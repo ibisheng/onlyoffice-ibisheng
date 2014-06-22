@@ -45,30 +45,32 @@ function SplineCommandBezier(x1, y1, x2, y2, x3, y3)
 function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
 {
 
-    this.pageIndex = pageIndex;
-    this.path = [];
+    ExecuteNoHistory(function(){
+        this.pageIndex = pageIndex;
+        this.path = [];
 
-    this.drawingObjects = drawingObjects;
+        this.drawingObjects = drawingObjects;
 
-    this.Matrix = new CMatrix();
-    this.TransformMatrix = new CMatrix();
+        this.Matrix = new CMatrix();
+        this.TransformMatrix = new CMatrix();
 
-    this.style  = CreateDefaultShapeStyle();
+        this.style  = CreateDefaultShapeStyle();
 
-    var style = this.style;
-    style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
-    var RGBA = style.fillRef.Color.RGBA;
-    var pen = theme.getLnStyle(style.lnRef.idx);
-    style.lnRef.Color.Calculate(theme, slide, layout, master);
-    RGBA = style.lnRef.Color.RGBA;
+        var style = this.style;
+        style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
+        var RGBA = style.fillRef.Color.RGBA;
+        var pen = theme.getLnStyle(style.lnRef.idx);
+        style.lnRef.Color.Calculate(theme, slide, layout, master);
+        RGBA = style.lnRef.Color.RGBA;
 
-    if(pen.Fill)
-    {
-        pen.Fill.calculate(theme, slide, layout, master, RGBA);
-    }
+        if(pen.Fill)
+        {
+            pen.Fill.calculate(theme, slide, layout, master, RGBA);
+        }
 
-    this.pen = pen;
-    this.splineForDraw = new SplineForDrawer(this);
+        this.pen = pen;
+        this.splineForDraw = new SplineForDrawer(this);
+    }, this, []);
     this.Draw = function(graphics)
     {
         graphics.SetIntegerGrid(false);

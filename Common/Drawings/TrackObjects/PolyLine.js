@@ -2,28 +2,33 @@
 
 function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 {
-    this.drawingObjects = drawingObjects;
-    this.arrPoint = [];
-    this.Matrix = new CMatrixL();
-    this.TransformMatrix = new CMatrixL();
 
-    this.pageIndex = pageIndex;
-    this.style  = CreateDefaultShapeStyle();
-    var style = this.style;
-    style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
-    var RGBA = style.fillRef.Color.RGBA;
-    var pen = theme.getLnStyle(style.lnRef.idx);
-    style.lnRef.Color.Calculate(theme, slide, layout, master);
-    RGBA = style.lnRef.Color.RGBA;
+    ExecuteNoHistory(function(){
 
-    if(pen.Fill)
-    {
-        pen.Fill.calculate(theme, slide, layout, master, RGBA);
-    }
+        this.drawingObjects = drawingObjects;
+        this.arrPoint = [];
+        this.Matrix = new CMatrixL();
+        this.TransformMatrix = new CMatrixL();
 
-    this.pen = pen;
+        this.pageIndex = pageIndex;
+        this.style  = CreateDefaultShapeStyle();
+        var style = this.style;
+        style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
+        var RGBA = style.fillRef.Color.RGBA;
+        var pen = theme.getLnStyle(style.lnRef.idx);
+        style.lnRef.Color.Calculate(theme, slide, layout, master);
+        RGBA = style.lnRef.Color.RGBA;
 
-    this.polylineForDrawer = new PolylineForDrawer(this);
+        if(pen.Fill)
+        {
+            pen.Fill.calculate(theme, slide, layout, master, RGBA);
+        }
+
+        this.pen = pen;
+
+        this.polylineForDrawer = new PolylineForDrawer(this);
+
+    }, this, []);
 
     this.Draw = function(graphics)
     {

@@ -12,6 +12,19 @@ CGroupShape.prototype.handleUpdateFill = function()
         this.spTree[i].handleUpdateFill();
     }
 };
+CGroupShape.prototype.recalcText = function()
+{
+    if(this.spTree)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].recalcText)
+            {
+                this.spTree[i].recalcText();
+            }
+        }
+    }
+};
 CGroupShape.prototype.handleUpdateLn = function()
 {
     for(var i = 0; i < this.spTree.length; ++i)

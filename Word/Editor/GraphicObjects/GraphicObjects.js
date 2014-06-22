@@ -203,12 +203,20 @@ CGraphicObjects.prototype =
             for(var i = 0; i < this.drawingObjects.length; ++i)
             {
                 if(this.drawingObjects[i].GraphicObj)
+                {
+                    if(this.drawingObjects[i].GraphicObj.recalcText)
+                    {
+                        this.drawingObjects[i].GraphicObj.recalcText();
+                    }
                     this.drawingObjects[i].GraphicObj.recalculate();
+                }
             }
             for(var i = 0; i < this.drawingObjects.length; ++i)
             {
                 if(this.drawingObjects[i].GraphicObj && this.drawingObjects[i].GraphicObj.recalculateText)
+                {
                     this.drawingObjects[i].GraphicObj.recalculateText();
+                }
             }
             this.zIndexManager.recalculate();
             //TODO

@@ -54,13 +54,16 @@ function hitToHandles(x, y, object)
     if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
         return 7;
 
-    var rotate_distance = object.convertPixToMM(TRACK_DISTANCE_ROTATE); ;
-    dist_y = t_y + rotate_distance;
-    sqr_y = dist_y * dist_y;
-    dist_x = t_x - hc;
-    sqr_x = dist_x * dist_x;
-    if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
-        return 8;
+    if(object.canRotate && object.canRotate())
+    {
+        var rotate_distance = object.convertPixToMM(TRACK_DISTANCE_ROTATE);
+        dist_y = t_y + rotate_distance;
+        sqr_y = dist_y * dist_y;
+        dist_x = t_x - hc;
+        sqr_x = dist_x * dist_x;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+            return 8;
+    }
 
     return -1;
 }
@@ -2069,6 +2072,7 @@ CShape.prototype =
         var parents = this.getParentObjects();
         if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef))
         {
+            compiled_style.fillRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
             RGBA = compiled_style.fillRef.Color.RGBA;
             this.brush = parents.theme.getFillStyle(compiled_style.fillRef.idx);
             if (isRealObject(this.brush))
@@ -2101,6 +2105,7 @@ CShape.prototype =
         var RGBA = { R: 0, G: 0, B: 0, A: 255 };
         var parents = this.getParentObjects();
         if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.lnRef)) {
+            compiled_style.lnRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
             RGBA = compiled_style.lnRef.Color.RGBA;
             this.pen = parents.theme.getLnStyle(compiled_style.lnRef.idx);
             if (isRealObject(this.pen)) {

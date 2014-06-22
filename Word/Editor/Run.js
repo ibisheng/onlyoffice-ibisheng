@@ -4364,7 +4364,14 @@ ParaRun.prototype =
             this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
         }
         else
+        {
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
+            if(this.Pr.Color && !this.Pr.Unifill)
+            {
+                TextPr.Unifill = undefined;
+            }
+        }
+
 
 
 

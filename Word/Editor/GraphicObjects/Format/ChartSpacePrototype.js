@@ -192,8 +192,18 @@ CChartSpace.prototype.recalculateChart = function()
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
+
+
+CChartSpace.prototype.recalcText = function()
+{
+    this.recalcInfo.recalculateAxisLabels = true;
+    this.recalcTitles2();
+    this.handleUpdateInternalChart();
+};
+
 CChartSpace.prototype.setStartPage = function(pageIndex)
 {
+    this.selectStartPage = pageIndex;
     var title, content;
     if(this.chart && this.chart.title)
     {
@@ -246,6 +256,10 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalcTitle = null;
             this.recalcInfo.bRecalculatedTitle = true;
         }
+        else
+        {
+
+        }
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
@@ -275,7 +289,7 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculateAxisTickMark)
         {
             this.recalculateAxisTickMark();
-            this.recalcInfo.recalculateAxisTickMark = true;
+            this.recalcInfo.recalculateAxisTickMark = false;
         }
         if(this.recalcInfo.recalculateDLbls)
         {
@@ -428,6 +442,10 @@ CChartSpace.prototype.recalculate = function()
 
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
+        if(isRealNumber(this.posX) && isRealNumber(this.posY))
+        {
+            this.updatePosition(this.posX, this.posY);
+        }
 
     }, this, []);
 };

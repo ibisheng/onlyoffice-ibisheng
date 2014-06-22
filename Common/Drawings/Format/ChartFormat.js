@@ -4867,7 +4867,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetMajorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_CatAxSetMinorGridlines:
@@ -4877,7 +4877,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetMinorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_CatAxSetNoMultiLvlLbl:
@@ -5026,7 +5026,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetMajorTickMark:
             {
-                this.majorTickMark = readObject(r);
+                this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -5044,7 +5044,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetMinorTickMark:
             {
-                this.minorTickMark = readObject(r);
+                this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -5986,7 +5986,7 @@ CDateAx.prototype =
             }
             case historyitem_DateAxMajorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_DateAxMajorTimeUnit:
@@ -6006,7 +6006,7 @@ CDateAx.prototype =
             }
             case historyitem_DateAxMinorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_DateAxMinorTimeUnit:
@@ -6150,7 +6150,7 @@ CDateAx.prototype =
             }
             case historyitem_DateAxMajorTickMark:
             {
-                this.majorTickMark = readObject(r);
+                this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -6186,7 +6186,7 @@ CDateAx.prototype =
             }
             case historyitem_DateAxMinorTickMark:
             {
-                this.minorTickMark = readObject(r);
+                this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -6937,7 +6937,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetMajorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_SerAxSetMinorGridlines:
@@ -6947,7 +6947,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetMinorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_SerAxSetNumFmt:
@@ -7068,7 +7068,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetMajorTickMark:
             {
-                this.majorTickMark = readObject(r);
+                this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -7086,7 +7086,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetMinorTickMark:
             {
-                this.minorTickMark = readObject(r);
+                this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -7926,7 +7926,7 @@ CValAx.prototype =
             }
             case historyitem_ValAxSetMajorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_ValAxSetMajorUnit:
@@ -7941,7 +7941,7 @@ CValAx.prototype =
             }
             case historyitem_ValAxSetMinorTickMark:
             {
-                writeObject(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_ValAxSetMinorUnit:
@@ -8071,7 +8071,7 @@ CValAx.prototype =
             }
             case historyitem_ValAxSetMajorTickMark:
             {
-                this.majorTickMark = readObject(r);
+                this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -8098,7 +8098,7 @@ CValAx.prototype =
             }
             case historyitem_ValAxSetMinorTickMark:
             {
-                this.minorTickMark = readObject(r);
+                this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateInternalChart();
@@ -15540,8 +15540,9 @@ CNumericPoint.prototype =
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumericPoint_SetVal, oldPr: this.val, newPr: pr});
-        this.val = pr;
+        var _pr = parseFloat(pr);
+        History.Add(this, {Type: historyitem_NumericPoint_SetVal, oldPr: this.val, newPr: _pr});
+        this.val = _pr;
     },
 
     Undo: function(data)
@@ -21784,12 +21785,12 @@ CTitle.prototype =
             if(this.recalcInfo.recalculateBrush)
             {
                 this.recalculateBrush();
-                this.recalcInfo.recalculateBrush = true;
+                this.recalcInfo.recalculateBrush = false;
             }
             if(this.recalcInfo.recalculatePen)
             {
                 this.recalculatePen();
-                this.recalcInfo.recalculatePen = true;
+                this.recalcInfo.recalculatePen = false;
             }
             if(this.recalcInfo.recalcStyle)
             {

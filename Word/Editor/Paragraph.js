@@ -12148,7 +12148,7 @@ Paragraph.prototype =
         CollaborativeEditing.Add_NewObject( this );
 
         this.bFromDocument = Reader.GetBool();
-        if(this.bFromDocument)
+        if(this.bFromDocument || (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument))
         {
             var DrawingDocument = editor.WordControl.m_oDrawingDocument;
             if ( undefined !== DrawingDocument && null !== DrawingDocument )

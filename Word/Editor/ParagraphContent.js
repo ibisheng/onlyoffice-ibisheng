@@ -4347,15 +4347,15 @@ ParaDrawing.prototype =
         }
 
         this.DocumentContent   = this.Parent.Parent;
-        this.GraphicObj.parent = this;
+        //this.GraphicObj.parent = this;
         
-        if ( this.GraphicObj.arrGraphicObjects )
-        {
-            var Count = this.GraphicObj.arrGraphicObjects.length;
-            for ( var Index = 0; Index < Count; Index++ )
-                this.GraphicObj.arrGraphicObjects[Index].parent = this;
-        }
-
+    //    if ( this.GraphicObj.arrGraphicObjects )
+    //    {
+    //        var Count = this.GraphicObj.arrGraphicObjects.length;
+    //        for ( var Index = 0; Index < Count; Index++ )
+    //            this.GraphicObj.arrGraphicObjects[Index].parent = this;
+    //    }
+    //
         var PageNum = ParaLayout.PageNum;
 
         var OtherFlowObjects = this.mainGraphicObjects.getAllFloatObjectsOnPage( PageNum, this.Parent.Parent );

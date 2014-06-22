@@ -13,85 +13,90 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.arrowsCount = 0;
     this.transform = new CMatrix();
     this.pageIndex = pageIndex;
-    var style;
-    if(presetGeom !== "textRect")
-        style = CreateDefaultShapeStyle();
-    else
-        style = CreateDefaultTextRectStyle();
-    var brush = theme.getFillStyle(style.fillRef.idx);
-    style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
-    var RGBA = style.fillRef.Color.RGBA;
-    if (style.fillRef.Color.color != null)
-    {
-        if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID))
+
+    ExecuteNoHistory(function(){
+        var style;
+        if(presetGeom !== "textRect")
+            style = CreateDefaultShapeStyle();
+        else
+            style = CreateDefaultTextRectStyle();
+        var brush = theme.getFillStyle(style.fillRef.idx);
+        style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
+        var RGBA = style.fillRef.Color.RGBA;
+        if (style.fillRef.Color.color != null)
         {
-            brush.fill.color = style.fillRef.Color.createDuplicate();
+            if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID))
+            {
+                brush.fill.color = style.fillRef.Color.createDuplicate();
+            }
         }
-    }
-    var pen = theme.getLnStyle(style.lnRef.idx);
-    style.lnRef.Color.Calculate(theme, slide, layout, master);
-    RGBA = style.lnRef.Color.RGBA;
+        var pen = theme.getLnStyle(style.lnRef.idx);
+        style.lnRef.Color.Calculate(theme, slide, layout, master);
+        RGBA = style.lnRef.Color.RGBA;
 
-    if(presetGeom === "textRect")
-    {
-        var ln, fill;
-        ln = new CLn();
-        ln.w = 6350;
-        ln.Fill = new CUniFill();
-        ln.Fill.fill = new CSolidFill();
-        ln.Fill.fill.color = new CUniColor();
-        ln.Fill.fill.color.color  = new CPrstColor();
-        ln.Fill.fill.color.color.id = "black";
-
-        fill = new CUniFill();
-        fill.fill = new CSolidFill();
-        fill.fill.color = new CUniColor();
-        fill.fill.color.color  = new CSchemeColor();
-        fill.fill.color.color.id = 12;
-        pen.merge(ln);
-        brush.merge(fill);
-    }
-    if(presetGeom.indexOf("WithArrow") > -1)
-    {
-        presetGeom = presetGeom.substr(0, presetGeom.length - 9);
-        this.presetGeom = presetGeom;
-        this.arrowsCount = 1;
-
-
-
-    }
-    if(presetGeom.indexOf("WithTwoArrows") > -1)
-    {
-        presetGeom = presetGeom.substr(0, presetGeom.length - 13);
-        this.presetGeom = presetGeom;
-        this.arrowsCount = 2;
-    }
-
-    if(this.arrowsCount > 0)
-    {
-        pen.setTailEnd(new EndArrow());
-        pen.tailEnd.setType(LineEndType.Arrow);
-        pen.tailEnd.setLen(LineEndSize.Mid);
-        if(this.arrowsCount === 2)
+        if(presetGeom === "textRect")
         {
-            pen.setHeadEnd(new EndArrow());
-            pen.headEnd.setType(LineEndType.Arrow);
-            pen.headEnd.setLen(LineEndSize.Mid);
+            var ln, fill;
+            ln = new CLn();
+            ln.w = 6350;
+            ln.Fill = new CUniFill();
+            ln.Fill.fill = new CSolidFill();
+            ln.Fill.fill.color = new CUniColor();
+            ln.Fill.fill.color.color  = new CPrstColor();
+            ln.Fill.fill.color.color.id = "black";
+
+            fill = new CUniFill();
+            fill.fill = new CSolidFill();
+            fill.fill.color = new CUniColor();
+            fill.fill.color.color  = new CSchemeColor();
+            fill.fill.color.color.id = 12;
+            pen.merge(ln);
+            brush.merge(fill);
         }
-    }
+        if(presetGeom.indexOf("WithArrow") > -1)
+        {
+            presetGeom = presetGeom.substr(0, presetGeom.length - 9);
+            this.presetGeom = presetGeom;
+            this.arrowsCount = 1;
 
-    var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
 
-    if(pen.Fill)
-    {
-        pen.Fill.calculate(theme, slide, layout, master, RGBA);
-    }
-    brush.calculate(theme, slide, layout, master, RGBA);
 
-    this.isLine = this.presetGeom === "line";
+        }
+        if(presetGeom.indexOf("WithTwoArrows") > -1)
+        {
+            presetGeom = presetGeom.substr(0, presetGeom.length - 13);
+            this.presetGeom = presetGeom;
+            this.arrowsCount = 2;
+        }
 
-    this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
-    this.shape = null;
+        if(this.arrowsCount > 0)
+        {
+            pen.setTailEnd(new EndArrow());
+            pen.tailEnd.setType(LineEndType.Arrow);
+            pen.tailEnd.setLen(LineEndSize.Mid);
+            if(this.arrowsCount === 2)
+            {
+                pen.setHeadEnd(new EndArrow());
+                pen.headEnd.setType(LineEndType.Arrow);
+                pen.headEnd.setLen(LineEndSize.Mid);
+            }
+        }
+
+        var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
+
+        if(pen.Fill)
+        {
+            pen.Fill.calculate(theme, slide, layout, master, RGBA);
+        }
+        brush.calculate(theme, slide, layout, master, RGBA);
+
+        this.isLine = this.presetGeom === "line";
+
+        this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
+        this.shape = null;
+
+    }, this, []);
+
     this.track = function(e, x, y)
     {
         var real_dist_x = x - this.startX;

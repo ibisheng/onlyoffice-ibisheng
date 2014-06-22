@@ -823,32 +823,13 @@ CShape.prototype.Is_TopDocument = function()
 {
     return false;
 };
-CShape.prototype.setStartPage = function(pageIndex)
+
+CShape.prototype.recalcText = function()
 {
-    this.selectStartPage = pageIndex;
-    if(this.getDocContent)
+    if(this.recalculateText && this.recalcTxBoxContent && this.recalculateText)
     {
-        var content = this.getDocContent();
-        if(content)
-        {
-            content.Set_StartPage(pageIndex);
-            if(this.recalculateText && this.recalcTxBoxContent && this.recalculateText)
-            {
-                this.recalcTxBoxContent();
-                this.recalcTransformText();
-                this.recalculateText();
-            }
-        }
-    }
-    if(this.spTree)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(this.spTree[i].setStartPage)
-            {
-                this.spTree[i].setStartPage(pageIndex);
-            }
-        }
+        this.recalcTxBoxContent();
+        this.recalcTransformText();
     }
 };
 

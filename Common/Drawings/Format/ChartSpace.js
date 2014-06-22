@@ -1170,8 +1170,8 @@ CChartSpace.prototype =
         if(this.chart && this.chart.title)
         {
             this.chart.title.recalcInfo.recalculateContent = true;
-            this.chart.title.recalcInfo.recalculateTransform = true;
-            this.chart.title.recalcInfo.recalculateTransformText = true;
+            this.chart.title.recalcInfo.recalcTransform = true;
+            this.chart.title.recalcInfo.recalcTransformText = true;
         }
         if(this.chart && this.chart.plotArea)
         {
@@ -1179,15 +1179,46 @@ CChartSpace.prototype =
             if(hor_axis && hor_axis.title)
             {
                 hor_axis.title.recalcInfo.recalculateContent = true;
-                hor_axis.title.recalcInfo.recalculateTransform = true;
-                hor_axis.title.recalcInfo.recalculateTransformText = true;
+                hor_axis.title.recalcInfo.recalcTransform = true;
+                hor_axis.title.recalcInfo.recalcTransformText = true;
             }
             var vert_axis = this.chart.plotArea.getVerticalAxis();
             if(vert_axis && vert_axis.title)
             {
                 vert_axis.title.recalcInfo.recalculateContent = true;
-                vert_axis.title.recalcInfo.recalculateTransform = true;
-                vert_axis.title.recalcInfo.recalculateTransformText = true;
+                vert_axis.title.recalcInfo.recalcTransform = true;
+                vert_axis.title.recalcInfo.recalcTransformText = true;
+            }
+        }
+    },
+
+
+    recalcTitles2: function()
+    {
+        if(this.chart && this.chart.title)
+        {
+            this.chart.title.recalcInfo.recalculateContent = true;
+            this.chart.title.recalcInfo.recalcTransform = true;
+            this.chart.title.recalcInfo.recalcTransformText = true;
+            this.chart.title.recalcInfo.recalculateTxBody = true;
+        }
+        if(this.chart && this.chart.plotArea)
+        {
+            var hor_axis = this.chart.plotArea.getHorizontalAxis();
+            if(hor_axis && hor_axis.title)
+            {
+                hor_axis.title.recalcInfo.recalculateContent = true;
+                hor_axis.title.recalcInfo.recalcTransform = true;
+                hor_axis.title.recalcInfo.recalcTransformText = true;
+                hor_axis.title.recalcInfo.recalculateTxBody = true;
+            }
+            var vert_axis = this.chart.plotArea.getVerticalAxis();
+            if(vert_axis && vert_axis.title)
+            {
+                vert_axis.title.recalcInfo.recalculateContent = true;
+                vert_axis.title.recalcInfo.recalcTransform = true;
+                vert_axis.title.recalcInfo.recalcTransformText = true;
+                vert_axis.title.recalcInfo.recalculateTxBody = true;
             }
         }
     },
@@ -7491,14 +7522,19 @@ CChartSpace.prototype =
                 || bounds.y + bounds.h < rect.y)
                 return;
         }
+
+
+
         var intGrid = graphics.GetIntegerGrid();
+        graphics.SaveGrState();
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
+        graphics.AddClipRect(0, 0, this.extX, this.extY);
 
         //graphics.AddClipRect(0, 0, this.extX, this.extY);
         this.chartObj.draw(this, graphics);
         graphics.reset();
-        graphics.SetIntegerGrid(intGrid);
+       // graphics.SetIntegerGrid(intGrid);
 
         if(this.chart)
         {
@@ -7545,6 +7581,7 @@ CChartSpace.prototype =
             }
         }
 
+        graphics.RestoreGrState();
        // graphics.reset();
     },
 
