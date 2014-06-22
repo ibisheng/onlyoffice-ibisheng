@@ -104,16 +104,11 @@ CChartSpace.prototype.handleUpdatePosition = function()
 };
 CChartSpace.prototype.handleUpdateExtents = function()
 {
-    this.recalcInfo.recalculateChart =  true;
-    this.recalcInfo.recalculateSeriesColors = true;
-    this.recalcInfo.recalculateDLbls = true;
-    this.recalcInfo.recalculateAxisLabels = true;
-    this.recalcInfo.dataLbls.length = 0;
-    this.recalcInfo.axisLabels.length = 0;
-    this.recalcInfo.recalculateAxisVal = true;
-    this.recalcInfo.recalculateLegend = true;
-    this.chartObj = null;
-    this.addToRecalculate();
+    this.recalcChart();
+    this.recalcBounds();
+    this.recalcTransform();
+    this.recalcTitles();
+    this.handleUpdateInternalChart();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
@@ -215,12 +210,7 @@ CChartSpace.prototype.recalculate = function()
 
         if(this.recalcInfo.recalcTitle)
         {
-            var pos_x, pos_y;
-            pos_x = this.recalcInfo.recalcTitle.x;
-            pos_y = this.recalcInfo.recalcTitle.y;
-            var pos_cx = pos_x +  this.recalcInfo.recalcTitle.extX/2;
-            this.recalculateAxisLabels();
-            this.recalcInfo.recalcTitle.setPosition(pos_cx - this.recalcInfo.recalcTitle.extX/2, pos_y);
+            this.recalculateChartTitleEditMode();
             this.recalcInfo.recalcTitle = null;
             this.recalcInfo.bRecalculatedTitle = true;
         }

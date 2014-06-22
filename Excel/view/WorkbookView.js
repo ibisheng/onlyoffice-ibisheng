@@ -603,8 +603,9 @@
 			}
 			var ws = this.getWorksheet(index);
 			ws.objectRender.controller.setSelectionState(state);
+            ws.objectRender.controller.updateOverlay();
             ws.objectRender.controller.updateSelectionState();
-			
+
 			// Селектим после выставления состояния
 			if (0 < ws.objectRender.controller.selectedObjects.length)
 				ws.setSelectionShape(true);
