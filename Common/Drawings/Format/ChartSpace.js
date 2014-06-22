@@ -237,6 +237,15 @@ CChartSpace.prototype =
     checkHitToBounds: CShape.prototype.checkHitToBounds,
 
 
+    recalculateTextPr: function()
+    {
+        if(this.txPr && this.txPr.content)
+        {
+            this.txPr.content.Reset(0, 0, 10, 10);
+            this.txPr.content.Recalculate_Page(0, true);
+        }
+    },
+
     getSelectionState: function()
     {
         var content_selection = null;

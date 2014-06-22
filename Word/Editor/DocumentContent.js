@@ -8498,6 +8498,7 @@ CDocumentContent.prototype =
         Writer.WriteString2( this.Parent.Get_Id() );
         Writer.WriteBool(this.TurnOffInnerWrap);
         Writer.WriteBool(this.Split);
+        writeBool(Writer, this.bPresentation);
 
         var Count = this.Content.length;
         Writer.WriteLong(Count);
@@ -8541,6 +8542,7 @@ CDocumentContent.prototype =
         LinkData.Parent         = Reader.GetString2();
         this.TurnOffInnerWrap   = Reader.GetBool();
         this.Split              = Reader.GetBool();
+        this.bPresentation      = readBool(Reader);
 
         var Count = Reader.GetLong();
         this.Content = [];

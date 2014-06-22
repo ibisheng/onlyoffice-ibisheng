@@ -244,8 +244,9 @@ function CTableId()
             case historyitem_type_WrapPolygon              : Element = new CWrapPolygon(); break;
             case historyitem_type_DateAx                   : Element = new CDateAx(); break;
             case historyitem_type_SerAx                    : Element = new CSerAx(); break;
-			
-			case historyitem_type_Math						: Element = new ParaMath(false); break;
+            case historyitem_type_Title                    : Element = new CTitle(); break;
+
+            case historyitem_type_Math						: Element = new ParaMath(false); break;
 			case historyitem_type_MathContent				: Element = new CMathContent(); break;			
 			case historyitem_type_acc						: Element = new CAccent(); break;
 			case historyitem_type_bar						: Element = new CBar(); break;

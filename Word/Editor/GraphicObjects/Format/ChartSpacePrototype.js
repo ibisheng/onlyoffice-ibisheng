@@ -88,7 +88,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateUpDownBars: true,
         recalculateLegend: true,
         recalculateWrapPolygon: true,
-        recalculatePenBrush: true
+        recalculatePenBrush: true,
+        recalculateTextPr: true
     };
     this.baseColors = [];
 
@@ -231,62 +232,6 @@ CChartSpace.prototype.createMoveTrack = CShape.prototype.createMoveTrack;
 CChartSpace.prototype.getAspect = CShape.prototype.getAspect;
 CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
 
-/*CChartSpace.prototype.draw = function(graphics)
-{
-
-    var intGrid = graphics.GetIntegerGrid();
-    graphics.SetIntegerGrid(false);
-    graphics.transform3(this.transform, false);
-
-    this.chartObj.draw(this, graphics);
-    graphics.reset();
-    graphics.SetIntegerGrid(intGrid);
-
-    if(this.chart)
-    {
-        if(this.chart.plotArea)
-        {
-            if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
-            {
-                var series = this.chart.plotArea.chart.series;
-                for(var i = 0; i < series.length; ++i)
-                {
-                    var ser = series[i];
-                    var pts = getPtsFromSeries(ser);
-                    for(var j = 0; j < pts.length; ++j)
-                    {
-                        if(pts[j].compiledDlb)
-                            pts[j].compiledDlb.draw(graphics);
-                    }
-                }
-            }
-            if(this.chart.plotArea.catAx)
-            {
-                if(this.chart.plotArea.catAx.title)
-                    this.chart.plotArea.catAx.title.draw(graphics);
-                if(this.chart.plotArea.catAx.labels)
-                    this.chart.plotArea.catAx.labels.draw(graphics);
-            }
-            if(this.chart.plotArea.valAx)
-            {
-                if(this.chart.plotArea.valAx.title)
-                    this.chart.plotArea.valAx.title.draw(graphics);
-                if(this.chart.plotArea.valAx.labels)
-                    this.chart.plotArea.valAx.labels.draw(graphics);
-            }
-
-        }
-        if(this.chart.title)
-        {
-            this.chart.title.draw(graphics);
-        }
-        if(this.chart.legend)
-        {
-            this.chart.legend.draw(graphics);
-        }
-    }
-
-};  */
 CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted)
@@ -463,6 +408,11 @@ CChartSpace.prototype.recalculate = function()
         {
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
             this.chart.legend.setPosition(pos.x, pos.y);
+        }
+        if(this.recalcInfo.recalculateTextPr)
+        {
+            this.recalculateTextPr();
+            this.recalcInfo.recalculateTextPr = false;
         }
 
         if(this.recalcInfo.recalculateBounds)

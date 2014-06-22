@@ -4822,7 +4822,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetAxId:
             {
-                writeString(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_CatAxSetAxPos:
@@ -4949,7 +4949,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetAxId:
             {
-                this.axId = readString(r);
+                this.axId = readLong(r);
                 break;
             }
             case historyitem_CatAxSetAxPos:
@@ -6902,7 +6902,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetAxId:
             {
-                writeString(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_SerAxSetAxPos:
@@ -7009,7 +7009,7 @@ CSerAx.prototype =
             }
             case historyitem_SerAxSetAxId:
             {
-                this.axId = readString(r);
+                this.axId = readLong(r);
                 break;
             }
             case historyitem_SerAxSetAxPos:
@@ -7881,7 +7881,7 @@ CValAx.prototype =
             }
             case historyitem_ValAxSetAxId:
             {
-                writeString(w, data.newPr);
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_ValAxSetAxPos:
@@ -7994,7 +7994,7 @@ CValAx.prototype =
             }
             case historyitem_ValAxSetAxId:
             {
-                this.axId = readString(r);
+                this.axId = readLong(r);
                 break;
             }
             case historyitem_ValAxSetAxPos:
@@ -10033,22 +10033,22 @@ CCat.prototype =
     },
     setNumLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: historyitem_Cat_SetNumLit, oldPr: this.multiLvlStrRef, newPr: pr});
         this.numLit = pr;
     },
     setNumRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: historyitem_Cat_SetNumRef, oldPr: this.multiLvlStrRef, newPr: pr});
         this.numRef = pr;
     },
     setStrLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: historyitem_Cat_SetStrLit, oldPr: this.multiLvlStrRef, newPr: pr});
         this.strLit = pr;
     },
     setStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: historyitem_Cat_SetStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
         this.strRef = pr;
     },
 
@@ -10245,7 +10245,7 @@ CChartText.prototype =
 
     Read_FromBinary2: function(r)
     {
-        this.Id = r.GetLong();
+        this.Id = r.GetString2();
     },
 
     setRich: function(pr)
@@ -15594,7 +15594,6 @@ CNumericPoint.prototype =
         switch (data.Type)
         {
             case historyitem_NumericPoint_SetFormatCode:
-            case historyitem_NumericPoint_SetVal:
             {
                 w.WriteBool(typeof data.newPr === "string");
                 if(typeof data.newPr === "string")
@@ -15611,6 +15610,11 @@ CNumericPoint.prototype =
                 {
                     w.WriteLong(data.newPr);
                 }
+                break;
+            }
+            case historyitem_NumericPoint_SetVal:
+            {
+                writeDouble(w, data.newPr);
                 break;
             }
         }
@@ -15647,14 +15651,7 @@ CNumericPoint.prototype =
             }
             case historyitem_NumericPoint_SetVal:
             {
-                if(r.GetBool())
-                {
-                    this.val = r.GetString2();
-                }
-                else
-                {
-                    this.val = null;
-                }
+                this.val = readDouble(r);
                 break;
             }
         }
@@ -22736,7 +22733,7 @@ CYVal.prototype =
 
     Read_FromBinary2: function(r)
     {
-        this.Id = r.GetLong();
+        this.Id = r.GetString2();
     },
 
     setNumLit: function(pr)

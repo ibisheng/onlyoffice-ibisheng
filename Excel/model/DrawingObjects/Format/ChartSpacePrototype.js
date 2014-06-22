@@ -59,7 +59,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateReferences: true,
         recalculateBBox: true,
         recalculateFormulas: true,
-        recalculatePenBrush: true
+        recalculatePenBrush: true,
+        recalculateTextPr : true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -399,6 +400,12 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateWrapPolygon();
             this.recalcInfo.recalculateWrapPolygon = false;
+        }
+
+        if(this.recalcInfo.recalculateTextPr)
+        {
+            this.recalculateTextPr();
+            this.recalcInfo.recalculateTextPr = false;
         }
 
         this.recalcInfo.axisLabels.length = 0;
