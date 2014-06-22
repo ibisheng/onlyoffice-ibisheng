@@ -1612,7 +1612,7 @@ BinaryChartWriter.prototype.WriteCT_SerAx = function (oVal) {
     }
     if (null != oVal.crossAx) {
         this.bs.WriteItem(c_oserct_seraxCROSSAX, function () {
-            oThis.WriteCT_UnsignedInt(oVal.crossAx);
+            oThis.WriteCT_UnsignedInt(oVal.crossAx.axId);
         });
     }
     if (null != oVal.crosses) {
@@ -1976,7 +1976,7 @@ BinaryChartWriter.prototype.WriteCT_DateAx = function (oVal) {
     }
     if (null != oVal.crossAx) {
         this.bs.WriteItem(c_oserct_dateaxCROSSAX, function () {
-            oThis.WriteCT_UnsignedInt(oVal.crossAx);
+            oThis.WriteCT_UnsignedInt(oVal.crossAx.axId);
         });
     }
     if (null != oVal.crosses) {
@@ -2133,7 +2133,7 @@ BinaryChartWriter.prototype.WriteCT_CatAx = function (oVal) {
     }
     if (null != oVal.crossAx) {
         this.bs.WriteItem(c_oserct_cataxCROSSAX, function () {
-            oThis.WriteCT_UnsignedInt(oVal.crossAx);
+            oThis.WriteCT_UnsignedInt(oVal.crossAx.axId);
         });
     }
     if (null != oVal.crosses) {
@@ -2335,7 +2335,7 @@ BinaryChartWriter.prototype.WriteCT_ValAx = function (oVal) {
     }
     if (null != oVal.crossAx) {
         this.bs.WriteItem(c_oserct_valaxCROSSAX, function () {
-            oThis.WriteCT_UnsignedInt(oVal.crossAx);
+            oThis.WriteCT_UnsignedInt(oVal.crossAx.axId);
         });
     }
     if (null != oVal.crosses) {
@@ -6210,8 +6210,11 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_UnsignedInt(t, l, oNewVal);
         });
+
         if (null != oNewVal.m_val)
-            val.setCrossAx(oNewVal.m_val);
+        {
+            val.crossAxId = oNewVal.m_val;
+        }
     }
     else if (c_oserct_seraxCROSSES === type) {
         var oNewVal = { m_val: null };
@@ -6670,8 +6673,11 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_UnsignedInt(t, l, oNewVal);
         });
+
         if (null != oNewVal.m_val)
-            val.setCrossAx(oNewVal.m_val);
+        {
+            val.crossAxId = oNewVal.m_val;
+        }
     }
     else if (c_oserct_dateaxCROSSES === type) {
         var oNewVal = { m_val: null };
@@ -6898,7 +6904,9 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
             return oThis.ReadCT_UnsignedInt(t, l, oNewVal);
         });
         if (null != oNewVal.m_val)
-            val.setCrossAx(oNewVal.m_val);
+        {
+            val.crossAxId = oNewVal.m_val;
+        }
     }
     else if (c_oserct_cataxCROSSES === type) {
         var oNewVal = { m_val: null };
@@ -7178,7 +7186,9 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
             return oThis.ReadCT_UnsignedInt(t, l, oNewVal);
         });
         if (null != oNewVal.m_val)
-            val.setCrossAx(oNewVal.m_val);
+        {
+            val.crossAxId = oNewVal.m_val;
+        }
     }
     else if (c_oserct_valaxCROSSES === type) {
         var oNewVal = { m_val: null };
@@ -10725,14 +10735,24 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         // выставляем axis в chart        
         // TODO: 1. Диаграмм может быть больше, но мы пока работаем только с одной
         // TODO: 2. Избавиться от oIdToAxisMap, aChartWithAxis, т.к. они здесь больше не нужны
-        var oZeroChart = oNewVal.charts[0];
-        if ( oZeroChart )
+      ///  var oZeroChart = oNewVal.charts[0];
+      ///  if ( oZeroChart )
+      ///  {
+      ///      var len = oNewVal.axId.length
+      ///      for ( var i = 0; i < len; i++ )
+      ///          oZeroChart.addAxId(oNewVal.axId[i]);
+      ///  }
+        for(var nAxIndex = 0; nAxIndex < oNewVal.axId.length; ++nAxIndex)
         {
-            var len = oNewVal.axId.length
-            for ( var i = 0; i < len; i++ )
-                oZeroChart.addAxId(oNewVal.axId[i]);
+            var oCurAxis = oNewVal.axId[nAxIndex];
+            oCurAxis.setCrossAx(oIdToAxisMap[oCurAxis.crossAxId]);
+            delete oCurAxis.crossAxId;
         }
-        
+        for(var nChartIndex = 0; nChartIndex < aChartWithAxis.length; ++nChartIndex)
+        {
+            var oCurChartWithAxis = aChartWithAxis[nChartIndex];
+            oCurChartWithAxis.chart.addAxId(oIdToAxisMap[oCurChartWithAxis.axisId]);
+        }
         val.setPlotArea(oNewVal);
     }
     else if (c_oserct_chartLEGEND === type) {

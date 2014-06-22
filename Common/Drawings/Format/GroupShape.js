@@ -985,7 +985,7 @@ CGroupShape.prototype =
         }
         else if(selection_state.chartSelection)
         {
-            this.selectObject(selection_state.chartSelection, selection_state.selectStartPage);
+            this.selectObject(selection_state.chartObject, selection_state.selectStartPage);
             this.selection.chartSelection = selection_state.chartObject;
             selection_state.chartObject.setSelectionState(selection_state.chartSelection);
         }
@@ -1838,22 +1838,6 @@ CGroupShape.prototype =
         this.nvGrpSpPr = pr;
     },
     recalculateLocalTransform: CShape.prototype.recalculateLocalTransform,
-
-    swapGraphicObject: function(idRemove, idAdd)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(this.spTree[i].Get_Id() === idRemove)
-            {
-                this.spTree.splice(i, 1)[0].setGroup(null);
-                var sp = g_oTableId.Get_ById(idAdd);
-                sp.setGroup(this);
-                this.spTree.splice(i, 0, sp);
-                History.Add(this, {Type:historyitem_AutoShapes_SwapGraphicObjects, pos: i, idRemove: idRemove, idAdd: idAdd});
-                break;
-            }
-        }
-    },
 
     bringToFront : function()//перемещаем заселекченые объекты наверх
     {

@@ -1,5 +1,8 @@
 "use strict";
 
+
+var GLOBAL_AX_ID_COUNTER = 1000;
+
 function findPrAndRemove(arr, pr)
 {
     for(var i = arr.length-1; i > -1; --i)
@@ -1814,6 +1817,7 @@ CPlotArea.prototype =
         for(i = 0; i < len; i++)
         {
             var oAxis = this.axId[i].createDuplicate();
+            oAxis.setAxId(++GLOBAL_AX_ID_COUNTER);
             c.addAxis(oAxis);
             
            // if ( oAxis instanceof CCatAx )
@@ -21464,6 +21468,12 @@ CSurfaceSeries.prototype =
         this.val = pr;
     }
 };
+
+
+function checkVerticalTitle(title)
+{
+    return false;
+}
 
 
 function CTitle()

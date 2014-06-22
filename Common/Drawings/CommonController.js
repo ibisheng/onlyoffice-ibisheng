@@ -11,6 +11,12 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 var global_canvas = null;
 
+
+function checkInternalSelection(selection)
+{
+    return !!(selection.groupSelection || selection.chartSelection || selection.textSelection);
+}
+
 function CheckLinePreset(preset)
 {
     return preset === "line";
@@ -333,14 +339,16 @@ DrawingObjectsController.prototype =
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             var selector = group ? group : this;
+            this.checkChartTextSelection();
             if(object.canMove())
             {
                 this.arrPreTrackObjects.length = 0;
                 var is_selected =  object.selected;
+                var b_check_internal = checkInternalSelection(selector.selection);
                 if(!(e.CtrlKey || e.ShiftKey) && !is_selected || b_is_inline || b_is_selected_inline)
                     selector.resetSelection();
                 selector.selectObject(object, pageIndex);
-                if(!is_selected)
+                if(!is_selected || b_check_internal)
                     this.updateOverlay();
                 this.checkSelectedObjectsForMove(group, pageIndex);
                 if(!isRealObject(group))
@@ -2691,15 +2699,15 @@ DrawingObjectsController.prototype =
         {
             text_object = this.selection.textSelection;
         }
-        else if(this.selection.groupSelection && this.selection.groupSelection.selection.textSelection)
+        else if(this.selection.groupSelection)
         {
             if(this.selection.groupSelection.selection.textSelection)
             {
                 text_object = this.selection.groupSelection.selection.textSelection;
             }
-            else if(this.selection.groupSelection.chartSelection && this.selection.groupSelection.chartSelection.textSelection)
+            else if(this.selection.groupSelection.selection.chartSelection && this.selection.groupSelection.selection.chartSelection.selection.textSelection)
             {
-                text_object = this.selection.groupSelection.chartSelection.textSelection;
+                text_object = this.selection.groupSelection.selection.chartSelection.selection.textSelection;
             }
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
@@ -3147,8 +3155,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 9 && false === isViewMode ) // Tab
         {
-            if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
-                || this.selection.chartSelection && this.selection.chartSelection.textSelection)
+            if(this.getTargetDocContent())
             {
                 this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaTab()])
             }
@@ -3159,10 +3166,9 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 13 && false === isViewMode ) // Enter
         {
-            if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
-                || this.selection.chartSelection && this.selection.chartSelection.textSelection)
+            if(this.getTargetDocContent())
             {
-                this.checkSelectedObjectsAndCallback(this.addNewParagraph, [])
+                this.checkSelectedObjectsAndCallback(this.addNewParagraph, []);
                 this.recalculate();
             }
             else
@@ -3527,9 +3533,9 @@ DrawingObjectsController.prototype =
         {
             chart_selection = this.selection.chartSelection;
         }
-        else if(this.selection.groupSelection && this.selection.groupSelection.chartSelection)
+        else if(this.selection.groupSelection && this.selection.groupSelection.selection.chartSelection)
         {
-            chart_selection = this.selection.groupSelection.chartSelection;
+            chart_selection = this.selection.groupSelection.selection.chartSelection;
         }
         if(chart_selection && chart_selection.selection.textSelection)
         {
