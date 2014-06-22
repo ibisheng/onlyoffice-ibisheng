@@ -297,15 +297,7 @@ CChartSpace.prototype.recalculate = function()
 
         if(this.recalcInfo.recalcTitle)
         {
-            var pos_x, pos_y;
-            pos_x = this.recalcInfo.recalcTitle.x;
-            pos_y = this.recalcInfo.recalcTitle.y;
-            var pos_cx = pos_x +  this.recalcInfo.recalcTitle.extX/2;
-            this.recalculateAxisLabels();
-            this.recalcInfo.recalcTitle.setPosition(pos_cx - this.recalcInfo.recalcTitle.extX/2, pos_y);
-            var posX = this.localTransform.tx + this.posX;
-            var posY = this.localTransform.ty + this.posY;
-            this.recalcInfo.recalcTitle.updatePosition(posX, posY);
+            this.recalculateChartTitleEditMode(true);
             this.recalcInfo.recalcTitle = null;
             this.recalcInfo.bRecalculatedTitle = true;
         }
@@ -609,14 +601,14 @@ CChartSpace.prototype.updateTransformMatrix  = function()
             if(this.chart.plotArea.catAx)
             {
                 if(this.chart.plotArea.catAx.title)
-                    this.chart.plotArea.catAx.title.updatePosition(posX, posY);
+                    this.chart.plotArea.catAx.title.updatePosition(this.posX, this.posY);
                 if(this.chart.plotArea.catAx.labels)
                     this.chart.plotArea.catAx.labels.updatePosition(posX, posY);
             }
             if(this.chart.plotArea.valAx)
             {
                 if(this.chart.plotArea.valAx.title)
-                    this.chart.plotArea.valAx.title.updatePosition(posX, posY);
+                    this.chart.plotArea.valAx.title.updatePosition(this.posX, this.posY);
                 if(this.chart.plotArea.valAx.labels)
                     this.chart.plotArea.valAx.labels.updatePosition(posX, posY);
             }
@@ -624,7 +616,7 @@ CChartSpace.prototype.updateTransformMatrix  = function()
         }
         if(this.chart.title)
         {
-            this.chart.title.updatePosition(posX, posY);
+            this.chart.title.updatePosition(this.posX, this.posY);
         }
         if(this.chart.legend)
         {

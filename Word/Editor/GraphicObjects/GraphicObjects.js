@@ -149,9 +149,9 @@ CGraphicObjects.prototype =
             ret.setBDeleted(false);
             ret.setStyle(2);
             ret.setSpPr(new CSpPr());
-            ret.spPr.setParent(Image);
+            ret.spPr.setParent(ret);
             ret.spPr.setXfrm(new CXfrm());
-            ret.spPr.xfrm.setParent(Image.spPr);
+            ret.spPr.xfrm.setParent(ret.spPr);
             ret.spPr.xfrm.setOffX(0);
             ret.spPr.xfrm.setOffY(0);
             ret.spPr.xfrm.setExtX(152);
@@ -576,6 +576,7 @@ CGraphicObjects.prototype =
                 if(parent_group.spTree[i] === this.selection.groupSelection.selectedObjects[0])
                 {
                     parent_group.removeFromSpTreeByPos(i);
+                    chart_space.setGroup(parent_group);
                     chart_space.spPr.xfrm.setOffX(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offX);
                     chart_space.spPr.xfrm.setOffY(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offY);
                     parent_group.addToSpTree(i, chart_space);
