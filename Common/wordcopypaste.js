@@ -2157,9 +2157,9 @@ function Editor_Paste_GetElem(api, bClean)
         pastebin.style.left = '0px';
 		
 		if(window.USER_AGENT_MACOS)
-			ElemToSelect.style.width = "10000px";
+			pastebin.style.width = "10000px";
 		else
-			ElemToSelect.style.width = "100px";
+			pastebin.style.width = "100px";
 		
         pastebin.style.height = '100px';
         pastebin.style.overflow = 'hidden';
