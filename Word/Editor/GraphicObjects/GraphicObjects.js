@@ -2075,7 +2075,7 @@ CGraphicObjects.prototype =
                                 {
                                     if(cur_group.group.spTree[j] === cur_group)
                                     {
-                                        cur_group.group.addToSpTreeToPos(j, sp);
+                                        cur_group.group.addToSpTree(j, sp);
                                         cur_group.group.removeFromSpTree(cur_group.Get_Id());
                                     }
                                 }

@@ -146,8 +146,7 @@ CGroupShape.prototype =
         if(!isRealNumber(pos))
             pos = this.spTree.length;
         History.Add(this, {Type: historyitem_GroupShapeAddToSpTree, pos: pos, item: item});
-        if(this.recalcBounds)
-            this.recalcBounds();
+        this.handleUpdateSpTree();
         this.spTree.splice(pos, 0, item);
     },
 
@@ -169,8 +168,7 @@ CGroupShape.prototype =
         {
             if(this.spTree[i].Get_Id() === id)
             {
-                if(this.recalcBounds)
-                    this.recalcBounds();
+                this.handleUpdateSpTree();
                 History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: i, item:this.spTree[i]});
                 return this.spTree.splice(i, 1)[0];
             }
@@ -182,6 +180,7 @@ CGroupShape.prototype =
     removeFromSpTreeByPos: function(pos)
     {
         History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: pos, item:this.spTree[pos]});
+        this.handleUpdateSpTree();
         return this.spTree.splice(pos, 1)[0];
     },
 

@@ -2796,7 +2796,7 @@ DrawingObjectsController.prototype =
                                 {
                                     if(cur_group.group.spTree[j] === cur_group)
                                     {
-                                        cur_group.group.addToSpTreeToPos(j, sp);
+                                        cur_group.group.addToSpTree(j, sp);
                                         cur_group.group.removeFromSpTree(cur_group.Get_Id());
                                     }
                                 }
@@ -2832,6 +2832,7 @@ DrawingObjectsController.prototype =
                             return;
                         }
                     }
+                    this.resetInternalSelection();
                 }
             }
             //else if(this.selection.chartSelection) TODO
@@ -3754,6 +3755,7 @@ DrawingObjectsController.prototype =
         xfrm.setChOffY(0);
         for(var i = 0; i < arrDrawings.length; ++i)
         {
+            CheckSpPrXfrm(arrDrawings[i]);
             arrDrawings[i].spPr.xfrm.setOffX(arrDrawings[i].x - min_x);
             arrDrawings[i].spPr.xfrm.setOffY(arrDrawings[i].y - min_y);
             arrDrawings[i].setGroup(group);
@@ -4206,6 +4208,7 @@ DrawingObjectsController.prototype =
             {
                 if(asc && asc["editor"])
                     this.drawingObjects.drawingDocument.InitGuiCanvasShape(asc["editor"].shapeElementId);
+                this.drawingObjects.drawingDocument.LastDrawingUrl = null;
                 this.drawingObjects.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
             }
             else

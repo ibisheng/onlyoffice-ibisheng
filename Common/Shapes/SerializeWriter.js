@@ -1754,7 +1754,8 @@ function CBinaryFileWriter()
 
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        oThis.WriteRecord1(1, rPr.Unifill, oThis.WriteUniFill);
+        if(rPr.Unifill)
+            oThis.WriteRecord1(1, rPr.Unifill, oThis.WriteUniFill);
 
         if (rPr.RFonts)
         {

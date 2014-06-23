@@ -3328,14 +3328,21 @@
 						{
 							aImagesSync.push(tempArr[n]);
 						}
-					};
-				};
-				
-				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
-				
-				ws.objectRender.showDrawingObjects(true);
+					}
+				}
+
+                ws.objectRender.showDrawingObjects(true);
                 ws.setSelectionShape(true);
-				History.EndTransaction();
+                History.EndTransaction();
+                if(aImagesSync.length > 0)
+                {
+                    window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
+                        function(){
+                            ws.objectRender.showDrawingObjects(true);
+                            ws.objectRender.controller.getGraphicObjectProps();
+                        });
+                }
+
 			},
 			
 			_insertImagesFromBinaryWord: function(ws, data)

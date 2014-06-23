@@ -514,7 +514,6 @@ asc_CChart.prototype = {
             }
             else if(_t.range.catHeadersBBox && _t.range.catHeadersBBox.c1 === data_bbox.c1 && _t.range.catHeadersBBox.c2 === data_bbox.c2 && _t.range.catHeadersBBox.r1 === _t.range.catHeadersBBox.r2)
             {
-
                 top_header_bbox = {r1: _t.range.catHeadersBBox.r1, c1: _t.range.catHeadersBBox.c1, r2: _t.range.catHeadersBBox.r1, c2: _t.range.catHeadersBBox.c2};
             }
 
