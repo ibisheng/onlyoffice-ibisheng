@@ -4311,7 +4311,7 @@
             var dDigitsCount = 0;
             var colWidth = 0;
             var cellType = c.getType();
-			fl.isNumberFormat = (!cellType || CellValueType.Number === cellType);
+			fl.isNumberFormat = (null === cellType || CellValueType.String !== cellType); // Автоподбор делается по любому типу (кроме строки)
             var numFormatStr = c.getNumFormatStr();
             var pad = this.width_padding * 2 + this.width_1px;
             var sstr, sfl, stm;
