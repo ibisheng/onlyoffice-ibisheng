@@ -5410,21 +5410,13 @@ function DrawingObjects() {
         if ( !settings )
         {
             settings = new asc_ChartSettings();
-            var range = null;
             var selectedRange = worksheet.getSelectedRange();
             if (selectedRange)
             {
                 var box = selectedRange.getBBox0();
                 settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
-                var startCell = new CellAddress(box.r1, box.c1, 0);
-                var endCell = new CellAddress(box.r2, box.c2, 0);
-                if (startCell && endCell)
-                {
-					range = parserHelp.get3DRef(worksheet.model.sName, startCell.getID() === endCell.getID() ?
-						startCell.getID() : startCell.getID() + ':' + endCell.getID());
-                }
             }
-            settings.putRange(range);
+            settings.putRange(worksheet.getSelectionRangeValue());
             settings.putStyle(2);
             settings.putType(c_oAscChartTypeSettings.lineNormal);
             settings.putTitle(c_oAscChartTitleShowSettings.none);
