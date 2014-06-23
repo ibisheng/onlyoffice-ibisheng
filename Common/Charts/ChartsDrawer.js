@@ -2642,7 +2642,7 @@ CChartsDrawer.prototype =
 		{
 			manualMin = chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling && chartProp.chart.plotArea.valAx.scaling.min !== null ? chartProp.chart.plotArea.valAx.scaling.min : null;
 			manualMax = chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling && chartProp.chart.plotArea.valAx.scaling.max !== null ? chartProp.chart.plotArea.valAx.scaling.max : null;
-		};
+		}
 		
 		if(this.calcProp.subType == 'stackedPer' && manualMin != null)
 			manualMin = manualMin * 100;
@@ -2676,7 +2676,7 @@ CChartsDrawer.prototype =
 				
 			firstStep = step;
 			step = step * firstDegree.numPow;
-		};
+		}
 		
 		if(isNaN(step) || step === 0)
 		{

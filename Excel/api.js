@@ -1591,10 +1591,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var oRecalcIndexColumns = null, oRecalcIndexRows = null;
 					for (; nIndex < nCount; ++nIndex) {
 						oElement = e[nIndex];
-						if ("string" === typeof oElement) {
+						if (!oElement.hasOwnProperty("type")) {
 							t.collaborativeEditing.addChanges(oElement);
 							bAddChanges = true;
-						} else if (false !== bSendEvent && "object" === typeof oElement) {
+						} else if (false !== bSendEvent) {
 							if ("0" === oElement["type"]) {
 								// Это мы получили recalcIndexColumns
 								oRecalcIndexColumns = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
