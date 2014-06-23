@@ -6,7 +6,11 @@ CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
 CChartSpace.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;
 CChartSpace.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
 
-CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
+CChartSpace.prototype.recalculateTransform = function()
+{
+    CShape.prototype.recalculateTransform.call(this);
+    this.localTransform.Reset();
+};
 CChartSpace.prototype.recalculateBounds = CShape.prototype.recalculateBounds;
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
 CChartSpace.prototype.hitToHandles = CShape.prototype.hitToHandles;
@@ -99,8 +103,8 @@ CChartSpace.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
     this.recalcBounds();
-    this.recalcDLbls();
-    this.setRecalculateInfo();
+  //  this.recalcDLbls();
+    //this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateExtents = function()
@@ -114,7 +118,7 @@ CChartSpace.prototype.handleUpdateExtents = function()
 CChartSpace.prototype.handleUpdateFlip = function()
 {
     this.recalcTransform();
-    this.setRecalculateInfo();
+    //this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateChart = function()
@@ -212,14 +216,17 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalcTitle)
         {
             this.recalculateChartTitleEditMode();
+            this.recalcInfo.recalcTitle.updatePosition(this.transform.tx, this.transform.ty);
             this.recalcInfo.recalcTitle = null;
             this.recalcInfo.bRecalculatedTitle = true;
         }
+        var b_transform = false;
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
             this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
+            b_transform = true;
         }
         if(this.recalcInfo.recalculateReferences)
         {
@@ -254,7 +261,7 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculateAxisTickMark)
         {
             this.recalculateAxisTickMark();
-            this.recalcInfo.recalculateAxisTickMark = true;
+            this.recalcInfo.recalculateAxisTickMark = false;
         }
         if(this.recalcInfo.recalculateDLbls)
         {
@@ -396,18 +403,16 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateBounds();
             this.recalcInfo.recalculateBounds = false;
         }
-        if(this.recalcInfo.recalculateWrapPolygon)
-        {
-            this.recalculateWrapPolygon();
-            this.recalcInfo.recalculateWrapPolygon = false;
-        }
 
         if(this.recalcInfo.recalculateTextPr)
         {
             this.recalculateTextPr();
             this.recalcInfo.recalculateTextPr = false;
         }
-
+       // if(b_transform)
+        {
+            this.updateChildLabelsTransform(this.transform.tx, this.transform.ty);
+        }
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
 
