@@ -2688,6 +2688,7 @@
                         for(var selDr = 0; selDr < oDrawingSelected.length; selDr++)
                         {
                             curDrawing = oDrawingSelected[selDr];
+							oDrawing = curDrawing.drawingBase;
                             this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing, curDrawing);});
                         }
                     }
