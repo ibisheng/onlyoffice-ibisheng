@@ -1668,7 +1668,8 @@ cTEXT.prototype.Calculate = function ( arg ) {
         arg0 = _tmp;
 
     var oFormat = oNumFormatCache.get( arg1.toString() );
-    var aText = oFormat.format( arg0.getValue(), arg0 instanceof cNumber ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null );
+    var a = g_oFormatParser.parse(arg0.getValue()+""), aText;
+    aText = oFormat.format( a ? a.value:arg0.getValue(), arg0 instanceof cNumber || a ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null );
     var text = "";
 
     for ( var i = 0, length = aText.length; i < length; ++i ) {
