@@ -812,8 +812,14 @@ DrawingContext.prototype = {
 			
 		var face = fm.m_pFont.m_pFace;
 		res.nat_scale = face.header.Units_Per_EM;
-		res.nat_y1 = face.header.yMax;
-		res.nat_y2 = face.header.yMin;
+
+		if (face.os2) {
+			res.nat_y1 = face.os2.usWinAscent;
+			res.nat_y2 = -face.os2.usWinDescent;
+		} else {
+			res.nat_y1 = face.header.yMax;
+			res.nat_y2 = face.header.yMin;
+		}
 		return res;
 	},
 
