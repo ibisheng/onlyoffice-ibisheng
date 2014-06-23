@@ -1148,10 +1148,10 @@ CDLbl.prototype =
 
         this.localTransform.Reset();
         global_MatrixTransformer.TranslateAppend(this.localTransform, this.calcX, this.calcY);
-        if (isRealObject(this.chart))
-        {
-            global_MatrixTransformer.MultiplyAppend(this.localTransform, this.chart.localTransform);
-        }
+      //  if (isRealObject(this.chart))
+      //  {
+      //      global_MatrixTransformer.MultiplyAppend(this.localTransform, this.chart.localTransform);
+      //  }
 
         this.transform = this.localTransform.CreateDublicate();
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
@@ -1160,10 +1160,10 @@ CDLbl.prototype =
 
         this.localTransformText = this.ownTransformText.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.localTransformText, this.calcX, this.calcY);
-        if (isRealObject(this.chart))
-        {
-            global_MatrixTransformer.MultiplyAppend(this.localTransformText, this.chart.localTransform);
-        }
+      //  if (isRealObject(this.chart))
+      //  {
+      //      global_MatrixTransformer.MultiplyAppend(this.localTransformText, this.chart.localTransform);
+      //  }
 
         this.transformText = this.localTransformText.CreateDublicate();
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
@@ -13075,8 +13075,8 @@ CLegend.prototype =
         this.y = y;
         this.localTransform.Reset();
         global_MatrixTransformer.TranslateAppend(this.localTransform, this.x, this.y);
-        if(this.chart)
-            global_MatrixTransformer.MultiplyAppend(this.localTransform, this.chart.localTransform);
+        //if(this.chart)
+        //    global_MatrixTransformer.MultiplyAppend(this.localTransform, this.chart.localTransform);
         this.transform = this.localTransform.CreateDublicate();
         var entry;
         for(var i = 0; i < this.calcEntryes.length; ++i)

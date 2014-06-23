@@ -3829,7 +3829,7 @@ CShape.prototype =
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.convertPixToMM(TRACK_DISTANCE_ROTATE)));
+            (this.canRotate && this.canRotate() && HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.convertPixToMM(TRACK_DISTANCE_ROTATE))));
     },
 
     canRotate: function () {

@@ -1492,10 +1492,11 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
             this.x = this.centerDistX*kw + this.parentTrack.extX*0.5 - this.extX*0.5;
             this.y = this.centerDistY*kh + this.parentTrack.extY*0.5 - this.extY*0.5;
 
-            if(this.geometry)
-            {
-                this.geometry.Recalculate(this.extX, this.extY);
-            }
+           //if(this.geometry)
+           //{
+           //    this.geometry.Recalculate(this.extX, this.extY);
+           //}
+            this.overlayObject.updateExtents(this.extX, this.extY);
             this.transform.Reset();
             var t = this.transform;
 

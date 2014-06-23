@@ -264,7 +264,7 @@ RotateState.prototype =
                     {
                         group.updateCoordinatesAfterInternalResize();
                     }
-                    drawingObjects.recalculate();
+                    //drawingObjects.recalculate();
                     var arr_x = [], arr_y = [], transform, min_x, min_y, drawing;
                     for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
                     {
@@ -274,12 +274,12 @@ RotateState.prototype =
                         transform = drawing.transform;
                         arr_x.push(transform.TransformPointX(0, 0));
                         arr_y.push(transform.TransformPointY(0, 0));
-                        arr_x.push(transform.TransformPointX(drawing.extX, 0));
-                        arr_y.push(transform.TransformPointY(drawing.extX, 0));
-                        arr_x.push(transform.TransformPointX(drawing.extX, drawing.extY));
-                        arr_y.push(transform.TransformPointY(drawing.extX, drawing.extY));
-                        arr_x.push(transform.TransformPointX(0, drawing.extY));
-                        arr_y.push(transform.TransformPointY(0, drawing.extY));
+                        arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, 0));
+                        arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, 0));
+                        arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
+                        arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
+                        arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
+                        arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
                         min_x = Math.min.apply(Math, arr_x);
                         min_y = Math.min.apply(Math, arr_y);
                         if(min_x < 0)
@@ -291,7 +291,6 @@ RotateState.prototype =
                             drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
                         }
                     }
-                    drawingObjects.startRecalculate();
                 }, []
             )
 

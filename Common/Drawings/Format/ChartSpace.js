@@ -1164,6 +1164,63 @@ CChartSpace.prototype =
         this.addToRecalculate();
     },
 
+    updateChildLabelsTransform: function(posX, posY)
+    {
+
+        if(this.localTransformText)
+        {
+            this.transformText = this.localTransformText.CreateDublicate();
+            global_MatrixTransformer.TranslateAppend(this.transformText, posX, posY);
+            this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
+        }
+
+        if(this.chart)
+        {
+            if(this.chart.plotArea)
+            {
+                if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+                {
+                    var series = this.chart.plotArea.chart.series;
+                    for(var i = 0; i < series.length; ++i)
+                    {
+                        var ser = series[i];
+                        var pts = getPtsFromSeries(ser);
+                        for(var j = 0; j < pts.length; ++j)
+                        {
+                            if(pts[j].compiledDlb)
+                            {
+                                pts[j].compiledDlb.updatePosition(posX, posY);
+                            }
+                        }
+                    }
+                }
+                if(this.chart.plotArea.catAx)
+                {
+                    if(this.chart.plotArea.catAx.title)
+                        this.chart.plotArea.catAx.title.updatePosition(posX, posY);
+                    if(this.chart.plotArea.catAx.labels)
+                        this.chart.plotArea.catAx.labels.updatePosition(posX, posY);
+                }
+                if(this.chart.plotArea.valAx)
+                {
+                    if(this.chart.plotArea.valAx.title)
+                        this.chart.plotArea.valAx.title.updatePosition(posX, posY);
+                    if(this.chart.plotArea.valAx.labels)
+                        this.chart.plotArea.valAx.labels.updatePosition(posX, posY);
+                }
+
+            }
+            if(this.chart.title)
+            {
+                this.chart.title.updatePosition(posX, posY);
+            }
+            if(this.chart.legend)
+            {
+                this.chart.legend.updatePosition(posX, posY);
+            }
+        }
+    },
+
 
     recalcTitles: function()
     {
@@ -3119,7 +3176,7 @@ CChartSpace.prototype =
 
                                     text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(text_transform, arr_x_points[i] - arr_labels[i].tx.rich.content.XLimit/2, top_line);
-                                    global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+                                   // global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
 
                                     local_text_transform = arr_labels[i].localTransformText;
@@ -3138,7 +3195,7 @@ CChartSpace.prototype =
                                     text_transform = arr_labels[i].transformText;
                                     text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(text_transform, arr_x_points[i] - arr_labels[i].tx.rich.content.XLimit/2, x_ax.labels.y + x_ax.labels.extY - vert_gap - arr_labels[i].tx.rich.content.Get_SummaryHeight());
-                                    global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+                                  //  global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
                                     local_text_transform = arr_labels[i].localTransformText;
                                     local_text_transform.Reset();
@@ -3163,7 +3220,7 @@ CChartSpace.prototype =
                                     text_transform = arr_labels[i].transformText;
                                     text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(text_transform, y_ax.labels.x + y_ax.labels.extX - hor_gap - arr_labels[i].tx.rich.content.XLimit, arr_y_points[i] - arr_labels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                    global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+                               //     global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
                                     local_text_transform = arr_labels[i].localTransformText;
                                     local_text_transform.Reset();
@@ -3181,7 +3238,7 @@ CChartSpace.prototype =
                                     text_transform = arr_labels[i].transformText;
                                     text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(text_transform, y_ax.labels.x + hor_gap, arr_y_points[i] - arr_labels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                    global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+                               //     global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
                                     local_text_transform = arr_labels[i].transformText;
                                     local_text_transform.Reset();
@@ -4069,7 +4126,7 @@ CChartSpace.prototype =
                                 transform_text = arr_labels[i].transformText;
                                 transform_text.Reset();
                                 global_MatrixTransformer.TranslateAppend(transform_text, val_ax.labels.x + val_ax.labels.extX - val_axis_labels_gap - arr_labels[i].tx.rich.content.XLimit, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                              //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                 local_text_transform = arr_labels[i].localTransformText;
                                 local_text_transform.Reset();
@@ -4087,7 +4144,7 @@ CChartSpace.prototype =
                                 transform_text = arr_labels[i].transformText;
                                 transform_text.Reset();
                                 global_MatrixTransformer.TranslateAppend(transform_text, left_line, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                              //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                 local_text_transform = arr_labels[i].localTransformText;
                                 local_text_transform.Reset();
@@ -4129,7 +4186,7 @@ CChartSpace.prototype =
                                         var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                         label_text_transform.Reset();
                                         global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + labels_offset);
-                                        global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
+                                     //   global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
 
                                         local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_text_transform.Reset();
@@ -4147,7 +4204,7 @@ CChartSpace.prototype =
                                         var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                         label_text_transform.Reset();
                                         global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight());
-                                        global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
+                                      //  global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
 
                                         local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_text_transform.Reset();
@@ -4864,7 +4921,7 @@ CChartSpace.prototype =
                                 var text_transform = val_ax.labels.arrLabels[i].transformText;
                                 text_transform.Reset();
                                 global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, y_pos);
-                                global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+                               // global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
                                 var local_transform_text = val_ax.labels.arrLabels[i].localTransformText;
                                 local_transform_text.Reset();
@@ -4878,7 +4935,7 @@ CChartSpace.prototype =
                                 var text_transform = val_ax.labels.arrLabels[i].transformText;
                                 text_transform.Reset();
                                 global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight());
-                                global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
+                            //    global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
 
                                 var local_transform_text = val_ax.labels.arrLabels[i].localTransformText;
@@ -4916,7 +4973,7 @@ CChartSpace.prototype =
                                         var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                         transform_text.Reset();
                                         global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                        global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                   //     global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                         local_transform_text = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_transform_text.Reset();
@@ -4937,7 +4994,7 @@ CChartSpace.prototype =
                                         var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                         transform_text.Reset();
                                         global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                        global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                      //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                         local_transform_text = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_transform_text.Reset();
@@ -4958,7 +5015,7 @@ CChartSpace.prototype =
                                         var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                         transform_text.Reset();
                                         global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                        global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                      //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                         local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_text_transform.Reset();
@@ -4994,7 +5051,7 @@ CChartSpace.prototype =
                                         var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                         transform_text.Reset();
                                         global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                        global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                     //   global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                         local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_text_transform.Reset();
@@ -5015,7 +5072,7 @@ CChartSpace.prototype =
                                         var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                         transform_text.Reset();
                                         global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                        global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                      //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                         local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_text_transform.Reset();
@@ -5035,7 +5092,7 @@ CChartSpace.prototype =
                                         var transform_text = cat_ax.labels.arrLabels[i].transformText;
                                         transform_text.Reset();
                                         global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.Get_SummaryHeight()/2);
-                                        global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
+                                      //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                                         local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
                                         local_text_transform.Reset();
@@ -7525,11 +7582,12 @@ CChartSpace.prototype =
 
 
 
+        var pix= 3*this.convertPixToMM(1);
         var intGrid = graphics.GetIntegerGrid();
         graphics.SaveGrState();
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
-        graphics.AddClipRect(0, 0, this.extX, this.extY);
+        graphics.AddClipRect(-pix, -pix, this.extX+pix, this.extY+pix);
 
         //graphics.AddClipRect(0, 0, this.extX, this.extY);
         this.chartObj.draw(this, graphics);

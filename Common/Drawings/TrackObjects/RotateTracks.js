@@ -23,7 +23,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
     {
         this.ext.cx = extX;
         this.ext.cy = extY;
-        this.geometry.Recalculate(extX, extY);
+        this.geometry && this.geometry.Recalculate(extX, extY);
     };
 
     this.updateTransformMatrix = function(transform)
