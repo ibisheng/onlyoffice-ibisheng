@@ -144,8 +144,6 @@ CChartSpace.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
     this.recalcBounds();
-    this.recalcDLbls();
-    this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateExtents = function()
@@ -538,59 +536,7 @@ CChartSpace.prototype.updateTransformMatrix  = function()
     this.transform = this.localTransform.CreateDublicate();
     global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
     this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-
-    if(this.localTransformText)
-    {
-        this.transformText = this.localTransformText.CreateDublicate();
-        global_MatrixTransformer.TranslateAppend(this.transformText, posX, posY);
-        this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
-    }
-
-    if(this.chart)
-    {
-        if(this.chart.plotArea)
-        {
-            if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
-            {
-                var series = this.chart.plotArea.chart.series;
-                for(var i = 0; i < series.length; ++i)
-                {
-                    var ser = series[i];
-                    var pts = getPtsFromSeries(ser);
-                    for(var j = 0; j < pts.length; ++j)
-                    {
-                        if(pts[j].compiledDlb)
-                        {
-                            pts[j].compiledDlb.updatePosition(posX, posY);
-                        }
-                    }
-                }
-            }
-            if(this.chart.plotArea.catAx)
-            {
-                if(this.chart.plotArea.catAx.title)
-                    this.chart.plotArea.catAx.title.updatePosition(this.posX, this.posY);
-                if(this.chart.plotArea.catAx.labels)
-                    this.chart.plotArea.catAx.labels.updatePosition(posX, posY);
-            }
-            if(this.chart.plotArea.valAx)
-            {
-                if(this.chart.plotArea.valAx.title)
-                    this.chart.plotArea.valAx.title.updatePosition(this.posX, this.posY);
-                if(this.chart.plotArea.valAx.labels)
-                    this.chart.plotArea.valAx.labels.updatePosition(posX, posY);
-            }
-
-        }
-        if(this.chart.title)
-        {
-            this.chart.title.updatePosition(this.posX, this.posY);
-        }
-        if(this.chart.legend)
-        {
-            this.chart.legend.updatePosition(this.posX, this.posY);
-        }
-    }
+    this.updateChildLabelsTransform(posX,posY);
     this.checkShapeChildTransform();
 };
 CChartSpace.prototype.getArrayWrapIntervals = CShape.prototype.getArrayWrapIntervals;
