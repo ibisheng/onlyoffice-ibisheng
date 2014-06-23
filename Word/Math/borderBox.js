@@ -568,11 +568,20 @@ function CBox(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BOX;
 
-    this.aln  = false;
+    this.Pr =
+    {
+        aln:        false,
+        opEmu:      false,
+        diff:       false,
+        noBreak:    false,
+        brk:        false
+    };
+
+    /*this.aln  = false;
     this.opEmu = false;
     this.diff = false;
     this.noBreak = false;
-    this.brk = false;
+    this.brk = false;*/
 
     CMathBase.call(this);
 
@@ -592,25 +601,25 @@ CBox.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.setContent();
 
-    if(this.opEmu)
+    if(this.Pr.opEmu)
         this.elements[0][0].decreaseArgSize();
 }
 CBox.prototype.setProperties = function(props)
 {
-    if(props.opEmu === true || props.opEmu === 1)
-        this.opEmu = true;
+    if(props.opEmu === true || props.opEmu === false)
+        this.Pr.opEmu = props.opEmu;
 
-    if(props.diff === true || props.diff === 1)
-        this.diff = true;
+    if(props.diff === true || props.diff === false)
+        this.Pr.diff = props.diff;
 
-    if(props.noBreak === true || props.noBreak === 1)
-        this.noBreak = true;
+    if(props.noBreak === true || props.noBreak === false)
+        this.Pr.noBreak = props.noBreak;
 
-    if(props.brk === true || props.brk === 1)
-        this.brk = true;
+    if(props.brk === true || props.brk === false)
+        this.Pr.brk = props.brk;
 
-    if(props.aln === true || props.aln === 1)
-        this.aln = true;
+    if(props.aln === true || props.aln === false)
+        this.Pr.aln = props.aln;
 
     this.setCtrPrp(props.ctrPrp);
 
@@ -630,16 +639,7 @@ CBox.prototype.getBase = function()
 }
 CBox.prototype.getPropsForWrite = function()
 {
-    var props =
-    {
-        aln:     this.aln,
-        opEmu:   this.opEmu,
-        diff:    this.diff,
-        noBreak: this.noBreak,
-        brk:     this.brk
-    };
-
-    return props;
+    return this.Pr;
 }
 CBox.prototype.Save_Changes = function(Data, Writer)
 {
@@ -857,7 +857,6 @@ CBar.prototype.Get_Id = function()
 function CPhantom(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
-    this.props = null;
     CMathBase.call(this);
 
     this.Pr =
@@ -921,7 +920,7 @@ CPhantom.prototype.fillMathComposition = function(props, contents /*array*/)
 }
 CPhantom.prototype.getPropsForWrite = function()
 {
-    return this.props;
+    return this.Pr;
 }
 CPhantom.prototype.Save_Changes = function(Data, Writer)
 {

@@ -8,8 +8,6 @@ function CMathMatrix(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_MATRIX;
 
-    this.gaps = null;
-
     this.Pr =
     {
         cGp:        0,
@@ -24,26 +22,11 @@ function CMathMatrix(props)
         plcHide:    false
     };
 
-    this.spaceRow =
-    {
-        rule: 0,
-        gap: 0,
-        minGap: 13/12    // em
-                         // 780 /20 (pt) for font 36 pt
-                         // minGap: 0
-    };
-    this.spaceColumn =
-    {
-        rule: 0,
-        gap: 0,
-        minGap: 0       // minGap / 20 pt
-    };
+    this.spaceRow    = null;
+    this.spaceColumn = null;
+    this.gaps        = null;
 
-    this.gaps =
-    {
-        row: [],
-        column: []
-    };
+    this.setDefaultSpace();
 
     ////  special for "read"  ////
     this.row = 0;
@@ -63,6 +46,29 @@ CMathMatrix.prototype.init = function(props)
 {
     this.setProperties(props);
     this.fillContent();
+}
+CMathMatrix.prototype.setDefaultSpace = function()
+{
+    this.spaceRow =
+    {
+        rule: 0,
+        gap: 0,
+        minGap: 13/12    // em
+        // 780 /20 (pt) for font 36 pt
+        // minGap: 0
+    };
+    this.spaceColumn =
+    {
+        rule: 0,
+        gap: 0,
+        minGap: 0       // minGap / 20 pt
+    };
+
+    this.gaps =
+    {
+        row: [],
+        column: []
+    };
 }
 CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
 {
@@ -591,49 +597,71 @@ function CEqArray(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_EQ_ARRAY;
 
-    this.maxDist = 0;
-    this.objDist = 0;
+    this.Pr =
+    {
+        /* only for CEqArray*/
+        maxDist:    0,
+        objDist:    0,
+        /**/
 
-    this.init_2(props);
+        cGp:        0,
+        cGpRule:    0,
+        cSp:        0,
+
+        rSp:        0,
+        rSpRule:    0,
+
+        mcJc:       new Array(),
+        baseJc:     BASEJC_CENTER,
+        plcHide:    false
+    };
+
+    this.spaceRow    = null;
+    this.spaceColumn = null;
+    this.gaps        = null;
+
+    this.setDefaultSpace();
+
+    ////  special for "read"  ////
+    this.column = 0;
+    ////
+
+    //CMathMatrix.call(this);
+    // Делаем так, чтобы лишный Id в историю не записался
+    CMathMatrix.superclass.constructor.call(this);
+
+    if(props !== null && typeof(props) !== "undefined")
+        this.init(props);
+
 	g_oTableId.Add( this, this.Id );
 }
 extend(CEqArray, CMathMatrix);
-CEqArray.prototype.init_2 = function(props)
+CEqArray.prototype.init = function(props)
 {
+    this.setProperties(props);
+    this.fillContent();
+}
+CEqArray.prototype.setProperties = function(props)
+{
+    if(props.maxDist !== "undefined" && props.maxDist !== null)
+        this.Pr.maxDist = props.maxDist;
+
+    if(props.objDist !== "undefined" && props.objDist !== null)
+        this.Pr.objDist = props.objDist;
+
     var Pr =
     {
         column:     1,
         row:        props.row,
-        baseJc:     BASEJC_CENTER,
-        rSpRule:    0,
-        rSp:        0,
-        maxDist:    0,
-        objDist:    0,
-        ctrPrp:     new CTextPr()
+        baseJc:     props.baseJc,
 
-    }; // default
+        rSpRule:    props.rSpRule,
+        rSp:        props.rSp,
+        ctrPrp:     props.ctrPrp
 
+    };
 
-    if(props.rSpRule !== "undefined" && props.rSpRule !== null)
-        Pr.rSpRule = props.rSpRule;
-
-    if(props.rSp !== "undefined" && props.rSp !== null)
-        Pr.rSp = props.rSp;
-
-    if(props.baseJc !== "undefined" && props.baseJc !== null)
-        Pr.baseJc = props.baseJc;
-
-    if(props.maxDist !== "undefined" && props.maxDist !== null)
-        this.maxDist = props.maxDist;
-
-    if(props.objDist !== "undefined" && props.objDist !== null)
-        this.objDist = props.objDist;
-
-    if(props.ctrPrp !== "undefined" && props.ctrPrp !== null)
-        Pr.ctrPrp = props.ctrPrp;
-
-
-    CEqArray.superclass.constructor.call(this, Pr);
+    CEqArray.superclass.setProperties.call(this, Pr);
 }
 CEqArray.prototype.getElement = function(num)
 {
@@ -649,17 +677,7 @@ CEqArray.prototype.fillMathComposition = function(props, contents /*array*/)
 }
 CEqArray.prototype.getPropsForWrite = function()
 {
-    var props = {};
-
-    props.row     = this.nRow;
-    props.baseJc  = this.baseJc;
-
-    props.rSpRule = this.spaceRow.rule;
-    props.rSp     = this.spaceRow.gap;
-    props.maxDist = this.maxDist;
-    props.objDist = this.objDist;
-
-    return props;
+    return this.Pr;
 }
 CEqArray.prototype.Save_Changes = function(Data, Writer)
 {

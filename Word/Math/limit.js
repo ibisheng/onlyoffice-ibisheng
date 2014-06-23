@@ -198,8 +198,7 @@ CMathFunc.prototype.fillMathComposition = function(props, contents /*array*/)
 }
 CMathFunc.prototype.getPropsForWrite = function()
 {
-    var props = {};
-    return props;
+    return this.Pr;
 }
 CMathFunc.prototype.Save_Changes = function(Data, Writer)
 {

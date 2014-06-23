@@ -2955,7 +2955,7 @@ COperator.prototype.getProps = function(props, defaultProps)
     this.defaultType = defaultProps.type;
 
     var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
-        bNotType = typeof(props.type)=="undefined" ||  props.type == null,
+        bNotType = typeof(props.type) == "undefined" ||  props.type == null,
         bStr = typeof(chr) === "string",
         bEmptyStr = bStr && chr.length == 0,
         bCode = typeof(chr) === "string" && chr.length > 0;
@@ -3905,16 +3905,15 @@ CDelimiter.prototype.getBase = function(numb)
 }
 CDelimiter.prototype.getPropsForWrite = function()
 {
-    var props = {};
-
-    props.grow = this.grow == true ? 1 : 0;
-    props.column = this.nCol;
-
-    props.shp = this.shape;
-
-    props.begChr = this.begOper.getChr(); // default: PARENTHESIS_LEFT
-    props.endChr = this.endOper.getChr(); // default: PARENTHESIS_RIGHT
-    props.sepChr = this.sepOper.getChr(); // default: DELIMITER_LINE
+    var props =
+    {
+        grow:       this.Pr.grow,
+        column:     this.nCol,
+        shp:        this.Pr.shp,
+        begChr:     this.begOper.getChr(), // default: PARENTHESIS_LEFT
+        endChr:     this.endOper.getChr(), // default: PARENTHESIS_RIGHT
+        sepChr:     this.sepOper.getChr()  // default: DELIMITER_LINE
+    };
 
     return props;
 }

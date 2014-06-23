@@ -450,10 +450,10 @@ CDegree.prototype.IsPlhIterator = function()
 }
 CDegree.prototype.setProperties = function(props)
 {
-    if(props.type === DEGREE_SUPERSCRIPT)
+    if(props.type === DEGREE_SUPERSCRIPT || props.type === DEGREE_SUBSCRIPT)
         this.Pr.type = DEGREE_SUPERSCRIPT;
-    else if(props.type === DEGREE_SUBSCRIPT)
-        this.Pr.type = DEGREE_SUBSCRIPT;
+    else
+        this.Pr.type = DEGREE_SUPERSCRIPT;
 
     this.setCtrPrp(props.ctrPrp);
 

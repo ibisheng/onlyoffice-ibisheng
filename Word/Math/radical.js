@@ -1355,12 +1355,7 @@ CRadical.prototype.getDegree = function()
 }
 CRadical.prototype.getPropsForWrite = function()
 {
-    var props =
-    {
-        degHide:    this.Pr.degHide
-    };
-
-    return props;
+    return this.Pr;
 }
 CRadical.prototype.Save_Changes = function(Data, Writer)
 {

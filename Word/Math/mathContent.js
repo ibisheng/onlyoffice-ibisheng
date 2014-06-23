@@ -888,8 +888,8 @@ CMathContent.prototype =
 
             for(var i = 0; i < this.content.length; i++)
             {
-                if(this.content[i].value.typeObj == MATH_COMP)
-                    this.content[i].value.setArgSize(argSize);
+                if(this.content[i].typeObj == MATH_COMP)
+                    this.content[i].setArgSize(argSize);
             }
         }
     },
@@ -5053,7 +5053,6 @@ CMathContent.prototype =
             this.Parent = Parent;
         }
 		if (!this.bRoot && this.content.length == 0)
-			if (!this.degHide)
 				this.fillPlaceholders();
 
         var lng = this.content.length;
