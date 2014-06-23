@@ -5869,6 +5869,10 @@ CMathContent.prototype =
                 this.content[i].Recalculate_Reset(StartRange, StartLine);
         }
     },
+    GetParent: function()
+    {
+        return this.Parent.GetParent();
+    },
 
 
     // Поиск позиции, селект
@@ -6020,6 +6024,14 @@ CMathContent.prototype =
         }
 
         return result;
+    },
+    SelectToParent : function()
+    {
+        this.bSelectionUse = true;
+
+        if(!this.bRoot)
+            this.Parent.SelectToParent();
+
     },
 
     ///////////////////////
@@ -6369,7 +6381,6 @@ CMathContent.prototype =
         var result = false;
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
 
-        var bUseContent = UseContentPos;
 
         while(CurPos >= 0 && SearchPos.Found == false)
         {
@@ -6384,7 +6395,13 @@ CMathContent.prototype =
             }
             else if(curType == MATH_COMP)
             {
-                this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, bUseContent, EndRun);
+                var bNotshift     = SearchPos.ForSelection == false,
+                    bShiftCurrObj = (SearchPos.ForSelection == true && this.SelectStartPos == CurPos);
+
+                //console.log("Get_LeftPos : CurPos " + CurPos + " SelectStartPos " + this.SelectStartPos);
+
+                if( bNotshift || bShiftCurrObj )
+                    this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos, EndRun);
             }
             else if(EndRun)
             {
@@ -6393,7 +6410,7 @@ CMathContent.prototype =
             }
             else
             {
-                this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, bUseContent);
+                this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
             }
 
             SearchPos.Pos.Update(CurPos, Depth);
@@ -6405,7 +6422,7 @@ CMathContent.prototype =
                 EndRun = true;
 
             CurPos--;
-            bUseContent = false;
+            UseContentPos = false;
         }
 
         result = SearchPos.Found;
@@ -6435,7 +6452,13 @@ CMathContent.prototype =
             }
             else if(curType == MATH_COMP)
             {
-                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd, BegRun);
+                var bNotshift     = SearchPos.ForSelection == false,
+                    bShiftCurrObj = SearchPos.ForSelection == true && this.SelectStartPos == CurPos;
+
+                //console.log("Get_RightPos : CurPos " + CurPos + " SelectStartPos " + this.SelectStartPos);
+
+                if( bNotshift || bShiftCurrObj )
+                    this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd, BegRun);
             }
             else if(BegRun)
             {
@@ -6710,7 +6733,7 @@ CMathContent.prototype =
                 this.content[this.CurPos + 1].SetSelectAll();
             }
         }
-        else if(this.content[this.CurPos].typeObj == MATH_COMP )
+        else if(this.content[this.CurPos].typeObj == MATH_COMP)
         {
             if(this.content[this.CurPos].IsCurrentPlh())
             {

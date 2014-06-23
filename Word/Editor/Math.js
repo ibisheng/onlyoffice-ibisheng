@@ -94,10 +94,12 @@ ParaMath.prototype =
         {
             var result = this.GetSelectContent();
             NewMath.Root = result.Content.Copy(Selected);
+            NewMath.Root.bRoot = true;
         }
         else
         {
             NewMath.Root = this.Root.Copy(Selected);
+            NewMath.Root.bRoot = true;
         }
 
         /// argSize, bDot и bRoot выставить на объединении контентов
@@ -223,6 +225,14 @@ ParaMath.prototype =
     Remove : function(Direction, bOnAddText)
     {
 		var oContent = this.GetSelectContent();
+
+        /*var Comp = oContent.Content.GetParent();
+        Comp.SetSelectAll();
+        Comp.SelectToParent();
+
+        this.bSelectionUse = true;*/
+
+
 		if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
@@ -445,7 +455,6 @@ ParaMath.prototype =
 
         this.Root.Resize(null, this, g_oTextMeasurer, TextPr);
 
-        BFIRST = false;
 
         var pos = new CMathPosition();
         pos.x = 0;
@@ -1149,6 +1158,8 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Cursor_MoveToStartPos
 
+        //console.log("Cursor_MoveToStartPos");
+
         this.Root.Cursor_MoveToStartPos();
     },
 
@@ -1296,14 +1307,38 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_LeftPos
 
-        return this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
+        var result = this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
+
+        /*var str = "";
+
+        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+        {
+            str += SearchPos.Pos.Data[i] + "  ";
+        }
+
+        console.log(str);*/
+
+        BFIRST = false;
+
+        return result;
     },
 
     Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
     {
         // TODO: ParaMath.Get_RightPos
 
-        return this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
+        var result = this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
+
+        var str = "";
+
+        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+        {
+            str += SearchPos.Pos.Data[i] + "  ";
+        }
+
+        console.log(str);
+
+        return result;
     },
 
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
@@ -1351,7 +1386,17 @@ ParaMath.prototype =
     Get_StartPos : function(ContentPos, Depth)
     {
         // TODO: ParaMath.Get_StartPos
+
         this.Root.Get_StartPos(ContentPos, Depth);
+
+        /*var str = "";
+
+        for(var i = 0 ; i < ContentPos.Data.length; i++)
+        {
+
+        }*/
+
+        //console.log("Get_StartPos");
     },
 
     Get_EndPos : function(BehindEnd, ContentPos, Depth)
@@ -1365,6 +1410,8 @@ ParaMath.prototype =
     Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
         // TODO: ParaMath.Set_SelectionContentPos
+
+        //console.log(" Set_SelectionContentPos " );
 
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
         this.bSelectionUse = true;

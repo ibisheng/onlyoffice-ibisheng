@@ -1015,10 +1015,6 @@ CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.RecalcInfo.bCtrPrp = false;
     }
 
-    //var base, degr;
-    var shTop,
-        height, width, ascent;
-
     if(this.RecalcInfo.bProps)
     {
         if(this.Pr.degHide == true)
@@ -1064,7 +1060,8 @@ CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.Iterator.Resize(this, ParaMath, oMeasure);
         this.RealBase.Resize(this, ParaMath, oMeasure);
     }
-
+    var shTop,
+        height, width, ascent;
 
     this.signRadical.recalculateSize(oMeasure, this.RealBase.size);
 
