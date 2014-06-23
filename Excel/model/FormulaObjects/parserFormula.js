@@ -356,14 +356,8 @@ cString.prototype.tryConvert = function () {
 function cBool( val ) {
     cBaseType.call( this, val );
 
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.ca = false;
-    this.node = undefined;
-
     this.type = cElementType.bool;
-    var v = val.toString().toUpperCase();
-    this.value = v === "TRUE";
+    this.value = val.toString().toUpperCase() === "TRUE";
 }
 
 cBool.prototype = Object.create( cBaseType.prototype );
@@ -410,6 +404,8 @@ function cError( val ) {
         case "#NULL!":
         case cErrorType.null_value:
         {
+            this.value = "#NULL!";
+            this.errorType = cErrorType.null_value;
             break;
         }
         case "#DIV/0!":
@@ -660,24 +656,30 @@ cArea.prototype.foreach2 = function ( action ) {
             var val, cellType;
             if ( cell ) {
                 cellType = cell.getType();
-                if ( cellType === CellValueType.Number ) {
-                    cell.getValueWithoutFormat() === "" ? val = new cEmpty() : val = new cNumber( cell.getValueWithoutFormat() );
-                }
-                else if ( cellType === CellValueType.Bool ) {
-                    val = new cBool( cell.getValueWithoutFormat() );
-                }
-                else if ( cellType === CellValueType.Error ) {
-                    val = new cError( cell.getValueWithoutFormat() );
-                }
-                else if ( cellType === CellValueType.String ) {
-                    val = new cString( cell.getValueWithoutFormat() );
-                }
-                else {
-                    if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
-                        val = new cNumber( cell.getValueWithoutFormat() );
+                switch( cellType ){
+                    case CellValueType.Number:{
+                        cell.getValueWithoutFormat() === "" ? val = new cEmpty() : val = new cNumber( cell.getValueWithoutFormat() );
+                        break;
                     }
-                    else {
-                        val = checkTypeCell( "" + cell.getValueWithoutFormat() );
+                    case CellValueType.Bool:{
+                        val = new cBool( cell.getValueWithoutFormat() );
+                        break;
+                    }
+                    case CellValueType.Error:{
+                        val = new cError( cell.getValueWithoutFormat() );
+                        break;
+                    }
+                    case CellValueType.String:{
+                        val = new cString( cell.getValueWithoutFormat() );
+                        break;
+                    }
+                    default:{
+                        if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
+                            val = new cNumber( cell.getValueWithoutFormat() );
+                        }
+                        else {
+                            val = checkTypeCell( "" + cell.getValueWithoutFormat() );
+                        }
                     }
                 }
             }
@@ -1043,29 +1045,36 @@ cArea3D.prototype.foreach2 = function ( action ) {
                     var val;
                     if ( _cell ) {
                         var cellType = _cell.getType();
-                        if ( cellType === CellValueType.Number ) {
-                            if ( _cell.getValueWithoutFormat() === "" ) {
-                                val = new cEmpty();
+                        switch( cellType ){
+                            case CellValueType.Number:{
+                                if ( _cell.getValueWithoutFormat() === "" ) {
+                                    val = new cEmpty();
+                                }
+                                else {
+                                    val = new cNumber( _cell.getValueWithoutFormat() );
+                                }
+                                break;
                             }
-                            else {
-                                val = new cNumber( _cell.getValueWithoutFormat() );
+                            case CellValueType.Bool:{
+                                val = new cBool( _cell.getValueWithoutFormat() );
+                                break;
                             }
-                        }
-                        else if ( cellType === CellValueType.Bool ) {
-                            val = new cBool( _cell.getValueWithoutFormat() );
-                        }
-                        else if ( cellType === CellValueType.Error ) {
-                            val = new cError( _cell.getValueWithoutFormat() );
-                        }
-                        else if ( cellType === CellValueType.String ) {
-                            val = new cString( _cell.getValueWithoutFormat() );
-                        }
-                        else {
-                            if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
-                                val = new cNumber( _cell.getValueWithoutFormat() );
+                            case CellValueType.Error:{
+                                val = new cError( _cell.getValueWithoutFormat() );
+                                break;
                             }
-                            else {
-                                val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                            case CellValueType.String:{
+                                val = new cString( _cell.getValueWithoutFormat() );
+                                break;
+                            }
+                            default:{
+                                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
+                                    val = new cNumber( _cell.getValueWithoutFormat() );
+                                }
+                                else {
+                                    val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                                }
+                                break;
                             }
                         }
                     }
