@@ -1906,9 +1906,11 @@
 				var countChild = mainChildrens.length;
 				
                 //определяем размер квадрата вставки
-                var arrMax = [];
+                var arrMax = [], findTable;
                 for (n = 0;n < $(pasteFragment).find('table').length; ++n) {
-                    arrMax[n] = $($(pasteFragment).find('table')[n]).find('tr')[0].children.length;
+					findTable = $($(pasteFragment).find('table')[n]).find('tr');
+					if(findTable && findTable[0])
+						arrMax[n] = findTable[0].children.length;
                 }
                 if(arrMax.length != 0)
                 {
@@ -2017,9 +2019,12 @@
 						}
                         else if(tag.nodeName.toLowerCase() == 'table')
                         {
-                            var startNum = r + tableRowCount;
                             var tableBody = tag.getElementsByTagName('tbody')[0];
-                            var n = 0;
+							if(!tableBody)
+								continue;
+							
+							var startNum = r + tableRowCount;
+							var n = 0;
 							var arrCount = [];
                             var cellCount = 0;
 							for(var i = 0;i < tableBody.children.length;++i)
@@ -2473,7 +2478,7 @@
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
 							
-							this._endCopyOrPaste();
+							t._endCopyOrPaste();
 							t.element.style.MozUserSelect = "none";
 							
 							document.body.style.overflow = overflowBody;
