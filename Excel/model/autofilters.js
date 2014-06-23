@@ -1148,7 +1148,7 @@ var gUndoInsDelCellsFlag = true;
 					var x2 = button.x + width;
 					var y1 = button.y;
 					var y2 = button.y + height;
-					if (x >= x1 && x <= x2 && y >= y1 && y <= y2 && y1 >= offset.top && x1 >= offset.left) {
+					if (x >= x1 && x <= x2 && y >= y1 && y <= y2 /*&& y1 >= offset.top && x1 >= offset.left*/) {
 						return {id: i, target: c_oTargetType.FilterObject, col: -1, row: -1};
 					}
 				}
