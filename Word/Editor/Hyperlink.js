@@ -311,14 +311,14 @@ ParaHyperlink.prototype =
 
                     if ( this.State.Selection.EndPos >= Pos + Count )
                         this.State.Selection.EndPos -= Count;
-                    else if ( this.State.Selection.EndPos > Pos )
+                    else if ( this.State.Selection.EndPos >= Pos )
                         this.State.Selection.EndPos = Math.max( 0, Pos - 1 );
                 }
                 else
                 {
                     if ( this.State.Selection.StartPos >= Pos + Count )
                         this.State.Selection.StartPos -= Count;
-                    else if ( this.State.Selection.StartPos > Pos )
+                    else if ( this.State.Selection.StartPos >= Pos )
                         this.State.Selection.StartPos = Math.max( 0, Pos - 1 );
 
                     if ( this.State.Selection.EndPos > Pos + Count )
@@ -453,7 +453,7 @@ ParaHyperlink.prototype =
 
                 for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
                 {
-                    this.Remove_FromContent( EndPos, 1, true );
+                    this.Remove_FromContent( CurPos, 1, true );
                 }
 
                 this.Content[StartPos].Remove(Direction, bOnAddText);

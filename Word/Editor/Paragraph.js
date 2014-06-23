@@ -522,7 +522,7 @@ Paragraph.prototype =
         if ( this.Selection.StartPos > Pos )
             this.Selection.StartPos--;
 
-        if ( this.Selection.EndPos > Pos )
+        if ( this.Selection.EndPos >= Pos )
             this.Selection.EndPos--;
 
         if ( this.CurPos.ContentPos > Pos )
@@ -5893,7 +5893,8 @@ Paragraph.prototype =
     {
         // В данной функции мы корректируем содержимое параграфа:
         // 1. Спаренные пустые раны мы удаляем (удаляем 1 ран)
-        // 2. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
+        // 2. Удаляем пустые гиперссылки
+        // 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
 
         var StartPos = ( undefined === _StartPos ? 0 : Math.max( _StartPos - 1, 0 ) );
         var EndPos   = ( undefined === _EndPos ? this.Content.length - 1 : Math.min( _EndPos + 1, this.Content.length - 1 ) );
@@ -5902,8 +5903,13 @@ Paragraph.prototype =
         {
             var CurElement = this.Content[CurPos];
 
-            if ( para_Run !== CurElement.Type )
+            if ( para_Hyperlink === CurElement.Type && true === CurElement.Is_Empty() )
             {
+                this.Internal_Content_Remove( CurPos );
+                CurPos++;
+            }
+            else if ( para_Run !== CurElement.Type )
+            {                                
                 if ( CurPos === this.Content.length - 1 || para_Run !== this.Content[CurPos + 1].Type || CurPos === this.Content.length - 2 )
                 {
                     var NewRun = new ParaRun(this);
