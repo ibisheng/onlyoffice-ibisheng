@@ -2678,7 +2678,7 @@ CChartsDrawer.prototype =
 			step = step * firstDegree.numPow;
 		};
 		
-		if(isNaN(step))
+		if(isNaN(step) || step === 0)
 		{
 			if('HBar' == this.calcProp.type && this.calcProp.subType == 'stackedPer')
 				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1];
@@ -3638,7 +3638,7 @@ CChartsDrawer.prototype =
 		}
 		else if(0 != secPart[0])
 			numPow = Math.pow(10, secPart[0].toString().length - 1)
-		else if(0 == secPart[0])
+		else if(0 == secPart[0] && secPart[1] != undefined)
 		{
 			var tempMax = val;
 			var num = 0;
