@@ -198,7 +198,12 @@
 				// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
 				t.element.style.top = '-100px';
 				t.element.style.left = '0px';
-				t.element.style.width = '10000px';
+				
+				if(window.USER_AGENT_MACOS)
+					t.element.style.width = '100px';
+				else
+					t.element.style.width = '10000px';
+			
 				t.element.style.height = '100px';
 				t.element.style.overflow = 'hidden';
 				t.element.style.zIndex = -1000;
@@ -221,7 +226,11 @@
 					t.elementText.style.position = "absolute";
 					// Если сделать width маленьким, то параграф будет постоянно переноситься по span
 					// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
-					t.elementText.style.width = '10000px';
+					if(window.USER_AGENT_MACOS)
+						t.element.style.width = '100px';
+					else
+						t.element.style.width = '10000px';
+						
 					t.elementText.style.height = '100px';
 					t.elementText.style.left = '0px';
 					t.elementText.style.top = '-100px';
@@ -265,6 +274,8 @@
 				
 				if(text == false)
 					return;
+					
+				this._startCopyOrPaste();
 				//исключения для opera в случае копирования пустой html
 				if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && AscBrowser.isOpera)
 					$(text).find('td')[0].innerHTML = '&nbsp;';
@@ -333,15 +344,16 @@
 						
 						window.global_pptx_content_writer.End_UseFullUrl()
 					}
-				}
+				};
 							
-				
 				History.TurnOn();
 				
 				if(AscBrowser.isMozilla)
 					t._selectElement(t._getStylesSelect);
 				else
 					t._selectElement();
+				
+				this._endCopyOrPaste();
 			},
 			
 
@@ -462,6 +474,9 @@
 			//****paste cells ****
 			pasteRange: function (worksheet) {
 				var t = this;
+				
+				this._startCopyOrPaste();
+				
 				if(AscBrowser.isMozilla)
 					t._editorPaste(worksheet,t._getStylesSelect);
 				else
@@ -519,6 +534,9 @@
 			//****copy cell value****
 			copyCellValue: function (value) {
 				var t = this;
+				
+				t._startCopyOrPaste();
+				
 				if(activateLocalStorage || copyPasteUseBinary)
 					t._addValueToLocalStrg(value);
 				var nodes = t._makeNodesFromCellValue(value);
@@ -541,6 +559,8 @@
 					t._selectElement(t._getStylesSelect);
 				else
 					t._selectElement();
+					
+				this._endCopyOrPaste();
 			},
 			
 			copyCellValueButton: function (value) {
@@ -616,6 +636,9 @@
 			pasteAsText: function (callback) {
 				var t = this;
 				t.elementText.style.display = "block";
+				
+				t._startCopyOrPaste();
+				
 				t.elementText.value = '\xa0';
 				t.elementText.focus();
 				t.elementText.select();
@@ -652,6 +675,8 @@
 								callback(textInsert, []);
 							if(AscBrowser.isMozilla)
 								t._getStylesSelect();
+							
+							t._endCopyOrPaste();
 						},
 						_interval_time);
 			},
@@ -830,6 +855,8 @@
 					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
 					
+					t._endCopyOrPaste();
+					
 					pastebin.style.display  = ELEMENT_DISPAY_STYLE2;
 						
 					if(AscBrowser.isIE)
@@ -856,7 +883,12 @@
                     pastebin.style.position = 'absolute';
                     pastebin.style.top = '100px';
                     pastebin.style.left = '0px';
-                    pastebin.style.width = '10000px';
+					
+                    if(window.USER_AGENT_MACOS)
+						t.element.style.width = '100px';
+					else
+						t.element.style.width = '10000px';
+						
                     pastebin.style.height = '100px';
                     pastebin.style.overflow = 'hidden';
                     pastebin.style.zIndex = -1000;
@@ -1077,12 +1109,20 @@
 					ifr.style.position = 'absolute';
 					ifr.style.top = '-100px';
 					ifr.style.left = '0px';
-					ifr.style.width = '10000px';
+					
+					if(window.USER_AGENT_MACOS)
+						ifr.style.width = '100px';
+					else
+						ifr.style.width = '10000px';
+						
 					ifr.style.height = '100px';
 					ifr.style.overflow = 'hidden';
 					ifr.style.zIndex = -1000;
 					document.body.appendChild(ifr);
-				}
+				};
+				
+				this._startCopyOrPaste();
+				
 				ifr.style.display  = "block";
 				var frameWindow = window.frames["pasteFrame"];
 				if(frameWindow)
@@ -1110,6 +1150,9 @@
 						e.stopPropagation();
 						e.preventDefault();
 					}
+					
+					this._endCopyOrPaste();
+					
 					return false;
 				}
 			},
@@ -2389,6 +2432,8 @@
 				overflowBody = document.body.style.overflow;
 				document.body.style.overflow = 'hidden';
 				
+				this._startCopyOrPaste();
+				
 				if (window.getSelection) {// all browsers, except IE before version 9
 					selection = window.getSelection();
 					rangeToSelect = doc.createRange();
@@ -2428,6 +2473,7 @@
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
 							
+							this._endCopyOrPaste();
 							t.element.style.MozUserSelect = "none";
 							
 							document.body.style.overflow = overflowBody;
@@ -3411,6 +3457,30 @@
 
 				}
 				return bin;
+			},
+			
+			_startCopyOrPaste: function()
+			{
+				if(window.USER_AGENT_MACOS)
+				{
+					this.element.style.width = "10000px";
+					this.elementText.style.width = "10000px";
+					var ifr = document.getElementById("pasteFrame");
+					if(ifr)
+						ifr.style.width = "10000px";
+				};
+			},
+			
+			_endCopyOrPaste: function()
+			{
+				if(window.USER_AGENT_MACOS)
+				{
+					this.element.style.width = "100px";
+					this.elementText.style.width = "100px";
+					var ifr = document.getElementById("pasteFrame");
+					if(ifr)
+						ifr.style.width = "100px";
+				};
 			}
 
 		};
@@ -5286,7 +5356,12 @@ function Editor_CopyPaste_Create2(api)
 
     ElemToSelect.style.left = '0px';
     ElemToSelect.style.top = '100px';
-    ElemToSelect.style.width = '1000px';
+	
+	if(window.USER_AGENT_MACOS)
+		ElemToSelect.style.width = '1000px';
+	else
+		ElemToSelect.style.width = '10000px';
+		
     ElemToSelect.style.height = '100px';
     ElemToSelect.style.overflow = 'hidden';
     ElemToSelect.style.zIndex = -1000;
@@ -5341,7 +5416,11 @@ function Editor_CopyPaste_Create2(api)
 	elementText.id = kElementTextId;
 	elementText.style.position = "absolute";
 
-	elementText.style.width = '10000px';
+	if(window.USER_AGENT_MACOS)
+		ElemToSelect.style.width = '100px';
+	else
+		ElemToSelect.style.width = '10000px';
+		
 	elementText.style.height = '100px';
 	elementText.style.left = '0px';
 	elementText.style.top = '100px';

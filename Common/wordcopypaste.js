@@ -64,7 +64,12 @@ function Editor_Copy_GetElem(api)
         //style.left = 0px, ���� ������� ���������� ������ ������� ������� ����, �� ����� ������� ������ �������� �����, �� � ����������� ����(� iframe) ������� ������������� � ����� ������ ��� ����� ������� ������ ����������.
         ElemToSelect.style.left = '0px';
         ElemToSelect.style.top = '-100px';
-        ElemToSelect.style.width = '10000px';
+		
+		if(window.USER_AGENT_MACOS)
+			ElemToSelect.style.width = '100px';
+		else	
+			ElemToSelect.style.width = '10000px';
+			
         ElemToSelect.style.height = '100px';
         ElemToSelect.style.overflow = 'hidden';
         ElemToSelect.style.zIndex = -1000;
@@ -200,6 +205,9 @@ function Editor_Copy(api, bCut)
     //������� ������� ����� ����������� ����������
     var ElemToSelect = Editor_Copy_GetElem(api);
     ElemToSelect.style.display  = "block";
+	
+	if(window.USER_AGENT_MACOS)
+		ElemToSelect.style.width = "10000px";
 
     while ( ElemToSelect.hasChildNodes() )
         ElemToSelect.removeChild( ElemToSelect.lastChild );
@@ -210,6 +218,9 @@ function Editor_Copy(api, bCut)
     delete document.body.style["-o-user-select"];
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
+	
+	var overflowBody = document.body.style.overflow;
+	document.body.style.overflow = 'hidden';
 	
 	ElemToSelect.style.MozUserSelect = "all";
 	
@@ -286,6 +297,8 @@ function Editor_Copy(api, bCut)
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
 		
+		document.body.style.overflow = overflowBody;
+		
 		ElemToSelect.style.MozUserSelect = "none";
 
         if(true == bCut)
@@ -295,6 +308,10 @@ function Editor_Copy(api, bCut)
             api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
     }, time_interval);
+	
+	if(window.USER_AGENT_MACOS)
+		ElemToSelect.style.width = "100px";
+		
     /*
      if (e.dataTransfer)
      {
@@ -2138,7 +2155,12 @@ function Editor_Paste_GetElem(api, bClean)
 
         pastebin.style.top = '-100px';
         pastebin.style.left = '0px';
-        pastebin.style.width = '10000px';
+		
+		if(window.USER_AGENT_MACOS)
+			ElemToSelect.style.width = "10000px";
+		else
+			ElemToSelect.style.width = "100px";
+		
         pastebin.style.height = '100px';
         pastebin.style.overflow = 'hidden';
         pastebin.style.zIndex = -1000;
@@ -2292,11 +2314,19 @@ function Editor_Paste(api, bClean)
     delete document.body.style["-o-user-select"];
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
+	
+	var overflowBody = document.body.style.overflow;
+	document.body.style.overflow = 'hidden';
 
     var Text;
     var pastebin = Editor_Paste_GetElem(api, bClean);
     pastebin.style.display  = "block";
-    pastebin.focus();
+	
+	if(window.USER_AGENT_MACOS)
+		pastebin.style.width = "10000px";
+   
+	pastebin.focus();
+	
     // Safari requires a filler node inside the div to have the content pasted into it. (#4882)
     pastebin.appendChild( document.createTextNode( '\xa0' ) );
 
@@ -2349,6 +2379,8 @@ function Editor_Paste(api, bClean)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+		
+		document.body.style.overflow = overflowBody;
 
         if (!window.USER_AGENT_SAFARI_MACOS)
             pastebin.onpaste = null;
@@ -2361,6 +2393,9 @@ function Editor_Paste(api, bClean)
             pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 
         window.PasteEndTimerId = -1;
+		
+		if(window.USER_AGENT_MACOS)
+			pastebin.style.width = "100px";
     };
 
     var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
@@ -2404,7 +2439,12 @@ function Body_Paste(api, e)
                     ifr.style.position = 'absolute';
                     ifr.style.top = '-100px';
                     ifr.style.left = '0px';
-                    ifr.style.width = '10000px';
+					
+                    if(window.USER_AGENT_MACOS)
+						ifr.style.width = '100px';
+					else	
+						ifr.style.width = '10000px';
+						
                     ifr.style.height = '100px';
                     ifr.style.overflow = 'hidden';
                     ifr.style.zIndex = -1000;
@@ -6820,7 +6860,12 @@ function Editor_CopyPaste_Create(api)
 
     ElemToSelect.style.left = '0px';
     ElemToSelect.style.top = '-100px';
-    ElemToSelect.style.width = '10000px';
+    
+	if(window.USER_AGENT_MACOS)
+		ElemToSelect.style.width = '100px';
+	else	
+		ElemToSelect.style.width = '10000px';
+		
     ElemToSelect.style.height = '100px';
     ElemToSelect.style.overflow = 'hidden';
     ElemToSelect.style.zIndex = -1000;
