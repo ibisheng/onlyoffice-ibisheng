@@ -1872,8 +1872,8 @@
 			
 			_parseHtml: function(pasteFragment, node, worksheet, isText)
 			{
-				if(node.children && node.children.length === 0)
-					return false;
+				//if(node.children && node.children.length === 0)
+					//return false;
 				
 				var cellCountAll = [], rowSpanPlus = 0, tableRowCount = 0, l = 0, n = 0, s = 0, countEmptyRow = 0, rowCount = 0, arrTags = [], t = this, aResult = [];
 				var range = worksheet.activeRange.clone(true);
