@@ -213,7 +213,7 @@ Paragraph.prototype =
 
     Copy : function(Parent)
     {
-        var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0);
+        var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0, !this.bFromDocument);
 
         // Копируем настройки
         Para.Set_Pr(this.Pr.Copy());

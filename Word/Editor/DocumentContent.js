@@ -112,7 +112,7 @@ CDocumentContent.prototype =
 
     Copy : function(Parent)
     {
-        var DC = new CDocumentContent(Parent, this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap);
+        var DC = new CDocumentContent(Parent, this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap, this.bPresentation);
 
         // Копируем содержимое
         DC.Internal_Content_RemoveAll();

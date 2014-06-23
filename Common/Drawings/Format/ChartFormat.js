@@ -21556,7 +21556,7 @@ CTitle.prototype =
         }
         if(this.txPr)
         {
-            c.setTxPr(this.txPr.createDuplciate());
+            c.setTxPr(this.txPr.createDuplicate());
         }
         return c;
     },
