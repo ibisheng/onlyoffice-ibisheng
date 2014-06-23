@@ -7317,7 +7317,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.boMathr.ReadMathArg(t,l,oMathPara.Root);
 			});			
-			oMathPara.Root.SetRunEmptyToContent(true);
 		}
 		else if (c_oSerParType.Hyperlink == type) {
 		    var oHyperlinkObj = {Link: null, Anchor: null, Tooltip: null, History: null, DocLocation: null, TgtFrame: null};
@@ -8406,6 +8405,8 @@ function Binary_oMathReader(stream)
         }
         else
             res = c_oSerConstants.ReadUnknown;
+			
+		oElem.SetRunEmptyToContent(true);
         return res;
     };		
 	this.ReadMathArgPr = function(type, length, oElem)
@@ -8441,7 +8442,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.begChr = this.stream.GetString2LE(length);
+			props.begChr = this.stream.GetString2LE(length).charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -8729,7 +8730,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			var text = this.stream.GetString2LE(length);	 
+			var text = this.stream.GetString2LE(length).charCodeAt(0);	 
 			props.chr = text;
         }
 		else
@@ -8941,7 +8942,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.endChr = this.stream.GetString2LE(length);
+			props.endChr = this.stream.GetString2LE(length).charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -9752,7 +9753,6 @@ function Binary_oMathReader(stream)
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oOMathPara.Root);
             });
-			oOMathPara.Root.SetRunEmptyToContent(true);
         }
 		else if (c_oSer_OMathContentType.OMathParaPr === type)
 		{
@@ -9911,7 +9911,10 @@ function Binary_oMathReader(stream)
 			if (oDeg.content && length == 0 && props.degHide !== true)
 				oDeg.content.fillPlaceholders();
 			else if ( oDeg.content && length == 0 && props.degHide == true)
-				oDeg.content = null;
+			{
+				oDeg.content.degHide = true;
+				oDeg.content = null;				
+			}
 
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oDeg.content);
@@ -10005,7 +10008,7 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.sepChr = this.stream.GetString2LE(length);
+			props.sepChr = this.stream.GetString2LE(length).charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;

@@ -225,14 +225,6 @@ ParaMath.prototype =
     Remove : function(Direction, bOnAddText)
     {
 		var oContent = this.GetSelectContent();
-
-        /*var Comp = oContent.Content.GetParent();
-        Comp.SetSelectAll();
-        Comp.SelectToParent();
-
-        this.bSelectionUse = true;*/
-
-
 		if (oContent.Start == oContent.End)
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
@@ -240,7 +232,12 @@ ParaMath.prototype =
 			if (oElem.typeObj == MATH_COMP)
 				this.RemoveElem(oContent, Direction, bOnAddText);
 			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == false)
-				return;
+			{
+				var Comp = oContent.Content.GetParent();
+				Comp.SetSelectAll();
+				Comp.SelectToParent();
+				this.bSelectionUse = true;
+			}
 			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == true)
 			{
 				History.Create_NewPoint();
@@ -261,11 +258,74 @@ ParaMath.prototype =
 			}
 			else	//pararun
 			{
-				if ((Direction > 0 && oElem.State.ContentPos + 1 > oElem.Content.length) || (Direction < 0 && oElem.State.ContentPos - 1 < 0))
+				if (Direction < 0 && oElem.State.ContentPos - 1 < 0) //backspase
 				{
-					this.Set_Select_ToMComp(Direction);
-					return;
+					if (oContent.Content.CurPos - 1 >= 0)//слева есть элементы
+					{
+						var prevElem = oContent.Content.getElem(oContent.Start - 1);
+						if (prevElem.typeObj == MATH_COMP) //слева композиция
+						{
+							this.Set_Select_ToMComp(Direction);
+							return;
+						}
+						else //слева ран
+						{
+							History.Create_NewPoint();
+							prevElem.Remove(Direction, bOnAddText);
+							
+							if(prevElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
+							{
+								var Items = [];
+								Items.push(prevElem.Parent.content[0]);
+								prevElem.Parent.content.splice( 0, 1 );
+								History.Add(prevElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+								prevElem.Parent.CurPos--;
+							}
+							return;
+						}
+					}
+					else //переходим на уровень выше и выделяем композицию
+					{
+						var Comp = oContent.Content.GetParent();
+						Comp.SetSelectAll();
+						Comp.SelectToParent();
+						this.bSelectionUse = true;
+					}
 				}
+				else if (Direction > 0 && oElem.State.ContentPos + 1 > oElem.Content.length) //delete
+				{
+					if (oContent.Content.CurPos + 1 >= oContent.Content.content.length) //переходим на уровень выше и выделяем композицию
+					{
+						var Comp = oContent.Content.GetParent();
+						Comp.SetSelectAll();
+						Comp.SelectToParent();
+						this.bSelectionUse = true;						
+					}
+					else //справа есть элемент
+					{
+						var nextElem = oContent.Content.getElem(oContent.Start + 1);
+						if (nextElem.typeObj == MATH_COMP) //справа композиция
+						{
+							this.Set_Select_ToMComp(Direction);
+							return;
+						}
+						else //справа ран
+						{
+							History.Create_NewPoint();
+							nextElem.State.ContentPos = 0;
+							nextElem.Remove(Direction, bOnAddText);
+							if(nextElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
+							{
+								var Items = [];
+								Items.push(nextElem.Parent.content[0]);
+								nextElem.Parent.content.splice( 0, 1 );
+								History.Add(nextElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+							}
+							return;
+						}
+					}
+				}
+
 				History.Create_NewPoint();
 				oElem.Remove(Direction, bOnAddText);
 				if(oElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
@@ -274,6 +334,8 @@ ParaMath.prototype =
 					Items.push(oElem.Parent.content[0]);
 					oElem.Parent.content.splice( 0, 1 );
 					History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+					if (Direction < 0)
+						oContent.Content.CurPos--;
 				}
 			}
 		}
@@ -297,12 +359,13 @@ ParaMath.prototype =
 		{
 			Items.push(oContent.Content.content[i]);
 			oContent.Content.content.splice( i, 1 );
-			oContent.Content.CurPos--;
+			if (Direction < 0)
+				oContent.Content.CurPos--;
 		}
 		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
 		return;
     },
-
+	
     GetSelectContent: function()
     {
         return this.Root.GetSelectContent();
