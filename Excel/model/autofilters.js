@@ -77,7 +77,7 @@ var gUndoInsDelCellsFlag = true;
 		/** @constructor */
 		function formatTablePictures (options) {
 			if ( !(this instanceof formatTablePictures) ) {return new formatTablePictures(options);}
-			
+
 			this.name = options.name;
 			this.displayName = options.displayName;
 			this.type = options.type;
@@ -1613,9 +1613,16 @@ var gUndoInsDelCellsFlag = true;
 			
 			getTablePictures: function(wb, fmgrGraphics, oFont)
 			{
+				var styleThumbnailWidth = 61;
+				var styleThumbnailHeight = 46;
+				if (AscBrowser.isRetina) {
+					styleThumbnailWidth <<= 1;
+					styleThumbnailHeight <<= 1;
+				}
+
 				var canvas = document.createElement('canvas');
-				canvas.width = '61';
-				canvas.height = '46';
+				canvas.width = styleThumbnailWidth;
+				canvas.height = styleThumbnailHeight;
 				var customStyles = wb.TableStyles.CustomStyles;
 				var result  = [];
 				var options;
@@ -5527,7 +5534,7 @@ var gUndoInsDelCellsFlag = true;
 				var canvas = document.getElementById('drawIcon');*/
 				
 				var ws = this.worksheet;
-				var ctx = new Asc.DrawingContext({canvas: canvas, units: 0/*px*/, fmgrGraphics: fmgrGraphics, font: oFont});
+				var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				if(style == undefined)
 					style = 'TableStyleLight1';
@@ -5563,8 +5570,9 @@ var gUndoInsDelCellsFlag = true;
 					}
 				}
 				
-				var ySize = 46;
-				var xSize = 61;				
+				var ySize = 46 * 72 / 96;
+				var xSize = 61 * 72 / 96;
+
 				var stepY = ySize/5;
 				var stepX = xSize/5;
 				var whiteColor = new CColor(255, 255, 255);
@@ -5906,7 +5914,7 @@ var gUndoInsDelCellsFlag = true;
 					ctx.stroke();
 					ctx.closePath();  
 				}
-				return canvas.toDataURL();
+				return canvas.toDataURL("image/png");
 			},
 			
 			_dataFilterParse: function(data,val)
@@ -7026,7 +7034,7 @@ var gUndoInsDelCellsFlag = true;
 		prot["asc_getIsTitle"]					= prot.asc_getIsTitle;
 		prot["asc_setRange"]					= prot.asc_setRange;
 		prot["asc_setIsTitle"]					= prot.asc_setIsTitle;
-		
+
 		window["Asc"]["formatTablePictures"]	= window["Asc"].formatTablePictures = formatTablePictures;
 		prot									= formatTablePictures.prototype;
 		prot["asc_getName"]					   	= prot.asc_getName;
