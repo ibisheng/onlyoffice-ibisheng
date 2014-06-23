@@ -1894,6 +1894,8 @@ CPlotArea.prototype =
     addAxis: function(axis)
     {
         //сначала проверим не лежит ли ось уже в plotArea
+        if(!axis)
+            return;
         var i;
         for(i = 0; i < this.axId.length; ++i)
         {
@@ -2510,6 +2512,8 @@ CBarChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_BarChart_AddAxId, pr: pr});
         this.axId.push(pr);
     },
@@ -2988,6 +2992,8 @@ CAreaChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_AreaChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
@@ -9144,6 +9150,8 @@ CBubbleChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type:historyitem_BubbleChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
@@ -13833,6 +13841,8 @@ CLineChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_LineChart_AddAxId, newPr:pr});
         this.axId.push(pr);
     },
@@ -17861,6 +17871,8 @@ CRadarChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_RadarChart_AddAxId, newPr:pr});
         this.axId.push(pr);
     },
@@ -18870,6 +18882,8 @@ CScatterChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_ScatterChart_AddAxId, newPr:pr});
         this.axId.push(pr);
     },
@@ -19971,6 +19985,8 @@ CStockChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_StockChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
@@ -20887,6 +20903,8 @@ CSurfaceChart.prototype =
 
     addAxId: function(pr)
     {
+        if(!pr)
+            return;
         History.Add(this, {Type: historyitem_SurfaceChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
