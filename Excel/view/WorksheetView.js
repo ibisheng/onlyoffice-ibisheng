@@ -5368,7 +5368,7 @@
 			this.objectRender.setScrollOffset();
 
 			var moveWidth = oldW - lastColWidth;
-			if (oldW > 0) {
+			if (moveWidth > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
 				this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
 			} else {
