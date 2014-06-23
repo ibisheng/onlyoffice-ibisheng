@@ -21538,6 +21538,71 @@ CTitle.prototype =
         this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
     },
 
+    Search : function(Str, Props, SearchEngine, Type)
+    {
+        var content = this.getDocContent();
+        if(content && this.tx && this.tx.rich)
+        {
+            var dd = this.getDrawingDocument();
+            dd.StartSearchTransform( this.transformText);
+            content.Search(Str, Props, SearchEngine, Type);
+            dd.EndSearchTransform();
+        }
+    },
+
+
+    Search_GetId : function(bNext, bCurrent)
+    {
+        var content = this.getDocContent();
+        if(content && this.tx && this.tx.rich)
+        {
+            return content.Search_GetId(bNext, bCurrent);
+        }
+        return null;
+    },
+
+    Set_CurrentElement: function(bUpdate, pageIndex)
+    {
+
+        var chart = this.chart;
+        if(editor && editor.WordControl && chart)
+        {
+            var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
+            drawing_objects.resetSelection();
+            var para_drawing;
+            if(chart.group)
+            {
+                var main_group = chart.group.getMainGroup();
+                drawing_objects.selectObject(main_group, pageIndex);
+                main_group.selectObject(chart, pageIndex);
+                main_group.selection.chartSelection = chart;
+
+                chart.selection.textSelection = this;
+                chart.selection.title = this;
+                drawing_objects.selection.groupSelection = main_group;
+                para_drawing = main_group.parent;
+            }
+            else
+            {
+                drawing_objects.selectObject(chart, pageIndex);
+                drawing_objects.selection.chartSelection = chart;
+                chart.selection.textSelection = this;
+                chart.selection.title = this;
+                para_drawing = chart.parent;
+            }
+            var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
+            if(hdr_ftr)
+            {
+                hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
+                hdr_ftr.Set_CurrentElement(bUpdate);
+            }
+            else
+            {
+                drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
+            }
+        }
+    },
+
     createDuplicate: function()
     {
         var c = new CTitle();

@@ -885,6 +885,19 @@ CTextBody.prototype =
         return new CNumbering();
     },
 
+    Set_CurrentElement: function(bUpdate, pageIndex)
+    {
+        if(this.parent.Set_CurrentElement)
+        {
+            this.parent.Set_CurrentElement(bUpdate, pageIndex);
+        }
+    },
+
+
+    checkDocContent: function()
+    {
+        this.parent && this.parent.checkDocContent && this.parent.checkDocContent();
+    },
     getBodyPr: function()
     {
         if(this.recalcInfo.recalculateBodyPr)
@@ -976,8 +989,6 @@ CTextBody.prototype =
     {},
 
 
-    Set_CurrentElement: function()
-    {},
     writeToBinary: function(w)
     {
         this.bodyPr.Write_ToBinary2(w);
