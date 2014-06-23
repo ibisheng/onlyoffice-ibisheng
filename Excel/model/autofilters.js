@@ -2707,8 +2707,6 @@ var gUndoInsDelCellsFlag = true;
 				
 				var isEnd = false, cell, isEndWhile, result;
 				
-				console.time("_getAdjacentCellsAF");
-				
 				var prevActiveRange = {r1: cloneActiveRange.r1, c1: cloneActiveRange.c1, r2: cloneActiveRange.r2, c2: cloneActiveRange.c2};
 				
 				while(isEnd === false)
@@ -2823,9 +2821,6 @@ var gUndoInsDelCellsFlag = true;
 					
 					prevActiveRange = {r1: cloneActiveRange.r1, c1: cloneActiveRange.c1, r2: cloneActiveRange.r2, c2: cloneActiveRange.c2};
 				};
-				
-
-				console.timeEnd("_getAdjacentCellsAF");
 				
 
 				//проверяем есть ли пустые строчки и столбцы в диапазоне
