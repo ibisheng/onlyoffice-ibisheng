@@ -1375,6 +1375,11 @@ ScrollObject.prototype = {
                             _tmp.that.unbind( "mouseup.main", cancelClick );
                             _tmp.that.lock = false;
                         };
+
+                    if ( this.that.onLockMouse ) {
+                        this.that.onLockMouse( evt );
+                    }
+
                     doScroll();
                     this.that.bind( "mouseup.main", cancelClick );
                 }
@@ -1417,6 +1422,11 @@ ScrollObject.prototype = {
                             _tmp.that.unbind( "mouseup.main", cancelClick );
                             _tmp.that.lock = false;
                         };
+
+                    if ( this.that.onLockMouse ) {
+                        this.that.onLockMouse( evt );
+                    }
+                    
                     doScroll();
                     this.that.bind( "mouseup.main", cancelClick );
                 }
