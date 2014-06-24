@@ -936,9 +936,10 @@
 				if (ct.col >=0 && ct.row >= 0)
 					this.controller.setStrictClose(!ws._isCellEmptyText(ct.col, ct.row));
 
-				// Для нажатия на колонку/строку/all обрабатывать dblClick не нужно
+				// Для нажатия на колонку/строку/all/frozenMove обрабатывать dblClick не нужно
 				if (c_oTargetType.ColumnHeader === ct.target || c_oTargetType.RowHeader === ct.target ||
-					c_oTargetType.Corner === ct.target) {
+					c_oTargetType.Corner === ct.target || c_oTargetType.FrozenAnchorH === ct.target ||
+					c_oTargetType.FrozenAnchorV === ct.target) {
 					asc_applyFunction(callback);
 					return;
 				}

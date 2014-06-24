@@ -3137,7 +3137,7 @@
 			this._drawSelection();
 
 			switch (targetInfo.target) {
-				case "frozenAnchorV":
+				case c_oTargetType.FrozenAnchorV:
 					x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
 					data = this._findColUnderCursor(x, true);
 					if (data && 0 <= data.col) {
@@ -3149,7 +3149,7 @@
 							.fillRect(this.cols[data.col].left - offsetX - this.width_1px, 0, this.width_1px, h);
 					}
 					break;
-				case "frozenAnchorH":
+				case c_oTargetType.FrozenAnchorH:
 					y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 					data = this._findRowUnderCursor(y, true);
 					if (data && 0 <= data.row) {
@@ -3188,7 +3188,7 @@
 			var h = _this.headersHeight;
 			if (isPointInAnchor(x, y, _x, _y, w, h)) {
 				result.result = true;
-				result.name = "frozenAnchorV";
+				result.name = c_oTargetType.FrozenAnchorV;
 			}
 			
 			// horizontal
@@ -3198,7 +3198,7 @@
 			h = 0;
 			if (isPointInAnchor(x, y, _x, _y, w, h)) {
 				result.result = true;
-				result.name = "frozenAnchorH";
+				result.name = c_oTargetType.FrozenAnchorH;
 			}
 			
 			return result;
@@ -3221,13 +3221,13 @@
 					lastRow = t.topLeftFrozenCell.getRow0();
 				}
 				switch (targetInfo.target) {
-					case "frozenAnchorV":
+					case c_oTargetType.FrozenAnchorV:
 						x *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIX());
 						data = t._findColUnderCursor(x, true);
 						if (data && 0 <= data.col)
 							lastCol = data.col;
 						break;
-					case "frozenAnchorH":
+					case c_oTargetType.FrozenAnchorH:
 						y *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIY());
 						data = t._findRowUnderCursor(y, true);
 						if (data && 0 <= data.row)

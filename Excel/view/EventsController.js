@@ -1305,7 +1305,8 @@
 						this.isMoveResizeChartsRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
-					} else if ( t.targetInfo && ((t.targetInfo.target === "frozenAnchorV") || (t.targetInfo.target === "frozenAnchorH")) ) {
+					} else if ( t.targetInfo && ((t.targetInfo.target === c_oTargetType.FrozenAnchorV) ||
+						(t.targetInfo.target === c_oTargetType.FrozenAnchorH)) ) {
 						// Режим установки закреплённых областей
 						this.isFrozenAnchorMode = t.targetInfo.target;
 						t._moveFrozenAnchorHandle(event, t.targetInfo);

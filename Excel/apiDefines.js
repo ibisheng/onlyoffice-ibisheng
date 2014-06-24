@@ -448,7 +448,9 @@ var c_oTargetType = {
 	Corner			: 9,
 	Hyperlink		: 10,
 	Cells			: 11,
-	Shape			: 12
+	Shape			: 12,
+	FrozenAnchorH	: 14,
+	FrozenAnchorV	: 15
 };
  
 var c_oAscCoAuthoringMeBorderColor					= new window.CColor(22, 156, 0);
