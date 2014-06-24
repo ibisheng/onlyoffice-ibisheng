@@ -17053,8 +17053,8 @@ CPieChart.prototype =
             }
             case historyitem_PieChart_AddSer:
             {
-                w.WriteBool(isRealObeject(data.ser));
-                if(isRealObeject(data.ser))
+                w.WriteBool(isRealObject(data.ser));
+                if(isRealObject(data.ser))
                 {
                     w.WriteString2(data.ser.Get_Id());
                 }
