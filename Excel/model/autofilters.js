@@ -323,7 +323,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 						History.StartTransaction();
 						
-						if(rangeShift && rangeShift.r1)
+						if(rangeShift && rangeShift.r1 != undefined)
 							rangeShift = ws.model.getRange3(rangeShift.r1, rangeShift.c1, rangeShift.r1, rangeShift.c2);
 						
 						if(paramsForCallBack)//меняем/удаляем/устанавливаем стиль для а/ф
