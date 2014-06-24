@@ -5018,19 +5018,22 @@ cVAR.prototype.Calculate = function ( arg ) {
 
         if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
             arg[j].foreach2( function ( elem ) {
-                if ( elem instanceof  cNumber )
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
+                }
             } );
         }
         else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
             var a = arg[j].getValue();
-            if ( a instanceof  cNumber )
+            if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
+            }
         }
         else if ( arg[j] instanceof cArray ) {
             arg[j].foreach( function ( elem ) {
-                if ( elem instanceof  cNumber )
+                if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
+                }
             } );
         }
         else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
@@ -5039,8 +5042,9 @@ cVAR.prototype.Calculate = function ( arg ) {
         else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
             continue;
         }
-        else
-            return this.value = cError( cErrorType.wrong_value_type )
+        else{
+            return this.value = cError( cErrorType.wrong_value_type );
+        }
 
     }
     return this.value = _var( arr0 );
