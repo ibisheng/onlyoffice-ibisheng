@@ -2737,7 +2737,7 @@ cIPMT.prototype.Calculate = function ( arg ) {
     var res;
 
     if ( per < 1 || per > nper || type != 0 && type != 1 ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.not_numeric );
     }
 
     res = getPMT( rate, nper, pv, fv, type );
@@ -4265,7 +4265,7 @@ cPPMT.prototype.Calculate = function ( arg ) {
     var res;
 
     if ( per < 1 || per > nper || type != 0 && type != 1 ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.not_numeric );
     }
 
     var fRmz = getPMT( rate, nper, pv, fv, type );
@@ -5494,64 +5494,76 @@ cXIRR.prototype = Object.create( cBaseFunction.prototype );
 cXIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0.1 );
 
-    function lcl_sca_XirrResult( rValues, rDates, fRate ) {
-        var D_0 = rDates[0];
-        var r = fRate + 1;
-        var fResult = rValues[0];
-        for ( var i = 1, nCount = rValues.length; i < nCount; ++i )
-            fResult += rValues[i] / Math.pow( r, (rDates[i] - D_0) / 365 );
-        return fResult;
+    function lcl_sca_XirrResult( values, dates, rate ) {
+        var D_0 = dates[0];
+        var r = rate + 1;
+        var res = values[0];
+        for ( var i = 1, count = values.length; i < count; ++i )
+            res += values[i] / Math.pow( r, (dates[i] - D_0) / 365 );
+        return res;
     }
 
-    function lcl_sca_XirrResult_Deriv1( rValues, rDates, fRate ) {
-        var D_0 = rDates[0];
-        var r = fRate + 1;
-        var fResult = 0;
-        for ( var i = 1, nCount = rValues.length; i < nCount; ++i ) {
-            var E_i = (rDates[i] - D_0) / 365;
-            fResult -= E_i * rValues[i] / Math.pow( r, E_i + 1 );
+    function lcl_sca_XirrResult_Deriv1( values, dates, rate ) {
+        var D_0 = dates[0];
+        var r = rate + 1;
+        var res = 0;
+        for ( var i = 1, count = values.length; i < count; ++i ) {
+            var E_i = (dates[i] - D_0) / 365;
+            res -= E_i * values[i] / Math.pow( r, E_i + 1 );
         }
-        return fResult;
+        return res;
     }
 
     function xirr( valueArray, dateArray, rate ) {
 
         var arr0 = valueArray[0], arr1 = dateArray[0];
 
-        if ( arr0 instanceof cError ) {
-            return new cError( cErrorType.not_available );
-        }
-
-        if ( arr1 instanceof cError ) {
-            return new cError( cErrorType.not_available );
+        if ( arr0 instanceof cError || arr1 instanceof cError || arr0.getValue() == 0 ) {
+            return new cError( cErrorType.not_numeric );
         }
 
         if ( valueArray.length < 2 || (dateArray.length != valueArray.length) )
             return new cError( cErrorType.not_numeric );
 
-
         var res = rate.getValue();
         if ( res <= -1 )
             return new cError( cErrorType.not_numeric );
 
-        var fMaxEps = 1e-10, maxIter = 50;
+        var deltaEps = 1e-6, maxIter = 100, wasNeg = false, wasPos = false,
+            newRate, eps, xirrRes, bContLoop = true;
 
         for ( var i = 0; i < dateArray.length; i++ ) {
             dateArray[i] = dateArray[i].tocNumber();
             valueArray[i] = valueArray[i].tocNumber();
-            if ( dateArray[i] instanceof cError || valueArray[i] instanceof cError )
-                return new cError( cErrorType.not_numeric );
-            dateArray[i] = dateArray[i].getValue();
+            if ( dateArray[i] instanceof cError || valueArray[i] instanceof cError ){
+                return new cError( cErrorType.wrong_value_type );
+            }
+            dateArray[i] = Math.floor(dateArray[i].getValue());
             valueArray[i] = valueArray[i].getValue();
+
+            if( dateArray[0] > dateArray[i] ){
+                return new cError( cErrorType.not_numeric );
+            }
+
+            if( valueArray[i] < 0 ){
+                wasNeg = true;
+            }
+            else{
+                wasPos = true;
+            }
+
         }
 
-        var newRate, eps, xirrRes, bContLoop = true;
+        if( !(wasNeg && wasPos) ){
+            return new cError( cErrorType.not_numeric );
+        }
+
         for ( var i = 0; i < maxIter && bContLoop; i++ ) {
             xirrRes = lcl_sca_XirrResult( valueArray, dateArray, res );
             newRate = res - xirrRes / lcl_sca_XirrResult_Deriv1( valueArray, dateArray, res );
             eps = Math.abs( newRate - res );
             res = newRate;
-            bContLoop = (eps > fMaxEps) && (Math.abs( xirrRes ) > fMaxEps);
+            bContLoop = (eps > deltaEps) && (Math.abs( xirrRes ) > deltaEps);
         }
 
         if ( bContLoop ) {
@@ -5566,65 +5578,104 @@ cXIRR.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( c ) {
-            valueArray.push( c.tocNumber() );
-        } )
+            if( c instanceof cNumber ){
+                valueArray.push( c );
+            }
+            else if( c instanceof cEmpty ){
+                valueArray.push( c.tocNumber() );
+            }
+            else{
+                valueArray.push( new cError( cErrorType.wrong_value_type ) );
+            }
+        } );
     }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( c ) {
-            valueArray.push( c.tocNumber() );
+            if( c instanceof cNumber ){
+                valueArray.push( c );
+            }
+            else if( c instanceof cEmpty ){
+                valueArray.push( c.tocNumber() );
+            }
+            else{
+                valueArray.push( new cError( cErrorType.wrong_value_type ) );
+            }
         } )
     }
     else if ( arg0 instanceof cArea3D ) {
         if ( arg0.wsFrom == arg0.wsTo ) {
             valueArray = arg0.getMatrix()[0];
         }
-        else
+        else{
             return this.value = new cError( cErrorType.wrong_value_type );
+        }
     }
     else {
-        arg0 = arg0.tocNumber();
-        if ( arg1 instanceof cError ) {
-            return this.value = new cError( cErrorType.not_numeric )
+        if ( !(arg0 instanceof cNumber) ) {
+            return this.value = new cError( cErrorType.wrong_value_type )
         }
-        else
-            valueArray.push( arg0 );
+        else{
+            valueArray[0] = arg0;
+        }
     }
 
     if ( arg1 instanceof cArea ) {
         arg1.foreach2( function ( c ) {
-            dateArray.push( c.tocNumber() );
-        } )
+            if( c instanceof cNumber ){
+                dateArray.push( c );
+            }
+            else{
+                dateArray.push( new cError( cErrorType.wrong_value_type ) );
+            }
+        } );
     }
     else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( c ) {
-            dateArray.push( c.tocNumber() );
+            if( c instanceof cNumber ){
+                dateArray.push( c );
+            }
+            else{
+                dateArray.push( new cError( cErrorType.wrong_value_type ) );
+            }
         } )
     }
     else if ( arg1 instanceof cArea3D ) {
         if ( arg1.wsFrom == arg1.wsTo ) {
             dateArray = arg1.getMatrix()[0];
         }
-        else
+        else{
             return this.value = new cError( cErrorType.wrong_value_type );
+        }
     }
     else {
-        arg1 = arg1.tocNumber();
-        if ( arg1 instanceof cError ) {
-            return this.value = new cError( cErrorType.not_numeric )
+        if ( !(arg1 instanceof cNumber) ) {
+            return this.value = new cError( cErrorType.wrong_value_type )
         }
-        else
+        else{
             dateArray[0] = arg1;
+        }
     }
 
-    if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
+    if( arg2 instanceof cRef || arg2 instanceof cRef3D ){
+        arg2 = arg2.getValue();
+        if( !(arg2 instanceof cNumber) ){
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
+    }
+    else if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
+        if( !(arg2 instanceof cNumber) ){
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
+    }
+    else if ( arg2 instanceof cArray ) {
+        arg2 = arg2.getElement( 0 );
+        if( !(arg2 instanceof cNumber) ){
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
     }
 
     arg2 = arg2.tocNumber();
-
-    if ( arg2 instanceof cArray ) {
-        arg2 = arg2.getElement( 0 );
-    }
 
     if ( arg2 instanceof cError ) {
         return this.value = arg2;
