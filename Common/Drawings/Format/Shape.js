@@ -3736,8 +3736,13 @@ CShape.prototype =
         this.spPr.setFill(fill);
     },
 
-    changeLine: function (line) {
-        this.spPr.setLn(CorrectUniStroke(line, this.spPr.ln));
+    changeLine: function (line)
+    {
+        if(this.recalcInfo.recalculatePen)
+        {
+            this.recalculatePen();
+        }
+        this.spPr.setLn(CorrectUniStroke(line, this.pen));
     },
 
     setLine: function (line) {
