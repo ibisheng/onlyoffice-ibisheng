@@ -428,23 +428,28 @@
 			t._moveCursor(kEndOfText);
 		};
 
-		CellEditor.prototype.move = function (dx, dy) {
-			var t = this;
-			var opt = t.options;
+		CellEditor.prototype.move = function (dx, dy, l, t, r, b) {
+			var opt = this.options;
 
-			t.left += dx;
-			t.right += dx;
-			t.top += dy;
-			t.bottom += dy;
+			this.left += dx;
+			this.right += dx;
+			this.top += dy;
+			this.bottom += dy;
 
 			opt.leftSide.forEach(function (e,i,a) {a[i] = e + dx;});
 			opt.rightSide.forEach(function (e,i,a) {a[i] = e + dx;});
 			opt.bottomSide.forEach(function (e,i,a) {a[i] = e + dy;});
 
-			// ToDo выставлять опции (т.к. при scroll редактор должен пересчитываться)
-			t._adjustCanvas();
-			t._renderText();
-			t._drawSelection();
+			if (this.left < l || this.top < t || this.left > r || this.top > b) {
+				// hide
+				this.canvasOuterStyle.display = 'none';
+			} else {
+				this.canvasOuterStyle.display = 'block';
+				// ToDo выставлять опции (т.к. при scroll редактор должен пересчитываться и уменьшаться размеры)
+				this._adjustCanvas();
+				this._renderText();
+				this._drawSelection();
+			}
 		};
 
 		CellEditor.prototype.setFocus = function (hasFocus) {

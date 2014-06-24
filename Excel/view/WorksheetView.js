@@ -5214,7 +5214,10 @@
 			var lastRowHeight = (scrollDown && oldVRE_isPartial) ?
 				ctxH - (this.rows[oldEnd].top - this.rows[vr.r1].top + this.cellsTop + diffHeight) : 0;
 
-			if (this.isCellEditMode && editor) {editor.move(0, -dy);}
+			if (this.isCellEditMode && editor && this.activeRange.r1 >= rFrozen) {
+				editor.move(0, -dy, this.cellsLeft + (this.activeRange.c1 >= cFrozen ? diffWidth : 0),
+						this.cellsTop + diffHeight, ctxW, ctxH);
+			}
 
 			vr.r1 = start;
 			this._updateVisibleRowsCount();
@@ -5346,7 +5349,7 @@
 			var scrollRight = (dx > 0 && oldW > 0);
 			var x = this.cellsLeft + (scrollRight ? dx : 0);
 			var y = this.headersTop;
-			var cFrozen, rFrozen;
+			var cFrozen = 0, rFrozen = 0;
 			if (this.topLeftFrozenCell) {
 				rFrozen = this.topLeftFrozenCell.getRow0();
 				cFrozen = this.topLeftFrozenCell.getCol0();
@@ -5360,7 +5363,10 @@
 			var lastColWidth = (scrollRight && oldVCE_isPartial) ?
 				ctxW - (this.cols[oldEnd].left - this.cols[vr.c1].left + this.cellsLeft + diffWidth) : 0;
 
-			if (this.isCellEditMode && editor) {editor.move(-dx, 0);}
+			if (this.isCellEditMode && editor && this.activeRange.c1 >= cFrozen) {
+				editor.move(-dx, 0, this.cellsLeft + diffWidth,
+						this.cellsTop + (this.activeRange.r1 >= rFrozen ? diffHeight : 0), ctxW, ctxH);
+			}
 
 			vr.c1 = start;
             this._updateVisibleColsCount();
