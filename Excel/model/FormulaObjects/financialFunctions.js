@@ -3098,18 +3098,22 @@ function cMIRR() {
 
 cMIRR.prototype = Object.create( cBaseFunction.prototype );
 cMIRR.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], fRate1_invest = arg[1], fRate1_reinvest = arg[2];
+    var arg0 = arg[0], invest = arg[1], reinvest = arg[2];
 
     var valueArray = [];
 
     if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( c ) {
-            valueArray.push( c.tocNumber() );
+            if( c instanceof cNumber || c instanceof  cError ){
+                valueArray.push( c );
+            }
         } )
     }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( c ) {
-            valueArray.push( c.tocNumber() );
+            if( c instanceof cNumber || c instanceof  cError ){
+                valueArray.push( c );
+            }
         } )
     }
     else if ( arg0 instanceof cArea3D ) {
@@ -3120,69 +3124,70 @@ cMIRR.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.wrong_value_type );
     }
     else {
-        arg0 = arg0.tocNumber();
+
         if ( arg0 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
-        else
+        else if( arg0 instanceof cNumber ){
             valueArray.push( arg0 );
+        }
     }
 
-    if ( fRate1_invest instanceof cArea || fRate1_invest instanceof cArea3D ) {
-        fRate1_invest = fRate1_invest.cross( arguments[1].first );
+    if ( invest instanceof cArea || invest instanceof cArea3D ) {
+        invest = invest.cross( arguments[1].first );
     }
-    else if ( fRate1_invest instanceof cArray ) {
-        fRate1_invest = fRate1_invest.getElementRowCol( 0, 0 );
-    }
-
-    if ( fRate1_reinvest instanceof cArea || fRate1_reinvest instanceof cArea3D ) {
-        fRate1_reinvest = fRate1_reinvest.cross( arguments[1].first );
-    }
-    else if ( fRate1_reinvest instanceof cArray ) {
-        fRate1_reinvest = fRate1_reinvest.getElementRowCol( 0, 0 );
+    else if ( invest instanceof cArray ) {
+        invest = invest.getElementRowCol( 0, 0 );
     }
 
-    fRate1_invest = fRate1_invest.tocNumber();
-    fRate1_reinvest = fRate1_reinvest.tocNumber();
+    if ( reinvest instanceof cArea || reinvest instanceof cArea3D ) {
+        reinvest = reinvest.cross( arguments[1].first );
+    }
+    else if ( reinvest instanceof cArray ) {
+        reinvest = reinvest.getElementRowCol( 0, 0 );
+    }
 
-    if ( fRate1_invest instanceof cError ) return this.value = fRate1_invest;
-    if ( fRate1_reinvest instanceof cError ) return this.value = fRate1_reinvest;
+    invest = invest.tocNumber();
+    reinvest = reinvest.tocNumber();
 
-    fRate1_invest = fRate1_invest.getValue() + 1;
-    fRate1_reinvest = fRate1_reinvest.getValue() + 1;
+    if ( invest instanceof cError ) return this.value = invest;
+    if ( reinvest instanceof cError ) return this.value = reinvest;
 
-    var fNPV_reinvest = 0, fPow_reinvest = 1, fNPV_invest = 0, fPow_invest = 1, fCellValue,
+    invest = invest.getValue() + 1;
+    reinvest = reinvest.getValue() + 1;
+
+    var NPVreinvest = 0, POWreinvest = 1, NPVinvest = 0, POWinvest = 1, cellValue,
         wasNegative = false, wasPositive = false;
 
     for ( var i = 0; i < valueArray.length; i++ ) {
-        fCellValue = valueArray[i];
+        cellValue = valueArray[i];
 
-        if ( fCellValue instanceof cError )
-            return this.value = fCellValue;
+        if ( cellValue instanceof cError )
+            return this.value = cellValue;
 
-        fCellValue = valueArray[i].getValue();
+        cellValue = valueArray[i].getValue();
 
-        if ( fCellValue > 0 ) {          // reinvestments
+        if ( cellValue > 0 ) {          // reinvestments
             wasPositive = true;
-            fNPV_reinvest += fCellValue * fPow_reinvest;
+            NPVreinvest += cellValue * POWreinvest;
         }
-        else if ( fCellValue < 0 ) {     // investments
+        else if ( cellValue < 0 ) {     // investments
             wasNegative = true;
-            fNPV_invest += fCellValue * fPow_invest;
+            NPVinvest += cellValue * POWinvest;
         }
-        fPow_reinvest /= fRate1_reinvest;
-        fPow_invest /= fRate1_invest;
+        POWreinvest /= reinvest;
+        POWinvest /= invest;
 
     }
 
     if ( !( wasNegative && wasPositive ) )
         return this.value = new cError( cErrorType.division_by_zero );
 
-    var fResult = -fNPV_reinvest / fNPV_invest;
-    fResult *= Math.pow( fRate1_reinvest, valueArray.length - 1 );
-    fResult = Math.pow( fResult, 1 / (valueArray.length - 1) );
+    var res = -NPVreinvest / NPVinvest;
+    res *= Math.pow( reinvest, valueArray.length - 1 );
+    res = Math.pow( res, 1 / (valueArray.length - 1) );
 
-    this.value = new cNumber( fResult - 1 );
+    this.value = new cNumber( res - 1 );
     this.value.numFormat = 9;
     return this.value;
 
