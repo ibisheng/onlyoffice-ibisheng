@@ -16900,7 +16900,7 @@ CPieChart.prototype =
 
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_PieChart_SetFirstSliceAng, ser: ser});
+        History.Add(this, {Type: historyitem_PieChart_AddSer, ser: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -16950,7 +16950,14 @@ CPieChart.prototype =
             }
             case historyitem_PieChart_AddSer:
             {
-                this.series.push(data.ser);
+                for(var i = this.series.length; i > -1; --i)
+                {
+                    if(this.series[i] === data.ser)
+                    {
+                        this.series.splice(i, 1);
+                        break;
+                    }
+                }
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateType();
