@@ -4329,7 +4329,7 @@ ParaRun.prototype =
 
     Internal_Compile_Pr : function ()
     {
-        if ( undefined === this.Paragraph )
+        if ( undefined === this.Paragraph || null === this.Paragraph )
         {
             // Сюда мы никогда не должны попадать, но на всякий случай,
             // чтобы не выпадало ошибок сгенерим дефолтовые настройки

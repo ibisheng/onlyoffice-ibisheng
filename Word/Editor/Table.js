@@ -17438,8 +17438,8 @@ CTable.prototype =
             }
         }
 
-        if ( CurGrid >= ColsCount.length )
-            CurGrid = ColsCount.length - 1;
+        if ( CurGrid >= ColsCount )
+            CurGrid = ColsCount - 1;
 
         // Найдем промежуток строк по PageIndex среди которых нам надо искать
         var PNum = PageIndex;// - this.PageNum;
@@ -18288,8 +18288,11 @@ CTable.prototype =
             if ( CellPos.Row + VMerge_count - 1 >= this.Pages[PageNum + 1].FirstRow )
             {
                 VMerge_count = this.Pages[PageNum + 1].FirstRow + 1 - CellPos.Row;
-                if ( false === this.RowsInfo[CellPos.Row + VMerge_count - 1].FirstPage )
+                if ( false === this.RowsInfo[CellPos.Row + VMerge_count - 1].FirstPage && PageNum === this.RowsInfo[CellPos.Row + VMerge_count - 1].StartPage )
                     VMerge_count--;
+                
+                if ( VMerge_count <= 0 )
+                    return { Pos : CellPos, Border : -1 };
             }
         }
 

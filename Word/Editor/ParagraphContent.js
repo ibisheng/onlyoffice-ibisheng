@@ -7185,7 +7185,7 @@ function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
     {
         this.Widths = [];
         var Len = Widths.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        for ( var Index = 0; Index < Len; Index++ )
             this.Widths[Index] = Widths[Index];
     }
 
