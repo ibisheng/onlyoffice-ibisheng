@@ -2952,24 +2952,37 @@ COperator.prototype.getProps = function(props, defaultProps)
         chr = props.chr,
         type = props.type;
 
+
+    var code = props.chr;
+
     this.defaultType = defaultProps.type;
 
     var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
-        bNotType = typeof(props.type) == "undefined" ||  props.type == null,
-        bStr = typeof(chr) === "string",
-        bEmptyStr = bStr && chr.length == 0,
-        bCode = typeof(chr) === "string" && chr.length > 0;
+        bNotType   = typeof(props.type) == "undefined" ||  props.type == null,
+        bUnicodeChr    = props.chr !== null && props.chr+0 == props.chr;
+        //bStr = typeof(chr) === "string",
+        //bEmptyStr = bStr && chr.length == 0,
+        //bCode = typeof(chr) === "string" && chr.length > 0;
 
-    var code = bCode ? chr.charCodeAt(0) : null;
+    //var code = bCode ? chr.charCodeAt(0) : null;
 
-    var bDPrpDelim =  bDelimiter && bNotType && !bStr,
+
+    if(bDelimiter && bUnicodeChr == -1) // empty operator
+    {
+        type = OPERATOR_EMPTY;
+    }
+    else if(bNotType && !bUnicodeChr)   // default operator
+    {
+        type = defaultProps.type;
+    }
+
+
+    /*var bDPrpDelim =  bDelimiter && bNotType && !bStr,
         bDPrpOther =  !bDelimiter && bNotType && !bCode;
 
     var bDefault = bDPrpDelim || bDPrpOther,
         bEmpty = bDelimiter && bEmptyStr;
 
-    var bLoc        = props.loc !== null && typeof(props.loc)!== "undefined";
-    var bDefaultLoc = defaultProps.loc !== null && typeof(defaultProps.loc)!== "undefined";
 
     if(bDefault)
     {
@@ -2978,7 +2991,10 @@ COperator.prototype.getProps = function(props, defaultProps)
     else if(bEmpty)
     {
         type = OPERATOR_EMPTY;
-    }
+    }*/
+
+    var bLoc        = props.loc !== null && typeof(props.loc)!== "undefined";
+    var bDefaultLoc = defaultProps.loc !== null && typeof(defaultProps.loc)!== "undefined";
 
 
     if(!bLoc && bDefaultLoc)
@@ -3905,7 +3921,7 @@ CDelimiter.prototype.getBase = function(numb)
 }
 CDelimiter.prototype.getPropsForWrite = function()
 {
-    var props =
+    /*var props =
     {
         grow:       this.Pr.grow,
         column:     this.nCol,
@@ -3915,7 +3931,9 @@ CDelimiter.prototype.getPropsForWrite = function()
         sepChr:     this.sepOper.getChr()  // default: DELIMITER_LINE
     };
 
-    return props;
+    return props;*/
+
+    return this.Pr;
 }
 CDelimiter.prototype.Save_Changes = function(Data, Writer)
 {
@@ -4226,9 +4244,6 @@ CGroupCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
         };
 
         this.setCharacter(operProps, operDefaultPrp);
-
-        this.Pr.chrType = this.operator.typeOper;
-        this.Pr.chr     = String.fromCharCode(this.operator.code);
 
         this.RecalcInfo.bProps = false;
     }

@@ -7583,7 +7583,7 @@ CMathContent.prototype =
 						var oSSub0 = new CDegree(props);
 						this.CreateDegree(oSSub0, delimiterBase, "X", null, "n"); 
 						
-						sChar = String.fromCharCode(8898);
+						var sChar = String.fromCharCode(8898);
 						this.AddText(delimiterBase, sChar);
 						
 						props = {ctrPrp: new CTextPr(), type:DEGREE_SUBSCRIPT};
