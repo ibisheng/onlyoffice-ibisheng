@@ -7587,12 +7587,20 @@ CChartSpace.prototype =
         graphics.SaveGrState();
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
-        graphics.AddClipRect(-pix, -pix, this.extX+pix, this.extY+pix);
 
-        //graphics.AddClipRect(0, 0, this.extX, this.extY);
+        var ln_width;
+        if(this.pen && isRealNumber(this.pen.w))
+        {
+            ln_width = this.pen.w/36000;
+        }
+        else
+        {
+            ln_width = 0;
+        }
+        graphics.AddClipRect(-ln_width, -ln_width, this.extX+ln_width, this.extY+ln_width);
+
         this.chartObj.draw(this, graphics);
         graphics.reset();
-       // graphics.SetIntegerGrid(intGrid);
 
         if(this.chart)
         {
