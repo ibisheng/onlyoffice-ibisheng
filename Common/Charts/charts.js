@@ -782,6 +782,7 @@ function ChartPreviewManager() {
             var new_line = new CLn();
             new_line.setFill(new CUniFill());
             new_line.Fill.setFill(new CNoFill());
+            chart_space.spPr.setLn(new_line);
             chart_space.recalculate();
 
             return chart_space;
