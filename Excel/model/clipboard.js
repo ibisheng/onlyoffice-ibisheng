@@ -2233,7 +2233,8 @@
 			ReadFromBinaryWord : function(sBase64, worksheet)
 			{
 			    //передавать CDrawingDocument текущего worksheet
-				var oTempDrawingDocument = worksheet.objectRender;
+				var oTempDrawingDocument = worksheet.model.DrawingDocument;
+				
 			    var newCDocument = new CDocument(oTempDrawingDocument);
 				newCDocument.bFromDocument = true;
 				newCDocument.theme = this.Api.wbModel.theme;
