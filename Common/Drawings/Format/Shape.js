@@ -386,7 +386,7 @@ CShape.prototype =
     {
         var tx_body = new CTextBody();
         tx_body.setParent(this);
-        tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
+        tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
         tx_body.setBodyPr(new CBodyPr());
         tx_body.content.Content[0].Set_DocumentIndex(0);
         this.setTxBody(tx_body);

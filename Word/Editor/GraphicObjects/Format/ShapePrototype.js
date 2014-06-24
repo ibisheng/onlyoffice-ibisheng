@@ -659,6 +659,10 @@ CShape.prototype.Get_StartPage_Relative = function()
 {
     return 0;
 };
+CShape.prototype.Check_TableCoincidence = function(table)
+{
+    return false;
+};
 
 CShape.prototype.Get_PrevElementEndInfo = function(CurElement)
 {
