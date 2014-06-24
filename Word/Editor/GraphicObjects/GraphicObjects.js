@@ -434,7 +434,7 @@ CGraphicObjects.prototype =
                 apply_props = props.ShapeProperties ? props.ShapeProperties : props;
             }
             var objects_by_types = this.applyDrawingProps(apply_props);
-            if(isRealNumber(apply_props.Width) && isRealNumber(apply_props.Height) || apply_props.ChartProperties || (objects_by_types.charts.length > 0))
+            if(isRealNumber(apply_props.Width) && isRealNumber(apply_props.Height) || apply_props.ChartProperties /*|| (objects_by_types.charts.length > 0)*/)
             {
                 for(i = 0; i < objects_by_types.shapes.length; ++i)
                 {
