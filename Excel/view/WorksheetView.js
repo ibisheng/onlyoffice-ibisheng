@@ -10189,15 +10189,19 @@
 			} else {
 				this.copyOfActiveRange = this.activeRange.clone(true);
 				if (selectRange) {
-					selectRange = parserHelp.parse3DRef(selectRange);
-					if (selectRange) {
-						// ToDo стоит менять и лист
-						selectRange = this.model.getRange2(selectRange.range);
-						if (null !== selectRange)
-						{
-							var bbox = selectRange.getBBox0();
-							this.activeRange.assign(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
-						}
+					var tmpSelectRange = parserHelp.parse3DRef(selectRange);
+					if (tmpSelectRange) {
+						// ToDo стоит менять и лист для диаграмм
+						tmpSelectRange = this.model.getRange2(tmpSelectRange.range);
+					} else {
+						// Это не 3D ссылка
+						tmpSelectRange = this.model.getRange2(selectRange);
+					}
+
+					if (null !== tmpSelectRange)
+					{
+						var bbox = tmpSelectRange.getBBox0();
+						this.activeRange.assign(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
 					}
 				}
 			}

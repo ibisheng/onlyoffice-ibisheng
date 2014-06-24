@@ -1603,6 +1603,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								oRecalcIndexRows = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
 							}
 						}
+
 					}
 
 					// Теперь нужно пересчитать индексы для lock-элементов
