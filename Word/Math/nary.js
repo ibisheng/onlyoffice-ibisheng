@@ -152,30 +152,32 @@ CNary.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
 
         this.Pr.chrType = oSign.chrType;
-        this.Pr.chr     = String.fromCharCode(oSign.chrCode);
+        this.Pr.chr     = oSign.chrCode;
     }
 
     CNary.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
 }
-CNary.prototype.getSign = function(chr, chrType)
+CNary.prototype.getSign = function(chrCode, chrType)
 {    
     var result = 
     {
         chrCode:   null,
         chrType:   null,
-        operator:      null
+        operator:  null
         
-    }
+    };
+
+    var bChr = chrCode !== null && chrCode == chrCode + 0;
   
-    var bChr = false;
-    var chrCode;
+    /*var bChr = false;
+    var chrCode;*/
 
 
-    if(typeof(chr) === "string")
+    /*if(typeof(chr) === "string")
     {
         chrCode = chr.charCodeAt(0);
         bChr = true;
-    }
+    }*/
 
     if(chrCode == 0x222B || chrType == NARY_INTEGRAL)
     {

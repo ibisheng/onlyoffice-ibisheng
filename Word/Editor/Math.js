@@ -518,7 +518,6 @@ ParaMath.prototype =
 
         this.Root.Resize(null, this, g_oTextMeasurer, TextPr);
 
-
         var pos = new CMathPosition();
         pos.x = 0;
         pos.y = 0;
@@ -987,7 +986,7 @@ ParaMath.prototype =
     },*/
     GetFirstRPrp: function()
     {
-        return this.Root.getFirstRPrp();
+        return this.Root.getFirstRPrp(this);
     },
     GetShiftCenter: function(oMeasure, font)
     {

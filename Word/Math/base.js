@@ -121,9 +121,9 @@ CMathBase.prototype =
     {
         return this.CtrPrp.Copy();
     },
-    Set_CompiledCtrPrp: function()
+    Set_CompiledCtrPrp: function(ParaMath)
     {
-        var defaultRPrp = this.ParaMath.GetFirstRPrp();
+        var defaultRPrp = ParaMath.GetFirstRPrp();
 
         this.CompiledCtrPrp.Merge(defaultRPrp);
         this.CompiledCtrPrp.Merge(this.CtrPrp);
@@ -139,12 +139,11 @@ CMathBase.prototype =
     {
         return this.CompiledCtrPrp.Copy();
     },
-    // TO DO
-    // пересмотреть
-    getCtrPrpForFirst: function()
+
+    getCtrPrpForFirst: function(ParaMath)
     {
         var ctrPrp = new CTextPr();
-        var defaultRPrp = this.ParaMath.Get_Default_TPrp();
+        var defaultRPrp = ParaMath.Get_Default_TPrp();
         //var gWPrp = defaultRPrp.getMergedWPrp();
         ctrPrp.Merge(defaultRPrp);
         ctrPrp.Merge(this.CtrPrp);
@@ -1001,18 +1000,20 @@ CMathBase.prototype =
         this.Parent = Parent;
         this.ParaMath = ParaMath;
 
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].Resize(this, ParaMath, oMeasure);
+
+        this.recalculateSize(oMeasure); // передаем oMeasure, для
+    },
+    CompiledCtrPrp: function()
+    {
         if(this.RecalcInfo.bCtrPrp == true)
         {
             this.Set_CompiledCtrPrp();
             this.RecalcInfo.bCtrPrp = false;
             //this.RecalcInfo.bProps  = false;
         }
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].Resize(this, ParaMath, oMeasure);
-
-        this.recalculateSize(oMeasure); // передаем oMeasure, для
     },
     getAscent: function(oMeasure, _height)
     {

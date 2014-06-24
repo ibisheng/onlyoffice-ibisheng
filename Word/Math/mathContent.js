@@ -405,8 +405,10 @@ CRecalculateInfo.prototype =
         }
         else
         {
-            var currCoeff = 0,
-                rightCoeff = 0;
+            var leftCoeff = 0,  /// for Current Object
+                rightCoeff = 0; /// for Left Object
+
+            var leftCode;
 
             if(this.Current.typeObj == MATH_TEXT)
             {
@@ -418,14 +420,14 @@ CRecalculateInfo.prototype =
                     if(this.Left.typeObj == MATH_COMP)
                     {
                         rightCoeff = this.getGapsMComp(this.Left, 1);
-                        currCoeff = COEFF_GAPS.getCoeff(currCode, -1, -1);
+                        leftCoeff = COEFF_GAPS.getCoeff(currCode, -1, -1);
 
-                        currCoeff -= rightCoeff;
+                        leftCoeff -= rightCoeff;
                     }
                     else
                     {
-                        var leftCode = this.Left.getCodeChr();
-                        currCoeff = COEFF_GAPS.getCoeff(currCode, leftCode, -1);
+                        leftCode = this.Left.getCodeChr();
+                        leftCoeff = COEFF_GAPS.getCoeff(currCode, leftCode, -1);
                         rightCoeff = COEFF_GAPS.getCoeff(leftCode, currCode, 1);
                     }
 
@@ -435,7 +437,7 @@ CRecalculateInfo.prototype =
             }
             else
             {
-                currCoeff = this.getGapsMComp(this.Current, -1);
+                leftCoeff = this.getGapsMComp(this.Current, -1);
 
                 if(this.Left != null)
                 {
@@ -443,33 +445,33 @@ CRecalculateInfo.prototype =
                     {
                         rightCoeff = this.getGapsMComp(this.Left, 1);
 
-                        if(rightCoeff/2 > currCoeff)
-                            rightCoeff -= currCoeff;
+                        if(rightCoeff/2 > leftCoeff)
+                            rightCoeff -= leftCoeff;
                         else
                             rightCoeff /= 2;
 
-                        if(currCoeff < rightCoeff/2)
+                        if(leftCoeff < rightCoeff/2)
                         {
-                            currCoeff = rightCoeff/2;
+                            leftCoeff = rightCoeff/2;
                         }
                     }
                     else
                     {
-                        var leftCode = this.Left.getCodeChr();
+                        leftCode = this.Left.getCodeChr();
                         rightCoeff = COEFF_GAPS.getCoeff(leftCode, -1, 1);
-                        if(rightCoeff > currCoeff)
-                            rightCoeff -= currCoeff;
+                        if(rightCoeff > leftCoeff)
+                            rightCoeff -= leftCoeff;
                     }
                 }
                 else
-                    currCoeff = 0;
+                    leftCoeff = 0;
             }
 
-            currCoeff = Math.ceil(currCoeff*10)/10;
+            leftCoeff = Math.ceil(leftCoeff*10)/10;
             rightCoeff = Math.ceil(rightCoeff*10)/10;
 
             var LGapSign = 0.1513*this.currRunPrp.FontSize;
-            this.Current.GapLeft = Math.ceil(currCoeff*LGapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
+            this.Current.GapLeft = Math.ceil(leftCoeff*LGapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
 
             if(this.Left != null)
             {
@@ -477,8 +479,6 @@ CRecalculateInfo.prototype =
                 this.Left.GapRight = Math.ceil(rightCoeff*RGapSign*10)/10;
             }
         }
-
-        this.bResize = true;
     },
     getGapsMComp: function(MComp, direct)
     {
@@ -5039,6 +5039,7 @@ CMathContent.prototype =
             descent =  descent < oDescent ? oDescent : descent;
         }
 
+
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },
     Resize: function(Parent, ParaMath, oMeasure)      // пересчитываем всю формулу  a
@@ -5060,11 +5061,16 @@ CMathContent.prototype =
         for(var pos = 0; pos < lng; pos++)
         {
             if(this.content[pos].typeObj == MATH_COMP)
+            {
+                // мержим ctrPrp до того, как добавим Gaps !
+                this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath несмержим ctrPrp
                 this.content[pos].SetGaps(this, ParaMath, RecalcInfo);
-            else if(this.content[pos].typeObj == MATH_PARA_RUN)
+            }
+            else if(this.content[pos].typeObj == MATH_PARA_RUN && !this.content[pos].Is_Empty())
                 this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, RecalcInfo);
-
         }
+
+
 
         if(RecalcInfo.Current !== null)
             RecalcInfo.Current.GapRight = 0;
@@ -5702,11 +5708,11 @@ CMathContent.prototype =
         this.plhHide = flag;
     },
     ///////// RunPrp, CtrPrp
-    getFirstRPrp:    function()
+    getFirstRPrp:    function(ParaMath)
     {
         //var rPrp =  new CMathRunPrp();
         var rPrp = new CTextPr();
-        var defaultRPrp = this.ParaMath.Get_Default_TPrp();
+        var defaultRPrp = ParaMath.Get_Default_TPrp();
         rPrp.Merge(defaultRPrp);
 
         if(this.content.length > 1)
@@ -5718,7 +5724,7 @@ CMathContent.prototype =
             }
             else if(obj.typeObj === MATH_COMP)
             {
-                var FirstRPrp = obj.getCtrPrpForFirst();// иначе зациклимся на getCtrPrp
+                var FirstRPrp = obj.getCtrPrpForFirst(ParaMath);// иначе зациклимся на getCtrPrp
                 rPrp.Merge(FirstRPrp);
             }
         }

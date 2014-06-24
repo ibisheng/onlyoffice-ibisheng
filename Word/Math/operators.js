@@ -3247,7 +3247,7 @@ COperator.prototype.setPosition = function(Positions)
             NewPos.y = this.Positions[0].y;
 
 
-        var operator = this.operator;
+        /*var operator = this.operator;
         if (!operator.bJDraw)                      // for text
         {
             operator.pos.x = NewPos.x + operator.GapLeft;
@@ -3259,7 +3259,7 @@ COperator.prototype.setPosition = function(Positions)
         {
             operator.pos.x = NewPos.x - operator.rasterOffsetX;
             operator.pos.y = NewPos.y - operator.rasterOffsetY;
-        }
+        }*/
 
         this.operator.setPosition(NewPos);
     }
@@ -3539,11 +3539,11 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    if(this.RecalcInfo.bCtrPrp == true)
+    /*if(this.RecalcInfo.bCtrPrp == true)
     {
         this.Set_CompiledCtrPrp();
         this.RecalcInfo.bCtrPrp = false;
-    }
+    }*/
 
     if(this.RecalcInfo.bProps == true)
     {
@@ -4038,11 +4038,11 @@ CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    if(this.RecalcInfo.bCtrPrp == true)
+    /*if(this.RecalcInfo.bCtrPrp == true)
     {
         this.Set_CompiledCtrPrp();
         this.RecalcInfo.bCtrPrp = false;
-    }
+    }*/
 
     var base = this.elements[0][0];
     base.Resize(this, ParaMath, oMeasure);

@@ -1099,21 +1099,23 @@ CAccent.prototype.setPosition = function(pos)
 }
 CAccent.prototype.getPropsForWrite = function()
 {
-    var props = {};
+    /*var props = {};
     props.chr = String.fromCharCode(this.code);
 
-    return props;
+    return props;*/
+
+    return this.Pr;
 }
 CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    if(this.RecalcInfo.bCtrPrp == true)
+    /*if(this.RecalcInfo.bCtrPrp == true)
     {
         this.Set_CompiledCtrPrp();
         this.RecalcInfo.bCtrPrp = false;
-    }
+    }*/
 
     if(this.RecalcInfo.bProps == true)
     {
@@ -1131,8 +1133,8 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
         this.operator.mergeProperties(prp, defaultPrp);
 
-        this.Pr.chr = String.fromCharCode(this.operator.code);
-        this.Pr.chrType = this.operator.typeOper;
+        /*this.Pr.chr = String.fromCharCode(this.operator.code);
+        this.Pr.chrType = this.operator.typeOper;*/
     }
 
     this.operator.relate(this);

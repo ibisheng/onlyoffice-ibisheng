@@ -1009,11 +1009,11 @@ CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    if(this.RecalcInfo.bCtrPrp == true)
+    /*if(this.RecalcInfo.bCtrPrp == true)
     {
         this.Set_CompiledCtrPrp();
         this.RecalcInfo.bCtrPrp = false;
-    }
+    }*/
 
     if(this.RecalcInfo.bProps)
     {
@@ -1060,6 +1060,7 @@ CRadical.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.Iterator.Resize(this, ParaMath, oMeasure);
         this.RealBase.Resize(this, ParaMath, oMeasure);
     }
+
     var shTop,
         height, width, ascent;
 
