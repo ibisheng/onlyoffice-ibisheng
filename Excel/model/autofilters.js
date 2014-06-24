@@ -2538,18 +2538,18 @@ var gUndoInsDelCellsFlag = true;
 							{
 								if(this._dataFilterParse(arrVal[h],valActive))
 									isConsist = h;
-							}
+							};
+							
 							if(isConsist == undefined)//создаём новый элемент дата
 							{
 								var dataVal = NumFormat.prototype.parseDate(valActive);
-								valActive = 
-								{
-									DateTimeGrouping: 1,
-									Day: dataVal.d,
-									Month: dataVal.month + 1,
-									Year: dataVal.year
-								}
-							}
+								valActive = new DateGroupItem();
+								valActive.DateTimeGrouping = 1;
+								valActive.Day = dataVal.d;
+								valActive.Month = dataVal.month + 1;
+								valActive.Year = dataVal.year;
+							};
+							
 							if(array[i] == true && isConsist == undefined)//добавляем значение в конец
 								arrVal[arrVal.length] = valActive;
 							else if(array[i] == false && isConsist != undefined)//убираем данное значение из массива
@@ -5325,6 +5325,8 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(filter.AutoFilter)
 								filter.AutoFilter.FilterColumns = cloneFilterColums;
+							if(!filter.AutoFilter)
+								filter.AutoFilter = new AutoFilter();
 							filter.AutoFilter.Ref = inFilter;
 						}
 					};
