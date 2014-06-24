@@ -2628,7 +2628,6 @@ UndoRedoWorkbook.prototype = {
 			{
 				var outputParams = {sheet: null, cwf: null};
 				this.wb.removeWorksheet(Data.insertBefore, outputParams);
-				this.wb.handlers.trigger("removeWorksheet", Data.insertBefore);
 				//сохраняем тот sheet который удалили, иначе может возникнуть ошибка, если какой-то обьект запоминал ссылку на sheet(например):
 				//Добавляем лист  -> Добавляем ссылку -> undo -> undo -> redo -> redo
 				Data.sheet = outputParams.sheet;
@@ -2664,7 +2663,6 @@ UndoRedoWorkbook.prototype = {
 						this.wb.copyWorksheet(nIndex, Data.insertBefore, Data.name, Data.sheetid, true);
 					}
 				}
-				this.wb.handlers.trigger("spliceWorksheet", Data.insertBefore, 0, null);
 			}
 		}
 		else if(historyitem_Workbook_SheetRemove == Type)
@@ -2672,7 +2670,6 @@ UndoRedoWorkbook.prototype = {
 			if(bUndo)
 			{
 				this.wb.insertWorksheet(Data.index, Data.sheet, Data.cwf);
-				this.wb.handlers.trigger("spliceWorksheet", Data.index, 0, null);
 			}
 			else
 			{
@@ -2685,7 +2682,6 @@ UndoRedoWorkbook.prototype = {
 				if(null != nIndex)
 				{
 					this.wb.removeWorksheet(nIndex);
-					this.wb.handlers.trigger("removeWorksheet", nIndex);
 				}
 			}
 		}
@@ -2694,12 +2690,10 @@ UndoRedoWorkbook.prototype = {
 			if(bUndo)
 			{
 				this.wb.replaceWorksheet(Data.to, Data.from);
-				this.wb.handlers.trigger("replaceWorksheet", Data.to, Data.from);
 			}
 			else
 			{
 				this.wb.replaceWorksheet(Data.from, Data.to);
-				this.wb.handlers.trigger("replaceWorksheet", Data.from, Data.to);
 			}
 		}
 		else if(historyitem_Workbook_SheetPositions == Type)

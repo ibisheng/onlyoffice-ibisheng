@@ -435,6 +435,9 @@ CHistory.prototype =
 	            }
 	            gUndoInsDelCellsFlag = true;
 	        }
+            //синхронизация index и id worksheet
+	        if (oRedoObjectParam.bUpdateWorksheetByModel)
+	            this.workbook.handlers.trigger("updateWorksheetByModel");
 	        for (var i in Point.UpdateRigions)
 	            this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
 	        if (bUndo) {
@@ -453,8 +456,6 @@ CHistory.prototype =
 	        }
 	        for (var i in oRedoObjectParam.oChangeWorksheetUpdate)
 	            this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);
-	        if (oRedoObjectParam.bUpdateWorksheetByModel)
-	            this.workbook.handlers.trigger("updateWorksheetByModel");
 	        if (oRedoObjectParam.bOnSheetsChanged)
 	            this.workbook.handlers.trigger("asc_onSheetsChanged");
 	        for (var i in oRedoObjectParam.oOnUpdateTabColor) {
