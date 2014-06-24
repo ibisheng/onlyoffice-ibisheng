@@ -2391,8 +2391,8 @@ function Binary_oMathWriter(memory, oMathPara)
 		var oThis = this;
 		if (null != props.mcJc)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.McJc, function(){oThis.WriteMcJc(props.mcJc);});
-		if (null != props.column)
-			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Count, function(){oThis.WriteCount(props.column);});
+		if (null != props.count)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Count, function(){oThis.WriteCount(props.count);});
 	}
 	this.WriteMcJc = function(McJc)
 	{
@@ -2408,7 +2408,8 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteMcs = function(props)
 	{
 		var oThis = this;
-		this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMc(props);});
+		for(var i = nStart; i < props.mc.length; i++)	
+			this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMc(props.mc[i]);});
 	}
 	this.WriteMPr = function(props,oMatrix)
 	{
@@ -8725,6 +8726,16 @@ function Binary_oMathReader(stream)
 
         return res;
     };
+	this.ReadMathCount = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+		props.count = 0;
+		
+		if(c_oSer_OMathBottomNodesValType.Val == type)
+            props.count = this.stream.GetULongLE();
+
+        return res;
+    };
 	this.ReadMathChr = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
@@ -9320,7 +9331,7 @@ function Binary_oMathReader(stream)
 			for(var i=0; i<props.row; i++)
 			{
 				arrContent[i] = [];
-				for(var j=0; j<props.column; j++)
+				for(var j=0; j<props.mc[i].count; j++)
 					arrContent[i][j] = oMatrix.getElement(i,j);
 			}
         }
@@ -9377,8 +9388,7 @@ function Binary_oMathReader(stream)
 		if (c_oSer_OMathBottomNodesType.Count === type)
         {
 			res = this.bcr.Read2(length, function(t, l){
-				//column а не count
-                return oThis.ReadMathColumn(t,l,props);
+                return oThis.ReadMathCount(t,l,props);
             });		
         }
 		else if (c_oSer_OMathBottomNodesType.McJc === type)
