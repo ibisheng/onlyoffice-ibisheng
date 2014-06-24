@@ -10198,8 +10198,7 @@
 						tmpSelectRange = this.model.getRange2(selectRange);
 					}
 
-					if (null !== tmpSelectRange)
-					{
+					if (null !== tmpSelectRange) {
 						var bbox = tmpSelectRange.getBBox0();
 						this.activeRange.assign(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
 					}

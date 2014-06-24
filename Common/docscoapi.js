@@ -5,7 +5,7 @@
 	
 	var asc			= window["Asc"];
 	var asc_user	= asc.asc_CUser;
-	var asc_coAuthV	= '3.0.0';
+	var asc_coAuthV	= '3.0.1';
 
 	// Класс надстройка, для online и offline работы
 	var CDocsCoApi = function (options) {
@@ -458,7 +458,8 @@
 
 		this._send({"type": "saveChanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
-			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel, "deleteIndex": this.deleteIndex});
+			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel, "deleteIndex": this.deleteIndex,
+			"startIndex": startIndex});
 	};
 
 	DocsCoApi.prototype.unLockDocument = function () {
