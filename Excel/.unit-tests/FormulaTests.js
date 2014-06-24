@@ -800,8 +800,7 @@
 
         wb.getWorksheet( 0 ).setName( "ЛистTEMP" );
 
-        strictEqual( ws.getCell2( "S100" ).getCells()[0].getFormula(), wb.getWorksheet( 0 ).getName() + "!S95",
-					 ws.getCell2( "S100" ).getCells()[0].getFormula() + " " + wb.getWorksheet( 0 ).getName() + "!S95" );
+        strictEqual( ws.getCell2( "S100" ).getCells()[0].getFormula(), wb.getWorksheet( 0 ).getName() + "!S95" );
 
     } )
 
