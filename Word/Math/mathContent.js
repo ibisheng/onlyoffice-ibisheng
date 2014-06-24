@@ -7095,6 +7095,7 @@ CMathContent.prototype =
 			case 18:	props = {ctrPrp: new CTextPr(), type:SQUARE_RADICAL, degHide:true};					
 						var oRadical = new CRadical(props);
 						this.CreateRadical(oRadical, this, null, null);
+						oRadical.Iterator = null;
 						break;
 			case 19:	props = {ctrPrp: new CTextPr(), type:DEGREE_RADICAL};					
 						var oRadical = new CRadical(props);
@@ -7123,9 +7124,7 @@ CMathContent.prototype =
 						var oRadical = new CRadical(props);
 						this.CreateElem(oRadical, oElemNum);						
 						var oElem = oRadical.getBase();
-						var oDeg = oRadical.getDegree();
-						oDeg.degHide = true;
-						oDeg = null;
+						oRadical.Iterator = null;
 						
 						props = {ctrPrp: new CTextPr(), type:DEGREE_SUPERSCRIPT};
 						var oDegree = new CDegree(props);
@@ -7143,9 +7142,7 @@ CMathContent.prototype =
 			case 23:	props = {ctrPrp: new CTextPr(), type:SQUARE_RADICAL, degHide:true};
 						var oRadical = new CRadical(props);
 						this.CreateElem(oRadical, this);
-						var oDeg = oRadical.getDegree();
-						oDeg.degHide = true;
-						oDeg = null;
+						oRadical.Iterator = null;
 						
 						var oElem = oRadical.getBase();
 						props = {ctrPrp: new CTextPr(), type:DEGREE_SUPERSCRIPT};
@@ -8768,13 +8765,7 @@ CMathContent.prototype =
         this.AddText(oElem, sElemText);
 
         var oDeg = oRad.getDegree();
-		if (oRad.Pr.degHide == true && sDegText == null)
-		{	
-			oDeg.degHide = true;
-			oDeg = null;
-		}
-		else
-			this.AddText(oDeg, sDegText);
+		this.AddText(oDeg, sDegText);
     },
 
     CreateNary : function (oNary,oParentElem,sElemText,sSubText,sSupText)

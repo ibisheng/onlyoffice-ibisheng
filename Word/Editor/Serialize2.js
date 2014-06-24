@@ -8365,8 +8365,9 @@ function Binary_oMathReader(stream)
         {
 			var oContent = {};
 			var oDeg = {};
+			var oRad = {};
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathRad(t,l,props,oElem,oContent,oDeg);
+                return oThis.ReadMathRad(t,l,props,oElem,oRad,oContent,oDeg);
             });			
         }
 		else if (c_oSer_OMathContentType.SPre === type)
@@ -9891,30 +9892,27 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathRad = function(type, length, props, oParent, oContent, oDeg)
+	this.ReadMathRad = function(type, length, props, oParent, oRad, oContent, oDeg)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		if (c_oSer_OMathContentType.RadPr === type)
         {			
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathRadPr(t,l,props,oRad);
+                return oThis.ReadMathRadPr(t,l,props);
             });
-			var oRad = new CRadical(props);
+			oRad.content = new CRadical(props);
 			if (oParent)
-				oParent.addElementToContent(oRad);
-			oDeg.content = oRad.getDegree();
-			oContent.content = oRad.getBase();
+				oParent.addElementToContent(oRad.content);
+			oDeg.content = oRad.content.getDegree();
+			oContent.content = oRad.content.getBase();
         }
 		else if (c_oSer_OMathContentType.Deg === type)
         {
 			if (oDeg.content && length == 0 && props.degHide !== true)
 				oDeg.content.fillPlaceholders();
 			else if ( oDeg.content && length == 0 && props.degHide == true)
-			{
-				oDeg.content.degHide = true;
-				oDeg.content = null;				
-			}
+				oRad.content.Iterator = null;				
 
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oDeg.content);
