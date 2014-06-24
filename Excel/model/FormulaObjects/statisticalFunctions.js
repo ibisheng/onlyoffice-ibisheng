@@ -4982,6 +4982,10 @@ cVAR.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
 
+        if( x.length < 1 ){
+            return new cError( cErrorType.division_by_zero );
+        }
+
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
@@ -5071,6 +5075,10 @@ cVARA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
 
+        if( x.length < 1 ){
+            return new cError( cErrorType.division_by_zero );
+        }
+
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
@@ -5109,7 +5117,7 @@ cVARA.prototype.Calculate = function ( arg ) {
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else {
+                else if ( elem instanceof  cString ) {
                     arr0.push( new cNumber( 0 ) );
                 }
             } );
@@ -5122,7 +5130,7 @@ cVARA.prototype.Calculate = function ( arg ) {
             else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
-            else {
+            else if ( a instanceof  cString ) {
                 arr0.push( new cNumber( 0 ) );
             }
         }
@@ -5134,7 +5142,7 @@ cVARA.prototype.Calculate = function ( arg ) {
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else {
+                else if ( a instanceof  cString ) {
                     arr0.push( new cNumber( 0 ) );
                 }
             } );
@@ -5142,11 +5150,12 @@ cVARA.prototype.Calculate = function ( arg ) {
         else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+        else if ( arg[j] instanceof cString ){
             arr0.push( new cNumber( 0 ) );
         }
-        else
+        else if ( arg[j] instanceof  cError ){
             return this.value = cError( cErrorType.wrong_value_type )
+        }
 
     }
     return this.value = _var( arr0 );
@@ -5180,12 +5189,16 @@ cVARP.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
 
+        if( x.length < 1 ){
+            return new cError( cErrorType.division_by_zero );
+        }
+
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
             if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
-                tA.push( x[i].getValue() )
+                tA.push( x[i].getValue() );
                 xLength++;
             }
             else if ( x[i] instanceof  cError ) {
@@ -5198,11 +5211,11 @@ cVARP.prototype.Calculate = function ( arg ) {
 
         for ( var i = 0; i < x.length; i++ ) {
 
-            sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
+            sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x);
 
         }
 
-        return new cNumber( sumSQRDeltaX / xLength )
+        return new cNumber( sumSQRDeltaX / xLength );
 
     }
 
@@ -5271,6 +5284,10 @@ cVARPA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
 
+        if( x.length < 1 ){
+            return new cError( cErrorType.division_by_zero );
+        }
+
         var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
         for ( var i = 0; i < x.length; i++ ) {
 
@@ -5309,7 +5326,7 @@ cVARPA.prototype.Calculate = function ( arg ) {
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else {
+                else if ( elem instanceof  cString ){
                     arr0.push( new cNumber( 0 ) );
                 }
             } );
@@ -5322,7 +5339,7 @@ cVARPA.prototype.Calculate = function ( arg ) {
             else if ( a instanceof  cBool ) {
                 arr0.push( a.tocNumber() );
             }
-            else {
+            else if ( a instanceof  cString ){
                 arr0.push( new cNumber( 0 ) );
             }
         }
@@ -5334,7 +5351,7 @@ cVARPA.prototype.Calculate = function ( arg ) {
                 else if ( elem instanceof  cBool ) {
                     arr0.push( elem.tocNumber() );
                 }
-                else {
+                else if ( elem instanceof  cString ){
                     arr0.push( new cNumber( 0 ) );
                 }
             } );
@@ -5342,11 +5359,12 @@ cVARPA.prototype.Calculate = function ( arg ) {
         else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
             arr0.push( arg[j].tocNumber() );
         }
-        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+        else if ( arg[j] instanceof cString ){
             arr0.push( new cNumber( 0 ) );
         }
-        else
+        else if ( elem instanceof  cError ){
             return this.value = cError( cErrorType.wrong_value_type )
+        }
 
     }
     return this.value = _var( arr0 );
