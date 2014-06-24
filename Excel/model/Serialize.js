@@ -853,6 +853,73 @@
         fontschemeMinor: 1,
         fontschemeNone: 2
     };
+    /** @enum */
+    var ECfOperator =
+    {
+        Operator_beginsWith: 0,
+        Operator_between: 1,
+        Operator_containsText: 2,
+        Operator_endsWith: 3,
+        Operator_equal: 4,
+        Operator_greaterThan: 5,
+        Operator_greaterThanOrEqual: 6,
+        Operator_lessThan: 7,
+        Operator_lessThanOrEqual: 8,
+        Operator_notBetween: 9,
+        Operator_notContains: 10,
+        Operator_notEqual: 11
+    };
+    /** @enum */
+    var ECfType =
+    {
+        aboveAverage: 0,
+        beginsWith: 1,
+        cellIs: 2,
+        colorScale: 3,
+        containsBlanks: 4,
+        containsErrors: 5,
+        containsText: 6,
+        dataBar: 7,
+        duplicateValues: 8,
+        expression: 9,
+        iconSet: 10,
+        notContainsBlanks: 11,
+        notContainsErrors: 12,
+        notContainsText: 13,
+        timePeriod: 14,
+        top10: 15,
+        uniqueValues: 16
+    };
+    /** @enum */
+    var EIconSetType =
+    {
+        Arrows3: 0,
+        Arrows3Gray: 1,
+        Flags3: 2,
+        Signs3: 3,
+        Symbols3: 4,
+        Symbols3_2: 5,
+        Traffic3Lights1: 6,
+        Traffic3Lights2: 7,
+        Arrows4: 8,
+        Arrows4Gray: 9,
+        Rating4: 10,
+        RedToBlack4: 11,
+        Traffic4Lights: 12,
+        Arrows5: 13,
+        Arrows5Gray: 14,
+        Quarters5: 15,
+        Rating5: 16
+    };
+    var ECfvoType =
+    {
+        Formula: 0,
+        Maximum: 1,
+        Minimum: 2,
+        Number: 3,
+        Percent: 4,
+        Percentile: 5,
+    };
 
     var DocumentPageSize = new function() {
         this.oSizes = [
@@ -5949,7 +6016,7 @@
             else if (c_oSer_ConditionalFormattingRule.EqualAverage === type)
                 oConditionalFormattingRule.EqualAverage = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.Operator === type)
-                oConditionalFormattingRule.Operator = this.stream.GetString2LE(length);
+                oConditionalFormattingRule.Operator = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingRule.Percent === type)
                 oConditionalFormattingRule.Percent = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.Priority === type)
@@ -5965,7 +6032,7 @@
             else if (c_oSer_ConditionalFormattingRule.TimePeriod === type)
                 oConditionalFormattingRule.TimePeriod = this.stream.GetString2LE(length);
             else if (c_oSer_ConditionalFormattingRule.Type === type)
-                oConditionalFormattingRule.Type = this.stream.GetString2LE(length);
+                oConditionalFormattingRule.Type = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingRule.ColorScale === type) {
                 oConditionalFormattingRuleElement = new Asc.CColorScale();
                 res = this.bcr.Read1(length, function (t, l) {
@@ -6049,7 +6116,7 @@
             var oThis = this;
             var oObject = null;
             if (c_oSer_ConditionalFormattingIconSet.IconSet === type)
-                oIconSet.IconSet = this.stream.GetString2LE(length);
+                oIconSet.IconSet = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingIconSet.Percent === type)
                 oIconSet.Percent = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingIconSet.Reverse === type)
@@ -6071,7 +6138,7 @@
             if (c_oSer_ConditionalFormattingValueObject.Gte === type)
                 oCFVO.Gte = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingValueObject.Type === type)
-                oCFVO.Type = this.stream.GetString2LE(length);
+                oCFVO.Type = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingValueObject.Val === type)
                 oCFVO.Val = this.stream.GetString2LE(length);
             else
@@ -7601,6 +7668,7 @@
     window["Asc"].EDateTimeGroup = EDateTimeGroup;
     window["Asc"].ETableStyleType = ETableStyleType;
     window["Asc"].EFontScheme = EFontScheme;
+    window["Asc"].EIconSetType = EIconSetType;
 
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;

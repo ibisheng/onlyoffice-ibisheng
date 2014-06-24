@@ -160,8 +160,7 @@
 		if ( !(this instanceof CIconSet) ) {
 			return new CIconSet ();
 		}
-
-		this.IconSet = "3TrafficLights1";
+		this.IconSet = Asc.EIconSetType.Traffic3Lights1;
 		this.Percent = true;
 		this.Reverse = false;
 		this.ShowValue = true;
