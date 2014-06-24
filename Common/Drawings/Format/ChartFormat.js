@@ -1819,13 +1819,6 @@ CPlotArea.prototype =
             var oAxis = this.axId[i].createDuplicate();
             oAxis.setAxId(++GLOBAL_AX_ID_COUNTER);
             c.addAxis(oAxis);
-            
-           // if ( oAxis instanceof CCatAx )
-           //     this.catAx = oAxis;
-           // else if ( oAxis instanceof CValAx )
-           //     this.valAx = oAxis;
-           // else if ( oAxis instanceof CDateAx )
-           //     this.dateAx = oAxis;
         }
 
         var cur_chart, cur_axis;
@@ -1863,19 +1856,6 @@ CPlotArea.prototype =
                 }
             }
         }
-
-        // выставляем axis в chart        
-        // TODO: Диаграмм может быть больше, но мы пока работаем только с одной
-       // var oZeroChart = c.charts[0];
-       // if ( oZeroChart )
-       // {
-       //     len = c.axId.length;
-       //     for ( var i = 0; i < len; i++ )
-       //         oZeroChart.addAxId(c.axId[i]);
-       //
-       //     c.chart = oZeroChart;
-       // }
-       //
         return c;
     },
 
@@ -22951,35 +22931,53 @@ CChart.prototype =
 
     createDuplicate: function()
     {
-        // TODO: Проверить данную функцию
         var c = new CChart();
         
         c.autoTitleDeleted = this.autoTitleDeleted;
-        c.backWall         = this.backWall;
+        if(this.backWall)
+        {
+            c.setBackWall(this.backWall.createDuplicate());
+        }
 
-        c.dispBlanksAs     = this.dispBlanksAs;
-        c.floor            = this.floor;
-        
+        c.setDispBlanksAs(this.dispBlanksAs);
+
+        if(this.floor)
+        {
+            c.setFloor(this.floor.createDuplicate());
+        }
+
         if ( this.legend )
-            c.legend = this.legend.createDuplicate();
+        {
+            c.setLegend(this.legend.createDuplicate());
+        }
         
-        var Count = this.pivotFmts;
-        for ( var i = 0; i < this.pivotFmts; i++ )        
-            c.pivotFmts[i] = this.pivotFmts[i];
+        var Count = this.pivotFmts.length;
+        for ( var i = 0; i < Count; i++ )
+        {
+            c.setPivotFmts(this.pivotFmts[i].createDuplicate());
+        }
         
         if ( this.plotArea )
-            c.plotArea = this.plotArea.createDuplicate();
-
-        c.plotVisOnly      = this.plotVisOnly;
-        c.showDLblsOverMax = this.showDLblsOverMax;
-        c.sideWall         = this.sideWall;
+        {
+            c.setPlotArea(this.plotArea.createDuplicate());
+        }
+        c.setPlotVisOnly(this.plotVisOnly);
+        c.setShowDLblsOverMax(this.showDLblsOverMax);
+        if(this.sideWall)
+        {
+            c.setSideWall(this.sideWall.createDuplicate());
+        }
         
         if ( this.title )
-            c.title = this.title.createDuplicate();
+        {
+            c.setTitle(this.title.createDuplicate());
+        }
         
         if ( this.view3D )
-            c.view3D = this.view3D.createDuplicate();
-        
+        {
+            c.setView3D(this.view3D.createDuplicate());
+        }
+
         return c;
     },
 
@@ -23426,6 +23424,26 @@ CChartWall.prototype =
     },
 
 
+    createDuplicate: function()
+    {
+        var copy = new CChartWall();
+        if(this.pictureOptions)
+        {
+            copy.setPictureOptions(this.pictureOptions.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            copy.setSpPr(this.spPr.createDuplicate());
+        }
+        if(isRealNumber(this.thickness))
+        {
+            copy.setThickness(this.thickness);
+        }
+        return copy;
+
+    },
+
+
     Write_ToBinary2: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -23574,6 +23592,18 @@ CView3d.prototype =
     getObjectType: function()
     {
         return historyitem_type_View3d;
+    },
+
+    createDuplicate: function()
+    {
+        var c = new CView3d();
+        isRealNumber(this.depthPercent) && c.setDepthPercent(this.depthPercent);
+        isRealNumber(this.hPercent) && c.setHPercent(this.hPercent);
+        isRealNumber(this.perspective) && this.setPerspective(this.perspective);
+        isRealBool(this.rAngAx) && c.setRAngAx(this.rAngAx);
+        isRealNumber(this.rotX) && c.setRotX(this.rotX);
+        isRealNumber(this.rotY) && c.setRotY(this.rotY);
+        return c;
     },
 
 
