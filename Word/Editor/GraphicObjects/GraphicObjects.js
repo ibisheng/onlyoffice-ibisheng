@@ -2101,6 +2101,7 @@ CGraphicObjects.prototype =
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(null);
                                 para_drawing.Set_GraphicObject(sp);
+                                sp.setParent(para_drawing);
                                 this.resetSelection();
                                 this.selectObject(sp, cur_group.selectStartPage);
                                 if(para_drawing.Is_Inline())
