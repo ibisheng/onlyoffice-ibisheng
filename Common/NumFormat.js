@@ -3004,7 +3004,7 @@ FormatParser.prototype =
         //в первый проход разделяем date и time с помощью delimiter
         for (var i = 0, length = match.length; i < length; i++) {
             var elem = match[i];
-            if (elem.type == oDataTypes.delimiter){
+            if (elem.type == oDataTypes.delimiter) {
                 bError = true;
                 if(i - 1 >= 0 && i + 1 < length){
                     var prev = match[i - 1];
@@ -3022,6 +3022,18 @@ FormatParser.prototype =
                                 bError = false;
                                 prev.date = true;
                                 next.date = true;
+                            }
+                        }
+                    }
+                }
+                else if (i - 1 >= 0 && i + 1 == length) {
+                    //случай "10:"
+                    var prev = match[i - 1];
+                    if (prev.type != oDataTypes.delimiter) {
+                        if (cultureInfo.TimeSeparator == elem.val || (":" == elem.val && cultureInfo.DateSeparator != elem.val)) {
+                            if (false == prev.date) {
+                                bError = false;
+                                prev.time = true;
                             }
                         }
                     }
@@ -3097,12 +3109,14 @@ FormatParser.prototype =
                     else
                         bError = true;
                 }
+                else if (oDataTypes.digit == elem.type)
+                    bError = true;//случай "1-2-3 10"
             }
             var nDateLength = aDate.length;
             if (nDateLength > 0 && !(2 <= nDateLength && nDateLength <= 3 && (null == nMonthIndex || (3 == nDateLength && 1 == nMonthIndex) || 2 == nDateLength)))
                 bError = true;
             var nTimeLength = aTime.length;
-            if (nTimeLength > 0 && !(nTimeLength <= 3 && (am || pm || 2 <= nTimeLength)))
+            if (nTimeLength > 3)
                 bError = true;
             if(!bError){
                 res = { d: null, m: null, y: null, h: null, min: null, s: null, am: am, pm: pm, sDateFormat: null };
