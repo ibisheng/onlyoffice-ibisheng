@@ -1260,7 +1260,7 @@ CAccent.prototype.Write_ToBinary2 = function( Writer )
     var Flags = 0;
 	if ( undefined != this.Pr.chr )
     {
-		Writer.WriteString2(this.Pr.chr);	
+		Writer.WriteLong(this.Pr.chr);	
 		Flags |= 1;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -1279,7 +1279,7 @@ CAccent.prototype.Read_FromBinary2 = function( Reader )
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
-		props.chr = Reader.GetString2();	
+		props.chr = Reader.GetLong();	
 		
 	this.fillMathComposition (props, arrElems);
 }

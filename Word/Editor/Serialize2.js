@@ -8328,7 +8328,7 @@ function Binary_oMathReader(stream)
         {
 			var oMatrix = {};
 			var arrContent = [];
-			props.mc = [];
+			props.mcs = [];
             res = this.bcr.Read1(length, function(t, l){				
                 return oThis.ReadMathMatrix(t,l,props,oElem,oMatrix,arrContent);
             });			
@@ -9331,7 +9331,7 @@ function Binary_oMathReader(stream)
 			for(var i=0; i<props.row; i++)
 			{
 				arrContent[i] = [];
-				for(var j=0; j<props.mc[i].count; j++)
+				for(var j=0; j<props.mcs[i].count; j++)
 					arrContent[i][j] = oMatrix.getElement(i,j);
 			}
         }
@@ -9411,7 +9411,7 @@ function Binary_oMathReader(stream)
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMc(t,l,mc);
             });	
-			props.mc.push(mc);
+			props.mcs.push(mc);
         }
         else
             res = c_oSerConstants.ReadUnknown;

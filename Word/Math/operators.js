@@ -3948,9 +3948,9 @@ CDelimiter.prototype.Refresh_RecalcData = function(Data)
 CDelimiter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_delimiter );
-	Writer.WriteLong(this.column);	
+	Writer.WriteLong(this.Pr.column);	
 	
-	for (var i=0; i<this.column; i++)
+	for (var i=0; i<this.Pr.column; i++)
 		Writer.WriteString2( this.getBase(i).Id );
 	
 	this.CtrPrp.Write_ToBinary(Writer);

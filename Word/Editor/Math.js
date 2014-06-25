@@ -349,19 +349,17 @@ ParaMath.prototype =
         var start = oContent.Start,
             end   = oContent.End,
             oMathContent = oContent.Content;
+		var len = end - start + 1;
 
         History.Create_NewPoint();		
         History.Create_NewPoint();
-		var oStartContent = oContent.Content.content[oContent.Start];
-		var oEndContent = oContent.Content.content[oContent.End];		
+		var oStartContent = oContent.Content.content[start];
+		var oEndContent = oContent.Content.content[end];
 		var Items = [];
-		for (var i=oContent.Start; i<=oContent.End; i++)
-		{
+		for (var i=start; i<=end; i++)
 			Items.push(oContent.Content.content[i]);
-			oContent.Content.content.splice( i, 1 );
-			if (Direction < 0)
-				oContent.Content.CurPos--;
-		}
+
+		oContent.Content.content.splice( oContent.Start, len );
 		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
 		return;
     },
