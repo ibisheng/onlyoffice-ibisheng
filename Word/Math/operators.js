@@ -182,11 +182,6 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
         YY[i] = y + X[i]*a2 + Y[i]*b2 + c2 + gpY;
     }
 
-    for(var i = 0; i < YY.length; i++)
-    {
-        console.log("YY["+ i + "] = "+ YY[i]);
-    }
-
     var intGrid = MathControl.pGraph.GetIntegerGrid();
     MathControl.pGraph.SetIntegerGrid(false);
 

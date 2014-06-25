@@ -75,7 +75,6 @@ function ParaMath()
 	g_oTableId.Add( this, this.Id );
 }
 
-var BFIRST = true;
 
 ParaMath.prototype =
 {
@@ -1367,7 +1366,20 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_LeftPos
 
-        var result = this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
+        return this.Root.Get_LeftPos(SearchPos, ContentPos, Depth, UseContentPos, false);
+    },
+
+    Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+    {
+        // TODO: ParaMath.Get_RightPos
+
+        return this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
+    },
+
+    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        // TODO: ParaMath.Get_StartEndPos
+        this.Root.Get_WordStartPos(SearchPos, ContentPos, Depth, UseContentPos, false);
 
         /*var str = "";
 
@@ -1377,34 +1389,6 @@ ParaMath.prototype =
         }
 
         console.log(str);*/
-
-        BFIRST = false;
-
-        return result;
-    },
-
-    Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
-    {
-        // TODO: ParaMath.Get_RightPos
-
-        var result = this.Root.Get_RightPos(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, false);
-
-        var str = "";
-
-        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-        {
-            str += SearchPos.Pos.Data[i] + "  ";
-        }
-
-        console.log(str);
-
-        return result;
-    },
-
-    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
-    {
-        // TODO: ParaMath.Get_StartEndPos
-        this.Root.Get_WordStartPos(SearchPos, ContentPos, Depth, UseContentPos, false);
     },
 
     Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)

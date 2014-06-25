@@ -19,9 +19,6 @@ function CMathBase()
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
 
-    //this.SelectStart_X = 0;
-    //this.SelectStart_Y = 0;
-
     this.SelectStart =
     {
         X:          0,
@@ -35,9 +32,6 @@ function CMathBase()
         Y:          0,
         bOutside:   false
     };
-
-    //this.SelectEnd_X = 0;
-    //this.SelectEnd_Y = 0;
 
     this.bSelectionUse = false;
 
@@ -1506,7 +1500,6 @@ CMathBase.prototype =
     Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
         var CurPos_X, CurPos_Y;
-        var result = false;
 
         if(UseContentPos === true)
         {
@@ -1556,14 +1549,11 @@ CMathBase.prototype =
 
         }
 
-        result = SearchPos.Found;
-
-        return result;
+        return SearchPos.Found;
     },
     Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
     {
         var CurPos_X, CurPos_Y;
-        var result = false;
 
         if(UseContentPos === true)
         {
@@ -1612,57 +1602,10 @@ CMathBase.prototype =
 
         }
 
-        result = SearchPos.Found;
+        /*var str = "Start: Outside " + this.SelectStart.bOutside + ", X " + this.SelectStart.X + ", Y " + this.SelectStart.Y + " ; "  + "End: Outside " + this.SelectEnd.bOutside +  ", X " + this.SelectEnd.X + ", Y " + this.SelectEnd.Y;
+        console.log(str);*/
 
-        var str = "Start: Outside " + this.SelectStart.bOutside + ", X " + this.SelectStart.X + ", Y " + this.SelectStart.Y + " ; "  + "End: Outside " + this.SelectEnd.bOutside +  ", X " + this.SelectEnd.X + ", Y " + this.SelectEnd.Y;
-        console.log(str);
-
-        return result;
-    },
-    old_Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
-    {
-        var CurPos_X, CurPos_Y;
-
-        if(UseContentPos === true)
-        {
-            CurPos_X = ContentPos.Get(Depth);
-            CurPos_Y = ContentPos.Get(Depth + 1);
-        }
-        else
-        {
-            CurPos_X = this.nRow - 1;
-            CurPos_Y = this.nCol - 1;
-        }
-
-        this.elements[CurPos_X][CurPos_Y].Get_WordStartPos(SearchPos, ContentPos, Depth + 2, UseContentPos);
-
-        while(CurPos_X >= 0)
-        {
-            var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
-                usePlh = !bJDraw && UseContentPos && this.elements[CurPos_X][CurPos_Y].IsPlaceholder(); // при первом проходе на плейсхолдере Get_WordStartPos не произойдет (если UseContentPos = true)
-                                                                                                        // на втором проходе UseContentPos = false
-
-            if(!bJDraw && !usePlh)
-            {
-                this.elements[CurPos_X][CurPos_Y].Get_WordStartPos(SearchPos, ContentPos, Depth + 2, UseContentPos);
-                SearchPos.Pos.Update(CurPos_X, Depth);
-                SearchPos.Pos.Update(CurPos_Y, Depth+1);
-            }
-
-            if(SearchPos.Found === true)
-                break;
-
-            UseContentPos = false;
-
-            CurPos_Y--;
-
-            if(CurPos_Y < 0)
-            {
-                CurPos_X--;
-                CurPos_Y = this.nCol - 1;
-            }
-        }
-
+        return SearchPos.Found;
     },
     Get_WordStartPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
@@ -1672,6 +1615,11 @@ CMathBase.prototype =
         {
             CurPos_X = ContentPos.Get(Depth);
             CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else if(SearchPos.ForSelection == true && this.SelectEnd.bOutside === true)
+        {
+            CurPos_X = this.SelectEnd.X;
+            CurPos_Y = this.SelectEnd.Y;
         }
         else
         {
@@ -1704,7 +1652,7 @@ CMathBase.prototype =
                 EndRun      = true;
             }
 
-            if(SearchPos.Found === true)
+            if(SearchPos.Found === true || SearchPos.ForSelection == true)
                 break;
 
             CurPos_X--;
@@ -1720,6 +1668,11 @@ CMathBase.prototype =
         {
             CurPos_X = ContentPos.Get(Depth);
             CurPos_Y = ContentPos.Get(Depth + 1);
+        }
+        else if(SearchPos.ForSelection == true && this.SelectEnd.bOutside === true)
+        {
+            CurPos_X = this.SelectEnd.X;
+            CurPos_Y = this.SelectEnd.Y;
         }
         else
         {
@@ -1752,7 +1705,7 @@ CMathBase.prototype =
                 BegRun      = true;
             }
 
-            if(SearchPos.Found === true)
+            if(SearchPos.Found === true || SearchPos.ForSelection == true)
                 break;
 
             CurPos_X++;
@@ -1861,25 +1814,13 @@ CMathBase.prototype =
     },
     SetSelectAll: function()
     {
-        /*this.SelectStart_X = -1;
-        this.SelectStart_Y = -1;*/
-
         this.SelectStart.bOutside = true;
         this.SelectEnd.bOutside   = true;
 
         this.bSelectionUse = true;
-
-        /*this.SelectEnd_X = this.nRow - 1;
-        this.SelectEnd_Y = this.nCol - 1;*/
-
     },
     SelectToParent: function()
     {
-        /*this.SelectStart.bOutside = true;
-        this.SelectEnd.bOutside   = true;
-
-        this.bSelectionUse = true;*/
-
         this.bSelectionUse = true;
         this.Parent.SelectToParent();
     },

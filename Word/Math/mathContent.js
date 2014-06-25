@@ -6384,9 +6384,7 @@ CMathContent.prototype =
     ////////////////////
     Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
-        var result = false;
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
-
 
         while(CurPos >= 0 && SearchPos.Found == false)
         {
@@ -6404,8 +6402,6 @@ CMathContent.prototype =
                 var bNotshift     = SearchPos.ForSelection == false,
                     bShiftCurrObj = (SearchPos.ForSelection == true && this.SelectStartPos == CurPos);
 
-                //console.log("Get_LeftPos : CurPos " + CurPos + " SelectStartPos " + this.SelectStartPos);
-
                 if( bNotshift || bShiftCurrObj )
                     this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos, EndRun);
             }
@@ -6422,28 +6418,22 @@ CMathContent.prototype =
             SearchPos.Pos.Update(CurPos, Depth);
 
 
-            if(curType == MATH_PARA_RUN && prevType == MATH_PARA_RUN)
-                EndRun = false;
-            else
-                EndRun = true;
+            // если перемещаемся между контентами мат объекта, то надо выставить курсор в конец следующего контента, в конечную позицию последнего рана
+            EndRun = (curType == MATH_PARA_RUN && prevType == MATH_PARA_RUN) ? false : true;
 
             CurPos--;
             UseContentPos = false;
         }
 
-        result = SearchPos.Found;
 
         /// для коррекции позиции курсора в начале Run
         // используется функция Correct_ContentPos в Paragraph
 
-        return result;
-
+        return SearchPos.Found;
     },
     Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
     {
-        var result = false;
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
-
 
         while(CurPos < this.content.length && SearchPos.Found == false)
         {
@@ -6475,70 +6465,19 @@ CMathContent.prototype =
 
             SearchPos.Pos.Update(CurPos, Depth);
 
+            // если перемещаемся между контентами мат объекта, то надо выставить курсор в начало следующего контента, в начальную позицию первого рана
+            BegRun = (curType == MATH_PARA_RUN && nextType == MATH_PARA_RUN) ? false : true;
 
-            if(curType == MATH_PARA_RUN && nextType == MATH_PARA_RUN)
-                BegRun = false;
-            else
-                BegRun = true;
 
             CurPos++;
             UseContentPos = false;
-
         }
 
-        result = SearchPos.Found;
-
-        return result;
-    },
-    old_Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
-    {
-        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.content.length - 1 );
-
-        //this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
-        //CurPos--;
-
-
-        //if ( true === SearchPos.UpdatePos )
-        //    SearchPos.Pos.Update( CurPos, Depth );
-
-
-        var bFirst = true;
-
-        while(CurPos >= 0 && SearchPos.Found == false)
-        {
-            var item = this.content[CurPos];
-
-            SearchPos.Pos.Update(CurPos, Depth);
-
-            if(item.typeObj == MATH_PLACEHOLDER)
-            {
-                SearchPos.UpdatePos = true;
-                SearchPos.Found = true;
-                break;
-            }
-            else if(item.typeObj == MATH_COMP)
-            {
-                SearchPos.UpdatePos = true;
-                SearchPos.Found = true;
-                break;
-            }
-            else if(item.typeObj == MATH_PARA_RUN)
-            {
-                item.Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
-
-                if(true === SearchPos.UpdatePos)
-                    break;
-            }
-
-            CurPos--;
-        }
-
+        return SearchPos.Found;
     },
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
-
-        var bUseContent = UseContentPos;
 
         while(CurPos >= 0 && SearchPos.Found == false)
         {
@@ -6553,7 +6492,11 @@ CMathContent.prototype =
             }
             else if(curType == MATH_COMP)
             {
-                this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, bUseContent, EndRun);
+                var bNotshift     = SearchPos.ForSelection == false,
+                    bShiftCurrObj = (SearchPos.ForSelection == true && this.SelectStartPos == CurPos);
+
+                if( bNotshift || bShiftCurrObj )
+                    this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos, EndRun);
             }
             else if(EndRun)
             {
@@ -6562,7 +6505,7 @@ CMathContent.prototype =
             }
             else
             {
-                this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, bUseContent);
+                this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
 
                 if(SearchPos.Found == false && SearchPos.Shift == true)
                 {
@@ -6573,22 +6516,18 @@ CMathContent.prototype =
 
             SearchPos.Pos.Update(CurPos, Depth);
 
+            // если перемещаемся между контентами мат объекта, то надо выставить курсор в конец следующего контента, в конечную позицию последнего рана
+            EndRun = (curType == MATH_PARA_RUN && prevType == MATH_PARA_RUN) ? false : true;
 
-            if(curType == MATH_PARA_RUN && prevType == MATH_PARA_RUN)
-                EndRun = false;
-            else
-                EndRun = true;
 
             CurPos--;
-            bUseContent = false;
+            UseContentPos = false;
         }
 
     },
     Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
     {
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
-
-        var bUseContent = UseContentPos;
 
         while(CurPos < this.content.length && SearchPos.Found == false)
         {
@@ -6602,7 +6541,11 @@ CMathContent.prototype =
             }
             else if(curType == MATH_COMP)
             {
-                this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd, BegRun);
+                var bNotshift     = SearchPos.ForSelection == false,
+                    bShiftCurrObj = SearchPos.ForSelection == true && this.SelectStartPos == CurPos;
+
+                if( bNotshift || bShiftCurrObj )
+                    this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd, BegRun);
             }
             else if(BegRun)
             {
@@ -6611,7 +6554,7 @@ CMathContent.prototype =
             }
             else
             {
-                this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd);
+                this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
 
                 if(SearchPos.Found == false && SearchPos.Shift == true)
                 {
@@ -6622,14 +6565,12 @@ CMathContent.prototype =
 
             SearchPos.Pos.Update(CurPos, Depth);
 
+            // если перемещаемся между контентами мат объекта, то надо выставить курсор в начало следующего контента, в начальную позицию первого рана
+            BegRun = (curType == MATH_PARA_RUN && nextType == MATH_PARA_RUN) ? false : true;
 
-            if(curType == MATH_PARA_RUN && nextType == MATH_PARA_RUN)
-                BegRun = false;
-            else
-                BegRun = true;
 
             CurPos++;
-            bUseContent = false;
+            UseContentPos = false;
 
         }
     },
@@ -6685,14 +6626,10 @@ CMathContent.prototype =
         {
             var element;
             if(this.content[i].typeObj == MATH_PARA_RUN)
-            {
                 element = this.content[i].Copy(Selected);
-            }
             else
-            {
                 element = this.content[i].Copy(false);
-                //element.relate(this);
-            }
+
 
             NewContent.content.push(element);
         }
