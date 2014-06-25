@@ -1085,12 +1085,8 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
-
-			// this.vsbApi.evt_mouseup(event);
-			// this.hsbApi.evt_mouseup(event);
-
 			var coord = this._getCoordinates(event);
-			
+
 			// Shapes
 			if ( this.isMouseDownMode && this.isShapeAction ) {
 				event.isLocked = this.isMousePressed = false;
@@ -1132,63 +1128,32 @@
 			}
 			// Режим установки закреплённых областей
 			if (this.isFrozenAnchorMode) {
-				this._moveFrozenAnchorHandleDone(event, { target: this.isFrozenAnchorMode });
+				this._moveFrozenAnchorHandleDone(event, {target: this.isFrozenAnchorMode});
 				this.isFrozenAnchorMode = false;
 			}
 
 			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
 			this.showCellEditorCursor();
 
-            if( this.hsbApiLockMouse )
-                this.hsbApi.mouseDown ? this.hsbApi.evt_mouseup.call(this.hsbApi,event) : false;
-
-            else if( this.vsbApiLockMouse )
-                this.vsbApi.mouseDown ? this.vsbApi.evt_mouseup.call(this.vsbApi,event) : false;
+			if (this.hsbApiLockMouse)
+				this.hsbApi.mouseDown ? this.hsbApi.evt_mouseup.call(this.hsbApi, event) : false;
+			else if (this.vsbApiLockMouse)
+				this.vsbApi.mouseDown ? this.vsbApi.evt_mouseup.call(this.vsbApi, event) : false;
 
 			return true;
 		};
 
 		/**
 		 *
+		 * @param event
 		 * @param x
 		 * @param y
 		 */
-		asc_CEventsController.prototype._onWindowMouseUpExternal = function (x, y) {
-			if (this.isSelectMode) {
-				this.isSelectMode = false;
-				this.handlers.trigger("changeSelectionDone", x, y);
-			}
-
-			if (this.isResizeMode) {
-				this.isResizeMode = false;
-				this.handlers.trigger("resizeElementDone", this.targetInfo, x, y, this.isResizeModeMove);
-				this.isResizeModeMove = false;
-			}
-
-			// Режим автозаполнения
-			if (this.isFillHandleMode) {
-				// Закончили автозаполнение
-				this.isFillHandleMode = false;
-				this.handlers.trigger("changeFillHandleDone", x, y, /*ctrlPress*/false);
-			}
-
-			// Режим перемещения диапазона
-			if (this.isMoveRangeMode) {
-				// Закончили перемещение диапазона
-				this.isMoveRangeMode = false;
-				this.handlers.trigger("moveRangeHandleDone");
-			}
-
-			if (this.isMoveResizeRange) {
-				this.isMoveResizeRange = false;
-				this.isMoveResizeChartsRange = false;
-				this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
-			}
-
-			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
-			this.showCellEditorCursor();
-
-			return true;
+		asc_CEventsController.prototype._onWindowMouseUpExternal = function (event, x, y) {
+			// ToDo стоит переделать на нормальную схему, пока пропишем прямо в эвенте
+			if (null != x && null != y)
+				event.coord = {x: x, y: y};
+			this._onWindowMouseUp(event);
 		};
 
 		/** @param event {MouseEvent} */
@@ -1545,8 +1510,12 @@
 			return true;
 		};
 
-		/** @param event {KeyboardEvent} */
+		/** @param event */
 		asc_CEventsController.prototype._getCoordinates = function (event) {
+			// ToDo стоит переделать
+			if (event.coord)
+				return event.coord;
+
 			var offs = $(this.element).offset();
 			var x = event.pageX - offs.left;
 			var y = event.pageY - offs.top;

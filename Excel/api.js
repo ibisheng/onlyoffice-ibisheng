@@ -3014,8 +3014,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb.getWorksheet().formatPainter();
 			},
 
-			asc_onMouseUp: function (x, y) {
-				this.controller._onWindowMouseUpExternal(x, y);
+			asc_onMouseUp: function (event, x, y) {
+				this.controller._onWindowMouseUpExternal(event, x, y);
 			},
 
 
