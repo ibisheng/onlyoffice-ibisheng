@@ -2715,7 +2715,6 @@ function DrawingObjects() {
     var api = asc["editor"];
     var worksheet = null;
     var asc_Range = asc.Range;
-    var asc_applyFunction = asc.applyFunction;
 
     var chartRender = null;
     if ( typeof ChartRender !== "undefined" )
@@ -2752,7 +2751,6 @@ function DrawingObjects() {
 
     // Task timer
     var aDrawTasks = [];
-    var drawTaskTimerId = null;
 
     function drawTaskFunction() {
 
@@ -2764,6 +2762,8 @@ function DrawingObjects() {
             _this.showDrawingObjectsEx(lastTask.params.clearCanvas, lastTask.params.graphicOption, lastTask.params.printOptions);
             aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
         }
+
+		api._autoSave();
     }
 
     //-----------------------------------------------------------------------------------

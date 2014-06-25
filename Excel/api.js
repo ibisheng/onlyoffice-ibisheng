@@ -98,12 +98,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isCoAuthoringEnable = true;
 
 			// AutoSave
-			this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-			this.autoSaveTimeOutId = null;		// Идентификатор таймаута
-			this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
-			this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении) в милесекундах
+			this.lastSaveTime = null;				// Время последнего сохранения
+			this.autoSaveGapFast = 5000;			// Интервал быстрого автосохранения (когда человек один) - 5 сек.
+			this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
-			this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+			this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
+			this.isAutoSave = false;				// Флаг, означает что запущено автосохранение
+
+			this.canSave = true;					//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 			
 			// Режим вставки диаграмм в редакторе документов
 			this.isChartEditor = false;
@@ -589,13 +591,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 				this.canSave = true;
 				this.isAutoSave = false;
+				this.lastSaveTime = null;
 				this.CoAuthoringApi.unSaveChanges();
-				if (isDocumentSaved) {
-					// Запускаем таймер автосохранения
-					this.autoSaveInit();
-				} else {
+				if (!isDocumentSaved)
 					this.CoAuthoringApi.disconnect();
-				}
 			},
 
 			asc_Print: function(adjustPrint){
@@ -672,7 +671,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_setAutoSaveGap: function (autoSaveGap) {
 				if (typeof autoSaveGap === "number") {
 					this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
-					this.autoSaveInit();
 				}
 			},
 			
@@ -1870,9 +1868,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 if (undefined != window['appBridge']) {
                     window['appBridge']['dummyCommandOpenDocumentProgress'] (10000);
                 }
-
-				// Запускаем таймер автосохранения
-				this.autoSaveInit();
 			},
 
 			// Переход на диапазон в листе
@@ -1944,7 +1939,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (this.isAutoSave) {
 							this.isAutoSave = false;
 							this.canSave = true;
-							this.autoSaveInit(this.autoSaveGapAsk);
 							return;
 						}
 
@@ -3214,36 +3208,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			/////////////////////////////////////////////////////////////////////////
 			////////////////////////////AutoSave api/////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////
-			autoSaveInit: function (autoSaveGap) {
-				// Очищаем предыдущий таймер
-				if (null !== this.autoSaveTimeOutId)
-					clearTimeout(this.autoSaveTimeOutId);
-
-				if (autoSaveGap || this.autoSaveGap) {
-					var t = this;
-					this.autoSaveTimeOutId = setTimeout(function () {
-						t.autoSaveTimeOutId = null;
-						if (t.asc_getViewerMode()) {
-							/*
-								1) При загрузке файла на просмотре при совместном редактировании загрузится
-									файл уже с последними изменениями.
-								2) Далее при срабатывании автосохранения должны накатываться новые изменения
-									(это надо делать) при этом файл отсылаться не должен, т.к. изменений во вьювере нет.
-								3) Если пользователь отключил автосохранение, то изменения к нему приходить не
-									будут, поскольку это его решение.
-							*/
-							// Принимаем чужие изменения
-							t.collaborativeEditing.applyChanges();
-							t.autoSaveInit();
-						} else if (t.asc_isDocumentModified()) {
-							// Если мы редактируем ячейку, то запустим автосохранение чуть позднее
-							if (t.asc_getCellEditMode())
-								t.autoSaveInit(t.autoSaveGapAsk);
-							else
-								t.asc_Save(/*isAutoSave*/true);
-						} else
-							t.autoSaveInit();
-					}, (autoSaveGap || this.autoSaveGap));
+			_autoSave: function () {
+				if (0 === this.autoSaveGap || this.asc_getCellEditMode() || !History.Is_Modified() || !this.canSave)
+					return;
+				if (null === this.lastSaveTime) {
+					this.lastSaveTime = new Date();
+					return;
+				}
+				var isFastSave = !this.collaborativeEditing.getCollaborativeEditing();
+				var gap = new Date() - this.lastSaveTime - (isFastSave ? this.autoSaveGapFast : this.autoSaveGapSlow);
+				if (0 <= gap) {
+					//isFastSave ? this.onSaveCallback() : this.asc_Save(true);
+					this.asc_Save(true);
 				}
 			},
 
