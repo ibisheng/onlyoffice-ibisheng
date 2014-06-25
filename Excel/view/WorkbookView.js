@@ -1988,13 +1988,10 @@
 			if (!this.maxDigitWidth) {throw "Error: can't measure text string";}
 		};
 
-
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
 		 */
 		window["Asc"].WorkbookView = WorkbookView;
-
-
 	}
 )(jQuery, window);

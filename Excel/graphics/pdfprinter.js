@@ -34,7 +34,7 @@ function Common_CopyObj(Obj)
         }
     }
     return c;
-};
+}
 
 var vector_koef = 25.4 / 72;
 
