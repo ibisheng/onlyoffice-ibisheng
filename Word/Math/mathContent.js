@@ -6444,7 +6444,6 @@ CMathContent.prototype =
         var result = false;
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
 
-        var bUseContent = UseContentPos;
 
         while(CurPos < this.content.length && SearchPos.Found == false)
         {
@@ -6461,10 +6460,8 @@ CMathContent.prototype =
                 var bNotshift     = SearchPos.ForSelection == false,
                     bShiftCurrObj = SearchPos.ForSelection == true && this.SelectStartPos == CurPos;
 
-                //console.log("Get_RightPos : CurPos " + CurPos + " SelectStartPos " + this.SelectStartPos);
-
                 if( bNotshift || bShiftCurrObj )
-                    this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd, BegRun);
+                    this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd, BegRun);
             }
             else if(BegRun)
             {
@@ -6473,7 +6470,7 @@ CMathContent.prototype =
             }
             else
             {
-                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, bUseContent, StepEnd);
+                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
             }
 
             SearchPos.Pos.Update(CurPos, Depth);
@@ -6485,7 +6482,7 @@ CMathContent.prototype =
                 BegRun = true;
 
             CurPos++;
-            bUseContent = false;
+            UseContentPos = false;
 
         }
 

@@ -1,6 +1,5 @@
 "use strict";
 
-var CENTER = -1;
 function CMathBase()
 {
     this.typeObj = MATH_COMP;
@@ -1514,13 +1513,16 @@ CMathBase.prototype =
             CurPos_X = ContentPos.Get(Depth);
             CurPos_Y = ContentPos.Get(Depth + 1);
         }
+        else if(SearchPos.ForSelection == true && this.SelectEnd.bOutside === true)
+        {
+            CurPos_X = this.SelectEnd.X;
+            CurPos_Y = this.SelectEnd.Y;
+        }
         else
         {
             CurPos_X = this.nRow - 1;
             CurPos_Y = this.nCol - 1;
         }
-
-        //var bUseContent = UseContentPos;
 
         while(CurPos_X >= 0)
         {
@@ -1568,24 +1570,27 @@ CMathBase.prototype =
             CurPos_X = ContentPos.Get(Depth);
             CurPos_Y = ContentPos.Get(Depth + 1);
         }
+        else if(SearchPos.ForSelection == true && this.SelectEnd.bOutside === true)
+        {
+            CurPos_X = this.SelectEnd.X;
+            CurPos_Y = this.SelectEnd.Y;
+        }
         else
         {
             CurPos_X = 0;
             CurPos_Y = 0;
         }
 
-        var bUseContent = UseContentPos;
-
         while(CurPos_X < this.nRow)
         {
             while(CurPos_Y < this.nCol)
             {
                 var bJDraw = this.elements[CurPos_X][CurPos_Y].IsJustDraw(),
-                    usePlh = !bJDraw && bUseContent && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
+                    usePlh = !bJDraw && UseContentPos && this.elements[CurPos_X][CurPos_Y].IsPlaceholder();
 
                 if(!bJDraw && !usePlh)
                 {
-                    this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, bUseContent, StepEnd, BegRun);
+                    this.elements[CurPos_X][CurPos_Y].Get_RightPos(SearchPos, ContentPos, Depth + 2, UseContentPos, StepEnd, BegRun);
                     SearchPos.Pos.Update(CurPos_X, Depth);
                     SearchPos.Pos.Update(CurPos_Y, Depth+1);
                 }
@@ -1595,7 +1600,7 @@ CMathBase.prototype =
 
                 CurPos_Y++;
 
-                bUseContent = false;
+                UseContentPos = false;
                 BegRun      = true;
             }
 
@@ -1609,8 +1614,10 @@ CMathBase.prototype =
 
         result = SearchPos.Found;
 
-        return result;
+        var str = "Start: Outside " + this.SelectStart.bOutside + ", X " + this.SelectStart.X + ", Y " + this.SelectStart.Y + " ; "  + "End: Outside " + this.SelectEnd.bOutside +  ", X " + this.SelectEnd.X + ", Y " + this.SelectEnd.Y;
+        console.log(str);
 
+        return result;
     },
     old_Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
     {

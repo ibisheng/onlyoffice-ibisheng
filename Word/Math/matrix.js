@@ -25,7 +25,7 @@ function CMathMatrix(props)
         rSp:        0,
         rSpRule:    0,
 
-        mcs:       new Array(),
+        mcs:        new Array(),
         baseJc:     BASEJC_CENTER,
         plcHide:    false
     };
@@ -42,7 +42,6 @@ function CMathMatrix(props)
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
-        //this.constructor.superclass.init.call(this, props);
 
 	g_oTableId.Add( this, this.Id );
 }
