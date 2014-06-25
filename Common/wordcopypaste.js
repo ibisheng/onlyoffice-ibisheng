@@ -631,7 +631,7 @@ CopyProcessor.prototype =
             sRes += this.ParseItem(Item.Content[i]);
         return sRes;
     },
-    CopyRunContent: function (Container, bUseSelection) {
+    CopyRunContent: function (Container, bUseSelection, bOmitHyperlink) {
         var sRes = "";
         var ParaStart = 0;
         var ParaEnd = Container.Content.length - 1;
@@ -665,16 +665,20 @@ CopyProcessor.prototype =
                 }
             }
             else if (para_Hyperlink == item.Type) {
-                sRes += "<a";
-                var sValue = item.Get_Value();
-                var sToolTip = item.Get_ToolTip();
-                if (null != sValue && "" != sValue)
-                    sRes += " href=\"" + CopyPasteCorrectString(sValue) + "\"";
-                if (null != sToolTip && "" != sToolTip)
-                    sRes += " title=\"" + CopyPasteCorrectString(sToolTip) + "\"";
-                sRes += ">";
-                sRes += this.CopyRunContent(item);
-                sRes += "</a>";
+                if (!bOmitHyperlink) {
+                    sRes += "<a";
+                    var sValue = item.Get_Value();
+                    var sToolTip = item.Get_ToolTip();
+                    if (null != sValue && "" != sValue)
+                        sRes += " href=\"" + CopyPasteCorrectString(sValue) + "\"";
+                    if (null != sToolTip && "" != sToolTip)
+                        sRes += " title=\"" + CopyPasteCorrectString(sToolTip) + "\"";
+                    sRes += ">";
+                }
+                //вложенные ссылки в html запрещены.
+                sRes += this.CopyRunContent(item, bUseSelection, true);
+                if (!bOmitHyperlink)
+                    sRes += "</a>";
             }
 			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
@@ -802,7 +806,7 @@ CopyProcessor.prototype =
         //pPr
         this.Commit_pPr(Item);
 
-        this.Para.innerHTML = this.CopyRunContent(Item, bUseSelection);
+        this.Para.innerHTML = this.CopyRunContent(Item, bUseSelection, false);
 
         if(bLast && false == this.bOccurEndPar)
         {
