@@ -1473,7 +1473,7 @@ DrawingObjectsController.prototype =
             {
                 result = getPropsFromArr(this.selectedObjects);
             }
-            return result ? result : new CParaPr();
+            return result;
         }
     },
 
@@ -1536,7 +1536,7 @@ DrawingObjectsController.prototype =
             {
                 result = getPropsFromArr(this.selectedObjects);
             }
-            return result ? result : new CTextPr();
+            return result;
         }
     },
 

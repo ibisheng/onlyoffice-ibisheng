@@ -6491,7 +6491,7 @@
 
 			var textPr = this.objectRender.controller.getParagraphTextPr();
             var theme = this.objectRender.controller.getTheme();
-            if(theme && theme.themeElements && theme.themeElements.fontScheme)
+            if(textPr && theme && theme.themeElements && theme.themeElements.fontScheme)
             {
                 if(textPr.FontFamily)
                 {

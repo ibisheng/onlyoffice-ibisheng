@@ -1490,9 +1490,18 @@ CGraphicObjects.prototype =
         return this.getParagraphTextPr();
     },
 
-    getParagraphParaPr: DrawingObjectsController.prototype.getParagraphParaPr,
+    getParagraphParaPr: function()
+    {
+        var ret =  DrawingObjectsController.prototype.getParagraphParaPr.call(this);
+        return ret ? ret : new CParaPr();
+    },
 
-    getParagraphTextPr: DrawingObjectsController.prototype.getParagraphTextPr,
+
+    getParagraphTextPr: function()
+    {
+        var ret =  DrawingObjectsController.prototype.getParagraphTextPr.call(this);
+        return ret ? ret : new CTextPr();
+    },
 
     isSelectedText: function()
     {
