@@ -348,10 +348,11 @@ CHistory.prototype =
 			this.TurnOn();
 			bNeedOff = true;
 		}
-		this.Add(Class, Type, sheetid, range, Data, LocalChange);
+        if(Class)
+		    this.Add(Class, Type, sheetid, range, Data, LocalChange);
 		if(bNeedOff)
 			this.TurnOff();
-        if(!Class.Load_Changes)
+        if(Class && !Class.Load_Changes)
         {
             Class.Redo( Type, Data, sheetid );
         }
@@ -361,8 +362,15 @@ CHistory.prototype =
                 Class.Redo(Data);
             else
             {
-                Data.oBinaryReader.Seek(Data.nPos);
-                Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+                Data.oBinaryReader.Seek2(Data.nPos);
+                if(!Class)
+                {
+                    Class = g_oTableId.Get_ById(Data.sChangedObjectId);
+                    if(Class)
+                        this.Add(Class, Type, sheetid, range, Data, LocalChange);
+                }
+                if(Class)
+                    Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
             }
         }
         this._addRedoObjectParam(oRedoObjectParam, this.CurPoint.Items[this.CurPoint.Items.length - 1]);

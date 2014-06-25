@@ -1789,7 +1789,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
 				{
 				    var item = aUndoRedoElems[i];
-				    if (null != item.oClass && null != item.nActionType) {
+				    if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
 				        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_SheetPositions == item.nActionType)
 				            oHistoryPositions = item;
 				        else {

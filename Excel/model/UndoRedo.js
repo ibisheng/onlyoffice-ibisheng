@@ -19,6 +19,7 @@ function DrawingCollaborativeData()
     this.oClass = null;
     this.oBinaryReader = null;
     this.nPos = null;
+    this.sChangedObjectId = null;
     this.isDrawingCollaborativeData = true;
 }
 //главный обьект для пересылки изменений
@@ -246,15 +247,13 @@ UndoRedoItemSerializable.prototype = {
         {
             var changedObjectId = oBinaryReader.GetString2();
             var changedObject = g_oTableId.Get_ById(changedObjectId);
-            if(changedObject)
-            {
-                this.nActionType = 1;
-                this.oClass = changedObject;
-                this.oData = new DrawingCollaborativeData();
-                this.oData.oClass = changedObject;
-                this.oData.oBinaryReader = oBinaryReader;
-                this.oData.nPos = oBinaryReader.pos;
-            }
+            this.nActionType = 1;
+            this.oClass = changedObject;
+            this.oData = new DrawingCollaborativeData();
+            this.oData.oClass = changedObject;
+            this.oData.sChangedObjectId = changedObjectId;
+            this.oData.oBinaryReader = oBinaryReader;
+            this.oData.nPos = oBinaryReader.cur;
         }
 	},
 	DeserializeData : function(oBinaryReader)
