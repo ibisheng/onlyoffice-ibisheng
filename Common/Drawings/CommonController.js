@@ -1386,6 +1386,8 @@ DrawingObjectsController.prototype =
     hyperlinkCanAdd: function(bCheckInHyperlink)
     {
         var content = this.getTargetDocContent();
+        if(this.document && content.Parent && content.Parent instanceof  CTextBody)
+            return false;
         return content && content.Hyperlink_CanAdd(bCheckInHyperlink);
     },
 
