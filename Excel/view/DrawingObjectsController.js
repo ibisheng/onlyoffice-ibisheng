@@ -326,6 +326,10 @@ DrawingObjectsController.prototype.createGroup = function()
     group.addToRecalculate();
     this.startRecalculate();
 };
+DrawingObjectsController.prototype.handleChartDoubleClick = function()
+{
+    this.drawingObjects.showChartSettings();
+};
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, options)
 {
