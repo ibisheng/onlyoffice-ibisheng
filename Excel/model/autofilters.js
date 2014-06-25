@@ -1602,7 +1602,7 @@ var gUndoInsDelCellsFlag = true;
 				var rangeButton;
 				for(var i = 0; i < this.allButtonAF.length; i++)
 				{
-					rangeButton = this._refToRange(this.allButtonAF[i].inFilter);
+					rangeButton = this.allButtonAF[i].inFilter;
 					if(rangeButton.r1 >= ar.r1 && rangeButton.r2 <= ar.r2 && rangeButton.c1 >= ar.c1 && rangeButton.c2 <= ar.c2)
 					{
 						this.allButtonAF.splice(i, 1);
@@ -2018,6 +2018,27 @@ var gUndoInsDelCellsFlag = true;
 				objOptions.asc_setRange(tmpRange.getName());
 				return objOptions;
 			},
+			
+			checkRemoveTableParts: function(delRange, tableRange)
+			{
+				var result = true, firstRowRange;
+				var aWs = this._getCurrentWS();
+				
+				if(tableRange)
+				{
+					if(delRange.containsRange(tableRange) == false)
+					{
+						firstRowRange = new Asc.Range(tableRange.c1, tableRange.r1, tableRange.c2, tableRange.r1);
+						if(firstRowRange.intersection(delRange))
+						{
+							result = false;
+						};
+					};
+				};
+				
+				return result;
+			},
+			
 			//если селект затрагивает часть хотя бы одной форматированной таблицы(для случая insert(delete) cells)
 			isActiveCellsCrossHalfFTable: function(activeCells, val, prop, bUndoRedo)
 			{
@@ -2067,7 +2088,7 @@ var gUndoInsDelCellsFlag = true;
 						var isPart = false;
 						for(var i = 0; i < tableParts.length; i++ )
 						{
-							tableRange = this._refToRange(tableParts[i].Ref);
+							tableRange = tableParts[i].Ref;
 							//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 							if(this._rangeHitInAnRange(newActiveRange, tableRange))
 							{
@@ -2095,6 +2116,14 @@ var gUndoInsDelCellsFlag = true;
 									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
+								else if(DeleteRows)
+								{
+									if(!this.checkRemoveTableParts(activeCells, tableRange))
+									{
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										return false;
+									};
+								}
 								else	
 									isPart = true;	
 							}
@@ -2110,7 +2139,7 @@ var gUndoInsDelCellsFlag = true;
 					var isExp;
 					for(var i = 0; i < tableParts.length; i++ )
 					{
-						tableRange = this._refToRange(tableParts[i].Ref);
+						tableRange = tableParts[i].Ref;
 						isExp = false;
 						//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 						if(this._rangeHitInAnRange(activeCells, tableRange))
