@@ -1706,6 +1706,8 @@
 			
 			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
 			{
+				targetDocContent.DrawingDocument.m_oLogicDocument = null;
+				
 				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
 				var newFonts;
 				
