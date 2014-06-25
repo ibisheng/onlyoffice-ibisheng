@@ -241,22 +241,37 @@
 
     function _getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ){
 
-        var fE = getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase );
-        var fDSC_E = getcoupdaysnc( new Date(nSettle), new Date(nMat), nFreq, nBase ) / fE;
-        var fN = getcoupnum( new Date(nSettle), (nMat), nFreq, nBase );
-        var fA = getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase );
+        var fdays = getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase ),
+            fdaybs = getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase ),
+            fnum = getcoupnum( new Date(nSettle), (nMat), nFreq, nBase ),
+            fdaysnc = ( fdays - fdaybs ) / fdays,
+            fT1 = 100 * fRate / nFreq,
+            fT2 = 1 + fYield / nFreq,
+            res = fRedemp / ( Math.pow( 1 + fYield / nFreq, fnum - 1 + fdaysnc ) );
 
-        var fRet = fRedemp / ( Math.pow( 1.0 + fYield / nFreq, fN - 1.0 + fDSC_E ) );
-        fRet -= 100.0 * fRate / nFreq * fA / fE;
+        /*var fRet = fRedemp / ( Math.pow( 1.0 + fYield / nFreq, fnum - 1.0 + fdaysnc ) );
+        fRet -= 100.0 * fRate / nFreq * fdaybs / fdays;
 
         var fT1 = 100.0 * fRate / nFreq;
         var fT2 = 1.0 + fYield / nFreq;
 
-        for( var fK = 0.0 ; fK < fN ; fK++ ){
-            fRet += fT1 / Math.pow( fT2, fK + fDSC_E );
+        for( var fK = 0.0 ; fK < fnum ; fK++ ){
+            fRet += fT1 / Math.pow( fT2, fK + fdaysnc );
         }
 
-        return fRet;
+        return fRet;*/
+
+        if( fnum == 1){
+            return (fRedemp + fT1) / (1 + fdaysnc * fYield / nFreq) - 100 * fRate / nFreq * fdaybs / fdays;
+        }
+
+        res -= 100 * fRate / nFreq * fdaybs / fdays;
+
+        for ( var i = 0; i < fnum; i++ ) {
+            res += fT1 / Math.pow( fT2, i + fdaysnc );
+        }
+
+        return res;
     }
 
     function _getYield( nSettle, nMat, fCoup, fPrice, fRedemp, nFreq, nBase ){

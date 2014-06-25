@@ -231,15 +231,18 @@ function getcoupncd( settl, matur, frequency ) {
 function getprice( settle, mat, rate, yld, redemp, freq, base ) {
 
     var cdays = getcoupdays( new Date( settle ), new Date( mat ), freq, base ),
-        cnum = getcoupnum( new Date( settle ), (mat), freq ),
+        cnum = getcoupnum( new Date( settle ), new Date(mat), freq ),
         cdaybs = getcoupdaybs( new Date( settle ), new Date( mat ), freq, base ),
         cdaysnc = ( cdays - cdaybs ) / cdays,
         fT1 = 100 * rate / freq,
         fT2 = 1 + yld / freq,
         res = redemp / ( Math.pow( 1 + yld / freq, cnum - 1 + cdaysnc ) );
 
-    res -= 100 * rate / freq * cdaybs / cdays;
+    if( cnum == 1){
+        return (redemp + fT1) / (1 + cdaysnc * yld / freq) - 100 * rate / freq * cdaybs / cdays;
+    }
 
+    res -= 100 * rate / freq * cdaybs / cdays;
 
     for ( var i = 0; i < cnum; i++ ) {
         res += fT1 / Math.pow( fT2, i + cdaysnc );
@@ -257,16 +260,18 @@ function getYield( settle, mat, coup, price, redemp, freq, base ) {
     for ( var i = 0; i < 100 && priceN != price; i++ ) {
         priceN = getprice( settle, mat, coup, yieldN, redemp, freq, base );
 
-        if ( price == price1 )
+        if ( price == price1 ){
             return yield1;
-        else if ( price == price2 )
+        }
+        else if ( price == price2 ){
             return yield2;
-        else if ( price == priceN )
+        }
+        else if ( price == priceN ){
             return yieldN;
+        }
         else if ( price < price2 ) {
             yield2 *= 2;
             price2 = getprice( settle, mat, coup, yield2, redemp, freq, base );
-
             yieldN = ( yield2 - yield1 ) * 0.5;
         }
         else {
@@ -283,10 +288,12 @@ function getYield( settle, mat, coup, price, redemp, freq, base ) {
         }
     }
 
-    if ( Math.abs( price - priceN ) > price / 100 )
+    if ( Math.abs( price - priceN ) > price / 100 ){
         return new cError( cErrorType.not_numeric );		// result not precise enough
+    }
 
     return new cNumber( yieldN );
+
 }
 
 function getyieldmat( settle, mat, issue, rate, price, base ) {
@@ -3744,7 +3751,7 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
             i, xBegin, xEnd, x, y, currentIter = 0;
 
         if ( guess <= min || guess >= max ) {
-            return new cError( cErrorType.not_numeric );
+            return this.value = new cError( cErrorType.not_numeric );
         }
 
         for ( i = 0; i < nIM; i++ ) {
@@ -3760,12 +3767,12 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
                 high = (xEnd + step * (xEnd - xBegin));
             }
             else {
-                return new cError( cErrorType.not_numeric );
+                return this.value = new cError( cErrorType.not_numeric );
             }
         }
 
         if ( i == nIM ) {
-            return new cError( cErrorType.not_numeric );
+            return this.value = new cError( cErrorType.not_numeric );
         }
 
         var fXbegin = iterF( xBegin ), fXend = iterF( xEnd ), fXi, xI;
