@@ -3254,6 +3254,8 @@ CShape.prototype =
         }
 
         if (this.txBody) {
+
+            graphics.SaveGrState();
             graphics.SetIntegerGrid(false);
             var transform_text;
             if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
@@ -3262,13 +3264,32 @@ CShape.prototype =
             else if (this.txBody.content) {
                 transform_text = _transform_text;
             }
-            graphics.transform3(transform_text);
+            var clip_rect = this.clipRect;
+            var bodyPr = this.txBody.bodyPr;
+            if(clip_rect)
+            {
+                if(!bodyPr || !bodyPr.upright)
+                {
+                    graphics.transform3(this.transform);
+                    graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+                    graphics.transform3(transform_text, true);
+                }
+                else
+                {
+                    graphics.transform3(transform_text, true);
+                    graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+                }
+            }
+            else
+            {
+                graphics.transform3(transform_text, true);
+            }
             if (graphics.CheckUseFonts2 !== undefined)
                 graphics.CheckUseFonts2(transform_text);
             this.txBody.draw(graphics);
             if (graphics.UncheckUseFonts2 !== undefined)
                 graphics.UncheckUseFonts2(transform_text);
-            graphics.SetIntegerGrid(true);
+            graphics.RestoreGrState();
             /*if (graphics.FreeFont !== undefined)
              graphics.FreeFont(); */
 
@@ -3286,7 +3307,6 @@ CShape.prototype =
              graphics._z();
              graphics.ds();        */
 
-            graphics.SetIntegerGrid(true);
         }
 
         if(this.textBoxContent && !graphics.IsNoSupportTextDraw && this.transformText)
@@ -3336,15 +3356,15 @@ CShape.prototype =
             graphics.RestoreGrState();
         }
 
-        graphics.transform3(_transform);
-
-        graphics.SetIntegerGrid(false);
 
         if (this.Lock && locktype_None != this.Lock.Get_Type())
+        {
+            graphics.transform3(_transform);
+            graphics.SetIntegerGrid(false);
             graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
-
-        graphics.reset();
+        }
         graphics.SetIntegerGrid(true);
+        graphics.reset();
     },
 
     getRotateAngle: function (x, y) {
