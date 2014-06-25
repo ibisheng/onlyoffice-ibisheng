@@ -3251,7 +3251,10 @@
 				var col, row;
 				if (null !== t.topLeftFrozenCell)
 					col = row = 0;
-				else {
+				else if (0 === ar.startCol && 0 === ar.startRow) {
+					col = (t.visibleRange.c2 - t.visibleRange.c1) / 2;
+					row = (t.visibleRange.r2 - t.visibleRange.r1) / 2;
+				} else {
 					col = ar.startCol;
 					row = ar.startRow;
 				}
