@@ -1006,6 +1006,7 @@ DrawingObjectsController.prototype =
             var content;
             if(chart.selection.textSelection)
             {
+                chart.selection.textSelection.checkDocContent();
                 content = chart.selection.textSelection.getDocContent();
                 if(content)
                 {
@@ -4359,6 +4360,10 @@ DrawingObjectsController.prototype =
         if(content)
         {
             return content.Get_SelectedText();
+        }
+        else
+        {
+            return "";
         }
     },
 
