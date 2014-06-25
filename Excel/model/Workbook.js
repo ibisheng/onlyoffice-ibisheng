@@ -646,6 +646,7 @@ DependencyGraph.prototype = {
     },
     _getNodeDependence:function ( oRes, oSheetRanges, node ) {
         var bBad = false;
+        var bStop = false;
         var oWeightMapElem = oRes.oWeightMap[node.nodeId];
         if ( null == oWeightMapElem ) {
             oWeightMapElem = {cur:0, max:1, gray:false, bad:false, master:false, area:false};
@@ -654,20 +655,22 @@ DependencyGraph.prototype = {
         else {
             oWeightMapElem.max++;
             //если пришли в gray node, то это цикл
-            if ( oWeightMapElem.gray )
+            if (oWeightMapElem.gray) {
+                bStop = true;
                 bBad = oWeightMapElem.bad = true;
+            }
             else {
-                if ( oWeightMapElem.master && oWeightMapElem.max > 1 )
-				{
-					//если повторно пришли в master node, то не считаем ее master
-					oWeightMapElem.master = false;
-					oWeightMapElem.max--;
-				}
-			}
+                if (oWeightMapElem.master && oWeightMapElem.max > 1) {
+                    bStop = true;
+                    //если повторно пришли в master node, то не считаем ее master
+                    oWeightMapElem.master = false;
+                    oWeightMapElem.max--;
+                }
+            }
 		}
-        if ( 1 == oWeightMapElem.max )
-            this._getNodeDependenceNodeToRange( node.sheetId, node.getBBox(), oSheetRanges );
-        if ( !bBad && oWeightMapElem.max <= 1 ) {
+        if (!bStop && 1 == oWeightMapElem.max)
+            this._getNodeDependenceNodeToRange(node.sheetId, node.getBBox(), oSheetRanges);
+        if (!bStop && !bBad && oWeightMapElem.max <= 1) {
             oWeightMapElem.gray = true;
             var aNext = node.getSlaveEdges();
             for ( var i in aNext ) {
