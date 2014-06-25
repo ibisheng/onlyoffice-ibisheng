@@ -3,6 +3,12 @@
 var MATH_MC_JC = MCJC_CENTER;
 
 
+function CMColumsPr()
+{
+    this.count = 1;
+    this.mcJc  = MCJC_CENTER;
+}
+
 function CMathMatrix(props)
 {
 	this.Id = g_oIdCounter.Get_NewId();
@@ -10,6 +16,8 @@ function CMathMatrix(props)
 
     this.Pr =
     {
+        row:        1,
+
         cGp:        0,
         cGpRule:    0,
         cSp:        0,
@@ -17,7 +25,7 @@ function CMathMatrix(props)
         rSp:        0,
         rSpRule:    0,
 
-        mcJc:       new Array(),
+        mcs:       new Array(),
         baseJc:     BASEJC_CENTER,
         plcHide:    false
     };
@@ -26,12 +34,9 @@ function CMathMatrix(props)
     this.spaceColumn = null;
     this.gaps        = null;
 
-    this.setDefaultSpace();
+    this.column     = 0;
 
-    ////  special for "read"  ////
-    this.row = 0;
-    this.column = 0;
-    ////
+    this.setDefaultSpace();
 
     CMathMatrix.superclass.constructor.call(this);
 
@@ -96,8 +101,22 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
         this.setRuleGap(this.spaceRow, this.Pr.rSpRule, this.Pr.rSp);
 
-        for(var j = 0; j < this.nCol; j++)
-            this.alignment.wdt[j] = this.Pr.mcJc[j];
+        var lng = this.Pr.mcs.length;
+        var col = 0;
+
+        this.alignment.wdt.length = 0;
+
+        for(var j = 0; j < lng; j++)
+        {
+            var mc = this.Pr.mcs[j],
+                count = mc.count;
+
+            for(var i = 0; i < count; i++)
+            {
+                this.alignment.wdt[col] = mc.mcJc;
+                col++;
+            }
+        }
 
         if(this.Pr.plcHide)
             this.hidePlaceholder(true);
@@ -408,10 +427,10 @@ CMathMatrix.prototype.setProperties = function(props)
     this.setCtrPrp(props.ctrPrp);
 
     if(typeof(props.row) !== "undefined" && props.row !== null)
-        this.nRow = props.row;
+        this.Pr.row = props.row;
 
-    if(typeof(props.column) !== "undefined" && props.column !== null)
-        this.nCol = props.column;
+    /*if(typeof(props.column) !== "undefined" && props.column !== null)
+        this.nCol = props.column;*/
 
     if(props.plcHide === true || props.plcHide === 1)
         this.Pr.plcHide = true;
@@ -419,8 +438,39 @@ CMathMatrix.prototype.setProperties = function(props)
     if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
         this.Pr.baseJc = props.baseJc;
 
+    if(props.mcs.length == 0) // ни одного элемента нет, а колонки могут быть
+    {
+        // TODO
+    }
+    else
+    {
+        this.column = 0;
+        this.Pr.mcs.length = 0;
 
-    if(typeof(props.mcJc) !== "undefined" && props.mcJc !== null && props.mcJc.constructor.name == "Array" && props.mcJc.length == props.column)
+        var lng = props.mcs.length;
+
+        for(var i = 0; i < lng; i++)
+        {
+            var MC = props.mcs[i];
+            this.Pr.mcs[i] = new CMColumsPr();
+
+            if(MC.count !== null && MC.count + 0 == MC.count)
+                this.Pr.mcs[i].count = MC.count;
+            else
+                this.Pr.mcs[i].count = 1;
+
+            if(MC.mcJc == MCJC_LEFT || MC.mcJc == MCJC_RIGHT || MC.mcJc == MCJC_CENTER)
+                this.Pr.mcs[i].mcJc = MC.mcJc;
+            else
+                this.Pr.mcs[i].mcJc = MCJC_CENTER;
+
+            this.column += this.Pr.mcs[i].count;
+
+        }
+    }
+
+
+    /*if(typeof(props.mcJc) !== "undefined" && props.mcJc !== null && props.mcJc.constructor.name == "Array" && props.mcJc.length == props.column)
     {
         for(var i = 0; i < this.nCol; i++)
         {
@@ -434,7 +484,7 @@ CMathMatrix.prototype.setProperties = function(props)
     {
         for(var j = 0; j < this.nCol; j++)
             this.Pr.mcJc[j] = MCJC_CENTER;
-    }
+    }*/
 
 
     this.Pr.cGpRule = props.cGpRule;
@@ -446,13 +496,13 @@ CMathMatrix.prototype.setProperties = function(props)
 }
 CMathMatrix.prototype.fillContent = function()
 {
-    if(this.nRow == 0)
+    /*if(this.nRow == 0)
         this.nRow = 1;
 
     if(this.nCol == 0)
-        this.nCol = 1;
+        this.nCol = 1;*/
 
-    this.setDimension(this.nRow, this.nCol);
+    this.setDimension(this.Pr.row, this.column);
     this.setContent();
 }
 CMathMatrix.prototype.fillMathComposition = function(props, contents /*array*/)
