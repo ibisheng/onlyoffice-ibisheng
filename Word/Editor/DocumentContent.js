@@ -1186,6 +1186,21 @@ CDocumentContent.prototype =
         return DrawingObjs;
     },
     
+    Get_AllComments : function(AllComments)
+    {
+        if ( undefined === AllComments )
+            AllComments = [];
+
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            Item.Get_AllComments( AllComments );
+        }
+
+        return AllComments;
+    },
+    
     Get_AllFloatElements : function(FloatObjs)
     {
         if ( undefined === FloatObjs )
@@ -8430,7 +8445,8 @@ CDocumentContent.prototype =
                             this.Content[Pos].Prev = Element;
                             Element.Next = this.Content[Pos];
                         }
-
+                        
+                        Element.Parent = this;
 
                         this.Content.splice( Pos, 0, Element );
                     }
@@ -8550,7 +8566,10 @@ CDocumentContent.prototype =
         {
             var Element = g_oTableId.Get_ById( Reader.GetString2() );
             if ( null != Element )
-                this.Content.push( Element );
+            {
+                this.Content.push( Element );                
+                Element.Parent = this;
+            }
         }
 
         CollaborativeEditing.Add_LinkData( this, LinkData );

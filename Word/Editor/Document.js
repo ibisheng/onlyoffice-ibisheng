@@ -76,6 +76,9 @@ function CSelectedContent()
 {
     this.Elements = [];
     
+    this.DrawingObjects = [];
+    this.Comments       = [];
+    
     this.HaveShape = false;
 }
 
@@ -84,6 +87,11 @@ CSelectedContent.prototype =
     Reset : function()
     {
         this.Elements = [];
+
+        this.DrawingObjects = [];
+        this.Comments       = [];
+        
+        this.HaveShape = false;
     },
 
     Add : function(Element)
@@ -91,9 +99,98 @@ CSelectedContent.prototype =
         this.Elements.push( Element );
     },
     
-    Set_Shape : function(Value)
+    On_EndCollectElements : function(LogicDocument)
     {
-       this.HaveShape = Value; 
+        // Теперь пройдемся по всем найденным элементам и выясним есть ли автофигуры и комментарии
+        var Count = this.Elements.length;
+
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var Element = this.Elements[Pos].Element;
+            Element.Get_AllDrawingObjects(this.DrawingObjects);
+            Element.Get_AllComments(this.Comments);
+        }
+
+        // Относительно картинок нас интересует только наличие автофигур с текстом.
+        Count = this.DrawingObjects.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var DrawingObj = this.DrawingObjects[Pos];
+            var ShapeType = DrawingObj.GraphicObj.getObjectType();
+
+            if ( historyitem_type_Shape === ShapeType || historyitem_type_GroupShape === ShapeType )
+            {
+                this.HaveShape = true;
+                break;
+            }
+        }
+        
+        // Если у комментария присутствует только начало или конец, тогда такой комментарий мы удяляем отсюда
+        var Comments = {};
+        Count = this.Comments.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var Element = this.Comments[Pos];
+            
+            var Id = Element.Comment.CommentId;
+            if ( undefined === Comments[Id] )
+                Comments[Id] = {};
+            
+            if ( true === Element.Comment.Start )
+                Comments[Id].Start = Element.Paragraph; 
+            else
+                Comments[Id].End   = Element.Paragraph;
+        }
+        
+        // Пробегаемся по найденным комментариям и удаляем те, у которых нет начала или конца
+        var NewComments = [];
+        for (var Id in Comments)
+        {
+            var Element = Comments[Id];
+            
+            var Para = null;
+            if ( undefined === Element.Start && undefined !== Element.End )
+                Para = Element.End;
+            else if ( undefined !== Element.Start && undefined === Element.End )
+                Para = Element.Start;
+            else if ( undefined !== Element.Start && undefined !== Element.End )
+                NewComments.push(Id);
+            
+            if (null !== Para)
+            {
+                var OldVal = Para.DeleteCommentOnRemove;
+                Para.DeleteCommentOnRemove = false;
+                Para.Remove_CommentMarks(Id);
+                Para.DeleteCommentOnRemove = OldVal;
+            }
+        }
+        
+        // Новые комментарии мы дублируем и добавляем в список комментариев
+        Count = NewComments.length;
+        var Count2 = this.Comments.length;
+        var DocumentComments = LogicDocument.Comments;        
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var Id = NewComments[Pos];
+            var OldComment = DocumentComments.Get_ById(Id)
+            
+            if (null !== OldComment)
+            {
+                var NewComment = OldComment.Copy();
+                DocumentComments.Add( NewComment );
+                editor.sync_AddComment( NewComment.Get_Id(), NewComment.Data );
+                
+                // поправим Id в самих элементах ParaComment
+                for (var Pos2 = 0; Pos2 < Count2; Pos2++)
+                {
+                    var Element = this.Comments[Pos2].Comment;
+                    if (Id === Element.CommentId)
+                    {
+                        Element.Set_CommentId(NewComment.Get_Id());
+                    }
+                }
+            }
+        }
     }
 };
 
@@ -618,7 +715,13 @@ CDocument.prototype =
 
     On_EndLoad : function()
     {
+        // Обновляем информацию о секциях
         this.Update_SectionsInfo();
+        
+        // Проверяем последний параграф на наличие секции 
+        this.Check_SectionLastParagraph();
+        
+        // Заполняем массив с ZIndex для всех автофигур документа
         if(null != this.DrawingObjects)
             this.DrawingObjects.addToZIndexManagerAfterOpen();
     },
@@ -1598,34 +1701,35 @@ CDocument.prototype =
             }
             else if ( recalcresult_NextElement === RecalcResult )
             {
-                // Ничего не делаем
-
-                var CurSectInfo  = this.SectionsInfo.Get_SectPr( Index );
-                var NextSectInfo = this.SectionsInfo.Get_SectPr( Index + 1 );
-                if ( CurSectInfo !== NextSectInfo )
+                if ( Index < Count - 1 )
                 {
-                    if ( section_type_Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize( NextSectInfo.SectPr ) )
+                    var CurSectInfo  = this.SectionsInfo.Get_SectPr( Index );
+                    var NextSectInfo = this.SectionsInfo.Get_SectPr( Index + 1 );
+                    if ( CurSectInfo !== NextSectInfo )
                     {
-                        // Новая секция начинается на данной странице. Нам надо получить новые поля данной секции, но
-                        // на данной странице мы будет использовать только новые горизонтальные поля, а поля по вертикали
-                        // используем от предыдущей секции.
+                        if ( section_type_Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize( NextSectInfo.SectPr ) )
+                        {
+                            // Новая секция начинается на данной странице. Нам надо получить новые поля данной секции, но
+                            // на данной странице мы будет использовать только новые горизонтальные поля, а поля по вертикали
+                            // используем от предыдущей секции.
 
-                        var NewStartPos = this.Get_PageContentStartPos( PageIndex, Index + 1 );
+                            var NewStartPos = this.Get_PageContentStartPos( PageIndex, Index + 1 );
 
-                        Y = Y + 0.001; // на всякий случай
-                        X      = NewStartPos.X;
-                        XLimit = NewStartPos.XLimit;
-                    }
-                    else
-                    {
-                        this.Pages[PageIndex].EndPos = Index;
+                            Y = Y + 0.001; // на всякий случай
+                            X      = NewStartPos.X;
+                            XLimit = NewStartPos.XLimit;
+                        }
+                        else
+                        {
+                            this.Pages[PageIndex].EndPos = Index;
 
-                        bContinue         = true;
-                        _PageIndex        = PageIndex + 1;
-                        _StartIndex       = Index + 1;
-                        _bStart           = true;
-                        _bStartNewSection = true;
-                        break;
+                            bContinue         = true;
+                            _PageIndex        = PageIndex + 1;
+                            _StartIndex       = Index + 1;
+                            _bStart           = true;
+                            _bStartNewSection = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -8279,8 +8383,7 @@ CDocument.prototype =
             // Получим копию выделенной части документа, которую надо перенести в новое место, одновременно с этим
             // удаляем эту выделенную часть (если надо).
 
-            var DocContent = new CSelectedContent();
-            this.Get_SelectedContent( DocContent );
+            var DocContent = this.Get_SelectedContent();
 
             var Para = NearPos.Paragraph;
             
@@ -8329,8 +8432,11 @@ CDocument.prototype =
         }
     },
 
-    Get_SelectedContent : function(SelectedContent)
+    Get_SelectedContent : function()
     {
+        var SelectedContent = new CSelectedContent();
+        
+        // Заполняем выделенный контент
         if ( docpostype_HdrFtr === this.CurPos.Type )
             return this.HdrFtr.Get_SelectedContent(SelectedContent);
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
@@ -8353,6 +8459,10 @@ CDocument.prototype =
                 this.Content[Index].Get_SelectedContent( SelectedContent );
             }
         }
+        
+        SelectedContent.On_EndCollectElements(this);               
+        
+        return SelectedContent;
     },
 
     Insert_Content : function(SelectedContent, NearPos)
@@ -9337,7 +9447,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
         {
-            this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
+            this.DrawingDocument.m_oWordControl.m_oApi.asc_Save2();
             bRetValue = true;
         }
         else if ( e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
@@ -12068,6 +12178,8 @@ CDocument.prototype =
                         }
                         else
                             Element.Next = null;
+                        
+                        Element.Parent = this;
 
                         this.Content.splice( Pos, 0, Element );
 
@@ -12577,6 +12689,17 @@ CDocument.prototype =
         }
 
         this.SectionsInfo.Add( this.SectPr, Count );
+    },
+    
+    Check_SectionLastParagraph : function()
+    {
+        var Count = this.Content.length;
+        if ( Count <= 0 )
+            return;
+        
+        var Element = this.Content[Count - 1];
+        if ( type_Paragraph === Element.GetType() && undefined !== Element.Get_SectionPr() )
+            this.Internal_Content_Add(Count, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
     },
 
     Add_SectionBreak : function(SectionBreakType)

@@ -302,6 +302,23 @@ Paragraph.prototype =
 
         return DrawingObjs;
     },
+    
+    Get_AllComments : function(List)
+    {
+        if ( undefined === List )
+            List = [];
+        
+        var Len = this.Content.length;
+        for ( var Pos = 0; Pos < Len; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            
+            if ( para_Comment === Item.Type )
+                List.push( { Comment : Item, Paragraph : this } );
+        }
+        
+        return List;
+    },
 
     Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
     {
@@ -4498,8 +4515,8 @@ Paragraph.prototype =
 
                 for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
                     this.Content[CurPos].Select_All( 1 );
-            }
-
+            }            
+            
             // TODO: Реализовать выделение гиперссылки целиком (само выделение тут сделано, но непонятно как
             //       дальше обрабатывать Shift + влево/вправо)
 
@@ -7117,25 +7134,6 @@ Paragraph.prototype =
             }
             DocContent.Add( new CSelectedElement( Para, false ) );
         }
-        
-        if ( null !== Para && false === DocContent.HaveShape )
-        {
-            // Проверим есть ли у нас автофигуры в параграфе
-            var DrawingObjects = Para.Get_AllDrawingObjects();
-
-            var Count = DrawingObjects.length;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var DrawingObj = DrawingObjects[Index];
-                var ShapeType = DrawingObj.GraphicObj.getObjectType();
-
-                if ( historyitem_type_Shape === ShapeType || historyitem_type_GroupShape === ShapeType )
-                {
-                    DocContent.Set_Shape( true );
-                    break;
-                }
-            }
-        }
     },
 
     Get_Paragraph_TextPr : function()
@@ -7835,11 +7833,7 @@ Paragraph.prototype =
     // Без пересчета расстояния между параграфами.
     Get_CompiledPr2 : function(bCopy)
     {
-        if ( true === this.CompiledPr.NeedRecalc )
-        {
-            this.CompiledPr.Pr = this.Internal_CompileParaPr();
-            this.CompiledPr.NeedRecalc = false;
-        }
+        this.Internal_CompileParaPr();
 
         if ( false === bCopy )
             return this.CompiledPr.Pr;
@@ -7852,9 +7846,36 @@ Paragraph.prototype =
             return Pr;
         }
     },
+    
+    Internal_CompileParaPr : function()
+    {
+        if ( true === this.CompiledPr.NeedRecalc )
+        {
+            if ( undefined !== this.Parent && null !== this.Parent )
+            {
+                this.CompiledPr.Pr = this.Internal_CompileParaPr2();
+                this.CompiledPr.NeedRecalc = false;
+            }
+            else
+            {
+                if ( undefined === this.CompiledPr.Pr || null === this.CompiledPr.Pr )
+                {
+                    this.CompiledPr.Pr =
+                    {
+                        ParaPr : new CParaPr(),
+                        TextPr : new CTextPr()
+                    };
+                    this.CompiledPr.Pr.ParaPr.Init_Default();
+                    this.CompiledPr.Pr.TextPr.Init_Default();
+                }
+
+                this.CompiledPr.NeedRecalc = true;
+            }
+        }
+    },
 
     // Формируем конечные свойства параграфа на основе стиля, возможной нумерации и прямых настроек.
-    Internal_CompileParaPr : function()
+    Internal_CompileParaPr2 : function()
     {
         if(this.bFromDocument)
         {
@@ -9003,11 +9024,7 @@ Paragraph.prototype =
         {
             this.FontMap.Map = {};
 
-            if ( true === this.CompiledPr.NeedRecalc )
-            {
-                this.CompiledPr.Pr = this.Internal_CompileParaPr();
-                this.CompiledPr.NeedRecalc = false;
-            }
+            this.Internal_CompileParaPr();
 
             var FontScheme = this.Get_Theme().themeElements.fontScheme;
             var CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
@@ -9034,11 +9051,7 @@ Paragraph.prototype =
 
     Document_CreateFontCharMap : function(FontCharMap)
     {
-        if ( true === this.CompiledPr.NeedRecalc )
-        {
-            this.CompiledPr.Pr = this.Internal_CompileParaPr();
-            this.CompiledPr.NeedRecalc = false;
-        }
+        this.Internal_CompileParaPr();
 
         var CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
         FontCharMap.StartFont( CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize );
@@ -11308,10 +11321,10 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                if ( null != Data.New )
-                    Writer.WriteString2( Data.New.Get_Id() );
-                else
-                    Writer.WriteString2( "" );
+//                if ( null != Data.New )
+//                    Writer.WriteString2( Data.New.Get_Id() );
+//                else
+//                    Writer.WriteString2( "" );
 
                 break;
             }
@@ -11917,7 +11930,7 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
+                //this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
 
                 break;
             }
@@ -12095,7 +12108,6 @@ Paragraph.prototype =
         Writer.WriteLong( historyitem_type_Paragraph );
 
         // String2   : Id
-        // String2   : Id родительского класса
         // Variable  : ParaPr
         // String2   : Id TextPr
         // Long      : количество элементов
@@ -12103,7 +12115,6 @@ Paragraph.prototype =
         // Bool     : bFromDocument
 
         Writer.WriteString2( "" + this.Id );
-        Writer.WriteString2( "" + this.Parent.Get_Id() );
         this.Pr.Write_ToBinary( Writer );
         Writer.WriteString2( "" + this.TextPr.Get_Id() );
 
@@ -12121,7 +12132,6 @@ Paragraph.prototype =
     Read_FromBinary2 : function(Reader)
     {
         // String2   : Id
-        // String2   : Id родительского класса
         // Variable  : ParaPr
         // String2   : Id TextPr
         // Long      : количество элементов
@@ -12129,17 +12139,10 @@ Paragraph.prototype =
         // Bool     : bFromDocument
 
         this.Id     = Reader.GetString2();
-        //this.Parent = g_oTableId.Get_ById( Reader.GetString2() );
-
-        var LinkData = {};
-        LinkData.Parent = Reader.GetString2();
 
         this.Pr = new CParaPr();
         this.Pr.Read_FromBinary( Reader );
-
-        //this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
-        LinkData.TextPr = Reader.GetString2();
-        CollaborativeEditing.Add_LinkData(this, LinkData);
+        this.TextPr = g_oTableId.Get_ById( Reader.GetString2() );
 
         this.Content = [];
         var Count = Reader.GetLong();
@@ -12167,10 +12170,6 @@ Paragraph.prototype =
 
     Load_LinkData : function(LinkData)
     {
-        if ( "undefined" != typeof(LinkData.Parent) )
-            this.Parent = g_oTableId.Get_ById( LinkData.Parent );
-        if ( "undefined" != typeof(LinkData.TextPr) )
-            this.TextPr = g_oTableId.Get_ById( LinkData.TextPr );
         if(this.Parent && this.Parent.Parent && this.Parent.Parent.Get_Worksheet)
         {
             var worksheet = this.Parent.Parent.Get_Worksheet();
@@ -12320,6 +12319,7 @@ Paragraph.prototype =
                     }
 
                     this.Internal_Content_Add( EndPos + 1, CommentEnd );
+                    this.Selection.EndPos = EndPos + 1;
                 }
 
                 if ( true === bStart )
@@ -12340,10 +12340,12 @@ Paragraph.prototype =
                         }
 
                         this.Internal_Content_Add( StartPos + 1, CommentStart );
+                        this.Selection.StartPos = StartPos + 1;
                     }
                     else
                     {
                         this.Internal_Content_Add( StartPos, CommentStart );
+                        this.Selection.StartPos = StartPos;
                     }
                 }
             }

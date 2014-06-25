@@ -1152,15 +1152,18 @@ ParaRun.prototype =
 
     Create_FontMap : function(Map)
     {
-        var TextPr = this.Get_CompiledPr(false);
-        TextPr.Document_CreateFontMap( Map, this.Paragraph.Get_Theme().themeElements.fontScheme);
-        var Count = this.Content.length;
-        for (var Index = 0; Index < Count; Index++)
+        if ( undefined !== this.Paragraph && null !== this.Paragraph )
         {
-            var Item = this.Content[Index];
+            var TextPr = this.Get_CompiledPr(false);
+            TextPr.Document_CreateFontMap( Map, this.Paragraph.Get_Theme().themeElements.fontScheme);
+            var Count = this.Content.length;
+            for (var Index = 0; Index < Count; Index++)
+            {
+                var Item = this.Content[Index];
 
-            if ( para_Drawing === Item.Type )
-                Item.documentCreateFontMap( Map );
+                if ( para_Drawing === Item.Type )
+                    Item.documentCreateFontMap( Map );
+            }
         }
     },
 

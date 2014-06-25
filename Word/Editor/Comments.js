@@ -15,6 +15,26 @@ function CCommentData()
     this.m_sQuoteText = null;
     this.m_bSolved    = false;
     this.m_aReplies   = [];
+    
+    this.Copy = function()
+    {
+        var NewData = new CCommentData();
+        
+        NewData.m_sText      = this.m_sText;
+        NewData.m_sTime      = this.m_sTime;
+        NewData.m_sUserId    = this.m_sUserId;
+        NewData.m_sUserName  = this.m_sUserName;
+        NewData.m_sQuoteText = this.m_sQuoteText;
+        NewData.m_bSolved    = this.m_bSolved;
+        
+        var Count = this.m_aReplies.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            NewData.m_aReplies.push(this.m_aReplies.Copy());
+        }
+
+        return NewData;
+    };
 
     this.Add_Reply = function(CommentData)
     {
@@ -211,6 +231,11 @@ function CComment(Parent, Data)
         this.Lock.Set_Type( locktype_Mine, false );
         CollaborativeEditing.Add_Unlock2( this );
     }
+    
+    this.Copy = function()
+    {
+        return new CComment(this.Parent, this.Data.Copy());
+    };
     
     this.Set_StartId = function(ObjId)
     {
@@ -858,6 +883,15 @@ ParaComment.prototype =
     {
         return this.Id;
     },
+    
+    Set_CommentId : function(NewCommentId)
+    {
+        if (this.CommentId !== NewCommentId)
+        {
+            History.Add(this, { Type : historyitem_ParaComment_CommentId, Old : this.CommentId, New : NewCommentId });
+            this.CommentId = NewCommentId;
+        }
+    },
 
     Set_Paragraph : function()
     {
@@ -943,6 +977,11 @@ ParaComment.prototype =
 
     Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
     {
+    },
+    
+    Copy : function()
+    {
+        return new ParaComment(this.Start, this.CommentId);
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
@@ -1214,6 +1253,85 @@ ParaComment.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
+    Undo : function(Data)
+    {
+        var Type = Data.Type;
+
+        switch ( Type )
+        {
+            case  historyitem_ParaComment_CommentId:
+            {
+                this.CommentId = Data.Old;
+                break;
+            }
+        }
+    },
+
+    Redo : function(Data)
+    {
+        var Type = Data.Type;
+
+        switch ( Type )
+        {
+            case  historyitem_ParaComment_CommentId:
+            {
+                this.CommentId = Data.New;
+                break;
+            }
+        }
+    },
+
+    Save_Changes : function(Data, Writer)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        Writer.WriteLong( historyitem_type_ParaComment );
+
+        var Type = Data.Type;
+
+        // Пишем тип
+        Writer.WriteLong( Type );
+
+        switch ( Type )
+        {
+            case  historyitem_ParaComment_CommentId:
+            {
+                // String : CommentId
+                Writer.WriteString2(Data.New);
+                break;
+            }
+        }
+    },
+    
+    Load_Changes : function(Reader)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_ParaComment != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case  historyitem_ParaComment_CommentId:
+            {
+                // String : CommentId
+                this.CommentId = Reader.GetString2();
+                break;
+            }
+        }
+    },
+    
+    Refresh_RecalcData : function()
+    {
+    },
+    
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( historyitem_type_CommentMark );

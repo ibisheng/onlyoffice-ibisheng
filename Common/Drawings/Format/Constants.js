@@ -1048,6 +1048,9 @@ var historyitem_Comments_Remove = 2; // Удалили комментарий
 var historyitem_Comment_Change   = 3; // Изменили комментарий
 var historyitem_Comment_TypeInfo = 4; // Изменили информацию о типе комментария
 
+// Типы изменений в классе ParaComment
+var historyitem_ParaComment_CommentId = 1; // Изменяем Id комментария, к которому привязана метка
+
 // Типы изменений в классе CParaHyperlinkStart
 var historyitem_Hyperlink_Value      = 1; // Изменяем значение гиперссылки
 var historyitem_Hyperlink_ToolTip    = 2; // Изменяем подсказку гиперссылки
@@ -1204,6 +1207,7 @@ var historyitem_type_rad              = 50;
 var historyitem_type_deg_subsup       = 51;
 var historyitem_type_iterators        = 52;
 var historyitem_type_deg              = 53;
+var historyitem_type_ParaComment      = 54;
 
 
 

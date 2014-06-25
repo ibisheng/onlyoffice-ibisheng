@@ -2381,6 +2381,26 @@ CTable.prototype =
         return DrawingObjs;
     },
 
+    Get_AllComments : function(AllComments)
+    {
+        if ( undefined === AllComments )
+            AllComments = [];
+
+        var Rows_Count = this.Content.length;
+        for ( var CurRow = 0; CurRow < Rows_Count; CurRow++ )
+        {
+            var Row = this.Content[CurRow];
+            var Cells_Count = Row.Get_CellsCount();
+            for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
+            {
+                var Cell = Row.Get_Cell( CurCell );
+                Cell.Content.Get_AllComments( AllComments );
+            }
+        }
+
+        return AllComments;
+    },
+
     Get_AllFloatElements : function(FloatObjs)
     {
         if ( undefined === FloatObjs )
@@ -5814,13 +5834,7 @@ CTable.prototype =
 
         TableState.CurCell = { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index };
 
-        var State = null;
-
-        if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
-            State = this.CurCell.Content.Get_SelectionState();
-        else
-            State = [];
-
+        var State = this.CurCell.Content.Get_SelectionState()
         State.push( TableState );
         return State;
     },
@@ -5862,9 +5876,7 @@ CTable.prototype =
         }
 
         this.CurCell = this.Content[TableState.CurCell.Row].Get_Cell( TableState.CurCell.Cell );
-
-        if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
-            this.CurCell.Content.Set_SelectionState( State, StateIndex - 1 );
+        this.CurCell.Content.Set_SelectionState( State, StateIndex - 1 );
     },
 
     Get_ParentObject_or_DocumentPos : function()
@@ -6070,10 +6082,10 @@ CTable.prototype =
             {
                 // String : Id элемента
 
-                if ( null != Data.New )
-                    Writer.WriteString2( Data.New.Get_Id() );
-                else
-                    Writer.WriteString2( "" );
+//                if ( null != Data.New )
+//                    Writer.WriteString2( Data.New.Get_Id() );
+//                else
+//                    Writer.WriteString2( "" );
 
                 break;
             }
@@ -6476,10 +6488,10 @@ CTable.prototype =
             {
                 // String : Id элемента
 
-                var LinkData = {};
-                LinkData.Parent = Reader.GetString2();
-                LinkData.Type   = historyitem_Table_Parent;
-                CollaborativeEditing.Add_LinkData( this, LinkData );
+                //var LinkData = {};
+                //LinkData.Parent = Reader.GetString2();
+                //LinkData.Type   = historyitem_Table_Parent;
+                //CollaborativeEditing.Add_LinkData( this, LinkData );
 
                 break;
             }
@@ -6914,7 +6926,6 @@ CTable.prototype =
 
         // Long               : type_Table
         // String             : Id самой таблицы
-        // String             : Id родительского класса
         // String             : Id стиля (если стока пустая, то null)
         // Bool               : Inline
         // Long               : количество элементов в TableGrid
@@ -6930,7 +6941,6 @@ CTable.prototype =
 
         Writer.WriteLong(type_Table);
         Writer.WriteString2( this.Id );
-        Writer.WriteString2( this.Parent.Get_Id() );
         Writer.WriteString2( null === this.TableStyle ? "" : this.TableStyle );
         Writer.WriteBool(this.Inline);
 
@@ -6957,7 +6967,6 @@ CTable.prototype =
     {
         // Long               : type_Table
         // String             : Id самой таблицы
-        // String             : Id родительского класса
         // String             : Id стиля (если стока пустая, то null)
         // Bool               : Inline
         // Long               : количество элементов в TableGrid
@@ -6973,11 +6982,6 @@ CTable.prototype =
 
         Reader.GetLong();
         this.Id = Reader.GetString2();
-
-        var LinkData = {};
-        LinkData.Parent = Reader.GetString2();
-        LinkData.Type   = historyitem_Table_Parent;
-        CollaborativeEditing.Add_LinkData( this, LinkData );
 
         var TableStyleId = Reader.GetString2();
         this.TableStyle = ( TableStyleId === "" ? null : TableStyleId );
@@ -7032,7 +7036,7 @@ CTable.prototype =
             {
                 case historyitem_Table_DocNext: this.Next   = g_oTableId.Get_ById( LinkData.Next ); break;
                 case historyitem_Table_DocPrev: this.Prev   = g_oTableId.Get_ById( LinkData.Prev ); break;
-                case historyitem_Table_Parent:  this.Parent = g_oTableId.Get_ById( LinkData.Parent ); break;
+                //case historyitem_Table_Parent:  this.Parent = g_oTableId.Get_ById( LinkData.Parent ); break;
             }
         }
 
@@ -10844,9 +10848,12 @@ CTable.prototype =
         var Len = this.Content.length;
         for ( var RowIndex = CurRow; RowIndex < Len; RowIndex++ )
         {
-            NewTable.Internal_Add_Row( RowIndex - CurRow, 0, true, this.Content[CurRow] );
+            NewTable.Internal_Add_Row( RowIndex - CurRow, 0, false, this.Content[CurRow] );
             this.Internal_Remove_Row( CurRow );            
         }
+        
+        NewTable.ReIndexing(0);
+        this.ReIndexing(0);
         
         NewTable.Set_Pr( this.Pr.Copy() );
         NewTable.Set_TableStyle2( this.TableStyle );
@@ -17826,6 +17833,8 @@ CTable.prototype =
             else
                 NewRow.Next = null;
         }
+        
+        NewRow.Table = this;
 
         return NewRow;
     },
