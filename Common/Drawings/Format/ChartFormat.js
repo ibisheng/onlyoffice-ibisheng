@@ -3082,6 +3082,22 @@ CAreaChart.prototype =
                 this.varyColors = data.oldPr;
                 break
             }
+            case historyitem_AreaChart_AddSer:
+            {
+                for(var i = this.series.length - 1; i >- 1; --i)
+                {
+                    if(this.series[i] === data.ser)
+                    {
+                        this.series.splice(i, 1);
+                        break;
+                    }
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
+                break;
+            }
         }
     },
 
@@ -3132,6 +3148,18 @@ CAreaChart.prototype =
                 this.varyColors = data.newPr;
                 break
             }
+            case historyitem_AreaChart_AddSer:
+            {
+                if(isRealObject(data.ser))
+                {
+                    this.series.push(data.ser);
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
+                break;
+            }
         }
     },
 
@@ -3167,6 +3195,11 @@ CAreaChart.prototype =
             {
                 writeBool(w, data.newPr);
                 break
+            }
+            case historyitem_AreaChart_AddSer:
+            {
+                writeObject(w, data.ser);
+                break;
             }
         }
     },
@@ -3225,6 +3258,19 @@ CAreaChart.prototype =
                 this.varyColors = readBool(r);
                 break
             }
+            case historyitem_AreaChart_AddSer:
+            {
+                var ser = readObject(r);
+                if(isRealObject(ser))
+                {
+                    this.series.push(ser);
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
+                break;
+            }
         }
     }
 };
@@ -3255,8 +3301,6 @@ CAreaSeries.prototype =
     {
         return this.Id;
     },
-
-
 
 
     Refresh_RecalcData: function()
@@ -3599,13 +3643,13 @@ CAreaSeries.prototype =
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: historyitem_AreaSeries_SetTx, oldPr: this.trendline, newPr: pr});
         this.tx = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
         this.val = pr;
     },
 
@@ -3674,6 +3718,16 @@ CAreaSeries.prototype =
                 this.trendline = data.oldPr;
                 break;
             }
+            case historyitem_AreaSeries_SetTx:
+            {
+                this.tx = data.oldPr;
+                break;
+            }
+            case historyitem_AreaSeries_SetVal:
+            {
+                this.val = data.oldPr;
+                break;
+            }
         }
     },
 
@@ -3736,6 +3790,16 @@ CAreaSeries.prototype =
                 this.trendline = data.newPr;
                 break;
             }
+            case historyitem_AreaSeries_SetTx:
+            {
+                this.tx = data.newPr;
+                break;
+            }
+            case historyitem_AreaSeries_SetVal:
+            {
+                this.val = data.newPr;
+                break;
+            }
         }
     },
 
@@ -3756,6 +3820,8 @@ CAreaSeries.prototype =
             case historyitem_AreaSeries_SetPictureOptions:
             case historyitem_AreaSeries_SetSpPr:
             case historyitem_AreaSeries_SetTrendline:
+            case historyitem_AreaSeries_SetTx:
+            case historyitem_AreaSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -3836,6 +3902,17 @@ CAreaSeries.prototype =
                 {
                     this.dPt.splice(pos, 1);
                 }
+                break;
+            }
+
+            case historyitem_AreaSeries_SetTx:
+            {
+                this.tx = readObject(r);
+                break;
+            }
+            case historyitem_AreaSeries_SetVal:
+            {
+                this.val = readObject(r);
                 break;
             }
         }
