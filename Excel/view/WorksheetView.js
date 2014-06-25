@@ -509,8 +509,8 @@
 			return this.visibleRange.r2;
 		};
 
-		WorksheetView.prototype.getHorizontalScrollRange = function (scrollWidth) {
-			var ctxW = this.drawingCtx.getWidth() - this.cellsLeft - scrollWidth;
+		WorksheetView.prototype.getHorizontalScrollRange = function () {
+			var ctxW = this.drawingCtx.getWidth() - this.cellsLeft;
 			for (var w = 0, i = this.cols.length - 1; i >= 0; --i) {
 				w += this.cols[i].width;
 				if (w > ctxW) {break;}
@@ -518,8 +518,8 @@
 			return i; // Диапазон скрола должен быть меньше количества столбцов, чтобы не было прибавления столбцов при перетаскивании бегунка
 		};
 
-		WorksheetView.prototype.getVerticalScrollRange = function (scrollHeight) {
-			var ctxH = this.drawingCtx.getHeight() - this.cellsTop - scrollHeight;
+		WorksheetView.prototype.getVerticalScrollRange = function () {
+			var ctxH = this.drawingCtx.getHeight() - this.cellsTop;
 			for (var h = 0, i = this.rows.length - 1; i >= 0; --i) {
 				h += this.rows[i].height;
 				if (h > ctxH) {break;}
@@ -1402,6 +1402,9 @@
 				this.cols[i].left = x;
 				x += this.cols[i].width;
 			}
+
+			if (1 === fullRecalc)
+				this.nColsCount = Math.max(this.nColsCount, i);
 		};
 
 		/**
@@ -1451,6 +1454,9 @@
 				};
 				y += this.rows[i].height;
 			}
+
+			if (1 === fullRecalc)
+				this.nRowsCount = Math.max(this.nRowsCount, i);
 		};
 
 		/** Вычисляет диапазон индексов видимых колонок */
