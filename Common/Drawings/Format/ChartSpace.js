@@ -876,8 +876,8 @@ CChartSpace.prototype =
             {
                 if(this.chart.plotArea.spPr)
                 {
-                    this.chart.plotArea.spPr.Fill && this.plotArea.chart.spPr.setFill(null);
-                    this.chart.plotArea.spPr.ln && this.plotArea.chart.spPr.setLn(null);
+                    this.chart.plotArea.spPr.Fill && this.chart.plotArea.spPr.setFill(null);
+                    this.chart.plotArea.spPr.ln && this.chart.plotArea.spPr.setLn(null);
                 }
                 var i, j, k, series, pts, chart, ser;
                 for(i = this.chart.plotArea.charts.length-1; i > -1; --i)
@@ -3401,7 +3401,7 @@ CChartSpace.prototype =
                             }
                         }
                     }
-                    if(string_pts.length === 0)
+                    //if(string_pts.length === 0)
                     {
                         pts_len = 0;
                         for(i = 0; i < chart_object.series.length; ++i)
@@ -3420,9 +3420,12 @@ CChartSpace.prototype =
                                 }
                             }
                         }
-                        for(i = 0; i < pts_len; ++i)
+                        if(pts_len > string_pts.length)
                         {
-                            string_pts.push({val:i+1 + ""});
+                            for(i = 0; i < pts_len; ++i)
+                            {
+                                string_pts.push({val:i+1 + ""});
+                            }
                         }
                     }
                     /*---------------------расчет позиции блока с подписями вертикальной оси-----------------------------------------------------------------------------*/
@@ -4409,18 +4412,23 @@ CChartSpace.prototype =
                             pts_len = string_pts.length;
                         }
                     }
-                    if(string_pts.length === 0)
+                    var pts_len2 = pts_len;
+                   // if(string_pts.length === 0)
                     {
                         if(ser.val)
                         {
                             if(ser.val.numRef && ser.val.numRef.numCache)
-                                pts_len = ser.val.numRef.numCache.pts.length;
+                                pts_len2 = ser.val.numRef.numCache.pts.length;
                             else if(ser.val.numLit)
-                                pts_len = ser.val.numLit.pts.length;
+                                pts_len2 = ser.val.numLit.pts.length;
                         }
-                        for(i = 0; i < pts_len; ++i)
+                        if(pts_len2 > pts_len)
                         {
-                            string_pts.push({val:i+1 + ""});
+                            pts_len = pts_len2;
+                            for(i = 0; i < pts_len2; ++i)
+                            {
+                                string_pts.push({val:i+1 + ""});
+                            }
                         }
                     }
                     /*---------------------расчет позиции блока с подписями вертикальной оси-----------------------------------------------------------------------------*/
@@ -7599,8 +7607,11 @@ CChartSpace.prototype =
         }
         graphics.AddClipRect(-ln_width, -ln_width, this.extX+ln_width, this.extY+ln_width);
 
+
         this.chartObj.draw(this, graphics);
-        graphics.reset();
+       // graphics.reset();
+
+
 
         if(this.chart)
         {
