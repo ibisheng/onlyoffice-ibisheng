@@ -2144,108 +2144,6 @@ CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
 }
 
 
-function old_CSeparatorDelimiter()
-{
-    CDelimiter.call(this);
-}
-extend(old_CSeparatorDelimiter, CDelimiter);
-old_CSeparatorDelimiter.prototype.init = function(type, column)
-{
-    var base = new CSeparator();
-    base.init(column);
-
-    var params =
-    {
-        type: type,
-        loc: 4,
-        turn1: 0,
-        turn2: 1
-    };
-    this.init_2(params, base);
-}
-old_CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
-{
-    var elem = this.findDisposition( mCoord);
-    var state = true,
-        SelectContent = null;
-
-    if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
-    {
-        var movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove(elem.mCoord);
-        SelectContent = movement.SelectContent;
-        state = movement.state;
-    }
-    else
-    {
-        state = false;
-    }
-
-    return {state: state, SelectContent: SelectContent};
-}
-
-
-function old_old_CSeparator()
-{
-    this.sepChr = 0x7C; // default
-    CMathBase.call(this);
-}
-extend(old_old_CSeparator, CMathBase);
-old_old_CSeparator.prototype.init = function(sepChr, column)
-{
-    if(sepChr !== "undefined" && sepChr !== null)
-        this.sepChr = sepChr.charCodeAt(0);
-
-    this.setDimension(1, column);
-    this.setContent();
-}
-old_old_CSeparator.prototype.setDistance = function()
-{
-    this.dW = this.getTxtPrp().FontSize/3*g_dKoef_pt_to_mm;
-}
-old_old_CSeparator.prototype.draw = function()
-{
-    //if(this.sepChr == )
-
-    old_old_CSeparator.superclass.draw.call(this);
-}
-old_old_CSeparator.prototype.drawHorLine = function()
-{
-    var x = this.pos.x,
-        y = this.pos.y;
-
-    var w = this.elements[0][0].size.width + this.dW/2;
-
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
-    MathControl.pGraph.p_width(1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-
-    var pW = this.getTxtPrp().FontSize/18*g_dKoef_pt_to_mm;
-
-    for(var i = 0; i < this.nCol - 1; i++)
-    {
-        var x1 = x + w - pW/2, y1 = y,
-            x2 = x + pW/2 + w, y2 = y,
-            x3 = x2, y3 = y + this.size.height,
-            x4 = x1, y4 = y3;
-
-        MathControl.pGraph._s();
-
-        MathControl.pGraph._m(x1, y1);
-        MathControl.pGraph._l(x2, y2);
-        MathControl.pGraph._l(x3, y3);
-        MathControl.pGraph._l(x4, y4);
-        MathControl.pGraph._l(x1, y1);
-
-        MathControl.pGraph.df();
-
-        w += this.elements[0][i+1].size.width + this.dW;
-    }
-
-    MathControl.pGraph.SetIntegerGrid(intGrid);
-}
-
-
 function COperator(type)
 {
     this.type = type; // delimiter, separator, group character, accent
@@ -3142,6 +3040,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
     if(this.typeOper !== OPERATOR_EMPTY)
     {
         var width, height, ascent;
+        var ascentSign = 0;
 
 
         if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
@@ -3170,6 +3069,8 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
                 width = this.operator.size.width;
                 height = this.operator.size.height;
             }
+
+            ascentSign = this.operator.size.ascent;
 
             /*var letterX = new CMathText(true);
             letterX.add(0x78);
@@ -3205,7 +3106,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         else // vertical
             ascent = height/2 + shCenter;
 
-        this.size = {width: width, height: height, ascent: ascent};
+        this.size = {width: width, height: height, ascent: ascent, ascentSign : ascentSign};
     }
 }
 COperator.prototype.setPosition = function(Positions)
@@ -3559,12 +3460,6 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
-
-    /*if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }*/
 
     if(this.RecalcInfo.bProps == true)
     {

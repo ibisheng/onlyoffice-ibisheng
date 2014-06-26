@@ -329,7 +329,6 @@ CMathText.prototype =
                 this.pos.x = pos.x + this.GapLeft;
                 this.pos.y = pos.y;
 
-                //this.pos = {x : pos.x + this.GapLeft, y: pos.y};
             }
             else                                    // for symbol only drawing
             {
@@ -440,7 +439,7 @@ CMathText.prototype =
 
 
     },
-    Get_ParaContentPosByXY: function(SearchPos, Depth)
+    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         SearchPos.Pos.Update(0, Depth);
         SearchPos.Pos.bPlaceholder = true;

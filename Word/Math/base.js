@@ -1264,7 +1264,7 @@ CMathBase.prototype =
 
     },
     /// Position for Paragraph
-    Get_ParaContentPosByXY: function(SearchPos, Depth)
+    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         /// элементов just-draw не должно прийти
 
@@ -1289,7 +1289,7 @@ CMathBase.prototype =
         SearchPos.Y = disp.mCoord.y;
 
 
-        this.elements[disp.pos.x][disp.pos.y].Get_ParaContentPosByXY(SearchPos, Depth);
+        this.elements[disp.pos.x][disp.pos.y].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {

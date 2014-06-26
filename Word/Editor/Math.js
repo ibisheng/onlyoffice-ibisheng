@@ -1263,15 +1263,12 @@ ParaMath.prototype =
                 var X = SearchPos.X,
                     Y = SearchPos.Y;
 
-                //SearchPos.X -= this.Math.absPos.x;
-                //SearchPos.Y -= this.Math.absPos.y;
-
                 SearchPos.X -= this.X;
                 SearchPos.Y -= this.Y;
 
 
 
-                this.Root.Get_ParaContentPosByXY(SearchPos, Depth);
+                this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
                 SearchPos.X = X;
                 SearchPos.Y = Y;

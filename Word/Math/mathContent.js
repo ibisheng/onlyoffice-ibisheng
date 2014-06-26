@@ -6138,7 +6138,7 @@ CMathContent.prototype =
     },
 
     /// функции для работы с курсором
-    Get_ParaContentPosByXY: function(SearchPos, Depth)
+    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
         {
@@ -6153,17 +6153,17 @@ CMathContent.prototype =
             if(this.content[pos].typeObj == MATH_COMP)
             {
                 SearchPos.Y -= this.size.ascent - this.content[pos].size.ascent;
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth);
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
             }
             else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
             {
                 SearchPos.X += this.pos.x + this.ParaMath.X + this.WidthToElement[pos];
                 SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, 0, 0);
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
             }
             else
             {
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth);
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
             }
         }
     },

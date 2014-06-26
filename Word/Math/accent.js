@@ -512,6 +512,9 @@ function CAccent(props)
         chrType:    null
     };
 
+    this.shiftX = 0;
+    this.gap = 0;
+
     /////////////////
 
     this.operator = new COperator(OPER_ACCENT);
@@ -1075,7 +1078,7 @@ CAccent.prototype.setPosition = function(pos)
     var PosOper = new CMathPosition();
 
     PosOper.x = this.pos.x + this.GapLeft + alignOp;
-    PosOper.y = this.pos.y;
+    PosOper.y = this.pos.y + this.shiftX;
 
     // TODO
     // выставить правильно смещение для остальных значков
@@ -1093,29 +1096,18 @@ CAccent.prototype.setPosition = function(pos)
     var PosBase = new CMathPosition();
 
     PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-    PosBase.y = this.pos.y + this.operator.size.height;
+    PosBase.y = this.pos.y + this.operator.size.height + this.gap;
 
     this.elements[0][0].setPosition(PosBase);
 }
 CAccent.prototype.getPropsForWrite = function()
 {
-    /*var props = {};
-    props.chr = String.fromCharCode(this.code);
-
-    return props;*/
-
     return this.Pr;
 }
 CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
-
-    /*if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }*/
 
     if(this.RecalcInfo.bProps == true)
     {
@@ -1132,9 +1124,6 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
         };
 
         this.operator.mergeProperties(prp, defaultPrp);
-
-        /*this.Pr.chr = String.fromCharCode(this.operator.code);
-        this.Pr.chrType = this.operator.typeOper;*/
     }
 
     this.operator.relate(this);
@@ -1150,11 +1139,13 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
     var letterX = new CMathText(true);
     letterX.add(0x78);
     letterX.Resize(null, oMeasure);
-    this.shiftX = base.size.ascent - letterX.size.ascent;
+    //this.shiftX = base.size.ascent - letterX.size.ascent;
+    this.gap = this.operator.size.ascentSign - letterX.size.ascent;
+    this.shiftX = this.operator.size.ascentSign;
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
-        height = base.size.height + this.operator.size.height + this.shiftX,
-        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
+        height = base.size.height + this.operator.size.height + this.gap,
+        ascent = this.operator.size.height + this.gap + this.elements[0][0].size.ascent;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
