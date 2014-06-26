@@ -5673,7 +5673,8 @@
 		WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
 			var c, r, f, i, offsetX, offsetY, cellCursor, sheetId = this.model.getId(), userId,
 				lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink, widthDiff = 0, heightDiff = 0,
-				isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject;
+				isLocked = false, ar = this.activeRange, target = c_oTargetType.Cells, row = -1, col = -1,
+				isSelGraphicObject, isNotFirst;
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (frozenCursor.result) {
@@ -5748,36 +5749,8 @@
 			if (x < this.cellsLeft && y < this.cellsTop) {
 				return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
 			}
-			if (x <= this.cellsLeft && y >= this.cellsTop) {
-				r = this._findRowUnderCursor(y, true);
-				if (r === null)
-					return oResDefault;
-				f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
-				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-				return {
-					cursor: f ? kCurRowResize : kCurRowSelect,
-					target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
-					col: -1,
-					row: r.row + (r.row !== this.visibleRange.r1 && f && y < r.top + 3 ? -1 : 0),
-					mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
-				};
-			}
-			if (y <= this.cellsTop && x >= this.cellsLeft) {
-				c = this._findColUnderCursor(x, true);
-				if (c === null)
-					return oResDefault;
-				f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
-				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-				return {
-					cursor: f ? kCurColResize : kCurColSelect,
-					target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
-					col: c.col + (c.col !== this.visibleRange.c1 && f && x < c.left + 3 ? -1 : 0),
-					row: -1,
-					mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
-				};
-			}
 
-			var cFrozen, rFrozen;
+			var cFrozen = -1, rFrozen = -1;
 			offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 			offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 			if (this.topLeftFrozenCell) {
@@ -5791,6 +5764,37 @@
 					heightDiff = 0;
 				offsetX -= widthDiff;
 				offsetY -= heightDiff;
+			}
+
+			if (x <= this.cellsLeft && y >= this.cellsTop) {
+				r = this._findRowUnderCursor(y, true);
+				if (r === null)
+					return oResDefault;
+				isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
+				f = !isViewerMode && (isNotFirst && y < r.top + 3 || y >= r.bottom - 3);
+				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+				return {
+					cursor: f ? kCurRowResize : kCurRowSelect,
+					target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
+					col: -1,
+					row: r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
+					mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
+				};
+			}
+			if (y <= this.cellsTop && x >= this.cellsLeft) {
+				c = this._findColUnderCursor(x, true);
+				if (c === null)
+					return oResDefault;
+				isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
+				f = !isViewerMode && (isNotFirst && x < c.left + 3 || x >= c.right - 3);
+				// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+				return {
+					cursor: f ? kCurColResize : kCurColSelect,
+					target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
+					col: c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
+					row: -1,
+					mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
+				};
 			}
 
 			var oFormulaOrChartCursor = this._getCursorFormulaOrChart(x, y, offsetX, offsetY);
