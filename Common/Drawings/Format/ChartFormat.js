@@ -1849,7 +1849,7 @@ CPlotArea.prototype =
             cur_axis = this.axId[i];
             for(j = 0; j < this.axId.length; ++j)
             {
-                if(cur_axis.crossAx === this.axId[j].crossAx)
+                if(cur_axis.crossAx === this.axId[j])
                 {
                     c.axId[i].setCrossAx(c.axId[j]);
                     break;
@@ -4221,7 +4221,7 @@ CCatAx.prototype =
             }
         }
 
-        if(isRealNumber(labelsPosition) && isRealObject(this.crossAx))
+        if(isRealNumber(labelsPosition) && isRealObject(this.crossAx) && this.crossAx.setCrossBetween)
             this.crossAx.setCrossBetween(labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN);
     },
 

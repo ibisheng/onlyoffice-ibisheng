@@ -4387,6 +4387,7 @@ ParaDrawing.prototype =
         this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
         this.Internal_Position.Correct_Values(bInline, PageLimits, this.AllowOverlap, this.Use_TextWrap(), OtherFlowObjects);
 
+        var OldPageNum = this.PageNum;
         this.PageNum = PageNum;
         this.X       = this.Internal_Position.CalcX;
         this.Y       = this.Internal_Position.CalcY;
@@ -4419,7 +4420,7 @@ ParaDrawing.prototype =
             this.Y = this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
         }
 
-        this.updatePosition3( this.PageNum, this.X, this.Y );
+        this.updatePosition3( this.PageNum, this.X, this.Y, OldPageNum );
     },
 
     Reset_SavedPosition : function()
@@ -4441,9 +4442,13 @@ ParaDrawing.prototype =
             this.GraphicObj.deselect();
     },
 
-    updatePosition3: function(pageIndex, x, y)
+    updatePosition3: function(pageIndex, x, y, oldPageNum)
     {
         this.graphicObjects.removeById(pageIndex, this.Get_Id());
+        if(isRealNumber(oldPageNum))
+        {
+            this.graphicObjects.removeById(oldPageNum, this.Get_Id());
+        }
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex);
