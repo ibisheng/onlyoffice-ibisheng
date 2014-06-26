@@ -1,5 +1,7 @@
 "use strict";
 
+var startRangeCurrentDateSystem = 1;
+
 function getPMT( rate, nper, pv, fv, flag ) {
     var res, part;
     if ( rate === 0 ) {
@@ -159,10 +161,10 @@ function RateIteration( nper, payment, pv, fv, payType, guess ) {
             }
         }
     }
-    if( valid && found ){
+    if ( valid && found ) {
         return new cNumber( x );
     }
-    else{
+    else {
         return new cError( cErrorType.not_numeric );
     }
 }
@@ -195,7 +197,7 @@ function getcoupdaybs( settl, matur, frequency, basis ) {
 }
 
 function getcoupdays( settl, matur, frequency, basis ) {
-    if( basis == DayCountBasis.ActualActual ){
+    if ( basis == DayCountBasis.ActualActual ) {
         var m = lcl_GetCouppcd( settl, matur, frequency ),
             n = new Date( m );
         n.addMonths( 12 / frequency );
@@ -231,14 +233,14 @@ function getcoupncd( settl, matur, frequency ) {
 function getprice( settle, mat, rate, yld, redemp, freq, base ) {
 
     var cdays = getcoupdays( new Date( settle ), new Date( mat ), freq, base ),
-        cnum = getcoupnum( new Date( settle ), new Date(mat), freq ),
+        cnum = getcoupnum( new Date( settle ), new Date( mat ), freq ),
         cdaybs = getcoupdaybs( new Date( settle ), new Date( mat ), freq, base ),
         cdaysnc = ( cdays - cdaybs ) / cdays,
         fT1 = 100 * rate / freq,
         fT2 = 1 + yld / freq,
         res = redemp / ( Math.pow( 1 + yld / freq, cnum - 1 + cdaysnc ) );
 
-    if( cnum == 1){
+    if ( cnum == 1 ) {
         return (redemp + fT1) / (1 + cdaysnc * yld / freq) - 100 * rate / freq * cdaybs / cdays;
     }
 
@@ -260,13 +262,13 @@ function getYield( settle, mat, coup, price, redemp, freq, base ) {
     for ( var i = 0; i < 100 && priceN != price; i++ ) {
         priceN = getprice( settle, mat, coup, yieldN, redemp, freq, base );
 
-        if ( price == price1 ){
+        if ( price == price1 ) {
             return yield1;
         }
-        else if ( price == price2 ){
+        else if ( price == price2 ) {
             return yield2;
         }
-        else if ( price == priceN ){
+        else if ( price == priceN ) {
             return yieldN;
         }
         else if ( price < price2 ) {
@@ -288,7 +290,7 @@ function getYield( settle, mat, coup, price, redemp, freq, base ) {
         }
     }
 
-    if ( Math.abs( price - priceN ) > price / 100 ){
+    if ( Math.abs( price - priceN ) > price / 100 ) {
         return new cError( cErrorType.not_numeric );		// result not precise enough
     }
 
@@ -340,7 +342,7 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
 
 }
 
-function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis) {
+function oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis ) {
     function positiveDaysBetween( d1, d2, b ) {
         var res = diffDate( d1, d2, b ).getValue();
         return res > 0 ? res : 0;
@@ -374,7 +376,7 @@ function oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis
 
     var res = 0, DSC,
         numMonths = 12 / frequency,
-        numMonthsNeg = - numMonths,
+        numMonthsNeg = -numMonths,
         E = getcoupdays( settl, new Date( firstCoup ), frequency, basis ).getValue(),
         coupNums = getcoupnum( settl, new Date( matur ), frequency ),
         dfc = positiveDaysBetween( new Date( iss ), new Date( firstCoup ), basis );
@@ -606,17 +608,17 @@ cACCRINT.prototype.Calculate = function ( arg ) {
     if ( basis instanceof cError ) return this.value = basis;
     if ( calcMethod instanceof cError ) return this.value = calcMethod;
 
-    issue = issue.getValue();
-    firstInterest = firstInterest.getValue();
-    settlement = settlement.getValue();
+    issue = Math.floor(issue.getValue());
+    firstInterest = Math.floor(firstInterest.getValue());
+    settlement = Math.floor(settlement.getValue());
     rate = rate.getValue();
     par = par.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
     calcMethod = calcMethod.toBool();
 
-    if ( issue >= settlement || rate <= 0 || par <= 0 ||
-         basis < 0 || basis > 4 || (frequency != 1 && frequency != 2 && frequency != 4) ) {
+    if ( issue < startRangeCurrentDateSystem || firstInterest < startRangeCurrentDateSystem || settlement < startRangeCurrentDateSystem || issue >= settlement || rate <= 0 || par <= 0 ||
+        basis < 0 || basis > 4 || (frequency != 1 && frequency != 2 && frequency != 4) ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -632,10 +634,10 @@ cACCRINT.prototype.Calculate = function ( arg ) {
     var iss = Date.prototype.getDateFromExcel( issue ),
         fInter = Date.prototype.getDateFromExcel( firstInterest ),
         settl = Date.prototype.getDateFromExcel( settlement ),
-        numMonths = 12 / frequency, numMonthsNeg = - numMonths, endMonth = fInter.lastDayOfMonth(),
+        numMonths = 12 / frequency, numMonthsNeg = -numMonths, endMonth = fInter.lastDayOfMonth(),
         coupPCD, firstDate, startDate, endDate, res, days, coupDays;
 
-    if(settl > fInter && calcMethod){
+    if ( settl > fInter && calcMethod ) {
         coupPCD = new Date( fInter );
         startDate = endDate = new Date( settl );
 
@@ -645,7 +647,7 @@ cACCRINT.prototype.Calculate = function ( arg ) {
         }
 
     }
-    else{
+    else {
         coupPCD = addMonth( fInter, numMonthsNeg, endMonth );
     }
 
@@ -656,15 +658,15 @@ cACCRINT.prototype.Calculate = function ( arg ) {
     startDate = new Date( coupPCD );
     endDate = iss;
 
-    while( !( numMonthsNeg > 0 ? startDate >= iss : startDate <= iss ) ) {
+    while ( !( numMonthsNeg > 0 ? startDate >= iss : startDate <= iss ) ) {
         endDate = startDate;
         startDate = addMonth( startDate, numMonthsNeg, endMonth );
         firstDate = iss > startDate ? iss : startDate;
-        if( basis == DayCountBasis.UsPsa30_360 ){
+        if ( basis == DayCountBasis.UsPsa30_360 ) {
             days = days360( firstDate, endDate, !( iss > startDate ) );
             coupDays = getcoupdays( startDate, endDate, frequency, basis ).getValue();
         }
-        else{
+        else {
             days = diffDate( firstDate, endDate, basis ).getValue();
             coupDays = ( basis == DayCountBasis.Actual365 ) ? ( 365 / frequency ) : diffDate( startDate, endDate, basis ).getValue();
         }
@@ -753,13 +755,13 @@ cACCRINTM.prototype.Calculate = function ( arg ) {
     if ( par instanceof cError ) return this.value = par;
     if ( basis instanceof cError ) return this.value = basis;
 
-    issue = issue.getValue();
-    settlement = settlement.getValue();
+    issue = Math.floor(issue.getValue());
+    settlement = Math.floor(settlement.getValue());
     rate = rate.getValue();
     par = par.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( issue >= settlement || rate <= 0 || par <= 0 || basis < 0 || basis > 4 ) {
+    if ( settlement < startRangeCurrentDateSystem || issue < startRangeCurrentDateSystem || issue >= settlement || rate <= 0 || par <= 0 || basis < 0 || basis > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -872,15 +874,15 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
     cost = cost.getValue();
     salvage = salvage.getValue();
     period = period.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ){
+    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
     var per = 1 / rate, coeff;
 
-    if( cost == salvage || period > per ){
+    if ( cost == salvage || period > per ) {
         return this.value = new cNumber( 0 );
     }
 
@@ -1027,13 +1029,13 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
     salvage = salvage.getValue();
     period = period.getValue();
     rate = rate.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ){
+    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    if( cost == salvage || period > 1/rate ){
+    if ( cost == salvage || period > 1 / rate ) {
         return this.value = new cNumber( 0 );
     }
 
@@ -1124,14 +1126,19 @@ cCOUPDAYBS.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    basis = Math.floor(basis.getValue());
-    frequency = Math.floor(frequency.getValue())
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    basis = Math.floor( basis.getValue() );
+    frequency = Math.floor( frequency.getValue() )
 
-    if ( settlement.getValue() >= maturity.getValue() || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
+
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
-        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
     return this.value = new cNumber( getcoupdaybs( settl, matur, frequency, basis ) );
 
@@ -1205,13 +1212,15 @@ cCOUPDAYS.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );
@@ -1288,14 +1297,18 @@ cCOUPDAYSNC.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement.getValue() >= maturity.getValue() || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
-        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
     return this.value = new cNumber( getcoupdaysnc( new Date( settl ), new Date( matur ), frequency, basis ) );
 
@@ -1369,14 +1382,18 @@ cCOUPNCD.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement.getValue() >= maturity.getValue() || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
-        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
     this.value = new cNumber( getcoupncd( settl, matur, frequency ).getExcelDate() );
     this.value.numFormat = 14;
@@ -1452,14 +1469,18 @@ cCOUPNUM.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement.getValue() >= maturity.getValue() || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
-        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
     var res = getcoupnum( settl, matur, frequency );
 
@@ -1534,14 +1555,18 @@ cCOUPPCD.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement.getValue() >= maturity.getValue() || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) )
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var settl = Date.prototype.getDateFromExcel( settlement.getValue() ),
-        matur = Date.prototype.getDateFromExcel( maturity.getValue() );
+    var settl = Date.prototype.getDateFromExcel( settlement ),
+        matur = Date.prototype.getDateFromExcel( maturity );
 
     var n = lcl_GetCouppcd( settl, matur, frequency );
 
@@ -2079,12 +2104,18 @@ cDISC.prototype.Calculate = function ( arg ) {
     if ( redemption instanceof cError ) return this.value = redemption;
     if ( basis instanceof cError ) return this.value = basis;
 
-    basis = Math.floor(basis.getValue());
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    pr = pr.getValue();
+    redemption = redemption.getValue()
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || redemption.getValue() <= 0 || basis < 0 || basis > 4 )
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity ||
+        pr <= 0 || redemption <= 0 || basis < 0 || basis > 4 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var res = ( 1 - pr.getValue() / redemption.getValue() ) / yearFrac( Date.prototype.getDateFromExcel( settlement.getValue() ), Date.prototype.getDateFromExcel( maturity.getValue() ), basis );
+    var res = ( 1 - pr / redemption ) / yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
 
     this.value = new cNumber( res );
     this.value.numFormat = 9;
@@ -2148,7 +2179,7 @@ cDOLLARDE.prototype.Calculate = function ( arg ) {
     else if ( fraction == 0 )
         return this.value = new cError( cErrorType.division_by_zero );
 
-    fraction = Math.floor(fraction);
+    fraction = Math.floor( fraction );
 
     var fInt = Math.floor( fractionalDollar ), res = fractionalDollar - fInt;
 
@@ -2218,7 +2249,7 @@ cDOLLARFR.prototype.Calculate = function ( arg ) {
     else if ( fraction == 0 )
         return this.value = new cError( cErrorType.division_by_zero );
 
-    fraction = Math.floor(fraction);
+    fraction = Math.floor( fraction );
 
     var fInt = Math.floor( decimalDollar ), res = decimalDollar - fInt;
 
@@ -2320,14 +2351,14 @@ cDURATION.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     coupon = coupon.getValue();
     yld = yld.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -2633,13 +2664,13 @@ cINTRATE.prototype.Calculate = function ( arg ) {
     if ( redemption instanceof cError ) return this.value = redemption;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     investment = investment.getValue();
     redemption = redemption.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity || investment <= 0 || redemption <= 0 || basis < 0 || basis > 4 ){
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity || investment <= 0 || redemption <= 0 || basis < 0 || basis > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -2781,24 +2812,24 @@ cIRR.prototype = Object.create( cBaseFunction.prototype );
 cIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber( 0.1 );
 
-    function npv(r,cf){
+    function npv( r, cf ) {
         var res = 0;
-        for(var i = 1; i<=cf.length;i++){
-            res += cf[i-1].getValue() / Math.pow( 1 + r, i );
+        for ( var i = 1; i <= cf.length; i++ ) {
+            res += cf[i - 1].getValue() / Math.pow( 1 + r, i );
         }
         return res;
     }
 
-    function irr2(x, arr){
-        var g_Eps = 1e-7, nIM = 500, eps = 1, nMC= 0, xN, guess = x;
+    function irr2( x, arr ) {
+        var g_Eps = 1e-7, nIM = 500, eps = 1, nMC = 0, xN, guess = x;
 
         while ( eps > g_Eps && nMC < nIM ) {
-            xN = x - npv(x,arr) / ( (npv( x +  g_Eps, arr ) - npv( x -  g_Eps, arr )) / (2 * g_Eps) );
+            xN = x - npv( x, arr ) / ( (npv( x + g_Eps, arr ) - npv( x - g_Eps, arr )) / (2 * g_Eps) );
             nMC++;
             eps = Math.abs( xN - x );
             x = xN;
         }
-        if ( isNaN( x ) || Infinity == Math.abs(x) ) {
+        if ( isNaN( x ) || Infinity == Math.abs( x ) ) {
             var max = Number.MAX_VALUE, min = -Number.MAX_VALUE,
                 step = 1.6,
                 low = guess - 0.01 <= min ? min + g_Eps : guess - 0.01,
@@ -2861,14 +2892,14 @@ cIRR.prototype.Calculate = function ( arg ) {
     var arr = [];
     if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( v ) {
-            if( v instanceof cNumber ){
+            if ( v instanceof cNumber ) {
                 arr.push( v );
             }
         } );
     }
     else if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( v ) {
-            if( v instanceof cNumber ){
+            if ( v instanceof cNumber ) {
                 arr.push( v );
             }
         } );
@@ -2881,14 +2912,14 @@ cIRR.prototype.Calculate = function ( arg ) {
     }
 
     var wasNeg = false, wasPos = false;
-    for(var i = 0; i<arr.length;i++){
-        if( arr[i].getValue() > 0 )
+    for ( var i = 0; i < arr.length; i++ ) {
+        if ( arr[i].getValue() > 0 )
             wasNeg = true;
-        if( arr[i].getValue() < 0 )
+        if ( arr[i].getValue() < 0 )
             wasPos = true;
     }
 
-    if( !(wasNeg && wasPos) ){
+    if ( !(wasNeg && wasPos) ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -2963,7 +2994,7 @@ cISPMT.prototype.Calculate = function ( arg ) {
     if ( nper instanceof cError ) return this.value = nper;
     if ( pv instanceof cError ) return this.value = pv;
 
-    if( nper.getValue() < 0 ){
+    if ( nper.getValue() < 0 ) {
         return this.value = new cError( cErrorType.division_by_zero );
     }
 
@@ -3058,14 +3089,14 @@ cMDURATION.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     coupon = coupon.getValue();
     yld = yld.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
+    if ( settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem || settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -3111,14 +3142,14 @@ cMIRR.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( c ) {
-            if( c instanceof cNumber || c instanceof  cError ){
+            if ( c instanceof cNumber || c instanceof  cError ) {
                 valueArray.push( c );
             }
         } )
     }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( c ) {
-            if( c instanceof cNumber || c instanceof  cError ){
+            if ( c instanceof cNumber || c instanceof  cError ) {
                 valueArray.push( c );
             }
         } )
@@ -3135,7 +3166,7 @@ cMIRR.prototype.Calculate = function ( arg ) {
         if ( arg0 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
-        else if( arg0 instanceof cNumber ){
+        else if ( arg0 instanceof cNumber ) {
             valueArray.push( arg0 );
         }
     }
@@ -3560,22 +3591,26 @@ cODDFPRICE.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    issue = issue.getValue();
-    first_coupon = first_coupon.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    issue = Math.floor(issue.getValue());
+    first_coupon = Math.floor(first_coupon.getValue());
     rate = rate.getValue();
     yld = yld.getValue();
     redemption = redemption.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( maturity <= first_coupon || first_coupon <= settlement ||
+    if ( maturity < startRangeCurrentDateSystem ||
+        settlement < startRangeCurrentDateSystem ||
+        first_coupon < startRangeCurrentDateSystem ||
+        issue < startRangeCurrentDateSystem ||
+        maturity <= first_coupon || first_coupon <= settlement ||
         settlement <= issue ||
         basis < 0 || basis > 4 ||
         yld < 0 || rate < 0 ||
         redemption < 0 ||
-        frequency != 1 && frequency != 2 && frequency != 4 ){
+        frequency != 1 && frequency != 2 && frequency != 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -3584,7 +3619,7 @@ cODDFPRICE.prototype.Calculate = function ( arg ) {
         iss = Date.prototype.getDateFromExcel( issue ),
         firstCoup = Date.prototype.getDateFromExcel( first_coupon );
 
-    this.value = new cNumber( oddFPrice(settl,matur,iss,firstCoup,rate,yld,redemption,frequency,basis) );
+    this.value = new cNumber( oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis ) );
     return this.value;
 
 };
@@ -3706,17 +3741,21 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    issue = issue.getValue();
-    first_coupon = first_coupon.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    issue = Math.floor(issue.getValue());
+    first_coupon = Math.floor(first_coupon.getValue());
     rate = rate.getValue();
     pr = pr.getValue();
     redemption = redemption.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( maturity <= first_coupon || first_coupon <= settlement ||
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        issue < startRangeCurrentDateSystem ||
+        first_coupon < startRangeCurrentDateSystem ||
+        maturity <= first_coupon || first_coupon <= settlement ||
         settlement <= issue ||
         basis < 0 || basis > 4 ||
         pr < 0 || rate < 0 ||
@@ -3729,13 +3768,15 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
         iss = Date.prototype.getDateFromExcel( issue ),
         firstCoup = Date.prototype.getDateFromExcel( first_coupon );
 
-    var years = diffDate(settl, matur,basis ),
+    var years = diffDate( settl, matur, basis ),
         px = pr - 100,
         num = rate * years * 100 - px,
         denum = px * 0.25 * ( 1 + 2 * years ) + years * 100,
-        guess = num / denum, x = guess, g_Eps = 1e-7, nIM = 500, eps = 1, nMC= 0, xN;
+        guess = num / denum, x = guess, g_Eps = 1e-7, nIM = 500, eps = 1, nMC = 0, xN;
 
-    function iterF(yld) {return pr - oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis)}
+    function iterF( yld ) {
+        return pr - oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis )
+    }
 
     while ( eps > g_Eps && nMC < nIM ) {
         xN = x - iterF( x ) / ( (iterF( x + g_Eps ) - iterF( x - g_Eps )) / (2 * g_Eps) );
@@ -3743,7 +3784,7 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
         eps = Math.abs( xN - x );
         x = xN;
     }
-    if ( isNaN( x ) || Infinity == Math.abs(x) ) {
+    if ( isNaN( x ) || Infinity == Math.abs( x ) ) {
         var max = Number.MAX_VALUE, min = -Number.MAX_VALUE,
             step = 1.6,
             low = guess - 0.01 <= min ? min + g_Eps : guess - 0.01,
@@ -3913,17 +3954,21 @@ cODDLPRICE.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    last_interest = last_interest.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    last_interest = Math.floor(maturity.getValue());
     rate = rate.getValue();
     yld = yld.getValue();
     redemption = redemption.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( maturity <= settlement || settlement <= last_interest || basis < 0 || basis > 4 || yld < 0 || rate < 0 ||
-        frequency != 1 && frequency != 2 && frequency != 4 || redemption <= 0 ){
+    if ( settlement  < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        last_interest < startRangeCurrentDateSystem ||
+        maturity <= settlement || settlement <= last_interest ||
+        basis < 0 || basis > 4 || yld < 0 || rate < 0 ||
+        frequency != 1 && frequency != 2 && frequency != 4 || redemption <= 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -4052,17 +4097,21 @@ cODDLYIELD.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    last_interest = last_interest.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    last_interest = Math.floor(maturity.getValue());
     rate = rate.getValue();
     pr = pr.getValue();
     redemption = redemption.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( maturity <= settlement || settlement <= last_interest || basis < 0 || basis > 4 || pr < 0 || rate < 0 ||
-        frequency != 1 && frequency != 2 && frequency != 4 || redemption <= 0 ){
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        last_interest < startRangeCurrentDateSystem ||
+        maturity <= settlement || settlement <= last_interest ||
+        basis < 0 || basis > 4 || pr < 0 || rate < 0 ||
+        frequency != 1 && frequency != 2 && frequency != 4 || redemption <= 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -4387,15 +4436,17 @@ cPRICE.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     rate = rate.getValue();
     yld = yld.getValue();
     redemption = redemption.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity ||
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        settlement >= maturity ||
         basis < 0 || basis > 4 ||
         ( frequency != 1 && frequency != 2 && frequency != 4 ) ||
         rate < 0 || yld < 0 ||
@@ -4487,13 +4538,15 @@ cPRICEDISC.prototype.Calculate = function ( arg ) {
     if ( redemption instanceof cError ) return this.value = redemption;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     discount = discount.getValue();
     redemption = redemption.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
     if ( settlement >= maturity ||
+        settlement  < startRangeCurrentDateSystem ||
+        maturity  < startRangeCurrentDateSystem ||
         basis < 0 || basis > 4 ||
         discount <= 0 || redemption <= 0 )
         return this.value = new cError( cErrorType.not_numeric );
@@ -4595,14 +4648,17 @@ cPRICEMAT.prototype.Calculate = function ( arg ) {
     if ( yld instanceof cError ) return this.value = yld;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    issue = issue.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    issue = Math.floor(issue.getValue());
     rate = rate.getValue();
     yld = yld.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity ||
+    if ( settlement  < startRangeCurrentDateSystem ||
+        maturity  < startRangeCurrentDateSystem ||
+        issue < startRangeCurrentDateSystem ||
+        settlement >= maturity ||
         basis < 0 || basis > 4 ||
         rate < 0 || yld < 0 )
         return this.value = new cError( cErrorType.not_numeric );
@@ -4893,13 +4949,16 @@ cRECEIVED.prototype.Calculate = function ( arg ) {
     if ( discount instanceof cError ) return this.value = discount;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     investment = investment.getValue();
     discount = discount.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity || investment <= 0 || discount <= 0 || basis < 0 || basis > 4 ){
+    if ( settlement >= maturity || investment <= 0 || discount <= 0 ||
+        settlement  < startRangeCurrentDateSystem ||
+        maturity  < startRangeCurrentDateSystem ||
+        basis < 0 || basis > 4 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -5051,7 +5110,7 @@ cSYD.prototype.Calculate = function ( arg ) {
     life = life.getValue();
     per = per.getValue();
 
-    if ( life == 1 || life <= 0 || cost < 0 || salvage < 0 || per < 0 ){
+    if ( life == 1 || life <= 0 || cost < 0 || salvage < 0 || per < 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -5121,22 +5180,32 @@ cTBILLEQ.prototype.Calculate = function ( arg ) {
     if ( maturity instanceof cError ) return this.value = maturity;
     if ( discount instanceof cError ) return this.value = discount;
 
-    var nMat = maturity.getValue();
-    nMat++;
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    discount = discount.getValue();
 
-    var d1 = Date.prototype.getDateFromExcel( settlement.getValue() );
+    if ( settlement >= maturity ||
+        settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        discount <= 0 || nDiff > 360 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
+    var nMat = maturity+1;
+
+    var d1 = Date.prototype.getDateFromExcel( settlement );
+
     var d2 = Date.prototype.getDateFromExcel( nMat );
     var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
         date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
     var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
 
-    if ( settlement.getValue() >= maturity.getValue() || discount.getValue() <= 0 || nDiff > 360 )
+    if ( nDiff > 360 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    var res = ( 365 * discount.getValue() ) / ( 360 - ( discount.getValue() * nDiff ) );
+    this.value = new cNumber( ( 365 * discount.getValue() ) / ( 360 - ( discount.getValue() * nDiff ) ) );
 
-    this.value = new cNumber( res );
     this.value.numFormat = 9;
     return this.value;
 
@@ -5200,20 +5269,22 @@ cTBILLPRICE.prototype.Calculate = function ( arg ) {
     if ( maturity instanceof cError ) return this.value = maturity;
     if ( discount instanceof cError ) return this.value = discount;
 
-    settlement = Math.floor( settlement.getValue() );
-    maturity = Math.floor( maturity.getValue() );
+    settlement = Math.floor( Math.floor(settlement.getValue()) );
+    maturity = Math.floor( Math.floor(maturity.getValue()) );
     discount = discount.getValue();
 
-    if ( settlement >= maturity || discount <= 0 ){
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        settlement >= maturity || discount <= 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
     var d1 = Date.prototype.getDateFromExcel( settlement ),
         d2 = Date.prototype.getDateFromExcel( maturity ),
-        d3 = new Date(d1);
+        d3 = new Date( d1 );
 
-    d3.addYears(1);
-    if( d2 > d3 ){
+    d3.addYears( 1 );
+    if ( d2 > d3 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -5282,21 +5353,29 @@ cTBILLYIELD.prototype.Calculate = function ( arg ) {
     if ( maturity instanceof cError ) return this.value = maturity;
     if ( pr instanceof cError ) return this.value = pr;
 
-    var d1 = Date.prototype.getDateFromExcel( settlement.getValue() );
-    var d2 = Date.prototype.getDateFromExcel( maturity.getValue() );
-    var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    pr = pr.getValue();
+
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        settlement >= maturity || pr <= 0 ){
+        return this.value = new cError( cErrorType.not_numeric );
+    }
+
+    var d1 = Date.prototype.getDateFromExcel( settlement ),
+        d2 = Date.prototype.getDateFromExcel( maturity ),
+        date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
         date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
     var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
     nDiff++;
-    if ( settlement.getValue() >= maturity.getValue() || pr.getValue() <= 0 || nDiff > 360 )
+
+    if ( nDiff > 360 ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    pr = pr.getValue();
-
-    var res = ( ( 100 - pr ) / pr) * (360 / nDiff);
-
-    this.value = new cNumber( res );
+    this.value = new cNumber( ( ( 100 - pr ) / pr) * (360 / nDiff) );
     this.value.numFormat = 9;
     return this.value;
 
@@ -5547,26 +5626,26 @@ cXIRR.prototype.Calculate = function ( arg ) {
         for ( var i = 0; i < dateArray.length; i++ ) {
             dateArray[i] = dateArray[i].tocNumber();
             valueArray[i] = valueArray[i].tocNumber();
-            if ( dateArray[i] instanceof cError || valueArray[i] instanceof cError ){
+            if ( dateArray[i] instanceof cError || valueArray[i] instanceof cError ) {
                 return new cError( cErrorType.wrong_value_type );
             }
-            dateArray[i] = Math.floor(dateArray[i].getValue());
+            dateArray[i] = Math.floor( dateArray[i].getValue() );
             valueArray[i] = valueArray[i].getValue();
 
-            if( dateArray[0] > dateArray[i] ){
+            if ( dateArray[0] > dateArray[i] ) {
                 return new cError( cErrorType.not_numeric );
             }
 
-            if( valueArray[i] < 0 ){
+            if ( valueArray[i] < 0 ) {
                 wasNeg = true;
             }
-            else{
+            else {
                 wasPos = true;
             }
 
         }
 
-        if( !(wasNeg && wasPos) ){
+        if ( !(wasNeg && wasPos) ) {
             return new cError( cErrorType.not_numeric );
         }
 
@@ -5590,26 +5669,26 @@ cXIRR.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 valueArray.push( c );
             }
-            else if( c instanceof cEmpty ){
+            else if ( c instanceof cEmpty ) {
                 valueArray.push( c.tocNumber() );
             }
-            else{
+            else {
                 valueArray.push( new cError( cErrorType.wrong_value_type ) );
             }
         } );
     }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 valueArray.push( c );
             }
-            else if( c instanceof cEmpty ){
+            else if ( c instanceof cEmpty ) {
                 valueArray.push( c.tocNumber() );
             }
-            else{
+            else {
                 valueArray.push( new cError( cErrorType.wrong_value_type ) );
             }
         } )
@@ -5618,7 +5697,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         if ( arg0.wsFrom == arg0.wsTo ) {
             valueArray = arg0.getMatrix()[0];
         }
-        else{
+        else {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
@@ -5626,27 +5705,27 @@ cXIRR.prototype.Calculate = function ( arg ) {
         if ( !(arg0 instanceof cNumber) ) {
             return this.value = new cError( cErrorType.wrong_value_type )
         }
-        else{
+        else {
             valueArray[0] = arg0;
         }
     }
 
     if ( arg1 instanceof cArea ) {
         arg1.foreach2( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 dateArray.push( c );
             }
-            else{
+            else {
                 dateArray.push( new cError( cErrorType.wrong_value_type ) );
             }
         } );
     }
     else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 dateArray.push( c );
             }
-            else{
+            else {
                 dateArray.push( new cError( cErrorType.wrong_value_type ) );
             }
         } )
@@ -5655,7 +5734,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         if ( arg1.wsFrom == arg1.wsTo ) {
             dateArray = arg1.getMatrix()[0];
         }
-        else{
+        else {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
@@ -5663,26 +5742,26 @@ cXIRR.prototype.Calculate = function ( arg ) {
         if ( !(arg1 instanceof cNumber) ) {
             return this.value = new cError( cErrorType.wrong_value_type )
         }
-        else{
+        else {
             dateArray[0] = arg1;
         }
     }
 
-    if( arg2 instanceof cRef || arg2 instanceof cRef3D ){
+    if ( arg2 instanceof cRef || arg2 instanceof cRef3D ) {
         arg2 = arg2.getValue();
-        if( !(arg2 instanceof cNumber) ){
+        if ( !(arg2 instanceof cNumber) ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
     else if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
         arg2 = arg2.cross( arguments[1].first );
-        if( !(arg2 instanceof cNumber) ){
+        if ( !(arg2 instanceof cNumber) ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
     else if ( arg2 instanceof cArray ) {
         arg2 = arg2.getElement( 0 );
-        if( !(arg2 instanceof cNumber) ){
+        if ( !(arg2 instanceof cNumber) ) {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
@@ -5729,24 +5808,24 @@ cXNPV.prototype.Calculate = function ( arg ) {
     function xnpv( rate, valueArray, dateArray ) {
         var res = 0, vaTmp, daTmp, r = rate.getValue();
 
-        if ( dateArray.length != valueArray.length ){
+        if ( dateArray.length != valueArray.length ) {
             return new cError( cErrorType.not_numeric );
         }
 
-        if( !( dateArray[0] instanceof cNumber ) || !( valueArray[0] instanceof cNumber ) ){
+        if ( !( dateArray[0] instanceof cNumber ) || !( valueArray[0] instanceof cNumber ) ) {
             return new cError( cErrorType.wrong_value_type );
         }
 
-        var d1 = Math.floor(dateArray[0].getValue()), wasNeg = false, wasPos = false;
+        var d1 = Math.floor( dateArray[0].getValue() ), wasNeg = false, wasPos = false;
 
         for ( var i = 0; i < dateArray.length; i++ ) {
             vaTmp = valueArray[i].tocNumber();
             daTmp = dateArray[i].tocNumber();
-            if ( vaTmp instanceof  cError || daTmp instanceof cError ){
+            if ( vaTmp instanceof  cError || daTmp instanceof cError ) {
                 return new cError( cErrorType.not_numeric );
             }
 
-            res += vaTmp.getValue() / ( Math.pow( ( 1 + r ), ( Math.floor(daTmp.getValue()) - d1 ) / 365 ) );
+            res += vaTmp.getValue() / ( Math.pow( ( 1 + r ), ( Math.floor( daTmp.getValue() ) - d1 ) / 365 ) );
         }
 
         return new cNumber( res );
@@ -5756,7 +5835,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
         arg0 = arg0.cross( arguments[1].first );
     }
 
-    if( !(arg0 instanceof cNumber) ){
+    if ( !(arg0 instanceof cNumber) ) {
         return this.value = new cError( cErrorType.not_available );
     }
 
@@ -5773,10 +5852,10 @@ cXNPV.prototype.Calculate = function ( arg ) {
 
     if ( arg1 instanceof cArea ) {
         arg1.foreach2( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 valueArray.push( c );
             }
-            else{
+            else {
                 valueArray.push( new cError( cErrorType.not_numeric ) );
             }
         } );
@@ -5784,10 +5863,10 @@ cXNPV.prototype.Calculate = function ( arg ) {
     }
     else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 valueArray.push( c );
             }
-            else{
+            else {
                 valueArray.push( new cError( cErrorType.not_numeric ) );
             }
         } )
@@ -5796,7 +5875,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
         if ( arg1.wsFrom == arg1.wsTo ) {
             valueArray = arg1.getMatrix()[0];
         }
-        else{
+        else {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
@@ -5805,17 +5884,17 @@ cXNPV.prototype.Calculate = function ( arg ) {
         if ( arg1 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
-        else{
+        else {
             valueArray[0] = arg1;
         }
     }
 
     if ( arg2 instanceof cArea ) {
         arg2.foreach2( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 dateArray.push( c );
             }
-            else{
+            else {
                 dateArray.push( new cError( cErrorType.not_numeric ) );
             }
         } );
@@ -5823,10 +5902,10 @@ cXNPV.prototype.Calculate = function ( arg ) {
     }
     else if ( arg2 instanceof cArray ) {
         arg2.foreach( function ( c ) {
-            if( c instanceof cNumber ){
+            if ( c instanceof cNumber ) {
                 dateArray.push( c );
             }
-            else{
+            else {
                 dateArray.push( new cError( cErrorType.not_numeric ) );
             }
         } )
@@ -5836,7 +5915,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
         if ( arg2.wsFrom == arg2.wsTo ) {
             dateArray = arg2.getMatrix()[0];
         }
-        else{
+        else {
             return this.value = new cError( cErrorType.wrong_value_type );
         }
     }
@@ -5845,7 +5924,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
         if ( arg2 instanceof cError ) {
             return this.value = new cError( cErrorType.not_numeric )
         }
-        else{
+        else {
             dateArray[0] = arg2;
         }
     }
@@ -5952,15 +6031,17 @@ cYIELD.prototype.Calculate = function ( arg ) {
     if ( frequency instanceof cError ) return this.value = frequency;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     rate = rate.getValue();
     pr = pr.getValue();
     redemption = redemption.getValue();
-    frequency = Math.floor(frequency.getValue());
-    basis = Math.floor(basis.getValue());
+    frequency = Math.floor( frequency.getValue() );
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity ||
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        settlement >= maturity ||
         basis < 0 || basis > 4 ||
         ( frequency != 1 && frequency != 2 && frequency != 4 ) ||
         rate < 0 ||
@@ -6054,13 +6135,15 @@ cYIELDDISC.prototype.Calculate = function ( arg ) {
     if ( redemption instanceof cError ) return this.value = redemption;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
     pr = pr.getValue();
     redemption = redemption.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity ||
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        settlement >= maturity ||
         basis < 0 || basis > 4 ||
         pr <= 0 || redemption <= 0 )
         return this.value = new cError( cErrorType.not_numeric );
@@ -6165,25 +6248,27 @@ cYIELDMAT.prototype.Calculate = function ( arg ) {
     if ( pr instanceof cError ) return this.value = pr;
     if ( basis instanceof cError ) return this.value = basis;
 
-    settlement = settlement.getValue();
-    maturity = maturity.getValue();
-    issue = issue.getValue();
+    settlement = Math.floor(settlement.getValue());
+    maturity = Math.floor(maturity.getValue());
+    issue = Math.floor(issue.getValue());
     rate = rate.getValue();
     pr = pr.getValue();
-    basis = Math.floor(basis.getValue());
+    basis = Math.floor( basis.getValue() );
 
-    if ( settlement >= maturity ||
+    if ( settlement < startRangeCurrentDateSystem ||
+        maturity < startRangeCurrentDateSystem ||
+        issue < startRangeCurrentDateSystem ||
+        settlement >= maturity ||
         basis < 0 || basis > 4 ||
         pr <= 0 || rate <= 0 )
         return this.value = new cError( cErrorType.not_numeric );
 
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity ),
-        iss = Date.prototype.getDateFromExcel( issue );
+        iss = Date.prototype.getDateFromExcel( issue ),
+        res = getyieldmat( settl, matur, iss, rate, pr, basis );
 
-    var fRet = getyieldmat( settl, matur, iss, rate, pr, basis );
-
-    this.value = new cNumber( fRet );
+    this.value = new cNumber( res );
     this.value.numFormat = 10;
     return this.value;
 
