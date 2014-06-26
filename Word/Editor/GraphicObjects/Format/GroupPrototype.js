@@ -36,6 +36,9 @@ CGroupShape.prototype.handleUpdateLn = function()
 CGroupShape.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
 CGroupShape.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CGroupShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+
+
+CGroupShape.prototype.getTargetDocContent = DrawingObjectsController.prototype.getTargetDocContent,
 CGroupShape.prototype.documentUpdateInterfaceState = function()
 {
     if(this.selection.textSelection)

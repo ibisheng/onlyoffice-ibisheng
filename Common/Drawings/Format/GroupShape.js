@@ -1012,6 +1012,7 @@ CGroupShape.prototype =
         }
     },
 
+
     rebuildSeries: function()
     {
         for(var i = 0; i < this.spTree.length; ++i)
