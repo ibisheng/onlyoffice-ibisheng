@@ -3903,26 +3903,8 @@ PasteProcessor.prototype =
         if(true == this.bUploadImage || true == this.bUploadFonts)
         {
             //����������� �� ��������� �������� ������ ������� � ��������.
-            this._Prepeare_recursive(node, true);
-
-            var aPrepeareFonts = [];
-            for(var font_family in this.oFonts)
-            {
-                //todo ��������� �����, ������ �� ��������
-                var oFontItem = this.oFonts[font_family];
-                //���� ����� ����� �������
-                var index = this.map_font_index[oFontItem.Name];
-                if(null != index)
-                {
-                    this.oFonts[font_family].Index = index;
-                    aPrepeareFonts.push(new CFont(oFontItem.Name, 0, "", 0));
-                }
-                else
-                {
-                    this.oFonts[font_family] = {Name:"Arial", Index: -1};
-                    aPrepeareFonts.push(new CFont("Arial", 0, "", 0));
-                }
-            }
+            var aPrepeareFonts = this._Prepeare_recursive(node, true, true);
+     
 			var aImagesToDownload = [];
 			for(var image in this.oImages)
             {
@@ -3956,7 +3938,7 @@ PasteProcessor.prototype =
         else
             fCallback();
     },
-    _Prepeare_recursive : function(node, bIgnoreStyle)
+    _Prepeare_recursive : function(node, bIgnoreStyle, isCheckFonts)
     {
         //����������� �� ����� ������, �������� ��� ������ � ��������
         var nodeName = node.nodeName.toLowerCase();
@@ -4131,6 +4113,30 @@ PasteProcessor.prototype =
             }
             this._Prepeare_recursive(child, false);
         }
+		
+		if(isCheckFonts)
+		{
+			var aPrepeareFonts = [];
+            for(var font_family in this.oFonts)
+            {
+                //todo ��������� �����, ������ �� ��������
+                var oFontItem = this.oFonts[font_family];
+                //���� ����� ����� �������
+                var index = this.map_font_index[oFontItem.Name];
+                if(null != index)
+                {
+                    this.oFonts[font_family].Index = index;
+                    aPrepeareFonts.push(new CFont(oFontItem.Name, 0, "", 0));
+                }
+                else
+                {
+                    this.oFonts[font_family] = {Name:"Arial", Index: -1};
+                    aPrepeareFonts.push(new CFont("Arial", 0, "", 0));
+                }
+            };
+			
+			return aPrepeareFonts;
+		};
     },
     _IsBlockElem : function(name)
     {

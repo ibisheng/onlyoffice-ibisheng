@@ -1709,12 +1709,14 @@
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
 				
 				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
+				oPasteProcessor.map_font_index = this.Api.FontLoader.map_font_index;
+				
 				var newFonts;
 				
 				if(onlyFromLocalStorage)
 					node = this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
 				
-				oPasteProcessor._Prepeare_recursive(node, true);
+				oPasteProcessor._Prepeare_recursive(node, true, true);
 				
 				oPasteProcessor.aContent = [];
                  
@@ -1727,7 +1729,8 @@
 				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
 					return false;
 					
-				worksheet._loadFonts(newFonts, function () {	
+				worksheet._loadFonts(newFonts, function () {
+					History.Create_NewPoint();
 					oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();
