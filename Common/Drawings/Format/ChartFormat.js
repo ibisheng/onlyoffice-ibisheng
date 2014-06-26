@@ -21607,7 +21607,9 @@ CTitle.prototype =
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        this.Refresh_RecalcData2();
+    },
 
     Refresh_RecalcData2: function(pageIndex)
     {
