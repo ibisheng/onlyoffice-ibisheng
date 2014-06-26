@@ -1003,21 +1003,21 @@ CGroupShape.prototype =
             this.selectedObjects[0].documentUpdateRulersState();
     },
 
-    documentUpdateInterfaceState: function()
+    updateChartReferences: function(oldWorksheet, newWorksheet)
     {
-        if(this.selection.textSelection)
+        for(var i = 0; i < this.spTree.length; ++i)
         {
-            this.selection.textSelection.getDocContent().Document_UpdateInterfaceState();
+            if(this.spTree[i].updateChartReferences)
+                this.spTree[i].updateChartReferences(oldWorksheet, newWorksheet);
         }
-        else
+    },
+
+    rebuildSeries: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
         {
-            ///var para_pr = this.getParagraphParaPr();
-            ///if(!(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape && this.selectedObjects[0].getDocContent()))
-            ///{
-            ///    para_pr = this.parent.Get_ParentParagraph().Get_CompiledPr2(true).ParaPr;
-            ///}
-            ///editor.UpdateParagraphProp(para_pr);
-            ///editor.UpdateTextPr(this.getParagraphTextPr());
+            if(this.spTree[i].rebuildSeries)
+                this.spTree[i].rebuildSeries();
         }
     },
 

@@ -105,6 +105,7 @@ var historyitem_ChartSpace_SetStyle = 2092;
 var historyitem_ChartSpace_SetTxPr = 2093;
 var historyitem_ChartSpace_SetUserShapes = 2094;
 var historyitem_ChartSpace_SetThemeOverride = 2095;
+var historyitem_ChartSpace_SetGroup = 2096;
 var historyitem_Legend_SetLayout = 2095;
 var historyitem_Legend_AddLegendEntry = 2096;
 var historyitem_Legend_SetLegendPos = 2097;

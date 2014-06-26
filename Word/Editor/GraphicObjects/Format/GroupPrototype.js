@@ -36,6 +36,32 @@ CGroupShape.prototype.handleUpdateLn = function()
 CGroupShape.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
 CGroupShape.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CGroupShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+CGroupShape.prototype.documentUpdateInterfaceState = function()
+{
+    if(this.selection.textSelection)
+    {
+        this.selection.textSelection.getDocContent().Document_UpdateInterfaceState();
+    }
+    else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
+    {
+        this.selection.chartSelection.selection.textSelection.getDocContent().Document_UpdateInterfaceState();
+    }
+    else
+    {
+        var para_pr = DrawingObjectsController.prototype.getParagraphParaPr.call(this);
+        var text_pr = DrawingObjectsController.prototype.getParagraphTextPr.call(this);
+        if(!para_pr)
+        {
+            para_pr = new CParaPr();
+        }
+        if(!text_pr)
+        {
+            text_pr = new CTextPr();
+        }
+        editor.UpdateParagraphProp(para_pr);
+        editor.UpdateTextPr(text_pr);
+    }
+};
 CGroupShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =

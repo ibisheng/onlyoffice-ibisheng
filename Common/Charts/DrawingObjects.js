@@ -4346,7 +4346,7 @@ function DrawingObjects() {
     {
         for(var i = 0; i < aObjects.length; ++i)
         {
-            if(aObjects[i].graphicObject.getObjectType() === historyitem_type_ChartSpace)
+            if(aObjects[i].graphicObject.rebuildSeries)
             {
                 aObjects[i].graphicObject.rebuildSeries();
             }
@@ -4882,7 +4882,7 @@ function DrawingObjects() {
         ExecuteNoHistory(function(){
             for (var i = 0; i < aObjects.length; i++) {
                 var graphicObject = aObjects[i].graphicObject;
-                if ( graphicObject.getObjectType() === historyitem_type_ChartSpace )
+                if ( graphicObject.updateChartReferences )
                 {
                     graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
                 }

@@ -1571,7 +1571,11 @@ CChartSpace.prototype =
 
     isPlaceholder: CShape.prototype.isPlaceholder,
     getBoundsInGroup: CShape.prototype.getBoundsInGroup,
-    setGroup: CShape.prototype.setGroup,
+    setGroup: function (group)
+    {
+        History.Add(this, { Type: historyitem_ChartSpace_SetGroup, oldPr: this.group, newPr: group });
+        this.group = group;
+    },
 
     getBase64Img: function () {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
@@ -7771,7 +7775,7 @@ CChartSpace.prototype =
                 this.themeOverride = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetGroup:
+            case historyitem_ChartSpace_SetGroup:
             {
                 this.group = data.oldPr;
                 break;
@@ -7873,7 +7877,7 @@ CChartSpace.prototype =
                 this.themeOverride = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetGroup:
+            case historyitem_ChartSpace_SetGroup:
             {
                 this.group = data.newPr;
                 break;
@@ -7981,9 +7985,9 @@ CChartSpace.prototype =
                 break;
             }
 
-            case historyitem_ShapeSetGroup:
+            case historyitem_ChartSpace_SetGroup:
             {
-                writeObject(w, data.oldPr);
+                writeObject(w, data.newPr);
                 break;
             }
         }
@@ -8098,7 +8102,7 @@ CChartSpace.prototype =
                 this.themeOverride = readObject(r);
                 break;
             }
-            case historyitem_ShapeSetGroup:
+            case historyitem_ChartSpace_SetGroup:
             {
                 this.group = readObject(r);
                 break;
