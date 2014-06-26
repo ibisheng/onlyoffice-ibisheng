@@ -3239,7 +3239,7 @@ COperator.prototype.setPosition = function(Positions)
         if(this.type == OPER_ACCENT)
             NewPos.y = this.Positions[0].y + this.shiftAccent + this.operator.size.height;
         else
-            NewPos.y = this.Positions[0].y;
+            NewPos.y = this.Positions[0].y + this.operator.size.ascent;
 
 
         /*var operator = this.operator;
@@ -3258,6 +3258,32 @@ COperator.prototype.setPosition = function(Positions)
 
         this.operator.setPosition(NewPos);
     }
+}
+COperator.prototype.old_setPosition = function(pos)
+{
+    this.pos = pos; // для оператора, это будет просто позиция
+    // для сепаратора - массив позиций
+
+    if(this.typeOper == OPERATOR_TEXT)
+    {
+        /*var ascent = this.size.ascent,
+         height = this.size.height;
+
+         var k = ascent/height > 0.1 ? ascent/height : 0.1;
+
+         var x = pos.x,
+         y = pos.y + ascent - k*this.operator.size.height;
+
+         this.operator.setPosition({x: x, y: y});*/
+
+        if(this.type == OPER_ACCENT)
+        {
+            this.operator.setPosition({x: pos.x, y: pos.y + this.shiftAccent + this.operator.size.height});
+        }
+        else
+            this.operator.setPosition(pos);
+    }
+
 }
 COperator.prototype.IsJustDraw = function()
 {

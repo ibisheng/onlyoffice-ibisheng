@@ -1432,15 +1432,6 @@ ParaMath.prototype =
         // TODO: ParaMath.Get_StartPos
 
         this.Root.Get_StartPos(ContentPos, Depth);
-
-        /*var str = "";
-
-        for(var i = 0 ; i < ContentPos.Data.length; i++)
-        {
-
-        }*/
-
-        //console.log("Get_StartPos");
     },
 
     Get_EndPos : function(BehindEnd, ContentPos, Depth)

@@ -5066,7 +5066,7 @@ CMathContent.prototype =
                 this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath несмержим ctrPrp
                 this.content[pos].SetGaps(this, ParaMath, RecalcInfo);
             }
-            else if(this.content[pos].typeObj == MATH_PARA_RUN && !this.content[pos].Is_Empty())
+            else if(this.content[pos].typeObj == MATH_PARA_RUN /*&& !this.content[pos].Is_Empty()*/)
                 this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, RecalcInfo);
         }
 

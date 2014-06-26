@@ -660,7 +660,7 @@ function CEqArray(props)
         rSp:        0,
         rSpRule:    0,
 
-        mcJc:       new Array(),
+        mcs:        new Array(),
         baseJc:     BASEJC_CENTER,
         plcHide:    false
     };
@@ -698,16 +698,19 @@ CEqArray.prototype.setProperties = function(props)
     if(props.objDist !== "undefined" && props.objDist !== null)
         this.Pr.objDist = props.objDist;
 
+    var mcs = new Array();
+    mcs.push(new CMColumsPr());
+
     var Pr =
     {
         column:     1,
+        mcs:        mcs,
         row:        props.row,
         baseJc:     props.baseJc,
 
         rSpRule:    props.rSpRule,
         rSp:        props.rSp,
         ctrPrp:     props.ctrPrp
-
     };
 
     CEqArray.superclass.setProperties.call(this, Pr);

@@ -984,7 +984,6 @@ CRadical.prototype.fillMathComposition = function(props, contents /*array*/)
 
     //if(this.Iterator != null && props.degHide == false)
 
-
     /*if(this.Pr.type == SQUARE_RADICAL)
         this.elements[0][0] = contents[0];
     else if(this.Pr.type == DEGREE_RADICAL)

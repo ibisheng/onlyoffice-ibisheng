@@ -120,6 +120,12 @@ CMathBase.prototype =
 
         this.CompiledCtrPrp.Merge(defaultRPrp);
         this.CompiledCtrPrp.Merge(this.CtrPrp);
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(this.elements[i][j].typeObj === MATH_COMP)
+                    this.elements[i][j].Set_CompiledCtrPrp(ParaMath);
+
     },
     Get_CompiledCtrPrp: function()
     {
