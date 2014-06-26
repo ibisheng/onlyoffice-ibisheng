@@ -888,8 +888,17 @@ CShape.prototype =
     getPaddings: function () {
         var paddings = null;
         var shape = this;
-        if (shape.txBody) {
-            var body_pr = shape.txBody.bodyPr;
+        var body_pr;
+        if (shape.txBody)
+        {
+            body_pr = shape.txBody.bodyPr;
+        }
+        else if(shape.textBoxContent)
+        {
+            body_pr = shape.bodyPr;
+        }
+        if(body_pr)
+        {
             paddings = new CPaddings();
             if (typeof body_pr.lIns === "number")
                 paddings.Left = body_pr.lIns;
@@ -1875,7 +1884,7 @@ CShape.prototype =
         }
         if(this.txBody)
         {
-            copy.setTxBody(this.txBody.createDublicate());
+            copy.setTxBody(this.txBody.createDuplicate());
             copy.txBody.setParent(copy);
         }
         if(this.bodyPr)
