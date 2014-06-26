@@ -1812,8 +1812,9 @@ var gUndoInsDelCellsFlag = true;
 									}
 								}
 								else*/
-									this._setColorStyleTable(splitRange, cloneData, null, true);
-								this._addButtonAF({result: cloneData.result,isVis: true});
+								this._setColorStyleTable(splitRange, cloneData, null, true);
+								if(cloneData.AutoFilter != null)
+									this._addButtonAF({result: cloneData.result,isVis: true});
 							}
 							else
 							{
@@ -1837,7 +1838,8 @@ var gUndoInsDelCellsFlag = true;
 							if(this._rangeHitInAnRange(cloneData.oldFilter.Ref, aWs.TableParts[l].Ref))
 							{
 								aWs.TableParts[l] = cloneData.oldFilter;
-								this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
+								if(aWs.TableParts[l].AutoFilter != null)
+									this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
 								
 								//var splitRange = cloneData.oldFilter.Ref.split(':');
 								var splitRange = cloneData.oldFilter.Ref;
@@ -5215,7 +5217,8 @@ var gUndoInsDelCellsFlag = true;
 								
 								newResult[n].hiddenRows = [];
 								var num = 1;
-								this._changeContentButton(newResult[n],num,'add',inFilter);
+								if(filter.AutoFilter !== null)
+									this._changeContentButton(newResult[n],num,'add',inFilter);
 								//changeNum[insCol - 1] = n;
 								n++;
 							}
@@ -5335,7 +5338,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 					};
 					
-					if(type == 'insCol')
+					if(type == 'insCol' && filter.AutoFilter !== null)
 					{
 						for(var n = 0; n < newResult.length; n++)
 						{
@@ -5353,11 +5356,11 @@ var gUndoInsDelCellsFlag = true;
 						else
 						{
 							if(filter.AutoFilter)
+							{
 								filter.AutoFilter.FilterColumns = cloneFilterColums;
-							if(!filter.AutoFilter)
-								filter.AutoFilter = new AutoFilter();
-							filter.AutoFilter.Ref = inFilter;
-						}
+								filter.AutoFilter.Ref = inFilter;
+							};	
+						};
 					};
 					
 					//change tableColumn
