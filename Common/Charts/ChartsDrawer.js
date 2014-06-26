@@ -2877,6 +2877,14 @@ CChartsDrawer.prototype =
 			axisMin = yMin + 0.05 * (yMin - yMax);
 		}
 		
+		if(axisMin == axisMax)
+		{
+			if(axisMin < 0)
+				axisMax = 0;
+			else
+				axisMin = 0;
+		};
+		
 		return {min: axisMin, max: axisMax};
 	},
 	
