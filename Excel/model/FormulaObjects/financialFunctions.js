@@ -1664,36 +1664,37 @@ cCUMIPMT.prototype.Calculate = function ( arg ) {
     if ( endPeriod instanceof cError ) return this.value = endPeriod;
     if ( type instanceof cError ) return this.value = type;
 
-    var fRate = rate.getValue(),
-        nNumPeriods = nper.getValue(),
-        fVal = pv.getValue(),
-        nStartPer = startPeriod.getValue(),
-        nEndPer = endPeriod.getValue(),
-        nPayType = type.getValue(),
-        fRmz, fZinsZ = 0;
+    rate = rate.getValue();
+    nper = nper.getValue();
+    pv = pv.getValue();
+    startPeriod = startPeriod.getValue();
+    endPeriod = endPeriod.getValue();
+    type = type.getValue();
 
-    if ( nStartPer < 1 || nEndPer < nStartPer || fRate <= 0 || nEndPer > nNumPeriods || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
+    var fv, ipmt = 0;
+
+    if ( startPeriod < 1 || endPeriod < startPeriod || rate <= 0 || endPeriod > nper || nper <= 0 || pv <= 0 || ( type != 0 && type != 1 ) )
         return this.value = new cError( cErrorType.not_numeric );
 
-    fRmz = getPMT( fRate, nNumPeriods, fVal, 0, nPayType );
+    fv = getPMT( rate, nper, pv, 0, type );
 
-    if ( nStartPer == 1 ) {
-        if ( nPayType <= 0 )
-            fZinsZ = -fVal;
-
-        nStartPer++;
+    if ( startPeriod == 1 ) {
+        if ( type <= 0 ){
+            ipmt = -pv;
+        }
+        startPeriod++;
     }
 
-    for ( var i = nStartPer; i <= nEndPer; i++ ) {
-        if ( nPayType > 0 )
-            fZinsZ += getFV( fRate, i - 2, fRmz, fVal, 1 ) - fRmz;
+    for ( var i = startPeriod; i <= endPeriod; i++ ) {
+        if ( type > 0 )
+            ipmt += getFV( rate, i - 2, fv, pv, 1 ) - fv;
         else
-            fZinsZ += getFV( fRate, i - 1, fRmz, fVal, 0 );
+            ipmt += getFV( rate, i - 1, fv, pv, 0 );
     }
 
-    fZinsZ *= fRate;
+    ipmt *= rate;
 
-    return this.value = new cNumber( fZinsZ );
+    return this.value = new cNumber( ipmt );
 
 };
 cCUMIPMT.prototype.getInfo = function () {
@@ -1785,40 +1786,41 @@ cCUMPRINC.prototype.Calculate = function ( arg ) {
     if ( endPeriod instanceof cError ) return this.value = endPeriod;
     if ( type instanceof cError ) return this.value = type;
 
-    var fRate = rate.getValue(),
-        nNumPeriods = nper.getValue(),
-        fVal = pv.getValue(),
-        nStartPer = startPeriod.getValue(),
-        nEndPer = endPeriod.getValue(),
-        nPayType = type.getValue(),
-        fRmz, fKapZ;
+    rate = rate.getValue();
+    nper = nper.getValue();
+    pv = pv.getValue();
+    startPeriod = startPeriod.getValue();
+    endPeriod = endPeriod.getValue();
+    type = type.getValue();
 
-    if ( nStartPer < 1 || nEndPer < nStartPer || nEndPer < 1 || fRate <= 0 || nNumPeriods <= 0 || fVal <= 0 || ( nPayType != 0 && nPayType != 1 ) )
+    var fv, res = 0, nStart = startPeriod;
+
+    if ( startPeriod < 1 || endPeriod < startPeriod || endPeriod < 1 || rate <= 0 || nper <= 0 || pv <= 0 || ( type != 0 && type != 1 ) ){
         return this.value = new cError( cErrorType.not_numeric );
+    }
 
-    fRmz = getPMT( fRate, nNumPeriods, fVal, 0, nPayType );
-
-    fKapZ = 0;
-
-    var nStart = nStartPer;
+    fv = getPMT( rate, nper, pv, 0, type );
 
     if ( nStart == 1 ) {
-        if ( nPayType <= 0 )
-            fKapZ = fRmz + fVal * fRate;
-        else
-            fKapZ = fRmz;
-
+        if ( type <= 0 ){
+            res = fv + pv * rate;
+        }
+        else{
+            res = fv;
+        }
         nStart++;
     }
 
-    for ( var i = nStart; i <= nEndPer; i++ ) {
-        if ( nPayType > 0 )
-            fKapZ += fRmz - ( getFV( fRate, i - 2, fRmz, fVal, 1 ) - fRmz ) * fRate;
-        else
-            fKapZ += fRmz - getFV( fRate, i - 1, fRmz, fVal, 0 ) * fRate;
+    for ( var i = nStart; i <= endPeriod; i++ ) {
+        if ( type > 0 ){
+            res += fv - ( getFV( rate, i - 2, fv, pv, 1 ) - fv ) * rate;
+        }
+        else{
+            res += fv - getFV( rate, i - 1, fv, pv, 0 ) * rate;
+        }
     }
 
-    return this.value = new cNumber( fKapZ );
+    return this.value = new cNumber( res );
 
 };
 cCUMPRINC.prototype.getInfo = function () {
@@ -1909,23 +1911,24 @@ cDB.prototype.Calculate = function ( arg ) {
     if ( month < 1 || month > 12 || salvage <= 0 || life < 0 || period < 0 || cost < 0 ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
-    var nAbRate = 1 - Math.pow( salvage / cost, 1 / life );
-    nAbRate = Math.floor( (nAbRate * 1000) + 0.5 ) / 1000;
-    var nErsteAbRate = cost * nAbRate * month / 12;
+    var rate = 1 - Math.pow( salvage / cost, 1 / life );
+    rate = Math.floor( (rate * 1000) + 0.5 ) / 1000;
+    var firstRate = cost * rate * month / 12;
 
     var res = 0;
     if ( Math.floor( period ) == 1 )
-        res = nErsteAbRate;
+        res = firstRate;
     else {
-        var nSummAbRate = nErsteAbRate, nMin = life;
-        if ( nMin > period ) nMin = period;
-        var iMax = Math.floor( nMin );
-        for ( var i = 2; i <= iMax; i++ ) {
-            res = (cost - nSummAbRate) * nAbRate;
-            nSummAbRate += res;
+        var sum = firstRate, min = life;
+        if ( min > period ){ min = period; }
+        var max = Math.floor( min );
+        for ( var i = 2; i <= max; i++ ) {
+            res = (cost - sum) * rate;
+            sum += res;
         }
-        if ( period > life )
-            res = ((cost - nSummAbRate) * nAbRate * (12 - month)) / 12;
+        if ( period > life ){
+            res = ((cost - sum) * rate * (12 - month)) / 12;
+        }
     }
 
     this.value = new cNumber( res );
@@ -3956,7 +3959,7 @@ cODDLPRICE.prototype.Calculate = function ( arg ) {
 
     settlement = Math.floor(settlement.getValue());
     maturity = Math.floor(maturity.getValue());
-    last_interest = Math.floor(maturity.getValue());
+    last_interest = Math.floor(last_interest.getValue());
     rate = rate.getValue();
     yld = yld.getValue();
     redemption = redemption.getValue();
@@ -4099,7 +4102,7 @@ cODDLYIELD.prototype.Calculate = function ( arg ) {
 
     settlement = Math.floor(settlement.getValue());
     maturity = Math.floor(maturity.getValue());
-    last_interest = Math.floor(maturity.getValue());
+    last_interest = Math.floor(last_interest.getValue());
     rate = rate.getValue();
     pr = pr.getValue();
     redemption = redemption.getValue();
@@ -5204,7 +5207,7 @@ cTBILLEQ.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    this.value = new cNumber( ( 365 * discount.getValue() ) / ( 360 - ( discount.getValue() * nDiff ) ) );
+    this.value = new cNumber( ( 365 * discount ) / ( 360 - ( discount * nDiff ) ) );
 
     this.value.numFormat = 9;
     return this.value;

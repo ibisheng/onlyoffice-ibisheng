@@ -81,6 +81,8 @@ Date.prototype.getExcelDate = function () {
 
 Date.prototype.getDateFromExcel = function ( val ) {
 
+    val = Math.floor(val);
+
     if ( g_bDate1904 ) {
         return new Date( val * c_msPerDay + this.getExcelNullDate() );
     }
@@ -98,22 +100,22 @@ Date.prototype.getDateFromExcel = function ( val ) {
 };
 
 Date.prototype.addYears = function ( counts ) {
-    this.setUTCFullYear( this.getUTCFullYear() + counts );
+    this.setUTCFullYear( this.getUTCFullYear() + Math.floor(counts) );
 };
 
 Date.prototype.addMonths = function ( counts ) {
     if( this.lastDayOfMonth() ){
         this.setUTCDate(1);
-        this.setUTCMonth( this.getUTCMonth() + counts );
+        this.setUTCMonth( this.getUTCMonth() + Math.floor(counts) );
         this.setUTCDate(this.getDaysInMonth());
     }
     else{
-        this.setUTCMonth( this.getUTCMonth() + counts );
+        this.setUTCMonth( this.getUTCMonth() + Math.floor(counts) );
     }
 };
 
 Date.prototype.addDays = function ( counts ) {
-    this.setUTCDate( this.getUTCDate() + counts );
+    this.setUTCDate( this.getUTCDate() + Math.floor(counts) );
 };
 
 Date.prototype.lastDayOfMonth = function ( ) {
@@ -3975,20 +3977,20 @@ function lcl_Erf0065( x ) {
             8.49717371168693357E-3,
             3.64915280629351082E-4
         ];
-    var fPSum = 0.0, fQSum = 0.0, fXPow = 1.0;
+    var pSum = 0.0, qSum = 0.0, xPow = 1.0;
     for ( var i = 0; i <= 4; ++i ) {
-        fPSum += pn[i] * fXPow;
-        fQSum += qn[i] * fXPow;
-        fXPow *= x * x;
+        pSum += pn[i] * xPow;
+        qSum += qn[i] * xPow;
+        xPow *= x * x;
     }
-    return x * fPSum / fQSum;
+    return x * pSum / qSum;
 }
 
 /** Approximation algorithm for erfc for 0.65 < x < 6.0. */
 function lcl_Erfc0600( x ) {
-    var fPSum = 0.0,
-        fQSum = 0.0,
-        fXPow = 1.0, pn, qn;
+    var pSum = 0.0,
+        qSum = 0.0,
+        xPow = 1.0, pn, qn;
 
     if ( x < 2.2 ) {
         pn = [
@@ -4030,12 +4032,12 @@ function lcl_Erfc0600( x ) {
     }
 
     for ( var i = 0; i < 6; ++i ) {
-        fPSum += pn[i] * fXPow;
-        fQSum += qn[i] * fXPow;
-        fXPow *= x;
+        pSum += pn[i] * xPow;
+        qSum += qn[i] * xPow;
+        xPow *= x;
     }
-    fQSum += qn[6] * fXPow;
-    return Math.exp( -1.0 * x * x ) * fPSum / fQSum;
+    qSum += qn[6] * xPow;
+    return Math.exp( -1.0 * x * x ) * pSum / qSum;
 }
 
 /** Approximation algorithm for erfc for 6.0 < x < 26.54 (but used for all x > 6.0). */
@@ -4055,14 +4057,14 @@ function lcl_Erfc2654( x ) {
             3.73997570145040850E1
         ];
 
-    var fPSum = 0.0, fQSum = 0.0, fXPow = 1.0;
+    var pSum = 0.0, qSum = 0.0, xPow = 1.0;
 
     for ( var i = 0; i <= 4; ++i ) {
-        fPSum += pn[i] * fXPow;
-        fQSum += qn[i] * fXPow;
-        fXPow /= x * x;
+        pSum += pn[i] * xPow;
+        qSum += qn[i] * xPow;
+        xPow /= x * x;
     }
-    return Math.exp( -1.0 * x * x ) * fPSum / (x * fQSum);
+    return Math.exp( -1.0 * x * x ) * pSum / (x * qSum);
 }
 
 function rtl_math_erf( x ) {
@@ -4075,18 +4077,18 @@ function rtl_math_erf( x ) {
         bNegative = true;
     }
 
-    var fErf = 1.0;
+    var res = 1.0;
     if ( x < 1.0e-10 )
-        fErf = parseFloat( x * 1.1283791670955125738961589031215452 );
+        res = parseFloat( x * 1.1283791670955125738961589031215452 );
     else if ( x < 0.65 )
-        fErf = lcl_Erf0065( x );
+        res = lcl_Erf0065( x );
     else
-        fErf = 1.0 - rtl_math_erfc( x );
+        res = 1.0 - rtl_math_erfc( x );
 
     if ( bNegative )
-        fErf *= -1.0;
+        res *= -1.0;
 
-    return fErf;
+    return res;
 }
 
 function rtl_math_erfc( x ) {
