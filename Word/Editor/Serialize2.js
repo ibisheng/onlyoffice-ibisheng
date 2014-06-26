@@ -9320,18 +9320,24 @@ function Binary_oMathReader(stream)
         {			
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMPr(t,l,props);
-            });
-			oMatr.row = 0;
-			oMatr.column = 0;
+            });			
 			var oMatrix = new CMathMatrix(props);
 			if (oParent)
 				oParent.addElementToContent(oMatrix);
 			oMatr.content = oMatrix;
 			
+			oMatr.content.row = 0;
+			oMatr.content.column = 0;
+			
+			var column = 0;
+			for (var i=0; i<props.mcs.length; i++)
+				column += props.mcs[i].count;
+			
 			for(var i=0; i<props.row; i++)
 			{
 				arrContent[i] = [];
-				for(var j=0; j<props.mcs[i].count; j++)
+				
+				for(var j=0; j<column; j++)
 					arrContent[i][j] = oMatrix.getElement(i,j);
 			}
         }
