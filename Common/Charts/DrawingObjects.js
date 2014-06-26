@@ -2594,100 +2594,95 @@ function CChangeTableData(changedRange, added, hided, removed)
     this.removed = removed;
 }
 
-function GraphicOption(ws, type, range, aId) {
-    var _this = this;
+function GraphicOption(ws, type, range, aId, offset) {
+    this.ws = ws;
+	this.type = type;
+	this.range = range;
+	this.aId = [];
+    if (aId && Array.isArray(aId))
+		this.aId = aId.concat();
 
-    var asc = window["Asc"];
-    var asc_Range = asc.Range;
-
-    _this.ws = ws;
-    _this.type = type;
-    _this.range = range;
-    _this.aId = [];
-    if ( aId && Array.isArray(aId) )
-        _this.aId = aId.concat();
-
-    function checkCol(col) {
-        while ( (col > 0) && !_this.ws.cols[col] )
-            _this.ws.expandColsOnScroll(true);
-    }
-
-    function checkRow(row) {
-        while ( (row > 0) && !_this.ws.rows[row] )
-            _this.ws.expandRowsOnScroll(true);
-    }
-
-    _this.isScrollType = function() {
-        return ( (_this.type === c_oAscGraphicOption.ScrollVertical) || (_this.type === c_oAscGraphicOption.ScrollHorizontal) );
-    };
-
-    _this.getUpdatedRange = function() {
-
-        var vr = new asc_Range(_this.ws.getFirstVisibleCol(true), _this.ws.getFirstVisibleRow(true), _this.ws.visibleRange.c2, _this.ws.visibleRange.r2);
-
-        //var vr = _this.ws.visibleRange.clone();
-        if ( _this.isScrollType() && !range )
-            return vr;
-
-        switch (_this.type) {
-            case c_oAscGraphicOption.ScrollVertical:
-            case c_oAscGraphicOption.ScrollHorizontal: {
-                vr = range.clone();
-                checkCol(++vr.c2);
-                checkRow(++vr.r2);
-            }
-                break;
-
-            case c_oAscGraphicOption.AddText: {
-                if ( _this.ws ) {
-                    var controller = _this.ws.objectRender.controller;
-                    var selectedObjects = controller.selectedObjects;
-
-                    if ( selectedObjects.length === 1 ) {
-                        if ( selectedObjects[0].isGroup() ) {
-                            var groupSelectedObjects = selectedObjects[0].selectedObjects;
-                            if ( groupSelectedObjects.length === 1 ) {
-                                var checker = _this.ws.objectRender.getBoundsChecker(groupSelectedObjects[0]);
-                                var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
-                                if ( coords ) {
-                                    vr.c1 = Math.max(coords.from.col, vr.c1);
-                                    vr.r1 = Math.max(coords.from.row, vr.r1);
-
-                                    checkCol(coords.to.col + 1);
-                                    vr.c2 = Math.min(coords.to.col + 1, vr.c2);
-
-                                    checkRow(coords.to.row + 1);
-                                    vr.r2 = Math.min(coords.to.row + 1, vr.r2);
-                                }
-                            }
-                        }
-                        else {
-                            var drawingObject = selectedObjects[0].drawingBase;
-                            var checker = _this.ws.objectRender.getBoundsChecker(drawingObject.graphicObject);
-                            var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
-                            if ( coords ) {
-                                vr.c1 = Math.max(coords.from.col, vr.c1);
-                                vr.r1 = Math.max(coords.from.row, vr.r1);
-
-                                checkCol(coords.to.col + 1);
-                                vr.c2 = Math.min(coords.to.col + 1, vr.c2);
-
-                                checkRow(coords.to.row + 1);
-                                vr.r2 = Math.min(coords.to.row + 1, vr.r2);
-                            }
-                        }
-                    }
-                }
-            }
-                break;
-        }
-        return vr;
-    }
+	this.offset = offset;
 }
+GraphicOption.prototype.checkCol = function (col) {
+	while ((col > 0) && !this.ws.cols[col])
+		this.ws.expandColsOnScroll(true);
+};
 
-function Exception(error) {
-    var err = error;
-}
+GraphicOption.prototype.checkRow = function (row) {
+	while ((row > 0) && !this.ws.rows[row])
+		this.ws.expandRowsOnScroll(true);
+};
+
+GraphicOption.prototype.isScrollType = function() {
+	return ((this.type === c_oAscGraphicOption.ScrollVertical) || (this.type === c_oAscGraphicOption.ScrollHorizontal));
+};
+
+GraphicOption.prototype.getUpdatedRange = function() {
+
+	var vr = new Asc.Range(this.ws.getFirstVisibleCol(true), this.ws.getFirstVisibleRow(true), this.ws.visibleRange.c2, this.ws.visibleRange.r2);
+
+	//var vr = _this.ws.visibleRange.clone();
+	if ( this.isScrollType() && !this.range )
+		return vr;
+
+	switch (this.type) {
+		case c_oAscGraphicOption.ScrollVertical:
+		case c_oAscGraphicOption.ScrollHorizontal: {
+			vr = range.clone();
+			this.checkCol(++vr.c2);
+			this.checkRow(++vr.r2);
+		}
+			break;
+
+		case c_oAscGraphicOption.AddText: {
+			if ( this.ws ) {
+				var controller = this.ws.objectRender.controller;
+				var selectedObjects = controller.selectedObjects;
+
+				if ( selectedObjects.length === 1 ) {
+					if ( selectedObjects[0].isGroup() ) {
+						var groupSelectedObjects = selectedObjects[0].selectedObjects;
+						if ( groupSelectedObjects.length === 1 ) {
+							var checker = this.ws.objectRender.getBoundsChecker(groupSelectedObjects[0]);
+							var coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
+							if ( coords ) {
+								vr.c1 = Math.max(coords.from.col, vr.c1);
+								vr.r1 = Math.max(coords.from.row, vr.r1);
+
+								this.checkCol(coords.to.col + 1);
+								vr.c2 = Math.min(coords.to.col + 1, vr.c2);
+
+								this.checkRow(coords.to.row + 1);
+								vr.r2 = Math.min(coords.to.row + 1, vr.r2);
+							}
+						}
+					}
+					else {
+						var drawingObject = selectedObjects[0].drawingBase;
+						var checker = this.ws.objectRender.getBoundsChecker(drawingObject.graphicObject);
+						var coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
+						if ( coords ) {
+							vr.c1 = Math.max(coords.from.col, vr.c1);
+							vr.r1 = Math.max(coords.from.row, vr.r1);
+
+							this.checkCol(coords.to.col + 1);
+							vr.c2 = Math.min(coords.to.col + 1, vr.c2);
+
+							this.checkRow(coords.to.row + 1);
+							vr.r2 = Math.min(coords.to.row + 1, vr.r2);
+						}
+					}
+				}
+			}
+		}
+			break;
+	}
+	return vr;
+};
+GraphicOption.prototype.getOffset = function () {
+	return this.offset;
+};
 
 function DrawingObjects() {
 
@@ -3523,6 +3518,7 @@ function DrawingObjects() {
 
             var lastTask = aDrawTasks[aDrawTasks.length - 1];
 
+			// ToDo не всегда грамотно так делать, т.к. в одном scroll я могу прислать 2 области (и их объединять не нужно)
             if ( lastTask.params.graphicOption && lastTask.params.graphicOption.isScrollType() && graphicOption && (lastTask.params.graphicOption.type === graphicOption.type) ) {
                 lastTask.params.graphicOption.range.c1 = Math.min(lastTask.params.graphicOption.range.c1, graphicOption.range.c1);
                 lastTask.params.graphicOption.range.r1 = Math.min(lastTask.params.graphicOption.range.r1, graphicOption.range.r1);
@@ -3560,10 +3556,7 @@ function DrawingObjects() {
                     var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
                     var updatedRange = graphicOption.getUpdatedRange();
 
-                    //	var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-                    //	var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
-
-                    var x1 = worksheet.getCellLeft(updatedRange.c1, 1);// - offsetX;
+					var x1 = worksheet.getCellLeft(updatedRange.c1, 1);// - offsetX;
                     var y1 = worksheet.getCellTop(updatedRange.r1, 1) ;//- offsetY;
                     var x2 = worksheet.getCellLeft(updatedRange.c2, 1);// - offsetX;
                     var y2 = worksheet.getCellTop(updatedRange.r2, 1);//- offsetY;
@@ -3576,17 +3569,10 @@ function DrawingObjects() {
                     updatedRect.w = ptToMm(w);
                     updatedRect.h = ptToMm(h);
 
-
-					var offsetX = worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 1);
-					var offsetY = worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 1);
+					var offsetScroll = graphicOption.getOffset();
 					shapeCtx.m_oContext.save();
 					shapeCtx.m_oContext.beginPath();
-					shapeCtx.m_oContext.rect(ptToPx(offset.left + x1 - offsetX), ptToPx(offset.top + y1 - offsetY), ptToPx(w), ptToPx(h));
-					shapeCtx.m_oContext.clip();
-
-
-                    //coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - worksheet.getCellTop(0, 0);
-                    //coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
+					shapeCtx.m_oContext.rect(ptToPx(x1 - offsetScroll.offsetX), ptToPx(y1 - offsetScroll.offsetY), ptToPx(w), ptToPx(h));
 
                     shapeCtx.updatedRect = updatedRect;
                 } else

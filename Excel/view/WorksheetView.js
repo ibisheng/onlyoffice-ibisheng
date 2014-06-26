@@ -5269,6 +5269,9 @@
 				.fillRect(this.headersLeft, y + (scrollDown ? oldH - dy - lastRowHeight : 0),
 					ctxW, Math.abs(dy) + lastRowHeight);
 
+			if(this.objectRender && this.objectRender.drawingArea)
+				this.objectRender.drawingArea.reinitRanges();
+
 			if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
 				var c1 = vr.c1;
 				var r1 = scrollDown ? oldEnd + (oldVRE_isPartial ? 0 : 1) : vr.r1;
@@ -5300,7 +5303,8 @@
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
-				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range));
+				this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
+					c_oAscGraphicOption.ScrollVertical, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
 				if (0 < cFrozen) {
 					range.c1 = 0;
 					range.c2 = cFrozen - 1;
@@ -5309,7 +5313,8 @@
 					this._drawCells(/*drawingCtx*/undefined, range, offsetX);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
 					this._drawAutoF(range, offsetX, offsetY);
-					this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range));
+					this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
+						c_oAscGraphicOption.ScrollVertical, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5324,8 +5329,6 @@
 
 			this.handlers.trigger("onDocumentPlaceChanged");
 			//ToDo this.drawDepCells();
-            if(this.objectRender && this.objectRender.drawingArea)
-                this.objectRender.drawingArea.reinitRanges();
 			this.cellCommentator.updateCommentPosition();
 			this.cellCommentator.drawCommentCells();
 			return this;
@@ -5393,6 +5396,9 @@
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(x + (scrollRight > 0 ? oldW - dx - lastColWidth : 0), y, Math.abs(dx) + lastColWidth, ctxH);
 
+			if(this.objectRender && this.objectRender.drawingArea)
+				this.objectRender.drawingArea.reinitRanges();
+
 			if ( !(dx > 0 && vr.c2 === oldEnd && !oldVCE_isPartial) ) {
 				var c1 = scrollRight ? oldEnd + (oldVCE_isPartial ? 0 : 1) : vr.c1;
 				var r1 = vr.r1;
@@ -5406,7 +5412,8 @@
 				this._drawCells(/*drawingCtx*/undefined, range);
 				this._drawCellsBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
-				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range));
+				this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
+					c_oAscGraphicOption.ScrollHorizontal, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
 				if (rFrozen) {
 					range.r1 = 0;
 					range.r2 = rFrozen - 1;
@@ -5415,7 +5422,8 @@
 					this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawAutoF(range, offsetX, offsetY);
-					this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range));
+					this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
+						c_oAscGraphicOption.ScrollHorizontal, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5428,9 +5436,6 @@
 
 			this.handlers.trigger("onDocumentPlaceChanged");
 			//ToDo this.drawDepCells();
-
-            if(this.objectRender && this.objectRender.drawingArea)
-                this.objectRender.drawingArea.reinitRanges();
 			this.cellCommentator.updateCommentPosition();
 			this.cellCommentator.drawCommentCells();
 			return this;
