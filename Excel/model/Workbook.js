@@ -603,14 +603,14 @@ DependencyGraph.prototype = {
                         }
                         else {
                             var aEdgeBBox = [];
-                            if ( oSheetRange.range.c1 < oSheetRange.prevRange.c1 )
-                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c1, oSheetRange.range.r1, oSheetRange.prevRange.c1 - 1, oSheetRange.range.r2 ) );
-                            if ( oSheetRange.range.c2 > oSheetRange.prevRange.c2 )
-                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c2, oSheetRange.range.r1, oSheetRange.prevRange.c2 + 1, oSheetRange.range.r2 ) );
-                            if ( oSheetRange.range.r1 < oSheetRange.prevRange.r1 )
-                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c1 + 1, oSheetRange.range.r1, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r1 - 1 ) );
-                            if ( oSheetRange.range.r2 > oSheetRange.prevRange.r2 )
-                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c1 + 1, oSheetRange.range.r2, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r2 + 1 ) );
+                            if (oSheetRange.range.c1 < oSheetRange.prevRange.c1)
+                                aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1, oSheetRange.range.r1, oSheetRange.prevRange.c1 - 1, oSheetRange.range.r2));
+                            if (oSheetRange.range.c2 > oSheetRange.prevRange.c2)
+                                aEdgeBBox.push(new Asc.Range(oSheetRange.prevRange.c2 + 1, oSheetRange.range.r1, oSheetRange.range.c2, oSheetRange.range.r2));
+                            if (oSheetRange.range.r1 < oSheetRange.prevRange.r1)
+                                aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1 + 1, oSheetRange.range.r1, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r1 - 1));
+                            if (oSheetRange.range.r2 > oSheetRange.prevRange.r2)
+                                aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1 + 1, oSheetRange.prevRange.r2 + 1, oSheetRange.range.c2 - 1, oSheetRange.range.r2));
                             aAllOuter = [];
                             for ( var j = 0, length = aEdgeBBox.length; j < length; j++ ) {
                                 var bbox = aEdgeBBox[j];
