@@ -10728,6 +10728,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Table_AddRow(bBefore);
+            this.Recalculate();
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -10763,6 +10764,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Table_AddCol(bBefore);
+            this.Recalculate();
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -10799,6 +10801,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Table_RemoveRow();
+            this.Recalculate();
         }
         else if ( docpostype_DrawingObjects == this.CurPos.Type )
         {
@@ -10830,6 +10833,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Table_RemoveCol();
+            this.Recalculate();
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -10860,7 +10864,8 @@ CDocument.prototype =
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            this.HdrFtr.Table_MergeCells()
+            this.HdrFtr.Table_MergeCells();
+            this.Recalculate();
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -10889,6 +10894,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Table_SplitCell(Cols, Rows);
+            this.Recalculate();
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
@@ -10915,7 +10921,10 @@ CDocument.prototype =
     {
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Table_RemoveTable();
+        {
+            this.HdrFtr.Table_RemoveTable();
+            this.Recalculate();
+        }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
             return this.DrawingObjects.tableRemoveTable();
         else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )

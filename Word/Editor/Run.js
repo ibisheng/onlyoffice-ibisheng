@@ -4459,11 +4459,13 @@ ParaRun.prototype =
                 var StartPos = this.State.Selection.StartPos;
                 var EndPos   = this.State.Selection.EndPos;
 
+                var Direction = 1;
                 if ( StartPos > EndPos )
                 {
                     var Temp = StartPos;
                     StartPos = EndPos;
                     EndPos = Temp;
+                    Direction = -1;
                 }
 
                 // Если выделено не до конца, тогда разделяем по последней точке
@@ -4486,7 +4488,7 @@ ParaRun.prototype =
                 if ( null !== LRun )
                     LRun.Selection_Remove();
 
-                CRun.Select_All();
+                CRun.Select_All(Direction);
 
                 if ( undefined === IncFontSize )
                     CRun.Apply_Pr( TextPr );

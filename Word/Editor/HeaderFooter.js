@@ -211,8 +211,12 @@ CHeaderFooter.prototype =
         {
             this.RecalcInfo.CurPage = Page_abs;
             
-            // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
-            this.LogicDocument.Document_UpdateInterfaceState();
+            if ( docpostype_Content === this.LogicDocument.CurPos.Type )
+            {
+                // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
+                this.LogicDocument.Document_UpdateSelectionState();
+                this.LogicDocument.Document_UpdateInterfaceState();
+            }
         }
         else            
         {
@@ -924,43 +928,36 @@ CHeaderFooter.prototype =
     Table_AddRow : function(bBefore)
     {
         this.Content.Table_AddRow( bBefore );
-        this.Recalculate();
     },
 
     Table_AddCol : function(bBefore)
     {
         this.Content.Table_AddCol( bBefore );
-        this.Recalculate();
     },
 
     Table_RemoveRow : function()
     {
         this.Content.Table_RemoveRow();
-        this.Recalculate();
     },
 
     Table_RemoveCol : function()
     {
         this.Content.Table_RemoveCol();
-        this.Recalculate();
     },
 
     Table_MergeCells : function()
     {
         this.Content.Table_MergeCells();
-        this.Recalculate();
     },
 
     Table_SplitCell : function( Cols, Rows )
     {
         this.Content.Table_SplitCell( Cols, Rows );
-        this.Recalculate();
     },
 
     Table_RemoveTable : function()
     {
         this.Content.Table_RemoveTable();
-        this.Recalculate();
     },
 
     Table_Select : function(Type)

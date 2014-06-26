@@ -3527,6 +3527,9 @@ Paragraph.prototype =
                 // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
                 if ( StartPos < this.Content.length - 2 && true === this.Content[StartPos].Is_Empty() )
                 {
+                    if ( this.Selection.StartPos === this.Selection.EndPos )
+                        this.Selection.Use = false;
+
                     this.Internal_Content_Remove( StartPos );
 
                     this.CurPos.ContentPos = StartPos;
@@ -3555,7 +3558,12 @@ Paragraph.prototype =
 
                 // Мы не удаляем последний элемент с ParaEnd
                 if ( StartPos < this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() )
-                    this.Internal_Content_Remove( StartPos );
+                {
+                    if ( this.Selection.StartPos === this.Selection.EndPos )
+                        this.Selection.Use = false;
+
+                    this.Internal_Content_Remove( StartPos );                    
+                }
             }
 
             if ( true !== this.Content[this.CurPos.ContentPos].Selection_IsUse() )
@@ -6624,7 +6632,8 @@ Paragraph.prototype =
                 EndPos   = this.Selection.StartPos;
             }
 
-            var EndPos = Math.min( this.Content.length - 1, EndPos );
+            StartPos = Math.max(0, StartPos);
+            EndPos   = Math.min(this.Content.length - 1, EndPos);
 
             for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
             {
