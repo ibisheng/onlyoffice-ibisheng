@@ -527,7 +527,7 @@
 			minY = r.y;
 			maxY = sr.y;
 		}
-		this.ctx.clearRect(minX, minY, maxX + sr.w, maxX + sr.y);
+		this.ctx.clearRect(minX, minY, maxX + sr.w, maxY + sr.y);
 		this.ctx.putImageData(imgData, r.x, r.y);
 		return this;
 	};
