@@ -331,7 +331,7 @@
 						
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
 						var sBase64 = oBinaryFileWriter.Write();
-						if(this.element.children && this.element.children.length == 1 && window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
+						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
@@ -1806,7 +1806,8 @@
 				//parse HTML
 				aResult = this._parseHtml(pasteFragment, node, worksheet, isText);
 				
-				this._correctImageUrl(aResult, worksheet);
+				if(aResult)
+					this._correctImageUrl(aResult, worksheet);
             },
 			
 			_correctImageUrl: function (aResult, worksheet)
