@@ -329,14 +329,14 @@ CMathText.prototype =
                 this.pos.x = pos.x + this.GapLeft;
                 this.pos.y = pos.y;
 
-                console.log("Placeholder : " + this.pos.y);
+                //console.log("Placeholder : " + this.pos.y);
             }
             else                                    // for symbol only drawing
             {
                 this.pos.x = pos.x - this.rasterOffsetX;
                 this.pos.y = pos.y - this.rasterOffsetY;
 
-                console.log("Dot : " + this.pos.y);
+                //console.log("Dot : " + this.pos.y);
             }
         }
         catch(e)
