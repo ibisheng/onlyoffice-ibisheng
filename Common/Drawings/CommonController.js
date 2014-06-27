@@ -2110,6 +2110,10 @@ DrawingObjectsController.prototype =
                     val_axis = axis_by_types.valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
@@ -2127,6 +2131,10 @@ DrawingObjectsController.prototype =
                     val_axis = axis_by_types.valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                         if(need_bar_dir = BAR_DIR_BAR)
@@ -2169,6 +2177,10 @@ DrawingObjectsController.prototype =
                     val_axis = chart_type.getAxisByTypes().valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
@@ -2184,6 +2196,10 @@ DrawingObjectsController.prototype =
                     val_axis = new_chart_type.getAxisByTypes().valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
@@ -2237,6 +2253,10 @@ DrawingObjectsController.prototype =
                     val_axis = chart_type.getAxisByTypes().valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
@@ -2250,6 +2270,10 @@ DrawingObjectsController.prototype =
                     val_axis = new_chart_type.getAxisByTypes().valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
                         if(val_axis[i].numFmt.formatCode !== need_num_fmt)
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }

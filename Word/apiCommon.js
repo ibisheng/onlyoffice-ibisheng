@@ -184,6 +184,8 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
             // тут выставляется ТОЛЬКО из меню. поэтому:
             var _index = parseInt(asc_color.value);
+            if(isNaN(_index))
+                break;
             var _id = (_index / 6) >> 0;
             var _pos = _index - _id * 6;
 
@@ -203,7 +205,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             if (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument && editor.WordControl.m_oDrawingDocument.GuiControlColorsMap)
             {
                 var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
-                _flag = isRealNumber(flag) ? flag : 0;
+                _flag = isRealNumber(flag) ? flag : 1;
 				__mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
             }
             else
