@@ -2658,6 +2658,14 @@ CChartsDrawer.prototype =
 		if(this.calcProp.subType == 'stackedPer' && axisMin < - percentChartMax)
 			axisMin = - percentChartMax;
 		
+		
+		if(axisMax < axisMin)
+		{
+			manualMax = 2 * axisMin;
+			axisMax = manualMax;
+		};
+			
+		
 		//приводим к первому порядку
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
 		
