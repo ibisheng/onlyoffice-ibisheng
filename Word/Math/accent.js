@@ -1070,12 +1070,14 @@ CAccent.prototype.setPosition = function(pos)
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    var alignOp  =  (this.size.width - this.operator.size.width)/2,
-        alignCnt =  (this.size.width - this.elements[0][0].size.width)/2;
+    var width = this.size.width - this.GapLeft - this.GapRight;
+
+    var alignOp  =  (width - this.operator.size.width)/2,
+        alignCnt =  (width- this.elements[0][0].size.width)/2;
 
     var PosOper = new CMathPosition();
 
-    PosOper.x = this.pos.x + this.GapLeft + alignOp;
+    PosOper.x = this.pos.x + this.GapLeft  + alignOp;
 
     PosOper.y = this.pos.y + this.shiftX_2;
     //PosOper.y = this.pos.y + this.size.ascent - this.shiftX;
@@ -1143,6 +1145,7 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height + this.gap,
         ascent = this.operator.size.height + this.gap + this.elements[0][0].size.ascent;
+
 
     this.size = {height: height, width: width, ascent: ascent};
 }

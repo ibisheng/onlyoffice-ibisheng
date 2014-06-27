@@ -9,6 +9,8 @@ function CGlyphOperator()
     this.stretch = 0;
     this.bStretch = true;
 
+    this.MIN_AUG = 1;
+
     this.penW = 1; // px
 }
 CGlyphOperator.prototype.init = function(props)
@@ -30,6 +32,11 @@ CGlyphOperator.prototype.init = function(props)
     this.loc = props.location;
     this.turn = props.turn;
     this.bStretch = (props.bStretch == true || props.bStretch == false) ? props.bStretch : true;
+
+    if(this.loc == LOCATION_TOP || this.loc  == LOCATION_BOT)
+        this.MIN_AUG = 0.8;
+    else
+        this.MIN_AUG = 1;
 }
 CGlyphOperator.prototype.fixSize = function(stretch)
 {
@@ -37,7 +44,7 @@ CGlyphOperator.prototype.fixSize = function(stretch)
     var width, height, ascent;
 
     //var betta = this.getTxtPrp().FontSize/36;
-    var bHor = this.loc == 0 || this.loc  == 1;
+    var bHor = this.loc == LOCATION_TOP || this.loc  == LOCATION_BOT;
 
     if(bHor)
     {

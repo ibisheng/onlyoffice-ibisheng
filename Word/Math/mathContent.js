@@ -454,6 +454,8 @@ CRecalculateInfo.prototype =
                         {
                             leftCoeff = rightCoeff/2;
                         }
+                        else
+                            leftCoeff -= rightCoeff/2;
                     }
                     else
                     {
@@ -5071,9 +5073,19 @@ CMathContent.prototype =
         }
 
 
-
         if(RecalcInfo.Current !== null)
             RecalcInfo.Current.GapRight = 0;
+
+        /*if(this.bRoot)
+        {
+            for(var pos = 0; pos < lng; pos++)
+            {
+                if(this.content[pos].typeObj == MATH_COMP)
+                    console.log("Gap left " + this.content[pos].GapLeft + " Gap Right " + this.content[pos].GapRight);
+            }
+
+            console.log("");
+        }*/
 
         this.recalculateSize(ParaMath, oMeasure);
     },
@@ -5111,8 +5123,8 @@ CMathContent.prototype =
 
             if(!checkGap.bChildGaps)
             {
-                var gapsMComp = RecalcInfo.getGapsMComp(this.content[1]);
-                gaps.left = gapsMComp.left;
+                gaps.left = RecalcInfo.getGapsMComp(this.content[1], -1);
+                //gaps.left = gapsMComp.left;
             }
         }
 
@@ -5122,8 +5134,8 @@ CMathContent.prototype =
 
             if(!checkGap.bChildGaps)
             {
-                var gapsMComp = RecalcInfo.getGapsMComp(this.content[len - 1]);
-                gaps.right = gapsMComp.right;
+                gaps.right = RecalcInfo.getGapsMComp(this.content[len - 1], 1);
+                //gaps.right = gapsMComp.right;
             }
         }
 
@@ -5681,6 +5693,10 @@ CMathContent.prototype =
         NewPos.x = pos.x;
         NewPos.y = pos.y + this.size.ascent;    // y по baseline;
 
+        //console.log("SetPosition");
+
+        var check = this.content.length > 1 && this.content[1].typeObj == MATH_COMP && !this.bRoot;
+        var check2 = this.bRoot;
 
         for(var i=0; i < this.content.length; i++)
         {
@@ -5696,7 +5712,18 @@ CMathContent.prototype =
             }
             else if(this.content[i].typeObj == MATH_PLACEHOLDER)
                 this.content[i].setPosition(NewPos);
+
+            if(check2)
+            {
+                if(this.content[i].typeObj == MATH_COMP)
+                    console.log("X " + NewPos.x);
+            }
         }
+
+        if(check2)
+            console.log("");
+
+
     },
     ///// properties /////
     SetDot: function(flag)

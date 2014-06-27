@@ -1444,7 +1444,7 @@ CMathBase.prototype =
         var start_X = this.SelectStart.X,
             start_Y = this.SelectStart.Y;
 
-        if(start_X !== -1 && start_Y !== -1)
+        if(!this.SelectStart.bOutside)
             this.elements[start_X][start_Y].Selection_Remove();
 
         this.bSelectionUse = false;
