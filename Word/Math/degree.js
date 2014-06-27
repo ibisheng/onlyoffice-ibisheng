@@ -667,6 +667,11 @@ CIterators.prototype.fillMathComposition = function(upperIterator, lowerIterator
     this.elements[0][0] = upperIterator;
     this.elements[1][0] = lowerIterator;
 }
+CIterators.prototype.alignIterators = function(mcJc)
+{
+    this.alignment.wdt[0] = mcJc;
+}
+
 
 function CDegreeSubSup(props)
 {
@@ -713,13 +718,13 @@ CDegreeSubSup.prototype.fillContent = function()
 
     if(this.Pr.type == DEGREE_SubSup)
     {
-        oIters.alignHor(-1, 0);
+        oIters.alignIterators(MCJC_LEFT);
         this.addMCToContent(oBase, oIters);
     }
     else if(this.Pr.type == DEGREE_PreSubSup)
     {
-        oIters.alignHor(-1, 1);
         this.addMCToContent(oIters, oBase);
+        oIters.alignIterators(MCJC_RIGHT);
     }
 }
 CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)

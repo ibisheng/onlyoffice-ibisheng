@@ -1270,12 +1270,6 @@ CMathBase.prototype =
 
         var disp = this.findDisposition({ x: SearchPos.X - this.GapLeft, y: SearchPos.Y});
 
-        // TO DO
-        // Рассмотреть дурацкий случай, если контент не заполнен, то тогда перейти в другой элемент
-        //
-        // Word
-        // в случае, если в xml отсутствуют элементы в контенте, то выставляются плейсхолдеры
-
 
         var pos = disp.pos;
 
@@ -1355,9 +1349,6 @@ CMathBase.prototype =
     },
     Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
     {
-        //var startX, startY;
-        //var bJustDraw = false;
-
         if(StartFlag === 0)
         {
             this.SelectStart.X = StartContentPos.Get(Depth);
@@ -1367,16 +1358,7 @@ CMathBase.prototype =
         else
         {
             this.SelectStart.bOutside = true;
-            /*startX = -1;
-            startY = -1;*/
         }
-
-        /*this.SelectStart.X = startX;
-        this.SelectStart.Y = startY;*/
-
-        //this.SelectStart_X = startX;
-        //this.SelectStart_Y = startY;
-
 
 
         if(EndFlag === 0)
@@ -1388,12 +1370,8 @@ CMathBase.prototype =
         else /// в случае, если закончили селект на уровень выше, а нужно выставить начало селекта во внутреннем элементе мат объекта
         {
             this.SelectEnd.bOutside = true;
-            /*endX = -1;
-            endY = -1;*/
         }
 
-        /*this.SelectEnd_X = endX;
-        this.SelectEnd_Y = endY;*/
 
         Depth += 2;
 
@@ -1411,7 +1389,7 @@ CMathBase.prototype =
             {
                 this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
             }
-            else /*if(startX !== -1 && startY !== -1)*/
+            else
             {
                 this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
             }

@@ -283,10 +283,10 @@ CAccentTilde.prototype.calcCoord = function(stretch)
         YY[i] = (Y[5] - Y[i])*alpha*0.65; // сжали !
     }
 
-    var W = X[13],
-        H = Y[5];
+    var W = XX[13],
+        H = YY[5];
 
-    return {XX: X, YY: Y, W: W, H: H};
+    return {XX: XX, YY: YY, W: W, H: H};
 }
 CAccentTilde.prototype.drawPath = function(pGraphics, XX, YY)
 {
@@ -512,15 +512,13 @@ function CAccent(props)
         chrType:    null
     };
 
-    this.shiftX = 0;
+    this.shiftX   = 0;
+    this.shiftX_2 = 0;
     this.gap = 0;
 
     /////////////////
 
     this.operator = new COperator(OPER_ACCENT);
-
-    //this.code = null;      // храним код буквы и тип здесь
-    //this.typeOper = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
 
     CAccent.superclass.constructor.call(this);
     //CMathBase.call(this);
@@ -1078,17 +1076,9 @@ CAccent.prototype.setPosition = function(pos)
     var PosOper = new CMathPosition();
 
     PosOper.x = this.pos.x + this.GapLeft + alignOp;
-    PosOper.y = this.pos.y + this.shiftX;
 
-    // TODO
-    // выставить правильно смещение для остальных значков
-    // для обычных текстовых значков (ACCENT_SIGN) выставлено
-
-    /*if(this.typeOper == ACCENT_SIGN)
-        //y1 = this.pos.y - this.shiftX + this.size.ascent; //shiftOperator to "CCharacter"
-        y1 = this.pos.y + this.shiftX; //shiftOperator to "CCharacter"
-    else
-        y1 = this.pos.y;*/
+    PosOper.y = this.pos.y + this.shiftX_2;
+    //PosOper.y = this.pos.y + this.size.ascent - this.shiftX;
 
 
     this.operator.setPosition(PosOper);
@@ -1136,12 +1126,19 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
     this.operator.fixSize(ParaMath, oMeasure, base.size.width);
 
-    var letterX = new CMathText(true);
-    letterX.add(0x78);
-    letterX.Resize(null, oMeasure);
-    //this.shiftX = base.size.ascent - letterX.size.ascent;
-    this.gap = this.operator.size.ascentSign - letterX.size.ascent;
-    this.shiftX = this.operator.size.ascentSign;
+
+    if(this.operator.typeOper == OPERATOR_TEXT)
+    {
+        var letterX = new CMathText(true);
+        letterX.add(0x78);
+        letterX.Resize(null, oMeasure);
+        this.gap = this.operator.size.ascentSign - letterX.size.ascent;
+
+        this.shiftX_2 = this.operator.size.ascentSign;
+
+        //this.shiftX = base.size.ascent - letterX.size.ascent;
+    }
+
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height + this.gap,
@@ -1172,7 +1169,6 @@ CAccent.prototype.draw = function(x, y, pGraphics)
     pGraphics.b_color1(0,0,0, 255);
 
     this.operator.draw(x, y, pGraphics);
-
 }
 CAccent.prototype.findDisposition = function(pos)
 {
@@ -1182,7 +1178,7 @@ CAccent.prototype.findDisposition = function(pos)
 
     var inside_flag = -1;
 
-    var content = this.elements[0][0],
+    var base = this.elements[0][0],
         align = (this.size.width - this.elements[0][0].size.width)/2;
 
     if(pos.x < align)
@@ -1190,22 +1186,26 @@ CAccent.prototype.findDisposition = function(pos)
         X = 0;
         inside_flag = 0;
     }
-    else if(pos.x > align + content.size.width)
+    else if(pos.x > align + base.size.width)
     {
-        X = content.size.width;
+        X = base.size.width;
         inside_flag = 1;
     }
     else
         X = pos.x - align;
 
-    if(pos.y < this.operator.size.height)
+    var accentGap = this.size.height - base.size.height;
+
+    if(pos.y < accentGap)
     {
         Y = 0;
         inside_flag = 2;
     }
     else
-        Y = pos.y - this.operator.size.height;
+        Y = pos.y - accentGap;
 
+    /*if(pos.y > 0)
+        console.log("Pos.y " + pos.y + "accent gap" + accentGap);*/
 
 
     var mouseCoord = {x: X, y: Y},
