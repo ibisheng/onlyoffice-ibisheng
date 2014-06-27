@@ -1155,6 +1155,82 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с колонтитулами
 //-----------------------------------------------------------------------------------        
+    GoTo_NextHdrFtr : function()
+    {
+        var CurHdrFtr = this.CurHdrFtr;
+        if (null === CurHdrFtr || -1 === CurHdrFtr.RecalcInfo.CurPage)
+            return;
+
+        var CurPage = CurHdrFtr.RecalcInfo.CurPage;
+        var Pages = this.Pages;
+
+        if (hdrftr_Header === CurHdrFtr.Type && undefined !== Pages[CurPage].Footer)
+            CurHdrFtr = Pages[CurPage].Footer;
+        else
+            CurHdrFtr = null;
+
+        while (null === CurHdrFtr)
+        {
+            CurPage++;
+
+            if (undefined === Pages[CurPage])
+                break;
+            else if (undefined !== Pages[CurPage].Header && null !== Pages[CurPage].Header)
+                CurHdrFtr = Pages[CurPage].Header;
+            else if (undefined !== Pages[CurPage].Footer && null !== Pages[CurPage].Footer)
+                CurHdrFtr = Pages[CurPage].Footer;
+        }
+
+        if (null !== CurHdrFtr)
+        {
+            this.CurHdrFtr = CurHdrFtr;
+            CurHdrFtr.Set_Page(CurPage);
+            CurHdrFtr.Content.Cursor_MoveToStartPos(false);
+
+            return true;
+        }
+        
+        return false;
+    },
+    
+    GoTo_PrevHdrFtr : function()
+    {
+        var CurHdrFtr = this.CurHdrFtr;
+        if (null === CurHdrFtr || -1 === CurHdrFtr.RecalcInfo.CurPage)
+            return;
+        
+        var CurPage = CurHdrFtr.RecalcInfo.CurPage;
+        var Pages = this.Pages;
+        
+        if (hdrftr_Footer === CurHdrFtr.Type && undefined !== Pages[CurPage].Header)
+            CurHdrFtr = Pages[CurPage].Header;
+        else
+            CurHdrFtr = null;
+        
+        while (null === CurHdrFtr)
+        {
+            CurPage--;
+            
+            if (undefined === Pages[CurPage])
+                return;
+            else if (undefined !== Pages[CurPage].Footer && null !== Pages[CurPage].Footer)
+                CurHdrFtr = Pages[CurPage].Footer;
+            else if (undefined !== Pages[CurPage].Header && null !== Pages[CurPage].Header)
+                CurHdrFtr = Pages[CurPage].Header;
+        }
+        
+        if (null !== CurHdrFtr)
+        {
+            this.CurHdrFtr = CurHdrFtr;
+            CurHdrFtr.Set_Page(CurPage);
+            CurHdrFtr.Content.Cursor_MoveToStartPos(false);
+            
+            return true;
+        }
+        
+        return false;
+    },
+    
     Get_CurPage : function()
     {
         if ( null != this.CurHdrFtr )

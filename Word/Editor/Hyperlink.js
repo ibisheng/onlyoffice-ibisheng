@@ -93,6 +93,18 @@ ParaHyperlink.prototype =
 
         return NewHyperlink;
     },
+
+    Recalc_RunsCompiledPr : function()
+    {
+        var Count = this.Content.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var Element = this.Content[Pos];
+
+            if (Element.Recalc_RunsCompiledPr)
+                Element.Recalc_RunsCompiledPr();
+        }
+    },
     
     Get_AllDrawingObjects : function(DrawingObjs)
     {

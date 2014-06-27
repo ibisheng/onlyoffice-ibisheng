@@ -4468,8 +4468,8 @@ Paragraph.prototype =
         if ( StartContentPos.Compare( EndContentPos ) > 0 )
             Direction = -1;
 
-        var OldStartPos = Math.min( this.Selection.StartPos, this.Content.length - 1 );
-        var OldEndPos   = Math.min( this.Selection.EndPos, this.Content.length - 1 );
+        var OldStartPos = Math.max(0, Math.min( this.Selection.StartPos, this.Content.length - 1 ));
+        var OldEndPos   = Math.max(0, Math.min( this.Selection.EndPos, this.Content.length - 1 ));
 
         if ( OldStartPos > OldEndPos )
         {
@@ -7837,6 +7837,18 @@ Paragraph.prototype =
     {
         this.CompiledPr.NeedRecalc = true;
     },
+    
+    Recalc_RunsCompiledPr : function()
+    {
+        var Count = this.Content.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            var Element = this.Content[Pos];
+            
+            if (Element.Recalc_RunsCompiledPr)
+                Element.Recalc_RunsCompiledPr();
+        }
+    },    
 
     // Формируем конечные свойства параграфа на основе стиля, возможной нумерации и прямых настроек.
     // Без пересчета расстояния между параграфами.
@@ -8152,8 +8164,9 @@ Paragraph.prototype =
             this.Pr.PStyle = Id;
         }
 
-        // Надо пересчитать конечный стиль
+        // Надо пересчитать конечный стиль самого параграфа и всех текстовых блоков
         this.CompiledPr.NeedRecalc = true;
+        this.Recalc_RunsCompiledPr();
 
         if ( true === bDoNotDeleteProps )
             return;
@@ -8189,7 +8202,7 @@ Paragraph.prototype =
             {
                 this.Content[Index].Clear_TextPr();
             }
-        }
+        }        
     },
 
     // Добавление стиля в параграф при открытии и копировании
@@ -8211,6 +8224,7 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+        this.Recalc_RunsCompiledPr();
     },
 
     // Проверяем находится ли курсор в конце параграфа
@@ -10314,6 +10328,7 @@ Paragraph.prototype =
                     this.Pr.PStyle = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
 
                 break;
             }
@@ -10695,6 +10710,7 @@ Paragraph.prototype =
                     this.Pr.PStyle = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
 
                 break;
             }
@@ -11915,6 +11931,7 @@ Paragraph.prototype =
                     this.Pr.PStyle = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
 
                 break;
             }
@@ -12489,6 +12506,22 @@ Paragraph.prototype =
         // Удалим старое слово
         var StartPos = Element.StartPos;
         var EndPos   = Element.EndPos;
+        
+        // Если комментарии попадают в текст, тогда сначала их надо отдельно удалить
+        var CommentsToDelete = {};
+        var EPos = EndPos.Get(0);
+        var SPos = StartPos.Get(0);
+        for (var Pos = SPos; Pos <= EPos; Pos++)
+        {
+            var Item = this.Content[Pos];
+            if (para_Comment === Item.Type)
+                CommentsToDelete[Item.CommentId] = true;
+        }
+        
+        for (var CommentId in CommentsToDelete)
+        {
+            this.LogicDocument.Remove_Comment( CommentId, true );
+        }
 
         this.Set_SelectionContentPos( StartPos, EndPos );
         this.Selection.Use  = true;

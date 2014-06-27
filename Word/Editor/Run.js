@@ -4316,6 +4316,11 @@ ParaRun.prototype =
             this.RecalcInfo.Measure = true;
     },
 
+    Recalc_RunsCompiledPr : function()
+    {
+        this.Recalc_CompiledPr(true);
+    },
+
     Get_CompiledPr : function(bCopy)
     {
         if ( true === this.RecalcInfo.TextPr )

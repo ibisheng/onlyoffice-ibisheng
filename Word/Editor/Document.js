@@ -8953,81 +8953,91 @@ CDocument.prototype =
 
                 MouseEvent.Type = g_mouse_event_type_up;
                 this.Selection_SetEnd( 0, 0, MouseEvent );
-
-                bRetValue = true;
             }
             else
             {
-                var TempXY = this.Cursor_GetPos();
-
-                var X = TempXY.X;
-                var Y = TempXY.Y;
-
-                var Dy = this.DrawingDocument.GetVisibleMMHeight();
-                if ( Y - Dy < 0 )
+                if (docpostype_HdrFtr === this.CurPos.Type)
                 {
-                    this.CurPage--;
-                    var PageH = this.Get_PageLimits( this.CurPage).YLimit;
-                    
-                    Dy -= Y;
-                    Y = PageH;
-                    while ( Dy > PageH )
+                    if ( true === this.HdrFtr.GoTo_PrevHdrFtr() )
                     {
-                        Dy -= PageH;
-                        this.CurPage--;
-                    }
-
-                    if ( this.CurPage < 0 )
-                    {
-                        this.CurPage = 0;
-                        Dy = PageH - this.Content[0].Pages[this.Content[0].Pages.length - 1].Bounds.Top;
+                        this.Document_UpdateSelectionState();
+                        this.Document_UpdateInterfaceState();
                     }
                 }
-
-                // TODO: переделать данную проверку
-                if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
-                    this.CurPage = this.DrawingDocument.m_lPagesCount;
-
-                var StartX = X;
-                var StartY = Y;
-                var CurY   = Y;
-
-                while ( Math.abs(StartY - Y) < 0.001 )
+                else
                 {
-                    var bBreak = false;
-                    CurY -= Dy;
 
-                    if ( CurY < 0 )
+                    var TempXY = this.Cursor_GetPos();
+
+                    var X = TempXY.X;
+                    var Y = TempXY.Y;
+
+                    var Dy = this.DrawingDocument.GetVisibleMMHeight();
+                    if ( Y - Dy < 0 )
                     {
                         this.CurPage--;
                         var PageH = this.Get_PageLimits( this.CurPage).YLimit;
-                        CurY = PageH;
 
-                        // Эта проверка нужна для выполнения PgUp в начале документа
-                        if ( this.CurPage < 0 )
+                        Dy -= Y;
+                        Y = PageH;
+                        while ( Dy > PageH )
                         {
-                            this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
-                            CurY = 0;
+                            Dy -= PageH;
+                            this.CurPage--;
                         }
 
-                        // Поскольку мы перешли на другую страницу, то можно из цикла выходить
-                        bBreak = true;
+                        if ( this.CurPage < 0 )
+                        {
+                            this.CurPage = 0;
+                            Dy = PageH - this.Content[0].Pages[this.Content[0].Pages.length - 1].Bounds.Top;
+                        }
                     }
 
-                    this.Cursor_MoveAt( StartX, CurY, false );
-                    this.CurPos.RealX = StartX;
-                    this.CurPos.RealY = CurY;
+                    // TODO: переделать данную проверку
+                    if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
+                        this.CurPage = this.DrawingDocument.m_lPagesCount;
 
-                    TempXY = this.Cursor_GetPos();
-                    X = TempXY.X;
-                    Y = TempXY.Y;
+                    var StartX = X;
+                    var StartY = Y;
+                    var CurY   = Y;
 
-                    if ( true === bBreak )
-                        break;
+                    while ( Math.abs(StartY - Y) < 0.001 )
+                    {
+                        var bBreak = false;
+                        CurY -= Dy;
+
+                        if ( CurY < 0 )
+                        {
+                            this.CurPage--;
+                            var PageH = this.Get_PageLimits( this.CurPage).YLimit;
+                            CurY = PageH;
+
+                            // Эта проверка нужна для выполнения PgUp в начале документа
+                            if ( this.CurPage < 0 )
+                            {
+                                this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
+                                CurY = 0;
+                            }
+
+                            // Поскольку мы перешли на другую страницу, то можно из цикла выходить
+                            bBreak = true;
+                        }
+
+                        this.Cursor_MoveAt( StartX, CurY, false );
+                        this.CurPos.RealX = StartX;
+                        this.CurPos.RealY = CurY;
+
+                        TempXY = this.Cursor_GetPos();
+                        X = TempXY.X;
+                        Y = TempXY.Y;
+
+                        if ( true === bBreak )
+                            break;
+                    }
                 }
-
-                bRetValue = true;
             }
+
+            bRetValue = true;
         }
         else if ( e.KeyCode == 34 ) // PgDn
         {
@@ -9050,84 +9060,93 @@ CDocument.prototype =
 
                 MouseEvent.Type = g_mouse_event_type_up;
                 this.Selection_SetEnd( 0, 0, MouseEvent );
-
-                bRetValue = true;
             }
             else
             {
-                if ( this.Pages.length > 0 )
+                if (docpostype_HdrFtr === this.CurPos.Type)
                 {
-                    var TempXY = this.Cursor_GetPos();
-
-                    var X = TempXY.X;
-                    var Y = TempXY.Y;
-
-                    var Dy = this.DrawingDocument.GetVisibleMMHeight();
-                    if ( Y + Dy > this.Get_PageLimits(this.CurPage).YLimit )
+                    if ( true === this.HdrFtr.GoTo_NextHdrFtr() )
                     {
-                        this.CurPage++;
-                        var PageH = this.Get_PageLimits(this.CurPage).YLimit;
-                        Dy -= PageH - Y;
-                        Y = 0;
-                        while ( Dy > PageH )
-                        {
-                            Dy -= PageH;
-                            this.CurPage++;
-                        }
-
-                        if ( this.CurPage >= this.Pages.length )
-                        {
-                            this.CurPage = this.Pages.length - 1;
-                            var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
-                            Dy = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
-                        }
+                        this.Document_UpdateSelectionState();
+                        this.Document_UpdateInterfaceState();
                     }
-
-                    if ( this.CurPage >= this.Pages.length )
-                        this.CurPage = this.Pages.length - 1;
-
-                    var StartX = X;
-                    var StartY = Y;
-                    var CurY   = Y;
-
-                    while ( Math.abs(StartY - Y) < 0.001 )
+                }
+                else
+                {
+                    if ( this.Pages.length > 0 )
                     {
-                        var bBreak = false;
-                        CurY += Dy;
+                        var TempXY = this.Cursor_GetPos();
 
-                        var PageH = this.Get_PageLimits(this.CurPage).YLimit;
-                        if ( CurY > PageH )
+                        var X = TempXY.X;
+                        var Y = TempXY.Y;
+
+                        var Dy = this.DrawingDocument.GetVisibleMMHeight();
+                        if ( Y + Dy > this.Get_PageLimits(this.CurPage).YLimit )
                         {
                             this.CurPage++;
-                            CurY = 0;
+                            var PageH = this.Get_PageLimits(this.CurPage).YLimit;
+                            Dy -= PageH - Y;
+                            Y = 0;
+                            while ( Dy > PageH )
+                            {
+                                Dy -= PageH;
+                                this.CurPage++;
+                            }
 
-                            // Эта проверка нужна для выполнения PgDn в конце документа
                             if ( this.CurPage >= this.Pages.length )
                             {
                                 this.CurPage = this.Pages.length - 1;
                                 var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
-                                CurY = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
+                                Dy = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
                             }
-
-                            // Поскольку мы перешли на другую страницу, то можно из цикла выходить
-                            bBreak = true;
                         }
 
-                        this.Cursor_MoveAt( StartX, CurY, false );
-                        this.CurPos.RealX = StartX;
-                        this.CurPos.RealY = CurY;
+                        if ( this.CurPage >= this.Pages.length )
+                            this.CurPage = this.Pages.length - 1;
 
-                        TempXY = this.Cursor_GetPos();
-                        X = TempXY.X;
-                        Y = TempXY.Y;
+                        var StartX = X;
+                        var StartY = Y;
+                        var CurY   = Y;
 
-                        if ( true === bBreak )
-                            break;
+                        while ( Math.abs(StartY - Y) < 0.001 )
+                        {
+                            var bBreak = false;
+                            CurY += Dy;
+
+                            var PageH = this.Get_PageLimits(this.CurPage).YLimit;
+                            if ( CurY > PageH )
+                            {
+                                this.CurPage++;
+                                CurY = 0;
+
+                                // Эта проверка нужна для выполнения PgDn в конце документа
+                                if ( this.CurPage >= this.Pages.length )
+                                {
+                                    this.CurPage = this.Pages.length - 1;
+                                    var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
+                                    CurY = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
+                                }
+
+                                // Поскольку мы перешли на другую страницу, то можно из цикла выходить
+                                bBreak = true;
+                            }
+
+                            this.Cursor_MoveAt( StartX, CurY, false );
+                            this.CurPos.RealX = StartX;
+                            this.CurPos.RealY = CurY;
+
+                            TempXY = this.Cursor_GetPos();
+                            X = TempXY.X;
+                            Y = TempXY.Y;
+
+                            if ( true === bBreak )
+                                break;
+                        }
                     }
                 }
-
-                bRetValue = true;
             }
+
+            bRetValue = true;
         }
         else if ( e.KeyCode == 35 ) // клавиша End
         {
