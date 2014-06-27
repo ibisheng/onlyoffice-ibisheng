@@ -4132,7 +4132,7 @@ CNoFill.prototype =
         }
         return null;
     }
-}
+};
 
 
 function CreateBlackRGBUnifill()

@@ -995,10 +995,52 @@
 	prot["asc_getHeight"]		= prot.asc_getHeight;
 
 	function generateColor() {
-		return Math.floor(Math.random()*0xFFFFFF);
+		// Генерируем светлые цвета через HSV (h - любой, s = [25..50], v = 100)
+		// Используем 361 и 26, т.к. Math.random возвращает диапазон [0..1)
+		var h = (Math.random() * 361) >> 0;
+		var s = 25 + ((Math.random() * 26) >> 0);
+		return asc.hsvToRgb(h, s, 100);
+	}
+
+	function hsvToRgb (h, s, v) {
+		var r, g, b;
+		var i;
+		var f, p, q, t;
+
+		// Можно добавить проверку аргументов (на '0 <= h <= 360' и '0 <= s и v <= 100')
+		s /= 100;
+		v /= 100;
+
+		if (0 === s) {
+			// Achromatic (grey)
+			r = g = b = ((v * 255) >> 0) & 0xFF;
+			return (r << 16) + (g << 8) + b;
+		}
+
+		h /= 60; // sector 0 to 5
+		i = h >> 0;
+		f = h - i; // factorial part of h
+		p = v * (1 - s);
+		q = v * (1 - s * f);
+		t = v * (1 - s * (1 - f));
+
+		switch (i) {
+			case 0: r = v; g = t; b = p; break;
+			case 1: r = q; g = v; b = p; break;
+			case 2: r = p; g = v; b = t; break;
+			case 3: r = p; g = q; b = v; break;
+			case 4: r = t; g = p; b = v; break;
+			default: r = v; g = p; b = q; break;
+		}
+
+		r = ((r * 255) >> 0) & 0xFF;
+		g = ((g * 255) >> 0) & 0xFF;
+		b = ((b * 255) >> 0) & 0xFF;
+		return (r << 16) + (g << 8) + b;
 	}
 
 	window["Asc"].generateColor = generateColor;
+	window["Asc"].hsvToRgb = hsvToRgb;
 }
 )(window);
 
