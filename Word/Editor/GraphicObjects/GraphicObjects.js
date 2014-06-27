@@ -1191,15 +1191,19 @@ CGraphicObjects.prototype =
         }
         else
         {
-            var para_pr = this.getParagraphParaPr();
-            if(!(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape && this.selectedObjects[0].getDocContent()))
+            var para_pr = DrawingObjectsController.prototype.getParagraphParaPr.call(this);
+            if(!para_pr)
             {
-                if(this.selectedObjects[0])
+                if(this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
                 {
                     var parent_para = this.selectedObjects[0].parent.Get_ParentParagraph();
                     if(parent_para)
                         para_pr = parent_para.Get_CompiledPr2(true).ParaPr;
                 }
+            }
+            if(!para_pr)
+            {
+                para_pr = new CParaPr();
             }
             var TextPr = this.getParagraphTextPr();
             var theme = this.document.Get_Theme();
