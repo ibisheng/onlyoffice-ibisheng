@@ -1730,7 +1730,6 @@
 					return false;
 					
 				worksheet._loadFonts(newFonts, function () {
-					History.Create_NewPoint();
 					oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();
@@ -1769,6 +1768,8 @@
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(isIntoShape)
 				{
+                    History.Create_NewPoint();
+                    isIntoShape = worksheet.objectRender.controller.getTargetDocContent(true);//нужно для заголовков диаграмм
 					var resultPasteInShape = this._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					if(resultPasteInShape == true)
 						return;
