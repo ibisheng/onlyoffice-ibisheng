@@ -348,7 +348,7 @@ CHistory.prototype =
 			this.TurnOn();
 			bNeedOff = true;
 		}
-        if(Class)
+        //if(Class)
 		    this.Add(Class, Type, sheetid, range, Data, LocalChange);
 		if(bNeedOff)
 			this.TurnOff();
@@ -682,7 +682,7 @@ CHistory.prototype =
         if ( this.RecIndex >= this.Index )
             this.RecIndex = this.Index - 1;
 		
-		if(!Class.Save_Changes)
+		if(Class && !Class.Save_Changes)
 		{
 			Item =
 			{

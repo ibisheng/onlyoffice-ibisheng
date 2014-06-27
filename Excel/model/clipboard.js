@@ -3294,6 +3294,7 @@
 				{
 					//if(i == 0)
 					//	window["Asc"]["editor"].isStartAddShape = true;
+                    data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
 					drawingObject = data.Drawings[i];
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
