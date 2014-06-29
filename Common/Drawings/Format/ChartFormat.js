@@ -4012,6 +4012,11 @@ CCatAx.prototype =
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
     },
 
+    getDrawingDocument: function()
+    {
+        return this.parent && this.parent.parent && this.parent.parent.getDrawingDocument && this.parent.parent.getDrawingDocument();
+    },
+
     createDuplicate: function()
     {
         var c = new CCatAx();
@@ -5251,6 +5256,11 @@ CDateAx.prototype =
     {
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
     },
+
+    getDrawingDocument: function()
+    {
+        return this.parent && this.parent.parent && this.parent.parent.getDrawingDocument && this.parent.parent.getDrawingDocument();
+    },
     Refresh_RecalcData: function(pageIndex, object)
     {
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6376,6 +6386,11 @@ CSerAx.prototype =
     {
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
     },
+
+    getDrawingDocument: function()
+    {
+        return this.parent && this.parent.parent && this.parent.parent.getDrawingDocument && this.parent.parent.getDrawingDocument();
+    },
     Refresh_RecalcData: function(pageIndex, object)
     {
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7287,6 +7302,10 @@ CValAx.prototype =
     Refresh_RecalcData2: function(pageIndex, object)
     {
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
+    },
+    getDrawingDocument: function()
+    {
+        return this.parent && this.parent.parent && this.parent.parent.getDrawingDocument && this.parent.parent.getDrawingDocument();
     },
 
     createDuplicate: function()
@@ -21622,6 +21641,7 @@ CTitle.prototype =
         this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
     },
 
+
     Search : function(Str, Props, SearchEngine, Type)
     {
         var content = this.getDocContent();
@@ -21850,7 +21870,9 @@ CTitle.prototype =
     },
     getDrawingDocument: function()
     {
-        return this.chart && this.chart.getDrawingDocument();
+        if(this.chart && this.chart.getDrawingDocument)
+            return this.chart && this.chart.getDrawingDocument();
+        return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
     },
     draw: function(graphics)
     {
@@ -23075,6 +23097,11 @@ CChart.prototype =
     Refresh_RecalcData2: function(pageIndex, object)
     {
         this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, object);
+    },
+
+    getDrawingDocument: function()
+    {
+        return this.parent && this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
     },
 
     setAutoTitleDeleted: function(autoTitleDeleted)

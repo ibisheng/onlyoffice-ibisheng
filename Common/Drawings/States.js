@@ -252,47 +252,84 @@ RotateState.prototype =
             var group = this.group;
             var drawingObjects = this.drawingObjects;
             var oThis = this;
-            this.drawingObjects.checkSelectedObjectsAndCallback(
-                function()
+
+            if(e.CtrlKey && this instanceof MoveState)
+            {
+                var i, copy;
+                this.drawingObjects.resetSelection();
+                for(i = 0; i < tracks.length; ++i)
                 {
-                    var i;
-                    for(i = 0; i < tracks.length; ++i)
+                    History.Create_NewPoint();
+                    copy = tracks[i].originalObject.copy();
+                    copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
+                    copy.addToDrawingObjects();
+                    tracks[i].originalObject = copy;
+                    tracks[i].trackEnd(false);
+                    this.drawingObjects.selectObject(copy, 0);
+                    ExecuteNoHistory(function(){drawingObjects.checkSelectedObjectsAndCallback(function(){}, []);}, this, []);
+                }
+            }
+            else
+            {
+                this.drawingObjects.checkSelectedObjectsAndCallback(
+                    function()
                     {
-                        tracks[i].trackEnd(false);
-                    }
-                    if(group)
-                    {
-                        group.updateCoordinatesAfterInternalResize();
-                    }
-                    //drawingObjects.recalculate();
-                    var arr_x = [], arr_y = [], transform, min_x, min_y, drawing;
-                    for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
-                    {
-                        arr_x.length = 0;
-                        arr_y.length = 0;
-                        drawing = oThis.drawingObjects.selectedObjects[i];
-                        transform = drawing.transform;
-                        arr_x.push(transform.TransformPointX(0, 0));
-                        arr_y.push(transform.TransformPointY(0, 0));
-                        arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, 0));
-                        arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, 0));
-                        arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
-                        arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
-                        arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
-                        arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
-                        min_x = Math.min.apply(Math, arr_x);
-                        min_y = Math.min.apply(Math, arr_y);
-                        if(min_x < 0)
+                        var i;
+                        if(e.CtrlKey && oThis instanceof MoveInGroupState)
                         {
-                            drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
+                            group.resetSelection();
+                            for(i = 0; i < tracks.length; ++i)
+                            {
+                                var copy = tracks[i].originalObject.copy();
+                                copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
+                                copy.setGroup(tracks[i].originalObject.group);
+                                copy.group.addToSpTree(copy.group.length, copy);
+                                tracks[i].originalObject = copy;
+                                tracks[i].trackEnd(false);
+                                group.selectObject(copy, 0);
+                            }
                         }
-                        if(min_y < 0)
+                        else
                         {
-                            drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
+                            for(i = 0; i < tracks.length; ++i)
+                            {
+                                tracks[i].trackEnd(false);
+                            }
                         }
-                    }
-                }, []
-            )
+                        if(group)
+                        {
+                            group.updateCoordinatesAfterInternalResize();
+                        }
+                        //drawingObjects.recalculate();
+                        var arr_x = [], arr_y = [], transform, min_x, min_y, drawing;
+                        for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
+                        {
+                            arr_x.length = 0;
+                            arr_y.length = 0;
+                            drawing = oThis.drawingObjects.selectedObjects[i];
+                            transform = drawing.transform;
+                            arr_x.push(transform.TransformPointX(0, 0));
+                            arr_y.push(transform.TransformPointY(0, 0));
+                            arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, 0));
+                            arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, 0));
+                            arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
+                            arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
+                            arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
+                            arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
+                            min_x = Math.min.apply(Math, arr_x);
+                            min_y = Math.min.apply(Math, arr_y);
+                            if(min_x < 0)
+                            {
+                                drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
+                            }
+                            if(min_y < 0)
+                            {
+                                drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
+                            }
+                        }
+                    }, []
+                )
+            }
 
         }
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));

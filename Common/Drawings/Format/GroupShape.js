@@ -195,6 +195,7 @@ CGroupShape.prototype =
         }
         else
         {
+            this.recalcInfo.recalculateArrGraphicObjects = true;
             this.group.handleUpdateSpTree();
             this.recalcBounds();
         }

@@ -2757,6 +2757,7 @@ DrawingObjectsController.prototype =
             this.drawingObjects.drawingDocument.SelectClear();
             this.drawingObjects.drawingDocument.SelectShow();
         }
+        this.updateOverlay();
     },
 
     remove: function(dir)
@@ -3174,8 +3175,7 @@ DrawingObjectsController.prototype =
 
     onKeyDown: function(e)
     {
-        // TODO!!! var ctrlKey = e.metaKey || e.ctrlKey
-
+        e.ctrlKey = e.metaKey || e.ctrlKey;
         var drawingObjectsController = this;
         var bRetValue = false;
         var state = drawingObjectsController.curState;
@@ -4182,9 +4182,9 @@ DrawingObjectsController.prototype =
                             {
                                 chart_props.severalChartTypes = (chart_props.type !== group_drawing_props.chartProps.type);
                             }
-                            if(chart_props.w != null && chart_props.w !== new_chart_props.w)
+                            if(chart_props.w != null && chart_props.w !== group_drawing_props.chartProps.w)
                                 chart_props.w = null;
-                            if(chart_props.h != null && chart_props.h !== new_chart_props.h)
+                            if(chart_props.h != null && chart_props.h !== group_drawing_props.chartProps.h)
                                 chart_props.h = null;
                         }
                     }
