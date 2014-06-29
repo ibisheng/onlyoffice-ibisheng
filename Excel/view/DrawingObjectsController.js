@@ -328,7 +328,8 @@ DrawingObjectsController.prototype.createGroup = function()
 };
 DrawingObjectsController.prototype.handleChartDoubleClick = function()
 {
-    this.drawingObjects.showChartSettings();
+    var drawingObjects = this.drawingObjects;
+    this.checkSelectedObjectsAndFireCallback(function(){this.drawingObjects.showChartSettings();}, []);
 };
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, options)

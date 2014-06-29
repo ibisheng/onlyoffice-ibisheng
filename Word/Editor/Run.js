@@ -6801,12 +6801,15 @@ ParaRun.prototype =
         Writer.WriteString2( null !== this.Paragraph && undefined !== this.Paragraph ? this.Paragraph.Get_Id() : "" );
         this.Pr.Write_ToBinary( Writer );
 
-        var Count = this.Content.length;
-        Writer.WriteLong( Count );
-        for ( var Index = 0; Index < Count; Index++ )
+        if(undefined !== editor && true === editor.isDocumentEditor)
         {
-            var Item = this.Content[Index];
-            Item.Write_ToBinary( Writer );
+            var Count = this.Content.length;
+            Writer.WriteLong( Count );
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Item = this.Content[Index];
+                Item.Write_ToBinary( Writer );
+            }
         }
     },
 
@@ -6823,13 +6826,16 @@ ParaRun.prototype =
         this.Pr        = new CTextPr();
         this.Pr.Read_FromBinary( Reader );
 
-        var Count = Reader.GetLong();
-        this.Content = [];
-        for ( var Index = 0; Index < Count; Index++ )
+        if(undefined !== editor && true === editor.isDocumentEditor)
         {
-            var Element = ParagraphContent_Read_FromBinary( Reader );
-            if ( null !== Element )
-                this.Content.push( Element );
+            var Count = Reader.GetLong();
+            this.Content = [];
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Element = ParagraphContent_Read_FromBinary( Reader );
+                if ( null !== Element )
+                    this.Content.push( Element );
+            }
         }
     },
 
