@@ -3458,7 +3458,7 @@ CShape.prototype =
 
     getInvertTransform: function ()
     {
-        return this.invertTransform;
+        return this.invertTransform ? this.invertTransform : new CMatrix();
     },
 
     getFullOffset: function () {

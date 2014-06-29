@@ -728,8 +728,11 @@ CGroupShape.prototype =
             }
             else if(this.selectedObjects.length > 0)
             {
-                this.parent.GoTo_Text();
-                this.resetSelection();
+                if(this.parent)
+                {
+                    this.parent.GoTo_Text();
+                    this.resetSelection();
+                }
             }
         }
     },
