@@ -6579,7 +6579,8 @@
 
 					objectInfo.hyperlink = new asc_CHyperlink(hyperlink);
 				}
-			} else if (c_oAscSelectionType.RangeShape == selectionType) {
+			} else
+            {
 				// Может быть не задано текста, поэтому выставим по умолчанию
 				objectInfo.font = new asc_CFont();
 				objectInfo.font.name = defaults.fontName;
