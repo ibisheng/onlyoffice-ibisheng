@@ -564,12 +564,13 @@ DependencyGraph.prototype = {
 		this.changeNodeEnd();
     },
     getNodeDependence:function ( aElems ) {
-        var oRes = {oMasterNodes:{}, oMasterAreaNodes:{}, oWeightMap:{}};
+        var oRes = { oMasterNodes: {}, oMasterAreaNodes: {}, oMasterAreaNodesRestricted: {}, oWeightMap: {}, oNodeToArea: {}, nCounter: 0 };
         var aWeightMapMasters = [];
         var aWeightMapMastersNodes = [];
         var node;
         var elem;
         var oSheetRanges = {};
+        var oSheetWithArea = {};//все sheet на которых есть area для пересчета
         while ( null != aElems ) {
             for ( var i in aElems ) {
                 elem = aElems[i];
@@ -580,7 +581,9 @@ DependencyGraph.prototype = {
 				node = this.getNode(sheetId, cellId);
                 if ( node && null == oRes.oWeightMap[node.nodeId] ) {
                     //все node из aElems записываем в master
-                    var oWeightMapElem = {cur:0, max:0, gray:false, bad:false, master:true, area:node.isArea};
+                    var oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 0, gray: false, bad: false, master: true, area: node.isArea };
+                    if (node.isArea)
+                        oSheetWithArea[node.sheetId] = 1;
                     aWeightMapMasters.push( oWeightMapElem );
                     aWeightMapMastersNodes.push( node );
                     oRes.oWeightMap[node.nodeId] = oWeightMapElem;
@@ -631,25 +634,79 @@ DependencyGraph.prototype = {
                 }
             }
         }
+        var bMasterAreaNodesExist = false;
+        var oAllMasterAreaNodes = {};
         for ( var i = 0, length = aWeightMapMasters.length; i < length; i++ ) {
             var oWeightMapElem = aWeightMapMasters[i];
             //возвращаем только настощие master
             if ( oWeightMapElem.master ) {
                 node = aWeightMapMastersNodes[i];
-                if ( oWeightMapElem.area )
-                    oRes.oMasterAreaNodes[node.nodeId] = node;
+                if (oWeightMapElem.area) {
+                    bMasterAreaNodesExist = true;
+                    oAllMasterAreaNodes[node.nodeId] = node;
+                }
                 else
                     oRes.oMasterNodes[node.nodeId] = node;
+            }
+        }
+        if (bMasterAreaNodesExist) {
+            //заносим все одинарные ячейки для пересчета в CellArea, чтобы определить какие из них лежат внутри area
+            var oCellsForCalculation = {};
+            for (var i in oRes.oWeightMap) {
+                var elem = oRes.oWeightMap[i];
+                if (!elem.area) {
+                    var node = this.wb.dependencyFormulas.nodesId[i];
+                    //если ячейка из oMasterNodes, даже если в ней формула, то она не может иметь master из oWeightMap(иначе она бы перестала быть master) - такие ячейки не добавляем
+                    //остальные ячейки имеют master из oWeightMap их надо проверять
+                    if (oSheetWithArea[node.sheetId] && !oRes.oMasterNodes[node.nodeId]) {
+                        var oCellsForCalculationSheet = oCellsForCalculation[node.sheetId];
+                        if (null == oCellsForCalculationSheet) {
+                            oCellsForCalculationSheet = new CellArea(null);
+                            oCellsForCalculation[node.sheetId] = oCellsForCalculationSheet;
+                        }
+                        var bbox = node.getBBox();
+                        oCellsForCalculationSheet.add(bbox.r1, bbox.c1, node);
+                    }
+                }
+            }
+            //делим oAllMasterAreaNodes на те что можно посчитать сразу и те что имеют внутри себя непосчитанные ячейки.
+            //заполняем oNodeToArea ячейками и ссылками на AreaNode в которых ини лежат
+            for (var i in oAllMasterAreaNodes) {
+                var nodeMaster = oAllMasterAreaNodes[i];
+                //элемент запоминает сколько node надо посечить прежде чем считать nodeMaster
+                var nodeMasterElement = { node: nodeMaster, cur: 0, max: 0 };
+                var bRestricted = false;
+                var oCellsForCalculationSheet = oCellsForCalculation[nodeMaster.sheetId];
+                if (oCellsForCalculationSheet) {
+                    var oGetRes = oCellsForCalculationSheet.get(nodeMaster.getBBox());
+                    if (oGetRes.length > 0) {
+                        bRestricted = true;
+                        for (var j = 0; j < oGetRes.length; ++j) {
+                            var node = oGetRes[j].data;
+                            var oNodeToAreaElement = oRes.oNodeToArea[node.nodeId];
+                            if (null == oNodeToAreaElement) {
+                                oNodeToAreaElement = [];
+                                oRes.oNodeToArea[node.nodeId] = oNodeToAreaElement;
+                            }
+                            nodeMasterElement.max++;
+                            oNodeToAreaElement.push(nodeMasterElement);
+                        }
+                    }
+                }
+                if (bRestricted)
+                    oRes.oMasterAreaNodesRestricted[nodeMaster.nodeId] = nodeMasterElement;
+                else
+                    oRes.oMasterAreaNodes[nodeMaster.nodeId] = nodeMaster;
             }
         }
         return oRes;
     },
     _getNodeDependence:function ( oRes, oSheetRanges, node ) {
-        var bBad = false;
+        var oResMapCycle = null;
         var bStop = false;
         var oWeightMapElem = oRes.oWeightMap[node.nodeId];
         if ( null == oWeightMapElem ) {
-            oWeightMapElem = {cur:0, max:1, gray:false, bad:false, master:false, area:false};
+            oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 1, gray: false, bad: false, master: false, area: node.isArea };
             oRes.oWeightMap[node.nodeId] = oWeightMapElem;
         }
         else {
@@ -657,30 +714,40 @@ DependencyGraph.prototype = {
             //если пришли в gray node, то это цикл
             if (oWeightMapElem.gray) {
                 bStop = true;
-                bBad = oWeightMapElem.bad = true;
+                oResMapCycle = {};
+                oResMapCycle[oWeightMapElem.id] = oWeightMapElem;
+                oWeightMapElem.bad = true;
+                oWeightMapElem.max--;
             }
-            else {
-                if (oWeightMapElem.master && oWeightMapElem.max > 1) {
-                    bStop = true;
-                    //если повторно пришли в master node, то не считаем ее master
-                    oWeightMapElem.master = false;
-                    oWeightMapElem.max--;
-                }
+            else if (oWeightMapElem.master && oWeightMapElem.max > 1) {
+                bStop = true;
+                //если повторно пришли в master node, то не считаем ее master
+                oWeightMapElem.master = false;
+                oWeightMapElem.max--;
             }
 		}
-        if (!bStop && 1 == oWeightMapElem.max)
-            this._getNodeDependenceNodeToRange(node.sheetId, node.getBBox(), oSheetRanges);
-        if (!bStop && !bBad && oWeightMapElem.max <= 1) {
+        if (!bStop && 1 == oWeightMapElem.max )
+            this._getNodeDependenceNodeToRange( node.sheetId, node.getBBox(), oSheetRanges );
+        if (!bStop && oWeightMapElem.max <= 1) {
             oWeightMapElem.gray = true;
             var aNext = node.getSlaveEdges();
-            for ( var i in aNext ) {
-                if ( this._getNodeDependence( oRes, oSheetRanges, aNext[i] ) )
-                    bBad = true;
+            for (var i in aNext) {
+                var oCurMapCycle = this._getNodeDependence(oRes, oSheetRanges, aNext[i], oWeightMapElem);
+                if (null != oCurMapCycle) {
+                    oWeightMapElem.bad = true;
+                    for (var i in oCurMapCycle) {
+                        var oCurElem = oCurMapCycle[i];
+                        if (oWeightMapElem != oCurElem) {
+                            if (null == oResMapCycle)
+                                oResMapCycle = {};
+                            oResMapCycle[oCurElem.id] = oCurElem;
+                        }
+                    }
+                }
             }
             oWeightMapElem.gray = false;
-            oWeightMapElem.bad = bBad;
         }
-        return bBad;
+        return oResMapCycle;
     },
     _getNodeDependenceNodeToRange:function ( sheetId, bbox, oSheetRanges ) {
         var oSheetRange = oSheetRanges[sheetId];
@@ -997,15 +1064,32 @@ function sortDependency( wb, setCellFormat ) {
     var nR = wb.needRecalc;
 	if(nR && (nR.length > 0))
 	{
-        var oCleanCellCacheArea = {};
-		var oNodeDependence = wb.dependencyFormulas.getNodeDependence(nR.nodes);
+	    var oCleanCellCacheArea = {};
+	    var oNodeDependence = wb.dependencyFormulas.getNodeDependence(nR.nodes);
         for ( var i in oNodeDependence.oMasterNodes ) {
             var node = oNodeDependence.oMasterNodes[i];
-            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea, setCellFormat );
+            _sortDependency(wb, node, oNodeDependence, oNodeDependence.oMasterAreaNodes, false, oCleanCellCacheArea, setCellFormat);
         }
-        for ( var i in oNodeDependence.oMasterAreaNodes ) {
-            var node = oNodeDependence.oMasterAreaNodes[i];
-            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea, setCellFormat );
+	    //те AreaNodes 
+        var oCurMasterAreaNodes = oNodeDependence.oMasterAreaNodes;
+        while (true) {
+            var bEmpty = true;
+            var oNewMasterAreaNodes = {};
+            for (var i in oCurMasterAreaNodes) {
+                bEmpty = false;
+                var node = oCurMasterAreaNodes[i];
+                _sortDependency(wb, node, oNodeDependence, oNewMasterAreaNodes, false, oCleanCellCacheArea, setCellFormat);
+            }
+            oCurMasterAreaNodes = oNewMasterAreaNodes;
+            if (bEmpty) {
+                //все оставшиеся считаем как bad
+                //todo сделать как в Excel, которой определяет циклические ссылки на момент подсчета(пример A1=VLOOKUP(1,B1:D2,2),B2 = 1, D1=A1 - это не циклическая ссылка)
+                for (var i in oNodeDependence.oMasterAreaNodesRestricted) {
+                    var node = oNodeDependence.oMasterAreaNodesRestricted[i].node;
+                    _sortDependency(wb, node, oNodeDependence, null, true, oCleanCellCacheArea, setCellFormat);
+                }
+                break;
+            }
         }
         for ( var sheetId in oCleanCellCacheArea ) {
             var sheetArea = oCleanCellCacheArea[sheetId];
@@ -1025,16 +1109,29 @@ function sortDependency( wb, setCellFormat ) {
     }
 	wb.needRecalc = {nodes: {}, length:0};
 }
-function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea, setCellFormat ) {
+function _sortDependency(wb, node, oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea, setCellFormat) {
     if ( node ) {
-        var oWeightMapElem = oWeightMap[node.nodeId];
+        var oWeightMapElem = oNodeDependence.oWeightMap[node.nodeId];
         if ( oWeightMapElem ) {
             oWeightMapElem.cur++;
-            if ( (!oWeightMapElem.bad && oWeightMapElem.cur >= oWeightMapElem.max) || (oWeightMapElem.bad && !oWeightMapElem.gray) ) {
-                bBad = oWeightMapElem.bad;
+            if (oWeightMapElem.cur == oWeightMapElem.max && !oWeightMapElem.gray) {
+				if(null != oNewMasterAreaNodes){
+					var oNodeToAreaElement = oNodeDependence.oNodeToArea[node.nodeId];
+					if (oNodeToAreaElement) {
+						for (var i = 0, length = oNodeToAreaElement.length; i < length; ++i) {
+							var elem = oNodeToAreaElement[i];
+							elem.cur++;
+							if (elem.cur == elem.max) {
+								oNewMasterAreaNodes[elem.node.nodeId] = elem.node;
+								delete oNodeDependence.oMasterAreaNodesRestricted[elem.node.nodeId];
+							}
+						}
+					}
+				}
+                var bCurBad = oWeightMapElem.bad || bBad;
                 //пересчитываем функцию
                 var ws = wb.getWorksheetById( node.sheetId );
-                ws._RecalculatedFunctions( node.cellId, bBad, setCellFormat );
+                ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
                 //запоминаем области для удаления cache
                 var sheetArea = oCleanCellCacheArea[node.sheetId];
                 if ( null == sheetArea ) {
@@ -1048,11 +1145,7 @@ function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea, setCe
                 var oSlaveNodes = node.getSlaveEdges();
                 if ( oSlaveNodes ) {
                     for ( var i in oSlaveNodes )
-                        _sortDependency( wb, oSlaveNodes[i], oWeightMap, bBad, oCleanCellCacheArea );
-                }
-                if ( oWeightMapElem.area ) {
-                    for ( var i = 0, length = oWeightMapElem.area.length; i < length; i++ )
-                        _sortDependency( wb, oWeightMapElem.area[i].data, oWeightMap, bBad, oCleanCellCacheArea );
+                        _sortDependency(wb, oSlaveNodes[i], oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea);
                 }
                 oWeightMapElem.gray = false;
             }
