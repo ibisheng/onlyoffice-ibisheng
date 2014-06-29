@@ -2860,6 +2860,7 @@ DrawingObjectsController.prototype =
                             {
                                 cur_group.updateCoordinatesAfterInternalResize();
                             }
+                            this.resetInternalSelection();
                             this.recalculate();
                             return;
                         }

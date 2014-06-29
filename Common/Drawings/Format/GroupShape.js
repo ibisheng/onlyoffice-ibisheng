@@ -2178,7 +2178,8 @@ CGroupShape.prototype =
                 {
                     if(this.spTree[pos] === item)
                     {
-                        this.spTree.splice(i, 1);
+                        this.spTree.splice(pos, 1);
+                        this.handleUpdateSpTree();
                     }
                 }
                 break;
