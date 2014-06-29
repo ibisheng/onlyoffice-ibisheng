@@ -5270,6 +5270,8 @@ CDateAx.prototype =
         }
     },
 
+    getMenuProps: CCatAx.prototype.getMenuProps,
+
     createDuplicate: function()
     {
         var c = new CDateAx();
