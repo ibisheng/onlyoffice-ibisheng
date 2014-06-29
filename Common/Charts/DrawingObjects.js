@@ -5458,24 +5458,35 @@ function DrawingObjects() {
 
     _this.getGraphicSelectionType = function(id) {
 
-        for ( var i = 0; i < aObjects.length; i++ ) {
-            var obj = aObjects[i];
-            if ( obj.graphicObject.Id == id ) {
-                if ( obj.isChart() ) {
-                    if ( _this.controller.selection.chartSelection && _this.controller.selection.chartSelection.textSelection)
-                        return c_oAscSelectionType.RangeChartText;
-                    return c_oAscSelectionType.RangeChart;
-                }
+        var selected_objects, selection, controller = _this.controller;
+        if(controller.selection.groupSelection)
+        {
+            selected_objects = controller.selection.groupSelection.selectedObjects;
+            selection = controller.selection.groupSelection.selection;
+        }
+        else
+        {
+            selected_objects = controller.selectedObjects;
+            selection = controller.selection;
+        }
+        if(selection.chartSelection && selection.chartSelection.selection.textSelection)
+        {
+            return c_oAscSelectionType.RangeChartText;
+        }
+        if(selection.textSelection)
+        {
+            return c_oAscSelectionType.RangeShapeText;
+        }
+        if(selected_objects[0] )
+        {
+            if(selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+                return c_oAscSelectionType.RangeChart;
 
-                if ( obj.graphicObject.isImage() )
-                    return c_oAscSelectionType.RangeImage;
+            if(selected_objects[0].getObjectType() === historyitem_type_Shape)
+                return c_oAscSelectionType.RangeShape;
 
-                if ( obj.graphicObject.isShape() || obj.graphicObject.isGroup() ) {
-                    if ( _this.controller.selection.textSelection )
-                        return c_oAscSelectionType.RangeShapeText;
-                    return c_oAscSelectionType.RangeShape;
-                }
-            }
+            if(selected_objects[0].getObjectType() === historyitem_type_ImageShape)
+                return c_oAscSelectionType.RangeImage;
         }
         return undefined;
     };

@@ -1586,15 +1586,11 @@ DrawingObjectsController.prototype =
             this.chartForProps = null;
 
         }
-
-        if(this.selectedObjects.length === 1
-            && (this.selectedObjects[0].isChart()
-            || (isRealObject(this.curState.group) && this.curState.group.selectedObjects.length === 1 && this.curState.group.selectedObjects[0].isChart())))
+        var objects_by_types = this.getSelectedObjectsByTypes();
+        if(objects_by_types.charts.length === 1)
         {
-
             this.checkSelectedObjectsAndCallback(this.editChartCallback, [chart]);
         }
-
     },
 
     applyDrawingProps: function(props)
