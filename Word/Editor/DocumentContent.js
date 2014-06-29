@@ -33,7 +33,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     {
         this.DrawingDocument = DrawingDocument;
         
-        if ( undefined !== editor && true === editor.isDocumentEditor )
+        if ( undefined !== editor && true === editor.isDocumentEditor && !(bPresentation === true) )
         {
             this.LogicDocument   = DrawingDocument.m_oLogicDocument;
             this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
@@ -8617,6 +8617,16 @@ CDocumentContent.prototype =
     {
         if ( "undefined" != typeof(LinkData.Parent) )
             this.Parent = g_oTableId.Get_ById( LinkData.Parent );
+
+        if(this.Parent.getDrawingDocument)
+        {
+            if(!this.DrawingDocument)
+                this.DrawingDocument = this.Parent.getDrawingDocument();
+            for(var i = 0;  i < this.Content.length; ++i)
+            {
+                this.Content[i].DrawingDocument = this.DrawingDocument;
+            }
+        }
     },
 
     Get_SelectionState2 : function()

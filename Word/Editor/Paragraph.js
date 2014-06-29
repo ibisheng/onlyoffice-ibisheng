@@ -12196,13 +12196,9 @@ Paragraph.prototype =
 
     Load_LinkData : function(LinkData)
     {
-        if(this.Parent && this.Parent.Parent && this.Parent.Parent.Get_Worksheet)
+        if(this.Parent && this.Parent.Parent && this.Parent.Parent.getDrawingDocument)
         {
-            var worksheet = this.Parent.Parent.Get_Worksheet();
-            if(worksheet)
-            {
-                this.DrawingDocument = worksheet.DrawingDocument;
-            }
+            this.DrawingDocument = this.Parent.Parent.getDrawingDocument();
         }
     },
 
