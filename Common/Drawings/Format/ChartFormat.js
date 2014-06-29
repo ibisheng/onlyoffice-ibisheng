@@ -2747,7 +2747,6 @@ CBarChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_BarChart_AddAxId:
@@ -2791,8 +2790,7 @@ CBarChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_BarChart_AddAxId:
@@ -3176,7 +3174,6 @@ CAreaChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_AreaChart_AddAxId:
@@ -3217,8 +3214,7 @@ CAreaChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_AreaChart_AddAxId:
@@ -9438,7 +9434,6 @@ CBubbleChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_BubbleChart_AddAxId:
@@ -9485,8 +9480,7 @@ CBubbleChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_BubbleChart_AddAxId:
@@ -12132,7 +12126,6 @@ CDoughnutChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_DoughnutChart_SetDLbls :
@@ -12188,8 +12181,7 @@ CDoughnutChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_DoughnutChart_SetDLbls :
@@ -14184,7 +14176,6 @@ CLineChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_LineChart_AddAxId:
@@ -14225,8 +14216,7 @@ CLineChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_LineChart_AddAxId:
@@ -16440,7 +16430,6 @@ COfPieChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_OfPieChart_AddCustSplit:
@@ -16518,8 +16507,7 @@ COfPieChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_OfPieChart_AddCustSplit:
@@ -17108,7 +17096,6 @@ CPieChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_PieChart_SetDLbls:
@@ -17162,8 +17149,7 @@ CPieChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_PieChart_SetDLbls:
@@ -18133,7 +18119,6 @@ CRadarChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_RadarChart_AddAxId:
@@ -18186,8 +18171,7 @@ CRadarChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_RadarChart_AddAxId:
@@ -19142,7 +19126,6 @@ CScatterChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_ScatterChart_SetDLbls:
@@ -19192,8 +19175,7 @@ CScatterChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_ScatterChart_AddAxId:
@@ -20257,7 +20239,6 @@ CStockChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_StockChart_AddAxId:
@@ -20290,8 +20271,7 @@ CStockChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_StockChart_AddAxId:
@@ -21138,7 +21118,6 @@ CSurfaceChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
-                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_SurfaceChart_AddAxId:
@@ -21177,8 +21156,7 @@ CSurfaceChart.prototype =
             case historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
-                var ser = readObject(r);
-                this.series.splice(pos, 0, ser);
+                this.series.splice(pos, 1);
                 break;
             }
             case historyitem_SurfaceChart_AddAxId:
