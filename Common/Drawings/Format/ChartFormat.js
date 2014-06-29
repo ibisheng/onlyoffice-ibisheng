@@ -19303,7 +19303,6 @@ CScatterSeries.prototype =
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
 
-
     removeDPt: function(idx)
     {
         if(this.dPt[idx])
@@ -19692,7 +19691,7 @@ CScatterSeries.prototype =
         }
     },
 
-    Load_Changes: function()
+    Load_Changes: function(r)
     {
         var type = r.GetLong();
         switch (type)
