@@ -469,11 +469,17 @@ function CCollaborativeEditing()
         this.Clear_LinkData();
 
 
-        Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null, function()
+        if(this.m_aNewImages.length > 0)
         {
-            CollaborativeEditing.m_aNewImages.length = 0;
-            Asc["editor"]._onShowDrawingObjects();
-        });
+            Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null, function()
+            {
+                CollaborativeEditing.m_aNewImages.length = 0;
+                Asc["editor"]._onShowDrawingObjects();
+                var worksheet = Asc["editor"].wb.getWorksheet();
+                worksheet && worksheet.objectRender.controller.getGraphicObjectProps();
+            });
+
+        }
     };
 //-----------------------------------------------------------------------------------
 // Функции для проверки корректности новых изменений
