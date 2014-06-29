@@ -1721,16 +1721,18 @@
 				oPasteProcessor.aContent = [];
                  
 				newFonts = this._convertFonts(oPasteProcessor.oFonts);
-				
+
+
+                History.Create_NewPoint();
 				oPasteProcessor._Execute(node, {}, true, true, false);
-					
-				targetDocContent.Remove(1, true, true);
-				
 				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length)
 					return false;
+
+                var targetContent = worksheet.objectRender.controller.getTargetDocContent(true);//нужно для заголовков диаграмм
+                targetContent.Remove(1, true, true);
 					
 				worksheet._loadFonts(newFonts, function () {
-					oPasteProcessor.InsertInPlace(targetDocContent , oPasteProcessor.aContent);
+					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();
 					
@@ -1768,8 +1770,7 @@
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(isIntoShape)
 				{
-                    History.Create_NewPoint();
-                    isIntoShape = worksheet.objectRender.controller.getTargetDocContent(true);//нужно для заголовков диаграмм
+
 					var resultPasteInShape = this._pasteInShape(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					if(resultPasteInShape == true)
 						return;
