@@ -293,6 +293,7 @@ CTableId.prototype =
             case historyitem_type_WrapPolygon              : Element = new CWrapPolygon(); break;
             case historyitem_type_DateAx                   : Element = new CDateAx(); break;
             case historyitem_type_SerAx                    : Element = new CSerAx(); break;
+            case historyitem_type_Title                    : Element = new CTitle(); break;
         }
 
         if ( null !== Element )
