@@ -3194,9 +3194,12 @@ function DrawingObjects() {
             }
             var metrics = drawingObject.getGraphicObjectMetrics();
             CheckSpPrXfrm(drawingObject.graphicObject);
-            drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
-            drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
-            if(drawingObject.graphicObject.getObjectType() !== historyitem_type_GroupShape)
+            if(!api.wbModel.bCollaborativeChanges)
+            {
+                drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
+                drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
+            }
+            if(drawingObject.graphicObject.getObjectType() !== historyitem_type_GroupShape && !api.wbModel.bCollaborativeChanges)
             {
                 drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
                 drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
