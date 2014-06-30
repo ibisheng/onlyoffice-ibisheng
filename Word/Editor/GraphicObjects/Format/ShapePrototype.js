@@ -56,6 +56,8 @@ CShape.prototype.recalcPen = function()
 CShape.prototype.recalcTransform = function()
 {
     this.recalcInfo.recalculateTransform = true;
+    this.snapArrayX.length = 0;
+    this.snapArrayY.length = 0;
 };
 CShape.prototype.recalcTransformText = function()
 {
@@ -479,7 +481,6 @@ CShape.prototype.updateTransformMatrix = function()
         global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     }
-
     this.checkShapeChildTransform();
     this.checkContentDrawings();
 };

@@ -153,6 +153,7 @@ CImageShape.prototype =
 
     normalize: CShape.prototype.normalize,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
+    calculateSnapArrays: CShape.prototype.calculateSnapArrays,
 
     sendMouseData: function()
     {

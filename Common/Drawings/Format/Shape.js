@@ -1,5 +1,6 @@
 "use strict";
 
+var BOUNDS_DELTA = 3;
 function CheckObjectLine(obj)
 {
     return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
@@ -2612,7 +2613,8 @@ CShape.prototype =
             _x = x - this.bounds.x;
             _y = y - this.bounds.y;
         }
-        return _x >= 0 && _x <= this.bounds.w && _y >= 0 && _y <= this.bounds.h;
+        var delta = BOUNDS_DELTA + (this.pen && isRealNumber(this.pen.w) ? this.pen.w/36000 : 0);
+        return _x >= -delta && _x <= this.bounds.w + delta && _y >= -delta && _y <= this.bounds.h + delta;
 
     },
 
@@ -3459,6 +3461,22 @@ CShape.prototype =
     getInvertTransform: function ()
     {
         return this.invertTransform ? this.invertTransform : new CMatrix();
+    },
+
+    calculateSnapArrays: function(snapArrayX, snapArrayY)
+    {
+        var t = this.transform;
+        snapArrayX.push(t.TransformPointX(0, 0));
+        snapArrayY.push(t.TransformPointY(0, 0));
+        snapArrayX.push(t.TransformPointX(this.extX, 0));
+        snapArrayY.push(t.TransformPointY(this.extX, 0));
+
+        snapArrayX.push(t.TransformPointX(this.extX*0.5, this.extY*0.5));
+        snapArrayY.push(t.TransformPointY(this.extX*0.5, this.extY*0.5));
+        snapArrayX.push(t.TransformPointX(this.extX, this.extY));
+        snapArrayY.push(t.TransformPointY(this.extX, this.extY));
+        snapArrayX.push(t.TransformPointX(0, this.extY));
+        snapArrayY.push(t.TransformPointY(0, this.extY));
     },
 
     getFullOffset: function () {

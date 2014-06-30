@@ -235,6 +235,7 @@ CChartSpace.prototype =
 
     select: CShape.prototype.select,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
+    calculateSnapArrays: CShape.prototype.calculateSnapArrays,
 
 
     recalculateTextPr: function()

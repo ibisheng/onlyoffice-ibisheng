@@ -1831,6 +1831,19 @@ CGroupShape.prototype =
     recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
 
+    calculateSnapArrays: function(snapArrayX, snapArrayY)
+    {
+        var sp;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            sp = this.spTree[i];
+            sp.calculateSnapArrays(snapArrayX, snapArrayY);
+            sp.snapArrayX.length = 0;
+            sp.snapArrayY.length = 0;
+            sp.calculateSnapArrays(sp.snapArrayX, sp.snapArrayY);
+        }
+    },
+
     hitToAdj: function(x, y)
     {
         return {hit: false, num: -1, polar: false};

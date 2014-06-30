@@ -732,9 +732,6 @@ MoveState.prototype =
             }
         }
 
-        var tr_to_start_page_x;
-        var tr_to_start_page_y;
-
         var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
 
         var startPage = this.drawingObjects.graphicPages[this.majorObject.selectStartPage];
@@ -745,12 +742,14 @@ MoveState.prototype =
         var snap_x = null, snap_y = null;
 
         var snapHorArray = [], snapVerArray = [];
-        snapHorArray.push(X_Left_Field);
-        snapHorArray.push(X_Right_Field);
-        snapHorArray.push(Page_Width/2);
-        snapVerArray.push(Y_Top_Field);
-        snapVerArray.push(Y_Bottom_Field);
-        snapVerArray.push(Page_Height/2);
+
+        var page = this.drawingObjects.document.Pages[pageIndex];
+        snapHorArray.push(page.Margins.Left);
+        snapHorArray.push(page.Margins.Right);
+        snapHorArray.push(page.W/2);
+        snapVerArray.push(page.Margins.Top);
+        snapVerArray.push(page.Margins.Bottom);
+        snapVerArray.push(page.H/2);
         if(result_x === this.startX)
         {
             min_dx = 0;
@@ -2053,3 +2052,113 @@ AddPolyLine2State3.prototype =
         }
     }
 };
+
+function GetMinSnapDistanceXObject(pointX, arrGrObjects)
+{
+    var min_dx = null;
+    var ret = null;
+    for(var i = 0; i < arrGrObjects.length; ++i)
+    {
+        var cur_snap_arr_x = arrGrObjects[i].snapArrayX;
+        var count = cur_snap_arr_x.length;
+        for(var snap_index  = 0; snap_index < count; ++snap_index)
+        {
+            var dx = cur_snap_arr_x[snap_index] - pointX;
+            if(min_dx === null)
+            {
+                ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+                min_dx = dx;
+            }
+            else
+            {
+                if(Math.abs(dx) < Math.abs(min_dx))
+                {
+                    min_dx = dx;
+                    ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+function GetMinSnapDistanceYObject(pointY, arrGrObjects)
+{
+    var min_dy = null;
+    var ret = null;
+    for(var i = 0; i < arrGrObjects.length; ++i)
+    {
+        var cur_snap_arr_y = arrGrObjects[i].snapArrayY;
+        var count = cur_snap_arr_y.length;
+        for(var snap_index  = 0; snap_index < count; ++snap_index)
+        {
+            var dy = cur_snap_arr_y[snap_index] - pointY;
+            if(min_dy === null)
+            {
+                min_dy = dy;
+                ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+            }
+            else
+            {
+                if(Math.abs(dy) < Math.abs(min_dy))
+                {
+                    min_dy = dy;
+                    ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+function GetMinSnapDistanceXObjectByArrays(pointX, snapArrayX)
+{
+    var min_dx = null;
+    var ret = null;
+    var cur_snap_arr_x = snapArrayX;
+    var count = cur_snap_arr_x.length;
+    for(var snap_index  = 0; snap_index < count; ++snap_index)
+    {
+        var dx = cur_snap_arr_x[snap_index] - pointX;
+        if(min_dx === null)
+        {
+            ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+            min_dx = dx;
+        }
+        else
+        {
+            if(Math.abs(dx) < Math.abs(min_dx))
+            {
+                min_dx = dx;
+                ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+            }
+        }
+    }
+    return ret;
+}
+
+function GetMinSnapDistanceYObjectByArrays(pointY, snapArrayY)
+{
+    var min_dy = null;
+    var ret = null;
+    var cur_snap_arr_y = snapArrayY;
+    var count = cur_snap_arr_y.length;
+    for(var snap_index  = 0; snap_index < count; ++snap_index)
+    {
+        var dy = cur_snap_arr_y[snap_index] - pointY;
+        if(min_dy === null)
+        {
+            min_dy = dy;
+            ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+        }
+        else
+        {
+            if(Math.abs(dy) < Math.abs(min_dy))
+            {
+                min_dy = dy;
+                ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+            }
+        }
+    }
+    return ret;
+}

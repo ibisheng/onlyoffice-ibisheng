@@ -4464,6 +4464,7 @@ ParaDrawing.prototype =
         if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.wrappingPolygon.posX) && isRealNumber(this.wrappingPolygon.posY)) ||
             !(Math.abs(this.wrappingPolygon.posX -_x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < MOVE_DELTA))
             this.wrappingPolygon.updatePosition(_x, _y);
+        this.calculateSnapArrays();
     },
 
     Set_XYForAdd2 : function(X, Y)
@@ -6222,10 +6223,10 @@ ParaDrawing.prototype =
 
     calculateSnapArrays: function()
     {
-        this.snapArrayX.length = 0;
-        this.snapArrayY.length = 0;
+        this.GraphicObj.snapArrayX.length = 0;
+        this.GraphicObj.snapArrayY.length = 0;
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateSnapArrays === "function")
-            this.GraphicObj.calculateSnapArrays(this.snapArrayX, this.snapArrayY);
+            this.GraphicObj.calculateSnapArrays(this.GraphicObj.snapArrayX, this.GraphicObj.snapArrayY);
 
     },
 
