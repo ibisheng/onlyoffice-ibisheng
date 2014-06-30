@@ -19297,7 +19297,7 @@ CScatterSeries.prototype =
     createDuplicate: function()
     {
         var c = new CScatterSeries();
-        c.setDLbls(this.dLbls.createDuplicate());
+        this.dLbls && c.setDLbls(this.dLbls.createDuplicate());
         for(var i = 0; i < this.dPt.length; ++i)
         {
             c.addDPt(this.dPt[i].createDuplicate());
