@@ -2305,40 +2305,35 @@ Woorksheet.prototype.renameWsToCollaborate=function(name){
 	//переименование для отправки изменений
 	for(var i = 0, length = this.workbook.aCollaborativeActions.length; i < length; ++i)
 	{
-		var action = this.workbook.aCollaborativeActions[i];
-		if(g_oUndoRedoWorkbook == action.oClass)
-		{
-			if(historyitem_Workbook_SheetAdd == action.nActionType)
-			{
-				if(lastname == action.oData.name)
-					action.oData.name = name;
-			}
-		}
-		else if(g_oUndoRedoWorksheet == action.oClass)
-		{
-			if(historyitem_Worksheet_Rename == action.nActionType)
-			{
-				if(lastname == action.oData.to)
-					action.oData.to = name;
-			}
-		}
-		else if(g_oUndoRedoCell == action.oClass)
-		{
-			if(action.oData instanceof UndoRedoData_CellSimpleData)
-			{
-				if(action.oData.oNewVal instanceof UndoRedoData_CellValueData)
-				{
-					var oNewVal = action.oData.oNewVal;
-					if(null != oNewVal.formula && -1 != oNewVal.formula.indexOf(lastname))
-					{
-						var oParser = new parserFormula(oNewVal.formula,"A1",this);
-						oParser.parse();
-						aFormulas.push({formula: oParser, value: oNewVal});
-						
-					}
-				}
-			}
-		}
+	    var aPointActions = this.workbook.aCollaborativeActions[i];
+	    for (var j = 0, length2 = aPointActions.length; j < length2; ++j) {
+	        var action = aPointActions[j];
+	        if (g_oUndoRedoWorkbook == action.oClass) {
+	            if (historyitem_Workbook_SheetAdd == action.nActionType) {
+	                if (lastname == action.oData.name)
+	                    action.oData.name = name;
+	            }
+	        }
+	        else if (g_oUndoRedoWorksheet == action.oClass) {
+	            if (historyitem_Worksheet_Rename == action.nActionType) {
+	                if (lastname == action.oData.to)
+	                    action.oData.to = name;
+	            }
+	        }
+	        else if (g_oUndoRedoCell == action.oClass) {
+	            if (action.oData instanceof UndoRedoData_CellSimpleData) {
+	                if (action.oData.oNewVal instanceof UndoRedoData_CellValueData) {
+	                    var oNewVal = action.oData.oNewVal;
+	                    if (null != oNewVal.formula && -1 != oNewVal.formula.indexOf(lastname)) {
+	                        var oParser = new parserFormula(oNewVal.formula, "A1", this);
+	                        oParser.parse();
+	                        aFormulas.push({ formula: oParser, value: oNewVal });
+
+	                    }
+	                }
+	            }
+	        }
+	    }
 	}
 	//переименование для локальной версии
 	this.setName(name);
