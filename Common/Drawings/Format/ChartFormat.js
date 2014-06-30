@@ -15693,7 +15693,7 @@ CNumericPoint.prototype =
             }
             case historyitem_NumericPoint_SetVal:
             {
-                writeDouble(w, data.newPr);
+                writeString(w, data.newPr + "");
                 break;
             }
         }
@@ -15730,7 +15730,7 @@ CNumericPoint.prototype =
             }
             case historyitem_NumericPoint_SetVal:
             {
-                this.val = readDouble(r);
+                this.val = parseFloat(readString(r));
                 break;
             }
         }
