@@ -7611,6 +7611,7 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
 };
 asc_docs_api.prototype.asc_doubleClickOnChart = function(obj)
 {
+	this.WordControl.onMouseUpMainSimple();
     this.asc_fireCallback("asc_doubleClickOnChart", obj);
 };
 

@@ -1514,6 +1514,7 @@ function CEditorPage(api)
         }
 
         oWordControl.StartUpdateOverlay();
+		var bIsSendSelectWhell = false;
 
         if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button))
         {
@@ -1542,6 +1543,13 @@ function CEditorPage(api)
                 if (ret === true)
                     return;
 
+				if (-1 == oWordControl.m_oTimerScrollSelect)
+				{
+					// добавим это и здесь, чтобы можно было отменять во время LogicDocument.OnMouseDown
+					oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
+					bIsSendSelectWhell = true;
+				}
+
                 oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = true;
                 oWordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
                 oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = false;
@@ -1557,7 +1565,7 @@ function CEditorPage(api)
         else if (global_mouseEvent.Button == 2)
             oWordControl.MouseDownDocumentCounter++;
 
-        if (-1 == oWordControl.m_oTimerScrollSelect)
+        if (!bIsSendSelectWhell && -1 == oWordControl.m_oTimerScrollSelect)
         {
             oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
         }
@@ -1749,6 +1757,30 @@ function CEditorPage(api)
 
         oWordControl.EndUpdateOverlay();
     }
+
+	this.onMouseUpMainSimple = function()
+	{
+		if (false === oThis.m_oApi.bInit_word_control)
+			return;
+
+		var oWordControl = oThis;
+
+		global_mouseEvent.Type = g_mouse_event_type_up;
+
+		g_bIsMouseUpLockedSend = true;
+
+		global_mouseEvent.Sender = null;
+
+		global_mouseEvent.UnLockMouse();
+
+		global_mouseEvent.IsPressed = false;
+
+		if (-1 != oWordControl.m_oTimerScrollSelect)
+		{
+			clearInterval(oWordControl.m_oTimerScrollSelect);
+			oWordControl.m_oTimerScrollSelect = -1;
+		}
+	}
 
     this.onMouseUpExternal = function(x, y)
     {
