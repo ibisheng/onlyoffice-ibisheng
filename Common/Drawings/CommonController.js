@@ -4718,7 +4718,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            this.selection.groupSelection.group.sendToBack();
+            this.selection.groupSelection.sendToBack();
         }
 
     },
