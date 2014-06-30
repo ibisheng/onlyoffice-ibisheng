@@ -1908,7 +1908,7 @@ cDB.prototype.Calculate = function ( arg ) {
     period = period.getValue();
     month = month.getValue();
 
-    if ( month < 1 || month > 12 || salvage <= 0 || life < 0 || period < 0 || cost < 0 ) {
+    if ( month < 1 || month > 12 || salvage <= 0 || life < 0 || period < 0 || cost < 0 || cost < salvage ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
     var rate = 1 - Math.pow( salvage / cost, 1 / life );
@@ -2020,7 +2020,7 @@ cDDB.prototype.Calculate = function ( arg ) {
     period = period.getValue();
     factor = factor.getValue();
 
-    if ( cost <= 0 || salvage < 0 || factor <= 0 || life <= 0 || period <= 0 ) {
+    if ( cost < salvage || cost <= 0 || salvage < 0 || factor <= 0 || life <= 0 || period <= 0 ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
