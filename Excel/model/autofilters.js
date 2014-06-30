@@ -5621,7 +5621,7 @@ var gUndoInsDelCellsFlag = true;
 
 				if(styleOptions != undefined)
 				{
-					if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+					if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
 					{
 						ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
 						ctx.fillRect(0,0,xSize,ySize);
@@ -5638,16 +5638,16 @@ var gUndoInsDelCellsFlag = true;
 							var color = defaultColorBackground;
 							if((k)%2 == 0)
 							{
-								if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill)
+								if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill && null != styleOptions.firstColumnStripe.dxf.fill.bg)
 									color =  styleOptions.firstColumnStripe.dxf.fill.bg;
-								else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+								else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
 									color =  styleOptions.wholeTable.dxf.fill.bg;
 							}
 							else
 							{
-								if(styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill)
+								if(styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill && null != styleOptions.secondColumnStripe.dxf.fill.bg)
 									color = styleOptions.secondColumnStripe.dxf.fill.bg;
-								else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+								else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
 									color =  styleOptions.wholeTable.dxf.fill.bg;	
 							}
 							ctx.setFillStyle(color);
@@ -5666,14 +5666,14 @@ var gUndoInsDelCellsFlag = true;
 									k++;
 								if((k)%2 != 0)
 								{
-									if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill)
+									if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
 										color = styleOptions.firstRowStripe.dxf.fill.bg;
 								}
 								else
 								{
-									if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill)
+									if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
 										color = styleOptions.secondRowStripe.dxf.fill.bg;
-									else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+									else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
 										color = styleOptions.wholeTable.dxf.fill.bg;
 										
 								}
@@ -5696,14 +5696,14 @@ var gUndoInsDelCellsFlag = true;
 								var color = null;
 								if((k+1)%2 != 0)
 								{
-									if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill)
+									if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
 										color =  styleOptions.firstRowStripe.dxf.fill.bg;
 								}
 								else
 								{
-									if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill)
+									if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
 										color =  styleOptions.secondRowStripe.dxf.fill.bg;
-									else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
+									else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
 										color =  styleOptions.wholeTable.dxf.fill.bg;
 								}
 								
@@ -5719,7 +5719,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
 					{
-						if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill)
+						if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
 							ctx.setFillStyle(styleOptions.firstColumn.dxf.fill.bg);
 						else
 							ctx.setFillStyle(defaultColorBackground);
@@ -5728,8 +5728,8 @@ var gUndoInsDelCellsFlag = true;
 					if(styleInfo.ShowLastColumn)//last column
 					{
 						var color = null;
-						if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill)
-							color =styleOptions.lastColumn.dxf.fill.bg;
+						if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill && null != styleOptions.lastColumn.dxf.fill.bg)
+							color = styleOptions.lastColumn.dxf.fill.bg;
 						/*else
 							ctx.fillStyle = defaultColorBackground;*/
 						if(color != null)
@@ -5741,7 +5741,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					if(styleOptions)//header row
 					{
-						if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill)
+						if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg)
 						{
 							ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
 						}
@@ -5755,7 +5755,7 @@ var gUndoInsDelCellsFlag = true;
 					if(styleInfo.TotalsRowCount)//total row
 					{
 						var color = null;
-						if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill)
+						if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg)
 							color = styleOptions.totalRow.dxf.fill.bg;
 						else
 							color = defaultColorBackground;
@@ -5767,7 +5767,7 @@ var gUndoInsDelCellsFlag = true;
 						//первая ячейка
 					if(styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn)
 					{
-						if(styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill)
+						if(styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill && null != styleOptions.firstHeaderCell.dxf.fill.bg)
 							ctx.setFillStyle(styleOptions.firstHeaderCell.dxf.fill.bg);
 						else
 							ctx.setFillStyle(defaultColorBackground);
@@ -5776,7 +5776,7 @@ var gUndoInsDelCellsFlag = true;
 					//последняя в первой строке
 					if(styleOptions.lastHeaderCell && styleInfo.ShowLastColumn)
 					{
-						if(styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill)
+						if(styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill && null != styleOptions.lastHeaderCell.dxf.fill.bg)
 							ctx.setFillStyle(styleOptions.lastHeaderCell.dxf.fill.bg);
 						else
 							ctx.setFillStyle(defaultColorBackground);
@@ -5785,7 +5785,7 @@ var gUndoInsDelCellsFlag = true;
 					//первая в последней строке	
 					if(styleOptions.firstTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn)
 					{
-						if(styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill)
+						if(styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill && null != styleOptions.firstTotalCell.dxf.fill.bg)
 							ctx.setFillStyle(styleOptions.firstTotalCell.dxf.fill.bg);
 						else
 							ctx.setFillStyle(defaultColorBackground);
@@ -5794,7 +5794,7 @@ var gUndoInsDelCellsFlag = true;
 					//последняя ячейка	
 					if(styleOptions.lastTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn)
 					{
-						if(styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill)
+						if(styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill && null != styleOptions.lastTotalCell.dxf.fill.bg)
 							ctx.setFillStyle(styleOptions.lastTotalCell.dxf.fill.bg);
 						else
 							ctx.setFillStyle(defaultColorBackground);
