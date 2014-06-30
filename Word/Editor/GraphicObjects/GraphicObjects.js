@@ -339,7 +339,7 @@ CGraphicObjects.prototype =
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
             }
-            if(props_by_types.chartProps)
+            if(props_by_types.chartProps && !(props_by_types.chartProps.severalCharts === true))
             {
                 chart_props = new CImgProperty(para_drawing_props);
                 chart_props.ChartProperties = props_by_types.chartProps.chartProps;

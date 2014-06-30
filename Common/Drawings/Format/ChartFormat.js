@@ -7323,8 +7323,8 @@ CValAx.prototype =
         }
         c.setMajorTickMark(this.majorTickMark);
         c.setMajorUnit(this.majorUnit);
-        c.setNumFmt(this.numFmt.createDuplicate());
-        c.setScaling(this.scaling.createDuplicate());
+        this.numFmt && c.setNumFmt(this.numFmt.createDuplicate());
+        this.scaling && c.setScaling(this.scaling.createDuplicate());
         if(this.spPr)
         {
             c.setSpPr(this.spPr.createDuplicate());
