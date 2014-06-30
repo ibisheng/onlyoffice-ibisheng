@@ -130,7 +130,6 @@
                 "../../Word/apiDefines.js",
                 "../../Word/api-all.js",
                 "../../Word/document/empty.js",
-                "../../Excel/graphics/DrawingContextWord.js",
                 "../../Word/Math/mathTypes.js",
                 "../../Word/Math/mathText.js",
                 "../../Word/Math/mathContent.js",
