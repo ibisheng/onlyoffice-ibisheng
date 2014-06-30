@@ -4654,12 +4654,12 @@ function CompareUniColor(u1, u2)
 
     if(u1.Mods && u2.Mods)
     {
-        if(u1.Mods.length !== u2.Mods.length)
+        if(u1.Mods.Mods.length !== u2.Mods.Mods.length)
             return false;
-        for(var i = 0; i < u1.Mods.length; ++i)
+        for(var i = 0; i < u1.Mods.Mods.length; ++i)
         {
-            if(u1.Mods[i].name !== u2.Mods[i].name
-                || u1.Mods[i].val !== u2.Mods[i].val)
+            if(u1.Mods.Mods[i].name !== u2.Mods.Mods[i].name
+                || u1.Mods.Mods[i].val !== u2.Mods.Mods[i].val)
                 return false;
         }
     }
