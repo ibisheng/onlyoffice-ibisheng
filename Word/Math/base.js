@@ -138,7 +138,6 @@ CMathBase.prototype =
     {
         return this.CompiledCtrPrp.Copy();
     },
-
     getCtrPrpForFirst: function(ParaMath)
     {
         var ctrPrp = new CTextPr();
@@ -202,76 +201,6 @@ CMathBase.prototype =
                 if( !this.elements[i][j].IsJustDraw() )
                     this.elements[i][j].setArgSize(argSize);
     },
-    /*setComposition: function(Composition)
-    {
-        this.Composition = Composition;
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setComposition(Composition);
-    },
-    setReferenceComposition: function(Comp)
-    {
-        this.Composition = Comp;
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setReferenceComposition(Comp);
-    },*/
-    /*old_getTxtPrp: function()
-    {
-        var txtPrp = new CMathTextPrp();
-        Common_CopyObj2(txtPrp, this.Composition.TxtPrp);
-
-        txtPrp.Merge(this.textPrp);
-
-
-        return txtPrp;
-    },
-    getTxtPrp: function()
-    {
-        var txtPrp = new CMathTextPrp();
-        txtPrp.Merge(this.TxtPrp);
-        txtPrp.Merge(this.OwnTPrp);
-
-        return txtPrp ;
-    },
-    setTxtPrp: function(txtPrp)
-    {
-        this.TxtPrp.Merge(txtPrp);
-
-        var tPrp = this.getTxtPrp();
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setTxtPrp(tPrp);
-    },
-    setOwnTPrp: function(txtPrp)
-    {
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                if( !this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].setOwnTPrp(txtPrp);
-    },
-    getOwnTPrp: function()
-    {
-        return this.textPrp;
-    },
-    old_setComposition: function(Compos)
-    {
-        this.Composition = Compos;
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-            {
-                if(!this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].setComposition(Compos);
-            }
-    },
-    old_setRunPrp: function(txtPrp)
-    {
-        this.RunPrp.Merge(txtPrp);
-        this.setTxtPrp(txtPrp);
-    },*/
     fillPlaceholders: function()
     {
          for(var i=0; i < this.nRow; i++)
@@ -301,318 +230,11 @@ CMathBase.prototype =
             this.setContent();
         }
     },
-    /*relate: function(parent)
-    {
-        this.Parent = parent;
-    },*/
-    old_cursor_moveLeft: function()
-    {
-        var bUpperLevel = false;
-        //var oldPos = {x: this.CurPos_X, y: this.CurPos_Y}; //старая позиция нужна когда  только в случае если находимся в базовом контенте, а здесь нет, т.к. всегда есть родитель
-
-        do{
-            if( this.CurPos_Y > 0  )
-            {
-                this.CurPos_Y--;
-            }
-            else if(this.CurPos_X > 0)
-            {
-                this.CurPos_X--;
-                this.CurPos_Y = this.nCol - 1;
-            }
-            else
-            {
-                bUpperLevel = true;
-                break;
-            }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() );
-
-        //из цикла вышли если bJustDraw = false  or  bUpperLevel = true
-
-        var content;
-        if(bUpperLevel)
-        {
-            var movement = this.Parent.cursor_moveLeft();
-            content = movement.SelectContent;
-        }
-        else
-        {
-            this.elements[ this.CurPos_X ][ this.CurPos_Y].cursor_MoveToEndPos(); //  end => cursor_MoveToEndPos
-            content = this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement(); //если внутренний элемент не контент, а базовый класс, вернется последний элемент этого класса
-        }
-
-        return { SelectContent: content };
-    },
-    old_cursor_moveRight: function()
-    {
-        var bUpperLevel = false;
-
-        do{
-            if( this.CurPos_Y < this.nCol - 1 )
-            {
-                this.CurPos_Y++;
-            }
-            else if(this.CurPos_X < this.nRow - 1)
-            {
-                this.CurPos_X++;
-                this.CurPos_Y = 0;
-            }
-            else
-            {
-                bUpperLevel = true;
-                break;
-            }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() );
-
-        var content;
-        if( bUpperLevel )
-        {
-            var movement = this.Parent.cursor_moveRight();
-            content = movement.SelectContent;
-        }
-        else
-        {
-            this.elements[ this.CurPos_X ][ this.CurPos_Y ].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
-            content = this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
-        } //если внутренний элемент не контент, а базовый класс, вернется первый элемент этого класса
-
-        return { SelectContent: content };
-    },
     // эта функция здесь необходима для случая с n-арными операторами : когда передаем n-арный оператор с итераторами и аргумент
     IsJustDraw: function()
     {
         return false;
     },
-    select_moveRight: function()
-    {
-        return this.elements[this.CurPos_X][this.CurPos_Y].select_moveRight();
-    },
-    select_moveLeft: function()
-    {
-        return this.elements[this.CurPos_X][this.CurPos_Y].select_moveLeft();
-    },
-    goToLastElement: function()
-    {
-        this.CurPos_X = this.nRow - 1;
-        this.CurPos_Y = this.nCol - 1;
-        while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-        {
-            if( this.CurPos_Y > 0)
-            {
-                this.CurPos_Y--;
-            }
-            else if(this.CurPos_X > 0)
-            {
-                this.CurPos_X--;
-                this.CurPos_Y = this.nCol - 1;
-            }
-        }
-
-        //this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
-
-        return this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement();
-    },
-    goToFirstElement: function()
-    {
-        this.CurPos_X = 0;
-        this.CurPos_Y = 0;
-        while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-        {
-            if( this.CurPos_Y < this.nCol - 1 )
-            {
-                this.CurPos_Y++;
-            }
-            else if(this.CurPos_X < this.nRow - 1)
-            {
-                this.CurPos_X++;
-                this.CurPos_Y = 0;
-            }
-        }
-
-        //this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
-
-        return this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
-    },
-    // TODO
-    // пересмотреть логику
-    // TODO
-    // пересомтреть this.gaps / this.dW
-    // остановиться на чем-нибудь одном
-    goToUpperLevel: function(coord)
-    {
-        //пришли из текущего контента
-
-        var state = false, bUp = false, content = null;
-        var alignPrev = this.align(this.CurPos_X, this.CurPos_Y);
-
-        var crd = {x: coord.x + alignPrev.x, y: coord.y};
-
-        if( this.CurPos_X > 0 )
-        {
-            this.CurPos_X--;
-            while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() &&  this.CurPos_X > 0)
-            {
-                this.CurPos_X--;
-            }
-            if( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() ) // все элементы только для отрисовки и дошли до конца
-            {
-                this.CurPos_X = prevPos.x;
-                state = false;
-            }
-            else
-                state = true;
-        }
-
-        if( state )
-        {
-            bUp = true;
-            var size = this.elements[this.CurPos_X][this.CurPos_Y].size;
-            var alignCurr = this.align(this.CurPos_X, this.CurPos_Y);
-            crd.y = size.height;
-
-            if( crd.x < alignCurr.x )
-                crd.x = 0;
-            else if( crd.x > alignCurr.x + size.width )
-                crd.x = size.width;
-            else
-                crd.x = crd.x - alignCurr.x;
-            content = this.elements[this.CurPos_X][this.CurPos_Y].afterDisplacement(crd);
-
-        }
-        else
-        {
-            var maxWH = this.getWidthsHeights();
-            var widthToEl = 0;
-            for(var j = 0; j < this.CurPos_Y; j++)
-                widthToEl += maxWH.widths[j] + this.dW;
-                //widthToEl += maxWH.widths[j] + this.gaps.column[j+1];
-
-            crd.x += widthToEl;
-            var upLevel = this.Parent.goToUpperLevel(crd);
-            bUp = upLevel.bUp;
-            if(bUp)
-                content = upLevel.content;
-            else
-                content = null;
-        }
-
-        return {bUp: bUp, content: content};
-
-    },
-    // TODO
-    // пересмотреть логику
-    goToLowerLevel: function(coord)
-    {
-        var state = false, bLow = false, content = null;
-        var alignPrev = this.align(this.CurPos_X, this.CurPos_Y);
-
-        var crd = {x: coord.x + alignPrev.x, y: coord.y};
-
-        if( this.CurPos_X < this.nRow - 1 )
-        {
-            this.CurPos_X++;
-            while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() && this.CurPos_X < this.nRow - 1)
-            {
-                this.CurPos_X++;
-            }
-            if( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() ) // все элементы только для отрисовки и дошли до конца
-            {
-                this.CurPos_X = prevPos.x;
-                state = false;
-            }
-            else
-                state = true;
-        }
-
-        if( state )
-        {
-            bLow = true;
-            var size = this.elements[this.CurPos_X][this.CurPos_Y].size;
-            var alignCurr = this.align(this.CurPos_X, this.CurPos_Y);
-            crd.y = 0;
-
-            if( crd.x < alignCurr.x )
-                crd.x = 0;
-            else if( crd.x > alignCurr.x + size.width )
-                crd.x = size.width;
-            else
-                crd.x = crd.x - alignCurr.x;
-            content = this.elements[this.CurPos_X][this.CurPos_Y].afterDisplacement(crd);
-        }
-        else
-        {
-            var maxWH = this.getWidthsHeights();
-            var widthToEl = 0;
-            for(var j = 0; j < this.CurPos_Y; j++)
-                widthToEl += maxWH.widths[j] + this.dW;
-                //widthToEl += maxWH.widths[j] + this.gaps.column[j+1];
-
-            crd.x += widthToEl;
-            var lowLevel = this.Parent.goToLowerLevel(crd);
-            bLow = lowLevel.bLow;
-
-            if(bLow)
-                content = lowLevel.content;
-            else
-                content = null;
-
-        }
-
-        return {bLow: bLow, content: content};
-    },
-    afterDisplacement: function(coord) //аналог mouseDown
-    {
-        var disp = this.findDisposition(coord);
-        this.CurPos_X = disp.pos.x;
-        this.CurPos_Y = disp.pos.y;
-
-        var content = this.elements[this.CurPos_X][this.CurPos_Y].afterDisplacement(disp.mCoord);
-
-        return content;
-    },
-    /*cursor_MoveToStartPos: function() //   home => cursor_MoveToStartPos
-    {
-        this.CurPos_X = 0;
-        this.CurPos_Y = 0;
-        while(this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw())
-        {
-            if( this.CurPos_Y < this.nCol - 1 )
-            {
-                this.CurPos_Y++;
-            }
-            else if(this.CurPos_X < this.nRow - 1)
-            {
-                this.CurPos_X++;
-                this.CurPos_Y = 0;
-            }
-        }
-
-        this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
-    },
-    cursor_MoveToEndPos: function()  //  end => cursor_MoveToEndPos
-    {
-         this.CurPos_X = this.nRow - 1;
-         this.CurPos_Y = this.nCol - 1;
-         while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-         {
-             if( this.CurPos_Y > 0)
-             {
-                 this.CurPos_Y--;
-             }
-             else if(this.CurPos_X > 0)
-             {
-                 this.CurPos_X--;
-                 this.CurPos_Y = this.nCol - 1;
-             }
-         }
-
-         this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
-
-    },*/
-    mouseUp: function()
-    {
-        this.elements[this.CurPos_X][this.CurPos_Y].mouseUp();
-     },
     getWidthsHeights: function()
     {
         var Widths = [];
@@ -644,35 +266,6 @@ CMathBase.prototype =
         }
 
         return { widths: Widths, heights: Heights };
-    },
-    mouseDown: function( mCoord)
-    {
-        var elem = this.findDisposition( mCoord);
-
-        this.CurPos_X = elem.pos.x;
-        this.CurPos_Y = elem.pos.y;
-
-        var res = this.elements[this.CurPos_X][this.CurPos_Y].mouseDown( elem.mCoord, elem.inside_flag );
-
-        return res;
-
-    },
-    mouseMove: function( mCoord )
-    {
-        var state = true, SelectContent = null;
-        var elem = this.findDisposition( mCoord);
-
-        if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
-        {
-            var movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove( elem.mCoord );
-            SelectContent = movement.SelectContent;
-            state = true;
-        }
-        else
-            state = false;
-
-        return {state: state, SelectContent: SelectContent};
-
     },
     align: function(pos_x, pos_y)
     {
@@ -1105,7 +698,7 @@ CMathBase.prototype =
         return content;
     },
     ////    For Edit   /////
-    selection_Start: function(x, y)
+    /*selection_Start: function(x, y)
     {
         var elem = this.findDisposition({x: x, y: y});
         var X = elem.mCoord.x,
@@ -1236,7 +829,7 @@ CMathBase.prototype =
             content = this.elements[this.CurPos_X][this.CurPos_Y].goToRightSelect(bParent);
 
         return content;
-    },
+    },*/
     getGapsInside: function(RecalcInfo)
     {
         var kind = this.kind;
