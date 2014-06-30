@@ -292,6 +292,8 @@
 
 		this.reconnectTimeout = null;
 		this.attemptCount = 0;
+		this.maxAttemptCount = 50;
+		this.reconnectInterval = 2000;
 
 		this._docid = null;
 		this._token = null;
@@ -901,7 +903,7 @@
 		};
 		sockjs.onclose = function (evt) {
 			t._state = -1; // Reconnect state
-			var bIsDisconnectAtAll = t.attemptCount >= 20 || t.isCloseCoAuthoring;
+			var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount || t.isCloseCoAuthoring;
 			if (bIsDisconnectAtAll)
 				t._state = 3; // Closed state
 			if (t.onDisconnect) {
@@ -910,7 +912,7 @@
 			if (t.isCloseCoAuthoring)
 				return;
 			//Try reconect
-			if (t.attemptCount < 20) {
+			if (t.attemptCount < t.maxAttemptCount) {
 				t._tryReconnect();
 			}
 		};
@@ -927,7 +929,7 @@
 		this.reconnectTimeout = setTimeout(function () {
 			delete t.sockjs;
 			t._initSocksJs();
-		}, 500 * t.attemptCount);
+		}, this.reconnectInterval);
 
 	};
 
