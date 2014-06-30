@@ -2704,10 +2704,6 @@ function DrawingObjects() {
     var worksheet = null;
     var asc_Range = asc.Range;
 
-    var chartRender = null;
-    if ( typeof ChartRender !== "undefined" )
-        chartRender = new ChartRender();
-
     var isInit = false;
     var drawingCtx = null;
     var overlayCtx = null;
@@ -3271,10 +3267,6 @@ function DrawingObjects() {
 
     _this.getAllFonts = function(AllFonts) {
 
-    };
-
-    _this.getChartRender = function() {
-        return chartRender;
     };
 
     _this.getOverlay = function() {
@@ -5304,7 +5296,6 @@ function DrawingObjects() {
 
       //  if ( !api.chartStyleManager.isReady()) {
       //      api.chartStyleManager.init();
-      //      api.chartPreviewManager.init();
       //      _this.callTrigger("asc_onUpdateChartStyles");
       //  }
 

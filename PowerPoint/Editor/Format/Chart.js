@@ -1229,6 +1229,7 @@ CChartAsGroup.prototype =
             {
 
                 var options = {theme: parents.theme, slide: parents.slide, layout: parents.layout, master: parents.master};
+				// ToDo ChartRender больше нет, поправить!!!!!!
                 this.brush.fill.canvas = (new ChartRender(options)).insertChart(this.chart, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extY), undefined, undefined, options);
                 this.brush.fill.RasterImageId = "";
                 //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);

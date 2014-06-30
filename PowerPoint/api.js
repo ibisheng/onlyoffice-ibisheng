@@ -679,7 +679,7 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function(options)
             if ( this.SelectedObjectsStack[i].Value.ChartProperties )
             {
                 this.chartStyleManager.init(options);
-                this.chartPreviewManager.init(options);
+                this.chartPreviewManager.init(options); // ToDo этой функции уже нет, когда будут правиться презентации - поправить!!!
                 this.asc_fireCallback("asc_onUpdateChartStyles");
                 break;
             }
