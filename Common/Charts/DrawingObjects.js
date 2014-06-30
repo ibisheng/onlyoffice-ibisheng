@@ -3649,7 +3649,7 @@ function DrawingObjects() {
             else if ( graphicObject instanceof CShape )
                 printShape(graphicObject, ctx, top, left);
             // Chart
-            else if (typeof CChartAsGroup != "undefined" &&  graphicObject instanceof CChartAsGroup )
+            else if (graphicObject instanceof CChartSpace)
                 printChart(graphicObject, ctx, top, left);
             // Group
             else if ( graphicObject instanceof CGroupShape )
@@ -3702,7 +3702,7 @@ function DrawingObjects() {
 
         function printChart(graphicObject, ctx, top, left) {
 
-            if ( typeof CChartAsGroup != "undefined" && (graphicObject instanceof CChartAsGroup) && graphicObject && ctx ) {
+            if ( (graphicObject instanceof CChartSpace) && graphicObject && ctx ) {
 
                 // Save
                 var tx = graphicObject.transform.tx;
@@ -3710,35 +3710,14 @@ function DrawingObjects() {
                 graphicObject.transform.tx -= left;
                 graphicObject.transform.ty -= top;
 
-                var chartTxtAreas = [], aTxtTransform = [];
-                // Title
-                if ( graphicObject.chartTitle && graphicObject.chartTitle.txBody && graphicObject.chartTitle.transformText )
-                    chartTxtAreas.push(graphicObject.chartTitle);
-                // Axis Y
-                if ( graphicObject.vAxisTitle && graphicObject.vAxisTitle.txBody && graphicObject.vAxisTitle.transformText )
-                    chartTxtAreas.push(graphicObject.vAxisTitle);
-                // Axis X
-                if ( graphicObject.hAxisTitle && graphicObject.hAxisTitle.txBody && graphicObject.hAxisTitle.transformText )
-                    chartTxtAreas.push(graphicObject.hAxisTitle);
-
-				var i, item;
-                for (i = 0; i < chartTxtAreas.length; i++ ) {
-                    item = chartTxtAreas[i];
-                    aTxtTransform.push( { tx: item.transformText.tx, ty: item.transformText.ty } );
-                    item.transformText.tx -= left;
-                    item.transformText.ty -= top;
-                }
+                graphicObject.updateChildLabelsTransform(graphicObject.transform.tx, graphicObject.transform.ty);
                 // Print
                 graphicObject.draw( ctx );
                 // Restore
                 graphicObject.transform.tx = tx;
                 graphicObject.transform.ty = ty;
+                graphicObject.updateChildLabelsTransform(graphicObject.transform.tx, graphicObject.transform.ty);
 
-                for (i = 0; i < chartTxtAreas.length; i++ ) {
-                    item = chartTxtAreas[i];
-                    item.transformText.tx = aTxtTransform[i].tx;
-                    item.transformText.ty = aTxtTransform[i].ty;
-                }
             }
         }
 
@@ -3754,7 +3733,7 @@ function DrawingObjects() {
                     else if ( graphicItem instanceof CShape )
                         printShape(graphicItem, ctx, top, left);
 
-                    else if ( typeof CChartAsGroup != "undefined" && graphicItem instanceof CChartAsGroup )
+                    else if (graphicItem instanceof CChartSpace )
                         printChart(graphicItem, ctx, top, left);
                 }
             }
