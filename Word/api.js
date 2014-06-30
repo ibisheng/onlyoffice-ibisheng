@@ -7003,6 +7003,7 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
     {
         this.isViewMode = true;
         this.ShowParaMarks = false;
+		CollaborativeEditing.m_bGlobalLock = true;
         //this.isShowTableEmptyLine = false;
         //this.WordControl.m_bIsRuler = true;
         this.WordControl.m_oDrawingDocument.ClearCachePages();
