@@ -1120,7 +1120,7 @@ CDocument.prototype =
         var bStart           = this.FullRecalc.Start;
         var StartIndex       = this.FullRecalc.StartIndex;
         var bStartNewSection = this.FullRecalc.NewSection;
-        
+
         var SectElement = this.SectionsInfo.Get_SectPr( StartIndex );
         
         var OldPage = ( undefined !== this.Pages[PageIndex] ? this.Pages[PageIndex] : null );
@@ -1945,6 +1945,14 @@ CDocument.prototype =
 
     Internal_CheckCurPage : function()
     {
+        if (docpostype_HdrFtr === this.CurPos.Type)
+        {
+            var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+
+            var CurHdrFtr = this.CurHdrFtr;
+            if (null !== CurHdrFtr && -1 !== CurHdrFtr.RecalcInfo.CurPage)
+                this.CurPage = CurHdrFtr.RecalcInfo.CurPage;
+        }
         if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
@@ -8394,16 +8402,10 @@ CDocument.prototype =
                 return;
             }
 
-            // Заполним массив для проверки лока
-            var ArrayForCheck = [];
-            var Count = DocContent.Elements.length;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                ArrayForCheck.push( DocContent.Elements[0].Element );
-            }
-            ArrayForCheck.push( Para );
+            // Если мы копируем, тогда не надо проверять выделенные параграфы, а если переносим, тогда проверяем 
+            var CheckChangesType = (true !== bCopy ? changestype_Document_Content : changestype_None);
 
-            if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : ArrayForCheck, CheckType : changestype_Paragraph_Content } ) )
+            if ( false === this.Document_Is_SelectionLocked( CheckChangesType, { Type : changestype_2_ElementsArray_and_Type, Elements : [Para], CheckType : changestype_Paragraph_Content } ) )
             {
                 // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
                 if ( true !== bCopy )
@@ -8438,9 +8440,9 @@ CDocument.prototype =
         
         // Заполняем выделенный контент
         if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Get_SelectedContent(SelectedContent);
+            this.HdrFtr.Get_SelectedContent(SelectedContent);
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.Get_SelectedContent(SelectedContent);
+            this.DrawingObjects.Get_SelectedContent(SelectedContent);
         else
         {
             if ( true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common )

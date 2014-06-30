@@ -211,7 +211,7 @@ CHeaderFooter.prototype =
         {
             this.RecalcInfo.CurPage = Page_abs;
             
-            if ( docpostype_Content === this.LogicDocument.CurPos.Type )
+            if ( docpostype_HdrFtr === this.LogicDocument.CurPos.Type )
             {
                 // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
                 this.LogicDocument.Document_UpdateSelectionState();

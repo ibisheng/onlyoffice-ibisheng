@@ -1698,6 +1698,7 @@ ParaRun.prototype =
                             {
                                 Para.Recalculate_Drawing_AddPageBreak( 0, 0, true );
                                 PRS.RecalcResult = recalcresult_NextPage;
+                                PRS.NewRange = true;
                                 return;
                             }
                             else
@@ -1706,6 +1707,7 @@ ParaRun.prototype =
                                 {
                                     Para.Recalculate_Drawing_AddPageBreak( CurLine, CurPage, false );
                                     PRS.RecalcResult = recalcresult_NextPage;
+                                    PRS.NewRange = true;
                                     return;
                                 }
                                 else

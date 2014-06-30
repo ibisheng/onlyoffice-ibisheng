@@ -1196,7 +1196,8 @@ ParaHyperlink.prototype =
 
     Refresh_RecalcData : function(Data)
     {
-        this.Paragraph.Refresh_RecalcData2(0);
+        if (undefined !== this.Paragraph && null !== this.Paragraph)
+            this.Paragraph.Refresh_RecalcData2(0);
     },
 
     Recalculate_MinMaxContentWidth : function(MinMax)

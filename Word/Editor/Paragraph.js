@@ -1147,9 +1147,13 @@ Paragraph.prototype =
                 this.ParaEnd.Range = CurRange;
             }
 
+            // Такое может случиться, если мы насильно переносим автофигуру на следующую страницу
+            if (recalcresult_NextPage === PRS.RecalcResult)
+                return;
+
             CurRange++;
         }
-
+        
         //-------------------------------------------------------------------------------------------------------------
         // 1. Обновляем метрики данной строки
         //-------------------------------------------------------------------------------------------------------------
@@ -6104,9 +6108,39 @@ Paragraph.prototype =
                 StartContentPos = EndContentPos;
                 EndContentPos   = Temp;
             }
+            
+            // Если у нас попадает комментарий с данную область, тогда удалим его.
+            // TODO: Переделать здесь, когда комментарии смогут лежать во всех классах (например в Hyperlink)
 
             var StartPos = StartContentPos.Get(0);
             var EndPos   = EndContentPos.Get(0);
+            
+            var CommentsToDelete = {};
+            for (var Pos = StartPos; Pos <= EndPos; Pos++)
+            {
+                var Item = this.Content[Pos];
+                if (para_Comment === Item.Type)
+                    CommentsToDelete[Item.CommentId] = true;
+            }
+
+            for (var CommentId in CommentsToDelete)
+            {
+                this.LogicDocument.Remove_Comment( CommentId, true );
+            }
+
+            // Еще раз обновим метки
+            StartContentPos = this.Get_ParaContentPos(true, true);
+            EndContentPos   = this.Get_ParaContentPos(true, false);
+
+            if ( StartContentPos.Compare(EndContentPos) > 0 )
+            {
+                var Temp = StartContentPos;
+                StartContentPos = EndContentPos;
+                EndContentPos   = Temp;
+            }
+
+            StartPos = StartContentPos.Get(0);
+            EndPos   = EndContentPos.Get(0);
 
             // TODO: Как только избавимся от ParaEnd, здесь надо будет переделать.
             if ( this.Content.length - 1 === EndPos && true === this.Selection_CheckParaEnd() )
