@@ -9,10 +9,10 @@
 "use strict";
 
 var NumberBase = {
-    BIN : 2,
-    OCT : 8,
-    DEC : 10,
-    HEX : 16
+    BIN:2,
+    OCT:8,
+    DEC:10,
+    HEX:16
 }
 
 var f_PI_DIV_2 = Math.PI / 2;
@@ -117,8 +117,8 @@ function BesselI( x, n ) {
     var nK = 0, fTerm = 1;
     // avoid overflow in Fak(n)
     /*for ( nK = 1; nK <= n; ++nK ) {
-        fTerm = fTerm / nK * fXHalf;
-    }*/
+     fTerm = fTerm / nK * fXHalf;
+     }*/
 
     fTerm = Math.pow( fXHalf, n ) / Math.fact( n );
 
@@ -131,21 +131,21 @@ function BesselI( x, n ) {
 
             /*  Calculation of TERM(n,k) from TERM(n,k-1):
 
-                            (x/2)^(n+2k)
+             (x/2)^(n+2k)
              TERM(n,k)  =  --------------
-                              k! (n+k)!
+             k! (n+k)!
 
-                 (x/2)^2 (x/2)^(n+2(k-1))
+             (x/2)^2 (x/2)^(n+2(k-1))
              =  --------------------------
-                 k (k-1)! (n+k) (n+k-1)!
+             k (k-1)! (n+k) (n+k-1)!
 
-                 (x/2)^2     (x/2)^(n+2(k-1))
+             (x/2)^2     (x/2)^(n+2(k-1))
              =  --------- * ------------------
-                 k(n+k)      (k-1)! (n+k-1)!
+             k(n+k)      (k-1)! (n+k-1)!
 
-                  x^2/4
+             x^2/4
              =  -------- TERM(n,k-1)
-                  k(n+k)
+             k(n+k)
              */
 //            fTerm = fTerm * fXHalf / nK * fXHalf / (nK + n);
             fResult = fResult + fTerm;
@@ -205,8 +205,12 @@ function BesselK( fNum, nOrder ) {
 
             var fTox = 2 / fNum, fBkm = Besselk0( fNum ), fBk = Besselk1( fNum );
 
-            if( fBkm instanceof  cError ){ return fBkm; }
-            if( fBk instanceof  cError ){ return fBk; }
+            if ( fBkm instanceof  cError ) {
+                return fBkm;
+            }
+            if ( fBk instanceof  cError ) {
+                return fBk;
+            }
 
             fBkm = fBkm.getValue();
             fBk = fBk.getValue();
@@ -223,11 +227,11 @@ function BesselK( fNum, nOrder ) {
 }
 
 function Bessely0( fX ) {
-    if ( fX <= 0 ){
+    if ( fX <= 0 ) {
         return new cError( cErrorType.not_numeric );
     }
     var fMaxIteration = 9000000; // should not be reached
-    if ( fX > 5.0e+6 ){ // iteration is not considerable better then approximation
+    if ( fX > 5.0e+6 ) { // iteration is not considerable better then approximation
         return new cNumber( Math.sqrt( 1 / Math.PI / fX ) * (Math.sin( fX ) - Math.cos( fX )) );
     }
     var epsilon = 1.0e-15, EulerGamma = 0.57721566490153286060;
@@ -242,7 +246,7 @@ function Bessely0( fX ) {
     {
         km1mod2 = Math.fmod( k - 1, 2 );
         m_bar = (2 * km1mod2) * f_bar;
-        if ( km1mod2 == 0 ){
+        if ( km1mod2 == 0 ) {
             alpha = 0;
         }
         else {
@@ -259,10 +263,10 @@ function Bessely0( fX ) {
         k = k + 1;
     }
     while ( !bHasFound && k < fMaxIteration );
-    if ( bHasFound ){
+    if ( bHasFound ) {
         return new cNumber( u * f_2_DIV_PI );
     }
-    else{
+    else {
         return new cError( cErrorType.not_numeric );
     }
 }
@@ -270,11 +274,11 @@ function Bessely0( fX ) {
 // See #i31656# for a commented version of this implementation, attachment #desc6
 // http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
 function Bessely1( fX ) {
-    if ( fX <= 0 ){
+    if ( fX <= 0 ) {
         return new cError( cErrorType.not_numeric );
     }
     var fMaxIteration = 9000000; // should not be reached
-    if ( fX > 5e+6 ){ // iteration is not considerable better then approximation
+    if ( fX > 5e+6 ) { // iteration is not considerable better then approximation
         return new cNumber( -Math.sqrt( 1 / Math.PI / fX ) * (Math.sin( fX ) + Math.cos( fX )) );
     }
     var epsilon = 1.0e-15, EulerGamma = 0.57721566490153286060, alpha = 1 / fX, f_bar = -1, u = alpha, k = 1, m_bar = 0;
@@ -292,11 +296,11 @@ function Bessely1( fX ) {
         km1mod2 = Math.fmod( k - 1, 2 );
         m_bar = (2 * km1mod2) * f_bar;
         q = (k - 1) / 2;
-        if ( km1mod2 == 0 ){ // k is odd
+        if ( km1mod2 == 0 ) { // k is odd
             alpha = sign_alpha * (1 / q + 1 / (q + 1));
             sign_alpha = -sign_alpha;
         }
-        else{
+        else {
             alpha = 0;
         }
         g_bar_delta_u = f_bar * alpha - g * delta_u - m_bar * u;
@@ -309,10 +313,10 @@ function Bessely1( fX ) {
         k = k + 1;
     }
     while ( !bHasFound && k < fMaxIteration );
-    if ( bHasFound ){
+    if ( bHasFound ) {
         return new cNumber( -u * 2 / Math.PI );
     }
-    else{
+    else {
         return new cError( cErrorType.not_numeric );
     }
 }
@@ -323,11 +327,16 @@ function BesselY( fNum, nOrder ) {
             return Bessely0( fNum );
         case 1:
             return Bessely1( fNum );
-        default:{
+        default:
+        {
             var fByp, fTox = 2 / fNum, fBym = Bessely0( fNum ), fBy = Bessely1( fNum );
 
-            if( fBym instanceof  cError ){ return fBym; }
-            if( fBy instanceof  cError ){ return fBy; }
+            if ( fBym instanceof  cError ) {
+                return fBym;
+            }
+            if ( fBy instanceof  cError ) {
+                return fBy;
+            }
 
             fBym = fBym.getValue();
             fBy = fBy.getValue();
@@ -345,66 +354,66 @@ function BesselY( fNum, nOrder ) {
 
 function erf( x ) {
 
-    var sqrtPI2 = 2 / Math.sqrt( Math.PI ), maxIter = 200, eps = 1e-14, res = x*sqrtPI2, v = 1, j = 1, i = 1, oldRes = 0, cont = true,
+    var sqrtPI2 = 2 / Math.sqrt( Math.PI ), maxIter = 200, eps = 1e-14, res = x * sqrtPI2, v = 1, j = 1, i = 1, oldRes = 0, cont = true,
         sqrtPI = Math.sqrt( Math.PI );
 
     /*for ( i = 1; i < maxIter && cont; i++) {
-        oldRes = res;
-        for ( j = 1, v = 1; j <= i; j++ ) {
-            v *= -x * x / j;
-        }
-        res += sqrtPI2*x * v / (2 * i + 1);
-        cont = (Math.abs(oldRes-res) >= eps);
-    }*/
+     oldRes = res;
+     for ( j = 1, v = 1; j <= i; j++ ) {
+     v *= -x * x / j;
+     }
+     res += sqrtPI2*x * v / (2 * i + 1);
+     cont = (Math.abs(oldRes-res) >= eps);
+     }*/
 
-/*    var r = -Math.exp(-x*x)/(x*sqrtPI), mo = -1
-    x = 2*x*x;
+    /*    var r = -Math.exp(-x*x)/(x*sqrtPI), mo = -1
+     x = 2*x*x;
 
-    for ( i = 1, res = 1; i < maxIter && cont; i++) {
-        oldRes = res;
+     for ( i = 1, res = 1; i < maxIter && cont; i++) {
+     oldRes = res;
 
-        res += Math.pow( -1, i ) * Math.doubleFact( 2*i-1 ) / Math.pow( x, i );
+     res += Math.pow( -1, i ) * Math.doubleFact( 2*i-1 ) / Math.pow( x, i );
 
-        cont = (Math.abs(oldRes-res) >= eps);
+     cont = (Math.abs(oldRes-res) >= eps);
 
-    }
-    res = res * r;*/
+     }
+     res = res * r;*/
 
     return res /** sqrtPI2*/;
 }
 
-function validBINNumber(n){
-    return rg_validBINNumber.test(n);
+function validBINNumber( n ) {
+    return rg_validBINNumber.test( n );
 }
 
-function validDEC2BINNumber(n){
-    return rg_validDEC2BINNumber.test(n);
+function validDEC2BINNumber( n ) {
+    return rg_validDEC2BINNumber.test( n );
 }
 
-function validDEC2OCTNumber(n){
-    return rg_validDEC2OCTNumber.test(n);
+function validDEC2OCTNumber( n ) {
+    return rg_validDEC2OCTNumber.test( n );
 }
 
-function validDEC2HEXNumber(n){
-    return rg_validDEC2HEXNumber.test(n);
+function validDEC2HEXNumber( n ) {
+    return rg_validDEC2HEXNumber.test( n );
 }
 
-function validHEXNumber(n){
-    return rg_validHEXNumber.test(n);
+function validHEXNumber( n ) {
+    return rg_validHEXNumber.test( n );
 }
 
-function validOCTNumber(n){
-    return rg_validOCTNumber.test(n);
+function validOCTNumber( n ) {
+    return rg_validOCTNumber.test( n );
 }
 
-function convertFromTo(src,from,to,charLim){
+function convertFromTo( src, from, to, charLim ) {
     var res = parseInt( src, from ).toString( to );
     if ( charLim == undefined ) {
-        return new cString(res.toUpperCase());
+        return new cString( res.toUpperCase() );
     }
     else {
         charLim = parseInt( charLim );
-        if( charLim >= res.length ){
+        if ( charLim >= res.length ) {
             return new cString( (String.prototype.repeat( '0', charLim - res.length ) + res).toUpperCase() );
         }
         else {
@@ -413,11 +422,11 @@ function convertFromTo(src,from,to,charLim){
     }
 }
 
-function Complex(r,i,suffix){
-    if( arguments.length == 1 ){
-        return this.parseComplexStr(arguments[0]);
+function Complex( r, i, suffix ) {
+    if ( arguments.length == 1 ) {
+        return this.parseComplexStr( arguments[0] );
     }
-    else{
+    else {
         this.real = r;
         this.img = i;
         this.suffix = suffix ? suffix : "i";
@@ -446,7 +455,7 @@ Complex.prototype = {
                 res.push( "-" );
             }
             else {
-                this.img > 0 && hasReal ? res.push( "+"+this.img ) : res.push( this.img );
+                this.img > 0 && hasReal ? res.push( "+" + this.img ) : res.push( this.img );
             }
             res.push( this.suffix );
         }
@@ -474,12 +483,12 @@ Complex.prototype = {
 
         return phi;
     },
-    Conj:function(){
+    Conj:function () {
         var c = new Complex( this.real, -this.img, this.suffix );
         return c.toString();
     },
-    Cos:function(){
-        if( i ){
+    Cos:function () {
+        if ( i ) {
             var a = Math.cos( this.real ) * Math.cosh( this.img );
             this.img = -( Math.sin( this.real ) * Math.sinh( this.img ) );
             this.real = a;
@@ -487,17 +496,17 @@ Complex.prototype = {
         else
             this.real = cos( this.real );
     },
-    Sin:function(){
-        if( this.img ){
+    Sin:function () {
+        if ( this.img ) {
             var a = Math.sin( this.real ) * Math.cosh( this.img );
             this.img = Math.cos( this.real ) * Math.sinh( this.img );
             this.real = a;
         }
-        else{
+        else {
             this.real = Math.sin( this.real );
         }
     },
-    Div:function(comp){
+    Div:function ( comp ) {
 
         var a = this.real, b = this.img,
             c = comp.real, d = comp.img,
@@ -506,64 +515,62 @@ Complex.prototype = {
         return new Complex( (a * c + b * d) * f, (b * c - a * d) * f, this.suffix );
 
     },
-    Exp:function(){
+    Exp:function () {
 
         var e = Math.exp( this.real ),
             c = Math.cos( this.img ),
             s = Math.sin( this.img );
 
-        this.real = e*c;
-        this.img = e*s;
+        this.real = e * c;
+        this.img = e * s;
 
     },
-    Ln:function(){
+    Ln:function () {
 
         var abs = this.Abs(),
             arg = this.Arg();
 
-        this.real = Math.ln(abs);
+        this.real = Math.ln( abs );
         this.img = arg;
 
     },
-    Log10:function(){
+    Log10:function () {
 
-        var c = new Complex( Math.ln(10), 0 )
+        var c = new Complex( Math.ln( 10 ), 0 )
         this.Ln();
-        c = this.Div(c);
+        c = this.Div( c );
 
         this.real = c.real;
         this.img = c.img;
 
     },
-    Log2:function(){
+    Log2:function () {
 
-        var c = new Complex( Math.ln(2), 0 )
+        var c = new Complex( Math.ln( 2 ), 0 )
         this.Ln();
-        c = this.Div(c);
+        c = this.Div( c );
 
         this.real = c.real;
         this.img = c.img;
 
     },
-    Power:function(power){
+    Power:function ( power ) {
 
-        if( this.real == 0 && this.img == 0 )
-        {
-            if( power > 0 )
-            {
+        if ( this.real == 0 && this.img == 0 ) {
+            if ( power > 0 ) {
                 this.real = this.img = 0;
                 return true;
             }
             else
                 return false;
         }
-        else{
+        else {
 
             var p = this.Abs(),
                 phi;
 
             phi = Math.acos( this.real / p );
-            if( i < 0 ){
+            if ( i < 0 ) {
                 phi = -phi;
             }
 
@@ -577,7 +584,7 @@ Complex.prototype = {
         }
 
     },
-    Product:function(comp){
+    Product:function ( comp ) {
 
         var a = this.real, b = this.img,
             c = comp.real, d = comp.img;
@@ -586,72 +593,72 @@ Complex.prototype = {
         this.img = a * d + b * c;
 
     },
-    SQRT:function(){
+    SQRT:function () {
 
-        if( this.real || this.img ){
+        if ( this.real || this.img ) {
             var abs = this.Abs(),
                 arg = this.Arg();
 
-            this.real = Math.sqrt(abs)*Math.cos(arg/2);
-            this.img = Math.sqrt(abs)*Math.sin(arg/2);
+            this.real = Math.sqrt( abs ) * Math.cos( arg / 2 );
+            this.img = Math.sqrt( abs ) * Math.sin( arg / 2 );
 
         }
 
     },
-    Sub:function(comp){
+    Sub:function ( comp ) {
 
         this.real -= comp.real;
         this.img -= comp.img;
 
     },
-    Sum:function(comp){
+    Sum:function ( comp ) {
 
         this.real += comp.real;
         this.img += comp.img;
 
     },
-    isImagUnit:function(c){
+    isImagUnit:function ( c ) {
         return c == 'i' || c == 'j';
     },
-    parseComplexStr:function(s){
-        var match = rg_complex_number.xexec(s), r, i, suf;
-        if( match ){
+    parseComplexStr:function ( s ) {
+        var match = rg_complex_number.xexec( s ), r, i, suf;
+        if ( match ) {
             r = match["real"];
             i = match["img"];
 
-            if( !(r || i) ){
+            if ( !(r || i) ) {
                 return new cError( cErrorType.not_numeric );
             }
 
-            if( i ){
-                suf = i[i.length-1];
-                i = i.substr(0,i.length-1);
-                if( i.length == 1 && (i[0] == "-" || i[0]== "+" ) ){
-                    i = parseFloat( i+"1" );
+            if ( i ) {
+                suf = i[i.length - 1];
+                i = i.substr( 0, i.length - 1 );
+                if ( i.length == 1 && (i[0] == "-" || i[0] == "+" ) ) {
+                    i = parseFloat( i + "1" );
                 }
-                else{
-                    i = parseFloat(i);
+                else {
+                    i = parseFloat( i );
                 }
             }
-            else{
+            else {
                 i = 0;
             }
 
-            if( r ){
-                r = parseFloat(r);
+            if ( r ) {
+                r = parseFloat( r );
             }
-            else{
+            else {
                 r = 0;
             }
 
             return new Complex( r, i, suf ? suf : "i" );
 
         }
-        else{
+        else {
             return new cError( cErrorType.not_numeric );
         }
     },
-    ParseString:function (rStr, rCompl){
+    ParseString:function ( rStr, rCompl ) {
 
         var pStr = rStr;
 
@@ -671,7 +678,8 @@ Complex.prototype = {
 
         switch ( pStr ) {
             case '-':   // imag part follows
-            case '+':{
+            case '+':
+            {
                 var r = f;
                 if ( this.isImagUnit( pStr[ 1 ] ) ) {
                     rCompl.c = pStr[ 1 ];
@@ -681,10 +689,10 @@ Complex.prototype = {
                         return true;
                     }
                 }
-                else if ( ParseDouble( pStr, f ) && this.isImagUnit( pStr ) ){
+                else if ( ParseDouble( pStr, f ) && this.isImagUnit( pStr ) ) {
                     rCompl.c = pStr;
                     pStr++;
-                    if ( pStr == 0 ){
+                    if ( pStr == 0 ) {
                         rCompl.r = r;
                         rCompl.i = f;
                         return true;
@@ -696,7 +704,7 @@ Complex.prototype = {
             case 'i':
                 rCompl.c = pStr;
                 pStr++;
-                if ( pStr == 0 ){
+                if ( pStr == 0 ) {
                     rCompl.i = f;
                     rCompl.r = 0.0;
                     return true;
@@ -762,49 +770,49 @@ function cBESSELI() {
 
 cBESSELI.prototype = Object.create( cBaseFunction.prototype );
 /*cBESSELI.prototype.Calculate = function ( arg ) {
-    var x = arg[0],
-        n = arg[1];
+ var x = arg[0],
+ n = arg[1];
 
-    if ( x instanceof cArea || x instanceof cArea3D ) {
-        x = x.cross( arguments[1].first );
-    }
-    else if ( x instanceof cArray ) {
-        x = x.getElementRowCol( 0, 0 );
-    }
+ if ( x instanceof cArea || x instanceof cArea3D ) {
+ x = x.cross( arguments[1].first );
+ }
+ else if ( x instanceof cArray ) {
+ x = x.getElementRowCol( 0, 0 );
+ }
 
-    if ( n instanceof cArea || n instanceof cArea3D ) {
-        n = n.cross( arguments[1].first );
-    }
-    else if ( n instanceof cArray ) {
-        n = n.getElementRowCol( 0, 0 );
-    }
+ if ( n instanceof cArea || n instanceof cArea3D ) {
+ n = n.cross( arguments[1].first );
+ }
+ else if ( n instanceof cArray ) {
+ n = n.getElementRowCol( 0, 0 );
+ }
 
-    x = x.tocNumber();
-    n = n.tocNumber();
+ x = x.tocNumber();
+ n = n.tocNumber();
 
-    if ( x instanceof cError ) {
-        return this.value = x;
-    }
-    if ( n instanceof cError ) {
-        return this.value = n;
-    }
+ if ( x instanceof cError ) {
+ return this.value = x;
+ }
+ if ( n instanceof cError ) {
+ return this.value = n;
+ }
 
-    x = x.getValue();
-    n = n.getValue();
+ x = x.getValue();
+ n = n.getValue();
 
-    if ( n < 0 ){
-        return this.value = new cError( cErrorType.not_numeric );
-    }
-    this.value = BesselI( x, n );
-    return this.value;
+ if ( n < 0 ){
+ return this.value = new cError( cErrorType.not_numeric );
+ }
+ this.value = BesselI( x, n );
+ return this.value;
 
-};
-cBESSELI.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( effect-rate , npery )"
-    };
-};*/
+ };
+ cBESSELI.prototype.getInfo = function () {
+ return {
+ name:this.name,
+ args:"( effect-rate , npery )"
+ };
+ };*/
 
 function cBESSELJ() {
     cBaseFunction.call( this, "BESSELJ" );
@@ -845,7 +853,7 @@ cBIN2DEC.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.getValue();
 
-    if( validBINNumber(arg0) ){
+    if ( validBINNumber( arg0 ) ) {
         var substr = arg0.toString();
         if ( substr.length == 10 && substr.substring( 0, 1 ) == "1" ) {
             this.value = new cNumber( parseInt( substr.substring( 1 ), NumberBase.BIN ) - 512 );
@@ -854,7 +862,7 @@ cBIN2DEC.prototype.Calculate = function ( arg ) {
             this.value = new cNumber( parseInt( arg0, NumberBase.BIN ) );
         }
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -896,23 +904,23 @@ cBIN2HEX.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validBINNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validBINNumber( arg0 ) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         var substr = arg0.toString();
         if ( substr.length === 10 && substr.substring( 0, 1 ) === '1' ) {
             this.value = new cString( (1099511627264 + parseInt( substr.substring( 1 ), NumberBase.BIN )).toString( NumberBase.HEX ).toUpperCase() );
         }
-        else{
+        else {
             this.value = convertFromTo( arg0, NumberBase.BIN, NumberBase.HEX, arg1 );
         }
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -954,23 +962,23 @@ cBIN2OCT.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validBINNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validBINNumber( arg0 ) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         var substr = arg0.toString();
         if ( substr.length === 10 && substr.substring( 0, 1 ) === '1' ) {
             this.value = new cString( (1073741312 + parseInt( substr.substring( 1 ), NumberBase.BIN )).toString( NumberBase.OCT ).toUpperCase() );
         }
-        else{
+        else {
             this.value = convertFromTo( arg0, NumberBase.BIN, NumberBase.OCT, arg1 );
         }
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -993,26 +1001,26 @@ cCOMPLEX.prototype.Calculate = function ( arg ) {
 
     var real = arg[0],
         img = arg[1],
-        suf = !arg[2] || arg[2] instanceof cEmpty ? new cString("i") : arg[2];
+        suf = !arg[2] || arg[2] instanceof cEmpty ? new cString( "i" ) : arg[2];
     if ( real instanceof cArea || img instanceof cArea3D ) {
         real = real.cross( arguments[1].first );
     }
     else if ( real instanceof cArray ) {
-        real = real.getElement(0);
+        real = real.getElement( 0 );
     }
 
     if ( img instanceof cArea || img instanceof cArea3D ) {
         img = img.cross( arguments[1].first );
     }
     else if ( img instanceof cArray ) {
-        img = img.getElement(0);
+        img = img.getElement( 0 );
     }
 
     if ( suf instanceof cArea || suf instanceof cArea3D ) {
         suf = suf.cross( arguments[1].first );
     }
     else if ( suf instanceof cArray ) {
-        suf = suf.getElement(0);
+        suf = suf.getElement( 0 );
     }
 
     real = real.tocNumber();
@@ -1027,11 +1035,11 @@ cCOMPLEX.prototype.Calculate = function ( arg ) {
     img = img.getValue();
     suf = suf.getValue();
 
-    if( suf != "i" && suf != "j" ){
+    if ( suf != "i" && suf != "j" ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    var c = new Complex(real,img,suf);
+    var c = new Complex( real, img, suf );
 
     this.value = new cString( c.toString() );
 
@@ -1076,25 +1084,25 @@ cDEC2BIN.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocNumber();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
-    arg0 = arg0.getValue();
+    arg0 = Math.floor( arg0.getValue() );
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validDEC2BINNumber(arg0) && arg0 >= -512 && arg0 <= 511 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validDEC2BINNumber( arg0 ) && arg0 >= -512 && arg0 <= 511 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         if ( arg0 < 0 ) {
             this.value = new cString( '1' + String.prototype.repeat( '0', 9 - (512 + arg0).toString( NumberBase.BIN ).length ) + (512 + arg0).toString( NumberBase.BIN ).toUpperCase() );
         }
-        else{
+        else {
             this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.BIN, arg1 );
         }
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1133,25 +1141,25 @@ cDEC2HEX.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocNumber();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
-    arg0 = arg0.getValue();
+    arg0 = Math.floor( arg0.getValue() );
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validDEC2HEXNumber(arg0) && arg0 >= -549755813888 && arg0 <= 549755813887 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validDEC2HEXNumber( arg0 ) && arg0 >= -549755813888 && arg0 <= 549755813887 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         if ( arg0 < 0 ) {
             this.value = new cString( (1099511627776 + arg0).toString( NumberBase.HEX ).toUpperCase() );
         }
-        else{
+        else {
             this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.HEX, arg1 );
         }
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1192,23 +1200,23 @@ cDEC2OCT.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validDEC2OCTNumber(arg0) && arg0 >= -536870912 && arg0 <= 536870911 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validDEC2OCTNumber( arg0 ) && arg0 >= -536870912 && arg0 <= 536870911 && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         if ( arg0 < 0 ) {
             this.value = new cString( (1073741824 + arg0).toString( NumberBase.OCT ).toUpperCase() );
         }
-        else{
+        else {
             this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.OCT, arg1 );
         }
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1229,20 +1237,20 @@ function cDELTA() {
 cDELTA.prototype = Object.create( cBaseFunction.prototype );
 cDELTA.prototype.Calculate = function ( arg ) {
 
-    var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
+    var number1 = arg[0], number2 = !arg[1] ? new cNumber( 0 ) : arg[1];
 
     if ( number1 instanceof cArea || number2 instanceof cArea3D ) {
         number1 = number1.cross( arguments[1].first );
     }
     else if ( number1 instanceof cArray ) {
-        number1 = number1.getElement(0);
+        number1 = number1.getElement( 0 );
     }
 
     if ( number2 instanceof cArea || number2 instanceof cArea3D ) {
         number2 = number2.cross( arguments[1].first );
     }
     else if ( number2 instanceof cArray ) {
-        number2 = number2.getElement(0);
+        number2 = number2.getElement( 0 );
     }
 
     number1 = number1.tocNumber();
@@ -1273,44 +1281,44 @@ function cERF() {
 cERF.prototype = Object.create( cBaseFunction.prototype );
 /*cERF.prototype.Calculate = function ( arg ) {
 
-    var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
-    if ( a instanceof cArea || b instanceof cArea3D ) {
-        a = a.cross( arguments[1].first );
-    }
-    else if ( a instanceof cArray ) {
-        a = a.getElement(0);
-    }
+ var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
+ if ( a instanceof cArea || b instanceof cArea3D ) {
+ a = a.cross( arguments[1].first );
+ }
+ else if ( a instanceof cArray ) {
+ a = a.getElement(0);
+ }
 
-    if ( b instanceof cArea || b instanceof cArea3D ) {
-        b = b.cross( arguments[1].first );
-    }
-    else if ( b instanceof cArray ) {
-        b = b.getElement(0);
-    }
+ if ( b instanceof cArea || b instanceof cArea3D ) {
+ b = b.cross( arguments[1].first );
+ }
+ else if ( b instanceof cArray ) {
+ b = b.getElement(0);
+ }
 
-    a = a.tocNumber();
-    if ( a instanceof cError ){ return this.value = a; }
+ a = a.tocNumber();
+ if ( a instanceof cError ){ return this.value = a; }
 
-    if( !( b instanceof cUndefined ) ){
-        b = b.tocNumber();
-        if ( b instanceof cError ){ return this.value = b; }
+ if( !( b instanceof cUndefined ) ){
+ b = b.tocNumber();
+ if ( b instanceof cError ){ return this.value = b; }
 
-        this.value = new cNumber( erf( b.getValue() ) - erf( a.getValue() ) );
+ this.value = new cNumber( erf( b.getValue() ) - erf( a.getValue() ) );
 
-    }
-    else{
-        this.value = new cNumber( erf( a.getValue() ) );
-    }
+ }
+ else{
+ this.value = new cNumber( erf( a.getValue() ) );
+ }
 
-    return this.value;
+ return this.value;
 
-}
-cERF.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( lower-bound [ , upper-bound ] )"
-    };
-}*/
+ }
+ cERF.prototype.getInfo = function () {
+ return {
+ name:this.name,
+ args:"( lower-bound [ , upper-bound ] )"
+ };
+ }*/
 
 function cERFC() {
     cBaseFunction.call( this, "ERFC" );
@@ -1325,20 +1333,20 @@ function cGESTEP() {
 cGESTEP.prototype = Object.create( cBaseFunction.prototype );
 cGESTEP.prototype.Calculate = function ( arg ) {
 
-    var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
+    var number1 = arg[0], number2 = !arg[1] ? new cNumber( 0 ) : arg[1];
 
     if ( number1 instanceof cArea || number2 instanceof cArea3D ) {
         number1 = number1.cross( arguments[1].first );
     }
     else if ( number1 instanceof cArray ) {
-        number1 = number1.getElement(0);
+        number1 = number1.getElement( 0 );
     }
 
     if ( number2 instanceof cArea || number2 instanceof cArea3D ) {
         number2 = number2.cross( arguments[1].first );
     }
     else if ( number2 instanceof cArray ) {
-        number2 = number2.getElement(0);
+        number2 = number2.getElement( 0 );
     }
 
     number1 = number1.tocNumber();
@@ -1390,31 +1398,33 @@ cHEX2BIN.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validHEXNumber( arg0 ) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         var negative = (arg0.length === 10 && arg0.substring( 0, 1 ).toUpperCase() === 'F'),
             arg0DEC = (negative) ? parseInt( arg0, NumberBase.HEX ) - 1099511627776 : parseInt( arg0, NumberBase.HEX );
 
         if ( arg0DEC < -512 || arg0DEC > 511 ) {
             this.value = new cError( cErrorType.not_numeric )
-        }else{
+        }
+        else {
 
             if ( negative ) {
                 var str = (512 + arg0DEC).toString( NumberBase.BIN );
                 this.value = new cString( '1' + String.prototype.repeat( '0', 9 - str.length ) + str );
-            }else{
+            }
+            else {
                 this.value = convertFromTo( arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1 );
             }
 
         }
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1450,13 +1460,13 @@ cHEX2DEC.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.getValue();
 
-    if( validHEXNumber(arg0) ){
+    if ( validHEXNumber( arg0 ) ) {
 
         arg0 = parseInt( arg0, NumberBase.HEX );
         this.value = new cNumber( (arg0 >= 549755813888) ? arg0 - 1099511627776 : arg0 );
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1498,30 +1508,32 @@ cHEX2OCT.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validHEXNumber( arg0 ) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         arg0 = parseInt( arg0, NumberBase.HEX );
 
         if ( arg0 > 536870911 && arg0 < 1098974756864 ) {
             this.value = new cError( cErrorType.not_numeric );
-        }else{
+        }
+        else {
 
             if ( arg0 >= 1098974756864 ) {
                 this.value = new cString( (arg0 - 1098437885952).toString( NumberBase.OCT ).toUpperCase() );
-            }else{
+            }
+            else {
                 this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.OCT, arg1 );
             }
 
         }
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1554,9 +1566,9 @@ cIMABS.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1589,9 +1601,9 @@ cIMAGINARY.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1624,9 +1636,9 @@ cIMARGUMENT.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1659,9 +1671,9 @@ cIMCONJUGATE.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1694,9 +1706,9 @@ cIMCOS.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1719,7 +1731,7 @@ function cIMDIV() {
 cIMDIV.prototype = Object.create( cBaseFunction.prototype );
 cIMDIV.prototype.Calculate = function ( arg ) {
 
-    var arg0 = arg[0],arg1 = arg[1];
+    var arg0 = arg[0], arg1 = arg[1];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -1741,14 +1753,14 @@ cIMDIV.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c1 = new Complex(arg0.toString()),
-        c2 = new Complex(arg1.toString() ),c3;
+    var c1 = new Complex( arg0.toString() ),
+        c2 = new Complex( arg1.toString() ), c3;
 
-    if( c1 instanceof cError || c2 instanceof cError ){
-        return this.value = new cError(cErrorType.not_numeric);
+    if ( c1 instanceof cError || c2 instanceof cError ) {
+        return this.value = new cError( cErrorType.not_numeric );
     }
 
-    c3 = c1.Div(c2);
+    c3 = c1.Div( c2 );
 
     return this.value = new cString( c3.toString() );
 
@@ -1779,9 +1791,9 @@ cIMEXP.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1816,9 +1828,9 @@ cIMLN.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1853,9 +1865,9 @@ cIMLOG10.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1890,9 +1902,9 @@ cIMLOG2.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -1937,16 +1949,16 @@ cIMPOWER.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
     if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
-    if( c.Power(arg1.getValue()) ){
+    if ( c.Power( arg1.getValue() ) ) {
         this.value = new cString( c.toString() );
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -1979,9 +1991,9 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-    var c = new Complex(arg0.toString() ), c1;
+    var c = new Complex( arg0.toString() ), c1;
 
-    if( c instanceof cError ) return this.value = c;
+    if ( c instanceof cError ) return this.value = c;
 
     for ( var i = 1; i < this.getArguments(); i++ ) {
 
@@ -1993,11 +2005,11 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
 
                 if ( _arg instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-                c1 = new Complex(_arg.toString());
+                c1 = new Complex( _arg.toString() );
 
-                if( c1 instanceof cError ) return this.value = c1;
+                if ( c1 instanceof cError ) return this.value = c1;
 
-                c.Product(c1);
+                c.Product( c1 );
 
             }
             continue;
@@ -2007,11 +2019,11 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
                 var e = elem.tocString();
                 if ( e instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-                c1 = new Complex(e.toString());
+                c1 = new Complex( e.toString() );
 
-                if( c1 instanceof cError ) return this.value = c1;
+                if ( c1 instanceof cError ) return this.value = c1;
 
-                c.Product(c1);
+                c.Product( c1 );
 
             } );
             continue;
@@ -2021,16 +2033,16 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
 
         if ( argI instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-        c1 = new Complex(argI.toString());
+        c1 = new Complex( argI.toString() );
 
-        c.Product(c1);
+        c.Product( c1 );
 
     }
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         this.value = c;
     }
-    else{
+    else {
         this.value = new cString( c.toString() );
     }
 
@@ -2063,9 +2075,9 @@ cIMREAL.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -2098,9 +2110,9 @@ cIMSIN.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -2135,9 +2147,9 @@ cIMSQRT.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c = new Complex(arg0.toString());
+    var c = new Complex( arg0.toString() );
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         return this.value = c;
     }
 
@@ -2160,7 +2172,7 @@ function cIMSUB() {
 cIMSUB.prototype = Object.create( cBaseFunction.prototype );
 cIMSUB.prototype.Calculate = function ( arg ) {
 
-    var arg0 = arg[0],arg1 = arg[1];
+    var arg0 = arg[0], arg1 = arg[1];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2182,14 +2194,14 @@ cIMSUB.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
-    var c1 = new Complex(arg0.toString()),
-        c2 = new Complex(arg1.toString());
+    var c1 = new Complex( arg0.toString() ),
+        c2 = new Complex( arg1.toString() );
 
-    if( c1 instanceof cError || c2 instanceof cError ){
-        return this.value = new cError(cErrorType.not_numeric);
+    if ( c1 instanceof cError || c2 instanceof cError ) {
+        return this.value = new cError( cErrorType.not_numeric );
     }
 
-    c1.Sub(c2);
+    c1.Sub( c2 );
 
     return this.value = new cString( c1.toString() );
 
@@ -2221,9 +2233,9 @@ cIMSUM.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-    var c = new Complex(arg0.toString() ), c1;
+    var c = new Complex( arg0.toString() ), c1;
 
-    if( c instanceof cError ) return this.value = c;
+    if ( c instanceof cError ) return this.value = c;
 
     for ( var i = 1; i < this.getArguments(); i++ ) {
 
@@ -2235,11 +2247,11 @@ cIMSUM.prototype.Calculate = function ( arg ) {
 
                 if ( _arg instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-                c1 = new Complex(_arg.toString());
+                c1 = new Complex( _arg.toString() );
 
-                if( c1 instanceof cError ) return this.value = c1;
+                if ( c1 instanceof cError ) return this.value = c1;
 
-                c.Sum(c1);
+                c.Sum( c1 );
 
             }
             continue;
@@ -2249,11 +2261,11 @@ cIMSUM.prototype.Calculate = function ( arg ) {
                 var e = elem.tocString();
                 if ( e instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-                c1 = new Complex(e.toString());
+                c1 = new Complex( e.toString() );
 
-                if( c1 instanceof cError ) return this.value = c1;
+                if ( c1 instanceof cError ) return this.value = c1;
 
-                c.Sum(c1);
+                c.Sum( c1 );
 
             } );
             continue;
@@ -2263,16 +2275,16 @@ cIMSUM.prototype.Calculate = function ( arg ) {
 
         if ( argI instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
 
-        c1 = new Complex(argI.toString());
+        c1 = new Complex( argI.toString() );
 
-        c.Sum(c1);
+        c.Sum( c1 );
 
     }
 
-    if( c instanceof cError ){
+    if ( c instanceof cError ) {
         this.value = c;
     }
-    else{
+    else {
         this.value = new cString( c.toString() );
     }
 
@@ -2314,31 +2326,33 @@ cOCT2BIN.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validOCTNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validOCTNumber( arg0 ) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         var negative = (arg0.length === 10 && arg0.substring( 0, 1 ).toUpperCase() === '7'),
             arg0DEC = (negative) ? parseInt( arg0, NumberBase.OCT ) - 1073741824 : parseInt( arg0, NumberBase.OCT );
 
         if ( arg0DEC < -512 || arg0DEC > 511 ) {
             this.value = new cError( cErrorType.not_numeric )
-        }else{
+        }
+        else {
 
             if ( negative ) {
                 var str = (512 + arg0DEC).toString( NumberBase.BIN );
                 this.value = new cString( ('1' + String.prototype.repeat( '0', 9 - str.length ) + str).toUpperCase() );
-            }else{
+            }
+            else {
                 this.value = convertFromTo( arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1 );
             }
 
         }
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -2374,13 +2388,13 @@ cOCT2DEC.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.getValue();
 
-    if( validOCTNumber(arg0) ){
+    if ( validOCTNumber( arg0 ) ) {
 
         arg0 = parseInt( arg0, NumberBase.OCT );
         this.value = new cNumber( (arg0 >= 536870912) ? arg0 - 1073741824 : arg0 );
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -2422,24 +2436,25 @@ cOCT2HEX.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
-    if( !(arg1 instanceof cUndefined) ){
+    if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     }
     arg1 = arg1.getValue();
 
-    if( validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ){
+    if ( validHEXNumber( arg0 ) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined ) ) {
 
         arg0 = parseInt( arg0, NumberBase.OCT );
 
         if ( arg0 >= 536870912 ) {
             this.value = new cString( ('ff' + (arg0 + 3221225472).toString( NumberBase.HEX )).toUpperCase() );
-        }else{
+        }
+        else {
             this.value = convertFromTo( arg0, NumberBase.DEC, NumberBase.HEX, arg1 );
         }
 
     }
-    else{
+    else {
         this.value = new cError( cErrorType.not_numeric );
     }
 
