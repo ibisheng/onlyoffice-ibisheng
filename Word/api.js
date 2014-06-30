@@ -7632,13 +7632,11 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
 {
-	if ( this.chartPreviewManager.isReady() ) {
-        if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
-            chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
-        else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
-            chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
-		return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
-	}
+	if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
+		chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
+	else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
+		chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
+	return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
 };
 
 asc_docs_api.prototype.sync_closeChartEditor = function()

@@ -2544,15 +2544,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asc_getChartPreviews: function(chartType, chartSubType) {
-				
-				if ( this.chartPreviewManager.isReady() )
-                {
-                    if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
-                        chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
-                    else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
-                        chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
-					return this.chartPreviewManager.getChartPreviews(chartType);
-				}
+
+				if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
+					chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
+				else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
+					chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
+				return this.chartPreviewManager.getChartPreviews(chartType);
 			},
 			
 			asc_checkChartInterval: function(type, interval, isRows) {

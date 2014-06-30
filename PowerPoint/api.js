@@ -672,7 +672,7 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function(options)
 {
 
-    if ( this.chartStyleManager && this.chartPreviewManager && ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() ))
+    if ( this.chartStyleManager && this.chartPreviewManager && ( !this.chartStyleManager.isReady() ))
     {
         for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
         {
@@ -4943,9 +4943,7 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
 {
-    if ( this.chartPreviewManager.isReady() ) {
-        return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
-    }
+	return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
 }
 
 asc_docs_api.prototype.sync_closeChartEditor = function()

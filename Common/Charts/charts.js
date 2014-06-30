@@ -116,7 +116,6 @@ function ChartStyleManager() {
 function ChartPreviewManager() {
 	
 	var _this = this;
-	var bReady = false;	
 	var previewGroups = [];
 
     var chartsByTypes = [];
@@ -444,16 +443,11 @@ function ChartPreviewManager() {
 				}				
 			}
 		}
-		bReady = true;
 		
 		/** proprietary end **/
 		
 		//var endTime = new Date();
 		//console.log( "ChartPreviewManager init: " + (endTime.getTime() - startTime.getTime()) );
-	}
-	
-	_this.isReady = function() {
-		return true;
 	};
 
     _this.createAscChart = function(type)

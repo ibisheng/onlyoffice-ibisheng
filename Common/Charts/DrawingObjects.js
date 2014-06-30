@@ -5302,7 +5302,7 @@ function DrawingObjects() {
 
     _this.getAscChartObject = function() {
 
-      //  if ( !api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady() ) {
+      //  if ( !api.chartStyleManager.isReady()) {
       //      api.chartStyleManager.init();
       //      api.chartPreviewManager.init();
       //      _this.callTrigger("asc_onUpdateChartStyles");
@@ -5778,7 +5778,7 @@ function ClickCounter() {
     }
 }
 
-function CoordsManager(ws, bLog) {
+function CoordsManager(ws) {
 
     var _t = this;
     var worksheet = ws;
