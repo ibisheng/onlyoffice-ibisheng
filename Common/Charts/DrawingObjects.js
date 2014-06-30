@@ -452,8 +452,8 @@ asc_CChart.prototype = {
 		var ws = _t.range.intervalObject.worksheet;
 
         // Save old series colors
-        var oldSeriaData = [];
-        for ( var i = 0; !isIgnoreColors && (i < _t.series.length); i++ ) {
+        var i, oldSeriaData = [];
+        for (i = 0; !isIgnoreColors && (i < _t.series.length); ++i) {
             if ( _t.series[i].OutlineColor && !_t.series[i].OutlineColor.isCustom )
                 oldSeriaData[i] = _t.series[i].OutlineColor;
         }
@@ -462,13 +462,13 @@ asc_CChart.prototype = {
         function getNumCache(c1, c2, r1, r2) {
 
             // (c1 == c2) || (r1 == r2)
-            var cache = [];
+            var cache = [], cell, item;
 
             if ( c1 == c2 ) {		// vertical cache
                 for (var row = r1; row <= r2; row++) {
-                    var cell = ws.getCell( new CellAddress(row, c1, 0) );
+                    cell = ws.getCell( new CellAddress(row, c1, 0) );
 
-                    var item = {};
+                    item = {};
                     item.numFormatStr = cell.getNumFormatStr();
                     item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
                     item.val = cell.getValue();
@@ -476,12 +476,11 @@ asc_CChart.prototype = {
 
                     cache.push(item);
                 }
-            }
-            else /*r1 == r2*/ {		// horizontal cache
+            } else /*r1 == r2*/ {		// horizontal cache
                 for (var col = c1; col <= c2; col++) {
-                    var cell = ws.getCell( new CellAddress(r1, col, 0) );
+                    cell = ws.getCell( new CellAddress(r1, col, 0) );
 
-                    var item = {};
+                    item = {};
                     item.numFormatStr = cell.getNumFormatStr();
                     item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
                     item.val = cell.getValue();
@@ -502,7 +501,7 @@ asc_CChart.prototype = {
             c2: bbox.c2
         };
 
-        var top_header_bbox, left_header_bbox;
+        var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, seriaName, start, end, formula, numCache;
         if ( _t.range.rows )
         {
             if(parsedHeaders.bTop)
@@ -523,11 +522,11 @@ asc_CChart.prototype = {
                 left_header_bbox = {r1: _t.range.serHeadersBBox.r1, c1: _t.range.serHeadersBBox.c1, r2: _t.range.serHeadersBBox.r1, c2: _t.range.serHeadersBBox.c2};
             }
 
-            for (var i = data_bbox.r1; i <= data_bbox.r2; i++)
+            for (i = data_bbox.r1; i <= data_bbox.r2; ++i)
             {
-                var ser = new asc_CChartSeria();
-                var startCell = new CellAddress(i, data_bbox.c1, 0);
-                var endCell = new CellAddress(i, data_bbox.c2, 0);
+                ser = new asc_CChartSeria();
+                startCell = new CellAddress(i, data_bbox.c1, 0);
+                endCell = new CellAddress(i, data_bbox.c2, 0);
 
                 if (ws._getRow(i).hd === true)
                     ser.isHidden = true;
@@ -541,18 +540,18 @@ asc_CChart.prototype = {
 
                 if(left_header_bbox)
                 {
-                    var formulaCell = new CellAddress( i, left_header_bbox.c1, 0 );
+                    formulaCell = new CellAddress( i, left_header_bbox.c1, 0 );
 					ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getID());
                 }
                 // xVal
 
                 if(top_header_bbox)
                 {
-                    var start = new CellAddress(top_header_bbox.r1, top_header_bbox.c1, 0);
-                    var end = new CellAddress(top_header_bbox.r1, top_header_bbox.c2, 0);
+                    start = new CellAddress(top_header_bbox.r1, top_header_bbox.c1, 0);
+                    end = new CellAddress(top_header_bbox.r1, top_header_bbox.c2, 0);
 
-					var formula = parserHelp.get3DRef(ws.sName, start.getID() + ':' + end.getID());
-                    var numCache = getNumCache(top_header_bbox.c1, top_header_bbox.c2, top_header_bbox.r1, top_header_bbox.r1 );
+					formula = parserHelp.get3DRef(ws.sName, start.getID() + ':' + end.getID());
+                    numCache = getNumCache(top_header_bbox.c1, top_header_bbox.c2, top_header_bbox.r1, top_header_bbox.r1 );
 
                     if ( _t.type == c_oAscChartType.scatter )
                     {
@@ -566,14 +565,12 @@ asc_CChart.prototype = {
                     }
                 }
 
-                var seriaName = left_header_bbox ? (ws.getCell(new CellAddress(i, left_header_bbox.c1, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
+                seriaName = left_header_bbox ? (ws.getCell(new CellAddress(i, left_header_bbox.c1, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
                 ser.TxCache.Tx = seriaName;
                 _t.series.push(ser);
                 nameIndex++;
             }
-        }
-        else
-        {
+        } else {
             if(parsedHeaders.bTop)
             {
                 top_header_bbox = {r1: bbox.r1, c1: data_bbox.c1, r2: bbox.r1, c2: data_bbox.c2};
@@ -593,11 +590,11 @@ asc_CChart.prototype = {
             }
 
 
-            for (var i = data_bbox.c1; i <= data_bbox.c2; i++) {
+            for (i = data_bbox.c1; i <= data_bbox.c2; i++) {
 
-                var ser = new asc_CChartSeria();
-                var startCell = new CellAddress(data_bbox.r1, i, 0);
-                var endCell = new CellAddress(data_bbox.r2, i, 0);
+                ser = new asc_CChartSeria();
+                startCell = new CellAddress(data_bbox.r1, i, 0);
+                endCell = new CellAddress(data_bbox.r2, i, 0);
 
                 if (ws._getCol(i).hd === true)
                     ser.isHidden = true;
@@ -614,11 +611,11 @@ asc_CChart.prototype = {
 
                 if ( left_header_bbox )
                 {
-                    var start = new CellAddress(left_header_bbox.r1, left_header_bbox.c1, 0);
-                    var end = new CellAddress(left_header_bbox.r2, left_header_bbox.c1, 0);
+                    start = new CellAddress(left_header_bbox.r1, left_header_bbox.c1, 0);
+                    end = new CellAddress(left_header_bbox.r2, left_header_bbox.c1, 0);
 
-                    var formula = parserHelp.get3DRef(ws.sName, start.getID() + ':' + end.getID());
-                    var numCache = getNumCache( left_header_bbox.c1, left_header_bbox.c1, left_header_bbox.r1, left_header_bbox.r2 );
+                    formula = parserHelp.get3DRef(ws.sName, start.getID() + ':' + end.getID());
+                    numCache = getNumCache( left_header_bbox.c1, left_header_bbox.c1, left_header_bbox.r1, left_header_bbox.r2 );
 
                     if ( _t.type == c_oAscChartType.scatter ) {
                         ser.xVal.Formula = formula;
@@ -632,11 +629,11 @@ asc_CChart.prototype = {
 
                 if (top_header_bbox)
                 {
-                    var formulaCell = new CellAddress( top_header_bbox.r1, i, 0 );
+                    formulaCell = new CellAddress( top_header_bbox.r1, i, 0 );
                     ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getID());
                 }
 
-                var seriaName = top_header_bbox ? (ws.getCell(new CellAddress(top_header_bbox.r1, i, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
+                seriaName = top_header_bbox ? (ws.getCell(new CellAddress(top_header_bbox.r1, i, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
                 ser.TxCache.Tx = seriaName;
                 _t.series.push(ser);
                 nameIndex++;
@@ -649,7 +646,7 @@ asc_CChart.prototype = {
             seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
 
         // Restore old series colors
-        for ( var i = 0; i < _t.series.length; i++ ) {
+        for (i = 0; i < _t.series.length; ++i) {
             if ( oldSeriaData[i] )
                 _t.series[i].OutlineColor = oldSeriaData[i];
             else
@@ -658,47 +655,45 @@ asc_CChart.prototype = {
     },
 
     getReverseSeries: function() {
-
-        var _t = this;
         var revSeries = [];
-        var serLen = _t.series.length;
+        var serLen = this.series.length;
 
-        var aData = [];
-        for (var j = 0; j < _t.series.length; j++) {
-            aData.push(_t.series[j].Val.NumCache.length);
-            aData.push(_t.series[j].xVal.NumCache.length);
-            aData.push(_t.series[j].Cat.NumCache.length);
+        var i, j, aData = [];
+        for (j = 0; j < this.series.length; j++) {
+            aData.push(this.series[j].Val.NumCache.length);
+            aData.push(this.series[j].xVal.NumCache.length);
+            aData.push(this.series[j].Cat.NumCache.length);
         }
         var maxDataLen = Math.max.apply(Math, aData);
         var emptyItem = { numFormatStr: "General", isDateTimeFormat: false, val: "", isHidden: false };
 
-        for (var j = 0; j < _t.series.length; j++) {
-            if ( _t.series[j].Val.NumCache.length ) {
-                while ( _t.series[j].Val.NumCache.length < maxDataLen )
-                    _t.series[j].Val.NumCache.push(emptyItem);
+        for (j = 0; j < this.series.length; j++) {
+            if ( this.series[j].Val.NumCache.length ) {
+                while ( this.series[j].Val.NumCache.length < maxDataLen )
+					this.series[j].Val.NumCache.push(emptyItem);
             }
-            if ( _t.series[j].xVal.NumCache.length ) {
-                while ( _t.series[j].xVal.NumCache.length < maxDataLen )
-                    _t.series[j].xVal.NumCache.push(emptyItem);
+            if ( this.series[j].xVal.NumCache.length ) {
+                while ( this.series[j].xVal.NumCache.length < maxDataLen )
+					this.series[j].xVal.NumCache.push(emptyItem);
             }
-            if ( _t.series[j].Cat.NumCache.length ) {
-                while ( _t.series[j].Cat.NumCache.length < maxDataLen )
-                    _t.series[j].Cat.NumCache.push(emptyItem);
+            if ( this.series[j].Cat.NumCache.length ) {
+                while ( this.series[j].Cat.NumCache.length < maxDataLen )
+					this.series[j].Cat.NumCache.push(emptyItem);
             }
         }
 
         if ( serLen ) {
-            for (var i = 0; i < _t.series[0].Val.NumCache.length; i++) {
+            for (i = 0; i < this.series[0].Val.NumCache.length; i++) {
 
                 var seria = new asc_CChartSeria();
-                for (var j = 0; j < _t.series.length; j++) {
-                    seria.Val.NumCache.push(_t.series[j].Val.NumCache[i]);
+                for (j = 0; j < this.series.length; j++) {
+                    seria.Val.NumCache.push(this.series[j].Val.NumCache[i]);
 
-                    if ( _t.series[j].TxCache.Formula && _t.series[j].TxCache.Tx )
-                        seria.Cat.NumCache.push( {val: _t.series[j].TxCache.Tx} );
+                    if ( this.series[j].TxCache.Formula && this.series[j].TxCache.Tx )
+                        seria.Cat.NumCache.push( {val: this.series[j].TxCache.Tx} );
 
-                    if ( _t.series[j].Cat.Formula && _t.series[j].Cat.NumCache.length )
-                        seria.TxCache.Tx = _t.series[j].Cat.NumCache[i].val;
+                    if ( this.series[j].Cat.Formula && this.series[j].Cat.NumCache.length )
+                        seria.TxCache.Tx = this.series[j].Cat.NumCache[i].val;
                     else
                         seria.TxCache.Tx = (i + 1);
                 }
@@ -707,8 +702,8 @@ asc_CChart.prototype = {
         }
 
         // Colors
-        var seriaUniColors = _t.generateUniColors(revSeries.length);
-        for (var i = 0; i < revSeries.length; i++) {
+        var seriaUniColors = this.generateUniColors(revSeries.length);
+        for (i = 0; i < revSeries.length; i++) {
             revSeries[i].OutlineColor = seriaUniColors[i];
         }
 
@@ -898,7 +893,7 @@ asc_CChart.prototype = {
 
         // Series
         this.series = [];
-        var seriesCount = Reader.GetLong();
+        var seriesCount = Reader.GetLong(), item;
         for (i = 0; i < seriesCount; i++) {
 
             var seria = new asc_CChartSeria();
@@ -906,7 +901,7 @@ asc_CChart.prototype = {
             seria.Val.Formula = Reader.GetString2();
             var numCacheCount = Reader.GetLong();
             for (j = 0; j < numCacheCount; j++) {
-                var item = {};
+                item = {};
                 item.numFormatStr = Reader.GetString2();
                 item.isDateTimeFormat = Reader.GetBool();
                 item.val = Reader.GetString2();
@@ -917,7 +912,7 @@ asc_CChart.prototype = {
             seria.xVal.Formula = Reader.GetString2();
             numCacheCount = Reader.GetLong();
             for (j = 0; j < numCacheCount; j++) {
-                var item = {};
+                item = {};
                 item.numFormatStr = Reader.GetString2();
                 item.isDateTimeFormat = Reader.GetBool();
                 item.val = Reader.GetString2();
@@ -928,7 +923,7 @@ asc_CChart.prototype = {
             seria.Cat.Formula = Reader.GetString2();
             numCacheCount = Reader.GetLong();
             for (j = 0; j < numCacheCount; j++) {
-                var item = {};
+                item = {};
                 item.numFormatStr = Reader.GetString2();
                 item.isDateTimeFormat = Reader.GetBool();
                 item.val = Reader.GetString2();
@@ -2623,6 +2618,7 @@ GraphicOption.prototype.getUpdatedRange = function() {
 	if ( this.isScrollType() && !this.range )
 		return vr;
 
+	var checker, coords;
 	switch (this.type) {
 		case c_oAscGraphicOption.ScrollVertical:
 		case c_oAscGraphicOption.ScrollHorizontal: {
@@ -2641,8 +2637,8 @@ GraphicOption.prototype.getUpdatedRange = function() {
 					if ( selectedObjects[0].isGroup() ) {
 						var groupSelectedObjects = selectedObjects[0].selectedObjects;
 						if ( groupSelectedObjects.length === 1 ) {
-							var checker = this.ws.objectRender.getBoundsChecker(groupSelectedObjects[0]);
-							var coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
+							checker = this.ws.objectRender.getBoundsChecker(groupSelectedObjects[0]);
+							coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
 							if ( coords ) {
 								vr.c1 = Math.max(coords.from.col, vr.c1);
 								vr.r1 = Math.max(coords.from.row, vr.r1);
@@ -2657,8 +2653,8 @@ GraphicOption.prototype.getUpdatedRange = function() {
 					}
 					else {
 						var drawingObject = selectedObjects[0].drawingBase;
-						var checker = this.ws.objectRender.getBoundsChecker(drawingObject.graphicObject);
-						var coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
+						checker = this.ws.objectRender.getBoundsChecker(drawingObject.graphicObject);
+						coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
 						if ( coords ) {
 							vr.c1 = Math.max(coords.from.col, vr.c1);
 							vr.r1 = Math.max(coords.from.row, vr.r1);
@@ -3171,9 +3167,10 @@ function DrawingObjects() {
         aImagesSync = [];
         aObjectsSync = [];
 
+		var i;
         isInit = false;
         aObjects = currentSheet.model.Drawings;
-        for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++)
+        for (i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++)
         {
             aObjects[i] = _this.cloneDrawingObject(aObjects[i]);
             var drawingObject = aObjects[i];
@@ -3219,7 +3216,7 @@ function DrawingObjects() {
             aImagesSync[i] = getFullImageSrc(aImagesSync[i]);
         }
 
-        for (var i = 0; i < currentSheet.model.Drawings.length; ++i)
+        for (i = 0; i < currentSheet.model.Drawings.length; ++i)
         {
             var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
             aBoundsCheckers.push(boundsChecker);
@@ -3253,10 +3250,10 @@ function DrawingObjects() {
         var selected_objects = _this.controller.selectedObjects;
         if(selected_objects.length > 0)
         {
-            var min_x, min_y;
+            var min_x, min_y, i;
             min_x = selected_objects[0].x;
             min_y = selected_objects[0].y;
-            for(var i = 1; i < selected_objects.length; ++i)
+            for(i = 1; i < selected_objects.length; ++i)
             {
                 if(selected_objects[i].x < min_x)
                     min_x = selected_objects[i].x;
@@ -3264,7 +3261,7 @@ function DrawingObjects() {
                 if(selected_objects[i].y < min_y)
                     min_y = selected_objects[i].y;
             }
-            for(var i = 0; i < selected_objects.length; ++i)
+            for(i = 0; i < selected_objects.length; ++i)
             {
                 _this.shiftMap[selected_objects[i].Get_Id()] = {x: selected_objects[i].x - min_x, y: selected_objects[i].y - min_y};
             }
@@ -3370,7 +3367,6 @@ function DrawingObjects() {
                 }
             }
             catch(e) {
-                var msg = e.message;
             }
         }
     };
@@ -3427,9 +3423,9 @@ function DrawingObjects() {
     };
 
     _this.clearDrawingObjects = function(graphicOption) {
-
+		var i;
         // Чистим предыдущие области
-        for (var i = 0; i < aBoundsCheckers.length; i++) {
+        for (i = 0; i < aBoundsCheckers.length; i++) {
 
             var bSkip = false;
             if ( graphicOption && (graphicOption.type === c_oAscGraphicOption.ChangePosition) && graphicOption.aId.length ) {
@@ -3442,7 +3438,7 @@ function DrawingObjects() {
         aBoundsCheckers = [];
 
         // Сохраняем текущие области
-        for ( var i = 0; i < aObjects.length; i++ ) {
+        for (i = 0; i < aObjects.length; i++ ) {
             if ( !aObjects[i].inVisibleArea() )
                 continue;
             var boundsChecker = _this.getBoundsChecker(aObjects[i].graphicObject);
@@ -3733,8 +3729,9 @@ function DrawingObjects() {
                 if ( graphicObject.hAxisTitle && graphicObject.hAxisTitle.txBody && graphicObject.hAxisTitle.transformText )
                     chartTxtAreas.push(graphicObject.hAxisTitle);
 
-                for ( var i = 0; i < chartTxtAreas.length; i++ ) {
-                    var item = chartTxtAreas[i];
+				var i, item;
+                for (i = 0; i < chartTxtAreas.length; i++ ) {
+                    item = chartTxtAreas[i];
                     aTxtTransform.push( { tx: item.transformText.tx, ty: item.transformText.ty } );
                     item.transformText.tx -= left;
                     item.transformText.ty -= top;
@@ -3745,8 +3742,8 @@ function DrawingObjects() {
                 graphicObject.transform.tx = tx;
                 graphicObject.transform.ty = ty;
 
-                for ( var i = 0; i < chartTxtAreas.length; i++ ) {
-                    var item = chartTxtAreas[i];
+                for (i = 0; i < chartTxtAreas.length; i++ ) {
+                    item = chartTxtAreas[i];
                     item.transformText.tx = aTxtTransform[i].tx;
                     item.transformText.ty = aTxtTransform[i].ty;
                 }
@@ -4334,13 +4331,14 @@ function DrawingObjects() {
 
         var changedRange = null;
         var metrics = null;
+		var count, bbox, offset;
 
         for (var i = 0; i < aObjects.length; i++) {
 
             var obj = aObjects[i];
             if ( !obj.isLocked() ) {
 
-                var bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
+                bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
 
                 if ( obj.isChart() || obj.isImage() || obj.isShape() ) {
 
@@ -4354,7 +4352,7 @@ function DrawingObjects() {
                         switch (operType) {
                             case c_oAscInsertOptions.InsertColumns:
                             {
-                                var count = updateRange.c2 - updateRange.c1 + 1;
+                                count = updateRange.c2 - updateRange.c1 + 1;
 
                                 // Position
                                 if (updateRange.c1 <= obj.from.col) {
@@ -4381,7 +4379,7 @@ function DrawingObjects() {
                                 // Range
                                 if (obj.isChart()) {
                                     if ( (updateRange.r1 <= bbox.r1) && (updateRange.r2 >= bbox.r2) && (updateRange.c2 < bbox.c1) ) {
-                                        var count = updateRange.c2 - updateRange.c1 + 1;
+                                        count = updateRange.c2 - updateRange.c1 + 1;
                                         changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 + count, bbox.r2, bbox.c2 + count);
                                     }
                                 }
@@ -4390,7 +4388,7 @@ function DrawingObjects() {
                             case c_oAscInsertOptions.InsertRows:
                             {
                                 // Position
-                                var count = updateRange.r2 - updateRange.r1 + 1;
+                                count = updateRange.r2 - updateRange.r1 + 1;
 
                                 if (updateRange.r1 <= obj.from.row) {
                                     metrics.from.row += count;
@@ -4416,7 +4414,7 @@ function DrawingObjects() {
                                 // Range
                                 if (obj.isChart()) {
                                     if ( (updateRange.c1 <= bbox.c1) && (updateRange.c2 >= bbox.c2) && (updateRange.r2 < bbox.r1) ) {
-                                        var count = updateRange.r2 - updateRange.r1 + 1;
+                                        count = updateRange.r2 - updateRange.r1 + 1;
                                         changedRange = new Range(worksheet.model, bbox.r1 + count, bbox.c1, bbox.r2 + count, bbox.c2);
                                     }
                                 }
@@ -4429,7 +4427,7 @@ function DrawingObjects() {
                             {
 
                                 // Position
-                                var count = updateRange.c2 - updateRange.c1 + 1;
+                                count = updateRange.c2 - updateRange.c1 + 1;
 
                                 if (updateRange.c1 <= obj.from.col) {
 
@@ -4443,7 +4441,7 @@ function DrawingObjects() {
                                         metrics.from.col = updateRange.c1;
                                         metrics.from.colOff = 0;
 
-                                        var offset = 0;
+                                        offset = 0;
                                         if (obj.to.col - updateRange.c2 - 1 > 0)
                                             offset = obj.to.col - updateRange.c2 - 1;
                                         else {
@@ -4469,7 +4467,7 @@ function DrawingObjects() {
 
                                 // Range
                                 if (obj.isChart()) {
-                                    var count = updateRange.c2 - updateRange.c1 + 1;
+                                    count = updateRange.c2 - updateRange.c1 + 1;
 
                                     if (updateRange.c1 < bbox.c1) {
 
@@ -4483,7 +4481,7 @@ function DrawingObjects() {
 
                                             // inside
                                             else {
-                                                var offset = bbox.c2 - updateRange.c2;
+                                                offset = bbox.c2 - updateRange.c2;
                                                 changedRange = new Range(worksheet.model, bbox.r1, updateRange.c1, bbox.r2, updateRange.c1 + offset - 1);
                                             }
                                         }
@@ -4493,13 +4491,13 @@ function DrawingObjects() {
 
                                         // outside
                                         if (updateRange.c2 > bbox.c2) {
-                                            var offset = (bbox.c1 + 1 > updateRange.c1) ? 1 : 0;
+                                            offset = (bbox.c1 + 1 > updateRange.c1) ? 1 : 0;
                                             changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, updateRange.c1 + offset - 1);
                                         }
 
                                         // inside
                                         else {
-                                            var offset = bbox.c2 + 1 - bbox.c1 - count;
+                                            offset = bbox.c2 + 1 - bbox.c1 - count;
                                             if (offset <= 0)
                                                 offset = 1;
                                             changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, bbox.c1 + offset - 1);
@@ -4512,7 +4510,7 @@ function DrawingObjects() {
                                 // Range
                                 if (obj.isChart()) {
                                     if ( (updateRange.r1 <= bbox.r1) && (updateRange.r2 >= bbox.r2) && (updateRange.c2 < bbox.c1) ) {
-                                        var count = updateRange.c2 - updateRange.c1 + 1;
+                                        count = updateRange.c2 - updateRange.c1 + 1;
                                         changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 - count, bbox.r2, bbox.c2 - count);
                                     }
                                 }
@@ -4522,7 +4520,7 @@ function DrawingObjects() {
                             {
 
                                 // Position
-                                var count = updateRange.r2 - updateRange.r1 + 1;
+                                count = updateRange.r2 - updateRange.r1 + 1;
 
                                 if (updateRange.r1 <= obj.from.row) {
 
@@ -4536,7 +4534,7 @@ function DrawingObjects() {
                                         metrics.from.row = updateRange.r1;
                                         metrics.from.colOff = 0;
 
-                                        var offset = 0;
+                                        offset = 0;
                                         if (obj.to.row - updateRange.r2 - 1 > 0)
                                             offset = obj.to.row - updateRange.r2 - 1;
                                         else {
@@ -4562,7 +4560,7 @@ function DrawingObjects() {
 
                                 // range
                                 if (obj.isChart()) {
-                                    var count = updateRange.r2 - updateRange.r1 + 1;
+                                    count = updateRange.r2 - updateRange.r1 + 1;
 
                                     if (updateRange.r1 < bbox.r1) {
 
@@ -4576,7 +4574,7 @@ function DrawingObjects() {
 
                                             // inside
                                             else {
-                                                var offset = bbox.r1 + 1 - updateRange.r2;
+                                                offset = bbox.r1 + 1 - updateRange.r2;
                                                 changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 + offset, bbox.c2);
                                             }
                                         }
@@ -4586,13 +4584,13 @@ function DrawingObjects() {
 
                                         // outside
                                         if (updateRange.r2 > bbox.r2) {
-                                            var offset = (bbox.r1 + 1 > updateRange.r1) ? 1 : 0;
+                                            offset = (bbox.r1 + 1 > updateRange.r1) ? 1 : 0;
                                             changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , updateRange.r1 + offset - 1, bbox.c2 );
                                         }
 
                                         // inside
                                         else {
-                                            var offset = bbox.r2 + 1 - bbox.r1 - count;
+                                            offset = bbox.r2 + 1 - bbox.r1 - count;
                                             if (offset <= 0) offset = 1;
                                             changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r1 + offset - 1, bbox.c2 );
                                         }
@@ -4604,7 +4602,7 @@ function DrawingObjects() {
                                 // Range
                                 if (obj.isChart()) {
                                     if ( (updateRange.c1 <= bbox.c1) && (updateRange.c2 >= bbox.c2) && (updateRange.r2 < bbox.r1) ) {
-                                        var count = updateRange.r2 - updateRange.r1 + 1;
+                                        count = updateRange.r2 - updateRange.r1 + 1;
                                         changedRange = new Range(worksheet.model, bbox.r1 - count, bbox.c1, bbox.r2 - count, bbox.c2);
                                     }
                                 }
@@ -4646,7 +4644,7 @@ function DrawingObjects() {
 
                     // Normalize range
                     if (changedRange) {
-                        var bbox = changedRange.getBBox0();
+                        bbox = changedRange.getBBox0();
 
                         var tmp;
                         if (bbox.c1 > bbox.c2) {
@@ -4931,8 +4929,8 @@ function DrawingObjects() {
 
         if ( idGroup && aGraphics.length ) {
 
-            var aSingleObjects = [];
-            for (var i = 0; i < aGraphics.length; i++) {
+            var i, aSingleObjects = [];
+            for (i = 0; i < aGraphics.length; i++) {
 
                 var obj = _this.createDrawingObject();
                 obj.graphicObject = aGraphics[i];
@@ -4942,7 +4940,7 @@ function DrawingObjects() {
                 aSingleObjects.push(obj);
             }
 
-            for (var i = 0; i < aObjects.length; i++) {
+            for (i = 0; i < aObjects.length; i++) {
 
                 if ( idGroup == aObjects[i].graphicObject.Id ) {
 
@@ -5183,8 +5181,9 @@ function DrawingObjects() {
 
         var objectProperties = props;
 
+		var _img;
         if ( !isNullOrEmptyString(objectProperties.ImageUrl) ) {
-            var _img = api.ImageLoader.LoadImage(objectProperties.ImageUrl, 1);
+            _img = api.ImageLoader.LoadImage(objectProperties.ImageUrl, 1);
 
             if (null != _img) {
                 _this.controller.setGraphicObjectProps( objectProperties );
@@ -5199,7 +5198,7 @@ function DrawingObjects() {
         else if ( objectProperties.ShapeProperties && objectProperties.ShapeProperties.fill && objectProperties.ShapeProperties.fill.fill &&
             !isNullOrEmptyString(objectProperties.ShapeProperties.fill.fill.url) ) {
 
-            var _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);
+            _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);
             if ( null != _img ) {
                 _this.controller.setGraphicObjectProps( objectProperties );
             }
@@ -5607,7 +5606,7 @@ function DrawingObjects() {
             }
         };
 
-        if (window.opera != undefined)
+        if (AscBrowser.isOpera)
             setTimeout(function() { fileName.click(); }, 0);
         else
             fileName.click();
@@ -5621,13 +5620,6 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
     // Private Misc Methods
     //-----------------------------------------------------------------------------------
-
-    function guid() {
-        function S4() {
-            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-        }
-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-    }
 
     function ascCvtRatio(fromUnits, toUnits) {
         return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
@@ -5789,7 +5781,6 @@ function ClickCounter() {
 function CoordsManager(ws, bLog) {
 
     var _t = this;
-    var log = bLog;
     var worksheet = ws;
 
     _t.calculateCell = function(x, y) {
@@ -5939,7 +5930,6 @@ function readFromBinaryParagraph(p, r)
     for ( var Index = 0; Index < Count; Index++ )
     {
         var Element = readFromBinaryParagraphContent(r);
-        var index_test = r.GetLong();
         if ( null != Element )
             p.Content.push( Element );
     }
