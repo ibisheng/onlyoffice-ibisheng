@@ -7609,6 +7609,10 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
         this.WordControl.m_oLogicDocument.Add_InlineImage( null, null, null, options );
     }
 };
+asc_docs_api.prototype.asc_doubleClickOnChart = function(obj)
+{
+    this.asc_fireCallback("asc_doubleClickOnChart", obj);
+};
 
 asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 {
