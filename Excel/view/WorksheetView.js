@@ -8028,6 +8028,8 @@
 			var t = this;
 			var callTrigger = false;
 			if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
+			
+			lockDraw(t.model.workbook);
 			var selectData;
 			if(isLocal === 'binary')
 				selectData = t._pasteFromBinary(val);
@@ -8039,12 +8041,14 @@
 			if (!selectData) {
 				bIsUpdate = false;
 				History.EndTransaction();
+				buildRecalc(t.model.workbook);
+				unLockDraw(t.model.workbook);
 				return;
-			}
+			};
 			t.expandColsOnScroll();
 			t.expandRowsOnScroll();
+			
 			var arrFormula = selectData[1];
-			lockDraw(t.model.workbook);
 			for (var i = 0; i < arrFormula.length; ++i) {//!!!
 				var rangeF = arrFormula[i].range;
 				var valF = arrFormula[i].val;
@@ -8054,7 +8058,8 @@
 					var oBBox = rangeF.getBBox0();
 					t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF);
 				}
-			}
+			};
+			
 			buildRecalc(t.model.workbook);
 			unLockDraw(t.model.workbook);
 			var arn = selectData[0];
