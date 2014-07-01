@@ -2374,7 +2374,7 @@ DrawingObjectsController.prototype =
         ret.putHorAxisLabel(hor_axis && hor_axis.title ? c_oAscChartHorAxisLabelShowSettings.noOverlay : c_oAscChartTitleShowSettings.none);
         ret.putVertAxisLabel(vert_axis && vert_axis.title ? c_oAscChartVertAxisLabelShowSettings.rotated : c_oAscChartVertAxisLabelShowSettings.none); //TODO
 
-        var data_labels = plot_area.chart.dLbls;
+        var data_labels = plot_area.charts[0].dLbls;
         if(data_labels)
         {
             ret.putShowSerName(data_labels.showSerName === true);
