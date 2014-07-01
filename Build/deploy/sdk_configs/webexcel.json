@@ -154,6 +154,7 @@
 				"../../Word/Editor/Serialize2.js",
 				"../../Word/Editor/FontClassification.js",
 				"../../Word/Editor/Spelling.js",
+				"../../Word/Editor/GraphicObjects/WrapManager.js",
 				
 				"../../Word/Math/mathTypes.js",
 				"../../Word/Math/mathText.js",
