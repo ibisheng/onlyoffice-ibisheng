@@ -5634,7 +5634,7 @@ ParaDrawing.prototype =
             {
                 // Long : тип обтекания
                 this.DrawingType = Reader.GetLong();
-                this.updateWidthHeight();
+                //this.updateWidthHeight();
                 break;
             }
 
@@ -5643,7 +5643,7 @@ ParaDrawing.prototype =
             {
                 // Long : тип обтекания
                 this.wrappingType = Reader.GetLong();
-                this.updateWidthHeight();
+                //this.updateWidthHeight();
                 break;
             }
 
