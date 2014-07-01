@@ -3178,6 +3178,7 @@ function DrawingObjects() {
 					shapeCtx.m_oContext.save();
 					shapeCtx.m_oContext.beginPath();
 					shapeCtx.m_oContext.rect(ptToPx(x1 - offsetScroll.offsetX), ptToPx(y1 - offsetScroll.offsetY), ptToPx(w), ptToPx(h));
+                    shapeCtx.m_oContext.clip();
 
                     shapeCtx.updatedRect = updatedRect;
                 } else
@@ -3251,7 +3252,9 @@ function DrawingObjects() {
                 }
 
 				if (graphicOption)
-					shapeCtx.m_oContext.restore();
+                {
+                    shapeCtx.m_oContext.restore();
+                }
             }
             worksheet.model.Drawings = aObjects;
         }
