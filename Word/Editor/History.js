@@ -12,6 +12,7 @@ function CHistory(Document)
 {
     this.Index      = -1;
     this.SavedIndex = null;        // Номер точки отката, на которой произошло последнее сохранение
+    this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
     this.RecIndex   = -1;          // Номер точки, на которой произошел последний пересчет
     this.Points     = []; // Точки истории, в каждой хранится массив с изменениями после текущей точки
     this.Document   = Document;
@@ -48,6 +49,7 @@ CHistory.prototype =
     {
         this.Index         = -1;
         this.SavedIndex    = null;
+        this.ForceSave     = false;
         this.Points.length = 0;
         this.Internal_RecalcData_Clear();
     },
@@ -130,7 +132,10 @@ CHistory.prototype =
     Create_NewPoint : function()
     {
         if ( this.Index < this.SavedIndex && null !== this.SavedIndex )
+        {
             this.SavedIndex = this.Index;
+            this.ForceSave  = true;
+        }
 
         this.Clear_Additional();
 
@@ -366,7 +371,10 @@ CHistory.prototype =
         };
 
 		if ( this.SavedIndex >= this.Points.length - 2 && null !== this.SavedIndex )
-			this.SavedIndex = this.Points.length - 2;
+        {
+			this.SavedIndex = this.Points.length - 3;
+            this.ForceSave  = true;
+        }
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
         if ( this.Index >= this.Points.length )
@@ -395,14 +403,15 @@ CHistory.prototype =
     Reset_SavedIndex : function()
     {
         this.SavedIndex = this.Index;
+        this.ForceSave   = false;
     },
 
     Have_Changes : function()
     {
-        if ( -1 === this.Index && null === this.SavedIndex )
+        if ( -1 === this.Index && null === this.SavedIndex && false === this.ForceSave )
             return false;
         
-        if ( this.Index != this.SavedIndex )
+        if ( this.Index != this.SavedIndex || true === this.ForceSave )
             return true;
 
         return false;

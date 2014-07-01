@@ -1948,8 +1948,6 @@ CDocument.prototype =
         if (docpostype_HdrFtr === this.CurPos.Type)
         {
             var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-
-            var CurHdrFtr = this.CurHdrFtr;
             if (null !== CurHdrFtr && -1 !== CurHdrFtr.RecalcInfo.CurPage)
                 this.CurPage = CurHdrFtr.RecalcInfo.CurPage;
         }
