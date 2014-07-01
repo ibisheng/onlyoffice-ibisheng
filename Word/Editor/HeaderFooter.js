@@ -1289,7 +1289,7 @@ CHeaderFooterController.prototype =
 
     Set_CurHdrFtr_ById : function(Id)
     {
-        var HdrFtr = g_oTableId.Get_BydId( Id );
+        var HdrFtr = g_oTableId.Get_ById( Id );
         if ( -1 === this.LogicDocument.SectionsInfo.Find_ByHdrFtr( HdrFtr ) )
             return false;
         
@@ -1569,7 +1569,7 @@ CHeaderFooterController.prototype =
 
     Is_UseInDocument : function(Id)
     {
-        var HdrFtr = g_oTableId.Get_BydId( Id );
+        var HdrFtr = g_oTableId.Get_ById( Id );
         if ( -1 === this.LogicDocument.SectionsInfo.Find_ByHdrFtr( HdrFtr ) )
             return false;        
 
