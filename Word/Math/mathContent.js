@@ -829,7 +829,7 @@ function CMathContent()
 
     this.content = []; // array of mathElem
 
-    this.CurPos = 0;
+    this.CurPos = -1;
     this.WidthToElement = [];
     this.pos = new CMathPosition();   // относительная позиция
 
@@ -4012,7 +4012,10 @@ CMathContent.prototype =
             this.Parent = Parent;
         }
 		if (!this.bRoot && this.content.length == 0)
-				this.fillPlaceholders();
+		{
+			this.CurPos = 0;
+			this.fillPlaceholders();
+		}
 
         var lng = this.content.length;
 
@@ -5695,21 +5698,7 @@ CMathContent.prototype =
 
             }
         }
-    },
-	Add: function (oElem, Pos)
-	{
-        oElem.Parent = this;
-
-        if(oElem.typeObj === MATH_COMP)
-        {
-            oElem.setArgSize(this.argSize);
-            this.content.splice(Pos,0,oElem);
-        }
-        else
-        {
-            this.content.push(obj);
-        }
-    },
+    },	
     Save_Changes: function(Data, Writer)
     {
         Writer.WriteLong( historyitem_type_MathContent );
@@ -5796,8 +5785,9 @@ CMathContent.prototype =
 						Element.MathPrp = MathPrp;
 						Element.typeObj = typeObj;
 					}
-					
+					this.DeleteEmptyRuns();
 					this.content.splice( Pos, 0, Element );
+					this.SetRunEmptyToContent(true);
                 }
                 break;
             }
@@ -7548,13 +7538,28 @@ CMathContent.prototype =
 						break;
 		}
 	},
+	Add: function (oElem, Pos)
+	{
+        oElem.Parent = this;
+
+        if(oElem.typeObj === MATH_COMP)
+        {
+            oElem.setArgSize(this.argSize);
+            this.content.splice(Pos,0,oElem);
+        }
+        else
+        {
+           this.content.splice(Pos,0,oElem);
+        }
+		this.CurPos++;
+    },
 	AddText : function(oElem, sText)
     {		
         if(sText)
         {			
             var MathRun = new ParaRun(this.Paragraph, true);
 			
-			var Pos = oElem.CurPos,
+			var Pos = oElem.CurPos + 1,
 				PosEnd = Pos + 1;
 			var items = [];
             for (var i=0; i < sText.length; i++)
@@ -7563,28 +7568,40 @@ CMathContent.prototype =
                 oText.addTxt(sText[i]);				
 				MathRun.Add(oText);
             }			
-            oElem.addElementToContent(MathRun);
+			oElem.DeleteEmptyRuns();
+            oElem.Add(MathRun,Pos);
 			items.push(MathRun);
 			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});	
-
-			oElem.CurPos++;
+			
+			oElem.SetRunEmptyToContent(true);
         }        
     },
 
+	DeleteEmptyRuns : function ()
+	{
+		var nLen = this.content.length;
+		while(nLen >= 0 )
+		{
+			var oElem = this.content[nLen];
+			if (oElem && oElem.typeObj == MATH_PARA_RUN && oElem.Content.length == 0)
+				this.content.splice(nLen, 1);
+			nLen--;
+		}
+	},
     CreateElem : function (oElem, oParent)
     {
 		oElem.Parent = oParent;
-		var Pos = oParent.CurPos,
+		var Pos = oParent.CurPos + 1,
 				PosEnd = Pos + 1;
 		var items = [];
 		
         if (oParent)
 		{
+			oParent.DeleteEmptyRuns();
             oParent.Add(oElem,Pos);
 			items.push(oElem);
 			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
-			
-			oParent.CurPos++;
+
 			oParent.SetRunEmptyToContent(true);
 		}
     },

@@ -192,7 +192,7 @@ ParaMath.prototype =
 					var oMRun = new ParaRun(this.Paragraph, true);
 					oMRun.Pr = oStartContent.Pr;
 
-					for (var i=nPosStart; i<nLenStart; i++)
+					for (var i=nLenStart-1; i>=nPosStart; i--)
 					{
 						var Pos = oMRun.Content.length;
 						var EndPos = Pos + 1;
@@ -202,13 +202,12 @@ ParaMath.prototype =
 					}
 				}
 
-				oContent.Content.CurPos++;
 				oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
 
 				if(nPosStart != nLenStart)
 				{
 					var items = [];
-					oContent.Content.addElementToContent(oMRun);
+					oContent.Content.Add(oMRun,oContent.Content.CurPos+1);
 					items.push(oMRun);
 					var Pos = oContent.Content.CurPos,
 						PosEnd = Pos + 1;
