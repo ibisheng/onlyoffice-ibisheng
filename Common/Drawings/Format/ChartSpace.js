@@ -2673,7 +2673,7 @@ CChartSpace.prototype =
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
         {
             var b_checkEmpty = this.checkEmptySeries();
-            this.bEmtySeries = b_checkEmpty;
+            this.bEmptySeries = b_checkEmpty;
             if(b_checkEmpty)
                 return;
             var plot_area = this.chart.plotArea;
