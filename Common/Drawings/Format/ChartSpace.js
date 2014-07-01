@@ -4469,7 +4469,22 @@ CChartSpace.prototype =
                     var arr_cat_labels_points = [];//массив середин подписей горизонтальной оси; i-й элемент - x-координата центра подписи категории с номером i;
                     if(cat_ax_orientation === ORIENTATION_MIN_MAX)
                     {
-                        if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                        if(labels_pos === TICK_LABEL_POSITION_NONE || val_ax.bDelete === true)
+                        {
+                            val_ax.labels = null;
+                            if(cross_between === CROSS_BETWEEN_MID_CAT)
+                            {
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + rect.h - point_interval*i;
+                            }
+                            else
+                            {
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + rect.h - (point_interval/2 + point_interval*i);
+                            }
+                            val_ax.posY = rect.y + rect.h - point_interval*(crosses-1);
+                        }
+                        else if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
                         {
                             if(val_ax.crosses === CROSSES_MAX)
                             {
@@ -4578,7 +4593,22 @@ CChartSpace.prototype =
                     }
                     else
                     {//то же самое, только зеркально отраженное
-                        if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                        if(labels_pos === TICK_LABEL_POSITION_NONE || val_ax.bDelete === true)
+                        {
+                            val_ax.labels = null;
+                            if(cross_between === CROSS_BETWEEN_MID_CAT)
+                            {
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + point_interval*i;
+                            }
+                            else
+                            {
+                                for(i = 0; i < string_pts.length; ++i)
+                                    arr_cat_labels_points[i] = rect.y + point_interval/2 + point_interval*i;
+                            }
+                            val_ax.posY = rect.y + point_interval*(crosses-1);
+                        }
+                        else if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
                         {
                             if(val_ax.crosses === CROSSES_MAX)
                             {
