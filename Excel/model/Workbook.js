@@ -2492,14 +2492,16 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 			this._moveCellVer(nIndex, j - 0, count);
         delete this.aGCells[nIndex];
 	}
-    if(null != oPrevRow && false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
-    {
+	if (null != oPrevRow && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+	{
+	    History.LocalChange = true;
         for(var i = 0; i < count; ++i)
         {
             var row = this._getRow(index + i);
             row.copyProperty(oPrevRow);
 			row.hd = null;
         }
+        History.LocalChange = false;
     }
 	var res = this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
 	buildRecalc(this.workbook);
@@ -2630,12 +2632,14 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	for(var i = 0; i < count; ++i)
     {
         var oNewCol = null;
-        if(null != oPrevCol && false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
+        if (null != oPrevCol && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
         {
+           History.LocalChange = true;
            oNewCol = oPrevCol.clone();
 		   oNewCol.hd = null;
            oNewCol.BestFit = null;
            oNewCol.index = index + i; 
+           History.LocalChange = false;
         }
 		this.aCols.splice(index, 0, oNewCol);
     }
@@ -3292,8 +3296,9 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 			}
 		}
 	}
-	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges && !copyRange)
+	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges) && !copyRange)
 	{
+	    History.LocalChange = true;
 		var aMerged = this.mergeManager.get(oBBoxFrom);
 		if(aMerged.inner.length > 0)
 		{
@@ -3314,6 +3319,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 				this.hyperlinkManager.removeElement(elem);
 			}
 		}
+		History.LocalChange = false;
 	}
 	//удаляем to через историю, для undo
 	var aRangesToCheck = this._prepareMoveRangeGetCleanRanges(oBBoxFrom, oBBoxTo);
@@ -3362,8 +3368,9 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
     }
 
 	History.TurnOn();
-	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
+	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
 	{
+	    History.LocalChange = true;
 		if(null != aTempObj.merged)
 		{
 			for(var i = 0, length = aTempObj.merged.length; i < length; i++)
@@ -3382,6 +3389,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 				this.hyperlinkManager.add(elem.bbox, elem.data);
 			}
 		}
+		History.LocalChange = false;
 	}
 	//расширяем границы
 	if(oBBoxFrom.r2 > this.nRowsCount)
@@ -6663,9 +6671,11 @@ Range.prototype._shiftLeftRight=function(bLeft){
 	//todo вставить предупреждение, что будет unmerge
 	History.Create_NewPoint();
 	History.StartTransaction();
-	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
+	var oShiftGet = null;
+	if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
-		var oShiftGet = mergeManager.shiftGet(this.bbox, true);
+	    History.LocalChange = true;
+		oShiftGet = mergeManager.shiftGet(this.bbox, true);
 		var aMerged = oShiftGet.elems;
 		if(null != aMerged.outer && aMerged.outer.length > 0)
 		{
@@ -6682,6 +6692,7 @@ Range.prototype._shiftLeftRight=function(bLeft){
 			if(bChanged)
 				oShiftGet = null;
 		}
+		History.LocalChange = false;
 	}
 	//сдвигаем ячейки
 	if(bLeft)
@@ -6698,10 +6709,12 @@ Range.prototype._shiftLeftRight=function(bLeft){
 		else
 			this.worksheet._insertColsBefore(oBBox.c1, nWidth);
 	}
-	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
+	if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
+	    History.LocalChange = true;
 		mergeManager.shift(this.bbox, !bLeft, true, oShiftGet);
 		this.worksheet.hyperlinkManager.shift(this.bbox, !bLeft, true);
+		History.LocalChange = false;
 	}
 	History.EndTransaction();
     buildRecalc(this.worksheet.workbook);
@@ -6719,9 +6732,11 @@ Range.prototype._shiftUpDown = function (bUp) {
 	//todo вставить предупреждение, что будет unmerge
 	History.Create_NewPoint();
 	History.StartTransaction();
-	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
+	var oShiftGet = null;
+	if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
-		var oShiftGet = mergeManager.shiftGet(this.bbox, false);
+	    History.LocalChange = true;
+		oShiftGet = mergeManager.shiftGet(this.bbox, false);
 		var aMerged = oShiftGet.elems;
 		if(null != aMerged.outer && aMerged.outer.length > 0)
 		{	
@@ -6738,6 +6753,7 @@ Range.prototype._shiftUpDown = function (bUp) {
 			if(bChanged)
 				oShiftGet = null;
 		}
+		History.LocalChange = false;
 	}
 	//сдвигаем ячейки
 	if(bUp)
@@ -6754,10 +6770,12 @@ Range.prototype._shiftUpDown = function (bUp) {
 		else
 			this.worksheet._insertRowsBefore(oBBox.r1, nHeight);
 	}
-	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
+	if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
+	    History.LocalChange = true;
 		mergeManager.shift(this.bbox, !bUp, false, oShiftGet);
 		this.worksheet.hyperlinkManager.shift(this.bbox, !bUp, false);
+		History.LocalChange = false;
 	}
 	History.EndTransaction();
 	buildRecalc(this.worksheet.workbook);
@@ -7068,8 +7086,9 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 	}
 	//сортируются только одинарные гиперссылки, все неодинарные оставляем
 	var aSortedHyperlinks = [];
-	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
+	if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
+	    History.LocalChange = true;
 		var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
 		for(var i = 0, length = aHyperlinks.inner.length; i < length; i++)
 		{
@@ -7090,6 +7109,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 				}
 			}
 		}
+		History.LocalChange = false;
 	}
 	//окончательно устанавливаем ячейки
 	var nColFirst0 = oBBox.c1;
@@ -7149,8 +7169,9 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 
 	if (this.worksheet.workbook.isNeedCacheClean)
 		sortDependency(this.worksheet.workbook);
-	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
+	if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
+	    History.LocalChange = true;
 		//восстанавливаем удаленые гиперссылки
 		if(aSortedHyperlinks.length > 0)
 		{
@@ -7160,6 +7181,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 				this.worksheet.hyperlinkManager.add(hyp.Ref.getBBox0(), hyp);
 			}
 		}
+		History.LocalChange = false;
 	}
 };
 Range.prototype._isSameSizeMerged=function(bbox, aMerged){

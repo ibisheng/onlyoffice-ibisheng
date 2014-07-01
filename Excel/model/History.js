@@ -177,7 +177,8 @@ function CHistory(workbook)
 	this.CurPoint = null;
 	this.IsModify = false;
     this.TurnOffHistory = 0;
-	this.Transaction = 0;
+    this.Transaction = 0;
+    this.LocalChange = false;//если true все добавленный изменения не пойдут в совместное редактирование.
 	this.RecIndex = -1;
 	this.lastDrawingObjects = null;
 
@@ -611,7 +612,7 @@ CHistory.prototype =
 				SheetId : sheetid,
 				Range : null,
 				Data  : Data,
-				LocalChange : false
+				LocalChange: this.LocalChange
 			};
 		}
 		else
@@ -623,7 +624,7 @@ CHistory.prototype =
 				SheetId : sheetid,
 				Range : null,
 				Data  : Type,
-				LocalChange : false
+				LocalChange: this.LocalChange
 			};
 		}
 		if(null != range)
