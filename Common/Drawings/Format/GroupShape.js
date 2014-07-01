@@ -2169,6 +2169,7 @@ CGroupShape.prototype =
                 {
                     this.spTree.splice(pos, 0, item);
                 }
+                this.handleUpdateSpTree();
                 break;
             }
             case historyitem_GroupShapeSetGroup:
