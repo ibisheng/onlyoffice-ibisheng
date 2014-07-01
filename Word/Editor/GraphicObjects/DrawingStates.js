@@ -979,9 +979,26 @@ MoveInGroupState.prototype =
         var old_x = this.group.bounds.x;
         var old_y = this.group.bounds.y;
         var i;
-        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+        var tracks = this.drawingObjects.arrTrackObjects;
+        if(this instanceof MoveInGroupState && e.CtrlKey)
         {
-            this.drawingObjects.arrTrackObjects[i].trackEnd(true);
+            this.group.resetSelection();
+            for(i = 0; i < tracks.length; ++i)
+            {
+                var copy = tracks[i].originalObject.copy();
+                copy.setGroup(tracks[i].originalObject.group);
+                copy.group.addToSpTree(copy.group.length, copy);
+                tracks[i].originalObject = copy;
+                tracks[i].trackEnd(true);
+                this.group.selectObject(copy, 0);
+            }
+        }
+        else
+        {
+            for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+            {
+                this.drawingObjects.arrTrackObjects[i].trackEnd(true);
+            }
         }
         this.group.updateCoordinatesAfterInternalResize();
         this.group.recalculate();
