@@ -192,10 +192,8 @@ CChartsDrawer.prototype =
 	_calculatePositionTitle: function(chartSpace)
 	{	
 		var widthGraph = chartSpace.extX;
-		var heightGraph = chartSpace.extY;
 		
 		var widthTitle = chartSpace.chart.title.extX;
-		var heightTitle = chartSpace.chart.title.extY;
 		var standartMargin = 7;
 		
 		var y = standartMargin / this.calcProp.pxToMM;
@@ -205,8 +203,7 @@ CChartsDrawer.prototype =
 	},
 	
 	_calculatePositionValAx: function(chartSpace)
-	{	
-		var widthTitle = chartSpace.chart.plotArea.valAx.title.extX;
+	{
 		var heightTitle = chartSpace.chart.plotArea.valAx.title.extY;
 		var standartMargin = 13;
 		
@@ -308,7 +305,6 @@ CChartsDrawer.prototype =
 			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
 		
 		var pxToMM = this.calcProp.pxToMM;
-		var standartMargin = 13 / pxToMM;
 		
 		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
 		
@@ -456,8 +452,8 @@ CChartsDrawer.prototype =
 					calculateTop  = valAx.yPoints[0].pos;
 					calculateBottom = this.calcProp.heightCanvas / pxToMM - valAx.yPoints[valAx.yPoints.length - 1].pos;
 				}
-			};
-		};
+			}
+		}
 		
 		
 		//catAx
@@ -477,7 +473,7 @@ CChartsDrawer.prototype =
 				{
 					calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos;
 					calculateRight = this.calcProp.widthCanvas / pxToMM - catAx.xPoints[0].pos;
-				};
+				}
 			}
 			else if(isHBar && valAx && !isNaN(valAx.posY) && this.calcProp.heightCanvas != undefined)
 			{
@@ -498,7 +494,7 @@ CChartsDrawer.prototype =
 					
 					calculateTop  = catAx.yPoints[0].pos - curBetween;
 					calculateBottom = this.calcProp.heightCanvas / pxToMM - (catAx.yPoints[catAx.yPoints.length - 1].pos + curBetween);
-				};
+				}
 			}
 			else if(valAx && !isNaN(valAx.posX) && this.calcProp.widthCanvas != undefined)
 			{
@@ -519,9 +515,9 @@ CChartsDrawer.prototype =
 					
 					calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos - curBetween;
 					calculateRight = this.calcProp.widthCanvas / pxToMM - (catAx.xPoints[0].pos + curBetween);
-				};
-			};
-		};
+				}
+			}
+		}
 		
 		return {calculateLeft: calculateLeft, calculateRight : calculateRight, calculateTop: calculateTop, calculateBottom: calculateBottom};
 	},
@@ -587,7 +583,7 @@ CChartsDrawer.prototype =
 					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos + Math.abs((catAx.interval) / 2);
 				else
 					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
-			};
+			}
 
 			
 			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
@@ -616,7 +612,7 @@ CChartsDrawer.prototype =
 			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
 			else
-				rightUpPointX = valAx.xPoints[0].pos
+				rightUpPointX = valAx.xPoints[0].pos;
 			
 			
 			if(catAx.labels && !catAx.bDelete)
@@ -830,7 +826,6 @@ CChartsDrawer.prototype =
 			this.calcProp.min = this.calcProp.scale[0];
 		}
 	},
-
 	
 	//****new calculate data****
 	_calculateStackedData2: function()
@@ -867,7 +862,7 @@ CChartsDrawer.prototype =
 				this.calcProp.max = maxMinObj.max;
 				this.calcProp.min = maxMinObj.min;
 			}
-		};
+		}
 		
 		
 		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
@@ -918,7 +913,7 @@ CChartsDrawer.prototype =
 				this.calcProp.min = maxMinObj.min;
 				this.calcProp.data = tempData;
 			}
-		};
+		}
 	},
 	
 	_calculateData2: function(chart) {	
@@ -979,7 +974,7 @@ CChartsDrawer.prototype =
 
 					if('' != orValue)
 						isSkip[numSeries] = false;
-					var value =  parseFloat(orValue)
+					var value =  parseFloat(orValue);
 					if(!isEn && !isNaN(value))
 					{
 						min = value;
@@ -987,9 +982,9 @@ CChartsDrawer.prototype =
 						isEn = true;
 					}
 					if(!isNaN(value) && value > max)
-						max = value
+						max = value;
 					if(!isNaN(value) && value < min)
-						min = value
+						min = value;
 					if(isNaN(value) && orValue == '' && (((this.calcProp.type == 'Line' ) && this.calcProp.type == 'normal')))
 					{
 						value = '';
@@ -1045,7 +1040,7 @@ CChartsDrawer.prototype =
 						max = xVal;
 						minY = yVal;
 						maxY = yVal;
-					};
+					}
 					
 					if(xVal < min)
 						min = xVal;
@@ -1125,7 +1120,7 @@ CChartsDrawer.prototype =
 		{
 			manualMax = 2 * axisMin;
 			axisMax = manualMax;
-		};
+		}
 			
 		
 		//приводим к первому порядку
@@ -1230,7 +1225,7 @@ CChartsDrawer.prototype =
 			{
 				pow --;
 				tempPow = tempPow * 10;
-			};
+			}
 		}
 		else	
 			temp = Math.pow(logBase, 0);
@@ -1251,7 +1246,7 @@ CChartsDrawer.prototype =
 				result[step] = temp;
 				pow++;
 				step++;
-			};
+			}
 		}
 		else
 		{
@@ -1261,7 +1256,7 @@ CChartsDrawer.prototype =
 				result[step] = temp;
 				pow++;
 				step++;
-			};
+			}
 		}
 		
 		return result;
@@ -1353,7 +1348,7 @@ CChartsDrawer.prototype =
 				axisMax = 0;
 			else
 				axisMin = 0;
-		};
+		}
 		
 		return {min: axisMin, max: axisMax};
 	},
@@ -1554,13 +1549,13 @@ CChartsDrawer.prototype =
 				this.calcProp.type = "Scatter";
 				break;
 			}
-		};
+		}
 		
 		var grouping = chartProp.chart.plotArea.chart.grouping;
 		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
-			this.calcProp.subType = (grouping === GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === GROUPING_STACKED) ? "stacked" : "normal"
+			this.calcProp.subType = (grouping === GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === GROUPING_STACKED) ? "stacked" : "normal";
 		else
-			this.calcProp.subType = (grouping === BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === BAR_GROUPING_STACKED) ? "stacked" : "normal"
+			this.calcProp.subType = (grouping === BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === BAR_GROUPING_STACKED) ? "stacked" : "normal";
 		
 		
 		this.calcProp.xaxispos = null;
@@ -1578,12 +1573,6 @@ CChartsDrawer.prototype =
 		
 		//отсеиваем пустые серии
 		this.calcProp.seriesCount = this._calculateCountSeries(chartProp);
-		
-		//находим значния для осей
-		/*this.calcProp.scale = this._getAxisData(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
-		if(this.calcProp.type == "Scatter")
-			this.calcProp.xScale = this._getAxisData(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax, chartProp);*/
-			
 		
 		if(this.calcProp.type == "Scatter")
 		{
@@ -1708,7 +1697,7 @@ CChartsDrawer.prototype =
 			{
 				path.moveTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
 				path.lnTo(x * pathW, (y  - (2/3)*size) * pathW);
-				path.lnTo((x + size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW)
+				path.lnTo((x + size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
 				path.lnTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
 				break;
 			}
@@ -1720,6 +1709,7 @@ CChartsDrawer.prototype =
 				path.lnTo((x + halfSize) * pathW, (y - halfSize) * pathW);
 				path.lnTo((x + halfSize) * pathW, (y + halfSize) * pathW);
 				path.lnTo((x - halfSize) * pathW, (y + halfSize) * pathW);
+				break;
 			}
 			
 			case SYMBOL_DIAMOND:
@@ -1756,7 +1746,7 @@ CChartsDrawer.prototype =
 		if(logBase)
 		{	
 			return this._getYPositionLogBase(val, yPoints, isOx, logBase);
-		};
+		}
 		
 		//позиция в заисимости от положения точек на оси OY
 		var result;
@@ -1860,7 +1850,7 @@ CChartsDrawer.prototype =
 				if(yPoints[i].val < maxVal && yPoints[i].val > minVal)
 				{
 					startPos = yPoints[i + 1].pos;
-					diffPos = yPoints[i].pos - yPoints[i + 1].pos
+					diffPos = yPoints[i].pos - yPoints[i + 1].pos;
 					break;
 				}
 			}
@@ -1878,12 +1868,12 @@ CChartsDrawer.prototype =
 				if(yPoints[i].val < maxVal && yPoints[i].val >= minVal)
 				{
 					startPos = yPoints[i].pos;
-					diffPos = yPoints[i].pos - yPoints[i + 1].pos
+					diffPos = yPoints[i].pos - yPoints[i + 1].pos;
 					break;
 				}
 			}
 			result = startPos - parseFloat("0." + parseVal[1]) * diffPos;
-		};
+		}
 		
 		return result;
 	},
@@ -2018,78 +2008,6 @@ CChartsDrawer.prototype =
 		return summ;
 	},
 	
-	_round_val: function (num)
-	{
-		if(num.toString() && num.toString().indexOf('e+') == -1 && isNaN(parseFloat(num)))
-			return num;
-		var floatKoff = 100000000000;
-		if(num.toString() && num.toString().indexOf('e+') > -1)
-		{
-			var parseVal = num.toString().split("e+");
-			var roundVal = Math.round(parseFloat(parseVal[0])*floatKoff)/floatKoff;
-			var changeSymbol = roundVal.toString() + "e+" + parseVal[1];
-			num = parseFloat(changeSymbol);
-		}
-		num =  Math.round(num*floatKoff)/floatKoff ;
-		return num;
-	},
-	
-	_array_exp: function (arr)
-    {
-		var maxDig = 1000000000;
-		var minDig = 0.000000001;
-		var floatKoff = 100000000000;
-		
-		if(typeof(arr) == 'number')
-		{
-			if(arr < 0)
-				maxDig = 100000000;
-			if(Math.abs(arr) > maxDig)
-			{
-				var tmp = Math.abs(arr);
-				var exp = 0;
-				while (tmp > 9) {
-					exp += 1;
-					tmp /= 10;
-				}
-				if(arr < 0)
-					tmp *= -1; 
-				arr = tmp + "E+" + exp;
-			}
-		}
-		else
-		{
-			for (var i=0; i<arr.length; ++i) {
-			maxDig = 1000000000
-			if(arr[i] < 0)
-				maxDig = 100000000;
-				if(Math.abs(arr[i]) > maxDig)
-				{
-					var tmp = Math.abs(arr[i]);
-					var exp = 0;
-					while (tmp > 9) {
-						exp += 1;
-						tmp /= 10;
-					}
-					tmp = Math.round(tmp*floatKoff)/floatKoff
-					if(arr[i] < 0)
-						tmp *= -1; 
-					arr[i] = tmp + "E+" + exp;
-				}
-			}
-		}
-		return arr;
-	},
-	
-	_array_reverse: function (arr)
-    {
-        var newarr = [];
-        for (var i = arr.length - 1; i >= 0; i--) {
-            newarr.push(arr[i]);
-        }
-        return newarr;
-    },
-	
 	_getFirstDegree: function(val)
 	{
 		var secPart = val.toString().split('.');
@@ -2118,7 +2036,7 @@ CChartsDrawer.prototype =
 			}
             numPow = Math.pow(10, num);
 			val = tempMax;
-		};
+		}
 
 		if(tempMax == undefined)
 			val = val / numPow;
@@ -2187,18 +2105,18 @@ CChartsDrawer.prototype =
 		}  
 		else if ((d02 / 6 >= d12 / 2) && (d13 / 6 >= d12 / 2)) 
 		{
-			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02))
-			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13))
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02));
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13));
 		}
 		else if((d02 / 6 >= d12 / 2))
 		{
-			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02))
-			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13 * (d13 / d02)))
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02));
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13 * (d13 / d02)));
 		}
 		else
 		{
-			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02 * (d02 / d13)))
-			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13))
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02 * (d02 / d13)));
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13));
 		}
 		
 		//end point
@@ -2241,12 +2159,12 @@ CChartsDrawer.prototype =
 					this.calcProp.ptCount = numCache.ptCount;
 				
 				counter++;
-			};
-		};
+			}
+		}
 		
 		return counter;
 	}
-}
+};
 
 
 
@@ -2358,7 +2276,7 @@ drawBarChart.prototype =
 						if(tempValues[k][idx] && tempValues[k][idx] > 0)
 							prevVal += tempValues[k][idx];
 					}
-				};
+				}
 				
 				
 				tempValues[i][idx]   = val;
@@ -2421,10 +2339,10 @@ drawBarChart.prototype =
 						this.paths.series[i] = [];
 					this.paths.series[i][idx] = paths;
 				//}
-			};
+			}
 			
 			seriesCounter++;
-		};
+		}
     },
 	
 	_getStartYColumnPosition: function (seriesHeight, i, j, val, yPoints, prevVal)
@@ -2493,7 +2411,7 @@ drawBarChart.prototype =
 				
 				if(curVal)
 					temp += Math.abs(curVal);
-			};
+			}
 			
 			this.summBarVal[j] = temp;
 		}
@@ -2511,7 +2429,7 @@ drawBarChart.prototype =
 				result += parseFloat(curVal);
 			else if(idxPoint && val < 0 && curVal < 0)
 				result += parseFloat(curVal);
-		};
+		}
 		
 		return result;
 	},
@@ -2724,7 +2642,7 @@ drawLineChart.prototype =
 				if(!points[i])
 					points[i] = [];
 				
-				idxPoint = this.cChartDrawer.getIdxPoint(seria, n)
+				idxPoint = this.cChartDrawer.getIdxPoint(seria, n);
 				compiledMarkerSize = idxPoint && idxPoint.compiledMarker && idxPoint.compiledMarker.size ? idxPoint.compiledMarker.size : null;
 				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker && idxPoint.compiledMarker.symbol ? idxPoint.compiledMarker.symbol : null;
 				
@@ -2739,7 +2657,7 @@ drawLineChart.prototype =
 					points[i][n] = null;
 				}
 			}
-		};
+		}
 		
 		this._calculateAllLines(points);
 	},
@@ -2790,7 +2708,7 @@ drawLineChart.prototype =
 						this.paths.series[i][n] = this._calculateLine(points[i][n].x, points[i][n].y, points[i][n + 1].x, points[i][n + 1].y);
 				}
 			}
-		};
+		}
 	},
 	
 	_getYPosition: function(val, yPoints)
@@ -2933,7 +2851,7 @@ drawLineChart.prototype =
 				{
 					markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
 					markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
-				};
+				}
 				
 				//frame of point
 				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
@@ -3045,7 +2963,7 @@ drawLineChart.prototype =
 		
 		return path;
 	}
-}
+};
 
 
 
@@ -3124,7 +3042,7 @@ drawAreaChart.prototype =
 					this.points[i][n] = {x: x, y: nullPositionOX};
 				}
 			}
-		};
+		}
 		
 		this._calculateAllLines();
 	},
@@ -3151,7 +3069,7 @@ drawAreaChart.prototype =
 				
 			if(points[i])
 				this.paths.series[i] = this._calculateLine(points[i], prevPoints);
-		};
+		}
 	},
 	
 	_getPrevSeriesPoints: function(points, i)
@@ -3165,7 +3083,7 @@ drawAreaChart.prototype =
 				prevPoints = points[p];
 				break;
 			}
-		};
+		}
 		
 		return prevPoints;
 	},
@@ -3196,7 +3114,7 @@ drawAreaChart.prototype =
 			{
 				path.lnTo(point.x * pathW, point.y * pathH);
 			}
-		};
+		}
 		
 		//точки предыдущей серии
 		var nullPositionOX = this.chartProp.nullPositionOX;
@@ -3358,7 +3276,7 @@ drawAreaChart.prototype =
 				brush = dataSeries[0].brush;
 			
 			this.cChartDrawer.drawPath(this.paths.series[i], pen, brush);
-        };
+        }
 		
 		this.cShapeDrawer.Graphics.RestoreGrState();
     },
@@ -3406,7 +3324,7 @@ drawAreaChart.prototype =
 		}
 		return val;
 	}
-}
+};
 
 
 
@@ -3466,7 +3384,7 @@ drawHBarChart.prototype =
 		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
-			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : his.chartProp.series[i].val.numLit;
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			
 			if(!numCache)
 				continue;
@@ -3545,11 +3463,11 @@ drawHBarChart.prototype =
 						this.paths.series[i] = [];
 					this.paths.series[i][idx] = paths;
 				}
-			};
+			}
 			
 			seriesCounter++;
 			
-        };
+        }
     },
 	
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints, summBarVal)
@@ -3608,9 +3526,9 @@ drawHBarChart.prototype =
 					
 				if(curVal)
 					temp += Math.abs(curVal);
-			};
+			}
 			this.summBarVal[j] = temp;
-		};
+		}
 	},
 	
 	_getStackedValue: function(series, i, j, val)
@@ -3625,7 +3543,7 @@ drawHBarChart.prototype =
 				result += parseFloat(curVal);
 			else if(idxPoint && val < 0 && curVal < 0)
 				result += parseFloat(curVal);	
-		};
+		}
 		
 		return result;
 	},
@@ -3796,7 +3714,7 @@ drawHBarChart.prototype =
 		
 		return path;
 	}
-}
+};
 
 
 
@@ -4117,11 +4035,11 @@ drawDoughnutChart.prototype =
 					this.paths.series[n][k] = this._calculateSegment(angle, radius, xCenter, yCenter, radius + step * (seriesCounter + 1), radius + step * seriesCounter, firstSliceAng);
 				else
 					this.paths.series[n][k] = null;
-			};
+			}
 			
 			seriesCounter++;
 			
-		};
+		}
     },
 	
 	_calculateSegment: function (angle, radius, xCenter, yCenter, radius1, radius2, firstSliceAng)
@@ -4334,7 +4252,7 @@ drawRadarChart.prototype =
 					if(!this.paths.series)
 						this.paths.series = [];
 					if(!this.paths.series[i])
-						this.paths.series[i] = []
+						this.paths.series[i] = [];
 					
 					this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 					
@@ -4583,7 +4501,7 @@ drawRadarChart.prototype =
 		
 		return path;
 	}
-}
+};
 
 
 
@@ -4671,7 +4589,7 @@ drawScatterChart.prototype =
 					points[i][n] = null;
 				}
 			}
-		};
+		}
 		
 		this._calculateAllLines(points);
 	},
@@ -4750,7 +4668,7 @@ drawScatterChart.prototype =
 					points[i][n] = null;
 				}
 			}
-		};
+		}
 		
 		this._calculateAllLines(points);
     },
@@ -4797,7 +4715,7 @@ drawScatterChart.prototype =
 					}					
 				}
 			}
-		};
+		}
 	},
 	
 	_getYVal: function(n, i)
@@ -4847,7 +4765,7 @@ drawScatterChart.prototype =
 				{
 					markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
 					markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
-				};
+				}
 				
 				//frame of point
 				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
@@ -5596,8 +5514,8 @@ drawBubbleChart.prototype =
 			{
 				maxArea = 1 / 4 * (Math.PI * (maxDiamBubble * maxDiamBubble));
 				defaultSize = Math.sqrt((maxArea / diffSize) / Math.PI);
-			};
-		};
+			}
+		}
 		
 		var path  = new Path();
 		
@@ -5772,7 +5690,7 @@ gridChart.prototype =
 						this.paths.horisontalMinorLines[i] = [];
 					
 					this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
-				};
+				}
 					
 				
 				if(crossDiff && i == yPoints.length - 1)
@@ -5838,7 +5756,7 @@ gridChart.prototype =
 					this.paths.verticalMinorLines[i] = [];
 				
 				this.paths.verticalMinorLines[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + heightLine);
-			};
+			}
 			
 			if(crossDiff && i == xPoints.length - 1)
 			{
@@ -5937,7 +5855,7 @@ gridChart.prototype =
 			}
 		}	
 	}
-}	
+};
 	
 
 //*****Category axis*****
@@ -6018,7 +5936,7 @@ catAxisChart.prototype =
 				widthLine = 5;
 				break;
 			}
-		};
+		}
 		
 		switch ( this.chartSpace.chart.plotArea.catAx.minorTickMark )
 		{
@@ -6042,13 +5960,13 @@ catAxisChart.prototype =
 				widthMinorLine = 3;
 				break;
 			}
-		};
+		}
 		
 		if(this.chartProp.type == "HBar")
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
-		};
+		}
 		
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.valAx ? this.chartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		if(orientation !== ORIENTATION_MIN_MAX)
@@ -6188,7 +6106,7 @@ catAxisChart.prototype =
 				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
 			else if(this.chartSpace.chart.plotArea.valAx.posX)
 				firstDiff = Math.abs(this.chartSpace.chart.plotArea.valAx.posX - xPoints[0].pos) * 2;
-		};
+		}
 			
 		
 		if(orientation == ORIENTATION_MIN_MAX)
@@ -6319,7 +6237,7 @@ catAxisChart.prototype =
 			}	
 		}
 	}
-}	
+};
 
 
 //*****value axis*****
@@ -6398,7 +6316,7 @@ valAxisChart.prototype =
 				widthLine = -5;
 				break;
 			}
-		};
+		}
 		
 		switch ( this.chartSpace.chart.plotArea.valAx.minorTickMark )
 		{
@@ -6422,20 +6340,20 @@ valAxisChart.prototype =
 				widthMinorLine = -3;
 				break;
 			}
-		};
+		}
 		
 		if(this.chartProp.type == "HBar")
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
-		};
+		}
 		
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		if(orientation !== ORIENTATION_MIN_MAX)
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
-		};
+		}
 		
 		if(!(widthLine === 0 && widthMinorLine === 0))
 		{
@@ -6565,7 +6483,7 @@ valAxisChart.prototype =
 			}
 		}	
 	}
-}	
+};
 
 	
 //*****all area of chart*****
@@ -6632,7 +6550,7 @@ allAreaChart.prototype =
 		var brush = this.chartSpace.brush;
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
-}	
+};
 	
 //*****Area of chart*****
 function areaChart()
@@ -6706,14 +6624,14 @@ areaChart.prototype =
 		var brush = this.chartSpace.chart.plotArea.brush;
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
-}	
+};
 	
 	
 //********************************3D******************************************
 	
-var angleOx = 0//- Math.PI/6;
-var angleOy = 0//- Math.PI/6;
-var angleOz = 0//- Math.PI/6;
+var angleOx = 0;//- Math.PI/6;
+var angleOy = 0;//- Math.PI/6;
+var angleOz = 0;//- Math.PI/6;
 	
 //*****3d LINE CHART*****
 function drawLine3DChart()
@@ -6763,7 +6681,7 @@ drawLine3DChart.prototype =
 		
 		var cX1, cY1, cZ1, cX2, cY2, cZ2, cX3, cY3, cZ3, cX4, cY4, cZ4, convertObj, z, turnResult;
 
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			var seria = this.chartProp.series[i];
 			
@@ -6787,7 +6705,7 @@ drawLine3DChart.prototype =
 				if(!this.paths.series)
 					this.paths.series = [];
 				if(!this.paths.series[i])
-					this.paths.series[i] = []
+					this.paths.series[i] = [];
 				
 				
 				z = 50;
@@ -6846,7 +6764,7 @@ drawLine3DChart.prototype =
 		var pen;
 		var dataSeries;
 		var seria;
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
@@ -6931,7 +6849,7 @@ drawLine3DChart.prototype =
 	{
 		return {x: 0, y: 0};
 	}
-}
+};
 
 
 
@@ -6991,7 +6909,7 @@ drawBar3DChart.prototype =
 					//затемнение боковых сторон
 					if(k != 5)
 					{
-						var  props = this.chartSpace.getParentObjects()
+						var  props = this.chartSpace.getParentObjects();
 						var duplicateBrush = brush.createDuplicate();
 						var cColorMod = new CColorMod;
 						cColorMod.val = 80000;
@@ -7025,7 +6943,7 @@ drawBar3DChart.prototype =
 					//затемнение боковых сторон
 					if(k != 5)
 					{
-						var  props = this.chartSpace.getParentObjects()
+						var  props = this.chartSpace.getParentObjects();
 						var duplicateBrush = brush.createDuplicate();
 						var cColorMod = new CColorMod;
 						cColorMod.val = 80000;
@@ -7376,7 +7294,7 @@ drawBar3DChart.prototype =
 	{
 		return {x: 0, y: 0};
 	}
-}
+};
 
 
 //*****3D   GRID*****
@@ -7457,19 +7375,19 @@ grid3DChart.prototype =
 			q = 0;
 			r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
 			x1n = convertResult.x + diff;
 			y1n = convertResult.y + heightLine/2;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x2, y2, z2, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x2, y2, z2, p, q, r);
 			x2n = convertResult.x + diff;
 			y2n = convertResult.y + heightLine/2;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x3, y3, z3, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x3, y3, z3, p, q, r);
 			x3n = convertResult.x + diff;
 			y3n = convertResult.y + heightLine/2;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x4, y4, z4, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x4, y4, z4, p, q, r);
 			x4n = convertResult.x + diff;
 			y4n = convertResult.y + heightLine/2;
 			
@@ -7477,9 +7395,9 @@ grid3DChart.prototype =
 			if(!this.paths.horisontalLines)
 				this.paths.horisontalLines = [];
 			if(i == 0)
-				this.paths.horisontalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n)
+				this.paths.horisontalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n);
 			else
-				this.paths.horisontalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n)
+				this.paths.horisontalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n);
 		}
 		
 		
@@ -7541,19 +7459,19 @@ grid3DChart.prototype =
 			q = 0;
 			r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
 			x1n = convertResult.x + diff;
 			y1n = convertResult.y + heightLine/2;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x2, y2, z2, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x2, y2, z2, p, q, r);
 			x2n = convertResult.x + diff;
 			y2n = convertResult.y + heightLine/2;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x3, y3, z3, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x3, y3, z3, p, q, r);
 			x3n = convertResult.x + diff;
 			y3n = convertResult.y + heightLine/2;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x4, y4, z4, p, q, r)
+			convertResult = this.cShapeDrawer._convert3DTo2D(x4, y4, z4, p, q, r);
 			x4n = convertResult.x + diff;
 			y4n = convertResult.y + heightLine/2;
 			
@@ -7561,9 +7479,9 @@ grid3DChart.prototype =
 			if(!this.paths.verticalLines)
 				this.paths.verticalLines = [];
 			if(i == 0)
-				this.paths.verticalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n)
+				this.paths.verticalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n);
 			else
-				this.paths.verticalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n)
+				this.paths.verticalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n);
 		}
 
 	},
@@ -7633,7 +7551,7 @@ grid3DChart.prototype =
 			this.cChartDrawer.drawPath(path, pen);
 		}
 	}
-}		
+};
 	
 	
 	

@@ -10,8 +10,7 @@
 		this.WordControl = new CEditorPage(this);
 		this.WordControl.m_oLogicDocument   = new CDocument(this.WordControl.m_oDrawingDocument);
 		this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
-		
-		this.chartStyleManager = new ChartStyleManager();
+
 		this.chartPreviewManager = new ChartPreviewManager();
 	}
 	

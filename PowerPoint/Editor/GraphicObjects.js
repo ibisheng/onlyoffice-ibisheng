@@ -1876,12 +1876,6 @@ CGraphicObjects.prototype = {
         History.TurnOff();
         var ret = new CChartAsGroup();
         ret.setAscChart(new asc_CChart());
-        var options = {};
-        options.slide =  this.slide;
-        options.layout = this.slide.Layout;
-        options.master = this.slide.Layout.Master;
-        options.theme = this.slide.Layout.Master.Theme;
-        editor.chartStyleManager.init(options);
 
         var presentation = editor.WordControl.m_oLogicDocument;
         var chart_width = 0.264583*c_oAscChartDefines.defaultChartWidth;

@@ -630,11 +630,7 @@ function asc_docs_api(name)
     this.DocumentReaderMode = null;
 	
 	this.isChartEditor = false;
-	
-	if(typeof ChartStyleManager != "undefined")
-		this.chartStyleManager = new ChartStyleManager();
-	else
-		this.chartStyleManager = null;
+
 	if(typeof ChartPreviewManager != "undefined")
 		this.chartPreviewManager = new ChartPreviewManager();
 	else

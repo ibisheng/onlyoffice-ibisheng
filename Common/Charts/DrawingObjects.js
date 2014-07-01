@@ -255,7 +255,6 @@ asc_CChart.prototype = {
 					ser.asc_setMarkerSize(object.series[i].Marker.Size);
 					ser.asc_setMarkerSymbol(object.series[i].Marker.Symbol);
 				}
-				ser.asc_setOutlineColor(object.series[i].OutlineColor);
 				ser.asc_setFormatCode(object.series[i].FormatCode);
 
 				this.series.push(ser);
@@ -320,39 +319,7 @@ asc_CChart.prototype = {
     asc_setSeria: function(seriaObj) { if (seriaObj) this.series.push(seriaObj); },
     asc_removeSeries: function() { this.series = []; },
 
-    _generateColorPart: function (val, percent) {
-        // 	Negative outputs are shades, and positive outputs are tints.
-        if ( percent >= 0 )
-            return Math.min( 255, ((255 - val) * percent + val) >> 0 );
-        else
-            return Math.max( 0, (val * (1 + percent)) >> 0 );
-    },
-
-    _generateColor: function (oColor, percent) {
-        return new CColor(this._generateColorPart(oColor.r, percent),
-            this._generateColorPart(oColor.g, percent), this._generateColorPart(oColor.b, percent));
-    },
-
-    _generateColors: function (countColors, arrayBaseColors) {
-        var arrayColors = [];
-        var countBase = arrayBaseColors.length;
-        var needCreate = parseInt(countColors / countBase) + 1;
-
-        for (var i = 0; i < needCreate; i++) {
-            for (var j = 0; j < countBase; j++) {
-                // Для равномерного затухания: percent = i / needCreate
-                var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) / 100.0;		// ECMA-376 Part 1
-                var color = this._generateColor(arrayBaseColors[j], percent);
-
-                arrayColors.push( color );
-            }
-        }
-        arrayColors.splice(countColors, arrayColors.length - countColors);
-        return arrayColors;
-    },
-
     initDefault: function() {
-
         // Обновлены тестовые данные для новой диаграммы
         function createItem(value) {
             return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
@@ -367,12 +334,10 @@ asc_CChart.prototype = {
         this.yAxis.title = "Medals";
 
         this.series = [];
-        var uniColors = this.generateUniColors(3);
 
         var seria = new asc_CChartSeria();
         seria.Val.Formula = "Sheet1!B2:B7";
         seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
-        seria.OutlineColor = uniColors[0];
         seria.TxCache.Formula = "Sheet1!B1";
         seria.TxCache.Tx = "Gold";
         if ( this.type != c_oAscChartType.scatter )
@@ -384,7 +349,6 @@ asc_CChart.prototype = {
         seria = new asc_CChartSeria();
         seria.Val.Formula = "Sheet1!C2:C7";
         seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
-        seria.OutlineColor = uniColors[1];
         seria.TxCache.Formula = "Sheet1!C1";
         seria.TxCache.Tx = "Silver";
         if ( this.type != c_oAscChartType.scatter )
@@ -396,7 +360,6 @@ asc_CChart.prototype = {
         seria = new asc_CChartSeria();
         seria.Val.Formula = "Sheet1!D2:D7";
         seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
-        seria.OutlineColor = uniColors[2];
         seria.TxCache.Formula = "Sheet1!D1";
         seria.TxCache.Tx = "Bronze";
         if ( this.type != c_oAscChartType.scatter )
@@ -452,11 +415,7 @@ asc_CChart.prototype = {
 		var ws = _t.range.intervalObject.worksheet;
 
         // Save old series colors
-        var i, oldSeriaData = [];
-        for (i = 0; !isIgnoreColors && (i < _t.series.length); ++i) {
-            if ( _t.series[i].OutlineColor && !_t.series[i].OutlineColor.isCustom )
-                oldSeriaData[i] = _t.series[i].OutlineColor;
-        }
+        var i;
         _t.series = [];
 
         function getNumCache(c1, c2, r1, r2) {
@@ -639,114 +598,6 @@ asc_CChart.prototype = {
                 nameIndex++;
             }
         }
-        // Colors
-        var seriaUniColors = _t.generateUniColors(_t.series.length);
-
-        if ( _t.type == c_oAscChartType.hbar )
-            seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
-
-        // Restore old series colors
-        for (i = 0; i < _t.series.length; ++i) {
-            if ( oldSeriaData[i] )
-                _t.series[i].OutlineColor = oldSeriaData[i];
-            else
-                _t.series[i].OutlineColor = seriaUniColors[i];
-        }
-    },
-
-    getReverseSeries: function() {
-        var revSeries = [];
-        var serLen = this.series.length;
-
-        var i, j, aData = [];
-        for (j = 0; j < this.series.length; j++) {
-            aData.push(this.series[j].Val.NumCache.length);
-            aData.push(this.series[j].xVal.NumCache.length);
-            aData.push(this.series[j].Cat.NumCache.length);
-        }
-        var maxDataLen = Math.max.apply(Math, aData);
-        var emptyItem = { numFormatStr: "General", isDateTimeFormat: false, val: "", isHidden: false };
-
-        for (j = 0; j < this.series.length; j++) {
-            if ( this.series[j].Val.NumCache.length ) {
-                while ( this.series[j].Val.NumCache.length < maxDataLen )
-					this.series[j].Val.NumCache.push(emptyItem);
-            }
-            if ( this.series[j].xVal.NumCache.length ) {
-                while ( this.series[j].xVal.NumCache.length < maxDataLen )
-					this.series[j].xVal.NumCache.push(emptyItem);
-            }
-            if ( this.series[j].Cat.NumCache.length ) {
-                while ( this.series[j].Cat.NumCache.length < maxDataLen )
-					this.series[j].Cat.NumCache.push(emptyItem);
-            }
-        }
-
-        if ( serLen ) {
-            for (i = 0; i < this.series[0].Val.NumCache.length; i++) {
-
-                var seria = new asc_CChartSeria();
-                for (j = 0; j < this.series.length; j++) {
-                    seria.Val.NumCache.push(this.series[j].Val.NumCache[i]);
-
-                    if ( this.series[j].TxCache.Formula && this.series[j].TxCache.Tx )
-                        seria.Cat.NumCache.push( {val: this.series[j].TxCache.Tx} );
-
-                    if ( this.series[j].Cat.Formula && this.series[j].Cat.NumCache.length )
-                        seria.TxCache.Tx = this.series[j].Cat.NumCache[i].val;
-                    else
-                        seria.TxCache.Tx = (i + 1);
-                }
-                revSeries.push(seria);
-            }
-        }
-
-        // Colors
-        var seriaUniColors = this.generateUniColors(revSeries.length);
-        for (i = 0; i < revSeries.length; i++) {
-            revSeries[i].OutlineColor = seriaUniColors[i];
-        }
-
-        return revSeries;
-    },
-
-    generateUniColors: function(count) {
-        var uniColors = [];
-        var api_doc = window["editor"];
-        var api_sheet = window["Asc"]["editor"];
-        var api = api_sheet ? api_sheet : api_doc;
-
-        if ( count > 0 ) {
-            if ( !api.chartStyleManager.isReady() )
-                api.chartStyleManager.init();
-
-            var baseColors = api.chartStyleManager.getBaseColors( parseInt(this.styleId) );
-            var colors = this._generateColors(count, baseColors);
-
-            for ( var i = 0; i < colors.length; i++ ) {
-                var uniColor = CreateUniColorRGB(colors[i].r, colors[i].g, colors[i].b);
-                uniColor.isCustom = true;
-                uniColors.push(uniColor);
-            }
-        }
-
-        return uniColors;
-    },
-
-    getLegendInfo: function() {
-
-        var aInfo = [];
-        function legendInfo() { return { text: null, color: null, marker: null } }
-
-        for ( var i = 0; i < this.series.length; i++ ) {
-
-            var info = new legendInfo();
-            info.text = this.series[i].asc_getTitle();
-            info.color = this.series[i].asc_getOutlineColor();
-            info.marker = c_oAscLegendMarkerType.Line;
-            aInfo.push(info);
-        }
-        return aInfo;
     },
 
     Get_Id: function() {
@@ -1436,7 +1287,6 @@ function asc_CChartSeria() {
     this.Cat = { Formula: "", NumCache: [] };
     this.TxCache = { Formula: "", Tx: "" };
     this.Marker = { Size: 0, Symbol: "" };
-    this.OutlineColor = null;
     this.FormatCode = "";
     this.isHidden = false;
     this.bShowValue = false;
@@ -1464,14 +1314,6 @@ asc_CChartSeria.prototype = {
 
     asc_getMarkerSymbol: function() { return this.Marker.Symbol; },
     asc_setMarkerSymbol: function(symbol) { this.Marker.Symbol = symbol; },
-
-    asc_getOutlineColor: function() { return this.OutlineColor; },
-    asc_setOutlineColor: function(color) {
-        if ( color instanceof CUniColor ) {
-            this.OutlineColor = color.createDuplicate();
-            this.OutlineColor.isCustom = color.isCustom;
-        }
-    },
 
     asc_getFormatCode: function() { return this.FormatCode; },
     asc_setFormatCode: function(format) { this.FormatCode = format; }
@@ -1502,9 +1344,6 @@ prot["asc_setMarkerSize"] = prot.asc_setMarkerSize;
 
 prot["asc_getMarkerSymbol"] = prot.asc_getMarkerSymbol;
 prot["asc_setMarkerSymbol"] = prot.asc_setMarkerSymbol;
-
-prot["asc_getOutlineColor"] = prot.asc_getOutlineColor;
-prot["asc_setOutlineColor"] = prot.asc_setOutlineColor;
 
 prot["asc_getFormatCode"] = prot.asc_getFormatCode;
 prot["asc_setFormatCode"] = prot.asc_setFormatCode;

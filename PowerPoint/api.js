@@ -126,10 +126,6 @@ function asc_docs_api(name)
 
 	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
-	if(typeof ChartStyleManager !== "undefined")
-		this.chartStyleManager = new ChartStyleManager();
-	else
-		this.chartStyleManager = null;
 	if(typeof ChartPreviewManager !== "undefined")	
 		this.chartPreviewManager = new ChartPreviewManager();
 	else
@@ -671,15 +667,15 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 }
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function(options)
 {
-
-    if ( this.chartStyleManager && this.chartPreviewManager && ( !this.chartStyleManager.isReady() ))
+	// ToDo chartStyleManager уже нет, когда будут правиться презентации - поправить!!!
+    if ( /*this.chartStyleManager && */ this.chartPreviewManager /*&& ( !this.chartStyleManager.isReady() )*/)
     {
         for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
         {
             if ( this.SelectedObjectsStack[i].Value.ChartProperties )
             {
-                this.chartStyleManager.init(options);
-                this.chartPreviewManager.init(options); // ToDo этой функции уже нет, когда будут правиться презентации - поправить!!!
+                //this.chartStyleManager.init(options);
+                //this.chartPreviewManager.init(options); // ToDo этой функции уже нет, когда будут правиться презентации - поправить!!!
                 this.asc_fireCallback("asc_onUpdateChartStyles");
                 break;
             }
