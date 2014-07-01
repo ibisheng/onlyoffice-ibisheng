@@ -2626,10 +2626,56 @@ CChartSpace.prototype =
         }
     },
 
+
+    checkEmptySeries: function()
+    {
+        var chart_type = this.chart.plotArea.charts[0];
+        var series = chart_type.series;
+        var checkEmptyVal = function(val)
+        {
+            if(val.numRef)
+            {
+                if(!val.numRef.numCache)
+                    return true;
+                if(val.numRef.numCache.pts.length === 0)
+                    return true;
+            }
+            else if(val.numLit)
+            {
+                if(val.numLit.pts.length === 0)
+                    return true;
+            }
+            else
+            {
+                return true;
+            }
+            return false;
+        };
+        for(var i = 0; i < series.length; ++i)
+        {
+            var ser = series[i];
+            if(ser.val)
+            {
+                if(!checkEmptyVal(ser.val))
+                    return false;
+            }
+            if(ser.yVal)
+            {
+                if(!checkEmptyVal(ser.yVal))
+                    return false;
+            }
+        }
+        return true;
+    },
+
     recalculateAxis: function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
         {
+            var b_checkEmpty = this.checkEmptySeries();
+            this.bEmtySeries = b_checkEmpty;
+            if(b_checkEmpty)
+                return;
             var plot_area = this.chart.plotArea;
             var chart_object = plot_area.chart;
             var i;

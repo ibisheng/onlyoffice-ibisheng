@@ -15619,6 +15619,10 @@ CNumericPoint.prototype =
     setVal: function(pr)
     {
         var _pr = parseFloat(pr);
+        if(isNaN(_pr))
+        {
+            _pr = 0;
+        }
         History.Add(this, {Type: historyitem_NumericPoint_SetVal, oldPr: this.val, newPr: _pr});
         this.val = _pr;
     },
