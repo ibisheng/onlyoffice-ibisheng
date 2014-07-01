@@ -23,8 +23,19 @@ CChartsDrawer.prototype =
 		this.cChartSpace = chartSpace;
 		
 		this.calcProp = {};
-		this._calculateProperties(chartSpace);
-
+		
+		if(!chartSpace.bEmptySeries)
+			this._calculateProperties(chartSpace);
+		
+		if(this.calcProp.widthCanvas == undefined && this.calcProp.pxToMM == undefined)
+		{
+			this.calcProp.pathH = 1000000000;
+			this.calcProp.pathW = 1000000000;
+			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
+			this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
+			this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
+		};
+		
 		//создаём область
 		this.allAreaChart = new allAreaChart();
 		
@@ -102,20 +113,24 @@ CChartsDrawer.prototype =
 		this.chart = newChart;
 		
 		//делаем полный пресчёт
-		this.areaChart.reCalculate(this.calcProp, null, this);
+		if(!chartSpace.bEmptySeries)
+		{
+			this.areaChart.reCalculate(this.calcProp, null, this);
 		
-		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
-			this.gridChart.reCalculate(this.calcProp, this, chartSpace);
+			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+				this.gridChart.reCalculate(this.calcProp, this, chartSpace);
+		};
 		
 		this.allAreaChart.reCalculate(this.calcProp);
 		
-		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart" && !chartSpace.bEmptySeries)
 		{
 			this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
 			this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
-		}
-
-		this.chart.reCalculate(this, chartSpace);
+		};
+		
+		if(!chartSpace.bEmptySeries)
+			this.chart.reCalculate(this, chartSpace);
 	},
 	
 	draw : function(chartSpace, graphics)
@@ -130,16 +145,20 @@ CChartsDrawer.prototype =
 		
 		//отрисовываем без пересчёта
 		this.allAreaChart.draw(this, cShapeDrawer, chartSpace);
-		this.areaChart.draw(this, cShapeDrawer, chartSpace);
 		
-		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+		if(!chartSpace.bEmptySeries)
 		{
-			this.gridChart.draw(this, cShapeDrawer, chartSpace);
-			this.catAxisChart.draw(this, cShapeDrawer, chartSpace);
-			this.valAxisChart.draw(this, cShapeDrawer, chartSpace);
-		}
-		
-		this.chart.draw(this, cShapeDrawer, chartSpace);
+			this.areaChart.draw(this, cShapeDrawer, chartSpace);
+			
+			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
+			{
+				this.gridChart.draw(this, cShapeDrawer, chartSpace);
+				this.catAxisChart.draw(this, cShapeDrawer, chartSpace);
+				this.valAxisChart.draw(this, cShapeDrawer, chartSpace);
+			}
+			
+			this.chart.draw(this, cShapeDrawer, chartSpace);
+		};
 	},
 	
 	
@@ -148,39 +167,44 @@ CChartsDrawer.prototype =
 	reCalculatePositionText : function(type, chartSpace, ser, val)
 	{
 		var pos;
-		switch ( type )
+		
+		if(!chartSpace.bEmptySeries)
 		{
-			case "dlbl":
+			switch ( type )
 			{
-				pos = this._calculatePositionDlbl(chartSpace, ser, val);
-				break;
-			}
-			case "title":
-			{
-				pos = this._calculatePositionTitle(chartSpace);
-				break;
-			}
-			case "valAx":
-			{
-				pos = this._calculatePositionValAx(chartSpace);
-				break;
-			}
-			case "catAx":
-			{
-				pos = this._calculatePositionCatAx(chartSpace);
-				break;
-			}
-			case "legend":
-			{
-				pos = this._calculatePositionLegend(chartSpace);
-				break;
-			}
-			default:
-			{
-				pos = {x: 0, y: 0};
-				break;
-			}
-		}
+				case "dlbl":
+				{
+					pos = this._calculatePositionDlbl(chartSpace, ser, val);
+					break;
+				}
+				case "title":
+				{
+					pos = this._calculatePositionTitle(chartSpace);
+					break;
+				}
+				case "valAx":
+				{
+					pos = this._calculatePositionValAx(chartSpace);
+					break;
+				}
+				case "catAx":
+				{
+					pos = this._calculatePositionCatAx(chartSpace);
+					break;
+				}
+				case "legend":
+				{
+					pos = this._calculatePositionLegend(chartSpace);
+					break;
+				}
+				default:
+				{
+					pos = {x: 0, y: 0};
+					break;
+				}
+			};
+		};
+		
 		return {x: pos ? pos.x : undefined, y : pos ? pos.y : undefined};
 	},
 	
