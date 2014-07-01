@@ -2556,6 +2556,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 	this.aContent = [];
 	
 	this.pasteInExcel = pasteInExcel;
+	this.pasteInPresentationShape = null;
 	
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
     this.bIgnoreNoBlockText = false;
@@ -2936,6 +2937,12 @@ PasteProcessor.prototype =
 					base64 = null;
 					base64FromExcel = null;
 				}
+				else if(this.oDocument.bPresentation)
+				{
+					base64 = null;
+					base64FromExcel = null;
+					this.pasteInPresentationShape = true;
+				};
 				
 				var isImageInNode = node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
                 if(base64 != null)
@@ -4913,7 +4920,11 @@ PasteProcessor.prototype =
     },
     _Add_NewParagraph : function()
     {
-        this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+        var bFromPresentation = false;
+		if(this.pasteInPresentationShape)
+			bFromPresentation = true;
+			
+		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, bFromPresentation );
         this.oCurParContentPos = this.oCurPar.CurPos.ContentPos;
         this.oCurRun = new ParaRun(this.oCurPar);
         this.oCurRunContentPos = 0;
