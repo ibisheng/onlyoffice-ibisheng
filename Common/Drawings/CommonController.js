@@ -69,6 +69,8 @@ function CheckSpPrXfrm(object)
 
 function CheckSpPrXfrm2(object)
 {
+    if(!object)
+        return;
     if(!object.spPr)
     {
         object.spPr = new CSpPr();

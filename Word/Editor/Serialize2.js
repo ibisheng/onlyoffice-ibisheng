@@ -3760,6 +3760,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                         item.Extent.W = item.GraphicObj.spPr.xfrm.extX;
                         item.Extent.H = item.GraphicObj.spPr.xfrm.extY;
                     }
+                    if(this.copyParams)
+                    {
+                        CheckSpPrXfrm2(item.GraphicObj)
+                    }
                     oThis.bs.WriteItem(c_oSerRunType.pptxDrawing, function () { oThis.WriteImage(item); });
                     break;
             }
