@@ -12530,7 +12530,7 @@ Paragraph.prototype =
         var Len = Word.length;
         for ( var Pos = 0; Pos < Len; Pos++ )
         {
-            Class.Add_ToContent( RunPos + Pos, new ParaText(Word[Pos]) );
+            Class.Add_ToContent( RunPos + Pos,  ( 0x0020 === Word.charCodeAt(Pos) ? new ParaSpace() : new ParaText(Word[Pos]) ) );
         }
 
         // Удалим старое слово

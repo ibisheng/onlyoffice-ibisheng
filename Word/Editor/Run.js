@@ -6279,11 +6279,14 @@ ParaRun.prototype =
 
                     if ( null != Element )
                     {
-                        this.CollaborativeMarks.Update_OnAdd( Pos );
-                        this.CollaborativeMarks.Add( Pos, Pos + 1, Color );
+                        if (null !== Color)
+                        {
+                            this.CollaborativeMarks.Update_OnAdd( Pos );
+                            this.CollaborativeMarks.Add( Pos, Pos + 1, Color );
+                            CollaborativeEditing.Add_ChangedClass(this);
+                        }
+                        
                         this.Content.splice( Pos, 0, Element );
-
-                        CollaborativeEditing.Add_ChangedClass(this);
                     }
                 }
 

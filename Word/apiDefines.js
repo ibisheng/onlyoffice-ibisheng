@@ -212,8 +212,9 @@ var c_oAscMouseMoveLockedObjectType = {
 };
 
 var c_oAscCollaborativeMarksShowType = {
-    All         : 0,
-    LastChanges : 1
+    None        : -1,
+    All         :  0,
+    LastChanges :  1
 };
 
 var c_oAscAlignH = {

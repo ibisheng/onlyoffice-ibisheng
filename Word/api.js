@@ -716,7 +716,15 @@ asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
 
 asc_docs_api.prototype.SetCollaborativeMarksShowType = function(Type)
 {
-    this.CollaborativeMarksShowType = Type;
+    if (c_oAscCollaborativeMarksShowType.None !== this.CollaborativeMarksShowType && c_oAscCollaborativeMarksShowType.None === Type)
+    {
+        this.CollaborativeMarksShowType = Type;
+        CollaborativeEditing.Clear_CollaborativeMarks(true);
+    }
+    else
+    {
+        this.CollaborativeMarksShowType = Type;
+    }
 };
 
 asc_docs_api.prototype.GetCollaborativeMarksShowType = function(Type)
@@ -1553,11 +1561,14 @@ asc_docs_api.prototype._coAuthoringInit = function()
             CollaborativeEditing.Remove_NeedLock(Id);
         }
     };
-	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent)
+	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent, bUseColor)
 	{
+        if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None)
+            bUseColor = false;
+        
 		var oUser = t.CoAuthoringApi.getUser(userId);
 		var nColor = oUser ? oUser.asc_getColorValue() :  null;
-        var oColor = null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 );
+        var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
 
         t._coAuthoringSetChanges(e, oColor);
 		var Count = e.length;
@@ -1567,7 +1578,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	};
 	this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId)
 	{
-        t.CoAuthoringApi.onSaveChanges(e, userId, false);
+        t.CoAuthoringApi.onSaveChanges(e, userId, false, (-1 === CollaborativeEditing.m_nUseType ? true : false));
         //CollaborativeEditing.Apply_Changes();
 	};
 	this.CoAuthoringApi.onFirstLoadChangesEnd		= function () {
@@ -2748,7 +2759,8 @@ function OnSave_Callback2(e)
             CollaborativeEditing.Clear_CollaborativeMarks();
 
         // Принимаем чужие изменения
-        safe_Apply_Changes();
+        //safe_Apply_Changes();
+        CollaborativeEditing.Apply_Changes();
 
         // Пересылаем свои изменения
         CollaborativeEditing.Send_Changes();
@@ -2758,7 +2770,7 @@ function OnSave_Callback2(e)
 
         editor.canSave = true;
 
-        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+        editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
         // Снимаем лок с функции сохранения на сервере
         editor.CoAuthoringApi.unSaveChanges();
