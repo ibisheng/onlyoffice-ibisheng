@@ -5030,7 +5030,7 @@ drawStockChart.prototype =
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var koffX = trueWidth / numCache.pts.length;
 		
-		var gapWidth = this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth ? this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth : 150;
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.upDownBars && this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth ? this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth : 150;
 		
 		var widthBar = koffX / (1 + gapWidth / 100);
 		
@@ -5139,14 +5139,14 @@ drawStockChart.prototype =
 			
 			if(this.paths.values[i].downBars)
 			{
-				brush = this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsBrush;
-				pen = this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsPen;
+				brush = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsBrush : null;
+				pen = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsPen : null;
 				this.cChartDrawer.drawPath(this.paths.values[i].downBars, pen, brush);
 			}
 			else
 			{
-				brush = this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsBrush;
-				pen = this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsPen;
+				brush = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsBrush : null;
+				pen = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsPen : null;
 				this.cChartDrawer.drawPath(this.paths.values[i].upBars, pen, brush);
 			}
         }
