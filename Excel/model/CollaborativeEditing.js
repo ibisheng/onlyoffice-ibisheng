@@ -246,7 +246,7 @@
 			}
 
 			// Отправляем на сервер изменения
-			this.handlers.trigger("sendChanges", null !== History.SavedIndex ? Math.min(History.SavedIndex, History.Index) : null,
+			this.handlers.trigger("sendChanges", null !== History.SavedIndex ? Math.min(History.SavedIndex + 1, History.Index + 1) : null,
 				this.getRecalcIndexSave(this.m_oRecalcIndexColumns), this.getRecalcIndexSave(this.m_oRecalcIndexRows));
 
 			if (bIsCollaborative) {
