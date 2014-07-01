@@ -1371,17 +1371,17 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_rad );
 
-	Writer.WriteString2( this.getBase().Id );
 	Writer.WriteString2( this.getDegree().Id );
+	Writer.WriteString2( this.getBase().Id );	
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
 	var StartPos = Writer.GetCurPosition();
     Writer.Skip(4);
     var Flags = 0;
-	if ( undefined != this.degHide )
+	if ( undefined != this.Pr.degHide )
     {
-		Writer.WriteBool( this.degHide );
+		Writer.WriteBool( this.Pr.degHide );
 		Flags |= 1;
 	}
 	var EndPos = Writer.GetCurPosition();
@@ -1402,6 +1402,9 @@ CRadical.prototype.Read_FromBinary2 = function( Reader )
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
 		props.degHide = Reader.GetBool();	
+	
+	if (props.degHide == true)
+		this.Iterator = null;
 	
 	this.fillMathComposition (props, arrElems);
 }

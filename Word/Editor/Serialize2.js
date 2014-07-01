@@ -8412,7 +8412,8 @@ function Binary_oMathReader(stream)
         else
             res = c_oSerConstants.ReadUnknown;
 			
-		oElem.SetRunEmptyToContent(true);
+		if (oElem)
+			oElem.SetRunEmptyToContent(true);
         return res;
     };		
 	this.ReadMathArgPr = function(type, length, oElem)
@@ -8746,8 +8747,11 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			var text = this.stream.GetString2LE(length).charCodeAt(0);	 
-			props.chr = text;
+			var text = this.stream.GetString2LE(length);
+			if (text == "")
+				props.chr = OPERATOR_EMPTY;
+			else 
+				props.chr = text.charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -8958,7 +8962,11 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.endChr = this.stream.GetString2LE(length).charCodeAt(0);
+			var text = this.stream.GetString2LE(length);
+			if (text == "")
+				props.endChr = OPERATOR_EMPTY;
+			else 
+				props.endChr = text.charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -9931,7 +9939,7 @@ function Binary_oMathReader(stream)
         {
 			if (oDeg.content && length == 0 && props.degHide !== true)
 				oDeg.content.fillPlaceholders();
-			else if ( oDeg.content && length == 0 && props.degHide == true)
+			if (props.degHide == true)
 				oRad.content.Iterator = null;				
 
             res = this.bcr.Read1(length, function(t, l){
@@ -10026,7 +10034,11 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.sepChr = this.stream.GetString2LE(length).charCodeAt(0);
+			var text = this.stream.GetString2LE(length);
+			if (text == "")
+				props.sepChr = OPERATOR_EMPTY;
+			else 
+				props.sepChr = text.charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
