@@ -835,6 +835,7 @@ CChartsDrawer.prototype =
 	//****new calculate data****
 	_calculateStackedData2: function()
 	{	
+		var maxMinObj;
 		if(this.calcProp.type == "Bar" || this.calcProp.type == "HBar")
 		{
 			if (this.calcProp.subType == 'stacked') {
@@ -842,10 +843,12 @@ CChartsDrawer.prototype =
 				for (var j = 0; j < this.calcProp.data.length; j++) {
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						this.calcProp.data[j][i] = this._findPrevValue(originalData, j, i)
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
-				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
+					};
+				};
+				
+				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
+				this.calcProp.max = maxMinObj.max;
+				this.calcProp.min = maxMinObj.min;
 			}
 			else if(this.calcProp.subType == 'stackedPer') {
 				var summ;
@@ -854,13 +857,15 @@ CChartsDrawer.prototype =
 					summ = 0;
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						summ += Math.abs(this.calcProp.data[j][i]);
-					}
+					};
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						this.calcProp.data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
-				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
+					};
+				};
+				
+				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
+				this.calcProp.max = maxMinObj.max;
+				this.calcProp.min = maxMinObj.min;
 			}
 		};
 		
@@ -873,10 +878,12 @@ CChartsDrawer.prototype =
 						if(!this.calcProp.data[j + 1])
 							this.calcProp.data[j + 1] = [];
 						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i];
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(this.calcProp.data);
-				this.calcProp.min = this._getMinValueArray(this.calcProp.data);
+					};
+				};
+				
+				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
+				this.calcProp.max = maxMinObj.max;
+				this.calcProp.min = maxMinObj.min;
 			}
 			else if (this.calcProp.subType == 'stackedPer') {
 				var firstData = this.calcProp.data;
@@ -886,14 +893,14 @@ CChartsDrawer.prototype =
 					summValue[j] = 0;
 					for (var i = 0; i < firstData.length; i++) {
 						summValue[j] += Math.abs(firstData[i][j])
-					}
-				}
+					};
+				};
 				
 				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
-					}
-				}
+					};
+				};
 				
 				var tempData = this.calcProp.data;
 
@@ -903,10 +910,12 @@ CChartsDrawer.prototype =
 							tempData[i][j] = 0;
 						else
 							tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
-					}
-				}
-				this.calcProp.max = this._getMaxValueArray(tempData);
-				this.calcProp.min = this._getMinValueArray(tempData);
+					};
+				};
+				
+				maxMinObj = this._getMaxMinValueArray(tempData);
+				this.calcProp.max = maxMinObj.max;
+				this.calcProp.min = maxMinObj.min;
 				this.calcProp.data = tempData;
 			}
 		};
@@ -1970,36 +1979,27 @@ CChartsDrawer.prototype =
         return sum;
     },
 	
-	_getMaxValueArray: function(array)
+	_getMaxMinValueArray: function(array)
 	{
-		var max = 0;
+		var max = 0, min = 0;
 		for(var i = 0; i < array.length; i++)
 		{
 			for(var j = 0; j < array[i].length; j++)
 			{
 				if(i == 0 && j == 0)
+				{
+					min =  array[i][j];
 					max =  array[i][j];
+				};
+				
 				if(array[i][j] > max)
 					max = array[i][j];
-			}
-		}
-		return max;
-	},
-	
-	_getMinValueArray: function(array)
-	{
-		var min = 0;
-		for(var i = 0; i < array.length; i++)
-		{
-			for(var j = 0; j < array[i].length; j++)
-			{
-				if(i == 0 && j == 0)
-					min =  array[i][j];
+					
 				if(array[i][j] < min)
 					min = array[i][j];
 			}
 		}
-		return min;
+		return {max: max, min: min};
 	},
 	
 	_findPrevValue: function(originalData, num, max) {
@@ -5578,7 +5578,7 @@ drawBubbleChart.prototype =
 			var maxSize, curSize, yPoints, maxDiamBubble, diffSize, maxArea;
 			
 			
-			maxSize = this.cChartDrawer._getMaxValueArray(bubbleSize);
+			maxSize = this.cChartDrawer._getMaxMinValueArray(bubbleSize).max;
 			curSize = bubbleSize[k].val;
 			
 			yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
