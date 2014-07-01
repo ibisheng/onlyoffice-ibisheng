@@ -1284,6 +1284,7 @@
 					oNewWsViews[item.model.getIndex()] = item;
 			}
 			this.wsViews = oNewWsViews;
+			this.wsActive = this.model.getActive();
 		};
 
 		WorkbookView.prototype.spliceWorksheet = function () {
