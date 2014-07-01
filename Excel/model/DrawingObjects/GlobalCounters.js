@@ -115,7 +115,7 @@ CTableId.prototype =
 {
     Add: function(Class, Id, sheetId)
     {
-        if ( false === this.m_bTurnOff && Class.Write_ToBinary2)
+        if ( false === this.m_bTurnOff && (Class.Write_ToBinary2 || Class === this))
         {
             Class.Id = Id;
             this.m_aPairs[Id] = Class;
