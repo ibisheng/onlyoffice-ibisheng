@@ -7924,7 +7924,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var DistR = this.bcr.ReadDouble();
 		else if( c_oSerWrapThroughTight.WrapText === type )
 			var WrapText = this.stream.GetUChar();
-		else if( c_oSerWrapThroughTight.WrapPolygon === type )
+		else if( c_oSerWrapThroughTight.WrapPolygon === type && wrappingPolygon !== undefined)
 		{
             wrappingPolygon.tempArrPoints = [];
 			var oStartRes = {start: null};
