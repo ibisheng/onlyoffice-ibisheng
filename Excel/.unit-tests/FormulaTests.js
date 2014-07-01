@@ -4465,6 +4465,14 @@
 
         function db( cost, salvage, life, period, month ){
 
+            if( cost == 0 || salvage == 0 ){
+                return 0;
+            }
+
+            if ( month < 1 || month > 12 || salvage <= 0 || life <= 0 || period < 0 || life + 1 < period || cost < 0 || cost < salvage ) {
+                return "#NUM!";
+            }
+
             var nAbRate = 1 - Math.pow( salvage / cost, 1 / life );
             nAbRate = Math.floor( (nAbRate * 1000) + 0.5 ) / 1000;
             var nErsteAbRate = cost * nAbRate * month / 12;

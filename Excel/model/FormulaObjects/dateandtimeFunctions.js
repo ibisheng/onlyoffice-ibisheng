@@ -37,7 +37,7 @@ function yearFrac( d1, d2, mode ) {
         case DayCountBasis.UsPsa30_360:
             return new cNumber( Math.abs( GetDiffDate360( date1, month1, year1, date2, month2, year2, true ) ) / 360 );
         case DayCountBasis.ActualActual:
-            var yc = /*Math.abs*/( year2 - year1 ),
+            var yc = Math.abs( year2 - year1 ),
                 sd = year1 > year2 ? new Date( d2 ) : new Date( d1 ),
                 yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
             for ( var i = 0; i < yc; i++ ) {
@@ -46,7 +46,7 @@ function yearFrac( d1, d2, mode ) {
             }
             yearAverage /= (yc + 1);
             dayDiff /= (yearAverage * c_msPerDay);
-            return new cNumber( dayDiff );
+            return new cNumber( Math.abs(dayDiff) );
         case DayCountBasis.Actual360:
             var dayDiff = Math.abs( d2 - d1 );
             dayDiff /= (360 * c_msPerDay);
