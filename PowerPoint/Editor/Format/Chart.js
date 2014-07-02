@@ -2054,20 +2054,6 @@ CChartAsGroup.prototype =
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
     },
 
-
-    syncAscChart: function() {
-
-        if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
-            this.chart.asc_getHeader().asc_setTitle(getTextString(this.chartTitle.txBody.content));
-        }
-        if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
-            this.chart.asc_getYAxis().asc_setTitle(getTextString(this.vAxisTitle.txBody.content));
-        }
-        if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
-            this.chart.asc_getXAxis().asc_setTitle(getTextString(this.hAxisTitle.txBody.content));
-        }
-    },
-
     setChartBinary: function(binary)
     {
         // Приводим бинарник к внутренней структуре

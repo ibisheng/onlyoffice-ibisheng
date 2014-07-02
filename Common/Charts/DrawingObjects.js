@@ -282,43 +282,6 @@ asc_CChart.prototype = {
             this.series.length == chart.series.length);
     },
 
-    asc_getType: function() { return this.type; },
-    asc_setType: function(type) { this.type = type; },
-
-    asc_getSubType: function() { return this.subType; },
-    asc_setSubType: function(subType) { this.subType = subType; },
-
-    asc_getStyleId: function() { return this.styleId; },
-    asc_setStyleId: function(styleId) { this.styleId = styleId; },
-
-    asc_getShowValueFlag: function() { return this.bShowValue; },
-    asc_setShowValueFlag: function(show) { this.bShowValue = show; },
-
-    asc_getShowCatNameFlag: function() { return this.bShowCatName; },
-    asc_setShowCatNameFlag: function(show) { this.bShowCatName = show; },
-
-    asc_getShowBorderFlag: function() { return this.bShowBorder; },
-    asc_setShowBorderFlag: function(show) { this.bShowBorder = show; },
-
-    asc_getHeader: function() { return this.header; },
-    asc_setHeader: function(headerObj) { this.header = headerObj; },
-
-    asc_getRange: function() { return this.range; },
-    asc_setRange: function(rangeObj) { this.range = rangeObj; },
-
-    asc_getXAxis: function() { return this.xAxis; },
-    asc_setXAxis: function(axisObj) { this.xAxis = axisObj; },
-
-    asc_getYAxis: function() { return this.yAxis; },
-    asc_setYAxis: function(axisObj) { this.yAxis = axisObj; },
-
-    asc_getLegend: function() { return this.legend; },
-    asc_setLegend: function(legendObj) { this.legend = legendObj; },
-
-    asc_getSeria: function(index) { return (index < this.series.length) ? this.series[index] : null; },
-    asc_setSeria: function(seriaObj) { if (seriaObj) this.series.push(seriaObj); },
-    asc_removeSeries: function() { this.series = []; },
-
     initDefault: function() {
         // Обновлены тестовые данные для новой диаграммы
         function createItem(value) {
@@ -407,7 +370,7 @@ asc_CChart.prototype = {
         return headers;
     },
 
-    rebuildSeries: function(isIgnoreColors) {
+    rebuildSeries: function() {
         var _t = this;
         var bbox = _t.range.intervalObject.getBBox0();
         var nameIndex = 1;
@@ -823,43 +786,6 @@ asc_CChart.prototype = {
 window["Asc"].asc_CChart = asc_CChart;
 window["Asc"]["asc_CChart"] = asc_CChart;
 prot = asc_CChart.prototype;
-
-prot["asc_getType"] = prot.asc_getType;
-prot["asc_setType"] = prot.asc_setType;
-
-prot["asc_getSubType"] = prot.asc_getSubType;
-prot["asc_setSubType"] = prot.asc_setSubType;
-
-prot["asc_getStyleId"] = prot.asc_getStyleId;
-prot["asc_setStyleId"] = prot.asc_setStyleId;
-
-prot["asc_getShowValueFlag"] = prot.asc_getShowValueFlag;
-prot["asc_setShowValueFlag"] = prot.asc_setShowValueFlag;
-
-prot["asc_getShowCatNameFlag"] = prot.asc_getShowCatNameFlag;
-prot["asc_setShowCatNameFlag"] = prot.asc_setShowCatNameFlag;
-
-prot["asc_getShowBorderFlag"] = prot.asc_getShowBorderFlag;
-prot["asc_setShowBorderFlag"] = prot.asc_setShowBorderFlag;
-
-prot["asc_getHeader"] = prot.asc_getHeader;
-prot["asc_setHeader"] = prot.asc_setHeader;
-
-prot["asc_getRange"] = prot.asc_getRange;
-prot["asc_setRange"] = prot.asc_setRange;
-
-prot["asc_getXAxis"] = prot.asc_getXAxis;
-prot["asc_setXAxis"] = prot.asc_setXAxis;
-
-prot["asc_getYAxis"] = prot.asc_getYAxis;
-prot["asc_setYAxis"] = prot.asc_setYAxis;
-
-prot["asc_getLegend"] = prot.asc_getLegend;
-prot["asc_setLegend"] = prot.asc_setLegend;
-
-prot["asc_getSeria"] = prot.asc_getSeria;
-prot["asc_setSeria"] = prot.asc_setSeria;
-prot["asc_removeSeries"] = prot.asc_removeSeries;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -3677,7 +3603,7 @@ function DrawingObjects() {
             }
             ExecuteNoHistory(function()
             {
-                asc_chart.rebuildSeries(true);
+                asc_chart.rebuildSeries();
             }, this, []);
 
             return _this.controller.addChartDrawingObject(asc_chart, chart);
