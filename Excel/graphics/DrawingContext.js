@@ -510,25 +510,12 @@
 	DrawingContext.prototype.moveImageData = function (sx, sy, w, h, x, y) {
 		var sr = this._calcRect(sx, sy, w, h);
 		var r = this._calcRect(x, y);
-		var imgData = this.ctx.getImageData(sr.x, sr.y, sr.w, sr.h);
 
-		var minX, maxX, minY, maxY;
-		if (sx < x) {
-			minX = sr.x;
-			maxX = r.x;
-		} else {
-			minX = r.x;
-			maxX = sr.x;
-		}
-		if (sy < y) {
-			minY = sr.y;
-			maxY = r.y;
-		} else {
-			minY = r.y;
-			maxY = sr.y;
-		}
-		this.ctx.clearRect(minX, minY, maxX + sr.w, maxY + sr.h);
-		this.ctx.putImageData(imgData, r.x, r.y);
+		var tmpOperation = this.ctx.globalCompositeOperation;
+		this.ctx.globalCompositeOperation = 'copy';
+		this.ctx.drawImage(this.getCanvas(), sr.x, sr.y, sr.w, sr.h, r.x, r.y, sr.w, sr.h);
+		this.ctx.globalCompositeOperation = tmpOperation;
+
 		return this;
 	};
 
