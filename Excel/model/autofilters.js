@@ -1182,12 +1182,12 @@ var gUndoInsDelCellsFlag = true;
 							width = width*(rowHeight/height);
 							height = rowHeight;
 						}
-						var x1 = ws.cols[col].left + ws.cols[col].width - width - offsetX - 0.5;
-						var y1 = ws.rows[row].top + ws.rows[row].height - height - offsetY - 0.5;
+						var x1 = ws.cols[col].left + ws.cols[col].width - width /*- offsetX*/ - 0.5;
+						var y1 = ws.rows[row].top + ws.rows[row].height - height /*- offsetY*/ - 0.5;
 						buttons[i].x = x1;
 						buttons[i].y = y1;
-						buttons[i].x1 = ws.cols[col].left - offsetX;
-						buttons[i].y1 = ws.rows[row].top - offsetY;
+						buttons[i].x1 = ws.cols[col].left/* - offsetX*/;
+						buttons[i].y1 = ws.rows[row].top /*- offsetY*/;
 						buttons[i].width = ws.cols[col].width;
 						buttons[i].height = ws.rows[row].height;
 
@@ -1257,7 +1257,7 @@ var gUndoInsDelCellsFlag = true;
 								col: col
 							};
 							if (buttons[i].x1 >= ws.cols[0].left && buttons[i].y1 >= ws.rows[0].top)
-								this._drawButton(x1,y1,filOptions);
+								this._drawButton(x1 - offsetX,y1 - offsetY,filOptions);
 						}
 					}
 				}
@@ -2547,7 +2547,7 @@ var gUndoInsDelCellsFlag = true;
 							if(currentFilter[isCurFilter])
 							{
 								currentFilter[isCurFilter].ColId = filtersOp[1];
-								currentFilter[isCurFilter].Filters = {};
+								currentFilter[isCurFilter].Filters = new Filters();
 							}
 							else
 							{

@@ -5809,7 +5809,7 @@
 			var xWithOffset = x + offsetX;
 			var yWithOffset = y + offsetY;
 
-			var autoFilterInfo = this.autoFilters.checkCursor(x, y);
+			var autoFilterInfo = this.autoFilters.checkCursor(xWithOffset, yWithOffset);
 			if (autoFilterInfo && !isViewerMode)
 				return {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: autoFilterInfo.id};
 
