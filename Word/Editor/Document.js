@@ -1141,6 +1141,8 @@ CDocument.prototype =
             this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Top;
             this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.W - SectPr.PageMargins.Right;
             this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+            
+            this.RecalcInfo.Reset();
         }
 
         var Count = this.Content.length;
@@ -12751,83 +12753,79 @@ CDocument.prototype =
                 this.Cursor_MoveLeft(false, false);
             }
 
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            var Element = this.Content[this.CurPos.ContentPos];
+
+            var CurSectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
+
+            if ( type_Paragraph === Element.GetType() )
             {
-                History.Create_NewPoint();
+                // Если мы стоим в параграфе, тогда делим данный параграф на 2 в текущей точке(даже если мы стоим в начале
+                // или в конце параграфа) и к первому параграфу приписываем конец секкции.
 
-                var Element = this.Content[this.CurPos.ContentPos];
+                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
 
-                var CurSectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
+                Element.Split( NewParagraph );
 
-                if ( type_Paragraph === Element.GetType() )
+                this.CurPos.ContentPos++;
+                NewParagraph.Cursor_MoveToStartPos(false);
+
+                this.Internal_Content_Add( this.CurPos.ContentPos, NewParagraph );
+
+                // Заметим, что после функции Split, у параграфа Element не может быть окончания секции, т.к. если она 
+                // была в нем изначально, тогда после функции Split, окончание секции перенеслось в новый параграф. 
+            }
+            else
+            {
+                // Если мы стоим в таблице, тогда делим данную таблицу на 2 по текущему ряду(текущий ряд попадает во
+                // вторую таблицу). Вставляем между таблицами параграф, и к этому параграфу приписываем окончание
+                // секции. Если мы стоим в первой строке таблицы, таблицу делить не надо, достаточно добавить новый 
+                // параграф перед ней.
+
+                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+                var NewTable = Element.Split_Table();
+
+                if ( null === NewTable )
                 {
-                    // Если мы стоим в параграфе, тогда делим данный параграф на 2 в текущей точке(даже если мы стоим в начале
-                    // или в конце параграфа) и к первому параграфу приписываем конец секкции.
-
-                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
-
-                    Element.Split( NewParagraph );
-
-                    this.CurPos.ContentPos++;
-                    NewParagraph.Cursor_MoveToStartPos(false);
-
                     this.Internal_Content_Add( this.CurPos.ContentPos, NewParagraph );
-
-                    // Заметим, что после функции Split, у параграфа Element не может быть окончания секции, т.к. если она 
-                    // была в нем изначально, тогда после функции Split, окончание секции перенеслось в новый параграф. 
+                    this.CurPos.ContentPos++;
                 }
                 else
                 {
-                    // Если мы стоим в таблице, тогда делим данную таблицу на 2 по текущему ряду(текущий ряд попадает во
-                    // вторую таблицу). Вставляем между таблицами параграф, и к этому параграфу приписываем окончание
-                    // секции. Если мы стоим в первой строке таблицы, таблицу делить не надо, достаточно добавить новый 
-                    // параграф перед ней.
-
-                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
-                    var NewTable = Element.Split_Table();
-
-                    if ( null === NewTable )
-                    {
-                        this.Internal_Content_Add( this.CurPos.ContentPos, NewParagraph );
-                        this.CurPos.ContentPos++;
-                    }
-                    else
-                    {
-                        this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
-                        this.Internal_Content_Add( this.CurPos.ContentPos + 2, NewTable );
-                        this.CurPos.ContentPos += 2;
-                    }
-
-                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos( false );
-
-                    Element = NewParagraph;
+                    this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
+                    this.Internal_Content_Add( this.CurPos.ContentPos + 2, NewTable );
+                    this.CurPos.ContentPos += 2;
                 }
 
-                var SectPr = new CSectionPr(this);
+                this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos( false );
 
-                // В данном месте мы ставим разрыв секции. Чтобы до текущего места ничего не изменилось, мы у новой
-                // для новой секции копируем все настройки из старой, а в старую секцию выставляем приходящий тип
-                // разрыва секций. Заметим, что поскольку мы делаем все так, чтобы до текущей страницы ничего не 
-                // изменилось, надо сохранить эту информацию для пересчета, для этого мы помечаем все следующие изменения
-                // как не влияющие на пересчет.
-                
-                History.MinorChanges = true;
-                
-                SectPr.Copy( CurSectPr );
-                CurSectPr.Set_Type( SectionBreakType );
-                CurSectPr.Set_PageNum_Start( -1 );
-                CurSectPr.Clear_AllHdrFtr();
-
-                History.MinorChanges = false;
-
-                Element.Set_SectionPr(SectPr);
-                Element.Refresh_RecalcData2(0, 0);
-
-                this.Recalculate();
-                this.Document_UpdateSelectionState();
-
-                return true;
+                Element = NewParagraph;
             }
+
+            var SectPr = new CSectionPr(this);
+
+            // В данном месте мы ставим разрыв секции. Чтобы до текущего места ничего не изменилось, мы у новой
+            // для новой секции копируем все настройки из старой, а в старую секцию выставляем приходящий тип
+            // разрыва секций. Заметим, что поскольку мы делаем все так, чтобы до текущей страницы ничего не 
+            // изменилось, надо сохранить эту информацию для пересчета, для этого мы помечаем все следующие изменения
+            // как не влияющие на пересчет.
+
+            History.MinorChanges = true;
+
+            SectPr.Copy( CurSectPr );
+            CurSectPr.Set_Type( SectionBreakType );
+            CurSectPr.Set_PageNum_Start( -1 );
+            CurSectPr.Clear_AllHdrFtr();
+
+            History.MinorChanges = false;
+
+            Element.Set_SectionPr(SectPr);
+            Element.Refresh_RecalcData2(0, 0);
+
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+
+            return true;
         }
         
         return false;

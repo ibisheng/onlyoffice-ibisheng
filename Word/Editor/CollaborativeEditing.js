@@ -985,42 +985,45 @@ function CCollaborativeEditing()
 
     this.OnCallback_AskLock = function(result)
     {
-        // Снимаем глобальный лок
-        oThis.m_bGlobalLock = false;
-
-        if (result["lock"])
+        if (true === oThis.m_bGlobalLock)
         {
-            // Пробегаемся по массиву и проставляем, что залочено нами
+            // Снимаем глобальный лок
+            oThis.m_bGlobalLock = false;
 
-            var Count = oThis.m_aCheckLocks.length;
-            for ( var Index = 0; Index < Count; Index++ )
+            if (result["lock"])
             {
-                var oItem = oThis.m_aCheckLocks[Index];
+                // Пробегаемся по массиву и проставляем, что залочено нами
 
-                if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
+                var Count = oThis.m_aCheckLocks.length;
+                for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Class = g_oTableId.Get_ById( oItem );
-                    if ( null != Class )
+                    var oItem = oThis.m_aCheckLocks[Index];
+
+                    if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
                     {
-                        Class.Lock.Set_Type( locktype_Mine );
-                        oThis.Add_Unlock2( Class );
+                        var Class = g_oTableId.Get_ById( oItem );
+                        if ( null != Class )
+                        {
+                            Class.Lock.Set_Type( locktype_Mine );
+                            oThis.Add_Unlock2( Class );
+                        }
                     }
                 }
             }
-        }
-        else if (result["error"])
-        {
-            // Если у нас началось редактирование диаграммы, а вернулось, что ее редактировать нельзя,
-            // посылаем сообщение о закрытии редактора диаграмм.
-            if ( true === editor.isChartEditor )
-                editor.sync_closeChartEditor();
+            else if (result["error"])
+            {
+                // Если у нас началось редактирование диаграммы, а вернулось, что ее редактировать нельзя,
+                // посылаем сообщение о закрытии редактора диаграмм.
+                if ( true === editor.isChartEditor )
+                    editor.sync_closeChartEditor();
 
-            // Делаем откат на 1 шаг назад и удаляем из Undo/Redo эту последнюю точку
-            editor.WordControl.m_oLogicDocument.Document_Undo();
-            History.Clear_Redo();
-        }
+                // Делаем откат на 1 шаг назад и удаляем из Undo/Redo эту последнюю точку
+                editor.WordControl.m_oLogicDocument.Document_Undo();
+                History.Clear_Redo();
+            }
 
-        editor.isChartEditor = false;
+            editor.isChartEditor = false;
+        }
     };
 //-----------------------------------------------------------------------------------
 // Функции для работы с залоченными объектами, которые еще не были добавлены
