@@ -842,7 +842,18 @@ CShapeDrawer.prototype =
                 return;
             }
 
-            if (null == this.UniFill.fill.tile || this.Graphics.m_oContext === undefined)
+			var bIsUnusePattern = false;
+			if (AscBrowser.isIE)
+			{
+				// ie падает иначе !!!
+				if (this.UniFill.fill.RasterImageId)
+				{
+					if (this.UniFill.fill.RasterImageId.lastIndexOf(".svg") == this.UniFill.fill.RasterImageId.length - 4)
+						bIsUnusePattern = true;
+				}
+			}
+
+            if (bIsUnusePattern || null == this.UniFill.fill.tile || this.Graphics.m_oContext === undefined)
             {
                 if (this.IsRectShape)
                 {
