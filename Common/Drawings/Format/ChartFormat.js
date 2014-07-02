@@ -162,8 +162,8 @@ function CDLbl()
         recalculateContent: true
     };
 
-    this.chart = null;//������������ ��� ���������
-    this.series = null;//������������ ��� ���������
+    this.chart = null;
+    this.series = null;
 
     this.x = 0;
     this.y = 0;
@@ -277,7 +277,9 @@ CDLbl.prototype =
     recalculate: function()
     {
         if(this.bDelete)
+        {
             return;
+        }
         ExecuteNoHistory(function()
         {
             if(this.recalcInfo.recalculateBrush)
@@ -453,12 +455,12 @@ CDLbl.prototype =
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                     var alpha = Math.atan2(_dy_t, _dx_t);
-                    global_MatrixTransformer.RotateRadAppend(_text_transform, -alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                    global_MatrixTransformer.RotateRadAppend(_text_transform, -alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                 }
                 else {
                     alpha = Math.atan2(_dy_t, _dx_t);
-                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI - alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI - alpha - (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                 }
             }
@@ -508,21 +510,21 @@ CDLbl.prototype =
                 _alpha = Math.atan2(_dy_t, _dx_t);
                 if (_body_pr.vert === nVertTTvert) {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                     }
                     else {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                     }
                 }
                 else {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5 + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lb, _t_y_lb);
                     }
                     else {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot : 0));
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha + (isRealNumber(_body_pr.rot) ? _body_pr.rot*cToRad2 : 0));
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rb, _t_y_rb);
                     }
                 }
@@ -966,7 +968,7 @@ CDLbl.prototype =
                 }
                 default:
                 {
-                    var _rot = isRealNumber(bodyPr.rot) ? bodyPr.rot : 0;
+                    var _rot = isRealNumber(bodyPr.rot) ? bodyPr.rot*cToRad2 : 0;
                     var t = new CMatrix();
                     global_MatrixTransformer.RotateRadAppend(t, -_rot);
                     var w, h, x0, y0, x1, y1, x2, y2, x3, y3;
@@ -22040,6 +22042,7 @@ CTitle.prototype =
             case historyitem_Title_SetTx:
             {
                 this.tx = data.oldPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case historyitem_Title_SetTxPr:
@@ -22077,6 +22080,7 @@ CTitle.prototype =
             case historyitem_Title_SetTx:
             {
                 this.tx = data.newPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case historyitem_Title_SetTxPr:
@@ -22141,6 +22145,7 @@ CTitle.prototype =
             case historyitem_Title_SetTx:
             {
                 this.tx = readObject(r);
+                this.Refresh_RecalcData2();
                 break;
             }
             case historyitem_Title_SetTxPr:
