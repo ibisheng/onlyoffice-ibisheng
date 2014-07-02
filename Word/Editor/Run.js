@@ -48,7 +48,7 @@ function ParaRun(Paragraph, bMathRun)
 
     if(bMathRun)
     {
-        this.typeObj = MATH_PARA_RUN;
+        this.Type = para_Math_Run;
         this.MathPrp = new CMPrp();
         this.Parent = null;
         this.size =
@@ -96,7 +96,7 @@ ParaRun.prototype =
 
         NewRun.Set_Pr( this.Pr.Copy() );
 
-        if(this.typeObj == MATH_PARA_RUN)
+        if(this.Type == para_Math_Run || this.Type == para_Math_Placeholder)
         {
             NewRun.MathPrp = this.MathPrp.Copy();
         }
@@ -427,7 +427,8 @@ ParaRun.prototype =
                 ContentPos.Data[Depth]++;
         }
 
-        this.Paragraph.SpellChecker.Update_OnAdd( this, Pos, Item );
+        if(this.Paragraph !== null)
+            this.Paragraph.SpellChecker.Update_OnAdd( this, Pos, Item );
 
         // Обновляем позиции меток совместного редактирования
         this.CollaborativeMarks.Update_OnAdd( Pos );
@@ -1152,6 +1153,7 @@ ParaRun.prototype =
 
     Create_FontMap : function(Map)
     {
+        // для Math_Para_Pun argSize учитывается, когда мержатся текстовые настройки в Internal_Compile_Pr()
         if ( undefined !== this.Paragraph && null !== this.Paragraph )
         {
             var TextPr = this.Get_CompiledPr(false);
@@ -3591,7 +3593,7 @@ ParaRun.prototype =
             Result = true;
         }
 
-        if ( MATH_PARA_RUN === this.typeObj )
+        if (this.Type == para_Math_Run || this.Type == para_Math_Placeholder)
         {
             var Diff = SearchPos.X - SearchPos.CurX;
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
@@ -4359,7 +4361,7 @@ ParaRun.prototype =
             TextPr.Merge( StyleTextPr );
         }
 
-        if(this.typeObj == MATH_PARA_RUN)
+        if(this.Type == para_Math_Run)
         {
             var oWPrp = this.Parent.Get_Default_TPrp();
             TextPr.Merge(oWPrp);
@@ -4373,6 +4375,20 @@ ParaRun.prototype =
 
             this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
         }
+        else if(this.Type == para_Math_Placeholder)
+        {
+            var oWPrp = this.Parent.Get_Default_TPrp();
+            TextPr.Merge(oWPrp);
+            TextPr.Merge(this.Parent.GetCtrPrp());
+            TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
+
+            // special for placeholder
+
+            TextPr.Italic = false;
+            TextPr.Bold   = false;
+
+            this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
+        }
         else
         {
             TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
@@ -4381,9 +4397,6 @@ ParaRun.prototype =
                 TextPr.Unifill = undefined;
             }
         }
-
-
-
 
         // Для совместимости со старыми версиями запишем FontFamily
         TextPr.FontFamily.Name  = TextPr.RFonts.Ascii.Name;
@@ -4675,13 +4688,13 @@ ParaRun.prototype =
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
     Apply_Pr : function(TextPr)
     {
-        if(this.typeObj == MATH_PARA_RUN)
+        /*if(this.typeObj == MATH_PARA_RUN)
         {
             this.MathPrp.Apply_Pr(TextPr);
             this.Recalc_CompiledPr(true);
 
             return;
-        }
+        }*/
 
         if ( undefined != TextPr.Bold )
             this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
@@ -7199,7 +7212,7 @@ function CRunCollaborativeRange(PosS, PosE, Color)
 }
 
 
-ParaRun.prototype.Math_SetPosition = function(_pos)
+ParaRun.prototype.setPosition = function(_pos)
 {
     var pos = new CMathPosition();
 
@@ -7231,6 +7244,12 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 }
 ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, RecalcInfo)
 {
+    if(this.IsPlaceholder())
+        this.Type = para_Math_Placeholder;
+    else
+        this.Type = para_Math_Run;
+
+
     var RangeStartPos = 0;
     var RangeEndPos = this.Content.length;
 
@@ -7252,6 +7271,7 @@ ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, Recal
 
     g_oTextMeasurer.SetFont(oWPrp);
 
+
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
         this.Content[Pos].Resize(this, oMeasure);
@@ -7263,13 +7283,15 @@ ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, Recal
         ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
         var oDescent = oSize.height - oSize.ascent;
         descent =  descent < oDescent ? oDescent : descent;
-
     }
+
 
     this.size = {width: width, height: ascent + descent, ascent: ascent};
 }
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
+    // TODO
+    // поставить заглушку на плейсхолдер, когда при перемещении всегда будет отрисовываться селкт на плейсхолдере
     var runPrp = this.Get_CompiledPr(true);
 
     var sizeCursor = runPrp.FontSize*g_dKoef_pt_to_mm;
@@ -7326,4 +7348,15 @@ ParaRun.prototype.Math_SetGaps = function(Parent, Paragraph, RecalcInfo)
         RecalcInfo.Current = this.Content[Pos];
         RecalcInfo.setGaps();
     }
+}
+ParaRun.prototype.IsPlaceholder = function()
+{
+    return this.Content.length == 1 && this.Content[0].IsPlaceholder();
+}
+ParaRun.prototype.fillPlaceholders = function()
+{
+    var placeholder = new CMathText(false);
+    placeholder.fillPlaceholders();
+
+    this.Add_ToContent(0, placeholder, false);
 }

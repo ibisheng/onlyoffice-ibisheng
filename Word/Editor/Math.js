@@ -435,6 +435,11 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Create_FontMap
 
+        // Styles.js
+        // Document_CreateFontMap
+
+        //
+
         this.Root.Create_FontMap(Map);
 
     },
@@ -442,7 +447,11 @@ ParaMath.prototype =
     Get_AllFontNames : function(AllFonts)
     {
         // TODO: ParaMath.Get_AllFontNames
+
+        // выставить для всех шрифтов, к-ые используются в AllFonts true
         AllFonts["Cambria Math"] = true;
+
+        this.Root.Get_AllFontNames(AllFonts);
     },
 
     Get_SelectedText : function(bAll, bClearText)
@@ -1442,8 +1451,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_SelectionContentPos
 
-        //console.log(" Set_SelectionContentPos " );
-
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
         this.bSelectionUse = true;
     },
@@ -1601,6 +1608,7 @@ ParaMath.prototype =
 	}
 };
 
+/*
 var MATH_CTX = null;
 
 function TEST_MATH_ImageConverter()
@@ -1608,4 +1616,4 @@ function TEST_MATH_ImageConverter()
     var dataImg = editor.WordControl.m_oLogicDocument.Content[0].Content[0].MathToImageConverter();
 
     console.log(dataImg.ImageUrl);
-}
+}*/
