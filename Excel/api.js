@@ -1684,7 +1684,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (recalcIndexRows)
 							arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
 					}
-					if (0 < arrChanges.length)
+					if (0 < arrChanges.length || null !== deleteIndex)
 						this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex);
 					else
 						this.CoAuthoringApi.unLockDocument();

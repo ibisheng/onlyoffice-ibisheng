@@ -2215,64 +2215,6 @@
 						{
 							text: "Ok",
 							click: function() {
-
-							/*	var chartForm = $("#chartSelector");
-								var isSelected = (chart.type != null) && (chart.type != "");
-								var range = chart.asc_getRange();
-									
-								if ( !api.asc_checkChartInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked")) )
-									return;
-								
-								range.asc_setRowsFlag(chartForm.find("#dataRows").is(":checked"));
-								range.asc_setColumnsFlag(chartForm.find("#dataColumns").is(":checked"));
-								range.asc_setInterval(chartForm.find("#chartRange").val());
-
-								chart.asc_setType(chartForm.find("#chartType").find("option:selected").val());
-								chart.asc_setSubType(chartForm.find("#chartSubType").find("option:selected").val());
-
-								chart.asc_getHeader().asc_setTitle(chartForm.find("#chartTitle").val());
-								chart.asc_setShowValueFlag(chartForm.find("#valueShow").is(":checked"));
-								chart.asc_setShowBorderFlag(chartForm.find("#borderShow").is(":checked"));
-
-								if(chart.type != null && chart.type == 'Stock' && !isSelected)
-								{
-									var cellRange = api.wb.getWorksheet().getSelectedRange()
-									var rowsSel = cellRange.last.row - cellRange.first.row + 1;
-									var colsSel = cellRange.last.col - cellRange.first.col + 1;
-									if((chart.range.columns && rowsSel != 4) || (chart.range.rows && colsSel != 4))
-									{
-										$(this).dialog("close");
-										alert('Four rows are necessary in the following order: opening rate, maximum rate, minimum rate, closing rate.');
-										return;
-									}
-								}
-
-								var xAxis = chart.asc_getXAxis();
-								xAxis.asc_setShowFlag(chartForm.find("#xAxisShow").is(":checked"));
-								xAxis.asc_setGridFlag(chartForm.find("#xGridShow").is(":checked"));
-								xAxis.asc_setTitle(chartForm.find("#xAxisTitle").val());
-
-								var yAxis = chart.asc_getYAxis();
-								yAxis.asc_setShowFlag(chartForm.find("#yAxisShow").is(":checked"));
-								yAxis.asc_setGridFlag(chartForm.find("#yGridShow").is(":checked"));
-								yAxis.asc_setTitle(chartForm.find("#yAxisTitle").val());
-
-								var legend = chart.asc_getLegend();
-								legend.asc_setShowFlag(chartForm.find("#legendShow").is(":checked"));
-								legend.asc_setPosition("");
-
-								if (chartForm.find("#legendLeft").is(":checked"))
-									legend.asc_setPosition("left");
-								else if (chartForm.find("#legendRight").is(":checked"))
-									legend.asc_setPosition("right");
-								else if (chartForm.find("#legendTop").is(":checked"))
-									legend.asc_setPosition("top");
-								else if (chartForm.find("#legendBottom").is(":checked"))
-									legend.asc_setPosition("bottom");
-
-                                    if (isSelected)
-                                        api.asc_editChartDrawingObject(chart);
-                                    else     */
                                 api.asc_addChartDrawingObject(chart);
 								$(this).dialog("close");
 							}
