@@ -2,7 +2,8 @@
 
 function CMathBase()
 {
-    this.typeObj = MATH_COMP;
+    //this.typeObj = MATH_COMP;
+    this.Type = para_Math_Composition;
 
     this.pos = new CMathPosition();
     this.size = null;
@@ -123,7 +124,7 @@ CMathBase.prototype =
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                if(this.elements[i][j].typeObj === MATH_COMP)
+                if(this.elements[i][j].Type === para_Math_Composition)
                     this.elements[i][j].Set_CompiledCtrPrp(ParaMath);
 
     },
@@ -157,7 +158,7 @@ CMathBase.prototype =
 
         return rPrp;
     },
-    setRPrp: function(rPrp)
+    /*setRPrp: function(rPrp)
     {
         //this.RunPrp.mathPrp.bold = rPrp.mathPrp.bold; // как в Ворде, все остальные стили не поддерживаются
         //this.RunPrp.setTxtPrp(rPrp.textPrp); // Merge wTxtPrp
@@ -172,7 +173,7 @@ CMathBase.prototype =
                 if( !this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setRPrp(rPrp);
             }
-    },
+    },*/
     increaseArgSize: function()
     {
         for(var i=0; i < this.nRow; i++)
@@ -1297,7 +1298,7 @@ CMathBase.prototype =
     },
     GetParent: function()
     {
-        return (this.Parent.typeObj !== MATH_COMP ? this : this.Parent.GetParent());
+        return (this.Parent.Type !== para_Math_Composition ? this : this.Parent.GetParent());
     },
     Copy: function(Selected)
     {
@@ -1418,7 +1419,7 @@ CMathBase.prototype =
     },
     Create_FontMap : function(Map)
     {
-        var CtrPrp = this.Get_CompiledCtrPrp(false);
+        var CtrPrp = this.Get_CompiledCtrPrp();
         CtrPrp.Document_CreateFontMap( Map, this.ParaMath.Paragraph.Get_Theme().themeElements.fontScheme);
 
         for(var i=0; i < this.nRow; i++)
@@ -1428,6 +1429,17 @@ CMathBase.prototype =
                     this.elements[i][j].Create_FontMap( Map );
             }
 
+    },
+    Get_AllFontNames: function(AllFonts)
+    {
+        this.CtrPrp.Document_Get_AllFontNames( AllFonts );
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].Get_AllFontNames(AllFonts);
+            }
     }
 
     //////////////////////////

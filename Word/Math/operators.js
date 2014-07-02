@@ -2867,7 +2867,7 @@ COperator.prototype.getProps = function(props, defaultProps)
     //var code = bCode ? chr.charCodeAt(0) : null;
 
 
-    if(bDelimiter && bUnicodeChr == -1) // empty operator
+    if(bDelimiter && props.chr == -1) // empty operator
     {
         type = OPERATOR_EMPTY;
     }

@@ -410,14 +410,14 @@ CRecalculateInfo.prototype =
 
             var leftCode;
 
-            if(this.Current.typeObj == MATH_TEXT)
+            if(this.Current.Type == para_Math_Text)
             {
                 var currCode = this.Current.getCodeChr();
 
 
                 if(this.Left !== null)
                 {
-                    if(this.Left.typeObj == MATH_COMP)
+                    if(this.Left.Type == para_Math_Composition)
                     {
                         rightCoeff = this.getGapsMComp(this.Left, 1);
                         leftCoeff = COEFF_GAPS.getCoeff(currCode, -1, -1);
@@ -441,7 +441,7 @@ CRecalculateInfo.prototype =
 
                 if(this.Left != null)
                 {
-                    if(this.Left.typeObj == MATH_COMP)
+                    if(this.Left.Type == para_Math_Composition)
                     {
                         rightCoeff = this.getGapsMComp(this.Left, 1);
 
@@ -529,6 +529,7 @@ CRecalculateInfo.prototype =
 
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
     }
+
 }
 
 // TO DO
@@ -829,7 +830,7 @@ function CMathContent()
 
     this.content = []; // array of mathElem
 
-    this.CurPos = -1;
+    this.CurPos = 0;
     this.WidthToElement = [];
     this.pos = new CMathPosition();   // относительная позиция
 
@@ -890,7 +891,7 @@ CMathContent.prototype =
 
             for(var i = 0; i < this.content.length; i++)
             {
-                if(this.content[i].typeObj == MATH_COMP)
+                if(this.content[i].Type == para_Math_Composition)
                     this.content[i].setArgSize(argSize);
             }
         }
@@ -953,13 +954,9 @@ CMathContent.prototype =
     },
     addElementToContent: function(obj)   //for "read"
     {
-        obj.Parent = this;
-
-        if(obj.typeObj === MATH_COMP)
+        if(obj.Type === para_Math_Composition)
         {
-            //obj.setComposition(this.Composition);
             obj.setArgSize(this.argSize);
-
             this.content.push(obj);
         }
         else
@@ -3927,7 +3924,7 @@ CMathContent.prototype =
 
         return items;
     },
-    removeAreaSelect: function()
+    /*removeAreaSelect: function()
     {
         if( this.IsPlaceholder() ) //удаляем тагет
         {
@@ -3938,14 +3935,20 @@ CMathContent.prototype =
         }
         else if( this.selectUse() ) //т.к. после того как удалили тагет у нас эти 2 значения не равны, равенство их выставляется позднее, после добавления символа
             this.remove(1);
-    },
+    },*/
     fillPlaceholders: function()
     {
-        var placeholder = new CMathText(false);
+        this.content.length = 0;
+
+        var oMRun = new ParaRun(null, true);
+        oMRun.fillPlaceholders();
+        this.addElementToContent(oMRun);
+
+        /*var placeholder = new CMathText(false);
         //placeholder.relate(this);
         placeholder.fillPlaceholders();
 
-        this.content.push( placeholder );
+        this.content.push( placeholder );*/
     },
 
     //////////////////////////////////////
@@ -3962,12 +3965,14 @@ CMathContent.prototype =
 
         for(var i = 0; i < this.content.length; i++)
         {
-            if(this.content[i].typeObj == MATH_COMP)
+            if(this.content[i].Type == para_Math_Composition)
             {
                 this.content[i].Resize(this, ParaMath, oMeasure);
                 this.content[i].ApplyGaps();
             }
-            else if(this.content[i].typeObj == MATH_PLACEHOLDER)
+            else
+                this.content[i].Math_Recalculate(this, ParaMath.Paragraph, oMeasure);
+            /*else if(this.content[i].typeObj == MATH_PLACEHOLDER)
             {
                 if(!this.bRoot)
                 {
@@ -3984,7 +3989,7 @@ CMathContent.prototype =
             else
             {
                 this.content[i].Math_Recalculate(this, ParaMath.Paragraph, oMeasure);
-            }
+            }*/
 
 
             this.WidthToElement[i] = width;
@@ -4012,22 +4017,19 @@ CMathContent.prototype =
             this.Parent = Parent;
         }
 		if (!this.bRoot && this.content.length == 0)
-		{
-			this.CurPos = 0;
 			this.fillPlaceholders();
-		}
 
         var lng = this.content.length;
 
         for(var pos = 0; pos < lng; pos++)
         {
-            if(this.content[pos].typeObj == MATH_COMP)
+            if(this.content[pos].Type == para_Math_Composition)
             {
                 // мержим ctrPrp до того, как добавим Gaps !
                 this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath несмержим ctrPrp
                 this.content[pos].SetGaps(this, ParaMath, RecalcInfo);
             }
-            else if(this.content[pos].typeObj == MATH_PARA_RUN /*&& !this.content[pos].Is_Empty()*/)
+            else if(this.content[pos].Type == para_Math_Run /*&& !this.content[pos].Is_Empty()*/)
                 this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, RecalcInfo);
         }
 
@@ -4035,27 +4037,8 @@ CMathContent.prototype =
         if(RecalcInfo.Current !== null)
             RecalcInfo.Current.GapRight = 0;
 
-        /*if(this.bRoot)
-        {
-            for(var pos = 0; pos < lng; pos++)
-            {
-                if(this.content[pos].typeObj == MATH_COMP)
-                    console.log("Gap left " + this.content[pos].GapLeft + " Gap Right " + this.content[pos].GapRight);
-            }
-
-            console.log("");
-        }*/
 
         this.recalculateSize(ParaMath, oMeasure);
-    },
-    IsEmptyRun: function(pos) // пустой Para_Run
-    {
-        var result = false;
-
-        if(pos < this.content.length)
-            result = this.content[pos].typeObj !== MATH_COMP && this.content[pos].Is_Empty();
-
-        return result;
     },
     getGapsInside: function(RecalcInfo) // учитываем gaps внутренних объектов
     {
@@ -4068,10 +4051,10 @@ CMathContent.prototype =
         if(len > 1)
         {
             var bFRunEmpty = this.content[0].Is_Empty();
-            bFirstComp = bFRunEmpty && this.content[1].typeObj == MATH_COMP; // первый всегда идет Run
+            bFirstComp = bFRunEmpty && this.content[1].Type == para_Math_Composition; // первый всегда идет Run
 
             var bLastRunEmpty = this.content[len - 1].Is_Empty(); // т.к. после мат. объекта стоит пустой Run
-            bLastComp = bLastRunEmpty && this.content[len - 2].typeObj == MATH_COMP;
+            bLastComp = bLastRunEmpty && this.content[len - 2].Type == para_Math_Composition;
         }
 
         var checkGap;
@@ -4105,7 +4088,7 @@ CMathContent.prototype =
         var bOnlyText = true;
         for(var i = 0; i < this.content.length; i++)
         {
-            if(this.content[i].typeObj == MATH_COMP)
+            if(this.content[i].Type == para_Math_Composition)
             {
                 bOnlyText = false;
                 break;
@@ -4114,67 +4097,25 @@ CMathContent.prototype =
 
         return bOnlyText;
     },
-    old_checkSignComp: function(pos)
-    {
-        var bPlus = false, bMinus = false,
-            bMult = false, bDivision = false,
-            bEqual = false;
-
-        var currType = pos > 0 && pos < this.content.length ? this.content[pos].value.typeObj : null;
-
-        if(currType == MATH_TEXT)
-        {
-            var code = this.content[pos].value.getCodeChr();
-
-            bPlus     = code === 0x2B;
-            bMinus    = code === 0x2212;
-            bMult     = code === 0x2217;
-            bDivision = code === 0x002F;
-            bEqual    = code === 0x3D;
-        }
-
-        return (bPlus || bMinus || bEqual);
-    },
     draw: function(x, y, pGraphics)
     {
         var bHidePlh = this.plhHide && this.IsPlaceholder();
 
         if( !bHidePlh )
         {
-            var oWPrp;
             for(var i=0; i < this.content.length;i++)
             {
-                if(this.content[i].typeObj == MATH_RUN_PRP)
+                if(this.content[i].Type == para_Math_Composition)
                 {
-                    pGraphics.b_color1(0,0,0,255);
-                    var mgWPrp = this.content[i].value.getMergedWPrp();
-                    oWPrp = new CTextPr();
-                    oWPrp.Merge(mgWPrp);
-
-                    this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
-
-                    pGraphics.SetFont(oWPrp);
-                }
-                else if(this.content[i].typeObj == MATH_PLACEHOLDER)
-                {
-                    pGraphics.b_color1(0,0,0,255);
-
-                    oWPrp = this.Parent.Get_CompiledCtrPrp_2();
-                    this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
-
-                    oWPrp.Italic = false;
-                    pGraphics.SetFont(oWPrp);
-
-
-
-                    pGraphics.SetFont(oWPrp);
-
                     this.content[i].draw(x, y, pGraphics);
                 }
-                else  if(this.content[i].typeObj == MATH_PARA_RUN)
+                else
+                    this.content[i].Math_Draw(x, y, pGraphics);
+
+                /*else  if(this.content[i].typeObj == MATH_PARA_RUN)
                     this.content[i].Math_Draw(x, y, pGraphics);
                 else
-                    this.content[i].draw(x, y, pGraphics);
+                    this.content[i].draw(x, y, pGraphics);*/
 
             }
         }
@@ -4183,11 +4124,11 @@ CMathContent.prototype =
     update_Cursor: function(CurPage, UpdateTarget)
     {
         var result;
-        if(this.content[this.CurPos].typeObj == MATH_COMP)
+        if(this.content[this.CurPos].Type == para_Math_Composition)
         {
             result = this.content[this.CurPos].update_Cursor(CurPage, UpdateTarget);
         }
-        else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+        else
         {
             var X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos],
                 Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
@@ -4209,7 +4150,7 @@ CMathContent.prototype =
             pos = i;
         }
 
-        if( this.content[pos].typeObj === MATH_COMP )
+        if( this.content[pos].Type === para_Math_Composition )
         {
             if(X < W - width + this.content[pos].GapLeft)
                 pos--;
@@ -4219,13 +4160,13 @@ CMathContent.prototype =
 
         return pos;
     },
-    remove: function(order)
+    /*remove: function(order)
     {
         var state =
         {
-            bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
-            bBegin:                 false,    /* в начале контента или нет */
-            bEnd:                   false,    /* в конце */
+            bDelete:                false,    *//* нужно ли пересчитывать позицию или нет, работает при backspace *//*
+            bBegin:                 false,    *//* в начале контента или нет *//*
+            bEnd:                   false,    *//* в конце *//*
             bAddRPrp:               false
         };
 
@@ -4524,13 +4465,13 @@ CMathContent.prototype =
         }
 
         return result;
-    },
-    setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
+    },*/
+    /*setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
         if(this.content.length == 1 && !this.bRoot )//только CEmpty
             this.fillPlaceholders();
-    },
-    selectUse: function()
+    },*/
+    /*selectUse: function()
     {
         var result;
 
@@ -4549,7 +4490,7 @@ CMathContent.prototype =
             result = true;
 
         return result;
-    },
+    },*/
     setCtrPrp: function()
     {
 
@@ -4558,7 +4499,7 @@ CMathContent.prototype =
     {
         var flag = false;
         if(!this.bRoot && this.content.length == 1)
-            flag  = this.content[0].typeObj === MATH_PLACEHOLDER;
+            flag  = this.content[0].IsPlaceholder();
 
         return flag;
     },
@@ -4580,36 +4521,13 @@ CMathContent.prototype =
         NewPos.x = pos.x;
         NewPos.y = pos.y + this.size.ascent;    // y по baseline;
 
-        //console.log("SetPosition");
 
-        var check = this.content.length > 1 && this.content[1].typeObj == MATH_COMP && !this.bRoot;
-        var check2 = this.bRoot;
 
         for(var i=0; i < this.content.length; i++)
         {
-            if(this.content[i].typeObj == MATH_COMP)
-            {
-                this.content[i].setPosition(NewPos);
-                NewPos.x += this.content[i].size.width;
-            }
-            else if(this.content[i].typeObj == MATH_PARA_RUN)
-            {
-                this.content[i].Math_SetPosition(NewPos);
-                NewPos.x += this.content[i].size.width;
-            }
-            else if(this.content[i].typeObj == MATH_PLACEHOLDER)
-                this.content[i].setPosition(NewPos);
-
-            if(check2)
-            {
-                if(this.content[i].typeObj == MATH_COMP)
-                    console.log("X " + NewPos.x);
-            }
+            this.content[i].setPosition(NewPos);
+            NewPos.x += this.content[i].size.width;
         }
-
-        if(check2)
-            console.log("");
-
 
     },
     ///// properties /////
@@ -4631,16 +4549,24 @@ CMathContent.prototype =
 
         if(this.content.length > 1)
         {
-            var obj = this.content[1];
-            if(obj.typeObj === MATH_RUN_PRP) // если первый объект - буква
+            // первый объект всегда para_Math_Run
+
+            this.content[0].Get_CompiledPr(true);
+
+
+
+            /*
+             var obj = this.content[1];
+
+            if(obj.Type === MATH_RUN_PRP) // если первый объект - буква
             {
                 rPrp.Merge(obj);
             }
-            else if(obj.typeObj === MATH_COMP)
+            else if(obj.Type === MATH_COMP)
             {
                 var FirstRPrp = obj.getCtrPrpForFirst(ParaMath);// иначе зациклимся на getCtrPrp
                 rPrp.Merge(FirstRPrp);
-            }
+            }*/
         }
 
         return rPrp;
@@ -4655,7 +4581,7 @@ CMathContent.prototype =
         if( this.argSize > -2 )
             this.argSize--;
     },
-    setItalic: function(flag)
+    /*setItalic: function(flag)
     {
         var rPrp = new CTextPr();
         rPrp.Italic = flag;
@@ -4673,7 +4599,7 @@ CMathContent.prototype =
             }
         }
     },
-    setRPrp: function(RunPrp) //object CMathRun
+    setRPrp: function(RunPrp)   // object CMathRun
     {
         for(var i = 0; i < this.content.length; i++)
         {
@@ -4687,15 +4613,23 @@ CMathContent.prototype =
                 obj.setRPrp(RunPrp);
             }
         }
-    },
-    apply_RunPr: function(RunPrp)
+    },*/
+    /*apply_RunPr: function(RunPrp)
     {
         this.setRPrp(RunPrp);
+    },*/
+    GetCtrPrp: function()       // for placeholder
+    {
+        var ctrPrp = new CTextPr();
+        if(!this.bRoot)
+            ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
+
+        return ctrPrp;
     },
     ////////////////////////
 
     ////////   /////////
-    getMetricsLetter: function(pos)
+    /*getMetricsLetter: function(pos)
     {
         return this.content[pos+1].value.getMetrics();
     },
@@ -4713,10 +4647,10 @@ CMathContent.prototype =
             }
 
         return res;
-    },
+    },*/
     
     // (!) повторяется функция (IsHighElement)
-    IsIncline: function()
+    /*IsIncline: function()
     {
         var bIncline = false;
 
@@ -4724,7 +4658,7 @@ CMathContent.prototype =
             bIncline = this.content[1].value.IsIncline();
 
         return bIncline;
-    },
+    },*/
 
     /// For Para Math
 
@@ -4732,11 +4666,11 @@ CMathContent.prototype =
     {
         var result;
 
-        if(this.content[this.CurPos].typeObj == MATH_COMP)
+        if(this.content[this.CurPos].Type == para_Math_Composition)
         {
             result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
-        else if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+        else if(this.content[this.CurPos].Type == para_Math_Run)
         {
             Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
             _X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos];
@@ -4744,13 +4678,13 @@ CMathContent.prototype =
 
             result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, 0, 0, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
-        else
+        /*else
         {
             Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
             _X = this.pos.x + this.ParaMath.X + this.size.width;
 
-            /*var ctrPrp = this.Parent.getCtrPrp();
-            this.ParaMath.ApplyArgSize(ctrPrp);*/
+            *//*var ctrPrp = this.Parent.getCtrPrp();
+            this.ParaMath.ApplyArgSize(ctrPrp);*//*
 
             var ctrPrp = this.Parent.Get_CompiledCtrPrp();
 
@@ -4764,7 +4698,7 @@ CMathContent.prototype =
 
 
             result = {X: _X, Y: Y};
-        }
+        }*/
 
         return result;
     },
@@ -4785,8 +4719,8 @@ CMathContent.prototype =
     {
         for(var i = 0; i < this.content.length; i++)
         {
-            if(this.content[i].typeObj !== MATH_PLACEHOLDER)
-                this.content[i].Recalculate_Reset(StartRange, StartLine);
+            //if(this.content[i].typeObj !== MATH_PLACEHOLDER)
+            this.content[i].Recalculate_Reset(StartRange, StartLine);
         }
     },
     GetParent: function()
@@ -4884,7 +4818,7 @@ CMathContent.prototype =
 
 
         var bEqual = startPos == endPos,
-            bNotSelectComp = bEqual ? this.content[startPos].typeObj === MATH_COMP && this.content[startPos].IsSelectEmpty() : false;
+            bNotSelectComp = bEqual ? this.content[startPos].Type === para_Math_Composition && this.content[startPos].IsSelectEmpty() : false;
 
         var result;
 
@@ -4901,10 +4835,12 @@ CMathContent.prototype =
         this.SelectStartPos = 0;
         this.SelectEndPos = this.content.length - 1;
 
-        if(this.content[this.SelectStartPos].typeObj == MATH_PARA_RUN)
+        this.bSelectionUse = true;
+
+        if(this.content[this.SelectStartPos].Type == para_Math_Run)
             this.content[this.SelectStartPos].Select_All();
 
-        if(this.content[this.SelectEndPos].typeObj == MATH_PARA_RUN)
+        if(this.content[this.SelectEndPos].Type == para_Math_Run)
             this.content[this.SelectEndPos].Select_All();
 
     },
@@ -4914,12 +4850,12 @@ CMathContent.prototype =
 
         if(this.SelectStartPos == 0 && this.SelectEndPos == this.content.length - 1)
         {
-            if(this.content[this.SelectStartPos].typeObj == MATH_PARA_RUN)
+            if(this.content[this.SelectStartPos].Type == para_Math_Run)
                 bFirst = this.content[this.SelectStartPos].Is_SelectedAll(Props);
             else
                 bFirst = true;
 
-            if(this.content[this.SelectEndPos].typeObj == MATH_PARA_RUN)
+            if(this.content[this.SelectEndPos].Type == para_Math_Run)
                 bEnd = this.content[this.SelectEndPos].Is_SelectedAll(Props);
             else
                 bEnd = true;
@@ -4935,6 +4871,9 @@ CMathContent.prototype =
         var result = false;
 
         if(startPos == endPos)
+            result = this.content[startPos].Selection_IsEmpty();
+
+        /*if(startPos == endPos)
         {
             var bRunPrp = this.content[startPos].typeObj == MATH_RUN_PRP,
                 bComp = this.content[startPos].typeObj == MATH_COMP;
@@ -4943,7 +4882,7 @@ CMathContent.prototype =
                 result = this.content[startPos].Selection_IsEmpty();
             else
                 result = false; // placeholder
-        }
+        }*/
 
         return result;
     },
@@ -4992,22 +4931,24 @@ CMathContent.prototype =
 
         var len = this.content.length;
 
+        var emptyRun, txtPrp;
+
         for(var i = 0; i < len; i++)
         {
             current = this.content[i];
 
-            var bLeftRun  = left !== null ? left.typeObj == MATH_PARA_RUN : false,
-                bRightRun = i < len - 1 ? this.content[i + 1].typeObj === MATH_PARA_RUN : false;
+            var bLeftRun  = left !== null ? left.Type == para_Math_Run : false,
+                bRightRun = i < len - 1 ? this.content[i + 1].Type === para_Math_Run : false;
 
-            var bCurrComp = current.typeObj == MATH_COMP,
-                bCurrEmptyRun = current.typeObj == MATH_PARA_RUN && current.Is_Empty();
+            var bCurrComp = current.Type == para_Math_Composition,
+                bCurrEmptyRun = current.Type == para_Math_Run && current.Is_Empty();
 
             var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
 
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
-                var emptyRun = new ParaRun(null, true);
-                var txtPrp = current.Get_CtrPrp();
+                emptyRun = new ParaRun(null, true);
+                txtPrp = current.Get_CtrPrp();
                 emptyRun.Set_Pr(txtPrp);
 
                 NewContent.push(emptyRun);
@@ -5027,12 +4968,12 @@ CMathContent.prototype =
                 this.content[i].SetRunEmptyToContent(bAll);
         }
 
-        if(len > 0 && this.content[len - 1].typeObj == MATH_COMP)
+        if(len > 0 && this.content[len - 1].Type == para_Math_Composition)
         {
-            var emptyRun = new ParaRun(null, true);
+            emptyRun = new ParaRun(null, true);
 
             //var emptyRun = new ParaRun(this.ParaMath.Paragraph, true);
-            var txtPrp = current.Get_CtrPrp();
+            txtPrp = current.Get_CtrPrp();
             emptyRun.Set_Pr(txtPrp);
 
             NewContent.push(emptyRun);
@@ -5043,14 +4984,14 @@ CMathContent.prototype =
     },
     Create_FontMap : function(Map)
     {
-        // TODO
-        // заделать для плейсхолдера
-        // т.к. для TXT_NORMAL можно выставить другой шрифт для одного плейсхолдера
-
         for (var index = 0; index < this.content.length; index++)
-            if(this.content[index].typeObj !== MATH_PLACEHOLDER)
                 this.content[index].Create_FontMap( Map );
 
+    },
+    Get_AllFontNames: function(AllFonts)
+    {
+        for (var index = 0; index < this.content.length; index++)
+                this.content[index].Get_AllFontNames(AllFonts);
     },
 
     /// функции для работы с курсором
@@ -5062,25 +5003,24 @@ CMathContent.prototype =
 
             SearchPos.Pos.Update( pos, Depth );
             Depth++;
-            //ContentPos.Add(pos);
 
             SearchPos.X -= this.WidthToElement[pos];
 
-            if(this.content[pos].typeObj == MATH_COMP)
+            if(this.content[pos].Type == para_Math_Composition)
             {
                 SearchPos.Y -= this.size.ascent - this.content[pos].size.ascent;
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
             }
-            else if(this.content[pos].typeObj == MATH_PARA_RUN)      // проверка на gaps в findDisposition
+            else if(this.content[pos].Type == para_Math_Run)      // проверка на gaps в findDisposition
             {
                 SearchPos.X += this.pos.x + this.ParaMath.X + this.WidthToElement[pos];
                 SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
             }
-            else
+            /*else
             {
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-            }
+            }*/
         }
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
@@ -5102,17 +5042,13 @@ CMathContent.prototype =
     Set_ParaContentPos: function(ContentPos, Depth)
     {
         this.CurPos = ContentPos.Get(Depth);
-        /*this.SelectStartPos = this.CurPos;
-        this.SelectEndPos   = this.CurPos;*/
 
         Depth++;
 
-        var curr = this.content[this.CurPos];
 
         if(this.content.length > 0)
         {
-            if(curr.typeObj == MATH_COMP || curr.typeObj == MATH_PARA_RUN)
-                curr.Set_ParaContentPos(ContentPos, Depth);
+            this.content[this.CurPos].Set_ParaContentPos(ContentPos, Depth);
         }
 
     },
@@ -5245,10 +5181,10 @@ CMathContent.prototype =
         {
             for ( var i = 0; i < this.content.length; i++ )
             {
-                var typeElem = this.content[i].typeObj;
+                //var typeElem = this.content[i].typeObj;
 
-                if( typeElem == MATH_COMP || typeElem == MATH_PARA_RUN)
-                    this.content[i].Apply_TextPr( TextPr, IncFontSize, true );
+                //if( typeElem == MATH_COMP || typeElem == MATH_PARA_RUN)
+                this.content[i].Apply_TextPr( TextPr, IncFontSize, true );
             }
         }
         else
@@ -5265,28 +5201,38 @@ CMathContent.prototype =
                     StartPos = temp;
                 }
 
-                if ( StartPos === EndPos )
+                for(var i = StartPos; i <= EndPos; i++)
                 {
-                    var elem = this.content[StartPos];
+                    var elem = this.content[i];
 
-                    if( elem.typeObj == MATH_COMP)
+                    if( elem.Type == para_Math_Composition)
                         elem.Apply_TextPr( TextPr, IncFontSize, true );
-                    else if(elem.typeObj == MATH_PARA_RUN)
+                    else if(elem.Type == para_Math_Run)
+                        elem.Apply_TextPr( TextPr, IncFontSize, false );
+                }
+
+                /*if ( StartPos === EndPos )
+                {
+                    elem = this.content[StartPos];
+
+                    if( elem.Type == para_Math_Composition)
+                        elem.Apply_TextPr( TextPr, IncFontSize, true );
+                    else if(elem.Type == para_Math_Run)
                         elem.Apply_TextPr( TextPr, IncFontSize, false );
                 }
                 else
                 {
                     for(var i = StartPos; i <= EndPos; i++)
                     {
-                        var elem = this.content[i];
+                        elem = this.content[i];
 
-                        if( elem.typeObj == MATH_COMP)
+                        if( elem.Type == para_Math_Composition)
                             elem.Apply_TextPr( TextPr, IncFontSize, true );
-                        else if(elem.typeObj == MATH_PARA_RUN)
+                        else if(elem.Type == para_Math_Run)
                             elem.Apply_TextPr( TextPr, IncFontSize, false );
                     }
 
-                }
+                }*/
             }
             else
             {
@@ -5298,10 +5244,11 @@ CMathContent.prototype =
     {
         return this.ParaMath.Get_Default_TPrp();
     },
+
     //////////////////////////////
     // Перемещение по стрелкам
     ////////////////////
-    Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
+    old_Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
 
@@ -5350,7 +5297,56 @@ CMathContent.prototype =
 
         return SearchPos.Found;
     },
-    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
+    Get_LeftPos: function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
+    {
+        var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
+
+        while(CurPos >= 0 && SearchPos.Found == false)
+        {
+            var curType = this.content[CurPos].Type,
+                prevType = CurPos > 0 ? this.content[CurPos - 1].Type : null;
+
+            /*if(curType == MATH_PLACEHOLDER)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else */
+            if(curType == para_Math_Composition)
+            {
+                var bNotshift     = SearchPos.ForSelection == false,
+                    bShiftCurrObj = (SearchPos.ForSelection == true && this.SelectStartPos == CurPos);
+
+                if( bNotshift || bShiftCurrObj )
+                    this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos, EndRun);
+            }
+            else if(EndRun)
+            {
+                SearchPos.Pos.Update(this.content[CurPos].Content.length, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else
+            {
+                this.content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+            }
+
+            SearchPos.Pos.Update(CurPos, Depth);
+
+
+            // если перемещаемся между контентами мат объекта, то надо выставить курсор в конец следующего контента, в конечную позицию последнего рана
+            EndRun = (curType == para_Math_Run && prevType == para_Math_Run) ? false : true;
+
+            CurPos--;
+            UseContentPos = false;
+        }
+
+
+        /// для коррекции позиции курсора в начале Run
+        // используется функция Correct_ContentPos в Paragraph
+
+        return SearchPos.Found;
+    },
+    old_Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
     {
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
 
@@ -5394,22 +5390,68 @@ CMathContent.prototype =
 
         return SearchPos.Found;
     },
+    Get_RightPos: function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd, BegRun)
+    {
+        var CurPos = UseContentPos ? ContentPos.Get(Depth) : 0;
+
+        while(CurPos < this.content.length && SearchPos.Found == false)
+        {
+            var curType = this.content[CurPos].Type,
+                nextType = CurPos < this.content.length - 1 ? this.content[CurPos + 1].Type : null;
+
+            /*if(curType == MATH_PLACEHOLDER)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else */
+            if(curType == para_Math_Composition)
+            {
+                var bNotshift     = SearchPos.ForSelection == false,
+                    bShiftCurrObj = SearchPos.ForSelection == true && this.SelectStartPos == CurPos;
+
+                if( bNotshift || bShiftCurrObj )
+                    this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd, BegRun);
+            }
+            else if(BegRun)
+            {
+                SearchPos.Pos.Update(0, Depth + 1);
+                SearchPos.Found = true;
+            }
+            else
+            {
+                this.content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
+            }
+
+            SearchPos.Pos.Update(CurPos, Depth);
+
+            // если перемещаемся между контентами мат объекта, то надо выставить курсор в начало следующего контента, в начальную позицию первого рана
+            BegRun = (curType == para_Math_Run && nextType == para_Math_Run) ? false : true;
+
+
+            CurPos++;
+            UseContentPos = false;
+        }
+
+        return SearchPos.Found;
+    },
     Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos, EndRun)
     {
         var CurPos = UseContentPos ? ContentPos.Get(Depth) : this.content.length-1;
 
         while(CurPos >= 0 && SearchPos.Found == false)
         {
-            var curType = this.content[CurPos].typeObj,
-                prevType = CurPos > 0 ? this.content[CurPos - 1].typeObj : null;
+            var curType = this.content[CurPos].Type,
+                prevType = CurPos > 0 ? this.content[CurPos - 1].Type : null;
 
-            if(curType == MATH_PLACEHOLDER)
+            /*if(curType == MATH_PLACEHOLDER)
             {
                 SearchPos.Pos.Update(0, Depth + 1);
                 SearchPos.Found = true;
 
             }
-            else if(curType == MATH_COMP)
+            else*/
+            if(curType == para_Math_Composition)
             {
                 var bNotshift     = SearchPos.ForSelection == false,
                     bShiftCurrObj = (SearchPos.ForSelection == true && this.SelectStartPos == CurPos);
@@ -5436,7 +5478,7 @@ CMathContent.prototype =
             SearchPos.Pos.Update(CurPos, Depth);
 
             // если перемещаемся между контентами мат объекта, то надо выставить курсор в конец следующего контента, в конечную позицию последнего рана
-            EndRun = (curType == MATH_PARA_RUN && prevType == MATH_PARA_RUN) ? false : true;
+            EndRun = (curType == para_Math_Run && prevType == para_Math_Run) ? false : true;
 
 
             CurPos--;
@@ -5450,15 +5492,17 @@ CMathContent.prototype =
 
         while(CurPos < this.content.length && SearchPos.Found == false)
         {
-            var curType = this.content[CurPos].typeObj,
-                nextType = CurPos < this.content.length - 1 ? this.content[CurPos + 1].typeObj : null;
+            var curType = this.content[CurPos].Type,
+                nextType = CurPos < this.content.length - 1 ? this.content[CurPos + 1].Type : null;
 
-            if(curType == MATH_PLACEHOLDER)
+            /*if(curType == MATH_PLACEHOLDER)
             {
                 SearchPos.Pos.Update(0, Depth + 1);
                 SearchPos.Found = true;
             }
-            else if(curType == MATH_COMP)
+            else */
+
+            if(curType == para_Math_Composition)
             {
                 var bNotshift     = SearchPos.ForSelection == false,
                     bShiftCurrObj = SearchPos.ForSelection == true && this.SelectStartPos == CurPos;
@@ -5485,7 +5529,7 @@ CMathContent.prototype =
             SearchPos.Pos.Update(CurPos, Depth);
 
             // если перемещаемся между контентами мат объекта, то надо выставить курсор в начало следующего контента, в начальную позицию первого рана
-            BegRun = (curType == MATH_PARA_RUN && nextType == MATH_PARA_RUN) ? false : true;
+            BegRun = (curType == para_Math_Run && nextType == para_Math_Run) ? false : true;
 
 
             CurPos++;
@@ -5544,7 +5588,7 @@ CMathContent.prototype =
         for(var i = start; i <= end; i++)
         {
             var element;
-            if(this.content[i].typeObj == MATH_PARA_RUN)
+            if(this.content[i].Type == para_Math_Run)
                 element = this.content[i].Copy(Selected);
             else
                 element = this.content[i].Copy(false);
@@ -5560,12 +5604,12 @@ CMathContent.prototype =
         var start = this.SelectStartPos,
             end   = this.SelectEndPos;
 
-        if(this.content[start].typeObj !== MATH_PLACEHOLDER)
+        //if(this.content[start].typeObj !== MATH_PLACEHOLDER)
             this.content[start].Selection_Remove();
 
         if(start !== end)
         {
-            if(this.content[end].typeObj !== MATH_PLACEHOLDER)
+            //if(this.content[end].typeObj !== MATH_PLACEHOLDER)
                 this.content[end].Selection_Remove();
         }
 
@@ -5579,22 +5623,22 @@ CMathContent.prototype =
     {
         this.bSelectionUse = true;
 
-        if(this.content[this.CurPos].typeObj == MATH_PARA_RUN)
+        if(this.content[this.CurPos].Type == para_Math_Run)
         {
-            if(Direction < 0 && this.CurPos > 0 && this.content[this.CurPos - 1].typeObj == MATH_COMP)
+            if(Direction < 0 && this.CurPos > 0 && this.content[this.CurPos - 1].Type == para_Math_Composition)
             {
                 this.SelectStartPos = this.SelectEndPos = this.CurPos - 1;
                 this.content[this.CurPos - 1].SetSelectAll();
             }
-            else if(this.CurPos < this.content.length - 1 && this.content[this.CurPos + 1].typeObj == MATH_COMP)
+            else if(this.CurPos < this.content.length - 1 && this.content[this.CurPos + 1].Type == para_Math_Composition)
             {
                 this.SelectStartPos = this.SelectEndPos = this.CurPos + 1;
                 this.content[this.CurPos + 1].SetSelectAll();
             }
         }
-        else if(this.content[this.CurPos].typeObj == MATH_COMP)
+        else if(this.content[this.CurPos].Type == para_Math_Composition)
         {
-            if(this.content[this.CurPos].IsCurrentPlh())
+            if(this.content[this.CurPos].IsPlaceholder())
             {
                 this.SelectStartPos = this.SelectEndPos = this.CurPos;
                 this.content[this.CurPos].SetSelectAll();

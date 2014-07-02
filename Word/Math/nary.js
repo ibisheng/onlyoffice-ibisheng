@@ -684,7 +684,7 @@ function CNaryOperator(flip)
 }
 CNaryOperator.prototype.draw = function(x, y, pGraphics)
 {
-    if(this.typeObj == MATH_TEXT)
+    if(this.Type == para_Math_Text)
         this.drawTextElem(x, y, pGraphics);
     else
         this.drawGlyph(x, y, pGraphics);

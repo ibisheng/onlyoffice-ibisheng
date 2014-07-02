@@ -62,27 +62,19 @@ function CMathPosition()
 
 function CMathText(bJDraw)
 {
-    this.typeObj = MATH_TEXT;
+    // для Para_Run
+    this.Type = para_Math_Text;
 
     this.bJDraw = bJDraw;
     this.size = null;
     this.value = null;
     this.pos = new CMathPosition();
 
-
-//    if(bJDraw === false || bJDraw === true)
-//        this.bJDraw = bJDraw;
-
-    this.type  = TXT_ROMAN;
-
     this.rasterOffsetX = 0;
     this.rasterOffsetY = 0;
     this.GapLeft = 0;
     this.GapRight = 0;
     this.WidthVisible = 0;
-
-    // для Para_Run
-    this.Type = para_Math_Text;
 
     // TO DO
     // убрать
@@ -117,112 +109,195 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if(this.typeObj === MATH_PLACEHOLDER || this.bJDraw)
+        if(this.Type === para_Math_Placeholder || this.bJDraw)
             return code;
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
-            bSmall = (code > 0x0060 && code < 0x007b);
+            bSmall = (code > 0x0060 && code < 0x007b),
+            bDigit = (code > 0x002F && code < 0x003A);
 
-        var Type = this.Parent.Math_GetTypeText();
+        var Scr = this.Parent.Math_GetTypeText();
 
+        // Mathematical Alphanumeric Characters
+        // http://www.w3.org/TR/2014/REC-xml-entity-names-20140410/Overview.html#alphabets
 
-        if(Type == TXT_ROMAN )
+        if(Scr == TXT_ROMAN)
         {
-            var bDigit = (code > 0x002F && code < 0x003A),
-                bCapGreek = (code > 0x0390 && code < 0x03AA ),
+            var bCapGreek = (code > 0x0390 && code < 0x03AA ),
                 bSmallGreek = (code > 0x03B0 && code < 0x03CA);
 
-            if(code == 0x68) // h
+            if(code == 0x68)            // h
                 code = 0x210E;
             else if(bCapitale)
                 code  = code + 0x1D3F3;
             else if(bSmall)
                 code  = code + 0x1D3ED;
+            else if(code == 0x3F4)      // Capital THETA special
+                code = 0x1D6F3;
+            else if(code == 0x2207)     // Capital NABLA
+                code = 0x1D6FB;
             else if(bCapGreek)
                 code = code + 0x1D351;
             else if(bSmallGreek)
                 code = code + 0x1D34B;
+            else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
+                code = 0x1D715;
+            else if(code == 0x3F5)      //  small EPSILON
+                code = 0x1D716;
+            else if(code == 0x3D1)      //  small THETA
+                code = 0x1D717;
+            else if(code == 0x3F0)      //  small KAPPA
+                code = 0x1D718;
+            else if(code == 0x3D5)      //  small PHI
+                code = 0x1D719;
+            else if(code == 0x3F1)      //  small RHO
+                code = 0x1D71A;
+            else if(code == 0x3D6)      //  small PI
+                code = 0x1D71B;
 
-            if(code == 0x131) // "i" without dot
+
+            if(code == 0x131)           // "i" without dot
                 code = 0x1D6A4;
-            else if(code == 0x237) // "j" without dot
+            else if(code == 0x237)      // "j" without dot
                 code = 0x1D6A5;
         }
-        else if(Type == TXT_DOUBLE_STRUCK)
+        else if(Scr == TXT_DOUBLE_STRUCK)
         {
-            if(code == 0x43)
+            if(code == 0x43)        // C
                 code = 0x2102;
-            else if(code == 0x48)
+            else if(code == 0x48)   // H
                 code = 0x210D;
-            else if(code == 0x4E)
+            else if(code == 0x4E)   // N
                 code = 0x2115;
-            else if(code == 0x50)
+            else if(code == 0x50)   // P
                 code = 0x2119;
-            else if(code == 0x51)
+            else if(code == 0x51)   // Q
                 code = 0x211A;
-            else if(code == 0x52)
+            else if(code == 0x52)   // R
                 code = 0x211D;
-            else if(code == 0x5A)
+            else if(code == 0x5A)   // Z
                 code = 0x2124;
             else if(bCapitale)
                 code  = code + 0x1D4F7;
             else if(bSmall)
                 code  = code + 0x1D4F1;
+
+            else if(bDigit)
+                code = code + 0x1D7A8;
+
+            // arabic mathematical symbols
+
+            else if(code == 0x628)
+                code = 0x1EEA1;
+            else if(code == 0x062C)
+                code = 0x1EEA2;
+            else if(code == 0x062F)
+                code = 0x1EEA3;
+            else if(code == 0x0648)
+                code = 0x1EEA5;
+            else if(code == 0x0632)
+                code = 0x1EEA6;
+            else if(code == 0x062D)
+                code = 0x1EEA7;
+            else if(code == 0x0637)
+                code = 0x1EEA8;
+            else if(code == 0x064A)
+                code = 0x1EEA9;
+
+            else if(code == 0x0644)
+                code = 0x1EEAB;
+            else if(code == 0x0645)
+                code = 0x1EEAC;
+            else if(code == 0x0646)
+                code = 0x1EEAD;
+            else if(code == 0x0633)
+                code = 0x1EEAE;
+            else if(code == 0x0639)
+                code = 0x1EEAF;
+            else if(code == 0x0641)
+                code = 0x1EEB0;
+            else if(code == 0x0635)
+                code = 0x1EEB1;
+            else if(code == 0x0642)
+                code = 0x1EEB2;
+            else if(code == 0x0631)
+                code = 0x1EEB3;
+            else if(code == 0x0634)
+                code = 0x1EEB4;
+            else if(code == 0x062A)
+                code = 0x1EEB5;
+            else if(code == 0x062B)
+                code = 0x1EEB6;
+            else if(code == 0x062E)
+                code = 0x1EEB7;
+            else if(code == 0x0630)
+                code = 0x1EEB8;
+            else if(code == 0x0636)
+                code = 0x1EEB9;
+            else if(code == 0x0638)
+                code = 0x1EEBA;
+            else if(code == 0x063A)
+                code = 0x1EEBB;
+
         }
-        else if(Type == TXT_MONOSPACE)
+        else if(Scr == TXT_MONOSPACE)
         {
             if(bCapitale)
                 code  = code + 0x1D62F;
             else if(bSmall)
                 code  = code + 0x1D629;
+            else if(bDigit)
+                code = code + 0x1D7C6;
         }
-        else if(Type == TXT_FRAKTUR)
+        else if(Scr == TXT_FRAKTUR)
         {
-            if(code == 0x43)
+            if(code == 0x43)        // C
                 code = 0x212D;
-            else if(code == 0x48)
+            else if(code == 0x48)   // H
                 code = 0x210C;
-            else if(code == 0x49)
+            else if(code == 0x49)   // I
                 code = 0x2111;
-            else if(code == 0x52)
+            else if(code == 0x52)   // R
                 code = 0x211C;
-            else if(code == 0x5A)
+            else if(code == 0x5A)   // Z
                 code = 0x2128;
             else if(bCapitale)
-                code  = code + 0x1D4C3;
+                code = code + 0x1D4C3;
             else if(bSmall)
-                code  = code + 0x1D4BD;
+                code = code + 0x1D4BD;
         }
-        else if(Type == TXT_SANS_SERIF)
+        else if(Scr == TXT_SANS_SERIF)
         {
             if(bCapitale)
-                code  = code + 0x1D5C7;
+                code = code + 0x1D5C7;
             else if(bSmall)
-                code  = code + 0x1D5C1;
+                code = code + 0x1D5C1;
+            else if(bDigit)
+                code = code + 0x1D7B2;
         }
-        else if(Type == TXT_SCRIPT)
+        else if(Scr == TXT_SCRIPT)
         {
-            if(code == 0x42)
+            if(code == 0x42)        // B
                 code = 0x212C;
-            else if(code == 0x45)
+            else if(code == 0x45)   // E
                 code = 0x2130;
-            else if(code == 0x46)
+            else if(code == 0x46)   // F
                 code = 0x2131;
-            else if(code == 0x48)
+            else if(code == 0x48)   // H
                 code = 0x210B;
-            else if(code == 0x49)
+            else if(code == 0x49)   // I
                 code = 0x2110;
-            else if(code == 0x4C)
+            else if(code == 0x4C)   // L
                 code = 0x2112;
-            else if(code == 0x4D)
+            else if(code == 0x4D)   // M
                 code = 0x2133;
-            else if(code == 0x52)
+            else if(code == 0x52)   // R
                 code = 0x211B;
-            else if(code == 0x65)
+            else if(code == 0x65)   // e
                 code = 0x212F;
-            else if(code == 0x67)
+            else if(code == 0x67)   // g
                 code = 0x210A;
-            else if(code == 0x6F)
+            else if(code == 0x6F)   // o
                 code = 0x2134;
             else if(bCapitale)
                 code  = code + 0x1D45B;
@@ -238,7 +313,7 @@ CMathText.prototype =
     },
     fillPlaceholders: function()
     {
-        this.typeObj = MATH_PLACEHOLDER;
+        this.Type = para_Math_Placeholder;
         this.value = StartTextElement;
     },
     Resize: function(Run, oMeasure)
@@ -376,7 +451,7 @@ CMathText.prototype =
     {
         this.Parent = parent;
     },
-    IsIncline: function()
+    /*IsIncline: function()
     {
         // возвращаем не Italic, т.к. могут быть мат. текст, но буквы без наклона (placeholder и т.п.)
 
@@ -394,12 +469,11 @@ CMathText.prototype =
     setJustDraw: function(bJustDraw)
     {
         this.bJDraw = bJustDraw;
-    },
-    SetTypeText: function(type)
+    },*/
+    IsPlaceholder:  function()
     {
-        this.type = type;
+        return this.Type == para_Math_Placeholder;
     },
-
     // For ParaRun
     Is_Punctuation: function()
     {
