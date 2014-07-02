@@ -317,9 +317,9 @@ cString.prototype.tocNumber = function () {
         res = new cNumber( 0 );
     }
 
-    if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
+    /*if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
         m = this.value.substring( 1, this.value.length - 1 );
-    }
+    }*/
     if ( !parseNum( m ) ) {
         res = new cError( cErrorType.wrong_value_type );
     }
@@ -522,7 +522,7 @@ cArea.prototype.getValue = function () {
                     break;
 
                 case CellValueType.String:
-                    val.push( checkTypeCell( "" + cell.getValueWithoutFormat() ) );
+                    val.push( new cString( cell.getValueWithoutFormat() ) );
                     break;
 
                 default:
@@ -546,25 +546,26 @@ cArea.prototype.getValue2 = function ( cell ) {
         r._foreachNoEmpty( function ( cellData ) {
             if ( cell.getID() === cellData.getName() ) {
                 var cellType = cellData.getType();
-                if ( cellType === CellValueType.Number ) {
-                    cellData.getValueWithoutFormat() === "" ? val.push( new cEmpty() ) : val.push( new cNumber( cellData.getValueWithoutFormat() ) );
-                }
-                else if ( cellType === CellValueType.Bool ) {
-                    val.push( new cBool( cellData.getValueWithoutFormat() ) );
-                }
-                else if ( cellType === CellValueType.Error ) {
-                    val.push( new cError( cellData.getValueWithoutFormat() ) );
-                }
-                else if ( cellType === CellValueType.String ) {
-                    val.push( checkTypeCell( "" + cellData.getValueWithoutFormat() ) );
-                }
-                else {
-                    if ( cellData.getValueWithoutFormat() && cellData.getValueWithoutFormat() !== "" ) {
-                        val.push( new cNumber( cellData.getValueWithoutFormat() ) );
-                    }
-                    else {
-                        val.push( checkTypeCell( "" + cellData.getValueWithoutFormat() ) );
-                    }
+                switch(cellType){
+                    case CellValueType.Number:
+                        cellData.getValueWithoutFormat() === "" ? val.push( new cEmpty() ) : val.push( new cNumber( cellData.getValueWithoutFormat() ) );
+                        break;
+                    case CellValueType.Bool:
+                        val.push( new cBool( cellData.getValueWithoutFormat() ) );
+                        break;
+                    case CellValueType.Error:
+                        val.push( new cError( cellData.getValueWithoutFormat() ) );
+                        break;
+                    case CellValueType.String:
+                        val.push( new cString( cellData.getValueWithoutFormat() ) );
+                        break;
+                    default:
+                        if ( cellData.getValueWithoutFormat() && cellData.getValueWithoutFormat() !== "" ) {
+                            val.push( new cNumber( cellData.getValueWithoutFormat() ) );
+                        }
+                        else {
+                            val.push( checkTypeCell( "" + cellData.getValueWithoutFormat() ) );
+                        }
                 }
             }
         } );
@@ -820,26 +821,29 @@ cArea3D.prototype.getValue = function () {
         }
         _r[i]._foreachNoEmpty( function ( _cell ) {
             var cellType = _cell.getType();
-            if ( cellType === CellValueType.Number ) {
-                _cell.getValueWithoutFormat() === "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.Bool ) {
-                _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.Error ) {
-                _val.push( new cError( _cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.String ) {
-                _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-            }
-            else {
-                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
-                    _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+            switch(cellType){
+                case CellValueType.Number:
+                    _cell.getValueWithoutFormat() === "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+                    break;
+                case CellValueType.Bool:
+                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
+                    break;
+                case CellValueType.Error:
+                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
+                    break;
+                case CellValueType.String:
+                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
+                    break;
+                default:{
+                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
+                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+                    }
+                    else {
+                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+                    }
                 }
-                else {
-                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                }
             }
+
         } );
     }
     return _val;
@@ -865,24 +869,30 @@ cArea3D.prototype.getValue2 = function ( cell ) {
     _r[0]._foreachNoEmpty( function ( _cell ) {
         if ( cell.getID() === _cell.getName() ) {
             var cellType = _cell.getType();
-            if ( cellType === CellValueType.Number ) {
-                _cell.getValueWithoutFormat() === "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.Bool ) {
-                _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.Error ) {
-                _val.push( new cError( _cell.getValueWithoutFormat() ) );
-            }
-            else if ( cellType === CellValueType.String ) {
-                _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-            }
-            else {
-                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
-                    _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+            switch(cellType){
+                case CellValueType.Number:{
+                    _cell.getValueWithoutFormat() === "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+                    break;
                 }
-                else {
-                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+                case CellValueType.Bool:{
+                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
+                    break;
+                }
+                case CellValueType.Error:{
+                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
+                    break;
+                }
+                case CellValueType.String:{
+                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
+                    break
+                }
+                default:{
+                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
+                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+                    }
+                    else {
+                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+                    }
                 }
             }
         }
@@ -1133,6 +1143,7 @@ cRef.prototype.getValue = function () {
         return new cError( cErrorType.bad_reference );
     }
     var cellType = this.range.getType(), v, res;
+
     if ( cellType === CellValueType.Number ) {
         v = this.range.getValueWithoutFormat();
         if ( v === "" ) {
@@ -1147,6 +1158,10 @@ cRef.prototype.getValue = function () {
     }
     else if ( cellType === CellValueType.Error ) {
         res = new cError( "" + this.range.getValueWithoutFormat() );
+    }
+    else if ( cellType === CellValueType.String ) {
+        res = new cString( this.range.getValueWithoutFormat() );
+//        res =  checkTypeCell( "" + this.range.getValueWithoutFormat() );
     }
     else {
         res = checkTypeCell( "" + this.range.getValueWithoutFormat() );
@@ -1739,13 +1754,14 @@ cUnarPlusOperator.prototype.Assemble = function ( arg ) {
     return new cString( "+" + arg[0] );
 };
 
-function cPlusOperator() {
+function cAddOperator() {
     cBaseOperator.apply( this, ['+', 20] );
 }
 
-cPlusOperator.prototype = Object.create( cBaseOperator.prototype );
-cPlusOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+cAddOperator.prototype = Object.create( cBaseOperator.prototype );
+cAddOperator.prototype.Calculate = function ( arg ) {
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0].tocNumber(), arg1 = arg[1].tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
 };
 
@@ -1948,7 +1964,7 @@ var cFormulaOperators = {
     '^':cPowOperator,
     '*':cMultOperator,
     '/':cDivOperator,
-    '+':cPlusOperator,
+    '+':cAddOperator,
     '-':cMinusOperator,
     '&':cConcatSTROperator /*concat str*/,
     '=':cEqualsOperator/*equals*/,
@@ -1997,6 +2013,7 @@ _func[cElementType.error] = [];
 _func[cElementType.cellsRange] = [];
 _func[cElementType.empty] = [];
 _func[cElementType.array] = [];
+_func[cElementType.cell] = [];
 
 
 _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) {
@@ -2763,6 +2780,136 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
 
 };
 
+_func[cElementType.number][cElementType.cell] = function(arg0,arg1,what,cellAddress){
+    var ar1 = arg1.tocNumber();
+    switch(what){
+        case ">":{
+            return new cBool( arg0.getValue() > ar1.getValue() );
+        }
+        case ">=":{
+            return new cBool( arg0.getValue() >= ar1.getValue() );
+        }
+        case "<":{
+            return new cBool( arg0.getValue() < ar1.getValue() );
+        }
+        case "<=":{
+            return new cBool( arg0.getValue() <= ar1.getValue() );
+        }
+        case "=":{
+            return new cBool( arg0.getValue() === ar1.getValue() );
+        }
+        case "<>":{
+            return new cBool( arg0.getValue() !== ar1.getValue() );
+        }
+        case "-":{
+            return new cNumber( arg0.getValue() - ar1.getValue() );
+        }
+        case "+":{
+            return new cNumber( arg0.getValue() + ar1.getValue() );
+        }
+        case "/":{
+            if ( arg1.getValue() !== 0 ) {
+                return new cNumber( arg0.getValue() / ar1.getValue() );
+            }
+            else {
+                return new cError( cErrorType.division_by_zero );
+            }
+        }
+        case "*":{
+            return new cNumber( arg0.getValue() * ar1.getValue() );
+        }
+        default:{
+            return new cError( cErrorType.wrong_value_type );
+        }
+    }
+
+};
+_func[cElementType.cell][cElementType.number] = function(arg0,arg1,what,cellAddress){
+    var ar0 = arg0.tocNumber();
+    switch(what){
+        case ">":{
+            return new cBool( ar0.getValue() > arg1.getValue() );
+        }
+        case ">=":{
+            return new cBool( ar0.getValue() >= arg1.getValue() );
+        }
+        case "<":{
+            return new cBool( ar0.getValue() < arg1.getValue() );
+        }
+        case "<=":{
+            return new cBool( ar0.getValue() <= arg1.getValue() );
+        }
+        case "=":{
+            return new cBool( ar0.getValue() === arg1.getValue() );
+        }
+        case "<>":{
+            return new cBool( ar0.getValue() !== arg1.getValue() );
+        }
+        case "-":{
+            return new cNumber( ar0.getValue() - arg1.getValue() );
+        }
+        case "+":{
+            return new cNumber( ar0.getValue() + arg1.getValue() );
+        }
+        case "/":{
+            if ( arg1.getValue() !== 0 ) {
+                return new cNumber( ar0.getValue() / arg1.getValue() );
+            }
+            else {
+                return new cError( cErrorType.division_by_zero );
+            }
+        }
+        case "*":{
+            return new cNumber( ar0.getValue() * arg1.getValue() );
+        }
+        default:{
+            return new cError( cErrorType.wrong_value_type );
+        }
+    }
+};
+_func[cElementType.cell][cElementType.cell] = function(arg0,arg1,what,cellAddress){
+    var ar0 = arg0.tocNumber();
+    switch(what){
+        case ">":{
+            return new cBool( ar0.getValue() > arg1.getValue() );
+        }
+        case ">=":{
+            return new cBool( ar0.getValue() >= arg1.getValue() );
+        }
+        case "<":{
+            return new cBool( ar0.getValue() < arg1.getValue() );
+        }
+        case "<=":{
+            return new cBool( ar0.getValue() <= arg1.getValue() );
+        }
+        case "=":{
+            return new cBool( ar0.getValue() === arg1.getValue() );
+        }
+        case "<>":{
+            return new cBool( ar0.getValue() !== arg1.getValue() );
+        }
+        case "-":{
+            return new cNumber( ar0.getValue() - arg1.getValue() );
+        }
+        case "+":{
+            return new cNumber( ar0.getValue() + arg1.getValue() );
+        }
+        case "/":{
+            if ( arg1.getValue() !== 0 ) {
+                return new cNumber( ar0.getValue() / arg1.getValue() );
+            }
+            else {
+                return new cError( cErrorType.division_by_zero );
+            }
+        }
+        case "*":{
+            return new cNumber( ar0.getValue() * arg1.getValue() );
+        }
+        default:{
+            return new cError( cErrorType.wrong_value_type );
+        }
+    }
+};
 
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
@@ -3139,7 +3286,7 @@ parserFormula.prototype = {
                     }
                 }
                 /* Referens to DefinesNames */
-                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb )[0] ) { // Shall be placed strongly before Area and Ref
+                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) { // Shall be placed strongly before Area and Ref
                     found_operand = new cName( this.operand_str, this.wb );
                 }
                 /* Referens to cells area A1:A10 */
