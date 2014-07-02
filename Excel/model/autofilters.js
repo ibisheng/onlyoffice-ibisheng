@@ -391,7 +391,10 @@ var gUndoInsDelCellsFlag = true;
 											delete aWs.TableParts[apocal.num].AutoFilter;
 											isReDrawFilter = aWs.TableParts[apocal.num].clone(aWs);
 										}	
-									}
+									};
+									
+									t._showButtonFlag(newRes.result);
+									
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
 									//открываем скрытые строки
@@ -1027,6 +1030,7 @@ var gUndoInsDelCellsFlag = true;
 							result[n].height = ws.rows[startCol].height;
 							result[n].id = cellId;
 							result[n].idNext = idCellNext.getID();
+							result[n].showButton = this._isShowButton(aWs.TableParts[openFilter].AutoFilter.FilterColumns, col - startCol);
 							
 							n++;
 						}
@@ -7015,6 +7019,18 @@ var gUndoInsDelCellsFlag = true;
 						}
 					}
 				}
+			},
+			
+			_showButtonFlag: function(result)
+			{	
+				if(!result)
+					return;
+				
+				for(var i = 0; i < result.length; i++)
+				{
+					if(result[i].showButton ===  false)
+						result[i].showButton = true;
+				};
 			}
 		};
 
