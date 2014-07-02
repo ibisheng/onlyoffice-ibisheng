@@ -1637,73 +1637,6 @@
 				return false;
 			},
 			
-			_pasteFromLocalStorage: function(worksheet, node, onlyFromLocalStorage)
-			{
-				var textNode, t = this;
-				
-				//в случае вставки по нажатию на правую кнопку мыши
-				if(onlyFromLocalStorage)
-				{
-					if(t.lStorage)
-					{
-						if(t.copyText && t.copyText.isImage)
-						{
-							if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
-							{
-								window.GlobalPasteFlag = false;
-								window.GlobalPasteFlagCounter = 0;
-								return true;
-							}
-						}
-						else
-						{
-							if(t.lStorage.htmlInShape)
-							{
-								return t.lStorage.htmlInShape;
-							}
-							else
-							{
-								worksheet.setSelectionInfo('paste',t,false,true);
-								window.GlobalPasteFlag = false;
-								window.GlobalPasteFlagCounter = 0;
-								return true;
-							}
-						}	
-					}	
-				}
-				
-				//проверяем на равенство содержимому локального буфера
-				textNode = t._getTextFromTable(node);
-				if(t._isEqualText(textNode, node) && !onlyFromLocalStorage)
-				{
-					if(t.copyText.isImage)
-					{
-						if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
-						{
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							return true;
-						}
-					}
-					else
-					{
-						if(t.lStorage.htmlInShape)
-						{
-							return t.lStorage.htmlInShape;
-						}
-						else
-						{
-							worksheet.setSelectionInfo('paste',t,false,true);
-							window.GlobalPasteFlag = false;
-							window.GlobalPasteFlagCounter = 0;
-							return true;
-						}
-					}	
-				};
-				
-				return false;
-			},
-			
 			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
 			{
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
@@ -1787,20 +1720,6 @@
 					{
 						pasteFragment = binaryResult;
 						node = binaryResult;
-					};
-				};
-				
-				//local storage
-				if(activateLocalStorage)
-				{
-					localStorageResult = this._pasteFromLocalStorage();
-					
-					if(localStorageResult === true)
-						return;
-					else if(localStorageResult !== false && localStorageResult != undefined)
-					{
-						pasteFragment = localStorageResult;
-						node = localStorageResult;
 					};
 				};
 				
@@ -3165,79 +3084,6 @@
 					return -1;
 				else
 					return arrImages;
-			},
-			
-			_insertImages: function (ws, array, onlyFromLocalStorage) {
-				//object{images:,fromCol,fromRow}
-				if(!array || array && array.length == 0)
-					return false;
-				
-				var firstRange = ws.activeRange.clone(true);
-				for(var i=0;i < array.length;i++)
-				{
-					var binary_shape = array[i].image.getAttribute("alt");
-					var sub;
-					if(typeof binary_shape === "string")
-						sub = binary_shape.substr(0, 18);
-					if(typeof binary_shape === "string" &&( sub === "TeamLabShapeSheets" || sub === "TeamLabImageSheets" || sub === "TeamLabChartSheets" || sub === "TeamLabGroupSheets"))
-					{
-						var reader = CreateBinaryReader(binary_shape, 18, binary_shape.length);
-						reader.GetLong();
-						if(isRealObject(reader))
-							reader.oImages = this.oImages;
-						var first_string = null;
-						if(reader !== null && typeof  reader === "object")
-						{
-							first_string = sub;
-						}
-						var positionX = null;
-						var positionY = null;
-						
-						if(ws.cols && firstRange && firstRange.c1 != undefined && ws.cols[firstRange.c1].left != undefined)
-							positionX = ws.cols[firstRange.c1].left - ws.getCellLeft(0, 1);
-						if(ws.rows && firstRange && firstRange.r1 != undefined && ws.rows[firstRange.r1].top != undefined)
-							positionY = ws.rows[firstRange.r1].top - ws.getCellTop(0, 1);
-						
-						var Drawing;
-						switch(first_string)
-						{
-							case "TeamLabImageSheets":
-							{
-								Drawing = new CImageShape();
-								break;
-							}
-							case "TeamLabShapeSheets":
-							{
-								Drawing = new CShape();
-								break;
-							}
-							case "TeamLabGroupSheets":
-							{
-								Drawing = new CGroupShape();
-								break;
-							}
-							case "TeamLabChartSheets":
-							{
-								Drawing = new CChartAsGroup();
-                                Drawing.setAscChart(new asc_CChart());
-								break;
-							}
-							/*default :
-							{
-								Drawing = CreateImageFromBinary(src);
-								break;
-							}*/
-						}
-						if(positionX && positionY && ws.objectRender)
-							Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender,ws.objectRender.convertMetric(positionX,1,3),ws.objectRender.convertMetric(positionY,1,3));
-						else
-							Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender);
-						Drawing.drawingObjects = ws.objectRender;
-						Drawing.select(ws.objectRender.controller);
-						Drawing.addToDrawingObjects();
-					}
-				}
-				return true;
 			},
 			
 			_insertImagesFromBinary: function(ws, data, isIntoShape)
