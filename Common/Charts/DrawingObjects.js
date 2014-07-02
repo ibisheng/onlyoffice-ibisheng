@@ -4756,7 +4756,7 @@ function DrawingObjects() {
     //-----------------------------------------------------------------------------------
 
     _this.graphicObjectMouseDown = function(e, x, y) {
-        var offsets = _this.drawingArea.getOffsets(x, y);
+        var offsets = _this.drawingArea.getOffsets(x, y, true);
         if ( offsets )
             _this.controller.onMouseDown( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
     };
@@ -4764,13 +4764,13 @@ function DrawingObjects() {
     _this.graphicObjectMouseMove = function(e, x, y) {
         e.IsLocked = e.isLocked;
 
-        var offsets = _this.drawingArea.getOffsets(x, y);
+        var offsets = _this.drawingArea.getOffsets(x, y, true);
         if ( offsets )
             _this.controller.onMouseMove( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
     };
 
     _this.graphicObjectMouseUp = function(e, x, y) {
-        var offsets = _this.drawingArea.getOffsets(x, y);
+        var offsets = _this.drawingArea.getOffsets(x, y, true);
         if ( offsets )
             _this.controller.onMouseUp( e, pxToMm(x - offsets.x), pxToMm(y - offsets.y) );
     };

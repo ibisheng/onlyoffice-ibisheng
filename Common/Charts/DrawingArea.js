@@ -181,18 +181,28 @@ function FrozenPlace(ws, type) {
 		return vr;
 	};
 	
-	_this.getRect = function() {
-		var rect = { x: 0, y: 0, w: 0, h: 0 };
+	_this.getRect = function(bEvent) {
+		var rect = { x: 0, y: 0, w: 0, h: 0, r: 0, b: 0 };
 		rect.x = _this.worksheet.getCellLeftRelative(_this.range.c1, 0);
 		rect.y = _this.worksheet.getCellTopRelative(_this.range.r1, 0);
 		rect.w = _this.worksheet.getCellLeftRelative(_this.range.c2, 0) + _this.worksheet.getColumnWidth(_this.range.c2, 0) - rect.x;
 		rect.h = _this.worksheet.getCellTopRelative(_this.range.r2, 0) + _this.worksheet.getRowHeight(_this.range.r2, 0) - rect.y;
+
+        rect.r = rect.x + rect.w;
+        rect.b = rect.y + rect.h;
+
 
         switch (_this.type) {
 
             case FrozenAreaType.Top:
             {
                 rect.w = +Infinity;
+                rect.r = +Infinity;
+                if(bEvent)
+                {
+                    rect.x = -Infinity;
+                    rect.y = -Infinity;
+                }
                 break;
             }
 
@@ -200,12 +210,26 @@ function FrozenPlace(ws, type) {
             {
                 rect.w = +Infinity;
                 rect.h = +Infinity;
+                rect.r = +Infinity;
+                rect.b = +Infinity;
+
+                if(bEvent)
+                {
+                    rect.x = -Infinity;
+                }
                 break;
             }
 
             case FrozenAreaType.Left:
             {
                 rect.h = +Infinity;
+                rect.b = +Infinity;
+
+                if(bEvent)
+                {
+                    rect.x = -Infinity;
+                    rect.y = -Infinity;
+                }
                 break;
             }
 
@@ -214,6 +238,13 @@ function FrozenPlace(ws, type) {
 
                 rect.w = +Infinity;
                 rect.h = +Infinity;
+                rect.r = +Infinity;
+                rect.b = +Infinity;
+
+                if(bEvent)
+                {
+                    rect.y = -Infinity;
+                }
                 break;
             }
 
@@ -221,23 +252,45 @@ function FrozenPlace(ws, type) {
             {
                 rect.w = +Infinity;
                 rect.h = +Infinity;
+                rect.r = +Infinity;
+                rect.b = +Infinity;
+                if(bEvent)
+                {
+                    rect.x = -Infinity;
+                    rect.y = -Infinity;
+                }
                 break;
             }
             // Other
             case FrozenAreaType.LeftTop:
             {
+                if(bEvent)
+                {
+                    rect.x = -Infinity;
+                    rect.y = -Infinity;
+                }
                 break;
             }
 
             case FrozenAreaType.RightTop:
             {
                 rect.w = +Infinity;
+                rect.r = +Infinity;
+                if(bEvent)
+                {
+                    rect.y = -Infinity;
+                }
                 break;
             }
 
             case FrozenAreaType.LeftBottom:
             {
                 rect.h = +Infinity;
+                rect.b = +Infinity;
+                if(bEvent)
+                {
+                    rect.x = -Infinity;
+                }
                 break;
             }
 
@@ -245,6 +298,8 @@ function FrozenPlace(ws, type) {
             {
                 rect.w = +Infinity;
                 rect.h = +Infinity;
+                rect.r = +Infinity;
+                rect.b = +Infinity;
                 break;
             }
         }
@@ -322,10 +377,10 @@ function FrozenPlace(ws, type) {
 		return fv;
 	};
 	
-	_this.isPointInside = function(x, y)
+	_this.isPointInside = function(x, y, bEvent)
     {
-        var rect = _this.getRect();
-         var result = (x >= rect.x ) && (y >= rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
+        var rect = _this.getRect(bEvent);
+         var result = (x >= rect.x ) && (y >= rect.y) && (x <= rect.r) && (y <= rect.b);
          if ( log && result )
          console.log( x + "," + y + " in " + _this.type);
          return result;
@@ -765,9 +820,9 @@ function DrawingArea(ws) {
 		}
 	};
 	
-	_this.getOffsets = function(x, y) {
+	_this.getOffsets = function(x, y, bEvents) {
 		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
-			if ( _this.frozenPlaces[i].isPointInside(x, y) ) {
+			if ( _this.frozenPlaces[i].isPointInside(x, y, bEvents) ) {
 				return { x: _this.frozenPlaces[i].getHorizontalScroll(), y: _this.frozenPlaces[i].getVerticalScroll() }
 			}
 		}
