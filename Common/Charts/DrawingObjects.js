@@ -4229,6 +4229,8 @@ function DrawingObjects() {
             {
                 chart = selected_objects[0];
             }
+            var object_to_check  = _this.controller.selection.groupSelection ? _this.controller.selection.groupSelection : chart;
+
             if(chart && !(!chart.bbox || !chart.bbox.seriesBBox || oBBoxTo.isEqual(chart.bbox.seriesBBox)))
             {
                 var editChart = function (drawingObject)
@@ -4329,9 +4331,13 @@ function DrawingObjects() {
                         editChart(chart);
                         _this.showDrawingObjects(true);
                     }
+                    else
+                    {
+                        _this.selectDrawingObjectRange(chart);
+                    }
                 };
                 _this.objectLocker.reset();
-                _this.objectLocker.addObjectId(chart.Get_Id());
+                _this.objectLocker.addObjectId(object_to_check.Get_Id());
                 _this.objectLocker.checkObjects(callbackCheck);
             }
         }
