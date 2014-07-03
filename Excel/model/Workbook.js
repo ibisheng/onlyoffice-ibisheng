@@ -1872,8 +1872,18 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		    }
 		}
 		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
-				History.Clear();
+
+                var wsViews = window["Asc"]["editor"].wb.wsViews;
+                for(var i in wsViews)
+                {
+                    if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
+                    {
+                        wsViews[i].objectRender.controller.resetSelection();
+                    }
+                }
+                History.Clear();
 				History.Create_NewPoint();
+
 				History.SetSelection(null);
 				History.SetSelectionRedo(null);
 				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
@@ -1896,6 +1906,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 					History.RedoAdd(oRedoObjectParam, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);
 			
 				History.UndoRedoEnd(null, oRedoObjectParam, false);
+
 				oThis.bCollaborativeChanges = false;
 				History.Clear();
 				if(null != fCallback)

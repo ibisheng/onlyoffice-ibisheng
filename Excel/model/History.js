@@ -354,6 +354,11 @@ CHistory.prototype =
 	                wsViews[i].objectRender.controller.recalculate(true, null);
 	            }
 	        }
+            var wsView = window["Asc"]["editor"].wb.getWorksheet();
+            if(wsView && wsView.objectRender && wsView.objectRender.controller)
+            {
+                wsView.objectRender.controller.updateOverlay();
+            }
 	    }
 
 	    if (null != Point) {
@@ -364,6 +369,11 @@ CHistory.prototype =
 	                    wsViews[i].objectRender.controller.recalculate(undefined, Point);
 	                }
 	            }
+                var wsView = window["Asc"]["editor"].wb.getWorksheet();
+                if(wsView && wsView.objectRender && wsView.objectRender.controller)
+                {
+                    wsView.objectRender.controller.updateOverlay();
+                }
 	            gUndoInsDelCellsFlag = true;
 	        }
             //синхронизация index и id worksheet
