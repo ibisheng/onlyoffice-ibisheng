@@ -211,6 +211,11 @@ function Editor_Copy(api, bCut)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 	
+	var oldBackgroundcolor = document.body.style["background-color"];
+	var oldColor = document.body.style["color"];
+	document.body.style["background-color"] = "transparent";
+	document.body.style["color"] = "transparent";
+	
 	ElemToSelect.style.MozUserSelect = "all";
 	
     if (null != api.WordControl.m_oLogicDocument)
@@ -221,7 +226,8 @@ function Editor_Copy(api, bCut)
     else
     {
         ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
-    }
+    };
+	
     //��������
     if (window.getSelection) // all browsers, except IE before version 9
     {
@@ -249,7 +255,7 @@ function Editor_Copy(api, bCut)
                 {
                     var elem = aChildNodes[0];
                     var wrap = document.createElement("b");
-                    wrap.setAttribute("style", "font-weight:normal");
+                    wrap.setAttribute("style", "font-weight:normal; background-color: transparent; color: transparent;");
                     elem = ElemToSelect.removeChild(elem);
                     wrap.appendChild(elem);
                     ElemToSelect.appendChild(wrap);
@@ -285,6 +291,9 @@ function Editor_Copy(api, bCut)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+		
+		document.body.style["background-color"] = oldBackgroundcolor;
+		document.body.style["color"] = oldColor;
 		
 		ElemToSelect.style.MozUserSelect = "none";
 
