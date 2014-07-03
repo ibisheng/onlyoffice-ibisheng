@@ -3353,7 +3353,7 @@ function DrawingObjects() {
                 var graphicObject = aObjects[i].graphicObject;
                 if ( graphicObject.updateChartReferences )
                 {
-                    graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
+                    graphicObject.updateChartReferences(oldWorksheet, parserHelp.getEscapeSheetName(newWorksheet));
                 }
             }
             if(this.controller)
