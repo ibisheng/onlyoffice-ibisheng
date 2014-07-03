@@ -9397,6 +9397,7 @@
 				case "showRows":
 					functionModelAction = function () {
 						t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
+						t.autoFilters.reDrawFilter(arn)
 						fullRecalc = true;
 					};
 					oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
@@ -9404,6 +9405,7 @@
 				case "hideRows":
 					functionModelAction = function () {
 						t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
+						t.autoFilters.reDrawFilter(arn)
 						fullRecalc = true;
 					};
 					oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
