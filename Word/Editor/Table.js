@@ -2494,6 +2494,11 @@ CTable.prototype =
         }
 
         Y += MaxTopBorder;
+        
+        // Учтем верхнее поле ячейки
+        var Cell = Row.Get_Cell(CellIndex);
+        var CellMar = Cell.Get_Margins();
+        Y += CellMar.Top.W;
 
         // TODO: Здесь надо учитывать нижнюю границу ячейки и вычесть ее ширину из YLimit
         return { X : CellInfo.X_content_start, XLimit : CellInfo.X_content_end, Y : Y, YLimit : Pos.YLimit, MaxTopBorder : MaxTopBorder };

@@ -773,6 +773,9 @@ CDocument.prototype =
 
     Get_PageContentStartPos : function (PageIndex, ElementIndex)
     {
+        if (undefined === ElementIndex && undefined !== this.Pages[PageIndex])
+            ElementIndex = this.Pages[PageIndex].Pos;
+        
         var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
         var Y      = SectPr.PageMargins.Top;
