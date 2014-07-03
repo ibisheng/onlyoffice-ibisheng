@@ -202,7 +202,7 @@ CShape.prototype.recalcTransparent = function()
 };
 CShape.prototype.recalcTextStyles = function()
 {
-    this.recalcInfo.recalculateTextStyles = true;
+    this.recalcInfo.recalculateTextStyles =  [true, true, true, true, true, true, true, true, true];
 };
 CShape.prototype.addToRecalculate = function()
 {

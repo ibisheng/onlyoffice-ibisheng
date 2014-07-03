@@ -360,6 +360,15 @@ CShape.prototype =
     {
         History.Add(this, { Type: historyitem_ShapeSetStyle, oldPr: this.style, newPr: style });
         this.style = style;
+        var content = this.getDocContent();
+
+        this.recalcInfo.recalculateShapeStyleForParagraph = true;
+        if(this.recalcTextStyles)
+            this.recalcTextStyles();
+        if(content)
+        {
+            content.Recalc_AllParagraphs_CompiledPr();
+        }
     },
 
     setTxBody: function (txBody)
@@ -4007,6 +4016,16 @@ CShape.prototype =
             case historyitem_ShapeSetStyle:
             {
                 this.style = data.oldPr;
+
+
+                this.recalcInfo.recalculateShapeStyleForParagraph = true;
+                if(this.recalcTextStyles)
+                    this.recalcTextStyles();
+                var content = this.getDocContent();
+                if(content)
+                {
+                    content.Recalc_AllParagraphs_CompiledPr();
+                }
                 break;
             }
             case historyitem_ShapeSetTxBody:
@@ -4079,6 +4098,15 @@ CShape.prototype =
             case historyitem_ShapeSetStyle:
             {
                 this.style = data.newPr;
+                var content = this.getDocContent();
+
+                this.recalcInfo.recalculateShapeStyleForParagraph = true;
+                if(this.recalcTextStyles)
+                    this.recalcTextStyles();
+                if(content)
+                {
+                    content.Recalc_AllParagraphs_CompiledPr();
+                }
                 break;
             }
             case historyitem_ShapeSetTxBody:
@@ -4221,6 +4249,15 @@ CShape.prototype =
                 case historyitem_ShapeSetStyle:
                 {
                     this.style = readObject(r);
+                    var content = this.getDocContent();
+
+                    this.recalcInfo.recalculateShapeStyleForParagraph = true;
+                    if(this.recalcTextStyles)
+                        this.recalcTextStyles();
+                    if(content)
+                    {
+                        content.Recalc_AllParagraphs_CompiledPr();
+                    }
                     break;
                 }
                 case historyitem_ShapeSetTxBody:
