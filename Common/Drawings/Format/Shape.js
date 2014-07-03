@@ -2191,7 +2191,7 @@ CShape.prototype =
 
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        if(this.drawingBase)
+        if(this.drawingBase && !this.group)
         {
             this.drawingBase.setGraphicObjectCoords();
         }
