@@ -1360,11 +1360,11 @@ CShape.prototype =
             if(this.spPr && isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
             {
                 var rect = this.spPr.geometry.rect;
-                this.clipRect = {x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t};
+                this.clipRect = {x: rect.l + _body_pr.lIns, y: rect.t + _body_pr.tIns, w: rect.r - rect.l - _body_pr.rIns, h: rect.b - rect.t - _body_pr.bIns};
             }
             else
             {
-                this.clipRect = {x: 0, y: 0, w: this.extX, h: this.extY};
+                this.clipRect = {x: _body_pr.lIns, y: _body_pr.tIns, w: this.extX - _body_pr.rIns, h: this.extY - _body_pr.bIns};
             }
         }
         else {
