@@ -1046,6 +1046,5 @@
 
 var CColor = window["CColor"];
 var asc_ChartSettings = window["asc_ChartSettings"];
-var asc_AxisSettings = window["asc_AxisSettings"];
 var asc_ValAxisSettings = window["asc_ValAxisSettings"];
 var asc_CatAxisSettings = window["asc_CatAxisSettings"];
