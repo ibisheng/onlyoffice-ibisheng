@@ -372,7 +372,10 @@ CDocumentContent.prototype =
         {
             var Item = this.Content[Pos];
             if ( type_Paragraph === Item.GetType() )
+            {
                 Item.Recalc_CompiledPr();
+                Item.Recalc_RunsCompiledPr();
+            }
             else if (type_Table === Item.GetType())
                 Item.Recalc_CompiledPr2();
         }
