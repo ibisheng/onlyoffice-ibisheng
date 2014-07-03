@@ -22,20 +22,6 @@ function isNullOrEmptyString(str) {
     return (str == undefined) || (str == null) || (str == "");
 }
 
-function convertFormula(formula, ws) {
-    var range = null;
-
-    if (formula && ws) {
-        var result = parserHelp.parse3DRef(formula);
-        if (null !== result) {
-            ws = ws.model.workbook.getWorksheetByName(result.sheet);
-            if (ws)
-                range = ws.getRange2(result.range);
-        }
-    }
-    return range;
-}
-
 function DrawingBounds(minX, maxX, minY, maxY)
 {
     this.minX = minX;
