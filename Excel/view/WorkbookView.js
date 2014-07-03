@@ -125,7 +125,6 @@
 			this.drawingGraphicCtx = undefined;
 			this.overlayGraphicCtx = undefined;
 			this.stringRender = undefined;
-			this.drawingCtxCharts = undefined;
 
 			// Комментарии для всего документа
 			this.cellCommentator = null;
@@ -197,8 +196,6 @@
 			this.overlayCtx = this.buffers.overlay;
 			this.drawingGraphicCtx = this.buffers.mainGraphic;
 			this.overlayGraphicCtx = this.buffers.overlayGraphic;
-			
-			this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			
 			// Обновляем размеры (чуть ниже, потому что должны быть проинициализированы ctx)
 			this._canResize();
@@ -1324,7 +1321,6 @@
 			// ToDo перепроверить на новых исходниках, должно поправиться, был баг в отрисовке!!!!!!!!!!!!!
 			this.drawingCtx.initContextSmoothing();
 			this.overlayCtx.initContextSmoothing();
-			this.drawingCtxCharts.initContextSmoothing();
 			return true;
 		};
 
@@ -1367,7 +1363,6 @@
 			this.buffers.overlay.changeZoom(factor);
 			this.buffers.mainGraphic.changeZoom(factor);
 			this.buffers.overlayGraphic.changeZoom(factor);
-			this.drawingCtxCharts.changeZoom(factor);
 			// Нужно сбросить кэш букв
 			var i, length;
 			for (i = 0, length = this.fmgrGraphics.length; i < length; ++i)

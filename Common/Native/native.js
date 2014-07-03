@@ -358,18 +358,15 @@ function GetNativeId()
     return window.native.GetFileId();
 }
 
-function clearTimeout() {};
-function setTimeout() {};
-function clearInterval() {};
-function setInterval() {};
+function clearTimeout() {}
+function setTimeout() {}
+function clearInterval() {}
+function setInterval() {}
 
 window.clearTimeout = clearTimeout;
 window.setTimeout = setTimeout;
 window.clearInterval = clearInterval;
 window.setInterval = setInterval;
-
-window["OfficeExcel"] = {type:'common'};
-var OfficeExcel = window["OfficeExcel"];
 
 var console = {
 	log : function(param) { window.native.ConsoleLog(param); }
