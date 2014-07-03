@@ -3791,22 +3791,27 @@ drawPieChart.prototype =
 
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
+		
         var radius = Math.min(trueHeight, trueWidth)/2;
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
 		this.tempAngle = Math.PI/2;
 		//рисуем против часовой стрелки, поэтому цикл с конца
+		var angle;
         for (var i = numCache.length - 1; i >= 0; i--) {
-            var angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
+			angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
 			if(!this.paths.series)
 				this.paths.series = [];
-            this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
-        }
+			this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
+        };
     },
 	
 	_calculateSegment: function (angle, radius, xCenter, yCenter)
     {
+		if(isNaN(angle))
+			return null;
+		
 		var startAngle = (this.tempAngle);
 		var endAngle   = angle;
 		
