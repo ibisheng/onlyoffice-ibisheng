@@ -988,6 +988,10 @@ ParaComment.prototype =
     {
         return new ParaRun();
     },
+    
+    Apply_TextPr : function()
+    {
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -1090,6 +1094,21 @@ ParaComment.prototype =
 
     Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
     {
+        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+        var Comment = DocumentComments.Get_ById( this.CommentId );
+        if ( null === Comment )
+            return;
+
+        if ( true === this.Start )
+        {
+            Comment.m_oStartInfo.X += Dx;
+            Comment.m_oStartInfo.Y += Dy;
+        }
+        else
+        {
+            Comment.m_oEndInfo.X += Dx;
+            Comment.m_oEndInfo.Y += Dy;
+        }
     },    
 //-----------------------------------------------------------------------------------
 // Функции отрисовки

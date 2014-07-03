@@ -1918,7 +1918,8 @@ CDocument.prototype =
 
         if ( true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove() )
         {
-            this.Document_UpdateRulersState();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();            
             this.RecalculateCurPos();
             this.NeedUpdateTarget = false;
         }
@@ -12551,7 +12552,7 @@ CDocument.prototype =
     Show_Comment : function(Id)
     {
         var Comment = this.Comments.Get_ById( Id );
-        if ( null != Comment && null != Comment.m_oStartInfo.ParaId && null != Comment.m_oEndInfo.ParaId )
+        if ( null != Comment && null != Comment.StartId && null != Comment.EndId )
         {
             var Comment_PageNum = Comment.m_oStartInfo.PageNum;
             var Comment_Y       = Comment.m_oStartInfo.Y;
