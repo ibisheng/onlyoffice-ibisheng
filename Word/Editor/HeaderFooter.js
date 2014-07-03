@@ -2070,7 +2070,8 @@ CHeaderFooterController.prototype =
 
     Get_NearestPos : function(PageNum, X, Y, bAnchor, Drawing)
     {
-        var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum );
+        var HdrFtr = (true === editor.isStartAddShape ? this.CurHdrFtr : this.Internal_GetContentByXY( X, Y, PageNum ));
+        
         if ( null != HdrFtr )
             return HdrFtr.Get_NearestPos( X, Y, bAnchor, Drawing );
         else

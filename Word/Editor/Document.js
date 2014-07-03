@@ -9741,11 +9741,26 @@ CDocument.prototype =
         var OldCurPage = this.CurPage;
         this.CurPage = PageIndex;
 
-        if ( true === editor.isStartAddShape && docpostype_HdrFtr != this.CurPos.Type )
+        if ( true === editor.isStartAddShape && (docpostype_HdrFtr !== this.CurPos.Type || null !== this.HdrFtr.CurHdrFtr) )
         {
-            this.CurPos.Type = docpostype_DrawingObjects;
-            this.Selection.Use   = true;
-            this.Selection.Start = true;
+            if (docpostype_HdrFtr !== this.CurPos.Type)
+            {
+                this.CurPos.Type     = docpostype_DrawingObjects;
+                this.Selection.Use   = true;
+                this.Selection.Start = true;
+            }
+            else
+            {
+                this.Selection.Use   = true;
+                this.Selection.Start = true;
+                
+                var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+                var DocContent = CurHdrFtr.Content;
+                
+                DocContent.CurPos.Type     = docpostype_DrawingObjects;
+                DocContent.Selection.Use   = true;
+                DocContent.Selection.Start = true;                                
+            }
 
             if ( true != this.DrawingObjects.isPolylineAddition() )
                 this.DrawingObjects.startAddShape( editor.addShapePreset );

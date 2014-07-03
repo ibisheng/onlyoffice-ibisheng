@@ -3911,7 +3911,8 @@ CDocumentContent.prototype =
 
             // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
             //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
-            bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type && ( null === this.LogicDocument || docpostype_DrawingObjects !== this.LogicDocument.CurPos.Type ) ? true : false);
+            var LogicDocument = this.LogicDocument;
+            bNeedSelect = (null !== LogicDocument && (docpostype_DrawingObjects === LogicDocument.CurPos.Type || (docpostype_HdrFtr === LogicDocument.CurPos.Type && null !== LogicDocument.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === LogicDocument.HdrFtr.CurHdrFtr.Content.CurPos.Type)) ? false : true);
 
             for ( var Index = 0; Index < NewElementsCount; Index++ )
             {
@@ -4028,8 +4029,15 @@ CDocumentContent.prototype =
             this.Selection.EndPos   = DstIndex + ElementsCount - 1;
         }
 
-        if ( true === bNeedSelect )
+        if (true === bNeedSelect)
             this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+        else if (null !== this.LogicDocument && docpostype_HdrFtr === this.LogicDocument.CurPos.Type) 
+        {
+            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+            this.CurPos.Type     = docpostype_DrawingObjects;
+            this.Selection.Use   = true;
+            this.Selection.Start = false;
+        }
     },
 
     Set_ParagraphAlign : function(Align)
