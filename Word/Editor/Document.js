@@ -2779,7 +2779,7 @@ CDocument.prototype =
                     // Передвинем курсор в начало следующего параграфа, и рассчитаем текстовые настройки и расстояния между строк
                     Next.Cursor_MoveToStartPos();
                     var Spacing = Next.Get_CompiledPr2(false).ParaPr.Spacing.Copy();
-                    var TextPr  = Next.Internal_CalculateTextPr(Next.CurPos.ContentPos);
+                    var TextPr  = Next.Get_FirstRunPr();                   
 
                     var Count = FrameParas.length;
                     for ( var Index = 0; Index < Count; Index++ )
@@ -2788,7 +2788,8 @@ CDocument.prototype =
                         FramePara.Set_FramePr( undefined, true );
                         FramePara.Set_Spacing( Spacing, true );
                         FramePara.Select_All();
-                        FramePara.Add( new ParaTextPr( TextPr ) );
+                        FramePara.Clear_TextFormatting();
+                        FramePara.Apply_TextPr(TextPr, false);
                     }
 
 
@@ -9772,8 +9773,8 @@ CDocument.prototype =
                         MouseEvent.ClickCount = 1;
                         MouseEvent.Type = g_mouse_event_type_down;
 
-                        var OldX = CurPara.CurPos.RealX;
-                        var OldY = CurPara.CurPos.RealY;
+                        var OldX = CurPara.CurPos.X;
+                        var OldY = CurPara.CurPos.Y;
 
                         if ( true === CurPara.Parent.Is_DrawingShape() )
                         {

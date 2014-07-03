@@ -8371,6 +8371,8 @@ Paragraph.prototype =
             var Item = this.Content[Index];
             Item.Clear_TextFormatting( DefHyper );                        
         }
+        
+        this.TextPr.Clear_Style();
     },
 
     Set_Ind : function(Ind, bDeleteUndefined)
