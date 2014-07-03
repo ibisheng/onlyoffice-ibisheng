@@ -2640,7 +2640,7 @@ DrawingObjectsController.prototype =
 		return null;
 	},
 
-	getChartSpace2: function(worksheet, options)
+	getChartSpace: function(worksheet, options)
 	{
 		var chartSeries = getChartSeries(worksheet, options);
 		return this._getChartSpace(chartSeries, options);
