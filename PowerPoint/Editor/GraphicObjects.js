@@ -1875,7 +1875,7 @@ CGraphicObjects.prototype = {
         }
         History.TurnOff();
         var ret = new CChartAsGroup();
-        ret.setAscChart(new asc_CChart());
+        ret.setAscChart(new asc_CChart());// ToDo Его нет!!!!
 
         var presentation = editor.WordControl.m_oLogicDocument;
         var chart_width = 0.264583*c_oAscChartDefines.defaultChartWidth;
@@ -3283,7 +3283,7 @@ CGraphicObjects.prototype = {
                     {
                         chart.addTitle(null);
                         g_oTableId.m_bTurnOff = true;
-                        var copy_asc_chart = new asc_CChart(chart.chart);
+                        var copy_asc_chart = new asc_CChart(chart.chart);// ToDo Его нет!!!!
                         g_oTableId.m_bTurnOff = false;
                         copy_asc_chart.header.asc_setTitle("");
                         chart.setAscChart(copy_asc_chart);
@@ -3292,7 +3292,7 @@ CGraphicObjects.prototype = {
                     {
                         chart.addXAxis(null);
                         g_oTableId.m_bTurnOff = true;
-                        var copy_asc_chart = new asc_CChart(chart.chart);
+                        var copy_asc_chart = new asc_CChart(chart.chart);// ToDo Его нет!!!!
                         g_oTableId.m_bTurnOff = false;
                         copy_asc_chart.xAxis.asc_setTitle("");
                         chart.setAscChart(copy_asc_chart);
@@ -3301,7 +3301,7 @@ CGraphicObjects.prototype = {
                     {
                         chart.addYAxis(null);
                         g_oTableId.m_bTurnOff = true;
-                        var copy_asc_chart = new asc_CChart(chart.chart);
+                        var copy_asc_chart = new asc_CChart(chart.chart);// ToDo Его нет!!!!
                         g_oTableId.m_bTurnOff = false;
                         copy_asc_chart.yAxis.asc_setTitle("");
                         chart.setAscChart(copy_asc_chart);

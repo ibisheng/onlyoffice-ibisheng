@@ -145,7 +145,7 @@ CGraphicObjects.prototype =
         }
         else if(isRealObject(chart))
         {
-            ret = DrawingObjectsController.prototype.getChartSpace.call(this, chart,options);
+            ret = DrawingObjectsController.prototype._getChartSpace.call(this, chart, options);
             ret.setBDeleted(false);
             ret.setStyle(2);
             ret.setSpPr(new CSpPr());
@@ -640,30 +640,21 @@ CGraphicObjects.prototype =
         }
     },
 
-    getChartObject: function(type_)
+    getChartObject: function(type)
     {
-
-        var type_subtype = TYPE_SUBTYPE_BY_TYPE[type_];
-        var type, subtype;
-        if(type_subtype)
-        {
-            type = type_subtype.type;
-            subtype = type_subtype.subtype;
-        }
-        if(typeof type === "string" && type.length > 0)
+        if(null != type)
         {
             return ExecuteNoHistory(function()
             {
-                var asc_chart = new asc_CChart();
-                asc_chart.initDefault();
-                asc_chart.type = type;
-                asc_chart.subType = subtype;
-                var ret = this.getChartSpace(asc_chart);
-                if(!ret)
-                {
-                    asc_chart.type = "Bar";
-                    asc_chart.subType = "normal";
-                    ret = this.getChartSpace(asc_chart);
+				var options = new asc_ChartSettings();
+				options.type = type;
+				var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
+					parsedHeaders: {bLeft: true, bTop: true}};
+                var ret = this.getChartSpace(chartSeries, options);
+                if (!ret) {
+					chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this,
+						c_oAscChartTypeSettings.barNormal), parsedHeaders: {bLeft: true, bTop: true}};
+					ret = this.getChartSpace(chartSeries, options);
                 }
                 ret.theme = this.document.theme;
                 CheckSpPrXfrm(ret);

@@ -2498,7 +2498,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_addChartDrawingObject: function(chart) {
 				var ws = this.wb.getWorksheet();
-				return ws.objectRender.addChartDrawingObject(chart, this.isChartEditor);
+				return ws.objectRender.addChartDrawingObject(chart);
 			},
 
 			asc_editChartDrawingObject: function(chart) {
@@ -2541,18 +2541,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return ws.objectRender.setGraphicObjectLayer(layerType);
 			},
 			
-			asc_getChartPreviews: function(chartType, chartSubType) {
-
-				if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
-					chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
-				else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
-					chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
+			asc_getChartPreviews: function(chartType) {
 				return this.chartPreviewManager.getChartPreviews(chartType);
 			},
 			
 			asc_checkChartInterval: function(type, interval, isRows) {
-				var ws = this.wb.getWorksheet();
-				return ws.objectRender.checkChartInterval(type, interval, isRows);
+				var errorId = checkDataRange(type, interval, isRows);
+				var bResult = errorId !== c_oAscError.ID.No;
+				if (bResult)
+					this.handlers.trigger("asc_onError", errorId, c_oAscError.Level.NoCritical);
+				return !bResult;
 			},
 			
 			// Для вставки диаграмм в Word

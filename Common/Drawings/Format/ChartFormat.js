@@ -37,63 +37,6 @@ function removeDPtsFromSeries(series)
     }
 }
 
-
-var TYPE_SUBTYPE_BY_TYPE = [];
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.barNormal           ] = {type: "Bar", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.barStacked          ] = {type: "Bar", subtype: "stacked"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.barStackedPer       ] = {type: "Bar", subtype: "stackedPer"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineNormal          ] = {type: "Line", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStacked         ] = {type: "Line", subtype: "stacked"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStackedPer      ] = {type: "Line", subtype: "stackedPer"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineNormalMarker    ] = {type: "Line", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStackedMarker   ] = {type: "Line", subtype: "stacked"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.lineStackedPerMarker] = {type: "Line", subtype: "stackedPer"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.pie                 ] = {type: "Pie", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.hBarNormal          ] = {type: "HBar", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.hBarStacked         ] = {type: "HBar", subtype: "stacked"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.hBarStackedPer      ] = {type: "HBar", subtype: "stackedPer"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.areaNormal          ] = {type: "Area", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.areaStacked         ] = {type: "Area", subtype: "stacked"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.areaStackedPer      ] = {type: "Area", subtype: "stackedPer"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.doughnut            ] = {type: "Doughnut", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.stock               ] = {type: "Stock", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatter             ] = {type: "Scatter", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterLine         ] = {type: "Scatter", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterLineMarker   ] = {type: "Scatter", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterMarker       ] = {type: "Scatter", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterNone         ] = {type: "Scatter", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterSmooth       ] = {type: "Scatter", subtype: "normal"};
-TYPE_SUBTYPE_BY_TYPE[c_oAscChartTypeSettings.scatterSmoothMarker ] = {type: "Scatter", subtype: "normal"};
-
-var REV_TYPE_SUBTYPE_BY_TYPE = [];
-REV_TYPE_SUBTYPE_BY_TYPE["Bar"] = [];
-REV_TYPE_SUBTYPE_BY_TYPE["Bar"]["normal"] = c_oAscChartTypeSettings.barNormal     ;
-REV_TYPE_SUBTYPE_BY_TYPE["Bar"]["stacked"] = c_oAscChartTypeSettings.barStacked    ;
-REV_TYPE_SUBTYPE_BY_TYPE["Bar"]["stackedPer"] = c_oAscChartTypeSettings.barStackedPer ;
-
-
-REV_TYPE_SUBTYPE_BY_TYPE["Line"] = [];
-REV_TYPE_SUBTYPE_BY_TYPE["Line"]["normal"] = c_oAscChartTypeSettings.lineNormal     ;
-REV_TYPE_SUBTYPE_BY_TYPE["Line"]["stacked"] = c_oAscChartTypeSettings.lineStacked    ;
-REV_TYPE_SUBTYPE_BY_TYPE["Line"]["stackedPer"] = c_oAscChartTypeSettings.lineStackedPer ;
-
-REV_TYPE_SUBTYPE_BY_TYPE["Pie"] = c_oAscChartTypeSettings.pie ;
-REV_TYPE_SUBTYPE_BY_TYPE["Doughnut"] = c_oAscChartTypeSettings.doughnut ;
-
-REV_TYPE_SUBTYPE_BY_TYPE["HBar"] = [];
-REV_TYPE_SUBTYPE_BY_TYPE["HBar"]["normal"] = c_oAscChartTypeSettings.hBarNormal     ;
-REV_TYPE_SUBTYPE_BY_TYPE["HBar"]["stacked"] = c_oAscChartTypeSettings.hBarStacked    ;
-REV_TYPE_SUBTYPE_BY_TYPE["HBar"]["stackedPer"] = c_oAscChartTypeSettings.hBarStackedPer ;
-
-REV_TYPE_SUBTYPE_BY_TYPE["Area"] = [];
-REV_TYPE_SUBTYPE_BY_TYPE["Area"]["normal"] = c_oAscChartTypeSettings.areaNormal     ;
-REV_TYPE_SUBTYPE_BY_TYPE["Area"]["stacked"] = c_oAscChartTypeSettings.areaStacked    ;
-REV_TYPE_SUBTYPE_BY_TYPE["Area"]["stackedPer"] = c_oAscChartTypeSettings.areaStackedPer ;
-
-
-REV_TYPE_SUBTYPE_BY_TYPE["Stock"] = c_oAscChartTypeSettings.stock ;
-REV_TYPE_SUBTYPE_BY_TYPE["Scatter"] = c_oAscChartTypeSettings.scatter ;
-
 function checkParagraphDefFonts(map, par)
 {
     par && par.Pr && par.Pr.DefaultRunPr && checkRFonts(map, par.Pr.DefaultRunPr.RFonts);

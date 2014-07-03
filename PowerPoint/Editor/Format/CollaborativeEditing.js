@@ -47,7 +47,7 @@ function CTableId()
 
     this.Add = function(Class, Id)
     {
-        if(Class instanceof asc_CChart)
+        if(Class instanceof asc_CChart)// ToDo Его нет!!!!
             return;
         if ( false === this.m_bTurnOff )
         {

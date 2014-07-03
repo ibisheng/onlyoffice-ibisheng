@@ -363,18 +363,12 @@ var UndoRedoDataTypes = new function() {
 	this.ClrScheme = 28;
 	this.AutoFilter = 29;
 	this.AutoFiltersOptions = 30;
-	this.DrawingObjectLayer = 31;
+
 	this.AutoFiltersOptionsElements = 32;
 	this.SingleProperty = 33;
 	this.RgbColor = 34;
 	this.ThemeColor = 35;
-	this.ChartData = 36;
-	this.ChartRange = 37;
-	this.ChartHeader = 38;
-	this.ChartAxisX = 39;
-	this.ChartAxisY = 40;
-	this.ChartLegend = 41;
-	this.ChartFont = 42;
+
 	this.SheetViewSettings = 43;
     this.GlobalTableIdAdd = 44;
     this.GraphicObjects = 45;
@@ -442,13 +436,6 @@ var UndoRedoDataTypes = new function() {
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
 			case this.RgbColor: return new RgbColor(); break;
 			case this.ThemeColor: return new ThemeColor(); break;
-			case this.ChartData: return new asc_CChart(); break;
-			case this.ChartRange: return new asc_CChartRange(); break;
-			case this.ChartHeader: return new asc_CChartHeader(); break;
-			case this.ChartAxisX: return new asc_CChartAxisX(); break;
-			case this.ChartAxisY: return new asc_CChartAxisY(); break;
-			case this.ChartLegend: return new asc_CChartLegend(); break;
-			case this.ChartFont: return new asc_CChartFont(); break;
 			case this.SheetViewSettings: return new Asc.asc_CSheetViewSettings(); break;
             case this.GraphicObjects: return new UndoRedoDataGraphicObjects();break;
             case this.GlobalTableIdAdd: return new UndoRedoData_GTableIdAdd(); break;

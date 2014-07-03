@@ -1,6 +1,5 @@
 "use strict";
 
-var CLASS_TYPE_CHART_DATA = 9999;
 function CChartAsGroup(parent)
 {
     this.document = document;
@@ -10,7 +9,7 @@ function CChartAsGroup(parent)
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    //this.chart = new asc_CChart();
+    //this.chart = new asc_CChart();// ToDo Его нет!!!!
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -53,7 +52,7 @@ function CChartAsGroup(parent)
     if(isRealObject(parent))
     {
         this.setParent(parent);
-        this.setAscChart(new asc_CChart());
+        this.setAscChart(new asc_CChart());// ToDo Его нет!!!!
 
     }
 }
@@ -220,7 +219,7 @@ CChartAsGroup.prototype =
         this.chart.Write_ToBinary2(w);
         var bin =  w.pos + ";" + w.GetBase64Memory();
 
-        var new_chart_data = new asc_CChart(this.chart);
+        var new_chart_data = new asc_CChart(this.chart);// ToDo Его нет!!!!
         /* var r = CreateBinaryReader(bin, 0, bin.length);
          new_chart_data.Read_FromBinary2(r);   */
 
@@ -1222,9 +1221,6 @@ CChartAsGroup.prototype =
                 yAxisTitle: yAxisTitle,
                 title: title_margin
             };
-
-            /*if ( !this.chart.range.intervalObject )
-             this.drawingObjects.intervalToIntervalObject(this.chart);           */
             if(!(updateImage === false))
             {
 
@@ -2074,7 +2070,7 @@ CChartAsGroup.prototype =
             this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.readFromBinary(r);
         }
-        var chart = new asc_CChart();
+        var chart = new asc_CChart();// ToDo Его нет!!!!
         chart.Read_FromBinary2(r, true);
         this.setAscChart(chart);
         var spPr = new CSpPr();
@@ -2662,7 +2658,7 @@ CChartAsGroup.prototype =
                 {
                     if(r.GetBool())
                     {
-                        this.chart = new asc_CChart();
+                        this.chart = new asc_CChart();// ToDo Его нет!!!!
                         //r.GetLong();
                         this.chart.Read_FromBinary2(r);
                     }
@@ -2753,5 +2749,3 @@ var CLASS_TYPE_PATH = 7;
 var CLASS_TYPE_CHART_AS_GROUP = 21;
 
 var CLASS_TYPE_CHART_TITLE = 23;
-
-//var CLASS_TYPE_CHART_DATA = 23;

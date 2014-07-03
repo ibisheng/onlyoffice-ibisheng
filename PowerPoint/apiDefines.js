@@ -173,17 +173,6 @@ var c_oAscChartSubType = {
     stackedPer: "stackedPer"
 };
 
-var c_oAscChartStyle = {
-    Dark: 1,
-    Standart: 2,
-    Accent1: 3,
-    Accent2: 4,
-    Accent3: 5,
-    Accent4: 6,
-    Accent5: 7,
-    Accent6: 8
-};
-
 var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 
 var THEME_THUMBNAIL_WIDTH = 180;

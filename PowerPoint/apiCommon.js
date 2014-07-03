@@ -1334,7 +1334,7 @@ function CAscChartProp( obj )
         this.ImageUrl = null;
         this.Locked   = false;
 
-        this.ChartProperties = new asc_CChart();
+        this.ChartProperties = new asc_CChart(); // ToDo Его нет!!!!
         this.ShapeProperties = null;
         this.ImageProperties = null;
 

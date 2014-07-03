@@ -1002,9 +1002,6 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.AddImage(true);
             break;
 		case "td_imageInText2":
-            var asc_chart = new asc_CChart();
-            asc_chart.initDefault();
-            editor.asc_addChartDrawingObject(asc_chart);
             break;
 			
         case "td_link":

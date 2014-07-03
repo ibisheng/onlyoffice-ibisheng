@@ -7601,12 +7601,12 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 //test
 
 // Вставка диаграмм
-asc_docs_api.prototype.asc_getChartObject = function(type, subtype)
+asc_docs_api.prototype.asc_getChartObject = function(type)
 {	
 	this.isChartEditor = true;		// Для совместного редактирования
 
 
-    return this.WordControl.m_oLogicDocument.Get_ChartObject(type, subtype);
+    return this.WordControl.m_oLogicDocument.Get_ChartObject(type);
 };
 
 asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
@@ -7639,13 +7639,9 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 	}
 };
 
-asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
+asc_docs_api.prototype.asc_getChartPreviews = function(chartType)
 {
-	if(isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType]))
-		chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType];
-	else if(Array.isArray(REV_TYPE_SUBTYPE_BY_TYPE[chartType]) && isRealNumber(REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType]))
-		chartType = REV_TYPE_SUBTYPE_BY_TYPE[chartType][chartSubType];
-	return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
+	return this.chartPreviewManager.getChartPreviews(chartType);
 };
 
 asc_docs_api.prototype.sync_closeChartEditor = function()

@@ -2526,9 +2526,9 @@ CDocument.prototype =
         }
     },
 
-    Get_ChartObject: function(type, subtype)
+    Get_ChartObject: function(type)
     {
-        return this.DrawingObjects.getChartObject(type, subtype);
+        return this.DrawingObjects.getChartObject(type);
     },
 
     Add_FlowTable : function(Cols, Rows)

@@ -24,15 +24,6 @@ var c_oAscNumFormatType = {
 	Percent : 9,
 	Fraction : 10
 };
-
-
-
- var c_oAscChartLegend = {
-	left: "left",
-	right: "right",
-	top: "top",
-	bottom: "bottom"
- };
  
  var c_oAscDrawingLayerType = {
 	BringToFront: 0,
@@ -40,8 +31,6 @@ var c_oAscNumFormatType = {
 	BringForward: 2,
 	SendBackward: 3
  };
- 
-
 
 var	c_oAscTransactionState = { 
 	No: -1,

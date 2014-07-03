@@ -4796,7 +4796,7 @@ function BinaryPPTYLoader()
                     _chart = new CChartAsGroup(this.TempGroupObject);
                     if(g_oTableId)
                         g_oTableId.m_bTurnOff = true;
-                    var chart = new asc_CChart();
+                    var chart = new asc_CChart();// ToDo Его нет!!!!
                     if(g_oTableId)
                         g_oTableId.m_bTurnOff = false;
 

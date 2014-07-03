@@ -1762,29 +1762,18 @@ DrawingObjectsController.prototype =
                 if(!(chart_space.bbox && chart_space.bbox.seriesBBox && b_equal_ws
                     && b_equal_bbox && b_equal_vert))
                 {
-                    var asc_chart = new asc_CChart();
-                    asc_chart.range.interval = sRange;
-                    asc_chart.worksheet = this.drawingObjects.getWorksheet();
-                    this.drawingObjects.intervalToIntervalObject(asc_chart);
+					var catHeadersBBox, serHeadersBBox;
                     if(chart_space.bbox && b_equal_bbox && b_equal_ws && !b_equal_vert)
                     {
                         if(chart_space.bbox.catBBox)
-                            asc_chart.range.serHeadersBBox = {r1: chart_space.bbox.catBBox.r1, r2: chart_space.bbox.catBBox.r2, c1: chart_space.bbox.catBBox.c1, c2: chart_space.bbox.catBBox.c2};
+                            serHeadersBBox = {r1: chart_space.bbox.catBBox.r1, r2: chart_space.bbox.catBBox.r2,
+								c1: chart_space.bbox.catBBox.c1, c2: chart_space.bbox.catBBox.c2};
                         if(chart_space.bbox.serBBox)
-                            asc_chart.range.catHeadersBBox = {r1: chart_space.bbox.serBBox.r1, r2: chart_space.bbox.serBBox.r2, c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
+                            catHeadersBBox = {r1: chart_space.bbox.serBBox.r1, r2: chart_space.bbox.serBBox.r2,
+								c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
                     }
-                    if(chartSettings.getInColumns())
-                    {
-                        asc_chart.range.rows = false;
-                        asc_chart.range.columns = true;
-                    }
-                    else
-                    {
-                        asc_chart.range.rows = true;
-                        asc_chart.range.columns = false;
-                    }
-                    asc_chart.rebuildSeries();
-                    chart_space.rebuildSeriesFromAsc(asc_chart);
+					var chartSeries = getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
+                    chart_space.rebuildSeriesFromAsc(chartSeries);
                 }
             }
         }
@@ -2602,108 +2591,107 @@ DrawingObjectsController.prototype =
         ret.type = calc_chart_type;
         return ret;
     },
+	_getChartSpace: function (chartSeries, options) {
+		switch (options.type) {
+			case c_oAscChartTypeSettings.lineNormal:
+			case c_oAscChartTypeSettings.lineNormalMarker:
+				return CreateLineChart(chartSeries, GROUPING_STANDARD);
+			case c_oAscChartTypeSettings.lineStacked:
+			case c_oAscChartTypeSettings.lineStackedMarker:
+				return CreateLineChart(chartSeries, GROUPING_STACKED);
+			case c_oAscChartTypeSettings.lineStackedPer:
+			case c_oAscChartTypeSettings.lineStackedPerMarker:
+				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED);
+			case c_oAscChartTypeSettings.barNormal:
+				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED);
+			case c_oAscChartTypeSettings.barStacked:
+				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED);
+			case c_oAscChartTypeSettings.barStackedPer:
+				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED);
+			case c_oAscChartTypeSettings.hBarNormal:
+				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED);
+			case c_oAscChartTypeSettings.hBarStacked:
+				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED);
+			case c_oAscChartTypeSettings.hBarStackedPer:
+				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED);
+			case c_oAscChartTypeSettings.areaNormal:
+				return CreateAreaChart(chartSeries, GROUPING_STANDARD);
+			case c_oAscChartTypeSettings.areaStacked:
+				return CreateAreaChart(chartSeries, GROUPING_STACKED);
+			case c_oAscChartTypeSettings.areaStackedPer:
+				return CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED);
+			case c_oAscChartTypeSettings.stock:
+				return CreateStockChart(chartSeries);
+			case c_oAscChartTypeSettings.doughnut:
+				return CreatePieChart(chartSeries, true);
+			case c_oAscChartTypeSettings.pie:
+				return CreatePieChart(chartSeries, false);
+			case c_oAscChartTypeSettings.scatter:
+			case c_oAscChartTypeSettings.scatterLine:
+			case c_oAscChartTypeSettings.scatterLineMarker:
+			case c_oAscChartTypeSettings.scatterMarker:
+			case c_oAscChartTypeSettings.scatterNone:
+			case c_oAscChartTypeSettings.scatterSmooth:
+			case c_oAscChartTypeSettings.scatterSmoothMarker:
+				return CreateScatterChart(chartSeries);
+			// radar return CreateRadarChart(chartSeries);
+		}
 
-    getChartSpace: function(chart, options)
-    {
-        var _type = typeof chart.type === "string" ? chart.type : "Bar";
-        switch (_type)
-        {
-            case "Line":
-            {
-                switch (chart.subType.toLowerCase())
-                {
-                    case "normal":
-                    {
-                        return CreateLineChart(chart, GROUPING_STANDARD);
-                    }
-                    case "stacked":
-                    {
-                        return CreateLineChart(chart, GROUPING_STACKED);
-                    }
-                    case "stackedper":
-                    {
-                        return CreateLineChart(chart, GROUPING_PERCENT_STACKED);
-                    }
-                }
-                break;
-            }
-            case "Bar":
-            {
-                switch (chart.subType.toLowerCase())
-                {
-                    case "normal":
-                    {
-                        return CreateBarChart(chart, BAR_GROUPING_CLUSTERED);
-                    }
-                    case "stacked":
-                    {
-                        return CreateBarChart(chart, BAR_GROUPING_STACKED);
-                    }
-                    case "stackedper":
-                    {
-                        return CreateBarChart(chart, BAR_GROUPING_PERCENT_STACKED);
-                    }
-                }
-                break;
-            }
-            case "HBar":
-            {
-                switch(chart.subType.toLowerCase())
-                {
-                    case "normal":
-                    {
-                        return CreateHBarChart(chart, BAR_GROUPING_CLUSTERED);
-                    }
-                    case "stacked":
-                    {
-                        return CreateHBarChart(chart, BAR_GROUPING_STACKED);
-                    }
-                    case "stackedper":
-                    {
-                        return CreateHBarChart(chart, BAR_GROUPING_PERCENT_STACKED);
-                    }
-                }
-                break;
-            }
-            case "Area":
-            {
-                switch(chart.subType.toLowerCase())
-                {
-                    case "normal":
-                    {
-                        return CreateAreaChart(chart, GROUPING_STANDARD);
-                    }
-                    case "stacked":
-                    {
-                        return CreateAreaChart(chart, GROUPING_STACKED);
-                    }
-                    case "stackedper":
-                    {
-                        return CreateAreaChart(chart, GROUPING_PERCENT_STACKED);
-                    }
-                }
-                break;
-            }
-            case "Pie":
-            case "Doughnut":
-            {
-                return CreatePieChart(chart, chart.type === "Doughnut");
-            }
-            case "Scatter":
-            {
-                return CreateScatterChart(chart);
-            }
-            case "Stock":
-            {
-                return CreateStockChart(chart);
-            }
-            case "Radar":
-            {
-                return CreateRadarChart(chart);
-            }
-        }
-        return null;
-    },
+		return null;
+	},
+
+	getChartSpace2: function(worksheet, options)
+	{
+		var chartSeries = getChartSeries(worksheet, options);
+		return this._getChartSpace(chartSeries, options);
+	},
+
+	getSeriesDefault: function (type) {
+		// Обновлены тестовые данные для новой диаграммы
+		function createItem(value) {
+			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
+		}
+		var bIsScatter = (c_oAscChartTypeSettings.scatter <= type && type <= c_oAscChartTypeSettings.scatterSmoothMarker);
+
+		var Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
+
+		var series = [];
+
+		var seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!B2:B7";
+		seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
+		seria.TxCache.Formula = "Sheet1!B1";
+		seria.TxCache.Tx = "Gold";
+		if (!bIsScatter)
+			seria.Cat = Cat;
+		else
+			seria.xVal = Cat;
+		series.push(seria);
+
+		seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!C2:C7";
+		seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
+		seria.TxCache.Formula = "Sheet1!C1";
+		seria.TxCache.Tx = "Silver";
+		if (!bIsScatter)
+			seria.Cat = Cat;
+		else
+			seria.xVal = Cat;
+		series.push(seria);
+
+		seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!D2:D7";
+		seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
+		seria.TxCache.Formula = "Sheet1!D1";
+		seria.TxCache.Tx = "Bronze";
+		if (!bIsScatter)
+			seria.Cat = Cat;
+		else
+			seria.xVal = Cat;
+		series.push(seria);
+
+		return series;
+	},
 
     changeCurrentState: function(newState)
     {

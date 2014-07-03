@@ -332,16 +332,10 @@ DrawingObjectsController.prototype.handleChartDoubleClick = function()
     this.checkSelectedObjectsAndFireCallback(function(){this.drawingObjects.showChartSettings();}, []);
 };
 
-DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, options)
+DrawingObjectsController.prototype.addChartDrawingObject = function(options)
 {
     History.Create_NewPoint();
-    var type_subtype = TYPE_SUBTYPE_BY_TYPE[options.type];
-    if(type_subtype)
-    {
-        asc_chart.type = type_subtype.type;
-        asc_chart.subType = type_subtype.subtype;
-    }
-    var chart = this.getChartSpace(asc_chart, options);
+    var chart = this.getChartSpace(this.drawingObjects.getWorksheetModel(), options);
     if(chart)
     {
         chart.setWorksheet(this.drawingObjects.getWorksheetModel());

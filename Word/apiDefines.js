@@ -154,17 +154,6 @@ var c_oAscChartSubType = {
     stackedPer: "stackedPer"
 };
 
-var c_oAscChartStyle = {
-    Dark: 1,
-    Standart: 2,
-    Accent1: 3,
-    Accent2: 4,
-    Accent3: 5,
-    Accent4: 6,
-    Accent5: 7,
-    Accent6: 8
-};
-
 var align_Right   = 0;
 var align_Left    = 1;
 var align_Center  = 2;
