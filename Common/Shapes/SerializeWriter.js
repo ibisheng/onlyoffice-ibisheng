@@ -2372,20 +2372,20 @@ function CBinaryFileWriter()
 
                     for (var hi = 0; hi < _content_len_h; hi++)
                     {
-                        var _elem_h = _elem.Content[i];
-                        switch (_elem.Type)
+                        var _elem_h = _elem.Content[hi];
+                        switch (_elem_h.Type)
                         {
                             case para_Run:
                             {
-                                var _run_len = _elem.Content.length;
+                                var _run_len = _elem_h.Content.length;
                                 var _run_text = "";
                                 for (var j = 0; j < _run_len; j++)
                                 {
-                                    switch (_elem.Content[j].Type)
+                                    switch (_elem_h.Content[j].Type)
                                     {
                                         case para_Text:
                                         {
-                                            _run_text += _elem.Content[j].Value;
+                                            _run_text += _elem_h.Content[j].Value;
                                             break;
                                         }
                                         case para_Space :
@@ -2403,7 +2403,7 @@ function CBinaryFileWriter()
                                             if("" != _run_text)
                                             {
                                                 oThis.StartRecord(0); // subtype
-                                                oThis.WriteTextRun(_elem.Pr, _run_text, _hObj);
+                                                oThis.WriteTextRun(_elem_h.Pr, _run_text, _hObj);
                                                 oThis.EndRecord();
 
                                                 _count++;
@@ -2411,7 +2411,7 @@ function CBinaryFileWriter()
                                                 _run_text = "";
                                             }
                                             oThis.StartRecord(0); // subtype
-                                            oThis.WriteLineBreak(_elem.Pr, _hObj);
+                                            oThis.WriteLineBreak(_elem_h.Pr, _hObj);
                                             oThis.EndRecord();
 
                                             _count++;
@@ -2424,7 +2424,7 @@ function CBinaryFileWriter()
                                 if ("" != _run_text)
                                 {
                                     oThis.StartRecord(0); // subtype
-                                    oThis.WriteTextRun(_elem.Pr, _run_text, _hObj);
+                                    oThis.WriteTextRun(_elem.Content[0].Pr, _run_text, _hObj);
                                     oThis.EndRecord();
 
                                     _count++;

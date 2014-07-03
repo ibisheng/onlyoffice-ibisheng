@@ -291,7 +291,9 @@ CHistory.prototype =
                         this.Add(Class, Type, sheetid, range, Data, LocalChange);
                 }
                 if(Class)
+                {
                     Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+                }
             }
         }
         this._addRedoObjectParam(oRedoObjectParam, this.CurPoint.Items[this.CurPoint.Items.length - 1]);
@@ -477,7 +479,7 @@ CHistory.prototype =
                     {
                         var Item = Point.Items[Index];
 
-                        if ( /*true === Item.NeedRecalc*/Item.Class.Refresh_RecalcData )
+                        if ( /*true === Item.NeedRecalc*/ Item.Class && Item.Class.Refresh_RecalcData )
                             Item.Class.Refresh_RecalcData( Item.Data );
                         if(Item.Type === historyitem_Workbook_ChangeColorScheme)
                         {
