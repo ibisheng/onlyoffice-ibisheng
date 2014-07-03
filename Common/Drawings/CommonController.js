@@ -1215,9 +1215,14 @@ DrawingObjectsController.prototype =
     },
 
     setCellFontName: function (fontName) {
+		var t = this;
         var text_pr = new ParaTextPr({ FontFamily : { Name : fontName , Index : -1 } });
-        this.checkSelectedObjectsAndCallback(this.paragraphAdd, [text_pr]);
-
+        this.checkSelectedObjectsAndCallback(function () {
+			// ToDo стоит перейти на проверку шрифтов на deserialize
+			History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null,
+				new UndoRedoData_SingleProperty([fontName]), true);
+			t.paragraphAdd(text_pr);
+		}, []);
     },
 
     setCellFontSize: function (fontSize) {

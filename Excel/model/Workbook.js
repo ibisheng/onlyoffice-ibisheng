@@ -1768,7 +1768,7 @@ Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChan
         if (nLen > 0)
             aPointChangesBase64.push(nLen + ";" + oMemory.GetBase64Memory2(nPosStart, nLen));
     }
-}
+};
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.

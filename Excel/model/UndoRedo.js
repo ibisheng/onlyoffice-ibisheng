@@ -212,7 +212,6 @@ UndoRedoItemSerializable.prototype = {
 	},
 
 
-
 	Deserialize : function(oBinaryReader)
 	{
 		var res = c_oSerConstants.ReadOk;
@@ -258,10 +257,9 @@ UndoRedoItemSerializable.prototype = {
 	},
 	DeserializeData : function(oBinaryReader)
 	{
-		var oDataObject = null;
 		var nDataClassType = oBinaryReader.GetUChar();
 		var nLength = oBinaryReader.GetULongLE();
-		oDataObject = UndoRedoDataTypes.Create(nDataClassType);
+		var oDataObject = UndoRedoDataTypes.Create(nDataClassType);
 		if(null != oDataObject)
 		{
 			if(null != oDataObject.Read_FromBinary2)
