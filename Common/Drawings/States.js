@@ -47,6 +47,14 @@ StartAddNewShape.prototype =
         {
             History.Create_NewPoint();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(false, this.drawingObjects.getDrawingDocument(), this.drawingObjects.drawingObjects);
+            if(shape.spPr.xfrm.offX < 0)
+            {
+                shape.spPr.xfrm.setOffX(0);
+            }
+            if(shape.spPr.xfrm.offY < 0)
+            {
+                shape.spPr.xfrm.setOffY(0);
+            }
             shape.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
             shape.addToDrawingObjects();
             this.drawingObjects.checkChartTextSelection();
@@ -307,6 +315,7 @@ RotateState.prototype =
                             arr_x.length = 0;
                             arr_y.length = 0;
                             drawing = oThis.drawingObjects.selectedObjects[i];
+                            drawing.recalculateTransform();
                             transform = drawing.transform;
                             arr_x.push(transform.TransformPointX(0, 0));
                             arr_y.push(transform.TransformPointY(0, 0));
