@@ -1668,7 +1668,7 @@
 					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();
-					
+                    worksheet.objectRender.controller.cursorMoveRight(false, false);
 					window.GlobalPasteFlag = false;
 					window.GlobalPasteFlagCounter = 0;
 				});
