@@ -6754,6 +6754,7 @@ CTable.prototype =
                 }
 
                 this.Recalc_CompiledPr2();
+                this.Internal_ReIndexing();
 
                 break;
             }
@@ -6777,6 +6778,7 @@ CTable.prototype =
                 }
 
                 this.Recalc_CompiledPr2();
+                this.Internal_ReIndexing();
 
                 break;
             }

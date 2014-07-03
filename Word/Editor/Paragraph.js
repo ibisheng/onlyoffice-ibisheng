@@ -3543,6 +3543,17 @@ Paragraph.prototype =
             }
             else
             {
+                // Комментарии удаляем потом отдельно, чтобы не путались метки селекта
+                var CommentsToDelete = {};
+                for (var Pos = StartPos; Pos <= EndPos; Pos++)
+                {
+                    var Item = this.Content[Pos];
+                    if (para_Comment === Item.Type)
+                        CommentsToDelete[Item.CommentId] = true;
+                }
+                
+                this.DeleteCommentOnRemove = false;
+                
                 this.Content[EndPos].Remove(nCount, bOnAddText);
 
                 // TODO: Как только избавимся от para_End переделать здесь
@@ -3567,6 +3578,13 @@ Paragraph.prototype =
                         this.Selection.Use = false;
 
                     this.Internal_Content_Remove( StartPos );                    
+                }
+                
+                this.DeleteCommentOnRemove = true;
+
+                for (var CommentId in CommentsToDelete)
+                {
+                    this.LogicDocument.Remove_Comment( CommentId, true );
                 }
             }
 
@@ -9003,7 +9021,7 @@ Paragraph.prototype =
         var NumPr = this.Numbering_Get();
         if ( undefined != NumPr )
         {
-            bEmptyParagraph = false;
+            ParaStats.EmptyParagraph = false;
             this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId).DocumentStatistics( NumPr.Lvl, Stats );
         }
 

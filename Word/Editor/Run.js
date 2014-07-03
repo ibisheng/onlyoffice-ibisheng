@@ -12,7 +12,8 @@ function ParaRun(Paragraph, bMathRun)
     this.Type       = para_Run;                  // тип данного элемента
     this.Paragraph  = Paragraph;                 // Ссылка на параграф
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
-    this.Content    = [];               // Содержимое данного run
+    this.Content    = [];                        // Содержимое данного run
+        
     this.State      = new CParaRunState();       // Положение курсора и селекта в данного run
     this.Selection  = this.State.Selection;
     this.CompiledPr = new CTextPr();             // Скомпилированные настройки
@@ -3934,7 +3935,7 @@ ParaRun.prototype =
         for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
-            if ( !((para_Drawing === Item.Type && true !== Item.Is_Inline) || para_End === Item.Type || (para_NewLine === Item.Type && break_Line === Item.BreakType ) ) )
+            if ( !((para_Drawing === Item.Type && true !== Item.Is_Inline()) || para_End === Item.Type || (para_NewLine === Item.Type && break_Line === Item.BreakType ) ) )
                 LastPos = CurPos + 1;
         }
 
@@ -3962,7 +3963,7 @@ ParaRun.prototype =
         for ( var CurPos = EndPos - 1; CurPos >= StartPos; CurPos-- )
         {
             var Item = this.Content[CurPos];
-            if ( !(para_Drawing === Item.Type && true !== Item.Is_Inline) )
+            if ( !(para_Drawing === Item.Type && true !== Item.Is_Inline()) )
                 FirstPos = CurPos;
         }
 
