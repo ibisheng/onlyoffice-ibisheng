@@ -219,7 +219,6 @@ function asc_CChartSeria() {
     this.Marker = { Size: 0, Symbol: "" };
     this.FormatCode = "";
     this.isHidden = false;
-    this.bShowValue = false;
 }
 
 asc_CChartSeria.prototype = {
