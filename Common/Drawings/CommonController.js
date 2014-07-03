@@ -1423,15 +1423,15 @@ DrawingObjectsController.prototype =
 
 
     insertHyperlink: function (options) {
-        //TODO
+        this.checkSelectedObjectsAndCallback(this.hyperlinkAdd, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}]);
     },
 
     removeHyperlink: function () {
-        // TODO
+        this.checkSelectedObjectsAndCallback(this.hyperlinkRemove, []);
     },
 
     canAddHyperlink: function() {
-        //TODO
+        return this.hyperlinkCanAdd();
     },
 
     getParagraphParaPr: function()
@@ -3159,8 +3159,34 @@ DrawingObjectsController.prototype =
 
     selectAll: function()
     {
-        var content = this.getTargetDocContent();
-        content && content.Select_All();
+        var content = this.getTargetDocContent(), i;
+        if(content)
+        {
+            content.Select_All();
+        }
+        else if(!this.document)
+        {
+            if(this.selection.groupSelection)
+            {
+                if(!this.selection.groupSelection.selection.chartSelection)
+                {
+                    this.selection.groupSelection.resetSelection();
+                    for(i = this.selection.groupSelection.arrGraphicObjects.length - 1; i > -1; --i)
+                    {
+                        this.selection.groupSelection.selectObject(this.selection.groupSelection.arrGraphicObjects[i], 0);
+                    }
+                }
+            }
+            else if(!this.selection.chartSelection)
+            {
+                this.resetSelection();
+                var drawings = this.getDrawingObjects();
+                for(i = drawings.length - 1; i > -1; --i)
+                {
+                    this.selectObject(drawings[i], 0);
+                }
+            }
+        }
         this.updateSelectionState();
     },
 

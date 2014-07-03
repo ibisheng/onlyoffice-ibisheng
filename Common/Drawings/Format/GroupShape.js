@@ -1816,7 +1816,12 @@ CGroupShape.prototype =
     resetSelection: function(graphicObjects)
     {
         this.selection.textSelection = null;
+        if(this.selection.chartSelection)
+        {
+            this.selection.chartSelection.resetSelection();
+        }
         this.selection.chartSelection = null;
+
         for(var i = this.selectedObjects.length - 1; i > -1; --i)
         {
             var old_gr = this.selectedObjects[i].group;
