@@ -2104,7 +2104,8 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
             var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
             drawingObject.graphicObject = this.Drawings[i].graphicObject.copy();
             drawingObject.graphicObject.setWorksheet(oNewWs);
-            oNewWs.Drawings.push(drawingObject);
+            drawingObject.graphicObject.addToDrawingObjects();
+            oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
         }
         drawingObjects.pushToAObjects(oNewWs.Drawings);
         drawingObjects.updateChartReferences(wsFrom.sName, oNewWs.sName);
