@@ -1242,7 +1242,7 @@ function CHorRuler()
             var _bottom = 5.2;
 
             // tabs
-            if (_y >= 3 && _y <= _bottom && _x >= this.m_dIndentLeft && (_x + _margin_left) <= (_margin_right - this.m_dIndentRight))
+            if (_y >= 3 && _y <= _bottom && _x >= (_margin_left + this.m_dIndentLeft) && _x <= (_margin_right - this.m_dIndentRight))
             {
                 var mm_1_4 = 10 / 4;
                 var mm_1_8 = mm_1_4 / 2;
