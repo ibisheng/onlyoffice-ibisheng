@@ -3826,6 +3826,7 @@ function DrawingObjects() {
 
     _this.selectDrawingObjectRange = function(drawing) {
 
+		worksheet.cleanSelection();
         worksheet.arrActiveChartsRanges = [];
 
         if(!drawing.bbox || drawing.bbox.worksheet !== worksheet.model)
@@ -3853,7 +3854,7 @@ function DrawingObjects() {
         var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
         worksheet.arrActiveChartsRanges.push(range);
         worksheet.isChartAreaEditMode = true;
-        worksheet._drawFormulaRanges(worksheet.arrActiveChartsRanges);
+		worksheet._drawSelection();
     };
 
     _this.unselectDrawingObjects = function() {
