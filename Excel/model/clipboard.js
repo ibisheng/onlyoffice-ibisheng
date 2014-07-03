@@ -1643,6 +1643,7 @@
 				
 				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
 				oPasteProcessor.map_font_index = this.Api.FontLoader.map_font_index;
+				oPasteProcessor.bIsDoublePx = false;
 				
 				var newFonts;
 				
