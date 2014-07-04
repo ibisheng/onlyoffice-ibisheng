@@ -983,6 +983,7 @@
 					History.StartTransaction();
 
 					asc_applyFunction(functionAction);
+					t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 
 					History.EndTransaction();
 				};
@@ -3397,9 +3398,9 @@
 		};
 
 		/**
-			 * Рисует выделение вокруг ячеек
-			 * @param {Asc.Range} range
-			 */
+		 * Рисует выделение вокруг ячеек
+		 * @param {Asc.Range} range
+		 */
 		WorksheetView.prototype._drawSelection = function (range) {
 			if (!this.isSelectionDialogMode) {
 				this._drawCollaborativeElements(/*bIsDrawObjects*/true);
