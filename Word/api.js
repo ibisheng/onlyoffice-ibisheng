@@ -1601,14 +1601,14 @@ asc_docs_api.prototype._coAuthoringInit = function()
 					CollaborativeEditing.Send_Changes();
 				} else {
 					// Изменений нет, но нужно сбросить lock
-					t.CoAuthoringApi.unLockDocument();
+					t.CoAuthoringApi.unLockDocument(true);
 				}
 			}
 		} else {
 			t.isStartCoAuthoringOnEndLoad = true;
 			if (!isStartEvent) {
 				// Документ еще не подгрузился, но нужно сбросить lock
-				t.CoAuthoringApi.unLockDocument();
+				t.CoAuthoringApi.unLockDocument(false);
 			}
 		}
 	};

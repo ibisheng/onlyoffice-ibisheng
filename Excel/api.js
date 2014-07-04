@@ -1624,7 +1624,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					if (!isStartEvent) {
 						// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
 						if (!t.IsSendDocumentLoadCompleate)
-							t.CoAuthoringApi.unLockDocument();
+							t.CoAuthoringApi.unLockDocument(false);
 						else {
 							// Принимаем чужие изменения
 							t.collaborativeEditing.applyChanges();
@@ -1683,7 +1683,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					if (0 < arrChanges.length || null !== deleteIndex)
 						this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex);
 					else
-						this.CoAuthoringApi.unLockDocument();
+						this.CoAuthoringApi.unLockDocument(true);
 				}
 			},
 

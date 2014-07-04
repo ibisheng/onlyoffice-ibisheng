@@ -133,9 +133,9 @@
 		}
 	};
 
-	CDocsCoApi.prototype.unLockDocument = function () {
+	CDocsCoApi.prototype.unLockDocument = function (isSave) {
 		if (this._CoAuthoringApi && this._onlineWork) {
-			this._CoAuthoringApi.unLockDocument();
+			this._CoAuthoringApi.unLockDocument(isSave);
 		}
 	};
 	
@@ -464,8 +464,8 @@
 			"startIndex": startIndex});
 	};
 
-	DocsCoApi.prototype.unLockDocument = function () {
-		this._send({"type": "unLockDocument"});
+	DocsCoApi.prototype.unLockDocument = function (isSave) {
+		this._send({'type': 'unLockDocument', 'isSave' : isSave});
 	};
 
     DocsCoApi.prototype.getUsers = function () {

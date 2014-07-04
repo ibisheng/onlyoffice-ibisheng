@@ -495,7 +495,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 				CollaborativeEditing.Send_Changes();
 			} else {
 				// Изменений нет, но нужно сбросить lock
-				t.CoAuthoringApi.unLockDocument();
+				t.CoAuthoringApi.unLockDocument(false);
 			}
 		} else
 			t.isStartCoAuthoringOnEndLoad = true;
