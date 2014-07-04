@@ -1331,8 +1331,8 @@ Paragraph.prototype =
             }
         }
 
-        Bottom2 += this.Lines[CurLine].Metrics.LineGap;
-        Bottom   = Bottom2;
+        Bottom  = Bottom2;
+        Bottom += this.Lines[CurLine].Metrics.LineGap;
 
         // Если данная строка последняя, тогда подкорректируем нижнюю границу
         if ( true === PRS.End )
