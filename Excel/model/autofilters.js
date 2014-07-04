@@ -5608,11 +5608,12 @@ var gUndoInsDelCellsFlag = true;
 					}
 				}
 				
-				var ySize = 46 * 72 / 96;
-				var xSize = 61 * 72 / 96;
+				var pxToMM = 72 / 96;
+				var ySize = 45 * pxToMM;
+				var xSize = 61 * pxToMM;
 
-				var stepY = ySize/5;
-				var stepX = xSize/5;
+				var stepY = (ySize)/5;
+				var stepX = (60 * pxToMM)/5;
 				var whiteColor = new CColor(255, 255, 255);
 				var blackColor = new CColor(0, 0, 0);
 				
@@ -5685,11 +5686,11 @@ var gUndoInsDelCellsFlag = true;
 								{
 									ctx.setFillStyle(color);
 									if(k == 1)
-										ctx.fillRect(0,Math.floor(k*stepY) + 1,xSize,stepY);
+										ctx.fillRect(0, k*stepY, xSize, stepY);
 									else if(k == 3)
-										ctx.fillRect(0,Math.floor(k*stepY),xSize,Math.floor(stepY));
+										ctx.fillRect(0, k*stepY, xSize,stepY);
 									else
-										ctx.fillRect(0,k*stepY,xSize,stepY);
+										ctx.fillRect(0, k*stepY, xSize, stepY);
 									//else
 										//ctx.fillRect(0,k*stepY,xSize,stepY);
 								}
@@ -5714,7 +5715,7 @@ var gUndoInsDelCellsFlag = true;
 								if(color != null)
 								{
 									ctx.setFillStyle(color);
-									ctx.fillRect(0,Math.floor(k*stepY),xSize,stepY);	
+									ctx.fillRect(0, k*stepY, xSize, stepY);	
 								}
 							}
 							
@@ -5733,9 +5734,8 @@ var gUndoInsDelCellsFlag = true;
 					{
 						var color = null;
 						if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill && null != styleOptions.lastColumn.dxf.fill.bg)
-							color = styleOptions.lastColumn.dxf.fill.bg;
-						/*else
-							ctx.fillStyle = defaultColorBackground;*/
+							color =styleOptions.lastColumn.dxf.fill.bg;
+
 						if(color != null)
 						{
 							ctx.setFillStyle(color);
@@ -5753,7 +5753,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							ctx.setFillStyle(defaultColorBackground);
 						}
-						ctx.fillRect(0,0,xSize,Math.ceil(stepY));
+						ctx.fillRect(0, 0, xSize, stepY);
 						
 					}
 					if(styleInfo.TotalsRowCount)//total row
@@ -5764,7 +5764,7 @@ var gUndoInsDelCellsFlag = true;
 						else
 							color = defaultColorBackground;
 						ctx.setFillStyle(color);
-						ctx.fillRect(0,Math.floor(stepY*4),xSize,Math.floor(stepY) + 1);
+						ctx.fillRect(0, stepY*4, xSize, stepY);
 					}
 					
 					
@@ -5830,24 +5830,24 @@ var gUndoInsDelCellsFlag = true;
 						if(borders.b.s !== c_oAscBorderStyles.None)
 						{
 							ctx.setStrokeStyle(borders.b.c);
-							ctx.lineHor(0, Math.floor(ySize) - 1, Math.floor(xSize));
+							ctx.lineHor(0, ySize, xSize);
 						}					
 						if(borders.l.s !== c_oAscBorderStyles.None)
 						{	
 							ctx.setStrokeStyle(borders.l.c);
-							ctx.lineVer(0, 0, Math.floor(ySize));
+							ctx.lineVer(0, 0, ySize);
 						}
 						if(borders.r.s !== c_oAscBorderStyles.None)
 						{
 							ctx.setStrokeStyle(borders.r.c);
-							ctx.lineVer(Math.floor(xSize) - 1, 0, Math.floor(ySize));
+							ctx.lineVer(xSize - 1, 0, ySize);
 						}
 						if(borders.ih.s !== c_oAscBorderStyles.None)
 						{
 							ctx.setStrokeStyle(borders.ih.c);
 							for(var n = 1; n < 5; n++)
 							{
-								ctx.lineHor(0, Math.floor(stepY*n), Math.floor(xSize));
+								ctx.lineHor(0, stepY*n, xSize);
 							}
 							ctx.stroke();			
 						}
@@ -5856,7 +5856,7 @@ var gUndoInsDelCellsFlag = true;
 							ctx.setStrokeStyle(borders.iv.c);
 							for(var n = 1; n < 5; n++)
 							{
-								ctx.lineVer(Math.floor(stepX*n), 0, Math.floor(ySize));
+								ctx.lineVer(stepX*n, 0, ySize);
 							}
 							ctx.stroke();			
 						}
@@ -5875,7 +5875,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							for(n = 1; n < 5; n++)
 							{
-								ctx.lineHor(0, Math.floor(stepY*n), xSize);
+								ctx.lineHor(0, stepY*n, xSize);
 							}
 							ctx.stroke();
 						}
@@ -5886,7 +5886,7 @@ var gUndoInsDelCellsFlag = true;
 						if(border.t.s !== c_oAscBorderStyles.None)
 						{
 							ctx.setStrokeStyle(border.t.c);
-							ctx.lineVer(0, xSize, Math.floor(ySize));
+							ctx.lineVer(0, xSize, ySize);
 						}
 					}
 					if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
@@ -5900,7 +5900,7 @@ var gUndoInsDelCellsFlag = true;
 						if(border.b.s !== c_oAscBorderStyles.None)
 						{
 							ctx.setStrokeStyle(border.b.c);
-							ctx.lineHor(0, Math.floor(stepY), xSize);
+							ctx.lineHor(0, stepY, xSize);
 						}
 						ctx.stroke();
 					}
@@ -5913,7 +5913,7 @@ var gUndoInsDelCellsFlag = true;
 					defaultColor = blackColor;
 				else
 					defaultColor = styleOptions.wholeTable.dxf.font.c;
-				for(n = 1; n < 6; n++)
+				for(var n = 1; n < 6; n++)
 				{
 					ctx.beginPath();
 					var color = null;
@@ -5943,15 +5943,16 @@ var gUndoInsDelCellsFlag = true;
 						color = defaultColor;
 					ctx.setStrokeStyle(color);
 					var k = 0;
-					var strY = Math.floor(n*stepY - stepY/2);
+					var strY = n*stepY - stepY/2;
 					while(k < 6)
 					{
-						ctx.lineHor(Math.floor(k*stepX) + 3, strY, Math.floor(k*stepX) + 10);
+						ctx.lineHor(k*stepX + 3 * pxToMM, strY, (k + 1)*stepX - 2 * pxToMM);
 						k++;
 					}
 					ctx.stroke();
 					ctx.closePath();  
-				}
+				};
+				
 				return canvas.toDataURL("image/png");
 			},
 			
