@@ -1522,59 +1522,6 @@ function DrawingObjects() {
         return row;
     };
 
-    DrawingBase.prototype.updateAnchorPosition = function() {
-        var _t = this;
-
-        var leftTop = worksheet.getCellsOffset(1), _x, _y, col, row, offsets;
-        switch(_t.Type)
-        {
-            case c_oAscCellAnchorType.cellanchorOneCell:
-            {
-                _x = mmToPt(_t.graphicObject.x + _t.graphicObject.extX) + leftTop.left;
-                _y = mmToPt(_t.graphicObject.y + _t.graphicObject.extY) + leftTop.top;
-                offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
-                col = _t.getColUnderCursor(_x - pxToPt(offsets.x)+ leftTop.left);
-                row = _t.getRowUnderCursor(_y - pxToPt(offsets.y)+ leftTop.top);
-                _t.to.col = col.col;
-                _t.to.colOff = ptToMm(_x - col.left);
-                _t.to.row = row.row;
-                _t.to.rowOff = ptToMm(_y - row.top);
-                break;
-            }
-
-            case c_oAscCellAnchorType.cellanchorAbsolute:
-            {
-                _t.Pos.X = _t.graphicObject.x;
-                _t.Pos.Y = _t.graphicObject.y;
-                break;
-            }
-            case c_oAscCellAnchorType.cellanchorTwoCell:
-            {
-                _x = mmToPt(_t.graphicObject.x) + leftTop.left;
-                _y = mmToPt(_t.graphicObject.y) + leftTop.top;
-                offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
-                col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
-                row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
-                _t.from.col = col.col;
-                _t.from.colOff = ptToMm(_x - col.left);
-                _t.from.row = row.row;
-                _t.from.rowOff = ptToMm(_y - row.top);
-
-                _x = mmToPt(_t.graphicObject.x + _t.graphicObject.extX) + leftTop.left;
-                _y = mmToPt(_t.graphicObject.y + _t.graphicObject.extY) + leftTop.top;
-                offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
-                col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
-                row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
-                _t.to.col = col.col;
-                _t.to.colOff = ptToMm(_x - col.left);
-                _t.to.row = row.row;
-                _t.to.rowOff = ptToMm(_y - row.top);
-                break;
-            }
-        }
-        _t.flags.anchorUpdated = true;
-    };
-
     // Реальное смещение по высоте
     DrawingBase.prototype.getRealTopOffset = function() {
         var _t = this;
@@ -2152,9 +2099,6 @@ function DrawingObjects() {
                  shapeCtx.updatedRect = null;*/
                 for (var i = 0; i < aObjects.length; i++) {
                     var drawingObject = aObjects[i];
-
-                    if ( !drawingObject.flags.anchorUpdated )
-                        drawingObject.updateAnchorPosition();
 
                     // Shape render (drawForPrint)
                     if ( drawingObject.isGraphicObject() ) {
@@ -2824,31 +2768,29 @@ function DrawingObjects() {
 
     _this.updateDrawingObject = function(bInsert, operType, updateRange) {
 
-        var changedRange = null;
+        if(History.TurnOffHistory > 0)
+            return;
         var metrics = null;
-		var count, bbox, offset;
-
-        for (var i = 0; i < aObjects.length; i++) {
-
-            var obj = aObjects[i];
-            if ( !obj.isLocked() ) {
-
-                bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
-
-                if ( obj.isChart() || obj.isImage() || obj.isShape() ) {
-
+		var count, bNeedRedraw = false, offset;
+       //this.controller.checkObjectsAndCallback(
+       //    function()
+       //    {
+            for (var i = 0; i < aObjects.length; i++)
+            {
+                var obj = aObjects[i];
                     metrics = { from: {}, to: {} };
                     metrics.from.col = obj.from.col; metrics.to.col = obj.to.col;
                     metrics.from.colOff = obj.from.colOff; metrics.to.colOff = obj.to.colOff;
                     metrics.from.row = obj.from.row; metrics.to.row = obj.to.row;
                     metrics.from.rowOff = obj.from.rowOff; metrics.to.rowOff = obj.to.rowOff;
 
-                    if (bInsert) {		// Insert
-                        switch (operType) {
+                    if (bInsert)
+                    {		// Insert
+                        switch (operType)
+                        {
                             case c_oAscInsertOptions.InsertColumns:
                             {
                                 count = updateRange.c2 - updateRange.c1 + 1;
-
                                 // Position
                                 if (updateRange.c1 <= obj.from.col) {
                                     metrics.from.col += count;
@@ -2860,24 +2802,10 @@ function DrawingObjects() {
                                 else
                                     metrics = null;
 
-                                // Range
-                                if (obj.isChart()) {
-                                    if (updateRange.c1 <= bbox.c1)
-                                        changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 + count, bbox.r2, bbox.c2 + count);
-
-                                    else if (updateRange.c1 <= bbox.c2)
-                                        changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 , bbox.r2, bbox.c2 + count);
-                                }
                             }
                                 break;
                             case c_oAscInsertOptions.InsertCellsAndShiftRight:
-                                // Range
-                                if (obj.isChart()) {
-                                    if ( (updateRange.r1 <= bbox.r1) && (updateRange.r2 >= bbox.r2) && (updateRange.c2 < bbox.c1) ) {
-                                        count = updateRange.c2 - updateRange.c1 + 1;
-                                        changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 + count, bbox.r2, bbox.c2 + count);
-                                    }
-                                }
+
                                 break;
 
                             case c_oAscInsertOptions.InsertRows:
@@ -2894,30 +2822,16 @@ function DrawingObjects() {
                                 }
                                 else
                                     metrics = null;
-
-                                // Range
-                                if (obj.isChart()) {
-                                    if (updateRange.r1 <= bbox.r1)
-                                        changedRange = new Range(worksheet.model, bbox.r1 + count, bbox.c1, bbox.r2 + count, bbox.c2);
-
-                                    else if (updateRange.r1 <= bbox.r2)
-                                        changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2 + count, bbox.c2);
-                                }
                             }
                                 break;
                             case c_oAscInsertOptions.InsertCellsAndShiftDown:
-                                // Range
-                                if (obj.isChart()) {
-                                    if ( (updateRange.c1 <= bbox.c1) && (updateRange.c2 >= bbox.c2) && (updateRange.r2 < bbox.r1) ) {
-                                        count = updateRange.r2 - updateRange.r1 + 1;
-                                        changedRange = new Range(worksheet.model, bbox.r1 + count, bbox.c1, bbox.r2 + count, bbox.c2);
-                                    }
-                                }
+
                                 break;
                         }
                     }
                     else {				// Delete
-                        switch (operType) {
+                        switch (operType)
+                        {
                             case c_oAscDeleteOptions.DeleteColumns:
                             {
 
@@ -2960,55 +2874,12 @@ function DrawingObjects() {
                                 else
                                     metrics = null;
 
-                                // Range
-                                if (obj.isChart()) {
-                                    count = updateRange.c2 - updateRange.c1 + 1;
 
-                                    if (updateRange.c1 < bbox.c1) {
-
-                                        if (updateRange.c2 < bbox.c1)
-                                            changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 - count , bbox.r2, bbox.c2 - count );
-                                        else {
-
-                                            // outside
-                                            if (updateRange.c2 > bbox.c2)
-                                                changedRange = new Range(worksheet.model, bbox.r1, updateRange.c1, bbox.r2, updateRange.c1);
-
-                                            // inside
-                                            else {
-                                                offset = bbox.c2 - updateRange.c2;
-                                                changedRange = new Range(worksheet.model, bbox.r1, updateRange.c1, bbox.r2, updateRange.c1 + offset - 1);
-                                            }
-                                        }
-                                    }
-
-                                    else if ((updateRange.c1 >= bbox.c1) && (updateRange.c1 <= bbox.c2)) {
-
-                                        // outside
-                                        if (updateRange.c2 > bbox.c2) {
-                                            offset = (bbox.c1 + 1 > updateRange.c1) ? 1 : 0;
-                                            changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, updateRange.c1 + offset - 1);
-                                        }
-
-                                        // inside
-                                        else {
-                                            offset = bbox.c2 + 1 - bbox.c1 - count;
-                                            if (offset <= 0)
-                                                offset = 1;
-                                            changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, bbox.c1 + offset - 1);
-                                        }
-                                    }
-                                }
                             }
                                 break;
                             case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
                                 // Range
-                                if (obj.isChart()) {
-                                    if ( (updateRange.r1 <= bbox.r1) && (updateRange.r2 >= bbox.r2) && (updateRange.c2 < bbox.c1) ) {
-                                        count = updateRange.c2 - updateRange.c1 + 1;
-                                        changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 - count, bbox.r2, bbox.c2 - count);
-                                    }
-                                }
+
                                 break;
 
                             case c_oAscDeleteOptions.DeleteRows:
@@ -3053,61 +2924,20 @@ function DrawingObjects() {
                                 else
                                     metrics = null;
 
-                                // range
-                                if (obj.isChart()) {
-                                    count = updateRange.r2 - updateRange.r1 + 1;
-
-                                    if (updateRange.r1 < bbox.r1) {
-
-                                        if (updateRange.r2 < bbox.r1)
-                                            changedRange = new Range(worksheet.model, bbox.r1 - count, bbox.c1 , bbox.r2 - count , bbox.c2 );
-                                        else {
-
-                                            // outside
-                                            if (updateRange.r2 >= bbox.r2)
-                                                changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 , bbox.c2);
-
-                                            // inside
-                                            else {
-                                                offset = bbox.r1 + 1 - updateRange.r2;
-                                                changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 + offset, bbox.c2);
-                                            }
-                                        }
-                                    }
-
-                                    else if ((updateRange.r1 >= bbox.r1) && (updateRange.r1 <= bbox.r2)) {
-
-                                        // outside
-                                        if (updateRange.r2 > bbox.r2) {
-                                            offset = (bbox.r1 + 1 > updateRange.r1) ? 1 : 0;
-                                            changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , updateRange.r1 + offset - 1, bbox.c2 );
-                                        }
-
-                                        // inside
-                                        else {
-                                            offset = bbox.r2 + 1 - bbox.r1 - count;
-                                            if (offset <= 0) offset = 1;
-                                            changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r1 + offset - 1, bbox.c2 );
-                                        }
-                                    }
-                                }
                             }
                                 break;
                             case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
                                 // Range
-                                if (obj.isChart()) {
-                                    if ( (updateRange.c1 <= bbox.c1) && (updateRange.c2 >= bbox.c2) && (updateRange.r2 < bbox.r1) ) {
-                                        count = updateRange.r2 - updateRange.r1 + 1;
-                                        changedRange = new Range(worksheet.model, bbox.r1 - count, bbox.c1, bbox.r2 - count, bbox.c2);
-                                    }
-                                }
+
                                 break;
                         }
                     }
 
                     // Normalize position
-                    if (metrics) {
-                        if (metrics.from.col < 0) {
+                    if (metrics)
+                    {
+                        if (metrics.from.col < 0)
+                        {
                             metrics.from.col = 0;
                             metrics.from.colOff = 0;
                         }
@@ -3135,58 +2965,27 @@ function DrawingObjects() {
                             metrics.to.row++;
                             metrics.to.rowOff = 0;
                         }
-                    }
 
-                    // Normalize range
-                    if (changedRange) {
-                        bbox = changedRange.getBBox0();
+                        obj.from.col = metrics.from.col;
+                        obj.from.colOff = metrics.from.colOff;
+                        obj.from.row = metrics.from.row;
+                        obj.from.rowOff = metrics.from.rowOff;
 
-                        var tmp;
-                        if (bbox.c1 > bbox.c2) {
-                            tmp = bbox.c1;
-                            bbox.c1 = bbox.c2;
-                            bbox.c2 = tmp;
-                        }
-                        if (bbox.r1 > bbox.r2) {
-                            tmp = bbox.r1;
-                            bbox.r1 = bbox.r2;
-                            bbox.r2 = tmp;
-                        }
-                        changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
-                    }
+                        obj.to.col = metrics.to.col;
+                        obj.to.colOff = metrics.to.colOff;
+                        obj.to.row = metrics.to.row;
+                        obj.to.rowOff = metrics.to.rowOff;
 
-                    if ( changedRange || metrics ) {
-
-                        if ( obj.isChart() && changedRange ) {
-                            obj.graphicObject.chart.range.intervalObject = changedRange;
-                            _this.calcChartInterval(obj.graphicObject.chart);
-                            obj.graphicObject.chart.rebuildSeries();
-                            obj.graphicObject.recalculate();
-                        }
-                        if (metrics) {
-                            obj.from.col = metrics.from.col;
-                            obj.from.colOff = metrics.from.colOff;
-                            obj.from.row = metrics.from.row;
-                            obj.from.rowOff = metrics.from.rowOff;
-
-                            obj.to.col = metrics.to.col;
-                            obj.to.colOff = metrics.to.colOff;
-                            obj.to.row = metrics.to.row;
-                            obj.to.rowOff = metrics.to.rowOff;
-                        }
-
-                        // Update graphic object
-                        History.TurnOff();
                         var coords = _this.coordsManager.calculateCoords(obj.from);
-                        obj.graphicObject.setPosition( pxToMm(coords.x), pxToMm(coords.y) );
-                        obj.graphicObject.recalculateTransform();
-                        obj.graphicObject.calculateTransformTextMatrix();
-                        History.TurnOn();
-                        _this.showDrawingObjects(true);
+                        obj.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
+                        obj.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y));
+                        obj.graphicObject.recalculate();
+                        bNeedRedraw = true;
                     }
                 }
-            }
-        }
+
+        //    },  []);
+        bNeedRedraw && _this.showDrawingObjects(true);
     };
 
     _this.moveRangeDrawingObject = function(oBBoxFrom, oBBoxTo, bResize) {

@@ -70,6 +70,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.chartObj = null;
     this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.lockType = c_oAscLockTypes.kLockTypeNone;
 };
 CChartSpace.prototype.recalcTransform = function()
 {

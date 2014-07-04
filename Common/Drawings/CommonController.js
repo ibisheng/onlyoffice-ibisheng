@@ -4485,6 +4485,27 @@ DrawingObjectsController.prototype =
         };
         this.drawingObjects.objectLocker.checkObjects(callback2);
     },
+    checkObjectsAndCallback: function(callback, args)
+    {
+        this.drawingObjects.objectLocker.reset();
+        var objects = this.getDrawingObjects();
+        for(var i = 0; i < objects.length; ++i)
+        {
+            this.drawingObjects.objectLocker.addObjectId(objects[i].Get_Id());
+        }
+        var _this = this;
+        var callback2 = function(bLock)
+        {
+            if(bLock)
+            {
+                callback.apply(_this, args);
+                _this.startRecalculate();
+                _this.recalculateCurPos();
+                _this.drawingObjects.sendGraphicObjectProps();
+            }
+        };
+        this.drawingObjects.objectLocker.checkObjects(callback2);
+    },
 
     setGraphicObjectPropsCallBack: function(props)
     {

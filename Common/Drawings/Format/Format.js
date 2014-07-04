@@ -8101,6 +8101,9 @@ CXfrm.prototype =
                 break;
             }
         }
+
+        if(type ===  historyitem_Xfrm_SetOffX || type === historyitem_Xfrm_SetOffY)
+            return this;
     }
 };
 
