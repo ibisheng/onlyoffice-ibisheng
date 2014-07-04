@@ -212,9 +212,9 @@ function Editor_Copy(api, bCut)
     document.body.style["-webkit-user-select"] = "text";
 	
 	var oldBackgroundcolor = document.body.style["background-color"];
-	var oldColor = document.body.style["color"];
+	//var oldColor = document.body.style["color"];
 	document.body.style["background-color"] = "transparent";
-	document.body.style["color"] = "transparent";
+	//document.body.style["color"] = "transparent";
 	
 	ElemToSelect.style.MozUserSelect = "all";
 	
@@ -293,7 +293,7 @@ function Editor_Copy(api, bCut)
         document.body.style["-webkit-user-select"] = "none";
 		
 		document.body.style["background-color"] = oldBackgroundcolor;
-		document.body.style["color"] = oldColor;
+		//document.body.style["color"] = oldColor;
 		
 		ElemToSelect.style.MozUserSelect = "none";
 
