@@ -3484,22 +3484,22 @@ var gUndoInsDelCellsFlag = true;
 						result[s] = checkComplexSymbols;
 					else
 					{
-					    if (arrLog[s] == Asc.ECustomFilter.customfilterEqual || arrLog[s] == Asc.ECustomFilter.customfilterNotEqual)//общие для числа и текста
+					    if (arrLog[s] == c_oAscCustomAutoFilter.equals || arrLog[s] == c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
 						{
 							val = val.toString();
 							filterVal = valLog[s].toString();
-							if (arrLog[s] == Asc.ECustomFilter.customfilterEqual)//equals
+							if (arrLog[s] == c_oAscCustomAutoFilter.equals)//equals
 							{
 								if(val == filterVal || valWithFormat == filterVal)
 									result[s] = true;
 							}
-							else if (arrLog[s] == Asc.ECustomFilter.customfilterNotEqual)//doesNotEqual
+							else if (arrLog[s] == c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
 							{
 								if(val != filterVal || valWithFormat != filterVal)
 									result[s] = true;
 							}
 						}
-					    else if (arrLog[s] == Asc.ECustomFilter.customfilterGreaterThan || arrLog[s] == Asc.ECustomFilter.customfilterGreaterThanOrEqual || arrLog[s] == Asc.ECustomFilter.customfilterLessThan || arrLog[s] == Asc.ECustomFilter.customfilterLessThanOrEqual)//только для чисел
+					    else if (arrLog[s] == c_oAscCustomAutoFilter.isGreaterThan || arrLog[s] == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || arrLog[s] == c_oAscCustomAutoFilter.isLessThan || arrLog[s] == c_oAscCustomAutoFilter.isLessThanOrEqualTo)//только для чисел
 						{
 							filterVal =  parseFloat(valLog[s]);
 							if(g_oFormatParser && g_oFormatParser.parse && g_oFormatParser.parse(valLog[s]) != null)
@@ -3510,26 +3510,26 @@ var gUndoInsDelCellsFlag = true;
 							{
 								switch (arrLog[s])
 								{
-								    case Asc.ECustomFilter.customfilterGreaterThan:
+								    case c_oAscCustomAutoFilter.isGreaterThan:
 										if(val > filterVal)//isGreaterThan
 											result[s] = true;
 										break;
-								    case Asc.ECustomFilter.customfilterGreaterThanOrEqual:
+								    case c_oAscCustomAutoFilter.isGreaterThanOrEqualTo:
 										if(val >= filterVal)//isGreaterThanOrEqualTo
 											result[s] = true;
 										break;
-								    case Asc.ECustomFilter.customfilterLessThan:
+								    case c_oAscCustomAutoFilter.isLessThan:
 										if(val < valLog[s])//isLessThan
 											result[s] = true;
 										break;
-								    case Asc.ECustomFilter.customfilterLessThanOrEqual:
+								    case c_oAscCustomAutoFilter.isLessThanOrEqualTo:
 										if(val <= filterVal)//isLessThanOrEqualTo
 											result[s] = true;
 										break;
 								}
 							}
 						}
-						else if(arrLog[s] == 7 || arrLog[s] == 8 || arrLog[s] == 9 || arrLog[s] == 10 || arrLog[s] == 11 || arrLog[s] == 12 || arrLog[s] == 13)//только для текста
+						else if(arrLog[s] == c_oAscCustomAutoFilter.beginsWith || arrLog[s] == c_oAscCustomAutoFilter.doesNotBeginWith || arrLog[s] == c_oAscCustomAutoFilter.endsWith || arrLog[s] == c_oAscCustomAutoFilter.doesNotEndWith || arrLog[s] == c_oAscCustomAutoFilter.contains || arrLog[s] == c_oAscCustomAutoFilter.doesNotContain)//только для текста
 						{
 							
 							filterVal = valLog[s];
@@ -3539,7 +3539,7 @@ var gUndoInsDelCellsFlag = true;
 								var position;
 								switch (arrLog[s])
 								{
-									case 7:
+									case c_oAscCustomAutoFilter.beginsWith:
 										if(type == 1)
 										{
 											//if(newVal.search("?") || newVal.search("*"))
@@ -3547,7 +3547,7 @@ var gUndoInsDelCellsFlag = true;
 												result[s] = true;
 										}
 										break;
-									case 8: 
+									case c_oAscCustomAutoFilter.doesNotBeginWith: 
 										if(type == 1)
 										{
 											if(newVal.search(filterVal) != 0)//doesNotBeginWith
@@ -3556,7 +3556,7 @@ var gUndoInsDelCellsFlag = true;
 										else
 											result[s] = true;
 										break;
-									case 9: 
+									case c_oAscCustomAutoFilter.endsWith: 
 										position = newVal.length - filterVal.length;
 										if(type == 1)
 										{
@@ -3564,7 +3564,7 @@ var gUndoInsDelCellsFlag = true;
 												result[s] = true;
 										}
 										break;
-									case 10: 
+									case c_oAscCustomAutoFilter.doesNotEndWith: 
 										position = newVal.length - filterVal.length;
 										if(type == 1)
 										{
@@ -3574,14 +3574,14 @@ var gUndoInsDelCellsFlag = true;
 										else
 											result[s] = true;
 										break;
-									case 11: 
+									case c_oAscCustomAutoFilter.contains: 
 										if(type == 1)
 										{
 											if(newVal.search(filterVal) != -1)//contains
 												result[s] = true;
 										}
 										break;
-									case 12: 
+									case c_oAscCustomAutoFilter.doesNotContain: 
 										if(type == 1)
 										{
 											if(newVal.search(filterVal) == -1)//doesNotContain

@@ -271,12 +271,12 @@ var c_oAscLayoutPageType = {
 };
 
  var c_oAscCustomAutoFilter = {
-	equals: 1, 
-	doesNotEqual: 6,
+	equals: 1,
 	isGreaterThan: 2, 
 	isGreaterThanOrEqualTo: 3, 
 	isLessThan: 4, 
 	isLessThanOrEqualTo: 5,
+    doesNotEqual: 6,
 	beginsWith: 7, 
 	doesNotBeginWith: 8, 
 	endsWith: 9, 
