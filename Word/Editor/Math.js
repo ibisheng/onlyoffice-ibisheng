@@ -59,7 +59,6 @@ function ParaMath()
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
 
 
-
     this.MathPr =
     {
         naryLim:    NARY_UndOvr,
@@ -381,7 +380,8 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Apply_TextPr
 
-        this.Root.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+        var content = this.GetSelectContent().Content;
+        content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
 
     },
 
@@ -954,21 +954,22 @@ ParaMath.prototype =
         tPrp.Merge(this.DefaultTextPr);
         tPrp.Merge(oWPrp);
 
-        var FSize = tPrp.FontSize;
+        //var FSize = tPrp.FontSize;
 
         if(argSize == -1)
         {
             //FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-            FSize = 0.76*FSize;
-
+            tPrp.FontSize   = 0.76*tPrp.FontSize;
+            tPrp.FontSizeCS = 0.76*tPrp.FontSizeCS;
         }
         else if(argSize == -2)
         {
             //FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-            FSize = 0.76*0.855*FSize;
+            tPrp.FontSize   = 0.76*0.855*tPrp.FontSize;
+            tPrp.FontSizeCS = 0.76*0.855*tPrp.FontSizeCS;
         }
 
-        tPrp.FontSize = FSize;
+        //tPrp.FontSize = FSize;
 
         oWPrp.Merge(tPrp);
 
@@ -1254,57 +1255,61 @@ ParaMath.prototype =
 
         // Проверяем, попали ли мы в формулу
 
-        var Dx = this.Root.size.width;
-        var D = SearchPos.X - SearchPos.CurX;
-
-        var startDx = Math.abs(D),
-            endDx = Math.abs(D - Dx);
-
-        var Diff = startDx < endDx ? startDx : endDx;
-
-        var CurX = SearchPos.CurX;
-
-        if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
+        if ( EndPos >= 1 )
         {
-            if ( D >= - 0.001 && D <= Dx + 0.001 )
+            var Dx = this.Root.size.width;
+            var D = SearchPos.X - SearchPos.CurX;
+
+            var startDx = Math.abs(D),
+                endDx = Math.abs(D - Dx);
+
+            var Diff = startDx < endDx ? startDx : endDx;
+
+            var CurX = SearchPos.CurX;
+
+            if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
             {
-                var X = SearchPos.X,
-                    Y = SearchPos.Y;
+                if ( D >= - 0.001 && D <= Dx + 0.001 )
+                {
+                    var X = SearchPos.X,
+                        Y = SearchPos.Y;
 
-                SearchPos.X -= this.X;
-                SearchPos.Y -= this.Y;
-
-
-
-                this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-
-                SearchPos.X = X;
-                SearchPos.Y = Y;
+                    SearchPos.X -= this.X;
+                    SearchPos.Y -= this.Y;
 
 
-                //////////
 
-                SearchPos.InText = true;
-                SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
+                    this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+
+                    SearchPos.X = X;
+                    SearchPos.Y = Y;
+
+
+                    //////////
+
+                    SearchPos.InText = true;
+                    SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
+
+                }
+                else if(startDx < endDx)
+                {
+                    this.Get_StartPos(SearchPos.Pos, Depth);
+                    SearchPos.DiffX = Diff;
+                }
+                else
+                {
+                    this.Get_EndPos(false, SearchPos.Pos, Depth);
+                    SearchPos.DiffX = Diff - 0.0015;
+
+                }
+
+                Result = true;
 
             }
-            else if(startDx < endDx)
-            {
-                this.Get_StartPos(SearchPos.Pos, Depth);
-                SearchPos.DiffX = Diff;
-            }
-            else
-            {
-                this.Get_EndPos(false, SearchPos.Pos, Depth);
-                SearchPos.DiffX = Diff - 0.0015;
 
-            }
-
-            Result = true;
-
+            SearchPos.CurX = CurX + Dx;
         }
 
-        SearchPos.CurX = CurX + Dx;
 
         return Result;
     },
@@ -1408,7 +1413,7 @@ ParaMath.prototype =
 
         // Сделать для случая, когда формула будет занимать несколько строк
 
-        this.Root.Get_EndPos(false, SearchPos, Depth);
+        this.Root.Get_EndPos(false, SearchPos.Pos, Depth);
 
     },
 
@@ -1418,7 +1423,7 @@ ParaMath.prototype =
 
         // Сделать для случая, когда формула будет занимать несколько строк, переделать
 
-        this.Root.Get_StartPos(SearchPos, Depth);
+        this.Root.Get_StartPos(SearchPos.Pos, Depth);
 
     },
 

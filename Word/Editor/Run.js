@@ -29,7 +29,7 @@ function ParaRun(Paragraph, bMathRun)
     this.YOffset     = 0; // смещение по Y
 
     this.NeedAddNumbering = false;  // Нужно ли добавлять нумерацию (true - нужно, false - не нужно, первый элемент,
-    // у которого будет false и будет элемент с нумерацией)
+                                    // у которого будет false и будет элемент с нумерацией)
 
     this.Lines       = []; // Массив CParaRunLine
     this.Lines[0]    = new CParaRunLine();
@@ -97,7 +97,7 @@ ParaRun.prototype =
 
         NewRun.Set_Pr( this.Pr.Copy() );
 
-        if(this.Type == para_Math_Run || this.Type == para_Math_Placeholder)
+        if(this.Type == para_Math_Run)
         {
             NewRun.MathPrp = this.MathPrp.Copy();
         }
@@ -639,6 +639,8 @@ ParaRun.prototype =
                 case para_Tab:
                 case para_End:
                 case para_NewLine:
+                case para_Math_Text:
+                case para_Math_Placeholder:
                 {
                     X += Item.WidthVisible;
                     break;
@@ -651,11 +653,11 @@ ParaRun.prototype =
                     X += Item.WidthVisible;
                     break;
                 }
-                case para_Math_Text:
+                /*case para_Math_Text:
                 {
                     X += Item.WidthVisible;
                     break;
-                }
+                }*/
             }
         }
 
@@ -671,7 +673,16 @@ ParaRun.prototype =
 
                 if ( true === UpdateTarget )
                 {
-                    var CurTextPr = this.Get_CompiledPr(false);
+                    var CurTextPr;
+
+                    if(this.Type == para_Math_Run)
+                    {
+                        CurTextPr = this.Get_CompiledPr(true);
+                        this.Parent.ParaMath.ApplyArgSize(CurTextPr, this.Parent.argSize);
+                    }
+                    else
+                        CurTextPr = this.Get_CompiledPr(false);
+
                     g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
                     g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
                     var Height    = g_oTextMeasurer.GetHeight();
@@ -764,7 +775,18 @@ ParaRun.prototype =
 
             if ( true === ReturnTarget )
             {
-                var CurTextPr = this.Get_CompiledPr(false);
+
+                var CurTextPr;
+
+                if(this.Type == para_Math_Run)
+                {
+                    CurTextPr = this.Get_CompiledPr(true);
+                    this.Parent.ParaMath.ApplyArgSize(CurTextPr, this.Parent.argSize);
+                }
+                else
+                    CurTextPr = this.Get_CompiledPr(false);
+
+
                 g_oTextMeasurer.SetTextPr( CurTextPr, this.Paragraph.Get_Theme() );
                 g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
 
@@ -1157,7 +1179,15 @@ ParaRun.prototype =
         // для Math_Para_Pun argSize учитывается, когда мержатся текстовые настройки в Internal_Compile_Pr()
         if ( undefined !== this.Paragraph && null !== this.Paragraph )
         {
-            var TextPr = this.Get_CompiledPr(false);
+            var TextPr;
+            if(this.Type === para_Math_Run)
+            {
+                TextPr = this.Get_CompiledPr(true);
+                this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
+            }
+            else
+                TextPr = this.Get_CompiledPr(false);
+
             TextPr.Document_CreateFontMap( Map, this.Paragraph.Get_Theme().themeElements.fontScheme);
             var Count = this.Content.length;
             for (var Index = 0; Index < Count; Index++)
@@ -3594,7 +3624,7 @@ ParaRun.prototype =
             Result = true;
         }
 
-        if (this.Type == para_Math_Run || this.Type == para_Math_Placeholder)
+        if (this.Type == para_Math_Run)
         {
             var Diff = SearchPos.X - SearchPos.CurX;
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
@@ -4364,31 +4394,38 @@ ParaRun.prototype =
 
         if(this.Type == para_Math_Run)
         {
+            // Not Apply ArgSize !
             var oWPrp = this.Parent.Get_Default_TPrp();
             TextPr.Merge(oWPrp);
-            TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
 
-            if(TXT_NORMAL !== this.Math_GetTypeText()) // math text
+            if(this.IsPlaceholder())
             {
-                var MPrp = this.MathPrp.getTxtPrp();
-                TextPr.Merge(MPrp); // bold, italic
+                /*oWPrp = this.Parent.Get_Default_TPrp();
+                TextPr.Merge(oWPrp);*/
+                TextPr.Merge(this.Parent.GetCtrPrp());
+                TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
+
+                // special for placeholder
+
+                TextPr.Italic = false;
+                TextPr.Bold   = false;
+
+                //this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
             }
+            else
+            {
+                /*oWPrp = this.Parent.Get_Default_TPrp();
+                TextPr.Merge(oWPrp);*/
+                TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
 
-            this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
-        }
-        else if(this.Type == para_Math_Placeholder)
-        {
-            var oWPrp = this.Parent.Get_Default_TPrp();
-            TextPr.Merge(oWPrp);
-            TextPr.Merge(this.Parent.GetCtrPrp());
-            TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
+                if(!this.IsNormalText()) // math text
+                {
+                    var MPrp = this.MathPrp.getTxtPrp();
+                    TextPr.Merge(MPrp); // bold, italic
+                }
 
-            // special for placeholder
-
-            TextPr.Italic = false;
-            TextPr.Bold   = false;
-
-            this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
+               //this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
+            }
         }
         else
         {
@@ -4601,10 +4638,14 @@ ParaRun.prototype =
     Split_Run : function(Pos)
     {
         // Создаем новый ран
-        var NewRun = new ParaRun(this.Paragraph);
+        var NewRun = new ParaRun(this.Paragraph, this.Type == para_Math_Run);
 
         // Копируем настройки
         NewRun.Set_Pr( this.Pr.Copy() );
+
+        if(this.Type == para_Math_Run)
+            NewRun.Set_MathPrp(this.MathPrp.Copy());
+
 
         var OldCrPos = this.State.ContentPos;
         var OldSSPos = this.State.Selection.StartPos;
@@ -4689,19 +4730,21 @@ ParaRun.prototype =
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
     Apply_Pr : function(TextPr)
     {
-        /*if(this.typeObj == MATH_PARA_RUN)
-        {
-            this.MathPrp.Apply_Pr(TextPr);
-            this.Recalc_CompiledPr(true);
-
-            return;
-        }*/
-
         if ( undefined != TextPr.Bold )
-            this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
+        {
+            if(this.Type == para_Math_Run && !this.IsNormalText())
+                this.Apply_StyleBold(null === TextPr.Bold ? undefined : TextPr.Bold);
+            else
+                this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
+        }
 
         if ( undefined != TextPr.Italic )
-            this.Set_Italic( null === TextPr.Italic ? undefined : TextPr.Italic );
+        {
+            if(this.Type == para_Math_Run && !this.IsNormalText())
+                this.Apply_StyleItalic(null === TextPr.Italic ? undefined : TextPr.Italic);
+            else
+                this.Set_Italic( null === TextPr.Italic ? undefined : TextPr.Italic );
+        }
 
         if ( undefined != TextPr.Strikeout )
             this.Set_Strikeout( null === TextPr.Strikeout ? undefined : TextPr.Strikeout );
@@ -7232,9 +7275,22 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     var Y = y + this.size.ascent;
 
     var oWPrp = this.Get_CompiledPr(true);
+    this.Parent.ParaMath.ApplyArgSize(oWPrp, this.Parent.argSize);
 
-    if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
+    if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
+    {
         oWPrp.Italic = false;
+        oWPrp.Bold   = false;
+
+        // TO DO
+        // реализовать получше
+        // пока так
+
+        var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
+
+        oWPrp.FontFamily  = defaultTxtPrp.FontFamily;
+        oWPrp.RFonts.Set_All(defaultTxtPrp.FontFamily.Name, defaultTxtPrp.FontFamily.Index);
+    }
 
     pGraphics.SetFont(oWPrp);
     pGraphics.b_color1(0,0,0,255);
@@ -7245,10 +7301,16 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 }
 ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, RecalcInfo)
 {
-    if(this.IsPlaceholder())
-        this.Type = para_Math_Placeholder;
-    else
-        this.Type = para_Math_Run;
+    // пересчет элементов контента в Run
+    // Recalculate_MeasureContent
+
+
+    // ParaText (ParagraphContent.js)
+    // для настройки TextPr
+    // Measure
+
+    // FontClassification.js
+    // Get_FontClass
 
 
     var RangeStartPos = 0;
@@ -7266,9 +7328,19 @@ ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, Recal
 
 
     var oWPrp = this.Get_CompiledPr(true);
+    this.Parent.ParaMath.ApplyArgSize(oWPrp, this.Parent.argSize);
 
-    if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
+    if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
+    {
         oWPrp.Italic = false;
+        oWPrp.Bold   = false;
+
+
+        var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
+
+        oWPrp.FontFamily  = defaultTxtPrp.FontFamily;
+        oWPrp.RFonts.Set_All(defaultTxtPrp.FontFamily.Name, defaultTxtPrp.FontFamily.Index);
+    }
 
     g_oTextMeasurer.SetFont(oWPrp);
 
@@ -7292,8 +7364,9 @@ ParaRun.prototype.Math_Recalculate = function(Parent, Paragraph, oMeasure, Recal
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
     // TODO
-    // поставить заглушку на плейсхолдер, когда при перемещении всегда будет отрисовываться селкт на плейсхолдере
+    // поставить заглушку на плейсхолдер, когда при перемещении всегда будет отрисовываться селект на плейсхолдере
     var runPrp = this.Get_CompiledPr(true);
+    this.Parent.ParaMath.ApplyArgSize(runPrp, this.Parent.argSize);
 
     var sizeCursor = runPrp.FontSize*g_dKoef_pt_to_mm;
 
@@ -7315,11 +7388,66 @@ ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 }
 ParaRun.prototype.Set_MathPrp = function(props)
 {
+    //History.Add( this, { Type : historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue } );
     this.MathPrp.setMathProps(props);
 }
-ParaRun.prototype.Math_GetTypeText = function()
+ParaRun.prototype.Apply_StyleBold = function(Value)
 {
-    return this.MathPrp.getTypeText();
+    if(Value == undefined)
+        Value = false;
+
+
+    if(Value == true)
+    {
+        if(this.MathPrp.sty == STY_ITALIC)
+            this.Apply_Style(STY_BI);
+        else if(this.MathPrp.sty == STY_PLAIN)
+            this.Apply_Style(STY_BOLD);
+    }
+    else if(Value == false)
+    {
+        if(this.MathPrp.sty == STY_BI)
+            this.Apply_Style(STY_ITALIC);
+        else if(this.MathPrp.sty == STY_BOLD)
+            this.Apply_Style(STY_PLAIN);
+    }
+}
+ParaRun.prototype.Apply_StyleItalic = function(Value)
+{
+    if(Value == undefined)
+        Value = true;
+
+
+    if(Value == true)
+    {
+        if(this.MathPrp.sty == STY_BOLD)
+            this.Apply_Style(STY_BI);
+        else if(this.MathPrp.sty == STY_PLAIN)
+            this.Apply_Style(STY_ITALIC);
+    }
+    else if(Value == false)
+    {
+        if(this.MathPrp.sty == STY_BI)
+            this.Apply_Style(STY_BOLD);
+        else if(this.MathPrp.sty == STY_ITALIC)
+            this.Apply_Style(STY_PLAIN);
+    }
+}
+ParaRun.prototype.Apply_Style = function(Value)
+{
+    if(Value !== this.MathPrp.sty)
+    {
+        var OldValue = this.MathPrp.sty;
+        this.MathPrp = Value;
+
+        History.Add( this, { Type : historyitem_Math_Style, New : Value, Old : OldValue } );
+
+        this.Recalc_CompiledPr(true);
+    }
+}
+ParaRun.prototype.IsNormalText = function()
+{
+    return this.MathPrp.nor == true;
 }
 ParaRun.prototype.getPropsForWrite = function()
 {
@@ -7334,9 +7462,13 @@ ParaRun.prototype.Math_SetGaps = function(Parent, Paragraph, RecalcInfo)
     this.Paragraph = Paragraph;
 
     var oWPrp = this.Get_CompiledPr(true);
+    this.Parent.ParaMath.ApplyArgSize(oWPrp, this.Parent.argSize);
 
-    if(TXT_NORMAL !== this.Math_GetTypeText()) // выставляем false, чтобы не применился наклон к спец символам
+    /*if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
+    {
         oWPrp.Italic = false;
+        oWPrp.Bold   = false;
+    }*/
 
     g_oTextMeasurer.SetFont(oWPrp);
 

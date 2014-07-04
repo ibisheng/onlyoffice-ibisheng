@@ -33,6 +33,7 @@
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
+var historyitem_Math_Style                     =  3; // Меняем стиль MathPr
 
 
 
@@ -614,6 +615,11 @@ CMathRunPrp.prototype =
 
 function CMPrp()
 {
+    this.sty      = STY_ITALIC;
+    this.scr      = TXT_ROMAN;
+
+    this.nor      = false;
+
     this.aln      = false;
     this.brk      = false;
     this.lit      = false;
@@ -627,16 +633,16 @@ function CMPrp()
     // буквы берутся обычные, не специальные для Cambria Math : то есть как для TXT_NORMAL
     // отличие от TXT_NORMAL w:rPrp в этом случае не учитываются !
 
-    this.typeText = TXT_ROMAN;
-    this.italic   = true;
-    this.bold     = false;
+    //this.typeText = TXT_ROMAN;
+    //this.italic   = true;
+    //this.bold     = false;
     //this.nor      = false;
     //this.plain    = false;
 
 }
 CMPrp.prototype =
 {
-    Merge:  function(mPrp)
+    /*Merge:  function(mPrp)
     {
         // выравнивание
         this.aln      = mPrp.aln;
@@ -658,8 +664,8 @@ CMPrp.prototype =
             obj = true;
         else if(prp === 0 || prp === false)
             obj = false;
-    },
-    getProps: function()
+    },*/
+    /*getProps: function()
     {
         var props =
         {
@@ -674,15 +680,36 @@ CMPrp.prototype =
         };
 
         return props;
-    },
+    },*/
     setMathProps: function(props)
     {
-        this.SetBProp(this.aln, props.aln);
-        this.SetBProp(this.brk, props.brk);
-        this.SetBProp(this.lit, props.lit);
+        if(props.aln === true || props.aln == false)
+            this.aln = props.aln;
 
-        // если приходит несколько параметров style из xml, то запоминается последний
-        if(props.sty === STY_ITALIC)
+        if(props.brk === true || props.brk == false)
+            this.brk = props.brk;
+
+        if(props.lit === true || props.lit == false)
+            this.lit = props.lit;
+
+        if(props.nor === true || props.nor == false)
+            this.nor = props.nor;
+
+
+        if(props.sty !== null && props.sty !== undefined)
+            this.sty = props.sty;
+
+        // TXT_DOUBLE_STRUCK        U+1D538 - U+1D56B
+        // TXT_MONOSPACE            U+1D670 - U+1D6A3
+        // TXT_FRAKTUR              U+1D504 - U+1D537
+        // TXT_SANS_SERIF           U+1D608 - U+1D63B
+        // TXT_SCRIPT               U+1D49C - U+1D4CF
+
+        if(props.scr !== null && props.scr !== undefined)
+            this.scr = props.scr;
+
+
+        /*if(props.sty === STY_ITALIC)
             this.italic = true;
         else if(props.sty === STY_BI)
         {
@@ -700,11 +727,7 @@ CMPrp.prototype =
                                         // отличие от TXT_NORMAL w:rPrp не учитываются !
         }
 
-        // TXT_DOUBLE_STRUCK        U+1D538 - U+1D56B
-        // TXT_MONOSPACE            U+1D670 - U+1D6A3
-        // TXT_FRAKTUR              U+1D504 - U+1D537
-        // TXT_SANS_SERIF           U+1D608 - U+1D63B
-        // TXT_SCRIPT               U+1D49C - U+1D4CF
+
 
         if(typeof(props.scr)!=="undefined" && props.scr !== null)
             this.typeText = props.scr;
@@ -712,22 +735,29 @@ CMPrp.prototype =
 
         if(props.nor)
             this.typeText = TXT_NORMAL;
-
+*/
     },
-    Apply_Pr: function(TextPr)
+    /*Apply_Pr: function(TextPr)
     {
         if(TextPr.Bold !== null && typeof(TextPr.Bold) !== "undefined")
             this.bold = TextPr.Bold;
 
         if(TextPr.Italic !== null && typeof(TextPr.Italic) !== "undefined")
             this.italic = TextPr.Italic;
-
-    },
+    },*/
     getPropsForWrite: function()
     {
-        var props = {};
+        var props =
+        {
+            aln:    this.aln,
+            brk:    this.brk,
+            lit:    this.lit,
+            nor:    this.nor,
+            sty:    this.sty,
+            scr:    this.scr
+        };
 
-        var Italic     = this.italic && !this.bold,
+        /*var Italic     = this.italic && !this.bold,
             BoldItalic = this.italic && this.bold,
             Bold       = this.bold && !this.italic,
             Plain      = this.plain;
@@ -757,35 +787,16 @@ CMPrp.prototype =
         if(this.lit)
             props.lit = 1;
 
-        props.scr = this.typeText;
+        props.scr = this.typeText;*/
 
         return props;
-    },
-    getTypeText: function()
-    {
-        return this.typeText;
-    },
-    getTxtSettings: function()
-    {
-        var type = this.typeText;
-
-        if(type == TXT_ROMAN && this.italic == false) // если MATH TEXT и не курсив, то подменяем на NORMAL TEXT
-            type = TXT_NORMAL;
-
-        var settings =
-        {
-            type:   type,
-            lit:    this.lit
-        };
-
-        return settings;
     },
     getTxtPrp: function()
     {
         var textPrp = new CTextPr();
 
-        textPrp.Italic = this.italic;
-        textPrp.Bold = this.bold;
+        textPrp.Italic = this.sty == STY_BI || this.sty == STY_ITALIC;
+        textPrp.Bold   = this.sty == STY_BI || this.sty == STY_BOLD;
 
         return textPrp;
     },
@@ -797,10 +808,8 @@ CMPrp.prototype =
         NewMPrp.brk      = this.brk;
         NewMPrp.lit      = this.lit;
         NewMPrp.nor      = this.nor;
-        NewMPrp.typeText = this.typeText;
-        NewMPrp.italic   = this.italic;
-        NewMPrp.bold     = this.bold;
-        NewMPrp.plain    = this.plain;
+        NewMPrp.typeText = this.sty;
+        NewMPrp.italic   = this.scr;
         
         return NewMPrp;
     }
@@ -4900,18 +4909,16 @@ CMathContent.prototype =
     Get_StartPos: function(ContentPos, Depth)
     {
         ContentPos.Update( 0, Depth );
-        Depth++;
 
-        this.content[0].Get_StartPos(ContentPos, Depth);
+        this.content[0].Get_StartPos(ContentPos, Depth + 1);
     },
     Get_EndPos: function(BehindEnd, ContentPos, Depth)
     {
         var len = this.content.length - 1;
         ContentPos.Update(len, Depth);
-        Depth++;
 
         if(len > 0)
-            this.content[len].Get_EndPos(BehindEnd, ContentPos, Depth);
+            this.content[len].Get_EndPos(BehindEnd, ContentPos, Depth + 1);
     },
     Get_Id : function()
     {
@@ -5194,22 +5201,60 @@ CMathContent.prototype =
                 var StartPos = this.SelectStartPos;
                 var EndPos   = this.SelectEndPos;
 
-                if(StartPos > EndPos)
+                var NewRuns;
+                var LRun, CRun, RRun;
+
+                if(StartPos == EndPos)
                 {
-                    var temp = StartPos;
-                    EndPos = StartPos;
-                    StartPos = temp;
+                    NewRuns = this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, false);
+
+                    LRun = NewRuns[0];
+                    CRun = NewRuns[1];
+                    RRun = NewRuns[2];
+
+                    var CRunPos = StartPos;
+                    var Pos;
+
+                    if(LRun !== null)
+                    {
+                        Pos = StartPos + 1;
+                        History.Add(this, {Type: historyitem_Math_AddItem, Pos: Pos, PosEnd: Pos+1, Items: [CRun]});
+                        this.content.splice(Pos, 0, CRun);
+                        CRunPos = Pos + 1;
+                    }
+
+                    if(RRun !== null)
+                    {
+                        Pos = CRunPos + 1;
+                        History.Add(this, {Type: historyitem_Math_AddItem, Pos: Pos, PosEnd: Pos+1, Items: [RRun]});
+                        this.content.splice(Pos, 0, RRun);
+                    }
+
+                    this.CurPos         = CRunPos;
+                    this.SelectStartPos = CRunPos;
+                    this.SelectEndPos   = CRunPos;
+                }
+                else
+                {
+                    if(StartPos > EndPos)
+                    {
+                        var temp = StartPos;
+                        EndPos = StartPos;
+                        StartPos = temp;
+                    }
+
+                    for(var i = StartPos; i <= EndPos; i++)
+                    {
+                        var elem = this.content[i];
+
+                        if( elem.Type == para_Math_Composition)
+                            elem.Apply_TextPr( TextPr, IncFontSize, true );
+                        else if(elem.Type == para_Math_Run)
+                            elem.Apply_TextPr( TextPr, IncFontSize, false );
+                    }
                 }
 
-                for(var i = StartPos; i <= EndPos; i++)
-                {
-                    var elem = this.content[i];
 
-                    if( elem.Type == para_Math_Composition)
-                        elem.Apply_TextPr( TextPr, IncFontSize, true );
-                    else if(elem.Type == para_Math_Run)
-                        elem.Apply_TextPr( TextPr, IncFontSize, false );
-                }
 
                 /*if ( StartPos === EndPos )
                 {

@@ -109,57 +109,126 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if(this.Type === para_Math_Placeholder || this.bJDraw)
+        if(this.Type === para_Math_Placeholder || this.bJDraw || this.Parent.MathPrp.nor)
             return code;
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
             bSmall = (code > 0x0060 && code < 0x007b),
             bDigit = (code > 0x002F && code < 0x003A);
 
-        var Scr = this.Parent.Math_GetTypeText();
+        var bCapGreek   = (code > 0x0390 && code < 0x03AA ),
+            bSmallGreek = (code > 0x03B0 && code < 0x03CA);
+
+        var Scr = this.Parent.MathPrp.scr,
+            Sty = this.Parent.MathPrp.sty;
 
         // Mathematical Alphanumeric Characters
         // http://www.w3.org/TR/2014/REC-xml-entity-names-20140410/Overview.html#alphabets
 
         if(Scr == TXT_ROMAN)
         {
-            var bCapGreek = (code > 0x0390 && code < 0x03AA ),
-                bSmallGreek = (code > 0x03B0 && code < 0x03CA);
+            if(Sty == STY_ITALIC)
+            {
+                if(code == 0x68)            // h
+                    code = 0x210E;
+                else if(bCapitale)
+                    code  = code + 0x1D3F3;
+                else if(bSmall)
+                    code  = code + 0x1D3ED;
+                else if(code == 0x131)       // "i" without dot
+                    code = 0x1D6A4;
+                else if(code == 0x237)      // "j" without dot
+                    code = 0x1D6A5;
+                else if(code == 0x3F4)      // Capital THETA special
+                    code = 0x1D6F3;
+                else if(code == 0x2207)     // Capital NABLA
+                    code = 0x1D6FB;
+                else if(bCapGreek)
+                    code = code + 0x1D351;
+                else if(bSmallGreek)
+                    code = code + 0x1D34B;
+                else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
+                    code = 0x1D715;
+                else if(code == 0x3F5)      //  small EPSILON
+                    code = 0x1D716;
+                else if(code == 0x3D1)      //  small THETA
+                    code = 0x1D717;
+                else if(code == 0x3F0)      //  small KAPPA
+                    code = 0x1D718;
+                else if(code == 0x3D5)      //  small PHI
+                    code = 0x1D719;
+                else if(code == 0x3F1)      //  small RHO
+                    code = 0x1D71A;
+                else if(code == 0x3D6)      //  small PI
+                    code = 0x1D71B;
 
-            if(code == 0x68)            // h
-                code = 0x210E;
-            else if(bCapitale)
-                code  = code + 0x1D3F3;
-            else if(bSmall)
-                code  = code + 0x1D3ED;
-            else if(code == 0x3F4)      // Capital THETA special
-                code = 0x1D6F3;
-            else if(code == 0x2207)     // Capital NABLA
-                code = 0x1D6FB;
-            else if(bCapGreek)
-                code = code + 0x1D351;
-            else if(bSmallGreek)
-                code = code + 0x1D34B;
-            else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
-                code = 0x1D715;
-            else if(code == 0x3F5)      //  small EPSILON
-                code = 0x1D716;
-            else if(code == 0x3D1)      //  small THETA
-                code = 0x1D717;
-            else if(code == 0x3F0)      //  small KAPPA
-                code = 0x1D718;
-            else if(code == 0x3D5)      //  small PHI
-                code = 0x1D719;
-            else if(code == 0x3F1)      //  small RHO
-                code = 0x1D71A;
-            else if(code == 0x3D6)      //  small PI
-                code = 0x1D71B;
-
-
-            if(code == 0x131)           // "i" without dot
-                code = 0x1D6A4;
-            else if(code == 0x237)      // "j" without dot
-                code = 0x1D6A5;
+            }
+            else if(Sty == STY_BI)
+            {
+                if(bCapitale)
+                    code = code + 0x1D427;
+                else if(bSmall)
+                    code = code + 0x1D421;
+                else if(bDigit)
+                    code  = code + 0x1D79E;
+                else if(code == 0x3F4)      // Capital THETA special
+                    code = 0x1D72D;
+                else if(code == 0x2207)     // Capital NABLA
+                    code = 0x1D735;
+                else if(bCapGreek)
+                    code = code + 0x1D38B;
+                else if(bSmallGreek)
+                    code = code + 0x1D385;
+                else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
+                    code = 0x1D74F;
+                else if(code == 0x3F5)      //  small EPSILON
+                    code = 0x1D750;
+                else if(code == 0x3D1)      //  small THETA
+                    code = 0x1D751;
+                else if(code == 0x3F0)      //  small KAPPA
+                    code = 0x1D752;
+                else if(code == 0x3D5)      //  small PHI
+                    code = 0x1D753;
+                else if(code == 0x3F1)      //  small RHO
+                    code = 0x1D754;
+                else if(code == 0x3D6)      //  small PI
+                    code = 0x1D755;
+            }
+            else if(Sty == STY_BOLD)
+            {
+                if(bCapitale)
+                    code = code + 0x1D3BF;
+                else if(bSmall)
+                    code = code + 0x1D3B9;
+                else if(bDigit)
+                    code  = code + 0x1D79E;
+                else if(code == 0x3F4)      // Capital THETA special
+                    code = 0x1D6B9;
+                else if(code == 0x2207)     // Capital NABLA
+                    code = 0x1D6C1;
+                else if(bCapGreek)
+                    code = code + 0x1D317;
+                else if(bSmallGreek)
+                    code = code + 0x1D311;
+                else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
+                    code = 0x1D6DB;
+                else if(code == 0x3F5)      //  small EPSILON
+                    code = 0x1D6DC;
+                else if(code == 0x3D1)      //  small THETA
+                    code = 0x1D6DD;
+                else if(code == 0x3F0)      //  small KAPPA
+                    code = 0x1D6DE;
+                else if(code == 0x3D5)      //  small PHI
+                    code = 0x1D6DF;
+                else if(code == 0x3F1)      //  small RHO
+                    code = 0x1D6E0;
+                else if(code == 0x3D6)      //  small PI
+                    code = 0x1D6E1;
+                else if(code == 0x3DC)      //  CAPITAL DIGAMMA
+                    code = 0x1D7CA;
+                else if(code == 0x3DD)      //  SMALL DIGAMMA
+                    code = 0x1D7CB;
+            }
         }
         else if(Scr == TXT_DOUBLE_STRUCK)
         {
@@ -247,62 +316,159 @@ CMathText.prototype =
             else if(bSmall)
                 code  = code + 0x1D629;
             else if(bDigit)
-                code = code + 0x1D7C6;
+                code  = code + 0x1D7C6;
         }
         else if(Scr == TXT_FRAKTUR)
         {
-            if(code == 0x43)        // C
-                code = 0x212D;
-            else if(code == 0x48)   // H
-                code = 0x210C;
-            else if(code == 0x49)   // I
-                code = 0x2111;
-            else if(code == 0x52)   // R
-                code = 0x211C;
-            else if(code == 0x5A)   // Z
-                code = 0x2128;
-            else if(bCapitale)
-                code = code + 0x1D4C3;
-            else if(bSmall)
-                code = code + 0x1D4BD;
+            if(Sty == STY_BOLD ||Sty == STY_BI)
+            {
+                if(bCapitale)
+                    code = code + 0x1D52B;
+                else if(bSmall)
+                    code = code + 0x1D525;
+            }
+            else
+            {
+                if(code == 0x43)        // C
+                    code = 0x212D;
+                else if(code == 0x48)   // H
+                    code = 0x210C;
+                else if(code == 0x49)   // I
+                    code = 0x2111;
+                else if(code == 0x52)   // R
+                    code = 0x211C;
+                else if(code == 0x5A)   // Z
+                    code = 0x2128;
+                else if(bCapitale)
+                    code = code + 0x1D4C3;
+                else if(bSmall)
+                    code = code + 0x1D4BD;
+            }
+
         }
         else if(Scr == TXT_SANS_SERIF)
         {
-            if(bCapitale)
-                code = code + 0x1D5C7;
-            else if(bSmall)
-                code = code + 0x1D5C1;
-            else if(bDigit)
-                code = code + 0x1D7B2;
+            if(Sty == STY_ITALIC)
+            {
+                if(bCapitale)
+                    code = code + 0x1D5C7;
+                else if(bSmall)
+                    code = code + 0x1D5C1;
+                else if(bDigit)
+                    code = code + 0x1D7B2;
+            }
+            else if(Sty == STY_BOLD)
+            {
+                if(bCapitale)
+                    code = code + 0x1D593;
+                else if(bSmall)
+                    code = code + 0x1D58D;
+                else if(bDigit)
+                    code = code + 0x1D7BC;
+                else if(code == 0x3F4)      // Capital THETA special
+                    code = 0x1D767;
+                else if(code == 0x2207)     // Capital NABLA
+                    code = 0x1D76F;
+                else if(bCapGreek)
+                    code = code + 0x1D3C5;
+                else if(bSmallGreek)
+                    code = code + 0x1D3BF;
+                else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
+                    code = 0x1D789;
+                else if(code == 0x3F5)      //  small EPSILON
+                    code = 0x1D78A;
+                else if(code == 0x3D1)      //  small THETA
+                    code = 0x1D78B;
+                else if(code == 0x3F0)      //  small KAPPA
+                    code = 0x1D78C;
+                else if(code == 0x3D5)      //  small PHI
+                    code = 0x1D78D;
+                else if(code == 0x3F1)      //  small RHO
+                    code = 0x1D78E;
+                else if(code == 0x3D6)      //  small PI
+                    code = 0x1D78F;
+            }
+            else if(Sty == STY_BI)
+            {
+                if(bCapitale)
+                    code = code + 0x1D5FB;
+                else if(bSmall)
+                    code = code + 0x1D5F5;
+                else if(bDigit)
+                    code = code + 0x1D7BC;
+                else if(code == 0x3F4)      // Capital THETA special
+                    code = 0x1D7A1;
+                else if(code == 0x2207)     // Capital NABLA
+                    code = 0x1D7A9;
+                else if(bCapGreek)
+                    code = code + 0x1D3FF;
+                else if(bSmallGreek)
+                    code = code + 0x1D3F9;
+                else if(code == 0x2202)     //  PARTIAL DIFFERENTIAL
+                    code = 0x1D7C3;
+                else if(code == 0x3F5)      //  small EPSILON
+                    code = 0x1D7C4;
+                else if(code == 0x3D1)      //  small THETA
+                    code = 0x11D7C5;
+                else if(code == 0x3F0)      //  small KAPPA
+                    code = 0x1D7C6;
+                else if(code == 0x3D5)      //  small PHI
+                    code = 0x1D7C7;
+                else if(code == 0x3F1)      //  small RHO
+                    code = 0x1D7C8;
+                else if(code == 0x3D6)      //  small PI
+                    code = 0x1D7C9;
+            }
+            else
+            {
+                if(bCapitale)
+                    code = code + 0x1D55F;
+                else if(bSmall)
+                    code = code + 0x1D559;
+                else if(bDigit)
+                    code = code + 0x1D7B2;
+            }
+
         }
         else if(Scr == TXT_SCRIPT)
         {
-            if(code == 0x42)        // B
-                code = 0x212C;
-            else if(code == 0x45)   // E
-                code = 0x2130;
-            else if(code == 0x46)   // F
-                code = 0x2131;
-            else if(code == 0x48)   // H
-                code = 0x210B;
-            else if(code == 0x49)   // I
-                code = 0x2110;
-            else if(code == 0x4C)   // L
-                code = 0x2112;
-            else if(code == 0x4D)   // M
-                code = 0x2133;
-            else if(code == 0x52)   // R
-                code = 0x211B;
-            else if(code == 0x65)   // e
-                code = 0x212F;
-            else if(code == 0x67)   // g
-                code = 0x210A;
-            else if(code == 0x6F)   // o
-                code = 0x2134;
-            else if(bCapitale)
-                code  = code + 0x1D45B;
-            else if(bSmall)
-                code  = code + 0x1D455;
+            if(Sty == STY_ITALIC || Sty == STY_PLAIN)
+            {
+                if(code == 0x42)        // B
+                    code = 0x212C;
+                else if(code == 0x45)   // E
+                    code = 0x2130;
+                else if(code == 0x46)   // F
+                    code = 0x2131;
+                else if(code == 0x48)   // H
+                    code = 0x210B;
+                else if(code == 0x49)   // I
+                    code = 0x2110;
+                else if(code == 0x4C)   // L
+                    code = 0x2112;
+                else if(code == 0x4D)   // M
+                    code = 0x2133;
+                else if(code == 0x52)   // R
+                    code = 0x211B;
+                else if(code == 0x65)   // e
+                    code = 0x212F;
+                else if(code == 0x67)   // g
+                    code = 0x210A;
+                else if(code == 0x6F)   // o
+                    code = 0x2134;
+                else if(bCapitale)
+                    code  = code + 0x1D45B;
+                else if(bSmall)
+                    code  = code + 0x1D455;
+            }
+            else
+            {
+                if(bCapitale)
+                    code = code + 0x1D48F;
+                else if(bSmall)
+                    code = code + 0x1D489;
+
+            }
         }
 
         return code;
@@ -403,15 +569,11 @@ CMathText.prototype =
             {
                 this.pos.x = pos.x + this.GapLeft;
                 this.pos.y = pos.y;
-
-                //console.log("Placeholder : " + this.pos.y);
             }
             else                                    // for symbol only drawing
             {
                 this.pos.x = pos.x - this.rasterOffsetX;
                 this.pos.y = pos.y - this.rasterOffsetY;
-
-                //console.log("Dot : " + this.pos.y);
             }
         }
         catch(e)
