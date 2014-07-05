@@ -10199,6 +10199,8 @@ function CChartText()
     this.strRef = null;
     this.chart = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -10217,12 +10219,14 @@ CChartText.prototype =
     {
         var c = new CChartText();
         if(this.rich)
+        {
             c.setRich(this.rich.createDuplicate());
+            c.rich.setParent(c);
+        }
         if(this.strRef)
         {
             c.setStrRef(this.strRef.createDuplicate());
         }
-        //Todo: разобраться с ссылками на chart
         return c;
     },
 
@@ -10235,6 +10239,18 @@ CChartText.prototype =
     {
         History.Add(this, {Type: historyitem_ChartFormatSetChart, oldPr: this.chart, newPr: pr});
         this.chart = pr;
+    },
+
+    getDrawingDocument: function()
+    {
+        return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
+    },
+
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
     },
 
     merge: function(tx, noCopyTextBody)
@@ -10289,6 +10305,11 @@ CChartText.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_ChartFormatSetChart:
             {
                 this.chart = data.oldPr;
@@ -10312,6 +10333,11 @@ CChartText.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_ChartFormatSetChart:
             {
                 this.chart = data.newPr;
@@ -10339,6 +10365,7 @@ CChartText.prototype =
             case historyitem_ChartText_SetRich:
             case historyitem_ChartText_SetStrRef:
             case historyitem_ChartFormatSetChart:
+            case historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -10351,6 +10378,11 @@ CChartText.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_ChartText_SetRich:
             {
                 this.rich = readObject(r);
@@ -21944,6 +21976,10 @@ CTitle.prototype =
     {
         History.Add(this, {Type: historyitem_Title_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
+        if(this.tx)
+        {
+            this.tx.setParent(this);
+        }
     },
     setTxPr: function(pr)
     {
