@@ -149,7 +149,7 @@ CShape.prototype.setRecalculateInfo = function()
 };
 CShape.prototype.recalcContent = function()
 {
-    this.recalcInfo.recalcContent = true;
+    this.recalcInfo.recalculateContent = true;
 };
 
 CShape.prototype.getDrawingDocument = function()
@@ -226,6 +226,7 @@ CShape.prototype.handleUpdateExtents = function()
     this.recalcGeometry();
     this.recalcBounds();
     this.recalcTransform();
+    this.recalcContent();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateRot = function()
@@ -287,6 +288,12 @@ CShape.prototype.getParentObjects = function ()
     return { slide: null, layout: null, master: null, theme: window["Asc"]["editor"].wbModel.theme};
 };
 
+CShape.prototype.recalcText = function()
+{
+    this.recalcInfo.recalculateContent = true;
+    this.recalcInfo.recalculateTransformText = true;
+};
+
 CShape.prototype.recalculate = function ()
 {
     ExecuteNoHistory(function(){
@@ -315,6 +322,7 @@ CShape.prototype.recalculate = function ()
             if (this.txBody)
                 this.txBody.recalcInfo.recalculateContent2 = true;
             this.recalculateContent();
+            this.recalcInfo.recalculateContent = false;
         }
 
         if (this.recalcInfo.recalculateTransformText) {

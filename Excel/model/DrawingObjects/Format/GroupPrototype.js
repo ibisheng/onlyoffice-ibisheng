@@ -25,6 +25,20 @@ CGroupShape.prototype.handleUpdateLn = function()
     this.addToRecalculate();
 };
 
+CGroupShape.prototype.recalcText = function()
+{
+    if(this.spTree)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].recalcText)
+            {
+                this.spTree[i].recalcText();
+            }
+        }
+    }
+};
+
 
 CGroupShape.prototype.setRecalculateInfo = function()
 {

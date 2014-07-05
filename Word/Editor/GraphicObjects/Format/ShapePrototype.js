@@ -36,7 +36,15 @@ CShape.prototype.setRecalculateInfo = function()
 
 CShape.prototype.recalcContent = function()
 {
-    this.recalcInfo.recalcContent = true;
+    if(this.bWordShape)
+    {
+        this.recalcInfo.recalculateTxBoxContent = true;
+    }
+    else
+    {
+        this.recalcInfo.recalculateContent = true;
+    }
+
 };
 
 CShape.prototype.getDrawingDocument = function()

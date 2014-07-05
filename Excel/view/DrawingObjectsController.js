@@ -97,6 +97,8 @@ function CContentChanges()
 {
     this.m_aChanges = [];
 
+
+
     this.Add = function(Changes)
     {
         this.m_aChanges.push( Changes );
@@ -205,6 +207,10 @@ DrawingObjectsController.prototype.recalculate = function(bAll, Point)
         var drawings = this.getDrawingObjects();
         for(var i = 0; i < drawings.length; ++i)
         {
+            if(drawings[i].recalcText)
+            {
+                drawings[i].recalcText();
+            }
             drawings[i].recalculate();
         }
     }
@@ -443,7 +449,6 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
         this.checkSelectedObjectsAndCallback(function()
         {
             this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-            this.startRecalculate();
         }, []);
         bRetValue = true;
     }

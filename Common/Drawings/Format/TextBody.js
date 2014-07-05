@@ -396,6 +396,9 @@ CTextBody.prototype =
         {
             this.parent.recalcInfo.recalcContent = true;
             this.parent.recalcInfo.recalcTransformText = true;
+
+            this.parent.recalcInfo.recalculateContent = true;
+            this.parent.recalcInfo.recalculateTransformText = true;
             if(this.parent.addToRecalculate)
             {
                 this.parent.addToRecalculate();

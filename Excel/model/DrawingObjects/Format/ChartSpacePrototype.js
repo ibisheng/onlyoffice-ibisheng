@@ -11,6 +11,13 @@ CChartSpace.prototype.recalculateTransform = function()
     CShape.prototype.recalculateTransform.call(this);
     this.localTransform.Reset();
 };
+CChartSpace.prototype.recalcText = function()
+{
+    this.recalcInfo.recalculateAxisLabels = true;
+    this.recalcTitles2();
+    this.handleUpdateInternalChart();
+};
+
 CChartSpace.prototype.recalculateBounds = CShape.prototype.recalculateBounds;
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
 CChartSpace.prototype.hitToHandles = CShape.prototype.hitToHandles;
