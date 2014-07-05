@@ -234,7 +234,10 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                             cur_grouped_object.selection.textSelection = title;
                             title.selectionSetStart(e, x, y, pageIndex);
                             drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
-                            drawingObjectsController.updateSelectionState();
+                            if(e.ClickCount <= 1)
+                            {
+                                drawingObjectsController.updateSelectionState();
+                            }
                             return true;
                         }
                         else
@@ -294,7 +297,10 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
                 drawing.selection.textSelection = title;
                 title.selectionSetStart(e, x, y, pageIndex);
                 drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
-                drawingObjectsController.updateSelectionState();
+                if(e.ClickCount <= 1)
+                {
+                    drawingObjectsController.updateSelectionState();
+                }
                 return true;
             }
             else
@@ -375,7 +381,10 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
                 drawing.selection.textSelection = title;
                 title.selectionSetStart(e, x, y, pageIndex);
                 drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
-                drawingObjectsController.updateSelectionState();
+                if(e.ClickCount <= 1)
+                {
+                    drawingObjectsController.updateSelectionState();
+                }
                 return true;
             }
             else

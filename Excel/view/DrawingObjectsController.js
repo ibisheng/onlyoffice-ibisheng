@@ -287,8 +287,11 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
     e.Button = e.button;
     e.Type = g_mouse_event_type_down;
     var ret = this.curState.onMouseDown(e, x, y, 0);
-    this.updateOverlay();
-    this.updateSelectionState();
+    if(e.ClickCount < 2)
+    {
+        this.updateOverlay();
+        this.updateSelectionState();
+    }
     return ret;
 };
 

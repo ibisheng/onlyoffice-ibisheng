@@ -922,6 +922,7 @@ TextAddState.prototype =
     onMouseUp: function(e, x, y, pageIndex)
     {
         this.majorObject.selectionSetEnd(e, x, y, pageIndex);
+        this.drawingObjects.updateSelectionState();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 

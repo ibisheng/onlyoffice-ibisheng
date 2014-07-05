@@ -199,7 +199,10 @@ NullState.prototype =
         {
             this.drawingObjects.checkChartTextSelection();
             this.drawingObjects.resetInternalSelection();
-            this.drawingObjects.updateOverlay();
+            if(e.ClickCount < 2)
+            {
+                this.drawingObjects.updateOverlay();
+            }
         }
         if(!b_no_handle_selected)
         {

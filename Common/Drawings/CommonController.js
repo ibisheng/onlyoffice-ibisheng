@@ -481,8 +481,8 @@ DrawingObjectsController.prototype =
                 group.selection.textSelection = object;
             }
             this.changeCurrentState(new TextAddState(this, object));
-            //if(e.ClickCount < 2)
-            this.updateSelectionState();
+            if(e.ClickCount < 2)
+                this.updateSelectionState();
             return true;
         }
         else
