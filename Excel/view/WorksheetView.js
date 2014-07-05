@@ -6527,7 +6527,6 @@
             }
 
 			var paraPr = this.objectRender.controller.getParagraphParaPr();
-            var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
 			if (textPr && paraPr) {
 				objectInfo.text = this.objectRender.controller.Get_SelectedText();
 
@@ -6539,6 +6538,7 @@
 					case align_Justify	: horAlign = "justify";	break;
 				}
 				var vertAlign = "center";
+                var shape_props = this.objectRender.controller.getDrawingProps().shapeProps;
                 if(shape_props)
                 {
                     switch (shape_props.verticalTextAlign) {

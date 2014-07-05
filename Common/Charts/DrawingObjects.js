@@ -3701,11 +3701,11 @@ function DrawingObjects() {
             if(selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
                 return c_oAscSelectionType.RangeChart;
 
-            if(selected_objects[0].getObjectType() === historyitem_type_Shape)
-                return c_oAscSelectionType.RangeShape;
-
             if(selected_objects[0].getObjectType() === historyitem_type_ImageShape)
                 return c_oAscSelectionType.RangeImage;
+
+            return c_oAscSelectionType.RangeShape;
+
         }
         return undefined;
     };
