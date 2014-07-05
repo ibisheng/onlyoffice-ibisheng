@@ -985,11 +985,16 @@ DrawingObjectsController.prototype =
     {
         function applyToArrayDrawings(arr)
         {
+            var ret = false, ret2;
             for(var i = 0; i < arr.length; ++i)
             {
                 if(arr[i].getObjectType() === historyitem_type_GroupShape)
                 {
-                    applyToArrayDrawings(arr[i].arrGraphicObjects);
+                    ret2 = applyToArrayDrawings(arr[i].arrGraphicObjects);
+                    if(ret2)
+                    {
+                        ret = true;
+                    }
                 }
                 else if(arr[i].getDocContent)
                 {
@@ -999,9 +1004,11 @@ DrawingObjectsController.prototype =
                         content.Set_ApplyToAll(true);
                         f.apply(content, args);
                         content.Set_ApplyToAll(false);
+                        ret = true;
                     }
                 }
             }
+            return ret;
         }
         function applyToChartSelection(chart)
         {
@@ -1047,7 +1054,15 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            applyToArrayDrawings(this.selectedObjects);
+            var ret = applyToArrayDrawings(this.selectedObjects);
+           //if(!ret)
+           //{
+           //    if(f !== CDocumentContent.prototype.Paragraph_Add && this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
+           //    {
+           //        var parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
+           //        parent_paragraph
+           //    }
+           //}
         }
         if(this.document)
         {
@@ -3194,6 +3209,7 @@ DrawingObjectsController.prototype =
     onKeyDown: function(e)
     {
         e.ctrlKey = e.metaKey || e.ctrlKey;
+        var ctrlKey = e.metaKey || e.ctrlKey;
         var drawingObjectsController = this;
         var bRetValue = false;
         var state = drawingObjectsController.curState;
@@ -3273,7 +3289,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 32 && false === isViewMode ) // Space
         {
-            if(!e.ctrlKey)
+            if(!ctrlKey)
             {
                 //if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
                 //    || this.selection.chartSelection && this.selection.chartSelection.textSelection)
@@ -3300,7 +3316,7 @@ DrawingObjectsController.prototype =
             var content = this.getTargetDocContent();
             if(content)
             {
-                if (e.ctrlKey) // Ctrl + End - переход в конец документа
+                if (ctrlKey) // Ctrl + End - переход в конец документа
                 {
                     content.Cursor_MoveToEndPos();
                     drawingObjectsController.updateSelectionState();
@@ -3318,7 +3334,7 @@ DrawingObjectsController.prototype =
             var content = this.getTargetDocContent();
             if(content)
             {
-                if (e.ctrlKey) // Ctrl + End - переход в конец документа
+                if (ctrlKey) // Ctrl + End - переход в конец документа
                 {
                     content.Cursor_MoveToStartPos();
                     drawingObjectsController.updateSelectionState();
@@ -3333,22 +3349,22 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 37 ) // Left Arrow
         {
-            this.cursorMoveLeft(e.shiftKey,e.ctrlKey );
+            this.cursorMoveLeft(e.shiftKey,ctrlKey );
             bRetValue = true;
         }
         else if ( e.keyCode == 38 ) // Top Arrow
         {
-            this.cursorMoveUp(e.shiftKey,e.ctrlKey );
+            this.cursorMoveUp(e.shiftKey,ctrlKey );
             bRetValue = true;
         }
         else if ( e.keyCode == 39 ) // Right Arrow
         {
-            this.cursorMoveRight(e.shiftKey,e.ctrlKey );
+            this.cursorMoveRight(e.shiftKey,ctrlKey );
             bRetValue = true;
         }
         else if ( e.keyCode == 40 ) // Bottom Arrow
         {
-            this.cursorMoveDown(e.shiftKey,e.ctrlKey );
+            this.cursorMoveDown(e.shiftKey,ctrlKey );
             bRetValue = true;
         }
         else if ( e.keyCode == 45 ) // Insert
@@ -3360,12 +3376,12 @@ DrawingObjectsController.prototype =
             drawingObjectsController.remove(1);
             bRetValue = true;
         }
-        else if ( e.keyCode == 65 && true === e.ctrlKey ) // Ctrl + A - выделяем все
+        else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
         {
             this.selectAll();
             bRetValue = true;
         }
-        else if ( e.keyCode == 66 && false === isViewMode && true === e.ctrlKey ) // Ctrl + B - делаем текст жирным
+        else if ( e.keyCode == 66 && false === isViewMode && true === ctrlKey ) // Ctrl + B - делаем текст жирным
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -3374,11 +3390,11 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 67 && true === e.ctrlKey ) // Ctrl + C + ...
+        else if ( e.keyCode == 67 && true === ctrlKey ) // Ctrl + C + ...
         {
             //TODO
         }
-        else if ( e.keyCode == 69 && false === isViewMode && true === e.ctrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
+        else if ( e.keyCode == 69 && false === isViewMode && true === ctrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
         {
 
             var ParaPr = drawingObjectsController.getParagraphParaPr();
@@ -3388,7 +3404,7 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 73 && false === isViewMode && true === e.ctrlKey ) // Ctrl + I - делаем текст наклонным
+        else if ( e.keyCode == 73 && false === isViewMode && true === ctrlKey ) // Ctrl + I - делаем текст наклонным
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -3397,7 +3413,7 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 74 && false === isViewMode && true === e.ctrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
+        else if ( e.keyCode == 74 && false === isViewMode && true === ctrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
         {
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
@@ -3406,12 +3422,12 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 75 && false === isViewMode && true === e.ctrlKey ) // Ctrl + K - добавление гиперссылки
+        else if ( e.keyCode == 75 && false === isViewMode && true === ctrlKey ) // Ctrl + K - добавление гиперссылки
         {
             //TODO
             bRetValue = true;
         }
-        else if ( e.keyCode == 76 && false === isViewMode && true === e.ctrlKey ) // Ctrl + L + ...
+        else if ( e.keyCode == 76 && false === isViewMode && true === ctrlKey ) // Ctrl + L + ...
         {
 
             var ParaPr = drawingObjectsController.getParagraphParaPr();
@@ -3422,17 +3438,17 @@ DrawingObjectsController.prototype =
             }
 
         }
-        else if ( e.keyCode == 77 && false === isViewMode && true === e.ctrlKey ) // Ctrl + M + ...
+        else if ( e.keyCode == 77 && false === isViewMode && true === ctrlKey ) // Ctrl + M + ...
         {
             bRetValue = true;
 
         }
-        else if ( e.keyCode == 80 && true === e.ctrlKey ) // Ctrl + P + ...
+        else if ( e.keyCode == 80 && true === ctrlKey ) // Ctrl + P + ...
         {
             bRetValue = true;
 
         }
-        else if ( e.keyCode == 82 && false === isViewMode && true === e.ctrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
+        else if ( e.keyCode == 82 && false === isViewMode && true === ctrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
         {
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
@@ -3441,11 +3457,11 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 83 && false === isViewMode && true === e.ctrlKey ) // Ctrl + S - save
+        else if ( e.keyCode == 83 && false === isViewMode && true === ctrlKey ) // Ctrl + S - save
         {
             bRetValue = false;
         }
-        else if ( e.keyCode == 85 && false === isViewMode && true === e.ctrlKey ) // Ctrl + U - делаем текст подчеркнутым
+        else if ( e.keyCode == 85 && false === isViewMode && true === ctrlKey ) // Ctrl + U - делаем текст подчеркнутым
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -3454,18 +3470,18 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 86 && false === isViewMode && true === e.ctrlKey ) // Ctrl + V - paste
+        else if ( e.keyCode == 86 && false === isViewMode && true === ctrlKey ) // Ctrl + V - paste
         {
 
         }
-        else if ( e.keyCode == 88 && false === isViewMode && true === e.ctrlKey ) // Ctrl + X - cut
+        else if ( e.keyCode == 88 && false === isViewMode && true === ctrlKey ) // Ctrl + X - cut
         {
             //не возвращаем true чтобы не было preventDefault
         }
-        else if ( e.keyCode == 89 && false === isViewMode && true === e.ctrlKey ) // Ctrl + Y - Redo
+        else if ( e.keyCode == 89 && false === isViewMode && true === ctrlKey ) // Ctrl + Y - Redo
         {
         }
-        else if ( e.keyCode == 90 && false === isViewMode && true === e.ctrlKey ) // Ctrl + Z - Undo
+        else if ( e.keyCode == 90 && false === isViewMode && true === ctrlKey ) // Ctrl + Z - Undo
         {
         }
         else if ( e.keyCode == 93 || 57351 == e.keyCode /*в Opera такой код*/ ) // контекстное меню
@@ -3481,7 +3497,7 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 145 ) // Scroll Lock
         {
         }
-        else if ( e.keyCode == 187 && false === isViewMode && true === e.ctrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
+        else if ( e.keyCode == 187 && false === isViewMode && true === ctrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -3493,7 +3509,7 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 188 && true === e.ctrlKey ) // Ctrl + ,
+        else if ( e.keyCode == 188 && true === ctrlKey ) // Ctrl + ,
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -3506,7 +3522,7 @@ DrawingObjectsController.prototype =
         {
 
             var Item = null;
-            if ( true === e.ctrlKey && true === e.shiftKey )
+            if ( true === ctrlKey && true === e.shiftKey )
             {
                 Item = new ParaText( String.fromCharCode( 0x2013 ) );
                 Item.SpaceAfter = false;
@@ -3520,7 +3536,7 @@ DrawingObjectsController.prototype =
             this.recalculate();
             bRetValue = true;
         }
-        else if ( e.keyCode == 190 && true === e.ctrlKey ) // Ctrl + .
+        else if ( e.keyCode == 190 && true === ctrlKey ) // Ctrl + .
         {
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
@@ -3529,12 +3545,12 @@ DrawingObjectsController.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.keyCode == 219 && false === isViewMode && true === e.ctrlKey ) // Ctrl + [
+        else if ( e.keyCode == 219 && false === isViewMode && true === ctrlKey ) // Ctrl + [
         {
             drawingObjectsController.decreaseFontSize();
             bRetValue = true;
         }
-        else if ( e.keyCode == 221 && false === isViewMode && true === e.ctrlKey ) // Ctrl + ]
+        else if ( e.keyCode == 221 && false === isViewMode && true === ctrlKey ) // Ctrl + ]
         {
             drawingObjectsController.increaseFontSize();
             bRetValue = true;
