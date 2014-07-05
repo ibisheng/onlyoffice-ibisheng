@@ -703,7 +703,7 @@ CChartSpace.prototype =
                                 cell = worksheet.getCell(new CellAddress(j, k, 0));
                                 pt = new pointConstructor();
                                 pt.setIdx(idx);
-                                pt.setFormatCode(cell.getNumFormatStr());
+                                pt.setFormatCode && pt.setFormatCode(cell.getNumFormatStr());
                                 pt.setVal(cell.getValue());
                                 cache.addPt(pt);
                             }
@@ -760,6 +760,7 @@ CChartSpace.prototype =
 
     rebuildSeries: function()
     {
+
         this.setRecalculateInfo();
         this.checkSeriesRefs(this.clearCacheVal);
         this.recalculate();
@@ -2560,10 +2561,7 @@ CChartSpace.prototype =
                                         pt = new CStringPoint();
                                         pt.setIdx(pt_index++);
                                         pt.setVal(cell.getValue());
-                                        if(cell.getNumFormatStr() !== "General")
-                                        {
-                                            pt.setFormatCode(cell.getNumFormatStr())
-                                        }
+
                                         str_cache.addPt(pt);
                                     }
                                 }
@@ -2575,10 +2573,7 @@ CChartSpace.prototype =
                                         pt = new CStringPoint();
                                         pt.setIdx(pt_index++);
                                         pt.setVal(cell.getValue());
-                                        if(cell.getNumFormatStr() !== "General")
-                                        {
-                                            pt.setFormatCode(cell.getNumFormatStr())
-                                        }
+
                                         str_cache.addPt(pt);
                                     }
                                 }

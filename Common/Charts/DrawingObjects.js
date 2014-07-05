@@ -1785,7 +1785,6 @@ function DrawingObjects() {
 
         _this.resizeCanvas();
         _this.setScrollOffset();
-        _this.rebuildChartGraphicObjects();
     };
 
     _this.resizeCanvas = function() {
@@ -2761,7 +2760,7 @@ function DrawingObjects() {
         {
             if(aObjects[i].graphicObject.rebuildSeries)
             {
-                aObjects[i].graphicObject.rebuildSeries();
+                aObjects[i].graphicObject.rebuildSeries(data);
             }
         }
     };

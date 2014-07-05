@@ -4938,6 +4938,7 @@ ParaDrawing.prototype =
                 this.Distance.R = Data.Old.Right;
                 this.Distance.B = Data.Old.Bottom;
 
+                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
 
@@ -5083,6 +5084,7 @@ ParaDrawing.prototype =
                 this.Distance.R = Data.New.Right;
                 this.Distance.B = Data.New.Bottom;
 
+                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
 
@@ -5196,10 +5198,18 @@ ParaDrawing.prototype =
             return this.Parent.Get_ParentObject_or_DocumentPos();
     },
 
-    Refresh_RecalcData : function()
+    Refresh_RecalcData : function(Data)
     {
         if ( undefined != this.Parent && null != this.Parent )
+        {
+            if(Data && Data.Type === historyitem_Drawing_Distance)
+            {
+                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                this.GraphicObj.addToRecalculate();
+            }
+
             return this.Parent.Refresh_RecalcData2();
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
@@ -5662,6 +5672,7 @@ ParaDrawing.prototype =
                 this.Distance.R = Reader.GetDouble();
                 this.Distance.B = Reader.GetDouble();
 
+                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
 

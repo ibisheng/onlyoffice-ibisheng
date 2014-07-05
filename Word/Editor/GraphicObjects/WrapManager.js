@@ -104,7 +104,6 @@ CWrapPolygon.prototype =
     {
     },
 
-
     getIntersection: function(y)
     {
         var min_x = null;
