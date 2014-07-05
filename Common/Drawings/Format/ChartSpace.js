@@ -10354,7 +10354,7 @@ function CreateAreaChart(chartSeries, type)
 
 
     var area_chart = plot_area.charts[0];
-    area_chart.setGrouping(GROUPING_STANDARD);
+    area_chart.setGrouping(type);
     area_chart.setVaryColors(false);
     var parsedHeaders = chartSeries.parsedHeaders;
     for(var i = 0; i < asc_series.length; ++i)
