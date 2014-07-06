@@ -908,7 +908,12 @@ function TextAddState(drawingObjects, majorObject)
 TextAddState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Id, cursorType: "text"};
+        }
+    },
     onMouseMove: function(e, x, y, pageIndex)
     {
         if(!e.IsLocked)

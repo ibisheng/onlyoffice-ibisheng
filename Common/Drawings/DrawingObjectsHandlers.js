@@ -484,7 +484,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
                 state.drawingObjects.selection.groupSelection = state.majorObject;
                 state.drawingObjects.OnMouseDown(e,x, y,pageIndex);
                 state.drawingObjects.OnMouseUp(e, x, y, pageIndex);
-                state.drawingObjects.drawingObjects && state.drawingObjects.drawingObjects.sendGraphicObjectProps();
+                state.drawingObjects.drawingObjects && state.drawingObjects.drawingObjects.sendGraphicObjectProps &&  state.drawingObjects.drawingObjects.sendGraphicObjectProps();
                 state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
                 break;
             }
