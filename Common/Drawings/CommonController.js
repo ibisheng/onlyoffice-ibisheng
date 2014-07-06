@@ -251,8 +251,8 @@ DrawingObjectsController.prototype =
         }
         if(this.selection.textSelection)
         {
-            var content = this.selection.textSelection.getDocContent();
-            content && content.Selection_Remove();
+           // var content = this.selection.textSelection.getDocContent();
+           // content && content.Selection_Remove();
             this.selection.textSelection = null;
         }
         if(this.selection.chartSelection)

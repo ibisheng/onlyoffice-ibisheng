@@ -2724,7 +2724,19 @@ CShape.prototype =
             var tx, ty;
             tx = this.invertTransformText.TransformPointX(x, y);
             ty = this.invertTransformText.TransformPointY(x, y);
-            content.Selection_SetStart(tx, ty, slideIndex, e);
+            if(e.Button === g_mouse_button_right)
+            {
+                if(content.Selection_Check(tx, ty, 0))
+                {
+                    this.rightButtonFlag = true;
+                    return;
+                }
+            }
+            if(!(content.Is_TextSelectionUse() && e.ShiftKey))
+                content.Selection_SetStart(tx, ty, slideIndex, e);
+            else
+                content.Selection_SetEnd(tx, ty, slideIndex, e);
+
         }
     },
 
@@ -2735,8 +2747,12 @@ CShape.prototype =
             var tx, ty;
             tx = this.invertTransformText.TransformPointX(x, y);
             ty = this.invertTransformText.TransformPointY(x, y);
-            content.Selection_SetEnd(tx, ty, slideIndex, e);
+            if(!(e.Type === g_mouse_event_type_up && this.rightButtonFlag))
+            {
+                content.Selection_SetEnd(tx, ty, slideIndex, e);
+            }
         }
+        delete this.rightButtonFlag;
     },
 
     Get_Theme: function()
