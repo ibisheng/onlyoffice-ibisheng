@@ -82,7 +82,7 @@ function CChartStyleManager()
             this.styles[25] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
             for(i = 26; i < 32; ++i)
             {
-                this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-27,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
+                this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-26,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
             }
             this.styles[32] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(8, -0.5)], 5, s[0], 9);
             this.styles[33] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  s[2], 5, s[1], 9);
@@ -94,7 +94,7 @@ function CChartStyleManager()
             this.styles[41] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE, [], 5, s[1], 9);
             for(i = 42; i < 48; ++i)
             {
-                this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-43, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-43, 0)], 9);
+                this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-42, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-42, 0)], 9);
             }
 
             this.defaultLineStyles = [];
@@ -6285,14 +6285,15 @@ CChartSpace.prototype =
         {
             var plot_area = this.chart.plotArea;
             var default_brush;
+            var tint = 0.20000;
             if(this.style >=1 && this.style <=32)
-                default_brush = CreateUnifillSolidFillSchemeColor(6, 0);
+                default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
             else if(this.style >=33 && this.style <= 34)
                 default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
             else if(this.style >=35 && this.style <=40)
-                default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0);
+                default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
             else
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000 - tint);
 
             if(plot_area.spPr && plot_area.spPr.Fill)
             {
@@ -6758,7 +6759,7 @@ CChartSpace.prototype =
             else if(this.style >= 33 && this.style <= 34)
                 default_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
             else if(this.style >= 35 && this.style <= 40)
-                default_line.setFill(CreateUnifillSolidFillSchemeColor(8, -25000));
+                default_line.setFill(CreateUnifillSolidFillSchemeColor(8, -0.25000));
             else
                 default_line.setFill(CreateUnifillSolidFillSchemeColor(12, 0));
             default_line.merge(this.chart.plotArea.chart.hiLowLines.ln);

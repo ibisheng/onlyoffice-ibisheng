@@ -290,6 +290,16 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 				isScatter = true;
 				break;
 			}
+            case c_oAscChartTypeSettings.areaNormal:
+            case c_oAscChartTypeSettings.areaStacked:
+            case c_oAscChartTypeSettings.areaStackedPer:
+            {
+                cat_ax_props.putLabelsPosition(CROSS_BETWEEN_BETWEEN);
+                vert_axis_settings = val_ax_props;
+                hor_axis_settings = cat_ax_props;
+                break;
+            }
+
 			default :
 			{
 				vert_axis_settings = val_ax_props;
@@ -352,6 +362,11 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
 		chart_space.style = styleIndex;
 		chart_space.recalculateMarkers();
 		chart_space.recalculateSeriesColors();
+		chart_space.recalculatePlotAreaChartBrush();
+		chart_space.recalculatePlotAreaChartPen();
+        chart_space.recalculateChartBrush();
+        chart_space.recalculateChartPen();
+        chart_space.recalculateUpDownBars();
 	}
 	chart_space.recalculatePenBrush();
 

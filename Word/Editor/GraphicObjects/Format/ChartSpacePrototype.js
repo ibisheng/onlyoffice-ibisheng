@@ -174,6 +174,8 @@ CChartSpace.prototype.handleUpdateStyle = function()
     this.recalcInfo.recalculateLegend = true;
     this.recalcInfo.recalculatePlotAreaBrush = true;
     this.recalcInfo.recalculatePlotAreaPen = true;
+    this.recalcInfo.recalculateBrush = true;
+    this.recalcInfo.recalculatePen = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
