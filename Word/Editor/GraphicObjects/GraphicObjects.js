@@ -384,6 +384,7 @@ CGraphicObjects.prototype =
 
     setProps: function(props)
     {
+        var apply_props;
         if(props.Group === 1)
         {
             this.groupSelectedObjects();
@@ -424,7 +425,6 @@ CGraphicObjects.prototype =
             {
                 this.selectedObjects[i].parent.Set_Props(props);
             }
-            var apply_props;
             if(isRealNumber(props.Width) && isRealNumber(props.Height))
             {
                 apply_props = props;
@@ -485,6 +485,7 @@ CGraphicObjects.prototype =
             }
         }
         this.document.Recalculate();
+        apply_props && isRealNumber(apply_props.verticalTextAlign) && this.document.Document_UpdateSelectionState();
     },
 
     applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
