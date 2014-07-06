@@ -174,7 +174,7 @@ NullState.prototype =
                     }
                     else
                     {
-                        this.drawingObjects.changeCurrentState(new PreChangeWrapContourAddPoint(this.drawingObjects, selection.wrapPolygonSelection, Math.min(hit_to_wrap_polygon.pointNum1, hit_to_wrap_polygon.pointNum2), object_page_x, object_page_y));
+                        this.drawingObjects.changeCurrentState(new PreChangeWrapContourAddPoint(this.drawingObjects, selection.wrapPolygonSelection, hit_to_wrap_polygon.pointNum1, object_page_x, object_page_y));
                         return true;
                     }
                 }
