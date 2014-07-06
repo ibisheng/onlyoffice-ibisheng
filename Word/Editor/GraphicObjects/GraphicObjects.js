@@ -2188,7 +2188,8 @@ CGraphicObjects.prototype =
     {
         this.drawingObjects.push(paraDrawing);
         this.objectsMap["_" + paraDrawing.Get_Id()] = paraDrawing;
-        this.zIndexManager.addItem(null, paraDrawing);
+        if(!g_oTableId.m_bTurnOff)
+            this.zIndexManager.addItem(null, paraDrawing);
     },
 
     isPointInDrawingObjects: function(x, y, pageIndex)
