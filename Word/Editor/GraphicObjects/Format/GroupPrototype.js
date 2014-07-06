@@ -347,3 +347,23 @@ CGroupShape.prototype.recalculateBounds = function()
 };
 
 
+CGroupShape.prototype.getBoundsPos = function()
+{
+    var sp_tree = this.spTree;
+    var x_arr_max = [], y_arr_max = [], x_arr_min = [], y_arr_min = [];
+    for(var i = 0; i < sp_tree.length; ++i)
+    {
+        var bounds = sp_tree[i].bounds;
+        var l = bounds.l;
+        var r = bounds.r;
+        var t = bounds.t;
+        var b = bounds.b;
+        x_arr_max.push(r);
+        x_arr_min.push(l);
+        y_arr_max.push(b);
+        y_arr_min.push(t);
+    }
+    return {x: Math.min.apply(Math, x_arr_min), y: Math.min.apply(Math, y_arr_min)};
+};
+
+

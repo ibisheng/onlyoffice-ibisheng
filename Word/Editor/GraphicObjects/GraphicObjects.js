@@ -1192,32 +1192,31 @@ CGraphicObjects.prototype =
                         para_pr = parent_para.Get_CompiledPr2(true).ParaPr;
                 }
             }
-            if(!para_pr)
+            if(para_pr)
             {
-                para_pr = new CParaPr();
-            }
-            var TextPr = this.getParagraphTextPr();
-            var theme = this.document.Get_Theme();
-            if(theme && theme.themeElements && theme.themeElements.fontScheme)
-            {
-                if(TextPr.FontFamily)
+                var TextPr = this.getParagraphTextPr();
+                var theme = this.document.Get_Theme();
+                if(theme && theme.themeElements && theme.themeElements.fontScheme)
                 {
-                    TextPr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
+                    if(TextPr.FontFamily)
+                    {
+                        TextPr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
+                    }
+                    if(TextPr.RFonts)
+                    {
+                        if(TextPr.RFonts.Ascii)
+                            TextPr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
+                        if(TextPr.RFonts.EastAsia)
+                            TextPr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
+                        if(TextPr.RFonts.HAnsi)
+                            TextPr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
+                        if(TextPr.RFonts.CS)
+                            TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
+                    }
                 }
-                if(TextPr.RFonts)
-                {
-                    if(TextPr.RFonts.Ascii)
-                        TextPr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
-                    if(TextPr.RFonts.EastAsia)
-                        TextPr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
-                    if(TextPr.RFonts.HAnsi)
-                        TextPr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
-                    if(TextPr.RFonts.CS)
-                        TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
-                }
+                editor.UpdateParagraphProp(para_pr);
+                editor.UpdateTextPr(TextPr);
             }
-            editor.UpdateParagraphProp(para_pr);
-            editor.UpdateTextPr(TextPr);
         }
     },
 
@@ -2129,10 +2128,13 @@ CGraphicObjects.prototype =
                             }
                             else
                             {
+
+                                this.resetInternalSelection();
                                 var new_x, new_y;
-                                new_x = cur_group.x + sp.bounds.x;
-                                new_y = cur_group.y + sp.bounds.y;
-                                sp.recalcBounds();
+                                var pos = cur_group.getBoundsPos();
+                                new_x = cur_group.x + pos.x;
+                                new_y = cur_group.y + pos.y;
+                                cur_group.updateCoordinatesAfterInternalResize();
                                 var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage, new_x, new_y, true, para_drawing);
                                 para_drawing.Remove_FromDocument(false);
                                 para_drawing.Set_XYForAdd(new_x, new_y, nearest_pos, cur_group.selectStartPage);
