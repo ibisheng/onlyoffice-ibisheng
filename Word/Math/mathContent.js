@@ -4903,133 +4903,99 @@ CMathContent.prototype =
         }
         else
         {
-            if(this.Selection.Use)
+            var StartPos = this.Selection.Start;
+            var EndPos   = this.Selection.End;
+
+            var NewRuns;
+            var LRun, CRun, RRun;
+
+            if( !this.Selection.Use || (this.Selection.Use && StartPos == EndPos) ) // TextPr меняем только в одном Run
             {
-                var StartPos = this.Selection.Start;
-                var EndPos   = this.Selection.End;
+                var Pos = !this.Selection.Use ? this.CurPos :  StartPos;
 
-                var NewRuns;
-                var LRun, CRun, RRun;
+                NewRuns = this.content[Pos].Apply_TextPr(TextPr, IncFontSize, false);
 
-                if(StartPos == EndPos)
+                LRun = NewRuns[0];
+                CRun = NewRuns[1];
+                RRun = NewRuns[2];
+
+                var CRunPos = Pos;
+
+                if(LRun !== null)
+                {
+                    this.Internal_Content_Add(Pos+1, CRun);
+                    CRunPos = Pos + 1;
+                }
+
+                if(RRun !== null)
+                {
+                    this.Internal_Content_Add(CRunPos+1, RRun);
+                }
+
+                this.CurPos         = CRunPos;
+                this.Selection.Start = CRunPos;
+                this.Selection.End   = CRunPos;
+
+            }
+            else
+            {
+                if(StartPos > EndPos)
+                {
+                    var temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos = temp;
+                }
+
+                for(var i = StartPos + 1; i < EndPos; i++)
+                    this.content[i].Apply_TextPr(TextPr, IncFontSize, true );
+
+
+                if(this.content[EndPos].Type == para_Math_Run)
+                {
+                    NewRuns = this.content[EndPos].Apply_TextPr(TextPr, IncFontSize, false);
+
+                    // LRun - null
+                    CRun = NewRuns[1];
+                    RRun = NewRuns[2];
+
+                    if(RRun !== null)
+                    {
+                        this.Internal_Content_Add(EndPos+1, RRun);
+                    }
+
+                }
+                else
+                    this.content[EndPos].Apply_TextPr(TextPr, IncFontSize, true);
+
+
+                if(this.content[StartPos].Type == para_Math_Run)
                 {
                     NewRuns = this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, false);
 
                     LRun = NewRuns[0];
                     CRun = NewRuns[1];
-                    RRun = NewRuns[2];
+                    // RRun - null
 
-                    var CRunPos = StartPos;
-                    var Pos;
 
                     if(LRun !== null)
                     {
                         this.Internal_Content_Add(StartPos+1, CRun);
-                        CRunPos = StartPos + 1;
                     }
 
-                    if(RRun !== null)
-                    {
-                        this.Internal_Content_Add(CRunPos+1, RRun);
-                    }
-
-                    this.CurPos         = CRunPos;
-                    this.Selection.Start = CRunPos;
-                    this.Selection.End   = CRunPos;
                 }
                 else
-                {
-                    if(StartPos > EndPos)
-                    {
-                        var temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos = temp;
-                    }
-
-                    for(var i = StartPos + 1; i < EndPos; i++)
-                        this.content[i].Apply_TextPr(TextPr, IncFontSize, true );
+                    this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
 
 
-                    if(this.content[EndPos].Type == para_Math_Run)
-                    {
-                        NewRuns = this.content[EndPos].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+                if ( this.Selection.Start < this.Selection.End && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
+                    this.Selection.Start++;
+                else if ( this.Selection.End < this.Selection.Start && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
+                    this.Selection.End++;
 
-                        // LRun - null
-                        CRun = NewRuns[1];
-                        RRun = NewRuns[2];
-
-                        if(RRun !== null)
-                        {
-                            this.Internal_Content_Add(EndPos+1, RRun);
-                        }
-
-                    }
-                    else
-                        this.content[EndPos].Apply_TextPr(TextPr, IncFontSize, true);
-
-
-                    if(this.content[StartPos].Type == para_Math_Run)
-                    {
-                        NewRuns = this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-
-                        LRun = NewRuns[0];
-                        CRun = NewRuns[1];
-                        // RRun - null
-
-
-                        if(LRun !== null)
-                        {
-                            //Pos = StartPos + 1;
-                            //History.Add(this, {Type: historyitem_Math_AddItem, Pos: Pos, PosEnd: Pos+1, Items: [CRun]});
-                            //this.content.splice(Pos, 0, CRun);
-                            this.Internal_Content_Add(StartPos+1, CRun);
-                        }
-
-                    }
-                    else
-                        this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
-
-
-                    if ( this.Selection.Start < this.Selection.End && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
-                        this.Selection.Start++;
-                    else if ( this.Selection.End < this.Selection.Start && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
-                        this.Selection.End++;
-
-                    if ( this.Selection.Start < this.Selection.End && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
-                        this.Selection.End--;
-                    else if ( this.Selection.End < this.Selection.Start && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
-                        this.Selection.Start--;
-
-                }
-
-
-
-                /*if ( StartPos === EndPos )
-                {
-                    elem = this.content[StartPos];
-
-                    if( elem.Type == para_Math_Composition)
-                        elem.Apply_TextPr( TextPr, IncFontSize, true );
-                    else if(elem.Type == para_Math_Run)
-                        elem.Apply_TextPr( TextPr, IncFontSize, false );
-                }
-                else
-                {
-                    for(var i = StartPos; i <= EndPos; i++)
-                    {
-                        elem = this.content[i];
-
-                        if( elem.Type == para_Math_Composition)
-                            elem.Apply_TextPr( TextPr, IncFontSize, true );
-                        else if(elem.Type == para_Math_Run)
-                            elem.Apply_TextPr( TextPr, IncFontSize, false );
-                    }
-
-                }*/
-            }
-            else
-            {
-                this.content[this.CurPos].Apply_TextPr( TextPr, IncFontSize, false );
+                if ( this.Selection.Start < this.Selection.End && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
+                    this.Selection.End--;
+                else if ( this.Selection.End < this.Selection.Start && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
+                    this.Selection.Start--;
             }
         }
     },
