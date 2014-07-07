@@ -33,7 +33,7 @@
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
-var historyitem_Math_Style                     =  3; // Меняем стиль MathPr
+
 
 
 
@@ -808,8 +808,8 @@ CMPrp.prototype =
         NewMPrp.brk      = this.brk;
         NewMPrp.lit      = this.lit;
         NewMPrp.nor      = this.nor;
-        NewMPrp.typeText = this.sty;
-        NewMPrp.italic   = this.scr;
+        NewMPrp.sty      = this.sty;
+        NewMPrp.scr      = this.scr;
         
         return NewMPrp;
     }
@@ -4411,6 +4411,7 @@ CMathContent.prototype =
             if(!bSelectRunPrp && bStartCurrRPrp)
                 start++;
             else if(bSelectRunPrp && bStartPrevRPrp)
+            else if(bSelectRunPrp && bStartPrevRPrp)
                 start--;
 
         }
@@ -5245,7 +5246,7 @@ CMathContent.prototype =
                         Pos = StartPos + 1;
                         History.Add(this, {Type: historyitem_Math_AddItem, Pos: Pos, PosEnd: Pos+1, Items: [CRun]});
                         this.content.splice(Pos, 0, CRun);
-                        CRunPos = Pos + 1;
+                        CRunPos = Pos;
                     }
 
                     if(RRun !== null)
@@ -5264,19 +5265,59 @@ CMathContent.prototype =
                     if(StartPos > EndPos)
                     {
                         var temp = StartPos;
-                        EndPos = StartPos;
-                        StartPos = temp;
+                        StartPos = EndPos;
+                        EndPos = temp;
                     }
 
-                    for(var i = StartPos; i <= EndPos; i++)
+                    for(var i = StartPos + 1; i < EndPos; i++)
+                        this.content[i].Apply_TextPr(TextPr, IncFontSize, true );
+
+
+                    if(this.content[EndPos].Type == para_Math_Run)
                     {
-                        var elem = this.content[i];
+                        NewRuns = this.content[EndPos].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
 
-                        if( elem.Type == para_Math_Composition)
-                            elem.Apply_TextPr( TextPr, IncFontSize, true );
-                        else if(elem.Type == para_Math_Run)
-                            elem.Apply_TextPr( TextPr, IncFontSize, false );
+                        // LRun - null
+                        CRun = NewRuns[1];
+                        RRun = NewRuns[2];
+
+                        if(RRun !== null)
+                        {
+                            Pos = EndPos + 1;
+                            History.Add(this, {Type: historyitem_Math_AddItem, Pos: Pos, PosEnd: Pos+1, Items: [RRun]});
+                            this.content.splice(Pos, 0, RRun);
+                        }
+
                     }
+                    else
+                        this.content[EndPos].Apply_TextPr(TextPr, IncFontSize, true);
+
+
+                    if(this.content[StartPos].Type == para_Math_Run)
+                    {
+                        NewRuns = this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+
+                        LRun = NewRuns[0];
+                        CRun = NewRuns[1];
+                        // RRun - null
+
+
+                        if(LRun !== null)
+                        {
+                            Pos = StartPos + 1;
+                            History.Add(this, {Type: historyitem_Math_AddItem, Pos: Pos, PosEnd: Pos+1, Items: [CRun]});
+                            this.content.splice(Pos, 0, CRun);
+
+
+                            this.SelectStartPos++;
+                            this.SelectEndPos++;
+                            this.CurPos++;
+                        }
+
+                    }
+                    else
+                        this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
+
                 }
 
 
@@ -5744,7 +5785,7 @@ CMathContent.prototype =
 
                 this.content = Content_start.concat(Content_end);
                 this.CurPos = Pos - 1;
-                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
+                //this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
 
                 break;
             }

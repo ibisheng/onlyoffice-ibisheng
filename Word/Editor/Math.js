@@ -392,7 +392,7 @@ ParaMath.prototype =
 
     Check_NearestPos : function(ParaNearPos, Depth)
     {
-        var MathNearPos = new CParagraphElementNearPos();
+        /*var MathNearPos = new CParagraphElementNearPos();
         MathNearPos.NearPos = ParaNearPos.NearPos;
         MathNearPos.Depth   = Depth;
 
@@ -401,7 +401,7 @@ ParaMath.prototype =
         ParaNearPos.Classes.push( this );
 
         var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
-        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
+        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );*/
     },
 
     Get_DrawingObjectRun : function(Id)

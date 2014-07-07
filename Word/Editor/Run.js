@@ -4638,12 +4638,13 @@ ParaRun.prototype =
     Split_Run : function(Pos)
     {
         // Создаем новый ран
-        var NewRun = new ParaRun(this.Paragraph, this.Type == para_Math_Run);
+        var bMathRun = this.Type == para_Math_Run
+        var NewRun = new ParaRun(this.Paragraph, bMathRun);
 
         // Копируем настройки
         NewRun.Set_Pr( this.Pr.Copy() );
 
-        if(this.Type == para_Math_Run)
+        if(bMathRun)
             NewRun.Set_MathPrp(this.MathPrp.Copy());
 
 
@@ -5587,6 +5588,14 @@ ParaRun.prototype =
                 
                 break;
             }
+
+            case historyitem_ParaRun_MathStyle:
+            {
+                this.MathPrp.sty = Data.Old;
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
         }
     },
 
@@ -5937,6 +5946,14 @@ ParaRun.prototype =
             {
                 this.Pr.Shd = Data.New;
                 this.Recalc_CompiledPr(false);
+
+                break;
+            }
+
+            case historyitem_ParaRun_MathStyle:
+            {
+                this.MathPrp.sty = Data.New;
+                this.Recalc_CompiledPr(true);
 
                 break;
             }
@@ -7437,10 +7454,10 @@ ParaRun.prototype.Apply_Style = function(Value)
 {
     if(Value !== this.MathPrp.sty)
     {
-        var OldValue = this.MathPrp.sty;
-        this.MathPrp = Value;
+        var OldValue     = this.MathPrp.sty;
+        this.MathPrp.sty = Value;
 
-        History.Add( this, { Type : historyitem_Math_Style, New : Value, Old : OldValue } );
+        History.Add( this, { Type : historyitem_ParaRun_MathStyle, New : Value, Old : OldValue } );
 
         this.Recalc_CompiledPr(true);
     }
