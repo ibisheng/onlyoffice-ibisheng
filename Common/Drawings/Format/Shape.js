@@ -1866,14 +1866,19 @@ CShape.prototype =
 
     selectionCheck: function( X, Y, Page_Abs, NearPos)
     {
-        if ( undefined !== NearPos )
-            return this.textBoxContent.Selection_Check(X, Y, Page_Abs, NearPos);
-        
-        if(isRealObject(this.textBoxContent) && this.hitInTextRect(X, Y))
+
+        var content = this.getDocContent();
+        if(content)
         {
-            var t_x = this.invertTransformText.TransformPointX(X, Y);
-            var t_y = this.invertTransformText.TransformPointY(X, Y);
-            return this.textBoxContent.Selection_Check(t_x, t_y, Page_Abs,  NearPos);
+            if ( undefined !== NearPos )
+                return content.Selection_Check(X, Y, Page_Abs, NearPos);
+
+            if(isRealObject(content) && this.hitInTextRect(X, Y))
+            {
+                var t_x = this.invertTransformText.TransformPointX(X, Y);
+                var t_y = this.invertTransformText.TransformPointY(X, Y);
+                return content.Selection_Check(t_x, t_y, Page_Abs,  NearPos);
+            }
         }
         return false;
     },
