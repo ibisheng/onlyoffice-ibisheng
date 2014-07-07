@@ -4679,7 +4679,7 @@ function Result() {
 	this.x = null;
 	this.y = null;
 	this.width = null;
-	this.heigth = null;
+	this.height = null;
 	this.id = null;
 	this.idNext = null;
 	this.hiddenRows = null;
@@ -4689,10 +4689,11 @@ Result.prototype.clone = function() {
 	res.x = this.x;
 	res.y = this.y;
 	res.width = this.width;
-	res.heigth = this.heigth;
+	res.height = this.height;
 	res.id = this.id;
 	res.idNext = this.idNext;
 	res.hiddenRows = this.hiddenRows;
+	res.showButton = this.showButton;
 	
 	return res;
 };

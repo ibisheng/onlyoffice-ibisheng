@@ -5238,7 +5238,7 @@ var gUndoInsDelCellsFlag = true;
 										for(var s = 0; s < cloneFilterColums.length; s++)
 										{
 											if(zF == cloneFilterColums[s].ColId)
-												cloneFilterColums.splice(s,1);
+												cloneFilterColums.splice(s, 1);
 										}
 									}
 									
@@ -5329,7 +5329,7 @@ var gUndoInsDelCellsFlag = true;
 							{
 								for(var s = 0; s < filterColums.length; s++)
 								{
-									if(filterColums[s].ColId == filR && filR > endCount)
+									if(cloneFilterColums[s] && filterColums[s].ColId == filR && filR > endCount)
 									{
 										cloneFilterColums[s].ColId = filR + val;
 										endCount = filR + val;
@@ -5425,6 +5425,9 @@ var gUndoInsDelCellsFlag = true;
 				var buttons = this.allButtonAF;
 				if(type == 'add')
 				{
+					if(array.showButton === false)
+						return;
+						
 					for(var j = 0; j < val; j++)
 					{
 						if(val != 1)
@@ -5494,8 +5497,8 @@ var gUndoInsDelCellsFlag = true;
 							isChange = true;
 						};
 						
-						if(!isChange)
-							buttons[buttons.length] = array;
+						//if(!isChange)
+							//buttons[buttons.length] = array;
 					}
 				};
 			},
