@@ -1133,6 +1133,23 @@ ParaHyperlink.prototype =
         return true;
     },
 
+    Check_Range_OnlyMath : function(Checker, _CurRange, _CurLine)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Check_Range_OnlyMath(Checker, _CurLine, _CurRange);
+            
+            if (false === Checker.Result)
+                break;
+        }
+    },
+
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {
         var CurLine = _CurLine - this.StartLine;
@@ -1776,6 +1793,9 @@ ParaHyperlink.prototype =
                 StartPos = Selection.EndPos;
                 EndPos   = Selection.StartPos;
             }
+
+            StartPos = Math.max( 0, StartPos );
+            EndPos   = Math.min( this.Content.length - 1, EndPos );
 
             for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
             {

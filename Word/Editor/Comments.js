@@ -546,7 +546,7 @@ function CComment(Parent, Data)
         }
 
         if ( false === bUse )
-            editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true );
+            editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true, false );
     };
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -1066,6 +1066,10 @@ ParaComment.prototype =
     Is_EmptyRange : function(_CurLine, _CurRange)
     {
         return true;
+    },
+
+    Check_Range_OnlyMath : function(Checker, CurRange, CurLine)
+    {
     },
 
     Check_BreakPageInRange : function(_CurLine, _CurRange)

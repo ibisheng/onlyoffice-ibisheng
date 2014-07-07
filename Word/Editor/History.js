@@ -81,6 +81,8 @@ CHistory.prototype =
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )
             this.LastState = this.Document.Get_SelectionState();
+        
+        this.Document.Selection_Remove();
 
         var Point = this.Points[this.Index--];
 
@@ -104,7 +106,9 @@ CHistory.prototype =
         // Проверяем можно ли сделать Redo
         if ( true != this.Can_Redo() )
             return null;
-
+        
+        this.Document.Selection_Remove();
+        
         var Point = this.Points[++this.Index];
 
         this.Internal_RecalcData_Clear();

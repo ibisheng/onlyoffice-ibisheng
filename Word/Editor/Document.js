@@ -12497,15 +12497,18 @@ CDocument.prototype =
         this.Comments.Set_CommentData( Id, CommentData );
     },
 
-    Remove_Comment : function(Id, bSendEvent)
+    Remove_Comment : function(Id, bSendEvent, bRecalculate)
     {
         if ( null === Id )
             return;
 
         if ( true === this.Comments.Remove_ById( Id ) )
         {
-            // TODO: Продумать как избавиться от пересчета при удалении комментария
-            this.Recalculate();
+            if ( true === bRecalculate )
+            {
+                // TODO: Продумать как избавиться от пересчета при удалении комментария
+                this.Recalculate();
+            }
 
             if ( true === bSendEvent )
                 editor.sync_RemoveComment( Id );

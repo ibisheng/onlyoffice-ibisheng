@@ -11276,8 +11276,6 @@ CTable.prototype =
                 break;
         }
 
-        this.Internal_Recalculate_1();
-
         // Выделяем полученную ячейку
         this.Selection.Use   = true;
         this.Selection.StartPos.Pos = Pos_tl;
@@ -11286,6 +11284,9 @@ CTable.prototype =
         this.Selection.Data = [ Pos_tl ];
 
         this.CurCell = Cell_tl;
+        
+        // Запускаем пересчет
+        this.Internal_Recalculate_1();
     },
 
     // Разделяем текущую ячейку
@@ -17871,6 +17872,7 @@ CTable.prototype =
             this.Content[Ind].Set_Index( Ind );
             this.Content[Ind].Prev = ( Ind > 0 ? this.Content[Ind - 1] : null );
             this.Content[Ind].Next = ( Ind < this.Content.length - 1 ? this.Content[Ind + 1] : null );
+            this.Content[Ind].Table = this;
         }
     },
     
@@ -19469,6 +19471,7 @@ CTableRow.prototype =
             this.Content[Ind].Set_Index( Ind );
             this.Content[Ind].Prev = ( Ind > 0 ? this.Content[Ind - 1] : null );
             this.Content[Ind].Next = ( Ind < this.Content.length - 1 ? this.Content[Ind + 1] : null );
+            this.Content[Ind].Row  = this;
         }
     },
 

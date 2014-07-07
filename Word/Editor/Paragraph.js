@@ -144,7 +144,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     EndRun.Add_ToContent( 0, new ParaEnd() );
 
     this.Content[0] = EndRun;
-
+    
     this.m_oPRSW = new CParagraphRecalculateStateWrap();
     this.m_oPRSC = new CParagraphRecalculateStateCounter();
     this.m_oPRSA = new CParagraphRecalculateStateAlign();
@@ -572,7 +572,7 @@ Paragraph.prototype =
 
         // Удаляем комментарий, если это необходимо
         if ( true === this.DeleteCommentOnRemove && para_Comment === Item.Type )
-            this.LogicDocument.Remove_Comment( Item.CommentId, true );
+            this.LogicDocument.Remove_Comment( Item.CommentId, true, false );
 
         var SpellingsCount  = this.SpellChecker.Elements.length;
         for ( var Pos = 0; Pos < SpellingsCount; Pos++ )
@@ -658,7 +658,7 @@ Paragraph.prototype =
         var CountCommentsToDelete = CommentsToDelete.length;
         for ( var Index = 0; Index < CountCommentsToDelete; Index++ )
         {
-            this.LogicDocument.Remove_Comment( CommentsToDelete[Index], true );
+            this.LogicDocument.Remove_Comment( CommentsToDelete[Index], true, false );
         }
 
         // Передвинем все метки слов для проверки орфографии
@@ -1718,77 +1718,86 @@ Paragraph.prototype =
                 var JustifySpace = 0;
                 var RangeWidth   = Range.XEnd - Range.X;
 
-                // RangeWidth - ширина всего пространства в данном отрезке, а Range.W - ширина занимаемого пространства
-
                 var X = 0;
-                switch (ParaPr.Jc)
-                {
-                    case align_Left :
-                    {
-                        X = Range.X;
-                        break;
-                    }
-                    case align_Right:
-                    {
-                        X = Math.max(Range.X +  RangeWidth - Range.W, Range.X);
-                        break;
-                    }
-                    case align_Center:
-                    {
-                        X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X);
-                        break;
-                    }
-                    case align_Justify:
-                    {
-                        X = Range.X;
-
-                        if ( 1 == Range.Words )
-                        {
-                            if ( 1 == RangesCount && this.Lines.length > 1 )
-                            {
-                                // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                                if ( RangeWidth - Range.W <= 0.05 * RangeWidth && Range.Letters > 1 )
-                                    JustifyWord = (RangeWidth -  Range.W) / (Range.Letters - 1);
-                            }
-                            else if ( 0 == CurRange || ( CurLine == this.Lines.length - 1 && CurRange == RangesCount - 1 ) )
-                            {
-                                // Ничего не делаем (выравниваем текст по левой границе)
-                            }
-                            else if ( CurRange == RangesCount - 1 )
-                            {
-                                X = Range.X +  RangeWidth - Range.W;
-                            }
-                            else
-                            {
-                                X = Range.X + (RangeWidth - Range.W) / 2;
-                            }
-                        }
-                        else
-                        {
-                            // TODO: Переделать проверку последнего отрезка в последней строке (нужно выставлять флаг когда пришел PRS.End в отрезке)
-
-                            // Последний промежуток последней строки не надо растягивать по ширине.
-                            if ( Range.Spaces > 0 && ( CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1 ) )
-                                JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
-                            else
-                                JustifySpace = 0;
-                        }
-
-                        break;
-                    }
-                    default:
-                    {
-                        X = Range.X;
-                        break;
-                    }
-                }
                 
-                // В последнем отрезке последней строки не делаем текст "по ширине"
-                if ( CurLine === this.ParaEnd.Line && CurRange === this.ParaEnd.Range )
+                // Если данный отрезок содержит только формулу, тогда прилегание данного отрезка определяется формулой
+                var ParaMath = this.Check_Range_OnlyMath(CurRange, CurLine);
+                if (null !== ParaMath)
                 {
-                    JustifyWord  = 0;
-                    JustifySpace = 0;
+                    X = Math.max(Range.X +  (RangeWidth - ParaMath.Width) / 2, Range.X);
                 }
+                else
+                {
+                    // RangeWidth - ширина всего пространства в данном отрезке, а Range.W - ширина занимаемого пространства
+                    switch (ParaPr.Jc)
+                    {
+                        case align_Left :
+                        {
+                            X = Range.X;
+                            break;
+                        }
+                        case align_Right:
+                        {
+                            X = Math.max(Range.X +  RangeWidth - Range.W, Range.X);
+                            break;
+                        }
+                        case align_Center:
+                        {
+                            X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X);
+                            break;
+                        }
+                        case align_Justify:
+                        {
+                            X = Range.X;
+
+                            if ( 1 == Range.Words )
+                            {
+                                if ( 1 == RangesCount && this.Lines.length > 1 )
+                                {
+                                    // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
+                                    if ( RangeWidth - Range.W <= 0.05 * RangeWidth && Range.Letters > 1 )
+                                        JustifyWord = (RangeWidth -  Range.W) / (Range.Letters - 1);
+                                }
+                                else if ( 0 == CurRange || ( CurLine == this.Lines.length - 1 && CurRange == RangesCount - 1 ) )
+                                {
+                                    // Ничего не делаем (выравниваем текст по левой границе)
+                                }
+                                else if ( CurRange == RangesCount - 1 )
+                                {
+                                    X = Range.X +  RangeWidth - Range.W;
+                                }
+                                else
+                                {
+                                    X = Range.X + (RangeWidth - Range.W) / 2;
+                                }
+                            }
+                            else
+                            {
+                                // TODO: Переделать проверку последнего отрезка в последней строке (нужно выставлять флаг когда пришел PRS.End в отрезке)
+
+                                // Последний промежуток последней строки не надо растягивать по ширине.
+                                if ( Range.Spaces > 0 && ( CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1 ) )
+                                    JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
+                                else
+                                    JustifySpace = 0;
+                            }
+
+                            break;
+                        }
+                        default:
+                        {
+                            X = Range.X;
+                            break;
+                        }
+                    }
+
+                    // В последнем отрезке последней строки не делаем текст "по ширине"
+                    if ( CurLine === this.ParaEnd.Line && CurRange === this.ParaEnd.Range )
+                    {
+                        JustifyWord  = 0;
+                        JustifySpace = 0;
+                    }
+                }                                                
 
                 PRSA.X    = X;
                 PRSA.Y    = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
@@ -1823,6 +1832,34 @@ Paragraph.prototype =
         }
 
         return recalcresult_NextElement;
+    },
+    
+    Check_Range_OnlyMath : function(CurRange, CurLine)
+    {
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+        var Checker  = new CParagraphMathRangeChecker();
+
+        for (var Pos = StartPos; Pos <= EndPos; Pos++)
+        {
+            this.Content[Pos].Check_Range_OnlyMath(Checker, CurRange, CurLine);
+
+            if (false === Checker.Result)
+                break;
+        }
+        
+        if (true !== Checker.Result)
+            return null;
+        
+        return Checker.Math;
+    },
+    
+    Check_MathPara : function(MathPos)
+    {
+        if (undefined === this.Content[MathPos] || para_Math !== this.Content[MathPos].Type)
+            return false;
+        
+        
     },
 
     Get_EndInfo : function()
@@ -3584,7 +3621,7 @@ Paragraph.prototype =
 
                 for (var CommentId in CommentsToDelete)
                 {
-                    this.LogicDocument.Remove_Comment( CommentId, true );
+                    this.LogicDocument.Remove_Comment( CommentId, true, false );
                 }
             }
 
@@ -6143,7 +6180,7 @@ Paragraph.prototype =
 
             for (var CommentId in CommentsToDelete)
             {
-                this.LogicDocument.Remove_Comment( CommentId, true );
+                this.LogicDocument.Remove_Comment( CommentId, true, false );
             }
 
             // Еще раз обновим метки
@@ -7237,7 +7274,10 @@ Paragraph.prototype =
                 for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
                 {
                     var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
-                    if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
+                    
+                    if ( null === TextPr || undefined === TextPr )
+                        TextPr = TempTextPr;
+                    else if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
                         TextPr = TextPr.Compare( TempTextPr );
                 }
             }
@@ -7246,6 +7286,9 @@ Paragraph.prototype =
                 TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
             }
         }
+        
+        if ( null === TextPr || undefined === TextPr )
+            TextPr = this.TextPr.Value.Copy();
 
         // TODO: Пока возвращаем всегда шрифт лежащий в Ascii, в будущем надо будет это переделать
         if ( undefined !== TextPr.RFonts && null !== TextPr.RFonts )
@@ -9236,6 +9279,7 @@ Paragraph.prototype =
             this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
         var HyperPos = -1;
+        var Math     = null;
 
         if ( true === this.Selection.Use )
         {
@@ -9264,11 +9308,16 @@ Paragraph.prototype =
 
             if ( this.Selection.StartPos === this.Selection.EndPos && para_Hyperlink === this.Content[this.Selection.StartPos].Type )
                 HyperPos = this.Selection.StartPos;
+            
+            if (this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type)
+                Math = this.Content[this.Selection.EndPos];
         }
         else
         {
-            if ( para_Hyperlink === this.Content[this.CurPos.ContentPos].Type )
+            if (para_Hyperlink === this.Content[this.CurPos.ContentPos].Type)
                 HyperPos = this.CurPos.ContentPos;
+            else if (para_Math === this.Content[this.CurPos.ContentPos].Type)
+                Math = this.Content[this.CurPos.ContentPos];
         }
 
         if ( -1 !== HyperPos )
@@ -9283,6 +9332,14 @@ Paragraph.prototype =
 
             editor.sync_HyperlinkPropCallback( HyperProps );
         }
+        
+        if (null !== Math)
+        {
+            var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1) * 3;
+            this.Parent.DrawingDocument.Update_MathTrack(true, Math.X - PixelError, Math.Y - PixelError, Math.Width + 2 * PixelError, Math.Height + 2 * PixelError, this.CurPos.PagesPos + this.Get_StartPage_Absolute());
+        }
+        else
+            this.Parent.DrawingDocument.Update_MathTrack(false);
     },
 
     // Функция, которую нужно вызвать перед удалением данного элемента
@@ -9298,7 +9355,7 @@ Paragraph.prototype =
             var Item = this.Content[Index];
             if ( para_Comment === Item.Type )
             {
-                editor.WordControl.m_oLogicDocument.Remove_Comment( Item.CommentId, true );
+                this.LogicDocument.Remove_Comment( Item.CommentId, true, false );
             }
         }
     },
@@ -12570,7 +12627,7 @@ Paragraph.prototype =
         
         for (var CommentId in CommentsToDelete)
         {
-            this.LogicDocument.Remove_Comment( CommentId, true );
+            this.LogicDocument.Remove_Comment( CommentId, true, false );
         }
 
         this.Set_SelectionContentPos( StartPos, EndPos );
@@ -14242,3 +14299,9 @@ CParagraphRecalculateObject.prototype =
         }
     }
 };
+
+function CParagraphMathRangeChecker()
+{
+    this.Math   = null; // Искомый элемент
+    this.Result = true; // Если есть отличные от Math элементы, тогда false, если нет, тогда true 
+}

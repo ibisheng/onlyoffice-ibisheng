@@ -7877,6 +7877,10 @@ CDocumentContent.prototype =
 
     Internal_Content_RemoveAll : function()
     {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+            this.Content[Index].PreDelete();
+
         History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : 0, Items : this.Content.slice( 0, this.Content.length ) } );
         this.Content = [];
     },
