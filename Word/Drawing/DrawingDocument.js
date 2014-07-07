@@ -1793,6 +1793,8 @@ function CDrawingDocument()
     this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
 
+    this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 } };
+
     this.m_oCacheManager    = new CCacheManager();
 
     this.m_lCountCalculatePages = 0;
@@ -3418,6 +3420,50 @@ function CDrawingDocument()
             ctx.beginPath();
         }
     }
+    
+    this.DrawMathTrack = function(overlay)
+    {
+        if (!this.MathRect.IsActive)
+            return;
+
+        var _page = this.m_arrPages[this.MathRect.Rect.PageIndex];
+        var drPage = _page.drawingPage;
+
+        var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+        var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+        var _x = (drPage.left + dKoefX * this.MathRect.Rect.X);
+        var _y = (drPage.top  + dKoefY * this.MathRect.Rect.Y);
+        var _r = (drPage.left + dKoefX * this.MathRect.Rect.R);
+        var _b = (drPage.top  + dKoefY * this.MathRect.Rect.B);
+
+        if (_x < overlay.min_x)
+            overlay.min_x = _x;
+        if (_r > overlay.max_x)
+            overlay.max_x = _r;
+
+        if (_y < overlay.min_y)
+            overlay.min_y = _y;
+        if (_b > overlay.max_y)
+            overlay.max_y = _b;
+
+        var ctx = overlay.m_oContext;
+        ctx.strokeStyle = "#939393";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);        
+        ctx.stroke();
+        ctx.beginPath();
+
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0);
+        ctx.stroke();
+        ctx.beginPath();
+    }
 
     this.DrawTableTrack = function(overlay)
     {
@@ -4234,6 +4280,20 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateVerRuler();
     }
 
+    this.Update_MathTrack = function(IsActive, X, Y, W, H, PageIndex)
+    {       
+        this.MathRect.IsActive = IsActive;
+        
+        if (true === IsActive)
+        {
+            this.MathRect.Rect.X = X;
+            this.MathRect.Rect.Y = Y;
+            this.MathRect.Rect.R = X + W;
+            this.MathRect.Rect.B = Y + H;
+            this.MathRect.Rect.PageIndex = PageIndex;
+        }
+    }
+    
     this.Update_ParaTab = function(Default_Tab, ParaTabs)
     {
         var hor_ruler = this.m_oWordControl.m_oHorRuler;

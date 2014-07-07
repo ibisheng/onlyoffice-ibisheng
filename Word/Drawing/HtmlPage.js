@@ -2982,6 +2982,11 @@ function CEditorPage(api)
             {
                 drDoc.DrawFrameTrack(overlay);
             }
+            
+            if (drDoc.MathRect.IsActive)
+            {
+                drDoc.DrawMathTrack(overlay);
+            }
 
             if (drDoc.InlineTextTrackEnabled && null != drDoc.InlineTextTrack)
             {
