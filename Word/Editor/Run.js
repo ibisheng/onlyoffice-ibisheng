@@ -2686,6 +2686,30 @@ ParaRun.prototype =
         return false;
     },
 
+    Check_Range_OnlyMath : function(Checker, _CurRange, _CurLine)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        for (var Pos = StartPos; Pos < EndPos; Pos++)
+        {
+            var Item = this.Content[Pos];
+
+            if (para_End === Item.Type || (para_Drawing === Item.Type && true !== Item.Is_Inline()))
+                continue;
+            else
+            {
+                Checker.Result = false;
+                Checker.Math   = null;
+                break;
+            }
+        }
+    },
+
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {
         var CurLine  = _CurLine - this.StartLine;

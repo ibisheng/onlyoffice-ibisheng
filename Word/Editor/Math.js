@@ -14,6 +14,7 @@ function ParaMath()
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
 
+    this.ParaMath = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)    
     this.Jc   = undefined;
     //this.Math = new CMathComposition();
     //this.Math.Parent = this;
@@ -780,6 +781,17 @@ ParaMath.prototype =
             return false;
 
         return true;
+    },
+
+    Check_Range_OnlyMath : function(Checker, CurRange, CurLine)
+    {
+        if (null !== Checker.Math)
+        {
+            Checker.Math   = null;
+            Checker.Result = false;
+        }
+        else
+            Checker.Math = this;
     },
 
     Check_BreakPageInRange : function(_CurLine, _CurRange)
