@@ -1793,7 +1793,8 @@ var gUndoInsDelCellsFlag = true;
 									break;
 								}	
 							}
-						}
+						};
+						
 						if(!isEn)//добавляем фильтр
 						{
 							if(cloneData.TableStyleInfo)
@@ -1824,9 +1825,9 @@ var gUndoInsDelCellsFlag = true;
 							{
 								aWs.AutoFilter = cloneData;
 								this._addButtonAF({result: cloneData.result,isVis: true});
-							}
-						}
-					}
+							};
+						};
+					};
 				}
 				else if(cloneData.oldFilter)//в случае удаления/добавления строк 
 				{
@@ -1849,10 +1850,13 @@ var gUndoInsDelCellsFlag = true;
 								var splitRange = cloneData.oldFilter.Ref;
 								
 								this._setColorStyleTable(splitRange, cloneData.oldFilter, null, true);
+								
+								this._checkShowButtonsFlag(aWs.TableParts[l]);
+								
 								break;
 							}	
 						}
-					}
+					};
 				}
 				else
 				{
@@ -7040,7 +7044,33 @@ var gUndoInsDelCellsFlag = true;
 					if(result[i].showButton ===  false)
 						result[i].showButton = true;
 				};
+			},
+			
+			_checkShowButtonsFlag: function(autoFilter)
+			{
+				//добавлена в связи с проблемами, возникающими при undo удаления столбца форматированной таблицы со скрытой кнопкой
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				var button;
+				var result = autoFilter.result;
+				
+				if(!result)
+					return;
+				
+				for(var i = 0; i < this.allButtonAF.length; i++)
+				{
+					button = this.allButtonAF[i];
+					for(var n = 0; n < result.length; n++)
+					{
+						if(button && button.id == result[n].id && result[n].showButton === false)
+						{
+							this.allButtonAF.splice(i, 1);
+							i--;
+						};
+					};
+				};
 			}
+			
 		};
 
 		/*
