@@ -996,7 +996,7 @@ var gUndoInsDelCellsFlag = true;
 							result[n].height = ws.rows[startCol].height;
 							result[n].id = cellId;
 							result[n].idNext = idCellNext.getID();
-							result[n].showButton = this._isShowButton(aWs.AutoFilter.FilterColumns, col - startCol);
+							result[n].showButton = this._isShowButton(aWs.AutoFilter, col - startCol);
 							
 							n++;
 						}
@@ -1030,7 +1030,7 @@ var gUndoInsDelCellsFlag = true;
 							result[n].height = ws.rows[startCol].height;
 							result[n].id = cellId;
 							result[n].idNext = idCellNext.getID();
-							result[n].showButton = this._isShowButton(aWs.TableParts[openFilter].AutoFilter.FilterColumns, col - startCol);
+							result[n].showButton = this._isShowButton(aWs.TableParts[openFilter].AutoFilter, col - startCol);
 							
 							n++;
 						}
@@ -6551,9 +6551,14 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
-			_isShowButton: function(filterColumns, colId)
+			_isShowButton: function(autoFilter, colId)
 			{
 				var result = true;
+				var filterColumns = (autoFilter && autoFilter.FilterColumns) ? autoFilter.FilterColumns : null;
+				
+				if(filterColumns == null)
+					return false;
+				
 				if(filterColumns && filterColumns.length != 0)
 				{
 					for(var i = 0; i < filterColumns.length;i++)
