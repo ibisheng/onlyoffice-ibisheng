@@ -112,6 +112,14 @@ CGraphicObjects.prototype =
         return this.document.DrawingDocument.GetMMPerDot(v);
     },
 
+    getGraphicInfoUnderCursor: function(pageIndex, x, y)
+    {
+        this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        var ret = this.curState.onMouseDown(global_mouseEvent, x, y, pageIndex, false);
+        this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        return ret || {};
+    },
+
     updateCursorType: function(pageIndex, x, y, e, bTextFlag)
     {
         var ret;
@@ -649,6 +657,7 @@ CGraphicObjects.prototype =
             {
 				var options = new asc_ChartSettings();
 				options.type = type;
+                options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
 				var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
 					parsedHeaders: {bLeft: true, bTop: true}};
                 var ret = this.getChartSpace(chartSeries, options);
