@@ -3208,7 +3208,6 @@ DrawingObjectsController.prototype =
 
     onKeyDown: function(e)
     {
-        e.ctrlKey = e.metaKey || e.ctrlKey;
         var ctrlKey = e.metaKey || e.ctrlKey;
         var drawingObjectsController = this;
         var bRetValue = false;
