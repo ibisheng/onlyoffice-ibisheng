@@ -3144,6 +3144,16 @@ function DrawingObjects() {
         }, this, []);
 
     };
+    _this.updateChartReferences2 = function(oldWorksheet, newWorksheet)
+    {
+        for (var i = 0; i < aObjects.length; i++) {
+            var graphicObject = aObjects[i].graphicObject;
+            if ( graphicObject.updateChartReferences )
+            {
+                graphicObject.updateChartReferences2(oldWorksheet, parserHelp.getEscapeSheetName(newWorksheet));
+            }
+        }
+    };
 
     //-----------------------------------------------------------------------------------
     // Graphic object
@@ -3597,7 +3607,7 @@ function DrawingObjects() {
             settings.putRange(worksheet.getSelectionRangeValue());
             settings.putStyle(2);
             settings.putType(c_oAscChartTypeSettings.lineNormal);
-            settings.putTitle(c_oAscChartTitleShowSettings.none);
+            settings.putTitle(c_oAscChartTitleShowSettings.noOverlay);
             settings.putLegendPos(c_oAscChartLegendShowSettings.right);
             settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
             settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);

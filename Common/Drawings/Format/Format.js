@@ -23,6 +23,9 @@
  */
 
 //Типы изменений в классе CTheme
+
+
+
 var historyitem_ChangeColorScheme = 0;
 var historyitem_ChangeFontScheme = 1;
 var historyitem_ChangeFmtScheme = 2;

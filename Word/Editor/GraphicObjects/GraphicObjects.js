@@ -672,7 +672,7 @@ CGraphicObjects.prototype =
                 ret.spPr.xfrm.setOffY(0);
                 ret.theme = this.document.theme;
                 return ret;
-            }, this, [])
+            }, this, []);
         }
         else
         {

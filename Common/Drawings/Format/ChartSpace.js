@@ -175,6 +175,9 @@ function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
         this, [schemeColorId, tintVal]);
 }
 
+
+var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
+
 function CChartSpace()
 {
     this.chart = null;
@@ -640,6 +643,14 @@ CChartSpace.prototype =
         }
     },
 
+    updateChartReferences2: function(oldWorksheetName, newWorksheetName)
+    {
+        if(this.checkChartReferences(oldWorksheetName))
+        {
+            this.changeChartReferences(oldWorksheetName, newWorksheetName);
+        }
+    },
+
     checkSeriesRefs: function(callback, bbox, worksheet)
     {
         if(this.chart && this.chart.plotArea)
@@ -760,7 +771,6 @@ CChartSpace.prototype =
 
     rebuildSeries: function()
     {
-
         this.setRecalculateInfo();
         this.checkSeriesRefs(this.clearCacheVal);
         this.recalculate();

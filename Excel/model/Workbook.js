@@ -1772,11 +1772,11 @@ Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChan
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
-    var wsViews = this.oApi.wb.wsViews;
-    for(var i in wsViews)
+
+    var worksheets = this.aWorksheets, t;
+    for(t = 0; t < worksheets.length; ++t)
     {
-        if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
-            wsViews[i].objectRender.controller.refreshContentChanges();
+        worksheets[t] && worksheets[t].refreshContentChanges();
     }
 	var aActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 	if(aActions.length > 0)
@@ -1800,10 +1800,12 @@ Workbook.prototype.SerializeHistory = function(){
 		            else if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
 		                bChangeSheetPlace = true;
 		        }
+
 		        this._SerializeHistoryBase64(oMemory, item, aPointChangesBase64);
 		    }
 		    aRes.push(aPointChangesBase64);
 		}
+
 		aPointChangesBase64 = [];
 		var aFonts = [];
 		for (var i in oFontMap)
@@ -2119,7 +2121,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
             oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
         }
         drawingObjects.pushToAObjects(oNewWs.Drawings);
-        drawingObjects.updateChartReferences(wsFrom.sName, oNewWs.sName);
+        drawingObjects.updateChartReferences2(wsFrom.sName, oNewWs.sName);
     }
 };
 Woorksheet.prototype.init=function(){
