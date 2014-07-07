@@ -5683,7 +5683,7 @@
 				isSelGraphicObject, isNotFirst;
 				
 			var frozenCursor = this._isFrozenAnchor(x, y);
-			if (frozenCursor.result) {
+			if (!isViewerMode && frozenCursor.result) {
 				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane);
 				isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
 				if (false !== isLocked) {

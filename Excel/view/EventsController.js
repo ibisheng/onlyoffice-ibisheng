@@ -1263,15 +1263,15 @@
 					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FilterObject) {
 						  t._autoFiltersClick(t.targetInfo.idFilter);
 						  return;
-					} else if (t.targetInfo && (undefined !== t.targetInfo.commentIndexes) && (false === this.settings.isViewerMode)) {
+					} else if (t.targetInfo && undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
 						t._commentCellClick(event);
 					} else if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 						this.isMoveResizeRange = true;
 						this.isMoveResizeChartsRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
-					} else if ( t.targetInfo && ((t.targetInfo.target === c_oTargetType.FrozenAnchorV) ||
-						(t.targetInfo.target === c_oTargetType.FrozenAnchorH)) ) {
+					} else if (t.targetInfo && (t.targetInfo.target === c_oTargetType.FrozenAnchorV ||
+						t.targetInfo.target === c_oTargetType.FrozenAnchorH) && false === this.settings.isViewerMode) {
 						// Режим установки закреплённых областей
 						this.isFrozenAnchorMode = t.targetInfo.target;
 						t._moveFrozenAnchorHandle(event, t.targetInfo);

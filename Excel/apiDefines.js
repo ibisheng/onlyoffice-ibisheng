@@ -270,7 +270,8 @@ var c_oAscLayoutPageType = {
 	ActualSize		: 1		// По реальным размерам
 };
 
- var c_oAscCustomAutoFilter = {
+/** @enum */
+var c_oAscCustomAutoFilter = {
 	equals: 1,
 	isGreaterThan: 2, 
 	isGreaterThanOrEqualTo: 3, 
@@ -283,7 +284,7 @@ var c_oAscLayoutPageType = {
 	doesNotEndWith: 10,
 	contains: 11, 
 	doesNotContain: 12
- };
+};
 
 // Состояние редактора ячейки
 var c_oAscCellEditorState = {
