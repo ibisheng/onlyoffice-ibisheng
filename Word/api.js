@@ -2781,17 +2781,19 @@ function OnSave_Callback2(e)
     }
 }
 
-asc_docs_api.prototype.asc_Save = function (isAutoSave) {
-	if(true === this.canSave) {
-		this.canSave = false;
-		this.isAutoSave = !!isAutoSave;
-		if (!this.isAutoSave) {
-			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-		}
-
-        this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
-	}
+asc_docs_api.prototype.asc_Save = function (isAutoSave) 
+{
+    this.asc_Save2();
+//	if(true === this.canSave) {
+//		this.canSave = false;
+//		this.isAutoSave = !!isAutoSave;
+//		if (!this.isAutoSave) {
+//			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+//			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+//		}
+//
+//        this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+//	}
 };
 
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
@@ -5874,7 +5876,7 @@ asc_docs_api.prototype.asc_removeComment = function(Id)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Comment, Id : Id } ) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
+        this.WordControl.m_oLogicDocument.Remove_Comment( Id, true, true );
     }
 };
 
