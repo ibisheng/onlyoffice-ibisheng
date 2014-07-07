@@ -5109,7 +5109,32 @@ CMathContent.prototype =
 
         return result;
     },
+    Get_StartRangePos: function(CurLine, CurRange, SearchPos, Depth)
+    {
+        SearchPos.Pos.Update( 0, Depth );
 
+        return this.content[0].Get_StartRangePos(CurLine, CurRange, SearchPos, Depth + 1);
+    },
+    Get_StartRangePos2: function(CurLine, CurRange, ContentPos, Depth)
+    {
+        ContentPos.Update( 0, Depth );
+
+        this.content[0].Get_StartRangePos2(CurLine, CurRange, ContentPos, Depth + 1);
+    },
+    Get_EndRangePos: function(CurLine, CurRange, SearchPos, Depth)
+    {
+        var len = this.content.length - 1;
+
+        var result = false;
+
+        if(len >= 0)
+        {
+            SearchPos.Pos.Update(len, Depth);
+            result = this.content[len].Get_EndRangePos(CurLine, CurRange, SearchPos, Depth + 1);
+        }
+
+        return result;
+    },
 
     //////////////////////////////////////
 

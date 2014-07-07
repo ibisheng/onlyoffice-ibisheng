@@ -1413,7 +1413,7 @@ ParaMath.prototype =
 
         // Сделать для случая, когда формула будет занимать несколько строк
 
-        this.Root.Get_EndPos(false, SearchPos.Pos, Depth);
+        return this.Root.Get_EndRangePos(_CurLine, _CurRange, SearchPos, Depth);
 
     },
 
@@ -1423,7 +1423,8 @@ ParaMath.prototype =
 
         // Сделать для случая, когда формула будет занимать несколько строк, переделать
 
-        this.Root.Get_StartPos(SearchPos.Pos, Depth);
+        return this.Root.Get_StartRangePos(_CurLine, _CurRange, SearchPos, Depth);
+        //this.Root.Get_StartPos(SearchPos.Pos, Depth);
 
     },
 
@@ -1433,7 +1434,7 @@ ParaMath.prototype =
 
         // Сделать для случая, когда формула будет занимать несколько строк, переделать
 
-        this.Root.Get_StartPos(ContentPos, Depth);
+        this.Root.Get_StartRangePos2(_CurLine, _CurRange, ContentPos, Depth);
 
     },
 
