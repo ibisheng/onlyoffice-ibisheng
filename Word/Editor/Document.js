@@ -79,7 +79,8 @@ function CSelectedContent()
     this.DrawingObjects = [];
     this.Comments       = [];
     
-    this.HaveShape = false;
+    this.HaveShape   = false;
+    this.MoveDrawing = false; // Только для переноса автофигур
 }
 
 CSelectedContent.prototype =
@@ -97,6 +98,11 @@ CSelectedContent.prototype =
     Add : function(Element)
     {
         this.Elements.push( Element );
+    },
+    
+    Set_MoveDrawing : function(Value)
+    {
+        this.MoveDrawing = Value;
     },
     
     On_EndCollectElements : function(LogicDocument)
@@ -8523,7 +8529,7 @@ CDocument.prototype =
 
             // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
             //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
-            var bNeedSelect = (docpostype_DrawingObjects !== this.CurPos.Type ? true : false);
+            var bNeedSelect = (true === SelectedContent.MoveDrawing ? false : true);
 
             for ( var Index = 0; Index < NewElementsCount; Index++ )
             {
@@ -10222,6 +10228,9 @@ CDocument.prototype =
 
         // Обновим информацию о секциях
         this.SectionsInfo.Update_OnRemove( Position, Count );
+
+        // Проверим последний параграф
+        this.Check_SectionLastParagraph();
 
         return ChangePos;
     },

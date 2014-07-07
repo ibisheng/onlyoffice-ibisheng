@@ -4848,6 +4848,7 @@ ParaDrawing.prototype =
         var SelectedElement = new CSelectedElement(Para, false)
         var SelectedContent = new CSelectedContent();
         SelectedContent.Add( SelectedElement );
+        SelectedContent.Set_MoveDrawing( true );        
 
         NearPos.Paragraph.Parent.Insert_Content( SelectedContent, NearPos );
 

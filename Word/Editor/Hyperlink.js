@@ -65,6 +65,8 @@ ParaHyperlink.prototype =
 
         NewHyperlink.Set_Value( this.Value );
         NewHyperlink.Set_ToolTip( this.ToolTip );
+        
+        NewHyperlink.Visited = this.Visited;
 
         var StartPos = 0;
         var EndPos   = this.Content.length - 1;

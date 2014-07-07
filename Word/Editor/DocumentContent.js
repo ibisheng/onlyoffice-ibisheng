@@ -3912,7 +3912,7 @@ CDocumentContent.prototype =
             // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас 
             //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
             var LogicDocument = this.LogicDocument;
-            bNeedSelect = (null !== LogicDocument && (docpostype_DrawingObjects === LogicDocument.CurPos.Type || (docpostype_HdrFtr === LogicDocument.CurPos.Type && null !== LogicDocument.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === LogicDocument.HdrFtr.CurHdrFtr.Content.CurPos.Type)) ? false : true);
+            bNeedSelect = (true === SelectedContent.MoveDrawing ? false : true);
 
             for ( var Index = 0; Index < NewElementsCount; Index++ )
             {
