@@ -653,7 +653,10 @@
 		
 				var _interval_time = 0;
 				if(AscBrowser.isMozilla)
-					_interval_time = 10;	
+					_interval_time = 10;
+				else if(window.USER_AGENT_MACOS && window.USER_AGENT_WEBKIT)
+					_interval_time = 200;
+				
 				// ждем выполнения
 				window.setTimeout(
 						function() {
