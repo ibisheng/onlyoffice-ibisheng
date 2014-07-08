@@ -4060,15 +4060,21 @@ DrawingObjectsController.prototype =
 
     getDrawingPropsFromArray: function(drawings)
     {
-        var image_props, shape_props, chart_props, new_image_props, new_shape_props, new_chart_props;
+        var image_props, shape_props, chart_props, new_image_props, new_shape_props, new_chart_props, locked;
         var drawing;
         for(var i = 0; i < drawings.length; ++i)
         {
             drawing = drawings[i];
+            locked = undefined;
+            if(!drawing.group)
+            {
+                locked = drawing.lockType !== c_oAscLockTypes.kLockTypeNone;
+            }
             switch(drawing.getObjectType())
             {
                 case historyitem_type_Shape:
                 {
+
                     new_shape_props =
                     {
                         canFill: drawing.canFill(),
@@ -4080,7 +4086,8 @@ DrawingObjectsController.prototype =
                         w: drawing.extX,
                         h: drawing.extY ,
                         canChangeArrows: drawing.canChangeArrows(),
-                        bFromChart: false
+                        bFromChart: false,
+                        locked: locked
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -4096,7 +4103,8 @@ DrawingObjectsController.prototype =
                     {
                         imageUrl: drawing.getImageUrl(),
                         w: drawing.extX,
-                        h: drawing.extY
+                        h: drawing.extY,
+                        locked: locked
                     };
                     if(!image_props)
                         image_props = new_image_props;
@@ -4108,6 +4116,8 @@ DrawingObjectsController.prototype =
                             image_props.w = null;
                         if(image_props.h != null && image_props.h !== new_image_props.h)
                             image_props.h = null;
+                        if(image_props.locked || new_image_props.locked)
+                            image_props.locked = true;
                     }
                     break;
                 }
@@ -4120,7 +4130,8 @@ DrawingObjectsController.prototype =
                         subtype: type_subtype.subtype,
                         styleId: drawing.style,
                         w: drawing.extX,
-                        h: drawing.extY
+                        h: drawing.extY,
+                        locked: locked
                     };
                     if(!chart_props)
                     {
@@ -4147,6 +4158,9 @@ DrawingObjectsController.prototype =
                             chart_props.w = null;
                         if(chart_props.h != null && chart_props.h !== new_chart_props.h)
                             chart_props.h = null;
+
+                        if(chart_props.locked || new_chart_props.locked)
+                            chart_props.locked = true;
                     }
 
                     new_shape_props =
@@ -4160,7 +4174,8 @@ DrawingObjectsController.prototype =
                         w: drawing.extX,
                         h: drawing.extY ,
                         canChangeArrows: false,
-                        bFromChart: true
+                        bFromChart: true,
+                        locked: locked
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -4195,6 +4210,9 @@ DrawingObjectsController.prototype =
                                 image_props.w = null;
                             if(image_props.h != null && image_props.h !== group_drawing_props.imageProps.h)
                                 image_props.h = null;
+
+                            if(image_props.locked || new_image_props.locked)
+                                image_props.locked = true;
                         }
                     }
                     if(group_drawing_props.chartProps)
@@ -4219,6 +4237,9 @@ DrawingObjectsController.prototype =
                                 chart_props.w = null;
                             if(chart_props.h != null && chart_props.h !== group_drawing_props.chartProps.h)
                                 chart_props.h = null;
+
+                            if(chart_props.locked || new_chart_props.locked)
+                                chart_props.locked = true;
                         }
                     }
                     break;
@@ -4248,6 +4269,7 @@ DrawingObjectsController.prototype =
         var ascSelectedObjects = [];
 
         var ret = [];
+        var i, j, cur_drawing;
         if (isRealObject(props.shapeProps))
         {
             shape_props = new asc_CImgProperty();
@@ -4284,6 +4306,9 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
             shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
             shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
+            shape_props.Locked = props.shapeProps.locked === true;
+
+
             //shape_props.Locked = false;
             ret.push(shape_props);
         }
@@ -4293,7 +4318,7 @@ DrawingObjectsController.prototype =
             image_props.Width = props.imageProps.w;
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.imageUrl;
-            //image_props.Locked = false;//TODO!(props.imageProps.lockType === c_oAscLockTypes.kLockTypeNone);
+            image_props.Locked = props.imageProps.locked === true;
             ret.push(image_props);
         }
         if (isRealObject(props.chartProps) && isRealObject(props.chartProps.chartProps))
@@ -4302,9 +4327,10 @@ DrawingObjectsController.prototype =
             chart_props.Width = props.chartProps.w;
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
+            chart_props.Locked = props.chartProps.locked === true;
             ret.push(chart_props);
         }
-        for (var i = 0; i < ret.length; i++)
+        for (i = 0; i < ret.length; i++)
         {
 
             ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));

@@ -4743,6 +4743,11 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     {
         _result_shape_prop.bFromChart = true;
     }
+
+    if(shapeProp1.locked || shapeProp1.locked)
+    {
+        _result_shape_prop.locked = true;
+    }
     return _result_shape_prop;
 }
 

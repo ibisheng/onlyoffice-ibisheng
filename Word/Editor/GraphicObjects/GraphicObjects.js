@@ -666,6 +666,8 @@ CGraphicObjects.prototype =
 						c_oAscChartTypeSettings.barNormal), parsedHeaders: {bLeft: true, bTop: true}};
 					ret = this.getChartSpace(chartSeries, options);
                 }
+                options.type = null;
+                this.applyPropsToChartSpace(options, ret);
                 ret.theme = this.document.theme;
                 CheckSpPrXfrm(ret);
                 ret.spPr.xfrm.setOffX(0);
