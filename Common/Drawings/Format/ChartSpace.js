@@ -11325,7 +11325,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 			// Val
 			if (startCell && endCell) {
 				if (startCell.getID() == endCell.getID())
-					ser.Val.Formula = startCell.getID();
+					ser.Val.Formula =  parserHelp.get3DRef(ws.sName, startCell.getID());
 				else
 					ser.Val.Formula = parserHelp.get3DRef(ws.sName, startCell.getID() + ':' + endCell.getID());
 			}
