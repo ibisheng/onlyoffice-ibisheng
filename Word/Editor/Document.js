@@ -10209,7 +10209,7 @@ CDocument.prototype =
             NextObj = null;
 
         for ( var Index = 0; Index < Count; Index++ )
-        {
+        {            
             this.Content[Position + Index].PreDelete();
         }
 
@@ -13455,7 +13455,7 @@ CDocumentSectionsInfo.prototype =
         {
             var CurPos = this.Elements[Index].Index;
 
-            if ( CurPos === Pos && CurPos < Pos + Count )
+            if ( CurPos >= Pos && CurPos < Pos + Count )
             {
                 this.Elements.splice( Index, 1 );
                 Len--;

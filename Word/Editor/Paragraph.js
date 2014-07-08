@@ -4630,13 +4630,13 @@ Paragraph.prototype =
                     }
                 }
             }
-            else if ( true !== this.Selection_IsEmpty(true) )
-            {
+            else if ( true !== this.Selection_IsEmpty(true) && ( ( 1 === Direction && true === this.Selection.StartManually ) || ( 1 !== Direction && true === this.Selection.EndManually ) ) )
+            {                                
                 // Эта ветка нужна для снятие выделения с плавающих объектов, стоящих в начале параграфа, когда параграф
                 // выделен не весь. Заметим, что это ветка имеет смысл, только при direction = 1, поэтому выделен весь
                 // параграф или нет, проверяется попаданием para_End в селект. Кроме того, ничего не делаем с селектом,
                 // если он пустой.
-
+                
                 var bNeedCorrectLeftPos = true;
                 var _StartPos = Math.min( StartPos, EndPos );
                 var _EndPos   = Math.max( StartPos, EndPos );
@@ -6592,7 +6592,8 @@ Paragraph.prototype =
         this.Selection.Use      = true;
         this.Selection.Start    = true;
         this.Selection.Flag     = selectionflag_Common;
-
+        this.Selection.StartManually = true;
+        
         // Выставим текущую позицию
         this.Set_ParaContentPos( SearchPosXY2.Pos, true, SearchPosXY2.Line, SearchPosXY2.Range );
 
@@ -6612,6 +6613,8 @@ Paragraph.prototype =
         // Обновляем позицию курсора
         this.CurPos.RealX = X;
         this.CurPos.RealY = Y;
+
+        this.Selection.EndManually = true;
 
         // Найдем позицию в контенте, в которую мы попали (для селекта ищем и за знаком параграфа, для курсора только перед)
         var SearchPosXY  = this.Get_ParaContentPosByXY( X, Y, PageNum, false, true );
@@ -7003,10 +7006,12 @@ Paragraph.prototype =
         if ( true === StartSelection )
         {
             this.Set_SelectionContentPos( ContentPos, this.Get_ParaContentPos( true, false ), false );
+            this.Selection.StartManually = false;
         }
         else
-        {
+        {            
             this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), ContentPos, false );
+            this.Selection.EndManually = false;
         }
     },
 
@@ -7028,6 +7033,9 @@ Paragraph.prototype =
             EndPos   = this.Get_EndPos( true );
         }
 
+        this.Selection.StartManually = false;
+        this.Selection.EndManually   = false;
+        
         this.Set_SelectionContentPos( StartPos, EndPos );
     },
 
@@ -9827,7 +9835,7 @@ Paragraph.prototype =
         // конца выделения, кроме этого в буквицу добавляем все табы идущие в начале.
 
         var DropCapText = new CParagraphGetDropCapText();     
-        if ( true == this.Selection.Use )
+        if ( true == this.Selection.Use && true === this.Parent.Selection_Is_OneElement() )
         {
             var SelSP = this.Get_ParaContentPos( true, true );
             var SelEP = this.Get_ParaContentPos( true, false );
@@ -13369,6 +13377,9 @@ function CParagraphSelection()
     this.StartPos  = 0;
     this.EndPos    = 0;
     this.Flag      = selectionflag_Common;
+    
+    this.StartManually = true; // true - через Selection_SetStart, false - через Selection_SetBegEnd
+    this.EndManually   = true; // true - через Selection_SetEnd, афдыу - через Selection_SetBegEnd  
 }
 
 CParagraphSelection.prototype =
