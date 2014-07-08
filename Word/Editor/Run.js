@@ -653,11 +653,6 @@ ParaRun.prototype =
                     X += Item.WidthVisible;
                     break;
                 }
-                /*case para_Math_Text:
-                {
-                    X += Item.WidthVisible;
-                    break;
-                }*/
             }
         }
 

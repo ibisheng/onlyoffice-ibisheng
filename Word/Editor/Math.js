@@ -53,7 +53,7 @@ function ParaMath()
     this.Descent      = 0;
 
     this.DefaultTextPr = new CTextPr();
-    this.DefaultTextPr.Init_Default();
+    //this.DefaultTextPr.Init_Default();
 
     this.DefaultTextPr.Italic     = true;
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
@@ -1204,6 +1204,7 @@ ParaMath.prototype =
         if ( EndPos >= 1 )
         {
             PDSL.X += this.Width;
+
         }
     },
 

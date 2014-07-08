@@ -37,19 +37,6 @@ var historyitem_Math_RemoveItem                =  2; // Удаляем элем�
 
 
 
-
-/*var  DEFAULT_RUN_PRP =
-{
-    FontFamily:     {Name  : "Cambria Math", Index : -1 },
-    FontSize:       11,
-    Italic:         true,
-    Bold:           false,
-    RFonts:         {},
-    Lang:           {}
-};*/
-
-
-
 function CGaps(oSign, oEqual, oZeroOper, oLett)
 {
     this.sign = oSign;
@@ -4231,7 +4218,7 @@ CMathContent.prototype =
         this.plhHide = flag;
     },
     ///////// RunPrp, CtrPrp
-    getFirstRPrp:    function(ParaMath)
+    old_getFirstRPrp:    function(ParaMath)
     {
         //var rPrp =  new CMathRunPrp();
         var rPrp = new CTextPr();
@@ -4241,26 +4228,14 @@ CMathContent.prototype =
         if(this.content.length > 1)
         {
             // первый объект всегда para_Math_Run
-
             this.content[0].Get_CompiledPr(true);
-
-
-
-            /*
-             var obj = this.content[1];
-
-            if(obj.Type === MATH_RUN_PRP) // если первый объект - буква
-            {
-                rPrp.Merge(obj);
-            }
-            else if(obj.Type === MATH_COMP)
-            {
-                var FirstRPrp = obj.getCtrPrpForFirst(ParaMath);// иначе зациклимся на getCtrPrp
-                rPrp.Merge(FirstRPrp);
-            }*/
         }
 
         return rPrp;
+    },
+    getFirstRPrp:    function(ParaMath)
+    {
+        return this.content[0].Get_CompiledPr(true);
     },
     increaseArgSize: function()
     {
@@ -4894,12 +4869,7 @@ CMathContent.prototype =
         if ( true === ApplyToAll )
         {
             for ( var i = 0; i < this.content.length; i++ )
-            {
-                //var typeElem = this.content[i].typeObj;
-
-                //if( typeElem == MATH_COMP || typeElem == MATH_PARA_RUN)
                 this.content[i].Apply_TextPr( TextPr, IncFontSize, true );
-            }
         }
         else
         {
