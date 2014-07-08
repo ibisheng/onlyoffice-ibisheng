@@ -6587,6 +6587,11 @@ function BinaryPPTYLoader()
                     if(r_pr)
                     {
                         para_pr.DefaultRunPr = new CTextPr();
+
+                        if(r_pr.Unifill && !r_pr.Unifill.fill)
+                        {
+                            r_pr.Unifill = undefined;
+                        }
                         para_pr.DefaultRunPr.Set_FromObject(r_pr);
                     }
                 }
@@ -6860,6 +6865,10 @@ function BinaryPPTYLoader()
                 {
                     var endRunPr =  this.ReadRunProperties();
                     var _value_text_pr = new CTextPr();
+                    if(endRunPr.Unifill && !endRunPr.Unifill.fill)
+                    {
+                        endRunPr.Unifill = undefined;
+                    }
                     _value_text_pr.Set_FromObject(endRunPr);
                     par.TextPr.Apply_TextPr(_value_text_pr);//endRunProperties
                     break;
@@ -6916,6 +6925,10 @@ function BinaryPPTYLoader()
                                         hyperlink.Set_Value(_run.hlink.url);
                                     }
                                     var text_pr = new CTextPr();
+                                    if(_run.Unifill && !_run.Unifill.fill)
+                                    {
+                                        _run.Unifill = undefined;
+                                    }
                                     text_pr.Set_FromObject(_run);
                                     new_run.Set_Pr(text_pr)
                                 }
@@ -7007,6 +7020,10 @@ function BinaryPPTYLoader()
                                         hyperlink.Set_Value(_run.hlink.url);
                                     }
                                     var text_pr = new CTextPr();
+                                    if(_run.Unifill && !_run.Unifill.fill)
+                                    {
+                                        _run.Unifill = undefined;
+                                    }
                                     text_pr.Set_FromObject(_run);
                                     new_run.Set_Pr(text_pr);
                                 }
