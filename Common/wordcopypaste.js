@@ -2244,6 +2244,12 @@ function Editor_Paste_Button(api)
 			History.Create_NewPoint();
 			Editor_Paste_Exec(api, ElemToSelect);
 		}
+		else
+		{
+			window.GlobalPasteFlagCounter = 0;
+			window.GlobalPasteFlag = false;
+		};
+		
 		return true;
 	}
     return false;
