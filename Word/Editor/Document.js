@@ -2799,7 +2799,7 @@ CDocument.prototype =
                         FramePara.Set_Spacing( Spacing, true );
                         FramePara.Select_All();
                         FramePara.Clear_TextFormatting();
-                        FramePara.Apply_TextPr(TextPr, false);
+                        FramePara.Apply_TextPr(TextPr, undefined);
                     }
 
 
@@ -8539,6 +8539,9 @@ CDocument.prototype =
                 if ( true === bNeedSelect )
                     Item.Select_All();
             }
+            
+            if ( PrevClass.Correct_Content )
+                PrevClass.Correct_Content();
 
             if ( true === bNeedSelect )
             {

@@ -3923,6 +3923,9 @@ CDocumentContent.prototype =
                     Item.Select_All();
             }
 
+            if ( PrevClass.Correct_Content )
+                PrevClass.Correct_Content();
+
             if ( true === bNeedSelect )
             {
                 PrevClass.Selection.Use = true;

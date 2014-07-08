@@ -4141,58 +4141,9 @@ Paragraph.prototype =
     {
         var NumPr = this.Numbering_Get();
 
-        if ( undefined != NumPr )
+        if ( undefined !== this.Numbering_Get() )
         {
-            if ( true != this.Selection.Use )
-            {
-                var NumId   = NumPr.NumId;
-                var Lvl     = NumPr.Lvl;
-                var NumInfo = this.Parent.Internal_GetNumInfo( this.Id, NumPr );
-
-                if ( 0 === Lvl && NumInfo[Lvl] <= 1 )
-                {
-                    var Numbering   = this.Parent.Get_Numbering();
-                    var AbstractNum = Numbering.Get_AbstractNum(NumId);
-
-                    var NumLvl = AbstractNum.Lvl[Lvl];
-                    var NumParaPr = NumLvl.ParaPr;
-
-                    var ParaPr = this.Get_CompiledPr2(false).ParaPr;
-
-                    if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
-                    {
-                        var NewX = ParaPr.Ind.Left;
-                        if ( true != bShift )
-                            NewX += Default_Tab_Stop;
-                        else
-                        {
-                            NewX -= Default_Tab_Stop;
-
-                            if ( NewX < 0 )
-                                NewX = 0;
-
-                            if ( ParaPr.Ind.FirstLine < 0 && NewX + ParaPr.Ind.FirstLine < 0 )
-                                NewX = -ParaPr.Ind.FirstLine;
-                        }
-
-                        AbstractNum.Change_LeftInd( NewX );
-
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
-
-                        // При добавлении списка в параграф, удаляем все собственные сдвиги
-                        this.Pr.Ind.FirstLine = undefined;
-                        this.Pr.Ind.Left      = undefined;
-
-                        // Надо пересчитать конечный стиль
-                        this.CompiledPr.NeedRecalc = true;
-                    }
-                }
-                else
-                    this.Numbering_IndDec_Level( !bShift );
-            }
-            else
-                this.Numbering_IndDec_Level( !bShift );
+            this.Shift_NumberingLvl( bShift );
         }
         else if ( true === this.Is_SelectionUse() )
         {
@@ -4260,9 +4211,12 @@ Paragraph.prototype =
     {
         var Page = this.Pages[this.Pages.length - 1];
 
-        var X0 = Page.X;
+        var X0 = Page.X;                
         var X1 = Page.XLimit - X0;
         var X  = _X - X0;
+        
+        if ( X < 10 )
+            return false;
 
         if ( true === this.IsEmpty() )
         {
@@ -4286,7 +4240,9 @@ Paragraph.prototype =
         this.Set_Tabs( Tabs );
 
         this.Set_ParaContentPos( this.Get_EndPos( false ), false, -1, -1 );
-        this.Add( new ParaTab() );
+        this.Add( new ParaTab() );     
+        
+        return true;
     },   
 
     IncDec_FontSize : function(bIncrease)
@@ -4367,13 +4323,68 @@ Paragraph.prototype =
 
         return true;
     },
+    
+    Shift_NumberingLvl : function(bShift)
+    {
+        var NumPr = this.Numbering_Get();
+        
+        if ( true != this.Selection.Use )
+        {
+            var NumId   = NumPr.NumId;
+            var Lvl     = NumPr.Lvl;
+            var NumInfo = this.Parent.Internal_GetNumInfo( this.Id, NumPr );
+
+            if ( 0 === Lvl && NumInfo[Lvl] <= 1 )
+            {
+                var Numbering   = this.Parent.Get_Numbering();
+                var AbstractNum = Numbering.Get_AbstractNum(NumId);
+
+                var NumLvl = AbstractNum.Lvl[Lvl];
+                var NumParaPr = NumLvl.ParaPr;
+
+                var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+
+                if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
+                {
+                    var NewX = ParaPr.Ind.Left;
+                    if ( true != bShift )
+                        NewX += Default_Tab_Stop;
+                    else
+                    {
+                        NewX -= Default_Tab_Stop;
+
+                        if ( NewX < 0 )
+                            NewX = 0;
+
+                        if ( ParaPr.Ind.FirstLine < 0 && NewX + ParaPr.Ind.FirstLine < 0 )
+                            NewX = -ParaPr.Ind.FirstLine;
+                    }
+
+                    AbstractNum.Change_LeftInd( NewX );
+
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+
+                    // При добавлении списка в параграф, удаляем все собственные сдвиги
+                    this.Pr.Ind.FirstLine = undefined;
+                    this.Pr.Ind.Left      = undefined;
+
+                    // Надо пересчитать конечный стиль
+                    this.CompiledPr.NeedRecalc = true;
+                }
+            }
+            else
+                this.Numbering_IndDec_Level( !bShift );
+        }
+        else
+            this.Numbering_IndDec_Level( !bShift );
+    },
 
     IncDec_Indent : function(bIncrease)
     {
-        var NumPr = this.Numbering_Get();
-        if ( undefined != NumPr )
+        if ( undefined !== this.Numbering_Get() )
         {
-            this.Numbering_IndDec_Level( bIncrease );
+            this.Shift_NumberingLvl( !bIncrease );
         }
         else
         {
@@ -6009,8 +6020,9 @@ Paragraph.prototype =
             }
             else
             {
-                if ( true === CurElement.Is_Empty() && CurPos < this.Content.length - 1 && para_Run === this.Content[CurPos + 1].Type && true === this.Content[CurPos + 1].Is_Empty() )
-                    this.Internal_Content_Remove( CurPos + 1 );
+                // TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
+                if ( true === CurElement.Is_Empty() && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type )
+                    this.Internal_Content_Remove( CurPos );
             }
         }
 
@@ -6625,18 +6637,23 @@ Paragraph.prototype =
 
         if ( true === SearchPosXY.End )
         {
-            if (  PageNum - this.PageNum >= PagesCount - 1 && X > this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1].W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom )
+            var LastRange = this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1];
+            if (  PageNum - this.PageNum >= PagesCount - 1 && X > LastRange.W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom && X > LastRange.X + 10 && X > LastRange.XVisible + 10 )
             {
                 if ( this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
                 {
                     History.Create_NewPoint();
                     History.Set_Additional_ExtendDocumentToPos();
 
-                    this.Extend_ToPos( X );
-                    this.Cursor_MoveToEndPos();
-                    this.Document_SetThisElementCurrent(true);
-                    editor.WordControl.m_oLogicDocument.Recalculate();
-                    return;
+                    if ( true === this.Extend_ToPos( X ) )
+                    {
+                        this.Cursor_MoveToEndPos();
+                        this.Document_SetThisElementCurrent(true);
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        return;
+                    }
+                    else
+                        History.Remove_LastPoint();                    
                 }
             }
         }
