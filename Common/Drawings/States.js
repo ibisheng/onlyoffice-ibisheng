@@ -928,6 +928,7 @@ TextAddState.prototype =
     {
         this.majorObject.selectionSetEnd(e, x, y, pageIndex);
         this.drawingObjects.updateSelectionState();
+        this.drawingObjects.drawingObjects.sendGraphicObjectProps();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 

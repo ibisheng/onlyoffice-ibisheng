@@ -2406,7 +2406,8 @@ CStyle.prototype =
         var TextPr =
         {
             Color     : { r : 0x00, g : 0x00, b : 0xFF },
-            Underline : true
+            Underline : true,
+            Unifill   : CreateUniFillSchemeColorWidthTint(11, 0)
         };
 
         this.Set_UiPriority( 99 );

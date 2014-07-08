@@ -3349,21 +3349,25 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 37 ) // Left Arrow
         {
             this.cursorMoveLeft(e.shiftKey,ctrlKey );
+            this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 38 ) // Top Arrow
         {
-            this.cursorMoveUp(e.shiftKey,ctrlKey );
+            this.cursorMoveUp(e.shiftKey);
+            this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 39 ) // Right Arrow
         {
             this.cursorMoveRight(e.shiftKey,ctrlKey );
+            this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 40 ) // Bottom Arrow
         {
-            this.cursorMoveDown(e.shiftKey,ctrlKey );
+            this.cursorMoveDown(e.shiftKey);
+            this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 45 ) // Insert
@@ -3378,6 +3382,7 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
         {
             this.selectAll();
+            this.drawingObjects.sendGraphicObjectProps();
             bRetValue = true;
         }
         else if ( e.keyCode == 66 && false === isViewMode && true === ctrlKey ) // Ctrl + B - делаем текст жирным

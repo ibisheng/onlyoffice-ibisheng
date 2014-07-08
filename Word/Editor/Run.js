@@ -3179,7 +3179,11 @@ ParaRun.prototype =
             RGBA = CurTextPr.Unifill.getRGBAColor();
 
             if ( true === PDSE.VisitedHyperlink )
-                pGraphics.b_color1( 128, 0, 151, 255 );
+            {
+                G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+                RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+            }
             else
             {
                 pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
@@ -3188,7 +3192,11 @@ ParaRun.prototype =
         else
         {
             if ( true === PDSE.VisitedHyperlink )
-                pGraphics.b_color1( 128, 0, 151, 255 );
+            {
+                G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+                RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+            }
             else if ( true === CurTextPr.Color.Auto )
                 pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
             else
