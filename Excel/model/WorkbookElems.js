@@ -1415,7 +1415,7 @@ CCellStyles.prototype = {
 			this.CustomStyles[i].XfId = ++maxXfId;
 			return this.CustomStyles[i].XfId;
 		}
-		return null;
+		return g_oDefaultXfId;
 	}
 };
 /** @constructor */

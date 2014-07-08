@@ -4153,7 +4153,7 @@ Cell.prototype.setValueCleanFormula = function (array) {
 
     wb.needRecalc.nodes[getVertexId(sheetId, cellId)] = [sheetId, cellId];
     wb.needRecalc.length++;
-}
+};
 Cell.prototype.setType=function(type){
 	return this.oValue.type = type;
 };
