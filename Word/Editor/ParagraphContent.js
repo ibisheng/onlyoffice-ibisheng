@@ -4939,7 +4939,7 @@ ParaDrawing.prototype =
                 this.Distance.R = Data.Old.Right;
                 this.Distance.B = Data.Old.Bottom;
 
-                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
 
@@ -5085,7 +5085,7 @@ ParaDrawing.prototype =
                 this.Distance.R = Data.New.Right;
                 this.Distance.B = Data.New.Bottom;
 
-                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
 
@@ -5205,8 +5205,8 @@ ParaDrawing.prototype =
         {
             if(Data && Data.Type === historyitem_Drawing_Distance)
             {
-                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
-                this.GraphicObj.addToRecalculate();
+                this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                this.GraphicObj && this.GraphicObj.addToRecalculate();
             }
 
             return this.Parent.Refresh_RecalcData2();
@@ -5673,7 +5673,7 @@ ParaDrawing.prototype =
                 this.Distance.R = Reader.GetDouble();
                 this.Distance.B = Reader.GetDouble();
 
-                this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
 
