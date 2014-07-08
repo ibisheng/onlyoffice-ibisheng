@@ -1092,131 +1092,135 @@ CCellCommentator.prototype.calcCommentsCoords = function(bSave) {
 	}
 };
 
-CCellCommentator.prototype.getCommentsCoords = function(comments) {
+CCellCommentator.prototype.calcCommentArea = function (comment, coords) {
+	/*	User name
+	 *	Time
+	 *	Text
+	 */
 
-	// bWithScroll - учитывать вертикальный и горизонтальный скроллы
+	var originalFont = this.overlayCtx.getFont();
+	var outputFont = originalFont.clone();
 
-	var t = this;
-	var coords = new asc_CCommentCoords();
+	// Set to bold
+	outputFont.Bold = true;
+	outputFont.FontSize = 9;
+	this.overlayCtx.setFont(outputFont);
 
-	function calcCommentArea(comment, coords) {
+	// Title
+	var txtMetrics = this.getTextMetrics(comment.sUserName, 1);
+	coords.dHeightPX += this.ptToPx(txtMetrics.height);
+	var userWidth = this.ptToPx(txtMetrics.width);
 
-		/*	User name
-		 *	Time
-		 *	Text
-		 */
+	if (coords.dWidthPX < userWidth)
+		coords.dWidthPX = userWidth;
 
-		var originalFont = t.overlayCtx.getFont();
-		var outputFont = originalFont.clone();
+	txtMetrics = this.getTextMetrics(comment.sTime, 1);
+	coords.dHeightPX += this.ptToPx(txtMetrics.height);
+	var timeWidth = this.ptToPx(txtMetrics.width);
 
-		// Set to bold
-		outputFont.Bold = true;
-		outputFont.FontSize = 9;
-		t.overlayCtx.setFont(outputFont);
+	if (coords.dWidthPX < timeWidth)
+		coords.dWidthPX = timeWidth;
 
-		// Title
-		var txtMetrics = t.getTextMetrics(comment.sUserName, 1);
-		coords.dHeightPX += t.ptToPx(txtMetrics.height);
-		var userWidth = t.ptToPx(txtMetrics.width);
+	// Set to normal
+	outputFont.Bold = false;
+	outputFont.FontSize = 9;
+	this.overlayCtx.setFont(outputFont);
 
-		if (coords.dWidthPX < userWidth)
-			coords.dWidthPX = userWidth;
+	// Comment text
+	var commentSpl = comment.sText.split('\n'), i;
+	for (i = 0; i < commentSpl.length; i++) {
 
-		txtMetrics = t.getTextMetrics(comment.sTime, 1);
-		coords.dHeightPX += t.ptToPx(txtMetrics.height);
-		var timeWidth = t.ptToPx(txtMetrics.width);
-
-		if (coords.dWidthPX < timeWidth)
-			coords.dWidthPX = timeWidth;
-
-		// Set to normal
-		outputFont.Bold = false;
-		outputFont.FontSize = 9;
-		t.overlayCtx.setFont(outputFont);
-
-		// Comment text
-		var commentSpl = comment.sText.split('\n'), i;
-		for (i = 0; i < commentSpl.length; i++) {
-
-			txtMetrics = t.getTextMetrics(commentSpl[i], 1);
-			coords.dHeightPX += t.ptToPx(txtMetrics.height);
-			var lineWidth = t.ptToPx(txtMetrics.width);
-			if (coords.dWidthPX < lineWidth)
-				coords.dWidthPX = lineWidth;
-		}
-
-		for (i = 0; i < comment.aReplies.length; i++) {
-			calcCommentArea(comment.aReplies[i], coords);
-		}
-
-		// Min values
-		if (coords.dWidthPX < t.minAreaWidth)
-			coords.dWidthPX = t.minAreaWidth;
-
-		if (coords.dHeightPX < t.minAreaHeight)
-			coords.dHeightPX = t.minAreaHeight;
-
-		// Calc other coords
-		coords.dWidthMM = t.pxToMm(coords.dWidthPX);
-		coords.dHeightMM = t.pxToMm(coords.dHeightPX);
-
-		var headerRowOffPx = t.worksheet.getCellTop(0, 0);
-		var headerColOffPx = t.worksheet.getCellLeft(0, 0);
-
-		coords.nCol = comment.nCol;
-		coords.nRow = comment.nRow;
-
-		var mergedRange = t.worksheet.model.getMergedByCell(comment.nRow, comment.nCol);
-
-		coords.nLeft = (mergedRange ? mergedRange.c2 : comment.nCol) + 1;
-		if ( !t.worksheet.cols[coords.nLeft] ) {
-			t.worksheet.expandColsOnScroll(true);
-			t.worksheet.handlers.trigger("reinitializeScrollX");
-		}
-
-		coords.nTop = mergedRange ? mergedRange.r1 : comment.nRow;
-		coords.nLeftOffset = 0;
-		coords.nTopOffset = 0;
-
-		var fvr = t.worksheet.getFirstVisibleRow(true);
-		var fvc = t.worksheet.getFirstVisibleCol(true);
-
-		var frozenOffset = t.getFrozenOffset();
-		if ( t.worksheet.topLeftFrozenCell ) {
-			if ( comment.nCol >= t.worksheet.getFirstVisibleCol(false) )
-				frozenOffset.offsetX = 0;
-			if ( comment.nRow >= t.worksheet.getFirstVisibleRow(false) )
-				frozenOffset.offsetY = 0;
-		}
-
-		// Tooltip coords
-		coords.dReverseLeftPX = t.worksheet.getCellLeft(comment.nCol, 0) - t.worksheet.getCellLeft(fvc, 0) + headerColOffPx + t.ptToPx(frozenOffset.offsetX);
-		coords.dLeftPX = t.worksheet.getCellLeft(coords.nLeft, 0) - t.worksheet.getCellLeft(fvc, 0) + headerColOffPx + t.ptToPx(frozenOffset.offsetX);
-		coords.dTopPX = t.worksheet.getCellTop(coords.nTop, 0) - t.worksheet.getCellTop(fvr, 0) + headerRowOffPx + t.ptToPx(frozenOffset.offsetY);
-
-		// Correction for merged cell
-		var fvrPx = t.worksheet.getCellTop(0, 0);
-		if (coords.dTopPX < fvrPx)
-			coords.dTopPX = fvrPx;
-
-		coords.dLeftMM = t.worksheet.getCellLeft(coords.nLeft, 3) - t.worksheet.getCellLeft(fvc, 3);
-		coords.dTopMM = t.worksheet.getCellTop(coords.nTop, 3) - t.worksheet.getCellTop(fvr, 3);
-
-		var findCol = t.worksheet._findColUnderCursor(t.worksheet.getCellLeft(coords.nLeft, 1) + t.pxToPt(coords.dWidthPX + headerColOffPx) - t.worksheet.getCellLeft(fvc, 1), true);
-		var findRow = t.worksheet._findRowUnderCursor(t.worksheet.getCellTop(coords.nTop, 1) + t.pxToPt(coords.dHeightPX + headerRowOffPx) - t.worksheet.getCellTop(fvr, 1), true);
-
-		coords.nRight = findCol ? findCol.col : 0;
-		coords.nBottom = findRow ? findRow.row : 0;
-
-		coords.nRightOffset = t.worksheet.getCellLeft(coords.nLeft, 0) + coords.nLeftOffset + coords.dWidthPX + headerColOffPx - t.worksheet.getCellLeft(coords.nRight, 0);
-		coords.nBottomOffset = t.worksheet.getCellTop(coords.nTop, 0) + coords.nTopOffset + coords.dHeightPX + headerRowOffPx - t.worksheet.getCellTop(coords.nBottom, 0);
-
-		// Return original font
-		t.overlayCtx.setFont(originalFont);
+		txtMetrics = this.getTextMetrics(commentSpl[i], 1);
+		coords.dHeightPX += this.ptToPx(txtMetrics.height);
+		var lineWidth = this.ptToPx(txtMetrics.width);
+		if (coords.dWidthPX < lineWidth)
+			coords.dWidthPX = lineWidth;
 	}
 
+	for (i = 0; i < comment.aReplies.length; i++) {
+		this.calcCommentArea(comment.aReplies[i], coords);
+	}
+
+	// Min values
+	if (coords.dWidthPX < this.minAreaWidth)
+		coords.dWidthPX = this.minAreaWidth;
+
+	if (coords.dHeightPX < this.minAreaHeight)
+		coords.dHeightPX = this.minAreaHeight;
+
+	// Calc other coords
+	coords.dWidthMM = this.pxToMm(coords.dWidthPX);
+	coords.dHeightMM = this.pxToMm(coords.dHeightPX);
+
+	var headerRowOffPx = this.worksheet.getCellTop(0, 0);
+	var headerColOffPx = this.worksheet.getCellLeft(0, 0);
+
+	var headerCellsOffsetPt = this.worksheet.getCellsOffset(1);
+
+	coords.nCol = comment.nCol;
+	coords.nRow = comment.nRow;
+
+	var mergedRange = this.worksheet.model.getMergedByCell(comment.nRow, comment.nCol);
+
+	coords.nLeft = (mergedRange ? mergedRange.c2 : comment.nCol) + 1;
+	if ( !this.worksheet.cols[coords.nLeft] ) {
+		this.worksheet.expandColsOnScroll(true);
+		this.worksheet.handlers.trigger("reinitializeScrollX");
+	}
+
+	coords.nTop = mergedRange ? mergedRange.r1 : comment.nRow;
+	coords.nLeftOffset = 0;
+	coords.nTopOffset = 0;
+
+	var fvr = this.worksheet.getFirstVisibleRow(false);
+	var fvc = this.worksheet.getFirstVisibleCol(false);
+
+	var frozenOffset = this.worksheet.getFrozenPaneOffset();
+	if (this.worksheet.topLeftFrozenCell) {
+		if (comment.nCol < fvc) {
+			frozenOffset.offsetX = 0;
+			fvc = 0;
+		}
+		if (comment.nRow < fvr) {
+			frozenOffset.offsetY = 0;
+			fvr = 0;
+		}
+	}
+
+	var fvrLeft = this.worksheet.getCellLeft(fvc, 1) - headerCellsOffsetPt.left;
+	var fvcTop = this.worksheet.getCellTop(fvr, 1) - headerCellsOffsetPt.top;
+
+	// Tooltip coords
+	coords.dReverseLeftPX = this.ptToPx(this.worksheet.getCellLeft(comment.nCol, 1) - fvrLeft + frozenOffset.offsetX);
+	coords.dLeftPX = this.ptToPx(this.worksheet.getCellLeft(coords.nLeft, 1) - fvrLeft + frozenOffset.offsetX);
+	coords.dTopPX = this.ptToPx(this.worksheet.getCellTop(coords.nTop, 1) - fvcTop + frozenOffset.offsetY);
+
+	// Correction for merged cell
+	var fvrPx = this.worksheet.getCellTop(0, 0);
+	if (coords.dTopPX < fvrPx)
+		coords.dTopPX = fvrPx;
+
+	coords.dLeftMM = this.worksheet.getCellLeft(coords.nLeft, 3) - this.worksheet.getCellLeft(fvc, 3);
+	coords.dTopMM = this.worksheet.getCellTop(coords.nTop, 3) - this.worksheet.getCellTop(fvr, 3);
+
+	var findCol = this.worksheet._findColUnderCursor(this.worksheet.getCellLeft(coords.nLeft, 1) + this.pxToPt(coords.dWidthPX + headerColOffPx) - this.worksheet.getCellLeft(fvc, 1), true);
+	var findRow = this.worksheet._findRowUnderCursor(this.worksheet.getCellTop(coords.nTop, 1) + this.pxToPt(coords.dHeightPX + headerRowOffPx) - this.worksheet.getCellTop(fvr, 1), true);
+
+	coords.nRight = findCol ? findCol.col : 0;
+	coords.nBottom = findRow ? findRow.row : 0;
+
+	coords.nRightOffset = this.worksheet.getCellLeft(coords.nLeft, 0) + coords.nLeftOffset + coords.dWidthPX + headerColOffPx - this.worksheet.getCellLeft(coords.nRight, 0);
+	coords.nBottomOffset = this.worksheet.getCellTop(coords.nTop, 0) + coords.nTopOffset + coords.dHeightPX + headerRowOffPx - this.worksheet.getCellTop(coords.nBottom, 0);
+
+	// Return original font
+	this.overlayCtx.setFont(originalFont);
+};
+
+CCellCommentator.prototype.getCommentsCoords = function(comments) {
+	var coords = new asc_CCommentCoords();
+
 	for (var i = 0; i < comments.length; i++) {
-		calcCommentArea(comments[i], coords);
+		this.calcCommentArea(comments[i], coords);
 	}
 
 	if (comments.length) {
@@ -1260,21 +1264,6 @@ CCellCommentator.prototype.cleanSelectedComment = function() {
 				this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
 		}
 	}
-};
-
-CCellCommentator.prototype.getFrozenOffset = function() {
-
-	var offsetX = 0, offsetY = 0, cFrozen = 0, rFrozen = 0, diffWidth = 0, diffHeight = 0;
-	if ( this.worksheet.topLeftFrozenCell ) {
-		cFrozen = this.worksheet.topLeftFrozenCell.getCol0();
-		rFrozen = this.worksheet.topLeftFrozenCell.getRow0();
-		diffWidth = this.worksheet.cols[cFrozen].left - this.worksheet.cols[0].left;
-		diffHeight = this.worksheet.rows[rFrozen].top - this.worksheet.rows[0].top;
-
-		offsetX = this.worksheet.cols[this.worksheet.visibleRange.c1].left - this.worksheet.cellsLeft - diffWidth;
-		offsetY = this.worksheet.rows[this.worksheet.visibleRange.r1].top - this.worksheet.cellsTop - diffHeight;
-	}
-	return { offsetX: offsetX, offsetY: offsetY };
 };
 
 //-----------------------------------------------------------------------------------
