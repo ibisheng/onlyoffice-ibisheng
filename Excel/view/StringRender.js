@@ -575,36 +575,42 @@
 			var fpx = f * ppi / 72;
 			var topt = 72 / ppi;
 
-			var h = asc_calcnpt(hpt, ppi);
+			var h;
 			var a = asc_round(fpx) * topt;
-			var d = h - a;
+			var d;
 
 			var a_2 = asc_round(fpx / 2) * topt;
 
-			var h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
+			var h_2_3;
 			var a_2_3 = asc_round(fpx * 2/3) * topt;
-			var d_2_3 = h_2_3 - a_2_3;
+			var d_2_3;
 
 			var x = a_2 + a_2_3;
 
 			if (va === "superscript") {
+				h = asc_calcnpt(hpt, ppi);
+				d = h - a;
+
 				l.th = x + d;
 				l.bl = x;
 				l.bl2 = a_2_3;
 				l.a = fm.ascender + a_2;         // >0
 				l.d = fm.descender - a_2;        // <0
 			} else if (va === "subscript") {
+				h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
+				d_2_3 = h_2_3 - a_2_3;
 				l.th = x + d_2_3;
 				l.bl = a;
 				l.bl2 = x;
 				l.a = fm.ascender + a - x;       // >0
 				l.d = fm.descender + x - a;      // >0
 			} else {
+				/* Было раньше
 				l.th = a + d;
 				l.bl = a;
 				l.a = fm.ascender;
-				l.d = fm.descender;
-				
+				l.d = fm.descender;*/
+
 				var _a = Math.max(0, fm.nat_y1 * f / fm.nat_scale);
 				var _d = Math.max(0, (-fm.nat_y2) * f / fm.nat_scale);
 				

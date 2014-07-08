@@ -1049,14 +1049,16 @@
 		};
 
 		CellEditor.prototype._updateCursorPosition = function (redrawText) {
+			// ToDo стоит переправить данную функцию
 			var t = this;
 			var h = t.canvas.height;
 			var y = - t.textRender.calcLineOffset(t.topLineIndex);
 			var cur = t.textRender.calcCharOffset(t.cursorPos);
 			var charsCount = t.textRender.getCharsCount();
-			var curLeft = asc_round(((kRightAlign !== t.textFlags.textAlign || t.cursorPos !== charsCount) && cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
+			var curLeft = asc_round(((kRightAlign !== t.textFlags.textAlign || t.cursorPos !== charsCount) &&
+				cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
 			var curTop  = asc_round(((cur !== null ? cur.top : 0) + y) * t.ky);
-			var curHeight = asc_round((cur !== null ? cur.height : t.options.font.FontSize) * 1.275 * t.ky);
+			var curHeight = asc_round((cur !== null ? cur.height : t._getContentHeight()) * t.ky);
 			var i, dy;
 
 			while (t.textRender.getLinesCount() > 1) {

@@ -153,28 +153,25 @@
 				return this.chars.length;
 			},
 
+			getCharInfo: function (pos) {
+				for (var p = this.charProps[pos]; (!p || !p.font) && pos > 0; --pos) {
+					p = this.charProps[pos - 1];
+				}
+				return {
+					fsz: p.font.FontSize,
+					dh: p && p.lm && p.lm.bl2 > 0 ? p.lm.bl2 - p.lm.bl : 0,
+					h: p && p.lm ? p.lm.th: 0
+				};
+			},
+
+			charOffset: function (pos, lineIndex, h) {
+				var ci = this.getCharInfo(pos);
+				var li = this.lines[lineIndex];
+				return new CharOffset(li.startX + (pos > 0 ? this._calcCharsWidth(li.beg, pos - 1) : 0), h, ci.h, lineIndex);
+			},
+
 			calcCharOffset: function (pos) {
-				var t = this, l = t.lines, i = 0, h = 0, co;
-
-				function getCharInfo(pos) {
-					for (var p = t.charProps[pos]; (!p || !p.font) && pos > 0; --pos) {
-						p = t.charProps[pos - 1];
-					}
-					return {
-						fsz: p.font.FontSize,
-						dh: p && p.lm && p.lm.bl2 > 0 ? p.lm.bl2 - p.lm.bl : 0
-					};
-				}
-
-				function charOffset(lineIndex) {
-					var ci = getCharInfo(pos);
-					var li = l[lineIndex];
-					return new CharOffset(
-							li.startX + (pos > 0 ? t._calcCharsWidth(li.beg, pos - 1) : 0),
-							h + li.bl - ci.fsz + ci.dh,
-							ci.fsz,
-							lineIndex);
-				}
+				var t = this, l = t.lines, i, h, co;
 
 				if (l.length < 1) {return null;}
 
@@ -183,14 +180,14 @@
 
 				for (i = 0, h = 0; i < l.length; ++i) {
 					if (pos >= l[i].beg && pos <= l[i].end) {
-						return charOffset(i);
+						return this.charOffset(pos, i, h);
 					}
 					if (i !== l.length - 1) {
 						h += l[i].th;
 					}
 				}
 
-				co = charOffset(i - 1);
+				co = this.charOffset(pos, i - 1, h);
 
 				// если самый последний символ - это новая строка, то надо сместить еще на одну линию
 				if (t.charWidths[t.chars.length - 1] === 0) {
