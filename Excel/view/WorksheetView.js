@@ -8956,8 +8956,13 @@
 										};
 										n++;
 									}
-								}
-
+								};
+								
+								//set style
+								var cellStyle = newVal.getStyleName();
+								if(cellStyle)
+									range.setCellStyle(cellStyle);
+								
 								//add formula
 								var numFormula = null;
 								var skipFormat = null;
