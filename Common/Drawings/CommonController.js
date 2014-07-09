@@ -487,6 +487,17 @@ DrawingObjectsController.prototype =
         }
         else
         {
+            if(this.document)
+            {
+                var content = object.getDocContent();
+                var invert_transform_text = object.invertTransformText, tx, ty;
+                if(content && invert_transform_text)
+                {
+                    tx = invert_transform_text.TransformPointX(x, y);
+                    ty = invert_transform_text.TransformPointY(x, y);
+                    content.Update_CursorType(tx, ty, pageIndex);
+                }
+            }
             return {objectId: object.Get_Id(), cursorType: "text"};
         }
     },

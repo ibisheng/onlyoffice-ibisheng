@@ -3385,7 +3385,7 @@ CAreaSeries.prototype =
                 return this.tx.strRef.strCache.pt[0].val;
             }
         }
-        return "Series " + (this.idx + 1) ;
+        return getChartTranslateManager().asc_getSeries() + " " + (this.idx + 1) ;
     },
 
     getCatName: function(idx)
@@ -13102,26 +13102,13 @@ CLegend.prototype =
     },
     draw: function(g)
     {
-        if(this.chart)
-        {
-            CShape.prototype.draw.call(this, g);/*
-         g.SetIntegerGrid(false);
-         g.p_width(70);
-         g.transform3(this.chart.transform, false);
-         g.p_color(0, 0, 0, 255);
-         g._s();
-         g._m(this.x, this.y);
-         g._l(this.x + this.extX, this.y + 0);
-         g._l(this.x + this.extX, this.y + this.extY);
-         g._l(this.x + 0, this.y + this.extY);
-         g._z();
-         g.ds();
-         g.SetIntegerGrid(true);    */
-        }
+        g.bDrawSmart = true;
+        CShape.prototype.draw.call(this, g);
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
             this.calcEntryes[i].draw(g);
         }
+        g.bDrawSmart = false;
     },
 
     setPosition: function(x, y)
@@ -21883,15 +21870,25 @@ CTitle.prototype =
 
     getDefaultTextForTxBody: function()
     {
-        //TODO: продумать с переводом
-        if(this.parent instanceof CChart)
+        if(this.parent)
         {
-            return "Chart Title";
+            if(this.parent.getObjectType() === historyitem_type_Chart)
+            {
+                return getChartTranslateManager().asc_getTitle();
+            }
+            else
+            {
+                if(this.parent.axPos === AX_POS_B || this.parent.axPos === AX_POS_T)
+                {
+                    return getChartTranslateManager().asc_getXAxis();
+                }
+                else
+                {
+                    return getChartTranslateManager().asc_getYAxis();
+                }
+            }
         }
-        else
-        {
-            return "Axis Title";
-        }
+        return "Axis Title";
     },
 
     getStyles: CDLbl.prototype.getStyles,
@@ -24050,6 +24047,7 @@ CalcLegendEntry.prototype =
 
     draw: function(g)
     {
+
         CShape.prototype.draw.call(this, g);
         if(this.calcMarkerUnion)
             this.calcMarkerUnion.draw(g);
