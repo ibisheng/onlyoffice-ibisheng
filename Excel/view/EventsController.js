@@ -1348,6 +1348,11 @@
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this.isMouseDownMode = false;
 				this._changeSelectionDone(event);
+                if(this.view && this.view.Api && this.view.Api.isStartAddShape)
+                {
+                    event.preventDefault && event.preventDefault();
+                    event.stopPropagation && event.stopPropagation();
+                }
 				return true;
 			}
 
