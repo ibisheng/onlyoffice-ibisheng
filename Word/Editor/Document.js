@@ -7074,7 +7074,7 @@ CDocument.prototype =
                     if ( undefined != PrevFrame && undefined != PrevFrame.DropCap )
                     {
                         Result_ParaPr.FramePr = PrevFrame.Copy();
-                        this.Content[this.CurPos.ContentPos - 1].Supplement_FramePr( Result_ParaPr.FramePr );
+                        this.Content[StartPos - 1].Supplement_FramePr( Result_ParaPr.FramePr );
                     }
                 }
 
