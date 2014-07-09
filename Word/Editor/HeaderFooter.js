@@ -240,6 +240,7 @@ CHeaderFooter.prototype =
 
     Reset_RecalculateCache : function()
     {
+        this.Refresh_RecalcData2();
         this.Content.Reset_RecalculateCache();
     },
 
@@ -1300,14 +1301,12 @@ CHeaderFooterController.prototype =
     },
 //-----------------------------------------------------------------------------------
 //
-//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------   
     RecalculateCurPos : function()
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.RecalculateCurPos();
     },
-
-
 
     Recalculate : function(PageIndex)    
     {
