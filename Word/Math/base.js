@@ -1372,7 +1372,12 @@ CMathBase.prototype =
     },
     Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
     {
-        this.CtrPrp.Merge(TextPr);
+        if(TextPr.FontSize !== undefined)
+        {
+            History.Add( this, { Type : historyitem_Math_CtrPrpFSize, New : TextPr.FontSize, Old : this.CtrPrp.FontSize } );
+            this.CtrPrp.FontSize = TextPr.FontSize;
+            this.RecalcInfo.bCtrPrp = true;
+        }
 
         for(var i=0; i < this.nRow; i++)
         {
@@ -1440,6 +1445,49 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].Get_AllFontNames(AllFonts);
             }
+    },
+    Undo: function(Data)
+    {
+        var type = Data.Type;
+
+        switch(type)
+        {
+            case historyitem_Math_CtrPrpFSize:
+            {
+                this.CtrPrp.FontSize = Data.Old;
+                this.RecalcInfo.bCtrPrp = true;
+
+                break;
+            }
+        }
+    },
+    Redo: function(Data)
+    {
+        var type = Data.Type;
+
+        switch(type)
+        {
+            case historyitem_Math_CtrPrpFSize:
+            {
+                this.CtrPrp.FontSize = Data.New;
+                this.RecalcInfo.bCtrPrp = true;
+
+                break;
+            }
+        }
+    },
+    Refresh_RecalcData: function()
+    {
+        if(this.ParaMath !== null)
+            this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
+    },
+    Save_Changes: function(Data, Writer)
+    {
+
+    },
+    Load_Changes : function(Reader)
+    {
+
     }
 
     //////////////////////////

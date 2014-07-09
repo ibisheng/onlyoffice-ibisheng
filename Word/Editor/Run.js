@@ -4030,6 +4030,11 @@ ParaRun.prototype =
             SearchPos.Pos.Update( FirstPos, Depth );
             return true;
         }
+        else if(this.Type == para_Math_Run && this.Parent.Is_FirstComposition())
+        {
+            SearchPos.Pos.Update( 0, Depth );
+            return true;
+        }
         else
             return false;
     },
@@ -7432,7 +7437,6 @@ ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 }
 ParaRun.prototype.Set_MathPrp = function(props)
 {
-    //History.Add( this, { Type : historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue } );
     this.MathPrp.setMathProps(props);
 }
 ParaRun.prototype.Apply_StyleBold = function(Value)

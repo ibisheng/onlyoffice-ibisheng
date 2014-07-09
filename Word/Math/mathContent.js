@@ -33,6 +33,7 @@
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
+var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
 
 
 
@@ -3928,18 +3929,6 @@ CMathContent.prototype =
 
         return items;
     },
-    /*removeAreaSelect: function()
-    {
-        if( this.IsPlaceholder() ) //удаляем тагет
-        {
-            var empty = this.content[0]; //CEmpty
-            this.content.length = 0;
-            this.content.push( empty );
-            this.CurPos = 0;
-        }
-        else if( this.selectUse() ) //т.к. после того как удалили тагет у нас эти 2 значения не равны, равенство их выставляется позднее, после добавления символа
-            this.remove(1);
-    },*/
     fillPlaceholders: function()
     {
         this.content.length = 0;
@@ -3976,25 +3965,6 @@ CMathContent.prototype =
             }
             else
                 this.content[i].Math_Recalculate(this, ParaMath.Paragraph, oMeasure);
-            /*else if(this.content[i].typeObj == MATH_PLACEHOLDER)
-            {
-                if(!this.bRoot)
-                {
-                    var oWPrp = this.Parent.Get_CompiledCtrPrp_2(); // without arg Size
-                    this.ParaMath.ApplyArgSize(oWPrp, this.argSize);
-                    oWPrp.Italic = false;
-
-
-                    oMeasure.SetFont(oWPrp);
-
-                    this.content[i].Resize(this, oMeasure);
-                }
-            }
-            else
-            {
-                this.content[i].Math_Recalculate(this, ParaMath.Paragraph, oMeasure);
-            }*/
-
 
             this.WidthToElement[i] = width;
 
@@ -4115,12 +4085,6 @@ CMathContent.prototype =
                 }
                 else
                     this.content[i].Math_Draw(x, y, pGraphics);
-
-                /*else  if(this.content[i].typeObj == MATH_PARA_RUN)
-                    this.content[i].Math_Draw(x, y, pGraphics);
-                else
-                    this.content[i].draw(x, y, pGraphics);*/
-
             }
         }
 
@@ -4247,43 +4211,6 @@ CMathContent.prototype =
         if( this.argSize > -2 )
             this.argSize--;
     },
-    /*setItalic: function(flag)
-    {
-        var rPrp = new CTextPr();
-        rPrp.Italic = flag;
-
-        if(this.IsEmpty())
-        {
-            this.addRunPrp(rPrp);
-        }
-        else
-        {
-            for(var i = 1; i < this.content.length; i++)
-            {
-                if(this.content[i].value.typeObj == MATH_RUN_PRP)
-                    this.content[i].value.Merge(rPrp);
-            }
-        }
-    },
-    setRPrp: function(RunPrp)   // object CMathRun
-    {
-        for(var i = 0; i < this.content.length; i++)
-        {
-            var obj = this.content[i].value;
-            if(obj.typeObj == MATH_RUN_PRP)
-            {
-                obj.Merge(RunPrp);
-            }
-            else if(obj.typeObj == MATH_COMP)
-            {
-                obj.setRPrp(RunPrp);
-            }
-        }
-    },*/
-    /*apply_RunPr: function(RunPrp)
-    {
-        this.setRPrp(RunPrp);
-    },*/
     GetCtrPrp: function()       // for placeholder
     {
         var ctrPrp = new CTextPr();
@@ -4342,29 +4269,8 @@ CMathContent.prototype =
             _X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos];
 
 
-            result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, 0, 0, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+            result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
         }
-        /*else
-        {
-            Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-            _X = this.pos.x + this.ParaMath.X + this.size.width;
-
-            *//*var ctrPrp = this.Parent.getCtrPrp();
-            this.ParaMath.ApplyArgSize(ctrPrp);*//*
-
-            var ctrPrp = this.Parent.Get_CompiledCtrPrp();
-
-            var sizeCursor = ctrPrp.FontSize*g_dKoef_pt_to_mm;
-
-            Y -= sizeCursor*0.8;
-
-            this.ParaMath.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
-            //Para.DrawingDocument.UpdateTargetFromPaint = true;
-            this.ParaMath.Paragraph.DrawingDocument.UpdateTarget( _X, Y, this.ParaMath.Paragraph.Get_StartPage_Absolute() + _CurPage );
-
-
-            result = {X: _X, Y: Y};
-        }*/
 
         return result;
     },
@@ -4539,17 +4445,6 @@ CMathContent.prototype =
         if(startPos == endPos)
             result = this.content[startPos].Selection_IsEmpty();
 
-        /*if(startPos == endPos)
-        {
-            var bRunPrp = this.content[startPos].typeObj == MATH_RUN_PRP,
-                bComp = this.content[startPos].typeObj == MATH_COMP;
-
-            if(bRunPrp || bComp)
-                result = this.content[startPos].Selection_IsEmpty();
-            else
-                result = false; // placeholder
-        }*/
-
         return result;
     },
     SelectToParent : function()
@@ -4681,10 +4576,6 @@ CMathContent.prototype =
                 SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
             }
-            /*else
-            {
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-            }*/
         }
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
@@ -4879,7 +4770,9 @@ CMathContent.prototype =
             var NewRuns;
             var LRun, CRun, RRun;
 
-            if( !this.Selection.Use || (this.Selection.Use && StartPos == EndPos) ) // TextPr меняем только в одном Run
+            var bSelectOneElement = this.Selection.Use && StartPos == EndPos;
+
+            if( !this.Selection.Use || (bSelectOneElement && this.content[StartPos].Type == MATH_PARA_RUN) ) // TextPr меняем только в одном Run
             {
                 var Pos = !this.Selection.Use ? this.CurPos :  StartPos;
 
@@ -4906,6 +4799,10 @@ CMathContent.prototype =
                 this.Selection.Start = CRunPos;
                 this.Selection.End   = CRunPos;
 
+            }
+            else if(bSelectOneElement && this.content[StartPos].Type == MATH_COMP)
+            {
+                this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
             }
             else
             {
@@ -5349,6 +5246,20 @@ CMathContent.prototype =
     getElem: function(nNum)
     {
         return this.content[nNum];
+    },
+    Is_FirstComposition: function()
+    {
+        var result = false;
+        if(this.content.length > 1)
+        {
+            var bEmptyRun = this.content[0].Is_Empty(),
+                bEmptyRun    = this.content[1].Type == para_Math_Composition;
+
+            if(bEmptyRun && bEmptyRun)
+                result = true;
+        }
+
+        return result;
     },
 
     ////////////////////////////////////////////////////////////////

@@ -54,6 +54,10 @@ CMathTextPrp.prototype =
         this.Italic = prp.Italic;
     }
 }*/
+
+// смена хентов
+// editor.SetFontRenderingMode(2);
+
 function CMathPosition()
 {
     this.x  = 0;
