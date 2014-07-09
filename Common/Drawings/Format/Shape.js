@@ -707,7 +707,8 @@ CShape.prototype =
     },
 
     pointInSelectedText: function (x, y) {
-        if (this.txBody) {
+        if (this.txBody && this.invertTransformText)
+        {
             var tx = this.invertTransformText.TransformPointX(x, y);
             var ty = this.invertTransformText.TransformPointY(x, y);
             return this.txBody.content.Selection_Check(tx, ty, this.parent.num);
@@ -1873,7 +1874,7 @@ CShape.prototype =
             if ( undefined !== NearPos )
                 return content.Selection_Check(X, Y, Page_Abs, NearPos);
 
-            if(isRealObject(content) && this.hitInTextRect(X, Y))
+            if(isRealObject(content) && this.hitInTextRect(X, Y) && this.invertTransformText)
             {
                 var t_x = this.invertTransformText.TransformPointX(X, Y);
                 var t_y = this.invertTransformText.TransformPointY(X, Y);
@@ -2664,7 +2665,7 @@ CShape.prototype =
     },
 
     hitToTextRect: function (x, y) {
-        if (isRealObject(this.txBody)) {
+        if (isRealObject(this.txBody) && this.invertTransformText) {
             var px = this.invertTransformText.TransformPointX(x, y);
             var py = this.invertTransformText.TransformPointY(x, y);
             return this.txBody.hitToRect(px, py);
@@ -2679,7 +2680,7 @@ CShape.prototype =
     hitInTextRect: function (x, y) {
         var tx_body = this.bWordShape ? this : this.txBody;
         var content = this.getDocContent && this.getDocContent();
-        if (isRealObject(tx_body) && content) {
+        if (isRealObject(tx_body) && content && this.invertTransformText) {
 
             var t_x, t_y;
             t_x = this.invertTransformText.TransformPointX(x, y);
@@ -2701,10 +2702,13 @@ CShape.prototype =
     },
 
     updateCursorType: function (x, y, e) {
-        var tx = this.invertTransformText.TransformPointX(x, y);
-        var ty = this.invertTransformText.TransformPointY(x, y);
-        var page_num = this.parent instanceof Slide ? this.parent.num : 0;
-        this.txBody.content.Update_CursorType(tx, ty, page_num)
+        if(this.invertTransformText)
+        {
+            var tx = this.invertTransformText.TransformPointX(x, y);
+            var ty = this.invertTransformText.TransformPointY(x, y);
+            var page_num = this.parent instanceof Slide ? this.parent.num : 0;
+            this.txBody.content.Update_CursorType(tx, ty, page_num);
+        }
     },
 
 
