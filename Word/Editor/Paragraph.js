@@ -6240,7 +6240,7 @@ Paragraph.prototype =
             var TextPr = new CTextPr();
             TextPr.Color     = null;
             TextPr.Underline = null;
-            TextPr.RStyle    = editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink();
+            TextPr.RStyle    = editor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
             Hyperlink.Apply_TextPr( TextPr, undefined, false );
         }
         else if ( null !== HyperProps.Text && "" !== HyperProps.Text )
@@ -9122,6 +9122,10 @@ Paragraph.prototype =
     Update_CursorType : function(X, Y, PageIndex)
     {
         var text_transform = null;
+        if(this.Parent && this.Parent.Parent && this.Parent.Parent.transformText)
+        {
+            text_transform = this.Parent.Parent.transformText;
+        }
         var MMData = new CMouseMoveData();
         var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
         MMData.X_abs = Coords.X;

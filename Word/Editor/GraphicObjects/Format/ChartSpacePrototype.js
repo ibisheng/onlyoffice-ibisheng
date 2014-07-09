@@ -1,5 +1,10 @@
 "use strict";
 
+function getChartTranslateManager()
+{
+    return editor.chartTranslate;
+}
+
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CChartSpace.prototype.recalculateBounds =  function()
 {

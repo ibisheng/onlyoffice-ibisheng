@@ -128,7 +128,8 @@ CGraphicObjects.prototype =
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
         if(ret)
         {
-            this.drawingDocument.SetCursorType(ret.cursorType);
+            if(ret.cursorType !== "text")
+                this.drawingDocument.SetCursorType(ret.cursorType);
             return true;
         }
         return false;
