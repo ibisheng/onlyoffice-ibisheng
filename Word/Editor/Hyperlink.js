@@ -1145,7 +1145,7 @@ ParaHyperlink.prototype =
 
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Check_Range_OnlyMath(Checker, _CurLine, _CurRange);
+            this.Content[CurPos].Check_Range_OnlyMath(Checker, _CurRange, _CurLine);
             
             if (false === Checker.Result)
                 break;
