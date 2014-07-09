@@ -529,7 +529,13 @@ CopyProcessor.prototype =
         else if (null != Value.HighLight && highlight_None != Value.HighLight)
             aProp.push("background-color:" + this.RGBToCSS(Value.HighLight, null));
         if (null != Value.Color || null != Value.Unifill) {
-            var color = this.RGBToCSS(Value.Color, Value.Unifill);
+			var color;
+			//TODO правка того, что в полученной html цвет текста всегда чёрный. стоит пересмотреть.
+			if(null != Value.Unifill)
+				color = this.RGBToCSS(null, Value.Unifill);
+			else
+				color = this.RGBToCSS(Value.Color, Value.Unifill);
+   
             aProp.push("color:" + color);
             aProp.push("mso-style-textfill-fill-color:" + color);
         }
