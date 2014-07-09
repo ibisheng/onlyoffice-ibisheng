@@ -11359,8 +11359,8 @@ CDocument.prototype =
                     {
                         this.DrawingDocument.SelectEnabled(false);
 
-                        //this.Internal_CheckCurPage();
-                        //this.RecalculateCurPos();
+                        this.Internal_CheckCurPage();
+                        this.RecalculateCurPos();
 
                         this.DrawingDocument.TargetStart();
                         this.DrawingDocument.TargetShow();

@@ -6108,6 +6108,28 @@ Paragraph.prototype =
                 this.CurPos.ContentPos = CenterRunPos;
                 this.CurPos.Line       = -1;
             }
+            
+            if ( true === this.Cursor_IsEnd() )
+            {
+                if ( undefined === IncFontSize )
+                    this.TextPr.Apply_TextPr( TextPr );
+                else
+                {
+                    // Выставляем настройки для символа параграфа
+                    var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                    EndTextPr.Merge( this.TextPr.Value );
+
+                    // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+                    this.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
+                }
+                
+                // TODO (ParaEnd): Переделать 
+                var LastElement = this.Content[this.Content.length - 1];
+                if ( para_Run === Element.Type )
+                {
+                    LastElement.Set_Pr(this.TextPr.Value.Copy());
+                }
+            }            
         }
     },
 
