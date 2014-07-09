@@ -5253,9 +5253,9 @@ CMathContent.prototype =
         if(this.content.length > 1)
         {
             var bEmptyRun = this.content[0].Is_Empty(),
-                bEmptyRun    = this.content[1].Type == para_Math_Composition;
+                bMathComp    = this.content[1].Type == para_Math_Composition;
 
-            if(bEmptyRun && bEmptyRun)
+            if(bEmptyRun && bMathComp)
                 result = true;
         }
 
