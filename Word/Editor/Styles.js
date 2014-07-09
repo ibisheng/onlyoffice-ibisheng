@@ -6579,6 +6579,13 @@ CTextPr.prototype =
 
         if(undefined != TextPr.Unifill)
             this.Unifill = TextPr.Unifill.createDuplicate();
+        else
+        {
+            if(undefined != TextPr.Color)
+            {
+                this.Unifill = undefined;
+            }
+        }
         
         if ( undefined !== TextPr.Shd )
             this.Shd = TextPr.Shd.Copy();
