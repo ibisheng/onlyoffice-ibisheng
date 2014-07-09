@@ -1658,7 +1658,8 @@
 				case 46:  // "del"
 					if (!t.hasFocus) {t.setFocus(true);}
 					if (hieroglyph) {t._syncEditors();}
-					t.skipTLUpdate = true;
+					event.stopPropagation();
+					event.preventDefault();
 					t._removeChars(ctrlKey ? kNextWord : kNextChar);
 					return true;
 
