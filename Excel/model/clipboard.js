@@ -1438,11 +1438,20 @@
 				}
 				
 				//link
+				var findHyperLink = $(node).find("a");
 				if($(node).children('a').length == 1 && oNewItem[0] != undefined)
 				{
 					oNewItem.hyperLink =  $(node).children('a').attr('href');
 					if($(node).children('a').attr('title'))
 						oNewItem.toolTip = $(node).children('a').attr('title');
+					else
+						oNewItem.toolTip = null;
+				}
+				else if(findHyperLink && findHyperLink[0] && oNewItem[0] != undefined && findHyperLink.length == 1)
+				{
+					oNewItem.hyperLink =  findHyperLink.attr('href');
+					if(findHyperLink.attr('title'))
+						oNewItem.toolTip = findHyperLink.attr('title');
 					else
 						oNewItem.toolTip = null;
 				}
