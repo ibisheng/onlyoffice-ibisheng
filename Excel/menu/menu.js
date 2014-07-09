@@ -2165,51 +2165,51 @@
 							return;
 							
 						// chart font binding
-						chartForm.find("#chartTitleFont").bind("click", setTitleFont);
-						chartForm.find("#chartAxisXFont").bind("click", setAxisXFont);
-						chartForm.find("#chartAxisYFont").bind("click", setAxisYFont);
+						//chartForm.find("#chartTitleFont").bind("click", setTitleFont);
+						//chartForm.find("#chartAxisXFont").bind("click", setAxisXFont);
+						//chartForm.find("#chartAxisYFont").bind("click", setAxisYFont);
 						
 						bIsUpdateChartProperties = false;
 						api.asc_enableKeyEvents(false);
 
-						var range = chart.asc_getRange();
-						var interval = range.asc_getInterval();
-
-						chartForm.find("#chartRange").val(interval);
-
-						chartForm.find("#chartRange").bind("keyup", function() {
-							var result = api.asc_checkChartInterval(chartForm.find("#chartType").val(), chartForm.find("#chartSubType").val(), chartForm.find("#chartRange").val(), chartForm.find("#dataRows").is(":checked"));
-							if (result)
-								chartForm.find("#chartRange").css("color", "black");
-							else
-								chartForm.find("#chartRange").css("color", "red");
-						});
+						//var range = chart.asc_getRange();
+						//var interval = range.asc_getInterval();
+                        //
+						//chartForm.find("#chartRange").val(interval);
+                        //
+						//chartForm.find("#chartRange").bind("keyup", function() {
+						//	var result = api.asc_checkChartInterval(chartForm.find("#chartType").val(), chartForm.find("#chartSubType").val(), chartForm.find("#chartRange").val(), chartForm.find("#dataRows").is(":checked"));
+						//	if (result)
+						//		chartForm.find("#chartRange").css("color", "black");
+						//	else
+						//		chartForm.find("#chartRange").css("color", "red");
+						//});
 
 						// Check selected
-						if (chart.type) {
+					//	if (chart.type) {
 
-							if (range.rows)
-								chartForm.find("#dataRows").attr("checked", range.asc_getRowsFlag());
-							else
-								chartForm.find("#dataColumns").attr("checked", range.asc_getColumnsFlag());
-
-							chartForm.find("#chartTitle").val(chart.asc_getHeader().asc_getTitle());
-							chartForm.find("#valueShow").attr("checked", chart.asc_getShowValueFlag());
-							chartForm.find("#borderShow").attr("checked", chart.asc_getShowBorderFlag());
-
-							var xAxis = chart.asc_getXAxis();
-							chartForm.find("#xAxisShow").attr("checked", xAxis.asc_getShowFlag());
-							chartForm.find("#xGridShow").attr("checked", xAxis.asc_getGridFlag());
-							chartForm.find("#xAxisTitle").val(xAxis.asc_getTitle() ? xAxis.asc_getTitle() : "");
-
-							var yAxis = chart.asc_getYAxis();
-							chartForm.find("#yAxisShow").attr("checked", yAxis.asc_getShowFlag());
-							chartForm.find("#yGridShow").attr("checked", yAxis.asc_getGridFlag());
-							chartForm.find("#yAxisTitle").val(yAxis.asc_getTitle() ? yAxis.asc_getTitle() : "");
-						}
-						else {
-							chartForm.find("#dataRows").attr("checked", true);
-						}
+						//	if (range.rows)
+						//		chartForm.find("#dataRows").attr("checked", range.asc_getRowsFlag());
+						//	else
+						//		chartForm.find("#dataColumns").attr("checked", range.asc_getColumnsFlag());
+                        //
+						//	chartForm.find("#chartTitle").val(chart.asc_getHeader().asc_getTitle());
+						//	chartForm.find("#valueShow").attr("checked", chart.asc_getShowValueFlag());
+						//	chartForm.find("#borderShow").attr("checked", chart.asc_getShowBorderFlag());
+                        //
+						//	var xAxis = chart.asc_getXAxis();
+						//	chartForm.find("#xAxisShow").attr("checked", xAxis.asc_getShowFlag());
+						//	chartForm.find("#xGridShow").attr("checked", xAxis.asc_getGridFlag());
+						//	chartForm.find("#xAxisTitle").val(xAxis.asc_getTitle() ? xAxis.asc_getTitle() : "");
+                        //
+						//	var yAxis = chart.asc_getYAxis();
+						//	chartForm.find("#yAxisShow").attr("checked", yAxis.asc_getShowFlag());
+						//	chartForm.find("#yGridShow").attr("checked", yAxis.asc_getGridFlag());
+						//	chartForm.find("#yAxisTitle").val(yAxis.asc_getTitle() ? yAxis.asc_getTitle() : "");
+						//}
+						//else {
+						//	chartForm.find("#dataRows").attr("checked", true);
+						//}
 					},
 					buttons: [
 						{
@@ -2232,9 +2232,9 @@
 						api.asc_enableKeyEvents(true);
 						
 						// chart font unbinding
-						chartForm.find("#chartTitleFont").unbind("click", setTitleFont);
-						chartForm.find("#chartAxisXFont").unbind("click", setAxisXFont);
-						chartForm.find("#chartAxisYFont").unbind("click", setAxisYFont);
+						//chartForm.find("#chartTitleFont").unbind("click", setTitleFont);
+						//chartForm.find("#chartAxisXFont").unbind("click", setAxisXFont);
+						//chartForm.find("#chartAxisYFont").unbind("click", setAxisYFont);
 					},
 					create: function() {
 					}

@@ -1,5 +1,11 @@
 "use strict";
 
+function getChartTranslateManager()
+{
+    return window["Asc"]["editor"].chartTranslate;
+}
+
+
 CChartSpace.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CChartSpace.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;

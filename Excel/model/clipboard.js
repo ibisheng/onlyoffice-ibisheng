@@ -3175,9 +3175,9 @@
 					drawingObject.graphicObject.setWorksheet(ws.model);
 					
 					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
-					drawingObject.graphicObject.recalculate();
-					
+
 					drawingObject.graphicObject.addToDrawingObjects();
+                    drawingObject.graphicObject.recalculate();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
 					tempArr = [];
