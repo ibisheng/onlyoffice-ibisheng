@@ -242,6 +242,17 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                         }
                         else
                         {
+                            if(drawingObjectsController.document)
+                            {
+                                var content = title.getDocContent();
+                                var invert_transform_text = title.invertTransformText, tx, ty;
+                                if(content && invert_transform_text)
+                                {
+                                    tx = invert_transform_text.TransformPointX(x, y);
+                                    ty = invert_transform_text.TransformPointY(x, y);
+                                    content.Update_CursorType(tx, ty, pageIndex);
+                                }
+                            }
                             return {objectId: drawing.Get_Id(), cursorType: "text"};
                         }
                     }
@@ -305,6 +316,17 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
             }
             else
             {
+                if(drawingObjectsController.document)
+                {
+                    var content = title.getDocContent();
+                    var invert_transform_text = title.invertTransformText, tx, ty;
+                    if(content && invert_transform_text)
+                    {
+                        tx = invert_transform_text.TransformPointX(x, y);
+                        ty = invert_transform_text.TransformPointY(x, y);
+                        content.Update_CursorType(tx, ty, pageIndex);
+                    }
+                }
                 return {objectId: drawing.Get_Id(), cursorType: "text"};
             }
         }
@@ -389,6 +411,17 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
             }
             else
             {
+                if(drawingObjectsController.document)
+                {
+                    var content = title.getDocContent();
+                    var invert_transform_text = title.invertTransformText, tx, ty;
+                    if(content && invert_transform_text)
+                    {
+                        tx = invert_transform_text.TransformPointX(x, y);
+                        ty = invert_transform_text.TransformPointY(x, y);
+                        content.Update_CursorType(tx, ty, pageIndex);
+                    }
+                }
                 return {objectId: drawing.Get_Id(), cursorType: "text"};
             }
         }
