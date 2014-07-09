@@ -3924,7 +3924,10 @@ CDocumentContent.prototype =
             }
 
             if ( PrevClass.Correct_Content )
+            {
                 PrevClass.Correct_Content();
+                PrevPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
+            }
 
             if ( true === bNeedSelect )
             {
@@ -3963,6 +3966,12 @@ CDocumentContent.prototype =
             if ( true === Para.Cursor_IsEnd() )
             {
                 bConcatE = false;
+
+                if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && true === FirstElement.Element.Is_Empty() )
+                {
+                    bConcatS = false;
+                    DstIndex++;
+                }
             }
             else if ( true === Para.Cursor_IsStart() )
             {

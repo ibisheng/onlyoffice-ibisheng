@@ -8507,12 +8507,12 @@ CDocument.prototype =
             return;
 
         var FirstElement = SelectedContent.Elements[0];
-        if ( 1 === ElementsCount && true !== FirstElement.SelectedAll && type_Paragraph === FirstElement.Element.GetType() )
+        if ( 1 === ElementsCount && true !== FirstElement.SelectedAll && type_Paragraph === FirstElement.Element.GetType() && true !== FirstElement.Element.Is_Empty() )
         {
             // Нам нужно в заданный параграф вставить выделенный текст
             var NewPara = FirstElement.Element;
             var NewElementsCount = NewPara.Content.length - 1; // Последний ран с para_End не добавляем
-
+            
             var ParaNearPos = Para.Get_ParaNearestPos( NearPos );
             if ( null === ParaNearPos || ParaNearPos.Classes.length < 2 )
                 return;
@@ -8541,7 +8541,10 @@ CDocument.prototype =
             }
             
             if ( PrevClass.Correct_Content )
+            {
                 PrevClass.Correct_Content();
+                PrevPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
+            }
 
             if ( true === bNeedSelect )
             {
@@ -8571,7 +8574,7 @@ CDocument.prototype =
             var ParaS = Para;
             var ParaE = Para;
             var ParaEIndex = DstIndex;
-
+            
             // Нам надо разделить наш параграф в заданной позиции, если позиция в
             // начале или конце параграфа, тогда делить не надо
             Para.Cursor_MoveToNearPos( NearPos );
@@ -8580,6 +8583,12 @@ CDocument.prototype =
             if ( true === Para.Cursor_IsEnd() )
             {
                 bConcatE = false;
+
+                if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && true === FirstElement.Element.Is_Empty() )
+                {
+                    bConcatS = false;
+                    DstIndex++;
+                }
             }
             else if ( true === Para.Cursor_IsStart() )
             {
@@ -8616,7 +8625,7 @@ CDocument.prototype =
             }
 
             var EndIndex = ElementsCount - 1;
-            if ( true === bConcatE )
+            if ( true === bConcatE && StartIndex < EndIndex )
             {
                 var _ParaE = Elements[ElementsCount - 1].Element;
 

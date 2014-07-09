@@ -3207,6 +3207,11 @@ CTable.prototype =
         }
     },
 
+    ReDraw : function()
+    {
+        this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
+    },
+
     Draw : function(nPageIndex, pGraphics)
     {
         var PNum = nPageIndex - this.PageNum;
@@ -9720,7 +9725,7 @@ CTable.prototype =
 
     Set_ParagraphShd : function(Shd)
     {
-        if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )
+        if ( true === this.ApplyToAll )
         {
             var Cells_array = this.Internal_Get_SelectionArray();
             for ( var Index = 0; Index < Cells_array.length; Index++ )
@@ -9743,8 +9748,31 @@ CTable.prototype =
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
+        else if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 )
+        {
+            var Cells_array = this.Internal_Get_SelectionArray();
+            for ( var Index = 0; Index < Cells_array.length; Index++ )
+            {
+                var Pos = Cells_array[Index];
+                var Row = this.Content[Pos.Row];
+                var Cell = Row.Get_Cell( Pos.Cell );
+
+                Cell.Set_Shd( Shd );
+            }
+
+            this.ReDraw();
+        }
         else
-            return this.CurCell.Content.Set_ParagraphShd( Shd );
+        {
+            var CellContent = this.CurCell.Content;
+            if ( docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType() )
+            {
+                this.CurCell.Set_Shd( Shd );
+                this.CurCell.Content.ReDraw();                
+            }
+            else
+                return this.CurCell.Content.Set_ParagraphShd( Shd );
+        }
     },
 
     Set_ParagraphStyle : function(Name)
