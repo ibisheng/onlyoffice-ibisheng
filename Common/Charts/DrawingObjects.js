@@ -2586,8 +2586,16 @@ function DrawingObjects() {
                     oNewChartSpace.addToDrawingObjects();
                     oNewChartSpace.recalculate();
                     CheckSpPrXfrm(oNewChartSpace);
-                    oNewChartSpace.spPr.xfrm.setOffX(50);
-                    oNewChartSpace.spPr.xfrm.setOffY(36);
+
+                    var canvas_height = worksheet.drawingCtx.getHeight(3);
+                    var pos_y = (canvas_height - oNewChartSpace.spPr.xfrm.extY)/2;
+                    if(pos_y < 0)
+                    {
+                        pos_y = 0;
+                    }
+
+                    oNewChartSpace.spPr.xfrm.setOffX(70);
+                    oNewChartSpace.spPr.xfrm.setOffY(pos_y);
                     oNewChartSpace.recalculate();
 
                     var min_r = 0, max_r = 0, min_c = 0, max_c = 0;

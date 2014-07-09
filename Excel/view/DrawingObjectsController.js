@@ -351,8 +351,6 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         chart.setStyle(2);
         chart.setBDeleted(false);
         this.resetSelection();
-        var chartLeft = this.drawingObjects.convertMetric(options && options.left ? options.left : (this.drawingObjects.getContextWidth() / 2) - c_oAscChartDefines.defaultChartWidth / 2, 1, 3);
-        var chartTop = this.drawingObjects.convertMetric(options && options.top ? options.top : (this.drawingObjects.getContextHeight() / 2) - c_oAscChartDefines.defaultChartHeight / 2, 1, 3);
         var w, h;
         if(isRealObject(options) && isRealNumber(options.width) && isRealNumber(options.height))
         {
@@ -364,6 +362,28 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
             w = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartWidth, 0, 3);
             h = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartHeight, 0, 3);
         }
+
+        var chartLeft, chartTop;
+        if(options && isRealNumber(options.left) && options.left >= 0 && isRealNumber(options.top) && options.top >= 0)
+        {
+            chartLeft = this.drawingObjects.convertMetric(options.left, 0, 3);
+            chartTop = this.drawingObjects.convertMetric(options.top, 0, 3);
+        }
+        else
+        {
+            chartLeft =  this.drawingObjects.convertMetric((this.drawingObjects.getContextWidth()  - w) / 2, 0, 3);
+            if(chartLeft < 0)
+            {
+                chartLeft = 0;
+            }
+            chartTop =  this.drawingObjects.convertMetric((this.drawingObjects.getContextHeight()  - h) / 2, 0, 3);
+            if(chartTop < 0)
+            {
+                chartTop = 0;
+            }
+        }
+
+
         chart.setSpPr(new CSpPr());
         chart.spPr.setParent(chart);
         chart.spPr.setXfrm(new CXfrm());
