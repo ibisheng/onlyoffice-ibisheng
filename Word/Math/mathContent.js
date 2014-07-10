@@ -521,86 +521,6 @@ CRecalculateInfo.prototype =
 
 }
 
-// TO DO
-// убрать
-
-/*function CMathRunPrp()
-{
-    this.typeObj = MATH_RUN_PRP;
-    this.textPrp = new CTextPr();
-    this.mathPrp = new CMPrp();
-    this.size = {width: 0, height: 0, center: 0, ascent: 0};
-}
-CMathRunPrp.prototype =
-{
-    Merge: function(MRunPrp)
-    {
-        // only For object of CMathRunPrp
-        var checkTxtPrp = MRunPrp.textPrp !== null && typeof(MRunPrp.textPrp)!== "undefined",
-            checkMPrp = MRunPrp.mathPrp !== null && typeof(MRunPrp.mathPrp)!== "undefined";
-        if(checkTxtPrp && checkMPrp)
-        {
-            this.textPrp.Merge(MRunPrp.textPrp);
-            this.mathPrp.Merge(MRunPrp.mathPrp);
-        }
-    },
-    old_Merge: function(oWPrp)
-    {
-        this.textPrp.Merge(oWPrp);
-    },
-    *//*getWRunPrp: function()
-    {
-        // смержить c MRunPrp
-        return this.textPrp;
-    },*//*
-    getMergedWPrp: function()
-    {
-        var oWPrp = new CTextPr();
-
-        if(!this.mathPrp.nor) // math text, style: plain
-        {
-            oWPrp.Merge(this.textPrp); // FontFamily, FontSize etc
-
-            var mPrp = this.mathPrp.getTxtPrp();
-            oWPrp.Merge(mPrp); // bold, italic
-        }
-        else
-        {
-            oWPrp.Merge(this.textPrp);
-        }
-
-        return oWPrp;
-    },
-    getTxtPrp: function()
-    {
-        return this.textPrp;
-    },
-    setTxtPrp: function(oWPrp)
-    {
-        this.textPrp.Merge(oWPrp);
-    },
-    setMathRunPrp: function(oMPrp)
-    {
-        this.mathPrp.setMathProps(oMPrp);
-    },
-    draw: function() {},
-    setPosition: function() {},
-	relate: function() {},
-    getPropsForWrite: function()
-    {
-        var props = {};
-
-        props.textPrp    = this.textPrp;
-        props.mathRunPrp = this.mathPrp.getPropsForWrite();
-
-        return props;
-    },
-    getTxtSettings: function()
-    {
-        return this.mathPrp.getTxtSettings();
-    }
-}*/
-
 function CMPrp()
 {
     this.sty      = STY_ITALIC;
@@ -630,45 +550,6 @@ function CMPrp()
 }
 CMPrp.prototype =
 {
-    /*Merge:  function(mPrp)
-    {
-        // выравнивание
-        this.aln      = mPrp.aln;
-        this.brk      = mPrp.brk;
-
-        // настройки для букв в контенте
-        this.lit      = mPrp.lit;
-        this.nor      = mPrp.nor;
-        this.typeText = mPrp.typeText;
-
-        // настройки bold, italic
-        this.italic   = mPrp.italic;
-        this.bold     = mPrp.bold;
-        this.plain    = mPrp.plain;
-    },
-    SetBProp:    function(obj, prp)
-    {
-        if(prp === 1 || prp === true)
-            obj = true;
-        else if(prp === 0 || prp === false)
-            obj = false;
-    },*/
-    /*getProps: function()
-    {
-        var props =
-        {
-            align:      this.aln,
-            brk:        this.brk,
-            literal:    this.lit,
-            script:     this.src,
-            italic:     this.italic,
-            bold:       this.bold,
-            plain:      this.plain,
-            typeText:   this.typeText
-        };
-
-        return props;
-    },*/
     setMathProps: function(props)
     {
         if(props.aln === true || props.aln == false)
@@ -696,43 +577,7 @@ CMPrp.prototype =
         if(props.scr !== null && props.scr !== undefined)
             this.scr = props.scr;
 
-
-        /*if(props.sty === STY_ITALIC)
-            this.italic = true;
-        else if(props.sty === STY_BI)
-        {
-            this.italic = true;
-            this.bold = true;
-        }
-        else if(props.sty === STY_BOLD)
-        {
-            this.italic = false;
-            this.bold = true;
-        }
-        else if(props.sty === STY_PLAIN )
-        {
-            this.typeText = TXT_PLAIN;  // буквы берутся обычные, не специальные для Cambria Math : то есть как для TXT_NORMAL
-                                        // отличие от TXT_NORMAL w:rPrp не учитываются !
-        }
-
-
-
-        if(typeof(props.scr)!=="undefined" && props.scr !== null)
-            this.typeText = props.scr;
-
-
-        if(props.nor)
-            this.typeText = TXT_NORMAL;
-*/
     },
-    /*Apply_Pr: function(TextPr)
-    {
-        if(TextPr.Bold !== null && typeof(TextPr.Bold) !== "undefined")
-            this.bold = TextPr.Bold;
-
-        if(TextPr.Italic !== null && typeof(TextPr.Italic) !== "undefined")
-            this.italic = TextPr.Italic;
-    },*/
     getPropsForWrite: function()
     {
         var props =
@@ -744,38 +589,6 @@ CMPrp.prototype =
             sty:    this.sty,
             scr:    this.scr
         };
-
-        /*var Italic     = this.italic && !this.bold,
-            BoldItalic = this.italic && this.bold,
-            Bold       = this.bold && !this.italic,
-            Plain      = this.plain;
-
-        if(this.typeText == TXT_NORMAL)
-        {
-            props.nor = 1;
-        }
-        else
-        {
-            if(BoldItalic)
-                props.sty = STY_BI;
-            else if(Bold)
-                props.sty = STY_BOLD;
-            else if(Italic)
-                props.sty = STY_ITALIC;
-            else if(Plain)
-                props.sty = STY_PLAIN;
-        }
-
-        if(this.aln)
-            props.aln = 1;
-
-        if(this.brk)
-            props.brk = 1;
-
-        if(this.lit)
-            props.lit = 1;
-
-        props.scr = this.typeText;*/
 
         return props;
     },
@@ -4019,6 +3832,7 @@ CMathContent.prototype =
         var gaps = {left: 0, right: 0};
         var bFirstComp = false,
             bLastComp = false;
+            bLastComp = false;
 
         var len = this.content.length;
 
@@ -4511,11 +4325,20 @@ CMathContent.prototype =
 
                 left = current;
 
+
+                /*if(this.CurPos <= i)
+                    this.CurPos++;*/
+
             }
             else if(!bDeleteEmptyRun )
             {
                 NewContent.push(this.content[i]);
                 left = current;
+            }
+            else
+            {
+                /*if(this.CurPos <= i )
+                    this.CurPos--;*/
             }
 
 
@@ -4605,32 +4428,29 @@ CMathContent.prototype =
     },
     Cursor_MoveToStartPos: function()
     {
-        if(!this.IsEmpty())
+        if(!this.Is_Empty())
         {
             this.CurPos = 0;
-            this.Selection.Start = 0;
-            this.Selection.End   = 0;
 
             this.content[0].Cursor_MoveToStartPos();
         }
     },
-    Cursor_MoveToEndPos: function()
+    Cursor_MoveToEndPos: function(SelectFromEnd)
     {
-        if(!this.IsEmpty())
+        if(!this.Is_Empty())
         {
             var len = this.content.length - 1;
             this.CurPos = len;
-            this.Selection.Start = len;
-            this.Selection.End   = len;
 
-            this.content[len].Cursor_MoveToEndPos();
+
+            this.content[len].Cursor_MoveToEndPos(SelectFromEnd);
         }
     },
     Cursor_Is_Start: function()
     {
         var result = false;
 
-        if( !this.IsEmpty() )
+        if( !this.Is_Empty() )
         {
             if(this.CurPos == 0)
                 result = this.content[0].Cursor_Is_Start();
@@ -4642,7 +4462,7 @@ CMathContent.prototype =
     {
         var result = false;
 
-        if(!this.IsEmpty())
+        if(!this.Is_Empty())
         {
             var len = this.content.length - 1;
             if(this.CurPos == len)
@@ -4810,15 +4630,9 @@ CMathContent.prototype =
                     EndPos = temp;
                 }
 
-                //var lng = this.content.length - 1;
-
-
 
                 for(var i = StartPos + 1; i < EndPos; i++)
                     this.content[i].Apply_TextPr(TextPr, IncFontSize, true );
-
-
-                var bDirect = this.Selection.Start < this.Selection.End;
 
 
                 if(this.content[EndPos].Type == para_Math_Run)
@@ -4832,9 +4646,6 @@ CMathContent.prototype =
                     if(RRun !== null)
                     {
                         this.Internal_Content_Add(EndPos+1, RRun);
-
-                        //if(bDirect && true === this.content[this.Selection.Start].Selection_IsEmpty(true))
-
                     }
 
                 }
@@ -4883,9 +4694,6 @@ CMathContent.prototype =
 
             }
         }
-
-        if(this.bRoot)
-            console.log("ApplyToAll " + ApplyToAll + " Start " + this.Selection.Start + " End " + this.Selection.End);
 
     },
     Internal_Content_Add : function(Pos, Item)
@@ -5108,25 +4916,9 @@ CMathContent.prototype =
         }
     },
     /////////////////////////
-    getContent: function(stack, bCurrent)
+    Is_Empty:    function()
     {
-        var content = null;
-        var pos = stack.pop();
-
-        if(bCurrent)
-            this.CurPos = pos.X;
-
-        if(stack.length > 0)
-            content = this.content[pos.X].value.getContent(stack, bCurrent);
-        else
-            content = this;
-
-        return content;
-
-    },
-    IsEmpty:    function()
-    {
-        return this.content.length == 1;
+        return this.content.length == 0;
     },
     Copy: function(Selected)
     {
@@ -5174,18 +4966,21 @@ CMathContent.prototype =
         var start = this.Selection.Start,
             end   = this.Selection.End;
 
-        //if(this.content[start].typeObj !== MATH_PLACEHOLDER)
+        var lng = this.content.length;
+
+        if(start >= 0 && start < lng && end >=0 && end < lng)
+        {
             this.content[start].Selection_Remove();
 
-        if(start !== end)
-        {
-            //if(this.content[end].typeObj !== MATH_PLACEHOLDER)
+            if(start !== end)
                 this.content[end].Selection_Remove();
         }
+        /*else
+            console.log("True");*/
 
 
-        this.Selection.Start = this.CurPos;
-        this.Selection.End   = this.CurPos;
+        /*this.Selection.Start = this.CurPos;
+        this.Selection.End   = this.CurPos;*/
 
         this.Selection.Use = false;
     },

@@ -381,8 +381,15 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Apply_TextPr
 
-        var content = this.GetSelectContent().Content;
-        content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+        if(ApplyToAll == true) // для ситуации, когда ApplyToAll = true, в Root формулы при этом позиции селекта не проставлены
+        {
+            this.Root.Apply_TextPr(TextPr, IncFontSize, true);
+        }
+        else
+        {
+            var content = this.GetSelectContent().Content;
+            content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+        }
 
     },
 
@@ -1242,7 +1249,7 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Cursor_MoveToEndPos
 
-        this.Root.Cursor_MoveToEndPos();
+        this.Root.Cursor_MoveToEndPos(SelectFromEnd);
     },
 
     Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY

@@ -681,23 +681,11 @@ CMathBase.prototype =
                     this.elements[i][j].hidePlaceholder(flag);
             }
     },
-     // ф-ия используется, для того чтобы добавить в контент элемента текст/др формулы
     getElement: function(x, y)
     {
      return this.elements[x][y];
     },
-    getContent: function(stack, bCurrent)
-    {
-        var pos = stack.pop();
-        if(bCurrent)
-        {
-            this.CurPos_X = pos.X;
-            this.CurPos_Y = pos.Y;
-        }
 
-        var content = this.elements[pos.X][pos.Y].getContent(stack, bCurrent);
-        return content;
-    },
     ////    For Edit   /////
     /*selection_Start: function(x, y)
     {
