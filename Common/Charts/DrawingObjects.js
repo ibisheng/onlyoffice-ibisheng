@@ -824,7 +824,7 @@ prot["asc_putLeft"] = prot.asc_putLeft;
 prot["asc_getRight"] = prot.asc_getRight;
 prot["asc_putRight"] = prot.asc_putRight;
 prot["asc_getFirstLine"] = prot.asc_getFirstLine;
-prot["asc_getFirstLine"] = prot.asc_getFirstLine;
+prot["asc_putFirstLine"] = prot.asc_putFirstLine;
 //}
 
 //-----------------------------------------------------------------------------------
