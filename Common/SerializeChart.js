@@ -10432,6 +10432,10 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         if (null != oNewVal.axId)
             oIdToAxisMap[oNewVal.axId] = oNewVal;
         val.addAxis(oNewVal);
+        if(!isRealNumber(oNewVal.crossBetween))
+        {
+            oNewVal.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+        }
     }
     else if (c_oserct_plotareaDTABLE === type) {
         var oNewVal = new CDTable();

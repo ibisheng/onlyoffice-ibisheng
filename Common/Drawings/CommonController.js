@@ -4084,7 +4084,7 @@ DrawingObjectsController.prototype =
             locked = undefined;
             if(!drawing.group)
             {
-                locked = drawing.lockType !== c_oAscLockTypes.kLockTypeNone;
+                locked = drawing.lockType !== c_oAscLockTypes.kLockTypeNone && drawing.lockType !== c_oAscLockTypes.kLockTypeMine ;
             }
             switch(drawing.getObjectType())
             {

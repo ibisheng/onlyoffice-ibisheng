@@ -3504,7 +3504,7 @@ CChartSpace.prototype =
                     var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var point_width = rect.w/string_pts.length;
                     var labels_pos = val_ax.tickLblPos;
-                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_MID_CAT;
+                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_BETWEEN;
 
                     var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
@@ -4506,7 +4506,7 @@ CChartSpace.prototype =
 
                     var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var labels_pos = val_ax.tickLblPos;
-                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_MID_CAT;
+                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_BETWEEN;
 
                     var bottom_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
