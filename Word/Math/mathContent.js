@@ -4802,6 +4802,7 @@ CMathContent.prototype =
             }
             else
             {
+
                 if(StartPos > EndPos)
                 {
                     var temp = StartPos;
@@ -4809,8 +4810,15 @@ CMathContent.prototype =
                     EndPos = temp;
                 }
 
+                //var lng = this.content.length - 1;
+
+
+
                 for(var i = StartPos + 1; i < EndPos; i++)
                     this.content[i].Apply_TextPr(TextPr, IncFontSize, true );
+
+
+                var bDirect = this.Selection.Start < this.Selection.End;
 
 
                 if(this.content[EndPos].Type == para_Math_Run)
@@ -4824,6 +4832,9 @@ CMathContent.prototype =
                     if(RRun !== null)
                     {
                         this.Internal_Content_Add(EndPos+1, RRun);
+
+                        //if(bDirect && true === this.content[this.Selection.Start].Selection_IsEmpty(true))
+
                     }
 
                 }
@@ -4850,17 +4861,32 @@ CMathContent.prototype =
                     this.content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
 
 
-                if ( this.Selection.Start < this.Selection.End && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
-                    this.Selection.Start++;
-                else if ( this.Selection.End < this.Selection.Start && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
-                    this.Selection.End++;
+                var bStartComposition = this.content[StartPos].Type == para_Math_Composition || (this.content[StartPos].Is_Empty() && this.content[StartPos + 1].Type == para_Math_Composition);
+                var bEndCompostion    = this.content[EndPos].Type == para_Math_Composition || (this.content[EndPos].Is_Empty()   && this.content[EndPos - 1].Type == para_Math_Composition);
 
-                if ( this.Selection.Start < this.Selection.End && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
-                    this.Selection.End--;
-                else if ( this.Selection.End < this.Selection.Start && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
-                    this.Selection.Start--;
+                if(!bStartComposition)
+                {
+                    if(this.Selection.Start < this.Selection.End && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
+                        this.Selection.Start++;
+                    else if (this.Selection.End < this.Selection.Start && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
+                        this.Selection.End++;
+                }
+
+
+                if(!bEndCompostion)
+                {
+                    if(this.Selection.Start < this.Selection.End && true === this.content[this.Selection.End].Selection_IsEmpty(true) )
+                        this.Selection.End--;
+                    else if (this.Selection.End < this.Selection.Start && true === this.content[this.Selection.Start].Selection_IsEmpty(true) )
+                        this.Selection.Start--;
+                }
+
             }
         }
+
+        if(this.bRoot)
+            console.log("ApplyToAll " + ApplyToAll + " Start " + this.Selection.Start + " End " + this.Selection.End);
+
     },
     Internal_Content_Add : function(Pos, Item)
     {

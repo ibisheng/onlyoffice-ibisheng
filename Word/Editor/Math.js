@@ -495,8 +495,6 @@ ParaMath.prototype =
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
         this.LinesLength = 0;
-
-        this.Root.Recalculate_Reset(StartRange, StartLine);
     },
 
     Recalculate_Range : function(PRS, ParaPr, Depth)
@@ -631,6 +629,11 @@ ParaMath.prototype =
                 PRS.WordLen += LetterLen;
             }
         }
+
+        if(PRS.NewRange  == false)
+            this.Root.Recalculate_Reset(PRS.Range, PRS.Line);
+
+
 
         var RangeStartPos = 0;
         var RangeEndPos   = 0;
@@ -953,15 +956,6 @@ ParaMath.prototype =
     ApplyArgSize : function(oWPrp, argSize)
     {
         var tPrp = new CTextPr();
-        /*var defaultWPrp =
-        {
-            FontFamily:     {Name  : "Cambria Math", Index : -1 },
-            FontSize:       11,
-            Italic:         true,
-            Bold:           false,
-            RFonts:         {},
-            Lang:           {}
-        };*/
 
         tPrp.Merge(this.DefaultTextPr);
         tPrp.Merge(oWPrp);
@@ -1525,16 +1519,16 @@ ParaMath.prototype =
 
                 if(Start == End)
                 {
-                    oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
+                    oCont.content[Start].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
                 }
                 else
                 {
-                    oCont.content[Start].Selection_DrawRange(0, 0, SelectionDraw);
+                    oCont.content[Start].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
 
                     SelectionDraw.FindStart = false; // выставляем здесь флаг, для того чтобы правильно отрисовался селект для случая пустой ран мат. объект пустой ран
                     SelectionDraw.W += oCont.WidthToElement[End] - oCont.WidthToElement[Start + 1]; // startPos < endPos !
 
-                    oCont.content[End].Selection_DrawRange(0,0, SelectionDraw);
+                    oCont.content[End].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
                 }
 
                 if(!oCont.bRoot)
