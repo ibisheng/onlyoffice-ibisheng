@@ -3832,7 +3832,6 @@ CMathContent.prototype =
         var gaps = {left: 0, right: 0};
         var bFirstComp = false,
             bLastComp = false;
-            bLastComp = false;
 
         var len = this.content.length;
 
