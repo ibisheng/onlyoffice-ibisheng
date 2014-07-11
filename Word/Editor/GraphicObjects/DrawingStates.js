@@ -576,15 +576,21 @@ RotateState.prototype =
                     {
                         History.Create_NewPoint();
                         this.drawingObjects.resetSelection();
+                        var arr_para_drawings = [], para_drawing ;
                         for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                         {
-                            var para_drawing = this.drawingObjects.arrTrackObjects[i].originalObject.parent.Copy();
+                            para_drawing = this.drawingObjects.arrTrackObjects[i].originalObject.parent.Copy();
                             para_drawing.Set_GraphicObject(this.drawingObjects.arrTrackObjects[i].originalObject.copy());
                             para_drawing.GraphicObj.setParent(para_drawing);
                             bounds = arr_bounds[i];
                             para_drawing.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], pageIndex);
-                            para_drawing.Add_ToDocument(arr_nearest_pos[i], false);
+                            arr_para_drawings.push(para_drawing);
                             this.drawingObjects.selectObject(para_drawing.GraphicObj, pageIndex);
+                        }
+                        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                        {
+                            para_drawing = arr_para_drawings[i];
+                            para_drawing.Add_ToDocument(arr_nearest_pos[i], false);
                         }
                     }
                     this.drawingObjects.document.Recalculate();
