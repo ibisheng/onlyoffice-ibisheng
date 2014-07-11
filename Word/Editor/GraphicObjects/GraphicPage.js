@@ -259,7 +259,7 @@ CGraphicPage.prototype =
             if(Array.isArray(drawing_array))
             {
                 for(var index = 0; index < drawing_array.length; ++index)
-                    if(drawing_array[index].parent.Get_Id() === id)
+                    if(drawing_array[index].parent && drawing_array[index].parent.Get_Id() === id)
                         return drawing_array.splice(index, 1);
             }
         }
@@ -267,22 +267,22 @@ CGraphicPage.prototype =
         {
             drawing_array = this.beforeTextObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].parent.Get_Id() === id)
+                if(drawing_array[index].parent && drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
 
             drawing_array = this.behindDocObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].parent.Get_Id() === id)
+                if(drawing_array[index].parent && drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
 
             drawing_array = this.inlineObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].parent.Get_Id() === id)
+                if(drawing_array[index].parent && drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
 
             drawing_array = this.wrappingObjects;
             for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].parent.Get_Id() === id)
+                if(drawing_array[index].parent && drawing_array[index].parent.Get_Id() === id)
                     return drawing_array.splice(index, 1);
         }
         return null;

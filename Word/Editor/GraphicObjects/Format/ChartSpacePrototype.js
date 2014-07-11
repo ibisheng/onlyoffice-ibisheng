@@ -162,10 +162,7 @@ CChartSpace.prototype.handleUpdateExtents = function()
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
-    this.recalcTransform();
-    this.recalcWrapPolygon();
-    this.setRecalculateInfo();
-    this.addToRecalculate();
+    this.handleUpdateExtents();
 };
 CChartSpace.prototype.handleUpdateChart = function()
 {

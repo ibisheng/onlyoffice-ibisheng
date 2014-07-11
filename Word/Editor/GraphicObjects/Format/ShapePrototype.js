@@ -867,3 +867,18 @@ CShape.prototype.setRecalcObject =  function(object)
         }
     }
 };
+
+
+CShape.prototype.setStartPage = function(pageIndex)
+{
+    this.selectStartPage = pageIndex;
+    var content = this.getDocContent && this.getDocContent();
+    content && content.Set_StartPage(pageIndex);
+    if(Array.isArray(this.spTree))
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].setStartPage && this.spTree[i].setStartPage(pageIndex);
+        }
+    }
+};

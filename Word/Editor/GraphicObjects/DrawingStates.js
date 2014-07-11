@@ -374,7 +374,7 @@ MoveInlineObject.prototype =
                 var drawing = this.majorObject.copy();
                 drawing.setParent(new_para_drawing);
                 new_para_drawing.Set_GraphicObject(drawing);
-                new_para_drawing.Add_ToDocument(this.InlinePos);
+                new_para_drawing.Add_ToDocument(this.InlinePos, false);
                 this.drawingObjects.resetSelection();
                 this.drawingObjects.selectObject(drawing, pageIndex);
                 this.drawingObjects.document.Recalculate();

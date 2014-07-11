@@ -234,7 +234,9 @@ CShape.prototype =
                 for(var i = 0; i < paragraphs.length; ++i)
                 {
                     var cur_par = paragraphs[i];
+                    cur_par.bFromDocument = true;
                     var new_paragraph = cur_par.Copy(new_content);
+                    cur_par.bFromDocument = false;
                     new_content.Internal_Content_Add( i, new_paragraph, false );
                     /*var bullet = cur_par.Pr.Bullet;
                     if(bullet && bullet.bulletType && bullet.bulletType.type !== BULLET_TYPE_BULLET_NONE)

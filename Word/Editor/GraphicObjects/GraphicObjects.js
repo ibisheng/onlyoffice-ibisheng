@@ -1811,24 +1811,8 @@ CGraphicObjects.prototype =
         if(objects_for_grouping.length < 2)
             return;
 
-        var check_paragraphs = [];
-        var parent_paragraph, i, j;
-        for(i = 0; i < objects_for_grouping.length; ++i)
-        {
-            parent_paragraph = objects_for_grouping[i].parent.Get_ParentParagraph();
-            for(j = 0; j < check_paragraphs.length; ++j)
-            {
-                if(check_paragraphs[j] === parent_paragraph)
-                    break;
-            }
-            if(j === check_paragraphs.length)
-                check_paragraphs.push(parent_paragraph);
-        }
-
-
+        var i;
         var common_bounds = this.checkCommonBounds(objects_for_grouping);
-
-
         History.Create_NewPoint();
         var para_drawing = new ParaDrawing(common_bounds.maxX - common_bounds.minX, common_bounds.maxY - common_bounds.minY, null, this.drawingDocument, null, null);
         para_drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
@@ -1842,32 +1826,19 @@ CGraphicObjects.prototype =
         var page_index = objects_for_grouping[0].parent.pageIndex;
         var first_paragraph = objects_for_grouping[0].parent.Get_ParentParagraph();
         var nearest_pos = this.document.Get_NearestPos(objects_for_grouping[0].parent.pageIndex, common_bounds.minX, common_bounds.minY, true, para_drawing);
-        parent_paragraph = nearest_pos.Paragraph;
-        for(j = 0; j < check_paragraphs.length; ++j)
-        {
-            if(check_paragraphs[j] === parent_paragraph)
-                break;
-        }
-        if(j === check_paragraphs.length)
-            check_paragraphs.push(parent_paragraph);
 
-//        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
+
+        for(i = 0; i < objects_for_grouping.length; ++i)
         {
-            for(i = 0; i < objects_for_grouping.length; ++i)
-            {
-                objects_for_grouping[i].parent.Remove_FromDocument(false);
-            }
-            para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
-            para_drawing.Add_ToDocument2(first_paragraph);
-            this.addGraphicObject(para_drawing);
-            this.resetSelection();
-            this.selectObject(group, page_index);
-            this.document.Recalculate();
+            objects_for_grouping[i].parent.Remove_FromDocument(false);
         }
-       // else
-       // {
-       //     this.document.Document_Undo();
-       // }
+        para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
+        para_drawing.Add_ToDocument2(first_paragraph);
+        this.addGraphicObject(para_drawing);
+        this.resetSelection();
+        this.selectObject(group, page_index);
+        this.document.Recalculate();
+
     },
 
     getParentParagraphsFromArr: function(drawings)
