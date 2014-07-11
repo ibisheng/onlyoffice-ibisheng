@@ -217,7 +217,8 @@ CHistory.prototype =
             ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
             ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaHyperlink    && ( historyitem_Hyperlink_AddItem       === Data.Type || historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaRun          && ( historyitem_ParaRun_AddItem         === Data.Type || historyitem_ParaRun_RemoveItem         === Data.Type ) ) )
+            ( Class instanceof ParaRun          && ( historyitem_ParaRun_AddItem         === Data.Type || historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
+            ( Class instanceof ZIndexManager    && (historyitem_ZIndexManagerRemoveItem  === Data.Type || historyitem_ZIndexManagerAddItem       === Data.Type )))
         {
             var bAdd = ( ( Class instanceof CDocument        && historyitem_Document_AddItem        === Data.Type ) ||
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
@@ -225,7 +226,8 @@ CHistory.prototype =
                 ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type ) ||
                 ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaHyperlink    && historyitem_Hyperlink_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaRun          && historyitem_ParaRun_AddItem         === Data.Type )
+                ( Class instanceof ParaRun          && historyitem_ParaRun_AddItem         === Data.Type ) ||
+                ( Class instanceof ZIndexManager    && historyitem_ZIndexManagerAddItem    === Data.Type )
                 ) ? true : false;
 
             var Count = 1;

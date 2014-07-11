@@ -227,6 +227,7 @@ CGraphicObjects.prototype =
                     this.drawingObjects[i].GraphicObj.recalculateText();
                 }
             }
+            this.zIndexManager.startRefreshIndex = 0;
             this.zIndexManager.recalculate();
             //TODO
         }
@@ -2839,20 +2840,22 @@ ZIndexManager.prototype =
     Load_Changes: function(r)
     {
         var type = r.GetLong();
-        var Pos;
+        var Pos, ChangedPos;
         switch(type)
         {
             case historyitem_ZIndexManagerRemoveItem:
             {
                 Pos = r.GetLong();
-                this.Content.splice(Pos, 1);
+                ChangedPos = this.m_oContentChanges.Check(contentchanges_Remove, Pos);
+                this.Content.splice(ChangedPos, 1);
                 break;
             }
             case historyitem_ZIndexManagerAddItem:
             {
                 Pos = r.GetLong();
                 var Id = r.GetString2();
-                this.Content.splice(Pos, 0, g_oTableId.Get_ById(Id));
+                ChangedPos = this.m_oContentChanges.Check(contentchanges_Add, Pos);
+                this.Content.splice(ChangedPos, 0, g_oTableId.Get_ById(Id));
                 break;
             }
         }

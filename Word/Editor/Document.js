@@ -7616,7 +7616,10 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-            ParaDrawing.GoTo_Text();
+            if(ParaDrawing)
+            {
+                ParaDrawing.GoTo_Text();
+            }
             return this.DrawingObjects.resetSelection();
         }
         else if ( docpostype_Content === this.CurPos.Type )

@@ -3931,7 +3931,6 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.snapArrayX = [];
     this.snapArrayY = [];
     this.bNeedUpdateWH = true;
-    this.setZIndex();
 //------------------------------------------------------------
     g_oTableId.Add( this, this.Id );
 
@@ -4995,11 +4994,6 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_SetZIndex:
-            {
-                this.RelativeHeight = Data.oldIndex;
-                break;
-            }
 
             case historyitem_Drawing_SetGraphicObject:
             {
@@ -5142,11 +5136,6 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_SetZIndex:
-            {
-                this.RelativeHeight = Data.newIndex;
-                break;
-            }
 
             case historyitem_Drawing_SetGraphicObject:
             {
@@ -5551,11 +5540,6 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_SetZIndex:
-            {
-                Writer.WriteLong(Data.newIndex);
-                break;
-            }
 
             case historyitem_Drawing_SetGraphicObject:
             {
@@ -5773,11 +5757,6 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_SetZIndex:
-            {
-                this.RelativeHeight = Reader.GetLong();
-                break;
-            }
 
             case historyitem_Drawing_SetGraphicObject:
             {
@@ -6087,14 +6066,6 @@ ParaDrawing.prototype =
         return [];
     },
 
-    setZIndex: function()
-    {
-        var data = {Type:historyitem_Drawing_SetZIndex, oldIndex: this.RelativeHeight};
-		if(this.mainGraphicObjects)
-			this.RelativeHeight = ++this.mainGraphicObjects.maximalGraphicObjectZIndex;
-        data.newIndex = this.RelativeHeight;
-        History.Add(this, data);
-    },
 
     setZIndex2: function(zIndex)
     {
@@ -6998,26 +6969,16 @@ ParaDrawing.prototype =
         {
             var g = this.GraphicObj.copy(c);
             c.Set_GraphicObject(g);
-            if(g.isGroup())
-                g.calculateAfterOpen3();
-            else if(!(typeof  CChartAsGroup != "undefined" && g instanceof CChartAsGroup))
-                g.calculateAfterOpen();
-            else
-                g.init2();
-
+            g.setParent(c);
         }
-
         var d = this.Distance;
         c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
         c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
         c.Set_Distance(d.L, d.T, d.R, d.B);
-        c.setZIndex();
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
         c.Set_BehindDoc(this.behindDoc);
         c.Update_Size(this.W, this.H);
-
-        History.Add(c, {Type: historyitem_CalculateAfterPaste});
         return c;
     },
 
