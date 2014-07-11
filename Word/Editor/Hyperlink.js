@@ -1152,6 +1152,37 @@ ParaHyperlink.prototype =
         }
     },
 
+    Check_MathPara : function(Checker)
+    {
+        var Count = this.Content.length;
+        if ( Checker.Direction > 0 )
+        {
+            for ( var CurPos = 0; CurPos < Count; CurPos++ )
+            {
+                if ( this.Content[CurPos].Check_MathPara )
+                {
+                    this.Content[CurPos].Check_MathPara( MathParaChecker );
+
+                    if ( false !== MathParaChecker.Found )
+                        break;
+                }
+            }            
+        }
+        else
+        {
+            for ( var CurPos = Count - 1; CurPos >= 0; CurPos-- )
+            {
+                if ( this.Content[CurPos].Check_MathPara )
+                {
+                    this.Content[CurPos].Check_MathPara( MathParaChecker );
+
+                    if ( false !== MathParaChecker.Found )
+                        break;
+                }
+            }
+        }
+    },
+
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {
         var CurLine = _CurLine - this.StartLine;

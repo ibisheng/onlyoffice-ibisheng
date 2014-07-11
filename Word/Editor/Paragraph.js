@@ -74,7 +74,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         Line  : 0,
         Range : 0
     }; //new ParaEnd();
-
+    
     this.CurPos  =
     {
         X           : 0,
@@ -1029,6 +1029,12 @@ Paragraph.prototype =
         for ( ;Pos < ContentLen; Pos++ )
         {
             var Item = this.Content[Pos];
+            
+            if ( para_Math === Item.Type )
+            {
+                // TODO: Надо бы перенести эту проверку на изменение контента параграфа
+                Item.MathPara = this.Check_MathPara(Pos);
+            }
 
             if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )
             {
@@ -1722,9 +1728,14 @@ Paragraph.prototype =
                 
                 // Если данный отрезок содержит только формулу, тогда прилегание данного отрезка определяется формулой
                 var ParaMath = this.Check_Range_OnlyMath(CurRange, CurLine);
-                if (null !== ParaMath)
+                if ( null !== ParaMath )
                 {
-                    X = Math.max(Range.X +  (RangeWidth - ParaMath.Width) / 2, Range.X);
+                    var Math_Jc = ParaMath.Jc;
+                    
+                    var Math_X      = ( 1 === RangesCount ? this.Pages[CurPage].X : Range.X );
+                    var Math_XLimit = ( 1 === RangesCount ? this.Pages[CurPage].XLimit : Range.XEnd );
+                    
+                    X = Math.max( Math_X +  (Math_XLimit + Math_X - ParaMath.Width) / 2, Math_X );
                 }
                 else
                 {
@@ -1848,9 +1859,9 @@ Paragraph.prototype =
                 break;
         }
         
-        if (true !== Checker.Result)
+        if ( true !== Checker.Result || null === Checker.Math || true !== Checker.Math.MathPara )
             return null;
-        
+                
         return Checker.Math;
     },
     
@@ -1859,7 +1870,43 @@ Paragraph.prototype =
         if (undefined === this.Content[MathPos] || para_Math !== this.Content[MathPos].Type)
             return false;
         
+        var MathParaChecker = new CParagraphMathParaChecker();
         
+        // Нам надо пробежаться впереди назад и найти ближайшие элементы.
+        MathParaChecker.Direction = -1;
+        for ( var CurPos = MathPos - 1; CurPos >= 0; CurPos-- )
+        {
+            if ( this.Content[CurPos].Check_MathPara )
+            {
+                this.Content[CurPos].Check_MathPara( MathParaChecker );
+
+                if ( false !== MathParaChecker.Found )
+                    break;
+            }
+        }
+        
+        if ( true !== MathParaChecker.Result )
+            return false;
+        
+        MathParaChecker.Direction = 1;
+        MathParaChecker.Found     = false;
+        
+        var Count = this.Content.length;
+        for ( var CurPos = MathPos + 1; CurPos < Count; CurPos++ )
+        {
+            if ( this.Content[CurPos].Check_MathPara )
+            {
+                this.Content[CurPos].Check_MathPara( MathParaChecker );
+
+                if ( false !== MathParaChecker.Found )
+                    break;
+            }            
+        }
+        
+        if ( true !== MathParaChecker.Result )
+            return false;
+        
+        return true;
     },
 
     Get_EndInfo : function()
@@ -2504,6 +2551,12 @@ Paragraph.prototype =
         {
             var Item = this.Content[Pos];
 
+            if ( para_Math === Item.Type )
+            {
+                // TODO: Надо бы перенести эту проверку на изменение контента параграфа
+                Item.MathPara = this.Check_MathPara(Pos);                
+            }
+            
             PRS.Update_CurPos( Pos, 0 );
 
             var SavedLines = Item.Save_RecalculateObject(true);
@@ -5864,6 +5917,7 @@ Paragraph.prototype =
         if ( true != bBefore )
             ContentPos.Data[ContentPos.Depth - 1]++;
 
+        this.Selection_Remove();
         this.Set_ParaContentPos(ContentPos, false, -1, -1);
 
         this.RecalculateCurPos();
@@ -9360,7 +9414,7 @@ Paragraph.prototype =
             if ( this.Selection.StartPos === this.Selection.EndPos && para_Hyperlink === this.Content[this.Selection.StartPos].Type )
                 HyperPos = this.Selection.StartPos;
             
-            if (this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type)
+            if (this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type )
                 Math = this.Content[this.Selection.EndPos];
         }
         else
@@ -9384,7 +9438,7 @@ Paragraph.prototype =
             editor.sync_HyperlinkPropCallback( HyperProps );
         }
         
-        if (null !== Math)
+        if ( null !== Math )
         {
             var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1) * 3;
             this.Parent.DrawingDocument.Update_MathTrack(true, Math.X - PixelError, Math.Y - PixelError, Math.Width + 2 * PixelError, Math.Height + 2 * PixelError, this.CurPos.PagesPos + this.Get_StartPage_Absolute());
@@ -9878,7 +9932,7 @@ Paragraph.prototype =
         // конца выделения, кроме этого в буквицу добавляем все табы идущие в начале.
 
         var DropCapText = new CParagraphGetDropCapText();     
-        if ( true == this.Selection.Use && true === this.Parent.Selection_Is_OneElement() )
+        if ( true == this.Selection.Use && 0 === this.Parent.Selection_Is_OneElement() )
         {
             var SelSP = this.Get_ParaContentPos( true, true );
             var SelEP = this.Get_ParaContentPos( true, false );
@@ -14358,4 +14412,11 @@ function CParagraphMathRangeChecker()
 {
     this.Math   = null; // Искомый элемент
     this.Result = true; // Если есть отличные от Math элементы, тогда false, если нет, тогда true 
+}
+
+function CParagraphMathParaChecker()
+{
+    this.Found     = false;
+    this.Result    = true;
+    this.Direction = 0;
 }

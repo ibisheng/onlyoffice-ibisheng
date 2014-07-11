@@ -2694,7 +2694,7 @@ ParaRun.prototype =
         {
             var Item = this.Content[Pos];
 
-            if (para_End === Item.Type || (para_Drawing === Item.Type && true !== Item.Is_Inline()))
+            if ( para_End === Item.Type || para_NewLine === Item.Type || ( para_Drawing === Item.Type && true !== Item.Is_Inline() ) )
                 continue;
             else
             {
@@ -2704,6 +2704,27 @@ ParaRun.prototype =
             }
         }
     },
+
+    Check_MathPara : function(Checker)
+    {
+        var Count = this.Content.length;
+        if ( Count <= 0 )
+            return;
+        
+        var Item = ( Checker.Direction > 0 ? this.Content[0] : this.Content[Count - 1] );
+        var ItemType = Item.Type
+
+        if ( para_End === ItemType || para_NewLine === ItemType )
+        {
+            Checker.Result = true;
+            Checker.Found  = true;
+        }
+        else
+        {
+            Checker.Result = false;
+            Checker.Found  = true;
+        }                
+    },    
 
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {

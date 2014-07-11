@@ -14,8 +14,8 @@ function ParaMath()
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
 
-    this.ParaMath = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)    
-    this.Jc   = undefined;
+    this.MathPara = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)    
+    this.Jc       = undefined;
     //this.Math = new CMathComposition();
     //this.Math.Parent = this;
     //this.Root = this.Math.Root;
@@ -803,6 +803,12 @@ ParaMath.prototype =
         else
             Checker.Math = this;
     },
+
+    Check_MathPara : function(Checker)
+    {
+        Checker.Found  = true;
+        Checker.Result = false;
+    },    
 
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {

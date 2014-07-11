@@ -1072,6 +1072,10 @@ ParaComment.prototype =
     {
     },
 
+    Check_MathPara : function(Checker)
+    {
+    },    
+
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {
         return false;

@@ -11221,6 +11221,11 @@ CDocument.prototype =
                 else
                     this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
             }
+            else
+            {
+                // Если выделено больше 1 элемента отключаем рамку формул
+                this.DrawingDocument.Update_MathTrack(false);
+            }
         }
 
         // Сообщаем, что список составлен
@@ -11230,6 +11235,7 @@ CDocument.prototype =
         this.Document_UpdateCanAddHyperlinkState();
         this.Document_UpdateSectionPr();
     },
+
 
     // Обновляем линейки
     Document_UpdateRulersState : function()
