@@ -5262,13 +5262,12 @@
 			if (moveHeight > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight);
 				this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
-			} else {
-				// Scroll на весь экран
-				this.drawingGraphicCtx.clear();
 			}
+			var clearTop = y + (scrollDown ? moveHeight - dy : 0);
+			moveHeight = Math.abs(dy) + lastRowHeight;
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(this.headersLeft, y + (scrollDown ? oldH - dy - lastRowHeight : 0),
-					ctxW, Math.abs(dy) + lastRowHeight);
+				.fillRect(this.headersLeft, clearTop, ctxW, moveHeight);
+			this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, moveHeight);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
@@ -5390,12 +5389,13 @@
 			if (moveWidth > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
 				this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
-			} else {
-				// Scroll на весь экран
-				this.drawingGraphicCtx.clear();
 			}
+
+			var clearLeft = x + (scrollRight > 0 ? moveWidth - dx : 0);
+			moveWidth = Math.abs(dx) + lastColWidth;
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(x + (scrollRight > 0 ? oldW - dx - lastColWidth : 0), y, Math.abs(dx) + lastColWidth, ctxH);
+				.fillRect(clearLeft, y, moveWidth, ctxH);
+			this.drawingGraphicCtx.clearRect(clearLeft, y, moveWidth, ctxH);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
