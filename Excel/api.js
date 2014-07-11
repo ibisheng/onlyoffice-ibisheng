@@ -2007,6 +2007,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.collaborativeEditing.onEndCheckLock(callback);
 			},
 
+			_addWorksheet: function (name, i) {
+				this.wbModel.createWorksheet(i, name);
+				this.wb.spliceWorksheet(i, 0, null);
+				this.asc_showWorksheet (i);
+				// Посылаем callback об изменении списка листов
+				this.sheetsChanged();
+			},
+
 			// Toolbar interface
 
 			/*asc_getEditorFonts: function () {
@@ -2204,19 +2212,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_addWorksheet: function (name) {
-				var active = this.wbModel.createWorksheet(null, name);
-				this.asc_showWorksheet (active);
-				// Посылаем callback об изменении списка листов
-				this.sheetsChanged();
+				var i = this.wbModel.getActive();
+				this._addWorksheet(name, i + 1);
 			},
 
 			asc_insertWorksheet: function (name) {
 				var i = this.wbModel.getActive();
-				var j = this.wbModel.createWorksheet(i, name);
-				this.wb.spliceWorksheet(i, 0, null);
-				this.asc_showWorksheet (i);
-				// Посылаем callback об изменении списка листов
-				this.sheetsChanged();
+				this._addWorksheet(name, i);
 			},
 
 			// Удаление листа
