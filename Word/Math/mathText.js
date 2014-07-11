@@ -113,7 +113,7 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        var Compiled_MPrp = this.Parent.MathPrp.GetCompiled_ScrStyles();
+        var Compiled_MPrp = this.bJDraw ? null : this.Parent.MathPrp.GetCompiled_ScrStyles();
 
         if(this.Type === para_Math_Placeholder || this.bJDraw || Compiled_MPrp.nor)
             return code;
