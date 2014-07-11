@@ -560,8 +560,17 @@ RotateState.prototype =
                         {
                             bounds = arr_bounds[i];
                             this.drawingObjects.arrTrackObjects[i].trackEnd(true);
-                            this.drawingObjects.arrTrackObjects[i].originalObject.parent.OnEnd_ChangeFlow(bounds.min_x, bounds.min_y,this.drawingObjects.arrTrackObjects[i].originalObject.parent, bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, arr_nearest_pos[i], true, false);
+                            var original = this.drawingObjects.arrTrackObjects[i].originalObject;
+                            original.parent.Update_Size(bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y);
+                            original.parent.Remove_FromDocument(false);
+                            original.parent.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], original.selectStartPage);
                         }
+
+                        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                        {
+                           this.drawingObjects.arrTrackObjects[i].originalObject.parent.Add_ToDocument2(arr_nearest_pos[i].Paragraph);
+                        }
+
                     }
                     else
                     {
