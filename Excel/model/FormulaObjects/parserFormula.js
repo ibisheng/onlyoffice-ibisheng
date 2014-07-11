@@ -1210,6 +1210,7 @@ function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
     this.isAbsolute = false;
     this.type = cElementType.cell;
     this.ws = this._wb.getWorksheetByName( _wsFrom );
+    this.range = null;
 }
 
 cRef3D.prototype = Object.create( cBaseType.prototype );
@@ -1225,10 +1226,13 @@ cRef3D.prototype.getWsId = function () {
 };
 cRef3D.prototype.getRange = function () {
     if ( this.ws ) {
-        return this.ws.getRange2( this._cells );
+        if( this.range ){
+            return this.range;
+        }
+        return this.range = this.ws.getRange2( this._cells );
     }
     else {
-        return null;
+        return this.range = null;
     }
 };
 cRef3D.prototype.isValid = function () {
@@ -1591,6 +1595,16 @@ cBaseOperator.prototype = {
             str = this.name + "" + arg[0];
         }
         return new cString( str );
+    },
+    Assemble2:function ( arg, start, count ) {
+        var str = "";
+        if ( this.argumentsCurrent === 2 ){
+            str += arg[start + count - 2] + this.name + arg[start + count - 1];
+        }
+        else{
+            str += this.name + arg[start];
+        }
+        return new cString( str );
     }
 };
 
@@ -1652,6 +1666,26 @@ cBaseFunction.prototype = {
         }
         return new cString( this.name + "(" + str + ")" );
     },
+    Assemble2:function ( arg, start, count ) {
+
+        var str = "", c = start+count-1
+        for ( var i = start; i <= c; i++ ) {
+            str += arg[i].toString();
+            if ( i !== c ) {
+                str += ",";
+            }
+        }
+        return new cString( this.name + "(" + str + ")" );
+
+/*        var str = "";
+        if ( this.argumentsCurrent === 2 ){
+            str += arg[start + count - 1] + this.name + arg[start + count - 2];
+        }
+        else{
+            str += this.name + arg[start];
+        }
+        return new cString( str );*/
+    },
     toString:function () {
         return this.name;
     },
@@ -1691,6 +1725,9 @@ parentLeft.prototype.getArguments = function () {
 };
 parentLeft.prototype.Assemble = function ( arg ) {
     return new cString( "(" + arg + ")" );
+};
+parentLeft.prototype.Assemble2 = function ( arg, start, count ) {
+    return new cString( "(" + arg[start + count - 1] + ")" );
 };
 
 function parentRight() {
@@ -1732,6 +1769,9 @@ cUnarMinusOperator.prototype.toString = function () {        // toString functio
 cUnarMinusOperator.prototype.Assemble = function ( arg ) {
     return new cString( "-" + arg[0] );
 };
+cUnarMinusOperator.prototype.Assemble2 = function ( arg, start, count ) {
+    return new cString( "-" + arg[start + count - 1] );
+};
 
 function cUnarPlusOperator() {
     cBaseOperator.apply( this, ['un_plus', 50, 1] );
@@ -1752,6 +1792,9 @@ cUnarPlusOperator.prototype.toString = function () {
 };
 cUnarPlusOperator.prototype.Assemble = function ( arg ) {
     return new cString( "+" + arg[0] );
+};
+cUnarPlusOperator.prototype.Assemble2 = function ( arg, start, count ) {
+    return new cString( "+" + arg[start + count - 1] );
 };
 
 function cAddOperator() {
@@ -1802,6 +1845,9 @@ cPercentOperator.prototype.Calculate = function ( arg ) {
 };
 cPercentOperator.prototype.Assemble = function ( arg ) {
     return new cString( arg[0] + this.name );
+};
+cPercentOperator.prototype.Assemble2 = function ( arg, start, count ) {
+    return new cString( arg[start + count - 1] + this.name );
 };
 
 function cPowOperator() {
@@ -2930,6 +2976,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.RefPos = [];
     this.operand_str = null;
     this.parenthesesNotEnough = false;
+    this.f = [];
 }
 
 parserFormula.prototype = {
@@ -3048,7 +3095,7 @@ parserFormula.prototype = {
                     this.outStack.push( this.elemArr.pop() );
                 }
                 this.elemArr.push( found_operator );
-
+                this.f.push( found_operator );
                 found_operand = null;
             }
 
@@ -3062,9 +3109,11 @@ parserFormula.prototype = {
                 wasRigthParentheses = false;
                 found_operand = null;
                 this.elemArr.push( new cFormulaOperators[this.operand_str]() );
+                this.f.push( new cFormulaOperators[this.operand_str]() );
             }
 
             else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+                this.f.push( new cFormulaOperators[this.operand_str]() );
                 wasRigthParentheses = true;
                 var top_elem = null;
                 if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && operand_expected ) {
@@ -3270,8 +3319,9 @@ parserFormula.prototype = {
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
                         this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                         found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
-                        if ( this.operand_str.indexOf( "$" ) > -1 )
+                        if ( this.operand_str.indexOf( "$" ) > -1 ){
                             found_operand.isAbsolute = true;
+                        }
                     }
                     else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
                         this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
@@ -3281,8 +3331,9 @@ parserFormula.prototype = {
                         else {
                             found_operand = new cRef3D( this.operand_str.toUpperCase(), _wsFrom, this.wb );
                         }
-                        if ( this.operand_str.indexOf( "$" ) > -1 )
+                        if ( this.operand_str.indexOf( "$" ) > -1 ){
                             found_operand.isAbsolute = true;
+                        }
                     }
                 }
                 /* Referens to DefinesNames */
@@ -3293,16 +3344,18 @@ parserFormula.prototype = {
                 else if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
-                    if ( this.operand_str.indexOf( "$" ) > -1 )
+                    if ( this.operand_str.indexOf( "$" ) > -1 ){
                         found_operand.isAbsolute = true;
+                    }
                 }
                 /* Referens to cell A4 */
                 else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
 //                else if ( isRef.call( this, this.Formula, this.pCurrPos, true ) ) {
                     this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length} );
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
-                    if ( this.operand_str.indexOf( "$" ) > -1 )
+                    if ( this.operand_str.indexOf( "$" ) > -1 ){
                         found_operand.isAbsolute = true;
+                    }
                 }
 
                 /* Numbers*/
@@ -3359,8 +3412,10 @@ parserFormula.prototype = {
                     else if ( this.operand_str.toUpperCase() in cFormulaFunction.LookupAndReference )//Lookup and reference
                         found_operator = new cFormulaFunction.LookupAndReference[this.operand_str.toUpperCase()]();
 
-                    if ( found_operator !== null && found_operator !== undefined )
+                    if ( found_operator !== null && found_operator !== undefined ){
                         this.elemArr.push( found_operator );
+                        this.f.push( found_operator );
+                    }
                     else {
                         this.error.push( c_oAscError.ID.FrmlWrongFunctionName );
                         this.outStack = [];
@@ -3374,6 +3429,7 @@ parserFormula.prototype = {
 
                 if ( found_operand != null && found_operand != undefined ) {
                     this.outStack.push( found_operand );
+                    this.f.push( found_operand );
                     operand_expected = false;
                     found_operand = null
                 }
@@ -3428,10 +3484,12 @@ parserFormula.prototype = {
             return this.isParsed = false;
         }
 
-        if ( this.outStack.length != 0 )
+        if ( this.outStack.length != 0 ){
             return this.isParsed = true;
-        else
+        }
+        else{
             return this.isParsed = false;
+        }
     },
 
     calculate:function () {
@@ -3640,7 +3698,7 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    assemble:function (rFormula) {/*При сборке формул вида A1+A2+A3 формула получает вид (A1+A2)+A3. Добавить проверку приоритета операций.*/
+    /*assemble:function (rFormula) {*//*При сборке формул вида A1+A2+A3 формула получает вид (A1+A2)+A3. Добавить проверку приоритета операций.*//*
         if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length-1] instanceof cError ) {
             return this.Formula;
         }
@@ -3670,6 +3728,39 @@ parserFormula.prototype = {
             return res.toString();
         else
             return this.Formula;
+    },*/
+
+    assemble:function ( rFormula ) {
+        if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
+            return this.Formula;
+        }
+        var currentElement = null,
+            _count = this.outStack.length,
+            elemArr = new Array( _count ),
+            res = undefined;
+        for ( var i = 0, j = 0; i < _count; i++,j++ ) {
+            currentElement = this.outStack[i];
+            if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
+                var _count_arg = currentElement.getArguments();
+                res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );
+                j -= _count_arg;
+                elemArr[j] = res;
+            }
+            else {
+                if ( currentElement instanceof cString ) {
+                    currentElement = new cString( "\"" + currentElement.toString() + "\"" );
+                }
+                res = currentElement;
+                elemArr[j] = res;
+            }
+        }
+        if ( res != undefined && res != null ){
+//            console.log( this.Formula + "  ===  " + res.toString() );
+            return res.toString();
+        }
+        else{
+            return this.Formula;
+        }
     },
 
     _changeOffsetHelper:function ( ref, offset ) {
@@ -4135,9 +4226,9 @@ function lcl_Erf0065( x ) {
 
 /** Approximation algorithm for erfc for 0.65 < x < 6.0. */
 function lcl_Erfc0600( x ) {
-    var pSum = 0.0,
-        qSum = 0.0,
-        xPow = 1.0, pn, qn;
+    var pSum = 0,
+        qSum = 0,
+        xPow = 1, pn, qn;
 
     if ( x < 2.2 ) {
         pn = [
@@ -4184,7 +4275,7 @@ function lcl_Erfc0600( x ) {
         xPow *= x;
     }
     qSum += qn[6] * xPow;
-    return Math.exp( -1.0 * x * x ) * pSum / qSum;
+    return Math.exp( -1 * x * x ) * pSum / qSum;
 }
 
 /** Approximation algorithm for erfc for 6.0 < x < 26.54 (but used for all x > 6.0). */
@@ -4204,62 +4295,62 @@ function lcl_Erfc2654( x ) {
             3.73997570145040850E1
         ];
 
-    var pSum = 0.0, qSum = 0.0, xPow = 1.0;
+    var pSum = 0, qSum = 0, xPow = 1;
 
     for ( var i = 0; i <= 4; ++i ) {
         pSum += pn[i] * xPow;
         qSum += qn[i] * xPow;
         xPow /= x * x;
     }
-    return Math.exp( -1.0 * x * x ) * pSum / (x * qSum);
+    return Math.exp( -1 * x * x ) * pSum / (x * qSum);
 }
 
 function rtl_math_erf( x ) {
-    if ( x == 0.0 )
-        return 0.0;
+    if ( x == 0 )
+        return 0;
 
     var bNegative = false;
-    if ( x < 0.0 ) {
+    if ( x < 0 ) {
         x = Math.abs( x );
         bNegative = true;
     }
 
-    var res = 1.0;
+    var res = 1;
     if ( x < 1.0e-10 )
         res = parseFloat( x * 1.1283791670955125738961589031215452 );
     else if ( x < 0.65 )
         res = lcl_Erf0065( x );
     else
-        res = 1.0 - rtl_math_erfc( x );
+        res = 1 - rtl_math_erfc( x );
 
     if ( bNegative )
-        res *= -1.0;
+        res *= -1;
 
     return res;
 }
 
 function rtl_math_erfc( x ) {
-    if ( x == 0.0 )
-        return 1.0;
+    if ( x == 0 )
+        return 1;
 
     var bNegative = false;
-    if ( x < 0.0 ) {
+    if ( x < 0 ) {
         x = Math.abs( x );
         bNegative = true;
     }
 
-    var fErfc = 0.0;
+    var fErfc = 0;
     if ( x >= 0.65 ) {
-        if ( x < 6.0 )
+        if ( x < 6 )
             fErfc = lcl_Erfc0600( x );
         else
             fErfc = lcl_Erfc2654( x );
     }
     else
-        fErfc = 1.0 - rtl_math_erf( x );
+        fErfc = 1 - rtl_math_erf( x );
 
     if ( bNegative )
-        fErfc = 2.0 - fErfc;
+        fErfc = 2 - fErfc;
 
     return fErfc;
 }
@@ -4269,7 +4360,7 @@ function integralPhi( x ) { // Using gauss(x)+0.5 has severe cancellation errors
 }
 
 function phi( x ) {
-    return  0.39894228040143268 * Math.exp( -(x * x) / 2.0 );
+    return  0.39894228040143268 * Math.exp( -(x * x) / 2 );
 }
 
 function taylor( pPolynom, nMax, x ) {
@@ -4303,19 +4394,19 @@ function gauss( x ) {
                 0.00000000909595465, 0.00000000944943118, -0.00000000329957075,
                 0.00000000029492075, 0.00000000011874477, -0.00000000004420396,
                 0.00000000000361422, 0.00000000000143638, -0.00000000000045848 ];
-    var asympt = [ -1.0, 1.0, -3.0, 15.0, -105.0 ],
+    var asympt = [ -1, 1, -3, 15, -105 ],
         xabs = Math.abs( x ),
         xshort = Math.floor( xabs ),
-        nval = 0.0;
+        nval = 0;
     if ( xshort == 0 )
         nval = taylor( t0, 11, (xabs * xabs) ) * xabs;
     else if ( (xshort >= 1) && (xshort <= 2) )
-        nval = taylor( t2, 23, (xabs - 2.0) );
+        nval = taylor( t2, 23, (xabs - 2) );
     else if ( (xshort >= 3) && (xshort <= 4) )
-        nval = taylor( t4, 20, (xabs - 4.0) );
+        nval = taylor( t4, 20, (xabs - 4) );
     else
-        nval = 0.5 + phi( xabs ) * taylor( asympt, 4, 1.0 / (xabs * xabs) ) / xabs;
-    if ( x < 0.0 )
+        nval = 0.5 + phi( xabs ) * taylor( asympt, 4, 1 / (xabs * xabs) ) / xabs;
+    if ( x < 0 )
         return -nval;
     else
         return nval;
@@ -4371,7 +4462,7 @@ function gaussinv( x ) {
                             )
                             * t + 42.313330701600911252
                         )
-                        * t + 1.0
+                        * t + 1
                     );
     }
     else {
@@ -4382,7 +4473,7 @@ function gaussinv( x ) {
 
         t = Math.sqrt( -Math.log( t ) );
 
-        if ( t <= 5.0 ) {
+        if ( t <= 5 ) {
             t += -1.6;
             z =
                 (
@@ -4426,11 +4517,11 @@ function gaussinv( x ) {
                                 )
                                 * t + 2.05319162663775882187
                             )
-                            * t + 1.0
+                            * t + 1
                         );
         }
         else {
-            t += -5.0;
+            t += -5;
             z =
                 (
                     (
@@ -4473,11 +4564,11 @@ function gaussinv( x ) {
                                 )
                                 * t + 0.59983220655588793769
                             )
-                            * t + 1.0
+                            * t + 1
                         );
         }
 
-        if ( q < 0.0 ) z = -z;
+        if ( q < 0 ) z = -z;
     }
 
     return z;
@@ -4516,7 +4607,7 @@ function lcl_getLanczosSum( fZ ) {
         ];
     // Horner scheme
     var sumNum, sumDenom, i, zInv;
-    if ( fZ <= 1.0 ) {
+    if ( fZ <= 1 ) {
         sumNum = num[12];
         sumDenom = denom[12];
         for ( i = 11; i >= 0; --i ) {
