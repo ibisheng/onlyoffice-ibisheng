@@ -90,6 +90,7 @@ cFormulaFunction.Statistical = {
     'VAR':cVAR,
     'VARA':cVARA,
     'VARP':cVARP,
+//    'VAR.P':cVARdotP,
     'VARPA':cVARPA,
     'WEIBULL':cWEIBULL,
     'ZTEST':cZTEST
@@ -169,7 +170,6 @@ cAVEDEV.prototype.getInfo = function () {
         args:"( argument-list )"
     };
 }
-
 
 function cAVERAGE() {
 //    cBaseFunction.call( this, "AVERAGE" );
@@ -846,9 +846,9 @@ function cCOUNTBLANK() {
     this.name = "COUNTBLANK";
     this.type = cElementType.func;
     this.value = null;
-    this.argumentsMin = 4;
+    this.argumentsMin = 1;
     this.argumentsCurrent = 0;
-    this.argumentsMax = 4;
+    this.argumentsMax = 1;
     this.formatType = {
         def:-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
@@ -5260,6 +5260,32 @@ cVARP.prototype.Calculate = function ( arg ) {
     return this.value = _var( arr0 );
 }
 cVARP.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( argument-list )"
+    };
+}
+
+function cVARdotP() {
+//    cBaseFunction.call( this, "VARP" );
+
+    this.name = "VAR.P";
+    this.type = cElementType.func;
+    this.value = null;
+    this.argumentsMin = 1;
+    this.argumentsCurrent = 0;
+    this.argumentsMax = 255;
+    this.formatType = {
+        def:-1, //подразумевается формат первой ячейки входящей в формулу.
+        noneFormat:-2
+    };
+    this.numFormat = this.formatType.def;
+
+}
+
+cVARdotP.prototype = Object.create( cBaseFunction.prototype )
+cVARdotP.prototype.Calculate = cVARP.prototype.Calculate;
+cVARdotP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
