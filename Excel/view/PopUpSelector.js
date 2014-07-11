@@ -83,7 +83,8 @@
 
 				// Для того, чтобы работал scroll
 				this.selectorListJQ = $('#apiPopUpList');
-				this.selectorListJQ.perfectScrollbar(this.scrollOptions);
+				if (this.selectorListJQ.perfectScrollbar)
+					this.selectorListJQ.perfectScrollbar(this.scrollOptions);
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
