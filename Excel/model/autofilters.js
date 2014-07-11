@@ -6563,11 +6563,8 @@ var gUndoInsDelCellsFlag = true;
 				var result = true;
 				var filterColumns = (autoFilter && autoFilter.FilterColumns) ? autoFilter.FilterColumns : null;
 				
-				if(autoFilter == null)
+				if(autoFilter == null || filterColumns == null)
 					return null;
-				
-				if(filterColumns == null)
-					return false;
 				
 				if(filterColumns && filterColumns.length != 0)
 				{
