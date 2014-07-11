@@ -4473,7 +4473,7 @@ ParaRun.prototype =
 
                 if(!this.IsNormalText()) // math text
                 {
-                    var MPrp = this.MathPrp.getTxtPrp();
+                    var MPrp = this.MathPrp.GetTxtPrp();
                     TextPr.Merge(MPrp); // bold, italic
                 }
 
@@ -4698,7 +4698,7 @@ ParaRun.prototype =
         NewRun.Set_Pr( this.Pr.Copy() );
 
         if(bMathRun)
-            NewRun.Set_MathPrp(this.MathPrp.Copy());
+            NewRun.Set_MathPr(this.MathPrp.Copy());
 
 
         var OldCrPos = this.State.ContentPos;
@@ -4784,19 +4784,56 @@ ParaRun.prototype =
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
     Apply_Pr : function(TextPr)
     {
-        if ( undefined != TextPr.Bold )
+        if(this.Type == para_Math_Run && !this.IsNormalText())
         {
-            if(this.Type == para_Math_Run && !this.IsNormalText())
-                this.Apply_StyleBold(null === TextPr.Bold ? undefined : TextPr.Bold);
+            if(null === TextPr.Bold && null === TextPr.Italic)
+                this.Math_Apply_Style(undefined);
             else
-                this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
-        }
+            {
+                if(undefined != TextPr.Bold)
+                {
+                    if(TextPr.Bold == true)
+                    {
+                        if(this.MathPrp.sty == STY_ITALIC)
+                            this.Math_Apply_Style(STY_BI);
+                        else if(this.MathPrp.sty == STY_PLAIN || this.MathPrp.sty == undefined)
+                            this.Math_Apply_Style(STY_BOLD);
 
-        if ( undefined != TextPr.Italic )
+                    }
+                    else if(TextPr.Bold == false || TextPr.Bold == null)
+                    {
+                        if(this.MathPrp.sty == STY_BI)
+                            this.Math_Apply_Style(STY_ITALIC);
+                        else if(this.MathPrp.sty == STY_BOLD || this.MathPrp.sty == undefined)
+                            this.Math_Apply_Style(STY_PLAIN);
+                    }
+                }
+
+                if(undefined != TextPr.Italic)
+                {
+                    if(TextPr.Italic == true)
+                    {
+                        if(this.MathPrp.sty == STY_BOLD)
+                            this.Math_Apply_Style(STY_BI);
+                        else if(this.MathPrp.sty == STY_PLAIN || this.MathPrp.sty == undefined)
+                            this.Math_Apply_Style(STY_ITALIC);
+                    }
+                    else if(TextPr.Italic == false || TextPr.Italic == null)
+                    {
+                        if(this.MathPrp.sty == STY_BI)
+                            this.Math_Apply_Style(STY_BOLD);
+                        else if(this.MathPrp.sty == STY_ITALIC || this.MathPrp.sty == undefined)
+                            this.Math_Apply_Style(STY_PLAIN);
+                    }
+                }
+            }
+        }
+        else
         {
-            if(this.Type == para_Math_Run && !this.IsNormalText())
-                this.Apply_StyleItalic(null === TextPr.Italic ? undefined : TextPr.Italic);
-            else
+            if ( undefined != TextPr.Bold )
+                this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
+
+            if( undefined != TextPr.Italic )
                 this.Set_Italic( null === TextPr.Italic ? undefined : TextPr.Italic );
         }
 
@@ -5649,6 +5686,14 @@ ParaRun.prototype =
 
                 break;
             }
+
+            case historyitem_ParaRun_MathPrp:
+            {
+                this.MathPrp = Data.Old;
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
         }
     },
 
@@ -6006,6 +6051,14 @@ ParaRun.prototype =
             case historyitem_ParaRun_MathStyle:
             {
                 this.MathPrp.sty = Data.New;
+                this.Recalc_CompiledPr(true);
+
+                break;
+            }
+
+            case historyitem_ParaRun_MathPrp:
+            {
+                this.MathPrp = Data.New;
                 this.Recalc_CompiledPr(true);
 
                 break;
@@ -7460,7 +7513,7 @@ ParaRun.prototype.Set_MathPrp = function(props)
 {
     this.MathPrp.setMathProps(props);
 }
-ParaRun.prototype.Apply_StyleBold = function(Value)
+/*ParaRun.prototype.Apply_StyleBold = function(Value)
 {
     if(Value == undefined)
         Value = false;
@@ -7486,12 +7539,13 @@ ParaRun.prototype.Apply_StyleItalic = function(Value)
     if(Value == undefined)
         Value = true;
 
-
     if(Value == true)
     {
         if(this.MathPrp.sty == STY_BOLD)
             this.Apply_Style(STY_BI);
         else if(this.MathPrp.sty == STY_PLAIN)
+            this.Apply_Style(STY_ITALIC);
+        else
             this.Apply_Style(STY_ITALIC);
     }
     else if(Value == false)
@@ -7500,9 +7554,12 @@ ParaRun.prototype.Apply_StyleItalic = function(Value)
             this.Apply_Style(STY_BOLD);
         else if(this.MathPrp.sty == STY_ITALIC)
             this.Apply_Style(STY_PLAIN);
+        else
+            this.Apply_Style(STY_PLAIN);
     }
-}
-ParaRun.prototype.Apply_Style = function(Value)
+
+}*/
+ParaRun.prototype.Math_Apply_Style = function(Value)
 {
     if(Value !== this.MathPrp.sty)
     {
@@ -7516,7 +7573,8 @@ ParaRun.prototype.Apply_Style = function(Value)
 }
 ParaRun.prototype.IsNormalText = function()
 {
-    return this.MathPrp.nor == true;
+    var comp_MPrp = this.MathPrp.GetCompiled_ScrStyles();
+    return comp_MPrp.nor == true;
 }
 ParaRun.prototype.getPropsForWrite = function()
 {
@@ -7561,4 +7619,12 @@ ParaRun.prototype.fillPlaceholders = function()
     placeholder.fillPlaceholders();
 
     this.Add_ToContent(0, placeholder, false);
+}
+ParaRun.prototype.Set_MathPr = function(MPrp)
+{
+    var OldValue = this.MathPrp;
+    this.MathPrp = MPrp;
+
+    History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : MPrp, Old : OldValue } );
+    this.Recalc_CompiledPr(true);
 }

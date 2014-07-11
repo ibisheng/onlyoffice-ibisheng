@@ -113,18 +113,20 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if(this.Type === para_Math_Placeholder || this.bJDraw || this.Parent.MathPrp.nor)
+        var Compiled_MPrp = this.Parent.MathPrp.GetCompiled_ScrStyles();
+
+        if(this.Type === para_Math_Placeholder || this.bJDraw || Compiled_MPrp.nor)
             return code;
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
             bSmall = (code > 0x0060 && code < 0x007b),
             bDigit = (code > 0x002F && code < 0x003A);
 
-        var bCapGreek   = (code > 0x0390 && code < 0x03AA ),
+        var bCapGreek   = (code > 0x0390 && code < 0x03AA),
             bSmallGreek = (code > 0x03B0 && code < 0x03CA);
 
-        var Scr = this.Parent.MathPrp.scr,
-            Sty = this.Parent.MathPrp.sty;
+        var Scr = Compiled_MPrp.scr,
+            Sty = Compiled_MPrp.sty;
 
         // Mathematical Alphanumeric Characters
         // http://www.w3.org/TR/2014/REC-xml-entity-names-20140410/Overview.html#alphabets
@@ -679,7 +681,6 @@ CMathText.prototype =
         }
         else
             ContentPos.Add(0);
-
 
     },
     Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)

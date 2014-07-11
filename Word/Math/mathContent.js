@@ -136,7 +136,7 @@ var COEFF_GAPS = new CCoeffGaps();
 // TODO
 // проконтролировать GapLeft и GapRight для setPosition всех элементов
 
-function CRecalculateInfo(oMeasure, argSize)
+function CMathRecalculateInfo(oMeasure, argSize)
 {
     this.measure = oMeasure;
 
@@ -151,7 +151,7 @@ function CRecalculateInfo(oMeasure, argSize)
     this.Current = null;    // текущий элемент
 
 }
-CRecalculateInfo.prototype =
+CMathRecalculateInfo.prototype =
 {
     old_checkGapsSign: function(oMeasure, posCurr)
     {
@@ -523,14 +523,22 @@ CRecalculateInfo.prototype =
 
 function CMPrp()
 {
-    this.sty      = STY_ITALIC;
+    this.sty      = undefined;
+    this.scr      = undefined;
+    this.nor      = undefined;
+
+    this.aln      = undefined;
+    this.brk      = undefined;
+    this.lit      = undefined;
+
+    /*this.sty      = STY_ITALIC;
     this.scr      = TXT_ROMAN;
 
     this.nor      = false;
 
     this.aln      = false;
     this.brk      = false;
-    this.lit      = false;
+    this.lit      = false;*/
 
     // TXT_NORMAL
     // если normal == false, то берем TextPrp отсюда (в wRunPrp bold/italic не учитываем, выставляем отсюда)
@@ -540,12 +548,6 @@ function CMPrp()
     // если plain == true
     // буквы берутся обычные, не специальные для Cambria Math : то есть как для TXT_NORMAL
     // отличие от TXT_NORMAL w:rPrp в этом случае не учитываются !
-
-    //this.typeText = TXT_ROMAN;
-    //this.italic   = true;
-    //this.bold     = false;
-    //this.nor      = false;
-    //this.plain    = false;
 
 }
 CMPrp.prototype =
@@ -592,7 +594,7 @@ CMPrp.prototype =
 
         return props;
     },
-    getTxtPrp: function()
+    GetTxtPrp: function()
     {
         var textPrp = new CTextPr();
 
@@ -613,6 +615,27 @@ CMPrp.prototype =
         NewMPrp.scr      = this.scr;
         
         return NewMPrp;
+    },
+    GetCompiled_ScrStyles : function()
+    {
+        var nor = this.nor == undefined ? false : this.nor;
+        var scr = this.scr == undefined ? TXT_ROMAN : this.scr;
+        var sty = this.sty == undefined ? STY_ITALIC : this.sty;
+
+        return {nor: nor, scr: scr, sty: sty};
+    },
+    SetStyle: function(Bold, Italic) /// из ctrPrp получить style для MathPrp
+    {
+        if(Bold == true && Italic == true)
+            this.sty = STY_BI;
+        else if(Italic == true)
+            this.sty = STY_ITALIC;
+        else if(Bold == true)
+            this.sty = STY_BOLD;
+        else
+            this.sty = STY_PLAIN;
+
+
     }
 }
 
@@ -3794,7 +3817,7 @@ CMathContent.prototype =
     },
     Resize: function(Parent, ParaMath, oMeasure)      // пересчитываем всю формулу
     {
-        var RecalcInfo = new CRecalculateInfo(oMeasure, this.argSize);
+        var RecalcInfo = new CMathRecalculateInfo(oMeasure, this.argSize);
 
         this.ParaMath = ParaMath;
 
@@ -4289,7 +4312,7 @@ CMathContent.prototype =
     {
         return this.Id;
     },
-    SetRunEmptyToContent: function(bAll)
+    old_SetRunEmptyToContent: function(bAll)
     {
         var current = null, left = null;
 
@@ -4357,6 +4380,75 @@ CMathContent.prototype =
         }
 
         this.content = NewContent;
+
+    },
+    SetRunEmptyToContent: function(bAll)
+    {
+        var len = this.content.length;
+
+        var current = null, left = null;
+        var emptyRun, ctrPrp, mathPrp, txtPrp;
+
+        for(var i = 0; i < len; i++)
+        {
+            current = this.content[i];
+
+            var bLeftRun  = left !== null ? left.Type == para_Math_Run : false,
+                bRightRun = i < len - 1 ? this.content[i + 1].Type === para_Math_Run : false;
+
+            var bCurrComp = current.Type == para_Math_Composition,
+                bCurrEmptyRun = current.Type == para_Math_Run && current.Is_Empty();
+
+            var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
+
+            if(bCurrComp && bAll == true)
+                this.content[i].SetRunEmptyToContent(bAll);
+
+            if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
+            {
+                emptyRun = new ParaRun(null, true);
+
+                ctrPrp = current.Get_CtrPrp();
+
+                mathPrp = new CMPrp();
+                mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
+
+                emptyRun.Set_MathPr(mathPrp);
+
+                ctrPrp.Bold   = undefined;
+                ctrPrp.Italic = undefined;
+
+                emptyRun.Set_Pr(ctrPrp);
+
+                this.Internal_Content_Add(i, emptyRun);
+            }
+            else if(bDeleteEmptyRun)
+            {
+                this.Remove_FromContent(i, 1);
+            }
+
+        }
+
+        len = this.content.length;
+
+        if(len > 0 && this.content[len - 1].Type == para_Math_Composition)
+        {
+            emptyRun = new ParaRun(null, true);
+
+            ctrPrp = current.Get_CtrPrp();
+
+            mathPrp = new CMPrp();
+            mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
+
+            emptyRun.Set_MathPr(mathPrp);
+
+            ctrPrp.Bold   = undefined;
+            ctrPrp.Italic = undefined;
+
+            emptyRun.Set_Pr(ctrPrp);
+
+            this.Internal_Content_Add(len, emptyRun);
+        }
 
     },
     Create_FontMap : function(Map)
@@ -4708,6 +4800,39 @@ CMathContent.prototype =
 
         if ( this.Selection.End >= Pos )
             this.Selection.End++;
+
+    },
+    Remove_FromContent : function(Pos, Count)
+    {
+        var DeletedItems = this.content.slice( Pos, Pos + Count );
+        History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+
+        if(this.CurPos > Pos)
+        {
+            if(this.CurPos >= Pos + Count)
+                this.CurPos -= Count;
+            else
+                this.CurPos = Pos;
+        }
+
+        if ( true === this.Selection.Use )
+        {
+            if(this.Selection.Start > Pos)
+            {
+                if(this.Selection.Start >= Pos + Count)
+                    this.Selection.Start -= Count;
+                else
+                    this.Selection.Start = Pos;
+            }
+
+            if(this.Selection.End > Pos)
+            {
+                if(this.Selection.End >= Pos + Count)
+                    this.Selection.End -= Count;
+                else
+                    this.Selection.End = Pos;
+            }
+        }
 
     },
     Get_Default_TPrp: function()
