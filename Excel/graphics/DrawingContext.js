@@ -511,10 +511,16 @@
 		var sr = this._calcRect(sx, sy, w, h);
 		var r = this._calcRect(x, y);
 
-		var tmpOperation = this.ctx.globalCompositeOperation;
+		this.ctx.save();
 		this.ctx.globalCompositeOperation = 'copy';
+		this.ctx.beginPath();
+		this.ctx.rect(r.x, r.y, sr.w, sr.h);
+		this.ctx.clip();
+
 		this.ctx.drawImage(this.getCanvas(), sr.x, sr.y, sr.w, sr.h, r.x, r.y, sr.w, sr.h);
-		this.ctx.globalCompositeOperation = tmpOperation;
+
+		this.ctx.restore();
+		this.ctx.beginPath();
 
 		return this;
 	};
