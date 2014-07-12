@@ -2798,7 +2798,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selection.groupSelection)
             {
-                if(this.selection.groupSelection.chartSelection)
+                if(this.selection.groupSelection.selection.chartSelection)
                 {
                     //TODO
                 }
@@ -3264,6 +3264,7 @@ DrawingObjectsController.prototype =
             if(this.selection.textSelection)
             {
                 this.selection.textSelection = null;
+                drawingObjectsController.updateSelectionState();
             }
             else if(this.selection.groupSelection)
             {
@@ -3271,19 +3272,37 @@ DrawingObjectsController.prototype =
                 {
                     this.selection.groupSelection.selection.textSelection = null;
                 }
-                else if(this.selection.groupSelection.chartSelection)
+                else if(this.selection.groupSelection.selection.chartSelection)
                 {
-                    //TODO
+                    if(this.selection.groupSelection.selection.chartSelection.selection.textSelection)
+                    {
+                        this.selection.groupSelection.selection.chartSelection.selection.textSelection = null;
+                    }
+                    else
+                    {
+                        this.selection.groupSelection.selection.chartSelection.resetSelection();
+                        this.selection.groupSelection.selection.chartSelection = null;
+                    }
                 }
                 else
                 {
                     this.selection.groupSelection.resetSelection();
                     this.selection.groupSelection = null;
                 }
+                drawingObjectsController.updateSelectionState();
             }
             else if(this.selection.chartSelection)
             {
-                //TODO
+                if(this.selection.chartSelection.selection.textSelection)
+                {
+                    this.selection.chartSelection.selection.textSelection = null;
+                }
+                else
+                {
+                    this.selection.chartSelection.resetSelection();
+                    this.selection.chartSelection = null;
+                }
+                drawingObjectsController.updateSelectionState();
             }
             else
             {
@@ -3302,7 +3321,7 @@ DrawingObjectsController.prototype =
             if(!ctrlKey)
             {
                 //if(this.selection.textSelection || this.selection.groupSelection && this.selection.groupSelection.selection.textSelection
-                //    || this.selection.chartSelection && this.selection.chartSelection.textSelection)
+                //    || this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
                 //{
                     this.checkSelectedObjectsAndCallback(this.paragraphAdd, [new ParaSpace(1)]);
                     this.recalculate();
