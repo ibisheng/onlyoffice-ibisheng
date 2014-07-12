@@ -112,7 +112,7 @@ function FrozenPlace(ws, type) {
 			
 			case FrozenAreaType.RightBottom: {
 				if (_this.frozenCell.col && _this.frozenCell.row)
-					_this.range = new asc_Range(_this.frozenCell.col, _this.worksheet.getFirstVisibleRow(), _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+					_this.range = new asc_Range(_this.worksheet.getFirstVisibleCol(), _this.worksheet.getFirstVisibleRow(), _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
 				else
 					_this.isValid = false;
 			}
