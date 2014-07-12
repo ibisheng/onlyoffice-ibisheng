@@ -1708,20 +1708,17 @@ function DrawingObjects() {
             }
             var metrics = drawingObject.getGraphicObjectMetrics();
             CheckSpPrXfrm(drawingObject.graphicObject);
-            if(!api.wbModel.bCollaborativeChanges)
+            if(!api.wbModel.bCollaborativeChanges && drawingObject.graphicObject.fromSerialize)
             {
                 drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
                 drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
             }
-            if(drawingObject.graphicObject.getObjectType() !== historyitem_type_GroupShape && !api.wbModel.bCollaborativeChanges)
+            if(drawingObject.graphicObject.getObjectType() !== historyitem_type_GroupShape && !api.wbModel.bCollaborativeChanges && drawingObject.graphicObject.fromSerialize)
             {
                 drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
                 drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
-                //drawingObject.graphicObject.spPr.xfrm.setChOffX(0);
-                //drawingObject.graphicObject.spPr.xfrm.setChOffY(0);
-                //drawingObject.graphicObject.spPr.xfrm.setChExtX(metrics.extX);
-                //drawingObject.graphicObject.spPr.xfrm.setChExtY(metrics.extY);
             }
+            delete drawingObject.graphicObject.fromSerialize;
 
             drawingObject.graphicObject.drawingBase = aObjects[i];
             drawingObject.graphicObject.drawingObjects = _this;
