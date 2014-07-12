@@ -45,37 +45,43 @@ StartAddNewShape.prototype =
     {
         if(this.bStart)
         {
-            History.Create_NewPoint();
-            var shape = this.drawingObjects.arrTrackObjects[0].getShape(false, this.drawingObjects.getDrawingDocument(), this.drawingObjects.drawingObjects);
-            if(shape.spPr.xfrm.offX < 0)
-            {
-                shape.spPr.xfrm.setOffX(0);
-            }
-            if(shape.spPr.xfrm.offY < 0)
-            {
-                shape.spPr.xfrm.setOffY(0);
-            }
-            shape.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
-            shape.addToDrawingObjects();
-            this.drawingObjects.checkChartTextSelection();
-            this.drawingObjects.resetSelection();
-            shape.select(this.drawingObjects, 0);
-            if(this.preset === "textRect")
-            {
-                this.drawingObjects.selection.textSelection = shape;
-                //shape.selectionSetStart(e, x, y, 0);
-                //shape.selectionSetEnd(e, x, y, 0);
-            }
+
             this.drawingObjects.drawingObjects.objectLocker.reset();
-            this.drawingObjects.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
-            this.drawingObjects.drawingObjects.objectLocker.checkObjects(function(bLock){});
-            this.drawingObjects.startRecalculate();
-            asc["editor"].asc_endAddShape();
-            this.drawingObjects.drawingObjects.sendGraphicObjectProps();
+            this.drawingObjects.drawingObjects.objectLocker.addObjectId("1");
+            var oThis = this;
+            var track =  oThis.drawingObjects.arrTrackObjects[0];
+            this.drawingObjects.drawingObjects.objectLocker.checkObjects(function(bLock){
+
+                if(bLock)
+                {
+                    History.Create_NewPoint();
+                    var shape = track.getShape(false, oThis.drawingObjects.getDrawingDocument(), oThis.drawingObjects.drawingObjects);
+                    if(shape.spPr.xfrm.offX < 0)
+                    {
+                        shape.spPr.xfrm.setOffX(0);
+                    }
+                    if(shape.spPr.xfrm.offY < 0)
+                    {
+                        shape.spPr.xfrm.setOffY(0);
+                    }
+                    shape.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
+                    shape.addToDrawingObjects();
+                    oThis.drawingObjects.checkChartTextSelection();
+                    oThis.drawingObjects.resetSelection();
+                    shape.select(oThis.drawingObjects, 0);
+                    if(oThis.preset === "textRect")
+                    {
+                        oThis.drawingObjects.selection.textSelection = shape;
+                    }
+                    oThis.drawingObjects.startRecalculate();
+                    oThis.drawingObjects.drawingObjects.sendGraphicObjectProps();
+                }
+
+            });
         }
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.drawingObjects.showDrawingObjects(true);
         this.drawingObjects.updateOverlay();
+        asc["editor"].asc_endAddShape();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 };

@@ -65,6 +65,8 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
     var drawingObject = drawingObjects.createDrawingObject();
     drawingObject.graphicObject = graphic;
     graphic.setDrawingBase(drawingObject);
+    if(!worksheet)
+        return;
     var ret, aObjects = worksheet.Drawings;
     if (isRealNumber(position)) {
         aObjects.splice(position, 0, drawingObject);
