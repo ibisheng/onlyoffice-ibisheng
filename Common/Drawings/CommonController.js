@@ -1017,6 +1017,28 @@ DrawingObjectsController.prototype =
                         content.Set_ApplyToAll(false);
                         ret = true;
                     }
+                    else
+                    {
+                        if(arr[i].getObjectType() === historyitem_type_Shape)
+                        {
+                            if(arr[i].bWordShape)
+                            {
+                                arr[i].createTextBoxContent();
+                            }
+                            else
+                            {
+                                arr[i].createTextBody();
+                            }
+                            content = arr[i].getDocContent();
+                            if(content)
+                            {
+                                content.Set_ApplyToAll(true);
+                                f.apply(content, args);
+                                content.Set_ApplyToAll(false);
+                                ret = true;
+                            }
+                        }
+                    }
                 }
             }
             return ret;
