@@ -309,7 +309,7 @@ RotateState.prototype =
                             group.updateCoordinatesAfterInternalResize();
                         }
                         //drawingObjects.recalculate();
-                        var arr_x = [], arr_y = [], transform, min_x, min_y, drawing;
+                        var arr_x = [], arr_y = [], transform, min_x, min_y, drawing, arr_x2 = [], arr_y2 = [], min_x2, min_y2;
                         for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
                         {
                             arr_x.length = 0;
@@ -325,8 +325,13 @@ RotateState.prototype =
                             arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
                             arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
                             arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
-                            min_x = Math.min.apply(Math, arr_x);
-                            min_y = Math.min.apply(Math, arr_y);
+
+                            arr_x2.push(drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX);
+                            arr_y2.push(drawing.spPr.xfrm.offY + drawing.spPr.xfrm.extY);
+
+                            min_x =  Math.min(Math.min.apply(Math, arr_x), drawing.spPr.xfrm.offX);
+                            min_y =  Math.min(Math.min.apply(Math, arr_y), drawing.spPr.xfrm.offY);
+
                             if(min_x < 0)
                             {
                                 drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
@@ -336,8 +341,8 @@ RotateState.prototype =
                                 drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
                             }
                         }
-                    }, []
-                )
+                        oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
+                    }, []);
             }
 
         }
@@ -402,6 +407,7 @@ ResizeState.prototype =
         var resize_coef = this.majorObject.getResizeCoefficients(this.handleNum, coords.x, coords.y);
         this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e);
         this.drawingObjects.updateOverlay();
+
     },
 
     onMouseUp: RotateState.prototype.onMouseUp
