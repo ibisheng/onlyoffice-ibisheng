@@ -930,6 +930,13 @@ TextAddState.prototype =
         this.drawingObjects.updateSelectionState();
         this.drawingObjects.drawingObjects.sendGraphicObjectProps();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        var cursor_type = this.drawingObjects.onMouseDown(e, x, y, pageIndex);
+        if(cursor_type.hyperlink)
+        {
+            this.drawingObjects.drawingObjects.showDrawingObjects(true);
+        }
+        this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
     }
 
 };

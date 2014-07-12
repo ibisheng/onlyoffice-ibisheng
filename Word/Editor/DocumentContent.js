@@ -7128,13 +7128,15 @@ CDocumentContent.prototype =
 
                 if ( null != this.Selection.Data && true === this.Selection.Data.Hyperlink )
                 {
-                    editor.sync_HyperlinkClickCallback( this.Selection.Data.Value.Get_Value() );
+                    editor && editor.sync_HyperlinkClickCallback( this.Selection.Data.Value.Get_Value() );
                     this.Selection.Data.Value.Set_Visited( true );
 
-                    for ( var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++ )
-                        this.DrawingDocument.OnRecalculatePage( PageIdx, this.DrawingDocument.m_oLogicDocument.Pages[PageIdx] );
-
-                    this.DrawingDocument.OnEndRecalculate(false, true);
+                    if(this.DrawingDocument.m_oLogicDocument)
+                    {
+                        for ( var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++ )
+                            this.DrawingDocument.OnRecalculatePage( PageIdx, this.DrawingDocument.m_oLogicDocument.Pages[PageIdx] );
+                        this.DrawingDocument.OnEndRecalculate(false, true);
+                    }
                 }
             }
             else

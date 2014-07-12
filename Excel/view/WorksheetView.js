@@ -5712,7 +5712,7 @@
 					lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
 				}
 
-				if (drawingInfo.hyperlink instanceof ParaHyperlinkStart) {
+				if (drawingInfo.hyperlink instanceof ParaHyperlink) {
 					oHyperlink = new Hyperlink();
 					oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
 					var spl = drawingInfo.hyperlink.Value.split("!");

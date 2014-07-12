@@ -6317,6 +6317,10 @@ Paragraph.prototype =
             TextPr.Color     = null;
             TextPr.Underline = null;
             TextPr.RStyle    = editor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
+            if(!this.bFromDocument)
+            {
+                TextPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+            }
             Hyperlink.Apply_TextPr( TextPr, undefined, false );
         }
         else if ( null !== HyperProps.Text && "" !== HyperProps.Text )

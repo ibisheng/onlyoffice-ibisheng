@@ -487,18 +487,32 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(this.document)
+            var ret = {objectId: object.Get_Id(), cursorType: "text"};
+            var content = object.getDocContent();
+            var invert_transform_text = object.invertTransformText, tx, ty;
+            if(content && invert_transform_text)
             {
-                var content = object.getDocContent();
-                var invert_transform_text = object.invertTransformText, tx, ty;
-                if(content && invert_transform_text)
+                tx = invert_transform_text.TransformPointX(x, y);
+                ty = invert_transform_text.TransformPointY(x, y);
+                if(this.document)
                 {
-                    tx = invert_transform_text.TransformPointX(x, y);
-                    ty = invert_transform_text.TransformPointY(x, y);
                     content.Update_CursorType(tx, ty, pageIndex);
                 }
+                else if(this.drawingObjects)
+                {
+                    var hit_paragraph = content.Internal_GetContentPosByXY(tx, ty, 0);
+                    var par = content.Content[hit_paragraph];
+                    if(isRealObject(par))
+                    {
+                        var check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        if(isRealObject(check_hyperlink))
+                        {
+                            ret.hyperlink = check_hyperlink;
+                        }
+                    }
+                }
             }
-            return {objectId: object.Get_Id(), cursorType: "text"};
+            return ret;
         }
     },
 
