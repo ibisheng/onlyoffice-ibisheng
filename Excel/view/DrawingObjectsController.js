@@ -270,11 +270,14 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = functio
         this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
     }
     var _this = this;
-    var callback2 = function(bLock)
+    var callback2 = function(bLock, bSync)
     {
         if(bLock)
         {
-            _this.setSelectionState(selection_state);
+            if(bSync !== true)
+            {
+                _this.setSelectionState(selection_state);
+            }
             callback.apply(_this, args);
         }
     };

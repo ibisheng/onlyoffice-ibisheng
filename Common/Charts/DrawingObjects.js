@@ -3939,16 +3939,16 @@ function ObjectLocker(ws) {
     // For array of objects -=Use reset before use=-
     _t.checkObjects = function(callback) {
 
-        function callbackEx(result) {
+        function callbackEx(result, sync) {
             //if ( worksheet )
             //	worksheet._drawCollaborativeElements(true);
             if ( callback )
-                callback(result);
+                callback(result, sync);
         }
 
         if ( !aObjectId.length || (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) ) {
             // Запрещено совместное редактирование
-            asc_applyFunction(callbackEx, true);
+            asc_applyFunction(callbackEx, true, true);
             return;
         }
 
@@ -3960,7 +3960,7 @@ function ObjectLocker(ws) {
 
             if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
                 // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-                asc_applyFunction(callbackEx, true);
+                asc_applyFunction(callbackEx, true, true);
                 callback = undefined;
             }
             if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
@@ -3978,7 +3978,7 @@ function ObjectLocker(ws) {
         if ( _t.bLock )
             worksheet.collaborativeEditing.onEndCheckLock(callbackEx);
         else
-            asc_applyFunction(callbackEx, true);
+            asc_applyFunction(callbackEx, true, true);
     }
 }
 
