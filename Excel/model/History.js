@@ -298,6 +298,12 @@ CHistory.prototype =
         }
         this._addRedoObjectParam(oRedoObjectParam, this.CurPoint.Items[this.CurPoint.Items.length - 1]);
 	},
+
+    CheckXfrmChanges: function(xfrm)
+    {
+
+    },
+
 	RedoExecute : function(Point, oRedoObjectParam)
 	{
 		// Выполняем все действия в прямом порядке
@@ -369,11 +375,7 @@ CHistory.prototype =
 	                    wsViews[i].objectRender.controller.recalculate(undefined, Point);
 	                }
 	            }
-                var wsView = window["Asc"]["editor"].wb.getWorksheet();
-                if(wsView && wsView.objectRender && wsView.objectRender.controller)
-                {
-                    wsView.objectRender.controller.updateOverlay();
-                }
+
 	            gUndoInsDelCellsFlag = true;
 	        }
             //синхронизация index и id worksheet
@@ -384,7 +386,14 @@ CHistory.prototype =
 	        if (bUndo) {
 	            this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
 	            if (Point.SelectionState != null)
-	                this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+                {
+                    this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+                    var wsView = window["Asc"]["editor"].wb.getWorksheet();
+                    if(wsView && wsView.objectRender && wsView.objectRender.controller)
+                    {
+                        wsView.objectRender.controller.updateOverlay();
+                    }
+                }
 	        }
 	        else {
 	            var oSelectRange = null;
@@ -780,7 +789,8 @@ CHistory.prototype =
 	{
 	    var aRes = [];
 	    this._checkCurPoint();
-	    var i = 0;
+	    var i = 0, t;
+        var worksheets = Asc["editor"].wbModel.aWorksheets;
 	    if (null != this.SavedIndex)
 	        i = this.SavedIndex + 1;
 		for(; i <= this.Index; ++i)
@@ -790,7 +800,8 @@ CHistory.prototype =
 			for(var j = 0, length2 = point.Items.length; j < length2; ++j)
 			{
 				var elem = point.Items[j];
-				aPointChanges.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
+                aPointChanges.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
+
 			}
 			aRes.push(aPointChanges);
 		}
