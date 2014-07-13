@@ -467,14 +467,13 @@ DrawingObjectsController.prototype =
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            if(e.CtrlKey)
+            if(e.CtrlKey && !this.document)
             {
                 var target_content = this.getTargetDocContent();
                 if(!target_content)
                 {
                     return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
                 }
-
             }
             this.resetSelection();
             (group ? group : this).selectObject(object,pageIndex);

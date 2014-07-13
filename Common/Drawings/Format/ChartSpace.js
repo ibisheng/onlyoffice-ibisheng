@@ -7525,6 +7525,17 @@ CChartSpace.prototype =
     {
         /*this.setRecalculateInfo();
          this.recalculate();*/
+        if(graphics.IsSlideBoundsCheckerType)
+        {
+            graphics.transform3(this.transform);
+            graphics._s();
+            graphics._m(0, 0);
+            graphics._l(this.extX, 0);
+            graphics._l(this.extX, this.extY);
+            graphics._l(0, this.extY);
+            graphics._e();
+            return;
+        }
         if(graphics.updatedRect)
         {
             var rect = graphics.updatedRect;
@@ -7535,6 +7546,8 @@ CChartSpace.prototype =
                 || bounds.y + bounds.h < rect.y)
                 return;
         }
+
+
 
 
 
