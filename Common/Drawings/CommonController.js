@@ -467,6 +467,15 @@ DrawingObjectsController.prototype =
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+            if(e.CtrlKey)
+            {
+                var target_content = this.getTargetDocContent();
+                if(!target_content)
+                {
+                    return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
+                }
+
+            }
             this.resetSelection();
             (group ? group : this).selectObject(object,pageIndex);
             object.selectionSetStart(e, x, y, pageIndex);
@@ -2345,6 +2354,11 @@ DrawingObjectsController.prototype =
                     plot_area.addChart(new_chart_type, 0);
                     plot_area.removeCharts(1, plot_area.charts.length - 1);
                     new_chart_type.setFromOtherChart(chart_type);
+                    for(var j = 0; j < new_chart_type.series.length; ++j)
+                    {
+                        new_chart_type.series[j].setMarker(null);
+                    }
+                    new_chart_type.setScatterStyle(SCATTER_STYLE_MARKER);
                     axis_obj = CreateScatterAxis(); //cat - 0, val - 1
                     new_chart_type.addAxId(axis_obj.catAx);
                     new_chart_type.addAxId(axis_obj.valAx);

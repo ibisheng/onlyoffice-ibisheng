@@ -271,9 +271,9 @@ RotateState.prototype =
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
+                History.Create_NewPoint();
                 for(i = 0; i < tracks.length; ++i)
                 {
-                    History.Create_NewPoint();
                     copy = tracks[i].originalObject.copy();
                     copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
                     copy.addToDrawingObjects();

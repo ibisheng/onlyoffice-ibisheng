@@ -5231,6 +5231,8 @@ CChartSpace.prototype =
             var max_width = 0, cur_width, max_font_size = 0, cur_font_size, ser, b_line_series;
             var max_word_width = 0;
             this.chart.legend.chart = this;
+            var b_scatter_no_line = false;/*(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart &&
+                (this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE));  */
             if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== historyitem_type_PieChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_DoughnutChart) && series.length !== 1)
             {
                 for(i = 0; i < series.length; ++i)
@@ -5254,6 +5256,7 @@ CChartSpace.prototype =
 
                     calc_entry.calcMarkerUnion = new CUnionMarker();
                     union_marker = calc_entry.calcMarkerUnion;
+                    var pts = getPtsFromSeries(ser);
                     switch(ser.getObjectType())
                     {
                         case historyitem_type_BarSeries:
@@ -5273,15 +5276,17 @@ CChartSpace.prototype =
                             if(ser.compiledSeriesMarker)
                             {
                                 union_marker.marker = CreateMarkerGeometryByType(ser.compiledSeriesMarker.symbol, null);
-                                if(ser.compiledSeriesPen)
-                                    union_marker.marker.brush = ser.compiledSeriesPen.Fill;
+                                if(pts[0] && pts[0].compiledMarker)
+                                    union_marker.marker.brush = pts[0].compiledMarker.brush;
                             }
-                            if(ser.compiledSeriesPen)
+
+                            if(ser.compiledSeriesPen && !b_scatter_no_line)
                             {
                                 union_marker.lineMarker = CreateMarkerGeometryByType(SYMBOL_DASH, null);
                                 union_marker.lineMarker.pen = ser.compiledSeriesPen.createDuplicate(); //Копируем, так как потом возможно придется изменять толщину линии;
                             }
-                            b_line_series = true;
+                            if(!b_scatter_no_line)
+                                b_line_series = true;
                             break;
                         }
                     }
@@ -5336,7 +5341,8 @@ CChartSpace.prototype =
                             union_marker.lineMarker = CreateMarkerGeometryByType(SYMBOL_DASH, null);
                             union_marker.lineMarker.pen = pt.pen;
                         }
-                        b_line_series = true;
+                        if(!b_scatter_no_line)
+                            b_line_series = true;
                     }
                     else
                     {
