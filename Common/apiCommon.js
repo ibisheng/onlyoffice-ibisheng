@@ -530,6 +530,9 @@
                         }
                         this.putHorGridLines(c_oAscGridLinesSettings.major);
                         this.putVertGridLines(c_oAscGridLinesSettings.major);
+                        this.putShowMarker(true);
+                        this.putSmooth(false);
+                        this.putLine(false);
                         break;
                     }
                 }

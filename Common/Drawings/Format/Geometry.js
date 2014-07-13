@@ -1033,7 +1033,10 @@ Geometry.prototype=
     draw: function(shape_drawer)
     {
         if(shape_drawer.Graphics && shape_drawer.Graphics.bDrawSmart)
+        {
             this.drawSmart(shape_drawer);
+            return;
+        }
         for (var i=0, n=this.pathLst.length; i<n;++i)
             this.pathLst[i].draw(shape_drawer);
     },

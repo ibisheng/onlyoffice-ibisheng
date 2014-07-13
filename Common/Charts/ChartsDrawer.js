@@ -2668,7 +2668,7 @@ drawLineChart.prototype =
 				
 				idxPoint = this.cChartDrawer.getIdxPoint(seria, n);
 				compiledMarkerSize = idxPoint && idxPoint.compiledMarker && idxPoint.compiledMarker.size ? idxPoint.compiledMarker.size : null;
-				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker && idxPoint.compiledMarker.symbol ? idxPoint.compiledMarker.symbol : null;
+				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker && isRealNumber(idxPoint.compiledMarker.symbol) ? idxPoint.compiledMarker.symbol : null;
 				
 				if(val != null)
 				{

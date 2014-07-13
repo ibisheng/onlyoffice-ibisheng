@@ -13918,6 +13918,10 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_SetMarker, oldPr: this.marker, newPr: pr});
         this.marker = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     addSer: function(ser)
     {
@@ -13933,6 +13937,10 @@ CLineChart.prototype =
     {
         History.Add(this, {Type: historyitem_LineChart_SetSmooth, oldPr: this.smooth, newPr: pr});
         this.smooth = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
     setUpDownBars: function(pr)
     {
@@ -14012,6 +14020,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetMarker:
             {
                 this.marker = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_AddSer:
@@ -14033,6 +14045,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetSmooth:
             {
                 this.smooth = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_SetUpDownBars:
@@ -14098,6 +14114,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetMarker:
             {
                 this.marker = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_AddSer:
@@ -14112,6 +14132,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetSmooth:
             {
                 this.smooth = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_SetUpDownBars:
@@ -14223,6 +14247,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetMarker:
             {
                 this.marker = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_AddSer:
@@ -14241,6 +14269,10 @@ CLineChart.prototype =
             case historyitem_LineChart_SetSmooth:
             {
                 this.smooth = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break
             }
             case historyitem_LineChart_SetUpDownBars:
@@ -18943,6 +18975,10 @@ CScatterChart.prototype =
     {
         History.Add(this, {Type: historyitem_ScatterChart_SetScatterStyle, oldPr: this.scatterStyle, newPr:pr});
         this.scatterStyle = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        {
+            this.parent.parent.parent.handleUpdateType();
+        }
     },
 
     addSer: function(ser)
@@ -19005,6 +19041,10 @@ CScatterChart.prototype =
             case historyitem_ScatterChart_SetScatterStyle:
             {
                 this.scatterStyle = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_ScatterChart_AddSer:
@@ -19062,6 +19102,10 @@ CScatterChart.prototype =
             case historyitem_ScatterChart_SetScatterStyle:
             {
                 this.scatterStyle = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
                 break;
             }
             case historyitem_ScatterChart_AddSer:
@@ -19183,6 +19227,10 @@ CScatterChart.prototype =
                 else
                 {
                     this.scatterStyle = null;
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
                 }
                 break;
             }
@@ -24125,20 +24173,20 @@ function CreateMarkerGeometryByType(type, src)
 
     function AddPlus(geom, w, h)
     {
-        geom.AddPathCommand(0,undefined, undefined, undefined, w, h);
-        geom.AddPathCommand(1, w/2+"", "0");
-        geom.AddPathCommand(2, w/2+"", "h");
-        geom.AddPathCommand(2, "0", h/2+"");
+        geom.AddPathCommand(0,undefined, "none", undefined, w, h);
+        geom.AddPathCommand(1, w/2 + "", "0");
+        geom.AddPathCommand(2, w/2 + "", h + "");
+        geom.AddPathCommand(1, "0", h/2+"");
         geom.AddPathCommand(2, w+"", h/2+"");
     }
 
     function AddX(geom, w, h)
     {
-        geom.AddPathCommand(0,undefined, undefined, undefined, w, h);
+        geom.AddPathCommand(0,undefined, "none", undefined, w, h);
         geom.AddPathCommand(1, "0", "0");
-        geom.AddPathCommand(2, "w", "h");
-        geom.AddPathCommand(2, "w", "0");
-        geom.AddPathCommand(2, "0", "h");
+        geom.AddPathCommand(2, w + "", h + "");
+        geom.AddPathCommand(1, w + "", "0");
+        geom.AddPathCommand(2, "0", h + "");
     }
 
     switch(type)
@@ -24146,20 +24194,20 @@ function CreateMarkerGeometryByType(type, src)
         case SYMBOL_CIRCLE:
         {
             ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
-            ret.AddPathCommand(1, "0", h/2+"");
-            ret.AddPathCommand(3, w/2+"", h/2 + "", "cd2", "cd4");
-            ret.AddPathCommand(3, w/2+"", h/2 + "", "_3cd4", "cd4");
-            ret.AddPathCommand(3, w/2+"", h/2 + "", "0", "cd4");
-            ret.AddPathCommand(3, w/2+"", h/2 + "", "cd4", "cd4");
+            ret.AddPathCommand(1, "0", h/2 + "");
+            ret.AddPathCommand(3, w/2 + "", h/2 + "", "cd2", "cd4");
+            ret.AddPathCommand(3, w/2 + "", h/2 + "", "_3cd4", "cd4");
+            ret.AddPathCommand(3, w/2 + "", h/2 + "", "0", "cd4");
+            ret.AddPathCommand(3, w/2 + "", h/2 + "", "cd4", "cd4");
             ret.AddPathCommand(6);
             break;
         }
         case SYMBOL_DASH:
         case SYMBOL_DOT:
         {
-            ret.AddPathCommand(0,undefined, undefined, undefined, w, h);
+            ret.AddPathCommand(0,undefined, "none", undefined, w, h);
             ret.AddPathCommand(1, type === SYMBOL_DASH ? "0" : w/2+"", h/2 +"");
-            ret.AddPathCommand(2, w+"", "0");
+            ret.AddPathCommand(2, w + "", h/2 +"");
             break;
         }
         case SYMBOL_DIAMOND:
@@ -24185,14 +24233,14 @@ function CreateMarkerGeometryByType(type, src)
         }
         case SYMBOL_PLUS:
         {
-            ret.AddPathCommand(0,undefined, undefined, false, w, h);
+            ret.AddPathCommand(0,undefined,  "none", false, w, h);
             AddRect(ret, w, h);
             AddPlus(ret, w, h);
             break;
         }
         case SYMBOL_STAR:
         {
-            ret.AddPathCommand(0,undefined, undefined, false, w, h);
+            ret.AddPathCommand(0,undefined,  "none", false, w, h);
             AddRect(ret, w, h);
             AddPlus(ret, w, h);
             AddX(ret, w, h);
@@ -24209,7 +24257,7 @@ function CreateMarkerGeometryByType(type, src)
         }
         case SYMBOL_X:
         {
-            ret.AddPathCommand(0,undefined, undefined, false, w, h);
+            ret.AddPathCommand(0,undefined, "none", false, w, h);
             AddRect(ret, w, h);
             AddX(ret, w, h);
             break;

@@ -3654,6 +3654,8 @@ function DrawingObjects() {
             settings.putVertGridLines(c_oAscGridLinesSettings.none);
             settings.putInColumns(false);
             settings.putSeparator(",");
+            settings.putLine(true);
+            settings.putShowMarker(false);
 
             var vert_axis_settings = new asc_ValAxisSettings();
             settings.putVertAxisProps(vert_axis_settings);

@@ -5277,7 +5277,11 @@ CChartSpace.prototype =
                             {
                                 union_marker.marker = CreateMarkerGeometryByType(ser.compiledSeriesMarker.symbol, null);
                                 if(pts[0] && pts[0].compiledMarker)
+                                {
                                     union_marker.marker.brush = pts[0].compiledMarker.brush;
+                                    union_marker.marker.pen = pts[0].compiledMarker.pen;
+
+                                }
                             }
 
                             if(ser.compiledSeriesPen && !b_scatter_no_line)
@@ -5335,6 +5339,7 @@ CChartSpace.prototype =
                         {
                             union_marker.marker = CreateMarkerGeometryByType(pt.compiledMarker.symbol, null);
                             union_marker.marker.brush = pt.compiledMarker.pen.Fill;
+                            union_marker.marker.pen = pt.compiledMarker.pen;
                         }
                         if(pt.pen)
                         {
@@ -5363,14 +5368,14 @@ CChartSpace.prototype =
             var line_marker_width;
             if(b_line_series)
             {
-                marker_size = 2;
+                marker_size = 2.5;
                 line_marker_width = 7.7;//Пока так
                 for(i = 0; i < calc_entryes.length; ++i)
                 {
                     calc_entry = calc_entryes[i];
                     if(calc_entry.calcMarkerUnion.lineMarker)
                     {
-                        calc_entry.calcMarkerUnion.lineMarker.spPr.geometry.Recalculate(line_marker_width, 0);
+                        calc_entry.calcMarkerUnion.lineMarker.spPr.geometry.Recalculate(line_marker_width, 1);
                         /*Excel не дает сделать толщину линии для маркера легенды больше определенной. Считаем, что это толщина равна 133000emu*/
                         if(calc_entry.calcMarkerUnion.lineMarker.pen
                             && isRealNumber(calc_entry.calcMarkerUnion.lineMarker.pen.w) && calc_entry.calcMarkerUnion.lineMarker.pen.w > 133000)
@@ -7546,10 +7551,6 @@ CChartSpace.prototype =
                 || bounds.y + bounds.h < rect.y)
                 return;
         }
-
-
-
-
 
         var pix= 3*this.convertPixToMM(1);
         var intGrid = graphics.GetIntegerGrid();
@@ -10589,7 +10590,6 @@ function CreateScatterChart(chartSeries)
     cat_ax.setMajorTickMark(TICK_MARK_OUT);
     cat_ax.setMinorTickMark(TICK_MARK_NONE);
     cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(plot_area.valAx);
     cat_ax.setCrosses(CROSSES_AUTO_ZERO);
     cat_ax.scaling.setOrientation(ORIENTATION_MIN_MAX);
     val_ax.setScaling(new CScaling());
@@ -10600,7 +10600,6 @@ function CreateScatterChart(chartSeries)
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
     val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
     var scaling = val_ax.scaling;
