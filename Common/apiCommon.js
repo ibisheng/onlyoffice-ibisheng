@@ -531,7 +531,7 @@
                         this.putHorGridLines(c_oAscGridLinesSettings.major);
                         this.putVertGridLines(c_oAscGridLinesSettings.major);
                         this.putShowMarker(true);
-                        this.putSmooth(false);
+                        this.putSmooth(null);
                         this.putLine(false);
                         break;
                     }

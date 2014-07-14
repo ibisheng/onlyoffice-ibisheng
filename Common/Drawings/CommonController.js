@@ -1526,7 +1526,7 @@ DrawingObjectsController.prototype =
                     }
                     else
                     {
-                        if(arr[i].getDocContent)
+                        if(arr[i].getDocContent && arr[i].getObjectType() !== historyitem_type_ChartSpace)
                         {
                             content = arr[i].getDocContent();
                             if(content)
