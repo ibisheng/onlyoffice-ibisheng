@@ -1053,33 +1053,33 @@ CAutoshapeTrack.prototype =
 						var _x1 = x1;
 						if (x2 < _x1)
 							_x1 = x2;
-						else if (x3 < _x1)
+						if (x3 < _x1)
 							_x1 = x3;
-						else if (x4 < _x1)
+						if (x4 < _x1)
 							_x1 = x4;
 
 						var _x4 = x1;
 						if (x2 > _x4)
 							_x4 = x2;
-						else if (x3 > _x4)
+						if (x3 > _x4)
 							_x4 = x3;
-						else if (x4 > _x4)
+						if (x4 > _x4)
 							_x4 = x4;
 
 						var _y1 = y1;
 						if (y2 < _y1)
 							_y1 = y2;
-						else if (y3 < _y1)
+						if (y3 < _y1)
 							_y1 = y3;
-						else if (y4 < _y1)
+						if (y4 < _y1)
 							_y1 = y4;
 
 						var _y4 = y1;
 						if (y2 > _y4)
 							_y4 = y2;
-						else if (y3 > _y4)
+						if (y3 > _y4)
 							_y4 = y3;
-						else if (y4 > _y4)
+						if (y4 > _y4)
 							_y4 = y4;
 
 						_x2 = _x4;
@@ -1397,33 +1397,33 @@ CAutoshapeTrack.prototype =
 						var _x1 = x1;
 						if (x2 < _x1)
 							_x1 = x2;
-						else if (x3 < _x1)
+						if (x3 < _x1)
 							_x1 = x3;
-						else if (x4 < _x1)
+						if (x4 < _x1)
 							_x1 = x4;
 
 						var _x4 = x1;
 						if (x2 > _x4)
 							_x4 = x2;
-						else if (x3 > _x4)
+						if (x3 > _x4)
 							_x4 = x3;
-						else if (x4 > _x4)
+						if (x4 > _x4)
 							_x4 = x4;
 
 						var _y1 = y1;
 						if (y2 < _y1)
 							_y1 = y2;
-						else if (y3 < _y1)
+						if (y3 < _y1)
 							_y1 = y3;
-						else if (y4 < _y1)
+						if (y4 < _y1)
 							_y1 = y4;
 
 						var _y4 = y1;
 						if (y2 > _y4)
 							_y4 = y2;
-						else if (y3 > _y4)
+						if (y3 > _y4)
 							_y4 = y3;
-						else if (y4 > _y4)
+						if (y4 > _y4)
 							_y4 = y4;
 
 						_x2 = _x4;
