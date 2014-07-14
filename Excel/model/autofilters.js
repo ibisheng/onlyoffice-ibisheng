@@ -1137,14 +1137,21 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//попал ли курсор на кнопку фильтра
-			checkCursor: function (x, y) {
+			checkCursor: function (x, y, offsetX, offsetY, frozenObj) {
 				if (!this.allButtonAF)
 					return false;
 				var ws = this.worksheet;
 				var offset = ws.getCellsOffset(1/*pt*/);
 				var width = 11.25;
 				var height = 11.25;
-
+				
+				var checkFrozenArea = this._checkClickFrozenArea(x, y, offsetX, offsetY, frozenObj);
+				if(checkFrozenArea)
+				{
+					x = checkFrozenArea.x;
+					y = checkFrozenArea.y;
+				};
+				
 				var button;
 				for (var i = 0; i < this.allButtonAF.length; i++) {
 					button = this.allButtonAF[i];
@@ -1596,6 +1603,33 @@ var gUndoInsDelCellsFlag = true;
 				History.EndTransaction();
 				if(turnOnHistory)
 					History.TurnOff();
+			},
+			
+			_checkClickFrozenArea: function(x, y, offsetX, offsetY, frozenObj)
+			{
+				var ws = this.worksheet;
+				var frosenPosX = frozenObj && frozenObj.cFrozen != undefined && ws.cols[frozenObj.cFrozen] ? ws.cols[frozenObj.cFrozen].left : null;
+				var frosenPosY = frozenObj && frozenObj.rFrozen != undefined && ws.rows[frozenObj.rFrozen] ? ws.rows[frozenObj.rFrozen].top : null;
+				var result;
+				
+				if(frosenPosX != null && frosenPosY != null && x < frosenPosX && y < frosenPosY)
+				{
+					result = {x: x, y: y};
+				}
+				else if(frosenPosX != null && x < frosenPosX)
+				{
+					result = {x: x, y: y + offsetY};
+				}
+				else if(frosenPosY != null && y < frosenPosY)
+				{
+					result = {x: x + offsetX, y: y};
+				}
+				else
+				{
+					result = {x: x + offsetX, y: y + offsetY};
+				}
+				
+				return result;
 			},
 			
 			_isEmptyButtons: function(ar)
