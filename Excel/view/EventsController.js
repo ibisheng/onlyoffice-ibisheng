@@ -1001,7 +1001,7 @@
 			// не вводим текст в режиме просмотра
 			// если в FF возвращать false, то отменяется дальнейшая обработка серии keydown -> keypress -> keyup
 			// и тогда у нас не будут обрабатываться ctrl+c и т.п. события
-			if (t.settings.isViewerMode || t.isSelectionDialogMode) {return true;}
+			if (t.settings.isViewerMode || t.isSelectionDialogMode || t.isMousePressed) {return true;}
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
