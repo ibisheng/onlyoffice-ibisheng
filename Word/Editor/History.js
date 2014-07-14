@@ -306,7 +306,7 @@ CHistory.prototype =
 
             case historyrecalctype_Inline:
             {
-                if ( Data.Data.Pos < this.RecalculateData.Inline.Pos || this.RecalculateData.Inline.Pos < 0 )
+                if ( (Data.Data.Pos < this.RecalculateData.Inline.Pos) || (Data.Data.Pos === this.RecalculateData.Inline.Pos && Data.Data.PageNum < this.RecalculateData.Inline.PageNum) || this.RecalculateData.Inline.Pos < 0 )
                 {
                     this.RecalculateData.Inline.Pos     = Data.Data.Pos;
                     this.RecalculateData.Inline.PageNum = Data.Data.PageNum;

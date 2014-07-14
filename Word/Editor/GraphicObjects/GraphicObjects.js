@@ -1030,7 +1030,7 @@ CGraphicObjects.prototype =
     addComment: function(commentData)
     {
         var content = this.getTargetDocContent();
-        return content && content.Add_Comment(commentData);
+        return content && content.Add_Comment(commentData, true, true);
     },
 
     documentIsSelectionLocked: function(CheckType)

@@ -506,6 +506,8 @@ CDocument.prototype.Set_DefaultLanguage = function(Lang)
 
     // Нужно заново запустить проверку орфографии
     this.Restart_CheckSpelling();
+    
+    this.Document_UpdateInterfaceState();
 };
 
 CDocument.prototype.Get_DefaultLanguage = function()
@@ -607,7 +609,11 @@ CTable.prototype.Restart_CheckSpelling = function()
 Paragraph.prototype.Restart_CheckSpelling = function()
 {
     this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-    this.CompiledPr.NeedRecalc = true; // потому что мы поменяли словарь по умолчанию
+    
+    // Пересчитываем скомпилированный стиль для самого параграфа и для всех ранов в данном параграфе
+    this.Recalc_CompiledPr();
+    this.Recalc_RunsCompiledPr();
+
     this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
 };
 

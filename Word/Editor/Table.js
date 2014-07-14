@@ -5819,15 +5819,31 @@ CTable.prototype =
             Use      : this.Selection.Use,
             StartPos :
             {
-                Pos : { Row : this.Selection.StartPos.Pos.Row, Cell : this.Selection.StartPos.Pos.Cell },
-                X   : this.Selection.StartPos.X,
-                Y   : this.Selection.StartPos.Y
+                Pos        : { Row : this.Selection.StartPos.Pos.Row, Cell : this.Selection.StartPos.Pos.Cell },
+                X          : this.Selection.StartPos.X,
+                Y          : this.Selection.StartPos.Y,
+                PageIndex  : this.Selection.StartPos.PageIndex,
+                MouseEvent :
+                {
+                    // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
+                    ClickCount : this.Selection.StartPos.MouseEvent.ClickCount,
+                    Type       : this.Selection.StartPos.MouseEvent.Type,
+                    CtrlKey    : this.Selection.StartPos.MouseEvent.CtrlKey
+                }
             },
             EndPos   :
             {
-                Pos : { Row : this.Selection.EndPos.Pos.Row, Cell : this.Selection.EndPos.Pos.Cell },
-                X   : this.Selection.EndPos.X,
-                Y   : this.Selection.EndPos.Y
+                Pos        : { Row : this.Selection.EndPos.Pos.Row, Cell : this.Selection.EndPos.Pos.Cell },
+                X          : this.Selection.EndPos.X,
+                Y          : this.Selection.EndPos.Y,
+                PageIndex  : this.Selection.EndPos.PageIndex,
+                MouseEvent :
+                {
+                    // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
+                    ClickCount : this.Selection.EndPos.MouseEvent.ClickCount,
+                    Type       : this.Selection.EndPos.MouseEvent.Type,
+                    CtrlKey    : this.Selection.EndPos.MouseEvent.CtrlKey
+                }
             },
             Type     : this.Selection.Type,
             Data     : null,
@@ -5862,15 +5878,31 @@ CTable.prototype =
             Use      : TableState.Selection.Use,
             StartPos :
             {
-                Pos : { Row : TableState.Selection.StartPos.Pos.Row, Cell : TableState.Selection.StartPos.Pos.Cell },
-                X   : TableState.Selection.StartPos.X,
-                Y   : TableState.Selection.StartPos.Y
+                Pos        : { Row : TableState.Selection.StartPos.Pos.Row, Cell : TableState.Selection.StartPos.Pos.Cell },
+                X          : TableState.Selection.StartPos.X,
+                Y          : TableState.Selection.StartPos.Y,
+                PageIndex  : TableState.Selection.StartPos.PageIndex,
+                MouseEvent :
+                {
+                    // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
+                    ClickCount : TableState.Selection.StartPos.MouseEvent.ClickCount,
+                    Type       : TableState.Selection.StartPos.MouseEvent.Type,
+                    CtrlKey    : TableState.Selection.StartPos.MouseEvent.CtrlKey
+                }                
             },
             EndPos   :
             {
-                Pos : { Row : TableState.Selection.EndPos.Pos.Row, Cell : TableState.Selection.EndPos.Pos.Cell },
-                X   : TableState.Selection.EndPos.X,
-                Y   : TableState.Selection.EndPos.Y
+                Pos        : { Row : TableState.Selection.EndPos.Pos.Row, Cell : TableState.Selection.EndPos.Pos.Cell },
+                X          : TableState.Selection.EndPos.X,
+                Y          : TableState.Selection.EndPos.Y,
+                PageIndex  : TableState.Selection.EndPos.PageIndex,
+                MouseEvent :
+                {
+                    // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
+                    ClickCount : TableState.Selection.EndPos.MouseEvent.ClickCount,
+                    Type       : TableState.Selection.EndPos.MouseEvent.Type,
+                    CtrlKey    : TableState.Selection.EndPos.MouseEvent.CtrlKey
+                }
             },
             Type     : TableState.Selection.Type,
             Data     : null,

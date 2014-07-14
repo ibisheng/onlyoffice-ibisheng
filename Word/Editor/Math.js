@@ -1306,10 +1306,9 @@ ParaMath.prototype =
 
 
                     //////////
-
+                    
                     SearchPos.InText = true;
                     SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
-
                 }
                 else if(startDx < endDx)
                 {

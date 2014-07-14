@@ -3031,7 +3031,19 @@ Paragraph.prototype =
                     pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
                     pGraphics.df();
 
-                    DocumentComments.Add_DrawingRect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Page_abs, Element.Additional.CommentId);
+                    if ( this.Parent && this.Parent.Parent && this.Parent.Parent.transformText )
+                    {
+                        var TextTransform = this.Parent.Parent.transformText;
+
+                        var _x0 = TextTransform.TransformPointX( Element.x0, Element.y0 );
+                        var _y0 = TextTransform.TransformPointY( Element.x0, Element.y0 );
+                        var _x1 = TextTransform.TransformPointX( Element.x1, Element.y1 );
+                        var _y1 = TextTransform.TransformPointY( Element.x1, Element.y1 );
+
+                        DocumentComments.Add_DrawingRect(_x0, _y0, _x1 - _x0, _y1 - _y0, Page_abs, Element.Additional.CommentId);
+                    }
+                    else
+                        DocumentComments.Add_DrawingRect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Page_abs, Element.Additional.CommentId);
 
                     Element = aComm.Get_Next();
                 }
@@ -4863,6 +4875,9 @@ Paragraph.prototype =
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
+            
+            if ( false === SearchPos.InText )
+                SearchPos.InTextPos.Update2( CurPos, 0 );
 
             if ( true === Item.Get_ParaContentPosByXY( SearchPos, 1, CurLine, CurRange, StepEnd ) )
                 SearchPos.Pos.Update2( CurPos, 0 );
@@ -7013,10 +7028,14 @@ Paragraph.prototype =
                 return false;
 
             var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
-            var CurPos = SearchPosXY.Pos.Get(0);
+            
+            if ( true === SearchPosXY.InText )
+            {
+                var CurPos = SearchPosXY.InTextPos.Get(0);
 
-            if ( SearchPosXY.Pos.Compare( SelSP ) >= 0 && SearchPosXY.Pos.Compare( SelEP ) <= 0 && ( para_Math !== this.Content[CurPos].Type || true !== this.Content[CurPos].Selection_IsPlaceholder() ) )
-                return true;
+                if ( SearchPosXY.InTextPos.Compare( SelSP ) >= 0 && SearchPosXY.InTextPos.Compare( SelEP ) <= 0 && ( para_Math !== this.Content[CurPos].Type || true !== this.Content[CurPos].Selection_IsPlaceholder() ) )
+                    return true;
+            }
 
             return false;
         }
@@ -14095,7 +14114,8 @@ function CParagraphSearchPos()
 
 function CParagraphSearchPosXY()
 {
-    this.Pos = new CParagraphContentPos();
+    this.Pos       = new CParagraphContentPos();
+    this.InTextPos = new CParagraphContentPos();
 
     this.CurX           = 0;
     this.X              = 0;

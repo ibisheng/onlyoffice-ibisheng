@@ -1416,6 +1416,9 @@ ParaHyperlink.prototype =
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
+            
+            if ( false === SearchPos.InText )
+                SearchPos.InTextPos.Update2( CurPos, Depth );
 
             if ( true === Item.Get_ParaContentPosByXY( SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd ) )
             {

@@ -3636,6 +3636,7 @@ ParaRun.prototype =
 
                 if ( Diff >= - 0.001 && Diff <= TempDx + 0.001 )
                 {
+                    SearchPos.InTextPos.Update( CurPos, Depth );
                     SearchPos.InText = true;
                 }
             }

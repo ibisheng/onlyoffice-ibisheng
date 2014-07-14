@@ -8543,12 +8543,6 @@ CDocument.prototype =
                     Item.Select_All();
             }
             
-            if ( PrevClass.Correct_Content )
-            {
-                PrevClass.Correct_Content();
-                PrevPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
-            }
-
             if ( true === bNeedSelect )
             {
                 PrevClass.Selection.Use = true;
@@ -8568,6 +8562,11 @@ CDocument.prototype =
                 this.Selection.Use      = true;
                 this.Selection.StartPos = DstIndex;
                 this.Selection.EndPos   = DstIndex;
+            }
+
+            if ( PrevClass.Correct_Content )
+            {
+                PrevClass.Correct_Content();
             }
         }
         else
@@ -9935,8 +9934,15 @@ CDocument.prototype =
                 {
                     var Comment_PageNum = Comment.m_oStartInfo.PageNum;
                     var Comment_Y       = Comment.m_oStartInfo.Y;
-                    var Comment_X       = this.Get_PageLimits(PageIndex).XLimit;
+                    var Comment_X       = this.Get_PageLimits(PageIndex).XLimit;                    
+                    var Para            = g_oTableId.Get_ById( Comment.StartId );
 
+                    if ( null !== Para && Para.Parent && Para.Parent.Parent && Para.Parent.Parent.transformText )
+                    {
+                        var TextTransform = Para.Parent.Parent.transformText;
+                        Comment_Y = TextTransform.TransformPointY( Comment.m_oStartInfo.X, Comment.m_oStartInfo.Y );
+                    }
+                    
                     var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
                     this.Select_Comment( Comment.Get_Id() );
                     editor.sync_ShowComment( Comment.Get_Id(), Coords.X, Coords.Y );
@@ -12754,6 +12760,14 @@ CDocument.prototype =
             var Comment_PageNum = Comment.m_oStartInfo.PageNum;
             var Comment_Y       = Comment.m_oStartInfo.Y;
             var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
+            var Para            = g_oTableId.Get_ById( Comment.StartId );
+
+            if ( null !== Para && Para.Parent && Para.Parent.Parent && Para.Parent.Parent.transformText )
+            {
+                var TextTransform = Para.Parent.Parent.transformText;                
+                Comment_Y = TextTransform.TransformPointY( Comment.m_oStartInfo.X, Comment.m_oStartInfo.Y );
+            }
+
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
             editor.sync_UpdateCommentPosition( Comment.Get_Id(), Coords.X, Coords.Y );
         }
