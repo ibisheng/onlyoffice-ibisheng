@@ -1710,6 +1710,11 @@ CAutoshapeTrack.prototype =
         var len_x2 = Math.abs(w_dist*(x2-x1)/len);
         var len_y2 = Math.abs(w_dist*(y2-y1)/len);
 
+		if (len_x1 < 0.01 && len_y1 < 0.01)
+			return;
+		if (len_x2 < 0.01 && len_y2 < 0.01)
+			return;
+
         if (x1 <= x2 && y1 <= y2)
         {
             for (var i = x1, j = y1; i <= x2 && j <= y2; i += len_x2, j += len_y2)
