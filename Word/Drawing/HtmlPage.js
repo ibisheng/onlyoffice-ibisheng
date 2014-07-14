@@ -259,10 +259,29 @@ function CEditorPage(api)
 
         var el = document.getElementById(this.Name);
 
-        if (this.Width != el.offsetWidth || this.Height != el.offsetHeight)
+		var _newW = el.offsetWidth;
+		var _newH = el.offsetHeight;
+
+		var _left_border_w = 0;
+		if (window.getComputedStyle)
+		{
+			var _computed_style = window.getComputedStyle(el, null);
+			if (_computed_style)
+			{
+				var _value = _computed_style.getPropertyValue("border-left-width");
+
+				if (typeof _value == "string")
+				{
+					_left_border_w = parseInt(_value);
+				}
+			}
+		}
+
+		_newW -= _left_border_w;
+        if (this.Width != _newW || this.Height != _newH)
         {
-            this.Width = el.offsetWidth;
-            this.Height = el.offsetHeight;
+            this.Width = _newW;
+            this.Height = _newH;
             return true;
         }
         return false;
