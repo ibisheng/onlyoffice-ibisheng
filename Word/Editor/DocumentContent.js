@@ -1162,7 +1162,7 @@ CDocumentContent.prototype =
         }
         
         if ( this.LogicDocument )
-            LogicDocument.DrawingObjects.drawWrappingObjectsInContent(this.Get_StartPage_Absolute() + PageNum, this);
+            this.LogicDocument.DrawingObjects.drawWrappingObjectsInContent(this.Get_StartPage_Absolute() + PageNum, pGraphics, this);
 
         var Page_StartPos = this.Pages[PageNum].Pos;
         var Page_EndPos   = this.Pages[PageNum].EndPos;
