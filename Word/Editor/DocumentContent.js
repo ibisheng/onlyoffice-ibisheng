@@ -1160,6 +1160,9 @@ CDocumentContent.prototype =
             pGraphics.AddClipRect( this.ClipInfo.X0, Bounds.Top - Correction, Math.abs(this.ClipInfo.X1 - this.ClipInfo.X0), Bounds.Bottom - Bounds.Top + Correction);
             bClip = true;
         }
+        
+        if ( this.LogicDocument )
+            LogicDocument.DrawingObjects.drawWrappingObjectsInContent(this.Get_StartPage_Absolute() + PageNum, this);
 
         var Page_StartPos = this.Pages[PageNum].Pos;
         var Page_EndPos   = this.Pages[PageNum].EndPos;
@@ -1170,7 +1173,6 @@ CDocumentContent.prototype =
 
         if ( true === bClip )
         {
-            //pGraphics.RemoveClipRect();
             pGraphics.RestoreGrState();
         }
     },
@@ -3923,12 +3925,6 @@ CDocumentContent.prototype =
                     Item.Select_All();
             }
 
-            if ( PrevClass.Correct_Content )
-            {
-                PrevClass.Correct_Content();
-                PrevPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
-            }
-
             if ( true === bNeedSelect )
             {
                 PrevClass.Selection.Use = true;
@@ -3949,6 +3945,11 @@ CDocumentContent.prototype =
                 this.Selection.StartPos = DstIndex;
                 this.Selection.EndPos   = DstIndex;
             }
+
+            if ( PrevClass.Correct_Content )
+            {
+                PrevClass.Correct_Content();
+            }            
         }
         else
         {
