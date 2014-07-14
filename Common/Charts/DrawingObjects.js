@@ -2742,7 +2742,7 @@ function DrawingObjects() {
                             }
                         }
                     }
-                    worksheet._updateCellsRange({r1: 0, r2: Math.max(worksheet.nRowsCount - 1, max_r), c1: 0, c2: Math.max(worksheet.nColsCount - 1, max_c)});
+                    worksheet._updateCellsRange(new asc_Range(0, 0, Math.max(worksheet.nColsCount - 1, max_c),  Math.max(worksheet.nRowsCount - 1, max_r)));
                     _this.showDrawingObjects(false);
                     _this.controller.selectObject(oNewChartSpace, 0);
                     _this.sendGraphicObjectProps();
