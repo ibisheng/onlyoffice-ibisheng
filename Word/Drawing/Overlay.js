@@ -2630,6 +2630,18 @@ CSlideBoundsChecker.prototype =
         }
     },
 
+	CheckLineWidth : function(shape)
+	{
+		if (!shape)
+			return;
+		var _ln = shape.pen;
+		if (_ln != null || _ln.Fill != null || _ln.Fill.fill != null)
+		{
+			this.LineWidth = (_ln.w == null) ? 12700 : parseInt(_ln.w);
+			this.LineWidth /= 36000.0;
+		}
+	},
+
     DrawLockObjectRect : function()
     {
     },

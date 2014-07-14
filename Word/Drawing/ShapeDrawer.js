@@ -1804,7 +1804,9 @@ function ShapeToImageConverter(shape, pageIndex)
     _bounds_cheker.transform(1,0,0,1,0,0);
 
     _bounds_cheker.AutoCheckLineWidth = true;
+	_bounds_cheker.CheckLineWidth(shape);
     shape.draw(_bounds_cheker, /*pageIndex*/0);
+	_bounds_cheker.CorrectBounds2();
 
     var _need_pix_width     = _bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1;
     var _need_pix_height    = _bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1;

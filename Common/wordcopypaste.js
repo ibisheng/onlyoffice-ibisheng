@@ -5603,7 +5603,7 @@ PasteProcessor.prototype =
                             var oDrawingDocument = this.oDocument.DrawingDocument;
                             if(oTargetDocument && oDrawingDocument)
                             {
-								Drawing = CreateImageFromBinary(sSrc, nWidth, nHeight);
+								var Drawing = CreateImageFromBinary(sSrc, nWidth, nHeight);
 								// oTargetDocument.DrawingObjects.Add( Drawing );
 
                                 this._Paragraph_Add( Drawing );
