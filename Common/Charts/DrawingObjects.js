@@ -2604,7 +2604,13 @@ function DrawingObjects() {
                         pos_y = 0;
                     }
 
-                    oNewChartSpace.spPr.xfrm.setOffX(70);
+                    var canvas_width = worksheet.drawingCtx.getWidth(3);
+                    var pos_x = (canvas_width - oNewChartSpace.spPr.xfrm.extX)/2;
+                    if(pos_x < 0)
+                    {
+                        pos_x = 0;
+                    }
+                    oNewChartSpace.spPr.xfrm.setOffX(pos_x);
                     oNewChartSpace.spPr.xfrm.setOffY(pos_y);
                     oNewChartSpace.recalculate();
 
