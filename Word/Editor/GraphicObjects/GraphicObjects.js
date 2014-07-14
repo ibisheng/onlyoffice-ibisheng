@@ -1829,12 +1829,29 @@ CGraphicObjects.prototype =
         var first_paragraph = objects_for_grouping[0].parent.Get_ParentParagraph();
         var nearest_pos = this.document.Get_NearestPos(objects_for_grouping[0].parent.pageIndex, common_bounds.minX, common_bounds.minY, true, para_drawing);
 
-
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
         }
         para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
+        para_drawing.Set_Props(new CImgProperty(
+            {
+                PositionH:
+                {
+                    RelativeFrom: c_oAscRelativeFromH.Page,
+                    UseAlign : false,
+                    Align    : undefined,
+                    Value    : common_bounds.minX
+                },
+
+                PositionV:
+                {
+                    RelativeFrom: c_oAscRelativeFromV.Page,
+                    UseAlign    : false,
+                    Align       : undefined,
+                    Value       : common_bounds.minY
+                }
+            }));
         para_drawing.Add_ToDocument2(first_paragraph);
         this.addGraphicObject(para_drawing);
         this.resetSelection();
