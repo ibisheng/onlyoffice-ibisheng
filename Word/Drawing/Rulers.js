@@ -1325,12 +1325,15 @@ function CHorRuler()
                 var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
                 if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < this.m_dIndentLeft || (this.m_dCurrentTabNewPosition + _margin_left) > (_margin_right - this.m_dIndentRight))
                 {
-                    this.m_arrTabs.splice(this.m_lCurrentTab, 1);
+					if (-1 != this.m_lCurrentTab)
+						this.m_arrTabs.splice(this.m_lCurrentTab, 1);
                 }
                 else
                 {
-                    this.m_arrTabs[this.m_lCurrentTab].pos = this.m_dCurrentTabNewPosition;
+					if (this.m_lCurrentTab < this.m_arrTabs.length)
+						this.m_arrTabs[this.m_lCurrentTab].pos = this.m_dCurrentTabNewPosition;
                 }
+
                 this.m_lCurrentTab = -1;
                 this.CorrectTabs();
                 this.m_oWordControl.UpdateHorRuler();
@@ -1407,11 +1410,13 @@ function CHorRuler()
                 var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
                 if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < this.m_dIndentLeft || (this.m_dCurrentTabNewPosition + _margin_left) > (_margin_right - this.m_dIndentRight))
                 {
-                    this.m_arrTabs.splice(this.m_lCurrentTab, 1);
+					if (-1 != this.m_lCurrentTab)
+						this.m_arrTabs.splice(this.m_lCurrentTab, 1);
                 }
                 else
                 {
-                    this.m_arrTabs[this.m_lCurrentTab].pos = this.m_dCurrentTabNewPosition;
+					if (this.m_lCurrentTab < this.m_arrTabs.length)
+						this.m_arrTabs[this.m_lCurrentTab].pos = this.m_dCurrentTabNewPosition;
                 }
                 this.m_lCurrentTab = -1;
                 this.CorrectTabs();
@@ -1656,7 +1661,7 @@ function CHorRuler()
                 context.stroke();
             }
 
-            if (-1 != this.m_lCurrentTab)
+            if (-1 != this.m_lCurrentTab && this.m_lCurrentTab < this.m_arrTabs.length)
             {
                 var _tab = this.m_arrTabs[this.m_lCurrentTab];
                 var _x = parseInt((_margin_left + _tab.pos) * dKoef_mm_to_pix) + left;
