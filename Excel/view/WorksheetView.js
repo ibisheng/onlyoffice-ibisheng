@@ -7721,7 +7721,7 @@
 				t.activeMoveRange = null;
 				t.startCellMoveRange = null;
 				t.isChanged = true;
-				t._updateCellsRange(new Range(0, 0, arnFrom.c2 > arnTo.c2 ? arnFrom.c2 : arnTo.c2,
+				t._updateCellsRange(new asc_Range(0, 0, arnFrom.c2 > arnTo.c2 ? arnFrom.c2 : arnTo.c2,
 					arnFrom.r2 > arnTo.r2 ? arnFrom.r2 : arnTo.r2), /*canChangeColWidth*/c_oAscCanChangeColWidth.none);
 				// Перерисовываем
 				t.cleanSelection();
@@ -7780,7 +7780,7 @@
 				t.activeMoveRange = null;
 				t.startCellMoveRange = null;
 				t.isChanged = true;
-				t._updateCellsRange(new Range(0, 0, arnFrom.c2 > arnTo.c2 ? arnFrom.c2 : arnTo.c2,
+				t._updateCellsRange(new asc_Range(0, 0, arnFrom.c2 > arnTo.c2 ? arnFrom.c2 : arnTo.c2,
 					arnFrom.r2 > arnTo.r2 ? arnFrom.r2 : arnTo.r2), /*canChangeColWidth*/c_oAscCanChangeColWidth.none);
 				// Перерисовываем
 				t.cleanSelection();
