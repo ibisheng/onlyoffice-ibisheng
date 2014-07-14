@@ -1632,10 +1632,20 @@ CDocumentRenderer.prototype =
                 this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img,x,y,w,h);
             else
             {
+				/*
                 if (!window.editor)
-                    this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img,x,y,w,h);
+				{
+					this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img,x,y,w,h);
+					return;
+				}
+				*/
 
-                var _img = window.editor.ImageLoader.map_image_index[img];
+				var _img = undefined;
+				if (window.editor)
+					_img = window.editor.ImageLoader.map_image_index[img];
+				else if (window["Asc"]["editor"])
+					_img = window["Asc"]["editor"].ImageLoader.map_image_index[img];
+
                 var w0 = 0;
                 var h0 = 0;
                 if (_img != undefined && _img.Image != null)
