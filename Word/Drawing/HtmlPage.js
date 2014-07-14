@@ -3946,6 +3946,9 @@ function CEditorPage(api)
         var _width = _p.firstChild.offsetWidth;
         _width = Math.min(_width + 10, this.TextBoxMaxWidth);
 
+		if (AscBrowser.isIE)
+			_width += 10;
+
         var area = document.createElement('textarea');
         area.style.zIndex = "-1";
         area.id = "area2_id";
