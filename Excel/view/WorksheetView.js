@@ -10546,10 +10546,10 @@
 		};
 
 		WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
-			var t = this, r, c, h, d, ct, isMerged;
+			var r, c, h, d, ct, isMerged;
 			var mergedRange, bUpdateRowHeight;
 
-			if (range === undefined) {range = t.activeRange.clone(true);}
+			if (range === undefined) {range = this.activeRange.clone(true);}
 
 			if(gc_nMaxCol0 === range.c2 || gc_nMaxRow0 === range.r2)
 			{
@@ -10560,23 +10560,29 @@
 					range.r2 = this.rows.length - 1;
 			}
 
-			t._cleanCache(range);
+			this._cleanCache(range);
 
 			// Если размер диапазона превышает размер видимой области больше чем в 3 раза, то очищаем весь кэш
-			if (t._isLargeRange(range)) {
-				t.changeWorksheet("update", {lockDraw: lockDraw});
+			if (this._isLargeRange(range)) {
+				this.changeWorksheet("update", {lockDraw: lockDraw});
 				return;
 			}
 
+			// Заглушка для бага http://bugzserver/show_bug.cgi?id=25420
+			// Обновление делаем только для диапазона, пересекающегося с visibleRange
+			range = range.intersectionSimple(this.visibleRange);
+			if (null === range)
+				return;
+
 			var cto;
 			for (r = range.r1; r <= range.r2; ++r) {
-				if (t.height_1px > t.rows[r].height) {continue;}
+				if (this.height_1px > this.rows[r].height) {continue;}
 				for (c = range.c1; c <= range.c2; ++c) {
-					if (t.width_1px > t.cols[c].width) {continue;}
-					c = t._addCellTextToCache(c, r, canChangeColWidth); // may change member 'this.isChanged'
+					if (this.width_1px > this.cols[c].width) {continue;}
+					c = this._addCellTextToCache(c, r, canChangeColWidth); // may change member 'this.isChanged'
 				}
-				for (h = t.defaultRowHeight, d = t.defaultRowDescender, c = 0; c < t.cols.length; ++c) {
-					ct = t._getCellTextCache(c, r, true);
+				for (h = this.defaultRowHeight, d = this.defaultRowDescender, c = 0; c < this.cols.length; ++c) {
+					ct = this._getCellTextCache(c, r, true);
 					if (!ct) {continue;}
 
 					/**
@@ -10584,7 +10590,7 @@
 					 * С помощью этой правки уйдем от обновления всей строки при каких-либо действиях
 					 */
 					if ((c < range.c1 || c > range.c2) && (0 !== ct.sideL || 0 !== ct.sideR)) {
-						cto = t._calcCellTextOffset(c, r, ct.cellHA, ct.metrics.width);
+						cto = this._calcCellTextOffset(c, r, ct.cellHA, ct.metrics.width);
 						ct.cellW = cto.maxWidth;
 						ct.sideL = cto.leftSide;
 						ct.sideR = cto.rightSide;
@@ -10606,35 +10612,35 @@
 						d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
 					}
 				}
-				if (Math.abs(h - t.rows[r].height) > 0.000001 && !t.rows[r].isCustomHeight) {
-					if (!t.rows[r].isDefaultHeight) {
-						t.rows[r].heightReal = t.rows[r].height = Math.min(h, t.maxRowHeight);
-						t.model.setRowHeight(t.rows[r].height + this.height_1px, r, r);
-						t.isChanged = true;
+				if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
+					if (!this.rows[r].isDefaultHeight) {
+						this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeight);
+						this.model.setRowHeight(this.rows[r].height + this.height_1px, r, r);
+						this.isChanged = true;
 					}
 				}
-				if (Math.abs(d - t.rows[r].descender) > 0.000001) {
-					t.rows[r].descender = d;
-					t.isChanged = true;
+				if (Math.abs(d - this.rows[r].descender) > 0.000001) {
+					this.rows[r].descender = d;
+					this.isChanged = true;
 				}
 			}
 
-			if (t.isChanged) {
-				t.isChanged = false;
-				t._initCellsArea(true);
-				t.cache.reset();
-				t._cleanCellsTextMetricsCache();
-				t._prepareCellTextMetricsCache(t.visibleRange);
-				t.handlers.trigger("reinitializeScroll");
-				t.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				t.handlers.trigger("selectionChanged", t.getSelectionInfo());
-				t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
+			if (this.isChanged) {
+				this.isChanged = false;
+				this._initCellsArea(true);
+				this.cache.reset();
+				this._cleanCellsTextMetricsCache();
+				this._prepareCellTextMetricsCache(this.visibleRange);
+				this.handlers.trigger("reinitializeScroll");
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			}
 
-			t.objectRender.rebuildChartGraphicObjects(new CChangeTableData(range, null, null, null));
-			t.cellCommentator.updateCommentPosition();
-			t.handlers.trigger("onDocumentPlaceChanged");
-			t.draw(lockDraw);
+			this.objectRender.rebuildChartGraphicObjects(new CChangeTableData(range, null, null, null));
+			this.cellCommentator.updateCommentPosition();
+			this.handlers.trigger("onDocumentPlaceChanged");
+			this.draw(lockDraw);
 		};
 
 		WorksheetView.prototype.enterCellRange = function (editor) {
