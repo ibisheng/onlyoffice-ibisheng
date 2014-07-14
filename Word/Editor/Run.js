@@ -6421,7 +6421,60 @@ ParaRun.prototype =
 
                 break;
             }
-
+			case historyitem_ParaRun_MathStyle:
+			{
+				// Bool : undefined ?
+                // false -> Long
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+				break;
+			}
+			case historyitem_ParaRun_MathPrp:
+			{
+				var StartPos = Writer.GetCurPosition();
+				Writer.Skip(4);
+				var Flags = 0;
+				if ( undefined != this.MathPrp.aln )
+				{
+					Writer.WriteBool( this.MathPrp.aln );
+					Flags |= 1;
+				}
+				if ( undefined != this.MathPrp.brk )
+				{
+					Writer.WriteBool( this.MathPrp.brk );
+					Flags |= 2;
+				}
+				if ( undefined != this.MathPrp.lit )
+				{
+					Writer.WriteBool( this.MathPrp.lit );
+					Flags |= 4;
+				}
+				if ( undefined != this.MathPrp.nor )
+				{
+					Writer.WriteBool( this.MathPrp.nor );
+					Flags |= 8;
+				}
+				if ( undefined != this.MathPrp.scr )
+				{
+					Writer.WriteLong( this.MathPrp.scr );
+					Flags |= 16;
+				}
+				if ( undefined != this.MathPrp.sty )
+				{
+					Writer.WriteLong( this.MathPrp.sty );
+					Flags |= 32;
+				}
+				var EndPos = Writer.GetCurPosition();
+				Writer.Seek( StartPos );
+				Writer.WriteLong( Flags );
+				Writer.Seek( EndPos );
+				break;
+			}
         }
 
         return Writer;
@@ -6967,8 +7020,37 @@ ParaRun.prototype =
 
                 break;
             }
-                
-                
+			case historyitem_ParaRun_MathStyle:
+			{
+				// Bool : undefined ?
+                // false -> Long
+                if ( false === Reader.GetBool() )
+                    this.MathPrp.sty = Reader.GetLong();
+                else
+                    this.MathPrp.sty = undefined;
+					
+				this.Recalc_CompiledPr(true);
+				break;
+			}
+			case historyitem_ParaRun_MathPrp:
+			{
+				var Flags = Reader.GetLong();
+				if ( Flags & 1 )
+					this.MathPrp.aln = Reader.GetBool();
+				if ( Flags & 2 )
+					this.MathPrp.brk = Reader.GetBool();
+				if ( Flags & 4 )
+					this.MathPrp.lit = Reader.GetBool();
+				if ( Flags & 8 )
+					this.MathPrp.nor = Reader.GetBool();
+				if ( Flags & 16 )
+					this.MathPrp.scr = Reader.GetLong();
+				if ( Flags & 32 )
+					this.MathPrp.sty = Reader.GetLong();
+					
+				this.Recalc_CompiledPr(true);
+				break;
+			}
         }
     },
 

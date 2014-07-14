@@ -5268,17 +5268,6 @@ CMathContent.prototype =
 					
 					Writer.WriteLong( Data.Pos + Index );
 					Writer.WriteString2( oElem.Id );					
-					Writer.WriteLong( typeObj );	
-					
-					if (typeObj == MATH_PARA_RUN)
-					{
-						Writer.WriteBool(oElem.MathPrp.aln);
-						Writer.WriteBool(oElem.MathPrp.bold);
-						Writer.WriteBool(oElem.MathPrp.brk);
-						Writer.WriteBool(oElem.MathPrp.italic);
-						Writer.WriteBool(oElem.MathPrp.lit);
-						Writer.WriteLong(oElem.MathPrp.typeText);
-					}
                 }
                 break;
             }
@@ -5319,20 +5308,6 @@ CMathContent.prototype =
                 {
                     var Pos     = Reader.GetLong();
 					var Element = g_oTableId.Get_ById( Reader.GetString2() );
-					var typeObj = Reader.GetLong();
-
-					if (typeObj == MATH_PARA_RUN)
-					{
-						var MathPrp = new CMPrp();
-						MathPrp.aln = Reader.GetBool();
-						MathPrp.bold = Reader.GetBool();
-						MathPrp.brk = Reader.GetBool();
-						MathPrp.italic = Reader.GetBool();
-						MathPrp.lit = Reader.GetBool();
-						Element.MathPrp = MathPrp;
-						Element.typeObj = typeObj;
-					}
-					this.DeleteEmptyRuns();
 					this.content.splice( Pos, 0, Element );
 					this.SetRunEmptyToContent(true);
                 }
@@ -7089,7 +7064,7 @@ CMathContent.prototype =
 	{
         oElem.Parent = this;
 
-        if(oElem.typeObj === MATH_COMP)
+        if(oElem.Type === para_Math_Composition)
         {
             oElem.setArgSize(this.argSize);
             this.content.splice(Pos,0,oElem);

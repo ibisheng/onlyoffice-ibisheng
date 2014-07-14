@@ -894,6 +894,7 @@ var historyitem_ParaRun_TextPr          = 29; // �������� ��
 var historyitem_ParaRun_Unifill         = 30; // �������� ��� ��������� �������
 var historyitem_ParaRun_Shd             = 31;
 var historyitem_ParaRun_MathStyle       = 32; // Меняем стиль MathPr
+var historyitem_ParaRun_MathPrp			= 33;
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку

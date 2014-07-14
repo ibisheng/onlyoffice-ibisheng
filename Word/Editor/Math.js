@@ -168,7 +168,7 @@ ParaMath.prototype =
 		}
 		else if ( para_Math === Type )
 		{
-			if (oStartContent.typeObj == MATH_PLACEHOLDER)
+			if (oStartContent.Type == para_Math_Run && oStartContent.IsPlaceholder())
 			{
 				History.Create_NewPoint();
 				
@@ -227,16 +227,16 @@ ParaMath.prototype =
 		{
 			var oElem = oContent.Content.getElem(oContent.Start);
 			
-			if (oElem.typeObj == MATH_COMP)
+			if (oElem.Type == para_Math_Composition)
 				this.RemoveElem(oContent, Direction, bOnAddText);
-			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == false)
+			else if (oElem.Type == para_Math_Run && oElem.IsPlaceholder() && bOnAddText == false)
 			{
 				var Comp = oContent.Content.GetParent();
 				Comp.SetSelectAll();
 				Comp.SelectToParent();
 				this.bSelectionUse = true;
 			}
-			else if (oElem.typeObj == MATH_PLACEHOLDER && bOnAddText == true)
+			else if (oElem.Type == para_Math_Run && oElem.IsPlaceholder() && bOnAddText == true)
 			{
 				History.Create_NewPoint();
 				
@@ -261,7 +261,7 @@ ParaMath.prototype =
 					if (oContent.Content.CurPos - 1 >= 0)//слева есть элементы
 					{
 						var prevElem = oContent.Content.getElem(oContent.Start - 1);
-						if (prevElem.typeObj == MATH_COMP) //слева композиция
+						if (prevElem.Type == para_Math_Composition) //слева композиция
 						{
 							this.Set_Select_ToMComp(Direction);
 							return;
@@ -302,7 +302,7 @@ ParaMath.prototype =
 					else //справа есть элемент
 					{
 						var nextElem = oContent.Content.getElem(oContent.Start + 1);
-						if (nextElem.typeObj == MATH_COMP) //справа композиция
+						if (nextElem.typeObj == para_Math_Composition) //справа композиция
 						{
 							this.Set_Select_ToMComp(Direction);
 							return;

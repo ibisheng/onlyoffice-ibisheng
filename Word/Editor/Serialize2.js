@@ -1827,9 +1827,9 @@ function Binary_oMathWriter(memory, oMathPara)
 	{
 		var oThis = this;
 		var item = mathElem;
-		switch ( item.typeObj)
+		switch ( item.Type)
 		{
-			case MATH_COMP:
+			case para_Math_Composition:
 				{
 					switch (item.kind)
 					{
@@ -1872,15 +1872,13 @@ function Binary_oMathWriter(memory, oMathPara)
 					}
 					break;
 				}		
-			case MATH_TEXT:
+			case para_Math_Text:
 				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(String.fromCharCode(item.value));}); //m:t
 				break;
-			case MATH_PARA_RUN:
+			case para_Math_Run:
 				this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});
 				break;
-			case MATH_RUN_PRP:
-			case MATH_PLACEHOLDER:	
-			case MATH_EMPTY: 			
+			default:		
 				break;
 		}
 	},
@@ -8449,7 +8447,11 @@ function Binary_oMathReader(stream)
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.begChr = this.stream.GetString2LE(length).charCodeAt(0);
+			var text = this.stream.GetString2LE(length);
+			if (text == "")
+				props.begChr = OPERATOR_EMPTY;
+			else 
+				props.begChr = text.charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -9582,23 +9584,24 @@ function Binary_oMathReader(stream)
 				*/
             }
 
-			oMRun.Set_MathPrp(props);
 			if (oParent)	
 				oParent.addElementToContent(oMRun);
         }
 		else if (c_oSer_OMathContentType.MRPr === type)
         {
-			//<m:rPr>			
+			//<m:rPr>
+			var mrPr = new CMPrp();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathMRPr(t,l,props);
-            });						
+                return oThis.ReadMathMRPr(t,l,mrPr);
+            });
+			oMRun.Set_MathPr(mrPr);
         }
 		else if (c_oSer_OMathContentType.RPr === type)
 		{
 			//<w:rPr>
 			var rPr = new CTextPr();
 			res = this.brPrr.Read(length, rPr);	
-			oMRun.Pr = rPr;
+			oMRun.Set_Pr(rPr);
 		}
         else
             res = c_oSerConstants.ReadUnknown;
