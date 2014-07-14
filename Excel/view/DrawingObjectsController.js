@@ -341,7 +341,7 @@ DrawingObjectsController.prototype.createGroup = function()
 DrawingObjectsController.prototype.handleChartDoubleClick = function()
 {
     var drawingObjects = this.drawingObjects;
-    this.checkSelectedObjectsAndFireCallback(function(){this.drawingObjects.showChartSettings();}, []);
+    this.checkSelectedObjectsAndFireCallback(function(){drawingObjects.showChartSettings();}, []);
 };
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(options)

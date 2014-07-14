@@ -447,7 +447,7 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
             if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1)
                 && drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
             {
-                drawingObjects.handleChartDoubleClick(drawing.parent, drawing);
+                drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
             }
             drawingObjects.updateOverlay();
             return true;

@@ -373,7 +373,7 @@ DrawingObjectsController.prototype =
                     && object.getObjectType() === historyitem_type_ChartSpace && !bInSelect && this.handleChartDoubleClick)
                 {
                     var drawing = this.selectedObjects[0].parent;
-                    this.handleChartDoubleClick(drawing, object);
+                    this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
                 }
             }
             return true;
