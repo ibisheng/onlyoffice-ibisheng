@@ -1441,7 +1441,11 @@ CGraphicObjects.prototype =
 
     getHdrFtrObjectsByPageIndex: function(pageIndex)
     {
-        return this.graphicPages[pageIndex].hdrFtrPage;
+        if(this.graphicPages[pageIndex])
+        {
+            return this.graphicPages[pageIndex].hdrFtrPage;
+        }
+        return null;
     },
 
     getNearestPos: function(x, y, pageIndex, drawing)
@@ -1537,6 +1541,21 @@ CGraphicObjects.prototype =
         this.graphicPages[pageIndex].drawWrappingObjects(graphics);
         graphics.shapePageIndex = null;
     },
+
+    drawWrappingObjectsInContent: function(pageIndex, graphics, content)
+    {
+        var page;
+        if(content.Is_HdrFtr())
+        {
+            page = this.getHdrFtrObjectsByPageIndex(pageIndex);
+        }
+        else
+        {
+            page = this.graphicPages[pageIndex];
+        }
+        page && page.drawWrappingObjectsByContent(graphics, content)
+    },
+
 
     drawBeforeObjects: function(pageIndex, graphics)
     {

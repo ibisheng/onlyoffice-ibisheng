@@ -444,9 +444,29 @@ CGraphicPage.prototype =
 
     drawWrappingObjects: function(graphics)
     {
+        var drawing;
         for(var _object_index = 0; _object_index < this.wrappingObjects.length; ++_object_index)
-            this.wrappingObjects[_object_index].draw(graphics);
+        {
+            drawing = this.wrappingObjects[_object_index];
+            if(!(drawing.parent && drawing.parent.DocumentContent && drawing.parent.DocumentContent.Is_TableCellContent()))
+            {
+                drawing.draw(graphics);
+            }
+        }
+        graphics.SetIntegerGrid(true);
+    },
 
+    drawWrappingObjectsByContent: function(graphics, content)
+    {
+        var drawing;
+        for(var _object_index = 0; _object_index < this.wrappingObjects.length; ++_object_index)
+        {
+            drawing = this.wrappingObjects[_object_index];
+            if(drawing.parent && drawing.parent.DocumentContent && drawing.parent.DocumentContent === content)
+            {
+                drawing.draw(graphics);
+            }
+        }
         graphics.SetIntegerGrid(true);
     },
 
