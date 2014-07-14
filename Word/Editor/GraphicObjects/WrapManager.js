@@ -916,7 +916,7 @@ CWrapManager.prototype =
             {
                 for(index = 0; index < objects_count; ++index)
                 {
-                    if(arrGraphicObjects[index].DocumentContent === docContent)
+                    if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
                     {
                         arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
                     }
@@ -941,7 +941,7 @@ CWrapManager.prototype =
                     arrGraphicObjects = hdr_footer_objects.wrappingObjects;
                     for(index = 0; index < arrGraphicObjects.length; ++index)
                     {
-                        if(arrGraphicObjects[index].DocumentContent === docContent)
+                        if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
                         {
                             arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals);
                         }
