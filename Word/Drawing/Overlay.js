@@ -1178,7 +1178,19 @@ CAutoshapeTrack.prototype =
 									_w2 += 1;
 								}
 
-                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+								//ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+
+								var _matrix = matrix.CreateDublicate();
+								_matrix.tx = 0;
+								_matrix.ty = 0;
+								var _xx = _matrix.TransformPointX(0, 1);
+								var _yy = _matrix.TransformPointY(0, 1);
+								var _angle = Math.atan2(_xx, -_yy) - Math.PI;
+								var _px = Math.cos(_angle);
+								var _py = Math.sin(_angle);
+
+								ctx.translate(_xI, _yI);
+								ctx.transform(_px, _py, -_py, _px, 0, 0);
                                 ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
                                 ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -1513,9 +1525,21 @@ CAutoshapeTrack.prototype =
 									_w2 += 1;
 								}
 
-                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
+								//ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+
+								var _matrix = matrix.CreateDublicate();
+								_matrix.tx = 0;
+								_matrix.ty = 0;
+								var _xx = _matrix.TransformPointX(0, 1);
+								var _yy = _matrix.TransformPointY(0, 1);
+								var _angle = Math.atan2(_xx, -_yy) - Math.PI;
+								var _px = Math.cos(_angle);
+								var _py = Math.sin(_angle);
+
+								ctx.translate(_xI, _yI);
+								ctx.transform(_px, _py, -_py, _px, 0, 0);
+								ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+								ctx.setTransform(1, 0, 0, 1, 0, 0);
 
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
