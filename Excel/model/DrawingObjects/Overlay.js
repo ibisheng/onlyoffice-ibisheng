@@ -734,741 +734,996 @@ CAutoshapeTrack.prototype =
     /*************************************************************************/
     /******************************** TRACKS *********************************/
     /*************************************************************************/
-    DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate)
-    {
-        // с самого начала нужно понять, есть ли поворот. Потому что если его нет, то можно
-        // (и нужно!) рисовать все по-умному
-        var overlay = this.m_oOverlay;
-        overlay.Show();
+	DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate)
+	{
+		// с самого начала нужно понять, есть ли поворот. Потому что если его нет, то можно
+		// (и нужно!) рисовать все по-умному
+		var overlay = this.m_oOverlay;
+		overlay.Show();
 
-        var bIsClever = false;
-        this.CurrentPageInfo = overlay.m_oHtmlPage.GetDrawingPageInfo(this.PageIndex);
+		var bIsClever = false;
+		this.CurrentPageInfo = overlay.m_oHtmlPage.GetDrawingPageInfo(this.PageIndex);
 
-        var drPage = this.CurrentPageInfo.drawingPage;
+		var drPage = this.CurrentPageInfo.drawingPage;
 
-        var xDst = drPage.left + (this.Graphics ? this.Graphics.m_oCoordTransform.tx : 0);
+		var xDst = drPage.left + (this.Graphics ? this.Graphics.m_oCoordTransform.tx : 0);
         var yDst = drPage.top + (this.Graphics ? this.Graphics.m_oCoordTransform.ty : 0);
-        var wDst = drPage.right - drPage.left;
-        var hDst = drPage.bottom - drPage.top;
-
-        var dKoefX = wDst / this.CurrentPageInfo.width_mm;
-        var dKoefY = hDst / this.CurrentPageInfo.height_mm;
-
-        var r = left + width;
-        var b = top + height;
-
-        // (x1,y1) --------- (x2,y2)
-        //    |                 |
-        //    |                 |
-        // (x3,y3) --------- (x4,y4)
-
-        var x1 = (xDst + dKoefX * (matrix.TransformPointX(left, top))) >> 0;
-        var y1 = (yDst + dKoefY * (matrix.TransformPointY(left, top))) >> 0;
-
-        var x2 = (xDst + dKoefX * (matrix.TransformPointX(r, top))) >> 0;
-        var y2 = (yDst + dKoefY * (matrix.TransformPointY(r, top))) >> 0;
-
-        var x3 = (xDst + dKoefX * (matrix.TransformPointX(left, b))) >> 0;
-        var y3 = (yDst + dKoefY * (matrix.TransformPointY(left, b))) >> 0;
-
-        var x4 = (xDst + dKoefX * (matrix.TransformPointX(r, b))) >> 0;
-        var y4 = (yDst + dKoefY * (matrix.TransformPointY(r, b))) >> 0;
-
-        var ctx = overlay.m_oContext;
-
-        if (x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4 && x1 < x2 && y1 < y3)
-            bIsClever = true;
-
-        var bIsEllipceCorner = false;
-        //var _style_blue = "#4D7399";
-        //var _style_blue = "#B2B2B2";
-        var _style_blue = "#939393";
-        var _style_green = "#84E036";
-        var _style_white = "#FFFFFF";
-
-        var _len_x = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
-        var _len_y = Math.sqrt((x1 - x3)*(x1 - x3) + (y1 - y3)*(y1 - y3));
-
-        if (_len_x < 1)
-            _len_x = 1;
-        if (_len_y < 1)
-            _len_y = 1;
-
-        var bIsRectsTrackX = (_len_x >= 30) ? true : false;
-        var bIsRectsTrackY = (_len_y >= 30) ? true : false;
-        var bIsRectsTrack = (bIsRectsTrackX || bIsRectsTrackY) ? true : false;
-
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-
-        var _oldGlobalAlpha = ctx.globalAlpha;
-        ctx.globalAlpha = 1;
-
-        switch (type)
-        {
-            case TYPE_TRACK_SHAPE:
-            case TYPE_TRACK_GROUP:
-            {
-                if (bIsClever)
-                {
-                    overlay.CheckRect(x1, y1, x4 - x1, y4 - y1);
-                    ctx.strokeStyle = _style_blue;
-
-                    if (!isLine)
-                    {
-                        ctx.rect(x1 + 0.5, y2 + 0.5, x4 - x1, y4 - y1);
-                        ctx.stroke();
-                        ctx.beginPath();
-                    }
-
-                    var xC = ((x1 + x2) / 2) >> 0;
-
-                    if (!isLine && isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _w = IMAGE_ROTATE_TRACK_W;
-                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
-                                var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
-
-                                overlay.CheckRect(_xI, _yI, _w, _w);
-                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
-                            }
-                        }
-
-                        ctx.beginPath();
-                        ctx.moveTo(xC + 0.5, y1);
-                        ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                    }
-
-                    ctx.fillStyle = _style_white;
-
-                    if (bIsEllipceCorner)
-                    {
-                        overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                        if (!isLine)
-                        {
-                            overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                        }
-                        overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                    }
-                    else
-                    {
-                        overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
-                        if (!isLine)
-                        {
-                            overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
-                        }
-                        overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
-                    }
-
-                    if (bIsRectsTrack && !isLine)
-                    {
-                        var _xC = (((x1 + x2) / 2) >> 0) + 0.5;
-                        var _yC = (((y1 + y3) / 2) >> 0) + 0.5;
-
-                        if (bIsRectsTrackX)
-                        {
-                            overlay.AddRect2(_xC, y1+0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(_xC, y3+0.5, TRACK_RECT_SIZE);
-                        }
-
-                        if (bIsRectsTrackY)
-                        {
-                            overlay.AddRect2(x2+0.5, _yC, TRACK_RECT_SIZE);
-                            overlay.AddRect2(x1+0.5, _yC, TRACK_RECT_SIZE);
-                        }
-                    }
-
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                }
-                else
-                {
-                    ctx.strokeStyle = _style_blue;
-
-                    if (!isLine)
-                    {
-                        ctx.moveTo(x1, y1);
-                        ctx.lineTo(x2, y2);
-                        ctx.lineTo(x4, y4);
-                        ctx.lineTo(x3, y3);
-                        ctx.closePath();
-                        ctx.stroke();
-                    }
-
-                    overlay.CheckPoint(x1, y1);
-                    overlay.CheckPoint(x2, y2);
-                    overlay.CheckPoint(x3, y3);
-                    overlay.CheckPoint(x4, y4);
-
-                    var ex1 = (x2 - x1) / _len_x;
-                    var ey1 = (y2 - y1) / _len_x;
-                    var ex2 = (x1 - x3) / _len_y;
-                    var ey2 = (y1 - y3) / _len_y;
-
-                    var _bAbsX1 = Math.abs(ex1) < 0.01;
-                    var _bAbsY1 = Math.abs(ey1) < 0.01;
-                    var _bAbsX2 = Math.abs(ex2) < 0.01;
-                    var _bAbsY2 = Math.abs(ey2) < 0.01;
-
-                    if (_bAbsX2 && _bAbsY2)
-                    {
-                        if (_bAbsX1 && _bAbsY1)
-                        {
-                            ex1 = 1;
-                            ey1 = 0;
-                            ex2 = 0;
-                            ey2 = 1;
-                        }
-                        else
-                        {
-                            ex2 = -ey1;
-                            ey2 = ex1;
-                        }
-                    }
-                    else if (_bAbsX1 && _bAbsY1)
-                    {
-                        ex1 = ey2;
-                        ey1 = -ex2;
-                    }
-
-                    var xc1 = (x1 + x2) / 2;
-                    var yc1 = (y1 + y2) / 2;
-
-                    ctx.beginPath();
-
-                    if (!isLine && isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
-                                var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
-                                var _w = IMAGE_ROTATE_TRACK_W;
-                                var _w2 = IMAGE_ROTATE_TRACK_W / 2;
-
-                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                                overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
-                            }
-                        }
-
-                        ctx.beginPath();
-
-                        ctx.moveTo(xc1, yc1);
-                        ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                    }
-
-                    ctx.fillStyle = _style_white;
-
-                    if (bIsEllipceCorner)
-                    {
-                        overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                        if (!isLine)
-                        {
-                            overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                        }
-                        overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                    }
-                    else
-                    {
-                        overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        if (!isLine)
-                        {
-                            overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                        overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                    }
-
-                    if (bIsRectsTrack && !isLine)
-                    {
-                        if (bIsRectsTrackX)
-                        {
-                            overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                        if (bIsRectsTrackY)
-                        {
-                            overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                    }
-
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                }
-
-                break;
-            }
-            case TYPE_TRACK_TEXT:
-            case TYPE_TRACK_GROUP_PASSIVE:
-            {
-                if (bIsClever)
-                {
-                    overlay.CheckRect(x1, y1, x4 - x1, y4 - y1);
-                    this.AddRectDashClever(ctx, x1, y1, x4, y4, 8, 3);
-
-                    ctx.strokeStyle = _style_blue;
-                    ctx.stroke();
-
-                    ctx.beginPath();
-
-                    if (isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _w = IMAGE_ROTATE_TRACK_W;
-                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
-                                var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
-
-                                overlay.CheckRect(_xI, _yI, _w, _w);
-                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
-                            }
-                        }
-
-                        ctx.beginPath();
-
-                        var xC = ((x1 + x2) / 2) >> 0;
-                        ctx.moveTo(xC + 0.5, y1);
-                        ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                    }
-
-                    ctx.fillStyle = _style_white;
-
-                    if (bIsEllipceCorner)
-                    {
-                        overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                    }
-                    else
-                    {
-                        overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
-                    }
-
-                    if (bIsRectsTrack)
-                    {
-                        var _xC = (((x1 + x2) / 2) >> 0) + 0.5;
-                        var _yC = (((y1 + y3) / 2) >> 0) + 0.5;
-
-                        if (bIsRectsTrackX)
-                        {
-                            overlay.AddRect2(_xC, y1+0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(_xC, y3+0.5, TRACK_RECT_SIZE);
-                        }
-                        if (bIsRectsTrackY)
-                        {
-                            overlay.AddRect2(x2+0.5, _yC, TRACK_RECT_SIZE);
-                            overlay.AddRect2(x1+0.5, _yC, TRACK_RECT_SIZE);
-                        }
-                    }
-
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                }
-                else
-                {
-                    overlay.CheckPoint(x1, y1);
-                    overlay.CheckPoint(x2, y2);
-                    overlay.CheckPoint(x3, y3);
-                    overlay.CheckPoint(x4, y4);
-
-                    this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 8, 3);
-
-                    ctx.strokeStyle = _style_blue;
-                    ctx.stroke();
-
-                    var ex1 = (x2 - x1) / _len_x;
-                    var ey1 = (y2 - y1) / _len_x;
-                    var ex2 = (x1 - x3) / _len_y;
-                    var ey2 = (y1 - y3) / _len_y;
-
-                    var _bAbsX1 = Math.abs(ex1) < 0.01;
-                    var _bAbsY1 = Math.abs(ey1) < 0.01;
-                    var _bAbsX2 = Math.abs(ex2) < 0.01;
-                    var _bAbsY2 = Math.abs(ey2) < 0.01;
-
-                    if (_bAbsX2 && _bAbsY2)
-                    {
-                        if (_bAbsX1 && _bAbsY1)
-                        {
-                            ex1 = 1;
-                            ey1 = 0;
-                            ex2 = 0;
-                            ey2 = 1;
-                        }
-                        else
-                        {
-                            ex2 = -ey1;
-                            ey2 = ex1;
-                        }
-                    }
-                    else if (_bAbsX1 && _bAbsY1)
-                    {
-                        ex1 = ey2;
-                        ey1 = -ex2;
-                    }
-
-                    var xc1 = (x1 + x2) / 2;
-                    var yc1 = (y1 + y2) / 2;
-
-                    ctx.beginPath();
-
-                    if (isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
-                                var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
-                                var _w = IMAGE_ROTATE_TRACK_W;
-                                var _w2 = IMAGE_ROTATE_TRACK_W / 2;
-
-                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                                overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
-                            }
-                        }
-
-                        ctx.beginPath();
-
-                        ctx.moveTo(xc1, yc1);
-                        ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-                        ctx.stroke();
-
-                        ctx.beginPath();
-
-                    }
-
-                    ctx.fillStyle = _style_white;
-
-                    if (bIsEllipceCorner)
-                    {
-                        overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                    }
-                    else
-                    {
-                        overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                    }
-
-                    if (bIsRectsTrack)
-                    {
-                        if (bIsRectsTrackX)
-                        {
-                            overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                        if (bIsRectsTrackY)
-                        {
-                            overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                    }
-
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                }
-
-                break;
-            }
-            case TYPE_TRACK_EMPTY_PH:
-            {
-                if (bIsClever)
-                {
-                    overlay.CheckRect(x1, y1, x4 - x1, y4 - y1);
-                    ctx.rect(x1 + 0.5, y2 + 0.5, x4 - x1 + 1, y4 - y1);
-                    ctx.fillStyle = _style_white;
-                    ctx.stroke();
-
-                    ctx.beginPath();
-
-                    this.AddRectDashClever(ctx, x1, y1, x4, y4, 8, 3);
-
-                    ctx.strokeStyle = _style_blue;
-                    ctx.stroke();
-
-                    ctx.beginPath();
-
-                    var xC = ((x1 + x2) / 2) >> 0;
-
-                    if (!bIsUseImageRotateTrack)
-                    {
-                        ctx.beginPath();
-                        overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE);
-
-                        ctx.fillStyle = _style_green;
-                        ctx.fill();
-                        ctx.stroke();
-                    }
-                    else
-                    {
-                        if (window.g_track_rotate_marker.asc_complete)
-                        {
-                            var _w = IMAGE_ROTATE_TRACK_W;
-                            var _xI = ((x1 + x2 - _w) / 2) >> 0;
-                            var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
-
-                            overlay.CheckRect(_xI, _yI, _w, _w);
-                            ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
-                        }
-                    }
-
-                    ctx.beginPath();
-                    ctx.moveTo(xC + 0.5, y1);
-                    ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
-                    ctx.stroke();
-
-                    ctx.beginPath();
-
-                    ctx.fillStyle = _style_white;
-
-                    if (bIsEllipceCorner)
-                    {
-                        overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                    }
-                    else
-                    {
-                        overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
-                    }
-
-                    if (bIsRectsTrack && false)
-                    {
-                        var _xC = (((x1 + x2) / 2) >> 0) + 0.5;
-                        var _yC = (((y1 + y3) / 2) >> 0) + 0.5;
-
-                        overlay.AddRect2(_xC, y1+0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x2+0.5, _yC, TRACK_RECT_SIZE);
-                        overlay.AddRect2(_xC, y3+0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x1+0.5, _yC, TRACK_RECT_SIZE);
-                    }
-
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                }
-                else
-                {
-                    overlay.CheckPoint(x1, y1);
-                    overlay.CheckPoint(x2, y2);
-                    overlay.CheckPoint(x3, y3);
-                    overlay.CheckPoint(x4, y4);
-
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.lineTo(x3, y3);
-                    ctx.lineTo(x4, y4);
-                    ctx.closePath();
-
-                    overlay.CheckPoint(x1, y1);
-                    overlay.CheckPoint(x2, y2);
-                    overlay.CheckPoint(x3, y3);
-                    overlay.CheckPoint(x4, y4);
-
-                    ctx.strokeStyle = _style_white;
-                    ctx.stroke();
-
-                    ctx.beginPath();
-
-                    this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 8, 3);
-
-                    ctx.strokeStyle = _style_blue;
-                    ctx.stroke();
-
-                    var ex1 = (x2 - x1) / _len_x;
-                    var ey1 = (y2 - y1) / _len_x;
-                    var ex2 = (x1 - x3) / _len_y;
-                    var ey2 = (y1 - y3) / _len_y;
-
-                    var _bAbsX1 = Math.abs(ex1) < 0.01;
-                    var _bAbsY1 = Math.abs(ey1) < 0.01;
-                    var _bAbsX2 = Math.abs(ex2) < 0.01;
-                    var _bAbsY2 = Math.abs(ey2) < 0.01;
-
-                    if (_bAbsX2 && _bAbsY2)
-                    {
-                        if (_bAbsX1 && _bAbsY1)
-                        {
-                            ex1 = 1;
-                            ey1 = 0;
-                            ex2 = 0;
-                            ey2 = 1;
-                        }
-                        else
-                        {
-                            ex2 = -ey1;
-                            ey2 = ex1;
-                        }
-                    }
-                    else if (_bAbsX1 && _bAbsY1)
-                    {
-                        ex1 = ey2;
-                        ey1 = -ex2;
-                    }
-
-                    var xc1 = (x1 + x2) / 2;
-                    var yc1 = (y1 + y2) / 2;
-
-                    ctx.beginPath();
-
-                    if (!bIsUseImageRotateTrack)
-                    {
-                        ctx.beginPath();
-                        overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_DISTANCE_ROTATE);
-
-                        ctx.fillStyle = _style_green;
-                        ctx.fill();
-                        ctx.stroke();
-                    }
-                    else
-                    {
-                        if (window.g_track_rotate_marker.asc_complete)
-                        {
-                            var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
-                            var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
-                            var _w = IMAGE_ROTATE_TRACK_W;
-                            var _w2 = IMAGE_ROTATE_TRACK_W / 2;
-
-                            ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                            ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                            ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                            overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
-                        }
-                    }
-
-                    ctx.beginPath();
-                    ctx.moveTo(xc1, yc1);
-                    ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-                    ctx.stroke();
-
-                    ctx.beginPath();
-
-                    ctx.fillStyle = _style_white;
-
-                    if (bIsEllipceCorner)
-                    {
-                        overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                        overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                    }
-                    else
-                    {
-                        overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                    }
-
-                    if (bIsRectsTrack)
-                    {
-                        overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                    }
-
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                }
-
-                break;
-            }
-
-            default:
-                break;
-        }
-
-        ctx.globalAlpha = _oldGlobalAlpha;
-    },
+		var wDst = drPage.right - drPage.left;
+		var hDst = drPage.bottom - drPage.top;
+
+		var dKoefX = wDst / this.CurrentPageInfo.width_mm;
+		var dKoefY = hDst / this.CurrentPageInfo.height_mm;
+
+		var r = left + width;
+		var b = top + height;
+
+		// (x1,y1) --------- (x2,y2)
+		//    |                 |
+		//    |                 |
+		// (x3,y3) --------- (x4,y4)
+
+		var x1 = (xDst + dKoefX * (matrix.TransformPointX(left, top))) >> 0;
+		var y1 = (yDst + dKoefY * (matrix.TransformPointY(left, top))) >> 0;
+
+		var x2 = (xDst + dKoefX * (matrix.TransformPointX(r, top))) >> 0;
+		var y2 = (yDst + dKoefY * (matrix.TransformPointY(r, top))) >> 0;
+
+		var x3 = (xDst + dKoefX * (matrix.TransformPointX(left, b))) >> 0;
+		var y3 = (yDst + dKoefY * (matrix.TransformPointY(left, b))) >> 0;
+
+		var x4 = (xDst + dKoefX * (matrix.TransformPointX(r, b))) >> 0;
+		var y4 = (yDst + dKoefY * (matrix.TransformPointY(r, b))) >> 0;
+
+		var ctx = overlay.m_oContext;
+
+		if (x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4 && x1 < x2 && y1 < y3)
+			bIsClever = true;
+
+		var nIsCleverWithTransform = bIsClever;
+		var nType = 0;
+		if (!nIsCleverWithTransform && x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4)
+		{
+			nIsCleverWithTransform = true;
+			nType = 1;
+		}
+		if (!nIsCleverWithTransform && x1 == x2 && x3 == x4 && y1 == y3 && y2 == y4)
+		{
+			nIsCleverWithTransform = true;
+			nType = 2;
+		}
+
+		var bIsEllipceCorner = false;
+		//var _style_blue = "#4D7399";
+		//var _style_blue = "#B2B2B2";
+		var _style_blue = "#939393";
+		var _style_green = "#84E036";
+		var _style_white = "#FFFFFF";
+
+		var _len_x = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+		var _len_y = Math.sqrt((x1 - x3)*(x1 - x3) + (y1 - y3)*(y1 - y3));
+
+		if (_len_x < 1)
+			_len_x = 1;
+		if (_len_y < 1)
+			_len_y = 1;
+
+		var bIsRectsTrackX = (_len_x >= 30) ? true : false;
+		var bIsRectsTrackY = (_len_y >= 30) ? true : false;
+		var bIsRectsTrack = (bIsRectsTrackX || bIsRectsTrackY) ? true : false;
+
+		if (nType == 2)
+		{
+			var _tmp = bIsRectsTrackX;
+			bIsRectsTrackX = bIsRectsTrackY;
+			bIsRectsTrackY = _tmp;
+		}
+
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+
+		var _oldGlobalAlpha = ctx.globalAlpha;
+		ctx.globalAlpha = 1;
+
+		switch (type)
+		{
+			case TYPE_TRACK_SHAPE:
+			case TYPE_TRACK_GROUP:
+			{
+				if (bIsClever)
+				{
+					overlay.CheckRect(x1, y1, x4 - x1, y4 - y1);
+					ctx.strokeStyle = _style_blue;
+
+					if (!isLine)
+					{
+						ctx.rect(x1 + 0.5, y2 + 0.5, x4 - x1, y4 - y1);
+						ctx.stroke();
+						ctx.beginPath();
+					}
+
+					var xC = ((x1 + x2) / 2) >> 0;
+
+					if (!isLine && isCanRotate)
+					{
+						if (!bIsUseImageRotateTrack)
+						{
+							ctx.beginPath();
+							overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+							ctx.fillStyle = _style_green;
+							ctx.fill();
+							ctx.stroke();
+						}
+						else
+						{
+							if (window.g_track_rotate_marker.asc_complete)
+							{
+								var _w = IMAGE_ROTATE_TRACK_W;
+								var _xI = ((x1 + x2 - _w) / 2) >> 0;
+								var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
+
+								overlay.CheckRect(_xI, _yI, _w, _w);
+								ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+							}
+						}
+
+						ctx.beginPath();
+						ctx.moveTo(xC + 0.5, y1);
+						ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
+						ctx.stroke();
+
+						ctx.beginPath();
+					}
+
+					ctx.fillStyle = _style_white;
+
+					if (bIsEllipceCorner)
+					{
+						overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+						if (!isLine)
+						{
+							overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+						}
+						overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+					}
+					else
+					{
+						overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
+						if (!isLine)
+						{
+							overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
+						}
+						overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
+					}
+
+					if (bIsRectsTrack && !isLine)
+					{
+						var _xC = (((x1 + x2) / 2) >> 0) + 0.5;
+						var _yC = (((y1 + y3) / 2) >> 0) + 0.5;
+
+						if (bIsRectsTrackX)
+						{
+							overlay.AddRect2(_xC, y1+0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_xC, y3+0.5, TRACK_RECT_SIZE);
+						}
+
+						if (bIsRectsTrackY)
+						{
+							overlay.AddRect2(x2+0.5, _yC, TRACK_RECT_SIZE);
+							overlay.AddRect2(x1+0.5, _yC, TRACK_RECT_SIZE);
+						}
+					}
+
+					ctx.fill();
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+				else
+				{
+					var _x1 = x1;
+					var _y1 = y1;
+					var _x2 = x2;
+					var _y2 = y2;
+					var _x3 = x3;
+					var _y3 = y3;
+					var _x4 = x4;
+					var _y4 = y4;
+
+					if (nIsCleverWithTransform)
+					{
+						var _x1 = x1;
+						if (x2 < _x1)
+							_x1 = x2;
+						if (x3 < _x1)
+							_x1 = x3;
+						if (x4 < _x1)
+							_x1 = x4;
+
+						var _x4 = x1;
+						if (x2 > _x4)
+							_x4 = x2;
+						if (x3 > _x4)
+							_x4 = x3;
+						if (x4 > _x4)
+							_x4 = x4;
+
+						var _y1 = y1;
+						if (y2 < _y1)
+							_y1 = y2;
+						if (y3 < _y1)
+							_y1 = y3;
+						if (y4 < _y1)
+							_y1 = y4;
+
+						var _y4 = y1;
+						if (y2 > _y4)
+							_y4 = y2;
+						if (y3 > _y4)
+							_y4 = y3;
+						if (y4 > _y4)
+							_y4 = y4;
+
+						_x2 = _x4;
+						_y2 = _y1;
+						_x3 = _x1;
+						_y3 = _y4;
+					}
+
+					ctx.strokeStyle = _style_blue;
+
+					if (nIsCleverWithTransform)
+					{
+						ctx.rect(_x1 + 0.5, _y2 + 0.5, _x4 - _x1, _y4 - _y1);
+						ctx.stroke();
+						ctx.beginPath();
+					}
+					else
+					{
+						if (!isLine)
+						{
+							ctx.moveTo(x1, y1);
+							ctx.lineTo(x2, y2);
+							ctx.lineTo(x4, y4);
+							ctx.lineTo(x3, y3);
+							ctx.closePath();
+							ctx.stroke();
+						}
+					}
+
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					var ex1 = (x2 - x1) / _len_x;
+					var ey1 = (y2 - y1) / _len_x;
+					var ex2 = (x1 - x3) / _len_y;
+					var ey2 = (y1 - y3) / _len_y;
+
+					var _bAbsX1 = Math.abs(ex1) < 0.01;
+					var _bAbsY1 = Math.abs(ey1) < 0.01;
+					var _bAbsX2 = Math.abs(ex2) < 0.01;
+					var _bAbsY2 = Math.abs(ey2) < 0.01;
+
+					if (_bAbsX2 && _bAbsY2)
+					{
+						if (_bAbsX1 && _bAbsY1)
+						{
+							ex1 = 1;
+							ey1 = 0;
+							ex2 = 0;
+							ey2 = 1;
+						}
+						else
+						{
+							ex2 = -ey1;
+							ey2 = ex1;
+						}
+					}
+					else if (_bAbsX1 && _bAbsY1)
+					{
+						ex1 = ey2;
+						ey1 = -ex2;
+					}
+
+					var xc1 = (x1 + x2) / 2;
+					var yc1 = (y1 + y2) / 2;
+
+					ctx.beginPath();
+
+					if (!isLine && isCanRotate)
+					{
+						if (!bIsUseImageRotateTrack)
+						{
+							ctx.beginPath();
+							overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+							ctx.fillStyle = _style_green;
+							ctx.fill();
+							ctx.stroke();
+						}
+						else
+						{
+							if (window.g_track_rotate_marker.asc_complete)
+							{
+								var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
+								var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
+								var _w = IMAGE_ROTATE_TRACK_W;
+								var _w2 = IMAGE_ROTATE_TRACK_W / 2;
+
+								if (nIsCleverWithTransform)
+								{
+									_xI >>= 0;
+									_yI >>= 0;
+									_w2 >>= 0;
+									_w2 += 1;
+								}
+
+								ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+								ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+								ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+								overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
+							}
+						}
+
+						ctx.beginPath();
+
+						if (!nIsCleverWithTransform)
+						{
+							ctx.moveTo(xc1, yc1);
+							ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
+						}
+						else
+						{
+							ctx.moveTo((xc1 >> 0) + 0.5, (yc1 >> 0) + 0.5);
+							ctx.lineTo(((xc1 + ex2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5, ((yc1 + ey2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5);
+						}
+
+						ctx.stroke();
+
+						ctx.beginPath();
+					}
+
+					ctx.fillStyle = _style_white;
+
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+							if (!isLine)
+							{
+								overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+								overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+							}
+							overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							if (!isLine)
+							{
+								overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+							overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						}
+					}
+					else
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(_x1, _y1, TRACK_CIRCLE_RADIUS);
+							if (!isLine)
+							{
+								overlay.AddEllipse(_x2, _y2, TRACK_CIRCLE_RADIUS);
+								overlay.AddEllipse(_x3, _y3, TRACK_CIRCLE_RADIUS);
+							}
+							overlay.AddEllipse(_x4, _y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE);
+							if (!isLine)
+							{
+								overlay.AddRect2(_x2 + 0.5, _y2 + 0.5, TRACK_RECT_SIZE);
+								overlay.AddRect2(_x3 + 0.5, _y3 + 0.5, TRACK_RECT_SIZE);
+							}
+							overlay.AddRect2(_x4 + 0.5, _y4 + 0.5, TRACK_RECT_SIZE);
+						}
+					}
+
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsRectsTrack && !isLine)
+						{
+							if (bIsRectsTrackX)
+							{
+								overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+							if (bIsRectsTrackY)
+							{
+								overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+						}
+					}
+					else
+					{
+						var _xC = (((_x1 + _x2) / 2) >> 0) + 0.5;
+						var _yC = (((_y1 + _y3) / 2) >> 0) + 0.5;
+
+						if (bIsRectsTrackX)
+						{
+							overlay.AddRect2(_xC, _y1+0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_xC, _y3+0.5, TRACK_RECT_SIZE);
+						}
+
+						if (bIsRectsTrackY)
+						{
+							overlay.AddRect2(_x2+0.5, _yC, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x1+0.5, _yC, TRACK_RECT_SIZE);
+						}
+					}
+
+					ctx.fill();
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+
+				break;
+			}
+			case TYPE_TRACK_TEXT:
+			case TYPE_TRACK_GROUP_PASSIVE:
+			{
+				if (bIsClever)
+				{
+					overlay.CheckRect(x1, y1, x4 - x1, y4 - y1);
+					this.AddRectDashClever(ctx, x1, y1, x4, y4, 8, 3);
+
+					ctx.strokeStyle = _style_blue;
+					ctx.stroke();
+
+					ctx.beginPath();
+
+					if (isCanRotate)
+					{
+						if (!bIsUseImageRotateTrack)
+						{
+							ctx.beginPath();
+							overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+							ctx.fillStyle = _style_green;
+							ctx.fill();
+							ctx.stroke();
+						}
+						else
+						{
+							if (window.g_track_rotate_marker.asc_complete)
+							{
+								var _w = IMAGE_ROTATE_TRACK_W;
+								var _xI = ((x1 + x2 - _w) / 2) >> 0;
+								var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
+
+								overlay.CheckRect(_xI, _yI, _w, _w);
+								ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+							}
+						}
+
+						ctx.beginPath();
+
+						var xC = ((x1 + x2) / 2) >> 0;
+						ctx.moveTo(xC + 0.5, y1);
+						ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
+						ctx.stroke();
+
+						ctx.beginPath();
+					}
+
+					ctx.fillStyle = _style_white;
+
+					if (bIsEllipceCorner)
+					{
+						overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+					}
+					else
+					{
+						overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
+					}
+
+					if (bIsRectsTrack)
+					{
+						var _xC = (((x1 + x2) / 2) >> 0) + 0.5;
+						var _yC = (((y1 + y3) / 2) >> 0) + 0.5;
+
+						if (bIsRectsTrackX)
+						{
+							overlay.AddRect2(_xC, y1+0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_xC, y3+0.5, TRACK_RECT_SIZE);
+						}
+						if (bIsRectsTrackY)
+						{
+							overlay.AddRect2(x2+0.5, _yC, TRACK_RECT_SIZE);
+							overlay.AddRect2(x1+0.5, _yC, TRACK_RECT_SIZE);
+						}
+					}
+
+					ctx.fill();
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+				else
+				{
+					var _x1 = x1;
+					var _y1 = y1;
+					var _x2 = x2;
+					var _y2 = y2;
+					var _x3 = x3;
+					var _y3 = y3;
+					var _x4 = x4;
+					var _y4 = y4;
+
+					if (nIsCleverWithTransform)
+					{
+						var _x1 = x1;
+						if (x2 < _x1)
+							_x1 = x2;
+						if (x3 < _x1)
+							_x1 = x3;
+						if (x4 < _x1)
+							_x1 = x4;
+
+						var _x4 = x1;
+						if (x2 > _x4)
+							_x4 = x2;
+						if (x3 > _x4)
+							_x4 = x3;
+						if (x4 > _x4)
+							_x4 = x4;
+
+						var _y1 = y1;
+						if (y2 < _y1)
+							_y1 = y2;
+						if (y3 < _y1)
+							_y1 = y3;
+						if (y4 < _y1)
+							_y1 = y4;
+
+						var _y4 = y1;
+						if (y2 > _y4)
+							_y4 = y2;
+						if (y3 > _y4)
+							_y4 = y3;
+						if (y4 > _y4)
+							_y4 = y4;
+
+						_x2 = _x4;
+						_y2 = _y1;
+						_x3 = _x1;
+						_y3 = _y4;
+					}
+
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					if (!nIsCleverWithTransform)
+					{
+						this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 8, 3);
+					}
+					else
+					{
+						this.AddRectDashClever(ctx, _x1, _y1, _x4, _y4, 8, 3);
+					}
+
+					ctx.strokeStyle = _style_blue;
+					ctx.stroke();
+
+					var ex1 = (x2 - x1) / _len_x;
+					var ey1 = (y2 - y1) / _len_x;
+					var ex2 = (x1 - x3) / _len_y;
+					var ey2 = (y1 - y3) / _len_y;
+
+					var _bAbsX1 = Math.abs(ex1) < 0.01;
+					var _bAbsY1 = Math.abs(ey1) < 0.01;
+					var _bAbsX2 = Math.abs(ex2) < 0.01;
+					var _bAbsY2 = Math.abs(ey2) < 0.01;
+
+					if (_bAbsX2 && _bAbsY2)
+					{
+						if (_bAbsX1 && _bAbsY1)
+						{
+							ex1 = 1;
+							ey1 = 0;
+							ex2 = 0;
+							ey2 = 1;
+						}
+						else
+						{
+							ex2 = -ey1;
+							ey2 = ex1;
+						}
+					}
+					else if (_bAbsX1 && _bAbsY1)
+					{
+						ex1 = ey2;
+						ey1 = -ex2;
+					}
+
+					var xc1 = (x1 + x2) / 2;
+					var yc1 = (y1 + y2) / 2;
+
+					ctx.beginPath();
+
+					if (isCanRotate)
+					{
+						if (!bIsUseImageRotateTrack)
+						{
+							ctx.beginPath();
+							overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+							ctx.fillStyle = _style_green;
+							ctx.fill();
+							ctx.stroke();
+						}
+						else
+						{
+							if (window.g_track_rotate_marker.asc_complete)
+							{
+								var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
+								var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
+								var _w = IMAGE_ROTATE_TRACK_W;
+								var _w2 = IMAGE_ROTATE_TRACK_W / 2;
+
+								if (nIsCleverWithTransform)
+								{
+									_xI >>= 0;
+									_yI >>= 0;
+									_w2 >>= 0;
+									_w2 += 1;
+								}
+
+								ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+								ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+								ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+								overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
+							}
+						}
+
+						ctx.beginPath();
+
+						if (!nIsCleverWithTransform)
+						{
+							ctx.moveTo(xc1, yc1);
+							ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
+						}
+						else
+						{
+							ctx.moveTo((xc1 >> 0) + 0.5, (yc1 >> 0) + 0.5);
+							ctx.lineTo(((xc1 + ex2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5, ((yc1 + ey2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5);
+						}
+
+						ctx.stroke();
+
+						ctx.beginPath();
+
+					}
+
+					ctx.fillStyle = _style_white;
+
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						}
+					}
+					else
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x2 + 0.5, _y2 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x3 + 0.5, _y3 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x4 + 0.5, _y4 + 0.5, TRACK_RECT_SIZE);
+						}
+					}
+
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsRectsTrack)
+						{
+							if (bIsRectsTrackX)
+							{
+								overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+							if (bIsRectsTrackY)
+							{
+								overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+						}
+					}
+					else
+					{
+						if (bIsRectsTrack)
+						{
+							var _xC = (((_x1 + _x2) / 2) >> 0) + 0.5;
+							var _yC = (((_y1 + _y3) / 2) >> 0) + 0.5;
+
+							if (bIsRectsTrackX)
+							{
+								overlay.AddRect2(_xC, _y1+0.5, TRACK_RECT_SIZE);
+								overlay.AddRect2(_xC, _y3+0.5, TRACK_RECT_SIZE);
+							}
+							if (bIsRectsTrackY)
+							{
+								overlay.AddRect2(_x2+0.5, _yC, TRACK_RECT_SIZE);
+								overlay.AddRect2(_x1+0.5, _yC, TRACK_RECT_SIZE);
+							}
+						}
+					}
+
+					ctx.fill();
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+
+				break;
+			}
+			case TYPE_TRACK_EMPTY_PH:
+			{
+				if (bIsClever)
+				{
+					overlay.CheckRect(x1, y1, x4 - x1, y4 - y1);
+					ctx.rect(x1 + 0.5, y2 + 0.5, x4 - x1 + 1, y4 - y1);
+					ctx.fillStyle = _style_white;
+					ctx.stroke();
+
+					ctx.beginPath();
+
+					this.AddRectDashClever(ctx, x1, y1, x4, y4, 8, 3);
+
+					ctx.strokeStyle = _style_blue;
+					ctx.stroke();
+
+					ctx.beginPath();
+
+					var xC = ((x1 + x2) / 2) >> 0;
+
+					if (!bIsUseImageRotateTrack)
+					{
+						ctx.beginPath();
+						overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE);
+
+						ctx.fillStyle = _style_green;
+						ctx.fill();
+						ctx.stroke();
+					}
+					else
+					{
+						if (window.g_track_rotate_marker.asc_complete)
+						{
+							var _w = IMAGE_ROTATE_TRACK_W;
+							var _xI = ((x1 + x2 - _w) / 2) >> 0;
+							var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
+
+							overlay.CheckRect(_xI, _yI, _w, _w);
+							ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+						}
+					}
+
+					ctx.beginPath();
+					ctx.moveTo(xC + 0.5, y1);
+					ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
+					ctx.stroke();
+
+					ctx.beginPath();
+
+					ctx.fillStyle = _style_white;
+
+					if (bIsEllipceCorner)
+					{
+						overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+					}
+					else
+					{
+						overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
+					}
+
+					if (bIsRectsTrack && false)
+					{
+						var _xC = (((x1 + x2) / 2) >> 0) + 0.5;
+						var _yC = (((y1 + y3) / 2) >> 0) + 0.5;
+
+						overlay.AddRect2(_xC, y1+0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x2+0.5, _yC, TRACK_RECT_SIZE);
+						overlay.AddRect2(_xC, y3+0.5, TRACK_RECT_SIZE);
+						overlay.AddRect2(x1+0.5, _yC, TRACK_RECT_SIZE);
+					}
+
+					ctx.fill();
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+				else
+				{
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.lineTo(x3, y3);
+					ctx.lineTo(x4, y4);
+					ctx.closePath();
+
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					ctx.strokeStyle = _style_white;
+					ctx.stroke();
+
+					ctx.beginPath();
+
+					this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 8, 3);
+
+					ctx.strokeStyle = _style_blue;
+					ctx.stroke();
+
+					var ex1 = (x2 - x1) / _len_x;
+					var ey1 = (y2 - y1) / _len_x;
+					var ex2 = (x1 - x3) / _len_y;
+					var ey2 = (y1 - y3) / _len_y;
+
+					var _bAbsX1 = Math.abs(ex1) < 0.01;
+					var _bAbsY1 = Math.abs(ey1) < 0.01;
+					var _bAbsX2 = Math.abs(ex2) < 0.01;
+					var _bAbsY2 = Math.abs(ey2) < 0.01;
+
+					if (_bAbsX2 && _bAbsY2)
+					{
+						if (_bAbsX1 && _bAbsY1)
+						{
+							ex1 = 1;
+							ey1 = 0;
+							ex2 = 0;
+							ey2 = 1;
+						}
+						else
+						{
+							ex2 = -ey1;
+							ey2 = ex1;
+						}
+					}
+					else if (_bAbsX1 && _bAbsY1)
+					{
+						ex1 = ey2;
+						ey1 = -ex2;
+					}
+
+					var xc1 = (x1 + x2) / 2;
+					var yc1 = (y1 + y2) / 2;
+
+					ctx.beginPath();
+
+					if (!bIsUseImageRotateTrack)
+					{
+						ctx.beginPath();
+						overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_DISTANCE_ROTATE);
+
+						ctx.fillStyle = _style_green;
+						ctx.fill();
+						ctx.stroke();
+					}
+					else
+					{
+						if (window.g_track_rotate_marker.asc_complete)
+						{
+							var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
+							var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
+							var _w = IMAGE_ROTATE_TRACK_W;
+							var _w2 = IMAGE_ROTATE_TRACK_W / 2;
+
+							ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+							ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+							ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+							overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
+						}
+					}
+
+					ctx.beginPath();
+					ctx.moveTo(xc1, yc1);
+					ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
+					ctx.stroke();
+
+					ctx.beginPath();
+
+					ctx.fillStyle = _style_white;
+
+					if (bIsEllipceCorner)
+					{
+						overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+						overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+					}
+					else
+					{
+						overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+					}
+
+					if (bIsRectsTrack)
+					{
+						overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+					}
+
+					ctx.fill();
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		ctx.globalAlpha = _oldGlobalAlpha;
+	},
 
     DrawTrackSelectShapes : function(x, y, w, h)
     {
