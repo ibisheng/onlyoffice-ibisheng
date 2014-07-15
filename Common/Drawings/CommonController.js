@@ -782,11 +782,11 @@ DrawingObjectsController.prototype =
                         drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.selection.chartSelection.extX, this.selection.groupSelection.selection.chartSelection.extY, false, this.selection.groupSelection.selection.chartSelection.canRotate());
                         if(this.selection.groupSelection.selection.chartSelection.selection.textSelection)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.groupSelection.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extX, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extY, false, false);
+                            drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.groupSelection.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extX, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extY, false, false, true);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.title)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.title.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.title.extX, this.selection.groupSelection.selection.chartSelection.selection.title.extY, false, false);
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.title.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.title.extX, this.selection.groupSelection.selection.chartSelection.selection.title.extY, false, false, true);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbls)
                         {
@@ -834,11 +834,11 @@ DrawingObjectsController.prototype =
                 drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.chartSelection.extX, this.selection.chartSelection.extY, false, this.selection.chartSelection.canRotate());
                 if(this.selection.chartSelection.selection.textSelection)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.chartSelection.selection.textSelection.extX, this.selection.chartSelection.selection.textSelection.extY, false, false);
+                    drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.chartSelection.selection.textSelection.extX, this.selection.chartSelection.selection.textSelection.extY, false, false, true);
                 }
                 else if(this.selection.chartSelection.selection.title)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.title.transform, 0, 0, this.selection.chartSelection.selection.title.extX, this.selection.chartSelection.selection.title.extY, false, false);
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.title.transform, 0, 0, this.selection.chartSelection.selection.title.extX, this.selection.chartSelection.selection.title.extY, false, false, true);
                 }
                 else if(this.selection.chartSelection.selection.dataLbls)
                 {
@@ -3938,6 +3938,7 @@ DrawingObjectsController.prototype =
                             var pos_x = para_drawing.GraphicObj.bounds.x + para_drawing.GraphicObj.posX;
                             var pos_y = para_drawing.GraphicObj.bounds.y + para_drawing.GraphicObj.posY;
                             var nearest_pos = this.document.Get_NearestPos(para_drawing.GraphicObj.selectStartPage, pos_x, pos_y, true, para_drawing);
+                            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                             para_drawing.Remove_FromDocument(false);
                             para_drawing.Set_XYForAdd(pos_x, pos_y, nearest_pos, para_drawing.GraphicObj.selectStartPage);
                             para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
