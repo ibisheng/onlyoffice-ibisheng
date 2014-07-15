@@ -455,7 +455,7 @@
 		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
 		 * @param {Object} flags      Optional. Text flags {wrapText, shrinkToFit, isMerged, textAlign}
 		 * @param {Number} maxWidth   Optional. Text width restriction
-		 * @return {TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
+		 * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
 		 */
 		StringRender.prototype.measureString = function(str, flags, maxWidth) {
 			if (str !== undefined) {
@@ -936,7 +936,7 @@
 
         /**
 		 * @param {Number} maxWidth
-		 * @return {TextMetrics}
+		 * @return {Asc.TextMetrics}
 		 */
 		StringRender.prototype._doMeasure = function(maxWidth) {
 			var tm = this._measureChars(maxWidth);

@@ -4229,57 +4229,34 @@
 			return undefined;
 		};
 
+		WorksheetView.prototype._changeColWidth = function (col, width, pad) {
+			var cc = Math.min(this._colWidthToCharCount(width + pad), /*max col width*/255);
+			var modelw = this._charCountToModelColWidth(cc, true);
+			var colw = this._calcColWidth(modelw);
+
+			if (colw.width > this.cols[col].width) {
+				this.cols[col].width = colw.width;
+				this.cols[col].innerWidth = colw.innerWidth;
+				this.cols[col].charCount = colw.charCount;
+
+				History.Create_NewPoint();
+				History.StartTransaction();
+				// Выставляем, что это bestFit
+				this.model.setColBestFit (true, modelw, col, col);
+				History.EndTransaction();
+
+				this._updateColumnPositions();
+				this.isChanged = true;
+			}
+		};
+
 		WorksheetView.prototype._addCellTextToCache = function (col, row, canChangeColWidth) {
             var self = this;
-
-            function isFixedWidthCell(frag) {
-				for (var i = 0; i < frag.length; ++i) {
-                    var f = frag[i].format;
-                    if (f && f.repeat) {return true;}
-                }
-                return false;
-            }
-
-            function truncFracPart(frag) {
-                var s = frag.reduce(function (prev,val) {return prev + val.text;}, "");
-                // Проверка scientific format
-                if (s.search(/E/i) >= 0) {
-                    return frag;
-                }
-                // Поиск десятичной точки
-                var pos = s.search(/[,\.]/);
-                if (pos >= 0) {
-                    frag[0].text = s.slice(0, pos);
-                    frag.splice(1, frag.length - 1);
-                }
-                return frag;
-            }
 
             function makeFnIsGoodNumFormat(flags, width) {
                 return function (str) {
                     return self.stringRender.measureString(str, flags, width).width <= width;
                 };
-            }
-
-            function changeColWidth(col, width, pad) {
-                var cc = Math.min(self._colWidthToCharCount(width + pad), /*max col width*/255);
-                var modelw = self._charCountToModelColWidth(cc, true);
-                var colw = self._calcColWidth(modelw);
-
-                if (colw.width > self.cols[col].width) {
-                    self.cols[col].width = colw.width;
-                    self.cols[col].innerWidth = colw.innerWidth;
-                    self.cols[col].charCount = colw.charCount;
-
-                    History.Create_NewPoint();
-                    History.StartTransaction();
-                    // Выставляем, что это bestFit
-                    self.model.setColBestFit (true, modelw, col, col);
-                    History.EndTransaction();
-
-                    self._updateColumnPositions();
-                    self.isChanged = true;
-                }
             }
 
             var c = this._getCell(col, row);
@@ -4333,17 +4310,17 @@
                 // Измеряем целую часть числа
 				sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
                 if ("General" === numFormatStr) {
-					// truncFracPart изменяет исходный массив, поэтому клонируем
+					// asc.truncFracPart изменяет исходный массив, поэтому клонируем
 					var fragmentsTmp = [];
 					for (var k = 0; k < sstr.length; ++k)
 						fragmentsTmp.push(sstr[k].clone());
-					sstr = truncFracPart(fragmentsTmp);
+					sstr = asc.truncFracPart(fragmentsTmp);
 				}
                 sfl = fl.clone();
                 sfl.wrapText = false;
                 stm = this._roundTextMetrics( this.stringRender.measureString(sstr, sfl, colWidth) );
                 // Если целая часть числа не убирается в ячейку, то расширяем столбец
-                if (stm.width > colWidth) {changeColWidth(col, stm.width, pad);}
+                if (stm.width > colWidth) {this._changeColWidth(col, stm.width, pad);}
                 // Обновленная ячейка
                 dDigitsCount = this.cols[col].charCount;
                 colWidth = this.cols[col].innerWidth;
@@ -4357,7 +4334,7 @@
                     sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
                     stm = this._roundTextMetrics( this.stringRender.measureString(sstr, fl, colWidth) );
                     if (stm.width > colWidth) {
-                        changeColWidth(col, stm.width, pad);
+						this._changeColWidth(col, stm.width, pad);
                         // Обновленная ячейка
                         dDigitsCount = this.cols[col].charCount;
                         colWidth = this.cols[col].innerWidth;
@@ -4367,9 +4344,9 @@
                 // Замерженная ячейка, нужна сумма столбцов
                 for (var i = mc.c1; i <= mc.c2 && i < this.nColsCount; ++i) {
                     colWidth += this.cols[i].width;
+					dDigitsCount += this.cols[i].charCount;
                 }
                 colWidth -= pad;
-                dDigitsCount = gc_nMaxDigCountView;
             }
 
             // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
@@ -4377,7 +4354,7 @@
             var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
             var ha   = c.getAlignHorizontalByValue().toLowerCase();
             var va   = c.getAlignVertical().toLowerCase();
-            var maxW = fl.wrapText || fl.shrinkToFit || isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
+            var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
             var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
 			var angle = c.getAngle();
             var cto  = (isMerged || fl.wrapText) ?

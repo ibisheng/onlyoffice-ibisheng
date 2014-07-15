@@ -814,6 +814,29 @@
 			return result;
 		}
 
+		function isFixedWidthCell(frag) {
+			for (var i = 0; i < frag.length; ++i) {
+				var f = frag[i].format;
+				if (f && f.repeat) {return true;}
+			}
+			return false;
+		}
+
+		function truncFracPart(frag) {
+			var s = frag.reduce(function (prev,val) {return prev + val.text;}, "");
+			// Проверка scientific format
+			if (s.search(/E/i) >= 0) {
+				return frag;
+			}
+			// Поиск десятичной точки
+			var pos = s.search(/[,\.]/);
+			if (pos >= 0) {
+				frag[0].text = s.slice(0, pos);
+				frag.splice(1, frag.length - 1);
+			}
+			return frag;
+		}
+
 		//-----------------------------------------------------------------
 		// События движения мыши
 		//-----------------------------------------------------------------
@@ -1462,6 +1485,8 @@
 		window["Asc"].trim = trim;
 		window["Asc"].extendClass = extendClass;
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;
+		window["Asc"].isFixedWidthCell = isFixedWidthCell;
+		window["Asc"].truncFracPart = truncFracPart;
 
 		window["Asc"].Range = Range;
 		window["Asc"].ActiveRange = ActiveRange;
