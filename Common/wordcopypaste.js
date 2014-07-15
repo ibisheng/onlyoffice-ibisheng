@@ -449,6 +449,7 @@ CopyProcessor.prototype =
                 if(linerule_Exact == Item_pPr.Spacing.LineRule)
                     apPr.push("mso-line-height-rule:exactly");
             }
+			//TODO при вставке в EXCEL(внутрь ячейки) появляются лишние пустые строки из-за того, что в HTML пишутся отступы - BUG #14663
             //��� ������� � word ����� ����� ��� �������� ������������ ������
             //if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
             apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
