@@ -1778,11 +1778,11 @@ function BinaryPPTYLoader()
 
                                             // TEST version ---------------
                                             var _s = uni_fill.fill.RasterImageId;
-                                            var indS = _s.indexOf("emf");
+                                            var indS = _s.lastIndexOf("emf");
                                             if (indS == -1)
-                                                indS = _s.indexOf("wmf");
+                                                indS = _s.lastIndexOf("wmf");
 
-                                            if (indS != -1)
+                                            if (indS != -1 && (indS == (_s.length - 3)))
                                             {
                                                 _s = _s.substring(0, indS);
                                                 _s += "svg";
