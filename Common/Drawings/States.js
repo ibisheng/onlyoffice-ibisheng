@@ -944,7 +944,7 @@ TextAddState.prototype =
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
         this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
         var cursor_type = this.drawingObjects.onMouseDown(e, x, y, pageIndex);
-        if(cursor_type.hyperlink)
+        if(cursor_type && cursor_type.hyperlink)
         {
             this.drawingObjects.drawingObjects.showDrawingObjects(true);
         }

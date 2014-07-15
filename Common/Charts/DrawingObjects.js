@@ -2039,6 +2039,7 @@ function DrawingObjects() {
          *****************************************/
 
         // Undo/Redo
+        _this.drawingDocument.CheckTargetShow();
         if ( (worksheet.model.index != api.wb.model.getActive()) && !printOptions )
             return;
 
