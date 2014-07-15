@@ -2761,7 +2761,10 @@ PasteProcessor.prototype =
                 oSelectedContent.Add(oSelectedElement);
             }
             oDoc.Insert_Content(oSelectedContent, NearPos);
-            paragraph.Clear_NearestPosArray();
+			
+			this._selectShapesBeforeInsert(aNewContent, oDoc);
+			
+            paragraph.Clear_NearestPosArray(aNewContent);
         }
     },
 
@@ -3810,6 +3813,30 @@ PasteProcessor.prototype =
 		};
 		
 		return {content: aContent, aPastedImages: aPastedImages, images: images};			
+	},
+	
+	_selectShapesBeforeInsert: function(aNewContent, oDoc)
+	{
+		var content, drawingObj, allDrawingObj = [];
+		for(var i = 0; i < aNewContent.length; i++)
+		{
+			content = aNewContent[i];
+			drawingObj = content.Get_AllDrawingObjects();
+			
+			if(!drawingObj || (drawingObj && !drawingObj.length) || content.GetType() == type_Table)
+			{
+				allDrawingObj = null;
+				break;
+			}
+			
+			for(var n = 0; n < drawingObj.length; n++)
+			{
+				allDrawingObj[allDrawingObj.length] = drawingObj[n];
+			};
+		};
+		
+		if(allDrawingObj && allDrawingObj.length)
+			oDoc.Select_Drawings(allDrawingObj, oDoc);
 	},
 	
 	_readFromBinaryExcel: function(base64)
