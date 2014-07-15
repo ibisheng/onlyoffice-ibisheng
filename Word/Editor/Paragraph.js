@@ -3031,15 +3031,13 @@ Paragraph.prototype =
                     pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
                     pGraphics.df();
 
-                    if ( this.Parent && this.Parent.Parent && this.Parent.Parent.transformText )
+                    var TextTransform = this.Get_ParentTextTransform();
+                    if (TextTransform)
                     {
-                        var TextTransform = this.Parent.Parent.transformText;
-
                         var _x0 = TextTransform.TransformPointX( Element.x0, Element.y0 );
                         var _y0 = TextTransform.TransformPointY( Element.x0, Element.y0 );
                         var _x1 = TextTransform.TransformPointX( Element.x1, Element.y1 );
                         var _y1 = TextTransform.TransformPointY( Element.x1, Element.y1 );
-
                         DocumentComments.Add_DrawingRect(_x0, _y0, _x1 - _x0, _y1 - _y0, Page_abs, Element.Additional.CommentId);
                     }
                     else
@@ -9218,13 +9216,23 @@ Paragraph.prototype =
         return this.ApplyToAll;
     },
 
+    Get_ParentTextTransform : function()
+    {
+        var CurDocContent = this.Parent;
+        while(CurDocContent.Is_TableCellContent())
+        {
+            CurDocContent = CurDocContent.Parent.Row.Table.Parent;
+        }
+        if(CurDocContent.Parent && CurDocContent.Parent.transformText)
+        {
+            return CurDocContent.Parent.transformText;
+        }
+        return null;
+    },
+
     Update_CursorType : function(X, Y, PageIndex)
     {
-        var text_transform = null;
-        if(this.Parent && this.Parent.Parent && this.Parent.Parent.transformText)
-        {
-            text_transform = this.Parent.Parent.transformText;
-        }
+        var text_transform = this.Get_ParentTextTransform();
         var MMData = new CMouseMoveData();
         var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
         MMData.X_abs = Coords.X;

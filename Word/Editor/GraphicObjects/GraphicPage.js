@@ -458,6 +458,7 @@ CGraphicPage.prototype =
 
     drawWrappingObjectsByContent: function(graphics, content)
     {
+        var bIntegerGrid = graphics.m_bIntegerGrid;
         var drawing;
         for(var _object_index = 0; _object_index < this.wrappingObjects.length; ++_object_index)
         {
@@ -467,7 +468,7 @@ CGraphicPage.prototype =
                 drawing.draw(graphics);
             }
         }
-        graphics.SetIntegerGrid(true);
+        graphics.SetIntegerGrid(bIntegerGrid);
     },
 
 
