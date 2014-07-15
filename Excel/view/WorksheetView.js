@@ -1885,13 +1885,8 @@
 
 				if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
-				// Отрисовываем ячейки
-				this._drawCells(drawingCtx, range, offsetX, offsetY);
-
-				if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
-
-				// Отрисовываем бордеры
-				this._drawCellsBorders(drawingCtx, range, offsetX, offsetY);
+				// Отрисовываем ячейки и бордеры
+				this._drawCellsAndBorders(drawingCtx, range, offsetX, offsetY);
 
                 if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
@@ -1918,8 +1913,7 @@
 			this._drawColumnHeaders(/*drawingCtx*/ undefined);
 			this._drawRowHeaders(/*drawingCtx*/ undefined);
 			this._drawGrid(/*drawingCtx*/ undefined);
-			this._drawCells(/*drawingCtx*/undefined);
-			this._drawCellsBorders(/*drawingCtx*/undefined);
+			this._drawCellsAndBorders(/*drawingCtx*/undefined);
 			this._drawFrozenPane();
 			this._drawFrozenPaneLines();
 			this._fixSelectionOfMergedCells();
@@ -2341,37 +2335,53 @@
 			ctx.stroke();
 		};
 
-		/** Рисует ячейки таблицы */
-		WorksheetView.prototype._drawCells = function (drawingCtx, range, offsetXForDraw, offsetYForDraw) {
+		WorksheetView.prototype._drawCellsAndBorders = function (drawingCtx, range, offsetXForDraw, offsetYForDraw) {
 			if (range === undefined) {
 				range = this.visibleRange;
 			}
 
-			this._prepareCellTextMetricsCache(range);
-
-			var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
+			var ctx, left, top, cFrozen, rFrozen;
 			var offsetX = (undefined === offsetXForDraw) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetXForDraw;
 			var offsetY = (undefined === offsetYForDraw) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetYForDraw;
 			if (undefined === drawingCtx && this.topLeftFrozenCell) {
 				if (undefined === offsetXForDraw) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
+					cFrozen = this.topLeftFrozenCell.getCol0();
 					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 				}
 				if (undefined === offsetYForDraw) {
-					var rFrozen = this.topLeftFrozenCell.getRow0();
+					rFrozen = this.topLeftFrozenCell.getRow0();
 					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
 				}
 			}
-			var mergedCells = {}, mc, i;
 
 			if (!drawingCtx) {
+				ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
+
+				left = this.cols[range.c1].left;
+				top = this.rows[range.r1].top;
 				// set clipping rect to cells area
 				ctx.save()
 					.beginPath()
-					.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
+					.rect(left - offsetX, top - offsetY,
+					Math.min(this.cols[range.c2].left - left + this.cols[range.c2].width, ctx.getWidth() - this.cellsLeft),
+					Math.min(this.rows[range.r2].top - top + this.rows[range.r2].height, ctx.getHeight() - this.cellsTop))
 					.clip();
 			}
 
+			this._drawCells(drawingCtx, range, offsetX, offsetY);
+			this._drawCellsBorders(drawingCtx, range, offsetX, offsetY);
+
+			if (!drawingCtx) {
+				// restore canvas' original clipping range
+				ctx.restore();
+			}
+		};
+
+		/** Рисует ячейки таблицы */
+		WorksheetView.prototype._drawCells = function (drawingCtx, range, offsetX, offsetY) {
+			this._prepareCellTextMetricsCache(range);
+
+			var mergedCells = {}, mc, i;
 			for (var row = range.r1; row <= range.r2; ++row) {
 				$.extend( mergedCells,
 				          this._drawRowBG(drawingCtx, row, range.c1, range.c2, offsetX, offsetY, null),
@@ -2383,19 +2393,15 @@
 				this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
 				this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
 			}
-
-			if (!drawingCtx) {
-				// restore canvas' original clipping range
-				ctx.restore();
-			}
 		};
 
 		/** Рисует фон ячеек в строке */
 		WorksheetView.prototype._drawRowBG = function (drawingCtx, row, colStart, colEnd, offsetX, offsetY, oMergedCell) {
 			if (this.rows[row].height < this.height_1px && null === oMergedCell) {return {};}
 
+			var mergedCells = {};
 			var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
-			for (var mergedCells = {}, col = colStart; col <= colEnd; ++col) {
+			for (var col = colStart; col <= colEnd; ++col) {
 				if (this.cols[col].width < this.width_1px && null === oMergedCell) {continue;}
 
 				// ToDo подумать, может стоит не брать ячейку из модели (а брать из кеш-а)
@@ -2457,8 +2463,7 @@
 				var w = this.cols[col].width + this.width_1px * (bg !== null ? +1 : -1) + mwidth;
 				var h = this.rows[row].height + this.height_1px * (bg !== null ? +1 : -1) + mheight;
 				var color = bg !== null ? bg : this.settings.cells.defaultState.background;
-				ctx.setFillStyle(color)
-					.fillRect(x - offsetX, y - offsetY, w, h);
+				ctx.setFillStyle(color).fillRect(x - offsetX, y - offsetY, w, h);
 			}
 			return mergedCells;
 		};
@@ -2727,26 +2732,25 @@
 		};
 
 		/** Рисует рамки для ячеек */
-		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, leftFieldInPt, topFieldInPt) {
-			//TODO: использовать стили линий при рисовании границ
-			var drawRange;
+		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, offsetX, offsetY) {
+			// ToDo убрать эту проверку (есть в функции выше!)
 			if (range === undefined) {
-				drawRange = this.visibleRange;
+				range = this.visibleRange;
 			} else {
 				// Если пришел диапазон не всего экрана, то нужно учитывать merge для бордеров
 				// ToDo возможно стоит оптимизировать, если будет тормозить
-				drawRange = range.clone(true);
-				this._fixSelectionOfMergedCells(drawRange);
+				range = range.clone(true);
+				this._fixSelectionOfMergedCells(range);
 				// ToDo убрать это и переделать!!!
-				drawRange.normalize();
+				range.normalize();
 			}
+
+			//TODO: использовать стили линий при рисовании границ
 			var t = this;
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
 			var c = this.cols;
 			var r = this.rows;
-			var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
-			var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
-			var mergedCells = this.model.getMergedByRange(drawRange);
+			var mergedCells = this.model.getMergedByRange(range);
 			var objectMergedCells = {}; // Двумерный массив вида строка-колонка {1: {1: true, 2: true}}
 			var i, length, arrMerged, mergeElem, col, row;
 			for (i = 0, arrMerged = mergedCells.inner, length = arrMerged.length; i < length; ++i) {
@@ -2758,7 +2762,7 @@
 				}
 			}
 			for (i = 0, arrMerged = mergedCells.outer, length = arrMerged.length; i < length; ++i) {
-				for (mergeElem = drawRange.intersectionSimple(arrMerged[i].bbox), row = mergeElem.r1; row <= mergeElem.r2; ++row) {
+				for (mergeElem = range.intersectionSimple(arrMerged[i].bbox), row = mergeElem.r1; row <= mergeElem.r2; ++row) {
 					if (!objectMergedCells.hasOwnProperty(row))
 						objectMergedCells[row] = {};
 					for (col = mergeElem.c1; col <= mergeElem.c2; ++col)
@@ -2767,16 +2771,6 @@
 			}
 
 			var bc = undefined; // cached border color
-			if (undefined === drawingCtx && this.topLeftFrozenCell) {
-				if (undefined === leftFieldInPt) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= c[cFrozen].left - c[0].left;
-				}
-				if (undefined === topFieldInPt) {
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetY -= r[rFrozen].top - r[0].top;
-				}
-			}
 
 			// ToDo в одну функцию
 			function drawBorderHor(border, x1, y, x2) {
@@ -2860,20 +2854,12 @@
 				}
 			}
 
-			// set clipping rect to cells area
-			if (!drawingCtx) {
-				ctx.save()
-					.beginPath()
-					.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
-					.clip();
-			}
-
 			var arrPrevRow = [], arrCurrRow = [], arrNextRow = [];
 			var objMCPrevRow = null, objMCRow = null, objMCNextRow = null;
 			var bCur, bPrev, bNext, bTopCur, bTopPrev, bTopNext, bBotCur, bBotPrev, bBotNext;
 			bCur = bPrev = bNext = bTopCur = bTopNext = bBotCur = bBotNext = null;
-			row = drawRange.r1 - 1;
-			var prevCol = drawRange.c1 - 1;
+			row = range.r1 - 1;
+			var prevCol = range.c1 - 1;
 			// Определим первую колонку (т.к. могут быть скрытые колонки)
 			while (0 <= prevCol && c[prevCol].width < t.width_1px)
 				--prevCol;
@@ -2882,7 +2868,7 @@
 			while (0 <= row) {
 				if (r[row].height >= t.height_1px) {
 					objMCPrevRow = objectMergedCells[row];
-					for (col = prevCol; col <= drawRange.c2 && col < t.nColsCount; ++col) {
+					for (col = prevCol; col <= range.c2 && col < t.nColsCount; ++col) {
 						if (0 > col || c[col].width < t.width_1px) {continue;}
 						arrPrevRow[col] = new CellBorderObject(t._getVisibleCell(col, row).getBorder(),
 							objMCPrevRow ? objMCPrevRow[col] : null, col, row);
@@ -2894,14 +2880,14 @@
 
 			var mc = null;
 			var isPrevColExist = (0 <= prevCol);
-			for (row = drawRange.r1; row <= drawRange.r2 && row < t.nRowsCount; row = nextRow) {
+			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow) {
 				if (r[row].height < t.height_1px) {continue;}
 
-				var isFirstRow = row === drawRange.r1;
-				var isLastRow  = row === drawRange.r2;
+				var isFirstRow = row === range.r1;
+				var isLastRow  = row === range.r2;
 				var nextRow;
 				// Нужно отсеять пустые снизу
-				for (nextRow = row + 1; nextRow <= drawRange.r2 && nextRow < t.nRowsCount; ++nextRow)
+				for (nextRow = row + 1; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow)
 					if (r[nextRow].height >= t.height_1px) {break;}
 
 				if (isFirstRow)
@@ -2916,12 +2902,12 @@
 				var y2 = y1 + r[row].height - t.height_1px;
 
 				var nextCol;
-				for (col = drawRange.c1; col <= drawRange.c2 && col < t.nColsCount; col = nextCol) {
+				for (col = range.c1; col <= range.c2 && col < t.nColsCount; col = nextCol) {
 					if (c[col].width < t.width_1px) {continue;}
-					var isFirstCol = col === drawRange.c1;
-					var isLastCol = col === drawRange.c2;
+					var isFirstCol = col === range.c1;
+					var isLastCol = col === range.c2;
 					// Нужно отсеять пустые справа
-					for (nextCol = col + 1; nextCol <= drawRange.c2 && nextCol < t.nColsCount; ++nextCol)
+					for (nextCol = col + 1; nextCol <= range.c2 && nextCol < t.nColsCount; ++nextCol)
 						if (c[nextCol].width >= t.width_1px) {break;}
 
 					mc = objMCRow ? objMCRow[col] : null;
@@ -3044,9 +3030,6 @@
 				arrCurrRow = arrNextRow;
 				arrNextRow = [];
 			}
-
-			if (!drawingCtx)
-				ctx.restore();
 		};
 
 		/** Рисует закрепленные области областей */
@@ -3062,8 +3045,7 @@
 					tmpRange = asc_Range(0, 0, col - 1, row - 1);
 					if (!noCells) {
 						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
-						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
-						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsAndBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
 					}
 				}
 				if (0 < row) {
@@ -3074,8 +3056,7 @@
 					this._drawRowHeaders(/*drawingCtx*/ undefined, 0, row, kHeaderDefault, offsetX, offsetY);
 					if (!noCells) {
 						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
-						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
-						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsAndBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
 					}
 				}
 				if (0 < col) {
@@ -3086,8 +3067,7 @@
 					this._drawColumnHeaders(/*drawingCtx*/ undefined, 0, col, kHeaderDefault, offsetX, offsetY);
 					if (!noCells) {
 						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
-						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
-						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsAndBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
 					}
 				}
 			}
@@ -5269,16 +5249,14 @@
 						var r_ = asc_Range(c2, r1_, c2, r2_);
 						if (r2_ >= r1_) {
 							this._drawGrid(/*drawingCtx*/ undefined, r_);
-							this._drawCells(/*drawingCtx*/undefined, r_);
-							this._drawCellsBorders(/*drawingCtx*/undefined, r_);
+							this._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
 						}
 					}
 				}
 				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 				this._drawGrid(/*drawingCtx*/ undefined, range);
-				this._drawCells(/*drawingCtx*/undefined, range);
-				this._drawCellsBorders(/*drawingCtx*/undefined, range);
+				this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
 				this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
 					c_oAscGraphicOption.ScrollVertical, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
@@ -5287,8 +5265,7 @@
 					range.c2 = cFrozen - 1;
 					offsetX = this.cols[0].left - this.cellsLeft;
 					this._drawGrid(/*drawingCtx*/ undefined, range, offsetX);
-					this._drawCells(/*drawingCtx*/undefined, range, offsetX);
-					this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
+					this._drawCellsAndBorders(/*drawingCtx*/undefined, range, offsetX);
 					this._drawAutoF(range, offsetX, offsetY);
 					this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
 						c_oAscGraphicOption.ScrollVertical, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
@@ -5387,8 +5364,7 @@
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 				this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
 				this._drawGrid(/*drawingCtx*/ undefined, range);
-				this._drawCells(/*drawingCtx*/undefined, range);
-				this._drawCellsBorders(/*drawingCtx*/undefined, range);
+				this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
 				this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
 					c_oAscGraphicOption.ScrollHorizontal, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
@@ -5397,8 +5373,7 @@
 					range.r2 = rFrozen - 1;
 					offsetY = this.rows[0].top - this.cellsTop;
 					this._drawGrid(/*drawingCtx*/ undefined, range, undefined, offsetY);
-					this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
-					this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
+					this._drawCellsAndBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawAutoF(range, offsetX, offsetY);
 					this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
 						c_oAscGraphicOption.ScrollHorizontal, range, undefined, {offsetX: offsetX, offsetY: offsetY}));

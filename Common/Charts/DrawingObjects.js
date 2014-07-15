@@ -1984,8 +1984,7 @@ function DrawingObjects() {
                 drawingCtx.clearRect( x1, y1, w, h );
                 drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
                 worksheet._drawGrid(/*drawingCtx*/undefined, r_);
-                worksheet._drawCells(/*drawingCtx*/undefined, r_);
-                worksheet._drawCellsBorders(/*drawingCtx*/undefined, r_);
+                worksheet._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
             }
         }
     };
@@ -2108,8 +2107,7 @@ function DrawingObjects() {
                  drawingCtx.clearRect( x1, y1, w, h );
                  drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
                  worksheet._drawGrid(undefined, updatedRange);
-                 worksheet._drawCells(undefined, updatedRange);
-                 worksheet._drawCellsBorders(undefined, updatedRange);
+                 worksheet._drawCellsAndBorders(undefined, updatedRange);
                  }
                  }
                  else
@@ -2333,8 +2331,7 @@ function DrawingObjects() {
 
     _this._drawWorksheetLayer = function (range, offsetLeft, offsetTop) {
         worksheet._drawGrid(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
-        worksheet._drawCells(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
-        worksheet._drawCellsBorders(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
+        worksheet._drawCellsAndBorders(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
     };
 
     _this.drawWorksheetLayer = function (range) {
