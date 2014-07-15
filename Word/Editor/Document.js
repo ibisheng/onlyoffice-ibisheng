@@ -6967,6 +6967,27 @@ CDocument.prototype =
         this.DrawingObjects.shapeApply(shapeProps);
     },
 
+    Select_Drawings : function(DrawingArray, TargetContent)
+    {
+        if(DrawingArray.length === 1 && DrawingArray[0].Is_Inline())
+            return;
+        this.DrawingObjects.resetSelection();
+        var hdr_ftr = TargetContent.Is_HdrFtr(true);
+        if(hdr_ftr)
+        {
+            hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
+            hdr_ftr.Set_CurrentElement(false);
+        }
+        else
+        {
+            this.CurPos.Type = docpostype_DrawingObjects;
+        }
+        for(var i = 0; i < DrawingArray.length; ++i)
+        {
+            this.DrawingObjects.selectObject(DrawingArray[i].GraphicObj, 0);
+        }
+    },
+
     Set_TableProps : function(Props)
     {
         // Работаем с колонтитулом
