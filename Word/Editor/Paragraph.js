@@ -4272,26 +4272,43 @@ Paragraph.prototype =
     // Расширяем параграф до позиции X
     Extend_ToPos : function(_X)
     {
+        var CompiledPr  = this.Get_CompiledPr2(false).ParaPr;
         var Page = this.Pages[this.Pages.length - 1];
 
         var X0 = Page.X;                
         var X1 = Page.XLimit - X0;
         var X  = _X - X0;
         
-        if ( X < 10 )
+        var Align = CompiledPr.Jc;
+        
+        if ( X < 0 || X > X1 || ( X < 7.5 && align_Left === Align ) || ( X > X1 - 10 && align_Right === Align ) || ( Math.abs( X1 / 2 - X ) < 10 && align_Center === Align )  )
             return false;
-
+        
         if ( true === this.IsEmpty() )
         {
-            if ( Math.abs(X - X1 / 2) < 12.5 )
-                return this.Set_Align( align_Center );
+            if ( align_Left !== Align )
+            {
+                this.Set_Align( align_Left );
+            }
+            
+            if ( Math.abs(X - X1 / 2) < 12.5 )            
+            {
+                this.Set_Align( align_Center );
+                return true;
+            }
             else if ( X > X1 - 12.5 )
-                return this.Set_Align( align_Right );
-            else if ( X < 12.5 )
-                return this.Set_Ind( { FirstLine : 12.5 }, false );
+            {
+                this.Set_Align( align_Right );
+                return true;
+            }
+            else if ( X < 17.5 )
+            {
+                this.Set_Ind( { FirstLine : 12.5 }, false );
+                return true;
+            }
         }
 
-        var Tabs = this.Get_CompiledPr2(false).ParaPr.Tabs.Copy();
+        var Tabs = CompiledPr.Tabs.Copy();
 
         if ( Math.abs(X - X1 / 2) < 12.5 )
             Tabs.Add( new CParaTab( tab_Center, X1 / 2 ) );
@@ -4347,14 +4364,8 @@ Paragraph.prototype =
 
                 if ( null === RItem || para_End === RItem.Type )
                 {
+                    // Изменение настройки для символа параграфа делается внутри
                     this.Apply_TextPr( undefined, bIncrease, false );
-
-                    // Выставляем настройки для символа параграфа
-                    var EndTextPr = this.Get_CompiledPr2( false).TextPr.Copy();
-                    EndTextPr.Merge( this.TextPr.Value );
-
-                    // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-                    this.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( bIncrease, EndTextPr.FontSize ) );
                 }
                 else if ( null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation() )
                 {
@@ -6144,23 +6155,15 @@ Paragraph.prototype =
 
                 var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
                 if ( para_Run === this.Content[EndPos].Type )
+                {
                     this.Internal_ReplaceRun( EndPos, NewElements );
+                }
 
                 var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize, false );
                 if ( para_Run === this.Content[StartPos].Type )
+                {
                     this.Internal_ReplaceRun( StartPos, NewElements );
-
-                // Подправим селект. Заметим, что метки выделения изменяются внутри функции Internal_Content_Add 
-                // за счет того, что EndPos - StartPos > 1.
-                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty(true) )
-                    this.Selection.StartPos++;
-                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty(true) )
-                    this.Selection.EndPos++;
-
-                if ( this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty(true) )
-                    this.Selection.EndPos--;
-                else if ( this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty(true) )
-                    this.Selection.StartPos--;                    
+                }
             }
         }
         else
@@ -6728,10 +6731,10 @@ Paragraph.prototype =
         // Выставим в полученном месте текущую позицию курсора
         this.Set_ParaContentPos( SearchPosXY2.Pos, true, SearchPosXY2.Line, SearchPosXY2.Range );
 
-        if ( true === SearchPosXY.End )
+        if ( true === SearchPosXY.End || true === this.Is_Empty() )
         {
             var LastRange = this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1];
-            if (  PageNum - this.PageNum >= PagesCount - 1 && X > LastRange.W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom && X > LastRange.X + 10 && X > LastRange.XVisible + 10 )
+            if (  PageNum - this.PageNum >= PagesCount - 1 && X > LastRange.W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom )
             {
                 if ( this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
                 {

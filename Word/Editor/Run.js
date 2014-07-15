@@ -3697,13 +3697,26 @@ ParaRun.prototype =
     {
         var Pos = ContentPos.Get(Depth);
 
-        if ( Pos > this.Content.length )
-            Pos = this.Content.length;
+        var Count = this.Content.length;
+        if ( Pos > Count )
+            Pos = Count;
+
+        // TODO: Как только переделаем работу c Para_End переделать здесь
+        for ( var TempPos = 0; TempPos < Pos; TempPos++ )
+        {
+            if ( para_End === this.Content[TempPos].Type )
+            {
+                Pos = TempPos;
+                break;
+            }
+        }
+        
 
         if ( Pos < 0 )
             Pos = 0;
 
         this.State.ContentPos = Pos;
+        
     },
 
     Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)

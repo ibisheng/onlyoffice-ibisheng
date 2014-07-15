@@ -2358,6 +2358,7 @@ CDocument.prototype =
         while ( true )
         {
             var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
+            var NewRun = new ParaRun( NewParagraph, false );
 
             var StyleId = LastPara.Style_Get();
             var NextId  = undefined;
@@ -2376,10 +2377,14 @@ CDocument.prototype =
             else
                 NewParagraph.Style_Add_Open( NextId );
 
-            if ( undefined != LastPara.TextPr.Value.FontSize )
+            if ( undefined != LastPara.TextPr.Value.FontSize || undefined !== LastPara.TextPr.Value.RFonts.Ascii )
             {
-                NewParagraph.TextPr.Set_FontSize(LastPara.TextPr.Value.FontSize);
-                NewParagraph.Internal_Content_Add( 0, new ParaTextPr( { FontSize : LastPara.TextPr.Value.FontSize, FontSizeCS : LastPara.TextPr.Value.FontSize } ) );
+                var TextPr = new CTextPr();
+                TextPr.FontSize   = LastPara.TextPr.Value.FontSize;
+                TextPr.FontSizeCS = LastPara.TextPr.Value.FontSize;
+                TextPr.RFonts     = LastPara.TextPr.Value.RFonts.Copy();
+                NewParagraph.Select_All();
+                NewParagraph.Apply_TextPr( TextPr );
             }
 
             LastPara.Set_DocumentNext( NewParagraph );
@@ -8607,10 +8612,12 @@ CDocument.prototype =
             {
                 bConcatE = false;
 
-                if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && true === FirstElement.Element.Is_Empty() )
+                if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && ( true === FirstElement.Element.Is_Empty() || true == FirstElement.SelectedAll ) )
                 {
                     bConcatS = false;
-                    DstIndex++;
+                    
+                    if ( true === FirstElement.Element.Is_Empty() )
+                        DstIndex++;
                 }
             }
             else if ( true === Para.Cursor_IsStart() )

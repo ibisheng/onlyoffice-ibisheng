@@ -3968,10 +3968,12 @@ CDocumentContent.prototype =
             {
                 bConcatE = false;
 
-                if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && true === FirstElement.Element.Is_Empty() )
+                if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && ( true === FirstElement.Element.Is_Empty() || true == FirstElement.SelectedAll ) )
                 {
                     bConcatS = false;
-                    DstIndex++;
+
+                    if ( true === FirstElement.Element.Is_Empty() )                    
+                        DstIndex++;
                 }
             }
             else if ( true === Para.Cursor_IsStart() )
