@@ -480,6 +480,7 @@ CGraphicObjects.prototype =
                     }
                     for(i = 0; i < this.selectedObjects.length; ++i)
                     {
+                        a_objects[i].nearestPos.Paragraph.Check_NearestPos(a_objects[i].nearestPos);
                         this.selectedObjects[i].parent.Remove_FromDocument(false);
                         this.selectedObjects[i].parent.Set_XYForAdd(this.selectedObjects[i].bounds.x + this.selectedObjects[i].posX, this.selectedObjects[i].bounds.y + this.selectedObjects[i].posY, a_objects[i].nearestPos, a_objects[i].pageNum);
                     }
@@ -609,6 +610,7 @@ CGraphicObjects.prototype =
                     {
                         parent_paragraph = major_group.parent.Get_ParentParagraph();
                         nearest_pos = this.document.Get_NearestPos(major_group.selectStartPage,major_group.posX + major_group.bounds.x, major_group.posY + major_group.bounds.y, true, major_group.parent);
+                        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                         major_group.parent.Remove_FromDocument(false);
                         major_group.parent.Set_XYForAdd(major_group.posX + major_group.bounds.x,major_group.posY + major_group.bounds.y, nearest_pos, major_group.selectStartPage);
                         major_group.parent.Add_ToDocument2(parent_paragraph);
@@ -639,6 +641,7 @@ CGraphicObjects.prototype =
             {
                 parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
                 nearest_pos = this.document.Get_NearestPos(this.selectedObjects[0].selectStartPage,this.selectedObjects[0].posX, this.selectedObjects[0].posY, true, this.selectedObjects[0].parent);
+                nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                 this.selectedObjects[0].parent.Remove_FromDocument(false);
                 this.selectedObjects[0].parent.Set_GraphicObject(chart_space);
                 this.selectedObjects[0].parent.Set_XYForAdd(this.selectedObjects[0].posX, this.selectedObjects[0].posY, nearest_pos, this.selectedObjects[0].selectStartPage);
@@ -1557,6 +1560,11 @@ CGraphicObjects.prototype =
     },
 
 
+    endTrackShape: function()
+    {
+
+    },
+
     drawBeforeObjects: function(pageIndex, graphics)
     {
         graphics.shapePageIndex = pageIndex;
@@ -1848,6 +1856,7 @@ CGraphicObjects.prototype =
         var first_paragraph = objects_for_grouping[0].parent.Get_ParentParagraph();
         var nearest_pos = this.document.Get_NearestPos(objects_for_grouping[0].parent.pageIndex, common_bounds.minX, common_bounds.minY, true, para_drawing);
 
+        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
@@ -1933,7 +1942,7 @@ CGraphicObjects.prototype =
                         sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                         sp.setGroup(null);
                         nearest_pos = this.document.Get_NearestPos(page_num, sp.bounds.x + sp.posX, sp.bounds.y + sp.posY, true, drawing);
-
+                        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                         drawing.Set_XYForAdd(sp.bounds.x + sp.posX, sp.bounds.y + sp.posY, nearest_pos, page_num);
                         //drawing.Add_ToDocument2(parent_paragraph);
                         a_objects.push({drawing: drawing, par: parent_paragraph});
@@ -1943,6 +1952,24 @@ CGraphicObjects.prototype =
                 }
                 for(i = 0; i < a_objects.length; ++i)
                 {
+                    a_objects[i].drawing.Set_Props(new CImgProperty(
+                        {
+                            PositionH:
+                            {
+                                RelativeFrom: c_oAscRelativeFromH.Page,
+                                UseAlign : false,
+                                Align    : undefined,
+                                Value    : a_objects[i].drawing.GraphicObj.bounds.x + a_objects[i].drawing.GraphicObj.posX
+                            },
+
+                            PositionV:
+                            {
+                                RelativeFrom: c_oAscRelativeFromV.Page,
+                                UseAlign    : false,
+                                Align       : undefined,
+                                Value       : a_objects[i].drawing.GraphicObj.bounds.y + a_objects[i].drawing.GraphicObj.posY
+                            }
+                        }));
                     a_objects[i].drawing.Add_ToDocument2(a_objects[i].par);
                 }
             }
@@ -2141,6 +2168,7 @@ CGraphicObjects.prototype =
                                     new_y = cur_group.y + sp.bounds.y;
                                     sp.recalcBounds();
                                     var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage, new_x, new_y, true, para_drawing);
+                                    nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                                     para_drawing.Remove_FromDocument(false);
                                     para_drawing.Set_XYForAdd(new_x, new_y, nearest_pos, cur_group.selectStartPage);
                                     para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
@@ -2158,6 +2186,7 @@ CGraphicObjects.prototype =
                                 new_y = cur_group.y + pos.y;
                                 cur_group.updateCoordinatesAfterInternalResize();
                                 var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage, new_x, new_y, true, para_drawing);
+                                nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                                 para_drawing.Remove_FromDocument(false);
                                 para_drawing.Set_XYForAdd(new_x, new_y, nearest_pos, cur_group.selectStartPage);
                                 para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
@@ -2171,6 +2200,7 @@ CGraphicObjects.prototype =
                             else
                                 d = para_drawing;
                             var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage,cur_group.posX + d.GraphicObj.bounds.x,cur_group.posY + d.GraphicObj.bounds.y, true, d);
+                            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                             para_drawing.Remove_FromDocument(false);
                             d.Set_XYForAdd(cur_group.posX + d.GraphicObj.bounds.x, cur_group.posX + d.GraphicObj.bounds.y, nearest_pos, cur_group.selectStartPage);
                             d.Add_ToDocument2(paragraph);

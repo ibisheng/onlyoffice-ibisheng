@@ -562,6 +562,7 @@ RotateState.prototype =
                             this.drawingObjects.arrTrackObjects[i].trackEnd(true);
                             var original = this.drawingObjects.arrTrackObjects[i].originalObject;
                             original.parent.Update_Size(bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y);
+                            arr_nearest_pos[i].Paragraph.Check_NearestPos(arr_nearest_pos[i]);
                             original.parent.Remove_FromDocument(false);
                             original.parent.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], original.selectStartPage);
                         }
@@ -1287,6 +1288,7 @@ ChangeWrapContour.prototype.onMouseUp = function(e, x, y, pageIndex)
         this.majorObject.parent.wrappingPolygon.setEdited(true);
         this.majorObject.parent.wrappingPolygon.setArrRelPoints(calc_points2);
         var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.majorObject.selectStartPage, this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, true, this.majorObject.parent);
+        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
         this.majorObject.parent.Remove_FromDocument(false);
         this.majorObject.parent.Set_XYForAdd(this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, nearest_pos, this.majorObject.selectStartPage);
         this.majorObject.parent.Add_ToDocument2(this.majorObject.parent.Get_ParentParagraph());
@@ -1375,6 +1377,7 @@ ChangeWrapContourAddPoint.prototype.onMouseUp = function(e, x, y, pageIndex)
         this.majorObject.parent.wrappingPolygon.setEdited(true);
         this.majorObject.parent.wrappingPolygon.setArrRelPoints(calc_points2);
         var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.majorObject.selectStartPage, this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, true, this.majorObject.parent);
+        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
         this.majorObject.parent.Remove_FromDocument(false);
         this.majorObject.parent.Set_XYForAdd(this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, nearest_pos, this.majorObject.selectStartPage);
         this.majorObject.parent.Add_ToDocument2(this.majorObject.parent.Get_ParentParagraph());
@@ -1419,7 +1422,6 @@ SplineBezierState.prototype =
 
 function SplineBezierState33(drawingObjects, startX, startY, pageIndex)
 {
-
     this.drawingObjects = drawingObjects;
     this.polylineFlag = true;
     this.pageIndex = pageIndex;
