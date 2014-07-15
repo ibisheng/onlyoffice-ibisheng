@@ -850,8 +850,11 @@ CAutoshapeTrack.prototype =
     /*************************************************************************/
     /******************************** TRACKS *********************************/
     /*************************************************************************/
-    DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate)
+    DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate, isNoMove)
     {
+		if (true === isNoMove)
+			return;
+
         // с самого начала нужно понять, есть ли поворот. Потому что если его нет, то можно
         // (и нужно!) рисовать все по-умному
         var overlay = this.m_oOverlay;
