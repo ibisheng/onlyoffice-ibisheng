@@ -3715,9 +3715,9 @@
 		};
 
 		WorksheetView.prototype._drawFormulaRanges = function (arrRanges){
-			var lineWidth = 1, isDashLine = false, opt = this.settings, length = c_oAscFormulaRangeBorderColor.length;
+			var i, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
 			var strokeColor, fillColor;
-			for (var i in arrRanges) {
+			for (i = 0; i < arrRanges.length; ++i) {
 				var oFormulaRange = arrRanges[i].clone(true);
 				strokeColor = fillColor = c_oAscFormulaRangeBorderColor[i % length];
 				this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
