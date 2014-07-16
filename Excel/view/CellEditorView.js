@@ -122,8 +122,8 @@
 			this.isOpened = false;
 			this.callTopLineMouseup = false;
 			this.lastKeyCode = undefined;
-			this.m_nEditorState		= null;			// Состояние редактора
-			this.isUpdateValue = true;				// Обновлять ли состояние строки при вводе в TextArea
+			this.m_nEditorState	= c_oAscCellEditorState.editEnd; // Состояние редактора
+			this.isUpdateValue = true;							// Обновлять ли состояние строки при вводе в TextArea
 
 			// Функции, которые будем отключать
 			this.fKeyDown		= null;
@@ -294,6 +294,8 @@
 			// delete autoComplete
 			this.objAutoComplete = {};
 
+			// Сброс состояния редактора
+			this.m_nEditorState	= c_oAscCellEditorState.editEnd;
 			t.handlers.trigger("closed");
 			return true;
 		};
