@@ -216,20 +216,20 @@
 				},
 				padding: 2/*px horizontal padding*/
 			};
-			this.activeCellBorderColor			= new CColor(105, 119, 62, 0.7);
-			this.activeCellBackground			= new CColor(157, 185, 85, 0.2);
+			this.activeCellBorderColor = new CColor(105, 119, 62, 0.7);
+			this.activeCellBackground = new CColor(157, 185, 85, 0.2);
 
-			this.formulaRangeBorderColor		= [	new CColor(0, 53, 214) , new CColor(216, 0, 0) , new CColor(214, 160, 0),
-													new CColor(107, 214, 0), new CColor(0, 214, 53), new CColor(0, 214, 214),
-													new CColor(107, 0, 214), new CColor(214, 0, 160)];
+			this.formulaRangeBorderColor = [
+				new CColor(95, 140, 237), new CColor(235, 94, 96), new CColor(141, 97, 194), new CColor(45, 150, 57),
+				new CColor(191, 76, 145), new CColor(227, 130, 34), new CColor(55, 127, 158)];
 			// Цвет заливки границы выделения области автозаполнения
-			this.fillHandleBorderColorSelect	= new CColor(255, 255, 255, 1);
+			this.fillHandleBorderColorSelect = new CColor(255, 255, 255, 1);
 
 			// Цвет закрепленных областей
-			this.frozenColor					= new CColor(105, 119, 62, 1);
+			this.frozenColor = new CColor(105, 119, 62, 1);
 
 			// Число знаков для математической информации
-			this.mathMaxDigCount				= 9;
+			this.mathMaxDigCount = 9;
 			return this;
 		}
 
