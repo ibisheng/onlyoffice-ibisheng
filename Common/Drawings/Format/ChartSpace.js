@@ -7567,7 +7567,7 @@ CChartSpace.prototype =
         {
             ln_width = 0;
         }
-        graphics.AddClipRect(-ln_width, -ln_width, this.extX+ln_width, this.extY+ln_width);
+        graphics.AddClipRect(-ln_width, -ln_width, this.extX+2*ln_width, this.extY+2*ln_width);
 
 
         this.chartObj.draw(this, graphics);
