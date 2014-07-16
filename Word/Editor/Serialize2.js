@@ -8235,6 +8235,8 @@ function Binary_oMathReader(stream)
     };	
 	this.ReadMathArg = function(type, length, oElem)
     {
+		var bLast = this.bcr.stream.bLast;
+			
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		var props = {};
@@ -8417,8 +8419,9 @@ function Binary_oMathReader(stream)
         else
             res = c_oSerConstants.ReadUnknown;
 			
-		if (oElem)
+		if (oElem && bLast)
 			oElem.SetRunEmptyToContent(true);
+
         return res;
     };		
 	this.ReadMathArgPr = function(type, length, oElem)

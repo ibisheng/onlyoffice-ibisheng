@@ -353,9 +353,12 @@ Binary_CommonReader.prototype.Read1 = function(stLen, fRead)
     var stCurPos = 0;
     while(stCurPos < stLen)
     {
+		this.stream.bLast = false;
         //stItem
         var type = this.stream.GetUChar();
         var length = this.stream.GetULongLE();
+		if (stCurPos + length + 5 >= stLen)
+			this.stream.bLast = true;
         res = fRead(type, length);
         if(res === c_oSerConstants.ReadUnknown)
         {
@@ -518,6 +521,7 @@ function FT_Stream2(data, size) {
     this.size = size;
     this.pos = 0;
     this.cur = 0;
+	this.bLast = false;
 }
 
 FT_Stream2.prototype.Seek = function(_pos) {
