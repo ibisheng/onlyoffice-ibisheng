@@ -444,6 +444,11 @@ var c_oAscCoAuthoringLockTablePropertiesBorderColor	= new window.CColor(255, 144
 var c_oAscCoAuthoringDottedWidth					= 2;
 var c_oAscCoAuthoringDottedDistance					= 2;
 
+var c_oAscFormulaRangeBorderColor = [
+	new window.CColor(95, 140, 237), new window.CColor(235, 94, 96), new window.CColor(141, 97, 194),
+	new window.CColor(45, 150, 57), new window.CColor(191, 76, 145), new window.CColor(227, 130, 34),
+	new window.CColor(55, 127, 158)];
+
 var c_oAscLockNameFrozenPane	= "frozenPane";
 var c_oAscLockNameTabColor		= "tabColor";
 

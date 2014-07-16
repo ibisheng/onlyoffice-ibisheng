@@ -219,9 +219,6 @@
 			this.activeCellBorderColor = new CColor(105, 119, 62, 0.7);
 			this.activeCellBackground = new CColor(157, 185, 85, 0.2);
 
-			this.formulaRangeBorderColor = [
-				new CColor(95, 140, 237), new CColor(235, 94, 96), new CColor(141, 97, 194), new CColor(45, 150, 57),
-				new CColor(191, 76, 145), new CColor(227, 130, 34), new CColor(55, 127, 158)];
 			// Цвет заливки границы выделения области автозаполнения
 			this.fillHandleBorderColorSelect = new CColor(255, 255, 255, 1);
 
@@ -3718,12 +3715,11 @@
 		};
 
 		WorksheetView.prototype._drawFormulaRanges = function (arrRanges){
-			var lineWidth = 1, isDashLine = false,
-				opt = this.settings, lengthColors = opt.formulaRangeBorderColor.length;
+			var lineWidth = 1, isDashLine = false, opt = this.settings, length = c_oAscFormulaRangeBorderColor.length;
 			var strokeColor, fillColor;
 			for (var i in arrRanges) {
 				var oFormulaRange = arrRanges[i].clone(true);
-				strokeColor = fillColor = opt.formulaRangeBorderColor[i%lengthColors];
+				strokeColor = fillColor = c_oAscFormulaRangeBorderColor[i % length];
 				this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
 					strokeColor, fillColor);
 			}
@@ -10501,6 +10497,10 @@
 				editor.paste(copyValue, cursorPos);
 			}
 			return bSuccess;
+		};
+
+		WorksheetView.prototype.getFormulaRanges = function () {
+			return this.arrActiveFormulaRanges;
 		};
 
 		WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {

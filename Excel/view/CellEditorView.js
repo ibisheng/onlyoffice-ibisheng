@@ -238,8 +238,7 @@
 		 *   saveValueCallback
 		 */
 		CellEditor.prototype.open = function (options) {
-			var t = this;
-			t.isOpened = true;
+			this.isOpened = true;
 			if (window.addEventListener) {
 				window.addEventListener("keydown"	, this.fKeyDown		, false);
 				window.addEventListener("keypress"	, this.fKeyPress	, false);
@@ -247,14 +246,16 @@
 				window.addEventListener("mouseup"	, this.fKeyMouseUp	, false);
 				window.addEventListener("mousemove"	, this.fKeyMouseMove, false);
 			}
-			t._setOptions(options);
-			t.isTopLineActive = true === t.input.isFocused;
-			t._draw();
+			this._setOptions(options);
+			this.isTopLineActive = true === this.input.isFocused;
+
+			this._updateFormulaEditMod(/*bIsOpen*/true);
+			this._draw();
 			if (!(options.cursorPos >= 0)) {
 				if (options.isClearCell)
-					t._selectChars(kEndOfText);
+					this._selectChars(kEndOfText);
 				else
-					t._moveCursor(kEndOfText);
+					this._moveCursor(kEndOfText);
 			}
 			/*
 			 * Выставляем фокус при открытии
@@ -262,9 +263,8 @@
 			 * При F2 выставляем фокус в редакторе
 			 * При dbl клике фокус выставляем в зависимости от наличия текста в ячейке
 			 */
-			t.setFocus(t.isTopLineActive ? true : (undefined !== options.focus) ? options.focus : t._haveTextInEdit() ? true : false);
-			t._updateFormulaEditMod(/*bIsOpen*/true);
-			t._updateUndoRedoChanged();
+			this.setFocus(this.isTopLineActive ? true : (undefined !== options.focus) ? options.focus : this._haveTextInEdit() ? true : false);
+			this._updateUndoRedoChanged();
 		};
 
 		CellEditor.prototype.close = function (saveValue) {
@@ -782,81 +782,110 @@
 			}
 		};
 
-		// Rendering
+		CellEditor.prototype._getRenderFragments = function () {
+			var opt = this.options, fragments = opt.fragments, i, j, first, last, val, lengthColors;
+			if (this.isFormula()) {
+				var arrRanges = this.handlers.trigger("getFormulaRanges");
+				if (0 < arrRanges.length) {
+					fragments = [];
+					for (i = 0; i < opt.fragments.length; ++i)
+						fragments.push(opt.fragments[i].clone());
 
-		CellEditor.prototype._draw = function () {
-			var t = this, opt = t.options, canExpW = true, canExpH = true, tm, expW, expH;
+					lengthColors = c_oAscFormulaRangeBorderColor.length;
+					for (i = 0; i < arrRanges.length; ++i) {
+						val = arrRanges[i];
 
-			if (opt.fragments.length > 0) {
-				tm = t.textRender.measureString(opt.fragments, t.textFlags, t._getContentWidth());
-				expW = tm.width > t._getContentWidth();
-				expH  = tm.height > t._getContentHeight();
+						this._extractFragments(val.cursorePos, val.formulaRangeLength, fragments);
 
-				while (expW && canExpW || expH && canExpH) {
-					if (expW) { canExpW = t._expandWidth(); }
-					if (expH) { canExpH = t._expandHeight(); }
-
-					if (!canExpW) {
-						t.textFlags.wrapText = true;
-						tm = t.textRender.measureString(opt.fragments, t.textFlags, t._getContentWidth());
-					} else {
-						tm = t.textRender.measure(t._getContentWidth());
+						first = this._findFragment(val.cursorePos, fragments);
+						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
+						if (first && last) {
+							for (j = first.index; j <= last.index; ++j)
+								fragments[j].format.c = c_oAscFormulaRangeBorderColor[i % lengthColors];
+						}
 					}
-					expW = tm.width > t._getContentWidth();
-					expH  = tm.height > t._getContentHeight();
 				}
 			}
 
-			t._cleanText();
-			t._cleanSelection();
-			t._adjustCanvas();
-			t._renderText();
-			t.input.value = t._getFragmentsText(opt.fragments);
-			t._updateCursorPosition();
-			t._showCursor();
+			return fragments;
+		};
+
+		// Rendering
+
+		CellEditor.prototype._draw = function () {
+			var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
+
+			if (0 < fragments.length) {
+				tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				expW = tm.width > this._getContentWidth();
+				expH  = tm.height > this._getContentHeight();
+
+				while (expW && canExpW || expH && canExpH) {
+					if (expW) { canExpW = this._expandWidth(); }
+					if (expH) { canExpH = this._expandHeight(); }
+
+					if (!canExpW) {
+						this.textFlags.wrapText = true;
+						tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+					} else {
+						tm = this.textRender.measure(this._getContentWidth());
+					}
+					expW = tm.width > this._getContentWidth();
+					expH  = tm.height > this._getContentHeight();
+				}
+			}
+
+			this._cleanText();
+			this._cleanSelection();
+			this._adjustCanvas();
+			this._renderText();
+			this.input.value = this._getFragmentsText(fragments);
+			this._updateCursorPosition();
+			this._showCursor();
 		};
 
 		CellEditor.prototype._update = function () {
-			var t = this, opt = t.options, tm, canExpW, canExpH, oldLC, doAjust = false;
+			this._updateFormulaEditMod(/*bIsOpen*/false);
 
-			if (opt.fragments.length > 0) {
-				oldLC = t.textRender.getLinesCount();
-				tm = t.textRender.measureString(opt.fragments, t.textFlags, t._getContentWidth());
-				if (t.textRender.getLinesCount() < oldLC) {
-					t.topLineIndex -= oldLC - t.textRender.getLinesCount();
+			var tm, canExpW, canExpH, oldLC, doAjust = false, fragments = this._getRenderFragments();
+
+			if (0 < fragments.length) {
+				oldLC = this.textRender.getLinesCount();
+				tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
+				if (this.textRender.getLinesCount() < oldLC) {
+					this.topLineIndex -= oldLC - this.textRender.getLinesCount();
 				}
 
-				canExpW = !t.textFlags.wrapText;
-				while (tm.width > t._getContentWidth() && canExpW) {
-					canExpW = t._expandWidth();
+				canExpW = !this.textFlags.wrapText;
+				while (tm.width > this._getContentWidth() && canExpW) {
+					canExpW = this._expandWidth();
 					if (!canExpW) {
-						t.textFlags.wrapText = true;
-						tm = t.textRender.measureString(opt.fragments, t.textFlags, t._getContentWidth());
+						this.textFlags.wrapText = true;
+						tm = this.textRender.measureString(fragments, this.textFlags, this._getContentWidth());
 					}
 					doAjust = true;
 				}
 
 				canExpH = true;
-				while (tm.height > t._getContentHeight() && canExpH) {
-					canExpH = t._expandHeight();
+				while (tm.height > this._getContentHeight() && canExpH) {
+					canExpH = this._expandHeight();
 					doAjust = true;
 				}
-				if (t.textRender.isLastCharNL() && !doAjust && canExpH) {
-					var lm = t.textRender.calcCharHeight(t.textRender.getCharsCount() - 1);
-					if (tm.height + lm.th > t._getContentHeight()) {
-						t._expandHeight();
+				if (this.textRender.isLastCharNL() && !doAjust && canExpH) {
+					var lm = this.textRender.calcCharHeight(this.textRender.getCharsCount() - 1);
+					if (tm.height + lm.th > this._getContentHeight()) {
+						this._expandHeight();
 						doAjust = true;
 					}
 				}
 			}
-			if (doAjust) {t._adjustCanvas();}
-			t._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
-			t._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
-			t._updateCursorPosition(true);
-			t._showCursor();
+			if (doAjust) {this._adjustCanvas();}
+			this._renderText();  // вызов нужен для пересчета поля line.startX, которое используется в _updateCursorPosition
+			this._fireUpdated(); // вызов нужен для обновление текста верхней строки, перед обновлением позиции курсора
+			this._updateCursorPosition(true);
+			this._showCursor();
 
-			t._updateFormulaEditMod(/*bIsOpen*/false);
-			t._updateUndoRedoChanged();
+			this._updateUndoRedoChanged();
 		};
 
 		CellEditor.prototype._fireUpdated = function () {
@@ -1361,15 +1390,17 @@
 			t.selectionTimer = window.setTimeout(function () {doChangeSelection(coord);}, 0);
 		};
 
-		CellEditor.prototype._findFragment = function (pos) {
-			var opt = this.options, i, begin, end;
+		CellEditor.prototype._findFragment = function (pos, fragments) {
+			var i, begin, end;
+			if (!fragments)
+				fragments = this.options.fragments;
 
-			for (i = 0, begin = 0; i < opt.fragments.length; ++i) {
-				end = begin + opt.fragments[i].text.length;
+			for (i = 0, begin = 0; i < fragments.length; ++i) {
+				end = begin + fragments[i].text.length;
 				if (pos >= begin && pos < end) {
 					return {index: i, begin: begin, end: end};
 				}
-				if (i < opt.fragments.length - 1) {
+				if (i < fragments.length - 1) {
 					begin = end;
 				}
 			}
@@ -1396,16 +1427,18 @@
 			return fr && pos === fr.begin && len === fr.end - fr.begin;
 		};
 
-		CellEditor.prototype._splitFragment = function (f, pos) {
-			var t = this, opt = t.options, fr;
+		CellEditor.prototype._splitFragment = function (f, pos, fragments) {
+			var fr;
+			if (!fragments)
+				fragments = this.options.fragments;
 
 			if (pos > f.begin && pos < f.end) {
-				fr = opt.fragments[f.index];
+				fr = fragments[f.index];
 				Array.prototype.splice.apply(
-						opt.fragments,
-						[f.index, 1].concat([
-								new Fragment({format: fr.format.clone(), text: fr.text.slice(0, pos - f.begin)}),
-								new Fragment({format: fr.format.clone(), text: fr.text.slice(pos - f.begin)})]));
+					fragments,
+					[f.index, 1].concat([
+						new Fragment({format: fr.format.clone(), text: fr.text.slice(0, pos - f.begin)}),
+						new Fragment({format: fr.format.clone(), text: fr.text.slice(pos - f.begin)})]));
 			}
 		};
 
@@ -1436,16 +1469,16 @@
 			return res;
 		};
 
-		CellEditor.prototype._extractFragments = function(startPos, length) {
-			var t = this, fr;
+		CellEditor.prototype._extractFragments = function(startPos, length, fragments) {
+			var fr;
 
-			fr = t._findFragment(startPos);
+			fr = this._findFragment(startPos, fragments);
 			if (!fr) {throw "Can not extract fragment of text";}
-			t._splitFragment(fr, startPos);
+			this._splitFragment(fr, startPos, fragments);
 
-			fr = t._findFragment(startPos + length);
+			fr = this._findFragment(startPos + length, fragments);
 			if (!fr) {throw "Can not extract fragment of text";}
-			t._splitFragment(fr, startPos + length);
+			this._splitFragment(fr, startPos + length, fragments);
 		};
 
 		CellEditor.prototype._addFragments = function (f, pos) {
