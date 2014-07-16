@@ -65,7 +65,7 @@ StartAddNewShape.prototype =
                 var ext_x, ext_y;
                 if(typeof SHAPE_ASPECTS[this.presetGeom] === "number")
                 {
-                    var _aspect = SHAPE_ASPECTS[this.graphicObjects.currentPresetGeom];
+                    var _aspect = SHAPE_ASPECTS[this.drawingObjects.currentPresetGeom];
                     if(_aspect >= 1)
                     {
                         ext_y = 25.4;
@@ -291,7 +291,7 @@ function PreMoveInlineObject(drawingObjects, majorObject, isSelected, bInside)
 {
     this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
-    this.isSelected = isSelected;
+    this.majorObjectIsSelected = isSelected;
     this.bInside = bInside;
 }
 
@@ -1518,7 +1518,7 @@ SplineBezierState2.prototype =
             }
             else
             {
-                var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+                var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.drawingObjects.startTrackPos.pageIndex);
                 tr_x = tr_point.x;
                 tr_y = tr_point.y;
             }
@@ -1567,7 +1567,7 @@ SplineBezierState3.prototype =
         }
         else
         {
-            var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.drawingObjects.startTrackPos.pageIndex);
             tr_x = tr_point.X;
             tr_y = tr_point.Y;
         }
@@ -1669,7 +1669,7 @@ SplineBezierState4.prototype =
         }
         else
         {
-            var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.drawingObjects.startTrackPos.pageIndex);
             tr_x = tr_point.X;
             tr_y = tr_point.Y;
         }
@@ -1721,7 +1721,7 @@ SplineBezierState4.prototype =
             }
             else
             {
-                var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+                var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.drawingObjects.startTrackPos.pageIndex);
                 tr_x = tr_point.X;
                 tr_y = tr_point.Y;
             }
@@ -1788,7 +1788,7 @@ SplineBezierState5.prototype =
         }
         else
         {
-            var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.drawingObjects.startTrackPos.pageIndex);
             tr_x = tr_point.X;
             tr_y = tr_point.Y;
         }
@@ -1993,7 +1993,7 @@ AddPolyLine2State2.prototype =
             }
             else
             {
-                var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+                var tr_point = this.drawingObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.drawingObjects.startTrackPos.pageIndex);
                 tr_x = tr_point.X;
                 tr_y = tr_point.Y;
             }
