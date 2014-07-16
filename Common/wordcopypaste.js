@@ -659,8 +659,14 @@ CopyProcessor.prototype =
                 ParaEnd = ParaStart;
                 ParaStart = Temp2;
             }
-        }
+        };
 
+		//TODO Стоит пересмотреть флаг bUseSelection и учитывать внутри Selection флаг use.
+		if(ParaEnd < 0)
+			ParaEnd = 0;
+		if(ParaStart < 0)
+			ParaStart = 0;	
+		
         for (var i = ParaStart; i <= ParaEnd; i++) {
             var item = Container.Content[i];
             if (para_Run == item.Type) {

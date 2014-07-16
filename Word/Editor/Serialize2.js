@@ -3544,7 +3544,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                 ParaEnd = ParaStart;
                 ParaStart = Temp2;
             }
-        }
+        };
+		
+		//TODO Стоит пересмотреть флаг bUseSelection и учитывать внутри Selection флаг use.
+		if(ParaEnd < 0)
+			ParaEnd = 0;
+		if(ParaStart < 0)
+			ParaStart = 0;	
+		
 		var Content = par.Content;
         //todo commentStart для копирования
         var oThis = this;
