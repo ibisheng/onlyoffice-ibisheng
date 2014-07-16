@@ -1724,11 +1724,27 @@ function DrawingObjects() {
             drawingObject.graphicObject.drawingObjects = _this;
             drawingObject.graphicObject.getAllRasterImages(aImagesSync);
         }
-		_this.recalculate(true);
+
         for(i = 0; i < aImagesSync.length; ++i)
         {
             aImagesSync[i] = getFullImageSrc(aImagesSync[i]);
         }
+
+        // Загружаем все картинки листа
+        _this.asyncImagesDocumentEndLoaded = function()
+        {
+            _this.showDrawingObjects(true);
+        };
+
+        if(aImagesSync.length > 0)
+        {
+            var old_val = api.ImageLoader.bIsAsyncLoadDocumentImages;
+            api.ImageLoader.bIsAsyncLoadDocumentImages = true;
+            api.ImageLoader.LoadDocumentImages(aImagesSync, null);
+            api.ImageLoader.bIsAsyncLoadDocumentImages = old_val;
+        }
+
+		_this.recalculate(true);
 
         for (i = 0; i < currentSheet.model.Drawings.length; ++i)
         {
@@ -1736,13 +1752,6 @@ function DrawingObjects() {
             aBoundsCheckers.push(boundsChecker);
         }
 
-        // Загружаем все картинки листа
-        _this.asyncImagesDocumentEndLoaded = function() {
-            _this.showDrawingObjects(true);
-        };
-
-        if(aImagesSync.length > 0)
-            api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
 
         // Upload event
         if (window.addEventListener) {

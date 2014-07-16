@@ -2753,6 +2753,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asyncImageEndLoadedBackground: function() {
+                var worksheet = this.wb.getWorksheet();
+                worksheet && worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, c_oAscGraphicOption.ScrollVertical, worksheet.getVisibleRange(), null, {offsetX: 0, offsetY: 0}));
 			},
 
 			// Frozen pane
