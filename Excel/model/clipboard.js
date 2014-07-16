@@ -361,7 +361,12 @@
 				if(AscBrowser.isIE)
 				{
 					this._cleanElement();
-					this.element.appendChild(this._makeTableNode(range, worksheet));
+					
+					var text = this._makeTableNode(range, worksheet);
+					if(text == false)
+						return true;
+					
+					this.element.appendChild(text);
 					
 					//use binary strings
 					if(copyPasteUseBinary)
@@ -438,6 +443,9 @@
 					var isIntoShape = objectRender.controller.getTargetDocContent();
 					
 					var text = t._makeTableNode(range, worksheet, isCut, isIntoShape);
+					
+					if(text == false)
+						return true;
 					
 					if(isIntoShape)
 					{
