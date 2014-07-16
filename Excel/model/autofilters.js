@@ -3516,6 +3516,9 @@ var gUndoInsDelCellsFlag = true;
 				var result = [];
 				for(var s = 0; s < arrLog.length; s++)
 				{
+					if(valLog[s] === undefined)
+						continue;
+					
 					var checkComplexSymbols = this._parseComplexSpecSymbols(val, arrLog[s], valLog[s],type);
 					var filterVal;
 					if(checkComplexSymbols != null)
@@ -4644,7 +4647,7 @@ var gUndoInsDelCellsFlag = true;
 				result.ColId = colId;
 				result.CustomFiltersObj = new CustomFilters();
 				
-				if(valFilter.filter1 && valFilter.valFilter1 != null && valFilter.valFilter1 != undefined)
+				if(valFilter.filter1 && valFilter.valFilter1 !== null)
 				{
 					result.CustomFiltersObj = new CustomFilters();
 					result.CustomFiltersObj.CustomFilters = [];
@@ -4653,7 +4656,7 @@ var gUndoInsDelCellsFlag = true;
 					result.CustomFiltersObj.CustomFilters[0].Val = valFilter.valFilter1;
 				}
 					
-				if(valFilter.filter2 && valFilter.valFilter2 != null && valFilter.valFilter2 != undefined)
+				if(valFilter.filter2 && valFilter.valFilter2 !== null)
 				{
 					if(result.CustomFiltersObj.CustomFilters[0])
 					{
