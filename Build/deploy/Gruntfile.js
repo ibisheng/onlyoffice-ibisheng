@@ -226,12 +226,12 @@ module.exports = function(grunt) {
 				},
 				sdk: {
 					TEMPcompilerOpts: {
-						compilation_level: 'ADVANCED_OPTIMIZATIONS',
+						compilation_level: 'ADVANCED',
 						externs: packageFile['compile']['sdk']['externs'],
 						define: packageFile['compile']['sdk']['define'],
 						warning_level: 'QUIET',
-						variable_map_output_file: packageFile['compile']['sdk']['log'] + '/variable.map',
-						property_map_output_file: packageFile['compile']['sdk']['log'] + '/property.map'/*,
+						variable_renaming_report: packageFile['compile']['sdk']['log'] + '/variable.map',
+						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map'/*,
 						create_source_map: map_file_path,
 						source_map_format: "V3"*/
 					},
@@ -240,7 +240,7 @@ module.exports = function(grunt) {
 				},
 				defines: {
 					TEMPcompilerOpts: {
-						compilation_level: 'SIMPLE_OPTIMIZATIONS',
+						compilation_level: 'SIMPLE',
 						warning_level: 'QUIET'
 					},
 					src: packageFile['compile']['defines']['src'],
