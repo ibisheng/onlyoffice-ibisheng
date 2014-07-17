@@ -1767,7 +1767,7 @@
 						this.oImages[image] = "local";
 					else*/ 
 					//TODO не вставляется картинка из EXCEL  - стоит base64 грузить на сервер bug 22957
-					if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
+					if(false == (/*0 == src.indexOf("data:") ||*/ 0 == src.indexOf(api.documentUrl) || 0 == src.indexOf(api.documentUrl)))
 						aImagesToDownload.push(src);
 				};
 				
