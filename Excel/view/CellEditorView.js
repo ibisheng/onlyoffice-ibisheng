@@ -783,7 +783,8 @@
 		};
 
 		CellEditor.prototype._getRenderFragments = function () {
-			var opt = this.options, fragments = opt.fragments, i, j, first, last, val, lengthColors;
+			var opt = this.options, fragments = opt.fragments, i, j, first, last, val, lengthColors,
+				tmpColors, colorIndex, uniqueColorIndex;
 			if (this.isFormula()) {
 				var arrRanges = this.handlers.trigger("getFormulaRanges");
 				if (0 < arrRanges.length) {
@@ -792,8 +793,15 @@
 						fragments.push(opt.fragments[i].clone());
 
 					lengthColors = c_oAscFormulaRangeBorderColor.length;
+					tmpColors = [];
+					uniqueColorIndex = 0;
 					for (i = 0; i < arrRanges.length; ++i) {
 						val = arrRanges[i];
+
+						colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
+						if (null == colorIndex)
+							colorIndex = uniqueColorIndex++;
+						tmpColors.push(colorIndex);
 
 						this._extractFragments(val.cursorePos, val.formulaRangeLength, fragments);
 
@@ -801,7 +809,7 @@
 						last = this._findFragment(val.cursorePos + val.formulaRangeLength - 1, fragments);
 						if (first && last) {
 							for (j = first.index; j <= last.index; ++j)
-								fragments[j].format.c = c_oAscFormulaRangeBorderColor[i % lengthColors];
+								fragments[j].format.c = c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
 						}
 					}
 				}

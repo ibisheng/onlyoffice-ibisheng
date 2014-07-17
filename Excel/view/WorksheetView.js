@@ -3716,10 +3716,16 @@
 
 		WorksheetView.prototype._drawFormulaRanges = function (arrRanges){
 			var i, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
-			var strokeColor, fillColor;
+			var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
 			for (i = 0; i < arrRanges.length; ++i) {
 				var oFormulaRange = arrRanges[i].clone(true);
-				strokeColor = fillColor = c_oAscFormulaRangeBorderColor[i % length];
+
+				colorIndex = asc.getUniqueRangeColor(arrRanges, i, tmpColors);
+				if (null == colorIndex)
+					colorIndex = uniqueColorIndex++;
+				tmpColors.push(colorIndex);
+
+				strokeColor = fillColor = c_oAscFormulaRangeBorderColor[colorIndex % length];
 				this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
 					strokeColor, fillColor);
 			}

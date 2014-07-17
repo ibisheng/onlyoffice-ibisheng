@@ -59,6 +59,17 @@
 			return -1;
 		}
 
+		function getUniqueRangeColor (arrRanges, curElem, tmpColors) {
+			var colorIndex, j, range = arrRanges[curElem];
+			for (j = 0; j < curElem; ++j) {
+				if (range.isEqual(arrRanges[j])) {
+					colorIndex = tmpColors[j];
+					break;
+				}
+			}
+			return colorIndex;
+		}
+
 
 		function round(x) {
 			var y = x + (x >= 0 ? .5 : -.4);
@@ -1473,6 +1484,7 @@
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;
+		window["Asc"].getUniqueRangeColor = getUniqueRangeColor;
 		window["Asc"].round = round;
 		window["Asc"].floor = floor;
 		window["Asc"].ceil = ceil;
