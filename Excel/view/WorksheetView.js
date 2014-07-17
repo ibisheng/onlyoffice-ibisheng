@@ -4426,7 +4426,7 @@
 				this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
 			}
 
-			this._updateRowHeight(tm, col, row, isMerged, fMergedRows, va, ha, maxW, colWidth, angle, textBound);
+			this._updateRowHeight(tm, col, row, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound);
 
             return mc ? mc.c2 : col;
         };
