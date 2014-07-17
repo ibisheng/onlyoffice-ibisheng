@@ -1235,6 +1235,9 @@
 					event.returnValue = false;
 			}
 
+			if (!this.targetInfo)
+				this.handlers.trigger("updateWorksheet", this.element, coord.x, coord.y, false, function (info){t.targetInfo = info;});
+
 			// Запоминаем координаты нажатия
 			this.mouseDownLastCord = coord;
 
