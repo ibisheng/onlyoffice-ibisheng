@@ -4262,6 +4262,8 @@
                 this.handlers.trigger("reinitializeScrollY");
             }
 
+			var str, tm, isMerged = false, strCopy;
+
             // Range для замерженной ячейки
             var fl = this._getCellFlags(c);
 			var mc = fl.merged;
@@ -4273,9 +4275,22 @@
                     fMergedColumns = true;
                 if (mc.r1 !== mc.r2)
                     fMergedRows = true;
+				isMerged = true;
             }
 
-            if (this._isCellEmptyTextString(c)) {return mc ? mc.c2 : col;}
+            if (this._isCellEmptyTextString(c)) {
+				// Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
+				str = c.getValue2();
+				if (0 < str.length) {
+					// Без текста не будет толка
+					strCopy = [str[0].clone()];
+					strCopy[0].text = 'A';
+					tm = this._roundTextMetrics(this.stringRender.measureString(strCopy, fl));
+					this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
+				}
+
+				return mc ? mc.c2 : col;
+			}
 
             var dDigitsCount = 0;
             var colWidth = 0;
@@ -4332,12 +4347,11 @@
             }
 
             // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
-			var isMerged = fl.isMerged();
-            var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
+                str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
             var ha   = c.getAlignHorizontalByValue().toLowerCase();
             var va   = c.getAlignVertical().toLowerCase();
             var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
-            var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
+                tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
 			var angle = c.getAngle();
             var cto  = (isMerged || fl.wrapText) ?
             {
@@ -4356,8 +4370,7 @@
                 }
             }
             var oFontColor = c.getFontcolor();
-			var rowInfo = this.rows[row];
-            var rowHeight = rowInfo.height;
+            var rowHeight = this.rows[row].height;
             var textBound = {};
 
             if (angle) {
@@ -4413,15 +4426,23 @@
 				this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
 			}
 
-            // update row's descender
-            if (va !== kvaTop && va !== kvaCenter && !isMerged) {
+			this._updateRowHeight(tm, col, row, isMerged, fMergedRows, va, ha, maxW, colWidth, angle, textBound);
+
+            return mc ? mc.c2 : col;
+        };
+
+		WorksheetView.prototype._updateRowHeight = function (tm, col, row, isMerged, fMergedRows, va, ha, angle,
+															 maxW, colWidth, textBound) {
+			var rowInfo = this.rows[row], rowHeight;
+			// update row's descender
+			if (va !== kvaTop && va !== kvaCenter && !isMerged) {
 				rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
-            }
+			}
 
 			rowHeight = rowInfo.height;
 
-            // update row's height
-            if (!rowInfo.isCustomHeight) {
+			// update row's height
+			if (!rowInfo.isCustomHeight) {
 				// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
 				if (!fMergedRows) {
 					var newHeight = tm.height;
@@ -4431,7 +4452,8 @@
 						}
 					}
 
-					rowInfo.heightReal = rowInfo.height = Math.min(this.maxRowHeight, Math.max(rowInfo.height, newHeight));
+					rowInfo.heightReal = rowInfo.height = Math.min(this.maxRowHeight,
+						Math.max(rowInfo.height, newHeight));
 					if (rowHeight !== rowInfo.height) {
 						if (!rowInfo.isDefaultHeight) {
 							this.model.setRowHeight(rowInfo.height + this.height_1px, row, row);
@@ -4439,16 +4461,15 @@
 
 						if (angle) {
 							this._fetchCellCache(col, row).text.textBound   =
-								this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowInfo.height, tm.width, ha, va, maxW);
+								this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowInfo.height, tm.width,
+									ha, va, maxW);
 						}
 
 						this.isChanged = true;
 					}
 				}
-            }
-
-            return mc ? mc.c2 : col;
-        };
+			}
+		};
 
 		WorksheetView.prototype._calcMaxWidth = function (col, row, mc) {
 			if (null === mc) {return this.cols[col].innerWidth;}
