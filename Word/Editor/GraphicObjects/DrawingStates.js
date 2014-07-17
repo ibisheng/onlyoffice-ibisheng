@@ -961,7 +961,7 @@ PreMoveInGroupState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        if(Math.abs(this.startX - x) > MOVE_DELTA || Math.abs(this.startY - y) > MOVE_DELTA || pageIndex !== this.majorObject.parent.pageIndex)
+        if(Math.abs(this.startX - x) > MOVE_DELTA || Math.abs(this.startY - y) > MOVE_DELTA || pageIndex !== this.group.parent.pageIndex)
         {
             this.drawingObjects.swapTrackObjects();
             this.drawingObjects.changeCurrentState(new MoveInGroupState(this.drawingObjects, this.majorObject, this.group, this.startX, this.startY));
