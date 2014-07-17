@@ -1075,7 +1075,7 @@ PreRotateInGroupState.prototype =
         this.drawingObjects.changeCurrentState(new RotateInGroupState(this.drawingObjects, this.group, this.majorObject))
     },
 
-    onMouseUp: PreMoveInGroupState.onMouseUp
+    onMouseUp: PreMoveInGroupState.prototype.onMouseUp
 };
 
 function RotateInGroupState(drawingObjects, group, majorObject)

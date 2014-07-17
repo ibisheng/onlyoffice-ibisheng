@@ -150,10 +150,14 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.m_oPRSA = new CParagraphRecalculateStateAlign();
     this.m_oPRSI = new CParagraphRecalculateStateInfo();
     
-    this.m_oPDSE = new CParagraphDrawStateElements(); 
-
+    this.m_oPDSE = new CParagraphDrawStateElements();
+    this.StartState = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+    if(bFromPresentation === true)
+    {
+        this.Save_StartState();
+    }
 }
 
 Paragraph.prototype =
@@ -161,6 +165,11 @@ Paragraph.prototype =
     GetType : function()
     {
         return type_Paragraph;
+    },
+
+    Save_StartState : function()
+    {
+        this.StartState = new CParagraphStartState(this);
     },
 
     GetId : function()
@@ -12391,8 +12400,21 @@ Paragraph.prototype =
         // Bool     : bFromDocument
 
         Writer.WriteString2( "" + this.Id );
-        this.Pr.Write_ToBinary( Writer );
-        Writer.WriteString2( "" + this.TextPr.Get_Id() );
+
+        var PrForWrite, TextPrForWrite;
+        if(this.StartState)
+        {
+            PrForWrite = this.StartState.Pr;
+            TextPrForWrite = this.StartState.TextPr;
+        }
+        else
+        {
+            PrForWrite = this.Pr;
+            TextPrForWrite = this.TextPr;
+        }
+
+        PrForWrite.Write_ToBinary( Writer );
+        Writer.WriteString2( "" + TextPrForWrite.Get_Id() );
 
         var Count = this.Content.length;
         Writer.WriteLong( Count );
@@ -14454,4 +14476,16 @@ function CParagraphMathParaChecker()
     this.Found     = false;
     this.Result    = true;
     this.Direction = 0;
+}
+
+
+function CParagraphStartState(Paragraph)
+{
+    this.Pr = Paragraph.Pr.Copy();
+    this.TextPr = Paragraph.TextPr;
+    this.Content = [];
+    for(var i = 0; i < Paragraph.Content.length; ++i)
+    {
+        this.Content.push(Paragraph.Content[i]);
+    }
 }

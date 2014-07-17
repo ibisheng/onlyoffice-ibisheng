@@ -59,9 +59,14 @@ function ParaRun(Paragraph, bMathRun)
             width: 0
         };
     }
+    this.StartState = null;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+    if(this.Paragraph && !this.Paragraph.bFromDocument)
+    {
+        this.Save_StartState();
+    }
 }
 ParaRun.prototype =
 {
@@ -87,6 +92,11 @@ ParaRun.prototype =
     Set_Paragraph : function(Paragraph)
     {
         this.Paragraph = Paragraph;
+    },
+
+    Save_StartState : function()
+    {
+        this.StartState = new CParaRunStartState(this);
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с содержимым данного рана
@@ -7078,19 +7088,30 @@ ParaRun.prototype =
         // Long     : Количество элементов
         // Array of variable : массив с элементами
 
-        Writer.WriteString2( this.Id );
-        Writer.WriteString2( null !== this.Paragraph && undefined !== this.Paragraph ? this.Paragraph.Get_Id() : "" );
-        this.Pr.Write_ToBinary( Writer );
-
-        if(undefined !== editor && true === editor.isDocumentEditor)
+        var ParagraphToWrite, PrToWrite, ContentToWrite;
+        if(this.StartState)
         {
-            var Count = this.Content.length;
-            Writer.WriteLong( Count );
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Item = this.Content[Index];
-                Item.Write_ToBinary( Writer );
-            }
+            ParagraphToWrite = this.StartState.Paragraph;
+            PrToWrite = this.StartState.Pr;
+            ContentToWrite = this.StartState.Content;
+        }
+        else
+        {
+            ParagraphToWrite = this.Paragraph;
+            PrToWrite = this.Pr;
+            ContentToWrite = this.Content;
+        }
+
+        Writer.WriteString2( this.Id );
+        Writer.WriteString2( null !== ParagraphToWrite && undefined !== ParagraphToWrite ? ParagraphToWrite.Get_Id() : "" );
+        PrToWrite.Write_ToBinary( Writer );
+
+        var Count = ContentToWrite.length;
+        Writer.WriteLong( Count );
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = ContentToWrite[Index];
+            Item.Write_ToBinary( Writer );
         }
     },
 
@@ -7723,4 +7744,17 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
 
     History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : MPrp, Old : OldValue } );
     this.Recalc_CompiledPr(true);
+}
+
+
+function CParaRunStartState(Run)
+{
+
+    this.Paragraph = Run.Paragraph;
+    this.Pr = Run.Pr.Copy();
+    this.Content = [];
+    for(var i = 0; i < Run.Content.length; ++i)
+    {
+        this.Content.push(Run.Content[i]);
+    }
 }

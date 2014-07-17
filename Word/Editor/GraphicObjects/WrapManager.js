@@ -14,10 +14,6 @@ function CWrapPolygon(wordGraphicObject)
 
     this.wrapSide = WRAP_TEXT_SIDE_BOTH_SIDES;
 
-    this.distL = 2.54;
-    this.distR = 2.54;
-    this.distT = 2.54;
-    this.distB = 2.54;
 
     this.posX = null;
     this.posY = null;
@@ -34,9 +30,6 @@ function CWrapPolygon(wordGraphicObject)
 
     this.wordGraphicObject = wordGraphicObject;
 
-    this.rightField = X_Right_Field;
-    this.leftField = X_Left_Field;
-    this.rect_flag = false;
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
 }
 
@@ -64,28 +57,34 @@ CWrapPolygon.prototype =
         this.relativeArrPoints = pr;
     },
 
-    writeToBinaryForCopyPaste: function(w)
+    setWrapSide: function(pr)
     {
-        w.WriteBool(this.edited);
-        w.WriteLong(this.wrapSide);
-        w.WriteLong(this.relativeArrPoints.length);
-        for(var i = 0; i < this.relativeArrPoints.length; ++i)
-        {
-            w.WriteDouble(this.relativeArrPoints[i].x);
-            w.WriteDouble(this.relativeArrPoints[i].y);
-        }
+        History.Add(this, {Type: historyitem_WrapPolygonSetWrapSide, oldPr: this.wrapSide, newPr: pr});
+        this.wrapSide = pr;
     },
 
-    readFromBinaryForCopyPaste: function(r)
+
+    fromOther: function(wrapPolygon)
     {
-        this.edited = r.GetBool();
-        this.wrapSide = r.GetLong();
-        var count = r.GetLong();
-        for(var i = 0; i< count; ++i)
+        if(!wrapPolygon)
+            return;
+        if(this.edited !== wrapPolygon.edited)
         {
-            this.relativeArrPoints[i] = {};
-            this.relativeArrPoints[i].x = r.GetDouble();
-            this.relativeArrPoints[i].y = r.GetDouble();
+            this.setEdited(wrapPolygon.edited);
+        }
+        if(wrapPolygon.edited)
+        {
+            var rel = [];
+            for(var i = 0; i < wrapPolygon.relativeArrPoints.length; ++i)
+            {
+                rel.push({x: wrapPolygon.relativeArrPoints[i].x, y: wrapPolygon.relativeArrPoints[i].y});
+            }
+            this.setArrRelPoints(rel);
+        }
+
+        if(this.wrapSide !== wrapPolygon.wrapSide)
+        {
+            this.setWrapSide(wrapPolygon.wrapSide);
         }
     },
 
@@ -93,11 +92,13 @@ CWrapPolygon.prototype =
     {
         writer.WriteLong(historyitem_type_WrapPolygon);
         writer.WriteString2(this.Get_Id());
+        writeObject(writer, this.wordGraphicObject);
     },
 
     Read_FromBinary2: function(reader)
     {
         this.Id = reader.GetString2();
+        this.wordGraphicObject = readObject(reader);
     },
 
     Load_LinkData: function(data)
@@ -211,27 +212,27 @@ CWrapPolygon.prototype =
                     }
                     case WRAP_TEXT_SIDE_LARGEST:
                     {
-                        if(this.rightField - this.right > 0 && this.rightField - this.right >  this.left -this.leftField)
-                            ret2.push({X0: this.leftField, X1: this.right, Y1: this.bottom});
-                        else if(this.left - this.leftField > 0 && this.left - this.leftField > this.rightField - this.right)
+                        if(RightField - this.right > 0 && RightField - this.right >  this.left -LeftField)
+                            ret2.push({X0: LeftField, X1: this.right, Y1: this.bottom});
+                        else if(this.left - LeftField > 0 && this.left - LeftField > RightField - this.right)
                         {
-                            ret2.push({X0: this.left, X1: this.rightField, Y1: this.bottom});
+                            ret2.push({X0: this.left, X1: RightField, Y1: this.bottom});
                         }
                         break;
                     }
                     case WRAP_TEXT_SIDE_LEFT:
                     {
-                        if(this.left > this.leftField)
+                        if(this.left > LeftField)
                         {
-                            ret2.push({X0: this.left, X1: this.rightField, Y1: this.bottom});
+                            ret2.push({X0: this.left, X1: RightField, Y1: this.bottom});
                         }
                         break;
                     }
                     case WRAP_TEXT_SIDE_RIGHT:
                     {
-                        if(this.right < this.rightField)
+                        if(this.right < RightField)
                         {
-                            ret2.push({X0: this.leftField, X1: this.right, Y1: this.bottom});
+                            ret2.push({X0: LeftField, X1: this.right, Y1: this.bottom});
                         }
                         break;
                     }
@@ -319,22 +320,22 @@ CWrapPolygon.prototype =
                         }
                         case WRAP_TEXT_SIDE_LARGEST:
                         {
-                            if(this.rightField - max_x > 0 && this.rightField - max_x >  min_x -this.leftField)
-                                ret2.push({X0: this.leftField, X1: max_x, Y1: y1});
-                            else if(min_x - this.leftField > 0 && min_x - this.leftField > this.rightField - max_x)
+                            if(RightField - max_x > 0 && RightField - max_x >  min_x -LeftField)
+                                ret2.push({X0: LeftField, X1: max_x, Y1: y1});
+                            else if(min_x - LeftField > 0 && min_x - LeftField > RightField - max_x)
                             {
-                                ret2.push({X0: min_x, X1: this.rightField, Y1: y1});
+                                ret2.push({X0: min_x, X1: RightField, Y1: y1});
                             }
                             break;
                         }
                         case WRAP_TEXT_SIDE_LEFT:
                         {
-                            ret2.push({X0: Math.max(min_x, this.leftField), X1: this.rightField, Y1: y1});
+                            ret2.push({X0: Math.max(min_x, LeftField), X1: RightField, Y1: y1});
                             break;
                         }
                         case WRAP_TEXT_SIDE_RIGHT:
                         {
-                            ret2.push({X0: this.leftField, X1: Math.min(max_x, this.rightField), Y1: y1});
+                            ret2.push({X0: LeftField, X1: Math.min(max_x, RightField), Y1: y1});
                             break;
                         }
                     }
@@ -790,6 +791,11 @@ CWrapPolygon.prototype =
                 this.relativeArrPoints = data.oldPr;
                 break;
             }
+            case historyitem_WrapPolygonSetWrapSide:
+            {
+                this.wrapSide = data.oldPr;
+                break;
+            }
         }
     },
 
@@ -805,6 +811,12 @@ CWrapPolygon.prototype =
             case historyitem_WrapPolygonSetRelPoints:
             {
                 this.relativeArrPoints = data.newPr;
+                break;
+            }
+
+            case historyitem_WrapPolygonSetWrapSide:
+            {
+                this.wrapSide = data.newPr;
                 break;
             }
         }
@@ -829,6 +841,12 @@ CWrapPolygon.prototype =
                     writer.WriteLong(data.newPr[i].x >> 0);
                     writer.WriteLong(data.newPr[i].y >> 0);
                 }
+                break;
+            }
+
+            case historyitem_WrapPolygonSetWrapSide:
+            {
+                writeLong(writer, data.newPr);
                 break;
             }
         }
@@ -858,9 +876,19 @@ CWrapPolygon.prototype =
                 this.relativeArrPoints = rel_arr;
                 break;
             }
+
+            case historyitem_WrapPolygonSetWrapSide:
+            {
+                this.wrapSide = readLong(reader);
+                break;
+            }
+        }
+        if(this.wordGraphicObject && this.wordGraphicObject.GraphicObj && this.wordGraphicObject.GraphicObj.recalcWrapPolygon)
+        {
+            this.wordGraphicObject.GraphicObj.recalcWrapPolygon();
+            this.wordGraphicObject.GraphicObj.addToRecalculate()
         }
     },
-
 
     Refresh_RecalcData : function(Data)
     {

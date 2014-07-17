@@ -32,10 +32,13 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
     };
 
 
-    this.draw = function(overlay)
+    this.draw = function(overlay, transform)
     {
-
-
+        var oldTransform = this.TransformMatrix;
+        if(transform)
+        {
+            this.updateTransformMatrix(transform);
+        }
         if(this.checkDrawGeometry())
         {
             overlay.SaveGrState();
@@ -85,6 +88,10 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
                 overlay.RestoreGrState();
             }
         }
+        if(transform)
+        {
+            this.updateTransformMatrix(oldTransform);
+        }
     };
 
     this.checkDrawGeometry = function()
@@ -126,13 +133,13 @@ function RotateTrackShapeImage(originalObject)
     var full_flip_h = this.originalObject.getFullFlipH();
     var full_flip_v = this.originalObject.getFullFlipV();
     this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
-    this.draw = function(overlay)
+    this.draw = function(overlay, transform)
     {
         if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }
-        this.overlayObject.draw(overlay);
+        this.overlayObject.draw(overlay, transform);
     };
 
     this.track = function(angle, e)
@@ -194,8 +201,14 @@ function RotateTrackShapeImage(originalObject)
     this.getBounds = function()
     {
         var boundsChecker = new  CSlideBoundsChecker();
-        this.draw(boundsChecker);
         var tr = this.transform;
+        var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild(true);
+        if(parent_shape)
+        {
+            tr = tr.CreateDublicate();
+            global_MatrixTransformer.MultiplyAppend(tr, parent_shape.invertTransformText);
+        }
+        this.draw(boundsChecker, parent_shape ? tr : null);
         var arr_p_x = [];
         var arr_p_y = [];
         arr_p_x.push(tr.TransformPointX(0,0));

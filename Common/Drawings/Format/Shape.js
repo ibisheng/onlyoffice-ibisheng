@@ -3138,11 +3138,6 @@ CShape.prototype =
         return true;
     },
 
-    getCurDocumentContent: function () {
-        if (this.txBody) {
-            return this.txBody.content;
-        }
-    },
 
     getSearchResults: function (str, ownNum)//возвращает массив SelectionState'ов
     {
@@ -3837,28 +3832,6 @@ CShape.prototype =
         this.recalcInfo.recalculatePen = true;
     },
 
-    transformPointRelativeShape: function (x, y) {
-
-        var _horizontal_center = this.extX * 0.5;
-        var _vertical_enter = this.extY * 0.5;
-        var _sin = Math.sin(this.rot);
-        var _cos = Math.cos(this.rot);
-
-
-        var _temp_x = x - (-_horizontal_center * _cos + _vertical_enter * _sin + this.x + _horizontal_center);
-        var _temp_y = y - (-_horizontal_center * _sin - _vertical_enter * _cos + this.y + _vertical_enter);
-
-        var _relative_x = _temp_x * _cos + _temp_y * _sin;
-        var _relative_y = -_temp_x * _sin + _temp_y * _cos;
-
-        if (this.absFlipH)
-            _relative_x = this.extX - _relative_x;
-
-        if (this.absFlipV)
-            _relative_y = this.extY - _relative_y;
-
-        return { x: _relative_x, y: _relative_y };
-    },
 
     hitToAdjustment: function (x, y) {
         var invert_transform = this.getInvertTransform();

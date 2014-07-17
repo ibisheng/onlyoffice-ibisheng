@@ -1190,9 +1190,7 @@ CShapeDrawer.prototype =
 
         if (this.IsRectShape && this.Graphics.AddSmartRect !== undefined)
         {
-            if (undefined !== this.Shape.absExtX)
-                this.Graphics.AddSmartRect(0, 0, this.Shape.absExtX, this.Shape.absExtY, this.StrokeWidth);
-            else if (undefined !== this.Shape.extX)
+            if (undefined !== this.Shape.extX)
                 this.Graphics.AddSmartRect(0, 0, this.Shape.extX, this.Shape.extY, this.StrokeWidth);
             else
                 this.Graphics.ds();

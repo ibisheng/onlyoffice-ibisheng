@@ -496,7 +496,7 @@ function ComparisonByZIndex(grObj1, grObj2)
         && typeof grObj1 === "object" && typeof grObj2 === "object" )
     {
         if(typeof grObj1.RelativeHeight === "number" && typeof grObj2.RelativeHeight === "number")
-            return grObj1.RelativeHeight - grObj2.RelativeHeight;
+            return grObj2.RelativeHeight - grObj1.RelativeHeight;
     }
     return 0;
 }

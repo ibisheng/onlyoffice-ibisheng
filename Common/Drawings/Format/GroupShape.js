@@ -283,20 +283,7 @@ CGroupShape.prototype =
         return {tables: tables, charts: charts, shapes: shapes, images: images, groups: groups};
     },
 
-    getCurDocumentContent: function()
-    {
-        if(this.parent.graphicObjects.State instanceof TextAddInGroup && this.parent.graphicObjects.State.group === this)
-        {
-            for(var i = 0; i < this.arrGraphicObjects.length; ++i)
-            {
-                if(this.arrGraphicObjects[i] === this.parent.graphicObjects.State.textObject)
-                {
-                    return this.arrGraphicObjects[i].getCurDocumentContent();
-                }
-            }
-        }
-        return null;
-    },
+
 
     getBoundsInGroup: function()
     {

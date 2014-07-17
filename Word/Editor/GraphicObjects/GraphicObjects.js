@@ -1710,110 +1710,6 @@ CGraphicObjects.prototype =
         return {X: 0, Y: 0};
     },
 
-    getNewGroupPos: function()
-    {
-        var arrGraphicObjects = this.selectionInfo.selectionArray;
-        var x_min, x_max, y_min, y_max;
-        var cur_x_min, cur_x_max, cur_y_max, cur_y_min;
-        for(var object_index = 0; object_index < arrGraphicObjects.length; object_index++)
-        {
-            arrGraphicObjects[object_index].deselect();
-            var cur_graphic_object = arrGraphicObjects[object_index].GraphicObj;
-            if(cur_graphic_object.isGroup())
-            {
-                var  cur_sp_tree = cur_graphic_object.spTree;
-                for(var sp_index = 0; sp_index < cur_sp_tree.length; ++sp_index)
-                {
-                    var  cur_sp = cur_sp_tree[sp_index];
-                    var full_rot = cur_sp.absRot + cur_graphic_object.absRot;
-                    var hc, vc;
-                    var xc, yc;
-                    hc = cur_sp.absExtX*0.5;
-                    vc = cur_sp.absExtY*0.5;
-                    xc = cur_sp.transform.TransformPointX(hc, vc);
-                    yc = cur_sp.transform.TransformPointY(hc, vc);
-                    if((full_rot >= 0 && full_rot < Math.PI*0.25)
-                        || (full_rot > 3*Math.PI*0.25 && full_rot < 5*Math.PI*0.25)
-                        || (full_rot > 7*Math.PI*0.25 && full_rot < 2*Math.PI))
-                    {
-                        cur_x_min = xc - hc;
-                        cur_x_max = xc + hc;
-                        cur_y_min = yc - vc;
-                        cur_y_max = yc + vc;
-                    }
-                    else
-                    {
-                        cur_x_min = xc - vc;
-                        cur_x_max = xc + vc;
-                        cur_y_min = yc - hc;
-                        cur_y_max = yc + hc;
-                    }
-                    if(object_index === 0 && sp_index === 0)
-                    {
-                        x_max = cur_x_max;
-                        x_min = cur_x_min;
-                        y_max = cur_y_max;
-                        y_min = cur_y_min;
-                    }
-                    else
-                    {
-                        if(cur_x_max > x_max)
-                            x_max = cur_x_max;
-                        if(cur_x_min < x_min)
-                            x_min = cur_x_min;
-                        if(cur_y_max > y_max)
-                            y_max = cur_y_max;
-                        if(cur_y_min < y_min)
-                            y_min = cur_y_min;
-                    }
-                }
-            }
-            else
-            {
-                full_rot = cur_graphic_object.absRot;
-                hc = cur_graphic_object.absExtX*0.5;
-                vc = cur_graphic_object.absExtY*0.5;
-                xc = cur_graphic_object.transform.TransformPointX(hc, vc);
-                yc = cur_graphic_object.transform.TransformPointY(hc, vc);
-                if((full_rot >= 0 && full_rot < Math.PI*0.25)
-                    || (full_rot > 3*Math.PI*0.25 && full_rot < 5*Math.PI*0.25)
-                    || (full_rot > 7*Math.PI*0.25 && full_rot < 2*Math.PI))
-                {
-                    cur_x_min = xc - hc;
-                    cur_x_max = xc + hc;
-                    cur_y_min = yc - vc;
-                    cur_y_max = yc + vc;
-                }
-                else
-                {
-                    cur_x_min = xc - vc;
-                    cur_x_max = xc + vc;
-                    cur_y_min = yc - hc;
-                    cur_y_max = yc + hc;
-                }
-                if(object_index === 0)
-                {
-                    x_max = cur_x_max;
-                    x_min = cur_x_min;
-                    y_max = cur_y_max;
-                    y_min = cur_y_min;
-                }
-                else
-                {
-                    if(cur_x_max > x_max)
-                        x_max = cur_x_max;
-                    if(cur_x_min < x_min)
-                        x_min = cur_x_min;
-                    if(cur_y_max > y_max)
-                        y_max = cur_y_max;
-                    if(cur_y_min < y_min)
-                        y_min = cur_y_min;
-                }
-            }
-        }
-        return {x: x_min, y: y_min};
-    },
-
     checkCommonBounds: function(arrDrawings)
     {
         var l, t, r,b;
@@ -2224,12 +2120,13 @@ CGraphicObjects.prototype =
             }
             else
             {
-                this.selectedObjects[0].parent.GoTo_Text();
+                var first_selected = this.selectedObjects[0];
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
                 }
                 this.resetSelection();
+                first_selected.parent.GoTo_Text();
                 this.document.Recalculate();
             }
         }
@@ -2631,13 +2528,13 @@ CGraphicObjects.prototype =
 function ComparisonByZIndexSimpleParent(obj1, obj2)
 {
     if(obj1.parent && obj2.parent)
-        return obj1.parent.RelativeHeight - obj2.parent.RelativeHeight;
+        return obj2.parent.RelativeHeight - obj1.parent.RelativeHeight;
     return 0;
 }
 
 function ComparisonByZIndexSimple(obj1, obj2)
 {
-    return obj1.RelativeHeight - obj2.RelativeHeight;
+    return obj2.RelativeHeight - obj1.RelativeHeight;
 }
 
 function ComparisonByZIndex(obj1, obj2)
@@ -2769,9 +2666,9 @@ ZIndexManager.prototype =
     {
         if(this.startRefreshIndex > -1)
         {
-            for(var i = this.startRefreshIndex; i < this.Content.length; ++i)
+            for(var i = 0; i < this.Content.length; ++i)
             {
-                this.Content[i].RelativeHeight = i;
+                this.Content[i].RelativeHeight = this.Content.length - i;
             }
             this.startRefreshIndex = -1;
         }

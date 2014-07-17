@@ -92,9 +92,15 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.TurnOffRecalc = false;
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.StartState = null;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+
+    if(this.bPresentation)
+    {
+        this.Save_StartState();
+    }
 }
 
 CDocumentContent.prototype =
@@ -108,6 +114,11 @@ CDocumentContent.prototype =
     Get_Id : function()
     {
         return this.Id;
+    },
+
+    Save_StartState: function()
+    {
+        this.StartState = new CDocumentContentStartState(this);
     },
 
     Copy : function(Parent)
@@ -8550,10 +8561,21 @@ CDocumentContent.prototype =
         Writer.WriteBool(this.Split);
         writeBool(Writer, this.bPresentation);
 
-        var Count = this.Content.length;
+
+        var ContentToWrite;
+        if(this.StartState)
+        {
+            ContentToWrite = this.StartState.Content;
+        }
+        else
+        {
+            ContentToWrite = this.Content;
+        }
+
+        var Count = ContentToWrite.length;
         Writer.WriteLong(Count);
         for ( var Index = 0; Index < Count; Index++ )
-            Writer.WriteString2( this.Content[Index].Get_Id() );
+            Writer.WriteString2( ContentToWrite[Index].Get_Id() );
 
         if(this.Parent && this.Parent.Get_Worksheet)
         {
@@ -8865,6 +8887,16 @@ CDocumentContent.prototype =
     }
 
 };
+
+
+function CDocumentContentStartState(DocContent)
+{
+    this.Content = [];
+    for(var i = 0; i < DocContent.Content.length; ++i)
+    {
+        this.Content.push(DocContent.Content[i]);
+    }
+}
 
 function CDocumentRecalculateObject()
 {

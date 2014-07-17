@@ -681,20 +681,27 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
         };
 
-        this.draw = function(overlay)
+        this.draw = function(overlay, transform)
         {
             if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
             {
                 overlay.SetCurrentPage(this.originalObject.selectStartPage);
             }
-            this.overlayObject.draw(overlay);
+            this.overlayObject.draw(overlay, transform);
         };
 
         this.getBounds = function()
         {
             var boundsChecker = new  CSlideBoundsChecker();
-            this.draw(boundsChecker);
             var tr = this.transform;
+            var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild(true);
+            if(parent_shape)
+            {
+                tr = tr.CreateDublicate();
+                global_MatrixTransformer.MultiplyAppend(tr, parent_shape.invertTransformText);
+            }
+            this.draw(boundsChecker, parent_shape ? tr : null);
+
             var arr_p_x = [];
             var arr_p_y = [];
             arr_p_x.push(tr.TransformPointX(0,0));
@@ -718,32 +725,6 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             return boundsChecker.Bounds;
         };
 
-        this.getBoundsRect = function()
-        {
-            var t = this.transform;
-            var max_x, min_x, max_y, min_y;
-            min_x = t.TransformPointX(0, 0);
-            max_x = min_x;
-            min_y = t.TransformPointY(0, 0);
-            max_y = min_y;
-            var arr = [{x: this.resizedExtX, y: 0}, {x: this.resizedExtX, y: this.resizedExtY}, {x: 0, y: this.resizedExtY}];
-            var t_x, t_y;
-            for(var i = 0; i < arr.length; ++i)
-            {
-                var p = arr[i];
-                t_x = t.TransformPointX(p.x, p.y);
-                t_y = t.TransformPointY(p.x, p.y);
-                if(t_x < min_x)
-                    min_x = t_x;
-                if(t_x > max_x)
-                    max_x = t_x;
-                if(t_y < min_y)
-                    min_y = t_y;
-                if(t_y > max_y)
-                    max_y = t_y;
-            }
-            return {l: min_x, t: min_y, r: max_x, b: max_y};
-        };
 
         this.trackEnd = function(bWord)
         {
@@ -1396,34 +1377,6 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         };
 
 
-        this.getBoundsRect = function()
-        {
-            var t = this.transform;
-            var min_x, max_x, min_y, max_y;
-            min_x = t.TransformPointX(0, 0);
-            max_x = min_x;
-            min_y = t.TransformPointY(0, 0);
-            max_y = min_y;
-
-            var arr = [{x: this.extX, y: 0}, {x: this.extX, y: this.extY},  {x: 0, y: this.extY}];
-            var t_x, t_y;
-            for(var i = 0; i < arr.length; ++i)
-            {
-                var p = arr[i];
-                t_x = t.TransformPointX(p.x, p.y);
-                t_y = t.TransformPointY(p.x, p.y);
-                if(t_x < min_x)
-                    min_x = t_x;
-                if(t_x > max_x)
-                    max_x = t_x;
-
-                if(t_y < min_y)
-                    min_y = t_y;
-
-                if(t_y > max_y)
-                    max_y = t_y;
-            }
-            return {l: min_x, t: min_y, r: max_x, b: max_y};};
 
         this.trackEnd = function(bWord)
         {

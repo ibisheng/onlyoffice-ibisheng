@@ -646,6 +646,7 @@ var historyitem_ZIndexManagerAddItem      = 2605;
 
 var historyitem_WrapPolygonSetEdited     = 2607;
 var historyitem_WrapPolygonSetRelPoints  = 2608;
+var historyitem_WrapPolygonSetWrapSide  = 2608;
 
 
 
@@ -936,14 +937,11 @@ var historyitem_Drawing_Distance          = 5; // Изменяем рассто�
 var historyitem_Drawing_AllowOverlap      = 6; // Изменяем возможность перекрытия плавающих картинок
 var historyitem_Drawing_PositionH         = 7; // Изменяем привязку по горизонтали
 var historyitem_Drawing_PositionV         = 8; // Изменяем привязку по вертикали
-var historyitem_Drawing_AbsoluteTransform = 9;
 var historyitem_Drawing_BehindDoc         = 10; // Изменяем положение объекта (за/перед текстом)
-var historyitem_Drawing_SetZIndex         = 11;
-var historyitem_Drawing_SetGraphicObject  = 12;
-var historyitem_CalculateAfterPaste       = 13;
-var historyitem_SetSimplePos              = 14;
-var historyitem_SetExtent                 = 15;
-var historyitem_SetWrapPolygon            = 16;
+var historyitem_Drawing_SetGraphicObject  = 11;
+var historyitem_SetSimplePos              = 12;
+var historyitem_SetExtent                 = 13;
+var historyitem_SetWrapPolygon            = 14;
 
 
 

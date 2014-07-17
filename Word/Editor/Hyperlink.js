@@ -2301,6 +2301,12 @@ ParaHyperlink.prototype =
         // Array of Strings : массив с Id элементов
 
         Writer.WriteString2( this.Id );
+        if(!(editor && editor.isDocumentEditor))
+        {
+            this.Write_ToBinary2SpreadSheets(Writer);
+            return;
+        }
+
         Writer.WriteString2( this.Value );
         Writer.WriteString2( this.ToolTip );
 
@@ -2334,5 +2340,24 @@ ParaHyperlink.prototype =
             if ( null !== Element )
                 this.Content.push( Element );
         }
+    },
+
+    Write_ToBinary2SpreadSheets : function(Writer)
+    {
+        Writer.WriteString2("");
+        Writer.WriteString2("");
+        Writer.WriteLong(0);
     }
 };
+
+
+function CParaHyperLinkStartState(HyperLink)
+{
+    this.Value = HyperLink.Value;
+    this.ToolTip = HyperLink.ToolTip;
+    this.Content = [];
+    for(var i = 0; i < HyperLink.Content.length; ++i)
+    {
+        this.Content.push(HyperLink.Content);
+    }
+}

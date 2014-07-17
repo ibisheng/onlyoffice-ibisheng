@@ -176,7 +176,7 @@ XYAdjustmentTrack.prototype.getBounds = function()
     var bounds_checker = new  CSlideBoundsChecker();
     bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
     this.draw(bounds_checker);
-    var tr = this.originalShape.transform;
+    var tr = this.originalShape.localTransform;
     var arr_p_x = [];
     var arr_p_y = [];
     arr_p_x.push(tr.TransformPointX(0,0));
@@ -281,13 +281,6 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }
         this.overlayObject.draw(overlay);
-    };
-    this.getBounds = function()
-    {
-        var bounds_checker = new  CSlideBoundsChecker();
-        bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
-        this.draw(bounds_checker);
-        return bounds_checker.Bounds;
     };
 
     this.track = function(posX, posY)

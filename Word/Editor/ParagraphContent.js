@@ -3831,10 +3831,6 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.DrawingDocument = DrawingDocument;
     this.Parent          = Parent;
 
-    this.Focused = false;
-
-    this.ImageTrackType = 1;
-
     // Расстояние до окружающего текста
     this.Distance =
     {
@@ -3891,10 +3887,6 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.Internal_Position = new CAnchorPosition();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-
-
-
-
     //--------------------------------------------------------
     this.selectX = 0;
     this.selectY = 0;
@@ -3906,27 +3898,11 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.document = editor.WordControl.m_oLogicDocument;
     this.drawingDocument = DrawingDocument;
     this.graphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-    this.mainGraphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
     this.selected = false;
 
     this.behindDoc = false;
 
     this.pageIndex = -1;//pageIndex;
-    this.absOffsetX = null;
-    this.absOffsetY = null;
-
-    this.absExtX = null;
-    this.absExtY = null;
-
-    this.absRot = null;
-
-    this.absFlipH = null;
-    this.absFlipV = null;
-
-    this.boundsOffsetX = null;
-    this.boundsOffsetY = null;
-
-    this.selectionObject = null;
 
     this.snapArrayX = [];
     this.snapArrayY = [];
@@ -4269,15 +4245,20 @@ ParaDrawing.prototype =
             c.Set_GraphicObject( this.GraphicObj.copy());
             c.GraphicObj.setParent(c);
         }
+
         var d = this.Distance;
         c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
         c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.Set_AllowOverlap(this.AllowOverlap);
-        
         c.Set_WrappingType(this.wrappingType);
+        if(this.wrappingPolygon)
+        {
+            c.wrappingPolygon.fromOther(this.wrappingPolygon);
+        }
         c.Set_BehindDoc(this.behindDoc);
         c.Update_Size(this.W, this.H);
+
         return c;
     },
 
@@ -4360,7 +4341,7 @@ ParaDrawing.prototype =
     //
         var PageNum = ParaLayout.PageNum;
 
-        var OtherFlowObjects = this.mainGraphicObjects.getAllFloatObjectsOnPage( PageNum, this.Parent.Parent );
+        var OtherFlowObjects = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatObjectsOnPage( PageNum, this.Parent.Parent );
         var bInline = ( drawing_Inline === this.DrawingType ? true : false );
 
         var W, H;
@@ -4965,28 +4946,6 @@ ParaDrawing.prototype =
 
                 break;
             }
-            case historyitem_Drawing_AbsoluteTransform:
-            {
-                if(Data.oldOffsetX != undefined)
-                    this.absOffsetX = Data.oldOffsetX;
-                if(Data.oldOffsetY != undefined)
-                    this.absOffsetY = Data.oldOffsetY;
-
-                if(Data.oldExtX != undefined)
-                    this.absExtX = Data.oldExtX;
-                if(Data.oldExtY != undefined)
-                    this.absExtY = Data.oldExtY;
-
-                if(Data.oldRot != undefined)
-                    this.absRot = Data.oldRot;
-
-                if(Data.oldFlipH != undefined)
-                    this.absFlipH = Data.oldFlipH;
-                if(Data.oldFlipV != undefined)
-                    this.absFlipV = Data.oldFlipV;
-                break;
-            }
-
             case historyitem_Drawing_BehindDoc:
             {
                 this.behindDoc = Data.Old;
@@ -5107,27 +5066,6 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_AbsoluteTransform:
-            {
-                if(Data.newOffsetX != undefined)
-                    this.absOffsetX = Data.newOffsetX;
-                if(Data.newOffsetY != undefined)
-                    this.absOffsetY = Data.newOffsetY;
-
-                if(Data.newExtX != undefined)
-                    this.absExtX = Data.newExtX;
-                if(Data.newExtY != undefined)
-                    this.absExtY = Data.newExtY;
-
-                if(Data.newRot != undefined)
-                    this.absRot = Data.newRot;
-
-                if(Data.newFlipH != undefined)
-                    this.absFlipH = Data.newFlipH;
-                if(Data.newFlipV != undefined)
-                    this.absFlipV = Data.newFlipV;
-                break;
-            }
 
             case historyitem_Drawing_BehindDoc:
             {
@@ -5484,62 +5422,6 @@ ParaDrawing.prototype =
 
                 break;
             }
-            case historyitem_Drawing_AbsoluteTransform:
-            {
-
-                var bool = Data.newOffsetX != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteDouble(Data.newOffsetX);
-                }
-
-                bool = Data.newOffsetY != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteDouble(Data.newOffsetY);
-                }
-
-
-                bool = Data.newExtX != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteDouble(Data.newExtX);
-                }
-
-                bool = Data.newExtY != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteDouble(Data.newExtY);
-                }
-
-                bool = Data.newRot != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteDouble(Data.newRot);
-                }
-
-                bool = Data.newFlipH != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteBool(Data.newFlipH);
-                }
-
-
-                bool = Data.newFlipV != null;
-                Writer.WriteBool(bool);
-                if(bool)
-                {
-                    Writer.WriteBool(Data.newFlipV);
-                }
-                break;
-            }
-
 
             case historyitem_Drawing_SetGraphicObject:
             {
@@ -5712,51 +5594,6 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_AbsoluteTransform:
-            {
-                var reader = Reader;
-                if(reader.GetBool())
-                {
-                    this.absOffsetX = reader.GetDouble();
-                }
-
-                if(reader.GetBool())
-                {
-                    this.absOffsetY= reader.GetDouble();
-                }
-
-
-
-                if(reader.GetBool())
-                {
-                    this.absExtX = reader.GetDouble();
-                }
-
-                if(reader.GetBool())
-                {
-                    this.absExtY= reader.GetDouble();
-                }
-
-
-                if(reader.GetBool())
-                {
-                    this.absRot = reader.GetDouble();
-                }
-
-                if(reader.GetBool())
-                {
-                    this.absFlipH = reader.GetBool();
-                }
-
-
-
-                if(reader.GetBool())
-                {
-                    this.absFlipV = reader.GetBool();
-                }
-                break;
-            }
-
 
             case historyitem_Drawing_SetGraphicObject:
             {
@@ -5776,21 +5613,6 @@ ParaDrawing.prototype =
                 {
                     this.GraphicObj.parent = this;
                     this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
-                }
-                break;
-            }
-            case historyitem_CalculateAfterPaste:
-            {
-                if(isRealObject(this.GraphicObj))
-                {
-                    if(this.GraphicObj.isGroup())
-                    {
-                        this.GraphicObj.calculateAfterOpen3();
-                    }
-                    else
-                    {
-                        this.GraphicObj.calculateAfterOpen();
-                    }
                 }
                 break;
             }
@@ -5827,7 +5649,7 @@ ParaDrawing.prototype =
                 }
                 else
                 {
-                    this.wrapPolygon = null;
+                    this.wrappingPolygon = null;
                 }
                 break;
             }
@@ -5848,61 +5670,45 @@ ParaDrawing.prototype =
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( historyitem_type_Drawing );
+        Writer.WriteString2(this.Id);
+        writeDouble(Writer, this.W);
+        writeDouble(Writer, this.H);
+        writeObject(Writer, this.GraphicObj);
+        writeObject(Writer, this.DocumentContent);
+        writeObject(Writer, this.Parent);
+        writeObject(Writer, this.wrappingPolygon);
 
-        // Long   : Type
-        // String : Id
-        // String : ParentId
-        // Byte   : DrawingType
-        // Long   : W
-        // Long   : H
-        // Long   : Distance.T
-        // Long   : Distance.B
-        // Long   : Distance.L
-        // Long   : Distance.R
-        // String : Указатель на картинку
-
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Id );
-        Writer.WriteByte( this.DrawingType );
-        Writer.WriteDouble( this.W );
-        Writer.WriteDouble( this.H );
-        Writer.WriteDouble( this.Distance.T );
-        Writer.WriteDouble( this.Distance.B );
-        Writer.WriteDouble( this.Distance.L );
-        Writer.WriteDouble( this.Distance.R );
-        //Writer.WriteString2( this.GraphicObj.Img );
     },
 
     Read_FromBinary2 : function(Reader)
     {
+        this.Id = Reader.GetString2();
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
-        this.Type        = Reader.GetLong();
-        this.Id          = Reader.GetString2();
-        this.DrawingType = Reader.GetByte();
-        this.W           = Reader.GetDouble();
-        this.H           = Reader.GetDouble();
-        this.Distance.T  = Reader.GetDouble();
-        this.Distance.B  = Reader.GetDouble();
-        this.Distance.L  = Reader.GetDouble();
-        this.Distance.R  = Reader.GetDouble();
-        // this.GraphicObj  = new GraphicPicture( Reader.GetString2() );
+        this.W               = readDouble(Reader);
+        this.H               = readDouble(Reader);
+        this.GraphicObj      = readObject(Reader);
+        this.DocumentContent = readObject(Reader);
+        this.Parent          = readObject(Reader);
+        this.wrappingPolygon = readObject(Reader);
+        if(this.wrappingPolygon)
+        {
+            this.wrappingPolygon.wordGraphicObject = this;
+        }
 
-        //  CollaborativeEditing.Add_NewImage( this.GraphicObj.Img );
+        this.Extent.W = this.W;
+        this.Extent.H = this.H;
+
+
         this.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
         this.document = editor.WordControl.m_oLogicDocument;
         this.graphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-        this.mainGraphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
         this.graphicObjects.objectsMap["_" + this.Get_Id()] = this;
         g_oTableId.Add(this, this.Id);
     },
 
-    Load_LinkData : function(LinkData)
+    Load_LinkData : function()
     {
-        this.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-        this.document = editor.WordControl.m_oLogicDocument;
-        this.graphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-        this.mainGraphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
     },
 
 
@@ -6069,9 +5875,7 @@ ParaDrawing.prototype =
 
     setZIndex2: function(zIndex)
     {
-        var data = {Type:historyitem_Drawing_SetZIndex, oldIndex: this.RelativeHeight, newIndex: zIndex};
         this.RelativeHeight = zIndex;
-        History.Add(this, data);
     },
 
     hitToAdj: function(x, y)
@@ -6282,46 +6086,6 @@ ParaDrawing.prototype =
         this.PageNum = newPageIndex;
     },
 
-    setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, bFromChild)
-    {
-        if(offsetX != null)
-        {
-            this.absOffsetX = offsetX;
-        }
-
-        if(offsetY != null)
-        {
-            this.absOffsetY = offsetY;
-        }
-
-        if(extX != null)
-        {
-            this.absExtX = extX;
-        }
-
-        if(extY != null)
-        {
-            this.absExtY = extY;
-        }
-
-        if(rot != null)
-        {
-            this.absRot = rot;
-        }
-
-        if(flipH != null)
-        {
-            this.absFlipH = flipH;
-        }
-
-        if(flipV != null)
-        {
-            this.absFlipV = flipV;
-        }
-
-        if(!bFromChild && isRealObject(this.GraphicObj) && typeof this.GraphicObj.setAbsoluteTransform === "function")
-            this.GraphicObj.setAbsoluteTransform(offsetX, offsetY, extX, extY, rot, flipH, flipV);
-    },
 
     Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
     {
@@ -6329,19 +6093,6 @@ ParaDrawing.prototype =
             this.GraphicObj.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
     },
 
-    getCursorTypeByNum: function(num)
-    {
-        if(isRealObject(this.cursorTypes) && typeof this.cursorTypes[num] === "string")
-        {
-            return this.cursorTypes[num];
-        }
-        else
-        {
-            this.updateCursorTypes();
-            return this.cursorTypes[num];
-        }
-        return "default";
-    },
 
     getTableProps: function()
     {
@@ -6675,50 +6426,12 @@ ParaDrawing.prototype =
 
     init: function()
     {
-        this.calculateAfterOpen();
-        if(editor.WordControl.m_oLogicDocument.DrawingObjects && this.RelativeHeight > editor.WordControl.m_oLogicDocument.DrawingObjects.maximalGraphicObjectZIndex)
-            editor.WordControl.m_oLogicDocument.DrawingObjects.maximalGraphicObjectZIndex = this.RelativeHeight;
     },
 
     calculateAfterOpen: function()
     {
-        /*if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.calculateAfterOpen === "function")
-         {
-         this.GraphicObj.parent = this;
-         this.GraphicObj.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
-         this.GraphicObj.calculateAfterOpen();
-         this.GraphicObj.recalculate(false, true);
-
-         var bounds = this.getBounds();
-         this.W = bounds.r - bounds.l;
-         this.H = bounds.b - bounds.t;
-         if(isRealObject(this.wrappingPolygon) && this.wrappingPolygon.edited === true)
-         {
-         var kw = this.GraphicObj.absExtX/0.6;
-         var kh = this.GraphicObj.absExtY/0.6;
-         var rel_points = this.wrappingPolygon.relativeArrPoints;
-         for(var i = 0; i < rel_points.length; ++i)
-         {
-         rel_points[i].x *= kw;
-         rel_points[i].y *= kh;
-         }
-         }
-         }     */
     },
 
-    calculateOffset: function()
-    {
-        var bounds = this.getBounds();
-
-        var hc = this.absExtX*0.5;
-        var vc = this.absExtY*0.5;
-
-        var transform = this.getOwnTransform();
-        var xc = transform.TransformPointX(hc, vc);
-        var yc = transform.TransformPointY(hc, vc);
-        this.boundsOffsetX = xc - hc - bounds.l;
-        this.boundsOffsetY = yc - vc - bounds.t;
-    },
 
     getBounds: function()
     {
@@ -6726,18 +6439,14 @@ ParaDrawing.prototype =
         return this.GraphicObj.bounds;
     },
 
-    getCenterPoint: function()
-    {
-        return {x: this.absOffsetX + this.absExtX*0.5, y: this.absOffsetY + 0.5*this.absExtY};
-    },
 
 
     getWrapContour: function()
     {
         if(isRealObject(this.wrappingPolygon))
         {
-            var kw = 0.6/this.GraphicObj.absExtX;
-            var kh = 0.6/this.GraphicObj.absExtY;
+            var kw = 1/36000;
+            var kh = 1/36000;
             var rel_points = this.wrappingPolygon.relativeArrPoints;
             var ret = [];
             for(var i = 0; i < rel_points.length; ++i)
@@ -6749,46 +6458,6 @@ ParaDrawing.prototype =
         return [];
     },
 
-    getBoundsRect: function()
-    {
-        var g = this.GraphicObj;
-        if(isRealObject(g))
-        {
-            var t;
-            if(!isRealObject(g.ownTransform))
-                t.Translate(g.absOffsetX, g.absOffsetY);
-            else
-                t = g.ownTransform;
-
-            var min_x, max_x, min_y, max_y;
-            min_x = t.TransformPointX(0, 0);
-            max_x = min_x;
-            min_y = t.TransformPointY(0, 0);
-            max_y = min_y;
-
-            var t_x, t_y;
-            var arr = [{x: this.absExtX, y: 0}, {x: this.absExtX, y: this.absExtY}, {x: 0, y: this.absExtY}];
-            for(var i = 0; i < 3; ++i)
-            {
-                var p = arr[i];
-                t_x = t.TransformPointX(p.x, p.y);
-                t_y = t.TransformPointY(p.x, p.y);
-                if(t_x < min_x)
-                    min_x = t_x;
-                if(t_x > max_x)
-                    max_x = t_x;
-                if(t_y < min_y)
-                    min_y = t_y;
-                if(t_y > max_y)
-                    max_y = t_y;
-            }
-            return {l: min_x, t: min_y, r: max_x, b: max_y};
-        }
-        else
-        {
-            return {l: 0, t: 0, r: 0, b: 0};
-        }
-    },
 
     getDrawingArrayType: function()
     {
@@ -6801,68 +6470,6 @@ ParaDrawing.prototype =
         return DRAWING_ARRAY_TYPE_WRAPPING;
     },
 
-    updateCursorTypes : function()
-    {
-        this.cursorTypes = [];
-        var transform = this.getTransformMatrix();
-        if(transform == null)
-        {
-            transform = new CMatrix();
-            transform.Translate(this.absOffsetX, this.absOffsetY, MATRIX_ORDER_APPEND);
-        }
-        var vc = this.absExtX*0.5;
-        var hc = this.absExtY*0.5;
-        var xc = transform.TransformPointX(hc, vc);
-        var yc = transform.TransformPointY(hc, vc);
-        var xt = transform.TransformPointX(hc, 0);
-        var yt = transform.TransformPointY(hc, 0);
-        var vx = xt-xc;
-        var vy = yc-yt;
-        var angle = Math.atan2(vy, vx)+Math.PI/8;
-        if(angle < 0)
-        {
-            angle+=2*Math.PI;
-        }
-        if(angle > 2*Math.PI)
-        {
-            angle-=2*Math.PI;
-        }
-
-        var xlt = transform.TransformPointX(0, 0);
-        var ylt = transform.TransformPointY(0, 0);
-        var vx_lt = xlt-xc;
-        var vy_lt = yc-ylt;
-        var curTypes = [];
-        curTypes[0] = "n-resize";
-        curTypes[1] = "ne-resize";
-        curTypes[2] = "e-resize";
-        curTypes[3] = "se-resize";
-        curTypes[4] = "s-resize";
-        curTypes[5] = "sw-resize";
-        curTypes[6] = "w-resize";
-        curTypes[7] = "nw-resize";
-        var _index = Math.floor(angle/(Math.PI/4));
-        var _index2, t;
-        if(vx_lt*vy-vx*vy_lt < 0) // нумерация якорьков по часовой стрелке
-        {
-            for(var i = 0; i<8; ++i)
-            {
-                //_index2 = (i-_index+17)%8;
-                t = i- _index + 17;
-                _index2 =  t - ((t/8) >> 0)*8;
-                this.cursorTypes[i] = curTypes[_index2];
-            }
-        }
-        else
-        {
-            for(i = 0; i<8; ++i)
-            {
-                t = -i-_index+19;
-                _index2 = t - ((t/8) >> 0)*8;//(-i-_index+19)%8;
-                this.cursorTypes[i] = curTypes[_index2];
-            }
-        }
-    },
 
     documentSearch: function(String, search_Common)
     {
@@ -6882,63 +6489,7 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.setParagraphStyle === "function")
             this.GraphicObj.setParagraphStyle(style);
     },
-    writeToBinaryForCopyPaste: function()
-    {
-        var w = new CMemory();
-        var start_string = "";
-        if(isRealObject(this.GraphicObj))
-        {
-            var g_o = this.GraphicObj;
-            if(g_o.isImage() && !isRealObject(g_o.chart))
-                start_string = "TeamLabImage";
-            //w.WriteString2("TeamLabImage");
-            else if(g_o.isImage() && isRealObject(g_o.chart))
-                start_string = "TeamLabChart";
-            //w.WriteString2("TeamLabChart");
-            else if(g_o.isShape())
-                start_string = "TeamLabShape";
 
-            // w.WriteString2("TeamLabShape");
-            else if(g_o.isGroup())
-                start_string = "TeamLabGroup";
-            //w.WriteString2("TeamLabGroup");
-        }
-        w.WriteLong(this.DrawingType);
-        this.GraphicObj.writeToBinaryForCopyPaste(w);
-        w.WriteDouble(this.X);
-        w.WriteDouble(this.Y);
-        w.WriteDouble(this.W);
-        w.WriteDouble(this.H);
-        w.WriteDouble(this.PageNum);
-        w.WriteDouble(this.YOffset);
-        w.WriteBool(this.Focused);
-        w.WriteDouble(this.Distance.T);
-        w.WriteDouble(this.Distance.B);
-        w.WriteDouble(this.Distance.L);
-        w.WriteDouble(this.Distance.R);
-        w.WriteBool(this.LayoutInCell);
-        w.WriteDouble(this.RelativeHeight);
-        w.WriteBool(this.SimplePos.Use);
-        w.WriteDouble(this.SimplePos.X);
-        w.WriteDouble(this.SimplePos.Y);
-        w.WriteDouble(this.Extent.W);
-        w.WriteDouble(this.Extent.H);
-        w.WriteBool(this.AllowOverlap);
-        w.WriteDouble(this.PositionH.RelativeFrom);
-        w.WriteDouble(this.PositionH.Align);
-        w.WriteDouble(this.PositionH.Value);
-        w.WriteDouble(this.PositionV.RelativeFrom);
-        w.WriteDouble(this.PositionV.Align);
-        w.WriteDouble(this.PositionV.Value);
-        w.WriteLong(this.wrappingType);
-        w.WriteBool(this.behindDoc);
-        // this.wrappingPolygon.writeToBinaryForCopyPaste(w);
-        return start_string + w.pos + ";" + w.GetBase64Memory();
-    },
-
-    readFromBinaryForCopyPaste: function(r, bNoRecalc)
-    {
-    },
 
     setSimplePos: function(use, x, y)
     {
