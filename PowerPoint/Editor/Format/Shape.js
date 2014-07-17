@@ -646,6 +646,9 @@ CShape.prototype =
         }
     },
 
+    setBDeleted: function()
+    {},
+
     Document_UpdateRulersState: function (margins) {
         if (this.txBody && this.txBody.content) {
             this.txBody.content.Document_UpdateRulersState(this.parent.num, this.getMargins());
@@ -1784,6 +1787,14 @@ CShape.prototype =
     },
 
     recalculateTransform: function () {
+        this.recalculateLocalTransform(this.transform);
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+
+    },
+
+
+    recalculateLocalTransform: function(transform)
+    {
         if (!isRealObject(this.group)) {
             if (this.spPr.xfrm.isNotNull()) {
                 var xfrm = this.spPr.xfrm;
@@ -1873,21 +1884,19 @@ CShape.prototype =
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
-        this.transform.Reset();
+        transform.Reset();
         var hc = this.extX * 0.5;
         var vc = this.extY * 0.5;
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        global_MatrixTransformer.TranslateAppend(transform, -hc, -vc);
         if (this.flipH)
-            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+            global_MatrixTransformer.ScaleAppend(transform, -1, 1);
         if (this.flipV)
-            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
-        global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+            global_MatrixTransformer.ScaleAppend(transform, 1, -1);
+        global_MatrixTransformer.RotateRadAppend(transform, -this.rot);
+        global_MatrixTransformer.TranslateAppend(transform, this.x + hc, this.y + vc);
         if (isRealObject(this.group)) {
-            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransformMatrix());
+            global_MatrixTransformer.MultiplyAppend(transform, this.group.getTransformMatrix());
         }
-        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-
     },
 
     updateInterfaceTextState: function () {

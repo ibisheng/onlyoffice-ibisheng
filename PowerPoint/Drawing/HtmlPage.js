@@ -750,10 +750,7 @@ function CEditorPage(api)
         oWordControl.CalculateDocumentSize();
         var lCurPage = oWordControl.m_oDrawingDocument.SlideCurrent;
 
-        if (oWordControl.m_oLogicDocument)
-        {
-            oWordControl.m_oLogicDocument.redrawCharts();
-        }
+
 
         this.GoToPage(lCurPage);
 

@@ -260,6 +260,23 @@ CColorMod.prototype =
     }
 };
 
+function _create_mod(default_obj)
+{
+	var ret = new CColorMod();
+	ret.name = default_obj["name"];
+	ret.val = default_obj["val"];
+	return ret;
+}
+
+function _create_mods(arr_defaults)
+{
+	var ret = [];
+	for (var i = 0; i < arr_defaults.length; i++)
+		ret.push(_create_mod(arr_defaults[i]));
+	return ret;
+}
+
+
 var cd16 = 1.0/6.0;
 var cd13 = 1.0/3.0;
 var cd23 = 2.0/3.0;
