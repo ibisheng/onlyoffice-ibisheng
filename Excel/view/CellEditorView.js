@@ -1081,44 +1081,43 @@
 
 		CellEditor.prototype._updateCursorPosition = function (redrawText) {
 			// ToDo стоит переправить данную функцию
-			var t = this;
-			var h = t.canvas.height;
-			var y = - t.textRender.calcLineOffset(t.topLineIndex);
-			var cur = t.textRender.calcCharOffset(t.cursorPos);
-			var charsCount = t.textRender.getCharsCount();
-			var curLeft = asc_round(((kRightAlign !== t.textFlags.textAlign || t.cursorPos !== charsCount) &&
-				cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
-			var curTop  = asc_round(((cur !== null ? cur.top : 0) + y) * t.ky);
-			var curHeight = asc_round((cur !== null ? cur.height : t._getContentHeight()) * t.ky);
+			var h = this.canvas.height;
+			var y = - this.textRender.calcLineOffset(this.topLineIndex);
+			var cur = this.textRender.calcCharOffset(this.cursorPos);
+			var charsCount = this.textRender.getCharsCount();
+			var curLeft = asc_round(((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) &&
+				cur !== null && cur.left !== null ? cur.left : this._getContentPosition()) * this.kx);
+			var curTop  = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
+			var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
 			var i, dy;
 
-			while (t.textRender.getLinesCount() > 1) {
+			while (this.textRender.getLinesCount() > 1) {
 				if (curTop + curHeight - 1 > h) {
 					i = i === undefined ? 0 : i + 1;
-					dy = t.textRender.getLineInfo(i).th;
+					dy = this.textRender.getLineInfo(i).th;
 					y -= dy;
-					curTop -= asc_round(dy * t.ky);
-					++t.topLineIndex;
+					curTop -= asc_round(dy * this.ky);
+					++this.topLineIndex;
 					continue;
 				}
 				if (curTop < 0) {
-					--t.topLineIndex;
-					dy = t.textRender.getLineInfo(t.topLineIndex).th;
+					--this.topLineIndex;
+					dy = this.textRender.getLineInfo(this.topLineIndex).th;
 					y += dy;
-					curTop += asc_round(dy * t.ky);
+					curTop += asc_round(dy * this.ky);
 					continue;
 				}
 				break;
 			}
 
-			if (dy !== undefined || redrawText) {t._renderText(y);}
+			if (dy !== undefined || redrawText) {this._renderText(y);}
 
-			t.cursorStyle.left = curLeft + "px";
-			t.cursorStyle.top = curTop + "px";
-			t.cursorStyle.height = curHeight + "px";
+			this.cursorStyle.left = curLeft + "px";
+			this.cursorStyle.top = curTop + "px";
+			this.cursorStyle.height = curHeight + "px";
 
-			if (cur) {t.input.scrollTop = t.input.clientHeight * cur.lineIndex;}
-			if (t.isTopLineActive && !t.skipTLUpdate) {t._updateTopLineCurPos();}
+			if (cur) {this.input.scrollTop = this.input.clientHeight * cur.lineIndex;}
+			if (this.isTopLineActive && !this.skipTLUpdate) {this._updateTopLineCurPos();}
 		};
 
 		CellEditor.prototype._moveCursor = function (kind, pos) {

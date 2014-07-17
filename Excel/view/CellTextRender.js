@@ -165,9 +165,8 @@
 			},
 
 			charOffset: function (pos, lineIndex, h) {
-				var ci = this.getCharInfo(pos);
 				var li = this.lines[lineIndex];
-				return new CharOffset(li.startX + (pos > 0 ? this._calcCharsWidth(li.beg, pos - 1) : 0), h, ci.h, lineIndex);
+				return new CharOffset(li.startX + (pos > 0 ? this._calcCharsWidth(li.beg, pos - 1) : 0), h, li.th, lineIndex);
 			},
 
 			calcCharOffset: function (pos) {
