@@ -692,12 +692,14 @@
 				return ret;
 			}
 
+			var fromIndex = 0;
 			while (null !== (m = re[reIdx].exec(s))) {
 				range = this._parseRangeStr(m[1]);
 				if (range) {
 					ret = true;
-					range.cursorePos = m.input.indexOf(m[0])+1;
+					range.cursorePos = m.input.indexOf(m[0], fromIndex)+1;
 					range.formulaRangeLength = m[1].length;
+					fromIndex = range.cursorePos + range.formulaRangeLength;
 					this.handlers.trigger("newRange", range);
 				} else {
 					i = m[1].indexOf(":");
