@@ -647,6 +647,14 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
     else
     {
         drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
+        drawing_objects.document.Selection.Use = true;
+
+        if ( true === bUpdate )
+        {
+            drawing_objects.document.Document_UpdateInterfaceState();
+            drawing_objects.document.Document_UpdateRulersState();
+            drawing_objects.document.Document_UpdateSelectionState();
+        }
     }
 };
 CShape.prototype.Get_StartPage_Relative = function()

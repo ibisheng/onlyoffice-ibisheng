@@ -33,8 +33,8 @@ var docpostype_FlowObjects    = 0x01;
 var docpostype_HdrFtr         = 0x02;
 var docpostype_DrawingObjects = 0x03;
 
-var selectionflag_Common        = 0x00;
-var selectionflag_Numbering     = 0x01;
+var selectionflag_Common        = 0x000;
+var selectionflag_Numbering     = 0x001;
 var selectionflag_DrawingObject = 0x002;
 
 var orientation_Portrait  = 0x00;
@@ -566,7 +566,8 @@ function CDocument(DrawingDocument)
         EndPos   : 0,
         Flag     : selectionflag_Common,
         Data     : null,
-        UpdateOnRecalc : false
+        UpdateOnRecalc : false,
+        DragDrop : { Flag : 0, Data : null }  // 0 - не drag-n-drop, и мы его проверяем, 1 - drag-n-drop, -1 - не проверять drag-n-drop 
     };
 
     // Здесь мы храним инфрмацию, связанную с разбивкой на страницы и самими страницами
@@ -7870,12 +7871,17 @@ CDocument.prototype =
         var bFlowTable   = (null === this.DrawingObjects.getTableByXY( X, Y, this.CurPage, this ) ? false : true);
 
         // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
-        if ( MouseEvent.ClickCount <= 1 && false === bTableBorder  &&
+        if ( -1 !== this.Selection.DragDrop.Flag && MouseEvent.ClickCount <= 1 && false === bTableBorder  &&
             ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) || ( nInDrawing > 0 && docpostype_DrawingObjects === this.CurPos.Type && true === this.DrawingObjects.isSelectedText() && null !== this.DrawingObjects.getMajorParaDrawing() &&  this.DrawingObjects.getGraphicInfoUnderCursor(this.CurPage, X, Y).cursorType === "text" ) ) &&
             true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
         {
-            // Начинаем передвижение текста
-            this.DrawingDocument.StartTrackText();
+            // Здесь мы сразу не начинаем перемещение текста. Его мы начинаем, курсор хотя бы немного изменит свою позицию,
+            // это проверяется на MouseMove.
+            // TODO: В ворде кроме изменения положения мыши, также запускается таймер для стартования drag-n-drop по времени,
+            //       его можно здесь вставить.
+            
+            this.Selection.DragDrop.Flag = 1;
+            this.Selection.DragDrop.Data = { X : X, Y : Y };            
             return;
         }
 
@@ -8404,7 +8410,7 @@ CDocument.prototype =
     },
 
     On_DragTextEnd : function(NearPos, bCopy)
-    {
+    {       
         // Сначала нам надо проверить попадаем ли мы обратно в выделенный текст, если да, тогда ничего не делаем,
         // а если нет, тогда удаляем выделенный текст и вставляем его в заданное место.
 
@@ -8416,6 +8422,12 @@ CDocument.prototype =
             var Paragraph = NearPos.Paragraph;
             Paragraph.Cursor_MoveToNearPos( NearPos );
             Paragraph.Document_SetThisElementCurrent(false);
+
+            if ( true === this.Comments.Is_Use() )
+            {
+                this.Select_Comment( null );
+                editor.sync_HideComment();
+            }
 
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
@@ -9765,6 +9777,10 @@ CDocument.prototype =
     {
         if ( PageIndex < 0 )
             return;
+        
+        // Сбрасываем проверку Drag-n-Drop
+        this.Selection.DragDrop.Flag = 0;
+        this.Selection.DragDrop.Data = null;
 
         // Сбрасываем текущий элемент в поиске
         if ( this.SearchEngine.Count > 0 )
@@ -9881,6 +9897,14 @@ CDocument.prototype =
     {
         if ( PageIndex < 0 )
             return;
+
+        if ( 1 === this.Selection.DragDrop.Flag )
+        {
+            this.Selection.DragDrop.Flag = -1;
+            this.Selection_SetStart( this.Selection.DragDrop.Data.X, this.Selection.DragDrop.Data.Y, e );
+            this.Selection.DragDrop.Flag = 0;
+            this.Selection.DragDrop.Data = null;
+        }
 
         // Если мы нажимали правую кнопку мыши, тогда нам надо сделать
         if ( g_mouse_button_right === e.Button )
@@ -10036,6 +10060,20 @@ CDocument.prototype =
 
         this.Update_CursorType( X, Y, PageIndex, e );
 
+        if ( 1 === this.Selection.DragDrop.Flag )
+        {
+            // Если курсор не изменил позицию, тогда ничего не делаем, а если изменил, тогда стартуем Drag-n-Drop
+            if ( Math.abs( this.Selection.DragDrop.Data.X - X ) > 0.001 || Math.abs( this.Selection.DragDrop.Data.Y - Y ) > 0.001 )
+            {
+                this.Selection.DragDrop.Flag = 0;
+                this.Selection.DragDrop.Data = null;
+
+                this.DrawingDocument.StartTrackText();                
+            }
+
+            return;
+        }
+        
         if ( true === this.Selection.Use && true === this.Selection.Start )
         {
             this.CurPage = PageIndex;
@@ -11626,26 +11664,22 @@ CDocument.prototype =
 
         var DocState = State[State.length - 1];
 
-        this.CurPos =
-        {
-            X          : DocState.CurPos.X,
-            Y          : DocState.CurPos.Y,
-            ContentPos : DocState.CurPos.ContentPos,
-            RealX      : DocState.CurPos.RealX,
-            RealY      : DocState.CurPos.RealY,
-            Type       : DocState.CurPos.Type
-        };
-
-        this.Selection =
-        {
-
-            Start    : DocState.Selection.Start,
-            Use      : DocState.Selection.Use,
-            StartPos : DocState.Selection.StartPos,
-            EndPos   : DocState.Selection.EndPos,
-            Flag     : DocState.Selection.Flag,
-            Data     : DocState.Selection.Data
-        };
+        this.CurPos.X          = DocState.CurPos.X;
+        this.CurPos.Y          = DocState.CurPos.Y;
+        this.CurPos.ContentPos = DocState.CurPos.ContentPos;
+        this.CurPos.RealX      = DocState.CurPos.RealX;
+        this.CurPos.RealY      = DocState.CurPos.RealY;
+        this.CurPos.Type       = DocState.CurPos.Type;
+        
+        this.Selection.Start    = DocState.Selection.Start;
+        this.Selection.Use      = DocState.Selection.Use;
+        this.Selection.StartPos = DocState.Selection.StartPos;
+        this.Selection.EndPos   = DocState.Selection.EndPos;
+        this.Selection.Flag     = DocState.Selection.Flag;
+        this.Selection.Data     = DocState.Selection.Data;
+        
+        this.Selection.DragDrop.Flag = 0;
+        this.Selection.DragDrop.Data = null;
 
         this.CurPage = DocState.CurPage;
         this.Comments.Set_Current(DocState.CurComment);
