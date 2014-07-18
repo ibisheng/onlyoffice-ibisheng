@@ -2740,7 +2740,10 @@ PasteProcessor.prototype =
         if(false == this.bNested && nInsertLength > 0)
         {
             this.oRecalcDocument.Recalculate();
-            oDocument.Cursor_MoveRight(false, false);
+            if(oDocument.CurPos.Type !== docpostype_DrawingObjects)
+            {
+                oDocument.Cursor_MoveRight(false, false);
+            }
             this.oLogicDocument.Document_UpdateInterfaceState();
         }
 
@@ -3842,7 +3845,7 @@ PasteProcessor.prototype =
 		};
 		
 		if(allDrawingObj && allDrawingObj.length)
-			oDoc.Select_Drawings(allDrawingObj, oDoc);
+            this.oLogicDocument.Select_Drawings(allDrawingObj, oDoc);
 	},
 	
 	_readFromBinaryExcel: function(base64)
