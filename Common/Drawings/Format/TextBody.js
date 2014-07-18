@@ -992,12 +992,6 @@ CTextBody.prototype =
     {},
 
 
-    writeToBinary: function(w)
-    {
-        this.bodyPr.Write_ToBinary2(w);
-        writeToBinaryDocContent(this.content, w);
-    },
-
 
     getMargins: function ()
     {
@@ -1043,47 +1037,6 @@ CTextBody.prototype =
         return {L : xc - hc , T: yc - vc , R : xc + hc , B : yc + vc, textMatrix : this.shape.transform};
     },
 
-    readFromBinary: function(r,  drawingDocument)
-    {
-        var bodyPr = new CBodyPr();
-        bodyPr.Read_FromBinary2(r);
-        if(isRealObject(this.parent) && this.parent.setBodyPr)
-        {
-            this.parent.setBodyPr(bodyPr);
-        }
-        //this.bodyPr.Read_FromBinary2(r);
-
-        var is_on = History.Is_On();
-        if(is_on)
-        {
-            History.TurnOff();
-        }
-        var dc= new CDocumentContent(this, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, false);
-        readFromBinaryDocContent(dc, r);
-
-        if(is_on)
-        {
-            History.TurnOn();
-        }
-        for(var i = 0; i < dc.Content.length; ++i)
-        {
-            if(i > 0)
-            {
-                this.content.Add_NewParagraph()
-            }
-            var par = dc.Content[i];
-            for(var i = 0; i < par.Content.length; ++i)
-            {
-                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty || par.Content[i] instanceof ParaNumbering) && par.Content[i].Copy)
-                    this.content.Paragraph_Add(par.Content[i].Copy());
-            }
-        }
-    },
-
-    getSelectedTextHtml: function()
-    {
-
-    },
 
     Refresh_RecalcData2: function(pageIndex)
     {

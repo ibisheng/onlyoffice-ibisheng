@@ -176,7 +176,7 @@ XYAdjustmentTrack.prototype.getBounds = function()
     var bounds_checker = new  CSlideBoundsChecker();
     bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
     this.draw(bounds_checker);
-    var tr = this.originalShape.localTransform;
+    var tr = this.originalShape.transform;
     var arr_p_x = [];
     var arr_p_y = [];
     arr_p_x.push(tr.TransformPointX(0,0));
