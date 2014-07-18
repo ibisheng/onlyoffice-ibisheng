@@ -91,7 +91,6 @@
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
 			this._clearList();
-			this.setPosition(cellRect);
 			if (!this.isVisible) {
 				this.selector.className = 'combobox open';
 				this.isVisible = true;
@@ -129,6 +128,8 @@
 				this.selectorListEl.push(item);
 			}
 
+			this.setPosition(cellRect);
+
 			// Для того, чтобы работал scroll
 			this.selectorListJQ.perfectScrollbar("update");
 
@@ -146,8 +147,17 @@
 			}
 		};
 		PopUpSelector.prototype.setPosition = function (cellRect) {
-			this.selectorStyle['left'] = (cellRect.asc_getX() + 10) + 'px';
-			this.selectorStyle['top'] = (cellRect.asc_getY() + cellRect.asc_getHeight()) + 'px';
+			var top = cellRect.asc_getY() + cellRect.asc_getHeight(),
+				left = cellRect.asc_getX();
+			var diff = top + this.selectorList.offsetHeight - this.element.offsetHeight;
+			if (0 < diff) {
+				top -= diff;
+				left += cellRect.asc_getWidth();
+			} else
+				left += 10;
+
+			this.selectorStyle['left'] = left + 'px';
+			this.selectorStyle['top'] = top + 'px';
 		};
 		PopUpSelector.prototype.getVisible = function () {
 			return this.isVisible;
