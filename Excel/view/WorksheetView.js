@@ -6323,7 +6323,8 @@
 					sum += tmp;
 				}
 			});
-			if (0 !== oSelectionMathInfo.countNumbers) {
+			// Показываем только данные для 2-х или более ячеек (http://bugzserver/show_bug.cgi?id=24115)
+			if (1 < oSelectionMathInfo.countNumbers) {
 				// Мы должны отдавать в формате активной ячейки
 				var numFormat = range.getNumFormat();
 
