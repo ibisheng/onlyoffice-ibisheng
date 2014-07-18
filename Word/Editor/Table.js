@@ -8079,11 +8079,17 @@ CTable.prototype =
         this.Selection.Start = false;
 
         this.Selection.StartPos.Pos = { Row : 0, Cell : 0 };
-        this.Selection.EndPos.Pos   = { Row : 0, Cell : 0 };
+        this.Selection.EndPos.Pos   = { Row : 0, Cell : 0 };        
 
         this.Markup.Internal.RowIndex  = 0;
         this.Markup.Internal.CellIndex = 0;
         this.Markup.Internal.PageNum   = 0;
+        
+        if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0 )
+        {
+            this.CurCell = this.Content[0].Get_Cell(0);
+            this.CurCell.Content.Selection_Remove();
+        }
     },
 
     Selection_Clear : function()

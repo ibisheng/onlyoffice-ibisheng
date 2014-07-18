@@ -7131,13 +7131,13 @@ Paragraph.prototype =
 
         if ( true === StartSelection )
         {
-            this.Set_SelectionContentPos( ContentPos, this.Get_ParaContentPos( true, false ), false );
             this.Selection.StartManually = false;
+            this.Set_SelectionContentPos( ContentPos, this.Get_ParaContentPos( true, false ) );
         }
         else
-        {            
-            this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), ContentPos, false );
+        {
             this.Selection.EndManually = false;
+            this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), ContentPos );
         }
     },
 

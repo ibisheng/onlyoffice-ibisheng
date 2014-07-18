@@ -11448,6 +11448,11 @@ CDocument.prototype =
                     }
                     else
                     {
+                        if ( true !== this.Selection.Start )
+                        {
+                            this.Selection_Remove();
+                        }
+                        
                         this.DrawingDocument.SelectEnabled(false);
 
                         this.Internal_CheckCurPage();

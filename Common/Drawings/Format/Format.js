@@ -2258,7 +2258,7 @@ CSrcRect.prototype =
         }
     },
 
-    Save_Changes: function()
+    Save_Changes: function(data, w)
     {
         w.WriteLong(this.getObjectType());
         w.WriteLong(data.Type);
