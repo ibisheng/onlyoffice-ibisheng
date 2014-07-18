@@ -85,6 +85,8 @@
 				this.selectorListJQ = $('#apiPopUpList');
 				if (this.selectorListJQ.perfectScrollbar)
 					this.selectorListJQ.perfectScrollbar(this.scrollOptions);
+
+				this.setAlwaysVisibleY(true);
 			}
 		};
 		PopUpSelector.prototype.show = function (isFormula, arrItems, cellRect) {
@@ -151,9 +153,11 @@
 			return this.isVisible;
 		};
 		PopUpSelector.prototype._clearList = function () {
-			var elem;
-			while(elem = this.selectorListEl.pop())
-				this.selectorList.removeChild(elem);
+			var i;
+			for (i = 0; i < this.selectorListEl.length; ++i)
+				this.selectorList.removeChild(this.selectorListEl[i]);
+
+			this.selectorListEl.length = 0;
 
 			this.selectElement = null;
 			this.firstElement = null;
@@ -251,6 +255,16 @@
 
 			if (div_top < inner_top || div_top + div.height() > inner_top + innerEl.height()) {
 				this.selectorListJQ.scrollTop(this.selectorListJQ.scrollTop() + div_top - inner_top);
+			}
+		};
+
+		PopUpSelector.prototype.setAlwaysVisibleY = function (flag) {
+			if (flag) {
+				$(this.selectorList).find('.ps-scrollbar-y-rail').addClass('always-visible-y');
+				$(this.selectorList).find('.ps-scrollbar-y').addClass('always-visible-y');
+			} else {
+				$(this.selectorList).find('.ps-scrollbar-y-rail').removeClass('always-visible-y');
+				$(this.selectorList).find('.ps-scrollbar-y').removeClass('always-visible-y');
 			}
 		};
 
