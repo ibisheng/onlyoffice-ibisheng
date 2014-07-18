@@ -7963,7 +7963,7 @@
 					case "paste":
 						// Вставляем текст из локального буфера или нет
 						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive);
-						return;
+						break;
 					case "hyperlink":
 						if (val && val.hyperlinkModel) {
 							if (c_oAscHyperlinkType.RangeLink === val.asc_getType()) {
