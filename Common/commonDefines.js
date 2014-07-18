@@ -411,3 +411,9 @@ var c_oAscLockTypes = {
     kLockTypeOther2	: 4, // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
     kLockTypeOther3	: 5  // данный объект был залочен (обновления пришли) и снова стал залочен
 };
+
+var c_oAscFormatPainterState = {
+	     kOff : 0,
+	      kOn : 1,
+	kMultiple : 2
+};

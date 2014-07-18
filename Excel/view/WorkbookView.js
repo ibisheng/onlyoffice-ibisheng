@@ -870,7 +870,7 @@
 
 		WorkbookView.prototype._onStopFormatPainter = function () {
 			var ws = this.getWorksheet();
-			if (ws.isFormatPainter)
+			if (ws.stateFormatPainter)
 				ws.formatPainter();
 		};
 
@@ -1145,7 +1145,7 @@
 		};
 
 		/**
-		 * @param index {Number}
+		 * @param {Number} [index]
 		 * @return {WorksheetView}
 		 */
 		WorkbookView.prototype.getWorksheet = function (index) {

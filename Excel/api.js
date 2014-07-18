@@ -2997,8 +2997,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			// Формат по образцу
-			asc_formatPainter: function () {
-				this.wb.getWorksheet().formatPainter();
+			asc_formatPainter: function (stateFormatPainter) {
+				this.wb.getWorksheet().formatPainter(stateFormatPainter);
 			},
 
 			asc_onMouseUp: function (event, x, y) {

@@ -428,7 +428,7 @@
 			this.lockDraw = false;
 			this.isSelectOnShape = false;	// Выделен shape
 
-			this.isFormatPainter = false;
+			this.stateFormatPainter = c_oAscFormatPainterState.kOff;
 
 			this.selectionDialogType = c_oAscSelectionDialogType.None;
 			this.isSelectionDialogMode = false;
@@ -3382,7 +3382,7 @@
 
 		/**
 		 * Рисует выделение вокруг ячеек
-		 * @param {Asc.Range} range
+		 * @param {Asc.Range} [range]
 		 */
 		WorksheetView.prototype._drawSelection = function (range) {
 			if (!this.isSelectionDialogMode) {
@@ -3674,7 +3674,7 @@
 			if (!isFrozen && this.isSelectionDialogMode) {
 				this._drawSelectRange(this.activeRange.clone(true));
 			}
-			if (!isFrozen && this.isFormatPainter)
+			if (!isFrozen && this.stateFormatPainter)
 				this._drawFormatPainterRange();
 
 			if (null !== this.activeMoveRange) {
@@ -5714,7 +5714,7 @@
 			x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
 			y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
-			if (this.isFormatPainter) {
+			if (this.stateFormatPainter) {
 				if (x <= this.cellsLeft && y >= this.cellsTop) {
 					r = this._findRowUnderCursor(y, true);
 					if (r !== null) {
@@ -6887,7 +6887,7 @@
 			} else {
 				// Нормализуем range
 				this.activeRange.normalize();
-				if (this.isFormatPainter)
+				if (this.stateFormatPainter)
 					this.applyFormatPainter();
 			}
 		};
@@ -6935,16 +6935,21 @@
 
 				// Сбрасываем параметры
 				t._updateCellsRange(t.activeRange, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
-				t.formatPainter();
+				if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter)
+					t.formatPainter();
 				// Перерисовываем
 				t.draw();
 			};
 
 			this._isLockedCells (to, null, onApplyFormatPainterCallback);
 		};
-		WorksheetView.prototype.formatPainter = function () {
-			this.isFormatPainter = !this.isFormatPainter;
-			if (this.isFormatPainter) {
+		WorksheetView.prototype.formatPainter = function (stateFormatPainter) {
+			// Если передали состояние, то выставляем его. Если нет - то меняем на противоположное.
+			this.stateFormatPainter = (null != stateFormatPainter) ? stateFormatPainter :
+				((c_oAscFormatPainterState.kOff !== this.stateFormatPainter) ? c_oAscFormatPainterState.kOff :
+					c_oAscFormatPainterState.kOn);
+
+			if (this.stateFormatPainter) {
 				this.copyOfActiveRange = this.activeRange.clone(true);
 				this._drawFormatPainterRange();
 			} else {
