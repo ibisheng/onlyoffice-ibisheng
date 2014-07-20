@@ -465,12 +465,33 @@ DrawingObjectsController.prototype =
 
     handleTextHit: function(object, e, x, y, group, pageIndex, bWord)
     {
+        var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             if(e.CtrlKey && !this.document)
             {
-                var target_content = this.getTargetDocContent();
-                if(!target_content)
+                content = object.getDocContent();
+                invert_transform_text = object.invertTransformText;
+                if(content && invert_transform_text)
+                {
+                    tx = invert_transform_text.TransformPointX(x, y);
+                    ty = invert_transform_text.TransformPointY(x, y);
+                    hit_paragraph = content.Internal_GetContentPosByXY(tx, ty, 0);
+                    par = content.Content[hit_paragraph];
+                    if(isRealObject(par))
+                    {
+                        check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        if(!isRealObject(check_hyperlink))
+                        {
+                            return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
+                        }
+                    }
+                    else
+                    {
+                        return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
+                    }
+                }
+                else
                 {
                     return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
                 }
@@ -496,8 +517,8 @@ DrawingObjectsController.prototype =
         else
         {
             var ret = {objectId: object.Get_Id(), cursorType: "text"};
-            var content = object.getDocContent();
-            var invert_transform_text = object.invertTransformText, tx, ty;
+            content = object.getDocContent();
+            invert_transform_text = object.invertTransformText;
             if(content && invert_transform_text)
             {
                 tx = invert_transform_text.TransformPointX(x, y);
@@ -508,11 +529,11 @@ DrawingObjectsController.prototype =
                 }
                 else if(this.drawingObjects)
                 {
-                    var hit_paragraph = content.Internal_GetContentPosByXY(tx, ty, 0);
-                    var par = content.Content[hit_paragraph];
+                    hit_paragraph = content.Internal_GetContentPosByXY(tx, ty, 0);
+                    par = content.Content[hit_paragraph];
                     if(isRealObject(par))
                     {
-                        var check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
                         if(isRealObject(check_hyperlink))
                         {
                             ret.hyperlink = check_hyperlink;
@@ -1487,7 +1508,16 @@ DrawingObjectsController.prototype =
     hyperlinkAdd: function( HyperProps )
     {
         var content = this.getTargetDocContent(true);
-        return content && content.Hyperlink_Add(HyperProps);
+        if(content)
+        {
+            if(!this.document)
+            {
+                if ( null != HyperProps.Text && "" != HyperProps.Text && true === content.Is_SelectionUse() )
+                    this.removeCallback(-1);
+            }
+            return content.Hyperlink_Add(HyperProps);
+        }
+        return null;
     },
 
 
@@ -4726,12 +4756,12 @@ DrawingObjectsController.prototype =
         return image;
     },
 
-    Get_SelectedText: function()
+    Get_SelectedText: function(bCleartText)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText();
+            return content.Get_SelectedText(bCleartText);
         }
         else
         {

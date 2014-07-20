@@ -6510,7 +6510,7 @@
 
 			var paraPr = this.objectRender.controller.getParagraphParaPr();
 			if (textPr && paraPr) {
-				objectInfo.text = this.objectRender.controller.Get_SelectedText();
+				objectInfo.text = this.objectRender.controller.Get_SelectedText(true);
 
 				var horAlign = "center";
 				switch (paraPr.Jc) {
