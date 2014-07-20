@@ -3153,8 +3153,6 @@ DrawingObjectsController.prototype =
                 this.recalculate();
             }
         }
-        this.drawingObjects.showDrawingObjects(true);
-        this.updateOverlay();
     },
 
 
