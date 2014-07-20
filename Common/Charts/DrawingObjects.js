@@ -3200,7 +3200,7 @@ function DrawingObjects() {
     {
         for (var i = 0; i < aObjects.length; i++) {
             var graphicObject = aObjects[i].graphicObject;
-            if ( graphicObject.updateChartReferences )
+            if ( graphicObject.updateChartReferences2 )
             {
                 graphicObject.updateChartReferences2(oldWorksheet, parserHelp.getEscapeSheetName(newWorksheet));
             }
