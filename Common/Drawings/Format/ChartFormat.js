@@ -22740,6 +22740,32 @@ CXVal.prototype =
         this.Id = r.GetString2();
     },
 
+    createDuplicate: function()
+    {
+        var ret = new CXVal();
+        if(this.multiLvlStrRef)
+        {
+            ret.setMultiLvlStrRef(this.multiLvlStrRef.createDuplicate());
+        }
+        if(this.numLit)
+        {
+            ret.setNumLit(this.numLit.createDuplicate());
+        }
+        if(this.numRef)
+        {
+            ret.setNumRef(this.numRef.createDuplicate());
+        }
+        if(this.strRef)
+        {
+            ret.setStrRef(this.strRef.createDuplicate());
+        }
+        if(this.strLit)
+        {
+            ret.setStrLit(this.strLit.createDuplicate());
+        }
+        return ret;
+    },
+
     setFromOtherObject: function(o)
     {
         if(o.multiLvlStrRef)

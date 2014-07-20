@@ -7,6 +7,31 @@ var EFFECT_INTENSE = 3;
 
 var CHART_STYLE_MANAGER = null;
 
+function BBoxInfo(worksheet, bbox)
+{
+    this.worksheet = worksheet;
+    if(window["Asc"] && typeof window["Asc"].Range === "function")
+    {
+        this.bbox = window["Asc"].Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2, false);
+    }
+    else
+    {
+        this.bbox = bbox;
+    }
+}
+
+BBoxInfo.prototype =
+{
+    checkIntersection: function(bboxInfo)
+    {
+        if(this.worksheet !== bboxInfo.worksheet)
+        {
+            return false;
+        }
+        return this.bbox.intersection(bboxInfo.bbox) !== null;
+    }
+};
+
 function CreateUnifillSolidFillSchemeColorByIndex(index)
 {
     var ret =  new CUniFill();
@@ -993,6 +1018,7 @@ CChartSpace.prototype =
             var  asc_series = asc_chart.series;
             var chart_type = this.chart.plotArea.charts[0];
             var first_series = chart_type.series[0] ? chart_type.series[0] : new chart_type.getSeriesConstructor()();
+            var first_series2 = chart_type.series[0] ? chart_type.series[0] : null;
             removeAllSeriesFromChart(chart_type);
             if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
             {
@@ -1069,7 +1095,7 @@ CChartSpace.prototype =
                 var minus = start_index === 1 ? 1 : 0;
                 for(var i = start_index; i < asc_series.length; ++i)
                 {
-                    var series = new CScatterSeries();
+                    var series = first_series2.createDuplicate();
                     series.setIdx(i - minus);
                     series.setOrder(i - minus);
                     if(first_series)
@@ -1637,529 +1663,20 @@ CChartSpace.prototype =
         return ret;
     },
 
-    recalculateBBox2: function()
-    {
-        this.bbox = null;
-        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
-        {
-            var series = this.chart.plotArea.charts[0].series;
-            if(Array.isArray(series) && series.length > 0)
-            {
-                var series_title_f = [], cat_title_f, series_f = [], i, range1;
-                var ref;
-                if(series[0].cat && series[0].cat.strRef)
-                {
-                    ref = series[0].cat.strRef;
-                }
-                else if(series[0].xVal)
-                {
-                    if(series[0].xVal.strRef)
-                    {
-                        ref = series[0].xVal.strRef;
-                    }
-                    else if(series[0].xVal.numRef)
-                    {
-                        ref = series[0].xVal.numRef;
-                    }
-                }
-                if(ref)
-                {
-                    var cat_title_parsed_ref = parserHelp.parse3DRef(ref.f);
-                    if(cat_title_parsed_ref)
-                    {
-                        var cat_title_sheet = this.worksheet.workbook.getWorksheetByName(cat_title_parsed_ref.sheet);
-                        if(cat_title_sheet === this.worksheet)
-                        {
-                            range1 = cat_title_sheet.getRange2(cat_title_parsed_ref.range);
-                            if(range1 && range1.bbox)
-                            {
-                                cat_title_f = range1.bbox;
-                            }
-                        }
-                    }
-                }
-                var b_vert/*флаг означает, что значения в серии идут по горизонтали, а сами серии по вертикали сверху вниз*/
-                    , b_titles_vert;
-                for(i = 0; i < series.length; ++i)
-                {
-                    var numRef = null;
-                    if(series[i].val)
-                        numRef = series[i].val.numRef;
-                    else if(series[i].yVal)
-                        numRef = series[i].yVal.numRef;
-                    if(numRef)
-                    {
-                        var series_parsed_ref = parserHelp.parse3DRef(numRef.f);
-                        if(!series_parsed_ref)
-                            return;
-                        var series_sheet = this.worksheet.workbook.getWorksheetByName(series_parsed_ref.sheet);
-                        if(series_sheet !== this.worksheet)
-                            return;
-                        range1 =  series_sheet.getRange2(series_parsed_ref.range);
-                        if(range1 && range1.bbox)
-                        {
-                            if(range1.bbox.r1 !== range1.bbox.r2 && range1.bbox.c1 !== range1.bbox.c2)
-                                return;
-                            if(series_f.length > 0)
-                            {
-                                if(!isRealBool(b_vert))
-                                {
-                                    if(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2)
-                                    {
-                                        b_vert = true;
-                                    }
-                                    else if(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2)
-                                    {
-                                        b_vert = false;
-                                    }
-                                    else
-                                    {
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    if(b_vert)
-                                    {
-                                        if(!(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2))
-                                        {
-                                            return;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(!(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2))
-                                        {
-                                            return;
-                                        }
-                                    }
-                                }
-                                if(b_vert)
-                                {
-                                    if(range1.bbox.r1 - series_f[series_f.length-1].r1 !== 1)
-                                        return;
-                                }
-                                else
-                                {
-                                    if(range1.bbox.c1 - series_f[series_f.length-1].c1 !== 1)
-                                        return;
-                                }
-                            }
-                            series_f.push(range1.bbox);
-                        }
-                        else
-                            return;
-                    }
-                    else
-                        return;
-                    if(Array.isArray(series_title_f))
-                    {
-                        if(series[i].tx && series[i].tx.strRef)
-                        {
-                            var series_cat_parsed_ref = parserHelp.parse3DRef(series[i].tx.strRef.f);
-                            if(!series_cat_parsed_ref)
-                            {
-                                series_title_f = null;
-                                continue;
-                            }
-                            var series_cat_sheet = this.worksheet.workbook.getWorksheetByName(series_cat_parsed_ref.sheet);
-                            if(series_cat_sheet !== this.worksheet)
-                            {
-                                series_title_f = null;
-                                continue;
-                            }
-                            range1 = series_cat_sheet.getRange2(series_cat_parsed_ref.range);
-                            if(range1 && range1.bbox)
-                            {
-                                if(range1.bbox.r1 !== range1.bbox.r2 || range1.bbox.c1 !== range1.bbox.c2)
-                                {
-                                    series_title_f = null;
-                                    continue;
-                                }
-                                if(!isRealBool(b_titles_vert))
-                                {
-                                    if(series_title_f.length > 0)
-                                    {
-                                        if( range1.bbox.r1 - series_title_f[0].r1 === 1)
-                                            b_titles_vert = true;
-                                        else if(range1.bbox.c1 - series_title_f[0].c1 === 1)
-                                            b_titles_vert = false;
-                                        else
-                                        {
-                                            series_title_f = null;
-                                            continue;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if(b_titles_vert)
-                                    {
-                                        if( range1.bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
-                                        {
-                                            series_title_f = null;
-                                            continue;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if( range1.bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
-                                        {
-                                            series_title_f = null;
-                                            continue;
-                                        }
-                                    }
-                                }
-                                series_title_f.push(range1.bbox);
-                            }
-                            else
-                            {
-                                series_title_f = null;
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            series_title_f = null;
-                        }
-                    }
-                }
-                this.bbox =  {
-                    seriesBBox: null,
-                    catBBox: null,
-                    serBBox: null
-                };
-                //if(b_vert)
-                //{
-                this.bbox.seriesBBox = {
-                    r1: series_f[0].r1,
-                    r2: series_f[series_f.length-1].r2,
-                    c1: series_f[0].c1,
-                    c2: series_f[series_f.length-1].c2,
-                    bVert: b_vert
-                };
-                /* }
-                 else
-                 {
-                 this.bbox.seriesBox = {
-                 r1: series_f[0].
-                 };
-                 }*/
-                if(cat_title_f)
-                {
-                    if(b_vert)
-                    {
-                        if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
-                            || cat_title_f.c2 !== this.bbox.seriesBBox.c2
-                            || cat_title_f.r1 !== cat_title_f.r1
-                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1-1)
-                        {
-                            cat_title_f = null;
-                        }
-                    }
-                    else
-                    {
-                        if(cat_title_f.c1 !== cat_title_f.c2
-                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1
-                            || cat_title_f.r2 !== this.bbox.seriesBBox.r2
-                            || cat_title_f.c1 !== this.bbox.seriesBBox.c1-1)
-                        {
-                            cat_title_f = null;
-                        }
-                    }
-                    this.bbox.catBBox = cat_title_f;
-                }
-                if(Array.isArray(series_title_f))
-                {
-                    // if(b_titles_vert)
-                    // {
-                    this.bbox.serBBox = {
-                        r1: series_title_f[0].r1,
-                        r2: series_title_f[series_title_f.length-1].r2,
-                        c1: series_title_f[0].c1,
-                        c2: series_title_f[series_title_f.length-1].c2
-                    };
-                    // }
-                    // else
-                    // {
-                    //     this.bbox.serBBox = {
-                    //         r1: series_title_f[0].r1,
-                    //         r2: series_title_f[0].r1,
-                    //     };
-                    // }
-                }
-            }
-        }
-    },
 
-
-    recalculateBBox4: function()
-    {
-        this.bbox = null;
-        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
-        {
-            var series = this.chart.plotArea.charts[0].series;
-            if(Array.isArray(series) && series.length > 0)
-            {
-                var series_title_f = [], cat_title_f, series_f = [], i, range1;
-                var ref;
-
-                var b_vert/*флаг означает, что значения в серии идут по горизонтали, а сами серии по вертикали сверху вниз*/
-                    , b_titles_vert;
-                var first_series_sheet;
-                for(i = 0; i < series.length; ++i)
-                {
-                    var numRef = null;
-                    if(series[i].val)
-                        numRef = series[i].val.numRef;
-                    else if(series[i].yVal)
-                        numRef = series[i].yVal.numRef;
-                    if(numRef)
-                    {
-                        var series_parsed_ref = parserHelp.parse3DRef(numRef.f);
-                        if(!series_parsed_ref)
-                            return;
-                        var series_sheet = this.worksheet.workbook.getWorksheetByName(series_parsed_ref.sheet);
-                        if(!first_series_sheet)
-                            first_series_sheet = series_sheet;
-                        if(series_sheet !== first_series_sheet)
-                            return;
-                        range1 =  series_sheet.getRange2(series_parsed_ref.range);
-                        if(range1 && range1.bbox)
-                        {
-                            if(range1.bbox.r1 !== range1.bbox.r2 && range1.bbox.c1 !== range1.bbox.c2)
-                                return;
-                            if(series_f.length > 0)
-                            {
-                                if(!isRealBool(b_vert))
-                                {
-                                    if(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2)
-                                    {
-                                        b_vert = true;
-                                    }
-                                    else if(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2)
-                                    {
-                                        b_vert = false;
-                                    }
-                                    else
-                                    {
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    if(b_vert)
-                                    {
-                                        if(!(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2))
-                                        {
-                                            return;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(!(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2))
-                                        {
-                                            return;
-                                        }
-                                    }
-                                }
-                                if(b_vert)
-                                {
-                                    if(range1.bbox.r1 - series_f[series_f.length-1].r1 !== 1)
-                                        return;
-                                }
-                                else
-                                {
-                                    if(range1.bbox.c1 - series_f[series_f.length-1].c1 !== 1)
-                                        return;
-                                }
-                            }
-                            series_f.push(range1.bbox);
-                        }
-                        else
-                            return;
-                    }
-                    else
-                        return;
-                    if(Array.isArray(series_title_f))
-                    {
-                        if(series[i].tx && series[i].tx.strRef)
-                        {
-                            var series_cat_parsed_ref = parserHelp.parse3DRef(series[i].tx.strRef.f);
-                            if(!series_cat_parsed_ref)
-                            {
-                                series_title_f = null;
-                                continue;
-                            }
-                            var series_cat_sheet = this.worksheet.workbook.getWorksheetByName(series_cat_parsed_ref.sheet);
-                            if(series_cat_sheet !== first_series_sheet)
-                            {
-                                series_title_f = null;
-                                continue;
-                            }
-                            range1 = series_cat_sheet.getRange2(series_cat_parsed_ref.range);
-                            if(range1 && range1.bbox)
-                            {
-                                if(range1.bbox.r1 !== range1.bbox.r2 || range1.bbox.c1 !== range1.bbox.c2)
-                                {
-                                    series_title_f = null;
-                                    continue;
-                                }
-                                if(!isRealBool(b_titles_vert))
-                                {
-                                    if(series_title_f.length > 0)
-                                    {
-                                        if( range1.bbox.r1 - series_title_f[0].r1 === 1)
-                                            b_titles_vert = true;
-                                        else if(range1.bbox.c1 - series_title_f[0].c1 === 1)
-                                            b_titles_vert = false;
-                                        else
-                                        {
-                                            series_title_f = null;
-                                            continue;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if(b_titles_vert)
-                                    {
-                                        if( range1.bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
-                                        {
-                                            series_title_f = null;
-                                            continue;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if( range1.bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
-                                        {
-                                            series_title_f = null;
-                                            continue;
-                                        }
-                                    }
-                                }
-                                series_title_f.push(range1.bbox);
-                            }
-                            else
-                            {
-                                series_title_f = null;
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            series_title_f = null;
-                        }
-                    }
-                }
-
-
-                if(series[0].cat && series[0].cat.strRef)
-                {
-                    ref = series[0].cat.strRef;
-                }
-                else if(series[0].xVal)
-                {
-                    if(series[0].xVal.strRef)
-                    {
-                        ref = series[0].xVal.strRef;
-                    }
-                    else if(series[0].xVal.numRef)
-                    {
-                        ref = series[0].xVal.numRef;
-                    }
-                }
-                if(ref)
-                {
-                    var cat_title_parsed_ref = parserHelp.parse3DRef(ref.f);
-                    if(cat_title_parsed_ref)
-                    {
-                        var cat_title_sheet = this.worksheet.workbook.getWorksheetByName(cat_title_parsed_ref.sheet);
-                        if(cat_title_sheet === first_series_sheet)
-                        {
-                            range1 = cat_title_sheet.getRange2(cat_title_parsed_ref.range);
-                            if(range1 && range1.bbox)
-                            {
-                                cat_title_f = range1.bbox;
-                            }
-                        }
-                    }
-                }
-
-
-                this.bbox =  {
-                    seriesBBox: null,
-                    catBBox: null,
-                    serBBox: null,
-                    worksheet: first_series_sheet
-                };
-                //if(b_vert)
-                //{
-                this.bbox.seriesBBox = {
-                    r1: series_f[0].r1,
-                    r2: series_f[series_f.length-1].r2,
-                    c1: series_f[0].c1,
-                    c2: series_f[series_f.length-1].c2,
-                    bVert: b_vert
-                };
-                /* }
-                 else
-                 {
-                 this.bbox.seriesBox = {
-                 r1: series_f[0].
-                 };
-                 }*/
-                if(cat_title_f)
-                {
-                    if(b_vert)
-                    {
-                        if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
-                            || cat_title_f.c2 !== this.bbox.seriesBBox.c2
-                            || cat_title_f.r1 !== cat_title_f.r1
-                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1-1)
-                        {
-                            cat_title_f = null;
-                        }
-                    }
-                    else
-                    {
-                        if(cat_title_f.c1 !== cat_title_f.c2
-                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1
-                            || cat_title_f.r2 !== this.bbox.seriesBBox.r2
-                            || cat_title_f.c1 !== this.bbox.seriesBBox.c1-1)
-                        {
-                            cat_title_f = null;
-                        }
-                    }
-                    this.bbox.catBBox = cat_title_f;
-                }
-                if(Array.isArray(series_title_f))
-                {
-                    // if(b_titles_vert)
-                    // {
-                    this.bbox.serBBox = {
-                        r1: series_title_f[0].r1,
-                        r2: series_title_f[series_title_f.length-1].r2,
-                        c1: series_title_f[0].c1,
-                        c2: series_title_f[series_title_f.length-1].c2
-                    };
-                    // }
-                    // else
-                    // {
-                    //     this.bbox.serBBox = {
-                    //         r1: series_title_f[0].r1,
-                    //         r2: series_title_f[0].r1,
-                    //     };
-                    // }
-                }
-            }
-        }
-    },
 
     recalculateBBox: function()
     {
         this.bbox = null;
+        this.seriesBBoxes = [];
+        this.seriesTitlesBBoxes = [];
+        this.catTitlesBBoxes = [];
+
+
+        var series_bboxes = [], cat_bboxes = [], ser_titles_bboxes = [];
+
+        var series_sheet, cur_bbox, parsed_formulas;
+
         if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.worksheet)
         {
             var series = this.chart.plotArea.charts[0].series;
@@ -2180,91 +1697,100 @@ CChartSpace.prototype =
                         numRef = series[i].yVal.numRef;
                     if(numRef)
                     {
-                        var series_parsed_ref = parserHelp.parse3DRef(numRef.f);
-                        if(!series_parsed_ref)
-                            return;
-                        var series_sheet = this.worksheet.workbook.getWorksheetByName(series_parsed_ref.sheet);
-                        if(!first_series_sheet)
-                            first_series_sheet = series_sheet;
-                        if(series_sheet !== first_series_sheet)
-                            return;
-                        range1 =  series_sheet.getRange2(series_parsed_ref.range);
-                        if(range1 && range1.bbox)
+                        parsed_formulas = this.parseChartFormula(numRef.f);
+                        if(parsed_formulas)
                         {
-                            if(range1.bbox.r1 !== range1.bbox.r2 && range1.bbox.c1 !== range1.bbox.c2)
-                                return;
-                            if(series_f.length > 0)
+                            series_bboxes = series_bboxes.concat(parsed_formulas);
+                            if(series_f !== null && parsed_formulas.length === 1)
                             {
-                                if(!isRealBool(b_vert))
+                                series_sheet = parsed_formulas[0].worksheet;
+                                if(!first_series_sheet)
+                                    first_series_sheet = series_sheet;
+                                if(series_sheet !== first_series_sheet)
+                                    series_f = null;
+                                if(parsed_formulas[0].bbox)
                                 {
-                                    if(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2)
+                                    cur_bbox = parsed_formulas[0].bbox;
+                                    if(cur_bbox.r1 !== cur_bbox.r2 && cur_bbox.c1 !== cur_bbox.c2)
+                                        series_f = null;
+                                    if(series_f.length > 0)
                                     {
-                                        b_vert = true;
-                                    }
-                                    else if(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2)
-                                    {
-                                        b_vert = false;
-                                    }
-                                    else
-                                    {
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    if(b_vert)
-                                    {
-                                        if(!(series_f[0].c1 === range1.bbox.c1 && series_f[0].c2 === range1.bbox.c2))
+                                        if(!isRealBool(b_vert))
                                         {
-                                            return;
+                                            if(series_f[0].c1 === cur_bbox.c1 && series_f[0].c2 === cur_bbox.c2)
+                                            {
+                                                b_vert = true;
+                                            }
+                                            else if(series_f[0].r1 === cur_bbox.r1 && series_f[0].r2 === cur_bbox.r2)
+                                            {
+                                                b_vert = false;
+                                            }
+                                            else
+                                            {
+                                                series_f = null;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if(b_vert)
+                                            {
+                                                if(!(series_f[0].c1 === cur_bbox.c1 && series_f[0].c2 === cur_bbox.c2))
+                                                {
+                                                    series_f = null;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if(!(series_f[0].r1 === cur_bbox.r1 && series_f[0].r2 === cur_bbox.r2))
+                                                {
+                                                    series_f = null;
+                                                }
+                                            }
+                                        }
+                                        if(b_vert)
+                                        {
+                                            if(cur_bbox.r1 - series_f[series_f.length-1].r1 !== 1)
+                                                series_f = null;
+                                        }
+                                        else
+                                        {
+                                            if(cur_bbox.c1 - series_f[series_f.length-1].c1 !== 1)
+                                                series_f = null;
                                         }
                                     }
-                                    else
-                                    {
-                                        if(!(series_f[0].r1 === range1.bbox.r1 && series_f[0].r2 === range1.bbox.r2))
-                                        {
-                                            return;
-                                        }
-                                    }
-                                }
-                                if(b_vert)
-                                {
-                                    if(range1.bbox.r1 - series_f[series_f.length-1].r1 !== 1)
-                                        return;
+                                    series_f.push(cur_bbox);
                                 }
                                 else
-                                {
-                                    if(range1.bbox.c1 - series_f[series_f.length-1].c1 !== 1)
-                                        return;
-                                }
+                                    series_f = null;
                             }
-                            series_f.push(range1.bbox);
                         }
-                        else
-                            return;
                     }
                     else
-                        return;
-                    if(Array.isArray(series_title_f))
+                        series_f = null;
+                    if(series[i].tx && series[i].tx.strRef)
                     {
-                        if(series[i].tx && series[i].tx.strRef)
+                        parsed_formulas = this.parseChartFormula(series[i].tx.strRef.f);
+                        if(parsed_formulas)
                         {
-                            var series_cat_parsed_ref = parserHelp.parse3DRef(series[i].tx.strRef.f);
-                            if(!series_cat_parsed_ref)
+                            ser_titles_bboxes = ser_titles_bboxes.concat(parsed_formulas);
+                        }
+                        if(series_title_f !== null)
+                        {
+                            if(!parsed_formulas || parsed_formulas.length !== 1)
                             {
                                 series_title_f = null;
                                 continue;
                             }
-                            var series_cat_sheet = this.worksheet.workbook.getWorksheetByName(series_cat_parsed_ref.sheet);
+                            var series_cat_sheet = parsed_formulas[0].worksheet;
                             if(series_cat_sheet !== first_series_sheet)
                             {
                                 series_title_f = null;
                                 continue;
                             }
-                            range1 = series_cat_sheet.getRange2(series_cat_parsed_ref.range);
-                            if(range1 && range1.bbox)
+                            cur_bbox = parsed_formulas[0].bbox;
+                            if(cur_bbox)
                             {
-                                if(range1.bbox.r1 !== range1.bbox.r2 || range1.bbox.c1 !== range1.bbox.c2)
+                                if(cur_bbox.r1 !== cur_bbox.r2 || cur_bbox.c1 !== cur_bbox.c2)
                                 {
                                     series_title_f = null;
                                     continue;
@@ -2273,9 +1799,9 @@ CChartSpace.prototype =
                                 {
                                     if(series_title_f.length > 0)
                                     {
-                                        if( range1.bbox.r1 - series_title_f[0].r1 === 1)
+                                        if( cur_bbox.r1 - series_title_f[0].r1 === 1)
                                             b_titles_vert = true;
-                                        else if(range1.bbox.c1 - series_title_f[0].c1 === 1)
+                                        else if(cur_bbox.c1 - series_title_f[0].c1 === 1)
                                             b_titles_vert = false;
                                         else
                                         {
@@ -2288,7 +1814,7 @@ CChartSpace.prototype =
                                 {
                                     if(b_titles_vert)
                                     {
-                                        if( range1.bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
+                                        if( cur_bbox.r1 - series_title_f[series_title_f.length-1].r1 !== 1)
                                         {
                                             series_title_f = null;
                                             continue;
@@ -2296,14 +1822,14 @@ CChartSpace.prototype =
                                     }
                                     else
                                     {
-                                        if( range1.bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
+                                        if( cur_bbox.c1 - series_title_f[series_title_f.length-1].c1 !== 1)
                                         {
                                             series_title_f = null;
                                             continue;
                                         }
                                     }
                                 }
-                                series_title_f.push(range1.bbox);
+                                series_title_f.push(cur_bbox);
                             }
                             else
                             {
@@ -2311,13 +1837,12 @@ CChartSpace.prototype =
                                 continue;
                             }
                         }
-                        else
-                        {
-                            series_title_f = null;
-                        }
+                    }
+                    else
+                    {
+                        series_title_f = null;
                     }
                 }
-
 
                 if(series[0].cat && series[0].cat.strRef)
                 {
@@ -2336,23 +1861,25 @@ CChartSpace.prototype =
                 }
                 if(ref)
                 {
-                    var cat_title_parsed_ref = parserHelp.parse3DRef(ref.f);
-                    if(cat_title_parsed_ref)
+                    parsed_formulas = this.parseChartFormula(ref.f);
+                    if(parsed_formulas)
                     {
-                        var cat_title_sheet = this.worksheet.workbook.getWorksheetByName(cat_title_parsed_ref.sheet);
-                        if(cat_title_sheet === first_series_sheet)
+                        cat_bboxes = cat_bboxes.concat(parsed_formulas);
+                        if(parsed_formulas.length === 1)
                         {
-                            range1 = cat_title_sheet.getRange2(cat_title_parsed_ref.range);
-                            if(range1 && range1.bbox)
+                            var cat_title_sheet = parsed_formulas[0].worksheet;
+                            if(cat_title_sheet === first_series_sheet)
                             {
-                                cat_title_f = range1.bbox;
+                                if(parsed_formulas[0].bbox)
+                                {
+                                    cat_title_f = parsed_formulas[0].bbox;
+                                }
                             }
                         }
                     }
                 }
 
-
-                if(series.length === 1)
+                if(series_f.length === 1)
                 {
                     if(series_f[0].r1 === series_f[0].r2 && series_f[0].c1 !== series_f[0].c2)
                     {
@@ -2394,69 +1921,81 @@ CChartSpace.prototype =
                     }
                 }
 
-                this.bbox =  {
-                    seriesBBox: null,
-                    catBBox: null,
-                    serBBox: null,
-                    worksheet: first_series_sheet
-                };
-                //if(b_vert)
-                //{
-
-                this.bbox.seriesBBox = {
-                    r1: series_f[0].r1,
-                    r2: series_f[series_f.length-1].r2,
-                    c1: series_f[0].c1,
-                    c2: series_f[series_f.length-1].c2,
-                    bVert: b_vert
-                };
-                /* }
-                 else
-                 {
-                 this.bbox.seriesBox = {
-                 r1: series_f[0].
-                 };
-                 }*/
-                if(cat_title_f)
+                if(series_f !== null && series_f.length > 0)
                 {
-                    if(b_vert)
-                    {
-                        if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
-                            || cat_title_f.c2 !== this.bbox.seriesBBox.c2
-                            || cat_title_f.r1 !== cat_title_f.r1)
-                        {
-                            cat_title_f = null;
-                        }
-                    }
-                    else
-                    {
-                        if(cat_title_f.c1 !== cat_title_f.c2
-                            || cat_title_f.r1 !== this.bbox.seriesBBox.r1
-                            || cat_title_f.r2 !== this.bbox.seriesBBox.r2)
-                        {
-                            cat_title_f = null;
-                        }
-                    }
-                    this.bbox.catBBox = cat_title_f;
-                }
-                if(Array.isArray(series_title_f))
-                {
-                    // if(b_titles_vert)
-                    // {
-                    this.bbox.serBBox = {
-                        r1: series_title_f[0].r1,
-                        r2: series_title_f[series_title_f.length-1].r2,
-                        c1: series_title_f[0].c1,
-                        c2: series_title_f[series_title_f.length-1].c2
+                    this.bbox =  {
+                        seriesBBox: null,
+                        catBBox: null,
+                        serBBox: null,
+                        worksheet: first_series_sheet
                     };
-                    // }
-                    // else
-                    // {
-                    //     this.bbox.serBBox = {
-                    //         r1: series_title_f[0].r1,
-                    //         r2: series_title_f[0].r1,
-                    //     };
-                    // }
+
+
+                    this.bbox.seriesBBox = {
+                        r1: series_f[0].r1,
+                        r2: series_f[series_f.length-1].r2,
+                        c1: series_f[0].c1,
+                        c2: series_f[series_f.length-1].c2,
+                        bVert: b_vert
+                    };
+
+
+                    this.seriesBBoxes.push(new BBoxInfo(first_series_sheet, this.bbox.seriesBBox));
+
+                    if(cat_title_f)
+                    {
+                        if(b_vert)
+                        {
+                            if(cat_title_f.c1 !== this.bbox.seriesBBox.c1
+                                || cat_title_f.c2 !== this.bbox.seriesBBox.c2
+                                || cat_title_f.r1 !== cat_title_f.r1)
+                            {
+                                cat_title_f = null;
+                            }
+                        }
+                        else
+                        {
+                            if(cat_title_f.c1 !== cat_title_f.c2
+                                || cat_title_f.r1 !== this.bbox.seriesBBox.r1
+                                || cat_title_f.r2 !== this.bbox.seriesBBox.r2)
+                            {
+                                cat_title_f = null;
+                            }
+                        }
+                        this.bbox.catBBox = cat_title_f;
+
+                        if(cat_title_f)
+                        {
+                            this.catTitlesBBoxes.push(new BBoxInfo(first_series_sheet, cat_title_f));
+                        }
+                    }
+                    if(Array.isArray(series_title_f))
+                    {
+                        this.bbox.serBBox = {
+                            r1: series_title_f[0].r1,
+                            r2: series_title_f[series_title_f.length-1].r2,
+                            c1: series_title_f[0].c1,
+                            c2: series_title_f[series_title_f.length-1].c2
+                        };
+                        this.seriesTitlesBBoxes.push(new BBoxInfo(first_series_sheet, this.bbox.serBBox));
+                    }
+                }
+                else
+                {
+                    for(i = 0;  i < series_bboxes.length; ++i)
+                    {
+                        this.seriesBBoxes.push(new BBoxInfo(series_bboxes[i].worksheet, series_bboxes[i].bbox));
+                    }
+
+                    for(i = 0;  i < cat_bboxes.length; ++i)
+                    {
+                        this.catTitlesBBoxes.push(new BBoxInfo(cat_bboxes[i].worksheet, cat_bboxes[i].bbox));
+                    }
+
+                    for(i = 0;  i < ser_titles_bboxes.length; ++i)
+                    {
+                        this.seriesTitlesBBoxes.push(new BBoxInfo(ser_titles_bboxes[i].worksheet, ser_titles_bboxes[i].bbox));
+                    }
                 }
             }
         }
@@ -11240,3 +10779,4 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 
 	return {series: series, parsedHeaders: parsedHeaders};
 }
+

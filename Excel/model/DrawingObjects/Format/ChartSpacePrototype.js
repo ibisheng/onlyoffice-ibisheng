@@ -77,7 +77,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateBBox: true,
         recalculateFormulas: true,
         recalculatePenBrush: true,
-        recalculateTextPr : true
+        recalculateTextPr : true,
+        recalculateBBoxRange: true
     };
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -219,6 +220,8 @@ CChartSpace.prototype.recalculateBounds = function()
     this.bounds.x = this.bounds.l;
     this.bounds.y = this.bounds.t;
 };
+
+
 
 
 CChartSpace.prototype.recalculate = function()
