@@ -326,11 +326,12 @@ CHistory.prototype =
         }
         CollaborativeEditing.Apply_LinkData();
         var wsViews = Asc["editor"].wb.wsViews;
+        this.Get_RecalcData(Point);
         for(var i = 0; i < wsViews.length; ++i)
         {
             if(wsViews[i])
             {
-                wsViews[i].objectRender.controller.recalculate(undefined, Point);
+                wsViews[i].objectRender.controller.recalculate2(undefined);
             }
         }
 
@@ -354,10 +355,11 @@ CHistory.prototype =
 	        this._checkCurPoint();
 	        Point = this.Points[this.Index];
 	        CollaborativeEditing.Apply_LinkData();
+            this.Get_RecalcData(Point);
 	        var wsViews = Asc["editor"].wb.wsViews;
 	        for (var i = 0; i < wsViews.length; ++i) {
 	            if (wsViews[i]) {
-	                wsViews[i].objectRender.controller.recalculate(true, null);
+	                wsViews[i].objectRender.controller.recalculate2(true);
 	            }
 	        }
             var wsView = window["Asc"]["editor"].wb.getWorksheet();
@@ -369,10 +371,11 @@ CHistory.prototype =
 
 	    if (null != Point) {
 	        if (bUndo) {
+                this.Get_RecalcData(Point);
 	            var wsViews = Asc["editor"].wb.wsViews;
 	            for (var i = 0; i < wsViews.length; ++i) {
 	                if (wsViews[i]) {
-	                    wsViews[i].objectRender.controller.recalculate(undefined, Point);
+	                    wsViews[i].objectRender.controller.recalculate2(undefined);
 	                }
 	            }
 

@@ -224,6 +224,31 @@ DrawingObjectsController.prototype.recalculate = function(bAll, Point)
     this.objectsForRecalculate = {};
 };
 
+DrawingObjectsController.prototype.recalculate2 = function(bAll)
+{
+    if(bAll)
+    {
+        var drawings = this.getDrawingObjects();
+        for(var i = 0; i < drawings.length; ++i)
+        {
+            if(drawings[i].recalcText)
+            {
+                drawings[i].recalcText();
+            }
+            drawings[i].recalculate();
+        }
+    }
+    else
+    {
+        for(var key in this.objectsForRecalculate)
+        {
+            this.objectsForRecalculate[key].recalculate();
+        }
+    }
+    this.objectsForRecalculate = {};
+};
+
+
 DrawingObjectsController.prototype.updateRecalcObjects = function()
 {};
 DrawingObjectsController.prototype. getTheme = function()
