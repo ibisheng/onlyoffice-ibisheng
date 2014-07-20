@@ -4876,7 +4876,7 @@ PasteProcessor.prototype =
 		if(this.pasteInPresentationShape)
 			bFromPresentation = true;
 			
-		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, bFromPresentation );
+		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, this.oDocument.bPresentation === true );
         this.oCurParContentPos = this.oCurPar.CurPos.ContentPos;
         this.oCurRun = new ParaRun(this.oCurPar);
         this.oCurRunContentPos = 0;

@@ -12464,6 +12464,10 @@ Paragraph.prototype =
                 this.LogicDocument   = this.bFromDocument ? this.DrawingDocument.m_oLogicDocument : null;
             }
         }
+        else
+        {
+            CollaborativeEditing.Add_LinkData(this, {});
+        }
     },
 
     Load_LinkData : function(LinkData)
