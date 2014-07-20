@@ -3081,6 +3081,11 @@ DrawingObjectsController.prototype =
         }
         else if(this.selectedObjects.length > 0)
         {
+            var worksheet = this.drawingObjects.getWorksheet();
+            if(worksheet)
+            {
+                worksheet.arrActiveChartsRanges = [];
+            }
             if(this.selection.groupSelection)
             {
                 if(this.selection.groupSelection.selection.chartSelection)
