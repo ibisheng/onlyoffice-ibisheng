@@ -2112,6 +2112,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
     {
         var drawingObjects = new DrawingObjects();
         oNewWs.Drawings = [];
+        NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
         for(var i = 0; i < this.Drawings.length; ++i)
         {
             var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
@@ -2120,6 +2121,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
             drawingObject.graphicObject.addToDrawingObjects();
             oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
         }
+        NEW_WORKSHEET_DRAWING_DOCUMENT = null;
         drawingObjects.pushToAObjects(oNewWs.Drawings);
         drawingObjects.updateChartReferences2(wsFrom.sName, oNewWs.sName);
     }

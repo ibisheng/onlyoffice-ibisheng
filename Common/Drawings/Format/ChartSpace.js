@@ -547,7 +547,11 @@ CChartSpace.prototype =
         if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0)
         {
             var ret = [];
-            var f1 = sFormula.replace(/\(|\)/g,"");
+            if(sFormula[0] === '(')
+                sFormula = sFormula.slice(1);
+            if(sFormula[sFormula.length-1] === ')')
+                sFormula = sFormula.slice(0, -1);
+            var f1 = sFormula;
             var arr_f = f1.split(",");
             var i, j;
             for(i = 0; i < arr_f.length; ++i)
@@ -556,11 +560,14 @@ CChartSpace.prototype =
                 if(parsed_ref)
                 {
                     var source_worksheet = this.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
-                    var range1 = source_worksheet.getRange2(parsed_ref.range);
-                    if(range1)
+                    if(source_worksheet)
                     {
-                        var range = range1.bbox;
-                        ret.push({worksheet: source_worksheet, bbox: range});
+                        var range1 = source_worksheet.getRange2(parsed_ref.range);
+                        if(range1)
+                        {
+                            var range = range1.bbox;
+                            ret.push({worksheet: source_worksheet, bbox: range});
+                        }
                     }
                 }
             }
@@ -953,12 +960,12 @@ CChartSpace.prototype =
         }
     },
 
-    copy: function()
+    copy: function(drawingDocument)
     {
         var copy = new CChartSpace();
         if(this.chart)
         {
-            copy.setChart(this.chart.createDuplicate());
+            copy.setChart(this.chart.createDuplicate(drawingDocument));
         }
         if(this.clrMapOvr)
         {
@@ -991,7 +998,7 @@ CChartSpace.prototype =
         copy.setStyle(this.style);
         if(this.txPr)
         {
-            copy.setTxPr(this.txPr.createDuplicate())
+            copy.setTxPr(this.txPr.createDuplicate(drawingDocument))
         }
         copy.setUserShapes(this.userShapes);
         copy.setThemeOverride(this.themeOverride);
@@ -1619,9 +1626,10 @@ CChartSpace.prototype =
 
     getRangeObjectStr: function()
     {
-        if(!this.recalcInfo.recalculateBBox)
+        if(this.recalcInfo.recalculateBBox)
         {
             this.recalculateBBox();
+            this.recalcInfo.recalculateBBox = false;
         }
         var ret = {range: null, bVert: null};
         if(this.bbox && this.bbox.seriesBBox)

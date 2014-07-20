@@ -121,9 +121,9 @@ CDocumentContent.prototype =
         this.StartState = new CDocumentContentStartState(this);
     },
 
-    Copy : function(Parent)
+    Copy : function(Parent, DrawingDocument)
     {
-        var DC = new CDocumentContent(Parent, this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap, this.bPresentation);
+        var DC = new CDocumentContent(Parent, DrawingDocument ? DrawingDocument : this.DrawingDocument, 0, 0, 0, 0, this.Split, this.TurnOffInnerWrap, this.bPresentation);
 
         // Копируем содержимое
         DC.Internal_Content_RemoveAll();
@@ -131,7 +131,7 @@ CDocumentContent.prototype =
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            DC.Internal_Content_Add( Index, this.Content[Index].Copy(DC), false );
+            DC.Internal_Content_Add( Index, this.Content[Index].Copy(DC, DrawingDocument), false );
         }
 
         return DC;
@@ -8676,8 +8676,7 @@ CDocumentContent.prototype =
 
         if(this.Parent.getDrawingDocument)
         {
-            if(!this.DrawingDocument)
-                this.DrawingDocument = this.Parent.getDrawingDocument();
+            this.DrawingDocument = this.Parent.getDrawingDocument();
             for(var i = 0;  i < this.Content.length; ++i)
             {
                 this.Content[i].DrawingDocument = this.DrawingDocument;

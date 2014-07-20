@@ -70,7 +70,7 @@ function removeAllSeriesFromChart(chart)
 
 
 var SCALE_INSET_COEFF = 1.016;//Возможно придется уточнять
-
+var NEW_WORKSHEET_DRAWING_DOCUMENT = null;
 function CDLbl()
 {
     this.bDelete = null;

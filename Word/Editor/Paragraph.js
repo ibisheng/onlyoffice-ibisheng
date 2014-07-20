@@ -220,9 +220,9 @@ Paragraph.prototype =
         this.Recalc_CompiledPr();
     },
 
-    Copy : function(Parent)
+    Copy : function(Parent, DrawingDocument)
     {
-        var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0, !this.bFromDocument);
+        var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, 0, 0, 0, 0, 0, !this.bFromDocument);
 
         // Копируем настройки
         Para.Set_Pr(this.Pr.Copy());
