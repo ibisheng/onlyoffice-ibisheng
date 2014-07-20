@@ -9537,6 +9537,8 @@ function CreateBarChart(chartSeries, type)
         bar_chart.addSer(series);
     }
     bar_chart.setGapWidth(150);
+    if(BAR_GROUPING_PERCENT_STACKED === type)
+        bar_chart.setOverlap(100);
     bar_chart.addAxId(cat_ax);
     bar_chart.addAxId(val_ax);
     cat_ax.setScaling(new CScaling());
@@ -9696,6 +9698,8 @@ function CreateHBarChart(chartSeries, type)
     //d_lbls.setShowLegendKey(false);
     //d_lbls.setShowVal(true);
     bar_chart.setGapWidth(150);
+    if(BAR_GROUPING_PERCENT_STACKED === type)
+        bar_chart.setOverlap(100);
     bar_chart.addAxId(cat_ax);
     bar_chart.addAxId(val_ax);
     cat_ax.setScaling(new CScaling());
