@@ -611,7 +611,15 @@ CDLbl.prototype =
             var text_pr = new CTextPr();
             text_pr.FontSize = 10;
             text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
-            var parent_objects = this.chart.getParentObjects();
+            var parent_objects;
+            if(this.chart)
+            {
+                parent_objects = this.chart.getParentObjects();
+            }
+            else if(this.parent)
+            {
+                parent_objects = this.parent.getParentObjects();
+            }
             var theme = parent_objects.theme;
 
             var para_pr = new CParaPr();
@@ -649,7 +657,7 @@ CDLbl.prototype =
 
             var chart_text_pr;
 
-            if(this.chart.txPr
+            if(this.chart && this.chart.txPr
                 && this.chart.txPr.content
                 && this.chart.txPr.content.Content[0]
                 && this.chart.txPr.content.Content[0].Pr)
@@ -662,10 +670,10 @@ CDLbl.prototype =
                 }
 
             }
-            if(this instanceof  CTitle)
+            if(this instanceof  CTitle || this.parent  instanceof  CTitle)
             {
                 style.TextPr.Bold = true;
-                if(this.parent instanceof CChart)
+                if(this.parent instanceof CChart || (this.parent && (this.parent.parent instanceof  CChart)))
                 {
                     if(chart_text_pr && typeof chart_text_pr.FontSize === "number")
                         style.TextPr.FontSize = (chart_text_pr.FontSize*1.2) >> 0;
@@ -4385,6 +4393,12 @@ CCatAx.prototype =
             this.parent.parent.parent.handleUpdateInternalChart();
         }
     },
+
+    getParentObjects: function()
+    {
+        return this.parent && this.parent.getParentObjects();
+    },
+
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_CatAxSetTxPr, oldPr: this.txPr, newPr:pr});
@@ -5473,6 +5487,12 @@ CDateAx.prototype =
             this.parent.parent.parent.handleUpdateInternalChart();
         }
     },
+
+    getParentObjects: function()
+    {
+        return this.parent && this.parent.getParentObjects();
+    },
+
     setTxPr: function(pr)
     {
         History.Add(this, {Type:historyitem_DateAxTxPr, oldPr: this.txPr, newPr: pr});
@@ -6539,6 +6559,12 @@ CSerAx.prototype =
             this.parent.parent.parent.handleUpdateInternalChart();
         }
     },
+
+    getParentObjects: function()
+    {
+        return this.parent && this.parent.getParentObjects();
+    },
+
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_SerAxSetTxPr, oldPr: this.txPr, newPr: pr});
@@ -7491,6 +7517,12 @@ CValAx.prototype =
             this.parent.parent.parent.handleUpdateInternalChart();
         }
     },
+
+    getParentObjects: function()
+    {
+        return this.parent && this.parent.getParentObjects();
+    },
+
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_ValAxSetTxPr, oldPr: this.txPr, newPr: pr});
@@ -21913,7 +21945,15 @@ CTitle.prototype =
 
     getParentObjects: function()
     {
-        return this.chart.getParentObjects();
+        if(this.chart)
+        {
+            return this.chart.getParentObjects();
+        }
+        else if(this.parent)
+        {
+            return this.parent.getParentObjects();
+        }
+        return null;
     },
 
     getDefaultTextForTxBody: function()
@@ -23042,6 +23082,11 @@ CChart.prototype =
         return  historyitem_type_Chart;
     },
 
+    getParentObjects: function()
+    {
+        return this.parent && this.parent.getParentObjects();
+    },
+
     createDuplicate: function()
     {
         var c = new CChart();
@@ -23187,6 +23232,7 @@ CChart.prototype =
             this.parent.handleUpdateInternalChart();
         }
     },
+
     setView3D: function(view3D)
     {
         History.Add(this, {Type: historyitem_Chart_SetView3D, oldView3D: this.view3D, newView3D: view3D});
