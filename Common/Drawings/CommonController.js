@@ -1443,13 +1443,12 @@ DrawingObjectsController.prototype =
 
     deleteSelectedObjects: function()
     {
+        var content = this.getTargetDocContent();
+        if(content && !content.Selection.Use)
+        {
+            return;
+        }
         this.remove(-1);
-        /*var drawingObjectsController = this;
-         for(var i = drawingObjectsController.selectedObjects.length-1; i > -1 ; --i)
-         {
-         drawingObjectsController.selectedObjects[i].deleteDrawingBase();
-         }
-         drawingObjectsController.resetSelectionState();*/
     },
 
 
