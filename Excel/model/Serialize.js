@@ -5772,7 +5772,7 @@
 
                // res = c_oSerConstants.ReadUnknown;
                 var oGraphicObject = this.oPPTXContentLoader.ReadGraphicObject(this.stream, this.curWorksheet);
-                if(null != oGraphicObject)
+                if(null != oGraphicObject && !((oGraphicObject.getObjectType() === historyitem_type_Shape || oGraphicObject.getObjectType() === historyitem_type_ImageShape) && !oGraphicObject.spPr))
                 {
                     oDrawing.graphicObject = oGraphicObject;
 					//TODO при copy/paste в word из excel пропадает метод setDrawingBase
