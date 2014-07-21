@@ -185,7 +185,7 @@ CMathMatrix.prototype.setPosition = function(pos)
 {
     this.pos.x = pos.x;
 
-    if(this.bMObjs === true)
+    if(this.bInside === true)
         this.pos.y = pos.y;
     else
         this.pos.y = pos.y - this.size.ascent; ///!!!!

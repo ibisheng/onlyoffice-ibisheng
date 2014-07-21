@@ -1,6 +1,6 @@
 "use strict";
 
-function CMathBase()
+function CMathBase(bInside)
 {
     //this.typeObj = MATH_COMP;
     this.Type = para_Math_Composition;
@@ -9,12 +9,14 @@ function CMathBase()
     this.size = null;
 
     //  Properties
-    this.argSize = 0;
     this.Parent = null;
     this.ParaMath = null; // ссылка на общую формулу
 
     this.CtrPrp = new CTextPr();
     this.CompiledCtrPrp = new CTextPr();
+
+    this.ArgSize = new CMathArgSize();
+
     /////////////////
 
     this.CurPos_X = 0;
@@ -39,9 +41,8 @@ function CMathBase()
     this.nRow = 0;
     this.nCol = 0;
 
-    // todo
-    // убрать !!!
-    this.bMObjs = false;
+
+    this.bInside = bInside === true ? true: false;
 
     this.elements = new Array();
 
@@ -74,11 +75,7 @@ CMathBase.prototype =
         {
             this.elements[i] = [];
             for(var j = 0; j < this.nCol; j++)
-            {
                 this.elements[i][j] = new CMathContent();
-                //this.elements[i][j].relate(this);
-                //this.elements[i][j].setComposition(this.Composition);
-            }
         }
     },
     setDimension: function(countRow, countCol)
@@ -96,7 +93,9 @@ CMathBase.prototype =
             this.alignment.wdt[u] = MCJC_CENTER;*/
 
         for(var i = 0; i < this.nCol ; i++)
+        {
             this.alignment.wdt[i] = MCJC_CENTER;
+        }
 
         for(var j=0; j < this.nRow; j++)
         {
@@ -113,7 +112,13 @@ CMathBase.prototype =
     },
     Get_CtrPrp: function()
     {
-        return this.CtrPrp.Copy();
+        var CtrPrp;
+        if(this.bInside === true)
+            CtrPrp = this.Parent.Get_CtrPrp();
+        else
+            CtrPrp = this.CtrPrp.Copy();
+
+        return CtrPrp;
     },
     Set_CompiledCtrPrp: function(ParaMath)
     {
@@ -130,14 +135,30 @@ CMathBase.prototype =
     },
     Get_CompiledCtrPrp: function()
     {
-        var CompiledCtrPrp = this.CompiledCtrPrp.Copy();
-        this.ParaMath.ApplyArgSize(CompiledCtrPrp, this.argSize);
+        var CompiledCtrPrp;
+
+        if(this.bInside === true)
+        {
+            CompiledCtrPrp = this.Parent.Get_CompiledCtrPrp();
+        }
+        else
+        {
+            CompiledCtrPrp = this.Get_CompiledCtrPrp_2();
+            this.ParaMath.ApplyArgSize(CompiledCtrPrp, this.Parent.Get_CompiledArgSize().value);
+        }
+
+        this.ParaMath.ApplyArgSize(CompiledCtrPrp, this.ArgSize.value); // для настроек inline формул
 
         return CompiledCtrPrp;
     },
     Get_CompiledCtrPrp_2: function() // without arg Size
     {
         return this.CompiledCtrPrp.Copy();
+        //return this.CompiledCtrPrp.Copy();
+    },
+    Get_CompiledArgSize: function()
+    {
+        return this.Parent.Get_CompiledArgSize();
     },
     getCtrPrpForFirst: function(ParaMath)
     {
@@ -174,7 +195,7 @@ CMathBase.prototype =
                     this.elements[i][j].setRPrp(rPrp);
             }
     },*/
-    increaseArgSize: function()
+    /*increaseArgSize: function()
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
@@ -201,7 +222,7 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 if( !this.elements[i][j].IsJustDraw() )
                     this.elements[i][j].setArgSize(argSize);
-    },
+    },*/
     fillPlaceholders: function()
     {
          for(var i=0; i < this.nRow; i++)
@@ -209,20 +230,18 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                  this.elements[i][j].fillPlaceholders();
     },
-    addMCToContent: function()
+    addMCToContent: function(elements)
     {
-        if(arguments.length == this.nRow*this.nCol)
+        if(elements.length == this.nRow*this.nCol)
         {
-            this.elements = [];
+            this.elements.length = 0;
             for(var i = 0; i < this.nRow; i++)
             {
                 this.elements[i] = [];
                 for(var j = 0; j < this.nCol; j++)
                 {
-                    this.elements[i][j] = arguments[j + i*this.nCol];
-                    //this.elements[i][j].relate(this);
-                    //this.elements[i][j].setComposition(this.Composition);
-                    this.elements[i][j].bMObjs = true;
+                    this.elements[i][j] = elements[j + i*this.nCol];
+                    //this.elements[i][j].bMObjs = true;
                 }
             }
         }
@@ -525,7 +544,7 @@ CMathBase.prototype =
     {
         this.pos.x = pos.x;
 
-        if(this.bMObjs === true)
+        if(this.bInside === true)
             this.pos.y = pos.y;
         else
             this.pos.y = pos.y - this.size.ascent; ///!!!!
@@ -588,16 +607,16 @@ CMathBase.prototype =
 
         this.size = {width: width, height: height, ascent: ascent};
     },
-    Resize: function(Parent, ParaMath, oMeasure)
+    Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     {
         this.Parent = Parent;
         this.ParaMath = ParaMath;
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].Resize(this, ParaMath, oMeasure);
+                this.elements[i][j].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
-        this.recalculateSize(oMeasure); // передаем oMeasure, для
+        this.recalculateSize(oMeasure, RPI);
     },
     CompiledCtrPrp: function()
     {
@@ -819,7 +838,7 @@ CMathBase.prototype =
 
         return content;
     },*/
-    getGapsInside: function(RecalcInfo)
+    getGapsInside: function(GapsInfo)
     {
         var kind = this.kind;
         var gaps = {left: 0, right: 0};
@@ -828,7 +847,7 @@ CMathBase.prototype =
         if(checkBase)
         {
             var base = this.getBase();
-            gaps = base.getGapsInside(RecalcInfo);
+            gaps = base.getGapsInside(GapsInfo);
         }
 
         return gaps;
@@ -1035,19 +1054,19 @@ CMathBase.prototype =
     {
         return this.elements[this.CurPos_X][this.CurPos_Y].IsCurrentPlh();
     },
-    SetGaps:  function(Parent, ParaMath, RecalcInfo)
+    SetGaps:  function(Parent, ParaMath, GapsInfo)
     {
-        this.Parent = Parent;
+        this.Parent   = Parent;
         this.ParaMath = ParaMath;
 
-        RecalcInfo.Left = RecalcInfo.Current;
-        RecalcInfo.leftRunPrp = RecalcInfo.currRunPrp;
+        GapsInfo.Left       = GapsInfo.Current;
+        GapsInfo.leftRunPrp = GapsInfo.currRunPrp;
 
 
-        RecalcInfo.Current = this;
-        RecalcInfo.currRunPrp = this.Get_CompiledCtrPrp();
+        GapsInfo.Current    = this;
+        GapsInfo.currRunPrp = this.Get_CompiledCtrPrp();
 
-        RecalcInfo.setGaps();
+        GapsInfo.setGaps();
 
     },
     ApplyGaps: function()
@@ -1292,14 +1311,16 @@ CMathBase.prototype =
     {
         var props = Common_CopyObj(this.Pr);
 
+        props.ctrPrp = this.CtrPrp.Copy();
+
         var NewObj = new this.constructor();
         NewObj.init(props);
-        NewObj.argSize = this.argSize;
+        //NewObj.argSize = this.argSize;
 
         //NewObj.Composition = Composition;
-        var CtrPrp = this.CtrPrp.Copy();
+        //var CtrPrp = this.CtrPrp.Copy();
 
-        NewObj.setCtrPrp(CtrPrp);
+        //NewObj.setCtrPrp(CtrPrp);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
@@ -1324,14 +1345,17 @@ CMathBase.prototype =
 
         var TextPr = null;
 
-        while(start_x < this.nCol && start_y < this.nRow && (TextPr == null || this.elements[start_x][start_y].IsJustDraw() ))
+        while(start_x < this.nRow && start_y < this.nCol && (TextPr == null || this.elements[start_x][start_y].IsJustDraw() ))
         {
             if(!this.elements[start_x][start_y].IsJustDraw())
+            {
                 TextPr = this.elements[start_x][start_y].Get_CompiledTextPr(Copy, true);
+                break;
+            }
 
             start_y++;
 
-            if(start_y >= this.nCol)
+            if(start_y == this.nCol)
             {
                 start_x++;
                 start_y = 0;

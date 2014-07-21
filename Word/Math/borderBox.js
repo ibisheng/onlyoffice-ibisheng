@@ -601,8 +601,18 @@ CBox.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.setContent();
 
+    /*if(this.Pr.opEmu)
+        this.elements[0][0].decreaseArgSize();*/
+}
+CBox.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    var CurrArgSize = new CMathArgSize();
+    CurrArgSize.Merge(ArgSize);
+
     if(this.Pr.opEmu)
-        this.elements[0][0].decreaseArgSize();
+        CurrArgSize.decrease();
+
+    CBox.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, CurrArgSize);
 }
 CBox.prototype.setProperties = function(props)
 {
@@ -750,7 +760,7 @@ CBar.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.setContent();
 }
-CBar.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CBar.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     if(this.RecalcInfo.bProps == true)
     {
@@ -769,7 +779,7 @@ CBar.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.RecalcInfo.bProps = false;
     }
 
-    CBar.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
+    CBar.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
 }
 CBar.prototype.getAscent = function()
 {

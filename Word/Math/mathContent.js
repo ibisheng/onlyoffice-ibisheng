@@ -26,8 +26,7 @@
 /// TODO
 
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
-// 2. Убрать ненужные(!!) setTxtPrp и
-// getTxtPrp
+
 // 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
 // 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выравнено как alignTop)
 
@@ -36,7 +35,24 @@ var historyitem_Math_RemoveItem                =  2; // Удаляем элем�
 var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
 
 
+function CRPI()
+{
+    this.bInsideFraction = false;
+    this.bInline         = false;
+    this.bChangeInline   = false;
+    this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
+}
+CRPI.prototype.Copy = function()
+{
+    var RPI = new CRPI();
 
+    RPI.bInline         = this.bInline;
+    RPI.bInsideFraction = this.bInsideFraction;
+    RPI.bChangeInline   = this.bChangeInline;
+    RPI.bNaryInline     = this.bNaryInline;
+
+    return RPI;
+}
 
 function CGaps(oSign, oEqual, oZeroOper, oLett)
 {
@@ -133,10 +149,54 @@ CCoeffGaps.prototype =
 
 var COEFF_GAPS = new CCoeffGaps();
 
+function CMathArgSize()
+{
+    this.value       = 0;
+}
+CMathArgSize.prototype =
+{
+    decrease: function()
+    {
+        if( this.value > -2 )
+            this.value--;
+    },
+    increase: function()
+    {
+        if(this.value < 2)
+            this.value++;
+    },
+    Set: function(ArgSize)
+    {
+        this.value = ArgSize.value;
+    },
+    SetValue: function(val)
+    {
+        if(val < - 2)
+            this.value = -2;
+        else if(val > 2)
+            this.value = 2;
+        else
+            this.value = val;
+
+    },
+    Copy: function()
+    {
+        var ArgSize = new CMathArgSize();
+        ArgSize.value = this.value;
+
+        return ArgSize;
+    },
+    Merge: function(ArgSize)
+    {
+        this.SetValue(this.value + ArgSize.value);
+    }
+}
+
+
 // TODO
 // проконтролировать GapLeft и GapRight для setPosition всех элементов
 
-function CMathRecalculateInfo(oMeasure, argSize)
+function CMathGapsInfo(oMeasure, argSize)
 {
     this.measure = oMeasure;
 
@@ -151,7 +211,7 @@ function CMathRecalculateInfo(oMeasure, argSize)
     this.Current = null;    // текущий элемент
 
 }
-CMathRecalculateInfo.prototype =
+CMathGapsInfo.prototype =
 {
     old_checkGapsSign: function(oMeasure, posCurr)
     {
@@ -668,11 +728,13 @@ function CMathContent()
     this.pos = new CMathPosition();   // относительная позиция
 
     //  Properties
-    this.ParaMath      = null;
-    this.argSize     = 0;
-    this.bDot       =   false;
-    this.plhHide    =   false;
-    this.bRoot      =   false;
+    this.ParaMath       = null;
+    this.ArgSize        = new CMathArgSize();
+    this.Compiled_ArgSz = new CMathArgSize();
+
+    this.bDot       = false;
+    this.plhHide    = false;
+    this.bRoot      = false;
     //////////////////
 
     this.Selection =
@@ -711,7 +773,7 @@ CMathContent.prototype =
     {
 
     },
-    setArgSize: function(argSize)
+    /*setArgSize: function(argSize)
     {
         var check = argSize == 0 || argSize == 1 || argSize == 2 || argSize == -1 || argSize === -2; // проверка параметра
 
@@ -736,7 +798,7 @@ CMathContent.prototype =
                     this.content[i].setArgSize(argSize);
             }
         }
-    },
+    },*/
     addTxt: function(txt)
     {
         var Pos = this.CurPos;
@@ -797,7 +859,7 @@ CMathContent.prototype =
     {
         if(obj.Type === para_Math_Composition)
         {
-            obj.setArgSize(this.argSize);
+            //obj.setArgSize(this.argSize);
             this.content.push(obj);
         }
         else
@@ -3782,7 +3844,7 @@ CMathContent.prototype =
 
     //////////////////////////////////////
 
-    recalculateSize: function(ParaMath, oMeasure)
+    recalculateSize: function(oMeasure, RPI, ArgSize)
     {
         var width      =   0 ;
         var ascent     =   0 ;
@@ -3796,11 +3858,11 @@ CMathContent.prototype =
         {
             if(this.content[i].Type == para_Math_Composition)
             {
-                this.content[i].Resize(this, ParaMath, oMeasure);
+                this.content[i].Resize(oMeasure, this, this.ParaMath, RPI, ArgSize);
                 this.content[i].ApplyGaps();
             }
             else
-                this.content[i].Math_Recalculate(this, ParaMath.Paragraph, oMeasure);
+                this.content[i].Math_Recalculate(oMeasure, this, this.ParaMath.Paragraph, RPI, ArgSize);
 
             this.WidthToElement[i] = width;
 
@@ -3815,9 +3877,15 @@ CMathContent.prototype =
 
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },
-    Resize: function(Parent, ParaMath, oMeasure)      // пересчитываем всю формулу
+    Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // пересчитываем всю формулу
     {
-        var RecalcInfo = new CMathRecalculateInfo(oMeasure, this.argSize);
+        if(ArgSize !== null && ArgSize !== undefined)
+        {
+            this.Compiled_ArgSz.value = this.ArgSize.value;
+            this.Compiled_ArgSz.Merge(ArgSize);
+        }
+
+        var GapsInfo = new CMathGapsInfo(oMeasure, this.Compiled_ArgSz.value);
 
         this.ParaMath = ParaMath;
 
@@ -3836,21 +3904,25 @@ CMathContent.prototype =
             if(this.content[pos].Type == para_Math_Composition)
             {
                 // мержим ctrPrp до того, как добавим Gaps !
-                this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath несмержим ctrPrp
-                this.content[pos].SetGaps(this, ParaMath, RecalcInfo);
+                this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath не смержим ctrPrp
+                this.content[pos].SetGaps(this, ParaMath, GapsInfo);
             }
             else if(this.content[pos].Type == para_Math_Run /*&& !this.content[pos].Is_Empty()*/)
-                this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, RecalcInfo);
+                this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, GapsInfo);
         }
 
 
-        if(RecalcInfo.Current !== null)
-            RecalcInfo.Current.GapRight = 0;
+        if(GapsInfo.Current !== null)
+            GapsInfo.Current.GapRight = 0;
 
 
-        this.recalculateSize(ParaMath, oMeasure);
+        this.recalculateSize(oMeasure, RPI, this.Compiled_ArgSz);
     },
-    getGapsInside: function(RecalcInfo) // учитываем gaps внутренних объектов
+    Get_CompiledArgSize: function()
+    {
+        return this.Compiled_ArgSz;
+    },
+    getGapsInside: function(GapsInfo) // учитываем gaps внутренних объектов
     {
         var gaps = {left: 0, right: 0};
         var bFirstComp = false,
@@ -3871,22 +3943,22 @@ CMathContent.prototype =
 
         if(bFirstComp)
         {
-            checkGap = RecalcInfo.checkGapKind(this.content[1].kind);
+            checkGap = GapsInfo.checkGapKind(this.content[1].kind);
 
             if(!checkGap.bChildGaps)
             {
-                gaps.left = RecalcInfo.getGapsMComp(this.content[1], -1);
+                gaps.left = GapsInfo.getGapsMComp(this.content[1], -1);
                 //gaps.left = gapsMComp.left;
             }
         }
 
         if(bLastComp)
         {
-            checkGap = RecalcInfo.checkGapKind(this.content[len - 1].kind);
+            checkGap = GapsInfo.checkGapKind(this.content[len - 1].kind);
 
             if(!checkGap.bChildGaps)
             {
-                gaps.right = RecalcInfo.getGapsMComp(this.content[len - 1], 1);
+                gaps.right = GapsInfo.getGapsMComp(this.content[len - 1], 1);
                 //gaps.right = gapsMComp.right;
             }
         }
@@ -4037,7 +4109,7 @@ CMathContent.prototype =
     {
         return this.content[0].Get_CompiledPr(true);
     },
-    increaseArgSize: function()
+    /*increaseArgSize: function()
     {
         if(this.argSize < 2)
             this.argSize++;
@@ -4046,7 +4118,7 @@ CMathContent.prototype =
     {
         if( this.argSize > -2 )
             this.argSize--;
-    },
+    },*/
     GetCtrPrp: function()       // for placeholder
     {
         var ctrPrp = new CTextPr();
@@ -4419,12 +4491,17 @@ CMathContent.prototype =
                 ctrPrp.Italic = undefined;
 
                 emptyRun.Set_Pr(ctrPrp);
+                left = current;
 
                 this.Internal_Content_Add(i, emptyRun);
             }
             else if(bDeleteEmptyRun)
             {
                 this.Remove_FromContent(i, 1);
+            }
+            else
+            {
+                left = current;
             }
 
         }
@@ -4454,13 +4531,12 @@ CMathContent.prototype =
     Create_FontMap : function(Map)
     {
         for (var index = 0; index < this.content.length; index++)
-                this.content[index].Create_FontMap( Map );
-
+            this.content[index].Create_FontMap( Map, this.Compiled_ArgSz ); // ArgSize компилируется только тогда, когда выставлены все ссылки на родительские классы
     },
     Get_AllFontNames: function(AllFonts)
     {
         for (var index = 0; index < this.content.length; index++)
-                this.content[index].Get_AllFontNames(AllFonts);
+            this.content[index].Get_AllFontNames(AllFonts);
     },
 
     /// функции для работы с курсором
@@ -5268,6 +5344,17 @@ CMathContent.prototype =
 					
 					Writer.WriteLong( Data.Pos + Index );
 					Writer.WriteString2( oElem.Id );					
+					Writer.WriteLong( typeObj );	
+					
+					if (typeObj == MATH_PARA_RUN)
+					{
+						Writer.WriteBool(oElem.MathPrp.aln);
+						Writer.WriteBool(oElem.MathPrp.bold);
+						Writer.WriteBool(oElem.MathPrp.brk);
+						Writer.WriteBool(oElem.MathPrp.italic);
+						Writer.WriteBool(oElem.MathPrp.lit);
+						Writer.WriteLong(oElem.MathPrp.typeText);
+					}
                 }
                 break;
             }
@@ -5308,6 +5395,20 @@ CMathContent.prototype =
                 {
                     var Pos     = Reader.GetLong();
 					var Element = g_oTableId.Get_ById( Reader.GetString2() );
+					var typeObj = Reader.GetLong();
+
+					if (typeObj == MATH_PARA_RUN)
+					{
+						var MathPrp = new CMPrp();
+						MathPrp.aln = Reader.GetBool();
+						MathPrp.bold = Reader.GetBool();
+						MathPrp.brk = Reader.GetBool();
+						MathPrp.italic = Reader.GetBool();
+						MathPrp.lit = Reader.GetBool();
+						Element.MathPrp = MathPrp;
+						Element.typeObj = typeObj;
+					}
+					this.DeleteEmptyRuns();
 					this.content.splice( Pos, 0, Element );
 					this.SetRunEmptyToContent(true);
                 }
@@ -7064,9 +7165,9 @@ CMathContent.prototype =
 	{
         oElem.Parent = this;
 
-        if(oElem.Type === para_Math_Composition)
+        if(oElem.typeObj === MATH_COMP)
         {
-            oElem.setArgSize(this.argSize);
+            //oElem.setArgSize(this.argSize);
             this.content.splice(Pos,0,oElem);
         }
         else

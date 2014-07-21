@@ -20,6 +20,12 @@ function CNary(props)
         limLoc:     null
     };
 
+    this.Base = null;
+    this.Sign = null;
+    this.LowerIterator = new CMathContent();
+    this.UpperIterator = new CMathContent();
+    this.Arg           = new CMathContent();
+
     CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
@@ -31,7 +37,7 @@ extend(CNary, CMathBase);
 CNary.prototype.init = function(props)
 {
     this.setProperties(props);
-    this.fillContent();
+    //this.fillContent();
 }
 CNary.prototype.setProperties = function(props)
 {
@@ -53,64 +59,125 @@ CNary.prototype.setProperties = function(props)
     if(props.limLoc == NARY_UndOvr || props.limLoc  == NARY_SubSup)
         this.Pr.limLoc = props.limLoc;
 }
-CNary.prototype.fillContent = function()
+CNary.prototype.fillContent = function(PropsInfo)
 {
     this.setDimension(1, 2);
 
-    var arg = new CMathContent(),
-        base;
+    //var arg = new CMathContent(),
+    var base;
 
+    var Sign = PropsInfo.sign;
     var ctrPrp = this.CtrPrp.Copy();
 
-    if(this.Pr.limLoc === NARY_UndOvr)
+    if(PropsInfo.limLoc === NARY_UndOvr)
     {
-        if(this.Pr.supHide && this.Pr.subHide)
+        if(PropsInfo.supHide && PropsInfo.subHide)
         {
-            base = new CMathText(true);
+            base = Sign;
         }
-        else if( this.Pr.supHide && !this.Pr.subHide )
+        else if( PropsInfo.supHide && !PropsInfo.subHide )
         {
-            base = new CNaryOvr();
-            base.setCtrPrp(ctrPrp);
+            base = new CNaryOvr(true);
+            base.setBase(Sign);
+            base.setLowerIterator(this.LowerIterator);
+
+            //base.setCtrPrp(ctrPrp);
+            //base.Set_CompiledCtrPrp(this.ParaMath);
 
         }
-        else if( !this.Pr.supHide && this.Pr.subHide )
+        else if( !PropsInfo.supHide && PropsInfo.subHide )
         {
-            base = new CNaryUnd();
-            base.setCtrPrp(ctrPrp);
+            base = new CNaryUnd(true);
+            base.setBase(Sign);
+            base.setUpperIterator(this.UpperIterator);
+
+            //base.setCtrPrp(ctrPrp);
+            //base.Set_CompiledCtrPrp(this.ParaMath);
         }
         else
         {
-            base = new CNaryUndOvr();
-            base.setCtrPrp(ctrPrp);
-        }
+            base = new CNaryUndOvr(true);
+            base.setBase(Sign);
+            base.setUpperIterator(this.UpperIterator);
+            base.setLowerIterator(this.LowerIterator);
 
+            //base.setCtrPrp(ctrPrp);
+            //base.Set_CompiledCtrPrp(this.ParaMath);
+        }
     }
     else
     {
         var prp;
 
-        if( this.Pr.supHide && !this.Pr.subHide )
+        if( PropsInfo.supHide && !PropsInfo.subHide )
         {
-            prp = {type: DEGREE_SUBSCRIPT, ctrPrp:  ctrPrp };
-            base = new CDegree(prp);
+            prp = {type: DEGREE_SUBSCRIPT, ctrPrp:  ctrPrp};
+            base = new CDegree(prp, true);
+            base.setBase(Sign);
+            base.setIterator(this.LowerIterator);
+
+            //base.setCtrPrp(ctrPrp);
+            //base.Set_CompiledCtrPrp(this.ParaMath);
         }
-        else if( !this.Pr.supHide && this.Pr.subHide )
+        else if( !PropsInfo.supHide && PropsInfo.subHide )
         {
             prp = {type: DEGREE_SUPERSCRIPT, ctrPrp: ctrPrp};
-            base = new CDegree(prp);
+            base = new CDegree(prp, true);
+            base.setBase(Sign);
+            base.setIterator(this.UpperIterator);
+
+            //base.setCtrPrp(ctrPrp);
+            //base.Set_CompiledCtrPrp(this.ParaMath);
+        }
+        else if(PropsInfo.supHide && PropsInfo.subHide)
+        {
+            base = Sign;
         }
         else
         {
             prp = {type: DEGREE_SubSup, ctrPrp: ctrPrp};
-            base = new CDegreeSubSup(prp);
+            base = new CDegreeSubSup(prp, true);
+            base.setBase(Sign);
+            base.setLowerIterator(this.LowerIterator);
+            base.setUpperIterator(this.UpperIterator);
+            base.setCtrPrp(ctrPrp);
+            base.Set_CompiledCtrPrp(this.ParaMath);
         }
     }
 
-    this.addMCToContent(base, arg);
+    this.Base = base;
+
+    this.addMCToContent( [base, this.Arg] );
 
 }
 CNary.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+
+    this.RecalcInfo.bProps = true;
+
+    this.Arg          = contents[0];
+
+    this.UpperIterator = contents[1];
+    this.LowerIterator = contents[2];
+
+
+    //this.fillContent();
+
+    /*// Base
+     this.elements[0][1] = contents[0];
+
+
+
+     if(!this.Pr.subHide)
+     this.elements[0][0].changeUpperIterator(contents[1]);
+
+     // Lower iterator
+     if(!this.Pr.subHide)
+     this.elements[0][0].changeLowerIterator(contents[2]);*/
+
+}
+CNary.prototype.old_fillMathComposition = function(props, contents /*array*/)
 {
     this.setProperties(props);
     this.fillContent();
@@ -127,35 +194,87 @@ CNary.prototype.fillMathComposition = function(props, contents /*array*/)
     if(!this.Pr.subHide)
         this.elements[0][0].changeLowerIterator(contents[2]);
 
-
 }
-CNary.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
-    if(this.RecalcInfo.bProps)
+    if(this.RecalcInfo.bProps || RPI.bChangeInline == true)
     {
         var oSign = this.getSign(this.Pr.chr, this.Pr.chrType);
+        this.Sign = oSign.operator;
+
+        var limLoc         = this.Pr.limLoc;
+
+        if(RPI.bInline == true || RPI.bInsideFraction == true)
+        {
+            limLoc = NARY_SubSup;
+            this.Sign = new CMathText(true);
+            this.Sign.add(oSign.chrCode);
+        }
 
         if(this.Pr.limLoc == null || typeof(this.Pr.limLoc) == "undefined")
         {
             var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
 
             if(bIntegral)
-                this.Pr.limLoc = g_oMathSettings.intLim;
+                limLoc = g_oMathSettings.intLim;
             else
-                this.Pr.limLoc = g_oMathSettings.naryLim;
+                limLoc = g_oMathSettings.naryLim;
         }
 
-        if(this.Pr.supHide && this.Pr.subHide)
-            this.elements[0][0] = oSign.operator;
-        else
-            this.elements[0][0].changeBase(oSign.operator);
+        var PropsInfo =
+        {
+            limLoc :    limLoc,
+            sign:       this.Sign,
+            supHide:    this.Pr.supHide,
+            subHide:    this.Pr.subHide
+        };
 
-
+        // пока оставим так, chrType сейчас нигде не используется
         this.Pr.chrType = oSign.chrType;
-        this.Pr.chr     = oSign.chrCode;
+
+        this.fillContent(PropsInfo);
     }
 
-    CNary.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
+    var NewRPI = RPI.Copy();
+
+    if(RPI.bInline || RPI.bInsideFraction)
+        NewRPI.bNaryInline = true;
+
+
+    this.Base.Resize(oMeasure, this, ParaMath, NewRPI, ArgSize);
+    this.Arg.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+
+    this.recalculateSize(oMeasure);
+
+    /*if(PropsInfo.subHide == false)
+    {
+        var ArgSzSub = ArgSize.Copy();
+        ArgSzSub.decrease();
+
+        this.UpperIterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzSub);
+    }
+
+    if(PropsInfo.supHide == false)
+    {
+        var ArgSzSupScr = ArgSize.Copy();
+        ArgSzSub.decrease();
+
+        this.UpperIterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzSupScr);
+    }
+
+    if(PropsInfo.subHide == false || PropsInfo.supHide == false)
+    {
+        this.Base.Parent = this;
+        this.Base.ParaMath = ParaMath;
+        this.Base.recalculateSize(oMeasure);
+
+    }
+
+    this.Sign.Resize(oMeasure, this.Base, ParaMath);
+
+    this.recalculateSize(oMeasure);*/
+
+    //CNary.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI);
 }
 CNary.prototype.getSign = function(chrCode, chrType)
 {    
@@ -164,7 +283,6 @@ CNary.prototype.getSign = function(chrCode, chrType)
         chrCode:   null,
         chrType:   null,
         operator:  null
-        
     };
 
     var bChr = chrCode !== null && chrCode == chrCode + 0;
@@ -290,17 +408,20 @@ CNary.prototype.setDistance = function()
 }
 CNary.prototype.getBase = function()
 {
-    return this.elements[0][1];
+    return this.Arg;
+    //return this.elements[0][1];
 }
 CNary.prototype.getUpperIterator = function()
 {
 	if (!this.Pr.supHide)
-		return this.elements[0][0].getUpperIterator();
+		return this.UpperIterator;
+		//return this.elements[0][0].getUpperIterator();
 }
 CNary.prototype.getLowerIterator = function()
 {
 	if (!this.Pr.subHide)
-		return this.elements[0][0].getLowerIterator();
+		return this.LowerIterator;
+		//return this.elements[0][0].getLowerIterator();
 }
 CNary.prototype.getPropsForWrite = function()
 {
@@ -402,38 +523,27 @@ CNary.prototype.Get_Id = function()
 }
 
 
-function CNaryUnd()
+function CNaryUnd(bInside)
 {
-    CMathBase.call(this);
+    CMathBase.call(this, bInside);
 
-    this.init();
+    this.setDimension(2, 1);
+    //this.init();
 }
 extend(CNaryUnd, CMathBase);
-CNaryUnd.prototype.init = function()
+/*CNaryUnd.prototype.old_init = function()
 {
-    this.setDimension(2, 1);
+    this.setDimension(2,1);
     var iter = new CMathContent();
     iter.decreaseArgSize();
 
     var base = new CMathContent();
 
     this.addMCToContent(iter, base);
-}
-CNaryUnd.prototype.old_init = function(sign)
-{
-    this.setDimension(2,1);
-    var iter = new CMathContent();
-    iter.decreaseArgSize();
-
-    this.addMCToContent(iter, sign);
-}
-CNaryUnd.prototype.changeBase = function(base)
-{
-    this.elements[1][0] = base;
-}
+}*/
 CNaryUnd.prototype.setDistance = function()
 {
-    var zetta = this.Get_CompiledCtrPrp().FontSize* 25.4/96;
+    var zetta = this.Get_CompiledCtrPrp().FontSize*25.4/96;
     this.dH = zetta*0.25;
 }
 CNaryUnd.prototype.getAscent = function()
@@ -444,47 +554,63 @@ CNaryUnd.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
 }
-CNaryUnd.prototype.changeUpperIterator = function(iterator)
+CNaryUnd.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    var ArgSzUnd = ArgSize.Copy();
+    ArgSzUnd.decrease();
+
+    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzUnd);
+    this.elements[1][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+
+    this.recalculateSize(oMeasure);
+}
+CNaryUnd.prototype.setBase = function(base)
+{
+    this.elements[1][0] = base;
+}
+CNaryUnd.prototype.setUpperIterator = function(iterator)
 {
     this.elements[0][0] = iterator;
 }
 
 
-function CNaryOvr()
+function CNaryOvr(bInside)
 {
-    CMathBase.call(this);
+    CMathBase.call(this, bInside);
 
-    this.init();
+    this.setDimension(2, 1);
 }
 extend(CNaryOvr, CMathBase);
-CNaryOvr.prototype.init = function()
+/*CNaryOvr.prototype.old_init = function()
 {
-    this.setDimension(2, 1);
+    this.setDimension(2,1);
     var iter = new CMathContent();
     iter.decreaseArgSize();
 
     var base = new CMathContent();
 
     this.addMCToContent(base, iter);
-}
-CNaryOvr.prototype.old_init = function(sign)
-{
-    this.setDimension(2,1);
-    var iter = new CMathContent();
-    iter.decreaseArgSize();
-
-    //sign.relate(this);
-
-    this.addMCToContent(sign, iter);
-}
-CNaryOvr.prototype.changeBase = function(base)
-{
-    this.elements[0][0] = base;
-}
+}*/
 CNaryOvr.prototype.old_setDistance = function()
 {
     var zetta = this.Get_CompiledCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.1;
+}
+CNaryOvr.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    var ArgSzOvr = ArgSize.Copy();
+    ArgSzOvr.decrease();
+
+    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    this.elements[1][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzOvr);
+
+    this.recalculateSize(oMeasure);
 }
 CNaryOvr.prototype.recalculateSize = function()
 {
@@ -515,21 +641,25 @@ CNaryOvr.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
 }
-CNaryOvr.prototype.changeLowerIterator = function(iterator)
+CNaryOvr.prototype.setBase = function(base)
+{
+    this.elements[0][0] = base;
+}
+CNaryOvr.prototype.setLowerIterator = function(iterator)
 {
     this.elements[1][0] = iterator;
 }
 
-function CNaryUndOvr()
+function CNaryUndOvr(bInside)
 {
     this.gapTop = 0;
     this.gapBottom = 0;
-    CMathBase.call(this);
+    CMathBase.call(this, bInside);
 
-    this.init();
+    this.setDimension(3,1);
 }
 extend(CNaryUndOvr, CMathBase);
-CNaryUndOvr.prototype.init = function()
+/*CNaryUndOvr.prototype.old_init = function(oSign)
 {
     this.setDimension(3,1);
 
@@ -542,10 +672,23 @@ CNaryUndOvr.prototype.init = function()
     var base = new CMathContent();
 
     this.addMCToContent(iter1, base, iter2);
-}
-CNaryUndOvr.prototype.changeBase = function(base)
+}*/
+CNaryUndOvr.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
-    this.elements[1][0] = base;
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    var ArgSzUnd = ArgSize.Copy();
+    ArgSzUnd.decrease();
+
+    var ArgSzOvr = ArgSize.Copy();
+    ArgSzOvr.decrease();
+
+    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzUnd);
+    this.elements[1][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    this.elements[2][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzOvr);
+
+    this.recalculateSize(oMeasure);
 }
 CNaryUndOvr.prototype.recalculateSize = function()
 {
@@ -657,11 +800,15 @@ CNaryUndOvr.prototype.findDisposition = function(mCoord)
 
     return {pos: {x: pos_x, y: pos_y}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
 }
-CNaryUndOvr.prototype.changeUpperIterator = function(iterator)
+CNaryUndOvr.prototype.setBase = function(base)
+{
+    this.elements[1][0] = base;
+}
+CNaryUndOvr.prototype.setUpperIterator = function(iterator)
 {
     this.elements[0][0] = iterator;
 }
-CNaryUndOvr.prototype.changeLowerIterator = function(iterator)
+CNaryUndOvr.prototype.setLowerIterator = function(iterator)
 {
     this.elements[2][0] = iterator;
 }
@@ -767,7 +914,7 @@ CNaryOperator.prototype.recalculateSize = function()
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CNaryOperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CNaryOperator.prototype.Resize = function(oMeasure, Parent, ParaMath)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;

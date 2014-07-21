@@ -10,7 +10,6 @@ function CFraction(props)
         type:   BAR_FRACTION
     };
 
-    //this.type     =   BAR_FRACTION;
     this.bHideBar =   false;
 
     CMathBase.call(this);
@@ -41,7 +40,10 @@ CFraction.prototype.draw = function(x, y, pGraphics)
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    //var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.Get_CompiledCtrPrp_2();
+    this.ParaMath.ApplyArgSize(mgCtrPrp, this.Parent.Get_CompiledArgSize().value);
+
     var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 
     var numHeight = this.elements[0][0].size.height;
@@ -81,6 +83,9 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
     var tg1 = -2.22,
         tg2 = -3.7;
 
+    var X = this.pos.x + x + this.GapLeft,
+        Y = this.pos.y + y;
+
     var heightSlash = this.size.height*2/3;
 
     if(heightSlash < maxHeight)
@@ -104,11 +109,11 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
         var x1 =  (y1 - b)/tg,
             x2 =  (y2 - b)/tg;
 
-        var xx1 = this.pos.x + x + x1,
-            xx2 = this.pos.x + x + x2;
+        var xx1 = X + x1,
+            xx2 = X + x2;
 
-        var yy1 = this.pos.y + y + y1,
-            yy2 = this.pos.y + y + y2;
+        var yy1 = Y + y1,
+            yy2 = Y + y2;
 
     }
     else
@@ -135,11 +140,11 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
         var x1 = (y1 - b)/tg,
             x2 = (y2 - b)/tg;
 
-        var xx1 = this.pos.x + x + x1,
-            xx2 = this.pos.x + x + x2;
+        var xx1 = X + x1,
+            xx2 = X + x2;
 
-        var yy1 = this.pos.y + y + y1 ,
-            yy2 = this.pos.y + y + y2;
+        var yy1 = Y + y1,
+            yy2 = Y + y2;
 
     }
 
@@ -160,10 +165,13 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
 {
     var shift = 0.1*this.dW;
 
-    var x1 = this.pos.x + x + this.elements[0][0].size.width + this.dW - shift,
-        y1 = this.pos.y + y,
-        x2 = this.pos.x + x + this.elements[0][0].size.width + shift,
-        y2 = this.pos.y + y + this.size.height;
+    var X = this.pos.x + x + this.GapLeft,
+        Y = this.pos.y + y;
+
+    var x1 = X + this.elements[0][0].size.width + this.dW - shift,
+        y1 = Y,
+        x2 = X + this.elements[0][0].size.width + shift,
+        y2 = Y + this.size.height;
 
     //var ctrPrp = this.Get_CompiledCtrPrp();
     var mgCtrPrp = this.Get_CompiledCtrPrp();
@@ -203,6 +211,48 @@ CFraction.prototype.getDenominator = function()
         denominator = this.elements[0][1];
 
     return denominator;
+}
+/*CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    if(RPI.inline == true && this.Pr.type == BAR_FRACTION)
+    {
+        var ArgNum = ArgSize.Copy();
+        ArgNum.decrease();
+
+        this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgNum);
+
+        var ArgDen = ArgSize.Copy();
+        ArgDen.decrease();
+
+        this.elements[1][0].Resize(oMeasure, this, ParaMath, RPI, ArgDen);
+
+        this.recalculateSize(oMeasure);
+    }
+    else
+        CFraction.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
+}*/
+CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    var ArgSzFr = ArgSize.Copy();
+
+    if(RPI.bInline == true && this.Pr.type === BAR_FRACTION)
+    {
+        ArgSzFr.decrease();        // для контентов числителя и знаменателя
+        this.ArgSize.SetValue(-1); // для CtrPrp
+    }
+    else if(RPI.bInsideFraction == true)
+    {
+        this.ArgSize.SetValue(-1); // для CtrPrp
+    }
+
+    var NewRPI = RPI.Copy();
+    NewRPI.bInsideFraction = true;
+
+    CFraction.superclass.Resize.call(this, oMeasure, Parent, ParaMath, NewRPI, ArgSzFr);
+
 }
 CFraction.prototype.recalculateSize = function(oMeasure)
 {
@@ -395,7 +445,7 @@ CFraction.prototype.fillContent = function()
         if(this.Pr.type == NO_BAR_FRACTION)
             this.bHideBar = true;
 
-        this.addMCToContent(num, den);
+        this.addMCToContent([num, den]);
     }
     else if(this.Pr.type == SKEWED_FRACTION)
     {
@@ -494,7 +544,7 @@ function CNumerator()
 {
     this.gap = 0;
 
-    CMathBase.call(this);
+    CMathBase.call(this, true);
 
     this.init();
 }
@@ -508,7 +558,6 @@ CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
-    //var ctrPrp = this.Get_CompiledCtrPrp();
     var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
@@ -550,10 +599,10 @@ CNumerator.prototype.fillMathComposition = function(content)
 {
     this.elements[0][0] = content;
 }
-CNumerator.prototype.Get_CompiledCtrPrp = function()
+/*CNumerator.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
-}
+}*/
 CNumerator.prototype.getPropsForWrite = function()
 {
     var props = {};
@@ -565,7 +614,7 @@ function CDenominator()
 {
     this.gap = 0;
 
-    CMathBase.call(this);
+    CMathBase.call(this, true);
 
     this.init();
 }
@@ -578,8 +627,9 @@ CDenominator.prototype.init = function()
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    //var ctrPrp = this.Get_CompiledCtrPrp();
+
     var mgCtrPrp = this.Get_CompiledCtrPrp();
+
 
     var gapDen = 7.325682539682539 * mgCtrPrp.FontSize/36,
         Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36,
@@ -631,10 +681,10 @@ CDenominator.prototype.fillMathComposition = function(content)
 {
     this.elements[0][0] = content;
 }
-CDenominator.prototype.Get_CompiledCtrPrp = function()
+/*CDenominator.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
-}
+}*/
 CDenominator.prototype.getPropsForWrite = function()
 {
     var props = {};

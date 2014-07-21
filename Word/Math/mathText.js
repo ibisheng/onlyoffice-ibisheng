@@ -488,7 +488,7 @@ CMathText.prototype =
         this.Type = para_Math_Placeholder;
         this.value = StartTextElement;
     },
-    Resize: function(Run, oMeasure)
+    Resize: function(oMeasure, Run)
     {
         /*
          var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
@@ -496,7 +496,10 @@ CMathText.prototype =
          height = g_oTextMeasurer.GetHeight();
         */
 
-        this.Parent = Run;
+        if(!this.bJustDraw)
+            this.Parent = Run;
+        else
+            this.Parent = null;
 
         var letter = this.getCode();
 
@@ -579,7 +582,7 @@ CMathText.prototype =
             else                                    // for symbol only drawing
             {
                 this.pos.x = pos.x - this.rasterOffsetX;
-                this.pos.y = pos.y - this.rasterOffsetY;
+                this.pos.y = pos.y - this.rasterOffsetY + this.size.ascent;
             }
         }
         catch(e)

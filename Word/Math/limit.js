@@ -6,6 +6,9 @@ function CLimit(props)
 
     this.kind = MATH_LIMIT;
 
+    this.FName  = new CMathContent();
+    this.Iterator = new CMathContent();
+
     this.Pr =
     {
         type: LIMIT_LOW
@@ -36,23 +39,23 @@ CLimit.prototype.getAscent = function()
 }
 CLimit.prototype.getFName = function()
 {
-    var fName;
+    /*var fName;
     if(this.Pr.type == LIMIT_LOW)
         fName = this.elements[0][0];
     else if(this.Pr.type == LIMIT_UP)
-        fName = this.elements[1][0];
+        fName = this.elements[1][0];*/
 
-    return fName;
+    return this.FName;
 }
 CLimit.prototype.getIterator = function()
 {
-    var iterator;
+    /*var iterator;
     if(this.Pr.type == LIMIT_LOW)
         iterator = this.elements[1][0];
     else if(this.Pr.type == LIMIT_UP)
-        iterator = this.elements[0][0];
+        iterator = this.elements[0][0];*/
 
-    return iterator;
+    return this.Iterator;
 }
 CLimit.prototype.setDistance = function()
 {
@@ -72,12 +75,12 @@ CLimit.prototype.fillContent = function()
     var oBase = new CMathContent();
 
     var oIter = new CMathContent();
-    oIter.decreaseArgSize();
+    //oIter.decreaseArgSize();
 
     if(this.Pr.type == LIMIT_LOW)
-        this.addMCToContent(oBase, oIter);
+        this.addMCToContent([oBase, oIter]);
     else if(this.Pr.type == LIMIT_UP)
-        this.addMCToContent(oIter, oBase);
+        this.addMCToContent([oIter, oBase]);
 }
 CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
 {
@@ -101,6 +104,34 @@ CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
         this.elements[1][0] = contents[0];
     }
 
+}
+CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    if(this.RecalcInfo.bProps == true)
+    {
+        if(this.Pr.type == LIMIT_LOW)
+        {
+            this.elements[0][0] = this.FName;
+            this.elements[1][0] = this.Iterator;
+        }
+        else
+        {
+            this.elements[0][0] = this.Iterator;
+            this.elements[1][0] = this.FName;
+        }
+    }
+
+    this.FName.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+
+    var ArgSzIter = ArgSize.Copy();
+    ArgSzIter.decrease();
+
+    this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
+
+    this.recalculateSize(oMeasure);
 }
 CLimit.prototype.getPropsForWrite = function()
 {

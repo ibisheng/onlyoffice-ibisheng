@@ -3064,7 +3064,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
             oMeasure.SetFont(rPrp);
 
-            this.operator.Resize(this, oMeasure);
+            this.operator.Resize(oMeasure, this);
 
             if(this.operator.loc == 0 || this.operator.loc == 1)
             {
@@ -3147,7 +3147,7 @@ COperator.prototype.setPosition = function(Positions)
         if(this.type == OPER_ACCENT)
             NewPos.y = this.Positions[0].y + this.shiftAccent + this.operator.size.height;
         else
-            NewPos.y = this.Positions[0].y + this.operator.size.ascent;
+            NewPos.y = this.Positions[0].y;
 
 
         /*var operator = this.operator;
@@ -3463,7 +3463,7 @@ CDelimiter.prototype.old_recalculateSize = function()
     this.size = {width: width, height: height, center: center};
 
 }
-CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
@@ -3526,7 +3526,7 @@ CDelimiter.prototype.Resize = function(Parent, ParaMath, oMeasure)
 
     for(var j = 0; j < this.nCol; j++)
     {
-        this.elements[0][j].Resize(this, ParaMath, oMeasure);
+        this.elements[0][j].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
         var content = this.elements[0][j].size;
         widthG += content.width;
         ascentG = content.ascent > ascentG ? content.ascent : ascentG;
@@ -3956,7 +3956,7 @@ CCharacter.prototype.setCharacter = function(props, defaultProps)
     //this.setDimension(1, 1);
     //this.setContent();
 }
-CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
@@ -3968,7 +3968,7 @@ CCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
     }*/
 
     var base = this.elements[0][0];
-    base.Resize(this, ParaMath, oMeasure);
+    base.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
     this.operator.fixSize(ParaMath, oMeasure, base.size.width);
 
@@ -4149,7 +4149,7 @@ CGroupCharacter.prototype.init = function(props)
     this.Pr.chr     = String.fromCharCode(this.operator.code);*/
 
 }
-CGroupCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     if(this.RecalcInfo.bProps == true)
     {
@@ -4171,7 +4171,7 @@ CGroupCharacter.prototype.Resize = function(Parent, ParaMath, oMeasure)
         this.RecalcInfo.bProps = false;
     }
 
-    CGroupCharacter.superclass.Resize.call(this, Parent, ParaMath, oMeasure);
+    CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
 }
 CGroupCharacter.prototype.setProperties = function(props)
 {

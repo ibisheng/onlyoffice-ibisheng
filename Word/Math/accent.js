@@ -471,7 +471,7 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 
     oMeasure.SetFont(rPrp);
 
-    this.sign.Resize(this, oMeasure);
+    this.sign.Resize(oMeasure);
 
     /*if(this.typeOper == ACCENT_THREE_DOTS)
      this.dH = 1.2*ctrPrp.FontSize/36;
@@ -1096,7 +1096,7 @@ CAccent.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
+CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
@@ -1121,7 +1121,7 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
     this.operator.relate(this);
 
     var base = this.elements[0][0];
-    base.Resize(this, ParaMath, oMeasure);
+    base.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
     var ctrPrp = this.Get_CompiledCtrPrp();
     oMeasure.SetFont(ctrPrp);
@@ -1133,7 +1133,7 @@ CAccent.prototype.Resize = function(Parent, ParaMath, oMeasure)
     {
         var letterX = new CMathText(true);
         letterX.add(0x78);
-        letterX.Resize(null, oMeasure);
+        letterX.Resize(oMeasure, null);
         this.gap = this.operator.size.ascentSign - letterX.size.ascent;
 
         this.shiftX_2 = this.operator.size.ascentSign;

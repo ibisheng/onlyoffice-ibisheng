@@ -14,7 +14,10 @@ function ParaMath()
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
 
-    this.MathPara = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)    
+    this.MathPara = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)
+
+    this.OldMathPara = null;
+
     this.Jc       = undefined;
     //this.Math = new CMathComposition();
     //this.Math.Parent = this;
@@ -60,7 +63,7 @@ function ParaMath()
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
 
 
-    this.MathPr =
+    /*this.MathPr =
     {
         naryLim:    NARY_UndOvr,
         intLim:     NARY_SubSup,
@@ -69,7 +72,7 @@ function ParaMath()
         wrapIndent: 0,
         smallFrac:  false,
         wrapRight:  false
-    };
+    };*/
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
@@ -138,7 +141,6 @@ ParaMath.prototype =
         // TODO: ParaMath.Get_CompiledTextPr
 
         var TextPr = new CTextPr();
-        TextPr.Init_Default();
 
         var oContent = this.GetSelectContent();
         var mTextPr = oContent.Content.Get_CompiledTextPr(Copy);
@@ -446,8 +448,6 @@ ParaMath.prototype =
         // Styles.js
         // Document_CreateFontMap
 
-        //
-
         this.Root.Create_FontMap(Map);
 
     },
@@ -502,6 +502,11 @@ ParaMath.prototype =
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
         this.LinesLength = 0;
+
+        if(this.Id == "81")
+        {
+            console.log("StartLine " + this.StartLine + " StartRange " + this.StartRange);
+        }
     },
 
     Recalculate_Range : function(PRS, ParaPr, Depth)
@@ -525,9 +530,16 @@ ParaMath.prototype =
         var TextPr = new CTextPr();
         TextPr.Init_Default();
 
-        //this.Math.RecalculateComposition(g_oTextMeasurer, TextPr);
+        var RPI = new CRPI();
+        RPI.bInline       = this.MathPara === false;
+        RPI.bChangeInline = this.MathPara != this.OldMathPara;
 
-        this.Root.Resize(null, this, g_oTextMeasurer, TextPr);
+        var ArgSize = new CMathArgSize();
+
+        this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize,  TextPr);
+        //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
+        this.OldMathPara = this.MathPara;
+
 
         var pos = new CMathPosition();
         pos.x = 0;
@@ -849,6 +861,15 @@ ParaMath.prototype =
 
         //var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        if(this.Id == "81")
+        {
+            console.log("CurLine " + _CurLine +"  CurRange " + _CurRange );
+            console.log("StartLine " + this.StartLine + " StartRange " + this.StartRange);
+            console.log("Current CurLine "+ CurLine + " Current CurRange " + CurRange);
+        }
+
+
 
 
         var result = {X: _X + this.Root.size.width};
@@ -1195,7 +1216,8 @@ ParaMath.prototype =
             // CMathComposition     =>   this.Root.draw(this.absPos.x, this.absPos.y , pGraphics);
             // this.absPos.x ~> this.X
             // this.absPos.y ~> this.Y
-            this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics );
+
+            this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
             PDSE.X += this.Width;
         }
     },
@@ -1356,14 +1378,14 @@ ParaMath.prototype =
 
         this.State.ContentPos = ContentPos.Get(Depth);
 
-        /*console.log("Set_ParaContentPos");
+        console.log("Set_ParaContentPos");
         var str = "";
         for(var i = 0; i < ContentPos.Data.length; i++)
         {
             str += ContentPos.Data[i] + "  ";
         }
 
-        console.log(str);*/
+        console.log(str);
 
         this.Root.Set_ParaContentPos(ContentPos, Depth);
 
