@@ -153,8 +153,14 @@ CMathBase.prototype =
     },
     Get_CompiledCtrPrp_2: function() // without arg Size
     {
-        return this.CompiledCtrPrp.Copy();
-        //return this.CompiledCtrPrp.Copy();
+        var CompiledCtrPrp;
+
+        if(this.bInside === true)
+            CompiledCtrPrp = this.Parent.Get_CompiledCtrPrp_2();
+        else
+            CompiledCtrPrp = this.CompiledCtrPrp.Copy();
+
+        return CompiledCtrPrp;
     },
     Get_CompiledArgSize: function()
     {

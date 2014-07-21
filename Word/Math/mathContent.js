@@ -4691,7 +4691,7 @@ CMathContent.prototype =
 
         if(this.IsPlaceholder())
         {
-            TextPr = this.Parent.Get_CompiledCtrPrp();
+            TextPr = this.Parent.Get_CompiledCtrPrp_2();
         }
         else if (this.Selection.Use || bAll == true)
         {
