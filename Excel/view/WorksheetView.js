@@ -3238,15 +3238,25 @@
 			var onChangeFreezePane = function (isSuccess) {
 				if (false === isSuccess)
 					return;
-				var col, row;
+				var col, row, mc;
 				if (null !== t.topLeftFrozenCell)
 					col = row = 0;
-				else if (0 === ar.startCol && 0 === ar.startRow) {
-					col = ((t.visibleRange.c2 - t.visibleRange.c1) / 2) >> 0;
-					row = ((t.visibleRange.r2 - t.visibleRange.r1) / 2) >> 0;
-				} else {
+				else {
 					col = ar.startCol;
 					row = ar.startRow;
+
+					if (0 !== row || 0 !== col) {
+						mc = t.model.getMergedByCell(row, col);
+						if (mc) {
+							col = mc.c1;
+							row = mc.r1;
+						}
+					}
+
+					if (0 === col && 0 === row) {
+						col = ((t.visibleRange.c2 - t.visibleRange.c1) / 2) >> 0;
+						row = ((t.visibleRange.r2 - t.visibleRange.r1) / 2) >> 0;
+					}
 				}
 				t._updateFreezePane(col, row);
 			};
