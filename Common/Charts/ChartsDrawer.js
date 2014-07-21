@@ -3803,7 +3803,10 @@ drawPieChart.prototype =
 			angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
 			if(!this.paths.series)
 				this.paths.series = [];
-			this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
+			if(sumData === 0)//TODO стоит пересмотреть
+				this.paths.series[i] = this._calculateEmptySegment(radius, xCenter, yCenter);
+			else
+				this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
         };
     },
 	
@@ -3823,6 +3826,33 @@ drawPieChart.prototype =
 		
 		return path;
     },
+	
+	_calculateEmptySegment: function(radius, xCenter, yCenter)
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		
+		var x0 = xCenter + radius*Math.cos(this.tempAngle);
+		var y0 = yCenter - radius*Math.sin(this.tempAngle);
+		
+		path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+		path.arcTo(radius / pxToMm * pathW, radius / pxToMm * pathH, this.tempAngle, this.tempAngle);
+		path.lnTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
+
+		path.recalculate(gdLst);
+		return path;	
+	},
 	
 	_calculateArc : function(radius, stAng, swAng, xCenter, yCenter)
 	{	
