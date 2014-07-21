@@ -1557,10 +1557,10 @@
 			}
 		};
 
-		WorksheetView.prototype._shiftVisibleRange = function () {
+		WorksheetView.prototype._shiftVisibleRange = function (range) {
 			var t = this;
 			var vr = t.visibleRange;
-			var arn = t.activeRange.clone(true);
+			var arn = range ? range : t.activeRange.clone(true);
 			var i;
 
 			var cFrozen = 0, rFrozen = 0;
