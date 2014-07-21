@@ -10559,12 +10559,6 @@
 				return;
 			}
 
-			// Заглушка для бага http://bugzserver/show_bug.cgi?id=25420
-			// Обновление делаем только для диапазона, пересекающегося с visibleRange
-			range = range.intersectionSimple(this.visibleRange);
-			if (null === range)
-				return;
-
 			var cto;
 			for (r = range.r1; r <= range.r2; ++r) {
 				if (this.height_1px > this.rows[r].height) {continue;}
