@@ -7600,7 +7600,7 @@
 			// Возвращаемый результат
 			if (!targetInfo)
 				return null;
-			var indexFormulaRange = targetInfo.indexFormulaRange, d, newFormulaRange = null;
+			var indexFormulaRange = targetInfo.indexFormulaRange, d = {deltaY:0,deltaX:0}, newFormulaRange = null;
 			// Пересчитываем координаты
 			x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 			y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
@@ -7645,19 +7645,16 @@
 				}
 
 				if (rowByY < this.startCellMoveResizeRange2.r1) {
-					if (this.visibleRange.r2 > ar.r2)
-						ar.r2 = this.startCellMoveResizeRange2.r2;
+                    ar.r2 = this.startCellMoveResizeRange2.r2;
 					ar.r1 = rowByY;
 				} else if (rowByY > this.startCellMoveResizeRange2.r1) {
-					if (this.visibleRange.r1 < ar.r1)
-						ar.r1 = this.startCellMoveResizeRange2.r1;
-
-					if (this.visibleRange.r2 > ar.r2)
-						ar.r2 = rowByY;
+                    ar.r1 = this.startCellMoveResizeRange2.r1;
+                    ar.r2 = rowByY;
 				} else {
 					ar.r1 = this.startCellMoveResizeRange2.r1;
 					ar.r2 = this.startCellMoveResizeRange2.r1;
 				}
+
 			} else {
 				this.startCellMoveResizeRange.normalize();
 				var colDelta = this.startCellMoveResizeRange.type != c_oAscSelectionType.RangeRow && this.startCellMoveResizeRange.type != c_oAscSelectionType.RangeMax ? colByX - this.startCellMoveResizeRange2.c1 : 0;
@@ -7677,12 +7674,30 @@
 				}
 				ar.r2 = this.startCellMoveResizeRange.r2 + rowDelta;
 
-				d = {
-					deltaX : ar.c1 <= this.visibleRange.c1 ? ar.c1 - this.visibleRange.c1 :
-						ar.c2 >= this.visibleRange.c2 ? ar.c2 - this.visibleRange.c2 : 0,
-					deltaY : ar.r1 <= this.visibleRange.r1 ? ar.r1 - this.visibleRange.r1 :
-						ar.r2 >= this.visibleRange.r2 ? ar.r2 - this.visibleRange.r2 : 0};
 			}
+
+            if (y <= this.cellsTop + this.height_2px ){
+                d.deltaY = -1;
+            }else if ( y >= this.drawingCtx.getHeight() - this.height_2px){
+                d.deltaY = 1;
+            }
+
+            if (x <= this.cellsLeft + this.width_2px ){
+                d.deltaX = -1;
+            }else if ( x >= this.drawingCtx.getWidth() - this.width_2px){
+                d.deltaX = 1;
+            }
+
+            if (this.startCellMoveResizeRange.type === c_oAscSelectionType.RangeRow){
+                d.deltaX = 0;
+            }
+            else if (this.startCellMoveResizeRange.type === c_oAscSelectionType.RangeCol){
+                d.deltaY = 0;
+            }
+            else if (this.startCellMoveResizeRange.type === c_oAscSelectionType.RangeMax) {
+                d.deltaX = 0;
+                d.deltaY = 0;
+            }
 
 			if (0 == targetInfo.targetArr) {
 				var _p = this.arrActiveFormulaRanges[indexFormulaRange].cursorePos,
