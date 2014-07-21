@@ -585,7 +585,14 @@ cArea.prototype.getRange = function () {
     return this.range;
 };
 cArea.prototype.tocNumber = function () {
-    return this.getValue()[0].tocNumber();
+    var v = this.getValue()[0];
+    if (!v){
+        v = new cNumber(0);
+    }
+    else{
+        v = v.tocNumber();
+    }
+    return v;
 };
 cArea.prototype.tocString = function () {
     return this.getValue()[0].tocString();
@@ -1804,7 +1811,15 @@ function cAddOperator() {
 cAddOperator.prototype = Object.create( cBaseOperator.prototype );
 cAddOperator.prototype.Calculate = function ( arg ) {
 //    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-    var arg0 = arg[0].tocNumber(), arg1 = arg[1].tocNumber();
+//    var arg0 = arg[0].tocNumber(), arg1 = arg[1].tocNumber();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
 };
 
@@ -1814,7 +1829,15 @@ function cMinusOperator() {
 
 cMinusOperator.prototype = Object.create( cBaseOperator.prototype );
 cMinusOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "-", arguments[1].first );
 };
 
@@ -1888,7 +1911,15 @@ function cMultOperator() {
 
 cMultOperator.prototype = Object.create( cBaseOperator.prototype );
 cMultOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "*", arguments[1].first );
 };
 
@@ -1898,7 +1929,15 @@ function cDivOperator() {
 
 cDivOperator.prototype = Object.create( cBaseOperator.prototype );
 cDivOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "/", arguments[1].first );
 };
 
@@ -1929,7 +1968,15 @@ function cEqualsOperator() {
 
 cEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cEqualsOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "=", arguments[1].first );
 };
 
@@ -1939,7 +1986,15 @@ function cNotEqualsOperator() {
 
 cNotEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cNotEqualsOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<>", arguments[1].first );
 };
 
@@ -1949,7 +2004,15 @@ function cLessOperator() {
 
 cLessOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<", arguments[1].first );
 };
 
@@ -1959,7 +2022,15 @@ function cLessOrEqualOperator() {
 
 cLessOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<=", arguments[1].first );
 };
 
@@ -1969,7 +2040,15 @@ function cGreaterOperator() {
 
 cGreaterOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
 };
 
@@ -1979,7 +2058,15 @@ function cGreaterOrEqualOperator() {
 
 cGreaterOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">=", arguments[1].first );
 };
 

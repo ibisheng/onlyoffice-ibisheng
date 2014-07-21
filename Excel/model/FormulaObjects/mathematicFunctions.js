@@ -119,7 +119,7 @@ cABS.prototype.Calculate = function ( arg ) {
 cABS.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     }
 }
 
@@ -171,7 +171,7 @@ cACOS.prototype.Calculate = function ( arg ) {
 cACOS.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -223,7 +223,7 @@ cACOSH.prototype.Calculate = function ( arg ) {
 cACOSH.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -275,7 +275,7 @@ cASIN.prototype.Calculate = function ( arg ) {
 cASIN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -327,7 +327,7 @@ cASINH.prototype.Calculate = function ( arg ) {
 cASINH.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -380,7 +380,7 @@ cATAN.prototype.Calculate = function ( arg ) {
 cATAN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -526,7 +526,7 @@ cATANH.prototype.Calculate = function ( arg ) {
 cATANH.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -634,7 +634,7 @@ cCEILING.prototype.Calculate = function ( arg ) {
 cCEILING.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, significance)"
+        args:"( x, significance )"
     };
 }
 
@@ -783,7 +783,7 @@ cCOS.prototype.Calculate = function ( arg ) {
 cCOS.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -835,7 +835,7 @@ cCOSH.prototype.Calculate = function ( arg ) {
 cCOSH.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -888,7 +888,7 @@ cDEGREES.prototype.Calculate = function ( arg ) {
 cDEGREES.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( angle )"
     };
 }
 
@@ -967,7 +967,7 @@ cEVEN.prototype.Calculate = function ( arg ) {
 cEVEN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -1022,7 +1022,7 @@ cEXP.prototype.Calculate = function ( arg ) {
 cEXP.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -1079,7 +1079,7 @@ cFACT.prototype.Calculate = function ( arg ) {
 cFACT.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -1150,7 +1150,7 @@ cFACTDOUBLE.prototype.Calculate = function ( arg ) {
 cFACTDOUBLE.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -1257,7 +1257,7 @@ cFLOOR.prototype.Calculate = function ( arg ) {
 cFLOOR.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, significance)"
+        args:"( x, significance )"
     };
 }
 
@@ -1413,7 +1413,7 @@ cINT.prototype.Calculate = function ( arg ) {
 cINT.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -1584,7 +1584,7 @@ cLN.prototype.Calculate = function ( arg ) {
 cLN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -1684,7 +1684,7 @@ cLOG.prototype.Calculate = function ( arg ) {
 cLOG.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number [ , base ])"
+        args:"( x [ , base ] )"
     };
 }
 
@@ -1741,7 +1741,7 @@ cLOG10.prototype.Calculate = function ( arg ) {
 cLOG10.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -2148,7 +2148,7 @@ cMOD.prototype.Calculate = function ( arg ) {
 cMOD.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, divisor)"
+        args:"( x, y )"
     };
 }
 
@@ -2259,7 +2259,7 @@ cMROUND.prototype.Calculate = function ( arg ) {
 cMROUND.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, multiple)"
+        args:"( x, multiple )"
     };
 }
 
@@ -2437,7 +2437,7 @@ cODD.prototype.Calculate = function ( arg ) {
 cODD.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -2547,7 +2547,7 @@ cPOWER.prototype.Calculate = function ( arg ) {
         return this.value = arg1;
     }
 
-    if ( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) ){
+    if ( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
@@ -2557,7 +2557,7 @@ cPOWER.prototype.Calculate = function ( arg ) {
 cPOWER.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, power)"
+        args:"( x, y )"
     };
 }
 
@@ -2617,7 +2617,7 @@ cPRODUCT.prototype.Calculate = function ( arg ) {
 cPRODUCT.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"( number1, number2, ... )"
+        args:"( argument-list )"
     };
 }
 
@@ -2760,7 +2760,7 @@ cRADIANS.prototype.Calculate = function ( arg ) {
 cRADIANS.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( angle )"
     };
 }
 
@@ -3151,7 +3151,7 @@ cROUND.prototype.Calculate = function ( arg ) {
 cROUND.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, num_digits)"
+        args:"( x , number-digits )"
     };
 }
 
@@ -3276,7 +3276,7 @@ cROUNDDOWN.prototype.Calculate = function ( arg ) {
 cROUNDDOWN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, num_digits)"
+        args:"( x , number-digits )"
     };
 }
 
@@ -3401,7 +3401,7 @@ cROUNDUP.prototype.Calculate = function ( arg ) {
 cROUNDUP.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number, num_digits)"
+        args:"( x , number-digits )"
     };
 }
 
@@ -3548,7 +3548,7 @@ cSIGN.prototype.Calculate = function ( arg ) {
 cSIGN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -3598,7 +3598,10 @@ cSIN.prototype.Calculate = function ( arg ) {
     return this.value = arg0;
 }
 cSIN.prototype.getInfo = function () {
-    return { name:this.name, args:"(number)" }
+    return {
+        name:this.name,
+        args:"( x )"
+    };
 }
 
 function cSINH() {
@@ -3649,7 +3652,7 @@ cSINH.prototype.Calculate = function ( arg ) {
 cSINH.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -3701,7 +3704,7 @@ cSQRT.prototype.Calculate = function ( arg ) {
 cSQRT.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"( number )"
+        args:"( x )"
     };
 }
 
@@ -3753,7 +3756,7 @@ cSQRTPI.prototype.Calculate = function ( arg ) {
 cSQRTPI.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"( number )"
+        args:"( x )"
     };
 }
 
@@ -3822,7 +3825,7 @@ cSUM.prototype.Calculate = function ( arg ) {
 cSUM.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number1, number2, ...)"
+        args:"( argument-list )"
     };
 }
 
@@ -4002,7 +4005,7 @@ cSUMPRODUCT.prototype.Calculate = function ( arg ) {
 cSUMPRODUCT.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"( argument-lists )"
+        args:"( argument-list )"
     };
 }
 
@@ -4417,7 +4420,7 @@ cTAN.prototype.Calculate = function ( arg ) {
 cTAN.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -4469,7 +4472,7 @@ cTANH.prototype.Calculate = function ( arg ) {
 cTANH.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"(number)"
+        args:"( x )"
     };
 }
 
@@ -4582,4 +4585,3 @@ cTRUNC.prototype.getInfo = function () {
         args:"( x [ , number-digits ] )"
     };
 }
-

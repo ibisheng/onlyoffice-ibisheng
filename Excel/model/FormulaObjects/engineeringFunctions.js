@@ -352,36 +352,6 @@ function BesselY( fNum, nOrder ) {
     }
 }
 
-function erf( x ) {
-
-    var sqrtPI2 = 2 / Math.sqrt( Math.PI ), maxIter = 200, eps = 1e-14, res = x * sqrtPI2, v = 1, j = 1, i = 1, oldRes = 0, cont = true,
-        sqrtPI = Math.sqrt( Math.PI );
-
-    /*for ( i = 1; i < maxIter && cont; i++) {
-     oldRes = res;
-     for ( j = 1, v = 1; j <= i; j++ ) {
-     v *= -x * x / j;
-     }
-     res += sqrtPI2*x * v / (2 * i + 1);
-     cont = (Math.abs(oldRes-res) >= eps);
-     }*/
-
-    /*    var r = -Math.exp(-x*x)/(x*sqrtPI), mo = -1
-     x = 2*x*x;
-
-     for ( i = 1, res = 1; i < maxIter && cont; i++) {
-     oldRes = res;
-
-     res += Math.pow( -1, i ) * Math.doubleFact( 2*i-1 ) / Math.pow( x, i );
-
-     cont = (Math.abs(oldRes-res) >= eps);
-
-     }
-     res = res * r;*/
-
-    return res /** sqrtPI2*/;
-}
-
 function validBINNumber( n ) {
     return rg_validBINNumber.test( n );
 }
@@ -1198,7 +1168,7 @@ cDEC2OCT.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocNumber();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
-    arg0 = arg0.getValue();
+    arg0 = Math.floor( arg0.getValue() );
 
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
@@ -1279,52 +1249,101 @@ function cERF() {
 }
 
 cERF.prototype = Object.create( cBaseFunction.prototype );
-/*cERF.prototype.Calculate = function ( arg ) {
+cERF.prototype.Calculate = function ( arg ) {
 
- var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
- if ( a instanceof cArea || b instanceof cArea3D ) {
- a = a.cross( arguments[1].first );
- }
- else if ( a instanceof cArray ) {
- a = a.getElement(0);
- }
+    var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
+    if ( a instanceof cArea || a instanceof cArea3D ) {
+        a = a.cross( arguments[1].first );
+    }
+    else if ( a instanceof cArray ) {
+        a = a.getElement( 0 );
+    }
 
- if ( b instanceof cArea || b instanceof cArea3D ) {
- b = b.cross( arguments[1].first );
- }
- else if ( b instanceof cArray ) {
- b = b.getElement(0);
- }
+    if ( b instanceof cArea || b instanceof cArea3D ) {
+        b = b.cross( arguments[1].first );
+    }
+    else if ( b instanceof cArray ) {
+        b = b.getElement( 0 );
+    }
 
- a = a.tocNumber();
- if ( a instanceof cError ){ return this.value = a; }
+    a = a.tocNumber();
+    if ( a instanceof cError ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
 
- if( !( b instanceof cUndefined ) ){
- b = b.tocNumber();
- if ( b instanceof cError ){ return this.value = b; }
+    a = a.getValue();
 
- this.value = new cNumber( erf( b.getValue() ) - erf( a.getValue() ) );
+    if ( a < 0 ) {
+        return this.value = new cError( cErrorType.not_numeric );
+    }
 
- }
- else{
- this.value = new cNumber( erf( a.getValue() ) );
- }
+    if ( !( b instanceof cUndefined ) ) {
+        b = b.tocNumber();
+        if ( b instanceof cError ) {
+            return this.value = new cError( cErrorType.wrong_value_type );
+        }
 
- return this.value;
+        b = b.getValue();
 
- }
- cERF.prototype.getInfo = function () {
- return {
- name:this.name,
- args:"( lower-bound [ , upper-bound ] )"
- };
- }*/
+        if ( b < 0 ) {
+            return this.value = new cError( cErrorType.not_numeric );
+        }
+
+        this.value = new cNumber( rtl_math_erf( b ) - rtl_math_erf( a ) );
+
+    }
+    else {
+        this.value = new cNumber( rtl_math_erf( a ) );
+    }
+
+    return this.value;
+
+}
+cERF.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( lower-bound [ , upper-bound ] )"
+    };
+}
 
 function cERFC() {
-    cBaseFunction.call( this, "ERFC" );
+    cBaseFunction.call( this, "ERFC", 1, 1 );
 }
 
 cERFC.prototype = Object.create( cBaseFunction.prototype );
+cERFC.prototype.Calculate = function ( arg ) {
+
+    var a = arg[0];
+    if ( a instanceof cArea || a instanceof cArea3D ) {
+        a = a.cross( arguments[1].first );
+    }
+    else if ( a instanceof cArray ) {
+        a = a.getElement( 0 );
+    }
+
+    a = a.tocNumber();
+    if ( a instanceof cError ) {
+        return this.value = new cError( cErrorType.wrong_value_type );
+    }
+
+    a = a.getValue();
+
+    if ( a < 0 ) {
+        this.value = new cError( cErrorType.not_numeric );
+    }
+    else {
+        this.value = new cNumber( rtl_math_erfc( a ) );
+    }
+
+    return this.value;
+
+}
+cERFC.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"( lower-bound )"
+    };
+}
 
 function cGESTEP() {
     cBaseFunction.call( this, "GESTEP", 1, 2 );
