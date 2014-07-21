@@ -24,8 +24,9 @@ function CLimit(props)
 extend(CLimit, CMathBase);
 CLimit.prototype.init = function(props)
 {
+    // посмотреть GetAllFonts
     this.setProperties(props);
-    this.fillContent();
+    //this.fillContent();
 }
 CLimit.prototype.getAscent = function()
 {
@@ -72,7 +73,7 @@ CLimit.prototype.fillContent = function()
 {
     this.setDimension(2, 1);
 
-    var oBase = new CMathContent();
+    /*var oBase = new CMathContent();
 
     var oIter = new CMathContent();
     //oIter.decreaseArgSize();
@@ -80,7 +81,7 @@ CLimit.prototype.fillContent = function()
     if(this.Pr.type == LIMIT_LOW)
         this.addMCToContent([oBase, oIter]);
     else if(this.Pr.type == LIMIT_UP)
-        this.addMCToContent([oIter, oBase]);
+        this.addMCToContent([oIter, oBase]);*/
 }
 CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
 {
@@ -112,6 +113,8 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     if(this.RecalcInfo.bProps == true)
     {
+        this.setDimension(2, 1);
+
         if(this.Pr.type == LIMIT_LOW)
         {
             this.elements[0][0] = this.FName;

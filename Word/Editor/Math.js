@@ -857,14 +857,12 @@ ParaMath.prototype =
         //var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-        if(this.Id == "81")
+        /*if(this.Id == "81")
         {
             console.log("CurLine " + _CurLine +"  CurRange " + _CurRange );
             console.log("StartLine " + this.StartLine + " StartRange " + this.StartRange);
             console.log("Current CurLine "+ CurLine + " Current CurRange " + CurRange);
-        }
-
-
+        }*/
 
 
         var result = {X: _X + this.Root.size.width};
