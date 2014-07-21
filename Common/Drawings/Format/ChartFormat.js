@@ -10556,6 +10556,7 @@ CDLbls.prototype =
         for(var i = 0; i < this.dLbl.length; ++i)
         {
             this.dLbl[i] && checkTxBodyDefFonts(allFonts, this.dLbl[i].txPr);
+            this.dLbl[i].tx && this.dLbl[i].tx.rich && this.dLbl[i].tx.rich.content && this.dLbl[i].tx.rich.content.Document_Get_AllFontNames(allFonts);
         }
     },
     getObjectType: function()

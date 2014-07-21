@@ -1427,13 +1427,36 @@ CChartSpace.prototype =
                     chart.legend.legendEntryes[i] && checkTxBodyDefFonts(allFonts, chart.legend.legendEntryes[i].txPr);
                 }
             }
-            chart.title && checkTxBodyDefFonts(allFonts, chart.title.txPr);
+            if(chart.title)
+            {
+                checkTxBodyDefFonts(allFonts, chart.title.txPr);
+                if(chart.title.tx && chart.title.tx.rich)
+                {
+                    checkTxBodyDefFonts(allFonts, chart.title.tx.rich);
+                    chart.title.tx.rich.content && chart.title.tx.rich.content.Document_Get_AllFontNames(allFonts);
+                }
+            }
             var plot_area = chart.plotArea;
             if(plot_area)
             {
                 for(i = 0; i < plot_area.charts.length; ++i)
                 {
-                    plot_area.charts[i] && plot_area.charts[i].documentCreateFontMap(allFonts);/*TODO нажо бы этот метод переименовать чтоб название не вводило в заблуждение*/
+                    plot_area.charts[i] && plot_area.charts[i].documentCreateFontMap(allFonts);/*TODO надо бы этот метод переименовать чтоб название не вводило в заблуждение*/
+                }
+                var cur_axis;
+                for(i = 0; i < plot_area.axId.length; ++i)
+                {
+                    cur_axis = plot_area.axId[i];
+                    checkTxBodyDefFonts(allFonts, cur_axis.txPr);
+                    if(cur_axis.title)
+                    {
+                        checkTxBodyDefFonts(allFonts, cur_axis.title.txPr);
+                        if(cur_axis.title.tx && chart.title.tx.rich)
+                        {
+                            checkTxBodyDefFonts(allFonts, cur_axis.title.tx.rich);
+                            cur_axis.title.tx.rich.content && cur_axis.title.tx.rich.content.Document_Get_AllFontNames(allFonts);
+                        }
+                    }
                 }
             }
         }
