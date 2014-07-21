@@ -112,27 +112,27 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     //var penW = this.Get_CompiledCtrPrp().FontSize* 25.4/72 * 0.06 ;
     var penW = this.Get_CompiledCtrPrp().FontSize*0.02;
 
+    var Width  = this.size.width - this.GapLeft - this.GapRight,
+        Height = this.size.height;
+
+    var X = this.pos.x + x + this.GapLeft,
+        Y = this.pos.y + y;
+
     if(!this.Pr.hideTop)
     {
-        var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width,
-            y1 = this.pos.y + y;
+        var x1 = X,
+            x2 = X + Width,
+            y1 = Y;
 
          pGraphics.p_color(0,0,0, 255);
          pGraphics.drawHorLine(0, y1, x1, x2, penW);
-
-        /*pGraphics.p_color(255,0,0, 255);
-        pGraphics.drawHorLine(0, y1 - 25.4/96, x1 + 2*25.4/96, x2, 25.4/96);
-
-        pGraphics.p_color(255,0,0, 255);
-        pGraphics.drawHorLine(0, y1 + penW, x1 + 2*25.4/96, x2 , 25.4/96);*/
     }
 
     if(!this.Pr.hideBot)
     {
-        var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width,
-            y1 = this.pos.y + y + this.size.height;
+        var x1 = X,
+            x2 = X + Width,
+            y1 = Y + Height;
 
             pGraphics.p_color(0,0,0, 255);
             pGraphics.drawHorLine(2, y1, x1, x2, penW);
@@ -140,9 +140,9 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(!this.Pr.hideLeft)
     {
-        var x1 = this.pos.x + x,
-            y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height;
+        var x1 = X,
+            y1 = Y,
+            y2 = Y + Height;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -150,9 +150,9 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(!this.Pr.hideRight)
     {
-        var x1 = this.pos.x + x + this.size.width,
-            y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height;
+        var x1 = X + Width,
+            y1 = Y,
+            y2 = Y + Height;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(2, x1, y1, y2, penW);
@@ -160,32 +160,10 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(this.Pr.strikeTLBR)  // left diagonal
     {
-        /*var pW = penW*0.8;
-        var x1 = this.pos.x + x , y1 = this.pos.y + y,
-            x2 = x1 + pW, y2 = y1,
-            x3 = x1 + this.size.width - penW, y3 = y1 + this.size.height - pW,
-            x4 = x3, y4 = y3 + pW,
-            x5 = x4 - pW, y5 = y4,
-            x6 = x1, y6 = y1 + pW,
-            x7 = x1, y7 = y1;
-
-        pGraphics.p_width(1000);
-        pGraphics.b_color1(0,0,0, 255);
-
-        pGraphics._s();
-        pGraphics._m(x1, y1);
-        pGraphics._l(x2, y2);
-        pGraphics._l(x3, y3);
-        pGraphics._l(x4, y4);
-        pGraphics._l(x5, y5);
-        pGraphics._l(x6, y6);
-        pGraphics._l(x7, y7);
-        pGraphics.df();*/
-
         if(penW < 0.3)
         {
-            var x1 = this.pos.x + x , y1 = this.pos.y + y,
-                x2 = this.pos.x + x + this.size.width, y2 = this.pos.y + y + this.size.height;
+            var x1 = X, y1 = Y,
+                x2 = X + Width, y2 = Y + Height;
 
             pGraphics.p_width(180);
             pGraphics.b_color1(0,0,0, 255);
@@ -198,14 +176,14 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         else
         {
             var pW = penW*0.8;
-            //var x1 = this.pos.x + x , y1 = this.pos.y + y + pW/2,
-            var x1 = this.pos.x + x , y1 = this.pos.y + y,
-                x2 = x1 + pW, y2 = y1,
-                x3 = x1 + this.size.width, y3 = y1 + this.size.height - pW,
-                x4 = x3, y4 = y3 + pW,
-                x5 = x4 - pW, y5 = y4,
-                x6 = x1, y6 = y1 + pW,
-                x7 = x1, y7 = y1;
+
+            var x1 = X,                 y1 = Y,
+                x2 = X + pW,            y2 = Y,
+                x3 = X + Width,         y3 = Y + Height - pW,
+                x4 = X + Width,         y4 = Y + Height,
+                x5 = X + Width - pW,    y5 = Y + Height,
+                x6 = X,                 y6 = Y + pW,
+                x7 = X,                 y7 = Y;
 
             pGraphics.p_width(1000);
             pGraphics.b_color1(0,0,0, 255);
@@ -225,19 +203,10 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(this.Pr.strikeBLTR) // right diagonal
     {
-        /*var pW = penW*0.8;
-        var x1 = this.pos.x + x + this.size.width - pW - penW, y1 = this.pos.y + y,
-            x2 = x1 + pW, y2 = y1,
-            x3 = x2, y3 = y2 + pW,
-            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - pW,
-            x5 = x4 - pW, y5 = y4,
-            x6 = x5, y6 = y5 - pW,
-            x7 = x1, y7 = y1;*/
-
         if(penW < 0.3)
         {
-            var x1 = this.pos.x + x + this.size.width, y1 = this.pos.y + y,
-                x2 = this.pos.x + x, y2 = this.pos.y + y + this.size.height;
+            var x1 = X + Width,      y1 = Y,
+                x2 = X,              y2 = Y + Height;
 
             pGraphics.p_width(180);
             pGraphics.b_color1(0,0,0, 255);
@@ -251,13 +220,13 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         {
             var pW = 0.8*penW;
 
-            var x1 = this.pos.x + x + this.size.width, y1 = this.pos.y + y,
-                x2 = x1 - pW, y2 = y1,
-                x3 = this.pos.x + x, y3 = this.pos.y + y + this.size.height - pW,
-                x4 = x3, y4 = y3 + pW,
-                x5 = x4 + pW, y5 = y4,
-                x6 = x1, y6 = y1 + pW,
-                x7 = x1, y7 = y1;
+            var x1 = X + Width,         y1 = Y,
+                x2 = X + Width - pW,    y2 = Y,
+                x3 = X,                 y3 = Y + Height - pW,
+                x4 = X,                 y4 = Y + Height,
+                x5 = X + pW,            y5 = Y + Height,
+                x6 = X + Width,         y6 = Y + pW,
+                x7 = X + Width,         y7 = Y;
 
 
             pGraphics.p_width(1000);
@@ -278,9 +247,9 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(this.Pr.strikeH)
     {
-        var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width,
-            y1 = this.pos.y + y + this.size.height/2 - penW/2;
+        var x1 = X,
+            x2 = X + Width,
+            y1 = Y + Height/2 - penW/2;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawHorLine(0, y1, x1, x2, penW);
@@ -288,9 +257,9 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(this.Pr.strikeV)
     {
-        var x1 = this.pos.x + x + this.size.width/2 - penW/2,
-            y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height;
+        var x1 = X + Width/2 - penW/2,
+            y1 = Y,
+            y2 = Y + Height;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
