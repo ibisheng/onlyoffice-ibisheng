@@ -4332,7 +4332,7 @@ DrawingObjectsController.prototype =
                 selection_state.selection.push({object: this.selectedObjects[i], pageIndex: this.selectedObjects[i].selectStartPage});
             }
         }
-        if(this.drawingObjects)
+        if(this.drawingObjects && this.drawingObjects.getWorksheet)
         {
             var worksheetView = this.drawingObjects.getWorksheet();
             if(worksheetView)
