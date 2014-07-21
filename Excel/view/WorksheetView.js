@@ -6717,6 +6717,11 @@
 			return oRes;
 		};
 
+		WorksheetView.prototype.setSelectionUndoRedoObject = function (range) {
+			this._shiftVisibleRange(range);
+			return this._calcActiveCellOffset();
+		};
+
 		WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isSelectMode) {
 		
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1]: this.activeRange;
