@@ -4551,7 +4551,7 @@ DrawingObjectsController.prototype =
                             if(image_props.h != null && image_props.h !== group_drawing_props.imageProps.h)
                                 image_props.h = null;
 
-                            if(image_props.locked || new_image_props.locked)
+                            if(image_props.locked || group_drawing_props.imageProps.locked)
                                 image_props.locked = true;
                         }
                     }
@@ -4578,7 +4578,7 @@ DrawingObjectsController.prototype =
                             if(chart_props.h != null && chart_props.h !== group_drawing_props.chartProps.h)
                                 chart_props.h = null;
 
-                            if(chart_props.locked || new_chart_props.locked)
+                            if(chart_props.locked || group_drawing_props.chartProps.locked)
                                 chart_props.locked = true;
                         }
                     }

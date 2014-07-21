@@ -63,9 +63,9 @@ StartAddNewShape.prototype =
             if(!this.bMoved && this instanceof StartAddNewShape)
             {
                 var ext_x, ext_y;
-                if(typeof SHAPE_ASPECTS[this.presetGeom] === "number")
+                if(typeof SHAPE_ASPECTS[this.preset] === "number")
                 {
-                    var _aspect = SHAPE_ASPECTS[this.drawingObjects.currentPresetGeom];
+                    var _aspect = SHAPE_ASPECTS[this.preset];
                     if(_aspect >= 1)
                     {
                         ext_y = 25.4;

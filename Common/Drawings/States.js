@@ -50,6 +50,30 @@ StartAddNewShape.prototype =
             this.drawingObjects.drawingObjects.objectLocker.addObjectId("1");
             var oThis = this;
             var track =  oThis.drawingObjects.arrTrackObjects[0];
+            if(!this.bMoved && this instanceof StartAddNewShape)
+            {
+                var ext_x, ext_y;
+                if(typeof SHAPE_ASPECTS[this.preset] === "number")
+                {
+                    var _aspect = SHAPE_ASPECTS[this.preset];
+                    if(_aspect >= 1)
+                    {
+                        ext_y = 25.4;
+                        ext_x = ext_y*_aspect;
+                    }
+                    else
+                    {
+                        ext_x = 25.4;
+                        ext_y = ext_x/_aspect;
+                    }
+                }
+                else
+                {
+                    ext_x = 25.4;
+                    ext_y = 25.4;
+                }
+                this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y);
+            }
             this.drawingObjects.drawingObjects.objectLocker.checkObjects(function(bLock){
 
                 if(bLock)
