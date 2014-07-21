@@ -3728,7 +3728,6 @@ function DrawingObjects() {
         var stroke_color, fill_color;
         if(drawing.bbox.serBBox)
         {
-
             stroke_color = fill_color = new CColor(0, 128, 0);
             worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
                 asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2, drawing.bbox.serBBox.r2, true),

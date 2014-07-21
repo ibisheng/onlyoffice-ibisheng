@@ -3103,6 +3103,7 @@ DrawingObjectsController.prototype =
                         this.selection.groupSelection.selectedObjects[i].group.removeFromSpTree(this.selection.groupSelection.selectedObjects[i].Get_Id());
                         group_map[this.selection.groupSelection.selectedObjects[i].group.Get_Id()+""] = this.selection.groupSelection.selectedObjects[i].group;
                     }
+                    group_map[this.selection.groupSelection.Get_Id()+""] = this.selection.groupSelection;
                     for(var key in group_map)
                     {
                         if(group_map.hasOwnProperty(key))
