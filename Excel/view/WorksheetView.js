@@ -6215,9 +6215,13 @@
 			};
 		};
 
-		WorksheetView.prototype._calcActiveCellOffset = function () {
+		/**
+		 * @param {ActiveRange} [range]
+		 * @returns {{deltaX: number, deltaY: number}}
+		 */
+		WorksheetView.prototype._calcActiveCellOffset = function (range) {
 			var vr = this.visibleRange;
-			var ar = this.activeRange;
+			var ar = range ? range : this.activeRange;
 			var arn = ar.clone(true);
 			var isMC = this._isMergedCells(arn);
 			var adjustRight = ar.startCol >= vr.c2 || ar.startCol >= vr.c2 && isMC;
@@ -6715,11 +6719,6 @@
 				oRes = this._calcActiveCellOffset();
 			}
 			return oRes;
-		};
-
-		WorksheetView.prototype.setSelectionUndoRedoObject = function (range) {
-			this._shiftVisibleRange(range);
-			return this._calcActiveCellOffset();
 		};
 
 		WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isSelectMode) {

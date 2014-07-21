@@ -48,7 +48,7 @@
 		 * Widget for displaying and editing Workbook object
 		 * -----------------------------------------------------------------------------
 		 * @param {Workbook} model               					Workbook
-		 * @param {asc.asc_CEventsController} controller  			Events controller
+		 * @param {asc_CEventsController} controller  				Events controller
 		 * @param {HandlersList} handlers        					Events handlers for WorkbookView events
 		 * @param {Element} elem                 					Container element
 		 * @param {Element} inputElem            					Input element for top line editor
@@ -599,7 +599,7 @@
                     this.showWorksheet(state[0].worksheet.index);
                     ws.setSelectionShape(true);
                     ws.objectRender.controller.setSelectionState(state);
-                    var d = ws.setSelectionUndoRedoObject(ws.objectRender.getSelectedDrawingsRange());
+                    var d = ws._calcActiveCellOffset(ws.objectRender.getSelectedDrawingsRange());
                     if (d) {
                         if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
                         if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
@@ -816,7 +816,7 @@
 		// Обработка перемещения диапазона
 		WorkbookView.prototype._onMoveRangeHandle = function (x, y, callback,ctrlKey) {
 			var ws = this.getWorksheet();
-			var d = ws.changeSelectionMoveRangeHandle(x, y,ctrlKey);
+			var d = ws.changeSelectionMoveRangeHandle(x, y, ctrlKey);
 			asc_applyFunction(callback, d);
 		};
 
@@ -1175,7 +1175,7 @@
 		/**
 		 *
 	 	 * @param index
-	 	 * @param isResized
+	 	 * @param [isResized]
 	 	 * @returns {WorkbookView}
 	 	 */
 		WorkbookView.prototype.showWorksheet = function (index, isResized) {

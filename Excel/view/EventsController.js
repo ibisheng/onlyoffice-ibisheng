@@ -107,17 +107,15 @@
 		 * @param {WorkbookView} view
 		 * @param {Element} widgetElem
 		 * @param {Element} canvasElem
-		 * @param {Object} handlers  Event handlers (resize, reinitializeScroll, scrollY, scrollX, changeSelection, updateWorksheet, editCell, stopCellEditing)
-		 * @param {Object} settings
+		 * @param {Object} handlers  Event handlers (resize, reinitializeScroll, scrollY, scrollX, changeSelection, ...)
 		 */
-		asc_CEventsController.prototype.init = function (view, widgetElem, canvasElem, handlers, settings) {
+		asc_CEventsController.prototype.init = function (view, widgetElem, canvasElem, handlers) {
 			var self = this;
 
 			this.view     = view;
 			this.widget   = widgetElem;
 			this.element  = canvasElem;
 			this.handlers = new asc.asc_CHandlersList(handlers);
-			this.settings = $.extend(true, {}, this.settings, settings);
             this._createScrollBars();
             if( this.view.Api.isMobileVersion ){
                 var __hasTouch = 'ontouchstart' in window;
@@ -223,7 +221,7 @@
 			this.isSelectionDialogMode = isSelectionDialogMode;
 		};
 
-		/** @param whichSB {Number}  Scroll bar to reinit (1=vertical, 2=horizontal) */
+		/** @param [whichSB] {Number}  Scroll bar to reinit (1=vertical, 2=horizontal) */
 		asc_CEventsController.prototype.reinitializeScroll = function (whichSB) {
 		    if (window["NATIVE_EDITOR_ENJINE"])
 		        return;
@@ -257,10 +255,10 @@
 
 		/**
 		 * @param delta {Number}
-		 * @param event {MouseEvent}
+		 * @param [event] {MouseEvent}
 		 */
 		asc_CEventsController.prototype.scrollVertical = function (delta, event) {
-			if( event && event.preventDefault )
+			if (event && event.preventDefault)
 				event.preventDefault();
 			this.vsbApi.scrollByY(this.settings.vscrollStep * delta);
 			return true;
@@ -268,7 +266,7 @@
 
 		/**
 		 * @param delta {Number}
-		 * @param event {MouseEvent}
+		 * @param [event] {MouseEvent}
 		 */
 		asc_CEventsController.prototype.scrollHorizontal = function (delta, event) {
 			if (event && event.preventDefault)
@@ -518,12 +516,8 @@
 			this.handlers.trigger("changeFillHandle", coord.x, coord.y,
 				function (d) {
 					if (!d) return;
-					if (d.deltaX) {
-						t.scrollHorizontal(d.deltaX);
-					}
-					if (d.deltaY) {
-						t.scrollVertical(d.deltaY);
-					}
+					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
+					if (d.deltaY) {t.scrollVertical(d.deltaY);}
 					asc_applyFunction(callback);
 				});
 		};
@@ -568,12 +562,8 @@
 			this.handlers.trigger("moveRangeHandle", coord.x, coord.y,
 				function (d) {
 					if (!d) return;
-					if (d.deltaX) {
-						t.scrollHorizontal(d.deltaX);
-					}
-					if (d.deltaY) {
-						t.scrollVertical(d.deltaY);
-					}
+					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
+					if (d.deltaY) {t.scrollVertical(d.deltaY);}
 					asc_applyFunction(callback);
 				}, event.metaKey || event.ctrlKey);
 		};
@@ -611,12 +601,8 @@
 			this.handlers.trigger("moveResizeRangeHandle", coord.x, coord.y, target,
 				function (d) {
 					if (!d) return;
-					if (d.deltaX) {
-						t.scrollHorizontal(d.deltaX);
-					}
-					if (d.deltaY) {
-						t.scrollVertical(d.deltaY);
-					}
+					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
+					if (d.deltaY) {t.scrollVertical(d.deltaY);}
 					asc_applyFunction(callback);
 				});
 		};

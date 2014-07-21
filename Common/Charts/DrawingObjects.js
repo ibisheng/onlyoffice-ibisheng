@@ -1791,7 +1791,7 @@ function DrawingObjects() {
                 }
             }
         }
-        return new asc_Range( cmin, rmin, cmax, rmax, true );
+        return new asc.ActiveRange(cmin, rmin, cmax, rmax, true);
     };
 
     _this.recalculate =  function(all)
