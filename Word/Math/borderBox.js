@@ -115,7 +115,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     if(!this.Pr.hideTop)
     {
         var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width - penW/2,
+            x2 = this.pos.x + x + this.size.width,
             y1 = this.pos.y + y;
 
          pGraphics.p_color(0,0,0, 255);
@@ -131,18 +131,18 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     if(!this.Pr.hideBot)
     {
         var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width - penW/2,
-            y1 = this.pos.y + y + this.size.height - penW/2;
+            x2 = this.pos.x + x + this.size.width,
+            y1 = this.pos.y + y + this.size.height;
 
             pGraphics.p_color(0,0,0, 255);
-            pGraphics.drawHorLine(0, y1, x1, x2, penW);
+            pGraphics.drawHorLine(2, y1, x1, x2, penW);
     }
 
     if(!this.Pr.hideLeft)
     {
         var x1 = this.pos.x + x,
             y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height - penW/2;
+            y2 = this.pos.y + y + this.size.height;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -150,20 +150,20 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(!this.Pr.hideRight)
     {
-        var x1 = this.pos.x + x + this.size.width - penW/2,
+        var x1 = this.pos.x + x + this.size.width,
             y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height - penW/2;
+            y2 = this.pos.y + y + this.size.height;
 
         pGraphics.p_color(0,0,0, 255);
-        pGraphics.drawVerLine(0, x1, y1, y2, penW);
+        pGraphics.drawVerLine(2, x1, y1, y2, penW);
     }
 
     if(this.Pr.strikeTLBR)  // left diagonal
     {
-        var pW = penW*0.8;
+        /*var pW = penW*0.8;
         var x1 = this.pos.x + x , y1 = this.pos.y + y,
             x2 = x1 + pW, y2 = y1,
-            x3 = x1 + this.size.width - penW, y3 = y1 + this.size.height - pW - penW,
+            x3 = x1 + this.size.width - penW, y3 = y1 + this.size.height - pW,
             x4 = x3, y4 = y3 + pW,
             x5 = x4 - pW, y5 = y4,
             x6 = x1, y6 = y1 + pW,
@@ -180,40 +180,106 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         pGraphics._l(x5, y5);
         pGraphics._l(x6, y6);
         pGraphics._l(x7, y7);
-        pGraphics.df();
+        pGraphics.df();*/
+
+        if(penW < 0.3)
+        {
+            var x1 = this.pos.x + x , y1 = this.pos.y + y,
+                x2 = this.pos.x + x + this.size.width, y2 = this.pos.y + y + this.size.height;
+
+            pGraphics.p_width(180);
+            pGraphics.b_color1(0,0,0, 255);
+
+            pGraphics._s();
+            pGraphics._m(x1, y1);
+            pGraphics._l(x2, y2);
+            pGraphics.ds();
+        }
+        else
+        {
+            var pW = penW*0.8;
+            //var x1 = this.pos.x + x , y1 = this.pos.y + y + pW/2,
+            var x1 = this.pos.x + x , y1 = this.pos.y + y,
+                x2 = x1 + pW, y2 = y1,
+                x3 = x1 + this.size.width, y3 = y1 + this.size.height - pW,
+                x4 = x3, y4 = y3 + pW,
+                x5 = x4 - pW, y5 = y4,
+                x6 = x1, y6 = y1 + pW,
+                x7 = x1, y7 = y1;
+
+            pGraphics.p_width(1000);
+            pGraphics.b_color1(0,0,0, 255);
+
+            pGraphics._s();
+            pGraphics._m(x1, y1);
+            pGraphics._l(x2, y2);
+            pGraphics._l(x3, y3);
+            pGraphics._l(x4, y4);
+            pGraphics._l(x5, y5);
+            pGraphics._l(x6, y6);
+            pGraphics._l(x7, y7);
+            pGraphics.df();
+        }
 
     }
 
     if(this.Pr.strikeBLTR) // right diagonal
     {
-        var pW = penW*0.8;
+        /*var pW = penW*0.8;
         var x1 = this.pos.x + x + this.size.width - pW - penW, y1 = this.pos.y + y,
             x2 = x1 + pW, y2 = y1,
             x3 = x2, y3 = y2 + pW,
-            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - penW,
+            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - pW,
             x5 = x4 - pW, y5 = y4,
             x6 = x5, y6 = y5 - pW,
-            x7 = x1, y7 = y1;
+            x7 = x1, y7 = y1;*/
 
-        pGraphics.p_width(1000);
-        pGraphics.b_color1(0,0,0, 255);
+        if(penW < 0.3)
+        {
+            var x1 = this.pos.x + x + this.size.width, y1 = this.pos.y + y,
+                x2 = this.pos.x + x, y2 = this.pos.y + y + this.size.height;
 
-        pGraphics._s();
-        pGraphics._m(x1, y1);
-        pGraphics._l(x2, y2);
-        pGraphics._l(x3, y3);
-        pGraphics._l(x4, y4);
-        pGraphics._l(x5, y5);
-        pGraphics._l(x6, y6);
-        pGraphics._l(x7, y7);
-        pGraphics.df();
+            pGraphics.p_width(180);
+            pGraphics.b_color1(0,0,0, 255);
+
+            pGraphics._s();
+            pGraphics._m(x1, y1);
+            pGraphics._l(x2, y2);
+            pGraphics.ds();
+        }
+        else
+        {
+            var pW = 0.8*penW;
+
+            var x1 = this.pos.x + x + this.size.width, y1 = this.pos.y + y,
+                x2 = x1 - pW, y2 = y1,
+                x3 = this.pos.x + x, y3 = this.pos.y + y + this.size.height - pW,
+                x4 = x3, y4 = y3 + pW,
+                x5 = x4 + pW, y5 = y4,
+                x6 = x1, y6 = y1 + pW,
+                x7 = x1, y7 = y1;
+
+
+            pGraphics.p_width(1000);
+            pGraphics.b_color1(0,0,0, 255);
+
+            pGraphics._s();
+            pGraphics._m(x1, y1);
+            pGraphics._l(x2, y2);
+            pGraphics._l(x3, y3);
+            pGraphics._l(x4, y4);
+            pGraphics._l(x5, y5);
+            pGraphics._l(x6, y6);
+            pGraphics._l(x7, y7);
+            pGraphics.df();
+        }
 
     }
 
     if(this.Pr.strikeH)
     {
         var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width - penW,
+            x2 = this.pos.x + x + this.size.width,
             y1 = this.pos.y + y + this.size.height/2 - penW/2;
 
         pGraphics.p_color(0,0,0, 255);
@@ -224,7 +290,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     {
         var x1 = this.pos.x + x + this.size.width/2 - penW/2,
             y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height - penW;
+            y2 = this.pos.y + y + this.size.height;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -577,12 +643,6 @@ function CBox(props)
         brk:        false
     };
 
-    /*this.aln  = false;
-    this.opEmu = false;
-    this.diff = false;
-    this.noBreak = false;
-    this.brk = false;*/
-
     CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
@@ -602,7 +662,9 @@ CBox.prototype.fillContent = function()
     this.setContent();
 
     /*if(this.Pr.opEmu)
-        this.elements[0][0].decreaseArgSize();*/
+    {
+        this.elements[0][0].decreaseArgSize();
+    }*/
 }
 CBox.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {

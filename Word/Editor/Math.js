@@ -502,11 +502,6 @@ ParaMath.prototype =
         this.StartLine   = StartLine;
         this.StartRange  = StartRange;
         this.LinesLength = 0;
-
-        if(this.Id == "81")
-        {
-            console.log("StartLine " + this.StartLine + " StartRange " + this.StartRange);
-        }
     },
 
     Recalculate_Range : function(PRS, ParaPr, Depth)
@@ -1378,14 +1373,14 @@ ParaMath.prototype =
 
         this.State.ContentPos = ContentPos.Get(Depth);
 
-        console.log("Set_ParaContentPos");
+        /*console.log("Set_ParaContentPos");
         var str = "";
         for(var i = 0; i < ContentPos.Data.length; i++)
         {
             str += ContentPos.Data[i] + "  ";
         }
 
-        console.log(str);
+        console.log(str);*/
 
         this.Root.Set_ParaContentPos(ContentPos, Depth);
 
