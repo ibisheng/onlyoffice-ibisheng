@@ -4615,7 +4615,7 @@ Range.prototype._foreachRowNoEmpty=function(actionRow, actionCell){
 					var oCurCell = row.c[j];
 					if(null != oCurCell)
 					{
-						var oRes = actionCell(oCurCell, i, j - 0, oBBox.r1, oBBox.c1);
+						var oRes = actionCell(oCurCell, i - 0, j - 0, oBBox.r1, oBBox.c1);
 						if(null != oRes)
 							return oRes;
 					}
@@ -4662,7 +4662,6 @@ Range.prototype._foreachCol=function(actionCol, actionCell){
 	}
 	if(null != actionCell)
 	{
-		var nRangeType = this._getRangeType();
 		var aRows = this.worksheet._getRows();
 		for(var i in aRows)
 		{
@@ -4675,7 +4674,7 @@ Range.prototype._foreachCol=function(actionCol, actionCell){
 					{
 						var oCurCell = row.c[j];
 						if(null != oCurCell)
-							actionCell(oCurCell, i - 0, j, oBBox.r1, oBBox.c1);
+							actionCell(oCurCell, i - 0, j - 0, oBBox.r1, oBBox.c1);
 					}
 				}
 				else
@@ -4730,7 +4729,7 @@ Range.prototype._foreachColNoEmpty=function(actionCol, actionCell){
 							var oCurCell = row.c[j];
 							if(null != oCurCell)
 							{
-								var oRes = actionCell(oCurCell, i - 0, j, oBBox.r1, oBBox.c1);
+								var oRes = actionCell(oCurCell, i - 0, nIndex, oBBox.r1, oBBox.c1);
 								if(null != oRes)
 									return oRes;
 							}
