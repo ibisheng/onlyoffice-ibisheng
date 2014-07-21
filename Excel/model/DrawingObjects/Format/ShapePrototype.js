@@ -83,6 +83,11 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
      _this.objectLocker.checkObjects( function(result) {} );
      }
      worksheet.setSelectionShape(true);  */
+    if(graphic.recalcTransform)
+    {
+        graphic.recalcTransform();
+        graphic.addToRecalculate();
+    }
     return ret;
 }
 

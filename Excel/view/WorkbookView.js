@@ -590,21 +590,27 @@
 		};
 
 		WorkbookView.prototype._onSetSelectionState = function (state) {
-			var index = 0;
-			for ( var i = 0; i < this.wsViews.length; i++ ) {
-				if (this.wsViews[i] &&  state.sheetId === this.wsViews[i].model.Id ) {
-					index = this.wsViews[i].model.index;
-					break;
-				}
-			}
-			var ws = this.getWorksheet(index);
-			ws.objectRender.controller.setSelectionState(state);
-            ws.objectRender.controller.updateOverlay();
-            ws.objectRender.controller.updateSelectionState();
 
-			// Селектим после выставления состояния
-			if (0 < ws.objectRender.controller.selectedObjects.length)
-				ws.setSelectionShape(true);
+            if(state[0] && state[0].worksheet)
+            {
+                var ws = this.getWorksheet(state[0].worksheet.index);
+                if(ws)
+                {
+                    this.showWorksheet(state[0].worksheet.index);
+                    ws.setSelectionShape(true);
+                    ws.objectRender.controller.setSelectionState(state);
+                    var d = ws.setSelectionUndoRedoObject(ws.objectRender.getSelectedDrawingsRange());
+                    if (d) {
+                        if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
+                        if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
+                    }
+                    ws.objectRender.showDrawingObjectsEx(true);
+                    ws.objectRender.controller.updateOverlay();
+                    ws.objectRender.controller.updateSelectionState();
+                }
+                // Селектим после выставления состояния
+
+            }
 		};
 
 		WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isSelectMode, callback) {

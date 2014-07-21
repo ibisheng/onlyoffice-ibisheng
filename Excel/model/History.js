@@ -334,21 +334,6 @@ CHistory.prototype =
                 wsViews[i].objectRender.controller.recalculate2(undefined);
             }
         }
-
-        // Восстанавливаем состояние на следующую точку
-        var State = null;
-        if ( this.Index === this.Points.length - 1 )
-            State = this.LastState;
-        else
-            State = this.Points[this.Index + 1].SelectionState;
-
-		if ( isRealObject(State) )
-			this.workbook.handlers.trigger("setSelectionState", State);
-        if(isRealObject(this.lastDrawingObjects))
-        {
-            this.lastDrawingObjects.sendGraphicObjectProps();
-            this.lastDrawingObjects = null;
-        }
 	},
 	UndoRedoEnd: function (Point, oRedoObjectParam, bUndo) {
 	    if (!bUndo && null == Point) {
@@ -387,25 +372,35 @@ CHistory.prototype =
 	        for (var i in Point.UpdateRigions)
 	            this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
 	        if (bUndo) {
-	            this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
-	            if (Point.SelectionState != null)
-                {
-                    this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
-                    var wsView = window["Asc"]["editor"].wb.getWorksheet();
-                    if(wsView && wsView.objectRender && wsView.objectRender.controller)
-                    {
-                        wsView.objectRender.controller.updateOverlay();
+                if(Point.SelectionState && Point.SelectionState[0] && Point.SelectionState[0].focus) {
+                    if (Point.SelectionState != null) {
+                        this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
                     }
+                }
+                else {
+                    this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
                 }
 	        }
 	        else {
-	            var oSelectRange = null;
-	            if (null != Point.SelectRangeRedo)
-	                oSelectRange = Point.SelectRangeRedo;
-	            else if (null != Point.SelectRange)
-	                oSelectRange = Point.SelectRange;
-	            if (null != oSelectRange)
-	                this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
+                var State = null;
+                if ( this.Index === this.Points.length - 1 )
+                    State = this.LastState;
+                else
+                    State = this.Points[this.Index + 1].SelectionState;
+
+                if ( State && State[0] && State[0].focus) {
+                    this.workbook.handlers.trigger("setSelectionState", State);
+                }
+                else {
+                    var oSelectRange = null;
+                    if (null != Point.SelectRangeRedo)
+                        oSelectRange = Point.SelectRangeRedo;
+                    else if (null != Point.SelectRange)
+                        oSelectRange = Point.SelectRange;
+                    if (null != oSelectRange)
+                        this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
+                }
+
 	        }
 	        for (var i in oRedoObjectParam.oChangeWorksheetUpdate)
 	            this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);

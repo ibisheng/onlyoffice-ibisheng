@@ -1789,7 +1789,8 @@ CChartSpace.prototype =
                                                 series_f = null;
                                         }
                                     }
-                                    series_f.push(cur_bbox);
+                                    if(series_f !== null)
+                                        series_f.push(cur_bbox);
                                 }
                                 else
                                     series_f = null;
@@ -1910,7 +1911,7 @@ CChartSpace.prototype =
                     }
                 }
 
-                if(series_f.length === 1)
+                if(series_f !== null && series_f.length === 1)
                 {
                     if(series_f[0].r1 === series_f[0].r2 && series_f[0].c1 !== series_f[0].c2)
                     {

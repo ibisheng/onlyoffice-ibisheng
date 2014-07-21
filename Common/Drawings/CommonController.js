@@ -4298,33 +4298,46 @@ DrawingObjectsController.prototype =
         var selection_state = {};
         if(this.selection.textSelection)
         {
+            selection_state.focus = true;
             selection_state.textObject = this.selection.textSelection;
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
             selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
         }
         else if(this.selection.groupSelection)
         {
+            selection_state.focus = true;
             selection_state.groupObject = this.selection.groupSelection;
             selection_state.selectStartPage = this.selection.groupSelection.selectStartPage;
             selection_state.groupSelection = this.selection.groupSelection.getSelectionState();
         }
         else if(this.selection.chartSelection)
         {
+            selection_state.focus = true;
             selection_state.chartObject = this.selection.chartSelection;
             selection_state.selectStartPage = this.selection.chartSelection.selectStartPage;
             selection_state.chartSelection = this.selection.chartSelection.getSelectionState();
         }
         else if(this.selection.wrapPolygonSelection)
         {
+            selection_state.focus = true;
             selection_state.wrapObject = this.selection.wrapPolygonSelection;
             selection_state.selectStartPage = this.selection.wrapPolygonSelection.selectStartPage;
         }
         else
         {
+            selection_state.focus = this.selectedObjects.length > 0;
             selection_state.selection = [];
             for(var i = 0; i < this.selectedObjects.length; ++i)
             {
                 selection_state.selection.push({object: this.selectedObjects[i], pageIndex: this.selectedObjects[i].selectStartPage});
+            }
+        }
+        if(this.drawingObjects)
+        {
+            var worksheetView = this.drawingObjects.getWorksheet();
+            if(worksheetView)
+            {
+                selection_state.worksheet = worksheetView.model;
             }
         }
         return [selection_state];

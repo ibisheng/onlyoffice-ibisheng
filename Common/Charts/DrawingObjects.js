@@ -1763,6 +1763,37 @@ function DrawingObjects() {
         isInit = true;
     };
 
+
+    _this.getSelectedDrawingsRange = function()
+    {
+        var i, rmin=gc_nMaxRow, rmax = 0, cmin = gc_nMaxCol, cmax = 0, selectedObjects = this.controller.selectedObjects, drawingBase;
+        for(i = 0; i < selectedObjects.length; ++i)
+        {
+
+            drawingBase = selectedObjects[i].drawingBase;
+            if(drawingBase)
+            {
+                if(drawingBase.from.col < cmin)
+                {
+                    cmin = drawingBase.from.col;
+                }
+                if(drawingBase.from.row < rmin)
+                {
+                    rmin = drawingBase.from.row;
+                }
+                if(drawingBase.to.col > cmax)
+                {
+                    cmax = drawingBase.to.col;
+                }
+                if(drawingBase.to.row > rmax)
+                {
+                    rmax = drawingBase.to.row;
+                }
+            }
+        }
+        return new asc_Range( cmin, rmin, cmax, rmax, true );
+    };
+
     _this.recalculate =  function(all)
     {
         _this.controller.recalculate(all);
