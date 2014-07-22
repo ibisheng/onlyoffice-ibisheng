@@ -1526,7 +1526,7 @@
 				 var k = 0;
 				 for (var n = 0;n < nodes.length; ++n)
 				 {
-					if(!(nodes[n].nodeName.toLowerCase() == '#comment' || (nodes[n].nodeName.toLowerCase() == '#text' && nodes[n].textContent.replace(/(\r|\t|\n| )/g, '') == '')))
+					if(!(nodes[n].nodeName.toLowerCase() == 'meta' || nodes[n].nodeName.toLowerCase() == 'style' || nodes[n].nodeName.toLowerCase() == '#comment' || (nodes[n].nodeName.toLowerCase() == '#text' && nodes[n].textContent.replace(/(\r|\t|\n| )/g, '') == '')))
 					{
 						/*if($(nodes[n]).find("img").length != 0 && nodes[n].nodeName.toLowerCase() != 'table')//если в вставляемом фрагменте присутствует изображение
 						{
