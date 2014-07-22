@@ -1670,6 +1670,13 @@
 				if(onlyFromLocalStorage)
 					node = this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
 				
+				//если находимся внутри диаграммы убираем ссылки
+				if(targetDocContent && targetDocContent.Parent && targetDocContent.Parent.parent && targetDocContent.Parent.parent.chart)
+				{
+					var changeTag = $(node).find("a");
+					this._changeHtmlTag(changeTag);
+				};
+				
 				oPasteProcessor._Prepeare_recursive(node, true, true);
 				
 				oPasteProcessor.aContent = [];
@@ -1696,6 +1703,31 @@
 				});
 				
  				return true;
+			},
+			//TODO сделать при получаении структуры. игнорировать размер шрифта и тп
+			_changeHtmlTag: function(arr)
+			{
+				var oldElem, value, style, bold, underline, italic;
+				for(var i = 0; i < arr.length; i++)
+				{
+					oldElem = arr[i];
+					value = oldElem.innerText;
+					
+					underline = "none";
+					if(oldElem.style.textDecoration && oldElem.style.textDecoration != "")
+						underline = oldElem.style.textDecoration;
+						
+					italic = "normal";
+					if(oldElem.style.textDecoration && oldElem.style.textDecoration != "")
+						italic = oldElem.style.fontStyle;
+						
+					bold = "normal";
+					if(oldElem.style.fontWeight && oldElem.style.fontWeight != "")
+						bold = oldElem.style.fontWeight;
+					
+					style = ' style = "text-decoration:' + underline + ";" + "font-style:" + italic + ";" + "font-weight:" + bold + ";" + '"';
+					$(oldElem).replaceWith("<span" + style +  ">" + value + "</span>");
+				};
 			},
 			
 			_convertFonts: function(oFonts)
