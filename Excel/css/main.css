@@ -133,6 +133,7 @@
 	background-color: #000;
 	width: 1px;
 	height: 11pt;
+    cursor: text;
 }
 
 #apiPopUpSelector {
