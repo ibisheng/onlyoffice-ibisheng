@@ -597,8 +597,8 @@
                 if(ws)
                 {
                     this.showWorksheet(state[0].worksheet.index);
-                    ws.setSelectionShape(true);
                     ws.objectRender.controller.setSelectionState(state);
+                    ws.setSelectionShape(true);
                     var d = ws._calcActiveCellOffset(ws.objectRender.getSelectedDrawingsRange());
                     if (d) {
                         if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
