@@ -1906,15 +1906,16 @@ cDB.prototype.Calculate = function ( arg ) {
     salvage = salvage.getValue();
     life = life.getValue();
     period = period.getValue();
-    month = month.getValue();
+    month = Math.floor(month.getValue());
 
-    if( cost == 0 || salvage == 0 ){
+    if ( salvage >= cost ) {
         return this.value = new cNumber( 0 );
     }
 
-    if ( month < 1 || month > 12 || salvage <= 0 || life <= 0 || period < 0 || life + 1 < period || cost < 0 || cost < salvage ) {
+    if ( month < 1 || month > 12 || salvage < 0 || life < 0 || period < 0 || life + 1 < period || cost < 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
+
     var rate = 1 - Math.pow( salvage / cost, 1 / life );
     rate = Math.floor( (rate * 1000) + 0.5 ) / 1000;
     var firstRate = cost * rate * month / 12;

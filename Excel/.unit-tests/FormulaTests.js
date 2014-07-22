@@ -4465,11 +4465,11 @@
 
         function db( cost, salvage, life, period, month ){
 
-            if( cost == 0 || salvage == 0 ){
-                return 0;
+            if ( salvage >= cost ) {
+                return this.value = new cNumber( 0 );
             }
 
-            if ( month < 1 || month > 12 || salvage <= 0 || life <= 0 || period < 0 || life + 1 < period || cost < 0 || cost < salvage ) {
+            if ( month < 1 || month > 12 || salvage < 0 || life <= 0 || period < 0 || life + 1 < period || cost < 0 ) {
                 return "#NUM!";
             }
 
@@ -5614,6 +5614,46 @@
         oParser = new parserFormula( "DELTA(0)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 1);
+
+    })
+
+    test( "Test: \"ERF\"", function () {
+
+        oParser = new parserFormula( "ERF(1.234,4.5432)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.08096058291050978 );
+
+        oParser = new parserFormula( "ERF(1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.8427007929497149 );
+
+        oParser = new parserFormula( "ERF(0,1.345)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.9428441710878559 );
+
+        oParser = new parserFormula( "ERF(1.234)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.9190394169576684 );
+
+    })
+
+    test( "Test: \"ERFC\"", function () {
+
+        oParser = new parserFormula( "ERFC(1.234)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.08096058304233157 );
+
+        oParser = new parserFormula( "ERFC(1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.15729920705028513 );
+
+        oParser = new parserFormula( "ERFC(0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1 );
+
+        oParser = new parserFormula( "ERFC(-1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
 
     })
 
