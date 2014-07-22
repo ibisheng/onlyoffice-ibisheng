@@ -1212,7 +1212,7 @@
 			this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
 			this.defaultColWidthChars = this._colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
 
-			gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(this.defaultColWidthChars, true);
+			gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(this.defaultColWidthChars);
 			this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
 
 			// ToDo разобраться со значениями
@@ -1275,13 +1275,11 @@
 		/**
 		 * Вычисляет ширину столбца для заданного количества символов
 		 * @param {Number} count  Количество символов
-		 * @param {Boolean} displayWidth  При расчете использовать целое число пикселов
 		 * @returns {Number}      Ширина столбца в символах
 		 */
-		WorksheetView.prototype._charCountToModelColWidth = function (count, displayWidth) {
+		WorksheetView.prototype._charCountToModelColWidth = function (count) {
 			if (count <= 0) { return 0; }
-			var maxw = displayWidth ? asc_round(this.maxDigitWidth) : this.maxDigitWidth;
-			return asc_floor((count * maxw + 5) / maxw * 256) / 256; // 5 - Это padding + border
+			return asc_floor((count * this.maxDigitWidth + 5) / this.maxDigitWidth * 256) / 256; // 5 - Это padding + border
 		};
 
 		/**
@@ -4227,7 +4225,7 @@
 
 		WorksheetView.prototype._changeColWidth = function (col, width, pad) {
 			var cc = Math.min(this._colWidthToCharCount(width + pad), /*max col width*/255);
-			var modelw = this._charCountToModelColWidth(cc, true);
+			var modelw = this._charCountToModelColWidth(cc);
 			var colw = this._calcColWidth(modelw);
 
 			if (colw.width > this.cols[col].width) {
@@ -9358,7 +9356,7 @@
 				case "colWidth":
 					functionModelAction = function () {
 						pad = t.width_padding * 2 + t.width_1px;
-						cw = t._charCountToModelColWidth(val, true);
+						cw = t._charCountToModelColWidth(val);
 						t.model.setColWidth(cw, checkRange.c1, checkRange.c2);
 						isUpdateCols = true;
 						fullRecalc = true;
@@ -9869,7 +9867,7 @@
 				if (width > 0) {
 					var pad = t.width_padding * 2 + t.width_1px;
 					var cc = Math.min(t._colWidthToCharCount(width + pad), /*max col width*/255);
-					var cw = t._charCountToModelColWidth(cc, true);
+					var cw = t._charCountToModelColWidth(cc);
 				} else {
 					cw = gc_dDefaultColWidthCharsAttribute;
 				}
