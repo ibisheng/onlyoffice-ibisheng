@@ -3791,7 +3791,7 @@ function DrawingObjects() {
         }
         if(selected_objects[0] )
         {
-            if(selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+            if(selected_objects[0].getObjectType() === historyitem_type_ChartSpace && selected_objects.length === 1)
                 return c_oAscSelectionType.RangeChart;
 
             if(selected_objects[0].getObjectType() === historyitem_type_ImageShape)
