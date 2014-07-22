@@ -12,7 +12,7 @@ function CContentChangesElement(Type, Pos, Count, Data)
 
     this.Refresh_BinaryData = function()
     {
-        this.m_pData.oldValue = this.m_aPositions[0];
+        this.m_pData.Pos = this.m_aPositions[0];
     };
 
     this.Check_Changes = function(Type, Pos)

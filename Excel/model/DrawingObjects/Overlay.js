@@ -2348,6 +2348,9 @@ CSlideBoundsChecker.prototype =
             return true;
         return (true === this.map_bounds_shape[preset]) ? false : true;
     },
+    drawHorLine2 : function(preset)
+    {
+    },
 
     init : function(width_px, height_px, width_mm, height_mm)
     {

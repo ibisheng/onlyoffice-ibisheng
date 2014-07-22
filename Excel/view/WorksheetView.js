@@ -6585,7 +6585,7 @@
 					objectInfo.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
 
 				var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
-				if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart)) {
+				if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlink)) {
 
 					var hyperlink = new Hyperlink();
 					hyperlink.Tooltip = shapeHyperlink.ToolTip;
@@ -6597,6 +6597,7 @@
 						hyperlink.Hyperlink = shapeHyperlink.Value;
 
 					objectInfo.hyperlink = new asc_CHyperlink(hyperlink);
+                    objectInfo.hyperlink.asc_setText(shapeHyperlink.Get_SelectedText(true, true));
 				}
 			} else
             {

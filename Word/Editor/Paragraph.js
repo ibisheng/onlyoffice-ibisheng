@@ -6479,11 +6479,22 @@ Paragraph.prototype =
                 Hyperlink.Add_ToContent( 0, HyperRun, false );
 
                 // Задаем текстовые настройки рана (те, которые шли в текущей позиции + стиль гиперссылки)
-                var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
-                HyperRun.Set_Pr( TextPr.Copy() );
-                HyperRun.Set_Color( undefined );
-                HyperRun.Set_Underline( undefined );
-                HyperRun.Set_RStyle( Styles.Get_Default_Hyperlink() );
+                if(this.bFromDocument)
+                {
+                    var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
+                    HyperRun.Set_Pr( TextPr.Copy() );
+                    HyperRun.Set_Color( undefined );
+                    HyperRun.Set_Underline( undefined );
+                    HyperRun.Set_RStyle( Styles.Get_Default_Hyperlink() );
+                }
+                else
+                {
+                    HyperRun.Set_Pr( TextPr.Copy() );
+                    HyperRun.Set_Color( undefined );
+                    HyperRun.Set_Unifill( CreateUniFillSchemeColorWidthTint(11, 0) );
+                    HyperRun.Set_Underline( true );
+                }
+
 
                 // Заполняем ран гиперссылки текстом
                 for ( var NewPos = 0; NewPos < HyperProps.Text.length; NewPos++ )
@@ -6569,6 +6580,11 @@ Paragraph.prototype =
 
             var TextPr = new CTextPr();
             TextPr.RStyle = null;
+            if(!this.bFromDocument)
+            {
+                TextPr.Unifill = null;
+                TextPr.Underline = null;
+            }
 
             for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
             {

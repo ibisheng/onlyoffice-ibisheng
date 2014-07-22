@@ -1931,7 +1931,7 @@ CGroupShape.prototype =
         {
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                addToDrawings(this.worksheet, this, data.oldPr);
+                addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
             case historyitem_AutoShapes_AddToDrawingObjects:
@@ -2004,7 +2004,7 @@ CGroupShape.prototype =
             }
             case historyitem_AutoShapes_AddToDrawingObjects:
             {
-                addToDrawings(this.worksheet, this, data.oldPr);
+                addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
             case historyitem_AutoShapes_SetWorksheet:
@@ -2079,7 +2079,8 @@ CGroupShape.prototype =
             }
             case historyitem_AutoShapes_AddToDrawingObjects:
             {
-                writeLong(w, data.oldPr);
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                writeLong(w, Pos);
                 break;
             }
             case historyitem_AutoShapes_SetWorksheet:
@@ -2128,6 +2129,10 @@ CGroupShape.prototype =
             case historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var pos = readLong(r);
+                if(this.worksheet)
+                {
+                    pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                }
                 addToDrawings(this.worksheet, this, pos);
                 break;
             }

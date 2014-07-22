@@ -513,7 +513,6 @@ CGraphicObjects.prototype =
         }
         else
         {
-            History.Create_NewPoint();
             this.zIndexManager.bringToFront(this.getArrZIndexSelectedObjects());
         }
         this.document.Recalculate();
@@ -531,7 +530,6 @@ CGraphicObjects.prototype =
         }
         else
         {
-            History.Create_NewPoint();
             this.zIndexManager.bringForward(this.getArrZIndexSelectedObjects());
         }
         this.document.Recalculate();
@@ -549,7 +547,6 @@ CGraphicObjects.prototype =
         }
         else
         {
-            History.Create_NewPoint();
             this.zIndexManager.sendToBack(this.getArrZIndexSelectedObjects());
         }
         this.document.Recalculate();
@@ -567,7 +564,6 @@ CGraphicObjects.prototype =
         }
         else
         {
-            History.Create_NewPoint();
             this.zIndexManager.bringBackward(this.getArrZIndexSelectedObjects());
         }
         this.document.Recalculate();
@@ -2669,14 +2665,14 @@ ZIndexManager.prototype =
         {
             for(var i = 0; i < this.Content.length; ++i)
             {
-                this.Content[i].RelativeHeight = this.Content.length - i;
+                this.Content[i].RelativeHeight = this.Content.length - (i+1);
             }
             this.startRefreshIndex = -1;
         }
         this.drawingObjects.sortDrawingArrays();
     },
 
-    bringToFront: function(arrInd)//
+    sendToBack: function(arrInd)//
     {
         arrInd.sort(function(a, b){return a-b});
         var arrDrawings = [];
@@ -2691,7 +2687,7 @@ ZIndexManager.prototype =
         }
     },
 
-    bringForward: function(arrInd)
+    bringBackward: function(arrInd)
     {
         arrInd.sort(function(a, b){return a - b;});
         var i;
@@ -2711,7 +2707,7 @@ ZIndexManager.prototype =
         }
     },
 
-    sendToBack: function(arrInd)
+    bringToFront: function(arrInd)
     {
         arrInd.sort(function(a, b){return a-b});
         var i;
@@ -2727,7 +2723,7 @@ ZIndexManager.prototype =
         }
     },
 
-    bringBackward: function(arrInd)
+    bringForward: function(arrInd)
     {
         arrInd.sort(function(a, b){return a - b});
         var i, item;

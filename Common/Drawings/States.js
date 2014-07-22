@@ -47,7 +47,7 @@ StartAddNewShape.prototype =
         {
 
             this.drawingObjects.drawingObjects.objectLocker.reset();
-            this.drawingObjects.drawingObjects.objectLocker.addObjectId("1");
+            this.drawingObjects.drawingObjects.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
             var oThis = this;
             var track =  oThis.drawingObjects.arrTrackObjects[0];
             if(!this.bMoved && this instanceof StartAddNewShape)

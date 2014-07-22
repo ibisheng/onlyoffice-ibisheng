@@ -1522,7 +1522,14 @@ DrawingObjectsController.prototype =
 
 
     insertHyperlink: function (options) {
-        this.checkSelectedObjectsAndCallback(this.hyperlinkAdd, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}]);
+        if(!this.getHyperlinkInfo())
+        {
+            this.checkSelectedObjectsAndCallback(this.hyperlinkAdd, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}]);
+        }
+        else
+        {
+            this.checkSelectedObjectsAndCallback(this.hyperlinkModify, [{Text: options.text, Value: options.hyperlinkModel.Hyperlink, ToolTip: options.hyperlinkModel.Tooltip}]);
+        }
     },
 
     removeHyperlink: function () {
@@ -4243,7 +4250,58 @@ DrawingObjectsController.prototype =
 
     getHyperlinkInfo: function()
     {
-        //TODO
+        var content = this.getTargetDocContent();
+        if(content)
+        {
+            if ( ( true === content.Selection.Use && content.Selection.StartPos == content.Selection.EndPos) || false == content.Selection.Use )
+            {
+                var paragraph;
+                if ( true == content.Selection.Use )
+                    paragraph = content.Content[content.Selection.StartPos];
+                else
+                    paragraph = content.Content[content.CurPos.ContentPos];
+
+                var HyperPos = -1;
+                if ( true === paragraph.Selection.Use )
+                {
+                    var StartPos = paragraph.Selection.StartPos;
+                    var EndPos   = paragraph.Selection.EndPos;
+                    if ( StartPos > EndPos )
+                    {
+                        StartPos = paragraph.Selection.EndPos;
+                        EndPos   = paragraph.Selection.StartPos;
+                    }
+
+                    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+                    {
+                        var Element = paragraph.Content[CurPos];
+
+                        if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
+                            break;
+                        else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
+                        {
+                            if ( -1 === HyperPos )
+                                HyperPos = CurPos;
+                            else
+                                break;
+                        }
+                    }
+
+                    if ( paragraph.Selection.StartPos === paragraph.Selection.EndPos && para_Hyperlink === paragraph.Content[paragraph.Selection.StartPos].Type )
+                        HyperPos = paragraph.Selection.StartPos;
+                }
+                else
+                {
+                    if (para_Hyperlink === paragraph.Content[paragraph.CurPos.ContentPos].Type)
+                        HyperPos = paragraph.CurPos.ContentPos;
+                }
+                if ( -1 !== HyperPos )
+                {
+                   return  paragraph.Content[HyperPos];
+                }
+
+            }
+        }
         return null;
     },
 
@@ -5038,7 +5096,17 @@ DrawingObjectsController.prototype =
     // layers
     setGraphicObjectLayer: function(layerType)
     {
-        this.checkSelectedObjectsAndCallback(this.setGraphicObjectLayerCallBack, [layerType]);
+        if(this.selection.groupSelection)
+        {
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectLayerCallBack, [layerType]);
+        }
+        else
+        {
+            History.Create_NewPoint();
+            this.setGraphicObjectLayerCallBack(layerType);
+            this.startRecalculate();
+        }
+       // this.checkSelectedObjectsAndCallback(this.setGraphicObjectLayerCallBack, [layerType]);
         //oAscDrawingLayerType
     },
 
