@@ -1473,7 +1473,10 @@
 
 			// Проверяем, открыт ли редактор
 			if (ws.getCellEditMode()) {
-				if (false === this.cellEditor.insertFormula (functionName)) {
+				// При autoComplete заканчиваем ввод
+				if (autoComplete)
+					this.cellEditor.close(true);
+				else if (false === this.cellEditor.insertFormula (functionName)) {
 					// Не смогли вставить формулу, закроем редактор, с сохранением текста
 					this.cellEditor.close(true);
 				}
