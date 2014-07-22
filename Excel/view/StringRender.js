@@ -453,7 +453,7 @@
 		/**
 		 * Measures string
 		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
-		 * @param {Object} flags      Optional. Text flags {wrapText, shrinkToFit, isMerged, textAlign}
+		 * @param {Object} [flags]      Optional. Text flags {wrapText, shrinkToFit, isMerged, textAlign}
 		 * @param {Number} [maxWidth]   Optional. Text width restriction
 		 * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
 		 */

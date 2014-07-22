@@ -1287,12 +1287,10 @@
 		/**
 		 * Вычисляет ширину столбца в пунктах
 		 * @param {Number} mcw  Количество символов
-		 * @param {Boolean} displayWidth  При расчете использовать целое число пикселов
 		 * @returns {Number}    Ширина столбца в пунктах (pt)
 		 */
-		WorksheetView.prototype._modelColWidthToColWidth = function (mcw, displayWidth) {
-			var maxw = displayWidth ? asc_round(this.maxDigitWidth) : this.maxDigitWidth;
-			var px = asc_floor( (( 256 * mcw + asc_floor(128 / maxw) ) / 256) * maxw );
+		WorksheetView.prototype._modelColWidthToColWidth = function (mcw) {
+			var px = asc_floor(((256 * mcw + asc_floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
 			return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
 		};
 
@@ -5257,13 +5255,25 @@
 			var moveHeight = oldH - lastRowHeight;
 			if (moveHeight > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight);
-				this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
+
+				// Заглушка для safari (http://bugzserver/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
+				// потом рисует (а т.к. мы рисуем сами на себе, то уже картинка будет пустой)
+				if (AscBrowser.isSafari)
+					this.drawingGraphicCtx.moveImageDataSafari(x, y, oldW, moveHeight, x + dx, y - dy);
+				else
+					this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
+			} else {
+				// Scroll на весь экран отрабатываем для Safari
+				if (AscBrowser.isSafari)
+					this.drawingGraphicCtx.clear();
 			}
 			var clearTop = y + (scrollDown ? moveHeight - dy : 0);
 			moveHeight = Math.abs(dy) + lastRowHeight;
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, clearTop, ctxW, moveHeight);
-			this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, moveHeight);
+
+			if (!AscBrowser.isSafari)
+				this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, moveHeight);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
@@ -5381,14 +5391,26 @@
 			var moveWidth = oldW - lastColWidth;
 			if (moveWidth > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
-				this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
+
+				// Заглушка для safari (http://bugzserver/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
+				// потом рисует (а т.к. мы рисуем сами на себе, то уже картинка будет пустой)
+				if (AscBrowser.isSafari)
+					this.drawingGraphicCtx.moveImageDataSafari(x, y, moveWidth, ctxH, x - dx, y);
+				else
+					this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
+			} else {
+				// Scroll на весь экран отрабатываем для Safari
+				if (AscBrowser.isSafari)
+					this.drawingGraphicCtx.clear();
 			}
 
 			var clearLeft = x + (scrollRight > 0 ? moveWidth - dx : 0);
 			moveWidth = Math.abs(dx) + lastColWidth;
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(clearLeft, y, moveWidth, ctxH);
-			this.drawingGraphicCtx.clearRect(clearLeft, y, moveWidth, ctxH);
+
+			if (!AscBrowser.isSafari)
+				this.drawingGraphicCtx.clearRect(clearLeft, y, moveWidth, ctxH);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
