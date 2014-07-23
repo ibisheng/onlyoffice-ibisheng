@@ -126,6 +126,9 @@
 			this.overlayGraphicCtx = undefined;
 			this.stringRender = undefined;
 
+			this.selectionDialogType = c_oAscSelectionDialogType.None;
+			this.copyActiveSheet = -1;
+
 			// Комментарии для всего документа
 			this.cellCommentator = null;
 
@@ -1194,6 +1197,14 @@
 				}
 			}
 
+			var tmpWorksheet, selectionRange = null;
+			if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
+				// Когда идет выбор диапазона, то должны на закрываемом листе отменить выбор диапазона
+				tmpWorksheet = this.getWorksheet();
+				selectionRange = tmpWorksheet.activeRange.clone(true);
+				tmpWorksheet.setSelectionDialogMode(c_oAscSelectionDialogType.None);
+			}
+
 			var wb = this.model;
 			if (asc_typeof(index) === "number" && index >= 0) {
 				if (index !== wb.getActive()) {wb.setActive(index);}
@@ -1212,6 +1223,12 @@
 				ws.changeZoom(true);
 			
 			ws.draw();
+			if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
+				// Когда идет выбор диапазона, то на позываемом листе должны выставить нужный режим
+				ws.setSelectionDialogMode(this.selectionDialogType, selectionRange);
+				this.handlers.trigger("asc_onSelectionRangeChanged", ws.getSelectionRangeValue());
+			}
+
             ws.objectRender.OnUpdateOverlay();
 			if (isSendInfo) {
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
@@ -1671,7 +1688,48 @@
 		};
 
 		WorkbookView.prototype.setSelectionDialogMode = function (selectionDialogType, selectRange) {
-			this.getWorksheet().setSelectionDialogMode(selectionDialogType, selectRange);
+			if (selectionDialogType === this.selectionDialogType)
+				return;
+
+			if (c_oAscSelectionDialogType.None === selectionDialogType) {
+				this.selectionDialogType = selectionDialogType;
+				this.getWorksheet().setSelectionDialogMode(selectionDialogType, selectRange);
+				if (this.copyActiveSheet !== this.wsActive) {
+					this.showWorksheet(this.copyActiveSheet);
+					// Посылаем эвент о смене активного листа
+					this.handlers.trigger("asc_onActiveSheetChanged", this.copyActiveSheet);
+				}
+				this.copyActiveSheet = -1;
+			} else {
+				this.copyActiveSheet = this.wsActive;
+
+				var index, tmpSelectRange = parserHelp.parse3DRef(selectRange);
+				if (tmpSelectRange) {
+					if (c_oAscSelectionDialogType.Chart === selectionDialogType) {
+						// Получаем sheet по имени
+						var ws = this.model.getWorksheetByName(tmpSelectRange.sheet);
+						if (!ws || ws.getHidden())
+							tmpSelectRange = null;
+						else {
+							index = ws.getIndex();
+							this.showWorksheet(index);
+							// Посылаем эвент о смене активного листа
+							this.handlers.trigger("asc_onActiveSheetChanged", index);
+
+							tmpSelectRange = tmpSelectRange.range;
+						}
+					}
+					else
+						tmpSelectRange = tmpSelectRange.range;
+				} else {
+					// Это не 3D ссылка
+					tmpSelectRange = selectRange;
+				}
+
+				this.getWorksheet().setSelectionDialogMode(selectionDialogType, tmpSelectRange);
+				// Нужно выставить после, т.к. при смене листа не должны проставлять режим
+				this.selectionDialogType = selectionDialogType;
+			}
 		};
 
 		WorkbookView.prototype._cleanFindResults = function () {

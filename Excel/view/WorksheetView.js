@@ -432,7 +432,7 @@
 
 			this.selectionDialogType = c_oAscSelectionDialogType.None;
 			this.isSelectionDialogMode = false;
-			this.copyOfActiveRange = null;
+			this.copyActiveRange = null;
 
 			this.startCellMoveResizeRange = null;
 			this.startCellMoveResizeRange2 = null;
@@ -3446,7 +3446,7 @@
 			if (!this.isSelectionDialogMode)
 				range = this.activeRange.intersection(range !== undefined ? range : this.visibleRange);
 			else
-				range = this.copyOfActiveRange.intersection(range !== undefined ? range : this.visibleRange);
+				range = this.copyActiveRange.intersection(range !== undefined ? range : this.visibleRange);
 
 			// Copy fill Handle
 			var aFH = null;
@@ -3483,7 +3483,7 @@
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 			}
 
-			var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
+			var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyActiveRange.clone(true);
 			var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
 			var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px) : 0;
 			var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
@@ -3609,7 +3609,7 @@
 				ctx.setFillStyle( opt.activeCellBackground )
 						.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
-				var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyOfActiveRange;
+				var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
 				cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
 				// Получаем активную ячейку в выделении
 				cr = range.intersection(null !== cr ? cr : asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
@@ -3717,7 +3717,7 @@
 
 		WorksheetView.prototype._drawFormatPainterRange = function () {
 			var lineWidth = 1, isDashLine = true, strokeColor = new CColor(0, 0, 0);
-			this._drawElements(this, this._drawSelectionElement, this.copyOfActiveRange, isDashLine, lineWidth, strokeColor);
+			this._drawElements(this, this._drawSelectionElement, this.copyActiveRange, isDashLine, lineWidth, strokeColor);
 		};
 
 		WorksheetView.prototype._drawFormulaRanges = function (arrRanges){
@@ -4000,12 +4000,12 @@
 				y2 = Math.max(y2, yMR2);
 			}
 
-			if (null !== this.copyOfActiveRange) {
+			if (null !== this.copyActiveRange) {
 				// Координаты для перемещения диапазона
-				var xCopyAr1 = this.cols[this.copyOfActiveRange.c1].left - offsetX - this.width_2px;
-				var xCopyAr2 = this.cols[this.copyOfActiveRange.c2].left + this.cols[this.copyOfActiveRange.c2].width - offsetX + this.width_1px + this.width_2px;
-				var yCopyAr1 = this.rows[this.copyOfActiveRange.r1].top - offsetY - this.height_2px;
-				var yCopyAr2 = this.rows[this.copyOfActiveRange.r2].top + this.rows[this.copyOfActiveRange.r2].height - offsetY + this.height_1px + this.height_2px;
+				var xCopyAr1 = this.cols[this.copyActiveRange.c1].left - offsetX - this.width_2px;
+				var xCopyAr2 = this.cols[this.copyActiveRange.c2].left + this.cols[this.copyActiveRange.c2].width - offsetX + this.width_1px + this.width_2px;
+				var yCopyAr1 = this.rows[this.copyActiveRange.r1].top - offsetY - this.height_2px;
+				var yCopyAr2 = this.rows[this.copyActiveRange.r2].top + this.rows[this.copyActiveRange.r2].height - offsetY + this.height_1px + this.height_2px;
 
 				// Выбираем наибольший range для очистки
 				x1 = Math.min(x1, xCopyAr1);
@@ -6959,7 +6959,7 @@
 
 		WorksheetView.prototype.applyFormatPainter = function () {
 			var t = this;
-			var from = t.copyOfActiveRange.getAllRange(), to = t.activeRange.getAllRange();
+			var from = t.copyActiveRange.getAllRange(), to = t.activeRange.getAllRange();
 
 			var onApplyFormatPainterCallback = function (isSuccess) {
 				// Очищаем выделение
@@ -6985,11 +6985,11 @@
 					c_oAscFormatPainterState.kOn);
 
 			if (this.stateFormatPainter) {
-				this.copyOfActiveRange = this.activeRange.clone(true);
+				this.copyActiveRange = this.activeRange.clone(true);
 				this._drawFormatPainterRange();
 			} else {
 				this.cleanSelection();
-				this.copyOfActiveRange = null;
+				this.copyActiveRange = null;
 				this._drawSelection();
 				this.handlers.trigger("onStopFormatPainter");
 			}
@@ -10257,10 +10257,6 @@
 			this.isFormulaEditMode = isFormulaEditMode;
 		};
 
-		WorksheetView.prototype.getFormulaEditMode = function () {
-			return this.isFormulaEditMode;
-		};
-
 		WorksheetView.prototype.setSelectionDialogMode = function (selectionDialogType, selectRange) {
 			if (selectionDialogType === this.selectionDialogType)
 				return;
@@ -10269,26 +10265,20 @@
 			this.cleanSelection();
 
 			if (false === this.isSelectionDialogMode) {
-				if (null !== this.copyOfActiveRange) {
-					this.activeRange = this.copyOfActiveRange.clone(true);
-				}
-				this.copyOfActiveRange = null;
+				if (null !== this.copyActiveRange)
+					this.activeRange = this.copyActiveRange.clone(true);
+				this.copyActiveRange = null;
 			} else {
-				this.copyOfActiveRange = this.activeRange.clone(true);
+				this.copyActiveRange = this.activeRange.clone(true);
 				if (selectRange) {
-					var tmpSelectRange = parserHelp.parse3DRef(selectRange);
-					if (tmpSelectRange) {
-						// ToDo стоит менять и лист для диаграмм
-						tmpSelectRange = this.model.getRange2(tmpSelectRange.range);
-					} else {
-						// Это не 3D ссылка
-						tmpSelectRange = this.model.getRange2(selectRange);
+					if (typeof selectRange === 'string') {
+						selectRange = this.model.getRange2(selectRange);
+						if (selectRange)
+							selectRange = selectRange.getBBox0();
 					}
 
-					if (null !== tmpSelectRange) {
-						var bbox = tmpSelectRange.getBBox0();
-						this.activeRange.assign(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
-					}
+					if (null != selectRange)
+						this.activeRange.assign(selectRange.c1, selectRange.r1, selectRange.c2, selectRange.r2);
 				}
 			}
 			this._drawSelection();
