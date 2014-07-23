@@ -244,7 +244,7 @@ var rx_operators = /^ *[-+*\/^&%<=>:] */,
     rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/,
     rg_validHEXNumber = /^[0-9A-Fa-f]{1,10}$/,
     rg_validOCTNumber = /^[0-7]{1,10}$/,
-    rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" )
+    rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" );
 
 
 /**
@@ -252,348 +252,301 @@ var rx_operators = /^ *[-+*\/^&%<=>:] */,
  * @constructor
  */
 function parserHelper() {
+	this.operand_str = null;
+	this.pCurrPos = null;
 }
-parserHelper.prototype = {
-    _reset:function () {
-        delete this.operand_str;
-        delete this.pCurrPos;
-    },
+parserHelper.prototype._reset = function () {
+	this.operand_str = null;
+	this.pCurrPos = null;
+};
+parserHelper.prototype.isOperator = function ( formula, start_pos ) {
+	if (this instanceof parserHelper) {
+		this._reset();
+	}
 
-    isOperator:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	var str = formula.substring( start_pos );
+	var match = str.match( rx_operators );
+	if (match != null) {
+		var mt = str.match( rx_LG );
+		if ( mt ) match = mt;
+		this.operand_str = match[0].replace( rx_space_g, "" );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isFunc = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var str = formula.substring( start_pos );
-        var match = str.match( rx_operators );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            var mt = str.match( rx_LG );
-            if ( mt ) match = mt;
-            this.operand_str = match[0].replace( rx_space_g, "" );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
+	var frml = formula.substring( start_pos );
+	var match = (frml).match( rg );
 
-    isFunc:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	if (match != null) {
+		if ( match.length == 2 ) {
+			this.pCurrPos += match[1].length;
+			this.operand_str = match[1];
+			return true;
+		}
+	}
+	return false;
+};
+parserHelper.prototype.isArea = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var frml = formula.substring( start_pos );
-        var match = (frml).match( rg );
+	var subSTR = formula.substring( start_pos );
+	var match = subSTR.match( rgRange ) || subSTR.match( rgCols ) || subSTR.match( rgRows );
+	if (match != null) {
+		this.pCurrPos += match[0].length;
+		this.operand_str = match[0];
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isRef = function ( formula, start_pos, allRef ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
+	var substr = formula.substring( start_pos );
+	var match = substr.match( rx_ref );
+	if (match != null) {
+		var m0 = match[0], m1 = match[1], m2 = match[2];
+		if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow ) {
+			this.pCurrPos += m0.indexOf( " " ) > -1 ? m0.length - 1 : m1.length;
+			this.operand_str = m1;
+			return true;
+		} else if ( allRef ) {
+			match = substr.match( rx_refAll );
+			if ( (match != null || match != undefined) && match.length >= 3 ) {
+				var m1 = match[1];
+				this.pCurrPos += m1.length;
+				this.operand_str = m1;
+				return true;
+			}
+		}
+	}
 
-        if ( match != null && match != undefined ) {
-            if ( match.length == 2 ) {
-                this.pCurrPos += match[1].length;
-                this.operand_str = match[1];
-                return true;
-            }
-        }
-//        this.operand_str = null;
-        return false;
-    },
+	return false;
+};
+parserHelper.prototype.is3DRef = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-    isArea:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	var subSTR = formula.substring( start_pos );
+	var match = rx_ref3D_quoted.xexec( subSTR ) || rx_ref3D_non_quoted.xexec( subSTR );
 
-        var subSTR = formula.substring( start_pos );
-        var match = subSTR.match( rgRange ) || subSTR.match( rgCols ) || subSTR.match( rgRows );
-        if ( match != null || match != undefined ) {
-            this.pCurrPos += match[0].length;
-            this.operand_str = match[0];
-            return true;
-        }
-//        this.operand_str = null;
-        return false;
-    },
+	if (match != null) {
+		this.pCurrPos += match[0].length;
+		this.operand_str = match[1];
+		return [ true, match["name_from"] ? match["name_from"].replace( /''/g, "'" ) : null, match["name_to"] ? match["name_to"].replace( /''/g, "'" ) : null ];
+	}
+	return [false, null, null];
+};
+parserHelper.prototype.isNextPtg = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-    isRef:function ( formula, start_pos, allRef ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-        var substr = formula.substring( start_pos );
-        var match = substr.match( rx_ref );
-        if ( match != null || match != undefined ) {
-            var m0 = match[0], m1 = match[1], m2 = match[2];
-            if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow ) {
-                this.pCurrPos += m0.indexOf( " " ) > -1 ? m0.length - 1 : m1.length;
-                this.operand_str = m1;
-                return true;
-            }
-            else if ( allRef ) {
-                match = substr.match( rx_refAll );
-                if ( (match != null || match != undefined) && match.length >= 3 ) {
-                    var m1 = match[1];
-                    this.pCurrPos += m1.length;
-                    this.operand_str = m1;
-                    return true;
-                }
-            }
-        }
+	var subSTR = formula.substring( start_pos );
+	return (subSTR.match( rx_before_operators ) != null && subSTR.match( rx_space ) != null);
+};
+parserHelper.prototype.isNumber = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-//        this.operand_str = null;
-        return false;
-    },
+	var match = (formula.substring( start_pos )).match( rx_number );
+	if (match != null) {
+		this.operand_str = match[0];
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isLeftParentheses = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-    is3DRef:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	var match = (formula.substring( start_pos )).match( rx_LeftParentheses );
+	if (match != null) {
+		this.operand_str = match[0].replace( rx_space, "" );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isRightParentheses = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var subSTR = formula.substring( start_pos );
-        var match = rx_ref3D_quoted.xexec( subSTR ) || rx_ref3D_non_quoted.xexec( subSTR );
+	var match = (formula.substring( start_pos )).match( rx_RightParentheses );
+	if (match != null) {
+		this.operand_str = match[0].replace( rx_space, "" );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isComma = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        if ( match != null || match != undefined ) {
-            this.pCurrPos += match[0].length;
-            this.operand_str = match[1];
-            return [ true, match["name_from"] ? match["name_from"].replace( /''/g, "'" ) : null, match["name_to"] ? match["name_to"].replace( /''/g, "'" ) : null ];
-        }
-//        this.operand_str = null;
-        return [false, null, null];
-    },
+	var match = (formula.substring( start_pos )).match( rx_Comma );
+	if (match != null) {
+		this.operand_str = match[0];
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isError = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-    isNextPtg:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	var match = (formula.substring( start_pos )).match( rx_error );
+	if (match != null) {
+		this.operand_str = match[0];
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isBoolean = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var subSTR = formula.substring( start_pos );
-        return (
-            ( subSTR.match( rx_before_operators ) != null || subSTR.match( rx_before_operators ) != undefined ) &&
-                ( subSTR.match( rx_space ) != null || subSTR.match( rx_space ) != undefined )
-            )
-    },
+	var match = (formula.substring( start_pos )).match( rx_bool );
+	if (match != null) {
+		this.operand_str = match[1];
+		this.pCurrPos += match[1].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isString = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-    isNumber:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	var match = (formula.substring( start_pos )).match( rx_string );
+	if (match != null) {
+		this.operand_str = match[1].replace( "\"\"", "\"" );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isName = function ( formula, start_pos, wb, ws ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var match = (formula.substring( start_pos )).match( rx_number );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0];
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
+	var subSTR = formula.substring( start_pos );
+	var match = rx_name.xexec( subSTR );
 
-    isLeftParentheses:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	if (match != null) {
+		var name = match["name"];
+		if ( name && name.length != 0 && wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null ) ) {
+			this.pCurrPos += name.length;
+			this.operand_str = name;
+			return [ true, name ];
+		}
+		this.operand_str = name;
+	}
+	return [false];
+};
+parserHelper.prototype.isArray = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var match = (formula.substring( start_pos )).match( rx_LeftParentheses );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0].replace( rx_space, "" );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
+	var match = (formula.substring( start_pos )).match( rx_array );
 
-    isRightParentheses:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	if (match != null) {
+		this.operand_str = match[0].substring( 1, match[0].length - 1 );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
 
-        var match = (formula.substring( start_pos )).match( rx_RightParentheses );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0].replace( rx_space, "" );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
+	return false;
+};
+parserHelper.prototype.isLeftBrace = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-    isComma:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
+	var match = (formula.substring( start_pos )).match( rx_LeftBrace );
+	if (match != null) {
+		this.operand_str = match[0].replace( /\s/, "" );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+parserHelper.prototype.isRightBrace = function ( formula, start_pos ) {
+	if ( this instanceof parserHelper ) {
+		this._reset();
+	}
 
-        var match = (formula.substring( start_pos )).match( rx_Comma );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0];
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
+	var match = (formula.substring( start_pos )).match( rx_RightBrace );
+	if (match != null) {
+		this.operand_str = match[0].replace( rx_space, "" );
+		this.pCurrPos += match[0].length;
+		return true;
+	}
+	return false;
+};
+// Парсим ссылку на диапазон в листе
+parserHelper.prototype.parse3DRef = function ( formula ) {
+	// Сначала получаем лист
+	var is3DRefResult = this.is3DRef( formula, 0 );
+	if ( is3DRefResult && true === is3DRefResult[0] ) {
+		// Имя листа в ссылке
+		var sheetName = is3DRefResult[1];
+		// Ищем начало range
+		var indexStartRange = formula.indexOf( "!" ) + 1;
+		if ( this.isArea( formula, indexStartRange ) ) {
+			if ( this.operand_str.length == formula.substring( indexStartRange ).length )
+				return {sheet:sheetName, range:this.operand_str};
+			else
+				return null;
+		}
+		else if ( this.isRef( formula, indexStartRange ) ) {
+			if ( this.operand_str.length == formula.substring( indexStartRange ).length )
+				return {sheet:sheetName, range:this.operand_str};
+			else
+				return null;
 
-    isError:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var match = (formula.substring( start_pos )).match( rx_error );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0];
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
-
-    isBoolean:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var match = (formula.substring( start_pos )).match( rx_bool );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[1];
-            this.pCurrPos += match[1].length;
-            return true;
-        }
-        return false;
-    },
-
-    isString:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var match = (formula.substring( start_pos )).match( rx_string );
-        if ( match != null || match != undefined ) {
-            this.operand_str = match[1].replace( "\"\"", "\"" );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
-
-    isName:function ( formula, start_pos, wb, ws ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var subSTR = formula.substring( start_pos );
-        var match = rx_name.xexec( subSTR );
-
-        if ( match != null || match != undefined ) {
-            var name = match["name"];
-            if ( name && name.length != 0 && wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null ) ) {
-                this.pCurrPos += name.length;
-                this.operand_str = name;
-                return [ true, name ];
-            }
-            this.operand_str = name;
-        }
-        return [false];
-    },
-
-    isArray:function ( formula, start_pos, wb ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var subSTR = formula.substring( start_pos );
-        var match = (formula.substring( start_pos )).match( rx_array );
-
-        if ( match != null || match != undefined ) {
-            this.operand_str = match[0].substring( 1, match[0].length - 1 );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-
-        return false;
-    },
-
-    isLeftBrace:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var match = (formula.substring( start_pos )).match( rx_LeftBrace );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0].replace( /\s/, "" );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
-
-    isRightBrace:function ( formula, start_pos ) {
-        if ( this instanceof parserHelper ) {
-            this._reset();
-        }
-
-        var match = (formula.substring( start_pos )).match( rx_RightBrace );
-        if ( match == null || match == undefined )
-            return false;
-        else {
-            this.operand_str = match[0].replace( rx_space, "" );
-            this.pCurrPos += match[0].length;
-            return true;
-        }
-        return false;
-    },
-
-    // Парсим ссылку на диапазон в листе
-    parse3DRef:function ( formula ) {
-        // Сначала получаем лист
-        var is3DRefResult = this.is3DRef( formula, 0 );
-        if ( is3DRefResult && true === is3DRefResult[0] ) {
-            // Имя листа в ссылке
-            var sheetName = is3DRefResult[1];
-            // Ищем начало range
-            var indexStartRange = formula.indexOf( "!" ) + 1;
-            if ( this.isArea( formula, indexStartRange ) ) {
-                if ( this.operand_str.length == formula.substring( indexStartRange ).length )
-                    return {sheet:sheetName, range:this.operand_str};
-                else
-                    return null;
-            }
-            else if ( this.isRef( formula, indexStartRange ) ) {
-                if ( this.operand_str.length == formula.substring( indexStartRange ).length )
-                    return {sheet:sheetName, range:this.operand_str};
-                else
-                    return null;
-
-            }
-        }
-        // Возвращаем ошибку
-        return null;
-    },
-
-	// Возвращает ссылку на диапазон с листом (название листа экранируется)
-	get3DRef: function (sheet, range) {
-        sheet = sheet.split(":");
-        var wsFrom = sheet[0],
-            wsTo = sheet[1] === undefined ? wsFrom : sheet[1];
-        if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
-            return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + range;
-        }
-        else{
-            wsFrom = wsFrom.replace( /'/g, "''" );
-            wsTo = wsTo.replace( /'/g, "''" );
-            return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + range;
-        }
-	},
-
-	// Возвращает экранируемое название листа
-	getEscapeSheetName: function (sheet) {
-		return rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
+		}
+	}
+	// Возвращаем ошибку
+	return null;
+};
+// Возвращает ссылку на диапазон с листом (название листа экранируется)
+parserHelper.prototype.get3DRef = function (sheet, range) {
+	sheet = sheet.split(":");
+	var wsFrom = sheet[0],
+		wsTo = sheet[1] === undefined ? wsFrom : sheet[1];
+	if ( rx_test_ws_name.test( wsFrom ) && rx_test_ws_name.test( wsTo ) ) {
+		return (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "!" + range;
+	} else {
+		wsFrom = wsFrom.replace( /'/g, "''" );
+		wsTo = wsTo.replace( /'/g, "''" );
+		return "'" + (wsFrom !== wsTo ? wsFrom + ":" + wsTo : wsFrom) + "'!" + range;
 	}
 };
+// Возвращает экранируемое название листа
+parserHelper.prototype.getEscapeSheetName = function (sheet) {
+	return rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
+};
+
 var parserHelp = new parserHelper();
