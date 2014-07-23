@@ -1451,7 +1451,7 @@ CChartSpace.prototype =
                     if(cur_axis.title)
                     {
                         checkTxBodyDefFonts(allFonts, cur_axis.title.txPr);
-                        if(cur_axis.title.tx && chart.title.tx.rich)
+                        if(cur_axis.title.tx && cur_axis.title.tx.rich)
                         {
                             checkTxBodyDefFonts(allFonts, cur_axis.title.tx.rich);
                             cur_axis.title.tx.rich.content && cur_axis.title.tx.rich.content.Document_Get_AllFontNames(allFonts);
