@@ -454,13 +454,28 @@ Paragraph.prototype =
         this.Content.splice( Pos, 0, Item );
 
         if ( this.CurPos.ContentPos >= Pos )
+        {
             this.CurPos.ContentPos++;
+            
+            if ( this.CurPos.ContentPos >= this.Content.length )
+                this.CurPos.ContentPos = this.Content.length - 1;
+        }
 
         if ( this.Selection.StartPos >= Pos )
+        {
             this.Selection.StartPos++;
 
+            if ( this.Selection.StartPos >= this.Content.length )
+                this.Selection.StartPos = this.Content.length - 1;
+        }
+
         if ( this.Selection.EndPos >= Pos )
+        {
             this.Selection.EndPos++;
+
+            if ( this.Selection.EndPos >= this.Content.length )
+                this.Selection.EndPos = this.Content.length - 1;
+        }
 
         // Обновляем позиции в NearestPos
         var NearPosLen = this.NearPosArray.length;
@@ -546,13 +561,28 @@ Paragraph.prototype =
         this.Content.splice( Pos, 1 );
 
         if ( this.Selection.StartPos > Pos )
+        {
             this.Selection.StartPos--;
+            
+            if ( this.Selection.StartPos < 0 )
+                this.Selection.StartPos = 0;
+        }
 
         if ( this.Selection.EndPos >= Pos )
+        {
             this.Selection.EndPos--;
+            
+            if ( this.Selection.EndPos < 0 )
+                this.Selection.EndPos = 0;
+        }
 
         if ( this.CurPos.ContentPos > Pos )
+        {
             this.CurPos.ContentPos--;
+            
+            if ( this.CurPos.ContentPos < 0 )
+                this.CurPos.ContentPos = 0;
+        }
 
         // Обновляем позиции в NearestPos
         var NearPosLen = this.NearPosArray.length;
@@ -9558,7 +9588,7 @@ Paragraph.prototype =
     {
         var Parent = this.Parent;
 
-        if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos )
+        if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
         return false;

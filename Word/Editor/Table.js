@@ -18935,6 +18935,8 @@ function CTableRow(Table, Cols, TableGrid)
     if (typeof CollaborativeEditing !== "undefined")
         CollaborativeEditing.Add_NewDC(this);
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    
+    this.Index = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -20327,6 +20329,8 @@ function CTableCell(Row, ColW)
         CurPage : 0,
         Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
     };
+    
+    this.Index = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
