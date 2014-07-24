@@ -259,12 +259,11 @@ ThemeColor.prototype =
 				var oCColorModifiers = new CColorModifiers();
 				var HSL = {H: 0, S: 0, L: 0};
 				oCColorModifiers.RGB2HSL(r, g, b, HSL);
-				var L = HSL.L / g_nHSLMaxValue;
 				if (this.tint < 0)
-					L = L * (1 + this.tint);
+					HSL.L = HSL.L * (1 + this.tint);
 				else
-					L = L * (1 - this.tint) + (1 - 1 * (1 - this.tint));
-				HSL.L = Asc.floor(L * g_nHSLMaxValue);
+					HSL.L = HSL.L * (1 - this.tint) + (g_nHSLMaxValue - g_nHSLMaxValue * (1 - this.tint));
+				HSL.L >>= 0;
 				var RGB = {R: 0, G: 0, B: 0};
 				oCColorModifiers.HSL2RGB(HSL, RGB);
 				r = RGB.R;

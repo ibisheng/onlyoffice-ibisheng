@@ -836,7 +836,7 @@
 	/**
 	 *
 	 * @param font
-	 * @param angle
+	 * @param [angle]
 	 * @returns {DrawingContext}
 	 */
 	DrawingContext.prototype.setFont = function (font, angle) {

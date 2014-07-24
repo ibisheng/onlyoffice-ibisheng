@@ -1,7 +1,6 @@
 "use strict";
 
-var d1,d2,d3;
-var g_nHSLMaxValue = 240;
+var g_nHSLMaxValue = 255;
 var g_nVerticalTextAngle = 255;
 var gc_dDefaultColWidthCharsAttribute;//определяется в WorksheetView.js
 var gc_dDefaultRowHeightAttribute;//определяется в WorksheetView.js

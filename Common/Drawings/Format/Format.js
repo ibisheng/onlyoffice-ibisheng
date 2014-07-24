@@ -808,8 +808,8 @@ CColorModifiers.prototype =
 
     RGB2HSL : function(R, G, B, HLS)
     {
-        var iMin = Math.min(R, Math.min(G, B));
-        var iMax = Math.max(R, Math.max(G, B));
+        var iMin = Math.min(R, G, B);
+        var iMax = Math.max(R, G, B);
         var iDelta = iMax - iMin;
         var dMax = (iMax + iMin)/255.0;
         var dDelta = iDelta/255.0;

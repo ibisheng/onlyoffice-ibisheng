@@ -3504,7 +3504,7 @@
         function xnpv( rate, valueArray, dateArray ){
             var res = 0, r = rate;
 
-            d1 = dateArray[0];
+            var d1 = dateArray[0];
 
             for( var i = 0; i < dateArray.length; i++ ){
 
