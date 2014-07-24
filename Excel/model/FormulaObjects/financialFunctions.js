@@ -5122,7 +5122,7 @@ cSYD.prototype.Calculate = function ( arg ) {
     life = life.getValue();
     per = per.getValue();
 
-    if ( life == 1 || life <= 0 || cost < 0 || salvage < 0 || per < 0 ) {
+    if ( life == 1 || life <= 0 || salvage < 0 || per < 0 ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
