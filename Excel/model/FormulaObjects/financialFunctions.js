@@ -5597,22 +5597,23 @@ cXIRR.prototype = Object.create( cBaseFunction.prototype );
 cXIRR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 0.1 );
 
-    function lcl_sca_XirrResult( values, dates, rate ) {
-        var D_0 = dates[0];
-        var r = rate + 1;
-        var res = values[0];
-        for ( var i = 1, count = values.length; i < count; ++i )
+    function xirrFunction( values, dates, rate ) {
+        var D_0 = dates[0],
+            r = rate + 1,
+            res = values[0];
+        for ( var i = 1, count = values.length; i < count; i++ ){
             res += values[i] / Math.pow( r, (dates[i] - D_0) / 365 );
+        }
         return res;
     }
 
-    function lcl_sca_XirrResult_Deriv1( values, dates, rate ) {
-        var D_0 = dates[0];
-        var r = rate + 1;
-        var res = 0;
-        for ( var i = 1, count = values.length; i < count; ++i ) {
-            var E_i = (dates[i] - D_0) / 365;
-            res -= E_i * values[i] / Math.pow( r, E_i + 1 );
+    function xirrDeriv( values, dates, rate ) {
+        var D_0 = dates[0],
+            r = rate + 1,
+            res = 0, sumDerivI;
+        for ( var i = 1, count = values.length; i < count; i++ ) {
+            sumDerivI = (dates[i] - D_0) / 365;
+            res -= sumDerivI * values[i] / Math.pow( r, sumDerivI + 1 );
         }
         return res;
     }
@@ -5621,7 +5622,13 @@ cXIRR.prototype.Calculate = function ( arg ) {
 
         var arr0 = valueArray[0], arr1 = dateArray[0];
 
-        if ( arr0 instanceof cError || arr1 instanceof cError || arr0.getValue() == 0 ) {
+        if ( arr0 instanceof cError ){
+            return arr0;
+        }
+        if ( arr1 instanceof cError ){
+            return arr1;
+        }
+        if ( arr0.getValue() == 0 ) {
             return new cError( cErrorType.not_numeric );
         }
 
@@ -5633,7 +5640,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return new cError( cErrorType.not_numeric );
 
         var deltaEps = 1e-6, maxIter = 100, wasNeg = false, wasPos = false,
-            newRate, eps, xirrRes, bContLoop = true;
+            newXirrRes, eps, xirrRes, bContLoop = true;
 
         for ( var i = 0; i < dateArray.length; i++ ) {
             dateArray[i] = dateArray[i].tocNumber();
@@ -5661,13 +5668,13 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return new cError( cErrorType.not_numeric );
         }
 
-        for ( var i = 0; i < maxIter && bContLoop; i++ ) {
-            xirrRes = lcl_sca_XirrResult( valueArray, dateArray, res );
-            newRate = res - xirrRes / lcl_sca_XirrResult_Deriv1( valueArray, dateArray, res );
-            eps = Math.abs( newRate - res );
-            res = newRate;
+        do{
+            xirrRes = xirrFunction( valueArray, dateArray, res );
+            newXirrRes = res - xirrRes / xirrDeriv( valueArray, dateArray, res );
+            eps = Math.abs( newXirrRes - res );
+            res = newXirrRes;
             bContLoop = (eps > deltaEps) && (Math.abs( xirrRes ) > deltaEps);
-        }
+        }while( --maxIter && bContLoop );
 
         if ( bContLoop ) {
             return new cError( cErrorType.not_numeric );
@@ -5727,6 +5734,9 @@ cXIRR.prototype.Calculate = function ( arg ) {
             if ( c instanceof cNumber ) {
                 dateArray.push( c );
             }
+            else if ( c instanceof cEmpty ) {
+                dateArray.push( c.tocNumber() );
+            }
             else {
                 dateArray.push( new cError( cErrorType.wrong_value_type ) );
             }
@@ -5736,6 +5746,9 @@ cXIRR.prototype.Calculate = function ( arg ) {
         arg1.foreach( function ( c ) {
             if ( c instanceof cNumber ) {
                 dateArray.push( c );
+            }
+            else if( c instanceof cEmpty ){
+                dateArray.push( c.tocNumber() );
             }
             else {
                 dateArray.push( new cError( cErrorType.wrong_value_type ) );

@@ -4599,9 +4599,9 @@
             if ( res <= -1 )
                 return "#NUM!"
 
-            var fMaxEps = 1e-10, maxIter = 50;
+            var fMaxEps = 1e-6, maxIter = 100;
 
-            var newRate, eps, xirrRes, bContLoop, nIter = 0;
+            var newRate, eps, xirrRes, bContLoop;
             do
              {
                  xirrRes = lcl_sca_XirrResult( valueArray, dateArray, res );
@@ -4610,7 +4610,7 @@
                  res = newRate;
                  bContLoop = (eps > fMaxEps) && (Math.abs( xirrRes ) > fMaxEps);
              }
-             while ( bContLoop && (++nIter < maxIter) );
+             while ( --maxIter && bContLoop );
 
             if ( bContLoop )
                 return "#NUM!";
