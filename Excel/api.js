@@ -99,7 +99,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			// AutoSave
 			this.lastSaveTime = null;				// Время последнего сохранения
-			this.autoSaveGapFast = 5000;			// Интервал быстрого автосохранения (когда человек один) - 5 сек.
+			this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
 			this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
 
 			this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
