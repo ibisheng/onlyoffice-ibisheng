@@ -8437,7 +8437,7 @@ CParaPr.prototype =
         if(undefined != this.DefaultRunPr && undefined != ParaPr.DefaultRunPr)
             Result_ParaPr.DefaultRunPr = this.DefaultRunPr.Compare(ParaPr.DefaultRunPr);
 
-        if(undefined != this.Lvl && undefined != ParPr.Lvl && ParPr.Lvl === this.Lvl)
+        if(undefined != this.Lvl && undefined != ParaPr.Lvl && ParaPr.Lvl === this.Lvl)
             Result_ParaPr.Lvl = this.Lvl;
 
 
