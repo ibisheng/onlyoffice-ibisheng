@@ -1,5 +1,7 @@
 "use strict";
 
+var g_fontManager2 = null;
+
 function CClipManager()
 {
     this.clipRects = [];
@@ -100,10 +102,10 @@ function CBrush()
 var MATRIX_ORDER_PREPEND    = 0;
 var MATRIX_ORDER_APPEND     = 1;
 
-var bIsChrome = AscBrowser.isChrome;
-var bIsSafari = AscBrowser.isSafari;
-var bIsIE = AscBrowser.isIE;
-var bIsAndroid = AscBrowser.isAndroid;
+var bIsChrome   = AscBrowser.isChrome;
+var bIsSafari   = AscBrowser.isSafari;
+var bIsIE       = AscBrowser.isIE;
+var bIsAndroid  = AscBrowser.isAndroid;
 
 function deg2rad(deg){
     return deg * Math.PI / 180.0;
@@ -500,6 +502,13 @@ function CGraphics()
     this.IsClipContext = false;
 
     this.ClearMode = false;
+
+ 	this.IsUseFonts2        = false;
+    this.m_oFontManager2    = null;
+    this.m_oLastFont2       = null;
+
+    this.ClearMode          = false;
+    this.IsRetina           = false;
 }
 
 CGraphics.prototype =
@@ -525,8 +534,10 @@ CGraphics.prototype =
             this.TextureFillTransformScaleY *= (height_px / (height_mm * g_dKoef_mm_to_pix))
         }
 		
+        /*
 		if (true == this.m_oContext.mozImageSmoothingEnabled)
 			this.m_oContext.mozImageSmoothingEnabled = false;
+        */
 
         this.m_oLastFont.Clear();
         this.m_oContext.save();
@@ -812,6 +823,30 @@ CGraphics.prototype =
                 this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
         }
         */
+    },
+	
+	CheckUseFonts2 : function(_transform)
+    {
+        if (!global_MatrixTransformer.IsIdentity2(_transform))
+        {
+            if (window.g_fontManager2 == null)
+            {
+                window.g_fontManager2 = new CFontManager();
+                window.g_fontManager2.Initialize(true);
+            }
+
+            this.m_oFontManager2 = window.g_fontManager2;
+
+            if (null == this.m_oLastFont2)
+                this.m_oLastFont2 = new CFontSetup();
+
+            this.IsUseFonts2 = true;
+        }
+    },
+
+    UncheckUseFonts2 : function()
+    {
+        this.IsUseFonts2 = false;
     },
 
     FreeFont : function()
@@ -1116,13 +1151,16 @@ CGraphics.prototype =
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-        this.m_oLastFont.SetUpIndex = font.FontFamily.Index;
-        this.m_oLastFont.SetUpSize = font.FontSize;
-        this.m_oLastFont.SetUpStyle = oFontStyle;
+        var _last_font = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
 
-        window.g_font_infos[font.FontFamily.Index].LoadFont(window.g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+        _last_font.SetUpIndex = font.FontFamily.Index;
+        _last_font.SetUpSize = font.FontSize;
+        _last_font.SetUpStyle = oFontStyle;
 
-        var _mD = this.m_oLastFont.SetUpMatrix;
+        window.g_font_infos[font.FontFamily.Index].LoadFont(window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+
+        var _mD = _last_font.SetUpMatrix;
         var _mS = this.m_oTransform;
 
         _mD.sx = _mS.sx;
@@ -1132,7 +1170,7 @@ CGraphics.prototype =
         _mD.tx = _mS.tx;
         _mD.ty = _mS.ty;
 
-        //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
+        //_font_manager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
         //    this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
     },
 
@@ -1150,7 +1188,7 @@ CGraphics.prototype =
     SetFontSlot : function(slot, fontSizeKoef)
     {
         var _rfonts = this.m_oTextPr.RFonts;
-        var _lastFont = this.m_oLastFont;
+        var _lastFont = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
 
         switch (slot)
         {
@@ -1230,17 +1268,28 @@ CGraphics.prototype =
         if (_lastFont.Bold)
             _style += 1;
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
         if (_lastFont.Index != _lastFont.SetUpIndex || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
         {
             _lastFont.SetUpIndex = _lastFont.Index;
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, this.m_oFontManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+
+            var _mD = _lastFont.SetUpMatrix;
+            var _mS = this.m_oTransform;
+            _mD.sx = _mS.sx;
+            _mD.sy = _mS.sy;
+            _mD.shx = _mS.shx;
+            _mD.shy = _mS.shy;
+            _mD.tx = _mS.tx;
+            _mD.ty = _mS.ty;
         }
         else
         {
-            var _mD = this.m_oLastFont.SetUpMatrix;
+            var _mD = _lastFont.SetUpMatrix;
             var _mS = this.m_oTransform;
 
             if (_mD.sx != _mS.sx || _mD.sy != _mS.sy || _mD.shx != _mS.shx || _mD.shy != _mS.shy || _mD.tx != _mS.tx || _mD.ty != _mS.ty)
@@ -1252,11 +1301,11 @@ CGraphics.prototype =
                 _mD.tx = _mS.tx;
                 _mD.ty = _mS.ty;
 
-                this.m_oFontManager.SetTextMatrix(_mD.sx,_mD.shy,_mD.shx,_mD.sy,_mD.tx,_mD.ty);
+                _font_manager.SetTextMatrix(_mD.sx,_mD.shy,_mD.shx,_mD.sy,_mD.tx,_mD.ty);
             }
         }
 
-        //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
+        //_font_manager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
         //    this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
     },
 
@@ -1274,9 +1323,11 @@ CGraphics.prototype =
         var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
         var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
         try
         {
-            this.m_oFontManager.LoadString2C(text,_x,_y);
+            _font_manager.LoadString2C(text,_x,_y);
         }
         catch(err)
         {
@@ -1286,7 +1337,7 @@ CGraphics.prototype =
         {
             this.m_oContext.setTransform(1,0,0,1,0,0);
         }
-        var pGlyph = this.m_oFontManager.m_oGlyphString.m_pGlyphsBuffer[0];
+        var pGlyph = _font_manager.m_oGlyphString.m_pGlyphsBuffer[0];
         if (null == pGlyph)
             return;
 
@@ -1308,9 +1359,11 @@ CGraphics.prototype =
 		var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
 		var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
 		try
 		{
-			this.m_oFontManager.LoadString2(text,_x,_y);
+			_font_manager.LoadString2(text,_x,_y);
 		}
 		catch(err)
 		{
@@ -1319,7 +1372,7 @@ CGraphics.prototype =
 	    this.m_oContext.setTransform(1,0,0,1,0,0);
         while (true)
         {
-            var pGlyph = this.m_oFontManager.GetNextChar2();
+            var pGlyph = _font_manager.GetNextChar2();
             if (null == pGlyph)
                 break;
 
@@ -1343,16 +1396,18 @@ CGraphics.prototype =
         var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
         var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
         try
         {
-            this.m_oFontManager.LoadString2C(text,_x,_y);
+            _font_manager.LoadString2C(text,_x,_y);
         }
         catch(err)
         {
         }
 
         this.m_oContext.setTransform(1,0,0,1,0,0);
-        var pGlyph = this.m_oFontManager.m_oGlyphString.m_pGlyphsBuffer[0];
+        var pGlyph = _font_manager.m_oGlyphString.m_pGlyphsBuffer[0];
         if (null == pGlyph)
             return;
 
@@ -1374,9 +1429,11 @@ CGraphics.prototype =
         var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
         var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
         try
         {
-            this.m_oFontManager.LoadString2(text,_x,_y);
+            _font_manager.LoadString2(text,_x,_y);
         }
         catch(err)
         {
@@ -1385,7 +1442,7 @@ CGraphics.prototype =
         this.m_oContext.setTransform(1,0,0,1,0,0);
         while (true)
         {
-            var pGlyph = this.m_oFontManager.GetNextChar2();
+            var pGlyph = _font_manager.GetNextChar2();
             if (null == pGlyph)
                 break;
 
@@ -1410,9 +1467,11 @@ CGraphics.prototype =
         var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
         var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
         try
         {
-            this.m_oFontManager.LoadString4C(lUnicode,_x,_y);
+            _font_manager.LoadString4C(lUnicode,_x,_y);
         }
         catch(err)
         {
@@ -1422,7 +1481,7 @@ CGraphics.prototype =
         {
             this.m_oContext.setTransform(1,0,0,1,0,0);
         }
-        var pGlyph = this.m_oFontManager.m_oGlyphString.m_pGlyphsBuffer[0];
+        var pGlyph = _font_manager.m_oGlyphString.m_pGlyphsBuffer[0];
         if (null == pGlyph)
             return;
 
@@ -1445,9 +1504,11 @@ CGraphics.prototype =
         var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
         var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
 
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
         try
         {
-            this.m_oFontManager.LoadString3C(text,_x,_y);
+            _font_manager.LoadString3C(text,_x,_y);
         }
         catch(err)
         {
@@ -1457,7 +1518,7 @@ CGraphics.prototype =
         {
             this.m_oContext.setTransform(1,0,0,1,0,0);
         }
-        var pGlyph = this.m_oFontManager.m_oGlyphString.m_pGlyphsBuffer[0];
+        var pGlyph = _font_manager.m_oGlyphString.m_pGlyphsBuffer[0];
         if (null == pGlyph)
             return;
 
@@ -1491,8 +1552,10 @@ CGraphics.prototype =
         if (0 == nW || 0 == nH)
             return;
 
-        var nX = (this.m_oFontManager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
-        var nY = (this.m_oFontManager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
+        var nX = (_font_manager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
+        var nY = (_font_manager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
 
         pGlyph.oBitmap.oGlyphData.checkColor(this.m_oBrush.Color1.R,this.m_oBrush.Color1.G,this.m_oBrush.Color1.B,nW,nH);
 
@@ -1510,8 +1573,10 @@ CGraphics.prototype =
         if (0 == nW || 0 == nH)
             return;
 
-        var nX = (this.m_oFontManager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
-        var nY = (this.m_oFontManager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
+        var nX = (_font_manager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
+        var nY = (_font_manager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
 
         var d_koef = this.m_dDpiX / 25.4;
 
@@ -1535,8 +1600,10 @@ CGraphics.prototype =
         if (0 == nW || 0 == nH)
             return;
 
-        var nX = parseInt(this.m_oFontManager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
-        var nY = parseInt(this.m_oFontManager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
+        var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
+
+        var nX = (_font_manager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
+        var nY = (_font_manager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
 
         var imageData = this.m_oContext.getImageData(nX,nY,nW,nH);
         var pPixels = imageData.data;
