@@ -2755,23 +2755,15 @@
                         for(var selDr = 0; selDr < oDrawingSelected.length; selDr++)
                         {
                             curDrawing = oDrawingSelected[selDr];
-							oDrawing = curDrawing.drawingBase;
+
+							//меняем graphicObject на время записи
+							graphicObject = oDrawing.graphicObject;
+							oDrawing.graphicObject = curDrawing;
+
+                            this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing, curDrawing);});
 							
-							if(oDrawing)
-							{
-								//меняем graphicObject на время записи
-								graphicObject = oDrawing.graphicObject;
-								oDrawing.graphicObject = curDrawing;
-								
-								this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing, curDrawing);});
-								
-								//возвращаем graphicObject обратно
-								oDrawing.graphicObject = graphicObject;
-							}
-							else
-							{
-								this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(curDrawing, curDrawing);});
-							};
+							//возвращаем graphicObject обратно
+							oDrawing.graphicObject = graphicObject;
                         }
                     }
                     else
