@@ -4125,6 +4125,7 @@
 				var formatText, fontFamily, colorText;
 				
 				var paragraphFontSize = paraPr.TextPr.FontSize;
+				var paragraphFontFamily = paraPr.TextPr && paraPr.TextPr.FontFamily ? paraPr.TextPr.FontFamily.Name : "Arial";
 				var paragraphBold = paraPr.TextPr.Bold;
 				var paragraphItalic = paraPr.TextPr.Italic;
 				var paragraphStrikeout = paraPr.TextPr.Strikeout;
@@ -4142,7 +4143,7 @@
 				else
 					colorText = null;
 				
-				fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
+				fontFamily = cTextPr.fontFamily ? cTextPr.fontFamily.Name : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
 				this.fontsNew[fontFamily] = 1;
 				
 				var verticalAlign;
