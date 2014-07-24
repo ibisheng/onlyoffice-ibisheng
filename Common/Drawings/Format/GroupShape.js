@@ -1004,12 +1004,12 @@ CGroupShape.prototype =
     },
 
 
-    rebuildSeries: function()
+    rebuildSeries: function(data)
     {
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(this.spTree[i].rebuildSeries)
-                this.spTree[i].rebuildSeries();
+                this.spTree[i].rebuildSeries(data);
         }
     },
 
