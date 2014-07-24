@@ -1309,9 +1309,10 @@ ParaMath.prototype =
                     var X = SearchPos.X,
                         Y = SearchPos.Y;
 
+                    //console.log("Get_ParaContentPosByXY: X " + SearchPos.X + " Y " + SearchPos.Y);
+
                     SearchPos.X -= this.X;
                     SearchPos.Y -= this.Y;
-
 
 
                     this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);

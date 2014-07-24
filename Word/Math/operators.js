@@ -3752,66 +3752,60 @@ CDelimiter.prototype.setPosition = function(position)
     content.setPosition(PosContent); // CMathContent*/
 
 }
-CDelimiter.prototype.findDisposition = function(pos)
+CDelimiter.prototype.findDisposition = function(SearchPos, Depth)
 {
-    var curs_X = 0,
-        curs_Y = 0;
-    var X, Y;
+    var begWidth = this.begOper.size.width,
+        sepWidth = this.sepOper.size.width,
+        endWidth = this.endOper.size.width;
 
-    var inside_flag = -1;
+    SearchPos.Pos.Update(0, Depth);
 
-    if(pos.x < this.begOper.size.width)
+    var Curr_Pos_Y;
+
+    if(SearchPos.X < begWidth)
     {
-        curs_Y = 0;
-        X = 0;
-        inside_flag = 0;
+        Curr_Pos_Y = 0;
+        SearchPos.X = 0;
     }
-    else if(pos.x > this.size.width - this.endOper.size.width)
+    else if(SearchPos.X > this.size.width - endWidth)
     {
-        curs_Y = this.nCol - 1;
-        X = this.elements[0][this.nCol - 1].size.width;
-        inside_flag = 1;
+        Curr_Pos_Y = 0;
+        SearchPos.X = this.elements[0][this.nCol - 1].size.width;
     }
     else
     {
-        var xx = this.begOper.size.width;
+        var ww = begWidth;
+
+        Curr_Pos_Y = this.nCol - 1;
 
         for(var j = 0; j < this.nCol; j++)
         {
-            if(xx + this.elements[0][j].size.width + this.sepOper.size.width/2 > pos.x)
+            if(ww + this.elements[0][j].size.width + this.sepOper.size.width/2 > SearchPos.X)
             {
-                curs_Y = j;
-                if( pos.x < xx + this.elements[0][j].size.width)
-                    X = pos.x - xx;
+                Curr_Pos_Y = j;
+
+                if( SearchPos.X < ww + this.elements[0][j].size.width)
+                    SearchPos.X -= ww;
                 else
-                    X = xx + this.elements[0][j].size.width;
+                    SearchPos.X = ww + this.elements[0][j].size.width;
                 break;
             }
 
-            xx += this.elements[0][j].size.width + this.sepOper.size.width;
+            ww += this.elements[0][j].size.width + sepWidth;
         }
     }
 
-    var align = this.align( this.elements[0][curs_Y]);
+    SearchPos.Pos.Update(Curr_Pos_Y, Depth+1);
 
 
-    if(align > pos.y)
-    {
-        Y = 0;
-        inside_flag = 2;
-    }
-    else if(this.elements[0][curs_Y].size.height + align < pos.y)
-    {
-        Y = this.elements[0][curs_Y].size.height;
-        inside_flag = 2;
-    }
+    var align = this.align(this.elements[0][Curr_Pos_Y]);
+
+    if(align > SearchPos.Y)
+        SearchPos.Y = 0;
+    else if(this.elements[0][Curr_Pos_Y].size.height + align < SearchPos.Y)
+        SearchPos.Y = this.elements[0][Curr_Pos_Y].size.height;
     else
-        Y = pos.y - align;
-
-    var mouseCoord = {x: X, y: Y},
-        posCurs =    {x: curs_X, y: curs_Y};
-
-    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+        SearchPos.Y -= align;
 
 }
 CDelimiter.prototype.draw = function(x, y, pGraphics)
@@ -4043,55 +4037,34 @@ CCharacter.prototype.draw = function(x, y, pGraphics)
     this.operator.draw(x, y, pGraphics);
 
 }
-CCharacter.prototype.findDisposition = function(pos)
+CCharacter.prototype.findDisposition = function(SearchPos, Depth)
 {
-    var curs_X = 0,
-        curs_Y = 0;
-    var X, Y;
+    var base = this.elements[0][0],
+        align = this.align(base);
 
-    var inside_flag = -1;
-
-    var content = this.elements[0][0],
-        align = this.align(content);
-
-    if(pos.x < align)
-    {
-        X = 0;
-        inside_flag = 0;
-    }
-    else if(pos.x > align + content.size.width)
-    {
-        X = content.size.width;
-        inside_flag = 1;
-    }
+    if(SearchPos.X < align)
+        SearchPos.X = 0;
+    else if(SearchPos.X > align + base.size.width)
+        SearchPos.X = base.size.width;
     else
-        X = pos.x - align;
+        SearchPos.X -= align;
 
     if(this.Pr.pos === LOCATION_TOP)
     {
-        if(pos.y < this.operator.size.height)
-        {
-            Y = 0;
-            inside_flag = 2;
-        }
+        if(SearchPos.Y < this.operator.size.height)
+            SearchPos.Y = 0;
         else
-            Y = pos.y - this.operator.size.height;
+            SearchPos.Y -= this.operator.size.height;
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
-        if(pos.y > content.size.height)
-        {
-            Y = content.size.height;
-            inside_flag = 2;
-        }
-        else
-            Y = pos.y;
+        if(SearchPos.Y > base.size.height)
+            SearchPos.Y = base.size.height;
     }
 
-    var mouseCoord = {x: X, y: Y},
-        posCurs =    {x: curs_X, y: curs_Y};
+    SearchPos.Pos.Update(0, Depth);
+    SearchPos.Pos.Update(0, Depth+1);
 
-    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
 CCharacter.prototype.getBase = function()
 {

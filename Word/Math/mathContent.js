@@ -4014,27 +4014,28 @@ CMathContent.prototype =
 
         return result;
     },
-    findPosition: function(X, Y)
+    findDisposition: function(SearchPos, Depth)
     {
-        var W = 0, width = 0;
+        var W = 0;
         var pos = 0;
-        for(var i = 0; i < this.content.length && X > W; i++)
+        for(var i = 0; i < this.content.length && SearchPos.X > W; i++)
         {
             W += this.content[i].size.width;
-            width = this.content[i].size.width;
-
             pos = i;
         }
 
         if( this.content[pos].Type === para_Math_Composition )
         {
-            if(X < W - width + this.content[pos].GapLeft)
+            if(SearchPos.X < W - this.content[pos].size.width + this.content[pos].GapLeft)
                 pos--;
-            else if(X >= W - this.content[pos].GapRight)
+            else if(SearchPos.X >= W - this.content[pos].GapRight)
                 pos++;
         }
 
-        return pos;
+        SearchPos.Pos.Update(pos, Depth);
+        SearchPos.X -= this.WidthToElement[pos];
+
+        //return pos;
     },
     setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
@@ -4206,6 +4207,10 @@ CMathContent.prototype =
     GetParent: function()
     {
         return this.Parent.GetParent();
+    },
+    SetArgSize: function(val)
+    {
+        this.ArgSize.SetValue(val);
     },
 
 
@@ -4452,21 +4457,22 @@ CMathContent.prototype =
         }
 
         this.content = NewContent;
-
     },
     SetRunEmptyToContent: function(bAll)
     {
         var len = this.content.length;
 
-        var current = null, left = null;
-        var emptyRun, ctrPrp, mathPrp, txtPrp;
+        var current = null;
+        var emptyRun, ctrPrp, mathPrp;
 
-        for(var i = 0; i < len; i++)
+        var currPos = 0;
+
+        while(currPos < len)
         {
-            current = this.content[i];
+            current = this.content[currPos];
 
-            var bLeftRun  = left !== null ? left.Type == para_Math_Run : false,
-                bRightRun = i < len - 1 ? this.content[i + 1].Type === para_Math_Run : false;
+            var bLeftRun  = currPos > 0 ? this.content[currPos-1].Type == para_Math_Run : false,
+                bRightRun = currPos < len - 1 ? this.content[currPos + 1].Type === para_Math_Run : false;
 
             var bCurrComp = current.Type == para_Math_Composition,
                 bCurrEmptyRun = current.Type == para_Math_Run && current.Is_Empty();
@@ -4474,7 +4480,7 @@ CMathContent.prototype =
             var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
 
             if(bCurrComp && bAll == true)
-                this.content[i].SetRunEmptyToContent(bAll);
+                this.content[currPos].SetRunEmptyToContent(bAll);
 
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
@@ -4491,22 +4497,20 @@ CMathContent.prototype =
                 ctrPrp.Italic = undefined;
 
                 emptyRun.Set_Pr(ctrPrp);
-                left = current;
 
-                this.Internal_Content_Add(i, emptyRun);
+                this.Internal_Content_Add(currPos, emptyRun);
+                currPos += 2;
             }
             else if(bDeleteEmptyRun)
             {
-                this.Remove_FromContent(i, 1);
+                this.Remove_FromContent(currPos, 1);
             }
             else
-            {
-                left = current;
-            }
+                currPos++;
 
+            len = this.content.length;
         }
 
-        len = this.content.length;
 
         if(len > 0 && this.content[len - 1].Type == para_Math_Composition)
         {
@@ -4544,23 +4548,25 @@ CMathContent.prototype =
     {
         if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
         {
-            var pos = this.findPosition(SearchPos.X, SearchPos.Y);
+            this.findDisposition(SearchPos, Depth);
+            var pos = SearchPos.Pos.Get(Depth);
+            //var pos = this.findPosition(SearchPos.X, SearchPos.Y);
 
-            SearchPos.Pos.Update( pos, Depth );
-            Depth++;
+            //SearchPos.Pos.Update( pos, Depth );
+            //Depth++;
 
-            SearchPos.X -= this.WidthToElement[pos];
+            //SearchPos.X -= this.WidthToElement[pos];
 
             if(this.content[pos].Type == para_Math_Composition)
             {
                 SearchPos.Y -= this.size.ascent - this.content[pos].size.ascent;
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd);
             }
             else if(this.content[pos].Type == para_Math_Run)      // проверка на gaps в findDisposition
             {
                 SearchPos.X += this.pos.x + this.ParaMath.X + this.WidthToElement[pos];
                 SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd);
             }
         }
     },
@@ -4721,9 +4727,8 @@ CMathContent.prototype =
 
             for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
             {
-                var CurTextPr;
+                var CurTextPr = this.content[CurPos].Get_CompiledPr(true);
 
-                    CurTextPr = this.content[CurPos].Get_CompiledPr(false);
                 if ( null !== CurTextPr )
                     TextPr = TextPr.Compare( CurTextPr );
             }
@@ -4880,8 +4885,8 @@ CMathContent.prototype =
     },
     Remove_FromContent : function(Pos, Count)
     {
-        var DeletedItems = this.content.slice( Pos, Pos + Count );
-        History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+        var DeletedItems = this.content.splice(Pos, Count);
+        History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count, Items : DeletedItems } );
 
         if(this.CurPos > Pos)
         {

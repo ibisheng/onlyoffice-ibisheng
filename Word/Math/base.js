@@ -1,5 +1,7 @@
 "use strict";
 
+
+
 function CMathBase(bInside)
 {
     //this.typeObj = MATH_COMP;
@@ -85,12 +87,6 @@ CMathBase.prototype =
 
         this.alignment.hgt = [];
         this.alignment.wdt = [];
-
-        /*for(var u = 0; u < this.nCol ; u++)
-            this.alignment.hgt[u] = MCJC_CENTER;
-
-        for(u=0; u < this.nRow; u++)
-            this.alignment.wdt[u] = MCJC_CENTER;*/
 
         for(var i = 0; i < this.nCol ; i++)
         {
@@ -185,50 +181,6 @@ CMathBase.prototype =
 
         return rPrp;
     },
-    /*setRPrp: function(rPrp)
-    {
-        //this.RunPrp.mathPrp.bold = rPrp.mathPrp.bold; // как в Ворде, все остальные стили не поддерживаются
-        //this.RunPrp.setTxtPrp(rPrp.textPrp); // Merge wTxtPrp
-
-        this.CtrPrp = new CTextPr();
-        //var gPrp  = rPrp.getMergedWPrp();
-        this.CtrPrp.Merge(rPrp);
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-            {
-                if( !this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].setRPrp(rPrp);
-            }
-    },*/
-    /*increaseArgSize: function()
-    {
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].increaseArgSize();
-    },
-    decreaseArgSize: function()
-    {
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].decreaseArgSize();
-    },
-    setArgSize: function(argSize)
-    {
-        var val = this.argSize + argSize;
-
-        if(val < -2)
-            this.argSize = -2;
-        else if(val > 2)
-            this.argSize = 2;
-        else
-            this.argSize = val;
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                if( !this.elements[i][j].IsJustDraw() )
-                    this.elements[i][j].setArgSize(argSize);
-    },*/
     fillPlaceholders: function()
     {
          for(var i=0; i < this.nRow; i++)
@@ -351,7 +303,186 @@ CMathBase.prototype =
 
         return PosAlign;
     },
-    findDisposition: function(mCoord)
+    findDisposition: function(SearchPos, Depth)
+    {
+        //var mouseCoord = {x: null, y: null},
+        //    posCurs =    {x: null, y: null};
+
+        var sumWidth = 0;
+        var sumHeight = 0;
+
+        var maxWH = this.getWidthsHeights();
+
+        var Widths = maxWH.widths;
+        var Heights = maxWH.heights;
+
+        ///////////////////////////////
+
+        var _h = 0;
+
+        var Curr_Pos_X = this.nRow - 1,
+            Curr_Pos_Y = this.nCol - 1;
+
+        for(var j = 0; j < this.nRow; j++)
+        {
+            _h += Heights[j] + this.dH/2;
+
+            if( SearchPos.Y <= _h + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
+            {
+                Curr_Pos_X = j;
+                //SearchPos.Pos.Update(j, Depth);
+                break;
+            }
+            _h += this.dH/2;
+        }
+
+        ///////////////////////////////
+
+        var _w = 0;
+        for(var u = 0; u < this.nCol; u++)
+        {
+            _w +=Widths[u];
+            _w += this.dW/2;
+            if( SearchPos.X <= _w  + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
+            {
+                if( this.elements[Curr_Pos_X][u].IsJustDraw() )
+                {
+                    if(this.nRow > 1)
+                    {
+                        if(Curr_Pos_X == 0)
+                        {
+                            Curr_Pos_X = 1;
+                            //SearchPos.Pos.Update(1, Depth);
+                            //posCurs.x = 1;
+                        }
+                        else if(Curr_Pos_X == this.nRow - 1)
+                        {
+                            Curr_Pos_X = this.nRow - 2;
+                            //SearchPos.Pos.Update(this.nRow - 2, Depth);
+                            //posCurs.x = this.nRow - 2;
+                        }
+                        else
+                        {
+                            if( SearchPos.Y < (_h - Heights[Curr_Pos_X]/2) )
+                            {
+                                Curr_Pos_X--;
+                                //SearchPos.Pos.Update(Curr_Pos_X - 1, Depth);
+                                //posCurs.x--;
+                            }
+                            else
+                            {
+                                Curr_Pos_X++;
+                                //SearchPos.Pos.Update(Curr_Pos_X + 1, Depth);
+                                //posCurs.x++;
+                            }
+                        }
+                        Curr_Pos_Y = u;
+                        //SearchPos.Pos.Update(u, Depth + 1);
+                        //posCurs.y = u;
+                    }
+                    else if(this.nCol > 1)
+                    {
+                        if(u == 0)
+                        {
+                            Curr_Pos_Y = 1;
+                            //SearchPos.Pos.Update(1, Depth + 1);
+                            //posCurs.y = 1;
+                        }
+                        else if(u == this.nCol - 1)
+                        {
+                            Curr_Pos_Y = this.nCol - 2;
+                            //SearchPos.Pos.Update(this.nCol - 2, Depth + 1);
+                            //posCurs.y = this.nCol - 2;
+                        }
+                        else
+                        {
+                            if( SearchPos.X < (_w - Widths[u]/2) )
+                            {
+                                Curr_Pos_Y = u - 1;
+                                //SearchPos.Pos.Update(u - 1, Depth + 1);
+                                //posCurs.y = u - 1;
+                            }
+                            else
+                            {
+                                Curr_Pos_Y = u + 1;
+                                //SearchPos.Pos.Update(u + 1, Depth + 1);
+                                //posCurs.y = u + 1;
+                            }
+                        }
+
+                    }
+                    else
+                        return; // не самое лучшее решение, в идеале если у нас если такая ситуация получилась
+                    // (что сомнительно, в контенте один элемент с которым ничего нельзя сделать),
+                    // то вставать  после этого элемента  в контенте на уровень выше
+                    // лучше следить за подобными ситуациями, чтобы такого не было
+                }
+                else
+                {
+                    Curr_Pos_Y = u;
+                    //SearchPos.Pos.Update(u, Depth + 1);
+                    //posCurs.y = u;
+                }
+                break;
+            }
+            _w += this.dW/2;
+        }
+
+        SearchPos.Pos.Update(Curr_Pos_X, Depth);
+        SearchPos.Pos.Update(Curr_Pos_Y, Depth + 1);
+
+
+        ////////////////////////////////
+
+        for(var t = 0; t < Curr_Pos_Y; t++)
+            sumWidth += Widths[t];
+        for(t = 0; t < Curr_Pos_X; t++)
+            sumHeight += Heights[t];
+
+        // флаг для случая, когда выходим за границы элемента и есть выравнивание относительно других элементов
+        // -1 - в пределах границы
+        // 0 - начало контента
+        // 1 - конец контента
+        // 2 - вышли за границы контента по Y
+
+        //var inside_flag = -1;
+
+        if(Curr_Pos_X != null && Curr_Pos_Y != null)
+        {
+            var size = this.elements[Curr_Pos_X][Curr_Pos_Y].size;
+            var align = this.align(Curr_Pos_X, Curr_Pos_Y);
+
+            if(SearchPos.X < ( Curr_Pos_Y*this.dW + sumWidth + align.x ))
+            {
+                SearchPos.X = 0;
+                //inside_flag = 0;
+            }
+            else if( SearchPos.X > ( Curr_Pos_Y*this.dW + sumWidth + align.x + size.width ))
+            {
+                SearchPos.X = size.width;
+                //inside_flag = 1;
+            }
+            else
+                SearchPos.X -= (Curr_Pos_Y*this.dW + sumWidth + align.x);
+
+
+            if(SearchPos.Y < (Curr_Pos_X*this.dH + sumHeight + align.y))
+            {
+                SearchPos.Y = 0;
+                //inside_flag = 2;
+            }
+            else if( SearchPos.Y > (Curr_Pos_X*this.dH + sumHeight + align.y + size.height ) )
+            {
+                SearchPos.Y = size.height;
+                //inside_flag = 2;
+            }
+            else
+                SearchPos.Y -= (Curr_Pos_X*this.dH + sumHeight + align.y );
+        }
+
+        //return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+    },
+    old_findDisposition: function(mCoord)
     {
          var mouseCoord = {x: null, y: null},
              posCurs =    {x: null, y: null};
@@ -366,85 +497,87 @@ CMathBase.prototype =
 
          ///////////////////////////////
 
-         if(mCoord.y > this.size.height)
-             posCurs.x = this.nRow - 1;
-         else
+
+         var _h = 0,
+              bFindX = false;
+
+         for(var j = 0; j < this.nRow; j++)
          {
-             var _h = 0;
-             for(var j = 0; j < this.nRow; j++)
+             _h += Heights[j];
+             _h += this.dH/2;
+             if( mCoord.y <= _h + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
              {
-                 _h += Heights[j];
-                 _h += this.dH/2;
-                 if( mCoord.y <= _h + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
-                 {
-                     posCurs.x = j;
-                     break;
-                 }
-                 _h += this.dH/2;
+                 bFindX = true;
+                 posCurs.x = j;
+                 break;
              }
+             _h += this.dH/2;
          }
+
+         if(!bFindX)
+             posCurs.x = this.nRow - 1;
 
          ///////////////////////////////
 
-         //если не правильно посчитали, а элемент был justDraw, то будет ошибка
-
-         if( mCoord.x > this.size.width )
-             posCurs.y = this.nCol - 1;
-         else
+         var _w = 0;
+         var bFindY = false;
+         for(var u = 0; u < this.nCol; u++)
          {
-             var _w = 0;
-             for(var u = 0; u < this.nCol; u++)
+             _w +=Widths[u];
+             _w += this.dW/2;
+             if( mCoord.x <= _w  + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
              {
-                 _w +=Widths[u];
-                 _w += this.dW/2;
-                 if( mCoord.x <= _w  + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
+                 bFindY = true;
+                 if( this.elements[posCurs.x][u].IsJustDraw() )
                  {
-
-                     if( this.elements[posCurs.x][u].IsJustDraw() )
+                     if(this.nRow > 1)
                      {
-                         if(this.nRow > 1)
-                         {
-                             if(posCurs.x == 0)
-                                 posCurs.x = 1;
-                             else if(posCurs.x == this.nRow - 1)
-                                 posCurs.x = this.nRow - 2;
-                             else
-                             {
-                                 if( mCoord.y < (_h - Heights[posCurs.x]/2) )
-                                     posCurs.x--;
-                                 else
-                                     posCurs.x++;
-                             }
-                             posCurs.y = u;
-                         }
-                         else if(this.nCol > 1)
-                         {
-                             if(u == 0)
-                                 posCurs.y = 1;
-                             else if(u == this.nCol - 1)
-                                 posCurs.y = this.nCol - 2;
-                             else
-                             {
-                                 if( mCoord.x < (_w - Widths[u]/2) )
-                                     posCurs.y = u - 1;
-                                 else
-                                     posCurs.y = u + 1;
-                             }
-
-                         }
+                         if(posCurs.x == 0)
+                             posCurs.x = 1;
+                         else if(posCurs.x == this.nRow - 1)
+                             posCurs.x = this.nRow - 2;
                          else
-                             return; // не самое лучшее решение, в идеале если у нас если такая ситуация получилась
-                         // (что сомнительно, в контенте один элемент с которым ничего нельзя сделать),
-                         // то вставать  после этого элемента  в контенте на уровень выше
-                         // лучше следить за подобными ситуациями, чтобы такого не было
+                         {
+                             if( mCoord.y < (_h - Heights[posCurs.x]/2) )
+                                 posCurs.x--;
+                             else
+                                 posCurs.x++;
+                         }
+                         posCurs.y = u;
+                     }
+                     else if(this.nCol > 1)
+                     {
+                         if(u == 0)
+                             posCurs.y = 1;
+                         else if(u == this.nCol - 1)
+                             posCurs.y = this.nCol - 2;
+                         else
+                         {
+                             if( mCoord.x < (_w - Widths[u]/2) )
+                                 posCurs.y = u - 1;
+                             else
+                                 posCurs.y = u + 1;
+                         }
+
                      }
                      else
-                         posCurs.y = u;
-                     break;
+                         return; // не самое лучшее решение, в идеале если у нас если такая ситуация получилась
+                     // (что сомнительно, в контенте один элемент с которым ничего нельзя сделать),
+                     // то вставать  после этого элемента  в контенте на уровень выше
+                     // лучше следить за подобными ситуациями, чтобы такого не было
                  }
-                 _w += this.dW/2;
+                 else
+                     posCurs.y = u;
+                 break;
              }
+             _w += this.dW/2;
          }
+
+         if(!bFindY)
+         {
+             posCurs.y = this.nCol - 1;
+         }
+
          ////////////////////////////////
 
          for(var t = 0; t < posCurs.y; t++)
@@ -712,138 +845,7 @@ CMathBase.prototype =
     },
 
     ////    For Edit   /////
-    /*selection_Start: function(x, y)
-    {
-        var elem = this.findDisposition({x: x, y: y});
-        var X = elem.mCoord.x,
-            Y = elem.mCoord.y,
-            Pos_X = elem.pos.x,
-            Pos_Y = elem.pos.y;
 
-        this.selectPos.startX = Pos_X;
-        this.selectPos.startY = Pos_Y;
-
-        this.elements[Pos_X][Pos_Y].selection_Start(X, Y);
-
-    },
-    selection_End: function(x, y)
-    {
-        var state = true, SelectContent = null;
-        var elem = this.findDisposition({x: x, y: y});
-        var X = elem.mCoord.x,
-            Y = elem.mCoord.y,
-            bInside = elem.inside_flag;
-
-        var endX   = elem.pos.x,
-            endY   = elem.pos.y,
-            startX = this.selectPos.startX,
-            startY = this.selectPos.startY;
-
-        if(startX == endX && startY == endY && bInside === -1)
-        {
-            this.CurPos_X = startX;
-            this.CurPos_Y = startY;
-            var movement = this.elements[endX][endY].selection_End(X, Y);
-            SelectContent = movement.SelectContent;
-            state = movement.state;
-            //state = true;
-        }
-        else
-            state = false;
-
-        return {state: state, SelectContent: SelectContent};
-    },
-    goToLeft: function()
-    {
-        var bUpperLevel = false;
-
-        do{
-            if( this.CurPos_Y > 0  )
-            {
-                this.CurPos_Y--;
-            }
-            else if(this.CurPos_X > 0)
-            {
-                this.CurPos_X--;
-                this.CurPos_Y = this.nCol - 1;
-            }
-            else
-            {
-                bUpperLevel = true;
-                break;
-            }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
-            ;
-
-        //из цикла вышли если bJustDraw = false  or  bUpperLevel = true
-
-        var SelectContent;
-        if(bUpperLevel)
-        {
-            SelectContent = this.Parent.goToLeft();
-        }
-        else
-        {
-            SelectContent = this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement(); //если внутренний элемент не контент, а базовый класс, вернется последний элемент этого класса
-        }
-
-        return SelectContent;
-    },
-    goToRight: function()
-    {
-        var bUpperLevel = false;
-
-        do{
-            if( this.CurPos_Y < this.nCol - 1 )
-            {
-                this.CurPos_Y++;
-            }
-            else if(this.CurPos_X < this.nRow - 1)
-            {
-                this.CurPos_X++;
-                this.CurPos_Y = 0;
-            }
-            else
-            {
-                bUpperLevel = true;
-                break;
-            }
-        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() );
-
-        var SelectContent;
-        if( bUpperLevel )
-        {
-            SelectContent = this.Parent.goToRight();
-        }
-        else
-        {
-            SelectContent = this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
-        }
-
-        return SelectContent;
-    },
-    goToLeftSelect: function(bParent)
-    {
-        var content;
-
-        if(bParent == SELECT_PARENT)
-            content = this.Parent.goToLeftSelect(bParent);
-        else
-            content = this.elements[this.CurPos_X][this.CurPos_Y].goToLeftSelect(bParent);
-
-        return content;
-    },
-    goToRightSelect: function(bParent)
-    {
-        var content;
-
-        if(bParent == SELECT_PARENT)
-            content = this.Parent.goToRightSelect(bParent);
-        else
-            content = this.elements[this.CurPos_X][this.CurPos_Y].goToRightSelect(bParent);
-
-        return content;
-    },*/
     getGapsInside: function(GapsInfo)
     {
         var kind = this.kind;
@@ -858,25 +860,20 @@ CMathBase.prototype =
 
         return gaps;
     },
-    WriteContentsToHistory: function()
-    {
-        for(var i = 0; i < this.nRow; i++)
-        {
-            for(var j = 0; j < this.nCol; j++)
-            {
-                var Pos = {row: i, column: j};
-                History.Add(this, {Type: historyitem_Math_AddItem, Items: this.elements[i][j], Pos: Pos});
-            }
-        }
-
-    },
     /// Position for Paragraph
     Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         /// элементов just-draw не должно прийти
 
-        var disp = this.findDisposition({ x: SearchPos.X - this.GapLeft, y: SearchPos.Y});
 
+        this.Check_PosInGaps(SearchPos);
+        this.findDisposition(SearchPos, Depth);
+
+        var Curr_Pos_X = SearchPos.Pos.Get(Depth),
+            Curr_Pos_Y = SearchPos.Pos.Get(Depth+1);
+
+
+        /*var disp = this.findDisposition(NewPos);
 
         var pos = disp.pos;
 
@@ -887,10 +884,20 @@ CMathBase.prototype =
 
 
         SearchPos.X = disp.mCoord.x;
-        SearchPos.Y = disp.mCoord.y;
+        SearchPos.Y = disp.mCoord.y;*/
 
 
-        this.elements[disp.pos.x][disp.pos.y].Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+        this.elements[Curr_Pos_X][Curr_Pos_Y].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+    },
+    Check_PosInGaps: function(SearchPos)
+    {
+        if(SearchPos.X <= this.GapLeft)
+            SearchPos.X = 0;
+        else if(SearchPos.X >= this.size.width - this.GapRight)
+            SearchPos.X = this.size.width - this.GapRight - this.GapLeft;
+        else
+            SearchPos.X -= this.GapLeft;
+
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
@@ -1374,7 +1381,7 @@ CMathBase.prototype =
             {
                 if(!this.elements[i][j].IsJustDraw())
                 {
-                    var CurTextPr = this.elements[i][j].Get_CompiledTextPr(false, true);
+                    var CurTextPr = this.elements[i][j].Get_CompiledTextPr(true, true);
 
                     if ( null !== CurTextPr )
                         TextPr = TextPr.Compare( CurTextPr );

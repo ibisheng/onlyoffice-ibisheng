@@ -354,7 +354,7 @@ CFraction.prototype.setPosition = function(pos)
     else
         CFraction.superclass.setPosition.call(this, pos);
 }
-CFraction.prototype.findDisposition = function( mCoord )
+CFraction.prototype.old_findDisposition = function(mCoord)
 {
     var disposition;
 
@@ -420,6 +420,63 @@ CFraction.prototype.findDisposition = function( mCoord )
         disposition = CFraction.superclass.findDisposition.call(this, mCoord);
 
     return disposition;
+}
+CFraction.prototype.findDisposition = function(SearchPos, Depth)
+{
+    if(this.Pr.type == SKEWED_FRACTION)
+    {
+        var Numerator   = this.elements[0][0].size,
+            Denominator = this.elements[0][1].size;
+
+
+        //posCurs.x = 0;
+        SearchPos.Pos.Update(0, Depth);
+
+        if( SearchPos.X < (Numerator.width + this.gapSlash/2))
+        {
+            if(Numerator.width < SearchPos.X)
+            {
+                SearchPos.X = Numerator.width;
+            }
+            if(Numerator.height < SearchPos.Y)
+            {
+                SearchPos.Y = Numerator.height;
+            }
+
+            SearchPos.Pos.Update(0, Depth+1);
+            //posCurs.y = 0;
+        }
+        else
+        {
+            if(SearchPos.X < this.size.width - Denominator.width)
+            {
+                SearchPos.X = 0;
+            }
+            else if(SearchPos.X > this.size.width)
+            {
+                SearchPos.X = Denominator.width;
+            }
+            else
+                SearchPos.X -= Numerator.width - this.gapSlash;
+
+            if( SearchPos.Y < this.size.height - Denominator.height)
+            {
+                SearchPos.Y = 0;
+            }
+            else if(SearchPos.Y > this.size.height)
+            {
+                SearchPos.Y = Denominator.height;
+            }
+            else
+                SearchPos.Y -= Numerator.height;
+
+            SearchPos.Pos.Update(1, Depth+1);
+            //posCurs.y = 1;
+        }
+    }
+    else
+       CFraction.superclass.findDisposition.call(this, SearchPos, Depth);
+
 }
 CFraction.prototype.setProperties = function(props)
 {
@@ -575,17 +632,17 @@ CNumerator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CNumerator.prototype.findDisposition = function(mCoord)
+CNumerator.prototype.findDisposition = function(SearchPos, Depth)
 {
     var arg = this.elements[0][0].size;
 
-    var posCurs = {x: 0, y: 0};
-    var inside_flag = -1;
+    SearchPos.Pos.Update(0, Depth);
+    SearchPos.Pos.Update(0, Depth+1);
 
-    if(mCoord.y > arg.height)
-        mCoord.y = arg.height;
 
-    return {pos: posCurs, mCoord: mCoord, inside_flag: inside_flag};
+    if(SearchPos.Y > arg.height)
+        SearchPos.Y = arg.height;
+
 }
 CNumerator.prototype.setPosition = function(pos)
 {
@@ -644,25 +701,25 @@ CDenominator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CDenominator.prototype.findDisposition = function(mCoord)
+CDenominator.prototype.findDisposition = function(SearchPos, Depth)
 {
     var arg = this.elements[0][0].size;
 
-    var posCurs = {x: 0, y: 0};
-    var inside_flag = -1;
 
-    if(mCoord.y < this.gap)
+    SearchPos.Pos.Update(0, Depth);
+    SearchPos.Pos.Update(0, Depth+1);
+
+    if(SearchPos.Y < this.gap)
     {
-        mCoord.y = 0;
+        SearchPos.Y = 0;
     }
-    else if (mCoord.y > arg.height + this.gap)
+    else if (SearchPos.Y > arg.height + this.gap)
     {
-        mCoord.y = arg.height;
+        SearchPos.Y = arg.height;
     }
     else
-        mCoord.y -= this.gap;
+        SearchPos.Y -= this.gap;
 
-    return {pos: posCurs, mCoord: mCoord, inside_flag: inside_flag};
 }
 CDenominator.prototype.setPosition = function(pos)
 {

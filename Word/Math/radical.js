@@ -1047,7 +1047,8 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     {
         var ArgSzIter = new CMathArgSize();
         ArgSzIter.SetValue(-2);
-        ArgSzIter.Merge(ArgSize);
+        //ArgSzIter.Merge(ArgSize);
+
 
         this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
         this.RealBase.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
@@ -1175,124 +1176,92 @@ CRadical.prototype.setPosition = function(pos)
         PosBase.x = this.pos.x + this.size.width - this.RealBase.size.width - this.GapRight;
         PosBase.y = this.pos.y + this.size.ascent - this.RealBase.size.ascent;
 
-
         this.RealBase.setPosition(PosBase);
     }
 }
-CRadical.prototype.findDisposition = function(mCoord)
+CRadical.prototype.findDisposition = function(SearchPos, Depth)
 {
-    var disposition;
-    var inside_flag = -1;
+    //var disposition;
+    //var inside_flag = -1;
+
+    var base, degree;
 
     if(this.Pr.type == SQUARE_RADICAL)
     {
-        var sizeBase = this.elements[0][0].size;
-        var X, Y;
+        base = this.elements[0][0].size;
+        //var X, Y;
 
-        var gapLeft = this.size.width - this.elements[0][0].size.width;
-        var gapTop = this.size.ascent - this.elements[0][0].size.ascent;
+        var gapLeft = this.size.width - base.width;
+        var gapTop = this.size.ascent - base.ascent;
 
-        if(mCoord.x < gapLeft)
-        {
-            X = 0;
-            inside_flag = 0;
-        }
-        else if(mCoord.x > gapLeft + sizeBase.width)
-        {
-            X = sizeBase.width;
-            inside_flag = 1;
-        }
+        if(SearchPos.X < gapLeft)
+            SearchPos.X = 0;
+        else if(SearchPos.X > gapLeft + base.width)
+            SearchPos.X = base.width;
         else
-            X = mCoord.x - gapLeft;
+            SearchPos.X -= gapLeft;
 
-        if(mCoord.y < gapTop)
-        {
-            Y = 0;
-            inside_flag = 2;
-        }
-        else if(mCoord.y > gapTop + sizeBase.height)
-        {
-            Y = sizeBase.height;
-            inside_flag = 2;
-        }
+
+        if(SearchPos.Y < gapTop)
+            SearchPos.Y = 0;
+        else if(SearchPos.Y > gapTop + base.height)
+            SearchPos.Y = base.height;
         else
-            Y = mCoord.y - gapTop;
+            SearchPos.Y -= gapTop;
 
-        disposition = {pos: {x:0, y:0}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
+        SearchPos.Pos.Update(0, Depth);
+        SearchPos.Pos.Update(0, Depth+1);
+
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
-        var mouseCoord = {x: null, y: null},
-            posCurs =    {x: 0, y: null};
+        //var mouseCoord = {x: null, y: null},
+        //    posCurs =    {x: 0, y: null};
 
-        var degr = this.elements[0][0].size,
-            base = this.elements[0][1].size;
+        degree = this.elements[0][0].size;
+        base = this.elements[0][1].size;
 
+        SearchPos.Pos.Update(0, Depth);
 
-        if(mCoord.x < this.size.width - base.width)
+        if(SearchPos.X < this.size.width - base.width)
         {
-            posCurs.y = 0;
+            //posCurs.y = 0;
+            SearchPos.Pos.Update(0, Depth+1);
 
-            if(mCoord.x > degr.width)
-            {
-                mouseCoord.x = degr.width;
-                inside_flag = 1;
-            }
-            else if(mCoord.x < this.gapWidth)
-            {
-                mouseCoord.x = 0;
-                inside_flag = 0;
-            }
+            if(SearchPos.X > degree.width)
+                SearchPos.X = degree.width;
+            else if(SearchPos.X < this.gapWidth)
+                SearchPos.X = 0;
             else
-            {
-                mouseCoord.x = mCoord.x - this.gapWidth;
-            }
+                SearchPos.X -= this.gapWidth;
 
-            mouseCoord.x = mCoord.x;
-
-            if(mCoord.y < this.gapDegree)
-            {
-                mouseCoord.y = 0;
-                inside_flag = 2;
-            }
-            else if(mCoord.y > degr.height + this.gapDegree)
-            {
-                mouseCoord.y = degr.height;
-                inside_flag = 2;
-            }
+            if(SearchPos.Y < this.gapDegree)
+                SearchPos.Y = 0;
+            else if(SearchPos.Y > degree.height + this.gapDegree)
+                SearchPos.Y = degree.height;
             else
-            {
-                mouseCoord.y = mCoord.y - this.gapDegree;
-            }
+                SearchPos.Y -= this.gapDegree;
         }
         else
         {
-            posCurs.y = 1;
+            //posCurs.y = 1;
+            SearchPos.Pos.Update(1, Depth+1);
 
-            mouseCoord.x = mCoord.x - (this.size.width - base.width);
+            SearchPos.X -= (this.size.width - base.width);
             var topBase = this.size.ascent - base.ascent;
 
-            if(mCoord.y < topBase)
-            {
-                mouseCoord.y = 0;
-                inside_flag = 2;
-            }
-            else if(mCoord.y > base.height + topBase)
-            {
-                mouseCoord.y = base.height;
-                inside_flag = 2;
-            }
+            if(SearchPos.Y < topBase)
+                SearchPos.Y = 0;
+            else if(SearchPos.Y > base.height + topBase)
+                SearchPos.Y = base.height;
             else
-                mouseCoord.y = mCoord.y - topBase;
+                SearchPos.Y -= topBase;
         }
 
-        disposition = {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+        //disposition = {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
     }
 
-    //console.log("x : " + disposition.pos.x + ", y : " + disposition.pos.y);
-
-
-    return disposition;
+    //return disposition;
 }
 CRadical.prototype.draw = function(x, y, pGraphics)
 {

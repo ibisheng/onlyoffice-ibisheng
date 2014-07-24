@@ -751,54 +751,48 @@ CNaryUndOvr.prototype.setPosition = function(pos)
     this.elements[1][0].setPosition(PosSign);
     this.elements[2][0].setPosition(PosLowIter);
 }
-CNaryUndOvr.prototype.findDisposition = function(mCoord)
+CNaryUndOvr.prototype.findDisposition = function(SearchPos, Depth)
 {
     var X = null, Y = null;
     var iter, pos_x, pos_y = 0;
     var inside_flag = -1;
 
-    if(mCoord.y < this.size.height/2)
+    var Curr_Pos_X, Curr_Pos_Y;
+
+    if(SearchPos.Y < this.size.height/2)
     {
         iter = this.elements[0][0].size;
-        if( mCoord.y > iter.height )
-        {
-            Y = iter.height;
-            inside_flag = 2;
-        }
-        else
-            Y = mCoord.y;
+        if( SearchPos.Y > iter.height )
+            SearchPos.Y = iter.height;
 
-        pos_x = 0;
+        SearchPos.Pos.Update(0, Depth);
+        Curr_Pos_X = 0;
     }
     else
     {
         iter = this.elements[2][0].size;
-        if( mCoord.y < iter.height )
-        {
-            Y = 0;
-            inside_flag = 2;
-        }
+        if( SearchPos.Y < iter.height )
+            SearchPos.Y = 0;
         else
-            Y = mCoord.y - (this.size.height - iter.height);
+            SearchPos.Y -= (this.size.height - iter.height);
 
-        pos_x = 2;
+        SearchPos.Pos.Update(2, Depth);
+        Curr_Pos_X = 2;
     }
 
-    var align = this.align(pos_x, 0);
-    if(mCoord.x < align.x )
+    SearchPos.Pos.Update(0, Depth+1);
+    var align = this.align(Curr_Pos_X, 0);
+    if(SearchPos.X < align.x )
     {
-        X = 0;
-        inside_flag = 0;
+        SearchPos.X = 0;
     }
-    else if(mCoord.x > align.x + iter.width)
+    else if(SearchPos.X > align.x + iter.width)
     {
-        X = iter.width;
-        inside_flag = 1;
+        SearchPos.X = iter.width;
     }
     else
-        X = mCoord.x - align.x;
+        SearchPos.X -= align.x;
 
-    return {pos: {x: pos_x, y: pos_y}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
 }
 CNaryUndOvr.prototype.setBase = function(base)
 {

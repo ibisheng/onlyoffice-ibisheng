@@ -1062,8 +1062,6 @@ CAccent.prototype.old_init = function(properties)
     //this.setOperator(accent);
     this.elements[0][0].SetDot(true);
 
-    /// вызов этой функции обязательно в конце
-    //this.WriteContentsToHistory();
 }
 CAccent.prototype.setPosition = function(pos)
 {
@@ -1079,7 +1077,7 @@ CAccent.prototype.setPosition = function(pos)
 
     PosOper.x = this.pos.x + this.GapLeft  + alignOp;
 
-    PosOper.y = this.pos.y + this.shiftX_2;
+    PosOper.y = this.pos.y + this.shiftX_2 ;
     //PosOper.y = this.pos.y + this.size.ascent - this.shiftX;
 
 
@@ -1136,9 +1134,8 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         letterX.Resize(oMeasure, null);
         this.gap = this.operator.size.ascentSign - letterX.size.ascent;
 
-        this.shiftX_2 = this.operator.size.ascentSign;
-
-        //this.shiftX = base.size.ascent - letterX.size.ascent;
+        //this.shiftX_2 = this.operator.size.ascentSign;
+        this.shiftX_2 = 0;
     }
 
 
@@ -1173,48 +1170,30 @@ CAccent.prototype.draw = function(x, y, pGraphics)
 
     this.operator.draw(x, y, pGraphics);
 }
-CAccent.prototype.findDisposition = function(pos)
+CAccent.prototype.findDisposition = function(SearchPos, Depth)
 {
-    var curs_X = 0,
-        curs_Y = 0;
-    var X, Y;
-
-    var inside_flag = -1;
-
     var base = this.elements[0][0],
-        align = (this.size.width - this.elements[0][0].size.width)/2;
+        align = (this.size.width - this.GapLeft - this.GapRight - base.size.width)/2;
 
-    if(pos.x < align)
-    {
-        X = 0;
-        inside_flag = 0;
-    }
-    else if(pos.x > align + base.size.width)
-    {
-        X = base.size.width;
-        inside_flag = 1;
-    }
+    if(SearchPos.X < align)
+        SearchPos.X = 0;
+    else if(SearchPos.X > align + base.size.width)
+        SearchPos.X = base.size.width;
     else
-        X = pos.x - align;
+        SearchPos.X -= align;
 
     var accentGap = this.size.height - base.size.height;
 
-    if(pos.y < accentGap)
+    if(SearchPos.Y < accentGap)
     {
-        Y = 0;
-        inside_flag = 2;
+        SearchPos.Y = 0;
     }
     else
-        Y = pos.y - accentGap;
+        SearchPos.Y -= accentGap;
 
-    /*if(pos.y > 0)
-        console.log("Pos.y " + pos.y + "accent gap" + accentGap);*/
+    SearchPos.Pos.Update(0, Depth);
+    SearchPos.Pos.Update(0, Depth + 1);
 
-
-    var mouseCoord = {x: X, y: Y},
-        posCurs =    {x: curs_X, y: curs_Y};
-
-    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
 CAccent.prototype.setProperties = function(props)
 {

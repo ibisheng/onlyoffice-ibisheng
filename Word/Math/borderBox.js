@@ -275,7 +275,7 @@ CBorderBox.prototype.setPosition = function(pos)
 
     this.elements[0][0].setPosition(NewPos);
 }
-CBorderBox.prototype.findDisposition = function(mCoord)
+CBorderBox.prototype.old_findDisposition = function(mCoord)
 {
     var X = null,
         Y = null,
@@ -326,6 +326,60 @@ CBorderBox.prototype.findDisposition = function(mCoord)
 
     return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 
+}
+CBorderBox.prototype.findDisposition = function(SearchPos, Depth)
+{
+   /*var X = null,
+         Y = null,
+        inside_flag = -1;*/ // остаемя в пределах данного элемента( за границы элемента не вышли )
+
+    var alignX = 0, alignY = 0;
+
+    if(this.Pr.hideLeft == false)
+        alignX = this.gapBrd;
+    if(this.Pr.hideTop == false)
+        alignY = this.gapBrd;
+
+    var base = this.elements[0][0].size;
+
+    if(SearchPos.X < alignX)
+    {
+        SearchPos.X = 0;
+        //inside_flag = 0;
+    }
+    else if(SearchPos.X > alignX + base.width)
+    {
+        SearchPos.X = base.width;
+        //inside_flag = 1;
+    }
+    else
+    {
+        SearchPos.X -= alignX;
+    }
+
+    if(SearchPos.Y < alignY)
+    {
+        SearchPos.Y = 0;
+        //inside_flag = 2;
+    }
+    else if(SearchPos.Y > alignY + base.height)
+    {
+        SearchPos.Y = base.height;
+        //inside_flag = 2;
+    }
+    else
+    {
+        SearchPos.Y -= alignY;
+    }
+
+    SearchPos.Pos.Update(0, Depth);
+    SearchPos.Pos.Update(0, Depth+1);
+
+    /*var coord = {x: X, y: Y},
+        posCurs = {x: 0, y: 0};*/
+
+
+    //return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 }
 CBorderBox.prototype.getBase = function()
 {
@@ -489,21 +543,15 @@ CBox.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.setContent();
-
-    /*if(this.Pr.opEmu)
-    {
-        this.elements[0][0].decreaseArgSize();
-    }*/
 }
 CBox.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
-    var CurrArgSize = new CMathArgSize();
-    CurrArgSize.Merge(ArgSize);
+    var ArgSizeBox = ArgSize.Copy();
 
     if(this.Pr.opEmu)
-        CurrArgSize.decrease();
+        ArgSizeBox.decrease();
 
-    CBox.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, CurrArgSize);
+    CBox.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSizeBox);
 }
 CBox.prototype.setProperties = function(props)
 {

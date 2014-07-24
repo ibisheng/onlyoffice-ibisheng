@@ -49,7 +49,7 @@ CDegree.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
-    var ArgSzDegr = new CMathArgSize();
+    var ArgSzDegr = ArgSize.Copy();
     ArgSzDegr.decrease();
 
     this.elements[0][1].Resize(oMeasure, this, ParaMath, RPI, ArgSzDegr);
@@ -265,74 +265,6 @@ CDegree.prototype.old_findDisposition = function(mCoord)
 
     var inside_flag = -1;
 
-    var shBase = 0,
-        shIter = 0;
-
-    if(this.upper > 0)
-        shBase = this.upper;
-    else
-        shIter = - this.upper;
-
-    if( mCoord.x < this.elements[0][0].size.width)
-    {
-        if( this.elements[0][0].IsJustDraw() )
-        {
-            X = 0; Y = 1; // встаем во второй элемент
-            coordX = 0;
-            coordY = mCoord.y - shIter;
-
-            inside_flag = 0;
-        }
-        else
-        {
-            X = 0; Y = 0; // встаем в первый элемент
-            coordX =  mCoord.x;
-            coordY =  mCoord.y - shBase;
-        }
-    }
-    else if(mCoord.x < (this.elements[0][0].size.width + this.dW ))
-    {
-        X = 0; Y = 1; // встаем во второй элемент
-        coordX = 0;
-        coordY = mCoord.y - shIter;
-        inside_flag = 0;
-    }
-    else if(mCoord.x > this.size.width)
-    {
-        X = 0; Y = 1; // встаем во второй элемент
-        coordX = this.size.width;
-        coordY = mCoord.y - shIter;
-        inside_flag = 1;
-    }
-    else
-    {
-        X = 0; Y = 1; // встаем во второй элемент
-        coordX = mCoord.x - (this.elements[0][0].size.width + this.dW);
-        coordY = mCoord.y - shIter;
-    }
-
-    if(coordY < 0)
-    {
-        coordY = 0;
-        inside_flag = 2;
-    }
-    else if(coordY > this.elements[X][Y].size.height)
-    {
-        coordY = this.elements[X][Y].size.height;
-        inside_flag = 2;
-    }
-
-    var mCoord = {x: coordX, y: coordY};
-
-    return {pos: {x: X, y: Y}, mCoord: mCoord, inside_flag: inside_flag};
-}
-CDegree.prototype.findDisposition = function(mCoord)
-{
-    var coordX, coordY;
-    var X, Y;
-
-    var inside_flag = -1;
-
     if( mCoord.x < this.elements[0][0].size.width)
     {
         if( this.elements[0][0].IsJustDraw() )
@@ -386,64 +318,59 @@ CDegree.prototype.findDisposition = function(mCoord)
 
     return {pos: {x: X, y: Y}, mCoord: mCoord, inside_flag: inside_flag};
 }
-CDegree.prototype.old_findDisposition = function(mCoord)
+CDegree.prototype.findDisposition = function(SearchPos, Depth)
 {
-    var coordX, coordY;
-    var X, Y;
+    var base = this.elements[0][0];
 
-    var inside_flag = -1;
+    var Curr_Pos_X = 0,
+        Curr_Pos_Y = SearchPos.Pos.Get(Depth+1);
 
-    if( mCoord.x < this.elements[0][0].size.width)
+
+    if( SearchPos.X < base.size.width)
     {
-        if( this.elements[0][0].IsJustDraw() )
+        if( base.IsJustDraw() )
         {
-            X = 0; Y = 1; // встаем во второй элемент
-            coordX = 0;
-            coordY = mCoord.y - this.shiftDegree;
-            inside_flag = 0;
+            Curr_Pos_Y = 1;     // позиция итератора
+            SearchPos.X = 0;
         }
         else
         {
-            X = 0; Y = 0; // встаем в первый элемент
-            coordX = mCoord.x;
-            coordY =  mCoord.y - ( this.size.center - this.elements[0][0].size.center);
+            Curr_Pos_Y = 0;     // позиция основания
         }
     }
-    else if(mCoord.x < (this.elements[0][0].size.width + this.dW ))
+    else if(SearchPos.X < (base.size.width + this.dW ))
     {
-        X = 0; Y = 1; // встаем во второй элемент
-        coordX = 0;
-        coordY = mCoord.y - this.shiftDegree;
-        inside_flag = 0;
+        Curr_Pos_Y = 1;         // позиция итератора
+        SearchPos.X = 0;
     }
-    else if(mCoord.x > this.size.width)
+    else if(SearchPos.X > this.size.width)
     {
-        X = 0; Y = 1; // встаем во второй элемент
-        coordX = this.size.width;
-        coordY = mCoord.y - this.shiftDegree;
-        inside_flag = 1;
+        Curr_Pos_Y = 1;
+        SearchPos.X = this.size.width;
     }
     else
     {
-        X = 0; Y = 1; // встаем во второй элемент
-        coordX = mCoord.x - (this.elements[0][0].size.width + this.dW);
-        coordY = mCoord.y - this.shiftDegree;
+        Curr_Pos_Y = 1;
+        SearchPos.X -= base.size.width + this.dW;
     }
 
-    if(coordY < 0)
-    {
-        coordY = 0;
-        inside_flag = 2;
-    }
-    else if(coordY > this.elements[X][Y].size.height)
-    {
-        coordY = this.elements[X][Y].size.height;
-        inside_flag = 2;
-    }
+    var alignY = 0;
+    if(Curr_Pos_Y == 0)
+        alignY = this.upBase;
+    else
+        alignY = this.upIter;
 
-    var mCoord = {x: coordX, y: coordY};
+    if(SearchPos.Y < alignY)
+        SearchPos.Y = 0;
+    else if(SearchPos.Y > alignY + this.elements[Curr_Pos_X][Curr_Pos_Y].size.height)
+        SearchPos.Y = this.elements[Curr_Pos_X][Curr_Pos_Y].size.height;
+    else
+        SearchPos.Y -= alignY;
 
-    return {pos: {x: X, y: Y}, mCoord: mCoord, inside_flag: inside_flag};
+
+    SearchPos.Pos.Update(Curr_Pos_X, Depth);
+    SearchPos.Pos.Update(Curr_Pos_Y, Depth+1);
+
 }
 CDegree.prototype.getIterator = function()
 {
@@ -745,8 +672,7 @@ CDegreeSubSup.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSi
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    var ArgSzIters = new CMathArgSize();
-    ArgSzIters.Merge(ArgSize);
+    var ArgSzIters = ArgSize.Copy();
     ArgSzIters.decrease();
 
     if(this.Pr.type == DEGREE_SubSup)

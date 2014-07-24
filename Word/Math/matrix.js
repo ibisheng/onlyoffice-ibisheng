@@ -214,82 +214,70 @@ CMathMatrix.prototype.setPosition = function(pos)
     }
 
 }
-CMathMatrix.prototype.findDisposition = function( coord )
+CMathMatrix.prototype.findDisposition = function(SearchPos, Depth)
 {
-    var mouseCoord = {x: null, y: null},
-        posCurs =    {x: this.nRow - 1, y: this.nCol - 1};
-
     var maxWH = this.getWidthsHeights();
     var Widths = maxWH.widths;
     var Heights = maxWH.heights;
 
+    var Curr_Pos_X = this.nRow - 1, Curr_Pos_Y = this.nCol - 1;
+
     for(var i = 0, w = 0; i < this.nCol; i++)
     {
         w += Widths[i] + this.gaps.column[i + 1]/2;
-        if(coord.x < w)
+        if(SearchPos.X < w)
         {
-            posCurs.y = i;
+            Curr_Pos_Y = i;
             break;
         }
         w += this.gaps.column[i + 1]/2;
     }
 
+    SearchPos.Pos.Update(Curr_Pos_Y, Depth+1);
+
     for(var j = 0, h = 0; j < this.nRow; j++)
     {
         h += Heights[j] + this.gaps.row[j + 1]/2;
-        if(coord.y < h)
+        if(SearchPos.Y < h)
         {
-            posCurs.x = j;
+            Curr_Pos_X = j;
             break;
         }
         h += this.gaps.row[j + 1]/2;
     }
+
+    SearchPos.Pos.Update(Curr_Pos_X, Depth);
 
     ////////////////////////////////
 
     var sumWidth = 0;
     var sumHeight = 0;
 
-    for(var t = 0; t < posCurs.y; t++)
+    for(var t = 0; t < Curr_Pos_Y; t++)
         sumWidth += Widths[t] + this.gaps.column[t + 1];
-    for(t = 0; t < posCurs.x; t++)
+    for(t = 0; t < Curr_Pos_X; t++)
         sumHeight += Heights[t] + this.gaps.row[t + 1];
 
-    // флаг для случая, когда выходим за границы элемента и есть выравнивание относительно других элементов
-    var inside_flag = -1;
 
-    if( posCurs.x != null && posCurs.y != null)
+    if( Curr_Pos_X != null && Curr_Pos_Y != null)
     {
-        var size = this.elements[posCurs.x][posCurs.y].size;
-        var align = this.align(posCurs.x, posCurs.y);
-        if(coord.x < ( sumWidth + align.x ))
-        {
-            mouseCoord.x = 0;
-            inside_flag = 0;
-        }
-        else if( coord.x > (sumWidth + align.x + size.width ))
-        {
-            mouseCoord.x = size.width;
-            inside_flag = 1;
-        }
+        var size = this.elements[Curr_Pos_X][Curr_Pos_Y].size;
+        var align = this.align(Curr_Pos_X, Curr_Pos_Y);
+        if(SearchPos.X < ( sumWidth + align.x ))
+            SearchPos.X = 0;
+        else if( SearchPos.X > (sumWidth + align.x + size.width ))
+            SearchPos.X = size.width;
         else
-            mouseCoord.x = coord.x - ( sumWidth + align.x );
+            SearchPos.X -= ( sumWidth + align.x );
 
-        if(coord.y < (sumHeight + align.y))
-        {
-            mouseCoord.y = 0;
-            inside_flag = 2;
-        }
-        else if( coord.y > ( sumHeight + align.y + size.height ) )
-        {
-            mouseCoord.y = size.height;
-            inside_flag = 2;
-        }
+
+        if(SearchPos.Y < (sumHeight + align.y))
+            SearchPos.Y = 0;
+        else if( SearchPos.Y > ( sumHeight + align.y + size.height ) )
+            SearchPos.Y = size.height;
         else
-            mouseCoord.y = coord.y - ( sumHeight + align.y );
+            SearchPos.Y -= ( sumHeight + align.y );
     }
-
-    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
 CMathMatrix.prototype.getMetrics = function()
 {
