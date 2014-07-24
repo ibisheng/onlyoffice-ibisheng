@@ -4855,8 +4855,11 @@ ParaRun.prototype =
         if ( undefined != TextPr.FontSize )
             this.Set_FontSize( null === TextPr.FontSize ? undefined : TextPr.FontSize );
 
-        if ( undefined !== TextPr.Color )
+        if ( undefined !== TextPr.Color && undefined === TextPr.Unifill )
+        {
             this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
+            this.Set_Unifill( undefined );
+        }
 
         if ( undefined !== TextPr.Unifill )
             this.Set_Unifill( null === TextPr.Unifill ? undefined : TextPr.Unifill );

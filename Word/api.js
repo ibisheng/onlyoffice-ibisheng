@@ -4008,10 +4008,18 @@ asc_docs_api.prototype.put_TextColor = function(color)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        var Unifill = new CUniFill();
-        Unifill.fill = new CSolidFill();
-        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
-        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : Unifill} ) );
+        
+        if ( true === color.Auto )
+        {
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color : { Auto : true, r : 0, g : 0, b : 0 }, Unifill : undefined } ) );   
+        }
+        else
+        {
+            var Unifill = new CUniFill();
+            Unifill.fill = new CSolidFill();
+            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : Unifill} ) );
+        }
 
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
