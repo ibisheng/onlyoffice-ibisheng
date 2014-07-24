@@ -2078,7 +2078,6 @@ function DrawingObjects() {
          *****************************************/
 
         // Undo/Redo
-        _this.drawingDocument.CheckTargetShow();
         if ( (worksheet.model.index != api.wb.model.getActive()) && !printOptions )
             return;
 
@@ -2192,6 +2191,8 @@ function DrawingObjects() {
                 if ( _this.controller.selectedObjects.length )
                     _this.OnUpdateOverlay();
             }
+            _this.drawingDocument.CheckTargetShow();
+            _this.controller.updateSelectionState();
         }
     };
 
@@ -2628,29 +2629,7 @@ function DrawingObjects() {
             window["Asc"]["editor"]._loadFonts(font_map,
                 function()
                 {
-                    oNewChartSpace.getAllRasterImages(aImagesSync);
-                    oNewChartSpace.setBDeleted(false);
-                    oNewChartSpace.setWorksheet(worksheet.model);
-                    oNewChartSpace.addToDrawingObjects();
-                    oNewChartSpace.recalculate();
-                    CheckSpPrXfrm(oNewChartSpace);
 
-                    var canvas_height = worksheet.drawingCtx.getHeight(3);
-                    var pos_y = (canvas_height - oNewChartSpace.spPr.xfrm.extY)/2;
-                    if(pos_y < 0)
-                    {
-                        pos_y = 0;
-                    }
-
-                    var canvas_width = worksheet.drawingCtx.getWidth(3);
-                    var pos_x = (canvas_width - oNewChartSpace.spPr.xfrm.extX)/2;
-                    if(pos_x < 0)
-                    {
-                        pos_x = 0;
-                    }
-                    oNewChartSpace.spPr.xfrm.setOffX(pos_x);
-                    oNewChartSpace.spPr.xfrm.setOffY(pos_y);
-                    oNewChartSpace.recalculate();
 
                     var min_r = 0, max_r = 0, min_c = 0, max_c = 0;
 
@@ -2787,6 +2766,29 @@ function DrawingObjects() {
                         }
                     }
                     worksheet._updateCellsRange(new asc_Range(0, 0, Math.max(worksheet.nColsCount - 1, max_c),  Math.max(worksheet.nRowsCount - 1, max_r)));
+                    oNewChartSpace.getAllRasterImages(aImagesSync);
+                    oNewChartSpace.setBDeleted(false);
+                    oNewChartSpace.setWorksheet(worksheet.model);
+                    oNewChartSpace.addToDrawingObjects();
+                    oNewChartSpace.recalculate();
+                    CheckSpPrXfrm(oNewChartSpace);
+
+                    var canvas_height = worksheet.drawingCtx.getHeight(3);
+                    var pos_y = (canvas_height - oNewChartSpace.spPr.xfrm.extY)/2;
+                    if(pos_y < 0)
+                    {
+                        pos_y = 0;
+                    }
+
+                    var canvas_width = worksheet.drawingCtx.getWidth(3);
+                    var pos_x = (canvas_width - oNewChartSpace.spPr.xfrm.extX)/2;
+                    if(pos_x < 0)
+                    {
+                        pos_x = 0;
+                    }
+                    oNewChartSpace.spPr.xfrm.setOffX(pos_x);
+                    oNewChartSpace.spPr.xfrm.setOffY(pos_y);
+                    oNewChartSpace.recalculate();
                     _this.showDrawingObjects(false);
                     _this.controller.selectObject(oNewChartSpace, 0);
                     _this.sendGraphicObjectProps();
@@ -2816,15 +2818,37 @@ function DrawingObjects() {
 
     _this.rebuildChartGraphicObjects = function(data)
     {
-        var wsViews = Asc["editor"].wb.wsViews;
-
-        for(var i = 0; i < wsViews.length; ++i)
-        {
-            if(wsViews[i])
+        ExecuteNoHistory(function(){
+            var wsViews = Asc["editor"].wb.wsViews;
+            var changedArr = [];
+            if(data.changedRange)
             {
-                wsViews[i].objectRender.rebuildCharts(data);
+                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.changedRange.c1, data.changedRange.r1, data.changedRange.c2, data.changedRange.r2)))
             }
-        }
+            if(data.added)
+            {
+                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.added.c1, data.added.r1, data.added.c2, data.added.r2)))
+            }
+
+            if(data.hided)
+            {
+                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.hided.c1, data.hided.r1, data.hided.c2, data.hided.r2)))
+            }
+
+            if(data.removed)
+            {
+                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.removed.c1, data.removed.r1, data.removed.c2, data.removed.r2)))
+            }
+
+            for(var i = 0; i < wsViews.length; ++i)
+            {
+                if(wsViews[i])
+                {
+                    wsViews[i].objectRender.rebuildCharts(changedArr);
+                }
+            }
+        }, _this, []);
+
 
     };
 
@@ -3219,7 +3243,7 @@ function DrawingObjects() {
                 var graphicObject = aObjects[i].graphicObject;
                 if ( graphicObject.updateChartReferences )
                 {
-                    graphicObject.updateChartReferences(oldWorksheet, parserHelp.getEscapeSheetName(newWorksheet));
+                    graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
                 }
             }
             if(this.controller)
@@ -3233,7 +3257,7 @@ function DrawingObjects() {
             var graphicObject = aObjects[i].graphicObject;
             if ( graphicObject.updateChartReferences2 )
             {
-                graphicObject.updateChartReferences2(oldWorksheet, parserHelp.getEscapeSheetName(newWorksheet));
+                graphicObject.updateChartReferences2(oldWorksheet, newWorksheet);
             }
         }
     };

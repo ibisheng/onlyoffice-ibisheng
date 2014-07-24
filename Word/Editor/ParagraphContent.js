@@ -4970,7 +4970,7 @@ ParaDrawing.prototype =
                 }
                 if(isRealObject(this.GraphicObj))
                 {
-                    this.GraphicObj.parent = this;
+                    //this.GraphicObj.parent = this;
                     this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
                 }
                 break;
@@ -5092,7 +5092,7 @@ ParaDrawing.prototype =
 
                 if(isRealObject(this.GraphicObj))
                 {
-                    this.GraphicObj.parent = this;
+                    //this.GraphicObj.parent = this;
                     this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
                 }
 
@@ -5607,11 +5607,11 @@ ParaDrawing.prototype =
                 {
                     this.GraphicObj = null;
                 }
-                if(isRealObject(this.GraphicObj))
-                    this.GraphicObj.parent = this;
+                //if(isRealObject(this.GraphicObj))
+                //    this.GraphicObj.parent = this;
                 if(isRealObject(this.GraphicObj))
                 {
-                    this.GraphicObj.parent = this;
+                    //this.GraphicObj.parent = this;
                     this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
                 }
                 break;

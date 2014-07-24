@@ -2251,7 +2251,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								History.TurnOn();
 							
 							if ( ws )
-								ws.objectRender.updateChartReferences(activeName, ws.model.sName);
+								ws.objectRender.updateChartReferences(parserHelp.getEscapeSheetName(activeName), parserHelp.getEscapeSheetName(ws.model.sName));
 						}
 						
 						// Удаляем Worksheet и получаем новый активный индекс (-1 означает, что ничего не удалилось)

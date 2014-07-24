@@ -260,7 +260,7 @@ DrawingObjectsController.prototype.startRecalculate = function()
 {
     this.recalculate();
     this.drawingObjects.showDrawingObjects(true);
-    this.updateSelectionState();
+    //this.updateSelectionState();
 };
 
 DrawingObjectsController.prototype.getDrawingObjects = function()
@@ -503,8 +503,8 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
         }, []);
         bRetValue = true;
     }
-    if ( true == bRetValue )
-        this.updateSelectionState();
+    //if ( true == bRetValue )
+    //    this.updateSelectionState();
     return bRetValue;
 };
 

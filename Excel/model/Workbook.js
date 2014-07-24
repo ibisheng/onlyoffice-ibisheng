@@ -2123,7 +2123,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         }
         NEW_WORKSHEET_DRAWING_DOCUMENT = null;
         drawingObjects.pushToAObjects(oNewWs.Drawings);
-        drawingObjects.updateChartReferences2(wsFrom.sName, oNewWs.sName);
+        drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }
 };
 Woorksheet.prototype.init=function(){

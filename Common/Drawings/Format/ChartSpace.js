@@ -28,7 +28,7 @@ BBoxInfo.prototype =
         {
             return false;
         }
-        return this.bbox.intersection(bboxInfo.bbox) !== null;
+        return this.bbox.isIntersect(bboxInfo.bbox);
     }
 };
 
@@ -801,12 +801,54 @@ CChartSpace.prototype =
         }
     },
 
-    rebuildSeries: function()
+    checkIntersectionChangedRange: function(data)
     {
-        this.setRecalculateInfo();
-        this.checkSeriesRefs(this.clearCacheVal);
-        this.recalculate();
-        //this.checkSeriesRefs(this.rebuildVal);
+        var i, j;
+        if(this.seriesBBoxes)
+        {
+            for(i = 0; i < this.seriesBBoxes.length; ++i)
+            {
+                for(j = 0; j < data.length; ++j)
+                {
+                    if(this.seriesBBoxes[i].checkIntersection(data[j]))
+                        return true;
+                }
+            }
+        }
+        if(this.seriesTitlesBBoxes)
+        {
+            for(i = 0; i < this.seriesTitlesBBoxes.length; ++i)
+            {
+                for(j = 0; j < data.length; ++j)
+                {
+                    if(this.seriesTitlesBBoxes[i].checkIntersection(data[j]))
+                        return true;
+                }
+            }
+        }
+        if(this.catTitlesBBoxes)
+        {
+            for(i = 0; i < this.catTitlesBBoxes.length; ++i)
+            {
+                for(j = 0; j < data.length; ++j)
+                {
+                    if(this.catTitlesBBoxes[i].checkIntersection(data[j]))
+                        return true;
+                }
+            }
+        }
+        return false;
+    },
+
+    rebuildSeries: function(data)
+    {
+        if( this.checkIntersectionChangedRange(data))
+        {
+            this.handleUpdateInternalChart();
+            this.recalcInfo.recalculateReferences = true;
+            this.checkSeriesRefs(this.clearCacheVal);
+            this.recalculate();
+        }
     },
 
     getTypeSubType: function()
@@ -1524,7 +1566,12 @@ CChartSpace.prototype =
         History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
     },
-    setParent: CShape.prototype.setParent,
+    setParent: function (parent)
+    {
+        History.Add(this, { Type: historyitem_ChartSpace_SetParent, oldPr: this.parent, newPr: parent });
+        this.parent = parent;
+    },
+
 
     setChart: function(chart)
     {
@@ -2076,32 +2123,48 @@ CChartSpace.prototype =
                                 var range = range1.bbox;
                                 if(range.r1 === range.r2)
                                 {
-                                    for(j = range.c1;  j <= range.c2; ++j)
+                                    var row = source_worksheet._getRowNoEmptyWithAll(range.r1);
+                                    if(row && !row.hd)
                                     {
-                                        cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
-                                        pt = new CNumericPoint();
-                                        pt.setIdx(pt_index++);
-                                        pt.setVal(parseFloat(cell.getValue()));
-                                        if(cell.getNumFormatStr() !== "General")
+                                        for(j = range.c1;  j <= range.c2; ++j)
                                         {
-                                            pt.setFormatCode(cell.getNumFormatStr())
+                                            var col = source_worksheet._getColNoEmptyWithAll(j);
+                                            if(!col || !col.hd)
+                                            {
+                                                cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                                pt = new CNumericPoint();
+                                                pt.setIdx(pt_index++);
+                                                pt.setVal(parseFloat(cell.getValue()));
+                                                if(cell.getNumFormatStr() !== "General")
+                                                {
+                                                    pt.setFormatCode(cell.getNumFormatStr())
+                                                }
+                                                num_cache.addPt(pt);
+                                            }
                                         }
-                                        num_cache.addPt(pt);
                                     }
                                 }
                                 else
                                 {
-                                    for(j = range.r1; j <= range.r2; ++j)
+                                    var col = source_worksheet._getColNoEmptyWithAll(range.c1);
+                                    if(!col || !col.hd)
                                     {
-                                        cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
-                                        pt = new CNumericPoint();
-                                        pt.setIdx(pt_index++);
-                                        pt.setVal(parseFloat(cell.getValue()));
-                                        if(cell.getNumFormatStr() !== "General")
+                                        for(j = range.r1; j <= range.r2; ++j)
                                         {
-                                            pt.setFormatCode(cell.getNumFormatStr())
+                                            var row = source_worksheet._getRowNoEmptyWithAll(j);
+                                            if(!row || !row.hd)
+                                            {
+                                                cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
+                                                pt = new CNumericPoint();
+                                                pt.setIdx(pt_index++);
+                                                pt.setVal(parseFloat(cell.getValue()));
+                                                if(cell.getNumFormatStr() !== "General")
+                                                {
+                                                    pt.setFormatCode(cell.getNumFormatStr())
+                                                }
+                                                num_cache.addPt(pt);
+                                            }
                                         }
-                                        num_cache.addPt(pt);
                                     }
                                 }
                             }
@@ -2117,11 +2180,25 @@ CChartSpace.prototype =
         {
             if(cat && cat.strRef && !cat.strRef.strCache)
             {
-                var f1 = cat.strRef.f.replace(/\(|\)/g,"");
+                var first_slice = 0, last_slice = 0;
+                if(cat.strRef.f[0] === "(")
+                {
+                    first_slice = 1;
+                }
+                if(cat.strRef.f[cat.strRef.f.length - 1] === ")")
+                {
+                    last_slice = -1;
+                }
+                else
+                {
+                    last_slice = cat.strRef.f.length;
+                }
+                var f1 = cat.strRef.f.slice(first_slice, last_slice);
                 var arr_f = f1.split(",");
                 var str_cache = new CStrCache();
                 //str_cache.setFormatCode("General");
                 var pt_index = 0, i, j, cell, pt;
+                var checked_hided_rows = [], checked_hided_cols = [];
                 for(i = 0; i < arr_f.length; ++i)
                 {
                     var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2136,26 +2213,42 @@ CChartSpace.prototype =
                                 var range = range1.bbox;
                                 if(range.r1 === range.r2)
                                 {
-                                    for(j = range.c1;  j <= range.c2; ++j)
+                                    var row = source_worksheet._getRowNoEmptyWithAll(range.r1);
+                                    if(!row || !row.hd)
                                     {
-                                        cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
-                                        pt = new CStringPoint();
-                                        pt.setIdx(pt_index++);
-                                        pt.setVal(cell.getValue());
+                                        for(j = range.c1;  j <= range.c2; ++j)
+                                        {
+                                            var col = source_worksheet._getColNoEmptyWithAll(j);
+                                            if(!col || !col.hd)
+                                            {
+                                                cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                                pt = new CStringPoint();
+                                                pt.setIdx(pt_index++);
+                                                pt.setVal(cell.getValue());
 
-                                        str_cache.addPt(pt);
+                                                str_cache.addPt(pt);
+                                            }
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    for(j = range.r1;  j <= range.r2; ++j)
+                                    var col = source_worksheet._getColNoEmptyWithAll(range.c1);
+                                    if(!col || !col.hd)
                                     {
-                                        cell = source_worksheet.getCell(new CellAddress(j, range.c1, 0));
-                                        pt = new CStringPoint();
-                                        pt.setIdx(pt_index++);
-                                        pt.setVal(cell.getValue());
+                                        for(j = range.r1;  j <= range.r2; ++j)
+                                        {
+                                            var row = source_worksheet._getRowNoEmptyWithAll(j);
+                                            if(!row || !row.hd)
+                                            {
+                                                cell = source_worksheet.getCell(new CellAddress(j, range.c1, 0));
+                                                pt = new CStringPoint();
+                                                pt.setIdx(pt_index++);
+                                                pt.setVal(cell.getValue());
 
-                                        str_cache.addPt(pt);
+                                                str_cache.addPt(pt);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -7232,6 +7325,11 @@ CChartSpace.prototype =
                 this.worksheet = data.oldPr;
                 break;
             }
+            case historyitem_ChartSpace_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
@@ -7327,6 +7425,12 @@ CChartSpace.prototype =
             case historyitem_AutoShapes_AddToDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
+                break;
+            }
+
+            case historyitem_ChartSpace_SetParent:
+            {
+                this.parent = data.newPr;
                 break;
             }
             case historyitem_AutoShapes_SetWorksheet:
@@ -7439,6 +7543,12 @@ CChartSpace.prototype =
                 {
                     writeString(w,data.newPr.getId());
                 }
+                break;
+            }
+
+            case historyitem_ChartSpace_SetParent:
+            {
+                writeObject(w, data.newPr);
                 break;
             }
             case historyitem_ShapeSetBDeleted:
@@ -7561,6 +7671,11 @@ CChartSpace.prototype =
                 {
                     this.worksheet = null;
                 }
+                break;
+            }
+            case historyitem_ChartSpace_SetParent:
+            {
+                this.parent = readObject(r);
                 break;
             }
             case historyitem_ShapeSetBDeleted:

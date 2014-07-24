@@ -4922,7 +4922,7 @@ DrawingObjectsController.prototype =
                 }
                 callback.apply(_this, args);
                 _this.startRecalculate();
-                _this.recalculateCurPos();
+               // _this.recalculateCurPos();
                 _this.drawingObjects.sendGraphicObjectProps();
             }
         };
