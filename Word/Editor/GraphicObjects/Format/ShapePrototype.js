@@ -701,7 +701,11 @@ CShape.prototype.Get_PrevElementEndInfo = function(CurElement)
 {
     var para_drawing = this.GetParaDrawing();
     if(isRealObject(para_drawing) && isRealObject(para_drawing.DocumentContent) && (para_drawing.DocumentContent.Get_PrevElementEndInfo) )
-        return para_drawing.DocumentContent.Get_PrevElementEndInfo(para_drawing.Get_ParentParagraph());
+    {
+        var parent_paragraph = para_drawing.Get_ParentParagraph();
+        if(parent_paragraph)
+            return para_drawing.DocumentContent.Get_PrevElementEndInfo(parent_paragraph);
+    }
     return null;
 };
 CShape.prototype.Is_ThisElementCurrent = function(CurElement)
