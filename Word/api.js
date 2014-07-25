@@ -5872,7 +5872,7 @@ asc_docs_api.prototype.asc_selectComment = function(Id)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-    this.WordControl.m_oLogicDocument.Select_Comment(Id);
+    this.WordControl.m_oLogicDocument.Select_Comment(Id, true);
 };
 
 asc_docs_api.prototype.asc_showComment = function(Id)

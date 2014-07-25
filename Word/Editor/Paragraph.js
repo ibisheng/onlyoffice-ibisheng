@@ -7020,6 +7020,9 @@ Paragraph.prototype =
 
                 var CurLine  = ParaNum.Line;
                 var CurRange = ParaNum.Range;
+                
+                if ( CurLine < this.Pages[CurPage].StartLine || CurLine > this.Pages[CurPage].EndLine )
+                    break;
 
                 var SelectY = this.Lines[CurLine].Top + this.Pages[CurPage].Y;
                 var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;

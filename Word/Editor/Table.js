@@ -7226,6 +7226,22 @@ CTable.prototype =
                     Cell_Content.Add_Comment( Comment, false, true );
                     Cell_Content.Set_ApplyToAll( false );
                 }
+
+                // TODO: Пока нам приходится пересчитывать ячейки после добавления комментариев. Как только
+                //       избавимся от этого, то надо будет переделать здесь.
+
+                var RowsCount = this.Content.length;
+                for ( var RowIndex = 0; RowIndex < RowsCount; RowIndex++ )
+                {
+                    var Row = this.Content[RowIndex];
+                    var CellsCount = Row.Get_CellsCount();
+                    
+                    for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
+                    {
+                        var Cell = Row.Get_Cell( CellIndex );
+                        this.RecalcInfo.Add_Cell( Cell );
+                    }
+                }
             }
         }
         else
@@ -7242,22 +7258,64 @@ CTable.prototype =
                 }
                 else
                 {
+                    var StartPos = null, EndPos = null;
+                    
                     if ( true === bStart )
                     {
-                        var Pos = this.Selection.Data[0];
-                        var Cell_Content = this.Content[Pos.Row].Get_Cell( Pos.Cell ).Content;
+                        StartPos = this.Selection.Data[0];
+                        var Cell_Content = this.Content[StartPos.Row].Get_Cell( StartPos.Cell ).Content;
                         Cell_Content.Set_ApplyToAll( true );
                         Cell_Content.Add_Comment( Comment, true, false );
-                        Cell_Content.Set_ApplyToAll( false );
+                        Cell_Content.Set_ApplyToAll( false );                        
                     }
 
                     if ( true === bEnd )
                     {
-                        var Pos = this.Selection.Data[this.Selection.Data.length - 1];
-                        var Cell_Content = this.Content[Pos.Row].Get_Cell( Pos.Cell ).Content;
+                        EndPos = this.Selection.Data[this.Selection.Data.length - 1];
+                        var Cell_Content = this.Content[EndPos.Row].Get_Cell( EndPos.Cell ).Content;
                         Cell_Content.Set_ApplyToAll( true );
                         Cell_Content.Add_Comment( Comment, false, true );
                         Cell_Content.Set_ApplyToAll( false );
+                    }
+                    
+                    // TODO: Пока нам приходится пересчитывать ячейки после добавления комментариев. Как только
+                    //       избавимся от этого, то надо будет переделать здесь.
+                    
+                    var StartRow = 0, EndRow = -1, StartCell = 0, EndCell = -1;
+                    if ( null !== StartPos && null !== EndPos )
+                    {
+                        StartRow  = StartPos.Row;
+                        EndRow    = EndPos.Row;
+                        StartCell = StartPos.Cell;
+                        EndCell   = EndPos.Cell;
+                    }
+                    else if ( null !== StartPos )
+                    {
+                        StartRow  = StartPos.Row;
+                        StartCell = StartPos.Cell;
+                        EndRow    = this.Content.length - 1;
+                        EndCell   = this.Content[EndRow].Get_CellsCount() - 1;                        
+                    }
+                    else if ( null !== EndPos )
+                    {
+                        StartRow  = 0;
+                        StartCell = 0;
+                        EndRow    = EndPos.Row;
+                        EndCell   = EndPos.Cell;
+                    }
+                    
+                    for ( var RowIndex = StartRow; RowIndex <= EndRow; RowIndex++ )
+                    {
+                        var Row = this.Content[RowIndex];
+                        
+                        var _StartCell = ( RowIndex === StartRow ? StartCell : 0 );
+                        var _EndCell   = ( RowIndex === EndRow   ? EndCell   : Row.Get_CellsCount() - 1 );
+                        
+                        for ( var CellIndex = _StartCell; CellIndex <= _EndCell; CellIndex++ )
+                        {
+                            var Cell = Row.Get_Cell( CellIndex );
+                            this.RecalcInfo.Add_Cell( Cell );
+                        }                        
                     }
                 }
             }
@@ -11288,7 +11346,7 @@ CTable.prototype =
             if ( 0 != Index )
             {
                 Cell_tl.Content_Merge( Cell.Content );
-                Cell.Content.Clear_Content();
+                Cell.Content.Selection_Remove();
             }
         }
 

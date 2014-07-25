@@ -651,10 +651,21 @@ ParaHyperlink.prototype =
 
     Clear_TextPr : function()
     {
+        var HyperlinkStyle = null;        
+        if ( undefined !== this.Paragraph && null !== this.Paragraph )
+        {
+            var Styles = this.Paragraph.Parent.Get_Styles();
+            HyperlinkStyle = Styles.Get_Default_Hyperlink();
+        }
+
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            this.Content[Index].Clear_TextPr();
+            var Item = this.Content[Index];
+            Item.Clear_TextPr();
+
+            if ( para_Run === Item.Type && null !== HyperlinkStyle )
+                Item.Set_RStyle( HyperlinkStyle );
         }
     },
 
@@ -792,12 +803,12 @@ ParaHyperlink.prototype =
     Clear_TextFormatting : function( DefHyper )
     {
         var Count = this.Content.length;
-        
+                
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
             var Item = this.Content[Pos];
             Item.Clear_TextFormatting( DefHyper );
-            
+                        
             if ( para_Run === Item.Type )
                 Item.Set_RStyle( DefHyper );
         }

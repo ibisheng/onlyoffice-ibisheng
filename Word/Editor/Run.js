@@ -3194,7 +3194,7 @@ ParaRun.prototype =
             CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
             RGBA = CurTextPr.Unifill.getRGBAColor();
 
-            if ( true === PDSE.VisitedHyperlink )
+            if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
             {
                 G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
                 RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
@@ -3207,7 +3207,7 @@ ParaRun.prototype =
         }
         else
         {
-            if ( true === PDSE.VisitedHyperlink )
+            if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
             {
                 G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
                 RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
@@ -3383,7 +3383,7 @@ ParaRun.prototype =
         var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
 
         // Выставляем цвет обводки
-        if ( true === PDSL.VisitedHyperlink )
+        if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
             CurColor = new CDocumentColor( 128, 0, 151 );
         else if ( true === CurTextPr.Color.Auto && !CurTextPr.Unifill)
             CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );

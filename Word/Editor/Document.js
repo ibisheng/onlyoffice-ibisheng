@@ -2699,10 +2699,10 @@ CDocument.prototype =
             NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD, Before );
 
             this.Internal_Content_Add( Pos, NewParagraph );
-            OldParagraph.Cursor_MoveToStartPos();
+            NewParagraph.Cursor_MoveToEndPos();
 
             this.Selection_Remove();
-            this.CurPos.ContentPos = Pos + 1;
+            this.CurPos.ContentPos = Pos;
             this.CurPos.Type       = docpostype_Content;
 
             this.Recalculate();
@@ -2838,6 +2838,19 @@ CDocument.prototype =
                     this.Document_UpdateRulersState();
                 }
             }
+        }
+    },
+
+    Check_FramePrLastParagraph : function()
+    {
+        var Count = this.Content.length;
+        if ( Count <= 0 )
+            return;
+
+        var Element = this.Content[Count - 1];
+        if ( type_Paragraph === Element.GetType() && undefined !== Element.Get_FramePr() )
+        {
+            Element.Set_FramePr( undefined, true );
         }
     },
 
@@ -8425,7 +8438,7 @@ CDocument.prototype =
 
             if ( true === this.Comments.Is_Use() )
             {
-                this.Select_Comment( null );
+                this.Select_Comment( null, false );
                 editor.sync_HideComment();
             }
 
@@ -9997,12 +10010,12 @@ CDocument.prototype =
                     }
                     
                     var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
-                    this.Select_Comment( Comment.Get_Id() );
+                    this.Select_Comment( Comment.Get_Id(), false );
                     editor.sync_ShowComment( Comment.Get_Id(), Coords.X, Coords.Y );
                 }
                 else
                 {
-                    this.Select_Comment( null );
+                    this.Select_Comment( null, false );
                     editor.sync_HideComment();
                 }
             }
@@ -10275,6 +10288,9 @@ CDocument.prototype =
         // Обновим информацию о секциях
         this.SectionsInfo.Update_OnAdd( Position, [ NewObject ] );
 
+        // Проверим последний параграф
+        this.Check_SectionLastParagraph();
+
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
@@ -10319,6 +10335,9 @@ CDocument.prototype =
 
         // Проверим последний параграф
         this.Check_SectionLastParagraph();
+        
+        // Проверим не является ли рамкой последний параграф
+        this.Check_FramePrLastParagraph();
 
         return ChangePos;
     },
@@ -12582,6 +12601,15 @@ CDocument.prototype =
                     else
                     {
                         this.Content[StartPos].Add_Comment( Comment, true, false );
+                        
+                        // Делаем так из-за того, что таблицы нужно пересчитывать после добавления комментариев
+                        for ( var ContentPos = StartPos + 1; ContentPos < EndPos; ContentPos++ )
+                        {
+                            this.Content[ContentPos].Set_ApplyToAll( true );
+                            this.Content[ContentPos].Add_Comment( Comment, false, false );
+                            this.Content[ContentPos].Set_ApplyToAll( false );
+                        }
+                        
                         this.Content[EndPos].Add_Comment( Comment, false, true );
                     }
                 }
@@ -12655,7 +12683,7 @@ CDocument.prototype =
         return false;
     },
 
-    Select_Comment : function(Id)
+    Select_Comment : function(Id, ScrollToComment)
     {
         var OldId = this.Comments.Get_CurrentId();
         this.Comments.Set_Current( Id );
@@ -12666,7 +12694,9 @@ CDocument.prototype =
             var Comment_PageNum = Comment.m_oStartInfo.PageNum;
             var Comment_Y       = Comment.m_oStartInfo.Y;
             var Comment_X       = Comment.m_oStartInfo.X;
-            this.DrawingDocument.m_oWordControl.ScrollToPosition( Comment_X, Comment_Y, Comment_PageNum );
+            
+            if ( true === ScrollToComment )
+                this.DrawingDocument.m_oWordControl.ScrollToPosition( Comment_X, Comment_Y, Comment_PageNum );
         }
 
         if ( OldId != Id )
@@ -12871,7 +12901,7 @@ CDocument.prototype =
         if ( type_Paragraph === Element.GetType() && undefined !== Element.Get_SectionPr() )
             this.Internal_Content_Add(Count, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
     },
-
+    
     Add_SectionBreak : function(SectionBreakType)
     {
         var Element = null;

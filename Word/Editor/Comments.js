@@ -30,7 +30,7 @@ function CCommentData()
         var Count = this.m_aReplies.length;
         for (var Pos = 0; Pos < Count; Pos++)
         {
-            NewData.m_aReplies.push(this.m_aReplies.Copy());
+            NewData.m_aReplies.push(this.m_aReplies[Pos].Copy());
         }
 
         return NewData;
@@ -217,14 +217,6 @@ function CComment(Parent, Data)
         PageNum : 0
     };
 
-    this.m_oEndInfo =
-    {
-        X       : 0,
-        Y       : 0,
-        H       : 0,
-        PageNum : 0
-    };
-
     this.Lock = new CLock(); // Зажат ли комментарий другим пользователем
     if ( false === g_oIdCounter.m_bLoad )
     {
@@ -255,14 +247,6 @@ function CComment(Parent, Data)
         this.m_oStartInfo.PageNum = PageNum;        
     };
     
-    this.Set_EndInfo = function(PageNum, X, Y, H)
-    {
-        this.m_oEndInfo.X       = X;
-        this.m_oEndInfo.Y       = Y;
-        this.m_oEndInfo.H       = H;
-        this.m_oEndInfo.PageNum = PageNum;
-    };
-
     this.Set_Data = function(Data)
     {
         History.Add( this, { Type : historyitem_Comment_Change, New : Data, Old : this.Data } );
@@ -306,7 +290,6 @@ function CComment(Parent, Data)
             // Проставим начальные значения страниц (это текущий номер страницы, на котором произошло добавление комментария)
             var PageNum = Data.Content.Get_StartPage_Absolute();
             this.m_oStartInfo.PageNum = PageNum;
-            this.m_oEndInfo.PageNum   = PageNum;
         }
     };
 
@@ -1035,7 +1018,6 @@ ParaComment.prototype =
         else
         {
             Comment.Set_EndId( Para.Get_Id() );
-            Comment.Set_EndInfo( Page, X, Y, H );
         }
     },
 
@@ -1111,11 +1093,6 @@ ParaComment.prototype =
         {
             Comment.m_oStartInfo.X += Dx;
             Comment.m_oStartInfo.Y += Dy;
-        }
-        else
-        {
-            Comment.m_oEndInfo.X += Dx;
-            Comment.m_oEndInfo.Y += Dy;
         }
     },    
 //-----------------------------------------------------------------------------------
