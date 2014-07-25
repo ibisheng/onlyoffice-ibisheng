@@ -12293,7 +12293,7 @@ function CreateBarChart(chartSeries, type)
         bar_chart.addSer(series);
     }
     bar_chart.setGapWidth(150);
-    if(BAR_GROUPING_PERCENT_STACKED === type)
+    if(BAR_GROUPING_PERCENT_STACKED === type || BAR_GROUPING_STACKED === type)
         bar_chart.setOverlap(100);
     bar_chart.addAxId(cat_ax);
     bar_chart.addAxId(val_ax);
@@ -12454,7 +12454,7 @@ function CreateHBarChart(chartSeries, type)
     //d_lbls.setShowLegendKey(false);
     //d_lbls.setShowVal(true);
     bar_chart.setGapWidth(150);
-    if(BAR_GROUPING_PERCENT_STACKED === type)
+    if(BAR_GROUPING_PERCENT_STACKED === type || BAR_GROUPING_STACKED === type)
         bar_chart.setOverlap(100);
     bar_chart.addAxId(cat_ax);
     bar_chart.addAxId(val_ax);

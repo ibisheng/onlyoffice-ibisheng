@@ -2218,7 +2218,7 @@ DrawingObjectsController.prototype =
                     new_chart_type.setBarDir(need_bar_dir);
                     new_chart_type.setGapWidth(150);
 
-                    if(BAR_GROUPING_PERCENT_STACKED === need_groupping)
+                    if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
                         new_chart_type.setOverlap(100);
 
                     axis_by_types = new_chart_type.getAxisByTypes();
