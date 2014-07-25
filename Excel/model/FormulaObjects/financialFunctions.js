@@ -3006,7 +3006,7 @@ cISPMT.prototype.Calculate = function ( arg ) {
     if ( nper instanceof cError ) return this.value = nper;
     if ( pv instanceof cError ) return this.value = pv;
 
-    if ( nper.getValue() < 0 ) {
+    if ( nper.getValue() == 0 ) {
         return this.value = new cError( cErrorType.division_by_zero );
     }
 
