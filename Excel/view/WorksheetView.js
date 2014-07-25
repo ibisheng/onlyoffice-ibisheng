@@ -7739,41 +7739,44 @@
 			return d;
 		};
 
+		WorksheetView.prototype._cleanSelectionMoveRange = function () {
+			// Перерисовываем и сбрасываем параметры
+			this.cleanSelection();
+			this.activeMoveRange = null;
+			this.startCellMoveRange = null;
+			this._drawSelection();
+		};
+
 		/* Функция для применения перемещения диапазона */
 		WorksheetView.prototype.applyMoveRangeHandle = function (ctrlKey) {
-			var t = this;
-
-			if (null === t.activeMoveRange) {
+			if (null === this.activeMoveRange) {
 				// Сбрасываем параметры
-				t.startCellMoveRange = null;
+				this.startCellMoveRange = null;
 				return;
 			}
 
-			var arnFrom = t.activeRange.clone(true);
-			var arnTo = t.activeMoveRange.clone(true);
-			var resmove = t.model._prepareMoveRange(arnFrom, arnTo);
-			if( resmove == -2 ){
-				t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical);
-				// Сбрасываем параметры
-				t.activeMoveRange = null;
-				t.startCellMoveRange = null;
-				t.isChanged = true;
-				t._updateCellsRange(new asc_Range(0, 0, arnFrom.c2 > arnTo.c2 ? arnFrom.c2 : arnTo.c2,
-					arnFrom.r2 > arnTo.r2 ? arnFrom.r2 : arnTo.r2), /*canChangeColWidth*/c_oAscCanChangeColWidth.none);
-				// Перерисовываем
-				t.cleanSelection();
-				t._drawSelection();
-				return false;
-			} else if( resmove == -1 ){
-				t.model.workbook.handlers.trigger("asc_onConfirmAction",
-												  c_oAscConfirm.ConfirmReplaceRange,
-												  function(can){t.moveRangeHandle(arnFrom, arnTo, can, ctrlKey)}
-				);
-
-			} else {
-				t.moveRangeHandle(arnFrom, arnTo, true, ctrlKey)
+			var arnFrom = this.activeRange.clone(true);
+			var arnTo = this.activeMoveRange.clone(true);
+			if (arnFrom.isEqual(arnTo)) {
+				this._cleanSelectionMoveRange();
+				return;
 			}
 
+			var resmove = this.model._prepareMoveRange(arnFrom, arnTo);
+			if (resmove === -2) {
+				this.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical);
+				this._cleanSelectionMoveRange();
+			} else if (resmove === -1) {
+				var t = this;
+				this.model.workbook.handlers.trigger("asc_onConfirmAction", c_oAscConfirm.ConfirmReplaceRange,
+					function (can) {
+						if (can)
+							t.moveRangeHandle(arnFrom, arnTo, ctrlKey);
+						else
+							t._cleanSelectionMoveRange();
+					});
+			} else
+				this.moveRangeHandle(arnFrom, arnTo, ctrlKey);
 		};
 
 		WorksheetView.prototype.applyMoveResizeRangeHandle = function (target){
@@ -7784,44 +7787,43 @@
 			this.startCellMoveResizeRange2 = null;
 		};
 
-		WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, can, copyRange){
+		WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, copyRange){
 			var t = this;
 			var onApplyMoveRangeHandleCallback = function (isSuccess) {
+				if (false === isSuccess) {
+					t._cleanSelectionMoveRange();
+					return;
+				}
+
 				// Очищаем выделение
 				t.cleanSelection();
 
-				if (true === isSuccess && !arnFrom.isEqual(arnTo) && can) {
-					//ToDo t.cleanDepCells();
-					History.Create_NewPoint();
-					History.SetSelection(arnFrom.clone());
-					History.SetSelectionRedo(arnTo.clone());
-					History.StartTransaction();
-                    if( !copyRange ) t.autoFilters._preMoveAutoFilters(arnFrom);
-					t.model._moveRange(arnFrom, arnTo, copyRange);
-					t._updateCellsRange(arnTo);
-					t.cleanSelection();
-					t.activeRange = arnTo.clone(true);
-					t.cellCommentator.moveRangeComments(arnFrom, arnTo);
-					t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
-                    if( !copyRange ) {
-                        t.autoFilters._moveAutoFilters(arnTo, arnFrom);
-					    // Вызываем функцию пересчета для заголовков форматированной таблицы
-                        t.autoFilters._renameTableColumn( arnFrom );
-                        t.autoFilters._renameTableColumn( arnTo );
-                        t.autoFilters.reDrawFilter( arnFrom );
-                    }
-					History.EndTransaction();
+				//ToDo t.cleanDepCells();
+				History.Create_NewPoint();
+				History.SetSelection(arnFrom.clone());
+				History.SetSelectionRedo(arnTo.clone());
+				History.StartTransaction();
+				if (!copyRange)
+					t.autoFilters._preMoveAutoFilters(arnFrom);
+				t.model._moveRange(arnFrom, arnTo, copyRange);
+				t._updateCellsRange(arnTo, false, true);
+				t.activeRange = arnTo.clone(true);
+				t.cellCommentator.moveRangeComments(arnFrom, arnTo);
+				t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
+				if (!copyRange) {
+					t.autoFilters._moveAutoFilters(arnTo, arnFrom);
+					// Вызываем функцию пересчета для заголовков форматированной таблицы
+					t.autoFilters._renameTableColumn( arnFrom );
+					t.autoFilters._renameTableColumn( arnTo );
+					t.autoFilters.reDrawFilter( arnFrom );
 				}
+				History.EndTransaction();
 
 				// Сбрасываем параметры
 				t.activeMoveRange = null;
 				t.startCellMoveRange = null;
-				t.isChanged = true;
-				t._updateCellsRange(new asc_Range(0, 0, arnFrom.c2 > arnTo.c2 ? arnFrom.c2 : arnTo.c2,
-					arnFrom.r2 > arnTo.r2 ? arnFrom.r2 : arnTo.r2), /*canChangeColWidth*/c_oAscCanChangeColWidth.none);
-				// Перерисовываем
-				t.cleanSelection();
-				t._drawSelection();
+				// Тут будет отрисовка select-а
+				t._updateCellsRange(arnFrom);
 			};
 
 			this._isLockedCells ([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
