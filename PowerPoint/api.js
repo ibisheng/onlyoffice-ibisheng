@@ -120,9 +120,7 @@ function asc_docs_api(name)
     /**************************************/
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-	this.autoSaveTimeOutId = null;		// Идентификатор таймаута
-	this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
-	this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении) в милесекундах
+	this.isAutoSave = false;			// Флаг, означает что запущено автосохранениеautoSaveTimeOutId
 
 	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
@@ -577,37 +575,6 @@ asc_docs_api.prototype.asc_coAuthoringGetUsers = function () {
     if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.getUsers();
-};
-/////////////////////////////////////////////////////////////////////////
-////////////////////////////AutoSave api/////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
-	// Очищаем предыдущий таймер
-	if (null !== this.autoSaveTimeOutId)
-		clearTimeout(this.autoSaveTimeOutId);
-
-	if (autoSaveGap || this.autoSaveGap) {
-		var t = this;
-		this.autoSaveTimeOutId = setTimeout(function () {
-			t.autoSaveTimeOutId = null;
-			if (t.isViewMode) {
-				/*
-				 1) При загрузке файла на просмотре при совместном редактировании загрузится
-				 файл уже с последними изменениями.
-				 2) Далее при срабатывании автосохранения должны накатываться новые изменения
-				 (это надо делать) при этом файл отсылаться не должен, т.к. изменений во вьювере нет.
-				 3) Если пользователь отключил автосохранение, то изменения к нему приходить не
-				 будут, поскольку это его решение.
-				 */
-				// Принимаем чужие изменения
-				CollaborativeEditing.Apply_Changes();
-				t.autoSaveInit();
-			} else if (t.isDocumentModified())
-				t.asc_Save(/*isAutoSave*/true);
-			else
-				t.autoSaveInit();
-		}, (autoSaveGap || this.autoSaveGap));
-	}
 };
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function () {
@@ -1445,12 +1412,8 @@ asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	this.canSave = true;
 	this.isAutoSave = false;
 	this.CoAuthoringApi.unSaveChanges();
-	if (isDocumentSaved) {
-		// Запускаем таймер автосохранения
-		this.autoSaveInit();
-	} else {
+	if (!isDocumentSaved)
 		this.CoAuthoringApi.disconnect();
-	}
 };
 asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	if(bInner)
@@ -1842,7 +1805,6 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 			if (t.isAutoSave) {
 				t.isAutoSave = false;
 				t.canSave = true;
-				t.autoSaveInit(t.autoSaveGapAsk);
 				return;
 			}
 
@@ -3924,9 +3886,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     if (this.isViewMode)
         this.SetViewMode(true);
-
-    // Запускаем таймер автосохранения
-    this.autoSaveInit();
 };
 
 asc_docs_api.prototype.asyncFontStartLoaded = function()
@@ -4061,7 +4020,6 @@ asc_docs_api.prototype.GetCurrentVisiblePage = function()
 asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
 	if (typeof autoSaveGap === "number") {
 		this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
-		this.autoSaveInit();
 	}
 };
 
