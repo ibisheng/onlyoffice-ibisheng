@@ -2067,8 +2067,11 @@ Woorksheet.prototype.clone=function(sNewId){
 		oNewWs.TableParts.push(this.TableParts[i].clone(oNewWs));
 	if(this.AutoFilter)
 		oNewWs.AutoFilter = this.AutoFilter.clone();
-	for(i in this.aCols)
-		oNewWs.aCols[i] = this.aCols[i].clone(oNewWs);
+	for (i in this.aCols) {
+	    var col = this.aCols[i];
+	    if(null != col)
+	        oNewWs.aCols[i] = col.clone(oNewWs);
+	}
 	if(null != this.oAllCol)
 		oNewWs.oAllCol = this.oAllCol.clone(oNewWs);
 	for(i in this.aGCells)
@@ -2729,8 +2732,9 @@ Woorksheet.prototype.setColWidth=function(width, start, stop){
 		var col = this.getAllCol();
 		fProcessCol(col);
 		for(var i in this.aCols){
-			var col = this.aCols[i];
-			fProcessCol(col);
+		    var col = this.aCols[i];
+		    if (null != col)
+			    fProcessCol(col);
 		}
 	}
 	else
@@ -2784,8 +2788,9 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 		if(null != col)
 			fProcessCol(col);
 		for(var i in this.aCols){
-			var col = this.aCols[i];
-			fProcessCol(col);
+		    var col = this.aCols[i];
+		    if (null != col)
+			    fProcessCol(col);
 		}
 	}
 	else
@@ -2835,8 +2840,9 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 		if(null != col)
 			fProcessCol(col);
 		for(var i in this.aCols){
-			var col = this.aCols[i];
-			fProcessCol(col);
+		    var col = this.aCols[i];
+		    if (null != col)
+			    fProcessCol(col);
 		}
 	}
 	else
