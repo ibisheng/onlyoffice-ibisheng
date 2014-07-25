@@ -5260,18 +5260,12 @@
 					this.drawingGraphicCtx.moveImageDataSafari(x, y, oldW, moveHeight, x + dx, y - dy);
 				else
 					this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
-			} else {
-				// Scroll на весь экран отрабатываем для Safari
-				if (AscBrowser.isSafari)
-					this.drawingGraphicCtx.clear();
 			}
 			var clearTop = y + (scrollDown ? moveHeight - dy : 0);
 			moveHeight = Math.abs(dy) + lastRowHeight;
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, clearTop, ctxW, moveHeight);
-
-			if (!AscBrowser.isSafari)
-				this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, moveHeight);
+			this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, moveHeight);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
@@ -5396,19 +5390,13 @@
 					this.drawingGraphicCtx.moveImageDataSafari(x, y, moveWidth, ctxH, x - dx, y);
 				else
 					this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
-			} else {
-				// Scroll на весь экран отрабатываем для Safari
-				if (AscBrowser.isSafari)
-					this.drawingGraphicCtx.clear();
 			}
 
 			var clearLeft = x + (scrollRight > 0 ? moveWidth - dx : 0);
 			moveWidth = Math.abs(dx) + lastColWidth;
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(clearLeft, y, moveWidth, ctxH);
-
-			if (!AscBrowser.isSafari)
-				this.drawingGraphicCtx.clearRect(clearLeft, y, moveWidth, ctxH);
+			this.drawingGraphicCtx.clearRect(clearLeft, y, moveWidth, ctxH);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
