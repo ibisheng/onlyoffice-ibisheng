@@ -303,8 +303,9 @@ ParaMath.prototype =
 					}
 					else //справа есть элемент
 					{
-						var nextElem = oContent.Content.getElem(oContent.Start + 1);
-						if (nextElem.typeObj == para_Math_Composition) //справа композиция
+						var nNextElem = oContent.Start + 1;
+						var nextElem = oContent.Content.getElem(nNextElem);
+						if (nextElem.Type == para_Math_Composition) //справа композиция
 						{
 							this.Set_Select_ToMComp(Direction);
 							return;
@@ -317,8 +318,8 @@ ParaMath.prototype =
 							if(nextElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
 							{
 								var Items = [];
-								Items.push(nextElem.Parent.content[0]);
-								nextElem.Parent.content.splice( 0, 1 );
+								Items.push(nextElem);
+								nextElem.Parent.content.splice( nNextElem, 1 );
 								History.Add(nextElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
 							}
 							return;
@@ -331,9 +332,9 @@ ParaMath.prototype =
 				if(oElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
 				{
 					var Items = [];
-					Items.push(oElem.Parent.content[0]);
-					oElem.Parent.content.splice( 0, 1 );
-					History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+					Items.push(oElem.Parent.content[oContent.Start]);
+					oElem.Parent.content.splice( oContent.Start, 1 );
+					History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
 					if (Direction < 0)
 						oContent.Content.CurPos--;
 				}

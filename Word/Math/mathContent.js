@@ -7179,7 +7179,8 @@ CMathContent.prototype =
         {
            this.content.splice(Pos,0,oElem);
         }
-		this.CurPos++;
+		if (this.content.length != 1)
+			this.CurPos++;
     },
 	AddText : function(oElem, sText)
     {		

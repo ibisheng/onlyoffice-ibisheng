@@ -8434,6 +8434,7 @@ function Binary_oMathReader(stream)
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadMathArgSz(t,l,props);
             });
+			oElem.SetArgSize(props.argSz);
         }
         else
             res = c_oSerConstants.ReadUnknown;
