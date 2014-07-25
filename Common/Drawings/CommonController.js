@@ -1286,20 +1286,15 @@ DrawingObjectsController.prototype =
         {
             content.Set_ParagraphIndent(indent);
         }
-        else
+        else if(this.document)
         {
-            if(this.selectedObjects.length ===1)
+            if(this.selectedObjects.length > 0)
             {
-                content = this.selectedObjects[0].getDocContent ? this.selectedObjects[0].getDocContent() : null;
-                if(content)
+                var parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
+                if(parent_paragraph)
                 {
-                    content.Set_ApplyToAll(true);
-                    content.Set_ParagraphIndent(indent);
-                    content.Set_ApplyToAll(false);
-                }
-                else
-                {
-                    this.selectedObjects[0].parent.Get_ParentParagraph().Set_Ind(indent, true)
+                    parent_paragraph.Set_Ind(indent, true);
+                    this.document.Recalculate();
                 }
             }
         }
@@ -3035,7 +3030,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    updateSelectionState: function()
+    updateSelectionState: function(bNoCheck)
     {
         var text_object;
         if(this.selection.textSelection)
@@ -3061,7 +3056,7 @@ DrawingObjectsController.prototype =
         {
             text_object.updateSelectionState(this.drawingObjects.drawingDocument);
         }
-        else
+        else if(bNoCheck !== true)
         {
             this.drawingObjects.drawingDocument.UpdateTargetTransform(null);
             this.drawingObjects.drawingDocument.TargetEnd();
@@ -3069,7 +3064,6 @@ DrawingObjectsController.prototype =
             this.drawingObjects.drawingDocument.SelectClear();
             this.drawingObjects.drawingDocument.SelectShow();
         }
-        this.updateOverlay();
     },
 
     remove: function(dir)
@@ -3197,6 +3191,7 @@ DrawingObjectsController.prototype =
                 this.resetSelection();
                 this.recalculate();
             }
+            this.updateOverlay();
         }
     },
 

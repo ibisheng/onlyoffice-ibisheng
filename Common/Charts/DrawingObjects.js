@@ -2115,42 +2115,7 @@ function DrawingObjects() {
                 } else
                     shapeCtx.updatedRect = null;
 
-                // Area for update
-                /*if ( graphicOption ) {
-                 var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
-                 var updatedRange = graphicOption.getUpdatedRange();
 
-                 var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-                 var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
-
-                 var x1 = worksheet.cols[updatedRange.c1].left - offsetX;
-                 var y1 = worksheet.rows[updatedRange.r1].top - offsetY;
-                 var x2 = worksheet.cols[updatedRange.c2].left - offsetX;
-                 var y2 = worksheet.rows[updatedRange.r2].top - offsetY;
-                 var w = x2 - x1;
-                 var h = y2 - y1;
-
-                 updatedRect.x = ptToMm(x1) - pxToMm(scrollOffset.getX());
-                 updatedRect.y = ptToMm(y1) - pxToMm(scrollOffset.getY());
-                 updatedRect.w = ptToMm(w);
-                 updatedRect.h = ptToMm(h);
-
-                 shapeCtx.m_oContext.beginPath();
-                 shapeCtx.m_oContext.strokeStyle = "#FF0000";
-                 shapeCtx.m_oContext.rect(mmToPx(updatedRect.x) + scrollOffset.getX(), mmToPx(updatedRect.y) + scrollOffset.getY(), mmToPx(updatedRect.w), mmToPx(updatedRect.h));
-                 shapeCtx.m_oContext.stroke();
-
-                 shapeCtx.updatedRect = updatedRect;
-
-                 if ( graphicOption.type === c_oAscGraphicOption.AddText ) {
-                 drawingCtx.clearRect( x1, y1, w, h );
-                 drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
-                 worksheet._drawGrid(undefined, updatedRange);
-                 worksheet._drawCellsAndBorders(undefined, updatedRange);
-                 }
-                 }
-                 else
-                 shapeCtx.updatedRect = null;*/
                 for (var i = 0; i < aObjects.length; i++) {
                     var drawingObject = aObjects[i];
 
@@ -2189,10 +2154,12 @@ function DrawingObjects() {
         if ( !printOptions ) {
             if ( aObjects.length ) {
                 if ( _this.controller.selectedObjects.length )
+                {
                     _this.OnUpdateOverlay();
+                    _this.drawingDocument.CheckTargetShow();
+                    _this.controller.updateSelectionState(true);
+                }
             }
-            _this.drawingDocument.CheckTargetShow();
-            _this.controller.updateSelectionState();
         }
     };
 

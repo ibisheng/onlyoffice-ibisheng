@@ -604,8 +604,8 @@ CDLbl.prototype =
     getStyles: function()
     {
         return ExecuteNoHistory(function(){
-
-            //todo: доработать
+            if(this.lastStyleObject)
+                return this.lastStyleObject;
             var styles = new CStyles();
             var style = new CStyle("dataLblStyle", null, null, null);
             var text_pr = new CTextPr();
@@ -713,6 +713,8 @@ CDLbl.prototype =
                     style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
             }
             styles.Add(style);
+            if(!(this instanceof CTitle))
+                this.lastStyleObject = {lastId: style.Id, styles: styles};
             return {lastId: style.Id, styles: styles};
         }, this, []);
     },

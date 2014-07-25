@@ -1180,8 +1180,19 @@ CGraphicObjects.prototype =
 
     documentUpdateRulersState: function()
     {
-        if(this.selectedObjects.length === 1 && this.selectedObjects[0].documentUpdateRulersState)
-            this.selectedObjects[0].documentUpdateRulersState();
+        var content = this.getTargetDocContent();
+        if(content && content.Parent && content.Parent.getObjectType && content.Parent.getObjectType() === historyitem_type_Shape)
+        {
+            content.Parent.documentUpdateRulersState();
+        }
+       //else if(this.selectedObjects.length > 0)
+       //{
+       //    var parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
+       //    if(parent_paragraph)
+       //    {
+       //        parent_paragraph.Document_UpdateRulersState();
+       //    }
+       //}
     },
 
     documentUpdateInterfaceState: function()
