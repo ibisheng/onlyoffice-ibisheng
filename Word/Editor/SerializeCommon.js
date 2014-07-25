@@ -816,7 +816,6 @@ function CPPTXContentWriter()
         {
             this.TreeDrawingIndex++;
             this.arrayStackStarts.push(this.BinaryFileWriter.pos);
-            this.BinaryFileWriter.pos = 0;
         }
 
         var _writer = this.BinaryFileWriter;
