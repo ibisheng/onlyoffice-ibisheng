@@ -5444,29 +5444,41 @@
 		// ----- Selection -----
 
 		// x,y - абсолютные координаты относительно листа (без учета заголовков)
-		WorksheetView.prototype.findCellByXY = function (x, y) {
+		WorksheetView.prototype.findCellByXY = function (x, y, canReturnNull, skipCol, skipRow) {
 			var r = 0, c = 0, tmpRow, tmpCol, result = new CCellObjectInfo();
-			x += this.cellsLeft;
-			y += this.cellsTop;
-			while (c < this.cols.length) {
-				tmpCol = this.cols[c];
-				if (x <= tmpCol.left + tmpCol.width) {
-					result.col = c;
-					break;
-				}
-				++c;
-			}
-			while (r < this.rows.length) {
-				tmpRow = this.rows[r];
-				if (y <= tmpRow.top + tmpRow.height) {
-					result.row = r;
-					break;
-				}
-				++r;
+			if (canReturnNull) {
+				result.col = result.row = null;
 			}
 
-			result.colOff = x - this.cols[result.col].left;
-			result.rowOff = y - this.rows[result.row].top;
+			x += this.cellsLeft;
+			y += this.cellsTop;
+			if (!skipCol) {
+				while (c < this.cols.length) {
+					tmpCol = this.cols[c];
+					if (x <= tmpCol.left + tmpCol.width) {
+						result.col = c;
+						break;
+					}
+					++c;
+				}
+
+				if (null !== result.col)
+					result.colOff = x - this.cols[result.col].left;
+			}
+			if (!skipRow) {
+				while (r < this.rows.length) {
+					tmpRow = this.rows[r];
+					if (y <= tmpRow.top + tmpRow.height) {
+						result.row = r;
+						break;
+					}
+					++r;
+				}
+
+				if (null !== result.row)
+					result.rowOff = y - this.rows[result.row].top;
+			}
+
 			return result;
 		};
 
