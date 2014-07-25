@@ -20297,13 +20297,9 @@ CStockChart.prototype =
             case historyitem_StockChart_SetDropLines:
             case historyitem_StockChart_SetHiLowLines:
             case historyitem_StockChart_AddSer:
-            {
-                writeObject(w, data.newPr);
-                break
-            }
             case historyitem_StockChart_SetUpDownBars:
             {
-                this.axId = data.newPr;
+                writeObject(w, data.newPr);
                 break
             }
         }

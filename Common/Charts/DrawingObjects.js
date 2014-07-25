@@ -1463,18 +1463,78 @@ function DrawingObjects() {
         //_t.to.row = toCell.row;
         //_t.to.rowOff = toCell.rowOff;
 
-            var fromCell = worksheet. findCellByXY(mmToPt(_t.graphicObject.x), mmToPt(_t.graphicObject.y));//_this.drawingArea.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-            var toCell =   worksheet. findCellByXY(mmToPt(_t.graphicObject.x + _t.graphicObject.extX), mmToPt(_t.graphicObject.y + _t.graphicObject.extY));
 
-            _t.from.col = fromCell.col;
-            _t.from.colOff = ptToMm(fromCell.colOff);
-            _t.from.row = fromCell.row;
-            _t.from.rowOff = ptToMm(fromCell.rowOff);
 
-            _t.to.col = toCell.col;
-            _t.to.colOff = ptToMm(toCell.colOff);
-            _t.to.row = toCell.row;
-            _t.to.rowOff = ptToMm(toCell.rowOff);
+            var fromX =  mmToPt(_t.graphicObject.x), fromY =  mmToPt(_t.graphicObject.y),
+                toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX), toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
+            var bReinitHorScroll = false, bReinitVertScroll = false;
+
+            var fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
+            while(fromColCell.col === null && worksheet.cols.length < gc_nMaxCol)
+            {
+                worksheet.expandColsOnScroll(true);
+                fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
+                bReinitHorScroll = true;
+            }
+            if(fromColCell.col === null)
+            {
+                fromColCell.col = gc_nMaxCol;
+            }
+            var fromRowCell = worksheet.findCellByXY(fromX, fromY, true, true, false);
+
+            while(fromRowCell.row === null && worksheet.rows.length < gc_nMaxRow)
+            {
+                worksheet.expandRowsOnScroll(true);
+                fromRowCell = worksheet.findCellByXY(fromX, fromY, true, true, false);
+                bReinitVertScroll = true;
+            }
+            if(fromRowCell.row === null)
+            {
+                fromRowCell.row = gc_nMaxRow;
+            }
+
+
+            var toColCell = worksheet.findCellByXY(toX, toY, true, false, true);
+            while(toColCell.col === null && worksheet.cols.length < gc_nMaxCol)
+            {
+                worksheet.expandColsOnScroll(true);
+                toColCell = worksheet.findCellByXY(toX, toY, true, false, true);
+                bReinitHorScroll = true;
+            }
+            if(toColCell.col === null)
+            {
+                toColCell.col = gc_nMaxCol;
+            }
+            var toRowCell = worksheet.findCellByXY(toX, toY, true, true, false);
+
+            while(toRowCell.row === null && worksheet.rows.length < gc_nMaxRow)
+            {
+                worksheet.expandRowsOnScroll(true);
+                toRowCell = worksheet.findCellByXY(toX, toY, true, true, false);
+                bReinitVertScroll = true;
+            }
+            if(toRowCell.row === null)
+            {
+                toRowCell.row = gc_nMaxRow;
+            }
+
+            _t.from.col = fromColCell.col;
+            _t.from.colOff = ptToMm(fromColCell.colOff);
+            _t.from.row = fromRowCell.row;
+            _t.from.rowOff = ptToMm(fromRowCell.rowOff);
+
+            _t.to.col = toColCell.col;
+            _t.to.colOff = ptToMm(toColCell.colOff);
+            _t.to.row = toRowCell.row;
+            _t.to.rowOff = ptToMm(toRowCell.rowOff);
+            if(bReinitHorScroll)
+            {
+                worksheet.handlers.trigger("reinitializeScrollX");
+            }
+            if(bReinitVertScroll)
+            {
+                worksheet.handlers.trigger("reinitializeScrollY");
+            }
         }
     };
 
