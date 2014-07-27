@@ -1911,104 +1911,7 @@ DrawingObjectsController.prototype =
         var plot_area = chart.plotArea;
         //horAxisLabel
 
-        var hor_axis = plot_area.getHorizontalAxis();
-        var hor_axis_label_setting = chartSettings.getHorAxisLabel();
-        if(hor_axis)
-        {
-            if(hor_axis_label_setting !== null)
-            {
-                switch (hor_axis_label_setting)
-                {
-                    case c_oAscChartHorAxisLabelShowSettings.none:
-                    {
-                        if(hor_axis.title)
-                            hor_axis.setTitle(null);
-                        break;
-                    }
-                    case c_oAscChartHorAxisLabelShowSettings.noOverlay:
-                    {
-                        if(!hor_axis.title)
-                        {
-                            hor_axis.setTitle(new CTitle());
-                        }
-                        if(!hor_axis.title.txPr)
-                        {
-                            hor_axis.title.setTxPr(new CTextBody());
-                        }
-                        if(!hor_axis.title.txPr.bodyPr)
-                        {
-                            hor_axis.title.txPr.setBodyPr(new CBodyPr());
-                            hor_axis.title.txPr.bodyPr.reset();
-                        }
-                        if(!hor_axis.title.txPr.content)
-                        {
-                            hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
-                        }
-                        if(hor_axis.title.overlay !== false)
-                            hor_axis.title.setOverlay(false);
-                        break;
-                    }
-                }
-            }
-            hor_axis.setMenuProps(chartSettings.getHorAxisProps());
-        }
 
-        //vertAxis
-        var vert_axis = plot_area.getVerticalAxis(); //TODO: запрашивать у chart_type
-        var vert_axis_labels_settings = chartSettings.getVertAxisLabel();
-        if(vert_axis)
-        {
-            if(vert_axis_labels_settings !== null)
-            {
-                switch (vert_axis_labels_settings)
-                {
-                    case c_oAscChartVertAxisLabelShowSettings.none:
-                    {
-                        if(vert_axis.title)
-                        {
-                            vert_axis.setTitle(null);
-                        }
-                        break;
-                    }
-                    case c_oAscChartVertAxisLabelShowSettings.vertical:
-                    {
-                        //TODO: пока СDocumentContent не поддерживает вертикальный текст, может быть будет когда-нибудь, хотя вряд ли.
-                        break;
-                    }
-                    default:
-                    {
-                        if( vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated
-                            || vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.horizontal)
-                        {
-                            if(!vert_axis.title)
-                            {
-                                vert_axis.setTitle(new CTitle());
-                            }
-                            if(!vert_axis.title.txPr)
-                            {
-                                vert_axis.title.setTxPr(new CTextBody());
-                            }
-                            if(!vert_axis.title.txPr.bodyPr)
-                            {
-                                vert_axis.title.txPr.setBodyPr(new CBodyPr());
-                                vert_axis.title.txPr.bodyPr.reset();
-                            }
-                            if(!vert_axis.title.txPr.content)
-                            {
-                                vert_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
-                            }
-                            if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated && vert_axis.title.txPr.bodyPr.vert !== nVertTTvert)
-                                vert_axis.title.txPr.bodyPr.setVert(nVertTTvert);
-                            if(vert_axis.title.overlay !== false)
-                            {
-                                vert_axis.title.setOverlay(false);
-                            }
-                        }
-                    }
-                }
-            }
-            vert_axis.setMenuProps(chartSettings.getVertAxisProps())
-        }
         //legend
         var legend_pos_settings =  chartSettings.getLegendPos();
         if(legend_pos_settings !== null)
@@ -2039,52 +1942,6 @@ DrawingObjectsController.prototype =
             }
         }
 
-        //gridLines
-        //Hor GridLInes
-        var setAxisGridLines = function(axis, gridLinesSettings)
-        {
-            if(axis)
-            {
-                switch(gridLinesSettings)
-                {
-                    case c_oAscGridLinesSettings.none:
-                    {
-                        if(axis.majorGridlines)
-                            axis.setMajorGridlines(null);
-                        if(axis.minorGridlines)
-                            axis.setMinorGridlines(null);
-                        break;
-                    }
-                    case c_oAscGridLinesSettings.major:
-                    {
-                        if(!axis.majorGridlines)
-                            axis.setMajorGridlines(new CSpPr());
-                        if(axis.minorGridlines)
-                            axis.setMinorGridlines(null);
-                        break;
-                    }
-                    case c_oAscGridLinesSettings.minor:
-                    {
-                        if(!axis.minorGridlines)
-                            axis.setMinorGridlines(new CSpPr());
-                        if(axis.majorGridlines)
-                            axis.setMajorGridlines(null);
-                        break;
-                    }
-                    case c_oAscGridLinesSettings.majorMinor:
-                    {
-                        if(!axis.minorGridlines)
-                            axis.setMinorGridlines(new CSpPr());
-                        if(!axis.majorGridlines)
-                            axis.setMajorGridlines(new CSpPr());
-                        break;
-                    }
-                }
-            }
-        };
-
-        setAxisGridLines(plot_area.getVerticalAxis(), chartSettings.getHorGridLines());
-        setAxisGridLines(plot_area.getHorizontalAxis(), chartSettings.getVertGridLines());
 
         var chart_type = plot_area.charts[0];
         //Data Labels
@@ -2399,6 +2256,152 @@ DrawingObjectsController.prototype =
                 break;
             }
         }
+
+        var hor_axis = plot_area.getHorizontalAxis();
+        var hor_axis_label_setting = chartSettings.getHorAxisLabel();
+        if(hor_axis)
+        {
+            if(hor_axis_label_setting !== null)
+            {
+                switch (hor_axis_label_setting)
+                {
+                    case c_oAscChartHorAxisLabelShowSettings.none:
+                    {
+                        if(hor_axis.title)
+                            hor_axis.setTitle(null);
+                        break;
+                    }
+                    case c_oAscChartHorAxisLabelShowSettings.noOverlay:
+                    {
+                        if(!hor_axis.title)
+                        {
+                            hor_axis.setTitle(new CTitle());
+                        }
+                        if(!hor_axis.title.txPr)
+                        {
+                            hor_axis.title.setTxPr(new CTextBody());
+                        }
+                        if(!hor_axis.title.txPr.bodyPr)
+                        {
+                            hor_axis.title.txPr.setBodyPr(new CBodyPr());
+                            hor_axis.title.txPr.bodyPr.reset();
+                        }
+                        if(!hor_axis.title.txPr.content)
+                        {
+                            hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                        }
+                        if(hor_axis.title.overlay !== false)
+                            hor_axis.title.setOverlay(false);
+                        break;
+                    }
+                }
+            }
+            hor_axis.setMenuProps(chartSettings.getHorAxisProps());
+        }
+
+        //vertAxis
+        var vert_axis = plot_area.getVerticalAxis(); //TODO: запрашивать у chart_type
+        var vert_axis_labels_settings = chartSettings.getVertAxisLabel();
+        if(vert_axis)
+        {
+            if(vert_axis_labels_settings !== null)
+            {
+                switch (vert_axis_labels_settings)
+                {
+                    case c_oAscChartVertAxisLabelShowSettings.none:
+                    {
+                        if(vert_axis.title)
+                        {
+                            vert_axis.setTitle(null);
+                        }
+                        break;
+                    }
+                    case c_oAscChartVertAxisLabelShowSettings.vertical:
+                    {
+                        //TODO: пока СDocumentContent не поддерживает вертикальный текст, может быть будет когда-нибудь, хотя вряд ли.
+                        break;
+                    }
+                    default:
+                    {
+                        if( vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated
+                            || vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.horizontal)
+                        {
+                            if(!vert_axis.title)
+                            {
+                                vert_axis.setTitle(new CTitle());
+                            }
+                            if(!vert_axis.title.txPr)
+                            {
+                                vert_axis.title.setTxPr(new CTextBody());
+                            }
+                            if(!vert_axis.title.txPr.bodyPr)
+                            {
+                                vert_axis.title.txPr.setBodyPr(new CBodyPr());
+                                vert_axis.title.txPr.bodyPr.reset();
+                            }
+                            if(!vert_axis.title.txPr.content)
+                            {
+                                vert_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                            }
+                            if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated && vert_axis.title.txPr.bodyPr.vert !== nVertTTvert)
+                                vert_axis.title.txPr.bodyPr.setVert(nVertTTvert);
+                            if(vert_axis.title.overlay !== false)
+                            {
+                                vert_axis.title.setOverlay(false);
+                            }
+                        }
+                    }
+                }
+            }
+            vert_axis.setMenuProps(chartSettings.getVertAxisProps())
+        }
+
+        //gridLines
+        //Hor GridLInes
+        var setAxisGridLines = function(axis, gridLinesSettings)
+        {
+            if(axis)
+            {
+                switch(gridLinesSettings)
+                {
+                    case c_oAscGridLinesSettings.none:
+                    {
+                        if(axis.majorGridlines)
+                            axis.setMajorGridlines(null);
+                        if(axis.minorGridlines)
+                            axis.setMinorGridlines(null);
+                        break;
+                    }
+                    case c_oAscGridLinesSettings.major:
+                    {
+                        if(!axis.majorGridlines)
+                            axis.setMajorGridlines(new CSpPr());
+                        if(axis.minorGridlines)
+                            axis.setMinorGridlines(null);
+                        break;
+                    }
+                    case c_oAscGridLinesSettings.minor:
+                    {
+                        if(!axis.minorGridlines)
+                            axis.setMinorGridlines(new CSpPr());
+                        if(axis.majorGridlines)
+                            axis.setMajorGridlines(null);
+                        break;
+                    }
+                    case c_oAscGridLinesSettings.majorMinor:
+                    {
+                        if(!axis.minorGridlines)
+                            axis.setMinorGridlines(new CSpPr());
+                        if(!axis.majorGridlines)
+                            axis.setMajorGridlines(new CSpPr());
+                        break;
+                    }
+                }
+            }
+        };
+
+        setAxisGridLines(plot_area.getVerticalAxis(), chartSettings.getHorGridLines());
+        setAxisGridLines(plot_area.getHorizontalAxis(), chartSettings.getVertGridLines());
 
         chart_type = plot_area.charts[0];
         //подписи данных
