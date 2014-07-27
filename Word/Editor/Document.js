@@ -11573,8 +11573,10 @@ CDocument.prototype =
             return;
 
         this.DrawingDocument.EndTrackTable( null, true );
+        this.DrawingObjects.TurnOffCheckChartSelection();
 
         this.History.Undo();
+        this.DrawingObjects.TurnOnCheckChartSelection();
         this.Recalculate( false, false, this.History.RecalculateData );
 
         this.Document_UpdateSelectionState();
@@ -11587,8 +11589,10 @@ CDocument.prototype =
             return;
 
         this.DrawingDocument.EndTrackTable( null, true );
+        this.DrawingObjects.TurnOffCheckChartSelection();
 
         this.History.Redo();
+        this.DrawingObjects.TurnOnCheckChartSelection();
         this.Recalculate( false, false, this.History.RecalculateData );
 
         this.Document_UpdateSelectionState();

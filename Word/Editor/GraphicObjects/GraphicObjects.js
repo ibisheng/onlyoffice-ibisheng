@@ -60,6 +60,7 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 
     this.nullState = new NullState(this);
+    this.bNoCheckChartTextSelection = false;
 
     this.Id = g_oIdCounter.Get_NewId();
     this.Lock = new CLock();
@@ -81,6 +82,16 @@ CGraphicObjects.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    TurnOffCheckChartSelection: function()
+    {
+        this.bNoCheckChartTextSelection = true;
+    },
+
+    TurnOnCheckChartSelection: function()
+    {
+        this.bNoCheckChartTextSelection = false;
     },
 
     sortDrawingArrays: function()

@@ -3922,6 +3922,8 @@ DrawingObjectsController.prototype =
 
     checkChartTextSelection: function()
     {
+        if(this.bNoCheckChartTextSelection === true)
+            return;
         var chart_selection;
         if(this.selection.chartSelection)
         {
