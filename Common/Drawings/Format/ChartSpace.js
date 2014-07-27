@@ -12932,6 +12932,11 @@ function CreateScatterChart(chartSeries)
     page_margins.setT(0.75);
     page_margins.setHeader(0.3);
     page_margins.setFooter(0.3);
+
+
+
+
+
     return chart_space;
 }
 

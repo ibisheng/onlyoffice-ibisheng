@@ -2214,7 +2214,6 @@ CPlotArea.prototype =
             case historyitem_PlotArea_RemoveAxis:
             {
                 writeLong(w, data.pos);
-                writeObject(w, data.newPr);
                 break;
             }
         }
@@ -2283,15 +2282,13 @@ CPlotArea.prototype =
             case historyitem_PlotArea_RemoveChart:
             {
                 var pos = readLong(r);
-                var chart = readObject(r);
-                this.charts.splice(pos, 0, chart);
+                this.charts.splice(pos, 1);
                 break;
             }
             case historyitem_PlotArea_RemoveAxis:
             {
                 var pos = readLong(r);
-                var axis = readObject(r);
-                this.axId.splice(pos, 0, axis);
+                this.axId.splice(pos, 1);
                 break;
             }
         }
