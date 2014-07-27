@@ -667,6 +667,20 @@ CGraphicObjects.prototype =
 						c_oAscChartTypeSettings.barNormal), parsedHeaders: {bLeft: true, bTop: true}};
 					ret = this.getChartSpace(chartSeries, options);
                 }
+                if(type === c_oAscChartTypeSettings.scatter)
+                {
+                    var new_hor_axis_settings = new asc_ValAxisSettings();
+                    new_hor_axis_settings.setDefault();
+                    options.putHorAxisProps(new_hor_axis_settings);
+                    var new_vert_axis_settings = new asc_ValAxisSettings();
+                    new_vert_axis_settings.setDefault();
+                    options.putVertAxisProps(new_vert_axis_settings);
+                    options.putHorGridLines(c_oAscGridLinesSettings.major);
+                    options.putVertGridLines(c_oAscGridLinesSettings.major);
+                    options.putShowMarker(true);
+                    options.putSmooth(null);
+                    options.putLine(false);
+                }
                 options.type = null;
                 this.applyPropsToChartSpace(options, ret);
                 ret.theme = this.document.theme;
