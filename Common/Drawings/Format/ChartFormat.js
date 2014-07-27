@@ -20134,7 +20134,7 @@ CStockChart.prototype =
     },
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_StockChart_AddSer, ser: ser});
+        History.Add(this, {Type: historyitem_StockChart_AddSer, oldPr: this.series.length, newPr: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
