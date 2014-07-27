@@ -26,6 +26,36 @@
 
 
 
+function checkRasterImageId(rasterImageId)
+{
+    return rasterImageId;
+    if ( 0 !== rasterImageId.indexOf("http:") && 0 !== rasterImageId.indexOf("data:") && 0 !== rasterImageId.indexOf("https:") && 0 !== rasterImageId.indexOf("ftp:") && 0 !== rasterImageId.indexOf("file:") )
+    {
+        var api_sheet = window["Asc"]["editor"];
+        var sFindString;
+        if(api_sheet)
+        {
+            sFindString = api_sheet.wbModel.sUrlPath + "media/";
+        }
+        else
+        {
+            sFindString = window.editor.DocumentUrl + "media/";
+        }
+        if(0 === rasterImageId.indexOf(sFindString))
+        {
+            return rasterImageId.substring(sFindString.length);
+        }
+        else
+        {
+            return rasterImageId;
+        }
+    }
+    else
+    {
+        return rasterImageId;
+    }
+}
+
 var historyitem_ChangeColorScheme = 0;
 var historyitem_ChangeFontScheme = 1;
 var historyitem_ChangeFmtScheme = 2;
@@ -2430,7 +2460,7 @@ CBlipFill.prototype =
     setRasterImageId: function(rasterImageId)
     {
         //History.Add(this, {Type: historyitem_BlipFill_SetRasterImageId, oldRasterImageId: this.RasterImageId, newRasterImageId: rasterImageId});
-        this.RasterImageId = rasterImageId;
+        this.RasterImageId = checkRasterImageId(rasterImageId);
     },
 
     setVectorImageBin: function(vectorImageBin)

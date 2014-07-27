@@ -712,6 +712,10 @@ CShape.prototype.Is_ThisElementCurrent = function(CurElement)
 {
     return editor.WordControl.m_oLogicDocument.DrawingObjects.getTargetDocContent() === this.getDocContent();
 };
+CShape.prototype.Is_UseInDocument = function()
+{
+    return !this.bDeleted;
+};
 CShape.prototype.Is_HdrFtr = function(bool)
 {
     if(!this.group)
