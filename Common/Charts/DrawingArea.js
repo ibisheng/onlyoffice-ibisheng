@@ -535,11 +535,38 @@ function FrozenPlace(ws, type) {
 		var y = convertMetrics(rect.y, 0, 1);
 		var w = convertMetrics(rect.w, 0, 1);
 		var h = convertMetrics(rect.h, 0, 1);
+
+
+        var deltaH = 0, deltaW = 0;
+        switch (_this.type)
+        {
+            case FrozenAreaType.Top:
+            case FrozenAreaType.Center:
+            case FrozenAreaType.LeftTop:
+            case FrozenAreaType.Left:
+            {
+                deltaH = _this.worksheet.getCellTop(0, 1);
+                deltaW = _this.worksheet.getCellLeft(0,1);
+                break;
+            }
+            case FrozenAreaType.LeftBottom:
+            case FrozenAreaType.Bottom:
+            {
+                deltaW = _this.worksheet.getCellLeft(0,1);
+                break;
+            }
+            case FrozenAreaType.Right:
+            case FrozenAreaType.RightTop:
+            {
+                deltaH = _this.worksheet.getCellTop(0,1);
+                break;
+            }
+        }
 		
 		if ( isOverlay ) 
-			_this.worksheet.overlayGraphicCtx.clearRect( x, y, w, h );
+			_this.worksheet.overlayGraphicCtx.clearRect( x - deltaW, y - deltaH, w, h );
 		else {
-			_this.worksheet.drawingGraphicCtx.clearRect( x, y, w, h );
+			_this.worksheet.drawingGraphicCtx.clearRect( x - deltaW, y - deltaH, w, h );
 		}
 	};
 	
