@@ -2648,6 +2648,7 @@ UndoRedoWorkbook.prototype = {
 					}
 				}
 			}
+			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
 		else if(historyitem_Workbook_SheetRemove == Type)
 		{
@@ -2668,6 +2669,7 @@ UndoRedoWorkbook.prototype = {
 					this.wb.removeWorksheet(nIndex);
 				}
 			}
+			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
 		else if(historyitem_Workbook_SheetMove == Type)
 		{
@@ -2679,6 +2681,7 @@ UndoRedoWorkbook.prototype = {
 			{
 				this.wb.replaceWorksheet(Data.from, Data.to);
 			}
+			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
 		else if(historyitem_Workbook_SheetPositions == Type)
 		{
