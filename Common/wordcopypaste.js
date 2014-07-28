@@ -117,6 +117,10 @@ function Editor_Copy_Button(api, bCut)
             }
         }
     }*/
+	
+	if(bCut)
+		History.Create_NewPoint();
+	
     if(AscBrowser.isIE)
     {
         var ElemToSelect = Editor_Copy_GetElem(api);
