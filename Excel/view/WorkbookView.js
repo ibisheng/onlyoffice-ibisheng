@@ -1186,9 +1186,11 @@
 
 			var isSendInfo = (-1 === this.wsActive) || !isResized;
 			// Только если есть активный
+            var oldWsView;
 			if (-1 !== this.wsActive) {
 				var ws = this.getWorksheet();
 				if (ws instanceof asc_WSV) {
+                    oldWsView = ws;
 					// Останавливаем ввод данных в редакторе ввода
 					if (ws.getCellEditMode() && !isResized)
 						this._onStopCellEditing();
@@ -1229,7 +1231,11 @@
 				this.handlers.trigger("asc_onSelectionRangeChanged", ws.getSelectionRangeValue());
 			}
 
-            ws.objectRender.OnUpdateOverlay();
+            if(oldWsView)
+            {
+                oldWsView.objectRender && oldWsView.objectRender.drawingDocument && oldWsView.objectRender.drawingDocument.TargetEnd();
+            }
+            ws.objectRender.controller.updateSelectionState();
 			if (isSendInfo) {
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				this._onWSSelectionChanged(ws.getSelectionInfo());
@@ -1249,6 +1255,7 @@
 		WorkbookView.prototype.removeWorksheet = function (nIndex) {
 			this.wsViews.splice(nIndex, 1);
 			// Сбрасываем активный (чтобы не досчитывать после смены)
+            this.stopTarget();
 			this.wsActive = -1;
 		};
 
@@ -1264,7 +1271,7 @@
 					// Делаем очистку селекта
 					ws.cleanSelection();
 				}
-
+                this.stopTarget();
 				this.wsActive = -1;
 				// Чтобы поменять, нужно его добавить
 				ws = this.getWorksheet(indexTo);
@@ -1272,6 +1279,18 @@
 			var movedSheet = this.wsViews.splice(indexFrom,1);
 			this.wsViews.splice(indexTo,0,movedSheet[0])
 		};
+
+        WorkbookView.prototype.stopTarget = function()
+        {
+            if (-1 !== this.wsActive)
+            {
+                var ws = this.getWorksheet(this.wsActive);
+                if (ws instanceof asc_WSV)
+                {
+                    ws.objectRender && ws.objectRender.drawingDocument && ws.objectRender.drawingDocument.TargetEnd();
+                }
+            }
+        };
 
 		// Копирует элемент перед другим элементом
 		WorkbookView.prototype.copyWorksheet = function (index, insertBefore) {
@@ -1285,7 +1304,7 @@
 					// Делаем очистку селекта
 					ws.cleanSelection();
 				}
-
+                this.stopTarget();
 				this.wsActive = -1;
 			}
 
@@ -1310,6 +1329,7 @@
 
 		WorkbookView.prototype.spliceWorksheet = function () {
 			this.wsViews.splice.apply(this.wsViews, arguments);
+            this.stopTarget();
 			this.wsActive = -1;
 		};
 
