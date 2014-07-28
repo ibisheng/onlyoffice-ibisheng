@@ -3163,6 +3163,10 @@ function CDocMeta()
             Editor_Copy(editor);
             //íå âîçâðàùàåì true ÷òîáû íå áûëî preventDefault
         }
+		else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
+        {
+            editor.asc_Print();
+        }
 
         return bRetValue;
     }
