@@ -3960,11 +3960,13 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 			},
+			
 			_cleanStyleTable : function(aWs, sRef)
 			{
-				var oRange = Range.prototype.createFromBBox(aWs, sRef);
+				var oRange = new Range(aWs, sRef.r1, sRef.c1, sRef.r2, sRef.c2)
 				oRange.setTableStyle(null);
 			},
+			
 			_setColorStyleTable: function(range, options, isOpenFilter, isSetVal)
 			{
 				var ws = this.worksheet;
@@ -5336,6 +5338,9 @@ var gUndoInsDelCellsFlag = true;
 							}
 							curFilter.inFilter = inFilter;
 							newResult[n] = curFilter;
+							
+							var oldId = curFilter.id;
+							this._changeContentButton(newResult[n], null,'change', null, oldId);
 							n++;
 						}
 						else
