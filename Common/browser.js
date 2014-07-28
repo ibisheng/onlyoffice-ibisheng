@@ -28,18 +28,14 @@ AscBrowser.isIE =  (AscBrowser.userAgent.indexOf("msie") > -1 ||
 // macOs detect
 AscBrowser.isMacOs = (AscBrowser.userAgent.indexOf('mac') > -1);
 
+// chrome detect
+AscBrowser.isChrome = (AscBrowser.userAgent.indexOf("chrome") > -1);
+
 // safari detect
-AscBrowser.isSafari = (AscBrowser.userAgent.indexOf("safari") > -1);
+AscBrowser.isSafari = !AscBrowser.isChrome && (AscBrowser.userAgent.indexOf("safari") > -1);
 
 // macOs safari detect
 AscBrowser.isSafariMacOs = (AscBrowser.isSafari && AscBrowser.isMacOs);
-if (AscBrowser.isSafariMacOs)
-{
-    // браузеры под мак все определяются как сафари
-    // проверим на дополнительные параметры
-    if (AscBrowser.userAgent.indexOf('chrome') > -1)
-        AscBrowser.isSafariMacOs = false;
-}
 
 // apple devices detect
 AscBrowser.isAppleDevices = (AscBrowser.userAgent.indexOf("ipad") > -1 ||
@@ -55,11 +51,8 @@ AscBrowser.isMobile = /android|avantgo|blackberry|blazer|compal|elaine|fennec|hi
 // gecko detect
 AscBrowser.isGecko = (AscBrowser.userAgent.indexOf("gecko/") > -1);
 
-// chrome detect
-AscBrowser.isChrome = (AscBrowser.userAgent.indexOf("chrome") > -1);
-
 // opera detect
-AscBrowser.isOpera = (window.opera) ? true : false;
+AscBrowser.isOpera = !!window.opera;
 
 // webkit detect
 AscBrowser.isWebkit = (AscBrowser.userAgent.indexOf("webkit") > -1);
@@ -67,7 +60,7 @@ AscBrowser.isWebkit = (AscBrowser.userAgent.indexOf("webkit") > -1);
 // arm detect
 AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
 
-AscBrowser.isMozilla = ((AscBrowser.userAgent.indexOf("firefox") > -1) && (!AscBrowser.isIE));
+AscBrowser.isMozilla = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("firefox") > -1);
 
 // detect retina (http://habrahabr.ru/post/159419/)
 AscBrowser.isRetina = 2 === window.devicePixelRatio;
