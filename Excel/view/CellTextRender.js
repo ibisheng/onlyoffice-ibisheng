@@ -113,11 +113,11 @@
 				return pos > lastChar ? pos : lastChar + (this.charWidths[lastChar] !== 0 ? 1 : 0);
 			},
 
-			getBeginOfText: function (pos) {
+			getBeginOfText: function () {
 				return 0;
 			},
 
-			getEndOfText: function (pos) {
+			getEndOfText: function () {
 				return this.chars.length;
 			},
 

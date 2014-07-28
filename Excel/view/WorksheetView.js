@@ -9704,6 +9704,22 @@
 
 				case "updateRange":
 					if (val && val.range) {
+						var bIsUpdateX = false, bIsUpdateY = false;
+						if (t.cols.length < val.range.c2) {
+							t.expandColsOnScroll(false, true, val.range.c2);
+							bIsUpdateX = true;
+						}
+						if (t.rows.length < val.range.r2) {
+							t.expandRowsOnScroll(false, true, val.range.r2);
+							bIsUpdateY = true;
+						}
+						if (bIsUpdateX && bIsUpdateY)
+							this.handlers.trigger("reinitializeScroll");
+						else if (bIsUpdateX)
+							t.handlers.trigger("reinitializeScrollX");
+						else if (bIsUpdateY)
+							t.handlers.trigger("reinitializeScrollY");
+						
 						t._updateCellsRange(val.range, val.canChangeColWidth, val.isLockDraw);
 					}
 					return;
