@@ -3166,6 +3166,12 @@ function CDocMeta()
 		else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
             editor.asc_Print();
+            bRetValue = true;
+        }
+        else if ( e.KeyCode == 83 && true === e.CtrlKey ) // Ctrl + S + ...
+        {
+            // nothing
+            bRetValue = true;
         }
 
         return bRetValue;
