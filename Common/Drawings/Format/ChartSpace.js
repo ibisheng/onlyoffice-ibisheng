@@ -2141,7 +2141,7 @@ CChartSpace.prototype =
 
         var checkValByNumRef = function(oThis, ser, val)
         {
-            if(val && val.numRef && !val.numRef.numCache)
+            if(val && val.numRef && (!val.numRef.numCache || val.numRef.numCache.pts.length === 0))
             {
                 var first_slice = 0, last_slice = 0;
                 if(val.numRef.f[0] === "(")
@@ -2160,7 +2160,7 @@ CChartSpace.prototype =
                 var arr_f = f1.split(",");
                 var num_cache = new CNumLit();
                 num_cache.setFormatCode("General");
-                var pt_index = 0, i, j, cell, pt, worksheet_id;
+                var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true;
                 for(i = 0; i < arr_f.length; ++i)
                 {
                     var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2184,6 +2184,7 @@ CChartSpace.prototype =
                                             var col = source_worksheet._getColNoEmptyWithAll(j);
                                             if(!col || !col.hd)
                                             {
+                                                hidden = false;
                                                 cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
                                                 pt = new CNumericPoint();
                                                 pt.setIdx(pt_index++);
@@ -2208,6 +2209,7 @@ CChartSpace.prototype =
                                             var row = source_worksheet._getRowNoEmptyWithAll(j);
                                             if(!row || !row.hd)
                                             {
+                                                hidden = false;
                                                 cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
                                                 pt = new CNumericPoint();
                                                 pt.setIdx(pt_index++);
@@ -2228,12 +2230,13 @@ CChartSpace.prototype =
                 }
                 num_cache.setPtCount(pt_index);
                 val.numRef.setNumCache(num_cache);
+                ser.isHidden = hidden;
             }
         };
 
         var checkCatByNumRef = function(oThis, ser, cat)
         {
-            if(cat && cat.strRef && !cat.strRef.strCache)
+            if(cat && cat.strRef && (!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0))
             {
                 var first_slice = 0, last_slice = 0;
                 if(cat.strRef.f[0] === "(")
@@ -7512,6 +7515,8 @@ CChartSpace.prototype =
                 for(i = 0; i < series.length; ++i)
                 {
                     ser = series[i];
+                    if(ser.isHidden)
+                        continue;
                     arr_str_labels.push(ser.getSeriesName());
                     calc_entry = new CalcLegendEntry(legend, this);
                     calc_entry.txBody = CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
