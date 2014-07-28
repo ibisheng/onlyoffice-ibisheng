@@ -8201,11 +8201,12 @@
 								if ( result ) {
 									for (var j = 0; j < a_drawings.length; ++j) {
 										a_drawings[j].recalculateTransform();
-										//TODO History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(a_drawings[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 										a_drawings[j].addToDrawingObjects();
-										a_drawings[j].select( t.objectRender.controller);
+										a_drawings[j].select( t.objectRender.controller, 0);
 									}
                                     t.objectRender.controller.startRecalculate();
+                                    t.objectRender.controller.updateOverlay();
+                                    t.setSelectionShape(true);
 								}
 							}
 						for(var j = 0; j < a_drawings.length; ++j)

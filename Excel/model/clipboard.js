@@ -3243,6 +3243,7 @@
 				}
 
                 ws.objectRender.showDrawingObjects(true);
+                ws.objectRender.controller.updateOverlay();
                 ws.setSelectionShape(true);
                 History.EndTransaction();
                 if(aImagesSync.length > 0)
@@ -3347,6 +3348,8 @@
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
 				ws.objectRender.showDrawingObjects(true);
+                ws.setSelectionShape(true);
+				ws.objectRender.controller.updateOverlay();
 				History.EndTransaction();
 			},
 			
