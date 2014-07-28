@@ -6,6 +6,7 @@ var EFFECT_MODERATE = 2;
 var EFFECT_INTENSE = 3;
 
 var CHART_STYLE_MANAGER = null;
+var SKIP_LBL_LIMIT = 100;
 
 function BBoxInfo(worksheet, bbox)
 {
@@ -3477,7 +3478,7 @@ CChartSpace.prototype =
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
                         cat_ax.labels = new CValAxisLabels(this);
-                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
                         var arr_max_contents = [];
@@ -4499,7 +4500,7 @@ CChartSpace.prototype =
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
                         cat_ax.labels = new CValAxisLabels(this);
-                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
                         var max_content_width = 0;
@@ -6025,7 +6026,7 @@ CChartSpace.prototype =
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
                         cat_ax.labels = new CValAxisLabels(this);
-                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip :  (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
                         var arr_max_contents = [];
@@ -7047,7 +7048,7 @@ CChartSpace.prototype =
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
                         cat_ax.labels = new CValAxisLabels(this);
-                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
                         var max_content_width = 0;
@@ -8796,7 +8797,7 @@ CChartSpace.prototype =
                     var common_height = t.h;
                     var plot_area_width = common_width - val_ax.labels.extX;
                     var max_sect_width = plot_area_width/string_pts.length;
-                    var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : 1;
+                    var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                     for(i = 0; i < string_pts.length; ++i)
                     {
                         var dlbl = null;
@@ -9504,11 +9505,14 @@ CChartSpace.prototype =
                 if(oThis.chart.plotArea.chart.varyColors && (oThis.chart.plotArea.chart.series.length === 1 || oThis.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || oThis.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
                 {
                     var ser = oThis.chart.plotArea.chart.series[0], pts;
+                    if(ser.marker && ser.marker.symbol === SYMBOL_NONE && (!Array.isArray(ser.dPt) || ser.dPt.length === 0))
+                        return;
                     pts = getPtsFromSeries(ser);
                     var series_marker = ser.marker;
                     var brushes = getArrayFillsFromBase(fill, getMaxIdx(pts));
                     var pens_fills = getArrayFillsFromBase(line, getMaxIdx(pts));
                     var compiled_markers = [];
+
                     for(var i = 0;  i < pts.length; ++i)
                     {
                         var compiled_marker = new CMarker();
@@ -9522,8 +9526,8 @@ CChartSpace.prototype =
                         if(!compiled_marker.spPr.ln)
                             compiled_marker.spPr.setLn(new CLn());
                         compiled_marker.spPr.ln.merge(pts[i].pen);
+                        compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
                         compiled_marker.merge(ser.marker);
-                        compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
 
                         if(Array.isArray(ser.dPt))
                         {
@@ -9573,6 +9577,8 @@ CChartSpace.prototype =
                     for(var i = 0; i < series.length; ++i)
                     {
                         var ser = series[i];
+                        if(ser.marker && ser.marker.symbol === SYMBOL_NONE && (!Array.isArray(ser.dPt) || ser.dPt.length === 0))
+                            continue;
                         pts = getPtsFromSeries(ser);
                         for(var j = 0; j < pts.length; ++j)
                         {
