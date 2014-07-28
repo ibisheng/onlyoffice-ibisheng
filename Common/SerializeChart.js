@@ -6165,6 +6165,10 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
+        if(!isRealBool(oNewVal.overlay))
+        {
+            oNewVal.setOverlay(true);
+        }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_seraxNUMFMT === type) {
@@ -6628,6 +6632,10 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
+        if(!isRealBool(oNewVal.overlay))
+        {
+            oNewVal.setOverlay(true);
+        }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_dateaxNUMFMT === type) {
@@ -6858,6 +6866,10 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
+        if(!isRealBool(oNewVal.overlay))
+        {
+            oNewVal.setOverlay(true);
+        }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_cataxNUMFMT === type) {
@@ -7140,6 +7152,10 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
+        if(!isRealBool(oNewVal.overlay))
+        {
+            oNewVal.setOverlay(true);
+        }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_valaxNUMFMT === type) {
@@ -10685,6 +10701,10 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
+        if(!isRealBool(oNewVal.overlay))
+        {
+            oNewVal.setOverlay(true);
+        }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_chartAUTOTITLEDELETED === type) {

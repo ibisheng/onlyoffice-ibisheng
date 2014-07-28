@@ -1844,6 +1844,7 @@ DrawingObjectsController.prototype =
         var chart_space = chartSpace;
         var style_index = chartSettings.getStyle();
         var sRange = chartSettings.getRange();
+        var b_clear_formatting = false;
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
             var ws_view = this.drawingObjects.getWorksheet();
@@ -1879,6 +1880,8 @@ DrawingObjectsController.prototype =
 								c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
                     }
 					var chartSeries = getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
+                    chart_space.clearFormatting();
+                    b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
                 }
             }
@@ -1886,7 +1889,10 @@ DrawingObjectsController.prototype =
 
         if(isRealNumber(style_index) && style_index > 0 && style_index < 49 && chart_space.style !== style_index)
         {
-            chart_space.clearFormatting();
+            if(!b_clear_formatting)
+            {
+                chart_space.clearFormatting();
+            }
             chart_space.setStyle(style_index);
         }
         //Title Settings
