@@ -1616,6 +1616,7 @@
                 var elem = this.oFillMap[i];
                 aFills[elem.index] = elem.val;
             }
+            //делаем второй fill как первый(Excel пишет не такой, но это не важно - они игнорируются)
             aFills[1] = aFills[0];
             for(var i = 0, length = aFills.length; i < length; ++i)
             {
@@ -2233,6 +2234,7 @@
         this.nFontMapIndex = 0;
         this.oFillMap = {};
         this.nFillMapIndex = 0;
+        this.nDefaultFillIndex = 0;//может быть 0(если default заливка пустая) или 2(если default заливка не пустая)
         this.oBorderMap = {};
         this.nBorderMapIndex = 0;
         this.oNumMap = {};
@@ -2264,8 +2266,18 @@
         this._prepeareStyles = function()
         {
             this.oFontMap[this._getStringFromObjWithProperty(g_oDefaultFont)] = {index: this.nFontMapIndex++, val: g_oDefaultFont};
-            this.oFillMap[this._getStringFromObjWithProperty(g_oDefaultFill)] = {index: this.nFillMapIndex++, val: g_oDefaultFill};
+            //первый 2 fill должны быть стандартными. Excel игнорирует то что записано, берет стандартные
+            this.oFillMap[this._getStringFromObjWithProperty(new Fill())] = { index: this.nFillMapIndex++, val: new Fill() };
+            //не добавляем в oFillMap а делаем nFillMapIndex, потому что элементы совпадают и перетрут друг друга
             this.nFillMapIndex++;
+            //проверяем совпадает ли g_oDefaultFill с new Fill
+            var sFillHash = this._getStringFromObjWithProperty(g_oDefaultFill);
+            var oFillDefElement = this.oFillMap[sFillHash];
+            if (null == oFillDefElement) {
+                this.nDefaultFillIndex = this.nFillMapIndex;
+                oFillDefElement =  {index: this.nFillMapIndex++, val: g_oDefaultFill};
+                this.oFillMap[sFillHash] = oFillDefElement;
+            }
             this.oBorderMap[this._getStringFromObjWithProperty(g_oDefaultBorder)] = {index: this.nBorderMapIndex++, val: g_oDefaultBorder};
             this.nNumMapIndex = g_nNumsMaxId;
             var sAlign = "0";
@@ -2276,8 +2288,8 @@
                 sAlign = this._getStringFromObjWithProperty(g_oDefaultAlign);
             }
             this.prepareXfsStyles();
-            var xfs = {borderid: 0, fontid: 0, fillid: 0, numid: 0, align: oAlign, QuotePrefix: null};
-            this.oXfsMap["0|0|0|0|"+sAlign] = {index: this.nXfsMapIndex++, val: xfs};
+            var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null };
+            this.oXfsMap["0|0|" + this.nDefaultFillIndex + "|0|" + sAlign] = { index: this.nXfsMapIndex++, val: xfs };
         };
         this.Write = function()
         {
@@ -2978,6 +2990,10 @@
                     }
                     else
                         sStyle.fillid = elem.index;
+                }
+                else if (0 != this.nDefaultFillIndex) {
+                    //если default fill не пустой, то надо его надо записывать даже если null != xfs.fill
+                    sStyle.fillid = this.nDefaultFillIndex;
                 }
                 sStyle.val += "|" + sStyle.fillid.toString();
 
