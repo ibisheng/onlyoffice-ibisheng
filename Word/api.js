@@ -6982,8 +6982,17 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
 		CollaborativeEditing.m_bGlobalLock = true;
         //this.isShowTableEmptyLine = false;
         //this.WordControl.m_bIsRuler = true;
-        this.WordControl.m_oDrawingDocument.ClearCachePages();
-        this.WordControl.HideRulers();
+
+        if (null == this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
+        {
+            this.WordControl.m_oDrawingDocument.ClearCachePages();
+            this.WordControl.HideRulers();
+        }
+        else
+        {
+            this.WordControl.HideRulers();
+            this.WordControl.OnScroll();
+        }
     }
     else
     {
