@@ -464,7 +464,14 @@
 						this.lStorage = sBase64;
 						
 						window.global_pptx_content_writer.End_UseFullUrl()
-					}
+					};
+					
+					this._cleanElement();
+					if(text !== false)
+						this.element.appendChild(text);
+					if(this.element.children[0] && sBase64)
+						$(this.element.children[0]).addClass("xslData;" + sBase64);
+					
 					return true;
 				}
 				else if(activateLocalStorage)
@@ -633,7 +640,15 @@
 				else if(activateLocalStorage || copyPasteUseBinary)
 				{
 					var t = this;
-					t._addValueToLocalStrg(value)
+					t._addValueToLocalStrg(value);
+					
+					var nodes = t._makeNodesFromCellValue(value);
+					t._cleanElement();
+					nodes.forEach(
+					function(node){
+						t.element.appendChild(node);
+					});
+					
 					return true;
 				}
 				return false;
@@ -1668,7 +1683,7 @@
 				var newFonts;
 				
 				if(onlyFromLocalStorage)
-					node = this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
+					node = this.element;//this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
 				
 				//если находимся внутри диаграммы убираем ссылки
 				if(targetDocContent && targetDocContent.Parent && targetDocContent.Parent.parent && targetDocContent.Parent.parent.chart)
@@ -1752,6 +1767,14 @@
 
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
 					onlyFromLocalStorage = true;
+				
+				//****binary****
+				if(onlyFromLocalStorage)
+				{
+					onlyFromLocalStorage = null;
+					node = this.element;
+					pasteFragment = node;
+				};
 				
 				//если находимся внутри шейпа
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
