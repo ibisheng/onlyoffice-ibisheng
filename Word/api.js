@@ -1182,10 +1182,10 @@ asc_docs_api.prototype.GetCopyPasteDivId = function()
 asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 {
     this.DocumentReaderMode = new CDocumentReaderMode();
-    var _old = copyPasteUseBinery;
-    copyPasteUseBinery = false;
+    var _old = copyPasteUseBinary;
+    copyPasteUseBinary = false;
     Editor_Copy(this);
-    copyPasteUseBinery = _old;
+    copyPasteUseBinary = _old;
     this.DocumentReaderMode = null;
     return document.getElementById("SelectId").innerHTML;
 };

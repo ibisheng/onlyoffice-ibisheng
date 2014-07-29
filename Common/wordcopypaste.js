@@ -36,7 +36,7 @@ window.PasteEndTimerId = -1;
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
-var copyPasteUseBinery = true;
+var copyPasteUseBinary = true;
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
@@ -1450,7 +1450,7 @@ CopyProcessor.prototype =
 
                             this.Para = document.createElement( "p" );
 
-                            if(copyPasteUseBinery)
+                            if(copyPasteUseBinary)
                             {
                                 var newArr = null;
                                 var tempAr = null;
@@ -1488,7 +1488,7 @@ CopyProcessor.prototype =
                                 {
                                     var base64_img = paraDrawing.getBase64Img();
 
-                                    if(copyPasteUseBinery)
+                                    if(copyPasteUseBinary)
                                     {
 										var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
                                         var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
@@ -1523,7 +1523,7 @@ CopyProcessor.prototype =
 
                             }
 
-                            if(copyPasteUseBinery)
+                            if(copyPasteUseBinary)
                             {
                                 this.oBinaryFileWriter.CopyEnd();
                                 var sBase64 = this.oBinaryFileWriter.GetResult();
@@ -1554,7 +1554,7 @@ CopyProcessor.prototype =
 
                             this.ElemToSelect.appendChild( this.Para );
 
-                            if(copyPasteUseBinery)
+                            if(copyPasteUseBinary)
                             {
                                 var paragraph = cur_element.Parent;
                                 
@@ -1605,7 +1605,7 @@ CopyProcessor.prototype =
                             }
                         }
                         
-						if(copyPasteUseBinery)
+						if(copyPasteUseBinary)
                         {
                             this.oBinaryFileWriter.CopyEnd();
                             var sBase64 = this.oBinaryFileWriter.GetResult();
@@ -1796,7 +1796,7 @@ CopyProcessor.prototype =
                 $(this.ElemToSelect.children[0]).addClass("pptData;" + sBase64);
         }
 		this.oBinaryFileWriter.CopyEnd();
-		if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
+		if(copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
 			if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
@@ -2940,7 +2940,7 @@ PasteProcessor.prototype =
             // });
             // return;
 
-            if(copyPasteUseBinery)
+            if(copyPasteUseBinary)
             {
                 var base64 = null, base64FromExcel = null,classNode, aContent, aContentExcel, pasteFromBinary = false;
 				
@@ -3075,7 +3075,7 @@ PasteProcessor.prototype =
         {
             var oThis = this;
             var presentation = editor.WordControl.m_oLogicDocument;
-            if(copyPasteUseBinery)
+            if(copyPasteUseBinary)
             {
                 var base64 = null;
                 var classNode;

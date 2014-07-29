@@ -5038,7 +5038,7 @@
 
 									this.Para = document.createElement( "p" );
 
-									if(copyPasteUseBinery)
+									if(copyPasteUseBinary)
 									{
 										var newArr = null;
 										var tempAr = null;
@@ -5076,7 +5076,7 @@
 										{
 											var base64_img = paraDrawing.getBase64Img();
 
-											if(copyPasteUseBinery)
+											if(copyPasteUseBinary)
 											{
 												var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
 												var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
@@ -5111,7 +5111,7 @@
 
 									}
 
-									if(copyPasteUseBinery)
+									if(copyPasteUseBinary)
 									{
 										this.oBinaryFileWriter.CopyEnd();
 										var sBase64 = this.oBinaryFileWriter.GetResult();
@@ -5142,7 +5142,7 @@
 
 									this.ElemToSelect.appendChild( this.Para );
 
-									if(copyPasteUseBinery)
+									if(copyPasteUseBinary)
 									{
 										var paragraph = cur_element.Parent;
 										
@@ -5193,7 +5193,7 @@
 									}
 								}
 								
-								if(copyPasteUseBinery)
+								if(copyPasteUseBinary)
 								{
 									this.oBinaryFileWriter.CopyEnd();
 									var sBase64 = this.oBinaryFileWriter.GetResult();
@@ -5219,7 +5219,7 @@
 				
 				
 				this.oBinaryFileWriter.CopyEnd();
-				if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
+				if(copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0)
 				{
 					var sBase64 = this.oBinaryFileWriter.GetResult();
 					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
