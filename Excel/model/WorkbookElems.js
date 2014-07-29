@@ -53,7 +53,7 @@ function shiftGetBBox(bbox, bHor)
 		bboxGet = Asc.Range(bbox.c1, bbox.r1, bbox.c2, gc_nMaxRow0);
 	return bboxGet;
 }
-function shiftSort(a, b, bAsc, bRow)
+function shiftSort(a, b, offset)
 {
 	var nRes = 0;
 	if(null == a.to || null == b.to)
@@ -67,20 +67,18 @@ function shiftSort(a, b, bAsc, bRow)
 	}
 	else
 	{
-		if(bRow)
-		{
-			if(bAsc)
-				nRes = a.to.r1 - b.to.r1;
-			else
-				nRes = b.to.r1 - a.to.r1;
-		}
-		else
-		{
-			if(bAsc)
-				nRes = a.to.c1 - b.to.c1;
-			else
-				nRes = b.to.c1 - a.to.c1;
-		}
+	    if (0 != offset.offsetRow) {
+	        if (offset.offsetRow > 0)
+	            nRes = b.to.r1 - a.to.r1;
+	        else
+	            nRes = a.to.r1 - b.to.r1;
+	    }
+	    if (0 == nRes && 0 != offset.offsetCol) {
+	        if (offset.offsetCol > 0)
+	            nRes = b.to.c1 - a.to.c1;
+	        else
+	            nRes = a.to.c1 - b.to.c1;
+	    }
 	}
 	return nRes;
 }
@@ -3989,165 +3987,127 @@ RangeDataManager.prototype = {
 	},
 	shift: function (bbox, bAdd, bHor, oGetRes, oChangeParam)
 	{
-		var _this = this;
-		if(null == oGetRes)
-			oGetRes = this.shiftGet(bbox, bHor);
-		var aToChange = [];
-		var elems = oGetRes.elems;
-		//сдвигаем inner
-		if(elems.inner.length > 0)
-		{
-			var offset = null;
-			if(bHor)
-				offset = {offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1};
-			else
-				offset = {offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0};
-			if(!bAdd)
-			{
-				offset.offsetRow = -offset.offsetRow;
-				offset.offsetCol = -offset.offsetCol;
-			}
-			for(var i = 0, length = elems.inner.length; i < length; i++)
-			{
-				var elem = elems.inner[i];
-				var from = elem.bbox;
-				var to = null;
-				if(bAdd)
-				{
-					to = elem.bbox.clone();
-					to.setOffset(offset);
-				}
-				else
-				{
-					var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
-					if(!bboxAsc.containsRange(from))
-					{
-						to = elem.bbox.clone();
-						if(bHor)
-						{
-							if(to.c1 <= bbox.c2)
-								to.setOffsetFirst({offsetRow: 0, offsetCol: bbox.c2 - to.c1 + 1});
-						}
-						else
-						{
-							if(to.r1 <= bbox.r2)
-								to.setOffsetFirst({offsetRow: bbox.r2 - to.r1 + 1, offsetCol: 0});
-						}
-						to.setOffset(offset);
-					}
-				}
-				aToChange.push({elem: elem, to: to});
-			}
-		}
-		//меняем outer
-		if(elems.outer.length > 0)
-		{
-			for(var i = 0, length = elems.outer.length; i < length; i++)
-			{
-				var elem = elems.outer[i];
-				var from = elem.bbox;
-				var to = null;
-				if(bHor)
-				{
-					if(from.c1 < bbox.c1 && bbox.r1 <= from.r1 && from.r2 <= bbox.r2)
-					{
-						if(bAdd)
-						{
-							to = from.clone();
-							to.setOffsetLast({offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1});
-						}
-						else
-						{
-							to = from.clone();
-							var nTemp1 = from.c2 - bbox.c1 + 1;
-							var nTemp2 = bbox.c2 - bbox.c1 + 1;
-							to.setOffsetLast({offsetRow: 0, offsetCol: -Math.min(nTemp1, nTemp2)});
-						}
-					}
-				}
-				else
-				{
-					if(from.r1 < bbox.r1 && bbox.c1 <= from.c1 && from.c2 <= bbox.c2)
-					{
-						if(bAdd)
-						{
-							to = from.clone();
-							to.setOffsetLast({offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0});
-						}
-						else
-						{
-							to = from.clone();
-							var nTemp1 = from.r2 - bbox.r1 + 1;
-							var nTemp2 = bbox.r2 - bbox.r1 + 1;
-							to.setOffsetLast({offsetRow: -Math.min(nTemp1, nTemp2), offsetCol: 0});
-						}
-					}
-				}
-				if(null != to)
-					aToChange.push({elem: elem, to: to});
-			}
-		}
-		//сначала сортируем чтобы не было конфликтов при сдвиге
-		if(bHor)
-		{
-			if(bAdd)
-				aToChange.sort(function(a, b){return shiftSort(a, b, false, false);});
-			else
-				aToChange.sort(function(a, b){return shiftSort(a, b, true, false);});
-		}
-		else
-		{
-			if(bAdd)
-				aToChange.sort(function(a, b){return shiftSort(a, b, false, true);});
-			else
-				aToChange.sort(function(a, b){return shiftSort(a, b, true, true);});
-		}
-		if(null != this.fChange)
-		{
-			for(var i = 0, length = aToChange.length; i < length; ++i)
-			{
-				var item = aToChange[i];
-				this.fChange.call(this, item.elem.data, item.elem.bbox, item.to, oChangeParam);
-			}
-		}
-		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-		var fOldChange = this.fChange;
-		this.fChange = null;
-		//сначала удаляем все чтобы не было конфликтов
-		for(var i = 0, length = aToChange.length; i < length; ++i)
-		{
-			var item = aToChange[i];
-			var elem = item.elem;
-			this.removeElement(elem, oChangeParam);
-		}
-		//добавляем измененные ячейки
-		for(var i = 0, length = aToChange.length; i < length; ++i)
-		{
-			var item = aToChange[i];
-			if(null != item.to)
-			    this.add(item.to, item.elem.data, oChangeParam);
-		}
-		this.fChange = fOldChange;
+	    var _this = this;
+	    if (null == oGetRes)
+	        oGetRes = this.shiftGet(bbox, bHor);
+	    var offset;
+	    if (bHor)
+	        offset = { offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 };
+	    else
+	        offset = { offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 };
+	    if (!bAdd) {
+	        offset.offsetRow = -offset.offsetRow;
+	        offset.offsetCol = -offset.offsetCol;
+	    }
+	    this._shiftmove(true, bbox, offset, oGetRes.elems, oChangeParam);
 	},
 	move: function (from, to, oChangeParam)
 	{
-        var fOldChange = this.fChange;
-		var nOffsetRow = to.r1 - from.r1;
-		var nOffsetCol = to.c1 - from.c1;
-		var oGetRes = this.get(from);
-		for(var i = 0, length = oGetRes.inner.length; i < length; i++)
-		{
-			var elem = oGetRes.inner[i];
-			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
-			if(null != fOldChange)
-			    fOldChange.call(this, elem.data, elem.bbox, oNewBBox, oChangeParam);
-            //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-            this.fChange = null;
-            this.removeElement(elem, oChangeParam);
-			this.add(oNewBBox, elem.data, oChangeParam);
-            this.fChange = fOldChange;
-		}
+	    var offset = { offsetRow: to.r1 - from.r1, offsetCol: to.c1 - from.c1 };
+	    var oGetRes = this.get(from);
+	    this._shiftmove(false, from, offset, oGetRes, oChangeParam);
+	},
+	_shiftmove: function (bShift, bbox, offset, elems, oChangeParam) {
+	    var aToChange = [];
+	    var bAdd = offset.offsetRow > 0 || offset.offsetCol > 0;
+	    var bHor = 0 != offset.offsetCol ? true : false;
+	    //сдвигаем inner
+	    if (elems.inner.length > 0) {
+	        var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
+	        for (var i = 0, length = elems.inner.length; i < length; i++) {
+	            var elem = elems.inner[i];
+	            var from = elem.bbox;
+	            var to = null;
+	            if (bShift) {
+	                if (bAdd) {
+	                    to = from.clone();
+	                    to.setOffset(offset);
+	                }
+	                else if (!bboxAsc.containsRange(from)) {
+	                    to = from.clone();
+	                    if (bHor) {
+	                        if (to.c1 <= bbox.c2)
+	                            to.setOffsetFirst({ offsetRow: 0, offsetCol: bbox.c2 - to.c1 + 1 });
+	                    }
+	                    else {
+	                        if (to.r1 <= bbox.r2)
+	                            to.setOffsetFirst({ offsetRow: bbox.r2 - to.r1 + 1, offsetCol: 0 });
+	                    }
+	                    to.setOffset(offset);
+	                }
+	            }
+	            else {
+	                to = from.clone();
+	                to.setOffset(offset);
+	            }
+	            aToChange.push({ elem: elem, to: to });
+	        }
+	    }
+	    //меняем outer
+	    if (bShift) {
+	        if (elems.outer.length > 0) {
+	            for (var i = 0, length = elems.outer.length; i < length; i++) {
+	                var elem = elems.outer[i];
+	                var from = elem.bbox;
+	                var to = null;
+	                if (bHor) {
+	                    if (from.c1 < bbox.c1 && bbox.r1 <= from.r1 && from.r2 <= bbox.r2) {
+	                        if (bAdd) {
+	                            to = from.clone();
+	                            to.setOffsetLast({ offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 });
+	                        }
+	                        else {
+	                            to = from.clone();
+	                            var nTemp1 = from.c2 - bbox.c1 + 1;
+	                            var nTemp2 = bbox.c2 - bbox.c1 + 1;
+	                            to.setOffsetLast({ offsetRow: 0, offsetCol: -Math.min(nTemp1, nTemp2) });
+	                        }
+	                    }
+	                }
+	                else {
+	                    if (from.r1 < bbox.r1 && bbox.c1 <= from.c1 && from.c2 <= bbox.c2) {
+	                        if (bAdd) {
+	                            to = from.clone();
+	                            to.setOffsetLast({ offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 });
+	                        }
+	                        else {
+	                            to = from.clone();
+	                            var nTemp1 = from.r2 - bbox.r1 + 1;
+	                            var nTemp2 = bbox.r2 - bbox.r1 + 1;
+	                            to.setOffsetLast({ offsetRow: -Math.min(nTemp1, nTemp2), offsetCol: 0 });
+	                        }
+	                    }
+	                }
+	                if (null != to)
+	                    aToChange.push({ elem: elem, to: to });
+	            }
+	        }
+	    }
+	    //сначала сортируем чтобы не было конфликтов при сдвиге
+	    aToChange.sort(function (a, b) { return shiftSort(a, b, offset); });
 
+	    if (null != this.fChange) {
+	        for (var i = 0, length = aToChange.length; i < length; ++i) {
+	            var item = aToChange[i];
+	            this.fChange.call(this, item.elem.data, item.elem.bbox, item.to, oChangeParam);
+	        }
+	    }
+	    //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
+	    var fOldChange = this.fChange;
+	    this.fChange = null;
+	    //сначала удаляем все чтобы не было конфликтов
+	    for (var i = 0, length = aToChange.length; i < length; ++i) {
+	        var item = aToChange[i];
+	        var elem = item.elem;
+	        this.removeElement(elem, oChangeParam);
+	    }
+	    //добавляем измененные ячейки
+	    for (var i = 0, length = aToChange.length; i < length; ++i) {
+	        var item = aToChange[i];
+	        if (null != item.to)
+	            this.add(item.to, item.elem.data, oChangeParam);
+	    }
+	    this.fChange = fOldChange;
 	},
 	getAll : function()
 	{
@@ -4249,116 +4209,69 @@ CellArea.prototype = {
 		var bboxGet = shiftGetBBox(bbox, bHor);
 		return {bbox: bboxGet, elems: this.get(bboxGet)};
 	},
-	shift : function(bbox, bAdd, bHor, oGetRes)
+	shift: function (bbox, bAdd, bHor, oGetRes)
 	{
-		if(null == oGetRes)
-			oGetRes = this.shiftGet(bbox, bHor);
-		var aToChange = [];
-		var elems = oGetRes.elems;
-		//сдвигаем inner
-		if(elems.length > 0)
-		{
-			var offset = null;
-			if(bHor)
-				offset = {offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1};
-			else
-				offset = {offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0};
-			if(!bAdd)
-			{
-				offset.offsetRow = -offset.offsetRow;
-				offset.offsetCol = -offset.offsetCol;
-			}
-			for(var i = 0, length = elems.length; i < length; i++)
-			{
-				var elem = elems[i];
-				var to = null;
-				if(bAdd)
-				{
-					to = elem.bbox.clone();
-					to.setOffset(offset);
-				}
-				else
-				{
-					var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
-					if(!bboxAsc.containsRange(elem.bbox))
-					{
-						to = elem.bbox.clone();
-						if(bHor)
-						{
-							if(to.c1 <= bbox.c2)
-								to.setOffsetFirst({offsetRow: 0, offsetCol: bbox.c2 - to.c1 + 1});
-						}
-						else
-						{
-							if(to.r1 <= bbox.r2)
-								to.setOffsetFirst({offsetRow: bbox.r2 - to.r1 + 1, offsetCol: 0});
-						}
-						to.setOffset(offset);
-					}
-				}
-				aToChange.push({elem: elem, to: to});
-			}
-		}
-		//сначала сортируем чтобы не было конфликтов при сдвиге
-		if(bHor)
-		{
-			if(bAdd)
-				aToChange.sort(function(a, b){return shiftSort(a, b, false, false);});
-			else
-				aToChange.sort(function(a, b){return shiftSort(a, b, true, false);});
-		}
-		else
-		{
-			if(bAdd)
-				aToChange.sort(function(a, b){return shiftSort(a, b, false, true);});
-			else
-				aToChange.sort(function(a, b){return shiftSort(a, b, true, true);});
-		}
-		if(null != this.fChange)
-		{
-			for(var i = 0, length = aToChange.length; i < length; ++i)
-			{
-				var item = aToChange[i];
-				this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
-			}
-		}
-		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-		var fOldChange = this.fChange;
-		this.fChange = null;
-		//сначала удаляем все чтобы не было конфликтов
-		for(var i = 0, length = aToChange.length; i < length; ++i)
-		{
-			var item = aToChange[i];
-			var elem = item.elem;
-			this.removeElement(elem);
-		}
-		//добавляем измененные ячейки
-		for(var i = 0, length = aToChange.length; i < length; ++i)
-		{
-			var item = aToChange[i];
-			if(null != item.to)
-				this.add(item.to.r1, item.to.c1, item.elem.data);
-		}
-		this.fChange = fOldChange;
+	    var _this = this;
+	    if (null == oGetRes)
+	        oGetRes = this.shiftGet(bbox, bHor);
+	    var offset;
+	    if (bHor)
+	        offset = { offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 };
+	    else
+	        offset = { offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 };
+	    if (!bAdd) {
+	        offset.offsetRow = -offset.offsetRow;
+	        offset.offsetCol = -offset.offsetCol;
+	    }
+	    this._shiftmove(true, bbox, offset, oGetRes.elems);
 	},
-	move : function(from, to)
+	move: function (from, to)
 	{
-        var fOldChange = this.fChange;
-		var nOffsetRow = to.r1 - from.r1;
-		var nOffsetCol = to.c1 - from.c1;
-		var oGetRes = this.get(from);
-		for(var i = 0, length = oGetRes.length; i < length; i++)
-		{
-			var elem = oGetRes[i];
-			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
-			if(null != fOldChange)
-				fOldChange.call(this, elem.data, elem.bbox, oNewBBox);
-            //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-            this.fChange = null;
-			this.removeElement(elem);
-			this.add(oNewBBox.r1, oNewBBox.c1, elem.data);
-            this.fChange = fOldChange;
-		}
+	    var offset = { offsetRow: to.r1 - from.r1, offsetCol: to.c1 - from.c1 };
+	    var oGetRes = this.get(from);
+	    this._shiftmove(false, from, offset, oGetRes);
+	},
+    _shiftmove: function (bShift, bbox, offset, elems) {
+	    var aToChange = [];
+	    //сдвигаем inner
+	    if (elems.length > 0) {
+	        var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
+	        var bAdd = offset.offsetRow > 0 || offset.offsetCol > 0;
+	        for (var i = 0, length = elems.length; i < length; i++) {
+	            var elem = elems[i];
+	            var to = null;
+	            if (!bShift || bAdd || !bboxAsc.containsRange(elem.bbox)) {
+	                to = elem.bbox.clone();
+	                to.setOffset(offset);
+	            }
+	            aToChange.push({ elem: elem, to: to });
+	        }
+	    }
+        //сначала сортируем чтобы не было конфликтов при сдвиге
+	    aToChange.sort(function (a, b) { return shiftSort(a, b, offset); });
+
+	    if (null != this.fChange) {
+	        for (var i = 0, length = aToChange.length; i < length; ++i) {
+	            var item = aToChange[i];
+	            this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
+	        }
+	    }
+	    //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
+	    var fOldChange = this.fChange;
+	    this.fChange = null;
+	    //сначала удаляем все чтобы не было конфликтов
+	    for (var i = 0, length = aToChange.length; i < length; ++i) {
+	        var item = aToChange[i];
+	        var elem = item.elem;
+	        this.removeElement(elem);
+	    }
+	    //добавляем измененные ячейки
+	    for (var i = 0, length = aToChange.length; i < length; ++i) {
+	        var item = aToChange[i];
+	        if (null != item.to)
+	            this.add(item.to.r1, item.to.c1, item.elem.data);
+	    }
+	    this.fChange = fOldChange;
 	},
 	getAll : function(){
 		var aRes = [];

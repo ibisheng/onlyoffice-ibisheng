@@ -3344,11 +3344,13 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	}
 	//удаляем to через историю, для undo
 	var aRangesToCheck = this._prepareMoveRangeGetCleanRanges(oBBoxFrom, oBBoxTo);
-	for(var i = 0, length = aRangesToCheck.length; i < length; i++)
-		aRangesToCheck[i].cleanAll();
-	//выставляем для slave refError
-	if(!copyRange)
-		this.workbook.dependencyFormulas.deleteNodes(this.getId(), oBBoxTo);
+	for (var i = 0, length = aRangesToCheck.length; i < length; i++) {
+	    var range = aRangesToCheck[i];
+	    range.cleanAll();
+	    //выставляем для slave refError
+	    if (!copyRange)
+	        this.workbook.dependencyFormulas.deleteNodes(this.getId(), range.getBBox0());
+	}
 	//перемещаем без истории
 	History.TurnOff();
 	//удаляем from без истории, потому что эти данные не терются а перемещаются
@@ -3360,6 +3362,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                 delete row.c[nCol0];
         });
     }
+	History.TurnOn();
     if(!copyRange){
         this.workbook.dependencyFormulas.helper(oBBoxFrom, oBBoxTo,this.Id);
     }
@@ -3388,7 +3391,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
         }
     }
 
-	History.TurnOn();
 	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
 	{
 	    History.LocalChange = true;
