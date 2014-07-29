@@ -2177,7 +2177,7 @@ CChartsDrawer.prototype =
 		{
 			seriaVal = series[i].val ? series[i].val : series[i].yVal;
 			numCache = seriaVal && seriaVal.numRef ? seriaVal.numRef.numCache : seriaVal.numLit;
-			if(numCache != null)
+			if(numCache != null && numCache.pts && numCache.pts.length)
 			{
 				if(!this.calcProp.ptCount)
 					this.calcProp.ptCount = numCache.ptCount;
@@ -3294,9 +3294,9 @@ drawAreaChart.prototype =
 			if(!dataSeries)
 				continue;
 			
-			if(dataSeries[0].pen)
+			if(dataSeries[0] && dataSeries[0].pen)
 				pen = dataSeries[0].pen;
-			if(dataSeries[0].brush)
+			if(dataSeries[0] && dataSeries[0].brush)
 				brush = dataSeries[0].brush;
 			
 			this.cChartDrawer.drawPath(this.paths.series[i], pen, brush);
