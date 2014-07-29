@@ -6669,6 +6669,7 @@
 		WorksheetView.prototype.setSelectionShape = function (isSelectOnShape) {
 			this.isSelectOnShape = isSelectOnShape;
 			// отправляем евент для получения свойств картинки, шейпа или группы
+            this.model.workbook.handlers.trigger("asc_onHideComment");
 			this.handlers.trigger("selectionNameChanged", this.getSelectionName());
 			this.handlers.trigger("selectionChanged", this.getSelectionInfo());
 			this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
