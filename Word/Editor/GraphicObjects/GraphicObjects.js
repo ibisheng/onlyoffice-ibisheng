@@ -128,6 +128,14 @@ CGraphicObjects.prototype =
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
         var ret = this.curState.onMouseDown(global_mouseEvent, x, y, pageIndex, false);
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        if(ret && ret.cursorType === "text")
+        {
+            if((this.selection.chartSelection && this.selection.chartSelection.selection.textSelection) ||
+                (this.selection.groupSelection && this.selection.groupSelection.selection.chartSelection && this.selection.groupSelection.selection.chartSelection.selection.textSelection))
+            {
+                ret = {};
+            }
+        }
         return ret || {};
     },
 
