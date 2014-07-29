@@ -6507,7 +6507,10 @@
 					}
 				}
 			}
-
+			
+			//применен ли а/ф к данной ячейке
+			cell_info.autoFilter = this.autoFilters.isApplyAutoFilterInCell(activeCell);
+			
 			return cell_info;
 		};
 

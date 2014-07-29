@@ -1605,6 +1605,37 @@ var gUndoInsDelCellsFlag = true;
 					History.TurnOff();
 			},
 			
+			isApplyAutoFilterInCell: function(activeCell)
+			{
+				var aWs = this._getCurrentWS();
+				var tableRange;
+				if(aWs.TableParts)
+				{
+					var tablePart;
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{
+						tablePart = aWs.TableParts[i];
+						
+						//если применен фильтр или сортировка
+						if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
+						{
+							if(tablePart.Ref.containsRange(activeCell))
+								return true;
+						}
+						else
+						{
+							if(tablePart.Ref.containsRange(activeCell))
+								return false;
+						};
+					};
+				};
+				
+				if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
+					return true;
+				
+				return false;
+			},
+			
 			_checkClickFrozenArea: function(x, y, offsetX, offsetY, frozenObj)
 			{
 				var ws = this.worksheet;
