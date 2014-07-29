@@ -419,38 +419,6 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 		return null;
 };
 
-//-----------------------------------------------------------------------------------
-// Draw 
-//-----------------------------------------------------------------------------------
-
-function checkDataRange(type, interval, isRows) {
-	var dataRange = parserHelp.parse3DRef(interval);
-	if (null !== dataRange)
-		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
-	if (null === dataRange)
-		return c_oAscError.ID.DataRangeError;
-	
-	//проверка максимального дипазона
-	var maxSeries = 255;
-	var minStockVal = 4;
-
-	var intervalValues, intervalSeries;
-	if (isRows) {
-		intervalSeries = dataRange.r2 - dataRange.r1 + 1;
-		intervalValues = dataRange.c2 - dataRange.c1 + 1;
-	} else {
-		intervalSeries = dataRange.c2 - dataRange.c1 + 1;
-		intervalValues = dataRange.r2 - dataRange.r1 + 1;
-	}
-	if (c_oAscChartTypeSettings.stock === type) {
-		if (minStockVal !== intervalSeries || intervalValues < minStockVal)
-			return c_oAscError.ID.StockChartError;
-	} else if (intervalSeries > maxSeries)
-		return c_oAscError.ID.DataRangeError;
-
-	return c_oAscError.ID.No;
-}
-
 function arrReverse(arr) {
 	if(!arr || !arr.length)
 		return;

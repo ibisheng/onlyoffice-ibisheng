@@ -524,7 +524,6 @@ parserHelper.prototype.parse3DRef = function ( formula ) {
 				return {sheet:sheetName, range:this.operand_str};
 			else
 				return null;
-
 		}
 	}
 	// Возвращаем ошибку
@@ -546,6 +545,42 @@ parserHelper.prototype.get3DRef = function (sheet, range) {
 // Возвращает экранируемое название листа
 parserHelper.prototype.getEscapeSheetName = function (sheet) {
 	return rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
+};
+// Проверяем ссылку на валидность для диаграммы или автофильтра
+parserHelper.prototype.checkDataRange = function (model, dialogType, dataRange, isRows, chartType) {
+	if (c_oAscSelectionDialogType.Chart === dialogType) {
+		dataRange = parserHelp.parse3DRef(dataRange);
+		if (null === dataRange || !model.getWorksheetByName(dataRange.sheet))
+			return c_oAscError.ID.DataRangeError;
+		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
+	} else
+		dataRange = Asc.g_oRangeCache.getAscRange(dataRange);
+
+	if (null === dataRange)
+		return c_oAscError.ID.DataRangeError;
+
+	if (c_oAscSelectionDialogType.Chart === dialogType) {
+		// Проверка максимального дипазона
+		var maxSeries = 255;
+		var minStockVal = 4;
+
+		var intervalValues, intervalSeries;
+		if (isRows) {
+			intervalSeries = dataRange.r2 - dataRange.r1 + 1;
+			intervalValues = dataRange.c2 - dataRange.c1 + 1;
+		} else {
+			intervalSeries = dataRange.c2 - dataRange.c1 + 1;
+			intervalValues = dataRange.r2 - dataRange.r1 + 1;
+		}
+
+		if (c_oAscChartTypeSettings.stock === chartType) {
+			if (minStockVal !== intervalSeries || intervalValues < minStockVal)
+				return c_oAscError.ID.StockChartError;
+		} else if (intervalSeries > maxSeries)
+			return c_oAscError.ID.MaxDataSeriesError;
+	}
+
+	return c_oAscError.ID.No;
 };
 
 var parserHelp = new parserHelper();

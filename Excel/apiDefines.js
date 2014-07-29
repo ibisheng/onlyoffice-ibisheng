@@ -31,6 +31,7 @@ var c_oAscError = {
 		UplImageUrl: 			-17,
 		CoAuthoringDisconnect:	-18,
 		ConvertationPassword:	-19,
+		MaxDataSeriesError:		-80,
 		
 		
 		VKeyEncrypt:			-20,
