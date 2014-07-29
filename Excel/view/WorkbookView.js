@@ -1253,9 +1253,9 @@
 
 		/** @param nIndex {Number} массив индексов */
 		WorkbookView.prototype.removeWorksheet = function (nIndex) {
+            this.stopTarget();
 			this.wsViews.splice(nIndex, 1);
 			// Сбрасываем активный (чтобы не досчитывать после смены)
-            this.stopTarget();
 			this.wsActive = -1;
 		};
 
