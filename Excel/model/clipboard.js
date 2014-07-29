@@ -466,7 +466,10 @@
 						window.global_pptx_content_writer.End_UseFullUrl()
 					};
 					
-					this._cleanElement();
+					while (this.element.hasChildNodes()) {
+						this.element.removeChild(this.element.lastChild);
+					};
+					
 					if(text !== false)
 						this.element.appendChild(text);
 					if(this.element.children[0] && sBase64)
@@ -593,7 +596,10 @@
 						nodes[0] = outer;
 					}
 
-					t._cleanElement();
+					while (this.element.hasChildNodes()) {
+						this.element.removeChild(this.element.lastChild);
+					}
+					
 					nodes.forEach(
 							function(node){
 								t.element.appendChild(node);
