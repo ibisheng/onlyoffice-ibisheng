@@ -564,9 +564,9 @@ function FrozenPlace(ws, type) {
         }
 		
 		if ( isOverlay ) 
-			_this.worksheet.overlayGraphicCtx.clearRect( x - deltaW, y - deltaH, w, h );
+			_this.worksheet.overlayGraphicCtx.clearRect( x - deltaW, y - deltaH, w + deltaW, h + deltaH );
 		else {
-			_this.worksheet.drawingGraphicCtx.clearRect( x - deltaW, y - deltaH, w, h );
+			_this.worksheet.drawingGraphicCtx.clearRect( x - deltaW, y - deltaH, w + deltaW, h + deltaH );
 		}
 	};
 	
