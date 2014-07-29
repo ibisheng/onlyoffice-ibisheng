@@ -2263,7 +2263,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							t.sheetsChanged();
 						}
 						
-						//History.EndTransaction();
+						History.EndTransaction();
 					}
 				};
 
