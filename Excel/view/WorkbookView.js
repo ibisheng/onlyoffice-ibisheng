@@ -1186,16 +1186,16 @@
 
 			var isSendInfo = (-1 === this.wsActive) || !isResized;
 			// Только если есть активный
-            var oldWsView;
 			if (-1 !== this.wsActive) {
 				var ws = this.getWorksheet();
 				if (ws instanceof asc_WSV) {
-                    oldWsView = ws;
 					// Останавливаем ввод данных в редакторе ввода
 					if (ws.getCellEditMode() && !isResized)
 						this._onStopCellEditing();
 					// Делаем очистку селекта
 					ws.cleanSelection();
+
+					this.stopTarget(ws);
 				}
 			}
 
@@ -1231,11 +1231,8 @@
 				this.handlers.trigger("asc_onSelectionRangeChanged", ws.getSelectionRangeValue());
 			}
 
-            if(oldWsView)
-            {
-                oldWsView.objectRender && oldWsView.objectRender.drawingDocument && oldWsView.objectRender.drawingDocument.TargetEnd();
-            }
             ws.objectRender.controller.updateSelectionState();
+
 			if (isSendInfo) {
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				this._onWSSelectionChanged(ws.getSelectionInfo());
@@ -1253,7 +1250,7 @@
 
 		/** @param nIndex {Number} массив индексов */
 		WorkbookView.prototype.removeWorksheet = function (nIndex) {
-            this.stopTarget();
+			this.stopTarget(null);
 			this.wsViews.splice(nIndex, 1);
 			// Сбрасываем активный (чтобы не досчитывать после смены)
 			this.wsActive = -1;
@@ -1270,27 +1267,23 @@
 						this._onStopCellEditing();
 					// Делаем очистку селекта
 					ws.cleanSelection();
+
+					this.stopTarget(ws);
 				}
-                this.stopTarget();
 				this.wsActive = -1;
 				// Чтобы поменять, нужно его добавить
-				ws = this.getWorksheet(indexTo);
+				this.getWorksheet(indexTo);
 			}
 			var movedSheet = this.wsViews.splice(indexFrom,1);
 			this.wsViews.splice(indexTo,0,movedSheet[0])
 		};
 
-        WorkbookView.prototype.stopTarget = function()
-        {
-            if (-1 !== this.wsActive)
-            {
-                var ws = this.getWorksheet(this.wsActive);
-                if (ws instanceof asc_WSV)
-                {
-                    ws.objectRender && ws.objectRender.drawingDocument && ws.objectRender.drawingDocument.TargetEnd();
-                }
-            }
-        };
+		WorkbookView.prototype.stopTarget = function (ws) {
+			if (null === ws && -1 !== this.wsActive)
+				ws = this.getWorksheet(this.wsActive);
+			if (null !== ws && ws.objectRender && ws.objectRender.drawingDocument)
+				ws.objectRender.drawingDocument.TargetEnd();
+		};
 
 		// Копирует элемент перед другим элементом
 		WorkbookView.prototype.copyWorksheet = function (index, insertBefore) {
@@ -1303,8 +1296,9 @@
 						this._onStopCellEditing();
 					// Делаем очистку селекта
 					ws.cleanSelection();
+
+					this.stopTarget(ws);
 				}
-                this.stopTarget();
 				this.wsActive = -1;
 			}
 
@@ -1328,8 +1322,8 @@
 		};
 
 		WorkbookView.prototype.spliceWorksheet = function () {
+			this.stopTarget(null);
 			this.wsViews.splice.apply(this.wsViews, arguments);
-            this.stopTarget();
 			this.wsActive = -1;
 		};
 

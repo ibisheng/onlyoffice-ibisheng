@@ -9719,7 +9719,7 @@
 							t.handlers.trigger("reinitializeScrollX");
 						else if (bIsUpdateY)
 							t.handlers.trigger("reinitializeScrollY");
-						
+
 						t._updateCellsRange(val.range, val.canChangeColWidth, val.isLockDraw);
 					}
 					return;
