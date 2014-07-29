@@ -3798,13 +3798,14 @@ PasteProcessor.prototype =
 				graphicObj = drawing.graphicObject.convertToWord(this.oLogicDocument);
 				
 				tempParaRun = new ParaRun();
-				tempParaRun.Content.unshift(new ParaDrawing());
+				tempParaRun.Paragraph = null;
+				tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );//tempParaRun.Content.unshift(new ParaDrawing());
 
 				//paraRun.Content[index].wrappingType = wrappingType;
 				//paraRun.Content[index].DrawingType = DrawingType;
 				
-				tempParaRun.Content[0].GraphicObj = graphicObj;
-				tempParaRun.Content[0].GraphicObj.parent = tempParaRun.Content[0];
+				tempParaRun.Content[0].Set_GraphicObject(graphicObj);
+				tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
 				
 				tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
 				
