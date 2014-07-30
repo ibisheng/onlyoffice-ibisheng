@@ -222,7 +222,7 @@ CHistory.prototype =
         if ( true != this.Can_Undo() )
             return null;
         
-        if ( this.Index === this.Points.length - 1 )
+        if (this.Index === this.Points.length - 1)
             this.LastState = this.workbook.handlers.trigger("getSelectionState");
 
 		this._checkCurPoint();
@@ -231,9 +231,6 @@ CHistory.prototype =
 		var oRedoObjectParam = new Asc.RedoObjectParam();
 		this.UndoRedoPrepare(oRedoObjectParam, true);
 
-		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
-		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
-			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
         // Откатываем все действия в обратном порядке (относительно их выполенения)
         for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
         {
@@ -253,8 +250,7 @@ CHistory.prototype =
 		}
 		/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
         lockDraw(this.workbook);
-		
-		this.workbook.handlers.trigger("lockDraw");
+
         if (bUndo)
             this.workbook.bUndoChanges = true;
         else
@@ -336,13 +332,14 @@ CHistory.prototype =
         }
 	},
 	UndoRedoEnd: function (Point, oRedoObjectParam, bUndo) {
+		var wsViews, i, oState;
 	    if (!bUndo && null == Point) {
 	        this._checkCurPoint();
 	        Point = this.Points[this.Index];
 	        CollaborativeEditing.Apply_LinkData();
             this.Get_RecalcData(Point);
-	        var wsViews = Asc["editor"].wb.wsViews;
-	        for (var i = 0; i < wsViews.length; ++i) {
+	        wsViews = Asc["editor"].wb.wsViews;
+	        for (i = 0; i < wsViews.length; ++i) {
 	            if (wsViews[i]) {
 	                wsViews[i].objectRender.controller.recalculate2(true);
 	            }
@@ -357,8 +354,8 @@ CHistory.prototype =
 	    if (null != Point) {
 	        if (bUndo) {
                 this.Get_RecalcData(Point);
-	            var wsViews = Asc["editor"].wb.wsViews;
-	            for (var i = 0; i < wsViews.length; ++i) {
+	            wsViews = Asc["editor"].wb.wsViews;
+	            for (i = 0; i < wsViews.length; ++i) {
 	                if (wsViews[i]) {
 	                    wsViews[i].objectRender.controller.recalculate2(undefined);
 	                }
@@ -369,29 +366,28 @@ CHistory.prototype =
             //синхронизация index и id worksheet
 	        if (oRedoObjectParam.bUpdateWorksheetByModel)
 	            this.workbook.handlers.trigger("updateWorksheetByModel");
-	        for (var i in Point.UpdateRigions)
-	            this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
+
+			oState = bUndo ? Point.SelectionState : ((this.Index === this.Points.length - 1) ?
+				this.LastState : this.Points[this.Index + 1].SelectionState);
+
+			// ToDo какое-то не очень решение брать 0-й элемент и у него получать индекс!
+			var nSheetId = (null !== oState) ? oState[0].worksheetId : Point.nLastSheetId;
+			if (null !== nSheetId)
+				this.workbook.handlers.trigger('showWorksheet', nSheetId);
+
+	        for (i in Point.UpdateRigions)
+	            this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i], false, true);
+
 	        if (bUndo) {
-                if(Point.SelectionState && Point.SelectionState[0] && Point.SelectionState[0].focus) {
-                    if (Point.SelectionState != null) {
-                        this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
-                    }
-                }
-                else {
+                if (Point.SelectionState) {
+					this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+                } else {
                     this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
                 }
-	        }
-	        else {
-                var State = null;
-                if ( this.Index === this.Points.length - 1 )
-                    State = this.LastState;
-                else
-                    State = this.Points[this.Index + 1].SelectionState;
-
-                if ( State && State[0] && State[0].focus) {
-                    this.workbook.handlers.trigger("setSelectionState", State);
-                }
-                else {
+	        } else {
+                if (null !== oState && oState[0] && oState[0].focus) {
+                    this.workbook.handlers.trigger("setSelectionState", oState);
+                } else {
                     var oSelectRange = null;
                     if (null != Point.SelectRangeRedo)
                         oSelectRange = Point.SelectRangeRedo;
@@ -400,13 +396,13 @@ CHistory.prototype =
                     if (null != oSelectRange)
                         this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
                 }
-
 	        }
-	        for (var i in oRedoObjectParam.oChangeWorksheetUpdate)
-	            this.workbook.handlers.trigger("changeWorksheetUpdate", oRedoObjectParam.oChangeWorksheetUpdate[i]);
+	        for (i in oRedoObjectParam.oChangeWorksheetUpdate)
+	            this.workbook.handlers.trigger("changeWorksheetUpdate",
+					oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true});
 	        if (oRedoObjectParam.bOnSheetsChanged)
 	            this.workbook.handlers.trigger("asc_onSheetsChanged");
-	        for (var i in oRedoObjectParam.oOnUpdateTabColor) {
+	        for (i in oRedoObjectParam.oOnUpdateTabColor) {
 	            var curSheet = this.workbook.getWorksheetById(i);
 	            if (curSheet)
 	                this.workbook.handlers.trigger("asc_onUpdateTabColor", curSheet.getIndex());
@@ -448,9 +444,6 @@ CHistory.prototype =
 		this.CurPoint = null;
         var Point = this.Points[++this.Index];
 		
-		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
-		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
-			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
 		this.RedoExecute(Point, oRedoObjectParam);
 		
 		this.UndoRedoEnd(Point, oRedoObjectParam, false);
@@ -594,15 +587,23 @@ CHistory.prototype =
         var Items = [];
 		var UpdateRigions = {};
         var Time  = new Date().getTime();
-		var oSelectRange = this.workbook.handlers.trigger("getSelection");
+		var oSelectRange = null, nLastSheetId = null,
+			oSelectionState = this.workbook.handlers.trigger("getSelectionState");
+		if (null === oSelectionState) {
+			var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
+			if (wsActive)
+				nLastSheetId = wsActive.getId();
+			oSelectRange = this.workbook.handlers.trigger("getSelection");
+		}
+
 		this.CurPoint = {
             Items : Items, // Массив изменений, начиная с текущего момента
 			UpdateRigions : UpdateRigions,
-			nLastSheetId : null,
+			nLastSheetId : nLastSheetId,
 			SelectRange : oSelectRange,
 			SelectRangeRedo : oSelectRange,
             Time  : Time,   // Текущее время
-			SelectionState : this.workbook.handlers.trigger("getSelectionState")
+			SelectionState : oSelectionState
         };
     },
 	
@@ -621,7 +622,8 @@ CHistory.prototype =
         var Item;
         if ( this.RecIndex >= this.Index )
             this.RecIndex = this.Index - 1;
-		
+
+		// ToDo Убрать это!!!
 		if(Class && !Class.Save_Changes)
 		{
 			Item =
@@ -661,7 +663,8 @@ CHistory.prototype =
 				updateRange = range.clone();
 			oCurPoint.UpdateRigions[sheetid] = updateRange;
 		}
-		oCurPoint.nLastSheetId = sheetid;
+		if (null != sheetid)
+			oCurPoint.nLastSheetId = sheetid;
 		if(1 == oCurPoint.Items.length)
 			this._sendCanUndoRedo();
     },

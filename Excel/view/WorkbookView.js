@@ -104,8 +104,6 @@
 			this.lastFindResults = {};		// Результаты поиска (для поиска по всей книге, чтобы перейти на другой лист)
 			this.fReplaceCallback = null;	// Callback для замены текста
 
-			this._lockDraw = false;
-
 			// Фонт, который выставлен в DrawingContext, он должен быть один на все DrawingContext-ы
 			this.m_oFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
 
@@ -309,10 +307,12 @@
 				    self.getWorksheetById(wsId).changeWorksheet("delCell", {val: val, range: range});
 			    });
 			    this.model.handlers.add("showWorksheet", function (wsId) {
-				    self.showWorksheetById(wsId);
-				    var ws = self.getWorksheetById(wsId);
-				    if ( ws )
-					    self.handlers.trigger("asc_onActiveSheetChanged", ws.model.getIndex());
+					var wsModel = self.model.getWorksheetById(wsId), index;
+					if (wsModel) {
+						index = wsModel.getIndex();
+						self.showWorksheet(index, false, true);
+						self.handlers.trigger("asc_onActiveSheetChanged", index);
+					}
 			    });
 			    this.model.handlers.add("setSelection", function () {
 				    self._onSetSelection.apply(self, arguments);
@@ -334,9 +334,6 @@
 			    });
 			    this.model.handlers.add("showDrawingObjects", function () {
 				    self.onShowDrawingObjects.apply(self, arguments);
-			    });
-			    this.model.handlers.add("lockDraw", function () {
-				    self.lockDraw.apply(self, arguments);
 			    });
 			    this.model.handlers.add("setCanUndo", function (bCanUndo) {
 				    self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
@@ -589,17 +586,15 @@
 
 		WorkbookView.prototype._onGetSelectionState = function () {
 			var ws = this.getWorksheet();
-			return ws.objectRender.controller.getSelectionState();
+			var res = ws.objectRender.controller.getSelectionState();
+			// ToDo лучше на getSelectionState возвращать null
+			return (res && res[0] && res[0].focus) ? res : null;
 		};
 
 		WorkbookView.prototype._onSetSelectionState = function (state) {
-
-            if(state[0] && state[0].worksheet)
-            {
-                var ws = this.getWorksheet(state[0].worksheet.index);
-                if(ws)
-                {
-                    this.showWorksheet(state[0].worksheet.index);
+            if (null !== state) {
+                var ws = this.getWorksheetById(state[0].worksheetId);
+                if (ws) {
                     ws.objectRender.controller.setSelectionState(state);
                     ws.setSelectionShape(true);
                     var d = ws._calcActiveCellOffset(ws.objectRender.getSelectedDrawingsRange());
@@ -612,7 +607,6 @@
                     ws.objectRender.controller.updateSelectionState();
                 }
                 // Селектим после выставления состояния
-
             }
 		};
 
@@ -1169,19 +1163,14 @@
 			return ws;
 		};
 
-		WorkbookView.prototype.showWorksheetById = function (id) {
-			var wsModel = this.model.getWorksheetById(id);
-			if ( wsModel )
-				this.showWorksheet(wsModel.getIndex());
-		};
-
 		/**
 		 *
 	 	 * @param index
 	 	 * @param [isResized]
+		 * @param [bLockDraw]
 	 	 * @returns {WorkbookView}
 	 	 */
-		WorkbookView.prototype.showWorksheet = function (index, isResized) {
+		WorkbookView.prototype.showWorksheet = function (index, isResized, bLockDraw) {
 			if (index === this.wsActive) {return this;}
 
 			var isSendInfo = (-1 === this.wsActive) || !isResized;
@@ -1223,8 +1212,10 @@
 				ws.resize(true);
 			else if (ws.updateZoom)
 				ws.changeZoom(true);
-			
-			ws.draw();
+
+			if (!bLockDraw)
+				ws.draw();
+
 			if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
 				// Когда идет выбор диапазона, то на позываемом листе должны выставить нужный режим
 				ws.setSelectionDialogMode(this.selectionDialogType, selectionRange);
@@ -1956,16 +1947,11 @@
 			ws._updateVisibleRowsCount();
 		};
 		WorkbookView.prototype.drawWS = function (){
-			this._lockDraw = false;
-			this.getWorksheet().draw(this._lockDraw);
+			this.getWorksheet().draw();
 		};
 		WorkbookView.prototype.onShowDrawingObjects = function (clearCanvas) {
 			var ws = this.getWorksheet();
 			ws.objectRender.showDrawingObjects(clearCanvas);
-		};
-
-		WorkbookView.prototype.lockDraw = function (){
-			this._lockDraw = true;
 		};
 
 		WorkbookView.prototype.insertHyperlink = function (options) {

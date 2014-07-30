@@ -6514,15 +6514,14 @@
 			return cell_info;
 		};
 
-		WorksheetView.prototype._getSelectionInfoObject = function (bExt) {
+		WorksheetView.prototype._getSelectionInfoObject = function () {
 			var objectInfo = new asc_CCellInfo();
 			var defaults = this.settings.cells;
-			var selectionType = c_oAscSelectionType.RangeShape;
 
 			objectInfo.flags = new asc_CCellFlag();
 			var graphicObjects = this.objectRender.getSelectedGraphicObjects();
 			if (graphicObjects.length)
-				selectionType = objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
+				objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
 
 			var textPr = this.objectRender.controller.getParagraphTextPr();
             var theme = this.objectRender.controller.getTheme();
@@ -9718,7 +9717,7 @@
 							bIsUpdateY = true;
 						}
 						if (bIsUpdateX && bIsUpdateY)
-							this.handlers.trigger("reinitializeScroll");
+							t.handlers.trigger("reinitializeScroll");
 						else if (bIsUpdateX)
 							t.handlers.trigger("reinitializeScrollX");
 						else if (bIsUpdateY)

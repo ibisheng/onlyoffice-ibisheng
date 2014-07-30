@@ -4402,7 +4402,7 @@ DrawingObjectsController.prototype =
             var worksheetView = this.drawingObjects.getWorksheet();
             if(worksheetView)
             {
-                selection_state.worksheet = worksheetView.model;
+                selection_state.worksheetId = worksheetView.model.getId();
             }
         }
         return [selection_state];
