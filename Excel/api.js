@@ -2547,14 +2547,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_getChartPreviews: function(chartType) {
 				return this.chartPreviewManager.getChartPreviews(chartType);
 			},
-
-			asc_checkChartInterval: function(type, interval, isRows) {
-				var errorId = checkDataRange(type, interval, isRows);
-				var bResult = errorId !== c_oAscError.ID.No;
-				if (bResult)
-					this.handlers.trigger("asc_onError", errorId, c_oAscError.Level.NoCritical);
-				return !bResult;
-			},
 			
 			asc_checkDataRange: function(dialogType, dataRange, isRows, chartType) {
 				return parserHelp.checkDataRange(this.wbModel, dialogType, dataRange, isRows, chartType);
@@ -3735,7 +3727,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
 		prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
 		prot["asc_checkDataRange"] = prot.asc_checkDataRange;
-		prot["asc_checkChartInterval"] = prot.asc_checkChartInterval; // ToDo убрать!
 		prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;
 		prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
 		prot["asc_cleanWorksheet"] = prot.asc_cleanWorksheet;

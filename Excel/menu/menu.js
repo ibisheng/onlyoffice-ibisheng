@@ -2178,6 +2178,7 @@
 						//chartForm.find("#chartRange").val(interval);
                         //
 						//chartForm.find("#chartRange").bind("keyup", function() {
+						// ToDo asc_checkChartInterval -> asc_checkDataRange
 						//	var result = api.asc_checkChartInterval(chartForm.find("#chartType").val(), chartForm.find("#chartSubType").val(), chartForm.find("#chartRange").val(), chartForm.find("#dataRows").is(":checked"));
 						//	if (result)
 						//		chartForm.find("#chartRange").css("color", "black");
