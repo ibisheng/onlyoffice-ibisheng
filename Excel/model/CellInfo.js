@@ -211,6 +211,6 @@
 		prot["asc_getStyleName"]		= prot.asc_getStyleName;
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;
-		prot["asc_getAutoFilter"]	    = prot.asc_getAutoFilter;
+		prot["asc_getClearFilter"]	    = prot.asc_getClearFilter;
 	}
 )(window);
