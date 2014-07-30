@@ -5791,7 +5791,16 @@ PasteProcessor.prototype =
                 this.oCurHyperlink = oOldHyperlink;
                 this.oCurHyperlinkContentPos = oOldHyperlinkContentPos;
                 if(oHyperlink.Content.length > 0)
+                {
+                    if(this.pasteInExcel)
+                    {
+                        var TextPr = new CTextPr();
+                        TextPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                        TextPr.Underline = true;
+                        oHyperlink.Apply_TextPr( TextPr, undefined, true );
+                    }
                     this._Paragraph_Add(oHyperlink);
+                }
             }
         }
         if(bRoot)
