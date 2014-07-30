@@ -166,6 +166,7 @@
 			this.numFormatType = null;
 			this.angle = null;
 			this.clearFilter = null;
+			this.isAutoFilter = false;
 		}
 
 		asc_CCellInfo.prototype = {
@@ -187,7 +188,8 @@
 			asc_getStyleName: function () { return this.styleName; },
 			asc_getNumFormatType: function(){ return this.numFormatType; },
 			asc_getAngle: function () { return this.angle; },
-			asc_getClearFilter: function () { return this.clearFilter; }
+			asc_getClearFilter: function () { return this.clearFilter; },
+			asc_getIsAutoFilter: function () { return this.isAutoFilter; }
 		};
 
 		window["Asc"].asc_CCellInfo = window["Asc"]["asc_CCellInfo"] = asc_CCellInfo;
@@ -212,5 +214,6 @@
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;
 		prot["asc_getClearFilter"]	    = prot.asc_getClearFilter;
+		prot["asc_getIsAutoFilter"]	    = prot.asc_getIsAutoFilter;
 	}
 )(window);

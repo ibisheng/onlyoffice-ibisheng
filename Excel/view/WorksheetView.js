@@ -6446,17 +6446,18 @@
 			
 			//null - disable, true - pressed button, false - unpressed button
 			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
+			cell_info.isFormatTable = (null !== tablePartsOptions);
 			if(tablePartsOptions === null)
 			{
 				var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
-				cell_info.isFormatTable = checkApplyFilterOrSort.isAutoFilter;
+				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
 				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
 			else
 			{
 				if(tablePartsOptions.tableRange.containsRange(activeCell))
 				{
-					cell_info.isFormatTable = true;
+					cell_info.isAutoFilter = true;
 					if(this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id))
 						cell_info.clearFilter = true;
 					else
@@ -6464,7 +6465,7 @@
 				}
 				else
 				{
-					cell_info.isFormatTable = null;
+					cell_info.isAutoFilter = null;
 					cell_info.clearFilter = null;
 				}
 			}
