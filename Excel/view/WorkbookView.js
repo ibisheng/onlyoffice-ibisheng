@@ -1223,6 +1223,7 @@
 			}
 
             ws.objectRender.controller.updateSelectionState();
+            ws.objectRender.controller.updateOverlay();
 
 			if (isSendInfo) {
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));

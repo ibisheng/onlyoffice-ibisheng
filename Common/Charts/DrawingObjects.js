@@ -3221,6 +3221,7 @@ function DrawingObjects() {
 					var chartSeries = getChartSeries(worksheet.model, options, catHeadersBBox, serHeadersBBox);
 					drawingObject.rebuildSeriesFromAsc(chartSeries);
                     _this.controller.startRecalculate();
+                    _this.sendGraphicObjectProps();
                 };
                 var callbackCheck = function (result) {
                     if(result)
@@ -3263,7 +3264,7 @@ function DrawingObjects() {
         return "";
     };
 
-    _this.updateChartReferences = function(oldWorksheet, newWorksheet)
+    _this.updateChartReferences = function(oldWorksheet, newWorksheet, bNoRedraw)
     {
         ExecuteNoHistory(function(){
             for (var i = 0; i < aObjects.length; i++) {
@@ -3273,8 +3274,7 @@ function DrawingObjects() {
                     graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
                 }
             }
-            if(this.controller)
-                this.controller.startRecalculate();
+
         }, this, []);
 
     };
