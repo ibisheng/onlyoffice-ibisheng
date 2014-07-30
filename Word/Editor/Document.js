@@ -7658,7 +7658,7 @@ CDocument.prototype =
             var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
             if(ParaDrawing)
             {
-                ParaDrawing.GoTo_Text();
+                ParaDrawing.GoTo_Text(undefined, false);
             }
             return this.DrawingObjects.resetSelection();
         }
