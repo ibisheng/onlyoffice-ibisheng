@@ -2072,11 +2072,11 @@ var gUndoInsDelCellsFlag = true;
 					}
 					else if(aWs.AutoFilter)
 					{
-						result = {isFilterColumns: false, isAutoFilter: true}
+						result = {isFilterColumns: null, isAutoFilter: true};
 					}
 					else
 					{
-						result = {isFilterColumns: false, isAutoFilter: false}
+						result = {isFilterColumns: null, isAutoFilter: false};
 					};
 				};
 				
