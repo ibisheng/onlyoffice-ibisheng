@@ -21928,6 +21928,8 @@ CTitle.prototype =
     checkShapeChildTransform: CDLbl.prototype.checkShapeChildTransform,
     updatePosition: function(x, y)
     {
+        this.posX = x;
+        this.posY = y;
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
 
