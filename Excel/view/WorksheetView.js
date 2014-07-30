@@ -1365,7 +1365,7 @@
 			var x = this.cellsLeft;
 			var visibleW = this.drawingCtx.getWidth();
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-			var l = Math.max(this.model.getColsCount(), this.nColsCount, obr.maxCol);
+			var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, obr.maxCol);
 			var i = 0, w, column, isBestFit, hiddenW = 0;
 
 			// Берем дефалтовую ширину документа
@@ -1410,7 +1410,7 @@
 			var y = this.cellsTop;
 			var visibleH = this.drawingCtx.getHeight();
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-			var l = Math.max(this.model.getRowsCount(), this.nRowsCount, obr.maxRow);
+			var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, obr.maxRow);
 			var defaultH = this.model.getDefaultHeight() || this.defaultRowHeight;
 			var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 
@@ -4621,8 +4621,8 @@
 		 * @return {Range}
 		 */
 		WorksheetView.prototype._getCell = function (col, row) {
-			this.nRowsCount = Math.max(this.model.getRowsCount() , this.rows.length);
-			this.nColsCount = Math.max(this.model.getColsCount(), this.cols.length);
+			this.nRowsCount = Math.max(this.model.getRowsCount() + 1, this.rows.length);
+			this.nColsCount = Math.max(this.model.getColsCount() + 1, this.cols.length);
 			if (col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount)
 				return null;
 
@@ -9731,21 +9731,25 @@
 
 				case "updateRange":
 					if (val && val.range) {
-						var bIsUpdateX = false, bIsUpdateY = false;
-						if (t.cols.length < val.range.c2) {
-							t.expandColsOnScroll(false, true, val.range.c2);
-							bIsUpdateX = true;
+						// Для принятия изменения нужно делать расширение диапазона
+						if (this.model.workbook.bCollaborativeChanges) {
+							var bIsUpdateX = false, bIsUpdateY = false;
+							if (val.range.c2 > t.nColsCount) {
+								t.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+								bIsUpdateX = true;
+							}
+							if (val.range.r2 > t.nRowsCount) {
+								t.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+								bIsUpdateY = true;
+							}
+
+							if (bIsUpdateX && bIsUpdateY)
+								t.handlers.trigger("reinitializeScroll");
+							else if (bIsUpdateX)
+								t.handlers.trigger("reinitializeScrollX");
+							else if (bIsUpdateY)
+								t.handlers.trigger("reinitializeScrollY");
 						}
-						if (t.rows.length < val.range.r2) {
-							t.expandRowsOnScroll(false, true, val.range.r2);
-							bIsUpdateY = true;
-						}
-						if (bIsUpdateX && bIsUpdateY)
-							t.handlers.trigger("reinitializeScroll");
-						else if (bIsUpdateX)
-							t.handlers.trigger("reinitializeScrollX");
-						else if (bIsUpdateY)
-							t.handlers.trigger("reinitializeScrollY");
 
 						t._updateCellsRange(val.range, val.canChangeColWidth, val.isLockDraw);
 					}
@@ -9779,7 +9783,7 @@
 			var arn;
 			var bIsMaxCols = false;
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-			var maxc = Math.max(this.model.getColsCount(), this.cols.length, obr.maxCol);
+			var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, obr.maxCol);
 			if (newColsCount) {
 				maxc = Math.max(maxc, newColsCount);
 			}
@@ -9818,7 +9822,7 @@
 			var arn;
 			var bIsMaxRows = false;
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-			var maxr = Math.max(this.model.getRowsCount() , this.rows.length, obr.maxRow);
+			var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, obr.maxRow);
 			if (newRowsCount) {
 				maxr = Math.max(maxr, newRowsCount);
 			}

@@ -271,6 +271,8 @@ CHistory.prototype =
 		    this.Add(Class, Type, sheetid, range, Data, LocalChange);
 		if(bNeedOff)
 			this.TurnOff();
+
+		// ToDo Убрать это!!!
         if(Class && !Class.Load_Changes)
         {
             Class.Redo( Type, Data, sheetid );
