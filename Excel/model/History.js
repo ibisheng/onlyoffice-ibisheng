@@ -588,12 +588,10 @@ CHistory.prototype =
         var Items = [];
 		var UpdateRigions = {};
         var Time  = new Date().getTime();
-		var oSelectRange = null, nLastSheetId = null,
-			oSelectionState = this.workbook.handlers.trigger("getSelectionState");
-		if (null === oSelectionState)
-			oSelectRange = this.workbook.handlers.trigger("getSelection");
+		var nLastSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
 
-		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист.
+		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
+		var oSelectRange = this.workbook.handlers.trigger("getSelection");
 		var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
 		if (wsActive)
 			nLastSheetId = wsActive.getId();
