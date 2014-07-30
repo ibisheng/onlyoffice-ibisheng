@@ -6442,8 +6442,32 @@
 
 			cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
 			cell_info.valign = c.getAlignVertical().toLowerCase();
-
-			cell_info.isFormatTable = (null !== this.autoFilters.searchRangeInTableParts(activeCell));
+			
+			//null - disable, true - pressed button, false - unpressed button
+			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
+			if(tablePartsOptions == null)
+			{
+				var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
+				cell_info.isFormatTable = checkApplyFilterOrSort.isAutoFilter;
+				cell_info.cleanFilter = checkApplyFilterOrSort.isFilterColumns;
+			}
+			else
+			{
+				if(tablePartsOptions.tableRange.containsRange(activeCell))
+				{
+					cell_info.isFormatTable = true;
+					if(this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id))
+						cell_info.cleanFilter = true;
+					else
+						cell_info.cleanFilter = null;
+				}
+				else
+				{
+					cell_info.isFormatTable = null;
+					cell_info.cleanFilter = null;
+				};
+			};
+			
 			cell_info.styleName = c.getStyleName();
 			cell_info.angle = c.getAngle();
 
@@ -6507,9 +6531,6 @@
 					}
 				}
 			}
-			
-			//применен ли а/ф к данной ячейке
-			cell_info.autoFilter = this.autoFilters.isApplyAutoFilterInCell(activeCell);
 			
 			return cell_info;
 		};

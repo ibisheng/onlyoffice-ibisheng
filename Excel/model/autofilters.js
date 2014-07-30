@@ -1605,7 +1605,8 @@ var gUndoInsDelCellsFlag = true;
 					History.TurnOff();
 			},
 			
-			isApplyAutoFilterInCell: function(activeCell)
+			//второй параметр - чистим у найденного фильтра FilterColumns и SortState
+			isApplyAutoFilterInCell: function(activeCell, clean)
 			{
 				var aWs = this._getCurrentWS();
 				var tableRange;
@@ -1620,18 +1621,27 @@ var gUndoInsDelCellsFlag = true;
 						if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
 						{
 							if(tablePart.Ref.containsRange(activeCell))
+							{
+								if(clean)
+									this._cleanFilterColumnsAndSortState(tablePart, activeCell);
 								return true;
+							}
+								
 						}
 						else
 						{
-							if(tablePart.Ref.containsRange(activeCell))
+							if(tablePart.Ref.containsRange(activeCell, activeCell))
 								return false;
 						};
 					};
 				};
 				
 				if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
+				{
+					if(clean)
+						this._cleanFilterColumnsAndSortState(aWs.AutoFilter);
 					return true;
+				}
 				
 				return false;
 			},
@@ -1759,6 +1769,9 @@ var gUndoInsDelCellsFlag = true;
 						break;
 					case historyitem_AutoFilter_Move:
 						this._moveAutoFilters(data.moveTo, data.moveFrom);
+						break;
+					case historyitem_AutoFilter_CleanAutoFilter:
+						this.isApplyAutoFilterInCell(data.activeCells, true);
 						break;
 				}
 				startRedo = false;
@@ -2030,25 +2043,44 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(aWs.TableParts[i].Ref)
 						{
-							/*var ref = aWs.TableParts[i].Ref.split(":");
-							var startRange = this._idToRange(ref[0]);
-							var endRange = this._idToRange(ref[1]);
-							tableRange = 
-							{
-								r1: startRange.r1,
-								r2: endRange.r1,
-								c1: startRange.c1,
-								c2: endRange.c1
-							}*/
-							
-							tableRange = aWs.TableParts[i].Ref;
-							
-						}
+							tableRange = aWs.TableParts[i].Ref;	
+						};
+						
 						if(this._rangeHitInAnRange(range,tableRange))
-							return tableRange;
+							return {tableRange: tableRange, id: i};
 					}
 				}
 				return null;
+			},
+			
+			checkApplyFilterOrSort: function(tablePartId)
+			{
+				var aWs = this._getCurrentWS();
+				var result = false;
+				
+				if(tablePartId !== undefined)
+				{
+					var tablePart = aWs.TablePart[tablePartId];
+					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
+						result = true;
+				}
+				else
+				{
+					if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
+					{
+						result = {isFilterColumns: true, isAutoFilter: true};
+					}
+					else if(aWs.AutoFilter)
+					{
+						result = {isFilterColumns: false, isAutoFilter: true}
+					}
+					else
+					{
+						result = {isFilterColumns: false, isAutoFilter: false}
+					};
+				};
+				
+				return result;
 			},
 			
 			getAddFormatTableOptions: function(activeCells)
@@ -7142,6 +7174,30 @@ var gUndoInsDelCellsFlag = true;
 						};
 					};
 				};
+			},
+			
+			_cleanFilterColumnsAndSortState: function(autoFilterElement, activeCells)
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				var oldFilter = autoFilterElement.clone(aWs);
+				
+				if(autoFilterElement.SortState)
+					autoFilterElement.SortState = null;
+				
+				if(autoFilterElement.AutoFilter && autoFilterElement.AutoFilter.FilterColumns)
+				{
+					autoFilterElement.AutoFilter.FilterColumns = null;
+				}
+				else if(autoFilterElement.FilterColumns)
+				{
+					autoFilterElement.FilterColumns = null;
+				};
+				
+				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells});
+				
+				ws.isChanged = true;
+				this._reDrawFilters();
 			}
 			
 		};
