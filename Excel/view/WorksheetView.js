@@ -6449,7 +6449,7 @@
 			{
 				var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
 				cell_info.isFormatTable = checkApplyFilterOrSort.isAutoFilter;
-				cell_info.cleanFilter = checkApplyFilterOrSort.isFilterColumns;
+				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
 			else
 			{
@@ -6457,14 +6457,14 @@
 				{
 					cell_info.isFormatTable = true;
 					if(this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id))
-						cell_info.cleanFilter = true;
+						cell_info.clearFilter = true;
 					else
-						cell_info.cleanFilter = null;
+						cell_info.clearFilter = null;
 				}
 				else
 				{
 					cell_info.isFormatTable = null;
-					cell_info.cleanFilter = null;
+					cell_info.clearFilter = null;
 				}
 			}
 			
