@@ -1565,6 +1565,9 @@ CopyProcessor.prototype =
                                 for(var k = 0; k < paragraph.Content.length;k++)
                                 {
                                     content = paragraph.Content[k].Content;
+									if(!content)
+										continue;
+									
 									for(var n = 0; n < content.length; n++)
 									{
 										if(content[n] == cur_element)
