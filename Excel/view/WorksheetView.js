@@ -6445,7 +6445,7 @@
 			
 			//null - disable, true - pressed button, false - unpressed button
 			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
-			if(tablePartsOptions == null)
+			if(tablePartsOptions === null)
 			{
 				var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
 				cell_info.isFormatTable = checkApplyFilterOrSort.isAutoFilter;
@@ -6465,8 +6465,8 @@
 				{
 					cell_info.isFormatTable = null;
 					cell_info.cleanFilter = null;
-				};
-			};
+				}
+			}
 			
 			cell_info.styleName = c.getStyleName();
 			cell_info.angle = c.getAngle();
