@@ -10795,6 +10795,18 @@
 			var ar = this.activeRange.clone(true);
 			return this.autoFilters.getAddFormatTableOptions(ar);
 		};
+		
+		WorksheetView.prototype.clearFilter = function () {
+			var t = this;
+			var ar = this.activeRange.clone(true);
+			var onChangeAutoFilterCallback = function (isSuccess) {
+				if (false === isSuccess)
+					return;
+				
+				//t.autoFilters.isApplyAutoFilterInCell(activeCell, clean);
+			};
+			this._isLockedAll (onChangeAutoFilterCallback);
+		};
 
 		WorksheetView.prototype._loadFonts = function (fonts, callback) {
 			var api = window["Asc"]["editor"];

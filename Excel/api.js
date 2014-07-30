@@ -664,7 +664,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var ws = this.wb.getWorksheet();
 				return ws.getAddFormatTableOptions();
 			},
-
+			
+			asc_clearFilter: function(){
+				var ws = this.wb.getWorksheet();
+				return ws.clearFilter();
+			},
+			
 			// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 			asc_setAutoSaveGap: function (autoSaveGap) {
 				if (typeof autoSaveGap === "number") {
@@ -3716,6 +3721,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
 		prot["asc_sortColFilter"] = prot.asc_sortColFilter;
 		prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
+		prot["asc_clearFilter"] = prot.asc_clearFilter;
 		
 		// Drawing objects interface
 
