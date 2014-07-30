@@ -293,9 +293,11 @@ var gUndoInsDelCellsFlag = true;
 				{
 					ref = addFormatTableOptionsObj.asc_getRange();
                     addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
-					/*var newRange = this._refToRange(ref);
+					
+					//TODO пересмотреть _refToRange
+					var newRange = this._refToRange(ref);
 					if(newRange)
-						activeCells = newRange;*/
+						activeCells = newRange;
 				}
 				else if(addFormatTableOptionsObj)
 					addNameColumn = false;
