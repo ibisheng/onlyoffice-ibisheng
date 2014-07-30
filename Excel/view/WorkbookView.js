@@ -1301,6 +1301,11 @@
 		};
 
 		WorkbookView.prototype.updateWorksheetByModel = function () {
+			// ToDo Сделал небольшую заглушку с показом листа. Нужно как мне кажется перейти от wsViews на wsViewsId (хранить по id)
+			var oldActiveWs;
+			if (-1 !== this.wsActive)
+				oldActiveWs = this.wsViews[this.wsActive];
+
 			//расставляем ws так как они идут в модели.
 			var oNewWsViews = [];
 			for (var i in this.wsViews)
@@ -1310,7 +1315,15 @@
 					oNewWsViews[item.model.getIndex()] = item;
 			}
 			this.wsViews = oNewWsViews;
-			this.wsActive = this.model.getActive();
+			var wsActive = this.model.getActive();
+
+			var newActiveWs = this.wsViews[wsActive];
+			if (undefined === newActiveWs || oldActiveWs !== newActiveWs) {
+				// Если сменили, то покажем
+				this.wsActive = -1;
+				this.showWorksheet(undefined, false, true);
+			} else
+				this.wsActive = wsActive;
 		};
 
 		WorkbookView.prototype.spliceWorksheet = function () {

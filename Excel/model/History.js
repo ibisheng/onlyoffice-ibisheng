@@ -590,12 +590,13 @@ CHistory.prototype =
         var Time  = new Date().getTime();
 		var oSelectRange = null, nLastSheetId = null,
 			oSelectionState = this.workbook.handlers.trigger("getSelectionState");
-		if (null === oSelectionState) {
-			var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
-			if (wsActive)
-				nLastSheetId = wsActive.getId();
+		if (null === oSelectionState)
 			oSelectRange = this.workbook.handlers.trigger("getSelection");
-		}
+
+		// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист.
+		var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
+		if (wsActive)
+			nLastSheetId = wsActive.getId();
 
 		this.CurPoint = {
             Items : Items, // Массив изменений, начиная с текущего момента
