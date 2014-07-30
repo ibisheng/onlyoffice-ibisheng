@@ -7293,17 +7293,18 @@ Range.prototype._canPromote=function(from, to, bIsPromote, nWidth, nHeight, bVer
 				oRes.oMergedFrom = oMergedFrom;				
 				if(oMergedTo.inner.length > 0)
 				{
-					oRes.oMergedTo = oMergedTo;
-					if(oMergedFrom.inner.length > 0)
-					{
-						//merge области должны иметь одинаковый размер
-						var oSizeFrom = this._isSameSizeMerged(from, oMergedFrom.inner);
-						var oSizeTo = this._isSameSizeMerged(to, oMergedTo.inner);
-						if(!(null != oSizeFrom && null != oSizeTo && oSizeTo.width == oSizeFrom.width && oSizeTo.height == oSizeFrom.height))
-							oRes = null;
-					}
-					else
-						oRes = null;
+				    oRes.oMergedTo = oMergedTo;
+				    if (bIsPromote) {
+				        if (oMergedFrom.inner.length > 0) {
+				            //merge области должны иметь одинаковый размер
+				            var oSizeFrom = this._isSameSizeMerged(from, oMergedFrom.inner);
+				            var oSizeTo = this._isSameSizeMerged(to, oMergedTo.inner);
+				            if (!(null != oSizeFrom && null != oSizeTo && oSizeTo.width == oSizeFrom.width && oSizeTo.height == oSizeFrom.height))
+				                oRes = null;
+				        }
+				        else
+				            oRes = null;
+				    }
 				}
 			}
 		}
@@ -7345,6 +7346,8 @@ Range.prototype.promoteFromTo=function(from, to){
 					oSelectionRedo.assign(to.c1, to.r1, to.c2, to.r2);
 					History.SetSelectionRedo(oSelectionRedo);
 				}
+			    //удаляем merge ячейки в to(после _canPromote должны остаться только inner)
+				this.worksheet.mergeManager.remove(to, true);
 				this._promoteFromTo(from, to, false, oCanPromote, false, bVertical, nIndex);
 			}
 		}
@@ -7736,28 +7739,21 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 			}
 		}
 		//добавляем замерженые области
-		var nShiftHorizontal = to.c1 - from.c1;
-		var nShiftVertical = to.r1 - from.r1;
+		var nDx = from.c2 - from.c1 + 1;
+		var nDy = from.r2 - from.r1 + 1;
 		var oMergedFrom = oCanPromote.oMergedFrom;
 		if(null != oMergedFrom && oMergedFrom.all.length > 0)
 		{
-			var bInserted = true;
-			var nCount = 0;
-			while(bInserted)
-			{
-				bInserted = false;
-				nCount++;
-				for(var i = 0, length = oMergedFrom.all.length; i < length; i++)
-				{
-					var oMergedBBox = oMergedFrom.all[i].bbox;
-					var oNewMerged = Asc.Range(oMergedBBox.c1 + nCount * nShiftHorizontal, oMergedBBox.r1 + nCount * nShiftVertical, oMergedBBox.c2 + nCount * nShiftHorizontal, oMergedBBox.r2 + nCount * nShiftVertical);
-					if(to.containsRange(oNewMerged))
-					{
-						this.worksheet.mergeManager.add(oNewMerged, 1);
-						bInserted = true;
-					}
-				}
-			}
+		    for (var i = to.c1; i <= to.c2; i += nDx) {
+		        for (var j = to.r1; j <= to.r2; j += nDy) {
+		            for (var k = 0, length3 = oMergedFrom.all.length; k < length3; k++) {
+		                var oMergedBBox = oMergedFrom.all[k].bbox;
+		                var oNewMerged = Asc.Range(i + oMergedBBox.c1 - from.c1, j + oMergedBBox.r1 - from.r1, i + oMergedBBox.c2 - from.c1, j + oMergedBBox.r2 - from.r1);
+		                if (to.containsRange(oNewMerged))
+		                    this.worksheet.mergeManager.add(oNewMerged, 1);
+		            }
+		        }
+		    }
 		}
 		if(bIsPromote)
 		{
@@ -7766,24 +7762,17 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 			var oHyperlinks = this.worksheet.hyperlinkManager.get(from);
 			if(oHyperlinks.inner.length > 0)
 			{
-				var bInserted = true;
-				var nCount = 0;
-				while(bInserted)
-				{
-					bInserted = false;
-					nCount++;
-					for(var i = 0, length = oHyperlinks.inner.length; i < length; i++)
-					{
-						var oHyperlink = oHyperlinks.inner[i];
-						var oHyperlinkBBox = oHyperlink.bbox;
-						var oNewHyperlink = Asc.Range(oHyperlinkBBox.c1 + nCount * nShiftHorizontal, oHyperlinkBBox.r1 + nCount * nShiftVertical, oHyperlinkBBox.c2 + nCount * nShiftHorizontal, oHyperlinkBBox.r2 + nCount * nShiftVertical);
-						if(to.containsRange(oNewHyperlink))
-						{
-							this.worksheet.hyperlinkManager.add(oNewHyperlink, oHyperlink.data.clone());
-							bInserted = true;
-						}
-					}
-				}
+			    for (var i = to.c1; i <= to.c2; i += nDx) {
+			        for (var j = to.r1; j <= to.r2; j += nDy) {
+			            for(var k = 0, length3 = oHyperlinks.inner.length; k < length3; k++){
+			                var oHyperlink = oHyperlinks.inner[k];
+			                var oHyperlinkBBox = oHyperlink.bbox;
+			                var oNewHyperlink = Asc.Range(i + oHyperlinkBBox.c1 - from.c1, j + oHyperlinkBBox.r1 - from.r1, i + oHyperlinkBBox.c2 - from.c1, j + oHyperlinkBBox.r2 - from.r1);
+			                if (to.containsRange(oNewHyperlink))
+			                    this.worksheet.hyperlinkManager.add(oNewHyperlink, oHyperlink.data.clone());
+			            }
+			        }
+			    }
 			}
 		}
 	}
