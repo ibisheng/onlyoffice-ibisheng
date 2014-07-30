@@ -2060,7 +2060,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				if(tablePartId !== undefined)
 				{
-					var tablePart = aWs.TablePart[tablePartId];
+					var tablePart = aWs.TableParts[tablePartId];
 					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
 						result = true;
 				}
