@@ -181,6 +181,7 @@ function CHistory(workbook)
     this.LocalChange = false;//если true все добавленный изменения не пойдут в совместное редактирование.
 	this.RecIndex = -1;
 	this.lastDrawingObjects = null;
+	this.LastState = null;
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
 }
