@@ -436,7 +436,8 @@
 
 			this.startCellMoveResizeRange = null;
 			this.startCellMoveResizeRange2 = null;
-			
+			this.moveRangeDrawingObjectTo = null;
+
 			// Координаты ячейки начала перемещения диапазона
 			this.startCellMoveRange = null;
 			// Дипазон перемещения
@@ -7660,8 +7661,7 @@
 			if (null === this.startCellMoveResizeRange) {
 				if ((targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize)) {
 					this.startCellMoveResizeRange = ar.clone(true);
-					this.startCellMoveResizeRange2 = asc_Range(targetInfo.col, targetInfo.row,
-						targetInfo.col, targetInfo.row, true);
+					this.startCellMoveResizeRange2 = asc_Range(targetInfo.col, targetInfo.row, targetInfo.col, targetInfo.row, true);
 				} else {
 					this.startCellMoveResizeRange = ar.clone(true);
 					if (colByX < ar.c1) { colByX = ar.c1; }
@@ -7804,11 +7804,13 @@
 		};
 
 		WorksheetView.prototype.applyMoveResizeRangeHandle = function (target){
-			if( -1 == target.targetArr )
-				this.objectRender.moveRangeDrawingObject(this.startCellMoveResizeRange, this.moveRangeDrawingObjectTo, true);
+			if( -1 == target.targetArr && !this.startCellMoveResizeRange.isEqual(this.moveRangeDrawingObjectTo) ) {
+                this.objectRender.moveRangeDrawingObject( this.startCellMoveResizeRange, this.moveRangeDrawingObjectTo, true );
+            }
 
 			this.startCellMoveResizeRange = null;
 			this.startCellMoveResizeRange2 = null;
+            this.moveRangeDrawingObjectTo = null;
 		};
 
 		WorksheetView.prototype.moveRangeHandle = function (arnFrom, arnTo, copyRange){
