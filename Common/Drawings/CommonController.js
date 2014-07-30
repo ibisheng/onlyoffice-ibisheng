@@ -4465,7 +4465,7 @@ DrawingObjectsController.prototype =
 
     getDrawingPropsFromArray: function(drawings)
     {
-        var image_props, shape_props, chart_props, new_image_props, new_shape_props, new_chart_props, locked;
+        var image_props, shape_props, chart_props, new_image_props, new_shape_props, new_chart_props, shape_chart_props, locked;
         var drawing;
         for(var i = 0; i < drawings.length; ++i)
         {
@@ -4588,6 +4588,15 @@ DrawingObjectsController.prototype =
                     {
                         shape_props = CompareShapeProperties(shape_props, new_shape_props);
                     }
+
+                    if(!shape_chart_props)
+                    {
+                        shape_chart_props = new_shape_props;
+                    }
+                    else
+                    {
+                        shape_chart_props = CompareShapeProperties(shape_chart_props, new_shape_props);
+                    }
                     break;
                 }
                 case historyitem_type_GroupShape:
@@ -4600,6 +4609,18 @@ DrawingObjectsController.prototype =
                         else
                         {
                             shape_props = CompareShapeProperties(shape_props, group_drawing_props.shapeProps);
+                        }
+                    }
+
+                    if(group_drawing_props.shapeChartProps)
+                    {
+                        if(!shape_chart_props)
+                        {
+                            shape_chart_props = group_drawing_props.shapeChartProps;
+                        }
+                        else
+                        {
+                            shape_chart_props = CompareShapeProperties(shape_chart_props, group_drawing_props.shapeChartProps);
                         }
                     }
                     if(group_drawing_props.imageProps)
@@ -4651,7 +4672,7 @@ DrawingObjectsController.prototype =
                 }
             }
         }
-        return {imageProps: image_props, shapeProps: shape_props, chartProps: chart_props};
+        return {imageProps: image_props, shapeProps: shape_props, chartProps: chart_props, shapeChartProps: shape_chart_props};
     },
 
 
@@ -4675,6 +4696,49 @@ DrawingObjectsController.prototype =
 
         var ret = [];
         var i, j, cur_drawing;
+        if(isRealObject(props.shapeChartProps))
+        {
+            shape_props = new asc_CImgProperty();
+            shape_props.fromGroup = props.shapeChartProps.fromGroup;
+            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props.ShapeProperties.type =  props.shapeChartProps.type;
+            shape_props.ShapeProperties.fill = props.shapeChartProps.fill;
+            shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
+            shape_props.ShapeProperties.canChangeArrows = props.shapeChartProps.canChangeArrows;
+            shape_props.ShapeProperties.bFromChart = props.shapeChartProps.bFromChart;
+
+            if(props.shapeChartProps.paddings)
+            {
+                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeChartProps.paddings);
+            }
+            shape_props.verticalTextAlign = props.shapeChartProps.verticalTextAlign;
+            shape_props.ShapeProperties.canFill = props.shapeChartProps.canFill;
+            shape_props.Width = props.shapeChartProps.w;
+            shape_props.Height = props.shapeChartProps.h;
+            var pr = shape_props.ShapeProperties;
+            if (!isRealObject(props.shapeProps))
+            {
+                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+                {
+                    if(asc && asc["editor"])
+                        this.drawingObjects.drawingDocument.InitGuiCanvasShape(asc["editor"].shapeElementId);
+                    this.drawingObjects.drawingDocument.LastDrawingUrl = null;
+                    this.drawingObjects.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
+                }
+                else
+                {
+                    if(asc && asc["editor"])
+                        this.drawingObjects.drawingDocument.InitGuiCanvasShape(asc["editor"].shapeElementId);
+                    this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
+                }
+            }
+            shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
+            shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
+            shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
+            shape_props.Locked = props.shapeChartProps.locked === true;
+
+            ret.push(shape_props);
+        }
         if (isRealObject(props.shapeProps))
         {
             shape_props = new asc_CImgProperty();
@@ -4713,8 +4777,6 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
             shape_props.Locked = props.shapeProps.locked === true;
 
-
-            //shape_props.Locked = false;
             ret.push(shape_props);
         }
         if (isRealObject(props.imageProps))
