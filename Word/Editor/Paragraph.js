@@ -3059,7 +3059,7 @@ Paragraph.prototype =
                 // Рисуем комментарии
                 //----------------------------------------------------------------------------------------------------------
                 var aComm = PDSH.Comm;
-                Element = aComm.Get_Next();
+                Element = ( pGraphics.RENDERER_PDF_FLAG === true ? null : aComm.Get_Next() );
                 while ( null != Element )
                 {
                     if ( Element.Additional.Active === true )
@@ -4589,7 +4589,8 @@ Paragraph.prototype =
         }
 
         // Если курсор находится в начале или конце гиперссылки, тогда выводим его из гиперссылки
-        while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
+        // TODO: Из каки
+        while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
         {
             if ( false === this.Content[CurPos - 1].Is_CursorPlaceable() )
                 break;
@@ -4598,7 +4599,7 @@ Paragraph.prototype =
             this.Content[CurPos].Cursor_MoveToEndPos();
         }
 
-        while ( CurPos < Count && para_Run !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End() )
+        while ( CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End() )
         {
             if ( false === this.Content[CurPos + 1].Is_CursorPlaceable() )
                 break;
