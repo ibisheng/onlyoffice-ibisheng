@@ -2548,8 +2548,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return this.chartPreviewManager.getChartPreviews(chartType);
 			},
 			
-			asc_checkDataRange: function(dialogType, dataRange, isRows, chartType) {
-				return parserHelp.checkDataRange(this.wbModel, dialogType, dataRange, isRows, chartType);
+			asc_checkDataRange: function(dialogType, dataRange, fullCheck, isRows, chartType) {
+				return parserHelp.checkDataRange(this.wbModel, this.wb, dialogType, dataRange, fullCheck, isRows, chartType);
 			},
 			
 			// Для вставки диаграмм в Word

@@ -2046,7 +2046,7 @@ var gUndoInsDelCellsFlag = true;
 						if(aWs.TableParts[i].Ref)
 						{
 							tableRange = aWs.TableParts[i].Ref;	
-						};
+						}; // ToDo ';' в конце } ставить не стоить
 						
 						if(this._rangeHitInAnRange(range,tableRange))
 							return {tableRange: tableRange, id: i};
@@ -3723,6 +3723,9 @@ var gUndoInsDelCellsFlag = true;
 			
 			_searchFilters: function(activeCells, isAll)
 			{
+				// ToDo по хорошему стоит порефакторить код. ws.model легко можно заменить на aWs (хотя aWs как мне кажется не совсем хорошее название)
+				// Условие на вхождение диапазона заменить на containsRange. Возвращаемое значение привести к одному типу
+				// После правки поправить функцию parserHelper.checkDataRange
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var allF =[];
@@ -6225,6 +6228,7 @@ var gUndoInsDelCellsFlag = true;
 			//если хотя бы одна ячейка попадает внутрь tableRange
 			_rangeHitInAnRange: function(range,tableRange)
 			{
+				// ToDo стоит заменить на range.isIntersect
 				for(var r = range.r1; r <= range.r2; r++)
 				{
 					for(var c = range.c1; c <= range.c2; c++)

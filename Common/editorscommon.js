@@ -546,8 +546,18 @@ parserHelper.prototype.get3DRef = function (sheet, range) {
 parserHelper.prototype.getEscapeSheetName = function (sheet) {
 	return rx_test_ws_name.test(sheet) ? sheet : "'" + sheet.replace(/'/g, "''") + "'";
 };
-// Проверяем ссылку на валидность для диаграммы или автофильтра
-parserHelper.prototype.checkDataRange = function (model, dialogType, dataRange, isRows, chartType) {
+/**
+ * Проверяем ссылку на валидность для диаграммы или автофильтра
+ * @param {Workbook} model
+ * @param {WorkbookView} wb
+ * @param {c_oAscSelectionDialogType} dialogType
+ * @param {string} dataRange
+ * @param {boolean} fullCheck
+ * @param {boolean} isRows
+ * @param {c_oAscChartTypeSettings} chartType
+ * @returns {*}
+ */
+parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRange, fullCheck, isRows, chartType) {
 	if (c_oAscSelectionDialogType.Chart === dialogType) {
 		dataRange = parserHelp.parse3DRef(dataRange);
 		if (null === dataRange || !model.getWorksheetByName(dataRange.sheet))
@@ -559,27 +569,32 @@ parserHelper.prototype.checkDataRange = function (model, dialogType, dataRange, 
 	if (null === dataRange)
 		return c_oAscError.ID.DataRangeError;
 
-	if (c_oAscSelectionDialogType.Chart === dialogType) {
-		// Проверка максимального дипазона
-		var maxSeries = 255;
-		var minStockVal = 4;
+	if (fullCheck) {
+		if (c_oAscSelectionDialogType.Chart === dialogType) {
+			// Проверка максимального дипазона
+			var maxSeries = 255;
+			var minStockVal = 4;
 
-		var intervalValues, intervalSeries;
-		if (isRows) {
-			intervalSeries = dataRange.r2 - dataRange.r1 + 1;
-			intervalValues = dataRange.c2 - dataRange.c1 + 1;
-		} else {
-			intervalSeries = dataRange.c2 - dataRange.c1 + 1;
-			intervalValues = dataRange.r2 - dataRange.r1 + 1;
+			var intervalValues, intervalSeries;
+			if (isRows) {
+				intervalSeries = dataRange.r2 - dataRange.r1 + 1;
+				intervalValues = dataRange.c2 - dataRange.c1 + 1;
+			} else {
+				intervalSeries = dataRange.c2 - dataRange.c1 + 1;
+				intervalValues = dataRange.r2 - dataRange.r1 + 1;
+			}
+
+			if (c_oAscChartTypeSettings.stock === chartType) {
+				if (minStockVal !== intervalSeries || intervalValues < minStockVal)
+					return c_oAscError.ID.StockChartError;
+			} else if (intervalSeries > maxSeries)
+				return c_oAscError.ID.MaxDataSeriesError;
+		} else if (c_oAscSelectionDialogType.FormatTable === dialogType) {
+			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
+			if ('error' === wb.getWorksheet().autoFilters._searchFilters(dataRange, false))
+				return c_oAscError.ID.AutoFilterDataRangeError;
 		}
-
-		if (c_oAscChartTypeSettings.stock === chartType) {
-			if (minStockVal !== intervalSeries || intervalValues < minStockVal)
-				return c_oAscError.ID.StockChartError;
-		} else if (intervalSeries > maxSeries)
-			return c_oAscError.ID.MaxDataSeriesError;
 	}
-
 	return c_oAscError.ID.No;
 };
 
