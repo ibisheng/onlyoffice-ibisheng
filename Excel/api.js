@@ -820,8 +820,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							switch( incomeObject["type"] ){
 								case "updateversion":
 							    case "open":
-							        if ("updateversion" == incomeObject["type"])
+							        if ("updateversion" == incomeObject["type"]){
 									    oThis.asc_setViewerMode(true);
+										oThis.handlers.trigger("asc_onError", c_oAscError.ID.FileRequest, c_oAscError.Level.Critical);
+									}
 									var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
 									asc_ajax({
 										url: sJsonUrl,

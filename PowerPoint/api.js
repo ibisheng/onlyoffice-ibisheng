@@ -4957,8 +4957,10 @@ function sendCommand(editor, fCallback, rdata){
 			switch(incomeObject["type"]){
 				case "updateversion":
                 case "open":
-					if ("updateversion" == incomeObject["type"])
+					if ("updateversion" == incomeObject["type"]){
 			            editor.SetViewMode(true);
+						editor.asc_fireCallback("asc_onError",c_oAscError.ID.FileRequest,c_oAscError.Level.Critical);
+					}
                     var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
 					asc_ajax({
 						url: sJsonUrl,
