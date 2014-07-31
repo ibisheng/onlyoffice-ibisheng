@@ -10810,7 +10810,7 @@
 				if (false === isSuccess)
 					return;
 				
-				//t.autoFilters.isApplyAutoFilterInCell(activeCell, clean);
+				t.autoFilters.isApplyAutoFilterInCell(ar, true);
 			};
 			this._isLockedAll (onChangeAutoFilterCallback);
 		};

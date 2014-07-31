@@ -7192,6 +7192,8 @@ var gUndoInsDelCellsFlag = true;
 				if(autoFilterElement.SortState)
 					autoFilterElement.SortState = null;
 				
+				aWs.setRowHidden(false, autoFilterElement.Ref.r1, autoFilterElement.Ref.r2);
+				
 				if(autoFilterElement.AutoFilter && autoFilterElement.AutoFilter.FilterColumns)
 				{
 					autoFilterElement.AutoFilter.FilterColumns = null;
