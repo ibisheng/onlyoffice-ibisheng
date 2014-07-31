@@ -1,5 +1,6 @@
 "use strict";
 
+
 function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex)
 {
     this.presetGeom = presetGeom;

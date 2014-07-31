@@ -1,14 +1,29 @@
 "use strict";
 
-function OverlayObject(geometry, extX, extY, brush, pen, transform)
+function OverlayObject(geometry, extX, extY, brush, pen, transform )
     //({check_bounds: function(){},brush: this.originalShape.brush, pen: this.originalShape.pen, ext:{cx:this.originalShape.absExtX, cy:this.originalShape.absExtY}, geometry: this.geometry, TransformMatrix: this.originalShape.transform})
 {
     this.geometry = geometry;
     this.ext = {};
     this.ext.cx = extX;
     this.ext.cy = extY;
-    this.brush = brush;
-    this.pen = pen;
+
+    var _brush, _pen;
+    if((!brush || !brush.fill || brush.fill.type === FILL_TYPE_NOFILL) &&
+        (!pen || !pen.Fill || !pen.Fill || !pen.Fill.fill || pen.Fill.fill.type === FILL_TYPE_NOFILL || pen.w === 0))
+    {
+        var penBrush = CreatePenBrushForChartTrack();
+        _brush = penBrush.brush;
+        _pen = penBrush.pen;
+    }
+    else
+    {
+        _brush = brush;
+        _pen = pen;
+    }
+
+    this.brush = _brush;
+    this.pen = _pen;
     this.TransformMatrix = transform;
     this.shapeDrawer = new CShapeDrawer();
 

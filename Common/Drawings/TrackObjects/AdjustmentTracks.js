@@ -82,7 +82,6 @@ function XYAdjustmentTrack(originalShape, adjIndex)
                 this.refY = _ref_y;
             }
         }
-
         this.overlayObject = new OverlayObject(this.geometry, originalShape.extX, originalShape.extY, originalShape.brush, originalShape.pen, originalShape.transform);
 
 
@@ -285,12 +284,6 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
 
     this.track = function(posX, posY)
     {
-        var _temp_x = posX - this.xLT;
-        var _temp_y = posY - this.yLT;
-
-        var _sin = this.sin;
-        var _cos = this.cos;
-
         var invert_transform = this.originalShape.invertTransform;
         var _relative_x = invert_transform.TransformPointX(posX, posY);
         var _relative_y = invert_transform.TransformPointY(posX, posY);
