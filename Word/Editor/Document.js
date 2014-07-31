@@ -7508,6 +7508,11 @@ CDocument.prototype =
                         TextPr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
                 }
             }
+            if(TextPr.Unifill)
+            {
+                var RGBAColor = TextPr.Unifill.getRGBAColor();
+                TextPr.Color = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
+            }
             editor.UpdateTextPr(TextPr);
         }
     },
