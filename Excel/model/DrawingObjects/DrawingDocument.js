@@ -4439,14 +4439,27 @@ function CDrawingDocument(drawingObjects)
         if (!_div_elem)
             return;
 
-        this.GuiCanvasFillTexture = document.createElement('canvas');
+        var bIsAppend = true;
+        if (_div_elem.childNodes && _div_elem.childNodes.length == 1)
+        {
+            this.GuiCanvasFillTexture = _div_elem.childNodes[0];
+            bIsAppend = false;
+        }
+        else
+        {
+            this.GuiCanvasFillTexture = document.createElement('canvas');
+        }
+
         this.GuiCanvasFillTexture.width = parseInt(_div_elem.style.width);
         this.GuiCanvasFillTexture.height = parseInt(_div_elem.style.height);
 
         this.LastDrawingUrl = "";
         this.GuiCanvasFillTextureCtx = this.GuiCanvasFillTexture.getContext('2d');
 
-        _div_elem.appendChild(this.GuiCanvasFillTexture);
+        if (bIsAppend)
+        {
+            _div_elem.appendChild(this.GuiCanvasFillTexture);
+        }
     }
 
     this.InitGuiCanvasTextProps = function(div_id)
