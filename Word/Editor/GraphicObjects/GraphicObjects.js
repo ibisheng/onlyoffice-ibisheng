@@ -293,6 +293,7 @@ CGraphicObjects.prototype =
     addToZIndexManagerAfterOpen: function()
     {
         this.drawingObjects.sort(ComparisonByZIndexSimple);
+        this.drawingObjects.reverse();
         this.zIndexManager.bTurnOff = false;
         for(var i = 0; i < this.drawingObjects.length; ++i)
         {
