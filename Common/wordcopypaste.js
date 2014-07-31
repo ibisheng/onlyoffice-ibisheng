@@ -3856,7 +3856,7 @@ PasteProcessor.prototype =
 	{
 		var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
 		var tempWorkbook = new Workbook();
-        tempWorkbook.theme = this.oDocument.theme;
+        tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		oBinaryFileReader.Read(base64, tempWorkbook);
 		
