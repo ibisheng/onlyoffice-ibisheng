@@ -290,113 +290,6 @@
 					"isPopUpSelectorOpen":			function () {return self.popUpSelector.getVisible();}
 			    });
 
-			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
-				    var ws = self.getWorksheetById(wsId);
-				    if (ws)
-					    ws.changeWorksheet("updateRange", {range: range,
-						    isLockDraw: bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(),
-						    canChangeColWidth: canChangeColWidth});
-			    });
-			    this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
-				    self.getWorksheetById(wsId).changeWorksheet("update", val);
-			    });
-			    this.model.handlers.add("insertCell", function (wsId, val, range) {
-				    self.getWorksheetById(wsId).changeWorksheet("insCell", {val: val, range: range});
-			    });
-			    this.model.handlers.add("deleteCell", function (wsId, val, range) {
-				    self.getWorksheetById(wsId).changeWorksheet("delCell", {val: val, range: range});
-			    });
-			    this.model.handlers.add("showWorksheet", function (wsId) {
-					var wsModel = self.model.getWorksheetById(wsId), index;
-					if (wsModel) {
-						index = wsModel.getIndex();
-						self.showWorksheet(index, false, true);
-						self.handlers.trigger("asc_onActiveSheetChanged", index);
-					}
-			    });
-			    this.model.handlers.add("setSelection", function () {
-				    self._onSetSelection.apply(self, arguments);
-			    });
-			    this.model.handlers.add("getSelection", function () {
-				    return self._onGetSelection.apply(self);
-			    });
-			    this.model.handlers.add("getSelectionState", function () {
-				    return self._onGetSelectionState.apply(self);
-			    });
-			    this.model.handlers.add("setSelectionState", function () {
-				    self._onSetSelectionState.apply(self, arguments);
-			    });
-			    this.model.handlers.add("reInit", function () {
-				    self.reInit.apply(self, arguments);
-			    });
-			    this.model.handlers.add("drawWS", function () {
-				    self.drawWS.apply(self, arguments);
-			    });
-			    this.model.handlers.add("showDrawingObjects", function () {
-				    self.onShowDrawingObjects.apply(self, arguments);
-			    });
-			    this.model.handlers.add("setCanUndo", function (bCanUndo) {
-				    self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
-			    });
-			    this.model.handlers.add("setCanRedo", function (bCanRedo) {
-				    self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-			    });
-			    this.model.handlers.add("setDocumentModified", function (bIsModified) {
-				    self.handlers.trigger("asc_onDocumentModifiedChanged", bIsModified);
-			    });
-			    this.model.handlers.add("initCommentsToSave", function () {
-				    self._initCommentsToSave();
-			    });
-			    this.model.handlers.add("replaceWorksheet", function (from, to) {
-				    self.replaceWorksheet(from, to);
-			    });
-			    this.model.handlers.add("removeWorksheet", function (nIndex) {
-				    self.removeWorksheet(nIndex);
-			    });
-			    this.model.handlers.add("spliceWorksheet", function () {
-				    self.spliceWorksheet.apply(self, arguments);
-			    });
-			    this.model.handlers.add("updateWorksheetByModel", function () {
-				    self.updateWorksheetByModel.apply(self, arguments);
-			    });
-			    this.model.handlers.add("undoRedoAddRemoveRowCols", function (sheetId, type, range, bUndo) {
-				    if (true === bUndo) {
-					    if (historyitem_Worksheet_AddRows === type) {
-						    self.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.undoRows(sheetId, range.r2 - range.r1 + 1);
-					    } else if (historyitem_Worksheet_RemoveRows === type) {
-						    self.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.undoRows(sheetId, range.r2 - range.r1 + 1);
-					    } else if (historyitem_Worksheet_AddCols === type) {
-						    self.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.undoCols(sheetId, range.c2 - range.c1 + 1);
-					    } else if (historyitem_Worksheet_RemoveCols === type) {
-						    self.collaborativeEditing.addColsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.undoCols(sheetId, range.c2 - range.c1 + 1);
-					    }
-				    } else {
-					    if (historyitem_Worksheet_AddRows === type) {
-						    self.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-					    } else if (historyitem_Worksheet_RemoveRows === type) {
-						    self.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-					    } else if (historyitem_Worksheet_AddCols === type) {
-						    self.collaborativeEditing.addColsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-					    } else if (historyitem_Worksheet_RemoveCols === type) {
-						    self.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
-						    self.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-					    }
-				    }
-			    });
-			    this.model.handlers.add("undoRedoHideSheet", function (sheetId) {
-				    self.showWorksheet(sheetId);
-				    // Посылаем callback об изменении списка листов
-				    self.handlers.trigger("asc_onSheetsChanged");
-			    });
-
-
 				if (this.input && this.input.addEventListener) {
 					this.input.addEventListener("focus", function () {
 						self.input.isFocused = true;
@@ -453,6 +346,112 @@
 					"insert"	: function () {self._onPopUpSelectorInsert.apply(self, arguments);}
 				});
 			}
+
+			this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
+				var ws = self.getWorksheetById(wsId);
+				if (ws)
+					ws.changeWorksheet("updateRange", {range: range,
+						isLockDraw: bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(),
+						canChangeColWidth: canChangeColWidth});
+			});
+			this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
+				self.getWorksheetById(wsId).changeWorksheet("update", val);
+			});
+			this.model.handlers.add("insertCell", function (wsId, val, range) {
+				self.getWorksheetById(wsId).changeWorksheet("insCell", {val: val, range: range});
+			});
+			this.model.handlers.add("deleteCell", function (wsId, val, range) {
+				self.getWorksheetById(wsId).changeWorksheet("delCell", {val: val, range: range});
+			});
+			this.model.handlers.add("showWorksheet", function (wsId) {
+				var wsModel = self.model.getWorksheetById(wsId), index;
+				if (wsModel) {
+					index = wsModel.getIndex();
+					self.showWorksheet(index, false, true);
+					self.handlers.trigger("asc_onActiveSheetChanged", index);
+				}
+			});
+			this.model.handlers.add("setSelection", function () {
+				self._onSetSelection.apply(self, arguments);
+			});
+			this.model.handlers.add("getSelection", function () {
+				return self._onGetSelection.apply(self);
+			});
+			this.model.handlers.add("getSelectionState", function () {
+				return self._onGetSelectionState.apply(self);
+			});
+			this.model.handlers.add("setSelectionState", function () {
+				self._onSetSelectionState.apply(self, arguments);
+			});
+			this.model.handlers.add("reInit", function () {
+				self.reInit.apply(self, arguments);
+			});
+			this.model.handlers.add("drawWS", function () {
+				self.drawWS.apply(self, arguments);
+			});
+			this.model.handlers.add("showDrawingObjects", function () {
+				self.onShowDrawingObjects.apply(self, arguments);
+			});
+			this.model.handlers.add("setCanUndo", function (bCanUndo) {
+				self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
+			});
+			this.model.handlers.add("setCanRedo", function (bCanRedo) {
+				self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
+			});
+			this.model.handlers.add("setDocumentModified", function (bIsModified) {
+				self.handlers.trigger("asc_onDocumentModifiedChanged", bIsModified);
+			});
+			this.model.handlers.add("initCommentsToSave", function () {
+				self._initCommentsToSave();
+			});
+			this.model.handlers.add("replaceWorksheet", function (from, to) {
+				self.replaceWorksheet(from, to);
+			});
+			this.model.handlers.add("removeWorksheet", function (nIndex) {
+				self.removeWorksheet(nIndex);
+			});
+			this.model.handlers.add("spliceWorksheet", function () {
+				self.spliceWorksheet.apply(self, arguments);
+			});
+			this.model.handlers.add("updateWorksheetByModel", function () {
+				self.updateWorksheetByModel.apply(self, arguments);
+			});
+			this.model.handlers.add("undoRedoAddRemoveRowCols", function (sheetId, type, range, bUndo) {
+				if (true === bUndo) {
+					if (historyitem_Worksheet_AddRows === type) {
+						self.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.undoRows(sheetId, range.r2 - range.r1 + 1);
+					} else if (historyitem_Worksheet_RemoveRows === type) {
+						self.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.undoRows(sheetId, range.r2 - range.r1 + 1);
+					} else if (historyitem_Worksheet_AddCols === type) {
+						self.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.undoCols(sheetId, range.c2 - range.c1 + 1);
+					} else if (historyitem_Worksheet_RemoveCols === type) {
+						self.collaborativeEditing.addColsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.undoCols(sheetId, range.c2 - range.c1 + 1);
+					}
+				} else {
+					if (historyitem_Worksheet_AddRows === type) {
+						self.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+					} else if (historyitem_Worksheet_RemoveRows === type) {
+						self.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+					} else if (historyitem_Worksheet_AddCols === type) {
+						self.collaborativeEditing.addColsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+					} else if (historyitem_Worksheet_RemoveCols === type) {
+						self.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
+						self.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+					}
+				}
+			});
+			this.model.handlers.add("undoRedoHideSheet", function (sheetId) {
+				self.showWorksheet(sheetId);
+				// Посылаем callback об изменении списка листов
+				self.handlers.trigger("asc_onSheetsChanged");
+			});
 
 			this.cellCommentator = new CCellCommentator({
 				model: new WorkbookCommentsModel(this.handlers),
