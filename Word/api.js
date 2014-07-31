@@ -2444,7 +2444,7 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 			FontSize   : function(oThis, v){ oThis.sync_TextPrFontSizeCallBack(v); },
 			FontFamily : function(oThis, v){ oThis.sync_TextPrFontFamilyCallBack(v); },
 			VertAlign  : function(oThis, v){ oThis.sync_VerticalAlign(v); },
-			Color      : function(oThis, v){ oThis.sync_TextColor(v); },
+			//Color      : function(oThis, v){ oThis.sync_TextColor(v); },
 			HighLight  : function(oThis, v){ oThis.sync_TextHighLight(v); },
             Spacing    : function(oThis, v){ oThis.sync_TextSpacing(v); },
             DStrikeout : function(oThis, v){ oThis.sync_TextDStrikeout(v); },
@@ -2452,12 +2452,13 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
             SmallCaps  : function(oThis, v){ oThis.sync_TextSmallCaps(v); },
             Position   : function(oThis, v){ oThis.sync_TextPosition(v); },
             Lang       : function(oThis, v){ oThis.sync_TextLangCallBack(v);}
-		}
+		};
 
         for ( var Item in oTextPrMap )
         {
             oTextPrMap[Item]( this, TextPr[Item] );
         }
+        this.sync_TextColor(TextPr);
 	}
 }
 asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
@@ -4061,10 +4062,16 @@ asc_docs_api.prototype.sync_PrAlignCallBack = function(value){
 asc_docs_api.prototype.sync_ListType = function(NumPr){
     this.asc_fireCallback("asc_onListType", new CListType( NumPr ) );
 }
-asc_docs_api.prototype.sync_TextColor = function(Color)
+asc_docs_api.prototype.sync_TextColor = function(TextPr)
 {
-    if ( undefined != Color )
-	    this.asc_fireCallback("asc_onTextColor", CreateAscColorCustom( Color.r, Color.g, Color.b, Color.Auto ));
+    if(TextPr.Unifill && TextPr.Unifill.fill && TextPr.Unifill.fill.type === FILL_TYPE_SOLID && TextPr.Unifill.fill.color)
+    {
+        this.asc_fireCallback("asc_onTextColor", CreateAscColor(TextPr.Unifill.fill.color));
+    }
+    else if( undefined != TextPr.Color )
+    {
+        this.asc_fireCallback("asc_onTextColor", CreateAscColorCustom( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto ));
+    }
 }
 asc_docs_api.prototype.sync_TextHighLight = function(HighLight)
 {
@@ -5343,7 +5350,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
         else if (ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill && ImagePr.ShapeProperties.fill.fill &&
             ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
         {
-            var _img = this.ImageLoader.LoadImage(ImagePr.ShapeProperties.fill.fill.url, 1)
+            var _img = this.ImageLoader.LoadImage(ImagePr.ShapeProperties.fill.fill.url, 1);
             if (null != _img)
             {
                 ImagePr.ImageUrl = _img.src;
