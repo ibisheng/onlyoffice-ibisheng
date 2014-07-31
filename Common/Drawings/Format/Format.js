@@ -7503,13 +7503,35 @@ CShapeStyle.prototype =
 
 };
 
-function CreateDefaultShapeStyle()
+var LINE_PRESETS_MAP = {};
+
+LINE_PRESETS_MAP["line"] = true;
+LINE_PRESETS_MAP["bracePair"] = true;
+LINE_PRESETS_MAP["leftBrace"] = true;
+LINE_PRESETS_MAP["rightBrace"] = true;
+LINE_PRESETS_MAP["bracketPair"] = true;
+LINE_PRESETS_MAP["leftBracket"] = true;
+LINE_PRESETS_MAP["rightBracket"] = true;
+LINE_PRESETS_MAP["bentConnector2"] = true;
+LINE_PRESETS_MAP["bentConnector3"] = true;
+LINE_PRESETS_MAP["bentConnector4"] = true;
+LINE_PRESETS_MAP["bentConnector5"] = true;
+LINE_PRESETS_MAP["curvedConnector2"] = true;
+LINE_PRESETS_MAP["curvedConnector3"] = true;
+LINE_PRESETS_MAP["curvedConnector4"] = true;
+LINE_PRESETS_MAP["curvedConnector5"] = true;
+LINE_PRESETS_MAP["straightConnector1"] = true;
+LINE_PRESETS_MAP["arc"] = true;
+
+function CreateDefaultShapeStyle(preset)
 {
 
+    var b_line = typeof preset === "string" && LINE_PRESETS_MAP[preset];
+    var tx_color = b_line;
     var unicolor;
     var style = new CShapeStyle();
     style.setLnRef(new StyleRef());
-    style.lnRef.setIdx(2);
+    style.lnRef.setIdx(b_line ? 1 : 2);
 
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
@@ -7525,7 +7547,7 @@ function CreateDefaultShapeStyle()
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
     style.setFillRef(new StyleRef());
-    style.fillRef.setIdx(1);
+    style.fillRef.setIdx(b_line ? 0 : 1);
     style.fillRef.setColor(unicolor);
 
 
@@ -7539,7 +7561,7 @@ function CreateDefaultShapeStyle()
 
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
-    unicolor.color.setId(12);
+    unicolor.color.setId(tx_color ? 15 : 12);
     style.setFontRef(new FontRef());
     style.fontRef.setIdx(fntStyleInd_minor);
     style.fontRef.setColor(unicolor);

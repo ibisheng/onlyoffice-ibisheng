@@ -17,16 +17,30 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     ExecuteNoHistory(function(){
         var style;
+
+        if(presetGeom.indexOf("WithArrow") > -1)
+        {
+            presetGeom = presetGeom.substr(0, presetGeom.length - 9);
+            this.presetGeom = presetGeom;
+            this.arrowsCount = 1;
+        }
+        if(presetGeom.indexOf("WithTwoArrows") > -1)
+        {
+            presetGeom = presetGeom.substr(0, presetGeom.length - 13);
+            this.presetGeom = presetGeom;
+            this.arrowsCount = 2;
+        }
+
         if(presetGeom !== "textRect")
-            style = CreateDefaultShapeStyle();
+            style = CreateDefaultShapeStyle(this.presetGeom);
         else
             style = CreateDefaultTextRectStyle();
         var brush = theme.getFillStyle(style.fillRef.idx);
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
         var RGBA = style.fillRef.Color.RGBA;
-        if (style.fillRef.Color.color != null)
+        if (style.fillRef.Color.color)
         {
-            if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID))
+            if (brush.fill && (brush.fill.type === FILL_TYPE_SOLID))
             {
                 brush.fill.color = style.fillRef.Color.createDuplicate();
             }
@@ -53,21 +67,6 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             fill.fill.color.color.id = 12;
             pen.merge(ln);
             brush.merge(fill);
-        }
-        if(presetGeom.indexOf("WithArrow") > -1)
-        {
-            presetGeom = presetGeom.substr(0, presetGeom.length - 9);
-            this.presetGeom = presetGeom;
-            this.arrowsCount = 1;
-
-
-
-        }
-        if(presetGeom.indexOf("WithTwoArrows") > -1)
-        {
-            presetGeom = presetGeom.substr(0, presetGeom.length - 13);
-            this.presetGeom = presetGeom;
-            this.arrowsCount = 2;
         }
 
         if(this.arrowsCount > 0)
@@ -400,7 +399,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         {
             shape.spPr.setGeometry(CreateGeometry(this.presetGeom));
             shape.spPr.geometry.setParent(shape.spPr);
-            shape.setStyle(CreateDefaultShapeStyle());
+            shape.setStyle(CreateDefaultShapeStyle(this.presetGeom));
             if(this.arrowsCount > 0)
             {
                 var ln = new CLn();

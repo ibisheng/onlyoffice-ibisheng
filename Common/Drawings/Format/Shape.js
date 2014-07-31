@@ -780,7 +780,7 @@ CShape.prototype =
 
     setDefaultStyle: function () {
 
-        this.setStyle(CreateDefaultShapeStyle());
+        this.setStyle(CreateDefaultShapeStyle(this.spPr && this.spPr.geometry ? this.spPr.geometry.preset : null));
     },
 
     setDefaultTextRectStyle: function () {
