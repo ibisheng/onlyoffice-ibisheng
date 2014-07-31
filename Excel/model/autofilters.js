@@ -1641,7 +1641,7 @@ var gUndoInsDelCellsFlag = true;
 				if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
 				{
 					if(clean)
-						this._cleanFilterColumnsAndSortState(aWs.AutoFilter);
+						this._cleanFilterColumnsAndSortState(aWs.AutoFilter, activeCell);
 					return true;
 				}
 				
@@ -2064,7 +2064,11 @@ var gUndoInsDelCellsFlag = true;
 				{
 					var tablePart = aWs.TableParts[tablePartId];
 					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
-						result = true;
+						result = {isFilterColumns: true, isAutoFilter: true};
+					else if(tablePart.Ref && tablePart.AutoFilter && tablePart.AutoFilter !== null)
+						result = {isFilterColumns: null, isAutoFilter: true};
+					else
+						result = {isFilterColumns: null, isAutoFilter: false};
 				}
 				else
 				{

@@ -6457,11 +6457,9 @@
 			{
 				if(tablePartsOptions.tableRange.containsRange(activeCell))
 				{
-					cell_info.isAutoFilter = true;
-					if(this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id))
-						cell_info.clearFilter = true;
-					else
-						cell_info.clearFilter = null;
+					var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id);
+					cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
+					cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 				}
 				else
 				{
