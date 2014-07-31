@@ -7486,6 +7486,10 @@ CDocument.prototype =
             if ( undefined != ParaPr.Tabs )
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
+            if(ParaPr.Shd && ParaPr.Shd.Unifill)
+            {
+                ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
+            }
             editor.UpdateParagraphProp( ParaPr );
         }
     },
@@ -7520,6 +7524,10 @@ CDocument.prototype =
             {
                 var RGBAColor = TextPr.Unifill.getRGBAColor();
                 TextPr.Color = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
+            }
+            if(TextPr.Shd && TextPr.Shd.Unifill)
+            {
+                TextPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
             }
             editor.UpdateTextPr(TextPr);
         }
