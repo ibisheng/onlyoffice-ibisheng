@@ -196,7 +196,12 @@ function ChangeAdjState(drawingObjects, majorObject)
 ChangeAdjState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject && this.majorObject.Get_Id(), bMarker: true, cursorType: "crosshair"};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -269,7 +274,12 @@ function RotateState(drawingObjects, majorObject)
 RotateState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject && this.majorObject.Get_Id(), bMarker: true, cursorType: "crosshair"};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -404,7 +414,7 @@ PreResizeState.prototype =
             return;
         }
         this.drawingObjects.swapTrackObjects();
-        this.drawingObjects.changeCurrentState(new ResizeState(this.drawingObjects, this.majorObject, this.handleNum));
+        this.drawingObjects.changeCurrentState(new ResizeState(this.drawingObjects, this.majorObject, this.handleNum, this.cardDirection));
         this.drawingObjects.OnMouseMove(e, x, y, pageIndex);
     },
 
@@ -414,17 +424,23 @@ PreResizeState.prototype =
     }
 };
 
-function ResizeState(drawingObjects, majorObject, handleNum)
+function ResizeState(drawingObjects, majorObject, handleNum, cardDirection)
 {
     this.drawingObjects = drawingObjects;
     this.majorObject  = majorObject;
     this.handleNum = handleNum;
+    this.cardDirection = cardDirection;
 }
 
 ResizeState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -437,7 +453,6 @@ ResizeState.prototype =
         var resize_coef = this.majorObject.getResizeCoefficients(this.handleNum, coords.x, coords.y);
         this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e);
         this.drawingObjects.updateOverlay();
-
     },
 
     onMouseUp: RotateState.prototype.onMouseUp
@@ -514,7 +529,12 @@ function MoveState(drawingObjects, majorObject, startX, startY)
 MoveState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "move", bMarker: true};
+        }
+    },
 
     onMouseMove: function(e, x, y, pageIndex)
     {
@@ -806,7 +826,12 @@ function MoveInGroupState(drawingObjects, majorObject, group, startX, startY)
 MoveInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "move", bMarker: true};
+        }
+    },
 
     onMouseMove: MoveState.prototype.onMouseMove,
 
@@ -850,7 +875,12 @@ function RotateInGroupState(drawingObjects, group, majorObject)
 RotateInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: RotateState.prototype.onMouseMove,
 
@@ -892,7 +922,12 @@ function ResizeInGroupState(drawingObjects, group, majorObject, handleNum, cardD
 ResizeInGroupState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
     onMouseMove: ResizeState.prototype.onMouseMove,
     onMouseUp: MoveInGroupState.prototype.onMouseUp
 };
@@ -928,7 +963,12 @@ function ChangeAdjInGroupState(drawingObjects, group)
 ChangeAdjInGroupState.prototype =
 {
     onMouseDown: function(e, x, y,pageIndex)
-    {},
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {objectId: this.majorObject.Get_Id(), cursorType: "crosshair", bMarker: true};
+        }
+    },
 
     onMouseMove: ChangeAdjState.prototype.onMouseMove,
 

@@ -611,39 +611,6 @@ DrawingObjectsController.prototype =
         this.updateOverlay();
     },
 
-    handleStartResizeTrack: function(e, x, y)
-    {
-        this.swapTrackObjects();
-        this.changeCurrentState(new ResizeState(this, this.curState.majorObject, this.curState.cardDirection));
-        this.onMouseMove(e, x, y);
-    },
-
-    handleResizeTrack: function(e, x, y)
-    {
-        var point_x, point_y;
-        var snap_object_x = GetSnapObject([x], 0, this.curState.snapX);
-        var snap_object_y = GetSnapObject([y], 0, this.curState.snapY);
-        if(snap_object_x.point !== null)
-        {
-            point_x = snap_object_x.point;
-        }
-        else
-        {
-            point_x = x;
-        }
-        if(snap_object_y.point !== null)
-        {
-            point_y = snap_object_y.point;
-        }
-        else
-        {
-            point_y = y;
-        }
-        var resize_coefficients = this.curState.majorObject.getResizeCoefficients(this.curState.handleNum, point_x, point_y);
-        this.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
-        this.updateOverlay();
-    },
-
 
     handleEndResizeTrack: function()
     {
