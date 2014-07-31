@@ -590,7 +590,8 @@ function CCollaborativeEditing()
 
     this.m_aLinkData    = []; // Массив, указателей, которые нам надо выставить при загрузке чужих изменений
 
-    this.m_bGlobalLock  = false;
+    this.m_bGlobalLock  = false;         // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
+    this.m_bGlobalLockSelection = false; // Запрещаем изменять селект и курсор
     this.m_aCheckLocks  = [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
 
     this.m_aNewObjects  = []; // Массив со списком чужих новых объектов
@@ -850,6 +851,7 @@ function CCollaborativeEditing()
     this.OnStart_Load_Objects = function()
     {
         oThis.m_bGlobalLock = true;
+        oThis.m_bGlobalLockSelection = true;
 
         // Вызываем функцию для загрузки необходимых элементов (новые картинки и шрифты)
         editor.pre_Save(oThis.m_aNewImages);
@@ -861,6 +863,7 @@ function CCollaborativeEditing()
 
         // Снимаем лок
         oThis.m_bGlobalLock = false;
+        oThis.m_bGlobalLockSelection = false;
 
         // Запускаем полный пересчет документа
         var LogicDocument = editor.WordControl.m_oLogicDocument;

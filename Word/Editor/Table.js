@@ -2426,6 +2426,7 @@ CTable.prototype =
     {
         var Row      = this.Content[RowIndex];
         var Cell     = Row.Get_Cell( CellIndex );
+        var CellMar  = Cell.Get_Margins();
         var CellInfo = Row.Get_CellInfo( CellIndex );
 
         var VMerge_count = this.Internal_GetVertMergeCount( RowIndex, CellInfo.StartGridCol, Cell.Get_GridSpan() );
@@ -2496,8 +2497,6 @@ CTable.prototype =
         Y += MaxTopBorder;
         
         // Учтем верхнее поле ячейки
-        var Cell = Row.Get_Cell(CellIndex);
-        var CellMar = Cell.Get_Margins();
         Y += CellMar.Top.W;
 
         // TODO: Здесь надо учитывать нижнюю границу ячейки и вычесть ее ширину из YLimit
@@ -3040,6 +3039,18 @@ CTable.prototype =
     Reset_RecalculateCache : function()
     {
         this.RecalcInfo.Reset(true);
+        
+        var RowsCount = this.Content.length;
+        for ( var RowIndex = 0; RowIndex < RowsCount; RowIndex++ )
+        {
+            var Row = this.Content[RowIndex];
+            var CellsCount = Row.Get_CellsCount();
+            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
+            {
+                var Cell = Row.Get_Cell( CellIndex );
+                Cell.Content.Reset_RecalculateCache();
+            }
+        }
     },
 
     Recalculate_Page : function(_PageIndex)
@@ -10990,6 +11001,10 @@ CTable.prototype =
         NewTable.Set_TableStyle2( this.TableStyle );
         NewTable.Set_TableLook( this.TableLook.Copy() );
         
+        // Сбросим селект и текущую позицию в таблицах
+        this.Cursor_MoveToStartPos( false );
+        NewTable.Cursor_MoveToStartPos( false );
+        
         return NewTable;
     },
     
@@ -18592,8 +18607,10 @@ CTable.prototype =
         }
         else
         {
-            var StartRow  = this.Selection.StartPos.Pos.Row;
-            var EndRow    = this.Selection.EndPos.Pos.Row;
+            var RowsCount = this.Content.length;
+            
+            var StartRow  = Math.min( Math.max( 0, this.Selection.StartPos.Pos.Row ), RowsCount - 1 );
+            var EndRow    = Math.min( Math.max( 0, this.Selection.EndPos.Pos.Row   ), RowsCount - 1 );
 
             if ( EndRow < StartRow )
             {

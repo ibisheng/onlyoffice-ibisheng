@@ -1928,15 +1928,20 @@ CDocument.prototype =
 
         if ( true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove() )
         {
+            // Обновляем курсор сначала, чтобы обновить текущую страницу
+            this.RecalculateCurPos();
+            
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();            
-            this.RecalculateCurPos();
             this.NeedUpdateTarget = false;
         }
     },
 
     RecalculateCurPos : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
         if ( docpostype_Content === this.CurPos.Type )
         {
             var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos ); 
@@ -1958,6 +1963,9 @@ CDocument.prototype =
 
     Internal_CheckCurPage : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
         if (docpostype_HdrFtr === this.CurPos.Type)
         {
             var CurHdrFtr = this.HdrFtr.CurHdrFtr;
@@ -11272,6 +11280,9 @@ CDocument.prototype =
     // Обновляем текущее состояние (определяем где мы находимся, картинка/параграф/таблица/колонтитул)
     Document_UpdateInterfaceState : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+        
         // Удаляем весь список
         editor.sync_BeginCatchSelectedElements();
 
@@ -11340,6 +11351,9 @@ CDocument.prototype =
     // Обновляем линейки
     Document_UpdateRulersState : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -11427,6 +11441,9 @@ CDocument.prototype =
     // Обновляем линейки
     Document_UpdateSelectionState : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
         this.DrawingDocument.UpdateTargetTransform(null);
         
         // Работаем с колонтитулом
@@ -11502,6 +11519,9 @@ CDocument.prototype =
 
     Document_UpdateUndoRedoState : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+       
         // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
         //       данные события при изменении значения History.Index
 
@@ -11525,12 +11545,18 @@ CDocument.prototype =
 
     Document_UpdateCanAddHyperlinkState : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
         // Проверяем можно ли добавить гиперссылку
         editor.sync_CanAddHyperlinkCallback( this.Hyperlink_CanAdd(false) );
     },
 
     Document_UpdateSectionPr : function()
     {
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
         // Обновляем ориентацию страницы
         editor.sync_PageOrientCallback( this.Get_DocumentOrientation() );
 

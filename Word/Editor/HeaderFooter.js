@@ -89,6 +89,13 @@ CHeaderFooter.prototype =
     {
         if ( Page_abs !== this.RecalcInfo.CurPage )
         {
+            // Возможна ситуация, когда у нас колонтитул был рассчитан для заданной страницы, но на ней сейчас данный
+            // колонтитул не используется. Запрещаем менять у данного колонтитула текущую страницу на заданную.
+            var HdrFtrController = this.Parent;
+            var HdrFtrPage = this.Parent.Pages[Page_abs];
+            if ( undefined === HdrFtrPage || ( this !== HdrFtrPage.Header && this !== HdrFtrPage.Footer ) )
+                return;
+            
             var RecalcObj = this.RecalcInfo.RecalcObj[Page_abs];
             if ( undefined !== RecalcObj )
             {
