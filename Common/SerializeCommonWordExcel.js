@@ -787,42 +787,60 @@ CellAddress.prototype._recalculate=function(bCoord, bId){
 	if(bCoord && this._invalidCoord){
 		this._invalidCoord = false;
 		var sId = this.id;
-		var nSymIndex = sId.indexOf("$");
-		if(-1 != nSymIndex)
-		{
-			if(0 == nSymIndex)
-			{
-				nSymIndex = sId.indexOf("$", nSymIndex + 1);
-				this.bColAbs = true;
-			}
-			if(-1 != nSymIndex)
-				this.bRowAbs = true;
-			sId = sId.replace(/\$/g,"");
+		this.row = this.col = 0;//выставляем невалидные значения, чтобы не присваивать их при каждом else
+		var indexes = {}, i = -1, indexesCount = 0;
+		while ((i = sId.indexOf("$", i + 1)) != -1) {
+		    indexes[i - indexesCount++] = 1;//отнимаем количество, чтобы индексы указывали на следующий после них символ после удаления $
 		}
-		var nIndex = 0;
-		var nIdLength = sId.length;
-		while(this._isAlpha(sId.charAt(nIndex)) && nIndex < nIdLength)
-			nIndex++;
-		if(0 == nIndex){
-			//  (1,Infinity)
-			this.bIsRow = true;
-			this.col = 1;
-			this.colLetter = g_oCellAddressUtils.colnumToColstr(this.col);
-			this.row = sId.substring(nIndex) - 0;
-			//this.id = this.colLetter + this.row;
-		}
-		else if(nIndex == nIdLength){
-			//  (Infinity,1)
-			this.bIsCol = true;
-			this.colLetter = sId;
-			this.col = g_oCellAddressUtils.colstrToColnum(this.colLetter);
-			this.row = 1;
-			//this.id = this.colLetter + this.row;
-		}
-		else{
-			this.colLetter = sId.substring(0, nIndex);
-			this.col = g_oCellAddressUtils.colstrToColnum(this.colLetter);
-			this.row = sId.substring(nIndex) - 0;
+		if (indexesCount <= 2) {
+		    if (indexesCount > 0)
+		        sId = sId.replace(/\$/g, "");
+		    var nIdLength = sId.length;
+		    if (nIdLength > 0) {
+		        var nIndex = 0;
+		        while (this._isAlpha(sId.charAt(nIndex)) && nIndex < nIdLength)
+		            nIndex++;
+		        if (0 == nIndex) {
+		            //  (1,Infinity)
+		            this.bIsRow = true;
+		            this.col = 1;
+		            this.colLetter = g_oCellAddressUtils.colnumToColstr(this.col);
+		            this.row = sId.substring(nIndex) - 0;
+		            //this.id = this.colLetter + this.row;
+		            if (null != indexes[0]) {
+		                this.bRowAbs = true;
+		                indexesCount--;
+		            }
+		        }
+		        else if (nIndex == nIdLength) {
+		            //  (Infinity,1)
+		            this.bIsCol = true;
+		            this.colLetter = sId;
+		            this.col = g_oCellAddressUtils.colstrToColnum(this.colLetter);
+		            this.row = 1;
+		            //this.id = this.colLetter + this.row;
+		            if (null != indexes[0]) {
+		                this.bColAbs = true;
+		                indexesCount--;
+		            }
+		        }
+		        else {
+		            this.colLetter = sId.substring(0, nIndex);
+		            this.col = g_oCellAddressUtils.colstrToColnum(this.colLetter);
+		            this.row = sId.substring(nIndex) - 0;
+		            if (null != indexes[0]) {
+		                this.bColAbs = true;
+		                indexesCount--;
+		            }
+		            if (null != indexes[nIndex]) {
+		                this.bRowAbs = true;
+		                indexesCount--;
+		            }
+		        }
+		        if (indexesCount > 0) {
+		            this.row = this.col = 0;
+		        }
+		    }
 		}
 	}
 	else if(bId && this._invalidId){

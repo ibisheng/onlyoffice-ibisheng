@@ -593,17 +593,20 @@
 				var oCacheVal = this.oCache[sRange];
 				if(null == oCacheVal)
 				{
-					var oFirstAddr, oLastAddr;
+				    var oFirstAddr, oLastAddr;
+				    var bIsSingle = true;
 					var nIndex = sRange.indexOf(":");
 					if(-1 != nIndex)
 					{
+					    bIsSingle = false;
 						oFirstAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(0, nIndex));
 						oLastAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(nIndex + 1));
 					}
 					else
 						oFirstAddr = oLastAddr = g_oCellAddressUtils.getCellAddress(sRange);
-					oCacheVal = {first: null, last: null, ascRange: null, formulaRange: null, activeRange: null};
-					if(oFirstAddr.isValid() && oLastAddr.isValid())
+					oCacheVal = { first: null, last: null, ascRange: null, formulaRange: null, activeRange: null };
+                    //последнее условие, чтобы не распознавалось "A", "1"(должно быть "A:A", "1:1")
+					if (oFirstAddr.isValid() && oLastAddr.isValid() && (!bIsSingle || (!oFirstAddr.getIsRow() && !oFirstAddr.getIsCol())))
 					{
 					    oCacheVal.first = oFirstAddr;
 					    oCacheVal.last = oLastAddr;
