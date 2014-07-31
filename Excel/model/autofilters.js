@@ -768,7 +768,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					//находимся вне зоны локального фильтра, тогда отменяем общий фильтр
 					//фунция определяющая в каком фильтре находится
-					var apocal = this._searchFilters(activeCells,isAll,aWs);
+					var apocal = this._searchFilters(activeCells, isAll);
 					//удаляем фильтр от этих ячеек]
 					var changesElemHistory = null;
 					if(apocal == 'error')
@@ -1424,7 +1424,7 @@ var gUndoInsDelCellsFlag = true;
 					var activeRange = ar;
 					if(cellId)
 						activeRange = t._idToRange(cellId);
-					var filter = t._searchFilters(activeRange,null,aWs);
+					var filter = t._searchFilters(activeRange, null);
 					if(type == 'ascending')
 						type = true;
 					else
@@ -2106,7 +2106,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 				}
 				return false;//к данному диапазону не применены форматированные таблицы и конфликтов с другими фильтрами нет*/
-				var alreadyAddFilter = this._searchFilters(activeCells,false,aWs);
+				var alreadyAddFilter = this._searchFilters(activeCells, false);
 				//в случае если меняем стиль фильтра
 				if((alreadyAddFilter && alreadyAddFilter.changeStyle) ||(alreadyAddFilter && !alreadyAddFilter.containsFilter && !alreadyAddFilter.all))
 					return false;
@@ -3721,9 +3721,10 @@ var gUndoInsDelCellsFlag = true;
 				return false;
 			},
 			
-			_searchFilters: function(activeCells,isAll,aWs)
+			_searchFilters: function(activeCells, isAll)
 			{
 				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var allF =[];
 				
 				if(aWs.AutoFilter)
