@@ -4427,7 +4427,7 @@ function CDrawingDocument(drawingObjects)
         if (null != this.GuiCanvasFillTexture)
         {
             var _div_elem = document.getElementById(this.GuiCanvasFillTextureParentId);
-            if (!_div_elem)
+            if (_div_elem)
                 _div_elem.removeChild(this.GuiCanvasFillTexture);
 
             this.GuiCanvasFillTexture = null;
