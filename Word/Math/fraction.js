@@ -72,12 +72,12 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
-    var gap = this.gapSlash/2 - penW/7.5;
+    var gap = this.dW/2 - penW/7.5;
     var plh = 9.877777777777776 * mgCtrPrp.FontSize / 36;
 
-    var minHeight = 2*this.gapSlash,
+    var minHeight = 2*this.dW,
         middleHeight = plh*4/3,
-        maxHeight = (3*this.gapSlash + 5*plh)*2/3;
+        maxHeight = (3*this.dW + 5*plh)*2/3;
 
 	var tg;
     var tg1 = -2.22,
@@ -284,8 +284,9 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
     //var ctrPrp = this.Get_CompiledCtrPrp();
     var mgCtrPrp = this.Get_CompiledCtrPrp();
 
-    this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
-    var width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
+    //this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
+    this.dW = 5.011235894097222 * mgCtrPrp.FontSize/36;
+    var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
     var height = this.elements[0][0].size.height + this.elements[0][1].size.height;
     var ascent = this.elements[0][0].size.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
@@ -337,16 +338,19 @@ CFraction.prototype.setPosition = function(pos)
         this.pos.x = pos.x;
         this.pos.y = pos.y - this.size.ascent;
 
+        var X = this.pos.x + this.GapLeft,
+            Y = this.pos.y;
+
         var PosNum = new CMathPosition();
 
-        PosNum.x = this.pos.x + this.GapLeft;
-        PosNum.y = this.pos.y;
+        PosNum.x = X;
+        PosNum.y = Y;
 
 
         var PosDen = new CMathPosition();
 
-        PosDen.x = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.gapSlash;
-        PosDen.y = this.pos.y + this.elements[0][0].size.height;
+        PosDen.x = X + this.elements[0][0].size.width + this.dW;
+        PosDen.y = Y + this.elements[0][0].size.height;
 
         this.elements[0][0].setPosition(PosNum);
         this.elements[0][1].setPosition(PosDen);

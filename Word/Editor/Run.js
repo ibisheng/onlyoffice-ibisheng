@@ -3669,7 +3669,7 @@ ParaRun.prototype =
             Result = true;
         }
 
-        if (this.Type == para_Math_Run)
+        if (this.Type == para_Math_Run && this.Is_Empty())
         {
             var Diff = SearchPos.X - SearchPos.CurX;
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
@@ -7733,6 +7733,10 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
 
     History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : MPrp, Old : OldValue } );
     this.Recalc_CompiledPr(true);
+}
+ParaRun.prototype.IsAccent = function()
+{
+    return this.Parent.IsAccent();
 }
 
 

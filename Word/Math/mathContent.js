@@ -68,6 +68,8 @@ function CCoeffGaps()
     {
         left:   new CGaps(0.52, 0.26, 0, 0.52),
         right:  new CGaps(0.49, 0, 0, 0.49)
+        //left:   new CGaps(0.52, 0.26, 0, 2.5),
+        //right:  new CGaps(0.49, 0, 0, 2)
     };
 
     this.Mult =
@@ -471,7 +473,8 @@ CMathGapsInfo.prototype =
                         rightCoeff = this.getGapsMComp(this.Left, 1);
                         leftCoeff = COEFF_GAPS.getCoeff(currCode, -1, -1);
 
-                        leftCoeff -= rightCoeff;
+                        if(leftCoeff > rightCoeff)
+                            leftCoeff -= rightCoeff;
                     }
                     else
                     {
@@ -500,9 +503,7 @@ CMathGapsInfo.prototype =
                             rightCoeff /= 2;
 
                         if(leftCoeff < rightCoeff/2)
-                        {
                             leftCoeff = rightCoeff/2;
-                        }
                         else
                             leftCoeff -= rightCoeff/2;
                     }
@@ -567,9 +568,8 @@ CMathGapsInfo.prototype =
             coeffRight = 0.3;
         }
 
-        var result = direct == -1 ? coeffLeft : coeffRight;
 
-        return result;
+        return direct == -1 ? coeffLeft : coeffRight;
     },
     checkGapKind: function(kind)
     {
@@ -4073,7 +4073,6 @@ CMathContent.prototype =
         NewPos.y = pos.y + this.size.ascent;    // y по baseline;
 
 
-
         for(var i=0; i < this.content.length; i++)
         {
             this.content[i].setPosition(NewPos);
@@ -4127,6 +4126,15 @@ CMathContent.prototype =
             ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
 
         return ctrPrp;
+    },
+    IsAccent: function()
+    {
+        var result = false;
+
+        if(!this.bRoot)
+            result = this.Parent.IsAccent();
+
+        return result;
     },
     ////////////////////////
 
@@ -4467,6 +4475,12 @@ CMathContent.prototype =
 
         var currPos = 0;
 
+        if(this.bRoot)
+        {
+            console.log(TEST_STR);
+            TEST_STR = "";
+        }
+
         while(currPos < len)
         {
             current = this.content[currPos];
@@ -4531,6 +4545,7 @@ CMathContent.prototype =
             this.Internal_Content_Add(len, emptyRun);
         }
 
+
     },
     Create_FontMap : function(Map)
     {
@@ -4544,7 +4559,8 @@ CMathContent.prototype =
     },
 
     /// функции для работы с курсором
-    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+
+    old_Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
         {
@@ -4565,10 +4581,132 @@ CMathContent.prototype =
             else if(this.content[pos].Type == para_Math_Run)      // проверка на gaps в findDisposition
             {
                 SearchPos.X += this.pos.x + this.ParaMath.X + this.WidthToElement[pos];
-                SearchPos.CurX += this.pos.x + this.WidthToElement[pos];
+                SearchPos.X += this.pos.x + this.WidthToElement[pos];
                 this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd);
             }
         }
+    },
+
+    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    {
+        var result = false;
+        if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
+        {
+            var W = 0;
+            var pos = 0;
+            var lng = this.content.length;
+
+
+            while( pos < lng - 1 && SearchPos.X > SearchPos.CurX + this.content[pos].size.width)
+            {
+                SearchPos.CurX += this.content[pos].size.width;
+                pos++;
+            }
+
+            var SearchCurX = SearchPos.CurX;
+
+            if(this.content[pos].Type == para_Math_Run)
+            {
+                //SearchPos.CurX += W;
+                if(this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
+                {
+                    SearchPos.Pos.Update(pos, Depth);
+                    result = true;
+                }
+
+
+            }
+            else // para_Math_Composition
+            {
+                // необязательно попадем непосредственно в GapLeft просто в этом случае не ищем позицию в мат объектах,
+                // это избавит от ошибок, связанных с тем что расстояния до мат объекта и до пустого рана совпадают
+                // если же ран не пустой, то также должны встать в ран (в конец), а не в мат объект
+                if(SearchPos.X < SearchPos.CurX + this.content[pos].GapLeft)
+                {
+                    SearchPos.CurX -= this.content[pos-1].size.width;
+                    if(this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
+                    {
+                        SearchPos.Pos.Update(pos-1, Depth);
+                        result = true;
+                    }
+                } // аналогично для GapRight
+                else if(SearchPos.CurX + this.content[pos].size.width - this.content[pos].GapRight < SearchPos.X)
+                {
+                    SearchPos.CurX += this.content[pos].size.width + this.content[pos+1].size.width;
+                    if(this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
+                    {
+                        SearchPos.Pos.Update(pos+1, Depth);
+                        result = true;
+                    }
+                }
+                else
+                {
+                    SearchPos.CurX -= this.content[pos-1].size.width;
+
+                    // Для случая с Just-Draw элементами
+                    if( this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                    {
+                        SearchPos.Pos.Update(pos-1, Depth);
+                        result = true;
+                    }
+
+                    if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                    {
+                        SearchPos.Pos.Update(pos, Depth);
+                        result = true;
+                    }
+
+                    if( this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                    {
+                        SearchPos.Pos.Update(pos+1, Depth);
+                        result = true;
+                    }
+
+
+                }
+            }
+
+            SearchPos.CurX = SearchCurX + this.size.width;
+
+
+            /*if(pos > 0)
+            {
+                SearchPos.CurX -= this.content[pos-1].size.width;
+                if( this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                {
+                    SearchPos.Pos.Update(pos-1, Depth);
+                    result = true;
+                }
+            }
+
+
+            if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+            {
+                SearchPos.Pos.Update(pos, Depth);
+                result = true;
+            }
+
+            //this.findToInternalContent(pos, SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+            //SearchPos.CurX += this.content[pos].size.width;
+
+            if(pos < lng - 1)
+            {
+                //SearchPos.CurX += this.size.width - this.WidthToElement[pos + 1];
+
+                if( this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                {
+                    SearchPos.Pos.Update(pos+1, Depth);
+                    result = true;
+                }
+
+                //SearchPos.CurX += this.size.width - this.WidthToElement[pos + 1] + this.content[pos + 1].size.width;
+            }*/
+
+
+
+        }
+
+        return result;
     },
     Get_ParaContentPos: function(bSelection, bStart, ContentPos)
     {
@@ -4590,13 +4728,8 @@ CMathContent.prototype =
     {
         this.CurPos = ContentPos.Get(Depth);
 
-        Depth++;
-
-
         if(this.content.length > 0)
-        {
-            this.content[this.CurPos].Set_ParaContentPos(ContentPos, Depth);
-        }
+            this.content[this.CurPos].Set_ParaContentPos(ContentPos, Depth+1);
 
     },
     Cursor_MoveToStartPos: function()

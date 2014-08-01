@@ -381,6 +381,24 @@ CBorderBox.prototype.findDisposition = function(SearchPos, Depth)
 
     //return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 }
+CBorderBox.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var alignLeft  =  this.Pr.hideLeft  ? 0 : this.gapBrd,
+        alignRight =  this.Pr.hideRight ? 0 : this.gapBrd;
+    SearchPos.CurX += this.GapLeft + alignLeft;
+
+    var result =  this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+
+    if(result)
+    {
+        SearchPos.Pos.Update(0, Depth);
+        SearchPos.Pos.Update(0, Depth + 1);
+    }
+
+    SearchPos.CurX += alignRight;
+
+    return result;
+}
 CBorderBox.prototype.getBase = function()
 {
     return this.elements[0][0];

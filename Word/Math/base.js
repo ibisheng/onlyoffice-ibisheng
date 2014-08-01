@@ -213,6 +213,10 @@ CMathBase.prototype =
     {
         return false;
     },
+    IsAccent: function()
+    {
+        return false;
+    },
     getWidthsHeights: function()
     {
         var Widths = [];
@@ -861,10 +865,9 @@ CMathBase.prototype =
         return gaps;
     },
     /// Position for Paragraph
-    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    old_Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         /// элементов just-draw не должно прийти
-
 
         this.Check_PosInGaps(SearchPos);
         this.findDisposition(SearchPos, Depth);
@@ -888,6 +891,97 @@ CMathBase.prototype =
 
 
         this.elements[Curr_Pos_X][Curr_Pos_Y].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+    },
+    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    {
+        var maxWH = this.getWidthsHeights();
+
+        var Widths = maxWH.widths;
+        var Heights = maxWH.heights;
+
+        var X = this.ParaMath.X + this.pos.x + this.GapLeft, // this.ParaMath.X + this.pos.x  совпадает с  SearchPos.CurX
+            Y = this.ParaMath.Y + this.pos.y;
+
+        var CurrX, CurrY,
+            W_CurX,
+            Diff = 100000000;
+
+        var W = 0, H = 0;
+
+        var rX, rY,
+            minR;
+
+        for(var i=0; i < this.nRow; i++)
+        {
+            for(var j=0; j < this.nCol; j++)
+            {
+                if(!this.elements[i][j].IsJustDraw())
+                {
+                    /*rY = SearchPos.Y - Y - H;
+                    rX = SearchPos.X - X - W;
+                    R =  rX*rX + rY*rY;
+
+                    rrX = SearchPos.X - X - W - Widths[j];
+                    rrY = SearchPos.Y - Y - H - Heights[i];
+                    RR  = rrX*rrX + rrY*rrY;*/
+
+                    var x1 = SearchPos.X - X - W,
+                        x2 = SearchPos.X - X - W - Widths[j],
+                        y1 = SearchPos.Y - Y - H,
+                        y2 = SearchPos.Y - Y - H - Heights[i];
+
+
+                    var bInY = 0 < y1 && y2 < 0,
+                        bInX = 0 < x1 && x2 < 0;
+
+                    rX = x1*x1 < x2*x2 ? x1 : x2;
+                    rY = y1*y1 < y2*y2 ? y1 : y2;
+
+
+                    if(bInY && bInX)
+                        minR = 0;
+                    else if(!bInY && !bInX)
+                        minR = rX*rX + rY*rY;
+                    else if(bInY)
+                        minR = rX*rX;
+                    else
+                        minR = rY*rY;
+
+
+                    if(Diff > minR)
+                    {
+                        Diff = minR;
+
+                        CurrX = i;
+                        CurrY = j;
+                        W_CurX  = W;
+                    }
+                }
+
+                W += Widths[j] + this.dW;
+
+            }
+
+            W = 0;
+            H += Heights[i] + this.dH;
+        }
+
+        var SearchCurX = SearchPos.CurX;
+        var align = this.align(CurrX, CurrY);
+
+        SearchPos.CurX += this.GapLeft + W_CurX + align.x;
+
+        var result =  this.elements[CurrX][CurrY].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+
+        if(result)
+        {
+            SearchPos.Pos.Update(CurrX, Depth);
+            SearchPos.Pos.Update(CurrY, Depth + 1);
+        }
+
+        SearchPos.CurX = SearchCurX + this.size.width;
+
+        return result;
     },
     Check_PosInGaps: function(SearchPos)
     {

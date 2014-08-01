@@ -550,6 +550,10 @@ CAccent.prototype.setChrType = function(chrType)
     this.Pr.chrType = chrType;
     this.RecalcInfo.bProps = true;
 }
+CAccent.prototype.IsAccent = function()
+{
+    return true;
+}
 CAccent.prototype.old_init = function(properties)
 {
     var type = properties.chrType,
@@ -1194,6 +1198,24 @@ CAccent.prototype.findDisposition = function(SearchPos, Depth)
     SearchPos.Pos.Update(0, Depth);
     SearchPos.Pos.Update(0, Depth + 1);
 
+}
+CAccent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var align =  (this.size.width - this.elements[0][0].size.width)/2;
+
+    SearchPos.CurX += this.GapLeft + align;
+
+    var result =  this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+
+    if(result)
+    {
+        SearchPos.Pos.Update(0, Depth);
+        SearchPos.Pos.Update(0, Depth+1);
+    }
+
+    SearchPos.CurX += this.GapRight + align;
+
+    return result;
 }
 CAccent.prototype.setProperties = function(props)
 {

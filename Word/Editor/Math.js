@@ -35,7 +35,7 @@ function ParaMath()
     this.bSelectionUse     = false;
 
 
-    this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
+    //this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
     this.Paragraph  = null;
 
     this.StartLine  = 0;
@@ -1204,6 +1204,9 @@ ParaMath.prototype =
         var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
+        /*PDSE.Graphics.p_color(255,0,0, 255);
+        PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
+
         if ( EndPos >= 1 )
         {
             //this.Math.Draw( PDSE.X, PDSE.Y, PDSE.Graphics );
@@ -1214,6 +1217,9 @@ ParaMath.prototype =
             this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
             PDSE.X += this.Width;
         }
+
+        /*PDSE.Graphics.p_color(255,0,0, 255);
+        PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
     },
 
     Draw_Lines : function(PDSL)
@@ -1296,21 +1302,41 @@ ParaMath.prototype =
             var Dx = this.Root.size.width;
             var D = SearchPos.X - SearchPos.CurX;
 
-            var startDx = Math.abs(D),
-                endDx = Math.abs(D - Dx);
+            /*var startDx = Math.abs(D),
+                endDx = Math.abs(D - Dx);*/
 
-            var Diff = startDx < endDx ? startDx : endDx;
+            //var Diff = startDx < endDx ? startDx : endDx;
 
             var CurX = SearchPos.CurX;
 
-            if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
+            //SearchPos.CurY = SearchPos.Y - this.Y;
+
+            Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+
+
+            /*var  str = "Get_ParaContentPosByXY :";
+
+            //console.log("Get_ParaContentPosByXY");
+            for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+            {
+                str += SearchPos.Pos.Data[i]  + " ";
+            }
+
+            if(this.Id == "80")
+                console.log(str);*/
+
+            if ( D >= - 0.001 && D <= Dx + 0.001 )
+            {
+                SearchPos.DiffX =  0.001;
+            }
+
+
+            /*if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
             {
                 if ( D >= - 0.001 && D <= Dx + 0.001 )
                 {
                     var X = SearchPos.X,
                         Y = SearchPos.Y;
-
-                    //console.log("Get_ParaContentPosByXY: X " + SearchPos.X + " Y " + SearchPos.Y);
 
                     SearchPos.X -= this.X;
                     SearchPos.Y -= this.Y;
@@ -1341,7 +1367,7 @@ ParaMath.prototype =
 
                 Result = true;
 
-            }
+            }*/
 
             SearchPos.CurX = CurX + Dx;
         }
@@ -1371,7 +1397,7 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_ParaContentPos
 
-        this.State.ContentPos = ContentPos.Get(Depth);
+        //this.State.ContentPos = ContentPos.Get(Depth);
 
         /*console.log("Set_ParaContentPos");
         var str = "";
@@ -1381,6 +1407,8 @@ ParaMath.prototype =
         }
 
         console.log(str);*/
+
+        //console.log("Set_ParaContentPos");
 
         this.Root.Set_ParaContentPos(ContentPos, Depth);
 

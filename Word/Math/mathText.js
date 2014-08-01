@@ -17,6 +17,8 @@ var DIV_CENT = 0.1386;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
+var TEST_STR = "";
+
 // TODO
 // убрать CMathTextPrp
 
@@ -103,6 +105,10 @@ CMathText.prototype =
             code = 0x2212;
 
         this.value = code;
+
+
+        TEST_STR += code.toString(16) + " ";
+
     },
 	addTxt: function(txt)
 	{
@@ -117,6 +123,8 @@ CMathText.prototype =
 
         if(this.Type === para_Math_Placeholder || this.bJDraw || Compiled_MPrp.nor)
             return code;
+
+        var bAccent = this.Parent.IsAccent();
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
             bSmall = (code > 0x0060 && code < 0x007b),
@@ -137,14 +145,14 @@ CMathText.prototype =
             {
                 if(code == 0x68)            // h
                     code = 0x210E;
+                else if((code == 0x69 && bAccent) || code == 0x131) // "i" with dot || "i" dotless plain => "i" dotless italic
+                    code = 0x1D6A4;
+                else if((code == 0x6A && bAccent) ||code == 0x237)      // "j" with dot || "j" dotless plain => "j" dotless italic
+                    code = 0x1D6A5;
                 else if(bCapitale)
                     code  = code + 0x1D3F3;
                 else if(bSmall)
                     code  = code + 0x1D3ED;
-                else if(code == 0x131)       // "i" without dot
-                    code = 0x1D6A4;
-                else if(code == 0x237)      // "j" without dot
-                    code = 0x1D6A5;
                 else if(code == 0x3F4)      // Capital THETA special
                     code = 0x1D6F3;
                 else if(code == 0x2207)     // Capital NABLA
@@ -234,6 +242,16 @@ CMathText.prototype =
                     code = 0x1D7CA;
                 else if(code == 0x3DD)      //  SMALL DIGAMMA
                     code = 0x1D7CB;
+            }
+            else // PLAIN
+            {
+                if(bAccent)
+                {
+                    if(code == 0x69)    // "i" with dot  => "i" dotless plain
+                        code = 0x131;
+                    else if(code == 0x6A)      //  "j" with dot => "j" dotless plain
+                        code = 0x237;
+                }
             }
         }
         else if(Scr == TXT_DOUBLE_STRUCK)
