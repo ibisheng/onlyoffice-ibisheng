@@ -6108,10 +6108,12 @@ Paragraph.prototype =
         // 1. Спаренные пустые раны мы удаляем (удаляем 1 ран)
         // 2. Удаляем пустые гиперссылки
         // 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
+        // 4. Удаляем пустые комментарии
 
         var StartPos = ( undefined === _StartPos ? 0 : Math.max( _StartPos - 1, 0 ) );
         var EndPos   = ( undefined === _EndPos ? this.Content.length - 1 : Math.min( _EndPos + 1, this.Content.length - 1 ) );
 
+        var CommentsToDelete = [];
         for ( var CurPos = EndPos; CurPos >= StartPos; CurPos-- )
         {
             var CurElement = this.Content[CurPos];
@@ -6120,6 +6122,23 @@ Paragraph.prototype =
             {
                 this.Internal_Content_Remove( CurPos );
                 CurPos++;
+            }
+            else if ( para_Comment === CurElement.Type && false === CurElement.Start )
+            {
+                var CommentId = CurElement.CommentId;
+                for ( var CurPos2 = CurPos - 1; CurPos2 >= 0; CurPos2-- )
+                {
+                    var CurElement2 = this.Content[CurPos2];
+                    
+                    if ( para_Comment === CurElement2.Type && CommentId === CurElement2.CommentId )
+                    {
+                        CommentsToDelete.push( CommentId );
+                        break;
+                    }
+                    else if ( true !== CurElement2.Is_Empty() )
+                        break;
+                }
+                
             }
             else if ( para_Run !== CurElement.Type )
             {                                
@@ -6142,6 +6161,12 @@ Paragraph.prototype =
                 if ( true === CurElement.Is_Empty() && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type )
                     this.Internal_Content_Remove( CurPos );
             }
+        }
+
+        var CommentsCount = CommentsToDelete.length;
+        for ( var CommentIndex = 0; CommentIndex < CommentsCount; CommentIndex++ )
+        {
+            this.LogicDocument.Remove_Comment( CommentsToDelete[CommentIndex], true, false );
         }
 
         this.Correct_ContentPos2();
@@ -7460,20 +7485,44 @@ Paragraph.prototype =
                     StartPos = this.Selection.EndPos;
                     EndPos   = this.Selection.StartPos;
                 }
-
-                while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
-                    StartPos++;
-
-                TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
-
-                for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+                
+                // TODO: Как только избавимся от para_End переделать здесь.
+                
+                if ( StartPos === EndPos && this.Content.length - 1 === EndPos )
                 {
-                    var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
-                    
-                    if ( null === TextPr || undefined === TextPr )
-                        TextPr = TempTextPr;
-                    else if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
-                        TextPr = TextPr.Compare( TempTextPr );
+                    TextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                    TextPr.Merge(this.TextPr.Value);
+                }
+                else
+                {
+                    var bCheckParaEnd = false;
+                    if ( this.Content.length - 1 === EndPos )
+                    {
+                        EndPos--;
+                        bCheckParaEnd = true;
+                    }
+
+                    while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
+                        StartPos++;
+
+                    TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+
+                    for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+                    {
+                        var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
+
+                        if ( null === TextPr || undefined === TextPr )
+                            TextPr = TempTextPr;
+                        else if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
+                            TextPr = TextPr.Compare( TempTextPr );
+                    }
+
+                    if ( true === bCheckParaEnd )
+                    {
+                        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                        EndTextPr.Merge(this.TextPr.Value);
+                        TextPr = TextPr.Compare( EndTextPr );
+                    }
                 }
             }
             else

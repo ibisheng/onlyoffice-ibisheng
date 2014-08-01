@@ -498,11 +498,13 @@ function SpellCheck_CallBack(Obj)
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Set_DefaultLanguage = function(Lang)
-{
+CDocument.prototype.Set_DefaultLanguage = function(NewLangId)
+{    
     // Устанавливаем словарь по умолчанию
-    var Styles = this.Styles;
-    Styles.Default.TextPr.Lang.Val = Lang;
+    var Styles = this.Styles;    
+    var OldLangId = Styles.Default.TextPr.Lang.Val;
+    this.History.Add( this, { Type : historyitem_Document_DefaultLanguage, Old : OldLangId, New : NewLangId } );
+    Styles.Default.TextPr.Lang.Val = NewLangId;
 
     // Нужно заново запустить проверку орфографии
     this.Restart_CheckSpelling();

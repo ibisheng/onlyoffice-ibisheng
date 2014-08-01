@@ -731,6 +731,9 @@ CDocument.prototype =
         // Заполняем массив с ZIndex для всех автофигур документа
         if(null != this.DrawingObjects)
             this.DrawingObjects.addToZIndexManagerAfterOpen();
+                
+        // Перемещаем курсор в начало документа
+        this.Cursor_MoveToStartPos( false );
     },
 
     LoadEmptyDocument : function()
@@ -2475,12 +2478,6 @@ CDocument.prototype =
         return this.DrawingObjects.canUnGroup();
     },
 
-    Add_FlowImage : function(W, H, Img)
-    {
-        // TODO: переделать данную функцию, если она вообще нужна
-        return;
-    },
-
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
         if ( undefined === bFlow )
@@ -2553,12 +2550,6 @@ CDocument.prototype =
     Get_ChartObject: function(type)
     {
         return this.DrawingObjects.getChartObject(type);
-    },
-
-    Add_FlowTable : function(Cols, Rows)
-    {
-        // TODO: переделать данную функцию, если она вообще нужна
-        return;
     },
 
     Add_InlineTable : function(Cols, Rows)
@@ -11833,6 +11824,12 @@ CDocument.prototype =
                 EvenAndOddHeaders = Data.Old;
                 break;
             }
+                
+            case historyitem_Document_DefaultLanguage:
+            {
+                this.Styles.Default.TextPr.Lang.Val = Data.Old;
+                break;
+            }
         }
     },
 
@@ -11873,6 +11870,12 @@ CDocument.prototype =
             case historyitem_Document_EvenAndOddHeaders:
             {
                 EvenAndOddHeaders = Data.New;
+                break;
+            }
+
+            case historyitem_Document_DefaultLanguage:
+            {
+                this.Styles.Default.TextPr.Lang.Val = Data.New;
                 break;
             }
         }
@@ -12320,10 +12323,17 @@ CDocument.prototype =
 
             case historyitem_Document_EvenAndOddHeaders:
             {
-                // Boold : EvenAndOddHeaders
+                // Bool : EvenAndOddHeaders
                 Writer.WriteBool( Data.New );
                 break;
             }
+
+            case historyitem_Document_DefaultLanguage:
+            {
+                // Long : LanguageId
+                Writer.WriteLong( Data.New );
+                break;
+            }                
         }
 
         return Writer;
@@ -12465,6 +12475,13 @@ CDocument.prototype =
                 
                 EvenAndOddHeaders = Reader.GetBool();
 
+                break;
+            }
+
+            case historyitem_Document_DefaultLanguage:
+            {
+                // Long : LanguageId
+                this.Styles.Default.TextPr.Lang.Val = Reader.GetLong();
                 break;
             }
         }

@@ -4405,24 +4405,13 @@ asc_docs_api.prototype.sync_HeadersAndFootersPropCallback = function(hafProp)
 
 /*----------------------------------------------------------------*/
 /*functions for working with table*/
-asc_docs_api.prototype.put_Table = function(col,row,isFlow)
+asc_docs_api.prototype.put_Table = function(col,row)
 {
-    if ( isFlow )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_Content_Add) )
     {
-        // TODO: Как только сделаем привязку Flow-таблиц к месту в документе,
-        //       добавить проверку здесь. Пока Flow-таблицы всегда можно добавить
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Add_FlowTable(col,row);
+        this.WordControl.m_oLogicDocument.Add_InlineTable(col,row);
     }
-    else
-    {
-        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_Content_Add) )
-        {
-            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Add_InlineTable(col,row);
-        }
-    }
-
 }
 asc_docs_api.prototype.addRowAbove = function(count)
 {
@@ -5260,7 +5249,6 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             var src = _image.src;
 
-            //this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
             if (this.isShapeImageChangeUrl)
             {
                 var AscShapeProp = new CAscShapeProp();
@@ -5743,15 +5731,16 @@ asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, b
 
 asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
 {
-    if (editor.WordControl.m_oLogicDocument)
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        History.Create_NewPoint();
         editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
+    }
 };
 
 asc_docs_api.prototype.asc_getDefaultLanguage = function()
 {
-    if (editor.WordControl.m_oLogicDocument)
-        return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
-    return null;
+    return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
 };
 
 asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
@@ -6588,20 +6577,10 @@ asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 		this.asyncImageEndLoaded2(_image);
 	else
     {
-        if (_image.Type == 0)
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
         {
-            // TODO: Как только сделаем привязку Flow-объектов к параграфу
-            //       добавить проверку здесь. Пока Flow-картинки всегда можно добавить
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Add_FlowImage(50, 50, _image.src);
-        }
-        else
-        {
-            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
-            {
-                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Add_InlineImage(50, 50, _image.src);
-            }
+            this.WordControl.m_oLogicDocument.Add_InlineImage(50, 50, _image.src);
         }
 	}
 };

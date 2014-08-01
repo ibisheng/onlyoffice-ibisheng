@@ -820,9 +820,10 @@ ParaRun.prototype =
         var Type = Changes[0].Data.Type;
         var Item = Changes[0].Data.Items[0];
         
-        // Добавление/удаление картинок может изменить размер строки. 
+        // Добавление/удаление картинок может изменить размер строки. Добавление/удаление переноса строки/страницы/колонки
+        // нельзя обсчитывать функцией Recalculate_Fast.
         // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
-        if ( undefined === Item || para_Drawing === Item.Type )
+        if ( undefined === Item || para_Drawing === Item.Type || para_NewLine === Item.Type )
             return false;
         
         if ( historyitem_ParaRun_AddItem === Type || historyitem_ParaRun_RemoveItem === Type )
@@ -3651,7 +3652,7 @@ ParaRun.prototype =
                         SearchPos.Pos.Update( this.Content.length, Depth );
                         Result = true;
                     }
-                }
+                } 
                 else if ( CurPos === EndPos - 1 && para_NewLine != Item.Type )
                 {
                     SearchPos.Pos.Update( EndPos, Depth );

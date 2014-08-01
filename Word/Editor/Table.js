@@ -8337,11 +8337,6 @@ CTable.prototype =
         this.CurCell.Content.Add_NewParagraph();
     },
 
-    Add_FlowImage : function(W, H, Img)
-    {
-        this.CurCell.Content.Add_FlowImage(W,H,Img);
-    },
-
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
         this.Selection.Use  = true;

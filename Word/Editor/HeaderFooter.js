@@ -601,11 +601,6 @@ CHeaderFooter.prototype =
         this.Content.Add_NewParagraph();
     },
 
-    Add_FlowImage : function(W, H, Img)
-    {
-        this.Content.Add_FlowImage(W,H,Img);
-    },
-
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
         this.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
@@ -1628,12 +1623,6 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.Add_NewParagraph();
-    },
-
-    Add_FlowImage : function(W, H, Img)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_FlowImage(W,H,Img);
     },
 
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
