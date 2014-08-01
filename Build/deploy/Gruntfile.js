@@ -210,7 +210,7 @@ module.exports = function(grunt) {
 		grunt.file.write(map_record_file_path, map_record);
 	});
 	
-	grunt.registerTask('compile_sdk_init', function() {
+	grunt.registerTask('compile_sdk_init', function(compilation_level) {
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
 		var concat_res = {};
@@ -226,7 +226,7 @@ module.exports = function(grunt) {
 				},
 				sdk: {
 					TEMPcompilerOpts: {
-						compilation_level: 'ADVANCED',
+						compilation_level: compilation_level,
 						externs: packageFile['compile']['sdk']['externs'],
 						define: packageFile['compile']['sdk']['define'],
 						warning_level: 'QUIET',
@@ -270,7 +270,8 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init', 'closureCompiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:ADVANCED', 'closureCompiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler', 'concat', 'replace', 'clean']);
 	
 	grunt.registerTask('deploy_sdk_init', function() {
         grunt.initConfig({
