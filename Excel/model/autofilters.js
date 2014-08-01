@@ -5650,7 +5650,7 @@ var gUndoInsDelCellsFlag = true;
 			{
 				elements.sort (function sortArr(a, b)
 				{
-					return a["val2"] - b["val2"];
+					return a.val2 - b.val2;
 				})
 				return elements;
 			},
