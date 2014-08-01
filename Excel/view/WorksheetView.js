@@ -6446,10 +6446,11 @@
 			
 			//null - disable, true - pressed button, false - unpressed button
 			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
+			var checkApplyFilterOrSort;
 			cell_info.isFormatTable = (null !== tablePartsOptions);
 			if(tablePartsOptions === null)
 			{
-				var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
+				checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
 				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
 				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
@@ -6457,7 +6458,7 @@
 			{
 				if(tablePartsOptions.tableRange.containsRange(activeCell))
 				{
-					var checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id);
+					checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id);
 					cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
 					cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 				}
