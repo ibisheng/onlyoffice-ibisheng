@@ -332,10 +332,10 @@
 		 * -----------------------------------------------------------------------------
 		 * @param {Woorksheet} model  Worksheet
 		 * @param {Object} handlers  Event handlers
-		 * @param {Array} buffers    DrawingContext + Overlay
+		 * @param {Object} buffers    DrawingContext + Overlay
 		 * @param {StringRender} stringRender    StringRender
 		 * @param {Number} maxDigitWidth    Максимальный размер цифры
-		 * @param {asc.CCollaborativeEditing} collaborativeEditing
+		 * @param {CCollaborativeEditing} collaborativeEditing
 		 * @param {Object} settings  Settings
 		 *
 		 * @constructor

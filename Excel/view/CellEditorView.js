@@ -268,15 +268,15 @@
 		};
 
 		CellEditor.prototype.close = function (saveValue) {
-			var t = this, opt = t.options, ret = false;
+			var opt = this.options, ret;
 
 			if (saveValue && "function" === typeof opt.saveValueCallback) {
-				ret = t._wrapFragments(opt.fragments); // восстанавливаем символы \n
-				ret = opt.saveValueCallback(opt.fragments, t.textFlags, /*skip NL check*/ret);
+				ret = this._wrapFragments(opt.fragments); // восстанавливаем символы \n
+				ret = opt.saveValueCallback(opt.fragments, this.textFlags, /*skip NL check*/ret);
 				if (!ret) {return false;}
 			}
 
-			t.isOpened = false;
+			this.isOpened = false;
 			if (window.removeEventListener) {
 				window.removeEventListener("keydown"	, this.fKeyDown		, false);
 				window.removeEventListener("keypress"	, this.fKeyPress	, false);
@@ -284,19 +284,19 @@
 				window.removeEventListener("mouseup"	, this.fKeyMouseUp	, false);
 				window.removeEventListener("mousemove"	, this.fKeyMouseMove, false);
 			}
-			t.input.blur();
-			t.isTopLineActive = false;
-			t.input.isFocused = false;
-			t._hideCursor();
+			this.input.blur();
+			this.isTopLineActive = false;
+			this.input.isFocused = false;
+			this._hideCursor();
 			// hide
-			t.canvasOuterStyle.display = "none";
+			this._hideCanvas();
 
 			// delete autoComplete
 			this.objAutoComplete = {};
 
 			// Сброс состояния редактора
 			this.m_nEditorState	= c_oAscCellEditorState.editEnd;
-			t.handlers.trigger("closed");
+			this.handlers.trigger("closed");
 			return true;
 		};
 
@@ -444,11 +444,11 @@
 
 			if (this.left < l || this.top < t || this.left > r || this.top > b) {
 				// hide
-				this.canvasOuterStyle.display = 'none';
+				this._hideCanvas();
 			} else {
-				this.canvasOuterStyle.display = 'block';
 				// ToDo выставлять опции (т.к. при scroll редактор должен пересчитываться и уменьшаться размеры)
 				this._adjustCanvas();
+				this._showCanvas();
 				this._renderText();
 				this._drawSelection();
 			}
@@ -848,6 +848,7 @@
 			this._cleanText();
 			this._cleanSelection();
 			this._adjustCanvas();
+			this._showCanvas();
 			this._renderText();
 			this.input.value = this._getFragmentsText(fragments);
 			this._updateCursorPosition();
@@ -978,13 +979,19 @@
 			this.drawingCtx.clear();
 		};
 
+		CellEditor.prototype._showCanvas = function () {
+			this.canvasOuterStyle.display = 'block';
+		};
+		CellEditor.prototype._hideCanvas = function () {
+			this.canvasOuterStyle.display = 'none';
+		};
+
 		CellEditor.prototype._adjustCanvas = function () {
-			var t = this;
-			var z = t.defaults.canvasZIndex;
-			var left = t.left * t.kx;
-			var top = t.top * t.ky;
-			var widthStyle = (t.right - t.left) * t.kx - 1; // ToDo разобраться с '-1'
-			var heightStyle = (t.bottom - t.top) * t.ky - 1;
+			var z = this.defaults.canvasZIndex;
+			var left = this.left * this.kx;
+			var top = this.top * this.ky;
+			var widthStyle = (this.right - this.left) * this.kx - 1; // ToDo разобраться с '-1'
+			var heightStyle = (this.bottom - this.top) * this.ky - 1;
 			var isRetina = AscBrowser.isRetina;
 			var width = widthStyle, height = heightStyle;
 
@@ -996,21 +1003,18 @@
 				heightStyle >>= 1;
 			}
 
-			t.canvasOuterStyle.left = left + 'px';
-			t.canvasOuterStyle.top = top + 'px';
-			t.canvasOuterStyle.width = widthStyle + 'px';
-			t.canvasOuterStyle.height = heightStyle + 'px';
-			t.canvasOuterStyle.zIndex = t.top <= 0 ? -1 : z;
+			this.canvasOuterStyle.left = left + 'px';
+			this.canvasOuterStyle.top = top + 'px';
+			this.canvasOuterStyle.width = widthStyle + 'px';
+			this.canvasOuterStyle.height = heightStyle + 'px';
+			this.canvasOuterStyle.zIndex = this.top <= 0 ? -1 : z;
 
-			t.canvas.width = t.canvasOverlay.width = width;
-			t.canvas.height = t.canvasOverlay.height = height;
+			this.canvas.width = this.canvasOverlay.width = width;
+			this.canvas.height = this.canvasOverlay.height = height;
 			if (isRetina) {
-				t.canvas.style.width = t.canvasOverlay.style.width = widthStyle + 'px';
-				t.canvas.style.height = t.canvasOverlay.style.height = heightStyle + 'px';
+				this.canvas.style.width = this.canvasOverlay.style.width = widthStyle + 'px';
+				this.canvas.style.height = this.canvasOverlay.style.height = heightStyle + 'px';
 			}
-
-			// show
-			t.canvasOuterStyle.display = 'block';
 		};
 
 		CellEditor.prototype._renderText = function (dy) {
