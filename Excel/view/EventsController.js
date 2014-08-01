@@ -254,7 +254,7 @@
 		};
 
 		/**
-		 * @param delta {Object}
+		 * @param delta {{deltaX: number, deltaY: number}}
 		 */
 		asc_CEventsController.prototype.scroll = function (delta) {
 			if (delta) {

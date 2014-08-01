@@ -10417,13 +10417,13 @@
 
 		WorksheetView.prototype.openCellEditor = function (editor, x, y, isCoord, fragments, cursorPos,
 														   isFocus, isClearCell, isHideCursor, isQuickInput, activeRange) {
-			var t = this, vr = t.visibleRange.clone(), tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg, isMerged;
+			var t = this, vr, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
 			var offsetX = 0, offsetY = 0;
-			var ar = t.activeRange;
+			var ar = this.activeRange;
 			if (activeRange)
-				t.activeRange = activeRange.clone();
+				this.activeRange = activeRange.clone();
 
-			if (t.objectRender.checkCursorDrawingObject(x, y))
+			if (this.objectRender.checkCursorDrawingObject(x, y))
 				return false;
 
 			function getLeftSide(col) {
@@ -10474,10 +10474,10 @@
 			}
 
 			if (isCoord) {
-				x *= asc_getcvt( 0/*px*/, 1/*pt*/, t._getPPIX() );
-				y *= asc_getcvt( 0/*px*/, 1/*pt*/, t._getPPIY() );
-				col = t._findColUnderCursor(x, true);
-				row = t._findRowUnderCursor(y, true);
+				x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
+				y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+				col = this._findColUnderCursor(x, true);
+				row = this._findRowUnderCursor(y, true);
 				if (!col || !row) {return false;}
 				col = col.col;
 				row = row.row;
@@ -10487,9 +10487,24 @@
 			}
 
 			// Возможно стоит заменить на ячейку из кеша
-			c = t._getVisibleCell(col, row);
+			c = this._getVisibleCell(col, row);
 			if (!c) {throw "Can not get cell data (col=" + col + ", row=" + row + ")";}
 
+			fl = this._getCellFlags(c);
+			isMerged = fl.isMerged();
+			if (isMerged) {
+				mc = fl.merged;
+				c = this._getVisibleCell(mc.c1, mc.r1);
+				if (!c) {throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";}
+				fl = this._getCellFlags(c);
+			}
+
+			// Выставляем режим 'не редактируем' (иначе мы попытаемся переместить редактор, который еще не открыт)
+			this.isCellEditMode = false;
+			this.handlers.trigger("onScroll", this._calcActiveCellOffset());
+			this.isCellEditMode = true;
+
+			vr = this.visibleRange.clone();
 			if (this.topLeftFrozenCell) {
 				var cFrozen = this.topLeftFrozenCell.getCol0();
 				var rFrozen = this.topLeftFrozenCell.getRow0();
@@ -10511,44 +10526,10 @@
 				}
 			}
 
-			fl = t._getCellFlags(c);
-			isMerged = fl.isMerged();
-			if (isMerged) {
-				mc = fl.merged;
-				c = t._getVisibleCell(mc.c1, mc.r1);
-				if (!c) {throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";}
-				fl = t._getCellFlags(c);
-
-				// Первую ячейку нужно сделать видимой
-				var bIsUpdateX = false;
-				var bIsUpdateY = false;
-				if (mc.c1 < vr.c1) {
-					t.visibleRange.c1 = vr.c1 = mc.c1;
-					bIsUpdateX = true;
-					t._calcVisibleColumns();
-				}
-				if (mc.r1 < vr.r1) {
-					t.visibleRange.r1 = vr.r1 = mc.r1;
-					bIsUpdateY = true;
-					t._calcVisibleRows();
-				}
-				if (bIsUpdateX && bIsUpdateY) {
-					this.handlers.trigger("reinitializeScroll");
-				} else if (bIsUpdateX) {
-					this.handlers.trigger("reinitializeScrollX");
-				} else if (bIsUpdateY) {
-					this.handlers.trigger("reinitializeScrollY");
-				}
-
-				if (bIsUpdateX || bIsUpdateY) {
-					t.draw();
-				}
-			}
-
 			bg = c.getFill();
-			t.isFormulaEditMode = false;
+			this.isFormulaEditMode = false;
 			// Очищаем массив ячеек для текущей формулы
-			t.arrActiveFormulaRanges = [];
+			this.arrActiveFormulaRanges = [];
 
 			var oFontColor = c.getFontcolor();
 			// Скрываем окно редактирования комментария
@@ -10565,18 +10546,18 @@
 			var arrAutoCompleteLC = asc.arrayToLowerCase(arrAutoComplete);
 
 			editor.open({
-				cellX: t.cellsLeft + tc[!isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
-				cellY: t.cellsTop + tr[!isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
+				cellX: this.cellsLeft + tc[!isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetX,
+				cellY: this.cellsTop + tr[!isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetY,
 				leftSide: getLeftSide(!isMerged ? col : mc.c1),
 				rightSide: getRightSide(!isMerged ? col : mc.c2),
 				bottomSide: getBottomSide(!isMerged ? row : mc.r2),
 				fragments: fragments,
 				flags: fl,
 				font: new asc_FP(c.getFontname(), c.getFontsize()),
-				background: bg || t.settings.cells.defaultState.background,
-				textColor: oFontColor || t.settings.cells.defaultState.color,
+				background: bg || this.settings.cells.defaultState.background,
+				textColor: oFontColor || this.settings.cells.defaultState.color,
 				cursorPos: cursorPos,
-				zoom: t.getZoom(),
+				zoom: this.getZoom(),
 				focus: isFocus,
 				isClearCell: isClearCell,
 				isHideCursor: isHideCursor,

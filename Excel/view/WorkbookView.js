@@ -363,7 +363,8 @@
 				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
 				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
-				"updateSheetViewSettings"	: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");}
+				"updateSheetViewSettings"	: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");},
+				"onScroll"					: function (d) {self.controller.scroll(d);}
 			});
 
 			this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
