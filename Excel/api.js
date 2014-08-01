@@ -1154,6 +1154,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return false;
 			},
 
+			asc_getCanUndo: function () {
+				return History.Can_Undo();
+			},
+			asc_getCanRedo: function () {
+				return History.Can_Redo();
+			},
+
 
 			// Actions and callbacks interface
 
@@ -3626,6 +3633,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getDocumentName"] = prot.asc_getDocumentName;
 		prot["asc_getDocumentFormat"] = prot.asc_getDocumentFormat;
 		prot["asc_isDocumentModified"] = prot.asc_isDocumentModified;
+		prot["asc_getCanUndo"] = prot.asc_getCanUndo;
+		prot["asc_getCanRedo"] = prot.asc_getCanRedo;
 
 		prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
