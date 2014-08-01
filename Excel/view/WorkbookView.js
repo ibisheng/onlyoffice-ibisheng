@@ -532,8 +532,13 @@
 			// При редактировании ячейки не нужно пересылать изменения
 			if (this.input && false === ws.getCellEditMode()) {
 				// Сами запретим заходить в строку формул, когда выделен shape
-				this.input.disabled = true === this.lastSendInfoRangeIsSelectOnShape;
-				this.input.value = info.text;
+				if (this.lastSendInfoRangeIsSelectOnShape) {
+					this.input.disabled = true;
+					this.input.value = '';
+				} else {
+					this.input.disabled = false;
+					this.input.value = info.text;
+				}
 			}
 			this.handlers.trigger("asc_onSelectionChanged", info);
 		};
