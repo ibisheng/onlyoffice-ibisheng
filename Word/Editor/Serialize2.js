@@ -837,6 +837,10 @@ function BinaryFileWriter(doc)
 		
 		this.WriteMainTableStart();
 		
+		var oMapCommentId = {};
+		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId));
+		this.copyParams.bdtw.oMapCommentId = oMapCommentId;
+		
 		this.copyParams.nDocumentWriterTablePos = this.WriteTableStart(c_oSerTableTypes.Document);
 		this.copyParams.nDocumentWriterPos = this.bs.WriteItemWithLengthStart();
 	}
@@ -5290,6 +5294,112 @@ function BinaryFileReader(doc, openParams)
 			
 			this.Document.On_EndLoad();
 		};
+		
+		//add comments
+		var setting = this.oReadResult.setting;        
+		var fInitCommentData = function(comment)
+		{
+			var oCommentObj = new CCommentData();
+			if(null != comment.UserName)
+				oCommentObj.m_sUserName = comment.UserName;
+			if(null != comment.UserId)
+				oCommentObj.m_sUserId = comment.UserId;
+			if(null != comment.Date)
+				oCommentObj.m_sTime = comment.Date;
+			if(null != comment.Text)
+				oCommentObj.m_sText = comment.Text;
+			if(null != comment.Solved)
+				oCommentObj.m_bSolved = comment.Solved;
+			if(null != comment.Replies)
+			{
+				for(var  i = 0, length = comment.Replies.length; i < length; ++i)
+					oCommentObj.Add_Reply(fInitCommentData(comment.Replies[i]));
+			}
+			return oCommentObj;
+		}
+		
+		var oCommentsNewId = {};
+		for(var i in this.oReadResult.oComments)
+		{
+			if(this.oReadResult.oCommentsPlaces && this.oReadResult.oCommentsPlaces[i] && this.oReadResult.oCommentsPlaces[i].Start != null && this.oReadResult.oCommentsPlaces[i].End != null)
+			{
+				var oOldComment = this.oReadResult.oComments[i];
+				var oNewComment = new CComment(this.Document.Comments, fInitCommentData(oOldComment))
+				this.Document.Comments.Add(oNewComment);
+				oCommentsNewId[oOldComment.Id] = oNewComment;
+			}
+		}
+		for(var i in this.oReadResult.oCommentsPlaces)
+		{
+			var item = this.oReadResult.oCommentsPlaces[i];
+			if((null != item.Start && null != item.End) || (null != item.Ref && null == item.Start && null == item.End))
+			{
+				var oStart = null;
+				var oEnd = null;
+				var bRef = false;
+				if(null != item.Start && null != item.End)
+				{
+					oStart = item.Start;
+					oEnd = item.End;
+				}
+				else if(null != item.Ref)
+				{
+					bRef = true;
+					oStart = oEnd = item.Ref;
+				}
+				
+				if(null != oStart || null != oEnd)
+				{
+					var nId = oStart.Id;
+					var oCommentObj = oCommentsNewId[nId];
+					if(oCommentObj)
+					{
+						if(null != item.QuoteText)
+							oCommentObj.Data.m_sQuoteText = item.QuoteText;
+						var fInsert = function(bStart, bRef, oCommentPosition)
+						{
+							var index = 0;
+							var oParent = oCommentPosition.oParent;
+							if(null != oParent)
+							{
+								if(bRef)
+								{
+									if(bStart)
+										index = 0;
+									else
+									    index = OpenParStruct.prototype._GetContentLength(oParent) - 1;
+								}
+								else if(oCommentPosition.oAfter)
+								{
+								    for (var j = 0, length2 = OpenParStruct.prototype._GetContentLength(oParent) ; j < length2; ++j)
+									{
+								        if (OpenParStruct.prototype._GetFromContent(oParent, j) == oCommentPosition.oAfter)
+										{
+											index = j + 1;
+											break;
+										}
+									}
+								}
+								var oParaCommentElem;
+								if(bStart)
+									oParaCommentElem = new ParaComment(true, oCommentObj.Get_Id());
+								else
+								    oParaCommentElem = new ParaComment(false, oCommentObj.Get_Id());
+								OpenParStruct.prototype._addToContent(oParent, index, oParaCommentElem);
+							}
+						}
+						fInsert(false, bRef, oEnd);
+						fInsert(true, bRef, oStart);
+					}
+				}
+			}
+		}
+		//посылаем событие о добавлении комментариев
+		for(var i in oCommentsNewId)
+		{
+			var oNewComment = oCommentsNewId[i];
+			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
+		}
 		
         return { content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages, bInBlock: bInBlock };
     }
