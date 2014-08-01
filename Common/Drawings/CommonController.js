@@ -2999,9 +2999,9 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            Cat = { Formula: "Sheet1!A2:A5", NumCache: [createItem2(38719, "d\-mmm\-yy"), createItem2(38720, "d\-mmm\-yy"), createItem2(38721, "d\-mmm\-yy"), createItem2(38722, "d\-mmm\-yy"), createItem2(38723, "d\-mmm\-yy")], formatCode: "d\-mmm\-yy" };
+            Cat = { Formula: "Sheet1!A2:A6", NumCache: [createItem2(38719, "d\-mmm\-yy"), createItem2(38720, "d\-mmm\-yy"), createItem2(38721, "d\-mmm\-yy"), createItem2(38722, "d\-mmm\-yy"), createItem2(38723, "d\-mmm\-yy")], formatCode: "d\-mmm\-yy" };
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!B2:B5";
+            seria.Val.Formula = "Sheet1!B2:B6";
             seria.Val.NumCache = [ createItem(40), createItem(21), createItem(37), createItem(49), createItem(32)];
             seria.TxCache.Formula = "Sheet1!B1";
             seria.TxCache.Tx = "Open";
@@ -3009,7 +3009,7 @@ DrawingObjectsController.prototype =
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!C2:C5";
+            seria.Val.Formula = "Sheet1!C2:C6";
             seria.Val.NumCache = [ createItem(57), createItem(54), createItem(52), createItem(59), createItem(34)];
             seria.TxCache.Formula = "Sheet1!C1";
             seria.TxCache.Tx = "High";
@@ -3017,7 +3017,7 @@ DrawingObjectsController.prototype =
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!D2:D5";
+            seria.Val.Formula = "Sheet1!D2:D6";
             seria.Val.NumCache = [ createItem(10), createItem(14), createItem(14), createItem(12), createItem(6)];
             seria.TxCache.Formula = "Sheet1!D1";
             seria.TxCache.Tx = "Low";
@@ -3025,7 +3025,7 @@ DrawingObjectsController.prototype =
             series.push(seria);
 
             seria = new asc_CChartSeria();
-            seria.Val.Formula = "Sheet1!E2:E5";
+            seria.Val.Formula = "Sheet1!E2:E6";
             seria.Val.NumCache = [ createItem(24), createItem(35), createItem(48), createItem(35), createItem(15)];
             seria.TxCache.Formula = "Sheet1!E1";
             seria.TxCache.Tx = "Close";

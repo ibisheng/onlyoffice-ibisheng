@@ -829,7 +829,7 @@ CChartSpace.prototype =
         {
             if(val.numRef.numCache)
             {
-                val.numRef.setNumCache(null);
+                removePtsFromLit(val.numRef.numCache);
             }
         }
         if(val.strRef)
@@ -2165,8 +2165,17 @@ CChartSpace.prototype =
                 }
                 var f1 = val.numRef.f.slice(first_slice, last_slice);
                 var arr_f = f1.split(",");
-                var num_cache = new CNumLit();
-                num_cache.setFormatCode("General");
+
+                var num_cache;
+                if(!val.numRef.numCache )
+                {
+                    num_cache = new CNumLit();
+                    num_cache.setFormatCode("General");
+                }
+                else
+                {
+                    num_cache = val.numRef.numCache;
+                }
                 var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true;
                 for(i = 0; i < arr_f.length; ++i)
                 {
@@ -2342,6 +2351,7 @@ CChartSpace.prototype =
                     //cat
                     checkValByNumRef(this, ser, ser.cat);
                     checkCatByNumRef(this, ser, ser.cat);
+                    checkValByNumRef(this, ser, ser.cat);
                     //tx
                     checkCatByNumRef(this, ser, ser.tx);
 
