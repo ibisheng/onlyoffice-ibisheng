@@ -765,10 +765,10 @@ MoveState.prototype =
         var page = this.drawingObjects.document.Pages[pageIndex];
         snapHorArray.push(page.Margins.Left);
         snapHorArray.push(page.Margins.Right);
-        snapHorArray.push(page.W/2);
+        snapHorArray.push(page.Width/2);
         snapVerArray.push(page.Margins.Top);
         snapVerArray.push(page.Margins.Bottom);
-        snapVerArray.push(page.H/2);
+        snapVerArray.push(page.Height/2);
         if(result_x === this.startX)
         {
             min_dx = 0;
