@@ -211,7 +211,7 @@
 				fontSize: 11,
 				defaultState: {
 					background: new CColor(255, 255, 255),
-					border: new CColor(218, 220, 221),
+					border: new CColor(212, 212, 212),
 					color: new CColor(0, 0, 0)
 				},
 				padding: 2/*px horizontal padding*/
