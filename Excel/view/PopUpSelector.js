@@ -186,10 +186,13 @@
 						retVal = true;
 					break;
 				case 13:  // Enter
-					if (!this.isFormula && null !== this.selectElement) {
+					if (null !== this.selectElement) {
 						event.stopPropagation();
 						event.preventDefault();
-						this._onInsert(this.selectElement.getAttribute('val'));
+						if (this.isFormula)
+							this._onMouseDblClick();
+						else
+							this._onInsert(this.selectElement.getAttribute('val'));
 					} else
 						retVal = true;
 					break;
