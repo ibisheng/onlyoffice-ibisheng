@@ -254,6 +254,16 @@
 		};
 
 		/**
+		 * @param delta {Object}
+		 */
+		asc_CEventsController.prototype.scroll = function (delta) {
+			if (delta) {
+				if (delta.deltaX) {this.scrollHorizontal(delta.deltaX);}
+				if (delta.deltaY) {this.scrollVertical(delta.deltaY);}
+			}
+		};
+
+		/**
 		 * @param delta {Number}
 		 * @param [event] {MouseEvent}
 		 */
@@ -403,8 +413,7 @@
 			this.handlers.trigger("changeSelection", /*isStartPoint*/false, coord.x, coord.y,
 				/*isCoord*/true, /*isSelectMode*/isSelectMode,
 				function (d) {
-					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-					if (d.deltaY) {t.scrollVertical(d.deltaY);}
+					t.scroll(d);
 
 					if (t.isFormulaEditMode)
 						t.handlers.trigger("enterCellRange");
@@ -516,8 +525,7 @@
 			this.handlers.trigger("changeFillHandle", coord.x, coord.y,
 				function (d) {
 					if (!d) return;
-					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-					if (d.deltaY) {t.scrollVertical(d.deltaY);}
+					t.scroll(d);
 					asc_applyFunction(callback);
 				});
 		};
@@ -562,8 +570,7 @@
 			this.handlers.trigger("moveRangeHandle", coord.x, coord.y,
 				function (d) {
 					if (!d) return;
-					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-					if (d.deltaY) {t.scrollVertical(d.deltaY);}
+					t.scroll(d);
 					asc_applyFunction(callback);
 				}, event.metaKey || event.ctrlKey);
 		};
@@ -601,8 +608,7 @@
 			this.handlers.trigger("moveResizeRangeHandle", coord.x, coord.y, target,
 				function (d) {
 					if (!d) return;
-					if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-					if (d.deltaY) {t.scrollVertical(d.deltaY);}
+					t.scroll(d);
 					asc_applyFunction(callback);
 				});
 		};
@@ -942,11 +948,7 @@
 
 				// Проверка на движение в выделенной области
 				if (selectionActivePointChanged) {
-					t.handlers.trigger("selectionActivePointChanged", dc, dr,
-						function (d) {
-							if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-							if (d.deltaY) {t.scrollVertical(d.deltaY);}
-						});
+					t.handlers.trigger("selectionActivePointChanged", dc, dr, function (d) {t.scroll(d);});
 				} else {
 					if (this.isCellEditMode && !this.isFormulaEditMode) {
 						if (!t.handlers.trigger("stopCellEditing")) {return true;}
@@ -962,8 +964,7 @@
 					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr,
 							/*isCoord*/false, /*isSelectMode*/false,
 							function (d) {
-								if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-								if (d.deltaY) {t.scrollVertical(d.deltaY);}
+								t.scroll(d);
 
 								if (t.isFormulaEditMode) {
 									t.handlers.trigger("enterCellRange");
@@ -1291,8 +1292,7 @@
 						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y,
 								/*isCoord*/true, /*isSelectMode*/true,
 								function (d) {
-									if (d.deltaX) {t.scrollHorizontal(d.deltaX);}
-									if (d.deltaY) {t.scrollVertical(d.deltaY);}
+									t.scroll(d);
 
 									if (t.isFormulaEditMode) {
 										t.handlers.trigger("enterCellRange");

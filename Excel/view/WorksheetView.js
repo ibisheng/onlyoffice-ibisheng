@@ -331,7 +331,7 @@
 		 * Widget for displaying and editing Worksheet object
 		 * -----------------------------------------------------------------------------
 		 * @param {Woorksheet} model  Worksheet
-		 * @param {Object} handlers  Event handlers
+		 * @param {asc_CHandlersList} handlers  Event handlers
 		 * @param {Object} buffers    DrawingContext + Overlay
 		 * @param {StringRender} stringRender    StringRender
 		 * @param {Number} maxDigitWidth    Максимальный размер цифры
@@ -342,10 +342,6 @@
 		 * @memberOf Asc
 		 */
 		function WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
-			if ( !(this instanceof WorksheetView) ) {
-				return new WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings);
-			}
-
 			this.defaults = new WorksheetViewSettings();
 			this.settings = $.extend(true, {}, this.defaults, settings);
 
@@ -355,8 +351,7 @@
 
 			this.vspRatio = 1.275;
 
-			this.handlers = new asc.asc_CHandlersList(handlers);
-
+			this.handlers = handlers;
 			this.model = model;
 
 			this.buffers = buffers;

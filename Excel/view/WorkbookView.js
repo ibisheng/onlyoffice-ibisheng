@@ -76,6 +76,7 @@
 			this.model					= model;
 			this.controller				= controller;
 			this.handlers				= handlers;
+			this.wsViewHandlers			= null;
 			this.element				= elem;
 			this.input					= inputElem;
 			this.settings				= $.extend(true, {}, this.defaults, settings);
@@ -347,6 +348,24 @@
 				});
 			}
 
+			this.wsViewHandlers = new asc.asc_CHandlersList(/*handlers*/{
+				"getViewerMode"				: function () { return self.controller.getViewerMode ? self.controller.getViewerMode() : true; },
+				"reinitializeScroll"		: function () {self.controller.reinitializeScroll(/*All*/);},
+				"reinitializeScrollY"		: function () {self.controller.reinitializeScroll(/*vertical*/1);},
+				"reinitializeScrollX"		: function () {self.controller.reinitializeScroll(/*horizontal*/2);},
+				"selectionChanged"			: function () {self._onWSSelectionChanged.apply(self, arguments);},
+				"selectionNameChanged"		: function () {self._onSelectionNameChanged.apply(self, arguments);},
+				"selectionMathInfoChanged"	: function () {self._onSelectionMathInfoChanged.apply(self, arguments);},
+				"onErrorEvent"				: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
+				"slowOperation"				: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
+				"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
+				"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
+				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
+				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
+				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
+				"updateSheetViewSettings"	: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");}
+			});
+
 			this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
 				var ws = self.getWorksheetById(wsId);
 				if (ws)
@@ -484,24 +503,8 @@
 		};
 
 		WorkbookView.prototype._createWorksheetView = function (wsModel) {
-			var self = this, opt  = $.extend(true, {}, this.settings.worksheetDefaults);
-			return new asc_WSV(wsModel, /*handlers*/{
-				"getViewerMode"				: function () { return self.controller.getViewerMode ? self.controller.getViewerMode() : true; },
-				"reinitializeScroll"		: function () {self.controller.reinitializeScroll(/*All*/);},
-				"reinitializeScrollY"		: function () {self.controller.reinitializeScroll(/*vertical*/1);},
-				"reinitializeScrollX"		: function () {self.controller.reinitializeScroll(/*horizontal*/2);},
-				"selectionChanged"			: function () {self._onWSSelectionChanged.apply(self, arguments);},
-				"selectionNameChanged"		: function () {self._onSelectionNameChanged.apply(self, arguments);},
-				"selectionMathInfoChanged"	: function () {self._onSelectionMathInfoChanged.apply(self, arguments);},
-				"onErrorEvent"				: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
-				"slowOperation"				: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
-				"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
-				"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
-				"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);},
-				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
-				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
-				"updateSheetViewSettings"		: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");}
-			}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
+			var opt  = $.extend(true, {}, this.settings.worksheetDefaults);
+			return new asc_WSV(wsModel, this.wsViewHandlers, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 		};
 
 		WorkbookView.prototype._onSelectionNameChanged = function (name) {
@@ -577,10 +580,7 @@
 			var ws = this.getWorksheet();
 			ws._checkSelectionShape();
 			var d = ws.setSelectionUndoRedo(range, validRange);
-			if (d) {
-				if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
-				if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
-			}
+			this.controller.scroll(d);
 		};
 
 		WorkbookView.prototype._onGetSelection = function () {
@@ -602,10 +602,7 @@
                     ws.objectRender.controller.setSelectionState(state);
                     ws.setSelectionShape(true);
                     var d = ws._calcActiveCellOffset(ws.objectRender.getSelectedDrawingsRange());
-                    if (d) {
-                        if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
-                        if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
-                    }
+					this.controller.scroll(d);
                     ws.objectRender.showDrawingObjectsEx(true);
                     ws.objectRender.controller.updateOverlay();
                     ws.objectRender.controller.updateSelectionState();
