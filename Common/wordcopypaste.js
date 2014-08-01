@@ -2741,10 +2741,12 @@ PasteProcessor.prototype =
         if(false == this.bNested && nInsertLength > 0)
         {
             this.oRecalcDocument.Recalculate();
-            if(this.oLogicDocument.CurPos.Type !== docpostype_DrawingObjects)
+            
+            if( this.oLogicDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText() )
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false);
             }
+            
             this.oLogicDocument.Document_UpdateInterfaceState();
         }
 
