@@ -2945,49 +2945,96 @@ DrawingObjectsController.prototype =
 
 	getSeriesDefault: function (type) {
 		// Обновлены тестовые данные для новой диаграммы
-		function createItem(value) {
-			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
-		}
-		var bIsScatter = (c_oAscChartTypeSettings.scatter <= type && type <= c_oAscChartTypeSettings.scatterSmoothMarker);
 
-		var Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
 
-		var series = [];
+        var series = [], seria, Cat;
+        var  createItem = function(value) {
+            return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
+        };
+        var  createItem2 = function(value, formatCode) {
+            return { numFormatStr: formatCode, isDateTimeFormat: false, val: value, isHidden: false };
+        };
+        if(type !== c_oAscChartTypeSettings.stock)
+        {
 
-		var seria = new asc_CChartSeria();
-		seria.Val.Formula = "Sheet1!B2:B7";
-		seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
-		seria.TxCache.Formula = "Sheet1!B1";
-		seria.TxCache.Tx = "Gold";
-		if (!bIsScatter)
-			seria.Cat = Cat;
-		else
-			seria.xVal = Cat;
-		series.push(seria);
+            var bIsScatter = (c_oAscChartTypeSettings.scatter <= type && type <= c_oAscChartTypeSettings.scatterSmoothMarker);
 
-		seria = new asc_CChartSeria();
-		seria.Val.Formula = "Sheet1!C2:C7";
-		seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
-		seria.TxCache.Formula = "Sheet1!C1";
-		seria.TxCache.Tx = "Silver";
-		if (!bIsScatter)
-			seria.Cat = Cat;
-		else
-			seria.xVal = Cat;
-		series.push(seria);
+            Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
 
-		seria = new asc_CChartSeria();
-		seria.Val.Formula = "Sheet1!D2:D7";
-		seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
-		seria.TxCache.Formula = "Sheet1!D1";
-		seria.TxCache.Tx = "Bronze";
-		if (!bIsScatter)
-			seria.Cat = Cat;
-		else
-			seria.xVal = Cat;
-		series.push(seria);
 
-		return series;
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!B2:B7";
+            seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
+            seria.TxCache.Formula = "Sheet1!B1";
+            seria.TxCache.Tx = "Gold";
+            if (!bIsScatter)
+                seria.Cat = Cat;
+            else
+                seria.xVal = Cat;
+            series.push(seria);
+
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!C2:C7";
+            seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
+            seria.TxCache.Formula = "Sheet1!C1";
+            seria.TxCache.Tx = "Silver";
+            if (!bIsScatter)
+                seria.Cat = Cat;
+            else
+                seria.xVal = Cat;
+            series.push(seria);
+
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!D2:D7";
+            seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
+            seria.TxCache.Formula = "Sheet1!D1";
+            seria.TxCache.Tx = "Bronze";
+            if (!bIsScatter)
+                seria.Cat = Cat;
+            else
+                seria.xVal = Cat;
+            series.push(seria);
+
+            return series;
+        }
+        else
+        {
+            Cat = { Formula: "Sheet1!A2:A5", NumCache: [createItem2(38719, "d\-mmm\-yy"), createItem2(38720, "d\-mmm\-yy"), createItem2(38721, "d\-mmm\-yy"), createItem2(38722, "d\-mmm\-yy"), createItem2(38723, "d\-mmm\-yy")], formatCode: "d\-mmm\-yy" };
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!B2:B5";
+            seria.Val.NumCache = [ createItem(40), createItem(21), createItem(37), createItem(49), createItem(32)];
+            seria.TxCache.Formula = "Sheet1!B1";
+            seria.TxCache.Tx = "Open";
+            seria.Cat = Cat;
+            series.push(seria);
+
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!C2:C5";
+            seria.Val.NumCache = [ createItem(57), createItem(54), createItem(52), createItem(59), createItem(34)];
+            seria.TxCache.Formula = "Sheet1!C1";
+            seria.TxCache.Tx = "High";
+            seria.Cat = Cat;
+            series.push(seria);
+
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!D2:D5";
+            seria.Val.NumCache = [ createItem(10), createItem(14), createItem(14), createItem(12), createItem(6)];
+            seria.TxCache.Formula = "Sheet1!D1";
+            seria.TxCache.Tx = "Low";
+            seria.Cat = Cat;
+            series.push(seria);
+
+            seria = new asc_CChartSeria();
+            seria.Val.Formula = "Sheet1!E2:E5";
+            seria.Val.NumCache = [ createItem(24), createItem(35), createItem(48), createItem(35), createItem(15)];
+            seria.TxCache.Formula = "Sheet1!E1";
+            seria.TxCache.Tx = "Close";
+            seria.Cat = Cat;
+            series.push(seria);
+
+            return series;
+        }
+
 	},
 
     changeCurrentState: function(newState)

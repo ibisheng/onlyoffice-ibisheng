@@ -2671,8 +2671,18 @@ function DrawingObjects() {
                     function fillTableFromRef(ref)
                     {
                         var cache = ref.numCache ? ref.numCache : (ref.strCache ? ref.strCache : null);
+                        var lit_format_code;
                         if(cache)
                         {
+
+                            if(typeof cache.formatCode === "string" && cache.formatCode.length > 0)
+                            {
+                                lit_format_code = cache.formatCode;
+                            }
+                            else
+                            {
+                                lit_format_code = "General"
+                            }
                             var f1 = ref.f.replace(/\(|\)/g,"");
                             var arr_f = f1.split(",");
                             var pt_index = 0, i, j, cell, pt;
@@ -2722,7 +2732,7 @@ function DrawingObjects() {
                                                     pt = cache.getPtByIndex(pt_index);
                                                     if(pt)
                                                     {
-                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : "General");
+                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
                                                         cell.setValue(pt.val + "");
                                                     }
                                                     ++pt_index;
@@ -2736,7 +2746,7 @@ function DrawingObjects() {
                                                     pt = cache.getPtByIndex(pt_index);
                                                     if(pt)
                                                     {
-                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : "General");
+                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
                                                         cell.setValue(pt.val + "");
                                                     }
                                                     ++pt_index;
