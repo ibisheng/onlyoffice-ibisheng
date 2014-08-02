@@ -6989,6 +6989,8 @@ Paragraph.prototype =
 
                 var DrawSelection = new CParagraphDrawSelectionRange();
 
+                var bFrame = ( undefined !== this.Get_FramePr() ? true : false );
+
                 for ( var CurLine = _StartLine; CurLine <= _EndLine; CurLine++ )
                 {
                     var Line = this.Lines[CurLine];
@@ -7027,6 +7029,19 @@ Paragraph.prototype =
 
                         var StartY = DrawSelection.StartY;
                         var H      = DrawSelection.H;
+                        
+                        if ( true === bFrame )
+                        {
+                            var Frame_X_min = this.CalculatedFrame.L2;
+                            var Frame_Y_min = this.CalculatedFrame.T2;
+                            var Frame_X_max = this.CalculatedFrame.L2 + this.CalculatedFrame.W2;
+                            var Frame_Y_max = this.CalculatedFrame.T2 + this.CalculatedFrame.H2;
+                                                        
+                            StartX = Math.min( Math.max( Frame_X_min, StartX ), Frame_X_max );
+                            StartY = Math.min( Math.max( Frame_Y_min, StartY ), Frame_Y_max );
+                            W      = Math.min( W, Frame_X_max - StartX );
+                            H      = Math.min( H, Frame_Y_max - StartY );
+                        }
 
                         // Отрисовываем селект
                         if ( W > 0.001 )

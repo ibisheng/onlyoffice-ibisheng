@@ -299,7 +299,11 @@ ParaRun.prototype =
             var CurPos = this.State.ContentPos;
 
             if ( Direction < 0 )
-            {
+            {                           
+                // Пропускаем все Flow-объекты
+                while ( CurPos > 0 && para_Drawing === this.Content[CurPos - 1].Type && false === this.Content[CurPos - 1].Is_Inline() )
+                    CurPos--;
+                
                 if ( CurPos <= 0 )
                     return false;
 
@@ -814,6 +818,9 @@ ParaRun.prototype =
     // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
     Is_SimpleChanges : function(Changes)
     {
+        if ( para_Math_Run === this.Type )
+            return false;
+        
         if ( Changes.length !== 1 || undefined === Changes[0].Data.Items || Changes[0].Data.Items.length <= 0 )
             return false;
 

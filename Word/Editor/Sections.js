@@ -70,7 +70,7 @@ CSectionPr.prototype =
         this.Set_Orientation( Other.PageSize.Orient, false );
 
         // Настройки отступов
-        this.Set_PageMargins( Other.PageMargins.L, Other.PageMargins.T, Other.PageMargins.R, Other.PageMargins.B );
+        this.Set_PageMargins( Other.PageMargins.Left, Other.PageMargins.Top, Other.PageMargins.Right, Other.PageMargins.Bottom );
 
         // Настройки границ
         this.Set_Borders_Left( Other.Borders.Left );

@@ -823,6 +823,7 @@ var historyitem_Document_PageSize          = 4; // Меняем размер с�
 var historyitem_Document_Orientation       = 5; // Меняем ориентацию страниц у документа
 var historyitem_Document_DefaultTab        = 6; // Меняем таб по умолчанию
 var historyitem_Document_EvenAndOddHeaders = 7; // Меняем настройку различия четных/нечетных колонтитулов
+var historyitem_Document_DefaultLanguage   = 8; // Меняем язык по умолчанию для всего документа
 
 // Типы изменений в классе Paragraph
 var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф

@@ -81,7 +81,7 @@ CHeaderFooter.prototype =
     Copy : function()
     {
         var NewHdrFtr = new CHeaderFooter(this.Parent, this.LogicDocument, this.DrawingDocument, this.Type);
-        NewHdrFtr.Content = this.Content.Copy( NewHdrFtr );
+        NewHdrFtr.Content.Copy2( this.Content );
         return NewHdrFtr;
     },
     

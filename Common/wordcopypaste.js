@@ -2742,7 +2742,7 @@ PasteProcessor.prototype =
         {
             this.oRecalcDocument.Recalculate();
             
-            if( this.oLogicDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText() )
+            if( oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText() )
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false);
             }

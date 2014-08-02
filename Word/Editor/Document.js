@@ -752,7 +752,6 @@ CDocument.prototype =
         var ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
 
         this.CurPos.Type = docpostype_Content;
-        this.Selection_Remove();
         this.CurPos.ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
 
         if ( true === this.Content[ContentPos].Is_SelectionUse() )
@@ -761,6 +760,8 @@ CDocument.prototype =
             this.Selection.StartPos = ContentPos;
             this.Selection.EndPos   = ContentPos;
         }
+        else
+            this.Selection_Remove();
 
         if ( false != bUpdateStates )
         {
@@ -7897,7 +7898,7 @@ CDocument.prototype =
 
         // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
         if ( -1 !== this.Selection.DragDrop.Flag && MouseEvent.ClickCount <= 1 && false === bTableBorder  &&
-            ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) || ( nInDrawing > -1 && docpostype_DrawingObjects === this.CurPos.Type && true === this.DrawingObjects.isSelectedText() && null !== this.DrawingObjects.getMajorParaDrawing() &&  this.DrawingObjects.getGraphicInfoUnderCursor(this.CurPage, X, Y).cursorType === "text" ) ) &&
+            ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) || ( nInDrawing > -1 && ( docpostype_DrawingObjects === this.CurPos.Type || ( docpostype_HdrFtr === this.CurPos.Type && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) ) && true === this.DrawingObjects.isSelectedText() && null !== this.DrawingObjects.getMajorParaDrawing() &&  this.DrawingObjects.getGraphicInfoUnderCursor(this.CurPage, X, Y).cursorType === "text" ) ) &&
             true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
         {
             // Здесь мы сразу не начинаем перемещение текста. Его мы начинаем, курсор хотя бы немного изменит свою позицию,
@@ -12689,6 +12690,7 @@ CDocument.prototype =
     Change_Comment : function(Id, CommentData)
     {
         this.Comments.Set_CommentData( Id, CommentData );
+        this.Document_UpdateInterfaceState();
     },
 
     Remove_Comment : function(Id, bSendEvent, bRecalculate)
