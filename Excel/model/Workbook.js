@@ -1782,44 +1782,31 @@ Workbook.prototype.SerializeHistory = function(){
 	{
 		var oMemory = new CMemory();
 		var oThis = this;
-		var oFontMap = {};
 		var bChangeSheetPlace = false;
 		var aPointChangesBase64;
 		for(var i = 0, length = aActions.length; i < length; ++i)
 		{
 		    var aPointChanges = aActions[i];
 		    aPointChangesBase64 = [];
+		    bChangeSheetPlace = false;
 		    for (var j = 0, length2 = aPointChanges.length; j < length2; ++j) {
 		        var item = aPointChanges[j];
 		        if (g_oUndoRedoWorkbook == item.oClass) {
-		            if (historyitem_Workbook_AddFont == item.nActionType) {
-		                for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
-		                    oFontMap[item.oData.elem[k]] = 1;
-		            }
-		            else if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
+		            if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
 		                bChangeSheetPlace = true;
 		        }
-
 		        this._SerializeHistoryBase64(oMemory, item, aPointChangesBase64);
+		    }
+		    if (bChangeSheetPlace) {
+		        //создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
+		        //добавляем не после конца aActions, чтобы можно было делать undo/redo и просто удалять хвост изменений.
+		        var oSheetPlaceData = [];
+		        for (var j = 0, length2 = this.aWorksheets.length; j < length2; ++j)
+		            oSheetPlaceData.push(this.aWorksheets[j].getId());
+		        this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, new UndoRedoData_SheetPositions(oSheetPlaceData)), aPointChangesBase64);
 		    }
 		    aRes.push(aPointChangesBase64);
 		}
-
-		aPointChangesBase64 = [];
-		var aFonts = [];
-		for (var i in oFontMap)
-		    aFonts.push(i);
-		if (aFonts.length > 0)
-		    this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont2, null, null, new UndoRedoData_SingleProperty(aFonts)), aPointChangesBase64);
-		if (bChangeSheetPlace) {
-		    //создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
-		    var oSheetPlaceData = [];
-		    for (var i = 0, length = this.aWorksheets.length; i < length; ++i)
-		        oSheetPlaceData.push(this.aWorksheets[i].getId());
-		    this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, new UndoRedoData_SheetPositions(oSheetPlaceData)), aPointChangesBase64);
-		}
-		if (aPointChangesBase64.length > 0)
-		    aRes.push(aPointChangesBase64);
 		this.aCollaborativeActions = [];
 	}
 	return aRes;
@@ -1865,7 +1852,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		        nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexesPoint[j], stream, nCurOffset);
 		        var item = new UndoRedoItemSerializable();
 		        item.Deserialize(stream);
-		        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont2 == item.nActionType) {
+		        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont == item.nActionType) {
 		            for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
 		                oFontMap[item.oData.elem[k]] = 1;
 		        }

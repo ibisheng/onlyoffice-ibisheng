@@ -1714,7 +1714,6 @@
                 targetContent.Remove(1, true, true);
 					
 				worksheet._loadFonts(newFonts, function () {
-					worksheet._addFontsToHistory(newFonts);
 					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
 					
 					worksheet.objectRender.controller.startRecalculate();

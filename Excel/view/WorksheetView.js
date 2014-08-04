@@ -7942,13 +7942,7 @@
 				History.StartTransaction();
 
 				switch (prop) {
-					case "fn":
-						// ToDo стоит перейти на проверку шрифтов на deserialize
-						History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null,
-							new UndoRedoData_SingleProperty([val]), true);
-						range.setFontname(val);
-						canChangeColWidth = c_oAscCanChangeColWidth.numbers;
-						break;
+					case "fn": range.setFontname(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
 					case "fs": range.setFontsize(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
 					case "b":  range.setBold(val); break;
 					case "i":  range.setItalic(val); break;
@@ -8219,8 +8213,6 @@
 			var t = this;
 			//загрузка шрифтов, в случае удачи на callback вставляем текст
 			t._loadFonts(val.fontsNew, function () {
-				t._addFontsToHistory(val.fontsNew);
-
 				if(val.onlyImages !== true)
 					t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
 					
@@ -8838,10 +8830,6 @@
 			var arn = t.activeRange.clone(true);
 			var arrFormula = [];
 			var numFor = 0;
-
-			// ToDo не совсем грамотная правка, но пока так
-			var newFonts = {};
-			this._addFontsToHistory(val.generateFontMap(newFonts));
 
 			var pasteRange = window["Asc"]["editor"].wb.clipboard.activeRange;
 			var activeCellsPasteFragment = this.autoFilters._refToRange(pasteRange);
@@ -10820,15 +10808,6 @@
 		WorksheetView.prototype._loadFonts = function (fonts, callback) {
 			var api = window["Asc"]["editor"];
 			api._loadFonts(fonts, callback);
-		};
-
-		WorksheetView.prototype._addFontsToHistory = function (fonts) {
-			var arrNewFonts = [];
-			for (var oFontName in fonts)
-				arrNewFonts.push(oFontName);
-			// ToDo стоит перейти на проверку шрифтов на deserialize
-			History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null,
-				new UndoRedoData_SingleProperty(arrNewFonts), true);
 		};
 
 		/*

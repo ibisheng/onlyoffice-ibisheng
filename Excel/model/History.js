@@ -8,7 +8,6 @@ var historyitem_Workbook_SheetMove = 3;
 var historyitem_Workbook_SheetPositions = 4;
 var historyitem_Workbook_ChangeColorScheme = 5;
 var historyitem_Workbook_AddFont = 6;
-var historyitem_Workbook_AddFont2 = 7;
 
 var historyitem_Worksheet_RemoveCell = 1;
 var historyitem_Worksheet_RemoveRows = 2;
@@ -183,6 +182,7 @@ function CHistory(workbook)
 	this.RecIndex = -1;
 	this.lastDrawingObjects = null;
 	this.LastState = null;
+	this.LoadFonts = {};//собираем все загруженные шрифты между моментами сохранения
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
 }
@@ -195,6 +195,7 @@ CHistory.prototype.Clear = function()
 	this.IsModify = false;
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
+	this.LoadFonts = {};
 
 	this.SavedIndex = null;
 
@@ -803,6 +804,14 @@ CHistory.prototype.GetSerializeArray = function()
 		}
 		aRes.push(aPointChanges);
 	}
+	if (aRes.length > 0) {
+	    var aFonts = [];
+	    for (var i in this.LoadFonts)
+	        aFonts.push(i);
+        //добавляем в начало, чтобы не потерять это изменение при undo/redo и обрезке изменений
+	    if(aFonts.length > 0)
+	        aRes[0].push(new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new UndoRedoData_SingleProperty(aFonts)));
+	}
 	return aRes;
 };
 //функция, которая перемещает последнее действие на первую позицию(в текущей точке)
@@ -813,4 +822,8 @@ CHistory.prototype.ChangeActionsEndToStart = function()
 		var endAction = this.CurPoint.Items.pop();
 		this.CurPoint.Items.unshift(endAction);
 	}
+};
+CHistory.prototype.loadFonts = function (fonts) {
+    for (var i in fonts)
+        this.LoadFonts[i] = 1;
 };
