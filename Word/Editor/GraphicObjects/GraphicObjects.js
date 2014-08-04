@@ -1010,7 +1010,7 @@ CGraphicObjects.prototype =
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
-        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing, CheckType : changestype_Paragraph_Content} ))
+        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing.Get_ParentParagraph(), CheckType : changestype_Paragraph_Content} ))
         {
             editor.asc_doubleClickOnChart(this.getChartObject());
         }
@@ -2269,6 +2269,15 @@ CGraphicObjects.prototype =
     {
         if(this.canChangeWrapPolygon())
         {
+            if(this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_THROUGH && this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_TIGHT)
+            {
+                if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : changestype_Paragraph_Content} ))
+                {
+                    History.Create_NewPoint();
+                    this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
+                    this.document.Recalculate();
+                }
+            }
             this.resetInternalSelection();
             this.selection.wrapPolygonSelection = this.selectedObjects[0];
             this.updateOverlay();
