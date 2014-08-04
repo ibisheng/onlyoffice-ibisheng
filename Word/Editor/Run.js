@@ -3676,7 +3676,7 @@ ParaRun.prototype =
             Result = true;
         }
 
-        if (this.Type == para_Math_Run && this.Is_Empty())
+        if (this.Type == para_Math_Run /*&& this.Is_Empty()*/) // не только для пустых Run, но и для проверки на конец Run (т.к. Diff не обновляется)
         {
             var Diff = SearchPos.X - SearchPos.CurX;
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )

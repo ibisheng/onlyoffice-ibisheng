@@ -3702,7 +3702,7 @@ CDelimiter.prototype.setPosition = function(position)
 
     var PosContent = new CMathPosition();
     PosContent.x = x;
-    PosContent.y = y + this.align(content);
+    PosContent.y = y + this.align_2(content);
     x += content.size.width;
 
     content.setPosition(PosContent); // CMathContent
@@ -3722,7 +3722,7 @@ CDelimiter.prototype.setPosition = function(position)
 
         var NewPosContent = new CMathPosition();
         NewPosContent.x = x;
-        NewPosContent.y = y + this.align(content);
+        NewPosContent.y = y + this.align_2(content);
 
         content.setPosition(NewPosContent);
         x += content.size.width;
@@ -3750,6 +3750,35 @@ CDelimiter.prototype.setPosition = function(position)
     x += content.size.width;
 
     content.setPosition(PosContent); // CMathContent*/
+
+}
+CDelimiter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var begWidth = this.begOper.size.width,
+        sepWidth = this.sepOper.size.width,
+        endWidth = this.endOper.size.width;
+
+    SearchPos.Pos.Update(0, Depth);
+
+    SearchPos.CurX += begWidth + this.GapLeft;
+
+    var result;
+
+    for(var j = 0; j < this.nCol; j++)
+    {
+        if(this.elements[0][j].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
+        {
+            SearchPos.Pos.Update(j, Depth+1);
+            result = true;
+        }
+
+        if(j < this.nCol - 1)
+            SearchPos.CurX += sepWidth;
+    }
+
+    SearchPos.CurX += endWidth + this.GapRight;
+
+    return result;
 
 }
 CDelimiter.prototype.findDisposition = function(SearchPos, Depth)
@@ -3817,7 +3846,7 @@ CDelimiter.prototype.draw = function(x, y, pGraphics)
     for(var j = 0; j < this.nCol; j++)
         this.elements[0][j].draw(x, y,pGraphics);
 }
-CDelimiter.prototype.align = function(element)
+CDelimiter.prototype.align_2 = function(element)
 {
     var align = 0;
     if(!element.IsJustDraw())
@@ -3981,8 +4010,8 @@ CCharacter.prototype.setPosition = function(pos)
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    var alignOp  =  this.align(this.operator),
-        alignCnt =  this.align(this.elements[0][0]);
+    var alignOp  =  this.align_2(this.operator),
+        alignCnt =  this.align_2(this.elements[0][0]);
 
     var PosOper = new CMathPosition(),
         PosBase = new CMathPosition();
@@ -4012,7 +4041,7 @@ CCharacter.prototype.setPosition = function(pos)
         this.operator.setPosition(PosOper);
     }
 }
-CCharacter.prototype.align = function(element)
+CCharacter.prototype.align_2 = function(element)
 {
     return (this.size.width - element.size.width)/2;
 }

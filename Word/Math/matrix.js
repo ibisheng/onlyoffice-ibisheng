@@ -123,13 +123,14 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         this.RecalcInfo.bProps = false;
     }
 
-
     var txtPrp = this.Get_CompiledCtrPrp();
 
-    var intervalCol = this.getLineGap(txtPrp);
-    this.gaps.column[0] = 0;
+    var gapsCol = this.getLineGap(txtPrp);
+
     for(var i = 0; i < this.nCol - 1; i++)
-        this.gaps.column[i + 1] = intervalCol;
+        this.gaps.column[i] = gapsCol;
+
+    this.gaps.column[this.nCol - 1] = 0;
 
     var intervalRow = this.getRowSpace(txtPrp);
 
@@ -139,16 +140,18 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
     var plH = 0.2743827160493827 * txtPrp.FontSize;
     var minGp = this.spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
     minGp -= plH;
-    this.gaps.row[0] = 0;
+
+
     for(var j = 0; j < this.nRow - 1; j++)
     {
         divCenter = intervalRow - (metrics.descents[j] + metrics.ascents[j + 1]);
-        this.gaps.row[j + 1] = minGp > divCenter ? minGp : divCenter;
+        this.gaps.row[j] = minGp > divCenter ? minGp : divCenter;
     }
+    this.gaps.row[this.nRow - 1] = 0;
 
     var height = 0, width = 0;
 
-    for(var i = 0; i< this.nCol; i++)
+    for(var i = 0; i < this.nCol; i++)
         width +=  this.gaps.column[i] + metrics.widths[i];
 
     for(var j = 0; j < this.nRow; j++)
@@ -204,14 +207,97 @@ CMathMatrix.prototype.setPosition = function(pos)
         for(var j = 0; j < this.nCol; j++)
         {
             var al = this.align(i, j);
-            NewPos.x = this.pos.x + this.GapLeft + al.x + this.gaps.column[j] + w;
-            NewPos.y = this.pos.y + al.y + this.gaps.row[i] + h;
+            NewPos.x = this.pos.x + this.GapLeft + al.x + w;
+            NewPos.y = this.pos.y + al.y + h;
 
             this.elements[i][j].setPosition(NewPos);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];
     }
+
+}
+CMathMatrix.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var maxWH = this.getWidthsHeights();
+    var Widths = maxWH.widths;
+    var Heights = maxWH.heights;
+
+    var X = this.ParaMath.X + this.pos.x + this.GapLeft, // this.ParaMath.X + this.pos.x  совпадает с  SearchPos.CurX
+        Y = this.ParaMath.Y + this.pos.y;
+
+    var CurrX, CurrY,
+        W_CurX,
+        Diff = 100000000;
+
+    var W = 0, H = 0;
+
+    var rX, rY,
+        minR;
+
+    for(var i=0; i < this.nRow; i++)
+    {
+        for(var j=0; j < this.nCol; j++)
+        {
+            if(!this.elements[i][j].IsJustDraw())
+            {
+                var x1 = SearchPos.X - X - W,
+                    x2 = SearchPos.X - X - W - Widths[j],
+                    y1 = SearchPos.Y - Y - H,
+                    y2 = SearchPos.Y - Y - H - Heights[i];
+
+
+                var bInY = 0 < y1 && y2 < 0,
+                    bInX = 0 < x1 && x2 < 0;
+
+                rX = x1*x1 < x2*x2 ? x1 : x2;
+                rY = y1*y1 < y2*y2 ? y1 : y2;
+
+
+                if(bInY && bInX)
+                    minR = 0;
+                else if(!bInY && !bInX)
+                    minR = rX*rX + rY*rY;
+                else if(bInY)
+                    minR = rX*rX;
+                else
+                    minR = rY*rY;
+
+
+                if(Diff > minR)
+                {
+                    Diff = minR;
+
+                    CurrX = i;
+                    CurrY = j;
+                    W_CurX  = W;
+                }
+            }
+
+            W += Widths[j] + this.gaps.column[j];
+
+        }
+
+        W = 0;
+        H += Heights[i] + this.gaps.row[i];
+    }
+
+    var SearchCurX = SearchPos.CurX;
+    var align = this.align(CurrX, CurrY);
+
+    SearchPos.CurX += this.GapLeft + W_CurX + align.x;
+
+    var result =  this.elements[CurrX][CurrY].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+
+    if(result)
+    {
+        SearchPos.Pos.Update(CurrX, Depth);
+        SearchPos.Pos.Update(CurrY, Depth + 1);
+    }
+
+    SearchPos.CurX = SearchCurX + this.size.width;
+
+    return result;
 
 }
 CMathMatrix.prototype.findDisposition = function(SearchPos, Depth)
@@ -308,10 +394,10 @@ CMathMatrix.prototype.findDistance = function() // для получения п�
 {
     var w = 0, h = 0;
     //кол-во элементов gap равно кол-ву элементов в строке/столбце для удобства подсчета
-    for(var i = 0; i <= this.CurPos_X; i++)
+    for(var i = 0; i < this.CurPos_X; i++)
         w += this.gaps.column[i];
 
-    for(var j = 0; j <= this.CurPos_Y; j++)
+    for(var j = 0; j < this.CurPos_Y; j++)
         h += this.gaps.row[j];
 
     return {w : w, h: h };

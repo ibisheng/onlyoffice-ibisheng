@@ -971,6 +971,28 @@ CMathBase.prototype =
 
         SearchPos.CurX += this.GapLeft + W_CurX + align.x;
 
+        /*if(SearchPos.CurX + this.GapLeft < SearchPos.X )
+        {
+            SearchPos.CurX += this.GapLeft;
+
+
+            for(var j = 0; j < CurrY; j++)
+            {
+                if(SearchPos.CurX + Widths[j] + this.dW > SearchPos.X)
+                {
+                    if(SearchPos.CurX + Widths[j] < SearchPos.X)
+                        SearchPos.CurX += Widths[j];
+
+                    break;
+                }
+
+                SearchPos.CurX += Widths[j] + this.dW;
+
+                if(j == CurrY-1 && SearchPos.CurX + align.x < SearchPos.X)
+                    SearchPos.CurX += align.x;
+            }
+        }*/
+
         var result =  this.elements[CurrX][CurrY].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
 
         if(result)

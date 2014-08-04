@@ -4597,7 +4597,7 @@ CMathContent.prototype =
             var lng = this.content.length;
 
 
-            while( pos < lng - 1 && SearchPos.X > SearchPos.CurX + this.content[pos].size.width)
+            while( pos < lng - 1 && SearchPos.CurX + this.content[pos].size.width < SearchPos.X)
             {
                 SearchPos.CurX += this.content[pos].size.width;
                 pos++;
@@ -4621,7 +4621,8 @@ CMathContent.prototype =
                 // необязательно попадем непосредственно в GapLeft просто в этом случае не ищем позицию в мат объектах,
                 // это избавит от ошибок, связанных с тем что расстояния до мат объекта и до пустого рана совпадают
                 // если же ран не пустой, то также должны встать в ран (в конец), а не в мат объект
-                if(SearchPos.X < SearchPos.CurX + this.content[pos].GapLeft)
+
+                /*if(SearchPos.X < SearchPos.CurX + this.content[pos].GapLeft)
                 {
                     SearchPos.CurX -= this.content[pos-1].size.width;
                     if(this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
@@ -4640,15 +4641,8 @@ CMathContent.prototype =
                     }
                 }
                 else
-                {
-                    SearchPos.CurX -= this.content[pos-1].size.width;
+                {*/
 
-                    // Для случая с Just-Draw элементами
-                    if( this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
-                    {
-                        SearchPos.Pos.Update(pos-1, Depth);
-                        result = true;
-                    }
 
                     if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
                     {
@@ -4656,14 +4650,28 @@ CMathContent.prototype =
                         result = true;
                     }
 
-                    if( this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                    SearchPos.CurX -= this.content[pos-1].size.width + this.content[pos].size.width;
+
+
+                    //SearchPos.InText == false -  проверка для случая, если позиция по X начала Run после мат объекта совпадает с концом Run внутри мат объекта (N-арный оператор в конце формулы)
+                    // Для случая с Just-Draw элементами
+                    if(SearchPos.InText == false && this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
+                    {
+                        SearchPos.Pos.Update(pos-1, Depth);
+                        result = true;
+                    }
+
+                    SearchPos.CurX += this.content[pos].size.width;
+
+
+                    if(SearchPos.InText == false && this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
                     {
                         SearchPos.Pos.Update(pos+1, Depth);
                         result = true;
                     }
 
 
-                }
+                /*}*/
             }
 
             SearchPos.CurX = SearchCurX + this.size.width;
