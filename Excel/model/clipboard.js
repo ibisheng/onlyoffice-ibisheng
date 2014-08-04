@@ -574,7 +574,7 @@
 							t.element.appendChild(node);
 						});
 				if(AscBrowser.isMozilla)
-					t._selectElement(t._getStylesSelect);
+					t._selectElement(t._getStylesSelect, true);
 				else
 					t._selectElement();
 					
@@ -2443,11 +2443,17 @@
 				return false;
 			},
 			
-			_selectElement: function (callback) {
-				var t = this, selection, rangeToSelect, overflowBody;
+			_selectElement: function (callback, copyCellValue) {
+				var t = this, selection, rangeToSelect, overflowBody, firstWidth;
 				
 				overflowBody = document.body.style.overflow;
-				document.body.style.overflow = 'hidden';
+				if(copyCellValue)
+				{
+					firstWidth = t.element.style.width;
+					t.element.style.width = document.body.offsetWidth - 1 + "px";
+				}
+				else
+					document.body.style.overflow = 'hidden';
 				
 				this._startCopyOrPaste();
 				
@@ -2493,6 +2499,8 @@
 							t._endCopyOrPaste();
 							t.element.style.MozUserSelect = "none";
 							
+							if(firstWidth)
+								t.element.style.width = firstWidth;
 							document.body.style.overflow = overflowBody;
 							
 							// for paste event
