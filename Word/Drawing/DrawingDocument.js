@@ -1806,7 +1806,6 @@ function CDrawingDocument()
     this.m_lTargetPage = -1;
     this.m_dTargetSize = 1;
 
-    this.NeedScrollToTarget = true;
     this.NeedScrollToTargetFlag = false;
 
     this.TargetHtmlElement = null;
@@ -2906,14 +2905,12 @@ function CDrawingDocument()
         if (this.UpdateTargetFromPaint === false)
         {
             this.UpdateTargetCheck = true;
-
-            if (this.NeedScrollToTargetFlag && this.m_dTargetX == x && this.m_dTargetY == y && this.m_lTargetPage == pageIndex)
-                this.NeedScrollToTarget = false;
-            else
-                this.NeedScrollToTarget = true;
-
             return;
         }
+
+        var bNeedScrollToTarget = true;
+        if (this.m_dTargetX == x && this.m_dTargetY == y && this.m_lTargetPage == pageIndex)
+            bNeedScrollToTarget = false;
 
         if (-1 != this.m_lTimerUpdateTargetID)
         {
@@ -3002,7 +2999,7 @@ function CDrawingDocument()
             nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(_mem, pageIndex);
         }
 
-        if (!this.NeedScrollToTarget)
+        if (!bNeedScrollToTarget)
         {
             nValueScrollHor = 0;
             nValueScrollVer = 0;
