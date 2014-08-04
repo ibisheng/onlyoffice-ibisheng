@@ -1500,8 +1500,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.CoAuthoringApi.onMessage               	= function (e) { t.handlers.trigger("asc_onCoAuthoringChatReceiveMessage", e); };
 				this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.handlers.trigger("asc_onConnectionStateChanged", e); };
 				this.CoAuthoringApi.onLocksAcquired				= function (e) {
-					if ( 2 != e["state"] )
-					{
+					if (2 != e["state"]) {
 						var elementValue = e["blockValue"];
 						var lockElem = t.collaborativeEditing.getLockByElem (elementValue, c_oAscLockTypes.kLockTypeOther);
 						if (null === lockElem) {

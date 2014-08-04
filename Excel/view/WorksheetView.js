@@ -7845,6 +7845,11 @@
 				t.startCellMoveRange = null;
 				// Тут будет отрисовка select-а
 				t._updateCellsRange(arnFrom);
+
+				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
+				t.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
+				t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+				t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 			};
 
 			this._isLockedCells ([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
