@@ -4614,7 +4614,11 @@ ParaRun.prototype =
                 }
 
                 if ( null !== LRun )
-                    LRun.Selection_Remove();
+                {
+                    LRun.Selection.Use      = true;
+                    LRun.Selection.StartPos = LRun.Content.length;
+                    LRun.Selection.EndPos   = LRun.Content.length;
+                }
 
                 CRun.Select_All(Direction);
 
@@ -4629,7 +4633,11 @@ ParaRun.prototype =
                 }
 
                 if ( null !== RRun )
-                    RRun.Selection_Remove();
+                {
+                    RRun.Selection.Use      = true;
+                    RRun.Selection.StartPos = 0;
+                    RRun.Selection.EndPos   = 0;
+                }
 
                 // Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
                 // применим заданные настроки к символу конца параграфа
@@ -5198,6 +5206,14 @@ ParaRun.prototype =
 
             if ( undefined != RFonts.Hint )
                 this.Set_RFonts_Hint( RFonts.Hint );
+        }
+        else
+        {
+            this.Set_RFonts_Ascii( undefined );
+            this.Set_RFonts_HAnsi( undefined );
+            this.Set_RFonts_CS( undefined );
+            this.Set_RFonts_EastAsia( undefined );
+            this.Set_RFonts_Hint( undefined );
         }
     },
 

@@ -12957,8 +12957,9 @@ CTable.prototype =
                     var CellMax      = CellMinMax.Max;
                     var GridSpan     = Cell.Get_GridSpan();
                     var CellMargins  = Cell.Get_Margins();
-                    var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
                     var CellW        = Cell.Get_W();
+                    var CellRBorder  = Cell.Get_Border(1);
+                    var CellLBorder  = Cell.Get_Border(3);
 					var CellWW;
 
                     var Add = ( ( 0 === CurCell || CellsCount - 1 === CurCell ) ? 3 / 2 * SpacingW : SpacingW );
@@ -12968,6 +12969,31 @@ CTable.prototype =
                     CellWW  = CellW.W + Add;
 
                     // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
+
+                    var CellMarginsW = 0;
+                    if ( null !== Spacing )
+                    {
+                        CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
+                        
+                        if ( border_None !== CellRBorder.Value )
+                            CellMarginsW += CellRBorder.Size;
+
+                        if ( border_None !== CellLBorder.Value )
+                            CellMarginsW += CellLBorder.Size;
+                    }
+                    else
+                    {
+                        if ( border_None !== CellRBorder.Value )
+                            CellMarginsW += Math.max( CellRBorder.Size / 2, CellMargins.Right.W );
+                        else
+                            CellMarginsW += CellMargins.Right.W;
+
+                        if ( border_None !== CellLBorder.Value )
+                            CellMarginsW += Math.max( CellLBorder.Size / 2, CellMargins.Left.W );
+                        else
+                            CellMarginsW += CellMargins.Left.W;
+                    }
+
                     if ( MinMargin[CurGridCol] < CellMarginsW )
                         MinMargin[CurGridCol] = CellMarginsW;
 
@@ -13088,7 +13114,7 @@ CTable.prototype =
             }
 
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-            {
+            {               
                 if ( true === MaxFlags[CurCol] )
                     MaxContent[CurCol] = Math.max( 0, MaxContent[CurCol] - MinMargin[CurCol] );
             }
@@ -15464,7 +15490,7 @@ CTable.prototype =
                         break;
                     }
 
-                    var CellContentBounds = Cell.Content.Get_PageBounds( 0 );
+                    var CellContentBounds = Cell.Content.Get_PageBounds( 0, undefined, true );
                     var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
 
                     if ( undefined === HeaderPage.RowsInfo[CurRow].TableRowsBottom || HeaderPage.RowsInfo[CurRow].TableRowsBottom < CellContentBounds_Bottom )
@@ -15600,7 +15626,7 @@ CTable.prototype =
                         var Y_1 = HeaderPage.RowsInfo[CurRow].TableRowsBottom - CellMar.Bottom.W;
                         var CellHeight = Y_1 - Y_0;
 
-                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight );
+                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight, true );
                         var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
 
                         var Dy = 0;
@@ -15818,7 +15844,7 @@ CTable.prototype =
                         bNextPage = true;
                     }
 
-                    var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
+                    var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, undefined, true );
                     var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
 
                     if ( undefined === this.TableRowsBottom[CurRow][CurPage] || this.TableRowsBottom[CurRow][CurPage] < CellContentBounds_Bottom )
@@ -15951,7 +15977,7 @@ CTable.prototype =
                             bNextPage = true;
                         }
 
-                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
+                        var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, undefined, true );
                         var CellContentBounds_Bottom = CellContentBounds.Bottom + BottomMargin;
 
                         if ( 0 != CurRow && false === this.RowsInfo[CurRow].FirstPage )
@@ -16126,7 +16152,7 @@ CTable.prototype =
                 var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
                 var CellHeight = Y_1 - Y_0;
 
-                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight );
+                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex, CellHeight, true );
                 var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
 
                 var Dy = 0;

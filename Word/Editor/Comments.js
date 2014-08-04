@@ -1009,6 +1009,12 @@ ParaComment.prototype =
         var Y    = Para.Pages[CurPage].Y      + Para.Lines[CurLine].Top;
         var H    = Para.Lines[CurLine].Bottom - Para.Lines[CurLine].Top;
         var Page = Para.Get_StartPage_Absolute() + CurPage;
+        
+        if ( comment_type_HdrFtr === Comment.m_oTypeInfo.Type )
+        {
+            var HdrFtr = Comment.m_oTypeInfo.Data;
+            Page = HdrFtr.RecalcInfo.CurPage;
+        }
 
         if ( true === this.Start )
         {
@@ -1018,7 +1024,7 @@ ParaComment.prototype =
         else
         {
             Comment.Set_EndId( Para.Get_Id() );
-        }
+        }                
     },
 
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
@@ -1035,10 +1041,17 @@ ParaComment.prototype =
         return RecalcObj;
     },
 
-    Load_RecalculateObject : function(RecalcObj)
+    Load_RecalculateObject : function(RecalcObj, Parent)
     {
         this.StartLine  = RecalcObj.StartLine;
         this.StartRange = RecalcObj.StartRange;
+        
+        var PageNum = Parent.Get_StartPage_Absolute();
+        
+        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+        var Comment = DocumentComments.Get_ById( this.CommentId );
+        
+        Comment.m_oStartInfo.PageNum = PageNum;
     },
 
     Prepare_RecalculateObject : function()

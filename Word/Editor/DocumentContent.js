@@ -1285,7 +1285,7 @@ CDocumentContent.prototype =
         }
     },
 
-    Get_PageBounds : function(PageNum, Height)
+    Get_PageBounds : function(PageNum, Height, bForceCheckDrawings)
     {
         if ( this.Pages.length <= 0 )
             return { Top : 0, Left : 0, Right : 0, Bottom : 0 };
@@ -1296,10 +1296,10 @@ CDocumentContent.prototype =
         var Bounds = this.Pages[PageNum].Bounds;
 
         // В колонтитуле не учитывается.
-        if ( true != this.Is_HdrFtr(false) )
+        if ( true != this.Is_HdrFtr(false) || true === bForceCheckDrawings )
         {
             
-            // Учитываем все Drawing-оьъекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в 
+            // Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в 
             // случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
                         
             var AllDrawingObjects = this.Get_AllDrawingObjects();

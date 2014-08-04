@@ -2730,7 +2730,7 @@ Paragraph.prototype =
         var Theme    = this.Get_Theme();
         var ColorMap = this.Get_ColorMap();
         var BgColor = undefined;
-        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value && true !== Pr.ParaPr.Shd.Color.Auto )
         {
             if(Pr.ParaPr.Shd.Unifill)
             {
@@ -6217,18 +6217,24 @@ Paragraph.prototype =
                     this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, false );
                 }
 
+                var bCorrectContent = false;
 
                 var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
                 if ( para_Run === this.Content[EndPos].Type )
                 {
                     this.Internal_ReplaceRun( EndPos, NewElements );
+                    bCorrectContent = true;
                 }
 
                 var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize, false );
                 if ( para_Run === this.Content[StartPos].Type )
                 {
                     this.Internal_ReplaceRun( StartPos, NewElements );
+                    bCorrectContent = true;
                 }
+                
+                if ( true === bCorrectContent )
+                    this.Correct_Content();
             }
         }
         else
@@ -8556,6 +8562,8 @@ Paragraph.prototype =
             {
                 this.Content[Index].Clear_TextPr();
             }
+
+            this.TextPr.Clear_Style();
         }        
     },
 
@@ -14580,7 +14588,7 @@ CParagraphRecalculateObject.prototype =
         var Count = Para.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            Para.Content[Index].Load_RecalculateObject(this.Content[Index]);
+            Para.Content[Index].Load_RecalculateObject(this.Content[Index], Para);
         }
     },
 
