@@ -763,63 +763,6 @@ CChartSpace.prototype =
         return false;
     },
 
-    rebuildVal: function(val)
-    {
-        if(val)
-        {
-            var i, j, k, parsed_formula, idx, cell, pt, bbox, worksheet;
-            var buildCache = function (ref, cache, pointConstructor)
-            {
-                idx = 0;
-                removePtsFromLit(cache);
-                for(i = 0; i < ref.parsedFormulas.length; ++i)
-                {
-                    parsed_formula = ref.parsedFormulas[i];
-                    bbox = parsed_formula.bbox;
-                    worksheet = parsed_formula.worksheet;
-                    for(j = bbox.r1; j <= bbox.r2; ++j)
-                    {
-                        for(k = bbox.c1; k <= bbox.c2; ++k)
-                        {
-                            if(!worksheet._getCol(i).hd  && !worksheet._getRow(row).hd)
-                            {
-                                cell = worksheet.getCell(new CellAddress(j, k, 0));
-                                pt = new pointConstructor();
-                                pt.setIdx(idx);
-                                pt.setFormatCode && pt.setFormatCode(cell.getNumFormatStr());
-                                pt.setVal(cell.getValue());
-                                cache.addPt(pt);
-                            }
-                            ++idx;
-                        }
-                    }
-                }
-            };
-
-            if(val.numRef)
-            {
-                if(!val.numRef.numCache)
-                {
-                    val.numRef.setNumCache(new CNumLit());
-                }
-                if(Array.isArray(val.numRef.parsedFormulas))
-                {
-                    buildCache(val.numRef, val.numRef.numCache, CNumericPoint);
-                }
-            }
-            if(val.strRef)
-            {
-                if(!val.strRef.strCache)
-                {
-                    val.strRef.setStrCache(new CStrCache());
-                }
-                if(Array.isArray(val.strRef.parsedFormulas))
-                {
-                    buildCache(val.strRef, val.strRef.strCache, CStringPoint);
-                }
-            }
-        }
-    },
 
     clearCacheVal: function(val)
     {
@@ -1126,14 +1069,14 @@ CChartSpace.prototype =
                     num_ref.setNumCache(new CNumLit());
                     var num_cache = num_ref.numCache;
                     num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-                    for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
-                    {
-                        var pt = new CNumericPoint();
-                        pt.setIdx(j);
-                        pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-                        pt.setVal(asc_series[i].Val.NumCache[j].val);
-                        num_cache.addPt(pt);
-                    }
+                   // for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+                   // {
+                   //     var pt = new CNumericPoint();
+                   //     pt.setIdx(j);
+                   //     pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                   //     pt.setVal(asc_series[i].Val.NumCache[j].val);
+                   //     num_cache.addPt(pt);
+                   // }
                     if(asc_series[i].Cat && asc_series[i].Cat.NumCache)
                     {
                         series.setCat(new CCat());
@@ -1145,13 +1088,13 @@ CChartSpace.prototype =
                         var str_cache = str_ref.strCache;
                         var cat_num_cache = asc_series[i].Cat.NumCache;
                         str_cache.setPtCount(cat_num_cache.length);
-                        for(var j= 0; j < cat_num_cache.length; ++j)
-                        {
-                            var string_pt = new CStringPoint();
-                            string_pt.setIdx(j);
-                            string_pt.setVal(cat_num_cache[j].val);
-                            str_cache.addPt(string_pt);
-                        }
+                        //for(var j= 0; j < cat_num_cache.length; ++j)
+                        //{
+                        //    var string_pt = new CStringPoint();
+                        //    string_pt.setIdx(j);
+                        //    string_pt.setVal(cat_num_cache[j].val);
+                        //    str_cache.addPt(string_pt);
+                        //}
                     }
                     else
                     {
@@ -1167,10 +1110,10 @@ CChartSpace.prototype =
                         str_ref.setStrCache(new CStrCache());
                         var str_cache = str_ref.strCache;
                         str_cache.setPtCount(1);
-                        str_cache.addPt(new CStringPoint());
-                        var pt = str_cache.pt[0];
-                        pt.setIdx(0);
-                        pt.setVal(asc_series[i].TxCache.Tx);
+                        //str_cache.addPt(new CStringPoint());
+                        //var pt = str_cache.pt[0];
+                        //pt.setIdx(0);
+                        //pt.setVal(asc_series[i].TxCache.Tx);
                     }
                     else
                     {
@@ -1199,14 +1142,14 @@ CChartSpace.prototype =
                         num_ref.setNumCache(new CNumLit());
                         var num_cache = num_ref.numCache;
                         num_cache.setPtCount(first_series.Val.NumCache.length);
-                        for(var j = 0; j < first_series.Val.NumCache.length; ++j)
-                        {
-                            var pt = new CNumericPoint();
-                            pt.setIdx(j);
-                            pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
-                            pt.setVal(first_series.Val.NumCache[j].val);
-                            num_cache.addPt(pt);
-                        }
+                       //for(var j = 0; j < first_series.Val.NumCache.length; ++j)
+                       //{
+                       //    var pt = new CNumericPoint();
+                       //    pt.setIdx(j);
+                       //    pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
+                       //    pt.setVal(first_series.Val.NumCache[j].val);
+                       //    num_cache.addPt(pt);
+                       //}
                     }
                     series.setYVal(new CYVal());
                     var y_val = series.yVal;
@@ -1216,17 +1159,18 @@ CChartSpace.prototype =
                     num_ref.setNumCache(new CNumLit());
                     var num_cache = num_ref.numCache;
                     num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-                    for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
-                    {
-                        var pt = new CNumericPoint();
-                        pt.setIdx(j);
-                        pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-                        pt.setVal(asc_series[i].Val.NumCache[j].val);
-                        num_cache.addPt(pt);
-                    }
+                    //for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+                    //{
+                    //    var pt = new CNumericPoint();
+                    //    pt.setIdx(j);
+                    //    pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                    //    pt.setVal(asc_series[i].Val.NumCache[j].val);
+                    //    num_cache.addPt(pt);
+                    //}
                     chart_type.addSer(series);
                 }
             }
+            this.recalculateReferences();
         }
     },
 
@@ -2176,6 +2120,7 @@ CChartSpace.prototype =
                 {
                     num_cache = val.numRef.numCache;
                 }
+                var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
                 var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true;
                 for(i = 0; i < arr_f.length; ++i)
                 {
@@ -2205,7 +2150,7 @@ CChartSpace.prototype =
                                                 pt = new CNumericPoint();
                                                 pt.setIdx(pt_index++);
                                                 pt.setVal(parseFloat(cell.getValue()));
-                                                if(cell.getNumFormatStr() !== "General")
+                                                if(cell.getNumFormatStr() !== lit_format_code)
                                                 {
                                                     pt.setFormatCode(cell.getNumFormatStr())
                                                 }
@@ -2230,7 +2175,7 @@ CChartSpace.prototype =
                                                 pt = new CNumericPoint();
                                                 pt.setIdx(pt_index++);
                                                 pt.setVal(parseFloat(cell.getValue()));
-                                                if(cell.getNumFormatStr() !== "General")
+                                                if(cell.getNumFormatStr() !== lit_format_code)
                                                 {
                                                     pt.setFormatCode(cell.getNumFormatStr())
                                                 }
@@ -2298,7 +2243,7 @@ CChartSpace.prototype =
                                                 cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
                                                 pt = new CStringPoint();
                                                 pt.setIdx(pt_index++);
-                                                pt.setVal(cell.getValue());
+                                                pt.setVal(cell.getValueWithFormat());
 
                                                 str_cache.addPt(pt);
                                                 addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
@@ -2319,7 +2264,7 @@ CChartSpace.prototype =
                                                 cell = source_worksheet.getCell(new CellAddress(j, range.c1, 0));
                                                 pt = new CStringPoint();
                                                 pt.setIdx(pt_index++);
-                                                pt.setVal(cell.getValue());
+                                                pt.setVal(cell.getValueWithFormat());
 
                                                 str_cache.addPt(pt);
                                                 addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
@@ -5752,7 +5697,7 @@ CChartSpace.prototype =
                                     {
                                         if(typeof pt.formatCode === "string" && pt.formatCode.length > 0)
                                         {
-                                            pt_format = oNumFormatCache.get(lit.formatCode);
+                                            pt_format = oNumFormatCache.get(pt.formatCode);
                                             if(pt_format)
                                             {
                                                 str_pt = pt_format.formatToChart(pt.val);
@@ -6823,7 +6768,7 @@ CChartSpace.prototype =
                                     {
                                         if(typeof pt.formatCode === "string" && pt.formatCode.length > 0)
                                         {
-                                            pt_format = oNumFormatCache.get(lit.formatCode);
+                                            pt_format = oNumFormatCache.get(pt.formatCode);
                                             if(pt_format)
                                             {
                                                 str_pt = pt_format.formatToChart(pt.val);

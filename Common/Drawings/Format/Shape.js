@@ -3769,14 +3769,16 @@ CShape.prototype =
                 break;
             }
         }
-        var old_geometry = this.spPr && isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if (_final_preset != null) {
             this.spPr.setGeometry(CreateGeometry(_final_preset));
+            if(this.spPr.geometry)
+            {
+                this.spPr.geometry.setParent(this.spPr);
+            }
         }
         else {
             this.spPr.geometry = null;
         }
-        var new_geometry = this.spPr &&  isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if ((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill)) {
             var new_line2 = new CLn();
             new_line2.Fill = new CUniFill();
