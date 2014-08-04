@@ -1390,6 +1390,8 @@ var gUndoInsDelCellsFlag = true;
 						ws.changeWorksheet("update");
 						if(isTurnOffHistory)
 							History.TurnOn();
+							
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 					}
 					else
 						return false;
@@ -6371,6 +6373,7 @@ var gUndoInsDelCellsFlag = true;
 					if(paramsForCallBackAdd == "addAutoFilterOneCell" && this._isEmptyRange(activeCells, true))
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
 					};
 					
@@ -6441,6 +6444,7 @@ var gUndoInsDelCellsFlag = true;
 						else
 						{
 							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+							//ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							History.EndTransaction();
 							return false;
 						};
@@ -6455,6 +6459,7 @@ var gUndoInsDelCellsFlag = true;
 					if(paramsForCallBackAdd == "addAutoFilterManyCells" && this._isEmptyRange(activeCells))
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
 					};
 					
