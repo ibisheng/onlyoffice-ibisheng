@@ -3862,7 +3862,7 @@ var gUndoInsDelCellsFlag = true;
 						if(this._crossRange(activeCells,range))
 						{
 							//если мы находимся в общем фильтре и нажали на кнопку общего фильтра - тогда нет ошибки
-							if(!(aWs.AutoFilter && i == 0 && isAll == true) && allF[i].AutoFilter !== undefined)
+							if(!(aWs.AutoFilter && i == 0 && isAll == true)/* && allF[i].AutoFilter !== undefined*/)
 								num = 'error';
 						}
 					}
