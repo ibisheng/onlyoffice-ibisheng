@@ -449,7 +449,8 @@ CShape.prototype.recalculateContent = function()
                 }
             }
         }
-
+        this.contentWidth = this.txBody.contentWidth;
+        this.contentHeight = this.txBody.contentHeight;
 
         content.Set_StartPage(0);
         content.Reset(0, 0, w, 20000);
