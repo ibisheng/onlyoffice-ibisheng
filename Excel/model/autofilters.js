@@ -2137,19 +2137,12 @@ var gUndoInsDelCellsFlag = true;
 			checkRemoveTableParts: function(delRange, tableRange)
 			{
 				var result = true, firstRowRange;
-				var aWs = this._getCurrentWS();
 				
-				if(tableRange)
+				if(tableRange && delRange.containsRange(tableRange) == false)
 				{
-					if(delRange.containsRange(tableRange) == false)
-					{
-						firstRowRange = new Asc.Range(tableRange.c1, tableRange.r1, tableRange.c2, tableRange.r1);
-						if(firstRowRange.intersection(delRange))
-						{
-							result = false;
-						};
-					};
-				};
+					firstRowRange = new Asc.Range(tableRange.c1, tableRange.r1, tableRange.c2, tableRange.r1);
+					result = !firstRowRange.isIntersect(delRange);
+				}
 				
 				return result;
 			},
@@ -6514,7 +6507,7 @@ var gUndoInsDelCellsFlag = true;
 							//проходимся по всем заголовкам
 							for(var j = tableRange.c1; j <= tableRange.c2; j++)
 							{
-								cell = ws.model.getCell(new CellAddress(ref.r1, j, 0))
+								cell = ws.model.getCell(new CellAddress(ref.r1, j, 0));
 								val = cell.getValue();
 								//если не пустая изменяем TableColumns
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )

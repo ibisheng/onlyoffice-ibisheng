@@ -388,27 +388,18 @@ function FrozenPlace(ws, type) {
 	
 	_this.isCellInside = function(cell) {
 		var result = false;
-		if ( cell &&  _this.range ) {
+		if (cell && _this.range) {
 			var cellRange = new asc_Range(cell.col, cell.row, cell.col, cell.row);
-			var _r = _this.range.intersection(cellRange);
-			if ( _r ) {
-				if ( log )
-					console.log( cell.col + "," + cell.row + " in " + _this.type);
-				result = true;
-			}
+			result = _this.range.isIntersect(cellRange);
 		}
 		return result;
 	};
 	
 	_this.isObjectInside = function(object) {
 		// TODO Нужно учитывать collOff, rowOff
-		
-		var result = false;
+
 		var objectRange = new asc_Range(object.from.col, object.from.row, object.to.col, object.to.row);
-		var _r = _this.range.intersection(objectRange);
-		if ( _r )
-			result = true;
-		return result;
+		return _this.range.isIntersect(objectRange);
 	};
 	
 	_this.getVerticalScroll = function() {
