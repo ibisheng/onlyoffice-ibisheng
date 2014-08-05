@@ -821,7 +821,7 @@ ParaRun.prototype =
         if ( para_Math_Run === this.Type )
             return false;
         
-        if ( Changes.length !== 1 || undefined === Changes[0].Data.Items || Changes[0].Data.Items.length <= 0 )
+        if ( Changes.length !== 1 || undefined === Changes[0].Data.Items || Changes[0].Data.Items.length !== 1 )
             return false;
 
         var Type = Changes[0].Data.Type;
@@ -1321,7 +1321,51 @@ ParaRun.prototype =
                 }
             }
         }
-    },    
+    },
+
+    Get_StartTabsCount : function(TabsCounter)
+    {
+        var ContentLen = this.Content.length;
+
+        for ( var Pos = 0; Pos < ContentLen; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            var ItemType = Item.Type;
+
+            if ( para_Tab === ItemType )
+            {
+                TabsCounter.Count++;
+                TabsCounter.Pos.push( Pos );
+            }
+            else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+                return false;
+        }
+        
+        return true;
+    },
+
+    Remove_StartTabs : function(TabsCounter)
+    {
+        var ContentLen = this.Content.length;
+        for ( var Pos = 0; Pos < ContentLen; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            var ItemType = Item.Type;
+
+            if ( para_Tab === ItemType )
+            {
+                this.Remove_FromContent( Pos, 1, true );
+
+                TabsCounter.Count--;
+                Pos--;
+                ContentLen--;
+            }
+            else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+                return false;
+        }
+
+        return true;
+    },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------
@@ -1363,6 +1407,18 @@ ParaRun.prototype =
                 Item.Parent          = this.Paragraph;
                 Item.DocumentContent = this.Paragraph.Parent;
                 Item.DrawingDocument = this.Paragraph.Parent.DrawingDocument;
+            }
+            
+            // TODO: Как только избавимся от para_End переделать здесь
+            if ( para_End === Item.Type )
+            {
+                var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
+                EndTextPr.Merge(this.Paragraph.TextPr.Value);
+
+                g_oTextMeasurer.SetTextPr( EndTextPr, this.Paragraph.Get_Theme());
+                Item.Measure( g_oTextMeasurer, EndTextPr );
+                
+                continue;
             }
 
             Item.Measure( g_oTextMeasurer, Pr );

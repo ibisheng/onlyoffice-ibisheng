@@ -2921,7 +2921,7 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 // Заливка параграфа
                 //----------------------------------------------------------------------------------------------------------
-                if ( (_Range.W > 0.001 || true === this.IsEmpty() ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value && (Pr.ParaPr.Shd.Unifill || (Pr.ParaPr.Shd.Color && true !== Pr.ParaPr.Shd.Color.Auto)) )
+                if ( (_Range.W > 0.001 || true === this.IsEmpty() || true !== this.Is_EmptyRange(CurLine, CurRange) ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value && (Pr.ParaPr.Shd.Unifill || (Pr.ParaPr.Shd.Color && true !== Pr.ParaPr.Shd.Color.Auto)) )
                 {
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
                     if ( 0 === CurRange )
@@ -6884,8 +6884,8 @@ Paragraph.prototype =
                     var SearchPosS = new CParagraphSearchPos();
                     var SearchPosE = new CParagraphSearchPos();
 
-                    this.Get_WordStartPos( SearchPosS, SearchPosXY.Pos );
                     this.Get_WordEndPos( SearchPosE, SearchPosXY.Pos );
+                    this.Get_WordStartPos( SearchPosS, SearchPosE.Pos );                    
 
                     var StartPos = ( true === SearchPosS.Found ? SearchPosS.Pos : this.Get_StartPos() );
                     var EndPos   = ( true === SearchPosE.Found ? SearchPosE.Pos : this.Get_EndPos(false) );
@@ -7633,6 +7633,32 @@ Paragraph.prototype =
 // Функции для работы с нумерацией параграфов в документах
 //-----------------------------------------------------------------------------------
 
+    Get_StartTabsCount : function(TabsCounter)
+    {
+        var ContentLen = this.Content.length;
+        for ( var Pos = 0; Pos < ContentLen; Pos++ )
+        {
+            var Element = this.Content[Pos];
+            if ( false === Element.Get_StartTabsCount( TabsCounter ) )
+                return false;
+        }
+        
+        return true;
+    },
+    
+    Remove_StartTabs : function(TabsCounter)
+    {
+        var ContentLen = this.Content.length;
+        for ( var Pos = 0; Pos < ContentLen; Pos++ )
+        {
+            var Element = this.Content[Pos];
+            if ( false === Element.Remove_StartTabs( TabsCounter ) )
+                return false;
+        }
+        
+        return true;
+    },
+    
     // Добавляем нумерацию к данному параграфу
     Numbering_Add : function(NumId, Lvl)
     {
@@ -7645,23 +7671,12 @@ Paragraph.prototype =
         var SelectedOneElement = (this.Parent.Selection_Is_OneElement() === 0 ? true : false );
 
         // Рассчитаем количество табов, идущих в начале параграфа
-        var Count = this.Content.length;
-        var TabsCount = 0;
-        var TabsPos = [];
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            var Item = this.Content[Pos];
-            var ItemType = Item.Type;
-
-            if ( para_Tab === ItemType )
-            {
-                TabsCount++;
-                TabsPos.push( Pos );
-            }
-            else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
-                break;
-        }
-
+        var TabsCounter = new CParagraphTabsCounter();
+        this.Get_StartTabsCount( TabsCounter );
+        
+        var TabsCount = TabsCounter.Count;
+        var TabsPos   = TabsCounter.Pos;
+        
         // Рассчитаем левую границу и сдвиг первой строки с учетом начальных табов
         var X = ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
         var LeftX = X;
@@ -7786,13 +7801,8 @@ Paragraph.prototype =
             }
 
             // Удалим все табы идущие в начале параграфа
-            TabsCount = TabsPos.length;
-            while ( TabsCount )
-            {
-                var Pos = TabsPos[TabsCount - 1];
-                this.Internal_Content_Remove( Pos );
-                TabsCount--;
-            }
+            TabsCounter.Count = TabsCount;
+            this.Remove_StartTabs( TabsCounter );
         }
         else
         {
@@ -14625,4 +14635,10 @@ function CParagraphStartState(Paragraph)
     {
         this.Content.push(Paragraph.Content[i]);
     }
+}
+
+function CParagraphTabsCounter()
+{
+    this.Count = 0;
+    this.Pos   = [];
 }

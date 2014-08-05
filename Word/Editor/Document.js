@@ -8981,12 +8981,18 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-            // 1. Если у нас сейчас происисходит выделение маркером, тогда его отменяем
-            // 2. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
-            // 3. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
+            // 1. Если у нас сейчас происходит выделение маркером, тогда его отменяем
+            // 2. Если у нас сейчас происходит форматирование по образцу, тогда его отменяем
+            // 3. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
+            // 4. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
             if ( true === editor.isMarkerFormat )
             {
                 editor.sync_MarkerFormatCallback( false );
+                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
+            }
+            else if ( c_oAscFormatPainterState.kOff !== editor.isPaintFormat )
+            {
+                editor.sync_PaintFormatCallback( c_oAscFormatPainterState.kOff );
                 this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
             }
             else if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
@@ -10041,14 +10047,16 @@ CDocument.prototype =
             this.Selection_SetEnd( X, Y, e );
             this.Document_UpdateSelectionState();
 
-            if ( true === editor.isPaintFormat )
+            if ( c_oAscFormatPainterState.kOff !== editor.isPaintFormat )
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
                     this.Create_NewHistoryPoint();
                     this.Document_Format_Paste();
                 }
-                editor.sync_PaintFormatCallback( false );
+                
+                if ( c_oAscFormatPainterState.kOn === editor.isPaintFormat )
+                    editor.sync_PaintFormatCallback( c_oAscFormatPainterState.kOff );
             }
 
             if ( true === editor.isMarkerFormat && true === this.Is_TextSelectionUse() )
@@ -11514,7 +11522,7 @@ CDocument.prototype =
 
                 this.DrawingDocument.TargetShow();
             }
-        }
+        }                       
     },
 
     Document_UpdateUndoRedoState : function()

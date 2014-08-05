@@ -961,6 +961,16 @@ ParaComment.prototype =
     Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
     {
     },
+
+    Get_StartTabsCount : function(TabsCounter)
+    {
+        return true;
+    },
+
+    Remove_StartTabs : function(TabsCounter)
+    {
+        return true;
+    },
     
     Copy : function()
     {

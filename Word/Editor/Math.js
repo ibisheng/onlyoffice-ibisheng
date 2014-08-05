@@ -490,6 +490,17 @@ ParaMath.prototype =
         if ( true === DropCapText.Check )
             DropCapText.Mixed = true;
     },
+
+    Get_StartTabsCount : function(TabsCounter)
+    {
+        return false;
+    },
+
+    Remove_StartTabs : function(TabsCounter)
+    {
+        return false;
+    },
+
     Add_ToContent : function(Pos, Item, UpdatePosition)
     {
 

@@ -537,7 +537,7 @@ function asc_docs_api(name)
     this.isKeepLinesTogether = false;
 
     this.isMobileVersion = false;
-    this.isPaintFormat = false;
+    this.isPaintFormat = c_oAscFormatPainterState.kOff;
     this.isMarkerFormat = false;
     this.isViewMode = false;
     this.isStartAddShape = false;
@@ -6848,8 +6848,10 @@ asc_docs_api.prototype.GetCurrentPixOffsetY = function()
     return this.WordControl.m_dScrollY;
 };
 
-asc_docs_api.prototype.SetPaintFormat = function(value)
+asc_docs_api.prototype.SetPaintFormat = function(_value)
 {
+    var value = ( true === _value ? c_oAscFormatPainterState.kOn : ( false === _value ? c_oAscFormatPainterState.kOff : _value ) );
+    
     this.isPaintFormat = value;
     this.WordControl.m_oLogicDocument.Document_Format_Copy();
 };
@@ -6859,8 +6861,10 @@ asc_docs_api.prototype.ChangeShapeType = function(value)
     this.ImgApply(new CImgProperty({ShapeProperties:{type:value}}));
 };
 
-asc_docs_api.prototype.sync_PaintFormatCallback = function(value)
+asc_docs_api.prototype.sync_PaintFormatCallback = function(_value)
 {
+    var value = ( true === _value ? c_oAscFormatPainterState.kOn : ( false === _value ? c_oAscFormatPainterState.kOff : _value ) );
+    
     this.isPaintFormat = value;
     return this.asc_fireCallback("asc_onPaintFormatChanged", value);
 };

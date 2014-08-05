@@ -841,6 +841,32 @@ ParaHyperlink.prototype =
         }
     },
 
+    Get_StartTabsCount : function(TabsCounter)
+    {
+        var ContentLen = this.Content.length;
+        for ( var Pos = 0; Pos < ContentLen; Pos++ )
+        {
+            var Element = this.Content[Pos];
+            if ( false === Element.Get_StartTabsCount( TabsCounter ) )
+                return false;
+        }
+
+        return true;
+    },
+
+    Remove_StartTabs : function(TabsCounter)
+    {
+        var ContentLen = this.Content.length;
+        for ( var Pos = 0; Pos < ContentLen; Pos++ )
+        {
+            var Element = this.Content[Pos];
+            if ( false === Element.Remove_StartTabs( TabsCounter ) )
+                return false;
+        }
+
+        return true;
+    },
+
     Split : function (ContentPos, Depth)
     {
         var NewHyperlink = new ParaHyperlink();
