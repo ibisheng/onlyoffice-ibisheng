@@ -999,7 +999,7 @@ CDocumentContent.prototype =
                             RecalcResult = recalcresult_NextElement;
                         else
                         {
-                            this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement);
+                            this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement, FlowCount);
                             RecalcResult = recalcresult_CurPage;
                         }
                     }

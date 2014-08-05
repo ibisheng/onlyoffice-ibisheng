@@ -3002,6 +3002,11 @@ asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
         this.asc_fireCallback("asc_onCanRedo", bCanRedo);
 }
 
+asc_docs_api.prototype.sync_CanCopyCutCallback = function(bCanCopyCut)
+{
+    this.asc_fireCallback("asc_onCanCopyCut", bCanCopyCut);
+}
+
 asc_docs_api.prototype.setStartPointHistory = function(){
     this.noCreatePoint = true; History.Create_NewPoint();
 };

@@ -416,6 +416,7 @@ function CDocumentRecalcInfo()
     this.FlowObject                = null;   // Текущий float-объект, который мы пересчитываем
     this.FlowObjectPageBreakBefore = false;  // Нужно ли перед float-объектом поставить pagebreak
     this.FlowObjectPage            = 0;      // Количество обработанных страниц
+    this.FlowObjectElementsCount   = 0;      // Количество элементов подряд идущих в рамке (только для рамок)
     this.RecalcResult              = recalcresult_NextElement;
 
     this.WidowControlParagraph     = null;   // Параграф, который мы пересчитываем из-за висячих строк
@@ -434,6 +435,7 @@ CDocumentRecalcInfo.prototype =
         this.FlowObject                = null;
         this.FlowObjectPageBreakBefore = false;
         this.FlowObjectPage            = 0;
+        this.FlowObjectElementsCount   = 0;
         this.RecalcResult              = recalcresult_NextElement;
 
         this.WidowControlParagraph     = null;
@@ -452,11 +454,12 @@ CDocumentRecalcInfo.prototype =
         return false;
     },
 
-    Set_FlowObject : function(Object, RelPage, RecalcResult)
+    Set_FlowObject : function(Object, RelPage, RecalcResult, ElementsCount)
     {
-        this.FlowObject     = Object;
-        this.FlowObjectPage = RelPage;
-        this.RecalcResult   = RecalcResult;
+        this.FlowObject              = Object;
+        this.FlowObjectPage          = RelPage;
+        this.FlowObjectElementsCount = ElementsCount;
+        this.RecalcResult            = RecalcResult;
     },
 
     Check_FlowObject : function(FlowObject)
@@ -1155,8 +1158,6 @@ CDocument.prototype =
             this.Pages[PageIndex].Margins.Top    = SectPr.PageMargins.Top;
             this.Pages[PageIndex].Margins.Right  = SectPr.PageSize.W - SectPr.PageMargins.Right;
             this.Pages[PageIndex].Margins.Bottom = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-            
-            this.RecalcInfo.Reset();
         }
 
         var Count = this.Content.length;
@@ -1285,7 +1286,7 @@ CDocument.prototype =
                     }
 
                     var TempRecalcResult = Element.Recalculate_Page( PageIndex );
-                    this.RecalcInfo.Set_FlowObject( Element, 0, TempRecalcResult );
+                    this.RecalcInfo.Set_FlowObject( Element, 0, TempRecalcResult, -1 );
 
                     var FlowTable = new CFlowTable( Element, PageIndex );
                     this.DrawingObjects.addFloatTable( FlowTable );
@@ -1631,16 +1632,36 @@ CDocument.prototype =
                             RecalcResult = recalcresult_NextElement;
                         else
                         {
-                            this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement);
+                            this.RecalcInfo.Set_FlowObject(Element, PageIndex, recalcresult_NextElement, FlowCount);
                             RecalcResult = recalcresult_CurPage;
                         }
                     }
                 }
+                else if ( true === this.RecalcInfo.Check_FlowObject(Element) && true === this.RecalcInfo.Is_PageBreakBefore() )
+                {
+                    this.RecalcInfo.Reset();
+                    this.RecalcInfo.Set_FrameRecalc(true);                    
+                    this.Content[Index].Start_FromNewPage();
+                    RecalcResult = recalcresult_NextPage;                    
+                }
                 else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
                 {
-                    Index += this.RecalcInfo.FlowObjectPage - 1;
-                    this.RecalcInfo.Reset();
-                    RecalcResult = recalcresult_NextElement;
+                    // Проверяем номер страницы
+                    if ( this.RecalcInfo.FlowObjectPage !== PageIndex )
+                    {
+                        // Номер страницы не такой же (должен быть +1), значит нам надо заново персесчитать предыдущую страницу
+                        // с условием, что данная рамка начнется с новой страницы
+                        this.RecalcInfo.Set_PageBreakBefore( true );
+                        this.DrawingObjects.removeFloatTableById( this.RecalcInfo.FlowObjectPage, Element.Get_Id() );
+                        RecalcResult = recalcresult_PrevPage;                        
+                    }
+                    else
+                    {
+                        // Все нормально рассчиталось
+                        Index += this.RecalcInfo.FlowObjectElementsCount - 1;
+                        this.RecalcInfo.Reset();
+                        RecalcResult = recalcresult_NextElement;
+                    }
                 }
                 else
                 {
@@ -11457,11 +11478,11 @@ CDocument.prototype =
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            return this.HdrFtr.Document_UpdateSelectionState();
+            this.HdrFtr.Document_UpdateSelectionState();                        
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            return this.DrawingObjects.documentUpdateSelectionState();
+            this.DrawingObjects.documentUpdateSelectionState();
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
@@ -11522,7 +11543,10 @@ CDocument.prototype =
 
                 this.DrawingDocument.TargetShow();
             }
-        }                       
+        }
+        
+        // Обновим состояние кнопок Copy/Cut
+        this.Document_UpdateCopyCutState();
     },
 
     Document_UpdateUndoRedoState : function()
@@ -11549,6 +11573,52 @@ CDocument.prototype =
         {
             editor.SetUnchangedDocument();
         }
+    },
+    
+    Document_UpdateCopyCutState : function()
+    {
+        // Во время работы селекта не обновляем состояние
+        if ( true === this.Selection.Start )
+            return;
+        
+        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+            return;
+
+        var bCanCopyCut = false;
+        
+        var LogicDocument  = null;
+        var DrawingObjects = null;
+        
+        // Работаем с колонтитулом
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+            if ( docpostype_DrawingObjects === CurHdrFtr.Content.CurPos.Type )
+                DrawingObjects = this.DrawingObjects;
+            else
+                LogicDocument = CurHdrFtr.Content;
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            DrawingObjects = this.DrawingObjects;
+        }
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            LogicDocument = this;
+        }
+
+        if ( null !== DrawingObjects )
+        {
+            if ( true === DrawingObjects.isSelectedText() )
+                LogicDocument = DrawingObjects.getTargetDocContent();
+            else
+                bCanCopyCut = true;
+        }
+        
+        if ( null !== LogicDocument )
+            bCanCopyCut = LogicDocument.Is_SelectionUse();
+
+        editor.sync_CanCopyCutCallback( bCanCopyCut );
     },
 
     Document_UpdateCanAddHyperlinkState : function()

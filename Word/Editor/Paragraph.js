@@ -7899,7 +7899,7 @@ Paragraph.prototype =
         {
             NewNumPr = new CNumPr();
             NewNumPr.Set( 0, 0 );
-        }
+        }        
 
         History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : undefined != this.Pr.NumPr ? this.Pr.NumPr : undefined, New : NewNumPr } );
         this.Pr.NumPr = NewNumPr;
@@ -7919,10 +7919,11 @@ Paragraph.prototype =
                     {
                         var CurParaPr = this.Get_CompiledPr2(false).ParaPr;
                         var Left = CurParaPr.Ind.Left  + CurParaPr.Ind.FirstLine;
+                        var NumLeftCorrection = ( undefined != Lvl.ParaPr.Ind.FirstLine ?  Math.abs( Lvl.ParaPr.Ind.FirstLine ) : 0 );
 
                         History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : Left, Old : this.Pr.Ind.Left } );
                         History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0,    Old : this.Pr.Ind.FirstLine } );
-                        this.Pr.Ind.Left      = Left;
+                        this.Pr.Ind.Left      = Left - NumLeftCorrection;
                         this.Pr.Ind.FirstLine = 0;
                     }
                 }

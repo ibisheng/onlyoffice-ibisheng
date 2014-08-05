@@ -1670,6 +1670,26 @@ $(".colorWatch").mouseover(function(){
              $("#td_redo_img").removeClass("ToolbarRedoD");
          }
      });
+     
+     editor.asc_registerCallback("asc_onCanCopyCut", function()
+     {
+         var bCanCopy = arguments[0];
+
+         if ( false === bCanCopy )
+         {
+             $("#td_copy_td").removeClass("ToolbarIconOut");
+             $("#td_copy_td").addClass("ToolbarIconOut2");
+             $("#td_copy_img").addClass("ToolbarCopy");
+             $("#td_copy_img").removeClass("ToolbarCopy");
+         }
+         else
+         {
+             $("#td_copy_td").removeClass("ToolbarIconOut2");
+             $("#td_copy_td").addClass("ToolbarIconOut");
+             $("#td_copy_img").addClass("ToolbarCopy");
+             $("#td_copy_img").removeClass("ToolbarCopy");
+         }
+     });
 
      editor.asc_registerCallback("asc_onCanAddHyperlink", function()
      {

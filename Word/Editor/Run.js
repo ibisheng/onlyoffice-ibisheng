@@ -2374,7 +2374,7 @@ ParaRun.prototype =
                             {
                                 // Обновляем позицию объекта
                                 Item.Update_Position( new CParagraphLayout( PRSA.X, PRSA.Y , Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits);
-                                LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement );
+                                LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
                                 PRSA.RecalcResult = recalcresult_CurPage;
                                 return;
                             }
@@ -2395,12 +2395,12 @@ ParaRun.prototype =
                                 else if ( true === Para.Parent.Is_TableCellContent() )
                                 {
                                     // Картинка не на нужной странице, но так как это таблица
-                                    // мы не персчитываем заново текущую страницу, а не предыдущую
+                                    // мы пересчитываем заново текущую страницу, а не предыдущую
 
                                     // Обновляем позицию объекта
                                     Item.Update_Position( new CParagraphLayout( PRSA.X, PRSA.Y, Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits);
 
-                                    LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement );
+                                    LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
                                     LDRecalcInfo.Set_PageBreakBefore( false );
                                     PRSA.RecalcResult = recalcresult_CurPage;
                                     return;
