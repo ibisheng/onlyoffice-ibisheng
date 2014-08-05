@@ -5631,48 +5631,45 @@
 		WorksheetView.prototype._getCursorFormulaOrChart = function (x, y, offsetX, offsetY) {
 			var i;
 			if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-				var cursor, oFormulaRange, oFormulaIn, xFormula1, xFormula2, yFormula1, yFormula2;
+				var cursor, oFormulaRange, xFormula1, xFormula2, yFormula1, yFormula2;
 				var col = -1, row = -1;
 				var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
 					targetArr = this.isFormulaEditMode ? 0 : -1;
 				for (i in arrRanges) {
 					oFormulaRange = arrRanges[i].clone(true);
 
-					oFormulaIn = oFormulaRange.intersection(this.visibleRange);
-					if (oFormulaIn) {
-						xFormula1 = this.cols[oFormulaIn.c1].left - offsetX;
-						xFormula2 = this.cols[oFormulaIn.c2].left + this.cols[oFormulaIn.c2].width - offsetX;
-						yFormula1 = this.rows[oFormulaIn.r1].top - offsetY;
-						yFormula2 = this.rows[oFormulaIn.r2].top + this.rows[oFormulaIn.r2].height - offsetY;
+					xFormula1 = this.cols[oFormulaRange.c1].left - offsetX;
+					xFormula2 = this.cols[oFormulaRange.c2].left + this.cols[oFormulaRange.c2].width - offsetX;
+					yFormula1 = this.rows[oFormulaRange.r1].top - offsetY;
+					yFormula2 = this.rows[oFormulaRange.r2].top + this.rows[oFormulaRange.r2].height - offsetY;
 
-						if (
-							(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
-								||
-								(y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px))
-							){
-							cursor = kCurMove;
-							break;
-						} else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
-							cursor = kCurSEResize;
-							col = oFormulaIn.c2;
-							row = oFormulaIn.r2;
-							break;
-						} else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ){
-							cursor = kCurSEResize;
-							col = oFormulaIn.c1;
-							row = oFormulaIn.r1;
-							break;
-						} else if( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ){
-							cursor = kCurNEResize;
-							col = oFormulaIn.c1;
-							row = oFormulaIn.r2;
-							break;
-						} else if( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ){
-							cursor = kCurNEResize;
-							col = oFormulaIn.c2;
-							row = oFormulaIn.r1;
-							break;
-						}
+					if (
+						(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
+						||
+						(y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px))
+						){
+						cursor = kCurMove;
+						break;
+					} else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
+						cursor = kCurSEResize;
+						col = oFormulaRange.c2;
+						row = oFormulaRange.r2;
+						break;
+					} else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ){
+						cursor = kCurSEResize;
+						col = oFormulaRange.c1;
+						row = oFormulaRange.r1;
+						break;
+					} else if( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ){
+						cursor = kCurNEResize;
+						col = oFormulaRange.c1;
+						row = oFormulaRange.r2;
+						break;
+					} else if( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ){
+						cursor = kCurNEResize;
+						col = oFormulaRange.c2;
+						row = oFormulaRange.r1;
+						break;
 					}
 				}
 				if (cursor) {
@@ -5793,12 +5790,9 @@
 				rFrozen = this.topLeftFrozenCell.getRow0();
 				widthDiff = this.cols[cFrozen].left - this.cols[0].left;
 				heightDiff = this.rows[rFrozen].top - this.rows[0].top;
-				if (x < this.cellsLeft + widthDiff)
-					widthDiff = 0;
-				if (y < this.cellsTop + heightDiff)
-					heightDiff = 0;
-				offsetX -= widthDiff;
-				offsetY -= heightDiff;
+
+				offsetX = (x < this.cellsLeft + widthDiff) ? 0 : offsetX - widthDiff;
+				offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
 			}
 
 			if (x <= this.cellsLeft && y >= this.cellsTop) {
@@ -5914,8 +5908,8 @@
 								lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
 								lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
 								// Пересчитываем X и Y относительно видимой области
-								lockRangePosLeft -= (this.cols[this.visibleRange.c1].left - this.cellsLeft);
-								lockRangePosTop -= (this.rows[this.visibleRange.r1].top - this.cellsTop);
+								lockRangePosLeft -= offsetX;
+								lockRangePosTop -= offsetY;
 								// Пересчитываем в px
 								lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
 								lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
