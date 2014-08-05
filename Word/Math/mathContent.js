@@ -4586,18 +4586,16 @@ CMathContent.prototype =
         var result = false;
         if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
         {
-            var W = 0;
             var pos = 0;
             var lng = this.content.length;
 
+            var SearchCurX = SearchPos.CurX;
 
             while( pos < lng - 1 && SearchPos.CurX + this.content[pos].size.width < SearchPos.X)
             {
                 SearchPos.CurX += this.content[pos].size.width;
                 pos++;
             }
-
-            var SearchCurX = SearchPos.CurX;
 
             if(this.content[pos].Type == para_Math_Run)
             {
