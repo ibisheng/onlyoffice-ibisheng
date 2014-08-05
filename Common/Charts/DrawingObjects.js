@@ -1418,59 +1418,10 @@ function DrawingObjects() {
     DrawingBase.prototype.setGraphicObjectCoords = function() {
         var _t = this;
 
-       /* var leftTop = worksheet.getCellsOffset(1), _x, _y, col, row, offsets;
-        _x = mmToPt(_t.graphicObject.x) + leftTop.left;
-        _y = mmToPt(_t.graphicObject.y) + leftTop.top;
-        offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
-        col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
-        row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
-        _t.from.col = col.col;
-        _t.from.colOff = ptToMm(_x - col.left);
-        _t.from.row = row.row;
-        _t.from.rowOff = ptToMm(_y - row.top);
-
-        _x = mmToPt(_t.graphicObject.x + _t.graphicObject.extX) + leftTop.left;
-        _y = mmToPt(_t.graphicObject.y + _t.graphicObject.extY) + leftTop.top;
-        offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
-        col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
-        row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
-        _t.to.col = col.col;
-        _t.to.colOff = ptToMm(_x - col.left);
-        _t.to.row = row.row;
-        _t.to.rowOff = ptToMm(_y - row.top);
-        return;        */
         if ( _t.isGraphicObject() ) {
 
             if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
                 return;
-
-        //////var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-        //////var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
-        //var leftTop = _t.worksheet.getCellsOffset(0);
-        //var fromCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x),leftTop.top +  mmToPx(_t.graphicObject.y) );
-        //var toCell = _this.drawingArea.calculateCell(leftTop.left +  mmToPx(_t.graphicObject.x + _t.graphicObject.extX), leftTop.top + mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
-        //
-        //ar _x = mmToPt(_t.graphicObject.x) + leftTop.left;
-        //ar _y = mmToPt(_t.graphicObject.y) + leftTop.top;
-        //ar offsets = _this.drawingArea.getOffsets(ptToPx(_x), ptToPx(_y));
-        //ar col = _t.getColUnderCursor(_x - pxToPt(offsets.x) + leftTop.left);
-        //ar row = _t.getRowUnderCursor(_y - pxToPt(offsets.y) + leftTop.top);
-        //_t.from.col = col.col;
-        //_t.from.colOff = ptToMm(_x - col.left);
-        //_t.from.row = row.row;
-        //_t.from.rowOff = ptToMm(_y - row.top);
-        //
-        //_t.from.col = fromCell.col;
-        //_t.from.colOff = fromCell.colOff;
-        //_t.from.row = fromCell.row;
-        //_t.from.rowOff = fromCell.rowOff;
-        //
-        //_t.to.col = toCell.col;
-        //_t.to.colOff = toCell.colOff;
-        //_t.to.row = toCell.row;
-        //_t.to.rowOff = toCell.rowOff;
-
-
 
             var fromX =  mmToPt(_t.graphicObject.x), fromY =  mmToPt(_t.graphicObject.y),
                 toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX), toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
@@ -3889,26 +3840,47 @@ function DrawingObjects() {
         }
     };
 
-    _this.updateSizeDrawingObjects = function() {
+    _this.updateSizeDrawingObjects = function(target) {
 
-        for (var i = 0; i < aObjects.length; i++) {
-            var drawingObject = aObjects[i];
+        ExecuteNoHistory(function(){
 
-            var coords = _this.coordsManager.calculateCoords(drawingObject.from);
-            //var cellTo = _this.coordsManager.calculateCell(coords.x + drawingObject.size.width, coords.y + drawingObject.size.height);
-            var cellTo = _this.drawingArea.calculateCell(coords.x + drawingObject.size.width, coords.y + drawingObject.size.height);
-            drawingObject.to.col = cellTo.col;
-            drawingObject.to.colOff = cellTo.colOff;
-            drawingObject.to.row = cellTo.row;
-            drawingObject.to.rowOff = cellTo.rowOff;
+            var i, bNeedRecalc = false, drawingObject, coords, cellTo;
+            if(target.target === c_oTargetType.RowResize)
+            {
+                for (i = 0; i < aObjects.length; i++) {
+                    drawingObject = aObjects[i];
 
-            // Update graphic object
-            CheckSpPrXfrm(drawingObject.graphicObject);
-            drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
-            drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
-            _this.controller.recalculate();
-        }
-        _this.showDrawingObjects(true);
+                    if(drawingObject.from.row >= target.row)
+                    {
+                        coords = _this.coordsManager.calculateCoords(drawingObject.from);
+                        CheckSpPrXfrm(drawingObject.graphicObject);
+                        drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
+                        drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+                        bNeedRecalc = true;
+                    }
+                }
+            }
+            else
+            {
+                for (i = 0; i < aObjects.length; i++) {
+                    drawingObject = aObjects[i];
+
+                    if(drawingObject.from.col >= target.col)
+                    {
+                        coords = _this.coordsManager.calculateCoords(drawingObject.from);
+                        CheckSpPrXfrm(drawingObject.graphicObject);
+                        drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
+                        drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+                        bNeedRecalc = true;
+                    }
+                }
+            }
+            if(bNeedRecalc)
+            {
+                _this.controller.recalculate();
+                _this.showDrawingObjects(true);
+            }
+        }, _this, []);
     };
 
     _this.checkCursorDrawingObject = function(x, y) {
@@ -4232,10 +4204,15 @@ function CoordsManager(ws) {
     _t.calculateCoords = function(cell) {
 
         var coords = { x: 0, y: 0 };
-
+        //0 - px, 1 - pt, 2 - in, 3 - mm
         if ( cell ) {
-            coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - worksheet.getCellTop(0, 0);
-            coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
+            var rowOffset;
+            var rowHeight = worksheet.getRowHeight(cell.row, 3);
+            var colWidth = worksheet.getColumnWidth(cell.col, 3);
+            var resultRowOff = cell.rowOff > rowHeight ? rowHeight : cell.rowOff;
+            var resultColOff = cell.colOff > colWidth ? colWidth : cell.colOff;
+            coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(resultRowOff, 3, 0) - worksheet.getCellTop(0, 0);
+            coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(resultColOff, 3, 0) - worksheet.getCellLeft(0, 0);
         }
         return coords;
     }
