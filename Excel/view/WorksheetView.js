@@ -4485,10 +4485,8 @@
 					rowInfo.heightReal = rowInfo.height = Math.min(this.maxRowHeight,
 						Math.max(rowInfo.height, newHeight));
 					if (rowHeight !== rowInfo.height) {
-						if (!rowInfo.isDefaultHeight) {
+						if (!rowInfo.isDefaultHeight)
 							this.model.setRowHeight(rowInfo.height + this.height_1px, row, row);
-							this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
-						}
 
 						if (angle) {
 							this._fetchCellCache(col, row).text.textBound   =
@@ -4496,6 +4494,8 @@
 									ha, va, maxW);
 						}
 
+						if (this.objectRender)
+							this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
 						this.isChanged = true;
 					}
 				}
