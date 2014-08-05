@@ -3059,21 +3059,26 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 		{
 		    var sheetId = this.getId();
 		    var cellId = cell.getName();
-			if(false == cell.isEmpty())
-			{
-				var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
-				if(null != cell.xfs)
-					oUndoRedoData_CellData.style = cell.xfs.clone();
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, sheetId, new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
-			}
 			if(cell.formulaParsed)
 			    this.workbook.dependencyFormulas.deleteMasterNodes2(sheetId, cellId);
 			this.workbook.needRecalc.nodes[getVertexId(sheetId, cellId)] = [sheetId, cellId];
 			this.workbook.needRecalc.length++;
 			
-			delete row.c[nCol];
-			if(row.isEmpty())
-				delete this.aGCells[nRow];
+			if (null != cell.getConditionalFormattingStyle() || null != cell.getTableStyle()) {
+			    cell.setValue("");
+			    cell.setStyle(null);
+			}
+			else {
+			    if (false == cell.isEmpty()) {
+			        var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
+			        if (null != cell.xfs)
+			            oUndoRedoData_CellData.style = cell.xfs.clone();
+			        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, sheetId, new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
+			    }
+			    delete row.c[nCol];
+			    if (row.isEmpty())
+			        delete this.aGCells[nRow];
+			}
 		}
 	}
 };
@@ -4386,10 +4391,16 @@ Cell.prototype.setConditionalFormattingStyle=function(xfs){
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
+Cell.prototype.getConditionalFormattingStyle = function (xfs) {
+    return this.conditionalFormattingXfs;
+};
 Cell.prototype.setTableStyle=function(xfs){
 	this.tableXfs = xfs;
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
+};
+Cell.prototype.getTableStyle=function(xfs){
+    return this.tableXfs;
 };
 Cell.prototype.setStyle=function(xfs){
 	var oldVal = this.xfs;
