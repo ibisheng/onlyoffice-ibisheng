@@ -4487,6 +4487,7 @@
 					if (rowHeight !== rowInfo.height) {
 						if (!rowInfo.isDefaultHeight) {
 							this.model.setRowHeight(rowInfo.height + this.height_1px, row, row);
+							this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
 						}
 
 						if (angle) {
