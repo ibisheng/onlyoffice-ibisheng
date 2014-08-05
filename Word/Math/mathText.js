@@ -17,7 +17,6 @@ var DIV_CENT = 0.1386;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
-var TEST_STR = "";
 
 // TODO
 // убрать CMathTextPrp
@@ -105,9 +104,6 @@ CMathText.prototype =
             code = 0x2212;
 
         this.value = code;
-
-
-        TEST_STR += code.toString(16) + " ";
 
     },
 	addTxt: function(txt)

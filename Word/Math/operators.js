@@ -4010,8 +4010,8 @@ CCharacter.prototype.setPosition = function(pos)
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    var alignOp  =  this.align_2(this.operator),
-        alignCnt =  this.align_2(this.elements[0][0]);
+    var alignOp = (this.size.width - this.operator.size.width)/2,
+        alignCnt = (this.size.width - this.elements[0][0].size.width)/2;
 
     var PosOper = new CMathPosition(),
         PosBase = new CMathPosition();
@@ -4041,9 +4041,20 @@ CCharacter.prototype.setPosition = function(pos)
         this.operator.setPosition(PosOper);
     }
 }
-CCharacter.prototype.align_2 = function(element)
+CCharacter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
-    return (this.size.width - element.size.width)/2;
+    var align = (this.size.width - this.elements[0][0].size.width)/2;
+
+    SearchPos.Pos.Update(0, Depth);
+    SearchPos.Pos.Update(0, Depth+1);
+
+    SearchPos.CurX += this.GapLeft + align;
+
+    var result = this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+
+    SearchPos.CurX += this.GapRight + align;
+
+    return result;
 }
 CCharacter.prototype.draw = function(x, y, pGraphics)
 {

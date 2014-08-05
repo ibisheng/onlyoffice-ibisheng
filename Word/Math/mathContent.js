@@ -4475,12 +4475,6 @@ CMathContent.prototype =
 
         var currPos = 0;
 
-        if(this.bRoot)
-        {
-            console.log(TEST_STR);
-            TEST_STR = "";
-        }
-
         while(currPos < len)
         {
             current = this.content[currPos];

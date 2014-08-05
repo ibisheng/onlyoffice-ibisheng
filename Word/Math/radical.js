@@ -1191,7 +1191,7 @@ CRadical.prototype.findDisposition = function(SearchPos, Depth)
         base = this.elements[0][0].size;
         //var X, Y;
 
-        var gapLeft = this.size.width - base.width;
+        var gapLeft = this.size.width - base.width - this.GapRight;
         var gapTop = this.size.ascent - base.ascent;
 
         if(SearchPos.X < gapLeft)
@@ -1247,7 +1247,7 @@ CRadical.prototype.findDisposition = function(SearchPos, Depth)
             //posCurs.y = 1;
             SearchPos.Pos.Update(1, Depth+1);
 
-            SearchPos.X -= (this.size.width - base.width);
+            SearchPos.X -= (this.size.width - base.width - this.GapRight);
             var topBase = this.size.ascent - base.ascent;
 
             if(SearchPos.Y < topBase)
@@ -1262,6 +1262,45 @@ CRadical.prototype.findDisposition = function(SearchPos, Depth)
     }
 
     //return disposition;
+}
+CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var result = false;
+    if(this.Pr.type == SQUARE_RADICAL)
+    {
+        SearchPos.CurX += this.size.width - this.Base.size.width - this.GapRight;
+        if(this.Base.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
+        {
+            SearchPos.Pos.Update(0, Depth);
+            SearchPos.Pos.Update(0, Depth + 1);
+            result = true;
+        }
+        SearchPos.CurX += this.GapRight;
+    }
+    else
+    {
+        SearchPos.CurX += this.GapLeft;
+        if(this.Iterator.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
+        {
+            SearchPos.Pos.Update(0, Depth);
+            SearchPos.Pos.Update(0, Depth + 1);
+            result = true;
+        }
+
+        SearchPos.CurX += this.size.width - this.Iterator.size.width - this.Base.size.width - this.GapRight;
+
+        if(this.Base.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
+        {
+            SearchPos.Pos.Update(0, Depth);
+            SearchPos.Pos.Update(1, Depth + 1);
+            result = true;
+        }
+
+
+        SearchPos.CurX += this.GapRight;
+    }
+
+    return result;
 }
 CRadical.prototype.draw = function(x, y, pGraphics)
 {
