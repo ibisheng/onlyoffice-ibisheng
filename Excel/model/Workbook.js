@@ -3057,22 +3057,19 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 		var cell = row.c[nCol];
 		if(null != cell)
 		{
+		    var sheetId = this.getId();
+		    var cellId = cell.getName();
 			if(false == cell.isEmpty())
 			{
 				var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
 				if(null != cell.xfs)
 					oUndoRedoData_CellData.style = cell.xfs.clone();
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, sheetId, new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
 			}
 			if(cell.formulaParsed)
-				this.workbook.dependencyFormulas.deleteMasterNodes2( this.getId(), cell.getName() );
-
-			// addToArrRecalc(this.workbook, this.getId(), cell.getName());
-            // if( this.workbook.dependencyFormulas.getNode(this.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
-                // this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] = [ this.getId(),cell.getName() ];
-                // if( this.workbook.needRecalc.length < 0) this.workbook.needRecalc.length = 0;
-                // this.workbook.needRecalc.length++;
-            // }
+			    this.workbook.dependencyFormulas.deleteMasterNodes2(sheetId, cellId);
+			this.workbook.needRecalc.nodes[getVertexId(sheetId, cellId)] = [sheetId, cellId];
+			this.workbook.needRecalc.length++;
 			
 			delete row.c[nCol];
 			if(row.isEmpty())
