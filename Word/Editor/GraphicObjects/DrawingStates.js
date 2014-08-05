@@ -532,7 +532,12 @@ RotateState.prototype =
                     if(j === check_paragraphs.length)
                         check_paragraphs.push(nearest_pos.Paragraph);
                 }
-                if(!e.CtrlKey)
+                var arr_parent_paragraphs = [];
+                if(this instanceof RotateState)
+                {
+                    check_paragraphs.length = 0;
+                }
+                if(!(e.CtrlKey && this instanceof MoveState))
                 {
                     for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                     {
@@ -548,6 +553,7 @@ RotateState.prototype =
                             {
                                 check_paragraphs.push(paragraph);
                             }
+                            arr_parent_paragraphs.push(paragraph)
                         }
                     }
                 }
@@ -567,9 +573,19 @@ RotateState.prototype =
                             original.parent.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], original.selectStartPage);
                         }
 
-                        for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                        if(!(this instanceof RotateState))
                         {
-                           this.drawingObjects.arrTrackObjects[i].originalObject.parent.Add_ToDocument2(arr_nearest_pos[i].Paragraph);
+                            for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                            {
+                                this.drawingObjects.arrTrackObjects[i].originalObject.parent.Add_ToDocument2(arr_nearest_pos[i].Paragraph);
+                            }
+                        }
+                        else
+                        {
+                            for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
+                            {
+                                this.drawingObjects.arrTrackObjects[i].originalObject.parent.Add_ToDocument2(arr_parent_paragraphs[i]);
+                            }
                         }
 
                     }
