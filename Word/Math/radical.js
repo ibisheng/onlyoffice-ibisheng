@@ -1179,90 +1179,6 @@ CRadical.prototype.setPosition = function(pos)
         this.RealBase.setPosition(PosBase);
     }
 }
-CRadical.prototype.findDisposition = function(SearchPos, Depth)
-{
-    //var disposition;
-    //var inside_flag = -1;
-
-    var base, degree;
-
-    if(this.Pr.type == SQUARE_RADICAL)
-    {
-        base = this.elements[0][0].size;
-        //var X, Y;
-
-        var gapLeft = this.size.width - base.width - this.GapRight;
-        var gapTop = this.size.ascent - base.ascent;
-
-        if(SearchPos.X < gapLeft)
-            SearchPos.X = 0;
-        else if(SearchPos.X > gapLeft + base.width)
-            SearchPos.X = base.width;
-        else
-            SearchPos.X -= gapLeft;
-
-
-        if(SearchPos.Y < gapTop)
-            SearchPos.Y = 0;
-        else if(SearchPos.Y > gapTop + base.height)
-            SearchPos.Y = base.height;
-        else
-            SearchPos.Y -= gapTop;
-
-        SearchPos.Pos.Update(0, Depth);
-        SearchPos.Pos.Update(0, Depth+1);
-
-    }
-    else if(this.Pr.type == DEGREE_RADICAL)
-    {
-        //var mouseCoord = {x: null, y: null},
-        //    posCurs =    {x: 0, y: null};
-
-        degree = this.elements[0][0].size;
-        base = this.elements[0][1].size;
-
-        SearchPos.Pos.Update(0, Depth);
-
-        if(SearchPos.X < this.size.width - base.width)
-        {
-            //posCurs.y = 0;
-            SearchPos.Pos.Update(0, Depth+1);
-
-            if(SearchPos.X > degree.width)
-                SearchPos.X = degree.width;
-            else if(SearchPos.X < this.gapWidth)
-                SearchPos.X = 0;
-            else
-                SearchPos.X -= this.gapWidth;
-
-            if(SearchPos.Y < this.gapDegree)
-                SearchPos.Y = 0;
-            else if(SearchPos.Y > degree.height + this.gapDegree)
-                SearchPos.Y = degree.height;
-            else
-                SearchPos.Y -= this.gapDegree;
-        }
-        else
-        {
-            //posCurs.y = 1;
-            SearchPos.Pos.Update(1, Depth+1);
-
-            SearchPos.X -= (this.size.width - base.width - this.GapRight);
-            var topBase = this.size.ascent - base.ascent;
-
-            if(SearchPos.Y < topBase)
-                SearchPos.Y = 0;
-            else if(SearchPos.Y > base.height + topBase)
-                SearchPos.Y = base.height;
-            else
-                SearchPos.Y -= topBase;
-        }
-
-        //disposition = {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
-    }
-
-    //return disposition;
-}
 CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
     var result = false;
@@ -1295,7 +1211,6 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
             SearchPos.Pos.Update(1, Depth + 1);
             result = true;
         }
-
 
         SearchPos.CurX += this.GapRight;
     }

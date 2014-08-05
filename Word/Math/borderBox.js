@@ -275,112 +275,6 @@ CBorderBox.prototype.setPosition = function(pos)
 
     this.elements[0][0].setPosition(NewPos);
 }
-CBorderBox.prototype.old_findDisposition = function(mCoord)
-{
-    var X = null,
-        Y = null,
-        inside_flag = -1; // остаемя в пределах данного элемента( за границы элемента не вышли )
-
-    var shX = 0, shY = 0;
-
-    if(this.Pr.hideLeft == false)
-        shX = this.gapBrd;
-    if(this.Pr.hideTop == false)
-        shY = this.gapBrd;
-
-    var sCont = this.elements[0][0].size;
-
-    if(mCoord.x < shX)
-    {
-        X = 0;
-        inside_flag = 0;
-    }
-    else if(mCoord.x > shX + sCont.width)
-    {
-        X = sCont.width;
-        inside_flag = 1;
-    }
-    else
-    {
-        X = mCoord.x - shX;
-    }
-
-    if(mCoord.y < shY)
-    {
-        Y = 0;
-        inside_flag = 2;
-    }
-    else if(mCoord.y > shY + sCont.height)
-    {
-        Y = sCont.height;
-        inside_flag = 2;
-    }
-    else
-    {
-        Y = mCoord.y - shY;
-    }
-
-    var coord = {x: X, y: Y},
-        posCurs = {x: 0, y: 0};
-
-
-    return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
-
-}
-CBorderBox.prototype.findDisposition = function(SearchPos, Depth)
-{
-   /*var X = null,
-         Y = null,
-        inside_flag = -1;*/ // остаемя в пределах данного элемента( за границы элемента не вышли )
-
-    var alignX = 0, alignY = 0;
-
-    if(this.Pr.hideLeft == false)
-        alignX = this.gapBrd;
-    if(this.Pr.hideTop == false)
-        alignY = this.gapBrd;
-
-    var base = this.elements[0][0].size;
-
-    if(SearchPos.X < alignX)
-    {
-        SearchPos.X = 0;
-        //inside_flag = 0;
-    }
-    else if(SearchPos.X > alignX + base.width)
-    {
-        SearchPos.X = base.width;
-        //inside_flag = 1;
-    }
-    else
-    {
-        SearchPos.X -= alignX;
-    }
-
-    if(SearchPos.Y < alignY)
-    {
-        SearchPos.Y = 0;
-        //inside_flag = 2;
-    }
-    else if(SearchPos.Y > alignY + base.height)
-    {
-        SearchPos.Y = base.height;
-        //inside_flag = 2;
-    }
-    else
-    {
-        SearchPos.Y -= alignY;
-    }
-
-    SearchPos.Pos.Update(0, Depth);
-    SearchPos.Pos.Update(0, Depth+1);
-
-    /*var coord = {x: X, y: Y},
-        posCurs = {x: 0, y: 0};*/
-
-
-    //return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
-}
 CBorderBox.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
     var alignLeft  =  this.Pr.hideLeft  ? 0 : this.gapBrd,
@@ -395,7 +289,7 @@ CBorderBox.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
         SearchPos.Pos.Update(0, Depth + 1);
     }
 
-    SearchPos.CurX += alignRight;
+    SearchPos.CurX += this.GapRight + alignRight;
 
     return result;
 }

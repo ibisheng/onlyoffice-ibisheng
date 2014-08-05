@@ -3781,62 +3781,6 @@ CDelimiter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
     return result;
 
 }
-CDelimiter.prototype.findDisposition = function(SearchPos, Depth)
-{
-    var begWidth = this.begOper.size.width,
-        sepWidth = this.sepOper.size.width,
-        endWidth = this.endOper.size.width;
-
-    SearchPos.Pos.Update(0, Depth);
-
-    var Curr_Pos_Y;
-
-    if(SearchPos.X < begWidth)
-    {
-        Curr_Pos_Y = 0;
-        SearchPos.X = 0;
-    }
-    else if(SearchPos.X > this.size.width - endWidth)
-    {
-        Curr_Pos_Y = 0;
-        SearchPos.X = this.elements[0][this.nCol - 1].size.width;
-    }
-    else
-    {
-        var ww = begWidth;
-
-        Curr_Pos_Y = this.nCol - 1;
-
-        for(var j = 0; j < this.nCol; j++)
-        {
-            if(ww + this.elements[0][j].size.width + this.sepOper.size.width/2 > SearchPos.X)
-            {
-                Curr_Pos_Y = j;
-
-                if( SearchPos.X < ww + this.elements[0][j].size.width)
-                    SearchPos.X -= ww;
-                else
-                    SearchPos.X = ww + this.elements[0][j].size.width;
-                break;
-            }
-
-            ww += this.elements[0][j].size.width + sepWidth;
-        }
-    }
-
-    SearchPos.Pos.Update(Curr_Pos_Y, Depth+1);
-
-
-    var align = this.align(this.elements[0][Curr_Pos_Y]);
-
-    if(align > SearchPos.Y)
-        SearchPos.Y = 0;
-    else if(this.elements[0][Curr_Pos_Y].size.height + align < SearchPos.Y)
-        SearchPos.Y = this.elements[0][Curr_Pos_Y].size.height;
-    else
-        SearchPos.Y -= align;
-
-}
 CDelimiter.prototype.draw = function(x, y, pGraphics)
 {
     this.begOper.draw(x, y, pGraphics);
@@ -4075,35 +4019,6 @@ CCharacter.prototype.draw = function(x, y, pGraphics)
     pGraphics.b_color1(0,0,0, 255);
 
     this.operator.draw(x, y, pGraphics);
-
-}
-CCharacter.prototype.findDisposition = function(SearchPos, Depth)
-{
-    var base = this.elements[0][0],
-        align = this.align(base);
-
-    if(SearchPos.X < align)
-        SearchPos.X = 0;
-    else if(SearchPos.X > align + base.size.width)
-        SearchPos.X = base.size.width;
-    else
-        SearchPos.X -= align;
-
-    if(this.Pr.pos === LOCATION_TOP)
-    {
-        if(SearchPos.Y < this.operator.size.height)
-            SearchPos.Y = 0;
-        else
-            SearchPos.Y -= this.operator.size.height;
-    }
-    else if(this.Pr.pos === LOCATION_BOT)
-    {
-        if(SearchPos.Y > base.size.height)
-            SearchPos.Y = base.size.height;
-    }
-
-    SearchPos.Pos.Update(0, Depth);
-    SearchPos.Pos.Update(0, Depth+1);
 
 }
 CCharacter.prototype.getBase = function()

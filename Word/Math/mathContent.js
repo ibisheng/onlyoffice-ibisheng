@@ -4014,29 +4014,6 @@ CMathContent.prototype =
 
         return result;
     },
-    findDisposition: function(SearchPos, Depth)
-    {
-        var W = 0;
-        var pos = 0;
-        for(var i = 0; i < this.content.length && SearchPos.X > W; i++)
-        {
-            W += this.content[i].size.width;
-            pos = i;
-        }
-
-        if( this.content[pos].Type === para_Math_Composition )
-        {
-            if(SearchPos.X < W - this.content[pos].size.width + this.content[pos].GapLeft)
-                pos--;
-            else if(SearchPos.X >= W - this.content[pos].GapRight)
-                pos++;
-        }
-
-        SearchPos.Pos.Update(pos, Depth);
-        SearchPos.X -= this.WidthToElement[pos];
-
-        //return pos;
-    },
     setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
         if(this.content.length == 1 && !this.bRoot )//только CEmpty
@@ -4553,34 +4530,6 @@ CMathContent.prototype =
     },
 
     /// функции для работы с курсором
-
-    old_Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-    {
-        if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
-        {
-            this.findDisposition(SearchPos, Depth);
-            var pos = SearchPos.Pos.Get(Depth);
-            //var pos = this.findPosition(SearchPos.X, SearchPos.Y);
-
-            //SearchPos.Pos.Update( pos, Depth );
-            //Depth++;
-
-            //SearchPos.X -= this.WidthToElement[pos];
-
-            if(this.content[pos].Type == para_Math_Composition)
-            {
-                SearchPos.Y -= this.size.ascent - this.content[pos].size.ascent;
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd);
-            }
-            else if(this.content[pos].Type == para_Math_Run)      // проверка на gaps в findDisposition
-            {
-                SearchPos.X += this.pos.x + this.ParaMath.X + this.WidthToElement[pos];
-                SearchPos.X += this.pos.x + this.WidthToElement[pos];
-                this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd);
-            }
-        }
-    },
-
     Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         var result = false;

@@ -1174,34 +1174,9 @@ CAccent.prototype.draw = function(x, y, pGraphics)
 
     this.operator.draw(x, y, pGraphics);
 }
-CAccent.prototype.findDisposition = function(SearchPos, Depth)
-{
-    var base = this.elements[0][0],
-        align = (this.size.width - this.GapLeft - this.GapRight - base.size.width)/2;
-
-    if(SearchPos.X < align)
-        SearchPos.X = 0;
-    else if(SearchPos.X > align + base.size.width)
-        SearchPos.X = base.size.width;
-    else
-        SearchPos.X -= align;
-
-    var accentGap = this.size.height - base.size.height;
-
-    if(SearchPos.Y < accentGap)
-    {
-        SearchPos.Y = 0;
-    }
-    else
-        SearchPos.Y -= accentGap;
-
-    SearchPos.Pos.Update(0, Depth);
-    SearchPos.Pos.Update(0, Depth + 1);
-
-}
 CAccent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
-    var align =  (this.size.width - this.elements[0][0].size.width)/2;
+    var align =  (this.size.width - this.elements[0][0].size.width - this.GapLeft - this.GapRight)/2;
 
     SearchPos.CurX += this.GapLeft + align;
 
