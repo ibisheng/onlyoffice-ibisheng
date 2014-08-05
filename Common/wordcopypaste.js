@@ -4853,7 +4853,7 @@ PasteProcessor.prototype =
     },
     _CommitElemToParagraph: function (elem) {
         if (null != this.oCurHyperlink) {
-            this.oCurHyperlink.Add_ToContent(this.oCurParContentPos, elem, false);
+            this.oCurHyperlink.Add_ToContent(this.oCurHyperlinkContentPos, elem, false);
             this.oCurHyperlinkContentPos++;
         }
         else {
