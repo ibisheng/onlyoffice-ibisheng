@@ -198,6 +198,9 @@
 				this.r2 = r2;
 				return normalize ? this.normalize() : this;
 			},
+			assign2: function (range) {
+				return this.assign(range.c1, range.r1, range.c2, range.r2);
+			},
 
 			clone: function (normalize) {
 			    var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
@@ -394,6 +397,11 @@
 		
 		ActiveRange.prototype.assign = function () {
 			ActiveRange.superclass.assign.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.assign2 = function () {
+			ActiveRange.superclass.assign2.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
