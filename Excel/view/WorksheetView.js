@@ -7509,9 +7509,12 @@
 				var applyFillHandleCallback = function (res) {
 					if (res) {
 						// Автозаполняем ячейки
-						range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex);
-						// Вызываем функцию пересчета для заголовков форматированной таблицы
-						t.autoFilters._renameTableColumn(arn);
+					    if (range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex)) {
+					        // Вызываем функцию пересчета для заголовков форматированной таблицы
+					        t.autoFilters._renameTableColumn(arn);
+					    }
+					    else
+					        t.handlers.trigger("onErrorEvent", c_oAscError.ID.CannotFillRange, c_oAscError.Level.NoCritical);
 					}
 
 					// Сбрасываем параметры автозаполнения

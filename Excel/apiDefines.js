@@ -32,6 +32,7 @@ var c_oAscError = {
 		CoAuthoringDisconnect:	-18,
 		ConvertationPassword:	-19,
 		MaxDataSeriesError:		-80,
+		CannotFillRange:        -81,
 		
 		
 		VKeyEncrypt:			-20,

@@ -7351,7 +7351,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
  	if(0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2)
 		bWholeRow = true;
 	if((bWholeCol && bWholeRow) || (true == bVertical && bWholeCol) || (false == bVertical && bWholeRow))
-		return;
+		return false;
 	var oPromoteAscRange = null;
 	if(0 == nIndex)
 		oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
@@ -7385,7 +7385,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	//проверяем можно ли осуществить promote
 	var oCanPromote = this._canPromote(oBBox, oPromoteAscRange, true, nWidth, nHeight, bVertical, nIndex);
 	if(null == oCanPromote)
-		return;
+		return false;
 
 	History.Create_NewPoint();
 	var oSelection = History.GetSelection();
@@ -7431,6 +7431,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		History.SetSelectionRedo(oSelectionRedo);
 	}
 	this._promoteFromTo(oBBox, oPromoteAscRange, true, oCanPromote, bCtrl, bVertical, nIndex);
+	return true;
 };
 Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex){
 	lockDraw(this.worksheet.workbook);
