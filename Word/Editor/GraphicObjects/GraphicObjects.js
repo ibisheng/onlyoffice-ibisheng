@@ -2102,8 +2102,12 @@ CGraphicObjects.prototype =
                                 else
                                 {
                                     var new_x, new_y;
-                                    new_x = cur_group.x + sp.bounds.x;
-                                    new_y = cur_group.y + sp.bounds.y;
+
+                                    var deltaX, deltaY;
+                                    deltaX = sp.localTransform.tx - sp.bounds.x;
+                                    deltaY = sp.localTransform.ty - sp.bounds.y;
+                                    new_x = sp.transform.tx - deltaX;
+                                    new_y = sp.transform.ty - deltaY;
                                     sp.recalcBounds();
                                     var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage, new_x, new_y, true, para_drawing);
                                     nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
