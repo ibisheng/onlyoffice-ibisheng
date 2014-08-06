@@ -875,8 +875,11 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
     salvage = salvage.getValue();
     period = period.getValue();
     basis = Math.floor( basis.getValue() );
+    datePurch = datePurch.getValue();
+    firstPer = firstPer.getValue();
 
-    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ) {
+    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ||
+         firstPer  <  0 || datePurch < 0 || datePurch > firstPer || cost < salvage ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
@@ -886,19 +889,23 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         return this.value = new cNumber( 0 );
     }
 
-    if ( per < 3 )
-        coeff = 1;
-    else if ( per < 5 )
+    if ( per >= 3 && per <= 4 ) {
         coeff = 1.5;
-    else if ( per <= 6 )
+    }
+    else if ( per >= 5 && per <= 6 ) {
         coeff = 2;
-    else
+    }
+    else if ( per > 6 ) {
         coeff = 2.5;
+    }
+    else {
+        return this.value = new cError( cErrorType.not_numeric );
+    }
 
     rate *= coeff;
 
-    var val0 = Date.prototype.getDateFromExcel( datePurch.getValue() ),
-        val1 = Date.prototype.getDateFromExcel( firstPer.getValue() );
+    var val0 = Date.prototype.getDateFromExcel( datePurch ),
+        val1 = Date.prototype.getDateFromExcel( firstPer );
 
     var _rate = Math.round( yearFrac( val0, val1, basis ) * rate * cost ), rest;
     cost -= _rate;
@@ -1030,31 +1037,40 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
     period = period.getValue();
     rate = rate.getValue();
     basis = Math.floor( basis.getValue() );
-
-    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ) {
+    var val0 = Date.prototype.getDateFromExcel( datePurch ),
+        val1 = Date.prototype.getDateFromExcel( firstPer );
+    if ( cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ||
+        datePurch < 0 || firstPer < 0 || datePurch > firstPer || cost < salvage ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    if ( cost == salvage || period > 1 / rate ) {
-        return this.value = new cNumber( 0 );
+    var fDepTime = yearFrac( val0, val1, basis ).getValue() * rate * cost,
+        fDep, depr = rate * cost, availDepr, availDeprTemp,
+        countedPeriod = 1, c = 0, maxIter = 10000;
+
+    fDep = fDepTime == 0 ? cost * rate : fDepTime;
+    availDepr = (cost - salvage - fDep);
+
+    rate = Math.ceil( 1 / rate );
+    if ( cost == salvage || period > rate ) {
+        return new cNumber( 0 );
     }
+    else {
+        if ( period == 0 ) {
+            return new cNumber( fDep );
+        }
+        else {
 
-    var val0 = Date.prototype.getDateFromExcel( datePurch ),
-        val1 = Date.prototype.getDateFromExcel( firstPer );
-
-    var costRate = cost * rate,
-        costDelta = cost - salvage,
-        _rate = yearFrac( val0, val1, basis ) * rate * cost,
-        countFullPeriods = ( cost - salvage - _rate) / costRate;
-
-    if ( period == 0 )
-        return this.value = new cNumber( _rate );
-    else if ( period <= countFullPeriods )
-        return this.value = new cNumber( costRate );
-    else if ( period == countFullPeriods + 1 )
-        return this.value = new cNumber( costDelta - costRate * countFullPeriods - _rate );
-    else
-        return this.value = new cNumber( 0 );
+            while ( countedPeriod <= period && c < maxIter ) {
+                depr = depr > availDepr ? availDepr : depr;
+                availDeprTemp = availDepr - depr;
+                availDepr = availDeprTemp < 0 ? 0 : availDeprTemp;
+                countedPeriod++;
+                c++;
+            }
+            return new cNumber( Math.floor(depr) );
+        }
+    }
 
 };
 cAMORLINC.prototype.getInfo = function () {

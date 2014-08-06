@@ -12,7 +12,9 @@ var cElementType = {
     func:8,
     operator:9,
     name:10,
-    array:11
+    array:11,
+    cell3D:12,
+    cellsRange3D:13
 };
 /** @enum */
 var cErrorType = {
@@ -225,13 +227,13 @@ String.prototype.repeat = function (s, n){
 }
 
 /** @constructor */
-function cBaseType( val ) {
+function cBaseType( val, type ) {
     this.needRecalc = false;
     this.numFormat = null;
-    this.type = null;
-    this.value = val;
     this.ca = false;
     this.node = undefined;
+    this.type = type;
+    this.value = val;
 }
 cBaseType.prototype = {
     constructor:cBaseType,
@@ -260,15 +262,7 @@ cBaseType.prototype = {
 /*Basic types of an elements used into formulas*/
 /** @constructor */
 function cNumber( val ) {
-//    cBaseType.apply( this, arguments );
-//    cBaseType.call( this, val );
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.ca = false;
-    this.node = undefined;
-
-    this.type = cElementType.number;
-    this.value = parseFloat( val );
+    this.constructor.call( this, parseFloat( val ), cElementType.number );
     var res;
 
     if ( !isNaN( this.value ) && Math.abs( this.value ) !== Infinity ) {
@@ -284,9 +278,6 @@ function cNumber( val ) {
 }
 
 cNumber.prototype = Object.create( cBaseType.prototype );
-cNumber.prototype.getValue = function () {
-    return this.value;//.toFixed( cExcelSignificantDigits ) - 0;
-};
 cNumber.prototype.tocString = function () {
     return new cString( "" + this.value );
 };
@@ -299,15 +290,7 @@ cNumber.prototype.tocBool = function () {
 
 /** @constructor */
 function cString( val ) {
-//    cBaseType.call( this, val );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
-
-    this.type = cElementType.string;
+    this.constructor.call( this, val, cElementType.string );
 }
 
 cString.prototype = Object.create( cBaseType.prototype );
@@ -356,10 +339,7 @@ cString.prototype.tryConvert = function () {
 
 /** @constructor */
 function cBool( val ) {
-    cBaseType.call( this, val );
-
-    this.type = cElementType.bool;
-    this.value = val.toString().toUpperCase() === "TRUE";
+    this.constructor.call( this, val.toString().toUpperCase() === "TRUE", cElementType.bool );
 }
 
 cBool.prototype = Object.create( cBaseType.prototype );
@@ -384,15 +364,8 @@ cBool.prototype.toBool = function () {
 
 /** @constructor */
 function cError( val ) {
-//    cBaseType.call( this, val );
+    this.constructor.call( this, val, cElementType.error );
 
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
-
-    this.type = cElementType.error;
     this.errorType = -1;
 
     switch ( val ) {
@@ -472,19 +445,12 @@ cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBo
 
 /** @constructor */
 function cArea( val, ws ) {/*Area means "A1:E5" for example*/
-//    cBaseType.call( this, val, _ws );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
+    this.constructor.call( this, val, cElementType.cellsRange );
 
     this.ws = ws;
     this.wb = ws.workbook;
     this._cells = val;
     this.isAbsolute = false;
-    this.type = cElementType.cellsRange;
     this.range = null;
 //    this._valid = this.range ? true : false;
 }
@@ -752,18 +718,11 @@ cArea.prototype.index = function ( r, c, n ) {
 
 /** @constructor */
 function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
-//    cBaseType.call( this, val, _wsFrom, _wsTo, wb );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
+    this.constructor.call( this, val, cElementType.cellsRange );
 
     this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
-    this.type = cElementType.cellsRange;
     this.wsFrom = this._wb.getWorksheetByName( wsFrom ).getId();
     this.wsTo = this._wb.getWorksheetByName( wsTo ).getId();
 }
@@ -1109,20 +1068,12 @@ cArea3D.prototype.foreach2 = function ( action ) {
 
 /** @constructor */
 function cRef( val, ws ) {/*Ref means A1 for example*/
-//    cBaseType.apply( this, arguments );
-//    cBaseType.call( this, val, _ws );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
+    this.constructor.call( this, val, cElementType.cell );
 
     this._cells = val;
     this.ws = ws;
     this.wb = this._wb = ws.workbook;
     this.isAbsolute = false;
-    this.type = cElementType.cell;
     var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
     this.range = null;
     this._valid = ca.isValid();
@@ -1204,18 +1155,10 @@ cRef.prototype.isValid = function () {
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-//    cBaseType.call( this, val, _wsFrom, wb );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
-
+    this.constructor.call( this, val, cElementType.cell );
     this.wb = this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
-    this.type = cElementType.cell;
     this.ws = this._wb.getWorksheetByName( _wsFrom );
     this.range = null;
 }
@@ -1299,15 +1242,7 @@ cRef3D.prototype.getWS = function () {
 
 /** @constructor */
 function cEmpty() {
-//    cBaseType.call( this );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = "";
-    this.ca = false;
-    this.node = undefined;
-
-    this.type = cElementType.empty;
+    this.constructor.call( this, "", cElementType.empty );
 }
 
 cEmpty.prototype = Object.create( cBaseType.prototype );
@@ -1326,16 +1261,8 @@ cEmpty.prototype.toString = function () {
 
 /** @constructor */
 function cName( val, wb ) {
-//    cBaseType.call( this, val, wb );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = val;
-    this.ca = false;
-    this.node = undefined;
-
+    this.constructor.call( this, val, cElementType.name );
     this.wb = wb;
-    this.type = cElementType.name;
 }
 
 cName.prototype = Object.create( cBaseType.prototype );
@@ -1363,19 +1290,11 @@ cName.prototype.toRef = function ( wsID ) {
 
 /** @constructor */
 function cArray() {
-//    cBaseType.call( this );
-
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.value = undefined;
-    this.ca = false;
-    this.node = undefined;
-
+    this.constructor.call( this, undefined,cElementType.array );
     this.array = [];
     this.rowCount = 0;
     this.countElementInRow = [];
     this.countElement = 0;
-    this.type = cElementType.array;
 }
 
 cArray.prototype = Object.create( cBaseType.prototype );
@@ -1526,7 +1445,6 @@ cArray.prototype.fillFromArray = function ( arr ) {
 
 function cUndefined(){this.value = undefined;}
 cUndefined.prototype = Object.create( cBaseType.prototype );
-
 
 //функция для определения к какому типу относится значение val.
 function checkTypeCell( val ) {
@@ -2394,7 +2312,7 @@ _func[cElementType.string][cElementType.bool] = function ( arg0, arg1, what ) {
         return new cBool( false );
     }
     else if ( what === "<>" ) {
-        return new cBool( false );
+        return new cBool( true );
     }
     else if ( what === "-" ) {
         _arg0 = arg0.tocNumber();
@@ -2485,10 +2403,10 @@ _func[cElementType.bool][cElementType.number] = function ( arg0, arg1, what ) {
         return new cBool( false );
     }
     else if ( what === "=" ) {
-        return new cBool( true );
+        return new cBool( false );
     }
     else if ( what === "<>" ) {
-        return new cBool( false );
+        return new cBool( true );
     }
     else if ( what === "-" ) {
         _arg = arg0.tocNumber();
@@ -2535,7 +2453,7 @@ _func[cElementType.bool][cElementType.string] = function ( arg0, arg1, what ) {
         return new cBool( false );
     }
     else if ( what === "=" ) {
-        return new cBool( true );
+        return new cBool( false );
     }
     else if ( what === "<>" ) {
         return new cBool( true );
@@ -3374,6 +3292,8 @@ parserFormula.prototype = {
                     this.outStack = [];
                     this.elemArr = [];
                     return false;
+//                    this.outStack = [new cError(cErrorType.unsupported_function)];
+//                    return this.isParsed = true;
                 }
 
                 /* Booleans */
@@ -3842,7 +3762,6 @@ parserFormula.prototype = {
             }
         }
         if ( res != undefined && res != null ){
-//            console.log( this.Formula + "  ===  " + res.toString() );
             return res.toString();
         }
         else{
@@ -4044,10 +3963,11 @@ parserFormula.prototype = {
 
     buildDependencies:function () {
 
-        var node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId );
+        var node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId ),
+         ref, nTo, wsR;
 
         for ( var i = 0; i < this.outStack.length; i++ ) {
-            var ref = this.outStack[i];
+            ref = this.outStack[i];
 
             if ( ref instanceof cName ) {
                 ref = ref.toRef( this.ws.getId() );
@@ -4055,23 +3975,26 @@ parserFormula.prototype = {
                     continue;
             }
 
-            if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) && ref.isValid() &&
-                this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction && ( this.outStack[i + 1].name == "ROWS" || this.outStack[i + 1].name == "COLUMNS" ) ) {
+            if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
+                ref.isValid() && this.outStack[i + 1] &&
+                this.outStack[i + 1] instanceof cBaseFunction &&
+                ( this.outStack[i + 1].name == "ROWS" || this.outStack[i + 1].name == "COLUMNS" ) ) {
                 continue;
             }
 
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
-                var nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
+                nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
 
-                ref.setNode( nTo );
+//                ref.setNode( nTo );
 
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
             else if ( ref instanceof cArea3D && ref.isValid() ) {
-                var wsR = ref.wsRange();
-                for ( var j = 0; j < wsR.length; j++ )
+                wsR = ref.wsRange();
+                for ( var j = 0; j < wsR.length; j++ ){
                     this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( /\$/g, "" ), wsR[j].Id, ref._cells.replace( /\$/g, "" ) );
+                }
             }
         }
     },
