@@ -11593,10 +11593,13 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-            if ( docpostype_DrawingObjects === CurHdrFtr.Content.CurPos.Type )
-                DrawingObjects = this.DrawingObjects;
-            else
-                LogicDocument = CurHdrFtr.Content;
+            if ( null !== CurHdrFtr )
+            {
+                if ( docpostype_DrawingObjects === CurHdrFtr.Content.CurPos.Type )
+                    DrawingObjects = this.DrawingObjects;
+                else
+                    LogicDocument = CurHdrFtr.Content;
+            }
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
