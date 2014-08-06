@@ -452,3 +452,8 @@ window.native.Call_VR_Table = function(_params, _cols, _margins, _rows)
 {
     return _api.Call_VR_Table(_params, _cols, _margins, _rows);
 };
+
+window.native.Call_Menu_Event = function(type, _params)
+{
+    return _api.Call_Menu_Event(type, _params);
+};

@@ -1,4 +1,6 @@
-﻿asc_docs_api.prototype.Update_ParaInd = function( Ind )
+﻿var global_memory_stream_menu = CreateNativeMemoryStream();
+
+asc_docs_api.prototype.Update_ParaInd = function( Ind )
 {
     this.WordControl.m_oDrawingDocument.Update_ParaInd(Ind);
 };
@@ -162,6 +164,16 @@ asc_docs_api.prototype["Call_VR_Table"] = function(_params, _cols, _margins, _ro
         _table_murkup.Table.Update_TableMarkupFromRuler(_table_murkup, false, _params[6]);
         _table_murkup.CorrectFrom();
     }
+};
+
+asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
+{
+    // TODO:
+};
+
+asc_docs_api.prototype["Send_Menu_Event"] = function(type)
+{
+    window.native.OnCallMenuEvent(type, global_memory_stream_menu);
 };
 
 function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
