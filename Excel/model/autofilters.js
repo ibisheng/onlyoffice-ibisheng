@@ -1355,6 +1355,8 @@ var gUndoInsDelCellsFlag = true;
 				var newEndId;
 				var t = this;
 				var selectionRange;
+				var sortCol;
+				
 				var onSortAutoFilterCallback = function(success)
 				{
 					if(success)
@@ -1377,7 +1379,7 @@ var gUndoInsDelCellsFlag = true;
 						currentFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
 						currentFilter.SortState.SortConditions[0].ConditionDescending = type;
 						//сама сортировка
-						var sortCol = curCell.c1;
+						sortCol = curCell.c1;
 						sortRange.sort(type,sortCol);
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
@@ -1481,6 +1483,10 @@ var gUndoInsDelCellsFlag = true;
 							else
 								ws._isLockedCells (sortRange1, /*subType*/null, standartSort);
 							return;
+						}
+						else if(splitRef.containsRange(activeRange))//TODO разделить обработки для а/ф и форматированной таблицы
+						{
+							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
 						}
 						else
 						{
