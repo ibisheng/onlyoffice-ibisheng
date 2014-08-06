@@ -4135,27 +4135,35 @@
 		 * @param {Asc.Range} [range]  Диапазон кэширования текта
 		 */
 		WorksheetView.prototype._prepareCellTextMetricsCache = function (range) {
-			var isUpdateRows = 0;
+			var firstUpdateRow = null, tmp = null;
 			if (!range) {
 				range = this.visibleRange;
 				if (this.topLeftFrozenCell) {
 					var row = this.topLeftFrozenCell.getRow0();
 					var col = this.topLeftFrozenCell.getCol0();
 					if (0 < row && 0 < col)
-						isUpdateRows += this._prepareCellTextMetricsCache2(new Asc.Range(0, 0, col - 1, row - 1));
+						firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow,
+							this._prepareCellTextMetricsCache2(new Asc.Range(0, 0, col - 1, row - 1)));
 					if (0 < row)
-						isUpdateRows += this._prepareCellTextMetricsCache2(new Asc.Range(this.visibleRange.c1, 0, this.visibleRange.c2, row - 1));
+						firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow,
+							this._prepareCellTextMetricsCache2(new Asc.Range(this.visibleRange.c1, 0,
+								this.visibleRange.c2, row - 1)));
 					if (0 < col)
-						isUpdateRows += this._prepareCellTextMetricsCache2(new Asc.Range(0, this.visibleRange.r1, col - 1, this.visibleRange.r2));
+						firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow,
+							this._prepareCellTextMetricsCache2(new Asc.Range(0, this.visibleRange.r1,
+									col - 1, this.visibleRange.r2)));
 				}
 			}
 
-			isUpdateRows += this._prepareCellTextMetricsCache2(range);
-			if (isUpdateRows) {
+			firstUpdateRow = asc.getMinValueOrNull(firstUpdateRow, this._prepareCellTextMetricsCache2(range));
+			if (null !== firstUpdateRow) {
 				// Убрал это из _calcCellsTextMetrics, т.к. вызов был для каждого сектора(добавляло тормоза: баг 20388)
 				// Код нужен для бага http://bugzserver/show_bug.cgi?id=13875
 				this._updateRowPositions();
 				this._calcVisibleRows();
+
+				if (this.objectRender)
+					this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: firstUpdateRow});
 			}
 		};
 
@@ -4167,17 +4175,17 @@
 			var s = this.cache.sectors;
 			if (s.length < 1) {return;}
 
-			var isUpdateRows = false;
+			var firstUpdateRow = null;
 			for (var i = 0; i < s.length; ) {
 				if (s[i].isIntersect(range)) {
 					this._calcCellsTextMetrics(s[i]);
 					s.splice(i, 1);
-					isUpdateRows = true;
+					firstUpdateRow = null !== firstUpdateRow ? Math.min(range.r1, firstUpdateRow) : range.r1;
 					continue;
 				}
 				++i;
 			}
-			return isUpdateRows;
+			return firstUpdateRow;
 		};
 
 		/**
@@ -4494,8 +4502,6 @@
 									ha, va, maxW);
 						}
 
-						if (this.objectRender)
-							this.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
 						this.isChanged = true;
 					}
 				}

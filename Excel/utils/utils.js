@@ -70,6 +70,10 @@
 			return colorIndex;
 		}
 
+		function getMinValueOrNull (val1, val2) {
+			return null === val2 ? val1 : (null === val1 ? val2 : Math.min(val1, val2));
+		}
+
 
 		function round(x) {
 			var y = x + (x >= 0 ? .5 : -.4);
@@ -1496,6 +1500,7 @@
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;
 		window["Asc"].getUniqueRangeColor = getUniqueRangeColor;
+		window["Asc"].getMinValueOrNull = getMinValueOrNull;
 		window["Asc"].round = round;
 		window["Asc"].floor = floor;
 		window["Asc"].ceil = ceil;

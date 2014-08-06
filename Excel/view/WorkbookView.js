@@ -789,6 +789,7 @@
 				} else if (target.target === c_oTargetType.RowResize) {
 					ws.changeRowHeight(target.row, y, target.mouseY);
 				}
+				// ToDo Нужна ли тут updateSizeDrawingObjects
 				ws.objectRender.updateSizeDrawingObjects(target);
 				ws.cellCommentator.updateCommentPosition();
 				this._onDocumentPlaceChanged();
