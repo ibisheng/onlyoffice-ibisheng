@@ -1509,6 +1509,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							t.collaborativeEditing.addUnlock (lockElem);
 						}
 
+                        var drawing;
 						if (null != lockElem) {
 							var oldType = lockElem.getType();
 							if (c_oAscLockTypes.kLockTypeOther2 === oldType || c_oAscLockTypes.kLockTypeOther3 === oldType)
@@ -1518,7 +1519,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 							// Выставляем ID пользователя, залочившего данный элемент
 							lockElem.setUserId (e["user"]);
+
+                            if(lockElem && lockElem.Element)
+                            {
+                                drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
+                                if(drawing)
+                                {
+                                    drawing.lockType = lockElem.Type;
+                                }
+                            }
 						}
+
 
 						if (t.wb) {
 							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
@@ -1534,6 +1545,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								ws.draw();
 							else
 								ws.updateSelection();
+                            if(drawing && ws.model === drawing.worksheet)
+                            {
+                                ws.objectRender.showDrawingObjects(true);
+                            }
 						}
 					}
 				};
@@ -1560,16 +1575,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							t.wb.getWorksheet().cleanSelection();
 						}
 
+                        var drawing;
 						if (c_oAscLockTypes.kLockTypeNone !== newType)
 							lockElem.setType (newType, true);
 						else {
 							// Удаляем из lock-ов, тот, кто правил ушел и не сохранил
 							t.collaborativeEditing.removeUnlock (lockElem);
-							
-							if ( lockElem.Element["type"] == c_oAscLockTypeElem.Object )
-								t._onTryResetLockedGraphicObject(lockElem.Element["rangeOrObjectId"]);
+                            drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
+                            if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone)
+                            {
+                                drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+                            }
 						}
-
 						if (t.wb) {
 							// Шлем update для листов
 							t._onUpdateSheetsLock(lockElem);

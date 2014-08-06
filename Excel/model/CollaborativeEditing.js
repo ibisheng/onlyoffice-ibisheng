@@ -223,10 +223,12 @@
 			while (bIsCollaborative && 0 < this.m_arrNeedUnlock2.length) {
 				oLock = this.m_arrNeedUnlock2.shift();
 				oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
-				if (oLock.Element["type"] == c_oAscLockTypeElem.Object) {
-					if (this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]))
-						bRedrawGraphicObjects = true;
-				}
+
+                var drawing = g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+                if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
+                    drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+                    bRedrawGraphicObjects = true;
+                }
 				this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
 			}
 			// Очищаем примененные чужие изменения
@@ -235,10 +237,11 @@
 			for (;bIsCollaborative && nIndex < nCount; ++nIndex) {
 				oLock = this.m_arrNeedUnlock[nIndex];
 				if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-					if (oLock.Element["type"] == c_oAscLockTypeElem.Object) {
-						if (this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]))
-							bRedrawGraphicObjects = true;
-					}
+                    drawing = g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+                    if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
+                        drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+                        bRedrawGraphicObjects = true;
+                    }
 					this.m_arrNeedUnlock.splice(nIndex, 1);
 					--nIndex;
 					--nCount;

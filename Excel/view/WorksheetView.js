@@ -3772,14 +3772,14 @@
 				arrayCells = this.collaborativeEditing.getLockCellsOther(currentSheetId);
 			}
 
-			if (bIsDrawObjects) {
-				var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ?
-					this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
-
-				for (i = 0; i < arrayObjects.length; ++i) {
-					this.objectRender.setGraphicObjectLockState(arrayObjects[i], type);
-				}
-			}
+			///if (bIsDrawObjects) {
+			///	var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ?
+			///		this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
+            ///
+			///	for (i = 0; i < arrayObjects.length; ++i) {
+			///		this.objectRender.setGraphicObjectLockState(arrayObjects[i], type);
+			///	}
+			///}
 
 			for (i = 0; i < arrayCells.length; ++i) {
 				oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
@@ -9379,6 +9379,7 @@
 				t._cleanCellsTextMetricsCache();
 				t._prepareCellTextMetricsCache();
 				t.objectRender.setScrollOffset();
+                t.objectRender.rebuildChartGraphicObjects(oChangeData);
 				t.draw();
 
 				t.handlers.trigger("reinitializeScroll");
@@ -9386,8 +9387,6 @@
 				if (isUpdateCols) { t._updateVisibleColsCount(); }
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
-				t.objectRender.rebuildChartGraphicObjects(oChangeData);
-				t.objectRender.showDrawingObjects(true);
 			};
 
 			switch (prop) {
@@ -9781,9 +9780,6 @@
 
 			if (isUpdateCols) { t._updateVisibleColsCount(); }
 			if (isUpdateRows) { t._updateVisibleRowsCount(); }
-
-			if (false === lockDraw)
-				t.objectRender.showDrawingObjects(true);
 		};
 
 		WorksheetView.prototype.expandColsOnScroll = function (isNotActive, updateColsCount, newColsCount) {

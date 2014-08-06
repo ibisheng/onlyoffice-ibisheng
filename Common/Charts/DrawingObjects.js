@@ -3456,15 +3456,15 @@ function DrawingObjects() {
         return response;
     };
 
-    _this.setGraphicObjectLockState = function(id, state) {
-
-        for (var i = 0; i < aObjects.length; i++) {
-            if ( id == aObjects[i].graphicObject.Id ) {
-                aObjects[i].graphicObject.lockType = state;
-                break;
-            }
-        }
-    };
+  // _this.setGraphicObjectLockState = function(id, state) {
+  //
+  //     for (var i = 0; i < aObjects.length; i++) {
+  //         if ( id == aObjects[i].graphicObject.Id ) {
+  //             aObjects[i].graphicObject.lockType = state;
+  //             break;
+  //         }
+  //     }
+  // };
 
     _this.resetLockedGraphicObjects = function() {
 

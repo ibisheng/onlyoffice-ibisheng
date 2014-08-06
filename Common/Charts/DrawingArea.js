@@ -776,7 +776,6 @@ function DrawingArea(ws) {
 		if ( !_this.worksheet.objectRender.controller.selectedObjects.length && !api.isStartAddShape )
 			_this.worksheet._drawSelection();
 
-
         var chart;
         var controller = _this.worksheet.objectRender.controller;
         var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
