@@ -480,7 +480,7 @@
 		if (null == canvas) {return;}
 		this.canvas = canvas;
 		this.ctx = this.canvas.getContext("2d");
-		this.initContextSmoothing();
+		//this.initContextSmoothing();
 	};
 
 	/**
@@ -629,9 +629,9 @@
 	/**
 	 * Delete smoothing
 	 */
-	DrawingContext.prototype.initContextSmoothing = function () {
+	/*DrawingContext.prototype.initContextSmoothing = function () {
 		var ctx = this.ctx;
-		if (!window.g_isMobileVersion || null === ctx)
+		if (!AscBrowser.isMobileVersion || null === ctx)
 			return;
 
 		// Не убирать. Баг на android при scroll!!!
@@ -643,7 +643,7 @@
 			ctx.oImageSmoothingEnabled = false;
 		if (ctx.webkitImageSmoothingEnabled)
 			ctx.webkitImageSmoothingEnabled = false;
-	};
+	};*/
 
 	// Canvas methods
 
@@ -927,7 +927,7 @@
 		var _g = this.fillColor.g;
 		var _b = this.fillColor.b;
 
-		if (window.g_isMobileVersion) {
+		if (AscBrowser.isMobileVersion) {
 			// Special for iPad (5.1)
 
 			if (!_r && !_g && !_b) {

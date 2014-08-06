@@ -682,7 +682,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.options = (this.options || {});
 				this.options.worksheetDefaults = (this.options.worksheetDefaults || {});
 				this.options.worksheetDefaults.isMobile = isMobile;
-				window.g_isMobileVersion = isMobile;
+				AscBrowser.isMobileVersion = isMobile;
 			},
 
 			asc_getViewerMode: function () {

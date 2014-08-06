@@ -404,7 +404,7 @@
 				//------API---------
 
 				var api = new Asc.spreadsheet_api("wb-widget", null);
-                api.isMobileVersion = true;
+                api.asc_setMobileVersion(true);
                 api.asc_setViewerMode(true);
 				api.asc_registerCallback("asc_onStartAction", onStartAction);
 				api.asc_registerCallback("asc_onEndAction", onEndAction);

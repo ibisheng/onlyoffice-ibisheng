@@ -1365,8 +1365,8 @@
 
 			// При смене ориентации у планшета, сбрасываются флаги у canvas!
 			// ToDo перепроверить на новых исходниках, должно поправиться, был баг в отрисовке!!!!!!!!!!!!!
-			this.drawingCtx.initContextSmoothing();
-			this.overlayCtx.initContextSmoothing();
+			//this.drawingCtx.initContextSmoothing();
+			//this.overlayCtx.initContextSmoothing();
 			return true;
 		};
 

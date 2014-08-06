@@ -8,6 +8,7 @@ var AscBrowser = {
     isAppleDevices : false,
     isAndroid : false,
     isMobile : false,
+	isMobileVersion : false,
     isGecko : false,
     isChrome : false,
     isOpera : false,
