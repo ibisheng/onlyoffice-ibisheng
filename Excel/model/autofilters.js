@@ -1470,6 +1470,14 @@ var gUndoInsDelCellsFlag = true;
 						{
 							cellId = Asc.Range(splitRef.c1, splitRef.r1, splitRef.c1, splitRef.r1);
 						}
+						else if(splitRef.r1 == activeRange.r1 && splitRef.containsRange(activeRange) && !curFilter.TableStyleInfo)
+						{
+							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
+						}
+						else if(splitRef.containsRange(activeRange) && curFilter.TableStyleInfo)//TODO разделить обработки для а/ф и форматированной таблицы
+						{
+							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
+						}
 						else if(splitRef.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
 						//else if(startCellFilter.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
 						{
@@ -1483,10 +1491,6 @@ var gUndoInsDelCellsFlag = true;
 							else
 								ws._isLockedCells (sortRange1, /*subType*/null, standartSort);
 							return;
-						}
-						else if(splitRef.containsRange(activeRange))//TODO разделить обработки для а/ф и форматированной таблицы
-						{
-							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
 						}
 						else
 						{
