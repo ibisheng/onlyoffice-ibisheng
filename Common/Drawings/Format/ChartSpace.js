@@ -8,6 +8,11 @@ var EFFECT_INTENSE = 3;
 var CHART_STYLE_MANAGER = null;
 var SKIP_LBL_LIMIT = 100;
 
+function checkStrToRegExp(str)
+{
+
+}
+
 function BBoxInfo(worksheet, bbox)
 {
     this.worksheet = worksheet;
@@ -665,13 +670,17 @@ CChartSpace.prototype =
     {
         if(val)
         {
-            if(val.numRef && typeof val.numRef.f === "string")
+            if(val.numRef && typeof val.numRef.f === "string" || val.strRef && typeof val.strRef.f === "string")
             {
-                val.numRef.setF(val.numRef.f.replace(new RegExp(oldName,'g'), newName));
-            }
-            if(val.strRef && typeof val.strRef.f === "string")
-            {
-                val.strRef.setF(val.strRef.f.replace(new RegExp(oldName,'g'), newName));
+                var checkString = oldName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,  "\\$&");
+                if(val.numRef && typeof val.numRef.f === "string")
+                {
+                    val.numRef.setF(val.numRef.f.replace(new RegExp(checkString,'g'), newName));
+                }
+                if(val.strRef && typeof val.strRef.f === "string")
+                {
+                    val.strRef.setF(val.strRef.f.replace(new RegExp(checkString,'g'), newName));
+                }
             }
         }
     },
@@ -9728,15 +9737,25 @@ CChartSpace.prototype =
                     {
                         var compiled_grid_lines = new CLn();
                         compiled_grid_lines.merge(subtleLine);
-                        if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
-                        {
-                            compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
-                        }
+                       // if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+                       // {
+                       //     compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+                       // }
                         if(!compiled_grid_lines.Fill)
                         {
                             compiled_grid_lines.setFill(new CUniFill());
                         }
+                        //if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+                        //{
+                        //    compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+                        //}
                         compiled_grid_lines.Fill.merge(defaultStyle);
+
+                        if(subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
+                            && compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color)
+                        {
+                            compiled_grid_lines.Fill.fill.color.Mods =  subtleLine.Fill.fill.color.Mods.createDuplicate();
+                        }
                         compiled_grid_lines.merge(spPr.ln);
                         compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
                         return compiled_grid_lines;
