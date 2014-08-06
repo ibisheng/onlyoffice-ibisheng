@@ -1503,33 +1503,29 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.CoAuthoringApi.onLocksAcquired				= function (e) {
 					if (2 != e["state"]) {
 						var elementValue = e["blockValue"];
-						var lockElem = t.collaborativeEditing.getLockByElem (elementValue, c_oAscLockTypes.kLockTypeOther);
+						var lockElem = t.collaborativeEditing.getLockByElem(elementValue, c_oAscLockTypes.kLockTypeOther);
 						if (null === lockElem) {
-							lockElem = new asc.CLock (elementValue);
-							t.collaborativeEditing.addUnlock (lockElem);
+							lockElem = new asc.CLock(elementValue);
+							t.collaborativeEditing.addUnlock(lockElem);
 						}
 
                         var drawing;
 						if (null != lockElem) {
 							var oldType = lockElem.getType();
 							if (c_oAscLockTypes.kLockTypeOther2 === oldType || c_oAscLockTypes.kLockTypeOther3 === oldType)
-								lockElem.setType (c_oAscLockTypes.kLockTypeOther3, true);
+								lockElem.setType(c_oAscLockTypes.kLockTypeOther3, true);
 							else
-								lockElem.setType (c_oAscLockTypes.kLockTypeOther, true);
+								lockElem.setType(c_oAscLockTypes.kLockTypeOther, true);
 
 							// Выставляем ID пользователя, залочившего данный элемент
-							lockElem.setUserId (e["user"]);
+							lockElem.setUserId(e["user"]);
 
-                            if(lockElem && lockElem.Element)
-                            {
-                                drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
-                                if(drawing)
-                                {
-                                    drawing.lockType = lockElem.Type;
-                                }
-                            }
+							if (lockElem.Element["type"] === c_oAscLockTypeElem.Object) {
+								drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
+								if (drawing)
+									drawing.lockType = lockElem.Type;
+							}
 						}
-
 
 						if (t.wb) {
 							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
@@ -1545,10 +1541,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								ws.draw();
 							else
 								ws.updateSelection();
-                            if(drawing && ws.model === drawing.worksheet)
-                            {
+
+                            if (drawing && ws.model === drawing.worksheet)
                                 ws.objectRender.showDrawingObjects(true);
-                            }
 						}
 					}
 				};
@@ -1581,11 +1576,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						else {
 							// Удаляем из lock-ов, тот, кто правил ушел и не сохранил
 							t.collaborativeEditing.removeUnlock (lockElem);
-                            drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
-                            if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone)
-                            {
-                                drawing.lockType = c_oAscLockTypes.kLockTypeNone;
-                            }
+							if (lockElem.Element["type"] === c_oAscLockTypeElem.Object) {
+								drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
+								if (drawing)
+									drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+							}
 						}
 						if (t.wb) {
 							// Шлем update для листов
