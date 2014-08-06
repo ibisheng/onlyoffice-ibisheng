@@ -398,7 +398,9 @@
 						}
 					}
 					
-					var t = this, selection, rangeToSelect;
+					var t = this, selection, rangeToSelect, overflowBody;
+					overflowBody = document.body.style.overflow;
+					document.body.style.overflow = 'hidden';
 					
 					if (window.getSelection) {// all browsers, except IE before version 9
 						selection = window.getSelection();
@@ -424,6 +426,8 @@
 					// ждем выполнения copy
 					window.setTimeout(
 					function() {
+						document.body.style.overflow = overflowBody;
+						
 						// отменяем возможность выделения
 						t.element.style.display = "none";
 						doc.body.style.MozUserSelect = "none";
