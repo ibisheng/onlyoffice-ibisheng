@@ -2618,7 +2618,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 	this.bIsPlainText = false;
 
     this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
-        "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
+        "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-column-break-before": 1, "mso-break-type": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
         "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
         "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1};
     this.oBorderCache = {};
@@ -4913,10 +4913,14 @@ PasteProcessor.prototype =
     {
         for(var i = 0, length = this.nBrCount - nIgnore; i < length; i++)
         {
-            if(this.bInBlock)
-                this._Paragraph_Add( new ParaNewLine( break_Line ) );
-            else
-                this._Execute_AddParagraph(node, pPr);
+            if ("always" == pPr["mso-column-break-before"])
+                this._Paragraph_Add(new ParaNewLine(break_Page));
+            else{
+                if (this.bInBlock)
+                    this._Paragraph_Add(new ParaNewLine(break_Line));
+                else
+                    this._Execute_AddParagraph(node, pPr);
+            }
         }
         this.nBrCount = 0;
     },
@@ -5663,9 +5667,10 @@ PasteProcessor.prototype =
             }
 
             //��������� linebreak, ���� �� �� ��������� ������� �������� � �� ����� ��� ������� �������
-            if("br" == sNodeName || "always" == node.style.pageBreakBefore)
+            var bPageBreakBefore = "always" == node.style.pageBreakBefore || "left" == node.style.pageBreakBefore || "right" == node.style.pageBreakBefore;
+            if ("br" == sNodeName || bPageBreakBefore)
             {
-                if("always" == node.style.pageBreakBefore)
+                if (bPageBreakBefore)
                 {
                     bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
                     bAddParagraph = true;
@@ -5676,7 +5681,7 @@ PasteProcessor.prototype =
                 {
                     bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph, false);
                     this.nBrCount++;//this._Paragraph_Add( new ParaNewLine( break_Line ) );
-                    if("line-break" == pPr["mso-special-character"])
+                    if("line-break" == pPr["mso-special-character"] || "always" == pPr["mso-column-break-before"])
                         this._Commit_Br(0, node, pPr);
 					return bAddParagraph;
                 }
