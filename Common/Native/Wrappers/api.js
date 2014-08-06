@@ -166,9 +166,203 @@ asc_docs_api.prototype["Call_VR_Table"] = function(_params, _cols, _margins, _ro
     }
 };
 
+function asc_menu_ReadFontFamily(_params, _cursor)
+{
+    var _fontfamily = { Name : undefined, Index : -1 };
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _fontfamily.Name = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _fontfamily.Index = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _fontfamily;
+}
+
+function asc_menu_ReadColor(_params, _cursor)
+{
+    var _color = new CAscColor();
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _color.type = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _color.r = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _color.g = _params[_cursor.pos++];
+                break;
+            }
+            case 3:
+            {
+                _color.b = _params[_cursor.pos++];
+                break;
+            }
+            case 4:
+            {
+                _color.a = _params[_cursor.pos++];
+                break;
+            }
+            case 5:
+            {
+                _color.Auto = _params[_cursor.pos++];
+                break;
+            }
+            case 6:
+            {
+                _color.value = _params[_cursor.pos++];
+                break;
+            }
+            case 7:
+            {
+                _color.ColorSchemeId = _params[_cursor.pos++];
+                break;
+            }
+            case 8:
+            {
+                var _count = _params[_cursor.pos++];
+                for (var i = 0; i < _count; i++)
+                {
+                    var _mod = new CColorMod();
+                    _mod.name = _params[_cursor.pos++];
+                    _mod.val = _params[_cursor.pos++];
+                }
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    return _color;
+}
+
 asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 {
-    // TODO:
+    var _current = { pos : 0 };
+    var _continue = true;
+    switch (type)
+    {
+        case 1: // ASC_MENU_EVENT_TYPE_TEXTPR
+        {
+            var _textPr = new CTextPr();
+            while (_continue)
+            {
+                var _attr = _params[_current.pos++];
+                switch (_attr)
+                {
+                    case 0:
+                    {
+                        _textPr.Bold = _params[_current.pos++];
+                        break;
+                    }
+                    case 1:
+                    {
+                        _textPr.Italic = _params[_current.pos++];
+                        break;
+                    }
+                    case 2:
+                    {
+                        _textPr.Underline = _params[_current.pos++];
+                        break;
+                    }
+                    case 3:
+                    {
+                        _textPr.Strikeout = _params[_current.pos++];
+                        break;
+                    }
+                    case 4:
+                    {
+                        _textPr.FontFamily = asc_menu_ReadFontFamily(_params, _current);
+                        break;
+                    }
+                    case 5:
+                    {
+                        _textPr.FontSize = _params[_current.pos++];
+                        break;
+                    }
+                    case 6:
+                    {
+                        var Unifill = new CUniFill();
+                        Unifill.fill = new CSolidFill();
+                        var color = asc_menu_ReadColor(_params, _current);
+                        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
+                        _textPr.Unifill = Unifill;
+                        break;
+                    }
+                    case 7:
+                    {
+                        _textPr.VertAlign = _params[_current.pos++];
+                        break;
+                    }
+                    case 8:
+                    {
+                        var color = asc_menu_ReadColor(_params, _current);
+                        _textPr.HighLight = { r : color.r, g : color.g, b : color.b };
+                        break;
+                    }
+                    case 9:
+                    {
+                        _textPr.DStrikeout = _params[_current.pos++];
+                        break;
+                    }
+                    case 10:
+                    {
+                        _textPr.Caps = _params[_current.pos++];
+                        break;
+                    }
+                    case 11:
+                    {
+                        _textPr.SmallCaps = _params[_current.pos++];
+                        break;
+                    }
+                    case 12:
+                    {
+                        _textPr.HighLight = highlight_None;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+        default:
+            break;
+    }
 };
 
 asc_docs_api.prototype["Send_Menu_Event"] = function(type)
