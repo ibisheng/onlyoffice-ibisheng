@@ -2847,7 +2847,8 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 };
 Woorksheet.prototype.getDefaultHeight=function(){
 	var dRes = null;
-	if(null != this.oSheetFormatPr.oAllRow)
+	// Нужно возвращать выставленную, только если флаг CustomHeight = true
+	if(null != this.oSheetFormatPr.oAllRow && this.oSheetFormatPr.oAllRow.CustomHeight)
 		dRes = this.oSheetFormatPr.oAllRow.h;
 	return dRes;
 };
