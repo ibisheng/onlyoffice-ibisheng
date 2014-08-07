@@ -6483,15 +6483,27 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     CollaborativeEditing.Release_Locks();
                 }
 
-                History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
+//                History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
 
                 //Recalculate для Document
                 Document.CurPos.ContentPos = 0;
-                History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
+//                History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
+
+                var RecalculateData =
+                {
+                    Inline : { Pos : 0, PageNum : 0 },
+                    Flow   : [],
+                    HdrFtr : [],
+                    Drawings: {
+                        All: true,
+                        Map:{}
+                    }
+                };
+
                 if (!this.isOnlyReaderMode)
                 {
                     if (false === this.isSaveFonts_Images)
-                        Document.Recalculate();
+                        Document.Recalculate(false, false, RecalculateData);
 
                     this.WordControl.m_oDrawingDocument.TargetStart();
                 }
