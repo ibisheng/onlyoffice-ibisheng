@@ -195,6 +195,26 @@ function asc_menu_ReadFontFamily(_params, _cursor)
     }
     return _fontfamily;
 }
+function asc_menu_WriteFontFamily(_type, _family, _stream)
+{
+    if (undefined === _family)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_family.Name !== undefined && _family.Name !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](_family.Name);
+    }
+    if (_family.Index !== undefined && _family.Index !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_family.Index);
+    }
+
+    _stream["WriteByte"](255);
+}
 
 function asc_menu_ReadColor(_params, _cursor)
 {
@@ -253,6 +273,7 @@ function asc_menu_ReadColor(_params, _cursor)
                     var _mod = new CColorMod();
                     _mod.name = _params[_cursor.pos++];
                     _mod.val = _params[_cursor.pos++];
+                    _color.Mods.push(_mod);
                 }
                 break;
             }
@@ -265,6 +286,69 @@ function asc_menu_ReadColor(_params, _cursor)
         }
     }
     return _color;
+}
+function asc_menu_WriteColor(_type, _color, _stream)
+{
+    if (undefined === _color)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_color.type !== undefined && _color.type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_color.type);
+    }
+    if (_color.r !== undefined && _color.r !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteByte"](_color.r);
+    }
+    if (_color.g !== undefined && _color.g !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteByte"](_color.g);
+    }
+    if (_color.b !== undefined && _color.b !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteByte"](_color.b);
+    }
+    if (_color.a !== undefined && _color.a !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteByte"](_color.a);
+    }
+    if (_color.Auto !== undefined && _color.Auto !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_color.Auto);
+    }
+    if (_color.value !== undefined && _color.value !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_color.value);
+    }
+    if (_color.ColorSchemeId !== undefined && _color.ColorSchemeId !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_color.ColorSchemeId);
+    }
+    if (_color.Mods !== undefined && _color.Mods !== null)
+    {
+        _stream["WriteByte"](8);
+
+        var _len = _color.Mods.length;
+        _stream["WriteLong"](_len);
+
+        for (var i = 0; i < _len; i++)
+        {
+            _stream["WriteString1"](_color.Mods[i].name);
+            _stream["WriteLong"](_color.Mods[i].val);
+        }
+    }
+
+    _stream["WriteByte"](255);
 }
 
 asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
@@ -358,6 +442,9 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     }
                 }
             }
+
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr(_textPr) );
+            this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
         }
         default:
@@ -365,9 +452,90 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
     }
 };
 
-asc_docs_api.prototype["Send_Menu_Event"] = function(type)
+asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 {
-    window.native.OnCallMenuEvent(type, global_memory_stream_menu);
+    if (!TextPr)
+        return;
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (TextPr.Bold !== undefined)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteBool"](TextPr.Bold);
+    }
+    if (TextPr.Italic !== undefined)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteBool"](TextPr.Italic);
+    }
+    if (TextPr.Underline !== undefined)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteBool"](TextPr.Underline);
+    }
+    if (TextPr.Strikeout !== undefined)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](TextPr.Strikeout);
+    }
+
+    asc_menu_WriteFontFamily(4, TextPr.FontFamily, _stream);
+
+    if (TextPr.FontSize !== undefined)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteDouble"](TextPr.FontSize);
+    }
+
+    if (TextPr.Color !== undefined)
+    {
+        asc_menu_WriteColor(6, CreateAscColorCustom(TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto), _stream);
+    }
+
+    if (TextPr.VertAlign !== undefined)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](TextPr.VertAlign);
+    }
+
+    if (TextPr.HighLight !== undefined)
+    {
+        if (TextPr.HighLight === highlight_None)
+        {
+            _stream["WriteByte"](12);
+        }
+        else
+        {
+            asc_menu_WriteColor(8, CreateAscColorCustom(TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b), _stream);
+        }
+    }
+
+    if (TextPr.DStrikeout !== undefined)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteBool"](TextPr.DStrikeout);
+    }
+    if (TextPr.Caps !== undefined)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteBool"](TextPr.Caps);
+    }
+    if (TextPr.SmallCaps !== undefined)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteBool"](TextPr.SmallCaps);
+    }
+
+    _stream["WriteByte"](255);
+
+    this.Send_Menu_Event(1, _stream);
+};
+
+asc_docs_api.prototype.Send_Menu_Event = function(type)
+{
+    window.native["OnCallMenuEvent"](type, global_memory_stream_menu);
 };
 
 function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
