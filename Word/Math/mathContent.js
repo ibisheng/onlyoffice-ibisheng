@@ -591,6 +591,7 @@ function CMPrp()
     this.brk      = undefined;
     this.lit      = undefined;
 
+    // Default
     /*this.sty      = STY_ITALIC;
     this.scr      = TXT_ROMAN;
 
@@ -694,8 +695,6 @@ CMPrp.prototype =
             this.sty = STY_BOLD;
         else
             this.sty = STY_PLAIN;
-
-
     }
 }
 
@@ -703,17 +702,7 @@ CMPrp.prototype =
 //TODO
 //пересмотреть this.dW и this.dH
 
-//TODO
-//сделать, чтобы курсор выставлялся только, где это действительно необходимо
-//в качеcтве позиции для контента передавать положение baseLine для него
 
-
-
-
-
-// TODO Refactoring
-
-// 1. (!!) повтор IsIncline, IsHighElement
 
 
 function CMathContent()
@@ -773,32 +762,6 @@ CMathContent.prototype =
     {
 
     },
-    /*setArgSize: function(argSize)
-    {
-        var check = argSize == 0 || argSize == 1 || argSize == 2 || argSize == -1 || argSize === -2; // проверка параметра
-
-        if(check)
-        {
-            // складываем здесь, чтобы не потерять собственные настройки argSize: при добавлении в итератор формулы из меню; при добавлении готовых формул, когда есть вложенность формул с итераторами
-            // не будет работать при копиравнии в случае, если argSize будет отличатся от нуля для копируемой части контента
-            // поэтому при копировании свойство argSize не учитываем (копируем только массив элекентов вместе с Run Properties)
-
-            var val = this.argSize + argSize;
-
-            if(val < -2)
-                this.argSize = -2;
-            else if(val > 2)
-                this.argSize = 2;
-            else
-                this.argSize = val;
-
-            for(var i = 0; i < this.content.length; i++)
-            {
-                if(this.content[i].Type == para_Math_Composition)
-                    this.content[i].setArgSize(argSize);
-            }
-        }
-    },*/
     addTxt: function(txt)
     {
         var Pos = this.CurPos;
@@ -3857,12 +3820,9 @@ CMathContent.prototype =
         for(var i = 0; i < this.content.length; i++)
         {
             if(this.content[i].Type == para_Math_Composition)
-            {
-                this.content[i].Resize(oMeasure, this, this.ParaMath, RPI, ArgSize);
                 this.content[i].ApplyGaps();
-            }
-            else
-                this.content[i].Math_Recalculate(oMeasure, this, this.ParaMath.Paragraph, RPI, ArgSize);
+            else if(this.content[i].Type == para_Math_Run)
+                this.content[i].Math_ApplyGaps();
 
             this.WidthToElement[i] = width;
 
@@ -3901,16 +3861,27 @@ CMathContent.prototype =
 
         for(var pos = 0; pos < lng; pos++)
         {
+
             if(this.content[pos].Type == para_Math_Composition)
             {
                 // мержим ctrPrp до того, как добавим Gaps !
-                this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath не смержим ctrPrp
-                this.content[pos].SetGaps(this, ParaMath, GapsInfo);
+
+                //this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath не смержим ctrPrp
+
+                // обнуляем Gaps, чтобы при расчете ширины они не участвовалиу
+                this.content[pos].GapLeft = 0;
+                this.content[pos].GapRight = 0;
+                this.content[pos].Resize(oMeasure, this, ParaMath, RPI, this.Compiled_ArgSz);
+                this.content[pos].SetGaps(GapsInfo);
+                //this.content[pos].ApplyGaps();
             }
             else if(this.content[pos].Type == para_Math_Run /*&& !this.content[pos].Is_Empty()*/)
-                this.content[pos].Math_SetGaps(this, ParaMath.Paragraph, GapsInfo);
+            {
+                this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz);
+                this.content[pos].Math_SetGaps(GapsInfo);
+                //this.content[pos].Math_ApplyGaps();
+            }
         }
-
 
         if(GapsInfo.Current !== null)
             GapsInfo.Current.GapRight = 0;
@@ -3995,7 +3966,6 @@ CMathContent.prototype =
                     this.content[i].Math_Draw(x, y, pGraphics);
             }
         }
-
     },
     update_Cursor: function(CurPage, UpdateTarget)
     {
@@ -4114,38 +4084,6 @@ CMathContent.prototype =
         return result;
     },
     ////////////////////////
-
-    ////////   /////////
-    /*getMetricsLetter: function(pos)
-    {
-        return this.content[pos+1].value.getMetrics();
-    },
-    // для диакритических элементов, если в контенте есть заглавные буквы, и для букв ascent > ascent "o"
-    // (!) повторяется функция (IsIncline)
-    IsHighElement: function()
-    {
-        var res = false;
-
-        for(var i =0 ; i < this.content.length; i++)
-            if(this.content[i].value.IsHighElement())
-            {
-                res = true;
-                break;
-            }
-
-        return res;
-    },*/
-    
-    // (!) повторяется функция (IsHighElement)
-    /*IsIncline: function()
-    {
-        var bIncline = false;
-
-        if(this.content.length == 2)
-            bIncline = this.content[1].value.IsIncline();
-
-        return bIncline;
-    },*/
 
     /// For Para Math
 

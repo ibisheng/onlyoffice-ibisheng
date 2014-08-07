@@ -998,12 +998,6 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    /*if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }*/
-
     if(this.RecalcInfo.bProps)
     {
         if(this.Pr.degHide == true)
@@ -1039,7 +1033,11 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             this.RealBase       = this.Base;
 
         }
+
+        this.RecalcInfo.bProps = false;
     }
+
+    this.Set_CompiledCtrPrp(ParaMath);
 
     if(this.Pr.type == SQUARE_RADICAL)
         this.RealBase.Resize(oMeasure, this, ParaMath, RPI, ArgSize);

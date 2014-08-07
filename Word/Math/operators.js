@@ -3468,6 +3468,8 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
+    this.Set_CompiledCtrPrp(ParaMath);
+
     if(this.RecalcInfo.bProps == true)
     {
         var begPrp =
@@ -3928,12 +3930,6 @@ CCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    /*if(this.RecalcInfo.bCtrPrp == true)
-    {
-        this.Set_CompiledCtrPrp();
-        this.RecalcInfo.bCtrPrp = false;
-    }*/
-
     var base = this.elements[0][0];
     base.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
@@ -3954,8 +3950,10 @@ CCharacter.prototype.setPosition = function(pos)
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
-    var alignOp = (this.size.width - this.operator.size.width)/2,
-        alignCnt = (this.size.width - this.elements[0][0].size.width)/2;
+    var width = this.size.width - this.GapLeft - this.GapRight;
+
+    var alignOp  = (width - this.operator.size.width)/2,
+        alignCnt = (width - this.elements[0][0].size.width)/2;
 
     var PosOper = new CMathPosition(),
         PosBase = new CMathPosition();
@@ -4099,7 +4097,14 @@ CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, Arg
         this.RecalcInfo.bProps = false;
     }
 
-    CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
+    var ArgSz = ArgSize.Copy();
+
+    if(this.Pr.pos == this.Pr.vertJc)
+        ArgSz.decrease();
+
+    this.Set_CompiledCtrPrp(ParaMath);
+
+    CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
 }
 CGroupCharacter.prototype.setProperties = function(props)
 {

@@ -111,6 +111,8 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
+    this.Set_CompiledCtrPrp(ParaMath);
+
     if(this.RecalcInfo.bProps == true)
     {
         this.setDimension(2, 1);
@@ -125,6 +127,8 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             this.elements[0][0] = this.Iterator;
             this.elements[1][0] = this.FName;
         }
+
+        this.RecalcInfo.bProps = false;
     }
 
     this.FName.Resize(oMeasure, this, ParaMath, RPI, ArgSize);

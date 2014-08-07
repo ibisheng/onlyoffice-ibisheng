@@ -7768,10 +7768,10 @@ ParaRun.prototype.getPropsForWrite = function()
 
     return {wRPrp: wRPrp, mathRPrp: mathRPrp};
 }
-ParaRun.prototype.Math_SetGaps = function(Parent, Paragraph, GapsInfo)
+ParaRun.prototype.Math_SetGaps = function(GapsInfo)
 {
-    this.Parent    = Parent;
-    this.Paragraph = Paragraph;
+    //this.Parent    = Parent;
+    //this.Paragraph = Paragraph;
 
     var oWPrp = this.Get_CompiledPr(true);
     //this.Parent.ParaMath.ApplyArgSize(oWPrp, this.Parent.argSize);
@@ -7816,6 +7816,14 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
 ParaRun.prototype.IsAccent = function()
 {
     return this.Parent.IsAccent();
+}
+ParaRun.prototype.Math_ApplyGaps = function()
+{
+    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+    {
+        this.Content[Pos].ApplyGaps();
+        this.size.width += this.Content[Pos].GapLeft + this.Content[Pos].GapRight;
+    }
 }
 
 

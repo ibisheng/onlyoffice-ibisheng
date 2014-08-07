@@ -31,21 +31,12 @@ CDegree.prototype.fillContent = function()
     this.setDimension(1, 2);
     this.setContent();
 }
-/*CDegree.prototype.fillContent = function()
-{
-    var oBase = new CMathContent();
-
-    this.setDimension(1, 2);
-
-    var oDegree = new CMathContent();
-    oDegree.decreaseArgSize();
-
-    this.addMCToContent([oBase, oDegree]);
-}*/
 CDegree.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
+
+    this.Set_CompiledCtrPrp(ParaMath);
 
     this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
@@ -60,13 +51,6 @@ CDegree.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.recalculateSubScript(oMeasure);
 
 }
-/*CDegree.prototype.recalculateSize = function(oMeasure)
-{
-    if(this.Pr.type === DEGREE_SUPERSCRIPT)
-        this.recalculateSup(oMeasure);
-    else if(this.Pr.type === DEGREE_SUBSCRIPT)
-        this.recalculateSubScript(oMeasure);
-}*/
 CDegree.prototype.old__recalculateSup = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -153,7 +137,8 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     this.upBase = 0;
     this.upIter = 0;
 
-    var bBaseOnlyText = this.elements[0][0].IsOnlyText();
+    var oBase = this.elements[0][0];
+    var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
 
     if(bBaseOnlyText)
     {
@@ -201,9 +186,9 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
-    //width += this.GapLeft + this.GapRight;
 
-    var bBaseOnlyText = this.elements[0][0].IsOnlyText();
+    var oBase = this.elements[0][0];
+    var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
 
     if(bBaseOnlyText)
     {
@@ -213,9 +198,6 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
             this.upIter = 1/4*base.ascent;
         else
             this.upIter = base.ascent + DownBaseline - iter.ascent;
-
-        /*if(base.ascent/2 > this.upIter)
-            this.upIter = base.ascent/2;*/
     }
     else
     {
@@ -248,12 +230,6 @@ CDegree.prototype.setPosition = function(pos)
 
     PosIter.x = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW;
     PosIter.y = this.pos.y + this.upIter;
-
-    //var x1 = this.pos.x + this.GapLeft,
-    //    y1 = this.pos.y + this.upBase;
-
-    //var x2 = this.pos.x + this.GapLeft + this.elements[0][0].size.width + this.dW,
-    //    y2 = this.pos.y + this.upIter;
 
     this.elements[0][0].setPosition(PosBase);
     this.elements[0][1].setPosition(PosIter);
@@ -557,6 +533,8 @@ CDegreeSubSup.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSi
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
+
+    this.Set_CompiledCtrPrp(ParaMath);
 
     var ArgSzIters = ArgSize.Copy();
     ArgSzIters.decrease();

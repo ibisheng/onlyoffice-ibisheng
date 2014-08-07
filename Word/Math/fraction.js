@@ -226,11 +226,20 @@ CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.ArgSize.SetValue(-1); // для CtrPrp
     }
 
+    if(this.Pr.type == NO_BAR_FRACTION)
+    {
+        ArgSzFr.decrease();
+        this.ArgSize.SetValue(-1);
+    }
+
+    // компилируем CtrPrp после того, как выставим ArgSize
+    // т.к. при компиляции CtrPrp для дроби важен this.Argsize  (NO_BAR_FRACTION)
+    this.Set_CompiledCtrPrp(ParaMath);
+
     var NewRPI = RPI.Copy();
     NewRPI.bInsideFraction = true;
 
     CFraction.superclass.Resize.call(this, oMeasure, Parent, ParaMath, NewRPI, ArgSzFr);
-
 }
 CFraction.prototype.recalculateSize = function(oMeasure)
 {

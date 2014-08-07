@@ -18,44 +18,6 @@ var DIV_CENT = 0.1386;
 var StartTextElement = 0x2B1A; // Cambria Math
 
 
-// TODO
-// убрать CMathTextPrp
-
-/*function CMathTextPrp()
-{
-    this.FontFamily = undefined;
-    this.FontSize   = undefined;
-    this.Bold       = undefined;
-    this.Italic     = undefined;
-    this.RFonts     = {};
-    this.Lang       = {};
-}
-CMathTextPrp.prototype =
-{
-    Merge: function(prp)
-    {
-        if(prp.FontFamily !== undefined)
-            this.FontFamily = Common_CopyObj(prp.FontFamily);
-
-        if(prp.FontSize !== undefined)
-            this.FontSize = prp.FontSize;
-
-        if(prp.Bold !== undefined)
-            this.Bold = prp.Bold;
-
-        if(prp.Italic !== undefined)
-            this.Italic = prp.Italic;
-
-    },
-    Set: function(prp)
-    {
-        this.FontFamily = Common_CopyObj(prp.FontFamily);
-        this.FontSize = prp.FontSize;
-        this.Bold = prp.Bold;
-        this.Italic = prp.Italic;
-    }
-}*/
-
 // смена хентов
 // editor.SetFontRenderingMode(2);
 
@@ -509,6 +471,9 @@ CMathText.prototype =
          var _width = metricsTxt.Width;
          height = g_oTextMeasurer.GetHeight();
         */
+
+        this.GapLeft = 0;
+        this.GapRight = 0;
 
         if(!this.bJustDraw)
             this.Parent = Run;

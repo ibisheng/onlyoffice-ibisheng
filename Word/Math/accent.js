@@ -1103,6 +1103,8 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
+    this.Set_CompiledCtrPrp(ParaMath);
+
     if(this.RecalcInfo.bProps == true)
     {
         var prp =
@@ -1118,6 +1120,8 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         };
 
         this.operator.mergeProperties(prp, defaultPrp);
+
+        this.RecalcInfo.bProps = false;
     }
 
     this.operator.relate(this);

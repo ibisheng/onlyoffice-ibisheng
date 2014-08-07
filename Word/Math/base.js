@@ -116,7 +116,7 @@ CMathBase.prototype =
 
         return CtrPrp;
     },
-    Set_CompiledCtrPrp: function(ParaMath)
+    /*Set_CompiledCtrPrp: function(ParaMath)
     {
         var defaultRPrp = ParaMath.GetFirstRPrp();
 
@@ -128,7 +128,7 @@ CMathBase.prototype =
                 if(this.elements[i][j].Type === para_Math_Composition)
                     this.elements[i][j].Set_CompiledCtrPrp(ParaMath);
 
-    },
+    },*/
     Get_CompiledCtrPrp: function()
     {
         var CompiledCtrPrp;
@@ -197,16 +197,11 @@ CMathBase.prototype =
             {
                 this.elements[i] = [];
                 for(var j = 0; j < this.nCol; j++)
-                {
                     this.elements[i][j] = elements[j + i*this.nCol];
-                    //this.elements[i][j].bMObjs = true;
-                }
             }
         }
         else
-        {
             this.setContent();
-        }
     },
     // эта функция здесь необходима для случая с n-арными операторами : когда передаем n-арный оператор с итераторами и аргумент
     IsJustDraw: function()
@@ -379,19 +374,28 @@ CMathBase.prototype =
         this.Parent = Parent;
         this.ParaMath = ParaMath;
 
+        this.Set_CompiledCtrPrp(ParaMath);
+
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
         this.recalculateSize(oMeasure, RPI);
     },
-    CompiledCtrPrp: function()
+    Set_CompiledCtrPrp: function(ParaMath)
     {
         if(this.RecalcInfo.bCtrPrp == true)
         {
-            this.Set_CompiledCtrPrp();
+            var defaultRPrp = ParaMath.GetFirstRPrp();
+
+            this.CompiledCtrPrp.Merge(defaultRPrp);
+            this.CompiledCtrPrp.Merge(this.CtrPrp);
+
+            for(var i=0; i < this.nRow; i++)
+                for(var j = 0; j < this.nCol; j++)
+                    if(this.elements[i][j].Type === para_Math_Composition)
+                        this.elements[i][j].Set_CompiledCtrPrp(ParaMath);
             this.RecalcInfo.bCtrPrp = false;
-            //this.RecalcInfo.bProps  = false;
         }
     },
     getAscent: function(oMeasure, _height)
@@ -761,10 +765,10 @@ CMathBase.prototype =
     {
         return this.elements[this.CurPos_X][this.CurPos_Y].IsCurrentPlh();
     },
-    SetGaps:  function(Parent, ParaMath, GapsInfo)
+    SetGaps:  function(GapsInfo)
     {
-        this.Parent   = Parent;
-        this.ParaMath = ParaMath;
+        //this.Parent   = Parent;
+        //this.ParaMath = ParaMath;
 
         GapsInfo.Left       = GapsInfo.Current;
         GapsInfo.leftRunPrp = GapsInfo.currRunPrp;

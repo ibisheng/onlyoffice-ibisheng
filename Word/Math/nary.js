@@ -141,7 +141,7 @@ CNary.prototype.fillContent = function(PropsInfo)
             base.setLowerIterator(this.LowerIterator);
             base.setUpperIterator(this.UpperIterator);
             base.setCtrPrp(ctrPrp);
-            base.Set_CompiledCtrPrp(this.ParaMath);
+            //base.Set_CompiledCtrPrp(this.ParaMath);
         }
     }
 
@@ -197,6 +197,11 @@ CNary.prototype.old_fillMathComposition = function(props, contents /*array*/)
 }
 CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
+    this.Parent   = Parent;
+    this.ParaMath = ParaMath;
+
+    this.Set_CompiledCtrPrp(ParaMath);
+
     if(this.RecalcInfo.bProps || RPI.bChangeInline == true)
     {
         var oSign = this.getSign(this.Pr.chr, this.Pr.chrType);
@@ -211,7 +216,7 @@ CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             this.Sign.add(oSign.chrCode);
         }
 
-        if(this.Pr.limLoc == null || typeof(this.Pr.limLoc) == "undefined")
+        if(limLoc == null || typeof(limLoc) == "undefined")
         {
             var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
 
@@ -233,6 +238,8 @@ CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.Pr.chrType = oSign.chrType;
 
         this.fillContent(PropsInfo);
+
+        this.RecalcInfo.bProps = false;
     }
 
     var NewRPI = RPI.Copy();
@@ -739,14 +746,6 @@ CNaryUndOvr.prototype.setPosition = function(pos)
     PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
     PosLowIter.y = PosSign.y + this.elements[1][0].size.height + this.gapBottom;
 
-
-    /*var x1 = pos.x + this.GapLeft + this.align(0, 0).x,
-        y1 = pos.y,
-        x2 = pos.x + this.GapLeft + this.align(1,0).x,
-        y2 = y1 + this.elements[0][0].size.height + this.gapTop,
-        x3 = pos.x + this.GapLeft + this.align(2,0).x,
-        y3 = y2 + this.elements[1][0].size.height + this.gapBottom;*/
-
     this.elements[0][0].setPosition(PosUpIter);
     this.elements[1][0].setPosition(PosSign);
     this.elements[2][0].setPosition(PosLowIter);
@@ -876,10 +875,10 @@ CNaryOperator.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
 }
-CNaryOperator.prototype.IsOnlyText = function()
+/*CNaryOperator.prototype.IsOnlyText = function()
 {
     return false;
-}
+}*/
 
 function CSigma()
 {

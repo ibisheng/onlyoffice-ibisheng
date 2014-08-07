@@ -91,7 +91,7 @@ CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
         oSpace.gap = 0;
 
     if(minGap == minGap - 0 && minGap == minGap^0)
-        oSpace.minGap = gap;
+        oSpace.minGap = minGap;
 }
 CMathMatrix.prototype.recalculateSize = function(oMeasure)
 {
