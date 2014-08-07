@@ -431,6 +431,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.documentFormat 		= this.DocInfo["Format"];
 					this.documentVKey   		= this.DocInfo["VKey"];
 					this.chartEditor			= this.DocInfo["ChartEditor"];
+					this.documentOpenOptions 	= this.DocInfo["Options"];
 					if(this.documentFormat)
 					{
 						switch(this.documentFormat)
