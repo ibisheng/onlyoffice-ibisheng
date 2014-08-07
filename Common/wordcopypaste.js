@@ -4639,6 +4639,19 @@ PasteProcessor.prototype =
 		if(!this.bIsPlainText)
 		{
 		    var rPr = this._read_rPr(node, bUseOnlyInherit);
+			
+			//заглушка для вставки в excel внутрь шейпа
+			var tempRpr;
+			if(this.pasteInExcel === true && this.oDocument && this.oDocument.Parent && this.oDocument.Parent.parent && this.oDocument.Parent.parent.getObjectType() == historyitem_type_Shape)
+			{
+				tempRpr = new CTextPr();
+				tempRpr.Underline = rPr.Underline;
+				tempRpr.Bold = rPr.Bold;
+				tempRpr.Italic = rPr.Italic;
+				
+				rPr = tempRpr;
+			}
+			
 			//���� ��������� ��������� ���������� ��������� �������
 			if(false == Common_CmpObj2(this.oCur_rPr, rPr))
 			{
