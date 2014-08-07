@@ -558,9 +558,11 @@ parserHelper.prototype.getEscapeSheetName = function (sheet) {
  * @returns {*}
  */
 parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRange, fullCheck, isRows, chartType) {
+    var sDataRange = dataRange, sheetModel;
 	if (c_oAscSelectionDialogType.Chart === dialogType) {
 		dataRange = parserHelp.parse3DRef(dataRange);
-		if (null === dataRange || !model.getWorksheetByName(dataRange.sheet))
+        sheetModel = model.getWorksheetByName(dataRange.sheet);
+		if (null === dataRange || !sheetModel)
 			return c_oAscError.ID.DataRangeError;
 		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
 	} else
@@ -585,7 +587,12 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 			}
 
 			if (c_oAscChartTypeSettings.stock === chartType) {
-				if (minStockVal !== intervalSeries || intervalValues < minStockVal)
+                var chartSettings = new asc_ChartSettings();
+                chartSettings.putType(c_oAscChartTypeSettings.stock);
+                chartSettings.putRange(sDataRange);
+                chartSettings.putInColumns(!isRows);
+                var chartSeries = getChartSeries (sheetModel, chartSettings).series;
+				if (minStockVal !== chartSeries.length || !chartSeries[0].Val || !chartSeries[0].Val.NumCache || chartSeries[0].Val.NumCache.length < minStockVal)
 					return c_oAscError.ID.StockChartError;
 			} else if (intervalSeries > maxSeries)
 				return c_oAscError.ID.MaxDataSeriesError;

@@ -2223,7 +2223,24 @@ DrawingObjectsController.prototype =
                 }
                 break;
             }
+            case c_oAscChartTypeSettings.stock:
+            {
+                if(chart_type.getObjectType() !== historyitem_type_StockChart)
+                {
+                    new_chart_type = new CStockChart();
+                    replaceChart(plot_area, chart_type, new_chart_type);
+                    checkSwapAxis(plot_area, chart_type, new_chart_type);
+
+                    new_chart_type.setHiLowLines(new CSpPr());
+                    new_chart_type.setUpDownBars(new CUpDownBars());
+                    new_chart_type.upDownBars.setGapWidth(150);
+                    new_chart_type.upDownBars.setUpBars(new CSpPr());
+                    new_chart_type.upDownBars.setDownBars(new CSpPr());
+                }
+                break;
+            }
         }
+
 
         var hor_axis = plot_area.getHorizontalAxis();
         var hor_axis_label_setting = chartSettings.getHorAxisLabel();
@@ -3035,17 +3052,17 @@ DrawingObjectsController.prototype =
     changeCurrentState: function(newState)
     {
         this.curState = newState;
-        this.sendDrawingObjectsProps();
+       // this.sendDrawingObjectsProps();
     },
 
 
-    sendDrawingObjectsProps: function()
-    {
-        //var objects_by_types = this.getSelectedObjectsByTypes();
-        var ret = {};
-        ret.chartProps = this.getChartProps();
-        window["Asc"]["editor"].handlers.trigger("asc_onChangeSelectDrawingObjects", ret);
-    },
+   // sendDrawingObjectsProps: function()
+   // {
+   //     //var objects_by_types = this.getSelectedObjectsByTypes();
+   //     var ret = {};
+   //     ret.chartProps = this.getChartProps();
+   //     window["Asc"]["editor"].handlers.trigger("asc_onChangeSelectDrawingObjects", ret);
+   // },
 
 
     updateSelectionState: function(bNoCheck)
@@ -4969,6 +4986,18 @@ DrawingObjectsController.prototype =
     {
         if(typeof asc_CParagraphProperty !== "undefined" && !(props instanceof asc_CParagraphProperty))
         {
+            if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
+            {
+                var editor = window["Asc"]["editor"];
+                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.isColumn, props.ChartProperties.type);
+                if(check === c_oAscError.ID.StockChartError || check === c_oAscError.ID.DataRangeError
+                    || check === c_oAscError.ID.MaxDataSeriesError)
+                {
+                    editor.wbModel.handlers.trigger("asc_onError", check, c_oAscError.Level.NoCritical);
+                    this.drawingObjects.sendGraphicObjectProps();
+                    return;
+                }
+            }
             this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props]);
         }
         else

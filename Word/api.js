@@ -5303,12 +5303,28 @@ CImgProperty заменяет пережнюю структуру:
 */
 asc_docs_api.prototype.ImgApply = function(obj)
 {
+
     var ImagePr = obj;
 
     // Если у нас меняется с Float->Inline мы также должны залочить соответствующий параграф
     var AdditionalData = null;
     var LogicDocument = this.WordControl.m_oLogicDocument;
-
+    if(obj && obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock)
+    {
+        var selectedObjectsByType = LogicDocument.DrawingObjects.getSelectedObjectsByTypes();
+        if(selectedObjectsByType.charts[0])
+        {
+            var chartSpace = selectedObjectsByType.charts[0];
+            if(chartSpace && chartSpace.chart && chartSpace.chart.plotArea && chartSpace.chart.plotArea.charts[0] && chartSpace.chart.plotArea.charts[0].getObjectType() !== historyitem_type_StockChart)
+            {
+                if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
+                {
+                    this.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError,c_oAscError.Level.NoCritical);
+                    return;
+                }
+            }
+        }
+    }
     /*
     if ( docpostype_FlowObjects == LogicDocument.CurPos.Type && "undefined" != typeof( ImagePr.WrappingStyle ) && null != ImagePr.WrappingStyle && c_oAscWrapStyle.Flow != ImagePr.WrappingStyle )
     {

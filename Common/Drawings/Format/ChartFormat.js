@@ -20033,6 +20033,48 @@ CStockChart.prototype =
     },
 
 
+    setFromOtherChart: function(c)
+    {
+        var i;
+        //if(Array.isArray(c.axId))
+        //{
+        //    for(i = 0; i < c.axId.length; ++i)
+        //    {
+        //        this.addAxId(c.axId[i]);
+        //    }
+        //}
+        if(c.dLbls)
+            this.setDLbls(c.dLbls);
+
+        if(c.dropLines)
+            this.setDropLines(c.dropLines);
+
+        if(c.hiLowLines)
+            this.setHiLowLines(c.hiLowLines);
+
+
+        if(Array.isArray(c.series))
+        {
+            for(i = 0; i < c.series.length; ++i)
+            {
+                var ser = new CLineSeries();
+                ser.setFromOtherSeries(c.series[i]);
+                ser.setMarker(new CMarker());
+                ser.setSpPr(new CSpPr());
+                ser.spPr.setLn(new CLn());
+                ser.spPr.ln.setW(28575);
+                ser.spPr.ln.setFill(CreateNoFillUniFill());
+                ser.marker.setSymbol(SYMBOL_NONE);
+                ser.setSmooth(false);
+                this.addSer(ser);
+            }
+        }
+        if(c.upDownBars)
+        {
+            this.setUpDownBars(c.upDownBars);
+        }
+    },
+
     Refresh_RecalcData: function()
     {},
     removeSeries: function(idx)
@@ -22600,6 +22642,25 @@ CUpDownBars.prototype =
         History.Add(this, {Type: historyitem_UpDownBars_SetUpBars, oldPr: this.downBars, newPr:pr});
         this.upBars = pr;
     },
+
+    createDuplicate: function()
+    {
+        var c = new CUpDownBars();
+        if(isRealNumber(this.gapWidth))
+        {
+            c.setGapWidth(this.gapWidth);
+        }
+        if(isRealObject(this.upBars))
+        {
+            c.setUpBars(this.upBars.createDuplicate());
+        }
+        if(isRealObject(this.downBars))
+        {
+            c.setUpBars(this.downBars.createDuplicate());
+        }
+        return c;
+    },
+
 
     Undo: function(data)
     {

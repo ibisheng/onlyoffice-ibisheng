@@ -963,22 +963,39 @@ CChartSpace.prototype =
                 for(i = this.chart.plotArea.charts.length-1; i > -1; --i)
                 {
                     chart = this.chart.plotArea.charts[i];
-                    if(chart.upDownBars)
+                    if(chart.upDownBars /*&& chart.getObjectType() !== historyitem_type_StockChart*/)
                     {
                         if(chart.upDownBars.upBars)
                         {
-                            chart.upDownBars.setUpBars(null);
+                            if(chart.upDownBars.upBars.Fill)
+                            {
+                                chart.upDownBars.upBars.setFill(null);
+                            }
+
+                            if(chart.upDownBars.upBars.ln)
+                            {
+                                chart.upDownBars.upBars.setLn(null);
+                            }
                         }
+
                         if(chart.upDownBars.downBars)
                         {
-                            chart.upDownBars.setDownBars(null);
+                            if(chart.upDownBars.downBars.Fill)
+                            {
+                                chart.upDownBars.downBars.setFill(null);
+                            }
+
+                            if(chart.upDownBars.downBars.ln)
+                            {
+                                chart.upDownBars.downBars.setLn(null);
+                            }
                         }
                     }
                     series = chart.series;
                     for(j = series.length - 1; j > -1; --j)
                     {
-                        ser = series[i];
-                        if(ser.spPr)
+                        ser = series[j];
+                        if(ser.spPr && chart.getObjectType() !== historyitem_type_StockChart)
                         {
                             if(ser.spPr.Fill)
                             {
@@ -8033,10 +8050,12 @@ CChartSpace.prototype =
                                 calc_entry = calc_entryes[i];
                                 calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
                                 calc_entry.calcMarkerUnion.lineMarker.localY = ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
-                                calc_entry.calcMarkerUnion.marker.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width/2 - marker_size/2;
-                                calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
 
-
+                                if(calc_entry.calcMarkerUnion.marker)
+                                {
+                                    calc_entry.calcMarkerUnion.marker.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width/2 - marker_size/2;
+                                    calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
+                                }
 
                                 calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
                                 calc_entry.localY = ((i/hor_count) >> 0)*(max_entry_height);
