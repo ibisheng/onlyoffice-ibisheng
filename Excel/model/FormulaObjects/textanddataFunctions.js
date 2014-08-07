@@ -734,6 +734,8 @@ cFIXED.prototype.Calculate = function ( arg ) {
         arg2 = arg2.cross( arguments[1].first );
     }
 
+    arg2 = arg2.tocBool();
+
     if ( arg0 instanceof cError ) return this.value = arg0;
     if ( arg1 instanceof cError ) return this.value = arg1;
     if ( arg2 instanceof cError ) return this.value = arg2;

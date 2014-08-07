@@ -1105,8 +1105,15 @@ function cFACTDOUBLE() {
 cFACTDOUBLE.prototype = Object.create( cBaseFunction.prototype )
 cFACTDOUBLE.prototype.Calculate = function ( arg ) {
     function factDouble( n ) {
-        if ( n < 0 ) return Number.NaN;
-        else if ( n > 300 ) return Number.Infinity;
+        if ( n == 0 ) {
+            return 0;
+        }
+        else if ( n < 0 ) {
+            return Number.NaN;
+        }
+        else if ( n > 300 ) {
+            return Number.Infinity;
+        }
         n = Math.floor( n );
         var k = 1, res = n, _n = n, ost = -(_n & 1)
         n -= 2
