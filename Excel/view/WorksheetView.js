@@ -10255,6 +10255,7 @@
 		WorksheetView.prototype.setSelectionDialogMode = function (selectionDialogType, selectRange) {
 			if (selectionDialogType === this.selectionDialogType)
 				return;
+            var oldSelectionDialogType = this.selectionDialogType;
 			this.selectionDialogType = selectionDialogType;
 			this.isSelectionDialogMode = c_oAscSelectionDialogType.None !== this.selectionDialogType;
 			this.cleanSelection();
@@ -10263,7 +10264,12 @@
 				if (null !== this.copyActiveRange)
 					this.activeRange = this.copyActiveRange.clone(true);
 				this.copyActiveRange = null;
+                if(oldSelectionDialogType === c_oAscSelectionDialogType.Chart)
+                {
+                    this.objectRender.controller.checkChartForProps(false);
+                }
 			} else {
+
 				this.copyActiveRange = this.activeRange.clone(true);
 				if (selectRange) {
 					if (typeof selectRange === 'string') {
@@ -10275,9 +10281,12 @@
 					if (null != selectRange)
 						this.activeRange.assign(selectRange.c1, selectRange.r1, selectRange.c2, selectRange.r2);
 				}
+                if(selectionDialogType === c_oAscSelectionDialogType.Chart)
+                {
+                    this.objectRender.controller.checkChartForProps(true);
+                }
 			}
 			this._drawSelection();
-            this.objectRender.controller.checkChartForProps();
 		};
 
 		// Получаем свойство: редактируем мы сейчас или нет

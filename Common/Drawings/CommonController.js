@@ -225,21 +225,26 @@ DrawingObjectsController.prototype =
         }
     },
 
-    checkChartForProps: function()
+    checkChartForProps: function(bStart)
     {
-        if(this.chartForProps)
-            return;
-        if(this.selection.groupSelection)
+        if(bStart)
         {
-            if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
-            {
-                this.chartForProps = this.selection.groupSelection.selectedObjects[0];
-            }
+            this.chartForProps = this.getSelectionState();
+            this.resetSelection();
+            this.drawingObjects.getWorksheet().arrActiveChartsRanges = [];
+            var oldIsStartAdd = window["Asc"]["editor"].isStartAddShape;
+            window["Asc"]["editor"].isStartAddShape = true;
+            this.updateOverlay();
+            window["Asc"]["editor"].isStartAddShape = oldIsStartAdd;
         }
-        else if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+        else
         {
-            this.chartForProps = this.selectedObjects[0];
+            this.setSelectionState(this.chartForProps, this.chartForProps.length - 1);
+            this.updateOverlay();
+            this.drawingObjects.getWorksheet().setSelectionShape(true);
+            this.chartForProps = null;
         }
+
     },
 
     resetInternalSelection: function()
@@ -2236,6 +2241,16 @@ DrawingObjectsController.prototype =
                     new_chart_type.upDownBars.setGapWidth(150);
                     new_chart_type.upDownBars.setUpBars(new CSpPr());
                     new_chart_type.upDownBars.setDownBars(new CSpPr());
+                    val_axis = new_chart_type.getAxisByTypes().valAx;
+                    for(i = 0; i < val_axis.length; ++i)
+                    {
+                        if(!val_axis[i].numFmt)
+                        {
+                            val_axis[i].setNumFmt(new CNumFmt());
+                        }
+                        if(val_axis[i].numFmt.formatCode !== "General")
+                            val_axis[i].numFmt.setFormatCode("General");
+                    }
                 }
                 break;
             }
