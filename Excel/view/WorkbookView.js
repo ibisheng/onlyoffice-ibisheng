@@ -21,15 +21,9 @@
 		var asc_applyFunction	= asc.applyFunction;
 		var asc_round			= asc.round;
 		var asc_typeof			= asc.typeOf;
-		var asc_FP				= asc.FontProperties;
 		var asc_CE				= asc.CellEditor;
-		var asc_PS				= asc.PopUpSelector;
-		var asc_WSV				= asc.WorksheetView;
-		var asc_CB				= asc.Clipboard;
 		var asc_CMM				= asc.asc_CMouseMoveData;
 		var asc_CPrintPagesData	= asc.CPrintPagesData;
-		var asc_DC				= asc.DrawingContext;
-		var asc_SR				= asc.StringRender;
 		var asc_getcvt			= asc.getCvtRatio;
 		var asc_CSP				= asc.asc_CStylesPainter;
 
@@ -43,6 +37,55 @@
 			return null;
 		};
 
+		function WorksheetViewSettings() {
+			this.header = {
+				style: [
+					// Header colors
+					{ // kHeaderDefault
+						background: new CColor(244, 244, 244),
+						border: new CColor(213, 213, 213),
+						color: new CColor(54, 54, 54)
+					},
+					{ // kHeaderActive
+						background: new CColor(193, 193, 193),
+						border: new CColor(146, 146, 146),
+						color: new CColor(54, 54, 54)
+					},
+					{ // kHeaderHighlighted
+						background: new CColor(223, 223, 223),
+						border: new CColor(175, 175, 175),
+						color: new CColor(101, 106, 112)
+					},
+					{ // kHeaderSelected
+						background: new CColor(170, 170, 170),
+						border: new CColor(117, 119, 122),
+						color: new CColor(54, 54, 54)
+					}
+				],
+				cornerColor: new CColor(193, 193, 193)
+			};
+			this.cells = {
+				defaultState: {
+					background: new CColor(255, 255, 255),
+					border: new CColor(212, 212, 212),
+					color: new CColor(0, 0, 0)
+				},
+				padding: 2/*px horizontal padding*/
+			};
+			this.activeCellBorderColor = new CColor(105, 119, 62, 0.7);
+			this.activeCellBackground = new CColor(157, 185, 85, 0.2);
+
+			// Цвет заливки границы выделения области автозаполнения
+			this.fillHandleBorderColorSelect = new CColor(255, 255, 255, 1);
+
+			// Цвет закрепленных областей
+			this.frozenColor = new CColor(105, 119, 62, 1);
+
+			// Число знаков для математической информации
+			this.mathMaxDigCount = 9;
+			return this;
+		}
+
 
 		/**
 		 * Widget for displaying and editing Workbook object
@@ -55,22 +98,17 @@
 		 * @param {Object} Api
 		 * @param {CCollaborativeEditing} collaborativeEditing
 		 * @param {c_oAscFontRenderingModeType} fontRenderingMode
-		 * @param {Object} settings              					Settings
 		 *
 		 * @constructor
 		 * @memberOf Asc
 		 */
-		function WorkbookView(model, controller, handlers, elem, inputElem, Api, collaborativeEditing, fontRenderingMode, settings) {
-			if ( !(this instanceof WorkbookView) ) {
-				return new WorkbookView(model, controller, handlers, elem, inputElem, Api, collaborativeEditing, fontRenderingMode, settings);
-			}
-
+		function WorkbookView(model, controller, handlers, elem, inputElem, Api, collaborativeEditing, fontRenderingMode) {
 			this.defaults = {
-				worksheetDefaults: {},
 				scroll: {
 					widthPx	: 16,
 					heightPx: 16
-				}
+				},
+				worksheetView: new WorksheetViewSettings()
 			};
 
 			this.model					= model;
@@ -79,8 +117,7 @@
 			this.wsViewHandlers			= null;
 			this.element				= elem;
 			this.input					= inputElem;
-			this.settings				= $.extend(true, {}, this.defaults, settings);
-			this.clipboard				= new asc_CB();
+			this.clipboard				= new asc.Clipboard();
 			this.Api					= Api;
 			this.collaborativeEditing	= collaborativeEditing;
 			this.lastSendInfoRange		= null;
@@ -106,7 +143,7 @@
 			this.fReplaceCallback = null;	// Callback для замены текста
 
 			// Фонт, который выставлен в DrawingContext, он должен быть один на все DrawingContext-ы
-			this.m_oFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
+			this.m_oFont = new asc.FontProperties(this.model.getDefaultFont(), this.model.getDefaultSize());
 
 			// Теперь у нас 2 FontManager-а на весь документ + 1 для автофигур (а не на каждом листе свой)
 			this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
@@ -137,7 +174,7 @@
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
 			this.maxDigitWidth = 0;
-			this.defaultFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
+			this.defaultFont = new asc.FontProperties(this.model.getDefaultFont(), this.model.getDefaultSize());
 			//-----------------------
 
             this.m_dScrollY         = 0;
@@ -188,11 +225,11 @@
 				AscBrowser.isRetina = false;
 			}
 
-			this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-			this.buffers.overlay = asc_DC({canvas: this.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.main = new asc.DrawingContext({canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.overlay = new asc.DrawingContext({canvas: this.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			
-			this.buffers.mainGraphic = asc_DC({canvas: this.canvasGraphic, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-			this.buffers.overlayGraphic = asc_DC({canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.mainGraphic = new asc.DrawingContext({canvas: this.canvasGraphic, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+			this.buffers.overlayGraphic = new asc.DrawingContext({canvas: this.canvasGraphicOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
@@ -211,7 +248,7 @@
 			this.buffers.shapeOverlayCtx.init(this.overlayGraphicCtx.ctx, this.overlayGraphicCtx.getWidth(0), this.overlayGraphicCtx.getHeight(0), this.overlayGraphicCtx.getWidth(3), this.overlayGraphicCtx.getHeight(3));
 			this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
-			this.stringRender		= asc_SR(this.buffers.main);
+			this.stringRender = new asc.StringRender(this.buffers.main);
 			this.stringRender.setDefaultFont(this.defaultFont);
 
 			// Мерить нужно только со 100% и один раз для всего документа
@@ -343,7 +380,7 @@
 						    font: this.defaultFont
 					    });
 
-				this.popUpSelector = new asc_PS(this.element, /*handlers*/{
+				this.popUpSelector = new asc.PopUpSelector(this.element, /*handlers*/{
 					"insert"	: function () {self._onPopUpSelectorInsert.apply(self, arguments);}
 				});
 			}
@@ -504,8 +541,8 @@
 		};
 
 		WorkbookView.prototype._createWorksheetView = function (wsModel) {
-			var opt  = $.extend(true, {}, this.settings.worksheetDefaults);
-			return new asc_WSV(wsModel, this.wsViewHandlers, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
+			return new asc.WorksheetView(wsModel, this.wsViewHandlers, this.buffers, this.stringRender,
+				this.maxDigitWidth, this.collaborativeEditing, this.defaults.worksheetView);
 		};
 
 		WorkbookView.prototype._onSelectionNameChanged = function (name) {
@@ -1120,11 +1157,9 @@
 
 		WorkbookView.prototype._onShowCellEditorCursor = function () {
 			var ws = this.getWorksheet();
-			if (ws instanceof asc_WSV) {
-				// Показываем курсор
-				if (ws.getCellEditMode())
-					this.cellEditor.showCursor();
-			}
+			// Показываем курсор
+			if (ws.getCellEditMode())
+				this.cellEditor.showCursor();
 		};
 
 		WorkbookView.prototype._onDocumentPlaceChanged = function () {
@@ -1158,7 +1193,7 @@
 			var wb = this.model;
 			var i  = asc_typeof(index) === "number" && index >= 0 ? index : wb.getActive();
 			var ws = this.wsViews[i];
-			if (!(ws instanceof asc_WSV)) {
+			if (null == ws) {
 				ws = this.wsViews[i] = this._createWorksheetView(wb.getWorksheet(i));
 				ws._prepareComments();
 				ws._prepareDrawingObjects();
@@ -1180,15 +1215,13 @@
 			// Только если есть активный
 			if (-1 !== this.wsActive) {
 				var ws = this.getWorksheet();
-				if (ws instanceof asc_WSV) {
-					// Останавливаем ввод данных в редакторе ввода
-					if (ws.getCellEditMode() && !isResized)
-						this._onStopCellEditing();
-					// Делаем очистку селекта
-					ws.cleanSelection();
+				// Останавливаем ввод данных в редакторе ввода
+				if (ws.getCellEditMode() && !isResized)
+					this._onStopCellEditing();
+				// Делаем очистку селекта
+				ws.cleanSelection();
 
-					this.stopTarget(ws);
-				}
+				this.stopTarget(ws);
 			}
 
 			var tmpWorksheet, selectionRange = null;
@@ -1256,15 +1289,13 @@
 			// Только если есть активный
 			if (-1 !== this.wsActive) {
 				var ws = this.getWorksheet(this.wsActive);
-				if (ws instanceof asc_WSV) {
-					// Останавливаем ввод данных в редакторе ввода
-					if (ws.getCellEditMode())
-						this._onStopCellEditing();
-					// Делаем очистку селекта
-					ws.cleanSelection();
+				// Останавливаем ввод данных в редакторе ввода
+				if (ws.getCellEditMode())
+					this._onStopCellEditing();
+				// Делаем очистку селекта
+				ws.cleanSelection();
 
-					this.stopTarget(ws);
-				}
+				this.stopTarget(ws);
 				this.wsActive = -1;
 				// Чтобы поменять, нужно его добавить
 				this.getWorksheet(indexTo);
@@ -1285,15 +1316,13 @@
 			// Только если есть активный
 			if (-1 !== this.wsActive) {
 				var ws = this.getWorksheet();
-				if (ws instanceof asc_WSV) {
-					// Останавливаем ввод данных в редакторе ввода
-					if (ws.getCellEditMode())
-						this._onStopCellEditing();
-					// Делаем очистку селекта
-					ws.cleanSelection();
+				// Останавливаем ввод данных в редакторе ввода
+				if (ws.getCellEditMode())
+					this._onStopCellEditing();
+				// Делаем очистку селекта
+				ws.cleanSelection();
 
-					this.stopTarget(ws);
-				}
+				this.stopTarget(ws);
 				this.wsActive = -1;
 			}
 
@@ -1459,7 +1488,7 @@
 		WorkbookView.prototype.closeCellEditor = function () {
 			var ws = this.getWorksheet();
 			// Останавливаем ввод данных в редакторе ввода
-			if (ws instanceof asc_WSV && ws.getCellEditMode())
+			if (ws.getCellEditMode())
 				this._onStopCellEditing();
 		};
 

@@ -249,7 +249,6 @@ var gUndoInsDelCellsFlag = true;
 		
 		/** @constructor */
 		function AutoFilters(currentSheet) {
-			if ( !(this instanceof AutoFilters) ) {return new AutoFilters();}
 			this.worksheet = currentSheet;
 
 			this.m_oColor = new CColor(120, 120, 120);

@@ -163,8 +163,6 @@
 
 		/** @constructor */
 		function Clipboard() {
-			if ( !(this instanceof Clipboard) ) {return new Clipboard();}
-
 			this.element = undefined;
 			this.ppix = 96;
 			this.ppiy = 96;

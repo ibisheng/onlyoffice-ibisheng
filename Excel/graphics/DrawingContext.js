@@ -272,10 +272,6 @@
 	 * @memberOf Asc
 	 */
 	function FontProperties(family, size, bold, italic, underline, strikeout) {
-		if ( !(this instanceof FontProperties) ) {
-			return new FontProperties(family, size, bold, italic, underline, strikeout);
-		}
-
 		this.FontFamily = {Name: family, Index: -1, Angle : 0};
 		this.FontSize   = size;
 		this.Bold       = !!bold;
@@ -392,9 +388,6 @@
 	 * @memberOf Asc
 	 */
 	function DrawingContext(settings) {
-		if ( !(this instanceof DrawingContext) ) {
-			return new DrawingContext(settings);
-		}
 		this.canvas = null;
 		this.ctx = null;
 

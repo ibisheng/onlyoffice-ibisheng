@@ -2668,6 +2668,12 @@ Woorksheet.prototype.insertColsAfter=function(index, count){
 Woorksheet.prototype.getDefaultWidth=function(){
 	return this.oSheetFormatPr.dDefaultColWidth;
 };
+Woorksheet.prototype.getDefaultFontName=function(){
+	return this.workbook.getDefaultFont();
+};
+Woorksheet.prototype.getDefaultFontSize=function(){
+	return this.workbook.getDefaultSize();
+};
 Woorksheet.prototype.getColWidth=function(index){
 	//index 0 based
 	//Результат в пунктах

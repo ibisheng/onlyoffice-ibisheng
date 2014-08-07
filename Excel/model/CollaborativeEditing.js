@@ -17,7 +17,6 @@
 		 */
 		var asc					= window["Asc"];
 		var asc_applyFunction	= asc.applyFunction;
-		var asc_lockInfo		= asc.asc_CLockInfo;
 		var asc_Range			= asc.Range;
 
 		/**
@@ -315,7 +314,7 @@
 		};
 
 		CCollaborativeEditing.prototype.getLockInfo = function (typeElem, subType, sheetId, info) {
-			var oLockInfo = new asc_lockInfo();
+			var oLockInfo = new asc.asc_CLockInfo();
 			oLockInfo["sheetId"] = sheetId;
 			oLockInfo["type"] = typeElem;
 			oLockInfo["subType"] = subType;

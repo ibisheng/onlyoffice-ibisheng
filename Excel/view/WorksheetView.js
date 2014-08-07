@@ -30,8 +30,6 @@
 		var asc_debug   = asc.outputDebugStr;
 		var asc_Range   = asc.Range;
 		var asc_ActiveRange   = asc.ActiveRange;
-		var asc_FP		= asc.FontProperties;
-		var asc_AF		= asc.AutoFilters;
 		var asc_CMM		= asc.asc_CMouseMoveData;
 
 		var asc_CCellFlag		= asc.asc_CCellFlag;
@@ -43,7 +41,6 @@
 		var asc_CPageSetup		= asc.asc_CPageSetup;
 		var asc_CPageMargins	= asc.asc_CPageMargins;
 		var asc_CPagePrint		= asc.CPagePrint;
-		var asc_CCollaborativeRange = asc.asc_CCollaborativeRange;
 		var asc_CSelectionMathInfo = asc.asc_CSelectionMathInfo;
 
 		/*
@@ -175,61 +172,6 @@
 			return this;
 		}
 
-
-		function WorksheetViewSettings() {
-			if ( !(this instanceof WorksheetViewSettings) ) {
-				return new WorksheetViewSettings();
-			}
-			this.header = {
-				style: [
-				// Header colors
-				{ // kHeaderDefault
-					background: new CColor(244, 244, 244),
-					border: new CColor(213, 213, 213),
-					color: new CColor(54, 54, 54)
-				},
-				{ // kHeaderActive
-					background: new CColor(193, 193, 193),
-					border: new CColor(146, 146, 146),
-					color: new CColor(54, 54, 54)
-				},
-				{ // kHeaderHighlighted
-					background: new CColor(223, 223, 223),
-					border: new CColor(175, 175, 175),
-					color: new CColor(101, 106, 112)
-				},
-				{ // kHeaderSelected
-					background: new CColor(170, 170, 170),
-					border: new CColor(117, 119, 122),
-					color: new CColor(54, 54, 54)
-				}
-				],
-				cornerColor: new CColor(193, 193, 193)
-			};
-			this.cells = {
-				fontName: "Calibri",
-				fontSize: 11,
-				defaultState: {
-					background: new CColor(255, 255, 255),
-					border: new CColor(212, 212, 212),
-					color: new CColor(0, 0, 0)
-				},
-				padding: 2/*px horizontal padding*/
-			};
-			this.activeCellBorderColor = new CColor(105, 119, 62, 0.7);
-			this.activeCellBackground = new CColor(157, 185, 85, 0.2);
-
-			// Цвет заливки границы выделения области автозаполнения
-			this.fillHandleBorderColorSelect = new CColor(255, 255, 255, 1);
-
-			// Цвет закрепленных областей
-			this.frozenColor = new CColor(105, 119, 62, 1);
-
-			// Число знаков для математической информации
-			this.mathMaxDigCount = 9;
-			return this;
-		}
-
 		function Cache() {
 			if ( !(this instanceof Cache) ) {
 				return new Cache();
@@ -342,12 +284,7 @@
 		 * @memberOf Asc
 		 */
 		function WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
-			this.defaults = new WorksheetViewSettings();
-			this.settings = $.extend(true, {}, this.defaults, settings);
-
-			var cells = this.settings.cells;
-			cells.fontName = model.workbook.getDefaultFont();
-			cells.fontSize = model.workbook.getDefaultSize();
+			this.settings = settings;
 
 			this.vspRatio = 1.275;
 
@@ -458,7 +395,7 @@
 			this.collaborativeEditing = collaborativeEditing;
 			
 			// Auto filters
-			this.autoFilters = new asc_AF(this);
+			this.autoFilters = new asc.AutoFilters(this);
 			this.drawingArea = new DrawingArea(this);
 			this.cellCommentator = new CCellCommentator(this);
 			this.objectRender = null;
@@ -1211,14 +1148,14 @@
 			gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(this.defaultColWidthChars);
 			this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
 
+			var defaultFontSize = this.model.getDefaultFontSize();
 			// ToDo разобраться со значениями
 			this.maxRowHeight = asc_calcnpt(409, this._getPPIY());
-			this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
-			this.defaultRowHeight = asc_calcnpt(this.settings.cells.fontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
+			this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
+			this.defaultRowHeight = asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
 			gc_dDefaultRowHeightAttribute = this.model.getDefaultHeight() || this.defaultRowHeight;
 
-			var cells = this.settings.cells;
-			this._setFont(undefined, cells.fontName, cells.fontSize);
+			this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
 			var sr = this.stringRender;
 			var tm = this._roundTextMetrics(sr.measureString("A"));
 			this.headersHeightByFont = tm.height;
@@ -2048,7 +1985,6 @@
 		WorksheetView.prototype._drawColumnHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
 			if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 				return;
-			var cells = this.settings.cells;
 			var vr  = this.visibleRange;
 			var c = this.cols;
 			var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : c[vr.c1].left - this.cellsLeft;
@@ -2065,7 +2001,7 @@
 			if (asc_typeof(end) !== "number") {end = vr.c2;}
 			if (style === undefined) {style = kHeaderDefault;}
 
-			this._setFont(drawingCtx, cells.fontName, cells.fontSize);
+			this._setFont(drawingCtx, this.model.getDefaultFontName(), this.model.getDefaultFontSize());
 
 			// draw column headers
 			for (var i = start; i <= end; ++i) {
@@ -2078,7 +2014,6 @@
 		WorksheetView.prototype._drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
 			if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 				return;
-			var cells = this.settings.cells;
 			var vr  = this.visibleRange;
 			var r = this.rows;
 			var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : this.headersLeft;
@@ -2095,7 +2030,7 @@
 			if (asc_typeof(end) !== "number") {end = vr.r2;}
 			if (style === undefined) {style = kHeaderDefault;}
 
-			this._setFont(drawingCtx, cells.fontName, cells.fontSize);
+			this._setFont(drawingCtx, this.model.getDefaultFontName(), this.model.getDefaultFontSize());
 
 			// draw row headers
 			for (var i = start; i <= end; ++i) {
@@ -4999,7 +4934,7 @@
 
 		WorksheetView.prototype._setFont = function (drawingCtx, name, size) {
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
-			ctx.setFont( new asc_FP(name, size) );
+			ctx.setFont(new asc.FontProperties(name, size));
 		};
 
 		/**
@@ -5898,7 +5833,7 @@
 					var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
 					if (false === isIntersection) {
 						lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-							sheetId, new asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
+							sheetId, new asc.asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
 								selectRangeRecalc.c2, selectRangeRecalc.r2));
 						isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
 							c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false);
@@ -6541,7 +6476,7 @@
 				var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
 				if (false === isIntersection) {
 					var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-						sheetId, new asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+						sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
 					if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 						c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
@@ -6556,7 +6491,6 @@
 
 		WorksheetView.prototype._getSelectionInfoObject = function () {
 			var objectInfo = new asc_CCellInfo();
-			var defaults = this.settings.cells;
 
 			objectInfo.flags = new asc_CCellFlag();
 			var graphicObjects = this.objectRender.getSelectedGraphicObjects();
@@ -6643,8 +6577,8 @@
             {
 				// Может быть не задано текста, поэтому выставим по умолчанию
 				objectInfo.font = new asc_CFont();
-				objectInfo.font.name = defaults.fontName;
-				objectInfo.font.size = defaults.fontSize;
+				objectInfo.font.name = this.model.getDefaultFontName();
+				objectInfo.font.size = this.model.getDefaultFontSize();
 			}
 
 			// Заливка не нужна как таковая
@@ -9189,7 +9123,7 @@
 			var ar = this.activeRange;
 
 			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType,
-				sheetId, new asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+				sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
 			if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
@@ -9281,7 +9215,8 @@
 				}
 
 				if (false === isIntersection) {
-					var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType, sheetId, new asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+					var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType,
+						sheetId, new asc.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
 					if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 						c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
@@ -10569,7 +10504,7 @@
 				bottomSide: getBottomSide(!isMerged ? row : mc.r2),
 				fragments: fragments,
 				flags: fl,
-				font: new asc_FP(c.getFontname(), c.getFontsize()),
+				font: new asc.FontProperties(c.getFontname(), c.getFontsize()),
 				background: bg || this.settings.cells.defaultState.background,
 				textColor: oFontColor || this.settings.cells.defaultState.color,
 				cursorPos: cursorPos,

@@ -21,7 +21,6 @@
 		var asc_debug   = asc.outputDebugStr;
 		var asc_typeof  = asc.typeOf;
 		var asc_round   = asc.round;
-		var asc_FP      = asc.FontProperties;
 		var asc_TM      = asc.TextMetrics;
 
 
@@ -105,11 +104,9 @@
 		 * @memberOf Asc
 		 */
 		function StringRender(drawingCtx) {
-			if ( !(this instanceof StringRender) ) {return new StringRender(drawingCtx);}
-
 			this.drawingCtx = drawingCtx;
 
-			/** @type FontProperties */
+			/** @type Asc.FontProperties */
 			this.defaultFont = undefined;
 
 			/** @type Array */
@@ -515,12 +512,12 @@
 
 		/**
 		 * @param {Object} format  Cell text format
-		 * @return {FontProperties}
+		 * @return {Asc.FontProperties}
 		 */
 		StringRender.prototype._makeFont = function(format) {
 			if (format !== undefined && asc_typeof(format.fn) === "string") {
 				var fsz = format.fs > 0 ? format.fs : this.defaultFont.FontSize;
-				return new asc_FP(format.fn, fsz, format.b, format.i, format.u, format.s);
+				return new asc.FontProperties(format.fn, fsz, format.b, format.i, format.u, format.s);
 			}
 			return this.defaultFont;
 		};

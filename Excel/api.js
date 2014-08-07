@@ -24,7 +24,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var CDocsCoApi = window["CDocsCoApi"];
 
 		/** @constructor */
-		function spreadsheet_api(name, inputName, eventsHandlers, options) {
+		function spreadsheet_api(name, inputName, eventsHandlers) {
 			/************ private!!! **************/
 			this.HtmlElementName = name;
 			this.topLineEditorName = inputName;
@@ -34,7 +34,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.controller	= new asc.asc_CEventsController();
 
 			this.handlers = new asc.asc_CHandlersList(eventsHandlers);
-			this.options = options;
 			// Вид печати
 			this.adjustPrint = null;
 			// Рассчитанные данные для печати
@@ -679,9 +678,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_setMobileVersion: function (isMobile){
 				this.isMobileVersion = isMobile;
-				this.options = (this.options || {});
-				this.options.worksheetDefaults = (this.options.worksheetDefaults || {});
-				this.options.worksheetDefaults.isMobile = isMobile;
 				AscBrowser.isMobileVersion = isMobile;
 			},
 
@@ -1863,8 +1859,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.topLineEditorElement,
 					this,
 					this.collaborativeEditing,
-					this.fontRenderingMode,
-					this.options);
+					this.fontRenderingMode);
 
 				this.DocumentLoadComplete = true;
 				
@@ -3455,8 +3450,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					        window["_null_object"],
 					        this,
 					        this.collaborativeEditing,
-					        this.fontRenderingMode,
-					        this.options);
+					        this.fontRenderingMode);
 			},
 			
 			asc_nativeCalculateFile : function()

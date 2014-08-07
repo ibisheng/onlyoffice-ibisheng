@@ -1080,9 +1080,6 @@
 
 		/** @constructor */
 		function asc_CLockInfo () {
-			if (!(this instanceof  asc_CLockInfo)) {
-				return new asc_CLockInfo();
-			}
 			this["sheetId"] = null;
 			this["type"] = null;
 			this["subType"] = null;
@@ -1092,9 +1089,6 @@
 
 		/** @constructor */
 		function asc_CCollaborativeRange (c1, r1, c2, r2) {
-			if (!(this instanceof asc_CCollaborativeRange)) {
-				return new asc_CCollaborativeRange(c1, r1, c2, r2);
-			}
 			this["c1"] = c1;
 			this["r1"] = r1;
 			this["c2"] = c2;
@@ -1275,7 +1269,7 @@
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
 
-				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle = null;
 				this.defaultStyles = [];
@@ -1301,7 +1295,7 @@
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
 
-				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle = null;
 				this.docStyles = [];

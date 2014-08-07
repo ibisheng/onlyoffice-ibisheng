@@ -20,8 +20,6 @@
 		var asc = window["Asc"];
 		var asc_lastindexof = asc.lastIndexOf;
 		var asc_inherit = asc.inherit;
-		var asc_SR      = asc.StringRender;
-
 
 		function CharOffset(left, top, height, line) {
 			this.left = left;
@@ -226,7 +224,7 @@
 
 		};
 
-		asc_inherit(CellTextRender, asc_SR, CellTextRender_methods);
+		asc_inherit(CellTextRender, asc.StringRender, CellTextRender_methods);
 
 
 		/*
