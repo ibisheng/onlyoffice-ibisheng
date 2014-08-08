@@ -211,7 +211,7 @@
 				if (!found) {doc.body.appendChild(t.element);}
 				
 				//fix for ipad
-				if(AscBrowser.isMobileVersion)
+				if(!AscBrowser.isMobileVersion)
 				{
 					var foundText = true;
 	
