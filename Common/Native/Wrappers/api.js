@@ -447,6 +447,16 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
         }
+        case 3: // ASC_MENU_EVENT_TYPE_UNDO
+        {
+            this.WordControl.m_oLogicDocument.Document_Undo();
+            break;
+        }
+        case 4: // ASC_MENU_EVENT_TYPE_REDO
+        {
+            this.WordControl.m_oLogicDocument.Document_Redo();
+            break;
+        }
         default:
             break;
     }
