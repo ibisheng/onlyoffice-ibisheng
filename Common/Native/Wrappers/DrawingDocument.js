@@ -454,6 +454,9 @@ function CDrawingDocument()
     // frame rect
     this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
+	
+	// math rect
+	this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 } };
 
     // table track
     this.TableOutlineDr = new CTableOutlineDr();
@@ -1071,6 +1074,7 @@ CDrawingDocument.prototype =
         }
 
         this.DrawFrameTrack();
+		this.DrawMathTrack();
 
         if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
         {
@@ -1743,6 +1747,29 @@ CDrawingDocument.prototype =
         {
             this.Native["DD_Overlay_DrawFrameTrack2"](this.FrameRect.Track.PageIndex,
                 this.FrameRect.Track.L, this.FrameRect.Track.T, this.FrameRect.Track.R, this.FrameRect.Track.B);
+        }
+    },
+	
+	DrawMathTrack : function()
+    {
+        if (!this.MathRect.IsActive)
+            return;
+
+        this.Native["DD_Overlay_DrawFrameTrack1"](this.MathRect.Rect.PageIndex,
+            this.MathRect.Rect.X, this.MathRect.Rect.Y, this.MathRect.Rect.R, this.MathRect.Rect.B);
+    },
+	
+	Update_MathTrack : function(IsActive, X, Y, W, H, PageIndex)
+    {       
+        this.MathRect.IsActive = IsActive;
+        
+        if (true === IsActive)
+        {
+            this.MathRect.Rect.X = X;
+            this.MathRect.Rect.Y = Y;
+            this.MathRect.Rect.R = X + W;
+            this.MathRect.Rect.B = Y + H;
+            this.MathRect.Rect.PageIndex = PageIndex;
         }
     },
 
