@@ -44,21 +44,15 @@ function CPdfPrinter(sUrlPath)
     this.DocumentRenderer.VectorMemoryForPrint = new CMemory();
 
     this.font = new window["Asc"].FontProperties("Arial", -1);
-	this.asc_round = window["Asc"].round;
     this.Transform = new CMatrix();
     this.InvertTransform = new CMatrix();
 
 	this.sUrlPath = sUrlPath;
-				
-    var ppiTest =
-        $('<div style="position: absolute; width: 10in; height:10in; ' +
-            'visibility:hidden; padding:0;"/>')
-            .appendTo("body");
-    this.dpiX = this.asc_round(ppiTest[0] ? (ppiTest[0].offsetWidth * 0.1) : 96);
-    this.dpiY = this.asc_round(ppiTest[0] ? (ppiTest[0].offsetHeight * 0.1) : 96);
-    ppiTest.remove();
 
     this.bIsSimpleCommands = false;
+
+	this.width_1px = 0.75;
+	this.height_1px = 0.75;
 }
 
 CPdfPrinter.prototype =
@@ -336,6 +330,20 @@ CPdfPrinter.prototype =
 	},
 	lineVer : function (x, y1, y2)
 	{
+		this.DocumentRenderer._m(x * vector_koef, y1 * vector_koef);
+		this.DocumentRenderer._l(x * vector_koef, y2 * vector_koef);
+		return this;
+	},
+	lineHorPrevPx : function (x1, y, x2)
+	{
+		y -= this.height_1px;
+		this.DocumentRenderer._m(x1 * vector_koef, y * vector_koef);
+		this.DocumentRenderer._l(x2 * vector_koef, y * vector_koef);
+		return this;
+	},
+	lineVerPrevPx : function (x, y1, y2)
+	{
+		x -= this.width_1px;
 		this.DocumentRenderer._m(x * vector_koef, y1 * vector_koef);
 		this.DocumentRenderer._l(x * vector_koef, y2 * vector_koef);
 		return this;

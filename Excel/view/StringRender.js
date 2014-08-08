@@ -1019,11 +1019,11 @@
 					if (isSO) {
 						dy += 1;
 						y = asc_calcnpt(y1 + l.bl - prop.lm.a * 0.275, ppiy);
-						ctx.lineHor(x1, y - dy * h_1px, x2 + w_1px);
+						ctx.lineHor(x1, y - dy * h_1px, x2 + w_1px); // ToDo вопрос тут
 					}
 					if (ul) {
 						y = asc_calcnpt(y1 + l.bl + prop.lm.d * 0.4, ppiy);
-						ctx.lineHor(x1, y + dy * h_1px, x2 + w_1px);
+						ctx.lineHor(x1, y + dy * h_1px, x2 + w_1px); // ToDo вопрос тут
 					}
 					ctx.stroke();
 				}

@@ -570,7 +570,6 @@
 		WorksheetView.prototype.changeZoom = function (isUpdate) {
 			if (isUpdate) {
 				this.cleanSelection();
-				this._initConstValues();
 				this._initCellsArea(false);
 				this._normalizeViewRange();
 				this._cleanCellsTextMetricsCache();
@@ -587,7 +586,6 @@
 		};
 		WorksheetView.prototype.changeZoomResize = function () {
 			this.cleanSelection();
-			this._initConstValues();
 			this._initCellsArea(true);
 			this._normalizeViewRange();
 			this._cleanCellsTextMetricsCache();
@@ -2091,8 +2089,10 @@
 
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
 			var st = this.settings.header.style[style];
-			var x2 = x + w - this.width_1px;
-			var y2 = y + h - this.height_1px;
+			var x2 = x + w;
+			var y2 = y + h;
+			var x2WithoutBorder = x2 - this.width_1px;
+			var y2WithoutBorder = y2 - this.height_1px;
 
 			// background только для видимых
 			if (!isZeroHeader) {
@@ -2106,15 +2106,17 @@
 				.beginPath();
 			if (style !== kHeaderDefault && !isColHeader) {
 				// Select row (top border)
-				ctx.lineHor(x, y - this.height_1px, x2 + this.width_1px);
+				ctx.lineHorPrevPx(x, y, x2);
 			}
+
 			// Right border
-			ctx.lineVer(x2, y, y2);
+			ctx.lineVerPrevPx(x2, y, y2);
 			// Bottom border
-			ctx.lineHor(x, y2, x2 + this.width_1px);
+			ctx.lineHorPrevPx(x, y2, x2);
+
 			if (style !== kHeaderDefault && isColHeader) {
 				// Select col (left border)
-				ctx.lineVer(x - this.width_1px, y, y2 + this.height_1px);
+				ctx.lineVerPrevPx(x, y, y2);
 			}
 			ctx.stroke();
 
@@ -2126,9 +2128,9 @@
 			var text  = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
 			var sr    = this.stringRender;
 			var tm    = this._roundTextMetrics( sr.measureString(text) );
-			var bl    = y2 - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
-			var textX = this._calcTextHorizPos(x, x2, tm, tm.width < w ? khaCenter : khaLeft);
-			var textY = this._calcTextVertPos(y, y2, bl, tm, kvaBottom);
+			var bl    = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
+			var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? khaCenter : khaLeft);
+			var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, kvaBottom);
 			if (drawingCtx) {
 				ctx.AddClipRect(x, y, w, h);
 				ctx.setFillStyle(st.color)
@@ -2157,9 +2159,8 @@
 			var colStartTmp = Math.max(this.visibleRange.c1, colStart);
 			var colEndTmp = Math.min(this.visibleRange.c2, colEnd);
 			for (i = colStartTmp; i <= colEndTmp; ++i) {
-				this.drawingCtx.clearRect(
-					this.cols[i].left - offsetX - this.width_1px, this.headersTop,
-					this.cols[i].width + this.width_1px, this.headersHeight);
+				this.drawingCtx.clearRectByX(this.cols[i].left - offsetX, this.headersTop,
+					this.cols[i].width, this.headersHeight);
 			}
 			if (0 !== cFrozen) {
 				offsetX = this.cols[0].left - this.cellsLeft;
@@ -2167,9 +2168,8 @@
 				colStart = Math.max(0, colStart);
 				colEnd = Math.min(cFrozen, colEnd);
 				for (i = colStart; i <= colEnd; ++i) {
-					this.drawingCtx.clearRect(
-						this.cols[i].left - offsetX - this.width_1px, this.headersTop,
-						this.cols[i].width + this.width_1px, this.headersHeight);
+					this.drawingCtx.clearRectByX(this.cols[i].left - offsetX, this.headersTop,
+						this.cols[i].width, this.headersHeight);
 				}
 			}
 		};
@@ -2188,9 +2188,8 @@
 			for (i = rowStartTmp; i <= rowEndTmp; ++i) {
 				if (this.height_1px > this.rows[i].height)
 					continue;
-				this.drawingCtx.clearRect(
-					this.headersLeft, this.rows[i].top - offsetY - this.height_1px,
-					this.headersWidth, this.rows[i].height + this.height_1px);
+				this.drawingCtx.clearRectByY(this.headersLeft, this.rows[i].top - offsetY,
+					this.headersWidth, this.rows[i].height);
 			}
 			if (0 !== rFrozen) {
 				offsetY = this.rows[0].top - this.cellsTop;
@@ -2200,9 +2199,8 @@
 				for (i = rowStart; i <= rowEnd; ++i) {
 					if (this.height_1px > this.rows[i].height)
 						continue;
-					this.drawingCtx.clearRect(
-						this.headersLeft, this.rows[i].top - offsetY - this.height_1px,
-						this.headersWidth, this.rows[i].height + this.height_1px);
+					this.drawingCtx.clearRectByY(this.headersLeft, this.rows[i].top - offsetY,
+						this.headersWidth, this.rows[i].height);
 				}
 			}
 		};
@@ -2249,17 +2247,17 @@
 				.setLineWidth(1).beginPath();
 
 			var w, h;
-			for (var i = range.c1, x = x1 - this.width_1px; i <= range.c2 && x <= x2; ++i) {
+			for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
 				w = c[i].width;
 				x += w;
 				if (w >= this.width_1px)
-					ctx.lineVer(x, y1, y2);
+					ctx.lineVerPrevPx(x, y1, y2);
 			}
-			for (var j = range.r1, y = y1 - this.height_1px; j <= range.r2 && y <= y2; ++j) {
+			for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
 				h = r[j].height;
 				y += h;
 				if (h >= this.height_1px)
-					ctx.lineHor(x1, y, x2);
+					ctx.lineHorPrevPx(x1, y, x2);
 			}
 
 			ctx.stroke();
@@ -3018,26 +3016,25 @@
 				fHorLine = ctx.dashLineCleverHor;
 				fVerLine = ctx.dashLineCleverVer;
 			} else {
-				fHorLine = ctx.lineHor;
-				fVerLine = ctx.lineVer;
+				fHorLine = ctx.lineHorPrevPx;
+				fVerLine = ctx.lineVerPrevPx;
 			}
 
-			// ToDo заделать отрисовку lock области
 			if (this.topLeftFrozenCell) {
 				var row = this.topLeftFrozenCell.getRow0();
 				var col = this.topLeftFrozenCell.getCol0();
 				if (0 < row)
-					fHorLine.apply(ctx, [0, this.rows[row].top - this.height_1px, ctx.getWidth()]);
+					fHorLine.apply(ctx, [0, this.rows[row].top, ctx.getWidth()]);
 				else
-					fHorLine.apply(ctx, [0, this.headersHeight - this.height_1px, this.headersWidth]);
+					fHorLine.apply(ctx, [0, this.headersHeight, this.headersWidth]);
 
 				if (0 < col)
-					fVerLine.apply(ctx, [this.cols[col].left - this.width_1px, 0, ctx.getHeight()]);
+					fVerLine.apply(ctx, [this.cols[col].left, 0, ctx.getHeight()]);
 				else
-					fVerLine.apply(ctx, [this.headersWidth - this.width_1px, 0, this.headersHeight - this.height_1px]);
+					fVerLine.apply(ctx, [this.headersWidth, 0, this.headersHeight]);
 			} else if (this.model.sheetViews[0].asc_getShowRowColHeaders()) {
-				fHorLine.apply(ctx, [0, this.headersHeight - this.height_1px, this.headersWidth]);
-				fVerLine.apply(ctx, [this.headersWidth - this.width_1px, 0, this.headersHeight - this.height_1px]);
+				fHorLine.apply(ctx, [0, this.headersHeight, this.headersWidth]);
+				fVerLine.apply(ctx, [this.headersWidth, 0, this.headersHeight]);
 			}
 
 			ctx.stroke();
@@ -3240,8 +3237,8 @@
 				fHorLine = ctx.dashLineCleverHor;
 				fVerLine = ctx.dashLineCleverVer;
 			} else {
-				fHorLine = ctx.lineHor;
-				fVerLine = ctx.lineVer;
+				fHorLine = ctx.lineHorPrevPx;
+				fVerLine = ctx.lineVerPrevPx;
 			}
 
 			var firstCol = oIntersection.c1 === visibleRange.c1 && !isAllRange;
@@ -3252,10 +3249,10 @@
 			var drawTopSide		= oIntersection.r1 === range.r1;
 			var drawBottomSide	= oIntersection.r2 === range.r2;
 
-			var x1 = c[oIntersection.c1].left - offsetX - this.width_1px;
-			var x2 = c[oIntersection.c2].left + c[oIntersection.c2].width - offsetX - this.width_1px;
+			var x1 = c[oIntersection.c1].left - offsetX;
+			var x2 = c[oIntersection.c2].left + c[oIntersection.c2].width - offsetX;
 			var y1 = r[oIntersection.r1].top - offsetY;
-			var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY - this.height_1px;
+			var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
 			ctx.setLineWidth(lineWidth).setStrokeStyle(strokeColor);
 			if (fillColor)
@@ -3263,24 +3260,24 @@
 			ctx.beginPath();
 
 			if (drawTopSide && !firstRow)
-				fHorLine.apply(ctx, [x1 + this.width_1px, y1 - this.height_1px, x2 + this.width_1px]);
+				fHorLine.apply(ctx, [x1, y1, x2]);
 			if (drawBottomSide)
-				fHorLine.apply(ctx, [x1 + this.width_1px, y2, x2 + this.width_1px]);
+				fHorLine.apply(ctx, [x1, y2, x2]);
 			if (drawLeftSide && !firstCol)
-				fVerLine.apply(ctx, [x1, y1 - this.width_1px * !firstRow, y2 + this.width_1px]);
+				fVerLine.apply(ctx, [x1, y1, y2]);
 			if (drawRightSide)
 				fVerLine.apply(ctx, [x2, y1, y2]);
 
 			// Отрисовка квадратов для move/resize
 			if (fillColor) {
 				if (drawLeftSide && drawTopSide)
-					ctx.fillRect(x1 + this.width_1px, y1, this.width_4px, this.height_4px);
+					ctx.fillRect(x1 - this.width_1px, y1 - this.height_1px, this.width_4px, this.height_4px);
 				if (drawRightSide && drawTopSide)
-					ctx.fillRect(x2 - this.width_4px, y1, this.width_4px, this.height_4px);
+					ctx.fillRect(x2 - this.width_4px, y1 - this.height_1px, this.width_4px, this.height_4px);
 				if (drawRightSide && drawBottomSide)
 					ctx.fillRect(x2 - this.width_4px, y2 - this.height_4px, this.width_4px, this.height_4px);
 				if (drawLeftSide && drawBottomSide)
-					ctx.fillRect(x1 + this.width_1px, y2 - this.height_4px, this.width_4px, this.height_4px);
+					ctx.fillRect(x1 - this.width_1px, y2 - this.height_4px, this.width_4px, this.height_4px);
 			}
 
 			ctx.closePath().stroke();

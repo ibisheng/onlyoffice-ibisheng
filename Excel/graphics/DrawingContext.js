@@ -415,8 +415,6 @@
 
 		this.scaleFactor = 1;
 
-		this._1px_x = getCvtRatio(0/*px*/, 3/*mm*/, this.ppiX);
-		this._1px_y = getCvtRatio(0/*px*/, 3/*mm*/, this.ppiY);
 		this.units  = 3/*mm*/;
 		this.changeUnits(undefined !== settings.units ? settings.units : this.units);
 
@@ -551,8 +549,6 @@
 		this._mct.sx = getCvtRatio(i, 0/*px*/, this.ppiX);
 		this._mct.sy = getCvtRatio(i, 0/*px*/, this.ppiY);
 		this._calcMFT();
-		this._1px_x = getCvtRatio(0/*px*/, i, this.ppiX);
-		this._1px_y = getCvtRatio(0/*px*/, i, this.ppiY);
 		this.units = units;
 		return this;
 	};
@@ -782,6 +778,15 @@
 		var r = this._calcRect(x, y, w, h);
 		this.ctx.clearRect(r.x, r.y, r.w, r.h);
 		return this;
+	};
+
+	DrawingContext.prototype.clearRectByX = function (x, y, w, h) {
+		var r = this._calcRect(x, y, w, h);
+		this.ctx.clearRect(r.x - 1, r.y, r.w + 1, r.h);
+	};
+	DrawingContext.prototype.clearRectByY = function (x, y, w, h) {
+		var r = this._calcRect(x, y, w, h);
+		this.ctx.clearRect(r.x, r.y - 1, r.w, r.h + 1);
 	};
 
 	// Font and text methods
@@ -1020,10 +1025,28 @@
 		return this;
 	};
 
+	// Отрисовка на 1px меньше
+	DrawingContext.prototype.lineHorPrevPx = function (x1, y, x2) {
+		var isEven = (0 !== this.ctx.lineWidth % 2 ? 0.5 : 0) - 1;
+		var r1 = this._calcRect(x1, y);
+		var r2 = this._calcRect(x2, y);
+		this.ctx.moveTo(r1.x, r1.y + isEven);
+		this.ctx.lineTo(r2.x, r2.y + isEven);
+		return this;
+	};
+	DrawingContext.prototype.lineVerPrevPx = function (x, y1, y2) {
+		var isEven = (0 !== this.ctx.lineWidth % 2 ? 0.5 : 0) - 1;
+		var r1 = this._calcRect(x, y1);
+		var r2 = this._calcRect(x, y2);
+		this.ctx.moveTo(r1.x + isEven, r1.y);
+		this.ctx.lineTo(r2.x + isEven, r2.y);
+		return this;
+	};
+
 	DrawingContext.prototype.dashLineCleverHor = function (x1, y, x2) {
 		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
 		var _x1 = this._mct.transformPointX(x1, y);
-		var _y  = this._mct.transformPointY(x1, y);
+		var _y  = this._mct.transformPointY(x1, y) - 1;
 		var _x2 = this._mct.transformPointX(x2, y);
 		var ctx = this.ctx;
 
@@ -1044,7 +1067,7 @@
 	DrawingContext.prototype.dashLineCleverVer = function (x, y1, y2) {
 		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
 		var _y1 = this._mct.transformPointY(x, y1);
-		var _x  = this._mct.transformPointX(x, y1);
+		var _x  = this._mct.transformPointX(x, y1) - 1;
 		var _y2 = this._mct.transformPointY(x, y2);
 		var ctx = this.ctx;
 
@@ -1189,15 +1212,15 @@
 
 	DrawingContext.prototype._calcRect = function (x, y, w, h) {
 		var wh = w !== undefined && h !== undefined,
-			x2 = x + w - this._1px_x,
-			y2 = y + h - this._1px_y,
+			x2 = x + w,
+			y2 = y + h,
 			_x = this._mft.transformPointX(x, y),
 			_y = this._mft.transformPointY(x, y);
 		return {
 			x: asc_round(_x),
 			y: asc_round(_y),
-			w: wh ? asc_round(this._mft.transformPointX(x2, y2) - _x + 1) : undefined,
-			h: wh ? asc_round(this._mft.transformPointY(x2, y2) - _y + 1) : undefined
+			w: wh ? asc_round(this._mft.transformPointX(x2, y2) - _x) : undefined,
+			h: wh ? asc_round(this._mft.transformPointY(x2, y2) - _y) : undefined
 		};
 	};
 
