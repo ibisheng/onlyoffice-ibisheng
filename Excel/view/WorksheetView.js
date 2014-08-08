@@ -3537,6 +3537,13 @@
 				ctx.setFillStyle( opt.activeCellBackground )
 						.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
+				var lRect2 = x1 + (drawLeftSide ? this.width_2px : this.width_1px),
+					rRect2 = x2 - (drawRightSide ? this.width_2px : 0),
+					tRect2 = y1 + (drawTopSide ? this.height_1px : 0),
+					bRect2 = y2 - (drawBottomSide ? this.width_2px : 0);
+				ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath()
+					.strokeRect(lRect2, tRect2, rRect2 - lRect2, bRect2 - tRect2);
+
 				var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyActiveRange;
 				cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
 				// Получаем активную ячейку в выделении
@@ -3559,7 +3566,12 @@
 						this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
 						this.fillHandleB = this.fillHandleT + fillHandleHeight;
 
-						ctx.setFillStyle (opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+						ctx.setFillStyle(opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+
+						ctx.setStrokeStyle(opt.activeCellBorderColor2).setLineWidth(1).beginPath();
+						ctx.lineHorPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleR);
+						ctx.lineVerPrevPx(this.fillHandleL, this.fillHandleT, this.fillHandleB);
+						ctx.stroke();
 					}
 				}
 			}
