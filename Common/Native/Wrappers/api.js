@@ -486,7 +486,7 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
     if (TextPr.FontSize !== undefined)
     {
         _stream["WriteByte"](5);
-        _stream["WriteDouble"](TextPr.FontSize);
+        _stream["WriteDouble2"](TextPr.FontSize);
     }
 
     if (TextPr.Color !== undefined)
