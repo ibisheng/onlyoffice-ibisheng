@@ -1023,7 +1023,7 @@
 			   .fillRect(0, 0, ctx.getWidth(), ctx.getHeight());
 
 			if (opt.fragments.length > 0) {
-				t.textRender.render(t._getContentLeft(), -ctx._1px_y + (dy === undefined ? 0 : dy), t._getContentWidth(), opt.textColor);
+				t.textRender.render(t._getContentLeft(), (dy === undefined ? 0 : dy), t._getContentWidth(), opt.textColor);
 			}
 		};
 
