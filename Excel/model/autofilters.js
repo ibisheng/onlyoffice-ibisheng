@@ -674,7 +674,12 @@ var gUndoInsDelCellsFlag = true;
 								result = result.result;
 							}
 							else
+							{
+								History.EndTransaction();
+								if(isTurnOffHistory)
+									History.TurnOn();
 								return false;
+							}	
 						};
 						
 						//добавляем структуру нового фильтра
