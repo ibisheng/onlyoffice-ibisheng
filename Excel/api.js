@@ -2386,11 +2386,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			},
 
-//			не используется (и не стоит так делать)
-//			asc_openCellEditor: function (text, cursorPos) {
-//				this.wb.openCellEditor(text, cursorPos, /*isFocus*/false);
-//			},
-
 			asc_closeCellEditor: function () {
 				this.wb.closeCellEditor();
 			},
@@ -3698,7 +3693,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_replaceText"] = prot.asc_replaceText;
 		prot["asc_endFindText"] = prot.asc_endFindText;
 		prot["asc_findCell"] = prot.asc_findCell;
-		//prot["asc_openCellEditor"] = prot.asc_openCellEditor; - не используется (и не стоит так делать)
 		prot["asc_closeCellEditor"] = prot.asc_closeCellEditor;
 
 		// Spreadsheet interface

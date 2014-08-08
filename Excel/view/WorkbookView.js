@@ -1466,24 +1466,6 @@
 				this.cellEditor.enableKeyEventsHandler(f);
 		};
 
-/*		WorkbookView.prototype.openCellEditor = function (text, cursorPos, isFocus) {
-			var t = this;
-			if(t.cellEditor.hasFocus){//предполагаю, что если cellEditor.hasFocus == true, то он открыт - закрываем редактор.
-				t.cellEditor.close();
-			}
-			var ws = this.getWorksheet();
-			t.controller.setCellEditMode(true);
-			ws.setCellEditMode(true);
-			if (!ws.openCellEditorWithText(t.cellEditor, text, cursorPos, isFocus)) {
-				t.controller.setCellEditMode(false);
-				t.controller.setStrictClose(false);
-				t.controller.setFormulaEditMode(false);
-				ws.setCellEditMode(false);
-				ws.setFormulaEditMode(false);
-			}
-		};
-*/
-
 		// Останавливаем ввод данных в редакторе ввода
 		WorkbookView.prototype.closeCellEditor = function () {
 			var ws = this.getWorksheet();
@@ -1582,9 +1564,11 @@
 						t.controller.setCellEditMode(true);
 						ws.setCellEditMode(true);
 
+						t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
 						// Открываем, с выставлением позиции курсора
 						if (!ws.openCellEditorWithText(t.cellEditor, functionName, cursorPos, /*isFocus*/false,
 							/*activeRange*/arn)) {
+							t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
 							t.controller.setCellEditMode(false);
 							t.controller.setStrictClose(false);
 							t.controller.setFormulaEditMode(false);
