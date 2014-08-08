@@ -3630,14 +3630,14 @@ parserFormula.prototype = {
     },
 
     setRefError: function (node) {
+		//когда выставляется setRefError node не сдвигаются, поэтому node.cellId совпадает с elem._cells
         for (var i = 0; i < this.outStack.length; i++) {
             var elem = this.outStack[i];
             if (elem instanceof cRef || elem instanceof cArea || elem instanceof cRef3D) {
-                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId)
+                if (node.sheetId == elem.ws.getId() && node.cellId == elem._cells)
                     this.outStack[i] = new cError(cErrorType.bad_reference);
             }
             else if (elem instanceof cArea3D) {
-                //когда выставляется setRefError node не сдвигаются, поэтому node.cellId совпадает с elem._cells
                 if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && node.cellId == elem._cells)
                     this.outStack[i] = new cError(cErrorType.bad_reference);
             }
@@ -3649,22 +3649,22 @@ parserFormula.prototype = {
      cellId - какую ячейку сдвигаем
      */
     shiftCells: function (node, from, to) {
+		//node.cellId содержит уже сдвинутое значение
         var sFromName = from.getName();
         for (var i = 0; i < this.outStack.length; i++) {
             var elem = this.outStack[i];
             if (elem instanceof cRef || elem instanceof cArea) {
-                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId) {
+                if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
                     elem.value = elem._cells = node.cellId;
                     elem.range = node.getBBox().clone();
                 }
             }
             else if (elem instanceof cRef3D) {
-                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId) {
+                if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
                     elem.value = elem._cells = node.cellId;
                 }
             }
             else if (elem instanceof cArea3D) {
-                //node.cellId содержит уже сдвинутое значение
                 if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells) {
                     elem.value = elem._cells = node.cellId;
                 }
@@ -3673,11 +3673,12 @@ parserFormula.prototype = {
     },
 
     stretchArea: function (node, from, to) {
+		//node.cellId содержит уже сдвинутое значение
         var sFromName = from.getName();
         for (var i = 0; i < this.outStack.length; i++) {
             var elem = this.outStack[i];
             if (elem instanceof cArea) {
-                if (node.sheetId == elem.ws.getId() && node.cellId == elem.node.cellId) {
+                if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
                     elem.value = elem._cells = node.cellId;
                     elem.range = node.getBBox().clone();
                 }
