@@ -455,6 +455,9 @@ CHistory.prototype =
 
     Is_SimpleChanges : function()
     {
+        if (this.Index - this.RecIndex !== 1)
+            return [];
+        
         if ( this.Index >= 0 && this.Points[this.Index].Items.length > 0 )
         {
             // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
