@@ -2919,10 +2919,15 @@
         {
             var oThis = this;
             var aIndexes = [];
+			var bIsTablePartContainActiveRange;
             if(oThis.isCopyPaste)
             {
                 for(var i = oThis.isCopyPaste.c1; i <= oThis.isCopyPaste.c2; i++)
                     aIndexes.push(i);
+					
+				var api = window["Asc"]["editor"];
+				var ws = api.wb.getWorksheet();
+				bIsTablePartContainActiveRange = ws.autoFilters.isTablePartContainActiveRange();
             }
             else
             {
@@ -2935,8 +2940,13 @@
                 var cell = aCells[aIndexes[i]];
                 //готовим ячейку к записи
                 if(!oThis.isCopyPaste || (oThis.isCopyPaste && cell))
-                {
-                    var nXfsId = this.prepareXfs(cell.xfs);
+                {	
+					var nXfsId;
+					if(oThis.isCopyPaste && bIsTablePartContainActiveRange)
+						nXfsId = this.prepareXfs(cell.compiledXfs);
+					else
+						nXfsId  = this.prepareXfs(cell.xfs);
+					
                     //сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
                     if(null != cell.xfs || false == cell.isEmptyText())
                         this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});

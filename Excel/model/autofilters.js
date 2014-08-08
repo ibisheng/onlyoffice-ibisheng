@@ -2372,6 +2372,23 @@ var gUndoInsDelCellsFlag = true;
 				}
 				return result;
 			},
+			//если активная область полностью лежит внутри форматированной таблицы, но не равно ей
+			isTablePartContainActiveRange: function()
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				var activeRange = ws.activeRange;
+				
+				var tableParts = aWs.TableParts;
+				var tablePart;
+				for(var i = 0; i < tableParts.length; i++)
+				{
+					tablePart = tableParts[i];
+					if(tablePart && tablePart.Ref && tablePart.Ref.containsRange(activeRange) && !tablePart.Ref.isEqual(activeRange))
+						return true;
+				}
+				return false;
+			},
 			
 			//при закрытии диалогового окна числового фильтра
 			_applyDigitalFilter: function(ar, autoFiltersObject) {
