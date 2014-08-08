@@ -8215,7 +8215,8 @@
 		
 		WorksheetView.prototype._setInfoAfterPaste = function (values,clipboard,isCheckSelection) {
 			var t = this;
-			var arn = t.activeRange.clone(true);
+			var wb = window["Asc"]["editor"].wb;
+			var arn = wb && wb.clipboard && wb.clipboard.activeRange ? wb.clipboard.activeRange : t.activeRange.clone(true);
 			var arrFormula = [];
 			var numFor = 0;
 			var rMax = values.length + values.rowSpanSpCount;
@@ -8338,14 +8339,17 @@
 			}
 			if(isMultiple)
 			{
-				var currentObj = values[arn.r1][arn.c1][0];
-				var valFormat = '';
-				if(currentObj[0] !== undefined)
-					valFormat = currentObj[0].text;
-				if(currentObj.format !== null && currentObj.format !== '' && currentObj.format !== undefined)
+				if(values[arn.r1] && values[arn.r1][arn.c1])
 				{
-					var nameFormat = clipboard._decode(currentObj.format.split(';')[0]);
-					valFormat = clipboard._decode(currentObj.format.split(';')[1]);
+					var currentObj = values[arn.r1][arn.c1][0];
+					var valFormat = '';
+					if(currentObj[0] !== undefined)
+						valFormat = currentObj[0].text;
+					if(currentObj.format !== null && currentObj.format !== '' && currentObj.format !== undefined)
+					{
+						var nameFormat = clipboard._decode(currentObj.format.split(';')[0]);
+						valFormat = clipboard._decode(currentObj.format.split(';')[1]);
+					}
 				}
 			}
 			for (var autoR = 0;autoR < maxARow; ++autoR) {

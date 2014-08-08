@@ -1807,6 +1807,8 @@
 					};
 				};
 				
+				this.activeRange = worksheet.activeRange.clone(true);
+				
 				//parse HTML
 				aResult = this._parseHtml(pasteFragment, node, worksheet, isText);
 				
