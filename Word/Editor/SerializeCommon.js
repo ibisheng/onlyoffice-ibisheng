@@ -1057,7 +1057,7 @@ function CPPTXContentWriter()
 
         delete group.spPr.WriteXfrm;
 
-        var spTree = group.arrGraphicObjects;
+        var spTree = group.spTree;
         var _len = spTree.length;
         if (0 != _len)
         {
