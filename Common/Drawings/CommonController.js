@@ -3586,10 +3586,21 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 13 && false === isViewMode ) // Enter
         {
-            if(this.getTargetDocContent())
+            var target_doc_content = this.getTargetDocContent();
+            if(target_doc_content)
             {
-                this.checkSelectedObjectsAndCallback(this.addNewParagraph, []);
-                this.recalculate();
+                var hyperlink = this.hyperlinkCheck(false);
+                if(hyperlink && !e.shiftKey)
+                {
+                    window["Asc"]["editor"].wb.handlers.trigger("asc_onHyperlinkClick", hyperlink.Get_Value());
+                    hyperlink.Set_Visited(true);
+                    this.drawingObjects.showDrawingObjects(true);
+                }
+                else
+                {
+                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, []);
+                    this.recalculate();
+                }
             }
             else
             {
