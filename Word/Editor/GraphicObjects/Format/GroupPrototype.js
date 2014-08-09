@@ -316,7 +316,7 @@ CGroupShape.prototype.recalculateBounds = function()
     }
 
 
-    if(!this.group)
+    //if(!this.group)
     {
         var tr = this.localTransform;
         var arr_p_x = [];
