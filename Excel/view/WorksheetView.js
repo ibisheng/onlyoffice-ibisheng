@@ -8217,6 +8217,10 @@
 			var t = this;
 			var wb = window["Asc"]["editor"].wb;
 			var arn = wb && wb.clipboard && wb.clipboard.activeRange ? wb.clipboard.activeRange : t.activeRange.clone(true);
+			
+			if(!clipboard)
+				clipboard = wb && wb.clipboard ? wb.clipboard : null;
+			
 			var arrFormula = [];
 			var numFor = 0;
 			var rMax = values.length + values.rowSpanSpCount;
