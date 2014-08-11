@@ -19196,13 +19196,17 @@ CScatterChart.prototype =
                 break;
             }
             case historyitem_ScatterChart_SetDLbls:
-            case historyitem_ScatterChart_SetScatterStyle:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
                     w.WriteString2(data.newPr.Get_Id());
                 }
+                break;
+            }
+            case historyitem_ScatterChart_SetScatterStyle:
+            {
+                writeLong(w, data.newPr);
                 break;
             }
 
@@ -19275,14 +19279,7 @@ CScatterChart.prototype =
             }
             case historyitem_ScatterChart_SetScatterStyle:
             {
-                if(r.GetBool())
-                {
-                    this.scatterStyle = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.scatterStyle = null;
-                }
+                this.scatterStyle = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateType();
