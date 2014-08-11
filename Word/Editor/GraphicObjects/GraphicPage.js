@@ -432,6 +432,10 @@ CGraphicPage.prototype =
         this.behindDocObjects.sort(ComparisonByZIndexSimpleParent);
         this.wrappingObjects.sort(ComparisonByZIndexSimpleParent);
         this.beforeTextObjects.sort(ComparisonByZIndexSimpleParent);
+        if(this.hdrFtrPage)
+        {
+            this.hdrFtrPage.sortDrawingArrays();
+        }
     },
 
     drawBehindDoc: function(graphics)
@@ -488,15 +492,3 @@ CGraphicPage.prototype =
         graphics.SetIntegerGrid(true);
     }
 };
-
-
-function ComparisonByZIndex(grObj1, grObj2)
-{
-    if(grObj1 !== null && grObj2 !== null
-        && typeof grObj1 === "object" && typeof grObj2 === "object" )
-    {
-        if(typeof grObj1.RelativeHeight === "number" && typeof grObj2.RelativeHeight === "number")
-            return grObj2.RelativeHeight - grObj1.RelativeHeight;
-    }
-    return 0;
-}

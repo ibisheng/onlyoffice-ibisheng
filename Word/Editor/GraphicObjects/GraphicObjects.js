@@ -293,7 +293,6 @@ CGraphicObjects.prototype =
     addToZIndexManagerAfterOpen: function()
     {
         this.drawingObjects.sort(ComparisonByZIndexSimple);
-        this.drawingObjects.reverse();
         this.zIndexManager.bTurnOff = false;
         for(var i = 0; i < this.drawingObjects.length; ++i)
         {
@@ -594,7 +593,7 @@ CGraphicObjects.prototype =
         var ret = [];
         for(var i = 0; i < this.selectedObjects.length; ++i)
         {
-            ret.push(this.selectedObjects[i].parent.RelativeHeight);
+            ret.push(this.selectedObjects[i].parent.RelativeHeight - 1000);
         }
         return ret;
     },
@@ -2167,10 +2166,13 @@ CGraphicObjects.prototype =
             else
             {
                 var first_selected = this.selectedObjects[0];
+                var arr_drawings_ = [];
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
+                    arr_drawings_.push(this.selectedObjects[i].parent);
                 }
+                this.zIndexManager.removeArrayDrawings(arr_drawings_);
                 this.resetSelection();
                 first_selected.parent.GoTo_Text();
                 this.document.Recalculate();
@@ -2583,24 +2585,16 @@ CGraphicObjects.prototype =
 function ComparisonByZIndexSimpleParent(obj1, obj2)
 {
     if(obj1.parent && obj2.parent)
-        return obj2.parent.RelativeHeight - obj1.parent.RelativeHeight;
+        return obj1.parent.RelativeHeight - obj2.parent.RelativeHeight;
     return 0;
 }
 
 function ComparisonByZIndexSimple(obj1, obj2)
 {
-    return obj2.RelativeHeight - obj1.RelativeHeight;
+    return obj1.RelativeHeight - obj2.RelativeHeight;
 }
 
-function ComparisonByZIndex(obj1, obj2)
-{
-    var array_type1 = obj1.getDrawingArrayType();
-    var array_type2 = obj2.getDrawingArrayType();
-    if(array_type1 === array_type2)
-        return ComparisonByZIndexSimple(obj1, obj2);
-    else
-        return array_type1 - array_type2;
-}
+
 
 function CreateImageFromBinary(bin, nW, nH)
 {
@@ -2698,6 +2692,15 @@ ZIndexManager.prototype =
         this.drawingObjects.addToRecalculate(this);
     },
 
+    removeArrayDrawings: function(aDrawings)
+    {
+        aDrawings.sort(ComparisonByZIndexSimple);
+        for(var i =  aDrawings.length-1; i > -1; --i)
+        {
+            this.removeItem(aDrawings[i].RelativeHeight-1000);
+        }
+    },
+
     removeItem: function(pos)
     {
         History.Add(this, {Type: historyitem_ZIndexManagerRemoveItem, Pos: pos, Item: this.Content[pos]});
@@ -2717,13 +2720,15 @@ ZIndexManager.prototype =
             this.startRefreshIndex = pos;
     },
 
+
+
     recalculate: function()
     {
         if(this.startRefreshIndex > -1)
         {
             for(var i = 0; i < this.Content.length; ++i)
             {
-                this.Content[i].RelativeHeight = this.Content.length - (i+1);
+                this.Content[i].RelativeHeight = i + 1000;
             }
             this.startRefreshIndex = -1;
         }
@@ -2739,13 +2744,13 @@ ZIndexManager.prototype =
         {
             arrDrawings.push(this.removeItem(arrInd[i]));
         }
-        for(i = arrDrawings.length-1; i > -1; --i)
+        for(i = 0; i < arrDrawings.length; ++i)
         {
-            this.addItem(null, arrDrawings[i]);
+            this.addItem(0, arrDrawings[i]);
         }
     },
 
-    bringBackward: function(arrInd)
+    bringForward: function(arrInd)
     {
         arrInd.sort(function(a, b){return a - b;});
         var i;
@@ -2777,11 +2782,11 @@ ZIndexManager.prototype =
         arrDrawings.reverse();
         for(i = 0; i < arrDrawings.length; ++i)
         {
-            this.addItem(i, arrDrawings[i]);
+            this.addItem(this.Content.length, arrDrawings[i]);
         }
     },
 
-    bringForward: function(arrInd)
+    bringBackward: function(arrInd)
     {
         arrInd.sort(function(a, b){return a - b});
         var i, item;

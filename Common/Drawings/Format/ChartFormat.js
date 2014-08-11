@@ -828,12 +828,20 @@ CDLbl.prototype =
     {
         var ret = new CBodyPr();
         ret.setDefault();
-        if(this.txPr && this.txPr.bodyPr)
+        if(this.tx && this.tx.rich)
         {
-            ret.merge(this.txPr.bodyPr);
+            ret.merge(this.tx.rich.bodyPr);
         }
+        else
+        {
+            if(this.txPr && this.txPr.bodyPr)
+            {
+                ret.merge(this.txPr.bodyPr);
+            }
+        }
+
         if(this.parent && isRealNumber(this.parent.axPos) && (this.parent.axPos === AX_POS_L || this.parent.axPos === AX_POS_R)
-            && (!this.txPr || !this.txPr.bodyPr || !isRealNumber(this.txPr.bodyPr.vert)))
+            && ((this.tx && this.tx.rich && (!this.tx.rich.bodyPr ||  !isRealNumber(this.tx.rich.bodyPr.vert) ) ) || (!(this.tx && this.tx.rich) && (!this.txPr || !this.txPr.bodyPr || !isRealNumber(this.txPr.bodyPr.vert))))  )
         {
             ret.vert = nVertTTvert270;
         }
@@ -4402,7 +4410,11 @@ CCatAx.prototype =
     {
         History.Add(this, {Type: historyitem_CatAxSetTxPr, oldPr: this.txPr, newPr:pr});
         this.txPr = pr;
-        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.handleUpdateInternalChart)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
         }
@@ -5496,7 +5508,11 @@ CDateAx.prototype =
     {
         History.Add(this, {Type:historyitem_DateAxTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
-        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.handleUpdateInternalChart)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
         }
@@ -6568,7 +6584,11 @@ CSerAx.prototype =
     {
         History.Add(this, {Type: historyitem_SerAxSetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
-        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.handleUpdateInternalChart)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
         }
@@ -7526,8 +7546,11 @@ CValAx.prototype =
     {
         History.Add(this, {Type: historyitem_ValAxSetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
-
-        if(this.parent && this.parent.parent && this.parent.parent.parent)
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.handleUpdateInternalChart)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
         }
@@ -22110,6 +22133,10 @@ CTitle.prototype =
     {
         History.Add(this, {Type: historyitem_Title_SetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
     },
 
 

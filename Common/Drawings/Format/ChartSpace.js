@@ -129,19 +129,19 @@ function CChartStyleManager()
             }
 
             this.defaultLineStyles = [];
-            this.defaultLineStyles[0] = new ChartLineStyle(f(15, 0), f(15, 0.5), f(15, 0.75), f(15, 0), EFFECT_SUBTLE);
+            this.defaultLineStyles[0] = new ChartLineStyle(f(15, 0.75), f(15, 0.5), f(15, 0.75), f(15, 0), EFFECT_SUBTLE);
             for(i = 0; i < 32; ++i)
             {
                 this.defaultLineStyles[i] = this.defaultLineStyles[0];
             }
-            this.defaultLineStyles[32] = new ChartLineStyle(f(8, 0), f(15, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
+            this.defaultLineStyles[32] = new ChartLineStyle(f(8, 0.75), f(8, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
             this.defaultLineStyles[33] = this.defaultLineStyles[32];
-            this.defaultLineStyles[34] = new ChartLineStyle(f(8, 0), f(15, 0.5), f(8, 0.75), f(8, -0.25), EFFECT_SUBTLE);
+            this.defaultLineStyles[34] = new ChartLineStyle(f(8, 0.75), f(8, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
             for(i = 35; i < 40; ++i)
             {
                 this.defaultLineStyles[i] = this.defaultLineStyles[34];
             }
-            this.defaultLineStyles[40] = new ChartLineStyle(f(8, 0), f(15, 0.9), f(12, 0), f(12, 0), EFFECT_NONE);
+            this.defaultLineStyles[40] = new ChartLineStyle(f(8, 0.75), f(8, 0.9), f(12, 0), f(12, 0), EFFECT_NONE);
             for(i = 41; i < 48; ++i)
             {
                 this.defaultLineStyles[i] = this.defaultLineStyles[40];
@@ -5804,6 +5804,10 @@ CChartSpace.prototype =
                     var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var point_width = rect.w/string_pts.length;
                     var labels_pos = val_ax.tickLblPos;
+                    if(val_ax.bDelete)
+                    {
+                        labels_pos = TICK_LABEL_POSITION_NONE;
+                    }
                     var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_BETWEEN;
 
                     var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
@@ -8759,17 +8763,26 @@ CChartSpace.prototype =
                 {
                     var compiled_grid_lines = new CLn();
                     compiled_grid_lines.merge(subtleLine);
-
+                    // if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+                    // {
+                    //     compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+                    // }
                     if(!compiled_grid_lines.Fill)
-
                     {
                         compiled_grid_lines.setFill(new CUniFill());
                     }
+                    //if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+                    //{
+                    //    compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+                    //}
                     compiled_grid_lines.Fill.merge(defaultStyle);
-                    if(spPr)
+
+                    if(subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
+                        && compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color)
                     {
-                        compiled_grid_lines.merge(spPr.ln);
+                        compiled_grid_lines.Fill.fill.color.Mods =  subtleLine.Fill.fill.color.Mods.createDuplicate();
                     }
+
                     compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
                     return compiled_grid_lines;
                 }

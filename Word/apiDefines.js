@@ -88,6 +88,7 @@ var c_oAscError = {
         SplitCellMaxRows:       -13,
         SplitCellMaxCols:       -14,
         SplitCellRowsDivider:   -15,
+        StockChartError:        -16,
 
 		CoAuthoringDisconnect:	-18,
 		ConvertationPassword:	-19,
@@ -145,7 +146,8 @@ var c_oAscChartType = {
     area: "Area",
     pie: "Pie",
     scatter: "Scatter",
-    stock: "Stock"
+    stock: "Stock",
+    doughnut: "Doughnut"
 };
 
 var c_oAscChartSubType = {

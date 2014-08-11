@@ -185,6 +185,11 @@ CTextBody.prototype =
                 this.parent.addToRecalculate();
             }
         }
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     setContent: function(pr)
@@ -217,6 +222,12 @@ CTextBody.prototype =
             case historyitem_TextBodySetBodyPr:
             {
                 this.bodyPr = data.oldPr;
+
+
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_TextBodySetContent:
@@ -245,6 +256,11 @@ CTextBody.prototype =
             case historyitem_TextBodySetBodyPr:
             {
                 this.bodyPr = data.newPr;
+
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_TextBodySetContent:
@@ -307,6 +323,11 @@ CTextBody.prototype =
                     else
                     {
                         this.bodyPr = null;
+                    }
+
+                    if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+                    {
+                        this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
                     }
                     break;
                 }

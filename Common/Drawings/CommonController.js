@@ -2309,7 +2309,6 @@ DrawingObjectsController.prototype =
                         if(!hor_axis.title.txPr.bodyPr)
                         {
                             hor_axis.title.txPr.setBodyPr(new CBodyPr());
-                            hor_axis.title.txPr.bodyPr.reset();
                         }
                         if(!hor_axis.title.txPr.content)
                         {
@@ -2351,25 +2350,42 @@ DrawingObjectsController.prototype =
                         if( vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated
                             || vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.horizontal)
                         {
-                            if(!vert_axis.title)
+                            var _text_body;
+                            if(vert_axis.title && vert_axis.title.tx && vert_axis.title.tx.rich)
                             {
-                                vert_axis.setTitle(new CTitle());
+                                _text_body = vert_axis.title.tx.rich;
                             }
-                            if(!vert_axis.title.txPr)
+                            else
                             {
-                                vert_axis.title.setTxPr(new CTextBody());
+                                if(!vert_axis.title)
+                                {
+                                    vert_axis.setTitle(new CTitle());
+                                }
+                                if(!vert_axis.title.txPr)
+                                {
+                                    vert_axis.title.setTxPr(new CTextBody());
+                                }
+                                _text_body =  vert_axis.title.txPr;
                             }
-                            if(!vert_axis.title.txPr.bodyPr)
+                            if(!_text_body.bodyPr)
                             {
-                                vert_axis.title.txPr.setBodyPr(new CBodyPr());
-                                vert_axis.title.txPr.bodyPr.reset();
+                                _text_body.setBodyPr(new CBodyPr());
                             }
-                            if(!vert_axis.title.txPr.content)
+                            var _body_pr = _text_body.bodyPr.createDuplicate();
+                            if(!_text_body.content)
                             {
-                                vert_axis.title.txPr.setContent(new CDocumentContent(vert_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                _text_body.setContent(new CDocumentContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
-                            if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated && vert_axis.title.txPr.bodyPr.vert !== nVertTTvert)
-                                vert_axis.title.txPr.bodyPr.setVert(nVertTTvert);
+                            if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)
+                            {
+                                _body_pr.reset();
+                            }
+                            else
+                            {
+                                _body_pr.setVert(nVertTThorz);
+                                _body_pr.setRot(0);
+                            }
+                            _text_body.setBodyPr(_body_pr);
                             if(vert_axis.title.overlay !== false)
                             {
                                 vert_axis.title.setOverlay(false);
@@ -2693,7 +2709,39 @@ DrawingObjectsController.prototype =
 
 
         ret.putHorAxisLabel(hor_axis && hor_axis.title ? c_oAscChartHorAxisLabelShowSettings.noOverlay : c_oAscChartTitleShowSettings.none);
-        ret.putVertAxisLabel(vert_axis && vert_axis.title ? c_oAscChartVertAxisLabelShowSettings.rotated : c_oAscChartVertAxisLabelShowSettings.none); //TODO
+        var _label;
+        if(vert_axis && vert_axis.title)
+        {
+            var tx_body;
+            if(vert_axis.title.tx && vert_axis.title.tx.rich)
+            {
+                tx_body  =  vert_axis.title.tx.rich;
+            }
+            else if(vert_axis.title.txPr)
+            {
+                tx_body  =  vert_axis.title.txPr;
+            }
+            if(tx_body)
+            {
+                if( tx_body.bodyPr &&  tx_body.bodyPr.vert === nVertTThorz)
+                {
+                    _label = c_oAscChartVertAxisLabelShowSettings.horizontal;
+                }
+                else
+                {
+                    _label = c_oAscChartVertAxisLabelShowSettings.rotated;
+                }
+            }
+            else
+            {
+                _label = c_oAscChartVertAxisLabelShowSettings.none;
+            }
+        }
+        else
+        {
+            _label = c_oAscChartVertAxisLabelShowSettings.none;
+        }
+        ret.putVertAxisLabel(_label);
 
         var data_labels = plot_area.charts[0].dLbls;
         if(data_labels)
