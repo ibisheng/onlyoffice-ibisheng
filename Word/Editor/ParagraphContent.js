@@ -4825,7 +4825,7 @@ ParaDrawing.prototype =
 
         Para.Add_ToContent( 0, DrawingRun );
 
-        var SelectedElement = new CSelectedElement(Para, false)
+        var SelectedElement = new CSelectedElement(Para, false);
         var SelectedContent = new CSelectedContent();
         SelectedContent.Add( SelectedElement );
         SelectedContent.Set_MoveDrawing( true );        

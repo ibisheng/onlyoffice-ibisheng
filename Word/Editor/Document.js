@@ -7171,7 +7171,10 @@ CDocument.prototype =
                     Result_ParaPr = Item.Get_Paragraph_ParaPr();
                 }
             }
-
+            if(Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
+            {
+                Result_ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
+            }
             return Result_ParaPr;
         }
     },

@@ -6365,7 +6365,10 @@ CDocumentContent.prototype =
 
             Result_ParaPr = Pr;
             Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
-
+            if(Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
+            {
+                Result_ParaPr.Shd.Unifill.check(this.Get_Theme(), this.Get_ColorMap());
+            }
             return Result_ParaPr;
         }
 
@@ -6445,7 +6448,10 @@ CDocumentContent.prototype =
                     Result_ParaPr = Item.Get_Paragraph_ParaPr();
                 }
             }
-
+            if(Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
+            {
+                Result_ParaPr.Shd.Unifill.check(this.Get_Theme(), this.Get_ColorMap());
+            }
             return Result_ParaPr;
         }
     },

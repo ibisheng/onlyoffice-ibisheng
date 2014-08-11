@@ -1549,6 +1549,11 @@ CGraphicObjects.prototype =
     getParagraphParaPr: function()
     {
         var ret =  DrawingObjectsController.prototype.getParagraphParaPr.call(this);
+
+        if(ret.Shd && ret.Shd.Unifill)
+        {
+            ret.Shd.Unifill.check(this.document.theme, this.document.Get_ColorMap());
+        }
         return ret ? ret : new CParaPr();
     },
 
