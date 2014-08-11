@@ -1338,11 +1338,15 @@
 					if(borderTopStyle == '')
 						borderTopStyle = tmpBorderStyle;
 					
-					/*var borderTopColor = node.style.borderTopColor;
+					var borderTopColor = node.style.borderTopColor;
 					if(borderTopColor == '')
-						borderTopColor = $(node).css('border-top-color');*/
-					var borderTopColor = 0;
-
+						borderTopColor = $(node).css('border-top-color');
+					
+					if(borderTopColor)
+						borderTopColor = this._getBinaryColor(borderTopColor);
+					else
+						borderTopColor = 0;
+					
 					borderStyleName = this._getBorderStyleName(borderTopStyle, borderTopWidth);
 					if (null !== borderStyleName) {
 						oNewItem.borders.t.setStyle(borderStyleName);
@@ -1360,10 +1364,14 @@
 					if(borderBottomStyle == '')
 						borderBottomStyle = tmpBorderStyle;
 					
-					/*var borderBottomColor = node.style.borderBottomColor;
+					var borderBottomColor = node.style.borderBottomColor;
 					if(borderBottomColor == '')
-						borderBottomColor = $(node).css('border-bottom-color');*/
-					var borderBottomColor = 0;
+						borderBottomColor = $(node).css('border-bottom-color');
+						
+					if(borderBottomColor)
+						borderBottomColor = this._getBinaryColor(borderBottomColor);
+					else
+						borderBottomColor = 0;
 
 					borderStyleName = this._getBorderStyleName(borderBottomStyle, borderBottomWidth);
 					if (null !== borderStyleName) {
@@ -1382,10 +1390,14 @@
 					if(borderLeftStyle == '')
 						borderLeftStyle = tmpBorderStyle;
 					
-					/*var borderLeftColor = node.style.borderLeftColor;
+					var borderLeftColor = node.style.borderLeftColor;
 					if(borderLeftColor == '')
-						borderLeftColor = $(node).css('border-left-color');*/
-					var borderLeftColor = 0;
+						borderLeftColor = $(node).css('border-left-color');
+					
+					if(borderLeftColor)
+						borderLeftColor = this._getBinaryColor(borderLeftColor);
+					else
+						borderLeftColor = 0;
 
 					borderStyleName = this._getBorderStyleName(borderLeftStyle, borderLeftWidth);
 					if (null !== borderStyleName) {
@@ -1404,10 +1416,14 @@
 					if(borderRightStyle == '')
 						borderRightStyle = tmpBorderStyle;
 					
-					/*var borderRightColor = node.style.borderRightColor;
+					var borderRightColor = node.style.borderRightColor;
 					if(borderRightColor == '')
-						borderRightColor = $(node).css('border-right-color'); */
-					var borderRightColor = 0;
+						borderRightColor = $(node).css('border-right-color'); 
+					
+					if(borderRightColor)
+						borderRightColor = this._getBinaryColor(borderRightColor);
+					else
+						borderRightColor = 0;
 
 					borderStyleName = this._getBorderStyleName(borderRightStyle, borderRightWidth);
 					if (null !== borderStyleName) {
