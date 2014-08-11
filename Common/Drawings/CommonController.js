@@ -1966,6 +1966,31 @@ DrawingObjectsController.prototype =
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
             }
+            else
+            {
+                if(newChartType.getObjectType() === historyitem_type_BarChart && newChartType.barDir === BAR_DIR_BAR)
+                {
+                    if(cat_ax.axPos !== AX_POS_L)
+                    {
+                        cat_ax.setAxPos(AX_POS_L);
+                    }
+                    if(val_ax.axPos !== AX_POS_B)
+                    {
+                        val_ax.setAxPos(AX_POS_B);
+                    }
+                }
+                else
+                {
+                    if(cat_ax.axPos !== AX_POS_B)
+                    {
+                        cat_ax.setAxPos(AX_POS_B);
+                    }
+                    if(val_ax.axPos !== AX_POS_L)
+                    {
+                        val_ax.setAxPos(AX_POS_L);
+                    }
+                }
+            }
             newChartType.addAxId(cat_ax);
             newChartType.addAxId(val_ax);
             plotArea.addAxis(cat_ax);
@@ -2043,9 +2068,9 @@ DrawingObjectsController.prototype =
                 {
                     new_chart_type = new CBarChart();
                     replaceChart(plot_area, chart_type, new_chart_type);
+                    new_chart_type.setBarDir(need_bar_dir);
                     checkSwapAxis(plot_area, chart_type, new_chart_type);
                     new_chart_type.setGrouping(need_groupping);
-                    new_chart_type.setBarDir(need_bar_dir);
                     new_chart_type.setGapWidth(150);
 
                     if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
