@@ -2470,6 +2470,7 @@
 				{
 					firstWidth = t.element.style.width;
 					t.element.style.width = document.body.offsetWidth - 1 + "px";
+					t.element.focus();
 				}
 				else
 					document.body.style.overflow = 'hidden';
