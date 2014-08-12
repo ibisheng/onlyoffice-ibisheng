@@ -1510,6 +1510,7 @@ StyleManager.prototype =
         // При открытии все стили будут ссылками. Поэтому при смене свойств нужно делать копию
         if (oItemWithXfs.xfs.isReference)
             oItemWithXfs.xfs = oItemWithXfs.xfs.clone();
+        return oItemWithXfs.xfs;
     },
     _prepareSet : function(oItemWithXfs)
 	{
@@ -1551,7 +1552,7 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultXfId;
 		if(null == val) {
 			if(null != xfs) {
-                this._prepareSetReference(oItemWithXfs);
+			    xfs = this._prepareSetReference(oItemWithXfs);
 				xfs.XfId = g_oDefaultXfId;
             }
 		} else {
@@ -1571,7 +1572,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.num = null;
             }
         }
@@ -1595,7 +1596,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font = null;
             }
         }
@@ -1619,7 +1620,7 @@ StyleManager.prototype =
         {
             if(null != xfs && null != xfs.font)
 			{
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.fn = g_oDefaultFont.fn;
                 xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
 			}
@@ -1643,7 +1644,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.fs = g_oDefaultFont.fs;
             }
         }
@@ -1665,7 +1666,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.c = g_oDefaultFont.c;
             }
         }
@@ -1687,7 +1688,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.b = g_oDefaultFont.b;
             }
         }
@@ -1709,7 +1710,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.i = g_oDefaultFont.i;
             }
         }
@@ -1731,7 +1732,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.u = g_oDefaultFont.u;
             }
         }
@@ -1753,7 +1754,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.s = g_oDefaultFont.s;
             }
         }
@@ -1775,7 +1776,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.font.va = g_oDefaultFont.va;
             }
         }
@@ -1797,7 +1798,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.align.ver = g_oDefaultAlign.ver;
             }
         }
@@ -1819,7 +1820,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.align.hor = g_oDefaultAlign.hor;
             }
         }
@@ -1841,7 +1842,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.fill) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.fill.bg = g_oDefaultFill.bg;
             }
         }
@@ -1865,7 +1866,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.border) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.border = val;
             }
         }
@@ -1887,7 +1888,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.align.shrink = g_oDefaultAlign.shrink;
             }
         }
@@ -1909,7 +1910,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.align.wrap = g_oDefaultAlign.wrap;
             }
         }
@@ -1929,7 +1930,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.QuotePrefix = val;
             }
         }
@@ -1952,7 +1953,7 @@ StyleManager.prototype =
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
-                this._prepareSetReference(oItemWithXfs);
+                xfs = this._prepareSetReference(oItemWithXfs);
                 xfs.align.angle = g_oDefaultAlign.angle;
             }
         }
