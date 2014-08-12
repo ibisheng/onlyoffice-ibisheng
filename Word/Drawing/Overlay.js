@@ -38,6 +38,7 @@ function COverlay()
     this.m_oHtmlPage = null;
 
     this.DashLineColor = "#000000";
+    this.ClearAll = false;
 }
 
 COverlay.prototype =
@@ -57,7 +58,16 @@ COverlay.prototype =
         this.m_oContext.beginPath();
         if (this.max_x != -0xFFFF && this.max_y != -0xFFFF)
         {
-            this.m_oContext.clearRect(this.min_x - 5, this.min_y - 5, this.max_x - this.min_x + 10, this.max_y - this.min_y + 10);
+            if (this.ClearAll === true)
+            {
+                this.m_oContext.clearRect(0, 0, this.m_oControl.HtmlElement.width, this.m_oControl.HtmlElement.height);
+                this.ClearAll = false;
+            }
+            else
+            {
+                var _eps = 5;
+                this.m_oContext.clearRect(this.min_x - _eps, this.min_y - _eps, this.max_x - this.min_x + 2*_eps, this.max_y - this.min_y + 2*_eps);
+            }
         }
         this.min_x = 0xFFFF;
         this.min_y = 0xFFFF;

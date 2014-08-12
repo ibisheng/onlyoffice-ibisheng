@@ -1258,6 +1258,9 @@ CShapeDrawer.prototype =
 
     drawFillStroke : function(bIsFill, fill_mode, bIsStroke)
     {
+        if (this.Graphics.IsTrack)
+            this.Graphics.m_oOverlay.ClearAll = true;
+
         if(this.Graphics.IsSlideBoundsCheckerType)
             return;
         if (this.Graphics.RENDERER_PDF_FLAG === undefined)
