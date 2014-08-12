@@ -2926,7 +2926,7 @@
 					}
 
 					// draw left border
-					if (isFirstCol && !t._isLeftBorderErased1(col, rowCache)) {
+					if (isFirstCol && !t._isLeftBorderErased(col, rowCache)) {
 						drawVerticalBorder(bPrev, bCur, x1 - t.width_1px, y1, y2);
 						// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
 //						if (lb.w >= 1 && drawingCtx && 0 === col) {
@@ -2936,7 +2936,7 @@
 //						}
 					}
 					// draw right border
-					if ((!mc || col === mc.c2 || isLastCol) && !t._isRightBorderErased1(col, rowCache)) {
+					if ((!mc || col === mc.c2 || isLastCol) && !t._isRightBorderErased(col, rowCache)) {
 						drawVerticalBorder(bCur, bNext, x2, y1, y2);
 					}
 					// draw top border
@@ -4539,10 +4539,10 @@
 			}
 		};
 
-		WorksheetView.prototype._isLeftBorderErased1 = function (col, rowCache) {
+		WorksheetView.prototype._isLeftBorderErased = function (col, rowCache) {
 			return rowCache.erased[col - 1] === true;
 		};
-		WorksheetView.prototype._isRightBorderErased1 = function (col, rowCache) {
+		WorksheetView.prototype._isRightBorderErased = function (col, rowCache) {
 			return rowCache.erased[col] === true;
 		};
 
@@ -9942,7 +9942,7 @@
 				}
 				History.StartTransaction();
 				// Выставляем, что это bestFit
-				t.model.setRowBestFit (true, Math.min(height + t.height_1px, t.maxRowHeight), row, row);
+				t.model.setRowBestFit(true, Math.min(height + t.height_1px, t.maxRowHeight), row, row);
 				History.EndTransaction();
 
 				t.nRowsCount = 0;
