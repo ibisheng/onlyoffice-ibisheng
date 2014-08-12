@@ -318,6 +318,7 @@
 				    "getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
 				    "getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
 				    "updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);},
+					"canReceiveKeyPress":			function () {return self.getWorksheet().objectRender.controller.canReceiveKeyPress()},
 					
 					// Frozen anchor
 					"moveFrozenAnchorHandle":		function () {self._onMoveFrozenAnchorHandle.apply(self, arguments);},

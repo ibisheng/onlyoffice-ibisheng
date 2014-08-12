@@ -980,47 +980,36 @@
 
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyPress = function (event) {
-			var t = this;
-
 			// Нельзя при отключенных эвентах возвращать false (это касается и ViewerMode)
-			if (!t.enableKeyEvents) {return true;}
+			if (!this.enableKeyEvents) {return true;}
 
 			// не вводим текст в режиме просмотра
 			// если в FF возвращать false, то отменяется дальнейшая обработка серии keydown -> keypress -> keyup
 			// и тогда у нас не будут обрабатываться ctrl+c и т.п. события
-			if (t.settings.isViewerMode || t.isSelectionDialogMode || t.isMousePressed) {return true;}
-
-			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if ( !t.isMousePressed && graphicObjects.length && t.enableKeyEvents ) {
-				if (t.skipKeyPress || event.which < 32) {		// Mozilla Firefox Fix #20080 (Ctrl+C, Ctrl+V, Ctrl+X)
-					t.skipKeyPress = true;
-					return true;
-				}
-				if (t.isCellEditMode) {
-					t.handlers.trigger("stopCellEditing");
-					t.isCellEditMode = false;
-				}
-				if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
-					return true;
-			}
+			if (this.settings.isViewerMode || this.isSelectionDialogMode) {return true;}
 
 			// Для таких браузеров, которые не присылают отжатие левой кнопки мыши для двойного клика, при выходе из
 			// окна редактора и отпускания кнопки, будем отрабатывать выход из окна (только Chrome присылает эвент MouseUp даже при выходе из браузера)
 			this.showCellEditorCursor();
 
-			if (t.isCellEditMode && !t.hasFocus || !t.enableKeyEvents || t.isSelectMode) {
+			// Не можем вводить когда селектим или когда совершаем действия с объектом
+			if (this.isCellEditMode && !this.hasFocus || this.isSelectMode ||
+				!this.handlers.trigger('canReceiveKeyPress'))
+				return true;
+
+			if (this.skipKeyPress || event.which < 32) {
+				this.skipKeyPress = true;
 				return true;
 			}
 
-			if (t.skipKeyPress || event.which < 32) {
-				t.skipKeyPress = true;
+			var graphicObjects = this.handlers.trigger("getSelectedGraphicObjects");
+			if (graphicObjects.length && this.handlers.trigger("graphicObjectWindowKeyPress", event))
 				return true;
-			}
 
-			if (!t.isCellEditMode) {
+			if (!this.isCellEditMode) {
 				// При нажатии символа, фокус не ставим
 				// Очищаем содержимое ячейки
-				t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
+				this.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
 					/*isHideCursor*/undefined, /*isQuickInput*/true, /*callback*/undefined, event);
 			}
 			return true;
@@ -1337,8 +1326,7 @@
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this.isMouseDownMode = false;
 				this._changeSelectionDone(event);
-                if(this.view && this.view.Api && this.view.Api.isStartAddShape)
-                {
+                if(asc["editor"].isStartAddShape) {
                     event.preventDefault && event.preventDefault();
                     event.stopPropagation && event.stopPropagation();
                 }
