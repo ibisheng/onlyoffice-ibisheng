@@ -193,6 +193,12 @@ function DrawingObjectsController(drawingObjects)
 
 DrawingObjectsController.prototype =
 {
+
+    canReceiveKeyPress: function()
+    {
+        return this.curState instanceof NullState;
+    },
+
     handleAdjustmentHit: function(hit, selectedObject, group, pageIndex, bWord)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
