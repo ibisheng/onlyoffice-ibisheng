@@ -651,7 +651,11 @@
 					t._addValueToLocalStrg(value);
 					
 					var nodes = t._makeNodesFromCellValue(value);
-					t._cleanElement();
+					
+					while (t.element.hasChildNodes()) {
+						t.element.removeChild(t.element.lastChild);
+					}
+					
 					nodes.forEach(
 					function(node){
 						t.element.appendChild(node);
