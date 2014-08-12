@@ -2806,16 +2806,16 @@
 				--row;
 			}
 
-			var mc = null;
+			var mc = null, nextRow;
 			var isPrevColExist = (0 <= prevCol);
 			for (row = range.r1; row <= range.r2 && row < t.nRowsCount; row = nextRow) {
+				nextRow = row + 1;
 				if (r[row].height < t.height_1px) {continue;}
 
 				var isFirstRow = row === range.r1;
 				var isLastRow  = row === range.r2;
-				var nextRow;
 				// Нужно отсеять пустые снизу
-				for (nextRow = row + 1; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow)
+				for (; nextRow <= range.r2 && nextRow < t.nRowsCount; ++nextRow)
 					if (r[nextRow].height >= t.height_1px) {break;}
 
 				if (isFirstRow)
