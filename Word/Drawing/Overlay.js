@@ -881,35 +881,92 @@ CAutoshapeTrack.prototype =
         //    |                 |
         // (x3,y3) --------- (x4,y4)
 
-        var x1 = (xDst + dKoefX * (matrix.TransformPointX(left, top))) >> 0;
-        var y1 = (yDst + dKoefY * (matrix.TransformPointY(left, top))) >> 0;
+        var dx1 = xDst + dKoefX * (matrix.TransformPointX(left, top));
+        var dy1 = yDst + dKoefY * (matrix.TransformPointY(left, top));
 
-        var x2 = (xDst + dKoefX * (matrix.TransformPointX(r, top))) >> 0;
-        var y2 = (yDst + dKoefY * (matrix.TransformPointY(r, top))) >> 0;
+        var dx2 = xDst + dKoefX * (matrix.TransformPointX(r, top));
+        var dy2 = yDst + dKoefY * (matrix.TransformPointY(r, top));
 
-        var x3 = (xDst + dKoefX * (matrix.TransformPointX(left, b))) >> 0;
-        var y3 = (yDst + dKoefY * (matrix.TransformPointY(left, b))) >> 0;
+        var dx3 = xDst + dKoefX * (matrix.TransformPointX(left, b));
+        var dy3 = yDst + dKoefY * (matrix.TransformPointY(left, b));
 
-        var x4 = (xDst + dKoefX * (matrix.TransformPointX(r, b))) >> 0;
-        var y4 = (yDst + dKoefY * (matrix.TransformPointY(r, b))) >> 0;
+        var dx4 = xDst + dKoefX * (matrix.TransformPointX(r, b));
+        var dy4 = yDst + dKoefY * (matrix.TransformPointY(r, b));
 
-        var ctx = overlay.m_oContext;
+        var x1 = dx1 >> 0;
+        var y1 = dy1 >> 0;
 
-		if (x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4 && x1 < x2 && y1 < y3)
+        var x2 = dx2 >> 0;
+        var y2 = dy2 >> 0;
+
+        var x3 = dx3 >> 0;
+        var y3 = dy3 >> 0;
+
+        var x4 = dx4 >> 0;
+        var y4 = dy4 >> 0;
+
+        var _eps = 0.001;
+        if (Math.abs(dx1 - dx3) < _eps &&
+            Math.abs(dx2 - dx4) < _eps &&
+            Math.abs(dy1 - dy2) < _eps &&
+            Math.abs(dy3 - dy4) < _eps &&
+            x1 < x2 && y1 < y3)
+        {
+            x3 = x1;
+            x4 = x2;
+            y2 = y1;
+            y4 = y3;
+            bIsClever = true;
+        }
+
+        var nIsCleverWithTransform = bIsClever;
+        var nType = 0;
+        if (!nIsCleverWithTransform &&
+            Math.abs(dx1 - dx3) < _eps &&
+            Math.abs(dx2 - dx4) < _eps &&
+            Math.abs(dy1 - dy2) < _eps &&
+            Math.abs(dy3 - dy4) < _eps)
+        {
+            x3 = x1;
+            x4 = x2;
+            y2 = y1;
+            y4 = y3;
+            nIsCleverWithTransform = true;
+            nType = 1;
+        }
+        if (!nIsCleverWithTransform &&
+            Math.abs(dx1 - dx2) < _eps &&
+            Math.abs(dx3 - dx4) < _eps &&
+            Math.abs(dy1 - dy3) < _eps &&
+            Math.abs(dy2 - dy4) < _eps)
+        {
+            x2 = x1;
+            x4 = x3;
+            y3 = y1;
+            y4 = y2;
+            nIsCleverWithTransform = true;
+            nType = 2;
+        }
+
+        /*
+        if (x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4 && x1 < x2 && y1 < y3)
             bIsClever = true;
 
-		var nIsCleverWithTransform = bIsClever;
-		var nType = 0;
-		if (!nIsCleverWithTransform && x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4)
-		{
-			nIsCleverWithTransform = true;
-			nType = 1;
-		}
-		if (!nIsCleverWithTransform && x1 == x2 && x3 == x4 && y1 == y3 && y2 == y4)
-		{
-			nIsCleverWithTransform = true;
-			nType = 2;
-		}
+        var nIsCleverWithTransform = bIsClever;
+        var nType = 0;
+        if (!nIsCleverWithTransform && x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4)
+        {
+            nIsCleverWithTransform = true;
+            nType = 1;
+        }
+        if (!nIsCleverWithTransform && x1 == x2 && x3 == x4 && y1 == y3 && y2 == y4)
+        {
+            nIsCleverWithTransform = true;
+            nType = 2;
+        }
+        */
+
+        var ctx = overlay.m_oContext;
 
         var bIsEllipceCorner = false;
         //var _style_blue = "#4D7399";
