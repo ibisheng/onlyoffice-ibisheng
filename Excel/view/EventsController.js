@@ -83,8 +83,6 @@
 			this.clickCounter = new ClickCounter();
 			this.isMousePressed = false;
 			this.isShapeAction = false;
-			// Для обработки _onMouseUp и _onWindowMouseUp
-			this.isMouseDownMode = false;
 
 			// Был ли DblClick обработан в onMouseDown эвенте
 			this.isDblClickInMouseDown = false;
@@ -130,7 +128,6 @@
                 }
                 /*раньше события на ресайз вызывался из меню через контроллер. теперь контроллер в меню не доступен, для ресайза подписываемся на глобальный ресайз от window.*/
                 window.addEventListener("resize", function () {self._onWindowResize.apply(self, arguments);}, false);
-//                this.element.addEventListener("dblclick"	, function () {alert("123");/*return self._onMouseDblClick.apply(self, arguments);*/}	, false);
                 return this;
             }
 
@@ -302,7 +299,7 @@
 
 			var coord = t._getCoordinates(event);
 			var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-			if ( t.isShapeAction || graphicsInfo )
+			if (graphicsInfo )
 				return;
 
 			setTimeout(function () {
@@ -1033,8 +1030,7 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseMove = function (event) {
-			var t = this;
-			var coord = t._getCoordinates(event);
+			var coord = this._getCoordinates(event);
 				
 			if (this.isSelectMode && !this.hasCursor) {this._changeSelection2(event);}
 			if (this.isResizeMode && !this.hasCursor) {
@@ -1047,14 +1043,15 @@
                 this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
 				
 			// Режим установки закреплённых областей
-			if (t.isFrozenAnchorMode) {
-				t._moveFrozenAnchorHandle(event, { target: t.isFrozenAnchorMode });
+			if (this.isFrozenAnchorMode) {
+				this._moveFrozenAnchorHandle(event, { target: this.isFrozenAnchorMode });
 				return true;
 			}
-				
-			event.isLocked = t.isMousePressed;
-			if (t.isShapeAction && t.isMouseDownMode)
-				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
+
+			if (this.isShapeAction) {
+				event.isLocked = this.isMousePressed;
+				this.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
+			}
 
 			return true;
 		};
@@ -1063,10 +1060,10 @@
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
 			var coord = this._getCoordinates(event);
 
+			this.isMousePressed = false;
 			// Shapes
-			if ( this.isMouseDownMode && this.isShapeAction ) {
-				event.isLocked = this.isMousePressed = false;
-				this.isMouseDownMode = false;
+			if (this.isShapeAction) {
+				event.isLocked = this.isMousePressed;
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
@@ -1172,19 +1169,16 @@
 					return;
 				
 				t.isShapeAction = true;
-				t.isMouseDownMode = true;
 				
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
-				
-				if ( (event.ClickCount == 2) && t.isShapeAction ) 
+				if (event.ClickCount == 2)
 					t.isDblClickInMouseDown = true;
 				
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 				t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
 				return;
-			}
-			else
+			} else
 				t.isShapeAction = false;
 
 			if (2 === event.detail) {
@@ -1316,17 +1310,11 @@
 			var coord = this._getCoordinates(event);
 			event.isLocked = this.isMousePressed = false;
 
-			if ( this.isShapeAction ) {
-				if (this.isCellEditMode) {
-					this.handlers.trigger("stopCellEditing");
-					this.isCellEditMode = false;
-				}
-				
+			if (this.isShapeAction) {
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
-				this.isMouseDownMode = false;
 				this._changeSelectionDone(event);
-                if(asc["editor"].isStartAddShape) {
+                if (asc["editor"].isStartAddShape) {
                     event.preventDefault && event.preventDefault();
                     event.stopPropagation && event.stopPropagation();
                 }
@@ -1375,7 +1363,6 @@
 			var t = this;
 			var ctrlKey = event.metaKey || event.ctrlKey;
 			var coord = t._getCoordinates(event);
-			event.isLocked = t.isMousePressed;
 
 			t.hasCursor = true;
 
@@ -1420,6 +1407,7 @@
 			}
 
 			if (t.isShapeAction || graphicsInfo) {
+				event.isLocked = t.isMousePressed;
 				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 				t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, ctrlKey, function(info){t.targetInfo = info;});
 				return true;
