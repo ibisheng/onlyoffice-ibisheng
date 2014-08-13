@@ -437,17 +437,17 @@
 
 	/**
 	 * Returns width of drawing context in current units
-	 * @param {Number} units  Единицы измерения (0=px, 1=pt, 2=in, 3=mm) в которых будет возвращена ширина
+	 * @param {Number} [units]  Единицы измерения (0=px, 1=pt, 2=in, 3=mm) в которых будет возвращена ширина
 	 * @return {Number}
 	 */
-		DrawingContext.prototype.getWidth = function (units) {
-			var i = units >= 0 && units <=3 ? units : this.units;
-			return this.canvas.width * getCvtRatio(0/*px*/, i, this.ppiX);
-		};
+	DrawingContext.prototype.getWidth = function (units) {
+		var i = units >= 0 && units <=3 ? units : this.units;
+		return this.canvas.width * getCvtRatio(0/*px*/, i, this.ppiX);
+	};
 
 	/**
 	 * Returns height of drawing context in current units
-	 * @param {Number} units  Единицы измерения (0=px, 1=pt, 2=in, 3=mm) в которых будет возвращена высота
+	 * @param {Number} [units]  Единицы измерения (0=px, 1=pt, 2=in, 3=mm) в которых будет возвращена высота
 	 * @return {Number}
 	 */
 	DrawingContext.prototype.getHeight = function (units) {
