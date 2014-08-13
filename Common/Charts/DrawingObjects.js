@@ -1265,7 +1265,6 @@ function DrawingObjects() {
     var worksheet = null;
     var asc_Range = asc.Range;
 
-    var isInit = false;
     var drawingCtx = null;
     var overlayCtx = null;
     var shapeCtx = null;
@@ -1703,7 +1702,6 @@ function DrawingObjects() {
         aObjectsSync = [];
 
 		var i;
-        isInit = false;
         aObjects = currentSheet.model.Drawings;
         for (i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++)
         {
@@ -1778,7 +1776,6 @@ function DrawingObjects() {
 
         _this.shiftMap = {};
         worksheet.model.Drawings = aObjects;
-        isInit = true;
     };
 
 
@@ -3277,12 +3274,6 @@ function DrawingObjects() {
             ret = aObjects.length;
             aObjects.push(drawingObject);
         }
-
-        /*if ( isInit ) {
-         _this.showDrawingObjects(false);
-         _this.sendGraphicObjectProps();
-         worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
-         }*/
 
         if ( lockByDefault ) {
             _this.objectLocker.reset();
