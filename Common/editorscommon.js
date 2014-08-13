@@ -561,7 +561,10 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
     var sDataRange = dataRange, sheetModel;
 	if (c_oAscSelectionDialogType.Chart === dialogType) {
 		dataRange = parserHelp.parse3DRef(dataRange);
-        sheetModel = model.getWorksheetByName(dataRange.sheet);
+        if(dataRange)
+        {
+            sheetModel =  model.getWorksheetByName(dataRange.sheet);
+        }
 		if (null === dataRange || !sheetModel)
 			return c_oAscError.ID.DataRangeError;
 		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
