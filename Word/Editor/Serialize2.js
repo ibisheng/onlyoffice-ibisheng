@@ -5797,10 +5797,6 @@ function Binary_pPrReader(doc, oReadResult, stream)
         {
             Border.Value = this.stream.GetUChar();
         }
-		else if( c_oSerBorderType.Value === type )
-        {
-            Border.Value = this.stream.GetUChar();
-        }
 		else if( c_oSerBorderType.ColorTheme === type )
         {
 			var themeColor = {Auto: null, Color: null, Tint: null, Shade: null};

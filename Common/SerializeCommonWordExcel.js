@@ -122,7 +122,7 @@ BinaryCommonWriter.prototype.WriteItemWithLengthEnd = function(nStart)
 BinaryCommonWriter.prototype.WriteBorder = function(border)
 {
 	var _this = this;
-    if(border_None != border.Value)
+    if(null != border.Value)
     {
         var color = null;
         if (null != border.Color)
@@ -135,27 +135,22 @@ BinaryCommonWriter.prototype.WriteBorder = function(border)
         }
         if (null != color && !color.Auto)
             this.WriteColor(c_oSerBorderType.Color, color);
-        if(null != border.Space)
-        {
+        if (null != border.Space) {
             this.memory.WriteByte(c_oSerBorderType.Space);
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble(border.Space);
         }
-        if(null != border.Size)
-        {
+        if (null != border.Size) {
             this.memory.WriteByte(c_oSerBorderType.Size);
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble(border.Size);
         }
-		if(null != border.Unifill || (null != border.Color && border.Color.Auto))
-        {
-			this.memory.WriteByte(c_oSerBorderType.ColorTheme);
-			this.memory.WriteByte(c_oSerPropLenType.Variable);
-			this.WriteItemWithLength(function(){_this.WriteColorTheme(border.Unifill, border.Color);});
+        if (null != border.Unifill || (null != border.Color && border.Color.Auto)) {
+            this.memory.WriteByte(c_oSerBorderType.ColorTheme);
+            this.memory.WriteByte(c_oSerPropLenType.Variable);
+            this.WriteItemWithLength(function () { _this.WriteColorTheme(border.Unifill, border.Color); });
         }
-    }
-    if(null != border.Value)
-    {
+
         this.memory.WriteByte(c_oSerBorderType.Value);
         this.memory.WriteByte(c_oSerPropLenType.Byte);
         this.memory.WriteByte(border.Value);
