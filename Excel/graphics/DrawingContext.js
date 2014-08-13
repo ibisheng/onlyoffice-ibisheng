@@ -905,14 +905,6 @@
 		return this._calcTextMetrics(w * r, w2 * r, fm, r);
 	};
 
-	DrawingContext.prototype.getHeightText = function() {
-		var fm = this.fmgrGraphics[0];
-		var UnitsPerEm = fm.m_lUnits_Per_Em;
-		var Height     = fm.m_lLineHeight;
-		var setUpSize  = this.font.FontSize;
-		return Height * setUpSize / UnitsPerEm;
-	};
-
 	DrawingContext.prototype.fillGlyph = function (pGlyph, fmgr) {
 		var nW = pGlyph.oBitmap.nWidth;
 		var nH = pGlyph.oBitmap.nHeight;
