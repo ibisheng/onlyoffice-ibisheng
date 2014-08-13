@@ -26,11 +26,33 @@
 
 
 
+function sRGB_to_scRGB(value)
+{
+    if(value < 0)
+        return 0;
+    if(value <= 0.04045)
+        return value / 12.92;
+    if(value <= 1)
+        return Math.pow(((value + 0.055) / 1.055), 2.4);
+    return  1;
+}
+
+function scRGB_to_sRGB(value)
+{
+    if( value < 0)
+        return 0;
+    if(value <= 0.0031308)
+        return value * 12.92;
+    if(value < 1)
+        return 1.055 * (Math.pow(value , (1 / 2.4))) - 0.055;
+    return 1;
+}
+
 function checkRasterImageId(rasterImageId)
 {
-    return rasterImageId;
-    if ( 0 !== rasterImageId.indexOf("http:") && 0 !== rasterImageId.indexOf("data:") && 0 !== rasterImageId.indexOf("https:") && 0 !== rasterImageId.indexOf("ftp:") && 0 !== rasterImageId.indexOf("file:") )
-    {
+    //return rasterImageId;
+   // if ( 0 !== rasterImageId.indexOf("http:") && 0 !== rasterImageId.indexOf("data:") && 0 !== rasterImageId.indexOf("https:") && 0 !== rasterImageId.indexOf("ftp:") && 0 !== rasterImageId.indexOf("file:") )
+   // {
         var api_sheet = window["Asc"]["editor"];
         var sFindString;
         if(api_sheet)
@@ -49,11 +71,11 @@ function checkRasterImageId(rasterImageId)
         {
             return rasterImageId;
         }
-    }
-    else
-    {
-        return rasterImageId;
-    }
+  //  }
+  // else
+  // {
+  //     return rasterImageId;
+  // }
 }
 
 var historyitem_ChangeColorScheme = 0;
@@ -1070,18 +1092,39 @@ CColorModifiers.prototype =
 
                 this.HSL2RGB(HSL, RGBA);
             }
-            else if (colorMod.name == "shade")
-            {
-                RGBA.R = Math.max(0, (RGBA.R * val) >> 0);
-                RGBA.G = Math.max(0, (RGBA.G * val) >> 0);
-                RGBA.B = Math.max(0, (RGBA.B * val) >> 0);
-            }
-            else if (colorMod.name == "tint")
-            {
-                RGBA.R = Math.max(0, (255 - (255 - RGBA.R) * val) >> 0);
-                RGBA.G = Math.max(0, (255 - (255 - RGBA.G) * val) >> 0);
-                RGBA.B = Math.max(0, (255 - (255 - RGBA.B) * val) >> 0);
-            }
+         /// else if (colorMod.name == "shade")
+         /// {
+         ///     RGBA.R = Math.max(0, (RGBA.R * val) >> 0);
+         ///     RGBA.G = Math.max(0, (RGBA.G * val) >> 0);
+         ///     RGBA.B = Math.max(0, (RGBA.B * val) >> 0);
+         /// }
+         /// else if (colorMod.name == "tint")
+         /// {
+         ///     RGBA.R = Math.max(0, (255 - (255 - RGBA.R) * val) >> 0);
+         ///     RGBA.G = Math.max(0, (255 - (255 - RGBA.G) * val) >> 0);
+         ///     RGBA.B = Math.max(0, (255 - (255 - RGBA.B) * val) >> 0);
+         /// }
+         else if (colorMod.name == "shade")
+         {
+             RGBA.R = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.R/255) * val)*255 >> 0);
+             RGBA.G = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.G/255) * val)*255 >> 0);
+             RGBA.B = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.B/255) * val)*255 >> 0);
+         }
+         else if (colorMod.name == "tint")
+         {
+             if(val > 0)
+             {
+                 RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * val)*255 >> 0);
+                 RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * val)*255 >> 0);
+                 RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * val)*255 >> 0);
+             }
+             else
+             {
+                 RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * (1-val))*255 >> 0);
+                 RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * (1-val))*255 >> 0);
+                 RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * (1-val))*255 >> 0);
+             }
+         }
         }
     }
 };
@@ -12294,8 +12337,8 @@ function CBodyPr()
         return this;
     }
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+  // this.Id = g_oIdCounter.Get_NewId();
+  // g_oTableId.Add(this, this.Id);
 }
 
 CBodyPr.prototype =

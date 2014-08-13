@@ -13,6 +13,30 @@ function checkStrToRegExp(str)
 
 }
 
+
+function checkBlackUnifill(unifill, bLines)
+{
+    if(unifill && unifill.fill && unifill.fill.color)
+    {
+        var RGBA = unifill.fill.color.RGBA;
+        if(RGBA.R === 0 && RGBA.G === 0 && RGBA.B === 0)
+        {
+            if(bLines)
+            {
+                RGBA.R = 134;
+                RGBA.G = 134;
+                RGBA.B = 134;
+            }
+            else
+            {
+                RGBA.R = 255;
+                RGBA.G = 255;
+                RGBA.B = 255;
+            }
+        }
+    }
+}
+
 function BBoxInfo(worksheet, bbox)
 {
     this.worksheet = worksheet;
@@ -8470,6 +8494,7 @@ CChartSpace.prototype =
         if(this.pen)
         {
             this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+            checkBlackUnifill(this.pen.Fill, true);
         }
         if(this.chart)
         {
@@ -8499,14 +8524,17 @@ CChartSpace.prototype =
                     if(this.chart.plotArea.valAx.compiledTickMarkLn)
                     {
                         this.chart.plotArea.valAx.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        checkBlackUnifill(this.chart.plotArea.valAx.compiledTickMarkLn.Fill, true);
                     }
                     if(this.chart.plotArea.valAx.compiledMajorGridLines)
                     {
                         this.chart.plotArea.valAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        checkBlackUnifill(this.chart.plotArea.valAx.compiledMajorGridLines.Fill, true);
                     }
                     if(this.chart.plotArea.valAx.compiledMinorGridLines)
                     {
                         this.chart.plotArea.valAx.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        checkBlackUnifill(this.chart.plotArea.valAx.compiledMinorGridLines.Fill, true);
                     }
                     if(this.chart.plotArea.valAx.title)
                     {
@@ -8527,14 +8555,17 @@ CChartSpace.prototype =
                     if(this.chart.plotArea.catAx.compiledTickMarkLn)
                     {
                         this.chart.plotArea.catAx.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        checkBlackUnifill(this.chart.plotArea.catAx.compiledTickMarkLn.Fill, true);
                     }
                     if(this.chart.plotArea.catAx.compiledMajorGridLines)
                     {
                         this.chart.plotArea.catAx.compiledMajorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        checkBlackUnifill(this.chart.plotArea.catAx.compiledMajorGridLines.Fill, true);
                     }
                     if(this.chart.plotArea.catAx.compiledMinorGridLines)
                     {
                         this.chart.plotArea.catAx.compiledMinorGridLines.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        checkBlackUnifill(this.chart.plotArea.catAx.compiledMinorGridLines.Fill, true);
                     }
                     if(this.chart.plotArea.catAx.title)
                     {
@@ -8690,7 +8721,7 @@ CChartSpace.prototype =
             else if(this.style >=35 && this.style <=40)
                 default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
             else
-                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000 - tint);
+                default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
 
             if(plot_area.spPr && plot_area.spPr.Fill)
             {
@@ -8726,6 +8757,7 @@ CChartSpace.prototype =
         var parents = this.getParentObjects();
         default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
         this.pen = default_line;
+        checkBlackUnifill(this.pen.Fill, true);
     },
 
 
@@ -8784,6 +8816,7 @@ CChartSpace.prototype =
                     }
 
                     compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+                    checkBlackUnifill(compiled_grid_lines.Fill, true);
                     return compiled_grid_lines;
                 }
                 axis.compiledLn = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.spPr, subtleLine, parents);
@@ -8806,279 +8839,6 @@ CChartSpace.prototype =
                 calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
             if(this.chart.plotArea.catAx)
                 calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
-        }
-    },
-
-
-    recalculateAxisValLabels: function()
-    {
-
-        if(this.chart && this.chart.plotArea && this.chart.plotArea)
-        {
-            var plot_area = this.chart.plotArea;
-            var chart = plot_area.chart;
-            var i;
-            if(!(chart instanceof CScatterChart))
-            {
-                var val_ax, cat_ax;
-                if(plot_area.valAx)
-                {
-                    val_ax = this.chart.plotArea.valAx;
-                    var arr_val =  this.getValAxisValues();
-                    var arr_strings = [];
-                    var multiplier;
-                    if(val_ax.dispUnits)
-                        multiplier = val_ax.dispUnits.getMultiplier();
-                    else
-                        multiplier = 1;
-                    var num_fmt = val_ax.numFmt;
-                    if(num_fmt && typeof num_fmt.formatCode === "string" /*&& !(num_fmt.formatCode === "General")*/)
-                    {
-                        var num_format = oNumFormatCache.get(num_fmt.formatCode);
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            var calc_value = arr_val[i]*multiplier;
-                            var rich_value = num_format.formatToChart(calc_value);
-                            arr_strings.push(rich_value);
-                        }
-                    }
-                    else
-                    {
-                        for(i = 0; i < arr_val.length; ++i)
-                        {
-                            var calc_value = arr_val[i]*multiplier;
-                            arr_strings.push(calc_value + "");
-                        }
-                    }
-                    val_ax.labels = new CValAxisLabels(this);
-                    for(i = 0; i < arr_val.length; ++i)
-                    {
-                        var dlbl = new CDLbl();
-                        dlbl.parent = val_ax;
-                        dlbl.chart = this;
-                        dlbl.spPr = val_ax.spPr;
-                        dlbl.txPr = val_ax.txPr;
-                        dlbl.tx = new CChartText();
-                        dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
-                        dlbl.recalculate();
-                        val_ax.labels.arrLabels.push(dlbl);
-                    }
-                    val_ax.labels.recalculateExtX();
-                }
-
-                var string_pts = [];
-                var pts_len = 0;
-                if(plot_area.catAx)
-                {
-                    cat_ax = plot_area.catAx;
-                    var ser = chart.series[0];
-                    if(ser && ser.cat)
-                    {
-                        if(ser.cat.strRef && ser.cat.strRef.strCache)
-                        {
-                            string_pts = ser.cat.strRef.strCache.pt;
-                            pts_len = string_pts.length;
-                        }
-                        else if(ser.cat.strLit)
-                        {
-                            string_pts = ser.cat.strLit.pt;
-                            pts_len = string_pts.length;
-                        }
-                    }
-                    if(string_pts.length === 0)
-                    {
-                        if(ser.val)
-                        {
-                            if(ser.val.numRef && ser.val.numRef.numCache)
-                                pts_len = ser.val.numRef.numCache.pts.length;
-                            else if(ser.val.numLit)
-                                pts_len = ser.val.numLit.pts.length;
-                        }
-                        for(i = 0; i < pts_len; ++i)
-                        {
-                            string_pts.push({val:i+1 + ""});
-                        }
-                    }
-                }
-                if(val_ax && cat_ax)
-                {
-                    cat_ax.labels = new CValAxisLabels(this);
-                    var t = this.getChartSizes();
-                    var common_width = t.w;
-                    var common_height = t.h;
-                    var plot_area_width = common_width - val_ax.labels.extX;
-                    var max_sect_width = plot_area_width/string_pts.length;
-                    var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
-                    for(i = 0; i < string_pts.length; ++i)
-                    {
-                        var dlbl = null;
-                        if(i%tick_lbl_skip === 0)
-                        {
-                            dlbl = new CDLbl();
-                            dlbl.parent = cat_ax;
-                            dlbl.chart = this;
-                            dlbl.spPr = cat_ax.spPr;
-                            dlbl.txPr = cat_ax.txPr;
-                            dlbl.tx = new CChartText();
-                            dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
-                            dlbl.recalculate();
-                        }
-                        cat_ax.labels.arrLabels.push(dlbl);
-                    }
-                    var lbls = cat_ax.labels.arrLabels;
-                    var rot = null;
-                    var w0 = val_ax.labels.extX;
-                    var w1 = (common_width - val_ax.labels.extX)/pts_len;
-                    var max_text_height = 0;
-                    if(!(cat_ax.txPr && cat_ax.txPr.bodyPr && isRealNumber(cat_ax.txPr.bodyPr.rot)))
-                    {
-                        var max_min_text_width = cat_ax.labels.getMinWidth();
-                        for(i = 0; i < lbls.length; ++i)
-                        {
-                            if(lbls[i])
-                            {
-                                if(lbls[i].extY > max_text_height)
-                                    max_text_height = lbls[i].extY;
-                            }
-                        }
-                        if(max_min_text_width <= max_sect_width)
-                        {
-                            for(i = 0; i < lbls.length; ++i)
-                            {
-                                if(lbls[i])
-                                {
-                                    lbls[i].x = w0 + w1/2 + w1*(i) - lbls[i].extX/2;
-                                    lbls[i].y = max_text_height;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            rot = -Math.PI/4;
-                        }
-                    }
-
-                    var _rot = isRealNumber(rot) ? rot : 0;
-                    var _cos = Math.cos(_rot);
-                    var _sin = Math.sin(_rot);
-                    if(isRealNumber(rot))
-                    {
-                        var max_height = 0;
-                        for(i = 0; i < lbls.length; ++i)
-                        {
-                            if(lbls[i])
-                            {
-                                var cur_height = lbls[i].extX*_sin;
-                                if(cur_height > max_height)
-                                    max_height = cur_height;
-                                if(lbls[i].extY > max_text_height)
-                                    max_text_height = lbls[i].extY;
-                            }
-                        }
-                        if(max_height + max_text_height <= common_height/2) //TODO:пока так. надо разобраться(зависит от шрифта подписей)
-                        {
-                            var min_x = w1/2 + w0;
-                            for(i = 0; i < lbls.length; ++i)
-                            {
-                                if(lbls[i])
-                                {
-                                    var point_cx = w1/2 + w0 + (i)*w1;
-                                    if(lbls[i].extX*_cos <= point_cx)
-                                    {
-                                        lbls[i].pX = point_cx - lbls[i].extX*_cos;
-                                        if(point_cx - lbls[i].extX*_cos<= min_x)
-                                        {
-                                            min_x = point_cx - lbls[i].extX;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            if(i === lbls.length)
-                            {//Значит слева мы не вылезли за пределы подписей значений
-                                if(rot < 0)
-                                {
-                                    for(i = 0; i < lbls.length; ++i)
-                                    {
-                                        if(lbls[i])
-                                        {
-                                            var point_cx = w1/2 + w0 + (i)*w1;
-                                            var x = point_cx - lbls[i].extX*_cos - lbls[i].extX;
-                                            var y = max_text_height + lbls[i].extX*(Math.abs(_sin));
-                                            lbls[i].setPositionRelative(x, y);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    for(i = 0; i < lbls.length; ++i)
-                                    {
-                                        if(lbls[i])
-                                        {
-                                            var point_cx = w1/2 + w0 + (i)*w1;
-                                            var x = point_cx + lbls[i].extX*_cos - lbls[i].extX;
-                                            var y = max_text_height + lbls[i].extX*(Math.abs(_sin));
-                                            lbls[i].setPositionRelative(x, y);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {}
-                        }
-                    }
-                    else
-                    {
-                        for(i = 0; i < lbls.length; ++i)
-                        {
-                            if(lbls[i])
-                            {
-                                var cx = w1/2 + w1*i;
-                                lbls[i].setPositionRelative(cx - lbls[i].extX/2, max_text_height);
-                            }
-                        }
-                    }
-                    var rot_matrix = new CMatrix();
-                    global_MatrixTransformer.RotateRadAppend(rot_matrix, -_rot);
-                    if(!cat_ax.txPr)
-                    {
-                        cat_ax.setTxPr(new CTextBody());
-                    }
-                    if(!cat_ax.txPr.bodyPr)
-                    {
-                        cat_ax.txPr.setBodyPr(new CBodyPr());
-                    }
-                    if(!isRealNumber( cat_ax.txPr.bodyPr.rot))
-                    {
-                        cat_ax.txPr.bodyPr.rot = _rot;
-                    }
-                    for(i = 0; i < lbls.length; ++i)
-                    {
-                        var lbl = lbls[i];
-                        var hc = lbl.extX/2;
-                        var vc = lbl.extY/2;
-                        var xc = lbl.x + hc, yc = lbl.y + vc;
-                        var x_0 = xc + rot_matrix.TransformPointX(-hc - vc);
-                        var y_0 = yc + rot_matrix.TransformPointY(-hc - vc);
-                        var x_1 = xc + rot_matrix.TransformPointX(hc, -vc);
-                        var y_1 = yc + rot_matrix.TransformPointY(hc, -vc);
-                        var x_2 = xc + rot_matrix.TransformPointX(hc, vc);
-                        var y_2 = yc + rot_matrix.TransformPointY(hc, vc);
-                        var x_3 = xc + rot_matrix.TransformPointX(-hc, vc);
-                        var y_3 = yc + rot_matrix.TransformPointY(-hc, vc);
-                        lbls[i].recalculate();
-                    }
-                    var val_labels = val_ax.labels;
-                    val_labels.extY =  common_height - cat_ax.labels.extY;
-                    for(i = 0; i < val_labels.length; ++i)
-                    {
-
-                    }
-                }
-            }
         }
     },
 
@@ -9790,6 +9550,7 @@ CChartSpace.prototype =
                         }
                         compiled_grid_lines.merge(spPr.ln);
                         compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+                        checkBlackUnifill(compiled_grid_lines.Fill, true);
                         return compiled_grid_lines;
                     }
                     return null;
