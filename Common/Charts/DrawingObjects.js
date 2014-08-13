@@ -3378,8 +3378,8 @@ function DrawingObjects() {
 
         var response = { result: true, x: 0, y: 0 };
 
-        var bottom = worksheet.getCellTop(worksheet.rows.length - 1, 3);
-        var right = worksheet.getCellLeft(worksheet.cols.length - 1, 3);
+        var bottom = worksheet.getCellTop(worksheet.rows.length - 1, 3) + worksheet.getRowHeight(worksheet.rows.length - 1, 3) - worksheet.getCellTop(0, 3);
+        var right = worksheet.getCellLeft(worksheet.cols.length - 1, 3) + worksheet.getColumnWidth(worksheet.cols.length - 1, 3) - worksheet.getCellLeft(0, 3);
 
         // выход за границу слева или сверху
         if ( y < 0 ) {

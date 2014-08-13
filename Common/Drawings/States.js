@@ -521,8 +521,8 @@ function MoveState(drawingObjects, majorObject, startX, startY)
     }
     this.rectX = Math.min.apply(Math, arr_x);
     this.rectY = Math.min.apply(Math, arr_y);
-    this.rectW = Math.max.apply(Math, arr_x);
-    this.rectH = Math.max.apply(Math, arr_y);
+    this.rectW = Math.max.apply(Math, arr_x) - this.rectX;
+    this.rectH = Math.max.apply(Math, arr_y) - this.rectY;
 
 }
 
