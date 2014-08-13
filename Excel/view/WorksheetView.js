@@ -1203,6 +1203,26 @@
 			}
 		};
 
+		WorksheetView.prototype._fixVisibleRange = function (range) {
+			var tmp;
+			if (null !== this.topLeftFrozenCell) {
+				tmp = this.topLeftFrozenCell.getRow0();
+				if (range.r1 < tmp) {
+					range.r1 = tmp;
+					tmp = this._findVisibleRow(range.r1, +1);
+					if (0 < tmp)
+						range.r1 = tmp;
+				}
+				tmp = this.topLeftFrozenCell.getCol0();
+				if (range.c1 < tmp) {
+					range.c1 = tmp;
+					tmp = this._findVisibleCol(range.c1, +1);
+					if (0 < tmp)
+						range.c1 = tmp;
+				}
+			}
+		};
+
 		/**
 		 * Вычисляет ширину столбца для заданного количества символов
 		 * @param {Number} count  Количество символов
@@ -5153,12 +5173,17 @@
 			fixStartRow.startCol = vr.c1;
 			fixStartRow.startRow = start;
 			this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
+			this._fixVisibleRange(fixStartRow);
 			var reinitScrollY = start !== fixStartRow.r1;
 			if (reinitScrollY && 0 > delta) // Для скролла вверх обычный сдвиг + дорисовка
 				delta += fixStartRow.r1 - start;
 			start = fixStartRow.r1;
 
-			if (start === vr.r1) {return this;}
+			if (start === vr.r1) {
+				if (reinitScrollY)
+					this.handlers.trigger("reinitializeScrollY");
+				return this;
+			}
 
 			this.cleanSelection();
 			this.cellCommentator.cleanSelectedComment();
@@ -5305,12 +5330,17 @@
 			fixStartCol.startCol = start;
 			fixStartCol.startRow = vr.r1;
 			this._fixSelectionOfHiddenCells(delta >= 0 ? +1 : -1, 0, fixStartCol);
+			this._fixVisibleRange(fixStartCol);
 			var reinitScrollX = start !== fixStartCol.c1;
 			if (reinitScrollX && 0 > delta) // Для скролла влево обычный сдвиг + дорисовка
 				delta += fixStartCol.c1 - start;
 			start = fixStartCol.c1;
 
-			if (start === vr.c1) {return this;}
+			if (start === vr.c1) {
+				if (reinitScrollX)
+					this.handlers.trigger("reinitializeScrollX");
+				return this;
+			}
 
 			this.cleanSelection();
 			this.cellCommentator.cleanSelectedComment();
@@ -5951,56 +5981,55 @@
 			ar.r2 = ar.r1 === res.r1 ? res.r2 : res.r1;
 		};
 
+		WorksheetView.prototype._findVisibleCol = function (from, dc, flag) {
+			var to = dc < 0 ? -1 : this.cols.length, c;
+			for (c = from; c !== to; c += dc) {
+				if (this.cols[c].width > t.width_1px) {return c;}
+			}
+			return flag ? -1 : this._findVisibleCol(from, dc * -1, true);
+		};
+		WorksheetView.prototype._findVisibleRow = function (from, dr, flag) {
+			var to = dr < 0 ? -1 : this.rows.length, r;
+			for (r = from; r !== to; r += dr) {
+				if (this.rows[r].height > this.height_1px) {return r;}
+			}
+			return flag ? -1 : this._findVisibleRow(from, dr * -1, true);
+		};
+
 		WorksheetView.prototype._fixSelectionOfHiddenCells = function (dc, dr, range) {
-			var t = this, ar = (range) ? range : t.activeRange, c1, c2, r1, r2, mc, i, arn = ar.clone(true);
+			var ar = (range) ? range : this.activeRange, c1, c2, r1, r2, mc, i, arn = ar.clone(true);
 
 			if (dc === undefined) {dc = +1;}
 			if (dr === undefined) {dr = +1;}
 
-			function findVisibleCol(from, dc, flag) {
-				var to = dc < 0 ? -1 : t.cols.length, c;
-				for (c = from; c !== to; c += dc) {
-					if (t.cols[c].width > t.width_1px) {return c;}
-				}
-				return flag ? -1 : findVisibleCol(from, dc * -1, true);
-			}
-
-			function findVisibleRow(from, dr, flag) {
-				var to = dr < 0 ? -1 : t.rows.length, r;
-				for (r = from; r !== to; r += dr) {
-					if (t.rows[r].height > t.height_1px) {return r;}
-				}
-				return flag ? -1 : findVisibleRow(from, dr * -1, true);
-			}
-
 			if (ar.c2 === ar.c1) {
-				if (t.cols[ar.c1].width < t.width_1px) {
-					c1 = c2 = findVisibleCol(ar.c1, dc);
+				if (this.cols[ar.c1].width < this.width_1px) {
+					c1 = c2 = this._findVisibleCol(ar.c1, dc);
 				}
 			} else {
-				if (0 !== dc && t.nColsCount > ar.c2 && t.cols[ar.c2].width < t.width_1px) {
+				if (0 !== dc && this.nColsCount > ar.c2 && this.cols[ar.c2].width < this.width_1px) {
 					// Проверка для одновременно замерженных и скрытых ячеек (A1:C1 merge, B:C hidden)
 					for (mc = null, i = arn.r1; i <= arn.r2; ++i) {
-						mc = t.model.getMergedByCell(i, ar.c2);
+						mc = this.model.getMergedByCell(i, ar.c2);
 						if (mc) {break;}
 					}
-					if (!mc) {c2 = findVisibleCol(ar.c2, dc);}
+					if (!mc) {c2 = this._findVisibleCol(ar.c2, dc);}
 				}
 			}
 			if (c1 < 0 || c2 < 0) {throw "Error: all columns are hidden";}
 
 			if (ar.r2 === ar.r1) {
-				if (t.rows[ar.r1].height < t.height_1px) {
-					r1 = r2 = findVisibleRow(ar.r1, dr);
+				if (this.rows[ar.r1].height < this.height_1px) {
+					r1 = r2 = this._findVisibleRow(ar.r1, dr);
 				}
 			} else {
-				if (0 !== dr && t.nRowsCount > ar.r2 && t.rows[ar.r2].height < t.height_1px) {
+				if (0 !== dr && this.nRowsCount > ar.r2 && this.rows[ar.r2].height < this.height_1px) {
 					//Проверка для одновременно замерженных и скрытых ячеек (A1:A3 merge, 2:3 hidden)
 					for (mc = null, i = arn.c1; i <= arn.c2; ++i) {
-						mc = t.model.getMergedByCell(ar.r2, i);
+						mc = this.model.getMergedByCell(ar.r2, i);
 						if (mc) {break;}
 					}
-					if (!mc) {r2 = findVisibleRow(ar.r2, dr);}
+					if (!mc) {r2 = this._findVisibleRow(ar.r2, dr);}
 				}
 			}
 			if (r1 < 0 || r2 < 0) {throw "Error: all rows are hidden";}
@@ -6015,12 +6044,12 @@
 			if (c1 >= 0) {ar.startCol = c1;}
 			if (r1 >= 0) {ar.startRow = r1;}
 
-			if (0 !== dc && t.cols[ar.startCol].width < t.width_1px) {
-				c1 = findVisibleCol(ar.startCol, dc);
+			if (0 !== dc && this.cols[ar.startCol].width < this.width_1px) {
+				c1 = this._findVisibleCol(ar.startCol, dc);
 				if (c1 >= 0) {ar.startCol = c1;}
 			}
-			if (0 !== dr && t.rows[ar.startRow].height < t.height_1px) {
-				r1 = findVisibleRow(ar.startRow, dr);
+			if (0 !== dr && this.rows[ar.startRow].height < this.height_1px) {
+				r1 = this._findVisibleRow(ar.startRow, dr);
 				if (r1 >= 0) {ar.startRow = r1;}
 			}
 		};
@@ -6260,8 +6289,7 @@
 
 		// Потеряем ли мы что-то при merge ячеек
 		WorksheetView.prototype.getSelectionMergeInfo = function (options) {
-			var t = this;
-			var arn = t.activeRange.clone(true);
+			var arn = this.activeRange.clone(true);
 			var notEmpty = false;
 			var r, c;
 
