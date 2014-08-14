@@ -137,67 +137,6 @@ asc_CCommentCoords.prototype = {
 };
 
 window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCommentCoords;
-var prot = asc_CCommentCoords.prototype;
-
-prot["asc_setRow"] = prot.asc_setRow;
-prot["asc_getRow"] = prot.asc_getRow;
-
-prot["asc_setCol"] = prot.asc_setCol;
-prot["asc_setCol"] = prot.asc_setCol;
-
-prot["asc_setLeft"] = prot.asc_setLeft;
-prot["asc_getLeft"] = prot.asc_getLeft;
-
-prot["asc_setLeftOffset"] = prot.asc_setLeftOffset;
-prot["asc_getLeftOffset"] = prot.asc_getLeftOffset;
-
-prot["asc_setTop"] = prot.asc_setTop;
-prot["asc_getTop"] = prot.asc_getTop;
-
-prot["asc_setTopOffset"] = prot.asc_setTopOffset;
-prot["asc_getTopOffset"] = prot.asc_getTopOffset;
-
-prot["asc_setRight"] = prot.asc_setRight;
-prot["asc_getRight"] = prot.asc_getRight;
-
-prot["asc_setRightOffset"] = prot.asc_setRightOffset;
-prot["asc_getRightOffset"] = prot.asc_getRightOffset;
-
-prot["asc_setBottom"] = prot.asc_setBottom;
-prot["asc_getBottom"] = prot.asc_getBottom;
-
-prot["asc_setBottomOffset"] = prot.asc_setBottomOffset;
-prot["asc_getBottomOffset"] = prot.asc_getBottomOffset;
-
-prot["asc_setLeftMM"] = prot.asc_setLeftMM;
-prot["asc_getLeftMM"] = prot.asc_getLeftMM;
-
-prot["asc_setLeftPX"] = prot.asc_setLeftPX;
-prot["asc_getLeftPX"] = prot.asc_getLeftPX;
-
-prot["asc_setTopMM"] = prot.asc_setTopMM;
-prot["asc_getTopMM"] = prot.asc_getTopMM;
-
-prot["asc_setTopPX"] = prot.asc_setTopPX;
-prot["asc_getTopPX"] = prot.asc_getTopPX;
-
-prot["asc_setWidthMM"] = prot.asc_setWidthMM;
-prot["asc_getWidthMM"] = prot.asc_getWidthMM;
-
-prot["asc_setHeightMM"] = prot.asc_setHeightMM;
-prot["asc_getHeightMM"] = prot.asc_getHeightMM;
-
-prot["asc_setWidthPX"] = prot.asc_setWidthPX;
-prot["asc_getWidthPX"] = prot.asc_getWidthPX;
-
-prot["asc_setHeightPX"] = prot.asc_setHeightPX;
-prot["asc_getHeightPX"] = prot.asc_getHeightPX;
-
-prot["asc_setMoveWithCells"] = prot.asc_setMoveWithCells;
-prot["asc_getMoveWithCells"] = prot.asc_getMoveWithCells;
-
-prot["asc_setSizeWithCells"] = prot.asc_setSizeWithCells;
-prot["asc_getSizeWithCells"] = prot.asc_getSizeWithCells;
 
 //-----------------------------------------------------------------------------------
 // CommentData
