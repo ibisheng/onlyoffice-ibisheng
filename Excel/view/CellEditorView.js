@@ -272,7 +272,11 @@
 			if (saveValue && "function" === typeof opt.saveValueCallback) {
 				ret = this._wrapFragments(opt.fragments); // восстанавливаем символы \n
 				ret = opt.saveValueCallback(opt.fragments, this.textFlags, /*skip NL check*/ret);
-				if (!ret) {return false;}
+				if (!ret) {
+					// При ошибке нужно выставить флаг, чтобы по стрелкам не закрывался редактор
+					this.handlers.trigger('setStrictClose', true);
+					return false;
+				}
 			}
 
 			this.isOpened = false;

@@ -376,7 +376,8 @@
 							"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
 							"isViewerMode"				: function () {return self.controller.settings.isViewerMode;},
 							"popUpSelectorKeyDown"	: function (event) {return self._onPopUpSelectorKeyDown(event);},
-							"getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();}
+							"getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();},
+							"setStrictClose"			: function (val) {self.controller.setStrictClose(val);}
 					    },
 					    /*settings*/{
 						    font: this.defaultFont
