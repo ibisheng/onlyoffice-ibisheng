@@ -12,7 +12,7 @@ function FileHandler() {
             var frmWindow = getIFrameWindow( file );
             var frm = frmWindow.document.getElementById( "frmFile" );
             frm.submit();
-            frmWindow.focus();
+//            frmWindow.focus();
         }
     }
     var getIFrameWindow = function ( file ) {
