@@ -5139,31 +5139,47 @@
 		};
 
 		WorksheetView.prototype._updateVisibleRowsCount = function (skipScrollReinit) {
+			var isUpdate = false;
 			this._calcVisibleRows();
-			if (this._isVisibleY()) {
-				do {  // Добавим еще строки, чтоб не было видно фон под таблицей
-					this.expandRowsOnScroll(true);
-					this._calcVisibleRows();
-					if (this.rows[this.rows.length - 1].height < 0.000001) {break;}
-				} while (this._isVisibleY() && gc_nMaxRow !== this.rows.length);
-				if (!skipScrollReinit) {
-					this.handlers.trigger("reinitializeScrollY");
-				}
+			while (this._isVisibleY() && !this.isMaxRow()) {
+				// Добавим еще строки, чтоб не было видно фон под таблицей
+				this.expandRowsOnScroll(true);
+				this._calcVisibleRows();
+				isUpdate = true;
 			}
+			if (!skipScrollReinit && isUpdate)
+				this.handlers.trigger("reinitializeScrollY");
 		};
 
 		WorksheetView.prototype._updateVisibleColsCount = function (skipScrollReinit) {
+			var isUpdate = false;
 			this._calcVisibleColumns();
-			if (this._isVisibleX()) {
-				do {  // Добавим еще столбцы, чтоб не было видно фон под таблицей
-					this.expandColsOnScroll(true);
-					this._calcVisibleColumns();
-					if (this.cols[this.cols.length - 1].width < 0.000001) {break;}
-				} while (this._isVisibleX() && gc_nMaxCol !== this.cols.length);
-				if (!skipScrollReinit) {
-					this.handlers.trigger("reinitializeScrollX");
-				}
+			while (this._isVisibleX() && !this.isMaxCol()) {
+				// Добавим еще столбцы, чтоб не было видно фон под таблицей
+				this.expandColsOnScroll(true);
+				this._calcVisibleColumns();
+				isUpdate = true;
 			}
+			if (!skipScrollReinit && isUpdate)
+				this.handlers.trigger("reinitializeScrollX");
+		};
+
+		WorksheetView.prototype.isMaxRow = function () {
+			var rowsCountCurrent = this.rows.length;
+			if (gc_nMaxRow === rowsCountCurrent)
+				return true;
+
+			var rowsCount = this.model.getRowsCount() + 1;
+			return rowsCount <= rowsCountCurrent && this.model.isDefaultHeightHidden();
+		};
+
+		WorksheetView.prototype.isMaxCol = function () {
+			var colsCountCurrent = this.cols.length;
+			if (gc_nMaxCol === colsCountCurrent)
+				return true;
+
+			var colsCount = this.model.getColsCount() + 1;
+			return colsCount <= colsCountCurrent && this.model.isDefaultWidthHidden();
 		};
 
 		WorksheetView.prototype.scrollVertical = function (delta, editor) {
