@@ -6000,7 +6000,7 @@
 		WorksheetView.prototype._findVisibleCol = function (from, dc, flag) {
 			var to = dc < 0 ? -1 : this.cols.length, c;
 			for (c = from; c !== to; c += dc) {
-				if (this.cols[c].width > t.width_1px) {return c;}
+				if (this.cols[c].width > this.width_1px) {return c;}
 			}
 			return flag ? -1 : this._findVisibleCol(from, dc * -1, true);
 		};
