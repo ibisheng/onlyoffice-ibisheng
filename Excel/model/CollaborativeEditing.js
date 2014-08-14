@@ -35,7 +35,6 @@
 
 			this.handlers					= new asc.asc_CHandlersList(handlers);
 			this.m_bIsViewerMode			= !!isViewerMode; // Режим Viewer-а
-			this.m_bIsCollaborative			= false; // Совместное ли редактирование
 			this.m_bGlobalLock				= false; // Глобальный lock
 			this.m_bGlobalLockEditCell		= false; // Глобальный lock (для редактирования ячейки) - отключаем смену select-а, но разрешаем сразу вводить
 			this.m_arrCheckLocks			= [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
@@ -92,6 +91,10 @@
 			if (true !== this.isCoAuthoringExcellEnable() || this.m_bIsViewerMode)
 				return false;
 			return 1 !== this.m_nUseType;
+		};
+
+		CCollaborativeEditing.prototype.getOwnLocksLength = function () {
+			return this.m_arrNeedUnlock2.length;
 		};
 
 		//-----------------------------------------------------------------------------------
@@ -167,6 +170,7 @@
 		};
 		CCollaborativeEditing.prototype.addUnlock2 = function (Lock) {
 			this.m_arrNeedUnlock2.push (Lock);
+			this.handlers.trigger("updateDocumentCanSave");
 		};
 
 		CCollaborativeEditing.prototype.removeUnlock = function (Lock) {

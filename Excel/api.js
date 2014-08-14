@@ -95,6 +95,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.CoAuthoringApi = new CDocsCoApi();
 			this.collaborativeEditing = null;
 			this.isCoAuthoringEnable = true;
+			this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 			// AutoSave
 			this.lastSaveTime = null;				// Время последнего сохранения
@@ -589,6 +590,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.CoAuthoringApi.unSaveChanges();
 			if (!isDocumentSaved)
 				this.CoAuthoringApi.disconnect();
+			// Обновляем состояние возможности сохранения документа
+			this._onUpdateDocumentCanSave();
 		};
 
 		spreadsheet_api.prototype.asc_Print = function(adjustPrint){
@@ -1146,6 +1149,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 			return false;
 		};
+		/**
+		 * Эта функция возвращает true, если есть изменения или есть lock-и в документе
+		 */
+		spreadsheet_api.prototype.asc_isDocumentCanSave = function () {
+			return this.isDocumentCanSave;
+		};
 
 		spreadsheet_api.prototype.asc_getCanUndo = function () {
 			return History.Can_Undo();
@@ -1188,6 +1197,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * asc_onStopFormatPainter		()													- эвент об окончании форматирования по образцу
 		 * asc_onUpdateSheetSettings	()													- эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
 		 * asc_onUpdateTabColor			(index)												- эвент об обновлении цвета иконки листа
+		 * asc_onDocumentCanSaveChanged	(bIsCanSave)										- эвент об обновлении статуса "можно ли сохранять файл"
 		 */
 
 		spreadsheet_api.prototype.asc_StartAction = function (type, id) {
@@ -1482,7 +1492,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				"showComments":						function () {t._onShowComments.apply(t, arguments);},
 				"unlockComments":					function () {t._onUnlockComments.apply(t);},
 				"tryUnlockComment":					function () {t._onTryUnlockComment.apply(t, arguments);},
-				"cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);}
+				"cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);},
+				"updateDocumentCanSave":			function () {t._onUpdateDocumentCanSave();}
 			}, this.asc_getViewerMode());
 
 			if (!this.CoAuthoringApi) {
@@ -3195,6 +3206,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 		};
 
+		spreadsheet_api.prototype._onUpdateDocumentCanSave = function () {
+			// Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
+			var tmp = this.asc_isDocumentModified() || (this.collaborativeEditing.getCollaborativeEditing() &&
+				0 !== this.collaborativeEditing.getOwnLocksLength());
+			if (tmp !== this.isDocumentCanSave) {
+				this.isDocumentCanSave = tmp;
+				this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
+			}
+		};
+
 		// offline mode
 
 		spreadsheet_api.prototype.offlineModeInit = function() {
@@ -3219,13 +3240,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						oAdditionalData["vkey"] = t.documentVKey;
 						oAdditionalData["outputformat"] = c_oAscFileType.PDFPRINT;
 
-						var bStart = false;
-
 						t.adjustPrint = new asc_CAdjustPrint();
 						t.printPagesData = t.wb.calcPagesPrint(t.adjustPrint);
 
 						var pdf_writer = new CPdfPrinter(t.wbModel.sUrlPath);
-						var isEndPrint = t.wb.printSheet(pdf_writer, t.printPagesData);
+						t.wb.printSheet(pdf_writer, t.printPagesData);
 
 						return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
 					};
@@ -3234,9 +3253,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if (!window['scriptBridge']['addFileImage']) {
 					window['scriptBridge']['addFileImage'] = function(imageUrl, x, y, width, height) {
 
-						var ws = t.wb.getWorksheet();
-						ws.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+						t.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 
+						var ws = t.wb.getWorksheet();
 						var options = null;
 						if (x && y) {
 							var picker = ws.objectRender.getPositionInfo(x,y);
@@ -3245,7 +3264,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 
 						ws.objectRender.addImageDrawingObject(imageUrl, options);
-						ws.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+						t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					};
 				}
 
@@ -3600,6 +3619,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getDocumentName"] = prot.asc_getDocumentName;
 		prot["asc_getDocumentFormat"] = prot.asc_getDocumentFormat;
 		prot["asc_isDocumentModified"] = prot.asc_isDocumentModified;
+		prot["asc_isDocumentCanSave"] = prot.asc_isDocumentCanSave;
 		prot["asc_getCanUndo"] = prot.asc_getCanUndo;
 		prot["asc_getCanRedo"] = prot.asc_getCanRedo;
 
