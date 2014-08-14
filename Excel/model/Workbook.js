@@ -2858,6 +2858,12 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 		}
 	}
 };
+Woorksheet.prototype.isDefaultHeightHidden=function(){
+	return null != this.oSheetFormatPr.oAllRow && this.oSheetFormatPr.oAllRow.hd;
+};
+Woorksheet.prototype.isDefaultWidthHidden=function(){
+	return null != this.oAllCol && this.oAllCol.hd;
+};
 Woorksheet.prototype.getDefaultHeight=function(){
 	var dRes = null;
 	// Нужно возвращать выставленную, только если флаг CustomHeight = true
