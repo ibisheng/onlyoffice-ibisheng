@@ -2448,21 +2448,8 @@ function DecodeGeneralFormat_Raw(val, nValType, dDigitsCount)
 			{
 				//если в nVarian1 число помещается полностью, то применяем nVarian1
 				var bUseVarian1 = false;
-				if(nVarian1 > 0)
-				{
-					var sTempNumber = parts.mantissa.toString();
-					sTempNumber = sTempNumber.substring(nVarian1, nVarian2);
-					var nTempNumberLength = sTempNumber.length;
+				if(nVarian1 > 0 && 0 == (parts.mantissa % Math.pow(10, gc_nMaxDigCount - nVarian1)))
 					bUseVarian1 = true;
-					for(var i = 0; i < nTempNumberLength; ++i)
-					{
-						if("0" != sTempNumber[i])
-						{
-							bUseVarian1 = false;
-							break;
-						}
-					}
-				}
 				if(false == bUseVarian1)
 				{
 					if(nDigitsCount >= nExpMinDigitsCount + 1)
