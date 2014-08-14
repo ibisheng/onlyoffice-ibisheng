@@ -553,6 +553,7 @@ function asc_docs_api(name)
     this.CoAuthoringApi = new CDocsCoApi();
 	this.isCoAuthoringEnable = true;
     this.isCoMarksDraw = false;
+	this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
 	// Spell Checking
 	this.SpellCheckApi = new CSpellCheckApi();
@@ -761,6 +762,7 @@ asc_docs_api.prototype.SetUnchangedDocument = function()
 {
     this.isDocumentModify = false;
     this.asc_fireCallback("asc_onDocumentModifiedChanged");
+	editor._onUpdateDocumentCanSave();
 };
 
 asc_docs_api.prototype.isDocumentModified = function()
@@ -770,6 +772,13 @@ asc_docs_api.prototype.isDocumentModified = function()
 		return true;
 	}
     return this.isDocumentModify;
+};
+
+/**
+ * Эта функция возвращает true, если есть изменения или есть lock-и в документе
+ */
+asc_docs_api.prototype.asc_isDocumentCanSave = function () {
+	return this.isDocumentCanSave;
 };
 
 asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
@@ -1698,6 +1707,17 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 	return g_spellCheckLanguages;
+};
+
+asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
+	// Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
+	var tmp = this.isDocumentModified() || (0 >= CollaborativeEditing.m_nUseType &&
+		0 !== CollaborativeEditing.getOwnLocksLength());
+	if (tmp !== this.isDocumentCanSave) {
+		this.isDocumentCanSave = tmp;
+		this.asc_fireCallback('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
+		console.log(this.isDocumentCanSave);
+	}
 };
 
 // get functions
@@ -2750,6 +2770,9 @@ function OnSave_Callback2(e)
 
         // Снимаем лок с функции сохранения на сервере
         editor.CoAuthoringApi.unSaveChanges();
+
+		// Обновляем состояние возможности сохранения документа
+		editor._onUpdateDocumentCanSave();
     } 
     else 
     {
@@ -2782,6 +2805,8 @@ asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	this.CoAuthoringApi.unSaveChanges();
 	if (!isDocumentSaved)
 		this.CoAuthoringApi.disconnect();
+	// Обновляем состояние возможности сохранения документа
+	this._onUpdateDocumentCanSave();
 };
 
 function safe_Apply_Changes()

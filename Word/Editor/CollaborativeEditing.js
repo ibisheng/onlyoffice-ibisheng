@@ -654,6 +654,7 @@ function CCollaborativeEditing()
     this.Add_Unlock2 = function(Lock)
     {
         this.m_aNeedUnlock2.push( Lock );
+		editor._onUpdateDocumentCanSave();
     };
 
     this.Apply_OtherChanges = function()
@@ -1155,6 +1156,9 @@ function CCollaborativeEditing()
         }
     };
 
+	this.getOwnLocksLength = function () {
+		return this.m_aNeedUnlock2.length;
+	};
 }
 
 var CollaborativeEditing = new CCollaborativeEditing();
