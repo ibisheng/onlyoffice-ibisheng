@@ -175,7 +175,7 @@ function CHistory(workbook)
 	this.SavePoint = null;
     this.Points   = [];
 	this.CurPoint = null;
-	this.IsModify = false;
+	this.IsModify = null;
     this.TurnOffHistory = 0;
     this.Transaction = 0;
     this.LocalChange = false;//если true все добавленный изменения не пойдут в совместное редактирование.
@@ -192,7 +192,7 @@ CHistory.prototype.Clear = function()
 	this.SavePoint = null;
 	this.Points.length = 0;
 	this.CurPoint = null;
-	this.IsModify = false;
+	this.IsModify = null;
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
 	this.LoadFonts = {};
@@ -678,9 +678,10 @@ CHistory.prototype._sendCanUndoRedo = function()
 {
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
-	if(this.IsModify != this.Is_Modified())
+	var IsModify = this.Is_Modified();
+	if(this.IsModify != IsModify)
 	{
-		this.IsModify = !this.IsModify;
+		this.IsModify = IsModify;
 		this.workbook.handlers.trigger("setDocumentModified", this.IsModify);
 	}
 };
@@ -777,9 +778,10 @@ CHistory.prototype.Save = function()
 		this.SavePoint = this.CurPoint;
 	else if(this.Index >= 0 && this.Index < this.Points.length)
 		this.SavePoint = this.Points[this.Index];
-	if(true == this.IsModify)
+	var IsModify = this.Is_Modified();
+	if(this.IsModify != IsModify)
 	{
-		this.IsModify = !this.IsModify;
+		this.IsModify = IsModify;
 		this.workbook.handlers.trigger("setDocumentModified", this.IsModify);
 	}
 };
