@@ -2685,7 +2685,7 @@ UndoRedoWorkbook.prototype = {
 		}
 		else if(historyitem_Workbook_SheetPositions == Type)
 		{
-		    var wsActive = this.wb.aWorksheets[this.wb.nActive];
+		    var wsActive = this.wb.getActiveWs();
 			//делаем вспомогательным map из sheetid
 			var oTempSheetMap = {};
 			for(var i = 0, length = Data.positions.length; i < length; ++i)
@@ -2744,8 +2744,7 @@ UndoRedoWorkbook.prototype = {
 				if(bEmpty)
 					break;
 			}
-			this.wb._updateWorksheetIndexes();
-			this.wb.nActive = wsActive.getIndex();
+			this.wb._updateWorksheetIndexes(wsActive);
 		}
 		else if(historyitem_Workbook_ChangeColorScheme == Type)
 		{

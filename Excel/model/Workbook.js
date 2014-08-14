@@ -1284,6 +1284,9 @@ Workbook.prototype.getDefaultSize=function(){
 Workbook.prototype.getActive=function(){
 	return this.nActive;
 };
+Workbook.prototype.getActiveWs = function () {
+    return this.getWorksheet(this.nActive);
+};
 Workbook.prototype.setActive=function(index){
 	if(index >= 0 && index < this.aWorksheets.length){
 		this.nActive = index;
@@ -1321,6 +1324,7 @@ Workbook.prototype.getWorksheetCount=function(){
 Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	History.Create_NewPoint();
 	History.TurnOff();
+	var wsActive = this.getActiveWs();
     var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, sId);
 	if(null != sName)
 	{
@@ -1337,11 +1341,12 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 		this.aWorksheets.push(oNewWorksheet);
 	}
 	this.aWorksheetsById[oNewWorksheet.getId()] = oNewWorksheet;
-	this._updateWorksheetIndexes();
-	this.setActive(oNewWorksheet.index);
+	this._updateWorksheetIndexes(wsActive);
 	History.TurnOn();
 	this._insertWorksheetFormula(oNewWorksheet.index);
 	History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(indexBefore, oNewWorksheet.getName(), null, oNewWorksheet.getId()));
+	History.SetSheetUndo(wsActive.getId());
+	History.SetSheetRedo(oNewWorksheet.getId());
 	return oNewWorksheet.index;
 };
 Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo){
@@ -1349,6 +1354,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 	if(index >= 0 && index < this.aWorksheets.length){
 		History.Create_NewPoint();
 		History.TurnOff();
+		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
 		var newSheet = wsFrom.clone(sId);
 		if(null != sName)
@@ -1367,7 +1373,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			this.aWorksheets.push(newSheet);
 		}
 		this.aWorksheetsById[newSheet.getId()] = newSheet;
-		this._updateWorksheetIndexes();
+		this._updateWorksheetIndexes(wsActive);
 		History.TurnOn();
 		this._insertWorksheetFormula(insertBefore);
 		//для формул. создаем копию this.cwf[this.Id] для нового листа.
@@ -1385,13 +1391,16 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		}
 		sortDependency(this);
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
+		History.SetSheetUndo(wsActive.getId());
+		History.SetSheetRedo(newSheet.getId());
         if(!(bFromRedo === true))
         {
             wsFrom.copyDrawingObjects(newSheet, wsFrom);
         }
 	}
 };
-Workbook.prototype.insertWorksheet=function(index, sheet, cwf){
+Workbook.prototype.insertWorksheet = function (index, sheet, cwf) {
+    var wsActive = this.getActiveWs();
 	if(null != index && index >= 0 && index < this.aWorksheets.length){
 		//помещаем новый sheet перед insertBefore
 		this.aWorksheets.splice(index, 0, sheet);
@@ -1401,7 +1410,7 @@ Workbook.prototype.insertWorksheet=function(index, sheet, cwf){
 		this.aWorksheets.push(sheet);
 	}
 	this.aWorksheetsById[sheet.getId()] = sheet;
-	this._updateWorksheetIndexes();
+	this._updateWorksheetIndexes(wsActive);
 	this._insertWorksheetFormula(index);
 	//восстанавливаем список ячеек с формулами для sheet
 	this.cwf[sheet.getId()] = cwf;
@@ -1434,6 +1443,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		indexTo >= 0 && indexTo < this.aWorksheets.length){
 		History.Create_NewPoint();
 		History.TurnOff();
+		var wsActive = this.getActiveWs();
 		var oWsFrom = this.aWorksheets[indexFrom];
 		var oWsTo = this.aWorksheets[indexTo];
 		var tempW = {
@@ -1474,7 +1484,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		History.TurnOn();
 		var movedSheet = this.aWorksheets.splice(indexFrom, 1);
 		this.aWorksheets.splice(indexTo, 0, movedSheet[0]);
-		this._updateWorksheetIndexes();
+		this._updateWorksheetIndexes(wsActive);
 		
 		this._insertWorksheetFormula(tempW.wTI);
 		
@@ -1483,6 +1493,28 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		unLockDraw(this);
 	}
 };
+Workbook.prototype.findSheetNoHidden = function (nIndex) {
+    var i, ws, oRes = null, bFound = false, countWorksheets = this.getWorksheetCount();
+    for (i = nIndex; i < countWorksheets; ++i) {
+        ws = this.getWorksheet(i);
+        if (false === ws.getHidden()) {
+            oRes = ws;
+            bFound = true;
+            break;
+        }
+    }
+    // Не нашли справа, ищем слева от текущего
+    if (!bFound) {
+        for (i = nIndex - 1; i >= 0; --i) {
+            ws = this.getWorksheet(i);
+            if (false === ws.getHidden()) {
+                oRes = ws;
+                break;
+            }
+        }
+    }
+    return oRes;
+}
 Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 	//проверяем останется ли хоть один нескрытый sheet
 	var bEmpty = true;
@@ -1521,54 +1553,42 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 				}
 			}
 		}
+	    //по всем удаленным листам пробегаемся и удаляем из workbook.cwf (cwf - cells with forluma) элементы с названием соответствующего листа.
 		this.dependencyFormulas.removeNodeBySheetId(removedSheetId);
-		History.TurnOff();
-		var nNewActive = this.nActive;
-		this.aWorksheets.splice(nIndex, 1);
-		//по всем удаленным листам пробегаемся и удаляем из workbook.cwf (cwf - cells with forluma) элементы с названием соответствующего листа.
 		var _cwf = this.cwf[removedSheetId];
 		delete this.cwf[removedSheetId];
-		delete this.aWorksheetsById[removedSheetId];
 		
-
-		var bFind = false;
-		if(nNewActive < this.aWorksheets.length)
-		{
-			for(var i = nNewActive; i < this.aWorksheets.length; ++i)
-				if(false == this.aWorksheets[i].getHidden())
-				{
-					bFind = true;
-					nNewActive = i;
-					break;
-				}
+		var wsActive = this.getActiveWs();
+		var oVisibleWs = null;
+		this.aWorksheets.splice(nIndex, 1);
+		delete this.aWorksheetsById[removedSheetId];
+		if (nIndex == this.getActive()) {
+		    oVisibleWs = this.findSheetNoHidden(nIndex);
+		    if (null != oVisibleWs)
+		        wsActive = oVisibleWs;
 		}
-		if(false == bFind)
-		{
-			for(var i = nNewActive - 1; i >= 0; --i)
-				if(false == this.aWorksheets[i].getHidden())
-				{
-					nNewActive = i;
-					break;
-				}
-		}
-		History.TurnOn();
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet, _cwf));
+		if (null != oVisibleWs) {
+		    History.SetSheetUndo(removedSheetId);
+		    History.SetSheetRedo(wsActive.getId());
+		}
 		if(null != outputParams)
 		{
 			outputParams.sheet = removedSheet;
 			outputParams.cwf = _cwf;
 		}
-		this._updateWorksheetIndexes();
-		this.nActive = nNewActive;
+		this._updateWorksheetIndexes(wsActive);
 		buildRecalc(this);
 		unLockDraw(this);
-		return nNewActive;
+		return wsActive.getIndex();
 	}
 	return -1;
 };
-Workbook.prototype._updateWorksheetIndexes=function(){
+Workbook.prototype._updateWorksheetIndexes = function (wsActive) {
 	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i]._setIndex(i);
+	if (null != wsActive)
+	    this.setActive(wsActive.getIndex());
 };
 Workbook.prototype.checkUniqueSheetName=function(name){
 	var workbookSheetCount = this.getWorksheetCount();
@@ -1795,6 +1815,9 @@ Workbook.prototype.SerializeHistory = function(){
 		            if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
 		                bChangeSheetPlace = true;
 		        }
+		        else if (g_oUndoRedoWorksheet === item.oClass && historyitem_Worksheet_Hide === item.nActionType) {
+		            bChangeSheetPlace = true;
+		        }
 		        this._SerializeHistoryBase64(oMemory, item, aPointChangesBase64);
 		    }
 		    if (bChangeSheetPlace) {
@@ -1874,24 +1897,17 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 
 				History.SetSelection(null);
 				History.SetSelectionRedo(null);
-				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
 				var oRedoObjectParam = new Asc.RedoObjectParam();
 				History.UndoRedoPrepare(oRedoObjectParam, false);
 				for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
 				{
 				    var item = aUndoRedoElems[i];
 				    if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
-				        if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_SheetPositions == item.nActionType)
-				            oHistoryPositions = item;
-				        else {
-				            // TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
-				            //     item.oData.drawingData.bCollaborativeChanges = true;
-				            History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
-				        }
+				        // TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
+				        //     item.oData.drawingData.bCollaborativeChanges = true;
+				        History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
 				    }
 				}
-				if(null != oHistoryPositions)
-					History.RedoAdd(oRedoObjectParam, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);
 			
 				History.UndoRedoEnd(null, oRedoObjectParam, false);
 
@@ -2353,35 +2369,26 @@ Woorksheet.prototype.getHidden=function(){
 		return false != this.bHidden;
 	return false;
 };
-Woorksheet.prototype.setHidden=function(hidden){
-	if(this.bHidden != hidden)
+Woorksheet.prototype.setHidden = function (hidden) {
+    var bOldHidden = this.bHidden, wb = this.workbook, wsActive = wb.getActiveWs(), oVisibleWs = null;
+    this.bHidden = hidden;
+    if (true == this.bHidden && this.getIndex() == wsActive.getIndex())
 	{
-		History.Create_NewPoint();
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Hide, this.getId(), null, new UndoRedoData_FromTo(this.bHidden, hidden));
+	    oVisibleWs = wb.findSheetNoHidden(this.getIndex());
+	    if (null != oVisibleWs) {
+	        var nNewIndex = oVisibleWs.getIndex();
+	        wb.setActive(nNewIndex);
+	        if (!wb.bUndoChanges && !wb.bRedoChanges)
+	            wb.handlers.trigger("undoRedoHideSheet", nNewIndex);
+	    }
 	}
-	this.bHidden = hidden;
-	if(true == this.bHidden && this.getIndex() == this.workbook.getActive())
-	{
-		//выбираем новый активный
-		var activeWorksheet = this.getIndex();
-		var countWorksheets = this.workbook.getWorksheetCount();
-		// Покажем следующий лист или предыдущий (если больше нет)
-		var i, ws;
-		for (i = activeWorksheet + 1; i < countWorksheets; ++i) {
-			ws = this.workbook.getWorksheet(i);
-			if (false === ws.getHidden()) {
-				this.workbook.handlers.trigger("undoRedoHideSheet", i);
-				return;
-			}
-		}
-		// Не нашли справа, ищем слева от текущего
-		for (i = activeWorksheet - 1; i >= 0; --i) {
-			ws = this.workbook.getWorksheet(i);
-			if (false === ws.getHidden()) {
-				this.workbook.handlers.trigger("undoRedoHideSheet", i);
-				return;
-			}
-		}
+	if (bOldHidden != hidden) {
+	    History.Create_NewPoint();
+	    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Hide, this.getId(), null, new UndoRedoData_FromTo(bOldHidden, hidden));
+	    if (null != oVisibleWs) {
+	        History.SetSheetUndo(wsActive.getId());
+	        History.SetSheetRedo(oVisibleWs.getId());
+	    }
 	}
 };
 Woorksheet.prototype.getSheetViewSettings = function () {

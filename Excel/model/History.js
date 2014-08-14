@@ -367,10 +367,16 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		oState = bUndo ? Point.SelectionState : ((this.Index === this.Points.length - 1) ?
 			this.LastState : this.Points[this.Index + 1].SelectionState);
 
-		// ToDo какое-то не очень решение брать 0-й элемент и у него получать индекс!
-		var nSheetId = (null !== oState) ? oState[0].worksheetId : Point.nLastSheetId;
-		if (null !== nSheetId)
-			this.workbook.handlers.trigger('showWorksheet', nSheetId);
+		if (this.workbook.bCollaborativeChanges) {
+		    //active может поменяться только при remove, hide листов
+		    this.workbook.handlers.trigger('showWorksheet', this.workbook.getActive());
+		}
+		else {
+		    // ToDo какое-то не очень решение брать 0-й элемент и у него получать индекс!
+		    var nSheetId = (null !== oState) ? oState[0].worksheetId : ((this.workbook.bRedoChanges && null != Point.RedoSheetId) ? Point.RedoSheetId : Point.UndoSheetId);
+		    if (null !== nSheetId)
+		        this.workbook.handlers.trigger('showWorksheet', nSheetId);
+		}
 
 		for (i in Point.UpdateRigions)
 			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i], false, true);
@@ -586,18 +592,19 @@ CHistory.prototype.Create_NewPoint = function()
 	var Items = [];
 	var UpdateRigions = {};
 	var Time  = new Date().getTime();
-	var nLastSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
+	var UndoSheetId = null, oSelectionState = this.workbook.handlers.trigger("getSelectionState");
 
 	// ToDo Берем всегда, т.к. в случае с LastState мы можем не попасть на нужный лист и не заселектить нужный диапазон!
 	var oSelectRange = this.workbook.handlers.trigger("getSelection");
 	var wsActive = this.workbook.getWorksheet(this.workbook.getActive());
 	if (wsActive)
-		nLastSheetId = wsActive.getId();
+		UndoSheetId = wsActive.getId();
 
 	this.CurPoint = {
 		Items : Items, // Массив изменений, начиная с текущего момента
 		UpdateRigions : UpdateRigions,
-		nLastSheetId : nLastSheetId,
+		UndoSheetId: UndoSheetId,
+        RedoSheetId: null,
 		SelectRange : oSelectRange,
 		SelectRangeRedo : oSelectRange,
 		Time  : Time,   // Текущее время
@@ -652,7 +659,7 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 		Item.LocalChange = LocalChange;
 
 	oCurPoint.Items.push( Item );
-	if(null != range)
+	if (null != range && null != sheetid)
 	{
 		var updateRange = oCurPoint.UpdateRigions[sheetid];
 		if(null != updateRange)
@@ -662,7 +669,7 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 		oCurPoint.UpdateRigions[sheetid] = updateRange;
 	}
 	if (null != sheetid)
-		oCurPoint.nLastSheetId = sheetid;
+		oCurPoint.UndoSheetId = sheetid;
 	if(1 == oCurPoint.Items.length)
 		this._sendCanUndoRedo();
 };
@@ -719,6 +726,22 @@ CHistory.prototype.GetSelectionRedo = function()
 	if(null != this.CurPoint)
 		oRes = this.CurPoint.SelectRangeRedo;
 	return oRes;
+};
+CHistory.prototype.SetSheetRedo = function (sheetId) {
+    if (0 !== this.TurnOffHistory)
+        return;
+
+    if (null == this.CurPoint)
+        return;
+    this.CurPoint.RedoSheetId = sheetId;
+};
+CHistory.prototype.SetSheetUndo = function (sheetId) {
+    if (0 !== this.TurnOffHistory)
+        return;
+
+    if (null == this.CurPoint)
+        return;
+    this.CurPoint.UndoSheetId = sheetId;
 };
 CHistory.prototype.TurnOff = function()
 {
