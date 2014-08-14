@@ -796,69 +796,35 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				type: 'POST',
 				url: g_sMainServiceLocalUrl,
 				data: sData,
-				error: function(jqXHR, textStatus, errorThrown){
+				error: function(){
 					var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
 					oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 					if(callback)
 						callback(result);
 				},
 				success: function(msg){
-					var result;
+					var result, rData, codePageCsv, delimiterCsv;
 					if(!msg || msg.length < 1){
 						result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
 						oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 						if(callback)
 							callback(result);
-						return;
-					}
-					else{
+					} else{
 						var incomeObject = JSON.parse(msg);
 						switch( incomeObject["type"] ){
 							case "updateversion":
-							case "open":
-								if ("updateversion" == incomeObject["type"]){
-									oThis.asc_setViewerMode(true);
-									oThis.handlers.trigger("asc_onError", c_oAscError.ID.FileRequest, c_oAscError.Level.Critical);
-								}
-								var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
-								asc_ajax({
-									url: sJsonUrl,
-									dataType: "text",
-									success: function(result, textStatus) {
-										//получаем url к папке с файлом
-										var url;
-										var nIndex = sJsonUrl.lastIndexOf("/");
-										if(-1 !== nIndex)
-											url = sJsonUrl.substring(0, nIndex + 1);
-										else
-											url = sJsonUrl;
-										if (Asc.c_oSerFormat.Signature === result.substring(0, Asc.c_oSerFormat.Signature.length))
-										{
-											var wb = oThis.asc_OpenDocument(url, result);
-											if (callback)
-												callback({returnCode: 0, val:wb});
-										}
-										else
-										{
-											result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-											oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-											if(callback)
-												callback(result);
-										}
-									},
-									error:function(){
-										result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-										oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-										if(callback)
-											callback(result);
-									}
+								oThis.handlers.trigger("asc_onDocumentUpdateVersion", function () {
+									oThis._onOpenCommand(callback, incomeObject["data"]);
 								});
+								break;
+							case "open":
+								oThis._onOpenCommand(callback, incomeObject["data"]);
 								break;
 							case "needparams":
 								// Проверяем, возможно нам пришли опции для CSV
 								if (oThis.documentOpenOptions) {
-									var codePageCsv = oThis.documentOpenOptions["codePage"];
-									var delimiterCsv = oThis.documentOpenOptions["delimiter"];
+									codePageCsv = oThis.documentOpenOptions["codePage"];
+									delimiterCsv = oThis.documentOpenOptions["delimiter"];
 									if (null !== codePageCsv && undefined !== codePageCsv &&
 										null !== delimiterCsv && undefined !== delimiterCsv) {
 										oThis.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
@@ -869,7 +835,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								asc_ajax({
 									url: incomeObject["data"],
 									dataType: "text",
-									success: function(result, textStatus) {
+									success: function(result) {
 										var cp = JSON.parse(result);
 										oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
 										//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
@@ -886,8 +852,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							case "getcodepage":
 								// Проверяем, возможно нам пришли опции для CSV
 								if (oThis.documentOpenOptions) {
-									var codePageCsv = oThis.documentOpenOptions["codePage"];
-									var delimiterCsv = oThis.documentOpenOptions["delimiter"];
+									codePageCsv = oThis.documentOpenOptions["codePage"];
+									delimiterCsv = oThis.documentOpenOptions["delimiter"];
 									if (null !== codePageCsv && undefined !== codePageCsv &&
 										null !== delimiterCsv && undefined !== delimiterCsv) {
 										oThis.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
@@ -905,7 +871,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									callback(incomeObject);
 								break;
 							case "waitopen":
-								var rData = {
+								rData = {
 									"id":oThis.documentId,
 									"userid": oThis.documentUserId,
 									"format": oThis.documentFormat,
@@ -916,7 +882,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
 								break;
 							case "waitsave":
-								var rData = {
+								rData = {
 									"id": oThis.documentId,
 									"userid": oThis.documentUserId,
 									"vkey": oThis.documentVKey,
@@ -960,7 +926,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				type: 'POST',
 				url: url,
 				data: rdata,
-				error: function(jqXHR, textStatus, errorThrown) {
+				error: function() {
 					if (callback)
 						callback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
 				},
@@ -975,6 +941,43 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				},
 				dataType: "text"});
+		};
+
+		spreadsheet_api.prototype._onOpenCommand = function (callback, url) {
+			var t = this;
+			var sJsonUrl = g_sResourceServiceLocalUrl + url;
+			asc_ajax({
+				url: sJsonUrl,
+				dataType: "text",
+				success: function(result) {
+					//получаем url к папке с файлом
+					var url;
+					var nIndex = sJsonUrl.lastIndexOf("/");
+					if(-1 !== nIndex)
+						url = sJsonUrl.substring(0, nIndex + 1);
+					else
+						url = sJsonUrl;
+					if (Asc.c_oSerFormat.Signature === result.substring(0, Asc.c_oSerFormat.Signature.length))
+					{
+						var wb = t.asc_OpenDocument(url, result);
+						if (callback)
+							callback({returnCode: 0, val:wb});
+					}
+					else
+					{
+						result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+						t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+						if(callback)
+							callback(result);
+					}
+				},
+				error:function(){
+					var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+					if(callback)
+						callback(result);
+				}
+			});
 		};
 
 		spreadsheet_api.prototype._OfflineAppDocumentStartLoad = function (fCallback) {
@@ -1173,7 +1176,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * asc_onInitEditorStyles		(gui_styles)
 		 * asc_onOpenDocumentProgress	(_OpenDocumentProgress)
 		 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)	- эвент на получение дополнительных опций (открытие/сохранение CSV)
-		 * asc_onError					(c_oAscError.ID, c_oAscError.Level)
+		 * asc_onError					(c_oAscError.ID, c_oAscError.Level)					- эвент об ошибке
 		 * asc_onEditCell				(c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
 		 * asc_onSelectionChanged		(asc_CCellInfo)										- эвент на смену информации о выделении
 		 * asc_onSelectionNameChanged	(sName)												- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
@@ -1198,6 +1201,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * asc_onUpdateSheetSettings	()													- эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
 		 * asc_onUpdateTabColor			(index)												- эвент об обновлении цвета иконки листа
 		 * asc_onDocumentCanSaveChanged	(bIsCanSave)										- эвент об обновлении статуса "можно ли сохранять файл"
+		 * asc_onDocumentUpdateVersion	(callback)											- эвент о том, что файл собрался и не может больше редактироваться
 		 */
 
 		spreadsheet_api.prototype.asc_StartAction = function (type, id) {
