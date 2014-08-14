@@ -814,6 +814,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						switch( incomeObject["type"] ){
 							case "updateversion":
 								oThis.handlers.trigger("asc_onDocumentUpdateVersion", function () {
+									oThis.asc_setViewerMode(true);
 									oThis._onOpenCommand(callback, incomeObject["data"]);
 								});
 								break;
