@@ -10642,6 +10642,10 @@
 			// Если размер диапазона превышает размер видимой области больше чем в 3 раза, то очищаем весь кэш
 			if (this._isLargeRange(range)) {
 				this.changeWorksheet("update", {lockDraw: lockDraw});
+
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 				return;
 			}
 
