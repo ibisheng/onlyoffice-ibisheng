@@ -2914,7 +2914,7 @@
 						continue;
 
 					// draw diagonal borders
-					if ((bCur.dd || bCur.du) && (!mc || (row === mc.r1 && col === mc.c1))) {
+					if ((bCur.borders.dd || bCur.borders.du) && (!mc || (row === mc.r1 && col === mc.c1))) {
 						var x2Diagonal = x2;
 						var y2Diagonal = y2;
 						if (mc) {
@@ -2931,13 +2931,13 @@
 								 r[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
 							 .clip();
 						 */
-						if (bCur.dd) {
+						if (bCur.borders.dd) {
 							// draw diagonal line l,t - r,b
-							drawDiagonal(bCur.d, x1 - t.width_1px, y1 - t.height_1px, x2Diagonal, y2Diagonal);
+							drawDiagonal(bCur.borders.d, x1 - t.width_1px, y1 - t.height_1px, x2Diagonal, y2Diagonal);
 						}
-						if (bCur.du) {
+						if (bCur.borders.du) {
 							// draw diagonal line l,b - r,t
-							drawDiagonal(bCur.d, x1 - t.width_1px, y2Diagonal, x2Diagonal, y1 - t.height_1px);
+							drawDiagonal(bCur.borders.d, x1 - t.width_1px, y2Diagonal, x2Diagonal, y1 - t.height_1px);
 						}
 						// ToDo Clip diagonal borders
 						//ctx.restore();
