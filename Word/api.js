@@ -762,7 +762,7 @@ asc_docs_api.prototype.SetUnchangedDocument = function()
 {
     this.isDocumentModify = false;
     this.asc_fireCallback("asc_onDocumentModifiedChanged");
-	editor._onUpdateDocumentCanSave();
+	this._onUpdateDocumentCanSave();
 };
 
 asc_docs_api.prototype.isDocumentModified = function()
@@ -1716,7 +1716,6 @@ asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 	if (tmp !== this.isDocumentCanSave) {
 		this.isDocumentCanSave = tmp;
 		this.asc_fireCallback('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
-		console.log(this.isDocumentCanSave);
 	}
 };
 
@@ -7289,9 +7288,9 @@ function sendCommand(editor, fCallback, rdata){
 			switch (incomeObject["type"]) {
 			    case "updateversion":
 					editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
-						editor.SetViewMode(true);
-						_onOpenCommand(fCallback, incomeObject);
-					});
+					editor.SetViewMode(true);
+					_onOpenCommand(fCallback, incomeObject);
+				});
 					break;
 			    case "open":
 					_onOpenCommand(fCallback, incomeObject);
