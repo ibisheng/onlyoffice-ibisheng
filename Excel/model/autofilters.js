@@ -519,7 +519,7 @@ var gUndoInsDelCellsFlag = true;
 									if(openFilter == undefined)
 									{
 										if(isAll) {
-											aWs.AutoFilter = {};
+											aWs.AutoFilter = new AutoFilter();
 											aWs.AutoFilter.result = result;
 											aWs.AutoFilter.Ref = t._refToRange(result[0].id + ':' + result[result.length -1].idNext);
 										}
@@ -587,10 +587,12 @@ var gUndoInsDelCellsFlag = true;
 								{
 									changesElemHistory = allAutoFilters[apocal.num -1].clone(aWs);
 									var ref = allAutoFilters[apocal.num - 1].Ref;
-									allAutoFilters[apocal.num - 1].AutoFilter = 
+									allAutoFilters[apocal.num - 1].AutoFilter = new AutoFilter();
+									allAutoFilters[apocal.num - 1].AutoFilter.Ref = ref;
+									/*allAutoFilters[apocal.num - 1].AutoFilter = 
 									{
 										Ref: allAutoFilters[apocal.num - 1].Ref
-									};
+									};*/
 									break;
 								}
 								case 'setStyleTableForAutoFilter1':
@@ -704,7 +706,7 @@ var gUndoInsDelCellsFlag = true;
 						if(openFilter == undefined) {
 							if(isAll) {
 								if(!aWs.AutoFilter)
-									aWs.AutoFilter = {};
+									aWs.AutoFilter = new AutoFilter();
 								aWs.AutoFilter.result = result;
 								aWs.AutoFilter.Ref = t._refToRange(result[0].id + ':' + result[result.length -1].idNext);
 							}
@@ -778,6 +780,7 @@ var gUndoInsDelCellsFlag = true;
 					if(apocal == 'error')
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
 					}
 					else if(apocal && apocal.changeStyle)
@@ -806,6 +809,8 @@ var gUndoInsDelCellsFlag = true;
 							onAddAutoFiltersCallback(true);
 						else
 							ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+							
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return;
 					}
 					else if((apocal && apocal.containsFilter != false && !lTable) || (apocal && apocal.changeAllFOnTable))
@@ -863,6 +868,8 @@ var gUndoInsDelCellsFlag = true;
 							onAddAutoFiltersCallback(true);
 						else
 							ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+							
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return;
 					}
 					else if(apocal && apocal.containsFilter == false)
@@ -895,6 +902,8 @@ var gUndoInsDelCellsFlag = true;
 								onAddAutoFiltersCallback(true);
 							else
 								ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+								
+							ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							return;
 						}
 						else if(aWs.AutoFilter)
@@ -917,6 +926,8 @@ var gUndoInsDelCellsFlag = true;
 								onAddAutoFiltersCallback(true);
 							else
 								ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+								
+							ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							return;
 						}
 						else
@@ -939,11 +950,14 @@ var gUndoInsDelCellsFlag = true;
 								onAddAutoFiltersCallback(true);
 							else
 								ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+								
+							ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							return;
 						}
 					}
 					else if(apocal && apocal.containsFilter == false && lTable)
 					{
+						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return true;
 					}
 				};
@@ -1074,6 +1088,8 @@ var gUndoInsDelCellsFlag = true;
 						onAddAutoFiltersCallback(true);
 					else
 						ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+						
+					ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 					return;
 				}
 				else//выделено > 1 ячейки
@@ -1102,8 +1118,13 @@ var gUndoInsDelCellsFlag = true;
 						onAddAutoFiltersCallback(true);
 					else
 						ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+						
+					ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 					return;
 				}
+				
+				if(openFilter == undefined)
+					ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 				
 				//устанавливаем стиль для таблицы
 				if(!isAll && openFilter != undefined)
@@ -1984,6 +2005,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				ws.changeWorksheet("update");
+				ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 				ws.isChanged = true;
 			},
 			
@@ -4203,7 +4225,7 @@ var gUndoInsDelCellsFlag = true;
 					numFilter = curIndex[1];
 					if(!currentFilter.AutoFilter)
 					{
-						currentFilter.AutoFilter = {}
+						currentFilter.AutoFilter = new AutoFilter();
 					}
 					if(!currentFilter.AutoFilter.FilterColumns)
 						currentFilter.AutoFilter.FilterColumns = [];
