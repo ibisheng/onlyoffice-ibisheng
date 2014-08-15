@@ -4917,21 +4917,21 @@ function CContextMenuData()
     this.IsSlideSelect = true;
 }
 
-CContextMenuData.prototype.get_Type  = function()  { return this.Type; }
-CContextMenuData.prototype.get_X = function()  { return this.X_abs; }
-CContextMenuData.prototype.get_Y = function()  { return this.Y_abs; }
-CContextMenuData.prototype.get_IsSlideSelect = function()  { return this.IsSlideSelect; }
+CContextMenuData.prototype.get_Type  = function()  { return this.Type; };
+CContextMenuData.prototype.get_X = function()  { return this.X_abs; };
+CContextMenuData.prototype.get_Y = function()  { return this.Y_abs; };
+CContextMenuData.prototype.get_IsSlideSelect = function()  { return this.IsSlideSelect; };
 
 asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 {
     this.asc_fireCallback("asc_onContextMenu", Data);
-}
+};
 
 var cCharDelimiter = String.fromCharCode(5);
 
 function getURLParameter(name) {
     return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
-};
+}
 function sendCommand(editor, fCallback, rdata){
 	var sData;
 	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
@@ -4947,63 +4947,30 @@ function sendCommand(editor, fCallback, rdata){
         type: 'POST',
         url: g_sMainServiceLocalUrl,
         data: sData,
-        error: function(jqXHR, textStatus, errorThrown){
+        error: function(){
 				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 				if(fCallback)
 					fCallback();
             },
         success: function(msg){
-			var incomeObject = JSON.parse(msg);
+			var incomeObject = JSON.parse(msg), rData;
 			switch(incomeObject["type"]){
 				case "updateversion":
-                case "open":
-					if ("updateversion" == incomeObject["type"]){
-			            editor.SetViewMode(true);
-						editor.asc_fireCallback("asc_onError",c_oAscError.ID.FileRequest,c_oAscError.Level.Critical);
-					}
-                    var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
-					asc_ajax({
-						url: sJsonUrl,
-						dataType: "text",
-						success: function(result, textStatus) {
-							//получаем url к папке с файлом
-							var url;
-							var nIndex = sJsonUrl.lastIndexOf("/");
-							if(-1 != nIndex)
-								url = sJsonUrl.substring(0, nIndex + 1);
-							else
-								url = sJsonUrl;
-							var bIsViewer = false;
-							if(result.length > 0)
-							{
-								if(c_oSerFormat.Signature != result.substring(0, c_oSerFormat.Signature.length))
-									bIsViewer = true;
-							}
-							if(true == bIsViewer)
-								editor.OpenDocument(url, result);
-							else
-								editor.OpenDocument2(url, result);
-							//callback
-							editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
-							editor.sync_DocSizeCallback(Page_Width, Page_Height);
-							editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
-							if(fCallback)
-								fCallback(incomeObject);
-						},
-						error:function(){
-							editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
-							if(fCallback)
-								fCallback();
-						}
+					editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
+						editor.SetViewMode(true);
+						_onOpenCommand(fCallback, incomeObject);
 					});
-                break;
+					break;
+                case "open":
+					_onOpenCommand(fCallback, incomeObject);
+                	break;
                 case "waitopen":
                     if (incomeObject["data"])
                     {
                         editor._lastConvertProgress = incomeObject["data"] / 2;
                         editor.sync_SendProgress(editor._lastConvertProgress);
                     }
-					var rData = {
+					rData = {
 						"id":documentId,
 						"userid": documentUserId,
 						"format": documentFormat,
@@ -5018,7 +4985,7 @@ function sendCommand(editor, fCallback, rdata){
 						fCallback(incomeObject);
                 break;
                 case "waitsave":
-					var rData = {
+					rData = {
 						"id":documentId,
 						"userid": documentUserId,
 						"vkey": documentVKey,
@@ -5051,28 +5018,63 @@ function sendCommand(editor, fCallback, rdata){
 					break;
 			}
 		}
-	})
-
-};
+	});
+}
 function sendTrack(fCallback, url, rdata){
 	asc_ajax({
         type: 'POST',
         url: url,
         data: rdata,
-        error: function(jqXHR, textStatus, errorThrown){
+        error: function(){
 				if(fCallback)
 					fCallback();
             },
         success: function(msg){
 			var incomeObject = JSON.parse(msg);
 			if(fCallback)
-				fCallback(incomeObject);			
+				fCallback(incomeObject);
 		}
 	})
-};
+}
+function _onOpenCommand(fCallback, incomeObject) {
+	var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
+	asc_ajax({
+		url: sJsonUrl,
+		dataType: "text",
+		success: function(result) {
+			//получаем url к папке с файлом
+			var url;
+			var nIndex = sJsonUrl.lastIndexOf("/");
+			if(-1 != nIndex)
+				url = sJsonUrl.substring(0, nIndex + 1);
+			else
+				url = sJsonUrl;
+			var bIsViewer = false;
+			if(result.length > 0)
+			{
+				if(c_oSerFormat.Signature != result.substring(0, c_oSerFormat.Signature.length))
+					bIsViewer = true;
+			}
+			if(true == bIsViewer)
+				editor.OpenDocument(url, result);
+			else
+				editor.OpenDocument2(url, result);
+			//callback
+			editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+			editor.sync_DocSizeCallback(Page_Width, Page_Height);
+			editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
+			if(fCallback)
+				fCallback(incomeObject);
+		},
+		error:function(){
+			editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+			if(fCallback)
+				fCallback();
+		}
+	});
+}
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 {
-	var sData;
 	var oAdditionalData = {};
 	oAdditionalData["c"] = "save";
 	oAdditionalData["id"] = documentId;
@@ -5107,7 +5109,7 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 		oAdditionalData["data"] = editor.WordControl.SaveDocument();
 		sendCommand(editor, fCallback, oAdditionalData);
 	}
-};
+}
 
 function _getFullImageSrc(src)
 {
@@ -5124,7 +5126,7 @@ function _getFullImageSrc(src)
     }
 	else
 		return src;
-};
+}
 function _mapAscServerErrorToAscError(nServerError)
 {
 	var nRes = c_oAscError.ID.Unknown;
