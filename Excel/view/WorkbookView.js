@@ -151,10 +151,12 @@
 			this.fmgrGraphics.push(new CFontManager());	// Для обычного
 			this.fmgrGraphics.push(new CFontManager());	// Для поворотного
 			this.fmgrGraphics.push(new CFontManager());	// Для автофигур
+			this.fmgrGraphics.push(new CFontManager());	// Для измерений
 
 			this.fmgrGraphics[0].Initialize(true); // IE memory enable
 			this.fmgrGraphics[1].Initialize(true); // IE memory enable
 			this.fmgrGraphics[2].Initialize(true); // IE memory enable
+			this.fmgrGraphics[3].Initialize(true); // IE memory enable
 
 			this.buffers = {};
 			this.drawingCtx = undefined;
@@ -2043,6 +2045,11 @@
 				hintProps = manager.m_oLibrary.tt_hint_props;
 				if (!hintProps)
 					continue;
+
+				// Последний без хинтования (только для измерения)
+				if (i === length - 1) {
+					bIsHinting = bIsSubpixHinting = false;
+				}
 
 				if (bIsHinting && bIsSubpixHinting) {
 					hintProps.TT_USE_BYTECODE_INTERPRETER = true;

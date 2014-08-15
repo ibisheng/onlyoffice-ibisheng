@@ -809,7 +809,7 @@
 	 * @return {FontMetrics}
 	 */
 	DrawingContext.prototype.getFontMetrics = function (units) {
-		var fm = this.fmgrGraphics[0];
+		var fm = this.fmgrGraphics[3];
 		var d  = Math.abs(fm.m_lDescender);
 		var r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		var factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
@@ -869,6 +869,8 @@
 		} else {
 			r = window.g_font_infos[ font.FontFamily.Index ].LoadFont(
 				window.g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
+			window.g_font_infos[ font.FontFamily.Index ].LoadFont(
+				window.g_font_loader, this.fmgrGraphics[3], font.FontSize, fontStyle, this.ppiX, this.ppiY);
 		}
 
 		if (r === false) {
@@ -895,7 +897,7 @@
 	 * @return {TextMetrics}  Returns the dimension of string {width: w, height: h}
 	 */
 	DrawingContext.prototype.measureText = function (text, units) {
-		var fm = this.fmgrGraphics[0],
+		var fm = this.fmgrGraphics[3],
 			r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 			tmp = fm.MeasureChar( text.charCodeAt(i) );
