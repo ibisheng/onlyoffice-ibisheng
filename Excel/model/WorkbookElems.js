@@ -1296,124 +1296,122 @@ function CCellStyles() {
 	// ToDo нужно все компоновать в общий список стилей (для того, чтобы не было проблем с добавлением стилей и отсутствия имени стиля)
 	this.AllStyles = {};
 }
-CCellStyles.prototype = {
-	generateFontMap: function (oFontMap) {
-		this._generateFontMap(oFontMap, this.DefaultStyles);
-		this._generateFontMap(oFontMap, this.CustomStyles);
-	},
-	_generateFontMap: function (oFontMap, aStyles) {
-		var i, length, oStyle;
-		for (i = 0, length = aStyles.length; i < length; ++i) {
-			oStyle = aStyles[i];
-			if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
-				oFontMap[oStyle.xfs.font.fn] = 1;
+CCellStyles.prototype.generateFontMap = function (oFontMap) {
+	this._generateFontMap(oFontMap, this.DefaultStyles);
+	this._generateFontMap(oFontMap, this.CustomStyles);
+};
+CCellStyles.prototype._generateFontMap = function (oFontMap, aStyles) {
+	var i, length, oStyle;
+	for (i = 0, length = aStyles.length; i < length; ++i) {
+		oStyle = aStyles[i];
+		if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
+			oFontMap[oStyle.xfs.font.fn] = 1;
+	}
+};
+/**
+ * Возвращает колличество стилей без учета скрытых
+ */
+CCellStyles.prototype.getDefaultStylesCount = function () {
+	var nCount = this.DefaultStyles.length;
+	for (var i = 0, length = nCount; i < length; ++i) {
+		if (this.DefaultStyles[i].Hidden)
+			--nCount;
+	}
+	return nCount;
+};
+/**
+ * Возвращает колличество стилей без учета скрытых и стандартных
+ */
+CCellStyles.prototype.getCustomStylesCount = function () {
+	var nCount = this.CustomStyles.length;
+	for (var i = 0, length = nCount; i < length; ++i) {
+		if (this.CustomStyles[i].Hidden || null != this.CustomStyles[i].BuiltinId)
+			--nCount;
+	}
+	return nCount;
+};
+CCellStyles.prototype.getStyleByXfId = function (oXfId) {
+	for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
+		if (oXfId === this.CustomStyles[i].XfId) {
+			return this.CustomStyles[i];
 		}
-	},
-	/**
-	 * Возвращает колличество стилей без учета скрытых
-	 */
-	getDefaultStylesCount: function () {
-		var nCount = this.DefaultStyles.length;
-		for (var i = 0, length = nCount; i < length; ++i) {
-			if (this.DefaultStyles[i].Hidden)
-				--nCount;
-		}
-		return nCount;
-	},
-	/**
-	 * Возвращает колличество стилей без учета скрытых и стандартных
-	 */
-	getCustomStylesCount: function () {
-		var nCount = this.CustomStyles.length;
-		for (var i = 0, length = nCount; i < length; ++i) {
-			if (this.CustomStyles[i].Hidden || null != this.CustomStyles[i].BuiltinId)
-				--nCount;
-		}
-		return nCount;
-	},
-	getStyleByXfId: function (oXfId) {
-		for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
-			if (oXfId === this.CustomStyles[i].XfId) {
-				return this.CustomStyles[i];
-			}
-		}
+	}
 
-		return null;
-	},
-	getStyleNameByXfId: function (oXfId) {
-		var styleName = null;
-		if (null === oXfId)
-			return styleName;
-
-		var style = null;
-		for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
-			style = this.CustomStyles[i];
-			if (oXfId === style.XfId) {
-				if (null !== style.BuiltinId) {
-					styleName = this.getDefaultStyleNameByBuiltinId(style.BuiltinId);
-					if (null === styleName)
-						styleName = style.Name;
-					break;
-				} else {
-					styleName = style.Name;
-					break;
-				}
-			}
-		}
-
+	return null;
+};
+CCellStyles.prototype.getStyleNameByXfId = function (oXfId) {
+	var styleName = null;
+	if (null === oXfId)
 		return styleName;
-	},
-	getDefaultStyleNameByBuiltinId: function (oBuiltinId) {
-		var style = null;
-		for (var i = 0, length = this.DefaultStyles.length; i < length; ++i) {
-			style = this.DefaultStyles[i];
-			if (style.BuiltinId === oBuiltinId)
-				return style.Name;
-		}
-		return null;
-	},
-	_prepareCellStyle: function (name) {
-		var defaultStyle = null;
-		var style = null;
-		var i, length;
-		var maxXfId = -1;
-		// Проверим, есть ли в default
-		for (i = 0, length = this.DefaultStyles.length; i < length; ++i) {
-			if (name === this.DefaultStyles[i].Name) {
-				defaultStyle = this.DefaultStyles[i];
+
+	var style = null;
+	for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
+		style = this.CustomStyles[i];
+		if (oXfId === style.XfId) {
+			if (null !== style.BuiltinId) {
+				styleName = this.getDefaultStyleNameByBuiltinId(style.BuiltinId);
+				if (null === styleName)
+					styleName = style.Name;
+				break;
+			} else {
+				styleName = style.Name;
 				break;
 			}
 		}
-		// Если есть в default, ищем в custom по builtinId. Если нет, то по имени
-		if (defaultStyle) {
-			for (i = 0, length = this.CustomStyles.length; i < length; ++i) {
-				if (defaultStyle.BuiltinId === this.CustomStyles[i].BuiltinId) {
-					style = this.CustomStyles[i];
-					break;
-				}
-				maxXfId = Math.max(maxXfId, this.CustomStyles[i].XfId);
-			}
-		} else {
-			for (i = 0, length = this.CustomStyles.length; i < length; ++i) {
-				if (name === this.CustomStyles[i].Name) {
-					style = this.CustomStyles[i];
-					break;
-				}
-				maxXfId = Math.max(maxXfId, this.CustomStyles[i].XfId);
-			}
-		}
-
-		// Если нашли, то возвращаем XfId
-		if (style)
-			return style.XfId;
-
-		if (defaultStyle) {
-			this.CustomStyles[i] = defaultStyle.clone();
-			this.CustomStyles[i].XfId = ++maxXfId;
-			return this.CustomStyles[i].XfId;
-		}
-		return g_oDefaultXfId;
 	}
+
+	return styleName;
+};
+CCellStyles.prototype.getDefaultStyleNameByBuiltinId = function (oBuiltinId) {
+	var style = null;
+	for (var i = 0, length = this.DefaultStyles.length; i < length; ++i) {
+		style = this.DefaultStyles[i];
+		if (style.BuiltinId === oBuiltinId)
+			return style.Name;
+	}
+	return null;
+};
+CCellStyles.prototype._prepareCellStyle = function (name) {
+	var defaultStyle = null;
+	var style = null;
+	var i, length;
+	var maxXfId = -1;
+	// Проверим, есть ли в default
+	for (i = 0, length = this.DefaultStyles.length; i < length; ++i) {
+		if (name === this.DefaultStyles[i].Name) {
+			defaultStyle = this.DefaultStyles[i];
+			break;
+		}
+	}
+	// Если есть в default, ищем в custom по builtinId. Если нет, то по имени
+	if (defaultStyle) {
+		for (i = 0, length = this.CustomStyles.length; i < length; ++i) {
+			if (defaultStyle.BuiltinId === this.CustomStyles[i].BuiltinId) {
+				style = this.CustomStyles[i];
+				break;
+			}
+			maxXfId = Math.max(maxXfId, this.CustomStyles[i].XfId);
+		}
+	} else {
+		for (i = 0, length = this.CustomStyles.length; i < length; ++i) {
+			if (name === this.CustomStyles[i].Name) {
+				style = this.CustomStyles[i];
+				break;
+			}
+			maxXfId = Math.max(maxXfId, this.CustomStyles[i].XfId);
+		}
+	}
+
+	// Если нашли, то возвращаем XfId
+	if (style)
+		return style.XfId;
+
+	if (defaultStyle) {
+		this.CustomStyles[i] = defaultStyle.clone();
+		this.CustomStyles[i].XfId = ++maxXfId;
+		return this.CustomStyles[i].XfId;
+	}
+	return g_oDefaultXfId;
 };
 /** @constructor */
 function CCellStyle() {
@@ -1431,50 +1429,48 @@ function CCellStyle() {
 	this.ApplyFont = true;
 	this.ApplyNumberFormat = true;
 }
-CCellStyle.prototype = {
-	clone: function () {
-		var oNewStyle = new CCellStyle();
-		oNewStyle.BuiltinId = this.BuiltinId;
-		oNewStyle.CustomBuiltin = this.CustomBuiltin;
-		oNewStyle.Hidden = this.Hidden;
-		oNewStyle.ILevel = this.ILevel;
-		oNewStyle.Name = this.Name;
+CCellStyle.prototype.clone = function () {
+	var oNewStyle = new CCellStyle();
+	oNewStyle.BuiltinId = this.BuiltinId;
+	oNewStyle.CustomBuiltin = this.CustomBuiltin;
+	oNewStyle.Hidden = this.Hidden;
+	oNewStyle.ILevel = this.ILevel;
+	oNewStyle.Name = this.Name;
 
-		oNewStyle.ApplyBorder = this.ApplyBorder;
-		oNewStyle.ApplyFill = this.ApplyFill;
-		oNewStyle.ApplyFont = this.ApplyFont;
-		oNewStyle.ApplyNumberFormat = this.ApplyNumberFormat;
+	oNewStyle.ApplyBorder = this.ApplyBorder;
+	oNewStyle.ApplyFill = this.ApplyFill;
+	oNewStyle.ApplyFont = this.ApplyFont;
+	oNewStyle.ApplyNumberFormat = this.ApplyNumberFormat;
 
-		oNewStyle.xfs = this.xfs.clone();
-		return oNewStyle;
-	},
-	getFill: function () {
-		if (null != this.xfs && null != this.xfs.fill)
-			return this.xfs.fill.bg;
+	oNewStyle.xfs = this.xfs.clone();
+	return oNewStyle;
+};
+CCellStyle.prototype.getFill = function () {
+	if (null != this.xfs && null != this.xfs.fill)
+		return this.xfs.fill.bg;
 
-		return g_oDefaultFill.bg;
-	},
-	getFontColor: function () {
-		if (null != this.xfs && null != this.xfs.font)
-			return this.xfs.font.c;
+	return g_oDefaultFill.bg;
+};
+CCellStyle.prototype.getFontColor = function () {
+	if (null != this.xfs && null != this.xfs.font)
+		return this.xfs.font.c;
 
-		return g_oDefaultFont.c;
-	},
-	getFont: function () {
-		if (null != this.xfs && null != this.xfs.font)
-			return this.xfs.font;
-		return null;
-	},
-	getBorder: function () {
-		if (null != this.xfs && null != this.xfs.border)
-			return this.xfs.border;
-		return g_oDefaultBorder;
-	},
-	getNumFormatStr: function () {
-		if(null != this.xfs && null != this.xfs.num)
-			return this.xfs.num.f;
-		return g_oDefaultNum.f;
-	}
+	return g_oDefaultFont.c;
+};
+CCellStyle.prototype.getFont = function () {
+	if (null != this.xfs && null != this.xfs.font)
+		return this.xfs.font;
+	return null;
+};
+CCellStyle.prototype.getBorder = function () {
+	if (null != this.xfs && null != this.xfs.border)
+		return this.xfs.border;
+	return g_oDefaultBorder;
+};
+CCellStyle.prototype.getNumFormatStr = function () {
+	if(null != this.xfs && null != this.xfs.num)
+		return this.xfs.num.f;
+	return g_oDefaultNum.f;
 };
 /** @constructor */
 function StyleManager(){
