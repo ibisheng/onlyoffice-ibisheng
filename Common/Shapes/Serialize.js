@@ -4638,6 +4638,7 @@ function BinaryPPTYLoader()
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
+                                    _object.setParent2(this.TempMainObject);
                                 }
                                 break;
                             }
@@ -4647,6 +4648,7 @@ function BinaryPPTYLoader()
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
+                                    _object.setParent2(this.TempMainObject);
                                 }
                                 break;
                             }
@@ -4656,6 +4658,7 @@ function BinaryPPTYLoader()
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
+                                    _object.setParent2(this.TempMainObject);
                                 }
                                 break;
                             }
@@ -4665,6 +4668,7 @@ function BinaryPPTYLoader()
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
+                                    _object.setParent2(this.TempMainObject);
                                 }
                                 break;
                             }
@@ -4672,7 +4676,10 @@ function BinaryPPTYLoader()
                             {
                                 var _ret = this.ReadGrFrame();
                                 if (null != _ret)
+                                {
                                     shapes[shapes.length] = _ret;
+                                    _ret.setParent2(this.TempMainObject);
+                                }
                                 break;
                             }
                             default:

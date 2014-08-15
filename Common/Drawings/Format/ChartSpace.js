@@ -501,18 +501,28 @@ CChartSpace.prototype =
         var content;
         if(paraItem.Type === para_TextPr)
         {
+            var _paraItem;
+            if(paraItem.Value.Unifill && paraItem.Value.Unifill.checkWordMods())
+            {
+                _paraItem = paraItem.Copy();
+                _paraItem.Value.Unifill.convertToPPTXMods();
+            }
+            else
+            {
+                _paraItem = paraItem;
+            }
             if(this.selection.title && !this.selection.textSelection)
             {
                 this.selection.title.checkDocContent();
                 content = this.selection.title.getDocContent();
                 content.Set_ApplyToAll(true);
-                content.Paragraph_Add(paraItem, bRecalculate);
+                content.Paragraph_Add(_paraItem, bRecalculate);
                 content.Set_ApplyToAll(false);
             }
             else  if(this.selection.textSelection)
             {
                 this.selection.textSelection.checkDocContent();
-                this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+                this.selection.textSelection.paragraphAdd(_paraItem, bRecalculate);
             }
             else
             {
@@ -594,7 +604,9 @@ CChartSpace.prototype =
         {
             this.recalculatePenBrush();
         }
-        this.spPr.setFill(CorrectUniFill(unifill, this.brush));
+        var unifill2 = CorrectUniFill(unifill, this.brush);
+        unifill2.convertToPPTXMods();
+        this.spPr.setFill(unifill2);
     },
     setFill: function (fill) {
 
@@ -607,7 +619,12 @@ CChartSpace.prototype =
         {
             this.recalculatePenBrush();
         }
-        this.spPr.setLn(CorrectUniStroke(line, this.spPr.ln));
+        var stroke = CorrectUniStroke(line, this.pen);
+        if(stroke.Fill)
+        {
+            stroke.Fill.convertToPPTXMods();
+        }
+        this.spPr.setLn(stroke);
     },
 
     parseChartFormula: function(sFormula)

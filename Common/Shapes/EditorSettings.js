@@ -232,39 +232,39 @@ var g_oStandartColors = [
 
 var g_oThemeColorsDefaultModsWord = [
     [
-        { name : "shade", val : 0xF2 },
-        { name : "shade", val : 0xD9 },
-        { name : "shade", val : 0xBF },
-        { name : "shade", val : 0xA6 },
-        { name : "shade", val : 0x80 }
+        { name : "wordShade", val : 0xF2 },
+        { name : "wordShade", val : 0xD9 },
+        { name : "wordShade", val : 0xBF },
+        { name : "wordShade", val : 0xA6 },
+        { name : "wordShade", val : 0x80 }
     ],
     [
-        { name : "shade", val : 0xE6 },
-        { name : "shade", val : 0xBF },
-        { name : "shade", val : 0x80 },
-        { name : "shade", val : 0x40 },
-        { name : "shade", val : 0x1A }
+        { name : "wordShade", val : 0xE6 },
+        { name : "wordShade", val : 0xBF },
+        { name : "wordShade", val : 0x80 },
+        { name : "wordShade", val : 0x40 },
+        { name : "wordShade", val : 0x1A }
     ],
     [
-        { name : "tint", val : 0x33 },
-        { name : "tint", val : 0x66 },
-        { name : "tint", val : 0x99 },
-        { name : "shade", val : 0xBF },
-        { name : "shade", val : 0x80 }
+        { name : "wordTint", val : 0x33 },
+        { name : "wordTint", val : 0x66 },
+        { name : "wordTint", val : 0x99 },
+        { name : "wordShade", val : 0xBF },
+        { name : "wordShade", val : 0x80 }
     ],
     [
-        { name : "tint", val : 0x1A },
-        { name : "tint", val : 0x40 },
-        { name : "tint", val : 0x80 },
-        { name : "tint", val : 0xBF },
-        { name : "tint", val : 0xE6 }
+        { name : "wordTint", val : 0x1A },
+        { name : "wordTint", val : 0x40 },
+        { name : "wordTint", val : 0x80 },
+        { name : "wordTint", val : 0xBF },
+        { name : "wordTint", val : 0xE6 }
     ],
     [
-        { name : "tint", val : 0x80 },
-        { name : "tint", val : 0xA6 },
-        { name : "tint", val : 0xBF },
-        { name : "tint", val : 0xD9 },
-        { name : "tint", val : 0xF2 }
+        { name : "wordTint", val : 0x80 },
+        { name : "wordTint", val : 0xA6 },
+        { name : "wordTint", val : 0xBF },
+        { name : "wordTint", val : 0xD9 },
+        { name : "wordTint", val : 0xF2 }
     ]
 ];
 
@@ -360,7 +360,7 @@ function GetDefaultMods(r, g, b, pos, editor_id)
 
         var _mod = {};
         _mod["name"] = _obj.name;
-        _mod["val"] = (_obj.val * 100000 / 255) >> 0;
+        _mod["val"] = _obj.val /** 100000 / 255) >> 0*/;
         _mods.push(_mod);
 
         return _mods;

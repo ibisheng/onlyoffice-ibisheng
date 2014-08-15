@@ -876,8 +876,7 @@ DrawingObjectsController.prototype =
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
                     drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
-                    //if(this.document)
-                    //    this.drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selectedObjects[i].parent.wrappingPolygon.calculatedPoints, new CMatrix());
+
                 }
 
             }
@@ -3161,7 +3160,7 @@ DrawingObjectsController.prototype =
 
     updateSelectionState: function(bNoCheck)
     {
-        var text_object;
+        var text_object, drawingDocument = this.drawingObjects.getDrawingDocument();
         if(this.selection.textSelection)
         {
             text_object = this.selection.textSelection;
@@ -3183,15 +3182,15 @@ DrawingObjectsController.prototype =
         }
         if(isRealObject(text_object))
         {
-            text_object.updateSelectionState(this.drawingObjects.drawingDocument);
+            text_object.updateSelectionState(drawingDocument);
         }
         else if(bNoCheck !== true)
         {
-            this.drawingObjects.drawingDocument.UpdateTargetTransform(null);
-            this.drawingObjects.drawingDocument.TargetEnd();
-            this.drawingObjects.drawingDocument.SelectEnabled(false);
-            this.drawingObjects.drawingDocument.SelectClear();
-            this.drawingObjects.drawingDocument.SelectShow();
+            drawingDocument.UpdateTargetTransform(null);
+            drawingDocument.TargetEnd();
+            drawingDocument.SelectEnabled(false);
+            drawingDocument.SelectClear();
+            drawingDocument.SelectShow();
         }
     },
 
@@ -4584,7 +4583,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            this.drawingObjects.drawingDocument.UpdateTargetTransform(this.getTargetTransform());
+            this.drawingObjects.getDrawingDocument().UpdateTargetTransform(this.getTargetTransform());
             content.Selection_Draw_Page(0);
         }
     },

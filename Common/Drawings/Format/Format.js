@@ -687,6 +687,13 @@ CColorModifiers.prototype =
     Refresh_RecalcData: function()
     {},
 
+    getModsToWrite: function()
+    {
+
+    },
+
+
+
     Write_ToBinary: function(w)
     {
         w.WriteLong(this.Mods.length);
@@ -1092,18 +1099,44 @@ CColorModifiers.prototype =
 
                 this.HSL2RGB(HSL, RGBA);
             }
-         /// else if (colorMod.name == "shade")
-         /// {
-         ///     RGBA.R = Math.max(0, (RGBA.R * val) >> 0);
-         ///     RGBA.G = Math.max(0, (RGBA.G * val) >> 0);
-         ///     RGBA.B = Math.max(0, (RGBA.B * val) >> 0);
-         /// }
-         /// else if (colorMod.name == "tint")
-         /// {
-         ///     RGBA.R = Math.max(0, (255 - (255 - RGBA.R) * val) >> 0);
-         ///     RGBA.G = Math.max(0, (255 - (255 - RGBA.G) * val) >> 0);
-         ///     RGBA.B = Math.max(0, (255 - (255 - RGBA.B) * val) >> 0);
-         /// }
+       else if (colorMod.name == "wordShade")
+       {
+           var val_ = colorMod.val/255;
+           //GBA.R = Math.max(0, (RGBA.R * (1 - val_)) >> 0);
+           //GBA.G = Math.max(0, (RGBA.G * (1 - val_)) >> 0);
+           //GBA.B = Math.max(0, (RGBA.B * (1 - val_)) >> 0);
+
+
+           //RGBA.R = Math.max(0,  ((1 - val_)*(- RGBA.R) + RGBA.R) >> 0);
+           //RGBA.G = Math.max(0,  ((1 - val_)*(- RGBA.G) + RGBA.G) >> 0);
+           //RGBA.B = Math.max(0,  ((1 - val_)*(- RGBA.B) + RGBA.B) >> 0);
+
+           var HSL = {H: 0, S: 0, L: 0};
+           this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
+
+           if(HSL.L*val_ > max_hls)
+               HSL.L = max_hls;
+           else
+               HSL.L = Math.max(0, (HSL.L * val_) >> 0);
+           this.HSL2RGB(HSL, RGBA);
+       }
+         else if (colorMod.name == "wordTint")
+         {
+             var _val = colorMod.val/255;
+             //RGBA.R = Math.max(0,  ((1 - _val)*(255 - RGBA.R) + RGBA.R) >> 0);
+             //RGBA.G = Math.max(0,  ((1 - _val)*(255 - RGBA.G) + RGBA.G) >> 0);
+             //RGBA.B = Math.max(0,  ((1 - _val)*(255 - RGBA.B) + RGBA.B) >> 0);
+
+             var HSL = {H: 0, S: 0, L: 0};
+             this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
+
+             var L_ = HSL.L*_val + (255 - colorMod.val);
+             if(L_ > max_hls)
+                 HSL.L = max_hls;
+             else
+                 HSL.L = Math.max(0, (L_) >> 0);
+             this.HSL2RGB(HSL, RGBA);
+         }
          else if (colorMod.name == "shade")
          {
              RGBA.R = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.R/255) * val)*255 >> 0);
@@ -1872,6 +1905,61 @@ CUniColor.prototype =
         }
     },
 
+    checkWordMods: function()
+    {
+        return this.Mods && this.Mods.Mods.length === 1
+            && (this.Mods.Mods[0].name === "wordTint" || this.Mods.Mods[0].name === "wordShade");
+    },
+
+    convertToPPTXMods: function()
+    {
+        if(this.checkWordMods())
+        {
+            var val_, mod_;
+            if(this.Mods.Mods[0].name === "wordShade")
+            {
+                mod_ = new CColorMod();
+                mod_.setName("lumMod");
+                mod_.setVal(((this.Mods.Mods[0].val/255)*100000) >> 0);
+                this.Mods.Mods.splice(0, this.Mods.Mods.length);
+                this.Mods.Mods.push(mod_);
+            }
+            else
+            {
+                val_ = ((this.Mods.Mods[0].val/255)*100000) >> 0;
+                this.Mods.Mods.splice(0, this.Mods.Mods.length);
+                mod_ = new CColorMod();
+                mod_.setName("lumMod");
+                mod_.setVal(val_);
+                this.Mods.Mods.push(mod_);
+                mod_ = new CColorMod();
+                mod_.setName("lumOff");
+                mod_.setVal(100000 - val_);
+                this.Mods.Mods.push(mod_);
+            }
+        }
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return this.Mods
+            && ((this.Mods.Mods.length === 1 && this.Mods.Mods[0].name === "lumMod" && this.Mods.Mods[0].val > 0)
+            || (this.Mods.Mods.length === 2 && this.Mods.Mods[0].name === "lumMod" && this.Mods.Mods[0].val > 0
+            &&  this.Mods.Mods[1].name === "lumOff" && this.Mods.Mods[1].val > 0));
+    },
+
+    convertToWordMods: function()
+    {
+        if(this.canConvertPPTXModsToWord())
+        {
+            var mod_ = new CColorMod();
+            mod_.setName( this.Mods.Mods.length === 1 ? "wordShade" : "wordTint");
+            mod_.setVal(((this.Mods.Mods[0].val*255)/100000) >> 0);
+            this.Mods.Mods.splice(0, this.Mods.Mods.length);
+            this.Mods.Mods.push(mod_);
+        }
+    },
+
     getObjectType: function()
     {
         return historyitem_type_UniColor;
@@ -2495,6 +2583,25 @@ CBlipFill.prototype =
     check: function()
     {},
 
+    checkWordMods: function()
+    {
+        return false;
+    },
+
+    convertToPPTXMods: function()
+    {
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return false;
+    },
+
+    convertToWordMods: function()
+    {
+    },
+
+
     getObjectType: function()
     {
         return historyitem_type_BlipFill;
@@ -2927,6 +3034,28 @@ CSolidFill.prototype =
             this.color.Read_FromBinary(r);
         }
     },
+
+
+    checkWordMods: function()
+    {
+        return this.color && this.color.checkWordMods();
+    },
+
+    convertToPPTXMods: function()
+    {
+        this.color && this.color.convertToPPTXMods();
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return this.color && this.color.canConvertPPTXModsToWord();
+    },
+
+    convertToWordMods: function()
+    {
+        this.color && this.color.convertToWordMods();
+    },
+
 
     Undo: function(data)
     {
@@ -3617,6 +3746,49 @@ CGradFill.prototype =
         return historyitem_type_GradFill;
     },
 
+    checkWordMods: function()
+    {
+        for(var i = 0; i < this.colors.length; ++i)
+        {
+            if(this.colors[i] && this.colors[i].color && this.colors[i].color.checkWordMods())
+            {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    convertToPPTXMods: function()
+    {
+        for(var i = 0; i < this.colors.length; ++i)
+        {
+            this.colors[i] && this.colors[i].color && this.colors[i].color.convertToPPTXMods();
+
+        }
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        for(var i = 0; i < this.colors.length; ++i)
+        {
+            if(this.colors[i] && this.colors[i].color && this.colors[i].color.canConvertPPTXModsToWord())
+            {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    convertToWordMods: function()
+    {
+        for(var i = 0; i < this.colors.length; ++i)
+        {
+            this.colors[i] && this.colors[i].color && this.colors[i].color.convertToWordMods();
+
+        }
+    },
+
+
     addColor: function(color)
     {
         //History.Add(this, {Type: historyitem_GradFill_AddColor, color: color});
@@ -3892,6 +4064,38 @@ CPattFill.prototype =
             this.fgClr.check(theme, colorMap);
         if(this.bgClr)
             this.bgClr.check(theme, colorMap);
+    },
+
+    checkWordMods: function()
+    {
+        if(this.fgClr && this.fgClr.checkWordMods())
+        {
+            return true;
+        }
+        return this.bgClr && this.bgClr.checkWordMods();
+
+    },
+
+    convertToPPTXMods: function()
+    {
+        this.fgClr && this.fgClr.convertToPPTXMods();
+        this.bgClr && this.bgClr.convertToPPTXMods();
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        if(this.fgClr && this.fgClr.canConvertPPTXModsToWord())
+        {
+            return true;
+        }
+        return this.bgClr && this.bgClr.canConvertPPTXModsToWord();
+    },
+
+    convertToWordMods: function()
+    {
+
+        this.fgClr && this.fgClr.convertToWordMods();
+        this.bgClr && this.bgClr.convertToWordMods();
     },
 
     setFType: function(fType)
@@ -4183,6 +4387,25 @@ CNoFill.prototype =
         this.Id = r.GetString2();
     },
 
+    checkWordMods: function()
+    {
+        return false;
+
+    },
+
+    convertToPPTXMods: function()
+    {
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return false;
+    },
+
+    convertToWordMods: function()
+    {
+    },
+
     createDuplicate : function()
     {
         return new CNoFill();
@@ -4251,6 +4474,26 @@ CUniFill.prototype =
         {
             this.fill.check(theme, colorMap);
         }
+    },
+
+    checkWordMods: function()
+    {
+        return this.fill && this.fill.checkWordMods();
+    },
+
+    convertToPPTXMods: function()
+    {
+        this.fill && this.fill.convertToPPTXMods();
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return this.fill && this.fill.canConvertPPTXModsToWord();
+    },
+
+    convertToWordMods: function()
+    {
+        this.fill && this.fill.convertToWordMods();
     },
 
     getCalcFill: function()

@@ -1946,8 +1946,8 @@ CShape.prototype =
                 && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
             {
                 var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-                default_style.ParaPr.Merge(default_ppt_style.pPr.Copy());
-                default_style.TextPr.Merge(default_ppt_style.rPr.Copy());
+                default_style.ParaPr.Merge(default_ppt_style.Copy());
+                default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
             }
 
             var master_style;
@@ -1988,8 +1988,8 @@ CShape.prototype =
                 if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level]))
                 {
                     var master_ppt_style = master_ppt_styles.levels[level];
-                    master_style.ParaPr = master_ppt_style.pPr.Copy();
-                    master_style.TextPr = master_ppt_style.rPr.Copy();
+                    master_style.ParaPr = master_ppt_style.Copy();
+                    master_style.TextPr = master_ppt_style.DefaultRunPr.Copy();
                 }
             }
 
@@ -2006,8 +2006,8 @@ CShape.prototype =
                 {
                     var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
                     var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
-                    hierarchy_style.ParaPr = hierarchy_ppt_style.pPr.Copy();
-                    hierarchy_style.TextPr = hierarchy_ppt_style.rPr.Copy();
+                    hierarchy_style.ParaPr = hierarchy_ppt_style.Copy();
+                    hierarchy_style.TextPr = hierarchy_ppt_style.DefaultRunPr.Copy();
                     hierarchy_styles.push(hierarchy_style);
                 }
             }
@@ -2017,8 +2017,8 @@ CShape.prototype =
             {
                 ownStyle = new CStyle("ownStyle", null, null, null);
                 var own_ppt_style = this.txBody.lstStyle[level];
-                ownStyle.ParaPr = own_ppt_style.pPr.Copy();
-                ownStyle.TextPr = own_ppt_style.rPr.Copy();
+                ownStyle.ParaPr = own_ppt_style.Copy();
+                ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
             }
             var shape_text_style;
             if (isRealObject(this.style) && isRealObject(this.style.fontRef))
@@ -3809,7 +3809,9 @@ CShape.prototype =
         {
             this.recalculateBrush();
         }
-        this.spPr.setFill(CorrectUniFill(unifill, this.brush));
+        var unifill2 = CorrectUniFill(unifill, this.brush);
+        unifill2.convertToPPTXMods();
+        this.spPr.setFill(unifill2);
     },
     setFill: function (fill) {
 
@@ -3822,7 +3824,12 @@ CShape.prototype =
         {
             this.recalculatePen();
         }
-        this.spPr.setLn(CorrectUniStroke(line, this.pen));
+        var stroke = CorrectUniStroke(line, this.pen);
+        if(stroke.Fill)
+        {
+            stroke.Fill.convertToPPTXMods();
+        }
+        this.spPr.setLn(stroke);
     },
 
     setLine: function (line) {

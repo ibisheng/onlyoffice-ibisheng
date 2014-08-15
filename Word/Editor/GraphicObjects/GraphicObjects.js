@@ -1561,7 +1561,28 @@ CGraphicObjects.prototype =
     getParagraphTextPr: function()
     {
         var ret =  DrawingObjectsController.prototype.getParagraphTextPr.call(this);
-        return ret ? ret : new CTextPr();
+        if(ret)
+        {
+            var ret_;
+            if(ret.Unifill && ret.Unifill.canConvertPPTXModsToWord())
+            {
+                ret_ = ret.Copy();
+                ret_.Unifill.convertToWordMods();
+            }
+            else
+            {
+                ret_ = ret;
+            }
+            if(ret_.Unifill)
+            {
+                ret_.Unifill.check(this.document.theme, this.document.Get_ColorMap());
+            }
+            return ret_;
+        }
+        else
+        {
+            return new CTextPr();
+        }
     },
 
     isSelectedText: function()

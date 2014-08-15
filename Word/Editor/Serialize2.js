@@ -723,14 +723,14 @@ function CreateThemeUnifill(color, tint, shade){
 			var mod;
 			if(null != tint){
 				mod = new CColorMod();
-				mod.setName("tint");
-				mod.setVal(tint * 100000.0 / 0xff);
+				mod.setName("wordTint");
+				mod.setVal(tint /** 100000.0 / 0xff*/);
 				ret.fill.color.Mods.addMod(mod);
 			}
 			if(null != shade){
 				mod = new CColorMod();
-				mod.setName("shade");
-				mod.setVal(shade * 100000.0 / 0xff);
+				mod.setName("wordShade");
+				mod.setVal(shade /** 100000.0 / 0xff*/);
 				ret.fill.color.Mods.addMod(mod);
 			}
 		}

@@ -2178,6 +2178,11 @@ function DrawingObjects() {
         }
     };
 
+    _this.getDrawingDocument = function()
+    {
+        return _this.drawingDocument;
+    };
+
     _this.printGraphicObject = function(graphicObject, ctx, top, left) {
 
         if ( graphicObject && ctx ) {
@@ -3392,31 +3397,31 @@ function DrawingObjects() {
         }
 
         /* Проверки на максимум в листе */
-        function isMaxCol() {
-            var result = false;
-            if ( worksheet.cols.length >= gc_nMaxCol ) {
-                var lastCol = worksheet.cols[gc_nMaxCol - 1];
-                if ( mmToPt(x + w) + scrollX > lastCol.left ) {
-                    response.result = false;
-                    response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
-                    result = true;
-                }
-            }
-            return result;
-        }
-
-        function isMaxRow() {
-            var result = false;
-            if ( worksheet.rows.length >= gc_nMaxRow ) {
-                var lastRow = worksheet.rows[gc_nMaxRow - 1];
-                if ( mmToPt(y + h) + scrollY > lastRow.top ) {
-                    response.result = false;
-                    response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
-                    result = true;
-                }
-            }
-            return result;
-        }
+      //  function isMaxCol() {
+      //      var result = false;
+      //      if ( worksheet.cols.length >= gc_nMaxCol ) {
+      //          var lastCol = worksheet.cols[gc_nMaxCol - 1];
+      //          if ( mmToPt(x + w) + scrollX > lastCol.left ) {
+      //              response.result = false;
+      //              response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
+      //              result = true;
+      //          }
+      //      }
+      //      return result;
+      //  }
+      //
+      //  function isMaxRow() {
+      //      var result = false;
+      //      if ( worksheet.rows.length >= gc_nMaxRow ) {
+      //          var lastRow = worksheet.rows[gc_nMaxRow - 1];
+      //          if ( mmToPt(y + h) + scrollY > lastRow.top ) {
+      //              response.result = false;
+      //              response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
+      //              result = true;
+      //          }
+      //      }
+      //      return result;
+      //  }
         //
 
         // выход за границу справа
@@ -3424,8 +3429,15 @@ function DrawingObjects() {
             var scrollX = scrollOffset.getX();
             var foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
             while ( foundCol == null ) {
-                if ( isMaxCol() )
+                if ( worksheet.isMaxCol() )
+                {
+                    var lastCol = worksheet.cols[worksheet.nColsCount - 1];
+                    if ( mmToPt(x + w) + scrollX > lastCol.left ) {
+                        response.result = false;
+                        response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
+                    }
                     break;
+                }
                 worksheet.expandColsOnScroll(true);
                 worksheet.handlers.trigger("reinitializeScrollX");
                 foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
@@ -3436,8 +3448,15 @@ function DrawingObjects() {
             var scrollY = scrollOffset.getY();
             var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
             while ( foundRow == null ) {
-                if ( isMaxRow() )
+                if ( worksheet.isMaxRow() )
+                {
+                    var lastRow = worksheet.rows[worksheet.nRowsCount - 1];
+                    if ( mmToPt(y + h) + scrollY > lastRow.top ) {
+                        response.result = false;
+                        response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
+                    }
                     break;
+                }
                 worksheet.expandRowsOnScroll(true);
                 worksheet.handlers.trigger("reinitializeScrollY");
                 foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);

@@ -309,15 +309,15 @@ BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
 		if(null != uniColor.Mods){
 			for(var i = 0, length = uniColor.Mods.Mods.length; i < length; ++i){
 				var mod = uniColor.Mods.Mods[i];
-				if("tint" == mod.name){
+				if("wordTint" == mod.name){
 					this.memory.WriteByte(c_oSer_ColorThemeType.Tint);
 					this.memory.WriteByte(c_oSerPropLenType.Byte);
-					this.memory.WriteByte(Math.round(0xff * mod.val / 100000));
+					this.memory.WriteByte(Math.round(mod.val));
 				}
-				else if("shade" == mod.name){
+				else if("wordShade" == mod.name){
 					this.memory.WriteByte(c_oSer_ColorThemeType.Shade);
 					this.memory.WriteByte(c_oSerPropLenType.Byte);
-					this.memory.WriteByte(Math.round(0xff * mod.val / 100000));
+					this.memory.WriteByte(Math.round(mod.val));
 				}
 			}
 		}
