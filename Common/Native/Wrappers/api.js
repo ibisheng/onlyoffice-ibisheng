@@ -1414,10 +1414,10 @@ function asc_menu_WriteParagraphPr(_paraPr, _stream)
 
     asc_menu_WriteParaListType(23, _paraPr.ListType, _stream);
 
-    if (_paraPr.Style !== undefined && _paraPr.Style !== null)
+    if (_paraPr.StyleName !== undefined && _paraPr.StyleName !== null)
     {
         _stream["WriteByte"](24);
-        _stream["WriteString2"](_paraPr.Style);
+        _stream["WriteString2"](_paraPr.StyleName);
     }
 
     if (_paraPr.Jc !== undefined && _paraPr.Jc !== null)
@@ -1661,6 +1661,7 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
             case c_oAscTypeSelectElement.Paragraph:
             {
                 _stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
+                //console.log(JSON.stringify(this.SelectedObjectsStack[i].Value));
                 asc_menu_WriteParagraphPr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
