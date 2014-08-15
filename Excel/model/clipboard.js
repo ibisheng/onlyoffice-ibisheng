@@ -1816,6 +1816,7 @@
 				//****binary****
 				if(copyPasteUseBinary)
 				{
+					this.activeRange = worksheet.activeRange.clone(true);
 					binaryResult = this._pasteFromBinary(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					
 					if(binaryResult === true)
