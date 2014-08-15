@@ -5018,6 +5018,7 @@ CPresentation.prototype =
             // дублирование евента. когда будет undo-redo - тогда
             // эти евенты начнут отличаться
             editor.asc_fireCallback("asc_onDocumentModifiedChanged");
+			editor._onUpdateDocumentCanSave();
         }
         else
         {

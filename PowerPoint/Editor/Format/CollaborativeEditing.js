@@ -471,7 +471,7 @@ function CCollaborativeChanges()
 
 function CCollaborativeEditing()
 {
-    this.m_bUse         = false; // началось ли совместное редактирование
+	this.m_nUseType     = 1;  // 1 - 1 клиент и мы сохраняем историю, -1 - несколько клиентов, 0 - переход из -1 в 1
 
     this.m_aUsers       = []; // Список текущих пользователей, редактирующих данный документ
     this.m_aChanges     = []; // Массив с изменениями других пользователей
@@ -505,8 +505,14 @@ function CCollaborativeEditing()
 
     this.Start_CollaborationEditing = function()
     {
-        this.m_bUse = true;
+		this.m_nUseType = -1;
     };
+
+	this.End_CollaborationEditing = function()
+	{
+		if ( this.m_nUseType <= 0 )
+			this.m_nUseType = 0;
+	};
 
     this.Add_User = function(UserId)
     {
@@ -546,6 +552,7 @@ function CCollaborativeEditing()
     this.Add_Unlock2 = function(Lock)
     {
         this.m_aNeedUnlock2.push( Lock );
+		editor._onUpdateDocumentCanSave();
     };
 
     this.Apply_OtherChanges = function()
@@ -632,7 +639,7 @@ function CCollaborativeEditing()
 
         // Генерируем свои изменения
         var PointsCount = 0;
-        if ( true === m_bUse )
+		if ( this.m_nUseType <= 0 )
         {
             // (ненужные точки предварительно удаляем)
             History.Clear_Redo();
@@ -704,9 +711,26 @@ function CCollaborativeEditing()
 
         editor.CoAuthoringApi.saveChanges(aChanges);
 
-        // Чистим Undo/Redo
-        if(this.m_bUse)
-            History.Clear();
+		if ( -1 === this.m_nUseType )
+		{
+			// Чистим Undo/Redo только во время совместного редактирования
+			History.Clear();
+			History.SavedIndex = null;
+		}
+		else if ( 0 === this.m_nUseType )
+		{
+			// Чистим Undo/Redo только во время совместного редактирования
+			History.Clear();
+			History.SavedIndex = null;
+
+			this.m_nUseType = 1;
+		}
+		else
+		{
+			// Обновляем точку последнего сохранения в истории
+			History.Reset_SavedIndex();
+		}
+
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
@@ -886,7 +910,7 @@ function CCollaborativeEditing()
             editor.CoAuthoringApi.askLock( aIds, this.OnCallback_AskLock );
 
             // Ставим глобальный лок, только во время совместного редактирования
-            if ( true === this.m_bUse )
+			if ( -1 === this.m_nUseType )
                 this.m_bGlobalLock = true;
             else
             {
@@ -1185,6 +1209,9 @@ function CCollaborativeEditing()
         }
     };
 
+	this.getOwnLocksLength = function () {
+		return this.m_aNeedUnlock2.length;
+	};
 }
 
 var CollaborativeEditing = new CCollaborativeEditing();
