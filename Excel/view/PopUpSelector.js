@@ -25,7 +25,7 @@
 				suppressScrollX		: false,
 				suppressScrollY		: false,
 				scrollXMarginOffset	: 5,
-				scrollYMarginOffset	: 40,
+				scrollYMarginOffset	: 5,
 				includePadding		: false
 			};
 
