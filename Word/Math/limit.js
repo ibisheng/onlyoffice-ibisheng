@@ -26,7 +26,6 @@ CLimit.prototype.init = function(props)
 {
     // посмотреть GetAllFonts
     this.setProperties(props);
-    //this.fillContent();
 }
 CLimit.prototype.getAscent = function()
 {
@@ -40,22 +39,10 @@ CLimit.prototype.getAscent = function()
 }
 CLimit.prototype.getFName = function()
 {
-    /*var fName;
-    if(this.Pr.type == LIMIT_LOW)
-        fName = this.elements[0][0];
-    else if(this.Pr.type == LIMIT_UP)
-        fName = this.elements[1][0];*/
-
     return this.FName;
 }
 CLimit.prototype.getIterator = function()
 {
-    /*var iterator;
-    if(this.Pr.type == LIMIT_LOW)
-        iterator = this.elements[1][0];
-    else if(this.Pr.type == LIMIT_UP)
-        iterator = this.elements[0][0];*/
-
     return this.Iterator;
 }
 CLimit.prototype.setDistance = function()
@@ -69,74 +56,85 @@ CLimit.prototype.setProperties = function(props)
 
     this.setCtrPrp(props.ctrPrp);
 }
-CLimit.prototype.fillContent = function()
-{
-    this.setDimension(2, 1);
-
-    /*var oBase = new CMathContent();
-
-    var oIter = new CMathContent();
-    //oIter.decreaseArgSize();
-
-    if(this.Pr.type == LIMIT_LOW)
-        this.addMCToContent([oBase, oIter]);
-    else if(this.Pr.type == LIMIT_UP)
-        this.addMCToContent([oIter, oBase]);*/
-}
 CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
 {
     this.setProperties(props);
-    this.fillContent();
 
-    if(this.Pr.type == LIMIT_LOW)
-    {
-        // Base
-        this.elements[0][0] = contents[0];
+    this.FName = contents[0];
+    this.Iterator = contents[1];
 
-        // Iterator
-        this.elements[1][0] = contents[1];
-    }
-    else
-    {
-        // Iterator
-        this.elements[0][0] = contents[1];
-
-        // Base
-        this.elements[1][0] = contents[0];
-    }
-
+    this.RecalcInfo.bProps = true;
 }
 CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(ParaMath);
+    //this.Set_CompiledCtrPrp(ParaMath);
 
-    if(this.RecalcInfo.bProps == true)
+    if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
     {
-        this.setDimension(2, 1);
-
-        if(this.Pr.type == LIMIT_LOW)
+        if(RPI.bInline == true)
         {
-            this.elements[0][0] = this.FName;
-            this.elements[1][0] = this.Iterator;
+            this.setDimension(1, 1);
+
+
+            var props;
+
+            if(this.Pr.type == LIMIT_LOW)
+            {
+                props =
+                {
+                    type:   DEGREE_SUBSCRIPT,
+                    ctrPrp: this.CtrPrp
+                };
+            }
+            else
+            {
+                props =
+                {
+                    type:   DEGREE_SUPERSCRIPT,
+                    ctrPrp: this.CtrPrp
+                };
+            }
+
+            this.elements[0][0] = new CDegree(null, true);
+            this.elements[0][0].fillMathComposition(props, [this.FName, this.Iterator]);
         }
         else
         {
-            this.elements[0][0] = this.Iterator;
-            this.elements[1][0] = this.FName;
+            this.setDimension(2, 1);
+
+            if(this.Pr.type == LIMIT_LOW)
+            {
+                this.elements[0][0] = this.FName;
+                this.elements[1][0] = this.Iterator;
+            }
+            else
+            {
+                this.elements[0][0] = this.Iterator;
+                this.elements[1][0] = this.FName;
+            }
         }
+
 
         this.RecalcInfo.bProps = false;
     }
 
-    this.FName.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
-    var ArgSzIter = ArgSize.Copy();
-    ArgSzIter.decrease();
+    if(RPI.bInline == true)
+    {
+        this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    }
+    else
+    {
+        this.FName.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
-    this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
+        var ArgSzIter = ArgSize.Copy();
+        ArgSzIter.decrease();
+
+        this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
+    }
 
     this.recalculateSize(oMeasure);
 }

@@ -1037,7 +1037,7 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.RecalcInfo.bProps = false;
     }
 
-    this.Set_CompiledCtrPrp(ParaMath);
+    //this.Set_CompiledCtrPrp(ParaMath);
 
     if(this.Pr.type == SQUARE_RADICAL)
         this.RealBase.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
@@ -1077,7 +1077,7 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         ascent = gapBase + shTop + this.RealBase.size.ascent;
         //ascent = height - (base.height - base.ascent);
 
-        //width += this.GapLeft + this.GapRight;
+        width += this.GapLeft + this.GapRight;
 
         this.size = {width: width, height: height, ascent: ascent};
     }
@@ -1097,8 +1097,7 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
         var wDegree = this.Iterator.size.width > wTick ? this.Iterator.size.width - wTick : 0;
         width = wDegree + sign.width + this.gapWidth;
-
-        //width += this.GapLeft + this.GapRight;
+        width += this.GapLeft + this.GapRight;
 
         var gapDegree;
         if( this.RealBase.size.height < plH )
@@ -1127,7 +1126,7 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.size = {width: width, height: height, ascent: ascent};
     }
 }
-CRadical.prototype.setPosition = function(pos)
+CRadical.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -1147,7 +1146,7 @@ CRadical.prototype.setPosition = function(pos)
         PosBase.y = this.pos.y + gapTop;
 
         this.signRadical.setPosition(PosRadical);
-        this.RealBase.setPosition(PosBase);
+        this.RealBase.setPosition(PosBase, PosInfo);
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
@@ -1162,7 +1161,7 @@ CRadical.prototype.setPosition = function(pos)
         PosDegree.x = this.pos.x + this.GapLeft + this.gapWidth;
         PosDegree.y = this.pos.y + this.gapDegree;
 
-        this.Iterator.setPosition(PosDegree);
+        this.Iterator.setPosition(PosDegree, PosInfo);
 
         var wDegree = this.Iterator.size.width > wTick ? this.Iterator.size.width - wTick : 0;
 
@@ -1174,7 +1173,7 @@ CRadical.prototype.setPosition = function(pos)
         PosBase.x = this.pos.x + this.size.width - this.RealBase.size.width - this.GapRight;
         PosBase.y = this.pos.y + this.size.ascent - this.RealBase.size.ascent;
 
-        this.RealBase.setPosition(PosBase);
+        this.RealBase.setPosition(PosBase, PosInfo);
     }
 }
 CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)

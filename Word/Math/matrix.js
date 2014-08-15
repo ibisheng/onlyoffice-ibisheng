@@ -93,7 +93,7 @@ CMathMatrix.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
     if(minGap == minGap - 0 && minGap == minGap^0)
         oSpace.minGap = minGap;
 }
-CMathMatrix.prototype.recalculateSize = function(oMeasure)
+CMathMatrix.prototype.recalculateSize = function(oMeasure, RPI)
 {
     if(this.RecalcInfo.bProps)
     {
@@ -135,7 +135,7 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
     var intervalRow = this.getRowSpace(txtPrp);
 
     var divCenter = 0;
-    var metrics = this.getMetrics();
+    var metrics = this.getMetrics(RPI);
 
     var plH = 0.2743827160493827 * txtPrp.FontSize;
     var minGp = this.spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
@@ -180,11 +180,11 @@ CMathMatrix.prototype.recalculateSize = function(oMeasure)
         ascent = this.getAscent(oMeasure, height);
 
 
-    //width += this.GapLeft + this.GapRight;
+    width += this.GapLeft + this.GapRight;
 
     this.size = {width: width, height: height, ascent: ascent};
 }
-CMathMatrix.prototype.setPosition = function(pos)
+CMathMatrix.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
 
@@ -201,6 +201,7 @@ CMathMatrix.prototype.setPosition = function(pos)
 
     var h = 0, w = 0;
 
+
     for(var i=0; i < this.nRow; i++)
     {
         w = 0;
@@ -210,7 +211,7 @@ CMathMatrix.prototype.setPosition = function(pos)
             NewPos.x = this.pos.x + this.GapLeft + al.x + w;
             NewPos.y = this.pos.y + al.y + h;
 
-            this.elements[i][j].setPosition(NewPos);
+            this.elements[i][j].setPosition(NewPos, PosInfo);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];
@@ -300,28 +301,25 @@ CMathMatrix.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLi
     return result;
 
 }
-CMathMatrix.prototype.getMetrics = function()
+CMathMatrix.prototype.getMetrics = function(RPI)
 {
     var Ascents = [];
     var Descents = [];
     var Widths = [];
 
-    for(tt = 0; tt < this.nRow; tt++ )
-    {
-        Ascents[tt] = 0;
-        Descents[tt] = 0;
-    }
-    for(var tt = 0; tt < this.nCol; tt++ )
-        Widths[tt] = 0;
-
     for(var i=0; i < this.nRow; i++)
+    {
+        Ascents[i]  = 0;
+        Descents[i] = 0;
+
         for(var j = 0; j < this.nCol ; j++)
         {
             var size = this.elements[i][j].size;
-            Widths[j] = ( Widths[j] > size.width ) ? Widths[j] : size.width;
-            Ascents[i] = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
+            Widths[j]   = i > 0  && ( Widths[j] > size.width ) ? Widths[j] : size.width;
+            Ascents[i]  = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
             Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
         }
+    }
 
     return {ascents: Ascents, descents: Descents, widths: Widths}
 }
@@ -680,6 +678,11 @@ function CEqArray(props)
 
     this.setDefaultSpace();
 
+    // for ampersand in Run
+    this.WidthsPoints = [];
+    this.Points = [];
+    //
+
     ////  special for "read"  ////
     this.column = 0;
     ////
@@ -698,6 +701,161 @@ CEqArray.prototype.init = function(props)
 {
     this.setProperties(props);
     this.fillContent();
+}
+CEqArray.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    RPI.bEqqArray = true;
+
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    //this.Set_CompiledCtrPrp(ParaMath);
+
+    RPI.AmperWPoints = new AmperWidths();
+
+    for(var i = 0; i < this.nRow; i++)
+    {
+        RPI.AmperWPoints.AddWRow();
+        this.elements[i][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    }
+
+
+    this.recalculateSize(oMeasure, RPI);
+
+    RPI.AmperWPoints = null;
+    RPI.bEqqArray     = false;
+
+    //CEqArray.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
+}
+CEqArray.prototype.getMetrics = function(RPI)
+{
+    var AscentsMetrics = [];
+    var DescentsMetrics = [];
+    var WidthsMetrics = [];
+
+    // нумерация начинается с нуля, поэтому все четные точки идут с нечетными номерами в массиве
+
+    //var lngW = RPI.Widths.length; // this.nRow
+    var EndWidths = 0;
+
+    var even, // четная точка
+        odd,  // нечетная точка
+        last;
+
+    var Pos = 0;
+
+    this.WidthsPoints.length = 0;
+    this.Points.length       = 0;
+
+    WidthsMetrics[0] = 0;
+
+    while(EndWidths < this.nRow)
+    {
+        even = 0;
+        odd  = 0;
+        last = 0;
+
+        for(var i = 0; i < this.nRow; i++)
+        {
+            var W   = RPI.AmperWPoints.Widths[i],
+                len = RPI.AmperWPoints.Widths[i].length;
+
+            if(Pos < len && Pos + 1 < len)
+            {
+                even = even > W[Pos]   ? even : W[Pos];     // before "odd"
+                odd  = odd  > W[Pos+1] ? odd  : W[Pos+1];   // after  "odd"
+            }
+            else if(Pos < len)
+            {
+                last = last > W[Pos] ? last: W[Pos];
+            }
+
+            if(Pos + 1 == len || Pos + 2 == len)
+                EndWidths++;
+        }
+
+        var w = even + odd > last ? even + odd : last;
+
+        this.WidthsPoints.push(w);
+        this.Points.push(even);
+
+        WidthsMetrics[0] += w;
+
+        Pos += 2;
+    }
+
+    if(true)
+    {
+        var str = "";
+
+        for(var i = 0; i < this.WidthsPoints.length; i++)
+        {
+            var num = this.WidthsPoints[i].toFixed(3);
+            str += num + " ";
+        }
+
+        console.log(str);
+    }
+
+    for(var i = 0; i < this.nRow; i++)
+    {
+        var size = this.elements[i][0].size;
+        AscentsMetrics[i]  = size.ascent;
+        DescentsMetrics[i] = size.height - size.ascent;
+    }
+
+
+    /*for(var tt = 0; tt < this.nCol; tt++ )
+        Widths[tt] = 0;
+
+    for(var i=0; i < this.nRow; i++)
+    {
+        Ascents[i]  = 0;
+        Descents[i] = 0;
+
+        for(var j = 0; j < this.nCol ; j++)
+        {
+            var size = this.elements[i][j].size;
+            Widths[j]   =  i > 0 && ( Widths[j] > size.width ) ? Widths[j] : size.width;
+            Ascents[i]  = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
+            Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
+        }
+    }*/
+
+    return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
+}
+CEqArray.prototype.setPosition = function(pos, PosInfo)
+{
+    PosInfo.Widths = this.WidthsPoints;
+    PosInfo.Points = this.Points;
+
+    this.pos.x = pos.x;
+
+    if(this.bInside === true)
+        this.pos.y = pos.y;
+    else
+        this.pos.y = pos.y - this.size.ascent; ///!!!!
+
+    var maxWH = this.getWidthsHeights();
+    var Heights = maxWH.heights;
+
+    var NewPos = new CMathPosition();
+
+    var h = 0;
+
+    for(var i=0; i < this.nRow; i++)
+    {
+        NewPos.x = this.pos.x + this.GapLeft;
+        NewPos.y = this.pos.y + h;
+
+        this.elements[i][0].setPosition(NewPos, PosInfo);
+
+        h += Heights[i] + this.gaps.row[i];
+    }
+
+    PosInfo.Widths.length = 0;
+    PosInfo.Points.length = 0;
+
 }
 CEqArray.prototype.setProperties = function(props)
 {

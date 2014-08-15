@@ -25,6 +25,7 @@ function ParaMath()
 
     this.Root       = new CMathContent();
     this.Root.bRoot = true;
+    this.NotDraw    = false;
     //this.Root.setComposition(this);
 
     this.X          = 0;
@@ -544,14 +545,21 @@ ParaMath.prototype =
         var ArgSize = new CMathArgSize();
 
         this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize,  TextPr);
+
+        this.NotDraw = RPI.bManyRuns;
+
         //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
         this.OldMathPara = this.MathPara;
 
 
+
+        var PosInfo = new CMathPosInfo();
+
         var pos = new CMathPosition();
         pos.x = 0;
         pos.y = 0;
-        this.Root.setPosition(pos);
+
+        this.Root.setPosition(pos, PosInfo);
 
         this.Width        = this.Root.size.width;
         this.Height       = this.Root.size.height;
@@ -1225,8 +1233,12 @@ ParaMath.prototype =
             // this.absPos.x ~> this.X
             // this.absPos.y ~> this.Y
 
-            this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
+            if(this.NotDraw == false)
+                this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
+
             PDSE.X += this.Width;
+
+
         }
 
         /*PDSE.Graphics.p_color(255,0,0, 255);

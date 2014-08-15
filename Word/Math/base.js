@@ -1,7 +1,5 @@
 "use strict";
 
-
-
 function CMathBase(bInside)
 {
     //this.typeObj = MATH_COMP;
@@ -212,6 +210,10 @@ CMathBase.prototype =
     {
         return false;
     },
+    IsEqqArray: function()
+    {
+        return false;
+    },
     getWidthsHeights: function()
     {
         var Widths = [];
@@ -302,7 +304,7 @@ CMathBase.prototype =
 
         return PosAlign;
     },
-    setPosition: function(pos)
+    setPosition: function(pos, PosInfo)
     {
         this.pos.x = pos.x;
 
@@ -326,7 +328,7 @@ CMathBase.prototype =
                 var al = this.align(i, j);
                 NewPos.x = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
                 NewPos.y = this.pos.y + al.y + this.dH*i + h;
-                this.elements[i][j].setPosition(NewPos);
+                this.elements[i][j].setPosition(NewPos, PosInfo);
                 w += Widths[j];
             }
             h += Heights[i];
@@ -362,8 +364,7 @@ CMathBase.prototype =
         for(var i=0; i < this.nCol ; i++)
             width += Widths[i];
 
-        width += this.dW*(this.nCol - 1);
-        //width += this.GapLeft + this.GapRight;
+        width += this.dW*(this.nCol - 1) + this.GapLeft + this.GapRight;
 
         var ascent = this.getAscent(oMeasure, height);
 
@@ -374,7 +375,7 @@ CMathBase.prototype =
         this.Parent = Parent;
         this.ParaMath = ParaMath;
 
-        this.Set_CompiledCtrPrp(ParaMath);
+        //this.Set_CompiledCtrPrp(ParaMath);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
@@ -767,8 +768,9 @@ CMathBase.prototype =
     },
     SetGaps:  function(GapsInfo)
     {
-        //this.Parent   = Parent;
-        //this.ParaMath = ParaMath;
+        this.Parent   = GapsInfo.Parent;
+        this.ParaMath = GapsInfo.ParaMath;
+
 
         GapsInfo.Left       = GapsInfo.Current;
         GapsInfo.leftRunPrp = GapsInfo.currRunPrp;
@@ -780,10 +782,10 @@ CMathBase.prototype =
         GapsInfo.setGaps();
 
     },
-    ApplyGaps: function()
+    /*ApplyGaps: function()
     {
         this.size.width += this.GapLeft + this.GapRight;
-    },
+    },*/
     Recalculate_Reset: function(StartRange, StartLine)
     {
         for(var i=0; i < this.nRow; i++)

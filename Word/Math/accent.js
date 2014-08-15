@@ -1067,7 +1067,7 @@ CAccent.prototype.old_init = function(properties)
     this.elements[0][0].SetDot(true);
 
 }
-CAccent.prototype.setPosition = function(pos)
+CAccent.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -1092,7 +1092,7 @@ CAccent.prototype.setPosition = function(pos)
     PosBase.x = this.pos.x + this.GapLeft + alignCnt;
     PosBase.y = this.pos.y + this.operator.size.height + this.gap;
 
-    this.elements[0][0].setPosition(PosBase);
+    this.elements[0][0].setPosition(PosBase, PosInfo);
 }
 CAccent.prototype.getPropsForWrite = function()
 {

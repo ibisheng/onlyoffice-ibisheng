@@ -52,12 +52,9 @@ function ParaRun(Paragraph, bMathRun)
         this.Type = para_Math_Run;
         this.MathPrp = new CMPrp();
         this.Parent = null;
-        this.size =
-        {
-            ascent: 0,
-            height: 0,
-            width: 0
-        };
+        this.bEqqArray = false;
+        this.WidthsPoints = [];
+        this.size = new CMathSize();
     }
     this.StartState = null;
 
@@ -7562,19 +7559,89 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.PosE  = PosE;
     this.Color = Color;
 }
-
-
-ParaRun.prototype.setPosition = function(_pos)
+ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
 {
-    var pos = new CMathPosition();
+    var NewPos = new CMathPosition();
 
-    pos.x = _pos.x;
-    pos.y = _pos.y - this.size.ascent;
+    NewPos.x = pos.x;
+    NewPos.y = pos.y - this.size.ascent;
 
-    for(var i = 0; i < this.Content.length; i++)
+
+    if(this.bEqqArray)
     {
-        this.Content[i].setPosition(pos);
-        pos.x += this.Content[i].size.width;
+        var align = 0;
+        // нечетным точкам соответствуют четные индексы в массиве
+
+        var Pos = 0,
+            lng = this.Content.length,
+            Amp = 1;
+
+        var W = 0;
+        var WPointsLng = this.WidthsPoints.length;
+        var widthCurrPoint = 0;
+
+
+        for(var j = 0; j < WPointsLng; j += 2)
+        {
+            widthCurrPoint = 0;
+
+            if(j == WPointsLng - 1)
+                align = (PosInfo.Widths[j/2] - this.WidthsPoints[j])/2; // то есть последняя точка четная, выравнивание по центру
+            else
+                align = PosInfo.Points[j/2] - this.WidthsPoints[j];
+
+            NewPos.x += align;
+
+            while(Pos < lng && Amp < 3)
+            {
+                if(this.Content[Pos].Type == para_Math_Ampersand)
+                {
+                    Amp++;
+                    if(Amp < 3)
+                    {
+                        this.Content[Pos].setPosition(NewPos);
+                        Pos++;
+                    }
+                }
+                else
+                {
+                    this.Content[Pos].setPosition(NewPos);
+                    NewPos.x += this.Content[Pos].size.width;
+                    widthCurrPoint += this.Content[Pos].size.width;
+                    W += this.Content[Pos].size.width;
+                    Pos++;
+                }
+            }
+
+            NewPos.x += PosInfo.Widths[j/2] - widthCurrPoint - align; // выравнивание справа
+
+            Amp = 0;
+        }
+
+        /*if(Pos < lng)
+        {
+            var Index = this.WidthsPoints.length/2;
+            align = (PosInfo.Widths[Index] - (this.size.width - W))/2;
+            NewPos.x += align;
+
+            while(Pos < lng)
+            {
+                {
+                    this.Content[Pos].setPosition(NewPos);
+                    NewPos.x += this.Content[Pos].size.width;
+                    Pos++;
+                }
+            }
+        }*/
+        //
+    }
+    else
+    {
+        for(var i = 0; i < this.Content.length; i++)
+        {
+            this.Content[i].setPosition(NewPos);
+            NewPos.x += this.Content[i].size.width;
+        }
     }
 }
 ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
@@ -7612,7 +7679,6 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     // пересчет элементов контента в Run
     // Recalculate_MeasureContent
 
-
     // ParaText (ParagraphContent.js)
     // для настройки TextPr
     // Measure
@@ -7631,8 +7697,6 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     // обновляем позиции start и end для Range
     this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
 
-    var width = 0,
-        ascent = 0, descent = 0;
 
 
     var oWPrp = this.Get_CompiledPr(true);
@@ -7652,22 +7716,81 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
 
     g_oTextMeasurer.SetFont(oWPrp);
 
+    this.WidthsPoints.length = 0;
 
-    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+    this.bEqqArray = RPI.bEqqArray;
+    var Widths, PosW = 0;
+
+    if(RPI.bEqqArray)
     {
-        this.Content[Pos].Resize(oMeasure, this);
-        this.Content[Pos].ApplyGaps();
+        Widths = RPI.AmperWPoints.GetWidths();
 
-        var oSize = this.Content[Pos].size;
-        width += oSize.width;
-
-        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-        var oDescent = oSize.height - oSize.ascent;
-        descent =  descent < oDescent ? oDescent : descent;
+        Widths[0] = 0
+        this.WidthsPoints.length = 0;
+        this.WidthsPoints[0] = 0;
     }
 
+    this.size.SetZero();
 
-    this.size = {width: width, height: ascent + descent, ascent: ascent};
+    var widthCurr = 0,
+        ascent = 0, descent = 0;
+
+    for (var i = 0 ; i < this.Content.length; i++ )
+    {
+        this.Content[i].Resize(oMeasure, this, RPI);
+
+        var oSize = this.Content[i].size;
+
+        widthCurr = oSize.width + this.Content[i].GapLeft + this.Content[i].GapRight;
+        this.size.width += widthCurr;
+
+        var oDescent = oSize.height - oSize.ascent;
+
+        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+        descent = descent < oDescent ? oDescent : descent;
+
+       /*if(this.Content[i].Type == para_Math_Ampersand && RPI.bEqqArray)
+        {
+            if(PosW == lng)
+            {
+                RPI.Widths[PosW] = W;
+                RPI.SingleAmpEnd    = true;
+            }
+            else
+            {
+                RPI.Widths[PosW] = RPI.Widths[PosW] > W ? RPI.Widths[PosW] : W;
+
+                if(PosW == lng -1)
+                    RPI.SingleAmpEnd    = false;
+            }
+
+            PosW++;
+
+            W = 0;
+        }
+        else
+            W += width;*/
+
+
+        if(RPI.bEqqArray)
+        {
+            if(this.Content[i].Type == para_Math_Ampersand)
+            {
+                PosW++;
+                Widths[PosW] = 0;
+                this.WidthsPoints[PosW] = 0;
+            }
+            else
+            {
+                Widths[PosW] += widthCurr;
+                this.WidthsPoints[PosW] += widthCurr;
+            }
+        }
+
+    }
+
+    this.size.ascent = ascent;
+    this.size.height = ascent + descent;
 }
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {
@@ -7770,10 +7893,10 @@ ParaRun.prototype.getPropsForWrite = function()
 }
 ParaRun.prototype.Math_SetGaps = function(GapsInfo)
 {
-    //this.Parent    = Parent;
-    //this.Paragraph = Paragraph;
-
+    this.Parent = GapsInfo.Parent;
+    this.Paragraph = GapsInfo.ParaMath.Paragraph;
     var oWPrp = this.Get_CompiledPr(true);
+
     //this.Parent.ParaMath.ApplyArgSize(oWPrp, this.Parent.argSize);
 
     /*if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
@@ -7824,6 +7947,14 @@ ParaRun.prototype.Math_ApplyGaps = function()
         this.Content[Pos].ApplyGaps();
         this.size.width += this.Content[Pos].GapLeft + this.Content[Pos].GapRight;
     }
+}
+ParaRun.prototype.GetCompiled_ScrStyles = function()
+{
+    return this.MathPrp.GetCompiled_ScrStyles();
+}
+ParaRun.prototype.IsEqqArray = function()
+{
+    return this.Parent.IsEqqArray();
 }
 
 

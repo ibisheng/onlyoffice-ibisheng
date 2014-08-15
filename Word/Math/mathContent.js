@@ -41,6 +41,9 @@ function CRPI()
     this.bInline         = false;
     this.bChangeInline   = false;
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
+    this.bEqqArray       = false; /*для амперсанда*/
+    this.AmperWPoints     = null;
+    this.bManyRuns       = false;
 }
 CRPI.prototype.Copy = function()
 {
@@ -53,6 +56,36 @@ CRPI.prototype.Copy = function()
 
     return RPI;
 }
+
+function CMathPosInfo()
+{
+    this.CurrPoint = 0;
+    this.Widths    = [];
+    this.Points    = [];
+}
+
+function CMathPosition()
+{
+    this.x  = 0;
+    this.y  = 0;
+}
+
+
+function AmperWidths()
+{
+    this.CurrRow = -1;
+    this.Widths = [];
+}
+AmperWidths.prototype.GetWidths = function()
+{
+    return this.Widths[this.CurrRow];
+}
+AmperWidths.prototype.AddWRow = function()
+{
+    this.CurrRow++;
+    this.Widths[this.CurrRow] = new Array();
+}
+
 
 function CGaps(oSign, oEqual, oZeroOper, oLett)
 {
@@ -198,12 +231,12 @@ CMathArgSize.prototype =
 // TODO
 // проконтролировать GapLeft и GapRight для setPosition всех элементов
 
-function CMathGapsInfo(oMeasure, argSize)
+function CMathGapsInfo(oMeasure, Parent, argSize)
 {
     this.measure = oMeasure;
 
-    //this.Parent = Parent;
-    //this.ParaMath = this.Parent.ParaMath; // для Para_Run
+    this.Parent   = Parent;
+    this.ParaMath = this.Parent.ParaMath; // для Para_Run
 
     this.argSize = argSize; // argSize выставляем один раз для всего контента
     this.leftRunPrp = null; // Run_Prp левого элемента
@@ -476,7 +509,7 @@ CMathGapsInfo.prototype =
                         if(leftCoeff > rightCoeff)
                             leftCoeff -= rightCoeff;
                     }
-                    else
+                    else if(this.Left.Type == para_Math_Text)
                     {
                         leftCode = this.Left.getCodeChr();
                         leftCoeff = COEFF_GAPS.getCoeff(currCode, leftCode, -1);
@@ -487,7 +520,7 @@ CMathGapsInfo.prototype =
                 else
                     this.Current.GapLeft = 0;
             }
-            else
+            else if(this.Current.Type == para_Math_Composition)
             {
                 leftCoeff = this.getGapsMComp(this.Current, -1);
 
@@ -507,7 +540,7 @@ CMathGapsInfo.prototype =
                         else
                             leftCoeff -= rightCoeff/2;
                     }
-                    else
+                    else if(this.Left.Type == para_Math_Text)
                     {
                         leftCode = this.Left.getCodeChr();
                         rightCoeff = COEFF_GAPS.getCoeff(leftCode, -1, 1);
@@ -704,7 +737,6 @@ CMPrp.prototype =
 
 
 
-
 function CMathContent()
 {
 	this.Id = g_oIdCounter.Get_NewId();		
@@ -744,13 +776,7 @@ function CMathContent()
 
     this.NearPosArray = [];
 
-    this.size =
-    {
-        width: 0,
-        height: 0,
-        ascent: 0
-    };
-
+    this.size = new CMathSize();
 	
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
@@ -3804,10 +3830,8 @@ CMathContent.prototype =
 
         this.content.push( placeholder );*/
     },
-
     //////////////////////////////////////
-
-    recalculateSize: function(oMeasure, RPI, ArgSize)
+    recalculateSize: function()
     {
         var width      =   0 ;
         var ascent     =   0 ;
@@ -3834,7 +3858,6 @@ CMathContent.prototype =
             descent =  descent < oDescent ? oDescent : descent;
         }
 
-
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },
     Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // пересчитываем всю формулу
@@ -3845,49 +3868,80 @@ CMathContent.prototype =
             this.Compiled_ArgSz.Merge(ArgSize);
         }
 
-        var GapsInfo = new CMathGapsInfo(oMeasure, this.Compiled_ArgSz.value);
-
         this.ParaMath = ParaMath;
-
         if(Parent !== null)
         {
             this.bRoot = false;
             this.Parent = Parent;
         }
+
+
+        var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
+
+
 		if (!this.bRoot && this.content.length == 0)
 			this.fillPlaceholders();
 
         var lng = this.content.length;
 
+        this.size.SetZero();
+
+        var bManyRuns =  RPI.bEqqArray == true && this.content.length > 1;
+        if(bManyRuns)
+            RPI.bManyRuns = true;
+
+
         for(var pos = 0; pos < lng; pos++)
         {
-
             if(this.content[pos].Type == para_Math_Composition)
             {
-                // мержим ctrPrp до того, как добавим Gaps !
-
-                //this.content[pos].Set_CompiledCtrPrp(ParaMath); // без ParaMath не смержим ctrPrp
-
                 // обнуляем Gaps, чтобы при расчете ширины они не участвовалиу
-                this.content[pos].GapLeft = 0;
-                this.content[pos].GapRight = 0;
-                this.content[pos].Resize(oMeasure, this, ParaMath, RPI, this.Compiled_ArgSz);
+                /*this.content[pos].GapLeft = 0;
+                this.content[pos].GapRight = 0;*/
+
+                this.content[pos].Set_CompiledCtrPrp(this.ParaMath);
                 this.content[pos].SetGaps(GapsInfo);
-                //this.content[pos].ApplyGaps();
             }
             else if(this.content[pos].Type == para_Math_Run /*&& !this.content[pos].Is_Empty()*/)
-            {
-                this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz);
                 this.content[pos].Math_SetGaps(GapsInfo);
-                //this.content[pos].Math_ApplyGaps();
-            }
+
+
+            if(pos > 0)
+                this.recalculateSize_2(pos-1, oMeasure, Parent, ParaMath, RPI);
+
         }
 
         if(GapsInfo.Current !== null)
             GapsInfo.Current.GapRight = 0;
 
+        if(lng > 0)
+            this.recalculateSize_2(lng-1, oMeasure, Parent, ParaMath, RPI);
 
-        this.recalculateSize(oMeasure, RPI, this.Compiled_ArgSz);
+
+    },
+    recalculateSize_2: function(pos, oMeasure, Parent, ParaMath, RPI)
+    {
+        if(this.content[pos].Type == para_Math_Composition)
+            this.content[pos].Resize(oMeasure, this, ParaMath, RPI, this.Compiled_ArgSz);
+        else if(this.content[pos].Type == para_Math_Run)
+            this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz);
+
+        this.WidthToElement[pos] = this.size.width;
+
+        var oSize = this.content[pos].size;
+        this.size.width += oSize.width;
+
+        var oDescent = oSize.height - oSize.ascent,
+            SizeDescent = this.size.height - this.size.ascent;
+
+        this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
+
+        this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
+
+    },
+    IsEqqArray: function()
+    {
+        return this.Parent.IsEqqArray();
     },
     Get_CompiledArgSize: function()
     {
@@ -4009,23 +4063,27 @@ CMathContent.prototype =
     {
         return false;
     },
-    setPosition: function(pos)
+    setPosition: function(pos, PosInfo)
     {
         this.pos.x = pos.x;
         this.pos.y = pos.y;
 
-        var NewPos = new CMathPosition();
-
-        NewPos.x = pos.x;
-        NewPos.y = pos.y + this.size.ascent;    // y по baseline;
-
+        var x = pos.x,
+            y = pos.y + this.size.ascent;    // y по baseline;
 
         for(var i=0; i < this.content.length; i++)
         {
-            this.content[i].setPosition(NewPos);
-            NewPos.x += this.content[i].size.width;
-        }
+            var NewPos = new CMathPosition();
+            NewPos.x = x;
+            NewPos.y = y;
 
+            if(this.content[i].Type == para_Math_Run)
+                this.content[i].Math_SetPosition(NewPos, PosInfo);
+            else
+                this.content[i].setPosition(NewPos, PosInfo);
+
+            x += this.content[i].size.width;
+        }
     },
     ///// properties /////
     SetDot: function(flag)

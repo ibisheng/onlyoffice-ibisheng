@@ -21,10 +21,17 @@ var StartTextElement = 0x2B1A; // Cambria Math
 // смена хентов
 // editor.SetFontRenderingMode(2);
 
-function CMathPosition()
+function CMathSize()
 {
-    this.x  = 0;
-    this.y  = 0;
+    this.width  = 0;
+    this.height = 0;
+    this.ascent = 0;
+}
+CMathSize.prototype.SetZero = function()
+{
+    this.width  = 0;
+    this.height = 0;
+    this.ascent = 0;
 }
 
 function CMathText(bJDraw)
@@ -33,8 +40,9 @@ function CMathText(bJDraw)
     this.Type = para_Math_Text;
 
     this.bJDraw = bJDraw;
-    this.size = null;
+    this.size = new CMathSize();
     this.value = null;
+    this.Parent = null;
     this.pos = new CMathPosition();
 
     this.rasterOffsetX = 0;
@@ -77,7 +85,7 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        var Compiled_MPrp = this.bJDraw ? null : this.Parent.MathPrp.GetCompiled_ScrStyles();
+        var Compiled_MPrp = this.bJDraw ? null : this.Parent.GetCompiled_ScrStyles();
 
         if(this.Type === para_Math_Placeholder || this.bJDraw || Compiled_MPrp.nor)
             return code;
@@ -464,7 +472,7 @@ CMathText.prototype =
         this.Type = para_Math_Placeholder;
         this.value = StartTextElement;
     },
-    Resize: function(oMeasure, Run)
+    Resize: function(oMeasure, Parent, RPI)
     {
         /*
          var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
@@ -475,8 +483,8 @@ CMathText.prototype =
         this.GapLeft = 0;
         this.GapRight = 0;
 
-        if(!this.bJustDraw)
-            this.Parent = Run;
+        if(!this.bJDraw)
+            this.Parent = Parent;
         else
             this.Parent = null;
 
@@ -508,14 +516,19 @@ CMathText.prototype =
 
         this.WidthVisible = width;
 
-        this.size = {width: width, widthG: width, height: height, ascent: ascent};
-    },
-    ApplyGaps: function()
-    {
-        this.size.width += this.GapLeft + this.GapRight;
+        this.size.width  = this.GapLeft + this.GapRight + width;
+        this.size.height = height;
+        this.size.ascent = ascent;
 
-        this.WidthVisible = this.size.width;
+        //this.size = {width: width, widthG: width, height: height, ascent: ascent};
     },
+    /*ApplyGaps: function()
+    {
+        this.size.SetZero();
+
+        this.size.width = this.GapLeft + this.GapRight;
+        this.WidthVisible = this.size.width;
+    },*/
     draw: function(x, y, pGraphics)
     {
         var X = this.pos.x + x,
@@ -677,12 +690,6 @@ CMathText.prototype =
 
         return NewLetter;
     },
-
-    // заглушка для текста (для n-арных операторов, когда выставляется текст вместо оператора)
-    setComposition: function() // заглушка
-    {},
-    setReferenceComposition: function() // заглушка
-    {},
     Write_ToBinary : function(Writer)
     {
         // Long : Type
@@ -695,6 +702,88 @@ CMathText.prototype =
     Read_FromBinary : function(Reader)
     {
         this.value      = Reader.GetLong();
+    }
+
+}
+
+function CMathAmp()
+{
+    this.bEqqArray = false;
+    this.Type = para_Math_Ampersand;
+
+    this.pos = new CMathPosition();
+
+    this.AmpText = new CMathText(false);
+    this.AmpText.add(0x26);
+
+    this.size = null;
+    this.Parent = null;
+}
+CMathAmp.prototype =
+{
+    Resize: function(oMeasure, Parent, RPI)
+    {
+        this.Parent = Parent;
+        this.bEqqArray = RPI.bEqqArray;
+
+        this.AmpText.Resize(oMeasure, this, RPI);
+
+        if(this.bEqqArray)
+        {
+            this.size =
+            {
+                width: 0,
+                height: 0,
+                ascent: 0
+            };
+        }
+        else
+        {
+            this.size =
+            {
+                width:      this.AmpText.size.width,
+                height:     this.AmpText.size.height,
+                ascent:     this.AmpText.size.ascent
+            };
+        }
+    },
+    setPosition: function(pos)
+    {
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
+
+        if(this.bEqqArray==false)
+            this.AmpText.setPosition(pos);
+    },
+    draw: function(x, y, pGraphics)
+    {
+        if(this.bEqqArray==false)
+            this.AmpText.draw(x, y, pGraphics);
+        else
+        {
+            var X  = x + this.pos.x,
+                Y  = y + this.pos.y,
+                Y2 = y + this.pos.y - this.AmpText.size.height;
+            pGraphics.p_color(0,0,0, 255);
+            pGraphics.drawVerLine(0, X, Y, Y2, 0.1);
+        }
+    },
+    IsPlaceholder: function()
+    {
+        return false;
+    },
+    /*ApplyGaps: function()
+    {
+        if(this.bEqqArray==false)
+            this.AmpText.ApplyGaps();
+    },*/
+    GetCompiled_ScrStyles: function()
+    {
+        return this.Parent.GetCompiled_ScrStyles();
+    },
+    IsAccent: function()
+    {
+        return this.Parent.IsAccent();
     }
 
 }

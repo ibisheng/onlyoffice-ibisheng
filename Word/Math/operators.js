@@ -3468,7 +3468,7 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(ParaMath);
+    //this.Set_CompiledCtrPrp(ParaMath);
 
     if(this.RecalcInfo.bProps == true)
     {
@@ -3557,7 +3557,7 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     // Общая ширина
     var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
-
+    width += this.GapLeft + this.GapRight;
 
     var maxDimOper;
     if(this.begOper.size.height > this.endOper.size.height && this.begOper.size.height > this.sepOper.size.height)
@@ -3684,7 +3684,7 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
 
     return align;
 }
-CDelimiter.prototype.setPosition = function(position)
+CDelimiter.prototype.setPosition = function(position, PosInfo)
 {
     this.pos.x = position.x;
     this.pos.y = position.y - this.size.ascent;
@@ -3707,7 +3707,7 @@ CDelimiter.prototype.setPosition = function(position)
     PosContent.y = y + this.align_2(content);
     x += content.size.width;
 
-    content.setPosition(PosContent); // CMathContent
+    content.setPosition(PosContent, PosInfo); // CMathContent
 
     var Positions = [];
 
@@ -3726,7 +3726,7 @@ CDelimiter.prototype.setPosition = function(position)
         NewPosContent.x = x;
         NewPosContent.y = y + this.align_2(content);
 
-        content.setPosition(NewPosContent);
+        content.setPosition(NewPosContent, PosInfo);
         x += content.size.width;
     }
 
@@ -3945,7 +3945,7 @@ CCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CCharacter.prototype.setPosition = function(pos)
+CCharacter.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -3968,14 +3968,14 @@ CCharacter.prototype.setPosition = function(pos)
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + this.operator.size.height;
 
-        this.elements[0][0].setPosition(PosBase);
+        this.elements[0][0].setPosition(PosBase, PosInfo);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y;
 
-        this.elements[0][0].setPosition(PosBase);
+        this.elements[0][0].setPosition(PosBase, PosInfo);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y + this.elements[0][0].size.height;
@@ -4102,7 +4102,7 @@ CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, Arg
     if(this.Pr.pos == this.Pr.vertJc)
         ArgSz.decrease();
 
-    this.Set_CompiledCtrPrp(ParaMath);
+    //this.Set_CompiledCtrPrp(ParaMath);
 
     CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
 }

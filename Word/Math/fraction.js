@@ -234,7 +234,10 @@ CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     // компилируем CtrPrp после того, как выставим ArgSize
     // т.к. при компиляции CtrPrp для дроби важен this.Argsize  (NO_BAR_FRACTION)
-    this.Set_CompiledCtrPrp(ParaMath);
+
+    // на Set_CompiledCtrPrp компилярются ctrPrp без учета ArgSize
+    // поэтому необязательно вызывать ее на Resize
+    //this.Set_CompiledCtrPrp(ParaMath);
 
     var NewRPI = RPI.Copy();
     NewRPI.bInsideFraction = true;
@@ -262,7 +265,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var height = num.height + den.height;
     var ascent = num.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    //width += this.GapLeft + this.GapRight;
+    width += this.GapLeft + this.GapRight;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
@@ -277,7 +280,7 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
     var height = this.elements[0][0].size.height + this.elements[0][1].size.height;
     var ascent = this.elements[0][0].size.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    //width += this.GapLeft + this.GapRight;
+    width += this.GapLeft + this.GapRight;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
@@ -314,11 +317,11 @@ CFraction.prototype.recalculateLinear = function()
 
     var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
 
-    //width += this.GapLeft + this.GapRight;
+    width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CFraction.prototype.setPosition = function(pos)
+CFraction.prototype.setPosition = function(pos, PosInfo)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
@@ -339,11 +342,11 @@ CFraction.prototype.setPosition = function(pos)
         PosDen.x = X + this.elements[0][0].size.width + this.dW;
         PosDen.y = Y + this.elements[0][0].size.height;
 
-        this.elements[0][0].setPosition(PosNum);
-        this.elements[0][1].setPosition(PosDen);
+        this.elements[0][0].setPosition(PosNum, PosInfo);
+        this.elements[0][1].setPosition(PosDen, PosInfo);
     }
     else
-        CFraction.superclass.setPosition.call(this, pos);
+        CFraction.superclass.setPosition.call(this, pos, PosInfo);
 }
 CFraction.prototype.setProperties = function(props)
 {
@@ -499,9 +502,9 @@ CNumerator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CNumerator.prototype.setPosition = function(pos)
+CNumerator.prototype.setPosition = function(pos, PosInfo)
 {
-    this.elements[0][0].setPosition(pos);
+    this.elements[0][0].setPosition(pos, PosInfo);
 }
 CNumerator.prototype.getElement = function()
 {
@@ -556,14 +559,14 @@ CDenominator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CDenominator.prototype.setPosition = function(pos)
+CDenominator.prototype.setPosition = function(pos, PosInfo)
 {
     var NewPos = new CMathPosition();
 
     NewPos.x = pos.x;
     NewPos.y = pos.y + this.gap;
 
-    this.elements[0][0].setPosition(NewPos);
+    this.elements[0][0].setPosition(NewPos, PosInfo);
 }
 CDenominator.prototype.getElement = function(txt)
 {

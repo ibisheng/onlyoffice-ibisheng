@@ -91,7 +91,7 @@ CBorderBox.prototype.recalculateSize = function()
     if(this.Pr.hideRight == false)
         width += this.gapBrd;
 
-    //width += this.GapLeft + this.GapRight;
+    width += this.GapLeft + this.GapRight;
 
     this.size = {width : width, height: height, ascent: ascent};
 }
@@ -255,7 +255,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     }
 
 }
-CBorderBox.prototype.setPosition = function(pos)
+CBorderBox.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -273,7 +273,7 @@ CBorderBox.prototype.setPosition = function(pos)
     else
         NewPos.y = this.pos.y;
 
-    this.elements[0][0].setPosition(NewPos);
+    this.elements[0][0].setPosition(NewPos, PosInfo);
 }
 CBorderBox.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
@@ -458,7 +458,7 @@ CBox.prototype.fillContent = function()
 }
 CBox.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
-    this.Set_CompiledCtrPrp(ParaMath);
+    //this.Set_CompiledCtrPrp(ParaMath);
 
     var ArgSizeBox = ArgSize.Copy();
 
@@ -632,7 +632,7 @@ CBar.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.RecalcInfo.bProps = false;
     }
 
-    this.Set_CompiledCtrPrp(ParaMath);
+    //this.Set_CompiledCtrPrp(ParaMath);
 
     CBar.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
 }
