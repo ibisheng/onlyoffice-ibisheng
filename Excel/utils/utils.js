@@ -1271,14 +1271,17 @@
 
 				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-				var oStyle = null;
+				var oStyle, oCustomStyle;
 				this.defaultStyles = [];
 				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
 					oStyle = cellStyles[i];
 					if (oStyle.Hidden)
 						continue;
+					// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
+					oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
+
 					this.defaultStyles[i] = new asc_CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default);
-					this.drawStyle(oGraphics, stringRenderer, oStyle, styleIndex);
+					this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name, styleIndex);
 					++styleIndex;
 				}
 
@@ -1297,20 +1300,20 @@
 
 				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-				var oStyle = null;
+				var oStyle;
 				this.docStyles = [];
 				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
 					oStyle = cellStyles[i];
 					if (oStyle.Hidden || null != oStyle.BuiltinId)
 						continue;
 					this.docStyles[styleIndex] = new asc_CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document);
-					this.drawStyle(oGraphics, stringRenderer, oStyle, styleIndex);
+					this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name, styleIndex);
 					++styleIndex;
 				}
 
 				this.docStylesImage = (0 === styleIndex) ? "" : oCanvas.toDataURL("image/png");
 			},
-			drawStyle: function (oGraphics, stringRenderer, oStyle, nIndex) {
+			drawStyle: function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
 				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
 
 				// Fill cell
@@ -1347,12 +1350,12 @@
 
 				var width_padding = 3; // 4 * 72 / 96
 
-				var tm = stringRenderer.measureString(oStyle.Name);
+				var tm = stringRenderer.measureString(sStyleName);
 				// Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
 				var textY = 0.5 * (nOffsetY + (nOffsetY + this.styleThumbnailHeightPt) - tm.height);
 				oGraphics.setFont(oFont);
 				oGraphics.setFillStyle(oFontColor);
-				oGraphics.fillText(oStyle.Name, width_padding, textY + tm.baseline);
+				oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
 				oGraphics.restore();
 			}
 		};

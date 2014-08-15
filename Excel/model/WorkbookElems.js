@@ -1371,6 +1371,15 @@ CCellStyles.prototype.getDefaultStyleNameByBuiltinId = function (oBuiltinId) {
 	}
 	return null;
 };
+CCellStyles.prototype.getCustomStyleByBuiltinId = function (oBuiltinId) {
+	var style = null;
+	for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
+		style = this.CustomStyles[i];
+		if (style.BuiltinId === oBuiltinId)
+			return style;
+	}
+	return null;
+};
 CCellStyles.prototype._prepareCellStyle = function (name) {
 	var defaultStyle = null;
 	var style = null;
