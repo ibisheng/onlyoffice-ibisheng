@@ -7027,35 +7027,43 @@ CMathContent.prototype =
 						var sText = String.fromCharCode(8710);
 						this.AddText(groupElem,sText);
 						break;
-			case 209:	props = {ctrPrp: new CTextPr(), column:2, row:1, mcJc:MCJC_CENTER};
+			case 209:	var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:1, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;		
-			case 210:	props = {ctrPrp: new CTextPr(), column:1, row:2, mcJc:MCJC_CENTER};
+			case 210:	var oMcs = [{count: 1, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;	
-			case 211:	props = {ctrPrp: new CTextPr(), column:3, row:1, mcJc:MCJC_CENTER};
+			case 211:	var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:1, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;
-			case 212:	props = {ctrPrp: new CTextPr(), column:1, row:3, mcJc:MCJC_CENTER};
+			case 212:	var oMcs = [{count: 1, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;	
-			case 213:	props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER};
+			case 213:	var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;
-			case 214:	props = {ctrPrp: new CTextPr(), column:3, row:2, mcJc:MCJC_CENTER};
+			case 214:	var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;
-			case 215:	props = {ctrPrp: new CTextPr(), column:2, row:3, mcJc:MCJC_CENTER};
+			case 215:	var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;
-			case 216:	props = {ctrPrp: new CTextPr(), column:3, row:3, mcJc:MCJC_CENTER};
+			case 216:	var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						break;
@@ -7071,7 +7079,8 @@ CMathContent.prototype =
 			case 220:	var sText = String.fromCharCode(8945);
 						this.AddText(this,sText);
 						break;
-			case 221:	props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER};
+			case 221:	var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						var oElem = oMatrix.getElement(0,0);
@@ -7083,7 +7092,8 @@ CMathContent.prototype =
 						oElem = oMatrix.getElement(1,1);
 						this.AddText(oElem, "1");
 						break;
-			case 222:	props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER, plcHide:1};
+			case 222:	var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs, plcHide:1};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						var oElem = oMatrix.getElement(0,0);
@@ -7091,7 +7101,8 @@ CMathContent.prototype =
 						oElem = oMatrix.getElement(1,1);
 						this.AddText(oElem, "1");
 						break;
-			case 223:	props = {ctrPrp: new CTextPr(), column:3, row:3, mcJc:MCJC_CENTER};
+			case 223:	var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						var oElem = oMatrix.getElement(0,0);
@@ -7113,7 +7124,8 @@ CMathContent.prototype =
 						oElem = oMatrix.getElement(2,2);
 						this.AddText(oElem, "1");
 						break;
-			case 224:	props = {ctrPrp: new CTextPr(), column:3, row:3, mcJc:MCJC_CENTER, plcHide:1};
+			case 224:	var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs, plcHide:1};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,this);
 						var oElem = oMatrix.getElement(0,0);
@@ -7128,7 +7140,8 @@ CMathContent.prototype =
 						this.CreateElem(oDelimiter,this);
 						var delimiterBase = oDelimiter.getBase(0);
 						
-						props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER};
+						var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,delimiterBase);
 						break;
@@ -7137,7 +7150,8 @@ CMathContent.prototype =
 						this.CreateElem(oDelimiter,this);
 						var delimiterBase = oDelimiter.getBase(0);
 						
-						props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER};
+						var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,delimiterBase);
 						break;
@@ -7146,7 +7160,8 @@ CMathContent.prototype =
 						this.CreateElem(oDelimiter,this);
 						var delimiterBase = oDelimiter.getBase(0);
 						
-						props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER};
+						var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,delimiterBase);
 						break;
@@ -7155,7 +7170,8 @@ CMathContent.prototype =
 						this.CreateElem(oDelimiter,this);
 						var delimiterBase = oDelimiter.getBase(0);
 						
-						props = {ctrPrp: new CTextPr(), column:2, row:2, mcJc:MCJC_CENTER};
+						var oMcs = [{count: 2, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:2, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,delimiterBase);
 						break;
@@ -7164,7 +7180,8 @@ CMathContent.prototype =
 						this.CreateElem(oDelimiter,this);
 						var delimiterBase = oDelimiter.getBase(0);
 						
-						props = {ctrPrp: new CTextPr(), column:3, row:3, mcJc:MCJC_CENTER};
+						var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,delimiterBase);
 						
@@ -7194,7 +7211,8 @@ CMathContent.prototype =
 						this.CreateElem(oDelimiter,this);
 						var delimiterBase = oDelimiter.getBase(0);
 						
-						props = {ctrPrp: new CTextPr(), column:3, row:3, mcJc:MCJC_CENTER};
+						var oMcs = [{count: 3, mcJc:MCJC_CENTER}];
+						props = {ctrPrp: new CTextPr(), row:3, mcs: oMcs};
 						var oMatrix = new CMathMatrix(props);
 						this.CreateElem(oMatrix,delimiterBase);
 						
