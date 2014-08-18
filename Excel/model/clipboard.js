@@ -5083,7 +5083,7 @@
 												tempAr[k] = s_arr[k].y;
 											}
 										}
-										tempAr.sort(function(a,b){return a-b;})
+										tempAr.sort(fSortAscending);
 										newArr = [];
 										for(var k = 0; k < tempAr.length; k++)
 										{

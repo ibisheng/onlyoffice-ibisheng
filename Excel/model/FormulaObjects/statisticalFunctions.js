@@ -1554,10 +1554,6 @@ cFREQUENCY.prototype.Calculate = function ( arg ) {
 
     function frequency( A, B ) {
 
-        function sort( a, b ) {
-            return a - b;
-        }
-
         var tA = [], tB = [Number.NEGATIVE_INFINITY];
 
         for ( var i = 0; i < A.length; i++ ) {
@@ -1587,9 +1583,9 @@ cFREQUENCY.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort( sort );
+        tA.sort( fSortAscending );
         tB.push( Number.POSITIVE_INFINITY );
-        tB.sort( sort );
+        tB.sort( fSortAscending );
 
         var C = [
             []
@@ -1635,25 +1631,25 @@ cFREQUENCY.prototype.getInfo = function () {
         name:this.name,
         args:"(  data-array , bins-array )"
     };
-}
+};
 
 function cFTEST() {
     cBaseFunction.call( this, "FTEST" );
 }
 
-cFTEST.prototype = Object.create( cBaseFunction.prototype )
+cFTEST.prototype = Object.create( cBaseFunction.prototype );
 
 function cGAMMADIST() {
     cBaseFunction.call( this, "GAMMADIST" );
 }
 
-cGAMMADIST.prototype = Object.create( cBaseFunction.prototype )
+cGAMMADIST.prototype = Object.create( cBaseFunction.prototype );
 
 function cGAMMAINV() {
     cBaseFunction.call( this, "GAMMAINV" );
 }
 
-cGAMMAINV.prototype = Object.create( cBaseFunction.prototype )
+cGAMMAINV.prototype = Object.create( cBaseFunction.prototype );
 
 function cGAMMALN() {
 //    cBaseFunction.call( this, "GAMMALN" );
@@ -1674,7 +1670,7 @@ function cGAMMALN() {
 
 }
 
-cGAMMALN.prototype = Object.create( cBaseFunction.prototype )
+cGAMMALN.prototype = Object.create( cBaseFunction.prototype );
 cGAMMALN.prototype.Calculate = function ( arg ) {
 
 
@@ -1707,10 +1703,10 @@ cGAMMALN.prototype.Calculate = function ( arg ) {
         return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
-}
+};
 cGAMMALN.prototype.getInfo = function () {
     return { name:this.name, args:"(number)" }
-}
+};
 
 function cGEOMEAN() {
 //    cBaseFunction.call( this, "GEOMEAN" );
@@ -1731,7 +1727,7 @@ function cGEOMEAN() {
 
 }
 
-cGEOMEAN.prototype = Object.create( cBaseFunction.prototype )
+cGEOMEAN.prototype = Object.create( cBaseFunction.prototype );
 cGEOMEAN.prototype.Calculate = function ( arg ) {
 
     function geommean( x ) {
@@ -1789,19 +1785,19 @@ cGEOMEAN.prototype.Calculate = function ( arg ) {
     }
     return this.value = geommean( arr0 );
 
-}
+};
 cGEOMEAN.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cGROWTH() {
     cBaseFunction.call( this, "GROWTH" );
 }
 
-cGROWTH.prototype = Object.create( cBaseFunction.prototype )
+cGROWTH.prototype = Object.create( cBaseFunction.prototype );
 
 function cHARMEAN() {
 //    cBaseFunction.call( this, "HARMEAN" );
@@ -2208,9 +2204,7 @@ cLARGE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort( function ( a, b ) {
-            return -(a - b)
-        } )
+        tA.sort(fSortDescending);
 
         if ( k.getValue() > tA.length || k.getValue() <= 0 )
             return new cError( cErrorType.not_available );
@@ -2248,7 +2242,7 @@ cLARGE.prototype.getInfo = function () {
         name:this.name,
         args:"(  array , k )"
     };
-}
+};
 
 function cLINEST() {
     cBaseFunction.call( this, "LINEST" );
@@ -2611,9 +2605,7 @@ cMEDIAN.prototype.Calculate = function ( arg ) {
             }
         }
 
-        medArr.sort( function ( a, b ) {
-            return a - b;
-        } );
+        medArr.sort(fSortAscending);
 
         if ( medArr.length < 1 )
             return cError( cErrorType.wrong_value_type );
@@ -2880,9 +2872,7 @@ cMODE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        medArr.sort( function ( a, b ) {
-            return b - a;
-        } );
+        medArr.sort(fSortDescending);
 
         if ( medArr.length < 1 )
             return cError( cErrorType.wrong_value_type );
@@ -3426,9 +3416,7 @@ cPERCENTILE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort( function ( a, b ) {
-            return a - b;
-        } )
+        tA.sort(fSortAscending);
 
         var nSize = tA.length;
         if ( tA.length < 1 || nSize == 0 )
@@ -3517,11 +3505,9 @@ cPERCENTRANK.prototype.Calculate = function ( arg ) {
             }
         }
 
-        var fNum = x.getValue()
+        var fNum = x.getValue();
 
-        tA.sort( function ( a, b ) {
-            return a - b;
-        } );
+        tA.sort(fSortAscending);
 
         var nSize = tA.length;
         if ( tA.length < 1 || nSize == 0 )
@@ -3531,7 +3517,7 @@ cPERCENTRANK.prototype.Calculate = function ( arg ) {
             if ( fNum < tA[0] || fNum > tA[nSize - 1] )
                 return new cError( cErrorType.not_available );
             else if ( nSize == 1 )
-                return new cNumber( 1 )
+                return new cNumber( 1 );
             else {
                 var fRes, nOldCount = 0, fOldVal = tA[0], i;
                 for ( i = 1; i < nSize && tA[i] < fNum; i++ ) {
@@ -3906,7 +3892,7 @@ cPROB.prototype.getInfo = function () {
         name:this.name,
         args:"( x-range , probability-range , lower-limit [ , upper-limit ] )"
     };
-}
+};
 
 function cQUARTILE() {
 //    cBaseFunction.call( this, "QUARTILE" );
@@ -3949,9 +3935,7 @@ cQUARTILE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort( function ( a, b ) {
-            return a - b;
-        } )
+        tA.sort(fSortAscending);
 
         var nSize = tA.length;
         if ( tA.length < 1 || nSize == 0 )
@@ -4029,7 +4013,7 @@ cQUARTILE.prototype.getInfo = function () {
         name:this.name,
         args:"(  array , result-category )"
     };
-}
+};
 
 function cRANK() {
     cBaseFunction.call( this, "RANK" );
@@ -4369,9 +4353,7 @@ cSMALL.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort( function ( a, b ) {
-            return a - b
-        } )
+        tA.sort(fSortAscending);
 
         if ( k.getValue() > tA.length || k.getValue() <= 0 )
             return new cError( cErrorType.not_available );

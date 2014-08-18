@@ -623,56 +623,52 @@
 		// Private
 
 		CellEditor.prototype._setOptions = function (options) {
-
-			function cmpNum(a, b) {return a - b;}
-			function cmpNumRev(a, b) {return b - a;}
-
 			var t = this;
-			var opt = t.options = options;
-			var ctx = t.drawingCtx;
+			var opt = this.options = options;
+			var ctx = this.drawingCtx;
 			var u = ctx.getUnits();
 
-			t.textFlags = opt.flags;
-			if (t.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula()) {
-				t.textFlags.textAlign = "left";
+			this.textFlags = opt.flags;
+			if (this.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula()) {
+				this.textFlags.textAlign = "left";
 			}
-			if (t.textFlags.wrapText) {
-				t.textFlags.wrapOnlyNL = true;
-				t.textFlags.wrapText = false;
+			if (this.textFlags.wrapText) {
+				this.textFlags.wrapOnlyNL = true;
+				this.textFlags.wrapText = false;
 			}
 
-			t._cleanFragments(opt.fragments);
-			t.textRender.setString(opt.fragments, t.textFlags);
-			delete t.newTextFormat;
+			this._cleanFragments(opt.fragments);
+			this.textRender.setString(opt.fragments, this.textFlags);
+			delete this.newTextFormat;
 
 			if (opt.zoom > 0) {
-				t.overlayCtx.setFont(t.drawingCtx.getFont());
-				t.changeZoom(opt.zoom);
+				this.overlayCtx.setFont(this.drawingCtx.getFont());
+				this.changeZoom(opt.zoom);
 			}
 
-			t.kx = asc_getcvt(u, 0/*px*/, ctx.getPPIX());
-			t.ky = asc_getcvt(u, 0/*px*/, ctx.getPPIY());
+			this.kx = asc_getcvt(u, 0/*px*/, ctx.getPPIX());
+			this.ky = asc_getcvt(u, 0/*px*/, ctx.getPPIY());
 
-			opt.leftSide.sort(cmpNumRev);
-			opt.rightSide.sort(cmpNum);
-			opt.bottomSide.sort(cmpNum);
+			opt.leftSide.sort(fSortDescending);
+			opt.rightSide.sort(fSortAscending);
+			opt.bottomSide.sort(fSortAscending);
 
-			t.left = opt.cellX;
-			t.top = opt.cellY;
-			t.right = opt.rightSide[0];
-			t.bottom = opt.bottomSide[0];
+			this.left = opt.cellX;
+			this.top = opt.cellY;
+			this.right = opt.rightSide[0];
+			this.bottom = opt.bottomSide[0];
 
-			t.cursorPos = opt.cursorPos !== undefined ? opt.cursorPos : 0;
-			t.topLineIndex = 0;
-			t.selectionBegin = -1;
-			t.selectionEnd = -1;
-			t.isSelectMode = false;
-			t.hasCursor = false;
+			this.cursorPos = opt.cursorPos !== undefined ? opt.cursorPos : 0;
+			this.topLineIndex = 0;
+			this.selectionBegin = -1;
+			this.selectionEnd = -1;
+			this.isSelectMode = false;
+			this.hasCursor = false;
 
-			t.undoList = [];
-			t.redoList = [];
-			t.undoMode = false;
-			t.skipKeyPress = false;
+			this.undoList = [];
+			this.redoList = [];
+			this.undoMode = false;
+			this.skipKeyPress = false;
 		};
 
 		CellEditor.prototype._parseRangeStr = function (s) {

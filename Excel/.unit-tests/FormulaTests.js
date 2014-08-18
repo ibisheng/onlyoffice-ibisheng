@@ -2351,9 +2351,7 @@
 
         function median( x ) {
 
-            x.sort( function ( a, b ) {
-                return a - b;
-            } );
+            x.sort(fSortAscending);
 
             if ( x.length % 2 )
                 return x[(x.length - 1) / 2];
@@ -2379,9 +2377,7 @@
 
         function mode( x ) {
 
-            x.sort( function ( a, b ) {
-                return b - a;
-            } );
+            x.sort(fSortDescending);
 
             if ( x.length < 1 )
                 return "#VALUE!";
@@ -2624,9 +2620,7 @@
 
         function percentile( A, k ) {
 
-            A.sort( function ( a, b ) {
-                return a - b;
-            } )
+            A.sort(fSortAscending)
 
             var nSize = A.length;
             if ( A.length < 1 || nSize == 0 )
@@ -2666,9 +2660,7 @@
 
             if ( !k ) k = 3;
 
-            tA.sort( function ( a, b ) {
-                return a - b;
-            } );
+            tA.sort(fSortAscending);
 
             var nSize = tA.length;
             if ( tA.length < 1 || nSize == 0 )
@@ -2778,9 +2770,7 @@
 
             var fFlag = k;
 
-            A.sort( function ( a, b ) {
-                return a - b;
-            } )
+            A.sort(fSortAscending);
 
             var nSize = A.length;
             if ( A.length < 1 || nSize == 0 )

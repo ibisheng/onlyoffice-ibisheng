@@ -715,8 +715,6 @@
 				return result;
 			}
 
-			function cmpNum(a, b) {return a - b;}
-
 			for (var c = this.activeRange.c1; c <= this.activeRange.c2; ++c) {
 				for (var r = this.activeRange.r1; r <= this.activeRange.r2; ++r) {
 					cell = this._getCellTextCache(c, r);
@@ -740,8 +738,8 @@
 				// Делаем массивы уникальными и сортируем
 				$.unique(result.arrCols);
 				$.unique(result.arrRows);
-				result.arrCols = result.arrCols.sort(cmpNum);
-				result.arrRows = result.arrRows.sort(cmpNum);
+				result.arrCols = result.arrCols.sort(fSortAscending);
+				result.arrRows = result.arrRows.sort(fSortAscending);
 			}
 			return result;
 		};

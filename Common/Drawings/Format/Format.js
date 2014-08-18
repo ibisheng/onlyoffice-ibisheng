@@ -11169,7 +11169,7 @@ _arr_lt_types_weight[16] =  _ph_summ__two_obj_and_two_tx;
 _arr_lt_types_weight[17] =  _ph_summ__tx;
 _arr_lt_types_weight[18] =  _ph_summ__tx_and_clip_art;
 
-_arr_lt_types_weight.sort(function(a,b){return a-b;});
+_arr_lt_types_weight.sort(fSortAscending);
 
 
 var _global_layout_summs_array = {};

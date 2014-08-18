@@ -4529,10 +4529,7 @@ var gUndoInsDelCellsFlag = true;
 							var sortTop10;
 							if(top10Filter.Top != false)
 							{
-								sortTop10 = top10Arr.sort(function sortArr(a, b)
-								{
-									return b - a;
-								})
+								sortTop10 = top10Arr.sort(fSortDescending);
 							}	
 							else
 								sortTop10 = top10Arr.sort();

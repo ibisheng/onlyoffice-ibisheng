@@ -5811,7 +5811,7 @@ CPresentation.prototype =
     shiftSlides: function(pos, array)
     {
         History.Create_NewPoint();
-        array.sort(function(a, b){return a - b;});
+        array.sort(fSortAscending);
         var deleted = [];
         for(var i = array.length -1; i > - 1; --i)
         {
@@ -5854,7 +5854,7 @@ CPresentation.prototype =
         {
             History.Create_NewPoint();
             var oldLen = this.Slides.length;
-            array.sort(function(a, b){return a - b;});
+            array.sort(fSortAscending);
             for(var i = array.length -1; i > - 1; --i)
             {
                 this.removeSlide(array[i]);

@@ -2763,7 +2763,7 @@ ZIndexManager.prototype =
 
     sendToBack: function(arrInd)//
     {
-        arrInd.sort(function(a, b){return a-b});
+        arrInd.sort(fSortAscending);
         var arrDrawings = [];
         var i;
         for(i = arrInd.length-1; i > -1; --i)
@@ -2778,7 +2778,7 @@ ZIndexManager.prototype =
 
     bringForward: function(arrInd)
     {
-        arrInd.sort(function(a, b){return a - b;});
+        arrInd.sort(fSortAscending);
         var i;
         var item;
         if(arrInd[arrInd.length-1] < this.Content.length-1)
@@ -2798,7 +2798,7 @@ ZIndexManager.prototype =
 
     bringToFront: function(arrInd)
     {
-        arrInd.sort(function(a, b){return a-b});
+        arrInd.sort(fSortAscending);
         var i;
         var arrDrawings = [];
         for(i = arrInd.length-1; i > -1; --i)
@@ -2814,7 +2814,7 @@ ZIndexManager.prototype =
 
     bringBackward: function(arrInd)
     {
-        arrInd.sort(function(a, b){return a - b});
+        arrInd.sort(fSortAscending);
         var i, item;
         if(arrInd[0] > 0)
         {
