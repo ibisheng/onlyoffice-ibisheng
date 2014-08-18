@@ -1273,10 +1273,6 @@ cERF.prototype.Calculate = function ( arg ) {
 
     a = a.getValue();
 
-    if ( a < 0 ) {
-        return this.value = new cError( cErrorType.not_numeric );
-    }
-
     if ( !( b instanceof cUndefined ) ) {
         b = b.tocNumber();
         if ( b instanceof cError ) {
@@ -1284,10 +1280,6 @@ cERF.prototype.Calculate = function ( arg ) {
         }
 
         b = b.getValue();
-
-        if ( b < 0 ) {
-            return this.value = new cError( cErrorType.not_numeric );
-        }
 
         this.value = new cNumber( rtl_math_erf( b ) - rtl_math_erf( a ) );
 
@@ -1323,17 +1315,12 @@ cERFC.prototype.Calculate = function ( arg ) {
 
     a = a.tocNumber();
     if ( a instanceof cError ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+        return this.value = a;
     }
 
     a = a.getValue();
 
-    if ( a < 0 ) {
-        this.value = new cError( cErrorType.not_numeric );
-    }
-    else {
-        this.value = new cNumber( rtl_math_erfc( a ) );
-    }
+    this.value = new cNumber( rtl_math_erfc( a ) );
 
     return this.value;
 
