@@ -160,14 +160,14 @@ ParaMath.prototype =
 		{
 			var oText = new CMathText(false);
 			oText.addTxt(Item.Value);
-			oStartContent.Add(oText);
+			oStartContent.Add(oText, true);
 		}
 		else if ( para_Space === Type )
 		{
 			//var oSpace = new ParaSpace(1);
 			var oText = new CMathText(false);
 			oText.addTxt(" ");
-			oStartContent.Add(oText);
+			oStartContent.Add(oText, true);
 		}
 		else if ( para_Math === Type )
 		{
@@ -200,7 +200,7 @@ ParaMath.prototype =
 						var Pos = oMRun.Content.length;
 						var EndPos = Pos + 1;
 						var oItem = oStartContent.Content[i];
-						oMRun.Add(oItem);
+						oMRun.Add(oItem, true);
 						oStartContent.Remove_FromContent(i, 1, false);
 					}
 				}
@@ -360,6 +360,8 @@ ParaMath.prototype =
 		var Items = [];
 		for (var i=start; i<=end; i++)
 			Items.push(oContent.Content.content[i]);
+			
+		oContent.Content.CurPos -= len;
 
 		oContent.Content.content.splice( oContent.Start, len );
 		History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});

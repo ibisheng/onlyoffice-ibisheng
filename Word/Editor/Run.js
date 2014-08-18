@@ -253,9 +253,9 @@ ParaRun.prototype =
     },
 
     // Добавляем элемент в текущую позицию
-    Add : function(Item)
+    Add : function(Item, bMath)
     {
-        this.Add_ToContent( this.State.ContentPos, Item, true );
+        this.Add_ToContent( this.State.ContentPos, Item, true, bMath );
     },
 
     Remove : function(Direction, bOnAddText)
@@ -357,7 +357,7 @@ ParaRun.prototype =
     },
 
     // Добавляем элемент в позицию с сохранием в историю
-    Add_ToContent : function(Pos, Item, UpdatePosition)
+    Add_ToContent : function(Pos, Item, UpdatePosition, bMath)
     {
         History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
@@ -396,7 +396,7 @@ ParaRun.prototype =
                 }
 
                 // Особый случай, когда мы добавляем элемент в самый последний ран
-                if ( Pos === this.Content.length - 1 && LinesCount - 1 === CurLine )
+                if ( Pos === this.Content.length - 1 && LinesCount - 1 === CurLine && !bMath)
                 {
                     this.Lines[CurLine].Ranges[RangesCount - 1].EndPos++;
                 }
