@@ -21,8 +21,6 @@
 		var asc_debug   = asc.outputDebugStr;
 		var asc_typeof  = asc.typeOf;
 		var asc_round   = asc.round;
-		var asc_TM      = asc.TextMetrics;
-
 
 		function LineInfo(tw, th, bl, a, d) {
 			this.tw = tw !== undefined ? tw : 0;
@@ -414,7 +412,7 @@
         /**
          * Measures string that was setup by 'setString' method
          * @param {Number} maxWidth  Optional. Text width restriction
-         * @return {TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
+         * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
          */
 		StringRender.prototype.measure = function(maxWidth) {
 			return this._doMeasure(maxWidth);
@@ -622,21 +620,22 @@
 			return l;
 		};
 
+		StringRender.prototype.calcDelta = function (vnew, vold) {
+			return vnew > vold ? vnew - vold : 0;
+		};
+
 		/**
-		 * @param {Boolean} dontCalcRepeatChars
-		 * @return {asc_TM}
+		 * @param {Boolean} [dontCalcRepeatChars]
+		 * @return {Asc.TextMetrics}
 		 */
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
-			var self = this, i, p, p_, lm, beg;
+			var self = this, i = 0, p, p_, lm, beg = 0;
 			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
 			var ppi = this.drawingCtx.getPPIY();
 
-			function calcDelta(vnew, vold) {
-				return vnew > vold ? vnew - vold : 0;
-			}
-
 			function addLine(b, e) {
-				l.tw += self._calcLineWidth(b, e - 1);
+				if (-1 !== b)
+					l.tw += self._calcLineWidth(b, e - 1);
 				l.beg = b;
 				l.end = e - 1;
 				self.lines.push(l);
@@ -645,37 +644,48 @@
 				TH += l.th;
 			}
 
-			for (i = 0, beg = 0; i < this.chars.length; ++i) {
-				p = this.charProps[i];
-
-				// if font has been changed than calc and update line height and etc.
+			if (0 >= this.chars.length) {
+				p = this.charProps[0];
 				if (p && p.font) {
 					lm = this._calcLineMetrics(p.fsz !== undefined ? p.fsz : p.font.FontSize, p.va, p.fm, ppi);
-					if (i === 0) {
-						l.assign(0, lm.th, lm.bl, lm.a, lm.d);
-					} else {
-						l.th += calcDelta(lm.bl, l.bl) + calcDelta(lm.th - lm.bl, l.th - l.bl);
-						l.bl += calcDelta(lm.bl, l.bl);
-						l.a += calcDelta(lm.a, l.a);
-						l.d += calcDelta(lm.d, l.d);
+					l.assign(0, lm.th, lm.bl, lm.a, lm.d);
+					addLine(-1, -1);
+					l.beg = l.end = 0;
+				}
+			} else {
+				for (; i < this.chars.length; ++i) {
+					p = this.charProps[i];
+
+					// if font has been changed than calc and update line height and etc.
+					if (p && p.font) {
+						lm = this._calcLineMetrics(p.fsz !== undefined ? p.fsz : p.font.FontSize, p.va, p.fm, ppi);
+						if (i === 0) {
+							l.assign(0, lm.th, lm.bl, lm.a, lm.d);
+						} else {
+							l.th += this.calcDelta(lm.bl, l.bl) + this.calcDelta(lm.th - lm.bl, l.th - l.bl);
+							l.bl += this.calcDelta(lm.bl, l.bl);
+							l.a += this.calcDelta(lm.a, l.a);
+							l.d += this.calcDelta(lm.d, l.d);
+						}
+						p.lm = lm;
+						p_ = p;
 					}
-					p.lm = lm;
-					p_ = p;
-				}
 
-				// process 'repeat char' marker
-				if (dontCalcRepeatChars && p && p.repeat) {
-					l.tw -= this._calcCharsWidth(i, i + p.total);
-				}
+					// process 'repeat char' marker
+					if (dontCalcRepeatChars && p && p.repeat) {
+						l.tw -= this._calcCharsWidth(i, i + p.total);
+					}
 
-				// process 'new line' marker
-				if (p && (p.nl || p.hp)) {
-					addLine(beg, i);
-					beg = i;
-					lm = this._calcLineMetrics(p_.fsz !== undefined ? p_.fsz : p_.font.FontSize, p_.va, p_.fm, ppi);
-					l = new LineInfo(0, lm.th, lm.bl, lm.a, lm.d);
+					// process 'new line' marker
+					if (p && (p.nl || p.hp)) {
+						addLine(beg, i);
+						beg = i;
+						lm = this._calcLineMetrics(p_.fsz !== undefined ? p_.fsz : p_.font.FontSize, p_.va, p_.fm, ppi);
+						l = new LineInfo(0, lm.th, lm.bl, lm.a, lm.d);
+					}
 				}
 			}
+
 			if (beg < i) {
 				// add last line of text
 				addLine(beg, i);
@@ -683,7 +693,7 @@
 			if (this.lines.length > 0) {
 				CL = (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2;
 			}
-			return new asc_TM(TW, TH, 0, BL, 0, 0, CL);
+			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, CL);
 		};
 
 		StringRender.prototype._getRepeatCharPos = function () {
@@ -773,9 +783,15 @@
 			this.lines = [];
 		};
 
+		StringRender.prototype._getCharPropAt = function (index) {
+			var prop = this.charProps[index];
+			if (!prop) {prop = this.charProps[index] = new charProperties();}
+			return prop;
+		};
+
 		/**
 		 * @param {Number} maxWidth
-		 * @return {TextMetrics}
+		 * @return {Asc.TextMetrics}
 		 */
 		StringRender.prototype._measureChars = function (maxWidth) {
 			var self = this;
@@ -785,12 +801,6 @@
 			var hasRepeats = false;
 			var i, j, fr, fmt, text, p, p_ = {}, pIndex, va, f, f_, eq, startCh;
 			var tw = 0, nlPos = 0, hpPos = undefined, isSP_ = true, delta = 0;
-
-			function charPropAt(index) {
-				var prop = self.charProps[index];
-				if (!prop) {prop = self.charProps[index] = new charProperties();}
-				return prop;
-			}
 
 			function measureFragment(s) {
 				var j, ch, chw, chPos, isNL, isSP, isHP, tm;
@@ -810,8 +820,8 @@
 						if (isNL) {
 							// add new line marker
 							nlPos = chPos + 1;
-							charPropAt(nlPos).nl = true;
-							charPropAt(nlPos).delta = delta;
+							self._getCharPropAt(nlPos).nl = true;
+							self._getCharPropAt(nlPos).delta = delta;
 							ch = " ";
 							chw = 0;
 							tw = 0;
@@ -824,8 +834,8 @@
 						if (wrap && tw + chw > maxWidth && chPos !== nlPos && !isSP) {
 							// add hyphenation marker
 							nlPos = hpPos !== undefined ? hpPos : chPos;
-							charPropAt(nlPos).hp = true;
-							charPropAt(nlPos).delta = delta;
+							self._getCharPropAt(nlPos).hp = true;
+							self._getCharPropAt(nlPos).delta = delta;
 							tw = self._calcCharsWidth(nlPos, chPos - 1);
 							hpPos = undefined;
 						}
@@ -833,7 +843,7 @@
 
 					if (isSP_ && !isSP && !isNL) {
 						// add word beginning marker
-						charPropAt(chPos).wrd = true;
+						self._getCharPropAt(chPos).wrd = true;
 					}
 
 					tw += chw;
@@ -852,7 +862,6 @@
 				fr = this.fragments[i];
 				fmt = fr.format;
 				text = this._filterText(fr.text, wrap || wrapNL);
-				if (text.length < 1) {continue;}
 
 				f = this._makeFont(fmt);
 				pIndex = this.chars.length;
@@ -888,18 +897,19 @@
 				}
 
 				if (fmt.skip) {
-					charPropAt(pIndex).skip = text.length;
+					this._getCharPropAt(pIndex).skip = text.length;
 				}
 
 				if (fmt.repeat) {
 					if (hasRepeats)
 						throw "Repeat should occur no more than once";
 
-					charPropAt(pIndex).repeat = true;
-					charPropAt(pIndex).total = 0;
+					this._getCharPropAt(pIndex).repeat = true;
+					this._getCharPropAt(pIndex).total = 0;
 					hasRepeats = true;
 				}
 
+				if (text.length < 1) {continue;}
 				measureFragment(text);
 
 				// для italic текста прибавляем к концу строки разницу между charWidth и BBox
@@ -914,7 +924,7 @@
 				}
 			}
 
-			if (this.charProps[this.chars.length] !== undefined) {
+			if (0 !== this.chars.length && this.charProps[this.chars.length] !== undefined) {
 				delete this.charProps[this.chars.length];
 			} else if (f_.Italic) {
 				// для italic текста прибавляем к концу текста разницу между charWidth и BBox

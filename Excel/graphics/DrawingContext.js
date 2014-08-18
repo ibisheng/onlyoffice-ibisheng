@@ -805,7 +805,7 @@
 	};
 
 	/**
-	 * @param {Number} units  Units of result (0=px, 1=pt, 2=in, 3=mm)
+	 * @param {Number} [units]  Units of result (0=px, 1=pt, 2=in, 3=mm)
 	 * @return {FontMetrics}
 	 */
 	DrawingContext.prototype.getFontMetrics = function (units) {
