@@ -1469,7 +1469,7 @@ CCellStyle.prototype.getFontColor = function () {
 CCellStyle.prototype.getFont = function () {
 	if (null != this.xfs && null != this.xfs.font)
 		return this.xfs.font;
-	return null;
+	return g_oDefaultFont;
 };
 CCellStyle.prototype.getBorder = function () {
 	if (null != this.xfs && null != this.xfs.border)
