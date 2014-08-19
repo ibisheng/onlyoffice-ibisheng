@@ -1090,6 +1090,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                 }
             }
 
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr(_textPr));
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
@@ -1097,6 +1098,8 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         case 2: // ASC_MENU_EVENT_TYPE_PARAPR
         {
             var _textPr = undefined;
+
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
             while (_continue)
             {
@@ -1304,6 +1307,26 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         case 4: // ASC_MENU_EVENT_TYPE_REDO
         {
             this.WordControl.m_oLogicDocument.Document_Redo();
+            break;
+        }
+        case 54: // ASC_MENU_EVENT_TYPE_INSERT_PAGEBREAK
+        {
+            this.put_AddPageBreak();
+            break;
+        }
+        case 55: // ASC_MENU_EVENT_TYPE_INSERT_LINEBREAK
+        {
+            this.put_AddLineBreak();
+            break;
+        }
+        case 56: // ASC_MENU_EVENT_TYPE_INSERT_PAGENUMBER
+        {
+            this.put_PageNum((_params[0] >> 16) & 0xFFFF, _params[0] & 0xFFFF);
+            break;
+        }
+        case 57: // ASC_MENU_EVENT_TYPE_INSERT_SECTIONBREAK
+        {
+            this.add_SectionBreak(_params[0]);
             break;
         }
         default:
@@ -1636,6 +1659,73 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     }
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Paragraph, ParaPr );
+};
+
+asc_docs_api.prototype.put_PageNum = function(where,align)
+{
+    if ( where >= 0 )
+    {
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_HdrFtr }) )
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+            this.WordControl.m_oLogicDocument.Document_AddPageNum( where, align );
+        }
+    }
+    else
+    {
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+            this.WordControl.m_oLogicDocument.Document_AddPageNum( where, align );
+        }
+    }
+};
+
+asc_docs_api.prototype.put_AddPageBreak = function()
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        var Document = this.WordControl.m_oLogicDocument;
+
+        if ( null === Document.Hyperlink_Check(false) )
+        {
+            Document.Create_NewHistoryPoint();
+            Document.Paragraph_Add( new ParaNewLine( break_Page ) );
+        }
+    }
+};
+
+asc_docs_api.prototype.add_SectionBreak = function(_Type)
+{
+    var Type = section_type_Continuous;
+    switch(_Type)
+    {
+        case c_oAscSectionBreakType.NextPage   : Type = section_type_NextPage; break;
+        case c_oAscSectionBreakType.OddPage    : Type = section_type_OddPage; break;
+        case c_oAscSectionBreakType.EvenPage   : Type = section_type_EvenPage; break;
+        case c_oAscSectionBreakType.Continuous : Type = section_type_Continuous; break;
+        case c_oAscSectionBreakType.Column     : Type = section_type_Column; break;
+    }
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Add_SectionBreak(Type);
+    }
+};
+
+asc_docs_api.prototype.put_AddLineBreak = function()
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        var Document = this.WordControl.m_oLogicDocument;
+
+        if ( null === Document.Hyperlink_Check(false) )
+        {
+            Document.Create_NewHistoryPoint();
+            Document.Paragraph_Add( new ParaNewLine( para_NewLine ) );
+        }
+    }
 };
 
 asc_docs_api.prototype.Send_Menu_Event = function(type)
