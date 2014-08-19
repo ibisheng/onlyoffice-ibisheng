@@ -308,16 +308,6 @@
 			// Флаг, сигнализирует о том, что мы сменили zoom, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
 			this.updateZoom = false;
 
-			var cnv = document.createElement("canvas");
-			cnv.width = 2;
-			cnv.height = 2;
-			var ctx = cnv.getContext("2d");
-			ctx.clearRect(0, 0, 2, 2);
-			ctx.fillStyle = "#000";
-			ctx.fillRect(0, 0, 1, 1);
-			ctx.fillRect(1, 1, 1, 1);
-			this.ptrnLineDotted1 = ctx.createPattern(cnv, "repeat");
-
 			this.cache = new Cache();
 
 			//---member declaration---
@@ -3077,7 +3067,7 @@
 						var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 						offsetFrozen = this.getFrozenPaneOffset(false, true);
 						offsetX -= offsetFrozen.offsetX;
-						ctx.setFillPattern(this.ptrnLineDotted1)
+						ctx.setFillPattern(this.settings.ptrnLineDotted1)
 							.fillRect(this.cols[data.col].left - offsetX - this.width_1px, 0, this.width_1px, h);
 					}
 					break;
@@ -3089,7 +3079,7 @@
 						var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 						offsetFrozen = this.getFrozenPaneOffset(true, false);
 						offsetY -= offsetFrozen.offsetY;
-						ctx.setFillPattern(this.ptrnLineDotted1)
+						ctx.setFillPattern(this.settings.ptrnLineDotted1)
 							.fillRect(0, this.rows[data.row].top - offsetY - this.height_1px, w, this.height_1px);
 					}
 					break;
@@ -3991,74 +3981,69 @@
 
 		// mouseX - это разница стартовых координат от мыши при нажатии и границы
 		WorksheetView.prototype.drawColumnGuides = function (col, x, y, mouseX) {
-			var t = this;
-
-			x *= asc_getcvt( 0/*px*/, 1/*pt*/, t._getPPIX() );
+			x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 			// Учитываем координаты точки, где мы начали изменение размера
 			x += mouseX;
 
-			var ctx = t.overlayCtx;
-			var offsetX = t.cols[t.visibleRange.c1].left - t.cellsLeft;
-			var offsetFrozen = t.getFrozenPaneOffset(false, true);
+			var ctx = this.overlayCtx;
+			var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+			var offsetFrozen = this.getFrozenPaneOffset(false, true);
 			offsetX -= offsetFrozen.offsetX;
 
-			var x1 = t.cols[col].left - offsetX - this.width_1px;
+			var x1 = this.cols[col].left - offsetX - this.width_1px;
 			var h = ctx.getHeight();
 			var widthPt = (x - x1);
 			if (0 > widthPt)
 				widthPt = 0;
 
 			ctx.clear();
-			t._drawSelection();
-			ctx.setFillPattern(t.ptrnLineDotted1)
+			this._drawSelection();
+			ctx.setFillPattern(this.settings.ptrnLineDotted1)
 				.fillRect(x1, 0, this.width_1px, h)
 				.fillRect(x, 0, this.width_1px, h);
 
-			return new asc_CMM({type: c_oAscMouseMoveType.ResizeColumn, sizeCCOrPt: t._colWidthToCharCount(widthPt),
-				sizePx: widthPt * 96 / 72, x: (x1 + t.cols[col].width) * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX()),
+			return new asc_CMM({type: c_oAscMouseMoveType.ResizeColumn, sizeCCOrPt: this._colWidthToCharCount(widthPt),
+				sizePx: widthPt * 96 / 72, x: (x1 + this.cols[col].width) * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX()),
 				y: this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY())});
 		};
 
 		// mouseY - это разница стартовых координат от мыши при нажатии и границы
 		WorksheetView.prototype.drawRowGuides = function (row, x, y, mouseY) {
-			var t = this;
-
-			y *= asc_getcvt( 0/*px*/, 1/*pt*/, t._getPPIY() );
+			y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
 			// Учитываем координаты точки, где мы начали изменение размера
 			y += mouseY;
 
-			var ctx = t.overlayCtx;
-			var offsetY = t.rows[t.visibleRange.r1].top - t.cellsTop;
-			var offsetFrozen = t.getFrozenPaneOffset(true, false);
+			var ctx = this.overlayCtx;
+			var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+			var offsetFrozen = this.getFrozenPaneOffset(true, false);
 			offsetY -= offsetFrozen.offsetY;
 
-			var y1 = t.rows[row].top - offsetY - this.height_1px;
+			var y1 = this.rows[row].top - offsetY - this.height_1px;
 			var w = ctx.getWidth();
 			var heightPt = (y - y1);
 			if (0 > heightPt)
 				heightPt = 0;
 
 			ctx.clear();
-			t._drawSelection();
-			ctx.setFillPattern(t.ptrnLineDotted1)
+			this._drawSelection();
+			ctx.setFillPattern(this.settings.ptrnLineDotted1)
 				.fillRect(0, y1, w, this.height_1px)
 				.fillRect(0, y, w, this.height_1px);
 
 			return new asc_CMM({type: c_oAscMouseMoveType.ResizeRow, sizeCCOrPt: heightPt, sizePx: heightPt * 96 / 72,
 				x: this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX()),
-				y: (y1 + t.rows[row].height) * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY())});
+				y: (y1 + this.rows[row].height) * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY())});
 		};
-
 
 		// --- Cache ---
 
 		WorksheetView.prototype._cleanCache = function (range) {
-			var t = this, r, c, row;
+			var r, c, row;
 
-			if (range === undefined) {range = t.activeRange.clone(true);}
+			if (range === undefined) {range = this.activeRange.clone(true);}
 
 			for (r = range.r1; r <= range.r2; ++r) {
-				row = t.cache.rows[r];
+				row = this.cache.rows[r];
 				if (row !== undefined) {
 					// Должны еще крайнюю удалить
 					c = range.c1;

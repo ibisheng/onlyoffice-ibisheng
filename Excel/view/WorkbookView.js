@@ -84,6 +84,17 @@
 
 			// Число знаков для математической информации
 			this.mathMaxDigCount = 9;
+
+			var cnv = document.createElement("canvas");
+			cnv.width = 2;
+			cnv.height = 2;
+			var ctx = cnv.getContext("2d");
+			ctx.clearRect(0, 0, 2, 2);
+			ctx.fillStyle = "#000";
+			ctx.fillRect(0, 0, 1, 1);
+			ctx.fillRect(1, 1, 1, 1);
+			this.ptrnLineDotted1 = ctx.createPattern(cnv, "repeat");
+
 			return this;
 		}
 
