@@ -710,12 +710,14 @@ CEqArray.prototype.init = function(props)
 }
 CEqArray.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
+    var CurrAmperWPoints = RPI.AmperWPoints,
+        CurrEqqArray        = RPI.bEqqArray;
+
     RPI.bEqqArray = true;
 
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    //this.Set_CompiledCtrPrp(ParaMath);
 
     RPI.AmperWPoints = new AmperWidths();
 
@@ -728,8 +730,8 @@ CEqArray.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     this.recalculateSize(oMeasure, RPI);
 
-    RPI.AmperWPoints = null;
-    RPI.bEqqArray     = false;
+    RPI.AmperWPoints = CurrAmperWPoints;
+    RPI.bEqqArray    = CurrEqqArray;
 
     //CEqArray.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
 }

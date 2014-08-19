@@ -53,6 +53,7 @@ CRPI.prototype.Copy = function()
     RPI.bInsideFraction = this.bInsideFraction;
     RPI.bChangeInline   = this.bChangeInline;
     RPI.bNaryInline     = this.bNaryInline;
+    RPI.bManyRuns       = false;
 
     return RPI;
 }
