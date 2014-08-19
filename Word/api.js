@@ -1642,9 +1642,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		}
 	};
 
-    this.CoAuthoringApi.init(this.User, documentId, 'fghhfgsjdgfjs', window.location.hostname,
-		window.location.port, g_sMainServiceLocalUrl, function(){
-    }, c_oEditorId.Word, documentFormatSave, this.isViewMode);
+    this.CoAuthoringApi.init(this.User, documentId, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Word,
+		documentFormatSave, this.isViewMode);
 
     // ToDo init other callbacks
 };

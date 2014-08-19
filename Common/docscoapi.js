@@ -30,8 +30,7 @@
 		}
 	};
 
-	CDocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
-										  editorType, documentFormatSave, isViewer) {
+	CDocsCoApi.prototype.init = function (user, docid, token, callback, editorType, documentFormatSave, isViewer) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
@@ -50,8 +49,7 @@
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
 
-			this._CoAuthoringApi.init(user, docid, token, serverHost, serverPort, serverPath, callback,
-				editorType, documentFormatSave, isViewer);
+			this._CoAuthoringApi.init(user, docid, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
 		}
 		else {
@@ -300,10 +298,6 @@
 		this._user = "Anonymous";
 		this._initCallback = null;
 		this.ownedLockBlocks = [];
-		// Server info
-		this._serverHost = null;
-		this._serverPort = null;
-		this._serverPath = null;
 		this.sockjs_url = null;
 		this.sockjs = null;
 		this._isExcel = false;
@@ -809,17 +803,12 @@
 		}
 	};
 
-    DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPort, serverPath, callback,
-										 editorType, documentFormatSave, isViewer) {
+    DocsCoApi.prototype.init = function (user, docid, token, callback, editorType, documentFormatSave, isViewer) {
         this._user = user;
         this._docid = docid;
         this._token = token;
         this._initCallback = callback;
         this.ownedLockBlocks = [];
-		// Server info
-		this._serverHost = serverHost;
-		this._serverPort = serverPort ? serverPort : '';
-		this._serverPath = serverPath;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
 		this._isExcel = c_oEditorId.Spreadsheet === editorType;
 		this._isPresentation = c_oEditorId.Presentation === editorType;
@@ -860,24 +849,25 @@
 			}
 			t._send(
 				{
-					"type":"auth",
-					"docid":t._docid,
-					"token":t._token,
-					"user": {
-						"id":t._user.asc_getId(),
-						"name":t._user.asc_getUserName(),
-						"color":t._user.asc_getColorValue()
+					'type'	: 'auth',
+					'docid'	: t._docid,
+					'token'	: t._token,
+					'user'	: {
+						'id'	: t._user.asc_getId(),
+						'name'	: t._user.asc_getUserName(),
+						'color'	: t._user.asc_getColorValue()
 					},
-					"locks":t.ownedLockBlocks,
-					"sessionId":t._id,
-					"server": {
-						"host": t._serverHost,
-						"port": t._serverPort,
-						"path":t._serverPath
+					'locks'		: t.ownedLockBlocks,
+					'sessionId'	: t._id,
+					'server'	: {
+						'https'	: 'https:' === window.location.protocol
+						'host'	: window.location.hostname,
+						'port'	: window.location.port || '',
+						'path'	: g_sMainServiceLocalUrl
 					},
-					"documentFormatSave": t._documentFormatSave,
-					"isViewer": t._isViewer,
-					"version": asc_coAuthV
+					'documentFormatSave'	: t._documentFormatSave,
+					'isViewer'	: t._isViewer,
+					'version'	: asc_coAuthV
 				});
 
 		};
