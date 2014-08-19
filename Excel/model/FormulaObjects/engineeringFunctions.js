@@ -1578,7 +1578,10 @@ cIMABS.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    return this.value = new cNumber( c.Abs() );
+    this.value = new cNumber( c.Abs() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMABS.prototype.getInfo = function () {
@@ -1613,7 +1616,10 @@ cIMAGINARY.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    return this.value = new cNumber( c.Imag() );
+    this.value = new cNumber( c.Imag() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMAGINARY.prototype.getInfo = function () {
@@ -1648,7 +1654,10 @@ cIMARGUMENT.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    return this.value = new cNumber( c.Arg() );
+    this.value = new cNumber( c.Arg() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMARGUMENT.prototype.getInfo = function () {
@@ -1683,7 +1692,10 @@ cIMCONJUGATE.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    return this.value = new cString( c.Conj() );
+    this.value = new cString( c.Conj() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMCONJUGATE.prototype.getInfo = function () {
@@ -1720,7 +1732,10 @@ cIMCOS.prototype.Calculate = function ( arg ) {
 
     c.Cos();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMCOS.prototype.getInfo = function () {
@@ -1768,7 +1783,10 @@ cIMDIV.prototype.Calculate = function ( arg ) {
 
     c3 = c1.Div( c2 );
 
-    return this.value = new cString( c3.toString() );
+    this.value = new cString( c3.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMDIV.prototype.getInfo = function () {
@@ -1805,7 +1823,10 @@ cIMEXP.prototype.Calculate = function ( arg ) {
 
     c.Exp();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMEXP.prototype.getInfo = function () {
@@ -1842,7 +1863,10 @@ cIMLN.prototype.Calculate = function ( arg ) {
 
     c.Ln();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMLN.prototype.getInfo = function () {
@@ -1879,7 +1903,10 @@ cIMLOG10.prototype.Calculate = function ( arg ) {
 
     c.Log10();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMLOG10.prototype.getInfo = function () {
@@ -1916,7 +1943,10 @@ cIMLOG2.prototype.Calculate = function ( arg ) {
 
     c.Log2();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMLOG2.prototype.getInfo = function () {
@@ -1967,6 +1997,8 @@ cIMPOWER.prototype.Calculate = function ( arg ) {
     else {
         this.value = new cError( cErrorType.not_numeric );
     }
+
+    this.value.numFormat = 0;
 
     return this.value;
 
@@ -2052,6 +2084,8 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
         this.value = new cString( c.toString() );
     }
 
+    this.value.numFormat = 0;
+
     return this.value;
 
 }
@@ -2087,7 +2121,10 @@ cIMREAL.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    return this.value = new cNumber( c.real );
+    this.value = new cNumber( c.real );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMREAL.prototype.getInfo = function () {
@@ -2124,7 +2161,10 @@ cIMSIN.prototype.Calculate = function ( arg ) {
 
     c.Sin();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMSIN.prototype.getInfo = function () {
@@ -2161,7 +2201,10 @@ cIMSQRT.prototype.Calculate = function ( arg ) {
 
     c.SQRT();
 
-    return this.value = new cString( c.toString() );
+    this.value = new cString( c.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMSQRT.prototype.getInfo = function () {
@@ -2209,7 +2252,10 @@ cIMSUB.prototype.Calculate = function ( arg ) {
 
     c1.Sub( c2 );
 
-    return this.value = new cString( c1.toString() );
+    this.value = new cString( c1.toString() );
+    this.value.numFormat = 0;
+
+    return this.value;
 
 }
 cIMSUB.prototype.getInfo = function () {
@@ -2293,6 +2339,8 @@ cIMSUM.prototype.Calculate = function ( arg ) {
     else {
         this.value = new cString( c.toString() );
     }
+
+    this.value.numFormat = 0;
 
     return this.value;
 
