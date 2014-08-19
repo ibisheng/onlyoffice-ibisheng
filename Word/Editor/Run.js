@@ -4377,6 +4377,10 @@ ParaRun.prototype =
 
         if ( true === CheckEnd )
             return ( EndPos > StartPos ? false : true );
+        else if(this.Type == para_Math_Run && this.Is_Empty())
+        {
+            return false;
+        }
         else
         {
             for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
@@ -7569,6 +7573,7 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
 
     if(this.bEqqArray)
     {
+        var alignEven = 0;
         var align = 0;
         // нечетным точкам соответствуют четные индексы в массиве
 
@@ -7581,42 +7586,64 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
         var widthCurrPoint = 0;
 
 
-        for(var j = 0; j < WPointsLng; j += 2)
+        if(WPointsLng > 0) // есть точки выравнивания
         {
-            widthCurrPoint = 0;
-
-            if(j == WPointsLng - 1)
-                align = (PosInfo.Widths[j/2] - this.WidthsPoints[j])/2; // то есть последняя точка четная, выравнивание по центру
-            else
-                align = PosInfo.Points[j/2] - this.WidthsPoints[j];
-
-            NewPos.x += align;
-
-            while(Pos < lng && Amp < 3)
+            for(var j = 0; j < WPointsLng; j++)
             {
-                if(this.Content[Pos].Type == para_Math_Ampersand)
+                widthCurrPoint = 0;
+
+                if(j == WPointsLng - 1 && this.WidthsPoints[j].odd == -1) // то есть последняя точка четная, выравнивание по центру
                 {
-                    Amp++;
-                    if(Amp < 3)
-                    {
-                        this.Content[Pos].setPosition(NewPos);
-                        Pos++;
-                    }
+                    align = (PosInfo.Widths[j] - this.WidthsPoints[j].even)/2;
+                    alignEven = 0;
                 }
                 else
                 {
-                    this.Content[Pos].setPosition(NewPos);
-                    NewPos.x += this.Content[Pos].size.width;
-                    widthCurrPoint += this.Content[Pos].size.width;
-                    W += this.Content[Pos].size.width;
-                    Pos++;
+                    alignEven = (PosInfo.Widths[j] - PosInfo.Points[j].even - PosInfo.Points[j].odd)/2;
+                    align = PosInfo.Points[j].even - this.WidthsPoints[j].even;
                 }
+
+                NewPos.x += align + alignEven;
+
+                while(Pos < lng && Amp < 3)
+                {
+                    if(this.Content[Pos].Type == para_Math_Ampersand)
+                    {
+                        Amp++;
+                        if(Amp < 3)
+                        {
+                            this.Content[Pos].setPosition(NewPos);
+                            Pos++;
+                        }
+                    }
+                    else
+                    {
+                        this.Content[Pos].setPosition(NewPos);
+                        NewPos.x += this.Content[Pos].size.width;
+                        widthCurrPoint += this.Content[Pos].size.width;
+                        W += this.Content[Pos].size.width;
+                        Pos++;
+                    }
+                }
+
+                NewPos.x += PosInfo.Widths[j] - widthCurrPoint - align - alignEven; // выравнивание справа
+
+                Amp = 0;
             }
-
-            NewPos.x += PosInfo.Widths[j/2] - widthCurrPoint - align; // выравнивание справа
-
-            Amp = 0;
         }
+        else    // точки выравнивания отсутсвуют
+        {
+            align = (PosInfo.Widths[0] - this.size.width)/2;
+
+            NewPos.x += align;
+            for(var i = 0; i < this.Content.length; i++)
+            {
+                this.Content[i].setPosition(NewPos);
+                NewPos.x += this.Content[i].size.width;
+            }
+        }
+
+
 
         /*if(Pos < lng)
         {
@@ -7724,10 +7751,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     if(RPI.bEqqArray)
     {
         Widths = RPI.AmperWPoints.GetWidths();
-
-        Widths[0] = 0
-        this.WidthsPoints.length = 0;
-        this.WidthsPoints[0] = 0;
+        Widths[0] = 0;
     }
 
     this.size.SetZero();
@@ -7735,13 +7759,16 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     var widthCurr = 0,
         ascent = 0, descent = 0;
 
-    for (var i = 0 ; i < this.Content.length; i++ )
+    var Lng = this.Content.length;
+    var len, NewPoint;
+
+    for (var i = 0 ; i < Lng; i++)
     {
         this.Content[i].Resize(oMeasure, this, RPI);
 
         var oSize = this.Content[i].size;
 
-        widthCurr = oSize.width + this.Content[i].GapLeft + this.Content[i].GapRight;
+        widthCurr = oSize.width;
         this.size.width += widthCurr;
 
         var oDescent = oSize.height - oSize.ascent;
@@ -7776,18 +7803,49 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
         {
             if(this.Content[i].Type == para_Math_Ampersand)
             {
+                if(PosW % 2 == 0)
+                {
+                    NewPoint = new CMathPoint();
+                    NewPoint.even = Widths[PosW];
+
+                    this.WidthsPoints.push(NewPoint);
+                }
+                else
+                {
+                    len = this.WidthsPoints.length;
+                    this.WidthsPoints[len-1].odd = Widths[PosW];
+                }
+
                 PosW++;
                 Widths[PosW] = 0;
-                this.WidthsPoints[PosW] = 0;
+
             }
             else
-            {
                 Widths[PosW] += widthCurr;
-                this.WidthsPoints[PosW] += widthCurr;
-            }
+
         }
 
     }
+
+
+    len = this.WidthsPoints.length;
+
+    if(RPI.bEqqArray && len > 0)
+    {
+        if(PosW%2 == 0)
+        {
+            NewPoint = new CMathPoint();
+            NewPoint.even = Widths[PosW];
+            NewPoint.odd  = -1;
+
+            this.WidthsPoints.push(NewPoint);
+        }
+        else
+        {
+            this.WidthsPoints[len-1].odd = Widths[PosW];
+        }
+    }
+
 
     this.size.ascent = ascent;
     this.size.height = ascent + descent;
@@ -7821,52 +7879,6 @@ ParaRun.prototype.Set_MathPrp = function(props)
 {
     this.MathPrp.setMathProps(props);
 }
-/*ParaRun.prototype.Apply_StyleBold = function(Value)
-{
-    if(Value == undefined)
-        Value = false;
-
-
-    if(Value == true)
-    {
-        if(this.MathPrp.sty == STY_ITALIC)
-            this.Apply_Style(STY_BI);
-        else if(this.MathPrp.sty == STY_PLAIN)
-            this.Apply_Style(STY_BOLD);
-    }
-    else if(Value == false)
-    {
-        if(this.MathPrp.sty == STY_BI)
-            this.Apply_Style(STY_ITALIC);
-        else if(this.MathPrp.sty == STY_BOLD)
-            this.Apply_Style(STY_PLAIN);
-    }
-}
-ParaRun.prototype.Apply_StyleItalic = function(Value)
-{
-    if(Value == undefined)
-        Value = true;
-
-    if(Value == true)
-    {
-        if(this.MathPrp.sty == STY_BOLD)
-            this.Apply_Style(STY_BI);
-        else if(this.MathPrp.sty == STY_PLAIN)
-            this.Apply_Style(STY_ITALIC);
-        else
-            this.Apply_Style(STY_ITALIC);
-    }
-    else if(Value == false)
-    {
-        if(this.MathPrp.sty == STY_BI)
-            this.Apply_Style(STY_BOLD);
-        else if(this.MathPrp.sty == STY_ITALIC)
-            this.Apply_Style(STY_PLAIN);
-        else
-            this.Apply_Style(STY_PLAIN);
-    }
-
-}*/
 ParaRun.prototype.Math_Apply_Style = function(Value)
 {
     if(Value !== this.MathPrp.sty)
@@ -7909,12 +7921,15 @@ ParaRun.prototype.Math_SetGaps = function(GapsInfo)
 
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
-        GapsInfo.leftRunPrp = GapsInfo.currRunPrp;
-        GapsInfo.Left       = GapsInfo.Current;
+        if( !this.Content[Pos].IsAlignPoint() )
+        {
+            GapsInfo.leftRunPrp = GapsInfo.currRunPrp;
+            GapsInfo.Left       = GapsInfo.Current;
 
-        GapsInfo.currRunPrp = oWPrp;
-        GapsInfo.Current = this.Content[Pos];
-        GapsInfo.setGaps();
+            GapsInfo.currRunPrp = oWPrp;
+            GapsInfo.Current = this.Content[Pos];
+            GapsInfo.setGaps();
+        }
     }
 }
 ParaRun.prototype.IsPlaceholder = function()

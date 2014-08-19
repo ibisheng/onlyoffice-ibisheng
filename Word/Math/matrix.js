@@ -647,6 +647,12 @@ CMathMatrix.prototype.Get_Id = function()
 	return this.Id;
 }
 
+function CMathPoint()
+{
+    this.even = 0;
+    this.odd  = 0;
+}
+
 ////
 function CEqArray(props)
 {
@@ -755,6 +761,7 @@ CEqArray.prototype.getMetrics = function(RPI)
         odd  = 0;
         last = 0;
 
+
         for(var i = 0; i < this.nRow; i++)
         {
             var W   = RPI.AmperWPoints.Widths[i],
@@ -776,15 +783,19 @@ CEqArray.prototype.getMetrics = function(RPI)
 
         var w = even + odd > last ? even + odd : last;
 
+        var NewPoint = new CMathPoint();
+        NewPoint.even   = even;
+        NewPoint.odd    = odd;
+
         this.WidthsPoints.push(w);
-        this.Points.push(even);
+        this.Points.push(NewPoint);
 
         WidthsMetrics[0] += w;
 
         Pos += 2;
     }
 
-    if(true)
+    /*if(true)
     {
         var str = "";
 
@@ -795,7 +806,7 @@ CEqArray.prototype.getMetrics = function(RPI)
         }
 
         console.log(str);
-    }
+    }*/
 
     for(var i = 0; i < this.nRow; i++)
     {

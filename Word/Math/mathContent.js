@@ -3882,6 +3882,8 @@ CMathContent.prototype =
 		if (!this.bRoot && this.content.length == 0)
 			this.fillPlaceholders();
 
+        this.WidthToElement.length = 0;
+
         var lng = this.content.length;
 
         this.size.SetZero();

@@ -480,9 +480,6 @@ CMathText.prototype =
          height = g_oTextMeasurer.GetHeight();
         */
 
-        this.GapLeft = 0;
-        this.GapRight = 0;
-
         if(!this.bJDraw)
             this.Parent = Parent;
         else
@@ -514,11 +511,11 @@ CMathText.prototype =
             width = metricsTxt.Width;
             //width = metricsTxt.Width + this.GapLeft + this.GapRight;
 
-        this.WidthVisible = width;
-
         this.size.width  = this.GapLeft + this.GapRight + width;
         this.size.height = height;
         this.size.ascent = ascent;
+
+        this.WidthVisible = this.size.width;
 
         //this.size = {width: width, widthG: width, height: height, ascent: ascent};
     },
@@ -637,6 +634,10 @@ CMathText.prototype =
     {
         return this.Type == para_Math_Placeholder;
     },
+    IsAlignPoint: function()
+    {
+        return false
+    },
     // For ParaRun
     Is_Punctuation: function()
     {
@@ -711,6 +712,9 @@ function CMathAmp()
     this.bEqqArray = false;
     this.Type = para_Math_Ampersand;
 
+    this.GapLeft = 0;
+    this.GapRight = 0;
+
     this.pos = new CMathPosition();
 
     this.AmpText = new CMathText(false);
@@ -784,6 +788,10 @@ CMathAmp.prototype =
     IsAccent: function()
     {
         return this.Parent.IsAccent();
+    },
+    IsAlignPoint: function()
+    {
+        return this.Type == para_Math_Ampersand;
     }
 
 }
