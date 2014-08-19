@@ -3642,6 +3642,10 @@
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 360 );
 
+        oParser = new parserFormula( "AMORLINC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.70,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1484 );
+
     } )
 
     test( "Test: \"CUMIPMT\"", function () {
@@ -5643,7 +5647,7 @@
 
         oParser = new parserFormula( "ERFC(-1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+        strictEqual( oParser.calculate().getValue(), 1.8427007929497148 );
 
     })
 
