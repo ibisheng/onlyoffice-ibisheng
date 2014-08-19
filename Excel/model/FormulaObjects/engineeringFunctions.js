@@ -1268,7 +1268,7 @@ cERF.prototype.Calculate = function ( arg ) {
 
     a = a.tocNumber();
     if ( a instanceof cError ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+        return this.value = a;
     }
 
     a = a.getValue();
@@ -1276,7 +1276,7 @@ cERF.prototype.Calculate = function ( arg ) {
     if ( !( b instanceof cUndefined ) ) {
         b = b.tocNumber();
         if ( b instanceof cError ) {
-            return this.value = new cError( cErrorType.wrong_value_type );
+            return this.value = b
         }
 
         b = b.getValue();
