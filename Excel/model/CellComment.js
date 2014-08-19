@@ -448,6 +448,7 @@ function CCellCommentator(currentSheet) {
 	this.lastSelectedId = null;
 	this.bSaveHistory = true;
 }
+CCellCommentator.sStartCommentId = 'comment_';
 
 //-----------------------------------------------------------------------------------
 // Public methods
@@ -457,91 +458,43 @@ CCellCommentator.prototype.isViewerMode = function () {
 	return this.worksheet.handlers.trigger("getViewerMode");
 };
 
-CCellCommentator.prototype.isLockedComment = function(oComment, lockByDefault, callbackFunc) {
-	var lockInfo;
-
-	var model = this.worksheet.model;
-	var sheetId = model.getId();
+CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
+	if (false === this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
+		// Запрещено совместное редактирование
+		Asc.applyFunction(callbackFunc, true);
+		return;
+	}
 
 	var objectGuid = oComment.asc_getId();
 	if (objectGuid) {
+		// Комментарии не должны влиять на lock-листа, поэтому вместо добавления нового c_oAscLockTypeElem, поменяем имя листа
+		var sheetId = CCellCommentator.sStartCommentId;
+		if (!oComment.bDocument)
+			sheetId += this.worksheet.model.getId();
 
-		if (false === this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-			// Запрещено совместное редактирование
-			Asc.applyFunction(callbackFunc, true);
-			return;
-		}
-
-		if ( lockByDefault )
-			this.worksheet.collaborativeEditing.onStartCheckLock();
-
-		// Комментарий к документу блокируем как Range
-		if ( !oComment.asc_getDocumentFlag() ) {
-			var c = oComment.asc_getCol();
-			var r = oComment.asc_getRow();
-			var c1, r1, c2, r2;
-			var mergedRange = model.getMergedByCell(r, c);
-			if (mergedRange) {
-				c1 = mergedRange.c1;
-				r1 = mergedRange.r1;
-				c2 = mergedRange.c2;
-				r2 = mergedRange.r2;
-			} else {
-				c1 = c2 = c;
-				r1 = r2 = r;
-			}
-
-			lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new Asc.asc_CCollaborativeRange(c1, r1, c2, r2));
-		} else
-			lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
+		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null,
+			sheetId, objectGuid);
 
 		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
 			// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
 			Asc.applyFunction(callbackFunc, true);
 			callbackFunc = undefined;
 		}
-		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
+			c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 			// Редактируем сами
 			Asc.applyFunction(callbackFunc, true);
 			return;
-		}
-		else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+		} else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
+			c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 			// Уже ячейку кто-то редактирует
 			Asc.applyFunction(callbackFunc, false);
 			return;
 		}
 
-		// Блокируем
-		if ( lockByDefault ) {
-			this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
-			this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
-		}
-		else
-			Asc.applyFunction(callbackFunc, true);
-	}
-};
-CCellCommentator.prototype.callLockComments = function(range) {
-	if ( range ) {
-		for (var i = 0; i < this.aComments.length; i++) {
-			var comment = this.aComments[i];
-			if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) )
-				this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-		}
-	}
-};
-
-CCellCommentator.prototype.unlockComments = function() {
-	for (var i = 0; i < this.aComments.length; i++) {
-		this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", this.aComments[i].asc_getId());
-	}
-};
-
-CCellCommentator.prototype.tryUnlockComment = function(id) {
-	for (var i = 0; i < this.aComments.length; i++) {
-		if ( this.aComments[i].asc_getId() == id ) {
-			this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", id);
-			break;
-		}
+		this.worksheet.collaborativeEditing.onStartCheckLock();
+		this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
+		this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
 	}
 };
 
@@ -919,43 +872,6 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 	}
 };
 
-CCellCommentator.prototype.showHideComments = function(bHide, bColumn, start, stop) {
-
-	var t = this;
-	var aChangedComments = [];
-
-	function updateCommentsList(aComments) {
-		if ( aComments.length ) {
-
-			History.StartTransaction();
-			for (var i = 0; i < aComments.length; i++) {
-				this.asc_changeComment(aComments[i].asc_getId(), aComments[i]);
-			}
-			History.EndTransaction();
-			t.drawCommentCells();
-		}
-	}
-
-
-	for (var i = 0; i < this.aComments.length; i++) {
-		var comment = new asc_CCommentData(this.aComments[i]);
-
-		if ( bColumn ) {
-			if ( (comment.nCol >= start) && (comment.nCol <= stop) ) {
-				comment.asc_putHiddenFlag(bHide);
-				aChangedComments.push(comment);
-			}
-		}
-		else {
-			if ( (comment.nRow >= start) && (comment.nRow <= stop) ) {
-				comment.asc_putHiddenFlag(bHide);
-				aChangedComments.push(comment);
-			}
-		}
-	}
-	updateCommentsList(aChangedComments);
-};
-
 CCellCommentator.prototype.sortComments = function(activeRange, changes) {
 	var t = this;
 
@@ -1246,42 +1162,25 @@ CCellCommentator.prototype.asc_hideComments = function() {
 // Main
 
 CCellCommentator.prototype.asc_showComment = function(id, bNew) {
-
-	var t = this;
 	var comment = this.asc_findComment(id);
-
 	if (comment) {
+		var commentList = this.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
+		var coords = this.getCommentsCoords(commentList);
 
-		var callbackFunc = function(result) {
+		var indexes = [];
+		for (var i = 0; i < commentList.length; i++) {
+			indexes.push(commentList[i].asc_getId());
+		}
 
-			if ( !result )
-				t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-			else
-				t.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
-
-			var commentList = t.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
-			var coords = t.getCommentsCoords(commentList);
-
-			var indexes = [];
-			for (var i = 0; i < commentList.length; i++) {
-				indexes.push(commentList[i].asc_getId());
-			}
-
-			// Second click - hide comment
-			if (indexes.length) {
-				if ( t.lastSelectedId != id )
-					t.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
-
-				t.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(), coords.asc_getTopPX(), coords.asc_getReverseLeftPX(), bNew);
-				t.drawCommentCells();
-			}
-			t.lastSelectedId = id;
-		};
-
-		t.isLockedComment(comment, false, callbackFunc);
-	}
-	else
-		t.lastSelectedId = null;
+		// Second click - hide comment
+		if (indexes.length) {
+			this.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(),
+				coords.asc_getTopPX(), coords.asc_getReverseLeftPX(), bNew);
+			this.drawCommentCells();
+		}
+		this.lastSelectedId = id;
+	} else
+		this.lastSelectedId = null;
 };
 
 CCellCommentator.prototype.asc_selectComment = function(id, bMove) {
@@ -1353,7 +1252,6 @@ CCellCommentator.prototype.asc_findComment = function(id) {
 };
 
 CCellCommentator.prototype.asc_addComment = function(comment, bIsNotUpdate) {
-
 	var t = this;
 	var oComment = comment;
 	var bChange = false;
@@ -1367,11 +1265,10 @@ CCellCommentator.prototype.asc_addComment = function(comment, bIsNotUpdate) {
 		}
 
 		var existComments = this.asc_getComments(oComment.nCol, oComment.nRow);
-		if ( existComments.length ) {
+		if (existComments.length) {
 			oComment = existComments[0];
 			bChange = true;
-		}
-		else {
+		} else {
 			if ((oComment.nCol != null) && (oComment.nRow != null)) {
 				var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
 				oComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
@@ -1379,98 +1276,83 @@ CCellCommentator.prototype.asc_addComment = function(comment, bIsNotUpdate) {
 		}
 	}
 
-	function callbackFunc(result) {
-		if ( !result ) {
-			t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", oComment.asc_getId(), oComment.asc_getUserId());
-		}
-		else {
-			t._addComment(oComment, bChange, bIsNotUpdate);
-		}
-	}
-
-	if (bIsNotUpdate)
-		callbackFunc(true);
-	else
-		this.isLockedComment(oComment, true, callbackFunc);
+	var onAddCommentCallback = function (isSuccess) {
+		if (false === isSuccess)
+			return;
+		t._addComment(oComment, bChange, bIsNotUpdate);
+	};
+	this.isLockedComment(oComment, onAddCommentCallback);
 };
 
 CCellCommentator.prototype.asc_changeComment = function(id, oComment, bChangeCoords, bNoEvent) {
-
 	var t = this;
 	var comment = this.asc_findComment(id);
 	if (null === comment)
 		return;
 
-	function callbackFunc(result) {
-		if ( !result ) {
-			t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-		} else {
-			t.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
+	var onChangeCommentCallback = function (isSuccess) {
+		if (false === isSuccess)
+			return;
 
-			var commentBefore = new asc_CCommentData(comment);
-			if (comment) {
-				if ( bChangeCoords ) {
-					comment.asc_putCol(oComment.asc_getCol());
-					comment.asc_putRow(oComment.asc_getRow());
-				}
-				comment.asc_putText(oComment.asc_getText());
-				comment.asc_putQuoteText(oComment.asc_getQuoteText());
-				comment.asc_putUserId(oComment.asc_getUserId());
-				comment.asc_putUserName(oComment.asc_getUserName());
-				comment.asc_putTime(oComment.asc_getTime());
-				comment.asc_putSolved(oComment.asc_getSolved());
-				comment.asc_putHiddenFlag(oComment.asc_getHiddenFlag());
-				comment.aReplies = [];
+		var commentBefore = new asc_CCommentData(comment);
+		if (comment) {
+			if ( bChangeCoords ) {
+				comment.asc_putCol(oComment.asc_getCol());
+				comment.asc_putRow(oComment.asc_getRow());
+			}
+			comment.asc_putText(oComment.asc_getText());
+			comment.asc_putQuoteText(oComment.asc_getQuoteText());
+			comment.asc_putUserId(oComment.asc_getUserId());
+			comment.asc_putUserName(oComment.asc_getUserName());
+			comment.asc_putTime(oComment.asc_getTime());
+			comment.asc_putSolved(oComment.asc_getSolved());
+			comment.asc_putHiddenFlag(oComment.asc_getHiddenFlag());
+			comment.aReplies = [];
 
-				if ( !comment.bDocument && (comment.nCol != null) && (comment.nRow != null) ) {
-					var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
-					comment.sQuoteText = cellAddress.getID() + " : " + t.worksheet.model.getCell(cellAddress).getValueWithFormat();
-				}
-
-				var count = oComment.asc_getRepliesCount();
-				for (var i = 0; i < count; i++) {
-					comment.asc_addReply(oComment.asc_getReply(i));
-				}
-				if ( !bNoEvent )
-					t.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
+			if ( !comment.bDocument && (comment.nCol != null) && (comment.nRow != null) ) {
+				var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
+				comment.sQuoteText = cellAddress.getID() + " : " + t.worksheet.model.getCell(cellAddress).getValueWithFormat();
 			}
 
-			if ( t.bSaveHistory ) {
-				var commentAfter = new asc_CCommentData(comment);
-
-				var compositeComment = new CompositeCommentData();
-				compositeComment.commentBefore = commentBefore;
-				compositeComment.commentAfter = commentAfter;
-
-				History.Create_NewPoint();
-				History.Add(g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
+			var count = oComment.asc_getRepliesCount();
+			for (var i = 0; i < count; i++) {
+				comment.asc_addReply(oComment.asc_getReply(i));
 			}
-
-			t.drawCommentCells();
+			if ( !bNoEvent )
+				t.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 		}
-	}
 
-	this.isLockedComment(comment, true, callbackFunc);
+		if ( t.bSaveHistory ) {
+			var commentAfter = new asc_CCommentData(comment);
+
+			var compositeComment = new CompositeCommentData();
+			compositeComment.commentBefore = commentBefore;
+			compositeComment.commentAfter = commentAfter;
+
+			History.Create_NewPoint();
+			History.Add(g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
+		}
+
+		t.drawCommentCells();
+	};
+
+	this.isLockedComment(comment, onChangeCommentCallback);
 };
 
 CCellCommentator.prototype.asc_removeComment = function(id, bNoEvent) {
-
 	var t = this;
 	var comment = this.asc_findComment(id);
 	if (null === comment)
 		return;
 
-	function callbackFunc(result) {
-		if ( !result ) {
-			t.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
-		} else {
-			t.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
-		}
+	var onRemoveCommentCallback = function (isSuccess) {
+		if (false === isSuccess)
+			return;
 
 		t._removeComment(comment, bNoEvent, true);
-	}
+	};
 
-	this.isLockedComment(comment, true, callbackFunc);
+	this.isLockedComment(comment, onRemoveCommentCallback);
 };
 
 // Extra functions
@@ -1526,8 +1408,6 @@ CCellCommentator.prototype.asc_getDocumentComments = function() {
 };
 
 CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpdate) {
-	this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", oComment.asc_getId());
-
 	// Add new comment
 	if (!bChange) {
 		History.Create_NewPoint();

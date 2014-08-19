@@ -240,11 +240,14 @@
 			for (;bIsCollaborative && nIndex < nCount; ++nIndex) {
 				oLock = this.m_arrNeedUnlock[nIndex];
 				if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-                    drawing = g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
-                    if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
-                        drawing.lockType = c_oAscLockTypes.kLockTypeNone;
-                        bRedrawGraphicObjects = true;
-                    }
+					if (!this.handlers.trigger("checkCommentRemoveLock", oLock.Element)) {
+						drawing = g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+						if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
+							drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+							bRedrawGraphicObjects = true;
+						}
+					}
+
 					this.m_arrNeedUnlock.splice(nIndex, 1);
 					--nIndex;
 					--nCount;
@@ -275,7 +278,6 @@
 					this.handlers.trigger("drawSelection");
 					this.handlers.trigger("drawFrozenPaneLines");
 					this.handlers.trigger("updateAllSheetsLock");
-					this.handlers.trigger("unlockComments");
 					this.handlers.trigger("showComments");
 				}
 

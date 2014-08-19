@@ -1492,13 +1492,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				"drawFrozenPaneLines":				function () {t._onDrawFrozenPaneLines.apply(t, arguments);},
 				"updateAllSheetsLock":				function () {t._onUpdateAllSheetsLock.apply(t, arguments);},
 				"showDrawingObjects":				function () {t._onShowDrawingObjects.apply(t, arguments);},
-				"resetLockedGraphicObjects":		function () {t._onResetLockedGraphicObjects.apply(t, arguments);},
-				"tryResetLockedGraphicObject":		function () {return t._onTryResetLockedGraphicObject.apply(t, arguments);},
 				"showComments":						function () {t._onShowComments.apply(t, arguments);},
-				"unlockComments":					function () {t._onUnlockComments.apply(t);},
-				"tryUnlockComment":					function () {t._onTryUnlockComment.apply(t, arguments);},
 				"cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);},
-				"updateDocumentCanSave":			function () {t._onUpdateDocumentCanSave();}
+				"updateDocumentCanSave":			function () {t._onUpdateDocumentCanSave();},
+				"checkCommentRemoveLock":			function (lockElem) {return t._onCheckCommentRemoveLock(lockElem);}
 			}, this.asc_getViewerMode());
 
 			if (!this.CoAuthoringApi) {
@@ -1518,22 +1515,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						t.collaborativeEditing.addUnlock(lockElem);
 					}
 
-					var drawing;
-					if (null != lockElem) {
-						var oldType = lockElem.getType();
-						if (c_oAscLockTypes.kLockTypeOther2 === oldType || c_oAscLockTypes.kLockTypeOther3 === oldType)
-							lockElem.setType(c_oAscLockTypes.kLockTypeOther3, true);
-						else
-							lockElem.setType(c_oAscLockTypes.kLockTypeOther, true);
+					var drawing, lockType = lockElem.Element["type"];
+					var oldType = lockElem.getType();
+					if (c_oAscLockTypes.kLockTypeOther2 === oldType || c_oAscLockTypes.kLockTypeOther3 === oldType)
+						lockElem.setType(c_oAscLockTypes.kLockTypeOther3, true);
+					else
+						lockElem.setType(c_oAscLockTypes.kLockTypeOther, true);
 
-						// Выставляем ID пользователя, залочившего данный элемент
-						lockElem.setUserId(e["user"]);
+					// Выставляем ID пользователя, залочившего данный элемент
+					lockElem.setUserId(e["user"]);
 
-						if (lockElem.Element["type"] === c_oAscLockTypeElem.Object) {
-							drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
-							if (drawing)
-								drawing.lockType = lockElem.Type;
-						}
+					if (lockType === c_oAscLockTypeElem.Object) {
+						drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
+						if (drawing)
+							drawing.lockType = lockElem.Type;
 					}
 
 					if (t.wb) {
@@ -1544,15 +1539,21 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						t._onUpdateSheetsLock(lockElem);
 
 						var ws = t.wb.getWorksheet();
-
-						// Нужно ли обновлять закрепление областей
-						if (t._onUpdateFrozenPane(lockElem, ws.model.getId()))
-							ws.draw();
-						else
-							ws.updateSelection();
-
-						if (drawing && ws.model === drawing.worksheet)
-							ws.objectRender.showDrawingObjects(true);
+						var lockSheetId = lockElem.Element["sheetId"];
+						if (lockSheetId === ws.model.getId()) {
+							if (lockType === c_oAscLockTypeElem.Object) {
+								// Нужно ли обновлять закрепление областей
+								if (t._onUpdateFrozenPane(lockElem))
+									ws.draw();
+								else if (drawing && ws.model === drawing.worksheet)
+									ws.objectRender.showDrawingObjects(true);
+							} else if (lockType === c_oAscLockTypeElem.Range) {
+								ws.updateSelection();
+							}
+						} else if (0 === lockSheetId.indexOf(CCellCommentator.sStartCommentId)) {
+							// Коммментарий
+							t.handlers.trigger("asc_onLockComment", lockElem.Element["rangeOrObjectId"], e["user"]);
+						}
 					}
 				}
 			};
@@ -1585,10 +1586,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					else {
 						// Удаляем из lock-ов, тот, кто правил ушел и не сохранил
 						t.collaborativeEditing.removeUnlock (lockElem);
-						if (lockElem.Element["type"] === c_oAscLockTypeElem.Object) {
-							drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
-							if (drawing)
-								drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+						if (!t._onCheckCommentRemoveLock(lockElem.Element)) {
+							if (lockElem.Element["type"] === c_oAscLockTypeElem.Object) {
+								drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
+								if (drawing)
+									drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+							}
 						}
 					}
 					if (t.wb) {
@@ -1606,7 +1609,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					worksheet._drawSelection();
 					worksheet._drawFrozenPaneLines();
 					worksheet.objectRender.showDrawingObjects(true);
-					worksheet.cellCommentator.unlockComments();
 				}
 			};
 			this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent) {
@@ -1735,7 +1737,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 
 			if (this.wb) {
-				this.wb.getWorksheet().cellCommentator.unlockComments();
 				// Нужно послать обновить свойства (иначе для удаления данных не обновится строка формул).
 				// ToDo Возможно стоит обновлять только строку формул
 				this.wb._onWSSelectionChanged(null);
@@ -1779,38 +1780,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 		};
 
-		spreadsheet_api.prototype._onResetLockedGraphicObjects = function () {
-			if (this.wb) {
-				this.wb.getWorksheet().objectRender.resetLockedGraphicObjects();
-			}
-		};
-
-		spreadsheet_api.prototype._onTryResetLockedGraphicObject = function (id) {
-			if (this.wb) {
-				for (var key in this.wb.wsViews) {
-					var ws = this.wb.wsViews[key];
-					ws.objectRender.tryResetLockedGraphicObject(id);
-				}
-			}
-		};
-
 		spreadsheet_api.prototype._onShowComments = function () {
 			if (this.wb) {
 				this.wb.getWorksheet().cellCommentator.drawCommentCells();
-			}
-		};
-
-		spreadsheet_api.prototype._onUnlockComments = function () {
-			if (this.wb) {
-				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.unlockComments();
-			}
-		};
-
-		spreadsheet_api.prototype._onTryUnlockComment = function (id) {
-			if (this.wb) {
-				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.tryUnlockComment(id);
 			}
 		};
 
@@ -1828,10 +1800,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 		};
 
-		spreadsheet_api.prototype._onUpdateFrozenPane = function (lockElem, sheetId) {
+		spreadsheet_api.prototype._onUpdateFrozenPane = function (lockElem) {
 			return (c_oAscLockTypeElem.Object === lockElem.Element["type"] &&
-				lockElem.Element["rangeOrObjectId"] === c_oAscLockNameFrozenPane &&
-				lockElem.Element["sheetId"] === sheetId);
+				lockElem.Element["rangeOrObjectId"] === c_oAscLockNameFrozenPane);
 		};
 
 		spreadsheet_api.prototype._sendWorkbookStyles = function () {
@@ -3219,6 +3190,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.isDocumentCanSave = tmp;
 				this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 			}
+		};
+
+		spreadsheet_api.prototype._onCheckCommentRemoveLock = function (lockElem) {
+			var res = false;
+			if (0 === lockElem["sheetId"].indexOf(CCellCommentator.sStartCommentId)) {
+				// Коммментарий
+				res = true;
+				this.handlers.trigger("asc_onUnLockComment", lockElem["rangeOrObjectId"]);
+			}
+			return res;
 		};
 
 		// offline mode
