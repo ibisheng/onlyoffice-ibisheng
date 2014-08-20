@@ -1903,6 +1903,10 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				{
 				    var item = aUndoRedoElems[i];
 				    if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
+				        if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"]) {
+				            if (!window["native"]["CheckNextChange"]())
+				                break;
+				        }
 				        // TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
 				        //     item.oData.drawingData.bCollaborativeChanges = true;
 				        History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);

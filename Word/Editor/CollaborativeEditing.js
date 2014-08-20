@@ -665,7 +665,7 @@ function CCollaborativeEditing()
         // Применяем изменения, пока они есть
         while ( this.m_aChanges.length > 0 )
         {
-            if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["SetCurrentChangeFile"])
+            if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"])
             {
                 if (!window["native"]["CheckNextChange"]())
                     break;
