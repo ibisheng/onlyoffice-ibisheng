@@ -622,7 +622,7 @@ function asc_docs_api(name)
     this._gui_control_colors = null;
     this._gui_color_schemes = null;
 
-    window["USE_FONTS_WIN_PARAMS"] = true;
+    //window["USE_FONTS_WIN_PARAMS"] = true;
 
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = true;
