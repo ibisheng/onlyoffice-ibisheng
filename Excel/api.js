@@ -1020,7 +1020,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"title"         : this.documentTitle,
 					"embeddedfonts" : this.isUseEmbeddedCutFonts
 				};
-				if (this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
+				if (false && this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
 					var sEmptyWorkbook = getEmptyWorkbook();
 					v["c"] = "create";
 					v["data"] = sEmptyWorkbook;

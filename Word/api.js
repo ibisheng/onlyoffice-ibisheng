@@ -1006,7 +1006,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 
 	if(documentId){
 		var oOpenOptions = this.DocInfo.get_Options();
-		if(oOpenOptions && oOpenOptions["isEmpty"])
+		if(false && oOpenOptions && oOpenOptions["isEmpty"])
 		{
 			var rData = {
 				"c": "create",
