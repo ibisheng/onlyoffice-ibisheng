@@ -4120,17 +4120,18 @@ Cell.prototype.setValue=function(val,callback){
             this.formulaParsed = null;
 		}
 	}
-	if ( this.ws.workbook.isNeedCacheClean ){
-		/*
-			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
-		*/
-		sortDependency(this.ws.workbook,true);
-	}
 	var DataNew = null;
 	if(History.Is_On())
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
-		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+	    History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+    if ( this.ws.workbook.isNeedCacheClean ){
+		/*
+			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
+		*/
+        //sortDependency вызывается ниже History.Add(historyitem_Cell_ChangeValue, потому что в ней может быть выставлен формат ячейки(если это текстовый, то принимая изменения формула станет текстом)
+		sortDependency(this.ws.workbook,true);
+	}
 	//todo не должны удаляться ссылки, если сделать merge ее части.
 	if(this.isEmptyTextString())
 	{
@@ -7703,12 +7704,6 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 						oCopyCell = this.worksheet._getCell(i, j);
 					else
 						oCopyCell = this.worksheet._getCell(j, i);
-					if(null != oFromCell)
-					{
-						oCopyCell.setStyle(oFromCell.getStyle());
-						if(bIsPromote)
-							oCopyCell.setType(oFromCell.getType());
-					}
 					if(bIsPromote)
 					{
 						if(false == bCopy && null != data.nCurValue)
@@ -7741,6 +7736,12 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 								}
 							}
 						}
+					}
+                    //выставляем стиль после текста, потому что если выставить числовой стиль ячейки 'text', то после этого не применится формула
+					if (null != oFromCell) {
+					    oCopyCell.setStyle(oFromCell.getStyle());
+					    if (bIsPromote)
+					        oCopyCell.setType(oFromCell.getType());
 					}
 				}
 			}
