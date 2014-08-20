@@ -53,6 +53,8 @@ var NumComporationOperators =
 function getNumberParts(x)
 {
     var sig = SignType.Null;
+    if (!isFinite(x))
+        x = 0;
 	if(x > 0)
 		sig = SignType.Positive;
 	else if(x < 0)
@@ -2673,7 +2675,7 @@ FormatParser.prototype =
             val = val.replace(".", "q");//заменяем на символ с которым не распознается, как в Excel
             val = val.replace(cultureInfo.NumberDecimalSeparator, ".");
         }
-        return Asc.isNumber(val);
+        return Asc.isNumberInfinity(val);
     },
     parseLocaleNumber: function (val, cultureInfo) {
         if (null == cultureInfo)
@@ -2683,7 +2685,7 @@ FormatParser.prototype =
             val = val.replace(".", "q");//заменяем на символ с которым не распознается, как в Excel
             val = val.replace(cultureInfo.NumberDecimalSeparator, ".");
         }
-        return parseFloat(val);
+        return val - 0;
     },
     parse: function (value, cultureInfo)
     {

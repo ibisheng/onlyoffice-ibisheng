@@ -18,6 +18,8 @@
 
 		/** @const */
 		var kLeftLim1 = .999999999999999;
+		var MAX_EXCEL_INT = 1e308;
+		var MIN_EXCEL_INT = -MAX_EXCEL_INT;
 
 		/** @const */
 		var kUndefinedL = "undefined";
@@ -833,6 +835,12 @@
 			return (valTrim - 0) == valTrim && valTrim.length > 0;
 		}
 
+		function isNumberInfinity(val) {
+		    var valTrim = trim(val);
+		    var valInt = valTrim - 0;
+		    return valInt == valTrim && valTrim.length > 0 && MIN_EXCEL_INT < valInt && valInt < MAX_EXCEL_INT;//
+		}
+
 		function arrayToLowerCase(array) {
 			var result = [];
 			for (var i = 0, length = array.length; i < length; ++i)
@@ -1507,6 +1515,7 @@
 		window["Asc"].isEqual = isEqual;
 		window["Asc"].profileTime = profileTime;
 		window["Asc"].isNumber = isNumber;
+		window["Asc"].isNumberInfinity = isNumberInfinity;
 		window["Asc"].trim = trim;
 		window["Asc"].extendClass = extendClass;
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;
