@@ -7574,10 +7574,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             {
                 var doc = this.Document;
                 //todo paragraph
-                var drawing = new ParaDrawing(image.W, image.H, null, doc.DrawingDocument, oParStruct.paragraph);
-                var Image = new WordImage( drawing, doc, doc.DrawingDocument, null );
+                var drawing = new ParaDrawing(image.W, image.H, null, doc.DrawingDocument, doc,  oParStruct.paragraph);
+
                 var src = this.oReadResult.ImageMap[image.MediaId];
-                Image.init( src, image.W, image.H, null );
+                var Image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(src, 0, 0, image.W, image.H);
+                drawing.Set_GraphicObject(Image);
+                Image.setParent(drawing);
                 if(c_oAscWrapStyle.Flow == image.Type)
                 {
                     drawing.Set_DrawingType(drawing_Anchor);
@@ -7585,11 +7587,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                     drawing.Set_PositionV(c_oAscRelativeFromV.Page, false, image.Y);
                     if(image.Paddings)
                         drawing.Set_Distance(image.Paddings.Left, image.Paddings.Top, image.Paddings.Right, image.Paddings.Bottom);
-                    History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : drawing});
                 }
-                //Copy вызывется только, потому что обьект создавался по пустому конструктору, а в нем могли совершаться какие-то операции над членами.
-                editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(drawing);
-                drawing.init();
                 if(null != drawing.GraphicObj)
                 {
                     window.global_pptx_content_loader.ImageMapChecker[src] = true;
