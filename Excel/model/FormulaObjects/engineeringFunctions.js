@@ -1608,7 +1608,7 @@ cIMAGINARY.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1646,7 +1646,7 @@ cIMARGUMENT.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1684,7 +1684,7 @@ cIMCONJUGATE.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1722,7 +1722,7 @@ cIMCOS.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1771,8 +1771,8 @@ cIMDIV.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocString();
     arg1 = arg1.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
-    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var c1 = new Complex( arg0.toString() ),
         c2 = new Complex( arg1.toString() ), c3;
@@ -1813,7 +1813,7 @@ cIMEXP.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1853,7 +1853,7 @@ cIMLN.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1893,7 +1893,7 @@ cIMLOG10.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1933,7 +1933,7 @@ cIMLOG2.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -1982,8 +1982,8 @@ cIMPOWER.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     arg1 = arg1.tocNumber();
 
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
-    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var c = new Complex( arg0.toString() );
 
@@ -2027,7 +2027,7 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocString();
 
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() ), c1;
 
@@ -2041,7 +2041,7 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
             for ( var j = 0; j < argIArr.length; j++ ) {
                 _arg = argIArr[i].tocString();
 
-                if ( _arg instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+                if ( _arg instanceof cError ) return this.value = _arg;
 
                 c1 = new Complex( _arg.toString() );
 
@@ -2055,7 +2055,7 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
         else if ( argI instanceof cArray ) {
             argI.foreach( function ( elem ) {
                 var e = elem.tocString();
-                if ( e instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+                if ( e instanceof cError ) return this.value = e;
 
                 c1 = new Complex( e.toString() );
 
@@ -2069,7 +2069,7 @@ cIMPRODUCT.prototype.Calculate = function ( arg ) {
 
         argI = argI.tocString();
 
-        if ( argI instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+        if ( argI instanceof cError ) return this.value = argI;
 
         c1 = new Complex( argI.toString() );
 
@@ -2113,7 +2113,7 @@ cIMREAL.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -2151,7 +2151,7 @@ cIMSIN.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -2191,7 +2191,7 @@ cIMSQRT.prototype.Calculate = function ( arg ) {
     }
 
     arg0 = arg0.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() );
 
@@ -2240,8 +2240,8 @@ cIMSUB.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocString();
     arg1 = arg1.tocString();
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
-    if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
 
     var c1 = new Complex( arg0.toString() ),
         c2 = new Complex( arg1.toString() );
@@ -2283,7 +2283,7 @@ cIMSUM.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.tocString();
 
-    if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+    if ( arg0 instanceof cError ) return this.value = arg0;
 
     var c = new Complex( arg0.toString() ), c1;
 
@@ -2297,7 +2297,7 @@ cIMSUM.prototype.Calculate = function ( arg ) {
             for ( var j = 0; j < argIArr.length; j++ ) {
                 _arg = argIArr[i].tocString();
 
-                if ( _arg instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+                if ( _arg instanceof cError ) return this.value = _arg;
 
                 c1 = new Complex( _arg.toString() );
 
@@ -2311,7 +2311,7 @@ cIMSUM.prototype.Calculate = function ( arg ) {
         else if ( argI instanceof cArray ) {
             argI.foreach( function ( elem ) {
                 var e = elem.tocString();
-                if ( e instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+                if ( e instanceof cError ) return this.value = e;
 
                 c1 = new Complex( e.toString() );
 
@@ -2325,7 +2325,7 @@ cIMSUM.prototype.Calculate = function ( arg ) {
 
         argI = argI.tocString();
 
-        if ( argI instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
+        if ( argI instanceof cError ) return this.value = argI;
 
         c1 = new Complex( argI.toString() );
 
