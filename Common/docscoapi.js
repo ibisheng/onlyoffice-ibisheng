@@ -860,7 +860,7 @@
 					'locks'		: t.ownedLockBlocks,
 					'sessionId'	: t._id,
 					'server'	: {
-						'https'	: 'https:' === window.location.protocol
+						'https'	: 'https:' === window.location.protocol,
 						'host'	: window.location.hostname,
 						'port'	: window.location.port || '',
 						'path'	: g_sMainServiceLocalUrl
