@@ -663,8 +663,14 @@ function CCollaborativeEditing()
         g_oIdCounter.Set_Load( true );
 
         // Применяем изменения, пока они есть
+        var _index = 0;
         while ( this.m_aChanges.length > 0 )
         {
+            if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["SetCurrentChangeFile"])
+            {
+                window["native"]["SetCurrentChangeFile"](_index++);
+            }
+        
             var Changes = this.m_aChanges[0];
             Changes.Apply_Data();
 

@@ -233,8 +233,10 @@ var Asc = window["Asc"];
 
 function NativeOpenFile()
 {
-    var doc_bin = window.native.GetFileString(g_file_path);
-    if (NATIVE_DOCUMENT_TYPE == "presentation" || NATIVE_DOCUMENT_TYPE == "document")
+    var doc_bin = window.native.GetFileString(window.native.GetFilePath());
+    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+    
+    if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["asc_docs_api"]("");       
         _api.asc_nativeOpenFile(doc_bin);
@@ -275,7 +277,7 @@ function NativeCalculateFile()
 
 function NativeApplyChanges()
 {
-    if (NATIVE_DOCUMENT_TYPE == "presentation" || NATIVE_DOCUMENT_TYPE == "document")
+    if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         var __changes = [];
         var _count_main = window.native.GetCountChanges();

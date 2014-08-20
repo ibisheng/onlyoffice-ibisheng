@@ -4675,6 +4675,11 @@ function CDrawingDocument()
         // regenerate styles
         if (null == this.m_oWordControl.m_oApi._gui_styles)
         {
+            if (window["NATIVE_EDITOR_ENJINE"] === true)
+            {
+                if (!this.m_oWordControl.m_oApi.asc_checkNeedCallback("asc_onInitEditorStyles"))
+                    return;
+            }
             var StylesPainter = new CStylesPainter();
             StylesPainter.GenerateStyles(this.m_oWordControl.m_oApi, this.m_oWordControl.m_oLogicDocument.Get_Styles().Style);
         }

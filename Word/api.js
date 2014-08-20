@@ -6168,6 +6168,12 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
 };
 asc_docs_api.prototype.GenerateStyles = function()
 {
+    if (window["NATIVE_EDITOR_ENJINE"] === true)
+    {
+        if (!this.asc_checkNeedCallback("asc_onInitEditorStyles"))
+            return;
+    }
+
     var StylesPainter = new CStylesPainter();
     if (null == this.LoadedObject && null != this.WordControl.m_oLogicDocument)
     {
