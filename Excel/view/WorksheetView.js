@@ -2293,16 +2293,14 @@
 			}
 
 			if (!drawingCtx) {
-				ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
-
 				left = this.cols[range.c1].left;
 				top = this.rows[range.r1].top;
 				// set clipping rect to cells area
-				ctx.save()
+				this.drawingCtx.save()
 					.beginPath()
 					.rect(left - offsetX, top - offsetY,
-					Math.min(this.cols[range.c2].left - left + this.cols[range.c2].width, ctx.getWidth() - this.cellsLeft),
-					Math.min(this.rows[range.r2].top - top + this.rows[range.r2].height, ctx.getHeight() - this.cellsTop))
+					Math.min(this.cols[range.c2].left - left + this.cols[range.c2].width, this.drawingCtx.getWidth() - this.cellsLeft),
+					Math.min(this.rows[range.r2].top - top + this.rows[range.r2].height, this.drawingCtx.getHeight() - this.cellsTop))
 					.clip();
 			}
 
@@ -2311,7 +2309,7 @@
 
 			if (!drawingCtx) {
 				// restore canvas' original clipping range
-				ctx.restore();
+				this.drawingCtx.restore();
 			}
 		};
 
@@ -4084,7 +4082,7 @@
 		 * @param {Asc.Range} [range]  Диапазон кэширования текта
 		 */
 		WorksheetView.prototype._prepareCellTextMetricsCache = function (range) {
-			var firstUpdateRow = null, tmp = null;
+			var firstUpdateRow = null;
 			if (!range) {
 				range = this.visibleRange;
 				if (this.topLeftFrozenCell) {
@@ -4121,10 +4119,8 @@
 		 * @param {Asc.Range} [range]  Диапазон кэширования текта
 		 */
 		WorksheetView.prototype._prepareCellTextMetricsCache2 = function (range) {
-			var s = this.cache.sectors;
-			if (s.length < 1) {return;}
-
 			var firstUpdateRow = null;
+			var s = this.cache.sectors;
 			for (var i = 0; i < s.length; ) {
 				if (s[i].isIntersect(range)) {
 					this._calcCellsTextMetrics(s[i]);
