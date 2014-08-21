@@ -1660,8 +1660,10 @@ function CDrawingDocument(drawingObjects)
     this.cursorPaintFormat = "";
     if (bIsIE)
     {
-        this.cursorPaintFormat = "url(../Common/Images/copy_format.cur), pointer";
-        this.cursorMarkerFormat = "url(../Common/Images/marker_format.cur), pointer";
+        // Пути указаны относительно html в меню, не надо их исправлять
+        // и коммитить на пути относительно тестового меню
+        this.cursorPaintFormat = "url(../../../sdk/Common/Images/copy_format.cur), pointer";
+        this.cursorMarkerFormat = "url(../../../sdk/Common/Images/marker_format.cur), pointer";
     }
     else if (window.opera)
     {

@@ -95,7 +95,9 @@
 		// ToDo стоит перенести в common-ы
 		var kCurFormatPainter = "";
 		if (AscBrowser.isIE)
-			kCurFormatPainter = "url(../Common/Images/copy_format.cur), pointer";
+			// Пути указаны относительно html в меню, не надо их исправлять
+			// и коммитить на пути относительно тестового меню
+			kCurFormatPainter = "url(../../../sdk/Common/Images/copy_format.cur), pointer";
 		else if (AscBrowser.isOpera)
 			kCurFormatPainter = "pointer";
 		else

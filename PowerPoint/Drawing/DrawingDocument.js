@@ -914,7 +914,9 @@ function CDrawingDocument()
     this.cursorPaintFormat = "";
     if (bIsIE)
     {
-        this.cursorPaintFormat = "url(../Common/Images/copy_format.cur), pointer";
+        // Пути указаны относительно html в меню, не надо их исправлять
+        // и коммитить на пути относительно тестового меню
+        this.cursorPaintFormat = "url(../../../sdk/Common/Images/copy_format.cur), pointer";
     }
     else if (window.opera)
         this.cursorPaintFormat = "pointer";
