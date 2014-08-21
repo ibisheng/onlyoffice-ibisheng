@@ -988,8 +988,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		else
 			documentOrigin = sHost;
 
-		var asc_user = window["Asc"].asc_CUser;
-		this.User = new asc_user();
+		this.User = new Asc.asc_CUser();
 		this.User.asc_setId(this.DocInfo.get_UserId());
 		this.User.asc_setUserName(this.DocInfo.get_UserName());
 	}
@@ -1476,8 +1475,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	}
 	//Если User не задан, отключаем коавторинг.
 	if (null == this.User || null == this.User.asc_getId()) {
-		var asc_user = window["Asc"].asc_CUser;
-		this.User = new asc_user();
+		this.User = new Asc.asc_CUser();
 		this.User.asc_setId("Unknown");
 		this.User.asc_setUserName("Unknown");
 
@@ -7721,8 +7719,8 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();        
-		var MathElement = new MathMenu (Type)
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+		var MathElement = new MathMenu (Type);
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
 };
@@ -7734,9 +7732,8 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
 
 	window.g_cAscCoAuthoringUrl = "";
 	window.g_cAscSpellCheckUrl = "";
-	
-	var asc_user = window["Asc"].asc_CUser;
-	this.User = new asc_user();
+
+	this.User = new Asc.asc_CUser();
 	this.User.asc_setId("TM");
 	this.User.asc_setUserName("native");
 	

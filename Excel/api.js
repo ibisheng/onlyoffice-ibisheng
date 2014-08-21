@@ -16,7 +16,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var asc_applyFunction = asc.applyFunction;
 		var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
 		var asc_CAdjustPrint = asc.asc_CAdjustPrint;
-		var asc_user  = asc.asc_CUser;
 		var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
 		var asc_CAscLicense = asc.asc_CAscLicense;
 		var asc_CTrackFile = asc.CTrackFile;
@@ -453,7 +452,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.documentTitleWithoutExtention = this.documentTitle;
 
 				// Выставляем пользователя
-				this.User = new asc_user();
+				this.User = new asc.asc_CUser();
 				this.User.asc_setId(this.DocInfo["UserId"]);
 				this.User.asc_setUserName(this.DocInfo["UserName"]);
 			}
@@ -1476,7 +1475,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			//Если User не задан, отключаем коавторинг.
 			if (null == t.User || null == t.User.asc_getId()) {
-				t.User = new asc_user();
+				t.User = new asc.asc_CUser();
 				t.User.asc_setId("Unknown");
 				t.User.asc_setUserName("Unknown");
 				t._coAuthoringSetServerUrl("");
@@ -3394,7 +3393,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			window.g_cAscCoAuthoringUrl = "";
 			window.g_cAscSpellCheckUrl = "";
 
-			this.User = new asc_user();
+			this.User = new asc.asc_CUser();
 			this.User.asc_setId("TM");
 			this.User.asc_setUserName("native");
 

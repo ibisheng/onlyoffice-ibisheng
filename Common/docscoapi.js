@@ -1,14 +1,13 @@
 ﻿"use strict";
 
-(function (global) {
+(function (window, undefined) {
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_user	= asc.asc_CUser;
-	var asc_coAuthV	= '3.0.1';
+	var asc_coAuthV	= '3.0.2';
 
 	// Класс надстройка, для online и offline работы
-	var CDocsCoApi = function (options) {
+	function CDocsCoApi (options) {
 		this._CoAuthoringApi = new DocsCoApi();
 		this._onlineWork = false;
 
@@ -28,7 +27,7 @@
 			this.onStartCoAuthoring = options.onStartCoAuthoring;
 			this.onEndCoAuthoring = options.onEndCoAuthoring;
 		}
-	};
+	}
 
 	CDocsCoApi.prototype.init = function (user, docid, token, callback, editorType, documentFormatSave, isViewer) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
@@ -242,7 +241,7 @@
      *  2 - authorized
 	 *  3 - closed
      */
-    var DocsCoApi = function (options) {
+    function DocsCoApi (options) {
 		if (options) {
 			this.onAuthParticipantsChanged = options.onAuthParticipantsChanged;
 			this.onParticipantsChanged = options.onParticipantsChanged;
@@ -305,7 +304,7 @@
 		this._isAuth = false;
 		this._documentFormatSave = 0;
 		this._isViewer = false;
-    };
+    }
 	
 	DocsCoApi.prototype.isRightURL = function () {
         return ("" != this._url);
@@ -704,7 +703,7 @@
 		if (participants) {
 			var tmpUser;
 			for (var i = 0; i < participants.length; ++i) {
-				tmpUser = new asc_user(participants[i]);
+				tmpUser = new asc.asc_CUser(participants[i]);
 				this._participants[tmpUser.asc_getId()] = tmpUser;
 				// Считаем только число редакторов
 				if (!tmpUser.asc_getView())
@@ -726,7 +725,7 @@
 	DocsCoApi.prototype._onConnectionStateChanged = function (data) {
 		var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
 		if (undefined !== data["state"] && this.onConnectionStateChanged) {
-			userStateChanged = new asc_user(data);
+			userStateChanged = new asc.asc_CUser(data);
 
 			userId = userStateChanged.asc_getId();
 			isEditUser = !userStateChanged.asc_getView();
@@ -854,8 +853,7 @@
 					'token'	: t._token,
 					'user'	: {
 						'id'	: t._user.asc_getId(),
-						'name'	: t._user.asc_getUserName(),
-						'color'	: t._user.asc_getColorValue()
+						'name'	: t._user.asc_getUserName()
 					},
 					'locks'		: t.ownedLockBlocks,
 					'sessionId'	: t._id,
@@ -923,5 +921,5 @@
 
 	};
 
-    global["CDocsCoApi"] = CDocsCoApi;
+	window["CDocsCoApi"] = CDocsCoApi;
 })(window);

@@ -1276,11 +1276,7 @@ function DrawingObjects() {
 
     var aObjects = null;
     var aImagesSync = null;
-    var aObjectsSync = null;
     var aBoundsCheckers = [];
-
-    var userId = null;
-    var documentId = null;
 
     _this.zoom = { last: 1, current: 1 };
     _this.isViewerMode = null;
@@ -1668,8 +1664,6 @@ function DrawingObjects() {
         setInterval(drawTaskFunction, 5);
 
         var api = window["Asc"]["editor"];
-        userId = api.User.asc_getId();
-        documentId = api.documentId;
         worksheet = currentSheet;
 
         drawingCtx = currentSheet.drawingGraphicCtx;
@@ -1699,7 +1693,6 @@ function DrawingObjects() {
         _this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
 
         aImagesSync = [];
-        aObjectsSync = [];
 
 		var i;
         aObjects = currentSheet.model.Drawings;
