@@ -1743,7 +1743,7 @@ NumFormat.prototype =
                     res += "?";
             }
             return res;
-        }
+        };
         //Color
         if(null != this.Color)
         {
@@ -2000,9 +2000,9 @@ function CellFormat(format)
 						if(null == oPositive)
 							oPositive = oCurFormat;
 						else if(null == oNegative)
-							oNegative = oCurFormat
+							oNegative = oCurFormat;
 						else if(null == oNull)
-							oNull = oCurFormat
+							oNull = oCurFormat;
 					}
 					else
 					{
@@ -2025,7 +2025,8 @@ function CellFormat(format)
 					}
 				}
 			}
-			this.oTextFormat = new NumFormat(false).setFormat("@");
+			this.oTextFormat = new NumFormat(false);
+			this.oTextFormat.setFormat("@");
 			if(null == oPositive || null == oNegative || null == oNull)
 			{
 				//по результатам опытов, если оператор сравнения проходит через 0, то надо добавлять знак минус в зависимости от значения
@@ -2127,10 +2128,7 @@ CellFormat.prototype =
 	    if (null == this.aComporationFormats) {
 	        if (null != this.oTextFormat && this.oTextFormat.bTextFormat)
 	            oRes = this.oTextFormat;
-	    }
-	    else {
-	        var nLength = this.aComporationFormats.length;
-	        var oDefaultComporationFormat = null;
+	    } else {
 	        for (var i = 0, length = this.aComporationFormats.length; i < length ; ++i) {
 	            var oCurFormat = this.aComporationFormats[i];
 	            if (null == oCurFormat.ComporationOperator && oCurFormat.bTextFormat) {
@@ -2641,7 +2639,7 @@ GeneralEditFormatCache.prototype =
 		var nLastNoZero = nLength - 1;
 		for(var i = val.length - 1; i >= 0; --i)
 		{
-			nLastNoZero = i
+			nLastNoZero = i;
 			if("0" != val[i])
 				break;
 		}
@@ -2967,7 +2965,7 @@ FormatParser.prototype =
                 nGroupSize = cultureInfo.NumberGroupSizes[nGroupSizeIndex];
             }
             else
-                nGroupSize = 1
+                nGroupSize = 1;
             nPrevIndex = nIndex + 1;
         }
         if (!bError) {
@@ -3070,7 +3068,7 @@ FormatParser.prototype =
         }
         if(!bError){
             var aDate = [];
-            var nMonthIndex = null
+            var nMonthIndex = null;
             var sMonthFormat = null;
             var aTime = [];
             var am = false;
