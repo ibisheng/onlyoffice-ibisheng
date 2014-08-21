@@ -1309,6 +1309,16 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             this.WordControl.m_oLogicDocument.Document_Redo();
             break;
         }
+        case 13: // ASC_MENU_EVENT_TYPE_INCREASEPARAINDENT
+        {
+            this.IncreaseIndent();
+            break;
+        }
+        case 14: // ASC_MENU_EVENT_TYPE_DECREASEPARAINDENT
+        {
+            this.DecreaseIndent();
+            break;
+        }
         case 54: // ASC_MENU_EVENT_TYPE_INSERT_PAGEBREAK
         {
             this.put_AddPageBreak();
@@ -1728,6 +1738,23 @@ asc_docs_api.prototype.put_AddLineBreak = function()
     }
 };
 
+asc_docs_api.prototype.IncreaseIndent = function()
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
+    }
+};
+asc_docs_api.prototype.DecreaseIndent = function()
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
+    }
+};
+
 asc_docs_api.prototype.Send_Menu_Event = function(type)
 {
     window.native["OnCallMenuEvent"](type, global_memory_stream_menu);
@@ -1753,6 +1780,11 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
                 _stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
                 //console.log(JSON.stringify(this.SelectedObjectsStack[i].Value));
                 asc_menu_WriteParagraphPr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+            default:
+            {  
+                _stream["WriteLong"](255);
                 break;
             }
         }
