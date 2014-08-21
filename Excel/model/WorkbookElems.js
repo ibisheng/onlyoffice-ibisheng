@@ -2510,6 +2510,12 @@ Row.prototype =
 	{
 		return this.xfs;
 	},
+	_getUpdateRange: function () {
+	    if (g_nAllRowIndex == this.index)
+	        return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+	    else
+	        return new Asc.Range(0, this.index, gc_nMaxCol0, this.index);
+	},
 	setStyle : function(xfs)
 	{
 		var oldVal = this.xfs;
@@ -2526,7 +2532,7 @@ Row.prototype =
 				oldVal = oldVal.clone();
 			if(null != newVal)
 				newVal = newVal.clone();
-			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetStyle, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
 	},
 	setCellStyle : function(val)
@@ -2535,7 +2541,7 @@ Row.prototype =
 		var oRes = this.sm.setCellStyle(this, newVal);
 		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
-			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetCellStyle, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
+			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
 
 			// Выставляем стиль
 			var oStyle = this.cs.getStyleByXfId(oRes.newVal);
@@ -2553,7 +2559,7 @@ Row.prototype =
 	{
 		var oRes = this.sm.setNumFormat(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_NumFormat, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2566,74 +2572,74 @@ Row.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_SetFont, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
 	},
 	setFontname : function(val)
 	{
 		var oRes = this.sm.setFontname(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontname, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFontsize : function(val)
 	{
 		var oRes = this.sm.setFontsize(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontsize, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFontcolor : function(val)
 	{
 		var oRes = this.sm.setFontcolor(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontcolor, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setBold : function(val)
 	{
 		var oRes = this.sm.setBold(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Bold, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setItalic : function(val)
 	{
 		var oRes = this.sm.setItalic(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Italic, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setUnderline : function(val)
 	{
 		var oRes = this.sm.setUnderline(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Underline, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setStrikeout : function(val)
 	{
 		var oRes = this.sm.setStrikeout(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Strikeout, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFontAlign : function(val)
 	{
 		var oRes = this.sm.setFontAlign(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_FontAlign, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setAlignVertical : function(val)
 	{
 		var oRes = this.sm.setAlignVertical(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_AlignVertical, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setAlignHorizontal : function(val)
 	{
 		var oRes = this.sm.setAlignHorizontal(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_AlignHorizontal, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFill : function(val)
 	{
 		var oRes = this.sm.setFill(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fill, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setBorder : function(val)
 	{
@@ -2646,32 +2652,32 @@ Row.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Border, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
 	},
 	setShrinkToFit : function(val)
 	{
 		var oRes = this.sm.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_ShrinkToFit, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setWrap : function(val)
 	{
 		var oRes = this.sm.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Wrap, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
     setAngle: function(val)
     {
         var oRes = this.sm.setFontname(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
     },
 	setVerticalText : function(val)
 	{
         var oRes = this.sm.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	}
 };
 function CCellValueMultiText()

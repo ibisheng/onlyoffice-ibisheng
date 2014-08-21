@@ -5246,8 +5246,7 @@
                     if(gc_nMaxCol == oLast.Max)
                     {
                         oAllCol = oLast;
-                        oWorksheet.oAllCol = new Col(oWorksheet, 0);
-                        fInitCol(oAllCol, oWorksheet.oAllCol);
+                        fInitCol(oAllCol, oWorksheet.getAllCol());
                     }
                 }
                 for(var i = 0, length = aTempCols.length; i < length; ++i)
