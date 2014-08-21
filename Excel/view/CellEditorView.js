@@ -1570,7 +1570,8 @@
 					format.i = val;
 					break;
 				case "u":
-					val = (null === val) ? ((format.u) ? !format.u : true) : val;
+					val = (null === val) ? ((Asc.EUnderline.underlineSingle !== format.u) ?
+						Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone) : val;
 					format.u = val;
 					break;
 				case "s":
