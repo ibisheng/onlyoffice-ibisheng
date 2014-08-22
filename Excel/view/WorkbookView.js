@@ -1092,7 +1092,6 @@
 			ws.setCellEditMode(false);
 			ws.setFormulaEditMode(false);
 			ws.updateSelection();
-			this.Api.lastFocused = null;
 			if (isCellEditMode)
 				this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
 			// Обновляем состояние Undo/Redo
