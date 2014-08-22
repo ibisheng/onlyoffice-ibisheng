@@ -1,27 +1,17 @@
 {
     "info": {
-        "version": "2.5",
-        "build": 161
+        "version": "3.0",
+        "build": 163
     },
     "update_src": {
         "revision": "HEAD",
         "src": "../../Common ../../Word"
     },
-    "concat_api": {
-        "../../Word/api-all.js": [
-            "../../Word/api.js",
-            "../../Word/apiCommon.js"
-        ]
-    },
-    "extract_api": {
-        "src": "../../Word/api-all.js",
-        "dst": "../../Word/Build/Log/apiExport.js"
-    },
     "compile": {
         "sdk": {
             "src": [
-                "../../Common/Build/License.js",
                 "../../Common/Native/Wrappers/memory.js",
+                "../../Common/Build/License.js",
                 "../../Common/browser.js",
                 "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
@@ -42,6 +32,9 @@
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/trackFile.js",
+                "../../Common/FontsFreeType/font_engine.js",
+                "../../Common/FontsFreeType/FontFile.js",
+                "../../Common/FontsFreeType/FontManager.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/GlobalLoaders.js",
                 "../../Word/Drawing/translations.js",
@@ -119,8 +112,6 @@
                 "../../Word/Drawing/documentrenderer.js",
                 "../../Common/scroll.js",
                 "../../Word/Editor/SerializeCommon.js",
-                "../../Word/apiDefines.js",
-                "../../Word/api-all.js",
                 "../../Word/document/empty.js",
                 "../../Word/Math/mathTypes.js",
                 "../../Word/Math/mathText.js",
@@ -135,6 +126,18 @@
                 "../../Word/Math/operators.js",
                 "../../Word/Math/accent.js",
                 "../../Word/Math/borderBox.js",
+                "../../Excel/utils/utils.js",
+                "../../Excel/model/CellComment.js",
+                "../../Excel/model/Serialize.js",
+                "../../Excel/model/WorkbookElems.js",
+                "../../Excel/model/Workbook.js",
+                "../../Excel/model/CellInfo.js",
+                "../../Excel/model/AdvancedOptions.js",
+                "../../Common/Shapes/EditorSettings.js",
+                "../../Common/commonDefines.js",
+                "../../Word/apiDefines.js",
+                "../../Word/apiCommon.js",
+                "../../Word/api.js",
                 "../../Common/Native/Wrappers/TextMeasurerWrapper.js",
                 "../../Common/Native/Wrappers/DrawingDocument.js",
                 "../../Common/Native/Wrappers/DrawingStream.js",
@@ -145,10 +148,7 @@
             ],
             "dst": "../../Word/sdk-all.js",
             "externs": [
-                "../../Common/Build/Externs.js",
-                "../../Word/Drawing/scrolls/jquery.min.js",
-                "../../Common/3rdparty/Underscore/underscore-min.js",
-                "../../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
+                "../../Common/Native/jquery_native.js",
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js"
             ],
             "map": "sdk-all.js.map",
@@ -159,90 +159,16 @@
             ]
         },
         "defines": {
-            "src": [
-                "../../Common/Shapes/EditorSettings.js",
-                "../../Common/commonDefines.js",
-                "../../Word/apiDefines.js"
-            ],
+            "src": [],
             "dst": "apiDefines.min.js"
         },
         "source_map": {
             "url": "http://localhost:8080/sdk/Word"
         }
     },
-    "deploy": {
-        "copy": {
-            "api": {
-                "expand": true,
-                "cwd": "../../Word/",
-                "src": [
-                    "api.js",
-                    "apiCommon.js",
-                    "apiDefines.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/Word/"
-            },
-            "sdk": {
-                "expand": true,
-                "cwd": "../../Word/",
-                "src": "sdk-all.js",
-                "dest": "<%= pkg.menu_path %>/Word/"
-            },
-            "fonts": {
-                "expand": true,
-                "cwd": "../../Fonts/",
-                "src": [
-                    "js/*.js",
-                    "native/*.ttf",
-                    "native/*.ttc",
-                    "native/*.otf",
-                    "native/*.TTF",
-                    "native/*.TTC",
-                    "native/*.OTF",
-                    "native/*.bin",
-                    "native/*.BIN"
-                ],
-                "dest": "<%= pkg.menu_path %>/Fonts/"
-            },
-            "doc": {
-                "expand": true,
-                "cwd": "../../Word/",
-                "src": "document/**",
-                "dest": "<%= pkg.menu_path %>/Word/"
-            },
-            "docscoapisettings": {
-                "expand": true,
-                "cwd": "../../Common/",
-                "src": [
-                    "AllFonts.js",
-                    "docscoapisettings.js",
-                    "commonDefines.js",
-                    "apiCommon.js",
-                    "downloaderfiles.js",
-                    "Images/*.cur"
-                ],
-                "dest": "<%= pkg.menu_path %>/Common/"
-            },
-            "log": {
-                "expand": true,
-                "cwd": "../../Word/",
-                "src": [
-                    "Build/Log/property.map",
-                    "Build/Log/variable.map",
-                    "Build/Log/apiExport.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/Word/"
-            }
-        },
-        "store_log": {
-            "dst": "../../Word/Build/Log"
-        }
-    },
     "tasks": {
         "build": [
             "increment_build",
-            "concat_js_api",
-            "extract_js_api",
             "compile_sdk"
         ]
     }
