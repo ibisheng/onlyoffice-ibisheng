@@ -774,6 +774,7 @@ CHistory.prototype.Is_On = function()
 };
 CHistory.prototype.Save = function()
 {
+	this.SavePoint = null;
 	if(null != this.CurPoint && this.CurPoint.Items.length > 0)
 		this.SavePoint = this.CurPoint;
 	else if(this.Index >= 0 && this.Index < this.Points.length)
