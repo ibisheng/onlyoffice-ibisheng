@@ -1643,7 +1643,7 @@
 
 		CellEditor.prototype._updateSelectionInfo = function () {
 			var tmp = this.cursorPos;
-			tmp = this._findFragment(tmp);
+			tmp = this._findFragmentToInsertInto(tmp);
 			if (!tmp)
 				return;
 			tmp = this.options.fragments[tmp.index].format;
