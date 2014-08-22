@@ -1309,6 +1309,71 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             this.WordControl.m_oLogicDocument.Document_Redo();
             break;
         }
+        case 7: // ASC_MENU_EVENT_TYPE_HEADERFOOTER
+        {
+            var bIsApply = (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) === false) ? true : false;
+
+            if (bIsApply)
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
+            while (_continue)
+            {
+                var _attr = _params[_current.pos++];
+                switch (_attr)
+                {
+                    case 0:
+                    {
+                        _current.pos++;
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (bIsApply)
+                            this.WordControl.m_oLogicDocument.Document_SetHdrFtrDistance(_params[_current.pos]);
+
+                        _current.pos++;
+                        break;
+                    }
+                    case 2:
+                    {
+                        if (bIsApply)
+                            this.WordControl.m_oLogicDocument.Document_SetHdrFtrFirstPage(_params[_current.pos]);
+
+                        _current.pos++;
+                        break;
+                    }
+                    case 3:
+                    {
+                        if (bIsApply)
+                            this.WordControl.m_oLogicDocument.Document_SetHdrFtrEvenAndOddHeaders(_params[_current.pos]);
+
+                        _current.pos++;
+                        break;
+                    }
+                    case 4:
+                    {
+                        if (bIsApply)
+                            this.WordControl.m_oLogicDocument.Document_SetHdrFtrLink(_params[_current.pos]);
+
+                        _current.pos++;
+                        break;
+                    }
+                    case 5:
+                    {
+                        _current.pos++;
+                        break;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+
+            break;
+        }
         case 13: // ASC_MENU_EVENT_TYPE_INCREASEPARAINDENT
         {
             this.IncreaseIndent();
@@ -1343,6 +1408,43 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             break;
     }
 };
+
+function asc_menu_WriteHeaderFooterPr(_hdrftrPr, _stream)
+{
+    if (_hdrftrPr.Type !== undefined && _hdrftrPr.Type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_hdrftrPr.Type);
+    }
+    if (_hdrftrPr.Position !== undefined && _hdrftrPr.Position !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_hdrftrPr.Position);
+    }
+
+    if (_hdrftrPr.DifferentFirst !== undefined && _hdrftrPr.DifferentFirst !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteBool"](_hdrftrPr.DifferentFirst);
+    }
+    if (_hdrftrPr.DifferentEvenOdd !== undefined && _hdrftrPr.DifferentEvenOdd !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](_hdrftrPr.DifferentEvenOdd);
+    }
+    if (_hdrftrPr.LinkToPrevious !== undefined && _hdrftrPr.LinkToPrevious !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteBool"](_hdrftrPr.LinkToPrevious);
+    }
+    if (_hdrftrPr.Locked !== undefined && _hdrftrPr.Locked !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_hdrftrPr.DifferentFirst);
+    }
+
+    _stream["WriteByte"](255);
+}
 
 function asc_menu_WriteParagraphPr(_paraPr, _stream)
 {
@@ -1780,6 +1882,12 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
                 _stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
                 //console.log(JSON.stringify(this.SelectedObjectsStack[i].Value));
                 asc_menu_WriteParagraphPr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+            case c_oAscTypeSelectElement.Header:
+            {
+                _stream["WriteLong"](c_oAscTypeSelectElement.Header);
+                asc_menu_WriteHeaderFooterPr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
             default:
