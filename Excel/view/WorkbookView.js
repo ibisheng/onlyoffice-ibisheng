@@ -1142,21 +1142,21 @@
 
 		WorkbookView.prototype._onSetFontAttributes = function (prop) {
 			var val;
-			var selectionInfo = this.getWorksheet().getSelectionInfo();
+			var selectionInfo = this.getWorksheet().getSelectionInfo().asc_getFont();
 			switch (prop) {
 				case "b":
-					val = !(selectionInfo.asc_getFont().asc_getBold());
+					val = !(selectionInfo.asc_getBold());
 					break;
 				case "i":
-					val = !(selectionInfo.asc_getFont().asc_getItalic());
+					val = !(selectionInfo.asc_getItalic());
 					break;
 				case "u":
 					// ToDo для двойного подчеркивания нужно будет немного переделать схему
-					val = !(selectionInfo.asc_getFont().asc_getUnderline());
+					val = !(selectionInfo.asc_getUnderline());
 					val = val ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone;
 					break;
 				case "s":
-					val = !(selectionInfo.asc_getFont().asc_getStrikeout());
+					val = !(selectionInfo.asc_getStrikeout());
 					break;
 			}
 			return this.setFontAttributes(prop, val);
