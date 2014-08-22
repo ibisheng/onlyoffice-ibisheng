@@ -78,8 +78,6 @@
 		 * @param {Object} settings
 		 */
 		function CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings) {
-			if ( !(this instanceof CellEditor) ) {return new CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings);}
-
 			this.element = elem;
 			this.input = input;
 			this.handlers = new asc_HL(handlers);

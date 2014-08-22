@@ -21,7 +21,6 @@
 		var asc_applyFunction	= asc.applyFunction;
 		var asc_round			= asc.round;
 		var asc_typeof			= asc.typeOf;
-		var asc_CE				= asc.CellEditor;
 		var asc_CMM				= asc.asc_CMouseMoveData;
 		var asc_CPrintPagesData	= asc.CPrintPagesData;
 		var asc_getcvt			= asc.getCvtRatio;
@@ -357,7 +356,7 @@
 					}, false);
 				}
 
-			    this.cellEditor = new asc_CE(this.element, this.input, this.fmgrGraphics, this.m_oFont,
+			    this.cellEditor = new asc.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont,
 					    /*handlers*/{
 						    "closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
 						    "updated"  : function () {self._onUpdateCellEditor.apply(self, arguments);},
