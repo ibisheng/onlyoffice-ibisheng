@@ -1646,7 +1646,9 @@
 		CellEditor.prototype._updateSelectionInfo = function () {
 			var tmp = Math.min(this.selectionBegin, this.selectionEnd);
 			tmp = this._findFragment(tmp);
-			tmp = this.options.fragments[tmp].format;
+			if (!tmp)
+				return;
+			tmp = this.options.fragments[tmp.index].format;
 
 			var result = new asc.asc_CFont();
 			result.name = tmp.fn;
