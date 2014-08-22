@@ -1097,6 +1097,8 @@
 				this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
 			// Обновляем состояние Undo/Redo
 			History._sendCanUndoRedo();
+			// Обновляем состояние информации
+			this._onWSSelectionChanged(null);
 		};
 
 		WorkbookView.prototype._onEmpty = function () {
