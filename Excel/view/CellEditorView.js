@@ -262,7 +262,6 @@
 			 */
 			this.setFocus(this.isTopLineActive ? true : (undefined !== options.focus) ? options.focus : this._haveTextInEdit() ? true : false);
 			this._updateUndoRedoChanged();
-			this._updateSelectionInfo();
 		};
 
 		CellEditor.prototype.close = function (saveValue) {
@@ -351,8 +350,6 @@
 				}
 
 			}
-
-			this._updateSelectionInfo();
 		};
 
 		CellEditor.prototype.empty = function(options) {
@@ -1130,6 +1127,7 @@
 
 			if (cur) {this.input.scrollTop = this.input.clientHeight * cur.lineIndex;}
 			if (this.isTopLineActive && !this.skipTLUpdate) {this._updateTopLineCurPos();}
+			this._updateSelectionInfo();
 		};
 
 		CellEditor.prototype._moveCursor = function (kind, pos) {
@@ -1644,7 +1642,7 @@
 		};
 
 		CellEditor.prototype._updateSelectionInfo = function () {
-			var tmp = Math.min(this.selectionBegin, this.selectionEnd);
+			var tmp = this.cursorPos;
 			tmp = this._findFragment(tmp);
 			if (!tmp)
 				return;
