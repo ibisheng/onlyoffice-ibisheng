@@ -1178,6 +1178,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)	- эвент на получение дополнительных опций (открытие/сохранение CSV)
 		 * asc_onError					(c_oAscError.ID, c_oAscError.Level)					- эвент об ошибке
 		 * asc_onEditCell				(c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
+		 * asc_onEditorSelectionChanged	(asc_CFont)											- эвент на смену информации о выделении в редакторе ячейки
 		 * asc_onSelectionChanged		(asc_CCellInfo)										- эвент на смену информации о выделении
 		 * asc_onSelectionNameChanged	(sName)												- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
 		 * asc_onSelectionMathChanged	(asc_CSelectionMathInfo)							- эвент на смену математической информации о выделении

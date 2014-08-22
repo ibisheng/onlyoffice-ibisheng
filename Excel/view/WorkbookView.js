@@ -356,44 +356,42 @@
 					}, false);
 				}
 
-			    this.cellEditor = new asc.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont,
-					    /*handlers*/{
-						    "closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
-						    "updated"  : function () {self._onUpdateCellEditor.apply(self, arguments);},
-						    "gotFocus" : function (hasFocus) {self.controller.setFocus(!hasFocus);},
-						    "copy"     : function () {self.copyToClipboard.apply(self, arguments);},
-						    "paste"    : function () {self.pasteFromClipboard.apply(self, arguments);},
-						    "cut"      : function () {self.cutToClipboard.apply(self, arguments);},
-						    "updateFormulaEditMod": function () {
-									    self.controller.setFormulaEditMode.apply(self.controller, arguments);
-									    var ws = self.getWorksheet();
-									    if (ws) {
-										    ws.cleanSelection();
-										    ws.cleanFormulaRanges();
-										    ws.setFormulaEditMode.apply(ws, arguments);
-									    }
-								    },
-						    "updateEditorState"	:	function () {self.handlers.trigger.apply(self.handlers,
-							    ["asc_onEditCell"].concat(Array.prototype.slice.call(arguments)));},
-						    "isGlobalLockEditCell" : function () {return self.collaborativeEditing.getGlobalLockEditCell();},
-						    "updateFormulaEditModEnd": function (rangeUpdated) {
-							    self.getWorksheet().updateSelection();
-						    },
-						    "newRange"     				: function (range) { self.getWorksheet().addFormulaRange(range); },
-						    "existedRange" 				: function (range) { self.getWorksheet().changeFormulaRange(range); },
-						    "updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
-							    self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
-							    self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-						    },
-							"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
-							"isViewerMode"				: function () {return self.controller.settings.isViewerMode;},
-							"popUpSelectorKeyDown"	: function (event) {return self._onPopUpSelectorKeyDown(event);},
-							"getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();},
-							"setStrictClose"			: function (val) {self.controller.setStrictClose(val);}
-					    },
-					    /*settings*/{
-						    font: this.defaultFont
-					    });
+				this.cellEditor = new asc.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont,
+					/*handlers*/{
+						"closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
+						"updated"  : function () {self._onUpdateCellEditor.apply(self, arguments);},
+						"gotFocus" : function (hasFocus) {self.controller.setFocus(!hasFocus);},
+						"copy"     : function () {self.copyToClipboard.apply(self, arguments);},
+						"paste"    : function () {self.pasteFromClipboard.apply(self, arguments);},
+						"cut"      : function () {self.cutToClipboard.apply(self, arguments);},
+						"updateFormulaEditMod": function () {
+							self.controller.setFormulaEditMode.apply(self.controller, arguments);
+							var ws = self.getWorksheet();
+							if (ws) {
+								ws.cleanSelection();
+								ws.cleanFormulaRanges();
+								ws.setFormulaEditMode.apply(ws, arguments);
+							}
+						},
+						"updateEditorState"			: function (state) {self.handlers.trigger("asc_onEditCell", state);},
+						"isGlobalLockEditCell"		: function () {return self.collaborativeEditing.getGlobalLockEditCell();},
+						"updateFormulaEditModEnd"	: function (rangeUpdated) {self.getWorksheet().updateSelection();},
+						"newRange"     				: function (range) { self.getWorksheet().addFormulaRange(range); },
+						"existedRange" 				: function (range) { self.getWorksheet().changeFormulaRange(range); },
+						"updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
+							self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
+							self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
+						},
+						"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);},
+						"isViewerMode"				: function () {return self.controller.settings.isViewerMode;},
+						"popUpSelectorKeyDown"		: function (event) {return self._onPopUpSelectorKeyDown(event);},
+						"getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();},
+						"setStrictClose"			: function (val) {self.controller.setStrictClose(val);},
+						"updateEditorSelectionInfo"	: function (info) {self.handlers.trigger("asc_onEditorSelectionChanged", info);}
+					},
+					/*settings*/{
+						font: this.defaultFont
+					});
 
 				this.popUpSelector = new asc.PopUpSelector(this.element, /*handlers*/{
 					"insert"	: function () {self._onPopUpSelectorInsert.apply(self, arguments);}

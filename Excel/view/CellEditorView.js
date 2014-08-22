@@ -262,6 +262,7 @@
 			 */
 			this.setFocus(this.isTopLineActive ? true : (undefined !== options.focus) ? options.focus : this._haveTextInEdit() ? true : false);
 			this._updateUndoRedoChanged();
+			this._updateSelectionInfo();
 		};
 
 		CellEditor.prototype.close = function (saveValue) {
@@ -305,7 +306,6 @@
 			var t = this, opt = t.options, begin, end, i, first, last;
 
 			if (t.selectionBegin !== t.selectionEnd) {
-
 				begin = Math.min(t.selectionBegin, t.selectionEnd);
 				end = Math.max(t.selectionBegin, t.selectionEnd);
 
@@ -342,7 +342,6 @@
 				}
 
 			} else {
-
 				first = t._findFragmentToInsertInto(t.cursorPos);
 				if (first) {
 					if (!t.newTextFormat) {
@@ -352,6 +351,8 @@
 				}
 
 			}
+
+			this._updateSelectionInfo();
 		};
 
 		CellEditor.prototype.empty = function(options) {
@@ -1640,6 +1641,25 @@
 					arrResult.push(arrAutoComplete[i]);
 			}
 			return this.objAutoComplete[str] = arrResult;
+		};
+
+		CellEditor.prototype._updateSelectionInfo = function () {
+			var tmp = Math.min(this.selectionBegin, this.selectionEnd);
+			tmp = this._findFragment(tmp);
+			tmp = this.options.fragments[tmp].format;
+
+			var result = new asc.asc_CFont();
+			result.name = tmp.fn;
+			result.size = tmp.fs;
+			result.bold = tmp.b;
+			result.italic = tmp.i;
+			result.underline = (Asc.EUnderline.underlineNone !== tmp.u); // ToDo убрать, когда будет реализовано двойное подчеркивание
+			result.strikeout = tmp.s;
+			result.subscript = tmp.va === "subscript";
+			result.superscript = tmp.va === "superscript";
+			result.color = (tmp.c ? asc.colorObjToAscColor(tmp.c) : new CAscColor(this.options.textColor));
+
+			this.handlers.trigger("updateEditorSelectionInfo", result);
 		};
 
 		// Event handlers
