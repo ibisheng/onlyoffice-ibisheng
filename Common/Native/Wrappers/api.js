@@ -1733,8 +1733,10 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 50: // ASC_MENU_EVENT_TYPE_INSERT_IMAGE
         {
-            var _src = _params[_current++];
-            this.AddImageUrlNative(_src);
+            var _src = _params[_current.pos++];
+            var _w = _params[_current.pos++];
+            var _h = _params[_current.pos++];
+            this.AddImageUrlNative(_src, _w, _h);
         }
         case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
@@ -4024,10 +4026,36 @@ asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
     }
 };
 
-asc_docs_api.prototype.AddImageUrlNative = function(url)
+asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h)
 {
+    var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+    var _page_width             = Page_Width;
+    var _page_height            = Page_Height;
+    var _page_x_left_margin     = X_Left_Margin;
+    var _page_y_top_margin      = Y_Top_Margin;
+    var _page_x_right_margin    = X_Right_Margin;
+    var _page_y_bottom_margin   = Y_Bottom_Margin;
+
+    if (_section_select)
+    {
+        if (_section_select.W)
+            _page_width = _section_select.W;
+
+        if (_section_select.H)
+            _page_height = _section_select.H;
+    }
+
+    var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+    var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+
+    var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
+    var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
+
+    wI = Math.max(5, Math.min(wI, __w));
+    hI = Math.max(5, Math.min(hI, __h));
+
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Add_InlineImage(100, 100, url);
+    this.WordControl.m_oLogicDocument.Add_InlineImage(wI, hI, url);
 };
 
 asc_docs_api.prototype.Send_Menu_Event = function(type)
