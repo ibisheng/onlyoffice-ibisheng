@@ -200,26 +200,26 @@
                 case 1:
                 {
                     var _w_pix = this.TableOutline.W * _dKoef_mm_to_pix;
-                    pos = this.__DD_ConvertCoordsFromCursor(X - _w_pix, Y);
+                    pos = drDoc.__DD_ConvertCoordsFromCursor(X - _w_pix, Y);
                     break;
                 }
                 case 2:
                 {
                     var _w_pix = this.TableOutline.W * _dKoef_mm_to_pix;
                     var _h_pix = this.TableOutline.H * _dKoef_mm_to_pix;
-                    pos = this.__DD_ConvertCoordsFromCursor(X - _w_pix, Y - _h_pix);
+                    pos = drDoc.__DD_ConvertCoordsFromCursor(X - _w_pix, Y - _h_pix);
                     break;
                 }
                 case 3:
                 {
                     var _h_pix = this.TableOutline.H * _dKoef_mm_to_pix;
-                    pos = this.__DD_ConvertCoordsFromCursor(X, Y - _h_pix);
+                    pos = drDoc.__DD_ConvertCoordsFromCursor(X, Y - _h_pix);
                     break;
                 }
                 case 0:
                 default:
                 {
-                    pos = this.__DD_ConvertCoordsFromCursor(X, Y);
+                    pos = drDoc.__DD_ConvertCoordsFromCursor(X, Y);
                     break;
                 }
             }
@@ -249,7 +249,7 @@
 
         if (true === this.IsChangeSmall)
         {
-            var _pos = this.__DD_ConvertCoordsFromCursor(X, Y);
+            var _pos = drDoc.__DD_ConvertCoordsFromCursor(X, Y);
             var _dist = 15 / _dKoef_mm_to_pix;
             if ((Math.abs(_pos.X - this.ChangeSmallPoint.X) < _dist) && (Math.abs(_pos.Y - this.ChangeSmallPoint.Y) < _dist) && (_pos.Page == this.ChangeSmallPoint.Page))
             {
@@ -296,26 +296,26 @@
             case 1:
             {
                 var _w_pix = this.TableOutline.W * _dKoef_mm_to_pix;
-                this.CurPos = this.__DD_ConvertCoordsFromCursor(X - _w_pix, Y);
+                this.CurPos = drDoc.__DD_ConvertCoordsFromCursor(X - _w_pix, Y);
                 break;
             }
             case 2:
             {
                 var _w_pix = this.TableOutline.W * _dKoef_mm_to_pix;
                 var _h_pix = this.TableOutline.H * _dKoef_mm_to_pix;
-                this.CurPos = this.__DD_ConvertCoordsFromCursor(X - _w_pix, Y - _h_pix);
+                this.CurPos = drDoc.__DD_ConvertCoordsFromCursor(X - _w_pix, Y - _h_pix);
                 break;
             }
             case 3:
             {
                 var _h_pix = this.TableOutline.H * _dKoef_mm_to_pix;
-                this.CurPos = this.__DD_ConvertCoordsFromCursor(X, Y - _h_pix);
+                this.CurPos = drDoc.__DD_ConvertCoordsFromCursor(X, Y - _h_pix);
                 break;
             }
             case 0:
             default:
             {
-                this.CurPos = this.__DD_ConvertCoordsFromCursor(X, Y);
+                this.CurPos = drDoc.__DD_ConvertCoordsFromCursor(X, Y);
                 break;
             }
         }
