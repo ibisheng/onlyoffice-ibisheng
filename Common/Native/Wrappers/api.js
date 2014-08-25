@@ -1414,47 +1414,47 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     case 0:
                     {
-                        _textPr.CanBeFlow = _params[_current.pos++];
+                        _tablePr.CanBeFlow = _params[_current.pos++];
                         break;
                     }
                     case 1:
                     {
-                        _textPr.CellSelect = _params[_current.pos++];
+                        _tablePr.CellSelect = _params[_current.pos++];
                         break;
                     }
                     case 2:
                     {
-                        _textPr.TableWidth = _params[_current.pos++];
+                        _tablePr.TableWidth = _params[_current.pos++];
                         break;
                     }
                     case 3:
                     {
-                        _textPr.TableSpacing = _params[_current.pos++];
+                        _tablePr.TableSpacing = _params[_current.pos++];
                         break;
                     }
                     case 4:
                     {
-                        _textPr.TableDefaultMargins = asc_menu_ReadPaddings(_params, _current);
+                        _tablePr.TableDefaultMargins = asc_menu_ReadPaddings(_params, _current);
                         break;
                     }
                     case 5:
                     {
-                        _textPr.CellMargins = asc_menu_ReadCellMargins(_params, _current);
+                        _tablePr.CellMargins = asc_menu_ReadCellMargins(_params, _current);
                         break;
                     }
                     case 6:
                     {
-                        _textPr.TableAlignment = _params[_current.pos++];
+                        _tablePr.TableAlignment = _params[_current.pos++];
                         break;
                     }
                     case 7:
                     {
-                        _textPr.TableIndent = _params[_current.pos++];
+                        _tablePr.TableIndent = _params[_current.pos++];
                         break;
                     }
                     case 8:
                     {
-                        _textPr.TableWrappingStyle = _params[_current.pos++];
+                        _tablePr.TableWrappingStyle = _params[_current.pos++];
                         break;
                     }
                     case 9:
@@ -1504,42 +1504,42 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 18:
                     {
-                        _textPr.ForSelectedCells = _params[_current.pos++];
+                        _tablePr.ForSelectedCells = _params[_current.pos++];
                         break;
                     }
                     case 19:
                     {
-                        _textPr.TableStyle = _params[_current.pos++];
+                        _tablePr.TableStyle = _params[_current.pos++];
                         break;
                     }
                     case 20:
                     {
-                        _textPr.TableLook = asc_menu_ReadTableLook(_params, _current);
+                        _tablePr.TableLook = asc_menu_ReadTableLook(_params, _current);
                         break;
                     }
                     case 21:
                     {
-                        _textPr.RowsInHeader = _params[_current.pos++];
+                        _tablePr.RowsInHeader = _params[_current.pos++];
                         break;
                     }
                     case 22:
                     {
-                        _textPr.CellsVAlign = _params[_current.pos++];
+                        _tablePr.CellsVAlign = _params[_current.pos++];
                         break;
                     }
                     case 23:
                     {
-                        _textPr.AllowOverlap = _params[_current.pos++];
+                        _tablePr.AllowOverlap = _params[_current.pos++];
                         break;
                     }
                     case 24:
                     {
-                        _textPr.TableLayout = _params[_current.pos++];
+                        _tablePr.TableLayout = _params[_current.pos++];
                         break;
                     }
                     case 25:
                     {
-                        _textPr.Locked = _params[_current.pos++];
+                        _tablePr.Locked = _params[_current.pos++];
                         break;
                     }
                     case 255:
