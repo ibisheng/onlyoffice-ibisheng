@@ -198,7 +198,7 @@ function asc_menu_ReadFontFamily(_params, _cursor)
 }
 function asc_menu_WriteFontFamily(_type, _family, _stream)
 {
-    if (undefined === _family)
+    if (!_family)
         return;
 
     _stream["WriteByte"](_type);
@@ -291,7 +291,7 @@ function asc_menu_ReadColor(_params, _cursor)
 }
 function asc_menu_WriteColor(_type, _color, _stream)
 {
-    if (undefined === _color)
+    if (!_color)
         return;
 
     _stream["WriteByte"](_type);
@@ -390,7 +390,7 @@ function asc_menu_ReadParaInd(_params, _cursor)
 }
 function asc_menu_WriteParaInd(_type, _ind, _stream)
 {
-    if (undefined === _ind)
+    if (!_ind)
         return;
 
     _stream["WriteByte"](_type);
@@ -466,7 +466,7 @@ function asc_menu_ReadParaSpacing(_params, _cursor)
 }
 function asc_menu_WriteParaSpacing(_type, _spacing, _stream)
 {
-    if (undefined === _spacing)
+    if (!_spacing)
         return;
 
     _stream["WriteByte"](_type);
@@ -547,7 +547,7 @@ function asc_menu_ReadParaBorder(_params, _cursor)
 }
 function asc_menu_WriteParaBorder(_type, _border, _stream)
 {
-    if (undefined === _border)
+    if (!_border)
         return;
 
     _stream["WriteByte"](_type);
@@ -620,7 +620,7 @@ function asc_menu_ReadParaBorders(_params, _cursor)
 }
 function asc_menu_WriteParaBorders(_type, _borders, _stream)
 {
-    if (undefined === _borders)
+    if (!_borders)
         return;
 
     _stream["WriteByte"](_type);
@@ -666,7 +666,7 @@ function asc_menu_ReadParaShd(_params, _cursor)
 }
 function asc_menu_WriteParaShd(_type, _shd, _stream)
 {
-    if (undefined === _shd)
+    if (!_shd)
         return;
 
     _stream["WriteByte"](_type);
@@ -714,7 +714,7 @@ function asc_menu_ReadParaListType(_params, _cursor)
 }
 function asc_menu_WriteParaListType(_type, _list, _stream)
 {
-    if (undefined === _list)
+    if (!_list)
         return;
 
     _stream["WriteByte"](_type);
@@ -774,7 +774,7 @@ function asc_menu_ReadParaTabs(_params, _cursor)
 }
 function asc_menu_WriteParaTabs(_type, _tabs, _stream)
 {
-    if (undefined === _tabs)
+    if (!_tabs)
         return;
 
     _stream["WriteByte"](_type);
@@ -910,7 +910,7 @@ function asc_menu_ReadParaFrame(_params, _cursor)
 }
 function asc_menu_WriteParaFrame(_type, _frame, _stream)
 {
-    if (undefined === _frame)
+    if (!_frame)
         return;
 
     _stream["WriteByte"](_type);
@@ -1736,6 +1736,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             var _src = _params[_current.pos++];
             var _w = _params[_current.pos++];
             var _h = _params[_current.pos++];
+
             this.AddImageUrlNative(_src, _w, _h);
         }
         case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
@@ -1948,7 +1949,7 @@ function asc_menu_ReadPaddings(_params, _cursor)
 }
 function asc_menu_WritePaddings(_type, _paddings, _stream)
 {
-    if (undefined === _paddings)
+    if (!_paddings)
         return;
 
     _stream["WriteByte"](_type);
@@ -2023,7 +2024,7 @@ function asc_menu_ReadCellMargins(_params, _cursor)
 }
 function asc_menu_WriteCellMargins(_type, _margins, _stream)
 {
-    if (undefined === _margins)
+    if (!_margins)
         return;
 
     _stream["WriteByte"](_type);
@@ -2108,7 +2109,7 @@ function asc_menu_ReadCellBorders(_params, _cursor)
 }
 function asc_menu_WriteCellBorders(_type, _borders, _stream)
 {
-    if (undefined === _borders)
+    if (!_borders)
         return;
 
     _stream["WriteByte"](_type);
@@ -2154,7 +2155,7 @@ function asc_menu_ReadCellBackground(_params, _cursor)
 }
 function asc_menu_WriteCellBackground(_type, _background, _stream)
 {
-    if (undefined === _background)
+    if (!_background)
         return;
 
     _stream["WriteByte"](_type);
@@ -2201,7 +2202,7 @@ function asc_menu_ReadPosition(_params, _cursor)
 }
 function asc_menu_WritePosition(_type, _position, _stream)
 {
-    if (undefined === _position)
+    if (!_position)
         return;
 
     _stream["WriteByte"](_type);
@@ -2261,7 +2262,7 @@ function asc_menu_ReadImagePosition(_params, _cursor)
 }
 function asc_menu_WriteImagePosition(_type, _position, _stream)
 {
-    if (undefined === _position)
+    if (!_position)
         return;
 
     _stream["WriteByte"](_type);
@@ -2315,7 +2316,7 @@ function asc_menu_ReadTableAnchorPosition(_params, _cursor)
 }
 function asc_menu_WriteTableAnchorPosition(_type, _position, _stream)
 {
-    if (undefined === _position)
+    if (!_position)
         return;
 
     _stream["WriteByte"](_type);
@@ -2391,7 +2392,7 @@ function asc_menu_ReadTableLook(_params, _cursor)
 }
 function asc_menu_WriteTableLook(_type, _look, _stream)
 {
-    if (undefined === _look)
+    if (!_look)
         return;
 
     _stream["WriteByte"](_type);
@@ -2634,7 +2635,7 @@ function asc_menu_ReadAscValAxisSettings(_params, _cursor)
 };
 function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream)
 {
-    if (undefined === _settings)
+    if (!_settings)
         return;
 
     _stream["WriteByte"](_type);
@@ -2861,7 +2862,7 @@ function asc_menu_ReadChartPr(_params, _cursor)
 };
 function asc_menu_WriteChartPr(_type, _chartPr, _stream)
 {
-    if (undefined === _chartPr)
+    if (!_chartPr)
         return;
 
     _stream["WriteByte"](_type);
@@ -3010,7 +3011,7 @@ function asc_menu_ReadAscFill_solid(_params, _cursor)
 };
 function asc_menu_WriteAscFill_solid(_type, _fill, _stream)
 {
-    if (undefined === _fill)
+    if (!_fill)
         return;
 
     _stream["WriteByte"](_type);
@@ -3057,7 +3058,7 @@ function asc_menu_ReadAscFill_patt(_params, _cursor)
 };
 function asc_menu_WriteAscFill_patt(_type, _fill, _stream)
 {
-    if (undefined === _fill)
+    if (!_fill)
         return;
 
     _stream["WriteByte"](_type);
@@ -3157,7 +3158,7 @@ function asc_menu_ReadAscFill_grad(_params, _cursor)
 };
 function asc_menu_WriteAscFill_grad(_type, _fill, _stream)
 {
-    if (undefined === _fill)
+    if (!_fill)
         return;
 
     _stream["WriteByte"](_type);
@@ -3249,7 +3250,7 @@ function asc_menu_ReadAscFill_blip(_params, _cursor)
 };
 function asc_menu_WriteAscFill_blip(_type, _fill, _stream)
 {
-    if (undefined === _fill)
+    if (!_fill)
         return;
 
     _stream["WriteByte"](_type);
@@ -3339,7 +3340,7 @@ function asc_menu_ReadAscFill(_params, _cursor)
 };
 function asc_menu_WriteAscFill(_type, _fill, _stream)
 {
-    if (undefined === _fill)
+    if (!_fill)
         return;
 
     _stream["WriteByte"](_type);
@@ -3461,7 +3462,7 @@ function asc_menu_ReadAscStroke(_params, _cursor)
 };
 function asc_menu_WriteAscStroke(_type, _stroke, _stream)
 {
-    if (undefined === _stroke)
+    if (!_stroke)
         return;
 
     _stream["WriteByte"](_type);
@@ -3573,7 +3574,7 @@ function asc_menu_ReadShapePr(_params, _cursor)
 };
 function asc_menu_WriteShapePr(_type, _shapePr, _stream)
 {
-    if (undefined === _shapePr)
+    if (!_shapePr)
         return;
 
     _stream["WriteByte"](_type);
@@ -4055,6 +4056,7 @@ asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h)
     hI = Math.max(5, Math.min(hI, __h));
 
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
     this.WordControl.m_oLogicDocument.Add_InlineImage(wI, hI, url);
 };
 
