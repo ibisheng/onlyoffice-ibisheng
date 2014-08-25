@@ -1738,6 +1738,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             var _h = _params[_current.pos++];
 
             this.AddImageUrlNative(_src, _w, _h);
+            break;
         }
         case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
