@@ -36,7 +36,7 @@
 				//scrollerColor:"#EDEDED",//цвет ползунка скрола
 				isViewerMode: false,
 				wheelScrollLines: 3,
-                isNeedInvertOnActive: true
+                isNeedInvertOnActive: false
 			};
 
 			this.view     = undefined;

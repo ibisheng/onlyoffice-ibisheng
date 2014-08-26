@@ -34,10 +34,11 @@
 	position: absolute;
 	right: 0;
 	width: 16px;
-	top: -1px;
+	top: 0px;
 	bottom: 15px;
 	overflow: hidden;
 	z-index: 10;
+    background-color: #CBCBCB;
 }
 
 #ws-v-scroll-helper {
@@ -48,10 +49,11 @@
 	position: absolute;
 	bottom: 0;
 	height: 16px;
-	left: 0;
+	left: 0px;
 	right: 15px;
 	overflow: hidden;
 	z-index: 10;
+    background-color: #CBCBCB;
 }
 
 #ws-h-scroll-helper {
