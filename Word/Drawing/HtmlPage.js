@@ -63,7 +63,7 @@ var GlobalSkinFlat = {
     PageOutline : "#BBBEC2",
     STYLE_THUMBNAIL_WIDTH : 109,
     STYLE_THUMBNAIL_HEIGHT : 45,
-    isNeedInvertOnActive: true
+    isNeedInvertOnActive: false
 };
 
 var GlobalSkin = GlobalSkinTeamlab;
