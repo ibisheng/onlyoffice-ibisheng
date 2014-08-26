@@ -9967,6 +9967,9 @@
 			var inc = options.scanForward ? +1 : -1;
 			var ct, isEqual;
 
+			// ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzserver/show_bug.cgi?id=26136)
+			this._prepareCellTextMetricsCache(new Asc.Range(0, 0, this.model.getColsCount(), this.model.getRowsCount()));
+
 			function findNextCell() {
 				var ct = undefined;
 				do {
