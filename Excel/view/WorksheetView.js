@@ -9965,7 +9965,7 @@
 			var maxC = this.cols.length - 1;
 			var maxR = this.rows.length - 1;
 			var inc = options.scanForward ? +1 : -1;
-			var ct, isEqual;
+			var isEqual;
 
 			// ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzserver/show_bug.cgi?id=26136)
 			this._prepareCellTextMetricsCache(new Asc.Range(0, 0, this.model.getColsCount(), this.model.getRowsCount()));
@@ -9985,8 +9985,7 @@
 				} while (!ct);
 				return ct;
 			}
-
-			for (ct = findNextCell(); ct; ct = findNextCell()) {
+			while (findNextCell()) {
 				isEqual = this._isCellEqual(c, r, options);
 				if (null !== isEqual)
 					return isEqual;
@@ -10024,7 +10023,7 @@
 				maxC = this.cols.length - 1;
 				maxR = this.rows.length - 1;
 			}
-			for (ct = findNextCell(); ct; ct = findNextCell()) {
+			while (findNextCell()) {
 				isEqual = this._isCellEqual(c, r, options);
 				if (null !== isEqual)
 					return isEqual;
