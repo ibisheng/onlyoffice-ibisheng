@@ -1165,7 +1165,7 @@
 		 */
 		WorksheetView.prototype._modelColWidthToColWidth = function (mcw) {
 			var px = asc_floor(((256 * mcw + asc_floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
-			return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
+			return px * asc_getcvt(0/*px*/, 1/*pt*/, 96);
 		};
 
 		/**
@@ -1174,8 +1174,8 @@
 		 * @returns {Number}  Количество символов
 		 */
 		WorksheetView.prototype._colWidthToCharCount = function (w) {
-			var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
-			return px <= this.settings.cells.paddingPlusBorder ? 0 : asc_floor( (px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5 ) / 100;
+			var px = w * asc_getcvt(1/*pt*/, 0/*px*/, 96);
+			return px <= this.settings.cells.paddingPlusBorder ? 0 : asc_floor((px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
 		};
 
 		/**
@@ -9273,7 +9273,7 @@
 
 			var range;
 			var fullRecalc = undefined;
-			var pad, cw;
+			var cw;
 			var isUpdateCols = false, isUpdateRows = false;
 			var cleanCacheCols = false, cleanCacheRows = false;
 			var _updateRangeIns, _updateRangeDel, bUndoRedo;
@@ -9310,7 +9310,6 @@
 			switch (prop) {
 				case "colWidth":
 					functionModelAction = function () {
-						pad = t.width_padding * 2 + t.width_1px;
 						cw = t._charCountToModelColWidth(val);
 						t.model.setColWidth(cw, checkRange.c1, checkRange.c2);
 						isUpdateCols = true;
