@@ -1235,7 +1235,7 @@ ParaMath.prototype =
             // this.absPos.x ~> this.X
             // this.absPos.y ~> this.Y
 
-            if(this.NotDraw == false)
+            //if(this.NotDraw == false)
                 this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
 
             PDSE.X += this.Width;

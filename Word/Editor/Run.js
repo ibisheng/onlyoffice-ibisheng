@@ -53,7 +53,7 @@ function ParaRun(Paragraph, bMathRun)
         this.MathPrp = new CMPrp();
         this.Parent = null;
         this.bEqqArray = false;
-        this.WidthsPoints = [];
+        //this.WidthsPoints = [];
         this.size = new CMathSize();
     }
     this.StartState = null;
@@ -7563,13 +7563,12 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.PosE  = PosE;
     this.Color = Color;
 }
-ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
+ParaRun.prototype.old_Math_SetPosition = function(pos, PosInfo, CurrWPoints)
 {
     var NewPos = new CMathPosition();
 
     NewPos.x = pos.x;
     NewPos.y = pos.y - this.size.ascent;
-
 
     if(this.bEqqArray)
     {
@@ -7577,30 +7576,93 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
         var align = 0;
         // нечетным точкам соответствуют четные индексы в массиве
 
+
+        var Len       = CurrWPoints.Widths.length,
+            Amp       = CurrWPoints.Amp,
+            CurrPoint = CurrWPoints.CurrPoint;
+
+
         var Pos = 0,
-            lng = this.Content.length,
-            Amp = 1;
+            Point;
 
-        var W = 0;
-        var WPointsLng = this.WidthsPoints.length;
-        var widthCurrPoint = 0;
+        var GWidth, GPoint;
 
 
-        if(WPointsLng > 0) // есть точки выравнивания
+        if(Len  > 0) // есть точки выравнивания
         {
-            for(var j = 0; j < WPointsLng; j++)
+            while(Pos < this.Content.length)
             {
-                widthCurrPoint = 0;
+                Point  = CurrWPoints.Widths[CurrPoint];
+                GWidth = PosInfo.Widths[CurrPoint];
+                GPoint = PosInfo.Points[CurrPoint];
 
-                if(j == WPointsLng - 1 && this.WidthsPoints[j].odd == -1) // то есть последняя точка четная, выравнивание по центру
+                if(CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
                 {
-                    align = (PosInfo.Widths[j] - this.WidthsPoints[j].even)/2;
+                    align = (GWidth - Point.even)/2;
                     alignEven = 0;
                 }
                 else
                 {
-                    alignEven = (PosInfo.Widths[j] - PosInfo.Points[j].even - PosInfo.Points[j].odd)/2;
-                    align = PosInfo.Points[j].even - this.WidthsPoints[j].even;
+                    alignEven = (GWidth - GPoint.even - GPoint.odd)/2;
+                    align = GPoint.even - Point.even;
+                }
+
+                if(Amp == 0 || (Amp == 1 && CurrPoint === 0))
+                    NewPos.x += align + alignEven;
+
+                while(Pos < this.Content.length && Amp < 3)
+                {
+                    if(this.Content[Pos].Type == para_Math_Ampersand)
+                    {
+                        Amp++;
+                        if(Amp < 3)
+                        {
+                            this.Content[Pos].setPosition(NewPos);
+                            Pos++;
+                        }
+                    }
+                    else
+                    {
+                        this.Content[Pos].setPosition(NewPos);
+                        NewPos.x += this.Content[Pos].size.width;
+                        //widthCurrPoint += this.Content[Pos].size.width;
+                        //W += this.Content[Pos].size.width;
+                        Pos++;
+                    }
+                }
+
+
+                if(Amp == 3)
+                {
+                    CurrPoint++;
+                    pos.x += GWidth;
+                    NewPos.x = pos.x;
+                }
+                else
+                    pos.x = NewPos.x;
+
+                Amp = 0;
+
+            }
+
+            CurrWPoints.CurrPoint = CurrPoint;
+            CurrWPoints.Amp       = Amp;
+
+
+
+            /*for(var j = 0; j < WPointsLng; j++)
+            {
+                widthCurrPoint = 0;
+
+                if(j == WPointsLng - 1 && CurrWPoints[j].odd == -1) // то есть последняя точка четная, выравнивание по центру
+                {
+                    align = (PosInfo.Widths[CurrPoint] - CurrWPoints[j].even)/2;
+                    alignEven = 0;
+                }
+                else
+                {
+                    alignEven = (PosInfo.Widths[CurrPoint] - PosInfo.Points[CurrPoint].even - PosInfo.Points[CurrPoint].odd)/2;
+                    align = PosInfo.Points[CurrPoint].even - CurrWPoints[j].even;
                 }
 
                 NewPos.x += align + alignEven;
@@ -7626,14 +7688,17 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
                     }
                 }
 
-                NewPos.x += PosInfo.Widths[j] - widthCurrPoint - align - alignEven; // выравнивание справа
+                NewPos.x += PosInfo.Widths[CurrPoint] - widthCurrPoint - align - alignEven; // выравнивание справа
 
                 Amp = 0;
-            }
+
+                CurrPoint++;
+            }*/
+
         }
         else    // точки выравнивания отсутсвуют
         {
-            align = (PosInfo.Widths[0] - this.size.width)/2;
+            align = (PosInfo.Widths[CurrPoint] - this.size.width)/2;
 
             NewPos.x += align;
             for(var i = 0; i < this.Content.length; i++)
@@ -7641,26 +7706,11 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
                 this.Content[i].setPosition(NewPos);
                 NewPos.x += this.Content[i].size.width;
             }
+
+            pos.x += PosInfo.Widths[CurrPoint];
         }
 
 
-
-        /*if(Pos < lng)
-        {
-            var Index = this.WidthsPoints.length/2;
-            align = (PosInfo.Widths[Index] - (this.size.width - W))/2;
-            NewPos.x += align;
-
-            while(Pos < lng)
-            {
-                {
-                    this.Content[Pos].setPosition(NewPos);
-                    NewPos.x += this.Content[Pos].size.width;
-                    Pos++;
-                }
-            }
-        }*/
-        //
     }
     else
     {
@@ -7669,7 +7719,191 @@ ParaRun.prototype.Math_SetPosition = function(pos, PosInfo)
             this.Content[i].setPosition(NewPos);
             NewPos.x += this.Content[i].size.width;
         }
+
+        pos.x += this.size.width;
     }
+
+}
+ParaRun.prototype.Math_SetPosition = function(PosInfo)
+{
+    var NewPos = new CMathPosition();
+
+    var x = PosInfo.x,
+        y = PosInfo.y - this.size.ascent;
+
+    if(this.bEqqArray)
+    {
+        for(var Pos = 0; Pos < this.Content.length; Pos++)
+        {
+            var CurrElem = this.Content[Pos];
+            if(this.Content[Pos].Type == para_Math_Ampersand)
+            {
+                PosInfo.UpdatePoint();
+                PosInfo.ApplyAlign();
+
+                CurrElem.setPosition(PosInfo.x, y);
+            }
+            else
+            {
+                CurrElem.setPosition(PosInfo.x, y);
+            }
+
+            PosInfo.UpdateX(CurrElem.size.width);
+
+        }
+
+
+        /*var alignEven = 0;
+        var align = 0;
+        // нечетным точкам соответствуют четные индексы в массиве
+
+
+        var Len       = CurrWPoints.Widths.length,
+            Amp       = CurrWPoints.Amp,
+            CurrPoint = CurrWPoints.CurrPoint;
+
+
+        var Pos = 0,
+            Point;
+
+        var GWidth, GPoint;
+
+
+        if(Len  > 0) // есть точки выравнивания
+        {
+            while(Pos < this.Content.length)
+            {
+                Point  = CurrWPoints.Widths[CurrPoint];
+                GWidth = PosInfo.Widths[CurrPoint];
+                GPoint = PosInfo.Points[CurrPoint];
+
+                if(CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
+                {
+                    align = (GWidth - Point.even)/2;
+                    alignEven = 0;
+                }
+                else
+                {
+                    alignEven = (GWidth - GPoint.even - GPoint.odd)/2;
+                    align = GPoint.even - Point.even;
+                }
+
+                if(Amp == 0 || (Amp == 1 && CurrPoint === 0))
+                    NewPos.x += align + alignEven;
+
+                while(Pos < this.Content.length && Amp < 3)
+                {
+                    if(this.Content[Pos].Type == para_Math_Ampersand)
+                    {
+                        Amp++;
+                        if(Amp < 3)
+                        {
+                            this.Content[Pos].setPosition(NewPos);
+                            Pos++;
+                        }
+                    }
+                    else
+                    {
+                        this.Content[Pos].setPosition(NewPos);
+                        NewPos.x += this.Content[Pos].size.width;
+                        //widthCurrPoint += this.Content[Pos].size.width;
+                        //W += this.Content[Pos].size.width;
+                        Pos++;
+                    }
+                }
+
+
+                if(Amp == 3)
+                {
+                    CurrPoint++;
+                    pos.x += GWidth;
+                    NewPos.x = pos.x;
+                }
+                else
+                    pos.x = NewPos.x;
+
+                Amp = 0;
+
+            }
+
+            CurrWPoints.CurrPoint = CurrPoint;
+            CurrWPoints.Amp       = Amp;
+
+
+
+            *//*for(var j = 0; j < WPointsLng; j++)
+             {
+             widthCurrPoint = 0;
+
+             if(j == WPointsLng - 1 && CurrWPoints[j].odd == -1) // то есть последняя точка четная, выравнивание по центру
+             {
+             align = (PosInfo.Widths[CurrPoint] - CurrWPoints[j].even)/2;
+             alignEven = 0;
+             }
+             else
+             {
+             alignEven = (PosInfo.Widths[CurrPoint] - PosInfo.Points[CurrPoint].even - PosInfo.Points[CurrPoint].odd)/2;
+             align = PosInfo.Points[CurrPoint].even - CurrWPoints[j].even;
+             }
+
+             NewPos.x += align + alignEven;
+
+             while(Pos < lng && Amp < 3)
+             {
+             if(this.Content[Pos].Type == para_Math_Ampersand)
+             {
+             Amp++;
+             if(Amp < 3)
+             {
+             this.Content[Pos].setPosition(NewPos);
+             Pos++;
+             }
+             }
+             else
+             {
+             this.Content[Pos].setPosition(NewPos);
+             NewPos.x += this.Content[Pos].size.width;
+             widthCurrPoint += this.Content[Pos].size.width;
+             W += this.Content[Pos].size.width;
+             Pos++;
+             }
+             }
+
+             NewPos.x += PosInfo.Widths[CurrPoint] - widthCurrPoint - align - alignEven; // выравнивание справа
+
+             Amp = 0;
+
+             CurrPoint++;
+             }*//*
+
+        }
+        else    // точки выравнивания отсутсвуют
+        {
+            align = (PosInfo.Widths[CurrPoint] - this.size.width)/2;
+
+            NewPos.x += align;
+            for(var i = 0; i < this.Content.length; i++)
+            {
+                this.Content[i].setPosition(NewPos);
+                NewPos.x += this.Content[i].size.width;
+            }
+
+            pos.x += PosInfo.Widths[CurrPoint];
+        }*/
+
+
+    }
+    else
+    {
+        for(var i = 0; i < this.Content.length; i++)
+        {
+            this.Content[i].setPosition(PosInfo.x, y);
+            PosInfo.x += this.Content[i].size.width;
+        }
+
+        //pos.x += this.size.width;
+    }
+
 }
 ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 {
@@ -7701,7 +7935,7 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
         this.Content[i].draw(X, Y, pGraphics);
 
 }
-ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, ArgSize)
+ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, ArgSize, WidthPoints)
 {
     // пересчет элементов контента в Run
     // Recalculate_MeasureContent
@@ -7725,7 +7959,6 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
 
 
-
     var oWPrp = this.Get_CompiledPr(true);
     this.Parent.ParaMath.ApplyArgSize(oWPrp, ArgSize.value);
 
@@ -7743,16 +7976,8 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
 
     g_oTextMeasurer.SetFont(oWPrp);
 
-    this.WidthsPoints.length = 0;
-
     this.bEqqArray = RPI.bEqqArray;
-    var Widths, PosW = 0;
 
-    if(RPI.bEqqArray)
-    {
-        Widths = RPI.AmperWPoints.GetWidths();
-        Widths[0] = 0;
-    }
 
     this.size.SetZero();
 
@@ -7760,7 +7985,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
         ascent = 0, descent = 0;
 
     var Lng = this.Content.length;
-    var len, NewPoint;
+
 
     for (var i = 0 ; i < Lng; i++)
     {
@@ -7776,76 +8001,14 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
         ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
         descent = descent < oDescent ? oDescent : descent;
 
-       /*if(this.Content[i].Type == para_Math_Ampersand && RPI.bEqqArray)
-        {
-            if(PosW == lng)
-            {
-                RPI.Widths[PosW] = W;
-                RPI.SingleAmpEnd    = true;
-            }
-            else
-            {
-                RPI.Widths[PosW] = RPI.Widths[PosW] > W ? RPI.Widths[PosW] : W;
-
-                if(PosW == lng -1)
-                    RPI.SingleAmpEnd    = false;
-            }
-
-            PosW++;
-
-            W = 0;
-        }
-        else
-            W += width;*/
-
-
         if(RPI.bEqqArray)
         {
-            if(this.Content[i].Type == para_Math_Ampersand)
-            {
-                if(PosW % 2 == 0)
-                {
-                    NewPoint = new CMathPoint();
-                    NewPoint.even = Widths[PosW];
-
-                    this.WidthsPoints.push(NewPoint);
-                }
-                else
-                {
-                    len = this.WidthsPoints.length;
-                    this.WidthsPoints[len-1].odd = Widths[PosW];
-                }
-
-                PosW++;
-                Widths[PosW] = 0;
-
-            }
+            if(this.Content[i].Type !== para_Math_Ampersand)
+                WidthPoints.UpdatePoint(widthCurr);
             else
-                Widths[PosW] += widthCurr;
-
-        }
-
-    }
-
-
-    len = this.WidthsPoints.length;
-
-    if(RPI.bEqqArray && len > 0)
-    {
-        if(PosW%2 == 0)
-        {
-            NewPoint = new CMathPoint();
-            NewPoint.even = Widths[PosW];
-            NewPoint.odd  = -1;
-
-            this.WidthsPoints.push(NewPoint);
-        }
-        else
-        {
-            this.WidthsPoints[len-1].odd = Widths[PosW];
+                WidthPoints.AddNewAlignRange();
         }
     }
-
 
     this.size.ascent = ascent;
     this.size.height = ascent + descent;

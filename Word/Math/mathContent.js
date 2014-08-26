@@ -42,8 +42,7 @@ function CRPI()
     this.bChangeInline   = false;
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
     this.bEqqArray       = false; /*для амперсанда*/
-    this.AmperWPoints     = null;
-    this.bManyRuns       = false;
+
 }
 CRPI.prototype.Copy = function()
 {
@@ -53,16 +52,165 @@ CRPI.prototype.Copy = function()
     RPI.bInsideFraction = this.bInsideFraction;
     RPI.bChangeInline   = this.bChangeInline;
     RPI.bNaryInline     = this.bNaryInline;
-    RPI.bManyRuns       = false;
+    RPI.bEqqArray       = this.bEqqArray;
 
     return RPI;
 }
 
-function CMathPosInfo()
+/*function CMathPosInfo()
 {
-    this.CurrPoint = 0;
     this.Widths    = [];
     this.Points    = [];
+}*/
+
+function CMathPosInfo()
+{
+    this.x    = 0;
+    this.y    = 0;
+
+    this.bEven         = true;
+    this.CurrPoint     = 0;
+    this.GWidths       = null;
+    this.GPoints       = null;
+    this.ContentPoints = null;
+
+    this.GMaxDimWidths = null;
+}
+CMathPosInfo.prototype.UpdateX = function(value)
+{
+    this.x += value;
+}
+CMathPosInfo.prototype.UpdatePoint = function()
+{
+    if(this.bEven)
+        this.bEven = false;
+    else
+    {
+        this.CurrPoint++;
+        this.bEven = true;
+    }
+}
+CMathPosInfo.prototype.old_old_ApplyAlign = function()
+{
+    var align = 0;
+
+    if(this.bEven)
+    {
+        var alignEven, alignGeneral;
+
+        var Len   = this.ContentPoints.length,
+            Point = this.ContentPoints[this.CurrPoint];
+
+        var GWidth = this.GWidths[this.CurrPoint],
+            GPoint = this.GPoints[this.CurrPoint];
+
+        if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
+        {
+            alignGeneral = (GWidth - Point.even)/2;
+            alignEven = 0;
+        }
+        else
+        {
+            alignEven = (GWidth - GPoint.even - GPoint.odd)/2;
+            alignGeneral = GPoint.even - Point.even;
+        }
+
+        align = alignGeneral + alignEven;
+    }
+
+
+    this.x += align;
+}
+
+CMathPosInfo.prototype.old_ApplyAlign = function() // нормальный расчет, без случая с Last элементом
+{
+    var align = 0;
+
+    if(this.bEven)
+    {
+        var alignEven, alignGeneral, alignOdd;
+
+        var Len   = this.ContentPoints.length,
+            Point = this.ContentPoints[this.CurrPoint];
+
+        var GWidth = this.GWidths[this.CurrPoint],
+            GPoint = this.GPoints[this.CurrPoint];
+
+        if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
+        {
+            alignGeneral = (GWidth - Point.even)/2;
+            alignEven = 0;
+        }
+        else
+        {
+            alignGeneral = (GWidth - GPoint.even - GPoint.odd)/2;
+            alignEven = GPoint.even - Point.even;
+        }
+
+        if(this.CurrPoint > 0)
+        {
+            var PrevGenPoint = this.GPoints[this.CurrPoint-1],
+                PrevGenWidth = this.GWidths[this.CurrPoint-1],
+                PrevPoint    = this.ContentPoints[this.CurrPoint-1];
+
+            var alignPrevGen = (PrevGenWidth - PrevGenPoint.even - PrevGenPoint.odd)/2;
+            alignOdd = alignPrevGen +  PrevGenPoint.odd - PrevPoint.odd;
+        }
+        else
+            alignOdd = 0;
+
+        align = alignGeneral + alignEven + alignOdd;
+    }
+
+
+    this.x += align;
+}
+CMathPosInfo.prototype.new_ApplyAlign = function()
+{
+    var align = 0;
+
+    if(this.bEven)
+    {
+        var alignEven, alignGeneral, alignOdd;
+
+        var Len   = this.ContentPoints.length,
+            Point = this.ContentPoints[this.CurrPoint];
+
+        var GWidth       = this.GWidths[this.CurrPoint],
+            GPoint       = this.GPoints[this.CurrPoint];
+
+
+        if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
+        {
+            var GMaxDimWidth = this.GMaxDimWidths[this.CurrPoint];
+
+            alignGeneral = (GMaxDimWidth - Point.even)/2; // для Last элемента
+            alignEven = 0;
+        }
+        else
+        {
+            alignGeneral = (GWidth - GPoint.even - GPoint.odd)/2; // для случая, когда у Last элемента максимальная ширина для данного отрезка выравнивания
+            //alignGeneral = (GWidth - Point.even - Point.odd)/2;
+            alignEven = GPoint.even - Point.even;
+        }
+
+        if(this.CurrPoint > 0)
+        {
+            var PrevGenPoint = this.GPoints[this.CurrPoint-1],
+                PrevGenWidth = this.GWidths[this.CurrPoint-1],
+                PrevPoint    = this.ContentPoints[this.CurrPoint-1];
+
+            var alignPrevGen = (PrevGenWidth - PrevPoint.even - PrevPoint.odd)/2;
+            alignOdd = alignPrevGen +  PrevGenPoint.odd - PrevPoint.odd;
+        }
+        else
+            alignOdd = 0;
+
+        align = alignGeneral + alignEven + alignOdd;
+    }
+
+
+    this.x += align;
 }
 
 function CMathPosition()
@@ -74,17 +222,96 @@ function CMathPosition()
 
 function AmperWidths()
 {
-    this.CurrRow = -1;
-    this.Widths = [];
+    /*this.Amp       = 0;
+    this.CurrPoint = -1;*/
+    this.bEven     = true; // является ли текущая точка нечетной
+    this.Widths    = [];
 }
-AmperWidths.prototype.GetWidths = function()
+/*AmperWidths.prototype.UpdatePoints = function(value)
 {
-    return this.Widths[this.CurrRow];
+    if(this.bEven)
+    {
+        this.CurrPoint++;
+        var NewPoint = new CMathPoint();
+        NewPoint.even = value;
+        this.Widths.push(NewPoint);
+        this.bEven = false;
+    }
+    else
+    {
+        var len = this.Widths.length;
+        this.Widths[len-1].odd = value;
+        this.bEven     = true;
+    }
 }
-AmperWidths.prototype.AddWRow = function()
+AmperWidths.prototype.AddToCurrentPoint = function(value)
 {
-    this.CurrRow++;
-    this.Widths[this.CurrRow] = new Array();
+    var len = this.Widths.length;
+
+    if(len == 0)
+    {
+        this.UpdatePoints(value);
+        this.bEven = true;
+    }
+    else
+    {
+        if(this.bEven) // текущая точка нечетная
+        {
+            if(this.Widths[len-1].even != -1)
+                this.Widths[len-1].even += value;
+            else
+                this.Widths[len-1].even = value;
+        }
+        else    // текущая точка четная
+        {
+            if(this.Widths[len-1].odd != -1)
+                this.Widths[len-1].odd += value;
+            else
+                this.Widths[len-1].odd = value;
+        }
+    }
+}*/
+AmperWidths.prototype.UpdatePoint = function(value)
+{
+    var len = this.Widths.length;
+
+    if(len == 0)
+    {
+        // дефолтное значение bEven true, для случая если первый элемент в контенте будет Ampersand
+        var NewPoint = new CMathPoint();
+        NewPoint.even = value;
+        this.Widths.push(NewPoint);
+        this.bEven = true;
+    }
+    else
+    {
+        if(this.bEven)
+            this.Widths[len-1].even += value;
+        else
+            this.Widths[len-1].odd += value;
+    }
+
+}
+AmperWidths.prototype.AddNewAlignRange = function()
+{
+    var len = this.Widths.length;
+
+    if(!this.bEven || len == 0)
+    {
+        var NewPoint = new CMathPoint();
+        NewPoint.even = 0;
+        this.Widths.push(NewPoint);
+    }
+
+    if(this.bEven)
+    {
+        len = this.Widths.length;
+        this.Widths[len-1].odd = 0;
+    }
+
+
+    this.bEven = !this.bEven;
+
 }
 
 
@@ -747,6 +974,7 @@ function CMathContent()
 
     this.CurPos = 0;
     this.WidthToElement = [];
+    this.WidthPoints    = []; /// for EqqArray Runs
     this.pos = new CMathPosition();   // относительная позиция
 
     //  Properties
@@ -3885,27 +4113,26 @@ CMathContent.prototype =
 
         this.WidthToElement.length = 0;
 
+        this.bEqqArray = RPI.bEqqArray;
+
         var lng = this.content.length;
 
         this.size.SetZero();
 
-        var bManyRuns =  RPI.bEqqArray == true && this.content.length > 1;
+        /*var bManyRuns =  RPI.bEqqArray == true && this.content.length > 1;
         if(bManyRuns)
-            RPI.bManyRuns = true;
+            var temp = true;*/
 
+        this.WidthPoints = new AmperWidths();
 
         for(var pos = 0; pos < lng; pos++)
         {
             if(this.content[pos].Type == para_Math_Composition)
             {
-                // обнуляем Gaps, чтобы при расчете ширины они не участвовалиу
-                /*this.content[pos].GapLeft = 0;
-                this.content[pos].GapRight = 0;*/
-
                 this.content[pos].Set_CompiledCtrPrp(this.ParaMath);
                 this.content[pos].SetGaps(GapsInfo);
             }
-            else if(this.content[pos].Type == para_Math_Run /*&& !this.content[pos].Is_Empty()*/)
+            else if(this.content[pos].Type == para_Math_Run)
                 this.content[pos].Math_SetGaps(GapsInfo);
 
 
@@ -3920,14 +4147,21 @@ CMathContent.prototype =
         if(lng > 0)
             this.recalculateSize_2(lng-1, oMeasure, Parent, ParaMath, RPI);
 
-
     },
     recalculateSize_2: function(pos, oMeasure, Parent, ParaMath, RPI)
     {
         if(this.content[pos].Type == para_Math_Composition)
-            this.content[pos].Resize(oMeasure, this, ParaMath, RPI, this.Compiled_ArgSz);
+        {
+            var NewRPI = RPI.Copy();
+            NewRPI.bEqqArray    = false;
+
+            this.content[pos].Resize(oMeasure, this, ParaMath, NewRPI, this.Compiled_ArgSz);
+
+            if(RPI.bEqqArray)
+                this.WidthPoints.UpdatePoint(this.content[pos].size.width);
+        }
         else if(this.content[pos].Type == para_Math_Run)
-            this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz);
+            this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.WidthPoints);
 
         this.WidthToElement[pos] = this.size.width;
 
@@ -4066,26 +4300,54 @@ CMathContent.prototype =
     {
         return false;
     },
-    setPosition: function(pos, PosInfo)
+    setPosition: function(PosInfo)
     {
-        this.pos.x = pos.x;
-        this.pos.y = pos.y;
+        this.pos.x = PosInfo.x;
+        this.pos.y = PosInfo.y ;
 
-        var x = pos.x,
-            y = pos.y + this.size.ascent;    // y по baseline;
+        /*var x = pos.x,
+            y = pos.y + this.size.ascent;  */
+
+        //this.WidthPoints.CurrPoint = 0;
+        //this.WidthPoints.Amp       = 1;
+
+        /*var NewPos = new CMathPosition();
+        NewPos.x = pos.x;
+        NewPos.y = pos.y + this.size.ascent; // y по baseline;*/
+
+        var NewPosInfo = new CMathPosInfo();
+        NewPosInfo.x = this.pos.x;
+        NewPosInfo.y = this.pos.y + this.size.ascent;
+
+        if(this.bEqqArray)
+        {
+            NewPosInfo.GWidths       = this.Parent.WidthsPoints;
+            NewPosInfo.GPoints       = this.Parent.Points;
+            NewPosInfo.ContentPoints = this.WidthPoints.Widths;
+            NewPosInfo.GMaxDimWidths = this.Parent.MaxDimWidths;
+
+            NewPosInfo.ApplyAlign();
+        }
+
 
         for(var i=0; i < this.content.length; i++)
         {
-            var NewPos = new CMathPosition();
-            NewPos.x = x;
-            NewPos.y = y;
-
             if(this.content[i].Type == para_Math_Run)
-                this.content[i].Math_SetPosition(NewPos, PosInfo);
-            else
-                this.content[i].setPosition(NewPos, PosInfo);
+            {
+                this.content[i].Math_SetPosition(NewPosInfo);
 
-            x += this.content[i].size.width;
+            }
+            else
+            {
+                /*var NewPos = new CMathPosition();
+                NewPos.x = pos.x;
+                NewPos.y = pos.y + this.size.ascent; // y по baseline;*/
+
+                this.content[i].setPosition(NewPosInfo);
+                NewPosInfo.UpdateX(this.content[i].size.width);
+            }
+
+
         }
     },
     ///// properties /////
