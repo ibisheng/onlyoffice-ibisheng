@@ -4210,6 +4210,10 @@ function CStylesPainter()
     this.CurrentTranslate = null;
     this.IsRetinaEnabled = false;
 
+    this.defaultStyles = [];
+    this.docStyles = [];
+    this.mergedStyles = [];
+
     this.GenerateStyles = function(_api, ds)
     {
         if (_api.WordControl.bIsRetinaSupport)
@@ -4229,6 +4233,65 @@ function CStylesPainter()
         this.GenerateDefaultStyles(_api, ds, _graphics);
         this.GenerateDocumentStyles(_api, _graphics);
 
+        // стили сформированы. осталось просто сформировать единый список
+        var _count_default = this.defaultStyles.length;
+        var _count_doc = 0;
+        if (null != this.docStyles)
+            _count_doc = this.docStyles.length;
+
+        var aPriorityStyles = [];
+        var fAddToPriorityStyles = function(style){
+            var index = style.Style.uiPriority;
+            if(null == index)
+                index = 0;
+            var aSubArray = aPriorityStyles[index];
+            if(null == aSubArray)
+            {
+                aSubArray = [];
+                aPriorityStyles[index] = aSubArray;
+            }
+            aSubArray.push(style);
+        };
+        var _map_document = {};
+
+        for (var i = 0; i < _count_doc; i++)
+        {
+            var style = this.docStyles[i];
+            _map_document[style.Name] = 1;
+            fAddToPriorityStyles(style);
+        }
+
+        for (var i = 0; i < _count_default; i++)
+        {
+            var style = this.defaultStyles[i];
+            if(null == _map_document[style.Name])
+                fAddToPriorityStyles(style);
+        }
+
+        this.mergedStyles = [];
+        for(var index in aPriorityStyles)
+        {
+            var aSubArray = aPriorityStyles[index];
+            aSubArray.sort(function(a, b){
+                if(a.Name < b.Name)
+                    return -1;
+                else if(a.Name > b.Name)
+                    return 1;
+                else
+                    return 0;
+            });
+            for(var i = 0, length = aSubArray.length; i < length; ++i)
+            {
+                this.mergedStyles.push(aSubArray[i]);
+            }
+        }
+
+        var _count = this.mergedStyles.length;
+        for (var i = 0; i < _count; i++)
+        {
+            this.drawStyle(_graphics, this.mergedStyles[i].Style, _api);
+        }
+
         _stream["ClearNoAttack"]();
 
         _stream["WriteByte"](1);
@@ -4244,7 +4307,8 @@ function CStylesPainter()
             var style = styles[i];
             if (true == style.qFormat)
             {
-                this.drawStyle(_graphics, style, _api);
+                this.defaultStyles.push({ Name: style.Name, Style: style });
+                //this.drawStyle(_graphics, style, _api);
             }
         }
     }
@@ -4275,9 +4339,9 @@ function CStylesPainter()
                 _dr_style.Name = style.Name;
                 _dr_style.Id = i;
 
-                this.drawStyle(_graphics, _dr_style, _api);
+                //this.drawStyle(_graphics, _dr_style, _api);
 
-                var _name = "";
+                var _name = _dr_style.Name;
                 // алгоритм смены имени
                 if (style.Default)
                 {
@@ -4300,6 +4364,8 @@ function CStylesPainter()
                 {
                     _name = "Heading ".concat(index + 1);
                 }
+
+                this.docStyles.push({ Name: _name, Style: _dr_style });
             }
         }
     }
