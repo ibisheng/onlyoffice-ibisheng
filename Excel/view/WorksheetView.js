@@ -23,7 +23,6 @@
 		var asc_getcvt  = asc.getCvtRatio;
 		var asc_floor   = asc.floor;
 		var asc_ceil    = asc.ceil;
-		var asc_round   = asc.round;
 		var asc_obj2Color = asc.colorObjToAscColor;
 		var asc_typeof  = asc.typeOf;
 		var asc_incDecFonSize  = asc.incDecFonSize;
