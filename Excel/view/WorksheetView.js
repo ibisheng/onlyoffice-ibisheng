@@ -1156,7 +1156,7 @@
 		 */
 		WorksheetView.prototype._charCountToModelColWidth = function (count) {
 			if (count <= 0) { return 0; }
-			return asc_floor((count * this.maxDigitWidth + 5) / this.maxDigitWidth * 256) / 256; // 5 - Это padding + border
+			return asc_floor((count * this.maxDigitWidth + this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
 		};
 
 		/**
@@ -1176,7 +1176,7 @@
 		 */
 		WorksheetView.prototype._colWidthToCharCount = function (w) {
 			var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
-			return px <= 5 ? 0 : asc_floor( (px - 5) / asc_round(this.maxDigitWidth) * 100 + 0.5 ) / 100;
+			return px <= this.settings.cells.paddingPlusBorder ? 0 : asc_floor( (px - this.settings.cells.paddingPlusBorder) / asc_round(this.maxDigitWidth) * 100 + 0.5 ) / 100;
 		};
 
 		/**

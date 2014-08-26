@@ -143,7 +143,7 @@
 			this.reFormula = /^([a-z_][a-z0-9_]*)/i;
 
 			this.defaults = {
-				padding     : 2,
+				padding     : -1,
 				selectColor : new CColor(190, 190, 255, 0.5),
 
 				canvasZIndex  : 500,
@@ -161,6 +161,7 @@
 		CellEditor.prototype._init = function (settings) {
 			var t = this;
 			var z = t.defaults.canvasZIndex;
+			this.defaults.padding = settings.padding;
 
 			if (null != this.element) {
 				t.canvasOuter = document.createElement('div');

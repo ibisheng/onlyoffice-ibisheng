@@ -69,7 +69,8 @@
 					border: new CColor(212, 212, 212),
 					color: new CColor(0, 0, 0)
 				},
-				padding: 2/*px horizontal padding*/
+				padding: -1, /*px horizontal padding*/
+				paddingPlusBorder: -1
 			};
 			this.activeCellBorderColor = new CColor(126, 152, 63);
 			this.activeCellBorderColor2 = new CColor(255, 255, 255, 0.75);
@@ -390,7 +391,8 @@
 						"updateEditorSelectionInfo"	: function (info) {self.handlers.trigger("asc_onEditorSelectionChanged", info);}
 					},
 					/*settings*/{
-						font: this.defaultFont
+						font: this.defaultFont,
+						padding: this.defaults.worksheetView.cells.padding
 					});
 
 				this.popUpSelector = new asc.PopUpSelector(this.element, /*handlers*/{
@@ -2098,6 +2100,10 @@
 			// Проверка для Calibri 11 должно быть this.maxDigitWidth = 7
 
 			if (!this.maxDigitWidth) {throw "Error: can't measure text string";}
+
+			// Padding рассчитывается исходя из maxDigitWidth (http://social.msdn.microsoft.com/Forums/en-US/9a6a9785-66ad-4b6b-bb9f-74429381bd72/margin-padding-in-cell-excel?forum=os_binaryfile)
+			this.defaults.worksheetView.cells.padding = Math.max(asc.ceil(this.maxDigitWidth / 4), 2);
+			this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
 		};
 
 		/*
