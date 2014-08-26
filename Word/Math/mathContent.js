@@ -122,7 +122,7 @@ CMathPosInfo.prototype.old_old_ApplyAlign = function()
     this.x += align;
 }
 
-CMathPosInfo.prototype.old_ApplyAlign = function() // нормальный расчет, без случая с Last элементом
+CMathPosInfo.prototype.ApplyAlign = function() // нормальный расчет, без случая с Last элементом
 {
     var align = 0;
 

@@ -862,7 +862,7 @@ CEqArray.prototype._getMetrics = function(RPI)
 
     return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
 }
-CEqArray.prototype.old_getMetrics = function(RPI) // нормальный расчет, без случая с Last элементом
+CEqArray.prototype.getMetrics = function(RPI) // нормальный расчет, без случая с Last элементом
 {
     var AscentsMetrics = [];
     var DescentsMetrics = [];
