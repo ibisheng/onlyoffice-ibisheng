@@ -14,6 +14,18 @@
 
 CDrawingStream.prototype =
 {
+    ClearParams : function()
+    {
+        this.m_oTextPr      = null;
+        this.m_oGrFonts     = new CGrRFonts();
+        this.m_oLastFont    = new CFontSetup();
+
+        this.IsUseFonts2    = false;
+        this.m_oLastFont2   = null;
+
+        this.m_bIntegerGrid = true;
+    },
+
     EndDraw : function()
     {
         // not used

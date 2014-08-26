@@ -22,6 +22,11 @@
     this.TableMatrix        = null;
     this.CurrentPageIndex   = null;
 
+    // TABLE_STYLES
+    this.TableStylesLastLook = null;
+    this.TableStylesSheckLook = null;
+    this.TableStylesSheckLookFlag = false;
+
     this.Native = window["native"];
 
     this.checkMouseDown = function(pos, drDoc)
@@ -1279,15 +1284,174 @@ CDrawingDocument.prototype =
     
     ///////////////////////////////////////////
     StartTableStylesCheck : function()
-    {        
+    {
+        this.TableStylesSheckLookFlag = true;
     },
 
     EndTableStylesCheck : function()
     {
+        this.TableStylesSheckLookFlag = false;
+        if (this.TableStylesSheckLook != null)
+        {
+            this.CheckTableStyles(this.TableStylesSheckLook);
+            this.TableStylesSheckLook = null;
+        }
     },
 
     CheckTableStyles : function(tableLook)
     {
+        if (this.TableStylesSheckLookFlag)
+        {
+            this.TableStylesSheckLook = tableLook;
+            return;
+        }
+
+        // сначала проверим, подписан ли кто на этот евент
+        // а то во вьюере не стоит ничего посылать
+
+        /*
+        TODO:
+        if (!this.m_oWordControl.m_oApi.asc_checkNeedCallback("asc_onInitTableTemplates"))
+            return;
+        */
+
+        var bIsChanged = false;
+        if (null == this.TableStylesLastLook)
+        {
+            this.TableStylesLastLook = new CTablePropLook();
+
+            this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
+            this.TableStylesLastLook.FirstRow = tableLook.FirstRow;
+            this.TableStylesLastLook.LastCol  = tableLook.LastCol;
+            this.TableStylesLastLook.LastRow  = tableLook.LastRow;
+            this.TableStylesLastLook.BandHor  = tableLook.BandHor;
+            this.TableStylesLastLook.BandVer  = tableLook.BandVer;
+            bIsChanged = true;
+        }
+        else
+        {
+            if (this.TableStylesLastLook.FirstCol != tableLook.FirstCol)
+            {
+                this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
+                bIsChanged = true;
+            }
+            if (this.TableStylesLastLook.FirstRow != tableLook.FirstRow)
+            {
+                this.TableStylesLastLook.FirstRow = tableLook.FirstRow;
+                bIsChanged = true;
+            }
+            if (this.TableStylesLastLook.LastCol != tableLook.LastCol)
+            {
+                this.TableStylesLastLook.LastCol = tableLook.LastCol;
+                bIsChanged = true;
+            }
+            if (this.TableStylesLastLook.LastRow != tableLook.LastRow)
+            {
+                this.TableStylesLastLook.LastRow = tableLook.LastRow;
+                bIsChanged = true;
+            }
+            if (this.TableStylesLastLook.BandHor != tableLook.BandHor)
+            {
+                this.TableStylesLastLook.BandHor = tableLook.BandHor;
+                bIsChanged = true;
+            }
+            if (this.TableStylesLastLook.BandVer != tableLook.BandVer)
+            {
+                this.TableStylesLastLook.BandVer = tableLook.BandVer;
+                bIsChanged = true;
+            }
+        }
+
+        if (!bIsChanged)
+            return;
+
+        var logicDoc = this.m_oWordControl.m_oLogicDocument;
+
+        var _styles = logicDoc.Styles.Get_AllTableStyles();
+        var _styles_len = _styles.length;
+
+        if (_styles_len == 0)
+            return;
+
+        var _x_mar = 10;
+        var _y_mar = 10;
+        var _r_mar = 10;
+        var _b_mar = 10;
+        var _pageW = 297;
+        var _pageH = 210;
+
+        var W = (_pageW - _x_mar - _r_mar);
+        var H = (_pageH - _y_mar - _b_mar);
+
+        var _stream = global_memory_stream_menu;
+        var _graphics = new CDrawingStream();
+
+        this.Native["DD_PrepareNativeDraw"]();
+
+        var Rows = 5;
+
+        History.TurnOff();
+        g_oTableId.m_bTurnOff = true;
+        for (var i1 = 0; i1 < _styles_len; i1++)
+        {
+            var i = _styles[i1];
+            var _style = logicDoc.Styles.Style[i];
+
+            if (!_style || _style.Type != styletype_Table)
+                continue;
+
+            if (_table_styles == null)
+            {
+                var Cols = 5;
+
+                var Grid = [];
+                for (var ii = 0; ii < Cols; ii++)
+                    Grid[ii] = W / Cols;
+
+                _table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
+
+                _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed});
+
+                for (var j = 0; j < Rows; j++)
+                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+            }
+            else
+            {
+                _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed, CellSelect: false});
+                _table_styles.Recalc_CompiledPr2();
+
+                for (var j = 0; j < Rows; j++)
+                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+            }
+
+
+            _table_styles.Recalculate_Page(0);
+
+            this.Native["DD_StartNativeDraw"](TABLE_STYLE_WIDTH_PIX, TABLE_STYLE_HEIGHT_PIX, _pageW, _pageH);
+
+            var _old_mode = editor.isViewMode;
+            editor.isViewMode = true;
+            editor.isShowTableEmptyLineAttack = true;
+            _table_styles.Draw(0, _graphics);
+            editor.isShowTableEmptyLineAttack = false;
+            editor.isViewMode = _old_mode;
+
+            _stream["ClearNoAttack"]();
+
+            _stream["WriteByte"](0);
+            _stream["WriteLong"](0);
+            _stream["WriteString2"]("" + i);
+
+            this.Native["DD_EndNativeDraw"](_stream);
+            _graphics.ClearParams();
+        }
+        g_oTableId.m_bTurnOff = false;
+        History.TurnOn();
+
+        _stream["ClearNoAttack"]();
+        _stream["WriteByte"](1);
+
+        this.Native["DD_EndNativeDraw"](_stream);
     },
     
     SendControlColors : function()
