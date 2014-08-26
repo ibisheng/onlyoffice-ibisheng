@@ -1081,8 +1081,7 @@
 			gc_dDefaultRowHeightAttribute = this.model.getDefaultHeight() || this.defaultRowHeight;
 
 			this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
-			var sr = this.stringRender;
-			var tm = this._roundTextMetrics(sr.measureString("A"));
+			var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
 			this.headersHeightByFont = tm.height;
 
 			// Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
@@ -9966,31 +9965,20 @@
 			var maxC = this.cols.length - 1;
 			var maxR = this.rows.length - 1;
 			var inc = options.scanForward ? +1 : -1;
-			var ct, mc, excluded = [], isEqual;
-
-			function isExcluded(col, row) {
-				for (var i = 0; i < excluded.length; ++i) {
-					if (excluded[i].contains(col, row)) {return true;}
-				}
-				return false;
-			}
+			var ct, isEqual;
 
 			function findNextCell() {
 				var ct = undefined;
 				do {
-					do {
-						mc = self.model.getMergedByCell(r, c);
-						if (mc) {excluded.push(mc);}
-						if (options.scanByRows) {
-							c += mc ? (options.scanForward ? mc.c2 + 1 - c : mc.c1 - 1 - c) : inc;
-							if (c < minC || c > maxC) {c = options.scanForward ? minC : maxC; r += inc;}
-						} else {
-							r += mc ? (options.scanForward ? mc.r2 + 1 - r : mc.r1 - 1 - r) : inc;
-							if (r < minR || r > maxR) {r = options.scanForward ? minR : maxR; c += inc;}
-						}
-						if (c < minC || c > maxC || r < minR || r > maxR) {return undefined;}
-					} while ( isExcluded(c, r) );
-					ct = self._getCellTextCache(c, r);
+					if (options.scanByRows) {
+						c += inc;
+						if (c < minC || c > maxC) {c = options.scanForward ? minC : maxC; r += inc;}
+					} else {
+						r += inc;
+						if (r < minR || r > maxR) {r = options.scanForward ? minR : maxR; c += inc;}
+					}
+					if (c < minC || c > maxC || r < minR || r > maxR) {return undefined;}
+					ct = self._getCellTextCache(c, r, true);
 				} while (!ct);
 				return ct;
 			}
@@ -10001,8 +9989,6 @@
 					return isEqual;
 			}
 
-			// Сбрасываем замерженные
-			excluded = [];
 			// Продолжаем циклический поиск
 			if (options.scanForward){
 				// Идем вперед с первой ячейки
