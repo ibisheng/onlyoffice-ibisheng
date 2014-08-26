@@ -1176,7 +1176,7 @@
 		 */
 		WorksheetView.prototype._colWidthToCharCount = function (w) {
 			var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
-			return px <= this.settings.cells.paddingPlusBorder ? 0 : asc_floor( (px - this.settings.cells.paddingPlusBorder) / asc_round(this.maxDigitWidth) * 100 + 0.5 ) / 100;
+			return px <= this.settings.cells.paddingPlusBorder ? 0 : asc_floor( (px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5 ) / 100;
 		};
 
 		/**
