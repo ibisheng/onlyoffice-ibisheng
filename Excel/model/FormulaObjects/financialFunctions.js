@@ -4710,7 +4710,7 @@ cPRICEMAT.prototype.Calculate = function ( arg ) {
 cPRICEMAT.prototype.getInfo = function () {
     return {
         name:this.name,
-        args:"( settlement , maturity , discount , redemption [ , [ basis ] ] )"
+        args:"( settlement , maturity , issue , rate , yld [ , [ basis ] ] )"
     };
 };
 
@@ -5875,16 +5875,12 @@ cXNPV.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
     }
-
-    if ( !(arg0 instanceof cNumber) ) {
-        return this.value = new cError( cErrorType.not_available );
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
     }
 
     arg0 = arg0.tocNumber();
 
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getElement( 0 );
-    }
     if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
