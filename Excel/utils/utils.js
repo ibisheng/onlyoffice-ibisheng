@@ -1273,10 +1273,6 @@
 				var oCanvas = document.createElement('canvas');
 				oCanvas.width = this.styleThumbnailWidthWithRetina;
 				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeightWithRetina;
-				var ctx = oCanvas.getContext('2d');
-				ctx.fillStyle = "#FFFFFF";
-				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
-
 				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle, oCustomStyle;
@@ -1302,10 +1298,6 @@
 				var oCanvas = document.createElement('canvas');
 				oCanvas.width = this.styleThumbnailWidthWithRetina;
 				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeightWithRetina;
-				var ctx = oCanvas.getContext('2d');
-				ctx.fillStyle = "#FFFFFF";
-				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
-
 				var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle;
