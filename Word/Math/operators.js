@@ -416,7 +416,7 @@ function COperatorBracket()
 {
     CGlyphOperator.call(this);
 }
-extend(COperatorBracket, CGlyphOperator);
+Asc.extendClass(COperatorBracket, CGlyphOperator);
 COperatorBracket.prototype.calcSize = function( stretch )
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -934,7 +934,7 @@ function COperatorParenthesis()
 {
     CGlyphOperator.call(this);
 }
-extend(COperatorParenthesis, CGlyphOperator);
+Asc.extendClass(COperatorParenthesis, CGlyphOperator);
 COperatorParenthesis.prototype.calcSize = function(stretch)
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1065,7 +1065,7 @@ function COperatorAngleBracket()
 {
     CGlyphOperator.call(this);
 }
-extend(COperatorAngleBracket, CGlyphOperator);
+Asc.extendClass(COperatorAngleBracket, CGlyphOperator);
 COperatorAngleBracket.prototype.calcSize = function(stretch)
 {
     //скобка перевернутая
@@ -1176,7 +1176,7 @@ function CSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-extend(CSquareBracket, CGlyphOperator);
+Asc.extendClass(CSquareBracket, CGlyphOperator);
 CSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1247,7 +1247,7 @@ function CHalfSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-extend(CHalfSquareBracket, CGlyphOperator);
+Asc.extendClass(CHalfSquareBracket, CGlyphOperator);
 CHalfSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1315,7 +1315,7 @@ function COperatorLine()
 {
     CGlyphOperator.call(this);
 }
-extend(COperatorLine, CGlyphOperator);
+Asc.extendClass(COperatorLine, CGlyphOperator);
 COperatorLine.prototype.setContent = function()
 {
     COperatorLine.superclass.setContent.call(this, this.calcSize, this.calcCoord, this.drawPath);
@@ -1383,7 +1383,7 @@ function CWhiteSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-extend(CWhiteSquareBracket, CGlyphOperator);
+Asc.extendClass(CWhiteSquareBracket, CGlyphOperator);
 CWhiteSquareBracket.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1482,7 +1482,7 @@ function COperatorDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-extend(COperatorDoubleLine, CGlyphOperator);
+Asc.extendClass(COperatorDoubleLine, CGlyphOperator);
 COperatorDoubleLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1559,7 +1559,7 @@ function CSingleArrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CSingleArrow, CGlyphOperator);
+Asc.extendClass(CSingleArrow, CGlyphOperator);
 CSingleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1635,7 +1635,7 @@ function CLeftRightArrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CLeftRightArrow, CGlyphOperator);
+Asc.extendClass(CLeftRightArrow, CGlyphOperator);
 CLeftRightArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1724,7 +1724,7 @@ function CDoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CDoubleArrow, CGlyphOperator);
+Asc.extendClass(CDoubleArrow, CGlyphOperator);
 CDoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1823,7 +1823,7 @@ function CLR_DoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CLR_DoubleArrow, CGlyphOperator);
+Asc.extendClass(CLR_DoubleArrow, CGlyphOperator);
 CLR_DoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1934,7 +1934,7 @@ function CCombiningArrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CCombiningArrow, CGlyphOperator);
+Asc.extendClass(CCombiningArrow, CGlyphOperator);
 CCombiningArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -2004,7 +2004,7 @@ function CCombiningHalfArrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CCombiningHalfArrow, CGlyphOperator);
+Asc.extendClass(CCombiningHalfArrow, CGlyphOperator);
 CCombiningHalfArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -2070,7 +2070,7 @@ function CCombining_LR_Arrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CCombining_LR_Arrow, CGlyphOperator);
+Asc.extendClass(CCombining_LR_Arrow, CGlyphOperator);
 CCombining_LR_Arrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -3277,7 +3277,7 @@ function CDelimiter(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CDelimiter, CMathBase);
+Asc.extendClass(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -3916,7 +3916,7 @@ function CCharacter()
 
     CMathBase.call(this);
 }
-extend(CCharacter, CMathBase);
+Asc.extendClass(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
@@ -4049,7 +4049,7 @@ function CGroupCharacter(props)
     /// вызов этой функции обязательно в конце
     g_oTableId.Add( this, this.Id );
 }
-extend(CGroupCharacter, CCharacter);
+Asc.extendClass(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)
 {
 

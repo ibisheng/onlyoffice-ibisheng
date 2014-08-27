@@ -44,7 +44,7 @@ function CMathBase(bInside)
 
     this.bInside = bInside === true ? true: false;
 
-    this.elements = new Array();
+    this.elements = [];
 
     this.dW = 0; //column gap, gap width
     this.dH = 0; //row gap, gap height
@@ -93,7 +93,7 @@ CMathBase.prototype =
 
         for(var j=0; j < this.nRow; j++)
         {
-            this.elements[j] = new Array();
+            this.elements[j] = [];
             this.alignment.hgt[j] = MCJC_CENTER;
         }
 

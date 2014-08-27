@@ -19,7 +19,7 @@ function CFraction(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CFraction, CMathBase);
+Asc.extendClass(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -475,7 +475,7 @@ function CNumerator()
 
     this.init();
 }
-extend(CNumerator, CMathBase);
+Asc.extendClass(CNumerator, CMathBase);
 CNumerator.prototype.init = function()
 {
     this.setDimension(1, 1);
@@ -533,7 +533,7 @@ function CDenominator()
 
     this.init();
 }
-extend(CDenominator, CMathBase);
+Asc.extendClass(CDenominator, CMathBase);
 CDenominator.prototype.init = function()
 {
     this.setDimension(1, 1);

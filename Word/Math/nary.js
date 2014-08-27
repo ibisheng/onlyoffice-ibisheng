@@ -33,7 +33,7 @@ function CNary(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CNary, CMathBase);
+Asc.extendClass(CNary, CMathBase);
 CNary.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -463,7 +463,7 @@ function CNaryUnd(bInside)
     this.setDimension(2, 1);
     //this.init();
 }
-extend(CNaryUnd, CMathBase);
+Asc.extendClass(CNaryUnd, CMathBase);
 /*CNaryUnd.prototype.old_init = function()
 {
     this.setDimension(2,1);
@@ -516,7 +516,7 @@ function CNaryOvr(bInside)
 
     this.setDimension(2, 1);
 }
-extend(CNaryOvr, CMathBase);
+Asc.extendClass(CNaryOvr, CMathBase);
 /*CNaryOvr.prototype.old_init = function()
 {
     this.setDimension(2,1);
@@ -591,7 +591,7 @@ function CNaryUndOvr(bInside)
 
     this.setDimension(3,1);
 }
-extend(CNaryUndOvr, CMathBase);
+Asc.extendClass(CNaryUndOvr, CMathBase);
 /*CNaryUndOvr.prototype.old_init = function(oSign)
 {
     this.setDimension(3,1);
@@ -810,7 +810,7 @@ function CSigma()
 {
     CNaryOperator.call(this);
 }
-extend(CSigma, CNaryOperator);
+Asc.extendClass(CSigma, CNaryOperator);
 CSigma.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1011,7 +1011,7 @@ function CProduct(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-extend(CProduct, CNaryOperator);
+Asc.extendClass(CProduct, CNaryOperator);
 CProduct.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1176,7 +1176,7 @@ function CUnion(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-extend(CUnion, CNaryOperator);
+Asc.extendClass(CUnion, CNaryOperator);
 CUnion.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1245,7 +1245,7 @@ function CLogicalOr(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-extend(CLogicalOr, CNaryOperator);
+Asc.extendClass(CLogicalOr, CNaryOperator);
 CLogicalOr.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1397,7 +1397,7 @@ function CIntegral()
 {
     CNaryOperator.call(this);
 }
-extend(CIntegral, CNaryOperator);
+Asc.extendClass(CIntegral, CNaryOperator);
 CIntegral.prototype.getCoord = function()
 {
     var X = [],
@@ -1627,7 +1627,7 @@ function CDoubleIntegral()
 {
     CIntegral.call(this);
 }
-extend(CDoubleIntegral, CIntegral);
+Asc.extendClass(CDoubleIntegral, CIntegral);
 CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     // XX[9] - ширина
@@ -1668,7 +1668,7 @@ function CTripleIntegral()
 {
     CIntegral.call(this);
 }
-extend(CTripleIntegral, CIntegral);
+Asc.extendClass(CTripleIntegral, CIntegral);
 CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     // XX[9] - ширина
@@ -2046,7 +2046,7 @@ function CContourIntegral()
 {
     CNaryOperator.call(this);
 }
-extend(CContourIntegral, CNaryOperator);
+Asc.extendClass(CContourIntegral, CNaryOperator);
 CContourIntegral.prototype.draw = function(x, y, pGraphics)
 {
     var circle = new CCircle();
@@ -2132,7 +2132,7 @@ function CSurfaceIntegral()
 {
     CNaryOperator.call(this);
 }
-extend(CSurfaceIntegral, CNaryOperator);
+Asc.extendClass(CSurfaceIntegral, CNaryOperator);
 CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
 {
     var surf = new CSurface();
@@ -2216,7 +2216,7 @@ function CVolumeIntegral()
 {
     CNaryOperator.call(this);
 }
-extend(CVolumeIntegral, CNaryOperator);
+Asc.extendClass(CVolumeIntegral, CNaryOperator);
 CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
 {
     var volume = new CVolume();

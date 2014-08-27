@@ -20,7 +20,7 @@ function CDegree(props, bInside)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CDegree, CMathBase);
+Asc.extendClass(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -332,7 +332,7 @@ function CIterators()
     this.upper = 0; // смещение сверху для позиции основания
     CMathBase.call(this, true);
 }
-extend(CIterators, CMathBase);
+Asc.extendClass(CIterators, CMathBase);
 CIterators.prototype.init = function()
 {
     this.setDimension(2, 1);
@@ -497,7 +497,7 @@ function CDegreeSubSup(props, bInside)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CDegreeSubSup, CMathBase);
+Asc.extendClass(CDegreeSubSup, CMathBase);
 CDegreeSubSup.prototype.init = function(props)
 {
     this.setProperties(props);

@@ -912,7 +912,7 @@ function CRadical(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CRadical, CMathBase);
+Asc.extendClass(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
     this.setProperties(props);

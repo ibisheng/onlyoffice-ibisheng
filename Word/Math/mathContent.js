@@ -42,6 +42,7 @@ function CRPI()
     this.bChangeInline   = false;
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
     this.bEqqArray       = false; /*для амперсанда*/
+    this.bMathFunc       = false;
 
 }
 CRPI.prototype.Copy = function()
@@ -53,15 +54,11 @@ CRPI.prototype.Copy = function()
     RPI.bChangeInline   = this.bChangeInline;
     RPI.bNaryInline     = this.bNaryInline;
     RPI.bEqqArray       = this.bEqqArray;
+    RPI.bMathFunc       = this.bMathFunc;
 
     return RPI;
 }
 
-/*function CMathPosInfo()
-{
-    this.Widths    = [];
-    this.Points    = [];
-}*/
 
 function CMathPosInfo()
 {
@@ -90,39 +87,7 @@ CMathPosInfo.prototype.UpdatePoint = function()
         this.bEven = true;
     }
 }
-CMathPosInfo.prototype.old_old_ApplyAlign = function()
-{
-    var align = 0;
-
-    if(this.bEven)
-    {
-        var alignEven, alignGeneral;
-
-        var Len   = this.ContentPoints.length,
-            Point = this.ContentPoints[this.CurrPoint];
-
-        var GWidth = this.GWidths[this.CurrPoint],
-            GPoint = this.GPoints[this.CurrPoint];
-
-        if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
-        {
-            alignGeneral = (GWidth - Point.even)/2;
-            alignEven = 0;
-        }
-        else
-        {
-            alignEven = (GWidth - GPoint.even - GPoint.odd)/2;
-            alignGeneral = GPoint.even - Point.even;
-        }
-
-        align = alignGeneral + alignEven;
-    }
-
-
-    this.x += align;
-}
-
-CMathPosInfo.prototype.ApplyAlign = function() // нормальный расчет, без случая с Last элементом
+CMathPosInfo.prototype.ApplyAlign = function()
 {
     var align = 0;
 
@@ -138,7 +103,9 @@ CMathPosInfo.prototype.ApplyAlign = function() // нормальный расч�
 
         if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
         {
-            alignGeneral = (GWidth - Point.even)/2;
+            var GMaxDimWidth = this.GMaxDimWidths[this.CurrPoint];
+
+            alignGeneral = (GMaxDimWidth - Point.even)/2;
             alignEven = 0;
         }
         else
@@ -165,53 +132,6 @@ CMathPosInfo.prototype.ApplyAlign = function() // нормальный расч�
 
     this.x += align;
 }
-CMathPosInfo.prototype.new_ApplyAlign = function()
-{
-    var align = 0;
-
-    if(this.bEven)
-    {
-        var alignEven, alignGeneral, alignOdd;
-
-        var Len   = this.ContentPoints.length,
-            Point = this.ContentPoints[this.CurrPoint];
-
-        var GWidth       = this.GWidths[this.CurrPoint],
-            GPoint       = this.GPoints[this.CurrPoint];
-
-
-        if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
-        {
-            var GMaxDimWidth = this.GMaxDimWidths[this.CurrPoint];
-
-            alignGeneral = (GMaxDimWidth - Point.even)/2; // для Last элемента
-            alignEven = 0;
-        }
-        else
-        {
-            alignGeneral = (GWidth - GPoint.even - GPoint.odd)/2; // для случая, когда у Last элемента максимальная ширина для данного отрезка выравнивания
-            //alignGeneral = (GWidth - Point.even - Point.odd)/2;
-            alignEven = GPoint.even - Point.even;
-        }
-
-        if(this.CurrPoint > 0)
-        {
-            var PrevGenPoint = this.GPoints[this.CurrPoint-1],
-                PrevGenWidth = this.GWidths[this.CurrPoint-1],
-                PrevPoint    = this.ContentPoints[this.CurrPoint-1];
-
-            var alignPrevGen = (PrevGenWidth - PrevPoint.even - PrevPoint.odd)/2;
-            alignOdd = alignPrevGen +  PrevGenPoint.odd - PrevPoint.odd;
-        }
-        else
-            alignOdd = 0;
-
-        align = alignGeneral + alignEven + alignOdd;
-    }
-
-
-    this.x += align;
-}
 
 function CMathPosition()
 {
@@ -227,50 +147,6 @@ function AmperWidths()
     this.bEven     = true; // является ли текущая точка нечетной
     this.Widths    = [];
 }
-/*AmperWidths.prototype.UpdatePoints = function(value)
-{
-    if(this.bEven)
-    {
-        this.CurrPoint++;
-        var NewPoint = new CMathPoint();
-        NewPoint.even = value;
-        this.Widths.push(NewPoint);
-        this.bEven = false;
-    }
-    else
-    {
-        var len = this.Widths.length;
-        this.Widths[len-1].odd = value;
-        this.bEven     = true;
-    }
-}
-AmperWidths.prototype.AddToCurrentPoint = function(value)
-{
-    var len = this.Widths.length;
-
-    if(len == 0)
-    {
-        this.UpdatePoints(value);
-        this.bEven = true;
-    }
-    else
-    {
-        if(this.bEven) // текущая точка нечетная
-        {
-            if(this.Widths[len-1].even != -1)
-                this.Widths[len-1].even += value;
-            else
-                this.Widths[len-1].even = value;
-        }
-        else    // текущая точка четная
-        {
-            if(this.Widths[len-1].odd != -1)
-                this.Widths[len-1].odd += value;
-            else
-                this.Widths[len-1].odd = value;
-        }
-    }
-}*/
 AmperWidths.prototype.UpdatePoint = function(value)
 {
     var len = this.Widths.length;
@@ -454,10 +330,6 @@ CMathArgSize.prototype =
         this.SetValue(this.value + ArgSize.value);
     }
 }
-
-
-// TODO
-// проконтролировать GapLeft и GapRight для setPosition всех элементов
 
 function CMathGapsInfo(oMeasure, Parent, argSize)
 {
@@ -4104,9 +3976,7 @@ CMathContent.prototype =
             this.Parent = Parent;
         }
 
-
         var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
-
 
 		if (!this.bRoot && this.content.length == 0)
 			this.fillPlaceholders();
@@ -4118,10 +3988,6 @@ CMathContent.prototype =
         var lng = this.content.length;
 
         this.size.SetZero();
-
-        /*var bManyRuns =  RPI.bEqqArray == true && this.content.length > 1;
-        if(bManyRuns)
-            var temp = true;*/
 
         this.WidthPoints = new AmperWidths();
 
@@ -4305,16 +4171,6 @@ CMathContent.prototype =
         this.pos.x = PosInfo.x;
         this.pos.y = PosInfo.y;
 
-        /*var x = pos.x,
-            y = pos.y + this.size.ascent;  */
-
-        //this.WidthPoints.CurrPoint = 0;
-        //this.WidthPoints.Amp       = 1;
-
-        /*var NewPos = new CMathPosition();
-        NewPos.x = pos.x;
-        NewPos.y = pos.y + this.size.ascent; // y по baseline;*/
-
         var NewPosInfo = new CMathPosInfo();
         NewPosInfo.x = this.pos.x;
         NewPosInfo.y = this.pos.y + this.size.ascent;
@@ -4329,6 +4185,11 @@ CMathContent.prototype =
             NewPosInfo.ApplyAlign();
         }
 
+        var ConsoleY = PosInfo.y + this.size.ascent,
+            id = this.Id;
+
+        console.log("" + id + " : " + ConsoleY);
+
 
         for(var i=0; i < this.content.length; i++)
         {
@@ -4339,10 +4200,6 @@ CMathContent.prototype =
             }
             else
             {
-                /*var NewPos = new CMathPosition();
-                NewPos.x = pos.x;
-                NewPos.y = pos.y + this.size.ascent; // y по baseline;*/
-
                 this.content[i].setPosition(NewPosInfo);
                 NewPosInfo.UpdateX(this.content[i].size.width);
             }
@@ -4360,35 +4217,10 @@ CMathContent.prototype =
         this.plhHide = flag;
     },
     ///////// RunPrp, CtrPrp
-    old_getFirstRPrp:    function(ParaMath)
-    {
-        //var rPrp =  new CMathRunPrp();
-        var rPrp = new CTextPr();
-        var defaultRPrp = ParaMath.Get_Default_TPrp();
-        rPrp.Merge(defaultRPrp);
-
-        if(this.content.length > 1)
-        {
-            // первый объект всегда para_Math_Run
-            this.content[0].Get_CompiledPr(true);
-        }
-
-        return rPrp;
-    },
     getFirstRPrp:    function(ParaMath)
     {
         return this.content[0].Get_CompiledPr(true);
     },
-    /*increaseArgSize: function()
-    {
-        if(this.argSize < 2)
-            this.argSize++;
-    },
-    decreaseArgSize: function()
-    {
-        if( this.argSize > -2 )
-            this.argSize--;
-    },*/
     GetCtrPrp: function()       // for placeholder
     {
         var ctrPrp = new CTextPr();

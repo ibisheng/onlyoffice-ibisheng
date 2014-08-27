@@ -19,7 +19,7 @@ function CAccentCircumflex()
 {
     CGlyphOperator.call(this);
 }
-extend(CAccentCircumflex, CGlyphOperator);
+Asc.extendClass(CAccentCircumflex, CGlyphOperator);
 CAccentCircumflex.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
@@ -122,7 +122,7 @@ function CAccentLine()
 {
     CGlyphOperator.call(this);
 }
-extend(CAccentLine, CGlyphOperator);
+Asc.extendClass(CAccentLine, CGlyphOperator);
 CAccentLine.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
@@ -166,7 +166,7 @@ function CAccentDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-extend(CAccentDoubleLine, CGlyphOperator);
+Asc.extendClass(CAccentDoubleLine, CGlyphOperator);
 CAccentDoubleLine.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
@@ -225,7 +225,7 @@ function CAccentTilde()
 {
     CGlyphOperator.call(this);
 }
-extend(CAccentTilde, CGlyphOperator);
+Asc.extendClass(CAccentTilde, CGlyphOperator);
 CAccentTilde.prototype.calcSize = function(stretch)
 {
     var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
@@ -312,7 +312,7 @@ function CAccentBreve()
 {
     CGlyphOperator.call(this);
 }
-extend(CAccentBreve, CGlyphOperator);
+Asc.extendClass(CAccentBreve, CGlyphOperator);
 CAccentBreve.prototype.calcSize = function(stretch)
 {
     var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
@@ -528,7 +528,7 @@ function CAccent(props)
 
 	g_oTableId.Add( this, this.Id );	
 }
-extend(CAccent, CMathBase);
+Asc.extendClass(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
     this.setProperties(props);

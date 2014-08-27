@@ -25,7 +25,7 @@ function CMathMatrix(props)
         rSp:        0,
         rSpRule:    0,
 
-        mcs:        new Array(),
+        mcs:        [],
         baseJc:     BASEJC_CENTER,
         plcHide:    false
     };
@@ -45,7 +45,7 @@ function CMathMatrix(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CMathMatrix, CMathBase);
+Asc.extendClass(CMathMatrix, CMathBase);
 CMathMatrix.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -673,7 +673,7 @@ function CEqArray(props)
         rSp:        0,
         rSpRule:    0,
 
-        mcs:        new Array(),
+        mcs:        [],
         baseJc:     BASEJC_CENTER,
         plcHide:    false
     };
@@ -703,7 +703,7 @@ function CEqArray(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CEqArray, CMathMatrix);
+Asc.extendClass(CEqArray, CMathMatrix);
 CEqArray.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -734,7 +734,7 @@ CEqArray.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     //CEqArray.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
 }
-CEqArray.prototype._getMetrics = function(RPI)
+CEqArray.prototype.getMetrics = function(RPI)
 {
     var AscentsMetrics = [];
     var DescentsMetrics = [];
@@ -755,6 +755,7 @@ CEqArray.prototype._getMetrics = function(RPI)
 
     this.WidthsPoints.length = 0;
     this.Points.length       = 0;
+    this.MaxDimWidths.length = 0;
 
     WidthsMetrics[0] = 0;
 
@@ -780,7 +781,6 @@ CEqArray.prototype._getMetrics = function(RPI)
                     {
                         maxDim = WidthsRow[Pos].even < WidthsRow[Pos].odd ? WidthsRow[Pos].odd : WidthsRow[Pos].even;
                         maxDimWidth = WidthsRow[Pos].even + WidthsRow[Pos].odd;
-                        //this.WidthsPoints[Pos] = WidthsRow[Pos].even + WidthsRow[Pos].odd;
                     }
                     even = even > WidthsRow[Pos].even  ? even : WidthsRow[Pos].even;     // before "odd"
                     odd  = odd  > WidthsRow[Pos].odd   ? odd  : WidthsRow[Pos].odd;   // after  "odd"
@@ -791,7 +791,6 @@ CEqArray.prototype._getMetrics = function(RPI)
                     {
                         maxDim = WidthsRow[Pos].even;
                         maxDimWidth = maxDim;
-                        //this.WidthsPoints[Pos] = maxDim;
                     }
                     last = last > WidthsRow[Pos].even ? last: WidthsRow[Pos].even;
                 }
@@ -799,12 +798,6 @@ CEqArray.prototype._getMetrics = function(RPI)
                 if(Pos == len - 1)
                     EndWidths++;
             }
-
-            /*if(Pos == len && len == 0) // для контентов без точек выравнивания
-             {
-             last =
-             EndWidths++;
-             }*/
         }
 
         var w = even + odd > last ? even + odd : last;
@@ -822,18 +815,6 @@ CEqArray.prototype._getMetrics = function(RPI)
         Pos++;
     }
 
-    /*if(true)
-     {
-     var str = "";
-
-     for(var i = 0; i < this.WidthsPoints.length; i++)
-     {
-     var num = this.WidthsPoints[i].toFixed(3);
-     str += num + " ";
-     }
-
-     console.log(str);
-     }*/
 
     for(var i = 0; i < this.nRow; i++)
     {
@@ -859,242 +840,6 @@ CEqArray.prototype._getMetrics = function(RPI)
      Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
      }
      }*/
-
-    return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
-}
-CEqArray.prototype.getMetrics = function(RPI) // нормальный расчет, без случая с Last элементом
-{
-    var AscentsMetrics = [];
-    var DescentsMetrics = [];
-    var WidthsMetrics = [];
-
-    // нумерация начинается с нуля, поэтому все четные точки идут с нечетными номерами в массиве
-
-    //var lngW = RPI.Widths.length; // this.nRow
-    var EndWidths = 0;
-
-    var even, // четная точка
-        odd,  // нечетная точка
-        last;
-
-    var Pos = 0;
-
-    this.WidthsPoints.length = 0;
-    this.Points.length       = 0;
-
-    WidthsMetrics[0] = 0;
-
-    while(EndWidths < this.nRow)
-    {
-        even = 0;
-        odd  = 0;
-        last = 0;
-
-
-        for(var i = 0; i < this.nRow; i++)
-        {
-            var WidthsRow = this.elements[i][0].WidthPoints.Widths,
-                len = WidthsRow.length;
-
-            if(Pos < len)
-            {
-                if(WidthsRow[Pos].odd !== -1)
-                {
-                    even = even > WidthsRow[Pos].even  ? even : WidthsRow[Pos].even;     // before "odd"
-                    odd  = odd  > WidthsRow[Pos].odd   ? odd  : WidthsRow[Pos].odd;   // after  "odd"
-                }
-                else
-                {
-                    last = last > WidthsRow[Pos].even ? last: WidthsRow[Pos].even;
-                }
-
-                if(Pos == len - 1)
-                    EndWidths++;
-            }
-
-            /*if(Pos == len && len == 0) // для контентов без точек выравнивания
-             {
-             last =
-             EndWidths++;
-             }*/
-        }
-
-        var w = even + odd > last ? even + odd : last;
-
-        var NewPoint = new CMathPoint();
-        NewPoint.even   = even;
-        NewPoint.odd    = odd;
-
-        this.WidthsPoints.push(w);
-        this.Points.push(NewPoint);
-
-        WidthsMetrics[0] += w;
-
-        Pos++;
-    }
-
-    /*if(true)
-     {
-     var str = "";
-
-     for(var i = 0; i < this.WidthsPoints.length; i++)
-     {
-     var num = this.WidthsPoints[i].toFixed(3);
-     str += num + " ";
-     }
-
-     console.log(str);
-     }*/
-
-    for(var i = 0; i < this.nRow; i++)
-    {
-        var size = this.elements[i][0].size;
-        AscentsMetrics[i]  = size.ascent;
-        DescentsMetrics[i] = size.height - size.ascent;
-    }
-
-
-    /*for(var tt = 0; tt < this.nCol; tt++ )
-     Widths[tt] = 0;
-
-     for(var i=0; i < this.nRow; i++)
-     {
-     Ascents[i]  = 0;
-     Descents[i] = 0;
-
-     for(var j = 0; j < this.nCol ; j++)
-     {
-     var size = this.elements[i][j].size;
-     Widths[j]   =  i > 0 && ( Widths[j] > size.width ) ? Widths[j] : size.width;
-     Ascents[i]  = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
-     Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
-     }
-     }*/
-
-    return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
-}
-CEqArray.prototype.new_getMetrics = function(RPI)
-{
-    var AscentsMetrics = [];
-    var DescentsMetrics = [];
-    var WidthsMetrics = [];
-
-    // нумерация начинается с нуля, поэтому все четные точки идут с нечетными номерами в массиве
-
-    //var lngW = RPI.Widths.length; // this.nRow
-    var EndWidths = 0;
-
-    var even, // четная точка
-        odd,  // нечетная точка
-        last,
-        maxDim;
-
-    var Pos = 0;
-
-    this.WidthsPoints.length = 0;
-    this.Points.length       = 0;
-
-    WidthsMetrics[0] = 0;
-
-    while(EndWidths < this.nRow)
-    {
-        even = 0;
-        odd  = 0;
-        last = 0;
-        maxDim = 0;
-
-
-        for(var i = 0; i < this.nRow; i++)
-        {
-            var WidthsRow = this.elements[i][0].WidthPoints.Widths,
-                len = WidthsRow.length;
-
-            if(Pos < len)
-            {
-                if(WidthsRow[Pos].odd !== -1)
-                {
-                    if(maxDim < WidthsRow[Pos].even || maxDim < WidthsRow[Pos].odd)
-                    {
-                        maxDim = WidthsRow[Pos].even < WidthsRow[Pos].odd ? WidthsRow[Pos].odd : WidthsRow[Pos].even;
-                        this.WidthsPoints[Pos] = WidthsRow[Pos].even + WidthsRow[Pos].odd;
-                    }
-
-                    even = even > WidthsRow[Pos].even  ? even : WidthsRow[Pos].even;     // before "odd"
-                    odd  = odd  > WidthsRow[Pos].odd   ? odd  : WidthsRow[Pos].odd;   // after  "odd"
-                }
-                else
-                {
-                    if(maxDim < WidthsRow[Pos].even)
-                    {
-                        maxDim = WidthsRow[Pos].even;
-                        this.WidthsPoints[Pos] = maxDim;
-                    }
-
-                    last = last > WidthsRow[Pos].even ? last: WidthsRow[Pos].even;
-                }
-
-                if(Pos == len - 1)
-                    EndWidths++;
-            }
-
-            /*if(Pos == len && len == 0) // для контентов без точек выравнивания
-            {
-                last =
-                EndWidths++;
-            }*/
-        }
-
-        var w = even + odd > last ? even + odd : last;
-
-        var NewPoint = new CMathPoint();
-        NewPoint.even   = even;
-        NewPoint.odd    = odd;
-
-        //this.WidthsPoints.push(w);
-        this.Points.push(NewPoint);
-
-        WidthsMetrics[0] += w;
-
-        Pos++;
-    }
-
-    /*if(true)
-    {
-        var str = "";
-
-        for(var i = 0; i < this.WidthsPoints.length; i++)
-        {
-            var num = this.WidthsPoints[i].toFixed(3);
-            str += num + " ";
-        }
-
-        console.log(str);
-    }*/
-
-    for(var i = 0; i < this.nRow; i++)
-    {
-        var size = this.elements[i][0].size;
-        AscentsMetrics[i]  = size.ascent;
-        DescentsMetrics[i] = size.height - size.ascent;
-    }
-
-
-    /*for(var tt = 0; tt < this.nCol; tt++ )
-        Widths[tt] = 0;
-
-    for(var i=0; i < this.nRow; i++)
-    {
-        Ascents[i]  = 0;
-        Descents[i] = 0;
-
-        for(var j = 0; j < this.nCol ; j++)
-        {
-            var size = this.elements[i][j].size;
-            Widths[j]   =  i > 0 && ( Widths[j] > size.width ) ? Widths[j] : size.width;
-            Ascents[i]  = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
-            Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
-        }
-    }*/
 
     return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
 }
@@ -1141,7 +886,7 @@ CEqArray.prototype.setProperties = function(props)
     if(props.objDist !== "undefined" && props.objDist !== null)
         this.Pr.objDist = props.objDist;
 
-    var mcs = new Array();
+    var mcs = [];
     mcs.push(new CMColumsPr());
 
     var Pr =

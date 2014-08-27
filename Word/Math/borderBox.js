@@ -26,7 +26,7 @@ function CBorderBox(props)
 
 	g_oTableId.Add(this, this.Id);
 }
-extend(CBorderBox, CMathBase);
+Asc.extendClass(CBorderBox, CMathBase);
 CBorderBox.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -445,7 +445,7 @@ function CBox(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CBox, CMathBase);
+Asc.extendClass(CBox, CMathBase);
 CBox.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -602,7 +602,7 @@ function CBar(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CBar, CCharacter);
+Asc.extendClass(CBar, CCharacter);
 CBar.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -738,7 +738,7 @@ function CPhantom(props)
 
 	g_oTableId.Add( this, this.Id );
 }
-extend(CPhantom, CMathBase);
+Asc.extendClass(CPhantom, CMathBase);
 CPhantom.prototype.init = function(props)
 {
     this.setProperties(props);
