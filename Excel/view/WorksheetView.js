@@ -7757,19 +7757,19 @@
 				if (!copyRange)
 					t.autoFilters._preMoveAutoFilters(arnFrom);
 				t.model._moveRange(arnFrom, arnTo, copyRange);
-				t._updateCellsRange(arnTo, false, true);
-				t.activeRange = arnTo.clone(true);
 				t.cellCommentator.moveRangeComments(arnFrom, arnTo);
 				t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
 				if (!copyRange) {
 					t.autoFilters._moveAutoFilters(arnTo, arnFrom);
 					// Вызываем функцию пересчета для заголовков форматированной таблицы
-					t.autoFilters._renameTableColumn( arnFrom );
-					t.autoFilters._renameTableColumn( arnTo );
-					t.autoFilters.reDrawFilter( arnFrom );
+					t.autoFilters._renameTableColumn(arnFrom);
+					t.autoFilters._renameTableColumn(arnTo);
+					t.autoFilters.reDrawFilter(arnFrom);
 				}
 				History.EndTransaction();
 
+				t._updateCellsRange(arnTo, false, true);
+				t.activeRange = arnTo.clone(true);
 				// Сбрасываем параметры
 				t.activeMoveRange = null;
 				t.startCellMoveRange = null;
