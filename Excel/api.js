@@ -1804,7 +1804,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype._sendWorkbookStyles = function () {
-			if(this.wbModel) {
+			if (this.wbModel) {
+				// Для нативной версии не генерируем стили
+				if (window["NATIVE_EDITOR_ENJINE"] && (!this.handlers.hasTrigger("asc_onInitTablePictures") ||
+					!this.handlers.hasTrigger("asc_onInitEditorStyles")))
+					return;
+
 				// Отправка стилей форматированных таблиц
 				var tablePictures = this.wb.getTablePictures();
 				var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);

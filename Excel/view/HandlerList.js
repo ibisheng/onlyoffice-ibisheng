@@ -5,12 +5,12 @@
  * Author: Alexey.Golubev@avsmedia.net
  * Date:   June 22, 2012
  */
-(	/**
-	 * @param {jQuery} $
+(
+	/**
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 		/*
 		 * Import
@@ -25,6 +25,10 @@
 			this.handlers = handlers || {};
 			return this;
 		}
+
+		asc_CHandlersList.prototype.hasTrigger = function (eventName) {
+			return null != this.handlers[eventName];
+		};
 
 		asc_CHandlersList.prototype.trigger = function (eventName) {
 			var h = this.handlers[eventName], t = asc_typeOf(h), a = Array.prototype.slice.call(arguments, 1), i;
@@ -76,4 +80,4 @@
 		 */
 		asc.asc_CHandlersList = asc_CHandlersList;
 	}
-)(jQuery, window);
+)(window);
