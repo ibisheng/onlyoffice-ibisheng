@@ -25,12 +25,12 @@ CDegree.prototype.init = function(props)
 {
     this.setProperties(props);
     this.fillContent();
-}
+};
 CDegree.prototype.fillContent = function()
 {
     this.setDimension(1, 2);
     this.setContent();
-}
+};
 CDegree.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
@@ -49,7 +49,7 @@ CDegree.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.recalculateSup(oMeasure);
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
-}
+};
 CDegree.prototype.old__recalculateSup = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -90,7 +90,7 @@ CDegree.prototype.old__recalculateSup = function(oMeasure)
     var width = base.width + iter.width + this.dW;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegree.prototype.old_recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -123,7 +123,7 @@ CDegree.prototype.old_recalculateSubScript = function(oMeasure)
     this.upper = -(height - iter.height);
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegree.prototype.recalculateSup = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -174,7 +174,7 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     width += this.GapLeft + this.GapRight;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegree.prototype.recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -210,7 +210,7 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     var ascent = base.ascent;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegree.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
@@ -232,27 +232,27 @@ CDegree.prototype.setPosition = function(pos, PosInfo)
 
     this.elements[0][0].setPosition(PosBase, PosInfo);
     this.elements[0][1].setPosition(PosIter, PosInfo);
-}
+};
 CDegree.prototype.getIterator = function()
 {
     return this.elements[0][1];
-}
+};
 CDegree.prototype.getUpperIterator = function()
 {
     return this.elements[0][1];
-}
+};
 CDegree.prototype.getLowerIterator = function()
 {
     return this.elements[0][1];
-}
+};
 CDegree.prototype.getBase = function()
 {
     return this.elements[0][0];
-}
+};
 CDegree.prototype.IsPlhIterator = function()
 {
     return this.elements[0][1].IsPlaceholder();
-}
+};
 CDegree.prototype.setProperties = function(props)
 {
     if(props.type === DEGREE_SUPERSCRIPT || props.type === DEGREE_SUBSCRIPT)
@@ -263,7 +263,7 @@ CDegree.prototype.setProperties = function(props)
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;
-}
+};
 CDegree.prototype.fillMathComposition = function(props, contents /*array*/)
 {
     this.setProperties(props);
@@ -274,29 +274,29 @@ CDegree.prototype.fillMathComposition = function(props, contents /*array*/)
 
     // Iterator
     this.elements[0][1] = contents[1];
-}
+};
 CDegree.prototype.setBase = function(base)
 {
     this.elements[0][0] = base;
-}
+};
 CDegree.prototype.setIterator = function(iterator)
 {
     this.elements[0][1] = iterator;
-}
+};
 CDegree.prototype.getPropsForWrite = function()
 {
     return this.Pr;
-}
+};
 CDegree.prototype.Save_Changes = function(Data, Writer)
 {
 	Writer.WriteLong( historyitem_type_deg );
-}
+};
 CDegree.prototype.Load_Changes = function(Reader)
 {
-}
+};
 CDegree.prototype.Refresh_RecalcData = function(Data)
 {
-}
+};
 CDegree.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_deg );
@@ -306,7 +306,7 @@ CDegree.prototype.Write_ToBinary2 = function( Writer )
 	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.Pr.type );
 
-}
+};
 CDegree.prototype.Read_FromBinary2 = function( Reader )
 {
 	var props = {ctrPrp: new CTextPr()};
@@ -319,11 +319,11 @@ CDegree.prototype.Read_FromBinary2 = function( Reader )
     props.type = Reader.GetLong();
 
 	this.fillMathComposition (props, arrElems);
-}
+};
 CDegree.prototype.Get_Id = function()
 {
 	return this.Id;
-}
+};
 
 function CIterators()
 {
@@ -337,7 +337,7 @@ CIterators.prototype.init = function()
 {
     this.setDimension(2, 1);
     this.setContent();
-}
+};
 CIterators.prototype.old_old_setDistanceIters = function(oMeasure)
 {
     var upIter  = this.elements[0][0].size,
@@ -376,7 +376,7 @@ CIterators.prototype.old_old_setDistanceIters = function(oMeasure)
     {
         this.dH = up + down;
     }
-}
+};
 CIterators.prototype.old_setDistanceIters = function(oMeasure)
 {
     var upIter  = this.elements[0][0].size,
@@ -416,7 +416,7 @@ CIterators.prototype.old_setDistanceIters = function(oMeasure)
     {
         this.dH = up + down;
     }
-}
+};
 CIterators.prototype._setDistanceIters = function(oMeasure)
 {
     var upIter  = this.elements[0][0].size,
@@ -442,36 +442,36 @@ CIterators.prototype._setDistanceIters = function(oMeasure)
     }
     else
         this.upper = 0;
-}
+};
 CIterators.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
-}
+};
 CIterators.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
-}
+};
 CIterators.prototype.setUpperIterator = function(iterator)
 {
     this.elements[0][0] = iterator;
-}
+};
 CIterators.prototype.setLowerIterator = function(iterator)
 {
     this.elements[1][0] = iterator;
-}
+};
 CIterators.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
-}
+};
 CIterators.prototype.fillMathComposition = function(upperIterator, lowerIterator)
 {
     this.elements[0][0] = upperIterator;
     this.elements[1][0] = lowerIterator;
-}
+};
 CIterators.prototype.alignIterators = function(mcJc)
 {
     this.alignment.wdt[0] = mcJc;
-}
+};
 
 
 function CDegreeSubSup(props, bInside)
@@ -502,7 +502,7 @@ CDegreeSubSup.prototype.init = function(props)
 {
     this.setProperties(props);
     this.fillContent();
-}
+};
 CDegreeSubSup.prototype.fillContent = function()
 {
     var oBase = new CMathContent();
@@ -527,7 +527,7 @@ CDegreeSubSup.prototype.fillContent = function()
         this.addMCToContent([oIters, oBase]);
         oIters.alignIterators(MCJC_RIGHT);
     }
-}
+};
 CDegreeSubSup.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
@@ -550,7 +550,7 @@ CDegreeSubSup.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSi
     }
 
     this.recalculateSize(oMeasure, RPI);
-}
+};
 CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
 {
     var mgCtrPrp = this.Get_CompiledCtrPrp();
@@ -593,7 +593,7 @@ CDegreeSubSup.prototype.old_old_recalculateSize = function(oMeasure)
     ascent = iters.upper + base.size.ascent;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
 {
     var mgCtrPrp = this.Get_CompiledCtrPrp();
@@ -674,7 +674,7 @@ CDegreeSubSup.prototype.old_recalculateSize = function(oMeasure)
     ascent = base.size.ascent + this.gapBase;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
 {
     var mgCtrPrp = this.Get_CompiledCtrPrp();
@@ -788,7 +788,7 @@ CDegreeSubSup.prototype._recalculateSize = function(oMeasure)
     ascent = base.size.ascent + this.gapBase;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 CDegreeSubSup.prototype.recalculateSize = function(oMeasure, RPI)
 {
     var mgCtrPrp = this.Get_CompiledCtrPrp();
@@ -871,11 +871,11 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure, RPI)
 
     this.size = {width: width, height: height, ascent: ascent};
 
-}
+};
 CDegreeSubSup.prototype.setPosition = function(pos, PosInfo)
 {
     CDegreeSubSup.superclass.setPosition.call(this, pos, PosInfo);
-}
+};
 CDegreeSubSup.prototype.old_setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.ascent};
@@ -891,7 +891,7 @@ CDegreeSubSup.prototype.old_setPosition = function(pos)
         iters.setPosition(posIters);
     }
 
-}
+};
 CDegreeSubSup.prototype.old_align = function(x, y)
 {
     var _x = 0, _y = 0;
@@ -908,7 +908,7 @@ CDegreeSubSup.prototype.old_align = function(x, y)
     }
 
     return {x: _x, y: _y};
-}
+};
 CDegreeSubSup.prototype.align = function(x, y)
 {
     var _x = 0, _y = 0;
@@ -925,7 +925,7 @@ CDegreeSubSup.prototype.align = function(x, y)
     }
 
     return {x: _x, y: _y};
-}
+};
 CDegreeSubSup.prototype.getBase = function()
 {
     var base;
@@ -936,7 +936,7 @@ CDegreeSubSup.prototype.getBase = function()
         base = this.elements[0][1];
 
     return base;
-}
+};
 CDegreeSubSup.prototype.getUpperIterator = function()
 {
     var iter;
@@ -947,7 +947,7 @@ CDegreeSubSup.prototype.getUpperIterator = function()
         iter = this.elements[0][0].getUpperIterator();
 
     return iter;
-}
+};
 CDegreeSubSup.prototype.getLowerIterator = function()
 {
     var iter;
@@ -958,28 +958,28 @@ CDegreeSubSup.prototype.getLowerIterator = function()
         iter = this.elements[0][0].getLowerIterator();
 
     return iter;
-}
+};
 CDegreeSubSup.prototype.setBase = function(base)
 {
     if(this.Pr.type == DEGREE_SubSup)
         this.elements[0][0] = base;
     else
         this.elements[0][1] = base;
-}
+};
 CDegreeSubSup.prototype.setUpperIterator = function(iterator)
 {
     if(this.Pr.type == DEGREE_SubSup)
         this.elements[0][1].setUpperIterator(iterator);
     else
         this.elements[0][0].setUpperIterator(iterator);
-}
+};
 CDegreeSubSup.prototype.setLowerIterator = function(iterator)
 {
     if(this.Pr.type == DEGREE_SubSup)
         this.elements[0][1].setLowerIterator(iterator);
     else
         this.elements[0][0].setLowerIterator(iterator);
-}
+};
 CDegreeSubSup.prototype.setProperties = function(props)
 {
     if(props.alnScr === true || props.alnScr === 1)
@@ -993,7 +993,7 @@ CDegreeSubSup.prototype.setProperties = function(props)
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;
-}
+};
 CDegreeSubSup.prototype.fillMathComposition = function(props, contents /*array*/)
 {
     this.setProperties(props);
@@ -1015,21 +1015,21 @@ CDegreeSubSup.prototype.fillMathComposition = function(props, contents /*array*/
         // Iterators
         this.elements[0][0].fillMathComposition(contents[1]/*upper iterator*/, contents[2]/*lower iterator*/);
     }
-}
+};
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
     return this.Pr;
-}
+};
 CDegreeSubSup.prototype.Save_Changes = function(Data, Writer)
 {
 	Writer.WriteLong( historyitem_type_deg_subsup );
-}
+};
 CDegreeSubSup.prototype.Load_Changes = function(Reader)
 {
-}
+};
 CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
 {
-}
+};
 CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_deg_subsup );
@@ -1054,11 +1054,11 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 		Writer.WriteLong( Flags );
 		Writer.Seek( EndPos );		
 	}
-}
+};
 CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 {
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = new Array();
+	var arrElems = [];
 	
 	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
 	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
@@ -1073,8 +1073,8 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 			props.alnScr = Reader.GetBool();	
 	}
 	this.fillMathComposition (props, arrElems);
-}
+};
 CDegreeSubSup.prototype.Get_Id = function()
 {
 	return this.Id;
-}
+};

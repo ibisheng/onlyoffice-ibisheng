@@ -11637,11 +11637,11 @@ CTable.prototype =
 
             // Массив содержит информацию о том сколько промежутков будет в
             // новых ячейках
-            var Grid_Info_new = Array();
+            var Grid_Info_new = [];
             for ( var Index = 0; Index < Cols; Index++ )
                 Grid_Info_new[Index] = 1;
 
-            var Grid_Info_start = Array();
+            var Grid_Info_start = [];
             for ( var Index = 0; Index < this.TableGridCalc.length; Index++ )
                 Grid_Info_start[Index] = this.TableGridCalc[Index];
 
