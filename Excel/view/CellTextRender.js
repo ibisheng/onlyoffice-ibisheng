@@ -19,7 +19,6 @@
 		 */
 		var asc = window["Asc"];
 		var asc_lastindexof = asc.lastIndexOf;
-		var asc_inherit = asc.inherit;
 
 		function CharOffset(left, top, height, line) {
 			this.left = left;
