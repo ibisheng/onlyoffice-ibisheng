@@ -1175,7 +1175,10 @@
 		 */
 		WorksheetView.prototype._colWidthToCharCount = function (w) {
 			var px = w * asc_getcvt(1/*pt*/, 0/*px*/, 96);
-			return px <= this.settings.cells.paddingPlusBorder ? 0 : asc_floor((px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
+			var pxInOneCharacter = this.maxDigitWidth + this.settings.cells.paddingPlusBorder;
+			// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
+			return px < pxInOneCharacter ? (1 - asc_floor(100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999) / 100) :
+				asc_floor((px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
 		};
 
 		/**
