@@ -7,11 +7,10 @@
  */
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 
 		/*
@@ -227,4 +226,4 @@
 		 */
 		window["Asc"].CellTextRender = CellTextRender;
 	}
-)(jQuery, window);
+)(window);
