@@ -26,7 +26,6 @@
 		var asc_lastidx = asc.lastIndexOf;
 
 		var asc_HL = asc.HandlersList;
-		var asc_TR = asc.CellTextRender;
 		var asc_incDecFonSize = asc.incDecFonSize;
 
 
@@ -184,7 +183,7 @@
 			// create text render
 			t.drawingCtx = new asc.DrawingContext({canvas: t.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 			t.overlayCtx = new asc.DrawingContext({canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-			t.textRender = asc_TR(t.drawingCtx);
+			t.textRender = new asc.CellTextRender(t.drawingCtx);
 			t.textRender.setDefaultFont(settings.font.clone());
 
 			// bind event handlers

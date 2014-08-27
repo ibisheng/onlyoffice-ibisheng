@@ -5,7 +5,8 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Jan 25, 2012
  */
-(	/**
+(
+	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
@@ -121,16 +122,6 @@
 			}
 
 			return aSizes[i];
-		}
-
-
-		function inherit(child, parent, childProto) {
-			parent.prototype.constructor = parent;
-			var F = function () {};
-			F.prototype = parent.prototype;
-			child.prototype = $.extend(true, new F(), childProto);
-			child.prototype.constructor = child;
-			child.superclass = parent.prototype;
 		}
 
 		// Определяет времени работы функции
@@ -399,7 +390,7 @@
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
 		}
-		extendClass(ActiveRange, Range);
+		asc.extendClass(ActiveRange, Range);
 		
 		ActiveRange.prototype.assign = function () {
 			ActiveRange.superclass.assign.apply(this, arguments);
@@ -518,7 +509,7 @@
 			this.r2Abs = false;
 			this.c2Abs = false;
 		}
-		extendClass(FormulaRange, Range);
+		asc.extendClass(FormulaRange, Range);
 		FormulaRange.prototype.clone = function(){
 			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
 			oRes.r1Abs = this.r1Abs;
@@ -820,15 +811,6 @@
 			else
 				return val.replace(/^\s+|\s+$/g,'');  
 		}
-		
-		function extendClass(Child, Parent){
-			var F = function() { };
-			F.prototype = Parent.prototype;
-			Child.prototype = new F();
-			Child.prototype.constructor = Child;
-			Child.superclass = Parent.prototype;
-		}
-
 		
 		function isNumber(val) {
 			var valTrim = trim(val);
@@ -1502,14 +1484,12 @@
 		window["Asc"].floor = floor;
 		window["Asc"].ceil = ceil;
 		window["Asc"].incDecFonSize = incDecFonSize;
-		window["Asc"].inherit = inherit;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].isEqual = isEqual;
 		window["Asc"].profileTime = profileTime;
 		window["Asc"].isNumber = isNumber;
 		window["Asc"].isNumberInfinity = isNumberInfinity;
 		window["Asc"].trim = trim;
-		window["Asc"].extendClass = extendClass;
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;
 		window["Asc"].isFixedWidthCell = isFixedWidthCell;
 		window["Asc"].truncFracPart = truncFracPart;

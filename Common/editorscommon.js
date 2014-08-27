@@ -671,3 +671,26 @@ else
 		FDqVBWmtq5oV65JdxpgqUKzTcf0ZEOOGl0Dsui4R+Ni+7wksOZAk+75nycQ6fl8S054+DEN1P25L\
 		M8Zg27Zb0DiOj6CPDE7TlB1rMgpAT2MJpEjSOff436zrGvjOuSCm+PL6z/MMAFiWJZirfz0j3wEA\
 		emp/gv47IxYAAAAASUVORK5CYII=') 14 8, pointer";
+
+(
+	/**
+	 * @param {Window} window
+	 * @param {undefined} undefined
+	 */
+	function (window, undefined) {
+		/*
+		 * Import
+		 * -----------------------------------------------------------------------------
+		 */
+		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
+		function extendClass (Child, Parent) {
+			var F = function() { };
+			F.prototype = Parent.prototype;
+			Child.prototype = new F();
+			Child.prototype.constructor = Child;
+			Child.superclass = Parent.prototype;
+		}
+
+		asc.extendClass = extendClass;
+	}
+)(window);

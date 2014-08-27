@@ -100,21 +100,18 @@
 		strictEqual(Asc.round(-.1-.2-.9+.2), -1, "Asc.round(.1+.2+.9-.2)"); // -1.0000...2
 	});
 
-	test("Asc.inherit", function test_inherit() {
+	test("Asc.extendClass", function test_extendClass() {
 		function Base(b1) {
 			this.b1 = b1;
 		}
-		Base.prototype = {
-			mb1: function (b1) {this.b1=b1;}
-		};
+		Base.prototype.mb1 = function (b1) {this.b1=b1;};
 
 		function Child(b1, c1) {
 			Child.superclass.constructor.call(this, b1);
 			this.c1 = c1;
 		}
-		Asc.inherit(Child, Base, {
-			mc1: function (c1) {this.c1=c1;}
-		});
+		Asc.extendClass(Child, Base);
+		Child.prototype.mc1 = function (c1) {this.c1=c1;};
 
 		var x = new Child(1, 2);
 		ok(x !== undefined, "x = new Child(1, 2)");
@@ -130,15 +127,13 @@
 		equal(x.c1, 4, "x.c1");
 	});
 
-	test("Asc.inherit with fabric method", function test_inherit2() {
+	test("Asc.extendClass with fabric method", function test_extendClass2() {
 		function Base(b1) {
 			if ( !(this instanceof Base) ) {return new Base(b1);}
 			this.b1 = b1;
 			return this;
 		}
-		Base.prototype = {
-			mb1: function (b1) {this.b1=b1;}
-		};
+		Base.prototype.mb1 = function (b1) {this.b1=b1;};
 
 		function Child(b1, c1) {
 			if ( !(this instanceof Child) ) {return new Child(b1, c1);}
@@ -146,9 +141,8 @@
 			this.c1 = c1;
 			return this;
 		}
-		Asc.inherit(Child, Base, {
-			mc1: function (c1) {this.c1=c1;}
-		});
+		Asc.extendClass(Child, Base);
+		Child.prototype.mc1 = function (c1) {this.c1=c1;};
 
 		var x = Child(1, 2);
 		ok(x !== undefined, "x = Child(1, 2)");
