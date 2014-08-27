@@ -1299,11 +1299,13 @@
 				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
 
 				// Fill cell
-				var bg = oStyle.getFill();
-				var oColor = bg !== null ? bg : new CColor(255, 255, 255);
-				oGraphics.save().beginPath().setFillStyle(oColor);
+				var oColor = oStyle.getFill();
+				oGraphics.save().beginPath();
+				if (null !== oColor)
+					oGraphics.setFillStyle(oColor);
 				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt).clip();
-				oGraphics.fill();
+				if (null !== oColor)
+					oGraphics.fill();
 
 
 				var drawBorder = function (b, x1, y1, x2, y2) {
