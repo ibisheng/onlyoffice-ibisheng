@@ -2902,7 +2902,7 @@ CCellValue.prototype =
 				if(CellValueType.String == this.type)
 					bNeedMeasure = false;
 				var oNumFormat;
-				var xfs = this.cell.getStyle();
+				var xfs = this.cell.getCompiledStyle();
 				if(null != xfs && null != xfs.num)
 					oNumFormat = oNumFormatCache.get(xfs.num.f);
 				else
@@ -3023,7 +3023,7 @@ CCellValue.prototype =
 			//применяем форматирование
 			var oValueText = null;
 			var oValueArray = null;
-			var xfs = this.cell.getStyle();
+			var xfs = this.cell.getCompiledStyle();
 			if(this.cell.sFormula)
 				oValueText = "="+this.cell.sFormula;
 			else
@@ -3122,7 +3122,7 @@ CCellValue.prototype =
 			sText = "";
 		var color;
 		var cellfont;
-		var xfs = this.cell.getStyle();
+		var xfs = this.cell.getCompiledStyle();
 		if(null != xfs && null != xfs.font)
 			cellfont = xfs.font;
 		else
@@ -3188,7 +3188,7 @@ CCellValue.prototype =
 		if("" == val)
 			return;
 		var oNumFormat;
-		var xfs = this.cell.getStyle();
+		var xfs = this.cell.getCompiledStyle();
 		if(null != xfs && null != xfs.num)
 			oNumFormat = oNumFormatCache.get(xfs.num.f);
 		else

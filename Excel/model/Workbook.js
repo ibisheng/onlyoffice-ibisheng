@@ -3971,12 +3971,14 @@ function Cell(worksheet){
 	this.formulaParsed = null;
 }
 Cell.prototype.getStyle=function(){
-	if(this.bNeedCompileXfs)
-	{
-		this.bNeedCompileXfs = false;
-		this.compileXfs();
-	}
-	return this.compiledXfs;
+	return this.xfs;
+};
+Cell.prototype.getCompiledStyle = function () {
+    if (this.bNeedCompileXfs) {
+        this.bNeedCompileXfs = false;
+        this.compileXfs();
+    }
+    return this.compiledXfs;
 };
 Cell.prototype.compileXfs=function(){
 	this.compiledXfs = null;
@@ -5664,7 +5666,7 @@ Range.prototype.getXfId=function(){
 	var nCol = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell) {
-		var xfs = cell.getStyle();
+	    var xfs = cell.getCompiledStyle();
 		if(null != xfs && null != xfs.XfId)
 			return xfs.XfId;
 	} else {
@@ -5693,7 +5695,7 @@ Range.prototype.getNumFormatStr=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+	    var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.num)
             return xfs.num.f;
     }
@@ -5718,7 +5720,7 @@ Range.prototype.getFont = function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font;
     }
@@ -5740,7 +5742,7 @@ Range.prototype.getFontname=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.fn;
     }
@@ -5762,7 +5764,7 @@ Range.prototype.getFontsize=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.fs;
     }
@@ -5784,7 +5786,7 @@ Range.prototype.getFontcolor=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.c;
     }
@@ -5806,7 +5808,7 @@ Range.prototype.getBold=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.b;
     }
@@ -5828,7 +5830,7 @@ Range.prototype.getItalic=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.i;
     }
@@ -5850,7 +5852,7 @@ Range.prototype.getUnderline=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.u;
     }
@@ -5872,7 +5874,7 @@ Range.prototype.getStrikeout=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.s;
     }
@@ -5894,7 +5896,7 @@ Range.prototype.getFontAlign=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.font)
             return xfs.font.va;
     }
@@ -5916,7 +5918,7 @@ Range.prototype.getQuotePrefix=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
 	{
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
 		if(null != xfs && null != xfs.QuotePrefix)
 			return xfs.QuotePrefix;
 	}
@@ -5928,7 +5930,7 @@ Range.prototype.getAlignVertical=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs)
 		{
 			if(null != xfs.align)
@@ -5955,7 +5957,7 @@ Range.prototype.getAlignHorizontal=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs)
 		{
 			if(null != xfs.align)
@@ -6017,7 +6019,7 @@ Range.prototype.getFill=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.fill)
             return xfs.fill.bg;
     }
@@ -6047,7 +6049,7 @@ Range.prototype.getBorderSrc=function(_cell){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.border)
             return xfs.border;
     }
@@ -6120,7 +6122,7 @@ Range.prototype.getShrinkToFit=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs)
 		{
 			if(null != xfs.align)
@@ -6150,7 +6152,7 @@ Range.prototype.getWrap=function(){
 	var nCol = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell) {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs) {
 			if(null != xfs.align)
 				return this.getWrapByAlign(xfs.align);
@@ -6175,7 +6177,7 @@ Range.prototype.getAngle=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs)
 		{
 			if(null != xfs.align)
@@ -6202,7 +6204,7 @@ Range.prototype.getVerticalText=function(){
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
 	if(null != cell)
     {
-		var xfs = cell.getStyle();
+		var xfs = cell.getCompiledStyle();
         if(null != xfs)
 		{
 			if(null != xfs.align)
