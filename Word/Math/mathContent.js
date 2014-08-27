@@ -4303,7 +4303,7 @@ CMathContent.prototype =
     setPosition: function(PosInfo)
     {
         this.pos.x = PosInfo.x;
-        this.pos.y = PosInfo.y ;
+        this.pos.y = PosInfo.y;
 
         /*var x = pos.x,
             y = pos.y + this.size.ascent;  */

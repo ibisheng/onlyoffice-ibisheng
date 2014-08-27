@@ -559,19 +559,19 @@ CMathText.prototype =
         pGraphics.FillTextCode(X, Y, this.getCode());    //на отрисовку символа отправляем положение baseLine
 
     },
-    setPosition: function(X, Y)
+    setPosition: function(pos)
     {
         try
         {
             if (!this.bJDraw)                      // for text
             {
-                this.pos.x = X + this.GapLeft;
-                this.pos.y = Y;
+                this.pos.x = pos.x + this.GapLeft;
+                this.pos.y = pos.y;
             }
             else                                    // for symbol only drawing
             {
-                this.pos.x = X - this.rasterOffsetX;
-                this.pos.y = Y - this.rasterOffsetY + this.size.ascent;
+                this.pos.x = pos.x - this.rasterOffsetX;
+                this.pos.y = pos.y - this.rasterOffsetY + this.size.ascent;
             }
         }
         catch(e)
@@ -751,13 +751,13 @@ CMathAmp.prototype =
             };
         }
     },
-    setPosition: function(X, Y)
+    setPosition: function(pos)
     {
-        this.pos.x = X;
-        this.pos.y = Y;
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
 
         if(this.bEqqArray==false)
-            this.AmpText.setPosition(X, Y);
+            this.AmpText.setPosition(pos);
     },
     draw: function(x, y, pGraphics)
     {

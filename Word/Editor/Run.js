@@ -7726,26 +7726,28 @@ ParaRun.prototype.old_Math_SetPosition = function(pos, PosInfo, CurrWPoints)
 }
 ParaRun.prototype.Math_SetPosition = function(PosInfo)
 {
-    var NewPos = new CMathPosition();
-
-    var x = PosInfo.x,
-        y = PosInfo.y - this.size.ascent;
-
     if(this.bEqqArray)
     {
         for(var Pos = 0; Pos < this.Content.length; Pos++)
         {
             var CurrElem = this.Content[Pos];
+
+            var NewPos = new CMathPosition();
+
+            NewPos.x = PosInfo.x;
+            NewPos.y = PosInfo.y - this.size.ascent;
+
+
             if(this.Content[Pos].Type == para_Math_Ampersand)
             {
                 PosInfo.UpdatePoint();
                 PosInfo.ApplyAlign();
 
-                CurrElem.setPosition(PosInfo.x, y);
+                CurrElem.setPosition(NewPos);
             }
             else
             {
-                CurrElem.setPosition(PosInfo.x, y);
+                CurrElem.setPosition(NewPos);
             }
 
             PosInfo.UpdateX(CurrElem.size.width);
@@ -7897,7 +7899,12 @@ ParaRun.prototype.Math_SetPosition = function(PosInfo)
     {
         for(var i = 0; i < this.Content.length; i++)
         {
-            this.Content[i].setPosition(PosInfo.x, y);
+            var NewPos = new CMathPosition();
+
+            NewPos.x = PosInfo.x;
+            NewPos.y = PosInfo.y - this.size.ascent;
+
+            this.Content[i].setPosition(NewPos);
             PosInfo.x += this.Content[i].size.width;
         }
 
