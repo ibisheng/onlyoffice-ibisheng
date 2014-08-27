@@ -1224,6 +1224,8 @@ CGraphics.prototype =
                 _lastFont.Name   = _rfonts.Ascii.Name;
                 _lastFont.Index  = _rfonts.Ascii.Index;
 
+                console.log(_lastFont.Name);
+
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
                     _lastFont.Index = window.g_map_font_index[_lastFont.Name];

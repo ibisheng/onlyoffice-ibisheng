@@ -1438,8 +1438,7 @@ CDrawingDocument.prototype =
 
             _stream["ClearNoAttack"]();
 
-            _stream["WriteByte"](0);
-            _stream["WriteLong"](0);
+            _stream["WriteByte"](2);
             _stream["WriteString2"]("" + i);
 
             this.Native["DD_EndNativeDraw"](_stream);
@@ -1449,7 +1448,7 @@ CDrawingDocument.prototype =
         History.TurnOn();
 
         _stream["ClearNoAttack"]();
-        _stream["WriteByte"](1);
+        _stream["WriteByte"](3);
 
         this.Native["DD_EndNativeDraw"](_stream);
     },

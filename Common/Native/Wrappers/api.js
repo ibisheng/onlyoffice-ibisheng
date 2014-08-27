@@ -4492,6 +4492,7 @@ function CStylesPainter()
         _stream["ClearNoAttack"]();
 
         _stream["WriteByte"](0);
+        _stream["WriteString2"](style.Name);
 
         _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
         graphics.ClearParams();

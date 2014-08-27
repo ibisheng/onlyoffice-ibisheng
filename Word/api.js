@@ -7768,6 +7768,11 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
 		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
 	this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
 	this.sync_PageOrientCallback(editor.get_DocumentOrientation());
+
+    if (this.GenerateNativeStyles !== undefined)
+    {
+        this.GenerateNativeStyles();
+    }
 };
 
 window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
