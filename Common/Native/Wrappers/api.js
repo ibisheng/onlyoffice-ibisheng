@@ -1006,6 +1006,7 @@ function asc_menu_WriteParaFrame(_type, _frame, _stream)
 
 asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 {
+    var _return = undefined;
     var _current = { pos : 0 };
     var _continue = true;
     switch (type)
@@ -1752,9 +1753,63 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             this.StartAddShape(_shapeProp.type, true);
             break;
         }
+        case 52: // ASC_MENU_EVENT_TYPE_INSERT_HYPERLINK
+        {
+            var _props = asc_menu_ReadHyperPr(_params, _current);
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                this.WordControl.m_oLogicDocument.Hyperlink_Add( _props );
+            }
+            break;
+        }
+        case 8: // ASC_MENU_EVENT_TYPE_HYPERLINK
+        {
+            var _props = asc_menu_ReadHyperPr(_params, _current);
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                this.WordControl.m_oLogicDocument.Hyperlink_Modify( _props );
+            }
+            break;
+        }
+        case 59: // ASC_MENU_EVENT_TYPE_REMOVE_HYPERLINK
+        {
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                this.WordControl.m_oLogicDocument.Hyperlink_Remove();
+            }
+            break;
+        }
+        case 58: // ASC_MENU_EVENT_TYPE_CAN_ADD_HYPERLINK
+        {
+            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(true);
+
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            if ( true === bCanAdd )
+            {
+                var _text = this.WordControl.m_oLogicDocument.Get_SelectedText(true);
+                if (null == _text)
+                    _stream["WriteByte"](1);
+                else
+                {
+                    _stream["WriteByte"](2);
+                    _stream["WriteString2"](_text);
+                }
+            }
+            else
+            {
+                _stream["WriteByte"](0);
+            }
+            _return = _stream;
+            break;
+        }
         default:
             break;
     }
+    return _return;
 };
 
 function asc_menu_WriteHeaderFooterPr(_hdrftrPr, _stream)
@@ -3708,6 +3763,46 @@ function asc_menu_WriteImagePr(_imagePr, _stream)
     _stream["WriteByte"](255);
 };
 ///////////////////////////////////////////////////////////////////////
+
+function asc_menu_ReadHyperPr(_params, _cursor)
+{
+    var _settings = new CHyperlinkProperty();
+
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.Text = _params[_cursor.pos++];
+                break;
+            }
+            case 1:
+            {
+                _settings.Value = _params[_cursor.pos++];
+                break;
+            }
+            case 2:
+            {
+                _settings.ToolTip = _params[_cursor.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+
+    return _settings;
+};
+
+///////////////////////////////////////////////////////////////////////
+
 
 asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 {
