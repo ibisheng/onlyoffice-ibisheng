@@ -3197,7 +3197,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype._onCheckCommentRemoveLock = function (lockElem) {
 			var res = false;
-			if (0 === lockElem["sheetId"].indexOf(CCellCommentator.sStartCommentId)) {
+			var sheetId = lockElem["sheetId"];
+			if (-1 !== sheetId && 0 === sheetId.indexOf(CCellCommentator.sStartCommentId)) {
 				// Коммментарий
 				res = true;
 				this.handlers.trigger("asc_onUnLockComment", lockElem["rangeOrObjectId"]);
