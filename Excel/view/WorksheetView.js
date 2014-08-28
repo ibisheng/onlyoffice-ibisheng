@@ -2625,21 +2625,23 @@
 			var c = this.cols;
 			var r = this.rows;
 			var mergedCells = this.model.getMergedByRange(range);
-			var objectMergedCells = {}; // Двумерный массив вида строка-колонка {1: {1: true, 2: true}}
+			var objectMergedCells = {}; // Двумерный map вида строка-колонка {1: {1: range, 4: range}}
 			var i, length, arrMerged, mergeElem, col, row;
 			for (i = 0, arrMerged = mergedCells.inner, length = arrMerged.length; i < length; ++i) {
-				for (mergeElem = arrMerged[i].bbox, row = mergeElem.r1; row <= mergeElem.r2; ++row) {
+				for (mergeElem = arrMerged[i].bbox, row = mergeElem.r1;
+					 row <= mergeElem.r2 && row < this.nRowsCount; ++row) {
 					if (!objectMergedCells.hasOwnProperty(row))
 						objectMergedCells[row] = {};
-					for (col = mergeElem.c1; col <= mergeElem.c2; ++col)
+					for (col = mergeElem.c1; col <= mergeElem.c2 && col < this.nColsCount; ++col)
 						objectMergedCells[row][col] = arrMerged[i].bbox;
 				}
 			}
 			for (i = 0, arrMerged = mergedCells.outer, length = arrMerged.length; i < length; ++i) {
-				for (mergeElem = range.intersectionSimple(arrMerged[i].bbox), row = mergeElem.r1; row <= mergeElem.r2; ++row) {
+				for (mergeElem = range.intersectionSimple(arrMerged[i].bbox), row = mergeElem.r1;
+					 row <= mergeElem.r2 && row < this.nRowsCount; ++row) {
 					if (!objectMergedCells.hasOwnProperty(row))
 						objectMergedCells[row] = {};
-					for (col = mergeElem.c1; col <= mergeElem.c2; ++col)
+					for (col = mergeElem.c1; col <= mergeElem.c2 && col < this.nColsCount; ++col)
 						objectMergedCells[row][col] = arrMerged[i].bbox;
 				}
 			}
