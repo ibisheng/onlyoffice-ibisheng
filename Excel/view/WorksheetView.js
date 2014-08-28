@@ -6191,11 +6191,13 @@
 			var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
 			var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
 
+			var offsetFrozen = this.getFrozenPaneOffset();
+
 			if (adjustRight) {
-				while ( this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX) ) {++incX;}
+				while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
 			}
 			if (adjustBottom) {
-				while ( this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY) ) {++incY;}
+				while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
 			}
 			return {
 				deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
@@ -6217,11 +6219,13 @@
 			var incX = ar.startCol < vr.c1 && isMC ? arn.startCol - vr.c1 : ar.startCol < vr.c1 ? ar.startCol - vr.c1 : 0;
 			var incY = ar.startRow < vr.r1 && isMC ? arn.startRow - vr.r1 : ar.startRow < vr.r1 ? ar.startRow - vr.r1 : 0;
 
+			var offsetFrozen = this.getFrozenPaneOffset();
+
 			if (adjustRight) {
-				while ( this._isColDrawnPartially(isMC ? arn.startCol : ar.startCol, vr.c1 + incX) ) {++incX;}
+				while (this._isColDrawnPartially(isMC ? arn.startCol : ar.startCol, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
 			}
 			if (adjustBottom) {
-				while ( this._isRowDrawnPartially(isMC ? arn.startRow : ar.startRow, vr.r1 + incY) ) {++incY;}
+				while (this._isRowDrawnPartially(isMC ? arn.startRow : ar.startRow, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
 			}
 			return {
 				deltaX: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? incX : 0,
@@ -6239,9 +6243,11 @@
 			var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
 			var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
 
+			var offsetFrozen = this.getFrozenPaneOffset();
+
 			if (adjustRight) {
 				try{
-					while ( this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX) ) {++incX;}
+					while (this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX, offsetFrozen.offsetX)) {++incX;}
 				}
 				catch(e){
 					this.expandColsOnScroll(true);
@@ -6250,7 +6256,7 @@
 			}
 			if (adjustBottom) {
 				try{
-					while ( this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY) ) {++incY;}
+					while (this._isRowDrawnPartially(isMC ? arn.r2 : ar.r2, vr.r1 + incY, offsetFrozen.offsetY)) {++incY;}
 				}
 				catch(e){
 					this.expandRowsOnScroll(true);
