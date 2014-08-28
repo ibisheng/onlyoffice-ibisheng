@@ -900,8 +900,8 @@
 		var fm = this.fmgrGraphics[3],
 			r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
-			tmp = fm.MeasureChar( text.charCodeAt(i) );
-			w += tmp.fAdvanceX;
+			tmp = fm.MeasureChar(text.charCodeAt(i));
+			w += asc_round(tmp.fAdvanceX);
 		}
 		w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
 		return this._calcTextMetrics(w * r, w2 * r, fm, r);
@@ -958,7 +958,7 @@
 		var length = text.length;
 		for (var i = 0; i < length; ++i) {
 			try {
-				_x = manager.LoadString2C(text.charAt(i), _x, _y);
+				_x = asc_round(manager.LoadString4C(text.charCodeAt(i), _x, _y));
 			} catch(err) {
 				// do nothing
 			}
