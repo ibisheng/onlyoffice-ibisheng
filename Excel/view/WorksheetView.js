@@ -2644,7 +2644,7 @@
 				}
 			}
 
-			var bc = undefined; // cached border color
+			var bc = null, bw = -1, isNotFirst = false, isStroke = false; // cached border color
 
 			// ToDo в одну функцию
 			function drawBorderHor(border, x1, y, x2) {
@@ -2652,11 +2652,23 @@
 					if (bc !== border.c) {
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
+						isStroke = true;
 					}
-					ctx.setLineWidth(border.w)
-						.beginPath()
-						.lineHor(x1, y, x2)
-						.stroke();
+					if (bw !== border.w) {
+						bw = border.w;
+						ctx.setLineWidth(border.w);
+						isStroke = true;
+					}
+
+					if (isNotFirst && isStroke)
+						ctx.stroke().beginPath();
+					else if (!isNotFirst) {
+						isNotFirst = true;
+						ctx.beginPath();
+					}
+
+					ctx.lineHor(x1, y, x2);
+					isStroke = false;
 				}
 			}
 
@@ -2665,11 +2677,23 @@
 					if (bc !== border.c) {
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
+						isStroke = true;
 					}
-					ctx.setLineWidth(border.w)
-						.beginPath()
-						.lineVer(x1, y1, y2)
-						.stroke();
+					if (bw !== border.w) {
+						bw = border.w;
+						ctx.setLineWidth(border.w);
+						isStroke = true;
+					}
+
+					if (isNotFirst && isStroke)
+						ctx.stroke().beginPath();
+					else if (!isNotFirst) {
+						isNotFirst = true;
+						ctx.beginPath();
+					}
+
+					ctx.lineVer(x1, y1, y2);
+					isStroke = false;
 				}
 			}
 
@@ -2678,11 +2702,23 @@
 					if (bc !== border.c) {
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
+						isStroke = true;
 					}
-					ctx.setLineWidth(border.w)
-						.beginPath()
-						.lineDiag(x1, y1, x2, y2)
-						.stroke();
+					if (bw !== border.w) {
+						bw = border.w;
+						ctx.setLineWidth(border.w);
+						isStroke = true;
+					}
+
+					if (isNotFirst && isStroke)
+						ctx.stroke().beginPath();
+					else if (!isNotFirst) {
+						isNotFirst = true;
+						ctx.beginPath();
+					}
+
+					ctx.lineDiag(x1, y1, x2, y2);
+					isStroke = false;
 				}
 			}
 
@@ -2904,6 +2940,9 @@
 				arrCurrRow = arrNextRow;
 				arrNextRow = [];
 			}
+
+			if (isNotFirst)
+				ctx.stroke();
 		};
 
 		/** Рисует закрепленные области областей */
