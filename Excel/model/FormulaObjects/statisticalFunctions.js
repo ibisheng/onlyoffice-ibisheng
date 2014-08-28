@@ -1232,7 +1232,7 @@ function cEXPONDIST() {
 //    this.setArgumentsMin( 3 );
 //    this.setArgumentsMax( 3 );
 
-    this.name = "EXPODIST";
+    this.name = "EXPONDIST";
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 3;

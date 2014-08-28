@@ -2633,7 +2633,7 @@ function cQUOTIENT() {
 //    this.setArgumentsMin( 2 );
 //    this.setArgumentsMax( 2 );
 
-    this.name = "QUPTIENT";
+    this.name = "QUOTIENT";
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 2;

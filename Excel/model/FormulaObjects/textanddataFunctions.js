@@ -1484,7 +1484,7 @@ function cSUBSTITUTE() {
 //    this.setArgumentsMin( 3 );
 //    this.setArgumentsMax( 4 );
 
-    this.name = "SUBTITUTE";
+    this.name = "SUBSTITUTE";
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 3;

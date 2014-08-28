@@ -357,7 +357,7 @@ function cDATEDIF() {
 //    this.setArgumentsMax( 3 );
 //    this.setFormat( this.formatType.noneFormat );
 
-    this.name = "DATEIF";
+    this.name = "DATEDIF";
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 3;
