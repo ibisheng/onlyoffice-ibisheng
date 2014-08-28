@@ -1585,7 +1585,7 @@ asc_docs_api.prototype.sync_ChangeActiveHeaderCallback = function (position, hea
 	this.asc_fireCallback("asc_onChangeActiveHeader", position, new CHeader (header));
 }
 asc_docs_api.prototype.sync_ReturnHeadersCallback = function (headers){
-	var _headers = Array ();
+	var _headers = [];
 	for (var i = 0; i < headers.length; i++)
 	{	
 		_headers[i] = new CHeader (headers[i]);
