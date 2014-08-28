@@ -1144,8 +1144,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_isDocumentModified = function () {
-			if (!this.canSave) {
-				// Пока идет сохранение, мы не закрываем документ
+			if (!this.canSave || this.asc_getCellEditMode()) {
+				// Пока идет сохранение или редактирование ячейки, мы не закрываем документ
 				return true;
 			} else if (History && History.Is_Modified) {
 				return History.Is_Modified();
@@ -2747,7 +2747,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		// Получаем свойство: редактируем мы сейчас или нет
 		spreadsheet_api.prototype.asc_getCellEditMode = function () {
-			return this.wb.getCellEditMode();
+			return this.wb ? this.wb.getCellEditMode() : false;
 		};
 
 		spreadsheet_api.prototype.asc_setCellFontName = function (fontName) {
