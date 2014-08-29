@@ -745,11 +745,13 @@ CMathAmp.prototype =
         {
             this.size =
             {
-                width:      this.AmpText.size.width,
-                height:     this.AmpText.size.height,
-                ascent:     this.AmpText.size.ascent
+                width:          this.AmpText.size.width,
+                height:         this.AmpText.size.height,
+                ascent:         this.AmpText.size.ascent
             };
         }
+
+        this.WidthVisible = this.size.width;
     },
     setPosition: function(pos)
     {

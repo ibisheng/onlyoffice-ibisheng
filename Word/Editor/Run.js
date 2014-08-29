@@ -50,11 +50,11 @@ function ParaRun(Paragraph, bMathRun)
     if(bMathRun)
     {
         this.Type = para_Math_Run;
-        this.MathPrp = new CMPrp();
+
         this.Parent = null;
         this.bEqqArray = false;
-        //this.WidthsPoints = [];
         this.size = new CMathSize();
+        this.MathPrp = new CMPrp();
     }
     this.StartState = null;
 
@@ -625,7 +625,7 @@ ParaRun.prototype =
         return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[0].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
     },
 
-    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo)
     {
         var Para = this.Paragraph;
 
@@ -664,8 +664,15 @@ ParaRun.prototype =
                     X += Item.WidthVisible;
                     break;
                 }
+                case para_Math_Ampersand:
+                {
+                    PointInfo.NextAlignRange();
+                    X += PointInfo.GetAlign();
+                }
             }
         }
+
+
 
         if ( true === CurrentRun && Pos === this.State.ContentPos )
         {
@@ -801,13 +808,13 @@ ParaRun.prototype =
                     }
                 }
 
-
                 return { X : X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
             }
             else
                 return { X : X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
 
         }
+
 
         return { X : X, Y: Y,  Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
     },
@@ -3659,7 +3666,7 @@ ParaRun.prototype =
         }
     },
 
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, PointInfo)
     {
         var Result = false;
 
@@ -3671,21 +3678,40 @@ ParaRun.prototype =
         var EndPos   = Range.EndPos;
 
         var CurPos = StartPos;
+
+        //only for para_Math_Run
+        var bUpdateDiffY  = true,
+            DiffY;
+
+        /*if(this.Type == para_Math_Run)
+        {
+            DiffY = SearchPos.Y - SearchPos.CurY;
+            if(Math.abs(DiffY) > SearchPos.DiffY)
+                bUpdateDiffY = false;
+        }*/
+
         for (; CurPos < EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
 
             var TempDx = 0;
 
-            if ( para_Drawing != Item.Type || true === Item.Is_Inline() )
+            if(Item.Type == para_Math_Ampersand)
+            {
+                PointInfo.NextAlignRange();
+                TempDx = PointInfo.GetAlign();
+            }
+            else if ( para_Drawing != Item.Type || true === Item.Is_Inline() )
             {
                 TempDx = Item.WidthVisible;
             }
 
             // Проверяем, попали ли мы в данный элемент
             var Diff = SearchPos.X - SearchPos.CurX;
-            if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+
+            if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 /*&& bUpdateDiffY*/)
             {
+                //SearchPos.DiffY = Math.abs(DiffY);
                 SearchPos.DiffX = Math.abs( Diff );
                 SearchPos.Pos.Update( CurPos, Depth );
                 Result = true;
@@ -3700,7 +3726,7 @@ ParaRun.prototype =
             SearchPos.CurX += TempDx;
 
             // Заглушка для знака параграфа и конца строки
-            if ( Math.abs( SearchPos.X - SearchPos.CurX ) < SearchPos.DiffX )
+            if ( Math.abs( SearchPos.X - SearchPos.CurX ) < SearchPos.DiffX /*&& bUpdateDiffY*/)
             {
                 if ( para_End === Item.Type )
                 {
@@ -3729,11 +3755,12 @@ ParaRun.prototype =
             Result = true;
         }
 
-        if (this.Type == para_Math_Run /*&& this.Is_Empty()*/) // не только для пустых Run, но и для проверки на конец Run (т.к. Diff не обновляется)
+        if (this.Type == para_Math_Run /*&& bUpdateDiffY*/ /*&& this.Is_Empty()*/) // не только для пустых Run, но и для проверки на конец Run (т.к. Diff не обновляется)
         {
             var Diff = SearchPos.X - SearchPos.CurX;
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
             {
+                //SearchPos.DiffY = Math.abs(DiffY);
                 SearchPos.DiffX = Math.abs( Diff );
                 SearchPos.Pos.Update( CurPos, Depth );
                 Result = true;
@@ -4053,7 +4080,7 @@ ParaRun.prototype =
             while ( CurPos < ContentLen - 1 )
             {
                 CurPos++;
-                var Item = this.Content[CurPos]
+                var Item = this.Content[CurPos];
                 var TempType = Item.Type;
 
                 if ( (true !== StepEnd && para_End === TempType) || !( para_Space === TempType || ( para_Text === TempType && true === Item.Is_NBSP() ) ) )
@@ -4385,7 +4412,7 @@ ParaRun.prototype =
         {
             for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
             {
-                if ( para_End !== this.Content[CurPos].Type )
+                if ( para_End !== this.Content[CurPos].Type  && para_Math_Ampersand !== this.Content[CurPos].Type) // para_math_Ampersand имеет нулевую ширину, поэтому чтобы не случилось так что не было ни селекта, ни курсора, не учитываем para_Math_Ampersand
                     return false;
             }
         }
@@ -7577,7 +7604,7 @@ ParaRun.prototype.Math_SetPosition = function(PosInfo)
 
             if(this.Content[Pos].Type == para_Math_Ampersand)
             {
-                PosInfo.UpdatePoint();
+                PosInfo.NextAlignRange();
                 PosInfo.ApplyAlign();
 
                 NewPos.x = PosInfo.x;
@@ -7595,7 +7622,6 @@ ParaRun.prototype.Math_SetPosition = function(PosInfo)
             PosInfo.UpdateX(CurrElem.size.width);
 
         }
-
     }
     else
     {

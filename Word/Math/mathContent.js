@@ -60,24 +60,28 @@ CRPI.prototype.Copy = function()
 }
 
 
-function CMathPosInfo()
+function CMathPointInfo()
 {
     this.x    = 0;
     this.y    = 0;
 
-    this.bEven         = true;
-    this.CurrPoint     = 0;
-    this.GWidths       = null;
-    this.GPoints       = null;
-    this.ContentPoints = null;
+    this.bEven      = true;
+    this.CurrPoint  = 0;
 
-    this.GMaxDimWidths = null;
+    this.InfoPoints = {};
 }
-CMathPosInfo.prototype.UpdateX = function(value)
+CMathPointInfo.prototype.SetInfoPoints = function(InfoPoints)
+{
+    this.InfoPoints.GWidths       = InfoPoints.GWidths;
+    this.InfoPoints.GPoints       = InfoPoints.GPoints;
+    this.InfoPoints.ContentPoints = InfoPoints.ContentPoints.Widths;
+    this.InfoPoints.GMaxDimWidths = InfoPoints.GMaxDimWidths;
+}
+CMathPointInfo.prototype.UpdateX = function(value)
 {
     this.x += value;
 }
-CMathPosInfo.prototype.UpdatePoint = function()
+CMathPointInfo.prototype.NextAlignRange = function()
 {
     if(this.bEven)
         this.bEven = false;
@@ -87,7 +91,11 @@ CMathPosInfo.prototype.UpdatePoint = function()
         this.bEven = true;
     }
 }
-CMathPosInfo.prototype.ApplyAlign = function()
+CMathPointInfo.prototype.ApplyAlign = function()
+{
+    this.x += this.GetAlign();
+}
+CMathPointInfo.prototype.GetAlign = function()
 {
     var align = 0;
 
@@ -95,15 +103,15 @@ CMathPosInfo.prototype.ApplyAlign = function()
     {
         var alignEven, alignGeneral, alignOdd;
 
-        var Len   = this.ContentPoints.length,
-            Point = this.ContentPoints[this.CurrPoint];
+        var Len   = this.InfoPoints.ContentPoints.length,
+            Point = this.InfoPoints.ContentPoints[this.CurrPoint];
 
-        var GWidth = this.GWidths[this.CurrPoint],
-            GPoint = this.GPoints[this.CurrPoint];
+        var GWidth = this.InfoPoints.GWidths[this.CurrPoint],
+            GPoint = this.InfoPoints.GPoints[this.CurrPoint];
 
         if(this.CurrPoint == Len - 1 && Point.odd == -1) // то есть последняя точка четная, выравнивание по центру
         {
-            var GMaxDimWidth = this.GMaxDimWidths[this.CurrPoint];
+            var GMaxDimWidth = this.InfoPoints.GMaxDimWidths[this.CurrPoint];
 
             alignGeneral = (GMaxDimWidth - Point.even)/2;
             alignEven = 0;
@@ -116,9 +124,9 @@ CMathPosInfo.prototype.ApplyAlign = function()
 
         if(this.CurrPoint > 0)
         {
-            var PrevGenPoint = this.GPoints[this.CurrPoint-1],
-                PrevGenWidth = this.GWidths[this.CurrPoint-1],
-                PrevPoint    = this.ContentPoints[this.CurrPoint-1];
+            var PrevGenPoint = this.InfoPoints.GPoints[this.CurrPoint-1],
+                PrevGenWidth = this.InfoPoints.GWidths[this.CurrPoint-1],
+                PrevPoint    = this.InfoPoints.ContentPoints[this.CurrPoint-1];
 
             var alignPrevGen = (PrevGenWidth - PrevGenPoint.even - PrevGenPoint.odd)/2;
             alignOdd = alignPrevGen +  PrevGenPoint.odd - PrevPoint.odd;
@@ -129,9 +137,24 @@ CMathPosInfo.prototype.ApplyAlign = function()
         align = alignGeneral + alignEven + alignOdd;
     }
 
-
-    this.x += align;
+    return align;
 }
+
+function CInfoPoints()
+{
+    this.GWidths       = null;
+    this.GPoints       = null;
+    this.GMaxDimWidths = null;
+    this.ContentPoints = new AmperWidths();
+}
+CInfoPoints.prototype.SetDefault = function()
+{
+    this.GWidths       = null;
+    this.GPoints       = null;
+    this.GMaxDimWidths = null;
+    this.ContentPoints.SetDefault();
+}
+
 
 function CMathPosition()
 {
@@ -142,8 +165,6 @@ function CMathPosition()
 
 function AmperWidths()
 {
-    /*this.Amp       = 0;
-    this.CurrPoint = -1;*/
     this.bEven     = true; // является ли текущая точка нечетной
     this.Widths    = [];
 }
@@ -189,6 +210,12 @@ AmperWidths.prototype.AddNewAlignRange = function()
     this.bEven = !this.bEven;
 
 }
+AmperWidths.prototype.SetDefault = function()
+{
+    this.bEven         = true;
+    this.Widths.length = 0;
+}
+
 
 
 function CGaps(oSign, oEqual, oZeroOper, oLett)
@@ -841,18 +868,21 @@ function CMathContent()
 {
 	this.Id = g_oIdCounter.Get_NewId();		
 
-
     this.content = []; // array of mathElem
 
     this.CurPos = 0;
     this.WidthToElement = [];
-    this.WidthPoints    = []; /// for EqqArray Runs
+    //this.WidthPoints    = []; /// for EqqArray Runs
     this.pos = new CMathPosition();   // относительная позиция
 
     //  Properties
     this.ParaMath       = null;
     this.ArgSize        = new CMathArgSize();
     this.Compiled_ArgSz = new CMathArgSize();
+
+    // for EqqArray
+    this.InfoPoints = new CInfoPoints();
+    ///////////////
 
     this.bDot       = false;
     this.plhHide    = false;
@@ -866,13 +896,11 @@ function CMathContent()
         Use:    false
     };
 
-    /*this.bSelectionUse = false;
-    this.SelectStartPos = 0;
-    this.SelectEndPos   = 0;*/
-
     this.RecalcInfo =
     {
-        TextPr:     true
+        TextPr:             true,
+        bEqqArray:          false,
+        bChangeInfoPoints:  false
     };
 
     this.NearPosArray = [];
@@ -3932,7 +3960,7 @@ CMathContent.prototype =
         this.content.push( placeholder );*/
     },
     //////////////////////////////////////
-    recalculateSize: function()
+    /*recalculateSize: function()
     {
         var width      =   0 ;
         var ascent     =   0 ;
@@ -3960,7 +3988,8 @@ CMathContent.prototype =
         }
 
         this.size = {width: width, height: ascent + descent, ascent: ascent};
-    },
+    },*/
+
     Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // пересчитываем всю формулу
     {
         if(ArgSize !== null && ArgSize !== undefined)
@@ -3976,20 +4005,21 @@ CMathContent.prototype =
             this.Parent = Parent;
         }
 
+        this.WidthToElement.length = 0;
+
+
         var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
 
 		if (!this.bRoot && this.content.length == 0)
 			this.fillPlaceholders();
 
-        this.WidthToElement.length = 0;
-
-        this.bEqqArray = RPI.bEqqArray;
+        this.RecalcInfo.bEqqArray = RPI.bEqqArray;
 
         var lng = this.content.length;
 
         this.size.SetZero();
 
-        this.WidthPoints = new AmperWidths();
+        this.InfoPoints.SetDefault();
 
         for(var pos = 0; pos < lng; pos++)
         {
@@ -4000,7 +4030,6 @@ CMathContent.prototype =
             }
             else if(this.content[pos].Type == para_Math_Run)
                 this.content[pos].Math_SetGaps(GapsInfo);
-
 
             if(pos > 0)
                 this.recalculateSize_2(pos-1, oMeasure, Parent, ParaMath, RPI);
@@ -4024,10 +4053,10 @@ CMathContent.prototype =
             this.content[pos].Resize(oMeasure, this, ParaMath, NewRPI, this.Compiled_ArgSz);
 
             if(RPI.bEqqArray)
-                this.WidthPoints.UpdatePoint(this.content[pos].size.width);
+                this.InfoPoints.ContentPoints.UpdatePoint(this.content[pos].size.width);
         }
         else if(this.content[pos].Type == para_Math_Run)
-            this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.WidthPoints);
+            this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.InfoPoints.ContentPoints);
 
         this.WidthToElement[pos] = this.size.width;
 
@@ -4041,6 +4070,10 @@ CMathContent.prototype =
 
         this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
 
+    },
+    getWidthsPoints: function()
+    {
+        return this.InfoPoints.ContentPoints.Widths;
     },
     IsEqqArray: function()
     {
@@ -4166,45 +4199,46 @@ CMathContent.prototype =
     {
         return false;
     },
-    setPosition: function(PosInfo)
+    setPosition: function(pos)
     {
-        this.pos.x = PosInfo.x;
-        this.pos.y = PosInfo.y;
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
 
-        var NewPosInfo = new CMathPosInfo();
-        NewPosInfo.x = this.pos.x;
-        NewPosInfo.y = this.pos.y + this.size.ascent;
+        var PosInfo = new CMathPointInfo();
+        PosInfo.x = this.pos.x;
+        PosInfo.y = this.pos.y + this.size.ascent;
 
-        if(this.bEqqArray)
+        if(this.RecalcInfo.bEqqArray)
         {
-            NewPosInfo.GWidths       = this.Parent.WidthsPoints;
-            NewPosInfo.GPoints       = this.Parent.Points;
-            NewPosInfo.ContentPoints = this.WidthPoints.Widths;
-            NewPosInfo.GMaxDimWidths = this.Parent.MaxDimWidths;
+            this.InfoPoints.GWidths       = this.Parent.WidthsPoints;
+            this.InfoPoints.GPoints       = this.Parent.Points;
+            this.InfoPoints.GMaxDimWidths = this.Parent.MaxDimWidths;
 
-            NewPosInfo.ApplyAlign();
+            PosInfo.SetInfoPoints(this.InfoPoints);
+            PosInfo.ApplyAlign();
+
+
+            if(this.Id == "91")
+            {
+                console.log("setPosition " + PosInfo.x);
+            }
         }
-
-        var ConsoleY = PosInfo.y + this.size.ascent,
-            id = this.Id;
-
-        console.log("" + id + " : " + ConsoleY);
-
 
         for(var i=0; i < this.content.length; i++)
         {
             if(this.content[i].Type == para_Math_Run)
             {
-                this.content[i].Math_SetPosition(NewPosInfo);
-
+                this.content[i].Math_SetPosition(PosInfo);
             }
             else
             {
-                this.content[i].setPosition(NewPosInfo);
-                NewPosInfo.UpdateX(this.content[i].size.width);
+                var NewPos = new CMathPosition();
+                NewPos.x = PosInfo.x;
+                NewPos.y = PosInfo.y;
+
+                this.content[i].setPosition(NewPos);
+                PosInfo.UpdateX(this.content[i].size.width);
             }
-
-
         }
     },
     ///// properties /////
@@ -4242,24 +4276,74 @@ CMathContent.prototype =
 
     /// For Para Math
 
-    Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    old_Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         var result;
 
-        if(this.content[this.CurPos].Type == para_Math_Composition)
+        var PointInfo = new CMathPointInfo();
+        PointInfo.SetInfoPoints(this.InfoPoints);
+
+        if(this.RecalcInfo.bEqqArray)
         {
-            result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-        }
-        else if(this.content[this.CurPos].Type == para_Math_Run)
-        {
+            _X = this.pos.x + this.ParaMath.X + PointInfo.GetAlign();
             Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-            _X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos];
 
+            for(var i = 0; i < this.CurPos; i++)
+            {
+                if(this.content[this.CurPos].Type == para_Math_Run)
+                    this.content[i].Recalculate_CurPos(_X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+                else
+                    _X += this.content[i].size.width;
+            }
 
             result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+
+        }
+        else
+        {
+            if(this.content[this.CurPos].Type == para_Math_Composition)
+            {
+                result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+            }
+            else if(this.content[this.CurPos].Type == para_Math_Run)
+            {
+                Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
+                _X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos];
+
+
+                result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+            }
         }
 
         return result;
+    },
+    Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    {
+        _X = this.pos.x + this.ParaMath.X;
+        Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
+
+
+        if(this.RecalcInfo.bEqqArray)
+        {
+            var PointInfo = new CMathPointInfo();
+            PointInfo.SetInfoPoints(this.InfoPoints);
+
+            _X += PointInfo.GetAlign();
+
+            for(var i = 0; i < this.CurPos; i++)
+            {
+                if(this.content[this.CurPos].Type == para_Math_Run)
+                    this.content[i].Recalculate_CurPos(_X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+                else
+                    _X += this.content[i].size.width;
+            }
+        }
+        else
+            _X += this.WidthToElement[this.CurPos];
+
+
+        return this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+
     },
     Check_NearestPos: function(ParaNearPos, Depth)
     {
@@ -4623,7 +4707,7 @@ CMathContent.prototype =
     },
 
     /// функции для работы с курсором
-    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    _Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         var result = false;
         if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
@@ -4641,41 +4725,17 @@ CMathContent.prototype =
 
             if(this.content[pos].Type == para_Math_Run)
             {
-                //SearchPos.CurX += W;
                 if(this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
                 {
                     SearchPos.Pos.Update(pos, Depth);
                     result = true;
                 }
-
-
             }
             else // para_Math_Composition
             {
                 // необязательно попадем непосредственно в GapLeft просто в этом случае не ищем позицию в мат объектах,
                 // это избавит от ошибок, связанных с тем что расстояния до мат объекта и до пустого рана совпадают
                 // если же ран не пустой, то также должны встать в ран (в конец), а не в мат объект
-
-                /*if(SearchPos.X < SearchPos.CurX + this.content[pos].GapLeft)
-                {
-                    SearchPos.CurX -= this.content[pos-1].size.width;
-                    if(this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
-                    {
-                        SearchPos.Pos.Update(pos-1, Depth);
-                        result = true;
-                    }
-                } // аналогично для GapRight
-                else if(SearchPos.CurX + this.content[pos].size.width - this.content[pos].GapRight < SearchPos.X)
-                {
-                    SearchPos.CurX += this.content[pos].size.width + this.content[pos+1].size.width;
-                    if(this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
-                    {
-                        SearchPos.Pos.Update(pos+1, Depth);
-                        result = true;
-                    }
-                }
-                else
-                {*/
 
 
                     if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
@@ -4704,49 +4764,61 @@ CMathContent.prototype =
                         result = true;
                     }
 
-
-                /*}*/
             }
 
             SearchPos.CurX = SearchCurX + this.size.width;
 
-
-            /*if(pos > 0)
-            {
-                SearchPos.CurX -= this.content[pos-1].size.width;
-                if( this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
-                {
-                    SearchPos.Pos.Update(pos-1, Depth);
-                    result = true;
-                }
-            }
-
-
-            if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
-            {
-                SearchPos.Pos.Update(pos, Depth);
-                result = true;
-            }
-
-            //this.findToInternalContent(pos, SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-            //SearchPos.CurX += this.content[pos].size.width;
-
-            if(pos < lng - 1)
-            {
-                //SearchPos.CurX += this.size.width - this.WidthToElement[pos + 1];
-
-                if( this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd) )
-                {
-                    SearchPos.Pos.Update(pos+1, Depth);
-                    result = true;
-                }
-
-                //SearchPos.CurX += this.size.width - this.WidthToElement[pos + 1] + this.content[pos + 1].size.width;
-            }*/
-
-
-
         }
+
+        return result;
+    },
+    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+    {
+        var result = false;
+
+        if(this.content.length > 0) // случай , если у нас контент не заполнен, не предусмотрен
+        {
+            var pos = 0;
+            var lng = this.content.length;
+
+            var PointInfo = new CMathPointInfo();
+            PointInfo.SetInfoPoints(this.InfoPoints);
+
+            if(this.RecalcInfo.bEqqArray)
+                SearchPos.CurX += PointInfo.GetAlign();
+
+            SearchPos.CurY = this.pos.y + this.ParaMath.Y + this.size.ascent;
+
+            while(pos < lng)
+            {
+                //result = this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd, PointInfo);
+
+                if(this.content[pos].Type == para_Math_Composition)
+                {
+                    if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
+                    {
+                        SearchPos.Pos.Update(pos, Depth);
+                        result = true;
+                    }
+                }
+                else
+                {
+                    if(this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd, PointInfo))
+                    {
+                        SearchPos.Pos.Update(pos, Depth);
+                        result = true;
+                    }
+                }
+
+                pos++;
+            }
+        }
+
+        /*if(this.bRoot)
+        {
+            var pos = SearchPos.Pos.Get(Depth+1);
+            console.log("SearchPos.Pos " +  pos);
+        }*/
 
         return result;
     },
@@ -5355,12 +5427,6 @@ CMathContent.prototype =
             if(start !== end)
                 this.content[end].Selection_Remove();
         }
-        /*else
-            console.log("True");*/
-
-
-        /*this.Selection.Start = this.CurPos;
-        this.Selection.End   = this.CurPos;*/
 
         this.Selection.Use = false;
     },

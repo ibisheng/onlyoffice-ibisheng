@@ -283,10 +283,13 @@ CMathMatrix.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLi
         H += Heights[i] + this.gaps.row[i];
     }
 
-    var SearchCurX = SearchPos.CurX;
-    var align = this.align(CurrX, CurrY);
+    var SearchCurX = SearchPos.CurX + this.GapLeft + W_CurX ;
 
-    SearchPos.CurX += this.GapLeft + W_CurX + align.x;
+    if(this.kind === MATH_MATRIX)
+    {
+        SearchPos.CurX += this.align(CurrX, CurrY).x;
+    }
+
 
     var result =  this.elements[CurrX][CurrY].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
 
@@ -770,7 +773,7 @@ CEqArray.prototype.getMetrics = function(RPI)
 
         for(var i = 0; i < this.nRow; i++)
         {
-            var WidthsRow = this.elements[i][0].WidthPoints.Widths,
+            var WidthsRow = this.elements[i][0].getWidthsPoints(),
                 len = WidthsRow.length;
 
             if(Pos < len)

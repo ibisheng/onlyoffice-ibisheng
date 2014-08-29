@@ -3760,8 +3760,6 @@ CDelimiter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
         sepWidth = this.sepOper.size.width,
         endWidth = this.endOper.size.width;
 
-    SearchPos.Pos.Update(0, Depth);
-
     SearchPos.CurX += begWidth + this.GapLeft;
 
     var result;
@@ -3770,6 +3768,7 @@ CDelimiter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
     {
         if(this.elements[0][j].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
         {
+            SearchPos.Pos.Update(0, Depth);
             SearchPos.Pos.Update(j, Depth+1);
             result = true;
         }
@@ -3987,12 +3986,15 @@ CCharacter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
 {
     var align = (this.size.width - this.elements[0][0].size.width)/2;
 
-    SearchPos.Pos.Update(0, Depth);
-    SearchPos.Pos.Update(0, Depth+1);
-
     SearchPos.CurX += this.GapLeft + align;
 
     var result = this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+
+    if(result)
+    {
+        SearchPos.Pos.Update(0, Depth);
+        SearchPos.Pos.Update(0, Depth+1);
+    }
 
     SearchPos.CurX += this.GapRight + align;
 

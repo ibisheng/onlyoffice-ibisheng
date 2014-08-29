@@ -1150,10 +1150,6 @@ CRadical.prototype.setPosition = function(pos, PosInfo)
     }
     else if(this.Pr.type == DEGREE_RADICAL)
     {
-        /*var degr = this.elements[0][0].size,
-            base = this.elements[0][1].size,
-            sign = this.signRadical.size;*/
-
         var wTick = this.signRadical.measure.widthTick;
 
         var PosDegree = new CMathPosition();
@@ -1216,54 +1212,15 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 }
 CRadical.prototype.draw = function(x, y, pGraphics)
 {
-    //////  test   //////
-
-    /*var xx = x + this.pos.x,
-        yy = y + this.pos.y,
-        w = this.size.width,
-        h = this.size.height;
-
-    pGraphics.p_width(1000);
-    pGraphics.b_color1(0,0,250, 255);
-
-    pGraphics._s();
-    pGraphics._m(xx, yy);
-    pGraphics._l(xx + w, yy);
-    pGraphics._l(xx + w, yy + h);
-    pGraphics._l(xx, yy + h);
-    pGraphics._l(xx, yy);
-    pGraphics.df();*/
-
-
     this.signRadical.draw(x, y, pGraphics);
     CRadical.superclass.draw.call(this, x, y, pGraphics);
 }
 CRadical.prototype.getBase = function()
 {
-    /*var base = null;
-
-    if(this.Pr.type == SQUARE_RADICAL)
-        base = this.elements[0][0];
-    else if(this.Pr.type == DEGREE_RADICAL)
-        base = this.elements[0][1];*/
-
     return this.Base;
 }
 CRadical.prototype.getDegree = function()
 {
-    /*var degree = null;
-    if(this.type == DEGREE_RADICAL)
-        degree = this.elements[0][0];
-    else if(this.type = SQUARE_RADICAL)
-        degree = this.elements[0][0];*/
-
-    // для стремной ситуации, когда руками в xml выставили в degHide true, а объект со степенью имеется, возвращаем основание
-
-    /*var iterator = null;
-
-    if(this.Pr.degHide == false)
-        iterator = this.elements[0][0];*/
-
     return this.Iterator;
 }
 CRadical.prototype.getPropsForWrite = function()

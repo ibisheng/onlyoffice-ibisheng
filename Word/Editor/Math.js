@@ -25,8 +25,6 @@ function ParaMath()
 
     this.Root       = new CMathContent();
     this.Root.bRoot = true;
-    this.NotDraw    = false;
-    //this.Root.setComposition(this);
 
     this.X          = 0;
     this.Y          = 0;
@@ -548,20 +546,15 @@ ParaMath.prototype =
 
         this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize,  TextPr);
 
-        this.NotDraw = RPI.bManyRuns;
-
         //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
         this.OldMathPara = this.MathPara;
 
-
-
-        var PosInfo = new CMathPosInfo();
 
         var pos = new CMathPosition();
         pos.x = 0;
         pos.y = 0;
 
-        this.Root.setPosition(pos, PosInfo);
+        this.Root.setPosition(pos);
 
         this.Width        = this.Root.size.width;
         this.Height       = this.Root.size.height;
@@ -1235,8 +1228,7 @@ ParaMath.prototype =
             // this.absPos.x ~> this.X
             // this.absPos.y ~> this.Y
 
-            //if(this.NotDraw == false)
-                this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
+            this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
 
             PDSE.X += this.Width;
 
@@ -1338,18 +1330,6 @@ ParaMath.prototype =
 
             Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
-
-            /*var  str = "Get_ParaContentPosByXY :";
-
-            //console.log("Get_ParaContentPosByXY");
-            for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-            {
-                str += SearchPos.Pos.Data[i]  + " ";
-            }
-
-            if(this.Id == "80")
-                console.log(str);*/
-
             if ( D >= - 0.001 && D <= Dx + 0.001 )
             {
                 SearchPos.DiffX =  0.001;
@@ -1407,14 +1387,6 @@ ParaMath.prototype =
 
         this.Root.Get_ParaContentPos(bSelection, bStart, ContentPos);
 
-        /*console.log("Get_ParaContentPos");
-        var str = "";
-        for(var i = 0; i < ContentPos.Data.length; i++)
-        {
-            str += ContentPos.Data[i] + ", ";
-        }
-
-        console.log(str);*/
 
         return ContentPos;
     },
@@ -1479,15 +1451,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Get_StartEndPos
         this.Root.Get_WordStartPos(SearchPos, ContentPos, Depth, UseContentPos, false);
-
-        /*var str = "";
-
-        for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-        {
-            str += SearchPos.Pos.Data[i] + "  ";
-        }
-
-        console.log(str);*/
     },
 
     Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
