@@ -6238,10 +6238,14 @@ Range.prototype.merge=function(type){
 	if(null == type)
 		type = c_oAscMergeOptions.Merge;
 	var oBBox = this.bbox;
-	if(oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2)
-		return;
 	History.Create_NewPoint();
-	History.StartTransaction();
+	History.StartTransaction();	
+	if(oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2){
+		if(type == c_oAscMergeOptions.MergeCenter)
+			this.setAlignHorizontal("center");
+		History.EndTransaction();
+		return;
+	}
 	if(this.hasMerged())
 	{
 		this.unmerge();
