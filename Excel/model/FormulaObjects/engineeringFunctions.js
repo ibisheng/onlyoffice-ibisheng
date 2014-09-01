@@ -394,7 +394,7 @@ function convertFromTo( src, from, to, charLim ) {
 
 function Complex( r, i, suffix ) {
     if ( arguments.length == 1 ) {
-        return this.parseComplexStr( arguments[0] );
+        return this.ParseString( arguments[0] );
     }
     else {
         this.real = r;
@@ -628,65 +628,257 @@ Complex.prototype = {
             return new cError( cErrorType.not_numeric );
         }
     },
-    ParseString:function ( rStr, rCompl ) {
+    ParseString:function ( rStr ) {
 
-        var pStr = rStr;
+        var pStr = {pStr:rStr}, f = {f:undefined};
 
-        if ( this.isImagUnit( pStr ) && rStr.length == 1 ) {
-
+        if ( this.isImagUnit( pStr.pStr[0] ) && rStr.length == 1 ) {
             this.real = 0;
             this.img = 1;
             this.suffix = pStr;
-
-            return true;
+            return this;
         }
 
-        var f;
+        if ( !this.ParseDouble( pStr, f ) ) {
+            return new cError( cErrorType.not_numeric );
+        }
 
-        if ( !ParseDouble( pStr, f ) )
-            return false;
-
-        switch ( pStr ) {
+        switch ( pStr.pStr[0] ) {
             case '-':   // imag part follows
             case '+':
             {
-                var r = f;
-                if ( this.isImagUnit( pStr[ 1 ] ) ) {
-                    rCompl.c = pStr[ 1 ];
-                    if ( pStr[ 2 ] == 0 ) {
-                        rCompl.r = f;
-                        rCompl.i = ( pStr == '+' ) ? 1.0 : -1.0;
-                        return true;
+                var r = f.f;
+
+                if ( this.isImagUnit( pStr.pStr[ 1 ] ) ) {
+                    this.c = pStr.pStr[ 1 ];
+                    if ( pStr.pStr[ 2 ] === undefined ) {
+                        this.real = f.f;
+                        this.img = ( pStr.pStr[0] == '+' ) ? 1.0 : -1.0;
+                        return this;
                     }
                 }
-                else if ( ParseDouble( pStr, f ) && this.isImagUnit( pStr ) ) {
-                    rCompl.c = pStr;
-                    pStr++;
-                    if ( pStr == 0 ) {
-                        rCompl.r = r;
-                        rCompl.i = f;
-                        return true;
+                else if ( this.ParseDouble( pStr, f ) && this.isImagUnit( pStr.pStr[0] ) ) {
+                    this.c = pStr.pStr;
+                    if ( pStr.pStr[2] === undefined ) {
+                        this.real = r;
+                        this.img = f.f;
+                        return this;
                     }
                 }
                 break;
             }
             case 'j':
             case 'i':
-                rCompl.c = pStr;
-                pStr++;
-                if ( pStr == 0 ) {
-                    rCompl.i = f;
-                    rCompl.r = 0.0;
-                    return true;
+                this.c = pStr;
+                if ( pStr.pStr[1] === undefined ) {
+                    this.img = f.f;
+                    this.real = 0.0;
+                    return this;
                 }
                 break;
             case 0:     // only real-part
-                rCompl.r = f;
-                rCompl.i = 0.0;
-                return true;
+                this.real = f.f;
+                this.img = 0.0;
+                return this;
+        }
+        return new cError( cErrorType.not_numeric );
+    },
+    ParseDouble:function ( rp, rRet ) {
+
+        function IsNum( c ) {
+            return c >= '0' && c <= '9';
         }
 
-        return sal_False;
+
+        function IsComma( c ) {
+            return c == '.' || c == ',';
+        }
+
+
+        function IsExpStart( c ) {
+            return c == 'e' || c == 'E';
+        }
+
+
+        function IsImagUnit( c ) {
+            return c == 'i' || c == 'j';
+        }
+
+        var fInt = 0.0,
+            fFrac = 0.0,
+            fMult = 0.1, // multiplier to multiply digits with, when adding fractional ones
+            nExp = 0,
+            nMaxExp = 307,
+            nDigCnt = 18, // max. number of digits to read in, rest doesn't matter
+            State = {
+                S_End:0,
+                S_Sign:1,
+                S_IntStart:2,
+                S_Int:3,
+                S_IgnoreIntDigs:4,
+                S_Frac:5,
+                S_IgnoreFracDigs:6,
+                S_ExpSign:7,
+                S_Exp:8
+            }, eS = State.S_Sign,
+            bNegNum = false,
+            bNegExp = false,
+            p = rp.pStr, c, i = 0;
+
+        while ( eS ) {
+            c = p[i];
+            switch ( eS ) {
+                case State.S_Sign:
+                    if ( IsNum( c ) ) {
+                        fInt = parseFloat( c );
+                        nDigCnt--;
+                        eS = State.S_Int;
+                    }
+                    else if ( c == '-' ) {
+                        bNegNum = true;
+                        eS = State.S_IntStart;
+                    }
+                    else if ( c == '+' ) {
+                        eS = State.S_IntStart;
+                    }
+                    else if ( IsComma( c ) ) {
+                        eS = State.S_Frac;
+                    }
+                    else {
+                        return false;
+                    }
+                    break;
+                case State.S_IntStart:
+                    if ( IsNum( c ) ) {
+                        fInt = parseFloat( c );
+                        nDigCnt--;
+                        eS = State.S_Int;
+                    }
+                    else if ( IsComma( c ) ) {
+                        eS = State.S_Frac;
+                    }
+                    else if ( IsImagUnit( c ) ) {
+                        rRet.f = 0.0;
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    break;
+                case State.S_Int:
+                    if ( IsNum( c ) ) {
+                        fInt *= 10.0;
+                        fInt += parseFloat( c );
+                        nDigCnt--;
+                        if ( !nDigCnt ) {
+                            eS = State.S_IgnoreIntDigs;
+                        }
+                    }
+                    else if ( IsComma( c ) ) {
+                        eS = State.S_Frac;
+                    }
+                    else if ( IsExpStart( c ) ) {
+                        eS = State.S_ExpSign;
+                    }
+                    else {
+                        eS = State.S_End;
+                    }
+                    break;
+                case State.S_IgnoreIntDigs:
+                    if ( IsNum( c ) ) {
+                        nExp++;
+                    }     // just multiply num with 10... ;-)
+                    else if ( IsComma( c ) ) {
+                        eS = State.S_Frac;
+                    }
+                    else if ( IsExpStart( c ) ) {
+                        eS = State.S_ExpSign;
+                    }
+                    else {
+                        eS = State.S_End;
+                    }
+                    break;
+                case State.S_Frac:
+                    if ( IsNum( c ) ) {
+                        fFrac += parseFloat( c ) * fMult;
+                        nDigCnt--;
+                        if ( nDigCnt ) {
+                            fMult *= 0.1;
+                        }
+                        else {
+                            eS = State.S_IgnoreFracDigs;
+                        }
+                    }
+                    else if ( IsExpStart( c ) ) {
+                        eS = State.S_ExpSign;
+                    }
+                    else {
+                        eS = State.S_End;
+                    }
+                    break;
+                case State.S_IgnoreFracDigs:
+                    if ( IsExpStart( c ) ) {
+                        eS = State.S_ExpSign;
+                    }
+                    else if ( !IsNum( c ) ) {
+                        eS = State.S_End;
+                    }
+                    break;
+                case State.S_ExpSign:
+                    if ( IsNum( c ) ) {
+                        nExp = parseFloat( c );
+                        eS = State.S_Exp;
+                    }
+                    else if ( c == '-' ) {
+                        bNegExp = true;
+                        eS = State.S_Exp;
+                    }
+                    else if ( c != '+' ) {
+                        eS = State.S_End;
+                    }
+                    break;
+                case State.S_Exp:
+                    if ( IsNum( c ) ) {
+                        nExp *= 10;
+                        nExp += parseFloat( c );
+                        if ( nExp > nMaxExp ) {
+                            return false;
+                        }
+                    }
+                    else {
+                        eS = State.S_End;
+                    }
+                    break;
+                case State.S_End:     // to avoid compiler warning
+                    break;      // loop exits anyway
+            }
+
+            i++;
+        }
+
+        i--;        // set pointer back to last
+        rp.pStr = p.substr( i );
+
+        fInt += fFrac;
+        var nLog10 = Math.log10( fInt );
+
+        if ( bNegExp ) {
+            nExp = -nExp;
+        }
+
+        if ( nLog10 + nExp > nMaxExp ) {
+            return false;
+        }
+
+        fInt = fInt * Math.pow( 10.0, nExp );
+
+        if ( bNegNum ) {
+            fInt = -fInt;
+        }
+
+        rRet.f = fInt;
+
+        return true;
     }
 
 }
