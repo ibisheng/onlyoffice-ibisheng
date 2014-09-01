@@ -233,6 +233,13 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 			var api_sheet = window["Asc"]["editor"];
 			chart_space.setWorksheet(api_sheet.wb.getWorksheet().model);
 		}
+        else
+        {
+            if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides && editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
+            {
+                chart_space.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+            }
+        }
 		CheckSpPrXfrm(chart_space);
 		chart_space.spPr.xfrm.setOffX(0);
 		chart_space.spPr.xfrm.setOffY(0);

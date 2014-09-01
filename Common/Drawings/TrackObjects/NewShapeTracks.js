@@ -14,6 +14,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.arrowsCount = 0;
     this.transform = new CMatrix();
     this.pageIndex = pageIndex;
+    this.theme = theme;
 
     ExecuteNoHistory(function(){
         var style;
@@ -31,8 +32,18 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             this.arrowsCount = 2;
         }
 
+        var spDef = theme.spDef;
         if(presetGeom !== "textRect")
-            style = CreateDefaultShapeStyle(this.presetGeom);
+        {
+            if(spDef && spDef.style)
+            {
+                style = spDef.style.createDuplicate();
+            }
+            else
+            {
+                style = CreateDefaultShapeStyle(this.presetGeom);
+            }
+        }
         else
             style = CreateDefaultTextRectStyle();
         var brush = theme.getFillStyle(style.fillRef.idx);
@@ -79,6 +90,21 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 pen.setHeadEnd(new EndArrow());
                 pen.headEnd.setType(LineEndType.Arrow);
                 pen.headEnd.setLen(LineEndSize.Mid);
+            }
+        }
+        if(presetGeom !== "textRect")
+        {
+            if(spDef && spDef.spPr )
+            {
+                if(spDef.spPr.Fill )
+                {
+                    brush.merge(spDef.spPr.Fill);
+                }
+
+                if(spDef.spPr.ln )
+                {
+                    pen.merge(spDef.spPr.ln);
+                }
             }
         }
 
@@ -360,23 +386,33 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         {
             shape.spPr.setGeometry(CreateGeometry("rect"));
             shape.spPr.geometry.setParent(shape.spPr);
-            shape.setStyle(CreateDefaultTextRectStyle());
+            var fill, ln;
+            if(!drawingObjects || !drawingObjects.cSld)
+            {
+                shape.setStyle(CreateDefaultTextRectStyle());
 
-            var fill = new CUniFill();
-            fill.setFill(new CSolidFill());
-            fill.fill.setColor(new CUniColor());
-            fill.fill.color.setColor(new CSchemeColor());
-            fill.fill.color.color.setId(12);
-            shape.spPr.setFill(fill);
+                fill = new CUniFill();
+                fill.setFill(new CSolidFill());
+                fill.fill.setColor(new CUniColor());
+                fill.fill.color.setColor(new CSchemeColor());
+                fill.fill.color.color.setId(12);
+                shape.spPr.setFill(fill);
 
-            var ln = new CLn();
-            ln.setW(6350);
-            ln.setFill(new CUniFill());
-            ln.Fill.setFill(new CSolidFill());
-            ln.Fill.fill.setColor(new CUniColor());
-            ln.Fill.fill.color.setColor(new CPrstColor());
-            ln.Fill.fill.color.color.setId("black");
-            shape.spPr.setLn(ln);
+                ln = new CLn();
+                ln.setW(6350);
+                ln.setFill(new CUniFill());
+                ln.Fill.setFill(new CSolidFill());
+                ln.Fill.fill.setColor(new CUniColor());
+                ln.Fill.fill.color.setColor(new CPrstColor());
+                ln.Fill.fill.color.color.setId("black");
+                shape.spPr.setLn(ln);
+            }
+            else
+            {
+                fill = new CUniFill();
+                fill.setFill(new CNoFill());
+                shape.spPr.setFill(fill);
+            }
             if(bFromWord)
             {
                 shape.setTextBoxContent(new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
@@ -413,6 +449,32 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                     ln.headEnd.setLen(LineEndSize.Mid);
                 }
                 shape.spPr.setLn(ln);
+            }
+            var spDef = this.theme && this.theme.spDef;
+            if(spDef)
+            {
+                if(spDef.style)
+                {
+                    shape.setStyle(spDef.style.createDuplicate());
+                }
+                if(spDef.spPr)
+                {
+                    if(spDef.spPr.Fill)
+                    {
+                        shape.spPr.setFill(spDef.spPr.Fill.createDuplicate());
+                    }
+                    if(spDef.spPr.ln)
+                    {
+                        if(shape.spPr.ln)
+                        {
+                            shape.spPr.ln.merge(spDef.spPr.ln);
+                        }
+                        else
+                        {
+                            shape.spPr.setLn(spDef.spPr.ln.createDuplicate());
+                        }
+                    }
+                }
             }
         }
         return shape;

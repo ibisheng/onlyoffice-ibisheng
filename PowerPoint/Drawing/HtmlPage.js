@@ -25,16 +25,7 @@ var X_Right_Field  = Page_Width  - X_Right_Margin;
 var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
 var Y_Top_Field    = Y_Top_Margin;
 
-var docpostype_Content     = 0x00;
-var docpostype_FlowObjects = 0x01;
-var docpostype_HdrFtr      = 0x02;
 
-var selectionflag_Common        = 0x00;
-var selectionflag_Numbering     = 0x01;
-var selectionflag_DrawingObject = 0x002;
-
-var orientation_Portrait  = 0x00;
-var orientation_Landscape = 0x01;
 
 var GlobalSkinTeamlab = {
     BackgroundColor : "#B0B0B0",
@@ -2366,7 +2357,7 @@ function CEditorPage(api)
             this.m_oLogicDocument.Slides[drDoc.SlideCurrent].drawSelect();
 
             var elements = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].graphicObjects;
-            if (elements.State.id!=0 && -1 != drDoc.SlideCurrent)
+            if (!elements.canReceiveKeyPress() && -1 != drDoc.SlideCurrent)
             {
                 var drawPage = drDoc.SlideCurrectRect;
                 drDoc.AutoShapesTrack.init(overlay, drawPage.left, drawPage.top, drawPage.right, drawPage.bottom, this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
@@ -2940,7 +2931,6 @@ function CEditorPage(api)
         for (var i = 0; i < _len; i++)
         {
             _layouts[i].recalculate();
-            _layouts[i].recalculate2();
 
             _layouts[i].ImageBase64 = this.m_oLayoutDrawer.GetThumbnail(_layouts[i]);
             _layouts[i].Width64 = this.m_oLayoutDrawer.WidthPx;

@@ -155,38 +155,10 @@ CGraphicObjects.prototype =
     },
 
     createImage: DrawingObjectsController.prototype.createImage,
+    getChartObject: DrawingObjectsController.prototype.getChartObject,
+    getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
 
-    getChartSpace: function(chart, options)
-    {
-        var ret = null;
-        if(isRealObject(chart) && typeof chart["binary"] === "string" && chart["binary"].length > 0)
-        {
-            var asc_chart_binary = new Asc.asc_CChartBinary();
-            asc_chart_binary.asc_setBinary(chart["binary"]);
-            ret = asc_chart_binary.getChartSpace(this.document);
-            if(ret.spPr && ret.spPr.xfrm)
-            {
-                ret.spPr.xfrm.setOffX(0);
-                ret.spPr.xfrm.setOffY(0);
-            }
-            ret.setBDeleted(false);
-        }
-        else if(isRealObject(chart))
-        {
-            ret = DrawingObjectsController.prototype._getChartSpace.call(this, chart, options);
-            ret.setBDeleted(false);
-            ret.setStyle(2);
-            ret.setSpPr(new CSpPr());
-            ret.spPr.setParent(ret);
-            ret.spPr.setXfrm(new CXfrm());
-            ret.spPr.xfrm.setParent(ret.spPr);
-            ret.spPr.xfrm.setOffX(0);
-            ret.spPr.xfrm.setOffY(0);
-            ret.spPr.xfrm.setExtX(152);
-            ret.spPr.xfrm.setExtY(89);
-        }
-        return ret;
-    },
+
 
     clearPreTrackObjects: function()
     {
@@ -601,7 +573,7 @@ CGraphicObjects.prototype =
     editChart: function(chart)
     {
         var bin_object = {"binary":chart};
-        var chart_space = this.getChartSpace(bin_object, null), select_start_page, parent_paragraph, nearest_pos;
+        var chart_space = this.getChartSpace2(bin_object, null), select_start_page, parent_paragraph, nearest_pos;
         if(this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
         {
             var parent_group = this.selection.groupSelection.selectedObjects[0].group;
@@ -669,76 +641,6 @@ CGraphicObjects.prototype =
         }
     },
 
-    getChartObject: function(type)
-    {
-        if(null != type)
-        {
-            return ExecuteNoHistory(function()
-            {
-				var options = new asc_ChartSettings();
-				options.type = type;
-                options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
-				var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
-					parsedHeaders: {bLeft: true, bTop: true}};
-                var ret = this.getChartSpace(chartSeries, options);
-                if (!ret) {
-					chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this,
-						c_oAscChartTypeSettings.barNormal), parsedHeaders: {bLeft: true, bTop: true}};
-					ret = this.getChartSpace(chartSeries, options);
-                }
-                if(type === c_oAscChartTypeSettings.scatter)
-                {
-                    var new_hor_axis_settings = new asc_ValAxisSettings();
-                    new_hor_axis_settings.setDefault();
-                    options.putHorAxisProps(new_hor_axis_settings);
-                    var new_vert_axis_settings = new asc_ValAxisSettings();
-                    new_vert_axis_settings.setDefault();
-                    options.putVertAxisProps(new_vert_axis_settings);
-                    options.putHorGridLines(c_oAscGridLinesSettings.major);
-                    options.putVertGridLines(c_oAscGridLinesSettings.major);
-                    options.putShowMarker(true);
-                    options.putSmooth(null);
-                    options.putLine(false);
-                }
-                options.type = null;
-                this.applyPropsToChartSpace(options, ret);
-                ret.theme = this.document.theme;
-                CheckSpPrXfrm(ret);
-                ret.spPr.xfrm.setOffX(0);
-                ret.spPr.xfrm.setOffY(0);
-                ret.theme = this.document.theme;
-                return ret;
-            }, this, []);
-        }
-        else
-        {
-            if(this.selection.groupSelection)
-            {
-                if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
-                {
-                    this.selection.groupSelection.selectedObjects[0].theme = this.document.theme;
-                    ExecuteNoHistory(function()
-                    {
-                        CheckSpPrXfrm2(this.selection.groupSelection.selectedObjects[0]);
-                    }, this, []);
-                    return this.selection.groupSelection.selectedObjects[0];
-                }
-            }
-            else
-            {
-                if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
-                {
-                    this.selectedObjects[0].theme = this.document.theme;
-                    ExecuteNoHistory(function()
-                    {
-                        CheckSpPrXfrm2(this.selectedObjects[0]);
-                    }, this, []);
-                    return this.selectedObjects[0];
-                }
-            }
-        }
-        return null;
-    },
 
 
     mergeDrawings: function(pageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables)

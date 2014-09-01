@@ -7277,18 +7277,18 @@ function ParaPresentationNumbering()
 
 ParaPresentationNumbering.prototype =
 {
-    Draw : function(X, Y, Context, FirstTextPr)
+    Draw : function(X, Y, Context, FirstTextPr, PDSE)
     {
-        this.Bullet.Draw( X, Y, Context, FirstTextPr );
+        this.Bullet.Draw( X, Y, Context, FirstTextPr, PDSE );
     },
 
-    Measure : function (Context, FirstTextPr)
+    Measure : function (Context, FirstTextPr, Theme)
     {
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
 
-        var Temp = this.Bullet.Measure( Context, FirstTextPr, this.BulletNum );
+        var Temp = this.Bullet.Measure( Context, FirstTextPr, this.BulletNum, Theme );
 
         this.Width        = Temp.Width;
         this.WidthVisible = Temp.Width;
@@ -7318,6 +7318,14 @@ ParaPresentationNumbering.prototype =
 
     Read_FromBinary : function(Reader)
     {
+    },
+
+    Check_Range : function(Range, Line)
+    {
+        if ( null !== this.Item && null !== this.Run && Range === this.Range && Line === this.Line )
+            return true;
+
+        return false;
     }
 };
 

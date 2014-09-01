@@ -96,7 +96,9 @@ StartAddNewShape.prototype =
                 shape.setParent(drawing);
                 drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
                 drawing.Set_Distance( 3.2,  0,  3.2, 0 );
+                nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                 nearest_pos.Page = this.pageIndex;
+
                 drawing.Set_XYForAdd(bounds.min_x, bounds.min_y, nearest_pos, this.pageIndex);
                 drawing.Add_ToDocument(nearest_pos, false);
                 this.drawingObjects.resetSelection();

@@ -1067,10 +1067,6 @@ Geometry.prototype=
             drawingDocument.DrawAdjustment(transform, _adjustments[_adj_index].posX, _adjustments[_adj_index].posY);
     },
 
-    hitToPath: function(hitCanvasContext, x, y)
-    {
-        return false;
-    },
 
 
     canFill: function()

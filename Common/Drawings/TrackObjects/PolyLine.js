@@ -106,7 +106,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         var min_dist;
         if(drawingObjects)
         {
-            min_dist = drawingObjects.convertMetric(3, 0, 3);
+            min_dist = drawingObjects.convertPixToMM(3);
         }
         else
         {

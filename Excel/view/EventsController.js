@@ -169,8 +169,9 @@
 			var oShapeCursor = document.getElementById("id_target_cursor");
 			if (null != oShapeCursor && oShapeCursor.addEventListener) {
 				oShapeCursor.addEventListener("mousedown"	, function () {return self._onMouseDown.apply(self, arguments);}, false);
-				oShapeCursor.addEventListener("mouseup"		, function () {return self._onMouseUp.apply(self, arguments);}	, false);
+				oShapeCursor.addEventListener("mouseup"		, function () {return self._onMouseUp.apply(self, arguments);}, false);
 				oShapeCursor.addEventListener("mousemove"	, function () {return self._onMouseMove.apply(self, arguments);}, false);
+                oShapeCursor.addEventListener("mouseleave"	, function () {return self._onMouseLeave.apply(self, arguments);}, false);
 			}
 
     		return this;

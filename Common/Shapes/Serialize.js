@@ -4860,6 +4860,7 @@ function BinaryPPTYLoader()
                     _stream.size = s.size;
 
                     _chart = new CChartSpace();
+                    _chart.setBDeleted(false);
                     var oBinaryChartReader = new BinaryChartReader(_stream);
                     oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     _chart.setBDeleted(false);
@@ -4952,7 +4953,8 @@ function BinaryPPTYLoader()
                 }
                 case 2:
                 {
-                    _table = this.ReadTable(_xfrm, _graphic_frame);
+                    s.Seek2(_end_rec);
+                    //_table = this.ReadTable(_xfrm, _graphic_frame);
                     break;
                 }
                 case 3:
@@ -4968,8 +4970,9 @@ function BinaryPPTYLoader()
                         _stream.cur = s.cur;
                         _stream.size = s.size;
                         _chart = new CChartSpace();
-                        var oBinaryChartReader = new BinaryChartReader(this.stream);
-                        oBinaryChartReader.ExternalReadCT_ChartSpace(length, _chart);
+                        _chart.setBDeleted(false);
+                        var oBinaryChartReader = new BinaryChartReader(_stream);
+                        oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     }
 
                     s.Seek2(_pos + _length);
@@ -4997,9 +5000,8 @@ function BinaryPPTYLoader()
         }
         else if (_chart != null)
         {
-            _chart.spPr.xfrm = _xfrm;
-            _chart.setAscChart(_chart.chart);
-            _chart.setSpPr(_chart.spPr);
+            _chart.spPr.setXfrm(_xfrm);
+            _xfrm.setParent(_chart.spPr);
             return _chart;
         }
 
@@ -5899,7 +5901,7 @@ function BinaryPPTYLoader()
         }
 
         s.Seek2(_end_rec);
-
+        //checkTextPr(rPr);
         return rPr;
     }
 

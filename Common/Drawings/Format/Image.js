@@ -232,22 +232,13 @@ CImageShape.prototype =
 
 
 
-    hitToPath: CShape.prototype.hitToPath,
     getParentObjects: CShape.prototype.getParentObjects,
 
     hitInPath: CShape.prototype.hitInPath,
     hitInInnerArea: CShape.prototype.hitInInnerArea,
     getRotateAngle: CShape.prototype.getRotateAngle,
 
-    changeSize: function(kw, kh)
-    {
-        if(this.spPr.xfrm.isNotNull())
-        {
-            var xfrm = this.spPr.xfrm;
-            this.setOffset(xfrm.offX*kw, xfrm.offY*kh);
-            this.setExtents(xfrm.extX*kw, xfrm.extY*kh);
-        }
-    },
+    changeSize: CShape.prototype.changeSize,
 
 
 
@@ -396,20 +387,6 @@ CImageShape.prototype =
     hitInTextRect: function(x, y)
     {
         return false;
-    },
-
-    hitToTextRect: function()
-    {
-        return false;
-    },
-    hitToBoundsRect: function(x, y)
-    {
-        return false;
-    },
-
-    getType: function()
-    {
-        return DRAWING_OBJECT_TYPE_IMAGE;
     },
 
 
@@ -655,48 +632,6 @@ CImageShape.prototype =
         if(this.drawingBase && !this.group)
         {
             this.drawingBase.setGraphicObjectCoords();
-        }
-    },
-
-
-
-    setXfrm: function(offX, offY, extX, extY, rot, flipH, flipV)
-    {
-        if(this.spPr.xfrm.isNotNull())
-        {
-            if(isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-
-            if(isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-
-            if(isRealNumber(rot))
-                this.setRotate(rot);
-
-            if(isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-        }
-        else
-        {
-            var transform = this.getTransform();
-            if(isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-            else
-                this.setOffset(transform.x, transform.y);
-
-            if(isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-            else
-                this.setExtents(transform.extX, transform.extY);
-
-            if(isRealNumber(rot))
-                this.setRotate(rot);
-            else
-                this.setRotate(transform.rot);
-            if(isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-            else
-                this.setFlips(transform.flipH, transform.flipV);
         }
     },
 

@@ -798,13 +798,17 @@ CGroupShape.prototype =
 
     changeSize: function(kw, kh)
     {
-        if(this.spPr.xfrm.isNotNullForGroup())
+        if(this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNullForGroup())
         {
             var xfrm = this.spPr.xfrm;
-            this.setOffset(xfrm.offX*kw, xfrm.offY*kh);
-            this.setExtents(xfrm.extX*kw, xfrm.extY*kh);
-            this.setChildOffset(xfrm.chOffX*kw, xfrm.chOffY*kh);
-            this.setChildExtents(xfrm.chExtX*kw, xfrm.chExtY*kh);
+            xfrm.setOffX(xfrm.offX * kw);
+            xfrm.setOffY(xfrm.offY * kh);
+            xfrm.setExtX(xfrm.extX * kw);
+            xfrm.setExtY(xfrm.extY * kh);
+            xfrm.setChExtX(xfrm.chExtX*kw);
+            xfrm.setChExtY(xfrm.chExtY*kh);
+            xfrm.setChOffX(xfrm.chOffX*kw);
+            xfrm.setChOffY(xfrm.chOffY*kh);
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {
@@ -1322,115 +1326,7 @@ CGroupShape.prototype =
         return {kd1: 1, kd2: 1};
     },
 
-    setXfrm: function(offX, offY, extX, extY, rot, flipH, flipV)
-    {
-        if(this.spPr.xfrm.isNotNull())
-        {
-            if(isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
 
-            if(isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-
-            if(isRealNumber(rot))
-                this.setRotate(rot);
-
-            if(isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-        }
-        else
-        {
-            var transform = this.getTransform();
-            if(isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-            else
-                this.setOffset(transform.x, transform.y);
-
-            if(isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-            else
-                this.setExtents(transform.extX, transform.extY);
-
-            if(isRealNumber(rot))
-                this.setRotate(rot);
-            else
-                this.setRotate(transform.rot);
-            if(isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-            else
-                this.setFlips(transform.flipH, transform.flipV);
-        }
-    },
-
-    setRotate: function(rot)
-    {
-        var xfrm = this.spPr.xfrm;
-        History.Add(this, {Type: historyitem_SetShapeRot, oldRot: xfrm.rot, newRot: rot});
-
-        this.recalcTransform();
-        this.recalcInfo.recalculateTransformText = true;
-        xfrm.rot = rot;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-
-    },
-
-    setOffset: function(offX, offY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY});
-        this.spPr.xfrm.offX = offX;
-        this.spPr.xfrm.offY = offY;
-        this.recalcTransform();
-        this.recalcInfo.recalculateTransformText = true;
-        this.recalcInfo.recalculateScaleCoefficients = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
-    setExtents: function(extX, extY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY});
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
-        this.recalcTransform();
-        this.recalcInfo.recalculateTransformText = true;
-        this.recalcInfo.recalculateGeometry = true;
-        this.recalcInfo.recalculateScaleCoefficients = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-    setChildOffset: function(offX, offY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeChildOffset, oldOffsetX: this.spPr.xfrm.chOffX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.chOffY, newOffsetY: offY});
-        this.spPr.xfrm.chOffX = offX;
-        this.spPr.xfrm.chOffY = offY;
-        this.recalcTransform();
-        this.recalcInfo.recalculateTransformText = true;
-        this.recalcInfo.recalculateScaleCoefficients = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
-    setChildExtents: function(extX, extY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeChildExtents, oldExtentX: this.spPr.xfrm.chExtX, newExtentX: extX, oldExtentY: this.spPr.xfrm.chExtY, newExtentY: extY});
-        this.spPr.xfrm.chExtX = extX;
-        this.spPr.xfrm.chExtY = extY;
-        this.recalcTransform();
-        this.recalcInfo.recalculateTransformText = true;
-        this.recalcInfo.recalculateGeometry = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
-    setFlips: function(flipH, flipV)
-    {
-        History.Add(this, {Type: historyitem_SetShapeFlips, oldFlipH: this.spPr.xfrm.flipH, newFlipH: flipH, oldFlipV: this.spPr.xfrm.flipV, newFlipV: flipV});
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
-        this.recalcTransform();
-        this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
 
 
     changePresetGeom: function(preset)

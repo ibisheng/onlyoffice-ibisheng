@@ -2137,7 +2137,7 @@ CDocumentContent.prototype =
                 else
                 {
                     Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
-                    var Image = this.DrawingObjects.getChartSpace(Chart,null);
+                    var Image = this.DrawingObjects.getChartSpace2(Chart,null);
                     Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
                     Drawing.Update_Size( Image.spPr.xfrm.extX, Image.spPr.xfrm.extY );
@@ -5301,6 +5301,133 @@ CDocumentContent.prototype =
         }
     },
 
+    Set_ParagraphPresentationNumbering : function(Bullet)
+    {
+        if ( true === this.ApplyToAll )
+        {
+            for ( var Index = 0; Index < this.Content.length; Index++ )
+            {
+                this.Content[Index].Add_PresentationNumbering(Bullet);
+            }
+            return;
+        }
+
+        if ( this.CurPos.ContentPos < 0 )
+            return false;
+
+        if ( true === this.Selection.Use )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( EndPos < StartPos )
+            {
+                var Temp = StartPos;
+                StartPos = EndPos;
+                EndPos   = Temp;
+            }
+
+            for ( var Index = StartPos; Index <= EndPos; Index++ )
+            {
+                this.Content[Index].Add_PresentationNumbering(Bullet);
+            }
+            // Нам нужно пересчитать все изменения, начиная с первого элемента,
+            // попавшего в селект.
+            this.ContentLastChangePos = StartPos;
+
+            this.Recalculate();
+
+            return;
+        }
+        this.Content[this.CurPos.ContentPos].Add_PresentationNumbering( Bullet );
+        // Нам нужно пересчитать все изменения, начиная с текущего элемента
+        this.ContentLastChangePos = this.CurPos.ContentPos;
+        this.Recalculate();
+    },
+
+    Can_IncreaseParagraphLevel : function(bIncrease)
+    {
+        if ( true === this.ApplyToAll )
+        {
+            for ( var Index = 0; Index < this.Content.length; Index++ )
+            {
+                if(!this.Content[Index].Can_IncreaseLevel(bIncrease))
+                    return false;
+            }
+            return true;
+        }
+
+        if ( this.CurPos.ContentPos < 0 )
+            return false;
+
+        if ( true === this.Selection.Use )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( EndPos < StartPos )
+            {
+                var Temp = StartPos;
+                StartPos = EndPos;
+                EndPos   = Temp;
+            }
+
+            for ( var Index = StartPos; Index <= EndPos; Index++ )
+            {
+                if(!this.Content[Index].Can_IncreaseLevel(bIncrease))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        return this.Content[this.CurPos.ContentPos].Can_IncreaseLevel( bIncrease );
+    },
+
+    Increase_ParagraphLevel : function(bIncrease)
+    {
+        if(!this.Can_IncreaseParagraphLevel(bIncrease))
+            return;
+        if ( true === this.ApplyToAll )
+        {
+            for ( var Index = 0; Index < this.Content.length; Index++ )
+            {
+                this.Content[Index].Increase_Level(bIncrease);
+            }
+            return;
+        }
+
+        if ( this.CurPos.ContentPos < 0 )
+            return false;
+
+        if ( true === this.Selection.Use )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( EndPos < StartPos )
+            {
+                var Temp = StartPos;
+                StartPos = EndPos;
+                EndPos   = Temp;
+            }
+
+            for ( var Index = StartPos; Index <= EndPos; Index++ )
+            {
+                this.Content[Index].Increase_Level(bIncrease);
+            }
+            // Нам нужно пересчитать все изменения, начиная с первого элемента,
+            // попавшего в селект.
+            this.ContentLastChangePos = StartPos;
+
+            this.Recalculate();
+
+            return;
+        }
+        this.Content[this.CurPos.ContentPos].Increase_Level( bIncrease );
+        // Нам нужно пересчитать все изменения, начиная с текущего элемента
+        this.ContentLastChangePos = this.CurPos.ContentPos;
+        this.Recalculate();
+    },
+
     Set_ParagraphShd : function(Shd)
     {
         if ( true === this.ApplyToAll )
@@ -7153,8 +7280,15 @@ CDocumentContent.prototype =
 
                     if(this.DrawingDocument.m_oLogicDocument)
                     {
-                        for ( var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++ )
-                            this.DrawingDocument.OnRecalculatePage( PageIdx, this.DrawingDocument.m_oLogicDocument.Pages[PageIdx] );
+                        if(editor.isDocumentEditor)
+                        {
+                            for ( var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++ )
+                                this.DrawingDocument.OnRecalculatePage( PageIdx, this.DrawingDocument.m_oLogicDocument.Pages[PageIdx] );
+                        }
+                        else
+                        {
+                            this.DrawingDocument.OnRecalculatePage( PageIdx, this.DrawingDocument.m_oLogicDocument.Slides[PageIdx] );
+                        }
                         this.DrawingDocument.OnEndRecalculate(false, true);
                     }
                 }

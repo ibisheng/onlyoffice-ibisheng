@@ -46,8 +46,11 @@ StartAddNewShape.prototype =
         if(this.bStart)
         {
 
-            this.drawingObjects.drawingObjects.objectLocker.reset();
-            this.drawingObjects.drawingObjects.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+            if(this.drawingObjects.drawingObjects.objectLocker)
+            {
+                this.drawingObjects.drawingObjects.objectLocker.reset();
+                this.drawingObjects.drawingObjects.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+            }
             var oThis = this;
             var track =  oThis.drawingObjects.arrTrackObjects[0];
             if(!this.bMoved && this instanceof StartAddNewShape)
@@ -74,7 +77,7 @@ StartAddNewShape.prototype =
                 }
                 this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y);
             }
-            this.drawingObjects.drawingObjects.objectLocker.checkObjects(function(bLock){
+            var callback = function(bLock){
 
                 if(bLock)
                 {
@@ -88,7 +91,12 @@ StartAddNewShape.prototype =
                     {
                         shape.spPr.xfrm.setOffY(0);
                     }
-                    shape.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
+                    oThis.drawingObjects.drawingObjects.getWorksheetModel && shape.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
+                    if(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld)
+                    {
+                        shape.setParent(oThis.drawingObjects.drawingObjects);
+                        shape.setRecalculateInfo();
+                    }
                     shape.addToDrawingObjects();
                     oThis.drawingObjects.checkChartTextSelection();
                     oThis.drawingObjects.resetSelection();
@@ -101,15 +109,42 @@ StartAddNewShape.prototype =
                     oThis.drawingObjects.drawingObjects.sendGraphicObjectProps();
                 }
 
-            });
+            };
+            if(this.drawingObjects.drawingObjects.objectLocker)
+            {
+                this.drawingObjects.drawingObjects.objectLocker.checkObjects(callback);
+            }
+            else
+            {
+                callback(true);
+            }
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.updateOverlay();
-        asc["editor"].asc_endAddShape();
+        if(asc["editor"])
+        {
+            asc["editor"].asc_endAddShape();
+        }
+        else if(editor && editor.sync_EndAddShape)
+        {
+            editor.sync_EndAddShape();
+        }
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 };
 
+
+function checkEmptyPlaceholderContent(content)
+{
+    if(!content || content.Is_Empty() && content.Parent && content.Parent.parent && content.Parent.parent.isPlaceholder && content.Parent.parent.isPlaceholder())
+        return content;
+    return null;
+}
+
+function checkRedrawEmptyPlaceholder()
+{
+
+}
 
 function NullState(drawingObjects)
 {
@@ -120,6 +155,11 @@ NullState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex, bTextFlag)
     {
+        var start_target_doc_content, end_target_doc_content;
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+        }
         var ret;
         var selection = this.drawingObjects.selection;
         var b_no_handle_selected = false;
@@ -127,10 +167,27 @@ NullState.prototype =
         {
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                }
                 return ret;
+            }
             ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
+            {
+                if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                {
+                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                    if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                    {
+                        this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                    }
+                }
                 return ret;
+            }
         }
         else if(selection.chartSelection)
         {}
@@ -143,13 +200,42 @@ NullState.prototype =
         {
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, false);
             if(ret)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                }
                 return ret;
+            }
         }
 
         ret = handleFloatObjects(this.drawingObjects, this.drawingObjects.getDrawingArray(), e, x, y, null, pageIndex, false);
         if(ret)
         {
+            if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                {
+                    this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                }
+            }
             return ret;
+        }
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            if(start_target_doc_content)
+            {
+                this.drawingObjects.drawingObjects.showDrawingObjects(true);
+            }
+            if(this.drawingObjects.drawingObjects.cSld)
+            {
+                this.drawingObjects.stX = x;
+                this.drawingObjects.stY = y;
+                this.drawingObjects.selectionRect = {x : x, y : y, w: 0, h: 0};
+                this.drawingObjects.changeCurrentState(new TrackSelectionRect(this.drawingObjects));
+            }
         }
         return null;
     },
@@ -159,6 +245,72 @@ NullState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {}
+};
+
+function TrackSelectionRect(drawingObjects)
+{
+    this.drawingObjects = drawingObjects;
+
+
+}
+
+TrackSelectionRect.prototype =
+{
+    onMouseDown: function(e, x, y, pageIndex)
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
+        {
+            return {cursorType: "default", objectId: "1"};
+        }
+        return null;
+    },
+    onMouseMove: function(e, x, y, pageIndex)
+    {
+        this.drawingObjects.selectionRect = {x : this.drawingObjects .stX, y : this.drawingObjects .stY, w : x - this.drawingObjects .stX, h : y - this.drawingObjects .stY};
+        editor.WordControl.m_oDrawingDocument.m_oWordControl.OnUpdateOverlay(true);
+    },
+    onMouseUp: function(e, x, y, pageIndex)
+    {
+        var _glyph_index;
+        var _glyphs_array = this.drawingObjects.getDrawingArray();
+        var _glyph, _glyph_transform;
+        var _xlt, _ylt, _xrt, _yrt, _xrb, _yrb, _xlb, _ylb;
+
+        var _rect_l = Math.min(this.drawingObjects.selectionRect.x, this.drawingObjects.selectionRect.x + this.drawingObjects.selectionRect.w);
+        var _rect_r = Math.max(this.drawingObjects.selectionRect.x, this.drawingObjects.selectionRect.x + this.drawingObjects.selectionRect.w);
+        var _rect_t = Math.min(this.drawingObjects.selectionRect.y, this.drawingObjects.selectionRect.y + this.drawingObjects.selectionRect.h);
+        var _rect_b = Math.max(this.drawingObjects.selectionRect.y, this.drawingObjects.selectionRect.y + this.drawingObjects.selectionRect.h);
+        for(_glyph_index = 0; _glyph_index < _glyphs_array.length; ++_glyph_index)
+        {
+            _glyph = _glyphs_array[_glyph_index];
+            _glyph_transform = _glyph.transform;
+
+            _xlt = _glyph_transform.TransformPointX(0, 0);
+            _ylt = _glyph_transform.TransformPointY(0, 0);
+
+            _xrt = _glyph_transform.TransformPointX( _glyph.extX, 0);
+            _yrt = _glyph_transform.TransformPointY( _glyph.extX, 0);
+
+            _xrb = _glyph_transform.TransformPointX( _glyph.extX, _glyph.extY);
+            _yrb = _glyph_transform.TransformPointY( _glyph.extX, _glyph.extY);
+
+            _xlb = _glyph_transform.TransformPointX(0, _glyph.extY);
+            _ylb = _glyph_transform.TransformPointY(0, _glyph.extY);
+
+            if((_xlb >= _rect_l && _xlb <= _rect_r) && (_xrb >= _rect_l && _xrb <= _rect_r)
+                && (_xlt >= _rect_l && _xlt <= _rect_r) && (_xrt >= _rect_l && _xrt <= _rect_r) &&
+                (_ylb >= _rect_t && _ylb <= _rect_b) && (_yrb >= _rect_t && _yrb <= _rect_b)
+                && (_ylt >= _rect_t && _ylt <= _rect_b) && (_yrt >= _rect_t && _yrt <= _rect_b))
+            {
+                this.drawingObjects.selectObject(_glyph, pageIndex);
+            }
+        }
+        this.drawingObjects.selectionRect = null;
+        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        editor.WordControl.m_oDrawingDocument.m_oWordControl.OnUpdateOverlay(true);
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    }
+
 };
 
 
@@ -301,7 +453,7 @@ RotateState.prototype =
             var drawingObjects = this.drawingObjects;
             var oThis = this;
 
-            if(e.CtrlKey && this instanceof MoveState && !(asc["editor"].isChartEditor === true))
+            if(e.CtrlKey && this instanceof MoveState && !(asc["editor"] && asc["editor"].isChartEditor === true))
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
@@ -309,8 +461,18 @@ RotateState.prototype =
                 for(i = 0; i < tracks.length; ++i)
                 {
                     copy = tracks[i].originalObject.copy();
-                    copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
+                    this.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
+                    if(this.drawingObjects.drawingObjects.cSld)
+                    {
+                        copy.setParent(this.drawingObjects.drawingObjects);
+                        if(!copy.spPr || !copy.spPr.xfrm
+                            || (copy.getObjectType() === historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNullForGroup() || copy.getObjectType() !== historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNull()))
+                        {
+                            copy.recalculateTransform();
+                        }
+                    }
                     copy.addToDrawingObjects();
+
                     tracks[i].originalObject = copy;
                     tracks[i].trackEnd(false);
                     this.drawingObjects.selectObject(copy, 0);
@@ -329,7 +491,11 @@ RotateState.prototype =
                             for(i = 0; i < tracks.length; ++i)
                             {
                                 var copy = tracks[i].originalObject.copy();
-                                copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
+                                oThis.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
+                                if(this.drawingObjects.drawingObjects.cSld)
+                                {
+                                    copy.setParent(this.drawingObjects.drawingObjects);
+                                }
                                 copy.setGroup(tracks[i].originalObject.group);
                                 copy.group.addToSpTree(copy.group.length, copy);
                                 tracks[i].originalObject = copy;
@@ -349,39 +515,42 @@ RotateState.prototype =
                             group.updateCoordinatesAfterInternalResize();
                         }
                         //drawingObjects.recalculate();
-                        var arr_x = [], arr_y = [], transform, min_x, min_y, drawing, arr_x2 = [], arr_y2 = [], min_x2, min_y2;
-                        for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
+                        if(!oThis.drawingObjects.drawingObjects.cSld)
                         {
-                            arr_x.length = 0;
-                            arr_y.length = 0;
-                            drawing = oThis.drawingObjects.selectedObjects[i];
-                            drawing.recalculateTransform();
-                            transform = drawing.transform;
-                            arr_x.push(transform.TransformPointX(0, 0));
-                            arr_y.push(transform.TransformPointY(0, 0));
-                            arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, 0));
-                            arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, 0));
-                            arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
-                            arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
-                            arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
-                            arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
-
-                            arr_x2.push(drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX);
-                            arr_y2.push(drawing.spPr.xfrm.offY + drawing.spPr.xfrm.extY);
-
-                            min_x =  Math.min(Math.min.apply(Math, arr_x), drawing.spPr.xfrm.offX);
-                            min_y =  Math.min(Math.min.apply(Math, arr_y), drawing.spPr.xfrm.offY);
-
-                            if(min_x < 0)
+                            var arr_x = [], arr_y = [], transform, min_x, min_y, drawing, arr_x2 = [], arr_y2 = [], min_x2, min_y2;
+                            for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
                             {
-                                drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
+                                arr_x.length = 0;
+                                arr_y.length = 0;
+                                drawing = oThis.drawingObjects.selectedObjects[i];
+                                drawing.recalculateTransform();
+                                transform = drawing.transform;
+                                arr_x.push(transform.TransformPointX(0, 0));
+                                arr_y.push(transform.TransformPointY(0, 0));
+                                arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, 0));
+                                arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, 0));
+                                arr_x.push(transform.TransformPointX(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
+                                arr_y.push(transform.TransformPointY(drawing.spPr.xfrm.extX, drawing.spPr.xfrm.extY));
+                                arr_x.push(transform.TransformPointX(0, drawing.spPr.xfrm.extY));
+                                arr_y.push(transform.TransformPointY(0, drawing.spPr.xfrm.extY));
+
+                                arr_x2.push(drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX);
+                                arr_y2.push(drawing.spPr.xfrm.offY + drawing.spPr.xfrm.extY);
+
+                                min_x =  Math.min(Math.min.apply(Math, arr_x), drawing.spPr.xfrm.offX);
+                                min_y =  Math.min(Math.min.apply(Math, arr_y), drawing.spPr.xfrm.offY);
+
+                                if(min_x < 0)
+                                {
+                                    drawing.spPr.xfrm.setOffX(drawing.spPr.xfrm.offX - min_x);
+                                }
+                                if(min_y < 0)
+                                {
+                                    drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
+                                }
                             }
-                            if(min_y < 0)
-                            {
-                                drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
-                            }
+                            oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
                         }
-                        oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
                     }, []);
             }
 
@@ -1013,6 +1182,11 @@ TextAddState.prototype =
             this.drawingObjects.drawingObjects.showDrawingObjects(true);
         }
         this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        if(editor && editor.isPaintFormat)
+        {
+            this.drawingObjects.paragraphFormatPaste2();
+            editor.sync_PaintFormatCallback(0);
+        }
     }
 
 };

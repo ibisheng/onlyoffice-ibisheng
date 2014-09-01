@@ -286,6 +286,7 @@ function CTextMeasurer()
 
     // RFonts
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
     this.Init = function()
@@ -328,14 +329,20 @@ function CTextMeasurer()
         }
     }
 
-    this.SetTextPr = function(textPr)
+    this.SetTextPr = function(textPr, theme)
     {
-        this.m_oTextPr = textPr.Copy();
-    }
+        this.m_oTextPr = textPr;
+        if (theme)
+        {
+            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
+        }
+        else
+            this.m_oGrFonts = this.m_oTextPr.RFonts;
+    };
 
     this.SetFontSlot = function(slot, fontSizeKoef)
     {
-        var _rfonts = this.m_oTextPr.RFonts;
+        var _rfonts = this.m_oGrFonts;
         var _lastFont = this.m_oLastFont;
 
         switch (slot)
@@ -452,12 +459,30 @@ function CTextMeasurer()
     {
         var Width  = 0;
 
-        var Temp = this.m_oManager.MeasureChar( text.charCodeAt(0) );
+        var Temp = this.m_oManager.MeasureChar( text.charCodeAt(0), true );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
-        return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72)};
+        if (Temp.oBBox.rasterDistances == null)
+        {
+            return {
+                Width  : Width,
+                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+                rasterOffsetX: 0,
+                rasterOffsetY: 0
+            };
+        }
+
+        return {
+            Width  : Width,
+            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
+        };
     }
 
     this.MeasureCode = function(lUnicode)
@@ -468,40 +493,58 @@ function CTextMeasurer()
         var Temp = this.m_oManager.MeasureChar( lUnicode );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
-        Height = 0;//Temp.fHeight;
+        Height = ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72);
 
-        return { Width : Width, Height : Height };
+        return { Width : Width, Height : Height, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72) };
     }
     this.Measure2Code = function(lUnicode)
     {
         var Width  = 0;
 
-        var Temp = this.m_oManager.MeasureChar( lUnicode );
+        var Temp = this.m_oManager.MeasureChar( lUnicode, true );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
-        return { Width : Width, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72), Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG: ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72)};
+        if (Temp.oBBox.rasterDistances == null)
+        {
+            return {
+                Width  : Width,
+                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+                rasterOffsetX: 0,
+                rasterOffsetY: 0
+            };
+        }
+
+        return {
+            Width  : Width,
+            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: (Temp.oBBox.rasterDistances.dist_l + Temp.oBBox.fMinX) * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
+        };
     }
 
     this.GetAscender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Ascender   = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * this.m_oManager.m_lUnits_Per_Em * this.m_oManager.m_lAscender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lAscender;
+        var Ascender   = this.m_oManager.m_lAscender;
 
         return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     }
     this.GetDescender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Descender  = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * this.m_oManager.m_lUnits_Per_Em * this.m_oManager.m_lDescender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lDescender;
+        var Descender  = this.m_oManager.m_lDescender;
 
         return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     }
     this.GetHeight = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Height     = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * this.m_oManager.m_lUnits_Per_Em : this.m_oManager.m_lLineHeight;
+        var Height     = this.m_oManager.m_lLineHeight;
 
         return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     }
@@ -1327,12 +1370,12 @@ function CDrawingDocument()
         var _oldTurn = editor.isViewMode;
         editor.isViewMode = true;
 
-        var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
+        var docContent = new CDocumentContent(this.m_oWordControl.m_oLogicDocument, this.m_oWordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
+        var par = docContent.Content[0];
 
         par.Cursor_MoveToStartPos();
 
-        var _paraPr = new CParaPr();
-        par.Pr = _paraPr;
+        par.Set_Pr(new CParaPr());
         var _textPr = new CTextPr();
         _textPr.FontFamily = { Name : "Arial", Index : -1 };
 
@@ -1352,20 +1395,22 @@ function CDrawingDocument()
         _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
         _textPr.Position   = this.GuiLastTextProps.Position;
 
-        par.Add(new ParaTextPr(_textPr));
-        par.Add(new ParaText("H"));
-        par.Add(new ParaText("e"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("o"));
-        par.Add(new ParaSpace(1));
-        par.Add(new ParaText("W"));
-        par.Add(new ParaText("o"));
-        par.Add(new ParaText("r"));
-        par.Add(new ParaText("l"));
-        par.Add(new ParaText("d"));
+        var parRun = new ParaRun(par); var Pos = 0;
+        parRun.Set_Pr(_textPr);
+        parRun.Add_ToContent(Pos++,new ParaText("H"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("e"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("l"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("l"), false);
+        parRun.Add_ToContent(Pos++,new ParaText("o"), false);
+        parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
+        parRun.Add_ToContent(Pos++, new ParaText("W"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("o"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("r"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("l"), false);
+        parRun.Add_ToContent(Pos++, new ParaText("d"), false);
+        par.Add_ToContent(0, parRun);
 
-        par.Recalculate_Page(0);
+        docContent.Recalculate_Page(0, true);
 
         var baseLineOffset = par.Lines[0].Y;
         var _bounds = par.Get_PageBounds(0);
@@ -1380,7 +1425,7 @@ function CDrawingDocument()
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, _wPx, _hPx);
 
-        var _pxBoundsW = par.Lines[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
+        var _pxBoundsW = par.Lines[0].Ranges[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
         var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
 
         if (this.GuiLastTextProps.Position !== undefined && this.GuiLastTextProps.Position != null && this.GuiLastTextProps.Position != 0)

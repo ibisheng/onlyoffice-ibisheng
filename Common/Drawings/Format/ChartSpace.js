@@ -598,6 +598,9 @@ CChartSpace.prototype =
 
     getStroke: CShape.prototype.getStroke,
 
+
+    changeSize: CShape.prototype.changeSize,
+
     changeFill: function (unifill)
     {
         if(this.recalcInfo.recalculatePenBrush)

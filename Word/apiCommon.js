@@ -560,14 +560,6 @@ function CorrectUniFill(asc_fill, unifill)
 
 // ---------------------------------------------------------------
 
-function CAscSlideProps()
-{
-    this.Background = null;
-}
-
-CAscSlideProps.prototype.get_background = function(){return this.Background;}
-CAscSlideProps.prototype.put_background = function(v){this.Background = v;}
-
 // ---------------------------------------------------------------
 
 // outline -------------------------------------------------------
@@ -805,21 +797,30 @@ function CAscShapeProp()
     this.paddings = null;
     this.canFill = true;
     this.bFromChart = false;
+    this.Locked = false;
+    this.w = null;
+    this.h = null;
 }
-CAscShapeProp.prototype.get_type = function(){return this.type}
-CAscShapeProp.prototype.put_type = function(v){this.type = v;}
-CAscShapeProp.prototype.get_fill = function(){return this.fill}
-CAscShapeProp.prototype.put_fill = function(v){this.fill = v;}
-CAscShapeProp.prototype.get_stroke = function(){return this.stroke}
-CAscShapeProp.prototype.put_stroke = function(v){this.stroke = v;}
+CAscShapeProp.prototype.get_type = function(){return this.type}    ;
+CAscShapeProp.prototype.put_type = function(v){this.type = v;}     ;
+CAscShapeProp.prototype.get_fill = function(){return this.fill}    ;
+CAscShapeProp.prototype.put_fill = function(v){this.fill = v;}     ;
+CAscShapeProp.prototype.get_stroke = function(){return this.stroke};
+CAscShapeProp.prototype.put_stroke = function(v){this.stroke = v;} ;
 
-CAscShapeProp.prototype.get_paddings = function(){return this.paddings}
-CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
-CAscShapeProp.prototype.get_CanFill = function(){return this.canFill}
-CAscShapeProp.prototype.put_CanFill = function(v){this.canFill = v;}
+CAscShapeProp.prototype.get_paddings = function(){return this.paddings};
+CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;} ;
+CAscShapeProp.prototype.get_CanFill = function(){return this.canFill}  ;
+CAscShapeProp.prototype.put_CanFill = function(v){this.canFill = v;}   ;
 
-CAscShapeProp.prototype.get_FromChart = function(){return this.bFromChart}
-CAscShapeProp.prototype.put_FromChart = function(v){this.bFromChart = v;}
+CAscShapeProp.prototype.get_FromChart = function(){return this.bFromChart};
+CAscShapeProp.prototype.put_FromChart = function(v){this.bFromChart = v;} ;
+CAscShapeProp.prototype.get_Locked = function(){return this.Locked}       ;
+CAscShapeProp.prototype.put_Locked = function(v){this.Locked = v;}        ;
+CAscShapeProp.prototype.get_Width = function(){return this.w}             ;
+CAscShapeProp.prototype.put_Width = function(v){this.w = v;}              ;
+CAscShapeProp.prototype.get_Height = function(){return this.h}            ;
+CAscShapeProp.prototype.put_Height = function(v){this.h = v;}             ;
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)

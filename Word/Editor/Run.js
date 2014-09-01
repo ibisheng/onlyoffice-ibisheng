@@ -1390,7 +1390,8 @@ ParaRun.prototype =
 
         var Pr = this.Get_CompiledPr(false);
 
-        g_oTextMeasurer.SetTextPr( Pr, this.Paragraph.Get_Theme());
+        var Theme = this.Paragraph.Get_Theme();
+        g_oTextMeasurer.SetTextPr( Pr, Theme);
         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
 
         // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
@@ -2580,7 +2581,46 @@ ParaRun.prototype =
         }
         else if ( para_PresentationNumbering === NumberingType )
         {
+            var Level = Para.PresentationPr.Level;
             var Bullet = Para.PresentationPr.Bullet;
+
+            var BulletNum = 0;
+            if (Bullet.Get_Type() >= numbering_presentationnumfrmt_ArabicPeriod)
+            {
+                var Prev = Para.Prev;
+                while (null != Prev && type_Paragraph === Prev.GetType())
+                {
+                    var PrevLevel = Prev.PresentationPr.Level;
+                    var PrevBullet = Prev.Get_PresentationNumbering();
+
+                    // Если предыдущий параграф более низкого уровня, тогда его не учитываем
+                    if (Level < PrevLevel)
+                    {
+                        Prev = Prev.Prev;
+                        continue;
+                    }
+                    else if (Level > PrevLevel)
+                        break;
+                    else if (PrevBullet.Get_Type() === Bullet.Get_Type() && PrevBullet.Get_StartAt() === PrevBullet.Get_StartAt())
+                    {
+                        if (true != Prev.IsEmpty())
+                            BulletNum++;
+
+                        Prev = Prev.Prev;
+                    }
+                    else
+                        break;
+                }
+            }
+
+            // Найдем настройки для первого текстового элемента
+            var FirstTextPr = Para.Get_FirstTextPr();
+
+            NumberingItem.Bullet = Bullet;
+            NumberingItem.BulletNum = BulletNum + 1;
+            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme());
+
+
             if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
             {
                 if ( ParaPr.Ind.FirstLine < 0 )

@@ -8714,6 +8714,51 @@ CParaPr.prototype =
             }
         }
         return true;
+    },
+
+    Get_PresentationBullet: function()
+    {
+        var Bullet = new CPresentationBullet();
+        if(this.Bullet && this.Bullet.isBullet())
+        {
+            switch(this.Bullet.bulletType.type)
+            {
+                case BULLET_TYPE_BULLET_CHAR:
+                {
+                    Bullet.m_nType = numbering_presentationnumfrmt_Char;
+                    Bullet.m_sChar = this.Bullet.bulletType.Char;
+                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
+                    {
+                        Bullet.m_bFontTx = false;
+                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
+                    }
+                    break;
+                }
+
+                case BULLET_TYPE_BULLET_AUTONUM :
+                {
+                    Bullet.m_nType = g_NumberingArr[this.Bullet.bulletType.AutoNumType];
+                    Bullet.m_nStartAt = this.Bullet.bulletType.startAt;
+                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
+                    {
+                        Bullet.m_bFontTx = false;
+                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
+                    }
+                    break;
+                }
+                case BULLET_TYPE_BULLET_NONE :
+                {
+                    break;
+                }
+                case BULLET_TYPE_BULLET_BLIP :
+                {
+                    Bullet.m_nType = numbering_presentationnumfrmt_Char;
+                    Bullet.m_sChar = "•";
+                    break;
+                }
+            }
+        }
+        return Bullet;
     }
 }
 

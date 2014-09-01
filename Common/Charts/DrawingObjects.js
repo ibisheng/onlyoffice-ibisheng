@@ -147,14 +147,20 @@ function asc_CChartBinary(chart) {
     this["binary"] = null;
     if (chart && chart.getObjectType() === historyitem_type_ChartSpace)
     {
-        var writer = new BinaryChartWriter(new CMemory(false));
+        var writer = new BinaryChartWriter(new CMemory(false)), pptx_writer;
         writer.WriteCT_ChartSpace(chart);
         this["binary"] = writer.memory.pos + ";" + writer.memory.GetBase64Memory();
         if(chart.theme)
         {
-            var pptx_writer = new CBinaryFileWriter();
+            pptx_writer = new CBinaryFileWriter();
             pptx_writer.WriteTheme(chart.theme);
             this["themeBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
+        }
+        if(chart.colorMap)
+        {
+            pptx_writer = new CBinaryFileWriter();
+            pptx_writer.WriteClrMap(chart.colorMap);
+            this["colorMapBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
     }
 }
@@ -190,6 +196,27 @@ asc_CChartBinary.prototype = {
             oBinaryReader.stream.pos    = stream.pos;
             oBinaryReader.stream.cur    = stream.cur;
             return oBinaryReader.ReadTheme();
+        }
+        return null;
+    },
+
+    getColorMap: function()
+    {
+        var binary = this["colorMapBinary"];
+        if(binary)
+        {
+            var stream = CreateBinaryReader(binary, 0, binary.length);
+            var oBinaryReader = new BinaryPPTYLoader();
+
+            oBinaryReader.stream = new FileStream();
+            oBinaryReader.stream.obj    = stream.obj;
+            oBinaryReader.stream.data   = stream.data;
+            oBinaryReader.stream.size   = stream.size;
+            oBinaryReader.stream.pos    = stream.pos;
+            oBinaryReader.stream.cur    = stream.cur;
+            var ret = new ClrMap();
+            oBinaryReader.ReadClrMap(ret);
+            return ret;
         }
         return null;
     }

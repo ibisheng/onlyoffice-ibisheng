@@ -196,7 +196,7 @@ function RotateTrackShapeImage(originalObject)
         {
             global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
         }
-        if(this.originalObject.parent)
+        if(this.originalObject.parent && this.originalObject.parent.isShapeChild)
         {
             var parent_shape = this.originalObject.parent.isShapeChild(true);
             if(parent_shape)
@@ -217,7 +217,7 @@ function RotateTrackShapeImage(originalObject)
     {
         var boundsChecker = new  CSlideBoundsChecker();
         var tr = this.transform;
-        var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild(true);
+        var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild && this.originalObject.parent.isShapeChild(true);
         if(parent_shape)
         {
             tr = tr.CreateDublicate();

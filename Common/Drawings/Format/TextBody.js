@@ -93,6 +93,7 @@ var nTWTNone   = 0;
 var nTWTSquare = 1;
 //-------------------
 
+
 function CTextBody()
 {
     this.bodyPr = null;
@@ -428,25 +429,6 @@ CTextBody.prototype =
     },
 
 
-    updateSelectionState: function(drawingDocument)
-    {
-        var Doc = this.content;
-        if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
-        {
-            drawingDocument.UpdateTargetTransform(this.shape.transformText);
-            drawingDocument.TargetEnd();
-            drawingDocument.SelectEnabled(true);
-            drawingDocument.SelectClear();
-            this.content.Selection_Draw_Page(this.shape.parent ? this.shape.parent.num : this.shape.chartGroup.parent.num);
-            drawingDocument.SelectShow();
-        }
-        else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
-        {
-            drawingDocument.UpdateTargetTransform(this.shape.transformText);
-            drawingDocument.TargetShow();
-            drawingDocument.SelectEnabled(false);
-        }
-    },
 
     isEmpty: function()
     {
@@ -456,438 +438,10 @@ CTextBody.prototype =
     OnContentReDraw: function()
     {},
 
-    calculateContent: function()
-    {
-        var parent_object = this.shape.getParentObjects();
-        for(var i = 0; i < this.textPropsForRecalc.length; ++i)
-        {
-            var props = this.textPropsForRecalc[i].Value;
-            if(props && props.FontFamily && typeof props.FontFamily.Name === "string" && isThemeFont(props.FontFamily.Name))
-            {
-                props.FontFamily.themeFont = props.FontFamily.Name;
-                props.FontFamily.Name = getFontInfo(props.FontFamily.Name)(parent_object.theme.themeElements.fontScheme);
-            }
-            var TextPr = props;
-            var parents = parent_object;
-            if(isRealObject(TextPr) && isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
-            {
-                TextPr.unifill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
-                var _rgba = TextPr.unifill.getRGBAColor();
-                TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
-            }
-            if(isRealObject(props.FontFamily) && typeof props.FontFamily.Name === "string")
-            {
-                TextPr.RFonts.Ascii = {Name : TextPr.FontFamily.Name, Index: -1};
-                TextPr.RFonts.CS = {Name : TextPr.FontFamily.Name, Index: -1};
-                TextPr.RFonts.HAnsi = {Name : TextPr.FontFamily.Name, Index: -1};
-            }
-        }
-        this.textPropsForRecalc.length = 0;
-        if(this.bRecalculateNumbering)
-        {
-            this.content.RecalculateNumbering();
-            this.bRecalculateNumbering = false;
-        }
-
-        this.content.Set_StartPage(/*isRealNumber(this.shape.parent.num) ? this.shape.parent.num : */0);
-
-
-
-        if(this.textFieldFlag)
-        {
-            this.textFieldFlag = false;
-            if(this.shape && this.shape.isPlaceholder())
-            {
-                var _ph_type = this.shape.getPlaceholderType();
-                switch (_ph_type)
-                {
-                    case phType_dt :
-                    {
-                        var _cur_date = new Date();
-                        var _cur_year = _cur_date.getFullYear();
-                        var _cur_month = _cur_date.getMonth();
-                        var _cur_month_day = _cur_date.getDate();
-                        var _cur_week_day = _cur_date.getDay();
-                        var _cur_hour = _cur_date.getHours();
-                        var _cur_minute = _cur_date.getMinutes();
-                        var _cur_second = _cur_date.getSeconds();
-                        var _text_string = "";
-                        switch (this.fieldType)
-                        {
-                            default :
-                            {
-                                _text_string += (_cur_month_day > 9 ? _cur_month_day : "0" + _cur_month_day)
-                                    +  "." +   ((_cur_month +1) > 9 ? (_cur_month + 1) : "0" + (_cur_month +1))
-                                    + "." + _cur_year;
-                                break;
-                            }
-                        }
-                        var par = this.content.Content[0];
-                        var EndPos = par.Internal_GetEndPos();
-
-                        var _history_status = History.Is_On();
-
-                        if(_history_status)
-                        {
-                            History.TurnOff();
-                        }
-
-                        for(var _text_index = 0; _text_index < _text_string.length; ++_text_index)
-                        {
-                            if(_text_string[_text_index] != " ")
-                            {
-                                par.Internal_Content_Add(EndPos, new ParaText(_text_string[_text_index]));
-                            }
-                            else
-                            {
-                                par.Internal_Content_Add(EndPos, new ParaSpace(1));
-                            }
-                            ++EndPos;
-                        }
-                        if(_history_status)
-                        {
-                            History.TurnOn();
-                        }
-                        this.calculateContent();
-                        break;
-                    }
-                    case phType_sldNum :
-                    {
-                        if(this.shape.parent instanceof Slide)
-                        {
-                            var _text_string = "" + (this.shape.parent.num+1);
-                            par = this.content.Content[0];
-                            EndPos = par.Internal_GetEndPos();
-
-                            _history_status = History.Is_On();
-
-                            if(_history_status)
-                            {
-                                History.TurnOff();
-                            }
-
-                            for(_text_index = 0; _text_index < _text_string.length; ++_text_index)
-                            {
-                                if(_text_string[_text_index] != " ")
-                                {
-                                    par.Internal_Content_Add(EndPos, new ParaText(_text_string[_text_index]));
-                                }
-                                else
-                                {
-                                    par.Internal_Content_Add(EndPos, new ParaSpace(1));
-                                }
-                                ++EndPos;
-                            }
-
-                            if(_history_status)
-                            {
-                                History.TurnOn();
-                            }
-                            this.calculateContent();
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-        if(this.bodyPr.textFit !== null && typeof this.bodyPr.textFit === "object")
-        {
-            if(this.bodyPr.textFit.type === text_fit_NormAuto)
-            {
-                var text_fit = this.bodyPr.textFit;
-                var font_scale, spacing_scale;
-                if(!isNaN(text_fit.fontScale) && typeof text_fit.fontScale === "number")
-                    font_scale = text_fit.fontScale/100000;
-                if(!isNaN(text_fit.lnSpcReduction) && typeof text_fit.lnSpcReduction === "number")
-                    spacing_scale = text_fit.lnSpcReduction/100000;
-
-                if(!isNaN(font_scale) && typeof font_scale === "number"
-                    || !isNaN(spacing_scale) && typeof spacing_scale === "number")
-                {
-                    var pars = this.content.Content;
-                    for(var index = 0; index < pars.length; ++index)
-                    {
-                        var parg = pars[index];
-                        if(!isNaN(spacing_scale) && typeof spacing_scale === "number")
-                        {
-                            var spacing = parg.Pr.Spacing;
-                            var spacing2 = parg.Get_CompiledPr(false).ParaPr;
-                            parg.Recalc_CompiledPr();
-                            var spc = (spacing2.Line*spacing_scale);
-                            if(!isNaN(spc) && typeof spc === "number")
-                                spacing.Line = spc;
-
-                            spc = (spacing2.Before*spacing_scale);
-                            if(!isNaN(spc) && typeof spc === "number")
-                                spacing.Before = spc;
-
-                            spc = (spacing2.After*spacing_scale);
-                            if(!isNaN(spc) && typeof spc === "number")
-                                spacing.After = spc;
-                        }
-
-                        if(!isNaN(font_scale) && typeof font_scale === "number")
-                        {
-                            var par_font_size = parg.Get_CompiledPr(false).TextPr.FontSize;
-                            parg.Recalc_CompiledPr();
-                            for(var r = 0; r < parg.Content.length; ++r)
-                            {
-                                var item = parg.Content[r];
-                                if(item.Type === para_TextPr)
-                                {
-                                    var value = item.Value;
-                                    if(!isNaN(value.FontSize) && typeof value.FontSize === "number")
-                                    {
-                                        value.FontSize = (value.FontSize*font_scale) >> 0;
-                                    }
-                                }
-                            }
-                            var result_par_text_pr_font_size = (par_font_size*font_scale) >> 0;
-                            if(!isNaN(result_par_text_pr_font_size) && typeof result_par_text_pr_font_size === "number")
-                            {
-                                var b_insert_text_pr = false, pos = -1;
-                                for(var p = 0; p < parg.Content.length; ++p)
-                                {
-                                    if(parg.Content[p].Type === para_TextPr)
-                                    {
-                                        if(!(!isNaN(parg.Content[p].Value.FontSize) && typeof parg.Content[p].Value.FontSize === "number"))
-                                            parg.Content[p].Value.FontSize = result_par_text_pr_font_size;
-                                        break;
-                                    }
-                                    if(parg.Content[p].Type === para_Text)
-                                    {
-                                        b_insert_text_pr = true;
-                                        pos = p;
-                                        break;
-                                    }
-                                }
-                                if(b_insert_text_pr)
-                                {
-                                    var history_is_on = History.Is_On();
-                                    if(history_is_on)
-                                        History.TurnOff();
-                                    parg.Internal_Content_Add(p, new ParaTextPr({FontSize: result_par_text_pr_font_size}));
-                                    if(history_is_on)
-                                        History.TurnOn();
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-            }
-            this.bodyPr.textFit = null;
-            this.calculateContent();
-            return;
-        }
-
-        this.bodyPr.normAutofit = false;
-
-        var _l, _t, _r, _b;
-
-        var _body_pr = this.getBodyPr();
-        var sp = this.shape;
-        if(isRealObject(sp.spPr.geometry) && isRealObject(sp.spPr.geometry.rect))
-        {
-            var _rect = sp.spPr.geometry.rect;
-            _l = _rect.l + _body_pr.lIns;
-            _t = _rect.t + _body_pr.tIns;
-            _r = _rect.r - _body_pr.rIns;
-            _b = _rect.b - _body_pr.bIns;
-        }
-        else
-        {
-            _l = _body_pr.lIns;
-            _t = _body_pr.tIns;
-            _r = sp.extX - _body_pr.rIns;
-            _b = sp.extY - _body_pr.bIns;
-        }
-
-        if(_body_pr.upright === false)
-        {
-            var _content_width;
-            if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-            {
-                _content_width = _r - _l;
-                this.contentWidth = _content_width;
-                this.contentHeight = _b - _t;
-            }
-            else
-            {
-                _content_width = _b - _t;
-                this.contentWidth = _content_width;
-                this.contentHeight = _r - _l;
-            }
-
-        }
-        else
-        {
-            var _full_rotate = sp.getFullRotate();
-            if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
-                    _content_width = _r - _l;
-                    this.contentWidth = _content_width;
-                    this.contentHeight = _b - _t;
-                }
-                else
-                {
-                    _content_width = _b - _t;
-                    this.contentWidth = _content_width;
-                    this.contentHeight = _r - _l;
-                }
-            }
-            else
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
-                    _content_width = _b - _t;
-                    this.contentWidth = _content_width;
-                    this.contentHeight = _r - _l;
-                }
-                else
-                {
-                    _content_width = _r - _l;
-                    this.contentWidth  = _content_width;
-                    this.contentHeight = _b - _t;
-                }
-            }
-        }
-        this.content.Reset(0, 0, _content_width, 20000);
-        this.content.Recalculate_Page(0, true);
-        this.contentHeight = this.getSummaryHeight();
-
-
-
-
-        if(this.recalcInfo.recalculateContent2)
-        {
-
-            var _history_is_on = History.Is_On();
-            if(_history_is_on)
-            {
-                History.TurnOff();
-            }
-            if(this.shape.isPlaceholder())
-            {
-                var text = pHText[0][this.shape.nvSpPr.nvPr.ph.type] != undefined ?  pHText[0][this.shape.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
-                this.content2 = new CDocumentContent(this, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, false);
-                this.content2.Content.length = 0;
-                var par = new Paragraph(editor.WordControl.m_oDrawingDocument, this.content2, 0, 0, 0, 0, 0);
-                var EndPos = 0;
-                for(var key = 0 ; key <  text.length; ++key)
-                {
-                    par.Internal_Content_Add( EndPos++, CreateParaContentFromString(text[key]));
-                }
-                if(this.content && this.content.Content[0] )
-                {
-                    if(this.content.Content[0].Pr)
-                    {
-                        par.Pr = this.content.Content[0].Pr.Copy();
-                    }
-                    if(this.content.Content[0].rPr)
-                    {
-                        par.rPr = clone(this.content.Content[0].rPr);
-                    }
-                }
-                this.content2.Internal_Content_Add( 0, par);
-
-                this.content2.RecalculateNumbering();
-                this.content2.Set_StartPage(/*isRealNumber(this.shape.parent.num) ? this.shape.parent.num : */0);
-                if(_body_pr.upright === false)
-                {
-                    var _content_width;
-                    if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                    {
-                        _content_width = _r - _l;
-                        this.contentWidth2 = _content_width;
-                        this.contentHeight2 = _b - _t;
-                    }
-                    else
-                    {
-                        _content_width = _b - _t;
-                        this.contentWidth2 = _content_width;
-                        this.contentHeight2 = _r - _l;
-                    }
-
-                }
-                else
-                {
-                    var _full_rotate = sp.getFullRotate();
-                    if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                        || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                        || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
-                    {
-                        if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                        {
-                            _content_width = _r - _l;
-                            this.contentWidth2 = _content_width;
-                            this.contentHeight2 = _b - _t;
-                        }
-                        else
-                        {
-                            _content_width = _b - _t;
-                            this.contentWidth2 = _content_width;
-                            this.contentHeight2 = _r - _l;
-                        }
-                    }
-                    else
-                    {
-                        if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                        {
-                            _content_width = _b - _t;
-                            this.contentWidth2 = _content_width;
-                            this.contentHeight2 = _r - _l;
-                        }
-                        else
-                        {
-                            _content_width = _r - _l;
-                            this.contentWidth2  = _content_width;
-                            this.contentHeight2 = _b - _t;
-                        }
-                    }
-                }
-                this.content2.Reset(0, 0, _content_width, 20000);
-                this.content2.Recalculate_Page(0, true);
-                this.contentHeight2 = this.getSummaryHeight2();
-            }
-
-
-
-
-            if(_history_is_on)
-            {
-                History.TurnOn();
-            }
-            this.recalcInfo.recalculateContent2 = false;
-        }
-
-
-    },
-
-    copy: function(txBody)
-    {
-        txBody.setDocContent(this.content.Copy(txBody));
-    },
-
-    updateCursorType: function(x, y, e)
-    {
-        if(this.shape && this.shape.invertTransformText)
-        {
-            var tx = this.shape.invertTransformText.TransformPointX(x, y);
-            var ty = this.shape.invertTransformText.TransformPointY(x, y);
-            this.content.Update_CursorType(tx, ty, 0);
-        }
-    },
 
     Get_StartPage_Absolute: function()
     {
-        return 0//TODO;
+        return 0;//TODO;
     },
 
     Get_TextBackGroundColor: function()
@@ -932,11 +486,6 @@ CTextBody.prototype =
         return this.compiledBodyPr;
     },
 
-    onParagraphChanged: function()
-    {
-        if(this.shape )
-            this.shape.onParagraphChanged();
-    },
 
     getSummaryHeight: function()
     {
@@ -963,16 +512,16 @@ CTextBody.prototype =
         return null;
     },
 
+    checkCurrentPlaceholder: function()
+    {
+        return false;
+    },
+
     draw: function(graphics)
     {
-        /*if(this.content.Is_Empty() && isRealObject(this.phContent))
-         this.content2.Draw(graphics);
-         else
-         this.content.Draw(0, graphics);  */
-
-        if((!this.content || this.content.Is_Empty()) && this.content2!=null && !this.shape.addTextFlag && (this.shape.isEmptyPlaceholder ? this.shape.isEmptyPlaceholder() : false))
+        if((!this.content || this.content.Is_Empty()) && this.parent.isEmptyPlaceholder() && !this.checkCurrentPlaceholder() )
         {
-            if (graphics.IsNoDrawingEmptyPlaceholder !== true && graphics.IsNoDrawingEmptyPlaceholderText !== true)
+            if (graphics.IsNoDrawingEmptyPlaceholder !== true && graphics.IsNoDrawingEmptyPlaceholderText !== true && this.content2)
             {
                 if(graphics.IsNoSupportTextDraw)
                 {
@@ -1016,13 +565,13 @@ CTextBody.prototype =
 
     getMargins: function ()
     {
-        var _parent_transform = this.shape.transform;
+        var _parent_transform = this.parent.transform;
         var _l;
         var _r;
         var _b;
         var _t;
         var _body_pr = this.getBodyPr();
-        var sp = this.shape;
+        var sp = this.parent;
         if(isRealObject(sp.spPr.geometry) && isRealObject(sp.spPr.geometry.rect))
         {
             var _rect = sp.spPr.geometry.rect;
@@ -1053,9 +602,7 @@ CTextBody.prototype =
         var xc = (x_lt + x_rb)/2;
         var yc = (y_lt + y_rb)/2;
 
-        var tx = xc-hc;
-        var ty = yc-vc;
-        return {L : xc - hc , T: yc - vc , R : xc + hc , B : yc + vc, textMatrix : this.shape.transform};
+        return {L : xc - hc , T: yc - vc , R : xc + hc , B : yc + vc, textMatrix : this.parent.transform};
     },
 
 

@@ -24,8 +24,9 @@ function CHistory(Document)
         HdrFtr : [],
         Drawings:
         {
-            All: false,
-            Map: {}
+            All:      false,
+            Map:      {},
+            ThemeInfo: null
         }
     };
 
@@ -210,7 +211,7 @@ CHistory.prototype =
         };
 
         this.Points[this.Index].Items.push( Item );
-
+        var bZIndexManager = !(typeof ZIndexManager === "undefined");
         if ( ( Class instanceof CDocument        && ( historyitem_Document_AddItem        === Data.Type || historyitem_Document_RemoveItem        === Data.Type ) ) ||
             ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
             ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
@@ -218,7 +219,7 @@ CHistory.prototype =
             ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaHyperlink    && ( historyitem_Hyperlink_AddItem       === Data.Type || historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaRun          && ( historyitem_ParaRun_AddItem         === Data.Type || historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
-            ( Class instanceof ZIndexManager    && (historyitem_ZIndexManagerRemoveItem  === Data.Type || historyitem_ZIndexManagerAddItem       === Data.Type )))
+            ( bZIndexManager && Class instanceof ZIndexManager    && (historyitem_ZIndexManagerRemoveItem  === Data.Type || historyitem_ZIndexManagerAddItem       === Data.Type )))
         {
             var bAdd = ( ( Class instanceof CDocument        && historyitem_Document_AddItem        === Data.Type ) ||
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
@@ -227,7 +228,7 @@ CHistory.prototype =
                 ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaHyperlink    && historyitem_Hyperlink_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaRun          && historyitem_ParaRun_AddItem         === Data.Type ) ||
-                ( Class instanceof ZIndexManager    && historyitem_ZIndexManagerAddItem    === Data.Type )
+                (bZIndexManager && Class instanceof ZIndexManager    && historyitem_ZIndexManagerAddItem    === Data.Type )
                 ) ? true : false;
 
             var Count = 1;
@@ -253,7 +254,8 @@ CHistory.prototype =
             Drawings:
             {
                 All: false,
-                Map: {}
+                Map: {},
+                ThemeInfo: null
             }
         };
     },
@@ -324,9 +326,29 @@ CHistory.prototype =
                     }
                     else
                     {
-                        this.RecalculateData.Drawings.Map[Data.Object.Get_Id()] = Data.Object;
+                        if(Data.Theme)
+                        {
+                            this.RecalculateData.Drawings.ThemeInfo =
+                            {
+                                Theme: true,
+                                ArrInd: Data.ArrInd
+                            }
+                        }
+                        else if(Data.ColorScheme)
+                        {
+                            this.RecalculateData.Drawings.ThemeInfo =
+                            {
+                                ColorScheme: true,
+                                ArrInd: Data.ArrInd
+                            }
+                        }
+                        else
+                        {
+                            this.RecalculateData.Drawings.Map[Data.Object.Get_Id()] = Data.Object;
+                        }
                     }
                 }
+                break;
             }
         }
     },

@@ -112,8 +112,11 @@ function CThemeLoader()
             pres.themes = [];
             pres.slideMasters = [];
             pres.slideLayouts = [];
+            pres.DrawingDocument = editor.WordControl.m_oDrawingDocument;
 
+            History.MinorChanges = true;
             _loader.Load(g_th, pres);
+            History.MinorChanges = false;
 
             if (oThis.IsReloadBinaryThemeEditorNow)
             {

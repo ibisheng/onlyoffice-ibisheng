@@ -2533,7 +2533,7 @@ CDocument.prototype =
                 else
                 {
                     Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
-                    var Image = this.DrawingObjects.getChartSpace(Chart,null);
+                    var Image = this.DrawingObjects.getChartSpace2(Chart,null);
                     Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
                     Drawing.Update_Size( Image.spPr.xfrm.extX, Image.spPr.xfrm.extY );

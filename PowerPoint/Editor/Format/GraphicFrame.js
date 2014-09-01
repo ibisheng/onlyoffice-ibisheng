@@ -1,27 +1,11 @@
 "use strict";
-
-/**
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 8/20/13
- * Time: 7:27 PM
- * To change this template use File | Settings | File Templates.
- */
-function CGraphicFrame(parent)
+function CGraphicFrame()
 {
-    //this.parent = parent;
+    this.parent = parent;
     this.graphicObject = null;
     this.nvGraphicFramePr = null;
-    this.spPr = new CSpPr();
-
-    this.recalcInfo =
-    {
-        recalculateTransform: true,
-        recalculateSizes: true,
-        recalculateNumbering: true,
-        recalculateShapeHierarchy: true
-};
+    this.spPr = null;
+    this.group = null;
 
     this.x = null;
     this.y = null;
@@ -29,46 +13,85 @@ function CGraphicFrame(parent)
     this.extY = null;
     this.transform = new CMatrix();
     this.compiledHierarchy = [];
-    this.textPropsForRecalc = [];
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
     this.stlesForParagraph = [];
-    if(parent)
+    this.recalcInfo =
     {
-        this.setParent(parent);
-        var nv_sp_pr = new UniNvPr();
-        nv_sp_pr.cNvPr.id = ++parent.maxId;
-        this.setNvSpPr(nv_sp_pr)
-    }
+        recalculateTransform: true,
+        recalculateSizes: true,
+        recalculateNumbering: true,
+        recalculateShapeHierarchy: true
+    };
 
 }
 
 CGraphicFrame.prototype =
 {
-    getCurDocumentContent: function()
+    addToRecalculate: CShape.prototype.addToRecalculate,
+
+    getDocContent: function()
     {
-        return this.graphicObject.CurCell ? this.graphicObject.CurCell.Content : null;
+        if(this.graphicObject && this.graphicObject.CurCell)
+        {
+            return this.graphicObject.CurCell.Content;
+        }
+        return null;
     },
 
     setSpPr: function(spPr)
     {
-        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+        History.Add(this, {Type:historyitem_GraphicFrameSetSpPr, oldPr: this.spPr, newPr: spPr});
         this.spPr = spPr;
     },
 
-    copy: function(sp)
+    setGraphicObject: function(graphicObject)
     {
-        if(!(sp instanceof CGraphicFrame))
-            sp = new CGraphicFrame();
-        sp.setSpPr(this.spPr.createDuplicate());
+        History.Add(this, {Type: historyitem_GraphicFrameSetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
+        this.graphicObject = graphicObject;
+    },
+
+    setNvSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_GraphicFrameSetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
+        this.nvGraphicFramePr = pr;
+    },
+
+    setParent: function(parent)
+    {
+        History.Add(this, {Type:historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
+        this.parent = parent;
+    },
+
+    setGroup: function(group)
+    {
+        History.Add(this, {Type: historyitem_GraphicFrameSetSetGroup, oldPr: this.group, newPr: group});
+        this.group = group;
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_GraphicFrame;
+    },
+
+    copy: function()
+    {
+        var ret = new CGraphicFrame();
+        if(this.graphicObject)
+        {
+            ret.setGraphicObject(this.graphicObject.Copy(ret));
+        }
         if(this.nvGraphicFramePr)
         {
-            sp.setNvSpPr(this.nvGraphicFramePr.createDuplicate());
+            ret.setNvSpPr(this.nvGraphicFramePr.createDuplicate());
         }
-        var table = this.graphicObject.Copy(sp);
-        sp.setGraphicObject(table);
-        return sp;
+        if(this.spPr)
+        {
+            ret.setSpPr(this.spPr.createDuplicate());
+            ret.spPr.setParent(ret);
+        }
+        return ret;
     },
 
 
@@ -189,24 +212,6 @@ CGraphicFrame.prototype =
     {
         return false;
     },
-    setGraphicObject: function(graphicObject)
-    {
-        History.Add(this, {Type: historyitem_SetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
-        this.graphicObject = graphicObject;
-    },
-
-    setNvSpPr: function(pr)
-    {
-        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
-        this.nvGraphicFramePr = pr;
-        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
-        {
-            if(pr.cNvPr.id > this.parent.maxId)
-            {
-                this.parent.maxId = pr.cNvPr.id+1;
-            }
-        }
-    },
 
     paragraphFormatPaste: function(CopyTextPr, CopyParaPr, Bool)
     {
@@ -250,16 +255,6 @@ CGraphicFrame.prototype =
     },
 
 
-    pointInSelectedText: function(x, y)
-    {
-        if(this.graphicObject)
-        {
-            var tx = this.invertTransform.TransformPointX(x, y);
-            var ty = this.invertTransform.TransformPointY(x, y);
-            return this.graphicObject.Selection_Check(tx, ty, this.parent.num);
-        }
-        return false;
-    },
 
     updateCursorType: function(x, y, e)
     {
@@ -358,54 +353,7 @@ CGraphicFrame.prototype =
     },
     recalculate: function()
     {
-        if(isRealObject(this.graphicObject) && isRealObject(this.parent) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
-        {
-            if(this.recalcInfo.recalculateNumbering)
-            {
-                var rows = this.graphicObject.Content;
-                for(var i = 0; i < rows.length; ++i)
-                {
-                    var row = rows[i];
-                    var cells = row.Content;
-                    for(var j = 0;  j< cells.length; ++j )
-                    {
-                        var cell = cells[j];
-                        cell.Content.RecalculateNumbering();
-                    }
-                }
-            }
-            this.graphicObject.X = 0;
-            this.graphicObject.Y = 0;
-            this.graphicObject.PageNum = 0;
 
-            var parent_object = this.getParentObjects();
-            for(var i = 0; i < this.textPropsForRecalc.length; ++i)
-            {
-                var props = this.textPropsForRecalc[i].Value;
-                if(props && props.FontFamily && typeof props.FontFamily.Name === "string" && isThemeFont(props.FontFamily.Name))
-                {
-                    props.FontFamily.themeFont = props.FontFamily.Name;
-                    props.FontFamily.Name = getFontInfo(props.FontFamily.Name)(parent_object.theme.themeElements.fontScheme);
-                }
-                var TextPr = props;
-                var parents = parent_object;
-                if(isRealObject(TextPr) && isRealObject(TextPr.unifill))
-                {
-                    TextPr.unifill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
-                    var _rgba = TextPr.unifill.getRGBAColor();
-                    TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
-                }
-                if(isRealObject(props.FontFamily) && typeof props.FontFamily.Name === "string")
-                {
-                    TextPr.RFonts.Ascii = {Name : TextPr.FontFamily.Name, Index: -1};
-                    TextPr.RFonts.CS = {Name : TextPr.FontFamily.Name, Index: -1};
-                    TextPr.RFonts.HAnsi = {Name : TextPr.FontFamily.Name, Index: -1};
-                }
-            }
-            this.textPropsForRecalc.length = 0;
-
-            this.graphicObject.Recalculate_Page(0);
-        }
         if(this.recalcInfo.recalculateSizes)
         {
             this.recalculateSizes();
@@ -419,13 +367,6 @@ CGraphicFrame.prototype =
 
     },
 
-    onParagraphChanged: function()
-    {
-
-        this.recalcInfo.recalculateSizes = true;
-        this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
 
     recalculateSizes: function()
     {
@@ -512,40 +453,6 @@ CGraphicFrame.prototype =
         return false;
     },
 
-
-    Hyperlink_Add : function(HyperProps)
-    {
-        if(this.graphicObject)
-        {
-            this.graphicObject.Hyperlink_Add(HyperProps);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransform = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
-    Hyperlink_Modify : function(HyperProps)
-    {
-        if(this.graphicObject)
-        {
-            this.graphicObject.Hyperlink_Modify(HyperProps);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransform = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
-    Hyperlink_Remove : function()
-    {
-        if(this.graphicObject)
-        {
-            this.graphicObject.Hyperlink_Remove();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransform = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
     getTransformMatrix: function()
     {
         return this.transform;
@@ -560,18 +467,6 @@ CGraphicFrame.prototype =
     OnContentReDraw: function()
     {},
 
-    applyAllTextProps: function(textPr)
-    {
-        if(this.graphicObject)
-        {
-            this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Paragraph_Add(textPr);
-            this.graphicObject.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateSizes = true;
-            this.recalcInfo.recalculateTransform = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
 
     getRectBounds: function()
     {
@@ -615,85 +510,6 @@ CGraphicFrame.prototype =
         return {x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV};
     },
 
-    setXfrm: function(offX, offY, extX, extY, rot, flipH, flipV)
-    {
-        if(this.spPr.xfrm.isNotNull())
-        {
-            if(isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-
-            if(isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-
-            if(isRealNumber(rot))
-                this.setRotate(rot);
-
-            if(isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-        }
-        else
-        {
-            var transform = this.getTransform();
-            if(isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-            else
-                this.setOffset(transform.x, transform.y);
-
-            if(isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-            else
-                this.setExtents(transform.extX, transform.extY);
-
-            if(isRealNumber(rot))
-                this.setRotate(rot);
-            else
-                this.setRotate(transform.rot);
-            if(isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-            else
-                this.setFlips(transform.flipH, transform.flipV);
-        }
-    },
-
-    setRotate: function(rot)
-    {
-        var xfrm = this.spPr.xfrm;
-        History.Add(this, {Type: historyitem_SetShapeRot, oldRot: xfrm.rot, newRot: rot});
-
-        this.recalcInfo.recalculateTransform = true;
-        xfrm.rot = rot;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-
-    },
-
-    setOffset: function(offX, offY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY});
-        this.spPr.xfrm.offX = offX;
-        this.spPr.xfrm.offY = offY;
-        this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
-    setExtents: function(extX, extY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY});
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
-        this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-    setFlips: function(flipH, flipV)
-    {
-        History.Add(this, {Type: historyitem_SetShapeFlips, oldFlipH: this.spPr.xfrm.flipH, newFlipH: flipH, oldFlipV: this.spPr.xfrm.flipV, newFlipV: flipV});
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
-        this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
     canRotate: function()
     {
         return false;
@@ -701,24 +517,19 @@ CGraphicFrame.prototype =
 
     canResize: function()
     {
-        return false;//TODO
+        return false;
     },
 
     canMove: function()
     {
-        return true;//TODO
+        return true;
     },
 
     canGroup: function()
     {
-        return true;//TODO
+        return false;
     },
 
-
-    canChangeAdjustments: function()
-    {
-        return true;//TODO
-    },
 
     createRotateTrack: function()
     {
@@ -746,21 +557,6 @@ CGraphicFrame.prototype =
         snapY.push(transform.ty + this.extY);
     },
 
-
-    createRotateInGroupTrack: function()
-    {
-        return new RotateTrackShapeImageInGroup(this);
-    },
-
-    createResizeInGroupTrack: function(cardDirection)
-    {
-        return new ResizeTrackShapeImageInGroup(this, cardDirection);
-    },
-
-    createMoveInGroupTrack: function()
-    {
-        return new MoveShapeImageTrackInGroup(this);
-    },
 
     hitInInnerArea: function(x, y)
     {
@@ -1498,19 +1294,12 @@ CGraphicFrame.prototype =
         return this.getPhIndex();
     },
 
-    setParent: function(parent)
-    {
-        History.Add(this, {Type:historyitem_SetShapeParent, Old: this.parent, New: parent});
-        this.parent = parent;
-    },
-
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
         this.graphicObject.Paragraph_Add(paraItem, false);
         this.recalcInfo.recalculateSizes = true;
         this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     remove: function(Count, bOnlyText, bRemoveOnlySelection)
@@ -1518,7 +1307,6 @@ CGraphicFrame.prototype =
         this.graphicObject.Remove(Count, bOnlyText, bRemoveOnlySelection);
         this.recalcInfo.recalculateSizes = true;
         this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     addNewParagraph: function()
@@ -1526,7 +1314,6 @@ CGraphicFrame.prototype =
         this.graphicObject.Add_NewParagraph(false);
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     setParagraphAlign: function(val)
@@ -1536,7 +1323,6 @@ CGraphicFrame.prototype =
             this.graphicObject.Set_ParagraphAlign(val);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransform = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -1547,9 +1333,6 @@ CGraphicFrame.prototype =
             this.graphicObject.Set_ApplyToAll(true);
             this.graphicObject.Set_ParagraphAlign(val);
             this.graphicObject.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -1558,9 +1341,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphSpacing(val);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -1571,9 +1351,6 @@ CGraphicFrame.prototype =
             this.graphicObject.Set_ApplyToAll(true);
             this.graphicObject.Set_ParagraphSpacing(val);
             this.graphicObject.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -1582,22 +1359,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphNumbering(val);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
-    applyAllNumbering: function(val)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphNumbering(val);
-            this.graphicObject.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
@@ -1607,116 +1368,9 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphIndent(val);
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
-    applyAllIndent: function(val)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphIndent(val);
-            this.graphicObject.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
-    Paragraph_IncDecFontSize: function(val)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Paragraph_IncDecFontSize(val);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
-    Paragraph_IncDecFontSizeAll: function(val)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Paragraph_IncDecFontSize(val);
-            this.graphicObject.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        }
-    },
-
-    Cursor_MoveLeft : function(AddToSelect, Word)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveLeft(AddToSelect, Word);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveRight : function(AddToSelect, Word)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveRight(AddToSelect, Word);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveUp : function(AddToSelect)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveUp(AddToSelect);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveDown : function(AddToSelect)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveDown(AddToSelect);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveEndOfLine : function(AddToSelect)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveEndOfLine(AddToSelect);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveStartOfLine : function(AddToSelect)
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveStartOfLine(AddToSelect);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveAt : function( X, Y, AddToSelect )
-    {
-        if(isRealObject(this.graphicObject))
-        {
-            this.graphicObject.Cursor_MoveAt(X, Y, AddToSelect);
-            this.graphicObject.RecalculateCurPos();
-
-        }
-    },
     
     Get_Styles: function(level, bTablesStyleId, bParagraph)
     {
@@ -2125,44 +1779,6 @@ CGraphicFrame.prototype =
             MaxTopBorder : 0};
 
 
-    } ,
-
-    getParagraphParaPr: function()
-    {
-        if(this.graphicObject !== null && typeof this.graphicObject === "object"
-            && typeof this.graphicObject.Set_ApplyToAll === "function"
-            && typeof this.graphicObject.Get_Paragraph_ParaPr === "function")
-        {
-            var _ret_para_pr;
-            this.graphicObject.Set_ApplyToAll(true);
-            _ret_para_pr =  this.graphicObject.Get_Paragraph_ParaPr();
-            this.graphicObject.Set_ApplyToAll(false);
-            return _ret_para_pr;
-        }
-    },
-
-    getParagraphTextPr: function()
-    {
-        if(this.graphicObject !== null && typeof this.graphicObject === "object"
-            && typeof this.graphicObject.Set_ApplyToAll === "function"
-            && typeof this.graphicObject.Get_Paragraph_TextPr === "function")
-        {
-            var _ret_para_pr;
-            this.graphicObject.Set_ApplyToAll(true);
-            _ret_para_pr =  this.graphicObject.Get_Paragraph_TextPr();
-            this.graphicObject.Set_ApplyToAll(false);
-            return _ret_para_pr;
-        }
-    },
-
-    getTextPr: function()
-    {
-        return this.graphicObject.Get_Paragraph_TextPr();
-    },
-
-    getParaPr: function()
-    {
-        return this.graphicObject.Get_Paragraph_ParaPr();
     },
 
     hitToHandles: function()
@@ -2175,399 +1791,94 @@ CGraphicFrame.prototype =
         return {hit:false};
     },
 
-    setGroup: function(group)
-    {
-        History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
-        this.group = group;
-    },
 
 
     Refresh_RecalcData: function()
     {
+        this.Refresh_RecalcData2();
+    },
+
+    Refresh_RecalcData2: function()
+    {
+        this.addToRecalculate();
     },
 
     Undo: function(data)
     {
-
         switch(data.Type)
         {
-            case historyitem_SetSetSpPr:
+            case historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_SetSetNvSpPr:
-            {
-                this.nvGraphicFramePr = data.oldPr;
-                break;
-            }
-            case historyitem_SetGraphicObject:
+            case historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = data.oldPr;
                 break;
             }
-
-            case historyitem_SetShapeRot:
+            case historyitem_GraphicFrameSetSetNvSpPr    :
             {
-                this.spPr.xfrm.rot = data.oldRot;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
+                this.nvGraphicFramePr = data.oldPr;
                 break;
             }
-            case historyitem_SetShapeOffset:
+            case historyitem_GraphicFrameSetSetParent    :
             {
-                this.spPr.xfrm.offX = data.oldOffsetX;
-                this.spPr.xfrm.offY = data.oldOffsetY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
+                this.parent = data.oldPr;
                 break;
             }
-
-            case historyitem_SetShapeExtents:
-            {
-                this.spPr.xfrm.extX = data.oldExtentX;
-                this.spPr.xfrm.extY = data.oldExtentY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                this.spPr.xfrm.flipH = data.oldFlipH;
-                this.spPr.xfrm.flipV = data.oldFlipV;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                if(isRealObject(data.oldFill))
-                {
-                    this.spPr.Fill = data.oldFill.createDuplicate();
-                }
-                else
-                {
-                    this.spPr.Fill = null;
-                }
-                this.recalcInfo.recalculateFill = true;
-                this.recalcInfo.recalculateBrush = true;
-                this.recalcInfo.recalculateTransparent = true;
-
-                break;
-            }
-            case historyitem_SetShapeSetLine:
-            {
-                if(isRealObject(data.oldLine))
-                {
-                    this.spPr.ln = data.oldLine.createDuplicate();
-                }
-                else
-                {
-                    this.spPr.ln = null;
-                }
-
-                this.recalcInfo.recalculateLine = true;
-                this.recalcInfo.recalculatePen = true;
-                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-                break;
-            }
-            case historyitem_SetShapeSetGeometry:
-            {
-                if(isRealObject(data.oldGeometry))
-                {
-                    this.spPr.geometry = data.oldGeometry.createDuplicate();
-                    this.spPr.geometry.Init(5, 5);
-                }
-                else
-                {
-                    this.spPr.geometry = null;
-                }
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetSpGroup:
+            case historyitem_GraphicFrameSetSetGroup     :
             {
                 this.group = data.oldPr;
                 break;
             }
-            case historyitem_SetShapeParent:
-            {
-                this.parent = data.Old;
-                break;
-            }
         }
-
-
-        if(isRealObject(this.parent) && isRealObject(this.graphicObject) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        else
-            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
     },
 
     Redo: function(data)
     {
         switch(data.Type)
         {
-            case historyitem_SetSetSpPr:
+            case historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_SetSetNvSpPr:
+            case historyitem_GraphicFrameSetGraphicObject:
+            {
+                this.graphicObject = data.newPr;
+                break;
+            }
+            case historyitem_GraphicFrameSetSetNvSpPr    :
             {
                 this.nvGraphicFramePr = data.newPr;
                 break;
             }
-            case historyitem_SetGraphicObject:
+            case historyitem_GraphicFrameSetSetParent    :
             {
-                this.graphicObject = data.newPr;
-                if(this.graphicObject && this.graphicObject.Recalc_CompiledPr)
-                    this.graphicObject.Recalc_CompiledPr();
+                this.parent = data.newPr;
                 break;
             }
-            case historyitem_SetShapeRot:
-            {
-                this.spPr.xfrm.rot = data.newRot;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                this.spPr.xfrm.offX = data.newOffsetX;
-                this.spPr.xfrm.offY = data.newOffsetY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                this.spPr.xfrm.extX = data.newExtentX;
-                this.spPr.xfrm.extY = data.newExtentY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                this.spPr.xfrm.flipH = data.newFlipH;
-                this.spPr.xfrm.flipV = data.newFlipV;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                if(isRealObject(data.newFill))
-                {
-                    this.spPr.Fill = data.newFill.createDuplicate();
-                }
-                this.recalcInfo.recalculateFill = true;
-                this.recalcInfo.recalculateBrush = true;
-                this.recalcInfo.recalculateTransparent = true;
-
-                break;
-            }
-            case historyitem_SetShapeSetLine:
-            {
-                if(isRealObject(data.newLine))
-                {
-                    this.spPr.ln = data.newLine.createDuplicate();
-                }
-                else
-                {
-                    this.spPr.ln = null;
-                }
-
-                this.recalcInfo.recalculateLine = true;
-                this.recalcInfo.recalculatePen = true;
-                break;
-            }
-            case historyitem_SetShapeSetGeometry:
-            {
-                if(isRealObject(data.newGeometry))
-                {
-                    this.spPr.geometry = data.newGeometry.createDuplicate();
-                    this.spPr.geometry.Init(5, 5);
-                }
-                else
-                {
-                    this.spPr.geometry = null;
-                }
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                this.txBody.bodyPr = data.newBodyPr.createDuplicate();
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetSpGroup:
+            case historyitem_GraphicFrameSetSetGroup     :
             {
                 this.group = data.newPr;
                 break;
             }
-            case historyitem_SetShapeParent:
-            {
-                this.parent = data.New;
-                break;
-            }
         }
-
-        if(isRealObject(this.parent) && isRealObject(this.graphicObject) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        else
-            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
-
-
     },
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(historyitem_type_GraphicFrame);
         w.WriteLong(data.Type);
-        var bool;
         switch(data.Type)
         {
-            case historyitem_SetSetSpPr:
+            case historyitem_GraphicFrameSetSpPr          :
+            case historyitem_GraphicFrameSetGraphicObject :
+            case historyitem_GraphicFrameSetSetNvSpPr     :
+            case historyitem_GraphicFrameSetSetParent     :
+            case historyitem_GraphicFrameSetSetGroup      :
             {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetSetNvSpPr:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetGraphicObject:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
-                break;
-            }
-            case historyitem_SetShapeRot:
-            {
-                w.WriteDouble(data.newRot);
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                w.WriteDouble(data.newOffsetX);
-                w.WriteDouble(data.newOffsetY);
-                w.WriteBool(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument));
-                if(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument))
-                {
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                w.WriteDouble(data.newExtentX);
-                w.WriteDouble(data.newExtentY);
-                w.WriteBool(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument));
-                if(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument))
-                {
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
-                }
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                w.WriteBool(data.newFlipH);
-                w.WriteBool(data.newFlipV);
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                w.WriteBool(isRealObject(data.newFill));
-                if(isRealObject(data.newFill))
-                {
-                    data.newFill.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeSetLine:
-            {
-                w.WriteBool(isRealObject(data.newLine));
-                if(isRealObject(data.newLine))
-                {
-                    data.newLine.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeSetGeometry:
-            {
-                w.WriteBool(isRealObject(data.newGeometry));
-                if(isRealObject(data.newGeometry))
-                {
-                    data.newGeometry.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                data.newBodyPr.Write_ToBinary2(w);
-                break;
-            }
-            case historyitem_SetSpGroup:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
-                break;
-            }
-            case historyitem_SetShapeParent:
-            {
-                w.WriteBool(isRealObject(data.New));
-                if(isRealObject(data.New))
-                {
-                    w.WriteString2(data.New.Id);
-                }
+                writeObject(w, data.newPr);
                 break;
             }
         }
@@ -2575,187 +1886,34 @@ CGraphicFrame.prototype =
 
     Load_Changes: function(r)
     {
-        if(r.GetLong() === historyitem_type_GraphicFrame)
+        var  type = r.GetLong();
+        switch(type)
         {
-            switch(r.GetLong())
+            case historyitem_GraphicFrameSetSpPr         :
             {
-                case historyitem_SetSetSpPr:
-                {
-
-                    this.spPr = new CSpPr();
-                    if(r.GetBool())
-                    {
-                        this.spPr.Read_FromBinary2(r);
-                    }
-                    break;
-                }
-                case historyitem_SetSetNvSpPr:
-                {
-                    if(r.GetBool())
-                    {
-                        this.nvGraphicFramePr = new UniNvPr();
-                        this.nvGraphicFramePr.Read_FromBinary2(r);
-                    }
-                    else
-                    {
-                        this.nvGraphicFramePr = null;
-                    }
-                    break;
-                }
-                case historyitem_SetGraphicObject:
-                {
-                    if(r.GetBool())
-                    {
-                        this.graphicObject = g_oTableId.Get_ById(r.GetString2());
-                        if(this.graphicObject && this.graphicObject.Recalc_CompiledPr)
-                            this.graphicObject.Recalc_CompiledPr();
-                    }
-                    else
-                    {
-                        this.graphicObject = null;
-                    }
-                    break;
-                }
-                case historyitem_SetShapeRot:
-                {
-                    this.spPr.xfrm.rot = r.GetDouble();
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
-                case historyitem_SetShapeOffset:
-                {
-                    this.spPr.xfrm.offX = r.GetDouble();
-                    this.spPr.xfrm.offY = r.GetDouble();
-                    if(r.GetBool())
-                    {
-                        var p_width = r.GetDouble();
-                        var p_height = r.GetDouble();
-                        if(isRealObject(editor)
-                            && isRealObject(editor.WordControl)
-                            && isRealObject(editor.WordControl.m_oLogicDocument))
-                        {
-                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
-                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
-                            this.spPr.xfrm.offX*=kw;
-                            this.spPr.xfrm.offY*=kh;
-                        }
-                    }
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
-
-                case historyitem_SetShapeExtents:
-                {
-                    this.spPr.xfrm.extX = r.GetDouble();
-                    this.spPr.xfrm.extY = r.GetDouble();
-                    if(r.GetBool())
-                    {
-                        var p_width = r.GetDouble();
-                        var p_height = r.GetDouble();
-                        if(isRealObject(editor)
-                            && isRealObject(editor.WordControl)
-                            && isRealObject(editor.WordControl.m_oLogicDocument))
-                        {
-                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
-                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
-                            this.spPr.xfrm.extX*=kw;
-                            this.spPr.xfrm.extY*=kh;
-                        }
-                    }
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateGeometry = true;
-
-                    break;
-                }
-                case historyitem_SetShapeFlips:
-                {
-                    this.spPr.xfrm.flipH = r.GetBool();
-                    this.spPr.xfrm.flipV = r.GetBool();
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    break;
-                }
-
-                case historyitem_SetShapeSetFill:
-                {
-                    if(r.GetBool())
-                    {
-                        this.spPr.Fill = new CUniFill();
-                        this.spPr.Fill.Read_FromBinary2(r);
-                    }
-                    this.recalcInfo.recalculateFill = true;
-                    this.recalcInfo.recalculateBrush = true;
-                    this.recalcInfo.recalculateTransparent = true;
-                    break;
-                }
-                case historyitem_SetShapeSetLine:
-                {
-                    if(r.GetBool())
-                    {
-                        this.spPr.ln = new CLn();
-                        this.spPr.ln.Read_FromBinary2(r);
-                    }
-                    this.recalcInfo.recalculateLine = true;
-                    this.recalcInfo.recalculatePen = true;
-                    break;
-                }
-                case historyitem_SetShapeSetGeometry:
-                {
-                    if(r.GetBool())
-                    {
-                        this.spPr.geometry = new Geometry();
-                        this.spPr.geometry.Read_FromBinary2(r);
-                        this.spPr.geometry.Init(5, 5);
-                    }
-                    else
-                    {
-                        this.spPr.geometry = null;
-                    }
-                    this.recalcInfo.recalculateGeometry = true;
-                    break;
-                }
-                case historyitem_SetShapeBodyPr:
-                {
-                    this.txBody.bodyPr = new CBodyPr();
-                    this.txBody.bodyPr.Read_FromBinary2(r);
-                    this.txBody.recalcInfo.recalculateBodyPr = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
-
-                case historyitem_SetSpGroup:
-                {
-                    if(r.GetBool())
-                    {
-                        this.group = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    else
-                    {
-                        this.group = null;
-                    }
-                    break;
-                }
-                case historyitem_SetShapeParent:
-                {
-                    if(r.GetBool())
-                    {
-                        this.parent = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    break;
-                }
-
+                this.spPr = readObject(r);
+                break;
             }
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-            if(isRealObject(this.parent) && isRealObject(this.graphicObject) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
-                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-            else
-                delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+            case historyitem_GraphicFrameSetGraphicObject:
+            {
+                this.graphicObject = readObject(r);
+                break;
+            }
+            case historyitem_GraphicFrameSetSetNvSpPr    :
+            {
+                this.nvGraphicFramePr = readObject(r);
+                break;
+            }
+            case historyitem_GraphicFrameSetSetParent    :
+            {
+                this.parent = readObject(r);
+                break;
+            }
+            case historyitem_GraphicFrameSetSetGroup     :
+            {
+                this.group = readObject(r);
+                break;
+            }
         }
     },
 

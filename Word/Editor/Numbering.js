@@ -1847,6 +1847,50 @@ var numbering_presentationnumfrmt_AlphaLcPeriod =   105;  // a., b., c.,
 var numbering_presentationnumfrmt_AlphaUcParenR =   106;  // A), B), C), ...
 var numbering_presentationnumfrmt_AlphaUcPeriod =   107;  // A., B., C., ...
 
+
+var g_NumberingArr = [];
+g_NumberingArr[0] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[1] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[2] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[3] = numbering_presentationnumfrmt_AlphaUcParenR;
+g_NumberingArr[4] = numbering_presentationnumfrmt_AlphaUcParenR;
+g_NumberingArr[5] = numbering_presentationnumfrmt_AlphaUcPeriod;
+g_NumberingArr[6] = numbering_presentationnumfrmt_ArabicPeriod;
+g_NumberingArr[7] = numbering_presentationnumfrmt_ArabicPeriod;
+g_NumberingArr[8] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[9] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[10] = numbering_presentationnumfrmt_ArabicParenR;
+g_NumberingArr[11] = numbering_presentationnumfrmt_ArabicParenR;
+g_NumberingArr[12] = numbering_presentationnumfrmt_ArabicPeriod;
+g_NumberingArr[13] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[14] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[15] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[16] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[17] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[18] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[19] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[20] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[21] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[22] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[23] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[24] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[25] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[26] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[27] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[28] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[29] = numbering_presentationnumfrmt_RomanLcPeriod;
+g_NumberingArr[30] = numbering_presentationnumfrmt_RomanLcPeriod;
+g_NumberingArr[31] = numbering_presentationnumfrmt_RomanLcPeriod;
+g_NumberingArr[32] = numbering_presentationnumfrmt_RomanUcPeriod;
+g_NumberingArr[33] = numbering_presentationnumfrmt_RomanUcPeriod;
+g_NumberingArr[34] = numbering_presentationnumfrmt_RomanUcPeriod;
+g_NumberingArr[35] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[36] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[37] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[38] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[39] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[40] = numbering_presentationnumfrmt_AlphaLcPeriod;
+
 // Класс для работы с нумерацией в презентациях
 function CPresentationBullet()
 {
@@ -1878,7 +1922,7 @@ function CPresentationBullet()
         return this.m_nStartAt;
     };
 
-    this.Measure = function(Context, FirstTextPr, _Num)
+    this.Measure = function(Context, FirstTextPr, _Num, Theme)
     {
         var dFontSize = FirstTextPr.FontSize;
         if ( false === this.m_bSizeTx )
@@ -1889,27 +1933,59 @@ function CPresentationBullet()
                 dFontSize = this.m_dSize;
         }
 
-        var sFontName = ( true === this.m_bFontTx ? FirstTextPr.FontFamily.Name : this.m_sFont );
-        this.m_oTextPr =
+        var RFonts;
+        if(!this.m_bFontTx)
         {
-            FontFamily :
-            {
-                Name  : sFontName,
-                Index : -1
-            },
+            RFonts = {
+                Ascii: {
+                    Name: this.m_sFont,
+                        Index: -1
+                },
+                EastAsia: {
+                    Name: this.m_sFont,
+                        Index: -1
+                },
+                CS: {
+                    Name: this.m_sFont,
+                        Index: -1
+                },
+                HAnsi: {
+                    Name: this.m_sFont,
+                        Index: -1
+                }
+            };
+        }
+        else
+        {
+            RFonts = FirstTextPr.RFonts;
+        }
+
+
+        var FirstTextPr_ = FirstTextPr.Copy();
+        if(FirstTextPr_.Underline)
+        {
+            FirstTextPr_.Underline = false;
+        }
+
+        var TextPr_ = new CTextPr();
+        TextPr_.Set_FromObject({
+            RFonts: RFonts,
 
             FontSize : dFontSize,
             Bold     : ( this.m_nType >= numbering_presentationnumfrmt_ArabicPeriod ? FirstTextPr.Bold   : false ),
             Italic   : ( this.m_nType >= numbering_presentationnumfrmt_ArabicPeriod ? FirstTextPr.Italic : false )
-        };
+        });
+        FirstTextPr_.Merge(TextPr_);
+        this.m_oTextPr = FirstTextPr_;
 
         var Num = _Num + this.m_nStartAt - 1;
         this.m_nNum = Num;
 
         var X = 0;
 
-        var OldFont = Context.GetFont();
-        Context.SetFont( this.m_oTextPr );
+
+        var OldTextPr = Context.GetTextPr();
+
 
         var sT = "";
 
@@ -1974,13 +2050,24 @@ function CPresentationBullet()
 
         this.m_sString = sT;
 
+        var Hint =  this.m_oTextPr.RFonts.Hint;
+        var bCS  =  this.m_oTextPr.CS;
+        var bRTL =  this.m_oTextPr.RTL;
+        var lcid =  this.m_oTextPr.Lang.EastAsia;
+
+        var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
+        Context.SetTextPr( this.m_oTextPr, Theme );
+        Context.SetFontSlot( FontSlot );
         for ( var Index2 = 0; Index2 < sT.length; Index2++ )
         {
             var Char = sT.charAt(Index2);
             X += Context.Measure( Char ).Width;
         }
 
-        Context.SetFont( OldFont );
+        if(OldTextPr)
+        {
+            Context.SetTextPr( OldTextPr, Theme );
+        }
         return { Width : X };
     };
 
@@ -2007,7 +2094,7 @@ function CPresentationBullet()
         return Bullet;
     };
 
-    this.Draw = function(X, Y, Context, FirstTextPr)
+    this.Draw = function(X, Y, Context, FirstTextPr, PDSE)
     {
         if ( null === this.m_oTextPr || null === this.m_nNum )
             return;
@@ -2015,21 +2102,40 @@ function CPresentationBullet()
         var oColor = { r : this.m_oColor.r, g : this.m_oColor.g, b : this.m_oColor.b };
         if ( true === this.m_bColorTx )
         {
-            oColor.r = FirstTextPr.Color.r;
-            oColor.g = FirstTextPr.Color.g;
-            oColor.b = FirstTextPr.Color.b;
+            if(FirstTextPr.Unifill)
+            {
+                FirstTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+                var RGBA = FirstTextPr.Unifill.getRGBAColor();
+                oColor.r = RGBA.R;
+                oColor.g = RGBA.G;
+                oColor.b = RGBA.B;
+            }
+            else
+            {
+                oColor.r = FirstTextPr.Color.r;
+                oColor.g = FirstTextPr.Color.g;
+                oColor.b = FirstTextPr.Color.b;
+            }
         }
 
         Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
         Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
 
-        var OldFont  = Context.GetFont();
-        var OldFont2 = g_oTextMeasurer.GetFont();
+        var OldTextPr  = Context.GetTextPr();
+        var OldTextPr2 = g_oTextMeasurer.GetTextPr();
 
-        Context.SetFont( this.m_oTextPr );
-        g_oTextMeasurer.SetFont( this.m_oTextPr );
+        var Hint =  this.m_oTextPr.RFonts.Hint;
+        var bCS  =  this.m_oTextPr.CS;
+        var bRTL =  this.m_oTextPr.RTL;
+        var lcid =  this.m_oTextPr.Lang.EastAsia;
 
         var sT = this.m_sString;
+        var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
+        Context.SetTextPr( this.m_oTextPr, PDSE.Theme );
+        Context.SetFontSlot( FontSlot );
+        g_oTextMeasurer.SetTextPr( this.m_oTextPr, PDSE.Theme  );
+        g_oTextMeasurer.SetFontSlot( FontSlot );
+
 
         for ( var Index2 = 0; Index2 < sT.length; Index2++ )
         {
@@ -2038,8 +2144,14 @@ function CPresentationBullet()
             X += g_oTextMeasurer.Measure( Char ).Width;
         }
 
-        Context.SetFont( OldFont );
-        g_oTextMeasurer.SetFont( OldFont2 );
+        if(OldTextPr)
+        {
+            Context.SetTextPr( OldTextPr, PDSE.Theme );
+        }
+        if(OldTextPr2)
+        {
+            g_oTextMeasurer.SetTextPr( OldTextPr2, PDSE.Theme  );
+        }
     };
 
     this.Write_ToBinary = function(Writer)

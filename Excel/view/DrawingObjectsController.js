@@ -251,7 +251,7 @@ DrawingObjectsController.prototype.recalculate2 = function(bAll)
 
 DrawingObjectsController.prototype.updateRecalcObjects = function()
 {};
-DrawingObjectsController.prototype. getTheme = function()
+DrawingObjectsController.prototype.getTheme = function()
 {
     return window["Asc"]["editor"].wbModel.theme;
 };
@@ -350,18 +350,22 @@ DrawingObjectsController.prototype.createGroup = function()
 {
     History.Create_NewPoint();
     var group = this.getGroup();
-    var group_array = this.getArrayForGrouping();
-    for(var i = group_array.length - 1; i > -1; --i)
+    if(group)
     {
-        group_array[i].deleteDrawingBase();
+        var group_array = this.getArrayForGrouping();
+        for(var i = group_array.length - 1; i > -1; --i)
+        {
+            group_array[i].deleteDrawingBase();
+        }
+        this.resetSelection();
+        this.drawingObjects.getWorksheetModel && group.setWorksheet(this.drawingObjects.getWorksheetModel());
+        group.setDrawingObjects(this.drawingObjects);
+        group.setParent(this.drawingObjects);
+        group.addToDrawingObjects();
+        this.selectObject(group, 0);
+        group.addToRecalculate();
+        this.startRecalculate();
     }
-    this.resetSelection();
-    group.setWorksheet(this.drawingObjects.getWorksheetModel());
-    group.setDrawingObjects(this.drawingObjects);
-    group.addToDrawingObjects();
-    this.selectObject(group, 0);
-    group.addToRecalculate();
-    this.startRecalculate();
 };
 DrawingObjectsController.prototype.handleChartDoubleClick = function()
 {
@@ -442,7 +446,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
 DrawingObjectsController.prototype.isPointInDrawingObjects = function(x, y, e)
 {
     this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
-    var ret = this.curState.onMouseDown(e || {}, x, y);
+    var ret = this.curState.onMouseDown(e || {}, x, y, 0);
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
     return ret;
 };
@@ -478,6 +482,32 @@ DrawingObjectsController.prototype.convertPixToMM = function(pix)
 {
     return this.drawingObjects ? this.drawingObjects.convertMetric(pix, 0, 3) : 0;
 };
+
+DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)
+{
+    this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphPresentationNumbering, [Bullet]);
+};
+
+DrawingObjectsController.prototype.paragraphIncDecIndent = function(bIncrease)
+{
+    this.applyDocContentFunction(CDocumentContent.prototype.Increase_ParagraphLevel, [bIncrease]);
+};
+
+DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncrease)
+{
+    var content = this.getTargetDocContent();
+    if(content)
+    {
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object && target_text_object.getObjectType() === historyitem_type_Shape
+            && (!target_text_object.isPlaceholder() || !target_text_object.getPhType() !== phType_title && target_text_object.getPhType() !== phType_ctrTitle))
+        {
+            return content.Can_IncreaseParagraphLevel(bIncrease);
+        }
+    }
+    return false;
+};
+
 
 DrawingObjectsController.prototype.onKeyPress = function(e)
 {

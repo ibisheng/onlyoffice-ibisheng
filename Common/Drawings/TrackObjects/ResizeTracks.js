@@ -555,7 +555,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
             if(this.originalObject.parent)
             {
-                var parent_shape = this.originalObject.parent.isShapeChild(true);
+                var parent_shape = this.originalObject.parent.isShapeChild && this.originalObject.parent.isShapeChild(true);
                 if(parent_shape)
                 {
                     global_MatrixTransformer.MultiplyAppend(_transform, parent_shape.transformText);
@@ -671,7 +671,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             }
             if(this.originalObject.parent)
             {
-                var parent_shape = this.originalObject.parent.isShapeChild(true);
+                var parent_shape = this.originalObject.parent.isShapeChild &&  this.originalObject.parent.isShapeChild(true);
                 if(parent_shape)
                 {
                     global_MatrixTransformer.MultiplyAppend(_transform, parent_shape.transformText);
@@ -694,7 +694,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         {
             var boundsChecker = new  CSlideBoundsChecker();
             var tr = this.transform;
-            var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild(true);
+            var parent_shape = this.originalObject && this.originalObject.parent && this.originalObject.parent.isShapeChild && this.originalObject.parent.isShapeChild(true);
             if(parent_shape)
             {
                 tr = tr.CreateDublicate();

@@ -1,0 +1,146 @@
+/**
+ *    app.js
+ *
+ *    Created by Julia Radzhabova on 26 March 2014
+ *    Copyright (c) 2014 Ascensio System SIA. All rights reserved.
+ *
+ */
+
+'use strict';
+
+require.config({
+    // The shim config allows us to configure dependencies for
+    // scripts that do not call define() to register a module
+    baseUrl: '../../',
+    waitSeconds: 30,
+    paths: {
+        jquery          : '../vendor/jquery/jquery',
+        underscore      : '../vendor/underscore/underscore',
+        backbone        : '../vendor/backbone/backbone',
+        bootstrap       : '../vendor/bootstrap/dist/js/bootstrap',
+        text            : '../vendor/requirejs-text/text',
+        perfectscrollbar: '../vendor/perfect-scrollbar/src/perfect-scrollbar',
+        jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
+        xregexp         : '../vendor/xregexp/xregexp-all-min',
+        sockjs          : '../vendor/sockjs/sockjs.min',
+        api             : 'api/documents/api',
+        core            : 'common/main/lib/core/application',
+        notification    : 'common/main/lib/core/NotificationCenter',
+        keymaster       : 'common/main/lib/core/keymaster',
+        tip             : 'common/main/lib/util/Tip',
+        analytics       : 'common/Analytics',
+        gateway         : 'common/Gateway',
+        locale          : 'common/locale',
+        irregularstack  : 'common/IrregularStack'
+    },
+    shim: {
+        underscore: {
+            exports: '_'
+        },
+        backbone: {
+            deps: [
+                'underscore',
+                'jquery'
+            ],
+            exports: 'Backbone'
+        },
+        bootstrap: {
+            deps: [
+                'jquery'
+            ]
+        },
+        perfectscrollbar: {
+            deps: [
+                'jmousewheel'
+            ]
+        },
+        notification: {
+            deps: [
+                'backbone'
+            ]
+        },
+        core: {
+            deps: [
+                'backbone',
+                'notification',
+                'irregularstack'
+            ]
+        },
+        gateway: {
+            deps: [
+                'jquery'
+            ]
+        },
+        analytics: {
+            deps: [
+                'jquery'
+            ]
+        }
+    }
+});
+
+require([
+    'backbone',
+    'bootstrap',
+    'core',
+    'api',
+    'analytics',
+    'gateway',
+    'locale'
+], function (Backbone, Bootstrap, Core) {
+    Backbone.history.start();
+
+    /**
+     * Application instance with PE namespace defined
+     */
+    var app = new Backbone.Application({
+        nameSpace: 'PE',
+        autoCreate: false,
+        controllers : [
+            'Viewport',
+            'DocumentHolder',
+            'Toolbar',
+            'Statusbar',
+            'RightMenu',
+            'LeftMenu',
+            'Main',
+            'Common.Controllers.Fonts'
+            /** coauthoring begin **/
+            , 'Common.Controllers.Chat',
+            'Common.Controllers.Comments',
+            /** coauthoring end **/
+            /** proprietary begin **/
+            'Common.Controllers.ExternalDiagramEditor'
+            /** proprietary end **/
+        ]
+    });
+
+    Common.Locale.apply();
+
+    require([
+        'presentationeditor/main/app/controller/Viewport',
+        'presentationeditor/main/app/controller/DocumentHolder',
+        'presentationeditor/main/app/controller/Toolbar',
+        'presentationeditor/main/app/controller/Statusbar',
+        'presentationeditor/main/app/controller/RightMenu',
+        'presentationeditor/main/app/controller/LeftMenu',
+        'presentationeditor/main/app/controller/Main',
+        'presentationeditor/main/app/view/ParagraphSettings',
+        'presentationeditor/main/app/view/ImageSettings',
+        'presentationeditor/main/app/view/ShapeSettings',
+        'presentationeditor/main/app/view/SlideSettings',
+        'presentationeditor/main/app/view/TableSettings',
+        'common/main/lib/util/utils',
+        'common/main/lib/controller/Fonts'
+        /** coauthoring begin **/
+        ,'common/main/lib/controller/Comments',
+        'common/main/lib/controller/Chat',
+        /** coauthoring end **/
+        /** proprietary begin **/
+        'presentationeditor/main/app/view/ChartSettings',
+        'common/main/lib/controller/ExternalDiagramEditor'
+        /** proprietary end **/
+    ], function() {
+        app.start();
+    });
+});

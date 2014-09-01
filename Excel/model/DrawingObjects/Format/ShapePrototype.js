@@ -326,8 +326,6 @@ CShape.prototype.recalculate = function ()
         }
 
         if (this.recalcInfo.recalculateContent) {
-            if (this.txBody)
-                this.txBody.recalcInfo.recalculateContent2 = true;
             this.recalculateContent();
             this.recalcInfo.recalculateContent = false;
         }

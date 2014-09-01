@@ -1,250 +1,16 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 7/5/13
- * Time: 7:01 PM
- * To change this template use File | Settings | File Templates.
- */
-// Класс Документ
-//
-// Логическая часть:
-//     Content : Массив объектов (параграфы, таблицы, картинки, графика и т.д.)
-//     SectPr  : Настройки секци (размеры, поля)
-//               PgSz : размеры страницы
-//                     W, H, Orient
-//               PgMar: отступы страницы
-//                      Top, Left, Right, Bottom, Header, Footer
-//
-// Графическая часть:
-
-var tableSpacingMinValue = 0.02;//0.02мм
-var Page_Width     = 210;
-var Page_Height    = 297;
-
-var X_Left_Margin   = 30;  // 3   cm
-var X_Right_Margin  = 15;  // 1.5 cm
-var Y_Bottom_Margin = 20;  // 2   cm
-var Y_Top_Margin    = 20;  // 2   cm
-
-var Y_Default_Header = 12.5; // 1.25 cm расстояние от верха страницы до верха верхнего колонтитула
-var Y_Default_Footer = 12.5; // 1.25 cm расстояние от низа страницы до низа нижнего колонтитула
-
-var X_Left_Field   = X_Left_Margin;
-var X_Right_Field  = Page_Width  - X_Right_Margin;
-var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-var Y_Top_Field    = Y_Top_Margin;
-
-var docpostype_Content        = 0x00;
-var docpostype_FlowObjects    = 0x01;
-var docpostype_HdrFtr         = 0x02;
-var docpostype_DrawingObjects = 0x03;
-
-var selectionflag_Common        = 0x00;
-var selectionflag_Numbering     = 0x01;
-var selectionflag_DrawingObject = 0x002;
-
-var orientation_Portrait  = 0x00;
-var orientation_Landscape = 0x01;
-
-var search_Common              = 0x0000; // Поиск в простом тексте
-
-var search_Header              = 0x0100; // Поиск в верхнем колонтитуле
-var search_Footer              = 0x0200; // Поиск в нижнем колонтитуле
-
-var search_HdrFtr_All          = 0x0001; // Поиск в колонтитуле, который находится на всех страницах
-var search_HdrFtr_All_no_First = 0x0002; // Поиск в колонтитуле, который находится на всех страницах, кроме первой
-var search_HdrFtr_First        = 0x0003; // Поиск в колонтитуле, который находится только на первой страниц
-var search_HdrFtr_Even         = 0x0004; // Поиск в колонтитуле, который находится только на четных страницах
-var search_HdrFtr_Odd          = 0x0005; // Поиск в колонтитуле, который находится только на нечетных страницах, включая первую
-var search_HdrFtr_Odd_no_First = 0x0006; // Поиск в колонтитуле, который находится только на нечетных страницах, кроме первой
-
-// Типы которые возвращают классы CParagraph и CTable после пересчета страницы
-var recalcresult_NextElement = 0x00; // Пересчитываем следующий элемент
-var recalcresult_PrevPage    = 0x01; // Пересчитываем заново предыдущую страницу
-var recalcresult_CurPage     = 0x02; // Пересчитываем заново текущую страницу
-var recalcresult_NextPage    = 0x03; // Пересчитываем следующую страницу
-
-// Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
-var recalcresult2_End      = 0x00; // Документ рассчитан до конца
-var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжить
-
 var History = null;
-var StartTime;
-
-function Document_Recalculate_Page()
-{
-    var LogicDocument = editor.WordControl.m_oLogicDocument;
-    var FullRecalc    = LogicDocument.FullRecalc;
-    LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
-}
-
-function CDocumentPage()
-{
-    this.Width   = Page_Width;
-    this.Height  = Page_Height;
-    this.Margins =
-    {
-        Left   : X_Left_Field,
-        Right  : X_Right_Field,
-        Top    : Y_Top_Field,
-        Bottom : Y_Bottom_Field
-    };
-
-    this.Bounds = new CDocumentBounds(0,0,0,0);
-    this.FlowObjects = new FlowObjects(editor.WordControl.m_oLogicDocument, 0); // Используем данный объект только для хранения ссылок на Flow-таблицы
-    this.Pos    = 0;
-    this.EndPos = 0;
-
-    this.X      = 0;
-    this.Y      = 0;
-    this.XLimit = 0;
-    this.YLimit = 0;
-}
-
-CDocumentPage.prototype =
-{
-    Update_Limits : function(Limits)
-    {
-        this.X      = Limits.X;
-        this.XLimit = Limits.XLimit;
-        this.Y      = Limits.Y;
-        this.YLimit = Limits.YLimit;
-    },
-
-    Shift : function(Dx, Dy)
-    {
-        this.X      += Dx;
-        this.XLimit += Dx;
-        this.Y      += Dy;
-        this.YLimit += Dy;
-
-        this.Bounds.Shift( Dx, Dy );
-    }
-};
-
-function CStatistics(LogicDocument)
-{
-    this.LogicDocument = LogicDocument;
-
-    this.Id = null;
-
-    this.StartPos = 0;
-    this.CurPage  = 0;
-
-    this.Pages           = 0;
-    this.Words           = 0;
-    this.Paragraphs      = 0;
-    this.SymbolsWOSpaces = 0;
-    this.SymbolsWhSpaces = 0;
-}
-
-CStatistics.prototype =
-{
-//-----------------------------------------------------------------------------------
-// Функции для запуска и остановки сбора статистики
-//-----------------------------------------------------------------------------------
-    Start : function()
-    {
-        this.StartPos = 0;
-        this.CurPage  = 0;
-
-        this.Pages           = 0;
-        this.Words           = 0;
-        this.Paragraphs      = 0;
-        this.SymbolsWOSpaces = 0;
-        this.SymbolsWhSpaces = 0;
-
-        this.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Statistics_OnPage()}, 1);
-        this.Send();
-    },
-
-    Next : function(StartPos, CurPage)
-    {
-        clearTimeout( this.Id );
-
-        this.StartPos = StartPos;
-        this.CurPage  = CurPage;
-
-        this.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Statistics_OnPage()}, 1);
-        this.Send();
-    },
-
-    Stop : function()
-    {
-        if ( null != this.Id )
-        {
-            this.Send();
-            clearTimeout( this.Id );
-            this.Id = null;
-
-            editor.sync_GetDocInfoEndCallback();
-        }
-    },
-
-    Send : function()
-    {
-        var Stats =
-        {
-            PageCount      : this.Pages,
-            WordsCount     : this.Words,
-            ParagraphCount : this.Paragraphs,
-            SymbolsCount   : this.SymbolsWOSpaces,
-            SymbolsWSCount : this.SymbolsWhSpaces
-        };
-
-        editor.sync_DocInfoCallback( Stats );
-    },
-//-----------------------------------------------------------------------------------
-// Функции для пополнения статистики
-//-----------------------------------------------------------------------------------
-    Add_Paragraph : function (Count)
-    {
-        if ( "undefined" != typeof( Count ) )
-            this.Paragraphs += Count;
-        else
-            this.Paragraphs++;
-    },
-
-    Add_Word : function(Count)
-    {
-        if ( "undefined" != typeof( Count ) )
-            this.Words += Count;
-        else
-            this.Words++;
-    },
-
-    Add_Page : function(Count)
-    {
-        if ( "undefined" != typeof( Count ) )
-            this.Pages += Count;
-        else
-            this.Pages++;
-    },
-
-    Add_Symbol : function(bSpace)
-    {
-        this.SymbolsWhSpaces++;
-        if ( true != bSpace )
-            this.SymbolsWOSpaces++;
-    }
-};
-
-var MASTER_STYLES = false;
-
+var recalcSlideInterval = 30;
 function CPresentation(DrawingDocument)
 {
     this.History = new CHistory(this);
     History = this.History;
 
     // Создаем глобальные объекты, необходимые для совместного редактирования
-    this.IdCounter = g_oIdCounter;
 
-    this.TableId = new CTableId();
-    g_oTableId = this.TableId;
+    g_oTableId = new CTableId();
 
-    this.CollaborativeEditing = CollaborativeEditing;
     //------------------------------------------------------------------------
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -253,59 +19,12 @@ function CPresentation(DrawingDocument)
     this.CurPage   = 0;
 
     this.Orientation = orientation_Portrait; // ориентация страницы
-    this.StyleCounter = 0;
-    this.NumInfoCounter = 0;
 
     // Сначала настраиваем размеры страницы и поля
     this.slidesToUnlock = [];
 
-    this.ContentLastChangePos = 0;
-
-    this.CurPos  =
-    {
-        X          : 0,
-        Y          : 0,
-        ContentPos : 0, // в зависимости, от параметра Type: позиция в Document.Content
-        RealX      : 0, // позиция курсора, без учета расположения букв
-        RealY      : 0, // это актуально для клавиш вверх и вниз
-        Type       : docpostype_Content
-    };
-
-    this.Selection =
-    {
-        Start    : false,
-        Use      : false,
-        StartPos : 0,
-        EndPos   : 0,
-        Flag     : selectionflag_Common,
-        Data     : null,
-        UpdateOnRecalc : false
-    };
-
-    // Здесь мы храним инфрмацию, связанную с разбивкой на страницы и самими страницами
-    this.Pages = [];
-
-    this.RecalcInfo =
-    {
-        FlowObject                : null,   // Текущий float-объект, который мы пересчитываем
-        FlowObjectPageBreakBefore : false,  // Нужно ли перед float-объектом поставить pagebreak
-        FlowObjectPage            : 0,      // Количество обработанных страниц
-
-        WidowControlParagraph     : null,   // Параграф, который мы пересчитываем из-за висячих строк
-        WidowControlLine          : -1      // Номер строки, перед которой надо поставить разрыв страницы
-    };
-    this.RecalcId   = 0; // Номер пересчета
-    this.FullRecalc = {};
-    this.FullRecalc.Id = null;
-    this.FullRecalc.X  = 0;
-    this.FullRecalc.Y  = 0;
-    this.FullRecalc.StartPos = 0;
-    this.FullRecalc.CurPage  = 0;
 
     this.TurnOffRecalc = false;
-
-    this.Numbering = new CNumbering();
-    this.Styles    = new CStyles();
 
     this.DrawingDocument = DrawingDocument;
 
@@ -332,9 +51,6 @@ function CPresentation(DrawingDocument)
     this.CopyTextPr = null; // TextPr для копирования по образцу
     this.CopyParaPr = null; // ParaPr для копирования по образцу
 
-    // Класс для работы со статискикой документа
-    this.Statistics = new CStatistics( this );
-
 
     this.Lock = new CLock();
 
@@ -360,65 +76,14 @@ function CPresentation(DrawingDocument)
     this.DefaultSlideTiming.setDefaultParams();
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
-
-    this.themeLock = new PropLocker(this.Id);
-    //this.schemeLock = new PropLocker(this.Id);
-    this.slideSizeLock = new PropLocker(this.Id);
+   //
+   this.themeLock = new PropLocker(this.Id);
+   this.schemeLock = new PropLocker(this.Id);
+   this.slideSizeLock = new PropLocker(this.Id);
 
     this.CommentAuthors = {};
     this.createDefaultTableStyles();
     this.bGoToPage = false;
-}
-
-var selected_None              = -1;
-var selected_DrawingObject     = 0;
-var selected_DrawingObjectText = 1;
-
-function CSelectedElementsInfo()
-{
-    this.m_bTable          = false; // Находится курсор или выделение целиком в какой-нибудь таблице
-    this.m_bMixedSelection = false; // Попадает ли в выделение одновременно несколько элементов
-    this.m_nDrawing        = selected_None;
-
-    this.Reset = function()
-    {
-        this.m_bSelection      = false;
-        this.m_bTable          = false;
-        this.m_bMixedSelection = false;
-        this.m_nDrawing        = -1;
-    };
-
-    this.Set_Table = function()
-    {
-        this.m_bTable = true;
-    };
-
-    this.Set_Drawing = function(nDrawing)
-    {
-        this.m_nDrawing = nDrawing;
-    };
-
-    this.Is_DrawingObjSelected = function()
-    {
-        return ( this.m_nDrawing === selected_DrawingObject ? true : false );
-    };
-
-
-
-    this.Set_MixedSelection = function()
-    {
-        this.m_bMixedSelection = true;
-    };
-
-    this.Is_InTable = function()
-    {
-        return this.m_bTable;
-    };
-
-    this.Is_MixedSelection = function()
-    {
-        return this.m_bMixedSelection;
-    };
 }
 
 CPresentation.prototype =
@@ -560,7 +225,7 @@ CPresentation.prototype =
 
     addSlideMaster: function(pos, master)
     {
-        History.Add(this, {Type:historyitem_Presenattion_AddSlideMaster, pos: pos, master: master});
+        History.Add(this, {Type: historyitem_Presentation_AddSlideMaster, pos: pos, master: master});
         this.slideMasters.splice(pos, 0, master);
     },
 
@@ -584,136 +249,85 @@ CPresentation.prototype =
         this.Interface_Update_TextPr();
     },
 
-    LoadTestDocument : function()
+
+    GetRecalculateMaps: function()
     {
-        g_oIdCounter.Set_Load(true);
+        var ret = {
+            layouts: {},
+            masters: {}
+        };
 
-        editor.ShowParaMarks = true;
-        //При сборке релиза ASC_DOCS_API_DEBUG равен false и тогда код после ифа удалится
-        if( true != ASC_DOCS_API_DEBUG )
-        {
-            this.LoadEmptyDocument();
-            return;
-        }
-
-        // Добавляем тестовый текст к документу
-        this.DrawingDocument.m_bIsNoSendChangeDocument = true;
-        this.Recalculate();
-        this.DrawingDocument.m_bIsNoSendChangeDocument = false;
-        this.DrawingDocument.m_bIsOpeningDocument = true;
-        this.DrawingDocument.TargetStart();
-
-        var Strings = ["History", "A box of punched cards with several program decks.", "Before text editors existed, computer text was punched into punched cards with keypunch machines. The text was carried as a physical box of these thin cardboard cards, and read into a card-reader. Magnetic tape or disk \"card-image\" files created from such card decks often had no line-separation characters at all, commonly assuming fixed-length 80-character records. An alternative to cards was punched paper tape, generated by teletype (TTY) machines; these did need special characters to indicate ends of records.",         "The first text editors were line editors oriented to teletype- or typewriter- style terminals, which did not provide a window or screen-oriented display. They usually had very short commands (to minimize typing) that reproduced the current line. Among them were a command to print a selected section(s) of the file on the typewriter (or printer) in case of necessity. An \"edit cursor\", an imaginary insertion point, could be moved by special commands that operated with line numbers of specific text strings (context). Later, the context strings were extended to regular expressions. To see the changes, the file needed to be printed on the printer. These \"line-based text editors\" were considered revolutionary improvements over keypunch machines. In case typewriter-based terminals were not available, they were adapted to keypunch equipment. In this case the user needed to punch the commands into the separate deck of cards and feed them into the computer in order to edit the file.",            "When computer terminals with video screens became available, screen-based text editors (sometimes termed just \"screen editors\") became common. One of the earliest \"full screen\" editors was O26 - which was written for the operator console of the CDC 6000 series machines in 1967. Another early full screen editor is vi. Written in the 1970s, vi is still a standard editor[1] for Unix and Linux operating systems. Vi and Emacs are popular editors on these systems. The productivity of editing using full-screen editors (compared to the line-based editors) motivated many of the early purchases of video terminals."];
-        var oldPara = this.Content[this.Content.length - 1];
-        var Para = new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
-
-        oldPara.Set_DocumentNext(Para);
-        Para.Set_DocumentPrev(oldPara);
-
-        this.Content.push( Para );
-        for ( var j = 0; j < 10; j++ )
-        {
-            var Pos = 0;
-            for ( var i = 0; i < Strings.length; i++ )
-            {
-                switch ( i )
-                {
-                    case 0 :
-                    {
-                        Para.Style_Add( this.Styles.Get_Default_Heading(0) );
-                        break;
-                    }
-                    default:
-                    {
-                        Para.Pr.Jc = align_Justify;
-                        break;
-                    }
-                }
-                for ( var Index = 0; Index < Strings[i].length; Index++ )
-                {
-                    if ( " " != Strings[i].charAt( Index )  )
-                        Para.Internal_Content_Add( Pos++, new ParaText( Strings[i].charAt( Index ) ) );
-                    else
-                        Para.Internal_Content_Add( Pos++, new ParaSpace() );
-                }
-
-                oldPara = Para;
-                Para = new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
-
-                oldPara.Set_DocumentNext(Para);
-                Para.Set_DocumentPrev(oldPara);
-                this.Content.push( Para );
-                Pos = 0;
-            }
-        }
-
-        this.Recalculate();
-
-        var Rand = Math.floor( Math.random() * 100 );
-        g_oIdCounter.Set_UserId("" + Rand);
-        g_oIdCounter.Set_Load(false);
-    },
-
-    Set_CurrentElement : function(Index)
-    {
-        var ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
-        this.CurPos.Type = docpostype_Content;
-        this.Selection_Remove();
-        this.CurPos.ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Index ) );
-
-        if ( true === this.Content[ContentPos].Is_SelectionUse() )
-        {
-            this.Selection.Use      = true;
-            this.Selection.StartPos = ContentPos;
-            this.Selection.EndPos   = ContentPos;
-        }
-
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-        this.Document_UpdateSelectionState();
-    },
-
-    Is_ThisElementCurrent : function()
-    {
-        return true;
-    },
-
-    Get_PageContentStartPos : function (PageIndex)
-    {
-        var Y = Y_Top_Field;
-
-        var YLimit = Y_Bottom_Field;
-
-        return { X : X_Left_Field, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
-    },
-
-    Get_PageLimits : function(PageIndex)
-    {
-        return { X : 0, Y : 0, XLimit : Page_Width, YLimit : Page_Height };
-    },
-
-    Get_PageFields : function(PageIndex)
-    {
-        return { X : X_Left_Field, Y : Y_Top_Field, XLimit : X_Right_Field, YLimit : Y_Bottom_Field };
-    },
-
-
-    Recalculate : function()
-    {
-        for(var i in this.recalcMap)
-        {
-            if(isRealObject(this.recalcMap[i]) && typeof this.recalcMap[i].recalculate === "function")
-                this.recalcMap[i].recalculate();
-        }
-
-        this.recalcMap = {};
-        this.updateSlideIndexes();
-        this.RecalculateCurPos();
         for(var i = 0; i < this.Slides.length; ++i)
         {
-            this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
+            ret.layouts[this.Slides[i].Layout.Id] = this.Slides[i].Layout;
+            ret.masters[this.Slides[i].Layout.Master.Id] = this.Slides[i].Layout.Master;
         }
-        this.DrawingDocument.OnEndRecalculate();
+        return ret;
+    },
+
+
+    Recalculate : function(RecalcData)
+    {
+        var _RecalcData = RecalcData ? RecalcData : History.Get_RecalcData(), key, recalcMap, bSync = true;
+        if(_RecalcData.Drawings.All || _RecalcData.Drawings.ThemeInfo)
+        {
+            recalcMap = this.GetRecalculateMaps();
+            for(key in recalcMap.masters)
+            {
+                if(recalcMap.masters.hasOwnProperty(key))
+                {
+                    recalcMap.masters[key].recalculate();
+                }
+            }
+            for(key in recalcMap.layouts)
+            {
+                if(recalcMap.layouts.hasOwnProperty(key))
+                {
+                    recalcMap.layouts[key].recalculate();
+                }
+            }
+            if(_RecalcData.Drawings.ThemeInfo)
+            {
+                this.clearThemeTimeouts();
+                var startRecalcIndex = _RecalcData.Drawings.ThemeInfo.ArrInd.indexOf(this.CurPage);
+                if(startRecalcIndex === -1)
+                {
+                    startRecalcIndex = 0;
+                }
+                var oThis = this;
+                bSync = false;
+                redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, _RecalcData.Drawings.ThemeInfo.ArrInd, startRecalcIndex,  0, oThis.Slides);
+            }
+            else
+            {
+                for(key = 0; key < this.Slides.length; ++key)
+                {
+                    this.Slides[key].recalculate()
+                }
+            }
+        }
+        else
+        {
+            for(key in _RecalcData.Drawings.Map)
+            {
+                if(_RecalcData.Drawings.Map.hasOwnProperty(key))
+                {
+                    _RecalcData.Drawings.Map[key].recalculate();
+                }
+            }
+        }
+        History.Reset_RecalcIndex();
+
+        this.updateSlideIndexes();
+        this.RecalculateCurPos();
+        if(bSync)
+        {
+            for(var i = 0; i < this.Slides.length; ++i)
+            {
+                this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
+            }
+            this.DrawingDocument.OnEndRecalculate();
+        }
         if(!this.Slides[this.CurPage])
         {
             this.DrawingDocument.m_oWordControl.GoToPage(this.Slides.length - 1);
@@ -745,44 +359,6 @@ CPresentation.prototype =
         }
     },
 
-
-    RecalculateAfterOpen: function()
-    {
-        var layouts = [], masters = [];
-        for(var i = 0;  i < this.Slides.length; ++i)
-        {
-            var slide = this.Slides[i];
-            slide.Width = this.Width;
-            slide.Height = this.Height;
-
-            slide.Load_Comments();
-            slide.recalculate();
-            var layout = slide.Layout;
-            var master = layout.Master;
-            for(var j = 0; j < masters.length; ++j)
-            {
-                if(masters[j] === master)
-                    break;
-            }
-            if(j === masters.length)
-            {
-                master.recalculate();
-                masters.push(master);
-            }
-
-            for(j = 0; j < layouts.length; ++j)
-            {
-                if(layouts[j] === layout)
-                    break;
-            }
-            if(j === layouts.length)
-            {
-                layout.recalculate();
-                layouts.push(layout);
-            }
-        }
-    },
-
     GenerateThumbnails : function(_drawerThemes, _drawerLayouts)
     {
         var _masters = this.slideMasters;
@@ -802,277 +378,9 @@ CPresentation.prototype =
         }
     },
 
-    RecalculateAfterUndoRedo: function()
-    {
-
-    },
-
-    // bStart - флаг, который говорит, о том рассчитываем мы эту страницу первый раз или нет (за один общий пересчет)
-    Recalculate_Page : function(PageIndex, bStart, StartIndex)
-    {
-        if ( true === bStart )
-        {
-            this.Pages.length = PageIndex;
-            this.Pages[PageIndex] = new CDocumentPage();
-            this.Pages[PageIndex].Pos = StartIndex;
-            this.DrawingObjects.createGraphicPage(PageIndex);
-            this.DrawingObjects.resetDrawingArrays(PageIndex, this);
-        }
-
-        var Count = this.Content.length;
-
-        var StartPos = this.Get_PageContentStartPos( PageIndex );
-
-        var X      = StartPos.X;
-        var StartY = StartPos.Y;
-        var Y      = StartY;
-            var YLimit = StartPos.YLimit;
-        var XLimit = StartPos.XLimit;
-
-        var bReDraw     = true;
-        var bContinue   = false;
-        var _PageIndex  = PageIndex;
-        var _StartIndex = StartIndex;
-        var _bStart     = false;
-
-        var Index;
-        for ( Index = StartIndex; Index < Count; Index++ )
-        {
-            // Пересчитываем элемент документа
-            var Element = this.Content[Index];
-
-            Element.TurnOff_RecalcEvent();
-
-            var RecalcResult = recalcresult_NextElement;
-            var bFlowTable = false;
-            if ( type_Table === Element.GetType() && true != Element.Is_Inline() )
-            {
-                bFlowTable = true;
-                if ( null === this.RecalcInfo.FlowObject )
-                {
-                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                    {
-                        Element.Set_DocumentIndex( Index );
-                        Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                    }
-
-                    this.RecalcInfo.FlowObjectPage = 0;
-                    this.RecalcInfo.FlowObject   = Element;
-                    this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
-                    this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
-                    RecalcResult = recalcresult_CurPage;
-                }
-                else if ( Element === this.RecalcInfo.FlowObject )
-                {
-                    // Если у нас текущая страница совпадает с той, которая указана в таблице, тогда пересчитываем дальше
-                    if ( Element.PageNum > PageIndex || ( this.RecalcInfo.FlowObjectPage <= 0 && Element.PageNum < PageIndex ) )
-                    {
-                        this.DrawingObjects.removeFloatTableById(PageIndex - 1, Element.Get_Id());
-                        this.RecalcInfo.FlowObjectPageBreakBefore = true;
-                        RecalcResult = recalcresult_PrevPage;
-                    }
-                    else if ( Element.PageNum === PageIndex )
-                    {
-                        if ( true === this.RecalcInfo.FlowObjectPageBreakBefore )
-                        {
-                            // Добавляем начало таблицы в конец страницы так, чтобы не убралось ничего
-                            Element.Set_DocumentIndex( Index );
-                            Element.Reset( X, Page_Height, XLimit, Page_Height, PageIndex );
-                            Element.Recalculate_Page( PageIndex );
-
-                            this.RecalcInfo.FlowObjectPage++;
-                            RecalcResult = recalcresult_NextPage;
-                        }
-                        else
-                        {
-                            if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                            {
-                                Element.Set_DocumentIndex( Index );
-                                Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                            }
-
-                            RecalcResult = Element.Recalculate_Page( PageIndex );
-                            if ( (( 0 === Index && 0 === PageIndex ) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage()  )
-                            {
-                                this.DrawingObjects.removeFloatTableById(PageIndex, Element.Get_Id());
-                                this.RecalcInfo.FlowObjectPageBreakBefore = true;
-                                RecalcResult = recalcresult_CurPage;
-                            }
-                            else
-                            {
-                                this.RecalcInfo.FlowObjectPage++;
-
-                                if ( recalcresult_NextElement === RecalcResult )
-                                {
-                                    this.RecalcInfo.FlowObject                = null;
-                                    this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                    this.RecalcInfo.FlowObjectPage            = 0;
-                                    this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        RecalcResult = Element.Recalculate_Page( PageIndex );
-                        this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
-
-                        if ( recalcresult_NextElement === RecalcResult )
-                        {
-                            this.RecalcInfo.FlowObject                = null;
-                            this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                            this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                        }
-                    }
-                }
-                else
-                {
-                    // Пропускаем
-                    RecalcResult = recalcresult_NextElement;
-                }
-            }
-            else
-            {
-                if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                {
-                    Element.Set_DocumentIndex( Index );
-                    Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                }
-
-                RecalcResult = Element.Recalculate_Page( PageIndex );
-            }
-
-            Element.TurnOn_RecalcEvent();
-
-            if ( recalcresult_CurPage === RecalcResult )
-            {
-                bReDraw     = false;
-                bContinue   = true;
-                _PageIndex  = PageIndex;
-                _StartIndex = StartIndex;
-                _bStart     = false;
-                break;
-            }
-            else if ( recalcresult_NextElement === RecalcResult )
-            {
-                // Ничего не делаем
-            }
-            else if ( recalcresult_NextPage === RecalcResult )
-            {
-                this.Pages[PageIndex].EndPos = Index;
-
-                bContinue   = true;
-                _PageIndex  = PageIndex + 1;
-                _StartIndex = Index;
-                _bStart     = true;
-                break;
-            }
-            else if ( recalcresult_PrevPage === RecalcResult )
-            {
-                bReDraw     = false;
-                bContinue   = true;
-                _PageIndex  =  Math.max( PageIndex - 1, 0 );
-                _StartIndex = this.Pages[_PageIndex].Pos;
-                _bStart     = false;
-                break;
-            }
-
-            if ( true != bFlowTable )
-            {
-                var Bounds = Element.Get_PageBounds( PageIndex - Element.Get_StartPage_Absolute() );
-                Y = Bounds.Bottom;
-            }
-
-            if ( docpostype_Content == this.CurPos.Type && Index >= this.ContentLastChangePos && Index == this.CurPos.ContentPos )
-            {
-                if ( type_Paragraph === Element.GetType() )
-                    this.CurPage = Element.PageNum + Element.CurPos.PagesPos;
-                else
-                    this.CurPage = Element.PageNum; // TODO: переделать
-            }
-        }
-
-        if ( Index >= Count )
-        {
-            // До перерисовки селекта должны выставить
-            this.Pages[PageIndex].EndPos = Count - 1;
-        }
-
-        if ( true === bReDraw )
-        {
-            this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
-        }
-
-        if ( Index >= Count )
-        {
-            this.DrawingDocument.OnEndRecalculate( true );
-            this.DrawingObjects.onEndRecalculateDocument( this.Pages.length );
-
-            if ( true === this.Selection.UpdateOnRecalc )
-            {
-                this.Selection.UpdateOnRecalc = false;
-                this.DrawingDocument.OnSelectEnd();
-            }
-            this.FullRecalc.Id = null;
-        }
-
-        if ( true === bContinue )
-        {
-            this.FullRecalc.PageIndex  = _PageIndex;
-            this.FullRecalc.Start      = _bStart;
-            this.FullRecalc.StartIndex = _StartIndex;
-
-            //this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
-
-            if ( _PageIndex > this.FullRecalc.StartPage + 2 )
-            {
-                this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );
-                /*
-                 this.FullRecalc.Id = setTimeout( function()
-                 {
-                 var LogicDocument = editor.WordControl.m_oLogicDocument;
-                 var FullRecalc    = LogicDocument.FullRecalc;
-                 LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
-                 }, 10 );
-                 */
-            }
-            else
-                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
-
-        }
-    },
-
     Stop_Recalculate : function()
     {
-        if ( null != this.FullRecalc.Id )
-        {
-            clearTimeout( this.FullRecalc.Id );
-            this.FullRecalc.Id = null;
-        }
-
         this.DrawingDocument.OnStartRecalculate( 0 );
-    },
-
-    OnContentRecalculate : function(bNeedRecalc, PageNum, DocumentIndex)
-    {
-        if ( false === bNeedRecalc )
-        {
-            var Element = this.Content[DocumentIndex];
-            // Просто перерисуем все страницы, на которых находится данный элеменет
-            for ( var PageNum = Element.PageNum; PageNum < Element.PageNum + Element.Pages.length; PageNum++ )
-            {
-                this.DrawingDocument.OnRecalculatePage( PageNum, this.Pages[PageNum] );
-            }
-
-            this.DrawingDocument.OnEndRecalculate(false, true);
-
-            this.Document_UpdateRulersState();
-        }
-        else
-        {
-            this.ContentLastChangePos = DocumentIndex;
-            this.Recalculate( false, false );
-        }
     },
 
     OnContentReDraw : function(StartPage, EndPage)
@@ -1102,14 +410,6 @@ CPresentation.prototype =
             this.Slides[this.CurPage].graphicObjects.recalculateCurPos();
     },
 
-    Internal_CheckCurPage : function()
-    {
-        if ( this.CurPos.ContentPos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos ) )
-        {
-            this.CurPage = this.Content[this.CurPos.ContentPos].Get_CurrentPage_Absolute();
-        }
-    },
-
     Set_TargetPos : function(X, Y, PageNum)
     {
         this.TargetPos.X       = X;
@@ -1137,52 +437,13 @@ CPresentation.prototype =
     // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics)
     {
-        this.Slides[nPageIndex].draw(pGraphics);
+        this.Slides[nPageIndex] && this.Slides[nPageIndex].draw(pGraphics);
     },
 
     Add_NewParagraph : function(bRecalculate)
     {
-        this.Slides[this.CurPage].graphicObjects.addNewParagraph(bRecalculate);
-        this.Recalculate();
-        this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.addNewParagraph, []);
     },
-
-    GroupGraphicObjects: function()
-    {
-        if(this.CanGroup())
-        {
-            this.DrawingObjects.groupSelectedObjects();
-        }
-    },
-
-    UnGroupGraphicObjects: function()
-    {
-        if(this.CanUnGroup())
-        {
-            this.DrawingObjects.unGroupSelectedObjects();
-        }
-    },
-
-    StartChangeWrapPolygon: function()
-    {
-        this.DrawingObjects.startChangeWrapPolygon();
-    },
-
-    CanChangeWrapPolygon: function()
-    {
-        return this.DrawingObjects.canChangeWrapPolygon();
-    },
-
-    CanGroup: function()
-    {
-        return this.DrawingObjects.canGroup();
-    },
-
-    CanUnGroup: function()
-    {
-        return this.DrawingObjects.canUnGroup();
-    },
-
 
     findText: function(text, scanForward)
     {
@@ -1253,109 +514,69 @@ CPresentation.prototype =
 
     groupShapes: function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.groupShapes();
-            this.Recalculate();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.createGroup, []);
     },
 
     unGroupShapes: function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.unGroup();
-            this.Recalculate();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.unGroupCallback, []);
     },
 
     Add_FlowImage : function(W, H, Img)
     {
-        this.Slides[this.CurPage].graphicObjects.Add_FlowImage(W, H, Img);
-        this.Recalculate();
-        editor.sync_EndAddShape();
+        if(this.Slides[this.CurPage])
+        {
+            History.Create_NewPoint();
+            var Image = this.Slides[this.CurPage].graphicObjects.createImage(Img, (this.Slides[this.CurPage].Width - W)/2, (this.Slides[this.CurPage].Height - H)/2, W, H);
+            Image.setParent(this.Slides[this.CurPage]);
+            Image.addToDrawingObjects();
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(Image, this.Slides[this.CurPage].num);
+            this.Recalculate();
+        }
     },
 
     addChart: function(binary)
     {
-        this.Slides[this.CurPage].graphicObjects.addChart(binary);
-        this.Document_UpdateUndoRedoState();
-        this.Recalculate();
+        var _this = this;
+        _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
+        {
+            var Image = _this.Slides[_this.CurPage].graphicObjects.getChartSpace2(binary, null);
+            Image.setParent(_this.Slides[_this.CurPage]);
+            Image.addToDrawingObjects();
+            Image.spPr.xfrm.setOffX((_this.Slides[_this.CurPage].Width - Image.spPr.xfrm.extX)/2);
+            Image.spPr.xfrm.setOffY((_this.Slides[_this.CurPage].Height - Image.spPr.xfrm.extY)/2);
+            _this.Slides[_this.CurPage].graphicObjects.resetSelection();
+            _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, _this.Slides[_this.CurPage].num);
+            _this.Recalculate();
+        }, []);
     },
 
-    redrawCharts: function()
-    {
-        for(var i = 0; i < this.Slides.length; ++i)
-        {
-            this.Slides[i].graphicObjects.redrawCharts();
-        }
-    },
-
-
-    Add_InlineImage : function(W, H, Img, Chart, bFlow)
-    {
-        if ( undefined === bFlow )
-            bFlow = false;
-
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Add_InlineImage(W, H, Img, Chart, bFlow);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.addInlineImage( W, H, Img, Chart, bFlow );
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true == this.Selection.Use )
-                this.Remove( 1, true );
-
-            var Item = this.Content[this.CurPos.ContentPos];
-            if ( type_Paragraph == Item.GetType() )
-            {
-                var Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this );
-                var Image   = new WordImage( Drawing, this, this.DrawingDocument, null );
-                Drawing.Set_GraphicObject(Image);
-
-                if ( true === bFlow )
-                {
-                    Drawing.Set_DrawingType( drawing_Anchor );
-                    Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
-                    Drawing.Set_BehindDoc( false );
-                    Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                    Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
-                    Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0);
-                }
-
-                Image.init( Img, W, H, Chart );
-                this.Paragraph_Add( Drawing );
-            }
-            else if ( type_Table == Item.GetType() )
-            {
-                Item.Add_InlineImage( W, H, Img, Chart, bFlow );
-            }
-        }
-    },
+    Selection_Remove: function()
+    {},
 
     Edit_Chart : function(binary)
     {
-        this.Slides[this.CurPage].graphicObjects.editChart(binary);
-        this.Recalculate();
+        var _this = this;
+        _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
+        {
+            _this.Slides[_this.CurPage].graphicObjects.editChart(binary);
+        }, [binary]);
     },
 
-    Get_ChartObject: function()
+    Get_ChartObject: function(type)
     {
-        return this.Slides[this.CurPage].graphicObjects.getChartObject();
+        return this.Slides[this.CurPage].graphicObjects.getChartObject(type);
     },
 
     Add_FlowTable : function(Cols, Rows)
     {
-
-            var X = 0;
-            var Y = 0;
+        if(!this.Slides[this.CurPage])
+            return;
+        History.Create_NewPoint();
+        var graphic_frame = new CGraphicFrame();
+        if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
+        {
 
             var W = this.Width*2/3;
             var Grid = [];
@@ -1363,32 +584,28 @@ CPresentation.prototype =
             for ( var Index = 0; Index < Cols; Index++ )
                 Grid[Index] = W / Cols;
 
-            var _cur_slide = this.Slides[this.CurPage];
-            var _graphic_frame = new CGraphicFrame(_cur_slide);
-            _graphic_frame.setXfrm((this.Width - W)/2, this.Height/5, W, 7.478268771701388 * Rows, null, null, null);
-            _graphic_frame.setParent(_cur_slide);
-            _graphic_frame.setNvSpPr(new UniNvPr());
+            graphic_frame.setParent(this.Slides[this.CurPage]);
+            graphic_frame.setSpPr(new CSpPr());
+            graphic_frame.spPr.setParent(graphic_frame);
+            graphic_frame.spPr.setXfrm(new CXfrm());
+            graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
+            graphic_frame.spPr.xfrm.setOffX((this.Width - W)/2);
+            graphic_frame.spPr.xfrm.setOffX(this.Height/5);
+            graphic_frame.spPr.xfrm.setExtX(W);
+            graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
+            graphic_frame.setNvSpPr(new UniNvPr());
 
-            if (this.globalTableStyles.length == 0)
-                this.globalTableStyles[0] = CreateDefaultStylesForTables();
-
-            var _table = new CTable(this.DrawingDocument, _graphic_frame/*Parent*/, false/*Inline*/, 0/*PageNum*/, 0/*X*/, 0/*Y*/, W/*XLimit*/, 100/*YLimit*/, Rows, Cols, Grid);
-            _table.Set_Inline(true);
-            _table.setStyleIndex(0);
-            _graphic_frame.setGraphicObject(_table);
-        if(this.Document_Is_SelectionLocked(changestype_AddShape, _graphic_frame) === false)
-        {
-            this.Slides[this.CurPage].graphicObjects.resetSelectionState();
-            _graphic_frame.select(this.Slides[this.CurPage].graphicObjects);
-            this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, _graphic_frame);
-            editor.WordControl.m_oLogicDocument.recalcMap[_graphic_frame.Id] = _graphic_frame;
+            var table = new CTable(this.DrawingDocument, graphic_frame, true, 0, 0, 0, W, 100000, Rows, Cols, Grid);
+            table.Set_Inline(true);
+            //table.setStyleIndex(0);
+            graphic_frame.setGraphicObject(table);
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, this.CurPage);
+            this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
 
             this.Recalculate();
-            this.DrawingDocument.OnRecalculatePage(this.CurPage, _cur_slide);
-            this.DrawingDocument.UpdateTargetTransform(_graphic_frame.TransformMatrix);
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
-            this.Document_UpdateSelectionState();
+            this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+            this.DrawingDocument.OnEndRecalculate();
         }
         else
         {
@@ -1396,129 +613,15 @@ CPresentation.prototype =
         }
     },
 
-    Add_InlineTable : function(Cols, Rows)
-    {
-        // Добавляем таблицу в колонтитул
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Add_InlineTable( Cols, Rows );
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.addInlineTable( Cols, Rows );
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( this.CurPos.ContentPos < 0 )
-                return false;
-
-            // Сначала удаляем заселекченую часть
-            if ( true === this.Selection.Use )
-            {
-                this.Remove( 1, true );
-            }
-
-            // Добавляем таблицу
-            var Item = this.Content[this.CurPos.ContentPos];
-
-            // Если мы внутри параграфа, тогда разрываем его и на месте разрыва добавляем таблицу.
-            // А если мы внутри таблицы, тогда добавляем таблицу внутрь текущей таблицы.
-            switch ( Item.GetType() )
-            {
-                case type_Paragraph:
-                {
-                    // Создаем новую таблицу
-                    var W = ( X_Right_Field - X_Left_Field  + 2 * 1.9);
-                    var Grid = [];
-
-                    W = Math.max( W, Cols * 2 * 1.9 );
-
-                    for ( var Index = 0; Index < Cols; Index++ )
-                        Grid[Index] = W / Cols;
-
-                    var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, X_Left_Field, Y_Bottom_Field, Rows, Cols, Grid );
-
-                    // Проверим позицию в текущем параграфе
-                    if ( true === Item.Cursor_IsEnd() )
-                    {
-                        // Выставляем курсор в начало таблицы
-                        NewTable.Cursor_MoveToStartPos();
-                        this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewTable );
-
-                        this.CurPos.ContentPos++;
-
-                        // Отмечаем, что последний измененный элемент - предыдущий параграф
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-
-                        this.Recalculate();
-
-                        this.Interface_Update_ParaPr();
-                        this.Interface_Update_TextPr();
-                        this.Interface_Update_TablePr();
-                    }
-                    else
-                    {
-                        // Создаем новый параграф
-                        var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
-                        Item.Split( NewParagraph );
-
-                        // Добавляем новый параграф
-                        this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
-
-                        // Выставляем курсор в начало таблицы
-                        NewTable.Cursor_MoveToStartPos();
-                        this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewTable );
-
-                        this.CurPos.ContentPos++;
-
-                        // Отмечаем, что последний измененный элемент - предыдущий параграф
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-
-                        this.Recalculate();
-
-                        this.Interface_Update_ParaPr();
-                        this.Interface_Update_TextPr();
-                        this.Interface_Update_TablePr();
-                    }
-
-                    break;
-                }
-
-                case type_Table:
-                {
-                    Item.Add_InlineTable( Cols, Rows );
-                    break;
-                }
-            }
-        }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-    },
-
-
-    CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum)
-    {
-        var HdrFtrRanges = this.HdrFtr.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum);
-        return this.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, HdrFtrRanges, null);
-    },
 
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
-        this.Slides[this.CurPage].paragraphAdd(ParaItem, bRecalculate);
-        this.Recalculate();
-        this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphAdd, [ParaItem, bRecalculate]);
     },
 
     Paragraph_ClearFormatting : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.Paragraph_ClearFormatting();
-            this.Recalculate();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphClearFormatting, []);
     },
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection)
@@ -1531,97 +634,68 @@ CPresentation.prototype =
         if ( "undefined" === typeof(bRemoveOnlySelection) )
             bRemoveOnlySelection = false;
 
-
-        this.Slides[this.CurPage].graphicObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
-        this.Recalculate();
-        this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-        return true;
-    },
-
-    Cursor_GetPos : function()
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if(this.Slides[this.CurPage])
         {
-            return this.HdrFtr.Cursor_GetPos();
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.cursorGetPos();
-        }
-        else if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                if ( selectionflag_Common === this.Selection.Flag )
-                {
-                    return this.Content[this.Selection.EndPos].Cursor_GetPos();
-                }
-
-                return { X: 0, Y : 0 };
-            }
-            else
-            {
-                return this.Content[this.CurPos.ContentPos].Cursor_GetPos();
-            }
+            this.Slides[this.CurPage].graphicObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
         }
     },
+
 
     Cursor_MoveToStartPos : function()
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveToStartPos();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveToStartPos();
         return true;
     },
 
     Cursor_MoveToEndPos : function()
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveToEndPos();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveToEndPos();
         return true;
     },
 
     Cursor_MoveLeft : function(AddToSelect, Word)
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveLeft(AddToSelect, Word);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveLeft(AddToSelect, Word);
         return true;
     },
 
     Cursor_MoveRight : function(AddToSelect, Word)
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveRight(AddToSelect, Word);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveRight(AddToSelect, Word);
         return true;
     },
 
     Cursor_MoveUp : function(AddToSelect)
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveUp(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect);
 
         return true;
     },
 
     Cursor_MoveDown : function(AddToSelect)
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveDown(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect);
 
         return true;
     },
 
     Cursor_MoveEndOfLine : function(AddToSelect)
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveEndOfLine(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveEndOfLine(AddToSelect);
 
         return true;
     },
 
     Cursor_MoveStartOfLine : function(AddToSelect)
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveStartOfLine(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveStartOfLine(AddToSelect);
 
         return true;
     },
 
     Cursor_MoveAt : function( X, Y, AddToSelect )
     {
-        this.Slides[this.CurPage].graphicObjects.Cursor_MoveAt(X, Y, AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveAt(X, Y, AddToSelect);
 
         return true;
     },
@@ -1631,153 +705,255 @@ CPresentation.prototype =
 
     },
 
+    Get_PresentationBulletByNumInfo : function(NumInfo)
+    {
+        var bullet = new CBullet();
+        if(NumInfo.SubType < 0)
+        {
+            bullet.bulletType = new CBulletType();
+            bullet.bulletType.type = BULLET_TYPE_BULLET_NONE;
+        }
+        else
+        {
+            switch (NumInfo.Type)
+            {
+                case 0 : /*bulletChar*/
+                {
+                    switch(NumInfo.SubType)
+                    {
+                        case 0:
+                        case 1:
+                        {
+                            var bulletText = "•";
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Arial";
+                            break;
+                        }
+                        case 2:
+                        {
+                            bulletText = "o";
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Courier New";
+                            break;
+                        }
+                        case 3:
+                        {
+                            bulletText = "§";
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 4:
+                        {
+                            bulletText = String.fromCharCode( 0x0076 );
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 5:
+                        {
+                            bulletText = String.fromCharCode( 0x00D8 );
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 6:
+                        {
+                            bulletText = String.fromCharCode( 0x00FC );
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 7:
+                        {
+
+                            bulletText = String.fromCharCode(119);
+                            bullet.bulletTypeface = new CBulletTypeface();
+                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                    }
+                    bullet.bulletType = new CBulletType();
+                    bullet.bulletType.type = BULLET_TYPE_BULLET_CHAR;
+                    bullet.bulletType.Char = bulletText;
+                    break;
+                }
+                case 1 : /*autonum*/
+                {
+                    switch(NumInfo.SubType)
+                    {
+                        case 0 :
+                        case 1 :
+                        {
+                            var numberingType = 12;//numbering_numfmt_arabicPeriod;
+                            break;
+                        }
+                        case 2:
+                        {
+                            numberingType = 11;//numbering_numfmt_arabicParenR;
+                            break;
+                        }
+                        case 3 :
+                        {
+                            numberingType = 34;//numbering_numfmt_romanUcPeriod;
+                            break;
+                        }
+                        case 4 :
+                        {
+                            numberingType = 5;//numbering_numfmt_alphaUcPeriod;
+                            break;
+                        }
+                        case 5 :
+                        {
+                            numberingType = 8;
+                            break;
+                        }
+                        case 6 :
+                        {
+                            numberingType = 40;
+                            break;
+                        }
+                        case 7 :
+                        {
+                            numberingType = 31;//numbering_numfmt_romanLcPeriod;
+                            break;
+                        }
+                    }
+                    bullet.bulletType = new CBulletType();
+                    bullet.bulletType.type = BULLET_TYPE_BULLET_AUTONUM;
+                    bullet.bulletType.AutoNumType = numberingType;
+                    break;
+                }
+                default :
+                {
+                    break;
+                }
+            }
+        }
+        return bullet;
+    },
+
     Set_ParagraphAlign : function(Align)
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.setParagraphAlign(Align);
-            this.Recalculate();
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
-
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphAlign, [Align]);
     },
 
     Set_ParagraphSpacing : function(Spacing)
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.setParagraphSpacing(Spacing);
-            this.Recalculate();
-
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphSpacing, [Spacing]);
     },
 
     Set_ParagraphTabs : function(Tabs)
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.setParagraphTabs(Tabs);
-            this.Recalculate();
-
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphTabs, [Tabs]);
     },
 
     Set_ParagraphIndent : function(Ind)
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.setParagraphIndent(Ind);
-            this.Recalculate();
-
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphIndent, [Ind]);
     },
 
     Set_ParagraphNumbering : function(NumInfo)
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].graphicObjects.setParagraphNumbering(NumInfo);
-            this.Recalculate();
-
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
-    },
-
-    Set_ParagraphShd : function(Shd)
-    {
-    },
-
-    Set_ParagraphStyle : function(Name)
-    {
-    },
-
-    Set_ParagraphContextualSpacing : function(Value)
-    {
-    },
-
-    Set_ParagraphPageBreakBefore : function(Value)
-    {
-    },
-
-    Set_ParagraphKeepLines : function(Value)
-    {
-    },
-
-    Set_ParagraphWidowControl : function(Value)
-    {
-    },
-
-    Set_ParagraphBorders : function(Borders)
-    {
-
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphNumbering, [this.Get_PresentationBulletByNumInfo(NumInfo)]);   //TODO
     },
 
     Paragraph_IncDecFontSize : function(bIncrease)
     {
-        this.Slides[this.CurPage].graphicObjects.Paragraph_IncDecFontSize(bIncrease);
-        this.Recalculate();
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecFontSize, [bIncrease]);
     },
 
     Paragraph_IncDecIndent : function(bIncrease)
     {
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecIndent, [bIncrease]);
     },
 
-    Paragraph_SetHighlight : function(IsColor, r, g, b)
+    Can_IncreaseParagraphLevel : function(bIncrease)
     {
+        return isRealObject(this.Slides[this.CurPage]) && this.Slides[this.CurPage].graphicObjects.canIncreaseParagraphLevel(bIncrease);
     },
 
     Set_ImageProps : function(Props)
     {
-        this.Slides[this.CurPage].graphicObjects.imageApply(Props);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [Props]);
     },
 
     ShapeApply: function(shapeProps)
     {
-        this.Slides[this.CurPage].graphicObjects.shapeApply(shapeProps);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
+
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [shapeProps]);
     },
 
     ChartApply: function(chartProps)
     {
-        this.Slides[this.CurPage].graphicObjects.chartApply(chartProps);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [chartProps]);
     },
 
     changeShapeType : function(shapeType)
     {
-
-        if(this.viewMode === true)
-        {
-            return;
-        }
-
-        this.ShapeApply({type: shapeType});
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{type:shapeType}]);
     },
 
     setVerticalAlign: function(align)
     {
-        this.Slides[this.CurPage].graphicObjects.setVerticalAlign(align);
-        this.Recalculate();
+        if(this.Slides[this.CurPage])
+        {
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{verticalTextAlign: align}]);
+        }
+    },
+
+    Get_Styles: function()
+    {
+        var styles = new CStyles();
+        return {styles: styles, lastId: styles.Get_Default_Paragraph()}
+    },
+
+    Is_TableCellContent: function()
+    {
+        return false;
+    },
+
+
+    Get_Theme: function()
+    {
+        return this.themes[0];
+    },
+
+    Get_ColorMap: function()
+    {
+        return G_O_DEFAULT_COLOR_MAP;
+    },
+
+    Get_PageFields: function()
+    {
+        return { X : 0, Y : 0, XLimit : 2000, YLimit : 2000};
+    },
+
+    CheckRange: function()
+    {
+        return [];
+    },
+
+
+    Is_Cell: function()
+    {
+        return false;
+    },
+
+    Get_PrevElementEndInfo : function(CurElement)
+    {
+        return null;
+    },
+    Get_TextBackGroundColor: function()
+    {
+        return new CDocumentColor(255, 255, 255, false);
     },
 
 
@@ -1806,145 +982,55 @@ CPresentation.prototype =
         this.Recalculate();
 
         this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
         this.Document_UpdateSelectionState();
     },
 
     Get_Paragraph_ParaPr : function()
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_ParaPr();
+        if(this.Slides[this.CurPage])
+        {
+            var ret = this.Slides[this.CurPage].graphicObjects.getParagraphParaPr();
+            if(ret)
+            {
+                return ret;
+            }
+        }
+        return new CParaPr();
     },
 
     Get_Paragraph_TextPr : function()
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_TextPr();
+        if(this.Slides[this.CurPage])
+        {
+            var ret = this.Slides[this.CurPage].graphicObjects.getParagraphTextPr();
+            if(ret)
+            {
+                return ret;
+            }
+        }
+        return new CTextPr();
     },
 
     Get_Paragraph_TextPr_Copy : function()
     {
-        if(this.Slides[this.CurPage].graphicObjects.State.textObject)
-            return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_TextPr().Copy();
-        return null;
+        if(this.Slides[this.CurPage])
+        {
+            return this.Slides[this.CurPage].graphicObjects.getParagraphTextPr();
+        }
+        return new CTextPr();
     },
 
     Get_Paragraph_ParaPr_Copy : function()
     {
-        if(this.Slides[this.CurPage].graphicObjects.State.textObject)
-            return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_ParaPr().Copy();
-        return null;
+        if(this.Slides[this.CurPage])
+        {
+            return this.Slides[this.CurPage].graphicObjects.getParagraphParaPr();
+        }
+        return new CParaPr();
     },
 
-    Get_AllParagraphs_ByNumbering : function(NumPr)
-    {
-        var ParaArray = [];
 
-        this.HdrFtr.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
 
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
-        }
-
-        return ParaArray;
-    },
-
-    Set_DocumentMargin : function(MarPr)
-    {
-        this.History.Add( this, { Type : historyitem_Document_Margin, Fields_old : { Left : X_Left_Field, Right : X_Right_Field, Top : Y_Top_Field, Bottom : Y_Bottom_Field }, Fields_new : MarPr, Recalc_Margins : true } );
-
-        if( "undefined" !== typeof( MarPr.Left ) )
-        {
-            X_Left_Field = MarPr.Left;
-        }
-
-        if( "undefined" !== typeof( MarPr.Right ) )
-        {
-            X_Right_Field = MarPr.Right;
-        }
-
-        if( "undefined" !== typeof( MarPr.Top ) )
-        {
-            Y_Top_Field = MarPr.Top;
-        }
-
-        if( "undefined" !== typeof( MarPr.Bottom ) )
-        {
-            Y_Bottom_Field = MarPr.Bottom;
-        }
-
-        X_Left_Margin   = X_Left_Field;
-        X_Right_Margin  = Page_Width - X_Right_Field;
-        Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
-        Y_Top_Margin    = Y_Top_Field;
-
-        this.HdrFtr.UpdateMargins( 0 );
-
-        this.ContentLastChangePos = 0;
-        this.Recalculate();
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-    },
-
-    Set_DocumentPageSize : function(W, H, bNoRecalc)
-    {
-        this.History.Add( this, { Type : historyitem_Document_PageSize, Width_new : W, Height_new : H, Width_old : Page_Width, Height_old : Page_Height } );
-
-        Page_Width  = W;
-        Page_Height = H;
-
-        X_Left_Field   = X_Left_Margin;
-        X_Right_Field  = Page_Width  - X_Right_Margin;
-        Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-        Y_Top_Field    = Y_Top_Margin;
-
-        this.HdrFtr.UpdateMargins( 0, bNoRecalc );
-
-        if( true != bNoRecalc )
-        {
-            this.ContentLastChangePos = 0;
-            this.Recalculate();
-
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
-    },
-
-    Set_DocumentOrientation : function(Orientation, bNoRecalc)
-    {
-        if ( this.Orientation === Orientation )
-            return;
-
-        var old_Orientation = this.Orientation;
-        this.Orientation = Orientation;
-
-        var old_X_Left_Margin   = X_Left_Margin;
-        var old_X_Right_Margin  = X_Right_Margin;
-        var old_Y_Bottom_Margin = Y_Bottom_Margin;
-        var old_Y_Top_Margin    = Y_Top_Margin;
-
-        if ( orientation_Landscape === Orientation )
-        {
-            // меняем с книжной на альбомную
-            Y_Top_Margin    = old_X_Right_Margin;
-            X_Right_Margin  = old_Y_Bottom_Margin;
-            Y_Bottom_Margin = old_X_Left_Margin;
-            X_Left_Margin   = old_Y_Top_Margin;
-        }
-        else
-        {
-            // меняем с альбомной най книжную
-            Y_Top_Margin    = old_X_Left_Margin;
-            X_Right_Margin  = old_Y_Top_Margin;
-            Y_Bottom_Margin = old_X_Right_Margin;
-            X_Left_Margin   = old_Y_Bottom_Margin;
-        }
-
-        this.History.Add( this, { Type : historyitem_Document_Orientation, Orientation_new : this.Orientation, Orientation_old : old_Orientation, Margins_old : { Left : old_X_Left_Margin, Right : old_X_Right_Margin, Top : old_Y_Top_Margin, Bottom : old_Y_Bottom_Margin }, Margins_new : { Left : X_Left_Margin, Right : X_Right_Margin, Top : Y_Top_Margin, Bottom : Y_Bottom_Margin } } );
-        this.Set_DocumentPageSize( Page_Height, Page_Width, bNoRecalc );
-    },
 
     // Обновляем данные в интерфейсе о свойствах параграфа
     Interface_Update_ParaPr : function()
@@ -1990,735 +1076,7 @@ CPresentation.prototype =
             return null;
     },
 
-    // Обновляем данные в интерфейсе о свойствах таблицы
-    Interface_Update_TablePr : function(Flag)
-    {
-        var TablePr = null;
-        if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            if ( true == this.Selection.Use )
-                TablePr = this.Content[this.Selection.StartPos].Get_Props();
-            else
-                TablePr = this.Content[this.CurPos.ContentPos].Get_Props();
-        }
-        TablePr.CanBeFlow = true;
 
-        if ( true === Flag )
-            return TablePr;
-        else if ( null != TablePr )
-            editor.sync_TblPropCallback( TablePr );
-    },
-
-    // Обновляем данные в интерфейсе о свойствах колонотитулов
-    Interface_Update_HdrFtrPr : function()
-    {
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            editor.sync_HeadersAndFootersPropCallback( this.HdrFtr.Get_Props() );
-        }
-    },
-
-    Internal_GetContentPosByXY : function(X,Y, PageNum)
-    {
-        if ( "undefined" === typeof(PageNum) )
-            PageNum = this.CurPage;
-
-        // Сначала проверим Flow-таблицы
-        var FlowTable = this.DrawingObjects.getTableByXY( X, Y, PageNum, this );
-        if ( null != FlowTable )
-            return FlowTable.Table.Index;
-
-        var StartPos = this.Pages[PageNum].Pos;
-        var EndPos   = this.Content.length - 1;
-
-        if ( PageNum < this.Pages.length - 1 )
-            EndPos = Math.min( this.Pages[PageNum + 1].Pos, EndPos );
-
-        // Сохраним позиции всех Inline элементов на данной странице
-        var InlineElements = [];
-        for ( var Index = StartPos; Index <= EndPos; Index++ )
-        {
-            var Item = this.Content[Index];
-            if ( type_Table != Item.GetType() || false != Item.Is_Inline() )
-                InlineElements.push( Index );
-        }
-
-        var Count = InlineElements.length;
-        if ( Count <= 0 )
-            return StartPos;
-
-        for ( var Pos = 0; Pos < Count - 1; Pos++ )
-        {
-            var Item = this.Content[InlineElements[Pos + 1]];
-
-            if ( Y < Item.Pages[0].Bounds.Top )
-                return InlineElements[Pos];
-
-            if ( Item.Pages.length > 1 )
-            {
-                if ( ( type_Paragraph === Item.GetType() && Item.Pages[0].FirstLine != Item.Pages[1].FirstLine ) || ( type_Table === Item.GetType() && true === Item.RowsInfo[0].FirstPage ) )
-                    return InlineElements[Pos + 1];
-
-                return InlineElements[Pos];
-            }
-
-            if ( Pos === Count - 2 )
-            {
-                // Такое возможно, если страница заканчивается Flow-таблицей
-                return InlineElements[Count - 1];
-            }
-        }
-
-        return InlineElements[0];
-    },
-
-    // Убираем селект
-    Selection_Remove : function()
-    {
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Selection_Remove();
-        }
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.resetSelection();
-        }
-        else if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                switch( this.Selection.Flag )
-                {
-                    case selectionflag_Common:
-                    {
-                        var Start = this.Selection.StartPos;
-                        var End   = this.Selection.EndPos;
-
-                        if ( Start > End )
-                        {
-                            var Temp = Start;
-                            Start = End;
-                            End = Temp;
-                        }
-
-                        for ( var Index = Start; Index <= End; Index++ )
-                        {
-                            this.Content[Index].Selection_Remove();
-                        }
-
-                        this.Selection.Use   = false;
-                        this.Selection.Start = false;
-
-                        this.Selection.StartPos = 0;
-                        this.Selection.EndPos   = 0;
-
-                        // Убираем селект и возвращаем курсор
-                        this.DrawingDocument.SelectEnabled(false);
-                        this.DrawingDocument.TargetStart();
-                        this.DrawingDocument.TargetShow();
-
-                        break;
-                    }
-                    case selectionflag_Numbering:
-                    {
-                        if ( null == this.Selection.Data )
-                            break;
-
-                        for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                        {
-                            this.Content[this.Selection.Data[Index]].Selection_Remove();
-                        }
-
-                        this.Selection.Use   = false;
-                        this.Selection.Start = false;
-                        this.Selection.Flag  = selectionflag_Common;
-
-                        // Убираем селект и возвращаем курсор
-                        this.DrawingDocument.SelectEnabled(false);
-                        this.DrawingDocument.TargetStart();
-                        this.DrawingDocument.TargetShow();
-
-                        break;
-                    }
-                }
-            }
-        }
-    },
-
-    Selection_IsEmpty : function(bCheckHidden)
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Selection_IsEmpty(bCheckHidden);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return false;
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                // Выделение нумерации
-                if ( selectionflag_Numbering == this.Selection.Flag )
-                    return false;
-                // Обрабатываем движение границы у таблиц
-                else if ( true === this.Selection_Is_TableBorderMove() )
-                    return false;
-                else
-                {
-                    if ( this.Selection.StartPos === this.Selection.EndPos )
-                        return this.Content[this.Selection.StartPos].Selection_IsEmpty(bCheckHidden);
-                    else
-                        return false;
-                }
-            }
-
-            return true;
-        }
-    },
-
-    Selection_Draw_Page : function(Page_abs)
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Selection_Draw_Page(Page_abs);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.drawSelectionPage(Page_abs);
-        }
-        else
-        {
-            var Pos_start = this.Pages[Page_abs].Pos;
-            var Pos_end   = this.Pages[Page_abs].EndPos;
-
-            if ( true === this.Selection.Use )
-            {
-                switch( this.Selection.Flag )
-                {
-                    case selectionflag_Common:
-                    {
-                        var Start = this.Selection.StartPos;
-                        var End   = this.Selection.EndPos;
-
-                        if ( Start > End )
-                        {
-                            Start = this.Selection.EndPos;
-                            End   = this.Selection.StartPos;
-                        }
-
-                        var Start = Math.max( Start, Pos_start );
-                        var End   = Math.min( End,   Pos_end   );
-
-                        for ( var Index = Start; Index <= End; Index++ )
-                        {
-                            this.Content[Index].Selection_Draw_Page(Page_abs);
-                        }
-
-                        if ( Page_abs >= 2 && End < this.Pages[Page_abs - 2].EndPos )
-                        {
-                            this.Selection.UpdateOnRecalc = false;
-                            this.DrawingDocument.OnSelectEnd();
-                        }
-
-                        break;
-                    }
-                    case selectionflag_Numbering:
-                    {
-                        if ( null == this.Selection.Data )
-                            break;
-
-                        var Count = this.Selection.Data.length;
-                        for ( var Index = 0; Index < Count; Index++ )
-                        {
-                            if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
-                                this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs);
-                        }
-
-                        if ( Page_abs >= 2 && this.Selection.Data[this.Selection.Data.length - 1] < this.Pages[Page_abs - 2].EndPos )
-                        {
-                            this.Selection.UpdateOnRecalc = false;
-                            this.DrawingDocument.OnSelectEnd();
-                        }
-
-                        break;
-                    }
-                }
-            }
-        }
-    },
-
-    Selection_Clear : function()
-    {
-        if ( true === this.Selection.Use )
-        {
-            switch( this.Selection.Flag )
-            {
-                case selectionflag_Common:
-                {
-
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if ( Start > End )
-                    {
-                        var Temp = Start;
-                        Start = End;
-                        End = Temp;
-                    }
-
-                    for ( var Index = Start; Index <= End; Index++ )
-                    {
-                        this.Content[Index].Selection_Clear();
-                    }
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    if ( null == this.Selection.Data )
-                        break;
-
-                    for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                    {
-                        this.Content[this.Selection.Data[Index]].Selection_Clear();
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        this.DrawingDocument.SelectClear();
-    },
-
-    Selection_SetStart : function(X,Y, MouseEvent)
-    {
-        var bCheckHdrFtr = true;
-
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            bCheckHdrFtr = false;
-            this.Selection.Start = true;
-            this.Selection.Use   = true;
-            if ( false != this.HdrFtr.Selection_SetStart( X, Y, this.CurPage, MouseEvent, false ) )
-                return;
-
-            this.Selection.Start = false;
-            this.Selection.Use   = false;
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
-            this.DrawingDocument.EndTrackTable( null, true );
-        }
-
-        var PageMetrics = this.Get_PageContentStartPos( this.CurPage );
-
-        var bInText      = (null === this.Is_InText(X, Y, this.CurPage)      ? false : true);
-        var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
-        var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage, this );
-        var bFlowTable   = (null === this.DrawingObjects.getTableByXY( X, Y, this.CurPage, this ) ? false : true);
-
-        // Проверяем, не попали ли мы в колонтитул (если мы попадаем в Flow-объект, то попадание в колонтитул не проверяем)
-        if ( true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ) )
-        {
-            // Если был селект, тогда убираем его
-            if ( true === this.Selection.Use )
-                this.Selection_Remove();
-
-            this.CurPos.Type = docpostype_HdrFtr;
-
-            // Переходим к работе с колонтитулами
-            MouseEvent.ClickCount = 1;
-            this.HdrFtr.Selection_SetStart( X, Y, this.CurPage, MouseEvent, true );
-            this.Interface_Update_HdrFtrPr();
-
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
-            this.DrawingDocument.EndTrackTable( null, true );
-        }
-        else if ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) )
-        {
-            if ( docpostype_DrawingObjects != this.CurPos.Type )
-                this.Selection_Remove();
-
-            // Прячем курсор
-            this.DrawingDocument.TargetEnd();
-            this.DrawingDocument.SetCurrentPage( this.CurPage );
-
-            this.Selection.Use   = true;
-            this.Selection.Start = true;
-            this.Selection.Flag  = selectionflag_Common;
-            this.CurPos.Type     = docpostype_DrawingObjects;
-            this.DrawingObjects.OnMouseDown(MouseEvent, X, Y, this.CurPage);
-        }
-        else
-        {
-            var bOldSelectionIsCommon = true;
-
-            if ( docpostype_DrawingObjects === this.CurPos.Type && true != this.Is_InDrawing( X, Y, this.CurPage ) )
-            {
-                this.DrawingObjects.resetSelection();
-                bOldSelectionIsCommon = false;
-            }
-
-            var ContentPos = this.Internal_GetContentPosByXY(X,Y);
-
-            if ( docpostype_Content != this.CurPos.Type )
-            {
-                this.CurPos.Type = docpostype_Content;
-                this.CurPos.ContentPos = ContentPos;
-                bOldSelectionIsCommon = false;
-            }
-
-            var SelectionUse_old = this.Selection.Use;
-            var Item = this.Content[ContentPos];
-
-            var bTableBorder = false;
-            if ( type_Table == Item.GetType() )
-                bTableBorder = ( null === Item.Is_TableBorder( X, Y, this.CurPage ) ? false : true );
-
-            // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
-            if ( !(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon) )
-            {
-                if ( (selectionflag_Common != this.Selection.Flag) || ( true === this.Selection.Use && MouseEvent.ClickCount <= 1 && true != bTableBorder )  )
-                    this.Selection_Remove();
-            }
-
-            this.Selection.Use      = true;
-            this.Selection.Start    = true;
-            this.Selection.Flag     = selectionflag_Common;
-
-            if ( true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon )
-            {
-                this.Selection_SetEnd( X, Y, {Type : g_mouse_event_type_up, ClickCount : 1} );
-                this.Selection.Use      = true;
-                this.Selection.Start    = true;
-                this.Selection.EndPos   = ContentPos;
-                this.Selection.Data     = null;
-            }
-            else
-            {
-                Item.Selection_SetStart( X, Y, this.CurPage, MouseEvent, bTableBorder );
-                Item.Selection_SetEnd( X, Y, this.CurPage, {Type : g_mouse_event_type_move, ClickCount : 1}, bTableBorder );
-
-                if ( !(type_Table == Item.GetType() && true == bTableBorder) )
-                {
-                    this.Selection.Use      = true;
-                    this.Selection.StartPos = ContentPos;
-                    this.Selection.EndPos   = ContentPos;
-                    this.Selection.Data     = null;
-
-                    this.CurPos.ContentPos  = ContentPos;
-
-                    if ( type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey )
-                    {
-                        var Hyperlink = Item.Check_Hyperlink( X, Y, this.CurPage );
-                        if ( null != Hyperlink )
-                        {
-                            this.Selection.Data =
-                            {
-                                Hyperlink : true,
-                                Value     : Hyperlink
-                            };
-                        }
-                    }
-                }
-                else
-                {
-                    this.Selection.Data =
-                    {
-                        TableBorder : true,
-                        Pos         : ContentPos,
-                        Selection   : SelectionUse_old
-                    };
-                }
-            }
-        }
-    },
-
-    // Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.
-    // Если bEnd = true, тогда это конец селекта.
-    Selection_SetEnd : function(X, Y, MouseEvent)
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Selection_SetEnd(  X, Y, this.CurPage, MouseEvent );
-            if ( g_mouse_event_type_up == MouseEvent.Type )
-            {
-                if ( true != this.DrawingObjects.isPolylineAddition() )
-                    this.Selection.Start = false;
-                else
-                    this.Selection.Start = true;
-            }
-
-            return;
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            if ( g_mouse_event_type_up == MouseEvent.Type )
-            {
-                this.DrawingObjects.OnMouseUp( MouseEvent, X, Y, this.CurPage );
-
-                if ( true != this.DrawingObjects.isPolylineAddition() )
-                {
-                    this.Selection.Start = false;
-                    this.Selection.Use   = true;
-                }
-                else
-                {
-                    this.Selection.Start = true;
-                    this.Selection.Use   = true;
-                }
-            }
-            else
-            {
-                this.DrawingObjects.OnMouseMove( MouseEvent, X, Y, this.CurPage );
-            }
-            return;
-        }
-
-        // Обрабатываем движение границы у таблиц
-        if ( true === this.Selection_Is_TableBorderMove() )
-        {
-            var Item = this.Content[this.Selection.Data.Pos];
-            Item.Selection_SetEnd( X, Y, this.CurPage, MouseEvent, true );
-
-            if ( g_mouse_event_type_up == MouseEvent.Type )
-            {
-                this.Selection.Start = false;
-
-                if ( true != this.Selection.Data.Selection )
-                {
-                    this.Selection.Use = false;
-                }
-
-                this.Selection.Data  = null;
-            }
-
-            return;
-        }
-
-        if ( false === this.Selection.Use )
-            return;
-
-        var ContentPos = this.Internal_GetContentPosByXY(X,Y);
-
-        var OldPos = this.CurPos.ContentPos;
-        var OldInnerPos = null;
-        if ( type_Paragraph === this.Content[OldPos].GetType() )
-            OldInnerPos = this.Content[OldPos].CurPos.ContentPos;
-        else //if ( type_Table === this.Content[OldPos].GetType() )
-            OldInnerPos = this.Content[OldPos].CurCell;
-
-        this.CurPos.ContentPos = ContentPos;
-        var OldEndPos = this.Selection.EndPos;
-        this.Selection.EndPos = ContentPos;
-
-        // Удалим отметки о старом селекте
-        if ( OldEndPos < this.Selection.StartPos && OldEndPos < this.Selection.EndPos )
-        {
-            var TempLimit = Math.min( this.Selection.StartPos, this.Selection.EndPos );
-            for ( var Index = OldEndPos; Index < TempLimit; Index++ )
-            {
-                this.Content[Index].Selection.Use   = false;
-                this.Content[Index].Selection.Start = false;
-            }
-        }
-        else if ( OldEndPos > this.Selection.StartPos && OldEndPos > this.Selection.EndPos )
-        {
-            var TempLimit = Math.max( this.Selection.StartPos, this.Selection.EndPos );
-            for ( var Index = TempLimit + 1; Index <= OldEndPos; Index++ )
-            {
-                this.Content[Index].Selection.Use   = false;
-                this.Content[Index].Selection.Start = false;
-            }
-        }
-
-        // Направление селекта: 1 - прямое, -1 - обратное, 0 - отмечен 1 элемент документа
-        var Direction = ( ContentPos > this.Selection.StartPos ? 1 : ( ContentPos < this.Selection.StartPos ? -1 : 0 )  );
-
-        if ( g_mouse_event_type_up == MouseEvent.Type )
-        {
-            // Останаливаем селект в глобальном классе. Кроме этого мы должны остановить селект в
-            // стартовом элементе селекта.
-            this.Selection.Start = false;
-
-            // Если 0 === Direction, в функции Selection_SetEnd все что нужно обработается
-            if ( 0 != Direction )
-                this.Content[this.Selection.StartPos].Selection_Stop(X, Y, this.CurPage, MouseEvent);
-        }
-
-        var Start, End;
-        if ( 0 == Direction )
-        {
-            var Item = this.Content[this.Selection.StartPos];
-            var ItemType = Item.GetType();
-            Item.Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
-
-            if ( false === Item.Selection.Use )
-            {
-                this.Selection.Use = false;
-
-                if ( null != this.Selection.Data && true === this.Selection.Data.Hyperlink )
-                {
-                    editor.sync_HyperlinkClickCallback( this.Selection.Data.Value.Get_Value() );
-                    this.Selection.Data.Value.Set_Visited( true );
-
-                    for ( var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++ )
-                        this.DrawingDocument.OnRecalculatePage( PageIdx, this.Pages[PageIdx] );
-
-                    this.DrawingDocument.OnEndRecalculate(false, true);
-                }
-            }
-            else
-            {
-                this.Selection.Use = true;
-            }
-
-            return;
-        }
-        else if ( Direction > 0 )
-        {
-            Start = this.Selection.StartPos;
-            End   = this.Selection.EndPos;
-        }
-        else
-        {
-            End   = this.Selection.StartPos;
-            Start = this.Selection.EndPos;
-        }
-
-        // Чтобы не было эффекта, когда ничего не поселекчено, а при удалении соединяются параграфы
-        if ( Direction > 0 && type_Paragraph === this.Content[Start].GetType() && true === this.Content[Start].Selection_IsEmpty() && this.Content[Start].Selection.StartPos == this.Content[Start].Content.length - 1 )
-        {
-            this.Content[Start].Selection.StartPos = this.Content[Start].Internal_GetEndPos();
-            this.Content[Start].Selection.EndPos   = this.Content[Start].Content.length - 1;
-        }
-
-        this.Content[ContentPos].Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
-
-        for ( var Index = Start; Index <= End; Index++ )
-        {
-            var Item = this.Content[Index];
-            Item.Selection.Use = true;
-            var ItemType = Item.GetType();
-
-            switch ( Index )
-            {
-                case Start:
-
-                    if ( type_Paragraph === ItemType )
-                    {
-                        if ( Direction > 0 )
-                            Item.Selection.EndPos   = Item.Content.length - 1;
-                        else
-                            Item.Selection.StartPos = Item.Content.length - 1;
-                    }
-                    else //if ( type_Table === ItemType )
-                    {
-                        var Row  = Item.Content.length - 1;
-                        var Cell = Item.Content[Row].Get_CellsCount() - 1;
-                        var Pos  = { Row: Row, Cell : Cell };
-
-                        if ( Direction > 0 )
-                            Item.Selection.EndPos.Pos   = Pos;
-                        else
-                            Item.Selection.StartPos.Pos = Pos;
-
-                        Item.Internal_Selection_UpdateCells();
-                    }
-
-                    break;
-
-                case End:
-
-                    if ( type_Paragraph === ItemType )
-                    {
-                        if ( Direction > 0 )
-                            Item.Selection.StartPos = Item.Internal_GetStartPos();
-                        else
-                            Item.Selection.EndPos   = Item.Internal_GetStartPos();
-                    }
-                    else //if ( type_Table === ItemType )
-                    {
-                        var Pos  = { Row: 0, Cell : 0 };
-
-                        if ( Direction > 0 )
-                            Item.Selection.StartPos.Pos = Pos;
-                        else
-                            Item.Selection.EndPos.Pos   = Pos;
-
-                        Item.Internal_Selection_UpdateCells();
-                    }
-
-                    break;
-
-                default:
-
-                    if ( type_Paragraph === ItemType )
-                    {
-                        if ( Direction > 0 )
-                        {
-                            Item.Selection.StartPos = Item.Internal_GetStartPos();
-                            Item.Selection.EndPos   = Item.Content.length - 1;
-                        }
-                        else
-                        {
-                            Item.Selection.EndPos   = Item.Internal_GetStartPos();
-                            Item.Selection.StartPos = Item.Content.length - 1;
-                        }
-                    }
-                    else //if ( type_Table === ItemType )
-                    {
-                        var Row  = Item.Content.length - 1;
-                        var Cell = Item.Content[Row].Get_CellsCount() - 1;
-                        var Pos0  = { Row: 0, Cell : 0 };
-                        var Pos1  = { Row: Row, Cell : Cell };
-
-                        if ( Direction > 0 )
-                        {
-                            Item.Selection.StartPos.Pos = Pos0;
-                            Item.Selection.EndPos.Pos   = Pos1;
-                        }
-                        else
-                        {
-                            Item.Selection.EndPos.Pos   = Pos0;
-                            Item.Selection.StartPos.Pos = Pos1;
-                        }
-
-                        Item.Internal_Selection_UpdateCells();
-                    }
-
-                    break;
-            }
-        }
-
-        // Проверяем, чтобы у нас в селект не попали элементы, в которых не выделено ничего
-        if ( true === this.Content[End].Selection_IsEmpty() )
-        {
-            this.Content[End].Selection_Remove();
-            End--;
-        }
-
-        if ( Start != End && true === this.Content[Start].Selection_IsEmpty() )
-        {
-            this.Content[Start].Selection_Remove();
-            Start++;
-        }
-
-        if ( Direction > 0 )
-        {
-            this.Selection.StartPos = Start;
-            this.Selection.EndPos   = End;
-        }
-        else
-        {
-            this.Selection.StartPos = End;
-            this.Selection.EndPos   = Start;
-        }
-    },
 
 
     getAllTableStyles: function()
@@ -2729,261 +1087,36 @@ CPresentation.prototype =
         }
         return this.globalTableStyles;
     },
-    // Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать
-    // происходил ли выделение в пределах одного элеменета.
-    Selection_Is_OneElement : function()
-    {
-        if ( true === this.Selection.Use && this.CurPos.Type === docpostype_Content && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos )
-            return true;
 
-        return false;
-    },
 
-    Selection_Is_TableBorderMove : function()
-    {
-        if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
-            return true;
-
-        return false;
-    },
-
-    // Проверяем попали ли мы в селект
-    Selection_Check : function(X, Y, Page_Abs)
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Selection_Check( X, Y, Page_Abs );
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.selectionCheck( X, Y, Page_Abs );
-        else //if ( docpostype_Content === thsi.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                switch( this.Selection.Flag )
-                {
-                    case selectionflag_Common:
-                    {
-                        var Start = this.Selection.StartPos;
-                        var End   = this.Selection.EndPos;
-
-                        if ( Start > End )
-                        {
-                            Start = this.Selection.EndPos;
-                            End   = this.Selection.StartPos;
-                        }
-
-                        var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Abs );
-                        if ( ContentPos > Start && ContentPos < End )
-                            return true;
-                        else if ( ContentPos < Start || ContentPos > End )
-                            return false;
-                        else
-                            return this.Content[ContentPos].Selection_Check( X, Y, Page_Abs );
-
-                        return false;
-                    }
-                    case selectionflag_Numbering : return false;
-                }
-
-                return false;
-            }
-
-            return false;
-        }
-    },
 
     // Селектим весь параграф
     Select_All : function()
     {
-        this.Slides[this.CurPage].graphicObjects.Select_All();
-        this.Document_UpdateInterfaceState();
-        return;
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if(this.Slides[this.CurPage])
         {
-            this.HdrFtr.Select_All();
+            this.Slides[this.CurPage].graphicObjects.selectAll();
+            this.Document_UpdateInterfaceState();
         }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type && true === this.DrawingObjects.isSelectedText() )
+    },
+
+
+    Update_CursorType : function( X, Y, MouseEvent )
+    {
+        var graphicObjectInfo = this.Slides[this.CurPage].graphicObjects.isPointInDrawingObjects(X, Y, MouseEvent);
+        if(graphicObjectInfo)
         {
-            this.DrawingObjects.selectAll();
+           if(!graphicObjectInfo.updated)
+           {
+               this.DrawingDocument.SetCursorType(graphicObjectInfo.cursorType);
+           }
         }
         else
         {
-            if ( true === this.Selection.Use )
-                this.Selection_Remove();
-
-            this.DrawingDocument.SelectEnabled(true);
-            this.DrawingDocument.TargetEnd();
-
-            this.CurPos.Type = docpostype_Content;
-
-            this.Selection.Use      = true;
-            this.Selection.Start    = false;
-            this.Selection.Flag     = selectionflag_Common;
-
-            this.Selection.StartPos = 0;
-            this.Selection.EndPos   = this.Content.length - 1;
-
-            for ( var Index = 0; Index < this.Content.length; Index++ )
-            {
-                this.Content[Index].Select_All();
-            }
-        }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-    },
-
-    Document_SelectNumbering : function(NumPr)
-    {
-        this.Selection_Remove();
-
-        this.Selection.Use  = true;
-        this.Selection.Flag = selectionflag_Numbering;
-        this.Selection.Data = [];
-
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Item = this.Content[Index];
-            var ItemNumPr = null;
-            if ( type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.Numbering_Get() ) && ItemNumPr.NumId == NumPr.NumId && ItemNumPr.Lvl == NumPr.Lvl )
-            {
-                this.Selection.Data.push( Index );
-                Item.Selection_SelectNumbering();
-            }
-        }
-
-        this.Interface_Update_ParaPr();
-        this.Interface_Update_TextPr();
-
-        this.Document_UpdateSelectionState();
-    },
-
-    // Если сейчас у нас заселекчена нумерация, тогда убираем селект
-    Remove_NumberingSelection : function()
-    {
-        if ( true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag )
-            this.Selection_Remove();
-    },
-
-    Update_CursorType : function( X, Y, PageIndex, MouseEvent )
-    {
-        editor.sync_MouseMoveStartCallback();
-        this.Slides[this.CurPage].graphicObjects.Update_CursorType( X, Y,  MouseEvent );
-        editor.sync_MouseMoveEndCallback();
-        return;
-        editor.sync_MouseMoveStartCallback();
-
-        // Ничего не делаем
-        if ( true === this.DrawingDocument.IsCursorInTableCur( X, Y, PageIndex ) )
-        {
-            this.DrawingDocument.SetCursorType( "default", new CMouseMoveData() );
-            editor.sync_MouseMoveEndCallback();
-            return;
-        }
-
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Update_CursorType( X, Y, PageIndex );
-        }
-        else
-        {
-            var bInText      = (null === this.Is_InText(X, Y, this.CurPage)      ? false : true);
-            var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
-
-            // Ничего не делаем
-            if ( true === this.DrawingObjects.updateCursorType(PageIndex, X, Y, MouseEvent, ( true === bInText || true === bTableBorder ? true : false )) )
-            {
-                editor.sync_MouseMoveEndCallback();
-                return;
-            }
-
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageIndex );
-            var Item = this.Content[ContentPos];
-            Item.Update_CursorType( X, Y, PageIndex );
-        }
-
-        editor.sync_MouseMoveEndCallback();
-    },
-
-    // Проверяем попадем ли мы в границу таблицы (null - не попали, а если попали возвращается указатель на таблицу)
-    Is_TableBorder : function( X, Y, PageIndex )
-    {
-        if ( PageIndex >= this.Pages.length || PageIndex < 0 )
-            return null;
-
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Is_TableBorder( X, Y, PageIndex );
-        }
-        else if ( -1 != this.DrawingObjects.isPointInDrawingObjects( X,Y, PageIndex, this ) )
-        {
-            return null;
-        }
-        else
-        {
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageIndex );
-            var Item = this.Content[ContentPos];
-
-            if ( type_Table == Item.GetType() )
-                return Item.Is_TableBorder( X, Y, PageIndex );
-            else
-                return null;
-        }
-
-        return null;
-    },
-
-    // Проверяем, попали ли мы четко в текст (не лежащий в автофигуре)
-    Is_InText : function(X, Y, PageIndex)
-    {
-        if ( PageIndex >= this.Pages.length || PageIndex < 0 )
-            return null;
-
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Is_InText( X, Y, PageIndex );
-        }
-        else
-        {
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageIndex );
-            var Item = this.Content[ContentPos];
-            return Item.Is_InText( X, Y, PageIndex );
+            this.DrawingDocument.SetCursorType("default");
         }
     },
 
-    // Проверяем, попали ли мы в автофигуру данного DocumentContent
-    Is_InDrawing : function(X, Y, PageIndex)
-    {
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Is_InDrawing( X, Y, PageIndex );
-        }
-        else if ( -1 != this.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage, this ) )
-            return true;
-        else
-        {
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageIndex );
-            var Item = this.Content[ContentPos];
-            if ( type_Table == Item.GetType() )
-                return Item.Is_InDrawing( X, Y, PageIndex );
-
-            return false;
-        }
-    },
-
-    Is_UseInDocument : function(Id)
-    {
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            if ( Id === this.Content[Index].Get_Id() )
-                return true;
-        }
-
-        return false;
-    },
 
     OnKeyDown : function(e)
     {
@@ -2998,147 +1131,7 @@ CPresentation.prototype =
         else if ( e.KeyCode == 9 && false === editor.isViewMode ) // Tab
         {
             var graphicObjects = this.Slides[this.CurPage].graphicObjects;
-            var state = graphicObjects.State;
-            var drawingObjectsController = graphicObjects;
-            switch(state.id)
-            {
-                case STATES_ID_NULL:
-                {
-                    var a_drawing_bases = this.Slides[this.CurPage].cSld.spTree;
-                    if(!e.ShiftKey)
-                    {
-                        var last_selected = null, last_selected_index = null;
-                        for(var i = a_drawing_bases.length - 1;  i > -1; --i)
-                        {
-                            if(a_drawing_bases[i].selected)
-                            {
-                                last_selected = a_drawing_bases[i];
-                                last_selected_index = i;
-                                break;
-                            }
-                        }
-                        if(isRealObject(last_selected))
-                        {
-                            bRetValue = true;
-                            drawingObjectsController.resetSelection();
-                            if(!last_selected.isGroup() || last_selected.arrGraphicObjects.length === 0)
-                            {
-                                if(last_selected_index < a_drawing_bases.length - 1)
-                                {
-                                    a_drawing_bases[last_selected_index+1].select(drawingObjectsController);
-                                }
-                                else
-                                {
-                                    a_drawing_bases[0].select(drawingObjectsController);
-                                }
-                            }
-                            else
-                            {
-                                last_selected.select(drawingObjectsController);
-                                last_selected.arrGraphicObjects[0].select(last_selected);
-                                drawingObjectsController.changeCurrentState(new GroupState(drawingObjectsController, drawingObjectsController.slide, last_selected));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var first_selected = null, first_selected_index = null;
-                        for(var i = 0; i < a_drawing_bases.length; ++i)
-                        {
-                            if(a_drawing_bases[i].selected)
-                            {
-                                first_selected = a_drawing_bases[i];
-                                first_selected_index = i;
-                                break;
-                            }
-                        }
-                        if(isRealObject(first_selected))
-                        {
-                            bRetValue = true;
-                            drawingObjectsController.resetSelection();
-                            if(first_selected_index > 0)
-                            {
-                                a_drawing_bases[first_selected_index - 1].select(drawingObjectsController);
-                            }
-                            else
-                            {
-                                a_drawing_bases[a_drawing_bases.length - 1].select(drawingObjectsController);
-                            }
-                        }
-                    }
-                    //drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    break;
-                }
-                case STATES_ID_GROUP:
-                {
-                    var group = state.group;
-                    var arr_graphic_objects = group.arrGraphicObjects;
-                    if(!e.shiftKey)
-                    {
-                        for(var i = arr_graphic_objects.length - 1; i > -1; --i)
-                        {
-                            if(arr_graphic_objects[i].selected)
-                            {
-                                break;
-                            }
-                        }
-                        group.resetSelection();
-                        if(i < arr_graphic_objects.length - 1)
-                        {
-                            arr_graphic_objects[i+1].select(group);
-                        }
-                        else
-                        {
-                            drawingObjectsController.resetSelectionState();
-                            var a_drawing_bases = this.Slides[this.CurPage].cSld.spTree;
-                            for(var i = 0; i < a_drawing_bases.length; ++i)
-                            {
-                                if(a_drawing_bases === group)
-                                {
-                                    break;
-                                }
-                            }
-                            if(i < a_drawing_bases.length)
-                            {
-                                a_drawing_bases[i+1].select(drawingObjectsController);
-                            }
-                            else
-                            {
-                                a_drawing_bases[0].select(drawingObjectsController);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for(var i = 0; i < arr_graphic_objects.length; ++i)
-                        {
-                            if(arr_graphic_objects[i].selected)
-                            {
-                                break;
-                            }
-                        }
-                        group.resetSelection();
-                        if(i > 0)
-                        {
-                            arr_graphic_objects[i - 1].select(group);
-                        }
-                        else
-                        {
-                            drawingObjectsController.resetSelectionState();
-                            group.select(drawingObjectsController);
-                        }
-                    }
-                    //drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    break;
-                }
-                case STATES_ID_TEXT_ADD:
-                case STATES_ID_TEXT_ADD_IN_GROUP:
-                {
-                    this.Paragraph_Add(new ParaTab());
-                    break;
-                }
-            }
-            
+
 			bRetValue = true;
         }
         else if ( e.KeyCode == 13 && false === editor.isViewMode ) // Enter
@@ -3173,18 +1166,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-            // 1. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
-            // 2. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
-            if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
-            {
-                this.DrawingObjects.resetSelection2();
-                this.Document_UpdateInterfaceState();
-                this.Document_UpdateSelectionState();
-            }
-            else if ( docpostype_HdrFtr == this.CurPos.Type )
-            {
-                this.Document_End_HdrFtrEditing();
-            }
+            // TODO !!!
             bRetValue = true;
         }
         else if ( e.KeyCode == 32 && false === editor.isViewMode ) // Space
@@ -3761,7 +1743,7 @@ CPresentation.prototype =
 
     Set_DocumentDefaultTab: function(DTab)
     {
-        History.Add( this, { Type : historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
+       //History.Add( this, { Type : historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
         Default_Tab_Stop = DTab;
     },
 
@@ -3819,60 +1801,29 @@ CPresentation.prototype =
             return;
 
         this.CurPage = PageIndex;
+        e.ctrlKey = e.CtrlKey;
+        e.shiftKey = e.ShiftKey;
         if(e.Button === 0)
         {
-            this.Slides[this.CurPage].graphicObjects.onMouseDown(e, X, Y);
-        }
-        else if(e.Button === 2 && this.viewMode === false )
-        {
-            this.Slides[this.CurPage].graphicObjects.onMouseDown2(e, X, Y);
-        }
-        this.Document_UpdateInterfaceState();
-        return;
-        if ( PageIndex < 0 )
-            return;
-
-        // Обработка правой кнопки мыши происходит на событии MouseUp
-        if ( g_mouse_button_right === e.Button )
-            return;
-
-        // Если мы двигаем границу таблицы, тогда создаем новую точку для отката.
-        var Table = this.Is_TableBorder( X, Y, PageIndex );
-        if ( null != Table )
-        {
-            if ( true === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Table, CheckType : changestype_Table_Properties } ) )
-                return;
-
-            this.Create_NewHistoryPoint();
-        }
-
-        this.CurPage = PageIndex;
-
-        if ( true === editor.isStartAddShape && docpostype_HdrFtr != this.CurPos.Type )
-        {
-            this.CurPos.Type = docpostype_DrawingObjects;
-            this.Selection.Use   = true;
-            this.Selection.Start = true;
-
-            if ( true != this.DrawingObjects.isPolylineAddition() )
-                this.DrawingObjects.startAddShape( editor.addShapePreset );
-
-            this.DrawingObjects.OnMouseDown(MouseEvent, X, Y, this.CurPage);
-        }
-        else
-        {
-            this.Selection_SetStart( X, Y, e );
-
-            if ( e.ClickCount <= 1 )
+            var ret = this.Slides[this.CurPage].graphicObjects.onMouseDown(e, X, Y);
+            if(!ret)
             {
-                this.RecalculateCurPos();
+                this.Slides[this.CurPage].graphicObjects.resetSelection();
                 this.Document_UpdateSelectionState();
             }
         }
+        //else if(e.Button === 2 && this.viewMode === false )
+        //{
+        //    this.Slides[this.CurPage].graphicObjects.onMouseDown2(e, X, Y);
+        //}
+        this.Document_UpdateInterfaceState();
     },
 
     OnMouseUp : function(e, X, Y, PageIndex)
     {
+
+        e.ctrlKey = e.CtrlKey;
+        e.shiftKey = e.ShiftKey;
         var elements = this.Slides[this.CurPage].graphicObjects;
         if(e.Button === 0)
         {
@@ -3887,244 +1838,40 @@ CPresentation.prototype =
 
     OnMouseMove : function(e, X, Y, PageIndex)
     {
+        e.ctrlKey = e.CtrlKey;
+        e.shiftKey = e.ShiftKey;
         editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
         this.Slides[this.CurPage].onMouseMove(e, X, Y);
-        this.Slides[this.CurPage].graphicObjects.Update_CursorType(X, Y,  e );
+        this.Update_CursorType(X, Y,  e );
         editor.sync_MouseMoveEndCallback();
     },
 
-    Get_Numbering : function()
-    {
-        return this.Numbering;
-    },
 
-    Internal_GetNumInfo : function(ParaId, NumPr)
-    {
-        this.NumInfoCounter++;
-        var NumInfo = new Array(NumPr.Lvl + 1);
-        for ( var Index = 0; Index < NumInfo.length; Index++ )
-            NumInfo[Index] = 0;
-
-        // Этот параметр контролирует уровень, начиная с которого делаем рестарт для текущего уровня
-        var Restart = [-1,-1,-1,-1,-1,-1,-1,-1,-1];
-        var AbstractNum = null;
-        if ( "undefined" != typeof(this.Numbering) && null != ( AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId) ) )
-        {
-            for ( var LvlIndex = 0; LvlIndex < 9; LvlIndex++ )
-                Restart[LvlIndex] = AbstractNum.Lvl[LvlIndex].Restart;
-        }
-
-        var PrevLvl = -1;
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            var Item = this.Content[Index];
-
-            var ItemNumPr = null;
-            if ( type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.Numbering_Get() ) && ItemNumPr.NumId == NumPr.NumId  )
-            {
-                // Делаем рестарты, если они нужны
-                if ( -1 != PrevLvl && PrevLvl < ItemNumPr.Lvl )
-                {
-                    for ( var Index2 = PrevLvl + 1; Index2 < 9; Index2++ )
-                    {
-                        if ( 0 != Restart[Index2] && ( -1 == Restart[Index2] || PrevLvl <= (Restart[Index2] - 1 ) ) )
-                            NumInfo[Index2] = 0;
-                    }
-                }
-
-                if ( "undefined" == typeof(NumInfo[ItemNumPr.Lvl]) )
-                    NumInfo[ItemNumPr.Lvl] = 0;
-                else
-                    NumInfo[ItemNumPr.Lvl]++;
-
-                for ( var Index2 = ItemNumPr.Lvl - 1; Index2 >= 0; Index2-- )
-                {
-                    if ( "undefined" == typeof(NumInfo[Index2]) || 0 == NumInfo[Index2] )
-                        NumInfo[Index2] = 1;
-                }
-
-                PrevLvl = ItemNumPr.Lvl;
-            }
-
-            if ( ParaId == Item.GetId() )
-                break;
-        }
-
-        return NumInfo;
-    },
-
-    Get_Styles : function()
-    {
-        return this.Styles;
-    },
 
     Get_TableStyleForPara : function()
     {
         return null;
     },
 
-    Content_GetPrev : function(Id)
-    {
-        var Index = this.Internal_Content_Find( Id );
-        if ( Index > 0 )
-        {
-            return this.Content[Index - 1];
-        }
 
-        return null;
-    },
-
-    Content_GetNext : function(Id)
-    {
-        var Index = this.Internal_Content_Find( Id );
-        if ( -1 != Index && Index < this.Content.length - 1 )
-        {
-            return this.Content[Index + 1];
-        }
-
-        return null;
-    },
-
-    Internal_Content_Find : function(Id)
-    {
-        return 0;
-
-        for ( var Index = 0; Index < this.Content.length; Index++ )
-        {
-            if ( this.Content[Index].GetId() === Id )
-                return Index;
-        }
-
-        return -1;
-    },
-
-    Select_DrawingObject : function(Id)
-    {
-        this.Selection_Remove();
-
-        // Прячем курсор
-        this.DrawingDocument.TargetEnd();
-        this.DrawingDocument.SetCurrentPage( this.CurPage );
-
-        this.CurPos.Type = docpostype_DrawingObjects;
-        this.DrawingObjects.selectById( Id, this.CurPage );
-
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
-    },
-
-    // Получем ближайшую возможную позицию курсора
-    Get_NearestPos : function(PageNum, X, Y, bAnchor, Drawing)
-    {
-        if ( undefined === bAnchor )
-            bAnchor = false;
-
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Get_NearestPos( PageNum, X, Y, bAnchor, Drawing );
-
-        var bInText      = (null === this.Is_InText(X, Y, PageNum)      ? false : true);
-        var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects( X, Y, PageNum, this );
-
-        if ( true != bAnchor )
-        {
-            // Проверяем попадание в графические объекты
-            var NearestPos = this.DrawingObjects.getNearestPos( X, Y, PageNum, Drawing);
-            if ( ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bInText && nInDrawing >= 0 ) ) && null != NearestPos )
-                return NearestPos;
-        }
-
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, PageNum);
-
-        // Делаем логику как в ворде
-        if ( true === bAnchor && (0 < ContentPos || PageNum > 0 ) && ContentPos === this.Pages[PageNum].Pos && this.Pages[PageNum].EndPos > this.Pages[PageNum].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage() )
-            ContentPos++;
-
-        return this.Content[ContentPos].Get_NearestPos( PageNum, X, Y, bAnchor, Drawing );
-    },
 
     Get_SelectionAnchorPos: function()
     {
-        var selected_objects = this.Slides[this.CurPage].graphicObjects.selectedObjects;
-        if(selected_objects.length  > 0)
+        if(this.Slides[this.CurPage])
         {
-            var last_object = selected_objects[selected_objects.length - 1];
-            return  { X0 : last_object.x, X1 : last_object.x + last_object.extX, Y : last_object.y};
+            var selected_objects = this.Slides[this.CurPage].graphicObjects.selectedObjects;
+            if(selected_objects.length  > 0)
+            {
+                var last_object = selected_objects[selected_objects.length - 1];
+                return  { X0 : last_object.x, X1 : last_object.x + last_object.extX, Y : last_object.y};
+            }
+            else
+            {
+                return  { X0 : this.Slides[this.CurPage].commentX, X1 : this.Slides[this.CurPage].commentX, Y : this.Slides[this.CurPage].commentY};
+            }
         }
-        else
-        {
-            return  { X0 : this.Slides[this.CurPage].commentX, X1 : this.Slides[this.CurPage].commentX, Y : this.Slides[this.CurPage].commentY};
-        }
-    },
-
-    Internal_Content_Add : function(Position, NewObject)
-    {
-        // Position = this.Content.length  допускается
-        if ( Position < 0 || Position > this.Content.length )
-            return;
-
-        var PrevObj = this.Content[Position - 1];
-        var NextObj = this.Content[Position];
-
-        if ( "undefined" == typeof(PrevObj) )
-            PrevObj = null;
-
-        if ( "undefined" == typeof(NextObj) )
-            NextObj = null;
-
-        this.History.Add( this, { Type : historyitem_Document_AddItem, Pos : Position, Item : NewObject } );
-        this.Content.splice( Position, 0, NewObject );
-        NewObject.Set_Parent( this );
-        NewObject.Set_DocumentNext( NextObj );
-        NewObject.Set_DocumentPrev( PrevObj );
-
-        if ( null != PrevObj )
-            PrevObj.Set_DocumentNext( NewObject );
-
-        if ( null != NextObj )
-            NextObj.Set_DocumentPrev( NewObject );
-
-        // Проверим, что последний элемент не таблица
-        if ( type_Table == this.Content[this.Content.length - 1].GetType() )
-            this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field ) );
-    },
-
-    Internal_Content_Remove : function(Position, Count)
-    {
-        var ChangePos = -1;
-
-        if ( Position < 0 || Position >= this.Content.length || Count <= 0 )
-            return -1;
-
-        var PrevObj = this.Content[Position - 1];
-        var NextObj = this.Content[Position + Count];
-
-        if ( "undefined" == typeof(PrevObj) )
-            PrevObj = null;
-
-        if ( "undefined" == typeof(NextObj) )
-            NextObj = null;
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Position + Index].PreDelete();
-        }
-
-        this.History.Add( this, { Type : historyitem_Document_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
-        this.Content.splice( Position, Count );
-
-        if ( null != PrevObj )
-            PrevObj.Set_DocumentNext( NextObj );
-
-        if ( null != NextObj )
-            NextObj.Set_DocumentPrev( PrevObj );
-
-        // Проверим, что последний элемент не таблица
-        if ( type_Table == this.Content[this.Content.length - 1].GetType() )
-            this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, X_Right_Field, Y_Bottom_Field ) );
-
-        return ChangePos;
+        return { X0 : 0, X1 : 0, Y : 0};
     },
 
     Clear_ContentChanges : function()
@@ -4142,58 +1889,6 @@ CPresentation.prototype =
         this.m_oContentChanges.Refresh();
     },
 
-    // AlignV = 0 - Верх, = 1 - низ
-    // AlignH  стандартные значения align_Left, align_Center, align_Right
-    Document_AddPageNum : function(AlignV, AlignH)
-    {
-        if ( AlignV >= 0 )
-        {
-            var PageIndex = this.CurPage;
-            if ( docpostype_HdrFtr === this.CurPos.Type )
-                PageIndex = this.HdrFtr.Get_CurPage();
-
-            if ( PageIndex < 0 )
-                PageIndex = this.CurPage;
-
-            this.HdrFtr.AddPageNum( PageIndex, AlignV, AlignH );
-        }
-        else
-        {
-            this.Paragraph_Add( new ParaPageNum() );
-        }
-
-        this.Document_UpdateInterfaceState();
-    },
-
-    // Type    - верхний или нижний колонтитул
-    // Subtype - first, even или default
-    Document_AddHdrFtr : function(Type, Subtype)
-    {
-        this.HdrFtr.AddHeaderOrFooter( Type, Subtype );
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-    },
-
-    Document_RemoveHdrFtr : function(Type, Subtype)
-    {
-        this.HdrFtr.RemoveHeaderOrFooter( Type, Subtype );
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-    },
-
-    Document_SetHdrFtrDistance : function(Value)
-    {
-        this.HdrFtr.Set_Distance( Value, Page_Height );
-        this.Document_UpdateRulersState();
-        this.Document_UpdateInterfaceState();
-    },
-
-    Document_SetHdrFtrBounds : function(Y0, Y1)
-    {
-        this.HdrFtr.Set_Bounds( Y0, Y1 );
-        this.Document_UpdateRulersState();
-        this.Document_UpdateInterfaceState();
-    },
 
     Document_Format_Copy : function()
     {
@@ -4201,158 +1896,7 @@ CPresentation.prototype =
         this.CopyParaPr = this.Get_Paragraph_ParaPr_Copy();
     },
 
-    Document_End_HdrFtrEditing : function()
-    {
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-            if ( null == CurHdrFtr )
-                return;
 
-            CurHdrFtr.Selection_Remove();
-
-            this.CurPos.Type = docpostype_Content;
-
-            if ( hdrftr_Header == CurHdrFtr.Type )
-                this.Cursor_MoveAt( 0, 0, false );
-            else
-                this.Cursor_MoveAt( 0, Page_Height, false );
-
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
-
-            this.Document_UpdateRulersState();
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateSelectionState();
-        }
-    },
-
-    Document_Format_Paste : function()
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            this.HdrFtr.Paragraph_Format_Paste( this.CopyTextPr, this.CopyParaPr, false );
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-            this.DrawingObjects.paragraphFormatPaste( this.CopyTextPr, this.CopyParaPr, false );
-        else //if ( docpostype_Content == this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                switch ( this.Selection.Flag )
-                {
-                    case selectionflag_Numbering    : return;
-                    case selectionflag_Common:
-                    {
-                        var Start = this.Selection.StartPos;
-                        var End   = this.Selection.EndPos;
-                        if ( Start > End )
-                        {
-                            Start = this.Selection.EndPos;
-                            End   = this.Selection.StartPos;
-                        }
-
-                        for ( var Pos = Start; Pos <= End; Pos++ )
-                        {
-                            this.Content[Pos].Paragraph_Format_Paste( this.CopyTextPr, this.CopyParaPr, ( Start === End ? false : true ) );
-                        }
-
-                        this.ContentLastChangePos = Math.max( Start - 1, 0 );
-                        this.Recalculate();
-
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                this.Content[this.CurPos.ContentPos].Paragraph_Format_Paste( this.CopyTextPr, this.CopyParaPr, true );
-                this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-                this.Recalculate();
-            }
-        }
-
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
-    },
-
-    Is_TableCellContent : function()
-    {
-        return false;
-    },
-
-    Is_TopDocument : function(bReturnTopDocument)
-    {
-        if ( true === bReturnTopDocument )
-            return this;
-
-        return true;
-    },
-
-    Is_DrawingShape : function()
-    {
-        return false;
-    },
-
-    Is_HdrFtr : function(bReturnHdrFtr)
-    {
-        if ( true === bReturnHdrFtr )
-            return null;
-
-        return false;
-    },
-
-    Is_SelectionUse : function()
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Is_SelectionUse();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.isSelectionUse();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-                return true;
-
-            return false;
-        }
-    },
-
-    Is_TextSelectionUse : function()
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Is_TextSelectionUse();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.isTextSelectionUse();
-        else //if ( docpostype_Content === this.CurPos.Type )
-            return this.Selection.Use;
-    },
-
-    Get_CurPosXY : function()
-    {
-        var TempXY;
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            TempXY = this.HdrFtr.Get_CurPosXY();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            TempXY = this.DrawingObjects.getCurPosXY();
-        else // if ( docpostype_Content == this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                    TempXY = { X : 0, Y : 0 };
-                else // if ( selectionflag_Common === this.Selection.Flag )
-                    TempXY = this.Content[this.Selection.EndPos].Get_CurPosXY();
-            }
-            else
-                TempXY = this.Content[this.CurPos.ContentPos].Get_CurPosXY();
-        }
-
-        this.Internal_CheckCurPage();
-
-        return { X : TempXY.X, Y : TempXY.Y, PageNum : this.CurPage };
-    },
 
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
     Get_SelectedText : function(bClearText)
@@ -4360,166 +1904,6 @@ CPresentation.prototype =
         return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
     },
 
-    // Получаем текущий параграф
-    Get_CurrentParagraph : function()
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Get_CurrentParagraph();
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.getCurrentParagraph();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-                return null;
-
-            if ( this.CurPos.ContentPos < 0 )
-                return null;
-
-            if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-            {
-                if ( true == this.Selection.Use )
-                    return this.Content[this.Selection.StartPos].Get_CurrentParagraph();
-                else
-                    return this.Content[this.CurPos.ContentPos].Get_CurrentParagraph();
-            }
-            else if ( type_Paragraph == this.Content[this.CurPos.ContentPos].GetType() )
-                return this.Content[this.CurPos.ContentPos];
-
-            return null;
-        }
-    },
-
-    Get_SelectedElementsInfo : function()
-    {
-        var Info = new CSelectedElementsInfo();
-
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Get_SelectedElementsInfo( Info );
-        }
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-        {
-            this.DrawingObjects.getSelectedElementsInfo( Info );
-        }
-        else if ( docpostype_Content == this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                if ( this.Selection.StartPos != this.Selection.EndPos )
-                    Info.Set_MixedSelection();
-                else
-                {
-                    this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
-                }
-            }
-            else
-            {
-                this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
-            }
-        }
-
-        return Info;
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы с поиском
-//-----------------------------------------------------------------------------------
-    Search_Start : function(Str)
-    {
-        if ( "string" != typeof(Str) || Str.length <= 0 )
-            return;
-
-        this.DrawingDocument.StartSearch();
-
-        this.SearchInfo.String   = Str;
-        this.SearchInfo.CurPage  = 0;
-        this.SearchInfo.StartPos = 0;
-
-        // Начнем поиск с поиска по колонтитулам
-        this.HdrFtr.DocumentSearch( this.SearchInfo.String );
-
-        this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_WaitRecalc()}, 1);
-    },
-
-    Search_WaitRecalc : function()
-    {
-        if ( null === this.SearchInfo.Id )
-            return;
-
-        // Пока рассчет не закончился не начинаем поиск
-        if ( null != this.FullRecalc.Id )
-            this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_WaitRecalc()}, 100);
-        else
-            this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_OnPage()}, 1);
-    },
-
-    Search_OnPage : function()
-    {
-        if ( null === this.SearchInfo.Id )
-            return;
-
-        var Count = this.Content.length;
-        var CurPage = this.SearchInfo.CurPage;
-
-        var bFlowObjChecked = false;
-
-        var Index = 0;
-        for ( Index = this.SearchInfo.StartPos; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.DocumentSearch( this.SearchInfo.String, search_Common );
-
-            if ( false === bFlowObjChecked )
-            {
-                this.DrawingObjects.documentSearch( CurPage, this.SearchInfo.String, search_Common );
-                bFlowObjChecked = true;
-            }
-
-            var bNewPage = false;
-            if ( Element.Pages.length > 1 )
-            {
-                for ( var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++ )
-                    this.DrawingObjects.documentSearch( CurPage + TempIndex, this.SearchInfo.String, search_Common );
-
-                CurPage += Element.Pages.length - 1;
-                bNewPage = true;
-            }
-
-            if ( bNewPage )
-            {
-                clearTimeout( this.SearchInfo.Id );
-
-                this.SearchInfo.StartPos = Index + 1;
-                this.SearchInfo.CurPage  = CurPage;
-                this.SearchInfo.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Search_OnPage()}, 1);
-
-                break;
-            }
-        }
-
-        if ( Index >= Count )
-        {
-            this.SearchInfo.Id = null;
-            this.Search_Stop( false );
-        }
-    },
-
-    Search_Stop : function(bChange)
-    {
-        if ( "undefined" === typeof(bChange) )
-            bChange = false;
-
-        if ( null != this.SearchInfo.Id )
-        {
-            clearTimeout( this.SearchInfo.Id );
-            this.SearchInfo.Id = null;
-        }
-
-        this.DrawingDocument.EndSearch( bChange );
-    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
@@ -4731,7 +2115,6 @@ CPresentation.prototype =
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
         }
-        //this.Document_UpdateRulersState();
     },
 
     Table_CheckMerge : function()
@@ -4800,44 +2183,13 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     Document_CreateFontMap : function()
     {
+        //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!
         return;
-        var StartTime = new Date().getTime();
-
-        var FontMap = {};
-        this.HdrFtr.Document_CreateFontMap(FontMap);
-
-        var CurPage = 0;
-        this.DrawingObjects.documentCreateFontMap( CurPage, FontMap );
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.Document_CreateFontMap(FontMap);
-
-            if ( Element.Pages.length > 1 )
-            {
-                for ( var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++ )
-                    this.DrawingObjects.documentCreateFontMap( ++CurPage, FontMap );
-            }
-        }
-
-        //console.log( "CreateFontMap: " + ((new Date().getTime() - StartTime) / 1000) + " s"  );
-
-        return FontMap;
     },
 
     Document_CreateFontCharMap : function(FontCharMap)
     {
-        this.HdrFtr.Document_CreateFontCharMap( FontCharMap );
-        this.DrawingObjects.documentCreateFontCharMap( FontCharMap );
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.Document_CreateFontCharMap( FontCharMap );
-        }
+        //TODO !!!!!!!!!!
     },
 
     Document_Get_AllFontNames : function()
@@ -4855,61 +2207,84 @@ CPresentation.prototype =
     {
         editor.sync_BeginCatchSelectedElements();
         editor.ClearPropObjCallback();
-
-        var _empty_para_pr =
-        {
-            Ind               : { Left : UnknownValue, Right : UnknownValue, FirstLine : UnknownValue },
-            Jc                : UnknownValue,
-            Spacing           : { Line : UnknownValue, LineRule : UnknownValue, Before : UnknownValue, After : UnknownValue, AfterAutoSpacing : UnknownValue, BeforeAutoSpacing : UnknownValue },
-            PageBreakBefore   : UnknownValue,
-            KeepLines         : UnknownValue,
-            ContextualSpacing : UnknownValue,
-            Shd               : UnknownValue,
-            StyleId           : -1,
-            NumPr             : null,
-            Brd               :
-            {
-                Between : null,
-                Bottom  : null,
-                Left    : null,
-                Right   : null
-            },
-            ListType:
-            {
-                Type: -1,
-                SubType: -1
-            }
-        };
-        var _empty_text_pr =
-        {
-            Bold       : false,
-            Italic     : false,
-            Underline  : false,
-            Strikeout  : false,
-            FontSize   : "",
-            FontFamily : {Index : 0, Name : ""},
-            VertAlign  : vertalign_Baseline,
-            Color      : { r : 0, g : 0, b : 0},
-            HighLight  : highlight_None
-        };
-
         if(this.Slides[this.CurPage])
         {
-            var _cur_slide = this.Slides[this.CurPage];
-            var _slide_elements = _cur_slide.graphicObjects;
-            _slide_elements.Document_UpdateInterfaceState();
+            editor.sync_slidePropCallback(this.Slides[this.CurPage]);
+            var graphic_objects = this.Slides[this.CurPage].graphicObjects;
+            var target_content = graphic_objects.getTargetDocContent(), drawing_props = graphic_objects.getDrawingProps(), i;
+            var para_pr = graphic_objects.getParagraphParaPr(), text_pr = graphic_objects.getParagraphTextPr();
+            if(!para_pr)
+            {
+                para_pr = new CParaPr();
+            }
+            if(!text_pr)
+            {
+                text_pr = new CTextPr();
+            }
+            if(!target_content)
+            {
+                    editor.UpdateParagraphProp( para_pr );
+                    editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
+                    //if(selected_objects.length === 1 )
+                    //{
+                    //    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
+                    //        editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
+                    //}
+                    editor.UpdateTextPr(text_pr);
+            }
 
+            if(drawing_props.imageProps)
+            {
+                editor.sync_ImgPropCallback(drawing_props.imageProps);
+            }
 
-            var slide = this.Slides[this.CurPage];
-            editor.sync_EndCatchSelectedElements({theme:slide.Layout.Master.Theme,slide: slide, layout:slide.Layout, master:slide.Layout.Master});
+            if(drawing_props.shapeProps)
+            {
+                editor.sync_shapePropCallback(drawing_props.shapeProps);
+            }
+
+            if(drawing_props.chartProps)
+            {
+                editor.sync_ImgPropCallback(drawing_props.chartProps);
+            }
+            if(target_content)
+            {
+                if(para_pr)
+                {
+                    editor.UpdateParagraphProp( para_pr );
+
+                    editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
+                    //if(selected_objects.length === 1 )
+                    //{
+                    //    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
+                    //        editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
+                    //}
+                }
+                if(text_pr)
+                {
+
+                    if(text_pr.RFonts)
+                    {
+                        var theme = graphic_objects.getTheme();
+                        if(text_pr.RFonts.Ascii)
+                            text_pr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.Ascii.Name);
+                        if(text_pr.RFonts.EastAsia)
+                            text_pr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.EastAsia.Name);
+                        if(text_pr.RFonts.HAnsi)
+                            text_pr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.HAnsi.Name);
+                        if(text_pr.RFonts.CS)
+                            text_pr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.CS.Name);
+                    }
+                    editor.UpdateTextPr(text_pr);
+                }
+            }
         }
-        else
-        {
-            editor.sync_EndCatchSelectedElements();
-        }
-        this.Document_UpdateRulersState();
+        editor.sync_EndCatchSelectedElements();
         this.Document_UpdateUndoRedoState();
-        this.Document_UpdateCanAddHyperlinkState();
+        this.Document_UpdateRulersState();
+        editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+        editor.asc_fireCallback("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
+        editor.asc_fireCallback("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
     },
 
     changeBackground: function(bg, arr_ind)
@@ -4938,70 +2313,22 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            var g_o = this.Slides[this.CurPage].graphicObjects;
-            switch(g_o.State.id)
+            var target_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+            if(target_content && target_content.Parent && target_content.Parent.getObjectType() === historyitem_type_TextBody)
             {
-                case STATES_ID_NULL:
-                {
-                    if(g_o.selectedObjects.length === 1 && g_o.selectedObjects[0].Document_UpdateRulersState)
-                    {
-                        g_o.selectedObjects[0].Document_UpdateRulersState();
-                        return;
-                    }
-                    break;
-                }
-                case STATES_ID_TEXT_ADD:
-                case STATES_ID_TEXT_ADD_IN_GROUP:
-                {
-                    if(g_o.selectedObjects.length === 1 && g_o.selectedObjects[0].Document_UpdateRulersState)
-                    {
-                        g_o.selectedObjects[0].Document_UpdateRulersState();
-                        return;
-                    }
-                    break;
-                }
-
-
+                return this.DrawingDocument.Set_RulerState_Paragraph( null , target_content.Parent.getMargins());
             }
         }
-        this.DrawingDocument.Set_RulerState_Paragraph( null );
-        return;
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Document_UpdateRulersState(this.CurPage);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.documentUpdateRulersState();
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                if ( this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType() )
-                    this.Content[this.Selection.StartPos].Document_UpdateRulersState(this.CurPage);
-                else
-                    this.DrawingDocument.Set_RulerState_Paragraph( null );
-            }
-            else
-            {
-                this.Internal_CheckCurPage();
-
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Table === Item.GetType() )
-                    Item.Document_UpdateRulersState(this.CurPage);
-                else
-                    this.DrawingDocument.Set_RulerState_Paragraph( null );
-            }
-        }
+        this.DrawingDocument.Set_RulerState_Paragraph(null);
     },
 
     // Обновляем линейки
     Document_UpdateSelectionState : function()
     {
         if(this.Slides[this.CurPage])
-        this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+        {
+            this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+        }
     },
 
     Document_UpdateUndoRedoState : function()
@@ -5030,27 +2357,13 @@ CPresentation.prototype =
     {
         editor.sync_CanAddHyperlinkCallback( this.Hyperlink_CanAdd(false) );
     },
-//-----------------------------------------------------------------------------------
-// Функции для работы с номерами страниц
-//-----------------------------------------------------------------------------------
-    Get_StartPage_Absolute : function()
-    {
-        return 0;
-    },
-
-    Get_StartPage_Relative : function()
-    {
-        return 0;
-    },
 
     Set_CurPage : function(PageNum)
     {
-
         if (-1 == PageNum)
         {
             this.CurPage = -1;
-            //this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
-
+            this.Document_UpdateInterfaceState();
             return;
         }
 
@@ -5063,30 +2376,19 @@ CPresentation.prototype =
                 this.Slides[oldCurPage].graphicObjects.resetSelectionState();
             }
             editor.asc_hideComments();
-            //this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
-            //this.Document_UpdateSelectionState();
-            //this.Document_UpdateInterfaceState();
-            //editor.asc_hideComments();
         }
-       /* else if (this.CurPage < this.Slides.length)
-        {
-            editor.sync_BeginCatchSelectedElements();
-            editor.sync_slidePropCallback(this.Slides[this.CurPage]);
-            editor.sync_EndCatchSelectedElements();
-        }    */
+        this.Document_UpdateInterfaceState();
     },
 
     Get_CurPage : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Get_CurPage();
-
         return this.CurPage;
     },
 
     resetStateCurSlide: function()
-    {},
+    {
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.resetSelection();
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -5102,8 +2404,9 @@ CPresentation.prototype =
         if ( true === CollaborativeEditing.Get_GlobalLock() )
             return;
 
+        this.clearThemeTimeouts();
         this.History.Undo();
-        this.Recalculate();
+        this.Recalculate(this.History.RecalculateData);
 
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
@@ -5114,9 +2417,9 @@ CPresentation.prototype =
         if ( true === CollaborativeEditing.Get_GlobalLock() )
             return;
 
-
+        this.clearThemeTimeouts();
         this.History.Redo();
-        this.Recalculate();
+        this.Recalculate(this.History.RecalculateData);
 
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
@@ -5129,153 +2432,14 @@ CPresentation.prototype =
         if(this.CurPage > -1)
             s.slideSelection = this.Slides[this.CurPage].graphicObjects.getSelectionState();
         return s;
-        var DocState = {};
-        DocState.CurPos =
-        {
-            X          : this.CurPos.X,
-            Y          : this.CurPos.Y,
-            ContentPos : this.CurPos.ContentPos,
-            RealX      : this.CurPos.RealX,
-            RealY      : this.CurPos.RealY,
-            Type       : this.CurPos.Type
-        };
-
-        DocState.Selection =
-        {
-
-            Start    : this.Selection.Start,
-            Use      : this.Selection.Use,
-            StartPos : this.Selection.StartPos,
-            EndPos   : this.Selection.EndPos,
-            Flag     : this.Selection.Flag,
-            Data     : this.Selection.Data
-        };
-
-        DocState.CurPage    = this.CurPage;
-        DocState.CurComment = this.Comments.Get_CurrentId();
-
-        var State = null;
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            State = this.HdrFtr.Get_SelectionState();
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-            State = this.DrawingObjects.getSelectionState();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                // Выделение нумерации
-                if ( selectionflag_Numbering == this.Selection.Flag )
-                    State = [];
-                else
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if ( StartPos > EndPos )
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
-
-                    State = [];
-
-                    var TempState = [];
-                    for ( var Index = StartPos; Index <= EndPos; Index++ )
-                    {
-                        TempState.push( this.Content[Index].Get_SelectionState() );
-                    }
-
-                    State.push( TempState );
-                }
-            }
-            else
-                State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
-        }
-
-        State.push( DocState );
-
-        return State;
     },
 
     Set_SelectionState : function(State)
     {
-        this.Set_CurPage(State.CurPage);
-        //this.DrawingDocument.m_oWordControl.GoToPage(State.CurPage);
         if(State.CurPage > -1)
-            this.Slides[this.CurPage].graphicObjects.setSelectionState(State.slideSelection);
-
+            this.Slides[State.CurPage].graphicObjects.setSelectionState(State.slideSelection);
+        this.Set_CurPage(State.CurPage);
         this.bGoToPage = true;
-        return ;
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
-            this.DrawingObjects.resetSelection();
-
-        if ( State.length <= 0 )
-            return;
-
-        var DocState = State[State.length - 1];
-
-        this.CurPos =
-        {
-            X          : DocState.CurPos.X,
-            Y          : DocState.CurPos.Y,
-            ContentPos : DocState.CurPos.ContentPos,
-            RealX      : DocState.CurPos.RealX,
-            RealY      : DocState.CurPos.RealY,
-            Type       : DocState.CurPos.Type
-        };
-
-        this.Selection =
-        {
-
-            Start    : DocState.Selection.Start,
-            Use      : DocState.Selection.Use,
-            StartPos : DocState.Selection.StartPos,
-            EndPos   : DocState.Selection.EndPos,
-            Flag     : DocState.Selection.Flag,
-            Data     : DocState.Selection.Data
-        };
-
-        this.CurPage = DocState.CurPage;
-        this.Comments.Set_Current(DocState.CurComment);
-
-        var StateIndex = State.length - 2;
-
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            this.HdrFtr.Set_SelectionState( State, StateIndex );
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            this.DrawingObjects.setSelectionState( State, StateIndex );
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                // Выделение нумерации
-                if ( selectionflag_Numbering == this.Selection.Flag )
-                {
-                    // Ничего не делаем
-                }
-                else
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if ( StartPos > EndPos )
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
-
-                    var CurState = State[StateIndex];
-                    for ( var Index = StartPos; Index <= EndPos; Index++ )
-                    {
-                        this.Content[Index].Set_SelectionState( CurState[Index - StartPos], CurState[Index - StartPos].length - 1 );
-                    }
-                }
-            }
-            else
-                this.Content[this.CurPos.ContentPos].Set_SelectionState( State, StateIndex );
-        }
     },
 
     Undo : function(Data)
@@ -5290,7 +2454,7 @@ CPresentation.prototype =
 
                 break;
             }
-            case historyitem_Presenattion_AddSlide:
+            case historyitem_Presentation_AddSlide:
             {
                 this.Slides.splice(Data.Pos, 1);
                 for(var i = 0; i < this.Slides.length; ++i)
@@ -5299,7 +2463,7 @@ CPresentation.prototype =
                 }
                 break;
             }
-            case historyitem_Presenattion_RemoveSlide:
+            case historyitem_Presentation_RemoveSlide:
             {
                 this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
                 for(var i = 0; i < this.Slides.length; ++i)
@@ -5308,47 +2472,19 @@ CPresentation.prototype =
                 }
                 break;
             }
-            case historyitem_Presenattion_SlideSize:
+            case historyitem_Presentation_SlideSize:
             {
                 var kw = Data.oldW/this.Width;
                 var kh = Data.oldH/this.Height;
 
                 this.Width = Data.oldW;
                 this.Height = Data.oldH;
-                var b_is_on = History.Is_On();
-                if(b_is_on)
-                {
-                    History.TurnOff();
-                }
-
-                for(var i = 0; i < this.slideMasters.length; ++i)
-                {
-                    this.slideMasters[i].changeSize(kw, kh);
-                    var master = this.slideMasters[i];
-                    for(var j = 0; j < master.sldLayoutLst.length; ++j)
-                    {
-                        master.sldLayoutLst[j].changeSize(kw, kh);
-                    }
-                }
-
-               // for(var i = 0; i < this.slideLayouts.length; ++i)
-               // {
-               //     this.slideLayouts[i].changeSize(kw, kh);
-               // }
-
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.Slides[i].changeSize(kw, kh);
-                }
+                this.changeSlideSizeFunction(kw, kh);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
 
-                if(b_is_on)
-                {
-                    History.TurnOn();
-                }
                 break;
             }
-            case historyitem_Presenattion_AddSlideMaster:
+            case historyitem_Presentation_AddSlideMaster:
             {
                 this.slideMasters.splice(Data.pos, 1);
                 break;
@@ -5362,13 +2498,7 @@ CPresentation.prototype =
 
         switch ( Type )
         {
-            case historyitem_Document_DefaultTab:
-            {
-                Default_Tab_Stop = Data.New;
-
-                break;
-            }
-            case historyitem_Presenattion_AddSlide:
+            case historyitem_Presentation_AddSlide:
             {
                 this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
                 for(var i = 0; i < this.Slides.length; ++i)
@@ -5377,7 +2507,7 @@ CPresentation.prototype =
                 }
                 break;
             }
-            case historyitem_Presenattion_RemoveSlide:
+            case historyitem_Presentation_RemoveSlide:
             {
                 this.Slides.splice(Data.Pos, 1);
                 for(var i = 0; i < this.Slides.length; ++i)
@@ -5386,46 +2516,17 @@ CPresentation.prototype =
                 }
                 break;
             }
-            case historyitem_Presenattion_SlideSize:
+            case historyitem_Presentation_SlideSize:
             {
                 var kw = Data.newW/this.Width;
                 var kh = Data.newH/this.Height;
                 this.Width = Data.newW;
                 this.Height = Data.newH;
-                var b_is_on = History.Is_On();
-                if(b_is_on)
-                {
-                    History.TurnOff();
-                }
-
-                for(var i = 0; i < this.slideMasters.length; ++i)
-                {
-                    this.slideMasters[i].changeSize(kw, kh);
-                    var master = this.slideMasters[i];
-                    for(var j = 0; j < master.sldLayoutLst.length; ++j)
-                    {
-                        master.sldLayoutLst[j].changeSize(kw, kh);
-                    }
-                }
-
-               // for(var i = 0; i < this.slideLayouts.length; ++i)
-               // {
-               //     this.slideLayouts[i].changeSize(kw, kh);
-               // }
-
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.Slides[i].changeSize(kw, kh);
-                }
+                this.changeSlideSizeFunction(kw, kh);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
-
-                if(b_is_on)
-                {
-                    History.TurnOn();
-                }
                 break;
             }
-            case historyitem_Presenattion_AddSlideMaster:
+            case historyitem_Presentation_AddSlideMaster:
             {
                 this.slideMasters.splice(Data.pos, 0, Data.master);
                 break;
@@ -5440,140 +2541,146 @@ CPresentation.prototype =
 
     Refresh_RecalcData : function(Data)
     {
-        return;
-        var ChangePos = -1;
-        var bNeedRecalcHdrFtr = false;
-
-        var Type = Data.Type;
-
-        switch ( Type )
+        var recalculateMaps, key;
+        switch ( Data.Type )
         {
-            case historyitem_Document_AddItem:
-            case historyitem_Document_RemoveItem:
+            case historyitem_Presentation_AddSlide:
             {
-                ChangePos = Data.Pos;
                 break;
             }
-
-            case historyitem_Document_Margin:
-            case historyitem_Document_PageSize:
-            case historyitem_Document_Orientation:
+            case historyitem_Presentation_RemoveSlide:
             {
-                bNeedRecalcHdrFtr = true;
                 break;
             }
-        }
-
-        if ( true === bNeedRecalcHdrFtr )
-        {
-            this.History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : 0 } );
-            this.History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.HdrFtr.Content[0].Header.First } );
-            this.History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.HdrFtr.Content[0].Header.Odd } );
-            this.History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.HdrFtr.Content[0].Header.Even } );
-            this.History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.HdrFtr.Content[0].Footer.First } );
-            this.History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.HdrFtr.Content[0].Footer.Odd } );
-            this.History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this.HdrFtr.Content[0].Footer.Even } );
-        }
-
-        if ( -1 != ChangePos )
-            this.History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : ChangePos, PageNum : 0 } } );
-    },
-
-    Refresh_RecalcData2 : function(Index, Page_rel)
-    {
-        this.History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : Index, PageNum : Page_rel } } );
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы со статистикой
-//-----------------------------------------------------------------------------------
-    Statistics_Start : function()
-    {
-        this.Statistics.Start();
-        this.Statistics.Add_Page();
-    },
-
-    Statistics_OnPage : function()
-    {
-        var Count = this.Content.length;
-        var CurPage = this.Statistics.CurPage;
-
-        var bFlowObjChecked = false;
-
-        var Index = 0;
-        for ( Index = this.Statistics.StartPos; Index < Count; Index++ )
-        {
-            var Element = this.Content[Index];
-            Element.DocumentStatistics( this.Statistics );
-
-            if ( false === bFlowObjChecked )
+            case historyitem_Presentation_SlideSize:
             {
-                this.DrawingObjects.documentStatistics( CurPage, this.Statistics );
-                bFlowObjChecked = true;
+                recalculateMaps = this.GetRecalculateMaps();
+                for(key in recalculateMaps.masters)
+                {
+                    if(recalculateMaps.masters.hasOwnProperty(key))
+                    {
+                        recalculateMaps.masters[key].checkSlideSize();
+                    }
+                }
+                for(key in recalculateMaps.layouts)
+                {
+                    if(recalculateMaps.layouts.hasOwnProperty(key))
+                    {
+                        recalculateMaps.layouts[key].checkSlideSize();
+                    }
+                }
+                for(key = 0; key < this.Slides.length; ++key)
+                {
+                    this.Slides[key].checkSlideSize();
+                }
+                break;
             }
-
-            var bNewPage = false;
-            if ( Element.Pages.length > 1 )
+            case historyitem_Presentation_AddSlideMaster:
             {
-                for ( var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++ )
-                    this.DrawingObjects.documentStatistics( CurPage + TempIndex, this.Statistics );
-
-                CurPage += Element.Pages.length - 1;
-                this.Statistics.Add_Page( Element.Pages.length - 1 );
-                bNewPage = true;
+                break;
             }
-
-            if ( bNewPage )
+            case historyitem_Presentation_ChangeTheme:
             {
-                this.Statistics.Next( Index + 1, CurPage );
+                for(var i = 0; i < Data.arrIndex.length; ++i)
+                {
+                    this.Slides[Data.arrIndex[i]] && this.Slides[Data.arrIndex[i]].checkSlideTheme();
+                }
+                break;
+            }
+            case historyitem_Presentation_ChangeColorScheme:
+            {
+                recalculateMaps = this.GetRecalculateMaps();
+                for(key in recalculateMaps.masters)
+                {
+                    if(recalculateMaps.masters.hasOwnProperty(key))
+                    {
+                        recalculateMaps.masters[key].checkSlideColorScheme();
+                    }
+                }
+                for(key in recalculateMaps.layouts)
+                {
+                    if(recalculateMaps.layouts.hasOwnProperty(key))
+                    {
+                        recalculateMaps.layouts[key].checkSlideColorScheme();
+                    }
+                }
+                for(var i = 0; i < Data.arrIndex.length; ++i)
+                {
+                    this.Slides[Data.arrIndex[i]] && this.Slides[Data.arrIndex[i]].checkSlideTheme();
+                }
                 break;
             }
         }
+        this.Refresh_RecalcData2(Data);
+    },
 
-        if ( Index >= Count )
+    Refresh_RecalcData2 : function(Data)
+    {
+        switch ( Data.Type )
         {
-            this.Statistics_Stop();
+            case historyitem_Presentation_AddSlide:
+            {
+                break;
+            }
+            case historyitem_Presentation_RemoveSlide:
+            {
+                break;
+            }
+            case historyitem_Presentation_SlideSize:
+            {
+                History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
+                break;
+            }
+            case historyitem_Presentation_AddSlideMaster:
+            {
+                break;
+            }
+            case historyitem_Presentation_ChangeTheme:
+            {
+                History.RecalcData_Add({Type: historyrecalctype_Drawing, Theme: true, ArrInd: Data.arrIndex});
+                break;
+            }
+            case historyitem_Presentation_ChangeColorScheme:
+            {
+                History.RecalcData_Add({Type: historyrecalctype_Drawing, ColorScheme: true, ArrInd: Data.arrIndex});
+                break;
+            }
         }
     },
 
-    Statistics_Stop : function()
-    {
-        this.Statistics.Stop();
-    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
     Hyperlink_Add : function(HyperProps)
     {
-        this.Slides[this.CurPage].graphicObjects.Hyperlink_Add(HyperProps);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+        if(this.Slides[this.CurPage])
+        {
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkAdd, [HyperProps]);
+        }
     },
 
     Hyperlink_Modify : function(HyperProps)
     {
-        this.Slides[this.CurPage].graphicObjects.Hyperlink_Modify(HyperProps);
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+        if(this.Slides[this.CurPage])
+        {
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkModify, [HyperProps]);
+        }
     },
 
     Hyperlink_Remove : function()
     {
-        this.Slides[this.CurPage].graphicObjects.Hyperlink_Remove();
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
+        if(this.Slides[this.CurPage])
+        {
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkRemove, []);
+        }
     },
 
     Hyperlink_CanAdd : function(bCheckInHyperlink)
     {
         if(this.Slides[this.CurPage])
-            return this.Slides[this.CurPage].graphicObjects.Hyperlink_CanAdd(bCheckInHyperlink);
+            return this.Slides[this.CurPage].graphicObjects.hyperlinkCanAdd(bCheckInHyperlink);
         return false;
     },
-
 
     canGroup: function()
     {
@@ -5589,146 +2696,72 @@ CPresentation.prototype =
         return false;
     },
 
-
     alignLeft : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].alignLeft();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignLeft);
     },
 
     alignRight : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].alignRight();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignRight);
     },
-
 
     alignTop : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].alignTop();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
-    },
 
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignTop);
+    },
 
     alignBottom : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].alignBottom();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignBottom);
     },
-
 
     alignCenter : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].alignCenter();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignCenter);
     },
 
     alignMiddle : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].alignMiddle();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignMiddle);
     },
 
     distributeHor : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].distributeHor();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeHor);
     },
     distributeVer : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].distributeVer();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeVer);
     },
 
     bringToFront : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].bringToFront();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringToFront);   //TODO: Передавать тип проверки
     },
 
     bringForward : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].bringForward();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringForward);   //TODO: Передавать тип проверки
     },
 
     sendToBack : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].sendToBack();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.sendToBack);   //TODO: Передавать тип проверки
     },
 
 
     bringBackward : function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-        {
-            History.Create_NewPoint();
-            this.Slides[this.CurPage].bringBackward();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-        }
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringBackward);   //TODO: Передавать тип проверки
     },
 
     // Проверяем, находимся ли мы в гиперссылке сейчас
     Hyperlink_Check : function(bCheckEnd)
     {
-        return this.Slides[this.CurPage].graphicObjects.Hyperlink_Check(bCheckEnd);
+        return isRealObject(this.Slides[this.CurPage]) && this.Slides[this.CurPage].graphicObjects.hyperlinkCheck(bCheckEnd);
     },
 
 
@@ -5749,59 +2782,46 @@ CPresentation.prototype =
                     var _ph_type = layout.cSld.spTree[i].getPhType();
                     if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                     {
-                        var sp = new CShape(new_slide);
-                        layout.cSld.spTree[i].copy2(sp);
+                        var sp = layout.cSld.spTree[i].copy();
+                        sp.setParent(new_slide);
+                        sp.clearContent && sp.clearContent();
                         new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
                     }
                 }
             }
             new_slide.setSlideNum(this.CurPage + 1);
-            new_slide.Width = this.Width;
-            new_slide.Height = this.Height;
-            new_slide.recalculate();
+            new_slide.setSlideSize(this.Width, this.Height);
             this.insertSlide(this.CurPage+1,  new_slide);
 
             for(var i = this.CurPage + 2; i < this.Slides.length; ++i)
             {
-                this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 this.Slides[i].setSlideNum(i);
             }
-            this.DrawingDocument.OnRecalculatePage(this.CurPage+1, this.Slides[this.CurPage+1]);
-            this.DrawingDocument.OnEndRecalculate();
-            //this.Set_CurPage(this.CurPage + 1);
-            this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage + 1);
-
-            //this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
+            this.Recalculate();
         }
         else
         {
             var master = this.slideMasters[0];
             var layout = master.sldLayoutLst[0];
-            var new_slide = new Slide(this, layout, this.CurPage + 1)
+            var new_slide = new Slide(this, layout, this.CurPage + 1);
             for(var i = 0; i < layout.cSld.spTree.length; ++i)
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
                 {
-                    var sp = new CShape(new_slide);
-                    layout.cSld.spTree[i].copy2(sp);
-                    new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
+                    var _ph_type = layout.cSld.spTree[i].getPhType();
+                    if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
+                    {
+                        var sp = layout.cSld.spTree[i].copy();
+                        sp.setParent(new_slide);
+                        sp.clearContent && sp.clearContent();
+                        new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
+                    }
                 }
             }
             new_slide.setSlideNum(this.CurPage + 1);
-            new_slide.Width = this.Width;
-            new_slide.Height = this.Height;
-            new_slide.recalculate();
+            new_slide.setSlideSize(this.Width, this.Height);
             this.insertSlide(this.CurPage+1,  new_slide);
-
-            for(var i = this.CurPage + 2; i < this.Slides.length; ++i)
-            {
-                this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
-                this.Slides[i].setSlideNum(i);
-            }
-            this.DrawingDocument.OnRecalculatePage(this.CurPage+1, this.Slides[this.CurPage+1]);
-            this.DrawingDocument.OnEndRecalculate();
-            //this.Set_CurPage(this.CurPage + 1);
-            this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage+1);
+            this.Recalculate();
         }
 
         this.Document_UpdateInterfaceState();
@@ -5906,36 +2926,24 @@ CPresentation.prototype =
                         if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                         {
                             var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex(), layout.cSld.spTree[j].getIsSingleBody ? layout.cSld.spTree[j].getIsSingleBody() : false);
-                            if(matching_shape == null && layout.cSld.spTree[j].copy2)
+                            if(matching_shape == null && layout.cSld.spTree[j])
                             {
-                                var sp = new CShape(slide);
-                                layout.cSld.spTree[j].copy2(sp);
+                                var sp = layout.cSld.spTree[j].copy();
+                                sp.setParent(slide);
+                                sp.clearContent && sp.clearContent();
                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, sp)
                             }
                         }
                     }
                 }
                 slide.setLayout(layout);
-                slide.recalcAll();
-                slide.recalculate();
-                this.DrawingDocument.OnRecalculatePage(_array[i], this.Slides[_array[i]]);
             }
-            this.DrawingDocument.OnEndRecalculate();
-            this.Document_UpdateInterfaceState();
+            this.Recalculate();
         }
     },
 
-
-
-    changeTheme : function(themeInfo)
+    clearThemeTimeouts: function()
     {
-        if(this.viewMode === true)
-        {
-            return;
-        }
-
-        //if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
-        //    return;
         if(this.startChangeThemeTimeOutId != null)
         {
             clearTimeout(this.startChangeThemeTimeOutId);
@@ -5948,15 +2956,32 @@ CPresentation.prototype =
         {
             clearTimeout(this.forwardChangeThemeTimeOutId);
         }
-        //this.themes.push(themeInfo.Theme);
-        this.addSlideMaster(this.slideMasters.length, themeInfo.Master);
-        //this.slideLayouts = this.slideLayouts.concat(themeInfo.Layouts);
+    },
 
+    changeTheme : function(themeInfo, arrInd)
+    {
+        if(this.viewMode === true)
+        {
+            return;
+        }
+        var arr_ind, i;
+        if(!Array.isArray(arrInd))
+        {
+            arr_ind = [];
+            for(i = 0; i < this.Slides.length; ++i)
+            {
+                arr_ind.push(i);
+            }
+        }
+        else
+        {
+            arr_ind = arrInd;
+        }
+        this.clearThemeTimeouts();
+
+        this.addSlideMaster(this.slideMasters.length, themeInfo.Master);
         var _new_master = themeInfo.Master;
         _new_master.presentation = this;
-
-
-
         var _master_width = _new_master.Width;
         var _master_height = _new_master.Height;
         if(_master_height !== this.Height || _master_width !== this.Width)
@@ -5964,75 +2989,41 @@ CPresentation.prototype =
             var kw = this.Width/_master_width;
             var kh = this.Height/_master_height;
             themeInfo.Master.changeSize(kw, kh);
-            for(var i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
+            for(i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
             {
                 themeInfo.Master.sldLayoutLst[i].changeSize(kw, kh);
             }
         }
-
-        _new_master.recalculate();
-        var _arr_slides = this.Slides;
-        var _slides_array = [];
-        for(var _index = 0; _index < this.Slides.length; ++_index)
+        var slides_array = [];
+        for(i = 0; i < arr_ind.length; ++i)
         {
-            _slides_array.push(this.Slides[_index]);
+            slides_array.push(this.Slides[arr_ind[i]]);
         }
-        var _current_slide = _arr_slides[this.CurPage];
-        var _presentation = this;
-
-        var _arr_old_layouts = [];
-        var _slide_index;
-        for(_slide_index = 0; _slide_index < _arr_slides.length; ++_slide_index)
+        var new_layout;
+        for(i = 0; i < slides_array.length; ++i)
         {
-            _arr_old_layouts[_slide_index] = _arr_slides[_slide_index].Layout;
-        }
-
-       // History.Create_NewPoint();
-
-        var _arr_new_layouts = [];
-        var _new_layout;
-        for(_slide_index = 0; _slide_index < this.Slides.length; ++_slide_index)
-        {
-            if(_arr_slides[_slide_index].Layout.calculatedType == null)
+            if(slides_array[i].Layout.calculatedType == null)
             {
-                _arr_slides[_slide_index].Layout.calculateType();
+                slides_array[i].Layout.calculateType();
             }
-            _new_layout = _new_master.getMatchingLayout(_arr_slides[_slide_index].Layout.type, _arr_slides[_slide_index].Layout.matchingName, _arr_slides[_slide_index].Layout.cSld.name, true);//.type, _arr_slides[_slide_index].Layout.matchingName, _arr_slides[_slide_index].Layout.cSld.name);
-            if(!isRealObject(_new_layout))
+            new_layout = _new_master.getMatchingLayout(slides_array[i].Layout.type, slides_array[i].Layout.matchingName, slides_array[i].Layout.cSld.name, true);
+            if(!isRealObject(new_layout))
             {
-                _new_layout = _new_master.sldLayoutLst[0];
+                new_layout = _new_master.sldLayoutLst[0];
             }
-            _arr_new_layouts.push(_new_layout);
-
-            this.Slides[_slide_index].setLayout(_new_layout);
-            this.Slides[_slide_index].checkNoTransformPlaceholder();
+            slides_array[i].setLayout(new_layout);
+            slides_array[i].checkNoTransformPlaceholder();
         }
-
-
+        History.Add(this, {Type: historyitem_Presentation_ChangeTheme, arrIndex: arr_ind});
         this.resetStateCurSlide();
-
-        this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide(_current_slide, _presentation, _arr_new_layouts, 0, _slides_array)}, 30);
-
-
-        this.Document_UpdateUndoRedoState();
+        this.Recalculate();
+        this.Document_UpdateInterfaceState();
     },
 
-    changeSlideSize: function(width, height)
+    changeSlideSizeFunction: function(kw, kh)
     {
-        if(this.Document_Is_SelectionLocked(changestype_SlideSize) === false)
+        ExecuteNoHistory(function()
         {
-            History.Create_NewPoint();
-            History.Add(this, {Type: historyitem_Presenattion_SlideSize, oldW:this.Width, oldH: this.Height, newW: width, newH: height});
-            var kw = width/this.Width;
-            var kh = height/this.Height;
-            this.Width = width;
-            this.Height = height;
-            var b_is_on = History.Is_On();
-            if(b_is_on)
-            {
-                History.TurnOff();
-            }
-
             for(var i = 0; i < this.slideMasters.length; ++i)
             {
                 this.slideMasters[i].changeSize(kw, kh);
@@ -6042,24 +3033,25 @@ CPresentation.prototype =
                     master.sldLayoutLst[j].changeSize(kw, kh);
                 }
             }
-
-           // for(var i = 0; i < this.slideLayouts.length; ++i)
-           // {
-           //     this.slideLayouts[i].changeSize(kw, kh);
-           // }
-
             for(var i = 0; i < this.Slides.length; ++i)
             {
                 this.Slides[i].changeSize(kw, kh);
             }
-            if(b_is_on)
-            {
-                History.TurnOn();
-            }
-            this.Recalculate();
-            editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+        }, this, []);
+    },
 
-            //editor.sync_DocSizeCallback(this.Width, this.Height);
+    changeSlideSize: function(width, height)
+    {
+        if(this.Document_Is_SelectionLocked(changestype_SlideSize) === false)
+        {
+            History.Create_NewPoint();
+            History.Add(this, {Type: historyitem_Presentation_SlideSize, oldW: this.Width, newW: width, oldH: this.Height, newH:  height});
+            var kw = width/this.Width;
+            var kh = height/this.Height;
+            this.Width = width;
+            this.Height = height;
+            this.changeSlideSizeFunction(kw, kh);
+            this.Recalculate();
         }
     },
 
@@ -6070,7 +3062,6 @@ CPresentation.prototype =
             return;
         }
 
-
         if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
             return;
 
@@ -6080,48 +3071,17 @@ CPresentation.prototype =
         }
         History.Create_NewPoint();
 
-
-
-        var _slides_array = [];
-        for(var _index = 0; _index < this.Slides.length; ++_index)
+        var arrInd = [];
+        for(var i = 0; i < this.Slides.length; ++i)
         {
-            _slides_array.push(this.Slides[_index]);
-        }
-        var _slides = this.Slides;
-        var _slide_index;
-        var _slide_count = _slides.length;
-        var _cur_slide;
-        var _cur_theme;
-        var _old_color_scheme;
-
-        var recalc_map = {};
-        for(_slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-        {
-            _cur_slide =_slides[_slide_index];
-            _cur_theme = _cur_slide.Layout.Master.Theme;
-            recalc_map[_cur_slide.Layout.Id] = _cur_slide.Layout;
-            recalc_map[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
-            if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
+            if(!this.Slides[i].Layout.Master.Theme.themeElements.clrScheme.isIdentical(colorScheme))
             {
-                _old_color_scheme = _cur_theme.themeElements.clrScheme;
-                _cur_theme.changeColorScheme(colorScheme.createDuplicate());
+                this.Slides[i].Layout.Master.Theme.changeColorScheme(colorScheme.createDuplicate());
             }
+            arrInd.push(i);
         }
-        for(var key in recalc_map)
-        {
-            if(recalc_map[key].recalcAll)
-            {
-                recalc_map[key].recalcAll();
-            }
-            if(recalc_map[key].recalculate)
-            {
-                recalc_map[key].recalculate();
-            }
-        }
-        var _start_slide = this.Slides[this.CurPage];
-        var _presentation = this;
-        setTimeout(function(){recalculateSlideAfterChangeThemeColors(_start_slide, _presentation, 0, _slides_array)},30);
-        this.Document_UpdateUndoRedoState();
+        History.Add(this, {Type: historyitem_Presentation_ChangeColorScheme, arrIndex: arrInd});
+        this.Recalculate();
     },
 
 
@@ -6129,7 +3089,7 @@ CPresentation.prototype =
     {
         if(isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
         {
-            History.Add(this, {Type: historyitem_Presenattion_RemoveSlide, Pos: pos, Id: this.Slides[pos].Get_Id()});
+            History.Add(this, {Type: historyitem_Presentation_RemoveSlide, Pos: pos, Id: this.Slides[pos].Get_Id()});
             return this.Slides.splice(pos, 1)[0];
         }
         return null;
@@ -6137,10 +3097,8 @@ CPresentation.prototype =
 
     insertSlide: function(pos, slide)
     {
-        History.Add(this, {Type: historyitem_Presenattion_AddSlide, Pos: pos, Id: slide.Get_Id()});
+        History.Add(this, {Type: historyitem_Presentation_AddSlide, Pos: pos, Id: slide.Get_Id()});
         this.Slides.splice(pos, 0, slide);
-        slide.setSlideSize(this.Width, this.Height);
-        editor.WordControl.m_oLogicDocument.recalcMap[slide.Id] = slide;
     },
 	
 	moveSlides: function(slidesIndexes, pos)
@@ -6161,97 +3119,6 @@ CPresentation.prototype =
 			this.insertSlide(insert_pos + i, removed_slides[i]);
 		}
 	},
-
-
-    changeTheme2 : function(themeInfo, arrInd)
-    {
-        if(this.viewMode === true)
-        {
-            return;
-        }
-        if(this.startChangeThemeTimeOutId != null)
-        {
-            clearTimeout(this.startChangeThemeTimeOutId);
-        }
-        if(this.backChangeThemeTimeOutId != null)
-        {
-            clearTimeout(this.backChangeThemeTimeOutId);
-        }
-        if(this.forwardChangeThemeTimeOutId != null)
-        {
-            clearTimeout(this.forwardChangeThemeTimeOutId);
-        }
-        this.themes.push(themeInfo.Theme);
-        this.slideMasters.push(themeInfo.Master);
-        this.slideLayouts = this.slideLayouts.concat(themeInfo.Layouts);
-
-
-        var _new_master = themeInfo.Master;
-        _new_master.presentation = this;
-
-
-
-        var _master_width = _new_master.Width;
-        var _master_height = _new_master.Height;
-        if(_master_height !== this.Height || _master_width !== this.Width)
-        {
-            var kw = this.Width/_master_width;
-            var kh = this.Height/_master_height;
-            themeInfo.Master.changeSize(kw, kh);
-            for(var i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
-            {
-                themeInfo.Master.sldLayoutLst[i].changeSize(kw, kh);
-            }
-        }
-        _new_master.recalculate();
-        var _arr_slides = this.Slides;
-        var _slides_array = [];
-        for(var _index = 0; _index < arrInd.length; ++_index)
-        {
-            _slides_array.push(this.Slides[arrInd[_index]]);
-        }
-        var _current_slide = this.Slides[this.CurPage];
-        var _presentation = this;
-
-        var _slide_index;
-
-        // History.Create_NewPoint();
-
-        var _arr_new_layouts = [];
-        var _new_layout;
-        for(_slide_index = 0; _slide_index < _slides_array.length; ++_slide_index)
-        {
-            if(_slides_array[_slide_index].Layout.calculatedType == null)
-            {
-                _slides_array[_slide_index].Layout.calculateType();
-            }
-            _new_layout = _new_master.getMatchingLayout(_slides_array[_slide_index].Layout.type, _slides_array[_slide_index].Layout.matchingName, _slides_array[_slide_index].Layout.cSld.name, true);//.type, _arr_slides[_slide_index].Layout.matchingName, _arr_slides[_slide_index].Layout.cSld.name);
-            if(_new_layout === null)
-            {
-                _new_layout = _new_master.sldLayoutLst[0];
-            }
-            _arr_new_layouts.push(_new_layout);
-
-            _slides_array[_slide_index].setLayout(_new_layout);
-            _slides_array[_slide_index].checkNoTransformPlaceholder();
-        }
-
-        this.resetStateCurSlide();
-
-        var start = this.CurPage;
-        for(var i = 0;  i< _slides_array.length; ++i)
-        {
-            if(_slides_array[i] == this.Slides[this.CurPage])
-            {
-                start = i;
-            }
-        }
-        var _this = this;
-        this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(_current_slide, _presentation, arrInd, start, _arr_new_layouts,0, _this.Slides)}, 30);
-
-
-        this.Document_UpdateUndoRedoState();
-    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
@@ -6316,8 +3183,6 @@ CPresentation.prototype =
                 AdditionalData[i].Lock.Check(check_obj);
             }
         }
-
-
 
         if(CheckType === changestype_MoveComment)
         {
@@ -6408,17 +3273,14 @@ CPresentation.prototype =
             var selected_objects = cur_slide.graphicObjects.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
             {
-                if(typeof selected_objects[i].applyAllTextProps === "function")
+                var check_obj =
                 {
-                    var check_obj =
-                    {
-                        "type": c_oAscLockTypeElemPresentation.Object,
-                        "slideId": slide_id,
-                        "objId": selected_objects[i].Get_Id(),
-                        "guid":selected_objects[i].Get_Id()
-                    };
-                    selected_objects[i].Lock.Check(check_obj);
-                }
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": slide_id,
+                    "objId": selected_objects[i].Get_Id(),
+                    "guid":selected_objects[i].Get_Id()
+                };
+                selected_objects[i].Lock.Check(check_obj);
             }
         }
 
@@ -6495,7 +3357,6 @@ CPresentation.prototype =
         {
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            //this.Document_UpdateRulersState();
         }
 
         return bResult;
@@ -6522,21 +3383,21 @@ CPresentation.prototype =
 
                 break;
             }
-            case historyitem_Presenattion_RemoveSlide:
-            case historyitem_Presenattion_AddSlide:
+            case historyitem_Presentation_RemoveSlide:
+            case historyitem_Presentation_AddSlide:
             {
                 var Pos = Data.UseArray ? Data.PosArray[0] : Data.Pos;
                 Writer.WriteLong(Pos);
                 Writer.WriteString2(Data.Id);
                 break;
             }
-            case historyitem_Presenattion_SlideSize:
+            case historyitem_Presentation_SlideSize:
             {
                 Writer.WriteDouble(Data.newW);
                 Writer.WriteDouble(Data.newH);
                 break;
             }
-            case historyitem_Presenattion_AddSlideMaster:
+            case historyitem_Presentation_AddSlideMaster:
             {
                 Writer.WriteLong(Data.pos);
                 Writer.WriteString2(Data.master.Get_Id());
@@ -6547,40 +3408,6 @@ CPresentation.prototype =
         return Writer;
     },
 
-    Save_Changes2 : function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-        switch ( Type )
-        {
-            case  historyitem_Document_AddItem:
-            {
-                break;
-            }
-
-            case historyitem_Document_RemoveItem:
-            {
-                break;
-            }
-
-            case historyitem_Document_Margin:
-            {
-                break;
-            }
-
-            case historyitem_Document_PageSize:
-            {
-                break;
-            }
-
-            case historyitem_Document_Orientation:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    },
 
     Load_Changes : function(Reader, Reader2)
     {
@@ -6597,16 +3424,15 @@ CPresentation.prototype =
 
         switch ( Type )
         {
-            case historyitem_Presenattion_AddSlide:
+            case historyitem_Presentation_AddSlide:
             {
                 var pos = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong());
                 var Id = Reader.GetString2();
                 this.Slides.splice(pos, 0, g_oTableId.Get_ById(Id));
-                this.recalcMap[this.Slides[pos].Get_Id()] = this.Slides[pos];
                 CollaborativeEditing.Add_ChangedClass(this);
                 break;
             }
-            case historyitem_Presenattion_RemoveSlide:
+            case historyitem_Presentation_RemoveSlide:
             {
                 var pos = Reader.GetLong();
                 Reader.GetString2();
@@ -6621,7 +3447,7 @@ CPresentation.prototype =
                 break;
             }
 
-            case historyitem_Presenattion_SlideSize:
+            case historyitem_Presentation_SlideSize:
             {
                 var w = Reader.GetDouble();
                 var h = Reader.GetDouble();
@@ -6629,41 +3455,12 @@ CPresentation.prototype =
                 var kh = h/this.Height;
                 this.Width = w;
                 this.Height = h;
-                var b_is_on = History.Is_On();
-                if(b_is_on)
-                {
-                    History.TurnOff();
-                }
-                CollaborativeEditing.ScaleX = kw;
-                CollaborativeEditing.ScaleY = kh;
-                for(var i = 0; i < this.slideMasters.length; ++i)
-                {
-                    this.slideMasters[i].changeSize(kw, kh);
-                    var master = this.slideMasters[i];
-                    for(var j = 0; j < master.sldLayoutLst.length; ++j)
-                    {
-                        master.sldLayoutLst[j].changeSize(kw, kh);
-                    }
-                }
-
-                //for(var i = 0; i < this.slideLayouts.length; ++i)
-                //{
-                //    this.slideLayouts[i].changeSize(kw, kh);
-                //}
-
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.Slides[i].changeSize(kw, kh);
-                }
-                //editor.sync_DocSizeCallback(this.Width, this.Height);
+                this.changeSlideSizeFunction(kw, kh);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
-                if(b_is_on)
-                {
-                    History.TurnOn();
-                }
+
                 break;
             }
-            case historyitem_Presenattion_AddSlideMaster:
+            case historyitem_Presentation_AddSlideMaster:
             {
                 var pos = Reader.GetLong();
                 var id = Reader.GetString2();
@@ -6671,134 +3468,12 @@ CPresentation.prototype =
                 this.bGoToPage = true;
                 break;
             }
-            case historyitem_Document_DefaultTab:
-            {
-                // Double : Default Tab
-
-                Default_Tab_Stop = Reader.GetDouble();
-
-                break;
-            }
         }
         return true;
     },
 
-    Get_SelectionState2 : function()
-    {
-        //this.Selection_Remove()
 
-        // Сохраняем Id ближайшего элемента в текущем классе
 
-        var State = {};
-        /*if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            State.Type = docpostype_HdrFtr;
-
-            if ( null != this.HdrFtr.CurHdrFtr )
-                State.Id = this.HdrFtr.CurHdrFtr.Get_Id();
-            else
-                State.Id = null;
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            // TODO: запрашиваем параграф текущего выделенного элемента
-            var X       = 0;
-            var Y       = 0;
-            var PageNum = this.CurPage;
-
-            var ContentPos = this.Internal_GetContentPosByXY(X, Y, PageNum);
-
-            State.Type = docpostype_Content;
-            State.Id   = this.Content[ContentPos].Get_Id();
-        }
-        else // if ( docpostype_Content === this.CurPos.Type )
-        {
-            State.Type = docpostype_Content;
-
-            if ( true === this.Selection.Use )
-            {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                {
-                    var FirstPara = this.Content[this.Selection.Data[0]];
-                    State.Id = FirstPara.Get_Id();
-                }
-                else // if ( selectionflag_Common === this.Selection.Flag )
-                {
-                    var LastPara = this.Content[this.Selection.EndPos];
-                    State.Id = LastPara.Get_Id();
-                }
-            }
-            else
-                State.Id = this.Content[this.CurPos.ContentPos].Get_Id();
-        }
-                   */
-        return State;
-    },
-
-    Set_SelectionState2 : function(State)
-    {
-        /*this.Selection_Remove();
-
-        var Id = State.Id;
-        if ( docpostype_HdrFtr === State.Type )
-        {
-            this.CurPos.Type = docpostype_HdrFtr;
-
-            if ( null === Id || true != this.HdrFtr.Set_CurHdrFtr_ById(Id) )
-            {
-                this.CurPos.Type       = docpostype_Content;
-                this.CurPos.ContentPos = 0;
-
-                this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-            }
-        }
-        else // if ( docpostype_Content === State.Type )
-        {
-            var CurId = Id;
-
-            var bFlag = false;
-
-            var Pos = 0;
-            while ( !bFlag )
-            {
-                // Найдем элемент с Id = CurId
-                var Count = this.Content.length;
-                Pos = 0;
-                for ( Pos = 0; Pos < Count; Pos++ )
-                {
-                    if ( this.Content[Pos].Get_Id() == CurId )
-                    {
-                        bFlag = true;
-                        break;
-                    }
-                }
-
-                if ( !bFlag )
-                {
-                    var TempElement = g_oTableId.Get_ById(CurId);
-
-                    if ( null === TempElement || null === TempElement.Prev || "undefined" === typeof(TempElement.Prev) )
-                    {
-                        Pos   = 0;
-                        bFlag = true;
-                        break;
-                    }
-                    else
-                        CurId = TempElement.Prev.Get_Id();
-                }
-            }
-
-            this.Selection.Start    = false;
-            this.Selection.Use      = false;
-            this.Selection.StartPos = Pos;
-            this.Selection.EndPos   = Pos;
-            this.Selection.Flag     = selectionflag_Common;
-
-            this.CurPos.Type       = docpostype_Content;
-            this.CurPos.ContentPos = Pos;
-            this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-        }     */
-    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
@@ -6809,18 +3484,8 @@ CPresentation.prototype =
             History.Create_NewPoint();
             var Comment = new CComment( this.Comments, CommentData );
             Comment.selected = true;
-
-            var positionX, positionY;
             var slide = this.Slides[this.CurPage];
-            var selected_objects;
-            if(slide.graphicObjects.State.group)
-            {
-                selected_objects = slide.graphicObjects.State.group.selectedObjects;
-            }
-            else
-            {
-                selected_objects = slide.graphicObjects.selectedObjects;
-            }
+            var selected_objects = slide.graphicObjects.selection.groupSelection ? slide.graphicObjects.selection.groupSelection.selectedObjects : slide.graphicObjects.selectedObjects;
             if(selected_objects.length  > 0)
             {
                 var last_object = selected_objects[selected_objects.length - 1];
@@ -6847,6 +3512,7 @@ CPresentation.prototype =
 
                 this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
                 this.DrawingDocument.OnEndRecalculate();
+                this.Document_UpdateInterfaceState();
                 return Comment;
             }
             else
@@ -6967,7 +3633,7 @@ CPresentation.prototype =
 
     Hide_Comments : function()
     {
-        this.Slides[this.CurPage].graphicObjects.hideComment();
+        //this.Slides[this.CurPage].graphicObjects.hideComment();
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
@@ -6993,61 +3659,24 @@ CPresentation.prototype =
             this.TurnOffRecalc = false;
         }
     },
-//-----------------------------------------------------------------------------------
-// события вьюера
-//-----------------------------------------------------------------------------------
-    Viewer_OnChangePosition : function()
-    {
-        var Comment = this.Comments.Get_Current();
-        if ( null != Comment )
-        {
-            var Comment_PageNum = Comment.m_oStartInfo.PageNum;
-            var Comment_Y       = Comment.m_oStartInfo.Y;
-            var Comment_X       = Page_Width;
-            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
-            editor.sync_UpdateCommentPosition( Comment.Get_Id(), Coords.X, Coords.Y );
-        }
-    },
 
     StartAddShape: function(preset, _is_apply)
     {
-        var elements =  this.Slides[this.CurPage].graphicObjects;
-        if(!(_is_apply === false))
+        if(this.Slides[this.CurPage])
         {
-            elements.CurPreset = preset;
-            switch (preset)
+            if(!(_is_apply === false))
             {
-                case "spline":
-                {
-                    elements.changeCurrentState(new SplineBezierState(elements, this.Slides[this.CurPage]));
-                    break;
-                }
-                case "polyline1":
-                {
-                    elements.changeCurrentState(new PolyLineAddState(elements, this.Slides[this.CurPage]));
-                    break;
-                }
-                case "polyline2":
-                {
-                    elements.changeCurrentState(new AddPolyLine2State(elements, this.Slides[this.CurPage]));
-                    break;
-                }
-
-                default :
-                {
-                    elements.changeCurrentState(new StartTrackNewShapeState(elements, this.Slides[this.CurPage], preset));
-                }
+                this.Slides[this.CurPage].graphicObjects.startTrackNewShape(preset);
+            }
+            else
+            {
+                //this.Slides[this.CurPage].graphicObjects.clearTrackObjects();
+                //this.Slides[this.CurPage].graphicObjects.clearPreTrackObjects();
+                //this.Slides[this.CurPage].graphicObjects.resetSelectionState();
+                //this.DrawingDocument.m_oWordControl.OnUpdateOverlay();
+                editor.sync_EndAddShape();
             }
         }
-        else
-        {
-            elements.resetSelectionState();
-            this.DrawingDocument.m_oWordControl.OnUpdateOverlay();
-            editor.sync_EndAddShape();
-        }
-
-
-        this.CurPos.Type = docpostype_Content;
     },
 
     CalculateComments : function()

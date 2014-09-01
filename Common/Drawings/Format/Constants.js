@@ -159,36 +159,6 @@ var historyitem_PlotArea_SetValAx = 2140;
 var historyitem_PlotArea_AddAxis = 2141;
 var historyitem_PlotArea_RemoveChart = 2142;
 var historyitem_PlotArea_RemoveAxis = 2143;
-var historyitem_Axis_SetType               = 2141;
-var historyitem_Axis_SetAuto               = 2142;
-var historyitem_Axis_SetAxId               = 2143;
-var historyitem_Axis_SetAxPos              = 2144;
-var historyitem_Axis_SetBaseTimeUnit       = 2145;
-var historyitem_Axis_SetCrossAx            = 2146;
-var historyitem_Axis_SetCrossBetween       = 2147;
-var historyitem_Axis_SetCrosses            = 2148;
-var historyitem_Axis_SetCrossesAt          = 2149;
-var historyitem_Axis_SetDelete             = 2150;
-var historyitem_Axis_SetDispUnits          = 2151;
-var historyitem_Axis_SetLblAlgn            = 2152;
-var historyitem_Axis_SetLblOffset          = 2153;
-var historyitem_Axis_SetMajorGridlines     = 2154;
-var historyitem_Axis_SetMajorTickMark      = 2155;
-var historyitem_Axis_SetMajorTimeUnit      = 2156;
-var historyitem_Axis_SetMajorUnit          = 2157;
-var historyitem_Axis_SetMinorGridlines      = 2158;
-var historyitem_Axis_SetMinorTickMark       = 2159;
-var historyitem_Axis_SetMinorTimeUnit      = 2160;
-var historyitem_Axis_SetMinorUnit          = 2161;
-var historyitem_Axis_SetNoMultiLvlLbl      = 2162;
-var historyitem_Axis_SetNumFmt             = 2163;
-var historyitem_Axis_SetScaling            = 2164;
-var historyitem_Axis_SetSpPr               = 2165;
-var historyitem_Axis_SetTickLblPos         = 2166;
-var historyitem_Axis_SetTickLblSkip        = 2167;
-var historyitem_Axis_SetTickMarkSkip       = 2168;
-var historyitem_Axis_SetTitle              = 2169;
-var historyitem_Axis_SetTxPr               = 2170;
 var historyitem_NumFmt_SetFormatCode = 2171;
 var historyitem_NumFmt_SetSourceLinked = 2172;
 var historyitem_Scaling_SetLogBase     = 2173;
@@ -675,7 +645,66 @@ var historyitem_DateAxTickLblPos      = 2629;
 var historyitem_DateAxTitle           = 2630;
 var historyitem_DateAxTxPr            = 2631;
 
+var historyitem_SlideSetComments       = 2632;
+var historyitem_SlideSetShow           = 2633;
+var historyitem_SlideSetShowPhAnim     = 2634;
+var historyitem_SlideSetShowMasterSp   = 2635;
+var historyitem_SlideSetLayout         = 2636;
+var historyitem_SlideSetNum            = 2637;
+var historyitem_SlideSetTiming         = 2638;
+var historyitem_SlideSetSize           = 2639;
+var historyitem_SlideSetBg             = 2640;
+var historyitem_SlideSetLocks          = 2641;
+var historyitem_SlideRemoveFromSpTree  = 2642;
+var historyitem_SlideAddToSpTree       = 2643;
+var historyitem_SlideSetCSldName       = 2644;
+var historyitem_SlideSetClrMapOverride = 2645;
 
+
+
+var historyitem_PropLockerSetId = 2646;
+
+
+
+var historyitem_SlideLayoutSetMaster        = 2646;
+var historyitem_SlideLayoutSetMatchingName    = 2647;
+var historyitem_SlideLayoutSetType            = 2648;
+var historyitem_SlideLayoutSetBg              = 2649;
+var historyitem_SlideLayoutSetCSldName        = 2650;
+var historyitem_SlideLayoutSetShow            = 2651;
+var historyitem_SlideLayoutSetShowPhAnim      = 2652;
+var historyitem_SlideLayoutSetShowMasterSp    = 2653;
+var historyitem_SlideLayoutSetClrMapOverride  = 2654;
+var historyitem_SlideLayoutAddToSpTree        = 2655;
+
+var historyitem_SlideMasterAddToSpTree       = 2656;
+var historyitem_SlideMasterSetTheme          = 2657;
+var historyitem_SlideMasterSetBg             = 2658;
+var historyitem_SlideMasterSetTxStyles       = 2659;
+var historyitem_SlideMasterSetCSldName       = 2660;
+var historyitem_SlideMasterSetClrMapOverride = 2661;
+var historyitem_SlideMasterAddLayout         = 2662;
+
+var historyitem_ThemeSetColorScheme           = 2663;
+var historyitem_ThemeSetFontScheme            = 2664;
+var historyitem_ThemeSetFmtScheme             = 2665;
+
+var historyitem_Presentation_AddSlide          = 2666;
+var historyitem_Presentation_RemoveSlide       = 2667;
+var historyitem_Presentation_SlideSize         = 2668;
+var historyitem_Presentation_AddSlideMaster    = 2669;
+var historyitem_Presentation_ChangeTheme       = 2670;
+var historyitem_Presentation_ChangeColorScheme = 2671;
+
+var historyitem_GraphicFrameSetSpPr          = 2672;
+var historyitem_GraphicFrameSetGraphicObject = 2673;
+var historyitem_GraphicFrameSetSetNvSpPr     = 2674;
+var historyitem_GraphicFrameSetSetParent     = 2675;
+var historyitem_GraphicFrameSetSetGroup      = 2676;
+
+
+var historyitem_SlideCommentsAddComment         = 2677;
+var historyitem_SlideCommentsRemoveComment      = 2678;
 
 var historyitem_SerAxSetAxId            = 2632;
 var historyitem_SerAxSetAxPos           = 2633;
@@ -815,6 +844,10 @@ var historyitem_type_Title = 1115;
 var historyitem_type_Slide = 1116;
 var historyitem_type_SlideLayout = 1117;
 var historyitem_type_SlideMaster = 1118;
+var historyitem_type_SlideComments = 1119;
+var historyitem_type_PropLocker = 1120;
+var historyitem_type_Theme = 1121;
+var historyitem_type_GraphicFrame = 1122;
 
 
 
@@ -1054,6 +1087,7 @@ var historyitem_Comments_Remove = 2; // Удалили комментарий
 // Типы изменений в классе СComment
 var historyitem_Comment_Change   = 3; // Изменили комментарий
 var historyitem_Comment_TypeInfo = 4; // Изменили информацию о типе комментария
+var historyitem_Comment_Position = 5; // Изменили информацию о типе комментария
 
 // Типы изменений в классе ParaComment
 var historyitem_ParaComment_CommentId = 1; // Изменяем Id комментария, к которому привязана метка
@@ -1154,10 +1188,10 @@ var historyitem_State_Paragraph       = 3;
 var historyitem_State_Table           = 4;
 
 // Типы произошедших изменений
-var historyrecalctype_Inline  = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
-var historyrecalctype_Flow    = 1; // Изменения произошли в "плавающем" объекте
-var historyrecalctype_HdrFtr  = 2; // Изменения произошли в колонтитуле
-var historyrecalctype_Drawing = 3; // Изменения произошли в drawing'е
+var historyrecalctype_Inline       = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
+var historyrecalctype_Flow         = 1; // Изменения произошли в "плавающем" объекте
+var historyrecalctype_HdrFtr       = 2; // Изменения произошли в колонтитуле
+var historyrecalctype_Drawing      = 3; // Изменения произошли в drawing'е
 
 // Типы классов, в которых происходили изменения (типы нужны для совместного редактирования)
 var historyitem_type_Unknown          =  0;
@@ -1182,7 +1216,6 @@ var historyitem_type_Comments         = 18;
 var historyitem_type_Image            = 19;
 var historyitem_type_GrObjects        = 20;
 var historyitem_type_Hyperlink        = 21;
-var historyitem_type_ChartGroup       = 22;
 var historyitem_type_Style            = 23;
 var historyitem_type_Styles           = 24;
 var historyitem_type_ChartTitle       = 25;

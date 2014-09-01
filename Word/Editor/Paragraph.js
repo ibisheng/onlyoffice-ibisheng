@@ -68,7 +68,14 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.Pages = []; // Массив страниц (CParaPage)
     this.Lines = []; // Массив строк (CParaLine)
 
-    this.Numbering = new ParaNumbering();
+    if(!(bFromPresentation === true))
+    {
+        this.Numbering = new ParaNumbering();
+    }
+    else
+    {
+        this.Numbering = new ParaPresentationNumbering();
+    }
     this.ParaEnd   =
     {
         Line  : 0,
@@ -296,6 +303,14 @@ Paragraph.prototype =
         return this.Content[0].Pr.Copy();
     },
 
+    Get_FirstTextPr : function()
+    {
+        if ( this.Content.length <= 0 || para_Run !== this.Content[0].Type )
+            return this.Get_CompiledPr2(false).TextPr;
+
+        return this.Content[0].Get_CompiledPr();
+    },
+
     Get_AllDrawingObjects : function(DrawingObjs)
     {
         if ( undefined === DrawingObjs )
@@ -425,13 +440,6 @@ Paragraph.prototype =
         {
             OtherParagraph.Numbering_Set( NumPr.NumId, NumPr.Lvl );
         }
-
-        var Bullet = this.Get_PresentationNumbering();
-        if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
-            OtherParagraph.Add_PresentationNumbering( Bullet.Copy() );
-
-        OtherParagraph.Set_PresentationLevel( this.PresentationPr.Level );
-
         // Копируем прямые настройки параграфа в конце, потому что, например, нумерация может
         // их изменить.
         var oOldPr = OtherParagraph.Pr;
@@ -3315,9 +3323,9 @@ Paragraph.prototype =
                         if ( true != this.IsEmpty() )
                         {
                             if ( Pr.ParaPr.Ind.FirstLine < 0 )
-                                NumberingItem.Draw( X, Y, pGraphics, CurTextPr, Theme );
+                                NumberingItem.Draw( X, Y, pGraphics, this.Get_FirstTextPr(), PDSE );
                             else
-                                NumberingItem.Draw( this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, CurTextPr, Theme );
+                                NumberingItem.Draw( this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE );
                         }
                     }
 
@@ -4491,6 +4499,122 @@ Paragraph.prototype =
         }
         else
             this.Numbering_IndDec_Level( !bShift );
+    },
+
+    Can_IncreaseLevel : function(bIncrease)
+    {
+        var CurLevel = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
+        if(bIncrease)
+        {
+            if(CurLevel >= 8)
+            {
+                return false;
+            }
+            NewPr = this.Internal_CompiledParaPrPresentation(CurLevel + 1).TextPr;
+        }
+        else
+        {
+            if(CurLevel <= 0)
+            {
+                return false;
+            }
+            NewPr = this.Internal_CompiledParaPrPresentation(CurLevel - 1).TextPr;
+        }
+        DeltaFontSize = NewPr.FontSize - OldPr.FontSize;
+        if(this.Pr.DefaultRunPr && isRealNumber(this.Pr.DefaultRunPr.FontSize))
+        {
+            if(this.Pr.DefaultRunPr.FontSize + DeltaFontSize < 1)
+            {
+                return false;
+            }
+        }
+        if(isRealNumber(this.TextPr.FontSize))
+        {
+            if(this.TextPr.FontSize + DeltaFontSize < 1)
+            {
+                return false;
+            }
+        }
+        for(i = 0; i < this.Content.length; ++i)
+        {
+            if(this.Content[i].Type === para_Run)
+            {
+                RunPr = this.Content[i].Get_CompiledPr();
+                if(RunPr.FontSize + DeltaFontSize < 1)
+                {
+                    return false;
+                }
+            }
+            else if(this.Content[i].Type === para_Hyperlink)
+            {
+                for(j = 0; j < this.Content[i].Content.length; ++j)
+                {
+                    RunPr = this.Content[i].Content[j].Get_CompiledPr();
+                    if(RunPr.FontSize + DeltaFontSize < 1)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    },
+
+    Increase_Level : function(bIncrease)
+    {
+        var CurLevel = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
+        if(bIncrease)
+        {
+            NewPr = this.Internal_CompiledParaPrPresentation(CurLevel + 1).TextPr;
+            if (this.Pr.Ind && this.Pr.Ind.Left != undefined)
+            {
+                this.Set_Ind({ FirstLine: this.Pr.Ind.FirstLine, Left: this.Pr.Ind.Left + 11.1125 }, false);
+            }
+            this.Set_PresentationLevel(CurLevel + 1);
+        }
+        else
+        {
+            NewPr = this.Internal_CompiledParaPrPresentation(CurLevel - 1).TextPr;
+            if (this.Pr.Ind && this.Pr.Ind.Left != undefined)
+            {
+                this.Set_Ind({ FirstLine: this.Pr.Ind.FirstLine, Left: this.Pr.Ind.Left - 11.1125 }, false);
+            }
+            this.Set_PresentationLevel(CurLevel - 1);
+        }
+        DeltaFontSize = NewPr.FontSize - OldPr.FontSize;
+        if(DeltaFontSize !== 0)
+        {
+            if(this.Pr.DefaultRunPr && isRealNumber(this.Pr.DefaultRunPr.FontSize))
+            {
+                var NewParaPr = this.Pr.Copy();
+                NewParaPr.DefaultRunPr.FontSize += DeltaFontSize;
+                this.Set_Pr(NewParaPr);//Todo: сделать отдельный метод для выставления DefaultRunPr
+            }
+            if(isRealNumber(this.TextPr.FontSize))
+            {
+                this.TextPr.Set_FontSize(this.TextPr.FontSize + DeltaFontSize);
+            }
+            for(i = 0; i < this.Content.length; ++i)
+            {
+                if(this.Content[i].Type === para_Run)
+                {
+                    if(isRealNumber(this.Content[i].Pr.FontSize))
+                    {
+                        this.Content[i].Set_FontSize(this.Content[i].Pr.FontSize + DeltaFontSize);
+                    }
+                }
+                else if(this.Content[i].Type === para_Hyperlink)
+                {
+                    for(j = 0; j < this.Content[i].Content.length; ++j)
+                    {
+                        if(isRealNumber(this.Content[i].Content[j].Pr.FontSize))
+                        {
+                            this.Content[i].Content[j].Set_FontSize(this.Content[i].Content[j].Pr.FontSize + DeltaFontSize);
+                        }
+                    }
+                }
+            }
+        }
     },
 
     IncDec_Indent : function(bIncrease)
@@ -6403,7 +6527,7 @@ Paragraph.prototype =
             var TextPr = new CTextPr();
             TextPr.Color     = null;
             TextPr.Underline = null;
-            TextPr.RStyle    = editor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
+            TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
             if(!this.bFromDocument)
             {
                 TextPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
@@ -7971,14 +8095,15 @@ Paragraph.prototype =
     // Добавляем нумерацию к данному параграфу
     Add_PresentationNumbering : function(_Bullet)
     {
-        var Bullet = _Bullet.Copy();
 
-        History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.PresentationPr.Bullet } );
+        var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+        var OldType = ParaPr.Bullet ? ParaPr.Bullet.getBulletType() : numbering_presentationnumfrmt_None;
+        var NewType = _Bullet ? _Bullet.getBulletType() : numbering_presentationnumfrmt_None;
 
-        var OldType = this.PresentationPr.Bullet.Get_Type();
-        var NewType = Bullet.Get_Type();
-        this.PresentationPr.Bullet = Bullet;
-
+        var Bullet = _Bullet ? _Bullet.createDuplicate() : undefined;
+        History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.Pr.Bullet } );
+        this.Pr.Bullet = Bullet;
+        this.CompiledPr.NeedRecalc = true;
         if ( OldType != NewType )
         {
             var ParaPr = this.Get_CompiledPr2(false).ParaPr;
@@ -8001,21 +8126,24 @@ Paragraph.prototype =
 
     Get_PresentationNumbering : function()
     {
+        this.Get_CompiledPr2(false);
         return this.PresentationPr.Bullet;
     },
 
     // Удаляем нумерацию
     Remove_PresentationNumbering : function()
     {
-        this.Add_PresentationNumbering( new CPresentationBullet() );
+        this.Add_PresentationNumbering(undefined);
     },
 
     Set_PresentationLevel : function(Level)
     {
-        if ( this.PresentationPr.Level != Level )
+        if ( this.Pr.Lvl != Level )
         {
-            History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Level, Old : this.PresentationPr.Level, New : Level } );
-            this.PresentationPr.Level = Level;
+            History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Level, Old : this.Pr.Lvl, New : Level } );
+            this.Pr.Lvl = Level;
+            this.CompiledPr.NeedRecalc = true;
+            this.Recalc_RunsCompiledPr();
         }
     },
 //-----------------------------------------------------------------------------------
@@ -8246,6 +8374,12 @@ Paragraph.prototype =
             if ( undefined !== this.Parent && null !== this.Parent )
             {
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
+                if(!this.bFromDocument)
+                {
+                    this.PresentationPr.Level = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0;
+                    this.PresentationPr.Bullet =  this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
+                    this.Numbering.Bullet = this.PresentationPr.Bullet;
+                }
                 this.CompiledPr.NeedRecalc = false;
             }
             else
@@ -8335,9 +8469,10 @@ Paragraph.prototype =
         }
     },
 
-    Internal_CompiledParaPrPresentation: function()
+    Internal_CompiledParaPrPresentation: function(Lvl)
     {
-        var styleObject = this.Parent.Get_Styles(this.Pr.Lvl);
+        var _Lvl = isRealNumber(Lvl) ? Lvl : this.Pr.Lvl;
+        var styleObject = this.Parent.Get_Styles(_Lvl);
         var Styles     = styleObject.styles;
         var TableStyle = this.Parent.Get_TableStyleForPara();
 
@@ -8351,6 +8486,7 @@ Paragraph.prototype =
         if(this.Pr.DefaultRunPr)
             Pr.TextPr.Merge( this.Pr.DefaultRunPr );
         Pr.TextPr.Color.Auto = false;
+
         return Pr;
     },
     // Сообщаем параграфу, что ему надо будет пересчитать скомпилированный стиль
@@ -8657,8 +8793,11 @@ Paragraph.prototype =
     // Очищение форматирования параграфа
     Clear_Formatting : function()
     {
-        this.Style_Remove();
-        this.Numbering_Remove();
+        if(this.bFromDocument)
+        {
+            this.Style_Remove();
+            this.Numbering_Remove();
+        }
 
         this.Set_ContextualSpacing(undefined);
         this.Set_Ind( new CParaInd(), true );
@@ -8682,8 +8821,12 @@ Paragraph.prototype =
 
     Clear_TextFormatting : function()
     {
-        var Styles = this.Parent.Get_Styles();
-        var DefHyper = Styles.Get_Default_Hyperlink();                
+        var Styles, DefHyper;
+        if(this.bFromDocument)
+        {
+            Styles = this.Parent.Get_Styles();
+            DefHyper = Styles.Get_Default_Hyperlink();
+        }
         
         // TODO: Сделать, чтобы данная функция работала по выделению
         
@@ -9023,6 +9166,14 @@ Paragraph.prototype =
         History.Add( this, { Type : HistoryType, New : Border, Old : OldValue } );
 
         // Надо пересчитать конечный стиль
+        this.CompiledPr.NeedRecalc = true;
+    },
+
+    Set_Bullet : function(Bullet)
+    {
+        var NewBullet = Bullet ? Bullet.createDuplicate() : null;
+        History.Add(this, {Type: historyitem_Paragraph_Bullet, Old: this.Pr.Bullet, New: NewBullet});
+        this.Pr.Bullet = NewBullet;
         this.CompiledPr.NeedRecalc = true;
     },
 
@@ -10814,13 +10965,16 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PresentationPr_Bullet:
             {
-                this.PresentationPr.Bullet = Data.Old;
+                this.Pr.Bullet = Data.Old;
+                this.CompiledPr.NeedRecalc = true;
                 break;
             }
 
             case historyitem_Paragraph_PresentationPr_Level:
             {
-                this.PresentationPr.Level = Data.Old;
+                this.Pr.Lvl = Data.Old;
+                this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
                 break;
             }
 
@@ -10835,6 +10989,13 @@ Paragraph.prototype =
             {
                 this.SectPr = Data.Old;
                 this.LogicDocument.Update_SectionsInfo();
+                break;
+            }
+
+            case historyitem_Paragraph_Bullet:
+            {
+                this.Pr.Bullet = Data.Old;
+                this.CompiledPr.NeedRecalc = true;
                 break;
             }
         }
@@ -11196,13 +11357,16 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PresentationPr_Bullet:
             {
-                this.PresentationPr.Bullet = Data.New;
+                this.Pr.Bullet = Data.New;
+                this.CompiledPr.NeedRecalc = true;
                 break;
             }
 
             case historyitem_Paragraph_PresentationPr_Level:
             {
-                this.PresentationPr.Level = Data.New;
+                this.Pr.Lvl = Data.New;
+                this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
                 break;
             }
 
@@ -11217,6 +11381,13 @@ Paragraph.prototype =
             {
                 this.SectPr = Data.New;
                 this.LogicDocument.Update_SectionsInfo();
+                break;
+            }
+
+            case historyitem_Paragraph_Bullet:
+            {
+                this.Pr.Bullet = Data.New;
+                this.CompiledPr.NeedRecalc = true;
                 break;
             }
         }
@@ -12480,17 +12651,19 @@ Paragraph.prototype =
             {
                 // Variable : Bullet
 
-                var Bullet = new CPresentationBullet();
+                var Bullet = new CBullet();
                 Bullet.Read_FromBinary( Reader );
                 this.PresentationPr.Bullet = Bullet;
-
+                this.CompiledPr.NeedRecalc = true;
                 break;
             }
 
             case historyitem_Paragraph_PresentationPr_Level:
             {
                 // Long : Level
-                this.PresentationPr.Level = Reader.GetLong();
+                this.Pr.Lvl = Reader.GetLong();
+                this.CompiledPr.NeedRecalc = true;
+                this.Recalc_RunsCompiledPr();
                 break;
             }
 

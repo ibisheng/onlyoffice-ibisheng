@@ -5,6 +5,7 @@ function CheckObjectLine(obj)
 {
     return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
 }
+
 function hitToHandles(x, y, object)
 {
     var invert_transform = object.getInvertTransform();
@@ -113,16 +114,6 @@ function getBoundsInGroup(shape)
         return { minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc };
     }
 }
-
-
-var SHAPE_TYPE_RECALC_POSITION = 0;
-var SHAPE_TYPE_RECALC_EXTENTS = 1;
-var SHAPE_TYPE_RECALC_ROT = 2;
-var SHAPE_TYPE_RECALC_FLIP = 3;
-var SHAPE_TYPE_RECALC_FILL = 4;
-var SHAPE_TYPE_RECALC_LINE = 5;
-var SHAPE_TYPE_RECALC_GEOMETRY = 6;
-
 
 function CreateUniFillByUniColorCopy(uniColor)
 {
@@ -435,6 +426,17 @@ CShape.prototype =
         }
     },
 
+    clearContent: function()
+    {
+        var content = this.getDocContent();
+        if(content)
+        {
+            content.Set_ApplyToAll(true);
+            content.Remove(-1);
+            content.Set_ApplyToAll(false);
+        }
+    },
+
     getDocContent: function()
     {
         if(this.txBody)
@@ -634,158 +636,6 @@ CShape.prototype =
         return false;
     },
 
-    initDefault: function (x, y, extX, extY, flipH, flipV, presetGeom, arrowsCount) {
-        this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
-        this.setPresetGeometry(presetGeom);
-        this.setDefaultStyle();
-        if (arrowsCount === 1 || arrowsCount === 2) {
-            switch (arrowsCount) {
-                case 1:
-                {
-                    var ln = new CLn();
-                    ln.tailEnd = new EndArrow();
-                    ln.tailEnd.type = LineEndType.Arrow;
-                    ln.tailEnd.len = LineEndSize.Mid;
-                    break;
-                }
-                case 2:
-                {
-                    var ln = new CLn();
-                    ln.tailEnd = new EndArrow();
-                    ln.tailEnd.type = LineEndType.Arrow;
-                    ln.tailEnd.len = LineEndSize.Mid;
-                    ln.headEnd = new EndArrow();
-                    ln.headEnd.type = LineEndType.Arrow;
-                    ln.headEnd.len = LineEndSize.Mid;
-                    break;
-                }
-            }
-            this.spPr.setLn(ln);
-        }
-    },
-
-    Hyperlink_CanAdd: function (bCheck) {
-        if (this.txBody)
-            return this.txBody.content.Hyperlink_CanAdd(bCheck);
-        return false;
-    },
-
-    Hyperlink_Check: function (bCheck) {
-        if (this.txBody)
-            return this.txBody.content.Hyperlink_Check(bCheck);
-        return false;
-    },
-
-
-    Hyperlink_Add: function (HyperProps) {
-        if (this.txBody) {
-            this.txBody.content.Hyperlink_Add(HyperProps);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    Hyperlink_Modify: function (HyperProps) {
-        if (this.txBody) {
-            this.txBody.content.Hyperlink_Modify(HyperProps);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    Hyperlink_Remove: function () {
-        if (this.txBody) {
-            this.txBody.content.Hyperlink_Remove();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    Get_SelectedText: function (bClearText) {
-        if (this.txBody) {
-            return this.txBody.content.Get_SelectedText(bClearText);
-        }
-        return null;
-    },
-
-    pointInSelectedText: function (x, y) {
-        if (this.txBody && this.invertTransformText)
-        {
-            var tx = this.invertTransformText.TransformPointX(x, y);
-            var ty = this.invertTransformText.TransformPointY(x, y);
-            return this.txBody.content.Selection_Check(tx, ty, this.parent.num);
-        }
-        return false;
-    },
-
-    getTextPr: function () {
-        if (this.txBody) {
-            return this.txBody.content.Get_Paragraph_TextPr();
-        }
-        return new CTextPr();
-    },
-
-    getParaPr: function () {
-        if (this.txBody) {
-            return this.txBody.content.Get_Paragraph_ParaPr();
-        }
-        return new CParaPr();
-    },
-
-    Paragraph_ClearFormatting: function () {
-        if (this.txBody) {
-            return this.txBody.content.Paragraph_ClearFormatting();
-        }
-    },
-
-    initDefaultTextRect: function (x, y, extX, extY, flipH, flipV) {
-        this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
-        this.setPresetGeometry("rect");
-        this.setDefaultTextRectStyle();
-        var uni_fill = new CUniFill();
-        uni_fill.fill = (new CSolidFill());
-        uni_fill.fill.color = (new CUniColor());
-        uni_fill.fill.color.color = (new CSchemeColor());
-        uni_fill.fill.color.color.id = (12);
-        this.setFill(uni_fill);
-
-        var ln = new CLn();
-        ln.w = (6350);
-        ln.Fill = new CUniFill();
-        ln.Fill.fill = (new CSolidFill());
-        ln.Fill.fill.color = (new CUniColor());
-        ln.Fill.fill.color.color = (new CPrstColor());
-        ln.Fill.fill.color.color.id = ("black");
-        this.spPr.setLn(ln);
-        this.setTextBody(new CTextBody(this));
-    },
-
-
-
-    setUniFill: function (fill) {
-        this.spPr.Fill = fill;
-    },
-
-    setUniLine: function (ln) {
-        this.spPr.ln = ln;
-    },
-
-    setPresetGeometry: function (preset) {
-        var old_geometry = this.spPr.geometry;
-        this.spPr.geometry = CreateGeometry(preset);
-        this.spPr.geometry.Init(5, 5);
-        History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: this.spPr.geometry });
-
-    },
-
-    setDefaultStyle: function () {
-
-        this.setStyle(CreateDefaultShapeStyle(this.spPr && this.spPr.geometry ? this.spPr.geometry.preset : null));
-    },
-
-    setDefaultTextRectStyle: function () {
-        this.setStyle(CreateDefaultTextRectStyle());
-    },
 
     isShape: function () {
         return true;
@@ -830,8 +680,9 @@ CShape.prototype =
     },
 
     getHierarchy: function () {
-        if (this.recalcInfo.recalculateShapeHierarchy) {
-            this.compiledHierarchy.length = 0;
+        //if (this.recalcInfo.recalculateShapeHierarchy)
+        {
+            this.compiledHierarchy = [];
             var hierarchy = this.compiledHierarchy;
             if (this.isPlaceholder()) {
                 var ph_type = this.getPlaceholderType();
@@ -1548,7 +1399,7 @@ CShape.prototype =
             return;
         if (!this.txBody.content2)
             return;
-        this.transformText2.Reset();
+        this.transformText2 = new CMatrix();
         var _text_transform = this.transformText2;
         var _shape_transform = this.transform;
         var _body_pr = this.txBody.getBodyPr();
@@ -2013,10 +1864,10 @@ CShape.prototype =
             }
 
             var ownStyle;
-            if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle[level]))
+            if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle.levels[level]))
             {
                 ownStyle = new CStyle("ownStyle", null, null, null);
-                var own_ppt_style = this.txBody.lstStyle[level];
+                var own_ppt_style = this.txBody.lstStyle.levels[level];
                 ownStyle.ParaPr = own_ppt_style.Copy();
                 ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
             }
@@ -2033,6 +1884,7 @@ CShape.prototype =
                 shape_text_style.TextPr.RFonts.Ascii =  { Name: first_name + "lt", Index: -1 };
                 shape_text_style.TextPr.RFonts.EastAsia =  { Name: first_name +"ea", Index: -1 };
                 shape_text_style.TextPr.RFonts.CS =  { Name: first_name +"cs", Index: -1 };
+                shape_text_style.TextPr.RFonts.HAnsi =  { Name: first_name +"lt", Index: -1 };
 
                 if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null)
                 {
@@ -2044,16 +1896,21 @@ CShape.prototype =
             }
             var Styles = new CStyles();
 
+
             var last_style_id;
+            var b_checked = false;
             var isPlaceholder = this.isPlaceholder();
             if (isPlaceholder) {
                 if (default_style) {
+                    //checkTextPr(default_style.TextPr);
+                    b_checked = true;
                     Styles.Add(default_style);
                     default_style.BasedOn = null;
                     last_style_id = default_style.Id;
                 }
 
                 if (master_style) {
+                    //checkTextPr(master_style.TextPr);
                     Styles.Add(master_style);
                     master_style.BasedOn = last_style_id;
                     last_style_id = master_style.Id;
@@ -2061,12 +1918,15 @@ CShape.prototype =
             }
             else {
                 if (master_style) {
+                   // checkTextPr(master_style.TextPr);
+                    b_checked = true;
                     Styles.Add(master_style);
                     master_style.BasedOn = null;
                     last_style_id = master_style.Id;
                 }
 
                 if (default_style) {
+                    //checkTextPr(default_style.TextPr);
                     Styles.Add(default_style);
                     default_style.BasedOn = last_style_id;
                     last_style_id = default_style.Id;
@@ -2076,6 +1936,7 @@ CShape.prototype =
             for (var i = hierarchy_styles.length - 1; i > -1; --i) {
 
                 if (hierarchy_styles[i]) {
+                    //checkTextPr(hierarchy_styles[i].TextPr);
                     Styles.Add(hierarchy_styles[i]);
                     hierarchy_styles[i].BasedOn = last_style_id;
                     last_style_id = hierarchy_styles[i].Id;
@@ -2083,6 +1944,7 @@ CShape.prototype =
             }
 
             if (shape_text_style) {
+                //checkTextPr(shape_text_style.TextPr);
                 Styles.Add(shape_text_style);
                 shape_text_style.BasedOn = last_style_id;
                 last_style_id = shape_text_style.Id;
@@ -2197,10 +2059,12 @@ CShape.prototype =
 
 
     changeSize: function (kw, kh) {
-        if (this.spPr && this.spPr.xfrm.isNotNull()) {
+        if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
             var xfrm = this.spPr.xfrm;
-            this.setOffset(xfrm.offX * kw, xfrm.offY * kh);
-            this.setExtents(xfrm.extX * kw, xfrm.extY * kh);
+            xfrm.setOffX(xfrm.offX * kw);
+            xfrm.setOffY(xfrm.offY * kh);
+            xfrm.setExtX(xfrm.extX * kw);
+            xfrm.setExtY(xfrm.extY * kh);
         }
     },
 
@@ -2239,7 +2103,7 @@ CShape.prototype =
                     for (var i = 0; i < hierarchy.length; ++i)
                     {
                         var hierarchy_sp = hierarchy[i];
-                        if (isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
+                        if (isRealObject(hierarchy_sp)  && hierarchy_sp.spPr.xfrm && hierarchy_sp.spPr.xfrm.isNotNull())
                         {
                             var xfrm = hierarchy_sp.spPr.xfrm;
                             this.x = xfrm.offX;
@@ -2358,33 +2222,6 @@ CShape.prototype =
         this.transform = transform;
     },
 
-    updateInterfaceTextState: function () {
-        var _b_no_change_indent;
-        if (this.isPlaceholder()) {
-            var _ph_type = this.getPhType();
-            _b_no_change_indent = _ph_type === phType_title || _ph_type === phType_ctrTitle || _ph_type === phType_chart
-                || _ph_type === phType_pic || _ph_type === phType_clipArt || _ph_type === phType_dgm
-                || _ph_type === phType_dgm;
-        }
-        else {
-            _b_no_change_indent = false;
-        }
-        if (this.txBody !== null && typeof this.txBody === "object") {
-            if (this.txBody.content !== null && typeof this.txBody.content === "object") {
-                var _content = this.txBody.content;
-                if (typeof _content.Document_UpdateInterfaceState === "function") {
-                    _content.Document_UpdateInterfaceState();
-                }
-                if (typeof _content.canIncreaseIndent === "function" && _b_no_change_indent === false) {
-                    editor.asc_fireCallback("asc_canIncreaseIndent", _content.canIncreaseIndent(true));
-                    editor.asc_fireCallback("asc_canDecreaseIndent", _content.canIncreaseIndent(false));
-                    return;
-                }
-            }
-        }
-        editor.asc_fireCallback("asc_canIncreaseIndent", false);
-        editor.asc_fireCallback("asc_canDecreaseIndent", false);
-    },
 
     getTransformMatrix: function ()
     {
@@ -2615,7 +2452,7 @@ CShape.prototype =
 
     checkHitToBounds: function(x, y)
     {
-        if(this.getObjectType() === historyitem_type_ImageShape && this.parent && this.parent.isShapeChild())
+        if(this.getObjectType() === historyitem_type_ImageShape && this.parent && this.parent.isShapeChild && this.parent.isShapeChild())
         {
             return true;
         }
@@ -2646,39 +2483,6 @@ CShape.prototype =
     },
 
 
-
-    hitToPath: function (x, y) {
-
-        if (this.spPr &&  isRealObject(this.spPr.geometry) && this.checkHitToBounds(x, y)) {
-            var px = this.invertTransform.TransformPointX(x, y);
-            var py = this.invertTransform.TransformPointY(x, y);
-            return this.spPr.geometry.hitInPath(this.getDrawingDocument().CanvasHitContext, px, py);
-        }
-        return false;
-    },
-
-    hitToInnerArea: function (x, y) {
-        if (this.spPr &&  isRealObject(this.spPr.geometry) && this.checkHitToBounds(x, y)) {
-            var px = this.invertTransform.TransformPointX(x, y);
-            var py = this.invertTransform.TransformPointY(x, y);
-            return this.spPr.geometry.hitInInnerArea(this.getDrawingDocument().CanvasHitContext, px, py);
-        }
-        return false;
-    },
-
-    hitToTextRect: function (x, y) {
-        if (isRealObject(this.txBody) && this.invertTransformText) {
-            var px = this.invertTransformText.TransformPointX(x, y);
-            var py = this.invertTransformText.TransformPointY(x, y);
-            return this.txBody.hitToRect(px, py);
-        }
-        return false;
-    },
-
-    hitToBoundsRect: function (x, y) {
-        return false;
-    },
-
     hitInTextRect: function (x, y) {
         var tx_body = this.bWordShape ? this : this.txBody;
         var content = this.getDocContent && this.getDocContent();
@@ -2692,16 +2496,6 @@ CShape.prototype =
         return false;
     },
 
-    setAdjustmentValue: function (ref1, value1, ref2, value2) {
-        if (this.spPr && isRealObject(this.spPr.geometry)) {
-            var old_geometry = this.spPr.geometry.createDuplicate();
-            this.spPr.geometry.setGuideValue(ref1, value1);
-            this.spPr.geometry.setGuideValue(ref2, value2);
-            var new_geometry = this.spPr.geometry.createDuplicate();
-            History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
-            this.recalcInfo.recalculateGeometry = true;
-        }
-    },
 
     updateCursorType: function (x, y, e) {
         if(this.invertTransformText)
@@ -2836,42 +2630,6 @@ CShape.prototype =
     },
 
 
-    setXfrm: function (offX, offY, extX, extY, rot, flipH, flipV) {
-        if (this.spPr.xfrm.isNotNull()) {
-            if (isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-
-            if (isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-
-            if (isRealNumber(rot))
-                this.setRotate(rot);
-
-            if (isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-        }
-        else {
-            var transform = this.getTransform();
-            if (isRealNumber(offX) && isRealNumber(offY))
-                this.setOffset(offX, offY);
-            else
-                this.setOffset(transform.x, transform.y);
-
-            if (isRealNumber(extX) && isRealNumber(extY))
-                this.setExtents(extX, extY);
-            else
-                this.setExtents(transform.extX, transform.extY);
-
-            if (isRealNumber(rot))
-                this.setRotate(rot);
-            else
-                this.setRotate(transform.rot);
-            if (isRealBool(flipH) && isRealBool(flipV))
-                this.setFlips(flipH, flipV);
-            else
-                this.setFlips(transform.flipH, transform.flipV);
-        }
-    },
 
     normalize: function () {
         var new_off_x, new_off_y, new_ext_x, new_ext_y;
@@ -2917,218 +2675,6 @@ CShape.prototype =
     },
 
 
-
-    addNewParagraph: function () {
-        if (!isRealObject(this.txBody)) {
-            this.addTextBody(new CTextBody(this));
-            this.recalculateContent();
-        }
-        else {
-            this.txBody.content.Add_NewParagraph(false);
-            //this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-            this.txBody.bRecalculateNumbering = true;
-        }
-    },
-
-    paragraphFormatPaste: function (CopyTextPr, CopyParaPr, Bool) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
-
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-
-    },
-
-    setParagraphAlign: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ParagraphAlign(val);
-            //this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    applyAllAlign: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ApplyToAll(true);
-            this.txBody.content.Set_ParagraphAlign(val);
-            this.txBody.content.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    setParagraphSpacing: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ParagraphSpacing(val);
-            this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    setParagraphTabs: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ParagraphTabs(val);
-            this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    applyAllSpacing: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ApplyToAll(true);
-            this.txBody.content.Set_ParagraphSpacing(val);
-            this.txBody.content.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    setParagraphNumbering: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ParagraphNumbering(val);
-            this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    applyAllNumbering: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ApplyToAll(true);
-            this.txBody.content.Set_ParagraphNumbering(val);
-            this.txBody.content.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    setParagraphIndent: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ParagraphIndent(val);
-            this.txBody.bRecalculateNumbering = true;
-            this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    applyAllIndent: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ApplyToAll(true);
-            this.txBody.content.Set_ParagraphIndent(val);
-            this.txBody.content.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    Paragraph_IncDecFontSize: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Paragraph_IncDecFontSize(val);
-            this.txBody.content.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    Paragraph_IncDecFontSizeAll: function (val) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Set_ApplyToAll(true);
-            this.txBody.content.Paragraph_IncDecFontSize(val);
-            this.txBody.content.Set_ApplyToAll(false);
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
-        }
-    },
-
-    Cursor_MoveToStartPos: function () {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveToStartPos();
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveToEndPos: function () {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveToEndPos();
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveLeft: function (AddToSelect, Word) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveLeft(AddToSelect, Word);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveRight: function (AddToSelect, Word) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveRight(AddToSelect, Word);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveUp: function (AddToSelect) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveUp(AddToSelect);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveDown: function (AddToSelect) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveDown(AddToSelect);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveEndOfLine: function (AddToSelect) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveEndOfLine(AddToSelect);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveStartOfLine: function (AddToSelect) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveStartOfLine(AddToSelect);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-    Cursor_MoveAt: function (X, Y, AddToSelect) {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.Cursor_MoveAt(X, Y, AddToSelect);
-            this.txBody.content.RecalculateCurPos();
-
-        }
-    },
-
-
-    addTextBody: function (txBody) {
-    },
-
-    recalculateCurPos: function () {
-        if (isRealObject(this.txBody)) {
-            this.txBody.content.RecalculateCurPos();
-        }
-    },
-
     onParagraphChanged: function () {
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
@@ -3139,36 +2685,6 @@ CShape.prototype =
     },
 
 
-    getSearchResults: function (str, ownNum)//возвращает массив SelectionState'ов
-    {
-        var documentContentSelectionStates = this.txBody ? this.txBody.getSearchResults(str) : [];
-        if (documentContentSelectionStates.length > 0) {
-            var arrSelSt = [];
-            for (var i = 0; i < documentContentSelectionStates.length; ++i) {
-
-                var s = {};
-                if (!isRealObject(this.group)) {
-                    s.id = STATES_ID_TEXT_ADD;
-                    s.textObject = this;
-                    s.textSelectionState = documentContentSelectionStates[i];
-                }
-                else {
-                    s.id = STATES_ID_TEXT_ADD_IN_GROUP;
-                    var group = this.group;
-                    while (group.group)
-                        group = group.group;
-                    s.group = group;
-                    s.textObject = this;
-                    s.textSelectionState = documentContentSelectionStates[i];
-                }
-                arrSelSt.push(s);
-            }
-            return arrSelSt;
-        }
-        else {
-            return null;
-        }
-    },
 
     draw: function (graphics, transform, transformText, pageIndex) {
 
@@ -3485,9 +3001,6 @@ CShape.prototype =
         return { minX: min_x, maxX: max_x, minY: min_y, maxY: max_y };
     },
 
-    getRectForGrouping: function () {
-
-    },
 
     getInvertTransform: function ()
     {
@@ -3983,6 +3496,7 @@ CShape.prototype =
     Refresh_RecalcData2: function(pageIndex/*для текста*/)
     {
         this.recalcContent();
+        this.recalcContent2 && this.recalcContent2();
         this.recalcTransformText();
         this.addToRecalculate();
     },

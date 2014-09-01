@@ -24068,8 +24068,18 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
         editor.isDocumentEditor = false;
         old_is_doc_editor = true;
     }
-    tx_body.setContent(new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true));
-    var content = tx_body.content;
+    tx_body.setContent(CreateDocContentFromString(str, drawingDocument, tx_body));
+
+    if(editor && old_is_doc_editor)
+    {
+        editor.isDocumentEditor = true;
+    }
+    return tx_body;
+}
+
+function CreateDocContentFromString(str, drawingDocument, parent)
+{
+    var content = new CDocumentContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
     for(var i = 0; i < str.length; ++i)
     {
         var ch = str[i];
@@ -24092,13 +24102,7 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
             content.Paragraph_Add(new ParaSpace(1), false );
         }
     }
-
-    if(editor && old_is_doc_editor)
-    {
-        editor.isDocumentEditor = true;
-    }
-    return tx_body;
-
+    return content;
 }
 
 function CValAxisLabels(chart)

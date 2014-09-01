@@ -78,9 +78,6 @@ function checkRasterImageId(rasterImageId)
   // }
 }
 
-var historyitem_ChangeColorScheme = 0;
-var historyitem_ChangeFontScheme = 1;
-var historyitem_ChangeFmtScheme = 2;
 
 var g_oThemeFontsName = {};
 g_oThemeFontsName["+mj-cs"] = true;
@@ -9665,6 +9662,10 @@ FontScheme.prototype =
             {
                 return this.fontMap[font];
             }
+            else if(this.fontMap["+mn-lt"])
+            {
+                return this.fontMap["+mn-lt"];
+            }
             else
             {
                 return "Arial";
@@ -10180,253 +10181,8 @@ function CTheme()
     this.presentation = null;
     this.clrMap = null;
 
-    this.getFillStyle = function(idx)
-    {
-        if (this.themeElements.fmtScheme.fillStyleLst[idx-1])
-        {
-            return this.themeElements.fmtScheme.fillStyleLst[idx-1].createDuplicate();
-        }
-        return new CUniFill();
-    };
-    this.getLnStyle = function(idx)
-    {
-        if (this.themeElements.fmtScheme.lnStyleLst[idx-1])
-        {
-            return this.themeElements.fmtScheme.lnStyleLst[idx-1].createDuplicate();
-        }
-        return new CLn();
-    };
-
-
-    this.changeColorScheme = function(clrScheme)
-    {
-        History.Add(this, {Type: historyitem_ChangeColorScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
-        this.themeElements.clrScheme = clrScheme;
-    };
-
-    this.setFontScheme = function(fontScheme)
-    {
-        History.Add(this, {Type: historyitem_ChangeFontScheme, oldPr: this.themeElements.fontScheme, newPr: fontScheme});
-        this.themeElements.fontScheme = fontScheme;
-    };
-
-    this.setFormatScheme = function(fmtScheme)
-    {
-        History.Add(this, {Type: historyitem_ChangeFmtScheme, oldPr: this.themeElements.fmtScheme, newPr: fmtScheme});
-        this.themeElements.fmtScheme = fmtScheme;
-    };
-
-    this.Refresh_RecalcData= function()
-    {
-        var slides = editor.WordControl.m_oLogicDocument.Slides;
-        for(var  i = 0; i < slides.length; ++i)
-        {
-            var slide = slides[i];
-            if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
-            {
-                slide.recalcAllColors();
-            }
-        }
-
-    };
-
-
-    this.Undo = function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ChangeColorScheme:
-            {
-                this.themeElements.clrScheme = data.oldPr;
-                break;
-            }
-            case historyitem_ChangeFontScheme:
-            {
-                this.themeElements.fontScheme = data.oldPr;
-                break;
-            }
-
-            case historyitem_ChangeFmtScheme:
-            {
-                this.themeElements.fmtScheme = data.oldPr;
-                break;
-            }
-        }
-        var _slides = editor.WordControl.m_oLogicDocument.Slides;
-        var _slide_count = _slides.length;
-        for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-        {
-            var _cur_slide =_slides[_slide_index];
-            var _cur_theme = _cur_slide.Layout.Master.Theme;
-            if(_cur_theme === this)
-            {
-                _cur_slide.recalcAllColors();
-                _cur_slide.Layout.recalcAll();
-                _cur_slide.Layout.Master.recalcAll();
-                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
-                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
-                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
-            }
-        }
-    };
-
-    this.Redo = function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ChangeColorScheme:
-            {
-                this.themeElements.clrScheme = data.newPr;
-                break;
-            }
-            case historyitem_ChangeFontScheme:
-            {
-                this.themeElements.fontScheme = data.newPr;
-                break;
-            }
-
-            case historyitem_ChangeFmtScheme:
-            {
-                this.themeElements.fmtScheme = data.newPr;
-                break;
-            }
-        }
-
-        var _slides = editor.WordControl.m_oLogicDocument.Slides;
-        var _slide_count = _slides.length;
-        for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-        {
-            var _cur_slide =_slides[_slide_index];
-            var _cur_theme = _cur_slide.Layout.Master.Theme;
-            if(_cur_theme === this)
-            {
-                _cur_slide.recalcAllColors();
-                _cur_slide.Layout.recalcAll();
-                _cur_slide.Layout.Master.recalcAll();
-                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
-                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
-                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
-            }
-        }
-    };
-
-    this.getObjectType = function()
-    {
-        return historyitem_type_Theme;
-    };
-
-    this.Write_ToBinary2 = function(w)
-    {
-        w.WriteLong(historyitem_type_Theme);
-        w.WriteString2(this.Id);
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        this.Id = r.GetString2();
-    };
-
-    this.Save_Changes = function(data, w)
-    {
-        w.WriteLong(historyitem_type_Theme);
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_ChangeColorScheme:
-            case historyitem_ChangeFontScheme:
-            case historyitem_ChangeFmtScheme:
-            {
-                data.newPr.Write_ToBinary2(w);
-                break;
-            }
-        }
-    };
-
-    this.Load_Changes = function(r)
-    {
-        if(r.GetLong() === historyitem_type_Theme)
-        {
-            var _cur_slide, _cur_theme;
-            var type = r.GetLong();
-            switch(type)
-            {
-                case historyitem_ChangeColorScheme:
-                {
-                    this.themeElements.clrScheme = new ClrScheme();
-                    this.themeElements.clrScheme.Read_FromBinary2(r);
-                    var _slides = editor.WordControl.m_oLogicDocument.Slides;
-                    var _slide_count = _slides.length;
-                    for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-                    {
-                        _cur_slide =_slides[_slide_index];
-                        _cur_theme = _cur_slide.Layout.Master.Theme;
-                        if(_cur_theme === this)
-                        {
-                            _cur_slide.recalcAllColors();
-                            _cur_slide.Layout.recalcAll();
-                            _cur_slide.Layout.Master.recalcAll();
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
-                        }
-                    }
-                    break;
-                }
-                case historyitem_ChangeFontScheme:
-                {
-                    this.themeElements.fontScheme = new FontScheme();
-                    this.themeElements.fontScheme.Read_FromBinary2(r);
-                    var _slides = editor.WordControl.m_oLogicDocument.Slides;
-                    var _slide_count = _slides.length;
-                    for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-                    {
-                        _cur_slide =_slides[_slide_index];
-                        _cur_theme = _cur_slide.Layout.Master.Theme;
-                        if(_cur_theme === this)
-                        {
-                            _cur_slide.recalcAllColors();
-                            _cur_slide.Layout.recalcAll();
-                            _cur_slide.Layout.Master.recalcAll();
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
-                        }
-                    }
-                    break;
-                }
-                case historyitem_ChangeFmtScheme:
-                {
-                    this.themeElements.fmtScheme = new FmtScheme();
-                    this.themeElements.fmtScheme.Read_FromBinary2(r);
-                    var _slides = editor.WordControl.m_oLogicDocument.Slides;
-                    var _slide_count = _slides.length;
-                    for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-                    {
-                        _cur_slide =_slides[_slide_index];
-                        _cur_theme = _cur_slide.Layout.Master.Theme;
-                        if(_cur_theme === this)
-                        {
-                            _cur_slide.recalcAllColors();
-                            _cur_slide.Layout.recalcAll();
-                            _cur_slide.Layout.Master.recalcAll();
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
-                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-    };
-
-    this.Get_Id = function()
-    {
-        return this.Id;
-    };
-
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 
@@ -10435,19 +10191,6 @@ CTheme.prototype =
     Get_Id: function()
     {
         return this.Id;
-    },
-
-    Refresh_RecalcData: function()
-    {},
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
     Document_Get_AllFontNames: function(AllFonts)
@@ -10461,7 +10204,156 @@ CTheme.prototype =
         typeof minor_font.latin === "string" && minor_font.latin.length > 0 && (AllFonts[minor_font.latin] = 1);
         typeof minor_font.ea === "string" && minor_font.ea.length > 0 && (AllFonts[minor_font.ea] = 1);
         typeof minor_font.cs === "string" && minor_font.latin.length > 0 && (AllFonts[minor_font.cs] = 1);
+    },
+
+    getFillStyle: function(idx)
+    {
+        if (this.themeElements.fmtScheme.fillStyleLst[idx-1])
+        {
+            return this.themeElements.fmtScheme.fillStyleLst[idx-1].createDuplicate();
+        }
+        return new CUniFill();
+    },
+    getLnStyle: function(idx)
+    {
+        if (this.themeElements.fmtScheme.lnStyleLst[idx-1])
+        {
+            return this.themeElements.fmtScheme.lnStyleLst[idx-1].createDuplicate();
+        }
+        return new CLn();
+    },
+
+
+    changeColorScheme: function(clrScheme)
+    {
+        History.Add(this, {Type: historyitem_ThemeSetColorScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        this.themeElements.clrScheme = clrScheme;
+    },
+
+    setFontScheme: function(fontScheme)
+    {
+        History.Add(this, {Type: historyitem_ThemeSetFontScheme, oldPr: this.themeElements.fontScheme, newPr: fontScheme});
+        this.themeElements.fontScheme = fontScheme;
+    },
+
+    setFormatScheme: function(fmtScheme)
+    {
+        History.Add(this, {Type: historyitem_ThemeSetFmtScheme, oldPr: this.themeElements.fmtScheme, newPr: fmtScheme});
+        this.themeElements.fmtScheme = fmtScheme;
+    },
+
+    Refresh_RecalcData: function()
+    {
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ThemeSetColorScheme:
+            {
+                this.themeElements.clrScheme = data.oldPr;
+                break;
+            }
+            case historyitem_ThemeSetFontScheme:
+            {
+                this.themeElements.fontScheme = data.oldPr;
+                break;
+            }
+
+            case historyitem_ThemeSetFmtScheme:
+            {
+                this.themeElements.fmtScheme = data.oldPr;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ThemeSetColorScheme:
+            {
+                this.themeElements.clrScheme = data.newPr;
+                break;
+            }
+            case historyitem_ThemeSetFontScheme:
+            {
+                this.themeElements.fontScheme = data.newPr;
+                break;
+            }
+
+            case historyitem_ThemeSetFmtScheme:
+            {
+                this.themeElements.fmtScheme = data.newPr;
+                break;
+            }
+        }
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_Theme;
+    },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_Theme);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_Theme);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_ThemeSetColorScheme:
+            case historyitem_ThemeSetFontScheme:
+            case historyitem_ThemeSetFmtScheme:
+            {
+                data.newPr.Write_ToBinary2(w);
+                break;
+            }
+        }
+    },
+
+    Load_Changes: function(r)
+    {
+        if(r.GetLong() === historyitem_type_Theme)
+        {
+            var _cur_slide, _cur_theme;
+            var type = r.GetLong();
+            switch(type)
+            {
+                case historyitem_ThemeSetColorScheme:
+                {
+                    this.themeElements.clrScheme = new ClrScheme();
+                    this.themeElements.clrScheme.Read_FromBinary2(r);
+                    break;
+                }
+                case historyitem_ThemeSetFontScheme:
+                {
+                    this.themeElements.fontScheme = new FontScheme();
+                    this.themeElements.fontScheme.Read_FromBinary2(r);
+                    break;
+                }
+                case historyitem_ThemeSetFmtScheme:
+                {
+                    this.themeElements.fmtScheme = new FmtScheme();
+                    this.themeElements.fmtScheme.Read_FromBinary2(r);
+                    break;
+                }
+            }
+        }
     }
+
 };
 // ----------------------------------
 
@@ -10774,50 +10666,7 @@ function CBg()
     this.bgPr   = null;
     this.bgRef  = null;
 
-    this.merge =  function(bg)
-    {
-        if(this.bgPr == null)
-        {
-            this.bgPr = new CBgPr();
-            if(bg.bgPr != null)
-            {
-                this.bgPr.merge(bg.bgPr);
-            }
-        }
-    };
 
-    this.createFullCopy = function()
-    {
-        var _copy = new CBg();
-        _copy.bwMode = this.bwMode;
-        if(this.bgPr != null)
-        {
-            _copy.bgPr = this.bgPr.createFullCopy();
-        }
-        if(this.bgRef != null)
-        {
-            _copy.bgRef = this.bgRef.createDuplicate();
-        }
-        return _copy;
-    };
-
-    this.Write_ToBinary2 = function(w)
-    {
-        w.WriteBool(isRealObject(this.bgPr));
-        if(isRealObject(this.bgPr))
-        {
-            this.bgPr.Write_ToBinary2(w);
-        }
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        if(r.GetBool())
-        {
-            this.bgPr = new CBgPr();
-            this.bgPr.Read_FromBinary2(r);
-        }
-    };
 }
 
 CBg.prototype =
@@ -10844,6 +10693,51 @@ CBg.prototype =
     {
         History.Add(this, {Type: historyitem_BgSetBgRef, oldPr: this.bgRef, newPr: pr});
         this.bgRef = pr;
+    },
+
+    merge:  function(bg)
+    {
+        if(this.bgPr == null)
+        {
+            this.bgPr = new CBgPr();
+            if(bg.bgPr != null)
+            {
+                this.bgPr.merge(bg.bgPr);
+            }
+        }
+    },
+
+    createFullCopy: function()
+    {
+        var _copy = new CBg();
+        _copy.bwMode = this.bwMode;
+        if(this.bgPr != null)
+        {
+            _copy.bgPr = this.bgPr.createFullCopy();
+        }
+        if(this.bgRef != null)
+        {
+            _copy.bgRef = this.bgRef.createDuplicate();
+        }
+        return _copy;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteBool(isRealObject(this.bgPr));
+        if(isRealObject(this.bgPr))
+        {
+            this.bgPr.Write_ToBinary2(w);
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            this.bgPr = new CBgPr();
+            this.bgPr.Read_FromBinary2(r);
+        }
     },
 
     Undo: function(data)
@@ -10997,63 +10891,6 @@ function CTextStyles()
     this.bodyStyle = null;
     this.otherStyle = null;
 
-    this.Write_ToBinary2 = function(w)
-    {
-        w.WriteBool(isRealObject(this.titleStyle));
-        if(isRealObject(this.titleStyle))
-        {
-            this.titleStyle.Write_ToBinary2(w);
-        }
-
-
-        w.WriteBool(isRealObject(this.bodyStyle));
-        if(isRealObject(this.bodyStyle))
-        {
-            this.bodyStyle.Write_ToBinary2(w);
-        }
-
-        w.WriteBool(isRealObject(this.otherStyle));
-        if(isRealObject(this.otherStyle))
-        {
-            this.otherStyle.Write_ToBinary2(w);
-        }
-        w.WriteString2("test");
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        if(r.GetBool())
-        {
-            this.titleStyle = new TextListStyle();
-            this.titleStyle.Read_FromBinary2(r);
-        }
-        else
-        {
-            this.titleStyle = null;
-        }
-
-
-        if(r.GetBool())
-        {
-            this.bodyStyle = new TextListStyle();
-            this.bodyStyle.Read_FromBinary2(r);
-        }
-        else
-        {
-            this.bodyStyle = null;
-        }
-
-        if(r.GetBool())
-        {
-            this.otherStyle = new TextListStyle();
-            this.otherStyle.Read_FromBinary2(r);
-        }
-        else
-        {
-            this.otherStyle = null;
-        }
-        var s = r.GetString2();
-    };
 }
 
 
@@ -11065,7 +10902,63 @@ CTextStyles.prototype =
     },
 
     Refresh_RecalcData: function()
-    {}
+    {},
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteBool(isRealObject(this.titleStyle));
+        if(isRealObject(this.titleStyle))
+        {
+            this.titleStyle.Write_ToBinary(w);
+        }
+
+
+        w.WriteBool(isRealObject(this.bodyStyle));
+        if(isRealObject(this.bodyStyle))
+        {
+            this.bodyStyle.Write_ToBinary(w);
+        }
+
+        w.WriteBool(isRealObject(this.otherStyle));
+        if(isRealObject(this.otherStyle))
+        {
+            this.otherStyle.Write_ToBinary(w);
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            this.titleStyle = new TextListStyle();
+            this.titleStyle.Read_FromBinary(r);
+        }
+        else
+        {
+            this.titleStyle = null;
+        }
+
+
+        if(r.GetBool())
+        {
+            this.bodyStyle = new TextListStyle();
+            this.bodyStyle.Read_FromBinary(r);
+        }
+        else
+        {
+            this.bodyStyle = null;
+        }
+
+        if(r.GetBool())
+        {
+            this.otherStyle = new TextListStyle();
+            this.otherStyle.Read_FromBinary(r);
+        }
+        else
+        {
+            this.otherStyle = null;
+        }
+    }
 };
 
 //---------------------------
@@ -11193,487 +11086,6 @@ _global_layout_summs_array["_" + _ph_summ__two_obj_and_two_tx] = nSldLtTTwoTxTwo
 _global_layout_summs_array["_" + _ph_summ__tx] = nSldLtTTx;
 _global_layout_summs_array["_" + _ph_summ__tx_and_clip_art] = nSldLtTTxAndClipArt;
 
-/*function SlideLayout(slideMaster)
- {
- this.cSld = new CSld();
- this.clrMap = null; // override ClrMap
-
- this.hf = new HF();
-
- this.matchingName = "";
- this.preserve = false;
- this.showMasterPhAnim = false;
- //this.showMasterSp = false;
- this.type = null;
-
- this.userDrawn = true;
-
- this.ImageBase64 = "";
-
- // pointers
- this.Master = slideMaster;
- this.Theme = null;
- this.TableStyles = null;
- this.Vml = null;
- this.kind = LAYOUT_KIND;
-
- this.Width = 254;
- this.Height = 190.5;
-
- this.changeProportions = function(kW, kH)
- {
- var _graphic_objects = this.cSld.spTree;
- var _object_index;
- var _objects_count = _graphic_objects.length;
- for(_object_index = 0; _object_index < _objects_count; ++_object_index)
- {
- _graphic_objects[_object_index].changeProportions(kW, kH)
- }
- };
-
-
- this.setSize = function(width, height)
- {
- var _k_h = height/this.Height;
- var _k_w = width/this.Width;
- this.Width = width;
- this.Height = height;
-
- var _graphic_objects = this.cSld.spTree;
- var _objects_count = _graphic_objects.length;
- var _object_index;
- for(_object_index = 0; _object_index < _objects_count; ++_object_index)
- {
- _graphic_objects[_object_index].updateProportions(_k_w, _k_h);
- }
- };
- this.Calculate = function()
- {
- // нужно пробежаться по всем шейпам:
- // учесть тему во всех заливках
- // учесть тему во всех текстовых настройках,
- };
-
-
- this.calculateColors = function()
- {
- var _shapes = this.cSld.spTree;
- var _shapes_count = _shapes.length;
- var _shape_index;
- for(_shape_index = 0; _shape_index < _shapes_count; ++_shape_index)
- {
- if(_shapes[_shape_index].calculateColors)
- {
- _shapes[_shape_index].calculateColors();
- }
- }
- };
-
- this.draw = function(graphics)
- {
- for(var i=0; i < this.cSld.spTree.length; ++i)
- {
- if(!this.cSld.spTree[i].isPlaceholder())
- this.cSld.spTree[i].Draw(graphics);
- }
- };
-
- //-----------------------------------------------
-
-
- this.getMatchingShape =  function(type, idx)
- {
- var _input_reduced_type;
- if(type == null)
- {
- _input_reduced_type = phType_body;
- }
- else
- {
- if(type == phType_ctrTitle)
- {
- _input_reduced_type = phType_title;
- }
- else
- {
- _input_reduced_type = type;
- }
- }
-
- var _input_reduced_index;
- if(idx == null)
- {
- _input_reduced_index = 0;
- }
- else
- {
- _input_reduced_index = idx;
- }
-
-
- var _sp_tree = this.cSld.spTree;
- var _shape_index;
- var _index, _type;
- var _final_index, _final_type;
- var _glyph;
- for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
- {
- _glyph = _sp_tree[_shape_index];
- if(_glyph.isPlaceholder())
- {
- if(_glyph instanceof CShape)
- {
- _index = _glyph.nvSpPr.nvPr.ph.idx;
- _type = _glyph.nvSpPr.nvPr.ph.type;
- }
- if(_glyph instanceof CImage2)
- {
- _index = _glyph.nvPicPr.nvPr.ph.idx;
- _type = _glyph.nvPicPr.nvPr.ph.type;
- }
- if(_glyph instanceof  GroupShape)
- {
- _index = _glyph.nvGrpSpPr.nvPr.ph.idx;
- _type = _glyph.nvGrpSpPr.nvPr.ph.type;
- }
-
- if(_type == null)
- {
- _final_type = phType_body;
- }
- else
- {
- if(_type == phType_ctrTitle)
- {
- _final_type = phType_title;
- }
- else
- {
- _final_type = _type;
- }
- }
- if(_index == null)
- {
- _final_index = 0;
- }
- else
- {
- _final_index = _index;
- }
-
- if(_input_reduced_type == _final_type && _input_reduced_index == _final_index)
- {
- return _glyph;
- }
- }
- }
-
-
-
- if(_input_reduced_type == phType_sldNum || _input_reduced_type == phType_dt || _input_reduced_type == phType_ftr || _input_reduced_type == phType_hdr)
- {
- for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
- {
- _glyph = _sp_tree[_shape_index];
- if(_glyph.isPlaceholder())
- {
- if(_glyph instanceof CShape)
- {
- _type = _glyph.nvSpPr.nvPr.ph.type;
- }
- if(_glyph instanceof CImage2)
- {
- _type = _glyph.nvPicPr.nvPr.ph.type;
- }
- if(_glyph instanceof  GroupShape)
- {
- _type = _glyph.nvGrpSpPr.nvPr.ph.type;
- }
-
- if(_input_reduced_type == _type)
- {
- return _glyph;
- }
- }
- }
- }
-
- for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
- {
- _glyph = _sp_tree[_shape_index];
- if(_glyph.isPlaceholder())
- {
- if(_glyph instanceof CShape)
- {
- _type = _glyph.nvSpPr.nvPr.ph.type;
- }
- if(_glyph instanceof CImage2)
- {
- _type = _glyph.nvPicPr.nvPr.ph.type;
- }
- if(_glyph instanceof  GroupShape)
- {
- _type = _glyph.nvGrpSpPr.nvPr.ph.type;
- }
-
- if(_type == null)
- {
- _final_type = phType_body;
- }
- else
- {
- if(_type == phType_ctrTitle)
- {
- _final_type = phType_title;
- }
- else
- {
- _final_type = _type;
- }
- }
-
- if(this.type === nSldLtTTitle && (_input_reduced_type === phType_body || _input_reduced_type === phType_subTitle) && (_final_type === phType_body || _final_type === phType_subTitle) )
- {
- return _glyph;
- }
- }
- }
-
- return null;
- };
-
-
- this.calculateType = function()
- {
- if(this.type !== null)
- {
- this.calculatedType = this.type;
- return;
- }
- var _ph_types_array = [];
- var _matchedLayoutTypes = [];
- for(var _ph_type_index = 0; _ph_type_index < 16; ++_ph_type_index)
- {
- _ph_types_array[_ph_type_index] = 0;
- }
- for(var _layout_type_index = 0; _layout_type_index < 36; ++_layout_type_index)
- {
- _matchedLayoutTypes[_layout_type_index] = false;
- }
- var _shapes = this.cSld.spTree;
- var _shape_index;
- var _shape;
- for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
- {
- _shape = _shapes[_shape_index];
- if(_shape.isPlaceholder())
- {
- var _cur_type = _shape.getPhType();
- if(!(typeof(_cur_type) == "number"))
- {
- _cur_type = phType_body;
- }
- if(typeof _ph_types_array[_cur_type] == "number")
- {
- ++_ph_types_array[_cur_type];
- }
- }
- }
-
- var _weight = Math.pow(_ph_multiplier, _weight_body)*_ph_types_array[phType_body] + Math.pow(_ph_multiplier, _weight_chart)*_ph_types_array[phType_chart] +
- Math.pow(_ph_multiplier, _weight_clipArt)*_ph_types_array[phType_clipArt] + Math.pow(_ph_multiplier, _weight_ctrTitle)*_ph_types_array[phType_ctrTitle] +
- Math.pow(_ph_multiplier, _weight_dgm)*_ph_types_array[phType_dgm] + Math.pow(_ph_multiplier, _weight_media)*_ph_types_array[phType_media] +
- Math.pow(_ph_multiplier, _weight_obj)*_ph_types_array[phType_obj] + Math.pow(_ph_multiplier, _weight_pic)*_ph_types_array[phType_pic] +
- Math.pow(_ph_multiplier, _weight_subTitle)*_ph_types_array[phType_subTitle] + Math.pow(_ph_multiplier, _weight_tbl)*_ph_types_array[phType_tbl] +
- Math.pow(_ph_multiplier, _weight_title)*_ph_types_array[phType_title];
-
- for(var _index = 0; _index < 18; ++_index)
- {
- if(_weight >= _arr_lt_types_weight[_index] && _weight <= _arr_lt_types_weight[_index+1])
- {
- if(Math.abs(_arr_lt_types_weight[_index]-_weight) <= Math.abs(_arr_lt_types_weight[_index + 1]-_weight))
- {
- this.calculatedType = _global_layout_summs_array["_" + _arr_lt_types_weight[_index]];
- return;
- }
- else
- {
- this.calculatedType = _global_layout_summs_array["_" + _arr_lt_types_weight[_index+1]];
- return;
- }
- }
- }
- this.calculatedType = _global_layout_summs_array["_" + _arr_lt_types_weight[18]];
- };
-
- this.calculateMatchedTypes = function()
- {
- this.matchedTypes = [];
- for(var i = 0; i < 36; ++i)
- {
- this.matchedTypes[i] = false;
- }
- if(this.calculatedType != null)
- {
- switch (this.calculatedType)
- {
- case nSldLtTBlank :
- {
- this.matchedTypes[nSldLtTBlank] = true;
- break;
- }
- case nSldLtTChart :
- {
- this.matchedTypes[nSldLtTChart] = true;
- break;
- }
- case nSldLtTChartAndTx:
- case nSldLtTTxAndChart:
- case nSldLtTVertTitleAndTxOverChart:
- {
- this.matchedTypes[nSldLtTChartAndTx] = true;
- this.matchedTypes[nSldLtTTxAndChart] = true;
- this.matchedTypes[nSldLtTVertTitleAndTxOverChart] = true;
- break;
- }
- case nSldLtTClipArtAndTx:
- case nSldLtTTxAndClipArt:
- case nSldLtTClipArtAndVertTx:
- {
- this.matchedTypes[nSldLtTClipArtAndTx] = true;
- this.matchedTypes[nSldLtTTxAndClipArt] = true;
- break;
- }
- case nSldLtTDgm :
- {
- this.matchedTypes[nSldLtTDgm] = true;
- break;
- }
- case nSldLtTFourObj :
- {
- this.matchedTypes[nSldLtTFourObj] = true;
- break;
- }
- case nSldLtTMediaAndTx:
- case nSldLtTTxAndMedia:
- {
- this.matchedTypes[nSldLtTMediaAndTx] = true;
- this.matchedTypes[nSldLtTTxAndMedia] = true;
- break;
- }
- case nSldLtTObj :
- {
- this.matchedTypes[nSldLtTObj] = true;
- break;
- }
- case nSldLtTObjAndTwoObj:
- case nSldLtTTwoObjAndObj:
- {
- this.matchedTypes[nSldLtTObjAndTwoObj] = true;
- this.matchedTypes[nSldLtTTwoObjAndObj] = true;
- break;
- }
- case nSldLtTObjAndTx:
- case nSldLtTTxAndObj:
- case nSldLtTTxOverObj:
- case nSldLtTObjOverTx:
- case nSldLtTObjTx:
- {
- this.matchedTypes[nSldLtTObjAndTx] = true;
- this.matchedTypes[nSldLtTTxAndObj] = true;
- this.matchedTypes[nSldLtTTxOverObj] = true;
- break;
- }
- case nSldLtTObjOnly:
- {
- this.matchedTypes[nSldLtTObjOnly] = true;
- break;
- }
-
- case nSldLtTPicTx :
- {
- this.matchedTypes[nSldLtTPicTx] = true;
- break;
- }
-
- case nSldLtTSecHead:
- case nSldLtTTitle:
- {
- this.matchedTypes[nSldLtTSecHead] = true;
- this.matchedTypes[nSldLtTTitle] = true;
- break;
- }
- case nSldLtTTbl:
- {
- this.matchedTypes[nSldLtTTbl] = true;
- break;
- }
- case nSldLtTTitleOnly:
- {
- this.matchedTypes[nSldLtTTitleOnly] = true;
- break;
- }
- case nSldLtTTwoColTx:
- {
- this.matchedTypes[nSldLtTTwoColTx] = true;
- break;
- }
- case nSldLtTTwoObj :
- {
- this.matchedTypes[nSldLtTTwoObj] = true;
- break;
- }
-
- case nSldLtTTwoObjAndTx :
- case nSldLtTTwoObjOverTx:
- case nSldLtTTxAndTwoObj:
- {
- this.matchedTypes[nSldLtTTwoObjAndTx] = true;
- this.matchedTypes[nSldLtTTwoObjOverTx] = true;
- this.matchedTypes[nSldLtTTxAndTwoObj] = true;
- break;
- }
- case nSldLtTTwoTxTwoObj :
- {
- this.matchedTypes[nSldLtTTwoTxTwoObj] = true;
- break;
- }
- case nSldLtTTx :
- case nSldLtTVertTx:
- case nSldLtTVertTitleAndTx:
- {
- this.matchedTypes[nSldLtTTx] = true;
- this.matchedTypes[nSldLtTVertTx] = true;
- this.matchedTypes[nSldLtTVertTitleAndTx] = true;
- break;
- }
-
-
-
-
- }
- }
- else
- {
-
- }
- };
-
- this.recalculate = function()
- {
-
- if(!this.calculated)
- return;
- var _shapes = this.cSld.spTree;
- var _shape_index;
- var _shape_count = _shapes.length;
- for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
- {
- if(!_shapes[_shape_index].isPlaceholder())
- _shapes[_shape_index].Recalculate();
- }
- };
- }  */
 
 // ----------------------------------
 
@@ -11809,132 +11221,15 @@ function getFontInfo(sFont)
 
 
 // SLIDE ----------------------------
-function redrawSlide(slide, presentation, arr_layouts, direction, arr_slides)
+function redrawSlide(slide, presentation, arrInd, pos,  direction, arr_slides)
 {
-
-    var _history_is_on = History.Is_On();
-    if(_history_is_on)
-    {
-        History.TurnOff();
-    }
-    if(slide !== null && typeof slide === "object")
-    {
-        var _new_layout = slide.Layout;
-        var _arr_shapes = _new_layout.cSld.spTree;
-        var _shape_index;
-        /*if(Math.abs(presentation.Width - 254) > 1 || Math.abs(presentation.Width - 190.5) > 1)
-         {
-         var kx = presentation.Width/254;
-         var ky = presentation.Height/190.5;
-         for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-         {
-         _arr_shapes[_shape_index].resizeToFormat(kx, ky);
-         }
-         }   */
-        for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-        {
-            _arr_shapes[_shape_index].recalculate();
-            // _arr_shapes[_shape_index].setContainer(_new_layout.elementsManipulator);
-            // _arr_shapes[_shape_index].calculate();
-        }
-        slide.recalcAll();
-        slide.recalculate();
-        if(direction === 0)
-        {
-            editor.WordControl.m_oLogicDocument.RecalculateCurPos();
-        }
-        presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
-    }
-
-    if(_history_is_on)
-    {
-        History.TurnOn();
-    }
-    if(slide !== null && typeof slide === "object")
-    {
-        if(direction == 0)
-        {
-
-            if(slide.num > 0)
-            {
-                presentation.backChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[slide.num-1], presentation, arr_layouts, -1, arr_slides)}, 30);
-            }
-            else
-            {
-                presentation.backChangeThemeTimeOutId = null;
-            }
-            if(slide.num < presentation.Slides.length-1)
-            {
-                presentation.forwardChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[slide.num+1], presentation, arr_layouts, +1, arr_slides)}, 30);
-            }
-            else
-            {
-                presentation.forwardChangeThemeTimeOutId = null;
-            }
-            presentation.startChangeThemeTimeOutId = null;
-        }
-        if(direction > 0)
-        {
-            if(slide.num < presentation.Slides.length-1)
-            {
-                presentation.forwardChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[slide.num+1], presentation, arr_layouts,  +1, arr_slides)}, 30);
-            }
-            else
-            {
-                presentation.forwardChangeThemeTimeOutId = null;
-            }
-        }
-        if(direction < 0)
-        {
-            if(slide.num > 0)
-            {
-                presentation.backChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[slide.num-1], presentation, arr_layouts,  -1, arr_slides)}, 30);
-            }
-            else
-            {
-                presentation.backChangeThemeTimeOutId = null;
-            }
-        }
-    }
-    else
-    {
-        presentation.startChangeThemeTimeOutId = null;
-        presentation.forwardChangeThemeTimeOutId = null;
-        presentation.backChangeThemeTimeOutId = null;
-    }
-}
-
-
-function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction, arr_slides)
-{
-    var _history_is_on = History.Is_On();
-    if(_history_is_on)
-    {
-        History.TurnOff();
-    }
-    if(slide !== null && typeof slide === "object")
-    {
-        var _new_layout = slide.Layout;
-        var _arr_shapes = _new_layout.cSld.spTree;
-        var _shape_index;
-        for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-        {
-            _arr_shapes[_shape_index].recalculate();
-        }
-        slide.recalcAll();
-        slide.recalculate();
-        presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
-    }
-
-    if(_history_is_on)
-    {
-        History.TurnOn();
-    }
+    slide.recalculate();
+    presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
     if(direction == 0)
     {
         if(pos > 0)
         {
-            presentation.backChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(arr_slides[arrInd[pos - 1]], presentation, arrInd,pos - 1, arr_layouts, -1, arr_slides)}, 30);
+            presentation.backChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[arrInd[pos - 1]], presentation, arrInd,pos - 1,  -1, arr_slides)}, recalcSlideInterval);
         }
         else
         {
@@ -11942,7 +11237,7 @@ function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction,
         }
         if(pos < arrInd.length-1)
         {
-            presentation.forwardChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(arr_slides[arrInd[pos + 1]], presentation, arrInd, pos + 1, arr_layouts, +1, arr_slides)}, 30);
+            presentation.forwardChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[arrInd[pos + 1]], presentation, arrInd, pos + 1,  +1, arr_slides)}, recalcSlideInterval);
         }
         else
         {
@@ -11954,7 +11249,7 @@ function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction,
     {
         if(pos < arrInd.length-1)
         {
-            presentation.forwardChangeThemeTimeOutId =setTimeout(function(){redrawSlide2(arr_slides[arrInd[pos + 1]], presentation, arrInd, pos + 1, arr_layouts, +1, arr_slides)}, 30);
+            presentation.forwardChangeThemeTimeOutId =setTimeout(function(){redrawSlide(arr_slides[arrInd[pos + 1]], presentation, arrInd, pos + 1,  +1, arr_slides)}, recalcSlideInterval);
         }
         else
         {
@@ -11965,7 +11260,7 @@ function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction,
     {
         if(pos > 0)
         {
-            presentation.backChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(arr_slides[arrInd[pos - 1]], presentation, arrInd, pos - 1, arr_layouts, -1, arr_slides)}, 30);
+            presentation.backChangeThemeTimeOutId = setTimeout(function(){redrawSlide(arr_slides[arrInd[pos - 1]], presentation, arrInd, pos - 1,  -1, arr_slides)}, recalcSlideInterval);
         }
         else
         {
@@ -11977,9 +11272,6 @@ function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction,
 
 function recalculateSlideAfterChangeThemeColors(slide, presentation, direction, arr_slides)
 {
-    var _history_is_on = History.Is_On();
-
-
     slide.recalcAllColors();
     slide.recalculate();
     presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
@@ -12999,9 +12291,50 @@ CTextParagraphPr.prototype =
 
 function CompareBullets(bullet1, bullet2)
 {
-    var ret = new CBullet();
-    //TODO: сделать сравнивание
-    return ret;
+
+    //TODO: пока будем сравнивать только bulletType, т. к. эта функция используется для мержа свойств при отдаче в интерфейс, а для интерфейса bulletTyp'a достаточно. Если понадобится нужно сделать полное сравнение.
+    //
+    if(bullet1.bulletType && bullet2.bulletType
+        && bullet1.bulletType.type === bullet2.bulletType.type
+        && bullet1.bulletType.type !== BULLET_TYPE_BULLET_NONE)
+    {
+        var ret = new CBullet();
+        ret.bulletType = new CBulletType();
+        switch(bullet1.bulletType.type)
+        {
+            case BULLET_TYPE_BULLET_CHAR:
+            {
+                ret.bulletType.type = BULLET_TYPE_BULLET_CHAR;
+                if(bullet1.bulletType.Char === bullet2.bulletType.Char)
+                {
+                    ret.bulletType.Char = bullet1.bulletType.Char;
+                }
+                break;
+            }
+            case BULLET_TYPE_BULLET_BLIP:
+            {
+                ret.bulletType.type = BULLET_TYPE_BULLET_CHAR; //TODO: в меню отдаем, что символьный.
+                break;
+            }
+            case BULLET_TYPE_BULLET_AUTONUM:
+            {
+                if(bullet1.bulletType.AutoNumType === bullet2.bulletType.AutoNumType)
+                {
+                    ret.bulletType.AutoNumType = bullet1.bulletType.AutoNumType;
+                }
+                if(bullet1.bulletType.startAt === bullet2.bulletType.startAt)
+                {
+                    ret.bulletType.startAt = bullet1.bulletType.startAt;
+                }
+                break;
+            }
+        }
+        return ret;
+    }
+    else
+    {
+        return undefined;
+    }
 }
 
 function CBullet()
@@ -13011,97 +12344,6 @@ function CBullet()
     this.bulletTypeface = null;
     this.bulletType = null;
     this.Bullet = null;
-
-    this.createDuplicate = function()
-    {
-        var duplicate = new CBullet();
-        if(this.bulletColor)
-        {
-            duplicate.bulletColor = this.bulletColor.createDuplicate();
-        }
-        if(this.bulletSize)
-        {
-            duplicate.bulletSize = this.bulletSize.createDuplicate();
-        }
-        if(this.bulletTypeface)
-        {
-            duplicate.bulletTypeface = this.bulletTypeface.createDuplicate();
-        }
-
-        if(this.bulletType)
-        {
-            duplicate.bulletType = this.bulletType.createDuplicate();
-        }
-
-        duplicate.Bullet = this.Bullet;
-        return duplicate;
-    };
-
-    this.isBullet = function()
-    {
-        return this.bulletType != null && this.bulletType.type != null;
-    };
-
-    this.Write_ToBinary2 =function(w)
-    {
-        w.WriteBool(isRealObject(this.bulletColor));
-        if(isRealObject(this.bulletColor))
-        {
-            this.bulletColor.Write_ToBinary2(w);
-        }
-
-        w.WriteBool(isRealObject(this.bulletSize));
-        if(isRealObject(this.bulletSize))
-        {
-            this.bulletSize.Write_ToBinary2(w);
-        }
-
-
-        w.WriteString2("dssdf");
-
-        w.WriteBool(isRealObject(this.bulletTypeface));
-        if(isRealObject(this.bulletTypeface))
-        {
-            this.bulletTypeface.Write_ToBinary2(w);
-        }
-
-
-        w.WriteBool(isRealObject(this.bulletType));
-        if(isRealObject(this.bulletType))
-        {
-            this.bulletType.Write_ToBinary2(w);
-        }
-
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-
-        if(r.GetBool())
-        {
-            this.bulletColor = new CBulletColor();
-            this.bulletColor.Read_FromBinary2(r);
-        }
-
-        if(r.GetBool())
-        {
-            this.bulletSize = new CBulletSize();
-            this.bulletSize.Read_FromBinary2(r);
-        }
-
-        var s = r.GetString2();
-        if(r.GetBool())
-        {
-            this.bulletTypeface = new CBulletTypeface();
-            this.bulletTypeface.Read_FromBinary2(r);
-        }
-
-        if(r.GetBool())
-        {
-            this.bulletType = new CBulletType();
-            this.bulletType.Read_FromBinary2(r);
-        }
-    };
 }
 
 CBullet.prototype =
@@ -13143,11 +12385,100 @@ CBullet.prototype =
         }
     },
 
+    createDuplicate: function()
+    {
+        var duplicate = new CBullet();
+        if(this.bulletColor)
+        {
+            duplicate.bulletColor = this.bulletColor.createDuplicate();
+        }
+        if(this.bulletSize)
+        {
+            duplicate.bulletSize = this.bulletSize.createDuplicate();
+        }
+        if(this.bulletTypeface)
+        {
+            duplicate.bulletTypeface = this.bulletTypeface.createDuplicate();
+        }
+
+        if(this.bulletType)
+        {
+            duplicate.bulletType = this.bulletType.createDuplicate();
+        }
+
+        duplicate.Bullet = this.Bullet;
+        return duplicate;
+    },
+
+    isBullet: function()
+    {
+        return this.bulletType != null && this.bulletType.type != null;
+    },
+
+    getBulletType: function()
+    {
+        var para_pr = new CParaPr();
+        para_pr.Bullet = this;
+        var pres_bullet = para_pr.Get_PresentationBullet();
+        return pres_bullet.m_nType;
+    },
+
     Write_ToBinary: function(w)
-    {},
+    {
+        w.WriteBool(isRealObject(this.bulletColor));
+        if(isRealObject(this.bulletColor))
+        {
+            this.bulletColor.Write_ToBinary(w);
+        }
+
+        w.WriteBool(isRealObject(this.bulletSize));
+        if(isRealObject(this.bulletSize))
+        {
+            this.bulletSize.Write_ToBinary(w);
+        }
+
+
+        w.WriteBool(isRealObject(this.bulletTypeface));
+        if(isRealObject(this.bulletTypeface))
+        {
+            this.bulletTypeface.Write_ToBinary(w);
+        }
+
+
+        w.WriteBool(isRealObject(this.bulletType));
+        if(isRealObject(this.bulletType))
+        {
+            this.bulletType.Write_ToBinary(w);
+        }
+
+    },
 
     Read_FromBinary: function(r)
-    {}
+    {
+        if(r.GetBool())
+        {
+            this.bulletColor = new CBulletColor();
+            this.bulletColor.Read_FromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.bulletSize = new CBulletSize();
+            this.bulletSize.Read_FromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.bulletTypeface = new CBulletTypeface();
+            this.bulletTypeface.Read_FromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.bulletType = new CBulletType();
+            this.bulletType.Read_FromBinary(r);
+        }
+    }
 
 };
 
@@ -13159,45 +12490,7 @@ function CBulletColor()
 {
     this.type = BULLET_TYPE_COLOR_NONE;
     this.UniColor = null;
-    this.createDuplicate = function()
-    {
-        var duplicate = new CBulletColor();
-        duplicate.type = this.type;
-        if(this.UniColor != null)
-        {
-            duplicate.UniColor = this.UniColor.createDuplicate();
-        }
-        return duplicate;
-    };
 
-    this.Write_ToBinary2 =function(w)
-    {
-        w.WriteBool(isRealNumber(this.type));
-        if(isRealNumber(this.type))
-        {
-            w.WriteLong(this.type);
-        }
-        w.WriteBool(isRealObject(this.UniColor));
-        if(isRealObject(this.UniColor))
-        {
-            this.UniColor.Write_ToBinary2(w);
-        }
-
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        if(r.GetBool())
-        {
-            (this.type) = r.GetLong();
-        }
-
-        if(r.GetBool())
-        {
-            this.UniColor = new CUniColor();
-            this.UniColor.Read_FromBinary2(r);
-        }
-    };
 }
 
 CBulletColor.prototype =
@@ -13216,6 +12509,46 @@ CBulletColor.prototype =
         {
 
         }
+    },
+
+    createDuplicate: function()
+    {
+        var duplicate = new CBulletColor();
+        duplicate.type = this.type;
+        if(this.UniColor != null)
+        {
+            duplicate.UniColor = this.UniColor.createDuplicate();
+        }
+        return duplicate;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteBool(isRealNumber(this.type));
+        if(isRealNumber(this.type))
+        {
+            w.WriteLong(this.type);
+        }
+        w.WriteBool(isRealObject(this.UniColor));
+        if(isRealObject(this.UniColor))
+        {
+            this.UniColor.Write_ToBinary(w);
+        }
+
+    },
+
+    Read_FromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            (this.type) = r.GetLong();
+        }
+
+        if(r.GetBool())
+        {
+            this.UniColor = new CUniColor();
+            this.UniColor.Read_FromBinary(r);
+        }
     }
 };
 
@@ -13228,15 +12561,28 @@ function CBulletSize()
 {
     this.type = BULLET_TYPE_SIZE_NONE;
     this.val = 0;
-    this.createDuplicate = function()
+
+}
+
+CBulletSize.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
+    createDuplicate: function()
     {
         var d = new CBulletSize();
         d.type = this.type;
         d.val = this.val;
         return d;
-    }
+    },
 
-    this.Write_ToBinary2 =function(w)
+    Write_ToBinary: function(w)
     {
         w.WriteBool(isRealNumber(this.type));
         if(isRealNumber(this.type))
@@ -13250,9 +12596,9 @@ function CBulletSize()
             w.WriteLong(this.val);
         }
 
-    };
+    },
 
-    this.Read_FromBinary2 = function(r)
+    Read_FromBinary: function(r)
     {
         if(r.GetBool())
         {
@@ -13262,18 +12608,7 @@ function CBulletSize()
         {
             (this.val) = r.GetLong();
         }
-    };
-}
-
-CBulletSize.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-    Refresh_RecalcData: function()
-    {}
+    }
 };
 
 var BULLET_TYPE_TYPEFACE_NONE	= 0;
@@ -13285,15 +12620,28 @@ function CBulletTypeface()
     this.type = BULLET_TYPE_TYPEFACE_NONE;
     this.typeface = "";
 
-    this.createDuplicate = function()
+
+}
+
+CBulletTypeface.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
+    createDuplicate: function()
     {
         var d = new CBulletTypeface();
         d.type = this.type;
         d.typeface = this.typeface;
         return d;
-    };
+    },
 
-    this.Write_ToBinary2 =function(w)
+    Write_ToBinary: function(w)
     {
         w.WriteBool(isRealNumber(this.type));
         if(isRealNumber(this.type))
@@ -13307,9 +12655,9 @@ function CBulletTypeface()
             w.WriteString2(this.typeface);
         }
 
-    };
+    },
 
-    this.Read_FromBinary2 = function(r)
+    Read_FromBinary: function(r)
     {
         if(r.GetBool())
         {
@@ -13319,18 +12667,7 @@ function CBulletTypeface()
         {
             (this.typeface) = r.GetString2();
         }
-    };
-}
-
-CBulletTypeface.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-    Refresh_RecalcData: function()
-    {}
+    }
 };
 
 var BULLET_TYPE_BULLET_NONE		= 0;
@@ -13344,8 +12681,19 @@ function CBulletType()
     this.Char = "*";
     this.AutoNumType = 0;
     this.startAt = 1;
+}
 
-    this.createDuplicate = function()
+CBulletType.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    } ,
+
+    Refresh_RecalcData: function()
+    {},
+
+    createDuplicate: function()
     {
         var d = new CBulletType();
         d.type = this.type;
@@ -13353,9 +12701,9 @@ function CBulletType()
         d.AutoNumType = this.AutoNumType;
         d.startAt = this.startAt;
         return d;
-    }
+    },
 
-    this.Write_ToBinary2 =function(w)
+    Write_ToBinary: function(w)
     {
         w.WriteBool(isRealNumber(this.type));
         if(isRealNumber(this.type))
@@ -13380,11 +12728,9 @@ function CBulletType()
         {
             w.WriteLong(this.startAt);
         }
+    },
 
-
-    };
-
-    this.Read_FromBinary2 = function(r)
+    Read_FromBinary: function(r)
     {
         if(r.GetBool())
         {
@@ -13404,18 +12750,7 @@ function CBulletType()
         {
             (this.startAt) = r.GetLong();
         }
-    };
-}
-
-CBulletType.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    } ,
-
-    Refresh_RecalcData: function()
-    {}
+    }
 };
 
 function TextListStyle()
@@ -13425,50 +12760,7 @@ function TextListStyle()
     for (var i = 0; i < 10; i++)
         this.levels[i] = null;
 
-    this.createDuplicate = function()
-    {
-        var duplicate = new TextListStyle();
-        for(var i=0; i<10; ++i)
-        {
-            if(this.levels[i]!=null)
-            {
-                duplicate.levels[i] = this.levels[i].createDuplicate();
-            }
-        }
-        return duplicate;
-    };
 
-    this.Write_ToBinary2 = function(w)
-    {
-        w.WriteBool(MASTER_STYLES);
-
-        for(var i = 0; i < 10; ++i)
-        {
-            w.WriteBool(isRealObject(this.levels[i]));
-            if(isRealObject(this.levels[i]))
-            {
-                this.levels[i].Write_ToBinary2(w);
-            }
-        }
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        var b = r.GetBool();
-
-        for(var i = 0; i < 10; ++i)
-        {
-            if(r.GetBool())
-            {
-                this.levels[i] = new CTextParagraphPr();
-                this.levels[i].Read_FromBinary2(r);
-            }
-            else
-            {
-                this.levels[i] = null;
-            }
-        }
-    };
 }
 
 TextListStyle.prototype =
@@ -13479,52 +12771,49 @@ TextListStyle.prototype =
     },
 
     Refresh_RecalcData: function()
-    {}
-};
+    {},
 
-function CPresParagraph()
-{
-    this.textPr = null;
-    this.endRunPr = null;
-    this.Content = [];
-
-    this.createDuplicate = function()
+    createDuplicate: function()
     {
-        var duplicate = new CPresParagraph();
-        duplicate.textPr = clone(this.textPr);
-        duplicate.endRunPr = clone(this.endRunPr);
-        duplicate.Content = clone(this.Content);
+        var duplicate = new TextListStyle();
+        for(var i=0; i<10; ++i)
+        {
+            if(this.levels[i]!=null)
+            {
+                duplicate.levels[i] = this.levels[i].Copy();
+            }
+        }
         return duplicate;
-    }
-}
-
-CPresParagraph.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
     },
 
-    Refresh_RecalcData: function()
-    {}
+    Write_ToBinary: function(w)
+    {
+        for(var i = 0; i < 10; ++i)
+        {
+            w.WriteBool(isRealObject(this.levels[i]));
+            if(isRealObject(this.levels[i]))
+            {
+                this.levels[i].Write_ToBinary(w);
+            }
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        for(var i = 0; i < 10; ++i)
+        {
+            if(r.GetBool())
+            {
+                this.levels[i] = new CParaPr();
+                this.levels[i].Read_FromBinary(r);
+            }
+            else
+            {
+                this.levels[i] = null;
+            }
+        }
+    }
 };
-
-
-function copyParagraph(paragraph, parent)
-{
-    var copy = new Paragraph(paragraph.DrawingDocument, parent, 0, 0, 0, 0, 0);
-    if(paragraph.bullet)
-    {
-        copy.bullet = paragraph.bullet.createDuplicate();
-    }
-    copy.Pr = clone(paragraph.Pr);
-    copy.rPr = clone(paragraph.rPr);
-    for(var i = 0, n = paragraph.Content.length; i < n; ++i )
-    {
-        copy.Content[i] = paragraph.Content[i].createDuplicate();
-    }
-    return copy;
-}
 
 var PARRUN_TYPE_NONE    = 0;
 var PARRUN_TYPE_RUN		= 1;
