@@ -161,6 +161,11 @@ NullState.prototype =
             start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
         }
         var ret;
+        ret = this.drawingObjects.handleSlideComments(e, x, y, pageIndex);
+        if(ret)
+        {
+            return ret;
+        }
         var selection = this.drawingObjects.selection;
         var b_no_handle_selected = false;
         if(selection.groupSelection)

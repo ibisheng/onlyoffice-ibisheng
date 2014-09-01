@@ -129,3 +129,132 @@ DrawingObjectsController.prototype.editChart = function(binary)
         this.sendGraphicObjectProps();
     }
 };
+
+DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pageIndex)
+{
+
+    var comments = this.drawingObjects.slideComments.comments, i;
+    if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+    {
+        editor.asc_hideComments();
+        for(i = comments.length - 1; i > -1; --i)
+        {
+            comments[i].selected = false;
+        }
+    }
+
+    for(i = comments.length - 1; i > -1; --i)
+    {
+        if(comments[i].hit(x, y))
+        {
+            if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                comments[i].selected = true;
+                this.addPreTrackObject(new MoveComment(comments[i]));
+                this.changeCurrentState(new PreMoveCommentState(this, x, y, comments[i]));
+                this.drawingObjects.showDrawingObjects(true);
+                return true;
+            }
+            else
+            {
+                return {objectId: comments[i], cursorType: "move"}
+            }
+        }
+    }
+    if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+    {
+        this.drawingObjects.showDrawingObjects(true);
+        return false;
+    }
+    else
+    {
+        return null;
+    }
+
+};
+
+function PreMoveCommentState(drawingObjects, startX, startY, comment)
+{
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.comment = comment;
+}
+
+PreMoveCommentState.prototype =
+{
+    onMouseDown: function(e, x, y, pageIndex)
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {objectId: this.comment, cursorType: "move"}
+        }
+    },
+
+    onMouseMove: function(e, x, y, pageIndex)
+    {
+        if(Math.abs(this.startX - x) < MOVE_DELTA && Math.abs(this.startY - y) < MOVE_DELTA)
+            return;
+        this.drawingObjects.swapTrackObjects();
+        this.drawingObjects.changeCurrentState(new MoveCommentState(this.drawingObjects, this.startX, this.startY, this.comment));
+        this.drawingObjects.onMouseMove(e, x, y);
+    },
+
+    onMouseUp: function(e, x, y, pageIndex)
+    {
+        var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( this.comment.x, this.comment.y, this.drawingObjects.num);
+        editor.sync_HideComment();
+        editor.sync_ShowComment(this.comment.Id, Coords.X, Coords.Y );
+        this.drawingObjects.clearPreTrackObjects();
+        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+    }
+};
+
+function MoveCommentState(drawingObjects, startX, startY, comment)
+{
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.comment = comment;
+}
+
+MoveCommentState.prototype =
+{
+    onMouseDown: function(e, x, y, pageIndex)
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {objectId: this.comment, cursorType: "move"}
+        }
+    },
+
+    onMouseMove: function(e, x, y, pageIndex)
+    {
+        var dx = x - this.startX;
+        var dy = y - this.startY;
+        this.drawingObjects.arrTrackObjects[0].track(dx, dy);
+        this.drawingObjects.updateOverlay();
+    },
+
+    onMouseUp: function(e, x, y, pageIndex)
+    {
+        if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, this.comment.Get_Id()) === false)
+        {
+            History.Create_NewPoint();
+            this.drawingObjects.trackEnd();
+            this.drawingObjects.startRecalculate();
+        }
+        this.drawingObjects.clearTrackObjects();
+        this.drawingObjects.updateOverlay();
+        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+
+    }
+};

@@ -994,6 +994,12 @@ Slide.prototype =
         editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.num, this);
     },
 
+    showComment: function(Id, x, y)
+    {
+        editor.sync_HideComment();
+        editor.sync_ShowComment(Id, x, y );
+    },
+
 
 
     getWorksheet: function()
@@ -1338,6 +1344,8 @@ SlideComments.prototype =
         History.Add(this, {Type: historyitem_SlideCommentsAddComment, objectId: comment.Get_Id(), Pos:this.comments.length});
         this.comments.splice(this.comments.length, 0, comment);
     },
+
+
 
     changeComment: function(id, commentData)
     {

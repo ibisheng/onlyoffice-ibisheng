@@ -231,6 +231,18 @@ DrawingObjectsController.prototype =
         }
     },
 
+    handleSlideComments: function(e, x, y, pageIndex)
+    {
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return null;
+        }
+        else
+        {
+            return false;
+        }
+    },
+
     checkChartForProps: function(bStart)
     {
         if(bStart)

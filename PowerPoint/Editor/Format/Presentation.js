@@ -3619,7 +3619,7 @@ CPresentation.prototype =
                     this.DrawingDocument.m_oWordControl.GoToPage(i);
 
                     var Coords = this.DrawingDocument.ConvertCoordsToCursorWR_Comment(comments[j].x, comments[j].y, i);
-                    this.Slides[i].graphicObjects.showComment(Id, Coords.X, Coords.Y);
+                    this.Slides[i].showComment(Id, Coords.X, Coords.Y);
                     return;
                 }
             }

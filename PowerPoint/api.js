@@ -1224,9 +1224,9 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 				oTextPrMap[Item]( this, TextPr[Item] );
 		}
 
-        if (TextPr.Color !== undefined && TextPr.unifill !== undefined)
+        if (TextPr.Unifill !== undefined)
         {
-            this.sync_TextColor2(TextPr.unifill, TextPr.Color);
+            this.sync_TextColor2(TextPr.Unifill);
         }
 	}
 }
@@ -2286,7 +2286,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
     _unifill.fill = new CSolidFill();
     _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color);
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { unifill : _unifill } ) );
+    this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : _unifill } ) );
 }
 asc_docs_api.prototype.put_ParagraphShade = function(is_flag, r, g, b)
 {
@@ -2338,32 +2338,36 @@ asc_docs_api.prototype.sync_ListType = function(NumPr){
 asc_docs_api.prototype.sync_TextColor = function(Color){
 	this.asc_fireCallback("asc_onTextColor", new CColor( Color.r, Color.g, Color.b ));
 }
-asc_docs_api.prototype.sync_TextColor2 = function(unifill, _color)
+asc_docs_api.prototype.sync_TextColor2 = function(unifill)
 {
+    var _color;
     if (unifill.fill == null)
         return;
     else if (unifill.fill.type == FILL_TYPE_SOLID)
     {
+        _color = unifill.getRGBAColor();
         var color = CreateAscColor(unifill.fill.color);
-        color.put_r(_color.r);
-        color.put_g(_color.g);
-        color.put_b(_color.b);
+        color.put_r(_color.R);
+        color.put_g(_color.G);
+        color.put_b(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
     else if (unifill.fill.type == FILL_TYPE_GRAD)
     {
+        _color = unifill.getRGBAColor();
         var color = CreateAscColor(unifill.fill.colors[0].color);
-        color.put_r(_color.r);
-        color.put_g(_color.g);
-        color.put_b(_color.b);
+        color.put_r(_color.R);
+        color.put_g(_color.G);
+        color.put_b(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
     else
     {
+        _color = unifill.getRGBAColor();
         var color = new CAscColor();
-        color.put_r(_color.r);
-        color.put_g(_color.g);
-        color.put_b(_color.b);
+        color.put_r(_color.R);
+        color.put_g(_color.G);
+        color.put_b(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
 }
