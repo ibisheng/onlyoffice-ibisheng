@@ -572,7 +572,7 @@ CTextBody.prototype =
         var _t;
         var _body_pr = this.getBodyPr();
         var sp = this.parent;
-        if(isRealObject(sp.spPr.geometry) && isRealObject(sp.spPr.geometry.rect))
+        if(isRealObject(sp.spPr) && isRealObject(sp.spPr.geometry) && isRealObject(sp.spPr.geometry.rect))
         {
             var _rect = sp.spPr.geometry.rect;
             _l = _rect.l + _body_pr.lIns;
