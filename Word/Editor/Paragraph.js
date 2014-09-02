@@ -14474,9 +14474,7 @@ function CParagraphSearchPosXY()
     this.CurX           = 0;
     this.CurY           = 0;
     this.X              = 0;
-    this.Y              = 0;
     this.DiffX          = 1000000; // километра для ограничения должно хватить
-    this.DiffY          = 1000000;
     this.NumberingDiffX = 1000000; // километра для ограничения должно хватить
 
     this.Line      = 0;

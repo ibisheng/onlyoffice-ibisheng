@@ -476,7 +476,26 @@ CMathBase.prototype =
     {
      return this.elements[x][y];
     },
+    IsOneLineText: function() // for degree
+    {
+        var bOneLineText = true;
+        if(this.nRow == 1)
+        {
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if( !this.elements[0][j].IsOneLineText() )
+                {
+                    bOneLineText = false;
+                    break;
+                }
+            }
+        }
+        else
+            bOneLineText = false;
 
+
+        return bOneLineText;
+    },
     ////    For Edit   /////
 
     getGapsInside: function(GapsInfo)
@@ -899,9 +918,6 @@ CMathBase.prototype =
             CurPos_Y = 0;
 
         }
-
-        /*var str = "Start: Outside " + this.SelectStart.bOutside + ", X " + this.SelectStart.X + ", Y " + this.SelectStart.Y + " ; "  + "End: Outside " + this.SelectEnd.bOutside +  ", X " + this.SelectEnd.X + ", Y " + this.SelectEnd.Y;
-        console.log(str);*/
 
         return SearchPos.Found;
     },

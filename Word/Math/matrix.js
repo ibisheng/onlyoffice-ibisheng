@@ -283,7 +283,11 @@ CMathMatrix.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLi
         H += Heights[i] + this.gaps.row[i];
     }
 
-    var SearchCurX = SearchPos.CurX + this.GapLeft + W_CurX ;
+    var PrevSearchCurX = SearchPos.CurX;
+
+    SearchPos.CurX += this.GapLeft + W_CurX;
+
+    //var SearchCurX = SearchPos.CurX + this.GapLeft + W_CurX ;
 
     if(this.kind === MATH_MATRIX)
     {
@@ -299,10 +303,9 @@ CMathMatrix.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLi
         SearchPos.Pos.Update(CurrY, Depth + 1);
     }
 
-    SearchPos.CurX = SearchCurX + this.size.width;
+    SearchPos.CurX = PrevSearchCurX + this.size.width;
 
     return result;
-
 }
 CMathMatrix.prototype.getMetrics = function(RPI)
 {

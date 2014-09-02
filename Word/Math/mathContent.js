@@ -4126,19 +4126,23 @@ CMathContent.prototype =
 
         return gaps;
     },
-    IsOnlyText: function()
+    IsOneLineText: function()   // for degree
     {
-        var bOnlyText = true;
+        var bOneLineText = true;
+
         for(var i = 0; i < this.content.length; i++)
         {
             if(this.content[i].Type == para_Math_Composition)
             {
-                bOnlyText = false;
-                break;
+                if(!this.content[i].IsOneLineText())
+                {
+                    bOneLineText = false;
+                    break;
+                }
             }
         }
 
-        return bOnlyText;
+        return bOneLineText;
     },
     draw: function(x, y, pGraphics)
     {
@@ -4217,11 +4221,6 @@ CMathContent.prototype =
             PosInfo.SetInfoPoints(this.InfoPoints);
             PosInfo.ApplyAlign();
 
-
-            if(this.Id == "91")
-            {
-                console.log("setPosition " + PosInfo.x);
-            }
         }
 
         for(var i=0; i < this.content.length; i++)
@@ -4317,32 +4316,34 @@ CMathContent.prototype =
 
         return result;
     },
-    Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
-        _X = this.pos.x + this.ParaMath.X;
+        X = this.pos.x + this.ParaMath.X;
         Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-
 
         if(this.RecalcInfo.bEqqArray)
         {
             var PointInfo = new CMathPointInfo();
             PointInfo.SetInfoPoints(this.InfoPoints);
 
-            _X += PointInfo.GetAlign();
+            X += PointInfo.GetAlign();
 
             for(var i = 0; i < this.CurPos; i++)
             {
-                if(this.content[this.CurPos].Type == para_Math_Run)
-                    this.content[i].Recalculate_CurPos(_X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+                if(this.content[i].Type == para_Math_Run)
+                {
+                    var res = this.content[i].Recalculate_CurPos(X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+                    X = res.X;
+                }
                 else
-                    _X += this.content[i].size.width;
+                    X += this.content[i].size.width;
             }
         }
         else
-            _X += this.WidthToElement[this.CurPos];
+            X += this.WidthToElement[this.CurPos];
 
 
-        return this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+        return this.content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
 
     },
     Check_NearestPos: function(ParaNearPos, Depth)
@@ -4799,6 +4800,31 @@ CMathContent.prototype =
                     {
                         SearchPos.Pos.Update(pos, Depth);
                         result = true;
+                    }
+
+                    if(SearchPos.InText == false)
+                    {
+                        if(this.content[pos-1].Is_Empty())
+                        {
+                            SearchPos.CurX -= this.content[pos].size.width;
+
+                            if( this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
+                            {
+                                SearchPos.Pos.Update(pos-1, Depth);
+                                result = true;
+                            }
+
+                            SearchPos.CurX += this.content[pos].size.width;
+                        }
+
+                        /*if(this.content[pos+1].Is_Empty())
+                        {
+                            if( this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
+                            {
+                                SearchPos.Pos.Update(pos, Depth);
+                                result = true;
+                            }
+                        }*/
                     }
                 }
                 else

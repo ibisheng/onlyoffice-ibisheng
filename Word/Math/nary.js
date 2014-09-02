@@ -1854,14 +1854,14 @@ CSurface.prototype.getCoord = function()
     X[42] = 24855.55; Y[42] = 312.82;
 
 
-    var t = Y[1];
+    /*var t = Y[1];
     for(var i = 0 ; i < X.length; i++)
     {
         var yy = Math.round((Y[i] - t)*100)/100;
         var str = "X[" + i + "] = " + X[i] + "; Y[" + i + "] = " + yy + ";";
         console.log(str);
 
-    }
+    }*/
 
     var W = X[11],
         H = Y[21];

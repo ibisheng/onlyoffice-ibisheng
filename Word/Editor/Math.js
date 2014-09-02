@@ -1335,6 +1335,14 @@ ParaMath.prototype =
                 SearchPos.DiffX =  0.001;
             }
 
+            /*var str = "";
+            for(var i = 0; i < SearchPos.Pos.Data.length; i++)
+            {
+                str += SearchPos.Pos.Data[i] + " ";
+            }
+
+            console.log(str);*/
+
 
             /*if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
             {

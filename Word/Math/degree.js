@@ -136,9 +136,11 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     this.upIter = 0;
 
     var oBase = this.elements[0][0];
-    var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
+    //var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
 
-    if(bBaseOnlyText)
+    var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
+
+    if(bOneLineText)
     {
         //var UpBaseline =  1.786*shCenter; // baseline итератора
         var UpBaseline = 1.65*shCenter; // baseline итератора
@@ -156,6 +158,8 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     {
         this.upBase = iter.ascent - 1.2*shCenter;
         var ascBase = base.ascent - shCenter > 0.27*mgCtrPrp.FontSize ? base.ascent - shCenter : 2/3*base.ascent;
+
+        // ограничение для случая, когда дескент итератора >> высоты основания
         if(iter.height - this.upBase > ascBase)
             this.upBase = iter.height - ascBase;
     }
@@ -187,9 +191,11 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     width += this.GapLeft + this.GapRight;
 
     var oBase = this.elements[0][0];
-    var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
+    //var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
 
-    if(bBaseOnlyText)
+    var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
+
+    if(bOneLineText)
     {
         var DownBaseline = 0.9*shCenter;
 
@@ -202,8 +208,15 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     {
         this.upIter = base.height + 0.9*shCenter - iter.ascent;
 
-        if(base.ascent - shCenter > this.upIter)
-            this.upIter = base.height - base.ascent + shCenter;
+        /*if(base.ascent - shCenter > this.upIter)
+            this.upIter = base.height - base.ascent + shCenter;*/
+
+        // ограничение для случая, когда аскент итератора >> высоты основания
+        /*if(base.ascent - shCenter > this.upIter)
+            this.upIter = base.ascent - shCenter;*/
+
+        if(base.ascent - 2*shCenter > this.upIter)
+            this.upIter = base.ascent - 2*shCenter;
     }
 
     var height = this.upIter + iter.height;
@@ -833,7 +846,7 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure, RPI)
         var upDesc = 0,
             downAsc = 0;
 
-        if(!base.IsJustDraw() && base.IsOnlyText())
+        if(!base.IsJustDraw() && base.IsOneLineText())
         {
             upDesc = 1.5*shIter;
             downAsc = 1.2*shIter;
