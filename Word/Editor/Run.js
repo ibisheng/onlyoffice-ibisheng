@@ -3740,67 +3740,6 @@ ParaRun.prototype =
             // Проверяем, попали ли мы в данный элемент
             var Diff = SearchPos.X - SearchPos.CurX;
 
-            /*if(this.Type == para_Math_Run)
-            {
-                var r0 = SearchPos.Y - (SearchPos.CurY - this.size.ascent),
-                    r1 = r0 - this.size.height;
-                var DiffY = Math.abs(r0) < Math.abs(r1) ? Math.abs(r0) : Math.abs(r1);
-
-                if (Diff*Diff + DiffY*DiffY < SearchPos.DiffXY + 0.001)
-                {
-                    SearchPos.DiffXY = Diff*Diff + DiffY*DiffY;
-                    SearchPos.Pos.Update( CurPos, Depth );
-                    Result = true;
-
-                    if(Diff >= - 0.001 && Diff <= TempDx + 0.001 &&  r0 > - 0.001 && r1 < -0.001)
-                    {
-                        SearchPos.InTextPos.Update( CurPos, Depth );
-                        SearchPos.InText = true;
-                    }
-                }
-
-
-                //SearchPos.DiffX = Math.abs( Diff );
-                //SearchPos.Pos.Update( CurPos, Depth );
-                //Result = true;
-
-
-                // almost work
-                /*//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//*/
-                *//*var r0 = SearchPos.Y - (SearchPos.CurY - this.size.ascent),
-                    r1 = r0 - this.size.height;
-
-                var DiffY = Math.abs(r0) < Math.abs(r1) ? Math.abs(r0) : Math.abs(r1);
-
-                if(Math.abs( Diff ) < SearchPos.DiffX + 0.001)
-                {
-                    var delta = Math.abs( Diff ) - SearchPos.DiffX;
-                    var bUpdate = !(Math.abs(delta) < 0.1 && (DiffY > SearchPos.DiffY));
-
-                    if( bUpdate )
-                    {
-                        SearchPos.DiffX = Math.abs( Diff );
-                        SearchPos.DiffY = DiffY;
-                        SearchPos.Pos.Update( CurPos, Depth );
-                        Result = true;
-
-                        if(Diff >= - 0.001 && Diff <= TempDx + 0.001)
-                        {
-                            SearchPos.InTextPos.Update( CurPos, Depth );
-                            SearchPos.InText = true;
-                        }
-                    }
-                }*//*
-                /*//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//*/
-
-                *//*if ( Diff >= - 0.001 && Diff <= TempDx + 0.001 )
-                {
-                    SearchPos.InTextPos.Update( CurPos, Depth );
-                    SearchPos.InText = true;
-                }*//*
-
-            }
-            else*/
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 && !bNotUpdate)
             {
                 SearchPos.DiffX = Math.abs( Diff );
@@ -3851,72 +3790,13 @@ ParaRun.prototype =
         {
             var Diff = SearchPos.X - SearchPos.CurX;
 
-           /* var r0 = SearchPos.Y - (SearchPos.CurY - this.size.ascent),
-                r1 = r0 - this.size.height;
-
-            var DiffY = Math.abs(r0) < Math.abs(r1) ? Math.abs(r0) : Math.abs(r1);
-
-            if (Diff*Diff + DiffY*DiffY < SearchPos.DiffXY + 0.001)
-            {
-                SearchPos.DiffXY = Diff*Diff + DiffY*DiffY;
-                SearchPos.Pos.Update( CurPos, Depth );
-                Result = true;
-                if(Diff >= - 0.001 && Diff <= TempDx + 0.001 &&  r0 > - 0.001 && r1 < -0.001)
-                {
-                    SearchPos.InTextPos.Update( CurPos, Depth );
-                    SearchPos.InText = true;
-                }
-            }*/
-
             if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 && !bNotUpdate)
             {
                 SearchPos.DiffX = Math.abs( Diff );
                 SearchPos.Pos.Update( CurPos, Depth );
                 Result = true;
 
-                /*if ( Diff >= - 0.001 && Diff <= TempDx + 0.001 )
-                {
-                    SearchPos.InTextPos.Update( CurPos, Depth );
-                    SearchPos.InText = true;
-                }*/
             }
-
-
-            // almost work
-            //**//**//**//**//**//**//**//**//**//**//**//**//
-            /*var r0 = SearchPos.Y - (SearchPos.CurY - this.size.ascent),
-                r1 = r0 - this.size.height;
-
-            var DiffY;
-
-            if(r0 > 0 && r1 < 0)
-                DiffY = 0; // In Content
-            else
-                DiffY = Math.abs(r0) < Math.abs(r1) ? Math.abs(r0) : Math.abs(r1);
-
-            Diff = SearchPos.X - SearchPos.CurX;
-
-            if(Math.abs( Diff ) < SearchPos.DiffX + 0.001)
-            {
-                var delta = Math.abs( Diff ) - SearchPos.DiffX;
-                var bUpdate = !(Math.abs(delta) < 0.1 && (DiffY > SearchPos.DiffY));
-
-                if( bUpdate )
-                {
-                    SearchPos.DiffX = Math.abs( Diff );
-                    SearchPos.DiffY = DiffY;
-                    SearchPos.Pos.Update( CurPos, Depth );
-                    Result = true;
-
-                    if(Diff >= - 0.001 && Diff <= TempDx + 0.001)
-                    {
-                        SearchPos.InTextPos.Update( CurPos, Depth );
-                        SearchPos.InText = true;
-                    }
-                }
-            }*/
-
-            //**//**//**//**//**//**//**//**//**//**//**//**//
         }
 
         return Result;
