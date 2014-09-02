@@ -2964,8 +2964,6 @@ FormatParser.prototype =
                 nGroupSizeIndex++;
                 nGroupSize = cultureInfo.NumberGroupSizes[nGroupSizeIndex];
             }
-            else
-                nGroupSize = 1;
             nPrevIndex = nIndex + 1;
         }
         if (!bError) {
