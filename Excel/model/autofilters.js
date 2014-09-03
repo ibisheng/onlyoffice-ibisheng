@@ -1592,8 +1592,8 @@ var gUndoInsDelCellsFlag = true;
 				{
 					var oRange = Range.prototype.createFromBBox(aWs, aWs.AutoFilter.Ref);
 					var bbox = oRange.getBBox0();
-					//смотрим находится ли фильтр внутри выделенного фрагмента
-					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
+					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
+					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r1 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 					{
 						var oldFilter = aWs.AutoFilter.clone();
 						aWs.AutoFilter = null;
