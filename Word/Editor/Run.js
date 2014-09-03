@@ -4330,7 +4330,6 @@ ParaRun.prototype =
     Selection_Stop : function()
     {
     },
-
     Selection_Remove : function()
     {
         var Selection = this.State.Selection;

@@ -4006,11 +4006,10 @@ CMathContent.prototype =
 
         this.WidthToElement.length = 0;
 
-
         var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
 
-		if (!this.bRoot && this.content.length == 0)
-			this.fillPlaceholders();
+        if (!this.bRoot && this.content.length == 0)
+            this.fillPlaceholders();
 
         this.RecalcInfo.bEqqArray = RPI.bEqqArray;
 
@@ -4029,17 +4028,106 @@ CMathContent.prototype =
             }
             else if(this.content[pos].Type == para_Math_Run)
                 this.content[pos].Math_SetGaps(GapsInfo);
-
-            if(pos > 0)
-                this.recalculateSize_2(pos-1, oMeasure, Parent, ParaMath, RPI);
-
         }
 
         if(GapsInfo.Current !== null)
             GapsInfo.Current.GapRight = 0;
 
-        if(lng > 0)
-            this.recalculateSize_2(lng-1, oMeasure, Parent, ParaMath, RPI);
+        for(var pos = 0; pos < lng; pos++)
+        {
+            if(this.content[pos].Type == para_Math_Composition)
+            {
+                var NewRPI = RPI.Copy();
+                NewRPI.bEqqArray    = false;
+
+                this.content[pos].Resize(oMeasure, this, ParaMath, NewRPI, this.Compiled_ArgSz);
+
+                if(RPI.bEqqArray)
+                    this.InfoPoints.ContentPoints.UpdatePoint(this.content[pos].size.width);
+            }
+            else if(this.content[pos].Type == para_Math_Run)
+                this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.InfoPoints.ContentPoints);
+
+            this.WidthToElement[pos] = this.size.width;
+
+            var oSize = this.content[pos].size;
+            this.size.width += oSize.width;
+
+            var oDescent = oSize.height - oSize.ascent,
+                SizeDescent = this.size.height - this.size.ascent;
+
+            this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
+
+            this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
+        }
+    },
+    M_Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // если делать один цикл for для Resize, то надо избавиться от WidthToElement,
+                                                                      // т.к. корректно рассчитывать не получается, либо выставлять WidthToElement для пустыx Run (которые идут после мат объекта) на recalculateSize_2 мат объекта
+    {
+        if(ArgSize !== null && ArgSize !== undefined)
+        {
+            this.Compiled_ArgSz.value = this.ArgSize.value;
+            this.Compiled_ArgSz.Merge(ArgSize);
+        }
+
+        this.ParaMath = ParaMath;
+        if(Parent !== null)
+        {
+            this.bRoot = false;
+            this.Parent = Parent;
+        }
+
+        this.WidthToElement.length = 0;
+
+        var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
+
+		if (!this.bRoot && this.content.length == 0)
+			this.fillPlaceholders();
+
+        this.RecalcInfo.bEqqArray = RPI.bEqqArray;
+
+        var lng = this.content.length;
+
+        this.size.SetZero();
+
+        this.InfoPoints.SetDefault();
+
+        var PosUpdate = -1;
+
+        var bEmptyRun;
+
+        for(var pos = 0; pos < lng; pos++)
+        {
+            bEmptyRun = this.content[pos].Type == para_Math_Run && this.content[pos].Is_Empty();
+
+            if(this.content[pos].Type == para_Math_Composition)
+            {
+                this.content[pos].Set_CompiledCtrPrp(this.ParaMath);
+                this.content[pos].SetGaps(GapsInfo);
+            }
+            else if(this.content[pos].Type == para_Math_Run)
+                this.content[pos].Math_SetGaps(GapsInfo);
+
+            // если пропускаем расчет одного из элементов, то WidthToElement будет неправильно выставлен
+            // если выставлять WidthToElement на recalculateSize_2, то WidthToElement не будет выставлен для пустых Run
+            this.WidthToElement[pos] = this.size.width;
+
+            // для случая если между двумя мат объектами стоит пустой Run, то Gaps должны рассчитываться между двумя этими мат объектами
+            // и при расчете должны сначала выставиться у правого мат объекта Gaps, а потом рассчитываться размер левого объекта
+            if(!bEmptyRun)
+            {
+                if(PosUpdate >= 0)
+                    this.recalculateSize_2(PosUpdate, oMeasure, Parent, ParaMath, RPI);
+
+                PosUpdate = pos;
+            }
+        }
+
+        if(GapsInfo.Current !== null)
+            GapsInfo.Current.GapRight = 0;
+
+        if(PosUpdate != -1)
+            this.recalculateSize_2(PosUpdate, oMeasure, Parent, ParaMath, RPI);
 
     },
     recalculateSize_2: function(pos, oMeasure, Parent, ParaMath, RPI)
@@ -4056,8 +4144,6 @@ CMathContent.prototype =
         }
         else if(this.content[pos].Type == para_Math_Run)
             this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.InfoPoints.ContentPoints);
-
-        this.WidthToElement[pos] = this.size.width;
 
         var oSize = this.content[pos].size;
         this.size.width += oSize.width;
@@ -4528,12 +4614,6 @@ CMathContent.prototype =
     },
     Selection_DrawRange: function(_CurLine, _CurRange, SelectionDraw)
     {
-        /*var result = this.GetSelectContent();
-
-        var Start = result.Start,
-            End = result.End,
-            oCont = result.Content;*/
-
         var Start = this.Selection.Start,
             End = this.Selection.End;
 
@@ -4560,18 +4640,8 @@ CMathContent.prototype =
 
         for(var i = 0; i < this.content.length; i++)
         {
-            /*if( i >= Start && i < End + 1)
-                SelectionDraw.FindStart = false;
-            else
-                SelectionDraw.FindStart = true;*/
-
             DrawSelection = i >= Start && i <= End ? true : false;
-            /*if(i >= Start && i < End )
-            {
-                DrawSelection = true;
-            }
-            else
-                DrawSelection = false;*/
+
 
             if(DrawSelection == false)
                 this.content[i].Selection_Remove();
@@ -4910,12 +4980,6 @@ CMathContent.prototype =
                 pos++;
             }
         }
-
-        /*if(this.bRoot)
-        {
-            var pos = SearchPos.Pos.Get(Depth+1);
-            console.log("SearchPos.Pos " +  pos);
-        }*/
 
         return result;
     },

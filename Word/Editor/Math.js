@@ -1454,11 +1454,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_SelectionContentPos
 
-        //console.log("Set_SelectionContentPos");
-
-        /*if(this.bSelectionUse)
-            this.Selection_Remove();*/
-
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
         this.bSelectionUse = true;
     },
@@ -1466,6 +1461,7 @@ ParaMath.prototype =
     Selection_IsUse : function()
     {
         // TODO: ParaMath.Selection_IsUse
+
         return this.bSelectionUse;
     },
 
@@ -1478,8 +1474,6 @@ ParaMath.prototype =
         // TODO: ParaMath.Selection_Remove
 
         this.bSelectionUse = false;
-        console.log("Selection_Remove");
-
         this.Root.Selection_Remove();
     },
     Select_All : function(Direction)
