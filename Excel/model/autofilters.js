@@ -3260,7 +3260,7 @@ var gUndoInsDelCellsFlag = true;
 						cell = ws.model._getCell(cloneActiveRange.r1, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
-						if(n == cloneActiveRange.c2 /*&& cloneActiveRange.c2 > cloneActiveRange.c1*/)
+						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1/*&& cloneActiveRange.c2 > cloneActiveRange.c1*/)
 							cloneActiveRange.r1++;
 					}
 				}
