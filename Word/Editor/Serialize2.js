@@ -5321,7 +5321,7 @@ function BinaryFileReader(doc, openParams)
 		var oCommentsNewId = {};
 		for(var i in this.oReadResult.oComments)
 		{
-			if(this.oReadResult.oCommentsPlaces && this.oReadResult.oCommentsPlaces[i] && this.oReadResult.oCommentsPlaces[i].Start != null && this.oReadResult.oCommentsPlaces[i].End != null)
+			if(this.oReadResult.oCommentsPlaces && this.oReadResult.oCommentsPlaces[i] && this.oReadResult.oCommentsPlaces[i].Start != null && this.oReadResult.oCommentsPlaces[i].End != null && this.Document && this.Document.Comments && isCopyPaste === true)
 			{
 				var oOldComment = this.oReadResult.oComments[i];
 				var oNewComment = new CComment(this.Document.Comments, fInitCommentData(oOldComment))
