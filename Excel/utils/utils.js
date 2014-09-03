@@ -1223,7 +1223,7 @@
 			this.docStylesImage = "";
 			this.docStyles = null;
 
-			this.styleThumbnailWidth	= 80;
+			this.styleThumbnailWidth	= 104;
 			this.styleThumbnailHeight	= 38;
 			this.styleThumbnailWidthPt	= this.styleThumbnailWidth * 72 / 96;
 			this.styleThumbnailHeightPt	= this.styleThumbnailHeight * 72 / 96;
