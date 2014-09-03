@@ -872,7 +872,6 @@ function CMathContent()
 
     this.CurPos = 0;
     this.WidthToElement = [];
-    //this.WidthPoints    = []; /// for EqqArray Runs
     this.pos = new CMathPosition();   // относительная позиция
 
     //  Properties
@@ -4526,6 +4525,78 @@ CMathContent.prototype =
         if(!this.bRoot)
             this.Parent.SelectToParent();
 
+    },
+    Selection_DrawRange: function(_CurLine, _CurRange, SelectionDraw)
+    {
+        /*var result = this.GetSelectContent();
+
+        var Start = result.Start,
+            End = result.End,
+            oCont = result.Content;*/
+
+        var Start = this.Selection.Start,
+            End = this.Selection.End;
+
+        if(Start > End)
+        {
+            Start = this.Selection.End;
+            End   = this.Selection.Start;
+        }
+
+        SelectionDraw.StartX += this.pos.x /*+ oCont.WidthToElement[Start]*/;
+
+        var PointsInfo = new CMathPointInfo();
+        PointsInfo.SetInfoPoints(this.InfoPoints);
+
+        if(this.RecalcInfo.bEqqArray)
+        {
+            if(SelectionDraw.FindStart == true)
+                SelectionDraw.StartX += PointsInfo.GetAlign();
+            else
+                SelectionDraw.W += PointsInfo.GetAlign();
+        }
+
+        var DrawSelection = false;
+
+        for(var i = 0; i < this.content.length; i++)
+        {
+            /*if( i >= Start && i < End + 1)
+                SelectionDraw.FindStart = false;
+            else
+                SelectionDraw.FindStart = true;*/
+
+            DrawSelection = i >= Start && i <= End ? true : false;
+            /*if(i >= Start && i < End )
+            {
+                DrawSelection = true;
+            }
+            else
+                DrawSelection = false;*/
+
+            if(DrawSelection == false)
+                this.content[i].Selection_Remove();
+            else if(i > Start && i < End  && this.content[i].Type == para_Math_Run) /// чтобы избежать багов, которые возникают при выходе за границы формулы (при резком движении мышки например в направлении начала формулы)
+                this.content[i].Select_All();
+
+            if(this.content[i].Type == para_Math_Run)
+                this.content[i].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw, PointsInfo);
+            else
+            {
+                if(DrawSelection == true)
+                {
+                    SelectionDraw.W += this.content[i].size.width;
+                    SelectionDraw.FindStart = false;
+                }
+                else if(SelectionDraw.FindStart == true)
+                    SelectionDraw.StartX += this.content[i].size.width;
+            }
+        }
+
+        if(!this.bRoot)
+        {
+            SelectionDraw.StartY = this.ParaMath.Y + this.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
+            SelectionDraw.H = this.size.height;
+        }
     },
 
     ///////////////////////

@@ -761,8 +761,15 @@ CMathBase.prototype =
     },
     Selection_DrawRange: function(CurLine, CurPage, SelectionDraw) // первые два параметра нужны только для аналогичной функции в ParaRun
     {
-        SelectionDraw.W += this.size.width;
-        SelectionDraw.FindStart = false;
+        if(SelectionDraw.FindStart == false)
+        {
+            SelectionDraw.W += this.size.width;
+        }
+        /*else
+        {
+            SelectionDraw.StartX += this.size.width;
+        }*/
+        //SelectionDraw.FindStart = true;
     },
     SetRunEmptyToContent: function(bAll)
     {

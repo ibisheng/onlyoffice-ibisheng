@@ -872,13 +872,6 @@ ParaMath.prototype =
         //var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-        /*if(this.Id == "81")
-        {
-            console.log("CurLine " + _CurLine +"  CurRange " + _CurRange );
-            console.log("StartLine " + this.StartLine + " StartRange " + this.StartRange);
-            console.log("Current CurLine "+ CurLine + " Current CurRange " + CurRange);
-        }*/
-
 
         var result = {X: _X + this.Root.size.width};
 
@@ -1285,8 +1278,6 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Cursor_MoveToStartPos
 
-        //console.log("Cursor_MoveToStartPos");
-
         this.Root.Cursor_MoveToStartPos();
     },
 
@@ -1319,14 +1310,7 @@ ParaMath.prototype =
             var Dx = this.Root.size.width;
             var D = SearchPos.X - SearchPos.CurX;
 
-            /*var startDx = Math.abs(D),
-                endDx = Math.abs(D - Dx);*/
-
-            //var Diff = startDx < endDx ? startDx : endDx;
-
             var CurX = SearchPos.CurX;
-
-            //SearchPos.CurY = SearchPos.Y - this.Y;
 
             Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
@@ -1334,53 +1318,6 @@ ParaMath.prototype =
             {
                 SearchPos.DiffX =  0.001;
             }
-
-            /*var str = "";
-            for(var i = 0; i < SearchPos.Pos.Data.length; i++)
-            {
-                str += SearchPos.Pos.Data[i] + " ";
-            }
-
-            console.log(str);*/
-
-
-            /*if(Math.abs(Diff) < SearchPos.DiffX + 0.001)
-            {
-                if ( D >= - 0.001 && D <= Dx + 0.001 )
-                {
-                    var X = SearchPos.X,
-                        Y = SearchPos.Y;
-
-                    SearchPos.X -= this.X;
-                    SearchPos.Y -= this.Y;
-
-
-                    this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-
-                    SearchPos.X = X;
-                    SearchPos.Y = Y;
-
-
-                    //////////
-                    
-                    SearchPos.InText = true;
-                    SearchPos.DiffX =  0.001; // сравниваем расстояние до ближайшего элемента
-                }
-                else if(startDx < endDx)
-                {
-                    this.Get_StartPos(SearchPos.Pos, Depth);
-                    SearchPos.DiffX = Diff;
-                }
-                else
-                {
-                    this.Get_EndPos(false, SearchPos.Pos, Depth);
-                    SearchPos.DiffX = Diff - 0.0015;
-
-                }
-
-                Result = true;
-
-            }*/
 
             SearchPos.CurX = CurX + Dx;
         }
@@ -1517,6 +1454,11 @@ ParaMath.prototype =
     {
         // TODO: ParaMath.Set_SelectionContentPos
 
+        //console.log("Set_SelectionContentPos");
+
+        /*if(this.bSelectionUse)
+            this.Selection_Remove();*/
+
         this.Root.Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
         this.bSelectionUse = true;
     },
@@ -1536,6 +1478,7 @@ ParaMath.prototype =
         // TODO: ParaMath.Selection_Remove
 
         this.bSelectionUse = false;
+        console.log("Selection_Remove");
 
         this.Root.Selection_Remove();
     },
@@ -1563,9 +1506,14 @@ ParaMath.prototype =
 
                 var result = this.GetSelectContent();
 
+                result.Content.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+
+                /*
+
                 var Start = result.Start,
                     End = result.End,
                     oCont = result.Content;
+
 
                 SelectionDraw.StartX += oCont.pos.x + oCont.WidthToElement[Start];
 
@@ -1589,7 +1537,7 @@ ParaMath.prototype =
                     //SelectionDraw.StartY = this.Math.absPos.y + oCont.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
                     SelectionDraw.StartY = this.Y + oCont.pos.y; // выставляем так, чтобы для формул с различной высотой в одной строке, всё было ok
                     SelectionDraw.H = oCont.size.height;
-                }
+                }*/
 
             }
             else
@@ -1673,13 +1621,3 @@ ParaMath.prototype =
 		
 	}
 };
-
-/*
-var MATH_CTX = null;
-
-function TEST_MATH_ImageConverter()
-{
-    var dataImg = editor.WordControl.m_oLogicDocument.Content[0].Content[0].MathToImageConverter();
-
-    console.log(dataImg.ImageUrl);
-}*/

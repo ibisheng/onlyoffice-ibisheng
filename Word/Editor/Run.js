@@ -625,7 +625,7 @@ ParaRun.prototype =
         return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[0].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
     },
 
-    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo)
+    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointsInfo)
     {
         var Para = this.Paragraph;
 
@@ -666,8 +666,8 @@ ParaRun.prototype =
                 }
                 case para_Math_Ampersand:
                 {
-                    PointInfo.NextAlignRange();
-                    X += PointInfo.GetAlign();
+                    PointsInfo.NextAlignRange();
+                    X += PointsInfo.GetAlign();
                 }
             }
         }
@@ -3706,7 +3706,7 @@ ParaRun.prototype =
         }
     },
 
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, PointInfo)
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, PointsInfo)
     {
         var Result = false;
 
@@ -3729,8 +3729,8 @@ ParaRun.prototype =
 
             if(Item.Type == para_Math_Ampersand)
             {
-                PointInfo.NextAlignRange();
-                TempDx = PointInfo.GetAlign();
+                PointsInfo.NextAlignRange();
+                TempDx = PointsInfo.GetAlign();
             }
             else if ( para_Drawing != Item.Type || true === Item.Is_Inline() )
             {
@@ -4358,7 +4358,7 @@ ParaRun.prototype =
         }
     },
 
-    Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw)
+    Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw, PointsInfo)
     {
         var CurLine  = _CurLine - this.StartLine;
         var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -4395,7 +4395,12 @@ ParaRun.prototype =
                 }
                 else
                 {
-                    if ( para_Drawing !== Item.Type || true === Item.Is_Inline() )
+                    if(Item.Type == para_Math_Ampersand)
+                    {
+                        PointsInfo.NextAlignRange();
+                        SelectionDraw.StartX += PointsInfo.GetAlign();
+                    }
+                    else if ( para_Drawing !== Item.Type || true === Item.Is_Inline() )
                         SelectionDraw.StartX += Item.WidthVisible;
                 }
             }
@@ -4411,6 +4416,11 @@ ParaRun.prototype =
             {
                 if ( para_Drawing === Item.Type && true !== Item.Is_Inline() )
                     Item.Draw_Selection();
+                else if(Item.Type == para_Math_Ampersand)
+                {
+                    PointsInfo.NextAlignRange();
+                    SelectionDraw.W += PointsInfo.GetAlign();
+                }
                 else
                     SelectionDraw.W += Item.WidthVisible;
             }
