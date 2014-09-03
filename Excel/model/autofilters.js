@@ -4783,9 +4783,6 @@ var gUndoInsDelCellsFlag = true;
 						result.CustomFiltersObj.CustomFilters[1] = new CustomFilter();
 						result.CustomFiltersObj.CustomFilters[1].Operator = valFilter.filter2;
 						result.CustomFiltersObj.CustomFilters[1].Val = valFilter.valFilter2;
-
-						if(valFilter.isChecked == true)
-							result.CustomFiltersObj.And = true;
 					}
 					else
 					{
@@ -4796,6 +4793,10 @@ var gUndoInsDelCellsFlag = true;
 						result.CustomFiltersObj.CustomFilters[0].Val = valFilter.valFilter2;
 					}
 				}
+				
+				if(valFilter.isChecked == true && valFilter.filter2)
+					result.CustomFiltersObj.And = true;
+				
 				return result;
 			},
 			
