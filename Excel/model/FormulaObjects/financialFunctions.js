@@ -885,11 +885,14 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
 
     var per = 1 / rate, coeff;
 
-    if ( cost == salvage || period > per ) {
+    if ( cost == salvage /*|| period > per*/ ) {
         return this.value = new cNumber( 0 );
     }
 
-    if ( per >= 3 && per <= 4 ) {
+    if( per < 3){
+        coeff = 1;
+    }
+    else if ( per >= 3 && per <= 4 ) {
         coeff = 1.5;
     }
     else if ( per >= 5 && per <= 6 ) {

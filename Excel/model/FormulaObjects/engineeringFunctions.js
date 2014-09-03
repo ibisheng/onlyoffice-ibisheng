@@ -413,6 +413,7 @@ Complex.prototype = {
             hasReal = !hasImag || (this.real != 0);
 
         if ( hasReal ) {
+
             res.push( this.real );
         }
         if ( hasImag ) {
@@ -427,7 +428,7 @@ Complex.prototype = {
             else {
                 this.img > 0 && hasReal ? res.push( "+" + this.img ) : res.push( this.img );
             }
-            res.push( this.suffix );
+            res.push( this.suffix ? this.suffix : "i" );
         }
         return res.join( "" );
     },
