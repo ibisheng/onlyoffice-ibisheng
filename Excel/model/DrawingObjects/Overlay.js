@@ -2440,6 +2440,8 @@ CSlideBoundsChecker.prototype =
         return false;
     },
 
+    GetTextPr: function()
+    {},
 
     EndDraw : function(){},
     put_GlobalAlpha : function(enable, alpha)
