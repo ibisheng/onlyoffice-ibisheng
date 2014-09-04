@@ -201,6 +201,7 @@ ParaMath.prototype =
 						oMRun.Add(oItem, true);
 						oStartContent.Remove_FromContent(i, 1, false);
 					}
+					oStartContent.Selection_Remove();
 				}
 
 				oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);

@@ -6624,9 +6624,9 @@ CMathContent.prototype =
 						this.CreateElem(oEqArr, del2Elem);
 						
 						var eqArrElem0 = oEqArr.getElement(0);
-						this.AddText(eqArrElem0, "-x,&x<0");
+						this.AddText(eqArrElem0, "-x,  &x<0");
 						var eqArrElem0 = oEqArr.getElement(1);
-						var sTxt = "x,&x" + String.fromCharCode(8805) + "0";
+						var sTxt = "x,  &x" + String.fromCharCode(8805) + "0";
 						this.AddText(eqArrElem0,sTxt);
 						break;
 			case 124:	props = {ctrPrp: new CTextPr(), column:1};
@@ -7589,8 +7589,14 @@ CMathContent.prototype =
 			var items = [];
             for (var i=0; i < sText.length; i++)
             {
-                var oText = new CMathText(false);
-                oText.addTxt(sText[i]);				
+                var oText = null;
+				if ( 0x0026 == sText[i].charCodeAt(0))
+					oText = new CMathAmp();
+				else
+				{
+					oText = new CMathText(false);
+					oText.addTxt(sText[i]);
+				}
 				MathRun.Add(oText, true);
             }			
 			oElem.DeleteEmptyRuns();

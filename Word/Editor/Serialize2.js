@@ -596,7 +596,9 @@ var c_oSer_OMathContentType = {
 	Sup: 56,
 	MText: 57,
 	CtrlPr: 58,
-	Id: 59
+	Id: 59,	
+	pagebreak: 60,
+	linebreak: 61
 };
 var c_oSer_HyperlinkType = {
     Content: 0,
@@ -1914,10 +1916,11 @@ function Binary_oMathWriter(memory, oMathPara)
 		{
 			var Item = oMRun.Content[CurPos];
 			switch ( Item.Type )
-            {
-				case para_Math_Text : oText += String.fromCharCode(Item.value); break;
+            {	
+				case para_Math_Ampersand :	oText += "&"; break;
+				case para_Math_Text :		oText += String.fromCharCode(Item.value); break;
             	case para_Space:
-            	case para_Tab  : oText += " "; break;
+            	case para_Tab : 			oText += " "; break;
             }
 		}
 		
@@ -9678,6 +9681,7 @@ function Binary_oMathReader(stream)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
+		var oNewElem = null;
 		
 		if (c_oSer_OMathContentType.MText === type)
         {
@@ -9686,17 +9690,20 @@ function Binary_oMathReader(stream)
 				text = this.stream.GetString2();
 			for (var i = 0; i < text.length; ++i)
             {
-				//управляющие символы
-				if (0x001F < text[i].charCodeAt(0))
+				var oText = null;
+				if ( 0x0026 == text[i].charCodeAt(0))
+					oText = new CMathAmp();				
+				else if (0x001F < text[i].charCodeAt(0)) //управляющие символы
 				{
-					var oText = new CMathText(false);
-					oText.addTxt(text[i]);
-					oMRun.Content.splice( i, 0, oText );
+					oText = new CMathText(false);					
+					oText.addTxt(text[i]);					
 				}
 				/*в будущем переделка под para_space
 				else if (text[i] == ' ')
-					oMRun.Content.splice(oMRun.Content.length, 0, new ParaSpace(1));
+					oText = new ParaSpace(1)
 				*/
+				if (oText)
+					oMRun.Content.splice( i, 0, oText );
             }
 
 			if (oParent)	
@@ -9718,8 +9725,23 @@ function Binary_oMathReader(stream)
 			res = this.brPrr.Read(length, rPr);	
 			oMRun.Set_Pr(rPr);
 		}
+		else if (c_oSer_OMathContentType.pagenum === type)
+        {
+            oNewElem = new ParaPageNum();
+        }
+        else if (c_oSer_OMathContentType.pagebreak === type)
+        {
+            oNewElem = new ParaNewLine( break_Page );
+        }
         else
             res = c_oSerConstants.ReadUnknown;
+			
+		if (null != oNewElem)
+        {
+			//TODO обработка переноса
+			//oMRun.Add_ToContent(0, oNewElem, false);
+        }
+		
         return res;
     };	
     this.ReadMathMRPr = function(type, length, props)

@@ -794,6 +794,15 @@ CMathAmp.prototype =
     IsAlignPoint: function()
     {
         return this.Type == para_Math_Ampersand;
+    },
+	Write_ToBinary : function(Writer)
+    {
+        // Long : Type
+        Writer.WriteLong( this.Type );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
     }
 
 }

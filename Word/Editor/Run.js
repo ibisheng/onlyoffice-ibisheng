@@ -7225,6 +7225,7 @@ ParaRun.prototype =
         // Long     : Количество элементов
         // Array of variable : массив с элементами
 
+		Writer.WriteLong( this.Type );
         var ParagraphToWrite, PrToWrite, ContentToWrite;
         if(this.StartState)
         {
@@ -7242,7 +7243,7 @@ ParaRun.prototype =
         Writer.WriteString2( this.Id );
         Writer.WriteString2( null !== ParagraphToWrite && undefined !== ParagraphToWrite ? ParagraphToWrite.Get_Id() : "" );
         PrToWrite.Write_ToBinary( Writer );
-
+		
         var Count = ContentToWrite.length;
         Writer.WriteLong( Count );
         for ( var Index = 0; Index < Count; Index++ )
@@ -7260,10 +7261,13 @@ ParaRun.prototype =
         // Long     : Количество элементов
         // Array of variable : массив с элементами
 
+		this.Type      = Reader.GetLong();
         this.Id        = Reader.GetString2();
         this.Paragraph = g_oTableId.Get_ById( Reader.GetString2() );
         this.Pr        = new CTextPr();
         this.Pr.Read_FromBinary( Reader );
+		if ( this.Type == para_Math_Run)
+			this.MathPrp = new CMPrp();
 
         if(undefined !== editor && true === editor.isDocumentEditor)
         {
