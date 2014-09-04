@@ -711,6 +711,16 @@ CDrawingDocument.prototype =
     },
 
     // search
+    StartSearchTransform : function(transform)
+    {
+        // TODO:
+    },
+
+    EndSearchTransform : function()
+    {
+        // TODO:
+    },
+
     StartSearch : function()
     {
         this.Native["DD_StartSearch"]();
