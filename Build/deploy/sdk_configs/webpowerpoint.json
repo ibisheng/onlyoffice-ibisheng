@@ -139,7 +139,9 @@
                  "../../PowerPoint/Editor/Format/ImagePrototype.js",
                  "../../PowerPoint/Editor/Format/GroupPrototype.js",
                  "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
-                 "../../PowerPoint/Editor/Format/GraphicFrame.js"
+                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
+                 "../../PowerPoint/api-all.js",
+                 "../../PowerPoint/Build/Log/apiExport.js"
             ],
             "dst": "../../PowerPoint/sdk-all.js",
             "externs": [
