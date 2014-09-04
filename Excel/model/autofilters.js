@@ -3235,6 +3235,8 @@ var gUndoInsDelCellsFlag = true;
 							if(k < cloneActiveRange.c1)
 							{
 								cloneActiveRange.c1 = k;isEnd = false;
+								//TODO пересмотреть правку
+								k = k - 2;
 							}	
 							else if(k > cloneActiveRange.c2)
 							{
