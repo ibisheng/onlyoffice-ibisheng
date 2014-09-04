@@ -1806,6 +1806,38 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             _return = _stream;
             break;
         }
+        case 62: // ASC_MENU_EVENT_TYPE_SEARCH_FINDTEXT
+        {
+            var _ret = this.asc_findText(_params[0], _params[1], _params[2]);
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteLong"](_ret);
+            _return = _stream;
+            break;
+        }
+        case 63: // ASC_MENU_EVENT_TYPE_SEARCH_REPLACETEXT
+        {
+            var _ret = this.asc_replaceText(_params[0], _params[1], _params[2], _params[3]);
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteBool"](_ret);
+            _return = _stream;
+            break;
+        }
+        case 64: // ASC_MENU_EVENT_TYPE_SEARCH_SELECTRESULTS
+        {
+            this.asc_selectSearchingResults(_params[0]);
+            break;
+        }
+        case 65: // ASC_MENU_EVENT_TYPE_SEARCH_ISSELECTRESULTS
+        {
+            var _ret = this.asc_isSelectSearchingResults();
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteBool"](_ret);
+            _return = _stream;
+            break;
+        }
         default:
             break;
     }
@@ -4247,6 +4279,73 @@ function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
 
     return _markup;
 }
+
+asc_docs_api.prototype.sync_CanUndoCallback = function(bCanUndo)
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteBool"](bCanUndo);
+    window["native"]["OnCallMenuEvent"](60, _stream); // ASC_MENU_EVENT_TYPE_CAN_UNDO
+};
+asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteBool"](bCanRedo);
+    window["native"]["OnCallMenuEvent"](61, _stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
+};
+
+// find -------------------------------------------------------------------------------------------------
+asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
+{
+    var SearchEngine = editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
+
+    var Id = this.WordControl.m_oLogicDocument.Search_GetId( isNext );
+
+    if ( null != Id )
+        this.WordControl.m_oLogicDocument.Search_Select( Id );
+
+    return SearchEngine.Count;
+};
+
+asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
+{
+    this.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
+
+    if ( true === isReplaceAll )
+    {
+        this.WordControl.m_oLogicDocument.Search_Replace(replaceWith, true, -1);
+        return true;
+    }
+    else
+    {
+        var CurId = this.WordControl.m_oLogicDocument.SearchEngine.CurId;
+        var bDirection = this.WordControl.m_oLogicDocument.SearchEngine.Direction;
+        if ( -1 != CurId )
+            this.WordControl.m_oLogicDocument.Search_Replace(replaceWith, false, CurId);
+
+        var Id = this.WordControl.m_oLogicDocument.Search_GetId( bDirection );
+
+        if ( null != Id )
+        {
+            this.WordControl.m_oLogicDocument.Search_Select( Id );
+            return true;
+        }
+
+        return false;
+    }
+};
+
+asc_docs_api.prototype.asc_selectSearchingResults = function(bShow)
+{
+    this.WordControl.m_oLogicDocument.Search_Set_Selection(bShow);
+};
+
+asc_docs_api.prototype.asc_isSelectSearchingResults = function()
+{
+    return this.WordControl.m_oLogicDocument.Search_Get_Selection();
+};
+// endfind ----------------------------------------------------------------------------------------------
 
 // font engine -------------------------------------
 var FONT_ITALIC_ANGLE   = 0.3090169943749;
