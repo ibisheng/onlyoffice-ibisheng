@@ -248,7 +248,7 @@ function NativeOpenFile()
     }
 }
 
-function NativeOpenFile2()
+function NativeOpenFile2(_params)
 {
 	window["CreateMainTextMeasurerWrapper"]();
 
@@ -257,7 +257,13 @@ function NativeOpenFile2()
     var doc_bin = window.native.GetFileString(window.g_file_path);
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");       
+        _api = new window["asc_docs_api"]("");
+
+        if (undefined !== _api.Native_Editor_Initialize_Settings)
+        {
+            _api.Native_Editor_Initialize_Settings(_params);
+        }
+
         _api.asc_nativeOpenFile(doc_bin);
         
         if (_api.NativeAfterLoad)

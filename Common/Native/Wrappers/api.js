@@ -4818,3 +4818,46 @@ window["use_native_fonts_only"] = true;
 
 // declarate unused methods and objects
 window["ftm"] = FT_Memory;
+
+
+asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
+{
+    if (!_params)
+        return;
+
+    var _current = { pos : 0 };
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_current.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                GlobalSkin.STYLE_THUMBNAIL_WIDTH = _params[_current.pos++];
+                break;
+            }
+            case 1:
+            {
+                GlobalSkin.STYLE_THUMBNAIL_HEIGHT = _params[_current.pos++];
+                break;
+            }
+            case 2:
+            {
+                TABLE_STYLE_WIDTH_PIX = _params[_current.pos++];
+                break;
+            }
+            case 3:
+            {
+                TABLE_STYLE_HEIGHT_PIX = _params[_current.pos++];
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+};
