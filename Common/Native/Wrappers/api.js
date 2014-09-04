@@ -1838,6 +1838,73 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             _return = _stream;
             break;
         }
+        case 17:
+        {
+            var _sect_width = undefined;
+            var _sect_height = undefined;
+            var _sect_orient = undefined;
+
+            while (_continue)
+            {
+                var _attr = _params[_current.pos++];
+                switch (_attr)
+                {
+                    case 0:
+                    {
+                        _sect_width = _params[_current.pos++];
+                        break;
+                    }
+                    case 1:
+                    {
+                        _sect_height = _params[_current.pos++];
+                        break;
+                    }
+                    case 2:
+                    {
+                        // margin_left
+                       _current.pos++;
+                        break;
+                    }
+                    case 3:
+                    {
+                        // margin_top
+                        _current.pos++;
+                        break;
+                    }
+                    case 4:
+                    {
+                        // margin_right
+                        _current.pos++;
+                        break;
+                    }
+                    case 5:
+                    {
+                        // margin_bottom
+                        _current.pos++;
+                        break;
+                    }
+                    case 6:
+                    {
+                        _sect_orient = _params[_current.pos++];
+                        break;
+                    }
+                    case 255:
+                    default:
+                    {
+                        _continue = false;
+                        break;
+                    }
+                }
+            }
+
+            if (undefined !== _sect_width && undefined !== _sect_height)
+                this.change_DocSize(_sect_width, _sect_height);
+
+            if (undefined !== _sect_orient)
+                this.change_PageOrient(_sect_orient);
+
+            break;
+        }
         default:
             break;
     }
@@ -4346,6 +4413,59 @@ asc_docs_api.prototype.asc_isSelectSearchingResults = function()
     return this.WordControl.m_oLogicDocument.Search_Get_Selection();
 };
 // endfind ----------------------------------------------------------------------------------------------
+
+// sectionPr --------------------------------------------------------------------------------------------
+asc_docs_api.prototype.change_PageOrient = function(isPortrait)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        if (isPortrait)
+        {
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Portrait);
+            this.DocumentOrientation = isPortrait;
+        }
+        else
+        {
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Landscape);
+            this.DocumentOrientation = isPortrait;
+        }
+        this.sync_PageOrientCallback(editor.get_DocumentOrientation());
+    }
+};
+asc_docs_api.prototype.change_DocSize = function(width,height)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        if (this.DocumentOrientation)
+            this.WordControl.m_oLogicDocument.Set_DocumentPageSize(width, height);
+        else
+            this.WordControl.m_oLogicDocument.Set_DocumentPageSize(height, width);
+    }
+};
+asc_docs_api.prototype.sync_PageOrientCallback = function(isPortrait)
+{
+    this.DocumentOrientation = isPortrait;
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteByte"](6);
+    _stream["WriteBool"](this.DocumentOrientation);
+    _stream["WriteByte"](255);
+    this.Send_Menu_Event(17, _stream); // ASC_MENU_EVENT_TYPE_SECTION
+};
+asc_docs_api.prototype.sync_DocSizeCallback = function(width,height)
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteByte"](0);
+    _stream["WriteDouble2"](width);
+    _stream["WriteByte"](1);
+    _stream["WriteDouble2"](height);
+    _stream["WriteByte"](255);
+    this.Send_Menu_Event(17, _stream); // ASC_MENU_EVENT_TYPE_SECTION
+};
+// endsectionPr -----------------------------------------------------------------------------------------
 
 // font engine -------------------------------------
 var FONT_ITALIC_ANGLE   = 0.3090169943749;
