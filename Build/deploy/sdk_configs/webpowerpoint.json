@@ -80,7 +80,6 @@
                  "../../PowerPoint/Drawing/HtmlPage.js",
                  "../../PowerPoint/apiDefines.js",
                  "../../PowerPoint/apiCommon.js",
-                 "../../PowerPoint/api.js",
                  "../../Common/Drawings/Format/Constants.js",
                  "../../PowerPoint/themes/Themes.js",
                  "../../Common/Shapes/Serialize.js",
