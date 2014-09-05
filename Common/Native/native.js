@@ -411,6 +411,10 @@ window.native.Call_OnKeyUp = function(e)
 {
     return _api.Call_OnKeyUp(e);
 };
+window.native.Call_OnKeyboardEvent = function(e)
+{
+    return _api.Call_OnKeyboardEvent(e);
+};
 
 window.native.Call_CalculateResume = function()
 {

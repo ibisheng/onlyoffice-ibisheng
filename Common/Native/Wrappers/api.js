@@ -55,6 +55,10 @@ asc_docs_api.prototype["Call_OnKeyUp"] = function(e)
 {
     this.WordControl.m_oDrawingDocument.OnKeyUp(e);
 };
+asc_docs_api.prototype["Call_OnKeyboardEvent"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnKeyboardEvent(e);
+};
 
 asc_docs_api.prototype["Call_CalculateResume"] = function()
 {

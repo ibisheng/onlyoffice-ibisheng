@@ -1279,6 +1279,53 @@ CDrawingDocument.prototype =
         this.EndUpdateOverlay();
         return retValue;
     },
+
+    OnKeyboardEvent: function (_params)
+    {
+        if (this.IsFreezePage(this.m_lCurrentPage))
+            return;
+
+        var _len = _params.length / 4;
+
+        editor["Call_TurnOffRecalculate"]();
+
+        this.StartUpdateOverlay();
+
+        for (var i = 0; i < _len; i++)
+        {
+            var _offset = i * 4;
+            switch (_params[_offset])
+            {
+                case 4: // down
+                {
+                    this.IsKeyDownButNoPress = true;
+                    check_KeyboardEvent_Array(_params, _offset);
+                    this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+                    break;
+                }
+                case 5: // Press
+                {
+                    this.StartUpdateOverlay();
+                    check_KeyboardEvent_Array(_params, _offset);
+                    this.LogicDocument.OnKeyPress(global_keyboardEvent);
+                    break;
+                }
+                case 6: // up
+                {
+                    global_keyboardEvent.AltKey = false;
+                    global_keyboardEvent.CtrlKey = false;
+                    global_keyboardEvent.ShiftKey = false;
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        this.EndUpdateOverlay();
+
+        editor["Call_TurnOnRecalculate"]();
+    },
 	
 	__DD_ConvertCoordsFromCursor : function(x, y)
 	{
@@ -2030,6 +2077,18 @@ function check_KeyboardEvent(e)
 
     global_keyboardEvent.CharCode   = e["CharCode"];
     global_keyboardEvent.KeyCode    = e["KeyCode"];
+    global_keyboardEvent.Which      = null;
+}
+function check_KeyboardEvent_Array(_params, i)
+{
+    global_keyboardEvent.AltKey     = ((_params[i + 1] & 0x01) == 0x01);
+    global_keyboardEvent.CtrlKey    = ((_params[i + 1] & 0x02) == 0x02);
+    global_keyboardEvent.ShiftKey   = ((_params[i + 1] & 0x04) == 0x04);
+
+    global_keyboardEvent.Sender = null;
+
+    global_keyboardEvent.CharCode   = _params[i + 3];
+    global_keyboardEvent.KeyCode    = _params[i + 2];
     global_keyboardEvent.Which      = null;
 }
 
