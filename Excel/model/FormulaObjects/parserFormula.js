@@ -1285,7 +1285,7 @@ cName.prototype.toRef = function ( wsID ) {
             return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
         }
     }
-    return new cError( "#NAME!" );
+    return new cError( "#NAME?" );
 };
 
 /** @constructor */
