@@ -1032,7 +1032,7 @@ ScrollObject.prototype = {
                 _b = this.canvasH - arrow - 2;
 
             if ( _b > _y ){
-                this.roundRect( this.scroller.x + 1.5, _y + 0.5, this.scroller.w - 1, _b - _y, 2 );
+                this.roundRect( this.scroller.x + 1.5, _y + 0.5, this.scroller.w - 1, _b - _y );
             }
         }
         else if ( this.isHorizontalScroll && this.maxScrollX != 0 ) {
@@ -1044,7 +1044,7 @@ ScrollObject.prototype = {
                 _r = this.canvasW - arrow - 2;
 
             if ( _r > _x ){
-                this.roundRect( _x + 0.5, this.scroller.y + 1.5, _r - _x, this.scroller.h - 1, 2 );
+                this.roundRect( _x + 0.5, this.scroller.y + 1.5, _r - _x, this.scroller.h - 1 );
             }
         }
 
@@ -1322,7 +1322,7 @@ ScrollObject.prototype = {
                     that.scrollByY( that.settings.vscrollStep );
                 else if ( that.isHorizontalScroll )
                     that.scrollByX( that.settings.hscrollStep );
-                that._drawArrow( 3 );
+                that._drawArrow( ArrowStatus.upLeftArrowNonActive_downRightArrowActive );
                 scrollTimeout = setTimeout( doScroll, isFirst ? that.settings.initialDelay : that.settings.arrowRepeatFreq );
                 isFirst = false;
             };
@@ -1339,7 +1339,7 @@ ScrollObject.prototype = {
                     that.scrollByY( -that.settings.vscrollStep );
                 else if ( that.isHorizontalScroll )
                     that.scrollByX( -that.settings.hscrollStep );
-                that._drawArrow( 1 );
+                that._drawArrow( ArrowStatus.upLeftArrowActive_downRightArrowNonActive );
                 scrollTimeout = setTimeout( doScroll, isFirst ? that.settings.initialDelay : that.settings.arrowRepeatFreq );
                 isFirst = false;
             };
@@ -1390,7 +1390,7 @@ ScrollObject.prototype = {
         }
         else if ( this.that.settings.showArrows && (downHover || upHover) ) {
             this.that.scrollerStatus = ScrollOverType.NONE;
-            if ( !this.that.mouseDownArrow && !this.that.moveble) {
+            if ( !this.that.mouseDownArrow ) {
                 if ( upHover ) {
 //                    this.that._drawArrow( ArrowStatus.upLeftArrowHover_downRightArrowNonActive );
                     arrowStat = ArrowStatus.upLeftArrowHover_downRightArrowNonActive;
@@ -1489,7 +1489,9 @@ ScrollObject.prototype = {
                 this.that.scrollerStatus = ScrollOverType.NONE;
             }
         }
-        this.that._drawArrow( arrowStat );
+        if( this.that.mouseDownArrow ){
+            this.that._drawArrow( arrowStat );
+        }
         this.that._draw();
 
     },
