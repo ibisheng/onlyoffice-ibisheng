@@ -4831,18 +4831,16 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal) {
                 oThis.WriteCT_ValAx(axis);
             });
         }
-        // else if(axis instanceof CDateAx)
-        // {
-        // this.bs.WriteItem(c_oserct_plotareaDATEAX, function () {
-        // oThis.WriteCT_DateAx(axis);
-        // });
-        // }
-        // else if(axis instanceof CSerAx)
-        // {
-        // this.bs.WriteItem(c_oserct_plotareaSERAX, function () {
-        // oThis.WriteCT_SerAx(axis);
-        // });
-        // }
+        else if (axis instanceof CDateAx) {
+            this.bs.WriteItem(c_oserct_plotareaDATEAX, function () {
+                oThis.WriteCT_DateAx(axis);
+            });
+        }
+        else if (axis instanceof CSerAx) {
+            this.bs.WriteItem(c_oserct_plotareaSERAX, function () {
+                oThis.WriteCT_SerAx(axis);
+            });
+        }
     }
     if (null != oVal.dTable) {
         this.bs.WriteItem(c_oserct_plotareaDTABLE, function () {
