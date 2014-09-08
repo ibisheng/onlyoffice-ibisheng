@@ -279,7 +279,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
     var xDeltaIMG = 2, yDeltaIMG = 0, xDeltaBORDER = 2.5, yDeltaBORDER = 2.5;
     ctx.fillStyle = this.ColorBackNone;
-    ctx.fillRect( x + .5, y + .5, strokeW + 2.5, strokeH + 2.5 );
+    ctx.fillRect( x + .5, y + .5, strokeW + 3.5, strokeH + 3.5 );
     ctx.beginPath();
 
     switch ( mode ) {
@@ -991,7 +991,7 @@ ScrollObject.prototype = {
                 _h = this.canvasH - (_y << 1);
 
             if ( _h > 0 ){
-                this.context.rect( 1, _y, this.canvasW, _h );
+                this.context.rect( 0, _y -1 , this.canvasW, _h );
             }
         }
         else if ( this.isHorizontalScroll ) {
@@ -999,7 +999,7 @@ ScrollObject.prototype = {
                 _w = this.canvasW - (_x << 1);
 
             if ( _w > 0 ){
-                this.context.rect( _x, 1, _w, this.canvasH );
+                this.context.rect( _x - 1, 0, _w, this.canvasH );
             }
         }
 
@@ -1077,10 +1077,10 @@ ScrollObject.prototype = {
         this.context.fill();
         this.context.stroke();
 
-        if ( this.isVerticalScroll ) {
+        if ( this.isVerticalScroll  && this.maxScrollY != 0 ) {
             this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + 5, _y + Math.floor( this.scroller.h / 2 ) - 6 );
         }
-        if ( this.isHorizontalScroll ) {
+        if ( this.isHorizontalScroll && this.maxScrollY != 0 ) {
             this.context.drawImage( this.piperImgHor[piperImgIndex], _x + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + 5 );
         }
 
@@ -1489,7 +1489,7 @@ ScrollObject.prototype = {
                 this.that.scrollerStatus = ScrollOverType.NONE;
             }
         }
-        if( this.that.mouseDownArrow ){
+        if( !this.that.mouseDownArrow ){
             this.that._drawArrow( arrowStat );
         }
         this.that._draw();
@@ -1553,6 +1553,7 @@ ScrollObject.prototype = {
                 this.that.handleEvents( "onmouseup", evt );
                 this.that._drawArrow( ArrowStatus.upLeftArrowHover_downRightArrowNonActive );
             }
+            this.that.mouseDownArrow = false;
         }
         else {
             this.that.mouseDown = false;
