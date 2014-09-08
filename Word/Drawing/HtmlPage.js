@@ -57,7 +57,7 @@ var GlobalSkinFlat = {
     BackgroundColor : "#F4F4F4",
     RulerDark : "#D8DADC",
     RulerLight : "#FFFFFF",
-    BackgroundScroll : "#F4F4F4",
+    BackgroundScroll : "#F1F1F1",
     RulerOutline : "#BBBEC2",
     RulerMarkersFillColor : "#FFFFFF",
     PageOutline : "#BBBEC2",

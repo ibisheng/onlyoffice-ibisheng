@@ -31,7 +31,7 @@ var GlobalSkinTeamlab = {
     BackgroundColor : "#B0B0B0",
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
-    BackgroundScroll : "#D3D3D3",
+    BackgroundScroll : "#F1F1F1",
     STYLE_THUMBNAIL_WIDTH : 80,
     STYLE_THUMBNAIL_HEIGHT : 40
 };
@@ -297,7 +297,6 @@ function CEditorPage(api)
     this.Init = function()
     {
         this.m_oBody = CreateControlContainer(this.Name);
-        this.m_oBody.HtmlElement.style.backgroundColor = "#D3D3D3";
 
         this.Splitter1Pos = 70;
         this.Splitter2Pos = (this.IsSupportNotes === true) ? 20 : 0;
