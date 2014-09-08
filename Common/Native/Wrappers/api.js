@@ -1091,6 +1091,12 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 12:
                     {
                         _textPr.HighLight = highlight_None;
+                        break;
+                    }
+                    case 13:
+                    {
+                        _textPr.Spacing = _params[_current.pos++];
+                        break;
                     }
                     case 255:
                     default:
@@ -3981,6 +3987,11 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
     {
         _stream["WriteByte"](11);
         _stream["WriteBool"](TextPr.SmallCaps);
+    }
+    if (TextPr.Spacing !== undefined)
+    {
+        _stream["WriteByte"](13);
+        _stream["WriteDouble2"](TextPr.Spacing);
     }
 
     _stream["WriteByte"](255);
