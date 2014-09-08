@@ -1639,8 +1639,8 @@ CAbstractNum.prototype =
             }
         }
 
-        // Пересчитываем стили у все параграфов с данной нумерацией
-        this.Recalc_CompiledPr(iLvl);
+        // Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
+        CollaborativeEditing.Add_LinkData(this, {iLvl : iLvl});
     },
 
     Write_ToBinary2 : function(Writer)
@@ -1672,7 +1672,12 @@ CAbstractNum.prototype =
 
     Load_LinkData : function(LinkData)
     {
-
+        var iLvl = LinkData.iLvl;
+        if (undefined !== iLvl)
+        {
+            // Пересчитываем стили у все параграфов с данной нумерацией
+            this.Recalc_CompiledPr(iLvl);
+        }
     },
     
     Recalc_CompiledPr : function(iLvl)

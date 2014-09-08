@@ -29,9 +29,6 @@ function ParaRun(Paragraph, bMathRun)
     this.Descent     = 0; // общий descent
     this.YOffset     = 0; // смещение по Y
 
-    this.NeedAddNumbering = false;  // Нужно ли добавлять нумерацию (true - нужно, false - не нужно, первый элемент,
-                                    // у которого будет false и будет элемент с нумерацией)
-
     this.StartLine   = -1; // Строка, с которой начинается данный ран
     this.StartRange  = -1;
 
@@ -622,7 +619,7 @@ ParaRun.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
     var LinesCount = this.protected_GetLinesCount();
     for (; CurLine < LinesCount; CurLine++)
     {
-        var RangesCount = this.protected_GetRangesCount();
+        var RangesCount = this.protected_GetRangesCount(CurLine);
         for (CurRange = 0; CurRange < RangesCount; CurRange++)
         {
             var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
