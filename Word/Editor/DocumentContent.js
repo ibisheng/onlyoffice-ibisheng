@@ -2272,7 +2272,7 @@ CDocumentContent.prototype =
         {
             if ( true === this.Selection.Use )
             {
-                var Type = ParaItem.Type;
+                var Type = ParaItem.Get_Type();
                 switch ( Type )
                 {
                     case para_NewLine:

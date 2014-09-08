@@ -4549,7 +4549,8 @@ function BinaryFileReader(doc, openParams)
 		aPostOpenStyleNumCallbacks: null,
 		headers: null,
 		footers: null
-	};
+	};   
+    
     this.getbase64DecodedData = function(szSrc)
     {
         var srcLen = szSrc.length;
@@ -7545,7 +7546,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 if (text[i] != ' ')
                     oPos.run.Add_ToContent(oPos.pos, new ParaText(text[i]), false);
                 else
-                    oPos.run.Add_ToContent(oPos.pos, new ParaSpace(1), false);
+                    oPos.run.Add_ToContent(oPos.pos, new ParaSpace(), false);
                 oPos.pos++;
             }
         }

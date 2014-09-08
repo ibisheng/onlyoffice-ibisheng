@@ -126,7 +126,7 @@ CDocumentSearch.prototype =
                 var Len = NewStr.length;
                 for ( var Pos = 0; Pos < Len; Pos++ )
                 {
-                    StartRun.Add_ToContent( RunPos + Pos, new ParaText( NewStr[Pos] ) );
+                    StartRun.Add_ToContent( RunPos + Pos, new ParaText(NewStr[Pos]) );
                 }
 
                 // Выделяем старый объект поиска и удаляем его

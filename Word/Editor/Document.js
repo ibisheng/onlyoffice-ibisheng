@@ -738,6 +738,50 @@ CDocument.prototype =
         // Перемещаем курсор в начало документа
         this.Cursor_MoveToStartPos( false );
     },
+    
+    Add_TestDocument : function()
+    {
+        this.Content = [];
+        var Text = ["Comparison view helps you track down memory leaks, by displaying which objects have been correctly cleaned up by the garbage collector. Generally used to record and compare two (or more) memory snapshots of before and after an operation. The idea is that inspecting the delta in freed memory and reference count lets you confirm the presence and cause of a memory leak.", "Containment view provides a better view of object structure, helping us analyse objects referenced in the global namespace (i.e. window) to find out what is keeping them around. It lets you analyse closures and dive into your objects at a low level.", "Dominators view helps confirm that no unexpected references to objects are still hanging around (i.e that they are well contained) and that deletion/garbage collection is actually working."];        
+        var ParasCount = 50;
+        var RunsCount = Text.length;
+        for (var ParaIndex = 0; ParaIndex < ParasCount; ParaIndex++)
+        {
+            var Para = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+            //var Run = new ParaRun(Para);
+            for (var RunIndex = 0; RunIndex < RunsCount; RunIndex++)
+            {
+                
+                var String = Text[RunIndex];
+                var StringLen = String.length;
+                for (var TextIndex = 0; TextIndex < StringLen; TextIndex++)
+                {
+                    var Run = new ParaRun(Para);
+                    var TextElement = String[TextIndex];
+                    
+                    var Element = (TextElement !== " " ? new ParaText(TextElement) : new ParaSpace() );
+                    Run.Add_ToContent(TextIndex, Element, false);
+                    Para.Add_ToContent(0, Run);
+                }
+                
+                
+            }
+            //Para.Add_ToContent(0, Run);
+            this.Internal_Content_Add(this.Content.length, Para);
+        }
+
+        var RecalculateData =
+        {
+            Inline : { Pos : 0, PageNum : 0 },
+            Flow   : [],
+            HdrFtr : [],
+            Drawings: {
+                All: true,
+                Map:{}
+            }
+        };
+        this.Recalculate(false, false, RecalculateData);
+    },
 
     LoadEmptyDocument : function()
     {
@@ -2910,7 +2954,7 @@ CDocument.prototype =
         {
             if ( true === this.Selection.Use )
             {
-                var Type = ParaItem.Type;
+                var Type = ParaItem.Get_Type();
                 switch ( Type )
                 {
                     case para_NewLine:
@@ -9041,7 +9085,7 @@ CDocument.prototype =
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
 
-                    this.Paragraph_Add( new ParaText( String.fromCharCode( 0x00A0 ) ) );
+                    this.Paragraph_Add( new ParaText(String.fromCharCode(0x00A0)) );
                 }
                 else if ( true === e.CtrlKey )
                 {
@@ -9052,7 +9096,7 @@ CDocument.prototype =
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
 
-                    this.Paragraph_Add( new ParaSpace( 1 ) );
+                    this.Paragraph_Add(new ParaSpace());
                 }
             }
 
@@ -9482,7 +9526,7 @@ CDocument.prototype =
 
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
-                    this.Paragraph_Add( new ParaText( "€" ) );
+                    this.Paragraph_Add(new ParaText("€"));
                 }
                 bRetValue = true;
             }
@@ -9747,13 +9791,13 @@ CDocument.prototype =
                 var Item = null;
                 if ( true === e.CtrlKey && true === e.ShiftKey )
                 {
-                    Item = new ParaText( String.fromCharCode( 0x2013 ) );
-                    Item.SpaceAfter = false;
+                    Item = new ParaText(String.fromCharCode(0x2013));
+                    Item.Set_SpaceAfter(false);
                 }
                 else if ( true === e.ShiftKey )
-                    Item = new ParaText( "_" );
+                    Item = new ParaText("_");
                 else
-                    Item = new ParaText( "-" );
+                    Item = new ParaText("-");
 
                 this.Paragraph_Add( Item );
             }
@@ -9818,7 +9862,7 @@ CDocument.prototype =
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
-                this.Paragraph_Add( new ParaText( String.fromCharCode( Code ) ) );
+                this.Paragraph_Add(new ParaText(String.fromCharCode(Code)));
             }
             bRetValue = true;
         }
@@ -12955,9 +12999,9 @@ CDocument.prototype =
 
                     var _char = sText.charAt(Index);
                     if (" " == _char)
-                        this.Paragraph_Add( new ParaSpace(1) );
+                        this.Paragraph_Add(new ParaSpace());
                     else
-                        this.Paragraph_Add( new ParaText(_char) );
+                        this.Paragraph_Add(new ParaText(_char));
                 }
 
                 // На случай, если Count = 0
@@ -12983,7 +13027,7 @@ CDocument.prototype =
                 {
                     var _char = sText.charAt(Index);
                     if (" " == _char)
-                        Run.Add_ToContent( Index, new ParaSpace(1), false );
+                        Run.Add_ToContent( Index, new ParaSpace(), false );
                     else
                         Run.Add_ToContent( Index, new ParaText(_char), false );
                 }

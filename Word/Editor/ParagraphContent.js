@@ -56,6 +56,8 @@ var para_Math_Ampersand            = 0x0035; // &
 var break_Line = 0x01;
 var break_Page = 0x02;
 
+var nbsp_charcode = 0x00A0;
+
 var nbsp_string = String.fromCharCode( 0x00A0 );
 var   sp_string = String.fromCharCode( 0x0032 );
 
@@ -93,82 +95,131 @@ g_aNumber[0x0039] = 1;
 var g_aSpecialSymbols = [];
 g_aSpecialSymbols[0x00AE] = 1;
 
+var PARATEXT_FLAGS_MASK               = 0xFFFFFFFF; // 4 байта
+var PARATEXT_FLAGS_FONTKOEF_SCRIPT    = 0x00000001; // 0 бит
+var PARATEXT_FLAGS_FONTKOEF_SMALLCAPS = 0x00000002; // 1 бит
+var PARATEXT_FLAGS_SPACEAFTER         = 0x00010000; // 16 бит
+var PARATEXT_FLAGS_CAPITALS           = 0x00020000; // 17 бит
+
+var PARATEXT_FLAGS_NON_FONTKOEF_SCRIPT    = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS_FONTKOEF_SCRIPT;
+var PARATEXT_FLAGS_NON_FONTKOEF_SMALLCAPS = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS_FONTKOEF_SMALLCAPS;
+var PARATEXT_FLAGS_NON_SPACEAFTER         = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS_SPACEAFTER;
+var PARATEXT_FLAGS_NON_CAPITALS           = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS_CAPITALS;
+
+var TEXTWIDTH_DIVIDER = 16384;
+
 // Класс ParaText
 function ParaText(value)
 {
-    this.Value = value;
-    this.Type  = para_Text;
-
-    this.SpaceAfter = false;
-    if ( "-" === this.Value )
-        this.SpaceAfter = true;
-
-    this.CalcValue = value;
-    this.FontSlot  = fontslot_ASCII;
-    this.FontKoef  = 1;
-
-    this.Width        = 0;
-    this.Height       = 0;
-    this.WidthVisible = 0;
-
-    this.IsNBSP       = (this.Value === nbsp_string ? true : false);
-
-//    this.TextAscent  = 0;
-//    this.TextDescent = 0;
-//    this.TextHeight  = 0;
-//    this.TextAscent2 = 0;
-//    this.YOffset     = 0;
-
-//    this.CurPage  = 0;
-//    this.CurLines = 0;
-//    this.CurRange = 0;
+    this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);    
+    this.Width        = 0x00000000 | 0;
+    this.WidthVisible = 0x00000000 | 0;
+    this.Flags        = 0x00000000;
+    
+    this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
 }
+
 ParaText.prototype =
 {
-    Draw : function(X,Y,Context)
-    {
-        Context.SetFontSlot( this.FontSlot, this.FontKoef );
+    Type : para_Text,
 
-        if ( true === this.IsNBSP && editor && editor.ShowParaMarks )
-            Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
+    Get_Type : function()
+    {
+        return para_Text;
+    },
+    
+    Draw : function(X, Y, Context)
+    {
+        var CharCode = this.Value;
+
+        var FontKoef = 1;
+        if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
+            FontKoef = smallcaps_and_script_koef;
+        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
+            FontKoef = vertalign_Koef_Size;
+        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
+            FontKoef = smallcaps_Koef;
+
+        Context.SetFontSlot(((this.Flags >> 8) & 0xFF), FontKoef);
+        
+        var ResultCharCode = (this.Flags & PARATEXT_FLAGS_CAPITALS ? (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0) : CharCode);
+
+        if ( true === this.Is_NBSP() && editor && editor.ShowParaMarks )
+            Context.FillText(X, Y, String.fromCharCode(0x00B0));
         else
-            Context.FillText( X, Y, this.CalcValue );
+            Context.FillText(X, Y, String.fromCharCode(ResultCharCode));
     },
 
     Measure : function(Context, TextPr)
     {
-        this.FontKoef = TextPr.Get_FontKoef();
-
         var bCapitals = false;
-        if ( true === TextPr.Caps || true === TextPr.SmallCaps )
+        var CharCode = this.Value;
+        var ResultCharCode = CharCode;
+        
+        if (true === TextPr.Caps || true === TextPr.SmallCaps)
         {
-            this.CalcValue = this.Value.toUpperCase();
-            bCapitals  = ( this.CalcValue === this.Value ? true : false );
+            this.Flags |= PARATEXT_FLAGS_CAPITALS;
+            ResultCharCode = (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0);
+            bCapitals = (ResultCharCode === CharCode ? true : false);
         }
         else
         {
-            this.CalcValue = this.Value;
-            bCapitals  = false;
+            this.Flags &= PARATEXT_FLAGS_NON_CAPITALS;
+            bCapitals = false;
         }
 
-        if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
-            this.FontKoef *= smallcaps_Koef;
+        if (TextPr.VertAlign !== vertalign_Baseline)
+            this.Flags |= PARATEXT_FLAGS_FONTKOEF_SCRIPT;
+        else
+            this.Flags &= PARATEXT_FLAGS_NON_FONTKOEF_SCRIPT;
+
+        if (true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals)
+            this.Flags |= PARATEXT_FLAGS_FONTKOEF_SMALLCAPS;
+        else
+            this.Flags &= PARATEXT_FLAGS_NON_FONTKOEF_SMALLCAPS;
 
         var Hint = TextPr.RFonts.Hint;
         var bCS  = TextPr.CS;
         var bRTL = TextPr.RTL;
         var lcid = TextPr.Lang.EastAsia;
 
-        this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid, bCS, bRTL );
+        var FontSlot = g_font_detector.Get_FontClass(ResultCharCode, Hint, lcid, bCS, bRTL);
 
-        Context.SetFontSlot( this.FontSlot, this.FontKoef );
-        var Temp = Context.Measure( this.CalcValue );
+        var Flags_0Byte = (this.Flags >>  0) & 0xFF;
+        var Flags_2Byte = (this.Flags >> 16) & 0xFF;
 
-        Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
+        this.Flags = Flags_0Byte | ((FontSlot & 0xFF) << 8) | (Flags_2Byte << 16);
 
-        this.Width        = Temp.Width;
-        this.Height       = Temp.Height;
-        this.WidthVisible = Temp.Width;
+        var FontKoef = 1;
+        if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
+            FontKoef = smallcaps_and_script_koef;
+        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
+            FontKoef = vertalign_Koef_Size;
+        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
+            FontKoef = smallcaps_Koef;
+
+        Context.SetFontSlot(FontSlot, FontKoef);
+        var Temp = Context.Measure(String.fromCharCode(ResultCharCode));
+        
+        var ResultWidth   = (Math.max((Temp.Width + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+                
+        this.Width        = ResultWidth;
+        this.WidthVisible = ResultWidth;
+    },
+
+    Get_Width : function()
+    {
+        return (this.Width / TEXTWIDTH_DIVIDER);
+    },
+    
+    Get_WidthVisible : function()
+    {
+        return (this.WidthVisible / TEXTWIDTH_DIVIDER);
+    },
+    
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
     },
 
     Is_RealContent : function()
@@ -183,17 +234,17 @@ ParaText.prototype =
 
     Copy : function()
     {
-        return new ParaText( this.Value );
+        return new ParaText(String.fromCharCode(this.Value));
     },
 
     Is_NBSP : function()
     {
-        return (this.Value === nbsp_string ? true : false);
+        return ( this.Value === nbsp_charcode ? true : false);
     },
 
     Is_Punctuation : function()
     {
-        if ( 1 === this.Value.length && 1 === g_aPunctuation[this.Value.charCodeAt(0)] )
+        if ( 1 === g_aPunctuation[this.Value] )
             return true;
 
         return false;
@@ -201,7 +252,7 @@ ParaText.prototype =
 
     Is_Number : function()
     {
-        if ( 1 === this.Value.length && 1 === g_aNumber[this.Value.charCodeAt(0)] )
+        if ( 1 === g_aNumber[this.Value] )
             return true;
 
         return false;
@@ -209,110 +260,23 @@ ParaText.prototype =
 
     Is_SpecialSymbol : function()
     {
-        if ( 1 === g_aSpecialSymbols[this.Value.charCodeAt(0)] )
+        if ( 1 === g_aSpecialSymbols[this.Value] )
             return true;
 
         return false;
     },
-
-    Write_ToBinary : function(Writer)
+    
+    Is_SpaceAfter : function()
     {
-        // Long : Type
-        // Long : Value
-        // Bool : SpaceAfter
-
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Value );
-        Writer.WriteBool( this.SpaceAfter );
+        return (this.Flags & PARATEXT_FLAGS_SPACEAFTER ? true : false); 
     },
-
-    Read_FromBinary : function(Reader)
+    
+    Set_SpaceAfter : function(bSpaceAfter)
     {
-        this.Value      = Reader.GetString2();
-        this.SpaceAfter = Reader.GetBool();
-    }
-};
-
-// Класс ParaSpace
-function ParaSpace(Count)
-{
-    if ( "number" != typeof(Count) )
-        this.Value = 1;
-    else
-        this.Value = Count;
-
-    this.Type = para_Space;
-    this.FontKoef = 1;
-
-    this.Width        = 0;
-    this.Height       = 0;
-    this.WidthVisible = 0;
-}
-ParaSpace.prototype =
-{
-    Draw : function(X,Y, Context)
-    {
-        var sString = "";
-        if ( 1 == this.Value )
-            sString = String.fromCharCode( 0x00B7 );
+        if (bSpaceAfter )
+            this.Flags |= PARATEXT_FLAGS_SPACEAFTER;
         else
-        {
-            for ( var Index = 0; Index < this.Value; Index++ )
-            {
-                sString += String.fromCharCode( 0x00B7 );
-            }
-        }
-
-        Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
-
-        if (typeof (editor) !== "undefined" && editor.ShowParaMarks )
-            Context.FillText( X, Y, sString );
-    },
-
-    Measure : function(Context, TextPr)
-    {
-        var sString = "";
-        if ( 1 == this.Value )
-            sString = " ";
-        else
-        {
-            for ( var Index = 0; Index < this.Value; Index++ )
-            {
-                sString += " ";
-            }
-        }
-
-        this.FontKoef = TextPr.Get_FontKoef();
-
-        if ( true != TextPr.Caps && true === TextPr.SmallCaps )
-            this.FontKoef *= smallcaps_Koef;
-
-        Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
-
-        var Temp = Context.Measure( sString );
-
-        Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
-
-        this.Width        = Temp.Width;
-        this.Height       = Temp.Height;
-
-        // Не меняем здесь WidthVisible, это значение для пробела высчитывается отдельно, и не должно меняться при пересчете
-        //this.WidthVisible = Temp.Width;
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return true;
-    },
-
-    Copy : function()
-    {
-        return new ParaSpace(this.Value);
+            this.Flags &= PARATEXT_FLAGS_NON_SPACEAFTER;
     },
 
     Write_ToBinary : function(Writer)
@@ -320,7 +284,7 @@ ParaSpace.prototype =
         // Long : Type
         // Long : Value
 
-        Writer.WriteLong( this.Type );
+        Writer.WriteLong( para_Text );
         Writer.WriteLong( this.Value );
     },
 
@@ -330,6 +294,117 @@ ParaSpace.prototype =
     }
 };
 
+// Класс ParaSpace
+function ParaSpace()
+{
+    this.Flags        = 0x00000000;
+    this.Width        = 0x00000000;
+    this.WidthVisible = 0x00000000;
+}
+ParaSpace.prototype =
+{
+    Type : para_Space,
+
+    Get_Type : function()
+    {
+        return para_Space;
+    },
+    
+    Draw : function(X,Y, Context)
+    {
+        if ( undefined !== editor && editor.ShowParaMarks )
+        {
+            Context.SetFontSlot( fontslot_ASCII, this.Get_FontKoef() );
+            Context.FillText(X, Y, String.fromCharCode(0x00B7));
+        }
+    },
+
+    Measure : function(Context, TextPr)
+    {
+        this.Set_FontKoef_Script( TextPr.VertAlign !== vertalign_Baseline ? true : false );
+        this.Set_FontKoef_SmallCaps( true != TextPr.Caps && true === TextPr.SmallCaps ? true : false );
+
+        Context.SetFontSlot( fontslot_ASCII, this.Get_FontKoef() );
+
+        var Temp = Context.Measure(" ");
+
+        var ResultWidth = (Math.max((Temp.Width + TextPr.Spacing), 0) * 16384) | 0;
+        this.Width      = ResultWidth;
+        // Не меняем здесь WidthVisible, это значение для пробела высчитывается отдельно, и не должно меняться при пересчете
+    },
+
+    Get_FontKoef : function()
+    {
+        if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
+            return smallcaps_and_script_koef;
+        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
+            return vertalign_Koef_Size;
+        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
+            return smallcaps_Koef;
+        else
+            return 1;
+    },
+
+    Set_FontKoef_Script : function(bScript)
+    {
+        if (bScript)
+            this.Flags |= PARATEXT_FLAGS_FONTKOEF_SCRIPT;
+        else
+            this.Flags &= PARATEXT_FLAGS_NON_FONTKOEF_SCRIPT;
+    },
+
+    Set_FontKoef_SmallCaps : function(bSmallCaps)
+    {
+        if (bSmallCaps)
+            this.Flags |= PARATEXT_FLAGS_FONTKOEF_SMALLCAPS;
+        else
+            this.Flags &= PARATEXT_FLAGS_NON_FONTKOEF_SMALLCAPS;
+    },
+
+    Get_Width : function()
+    {
+        return (this.Width / TEXTWIDTH_DIVIDER);
+    },
+    
+    Get_WidthVisible : function()
+    {
+        return (this.WidthVisible / TEXTWIDTH_DIVIDER);
+    },
+    
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
+    },
+
+    Is_RealContent : function()
+    {
+        return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
+    Copy : function()
+    {
+        return new ParaSpace();
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Long : Type
+        // Long : Value
+
+        Writer.WriteLong( para_Space );
+        Writer.WriteLong( this.Value );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        this.Value = Reader.GetLong();
+    }
+};
 
 function ParaSym(Char, FontFamily)
 {
@@ -436,7 +511,6 @@ ParaSym.prototype =
     }
 };
 
-
 // Класс ParaTextPr
 function ParaTextPr(Props)
 {
@@ -461,6 +535,13 @@ function ParaTextPr(Props)
 }
 ParaTextPr.prototype =
 {
+    Type : para_TextPr,
+
+    Get_Type : function()
+    {
+        return para_TextPr;
+    },
+    
     Draw : function()//(X,Y,Context)
     {
         // Ничего не делаем
@@ -2350,24 +2431,25 @@ ParaTextPr.prototype =
 // Класс окончание параграфа ParaEnd
 function ParaEnd()
 {
-    this.Type = para_End;
-
-    this.TextPr    = null; // Рассчитанные настройки текста для символа конца параграфа
-    this.SectionPr = null;
-
-    this.Width        = 0;
-    this.Height       = 0;
-    this.WidthVisible = 0;    
+    this.SectionPr    = null;
+    this.WidthVisible = 0x00000000 | 0; 
 }
 
 ParaEnd.prototype =
 {
-    Draw : function(X,Y,Context, bEndCell)
-    {
-        Context.SetFontSlot( fontslot_ASCII );
+    Type : para_End,
 
-        if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
+    Get_Type : function()
+    {
+        return para_End;
+    },
+    
+    Draw : function(X, Y, Context, bEndCell)
+    {
+        if ( undefined !== editor && editor.ShowParaMarks )
         {
+            Context.SetFontSlot( fontslot_ASCII );
+
             if ( null !== this.SectionPr )
             {
                 Context.b_color1( 0, 0, 0, 255);
@@ -2386,23 +2468,35 @@ ParaEnd.prototype =
                 }
             }
             else if ( true === bEndCell )
-                Context.FillText( X, Y, String.fromCharCode( 0x00A4 ) );
+                Context.FillText(X, Y, String.fromCharCode(0x00A4));
             else
-                Context.FillText( X, Y, String.fromCharCode( 0x00B6 ) );
+                Context.FillText(X, Y, String.fromCharCode(0x00B6));
         }
     },
 
     Measure : function(Context, bEndCell)
     {
-        this.Width  = 0;
-        this.Height = 0;
-
-        Context.SetFontSlot( fontslot_ASCII );
+        Context.SetFontSlot(fontslot_ASCII);
 
         if ( true === bEndCell )
-            this.WidthVisible = Context.Measure( String.fromCharCode( 0x00A4 ) ).Width;
+            this.WidthVisible = (Context.Measure(String.fromCharCode(0x00A4)).Width * TEXTWIDTH_DIVIDER) | 0;
         else
-            this.WidthVisible = Context.Measure( String.fromCharCode( 0x00B6 ) ).Width;
+            this.WidthVisible = (Context.Measure(String.fromCharCode(0x00B6)).Width * TEXTWIDTH_DIVIDER) | 0;
+    },
+
+    Get_Width : function()
+    {
+        return 0;
+    },
+
+    Get_WidthVisible : function()
+    {
+        return (this.WidthVisible / TEXTWIDTH_DIVIDER);
+    },
+
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
     },
 
     Update_SectionPr : function(SectionPr, W)
@@ -2480,8 +2574,8 @@ ParaEnd.prototype =
         this.SectionPr.Str      = strResult;
         this.SectionPr.Widths   = Widths;
 
-        this.Width        = W;
-        this.WidthVisible = W;
+        var _W = (W * TEXTWIDTH_DIVIDER) | 0;
+        this.WidthVisible = _W;
     },
 
     Clear_SectionPr : function()
@@ -2507,20 +2601,17 @@ ParaEnd.prototype =
     Write_ToBinary : function(Writer)
     {
         // Long   : Type
-        Writer.WriteLong( this.Type );
+        Writer.WriteLong( para_End );
     },
 
     Read_FromBinary : function(Reader)
     {
     }
-
-
 };
 
 // Класс ParaNewLine
 function ParaNewLine(BreakType)
 {
-    this.Type = para_NewLine;
     this.BreakType = BreakType;
 
     this.Flags = {}; // специальные флаги для разных break
@@ -2538,6 +2629,13 @@ function ParaNewLine(BreakType)
 
 ParaNewLine.prototype =
 {
+    Type : para_NewLine,
+
+    Get_Type : function()
+    {
+        return para_NewLine;
+    },
+    
     Draw : function(X,Y,Context)
     {
         if ( false === this.Flags.Use )
@@ -2612,6 +2710,21 @@ ParaNewLine.prototype =
             }
         }
     },
+
+    Get_Width : function()
+    {
+        return this.Width;
+    },
+
+    Get_WidthVisible : function()
+    {
+        return this.WidthVisible;
+    },
+
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = WidthVisible;
+    },    
 
     Update_String : function(_W)
     {
@@ -2726,7 +2839,7 @@ ParaNewLine.prototype =
         // Long   : BreakType
         // Optional :
         // Long   : Flags (breakPage)
-        Writer.WriteLong( this.Type );
+        Writer.WriteLong( para_NewLine );
         Writer.WriteLong( this.BreakType );
 
         if ( break_Page === this.BreakType )
@@ -2743,192 +2856,6 @@ ParaNewLine.prototype =
             this.Flags = { NewLine : Reader.GetBool() };
     }
 };
-
-// Класс ParaNewLineRendered
-function ParaNewLineRendered()
-{
-    this.Type = para_NewLineRendered;
-}
-
-ParaNewLineRendered.prototype =
-{
-    Draw : function()//(X,Y,Context)
-    {
-        // Ничего не делаем
-    },
-
-    Measure : function()//(Context)
-    {
-        this.Width  = 0;
-        this.Height = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return false;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс ParaInlineBreak
-function ParaInlineBreak()
-{
-    this.Type = para_InlineBreak;
-}
-
-ParaInlineBreak.prototype =
-{
-    Draw : function()
-    {
-        // Ничего не делаем
-    },
-
-    Measure : function()
-    {
-        this.Width  = 0;
-        this.Height = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return false;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс ParaPageBreakRenderer
-function ParaPageBreakRenderer()
-{
-    this.Type = para_PageBreakRendered;
-}
-
-ParaPageBreakRenderer.prototype =
-{
-    Draw : function()
-    {
-
-    },
-
-    Measure : function()
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return false;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс ParaEmpty
-function ParaEmpty(bDelete)
-{
-    this.Type = para_Empty;
-
-    this.NeedToDelete = false; // Нужно ли удалить данный элемент при пересчете параграфа
-
-    if ( "undefined" != typeof(bDelete) && null != bDelete )
-        this.NeedToDelete = bDelete;
-}
-
-ParaEmpty.prototype =
-{
-    Draw : function()
-    {
-
-    },
-
-    Measure : function()
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Copy : function()
-    {
-        return new ParaEmpty(this.NeedToDelete);
-    },
-
-    Check_Delete : function()
-    {
-        return this.NeedToDelete;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        // Bool   : NeedToDelete
-        Writer.WriteLong( this.Type );
-        Writer.WriteBool( this.NeedToDelete );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        this.NeedToDelete = Reader.GetBool();
-    }
-};
-
 
 // Класс ParaNumbering
 function ParaNumbering()
@@ -2949,6 +2876,8 @@ function ParaNumbering()
 
 ParaNumbering.prototype =
 {
+    Type : para_Numbering,
+
     Draw : function(X,Y,Context, Numbering, TextPr, NumPr, Theme)
     {
         Numbering.Draw( NumPr.NumId, NumPr.Lvl, X, Y, Context, this.Internal.NumInfo, TextPr, Theme );
@@ -3020,18 +2949,22 @@ var tab_Symbol = 0x0022;//0x2192;
 // Класс ParaTab
 function ParaTab()
 {
-    this.Type = para_Tab;
-
     this.TabType = tab_Left;
 
     this.Width        = 0;
-    this.Height       = 0;
     this.WidthVisible = 0;
     this.RealWidth    = 0;
 }
 
 ParaTab.prototype =
 {
+    Type : para_Tab,
+
+    Get_Type : function()
+    {
+        return para_Tab;
+    },
+    
     Draw : function(X,Y,Context)
     {
         if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
@@ -3053,6 +2986,21 @@ ParaTab.prototype =
         this.RealWidth = Context.Measure( String.fromCharCode( tab_Symbol ) ).Width;
     },
 
+    Get_Width : function()
+    {
+        return this.Width;
+    },
+
+    Get_WidthVisible : function()
+    {
+        return this.WidthVisible;
+    },
+
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = WidthVisible;
+    },
+
     Is_RealContent : function()
     {
         return true;
@@ -3072,7 +3020,7 @@ ParaTab.prototype =
     {
         // Long   : Type
         // Long   : TabType
-        Writer.WriteLong( this.Type );
+        Writer.WriteLong( para_Tab );
         Writer.WriteLong( this.TabType );
     },
 
@@ -3808,8 +3756,6 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
-    this.Type = para_Drawing;
-
     this.Lock = new CLock();
     if ( false === g_oIdCounter.m_bLoad )
     {
@@ -3918,6 +3864,27 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 
 ParaDrawing.prototype =
 {
+    Type : para_Drawing,
+
+    Get_Type : function()
+    {
+        return para_Drawing;
+    },
+
+    Get_Width : function()
+    {
+        return this.Width;
+    },
+
+    Get_WidthVisible : function()
+    {
+        return this.WidthVisible;
+    },
+
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = WidthVisible;
+    },
 
     Get_SelectedContent: function(SelectedContent)
     {
@@ -6584,8 +6551,6 @@ GraphicPicture.prototype =
 // Класс ParaPageNum
 function ParaPageNum()
 {
-    this.Type = para_PageNum;
-
     this.FontKoef = 1;
 
     this.NumWidths = [];
@@ -6594,12 +6559,18 @@ function ParaPageNum()
     this.String = [];
 
     this.Width        = 0;
-    this.Height       = 0;
     this.WidthVisible = 0;
 }
 
 ParaPageNum.prototype =
 {
+    Type : para_PageNum,
+
+    Get_Type : function()
+    {
+        return para_PageNum;
+    },
+    
     Draw : function(X, Y, Context)
     {
         // Value - реальное значение, которое должно быть отрисовано.
@@ -6632,6 +6603,21 @@ ParaPageNum.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
+    },
+
+    Get_Width : function()
+    {
+        return this.Width;
+    },
+
+    Get_WidthVisible : function()
+    {
+        return this.WidthVisible;
+    },
+
+    Set_WidthVisible : function(WidthVisible)
+    {
+        this.WidthVisible = WidthVisible;
     },
 
     Set_Page : function(PageNum)
@@ -6700,7 +6686,7 @@ ParaPageNum.prototype =
     Write_ToBinary : function(Writer)
     {
         // Long   : Type
-        Writer.WriteLong( this.Type );
+        Writer.WriteLong( para_PageNum );
     },
 
     Read_FromBinary : function(Reader)
@@ -6722,554 +6708,11 @@ function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
         for ( var Index = 0; Index < Len; Index++ )
             this.Widths[Index] = Widths[Index];
     }
-
 }
-
-
-// Класс ParaFlowObjectAnchor
-function ParaFlowObjectAnchor(FlowObject)
-{
-    this.Type = para_FlowObjectAnchor;
-
-    this.FlowObject = FlowObject;
-}
-
-ParaFlowObjectAnchor.prototype =
-{
-    Draw : function(X,Y,Context, Value, Align)
-    {
-    },
-
-    Measure : function (Context)
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-
-        //return { Width : 0, Height : 0, WidthVisible : 0 };
-    },
-
-    Is_RealContent : function()
-    {
-        return false;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Set_FlowObject : function(Object)
-    {
-        this.FlowObject = Object;
-    },
-
-    Get_FlowObject : function()
-    {
-        return this.FlowObject;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс начало гиперссылки
-function ParaHyperlinkStart()
-{
-    this.Id = g_oIdCounter.Get_NewId();
-
-    this.Type = para_HyperlinkStart;
-
-    this.Value = "";
-
-    this.Visited = false;
-    this.ToolTip = "";
-
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
-}
-
-ParaHyperlinkStart.prototype =
-{
-    Get_Id : function()
-    {
-        return this.Id;
-    },
-
-    Draw : function(X, Y, Context)
-    {
-
-    },
-
-    Measure : function(Context)
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-    Set_Visited : function(Value)
-    {
-        this.Visited = Value;
-    },
-
-    Get_Visited : function()
-    {
-        return this.Visited;
-    },
-
-    Set_ToolTip : function(ToolTip)
-    {
-        History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
-        this.ToolTip = ToolTip;
-    },
-
-    Get_ToolTip : function()
-    {
-        if ( null === this.ToolTip )
-        {
-            if ( "string" === typeof(this.Value) )
-                return this.Value;
-            else
-                return "";
-        }
-        else
-            return this.ToolTip;
-    },
-
-    Get_Value : function()
-    {
-        return this.Value;
-    },
-
-    Set_Value : function(Value)
-    {
-        History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
-        this.Value = Value;
-    },
-
-    Copy : function()
-    {
-        var Hyperlink_new = new ParaHyperlinkStart();
-
-        Hyperlink_new.Value   = this.Value;
-        Hyperlink_new.Visited = this.Visited;
-        Hyperlink_new.ToolTip = this.ToolTip;
-
-        return Hyperlink_new;
-    },
-
-//-----------------------------------------------------------------------------------
-// Undo/Redo функции
-//-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-        switch(Type)
-        {
-            case historyitem_Hyperlink_Value :
-            {
-                this.Value = Data.Old;
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                this.ToolTip = Data.Old;
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-        switch(Type)
-        {
-            case historyitem_Hyperlink_Value :
-            {
-                this.Value = Data.New;
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                this.ToolTip = Data.New;
-                break;
-            }
-        }
-    },
-
-    Refresh_RecalcData : function()
-    {
-    },
-
-//-----------------------------------------------------------------------------------
-// Функции для работы с совместным редактирования
-//-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( historyitem_type_Hyperlink );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch(Type)
-        {
-            case historyitem_Hyperlink_Value :
-            {
-                // String : Value
-                Writer.WriteString2( Data.New );
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                // String : ToolTip
-                Writer.WriteString2( Data.New );
-
-                break;
-            }
-        }
-    },
-
-    Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_Hyperlink != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case historyitem_Hyperlink_Value:
-            {
-                // String : Value
-                this.Value = Reader.GetString2();
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                // String : ToolTip
-                this.ToolTip = Reader.GetString2();
-
-                //if ( "" === this.ToolTip )
-                //    this.ToolTip = null;
-
-                break;
-            }
-        }
-    },
-
-    Write_ToBinary2 : function(Writer)
-    {
-        Writer.WriteLong( historyitem_type_Hyperlink );
-
-        // Long   : Type
-        // String : Id
-        // String : Value
-        // String : ToolTip
-
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Id );
-        Writer.WriteString2( this.Value );
-        Writer.WriteString2( this.ToolTip );
-    },
-
-    Read_FromBinary2 : function(Reader)
-    {
-        // Long   : Type
-        // String : Id
-        // String : Value
-        // String : ToolTip
-
-        this.Type    = Reader.GetLong();
-        this.Id      = Reader.GetString2();
-        this.Value   = Reader.GetString2();
-        this.ToolTip = Reader.GetString2();
-
-        //if ( "" === this.ToolTip )
-        //   this.ToolTip = null;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        // String : Id
-
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Id );
-    }
-};
-
-// Класс конец гиперссылки
-function ParaHyperlinkEnd()
-{
-    this.Type = para_HyperlinkEnd;
-}
-
-ParaHyperlinkEnd.prototype =
-{
-    Draw : function(X, Y, Context)
-    {
-
-    },
-
-    Measure : function(Context)
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Copy : function()
-    {
-        return new ParaHyperlinkEnd();
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс ParaCollaborativeChangesStart
-function ParaCollaborativeChangesStart()
-{
-    this.Type = para_CollaborativeChangesStart;
-}
-
-ParaCollaborativeChangesStart.prototype =
-{
-    Draw : function()
-    {
-
-    },
-
-    Measure : function()
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-
-    },
-
-    Is_RealContent : function()
-    {
-        return false;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс ParaCollaborativeChangesEnd
-function ParaCollaborativeChangesEnd()
-{
-    this.Type = para_CollaborativeChangesEnd;
-}
-
-ParaCollaborativeChangesEnd.prototype =
-{
-    Draw : function()
-    {
-
-    },
-
-    Measure : function()
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return false;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-    }
-};
-
-// Класс ParaCommentStart
-function ParaCommentStart(Id)
-{
-    this.Type = para_CommentStart;
-    this.Id   = Id;
-}
-
-ParaCommentStart.prototype =
-{
-    Draw : function()
-    {
-
-    },
-
-    Measure : function()
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Copy : function()
-    {
-        return new ParaCommentStart(this.Id);
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Id );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        this.Id = Reader.GetString2();
-    }
-};
-
-// Класс ParaCommentEnd
-function ParaCommentEnd(Id)
-{
-    this.Type = para_CommentEnd;
-    this.Id   = Id;
-}
-
-ParaCommentEnd.prototype =
-{
-    Draw : function()
-    {
-
-    },
-
-    Measure : function()
-    {
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return false;
-    },
-
-
-    Copy : function()
-    {
-        return new ParaCommentEnd(this.Id);
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Id );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        this.Id = Reader.GetString2();
-    }
-};
 
 // Класс ParaPresentationNumbering
 function ParaPresentationNumbering()
 {
-    this.Type = para_PresentationNumbering;
-
     // Эти данные заполняются во время пересчета, перед вызовом Measure
     this.Bullet    = null;
     this.BulletNum = null;
@@ -7277,6 +6720,8 @@ function ParaPresentationNumbering()
 
 ParaPresentationNumbering.prototype =
 {
+    Type : para_PresentationNumbering,
+
     Draw : function(X, Y, Context, FirstTextPr, PDSE)
     {
         this.Bullet.Draw( X, Y, Context, FirstTextPr, PDSE );
@@ -7329,388 +6774,6 @@ ParaPresentationNumbering.prototype =
     }
 };
 
-// Класс ParaMath
-function ParaMath(bAddMenu, bCollaborative)
-{
-    this.Id = g_oIdCounter.Get_NewId();
-
-    this.Type  = para_Math;
-
-    this.Jc   = undefined;
-    this.Math = new CMathComposition(bCollaborative);
-    this.Math.Parent = this;
-
-    this.Inline = false; // внутристроковая формула или нет (проверяемся внутри Internal_Recalculate_0)
-
-    this.Width        = 0;
-    this.Height       = 0;
-    this.WidthVisible = 0;
-    this.Ascent       = 0;
-    this.Descent      = 0;
-
-    this.TextAscent  = 0;
-    this.TextDescent = 0;
-    this.TextHeight  = 0;
-    this.TextAscent2 = 0;
-    this.YOffset     = 0;
-
-    this.CurPage  = 0;
-    this.CurLines = 0;
-    this.CurRange = 0;
-
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    if (!bAddMenu)
-        g_oTableId.Add( this, this.Id );
-
-    // TODO:
-    // по двойному, тройному клику селект элемента (мат. объекта/Run), формулы
-    // по shift + ctr + стрелка сделать выделение, как минимумумом по элементам (мат. объект/Run)
-}
-
-ParaMath.prototype =
-{
-    Get_Id : function()
-    {
-        return this.Id;
-    },
-
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
-    Draw : function( X, Y, Context)
-    {
-        this.Math.Draw( X, Y, Context );
-    },
-
-    Measure : function( Context, TextPr )
-    {
-        this.Math.RecalculateComposition(Context, TextPr);
-        var Size = this.Math.Size;
-
-        this.Width        = Size.Width;
-        this.Height       = Size.Height;
-        this.WidthVisible = Size.WidthVisible;
-        this.Ascent       = Size.Ascent;
-        this.Descent      = Size.Descent;
-    },
-
-    Is_RealContent : function( )
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return true;
-    },
-
-    Add : function(Item)
-    {
-        var Type = Item.Type;
-
-        if ( para_Text === Type )
-            this.Math.AddLetter( Item.Value.charCodeAt(0) );
-        else if ( para_Space === Type )
-            this.Math.AddLetter( 0x0020 );
-        else if ( para_Math === Type )
-        {
-            var rPr = this.Math.GetCurrentRunPrp();
-            Item.Math.Root.setRPrp(rPr);
-            this.Math.AddToComposition(Item.Math.Root);
-        }
-    },
-
-    AddText : function(oElem, sText, props)
-    {
-        if(sText)
-        {
-            var rPr = new CTextPr();
-            var oMRun = new CMathRunPrp();
-            if (props)
-                oMRun.setMathRunPrp(props);
-            oMRun.setTxtPrp(rPr);
-            if (oElem)
-            {
-                oElem.addElementToContent(oMRun);
-                for (var i=0;i<sText.length;i++)
-                {
-                    /*text[i].replace("&",	"&amp;");
-                     text[i].Replace("'",	"&apos;");
-                     text[i].Replace("<",	"&lt;");
-                     text[i].Replace(">",	"&gt;");
-                     text[i].Replace("\"",	"&quot;");*/
-                    var oText = new CMathText(false);
-                    oText.addTxt(sText[i]);
-                    oElem.addElementToContent(oText);
-                }
-            }
-        }
-    },
-
-    CreateElem : function (oElem, oParent, props)
-    {
-        /*var ctrPrp = new CTextPr();
-         oElem.setCtrPrp(ctrPrp);*/
-        oElem.relate(oParent);
-        oElem.init(props);
-
-        if (oParent)
-            oParent.addElementToContent(oElem);
-
-    },
-
-    CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
-    {
-        this.CreateElem(oFraction, oParentElem, props);
-
-        var oElemDen = oFraction.getDenominator();
-        this.AddText(oElemDen, sDenText);
-
-        var oElemNum = oFraction.getNumerator();
-        this.AddText(oElemNum, sNumText);
-    },
-
-    CreateDegree : function (oDegree, oParentElem,props,sBaseText,sSupText,sSubText)
-    {
-        this.CreateElem(oDegree, oParentElem, props);
-
-        var oElem = oDegree.getBase();
-        this.AddText(oElem, sBaseText);
-
-        var oSup = oDegree.getUpperIterator();
-        this.AddText(oSup, sSupText);
-
-        var oSub = oDegree.getLowerIterator();
-        this.AddText(oSub, sSubText);
-    },
-
-    CreateRadical : function (oRad,oParentElem,props,sElemText,sDegText)
-    {
-        this.CreateElem(oRad, oParentElem, props);
-
-        var oElem = oRad.getBase();
-        this.AddText(oElem, sElemText);
-
-        var oDeg = oRad.getDegree();
-        this.AddText(oDeg, sDegText);
-    },
-
-    CreateNary : function (oNary,oParentElem,props,sElemText,sSubText,sSupText)
-    {
-        this.CreateElem(oNary, oParentElem, props);
-
-        var oElem = oNary.getBase();
-        this.AddText(oElem, sElemText);
-
-        var oSub = oNary.getLowerIterator();
-        this.AddText(oSub, sSubText);
-
-        var oSup = oNary.getUpperIterator();
-        this.AddText(oSup, sSupText);
-    },
-
-    CreateBox : function (oBox,oParentElem,props,sElemText)
-    {
-        this.CreateElem(oBox, oParentElem, props);
-
-        var oElem = oBox.getBase();
-        this.AddText(oElem, sElemText);
-    },
-
-    Is_Empty : function()
-    {
-        return this.Math.Is_Empty();
-    },
-
-    Remove : function(Order, bOnAddText)
-    {
-        return this.Math.Remove(Order, bOnAddText);
-    },
-
-    RecalculateCurPos : function()
-    {
-        this.Math.UpdateCursor();
-    },
-
-    Refresh_RecalcData2: function()
-    {
-        this.Parent.RecalcInfo.Set_Type_0(pararecalc_0_All);
-        this.Parent.Refresh_RecalcData2();
-    },
-
-    Selection_SetStart : function(X, Y, PageNum)
-    {
-        this.Math.Selection_SetStart( X, Y, PageNum );
-    },
-
-    Selection_SetEnd : function(X, Y, PageNum, MouseEvent)
-    {
-        this.Math.Selection_SetEnd( X, Y, PageNum, MouseEvent );
-    },
-
-    Selection_Beginning : function(bStart)
-    {
-        this.Math.Selection_Beginning(bStart);
-    },
-
-    Selection_Ending : function(bStart)
-    {
-        this.Math.Selection_Ending(bStart);
-    },
-
-    Selection_Draw : function()
-    {
-        this.Math.Selection_Draw();
-    },
-
-    Selection_IsEmpty : function()
-    {
-        //console.log("Selection_IsEmpty " + this.Math.Selection_IsEmpty());
-        return this.Math.Selection_IsEmpty();
-    },
-
-    Selection_IsUse : function()
-    {
-        //console.log("Selection_IsUse " + ( true === this.Math.Selection_IsEmpty() ? false : true ));
-        return ( true === this.Math.Selection_IsEmpty() ? false : true );
-    },
-
-    Selection_Remove : function()
-    {
-
-    },
-
-    Selection_Check : function(X, Y, Page_Abs)
-    {
-        return this.Math.Selection_Check(X, Y);
-    },
-
-    Cursor_MoveLeft : function(bShiftKey, bCtrlKey)
-    {
-        return this.Math.Cursor_MoveLeft(bShiftKey, bCtrlKey);
-    },
-
-    Cursor_MoveRight : function(bShiftKey, bCtrlKey)
-    {
-        return this.Math.Cursor_MoveRight(bShiftKey, bCtrlKey);
-    },
-
-    Cursor_MoveUp : function(bShiftKey)
-    {
-        return this.Math.Cursor_MoveUp( bShiftKey );
-    },
-
-    Cursor_MoveDown : function(bShiftKey)
-    {
-        return this.Math.Cursor_MoveDown( bShiftKey );
-    },
-
-    Cursor_MoveAt : function(X, Y)
-    {
-        var MouseEvent = new CMouseEventHandler();
-        MouseEvent.Type = g_mouse_event_type_up;
-        this.Math.Selection_SetStart( X, Y, 0 );
-        this.Math.Selection_SetEnd( X, Y, 0, MouseEvent );
-    },
-
-    Cursor_MoveToStartPos : function()
-    {
-        this.Math.Cursor_MoveToStartPos();
-    },
-
-    Cursor_MoveToEndPos : function()
-    {
-        this.Math.Cursor_MoveToEndPos();
-    },
-    /*Apply_TextPr: function(TextPr)
-     {
-     this.Math.Apply_TextPr(TextPr);
-     },*/
-
-    Copy : function()
-    {
-        var Math = new ParaMath();
-        return Math;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        // String : Id
-
-        Writer.WriteLong( this.Type );
-        Writer.WriteString2( this.Id );
-    },
-
-    Write_ToBinary2 : function(Writer)
-    {
-        Writer.WriteLong( historyitem_type_Math );
-
-        var oThis = this;
-        this.bs = new BinaryCommonWriter(Writer);
-        this.boMaths = new Binary_oMathWriter(Writer);
-
-        this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathParaCollaborative(oThis.Math);});//WriteOMathParaCollaborative
-    },
-
-    /*Write_ElemToBinary2 : function(Writer, elem)
-     {
-     var oThis = this;
-     this.bs = new BinaryCommonWriter(Writer);
-     this.boMaths = new Binary_oMathWriter(Writer);
-
-     this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(elem);});
-     },*/
-
-    //добавление формулы в формулу
-
-
-    Read_FromBinary2 : function(Reader)
-    {
-        var oThis = this;
-        this.boMathr = new Binary_oMathReader(Reader);
-        this.bcr = new Binary_CommonReader(Reader);
-
-        var length = Reader.GetUChar();
-
-        var res = false;
-        Reader.cur += 3;
-        res = this.bcr.Read1(length, function(t, l){
-            return oThis.boMathr.ReadMathOMathParaCollaborative(t,l,oThis.Math);
-        });
-    },
-
-    /*Read_ElemFromBinary2 : function(Reader, elem)
-     {
-     var oThis = this;
-     this.boMathr = new Binary_oMathReader(Reader);
-     this.bcr = new Binary_CommonReader(Reader);
-
-     var length = Reader.GetUChar();
-
-     var res = false;
-     Reader.cur += 3;
-     res = this.bcr.Read1(length, function(t, l){
-     return oThis.boMathr.ReadMathArg(t,l,elem);
-     });
-     },*/
-
-
-
-    Save_Changes : function(Data, Writer)
-    {
-
-    },
-
-    Load_Changes : function(Reader)
-    {
-        this.Math.CurrentContent.Load_Changes(Reader);
-    }
-};
-
 function ParagraphContent_Read_FromBinary(Reader)
 {
     var ElementType = Reader.GetLong();
@@ -7721,7 +6784,6 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_TextPr            :
         case para_Drawing           :
         case para_HyperlinkStart    :
-        case para_Math              :
         {
             var ElementId = Reader.GetString2();
             Element = g_oTableId.Get_ById( ElementId );
@@ -7731,17 +6793,9 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_Space             : Element = new ParaSpace();             break;
         case para_End               : Element = new ParaEnd();               break;
         case para_NewLine           : Element = new ParaNewLine();           break;
-        case para_NewLineRendered   : Element = new ParaNewLineRendered();   break;
-        case para_InlineBreak       : Element = new ParaInlineBreak();       break;
-        case para_PageBreakRendered : Element = new ParaPageBreakRenderer(); break;
-        case para_Empty             : Element = new ParaEmpty();             break;
         case para_Numbering         : Element = new ParaNumbering();         break;
         case para_Tab               : Element = new ParaTab();               break;
         case para_PageNum           : Element = new ParaPageNum();           break;
-        case para_FlowObjectAnchor  : Element = new ParaFlowObjectAnchor();  break;
-        case para_HyperlinkEnd      : Element = new ParaHyperlinkEnd();      break;
-        case para_CommentStart      : Element = new ParaCommentStart();      break;
-        case para_CommentEnd        : Element = new ParaCommentEnd();        break;
         case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
 		case para_Math_Text			: Element = new CMathText(false);		 break;
 		case para_Math_Ampersand	: Element = new CMathAmp();   		   	 break;
@@ -7752,5 +6806,3 @@ function ParagraphContent_Read_FromBinary(Reader)
 
     return Element;
 }
-
-

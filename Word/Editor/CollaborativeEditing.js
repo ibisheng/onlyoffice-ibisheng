@@ -980,7 +980,7 @@ function CCollaborativeEditing()
                         var Class = g_oTableId.Get_ById( oItem );
                         if ( null != Class )
                         {
-                            Class.Lock.Set_Type( locktype_Mine );
+                            Class.Lock.Set_Type( locktype_Mine, false );
                             this.Add_Unlock2( Class );
                         }
                     }
@@ -1200,13 +1200,16 @@ function CLock()
 {
     this.Type   = locktype_None;
     this.UserId = null;
+}
 
-    this.Get_Type = function()
+CLock.prototype = 
+{
+    Get_Type : function()
     {
         return this.Type;
-    };
+    },
 
-    this.Set_Type = function(NewType, Redraw)
+    Set_Type : function(NewType, Redraw)
     {
         if ( NewType === locktype_None )
             this.UserId = null;
@@ -1220,9 +1223,9 @@ function CLock()
             DrawingDocument.ClearCachePages();
             DrawingDocument.FirePaint();
         }
-    };
+    },
 
-    this.Check = function(Id)
+    Check : function(Id)
     {
         if ( this.Type === locktype_Mine )
             CollaborativeEditing.Add_CheckLock( false );
@@ -1230,9 +1233,9 @@ function CLock()
             CollaborativeEditing.Add_CheckLock( true );
         else
             CollaborativeEditing.Add_CheckLock( Id );
-    };
+    },
 
-    this.Lock = function(bMine)
+    Lock : function(bMine)
     {
         if ( locktype_None === this.Type )
         {
@@ -1241,33 +1244,33 @@ function CLock()
             else
                 true.Type = locktype_Other;
         }
-    };
+    },
 
-    this.Is_Locked = function()
+    Is_Locked : function()
     {
         if ( locktype_None != this.Type && locktype_Mine != this.Type )
             return true;
 
         return false;
-    };
+    },
 
-    this.Set_UserId = function(UserId)
+    Set_UserId : function(UserId)
     {
         this.UserId = UserId;
-    };
+    },
 
-    this.Get_UserId = function()
+    Get_UserId : function()
     {
         return this.UserId;
-    };
+    },
 
-    this.Have_Changes = function()
+    Have_Changes : function()
     {
         if ( locktype_Other2 === this.Type || locktype_Other3 === this.Type )
             return true;
 
         return false;
-    };
+    }
 }
 
 var contentchanges_Add    = 1;
@@ -1280,7 +1283,14 @@ function CContentChangesElement(Type, Pos, Count, Data)
     this.m_nCount = Count; // Количество добавленных/удаленных элементов
     this.m_pData  = Data;  // Связанные с данным изменением данные из истории
 
-    this.Refresh_BinaryData = function()
+    // Разбиваем сложное действие на простейшие
+    this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
+}
+
+CContentChangesElement.prototype =
+{
+
+    Refresh_BinaryData : function()
     {
         var Binary_Writer = History.BinaryWriter;
         var Binary_Pos = Binary_Writer.GetCurPosition();
@@ -1294,9 +1304,9 @@ function CContentChangesElement(Type, Pos, Count, Data)
 
         this.m_pData.Binary.Pos = Binary_Pos;
         this.m_pData.Binary.Len = Binary_Len;
-    };
+    },
 
-    this.Check_Changes = function(Type, Pos)
+    Check_Changes : function(Type, Pos)
     {
         var CurPos = Pos;
         if ( contentchanges_Add === Type )
@@ -1350,9 +1360,9 @@ function CContentChangesElement(Type, Pos, Count, Data)
         }
 
         return CurPos;
-    };
+    },
 
-    this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
+    Make_ArrayOfSimpleActions : function(Type, Pos, Count)
     {
         // Разбиваем действие на простейшие
         var Positions = [];
@@ -1368,27 +1378,27 @@ function CContentChangesElement(Type, Pos, Count, Data)
         }
 
         return Positions;
-    };
-
-    // Разбиваем сложное действие на простейшие
-    this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
-}
+    }
+};
 
 function CContentChanges()
 {
     this.m_aChanges = [];
+}
 
-    this.Add = function(Changes)
+CContentChanges.prototype =
+{
+    Add : function(Changes)
     {
         this.m_aChanges.push( Changes );
-    };
+    },
 
-    this.Clear = function()
+    Clear : function()
     {
         this.m_aChanges.length = 0;
-    };
+    },
 
-    this.Check = function(Type, Pos)
+    Check : function(Type, Pos)
     {
         var CurPos = Pos;
         var Count = this.m_aChanges.length;
@@ -1402,14 +1412,14 @@ function CContentChanges()
         }
 
         return CurPos;
-    };
+    },
 
-    this.Refresh = function()
+    Refresh : function()
     {
         var Count = this.m_aChanges.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
             this.m_aChanges[Index].Refresh_BinaryData();
         }
-    };
-}
+    }
+};

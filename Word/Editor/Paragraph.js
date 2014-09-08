@@ -95,8 +95,6 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     };
 
     this.Selection = new CParagraphSelection();
-
-    this.NeedReDraw = true;
     
     this.DrawingDocument = null;
     this.LogicDocument   = null;
@@ -107,9 +105,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         this.DrawingDocument = DrawingDocument;
         this.LogicDocument   = bFromPresentation ? null : this.DrawingDocument.m_oLogicDocument;
         this.bFromDocument   = bFromPresentation === true ? false : !!this.LogicDocument;
-    }
-    
-    this.TurnOffRecalcEvent = false;
+    }   
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
     // True, если ячейка попадает в выделение по ячейкам.
@@ -121,7 +117,6 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
         //CollaborativeEditing.Add_Unlock2( this );
     }
 
-    this.DeleteCollaborativeMarks = true;
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
@@ -4070,7 +4065,7 @@ Paragraph.prototype =
         // Выставляем родительский класс
         Item.Parent = this;
 
-        switch (Item.Type)
+        switch (Item.Get_Type())
         {
             case para_Text:
             case para_Space:
@@ -14557,8 +14552,7 @@ function CRunRecalculateObject(StartLine, StartRange)
     this.StartLine   = StartLine;
     this.StartRange  = StartRange
 
-    this.Lines       = []; // CParaRunLines
-    this.LinesLength = 0;
+    this.Lines       = [];
 
     this.Content = [];
 }
@@ -14573,14 +14567,11 @@ CRunRecalculateObject.prototype =
             var Lines = Obj.Lines;
             var Count = Obj.Lines.length;
             for ( var Index = 0; Index < Count; Index++ )
-                this.Lines[Index] = Lines[Index].Copy();
-
-            this.LinesLength = Obj.LinesLength;
+                this.Lines[Index] = Lines[Index];
         }
         else
         {
-            this.Lines       = Obj.Lines;
-            this.LinesLength = Obj.LinesLength;
+            this.Lines = Obj.Lines;
         }
     },
 
@@ -14598,14 +14589,7 @@ CRunRecalculateObject.prototype =
     {
         Obj.StartLine  = this.StartLine;
         Obj.StartRange = this.StartRange;
-
-        Obj.Lines       = this.Lines;
-        Obj.LinesLength = this.LinesLength;
-    },
-
-    Load_ZeroRange : function(Obj)
-    {
-        Obj.Range = this.Lines[0].Ranges[0];
+        Obj.Lines      = this.Lines;
     },
 
     Load_Content : function(Obj)
@@ -14664,14 +14648,14 @@ CRunRecalculateObject.prototype =
         if ( ( 0 === this.Lines.length || 0 === this.LinesLength ) && ( 0 === OLI.Lines.length || 0 === OLI.LinesLength ) )
             return true;
 
-        if ( this.StartLine !== OLI.StartLine || this.StartRange !== OLI.StartRange || CurLine < 0 || CurLine >= this.Lines.length || CurLine >= OLI.Lines.length || CurRange < 0 || CurRange >= this.Lines[CurLine].Ranges.length || CurRange >= OLI.Lines[CurLine].Ranges.length )
+        if ( this.StartLine !== OLI.StartLine || this.StartRange !== OLI.StartRange || CurLine < 0 || CurLine >= this.private_Get_LinesCount() || CurLine >= OLI.protected_GetLinesCount() || CurRange < 0 || CurRange >= this.private_Get_RangesCount(CurLine) || CurRange >= OLI.protected_GetRangesCount(CurLine) )
             return false;
 
-        var ThisSP = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var ThisEP = this.Lines[CurLine].Ranges[CurRange].EndPos;
+        var ThisSP = this.private_Get_RangeStartPos(CurLine, CurRange);
+        var ThisEP = this.private_Get_RangeEndPos(CurLine, CurRange);
 
-        var OtherSP = OLI.Lines[CurLine].Ranges[CurRange].StartPos;
-        var OtherEP = OLI.Lines[CurLine].Ranges[CurRange].EndPos;
+        var OtherSP = OLI.protected_GetRangeStartPos(CurLine, CurRange);
+        var OtherEP = OLI.protected_GetRangeEndPos(CurLine, CurRange);
 
         if ( ThisSP !== OtherSP || ThisEP !== OtherEP )
             return false;
@@ -14690,7 +14674,35 @@ CRunRecalculateObject.prototype =
         }
 
         return true;
-    }
+    },
+    
+    private_Get_RangeOffset : function(LineIndex, RangeIndex)
+    {
+        return (1 + this.Lines[0] + this.Lines[1 + LineIndex] + RangeIndex * 2);
+    },
+    
+    private_Get_RangeStartPos : function(LineIndex, RangeIndex)
+    { 
+        return this.Lines[this.private_Get_RangeOffset(LineIndex, RangeIndex)];
+    },
+
+    private_Get_RangeEndPos : function(LineIndex, RangeIndex)
+    {
+        return this.Lines[this.private_Get_RangeOffset(LineIndex, RangeIndex) + 1];
+    },
+    
+    private_Get_LinesCount : function()
+    {
+        return this.Lines[0];
+    },
+    
+    private_Get_RangesCount : function(LineIndex)
+    {
+        if (LineIndex === this.Lines[0] - 1)
+            return (this.Lines.length - this.Lines[1 + LineIndex]) / 2;
+        else
+            return (this.Lines[1 + LineIndex + 1] - this.Lines[1 + LineIndex]) / 2;
+    }    
 };
 
 function CParagraphRunElements(ContentPos, Count)

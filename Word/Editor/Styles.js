@@ -33,6 +33,8 @@ var vertalign_Koef_Sub   = -0.141; // Позиция нижнего индекс
 
 var smallcaps_Koef = 0.8; // Коэффициент изменения размера шрифта для малых прописных букв
 
+var smallcaps_and_script_koef = vertalign_Koef_Size * smallcaps_Koef; // суммарный коэффициент, когда текст одновременно и в индексе, и написан малыми прописными
+
 var g_dKoef_pt_to_mm = 25.4 / 72;
 var g_dKoef_pc_to_mm = g_dKoef_pt_to_mm / 12;
 var g_dKoef_in_to_mm = 25.4;

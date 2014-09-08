@@ -80,6 +80,11 @@ function ParaMath()
 
 ParaMath.prototype =
 {
+    Get_Type : function()
+    {
+        return this.Type;
+    },
+    
     Get_Id : function()
     {
         return this.Id;
@@ -790,7 +795,6 @@ ParaMath.prototype =
     Load_RecalculateObject : function(RecalcObj)
     {
         RecalcObj.Load_Lines(this);
-        RecalcObj.Load_ZeroRange(this);
     },
 
     Prepare_RecalculateObject : function()
