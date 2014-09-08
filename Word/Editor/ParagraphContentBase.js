@@ -57,7 +57,7 @@ CParagraphContentWithContentBase.prototype.protected_GetLinesCount = function()
 CParagraphContentWithContentBase.prototype.protected_GetRangesCount = function(LineIndex)
 {
     if (LineIndex === this.Lines[0] - 1)
-        return (this.Lines.length - this.Lines[1 + LineIndex]) / 2;
+        return (this.Lines.length - this.Lines[1 + LineIndex] - (this.Lines[0] + 1)) / 2;
     else
         return (this.Lines[1 + LineIndex + 1] - this.Lines[1 + LineIndex]) / 2;
 };

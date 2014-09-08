@@ -941,12 +941,10 @@ ParaRun.prototype.Split2 = function(CurPos)
             var MarkElement = Mark.Element;
             if ( true === Mark.Start )
             {
-                MarkElement.ClassesS[Mark.Depth]       = NewRun;
                 MarkElement.StartPos.Data[Mark.Depth] -= CurPos;
             }
             else
             {
-                MarkElement.ClassesE[Mark.Depth]     = NewRun;
                 MarkElement.EndPos.Data[Mark.Depth] -= CurPos;
             }
 
