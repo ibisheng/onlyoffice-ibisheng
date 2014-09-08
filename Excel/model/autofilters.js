@@ -2382,7 +2382,7 @@ var gUndoInsDelCellsFlag = true;
 				//при вставке ошибка в MS Excel может возникать как в случае автофильтров, так и в случае форматированных таблиц
 				if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop || InsertCellsAndShiftDown || InsertCellsAndShiftRight) && autoFilter)
 				{
-					tableRange = this._refToRange(autoFilter.Ref);
+					tableRange = autoFilter.Ref;
 					//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 					if(this._rangeHitInAnRange(activeCells, tableRange))
 					{
