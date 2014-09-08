@@ -1,6 +1,508 @@
-﻿function CDrawingStream()
+﻿function CDrawingStreamSerializer()
 {
-    this.Native = window["native"];
+    this.Memory = [];
+}
+
+CDrawingStreamSerializer.prototype["PD_put_GlobalAlpha"] = function(enable, alpha)
+{
+    this.Memory.push(0);
+    this.Memory.push(enable);
+    this.Memory.push(alpha);
+};
+CDrawingStreamSerializer.prototype["PD_End_GlobalAlpha"] = function()
+{
+    this.Memory.push(1);
+};
+CDrawingStreamSerializer.prototype["PD_p_color"] = function(r,g,b,a)
+{
+    this.Memory.push(2);
+    this.Memory.push(r);
+    this.Memory.push(g);
+    this.Memory.push(b);
+    this.Memory.push(a);
+};
+CDrawingStreamSerializer.prototype["PD_p_width"] = function(w)
+{
+    this.Memory.push(3);
+    this.Memory.push(w);
+};
+CDrawingStreamSerializer.prototype["PD_b_color1"] = function(r,g,b,a)
+{
+    this.Memory.push(4);
+    this.Memory.push(r);
+    this.Memory.push(g);
+    this.Memory.push(b);
+    this.Memory.push(a);
+};
+CDrawingStreamSerializer.prototype["PD_b_color2"] = function(r,g,b,a)
+{
+    this.Memory.push(5);
+    this.Memory.push(r);
+    this.Memory.push(g);
+    this.Memory.push(b);
+    this.Memory.push(a);
+};
+CDrawingStreamSerializer.prototype["PD_transform"] = function(sx,shy,shx,sy,tx,ty)
+{
+    this.Memory.push(6);
+    this.Memory.push(sx);
+    this.Memory.push(shy);
+    this.Memory.push(shx);
+    this.Memory.push(sy);
+    this.Memory.push(tx);
+    this.Memory.push(ty);
+};
+CDrawingStreamSerializer.prototype["PD_PathStart"] = function()
+{
+    this.Memory.push(11);
+};
+CDrawingStreamSerializer.prototype["PD_PathEnd"] = function()
+{
+    this.Memory.push(12);
+};
+CDrawingStreamSerializer.prototype["PD_PathClose"] = function()
+{
+    this.Memory.push(13);
+};
+CDrawingStreamSerializer.prototype["PD_PathMoveTo"] = function(x,y)
+{
+    this.Memory.push(7);
+    this.Memory.push(x);
+    this.Memory.push(y);
+};
+CDrawingStreamSerializer.prototype["PD_PathLineTo"] = function(x,y)
+{
+    this.Memory.push(8);
+    this.Memory.push(x);
+    this.Memory.push(y);
+};
+CDrawingStreamSerializer.prototype["PD_PathCurveTo"] = function(x1,y1,x2,y2,x3,y3)
+{
+    this.Memory.push(9);
+    this.Memory.push(x1);
+    this.Memory.push(y1);
+    this.Memory.push(x2);
+    this.Memory.push(y2);
+    this.Memory.push(x3);
+    this.Memory.push(y3);
+};
+CDrawingStreamSerializer.prototype["PD_PathCurveTo2"] = function(x1,y1,x2,y2)
+{
+    this.Memory.push(10);
+    this.Memory.push(x1);
+    this.Memory.push(y1);
+    this.Memory.push(x2);
+    this.Memory.push(y2);
+};
+CDrawingStreamSerializer.prototype["PD_Stroke"] = function()
+{
+    this.Memory.push(14);
+};
+CDrawingStreamSerializer.prototype["PD_Fill"] = function()
+{
+    this.Memory.push(15);
+};
+CDrawingStreamSerializer.prototype["PD_Save"] = function()
+{
+    this.Memory.push(16);
+};
+CDrawingStreamSerializer.prototype["PD_Restore"] = function()
+{
+    this.Memory.push(17);
+};
+CDrawingStreamSerializer.prototype["PD_clip"] = function()
+{
+    this.Memory.push(18);
+};
+CDrawingStreamSerializer.prototype["PD_reset"] = function()
+{
+    this.Memory.push(19);
+};
+CDrawingStreamSerializer.prototype["PD_transform3"] = function(sx,shy,shx,sy,tx,ty,isNeedInvert)
+{
+    this.Memory.push(20);
+    this.Memory.push(sx);
+    this.Memory.push(shy);
+    this.Memory.push(shx);
+    this.Memory.push(sy);
+    this.Memory.push(tx);
+    this.Memory.push(ty);
+    this.Memory.push(isNeedInvert);
+};
+CDrawingStreamSerializer.prototype["PD_FreeFont"] = function()
+{
+    // none
+};
+CDrawingStreamSerializer.prototype["PD_drawImage"] = function(img,x,y,w,h,alpha,srcRect_l,srcRect_t,srcRect_r,srcRect_b)
+{
+    if (srcRect_l === undefined)
+    {
+        this.Memory.push(22);
+        this.Memory.push(img);
+        this.Memory.push(x);
+        this.Memory.push(y);
+        this.Memory.push(w);
+        this.Memory.push(h);
+        this.Memory.push(alpha);
+        return;
+    }
+    this.Memory.push(23);
+    this.Memory.push(img);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+    this.Memory.push(alpha);
+    this.Memory.push(srcRect_l);
+    this.Memory.push(srcRect_t);
+    this.Memory.push(srcRect_r);
+    this.Memory.push(srcRect_b);
+};
+CDrawingStreamSerializer.prototype["PD_font"] = function(font_id, font_size)
+{
+    // nothing
+};
+CDrawingStreamSerializer.prototype["PD_LoadFont"] = function(Path, FaceIndex, FontSize, flag)
+{
+    this.Memory.push(25);
+    this.Memory.push(Path);
+    this.Memory.push(FaceIndex);
+    this.Memory.push(FontSize);
+    this.Memory.push(flag);
+};
+CDrawingStreamSerializer.prototype["PD_FillText"] = function(x,y,text_code)
+{
+    this.Memory.push(26);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(text_code);
+};
+CDrawingStreamSerializer.prototype["PD_Text"] = function(x,y,_arr)
+{
+    // not used.
+};
+CDrawingStreamSerializer.prototype["PD_FillText2"] = function(x,y,text_code,cropX,cropW)
+{
+    this.Memory.push(28);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(text_code);
+    this.Memory.push(cropX);
+    this.Memory.push(cropW);
+};
+CDrawingStreamSerializer.prototype["PD_Text2"] = function(x,y,_arr,cropX,cropW)
+{
+    // not used.
+};
+CDrawingStreamSerializer.prototype["PD_FillTextG"] = function(x,y,text_code)
+{
+    this.Memory.push(31);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(text_code);
+};
+CDrawingStreamSerializer.prototype["PD_SetIntegerGrid"] = function(param)
+{
+    this.Memory.push(32);
+    this.Memory.push(param);
+};
+CDrawingStreamSerializer.prototype["PD_DrawHeaderEdit"] = function(yPos, lock_type)
+{
+    this.Memory.push(33);
+    this.Memory.push(yPos);
+    this.Memory.push(lock_type);
+};
+CDrawingStreamSerializer.prototype["PD_DrawFooterEdit"] = function(yPos, lock_type)
+{
+    this.Memory.push(34);
+    this.Memory.push(yPos);
+    this.Memory.push(lock_type);
+};
+CDrawingStreamSerializer.prototype["PD_DrawLockParagraph"] = function(lock_type, x, y1, y2)
+{
+    this.Memory.push(35);
+    this.Memory.push(lock_type);
+    this.Memory.push(x);
+    this.Memory.push(y1);
+    this.Memory.push(y2);
+};
+CDrawingStreamSerializer.prototype["PD_DrawLockObjectRect"] = function(lock_type, x, y, w, h)
+{
+    this.Memory.push(36);
+    this.Memory.push(lock_type);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_DrawEmptyTableLine"] = function(x1,y1,x2,y2)
+{
+    this.Memory.push(37);
+    this.Memory.push(x1);
+    this.Memory.push(y1);
+    this.Memory.push(x2);
+    this.Memory.push(y2);
+};
+CDrawingStreamSerializer.prototype["PD_DrawSpellingLine"] = function(y0, x0, x1, w)
+{
+    this.Memory.push(38);
+    this.Memory.push(y0);
+    this.Memory.push(x0);
+    this.Memory.push(x1);
+    this.Memory.push(w);
+};
+CDrawingStreamSerializer.prototype["PD_drawHorLine"] = function(align, y, x, r, penW)
+{
+    this.Memory.push(39);
+    this.Memory.push(align);
+    this.Memory.push(y);
+    this.Memory.push(x);
+    this.Memory.push(r);
+    this.Memory.push(penW);
+};
+CDrawingStreamSerializer.prototype["PD_drawHorLine2"] = function(align, y, x, r, penW)
+{
+    this.Memory.push(40);
+    this.Memory.push(align);
+    this.Memory.push(y);
+    this.Memory.push(x);
+    this.Memory.push(r);
+    this.Memory.push(penW);
+};
+CDrawingStreamSerializer.prototype["PD_drawVerLine"] = function(align, x, y, b, penW)
+{
+    this.Memory.push(41);
+    this.Memory.push(align);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(b);
+    this.Memory.push(penW);
+};
+CDrawingStreamSerializer.prototype["PD_drawHorLineExt"] = function(align, y, x, r, penW, leftMW, rightMW)
+{
+    this.Memory.push(42);
+    this.Memory.push(align);
+    this.Memory.push(y);
+    this.Memory.push(x);
+    this.Memory.push(r);
+    this.Memory.push(penW);
+    this.Memory.push(leftMW);
+    this.Memory.push(rightMW);
+};
+CDrawingStreamSerializer.prototype["PD_rect"] = function(x,y,w,h)
+{
+    this.Memory.push(43);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_TableRect"] = function(x,y,w,h)
+{
+    this.Memory.push(44);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_AddClipRect"] = function(x,y,w,h)
+{
+    this.Memory.push(45);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_SetClip"] = function(x,y,w,h)
+{
+    this.Memory.push(46);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_RemoveClip"] = function()
+{
+    this.Memory.push(47);
+};
+CDrawingStreamSerializer.prototype["PD_drawCollaborativeChanges"] = function(x, y, w, h)
+{
+    this.Memory.push(48);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_drawSearchResult"] = function(x, y, w, h)
+{
+    this.Memory.push(49);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_drawFlowAnchor"] = function(x, y)
+{
+    this.Memory.push(50);
+    this.Memory.push(x);
+    this.Memory.push(y);
+};
+CDrawingStreamSerializer.prototype["PD_SavePen"] = function()
+{
+    this.Memory.push(51);
+};
+CDrawingStreamSerializer.prototype["PD_RestorePen"] = function()
+{
+    this.Memory.push(52);
+};
+CDrawingStreamSerializer.prototype["PD_SaveBrush"] = function()
+{
+    this.Memory.push(53);
+};
+CDrawingStreamSerializer.prototype["PD_RestoreBrush"] = function()
+{
+    this.Memory.push(54);
+};
+CDrawingStreamSerializer.prototype["PD_SavePenBrush"] = function()
+{
+    this.Memory.push(55);
+};
+CDrawingStreamSerializer.prototype["PD_RestorePenBrush"] = function()
+{
+    this.Memory.push(56);
+};
+CDrawingStreamSerializer.prototype["PD_SaveGrState"] = function()
+{
+    this.Memory.push(57);
+};
+CDrawingStreamSerializer.prototype["PD_RestoreGrState"] = function()
+{
+    this.Memory.push(58);
+};
+CDrawingStreamSerializer.prototype["PD_StartClipPath"] = function()
+{
+    this.Memory.push(59);
+};
+CDrawingStreamSerializer.prototype["PD_EndClipPath"] = function()
+{
+    this.Memory.push(65);
+};
+CDrawingStreamSerializer.prototype["PD_StartCheckTableDraw"] = function()
+{
+    this.Memory.push(60);
+};
+CDrawingStreamSerializer.prototype["PD_EndCheckTableDraw"] = function(bIsRestore)
+{
+    this.Memory.push(61);
+};
+CDrawingStreamSerializer.prototype["PD_SetTextClipRect"] = function(_l, _t, _r, _b)
+{
+    this.Memory.push(62);
+    this.Memory.push(_l);
+    this.Memory.push(_t);
+    this.Memory.push(_r);
+    this.Memory.push(_b);
+};
+CDrawingStreamSerializer.prototype["PD_AddSmartRect"] = function(x, y, w, h, pen_w)
+{
+    this.Memory.push(63);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+    this.Memory.push(pen_w);
+};
+CDrawingStreamSerializer.prototype["PD_DrawPresentationComment"] = function(type, x, y, w, h)
+{
+    this.Memory.push(64);
+    this.Memory.push(type);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_StartShapeDraw"] = function(IsRectShape)
+{
+    this.Memory.push(70);
+    this.Memory.push(IsRectShape);
+};
+CDrawingStreamSerializer.prototype["PD_EndShapeDraw"] = function()
+{
+    this.Memory.push(71);
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushTextute"] = function(id, l, t, r, b)
+{
+    if (l === undefined)
+    {
+        this.Memory.push(72);
+        this.Memory.push(id);
+        return;
+    }
+    this.Memory.push(73);
+    this.Memory.push(id);
+    this.Memory.push(l);
+    this.Memory.push(t);
+    this.Memory.push(r);
+    this.Memory.push(b);
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushTextureMode"] = function(mode)
+{
+    this.Memory.push(74);
+    this.Memory.push(mode);
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushBounds"] = function(x, y, w, h)
+{
+    this.Memory.push(75);
+    this.Memory.push(x);
+    this.Memory.push(y);
+    this.Memory.push(w);
+    this.Memory.push(h);
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushGradientLinear"] = function(x0, y0, x1, y1)
+{
+    this.Memory.push(76);
+    this.Memory.push(x0);
+    this.Memory.push(y0);
+    this.Memory.push(x1);
+    this.Memory.push(y1);
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushGragientColors"] = function(arr_pos, arr_colors)
+{
+    this.Memory.push(77);
+    this.Memory.push(arr_colors.length);
+
+    for (var i = 0; i < arr_colors.length; i++)
+    {
+        this.Memory.push(arr_pos[i].pos / 100000);
+
+        var _rgba = arr_colors[i].color.RGBA;
+        this.Memory.push(_rgba.R * 256*256*256 + _rgba.G * 256*256 + _rgba.B * 256 + _rgba.A);
+    }
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushPattern"] = function(_patt_name)
+{
+    this.Memory.push(78);
+    this.Memory.push(_patt_name);
+};
+CDrawingStreamSerializer.prototype["PD_lineJoin"] = function(_join)
+{
+    this.Memory.push(79);
+    this.Memory.push(_join);
+};
+CDrawingStreamSerializer.prototype["PD_put_BrushGradientRadial"] = function(x1, y1, r1, x2, y2, r2)
+{
+    this.Memory.push(80);
+    this.Memory.push(x1);
+    this.Memory.push(y1);
+    this.Memory.push(r1);
+    this.Memory.push(x2);
+    this.Memory.push(y2);
+    this.Memory.push(r2);
+};
+
+function CDrawingStream(_writer)
+{
+    this.Native = (undefined === _writer) ? window["native"] : _writer;
 
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new CGrRFonts();
