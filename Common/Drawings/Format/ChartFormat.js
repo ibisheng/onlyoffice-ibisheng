@@ -25,7 +25,6 @@ function removePtsFromLit(lit)
     }
 }
 
-
 function removeDPtsFromSeries(series)
 {
     if(Array.isArray(series.dPt))
@@ -21754,7 +21753,7 @@ CTitle.prototype =
     {
 
         var chart = this.chart;
-        if(editor && editor.WordControl && chart)
+        if(typeof editor !== "undefined" && editor && editor.WordControl && chart)
         {
             var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
             drawing_objects.resetSelection();
@@ -21839,6 +21838,15 @@ CTitle.prototype =
         if(content)
         {
             content.Paragraph_Add(paraItem, bRecalculate);
+        }
+    },
+
+    applyTextFunction: function(docContentFunction, tableFunction, args)
+    {
+        var content = this.getDocContent();
+        if(content)
+        {
+            docContentFunction.apply(content, args);
         }
     },
 
@@ -24063,14 +24071,14 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
     tx_body.setParent(parent);
     tx_body.setBodyPr(new CBodyPr());
     var old_is_doc_editor = false;
-    if(editor && editor.isDocumentEditor)
+    if(typeof editor !== "undefined" && editor && editor.isDocumentEditor)
     {
         editor.isDocumentEditor = false;
         old_is_doc_editor = true;
     }
     tx_body.setContent(CreateDocContentFromString(str, drawingDocument, tx_body));
 
-    if(editor && old_is_doc_editor)
+    if(typeof editor !== "undefined" && editor && old_is_doc_editor)
     {
         editor.isDocumentEditor = true;
     }
