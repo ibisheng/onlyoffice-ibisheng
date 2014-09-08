@@ -1,8 +1,8 @@
 "use strict";
 
-if(typeof editor === "undefined" && window["Asc"]["editor"])
+if(window.editor === "undefined" && window["Asc"]["editor"])
 {
-    var editor = window["Asc"]["editor"];
+    window.editor = window["Asc"]["editor"];
 }
 
 
