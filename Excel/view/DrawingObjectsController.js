@@ -1,6 +1,9 @@
 "use strict";
 
-var editor = window["Asc"]["editor"];
+if(typeof editor === "undefined" && window["Asc"]["editor"])
+{
+    var editor = window["Asc"]["editor"];
+}
 
 
 function CContentChangesElement(Type, Pos, Count, Data)
@@ -485,12 +488,17 @@ DrawingObjectsController.prototype.convertPixToMM = function(pix)
 
 DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)
 {
-    this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphPresentationNumbering, [Bullet]);
+    this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphPresentationNumbering, [Bullet], CTable.prototype.Set_ParagraphPresentationNumbering);
+};
+
+DrawingObjectsController.prototype.setParagraphIndent = function(Indent)
+{
+    this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphIndent, [Indent], CTable.prototype.Set_ParagraphIndent);
 };
 
 DrawingObjectsController.prototype.paragraphIncDecIndent = function(bIncrease)
 {
-    this.applyDocContentFunction(CDocumentContent.prototype.Increase_ParagraphLevel, [bIncrease]);
+    this.applyDocContentFunction(CDocumentContent.prototype.Increase_ParagraphLevel, [bIncrease], CTable.prototype.Increase_ParagraphLevel);
 };
 
 DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncrease)
