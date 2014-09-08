@@ -1332,7 +1332,7 @@ var gUndoInsDelCellsFlag = true;
 				else if(type == 'delCell')
 					val = activeCells.c1 - activeCells.c2 - 1;
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells);
+				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells, insertType);
 			},
 			//при вставке пользователем строки изменяем фильтры
 			insertRows: function(type, val, ar, insertType)
@@ -1366,7 +1366,7 @@ var gUndoInsDelCellsFlag = true;
 				else if(type == 'delCell')
 					val = activeCells.r1 - activeCells.r2 - 1;
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(colInsert,val,'insRow',activeCells);
+				this._changeFiltersAfterColumn(colInsert,val,'insRow',activeCells, insertType);
 			},
 			//применяем сортировку из меню фильтра
 			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
@@ -5001,7 +5001,7 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//change filters after insert column
-			_changeFiltersAfterColumn: function(col, val, type, activeCells)
+			_changeFiltersAfterColumn: function(col, val, type, activeCells, insertType)
 			{
 				History.TurnOff();
 				var aWs = this._getCurrentWS();
@@ -5038,7 +5038,8 @@ var gUndoInsDelCellsFlag = true;
 						};
 						length = aWs.TableParts.length;
 						//внутри данного фильтра располагается колонка
-						this._changeFilterAfterInsertColumn(options,type,activeCells);
+						if(this._bCheckChangeFilter(type, insertType, activeCells, ref))
+							this._changeFilterAfterInsertColumn(options,type,activeCells);
 						if(length > aWs.TableParts.length)
 							lT--;
 					}
@@ -5046,6 +5047,22 @@ var gUndoInsDelCellsFlag = true;
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
 				this._reDrawFilters();
 				History.TurnOn();
+			},
+			
+			_bCheckChangeFilter: function(type, insertType, activeCells, ref)
+			{
+				var result = false;
+				
+				if(insertType == c_oAscDeleteOptions.DeleteColumns || insertType == c_oAscDeleteOptions.DeleteRows)
+					result = true;
+				else if(type == "insCol" && (insertType == c_oAscDeleteOptions.DeleteCellsAndShiftLeft || insertType == c_oAscDeleteOptions.DeleteCellsAndShiftTop) && activeCells.r1 <= ref.r1 && activeCells.r2 >= ref.r2)
+					result = true;
+				else if(type == "insRow" && (insertType == c_oAscDeleteOptions.DeleteCellsAndShiftLeft || insertType == c_oAscDeleteOptions.DeleteCellsAndShiftTop) && activeCells.c1 <= ref.c1 && activeCells.c2 >= ref.c2)
+					result = true;
+				else if(insertType == undefined)
+					result = true;
+					
+				return result;
 			},
 			
 			_changeFilterAfterInsertColumn: function(options, type, activeCells)
