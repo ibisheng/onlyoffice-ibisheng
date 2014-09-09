@@ -907,7 +907,7 @@ CDocument.prototype =
     {
         this.TurnOffRecalc = false;
 
-        if (bRecalculte)
+        if (bRecalculate)
             this.Recalculate();
     },
 
