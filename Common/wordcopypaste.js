@@ -560,7 +560,7 @@ CopyProcessor.prototype =
         {
             case para_Text:
                 //���������� �����������
-                var sValue = ParaItem.Value;
+                var sValue = String.fromCharCode(ParaItem.Value);
                 if(sValue)
                     sRes += CopyPasteCorrectString(sValue);
                 break;
