@@ -563,6 +563,10 @@ CShape.prototype.Refresh_RecalcData2 = function()
     this.recalcTxBoxContent();
     this.recalcTransformText();
     this.addToRecalculate();
+
+    var HdrFtr = this.Is_HdrFtr(true);
+    if (HdrFtr)
+        HdrFtr.Refresh_RecalcData2();
 };
 
 CShape.prototype.getStartPageAbsolute = function()

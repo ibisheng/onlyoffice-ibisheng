@@ -1469,7 +1469,7 @@ ParaRun.prototype.Recalculate_Measure2 = function(Metrics)
 
         if ( para_Text === ItemType )
         {
-            var Temp = g_oTextMeasurer.Measure2( Item.Value );
+            var Temp = g_oTextMeasurer.Measure2(String.fromCharCode(Item.Value));
 
             if ( null === TAscent || TAscent < Temp.Ascent )
                 TAscent = Temp.Ascent;

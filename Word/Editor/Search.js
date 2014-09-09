@@ -981,7 +981,7 @@ ParaRun.prototype.Search = function(ParaSearch, Depth)
             ParaSearch.Reset();
         }
 
-        if ( (" " === Str[ParaSearch.SearchIndex] && para_Space === Item.Type) || ( para_Text === Item.Type && (  ( true != MatchCase && (Item.Value).toLowerCase() === Str[ParaSearch.SearchIndex].toLowerCase() ) || ( true === MatchCase && Item.Value === Str[ParaSearch.SearchIndex] ) ) ) )
+        if ( (" " === Str[ParaSearch.SearchIndex] && para_Space === Item.Type) || ( para_Text === Item.Type && (  ( true != MatchCase && (String.fromCharCode(Item.Value)).toLowerCase() === Str[ParaSearch.SearchIndex].toLowerCase() ) || ( true === MatchCase && Item.Value === Str.charCodeAt(ParaSearch.SearchIndex) ) ) ) )
         {
             if ( 0 === ParaSearch.SearchIndex )
             {

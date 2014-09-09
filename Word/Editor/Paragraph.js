@@ -2616,7 +2616,7 @@ Paragraph.prototype =
             if ( false === SavedLines.Compare( _Line, _Range, Item ) )
                 return -1;
 
-            Item.Load_RecalculateObject( SavedLines );
+            Item.Load_RecalculateObject(SavedLines, this);
         }
 
         // Recalculate_Lines_Width
@@ -7600,11 +7600,16 @@ Paragraph.prototype =
         if ( true === this.ApplyToAll )
         {
             this.Select_All(1);
+
+            var StartPos = 0;
+            var Count = this.Content.length;
+            while (true !== this.Content[StartPos].Is_CursorPlaceable() && StartPos < Count - 1)
+                StartPos++;
             
-            TextPr = this.Content[0].Get_CompiledTextPr(true);
+            TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
             var Count = this.Content.length;
 
-            for ( var CurPos = 1; CurPos < Count; CurPos++ )
+            for ( var CurPos = StartPos + 1; CurPos < Count; CurPos++ )
             {
                 var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
                 if ( null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty() )
@@ -7642,10 +7647,24 @@ Paragraph.prototype =
                         bCheckParaEnd = true;
                     }
 
+                    // Сначала пропускаем все пустые элементы. После этой операции мы можем попасть в элемент, в котором
+                    // нельзя находиться курсору, поэтому ищем в обратном направлении первый подходящий элемент.
+                    var OldStartPos = StartPos;
                     while ( true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos )
                         StartPos++;
 
+                    while (true !== this.Content[StartPos].Is_CursorPlaceable() && StartPos > OldStartPos)
+                        StartPos--;
+
                     TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+
+                    // Если все-так так сложилось, что мы находимся в элементе без настроек, тогда берем настройки для
+                    // символа конца параграфа.
+                    if (null === TextPr)
+                    {
+                        TextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                        TextPr.Merge(this.TextPr.Value);
+                    }
 
                     for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
                     {

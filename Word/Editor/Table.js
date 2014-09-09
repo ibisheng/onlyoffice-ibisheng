@@ -13348,8 +13348,15 @@ CTable.prototype =
 
         if ( this.TableGrid.length != GridCount )
         {
-            for (var Index = 0; Index < GridCount; Index++ )
-                this.TableGrid[Index] = 20;
+            if (this.TableGrid.length < GridCount)
+            {
+                for (var Index = 0; Index < GridCount; Index++)
+                    this.TableGrid[Index] = 20;
+            }
+            else
+            {
+                this.TableGrid.splice(GridCount, this.TableGrid.length - GridCount);
+            }
         }
 
         this.RecalcInfo.TableGridOpen = false;
