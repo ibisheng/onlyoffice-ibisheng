@@ -88,7 +88,7 @@ function CArrowDrawer( settings ) {
     this.ColorGradStart[ScrollOverType.STABLE] = HEXTORGB("cfcfcf")//{R:203, G:203, B:203};
     this.ColorGradEnd[ScrollOverType.STABLE] = HEXTORGB("cfcfcf")//{R:203, G:203, B:203};
 
-    this.ColorBorder = settings && settings.strokeStyle ? settings.strokeStyle : "#BBBEC2";
+    this.ColorBorder = settings && settings.strokeStyleNone ? settings.strokeStyleNone : "#BBBEC2";
     this.ColorBackNone = settings && settings.scrollBackgroundColor ? settings.scrollBackgroundColor : "#F4F4F4";
     this.ColorBackOver = "#cfcfcf"//settings && settings.scrollerColorOver ? settings.scrollerColorOver : "#D8DADC";
     this.ColorBackActive = "#848484"//settings && settings.scrollBackgroundColorHover ? settings.scrollBackgroundColorHover : "#7A7A7A";
@@ -245,12 +245,14 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
     var img = this.ImageTop[mode],
         x = 0, y = 0, is_vertical = true,
-        bottomRightDelta = 4;
+        bottomRightDelta = 1,
+        xDeltaIMG = 0, yDeltaIMG = 0, xDeltaBORDER = 0.5, yDeltaBORDER = 2.5;
 
     switch ( type ) {
         case ScrollArrowType.ARROW_LEFT:
         {
-            x = -1;
+            x = 1;
+            y = -2;
             is_vertical = false;
             img = this.ImageLeft[mode];
             break;
@@ -259,12 +261,13 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
         {
             is_vertical = false;
             x = w - this.SizeW - bottomRightDelta;
+            y = -2;
             img = this.ImageRight[mode];
             break;
         }
         case ScrollArrowType.ARROW_BOTTOM:
         {
-            y = h - this.SizeH - bottomRightDelta;
+            y = h - this.SizeH - bottomRightDelta - 2;
             img = this.ImageBottom[mode];
             break;
         }
@@ -277,9 +280,9 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
     var strokeW = is_vertical ? this.SizeW - 1 : this.SizeW - 1;
     var strokeH = is_vertical ? this.SizeH - 1 : this.SizeH - 1;
 
-    var xDeltaIMG = 2, yDeltaIMG = 0, xDeltaBORDER = 2.5, yDeltaBORDER = 2.5;
+
     ctx.fillStyle = this.ColorBackNone;
-    ctx.fillRect( x + .5, y + .5, strokeW + 3.5, strokeH + 3.5 );
+    ctx.fillRect( x + 0, y + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
     ctx.beginPath();
 
     switch ( mode ) {
@@ -287,13 +290,11 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
         {
 
             ctx.drawImage( img, x + xDeltaIMG, y + yDeltaIMG, this.SizeW, this.SizeH );
-//            ctx.strokeStyle = this.ColorBackNone;
-//            ctx.rect( x + 2.5, y + 1.5, strokeW, strokeH );
-//            if ( this.IsDrawBorders ) {
-//                ctx.strokeStyle = this.ColorBorder;
-//                ctx.rect( x + 2.5, y + 1.5, strokeW, strokeH );
-//                ctx.stroke();
-//            }
+            if ( this.IsDrawBorders ) {
+                ctx.strokeStyle = this.ColorBorder;
+                ctx.rect( x + xDeltaBORDER, y + yDeltaBORDER, strokeW, strokeH );
+                ctx.stroke();
+            }
             break;
         }
         case ScrollOverType.OVER:
@@ -304,7 +305,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 //            ctx.fillStyle = this.ColorBackNone;
 //            ctx.fillRect( x + .5, y + .5, strokeW+2.5, strokeH+2.5 );
 
-            ctx.fillRect( x + 2, y + 2, strokeW + 1, strokeH + 1 );
+            ctx.fillRect( x + xDeltaBORDER -.5 , y + yDeltaBORDER -.5 , strokeW + 1 , strokeH + 1 );
             ctx.drawImage( img, x + xDeltaIMG, y + yDeltaIMG, this.SizeW, this.SizeH );
             /*if ( this.IsDrawBorders ) {
              ctx.strokeStyle = this.ColorBorder;
@@ -316,7 +317,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
         case ScrollOverType.ACTIVE:
         {
             ctx.fillStyle = this.ColorBackActive;
-            ctx.fillRect( x + 2, y + 2, strokeW + 1, strokeH + 1 );
+            ctx.fillRect( x + xDeltaBORDER -.5 , y + yDeltaBORDER -.5 , strokeW + 1 , strokeH + 1 );
 //            ctx.fill();
 
             if ( !this.IsNeedInvertOnActive ) {
@@ -379,6 +380,14 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
     ctx.beginPath();
 }
 
+function _HEXTORGB_(colorHEX){
+    return {
+        R:parseInt(colorHEX.substring(0,2),16),
+        G:parseInt(colorHEX.substring(2,4),16),
+        B:parseInt(colorHEX.substring(4,6),16)
+    }
+}
+
 /**
  * @constructor
  */
@@ -409,14 +418,6 @@ function ScrollObject( elemID, settings, dbg ) {
         return _st;
     }
 
-    function HEXTORGB(colorHEX){
-        return {
-            R:parseInt(colorHEX.substring(0,2),16),
-            G:parseInt(colorHEX.substring(2,4),16),
-            B:parseInt(colorHEX.substring(4,6),16)
-        }
-    }
-
     var scrollSettings = {
         showArrows:false,
         screenW:-1,
@@ -429,13 +430,15 @@ function ScrollObject( elemID, settings, dbg ) {
         arrowRepeatFreq:50,
         trackClickRepeatFreq:70,
         scrollPagePercent:1. / 8,
-        arrowDim:17,
+        arrowDim:13,
         scrollerColor:"#f1f1f1",
         scrollerColorOver:"#cfcfcf",
-        scrollerColorActive:"#cfcfcf",
+        scrollerColorActive:"#848484",
         scrollBackgroundColor:"#F1F1F1",
         scrollBackgroundColorHover:"#F1F1F1",
-        strokeStyle:"#cfcfcf",
+        strokeStyleNone:"#cfcfcf",
+        strokeStyleOver:"#cfcfcf",
+        strokeStyleActive:"#848484",
         vscrollStep:10,
         hscrollStep:10,
         wheelScrollLines:1,
@@ -523,7 +526,7 @@ function ScrollObject( elemID, settings, dbg ) {
     this.piperImgHor[1].height = 5;
 
     var r, g, b, ctx_piperImg, _data, px;
-    r = HEXTORGB("CFCFCF");
+    r = _HEXTORGB_("CFCFCF");
     g = r.G;
     b = r.B;
     r = r.R;
@@ -558,7 +561,7 @@ function ScrollObject( elemID, settings, dbg ) {
 
         ctx_piperImg.putImageData( _data, 0, 0 )
 
-        r = HEXTORGB("F1F1F1");
+        r = _HEXTORGB_("F1F1F1");
         g = r.G;
         b = r.B;
         r = r.R;
@@ -636,8 +639,8 @@ ScrollObject.prototype = {
 
         if ( this.canvas.addEventListener )
             this.canvas.addEventListener( 'DOMMouseScroll', this.evt_mousewheel, false );
-        this._draw();
         this._drawArrow();
+        this._draw();
 
         return true;
     },
@@ -738,8 +741,8 @@ ScrollObject.prototype = {
         if ( this.isHorizontalScroll ) {
             this.scrollToX( this.scrollHCurrentX );
         }
-        this._draw();
         this._drawArrow();
+        this._draw();
     },
     Reinit:function ( settings, pos ) {
         this._setDimension( this.canvas.parentNode.clientHeight, this.canvas.parentNode.clientWidth );
@@ -767,8 +770,8 @@ ScrollObject.prototype = {
             pos !== undefined ? this.scrollByX( pos - this.scrollHCurrentX ) : this.scrollToX( this.scrollHCurrentX );
         }
         this.reinit = false;
-        this._draw();
         this._drawArrow();
+        this._draw();
     },
     _scrollV:function ( that, evt, pos, isTop, isBottom, bIsAttack ) {
         if ( !this.isVerticalScroll ) {
@@ -780,8 +783,8 @@ ScrollObject.prototype = {
             evt.scrollD = evt.scrollPositionY = that.scrollVCurrentY;
             evt.maxScrollY = that.maxScrollY;
 
-            that._draw();
             that._drawArrow();
+            that._draw();
             that.handleEvents( "onscrollvertical", evt );
         }
         else if ( that.scrollVCurrentY === pos && pos > 0 && !this.reinit && !this.moveble && !this.lock ) {
@@ -824,8 +827,8 @@ ScrollObject.prototype = {
             evt.scrollD = evt.scrollPositionX = that.scrollHCurrentX;
             evt.maxScrollX = that.maxScrollX;
 
-            that._draw();
             that._drawArrow();
+            that._draw();
             that.handleEvents( "onscrollhorizontal", evt );
         }
         else if ( that.scrollHCurrentX === pos && pos > 0 && !this.reinit && !this.moveble && !this.lock ) {
@@ -991,7 +994,7 @@ ScrollObject.prototype = {
                 _h = this.canvasH - (_y << 1);
 
             if ( _h > 0 ){
-                this.context.rect( 0, _y -1 , this.canvasW, _h );
+                this.context.rect( 0, _y - 1, this.canvasW, _h );
             }
         }
         else if ( this.isHorizontalScroll ) {
@@ -1006,6 +1009,10 @@ ScrollObject.prototype = {
         switch ( this.scrollerStatus ) {
 
             case ScrollOverType.OVER:
+            {
+                this.context.fillStyle = this.settings.scrollBackgroundColorHover;
+                break;
+            }
             case ScrollOverType.ACTIVE:
             {
                 this.context.fillStyle = this.settings.scrollBackgroundColorHover;
@@ -1028,11 +1035,11 @@ ScrollObject.prototype = {
             if ( _y < arrow )
                 _y = arrow;
             var _b = (this.scroller.y + this.scroller.h) >> 0;
-            if ( _b > (this.canvasH - arrow - 2) )
-                _b = this.canvasH - arrow - 2;
+            if ( _b > (this.canvasH - arrow - 1) )
+                _b = this.canvasH - arrow - 1;
 
             if ( _b > _y ){
-                this.roundRect( this.scroller.x + 1.5, _y + 0.5, this.scroller.w - 1, _b - _y );
+                this.roundRect( this.scroller.x - 0.5, _y + 0.5, this.scroller.w - 1, _b - _y + 1 );
             }
         }
         else if ( this.isHorizontalScroll && this.maxScrollX != 0 ) {
@@ -1044,7 +1051,7 @@ ScrollObject.prototype = {
                 _r = this.canvasW - arrow - 2;
 
             if ( _r > _x ){
-                this.roundRect( _x + 0.5, this.scroller.y + 1.5, _r - _x, this.scroller.h - 1 );
+                this.roundRect( _x + 0.5, (this.scroller.y >> 0) - 0.5, _r - _x + 1, (this.scroller.h >> 0) - 1 );
             }
         }
 
@@ -1052,14 +1059,17 @@ ScrollObject.prototype = {
         switch ( this.scrollerStatus ) {
 
             case ScrollOverType.OVER:
-            /*{
-             this.context.fillStyle = this.settings.scrollerColorOver;
-             break;
-             }*/
+            {
+                this.context.fillStyle = this.settings.scrollerColorOver;
+                this.context.strokeStyle = this.settings.strokeStyleOver;
+                piperImgIndex = 1;
+                break;
+            }
             case ScrollOverType.ACTIVE:
             {
+//                fadeIn = true;
                 this.context.fillStyle = this.settings.scrollerColorActive;
-                this.context.strokeStyle = this.settings.strokeStyle;
+                this.context.strokeStyle = this.settings.strokeStyleActive;
                 piperImgIndex = 1;
                 break;
             }
@@ -1067,7 +1077,7 @@ ScrollObject.prototype = {
             default:
             {
                 this.context.fillStyle = this.settings.scrollerColor;
-                this.context.strokeStyle = this.settings.strokeStyle;
+                this.context.strokeStyle = this.settings.strokeStyleNone;
                 piperImgIndex = 0;
                 break;
             }
@@ -1078,10 +1088,10 @@ ScrollObject.prototype = {
         this.context.stroke();
 
         if ( this.isVerticalScroll  && this.maxScrollY != 0 ) {
-            this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + 5, _y + Math.floor( this.scroller.h / 2 ) - 6 );
+            this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + 3, _y + Math.floor( this.scroller.h / 2 ) - 6 );
         }
         if ( this.isHorizontalScroll && this.maxScrollY != 0 ) {
-            this.context.drawImage( this.piperImgHor[piperImgIndex], _x + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + 5 );
+            this.context.drawImage( this.piperImgHor[piperImgIndex], _x + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + 3 );
         }
 
     },
@@ -1249,13 +1259,13 @@ ScrollObject.prototype = {
             this.scroller.x = 1;//0;
             this.scroller.w = 13;//this.canvasW - 1;
             if ( this.settings.showArrows )
-                this.ArrowDrawer.InitSize( 13, 17, this.IsRetina );
+                this.ArrowDrawer.InitSize( 13, 13, this.IsRetina );
         }
         else if ( this.isHorizontalScroll ) {
             this.scroller.y = 1;//0;
             this.scroller.h = 13;//this.canvasH - 1;
             if ( this.settings.showArrows )
-                this.ArrowDrawer.InitSize( 17, 13, this.IsRetina );
+                this.ArrowDrawer.InitSize( 13, 13, this.IsRetina );
         }
     },
     _MouseHoverOnScroller:function ( mp ) {
@@ -1408,10 +1418,12 @@ ScrollObject.prototype = {
             }
             this.that.scrollerStatus = ScrollOverType.NONE;
         }
-        if ( this.that.mouseDown && this.that.scrollerMouseDown )
+        if ( this.that.mouseDown && this.that.scrollerMouseDown ){
             this.that.moveble = true;
-        else
+        }
+        else{
             this.that.moveble = false;
+        }
 
         if ( this.that.isVerticalScroll ) {
             if ( this.that.moveble && this.that.scrollerMouseDown ) {
@@ -1561,8 +1573,8 @@ ScrollObject.prototype = {
             this.that.scrollerMouseDown = false;
             this.that.mouseDownArrow = false;
             this.that.scrollerStatus = ScrollOverType.NONE;
-            this.that._draw();
             this.that._drawArrow();
+            this.that._draw();
         }
 
         //for unlock global mouse event
