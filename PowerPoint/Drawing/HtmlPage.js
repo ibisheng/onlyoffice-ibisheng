@@ -93,7 +93,7 @@ function CEditorPage(api)
     this.m_oTopRuler                    = null;
     this.m_oTopRuler_horRuler           = null;
 
-    this.ScrollWidthPx      = 16;
+    this.ScrollWidthPx      = 14;
 
     // main view
     this.m_oMainView        = null;

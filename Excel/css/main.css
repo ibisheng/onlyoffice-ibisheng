@@ -9,8 +9,8 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	right: 16px;
-	bottom: 16px;
+	right: 14px;
+	bottom: 14px;
 }
 
 #ws-canvas {
@@ -33,9 +33,9 @@
 #ws-v-scrollbar {
 	position: absolute;
 	right: 0;
-	width: 16px;
+	width: 14px;
 	top: 0px;
-	bottom: 15px;
+	bottom: 14px;
 	overflow: hidden;
 	z-index: 10;
     background-color: #f1f1f1;
@@ -48,9 +48,9 @@
 #ws-h-scrollbar {
 	position: absolute;
 	bottom: 0;
-	height: 16px;
+	height: 14px;
 	left: 0px;
-	right: 15px;
+	right: 14px;
 	overflow: hidden;
 	z-index: 10;
     background-color: #f1f1f1;
@@ -64,8 +64,8 @@
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	width: 15px;
-	height: 15px;
+	width: 14px;
+	height: 14px;
 	background-color: #F4F4F4;
 	border: 0;
 	z-index: 10;

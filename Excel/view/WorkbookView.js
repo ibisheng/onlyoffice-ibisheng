@@ -117,8 +117,8 @@
 		function WorkbookView(model, controller, handlers, elem, inputElem, Api, collaborativeEditing, fontRenderingMode) {
 			this.defaults = {
 				scroll: {
-					widthPx	: 16,
-					heightPx: 16
+					widthPx	: 14,
+					heightPx: 14
 				},
 				worksheetView: new WorksheetViewSettings()
 			};

@@ -55,7 +55,7 @@ var GlobalSkinFlat = {
     Name : "flat",
     RulersButton : false,
     BackgroundColor : "#F4F4F4",
-    RulerDark : "#D8DADC",
+    RulerDark : "#CFCFCF",
     RulerLight : "#FFFFFF",
     BackgroundScroll : "#F1F1F1",
     RulerOutline : "#BBBEC2",
@@ -128,7 +128,7 @@ function CEditorPage(api)
     this.NoneRepaintPages   = false;
 
     this.m_bIsScroll        = false;
-    this.ScrollsWidthPx     = 16;
+    this.ScrollsWidthPx     = 14;
 
     this.m_oHorRuler        = new CHorRuler();
     this.m_oVerRuler        = new CVerRuler();
