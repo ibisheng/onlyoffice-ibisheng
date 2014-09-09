@@ -1009,12 +1009,12 @@ ParaHyperlink.prototype.Add_SpellCheckerElement = function(Element, Start, Depth
 {
     if ( true === Start )
     {
-        Element.ClassesS.push(this);
+        //Element.ClassesS.push(this);
         this.Content[Element.StartPos.Get(Depth)].Add_SpellCheckerElement(Element, Start, Depth + 1);
     }
     else
     {
-        Element.ClassesE.push(this);
+        //Element.ClassesE.push(this);
         this.Content[Element.EndPos.Get(Depth)].Add_SpellCheckerElement(Element, Start, Depth + 1);
     }
 

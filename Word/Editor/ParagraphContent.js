@@ -114,7 +114,7 @@ function ParaText(value)
     this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);    
     this.Width        = 0x00000000 | 0;
     this.WidthVisible = 0x00000000 | 0;
-    this.Flags        = 0x00000000;
+    this.Flags        = 0x00000000 | 0;
     
     this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
 }
@@ -297,9 +297,9 @@ ParaText.prototype =
 // Класс ParaSpace
 function ParaSpace()
 {
-    this.Flags        = 0x00000000;
-    this.Width        = 0x00000000;
-    this.WidthVisible = 0x00000000;
+    this.Flags        = 0x00000000 | 0;
+    this.Width        = 0x00000000 | 0;
+    this.WidthVisible = 0x00000000 | 0;
 }
 ParaSpace.prototype =
 {
@@ -2938,7 +2938,7 @@ ParaNumbering.prototype =
     }
 };
 
-// TODO: Реализовать табы правые, центральные, по точке и с чертой.
+// TODO: Реализовать табы по точке и с чертой.
 var tab_Clear  = 0x00;
 var tab_Left   = 0x01;
 var tab_Right  = 0x02;

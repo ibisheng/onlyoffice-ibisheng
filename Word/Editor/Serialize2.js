@@ -3269,12 +3269,12 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
 		var index = 0;
 		if(null != this.oUsedNumIdMap)
 		{
-			for(i in this.oUsedNumIdMap)
+			for(var i in this.oUsedNumIdMap)
 				this.bs.WriteItem(c_oSerNumTypes.Num, function(){oThis.WriteNum(i, oThis.oUsedNumIdMap[i] - 1);});
 		}
 		else
 		{
-			for(i in nums)
+			for(var i in nums)
 			{
 				this.bs.WriteItem(c_oSerNumTypes.Num, function(){oThis.WriteNum(i, index);});
 				index++;
@@ -3300,7 +3300,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
 		var aNumsToWrite = nums;
 		if(null != this.oUsedNumIdMap)
 		{
-			for(i in this.oUsedNumIdMap)
+			for(var i in this.oUsedNumIdMap)
 			{
 				var num = nums[i];
 				if(null != num)
@@ -3309,7 +3309,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
 		}
 		else
 		{
-			for(i in nums)
+			for(var i in nums)
 			{
 				var num = nums[i];
 				this.bs.WriteItem(c_oSerNumTypes.AbstractNum, function(){oThis.WriteAbstractNum(num, index);});
@@ -3748,7 +3748,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             switch ( item.Type )
             {
                 case para_Text:
-                    sCurText += item.Value;
+                    sCurText += String.fromCharCode(item.Value);
                     break;
                 case para_Space:
                     sCurText += " ";

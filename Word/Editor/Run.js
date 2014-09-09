@@ -4880,12 +4880,12 @@ ParaRun.prototype.Split_Run = function(Pos)
             var MarkElement = Mark.Element;
             if ( true === Mark.Start )
             {
-                MarkElement.ClassesS[Mark.Depth]       = NewRun;
+                //MarkElement.ClassesS[Mark.Depth]       = NewRun;
                 MarkElement.StartPos.Data[Mark.Depth] -= Pos;
             }
             else
             {
-                MarkElement.ClassesE[Mark.Depth]     = NewRun;
+                //MarkElement.ClassesE[Mark.Depth]     = NewRun;
                 MarkElement.EndPos.Data[Mark.Depth] -= Pos;
             }
 

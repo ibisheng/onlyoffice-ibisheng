@@ -725,7 +725,7 @@ ParaHyperlink.prototype =
 
         var CurContentPos = ( true === UseContentPos ? ContentPos.Get(Depth) : -1 );
 
-        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
             this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, Depth + 1 );
 
