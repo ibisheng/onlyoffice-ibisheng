@@ -5037,9 +5037,19 @@ var gUndoInsDelCellsFlag = true;
 							index: lT
 						};
 						length = aWs.TableParts.length;
+						
 						//внутри данного фильтра располагается колонка
 						if(this._bCheckChangeFilter(type, insertType, activeCells, ref))
+						{
+							if(ref)
+							{
+								var clearRange = new Range(aWs, ref.r1, ref.c1, ref.r2, ref.c2)
+								clearRange.setTableStyle(null);
+							}
+								
 							this._changeFilterAfterInsertColumn(options,type,activeCells);
+						}
+							
 						if(length > aWs.TableParts.length)
 							lT--;
 					}
