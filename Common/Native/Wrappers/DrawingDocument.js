@@ -1287,7 +1287,8 @@ CDrawingDocument.prototype =
 
         var _len = _params.length / 4;
 
-        editor["Call_TurnOffRecalculate"]();
+        this.LogicDocument.TurnOff_Recalculate();
+        this.LogicDocument.TurnOff_InterfaceEvents();
 
         this.StartUpdateOverlay();
 
@@ -1324,7 +1325,8 @@ CDrawingDocument.prototype =
 
         this.EndUpdateOverlay();
 
-        editor["Call_TurnOnRecalculate"]();
+        this.LogicDocument.TurnOn_Recalculate(true);
+        this.LogicDocument.TurnOn_InterfaceEvents(true);
     },
 	
 	__DD_ConvertCoordsFromCursor : function(x, y)

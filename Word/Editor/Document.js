@@ -581,7 +581,8 @@ function CDocument(DrawingDocument)
     this.RecalcId   = 0; // Номер пересчета
     this.FullRecalc = new CDocumentRecalculateState();
     
-    this.TurnOffRecalc = false;
+    this.TurnOffRecalc          = false;
+    this.TurnOffInterfaceEvents = false;
 
     this.Numbering = new CNumbering();
     this.Styles    = new CStyles();
@@ -886,6 +887,28 @@ CDocument.prototype =
     Get_ColorMap: function()
     {
         return this.clrSchemeMap;
+    },
+
+    /**
+     * Данная функция предназначена для отключения пересчета. Это может быть полезно, т.к. редактор всегда запускает пересчет после каждого действия.
+     *
+     */
+    TurnOff_Recalculate : function()
+    {
+        this.TurnOffRecalc = true;
+    },
+
+    /**
+     * Включаем пересчет, если он был отключен
+     *
+     * @param {bool} bRecalculate Запускать ли пересчет
+     */
+    TurnOn_Recalculate : function(bRecalculate)
+    {
+        this.TurnOffRecalc = false;
+
+        if (bRecalculte)
+            this.Recalculate();
     },
 
     // Пересчет содержимого Документа
@@ -11356,6 +11379,9 @@ CDocument.prototype =
     // Обновляем текущее состояние (определяем где мы находимся, картинка/параграф/таблица/колонтитул)
     Document_UpdateInterfaceState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
         
@@ -11422,11 +11448,12 @@ CDocument.prototype =
         this.Document_UpdateCanAddHyperlinkState();
         this.Document_UpdateSectionPr();
     },
-
-
     // Обновляем линейки
     Document_UpdateRulersState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
@@ -11498,7 +11525,6 @@ CDocument.prototype =
             }
         }
     },
-
     Document_UpdateRulersStateBySection : function()
     {
         // В данной функции мы уже точно знаем, что нам секцию нужно выбирать исходя из текущего параграфа
@@ -11513,10 +11539,12 @@ CDocument.prototype =
 
         this.DrawingDocument.Set_RulerState_Paragraph( { L : L, T : T, R : R, B : B }, true );
     },
-
     // Обновляем линейки
     Document_UpdateSelectionState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
@@ -11598,6 +11626,9 @@ CDocument.prototype =
 
     Document_UpdateUndoRedoState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
        
@@ -11625,6 +11656,9 @@ CDocument.prototype =
     
     Document_UpdateCopyCutState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         // Во время работы селекта не обновляем состояние
         if ( true === this.Selection.Start )
             return;
@@ -11674,6 +11708,9 @@ CDocument.prototype =
 
     Document_UpdateCanAddHyperlinkState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
@@ -11683,6 +11720,9 @@ CDocument.prototype =
 
     Document_UpdateSectionPr : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
@@ -11692,6 +11732,31 @@ CDocument.prototype =
         // Обновляем размер страницы
         var PageSize = this.Get_DocumentPageSize();
         editor.sync_DocSizeCallback( PageSize.W, PageSize.H );
+    },
+
+    /**
+     * Отключаем отсылку сообщений в интерфейс.
+     */
+    TurnOff_InterfaceEvents : function()
+    {
+        this.TurnOffInterfaceEvents = true;
+    },
+
+    /**
+     * Включаем отсылку сообщений в интерфейс.
+     *
+     * @param {bool} bUpdate Обновлять ли интерфейс
+     */
+    TurnOn_InterfaceEvents : function(bUpdate)
+    {
+        this.TurnOffInterfaceEvents = true;
+
+        if (true === bUpdate)
+        {
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateRulersState();
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
