@@ -1,4 +1,74 @@
-﻿function CEditorPage(api)
+﻿var g_dDpiX = 96.0;
+var g_dDpiY = 96.0;
+
+var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
+var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+
+var g_bIsMobile =  AscBrowser.isMobile;
+var g_bIsMouseUpLockedSend = false;
+
+var Page_Width     = 210;
+var Page_Height    = 297;
+
+var X_Left_Margin   = 30;  // 3   cm
+var X_Right_Margin  = 15;  // 1.5 cm
+var Y_Bottom_Margin = 20;  // 2   cm
+var Y_Top_Margin    = 20;  // 2   cm
+
+var Y_Default_Header = 12.5; // 1.25 cm расстояние от верха страницы до верха верхнего колонтитула
+var Y_Default_Footer = 12.5; // 1.25 cm расстояние от низа страницы до низа нижнего колонтитула
+
+var X_Left_Field   = X_Left_Margin;
+var X_Right_Field  = Page_Width  - X_Right_Margin;
+var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
+var Y_Top_Field    = Y_Top_Margin;
+
+var docpostype_Content     = 0x00;
+var docpostype_FlowObjects = 0x01;
+var docpostype_HdrFtr      = 0x02;
+
+var selectionflag_Common        = 0x00;
+var selectionflag_Numbering     = 0x01;
+var selectionflag_DrawingObject = 0x002;
+
+var orientation_Portrait  = 0x00;
+var orientation_Landscape = 0x01;
+
+var tableSpacingMinValue = 0.02;//0.02мм
+
+var GlobalSkinTeamlab = {
+    Name : "classic",
+    RulersButton : true,
+    NavigationButtons : true,
+    BackgroundColor : "#B0B0B0",
+    RulerDark : "#B0B0B0",
+    RulerLight : "EDEDED",
+    BackgroundScroll : "#D3D3D3",
+    RulerOutline : "#929292",
+    RulerMarkersFillColor : "#E7E7E7",
+    PageOutline : "#81878F",
+    STYLE_THUMBNAIL_WIDTH : 80,
+    STYLE_THUMBNAIL_HEIGHT : 40
+};
+var GlobalSkinFlat = {
+    Name : "flat",
+    RulersButton : false,
+    NavigationButtons : false,
+    BackgroundColor : "#F4F4F4",
+    RulerDark : "#CFCFCF",
+    RulerLight : "#FFFFFF",
+    BackgroundScroll : "#F1F1F1",
+    RulerOutline : "#BBBEC2",
+    RulerMarkersFillColor : "#FFFFFF",
+    PageOutline : "#BBBEC2",
+    STYLE_THUMBNAIL_WIDTH : 109,
+    STYLE_THUMBNAIL_HEIGHT : 45,
+    isNeedInvertOnActive: false
+};
+
+var GlobalSkin = GlobalSkinTeamlab;
+
+function CEditorPage(api)
 {
     this.Name = "";
 

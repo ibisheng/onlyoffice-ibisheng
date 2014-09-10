@@ -1,4 +1,418 @@
-﻿function CShapeDrawer()
+﻿window.IsShapeToImageConverter = false;
+function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
+{
+    switch (type)
+    {
+        case LineEndType.None:
+            break;
+        case LineEndType.Arrow:
+        {
+            var _ex = xPrev - xEnd;
+            var _ey = yPrev - yEnd;
+            var _elen = Math.sqrt(_ex*_ex + _ey*_ey);
+            _ex /= _elen;
+            _ey /= _elen;
+
+            var _vx = _ey;
+            var _vy = -_ex;
+
+            var tmpx = xEnd + len * _ex;
+            var tmpy = yEnd + len * _ey;
+
+            var x1 = tmpx + _vx * w/2;
+            var y1 = tmpy + _vy * w/2;
+
+            var x3 = tmpx - _vx * w/2;
+            var y3 = tmpy - _vy * w/2;
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(xEnd, yEnd), trans.TransformPointY(xEnd, yEnd));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer.ds();
+            drawer._e();
+
+            break;
+        }
+        case LineEndType.Diamond:
+        {
+            var _ex = xPrev - xEnd;
+            var _ey = yPrev - yEnd;
+            var _elen = Math.sqrt(_ex*_ex + _ey*_ey);
+            _ex /= _elen;
+            _ey /= _elen;
+
+            var _vx = _ey;
+            var _vy = -_ex;
+
+            var tmpx = xEnd + len/2 * _ex;
+            var tmpy = yEnd + len/2 * _ey;
+
+            var x1 = xEnd + _vx * w/2;
+            var y1 = yEnd + _vy * w/2;
+
+            var x3 = xEnd - _vx * w/2;
+            var y3 = yEnd - _vy * w/2;
+
+            var tmpx2 = xEnd - len/2 * _ex;
+            var tmpy2 = yEnd - len/2 * _ey;
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(tmpx, tmpy), trans.TransformPointY(tmpx, tmpy));
+            drawer._l(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(tmpx2, tmpy2), trans.TransformPointY(tmpx2, tmpy2));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer._z();
+            drawer.drawStrokeFillStyle();
+            drawer._e();
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(tmpx, tmpy), trans.TransformPointY(tmpx, tmpy));
+            drawer._l(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(tmpx2, tmpy2), trans.TransformPointY(tmpx2, tmpy2));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer._z();
+            drawer.ds();
+            drawer._e();
+
+            break;
+        }
+        case LineEndType.Oval:
+        {
+            var _ex = xPrev - xEnd;
+            var _ey = yPrev - yEnd;
+            var _elen = Math.sqrt(_ex*_ex + _ey*_ey);
+            _ex /= _elen;
+            _ey /= _elen;
+
+            var _vx = _ey;
+            var _vy = -_ex;
+
+            var tmpx = xEnd + len/2 * _ex;
+            var tmpy = yEnd + len/2 * _ey;
+
+            var tmpx2 = xEnd - len/2 * _ex;
+            var tmpy2 = yEnd - len/2 * _ey;
+
+            var cx1 = tmpx + _vx * 3*w/4;
+            var cy1 = tmpy + _vy * 3*w/4;
+            var cx2 = tmpx2 + _vx * 3*w/4;
+            var cy2 = tmpy2 + _vy * 3*w/4;
+
+            var cx3 = tmpx - _vx * 3*w/4;
+            var cy3 = tmpy - _vy * 3*w/4;
+            var cx4 = tmpx2 - _vx * 3*w/4;
+            var cy4 = tmpy2 - _vy * 3*w/4;
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(tmpx, tmpy), trans.TransformPointY(tmpx, tmpy));
+            drawer._c(trans.TransformPointX(cx1, cy1), trans.TransformPointY(cx1, cy1),
+                trans.TransformPointX(cx2, cy2), trans.TransformPointY(cx2, cy2),
+                trans.TransformPointX(tmpx2, tmpy2), trans.TransformPointY(tmpx2, tmpy2));
+
+            drawer._c(trans.TransformPointX(cx4, cy4), trans.TransformPointY(cx4, cy4),
+                trans.TransformPointX(cx3, cy3), trans.TransformPointY(cx3, cy3),
+                trans.TransformPointX(tmpx, tmpy), trans.TransformPointY(tmpx, tmpy));
+
+            drawer.drawStrokeFillStyle();
+            drawer._e();
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(tmpx, tmpy), trans.TransformPointY(tmpx, tmpy));
+            drawer._c(trans.TransformPointX(cx1, cy1), trans.TransformPointY(cx1, cy1),
+                trans.TransformPointX(cx2, cy2), trans.TransformPointY(cx2, cy2),
+                trans.TransformPointX(tmpx2, tmpy2), trans.TransformPointY(tmpx2, tmpy2));
+
+            drawer._c(trans.TransformPointX(cx4, cy4), trans.TransformPointY(cx4, cy4),
+                trans.TransformPointX(cx3, cy3), trans.TransformPointY(cx3, cy3),
+                trans.TransformPointX(tmpx, tmpy), trans.TransformPointY(tmpx, tmpy));
+
+            drawer.ds();
+            drawer._e();
+            break;
+        }
+        case LineEndType.Stealth:
+        {
+            var _ex = xPrev - xEnd;
+            var _ey = yPrev - yEnd;
+            var _elen = Math.sqrt(_ex*_ex + _ey*_ey);
+            _ex /= _elen;
+            _ey /= _elen;
+
+            var _vx = _ey;
+            var _vy = -_ex;
+
+            var tmpx = xEnd + len * _ex;
+            var tmpy = yEnd + len * _ey;
+
+            var x1 = tmpx + _vx * w/2;
+            var y1 = tmpy + _vy * w/2;
+
+            var x3 = tmpx - _vx * w/2;
+            var y3 = tmpy - _vy * w/2;
+
+            var x4 = xEnd + (len - w/2) * _ex;
+            var y4 = yEnd + (len - w/2) * _ey;
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(xEnd, yEnd), trans.TransformPointY(xEnd, yEnd));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer._l(trans.TransformPointX(x4, y4), trans.TransformPointY(x4, y4));
+            drawer._z();
+            drawer.drawStrokeFillStyle();
+            drawer._e();
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(xEnd, yEnd), trans.TransformPointY(xEnd, yEnd));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer._l(trans.TransformPointX(x4, y4), trans.TransformPointY(x4, y4));
+            drawer._z();
+            drawer.ds();
+            drawer._e();
+
+            break;
+        }
+        case LineEndType.Triangle:
+        {
+            var _ex = xPrev - xEnd;
+            var _ey = yPrev - yEnd;
+            var _elen = Math.sqrt(_ex*_ex + _ey*_ey);
+            _ex /= _elen;
+            _ey /= _elen;
+
+            var _vx = _ey;
+            var _vy = -_ex;
+
+            var tmpx = xEnd + len * _ex;
+            var tmpy = yEnd + len * _ey;
+
+            var x1 = tmpx + _vx * w/2;
+            var y1 = tmpy + _vy * w/2;
+
+            var x3 = tmpx - _vx * w/2;
+            var y3 = tmpy - _vy * w/2;
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(xEnd, yEnd), trans.TransformPointY(xEnd, yEnd));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer._z();
+            drawer.drawStrokeFillStyle();
+            drawer._e();
+
+            drawer._s();
+            drawer._m(trans.TransformPointX(x1, y1), trans.TransformPointY(x1, y1));
+            drawer._l(trans.TransformPointX(xEnd, yEnd), trans.TransformPointY(xEnd, yEnd));
+            drawer._l(trans.TransformPointX(x3, y3), trans.TransformPointY(x3, y3));
+            drawer._z();
+            drawer.ds();
+            drawer._e();
+            break;
+        }
+    }
+}
+
+
+//рисуем конечную стрелку
+function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
+{
+    var sin, cos;
+    sin=Math.sin(angle);
+    cos=Math.cos(angle);
+    switch(type)
+    {
+        case ar_arrow:
+        {
+            var xb, yb, xc, yc;
+            xb=-length;
+            yb=-width*0.5;
+
+            xc=xb;
+            yc=yb+width;
+
+            graphics._s();
+            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(x, y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics.ds();
+
+            break;
+        }
+        case ar_diamond:
+        {
+            var xd, yd;
+            xb=-length*0.5;
+            yb=-width*0.5;
+
+            xc=-length;
+            yc=0;
+
+            xd=xb;
+            yd=yb+width;
+
+            graphics._s();
+            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(x, y);
+            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics._z();
+            graphics.ds();
+            graphics.df();
+
+            break;
+        }
+        case ar_none:
+        {
+            break;
+        }
+        case ar_oval:
+        {
+            EllipseN(graphics, x, y, length*0.5, width*0.5, angle);
+            break;
+        }
+        case ar_stealth:
+        {
+            xb=-length;
+            yb=-width*0.5;
+
+            xc=-length*0.5;
+            yc=0;
+
+            xd=xb;
+            yd=-yb;
+
+            graphics._s();
+            graphics._m(x, y);
+            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
+            graphics._z();
+            graphics.ds();
+            graphics.df();
+            break;
+        }
+        case ar_triangle:
+        {
+            xb=-length;
+            yb=-width*0.5;
+
+            xc=xb;
+            yc=-yb;
+
+            graphics._s();
+            graphics._m(x, y);
+            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics._z();
+            graphics.ds();
+            graphics.df();
+            break;
+        }
+    }
+}
+
+
+//рисуем начальную стрелку
+function DrawHeadEnd(type, length, width, x, y, angle, graphics)
+{
+    var sin, cos;
+    sin=Math.sin(angle);
+    cos=Math.cos(angle);
+    switch(type)
+    {
+        case ar_arrow:
+        {
+            var xb, yb, xc, yc;
+            xb=length;
+            yb=-width*0.5;
+
+            xc=xb;
+            yc=yb+width;
+
+            graphics._s();
+            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(x, y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics.ds();
+
+            break;
+        }
+        case ar_diamond:
+        {
+            var xd, yd;
+            xb=length*0.5;
+            yb=-width*0.5;
+
+            xc=length;
+            yc=0;
+
+            xd=xb;
+            yd=yb+width;
+
+            graphics._s();
+            graphics._m(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(x, y);
+            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics._z();
+            graphics.ds();
+            graphics.df();
+
+            break;
+        }
+        case ar_none:
+        {
+            break;
+        }
+        case ar_oval:
+        {
+            Ellipse2(graphics, x, y, length*0.5, width*0.5, angle);
+            break;
+        }
+        case ar_stealth:
+        {
+            xb=length;
+            yb=-width*0.5;
+
+            xc=length*0.5;
+            yc=0;
+
+            xd=xb;
+            yd=-yb;
+
+            graphics._s();
+            graphics._m(x, y);
+            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics._l(xd*cos-yd*sin+x, xd*sin+yd*cos+y);
+            graphics._z();
+            graphics.ds();
+            graphics.df();
+            break;
+        }
+        case ar_triangle:
+        {
+            xb=length;
+            yb=-width*0.5;
+
+            xc=xb;
+            yc=-yb;
+
+            graphics._s();
+            graphics._m(x, y);
+            graphics._l(xb*cos-yb*sin+x, xb*sin+yb*cos+y);
+            graphics._l(xc*cos-yc*sin+x, xc*sin+yc*cos+y);
+            graphics._z();
+            graphics.ds();
+            graphics.df();
+            break;
+        }
+    }
+}
+
+function CShapeDrawer()
 {
     this.Shape      = null;
     this.Graphics   = null;
@@ -699,3 +1113,75 @@ CShapeDrawer.prototype =
     {
     }
 };
+
+function ShapeToImageConverter(shape, pageIndex)
+{
+	window.IsShapeToImageConverter = true;
+    var _bounds_cheker = new CSlideBoundsChecker();
+
+    var dKoef = g_dKoef_mm_to_pix;
+    var w_mm = 210;
+    var h_mm = 297;
+    var w_px = (w_mm * dKoef) >> 0;
+    var h_px = (h_mm * dKoef) >> 0;
+
+    _bounds_cheker.init(w_px, h_px, w_mm, h_mm);
+    _bounds_cheker.transform(1,0,0,1,0,0);
+
+    _bounds_cheker.AutoCheckLineWidth = true;
+	_bounds_cheker.CheckLineWidth(shape);
+    shape.draw(_bounds_cheker, /*pageIndex*/0);
+	_bounds_cheker.CorrectBounds2();
+
+    var _need_pix_width     = _bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1;
+    var _need_pix_height    = _bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1;
+
+    if (_need_pix_width <= 0 || _need_pix_height <= 0)
+        return null;
+
+    /*
+    if (shape.pen)
+    {
+        var _w_pen = (shape.pen.w == null) ? 12700 : parseInt(shape.pen.w);
+        _w_pen /= 36000.0;
+        _w_pen *= g_dKoef_mm_to_pix;
+
+        _need_pix_width += (2 * _w_pen);
+        _need_pix_height += (2 * _w_pen);
+
+        _bounds_cheker.Bounds.min_x -= _w_pen;
+        _bounds_cheker.Bounds.min_y -= _w_pen;
+    }*/
+
+    var _canvas = document.createElement('canvas');
+    _canvas.width = _need_pix_width;
+    _canvas.height = _need_pix_height;
+
+    var _ctx = _canvas.getContext('2d');
+
+    var g = new CGraphics();
+    g.init(_ctx, w_px, h_px, w_mm, h_mm);
+    g.m_oFontManager = g_fontManager;
+
+    g.m_oCoordTransform.tx = -_bounds_cheker.Bounds.min_x;
+    g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
+    g.transform(1,0,0,1,0,0);
+
+    shape.draw(g, /*pageIndex*/0);
+
+	window.IsShapeToImageConverter = false;
+
+    var _ret = { ImageNative : _canvas, ImageUrl : "" };
+    try
+    {
+        _ret.ImageUrl = _canvas.toDataURL("image/png");
+    }
+    catch (err)
+    {
+        if (shape.brush != null && shape.brush.fill && shape.brush.fill.RasterImageId)
+            _ret.ImageUrl = _getFullImageSrc(shape.brush.fill.RasterImageId);
+        else
+            _ret.ImageUrl = "";
+    }
+    return _ret;
+}
