@@ -54,7 +54,7 @@
 			asc_getCanBranding: function(v){ return this.canBranding; },
 			asc_getIsAutosaveEnable: function(){ return this.isAutosaveEnable; },
 			asc_getAutosaveMinInterval: function(){ return this.AutosaveMinInterval; },
-			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; }
+			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; },
 
 			asc_setCanEdit: function(v){ this.canEdit = v; },
 			asc_setCanDownload: function(v){ this.canDownload = v; },
