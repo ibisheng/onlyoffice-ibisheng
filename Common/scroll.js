@@ -76,8 +76,8 @@ function CArrowDrawer( settings ) {
     this.ColorGradStart = [];
     this.ColorGradEnd = [];
 
-    this.ColorGradStart[ScrollOverType.NONE] = HEXTORGB("cfcfcf")//{R:207, G:207, B:207};
-    this.ColorGradEnd[ScrollOverType.NONE] = HEXTORGB("cfcfcf")//{R:207, G:207, B:207};
+    this.ColorGradStart[ScrollOverType.NONE] = HEXTORGB("888888")//{R:207, G:207, B:207};
+    this.ColorGradEnd[ScrollOverType.NONE] = HEXTORGB("888888")//{R:207, G:207, B:207};
 
     this.ColorGradStart[ScrollOverType.OVER] = HEXTORGB("f1f1f1")//{R:241, G:241, B:241};
     this.ColorGradEnd[ScrollOverType.OVER] = HEXTORGB("f1f1f1")//{R:241, G:241, B:241};
@@ -85,8 +85,8 @@ function CArrowDrawer( settings ) {
     this.ColorGradStart[ScrollOverType.ACTIVE] = HEXTORGB("f1f1f1")//{R:207, G:207, B:207};
     this.ColorGradEnd[ScrollOverType.ACTIVE] = HEXTORGB("f1f1f1")//{R:207, G:207, B:207};
 
-    this.ColorGradStart[ScrollOverType.STABLE] = HEXTORGB("cfcfcf")//{R:203, G:203, B:203};
-    this.ColorGradEnd[ScrollOverType.STABLE] = HEXTORGB("cfcfcf")//{R:203, G:203, B:203};
+    this.ColorGradStart[ScrollOverType.STABLE] = HEXTORGB("888888")//{R:203, G:203, B:203};
+    this.ColorGradEnd[ScrollOverType.STABLE] = HEXTORGB("888888")//{R:203, G:203, B:203};
 
     this.ColorBorder = settings && settings.strokeStyleNone ? settings.strokeStyleNone : "#BBBEC2";
     this.ColorBackNone = settings && settings.scrollBackgroundColor ? settings.scrollBackgroundColor : "#F4F4F4";
