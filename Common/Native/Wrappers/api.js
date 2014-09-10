@@ -4542,8 +4542,10 @@ function CStylesPainter()
     this.defaultStyles = [];
     this.docStyles = [];
     this.mergedStyles = [];
-
-    this.GenerateStyles = function(_api, ds)
+}
+CDrawingDocument.prototype =
+{
+    GenerateStyles: function(_api, ds)
     {
         if (_api.WordControl.bIsRetinaSupport)
         {
@@ -4626,8 +4628,8 @@ function CStylesPainter()
         _stream["WriteByte"](1);
 
         _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
-    }
-    this.GenerateDefaultStyles = function(_api, ds, _graphics)
+    },
+    GenerateDefaultStyles: function(_api, ds, _graphics)
     {
         var styles = ds;
 
@@ -4640,9 +4642,9 @@ function CStylesPainter()
                 //this.drawStyle(_graphics, style, _api);
             }
         }
-    }
+    },
 
-    this.GenerateDocumentStyles = function(_api, _graphics)
+    GenerateDocumentStyles: function(_api, _graphics)
     {
         if (_api.WordControl.m_oLogicDocument == null)
             return;
@@ -4697,9 +4699,9 @@ function CStylesPainter()
                 this.docStyles.push({ Name: _name, Style: _dr_style });
             }
         }
-    }
+    },
 
-    this.drawStyle = function(graphics, style, _api)
+    drawStyle: function(graphics, style, _api)
     {
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](this.STYLE_THUMBNAIL_WIDTH, this.STYLE_THUMBNAIL_HEIGHT,
                 this.STYLE_THUMBNAIL_WIDTH * g_dKoef_pix_to_mm, this.STYLE_THUMBNAIL_HEIGHT * g_dKoef_pix_to_mm);

@@ -5761,8 +5761,10 @@ function CStylesPainter()
 
     this.CurrentTranslate = null;
     this.IsRetinaEnabled = false;
-
-    this.GenerateStyles = function(_api, ds)
+}
+CStylesPainter.prototype =
+{
+    GenerateStyles: function(_api, ds)
     {
         if (_api.WordControl.bIsRetinaSupport)
         {
@@ -5831,8 +5833,8 @@ function CStylesPainter()
 
         // теперь просто отдаем евент наверх
         _api.sync_InitEditorStyles(this);
-    }
-    this.GenerateDefaultStyles = function(_api, ds)
+    },
+    GenerateDefaultStyles: function(_api, ds)
     {
         var styles = ds;
         var _count = 0;
@@ -5884,9 +5886,9 @@ function CStylesPainter()
         }
 
         this.defaultStylesImage = _canvas.toDataURL("image/png");
-    }
+    },
 
-    this.GenerateDocumentStyles = function(_api)
+    GenerateDocumentStyles: function(_api)
     {
         if (_api.WordControl.m_oLogicDocument == null)
             return;
@@ -5970,9 +5972,9 @@ function CStylesPainter()
         }
 
         this.docStylesImage = _canvas.toDataURL("image/png");
-    }
+    },
 
-    this.drawStyle = function(graphics, style, index)
+    drawStyle: function(graphics, style, index)
     {
         var font = { FontFamily : { Name: "Times New Roman", Index : -1 }, Color : { r : 0, g : 0, b : 0 }, Bold : false, Italic : false, FontSize : 10 };
 
