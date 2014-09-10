@@ -4543,7 +4543,7 @@ function CStylesPainter()
     this.docStyles = [];
     this.mergedStyles = [];
 }
-CDrawingDocument.prototype =
+CStylesPainter.prototype =
 {
     GenerateStyles: function(_api, ds)
     {
