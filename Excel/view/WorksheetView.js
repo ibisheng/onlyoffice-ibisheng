@@ -10604,7 +10604,11 @@
 			}
 
 			var cto;
-			for (r = range.r1; r <= range.r2; ++r) {
+
+            // TODO: падает при merge!!!
+            var __r1 = Math.min(range.r1, this.rows.length - 1);
+            var __r2 = Math.min(range.r2, this.rows.length - 1);
+			for (r = __r1; r <= __r2; ++r) {
 				if (this.height_1px > this.rows[r].height) {continue;}
 				for (c = range.c1; c <= range.c2; ++c) {
 					if (this.width_1px > this.cols[c].width) {continue;}
