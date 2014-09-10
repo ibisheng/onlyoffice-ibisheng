@@ -145,7 +145,7 @@
 				"../../Excel/model/CellInfo.js",
 				"../../Excel/model/AdvancedOptions.js",
 				
-				"../../Common/Shapes/EditorSettings.js",
+
                 "../../Common/commonDefines.js",
                 "../../Word/apiDefines.js",
                 "../../Word/apiCommon.js",
