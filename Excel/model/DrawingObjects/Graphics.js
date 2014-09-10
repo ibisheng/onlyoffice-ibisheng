@@ -2500,7 +2500,92 @@ CGraphics.prototype =
     {
         if (!global_MatrixTransformer.IsIdentity2(this.m_oTransform))
         {
+            // проверим - может все-таки можно нарисовать как надо?
+            var r = x + w;
+            var b = y + h;
+            var dx1 = this.m_oFullTransform.TransformPointX(x, y);
+            var dy1 = this.m_oFullTransform.TransformPointY(x, y);
+
+            var dx2 = this.m_oFullTransform.TransformPointX(r, y);
+            var dy2 = this.m_oFullTransform.TransformPointY(r, y);
+
+            var dx3 = this.m_oFullTransform.TransformPointX(x, b);
+            var dy3 = this.m_oFullTransform.TransformPointY(x, b);
+
+            var dx4 = this.m_oFullTransform.TransformPointX(r, b);
+            var dy4 = this.m_oFullTransform.TransformPointY(r, b);
+
+            var _eps = 0.001;
+            var bIsClever = false;
+            var _type = 1;
+            if (Math.abs(dx1 - dx3) < _eps &&
+                Math.abs(dx2 - dx4) < _eps &&
+                Math.abs(dy1 - dy2) < _eps &&
+                Math.abs(dy3 - dy4) < _eps)
+            {
+                bIsClever = true;
+                _type = 1;
+            }
+            if (!bIsClever &&
+                Math.abs(dx1 - dx2) < _eps &&
+                Math.abs(dx3 - dx4) < _eps &&
+                Math.abs(dy1 - dy3) < _eps &&
+                Math.abs(dy2 - dy4) < _eps)
+            {
+                _type = 2;
+                bIsClever = true;
+            }
+
+            if (!bIsClever)
+            {
+                this.ds();
+                return;
+            }
+
+            var _xI = (_type == 1) ? Math.min(dx1, dx2) : Math.min(dx1, dx3);
+            var _rI = (_type == 1) ? Math.max(dx1, dx2) : Math.max(dx1, dx3);
+            var _yI = (_type == 1) ? Math.min(dy1, dy3) : Math.min(dy1, dy2);
+            var _bI = (_type == 1) ? Math.max(dy1, dy3) : Math.max(dy1, dy2);
+
+            var bIsSmartAttack = false;
+            if (!this.m_bIntegerGrid)
+            {
+                this.SetIntegerGrid(true);
+                bIsSmartAttack = true;
+            }
+
+            var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
+            if (0 >= _pen_w)
+                _pen_w = 1;
+
+            this._s();
+
+            if ((_pen_w & 0x01) == 0x01)
+            {
+                var _x = (_xI >> 0) + 0.5;
+                var _y = (_yI >> 0) + 0.5;
+                var _r = (_rI >> 0) + 0.5;
+                var _b = (_bI >> 0) + 0.5;
+
+                this.m_oContext.rect(_x, _y, _r - _x, _b - _y);
+            }
+            else
+            {
+                var _x = (_xI + 0.5) >> 0;
+                var _y = (_yI + 0.5) >> 0;
+                var _r = (_rI + 0.5) >> 0;
+                var _b = (_bI + 0.5) >> 0;
+
+                this.m_oContext.rect(_x, _y, _r - _x, _b - _y);
+            }
+
+            this.m_oContext.lineWidth = _pen_w;
             this.ds();
+
+            if (bIsSmartAttack)
+            {
+                this.SetIntegerGrid(false);
+            }
             return;
         }
 

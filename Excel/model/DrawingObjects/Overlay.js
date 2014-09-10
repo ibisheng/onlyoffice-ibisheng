@@ -859,17 +859,17 @@ CAutoshapeTrack.prototype =
 		var _style_green = "#84E036";
 		var _style_white = "#FFFFFF";
 
-		var _len_x = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
-		var _len_y = Math.sqrt((x1 - x3)*(x1 - x3) + (y1 - y3)*(y1 - y3));
+        var _len_x = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+        var _len_y = Math.sqrt((x1 - x3)*(x1 - x3) + (y1 - y3)*(y1 - y3));
 
-		if (_len_x < 1)
-			_len_x = 1;
-		if (_len_y < 1)
-			_len_y = 1;
+        if (_len_x < 1)
+            _len_x = 1;
+        if (_len_y < 1)
+            _len_y = 1;
 
-		var bIsRectsTrackX = (_len_x >= 30) ? true : false;
-		var bIsRectsTrackY = (_len_y >= 30) ? true : false;
-		var bIsRectsTrack = (bIsRectsTrackX || bIsRectsTrackY) ? true : false;
+        var bIsRectsTrackX = (_len_x >= 30) ? true : false;
+        var bIsRectsTrackY = (_len_y >= 30) ? true : false;
+        var bIsRectsTrack = (bIsRectsTrackX || bIsRectsTrackY) ? true : false;
 
 		if (nType == 2)
 		{
@@ -878,11 +878,11 @@ CAutoshapeTrack.prototype =
 			bIsRectsTrackY = _tmp;
 		}
 
-		ctx.lineWidth = 1;
-		ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.beginPath();
 
-		var _oldGlobalAlpha = ctx.globalAlpha;
-		ctx.globalAlpha = 1;
+        var _oldGlobalAlpha = ctx.globalAlpha;
+        ctx.globalAlpha = 1;
 
         switch (type)
         {
@@ -983,54 +983,54 @@ CAutoshapeTrack.prototype =
                 }
                 else
                 {
-                    var _x1 = x1;
-                    var _y1 = y1;
-                    var _x2 = x2;
-                    var _y2 = y2;
-                    var _x3 = x3;
-                    var _y3 = y3;
-                    var _x4 = x4;
-                    var _y4 = y4;
+					var _x1 = x1;
+					var _y1 = y1;
+					var _x2 = x2;
+					var _y2 = y2;
+					var _x3 = x3;
+					var _y3 = y3;
+					var _x4 = x4;
+					var _y4 = y4;
 
-                    if (nIsCleverWithTransform)
-                    {
-                        var _x1 = x1;
-                        if (x2 < _x1)
-                            _x1 = x2;
-                        if (x3 < _x1)
-                            _x1 = x3;
-                        if (x4 < _x1)
-                            _x1 = x4;
+					if (nIsCleverWithTransform)
+					{
+						var _x1 = x1;
+						if (x2 < _x1)
+							_x1 = x2;
+						if (x3 < _x1)
+							_x1 = x3;
+						if (x4 < _x1)
+							_x1 = x4;
 
-                        var _x4 = x1;
-                        if (x2 > _x4)
-                            _x4 = x2;
-                        if (x3 > _x4)
-                            _x4 = x3;
-                        if (x4 > _x4)
-                            _x4 = x4;
+						var _x4 = x1;
+						if (x2 > _x4)
+							_x4 = x2;
+						if (x3 > _x4)
+							_x4 = x3;
+						if (x4 > _x4)
+							_x4 = x4;
 
-                        var _y1 = y1;
-                        if (y2 < _y1)
-                            _y1 = y2;
-                        if (y3 < _y1)
-                            _y1 = y3;
-                        if (y4 < _y1)
-                            _y1 = y4;
+						var _y1 = y1;
+						if (y2 < _y1)
+							_y1 = y2;
+						if (y3 < _y1)
+							_y1 = y3;
+						if (y4 < _y1)
+							_y1 = y4;
 
-                        var _y4 = y1;
-                        if (y2 > _y4)
-                            _y4 = y2;
-                        if (y3 > _y4)
-                            _y4 = y3;
-                        if (y4 > _y4)
-                            _y4 = y4;
+						var _y4 = y1;
+						if (y2 > _y4)
+							_y4 = y2;
+						if (y3 > _y4)
+							_y4 = y3;
+						if (y4 > _y4)
+							_y4 = y4;
 
-                        _x2 = _x4;
-                        _y2 = _y1;
-                        _x3 = _x1;
-                        _y3 = _y4;
-                    }
+						_x2 = _x4;
+						_y2 = _y1;
+						_x3 = _x1;
+						_y3 = _y4;
+					}
 
                     ctx.strokeStyle = _style_blue;
 
@@ -1114,27 +1114,27 @@ CAutoshapeTrack.prototype =
                                 var _w = IMAGE_ROTATE_TRACK_W;
                                 var _w2 = IMAGE_ROTATE_TRACK_W / 2;
 
-                                if (nIsCleverWithTransform)
-                                {
-                                    _xI >>= 0;
-                                    _yI >>= 0;
-                                    _w2 >>= 0;
-                                    _w2 += 1;
-                                }
+								if (nIsCleverWithTransform)
+								{
+									_xI >>= 0;
+									_yI >>= 0;
+									_w2 >>= 0;
+									_w2 += 1;
+								}
 
-                                //ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+								//ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
 
-                                var _matrix = matrix.CreateDublicate();
-                                _matrix.tx = 0;
-                                _matrix.ty = 0;
-                                var _xx = _matrix.TransformPointX(0, 1);
-                                var _yy = _matrix.TransformPointY(0, 1);
-                                var _angle = Math.atan2(_xx, -_yy) - Math.PI;
-                                var _px = Math.cos(_angle);
-                                var _py = Math.sin(_angle);
+								var _matrix = matrix.CreateDublicate();
+								_matrix.tx = 0;
+								_matrix.ty = 0;
+								var _xx = _matrix.TransformPointX(0, 1);
+								var _yy = _matrix.TransformPointY(0, 1);
+								var _angle = Math.atan2(_xx, -_yy) - Math.PI;
+								var _px = Math.cos(_angle);
+								var _py = Math.sin(_angle);
 
-                                ctx.translate(_xI, _yI);
-                                ctx.transform(_px, _py, -_py, _px, 0, 0);
+								ctx.translate(_xI, _yI);
+								ctx.transform(_px, _py, -_py, _px, 0, 0);
                                 ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
                                 ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -1144,16 +1144,16 @@ CAutoshapeTrack.prototype =
 
                         ctx.beginPath();
 
-                        if (!nIsCleverWithTransform)
-                        {
-                            ctx.moveTo(xc1, yc1);
-                            ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-                        }
-                        else
-                        {
-                            ctx.moveTo((xc1 >> 0) + 0.5, (yc1 >> 0) + 0.5);
-                            ctx.lineTo(((xc1 + ex2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5, ((yc1 + ey2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5);
-                        }
+						if (!nIsCleverWithTransform)
+						{
+							ctx.moveTo(xc1, yc1);
+							ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
+						}
+						else
+						{
+							ctx.moveTo((xc1 >> 0) + 0.5, (yc1 >> 0) + 0.5);
+							ctx.lineTo(((xc1 + ex2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5, ((yc1 + ey2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5);
+						}
 
                         ctx.stroke();
 
@@ -1162,43 +1162,43 @@ CAutoshapeTrack.prototype =
 
                     ctx.fillStyle = _style_white;
 
-                    if (!nIsCleverWithTransform)
-                    {
-                        if (bIsEllipceCorner)
-                        {
-                            overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                            if (!isLine)
-                            {
-                                overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                                overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                            }
-                            overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                        }
-                        else
-                        {
-                            overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            if (!isLine)
-                            {
-                                overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                                overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            }
-                            overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                    }
-                    else
-                    {
-                        if (bIsEllipceCorner)
-                        {
-                            overlay.AddEllipse(_x1, _y1, TRACK_CIRCLE_RADIUS);
-                            if (!isLine)
-                            {
-                                overlay.AddEllipse(_x2, _y2, TRACK_CIRCLE_RADIUS);
-                                overlay.AddEllipse(_x3, _y3, TRACK_CIRCLE_RADIUS);
-                            }
-                            overlay.AddEllipse(_x4, _y4, TRACK_CIRCLE_RADIUS);
-                        }
-                        else
-                        {
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+							if (!isLine)
+							{
+								overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+								overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+							}
+							overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							if (!isLine)
+							{
+								overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+							overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						}
+					}
+					else
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(_x1, _y1, TRACK_CIRCLE_RADIUS);
+							if (!isLine)
+							{
+								overlay.AddEllipse(_x2, _y2, TRACK_CIRCLE_RADIUS);
+								overlay.AddEllipse(_x3, _y3, TRACK_CIRCLE_RADIUS);
+							}
+							overlay.AddEllipse(_x4, _y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
                             if (!isLine)
                             {
                                 overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE);
@@ -1211,8 +1211,8 @@ CAutoshapeTrack.prototype =
                                 overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
                                 overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
                             }
-                        }
-                    }
+						}
+					}
 
                     if (!isLine)
                     {
@@ -1347,68 +1347,68 @@ CAutoshapeTrack.prototype =
                 }
                 else
                 {
-                    var _x1 = x1;
-                    var _y1 = y1;
-                    var _x2 = x2;
-                    var _y2 = y2;
-                    var _x3 = x3;
-                    var _y3 = y3;
-                    var _x4 = x4;
-                    var _y4 = y4;
+					var _x1 = x1;
+					var _y1 = y1;
+					var _x2 = x2;
+					var _y2 = y2;
+					var _x3 = x3;
+					var _y3 = y3;
+					var _x4 = x4;
+					var _y4 = y4;
 
-                    if (nIsCleverWithTransform)
-                    {
-                        var _x1 = x1;
-                        if (x2 < _x1)
-                            _x1 = x2;
-                        if (x3 < _x1)
-                            _x1 = x3;
-                        if (x4 < _x1)
-                            _x1 = x4;
+					if (nIsCleverWithTransform)
+					{
+						var _x1 = x1;
+						if (x2 < _x1)
+							_x1 = x2;
+						if (x3 < _x1)
+							_x1 = x3;
+						if (x4 < _x1)
+							_x1 = x4;
 
-                        var _x4 = x1;
-                        if (x2 > _x4)
-                            _x4 = x2;
-                        if (x3 > _x4)
-                            _x4 = x3;
-                        if (x4 > _x4)
-                            _x4 = x4;
+						var _x4 = x1;
+						if (x2 > _x4)
+							_x4 = x2;
+						if (x3 > _x4)
+							_x4 = x3;
+						if (x4 > _x4)
+							_x4 = x4;
 
-                        var _y1 = y1;
-                        if (y2 < _y1)
-                            _y1 = y2;
-                        if (y3 < _y1)
-                            _y1 = y3;
-                        if (y4 < _y1)
-                            _y1 = y4;
+						var _y1 = y1;
+						if (y2 < _y1)
+							_y1 = y2;
+						if (y3 < _y1)
+							_y1 = y3;
+						if (y4 < _y1)
+							_y1 = y4;
 
-                        var _y4 = y1;
-                        if (y2 > _y4)
-                            _y4 = y2;
-                        if (y3 > _y4)
-                            _y4 = y3;
-                        if (y4 > _y4)
-                            _y4 = y4;
+						var _y4 = y1;
+						if (y2 > _y4)
+							_y4 = y2;
+						if (y3 > _y4)
+							_y4 = y3;
+						if (y4 > _y4)
+							_y4 = y4;
 
-                        _x2 = _x4;
-                        _y2 = _y1;
-                        _x3 = _x1;
-                        _y3 = _y4;
-                    }
+						_x2 = _x4;
+						_y2 = _y1;
+						_x3 = _x1;
+						_y3 = _y4;
+					}
 
                     overlay.CheckPoint(x1, y1);
                     overlay.CheckPoint(x2, y2);
                     overlay.CheckPoint(x3, y3);
                     overlay.CheckPoint(x4, y4);
 
-                    if (!nIsCleverWithTransform)
-                    {
-                        this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 8, 3);
-                    }
-                    else
-                    {
-                        this.AddRectDashClever(ctx, _x1, _y1, _x4, _y4, 8, 3);
-                    }
+					if (!nIsCleverWithTransform)
+					{
+						this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 8, 3);
+					}
+					else
+					{
+						this.AddRectDashClever(ctx, _x1, _y1, _x4, _y4, 8, 3);
+					}
 
                     ctx.strokeStyle = _style_blue;
                     ctx.stroke();
@@ -1469,29 +1469,29 @@ CAutoshapeTrack.prototype =
                                 var _w = IMAGE_ROTATE_TRACK_W;
                                 var _w2 = IMAGE_ROTATE_TRACK_W / 2;
 
-                                if (nIsCleverWithTransform)
-                                {
-                                    _xI >>= 0;
-                                    _yI >>= 0;
-                                    _w2 >>= 0;
-                                    _w2 += 1;
-                                }
+								if (nIsCleverWithTransform)
+								{
+									_xI >>= 0;
+									_yI >>= 0;
+									_w2 >>= 0;
+									_w2 += 1;
+								}
 
-                                //ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+								//ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
 
-                                var _matrix = matrix.CreateDublicate();
-                                _matrix.tx = 0;
-                                _matrix.ty = 0;
-                                var _xx = _matrix.TransformPointX(0, 1);
-                                var _yy = _matrix.TransformPointY(0, 1);
-                                var _angle = Math.atan2(_xx, -_yy) - Math.PI;
-                                var _px = Math.cos(_angle);
-                                var _py = Math.sin(_angle);
+								var _matrix = matrix.CreateDublicate();
+								_matrix.tx = 0;
+								_matrix.ty = 0;
+								var _xx = _matrix.TransformPointX(0, 1);
+								var _yy = _matrix.TransformPointY(0, 1);
+								var _angle = Math.atan2(_xx, -_yy) - Math.PI;
+								var _px = Math.cos(_angle);
+								var _py = Math.sin(_angle);
 
-                                ctx.translate(_xI, _yI);
-                                ctx.transform(_px, _py, -_py, _px, 0, 0);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
+								ctx.translate(_xI, _yI);
+								ctx.transform(_px, _py, -_py, _px, 0, 0);
+								ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+								ctx.setTransform(1, 0, 0, 1, 0, 0);
 
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
@@ -1499,16 +1499,16 @@ CAutoshapeTrack.prototype =
 
                         ctx.beginPath();
 
-                        if (!nIsCleverWithTransform)
-                        {
-                            ctx.moveTo(xc1, yc1);
-                            ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-                        }
-                        else
-                        {
-                            ctx.moveTo((xc1 >> 0) + 0.5, (yc1 >> 0) + 0.5);
-                            ctx.lineTo(((xc1 + ex2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5, ((yc1 + ey2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5);
-                        }
+						if (!nIsCleverWithTransform)
+						{
+							ctx.moveTo(xc1, yc1);
+							ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
+						}
+						else
+						{
+							ctx.moveTo((xc1 >> 0) + 0.5, (yc1 >> 0) + 0.5);
+							ctx.lineTo(((xc1 + ex2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5, ((yc1 + ey2 * TRACK_DISTANCE_ROTATE2) >> 0) + 0.5);
+						}
 
                         ctx.stroke();
 
@@ -1518,76 +1518,76 @@ CAutoshapeTrack.prototype =
 
                     ctx.fillStyle = _style_white;
 
-                    if (!nIsCleverWithTransform)
-                    {
-                        if (bIsEllipceCorner)
-                        {
-                            overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                        }
-                        else
-                        {
-                            overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        }
-                    }
-                    else
-                    {
-                        if (bIsEllipceCorner)
-                        {
-                            overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
-                            overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
-                        }
-                        else
-                        {
-                            overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(_x2 + 0.5, _y2 + 0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(_x3 + 0.5, _y3 + 0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(_x4 + 0.5, _y4 + 0.5, TRACK_RECT_SIZE);
-                        }
-                    }
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+						}
+					}
+					else
+					{
+						if (bIsEllipceCorner)
+						{
+							overlay.AddEllipse(x1, y1, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x2, y2, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x3, y3, TRACK_CIRCLE_RADIUS);
+							overlay.AddEllipse(x4, y4, TRACK_CIRCLE_RADIUS);
+						}
+						else
+						{
+							overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x2 + 0.5, _y2 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x3 + 0.5, _y3 + 0.5, TRACK_RECT_SIZE);
+							overlay.AddRect2(_x4 + 0.5, _y4 + 0.5, TRACK_RECT_SIZE);
+						}
+					}
 
-                    if (!nIsCleverWithTransform)
-                    {
-                        if (bIsRectsTrack)
-                        {
-                            if (bIsRectsTrackX)
-                            {
-                                overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                                overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            }
-                            if (bIsRectsTrackY)
-                            {
-                                overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                                overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (bIsRectsTrack)
-                        {
-                            var _xC = (((_x1 + _x2) / 2) >> 0) + 0.5;
-                            var _yC = (((_y1 + _y3) / 2) >> 0) + 0.5;
+					if (!nIsCleverWithTransform)
+					{
+						if (bIsRectsTrack)
+						{
+							if (bIsRectsTrackX)
+							{
+								overlay.AddRect3((x1 + x2) / 2, (y1 + y2) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3((x3 + x4) / 2, (y3 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+							if (bIsRectsTrackY)
+							{
+								overlay.AddRect3((x2 + x4) / 2, (y2 + y4) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3((x3 + x1) / 2, (y3 + y1) / 2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							}
+						}
+					}
+					else
+					{
+						if (bIsRectsTrack)
+						{
+							var _xC = (((_x1 + _x2) / 2) >> 0) + 0.5;
+							var _yC = (((_y1 + _y3) / 2) >> 0) + 0.5;
 
-                            if (bIsRectsTrackX)
-                            {
-                                overlay.AddRect2(_xC, _y1+0.5, TRACK_RECT_SIZE);
-                                overlay.AddRect2(_xC, _y3+0.5, TRACK_RECT_SIZE);
-                            }
-                            if (bIsRectsTrackY)
-                            {
-                                overlay.AddRect2(_x2+0.5, _yC, TRACK_RECT_SIZE);
-                                overlay.AddRect2(_x1+0.5, _yC, TRACK_RECT_SIZE);
-                            }
-                        }
-                    }
+							if (bIsRectsTrackX)
+							{
+								overlay.AddRect2(_xC, _y1+0.5, TRACK_RECT_SIZE);
+								overlay.AddRect2(_xC, _y3+0.5, TRACK_RECT_SIZE);
+							}
+							if (bIsRectsTrackY)
+							{
+								overlay.AddRect2(_x2+0.5, _yC, TRACK_RECT_SIZE);
+								overlay.AddRect2(_x1+0.5, _yC, TRACK_RECT_SIZE);
+							}
+						}
+					}
 
                     ctx.fill();
                     ctx.stroke();
@@ -1814,7 +1814,7 @@ CAutoshapeTrack.prototype =
                 break;
         }
 
-		ctx.globalAlpha = _oldGlobalAlpha;
+        ctx.globalAlpha = _oldGlobalAlpha;
 	},
 
     DrawTrackSelectShapes : function(x, y, w, h)
