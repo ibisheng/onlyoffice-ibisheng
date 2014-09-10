@@ -33,9 +33,7 @@
                 "../../Common/Drawings/Format/Constants.js",
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/trackFile.js",
-                "../../Common/FontsFreeType/font_engine.js",
-                "../../Common/FontsFreeType/FontFile.js",
-                "../../Common/FontsFreeType/FontManager.js",
+
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/GlobalLoaders.js",
                 "../../Word/Drawing/translations.js",
@@ -110,15 +108,15 @@
                 "../../Word/Drawing/Graphics.js",
                 "../../Word/Drawing/Overlay.js",
                 "../../Word/Drawing/HatchPattern.js",
-                "../../Word/Drawing/ShapeDrawer.js",
+
                 "../../Word/Drawing/Metafile.js",
-                "../../Word/Drawing/DrawingDocument.js",
+
                 "../../Word/Drawing/GraphicsEvents.js",
                 "../../Common/Scrolls/iscroll.js",
                 "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Controls.js",
                 "../../Word/Drawing/Rulers.js",
-                "../../Word/Drawing/HtmlPage.js",
+
                 "../../Word/Drawing/documentrenderer.js",
                 "../../Common/scroll.js",
                 "../../Word/Editor/SerializeCommon.js",
