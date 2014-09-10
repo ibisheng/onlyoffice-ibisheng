@@ -3850,7 +3850,7 @@
 					{
 						case para_Text://*paraText*
 						{
-							text += paraRunContent[pR].Value;
+							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
 						};
 						
