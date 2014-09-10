@@ -41,6 +41,7 @@ var tableSpacingMinValue = 0.02;//0.02мм
 var GlobalSkinTeamlab = {
     Name : "classic",
     RulersButton : true,
+    NavigationButtons : true,
     BackgroundColor : "#B0B0B0",
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
@@ -54,6 +55,7 @@ var GlobalSkinTeamlab = {
 var GlobalSkinFlat = {
     Name : "flat",
     RulersButton : false,
+    NavigationButtons : false,
     BackgroundColor : "#F4F4F4",
     RulerDark : "#CFCFCF",
     RulerLight : "#FFFFFF",
@@ -317,9 +319,11 @@ function CEditorPage(api)
         this.m_oPanelRight_buttonRulers.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonRulers);
 
+        var _vertScrollTop = scrollWidthMm;
         if (GlobalSkin.RulersButton === false)
         {
             this.m_oPanelRight_buttonRulers.HtmlElement.style.display = "none";
+            _vertScrollTop = 0;
         }
 
         this.m_oPanelRight_buttonNextPage = CreateControl("id_buttonNextPage");
@@ -332,11 +336,16 @@ function CEditorPage(api)
         this.m_oPanelRight_buttonPrevPage.Anchor = (g_anchor_left | g_anchor_bottom | g_anchor_right);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonPrevPage);
 
+        var _vertScrollBottom = 2 * scrollWidthMm;
+        if (GlobalSkin.NavigationButtons == false)
+        {
+            this.m_oPanelRight_buttonNextPage.HtmlElement.style.display = "none";
+            this.m_oPanelRight_buttonPrevPage.HtmlElement.style.display = "none";
+            _vertScrollBottom = 0;
+        }
+
         this.m_oPanelRight_vertScroll = CreateControl("id_vertical_scroll");
-        if (GlobalSkin.RulersButton === false)
-            this.m_oPanelRight_vertScroll.Bounds.SetParams(0,0,1000,2*scrollWidthMm,false,true,false,true,-1,-1);
-        else
-            this.m_oPanelRight_vertScroll.Bounds.SetParams(0,scrollWidthMm,1000,2*scrollWidthMm,false,true,false,true,-1,-1);
+        this.m_oPanelRight_vertScroll.Bounds.SetParams(0,_vertScrollTop,1000,_vertScrollBottom,false,true,false,true,-1,-1);
         this.m_oPanelRight_vertScroll.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_vertScroll);
         // --------------------------------------------------------------------------
