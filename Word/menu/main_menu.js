@@ -23,6 +23,37 @@ var g_oTablePr   = {};
 var g_oSpellCheck = {};
 //var oChartEditor = new ChartEditor();
 
+
+var TEST_FLAGS_MASK = 0xFFFFFFFF; // 4 байта
+var TEST_FLAGS_A    = 0x00000001; // 1 бит
+var TEST_FLAGS_B    = 0x00000002; // 2 бит
+var TEST_FLAGS_C    = 0x00000004; // 1 бит
+var TEST_FLAGS_D    = 0x00000008; // 2 бит
+var TEST_FLAGS_E    = 0x00000010; // 1 бит
+
+var TEST_FLAGS_NON_A = TEST_FLAGS_MASK ^ TEST_FLAGS_A;
+var TEST_FLAGS_NON_B = TEST_FLAGS_MASK ^ TEST_FLAGS_B;
+var TEST_FLAGS_NON_C = TEST_FLAGS_MASK ^ TEST_FLAGS_C;
+var TEST_FLAGS_NON_D = TEST_FLAGS_MASK ^ TEST_FLAGS_D;
+var TEST_FLAGS_NON_E = TEST_FLAGS_MASK ^ TEST_FLAGS_E;
+
+var Objects1, Objects2;
+function CTestA()
+{
+    this.A = true;
+    this.B = 0x00;
+}
+
+CTestA.prototype.T = 2;
+
+function CTestB()
+{
+    this.A = true;
+    this.B = 0x00;
+    this.T = 1;
+}
+
+
 var Drag = {
 
     obj : null,
@@ -990,7 +1021,7 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
 			editor.AddImageUrl("Test.jpg", 0);
 			break;
 		case "td_imageInText":
-
+    
 			var _img = new Image();
             _img.onload = function(){
                 editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
@@ -1024,7 +1055,43 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.LoadTestDocument4(); // среднее количество ранов
             //editor.WordControl.m_oLogicDocument.LoadTestDocument5(); // 1 ран в параграфе
 
-            editor.WordControl.m_oLogicDocument.Add_SectionBreak(section_type_NextPage);
+            //editor.WordControl.m_oLogicDocument.Add_SectionBreak(section_type_NextPage);
+            
+            var Count = 50000;
+
+            Objects1 = new Array(), Objects2 = new Array();
+
+            var TestTime = new Date().getTime();
+            for (var i = 0; i < Count; i++)
+            {
+                Objects1[i] = new CTestA();                
+            }            
+            alert("Время создания : " + ((new Date().getTime() - TestTime) / 1000) );
+            
+            TestTime = new Date().getTime();            
+            for (var i = 0; i < Count; i++)
+            {
+                Objects2[i] = new CTestB();
+            }            
+            alert("Время создания : " + ((new Date().getTime() - TestTime) / 1000) );
+            
+            TestTime = new Date().getTime();
+            for (var i = 0; i < Count; i++)
+            {
+                var Temp1 = Objects1[i].A;
+                var Temp2 = Objects1[i].B;
+                var Temp3 = Objects1[i].T;
+            }
+            alert("Время обращения к переменным : " + ((new Date().getTime() - TestTime) / 1000) );
+            
+            TestTime = new Date().getTime();
+            for (var i = 0; i < Count; i++)
+            {
+                var Temp1 = Objects2[i].A;
+                var Temp2 = Objects2[i].B;
+                var Temp3 = Objects2[i].T;
+            }
+            alert("Время обращения к переменным : " + ((new Date().getTime() - TestTime) / 1000) );
 
 			break;
 		case "td_indent":

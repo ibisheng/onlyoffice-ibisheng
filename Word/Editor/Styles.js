@@ -3965,7 +3965,12 @@ CStyles.prototype =
 
     Get_Next : function(StyleId)
     {
-        return this.Style[StyleId].Next;
+        var NextId = this.Style[StyleId].Next;
+
+        if (null !== NextId && undefined !== this.Style[NextId])
+            return NextId;
+
+        return null;
     },
 
     Get_Name : function(StyleId)

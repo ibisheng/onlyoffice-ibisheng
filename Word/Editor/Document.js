@@ -3954,7 +3954,7 @@ CDocument.prototype =
         }
     },
 
-    Cursor_MoveRight : function(AddToSelect, Word)
+    Cursor_MoveRight : function(AddToSelect, Word, FromPaste)
     {
         if ( "undefined" === typeof(Word) || null === Word )
             Word = false;
@@ -4056,12 +4056,21 @@ CDocument.prototype =
                         End = this.Selection.StartPos;
 
                     this.CurPos.ContentPos = End;
-                    if ( false === this.Content[this.CurPos.ContentPos].Cursor_MoveRight( 1, false, Word ) )
+
+                    if (true === FromPaste && type_Table === this.Content[this.CurPos.ContentPos].Get_Type() && true === this.Content[this.CurPos.ContentPos].Selection_IsToEnd() && this.Content.length - 1 !== this.CurPos.ContentPos)
                     {
-                        if ( this.Content.length - 1 === this.CurPos.ContentPos )
+                        this.CurPos.ContentPos = End + 1;
+                        this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos(false);
+                    }
+                    else
+                    {
+                        if (false === this.Content[this.CurPos.ContentPos].Cursor_MoveRight(1, false, Word, FromPaste))
                         {
-                            var Item = this.Content[this.CurPos.ContentPos];
-                            Item.Cursor_MoveToEndPos(false);
+                            if (this.Content.length - 1 === this.CurPos.ContentPos)
+                            {
+                                var Item = this.Content[this.CurPos.ContentPos];
+                                Item.Cursor_MoveToEndPos(false);
+                            }
                         }
                     }
 
@@ -10192,6 +10201,11 @@ CDocument.prototype =
             {
                 this.Selection.DragDrop.Flag = 0;
                 this.Selection.DragDrop.Data = null;
+
+                // Вызываем стандартное событие mouseMove, чтобы сбросить раличные подсказки, если они были
+                editor.sync_MouseMoveStartCallback();
+                editor.sync_MouseMoveCallback(new CMouseMoveData());
+                editor.sync_MouseMoveEndCallback();
 
                 this.DrawingDocument.StartTrackText();                
             }

@@ -1295,7 +1295,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	}
 	else
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
-
+    
 	//callback
 	editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
 	var sizeMM;
@@ -2548,7 +2548,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
 
     if ( -1 === ParaPr.PStyle )
         ParaPr.StyleName = "";
-    else if ( undefined === ParaPr.PStyle )
+    else if ( undefined === ParaPr.PStyle || undefined === this.WordControl.m_oLogicDocument.Styles.Style[ParaPr.PStyle] )
         ParaPr.StyleName = this.WordControl.m_oLogicDocument.Styles.Style[this.WordControl.m_oLogicDocument.Styles.Get_Default_Paragraph()].Name;
     else
         ParaPr.StyleName = this.WordControl.m_oLogicDocument.Styles.Style[ParaPr.PStyle].Name;

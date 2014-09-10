@@ -169,6 +169,11 @@ Paragraph.prototype =
         return type_Paragraph;
     },
 
+    Get_Type : function()
+    {
+        return type_Paragraph;
+    },
+
     Save_StartState : function()
     {
         this.StartState = new CParagraphStartState(this);

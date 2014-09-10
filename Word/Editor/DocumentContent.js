@@ -3055,7 +3055,7 @@ CDocumentContent.prototype =
         }
     },
 
-    Cursor_MoveRight : function(AddToSelect, Word)
+    Cursor_MoveRight : function(AddToSelect, Word, FromPaste)
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )
             return this.LogicDocument.DrawingObjects.cursorMoveRight( AddToSelect, Word );
@@ -3147,10 +3147,20 @@ CDocumentContent.prototype =
                     if ( End < this.Selection.StartPos )
                         End = this.Selection.StartPos;
 
-                    this.CurPos.ContentPos = End;
-                    this.Content[this.CurPos.ContentPos].Cursor_MoveRight( 1, false, Word );
 
-                    this.Selection_Remove();
+                    this.CurPos.ContentPos = End;
+
+                    if (true === FromPaste && type_Table === this.Content[this.CurPos.ContentPos].Get_Type() && true === this.Content[this.CurPos.ContentPos].Selection_IsToEnd() && this.Content.length - 1 !== this.CurPos.ContentPos)
+                    {
+                        this.CurPos.ContentPos = End + 1;
+                        this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos(false);
+                        this.Selection_Remove();
+                    }
+                    else
+                    {
+                        this.Content[this.CurPos.ContentPos].Cursor_MoveRight(1, false, Word, FromPaste);
+                        this.Selection_Remove();
+                    }
                 }
             }
             else

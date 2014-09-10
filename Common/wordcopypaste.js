@@ -2744,7 +2744,7 @@ PasteProcessor.prototype =
             
             if( oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText() )
             {
-                this.oLogicDocument.Cursor_MoveRight(false, false);
+                this.oLogicDocument.Cursor_MoveRight(false, false, true);
             }
             
             this.oLogicDocument.Document_UpdateInterfaceState();

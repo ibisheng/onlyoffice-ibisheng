@@ -2681,7 +2681,7 @@ CTable.prototype =
 
     Get_Type : function()
     {
-        return flowobject_Image;
+        return type_Table;
     },
 
     Set_Id : function(newId)
@@ -5016,12 +5016,6 @@ CTable.prototype =
     Is_Inline : function()
     {
         return this.Inline;
-        
-        // TODO:  переделать данную проверку
-        if ( "undefined" != typeof(this.Parent.Get_Type) && flowobject_Table === this.Parent.Get_Type() )
-            return false;
-
-        return true;
     },
 
     TurnOff_RecalcEvent : function()
@@ -8177,8 +8171,13 @@ CTable.prototype =
 
         if ( table_Selection_Text === this.Selection.Type )
         {
-            var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
-            Cell.Content.Selection_Remove();
+            this.CurCell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
+            this.CurCell.Content.Selection_Remove();
+        }
+        else if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0 )
+        {
+            this.CurCell = this.Content[0].Get_Cell(0);
+            this.CurCell.Content.Selection_Remove();
         }
 
         this.Selection.Use   = false;
@@ -8190,12 +8189,6 @@ CTable.prototype =
         this.Markup.Internal.RowIndex  = 0;
         this.Markup.Internal.CellIndex = 0;
         this.Markup.Internal.PageNum   = 0;
-        
-        if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0 )
-        {
-            this.CurCell = this.Content[0].Get_Cell(0);
-            this.CurCell.Content.Selection_Remove();
-        }
     },
 
     Selection_Clear : function()
@@ -8288,6 +8281,30 @@ CTable.prototype =
         this.Selection.EndPos.PageIndex    = this.Pages.length - 1;
 
         this.Internal_Selection_UpdateCells();
+    },
+
+    /**
+     * В данной функции проверяется идет ли выделение таблицы до конца таблицы.
+     *
+     */
+    Selection_IsToEnd : function()
+    {
+        if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
+        {
+            var Cells_array = this.Internal_Get_SelectionArray();
+            var Len = Cells_array.length;
+
+            if (Len < 1)
+                return false;
+
+            var Pos = Cells_array[Len - 1];
+            if (Pos.Row !== this.Content.length - 1 || Pos.Cell !== this.Content[Pos.Row].Get_CellsCount() - 1)
+                return false;
+
+            return true;
+        }
+        else
+            return false;
     },
 
     Cursor_MoveToStartPos : function(AddToSelect)
@@ -8497,7 +8514,7 @@ CTable.prototype =
 
             if ( true === bOnTextAdd && Cells_array.length > 0 )
             {
-                // Снимаем выделением со всемх ячеек, кроме первой, попавшей в выделение
+                // Снимаем выделением со всех ячеек, кроме первой, попавшей в выделение
                 var Pos = Cells_array[0];
                 var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
                 Cell.Content.Select_All();
@@ -8529,6 +8546,17 @@ CTable.prototype =
                     Cell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, false);
                     Cell_Content.Set_ApplyToAll( false );
                 }
+
+                // Снимаем выделение
+                var Pos = Cells_array[0];
+                var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
+                this.CurCell = Cell;
+
+                this.Selection.Use   = false;
+                this.Selection.Start = false;
+
+                this.Selection.StartPos.Pos = { Row : Cell.Row.Index, Cell : Cell.Index };
+                this.Selection.EndPos.Pos   = { Row : Cell.Row.Index, Cell : Cell.Index };
 
                 if ( Cells_array[0].Row - 1 >= 0 )
                     this.Internal_RecalculateFrom( Cells_array[0].Row - 1, 0, true, true );
@@ -8699,7 +8727,7 @@ CTable.prototype =
         }
     },
 
-    Cursor_MoveRight : function(Count, AddToSelect, Word)
+    Cursor_MoveRight : function(Count, AddToSelect, Word, FromPaste)
     {
         if ( true === this.Selection.Use && this.Selection.Type === table_Selection_Cell )
         {
@@ -8756,7 +8784,7 @@ CTable.prototype =
         }
         else
         {
-            if ( false === this.CurCell.Content.Cursor_MoveRight( AddToSelect, Word ) )
+            if ( false === this.CurCell.Content.Cursor_MoveRight( AddToSelect, Word, FromPaste ) )
             {
                 if ( false === AddToSelect )
                 {

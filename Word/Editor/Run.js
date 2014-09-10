@@ -6788,10 +6788,8 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             if ( true != Reader.GetBool() )
             {
-                var r = Reader.GetByte();
-                var g = Reader.GetByte();
-                var b = Reader.GetByte();
-                this.Pr.Color = new CDocumentColor( r, g, b );
+                this.Pr.Color = new CDocumentColor(0, 0, 0, false);
+                this.Pr.Color.Read_FromBinary(Reader);
             }
             else
                 this.Pr.Color = undefined;
