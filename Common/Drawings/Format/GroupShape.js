@@ -49,7 +49,6 @@ function CGroupShape(parent)
 
 CGroupShape.prototype =
 {
-
     getObjectType: function()
     {
         return historyitem_type_GroupShape;
@@ -77,6 +76,7 @@ CGroupShape.prototype =
                 this.spTree[i].documentCreateFontMap(allFonts);
         }
     },
+
     setBDeleted: function(pr)
     {
         History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
@@ -103,7 +103,6 @@ CGroupShape.prototype =
             this.getDrawingDocument().TargetEnd();
         }
     },
-
 
     drawSelectionPage: function(pageIndex)
     {
@@ -140,7 +139,6 @@ CGroupShape.prototype =
         this.spPr = pr;
     },
 
-
     addToSpTree: function(pos, item)
     {
         if(!isRealNumber(pos))
@@ -175,7 +173,6 @@ CGroupShape.prototype =
         }
         return null;
     },
-
 
     removeFromSpTreeByPos: function(pos)
     {
@@ -251,7 +248,6 @@ CGroupShape.prototype =
         return commonSearchResults.length > 0 ? commonSearchResults : null;
     },
 
-
     getSelectedArraysByTypes: function()
     {
         var selected_objects = this.selectedObjects;
@@ -282,8 +278,6 @@ CGroupShape.prototype =
         }
         return {tables: tables, charts: charts, shapes: shapes, images: images, groups: groups};
     },
-
-
 
     getBoundsInGroup: function()
     {
@@ -340,42 +334,6 @@ CGroupShape.prototype =
             {
                 this.spTree[i].setDiagram(chartPr);
             }
-        }
-    },
-
-    recalcAll: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateBrush: true,
-            recalculatePen: true,
-            recalculateTransform: true,
-            recalculateSpTree: true,
-            recalculateCursorTypes: true,
-            recalculateScaleCoefficients: true,
-            recalculateArrGraphicObjects: true
-        };
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            this.spTree[i].recalcAll();
-        }
-    },
-
-    recalcAllColors: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateBrush: true,
-            recalculatePen: true,
-            recalculateTransform: true,
-            recalculateSpTree: true,
-            recalculateCursorTypes: true,
-            recalculateScaleCoefficients: true
-        };
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(this.spTree[i].recalcAllColors)
-                this.spTree[i].recalcAllColors();
         }
     },
 
@@ -511,7 +469,6 @@ CGroupShape.prototype =
         }
         return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
     },
-
 
     getResultScaleCoefficients: function()
     {
@@ -686,7 +643,6 @@ CGroupShape.prototype =
         }
     },
 
-
     paragraphAdd: function(paraItem, bRecalculate)
     {
         if(this.selection.textSelection)
@@ -702,7 +658,7 @@ CGroupShape.prototype =
             var i;
             if(paraItem.Type === para_TextPr)
             {
-                DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate]);
+                DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
             }
             else if(this.selectedObjects.length === 1
                 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape
@@ -724,7 +680,7 @@ CGroupShape.prototype =
         }
     },
 
-
+    applyTextFunction: DrawingObjectsController.prototype.applyTextFunction,
 
     applyAllAlign: function(val)
     {
@@ -749,7 +705,6 @@ CGroupShape.prototype =
         }
     },
 
-
     applyAllNumbering: function(val)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -760,8 +715,6 @@ CGroupShape.prototype =
             }
         }
     },
-
-
 
     applyAllIndent: function(val)
     {
@@ -774,7 +727,6 @@ CGroupShape.prototype =
         }
     },
 
-
     Paragraph_IncDecFontSizeAll: function(val)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -784,16 +736,6 @@ CGroupShape.prototype =
                 this.spTree[i].Paragraph_IncDecFontSizeAll(val);
             }
         }
-    },
-
-    haveShapes: function()
-    {
-        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
-        {
-            if(this.arrGraphicObjects[i].isShape())
-                return true;
-        }
-        return false;
     },
 
     changeSize: function(kw, kh)
@@ -922,25 +864,6 @@ CGroupShape.prototype =
     {
         return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.idx : null;
     },
-
-    getIsSingleBody: function()
-    {
-        if(!this.isPlaceholder())
-            return false;
-        if(this.getPlaceholderType() !== phType_body)
-            return false;
-        if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
-        {
-            var sp_tree = this.parent.cSld.spTree;
-            for(var i = 0; i < sp_tree.length; ++i)
-            {
-                if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
-                    return true;
-            }
-        }
-        return true;
-    },
-
 
     getSelectionState: function()
     {
@@ -1077,64 +1000,6 @@ CGroupShape.prototype =
         }
                 
         return null;
-    },
-
-    checkNotNullTransform: function()
-    {
-        if(this.spPr.xfrm && this.spPr.xfrm.isNotNullForGroup())
-            return true;
-        if(this.isPlaceholder())
-        {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            var b_is_single_body = this.getIsSingleBody();
-            switch (this.parent.kind)
-            {
-                case SLIDE_KIND:
-                {
-                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup())
-                        return true;
-                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup();
-                }
-
-                case LAYOUT_KIND:
-                {
-                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup();
-                }
-            }
-        }
-        return false;
-    },
-
-    getHierarchy: function()
-    {
-        this.compiledHierarchy = [];
-        var hierarchy = this.compiledHierarchy;
-        if(this.isPlaceholder())
-        {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            var b_is_single_body = this.getIsSingleBody();
-            switch (this.parent.kind)
-            {
-                case SLIDE_KIND:
-                {
-                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                    break;
-                }
-
-                case LAYOUT_KIND:
-                {
-                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                    break;
-                }
-            }
-        }
-        return this.compiledHierarchy;
     },
 
     isEmptyPlaceholder: function ()
@@ -1373,32 +1238,6 @@ CGroupShape.prototype =
     canUnGroup: function()
     {
         return true;
-    },
-
-    getUnGroupedSpTree: function()
-    {
-        this.normalize();
-        this.recalculateTransform();
-        var sp_tree = this.spTree;
-        var ret = [];
-        for(var i = 0; i < sp_tree.length; ++i)
-        {
-            var sp = sp_tree[i];
-            var full_flip_h = sp.getFullFlipH();
-            var full_flip_v = sp.getFullFlipV();
-            var full_rotate = sp.getFullRotate();
-            var hc = sp.spPr.xfrm.extX*0.5;
-            var vc = sp.spPr.xfrm.extY*0.5;
-            var xc = sp.transform.TransformPointX(hc, vc);
-            var yc = sp.transform.TransformPointY(hc, vc);
-
-            sp.setRotate(normalizeRotate(sp.getFullRotate()));
-            sp.setGroup(null);
-            sp.setOffset(xc - hc, yc - vc);
-            sp.setFlips(full_flip_h, full_flip_v);
-            ret.push(sp);
-        }
-        return ret;
     },
 
     normalize: function()
@@ -1670,9 +1509,6 @@ CGroupShape.prototype =
         return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
     },
 
-
-
-
     createRotateTrack: function()
     {
         return new RotateTrackGroup(this);
@@ -1733,6 +1569,7 @@ CGroupShape.prototype =
         History.Add(this, {Type: historyitem_GroupShapeSetNvGrpSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
         this.nvGrpSpPr = pr;
     },
+
     recalculateLocalTransform: CShape.prototype.recalculateLocalTransform,
 
     bringToFront : function()//перемещаем заселекченые объекты наверх
@@ -1809,8 +1646,6 @@ CGroupShape.prototype =
             }
         }
     },
-
-
 
     Undo: function(data)
     {
@@ -1946,11 +1781,6 @@ CGroupShape.prototype =
             }
         }
     },
-
-
-
-
-
 
     Refresh_RecalcData: function()
     {},

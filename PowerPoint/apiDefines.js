@@ -281,6 +281,11 @@ var c_oAscLineCapType = {
     Square : 2
 };
 
+var c_oAscTableLayout = {
+    AutoFit : 0x00,
+    Fixed   : 0x01
+};
+
 var c_oAscLineBeginType = {
     None: 0,
     Arrow: 1,

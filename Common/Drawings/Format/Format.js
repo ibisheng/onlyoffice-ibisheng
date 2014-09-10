@@ -7244,7 +7244,19 @@ function StyleRef()
 
 
 
-    this.isIdentical = function(styleRef)
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+StyleRef.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    isIdentical: function(styleRef)
     {
         if(styleRef == null)
         {
@@ -7261,18 +7273,6 @@ function StyleRef()
         }
 
         return true;
-
-    }
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
-}
-
-StyleRef.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
     },
 
     getObjectType: function()
@@ -7282,13 +7282,13 @@ StyleRef.prototype =
 
     setIdx: function(idx)
     {
-        History.Add(this, {Type: historyitem_StyleRef_SetIdx, oldIdx:this.idx, newIdx: idx});
+        //History.Add(this, {Type: historyitem_StyleRef_SetIdx, oldIdx:this.idx, newIdx: idx});
         this.idx= idx;
     },
 
     setColor: function(color)
     {
-        History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
+        //History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
         this.Color = color;
     },
 
@@ -7401,6 +7401,26 @@ StyleRef.prototype =
 
     },
 
+    Write_ToBinary: function (w)
+    {
+        writeLong(w, this.idx);
+        w.WriteBool(isRealObject(this.Color));
+        if(isRealObject(this.Color))
+        {
+            this.Color.Write_ToBinary(w);
+        }
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.idx = readLong(r);
+        if(r.GetBool())
+        {
+            this.Color = new CUniColor();
+            this.Color.Read_FromBinary(r);
+        }
+    },
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -7424,8 +7444,8 @@ function FontRef()
 
 
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 FontRef.prototype =
@@ -7444,13 +7464,13 @@ FontRef.prototype =
 
     setIdx: function(idx)
     {
-        History.Add(this, {Type: historyitem_FontRef_SetIdx, oldIdx:this.idx, newIdx: idx});
+        //History.Add(this, {Type: historyitem_FontRef_SetIdx, oldIdx:this.idx, newIdx: idx});
         this.idx= idx;
     },
 
     setColor: function(color)
     {
-        History.Add(this, {Type: historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
+        //History.Add(this, {Type: historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
         this.Color = color;
     },
 
@@ -7560,6 +7580,25 @@ FontRef.prototype =
 
     },
 
+    Write_ToBinary: function (w)
+    {
+        writeLong(w, this.idx);
+        w.WriteBool(isRealObject(this.Color));
+        if(isRealObject(this.Color))
+        {
+            this.Color.Write_ToBinary(w);
+        }
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.idx = readLong(r);
+        if(r.GetBool())
+        {
+            this.Color = new CUniColor();
+            this.Color.Read_FromBinary(r);
+        }
+    },
 
     Write_ToBinary2: function (w)
     {
@@ -7581,32 +7620,6 @@ function CShapeStyle()
     this.fontRef = null;//new FontRef();
 
 
-
-    this.merge = function(style)
-    {
-        if(style!=null)
-        {
-            if(style.lnRef != null)
-            {
-                this.lnRef = style.lnRef.createDuplicate();
-            }
-
-            if(style.fillRef != null)
-            {
-                this.fillRef = style.fillRef.createDuplicate();
-            }
-
-            if(style.effectRef != null)
-            {
-                this.effectRef = style.effectRef.createDuplicate();
-            }
-
-            if(style.fontRef != null)
-            {
-                this.fontRef = style.fontRef.createDuplicate();
-            }
-        }
-    }
 
 
 
@@ -7633,6 +7646,32 @@ CShapeStyle.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    merge: function(style)
+    {
+        if(style!=null)
+        {
+            if(style.lnRef != null)
+            {
+                this.lnRef = style.lnRef.createDuplicate();
+            }
+
+            if(style.fillRef != null)
+            {
+                this.fillRef = style.fillRef.createDuplicate();
+            }
+
+            if(style.effectRef != null)
+            {
+                this.effectRef = style.effectRef.createDuplicate();
+            }
+
+            if(style.fontRef != null)
+            {
+                this.fontRef = style.fontRef.createDuplicate();
+            }
+        }
     },
 
     createDuplicate:  function()
@@ -7748,7 +7787,11 @@ CShapeStyle.prototype =
             case historyitem_ShapeStyle_SetFontRef:
             case historyitem_ShapeStyle_SetEffectRef:
             {
-                writeObject(w, data.newPr);
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary(w);
+                }
                 break;
             }
         }
@@ -7761,22 +7804,26 @@ CShapeStyle.prototype =
         {
             case historyitem_ShapeStyle_SetLnRef:
             {
-                this.lnRef = readObject(r);
+                this.lnRef = new StyleRef();
+                this.lnRef.Read_FromBinary(r);
                 break;
             }
             case historyitem_ShapeStyle_SetFillRef:
             {
-                this.fillRef = readObject(r);
+                this.fillRef = new StyleRef();
+                this.fillRef.Read_FromBinary(r);
                 break;
             }
             case historyitem_ShapeStyle_SetFontRef:
             {
-                this.fontRef = readObject(r);
+                this.fontRef = new FontRef();
+                this.fontRef.Read_FromBinary(r);
                 break;
             }
             case historyitem_ShapeStyle_SetEffectRef:
             {
-                this.effectRef = readObject(r);
+                this.effectRef = new StyleRef();
+                this.effectRef.Read_FromBinary(r);
                 break;
             }
         }
@@ -11157,69 +11204,6 @@ NoteSlide.prototype =
 
 // ----------------------------------
 
-function isThemeFont(sFont)
-{
-    return sFont == "+mj-lt" || sFont == "+mn-lt" || sFont == "+mj-ea" || sFont == "+mn-ea" || sFont == "+mj-cs" || sFont == "+mn-cs";
-}
-
-function getFontInfo(sFont)
-{
-    switch(sFont)
-    {
-        case "+mj-lt":
-        {
-            return  function(obj)
-            {
-                return obj.majorFont.latin;
-            };
-        }
-        case "+mn-lt":
-        {
-            return  function(obj)
-            {
-                return obj.minorFont.latin;
-            };
-        }
-        case "+mj-ea":
-        {
-            return  function(obj)
-            {
-                return obj.majorFont.ea;
-            };
-        }
-        case "+mn-ea":
-        {
-            return  function(obj)
-            {
-                return obj.minorFont.ea;
-            };
-        }
-        case "+mj-cs":
-        {
-            return  function(obj)
-            {
-                return obj.majorFont.cs;
-            };
-        }
-        case "+mn-cs":
-        {
-            return  function(obj)
-            {
-                return obj.minorFont.cs;
-            };
-        }
-        default :
-        {
-            return function(obj)
-            {
-                return sFont;
-            };
-        }
-    }
-}
-
-
-
 // SLIDE ----------------------------
 function redrawSlide(slide, presentation, arrInd, pos,  direction, arr_slides)
 {
@@ -11268,42 +11252,6 @@ function redrawSlide(slide, presentation, arrInd, pos,  direction, arr_slides)
         }
     }
 }
-
-
-function recalculateSlideAfterChangeThemeColors(slide, presentation, direction, arr_slides)
-{
-    slide.recalcAllColors();
-    slide.recalculate();
-    presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
-
-    if(direction == 0)
-    {
-        if(slide.num > 0)
-        {
-            setTimeout(function(){recalculateSlideAfterChangeThemeColors(arr_slides[slide.num-1], presentation,  -1, arr_slides)}, 30);
-        }
-        if(slide.num < presentation.Slides.length-1)
-        {
-            setTimeout(function(){recalculateSlideAfterChangeThemeColors(arr_slides[slide.num+1], presentation,  +1, arr_slides)}, 30);
-        }
-        presentation.startChangeThemeTimeOutId = null;
-    }
-    if(direction > 0)
-    {
-        if(slide.num < presentation.Slides.length-1)
-        {
-            setTimeout(function(){recalculateSlideAfterChangeThemeColors(arr_slides[slide.num+1], presentation,   +1, arr_slides)}, 30);
-        }
-    }
-    if(direction < 0)
-    {
-        if(slide.num > 0)
-        {
-            setTimeout(function(){recalculateSlideAfterChangeThemeColors(arr_slides[slide.num-1], presentation,   -1, arr_slides)}, 30);
-        }
-    }
-}
-
 
 var text_fit_No         = 0;
 var text_fit_Auto       = 1;

@@ -91,7 +91,7 @@ function CheckSpPrXfrm2(object)
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
-    var ret = {shapes: [], images: [], groups: [], charts: []};
+    var ret = {shapes: [], images: [], groups: [], charts: [], tables: []};
     var selected_objects = arr;
     for(var i = 0;  i < selected_objects.length; ++i)
     {
@@ -118,12 +118,18 @@ function getObjectsByTypesFromArr(arr, bGrouped)
                     ret.shapes = ret.shapes.concat(by_types.shapes);
                     ret.images = ret.images.concat(by_types.images);
                     ret.charts = ret.charts.concat(by_types.charts);
+                    ret.tables = ret.tables.concat(by_types.charts);
                 }
                 break;
             }
             case historyitem_type_ChartSpace:
             {
                 ret.charts.push(drawing);
+                break;
+            }
+            case historyitem_type_GraphicFrame:
+            {
+                ret.tables.push(drawing);
                 break;
             }
         }
@@ -427,39 +433,6 @@ DrawingObjectsController.prototype =
         }
     },
 
-    handleEndMoveTrack: function(e)
-    {
-        if(!e.CtrlKey)
-        {
-            this.handleEndResizeTrack();
-        }
-        else
-        {
-            //TODO: сделать копирование
-        }
-    },
-
-
-    handleNoHit: function()
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            this.resetSelectionState();
-        }
-        else
-        {
-            return null;
-        }
-    },
-
-    handleClickOnSelectedGroup: function(group, e, x, y)
-    {
-        this.changeCurrentState(new GroupState(this, group));
-        this.onMouseDown(e, x, y);
-        this.onMouseUp(e, x, y);
-    },
-
-
     checkSelectedObjectsForMove: function(group, pageIndex)
     {
         var selected_object = group ? group.selectedObjects : this.selectedObjects;
@@ -569,172 +542,12 @@ DrawingObjectsController.prototype =
         }
     },
 
-    handleTextHitGroup: function(object, group, e, pageIndex)
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            this.resetSelection();
-            this.selectObject(group, pageIndex);
-            group.selectObject(object, pageIndex);
-            object.selectionSetStart(e, x, y);
-            this.changeCurrentState(new TextAddInGroup(this, group, object));
-            if(e.ClickCount < 2)
-                this.updateSelectionState();
-            return true;
-        }
-        else
-        {
-            return {objectId: object.Get_Id(), cursorType: "text"};
-        }
-    },
-
-    handleStartTrackAdj: function(e, x, y)
-    {
-        this.arrTrackObjects.push(this.arrPreTrackObjects[0]);
-        this.arrPreTrackObjects.length = 0;
-        this.changeCurrentState(new ChangeAdjState(this, this.curState.majorObject));
-        this.onMouseMove(e, x, y);
-    },
-
-    handleTrackAdj: function(e, x, y)
-    {
-        this.arrTrackObjects[0].track(x, y);
-        this.updateOverlay();
-    },
-
-    handleEndTrackAdj: function()
-    {
-        var track_object = this.arrTrackObjects[0];
-        var _this = this;
-        var group = this.curState.group;
-        function callback()
-        {
-            History.Create_NewPoint();
-            track_object.trackEnd();
-            _this.startRecalculate();
-        }
-        this.checkSelectedObjectsAndFireCallback(callback, []);
-        this.arrTrackObjects.length = 0;
-        if(group)
-            this.changeCurrentState(new GroupState(this, group));
-        else
-            this.changeCurrentState(new NullState(this));
-    },
-
-    handleStartRotateTrack: function(e, x, y)
-    {
-        this.changeCurrentState(new RotateState(this, this.curState.majorObject));
-        this.swapTrackObjects();
-        this.onMouseMove(e, x, y);
-    },
 
     handleRotateTrack: function(e, x, y)
     {
         var angle = this.curState.majorObject.getRotateAngle(x, y);
         this.rotateTrackObjects(angle, e);
         this.updateOverlay();
-    },
-
-
-    handleEndResizeTrack: function()
-    {
-        var tracks = this.getCopyTrackArray();
-        var _this = this;
-        var group = this.curState.group;
-        function callback()
-        {
-            History.Create_NewPoint();
-            for(var i = 0; i < tracks.length; ++i)
-            {
-                tracks[i].trackEnd();
-            }
-            if(isRealObject(group))
-            {
-                group.updateCoordinatesAfterInternalResize();
-            }
-            _this.startRecalculate();
-        }
-        this.checkSelectedObjectsAndFireCallback(callback, []);
-        this.arrTrackObjects.length = 0;
-        if(!isRealObject(this.curState.group))
-            this.changeCurrentState(new NullState(this));
-        else
-            this.changeCurrentState(new GroupState(this, this.curState.group));
-    },
-
-
-    handleMoveMouseDown: function()
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            return true;
-        }
-        else
-        {
-            return {cursorType: "move", objectId: this.curState.majorObject.Get_Id()};
-        }
-    },
-
-
-    handleAdjMouseDown: function()
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            return true;
-        }
-        else
-        {
-            return {cursorType: "crosshair", objectId: this.curState.majorObject.Get_Id()};
-        }
-    },
-
-    handleRotateMouseDown: function()
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            return true;
-        }
-        else
-        {
-            return {cursorType: "crosshair", objectId: this.curState.majorObject.Get_Id()};
-        }
-    },
-
-    handleResizeMouseDown: function()
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            return true;
-        }
-        else
-        {
-            return {cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.curState.cardDirection], objectId: this.curState.majorObject.Get_Id()};
-        }
-    },
-
-    handleStartTrackNewShape: function(persetGeom, x, y)
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            this.changeCurrentState(new BeginTrackNewShapeState(this, persetGeom, x, y));
-            return true;
-        }
-        else
-        {
-            return {cursorType: "crosshair", objectId: null/*TODO: выяснить какой Id нужен верхнему классу*/};
-        }
-    },
-
-    handleTarckNewShapeMouseDown: function()
-    {
-        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-        {
-            return true;
-        }
-        else
-        {
-            return {cursorType: "crosshair", objectId: null/*TODO: выяснить какой Id нужен верхнему классу*/};
-        }
     },
 
     getSnapArrays: function()
@@ -751,7 +564,6 @@ DrawingObjectsController.prototype =
         }
         return {snapX: snapX, snapY: snapY};
     },
-
 
     getCopyTrackArray: function()
     {
@@ -933,49 +745,15 @@ DrawingObjectsController.prototype =
         return;
     },
 
-    handleEndRotateTrack: function()
-    {
-        var tracks = this.getCopyTrackArray();
-        var _this = this;
-        var group = this.curState.group;
-        function callback()
-        {
-            History.Create_NewPoint();
-            for(var i = 0; i < tracks.length; ++i)
-            {
-                tracks[i].trackEnd();
-            }
-            if(isRealObject(group))
-            {
-                group.updateCoordinatesAfterInternalResize();
-            }
-            _this.startRecalculate();
-        }
-        this.checkSelectedObjectsAndCallback(callback, []);
-        this.arrTrackObjects.length = 0;
-        if(!group)
-            this.changeCurrentState(new NullState(this));
-        else
-            this.changeCurrentState(new GroupState(this, group));
-    },
-
-    handleMouseUpCtrlShiftOnSelectedObject: function(object)
-    {
-        object.deselect(this);
-        this.changeCurrentState(new NullState(this));
-    },
-
     selectObject: function(object, pageIndex)
     {
         object.select(this, pageIndex);
-//        this.sendDrawingObjectsProps();
     },
 
     deselectObject: function(object)
     {
 
     },
-
 
     recalculate: function()
     {
@@ -1001,11 +779,18 @@ DrawingObjectsController.prototype =
     {
     },
 
-    getTargetDocContent: function(bCheckChartTitle)
+    getTargetDocContent: function(bCheckChartTitle, bOrTable)
     {
         var text_object = getTargetTextObject(this);
         if(text_object)
         {
+            if(bOrTable)
+            {
+                if(text_object.getObjectType() === historyitem_type_GraphicFrame)
+                {
+                    return text_object.graphicObject;
+                }
+            }
             if(bCheckChartTitle && text_object.checkDocContent)
             {
                 text_object.checkDocContent();
@@ -1015,21 +800,18 @@ DrawingObjectsController.prototype =
         return null;
     },
 
-
     addNewParagraph: function(bRecalculate)
     {
-        var content = this.getTargetDocContent(true);
-        content && content.Add_NewParagraph(bRecalculate);
+        this.applyTextFunction(CDocumentContent.prototype.Add_NewParagraph, CTable.prototype.Add_NewParagraph, [bRecalculate]);
     },
 
 
     paragraphClearFormatting: function()
     {
-        var content = this.getTargetDocContent(true);
-        content && content.Paragraph_ClearFormatting();
+        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_ClearFormatting, [], CTable.prototype.Paragraph_ClearFormatting);
     },
 
-    applyDocContentFunction: function(f, args)
+    applyDocContentFunction: function(f, args, tableFunction)
     {
         function applyToArrayDrawings(arr)
         {
@@ -1043,6 +825,13 @@ DrawingObjectsController.prototype =
                     {
                         ret = true;
                     }
+                }
+                else if(arr[i].getObjectType() === historyitem_type_GraphicFrame)
+                {
+                    arr[i].graphicObject.Set_ApplyToAll(true);
+                    tableFunction.apply(arr[i].graphicObject, args);
+                    arr[i].graphicObject.Set_ApplyToAll(false);
+                    ret = true;
                 }
                 else if(arr[i].getDocContent)
                 {
@@ -1105,12 +894,28 @@ DrawingObjectsController.prototype =
         }
         if(this.selection.textSelection)
         {
-            f.apply(this.selection.textSelection.getDocContent(), args);
+            if(this.selection.textSelection.getObjectType() !== historyitem_type_GraphicFrame)
+            {
+                f.apply(this.selection.textSelection.getDocContent(), args);
+            }
+            else
+            {
+                tableFunction.apply(this.selection.textSelection.graphicObject, args);
+            }
         }
         else if(this.selection.groupSelection)
         {
             if(this.selection.groupSelection.selection.textSelection)
-                f.apply(this.selection.groupSelection.selection.textSelection.getDocContent(), args);
+            {
+                if(this.selection.groupSelection.selection.textSelection.getObjectType() !== historyitem_type_GraphicFrame)
+                {
+                    f.apply(this.selection.groupSelection.selection.textSelection.getDocContent(), args);
+                }
+                else
+                {
+                    tableFunction.apply(this.selection.groupSelection.selection.textSelection.graphicObject, args);
+                }
+            }
             else if(this.selection.groupSelection.selection.chartSelection)
             {
                 applyToChartSelection(this.selection.groupSelection.selection.chartSelection);
@@ -1142,86 +947,111 @@ DrawingObjectsController.prototype =
 
     setParagraphSpacing: function(Spacing)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphSpacing, [Spacing]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphSpacing, [Spacing], CTable.prototype.Set_ParagraphSpacing);
     },
 
     setParagraphTabs: function(Tabs)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
-        {
-            content.Set_ParagraphTabs(Tabs);
-        }
+        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphTabs, CTable.prototype.Set_ParagraphTabs, [Tabs]);
     },
 
     setParagraphNumbering: function(NumInfo)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphNumbering, [NumInfo]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphNumbering, [NumInfo], CTable.prototype.Set_ParagraphNumbering);
     },
 
     setParagraphShd: function(Shd)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphShd, [Shd]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphShd, [Shd], CTable.prototype.Set_ParagraphShd);
     },
 
 
     setParagraphStyle: function(Style)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphStyle, [Style]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphStyle, [Style], CTable.prototype.Set_ParagraphStyle);
     },
 
 
     setParagraphContextualSpacing: function(Value)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphContextualSpacing, [Value]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphContextualSpacing, [Value], CTable.prototype.Set_ParagraphPageBreakBefore);
     },
 
     setParagraphPageBreakBefore: function(Value)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
-        {
-            content.Set_ParagraphPageBreakBefore(Value);
-        }
+        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphPageBreakBefore, CTable.prototype.Set_ParagraphPageBreakBefore, [Value]);
     },
     setParagraphKeepLines: function(Value)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
-        {
-            content.Set_ParagraphKeepLines(Value);
-        }
+        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphKeepLines, CTable.prototype.Set_ParagraphKeepLines, [Value]);
     },
 
     setParagraphKeepNext: function(Value)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
-        {
-            content.Set_ParagraphKeepNext(Value);
-        }
+        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphKeepNext, CTable.prototype.Set_ParagraphKeepNext, [Value]);
     },
 
     setParagraphWidowControl: function(Value)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
-        {
-            content.Set_ParagraphWidowControl(Value);
-        }
+        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphWidowControl, CTable.prototype.Set_ParagraphWidowControl, [Value]);
     },
 
     setParagraphBorders: function(Value)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
+        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphBorders, CTable.prototype.Set_ParagraphBorders, [Value]);
+    },
+
+    applyTextFunction: function(docContentFunction, tableFunction, args)
+    {
+        if(this.selection.textSelection)
         {
-            content.Set_ParagraphBorders(Value);
+            this.selection.textSelection.applyTextFunction(docContentFunction, tableFunction, args);
+        }
+        else if(this.selection.groupSelection)
+        {
+            this.selection.groupSelection.applyTextFunction(docContentFunction, tableFunction, args);
+        }
+        else if(this.selection.chartSelection)
+        {
+            this.selection.chartSelection.applyTextFunction(docContentFunction, tableFunction, args);
+        }
+        else
+        {
+            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr)
+            {
+                this.applyDocContentFunction(docContentFunction, args, tableFunction);
+            }
+            else if(this.selectedObjects.length === 1 && ((this.selectedObjects[0].getObjectType() === historyitem_type_Shape && !CheckLinePreset(this.selectedObjects[0].getPresetGeom())) || this.selectedObjects[0].getObjectType() === historyitem_type_GraphicFrame))
+            {
+                this.selection.textSelection = this.selectedObjects[0];
+                if(this.selectedObjects[0].getObjectType() === historyitem_type_GraphicFrame)
+                {
+                    this.selectedObjects[0].graphicObject.Cursor_MoveToStartPos(false);
+                    this.selectedObjects[0].applyTextFunction(docContentFunction, tableFunction, args);
+                }
+                else
+                {
+                    this.selectedObjects[0].applyTextFunction(docContentFunction, tableFunction, args);
+                    this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
+                }
+            }
+            else if(this.parent && this.parent.GoTo_Text)
+            {
+                this.parent.GoTo_Text();
+                this.resetSelection();
+            }
+            else if(this.selectedObjects.length > 0 && this.selectedObjects[0].parent && this.selectedObjects[0].parent.GoTo_Text)
+            {
+                this.selectedObjects[0].parent.GoTo_Text();
+                this.resetSelection();
+            }
         }
     },
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
+        this.applyTextFunction(CDocumentContent.prototype.Paragraph_Add, CTable.prototype.Paragraph_Add, [paraItem, bRecalculate]);
+        return;
         if(this.selection.textSelection)
         {
             this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
@@ -1239,7 +1069,7 @@ DrawingObjectsController.prototype =
             var i;
             if(paraItem.Type === para_TextPr)
             {
-                this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate]);
+                this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
             }
             else if(this.selectedObjects.length === 1
                 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape
@@ -1260,17 +1090,17 @@ DrawingObjectsController.prototype =
 
     paragraphIncDecFontSize: function(bIncrease)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecFontSize, [bIncrease]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecFontSize, [bIncrease], CTable.prototype.Paragraph_IncDecFontSize);
     },
 
     paragraphIncDecIndent: function(bIncrease)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecIndent, [bIncrease]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecIndent, [bIncrease], CTable.prototype.Paragraph_IncDecIndent);
     },
 
     setParagraphAlign: function(align)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphAlign, [align]);
+        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphAlign, [align], CTable.prototype.Set_ParagraphAlign);
     },
 
     setParagraphIndent: function(indent)
@@ -1526,10 +1356,21 @@ DrawingObjectsController.prototype =
 
     getParagraphParaPr: function()
     {
-        var content = this.getTargetDocContent();
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            return content.Get_Paragraph_ParaPr();
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                return target_text_object.graphicObject.Get_Paragraph_ParaPr();
+            }
+            else
+            {
+                var content = this.getTargetDocContent();
+                if(content)
+                {
+                    return content.Get_Paragraph_ParaPr();
+                }
+            }
         }
         else
         {
@@ -1588,11 +1429,21 @@ DrawingObjectsController.prototype =
 
     getParagraphTextPr: function()
     {
-        var content = this.getTargetDocContent();
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            var text_pr = content.Get_Paragraph_TextPr();
-            return text_pr;
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                return target_text_object.graphicObject.Get_Paragraph_TextPr();
+            }
+            else
+            {
+                var content = this.getTargetDocContent();
+                if(content)
+                {
+                    return content.Get_Paragraph_TextPr();
+                }
+            }
         }
         else
         {
@@ -3293,10 +3144,21 @@ DrawingObjectsController.prototype =
 
     removeCallback: function(dir)
     {
-        var content = this.getTargetDocContent(true);
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            content.Remove(dir, true)
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                target_text_object.graphicObject.Remove(dir);
+            }
+            else
+            {
+                var content = this.getTargetDocContent(true);
+                if(content)
+                {
+                    content.Remove(dir, true)
+                }
+            }
         }
         else if(this.selectedObjects.length > 0)
         {
@@ -3589,7 +3451,7 @@ DrawingObjectsController.prototype =
 
     cursorMoveToStartPos: function()
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
             content.Cursor_MoveToStartPos();
@@ -3599,7 +3461,7 @@ DrawingObjectsController.prototype =
 
     cursorMoveToEndPos: function()
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
             content.Cursor_MoveToEndPos();
@@ -3610,10 +3472,21 @@ DrawingObjectsController.prototype =
 
     cursorMoveLeft: function(AddToSelect/*Shift*/, Word/*Ctrl*/)
     {
-        var content = this.getTargetDocContent();
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            content.Cursor_MoveLeft(AddToSelect, Word);
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                target_text_object.graphicObject.Cursor_MoveLeft(1, AddToSelect, Word);
+            }
+            else
+            {
+                var content = this.getTargetDocContent(undefined, true);
+                if(content)
+                {
+                    content.Cursor_MoveLeft(AddToSelect, Word);
+                }
+            }
             this.updateSelectionState();
         }
         else
@@ -3626,10 +3499,21 @@ DrawingObjectsController.prototype =
 
     cursorMoveRight: function(AddToSelect, Word)
     {
-        var content = this.getTargetDocContent();
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            content.Cursor_MoveRight(AddToSelect, Word);
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                target_text_object.graphicObject.Cursor_MoveRight(1, AddToSelect, Word);
+            }
+            else
+            {
+                var content = this.getTargetDocContent(undefined, true);
+                if(content)
+                {
+                    content.Cursor_MoveRight(AddToSelect, Word);
+                }
+            }
             this.updateSelectionState();
         }
         else
@@ -3643,10 +3527,21 @@ DrawingObjectsController.prototype =
 
     cursorMoveUp: function(AddToSelect)
     {
-        var content = this.getTargetDocContent();
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            content.Cursor_MoveUp(AddToSelect);
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                target_text_object.graphicObject.Cursor_MoveUp(1, AddToSelect);
+            }
+            else
+            {
+                var content = this.getTargetDocContent(undefined, true);
+                if(content)
+                {
+                    content.Cursor_MoveUp(AddToSelect);
+                }
+            }
             this.updateSelectionState();
         }
         else
@@ -3659,10 +3554,21 @@ DrawingObjectsController.prototype =
 
     cursorMoveDown: function(AddToSelect)
     {
-        var content = this.getTargetDocContent();
-        if(content)
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            content.Cursor_MoveDown(AddToSelect);
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                target_text_object.graphicObject.Cursor_MoveDown(1, AddToSelect);
+            }
+            else
+            {
+                var content = this.getTargetDocContent(undefined, true);
+                if(content)
+                {
+                    content.Cursor_MoveDown(AddToSelect);
+                }
+            }
             this.updateSelectionState();
         }
         else
@@ -3675,7 +3581,7 @@ DrawingObjectsController.prototype =
 
     cursorMoveEndOfLine: function(AddToSelect)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
             content.Cursor_MoveEndOfLine(AddToSelect);
@@ -3687,7 +3593,7 @@ DrawingObjectsController.prototype =
     cursorMoveStartOfLine: function(AddToSelect)
     {
 
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
             content.Cursor_MoveStartOfLine(AddToSelect);
@@ -3706,7 +3612,7 @@ DrawingObjectsController.prototype =
         {
             text_object = this.selection.groupSelection.selection.textSelection;
         }
-        if(text_object)
+        if(text_object && text_object.cursorMoveAt)
         {
             text_object.cursorMoveAt( X, Y, AddToSelect );
             this.updateSelectionState();
@@ -3715,10 +3621,22 @@ DrawingObjectsController.prototype =
 
     selectAll: function()
     {
-        var content = this.getTargetDocContent(), i;
-        if(content)
+        var i;
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object)
         {
-            content.Select_All();
+            if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                target_text_object.graphicObject.Select_All();
+            }
+            else
+            {
+                var content = this.getTargetDocContent();
+                if(content)
+                {
+                    content.Select_All();
+                }
+            }
         }
         else if(!this.document)
         {
@@ -4294,7 +4212,6 @@ DrawingObjectsController.prototype =
                         }
                         else
                         {
-
                             var pos_x = para_drawing.GraphicObj.bounds.x + para_drawing.GraphicObj.posX;
                             var pos_y = para_drawing.GraphicObj.bounds.y + para_drawing.GraphicObj.posY;
                             var nearest_pos = this.document.Get_NearestPos(para_drawing.GraphicObj.selectStartPage, pos_x, pos_y, true, para_drawing);
@@ -4624,7 +4541,6 @@ DrawingObjectsController.prototype =
 
     setSelectionState: function( state, stateIndex )
     {
-
         var _state_index = isRealNumber(stateIndex) ? stateIndex : state.length-1;
         var selection_state = state[_state_index];
         this.resetSelection();
@@ -4632,7 +4548,14 @@ DrawingObjectsController.prototype =
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
             this.selection.textSelection = selection_state.textObject;
-            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+            if(selection_state.textObject.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                selection_state.textObject.graphicObject.Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+            }
+            else
+            {
+                selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+            }
         }
         else if(selection_state.groupObject)
         {
@@ -4658,14 +4581,6 @@ DrawingObjectsController.prototype =
                 this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
             }
         }
-       //if(this.drawingObjects && this.selectedObjects.length > 0)
-       //{
-       //    var ws_view = this.drawingObjects.getWorksheet();
-       //    if(ws_view)
-       //    {
-       //        ws_view.isSelectOnShape = true;
-       //    }
-       //}
     },
 
 
@@ -4677,7 +4592,14 @@ DrawingObjectsController.prototype =
             selection_state.focus = true;
             selection_state.textObject = this.selection.textSelection;
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
-            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+            if(this.selection.textSelection.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                selection_state.textSelection = this.selection.textSelection.graphicObject.Get_SelectionState();
+            }
+            else
+            {
+                selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+            }
         }
         else if(this.selection.groupSelection)
         {
@@ -4781,7 +4703,7 @@ DrawingObjectsController.prototype =
 
     getDrawingPropsFromArray: function(drawings)
     {
-        var image_props, shape_props, chart_props, new_image_props, new_shape_props, new_chart_props, shape_chart_props, locked;
+        var image_props, shape_props, chart_props, table_props, new_image_props, new_shape_props, new_chart_props, new_table_props, shape_chart_props, locked;
         var drawing;
         for(var i = 0; i < drawings.length; ++i)
         {
@@ -4922,6 +4844,19 @@ DrawingObjectsController.prototype =
                     }
                     break;
                 }
+                case historyitem_type_GraphicFrame:
+                {
+                    new_table_props = drawing.graphicObject.Get_Props();
+                    if(!table_props)
+                    {
+                        table_props = new_table_props;
+                    }
+                    else
+                    {
+                        table_props = null;
+                    }
+                    break;
+                }
                 case historyitem_type_GroupShape:
                 {
                     var group_drawing_props = this.getDrawingPropsFromArray(drawing.spTree);
@@ -4995,11 +4930,22 @@ DrawingObjectsController.prototype =
                                 chart_props.locked = true;
                         }
                     }
+                    if(group_drawing_props.tableProps)
+                    {
+                        if(!table_props)
+                        {
+                            table_props = group_drawing_props.tableProps;
+                        }
+                        else
+                        {
+                            table_props = null;
+                        }
+                    }
                     break;
                 }
             }
         }
-        return {imageProps: image_props, shapeProps: shape_props, chartProps: chart_props, shapeChartProps: shape_chart_props};
+        return {imageProps: image_props, shapeProps: shape_props, chartProps: chart_props, tableProps: table_props, shapeChartProps: shape_chart_props};
     },
 
     getDrawingProps: function()

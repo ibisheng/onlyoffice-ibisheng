@@ -1,7 +1,7 @@
 "use strict";
 function CGraphicFrame()
 {
-    this.parent = parent;
+    this.parent = null;
     this.graphicObject = null;
     this.nvGraphicFramePr = null;
     this.spPr = null;
@@ -13,27 +13,65 @@ function CGraphicFrame()
     this.extY = null;
     this.transform = new CMatrix();
     this.compiledHierarchy = [];
+    this.snapArrayX = [];
+    this.snapArrayY = [];
+    this.Pages      = [];
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
-    this.stlesForParagraph = [];
+    this.compiledStyles = [];
     this.recalcInfo =
     {
         recalculateTransform: true,
         recalculateSizes: true,
         recalculateNumbering: true,
-        recalculateShapeHierarchy: true
+        recalculateShapeHierarchy: true,
+        recalculateTable: true
     };
-
+    this.RecalcInfo = {};
+    this.bDeleted = true;
 }
 
 CGraphicFrame.prototype =
 {
     addToRecalculate: CShape.prototype.addToRecalculate,
 
+    Get_Theme: CShape.prototype.Get_Theme,
+
+    Get_ColorMap: CShape.prototype.Get_ColorMap,
+
+    setBDeleted: CShape.prototype.setBDeleted,
+
+
+    Is_DrawingShape: function()
+    {
+        return false;
+    },
+
+    handleUpdatePosition: function()
+    {
+        this.recalcInfo.recalculateTransform = true;
+        this.addToRecalculate();
+    },
+
+    Get_TextBackGroundColor: function()
+    {
+        return undefined;
+    },
+
+    Get_PrevElementEndInfo: function()
+    {
+        return null;
+    },
+
+    Get_PageFields: function()
+    {
+        return editor.WordControl.m_oLogicDocument.Get_PageFields();
+    },
+
     getDocContent: function()
     {
-        if(this.graphicObject && this.graphicObject.CurCell)
+        if(this.graphicObject && this.graphicObject.CurCell && ( false === this.graphicObject.Selection.Use || ( true === this.graphicObject.Selection.Use && table_Selection_Text === this.graphicObject.Selection.Type ) ) )
         {
             return this.graphicObject.CurCell.Content;
         }
@@ -50,6 +88,10 @@ CGraphicFrame.prototype =
     {
         History.Add(this, {Type: historyitem_GraphicFrameSetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
         this.graphicObject = graphicObject;
+        if(this.graphicObject)
+        {
+            this.graphicObject.Index = 0;
+        }
     },
 
     setNvSpPr: function(pr)
@@ -81,6 +123,7 @@ CGraphicFrame.prototype =
         if(this.graphicObject)
         {
             ret.setGraphicObject(this.graphicObject.Copy(ret));
+            ret.graphicObject.Reset(0, 0, this.graphicObject.XLimit, this.graphicObject.YLimit, ret.graphicObject.PageNum)
         }
         if(this.nvGraphicFramePr)
         {
@@ -91,9 +134,9 @@ CGraphicFrame.prototype =
             ret.setSpPr(this.spPr.createDuplicate());
             ret.spPr.setParent(ret);
         }
+        ret.setBDeleted(false);
         return ret;
     },
-
 
     isEmptyPlaceholder: function()
     {
@@ -270,119 +313,54 @@ CGraphicFrame.prototype =
         return this.Id;
     },
 
-
-
-    getIsSingleBody: function()
-    {
-        if(!this.isPlaceholder())
-            return false;
-        if(this.getPlaceholderType() !== phType_body)
-            return false;
-        if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
-        {
-            var sp_tree = this.parent.cSld.spTree;
-            for(var i = 0; i < sp_tree.length; ++i)
-            {
-                if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
-                    return true;
-            }
-        }
-        return true;
-    },
-
-    checkNotNullTransform: function()
-    {
-        if(this.spPr.xfrm && this.spPr.xfrm.isNotNull())
-            return true;
-        if(this.isPlaceholder())
-        {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            var b_is_single_body = this.getIsSingleBody();
-            switch (this.parent.kind)
-            {
-                case SLIDE_KIND:
-                {
-                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
-                        return true;
-                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                }
-
-                case LAYOUT_KIND:
-                {
-                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                }
-            }
-        }
-        return false;
-    },
-
-    getHierarchy: function()
-    {
-        if(this.recalcInfo.recalculateShapeHierarchy)
-        {
-            this.compiledHierarchy.length = 0;
-            var hierarchy = this.compiledHierarchy;
-            if(this.isPlaceholder())
-            {
-                var ph_type = this.getPlaceholderType();
-                var ph_index = this.getPlaceholderIndex();
-                var b_is_single_body = this.getIsSingleBody();
-                switch (this.parent.kind)
-                {
-                    case SLIDE_KIND:
-                    {
-                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                        break;
-                    }
-
-                    case LAYOUT_KIND:
-                    {
-                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                        break;
-                    }
-                }
-            }
-            this.recalcInfo.recalculateShapeHierarchy = true;
-        }
-        return this.compiledHierarchy;
-    },
+    getIsSingleBody: CShape.prototype.getIsSingleBody,
+    getHierarchy: CShape.prototype.getHierarchy,
     recalculate: function()
     {
+        if(this.bDeleted)
+            return;
+        ExecuteNoHistory(function(){
+            if(this.recalcInfo.recalculateTable)
+            {
+                this.graphicObject && this.graphicObject.Recalculate_Page(0);
+            }
+            if(this.recalcInfo.recalculateSizes)
+            {
+                this.recalculateSizes();
+                this.recalcInfo.recalculateSizes = false;
 
-        if(this.recalcInfo.recalculateSizes)
-        {
-            this.recalculateSizes();
-            this.recalcInfo.recalculateSizes = false;
-        }
-        if(this.recalcInfo.recalculateTransform)
-        {
-            this.recalculateTransform();
-            this.recalcInfo.recalculateTransform = false;
-        }
+            }
+            if(this.recalcInfo.recalculateTransform)
+            {
+                this.recalculateTransform();
+                this.recalcInfo.recalculateTransform = false;
+                this.transformText = this.transform;
+                this.invertTransformText = this.invertTransform;
+            }
+        }, this, []);
 
     },
 
 
     recalculateSizes: function()
     {
-        this.graphicObject.XLimit -= this.graphicObject.X;
-        this.graphicObject.YLimit -= this.graphicObject.Y;
-        this.graphicObject.X = 0;
-        this.graphicObject.Y = 0;
-        this.graphicObject.X_origin = 0;
-        var _page_bounds = this.graphicObject.Get_PageBounds(0);
-        this.spPr.xfrm.extY = _page_bounds.Bottom - _page_bounds.Top;
-        this.spPr.xfrm.extX = _page_bounds.Right - _page_bounds.Left;
+        if(this.graphicObject)
+        {
+            this.graphicObject.XLimit -= this.graphicObject.X;
+            this.graphicObject.X = 0;
+            this.graphicObject.Y = 0;
+            this.graphicObject.X_origin = 0;
+            var _page_bounds = this.graphicObject.Get_PageBounds(0);
+            this.spPr.xfrm.extY = _page_bounds.Bottom - _page_bounds.Top;
+            this.spPr.xfrm.extX = _page_bounds.Right - _page_bounds.Left;
+            this.extX =  this.spPr.xfrm.extX;
+            this.extY =  this.spPr.xfrm.extY;
+        }
     },
 
     Selection_Is_OneElement : function()
     {
-        return true;
+        return 0;
     },
 
     recalculateCurPos: function()
@@ -419,25 +397,6 @@ CGraphicFrame.prototype =
         return this.graphicObject instanceof CTable;
     },
 
-    recalcAllColors: function()
-    {
-        this.recalcInfo.recalculateNumbering = true;
-        this.stlesForParagraph = [];
-        this.graphicObject.Recalc_CompiledPr();
-    },
-
-    recalcAll: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateTransform: true,
-            recalculateSizes: true,
-            recalculateNumbering: true,
-            recalculateShapeHierarchy: true
-        };
-        this.stlesForParagraph = [];
-        this.graphicObject.Recalc_CompiledPr();
-    },
 
     Hyperlink_CanAdd: function(bCheck)
     {
@@ -606,38 +565,7 @@ CGraphicFrame.prototype =
         return { X : 0, Y : 0, XLimit : Page_Width, YLimit : Page_Height };
     },
 
-    getParentObjects: function()
-    {
-        var parents = {slide: null, layout: null, master: null, theme: null};
-        switch (this.parent.kind)
-        {
-            case SLIDE_KIND:
-            {
-                parents.slide = this.parent;
-                parents.layout = this.parent.Layout;
-                parents.master = this.parent.Layout.Master;
-                parents.theme = this.parent.Layout.Master.Theme;
-                parents.presentation = this.parent.Layout.Master.presentation;
-                break;
-            }
-            case LAYOUT_KIND:
-            {
-                parents.layout = this.parent;
-                parents.master = this.parent.Master;
-                parents.theme = this.parent.Master.Theme;
-                parents.presentation = this.parent.Master.presentation;
-                break;
-            }
-            case MASTER_KIND:
-            {
-                parents.master = this.parent;
-                parents.theme = this.parent.Theme;
-                parents.presentation = this.parent.presentation;
-                break;
-            }
-        }
-        return parents;
-    },
+    getParentObjects: CShape.prototype.getParentObjects,
 
     Is_HdrFtr: function(bool)
     {
@@ -682,7 +610,7 @@ CGraphicFrame.prototype =
         var tx, ty;
         tx = this.invertTransform.TransformPointX(x, y);
         ty = this.invertTransform.TransformPointY(x, y);
-        return this.graphicObject.Is_TableBorder( tx, ty, 0) != null;
+        return this.graphicObject.Is_TableBorder( tx, ty, 0);
     },
 
     selectionSetEnd: function(e, x, y, slideIndex)
@@ -715,9 +643,10 @@ CGraphicFrame.prototype =
             }
             else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
             {
+                drawingDocument.SelectEnabled(false);
+                Doc.RecalculateCurPos();
                 drawingDocument.UpdateTargetTransform(this.transform);
                 drawingDocument.TargetShow();
-                drawingDocument.SelectEnabled(false);
             }
         }
         else
@@ -730,184 +659,27 @@ CGraphicFrame.prototype =
         }
     },
 
-    updateInterfaceTextState: function()
+    Is_TopDocument: function()
     {
-        if(this.graphicObject !== null && typeof this.graphicObject === "object" && typeof this.graphicObject.Document_UpdateInterfaceState === "function")
-        {
-            return this.graphicObject.Document_UpdateInterfaceState();
-        }
+        return false;
     },
 
     drawAdjustments: function()
     {},
 
-    recalculateTransform: function()
-    {
-        if(!isRealObject(this.group))
-        {
-            if(this.spPr.xfrm.isNotNull())
-            {
-                var xfrm = this.spPr.xfrm;
-                this.x = xfrm.offX;
-                this.y = xfrm.offY;
-                this.extX = xfrm.extX;
-                this.extY = xfrm.extY;
-                this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
-                this.flipH = xfrm.flipH === true;
-                this.flipV = xfrm.flipV === true;
-            }
-            else
-            {
-                if(this.isPlaceholder())
-                {
-                    var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
-                        var hierarchy_sp = hierarchy[i];
-                        if(isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
-                        {
-                            var xfrm = hierarchy_sp.spPr.xfrm;
-                            this.x = xfrm.offX;
-                            this.y = xfrm.offY;
-                            this.extX = xfrm.extX;
-                            this.extY = xfrm.extY;
-                            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
-                            this.flipH = xfrm.flipH === true;
-                            this.flipV = xfrm.flipV === true;
-                            break;
-                        }
-                    }
-                    if(i === hierarchy.length)
-                    {
-                        this.x = 0;
-                        this.y = 0;
-                        this.extX = 5;
-                        this.extY = 5;
-                        this.rot = 0;
-                        this.flipH = false;
-                        this.flipV = false;
-                    }
-                }
-                else
-                {
-                    this.x = 0;
-                    this.y = 0;
-                    this.extX = 5;
-                    this.extY = 5;
-                    this.rot = 0;
-                    this.flipH = false;
-                    this.flipV = false;
-                }
-            }
-        }
-        else
-        {
-            var xfrm;
-            if(this.spPr.xfrm.isNotNull())
-            {
-                xfrm = this.spPr.xfrm;
-            }
-            else
-            {
-                if(this.isPlaceholder())
-                {
-                    var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
-                        var hierarchy_sp = hierarchy[i];
-                        if(isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
-                        {
-                            xfrm = hierarchy_sp.spPr.xfrm;
-                            break;
-                        }
-                    }
-                    if(i === hierarchy.length)
-                    {
-                        xfrm = new CXfrm();
-                        xfrm.offX = 0;
-                        xfrm.offX = 0;
-                        xfrm.extX = 5;
-                        xfrm.extY = 5;
-                    }
-                }
-                else
-                {
-                    xfrm = new CXfrm();
-                    xfrm.offX = 0;
-                    xfrm.offY = 0;
-                    xfrm.extX = 5;
-                    xfrm.extY = 5;
-                }
-            }
-            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            this.extX = scale_scale_coefficients.cx*xfrm.extX;
-            this.extY = scale_scale_coefficients.cy*xfrm.extY;
-            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
-            this.flipH = xfrm.flipH === true;
-            this.flipV = xfrm.flipV === true;
-        }
-        this.transform.Reset();
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
-        if(this.flipH)
-            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
-        if(this.flipV)
-            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
-        global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
-        if(isRealObject(this.group))
-        {
-            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransformMatrix());
-        }
-        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+    recalculateTransform: CShape.prototype.recalculateTransform,
 
-    },
+    recalculateLocalTransform: CShape.prototype.recalculateLocalTransform,
+    deleteDrawingBase: CShape.prototype.deleteDrawingBase,
+    addToDrawingObjects: CShape.prototype.addToDrawingObjects,
 
+    select: CShape.prototype.select,
 
-    select: function(drawingObjectsController)
-    {
-        this.selected = true;
-        var selected_objects;
-        if(!isRealObject(this.group))
-            selected_objects = drawingObjectsController.selectedObjects;
-        else
-            selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
-                break;
-        }
-        if(i === selected_objects.length)
-            selected_objects.push(this);
-    },
-
-    deselect: function(drawingObjectsController)
-    {
-        this.selected = false;
-        var selected_objects;
-        if(!isRealObject(this.group))
-            selected_objects = drawingObjectsController.selectedObjects;
-        else
-            selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
-            {
-                selected_objects.splice(i, 1);
-                break;
-            }
-        }
-        /*if(this.graphicObject)
-            this.graphicObject.Selection_Remove();   */
-        return this;
-    },
+    deselect: CShape.prototype.deselect,
 
     draw: function(graphics)
     {
-        if(this.graphicObject !== null && typeof this.graphicObject === "object" && this.graphicObject.Draw)
+        if(this.graphicObject)
         {
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
@@ -924,13 +696,29 @@ CGraphicFrame.prototype =
 
 
     Set_CurrentElement: function()
-    {},
+    {
+        if(this.parent && this.parent.graphicObjects)
+        {
+            this.parent.graphicObjects.resetSelection();
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                this.parent.graphicObjects.selectObject(main_group, this.parent.num);
+                main_group.selectObject(this, this.parent.num);
+                main_group.selection.textSelection = this;
+            }
+            else
+            {
+                this.parent.graphicObjects.selectObject(this, this.parent.num);
+                this.parent.graphicObjects.selection.textSelection = this;
+            }
+        }
+    },
 
     OnContentRecalculate: function()
     {
         this.recalcInfo.recalculateSizes = true;
         this.recalcInfo.recalculateTransform = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
 
@@ -945,320 +733,6 @@ CGraphicFrame.prototype =
         return this.graphicObject.Set_SelectionState(Sate, Sate.length-1);
     },
 
-    getStylesForParagraph: function(level)
-    {
-        if(level == undefined)
-        {
-            level  = 0;
-        }
-
-        if(this.stlesForParagraph[level])
-            return this.stlesForParagraph[level];
-
-        var Styles = new CStyles();
-
-        var theme = null, layout = null, master = null, presentation;
-
-        switch(this.parent.kind)
-        {
-            case SLIDE_KIND :
-            {
-                layout = this.parent.Layout;
-                if(layout!=null)
-                {
-                    master = layout.Master;
-                    if(master!=null)
-                    {
-                        theme = master.Theme;
-                        presentation = master.presentation;
-                    }
-                }
-                break;
-            }
-            case LAYOUT_KIND :
-            {
-
-                layout = this.parent;
-                if(layout!=null)
-                {
-                    master = layout.Master;
-                    if(master!=null)
-                    {
-                        theme = master.Theme;
-                        presentation = master.presentation;
-                    }
-                }
-                break;
-            }
-            case MASTER_KIND :
-            {
-
-                master = this.parent;
-                if(master!=null)
-                {
-                    theme = master.Theme;
-                    presentation = master.presentation;
-                }
-                break;
-            }
-        }
-
-        var isPlaceholder = this.isPlaceholder();
-        if(isPlaceholder)
-        {
-            var phId = this.nvGraphicFramePr.nvPr.ph.idx, phType = this.nvGraphicFramePr.nvPr.ph.type;
-            var b_is_single_body = this.getIsSingleBody();
-            var layoutShape = null, masterShape = null;
-            if(layout!=null)
-            {
-                layoutShape = layout.getMatchingShape(phType, phId, b_is_single_body);
-            }
-            if(master != null)
-            {
-                masterShape = master.getMatchingShape(phType, phId, b_is_single_body);
-            }
-        }
-
-        var defaultStyle = null, masterStyle = null, masterShapeStyle = null, layoutShapeStyle = null, slideShapeStyle = null;
-
-
-        if(presentation != null
-            && presentation.defaultTextStyle != null
-            && presentation.defaultTextStyle.levels[level] != null)
-        {
-            defaultStyle = new CStyle("defaultStyle", null, null, null);
-            defaultStyle.ParaPr =  clone(presentation.defaultTextStyle.levels[level].pPr);
-            defaultStyle.TextPr =  clone(presentation.defaultTextStyle.levels[level].rPr);
-            if(defaultStyle.TextPr != undefined)
-            {
-                if(defaultStyle.TextPr.FontFamily  && defaultStyle.TextPr.FontFamily.Name )
-                {
-                    if(isThemeFont(defaultStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                    {
-                        defaultStyle.TextPr.FontFamily.themeFont =  defaultStyle.TextPr.FontFamily.Name;
-                        defaultStyle.TextPr.FontFamily.Name = getFontInfo(defaultStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                    }
-                }
-                if(defaultStyle.TextPr.unifill && defaultStyle.TextPr.unifill.fill)
-                {
-                    defaultStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    var _rgba =  defaultStyle.TextPr.unifill.getRGBAColor();
-
-                    defaultStyle.TextPr.Color = new CDocumentColor( _rgba.R, _rgba.G, _rgba.B);
-                }
-                if(defaultStyle.TextPr.FontSize != undefined)
-                {
-                    defaultStyle.TextPr.themeFontSize = defaultStyle.TextPr.FontSize;
-                }
-            }
-
-        }
-
-
-        if(master && master.txStyles)
-        {
-            if(isPlaceholder)
-            {
-                switch(phType)
-                {
-                    case phType_ctrTitle :
-                    case phType_title :
-                    {
-                        if(master.txStyles.titleStyle && master.txStyles.titleStyle.levels[level])
-                        {
-                            masterStyle = new CStyle("masterStyle", null, null, null);
-                            masterStyle.ParaPr =  clone(master.txStyles.titleStyle.levels[level].pPr);
-                            masterStyle.TextPr =  clone(master.txStyles.titleStyle.levels[level].rPr);
-                        }
-                        break;
-                    }
-                    case phType_body :
-                    case phType_subTitle :
-                    case phType_obj :
-                    //case null :
-                    {
-                        if(master.txStyles.bodyStyle && master.txStyles.bodyStyle.levels[level])
-                        {
-                            masterStyle = new CStyle("masterStyle", null, null, null);
-                            masterStyle.ParaPr =  clone(master.txStyles.bodyStyle.levels[level].pPr);
-                            masterStyle.TextPr =  clone(master.txStyles.bodyStyle.levels[level].rPr);
-                        }
-                        break;
-                    }
-                    default :
-                    {
-                        if(master.txStyles.otherStyle && master.txStyles.otherStyle.levels[level])
-                        {
-                            masterStyle = new CStyle("masterStyle", null, null, null);
-                            masterStyle.ParaPr =  clone(master.txStyles.otherStyle.levels[level].pPr);
-                            masterStyle.TextPr =  clone(master.txStyles.otherStyle.levels[level].rPr);
-                        }
-                        break;
-                    }
-                }
-
-            }
-            else
-            {
-                if(master.txStyles.otherStyle && master.txStyles.otherStyle.levels[level])
-                {
-                    masterStyle = new CStyle("masterStyle", null, null, null);
-                    masterStyle.ParaPr =  clone(master.txStyles.otherStyle.levels[level].pPr);
-                    masterStyle.TextPr =  clone(master.txStyles.otherStyle.levels[level].rPr);
-                }
-            }
-
-            if(masterStyle && masterStyle.TextPr)
-            {
-                if( masterStyle.TextPr.FontFamily  && masterStyle.TextPr.FontFamily.Name )
-                {
-                    if(masterStyle.TextPr.FontFamily && isThemeFont(masterStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                    {
-                        masterStyle.TextPr.FontFamily.themeFont =  masterStyle.TextPr.FontFamily.Name;
-                        masterStyle.TextPr.FontFamily.Name = getFontInfo(masterStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                    }
-                }
-
-                if(masterStyle.TextPr.unifill && masterStyle.TextPr.unifill.fill)
-                {
-                    masterStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    var _rgba = masterStyle.TextPr.unifill.getRGBAColor();
-                    masterStyle.TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
-                }
-
-                if(masterStyle.TextPr.FontSize != undefined)
-                {
-                    masterStyle.TextPr.themeFontSize = masterStyle.TextPr.FontSize;
-                }
-            }
-
-        }
-
-        if(isPlaceholder)
-        {
-            if(masterShape && masterShape.txBody && masterShape.txBody.lstStyle && masterShape.txBody.lstStyle.levels[level])
-            {
-                masterShapeStyle = new CStyle("masterShapeStyle", null, null, null);
-                masterShapeStyle.ParaPr =  clone(masterShape.txBody.lstStyle.levels[level].pPr);
-                masterShapeStyle.TextPr =  clone(masterShape.txBody.lstStyle.levels[level].rPr);
-                if(masterShapeStyle.TextPr)
-                {
-                    if(masterShapeStyle.TextPr.FontFamily && isThemeFont(masterShapeStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                    {
-                        masterShapeStyle.TextPr.FontFamily.themeFont =  masterShapeStyle.TextPr.FontFamily.Name;
-                        masterShapeStyle.TextPr.FontFamily.Name = getFontInfo(masterShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                    }
-
-                    if(masterShapeStyle.TextPr.unifill && masterShapeStyle.TextPr.unifill.fill)
-                    {
-                        masterShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        var _rgba = masterShapeStyle.TextPr.unifill.getRGBAColor();
-                        masterShapeStyle.TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
-                    }
-                }
-            }
-            if(layoutShape && layoutShape.txBody && layoutShape.txBody.lstStyle && layoutShape.txBody.lstStyle.levels[level])
-            {
-                layoutShapeStyle = new CStyle("layoutShapeStyle", null, null, null);
-                layoutShapeStyle.ParaPr =  clone(layoutShape.txBody.lstStyle.levels[level].pPr);
-                layoutShapeStyle.TextPr =  clone(layoutShape.txBody.lstStyle.levels[level].rPr);
-                if(layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.FontFamily && isThemeFont(layoutShapeStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                {
-                    layoutShapeStyle.TextPr.FontFamily.themeFont =  layoutShapeStyle.TextPr.FontFamily.Name;
-                    layoutShapeStyle.TextPr.FontFamily.Name = getFontInfo(layoutShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                }
-
-
-                if(layoutShapeStyle && layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.unifill)
-                {
-                    layoutShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    var _rgba = layoutShapeStyle.TextPr.unifill.getRGBAColor();
-                    layoutShapeStyle.TextPr.Color =  new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
-                }
-            }
-        }
-
-        if(/*this.parent.kind == SLIDE_KIND &&*/ this.txBody && this.txBody.lstStyle && this.txBody.lstStyle.levels[level])
-        {
-            slideShapeStyle = new CStyle("slideShapeStyle", null, null, null);
-            slideShapeStyle.ParaPr =  clone(this.txBody.lstStyle.levels[level].pPr);
-            slideShapeStyle.TextPr =  clone(this.txBody.lstStyle.levels[level].rPr);
-            if(slideShapeStyle.TextPr && slideShapeStyle.TextPr.FontFamily && isThemeFont(slideShapeStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-            {
-                slideShapeStyle.TextPr.FontFamily.themeFont =  slideShapeStyle.TextPr.FontFamily.Name;
-                slideShapeStyle.TextPr.FontFamily.Name = getFontInfo(slideShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-            }
-
-            if(slideShapeStyle && slideShapeStyle.TextPr && slideShapeStyle.TextPr.unifill && slideShapeStyle.TextPr.unifill.fill)
-            {
-                slideShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                var _rgba = slideShapeStyle.TextPr.unifill.getRGBAColor();
-                slideShapeStyle.TextPr.Color = {
-                    r : _rgba.R,
-                    g : _rgba.G,
-                    b : _rgba.B,
-                    a : _rgba.A
-                };
-            }
-        }
-
-        if(isPlaceholder)
-        {
-            if(defaultStyle)
-            {
-                Styles.Style[Styles.Id] = defaultStyle;
-                defaultStyle.BasedOn = null;
-                ++Styles.Id;
-            }
-
-            if(masterStyle)
-            {
-                Styles.Style[Styles.Id] = masterStyle;
-                masterStyle.BasedOn = Styles.Id-1;
-                ++Styles.Id;
-            }
-        }
-        else
-        {
-            if(masterStyle)
-            {
-                Styles.Style[Styles.Id] = masterStyle;
-                masterStyle.BasedOn = null;
-                ++Styles.Id;
-            }
-
-            if(defaultStyle)
-            {
-                Styles.Style[Styles.Id] = defaultStyle;
-                defaultStyle.BasedOn = Styles.Id-1;
-                ++Styles.Id;
-            }
-        }
-
-        if(masterShapeStyle)
-        {
-            Styles.Style[Styles.Id] = masterShapeStyle;
-            masterShapeStyle.BasedOn = Styles.Id-1;
-            ++Styles.Id;
-        }
-
-        if(layoutShapeStyle)
-        {
-            Styles.Style[Styles.Id] = layoutShapeStyle;
-            layoutShapeStyle.BasedOn = Styles.Id-1;
-            ++Styles.Id;
-        }
-
-        if(slideShapeStyle)
-        {
-            Styles.Style[Styles.Id] = slideShapeStyle;
-            slideShapeStyle.BasedOn = Styles.Id-1;
-            ++Styles.Id;
-        }
-
-        this.stlesForParagraph[level] = Styles;
-        return Styles;
-    },
 
     isPlaceholder: function()
     {
@@ -1297,9 +771,27 @@ CGraphicFrame.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
-        this.graphicObject.Paragraph_Add(paraItem, false);
-        this.recalcInfo.recalculateSizes = true;
-        this.recalcInfo.recalculateTransform = true;
+    },
+
+    applyTextFunction: function(docContentFunction, tableFunction, args)
+    {
+        if(tableFunction === CTable.prototype.Paragraph_Add)
+        {
+            if((args[0].Type === para_NewLine
+                || args[0].Type === para_Text
+                || args[0].Type === para_Space
+                || args[0].Type === para_Tab
+                || args[0].Type === para_PageNum)
+                && this.graphicObject.Selection.Use)
+            {
+                this.graphicObject.Remove(1, true, undefined, true);
+            }
+        }
+        else if(tableFunction === CTable.prototype.Add_NewParagraph)
+        {
+            this.graphicObject.Selection.Use && this.graphicObject.Remove(1, true, undefined, true);
+        }
+        tableFunction.apply(this.graphicObject, args);
     },
 
     remove: function(Count, bOnlyText, bRemoveOnlySelection)
@@ -1371,394 +863,22 @@ CGraphicFrame.prototype =
         }
     },
 
-    
-    Get_Styles: function(level, bTablesStyleId, bParagraph)
+    setParent2: CShape.prototype.setParent2,
+
+    Get_Styles: function(level)
     {
-        if(level == undefined)
+        if(isRealNumber(level))
         {
-            level  = 0;
+            if(!this.compiledStyles[level])
+            {
+                CShape.prototype.recalculateTextStyles.call(this, level);
+            }
+            return this.compiledStyles[level];
         }
-
-        var Styles = new CStyles();
-
-        if(!this.parent)
-            return Styles;
-        var theme = null, layout = null, master = null, presentation;
-
-        switch(this.parent.kind)
+        else
         {
-            case SLIDE_KIND :
-            {
-                layout = this.parent.Layout;
-                if(layout!=null)
-                {
-                    master = layout.Master;
-                    if(master!=null)
-                    {
-                        theme = master.Theme;
-                        presentation = master.presentation;
-                    }
-                }
-                break;
-            }
-            case LAYOUT_KIND :
-            {
-
-                layout = this.parent;
-                if(layout!=null)
-                {
-                    master = layout.Master;
-                    if(master!=null)
-                    {
-                        theme = master.Theme;
-                        presentation = master.presentation;
-                    }
-                }
-                break;
-            }
-            case MASTER_KIND :
-            {
-
-                master = this.parent;
-                if(master!=null)
-                {
-                    theme = master.Theme;
-                    presentation = master.presentation;
-                }
-                break;
-            }
+            return editor.WordControl.m_oLogicDocument.globalTableStyles;
         }
-
-        if(bParagraph && false)
-        {
-            var isPlaceholder = this.isPlaceholder();
-            if(isPlaceholder)
-            {
-                var phId = this.nvGraphicFramePr.nvPr.ph.idx, phType = this.nvGraphicFramePr.nvPr.ph.type;
-                var b_is_single_body = this.getIsSingleBody();
-                var layoutShape = null, masterShape = null;
-
-                if(layout!=null)
-                {
-                    layoutShape = layout.getMatchingShape(phType, phId, b_is_single_body);
-                }
-                if(master != null)
-                {
-                    masterShape = master.getMatchingShape(phType, phId, b_is_single_body);
-                }
-            }
-
-            var defaultStyle = null, masterStyle = null, masterShapeStyle = null, layoutShapeStyle = null, slideShapeStyle = null;
-
-
-            if(presentation != null
-                && presentation.defaultTextStyle != null
-                && presentation.defaultTextStyle.levels[level] != null)
-            {
-                defaultStyle = new CStyle("defaultStyle", null, null, null);
-                defaultStyle.ParaPr =  clone(presentation.defaultTextStyle.levels[level].pPr);
-                defaultStyle.TextPr =  clone(presentation.defaultTextStyle.levels[level].rPr);
-                if(defaultStyle.TextPr != undefined)
-                {
-                    if(defaultStyle.TextPr.FontFamily  && defaultStyle.TextPr.FontFamily.Name )
-                    {
-                        if(isThemeFont(defaultStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                        {
-                            defaultStyle.TextPr.FontFamily.themeFont =  defaultStyle.TextPr.FontFamily.Name;
-                            defaultStyle.TextPr.FontFamily.Name = getFontInfo(defaultStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                        }
-                    }
-                    if(defaultStyle.TextPr.unifill && defaultStyle.TextPr.unifill.fill)
-                    {
-                        defaultStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        var _rgba = defaultStyle.TextPr.unifill.getRGBAColor();
-                        defaultStyle.TextPr.Color = {
-                            r : _rgba.R,
-                            g : _rgba.G,
-                            b : _rgba.B,
-                            a : _rgba.A
-                        };
-                    }
-                    if(defaultStyle.TextPr.FontSize != undefined)
-                    {
-                        defaultStyle.TextPr.themeFontSize = defaultStyle.TextPr.FontSize;
-                    }
-                }
-
-            }
-
-
-            if(master && master.txStyles)
-            {
-                if(isPlaceholder)
-                {
-                    switch(phType)
-                    {
-                        case phType_ctrTitle :
-                        case phType_title :
-                        {
-                            if(master.txStyles.titleStyle && master.txStyles.titleStyle.levels[level])
-                            {
-                                masterStyle = new CStyle("masterStyle", null, null, null);
-                                masterStyle.ParaPr =  clone(master.txStyles.titleStyle.levels[level].pPr);
-                                masterStyle.TextPr =  clone(master.txStyles.titleStyle.levels[level].rPr);
-                            }
-                            break;
-                        }
-                        case phType_body :
-                        case phType_subTitle :
-                        case phType_obj :
-                        case null :
-                        {
-                            if(master.txStyles.bodyStyle && master.txStyles.bodyStyle.levels[level])
-                            {
-                                masterStyle = new CStyle("masterStyle", null, null, null);
-                                masterStyle.ParaPr =  clone(master.txStyles.bodyStyle.levels[level].pPr);
-                                masterStyle.TextPr =  clone(master.txStyles.bodyStyle.levels[level].rPr);
-                            }
-                            break;
-                        }
-                        default :
-                        {
-                            if(master.txStyles.otherStyle && master.txStyles.otherStyle.levels[level])
-                            {
-                                masterStyle = new CStyle("masterStyle", null, null, null);
-                                masterStyle.ParaPr =  clone(master.txStyles.otherStyle.levels[level].pPr);
-                                masterStyle.TextPr =  clone(master.txStyles.otherStyle.levels[level].rPr);
-                            }
-                            break;
-                        }
-                    }
-
-                }
-                else
-                {
-                    if(master.txStyles.otherStyle && master.txStyles.otherStyle.levels[level])
-                    {
-                        masterStyle = new CStyle("masterStyle", null, null, null);
-                        masterStyle.ParaPr =  clone(master.txStyles.otherStyle.levels[level].pPr);
-                        masterStyle.TextPr =  clone(master.txStyles.otherStyle.levels[level].rPr);
-                    }
-                }
-
-                if(masterStyle && masterStyle.TextPr)
-                {
-                    if( masterStyle.TextPr.FontFamily  && masterStyle.TextPr.FontFamily.Name )
-                    {
-                        if(masterStyle.TextPr.FontFamily && isThemeFont(masterStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                        {
-                            masterStyle.TextPr.FontFamily.themeFont =  masterStyle.TextPr.FontFamily.Name;
-                            masterStyle.TextPr.FontFamily.Name = getFontInfo(masterStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                        }
-                    }
-
-                    if(masterStyle.TextPr.unifill && masterStyle.TextPr.unifill.fill)
-                    {
-                        masterStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        var _rgba = masterStyle.TextPr.unifill.getRGBAColor();
-                        masterStyle.TextPr.Color = {
-                            r : _rgba.R,
-                            g : _rgba.G,
-                            b : _rgba.B,
-                            a : _rgba.A
-                        };
-                    }
-
-                    if(masterStyle.TextPr.FontSize != undefined)
-                    {
-                        masterStyle.TextPr.themeFontSize = masterStyle.TextPr.FontSize;
-                    }
-                }
-
-            }
-
-            if(isPlaceholder)
-            {
-                if(masterShape && masterShape.txBody && masterShape.txBody.lstStyle && masterShape.txBody.lstStyle.levels[level])
-                {
-                    masterShapeStyle = new CStyle("masterShapeStyle", null, null, null);
-                    masterShapeStyle.ParaPr =  clone(masterShape.txBody.lstStyle.levels[level].pPr);
-                    masterShapeStyle.TextPr =  clone(masterShape.txBody.lstStyle.levels[level].rPr);
-                    if(masterShapeStyle.TextPr)
-                    {
-                        if(masterShapeStyle.TextPr.FontFamily && isThemeFont(masterShapeStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                        {
-                            masterShapeStyle.TextPr.FontFamily.themeFont =  masterShapeStyle.TextPr.FontFamily.Name;
-                            masterShapeStyle.TextPr.FontFamily.Name = getFontInfo(masterShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                        }
-
-                        if(masterShapeStyle.TextPr.unifill && masterShapeStyle.TextPr.unifill.fill)
-                        {
-                            masterShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            var _rgba = masterShapeStyle.TextPr.unifill.getRGBAColor();
-                            masterShapeStyle.TextPr.Color = {
-                                r : _rgba.R,
-                                g : _rgba.G,
-                                b : _rgba.B,
-                                a : _rgba.A
-                            };
-                        }
-                    }
-                }
-                if(layoutShape && layoutShape.txBody && layoutShape.txBody.lstStyle && layoutShape.txBody.lstStyle.levels[level])
-                {
-                    layoutShapeStyle = new CStyle("layoutShapeStyle", null, null, null);
-                    layoutShapeStyle.ParaPr =  clone(layoutShape.txBody.lstStyle.levels[level].pPr);
-                    layoutShapeStyle.TextPr =  clone(layoutShape.txBody.lstStyle.levels[level].rPr);
-                    if(layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.FontFamily && isThemeFont(layoutShapeStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                    {
-                        layoutShapeStyle.TextPr.FontFamily.themeFont =  layoutShapeStyle.TextPr.FontFamily.Name;
-                        layoutShapeStyle.TextPr.FontFamily.Name = getFontInfo(layoutShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                    }
-
-
-                    if(layoutShapeStyle && layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.unifill && layoutShapeStyle.TextPr.unifill.fill)
-                    {
-                        layoutShapeStyle.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        var _rgba = layoutShapeStyle.unifill.getRGBAColor();
-                        layoutShapeStyle.TextPr.Color = {
-                            r : _rgba.R,
-                            g : _rgba.G,
-                            b : _rgba.B,
-                            a : _rgba.A
-                        };
-                    }
-                }
-            }
-
-            if(/*this.parent.kind == SLIDE_KIND &&*/ this.txBody && this.txBody.lstStyle && this.txBody.lstStyle.levels[level])
-            {
-                slideShapeStyle = new CStyle("slideShapeStyle", null, null, null);
-                slideShapeStyle.ParaPr =  clone(this.txBody.lstStyle.levels[level].pPr);
-                slideShapeStyle.TextPr =  clone(this.txBody.lstStyle.levels[level].rPr);
-                if(slideShapeStyle.TextPr && slideShapeStyle.TextPr.FontFamily && isThemeFont(slideShapeStyle.TextPr.FontFamily.Name) && theme && theme.themeElements.fontScheme)
-                {
-                    slideShapeStyle.TextPr.FontFamily.themeFont =  slideShapeStyle.TextPr.FontFamily.Name;
-                    slideShapeStyle.TextPr.FontFamily.Name = getFontInfo(slideShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-                }
-
-                if(slideShapeStyle && slideShapeStyle.TextPr && slideShapeStyle.TextPr.unifill)
-                {
-                    slideShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    var _rgba = slideShapeStyle.TextPr.unifill.getRGBAColor();
-                    slideShapeStyle.TextPr.Color = {
-                        r : _rgba.R,
-                        g : _rgba.G,
-                        b : _rgba.B,
-                        a : _rgba.A
-                    };
-                }
-            }
-
-            if(isPlaceholder)
-            {
-                if(defaultStyle)
-                {
-                    Styles.Style[Styles.Id] = defaultStyle;
-                    defaultStyle.BasedOn = null;
-                    ++Styles.Id;
-                }
-
-                if(masterStyle)
-                {
-                    Styles.Style[Styles.Id] = masterStyle;
-                    masterStyle.BasedOn = Styles.Id-1;
-                    ++Styles.Id;
-                }
-            }
-            else
-            {
-                if(masterStyle)
-                {
-                    Styles.Style[Styles.Id] = masterStyle;
-                    masterStyle.BasedOn = null;
-                    ++Styles.Id;
-                }
-
-                if(defaultStyle)
-                {
-                    Styles.Style[Styles.Id] = defaultStyle;
-                    defaultStyle.BasedOn = Styles.Id-1;
-                    ++Styles.Id;
-                }
-            }
-
-            if(masterShapeStyle)
-            {
-                Styles.Style[Styles.Id] = masterShapeStyle;
-                masterShapeStyle.BasedOn = Styles.Id-1;
-                ++Styles.Id;
-            }
-
-            if(layoutShapeStyle)
-            {
-                Styles.Style[Styles.Id] = layoutShapeStyle;
-                layoutShapeStyle.BasedOn = Styles.Id-1;
-                ++Styles.Id;
-            }
-
-            if(slideShapeStyle)
-            {
-                Styles.Style[Styles.Id] = slideShapeStyle;
-                slideShapeStyle.BasedOn = Styles.Id-1;
-                ++Styles.Id;
-            }
-
-            if(this.style && this.style.fontRef)
-            {
-                var refStyle = new CStyle("refStyle", null, null, null);
-                refStyle.ParaPr = {};
-                refStyle.TextPr = {};
-                switch  (this.style.fontRef.idx)
-                {
-                    case fntStyleInd_major :
-                    {
-                        refStyle.TextPr.FontFamily = {Name : getFontInfo("+mj-lt")(theme.themeElements.fontScheme) };
-                        break;
-                    }
-                    case fntStyleInd_minor :
-                    {
-                        refStyle.TextPr.FontFamily = {Name : getFontInfo("+mn-lt")(theme.themeElements.fontScheme) };
-                        break;
-                    }
-                    default :
-                    {
-                        break;
-                    }
-                }
-
-                if(this.style.fontRef.Color!=null && this.style.fontRef.Color.color != null)
-                {
-                    var unifill = new CUniFill();
-                    unifill.fill = new CSolidFill();
-                    unifill.fill.color = this.style.fontRef.Color;
-                    refStyle.TextPr.unifill = unifill;
-                }
-                else
-                {
-                    refStyle.TextPr.unifill = null;
-                }
-
-                Styles.Style[Styles.Id] = refStyle;
-                refStyle.BasedOn = Styles.Id-1;
-                ++Styles.Id;
-            }
-            return Styles;
-        }
-
-
-        if(typeof bTablesStyleId === "number")
-        {
-            if(presentation !== null && typeof presentation === "object")
-            {
-                if(Array.isArray(presentation.globalTableStyles) && presentation.globalTableStyles[bTablesStyleId] instanceof CStyle)
-                {
-                    Styles.Style[Styles.Id] = presentation.globalTableStyles[bTablesStyleId];
-                    ++Styles.Id;
-                }
-            }
-        }
-        return Styles;
     },
 
     Get_StartPage_Absolute: function()
@@ -1800,6 +920,8 @@ CGraphicFrame.prototype =
 
     Refresh_RecalcData2: function()
     {
+        this.recalcInfo.recalculateTable = true;
+        this.recalcInfo.recalculateSizes = true;
         this.addToRecalculate();
     },
 
@@ -1807,6 +929,11 @@ CGraphicFrame.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.oldPr;
+                break;
+            }
             case historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = data.oldPr;
@@ -1815,6 +942,10 @@ CGraphicFrame.prototype =
             case historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = data.oldPr;
+                if(this.graphicObject)
+                {
+                    this.graphicObject.Index = 0;
+                }
                 break;
             }
             case historyitem_GraphicFrameSetSetNvSpPr    :
@@ -1839,6 +970,11 @@ CGraphicFrame.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = data.newPr;
+                break;
+            }
             case historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = data.newPr;
@@ -1847,6 +983,10 @@ CGraphicFrame.prototype =
             case historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = data.newPr;
+                if(this.graphicObject)
+                {
+                    this.graphicObject.Index = 0;
+                }
                 break;
             }
             case historyitem_GraphicFrameSetSetNvSpPr    :
@@ -1881,6 +1021,11 @@ CGraphicFrame.prototype =
                 writeObject(w, data.newPr);
                 break;
             }
+            case historyitem_ShapeSetBDeleted:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
         }
     },
 
@@ -1889,6 +1034,11 @@ CGraphicFrame.prototype =
         var  type = r.GetLong();
         switch(type)
         {
+            case historyitem_ShapeSetBDeleted:
+            {
+                this.bDeleted = readBool(r);
+                break;
+            }
             case historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = readObject(r);
@@ -1897,6 +1047,10 @@ CGraphicFrame.prototype =
             case historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = readObject(r);
+                if(this.graphicObject)
+                {
+                    this.graphicObject.Index = 0;
+                }
                 break;
             }
             case historyitem_GraphicFrameSetSetNvSpPr    :
@@ -1926,5 +1080,69 @@ CGraphicFrame.prototype =
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+    }
+};
+
+CTable.prototype.Get_TableOffsetCorrection = function()
+{
+    return 0;
+};
+
+CTable.prototype.Selection_Draw_Page = function(Page_abs)
+{
+    if ( false === this.Selection.Use )
+        return;
+
+    var CurPage = Page_abs - this.Get_StartPage_Absolute();
+    if ( CurPage < 0 || CurPage >= this.Pages.length )
+        return;
+
+    switch( this.Selection.Type )
+    {
+        case table_Selection_Cell:
+        {
+            var Row_prev_index = -1;
+            for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+            {
+                var Pos = this.Selection.Data[Index];
+                var Row = this.Content[Pos.Row];
+                var Cell = Row.Get_Cell( Pos.Cell );
+                var CellInfo = Row.Get_CellInfo( Pos.Cell );
+                var CellMar = Cell.Get_Margins();
+
+                if ( -1 === Row_prev_index || Row_prev_index != Pos.Row )
+                    Row_prev_index = Pos.Row;
+
+                var X_start = CellInfo.X_cell_start;
+                var X_end   = CellInfo.X_cell_end;
+
+                var Cell_Pages   = Cell.Content_Get_PagesCount();
+                var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
+                if ( Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages )
+                    continue;
+
+                var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
+                var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
+
+                if ( 0 != Cell_PageRel )
+                {
+                    // мы должны определить ряд, на котором случился перенос на новую страницу
+                    var TempRowIndex = this.Pages[CurPage].FirstRow;
+                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] +  Y_offset, X_end - X_start, this.RowsInfo[TempRowIndex].H[CurPage] );
+                }
+                else
+                {
+                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] +  Y_offset, X_end - X_start, this.RowsInfo[Pos.Row].H[CurPage] );
+                }
+            }
+            break;
+        }
+        case table_Selection_Text:
+        {
+            var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
+            Cell.Content.Selection_Draw_Page(Page_abs);
+
+            break;
+        }
     }
 };

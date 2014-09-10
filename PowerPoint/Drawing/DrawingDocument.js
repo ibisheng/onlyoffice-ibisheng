@@ -1079,6 +1079,9 @@ function CDrawingDocument()
         this.TargetCursorColor.B = b;
     }
 
+    this.StartTrackTable = function()
+    {};
+
     this.OnRecalculatePage = function(index, pageObject)
     {
         editor.asc_fireCallback("asc_onDocumentChanged");
@@ -2482,6 +2485,14 @@ function CDrawingDocument()
         }
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
+    }
+
+    this.CorrectRulerPosition = function(pos)
+    {
+        if (global_keyboardEvent.AltKey)
+            return pos;
+
+        return ((pos / 2.5 + 0.5) >> 0) * 2.5;
     }
 
     // вот здесь весь трекинг

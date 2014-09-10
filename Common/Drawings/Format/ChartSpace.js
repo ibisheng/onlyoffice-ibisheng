@@ -537,7 +537,20 @@ CChartSpace.prototype =
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
             }
         }
+    },
 
+    applyTextFunction: function(docContentFunction, tableFunction, args)
+    {
+        if(docContentFunction === CDocumentContent.prototype.Paragraph_Add)
+        {
+            this.paragraphAdd(args[0], args[1]);
+            return;
+        }
+        if(this.selection.textSelection)
+        {
+            this.selection.textSelection.checkDocContent();
+            this.selection.textSelection.applyTextFunction(docContentFunction, tableFunction, args);
+        }
     },
 
     selectTitle: function(title, pageIndex)

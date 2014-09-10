@@ -892,32 +892,7 @@ function CorrectShapeProp(asc_shape_prop, shape)
 
 // ---------------------------------------------------------------
 
-// информация о темах --------------------------------------------
 
-function CAscThemeInfo(themeInfo)
-{
-    this.Obj = themeInfo;
-    this.Index = -1000;
-}
-CAscThemeInfo.prototype.get_Name = function() { return this.Obj["Name"]; }
-CAscThemeInfo.prototype.get_Url = function() { return this.Obj["Url"]; }
-CAscThemeInfo.prototype.get_Image = function() { return this.Obj["Thumbnail"]; }
-CAscThemeInfo.prototype.get_Index = function() { return this.Index; }
-
-function CAscThemes()
-{
-    this.EditorThemes = [];
-    this.DocumentThemes = [];
-
-    var _count = _presentation_editor_themes.length;
-    for (var i = 0; i < _count; i++)
-    {
-        this.EditorThemes[i] = new CAscThemeInfo(_presentation_editor_themes[i]);
-        this.EditorThemes[i].Index = i;
-    }
-}
-CAscThemes.prototype.get_EditorThemes = function(){ return this.EditorThemes; }
-CAscThemes.prototype.get_DocumentThemes = function(){ return this.DocumentThemes; }
 
 // ---------------------------------------------------------------
 

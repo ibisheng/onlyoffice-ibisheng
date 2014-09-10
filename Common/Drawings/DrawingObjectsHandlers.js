@@ -94,26 +94,38 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
+                {
                     return ret;
+                }
                 break;
             }
             case historyitem_type_ChartSpace:
             {
                 ret = handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
+                {
                     return ret;
+                }
                 break;
             }
             case historyitem_type_GroupShape:
             {
                 ret = handleGroup(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
+                {
                     return ret;
+                }
                 break;
             }
-            /*
-             TODO сделать обработку для таблиц в презентаиях
-             * */
+            case historyitem_type_GraphicFrame:
+            {
+                ret = handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pageIndex);
+                if(ret)
+                {
+                    return ret;
+                }
+                break;
+            }
         }
     }
     return ret;
@@ -527,4 +539,44 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
             }
         }
     }
+}
+
+function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pageIndex)
+{
+    if(drawing.hitInBoundingRect(x, y))
+    {
+        return drawingObjectsController.handleMoveHit(drawing, e, x, y, group, false, pageIndex, false);
+    }
+    else
+    {
+        if(drawing.hitInInnerArea(x, y))
+        {
+            var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
+            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            {
+                drawingObjectsController.resetSelection();
+                (group ? group : drawingObjectsController).selectObject(drawing,pageIndex);
+                if(!group)
+                {
+                    drawingObjectsController.selection.textSelection = drawing;
+                    drawing.selectionSetStart(e, x, y, pageIndex);
+                }
+                else
+                {
+                    group.selection.textSelection = drawing;
+                    drawing.selectionSetStart(e, x, y, pageIndex);
+                    drawingObjectsController.selectObject(group, pageIndex);
+                    drawingObjectsController.selection.groupSelection = group;
+                }
+                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawing));
+                return true;
+            }
+            else
+            {
+                drawing.updateCursorType(x, y, e);
+                return {objectId: drawing.Get_Id(), cursorType: "text", updated: true};
+            }
+        }
+    }
+    return false;
 }

@@ -8485,13 +8485,21 @@ Paragraph.prototype =
 
     Internal_CompiledParaPrPresentation: function(Lvl)
     {
-        var _Lvl = isRealNumber(Lvl) ? Lvl : this.Pr.Lvl;
+        var _Lvl = isRealNumber(Lvl) ? Lvl : (isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
         var styleObject = this.Parent.Get_Styles(_Lvl);
         var Styles     = styleObject.styles;
-        var TableStyle = this.Parent.Get_TableStyleForPara();
 
         // Считываем свойства для текущего стиля
-        var Pr = Styles.Get_Pr( styleObject.lastId, styletype_Paragraph, TableStyle );
+        var TableStyle = this.Parent.Get_TableStyleForPara();
+        var Pr = Styles.Get_Pr( styleObject.lastId, styletype_Paragraph, TableStyle);
+
+        if(TableStyle && TableStyle.TextPr)
+        {
+            var TextPr2 = new CTextPr();
+            TextPr2.Unifill = TableStyle.TextPr.Unifill;
+            TextPr2.RFonts = TableStyle.TextPr.RFonts;
+            Pr.TextPr.Merge(TextPr2);
+        }
 
         Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
 

@@ -102,6 +102,12 @@ CTableStylePr.prototype =
         return TableStylePr;
     },
 
+    Check_PresentationPr : function(Theme)
+    {
+        this.TextPr.Check_PresentationPr();
+        this.TableCellPr.Check_PresentationPr(Theme);
+    },
+
     Set_FromObject : function(Obj)
     {
         if ( undefined != Obj.TextPr )
@@ -4553,6 +4559,7 @@ function CDocumentShd()
     this.Value = shd_Nil;
     this.Color = new CDocumentColor(255, 255, 255);
     this.Unifill = undefined;
+    this.FillRef = undefined;
 };
 
 CDocumentShd.prototype =
@@ -4567,6 +4574,9 @@ CDocumentShd.prototype =
         
         if( undefined !== this.Unifill )
             Shd.Unifill = this.Unifill.createDuplicate();
+
+        if( undefined !== this.FillRef )
+            Shd.FillRef = this.FillRef.createDuplicate();
 
         return Shd;
     },
@@ -4622,6 +4632,7 @@ CDocumentShd.prototype =
         this.Value = shd_Nil;
         this.Color.Set( 0, 0, 0, false );
         this.Unifill = undefined;
+        this.FillRef = undefined;
     },
 
     Set_FromObject : function(Shd)
@@ -4641,9 +4652,23 @@ CDocumentShd.prototype =
             {
                 this.Unifill = Shd.Unifill.createDuplicate();
             }
+            if(undefined != Shd.FillRef)
+            {
+                this.FillRef = Shd.FillRef.createDuplicate();
+            }
         }
         else if ( undefined === Shd.Color )
             this.Color = undefined;
+    },
+
+
+    Check_PresentationPr : function(Theme)
+    {
+        if(this.FillRef)
+        {
+            this.Unifill = Theme.getFillStyle(this.FillRef.idx);
+            this.FillRef = undefined;
+        }
     },
 
     Write_ToBinary : function(Writer)
@@ -4661,6 +4686,15 @@ CDocumentShd.prototype =
             {
                 Writer.WriteBool(true);
                 this.Unifill.Write_ToBinary(Writer);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+            }
+            if(this.FillRef)
+            {
+                Writer.WriteBool(true);
+                this.FillRef.Write_ToBinary(Writer);
             }
             else
             {
@@ -4686,6 +4720,11 @@ CDocumentShd.prototype =
                 this.Unifill = new CUniFill();
                 this.Unifill.Read_FromBinary(Reader);
             }
+            if(Reader.GetBool())
+            {
+                this.FillRef = new StyleRef();
+                this.FillRef.Read_FromBinary(Reader);
+            }
         }
         else
             this.Color.Set(0, 0, 0);
@@ -4696,6 +4735,7 @@ function CDocumentBorder()
 {
     this.Color = new CDocumentColor( 0, 0, 0 );
     this.Unifill = undefined;
+    this.LineRef = undefined;
     this.Space = 0;
     this.Size  = 0.5 * g_dKoef_pt_to_mm;
     this.Value = border_None;
@@ -4716,6 +4756,15 @@ CDocumentBorder.prototype =
             Border.Unifill = undefined;
         else
             Border.Unifill = this.Unifill.createDuplicate();
+
+        if(undefined === this.LineRef)
+        {
+            Border.LineRef = undefined;
+        }
+        else
+        {
+            Border.LineRef = this.LineRef.createDuplicate();
+        }
 
         if ( undefined === this.Space )
             Border.Space = undefined;
@@ -4742,6 +4791,14 @@ CDocumentBorder.prototype =
 
         if(CompareUnifillBool(this.Unifill, Border.Unifill) === false)
             return false;
+
+        if(this.LineRef !== undefined && Border.LineRef === undefined || Border.LineRef !== undefined && this.LineRef === undefined)
+            return false;
+
+        if(this.LineRef !== undefined && !this.LineRef.compare(Border.LineRef))
+        {
+            return false;
+        }
 
         if ( Math.abs( this.Size - Border.Size ) > 0.001 )
             return false;
@@ -4780,6 +4837,17 @@ CDocumentBorder.prototype =
             return this.Color;
     },
 
+    Check_PresentationPr : function(Theme)
+    {
+        if(this.LineRef)
+        {
+            var pen = Theme.getLnStyle(this.LineRef.idx);
+            this.Size = isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
+            this.Unifill = pen.Fill;
+            this.LineRef = undefined;
+        }
+    },
+
     Set_FromObject : function(Border)
     {
         this.Space = Border.Space;
@@ -4795,11 +4863,15 @@ CDocumentBorder.prototype =
         {
             this.Unifill = Border.Unifill.createDuplicate();
         }
+        if(undefined != Border.LineRef)
+        {
+            this.LineRef = Border.LineRef.createDuplicate();
+        }
     },
 
     Check_Null : function()
     {
-        if ( undefined === this.Space || undefined === this.Size || undefined === this.Value || undefined === this.Color || undefined === this.Unifill)
+        if ( undefined === this.Space || undefined === this.Size || undefined === this.Value || undefined === this.Color || undefined === this.Unifill || undefined === this.LineRef)
             return false;
 
         return true;
@@ -4825,6 +4897,16 @@ CDocumentBorder.prototype =
         {
             Writer.WriteBool(false);
         }
+        if(this.LineRef)
+        {
+            Writer.WriteBool(true);
+            this.LineRef.Write_ToBinary(Writer);
+        }
+        else
+        {
+            Writer.WriteBool(false);
+        }
+
     },
 
     Read_FromBinary : function(Reader)
@@ -4843,8 +4925,13 @@ CDocumentBorder.prototype =
             this.Unifill = new CUniFill();
             this.Unifill.Read_FromBinary(Reader);
         }
+        if(Reader.GetBool())
+        {
+            this.LineRef = new StyleRef();
+            this.LineRef.Read_FromBinary(Reader);
+        }
     }
-}
+};
 
 function CTableMeasurement(Type, W)
 {
@@ -5862,6 +5949,30 @@ CTableCellPr.prototype =
         this.VMerge = CellPr.VMerge;
     },
 
+    Check_PresentationPr : function(Theme)
+    {
+        if(this.Shd)
+        {
+            this.Shd.Check_PresentationPr(Theme);
+        }
+        if(this.TableCellBorders.Bottom)
+        {
+            this.TableCellBorders.Bottom.Check_PresentationPr(Theme);
+        }
+        if(this.TableCellBorders.Left)
+        {
+            this.TableCellBorders.Left.Check_PresentationPr(Theme);
+        }
+        if(this.TableCellBorders.Right)
+        {
+            this.TableCellBorders.Right.Check_PresentationPr(Theme);
+        }
+        if(this.TableCellBorders.Top)
+        {
+            this.TableCellBorders.Top.Check_PresentationPr(Theme);
+        }
+    },
+
     Write_ToBinary : function(Writer)
     {
         var StartPos = Writer.GetCurPosition();
@@ -6416,6 +6527,8 @@ function CTextPr()
     this.RTL        = undefined;
     this.Lang       = new CLang();
     this.Unifill    = undefined;
+    this.FontRef    = undefined;
+
     this.Shd        = undefined;
     this.Vanish     = undefined;
 }
@@ -6448,6 +6561,7 @@ CTextPr.prototype =
         this.RTL        = undefined;
         this.Lang       = new CLang();
         this.Unifill    = undefined;
+        this.FontRef    = undefined;
         this.Shd        = undefined;
         this.Vanish     = undefined;
     },
@@ -6496,6 +6610,8 @@ CTextPr.prototype =
         TextPr.Lang       = this.Lang.Copy();
         if(undefined != this.Unifill)
             TextPr.Unifill = this.Unifill.createDuplicate();
+        if(undefined != this.FontRef)
+            TextPr.FontRef = this.FontRef.createDuplicate();
         
         if (undefined !== this.Shd )
             TextPr.Shd = this.Shd.Copy();
@@ -6588,6 +6704,10 @@ CTextPr.prototype =
                 this.Unifill = undefined;
             }
         }
+        if(undefined != TextPr.FontRef)
+        {
+            this.FontRef = TextPr.FontRef.createDuplicate();
+        }
         
         if ( undefined !== TextPr.Shd )
             this.Shd = TextPr.Shd.Copy();
@@ -6625,6 +6745,7 @@ CTextPr.prototype =
         this.RTL        = false;
         this.Lang.Init_Default();
         this.Unifill    = undefined;
+        this.FontRef    = undefined;
         this.Shd        = undefined;     
         this.Vanish     = false;
     },
@@ -6684,6 +6805,11 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.Unifill )
             this.Unifill =  TextPr.Unifill ;
+
+        if( undefined != TextPr.FontRef )
+        {
+            this.FontRef = TextPr.FontRef;
+        }
         
         if ( undefined !== TextPr.Shd )
         {
@@ -6694,6 +6820,46 @@ CTextPr.prototype =
             this.Shd = undefined;
         
         this.Vanish       = TextPr.Vanish;
+    },
+
+    Check_PresentationPr: function()
+    {
+        if(this.FontRef)
+        {
+            var prefix;
+            if(this.FontRef.idx === fntStyleInd_minor)
+            {
+                prefix = "+mn-";
+            }
+            else
+            {
+                prefix = "+mj-";
+            }
+            this.RFonts.Set_FromObject(
+                {
+                    Ascii: {
+                        Name: prefix+"lt",
+                        Index: -1
+                    },
+                    EastAsia: {
+                        Name: prefix+"ea",
+                        Index: -1
+                    },
+                    HAnsi: {
+                        Name: prefix+"lt",
+                        Index: -1
+                    },
+                    CS: {
+                        Name: prefix+"lt",
+                        Index: -1
+                    }
+                }
+            );
+            if(this.FontRef.Color && !this.Unifill)
+            {
+                this.Unifill = CreateUniFillByUniColorCopy(this.FontRef.Color);
+            }
+        }
     },
 
     Compare : function(TextPr)
@@ -6957,6 +7123,12 @@ CTextPr.prototype =
             Flags |= 16777216;
         }
 
+        if( undefined !== this.FontRef )
+        {
+            this.FontRef.Write_ToBinary(Writer);
+            Flags |= 33554432;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -7084,6 +7256,12 @@ CTextPr.prototype =
         // Vanish
         if ( Flags & 16777216 )
             this.Vanish = Reader.GetBool();
+
+        if ( Flags & 33554432 )
+        {
+            this.FontRef = new FontRef();
+            this.FontRef.ReadFromBinary(Reader);
+        }
     },
 
     Check_NeedRecalc : function()

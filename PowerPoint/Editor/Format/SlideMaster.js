@@ -589,15 +589,6 @@ MasterSlide.prototype =
 
     },
 
-    recalcAll: function()
-    {
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].recalcAll();
-        }
-    },
-
-
     getAllImages: function(images)
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )

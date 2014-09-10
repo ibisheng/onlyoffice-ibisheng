@@ -426,6 +426,27 @@ CShape.prototype =
         }
     },
 
+    applyTextFunction: function (docContentFunction, tableFunction, args)
+    {
+        var content_to_add =  this.getDocContent();
+        if(!content_to_add)
+        {
+            if(this.bWordShape)
+            {
+                this.createTextBoxContent();
+            }
+            else
+            {
+                this.createTextBody();
+            }
+            content_to_add =  this.getDocContent();
+        }
+        if(content_to_add)
+        {
+            docContentFunction.apply(content_to_add, args);
+        }
+    },
+
     clearContent: function()
     {
         var content = this.getDocContent();
@@ -574,47 +595,6 @@ CShape.prototype =
         }
     },
 
-    recalcAll: function () {
-        this.recalcInfo =
-        {
-            recalculateContent: true,
-            recalculateBrush: true,
-            recalculatePen: true,
-            recalculateTransform: true,
-            recalculateTransformText: true,
-            recalculateCursorTypes: true,
-            recalculateGeometry: true,
-            recalculateStyle: true,
-            recalculateFill: true,
-            recalculateLine: true,
-            recalculateShapeHierarchy: true,
-            recalculateTransparent: true,
-            recalculateGroupHierarchy: true,
-            recalculateTextStyles: [true, true, true, true, true, true, true, true, true]
-        };
-        if (this.txBody) {
-            this.txBody.recalcAll();
-        }
-    },
-
-    recalcAllColors: function () {
-        this.recalcInfo.recalculateContent = true;
-        this.recalcInfo.recalculateBrush = true;
-        this.recalcInfo.recalculatePen = true;
-        this.recalcInfo.recalculateStyle = true;
-        this.recalcInfo.recalculateFill = true;
-        this.recalcInfo.recalculateLine = true;
-        this.recalcInfo.recalculateTextStyles = [true, true, true, true, true, true, true, true, true];
-        if (this.txBody) {
-            this.txBody.recalcColors();
-        }
-    },
-
-
-    getType: function () {
-        return DRAWING_OBJECT_TYPE_SHAPE;
-    },
-
     getAllFonts: function (fonts) {
         if (this.txBody) {
             this.txBody.content.Document_Get_AllFontNames(fonts);
@@ -653,32 +633,6 @@ CShape.prototype =
         return false;
     },
 
-    checkNotNullTransform: function () {
-        if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
-            return true;
-        if (this.isPlaceholder()) {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            switch (this.parent.kind) {
-                case SLIDE_KIND:
-                {
-                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
-                    if (placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
-                        return true;
-                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                }
-
-                case LAYOUT_KIND:
-                {
-                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                }
-            }
-        }
-        return false;
-    },
-
     getHierarchy: function () {
         //if (this.recalcInfo.recalculateShapeHierarchy)
         {
@@ -706,48 +660,6 @@ CShape.prototype =
         }
         return this.compiledHierarchy;
     },
-
-    // getCompiledStyle: function () {
-    //
-    //     if (this.recalcInfo.recalculateStyle) {
-    //         this.compiledStyle = null;
-    //         if (this.isPlaceholder()) {
-    //             if (isRealObject(this.style)) {
-    //                 this.compiledStyle = this.style.createDuplicate();
-    //             }
-    //             else {
-    //                 var hierarchy = this.getHierarchy();
-    //                 for (var i = 0; i < hierarchy.length; ++i) {
-    //                     if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].style)) {
-    //                         this.compiledStyle = hierarchy[i].style.createDuplicate();
-    //                         break;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         else {
-    //             if (isRealObject(this.style))
-    //                 this.compiledStyle = this.style.createDuplicate();
-    //         }
-    //         if (isRealObject(this.compiledStyle)) {
-    //             var parents = this.getParentObjects();
-    //             if (isRealObject(this.compiledStyle.fillRef)
-    //                 && isRealObject(this.compiledStyle.fillRef.Color)) {
-    //                 this.compiledStyle.fillRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master);
-    //             }
-    //             if (isRealObject(this.compiledStyle.lnRef)
-    //                 && isRealObject(this.compiledStyle.lnRef.Color)) {
-    //                 this.compiledStyle.lnRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master);
-    //             }
-    //             if (isRealObject(this.compiledStyle.fontRef)
-    //                 && isRealObject(this.compiledStyle.fontRef.Color)) {
-    //                 this.compiledStyle.fontRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master);
-    //             }
-    //         }
-    //         this.recalcInfo.recalculateStyle = false;
-    //     }
-    //     return this.compiledStyle;
-    // },
 
     getPaddings: function () {
         var paddings = null;
@@ -786,37 +698,6 @@ CShape.prototype =
         }
         return paddings;
     },
-
-    //getParentObjects: function () {
-    //    var parents = { slide: null, layout: null, master: null, theme: null };
-    //    switch (this.parent.kind) {
-    //        case SLIDE_KIND:
-    //        {
-    //            parents.slide = this.parent;
-    //            parents.layout = this.parent.Layout;
-    //            parents.master = this.parent.Layout.Master;
-    //            parents.theme = this.parent.Layout.Master.Theme;
-    //            parents.presentation = this.parent.Layout.Master.presentation;
-    //            break;
-    //        }
-    //        case LAYOUT_KIND:
-    //        {
-    //            parents.layout = this.parent;
-    //            parents.master = this.parent.Master;
-    //            parents.theme = this.parent.Master.Theme;
-    //            parents.presentation = this.parent.Master.presentation;
-    //            break;
-    //        }
-    //        case MASTER_KIND:
-    //        {
-    //            parents.master = this.parent;
-    //            parents.theme = this.parent.Theme;
-    //            parents.presentation = this.parent.presentation;
-    //            break;
-    //        }
-    //    }
-    //    return parents;
-    //},
 
     getCompiledFill: function () {
         if (this.recalcInfo.recalculateFill) {
@@ -1002,8 +883,11 @@ CShape.prototype =
             }
         }
     },
-    setPaddings: function (paddings) {
-        if (paddings) {
+
+    setPaddings: function (paddings)
+    {
+        if (paddings)
+        {
 
             var new_body_pr = this.getBodyPr();
             if(new_body_pr)
@@ -2421,6 +2305,10 @@ CShape.prototype =
                 selected_objects.splice(i, 1);
                 break;
             }
+        }
+        if(this.graphicObject)
+        {
+            this.graphicObject.Selection_Remove();
         }
         return this;
     },

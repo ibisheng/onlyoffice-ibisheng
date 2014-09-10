@@ -1,5 +1,87 @@
 "use strict";
 
+
+function CAscTexture()
+{
+    this.Id = 0;
+    this.Image = "";
+}
+CAscTexture.prototype.get_id = function() { return this.Id; }
+CAscTexture.prototype.get_image = function() { return this.Image; }
+
+function CAscColorScheme()
+{
+    this.Colors = [];
+    this.Name = "";
+}
+CAscColorScheme.prototype.get_colors = function() { return this.Colors; }
+CAscColorScheme.prototype.get_name = function() { return this.Name; }
+
+
+function CAscColor()
+{
+    this.type = c_oAscColor.COLOR_TYPE_SRGB;
+    this.value = null;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.a = 255;
+
+    this.Auto = false;
+
+    this.Mods = [];
+    this.ColorSchemeId = -1;
+
+    if (1 === arguments.length) {
+        this.r = arguments[0].r;
+        this.g = arguments[0].g;
+        this.b = arguments[0].b;
+    } else {
+        if (3 <= arguments.length) {
+            this.r = arguments[0];
+            this.g = arguments[1];
+            this.b = arguments[2];
+        }
+        if (4 === arguments.length)
+            this.a = arguments[3];
+    }
+}
+CAscColor.prototype.get_r = function(){return this.r}
+CAscColor.prototype.put_r = function(v){this.r = v; this.hex = undefined;}
+CAscColor.prototype.get_g = function(){return this.g;}
+CAscColor.prototype.put_g = function(v){this.g = v; this.hex = undefined;}
+CAscColor.prototype.get_b = function(){return this.b;}
+CAscColor.prototype.put_b = function(v){this.b = v; this.hex = undefined;}
+CAscColor.prototype.get_a = function(){return this.a;}
+CAscColor.prototype.put_a = function(v){this.a = v; this.hex = undefined;}
+CAscColor.prototype.get_type = function(){return this.type;}
+CAscColor.prototype.put_type = function(v){this.type = v;}
+CAscColor.prototype.get_value = function(){return this.value;}
+CAscColor.prototype.put_value = function(v){this.value = v;}
+CAscColor.prototype.put_auto = function(v){this.Auto = v;}
+CAscColor.prototype.get_auto = function(){return this.Auto;}
+CAscColor.prototype.get_hex = function()
+{
+    if(!this.hex)
+    {
+        var a = this.a.toString(16);
+        var r = this.r.toString(16);
+        var g = this.g.toString(16);
+        var b = this.b.toString(16);
+        this.hex = ( a.length == 1? "0" + a: a) +
+            ( r.length == 1? "0" + r: r) +
+            ( g.length == 1? "0" + g: g) +
+            ( b.length == 1? "0" + b: b);
+    }
+    return this.hex;
+}
+
+CAscColor.prototype.get_color = function()
+{
+    var ret = new CColor(this.r, this.g, this.b);
+    return ret;
+}
+
 function CDocOpenProgress()
 {
     this.Type = c_oAscAsyncAction.Open;
@@ -850,33 +932,19 @@ function CBackground (obj)
 {
     if (obj)
     {
-        this.Color = (undefined != obj.Color && null != obj.Color) ? new CColor (obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
         this.Value = (undefined != obj.Value) ? obj.Value : null;
-
-        if(obj.fill != null)
-        {
-            this.fill = obj.fill;
-        }
-        else
-        {
-            this.fill = new CAscFill();
-            this.fill.type = FILL_TYPE_NOFILL;
-        }
     }
     else
     {
-        this.Color = new CColor(0, 0, 0);
+        this.Color = CreateAscColorCustom(0, 0, 0);
         this.Value = 1;
-        this.fill = new CAscFill();
-        this.fill.type = FILL_TYPE_NOFILL;
     }
 }
 CBackground.prototype.get_Color = function (){return this.Color;}
-CBackground.prototype.put_Color = function (v){this.Color = (v) ? new CColor (v.r, v.g, v.b): null;}
+CBackground.prototype.put_Color = function (v){this.Color = (v) ? v: null;}
 CBackground.prototype.get_Value = function (){return this.Value;}
 CBackground.prototype.put_Value = function (v){this.Value = v;}
-CBackground.prototype.get_fill = function (){return this.fill;}
-CBackground.prototype.put_fill = function(v){this.fill = v;};
 
 function CTablePositionH(obj)
 {
@@ -942,23 +1010,24 @@ CTablePositionV.prototype.put_Align = function(v) { this.Align = v; }
 CTablePositionV.prototype.get_Value = function()  { return this.Value; }
 CTablePositionV.prototype.put_Value = function(v) { this.Value = v; }
 
+
 function CTablePropLook(obj)
 {
-    this.FirstCol = undefined;
-    this.FirstRow = undefined;
-    this.LastCol  = undefined;
-    this.LastRow  = undefined;
-    this.BandHor  = undefined;
-    this.BandVer  = undefined;
+    this.FirstCol = false;
+    this.FirstRow = false;
+    this.LastCol  = false;
+    this.LastRow  = false;
+    this.BandHor  = false;
+    this.BandVer  = false;
 
     if ( obj )
     {
-        this.FirstCol = ( undefined === obj.FirstCol ? undefined : obj.FirstCol );
-        this.FirstRow = ( undefined === obj.FirstRow ? undefined : obj.FirstRow );
-        this.LastCol  = ( undefined === obj.LastCol  ? undefined : obj.LastCol );
-        this.LastRow  = ( undefined === obj.LastRow  ? undefined : obj.LastRow );
-        this.BandHor  = ( undefined === obj.HorBand  ? undefined : obj.HorBand );
-        this.BandVer  = ( undefined === obj.VerBand  ? undefined : obj.VerBand );
+        this.FirstCol = ( undefined === obj.m_bFirst_Col ? false : obj.m_bFirst_Col );
+        this.FirstRow = ( undefined === obj.m_bFirst_Row ? false : obj.m_bFirst_Row );
+        this.LastCol  = ( undefined === obj.m_bLast_Col  ? false : obj.m_bLast_Col );
+        this.LastRow  = ( undefined === obj.m_bLast_Row  ? false : obj.m_bLast_Row );
+        this.BandHor  = ( undefined === obj.m_bBand_Hor  ? false : obj.m_bBand_Hor );
+        this.BandVer  = ( undefined === obj.m_bBand_Ver  ? false : obj.m_bBand_Ver );
     }
 }
 
@@ -1124,56 +1193,29 @@ function CBorder (obj)
 {
     if (obj)
     {
-        this.Color = (undefined != obj.Color && null != obj.Color) ? new CColor (obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
         this.Size = (undefined != obj.Size) ? obj.Size : null;
         this.Value = (undefined != obj.Value) ? obj.Value : null;
         this.Space = (undefined != obj.Space) ? obj.Space : null;
-        this.fill = (undefined != obj.unifill) ? CreateAscFill(obj.unifill) : null;
-        if(obj.fill != undefined)
-        {
-            this.fill = obj.fill;
-        }
     }
     else
     {
-        this.Color = new CColor (0,0,0);
+        this.Color = CreateAscColorCustom(0,0,0);
         this.Size  = 0.5 * g_dKoef_pt_to_mm;
         this.Value = border_Single;
         this.Space = 0;
-        this.fill = new CAscFill();
-        this.fill.type = FILL_TYPE_NOFILL;
     }
 }
-CBorder.prototype.get_Color = function(){return this.Color; }
-CBorder.prototype.put_Color = function(v){this.Color = new CColor (v.r, v.g, v.b);}
-CBorder.prototype.get_Size = function(){return this.Size; }
-CBorder.prototype.put_Size = function(v){this.Size = v;}
-CBorder.prototype.get_Value = function(){return this.Value; }
-CBorder.prototype.put_Value = function(v){this.Value = v;}
-CBorder.prototype.get_Space = function(){return this.Space; }
-CBorder.prototype.put_Space = function(v){this.Space = v;}
-CBorder.prototype.get_ForSelectedCells = function(){return this.ForSelectedCells; }
-CBorder.prototype.put_ForSelectedCells = function(v){this.ForSelectedCells = v;}
-
-CBorder.prototype.put_Fill = function(v)
-{
-    this.fill = v;
-}
-
-CBorder.prototype.get_Fill = function()
-{
-    return this.fill;
-}
-
-CBorder.prototype.put_LnRef = function(v)
-{
-    this.llnRef = v;
-}
-
-CBorder.prototype.get_LnRef = function()
-{
-    return this.lnRef;
-}
+CBorder.prototype.get_Color = function(){return this.Color; };
+CBorder.prototype.put_Color = function(v){this.Color = v;};
+CBorder.prototype.get_Size = function(){return this.Size; };
+CBorder.prototype.put_Size = function(v){this.Size = v;};
+CBorder.prototype.get_Value = function(){return this.Value; };
+CBorder.prototype.put_Value = function(v){this.Value = v;};
+CBorder.prototype.get_Space = function(){return this.Space; };
+CBorder.prototype.put_Space = function(v){this.Space = v;};
+CBorder.prototype.get_ForSelectedCells = function(){return this.ForSelectedCells; };
+CBorder.prototype.put_ForSelectedCells = function(v){this.ForSelectedCells = v;};
 
 // CMargins
 function CMargins (obj)

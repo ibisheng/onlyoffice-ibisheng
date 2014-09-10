@@ -97,6 +97,7 @@ CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CGroupShape.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
 CGroupShape.prototype.getCanvasContext = CShape.prototype.getCanvasContext;
 CGroupShape.prototype.getHierarchy = CShape.prototype.getHierarchy;
+CGroupShape.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
 CGroupShape.prototype.getParentObjects = CShape.prototype.getParentObjects;
 CGroupShape.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CGroupShape.prototype.recalculateBounds = function()

@@ -724,6 +724,23 @@ CShape.prototype.hitInTextRect = function(x, y)
     }
     return false;
 };
+CShape.prototype.getIsSingleBody = function(x, y)
+{
+    if(!this.isPlaceholder())
+        return false;
+    if(this.getPlaceholderType() !== phType_body)
+        return false;
+    if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
+    {
+        var sp_tree = this.parent.cSld.spTree;
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
+                return true;
+        }
+    }
+    return true;
+};
 
 CTextBody.prototype.Get_Worksheet = function()
 {

@@ -19,6 +19,7 @@ CImageShape.prototype.setWorksheet = CShape.prototype.setWorksheet;
 CImageShape.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
 CImageShape.prototype.setParent2 = CShape.prototype.setParent2;
 CImageShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
+CImageShape.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
 
 CImageShape.prototype.setRecalculateInfo = function()
 {

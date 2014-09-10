@@ -158,9 +158,23 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return ret;
 };
 
-DrawingObjectsController.prototype.getSlide = function()
+DrawingObjectsController.prototype.setTableProps = function(props)
 {
-    return null;
+    var by_type = this.getSelectedObjectsByTypes();
+    if(by_type.tables.length === 1)
+    {
+        var target_text_object = getTargetTextObject(this);
+        if(target_text_object === by_type.tables[0])
+        {
+            by_type.tables[0].graphicObject.Set_Props(props);
+        }
+        else
+        {
+            by_type.tables[0].graphicObject.Select_All();
+            by_type.tables[0].graphicObject.Set_Props(props);
+            by_type.tables[0].graphicObject.Selection_Remove();
+        }
+    }
 };
 
 DrawingObjectsController.prototype.RefreshAfterChangeColorScheme = function()

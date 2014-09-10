@@ -141,10 +141,6 @@ function checkEmptyPlaceholderContent(content)
     return null;
 }
 
-function checkRedrawEmptyPlaceholder()
-{
-
-}
 
 function NullState(drawingObjects)
 {

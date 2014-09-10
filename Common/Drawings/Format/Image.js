@@ -130,11 +130,6 @@ CImageShape.prototype =
         return true;
     },
 
-    recalcAllColors: function()
-    {
-
-    },
-
     getSnapArrays: function(snapX, snapY)
     {
         var transform = this.getTransformMatrix();
@@ -171,24 +166,6 @@ CImageShape.prototype =
             MMData.LockedObjectType = 0;
             editor.sync_MouseMoveCallback( MMData );
         }
-    },
-
-    recalcAll: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateBrush: true,
-            recalculatePen: true,
-            recalculateTransform: true,
-            recalculateCursorTypes: true,
-            recalculateGeometry: true,
-            recalculateStyle: true,
-            recalculateFill: true,
-            recalculateLine: true,
-            recalculateShapeHierarchy: true,
-            recalculateTransparent: true,
-            recalculateGroupHierarchy: true
-        };
     },
 
     isPlaceholder : function()
@@ -426,54 +403,6 @@ CImageShape.prototype =
     getAllRasterImages: function(images)
     {
         this.blipFill && typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0 && images.push(this.blipFill.RasterImageId);
-    },
-
-    getIsSingleBody: function()
-    {
-        if(!this.isPlaceholder())
-            return false;
-        if(this.getPlaceholderType() !== phType_body)
-            return false;
-        if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
-        {
-            var sp_tree = this.parent.cSld.spTree;
-            for(var i = 0; i < sp_tree.length; ++i)
-            {
-                if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
-                    return true;
-            }
-        }
-        return true;
-    },
-
-    checkNotNullTransform: function()
-    {
-        if(this.spPr.xfrm && this.spPr.xfrm.isNotNull())
-            return true;
-        if(this.isPlaceholder())
-        {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            var b_is_single_body = this.getIsSingleBody();
-            switch (this.parent.kind)
-            {
-                case SLIDE_KIND:
-                {
-                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
-                        return true;
-                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                }
-
-                case LAYOUT_KIND:
-                {
-                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
-                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                }
-            }
-        }
-        return false;
     },
 
     getHierarchy: function()

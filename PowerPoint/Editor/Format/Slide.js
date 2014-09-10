@@ -1,13 +1,5 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/26/13
- * Time: 11:38 AM
- * To change this template use File | Settings | File Templates.
- */
-
 function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;
@@ -105,7 +97,6 @@ Slide.prototype =
         }
     },
 
-
     getMatchingShape: function(type, idx, bSingleBody)
     {
         var _input_reduced_type;
@@ -134,7 +125,6 @@ Slide.prototype =
         {
             _input_reduced_index = idx;
         }
-
 
         var _sp_tree = this.cSld.spTree;
         var _shape_index;
@@ -787,33 +777,6 @@ Slide.prototype =
         {
             this.cSld.spTree[i].handleUpdateFill();
             this.cSld.spTree[i].handleUpdateLn();
-        }
-    },
-
-
-    recalcAll: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateBackground: true,
-            recalculateSpTree: true
-        };
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].setRecalculateInfo();
-        }
-    },
-
-    recalcAllColors: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateBackground: true,
-            recalculateSpTree: true
-        };
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].recalcAllColors();
         }
     },
 

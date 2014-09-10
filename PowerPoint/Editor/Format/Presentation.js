@@ -63,7 +63,7 @@ function CPresentation(DrawingDocument)
     this.slideLayouts = [];
     this.notesMasters = [];
     this.notes        = [];
-    this.globalTableStyles = [];
+    this.globalTableStyles = null;
 
     this.updateSlideIndex = false;
     this.recalcMap = {};
@@ -74,6 +74,8 @@ function CPresentation(DrawingDocument)
 
     this.DefaultSlideTiming = new CAscSlideTiming();
     this.DefaultSlideTiming.setDefaultParams();
+
+    this.DefaultTableStyleId = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -90,132 +92,9 @@ CPresentation.prototype =
 {
     createDefaultTableStyles: function()
     {
-        var count = 0;
-
-        // Стандартные стили таблиц
-        var Style_Table_Lined = new CStyle("Lined", null, null, styletype_Table );
-        Style_Table_Lined.Create_Table_Lined( new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
-        this.globalTableStyles[count] = Style_Table_Lined;
-
-        count++;
-
-        var Style_Table_Lined_Accent1 = new CStyle("Lined - Accent 1", null, null, styletype_Table );
-        Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor( 0x95, 0xB3, 0xD7 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
-        this.globalTableStyles[count] = Style_Table_Lined_Accent1;
-
-        count++;
-
-        var Style_Table_Lined_Accent2 = new CStyle("Lined - Accent 2", null, null, styletype_Table);
-        Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
-        this.globalTableStyles[count]= Style_Table_Lined_Accent2;
-
-        count++;
-
-        var Style_Table_Lined_Accent3 = new CStyle("Lined - Accent 3", null, null, styletype_Table );
-        Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
-        this.globalTableStyles[count] = Style_Table_Lined_Accent3;
-
-        count++;
-
-        var Style_Table_Lined_Accent4 = new CStyle("Lined - Accent 4", null, null, styletype_Table );
-        Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
-        this.globalTableStyles[count] = Style_Table_Lined_Accent4;
-
-        count++;
-
-        var Style_Table_Lined_Accent5 = new CStyle("Lined - Accent 5", null, null, styletype_Table );
-        Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
-        this.globalTableStyles[count] = Style_Table_Lined_Accent5;
-
-        count++;
-
-        var Style_Table_Lined_Accent6 = new CStyle("Lined - Accent 6", null, null, styletype_Table );
-        Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xE9 ) );
-        this.globalTableStyles[count] = Style_Table_Lined_Accent6;
-
-        count++;
-
-        var Style_Table_Bordered = new CStyle("Bordered", null, null, styletype_Table );
-        Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor( 0xBF, 0xBF, 0xBF ), new CDocumentColor( 0x00, 0x00, 0x00 ) );
-        this.globalTableStyles[count] = Style_Table_Bordered;
-
-        count++;
-
-        var Style_Table_Bordered_Accent_1 = new CStyle("Bordered - Accent 1", null, null, styletype_Table );
-        Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor( 0xB8, 0xCC, 0xE4 ), new CDocumentColor( 0x36, 0x5F, 0x91 ) );
-        this.globalTableStyles[count] = Style_Table_Bordered_Accent_1;
-
-        count++;
-
-        var Style_Table_Bordered_Accent_2 = new CStyle("Bordered - Accent 2", null, null, styletype_Table );
-        Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor( 0xE5, 0xB8, 0xB7 ), new CDocumentColor( 0x94, 0x36, 0x34 ) );
-        this.globalTableStyles[count] = Style_Table_Bordered_Accent_2;
-
-        count++;
-
-        var Style_Table_Bordered_Accent_3 = new CStyle("Bordered - Accent 3", null, null, styletype_Table );
-        Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor( 0xD6, 0xE3, 0xBC ), new CDocumentColor( 0x76, 0x92, 0x3C ) );
-        this.globalTableStyles[count] = Style_Table_Bordered_Accent_3;
-
-        count++;
-
-        var Style_Table_Bordered_Accent_4 = new CStyle("Bordered - Accent 4", null, null, styletype_Table );
-        Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor( 0xCC, 0xC0, 0xD9 ), new CDocumentColor( 0x5F, 0x49, 0x7A ) );
-        this.globalTableStyles[count] = Style_Table_Bordered_Accent_4;
-
-        count++;
-
-        var Style_Table_Bordered_Accent_5 = new CStyle("Bordered - Accent 5", null, null, styletype_Table );
-        Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor( 0xB6, 0xDD, 0xE8 ), new CDocumentColor( 0x31, 0x84, 0x9B ) );
-        this.globalTableStyles[count] = Style_Table_Bordered_Accent_5;
-
-        count++;
-
-        var Style_Table_Bordered_Accent_6 = new CStyle("Bordered - Accent 6", null, null, styletype_Table );
-        Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor( 0xFB, 0xD4, 0xB4 ), new CDocumentColor( 0xE3, 0x6C, 0x0A ) );
-        this.globalTableStyles[count] = Style_Table_Bordered_Accent_6;
-
-        count++;
-
-        var Style_Table_BorderedLined = new CStyle("Bordered & Lined", null, null, styletype_Table );
-        Style_Table_BorderedLined.Create_Table_BorderedAndLined( new CDocumentColor( 0x00, 0x00, 0x00 ), new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined;
-
-        count++;
-
-        var Style_Table_BorderedLined_Accent1 = new CStyle("Bordered & Lined - Accent 1", null, null, styletype_Table );
-        Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined( new CDocumentColor( 0x17, 0x36, 0x5D ), new CDocumentColor( 0x8D, 0xB3, 0xE2 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent1;
-
-        count++;
-
-        var Style_Table_BorderedLined_Accent2 = new CStyle("Bordered & Lined - Accent 2", null, null, styletype_Table );
-        Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor( 0x94, 0x36, 0x34 ), new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent2;
-
-        count++;
-
-        var Style_Table_BorderedLined_Accent3 = new CStyle("Bordered & Lined - Accent 3", null, null, styletype_Table );
-        Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor( 0x76, 0x92, 0x3C ), new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent3;
-
-        count++;
-
-        var Style_Table_BorderedLined_Accent4 = new CStyle("Bordered & Lined - Accent 4", null, null, styletype_Table );
-        Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor( 0x5F, 0x49, 0x7A ), new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent4;
-
-        count++;
-
-        var Style_Table_BorderedLined_Accent5 = new CStyle("Bordered & Lined - Accent 5", null, null, styletype_Table );
-        Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor( 0x31, 0x84, 0x9B ), new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent5;
-
-        count++;
-
-        var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", null, null, styletype_Table );
-        Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
-        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent6;
+        ExecuteNoHistory(function(){
+            this.globalTableStyles = new CStyles();
+        }, this, []);
     },
     // Проводим начальные действия, исходя из Документа
     Init : function()
@@ -590,15 +469,20 @@ CPresentation.prototype =
             graphic_frame.spPr.setXfrm(new CXfrm());
             graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
             graphic_frame.spPr.xfrm.setOffX((this.Width - W)/2);
-            graphic_frame.spPr.xfrm.setOffX(this.Height/5);
+            graphic_frame.spPr.xfrm.setOffY(this.Height/5);
             graphic_frame.spPr.xfrm.setExtX(W);
             graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
             graphic_frame.setNvSpPr(new UniNvPr());
 
-            var table = new CTable(this.DrawingDocument, graphic_frame, true, 0, 0, 0, W, 100000, Rows, Cols, Grid);
-            table.Set_Inline(true);
-            //table.setStyleIndex(0);
+            var table = new CTable(this.DrawingDocument, graphic_frame, true, 0, 0, 0, W, 100000, Rows, Cols, Grid, true);
+            table.Set_TableLayout(tbllayout_Fixed);
+            if(typeof this.DefaultTableStyleId === "string")
+            {
+                table.Set_TableStyle(this.DefaultTableStyleId);
+            }
+            table.Set_TableLook(new CTableLook(false, true, false, false, true, false));
             graphic_frame.setGraphicObject(table);
+            graphic_frame.setBDeleted(false);
             this.Slides[this.CurPage].graphicObjects.resetSelection();
             this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, this.CurPage);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
@@ -936,6 +820,11 @@ CPresentation.prototype =
         return { X : 0, Y : 0, XLimit : 2000, YLimit : 2000};
     },
 
+    Get_PageLimits : function(PageIndex)
+    {
+        return this.Get_PageFields();
+    },
+
     CheckRange: function()
     {
         return [];
@@ -959,28 +848,8 @@ CPresentation.prototype =
 
     Set_TableProps : function(Props)
     {
-        if(Props.CellBorders)
-        {
-            if(Props.CellBorders.Left && Props.CellBorders.Left.Color)
-            {
-                Props.CellBorders.Left.unifill = CreteSolidFillRGB(Props.CellBorders.Left.Color.r, Props.CellBorders.Left.Color.g, Props.CellBorders.Left.Color.b)
-            }
-            if(Props.CellBorders.Top && Props.CellBorders.Top.Color)
-            {
-                Props.CellBorders.Top.unifill = CreteSolidFillRGB(Props.CellBorders.Top.Color.r, Props.CellBorders.Top.Color.g, Props.CellBorders.Top.Color.b)
-            }
-            if(Props.CellBorders.Right && Props.CellBorders.Right.Color)
-            {
-                Props.CellBorders.Right.unifill = CreteSolidFillRGB(Props.CellBorders.Right.Color.r, Props.CellBorders.Right.Color.g, Props.CellBorders.Right.Color.b)
-            }
-            if(Props.CellBorders.Bottom && Props.CellBorders.Bottom.Color)
-            {
-                Props.CellBorders.Bottom.unifill = CreteSolidFillRGB(Props.CellBorders.Bottom.Color.r, Props.CellBorders.Bottom.Color.g, Props.CellBorders.Bottom.Color.b)
-            }
-        }
         this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
         this.Recalculate();
-
         this.Document_UpdateInterfaceState();
         this.Document_UpdateSelectionState();
     },
@@ -1029,9 +898,6 @@ CPresentation.prototype =
         return new CParaPr();
     },
 
-
-
-
     // Обновляем данные в интерфейсе о свойствах параграфа
     Interface_Update_ParaPr : function()
     {
@@ -1055,28 +921,6 @@ CPresentation.prototype =
         if ( null != TextPr )
             editor.UpdateTextPr(TextPr);
     },
-
-    // Обновляем данные в интерфейсе о свойствах графики (картинки, автофигуры)
-    Interface_Update_DrawingPr : function(Flag)
-    {
-        // if(!(this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD || this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP))
-        {
-            var DrawingPr = this.DrawingObjects.getProps();
-
-            if ( true === Flag )
-                return DrawingPr;
-            else
-            {
-
-                for(var i = 0; i < DrawingPr.length; ++i)
-                    editor.sync_ImgPropCallback( DrawingPr[i] );
-            }
-        }
-        if(Flag)
-            return null;
-    },
-
-
 
 
     getAllTableStyles: function()
@@ -1821,18 +1665,9 @@ CPresentation.prototype =
 
     OnMouseUp : function(e, X, Y, PageIndex)
     {
-
         e.ctrlKey = e.CtrlKey;
         e.shiftKey = e.ShiftKey;
-        var elements = this.Slides[this.CurPage].graphicObjects;
-        if(e.Button === 0)
-        {
-            elements.onMouseUp(e, X, Y);
-        }
-        else if(e.Button === 2 && this.viewMode === false )
-        {
-            elements.onMouseUp2(e, X, Y);
-        }
+        this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.onMouseUp(e, X, Y);
         this.Document_UpdateInterfaceState();
     },
 
@@ -1842,7 +1677,7 @@ CPresentation.prototype =
         e.shiftKey = e.ShiftKey;
         editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
-        this.Slides[this.CurPage].onMouseMove(e, X, Y);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.onMouseMove(e, X, Y);
         this.Update_CursorType(X, Y,  e );
         editor.sync_MouseMoveEndCallback();
     },
@@ -1907,271 +1742,171 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-    Table_AddRow : function(bBefore)
+    ApplyTableFunction : function(Function, bBefore, bAll, Rows, Cols)
     {
-        if( this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
+        if(this.Slides[this.CurPage])
         {
-            var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
-            if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
+            var args;
+            if(isRealNumber(Rows) && isRealNumber(Cols))
             {
-                _cur_object.graphicObject.Row_Add(bBefore);
-                this.Recalculate();
-                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                args = [Rows, Cols];
             }
-        }
-        else
-        {
-            var _elements = this.Slides[this.CurPage].graphicObjects;
-            if(_elements.State.id === STATES_ID_NULL)
+            else
             {
-                var _shapes = this.Slides[this.CurPage].cSld.spTree;
-                var _shape_index;
-                var _shape_count = _shapes.length;
-                var _selected_count = 0;
-                var _target_table = null;
-                for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
+                args = [bBefore];
+            }
+            var target_text_object = getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+            if(target_text_object && target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                Function.apply(target_text_object.graphicObject, args);
+                if(target_text_object.graphicObject.Content.length === 0)
                 {
-                    if(_shapes[_shape_index].selected)
+                    this.Table_RemoveTable();
+                    return;
+                }
+                this.Recalculate();
+                this.Document_UpdateInterfaceState();
+            }
+            else
+            {
+                var by_types = this.Slides[this.CurPage].graphicObjects.getSelectedObjectsByTypes(true);
+                if(by_types.tables.length === 1)
+                {
+                    by_types.tables[0].Set_CurrentElement();
+                    if(!(bAll === true))
                     {
-                        ++_selected_count;
-                        if(_selected_count > 1)
+                        if(bBefore)
                         {
-                            return;
-                        }
-                        if(_shapes[_shape_index] instanceof  CGraphicFrame && _shapes[_shape_index].graphicObject instanceof  CTable)
-                        {
-                            _target_table = _shapes[_shape_index].graphicObject;
+                            by_types.tables[0].graphicObject.Cursor_MoveToStartPos();
                         }
                         else
                         {
-                            return;
+                            by_types.tables[0].graphicObject.Cursor_MoveToStartPos();
                         }
                     }
-                }
-                if(_target_table !== null)
-                {
-                    _elements.changeCurrentState(new TextAddState(_elements, this.Slides[this.CurPage], _target_table.Parent));
-                    _target_table.Row_Add(bBefore);
+                    else
+                    {
+                        by_types.tables[0].graphicObject.Select_All();
+                    }
+                    Function.apply(by_types.tables[0].graphicObject, args);
+                    if(by_types.tables[0].graphicObject.Content.length === 0)
+                    {
+                        this.Table_RemoveTable();
+                        return;
+                    }
                     this.Recalculate();
-                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                    this.Document_UpdateSelectionState();
+                    this.Document_UpdateInterfaceState();
                 }
             }
         }
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+    },
+
+
+    Table_AddRow : function(bBefore)
+    {
+        this.ApplyTableFunction(CTable.prototype.Row_Add, bBefore);
     },
 
     Table_AddCol : function(bBefore)
     {
-        if( this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
-        {
-            var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
-            if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
-            {
-                _cur_object.graphicObject.Col_Add(bBefore);
-                this.Recalculate();
-                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-            }
-        }
-        else
-        {
-            var _elements = this.Slides[this.CurPage].graphicObjects;
-            if(_elements.State.id === STATES_ID_NULL)
-            {
-                var _shapes = this.Slides[this.CurPage].cSld.spTree;
-                var _shape_index;
-                var _shape_count = _shapes.length;
-                var _selected_count = 0;
-                var _target_table = null;
-                for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
-                {
-                    if(_shapes[_shape_index].selected)
-                    {
-                        ++_selected_count;
-                        if(_selected_count > 1)
-                        {
-                            return;
-                        }
-                        if(_shapes[_shape_index] instanceof  CGraphicFrame && _shapes[_shape_index].graphicObject instanceof  CTable)
-                        {
-                            _target_table = _shapes[_shape_index].graphicObject;
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                }
-                if(_target_table !== null)
-                {
-                    _elements.changeCurrentState(new TextAddState(_elements, this.Slides[this.CurPage], _target_table.Parent));
-                    _target_table.Col_Add(bBefore);
-                    this.Recalculate();
-                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-                }
-            }
-        }
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+        this.ApplyTableFunction(CTable.prototype.Col_Add, bBefore);
     },
 
     Table_RemoveRow : function()
     {
-        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
-        if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
-        {
-            if(_cur_object.graphicObject.Row_Remove() === false)
-            {
-                this.Table_RemoveTable(true);
-            }
-            else
-            {
-                this.Recalculate();
-                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-            }
-        }
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+        this.ApplyTableFunction(CTable.prototype.Row_Remove, undefined);
     },
 
     Table_RemoveCol : function()
     {
-        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
-        if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
-        {
-            if(_cur_object.graphicObject.Col_Remove() === false)
-            {
-                this.Table_RemoveTable(true);
-            }
-            else
-            {
-                this.Recalculate();
-                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-            }
-        }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+        this.ApplyTableFunction(CTable.prototype.Col_Remove, true);
     },
 
     Table_MergeCells : function()
     {
-        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
-        if(_cur_object instanceof CGraphicFrame)
-        {
-            if(_cur_object.graphicObject !== null && typeof _cur_object.graphicObject === "object" && typeof _cur_object.graphicObject.Cell_Merge === "function")
-            {
-                _cur_object.graphicObject.Cell_Merge();
-                this.Recalculate(0);
-                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-                this.Document_UpdateSelectionState();
-
-            }
-        }
+        this.ApplyTableFunction(CTable.prototype.Cell_Merge, true, true);
     },
 
     Table_SplitCell : function( Cols, Rows )
     {
-        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
-        if(_cur_object.graphicObject !== null && typeof _cur_object.graphicObject === "object" && typeof _cur_object.graphicObject.Cell_Split === "function")
-        {
-
-            _cur_object.graphicObject.Cell_Split( Cols, Rows);
-            this.Recalculate();
-            this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-            return;
-        }
-        else
-        {
-            return;
-        }
-
+        this.ApplyTableFunction(CTable.prototype.Cell_Split, true, true, parseInt(Cols, 10), parseInt(Rows, 10) );
     },
 
-    Table_RemoveTable : function(bHistoryFlag)
+    Table_RemoveTable : function()
     {
-        if(this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
+        if(this.Slides[this.CurPage])
         {
-            var gr_fr = this.Slides[this.CurPage].graphicObjects.State.textObject;
-            this.Slides[this.CurPage].graphicObjects.resetSelectionState();
-            gr_fr.select(this.Slides[this.CurPage].graphicObjects);
-            this.Slides[this.CurPage].removeSelectedObjects();
-            this.Recalculate();
-            this.Document_UpdateUndoRedoState();
-            this.Document_UpdateInterfaceState()
+            var by_types = this.Slides[this.CurPage].graphicObjects.getSelectedObjectsByTypes(true);
+            if(by_types.tables.length === 1)
+            {
+                by_types.tables[0].deselect(this.Slides[this.CurPage].graphicObjects);
+                this.Slides[this.CurPage].graphicObjects.resetInternalSelection();
+                if(by_types.tables[0].group)
+                {
+                    by_types.tables[0].group.removeFromSpTree(by_types.tables[0].Id);
+                }
+                else
+                {
+                    this.Slides[this.CurPage].removeFromSpTreeById(by_types.tables[0].Id);
+                }
+                by_types.tables[0].setBDeleted(true);
+                this.Recalculate();
+                this.Document_UpdateInterfaceState();
+                this.Document_UpdateSelectionState();
+            }
         }
-        //this.Document_UpdateSelectionState();
-        //this.Document_UpdateUndoRedoState();
-        //this.Document_UpdateInterfaceState();
     },
 
     Table_Select : function(Type)
     {
-        if(this.Slides[this.CurPage].graphicObjects.State.textObject && this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
+        if(this.Slides[this.CurPage])
         {
-            this.Slides[this.CurPage].graphicObjects.State.textObject.graphicObject.Table_Select(Type);
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
+            var by_types = this.Slides[this.CurPage].graphicObjects.getSelectedObjectsByTypes(true);
+            if(by_types.tables.length === 1)
+            {
+                by_types.tables[0].Set_CurrentElement();
+                by_types.tables[0].graphicObject.Table_Select(Type);
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
+            }
         }
+    },
+
+    Table_CheckFunction : function(Function)
+    {
+        if(this.Slides[this.CurPage])
+        {
+            var target_text_object = getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+            if(target_text_object && target_text_object.getObjectType() === historyitem_type_GraphicFrame)
+            {
+                return Function.apply(target_text_object.graphicObject, []);
+            }
+           //else
+           //{
+           //    return
+           //    var by_types = this.Slides[this.CurPage].graphicObjects.getSelectedObjectsByTypes(true);
+           //    if(by_types.tables.length === 1)
+           //    {
+           //        var ret;
+           //        by_types.tables[0].graphicObject.Set_ApplyToAll(true);
+           //        ret = Function.apply(by_types.tables[0].graphicObject, []);
+           //        by_types.tables[0].graphicObject.Set_ApplyToAll(false);
+           //        return ret;
+           //    }
+           //}
+        }
+        return false;
     },
 
     Table_CheckMerge : function()
     {
-        if(this.Slides[this.CurPage].graphicObjects.State.textObject && this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
-        {
-            return this.Slides[this.CurPage].graphicObjects.State.textObject.graphicObject.Check_Merge();
-        }
-        return false;
+        return this.Table_CheckFunction(CTable.prototype.Check_Merge);
     },
 
     Table_CheckSplit : function()
     {
-        if(this.Slides[this.CurPage].graphicObjects.State.textObject && this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
-        {
-            return this.Slides[this.CurPage].graphicObjects.State.textObject.graphicObject.Check_Split();
-        }
-        /*else
-        {
-            var _elements = this.Slides[this.CurPage].graphicObjects;
-            if(_elements.State.id === STATES_ID_NULL)
-            {
-                var _selected_count = 0;
-                var _shapes = this.Slides[this.CurPage].cSld.spTree;
-                var _shapes_count = _shapes.length;
-                var _shape_index;
-                var _check_split_table = null;
-                for(_shape_index = 0; _shape_index < _shapes_count; ++_shape_index)
-                {
-                    if(_shapes[_shape_index].selected )
-                    {
-                        ++_selected_count;
-                        if(_selected_count > 1)
-                        {
-                            return false;
-                        }
-                        if(_shapes[_shape_index] instanceof CGraphicFrame && _shapes[_shape_index].graphicObject instanceof CTable)
-                        {
-                            _check_split_table = _shapes[_shape_index].graphicObject;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                }
-                if(_check_split_table !== null && typeof _check_split_table === "object" && typeof _check_split_table.Check_Split === "function")
-                {
-                    return _check_split_table.Check_Split();
-                }
-            }
-            else
-            {
-                return false;
-            }
-        } */
-        return false;
+        return this.Table_CheckFunction(CTable.prototype.Check_Split);
     },
 
     Check_TableCoincidence : function(Table)
@@ -2247,6 +1982,11 @@ CPresentation.prototype =
             {
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
             }
+
+            if(drawing_props.tableProps)
+            {
+                editor.sync_TblPropCallback(drawing_props.tableProps);
+            }
             if(target_content)
             {
                 if(para_pr)
@@ -2314,7 +2054,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             var target_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
-            if(target_content && target_content.Parent && target_content.Parent.getObjectType() === historyitem_type_TextBody)
+            if(target_content && target_content.Parent && target_content.Parent.getObjectType && target_content.Parent.getObjectType() === historyitem_type_TextBody)
             {
                 return this.DrawingDocument.Set_RulerState_Paragraph( null , target_content.Parent.getMargins());
             }
@@ -2832,8 +2572,8 @@ CPresentation.prototype =
     {
         History.Create_NewPoint();
         array.sort(fSortAscending);
-        var deleted = [];
-        for(var i = array.length -1; i > - 1; --i)
+        var deleted = [], i;
+        for(i = array.length -1; i > - 1; --i)
         {
             deleted.push(this.removeSlide(array[i]));
         }
@@ -2850,7 +2590,7 @@ CPresentation.prototype =
         var _newSelectedPage = 0;
 
         deleted.reverse();
-        for(var i = 0; i < deleted.length; ++i)
+        for(i = 0; i < deleted.length; ++i)
         {
             this.insertSlide(pos + i, deleted[i]);
         }
@@ -2921,7 +2661,6 @@ CPresentation.prototype =
                 {
                     if(layout.cSld.spTree[j].isPlaceholder())
                     {
-
                         var _ph_type = layout.cSld.spTree[j].getPhType();
                         if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                         {

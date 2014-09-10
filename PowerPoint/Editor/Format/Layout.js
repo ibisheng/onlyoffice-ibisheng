@@ -353,19 +353,6 @@ SlideLayout.prototype =
         }
     },
 
-    recalcAll: function()
-    {
-        this.recalcInfo =
-        {
-            recalculateBackground: true,
-            recalculateSpTree: true
-        };
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].recalcAll();
-        }
-    },
-
     Get_Id: function()
     {
         return this.Id;
