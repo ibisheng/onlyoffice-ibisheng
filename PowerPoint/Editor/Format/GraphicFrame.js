@@ -54,6 +54,30 @@ CGraphicFrame.prototype =
         this.addToRecalculate();
     },
 
+    handleUpdateTheme: function()
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Recalc_CompiledPr2();
+            this.graphicObject.RecalcInfo.Recalc_AllCells();
+            this.recalcInfo.recalculateSizes          = true;
+            this.recalcInfo.recalculateShapeHierarchy = true;
+            this.recalcInfo.recalculateTable          = true;
+            this.addToRecalculate();
+        }
+    },
+    handleUpdateFill: function()
+    {},
+
+    handleUpdateLn: function()
+    {},
+
+    handleUpdateExtents: function()
+    {
+        this.recalcInfo.recalculateTransform = true;
+        this.addToRecalculate();
+    },
+
     Get_TextBackGroundColor: function()
     {
         return undefined;
