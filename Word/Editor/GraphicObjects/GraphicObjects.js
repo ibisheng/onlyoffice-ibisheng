@@ -2319,6 +2319,7 @@ CGraphicObjects.prototype =
     paragraphClearFormatting: DrawingObjectsController.prototype.paragraphClearFormatting,
 
     applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,
+    applyTextFunction: DrawingObjectsController.prototype.applyTextFunction,
 
     setParagraphSpacing: DrawingObjectsController.prototype.setParagraphSpacing,
 
