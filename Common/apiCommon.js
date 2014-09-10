@@ -31,6 +31,7 @@
 				this.canBranding = settings["canBranding"];
 				this.isAutosaveEnable = settings["isAutosaveEnable"];
 				this.AutosaveMinInterval = settings["AutosaveMinInterval"];
+				this.isAnalyticsEnable = settings["isAnalyticsEnable"];
 			} else {
 				this.canEdit = true;
 				this.canDownload = true;
@@ -39,6 +40,7 @@
 				this.canBranding = true;
 				this.isAutosaveEnable = true;
 				this.AutosaveMinInterval = 300;
+				this.isAnalyticsEnable = false;
 			}
 			return this;
 		}
@@ -52,6 +54,7 @@
 			asc_getCanBranding: function(v){ return this.canBranding; },
 			asc_getIsAutosaveEnable: function(){ return this.isAutosaveEnable; },
 			asc_getAutosaveMinInterval: function(){ return this.AutosaveMinInterval; },
+			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; }
 
 			asc_setCanEdit: function(v){ this.canEdit = v; },
 			asc_setCanDownload: function(v){ this.canDownload = v; },
@@ -59,7 +62,8 @@
 			asc_setCanReaderMode: function(v){ this.canReaderMode = v; },
 			asc_setCanBranding: function(v){ this.canBranding = v; },
 			asc_setIsAutosaveEnable: function(v){ this.isAutosaveEnable = v; },
-			asc_setAutosaveMinInterval: function(v){ this.AutosaveMinInterval = v; }
+			asc_setAutosaveMinInterval: function(v){ this.AutosaveMinInterval = v; },
+			asc_setIsAnalyticsEnable: function(v){ this.isAnalyticsEnable = v; }
 		};
 		
 		/*
@@ -77,6 +81,7 @@
 		prot["asc_getCanBranding"]			= prot.asc_getCanBranding;
 		prot["asc_getIsAutosaveEnable"]		= prot.asc_getIsAutosaveEnable;
 		prot["asc_getAutosaveMinInterval"]	= prot.asc_getAutosaveMinInterval;
+		prot["asc_getIsAnalyticsEnable"]	= prot.asc_getIsAnalyticsEnable;
 
 		/**
 		 * Класс asc_CAscLicense для лицензии
