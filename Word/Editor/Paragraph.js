@@ -807,7 +807,7 @@ Paragraph.prototype =
             while ( null != Curr && type_Paragraph === Curr.GetType() && undefined === Curr.Get_SectionPr() )
             {
                 var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
-                if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext || true !== Curr.Is_Inline() )
+                if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext || true !== Curr.Is_Inline() || true === Curr.Check_PageBreak() )
                 {
                     break;
                 }
@@ -2028,6 +2028,23 @@ Paragraph.prototype =
 
         if ( 0 === CurLine )
             this.Lines[-1] = new CParaLine(0);
+    },
+
+    /**
+     * Проверяем есть ли в параграфе встроенные PageBreak
+     * @return {bool}
+     */
+    Check_PageBreak : function()
+    {
+        //TODO: возможно стоит данную проверку проводить во время добавления/удаления элементов из параграфа
+        var Count = this.Content.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            if (true === this.Content[Pos].Check_PageBreak())
+                return true;
+        }
+
+        return false;
     },
 
     Check_BreakPageInLine : function(CurLine)
@@ -9961,16 +9978,28 @@ Paragraph.prototype =
             NewFramePr.W = FramePr.W;
 
             if ( undefined != FramePr.X )
-                NewFramePr.X = FramePr.X;
+            {
+                NewFramePr.X      = FramePr.X;
+                NewFramePr.XAlign = undefined;
+            }
 
             if ( undefined != FramePr.XAlign )
+            {
                 NewFramePr.XAlign = FramePr.XAlign;
+                NewFramePr.X      = undefined;
+            }
 
             if ( undefined != FramePr.Y )
-                NewFramePr.Y = FramePr.Y;
+            {
+                NewFramePr.Y      = FramePr.Y;
+                NewFramePr.YAlign = undefined;
+            }
 
             if ( undefined != FramePr.YAlign )
+            {
                 NewFramePr.YAlign = FramePr.YAlign;
+                NewFramePr.Y      = undefined;
+            }
             
             if ( undefined !== FramePr.Wrap )
             {
@@ -13108,11 +13137,11 @@ Paragraph.prototype =
         var Element = this.SpellChecker.Elements[WordId];
 
         // Сначала вставим новое слово
-        var Class = Element.ClassesS[Element.ClassesS.length - 1];
-        if ( para_Run !== Class.Type )
+        var Class = Element.StartRun;
+        if (para_Run !== Class.Type || Element.StartPos.Data.Depth <= 0)
             return;
 
-        var RunPos = Element.StartPos.Data[Element.ClassesS.length - 1];
+        var RunPos = Element.StartPos.Data[Element.StartPos.Depth - 1];
         var Len = Word.length;
         for ( var Pos = 0; Pos < Len; Pos++ )
         {

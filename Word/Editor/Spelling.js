@@ -712,15 +712,20 @@ CDocumentSectionsInfo.prototype.Restart_CheckSpelling = function()
 //----------------------------------------------------------------------------------------------------------------------
 CTable.prototype.Restart_CheckSpelling = function()
 {
+    this.Recalc_CompiledPr();
+
     var RowsCount = this.Content.length;
     for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
     {
         var Row = this.Content[CurRow];
+        Row.Recalc_CompiledPr();
         var CellsCount = Row.Get_CellsCount();
 
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
-            Row.Get_Cell( CurCell ).Content.Restart_CheckSpelling();
+            var Cell = Row.Get_Cell(CurCell);
+            Cell.Recalc_CompiledPr();
+            Cell.Content.Restart_CheckSpelling();
         }
     }
 };

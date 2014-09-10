@@ -9044,7 +9044,7 @@ CDocument.prototype =
             }
             bRetValue = true;
         }
-        else if ( e.KeyCode == 13 && false === editor.isViewMode ) // Enter
+        else if ( e.KeyCode == 13 ) // Enter
         {
             var Hyperlink = this.Hyperlink_Check(false);
             if ( null != Hyperlink && false === e.ShiftKey )
@@ -9058,21 +9058,24 @@ CDocument.prototype =
             }
             else
             {
-                var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : changestype_Document_Content_Add );
-                if ( false === this.Document_Is_SelectionLocked(CheckType) )
+                if (false === editor.isViewMode)
                 {
-                    this.Create_NewHistoryPoint();
-                    if ( e.ShiftKey )
+                    var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : changestype_Document_Content_Add );
+                    if (false === this.Document_Is_SelectionLocked(CheckType))
                     {
-                        this.Paragraph_Add( new ParaNewLine( break_Line ) );
-                    }
-                    else if ( e.CtrlKey )
-                    {
-                        this.Paragraph_Add( new ParaNewLine( break_Page ) );
-                    }
-                    else
-                    {
-                        this.Add_NewParagraph();
+                        this.Create_NewHistoryPoint();
+                        if (e.ShiftKey)
+                        {
+                            this.Paragraph_Add(new ParaNewLine(break_Line));
+                        }
+                        else if (e.CtrlKey)
+                        {
+                            this.Paragraph_Add(new ParaNewLine(break_Page));
+                        }
+                        else
+                        {
+                            this.Add_NewParagraph();
+                        }
                     }
                 }
             }

@@ -1002,11 +1002,11 @@ CTable.prototype =
 
             Pr.CellsVAlign = Cell.Get_VAlign();
 
+            Pr.CellsBackground = CellShd.Copy();
+
             var Spacing = this.Content[0].Get_CellSpacing();
             if ( null === Spacing )
             {
-                Pr.CellsBackground = CellShd.Copy();
-
                 Pr.CellBorders =
                 {
                     Left    : CellBorders.Left.Copy(),
@@ -1251,13 +1251,10 @@ CTable.prototype =
         var bRedraw     = false;
 
         // TableStyle (стиль таблицы)
-        if ( "undefined" != typeof(Props.TableStyle) )
+        if ( undefined !== Props.TableStyle )
         {
-            if ( this.TableStyle != Props.TableStyle )
-            {
-                this.Set_TableStyle( Props.TableStyle );
-                bRecalc_All = true;
-            }
+            this.Set_TableStyle( Props.TableStyle );
+            bRecalc_All = true;
         }
 
         // TableLook
@@ -10633,16 +10630,16 @@ CTable.prototype =
 
     Set_TableStyle : function(StyleId)
     {
-        if ( this.TableStyle != StyleId )
-        {
-            History.Add( this, { Type : historyitem_Table_TableStyle, Old : this.TableStyle, New : StyleId } );
-            this.TableStyle = StyleId;
+        // Здесь мы не проверяем изменился ли стиль, потому что при выставлении стиля нужно сбрасывать
+        // прямые настройки, даже если мы выставляем тот же самый стиль.
 
-            // Очищаем все прямое форматирование таблицы
-            this.Clear_DirectFormatting(false);
+        History.Add( this, { Type : historyitem_Table_TableStyle, Old : this.TableStyle, New : StyleId } );
+        this.TableStyle = StyleId;
 
-            this.Recalc_CompiledPr();
-        }
+        // Очищаем все прямое форматирование таблицы
+        this.Clear_DirectFormatting(false);
+
+        this.Recalc_CompiledPr();
     },
 
     Set_TableStyle2 : function(StyleId)

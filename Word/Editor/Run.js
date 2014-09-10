@@ -2804,6 +2804,19 @@ ParaRun.prototype.Check_MathPara = function(Checker)
     }
 };
 
+ParaRun.prototype.Check_PageBreak = function()
+{
+    var Count = this.Content.length;
+    for (var Pos = 0; Pos < Count; Pos++)
+    {
+        var Item = this.Content[Pos];
+        if (para_NewLine === Item.Type && break_Page === Item.BreakType)
+            return true;
+    }
+
+    return false;
+};
+
 ParaRun.prototype.Check_BreakPageInRange = function(_CurLine, _CurRange)
 {
     var CurLine  = _CurLine - this.StartLine;

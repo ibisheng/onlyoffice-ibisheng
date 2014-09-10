@@ -835,7 +835,12 @@ ParaMath.prototype =
     {
         Checker.Found  = true;
         Checker.Result = false;
-    },    
+    },
+
+    Check_PageBreak : function()
+    {
+        return false;
+    },
 
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {

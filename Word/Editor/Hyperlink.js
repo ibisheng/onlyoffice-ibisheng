@@ -1220,6 +1220,18 @@ ParaHyperlink.prototype =
         }
     },
 
+    Check_PageBreak : function()
+    {
+        var Count = this.Content.length;
+        for (var Pos = 0; Pos < Count; Pos++)
+        {
+            if (true === this.Content[Pos].Check_PageBreak())
+                return true;
+        }
+
+        return false;
+    },
+
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {
         var CurLine = _CurLine - this.StartLine;

@@ -1079,7 +1079,12 @@ ParaComment.prototype =
 
     Check_MathPara : function(Checker)
     {
-    },    
+    },
+
+    Check_PageBreak : function()
+    {
+        return false;
+    },
 
     Check_BreakPageInRange : function(_CurLine, _CurRange)
     {
