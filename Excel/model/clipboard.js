@@ -2267,7 +2267,8 @@
 			
 			ReadFromBinaryWord : function(sBase64, worksheet)
 			{
-			    //передавать CDrawingDocument текущего worksheet
+			    History.TurnOff();
+				//передавать CDrawingDocument текущего worksheet
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
 				
 			    var newCDocument = new CDocument(oTempDrawingDocument);
@@ -2285,148 +2286,15 @@
 				window.global_pptx_content_loader.Start_UseFullUrl();
 				
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-			    History.TurnOff();
 			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
-			    History.TurnOn();
+			  
+				History.TurnOn();
 			    editor = oOldEditor;
 				
 				window.global_pptx_content_loader.End_UseFullUrl();
 				
 			    return oBinaryFileReader.oReadResult;
-
-				//TODO ПРОСМОТРЕТЬ ВСЕ ЗАКОММЕНТИРОВАННЫЕ ОБЛАСТИ!!!!
-				
-				//надо сбросить то, что остался после открытия документа
-				//window.global_pptx_content_loader.Clear();
-				//window.global_pptx_content_loader.Start_UseFullUrl();		
-				var openParams = {checkFileSize: false, charCount: 0, parCount: 0};
-				var newCDocument = new CDocument2();
-				var oBinaryFileReader = new BinaryFileReader2(newCDocument, openParams);
-				oBinaryFileReader.stream = oBinaryFileReader.getbase64DecodedData(sBase64);
-				oBinaryFileReader.ReadMainTable();
-				
-				//обрабатываем списки
-				/*for(var i in oReadResult.numToNumClass)
-				{
-					var oNumClass = oReadResult.numToNumClass[i];
-					var documentANum = this.oDocument.Numbering.AbstractNum;
-					//проверка на уже существующий такой же AbstractNum
-					var isAlreadyContains = false;
-					for(var n in documentANum)
-					{
-						var isEqual = documentANum[n].isEqual(oNumClass);
-						if(isEqual == true)
-						{
-							isAlreadyContains = true;
-							break;
-						}
-					}
-					if(!isAlreadyContains)
-					{
-						this.oDocument.Numbering.Add_AbstractNum(oNumClass);
-					}
-					else
-						oReadResult.numToNumClass[i] = documentANum[n];
-						
-				}
-				for(var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i)
-				{
-					var numPr = oReadResult.paraNumPrs[i];
-					var oNumClass = oReadResult.numToNumClass[numPr.NumId];
-					if(null != oNumClass)
-						numPr.NumId = oNumClass.Get_Id();
-					else
-						numPr.NumId = 0;
-				}*/
-				//обрабатываем стили
-				var isAlreadyContainsStyle;
-				var api = this.api;
-				var oStyleTypes = {par: 1, table: 2, lvl: 3};
-				var addNewStyles = false;
-				var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, nStyleType)
-				{
-					if(aStyles == undefined)
-						return;
-					for(var i = 0, length = aStyles.length; i < length; ++i)
-					{
-						var elem = aStyles[i];
-						var stylePaste = oReadResult.styles[elem.style];
-						var isEqualName = null;
-						if(null != stylePaste && null != stylePaste.style)
-						{
-							for(var j in oDocumentStyles.Style)
-							{
-								var styleDoc = oDocumentStyles.Style[j];
-								isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);
-								if(styleDoc.Name == stylePaste.style.Name)
-									isEqualName = j;
-								if(isAlreadyContainsStyle)
-								{
-									if(oStyleTypes.par == nStyleType)
-										elem.pPr.PStyle = j;
-									else if(oStyleTypes.table == nStyleType)
-										elem.pPr.Set_TableStyle2(j);
-									else
-										elem.pPr.PStyle = j;
-									break;
-								}
-							}
-							if(!isAlreadyContainsStyle && isEqualName != null)//если нашли имя такого же стиля
-							{
-								if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
-									elem.pPr.PStyle = isEqualName;
-								else if (nStyleType == oStyleTypes.table)
-									elem.pPr.Set_TableStyle2(isEqualName);
-							}
-							else if(!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
-							{
-								//todo править и BaseOn
-								var nStyleId = oDocumentStyles.Add(stylePaste.style);
-								if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
-									elem.pPr.PStyle = nStyleId;
-								else if (nStyleType == oStyleTypes.table)
-									elem.pPr.Set_TableStyle2(nStyleId);
-								addNewStyles = true;
-							}
-						}
-					}
-				}
-
-				fParseStyle(oBinaryFileReader.oReadResult.paraStyles, newCDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.par);
-				fParseStyle(oBinaryFileReader.oReadResult.tableStyles, newCDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.table);
-				fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, newCDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
-				
-				return oBinaryFileReader.oReadResult;
-					
-				/*var aContent = oBinaryFileReader.oReadResult.DocumentContent;
-				for(var i = 0, length = oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
-					oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks[i].call();
-				if(oReadResult.bLastRun)
-					this.bInBlock = false;
-				else
-					this.bInBlock = true;
-				//создаем список используемых шрифтов
-				var AllFonts = {};
-				this.oDocument.Numbering.Document_Get_AllFontNames(AllFonts);
-				this.oDocument.Styles.Document_Get_AllFontNames(AllFonts);
-				for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )
-					aContent[Index].Document_Get_AllFontNames( AllFonts );
-				var aPrepeareFonts = [];
-				for(var i in AllFonts)
-					aPrepeareFonts.push(new CFont(i, 0, "", 0));
-				//создаем список используемых картинок
-				var oPastedImagesUnique = {};
-				var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
-				for(var i = 0, length = aPastedImages.length; i < length; ++i)
-				{
-					var elem = aPastedImages[i];
-					oPastedImagesUnique[elem.Url] = 1;
-				}
-				var aPrepeareImages = [];
-				for(var i in oPastedImagesUnique)
-					aPrepeareImages.push(i);
-				return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages};*/
 			},
 			
 			_isEqualText: function(node, table){
