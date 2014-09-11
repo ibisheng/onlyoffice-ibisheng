@@ -3406,6 +3406,8 @@
 					
 					if(drawingObject.graphicObject.isImage())
 						aImagesSync.push(drawingObject.graphicObject.getImageUrl());
+					else if(drawingObject.graphicObject.spPr && drawingObject.graphicObject.spPr.Fill && drawingObject.graphicObject.spPr.Fill.fill && drawingObject.graphicObject.spPr.Fill.fill.RasterImageId && drawingObject.graphicObject.spPr.Fill.fill.RasterImageId != null)
+						aImagesSync.push(drawingObject.graphicObject.spPr.Fill.fill.RasterImageId);
 				};
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);

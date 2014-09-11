@@ -3821,6 +3821,13 @@ PasteProcessor.prototype =
 					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
 					images[images.length] = imageUrl;
 				}
+				else if(graphicObj.spPr && graphicObj.spPr.Fill && graphicObj.spPr.Fill.fill && graphicObj.spPr.Fill.fill.RasterImageId && graphicObj.spPr.Fill.fill.RasterImageId != null)
+				{
+					imageUrl = graphicObj.spPr.Fill.fill.RasterImageId;
+					
+					//aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
+					images[images.length] = imageUrl;
+				}	
 			};
 			
 			aContent = [];
