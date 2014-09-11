@@ -12292,7 +12292,7 @@ Paragraph.prototype =
                 // Bool : Value
 
                 if ( false === Reader.GetBool() )
-                    this.Pr.KeepNext = Reader.GetLong();
+                    this.Pr.KeepNext = Reader.GetBool();
                 else
                     this.Pr.KeepNext = undefined;
 

@@ -1933,6 +1933,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
             case para_NewLine:
             {
+                // Сначала проверяем, если у нас уже есть таб, которым мы должны рассчитать, тогда высчитываем
+                // его ширину.
+                X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
+
                 X += WordLen;
 
                 if ( true === Word )
@@ -3467,7 +3471,15 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
     var CurTextPr = this.Get_CompiledPr( false );
 
-    var StrikeoutY = Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27 -  this.YOffset;
+    var StrikeoutY = Y - this.YOffset;
+
+    switch(CurTextPr.VertAlign)
+    {
+        case vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27; break;
+        case vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm; break;
+        case vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm; break;
+    }
+
     var UnderlineY = Y + UndOff -  this.YOffset;
     var LineW      = (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm;
 

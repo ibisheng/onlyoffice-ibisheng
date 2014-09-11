@@ -12009,6 +12009,15 @@ CTable.prototype =
                 var FirstPara = Old_Cell.Content.Get_FirstParagraph();
                 var TextPr = FirstPara.Get_FirstRunPr();
                 New_Cell.Content.Set_ApplyToAll( true );
+
+                // Добавляем стиль во все параграфы
+                var PStyleId = FirstPara.Style_Get();
+                if ( undefined !== PStyleId && null !== this.LogicDocument )
+                {
+                    var Styles = this.LogicDocument.Get_Styles();
+                    New_Cell.Content.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
+                }
+
                 New_Cell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
                 New_Cell.Content.Set_ApplyToAll( false );
 

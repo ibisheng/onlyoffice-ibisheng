@@ -457,6 +457,9 @@ CParaSpellChecker.prototype =
                 Element.Checked = true;
         }
 
+        if (undefined !== this.Words[Word])
+            delete this.Words[Word];
+
         this.Internal_UpdateParagraphState();
     },
 
