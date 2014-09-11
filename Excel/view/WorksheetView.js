@@ -8052,8 +8052,9 @@
 					t.isChanged = true;
 					t._updateCellsRange(arn, canChangeColWidth);
 				}
-
-				History.EndTransaction();
+				
+				if(!(prop === "paste" && !isLocal))
+					History.EndTransaction();
 			};
 			if ("paste" === prop && val.onlyImages !== true) {
 				// Для past свой диапазон
@@ -8220,6 +8221,8 @@
 				{
 					window["Asc"]["editor"].wb.clipboard._insertImagesFromBinaryWord(t, val.addImagesFromWord);
 				}
+				
+				History.EndTransaction();
 			});
 		};
 		
