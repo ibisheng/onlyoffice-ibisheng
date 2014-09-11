@@ -5142,6 +5142,10 @@ var gUndoInsDelCellsFlag = true;
 						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 					}
 				}
+				else if(type == 'insRow' && colStart <= startRangeCell && colEnd >= endRangeCell)
+				{
+					this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+				}
 				else if((colStart >= startRangeCell && colStart <= endRangeCell && colEnd >= endRangeCell) || (colStart >= startRangeCell && colStart <= endRangeCell && colEnd > endRangeCell && val < 0))
 				{
 					if(val < 0)
