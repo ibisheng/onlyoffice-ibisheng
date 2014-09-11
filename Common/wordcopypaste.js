@@ -565,7 +565,7 @@ CopyProcessor.prototype =
                     sRes += CopyPasteCorrectString(sValue);
                 break;
             case para_Space:    sRes += " "; break;
-            case para_Tab: sRes += "<span style='mso-tab-count:1'>" + String.fromCharCode(0xA0, 0xA0, 0xA0, 0xA0) + "</span>"; break;
+			case para_Tab: sRes += "<span style='white-space:pre;'>" + String.fromCharCode(0x09) + "</span>"; break;
             case para_NewLine:
                 if( break_Page == ParaItem.BreakType)
                 {
