@@ -202,7 +202,7 @@ Paragraph.prototype =
 
     Use_Wrap : function()
     {
-        if ( undefined != this.Get_FramePr() )
+        if ( true !== this.Is_Inline() )
             return false;
 
         return true;
@@ -2737,17 +2737,20 @@ Paragraph.prototype =
         var Pr = this.Get_CompiledPr();
 
         // Задаем обрезку, если данный параграф является рамкой
-        var FramePr = this.Get_FramePr();
-        if ( undefined != FramePr && this.Parent instanceof CDocument )
+        if (true !== this.Is_Inline())
         {
-            var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1);
-            var BoundsL = this.CalculatedFrame.L2 - PixelError;
-            var BoundsT = this.CalculatedFrame.T2 - PixelError;
-            var BoundsH = this.CalculatedFrame.H2 + 2 * PixelError;
-            var BoundsW = this.CalculatedFrame.W2 + 2 * PixelError;
+            var FramePr = this.Get_FramePr();
+            if (undefined != FramePr && this.Parent instanceof CDocument)
+            {
+                var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1);
+                var BoundsL = this.CalculatedFrame.L2 - PixelError;
+                var BoundsT = this.CalculatedFrame.T2 - PixelError;
+                var BoundsH = this.CalculatedFrame.H2 + 2 * PixelError;
+                var BoundsW = this.CalculatedFrame.W2 + 2 * PixelError;
 
-            pGraphics.SaveGrState();
-            pGraphics.AddClipRect( BoundsL, BoundsT, BoundsW, BoundsH );
+                pGraphics.SaveGrState();
+                pGraphics.AddClipRect(BoundsL, BoundsT, BoundsW, BoundsH);
+            }
         }
 
         // Выясним какая заливка у нашего текста
@@ -7136,7 +7139,7 @@ Paragraph.prototype =
 
                 var DrawSelection = new CParagraphDrawSelectionRange();
 
-                var bFrame = ( undefined !== this.Get_FramePr() ? true : false );
+                var bInline = this.Is_Inline();
 
                 for ( var CurLine = _StartLine; CurLine <= _EndLine; CurLine++ )
                 {
@@ -7177,7 +7180,7 @@ Paragraph.prototype =
                         var StartY = DrawSelection.StartY;
                         var H      = DrawSelection.H;
                         
-                        if ( true === bFrame )
+                        if ( true !== bInline )
                         {
                             var Frame_X_min = this.CalculatedFrame.L2;
                             var Frame_Y_min = this.CalculatedFrame.T2;
@@ -9734,8 +9737,7 @@ Paragraph.prototype =
     // Обновляем линейку
     Document_UpdateRulersState : function()
     {
-        var FramePr = this.Get_FramePr();
-        if ( undefined === FramePr )
+        if ( true === this.Is_Inline() )
         {
             this.LogicDocument.Document_UpdateRulersStateBySection();
         }
@@ -9878,7 +9880,7 @@ Paragraph.prototype =
 
     Is_Inline : function()
     {
-        if ( undefined != this.Pr.FramePr )
+        if ( undefined != this.Pr.FramePr && c_oAscYAlign.Inline !== this.Pr.FramePr.YAlign )
             return false;
 
         return true;
@@ -10108,6 +10110,11 @@ Paragraph.prototype =
         this.CalculatedFrame.W2 = W2;
         this.CalculatedFrame.H2 = H2;
         this.CalculatedFrame.PageIndex = PageIndex;
+    },
+
+    Get_CalculatedFrame : function()
+    {
+        return this.CalculatedFrame;
     },
 
     Internal_Get_FrameParagraphs : function()

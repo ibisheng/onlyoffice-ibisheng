@@ -906,6 +906,7 @@ CDocumentContent.prototype =
                     if ( undefined != FramePr.YAlign )
                     {
                         var YAlign = FramePr.YAlign;
+                        // Случай c_oAscYAlign.Inline не обрабатывается, потому что такие параграфы считаются Inline
 
                         switch ( FrameVAnchor )
                         {
@@ -914,7 +915,6 @@ CDocumentContent.prototype =
                                 switch ( YAlign )
                                 {
                                     case c_oAscYAlign.Inside  :
-                                    case c_oAscYAlign.Inline  :
                                     case c_oAscYAlign.Outside :
                                     case c_oAscYAlign.Top     : FrameY = 0; break;
                                     case c_oAscYAlign.Bottom  : FrameY = Page_H - FrameH; break;
@@ -933,7 +933,6 @@ CDocumentContent.prototype =
                                 switch ( YAlign )
                                 {
                                     case c_oAscYAlign.Inside  :
-                                    case c_oAscYAlign.Inline  :
                                     case c_oAscYAlign.Outside :
                                     case c_oAscYAlign.Top     : FrameY = Page_Field_T; break;
                                     case c_oAscYAlign.Bottom  : FrameY = Page_Field_B - FrameH; break;
