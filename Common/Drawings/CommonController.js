@@ -1085,7 +1085,6 @@ DrawingObjectsController.prototype =
                 this.resetSelection();
             }
         }
-        //this.document.Recalculate();
     },
 
     paragraphIncDecFontSize: function(bIncrease)
@@ -4189,42 +4188,46 @@ DrawingObjectsController.prototype =
             {
                 chart_selection.recalcInfo.recalcTitle = null;
                 chart_selection.handleUpdateInternalChart();
-                chart_selection.addToRecalculate();
                 if(this.document)
                 {
-                    var para_drawing;
-                    if(chart_selection.group)
-                    {
-                        var cur_group = chart_selection.group;
-                        while(cur_group.group)
-                            cur_group = cur_group.group;
-                        para_drawing = cur_group.parent;
-                    }
-                    else
-                    {
-                        para_drawing = chart_selection.parent;
-                    }
-                    if(para_drawing && para_drawing.GraphicObj)
-                    {
-                        if(para_drawing.Is_Inline())
-                        {
-                            para_drawing.OnEnd_ResizeInline(para_drawing.GraphicObj.bounds.w, para_drawing.GraphicObj.bounds.h);
-                        }
-                        else
-                        {
-                            var pos_x = para_drawing.GraphicObj.bounds.x + para_drawing.GraphicObj.posX;
-                            var pos_y = para_drawing.GraphicObj.bounds.y + para_drawing.GraphicObj.posY;
-                            var nearest_pos = this.document.Get_NearestPos(para_drawing.GraphicObj.selectStartPage, pos_x, pos_y, true, para_drawing);
-                            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                            para_drawing.Remove_FromDocument(false);
-                            para_drawing.Set_XYForAdd(pos_x, pos_y, nearest_pos, para_drawing.GraphicObj.selectStartPage);
-                            para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
-                        }
-                    }
-                    this.document.Recalculate();
+                    chart_selection.recalculate();
+                    this.document.DrawingDocument.OnRecalculatePage( chart_selection.selectStartPage, this.document.Pages[chart_selection.selectStartPage] );
+                    this.document.DrawingDocument.OnEndRecalculate( false, true );
+
+                    //var para_drawing;
+                    //if(chart_selection.group)
+                    //{
+                    //    var cur_group = chart_selection.group;
+                    //    while(cur_group.group)
+                    //        cur_group = cur_group.group;
+                    //    para_drawing = cur_group.parent;
+                    //}
+                    //else
+                    //{
+                    //    para_drawing = chart_selection.parent;
+                    //}
+                    //if(para_drawing && para_drawing.GraphicObj)
+                    //{
+                    //    if(para_drawing.Is_Inline())
+                    //    {
+                    //        para_drawing.OnEnd_ResizeInline(para_drawing.GraphicObj.bounds.w, para_drawing.GraphicObj.bounds.h);
+                    //    }
+                    //    else
+                    //    {
+                    //        var pos_x = para_drawing.GraphicObj.bounds.x + para_drawing.GraphicObj.posX;
+                    //        var pos_y = para_drawing.GraphicObj.bounds.y + para_drawing.GraphicObj.posY;
+                    //        var nearest_pos = this.document.Get_NearestPos(para_drawing.GraphicObj.selectStartPage, pos_x, pos_y, true, para_drawing);
+                    //        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
+                    //        para_drawing.Remove_FromDocument(false);
+                    //        para_drawing.Set_XYForAdd(pos_x, pos_y, nearest_pos, para_drawing.GraphicObj.selectStartPage);
+                    //        para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
+                    //    }
+                    //}
+                    //this.document.Recalculate();
                 }
                 else
                 {
+                    chart_selection.addToRecalculate();
                     this.startRecalculate();
                 }
                 chart_selection.recalcInfo.bRecalculatedTitle = false;

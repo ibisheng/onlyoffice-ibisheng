@@ -1930,7 +1930,8 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent(true);
         if(content)
         {
-            content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
+            content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+            this.document.Recalculate();
         }
         else if(this.selectedObjects.length > 0)
         {

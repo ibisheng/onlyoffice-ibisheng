@@ -2319,7 +2319,7 @@ function CBinaryFileWriter()
                         {
                             case para_Text:
                             {
-                                _run_text += _elem.Content[j].Value;
+                                _run_text += String.fromCharCode(_elem.Content[j].Value);
                                 break;
                             }
                             case para_Space :
@@ -2385,7 +2385,7 @@ function CBinaryFileWriter()
                                     {
                                         case para_Text:
                                         {
-                                            _run_text += _elem_h.Content[j].Value;
+                                            _run_text += String.fromCharCode(_elem_h.Content[j].Value);
                                             break;
                                         }
                                         case para_Space :
