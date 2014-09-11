@@ -182,7 +182,7 @@
     "tasks": {
         "build": [
             "increment_build",
-            "compile_sdk"
+            "compile_sdk_native"
         ]
     }
 }

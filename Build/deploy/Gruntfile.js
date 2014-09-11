@@ -14,7 +14,7 @@ module.exports = function(grunt) {
 						  patterns: [
 							{
 							  match: '\'java \'',
-							  replacement: '\'java -Xms512m \''
+							  replacement: '\'java -Xms1024m \''
 							}
 						  ],
 						  usePrefix: false
@@ -272,6 +272,9 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:ADVANCED', 'closureCompiler', 'concat', 'replace', 'clean']);
 	grunt.registerTask('compile_sdk_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler', 'concat', 'replace', 'clean']);
+		
+	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:ADVANCED', 'closureCompiler:sdk', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_native_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler:sdk', 'concat', 'replace', 'clean']);
 	
 	grunt.registerTask('deploy_sdk_init', function() {
         grunt.initConfig({
