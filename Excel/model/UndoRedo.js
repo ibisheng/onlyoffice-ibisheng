@@ -2745,6 +2745,7 @@ UndoRedoWorkbook.prototype = {
 					break;
 			}
 			this.wb._updateWorksheetIndexes(wsActive);
+			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
 		else if(historyitem_Workbook_ChangeColorScheme == Type)
 		{
