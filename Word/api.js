@@ -952,24 +952,24 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
-		if(documentFormat)
-		{
-			switch(documentFormat)
-			{
-				case "docx" : documentFormatSave = c_oAscFileType.DOCX;break;
-				case "doc" : documentFormatSave = c_oAscFileType.DOC;break;
-				case "odt" : documentFormatSave = c_oAscFileType.ODT;break;
-				case "rtf" : documentFormatSave = c_oAscFileType.RTF;break;
-				case "txt" : documentFormatSave = c_oAscFileType.TXT;break;
-				case "htm" :
-				case "html" : documentFormatSave = c_oAscFileType.HTML_ZIP;break;
-				case "mht" : documentFormatSave = c_oAscFileType.MHT;break;
-				case "pdf" : documentFormatSave = c_oAscFileType.PDF;break;
-				case "epub" : documentFormatSave = c_oAscFileType.EPUB;break;
-				case "fb2" : documentFormatSave = c_oAscFileType.FB2;break;
-				case "mobi" : documentFormatSave = c_oAscFileType.MOBI;break;
-			}
-		}
+		// if(documentFormat)
+		// {
+			// switch(documentFormat)
+			// {
+				// case "docx" : documentFormatSave = c_oAscFileType.DOCX;break;
+				// case "doc" : documentFormatSave = c_oAscFileType.DOC;break;
+				// case "odt" : documentFormatSave = c_oAscFileType.ODT;break;
+				// case "rtf" : documentFormatSave = c_oAscFileType.RTF;break;
+				// case "txt" : documentFormatSave = c_oAscFileType.TXT;break;
+				// case "htm" :
+				// case "html" : documentFormatSave = c_oAscFileType.HTML_ZIP;break;
+				// case "mht" : documentFormatSave = c_oAscFileType.MHT;break;
+				// case "pdf" : documentFormatSave = c_oAscFileType.PDF;break;
+				// case "epub" : documentFormatSave = c_oAscFileType.EPUB;break;
+				// case "fb2" : documentFormatSave = c_oAscFileType.FB2;break;
+				// case "mobi" : documentFormatSave = c_oAscFileType.MOBI;break;
+			// }
+		// }
 		var nIndex = -1;
 		if(documentTitle)
 			nIndex = documentTitle.lastIndexOf(".");

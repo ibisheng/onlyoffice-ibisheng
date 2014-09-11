@@ -430,18 +430,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.documentVKey   		= this.DocInfo["VKey"];
 				this.chartEditor			= this.DocInfo["ChartEditor"];
 				this.documentOpenOptions 	= this.DocInfo["Options"];
-				if(this.documentFormat)
-				{
-					switch(this.documentFormat)
-					{
-						case "xlsx" : this.documentFormatSave = c_oAscFileType.XLSX;break;
-						case "xls"  : this.documentFormatSave = c_oAscFileType.XLS;break;
-						case "ods"  : this.documentFormatSave = c_oAscFileType.ODS;break;
-						case "csv"  : this.documentFormatSave = c_oAscFileType.CSV;break;
-						case "htm"  :
-						case "html" : this.documentFormatSave = c_oAscFileType.HTML;break;
-					}
-				}
+				// if(this.documentFormat)
+				// {
+					// switch(this.documentFormat)
+					// {
+						// case "xlsx" : this.documentFormatSave = c_oAscFileType.XLSX;break;
+						// case "xls"  : this.documentFormatSave = c_oAscFileType.XLS;break;
+						// case "ods"  : this.documentFormatSave = c_oAscFileType.ODS;break;
+						// case "csv"  : this.documentFormatSave = c_oAscFileType.CSV;break;
+						// case "htm"  :
+						// case "html" : this.documentFormatSave = c_oAscFileType.HTML;break;
+					// }
+				// }
 
 				var nIndex = -1;
 				if(this.documentTitle)
