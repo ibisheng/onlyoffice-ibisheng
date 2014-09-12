@@ -2943,7 +2943,7 @@ function CEditorPage(api)
             return;
 
         var master = this.m_oLogicDocument.Slides[this.m_oDrawingDocument.SlideCurrent].Layout.Master;
-        if (this.MasterLayouts != master || bIsAttack === true)
+        if (this.MasterLayouts != master || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) < MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) < MOVE_DELTA || bIsAttack === true)
         {
             this.MasterLayouts = master;
 
@@ -2961,8 +2961,10 @@ function CEditorPage(api)
 
                 arr[i].Name = master.sldLayoutLst[i].cSld.name;
 
-                if ("" == master.sldLayoutLst[i].ImageBase64)
+                if ("" == master.sldLayoutLst[i].ImageBase64 || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) < MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) < MOVE_DELTA)
                 {
+                    this.m_oLayoutDrawer.WidthMM = this.m_oLogicDocument.Width;
+                    this.m_oLayoutDrawer.HeightMM = this.m_oLogicDocument.Height;
                     master.sldLayoutLst[i].ImageBase64 = this.m_oLayoutDrawer.GetThumbnail(master.sldLayoutLst[i]);
                     master.sldLayoutLst[i].Width64 = this.m_oLayoutDrawer.WidthPx;
                     master.sldLayoutLst[i].Height64 = this.m_oLayoutDrawer.HeightPx;
