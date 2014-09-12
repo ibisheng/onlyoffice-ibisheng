@@ -68,14 +68,16 @@ CParagraphContentWithContentBase.prototype.protected_GetRangesCount = function(L
 // с номерами больше, чем RangeIndex. Возвращается позиция предпоследнего отрезка, либо 0.
 CParagraphContentWithContentBase.prototype.protected_AddRange = function(LineIndex, RangeIndex)
 {
-    // Удаляем лишние записи о строках
-    if (this.Lines[0] > LineIndex + 1)
+    // Удаляем лишние записи о строках и отрезках
+    if (this.Lines[0] >= LineIndex + 1)
     {
-        var RangeOffset = this.protected_GetRangeOffset(LineIndex, 0);
+        var RangeOffset = this.protected_GetRangeOffset(LineIndex, 0) + RangeIndex * 2;
         this.Lines.splice(RangeOffset, this.Lines.length - RangeOffset);
-        this.Lines.splice(LineIndex + 1, this.Lines[0] - LineIndex);
+
+        if (this.Lines[0] !== LineIndex + 1)
+            this.Lines.splice(LineIndex + 1, this.Lines[0] - LineIndex);
     }
-            
+
     if (0 === RangeIndex)
     {
         if (this.Lines[0] !== LineIndex + 1)

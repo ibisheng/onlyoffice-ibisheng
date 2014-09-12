@@ -589,6 +589,7 @@ function CCollaborativeEditing()
     this.m_aNeedLock    = []; // Массив со списком залоченных объектов(которые были залочены, но еще не были добавлены на данном клиенте)
 
     this.m_aLinkData    = []; // Массив, указателей, которые нам надо выставить при загрузке чужих изменений
+    this.m_aEndActions  = []; // Массив действий, которые надо выполнить после принятия чужих изменений
 
     this.m_bGlobalLock  = false;         // Запрещаем производить любые "редактирующие" действия (т.е. то, что в историю запишется)
     this.m_bGlobalLockSelection = false; // Запрещаем изменять селект и курсор
@@ -1083,6 +1084,16 @@ function CCollaborativeEditing()
         Class.FromBinary = true;
     };
 
+    this.Clear_EndActions = function()
+    {
+        this.m_aEndActions.length = 0;
+    };
+
+    this.Add_EndActions = function(Class, Data)
+    {
+        this.m_aEndActions.push({Class : Class, Data : Data});
+    };
+
     this.OnEnd_ReadForeignChanges = function()
     {
         var Count = this.m_aNewObjects.length;
@@ -1093,6 +1104,14 @@ function CCollaborativeEditing()
             Class.FromBinary = false;
         }
 
+        Count = this.m_aEndActions.length;
+        for (var Index = 0; Index < Count; Index++)
+        {
+            var Item = this.m_aEndActions[Index];
+            Item.Class.Process_EndLoad(Item.Data);
+        }
+
+        this.Clear_EndActions();
         this.Clear_NewObjects();
     };
 //-----------------------------------------------------------------------------------

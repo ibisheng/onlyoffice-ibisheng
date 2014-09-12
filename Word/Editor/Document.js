@@ -8752,9 +8752,7 @@ CDocument.prototype =
                 if ( 1 === ElementsCount && type_Paragraph === FirstElement.Element.GetType() && ( true === FirstElement.Element.Is_Empty() || true == FirstElement.SelectedAll ) )
                 {
                     bConcatS = false;
-                    
-                    if ( true === FirstElement.Element.Is_Empty() )
-                        DstIndex++;
+                    DstIndex++;
                 }
             }
             else if ( true === Para.Cursor_IsStart() )
@@ -10674,6 +10672,9 @@ CDocument.prototype =
             // Если нам надо повторять колонтитул, а он уже изначально повторяющийся, тогда не делаем ничего
             if ( null === _CurHdrFtr )
                 return;
+
+            // Очистим селект
+            _CurHdrFtr.Selection_Remove();
             
             // Просто удаляем запись о данном колонтитуле в секции
             SectPr.Set_HdrFtr( bHeader, bFirst, bEven, null );

@@ -278,8 +278,8 @@ CDocument.prototype.Search_GetId = function(bNext)
         if ( null != Id )
             return Id;
 
-        ParaDrawing.GoTo_Text( true === bNext ? false : true, false );
         this.DrawingObjects.resetSelection();
+        ParaDrawing.GoTo_Text( true === bNext ? false : true, false );
     }
 
     if ( docpostype_Content === this.CurPos.Type )
