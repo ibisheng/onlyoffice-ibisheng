@@ -768,6 +768,7 @@ function BinaryPPTYLoader()
                 {
                     var indexTh = s.GetULong();
                     master.setTheme(this.presentation.themes[indexTh]);
+                    master.ThemeIndex = -indexTh - 1;
                     break;
                 }
                 case 1:

@@ -3497,6 +3497,11 @@ CTable.prototype =
         // Рисуем заливку всех ячеек на странице
         var Theme = this.Get_Theme();
         var ColorMap = this.Get_ColorMap();
+        if(this.bPresentation)
+        {
+            pGraphics.SaveGrState();
+            pGraphics.SetIntegerGrid(false);
+        }
         if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
         {
             var HeaderPage = this.HeaderInfo.Pages[PNum];
@@ -3528,11 +3533,42 @@ CTable.prototype =
 
                     // Заливаем ячейку
                     var CellShd = Cell.Get_Shd();
-                    if ( shd_Nil != CellShd.Value )
+                    if(!this.bPresentation)
                     {
                         var RGBA = CellShd.Get_Color2(Theme, ColorMap);
                         pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
                         pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                    }
+                    else
+                    {
+                        if(CellShd.Unifill && CellShd.Unifill.fill)
+                        {
+                            if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
+                            {
+                                var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
+                                if(isRealNumber(CellShd.Unifill.transparent))
+                                {
+                                    Alpha = 255 - CellShd.Unifill.transparent;
+                                }
+                                else
+                                {
+                                    Alpha = 255;
+                                }
+                                pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, Alpha );
+                                pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                            }
+                            else
+                            {
+                                var ShapeDrawer = new CShapeDrawer();
+                                CellShd.Unifill.check(Theme, ColorMap);
+                                var Transform = this.Parent.transform.CreateDublicate();
+                                global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
+
+                                pGraphics.transform3(Transform, false);
+                                ShapeDrawer.fromShape2(new ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
+                                ShapeDrawer.draw(null);
+                            }
+                        }
                     }
                 }
             }
@@ -3597,11 +3633,49 @@ CTable.prototype =
                 var CellShd = Cell.Get_Shd();
                 if ( shd_Nil != CellShd.Value )
                 {
-                    var RGBA = CellShd.Get_Color2(Theme, ColorMap);
-                    pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
-                    pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                    if(!this.bPresentation)
+                    {
+                        var RGBA = CellShd.Get_Color2(Theme, ColorMap);
+                        pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
+                        pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                    }
+                    else
+                    {
+                        if(CellShd.Unifill && CellShd.Unifill.fill)
+                        {
+                            if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
+                            {
+                                var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
+                                if(isRealNumber(CellShd.Unifill.transparent))
+                                {
+                                    Alpha = 255 - CellShd.Unifill.transparent;
+                                }
+                                else
+                                {
+                                    Alpha = 255;
+                                }
+                                pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, Alpha );
+                                pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                            }
+                            else
+                            {
+                                var ShapeDrawer = new CShapeDrawer();
+                                CellShd.Unifill.check(Theme, ColorMap);
+                                var Transform = this.Parent.transform.CreateDublicate();
+                                global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
+                                pGraphics.transform3(Transform, false);
+                                ShapeDrawer.fromShape2(new ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
+                                ShapeDrawer.draw(null);
+                            }
+                        }
+                    }
                 }
             }
+        }
+
+        if(this.bPresentation)
+        {
+            pGraphics.RestoreGrState();
         }
     },
 
@@ -21156,7 +21230,8 @@ CTableCell.prototype =
             var Shd_new =
             {
                 Value : OtherPr.Shd.Value,
-                Color : { r : OtherPr.Shd.Color.r, g : OtherPr.Shd.Color.g, b : OtherPr.Shd.Color.b }
+                Color : { r : OtherPr.Shd.Color.r, g : OtherPr.Shd.Color.g, b : OtherPr.Shd.Color.b },
+                Unifill : OtherPr.Shd.Unifill ? OtherPr.Shd.Unifill.createDuplicate() : undefined
             };
 
             this.Set_Shd( Shd_new );

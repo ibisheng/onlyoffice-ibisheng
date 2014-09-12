@@ -3770,7 +3770,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     CollaborativeEditing.Apply_Changes();
                     CollaborativeEditing.Release_Locks();
                     this.bNoSendComments = false;
-                   /// return;
+                    return;
                 }
             }
             this.WordControl.m_oLogicDocument.Recalculate({Drawings: {All:true, Map: {}}});

@@ -1647,7 +1647,7 @@ CPresentation.prototype =
         this.CurPage = PageIndex;
         e.ctrlKey = e.CtrlKey;
         e.shiftKey = e.ShiftKey;
-        if(e.Button === 0)
+       //if(e.Button === 0)
         {
             var ret = this.Slides[this.CurPage].graphicObjects.onMouseDown(e, X, Y);
             if(!ret)
@@ -1668,6 +1668,15 @@ CPresentation.prototype =
         e.ctrlKey = e.CtrlKey;
         e.shiftKey = e.ShiftKey;
         this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.onMouseUp(e, X, Y);
+        if(e.Button === g_mouse_button_right)
+        {
+            var ContextData = new CContextMenuData();
+            var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, PageIndex );
+            ContextData.X_abs = ConvertedPos.X;
+            ContextData.Y_abs = ConvertedPos.Y;
+            ContextData.IsSlideSelect = false;
+            editor.sync_ContextMenuCallback( ContextData );
+        }
         this.Document_UpdateInterfaceState();
     },
 

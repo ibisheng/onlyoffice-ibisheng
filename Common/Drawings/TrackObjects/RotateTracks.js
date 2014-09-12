@@ -7,6 +7,8 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     this.ext = {};
     this.ext.cx = extX;
     this.ext.cy = extY;
+    this.extX = extX;
+    this.extY = extY;
 
     var _brush, _pen;
     if((!brush || !brush.fill || brush.fill.type === FILL_TYPE_NOFILL) &&
@@ -138,6 +140,36 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     }
 }
 
+function ObjectToDraw(brush, pen, extX, extY, geometry, transform)
+{
+    this.brush = brush;
+    this.pen = pen;
+    this.extX = extX;
+    this.extY = extY;
+    this.transform = transform;
+    this.TransformMatrix = transform;
+    this.geometry = geometry;
+}
+ObjectToDraw.prototype =
+{
+    check_bounds: function(boundsChecker)
+    {
+        if(this.geometry)
+        {
+            this.geometry.check_bounds(boundsChecker);
+        }
+        else
+        {
+            boundsChecker._s();
+            boundsChecker._m(0, 0);
+            boundsChecker._l(this.extX, 0);
+            boundsChecker._l(this.extX, this.extY);
+            boundsChecker._l(0, this.extY);
+            boundsChecker._z();
+            boundsChecker._e();
+        }
+    }
+};
 function RotateTrackShapeImage(originalObject)
 {
     this.originalObject = originalObject;

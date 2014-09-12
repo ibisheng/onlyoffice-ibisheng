@@ -821,6 +821,8 @@ CAscShapeProp.prototype.get_Width = function(){return this.w}             ;
 CAscShapeProp.prototype.put_Width = function(v){this.w = v;}              ;
 CAscShapeProp.prototype.get_Height = function(){return this.h}            ;
 CAscShapeProp.prototype.put_Height = function(v){this.h = v;}             ;
+CAscShapeProp.prototype.get_VerticalTextAlign = function(){return this.verticalTextAlign}            ;
+CAscShapeProp.prototype.put_VerticalTextAlign = function(v){this.verticalTextAlign = v;}             ;
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)

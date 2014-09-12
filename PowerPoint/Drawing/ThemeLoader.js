@@ -116,6 +116,10 @@ function CThemeLoader()
 
             History.MinorChanges = true;
             _loader.Load(g_th, pres);
+            for(var i = 0; i < pres.slideMasters.length; ++i)
+            {
+                pres.slideMasters[i].ThemeIndex = oThis.CurrentLoadThemeIndex;
+            }
             History.MinorChanges = false;
 
             if (oThis.IsReloadBinaryThemeEditorNow)
