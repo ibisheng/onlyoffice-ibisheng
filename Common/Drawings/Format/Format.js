@@ -7795,26 +7795,38 @@ CShapeStyle.prototype =
         {
             case historyitem_ShapeStyle_SetLnRef:
             {
-                this.lnRef = new StyleRef();
-                this.lnRef.Read_FromBinary(r);
+                if(r.GetBool())
+                {
+                    this.lnRef = new StyleRef();
+                    this.lnRef.Read_FromBinary(r);
+                }
                 break;
             }
             case historyitem_ShapeStyle_SetFillRef:
             {
-                this.fillRef = new StyleRef();
-                this.fillRef.Read_FromBinary(r);
+                if(r.GetBool())
+                {
+                    this.fillRef = new StyleRef();
+                    this.fillRef.Read_FromBinary(r);
+                }
                 break;
             }
             case historyitem_ShapeStyle_SetFontRef:
             {
-                this.fontRef = new FontRef();
-                this.fontRef.Read_FromBinary(r);
+                if(r.GetBool())
+                {
+                    this.fontRef = new FontRef();
+                    this.fontRef.Read_FromBinary(r);
+                }
                 break;
             }
             case historyitem_ShapeStyle_SetEffectRef:
             {
-                this.effectRef = new StyleRef();
-                this.effectRef.Read_FromBinary(r);
+                if(r.GetBool())
+                {
+                    this.effectRef = new StyleRef();
+                    this.effectRef.Read_FromBinary(r);
+                }
                 break;
             }
         }
