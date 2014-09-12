@@ -25,7 +25,6 @@
 //Типы изменений в классе CTheme
 
 
-
 function sRGB_to_scRGB(value)
 {
     if(value < 0)
@@ -7239,14 +7238,6 @@ function StyleRef()
 {
     this.idx = 0;
     this.Color = new CUniColor();
-
-
-
-
-
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
 }
 
 StyleRef.prototype =
