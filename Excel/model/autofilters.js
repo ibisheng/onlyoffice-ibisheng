@@ -447,31 +447,10 @@ var gUndoInsDelCellsFlag = true;
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
 										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
+									
 									//добавляем название колонок
-									for(var col = activeCells.c1; col <= activeCells.c2; col++)
-									{
-										var cell = new CellAddress(activeCells.r1, col, 0);
-										var strNum = null;
-										if(addNameColumn) {
-											var range = ws.model.getCell(cell);
-											strNum = "Column" + (col - activeCells.c1 + 1).toString();
-											if(!isTurnOffHistory)
-												range.setValue(strNum);
-										}
-										else
-										{
-											var range = ws.model.getCell(cell);
-											strNum = range.getValue();
-											//if(!isTurnOffHistory)
-												//range.setNumFormat("@");
-										}
-										
-										tableColumns[j] = new TableColumn();
-										tableColumns[j].Name = strNum;
+									tableColumns = t._generateColumnNameWithoutTitle(activeCells, isTurnOffHistory);
 
-										j++;
-										
-									}
 									var cloneAC = activeCells.clone();
 									
 									if(addNameColumn)
