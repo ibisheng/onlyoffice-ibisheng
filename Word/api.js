@@ -6694,7 +6694,27 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
         this.pasteCallback = null;
-        return;
+        
+		if (-1 != window.PasteEndTimerId)
+        {
+            clearTimeout(window.PasteEndTimerId);
+            window.PasteEndTimerId = -1;
+
+            document.body.style.MozUserSelect = "none";
+            document.body.style["-khtml-user-select"] = "none";
+            document.body.style["-o-user-select"] = "none";
+            document.body.style["user-select"] = "none";
+            document.body.style["-webkit-user-select"] = "none";
+
+            var pastebin = Editor_Paste_GetElem(this, true);
+
+            if (!window.USER_AGENT_SAFARI_MACOS)
+                pastebin.onpaste = null;
+
+            pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+        }
+		
+		return;
     }
 
     this.isPasteFonts_Images = true;
