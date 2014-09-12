@@ -12877,15 +12877,6 @@ CDocument.prototype =
                     else
                     {
                         this.Content[StartPos].Add_Comment( Comment, true, false );
-                        
-                        // Делаем так из-за того, что таблицы нужно пересчитывать после добавления комментариев
-                        for ( var ContentPos = StartPos + 1; ContentPos < EndPos; ContentPos++ )
-                        {
-                            this.Content[ContentPos].Set_ApplyToAll( true );
-                            this.Content[ContentPos].Add_Comment( Comment, false, false );
-                            this.Content[ContentPos].Set_ApplyToAll( false );
-                        }
-                        
                         this.Content[EndPos].Add_Comment( Comment, false, true );
                     }
                 }

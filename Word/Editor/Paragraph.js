@@ -2002,8 +2002,18 @@ Paragraph.prototype =
             }
         }
 
-        this.Pages[CurPage].EndInfo.Comments      = PRSI.Comments;
-        this.Pages[CurPage].EndInfo.RunRecalcInfo = PRSW.RunRecalcInfoBreak;
+        this.Pages[CurPage].EndInfo.Comments = PRSI.Comments;
+
+        if (PRSW)
+            this.Pages[CurPage].EndInfo.RunRecalcInfo = PRSW.RunRecalcInfoBreak;
+    },
+
+    Update_EndInfo : function()
+    {
+        for (var CurPage = 0, PagesCount = this.Pages.length; CurPage < PagesCount; CurPage++)
+        {
+            this.Recalculate_PageEndInfo(null, CurPage);
+        }
     },
 
     Recalculate_Drawing_AddPageBreak : function(CurLine, CurPage, RemoveDrawings)
@@ -3659,6 +3669,7 @@ Paragraph.prototype =
             }
         }
     },
+
 
     // Удаляем элементы параграфа
     // nCount - количество удаляемых элементов, > 0 удаляем элементы после курсора

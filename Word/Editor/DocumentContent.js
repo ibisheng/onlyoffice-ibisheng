@@ -1261,6 +1261,14 @@ CDocumentContent.prototype =
         }
     },
 
+    Update_EndInfo : function()
+    {
+        for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+        {
+            this.Content[Index].Update_EndInfo();
+        }
+    },
+
     RecalculateCurPos : function()
     {
         if ( docpostype_Content === this.CurPos.Type )

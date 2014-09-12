@@ -2757,6 +2757,19 @@ CTable.prototype =
         }
     },
 
+    Update_EndInfo : function()
+    {
+        for (var RowIndex = 0, RowsCount = this.Content.length; RowIndex < RowsCount; RowIndex++)
+        {
+            var Row = this.Content[RowIndex];
+            for (var CellIndex = 0, CellsCount = Row.Get_CellsCount(); CellIndex < CellsCount; CellIndex++)
+            {
+                var Cell = Row.Get_Cell(CellIndex);
+                Cell.Content.Update_EndInfo();
+            }
+        }
+    },
+
     Internal_UpdateFlowPosition : function(X, Y)
     {
         this.X_origin = X;
@@ -16040,6 +16053,7 @@ CTable.prototype =
                     if ( true === bCanShift )
                     {
                         Cell.Content.Shift( 0, ShiftDx, ShiftDy );
+                        Cell.Content.Update_EndInfo();
                     }
                     else if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
                     {
