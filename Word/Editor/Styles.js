@@ -4631,6 +4631,19 @@ CDocumentShd.prototype =
         else
             return this.Color;
     },
+
+    Get_Color3 : function(Theme, ColorMap)
+    {
+        if ( undefined !== this.Unifill )
+        {
+            this.Unifill.check(Theme, ColorMap);
+            return this.Unifill.getRGBAColor();
+        }
+        else
+        {
+            return {R: 255, G: 255, B: 255, A: 255};
+        }
+    },
     
     Init_Default : function()
     {
@@ -7265,7 +7278,7 @@ CTextPr.prototype =
         if ( Flags & 33554432 )
         {
             this.FontRef = new FontRef();
-            this.FontRef.ReadFromBinary(Reader);
+            this.FontRef.Read_FromBinary(Reader);
         }
     },
 
