@@ -6592,6 +6592,8 @@ var gUndoInsDelCellsFlag = true;
 				//проверяем покрывает ли диапазон хотя бы один автофильтр
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
+				var isUpdate;
+				
 				if(arnTo == null && arnFrom == null && data)
 				{
 					arnTo = data.moveFrom ? data.moveFrom : null;
@@ -6625,7 +6627,13 @@ var gUndoInsDelCellsFlag = true;
 						findFilters[i].Ref = newRange;
 						if(findFilters[i].AutoFilter)
 							findFilters[i].AutoFilter.Ref = newRange;
-							
+						
+						if((findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns && findFilters[i].AutoFilter.FilterColumns.length) || (findFilters[i].FilterColumns && findFilters[i].FilterColumns.length))
+						{
+							aWs.setRowHidden(false, ref.r1, ref.r2);
+							isUpdate = true;
+						}
+
 						if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
 							delete findFilters[i].AutoFilter.FilterColumns;
 						else if(!data && findFilters[i] && findFilters[i].FilterColumns)
@@ -6677,6 +6685,9 @@ var gUndoInsDelCellsFlag = true;
 					if(arnFrom)
 						this.reDrawFilter(arnFrom);
 				}
+				
+				if(isUpdate)
+					ws.changeWorksheet("update");
 			},
 			
 			_refToRange: function(ref)
