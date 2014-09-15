@@ -377,7 +377,10 @@ DrawingObjectsController.prototype.createGroup = function()
         this.resetSelection();
         this.drawingObjects.getWorksheetModel && group.setWorksheet(this.drawingObjects.getWorksheetModel());
         group.setDrawingObjects(this.drawingObjects);
-        group.setParent(this.drawingObjects);
+        if(this.drawingObjects && this.drawingObjects.cSld)
+        {
+            group.setParent(this.drawingObjects);
+        }
         group.addToDrawingObjects();
         this.selectObject(group, 0);
         group.addToRecalculate();
