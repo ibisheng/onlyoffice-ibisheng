@@ -6315,19 +6315,21 @@
 			var oSelectionMathInfo = new asc_CSelectionMathInfo();
 			var sum = 0;
 			range._setPropertyNoEmpty(null, null, function (c) {
-				++oSelectionMathInfo.count;
-				if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
-					tmp = parseFloat(c.getValueWithoutFormat());
-					if (isNaN(tmp))
-						return;
-					if (0 === oSelectionMathInfo.countNumbers)
-						oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
-					else {
-						oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
-						oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
+				if (false === c.isEmptyTextString()) {
+					++oSelectionMathInfo.count;
+					if (CellValueType.Number === c.getType()) {
+						tmp = parseFloat(c.getValueWithoutFormat());
+						if (isNaN(tmp))
+							return;
+						if (0 === oSelectionMathInfo.countNumbers)
+							oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
+						else {
+							oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
+							oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
+						}
+						++oSelectionMathInfo.countNumbers;
+						sum += tmp;
 					}
-					++oSelectionMathInfo.countNumbers;
-					sum += tmp;
 				}
 			});
 			// Показываем только данные для 2-х или более ячеек (http://bugzserver/show_bug.cgi?id=24115)
