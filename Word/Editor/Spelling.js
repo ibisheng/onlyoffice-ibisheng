@@ -504,6 +504,11 @@ CParaSpellChecker.prototype =
                     Element.Checked  = true;
                     Element.Variants = null;
                 }
+                else if (undefined === this.Words[Word][Lang])
+                {
+                    Element.Checked  = null;
+                    Element.Variants = null;
+                }
                 else
                 {
                     Element.Checked  = false;
