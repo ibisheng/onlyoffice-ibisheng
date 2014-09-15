@@ -7122,7 +7122,7 @@ var gUndoInsDelCellsFlag = true;
 				return result;
 			},
 			
-			_preMoveAutoFilters: function(arnFrom)
+			_preMoveAutoFilters: function(arnFrom, arnTo)
 			{
 				var aWs = this._getCurrentWS();
 				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
@@ -7132,6 +7132,13 @@ var gUndoInsDelCellsFlag = true;
 					{
 						this._openHiddenRows(findFilters[i]);
 					}
+				}
+				
+				//TODO пока будем всегда чистить фильтры, которые будут в месте вставки. Позже сделать аналогично MS либо пересмотреть все возможные ситуации.
+				var findFiltersTo = this._searchFiltersInRange(arnTo , aWs);
+				if(arnTo && findFiltersTo)
+				{
+					this.isEmptyAutoFilters(arnTo);
 				}
 			},
 			
