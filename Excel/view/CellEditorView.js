@@ -371,8 +371,8 @@
 			while (this.undoList.length > 0) {
 				this.undo();
 			}
-			this.undoAllMode = false;
 			this._update();
+			this.undoAllMode = false;
 		};
 
 		CellEditor.prototype.redo = function () {
@@ -916,7 +916,8 @@
 				}
 			}
 
-			t.handlers.trigger("updated", s, t.cursorPos, isFormula, funcPos, funcName);
+			if (!t.undoAllMode)
+				t.handlers.trigger("updated", s, t.cursorPos, isFormula, funcPos, funcName);
 		};
 
 		CellEditor.prototype._expandWidth = function () {

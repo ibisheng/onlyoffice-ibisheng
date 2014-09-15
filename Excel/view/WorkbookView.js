@@ -1100,6 +1100,13 @@
 			History._sendCanUndoRedo();
 			// Обновляем состояние информации
 			this._onWSSelectionChanged(null);
+
+			// Закрываем подбор формулы
+			if (this.popUpSelector) {
+				this.popUpSelector.hide();
+				this.lastFormulaPos = -1;
+				this.lastFormulaName = "";
+			}
 		};
 
 		WorkbookView.prototype._onEmpty = function () {
