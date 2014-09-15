@@ -6336,6 +6336,10 @@
 			if (1 < oSelectionMathInfo.countNumbers) {
 				// Мы должны отдавать в формате активной ячейки
 				var numFormat = range.getNumFormat();
+				if (c_oAscNumFormatType.Time === numFormat.getType()) {
+					// Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
+					numFormat = oNumFormatCache.get('[h]:mm:ss');
+				}
 
 				oSelectionMathInfo.sum = numFormat.formatToMathInfo(sum, CellValueType.Number, this.settings.mathMaxDigCount);
 				oSelectionMathInfo.average = numFormat.formatToMathInfo(sum / oSelectionMathInfo.countNumbers,
