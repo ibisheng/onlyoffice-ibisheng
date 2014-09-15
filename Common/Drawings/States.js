@@ -230,7 +230,7 @@ NullState.prototype =
             {
                 this.drawingObjects.drawingObjects.showDrawingObjects(true);
             }
-            if(this.drawingObjects.drawingObjects.cSld)
+            if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
             {
                 this.drawingObjects.stX = x;
                 this.drawingObjects.stY = y;
@@ -463,7 +463,7 @@ RotateState.prototype =
                 {
                     copy = tracks[i].originalObject.copy();
                     this.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
-                    if(this.drawingObjects.drawingObjects.cSld)
+                    if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
                     {
                         copy.setParent(this.drawingObjects.drawingObjects);
                         if(!copy.spPr || !copy.spPr.xfrm
@@ -516,7 +516,7 @@ RotateState.prototype =
                             group.updateCoordinatesAfterInternalResize();
                         }
                         //drawingObjects.recalculate();
-                        if(!oThis.drawingObjects.drawingObjects.cSld)
+                        if(!oThis.drawingObjects.drawingObjects || !oThis.drawingObjects.drawingObjects.cSld)
                         {
                             var arr_x = [], arr_y = [], transform, min_x, min_y, drawing, arr_x2 = [], arr_y2 = [], min_x2, min_y2;
                             for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
