@@ -882,7 +882,7 @@ CCellCommentator.prototype.sortComments = function(activeRange, changes) {
 				History.StartTransaction();
 
 				for (var i = 0; i < aComments.length; i++) {
-					this.asc_changeComment(aComments[i].asc_getId(), aComments[i], true);
+					t.asc_changeComment(aComments[i].asc_getId(), aComments[i], true);
 				}
 
 				History.EndTransaction();
