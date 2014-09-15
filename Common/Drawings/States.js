@@ -493,7 +493,7 @@ RotateState.prototype =
                             {
                                 var copy = tracks[i].originalObject.copy();
                                 oThis.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
-                                if(this.drawingObjects.drawingObjects.cSld)
+                                if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
                                 {
                                     copy.setParent(this.drawingObjects.drawingObjects);
                                 }
