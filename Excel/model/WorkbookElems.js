@@ -1092,6 +1092,7 @@ CellXfs.prototype =
 		oRes.num = this._mergeProperty(this.num, xfs.num);
 		oRes.align = this._mergeProperty(this.align, xfs.align);
 		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
+		oRes.XfId = this._mergeProperty(this.XfId, xfs.XfId);
 		return oRes;
 	},
     clone : function()
