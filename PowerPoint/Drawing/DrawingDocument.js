@@ -1042,6 +1042,11 @@ function CDrawingDocument()
         return false;
     }
 
+    this.ConvertCoordsToAnotherPage = function(x, y)
+    {
+        return {X: x, Y: y};
+    };
+
     this.SetCursorType = function(sType)
     {
         if ("" == this.m_sLockedCursorType)

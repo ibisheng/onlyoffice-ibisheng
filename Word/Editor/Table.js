@@ -3561,13 +3561,13 @@ CTable.prototype =
                                 var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
                                 if(isRealNumber(CellShd.Unifill.transparent))
                                 {
-                                    Alpha = 255 - CellShd.Unifill.transparent;
+                                    Alpha = CellShd.Unifill.transparent;
                                 }
                                 else
                                 {
                                     Alpha = 255;
                                 }
-                                pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, Alpha );
+                                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
                                 pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
                             }
                             else
@@ -3661,13 +3661,13 @@ CTable.prototype =
                                 var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
                                 if(isRealNumber(CellShd.Unifill.transparent))
                                 {
-                                    Alpha = 255 - CellShd.Unifill.transparent;
+                                    Alpha = CellShd.Unifill.transparent;
                                 }
                                 else
                                 {
                                     Alpha = 255;
                                 }
-                                pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, Alpha );
+                                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
                                 pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
                             }
                             else
