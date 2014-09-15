@@ -288,6 +288,24 @@ CShape.prototype =
             var new_content = new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true);
             new_content.Internal_Content_RemoveAll();
             var paragraphs = this.textBoxContent.Content;
+            var CopyRunToPPTX = function(Run, Paragraph)
+            {
+                var NewRun = new ParaRun(Paragraph, false);
+                NewRun.Set_Pr( Run.Pr.Copy() );
+
+                var PosToAdd = 0;
+                for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
+                {
+                    var Item = Run.Content[CurPos];
+                    if ( para_End !== Item.Type && Item.Type !== para_Drawing)
+                    {
+                        NewRun.Add_ToContent( PosToAdd, Item.Copy(), false );
+                        ++PosToAdd;
+                    }
+                }
+                return NewRun;
+            };
+
             for(var i = 0; i < paragraphs.length; ++i)
             {
                 var cur_par = paragraphs[i];
@@ -299,7 +317,10 @@ CShape.prototype =
                 for ( var Index = 0; Index < Count; Index++ )
                 {
                     var Item = cur_par.Content[Index];
-                    new_paragraph.Internal_Content_Add( new_paragraph.Content.length, Item.Copy(false), false );
+                    if(Item.Type === para_Run)
+                    {
+                        new_paragraph.Internal_Content_Add(new_paragraph.Content.length, CopyRunToPPTX(Item, new_paragraph), false);
+                    }
                 }
                 var EndRun = new ParaRun(new_paragraph);
                 EndRun.Add_ToContent( 0, new ParaEnd() );

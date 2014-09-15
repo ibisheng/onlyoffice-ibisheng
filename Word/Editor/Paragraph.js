@@ -12846,6 +12846,10 @@ Paragraph.prototype =
         CollaborativeEditing.Add_NewObject( this );
 
         this.bFromDocument = Reader.GetBool();
+        if(!this.bFromDocument)
+        {
+            this.Numbering = new ParaPresentationNumbering();
+        }
         if(this.bFromDocument || (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument))
         {
             var DrawingDocument = editor.WordControl.m_oDrawingDocument;
