@@ -39,6 +39,36 @@ function ParaHyperlink()
 
 ParaHyperlink.prototype =
 {
+
+    protected_GetRangeStartPos : function(LineIndex, RangeIndex)
+    {
+        if (undefined !== this.Lines[LineIndex] && undefined !== this.Lines[LineIndex].Ranges[RangeIndex])
+            return this.Lines[LineIndex].Ranges[RangeIndex].StartPos;
+
+        return 0;
+    },
+
+    protected_GetRangeEndPos : function(LineIndex, RangeIndex)
+    {
+        if (undefined !== this.Lines[LineIndex] && undefined !== this.Lines[LineIndex].Ranges[RangeIndex])
+            return this.Lines[LineIndex].Ranges[RangeIndex].EndPos;
+
+        return 0;
+    },
+
+    protected_GetLinesCount : function()
+    {
+        return this.LinesLength;
+    },
+
+    protected_GetRangesCount : function(LineIndex)
+    {
+        if (undefined !== this.Lines[LineIndex])
+            return this.Lines[LineIndex].RangesLength;
+
+        return 0;
+    },
+
     Get_Id : function()
     {
         return this.Id;

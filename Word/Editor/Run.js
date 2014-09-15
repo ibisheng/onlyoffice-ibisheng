@@ -589,6 +589,9 @@ ParaRun.prototype.Get_CurrentParaPos = function()
 {
     var Pos = this.State.ContentPos;
 
+    if (-1 === this.StartLine)
+        return new CParaPos(-1, -1, -1, -1);
+
     var CurLine  = 0;
     var CurRange = 0;
 

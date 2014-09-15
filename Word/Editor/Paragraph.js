@@ -2101,6 +2101,9 @@ Paragraph.prototype =
 
         var LinePos = this.Get_CurrentParaPos();
 
+        if (-1 === LinePos.Line)
+            return { X : 0, Y : 0, Height : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
+
         var CurLine  = LinePos.Line;
         var CurRange = LinePos.Range;
         var CurPage  = LinePos.Page;
