@@ -194,6 +194,7 @@ CShape.prototype =
 
     convertToWord: function(document)
     {
+        this.setBDeleted(true);
         var c = new CShape();
         c.setWordShape(true);
         c.setBDeleted(false);

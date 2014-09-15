@@ -934,3 +934,7 @@ CShape.prototype.setStartPage = function(pageIndex)
         }
     }
 };
+CShape.prototype.getStyles = function(pageIndex)
+{
+    return {styles: editor.WordControl.m_oLogicDocument.Styles, styleId: null};
+};
