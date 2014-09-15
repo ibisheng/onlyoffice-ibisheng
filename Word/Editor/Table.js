@@ -20472,6 +20472,8 @@ CTableRow.prototype =
                         this.Content.splice( Pos, 0, Element );
                 }
 
+                this.Internal_ReIndexing();
+
                 break;
             }
 
@@ -20492,6 +20494,8 @@ CTableRow.prototype =
 
                     this.Content.splice( Pos, 1 );
                 }
+
+                this.Internal_ReIndexing();
 
                 break;
             }
@@ -20530,14 +20534,11 @@ CTableRow.prototype =
         Writer.WriteLong( historyitem_type_TableRow );
 
         // String          : Id строки
-        // String          : Id родительской таблицы
         // Variable        : свойства строки
         // Long            : количество ячеек
         // Array strings   : Id ячеек
 
         Writer.WriteString2(this.Id);
-        Writer.WriteString2(this.Table.Get_Id());
-
         this.Pr.Write_ToBinary( Writer );
 
         var Count = this.Content.length;
@@ -20549,17 +20550,11 @@ CTableRow.prototype =
     Read_FromBinary2 : function(Reader)
     {
         // String          : Id строки
-        // String          : Id родительской таблицы
         // Variable        : свойства строки
         // Long            : количество ячеек
         // Array variables : сами ячейки
 
         this.Id = Reader.GetString2();
-
-        var LinkData = {};
-        LinkData.Table = Reader.GetString2();
-        CollaborativeEditing.Add_LinkData( this, LinkData );
-
         this.Pr = new CTableRowPr()
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
@@ -20579,8 +20574,6 @@ CTableRow.prototype =
 
     Load_LinkData : function(LinkData)
     {
-        if ( "undefined" != typeof(LinkData.Table) )
-            this.Table = g_oTableId.Get_ById( LinkData.Table );
     }
 };
 
@@ -22610,31 +22603,21 @@ CTableCell.prototype =
         Writer.WriteLong( historyitem_type_TableCell );
 
         // String   : Id ячейки
-        // String   : Id родительской строки
         // Variable : TableCell.Pr
         // String   : Id DocumentContent
 
         Writer.WriteString2( this.Id );
-        Writer.WriteString2( this.Row.Get_Id() );
-
         this.Pr.Write_ToBinary( Writer );
-
         Writer.WriteString2( this.Content.Get_Id() );
     },
 
     Read_FromBinary2 : function(Reader)
     {
         // String   : Id ячейки
-        // String   : Id родительской строки
         // Variable : TableCell.Pr
         // String   : Id DocumentContent
 
         this.Id = Reader.GetString2();
-
-        var LinkData = {};
-        LinkData.Row = Reader.GetString2();
-        CollaborativeEditing.Add_LinkData( this, LinkData );
-
         this.Pr = new CTableCellPr();
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
@@ -22647,8 +22630,6 @@ CTableCell.prototype =
 
     Load_LinkData : function(LinkData)
     {
-        if ( "undefined" != typeof(LinkData.Row) )
-            this.Row = g_oTableId.Get_ById( LinkData.Row );
     }
 };
 

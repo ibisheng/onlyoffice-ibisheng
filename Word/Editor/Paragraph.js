@@ -13393,17 +13393,9 @@ function CParaLineRange(X, XEnd)
     this.XEnd      = XEnd;
 
     this.W         = 0;
-    this.Words     = 0;
-    this.Spaces    = 0;
-    this.Letters   = 0;
-
-    this.SpacesSkip  = 0;
-    this.LettersSkip = 0;
 
     this.StartPos  = 0;  // Позиция в контенте параграфа, с которой начинается данный отрезок
     this.EndPos    = 0;  // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
-
-    this.SpacePos  = -1; // Позиция, с которой начинаем считать пробелы
 }
 
 CParaLineRange.prototype =
@@ -13418,11 +13410,6 @@ CParaLineRange.prototype =
     Reset_Width : function()
     {
         this.W           = 0;
-        this.Words       = 0;
-        this.Spaces      = 0;
-        this.Letters     = 0;
-        this.SpacesSkip  = 0;
-        this.LettersSkip = 0;
     },
 
     Copy : function()
@@ -13434,17 +13421,9 @@ CParaLineRange.prototype =
         NewRange.XEnd        = this.XEnd;
 
         NewRange.W           = this.W;
-        NewRange.Words       = this.Words;
-        NewRange.Spaces      = this.Spaces;
-        NewRange.Letters     = this.Letters;
-
-        NewRange.SpacesSkip  = this.SpacesSkip;
-        NewRange.LettersSkip = this.LettersSkip;
 
         NewRange.StartPos    = this.StartPos;
         NewRange.EndPos      = this.EndPos;
-
-        NewRange.SpacePos    = this.SpacePos;
 
         return NewRange;
     }

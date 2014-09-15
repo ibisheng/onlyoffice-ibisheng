@@ -4000,7 +4000,7 @@ CDocumentContent.prototype =
                 {
                     bConcatS = false;
 
-                    if ( true === FirstElement.Element.Is_Empty() )                    
+                    if (type_Paragraph !== this.Content[DstIndex].Get_Type() || true !== this.Content[DstIndex].Is_Empty())
                         DstIndex++;
                 }
             }
@@ -7584,16 +7584,25 @@ CDocumentContent.prototype =
         this.DrawingDocument.TargetEnd();
         this.DrawingDocument.SetCurrentPage( this.Get_StartPage_Absolute() + this.CurPage );
 
-        this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
-
         var HdrFtr = this.Is_HdrFtr(true);
         if ( null != HdrFtr )
-            HdrFtr.Content.CurPos.Type = docpostype_DrawingObjects;
-        else
-            this.LogicDocument.CurPos.Type = docpostype_DrawingObjects;
+        {
+            HdrFtr.Content.CurPos.Type     = docpostype_DrawingObjects;
+            HdrFtr.Content.Selection.Use   = true;
+            HdrFtr.Content.Selection.Start = false;
 
-        this.LogicDocument.Selection.Use   = true;
-        this.LogicDocument.Selection.Start = false;
+            this.LogicDocument.Selection.Use   = true;
+            this.LogicDocument.Selection.Start = false;
+        }
+        else
+        {
+            this.LogicDocument.CurPos.Type     = docpostype_DrawingObjects;
+            this.LogicDocument.Selection.Use   = true;
+            this.LogicDocument.Selection.Start = false;
+        }
+
+        this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
+
         this.LogicDocument.DrawingObjects.selectById( Id, this.Get_StartPage_Absolute() + this.CurPage );
 
         // TODO: Пока сделаем так, в будущем надо сделать функцию, которая у родительского класса обновляет Select
