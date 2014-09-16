@@ -6353,7 +6353,7 @@ var gUndoInsDelCellsFlag = true;
 						nameStart = tableColumns[indexInsertColumn].Name.split("Column");
 					if(tableColumns[indexInsertColumn + 1] && tableColumns[indexInsertColumn + 1].Name)
 						nameEnd = tableColumns[indexInsertColumn + 1].Name.split("Column");
-					if(nameStart[1] && nameEnd[1] && !isNaN(parseInt(nameStart[1])) && !isNaN(parseInt(nameEnd[1])) && ((parseInt(nameStart[1]) + 1) == parseInt(nameEnd[1])))
+					if(nameStart && nameStart[1] && nameEnd && nameEnd[1] && !isNaN(parseInt(nameStart[1])) && !isNaN(parseInt(nameEnd[1])) && ((parseInt(nameStart[1]) + 1) == parseInt(nameEnd[1])))
 						isSequence = true;
 				}
 				if(indexInsertColumn == undefined || !isSequence)
