@@ -3276,6 +3276,17 @@
 						aImagesSync.push(drawingObject.graphicObject.getImageUrl());
 					else if(drawingObject.graphicObject.spPr && drawingObject.graphicObject.spPr.Fill && drawingObject.graphicObject.spPr.Fill.fill && drawingObject.graphicObject.spPr.Fill.fill.RasterImageId && drawingObject.graphicObject.spPr.Fill.fill.RasterImageId != null)
 						aImagesSync.push(drawingObject.graphicObject.spPr.Fill.fill.RasterImageId);
+					else if(drawingObject.graphicObject.isGroup() && drawingObject.graphicObject.spTree && drawingObject.graphicObject.spTree.length)
+					{
+						var spTree = drawingObject.graphicObject.spTree;
+						for(var j = 0; j < spTree.length; j++)
+						{
+							if(spTree[j].isImage())
+							{
+								aImagesSync.push(spTree[j].getImageUrl());
+							}
+						}
+					}
 				};
 				
 				window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null, ws.objectRender.asyncImagesDocumentEndLoaded);
