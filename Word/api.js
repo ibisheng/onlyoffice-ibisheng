@@ -3023,6 +3023,11 @@ asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
         this.asc_fireCallback("asc_onCanRedo", bCanRedo);
 }
 
+asc_docs_api.prototype.can_CopyCut = function()
+{
+    return this.WordControl.m_oLogicDocument.Can_CopyCut();
+};
+
 asc_docs_api.prototype.sync_CanCopyCutCallback = function(bCanCopyCut)
 {
     this.asc_fireCallback("asc_onCanCopyCut", bCanCopyCut);

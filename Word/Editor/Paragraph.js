@@ -774,7 +774,7 @@ Paragraph.prototype =
         }
 
         return ParaPos;
-    },   
+    },
 
     // Пересчет переносов строк в параграфе, с учетом возможного обтекания
     Recalculate_Page__ : function(CurPage)
@@ -789,7 +789,7 @@ Paragraph.prototype =
         var Pr     = this.Get_CompiledPr();
         var ParaPr = Pr.ParaPr;
 
-        var StartLine = ( CurPage > 0 ? this.Pages[CurPage - 1].EndLine + 1 : 0 );       
+        var StartLine = ( CurPage > 0 ? this.Pages[CurPage - 1].EndLine + 1 : 0 );
 
         //-------------------------------------------------------------------------------------------------------------
         // Обрабатываем настройку "не отрывать от следующего"
@@ -840,7 +840,7 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // Если это первая страница параграфа (CurPage = 0), тогда мы должны использовать координаты, которые нам
         // были заданы сверху, а если не первая, тогда координаты мы должны запросить у родительского класса.
-        // TODO: Тут отдельно обрабатывается случай, когда рамка переносится на новую страницу, т.е. страница начинается 
+        // TODO: Тут отдельно обрабатывается случай, когда рамка переносится на новую страницу, т.е. страница начинается
         //       сразу с рамки. Надо бы не разбивать в данной ситуации рамку на страницы, а просто новую страницу начать
         //       с нее на уровне DocumentContent.
 
@@ -888,9 +888,9 @@ Paragraph.prototype =
             if ( 0 === CurPage && true === ParaPr.PageBreakBefore )
             {
                 // Если это первый элемент документа или секции, тогда не надо начинать его с новой страницы.
-                // Кроме случая, когда у нас разрыв секции на текущей странице. Также не добавляем разрыв страницы для 
+                // Кроме случая, когда у нас разрыв секции на текущей странице. Также не добавляем разрыв страницы для
                 // особого пустого параграфа с разрывом секции.
-                
+
                 var bNeedPageBreak = true;
 
                 var Prev = this.Get_DocumentPrev();
@@ -901,9 +901,9 @@ Paragraph.prototype =
                     var PrevSectPr = Prev.Get_SectionPr();
                     var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr( this.Index).SectPr;
                     if ( section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize( PrevSectPr ) )
-                        bNeedPageBreak = false;                    
+                        bNeedPageBreak = false;
                 }
-                
+
                 if ( true === bNeedPageBreak )
                 {
                     // Добавляем разрыв страницы
@@ -1023,6 +1023,9 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         var RecalcResultAlign = this.Recalculate_Lines_Align(PRS, CurPage, ParaPr, false);
 
+        if (recalcresult_CurPagePara === RecalcResultAlign)
+            RecalcResultAlign = this.Recalculate_Page__(CurPage);
+
         if ( recalcresult_NextElement !== RecalcResultAlign )
             return RecalcResultAlign;
 
@@ -1076,7 +1079,7 @@ Paragraph.prototype =
         for ( ;Pos < ContentLen; Pos++ )
         {
             var Item = this.Content[Pos];
-            
+
             if ( para_Math === Item.Type )
             {
                 // TODO: Надо бы перенести эту проверку на изменение контента параграфа
@@ -1154,19 +1157,19 @@ Paragraph.prototype =
 
         // Обнуляем параметры PRS для строки
         PRS.Reset_Line();
-        
+
         // Проверим, нужно ли в данной строке учитывать FirstLine (т.к. не всегда это первая строка должна быть)
         var UseFirstLine = true;
         for ( var TempCurLine = CurLine - 1; TempCurLine >= 0; TempCurLine-- )
         {
             var TempLineInfo = this.Lines[TempCurLine].LineInfo;
-            if ( !(TempLineInfo & 1) || !(TempLineInfo & 2) )                
+            if ( !(TempLineInfo & 1) || !(TempLineInfo & 2) )
             {
                 UseFirstLine = false;
                 break;
             }
         }
-        
+
         PRS.UseFirstLine = UseFirstLine;
 
         // Заполняем строку отрезками обтекания. Выставляем начальные сдвиги для отрезков. Начало промежутка = конец вырезаемого промежутка
@@ -1190,10 +1193,10 @@ Paragraph.prototype =
             {
                 // Поскольку мы выходим досрочно из цикла, нам надо удалить лишние отрезки обтекания
                 this.Lines[CurLine].Ranges.length = CurRange + 1;
-                
+
                 break;
             }
-            
+
             if ( -1 === this.ParaEnd.Line && true === PRS.End )
             {
                 this.ParaEnd.Line  = CurLine;
@@ -1206,7 +1209,7 @@ Paragraph.prototype =
 
             CurRange++;
         }
-        
+
         //-------------------------------------------------------------------------------------------------------------
         // 1. Обновляем метрики данной строки
         //-------------------------------------------------------------------------------------------------------------
@@ -1220,7 +1223,7 @@ Paragraph.prototype =
             if ( true === PRS.End )
             {
                 // TODO: Как только переделаем para_End переделать тут
-                
+
                 // Выставляем настройки для символа параграфа
                 var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
                 EndTextPr.Merge(this.TextPr.Value);
@@ -1233,7 +1236,7 @@ Paragraph.prototype =
                 var EndTextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
                 var EndTextAscent  = EndTextHeight - EndTextDescent;
                 var EndTextAscent2 = g_oTextMeasurer.GetAscender();
-                                
+
                 PRS.LineTextAscent  = EndTextAscent;
                 PRS.LineTextAscent2 = EndTextAscent2;
                 PRS.LineTextDescent = EndTextDescent;
@@ -1404,7 +1407,7 @@ Paragraph.prototype =
 
             if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
                 Bottom = this.YLimit;
-            
+
             // В ячейке перенос страницы происходит по нижней границе, т.е. с учетом Spacing.After и границы
             if ( true === this.Parent.Is_TableCellContent() )
                 Bottom2 = Bottom;
@@ -1425,16 +1428,16 @@ Paragraph.prototype =
 
         // Переносим строку по PageBreak. Если в строке ничего нет, кроме PageBreak, тогда нам не надо проверять высоту строки и обтекание.
         var bBreakPageLineEmpty = ( true === PRS.BreakPageLine && true === PRS.EmptyLine );
-        
-        // Сохраним это, чтобы знать, использовать ли FirstLine в следующей строке или нет 
+
+        // Сохраним это, чтобы знать, использовать ли FirstLine в следующей строке или нет
         this.Lines[CurLine].LineInfo = 0;
-        
+
         if ( true === PRS.BreakPageLine )
             this.Lines[CurLine].LineInfo |= 1;
-        
+
         if ( true === PRS.EmptyLine )
             this.Lines[CurLine].LineInfo |= 2;
-        
+
         if ( true === PRS.End )
             this.Lines[CurLine].LineInfo |= 4;
 
@@ -1473,7 +1476,7 @@ Paragraph.prototype =
         }
 
         //-------------------------------------------------------------------------------------------------------------
-        // 4. Проверяем обтекание данной строки относитально плавающих объектов
+        // 4. Проверяем обтекание данной строки относительно плавающих объектов
         //-------------------------------------------------------------------------------------------------------------
 
         var Left   = ( 0 !== CurLine ? this.X + ParaPr.Ind.Left : this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
@@ -1502,7 +1505,7 @@ Paragraph.prototype =
 
             if ( true === this.Lines[CurLine].RangeY )
                 PRS.RangeY = true;
-            
+
             return;
         }
 
@@ -1574,12 +1577,12 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // 6. Последние проверки
         //-------------------------------------------------------------------------------------------------------------
-        
+
         // Такое случается, когда у нас после пересчета Flow картинки, место к которому она была привязана перешло на
         // следующую страницу.
         if ( PRS.RecalcResult === recalcresult_NextPage )
             return;
-        
+
         if ( true !== PRS.End )
         {
             // Если строка пустая в следствии того, что у нас было обтекание, тогда мы не добавляем новую строку,
@@ -1626,7 +1629,7 @@ Paragraph.prototype =
             }
         }
         else
-        {           
+        {
             // В последней строке могут быть заполнены не все отрезки обтекания
             for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
                 this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
@@ -1757,6 +1760,8 @@ Paragraph.prototype =
         PRSA.Paragraph  = this;
         PRSA.LastW      = 0;
         PRSA.RecalcFast = Fast;
+        PRSA.CurPage    = CurPage;
+        PRSA.PageY      = this.Pages[CurPage].Y;
 
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
@@ -1772,16 +1777,16 @@ Paragraph.prototype =
                 var RangeWidth   = Range.XEnd - Range.X;
 
                 var X = 0;
-                
+
                 // Если данный отрезок содержит только формулу, тогда прилегание данного отрезка определяется формулой
                 var ParaMath = this.Check_Range_OnlyMath(CurRange, CurLine);
                 if ( null !== ParaMath )
                 {
                     var Math_Jc = ParaMath.Jc;
-                    
+
                     var Math_X      = ( 1 === RangesCount ? this.Pages[CurPage].X : Range.X );
                     var Math_XLimit = ( 1 === RangesCount ? this.Pages[CurPage].XLimit : Range.XEnd );
-                    
+
                     X = Math.max( Math_X +  (Math_XLimit + Math_X - ParaMath.Width) / 2, Math_X );
                 }
                 else
@@ -1855,7 +1860,7 @@ Paragraph.prototype =
                         JustifyWord  = 0;
                         JustifySpace = 0;
                     }
-                }                                                
+                }
 
                 PRSA.X    = X;
                 PRSA.Y    = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
@@ -13400,9 +13405,17 @@ function CParaLineRange(X, XEnd)
     this.XEnd      = XEnd;
 
     this.W         = 0;
+    this.Words     = 0;
+    this.Spaces    = 0;
+    this.Letters   = 0;
+
+    this.SpacesSkip  = 0;
+    this.LettersSkip = 0;
 
     this.StartPos  = 0;  // Позиция в контенте параграфа, с которой начинается данный отрезок
     this.EndPos    = 0;  // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
+
+    this.SpacePos  = -1; // Позиция, с которой начинаем считать пробелы
 }
 
 CParaLineRange.prototype =
@@ -13417,6 +13430,11 @@ CParaLineRange.prototype =
     Reset_Width : function()
     {
         this.W           = 0;
+        this.Words       = 0;
+        this.Spaces      = 0;
+        this.Letters     = 0;
+        this.SpacesSkip  = 0;
+        this.LettersSkip = 0;
     },
 
     Copy : function()
@@ -13428,9 +13446,17 @@ CParaLineRange.prototype =
         NewRange.XEnd        = this.XEnd;
 
         NewRange.W           = this.W;
+        NewRange.Words       = this.Words;
+        NewRange.Spaces      = this.Spaces;
+        NewRange.Letters     = this.Letters;
+
+        NewRange.SpacesSkip  = this.SpacesSkip;
+        NewRange.LettersSkip = this.LettersSkip;
 
         NewRange.StartPos    = this.StartPos;
         NewRange.EndPos      = this.EndPos;
+
+        NewRange.SpacePos    = this.SpacePos;
 
         return NewRange;
     }
@@ -14226,6 +14252,9 @@ function CParagraphRecalculateStateAlign()
     this.Paragraph     = undefined;
     this.RecalcResult  = 0x00;//recalcresult_NextElement;
 
+    this.CurPage       = 0;
+    this.PageY         = 0;
+
     this.RecalcFast    = false; // Если пересчет быстрый, тогда все "плавающие" объекты мы не трогаем
 }
 
@@ -14289,6 +14318,7 @@ function CParagraphDrawStateHightlights()
     this.Comm   = new CParaDrawingRangeLines();
     this.Shd    = new CParaDrawingRangeLines();
 
+    this.DrawComments = true;
     this.Comments     = [];
     this.CommentsFlag = comments_NoComment;
 
@@ -14306,7 +14336,7 @@ function CParagraphDrawStateHightlights()
 
 CParagraphDrawStateHightlights.prototype =
 {
-    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComm, PageEndInfo)
+    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, PageEndInfo)
     {
         this.Paragraph = Paragraph;
         this.Graphics  = Graphics;
@@ -14318,6 +14348,7 @@ CParagraphDrawStateHightlights.prototype =
 
         this.SearchCounter = 0;
 
+        this.DrawComments = DrawComments;
         if ( null !== PageEndInfo )
             this.Comments = PageEndInfo.Comments;
         else
@@ -14346,24 +14377,30 @@ CParagraphDrawStateHightlights.prototype =
 
     Add_Comment : function(Id)
     {
-        this.Comments.push( Id );
+        if (true === this.DrawComments)
+        {
+            this.Comments.push(Id);
 
-        this.Check_CommentsFlag();
+            this.Check_CommentsFlag();
+        }
     },
 
     Remove_Comment : function(Id)
     {
-        var CommentsLen = this.Comments.length;
-        for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
+        if (true === this.DrawComments)
         {
-            if ( this.Comments[CurPos] === Id )
+            var CommentsLen = this.Comments.length;
+            for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
             {
-                this.Comments.splice( CurPos, 1 );
-                break;
+                if (this.Comments[CurPos] === Id)
+                {
+                    this.Comments.splice(CurPos, 1);
+                    break;
+                }
             }
-        }
 
-        this.Check_CommentsFlag();
+            this.Check_CommentsFlag();
+        }
     },
 
     Check_CommentsFlag : function()

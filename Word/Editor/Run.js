@@ -2367,7 +2367,12 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                             // Обновляем позицию объекта
                             Item.Update_Position( new CParagraphLayout( PRSA.X, PRSA.Y , Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits);
                             LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
-                            PRSA.RecalcResult = recalcresult_CurPage;
+
+                            if (0 === PRSA.CurPage && Item.Y > PRSA.PageY + 0.001)
+                                PRSA.RecalcResult = recalcresult_CurPagePara;
+                            else
+                                PRSA.RecalcResult = recalcresult_CurPage;
+
                             return;
                         }
                         else if ( true === LDRecalcInfo.Check_FlowObject(Item) )
@@ -6243,6 +6248,7 @@ ParaRun.prototype.Check_HistoryUninon = function(Data1, Data2)
         if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && para_Text === Data1.Items[0].Type && para_Text === Data2.Items[0].Type )
             return true;
     }
+
     return false;
 };
 //-----------------------------------------------------------------------------------

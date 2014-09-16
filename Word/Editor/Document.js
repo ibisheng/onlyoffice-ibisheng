@@ -59,6 +59,7 @@ var recalcresult_CurPage     = 0x02; // Пересчитываем заново 
 var recalcresult_NextPage    = 0x03; // Пересчитываем следующую страницу
 var recalcresult_NextLine    = 0x04; // Пересчитываем следующую строку
 var recalcresult_CurLine     = 0x05; // Пересчитываем текущую строку
+var recalcresult_CurPagePara = 0x06; // Специальный случай, когда мы встретили картинку в начале параграфа
 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
@@ -11678,51 +11679,14 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        // Во время работы селекта не обновляем состояние
-        if ( true === this.Selection.Start )
-            return;
-        
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
-        var bCanCopyCut = false;
-        
-        var LogicDocument  = null;
-        var DrawingObjects = null;
-        
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-            if ( null !== CurHdrFtr )
-            {
-                if ( docpostype_DrawingObjects === CurHdrFtr.Content.CurPos.Type )
-                    DrawingObjects = this.DrawingObjects;
-                else
-                    LogicDocument = CurHdrFtr.Content;
-            }
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            DrawingObjects = this.DrawingObjects;
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            LogicDocument = this;
-        }
+        // Во время работы селекта не обновляем состояние
+        if ( true === this.Selection.Start )
+            return;
 
-        if ( null !== DrawingObjects )
-        {
-            if ( true === DrawingObjects.isSelectedText() )
-                LogicDocument = DrawingObjects.getTargetDocContent();
-            else
-                bCanCopyCut = true;
-        }
-        
-        if ( null !== LogicDocument )
-            bCanCopyCut = LogicDocument.Is_SelectionUse();
-
-        editor.sync_CanCopyCutCallback( bCanCopyCut );
+        editor.sync_CanCopyCutCallback(this.Can_CopyCut());
     },
 
     Document_UpdateCanAddHyperlinkState : function()
@@ -11776,6 +11740,48 @@ CDocument.prototype =
             this.Document_UpdateSelectionState();
             this.Document_UpdateRulersState();
         }
+    },
+
+    Can_CopyCut : function()
+    {
+        var bCanCopyCut = false;
+
+        var LogicDocument  = null;
+        var DrawingObjects = null;
+
+        // Работаем с колонтитулом
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+            if ( null !== CurHdrFtr )
+            {
+                if ( docpostype_DrawingObjects === CurHdrFtr.Content.CurPos.Type )
+                    DrawingObjects = this.DrawingObjects;
+                else
+                    LogicDocument = CurHdrFtr.Content;
+            }
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            DrawingObjects = this.DrawingObjects;
+        }
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            LogicDocument = this;
+        }
+
+        if ( null !== DrawingObjects )
+        {
+            if ( true === DrawingObjects.isSelectedText() )
+                LogicDocument = DrawingObjects.getTargetDocContent();
+            else
+                bCanCopyCut = true;
+        }
+
+        if ( null !== LogicDocument )
+            bCanCopyCut = LogicDocument.Is_SelectionUse();
+
+        return bCanCopyCut;
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -12921,6 +12927,9 @@ CDocument.prototype =
 
     CanAdd_Comment : function()
     {
+        if (true !== this.Comments.Is_Use())
+            return false;
+
         // Проверим можно ли добавлять гиперссылку
         if ( docpostype_HdrFtr === this.CurPos.Type )
             return this.HdrFtr.CanAdd_Comment();
