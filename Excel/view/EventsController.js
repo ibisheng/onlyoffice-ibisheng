@@ -1168,9 +1168,12 @@
 				// При выборе диапазона не нужно выделять автофигуру
 				if (t.isSelectionDialogMode)
 					return;
-				
+
+				if (this.isCellEditMode && !this.handlers.trigger("stopCellEditing"))
+					return;
+
 				t.isShapeAction = true;
-				
+
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
 				if (event.ClickCount == 2)
