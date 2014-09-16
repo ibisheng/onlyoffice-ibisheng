@@ -4240,7 +4240,8 @@
 				isMerged = true;
             }
 
-            if (this._isCellEmptyTextString(c)) {
+			var angle = c.getAngle();
+            if (this._isCellEmptyTextString(c) && !angle) {
 				// Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
 				str = c.getValue2();
 				if (0 < str.length) {
@@ -4314,7 +4315,6 @@
             var va   = c.getAlignVertical().toLowerCase();
             var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
                 tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
-			var angle = c.getAngle();
             var cto  = (isMerged || fl.wrapText) ?
             {
                 maxWidth:  maxW - this.cols[col].innerWidth + this.cols[col].width,
