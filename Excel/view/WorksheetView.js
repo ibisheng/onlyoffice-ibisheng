@@ -9717,11 +9717,11 @@
 						// Для принятия изменения нужно делать расширение диапазона
 						if (this.model.workbook.bCollaborativeChanges) {
 							var bIsUpdateX = false, bIsUpdateY = false;
-							if (val.range.c2 > t.nColsCount) {
+							if (val.range.c2 >= t.nColsCount) {
 								t.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 								bIsUpdateX = true;
 							}
-							if (val.range.r2 > t.nRowsCount) {
+							if (val.range.r2 >= t.nRowsCount) {
 								t.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 								bIsUpdateY = true;
 							}
@@ -10613,11 +10613,7 @@
 			}
 
 			var cto;
-
-            // TODO: падает при merge!!!
-            var __r1 = Math.min(range.r1, this.rows.length - 1);
-            var __r2 = Math.min(range.r2, this.rows.length - 1);
-			for (r = __r1; r <= __r2; ++r) {
+			for (r = range.r1; r <= range.r2; ++r) {
 				if (this.height_1px > this.rows[r].height) {continue;}
 				for (c = range.c1; c <= range.c2; ++c) {
 					if (this.width_1px > this.cols[c].width) {continue;}
