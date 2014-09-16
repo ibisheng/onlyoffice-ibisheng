@@ -11768,7 +11768,7 @@ CDocument.prototype =
      */
     TurnOn_InterfaceEvents : function(bUpdate)
     {
-        this.TurnOffInterfaceEvents = true;
+        this.TurnOffInterfaceEvents = false;
 
         if (true === bUpdate)
         {
