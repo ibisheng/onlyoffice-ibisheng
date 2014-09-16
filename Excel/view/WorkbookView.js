@@ -1798,6 +1798,9 @@
 
 		// Поиск текста в листе
 		WorkbookView.prototype.findCellText = function (options) {
+			// Для поиска эта переменная не нужна (но она может остаться от replace)
+			options.activeRange = null;
+
 			var ws = this.getWorksheet();
 			// Останавливаем ввод данных в редакторе ввода
 			if (ws.getCellEditMode())
