@@ -10089,6 +10089,9 @@
 		};
 
 		WorksheetView.prototype.replaceCellText = function (options, lockDraw, callback) {
+			if (true !== options.isMatchCase)
+				options.findWhat = options.findWhat.toLowerCase();
+
 			// Очищаем результаты
 			options.countFind = 0;
 			options.countReplace = 0;
