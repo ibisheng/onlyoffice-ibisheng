@@ -757,10 +757,11 @@ CDrawingDocument.prototype =
     TargetShow : function()
     {
         this.TargetShowNeedFlag = true;
-        //this.Native["DD_TargetShow"]();
+        this.Native["DD_TargetShow"]();
     },
     CheckTargetShow : function()
     {
+        return;
         if (this.TargetShowFlag && this.TargetShowNeedFlag)
         {
             this.Native["DD_TargetShow"]();
