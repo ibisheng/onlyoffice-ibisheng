@@ -632,26 +632,26 @@ CDLbl.prototype =
             var minor_font = theme.themeElements.fontScheme.minorFont;
 
 
-            if(minor_font)
-            {
-                if(typeof minor_font.latin === "string" && minor_font.latin.length > 0)
+            text_pr.RFonts.Set_FromObject(
                 {
-                    text_pr.RFonts.Ascii = {Name: minor_font.latin, Index: -1};
+                    Ascii: {
+                        Name: "+mn-lt",
+                        Index: -1
+                    },
+                    EastAsia: {
+                        Name: "+mn-ea",
+                        Index: -1
+                    },
+                    HAnsi: {
+                        Name: "+mn-lt",
+                        Index: -1
+                    },
+                    CS: {
+                        Name: "+mn-lt",
+                        Index: -1
+                    }
                 }
-                if(typeof minor_font.ea === "string" && minor_font.ea.length > 0)
-                {
-                    text_pr.RFonts.EastAsia = {Name: minor_font.ea, Index: -1};
-                }
-                if(typeof minor_font.cs === "string" && minor_font.cs.length > 0)
-                {
-                    text_pr.RFonts.CS = {Name: minor_font.cs, Index: -1};
-                }
-
-                if(typeof minor_font.sym === "string" && minor_font.sym.length > 0)
-                {
-                    text_pr.RFonts.HAnsi = {Name: minor_font.sym, Index: -1};
-                }
-            }
+            );
             style.TextPr = text_pr;
 
             var chart_text_pr;
