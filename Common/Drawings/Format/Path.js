@@ -583,7 +583,7 @@ Path.prototype = {
 
                     if((swAng > 0) && (a3 < 0)) swAng -= 21600000;
                     if((swAng < 0) && (a3 > 0)) swAng += 21600000;
-                    if(swAng == 0) swAng = 21600000;
+                    if(swAng == 0 && a3 != 0) swAng = 21600000;
 
                     var a = wR*cw;
                     var b = hR*ch;
