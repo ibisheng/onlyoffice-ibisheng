@@ -1623,6 +1623,42 @@ var gUndoInsDelCellsFlag = true;
 					History.TurnOff();
 			},
 			
+			_deleteAutoFilter: function(turnOnHistory)
+			{
+				if(turnOnHistory)
+				{
+					History.TurnOn();
+					History.Create_NewPoint();
+				}
+				History.StartTransaction();
+				var aWs = this._getCurrentWS();
+				var activeCells;
+				
+				if(aWs.AutoFilter)
+				{
+					var oRange = Range.prototype.createFromBBox(aWs, aWs.AutoFilter.Ref);
+					var bbox = oRange.getBBox0();
+					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
+					
+					var oldFilter = aWs.AutoFilter.clone();
+					activeCells = aWs.AutoFilter.Ref;
+					
+					aWs.AutoFilter = null;
+					//открываем скрытые строки
+					aWs.setRowHidden(false, bbox.r1, bbox.r2);
+						
+					//заносим в историю
+					this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+				}
+				
+				if(activeCells)
+					this._isEmptyButtons(activeCells);
+				
+				History.EndTransaction();
+				if(turnOnHistory)
+					History.TurnOff();
+			},
+			
 			//второй параметр - чистим у найденного фильтра FilterColumns и SortState
 			isApplyAutoFilterInCell: function(activeCell, clean)
 			{
@@ -5391,6 +5427,7 @@ var gUndoInsDelCellsFlag = true;
 								newResult[n].height = curFilter.height;
 								newResult[n].id = id;
 								newResult[n].idNext = nextId;
+								newResult[n].inFilter = inFilter;
 								
 								
 								newResult[n].hiddenRows = [];
@@ -7139,6 +7176,10 @@ var gUndoInsDelCellsFlag = true;
 				if(arnTo && findFiltersTo)
 				{
 					this.isEmptyAutoFilters(arnTo);
+				}
+				else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo))//если задеваем часть а/ф областью вставки
+				{
+					this._deleteAutoFilter();
 				}
 			},
 			
