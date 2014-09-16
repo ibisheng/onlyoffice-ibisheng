@@ -77,7 +77,10 @@ asc_docs_api.prototype["Call_TurnOnRecalculate"] = function()
 
 asc_docs_api.prototype["Call_CheckTargetUpdate"] = function()
 {
+    this.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
     this.WordControl.m_oLogicDocument.CheckTargetUpdate();
+    this.WordControl.m_oDrawingDocument.CheckTargetShow();
+    this.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 };
 
 asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)

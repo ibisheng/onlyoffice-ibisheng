@@ -558,6 +558,11 @@ function CDrawingDocument()
     this.IsUpdateOverlayOnlyEndReturn   = false;
     this.IsUpdateOverlayOnEndCheck      = false;
 
+    this.UpdateTargetFromPaint  = false;
+    this.UpdateTargetCheck      = true;
+    this.TargetShowNeedFlag     = false;
+    this.TargetShowNeedFlag     = false;
+
     this.m_bIsSelection         = false;
     this.m_bIsMouseLock         = false;
 
@@ -723,6 +728,8 @@ CDrawingDocument.prototype =
     },
     TargetEnd : function()
     {
+        this.TargetShowFlag = false;
+        this.TargetShowNeedFlag = false;
         this.Native["DD_TargetEnd"]();
     },
     SetTargetColor : function(r, g, b)
@@ -739,6 +746,7 @@ CDrawingDocument.prototype =
     UpdateTarget : function(x, y, pageIndex)
     {
         this.LogicDocument.Set_TargetPos( x, y, pageIndex );
+        this.UpdateTargetCheck = true;
         this.Native["DD_UpdateTarget"](x, y, pageIndex);
     },
     SetTargetSize : function(size)
@@ -748,7 +756,28 @@ CDrawingDocument.prototype =
     },
     TargetShow : function()
     {
+        this.TargetShowNeedFlag = true;
+        //this.Native["DD_TargetShow"]();
+    },
+    CheckTargetShow : function()
+    {
+        if (this.TargetShowFlag && this.TargetShowNeedFlag)
+        {
+            this.Native["DD_TargetShow"]();
+            this.TargetShowNeedFlag = false;
+            return;
+        }
+
+        if (!this.TargetShowNeedFlag)
+            return;
+
+        this.TargetShowNeedFlag = false;
+
+        this.TargetStart();
+
         this.Native["DD_TargetShow"]();
+
+        this.TargetShowFlag = true;
     },
 
     // track images
