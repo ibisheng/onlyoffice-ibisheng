@@ -6,6 +6,8 @@
 
 function ParaHyperlink()
 {
+    ParaRun.superclass.constructor.call(this);
+
     this.Id = g_oIdCounter.Get_NewId();
 
     this.Type    = para_Hyperlink;
@@ -20,15 +22,6 @@ function ParaHyperlink()
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
-    this.StartLine  = 0;
-    this.StartRange = 0;
-
-    this.Lines       = []; // Массив CParaRunLine
-    this.Lines[0]    = new CParaRunLine();
-    this.LinesLength = 0;
-
-    this.Range = this.Lines[0].Ranges[0];
-
     this.NearPosArray  = [];
     this.SearchMarks   = [];
     this.SpellingMarks = [];
@@ -37,1932 +30,151 @@ function ParaHyperlink()
     g_oTableId.Add( this, this.Id );
 }
 
-ParaHyperlink.prototype =
+Asc.extendClass(ParaHyperlink, CParagraphContentWithContentBase)
+
+ParaHyperlink.prototype.Get_Id = function()
 {
+    return this.Id;
+};
 
-    protected_GetRangeStartPos : function(LineIndex, RangeIndex)
+ParaHyperlink.prototype.Clear_ContentChanges = function()
+{
+    this.m_oContentChanges.Clear();
+};
+
+ParaHyperlink.prototype.Add_ContentChanges = function(Changes)
+{
+    this.m_oContentChanges.Add( Changes );
+};
+
+ParaHyperlink.prototype.Refresh_ContentChanges = function()
+{
+    this.m_oContentChanges.Refresh();
+};
+
+ParaHyperlink.prototype.Copy = function(Selected)
+{
+    var NewHyperlink = new ParaHyperlink();
+
+    NewHyperlink.Set_Value( this.Value );
+    NewHyperlink.Set_ToolTip( this.ToolTip );
+
+    NewHyperlink.Visited = this.Visited;
+
+    var StartPos = 0;
+    var EndPos   = this.Content.length - 1;
+
+    if ( true === Selected && true === this.State.Selection.Use )
     {
-        if (undefined !== this.Lines[LineIndex] && undefined !== this.Lines[LineIndex].Ranges[RangeIndex])
-            return this.Lines[LineIndex].Ranges[RangeIndex].StartPos;
+        StartPos = this.State.Selection.StartPos;
+        EndPos   = this.State.Selection.EndPos;
 
-        return 0;
-    },
-
-    protected_GetRangeEndPos : function(LineIndex, RangeIndex)
-    {
-        if (undefined !== this.Lines[LineIndex] && undefined !== this.Lines[LineIndex].Ranges[RangeIndex])
-            return this.Lines[LineIndex].Ranges[RangeIndex].EndPos;
-
-        return 0;
-    },
-
-    protected_GetLinesCount : function()
-    {
-        return this.LinesLength;
-    },
-
-    protected_GetRangesCount : function(LineIndex)
-    {
-        if (undefined !== this.Lines[LineIndex])
-            return this.Lines[LineIndex].RangesLength;
-
-        return 0;
-    },
-
-    Get_Id : function()
-    {
-        return this.Id;
-    },
-
-    Clear_ContentChanges : function()
-    {
-        this.m_oContentChanges.Clear();
-    },
-
-    Add_ContentChanges : function(Changes)
-    {
-        this.m_oContentChanges.Add( Changes );
-    },
-
-    Refresh_ContentChanges : function()
-    {
-        this.m_oContentChanges.Refresh();
-    },
-
-    Copy : function(Selected)
-    {
-        var NewHyperlink = new ParaHyperlink();
-
-        NewHyperlink.Set_Value( this.Value );
-        NewHyperlink.Set_ToolTip( this.ToolTip );
-        
-        NewHyperlink.Visited = this.Visited;
-
-        var StartPos = 0;
-        var EndPos   = this.Content.length - 1;
-
-        if ( true === Selected && true === this.State.Selection.Use )
+        if ( StartPos > EndPos )
         {
-            StartPos = this.State.Selection.StartPos;
-            EndPos   = this.State.Selection.EndPos;
-
-            if ( StartPos > EndPos )
-            {
-                StartPos = this.State.Selection.EndPos;
-                EndPos   = this.State.Selection.StartPos;
-            }
+            StartPos = this.State.Selection.EndPos;
+            EndPos   = this.State.Selection.StartPos;
         }
+    }
 
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            var Item = this.Content[CurPos];
-
-            if ( StartPos === CurPos || EndPos === CurPos )
-                NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(Selected) );
-            else
-                NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(false) );
-        }
-
-        return NewHyperlink;
-    },
-
-    Recalc_RunsCompiledPr : function()
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
     {
-        var Count = this.Content.length;
-        for (var Pos = 0; Pos < Count; Pos++)
-        {
-            var Element = this.Content[Pos];
+        var Item = this.Content[CurPos];
 
-            if (Element.Recalc_RunsCompiledPr)
-                Element.Recalc_RunsCompiledPr();
-        }
-    },
-    
-    Get_AllDrawingObjects : function(DrawingObjs)
+        if ( StartPos === CurPos || EndPos === CurPos )
+            NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(Selected) );
+        else
+            NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(false) );
+    }
+
+    return NewHyperlink;
+};
+
+ParaHyperlink.prototype.Recalc_RunsCompiledPr = function()
+{
+    var Count = this.Content.length;
+    for (var Pos = 0; Pos < Count; Pos++)
     {
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Item = this.Content[Index];
-            
-            if ( para_Run === Item.Type || para_Hyperlink === Item.Type )
-                Item.Get_AllDrawingObjects(DrawingObjs);
-        }
-    },
+        var Element = this.Content[Pos];
 
-    Set_Paragraph : function(Paragraph)
+        if (Element.Recalc_RunsCompiledPr)
+            Element.Recalc_RunsCompiledPr();
+    }
+};
+
+ParaHyperlink.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+{
+    var Count = this.Content.length;
+    for ( var Index = 0; Index < Count; Index++ )
     {
-        this.Paragraph = Paragraph;
+        var Item = this.Content[Index];
 
-        var ContentLen = this.Content.length;
-        for (var CurPos = 0; CurPos < ContentLen; CurPos++)
-        {
-            this.Content[CurPos].Set_Paragraph( Paragraph );
-        }
-    },
+        if ( para_Run === Item.Type || para_Hyperlink === Item.Type )
+            Item.Get_AllDrawingObjects(DrawingObjs);
+    }
+};
 
-    Is_Empty : function()
+ParaHyperlink.prototype.Set_Paragraph = function(Paragraph)
+{
+    this.Paragraph = Paragraph;
+
+    var ContentLen = this.Content.length;
+    for (var CurPos = 0; CurPos < ContentLen; CurPos++)
     {
-        var ContentLen = this.Content.length;
-        for ( var Index = 0; Index < ContentLen; Index++ )
-        {
-            if ( false === this.Content[Index].Is_Empty() )
-                return false;
-        }
+        this.Content[CurPos].Set_Paragraph( Paragraph );
+    }
+};
 
-        return true;
-    },
-
-    Is_StartFromNewLine : function()
+ParaHyperlink.prototype.Is_Empty = function()
+{
+    var ContentLen = this.Content.length;
+    for ( var Index = 0; Index < ContentLen; Index++ )
     {
-        if ( this.Content.length < 0 )
+        if ( false === this.Content[Index].Is_Empty() )
             return false;
+    }
 
-        return this.Content[0].Is_StartFromNewLine();
-    },
-    
-    Get_SelectedText : function(bAll, bClearText)
-    {
-        var Str = "";        
-        var Count = this.Content.length;
-        
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            var _Str = this.Content[Pos].Get_SelectedText( bAll, bClearText );
-            
-            if ( null === _Str )
-                return null;
-            
-            Str += _Str;
-        }
-        
-        return Str;
-    },
+    return true;
+};
 
-    Get_TextPr : function(_ContentPos, Depth)
-    {
-        if ( undefined === _ContentPos )
-            return this.Content[0].Get_TextPr();
-        else
-            return this.Content[_ContentPos.Get(Depth)].Get_TextPr( _ContentPos, Depth + 1 );
-    },
-
-    Get_CompiledTextPr : function(Copy)
-    {
-        var TextPr = null;
-
-        if ( true === this.State.Selection )
-        {
-            var StartPos = this.State.Selection.StartPos;
-            var EndPos   = this.State.Selection.EndPos;
-
-            if ( StartPos > EndPos )
-            {
-                StartPos = this.State.Selection.EndPos;
-                EndPos   = this.State.Selection.StartPos;
-            }
-
-            TextPr = this.Content[StartPos].Get_CompiledTextPr(Copy);
-
-            while ( null === TextPr && StartPos < EndPos )
-            {
-                StartPos++;
-                TextPr = this.Content[StartPos].Get_CompiledTextPr(Copy);
-            }
-
-            for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
-            {
-                var CurTextPr = this.Content[CurPos].Get_CompiledPr(false);
-
-                if ( null !== CurTextPr )
-                    TextPr = TextPr.Compare( CurTextPr );
-            }
-        }
-        else
-        {
-            var CurPos = this.State.ContentPos;
-
-            if ( CurPos >= 0 && CurPos < this.Content.length )
-                TextPr = this.Content[CurPos].Get_CompiledTextPr(Copy);
-        }
-
-        return TextPr;
-    },
-    
-    Check_Content : function()
-    {
-        // Данная функция запускается при чтении файла. Заглушка, на случай, когда в Hyperlink ничего не будет
-        if ( this.Content.length <= 0 )
-            this.Add_ToContent( 0, new ParaRun(), false );
-    },
-
-    Add_ToContent : function(Pos, Item, UpdatePosition)
-    {
-        History.Add( this, { Type : historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
-        this.Content.splice( Pos, 0, Item );
-
-        if ( true === UpdatePosition )
-        {
-            // Обновляем текущую позицию
-            if ( this.State.ContentPos >= Pos )
-                this.State.ContentPos++;
-
-            // Обновляем начало и конец селекта
-            if ( true === this.State.Selection.Use )
-            {
-                if ( this.State.Selection.StartPos >= Pos )
-                    this.State.Selection.StartPos++;
-
-                if ( this.State.Selection.EndPos >= Pos )
-                    this.State.Selection.EndPos++;
-            }
-
-            // Также передвинем всем метки переносов страниц и строк
-            var LinesCount = this.Lines.length;
-            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-            {
-                var RangesCount = this.Lines[CurLine].RangesLength;
-
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-                {
-                    var Range = this.Lines[CurLine].Ranges[CurRange];
-
-                    if ( Range.StartPos > Pos )
-                        Range.StartPos++;
-
-                    if ( Range.EndPos > Pos )
-                        Range.EndPos++;
-                }
-
-                // Особый случай, когда мы добавляем элемент в самый последний ран
-                if ( Pos === this.Content.length - 1 && LinesCount - 1 === CurLine )
-                {
-                    this.Lines[CurLine].Ranges[RangesCount - 1].EndPos++;
-                }
-            }
-        }
-
-        // Обновляем позиции в NearestPos
-        var NearPosLen = this.NearPosArray.length;
-        for ( var Index = 0; Index < NearPosLen; Index++ )
-        {
-            var HyperNearPos = this.NearPosArray[Index];
-            var ContentPos = HyperNearPos.NearPos.ContentPos;
-            var Depth      = HyperNearPos.Depth;
-
-            if ( ContentPos.Data[Depth] >= Pos )
-                ContentPos.Data[Depth]++;
-        }
-
-        // Обновляем позиции в поиске
-        var SearchMarksCount = this.SearchMarks.length;
-        for ( var Index = 0; Index < SearchMarksCount; Index++ )
-        {
-            var Mark       = this.SearchMarks[Index];
-            var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
-            var Depth      = Mark.Depth;
-
-            if ( ContentPos.Data[Depth] >= Pos )
-                ContentPos.Data[Depth]++;
-        }
-    },
-
-    Remove_FromContent : function(Pos, Count, UpdatePosition)
-    {
-        // Получим массив удаляемых элементов
-        var DeletedItems = this.Content.slice( Pos, Pos + Count );
-        History.Add( this, { Type : historyitem_Hyperlink_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
-
-        this.Content.splice( Pos, Count );
-
-        if ( true === UpdatePosition )
-        {
-            // Обновим текущую позицию
-            if ( this.State.ContentPos > Pos + Count )
-                this.State.ContentPos -= Count;
-            else if ( this.State.ContentPos > Pos )
-                this.State.ContentPos = Pos;
-
-            // Обновим начало и конец селекта
-            if ( true === this.State.Selection.Use )
-            {
-                if ( this.State.Selection.StartPos <= this.State.Selection.EndPos )
-                {
-                    if ( this.State.Selection.StartPos > Pos + Count )
-                        this.State.Selection.StartPos -= Count;
-                    else if ( this.State.Selection.StartPos > Pos )
-                        this.State.Selection.StartPos = Pos;
-
-                    if ( this.State.Selection.EndPos >= Pos + Count )
-                        this.State.Selection.EndPos -= Count;
-                    else if ( this.State.Selection.EndPos >= Pos )
-                        this.State.Selection.EndPos = Math.max( 0, Pos - 1 );
-                }
-                else
-                {
-                    if ( this.State.Selection.StartPos >= Pos + Count )
-                        this.State.Selection.StartPos -= Count;
-                    else if ( this.State.Selection.StartPos >= Pos )
-                        this.State.Selection.StartPos = Math.max( 0, Pos - 1 );
-
-                    if ( this.State.Selection.EndPos > Pos + Count )
-                        this.State.Selection.EndPos -= Count;
-                    else if ( this.State.Selection.EndPos > Pos )
-                        this.State.Selection.EndPos = Pos;
-                }
-            }
-
-
-            // Также передвинем всем метки переносов страниц и строк
-            var LinesCount = this.Lines.length;
-            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-            {
-                var RangesCount = this.Lines[CurLine].RangesLength;
-                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-                {
-                    var Range = this.Lines[CurLine].Ranges[CurRange];
-
-                    if ( Range.StartPos > Pos + Count )
-                        Range.StartPos -= Count;
-                    else if ( Range.StartPos > Pos )
-                        Range.StartPos = Math.max( 0 , Pos );
-
-                    if ( Range.EndPos >= Pos + Count )
-                        Range.EndPos -= Count;
-                    else if ( Range.EndPos >= Pos )
-                        Range.EndPos = Math.max( 0 , Pos );
-                }
-            }
-        }
-
-        // Обновляем позиции в NearestPos
-        var NearPosLen = this.NearPosArray.length;
-        for ( var Index = 0; Index < NearPosLen; Index++ )
-        {
-            var HyperNearPos = this.NearPosArray[Index];
-            var ContentPos = HyperNearPos.NearPos.ContentPos;
-            var Depth      = HyperNearPos.Depth;
-
-            if ( ContentPos.Data[Depth] > Pos + Count )
-                ContentPos.Data[Depth] -= Count;
-            else if ( ContentPos.Data[Depth] > Pos )
-                ContentPos.Data[Depth] = Math.max( 0 , Pos );
-        }
-
-        // Обновляем позиции в поиске
-        var SearchMarksCount = this.SearchMarks.length;
-        for ( var Index = 0; Index < SearchMarksCount; Index++ )
-        {
-            var Mark       = this.SearchMarks[Index];
-            var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
-            var Depth      = Mark.Depth;
-
-            if ( ContentPos.Data[Depth] > Pos + Count )
-                ContentPos.Data[Depth] -= Count;
-            else if ( ContentPos.Data[Depth] > Pos )
-                ContentPos.Data[Depth] = Math.max( 0 , Pos );
-        }
-    },
-
-    Add : function(Item)
-    {
-        switch (Item.Type)
-        {            
-            case para_Run :
-            {
-                var CurItem = this.Content[this.State.ContentPos];
-
-                switch ( CurItem.Type )
-                {
-                    case para_Run :
-                    {
-                        var NewRun = CurItem.Split2(CurItem.State.ContentPos);
-
-                        this.Internal_Content_Add( CurPos + 1, Item );
-                        this.Internal_Content_Add( CurPos + 2, NewRun );
-                        this.State.ContentPos = CurPos + 1;
-                        break;
-                    }
-
-                    default:
-                    {
-                        this.Content[this.State.ContentPos].Add( Item );
-                        break;
-                    }
-                }
-
-                break;
-            }
-                
-            default :
-            {
-                this.Content[this.State.ContentPos].Add( Item );
-                break;
-            }
-        }
-    },
-
-    Remove : function(Direction, bOnAddText)
-    {
-        var Selection = this.State.Selection;
-
-        if ( true === Selection.Use )
-        {
-            var StartPos = Selection.StartPos;
-            var EndPos   = Selection.EndPos;
-
-            if ( StartPos > EndPos )
-            {
-                StartPos = Selection.EndPos;
-                EndPos   = Selection.StartPos;
-            }
-
-            if ( StartPos === EndPos )
-            {
-                this.Content[StartPos].Remove(Direction, bOnAddText);
-
-                if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty() )
-                {
-                    this.Remove_FromContent( StartPos, 1, true );
-                }
-            }
-            else
-            {
-                this.Content[EndPos].Remove(Direction, bOnAddText);
-
-                if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty() )
-                {
-                    this.Remove_FromContent( EndPos, 1, true );
-                }
-
-                for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
-                {
-                    this.Remove_FromContent( CurPos, 1, true );
-                }
-
-                this.Content[StartPos].Remove(Direction, bOnAddText);
-
-                if ( true === this.Content[StartPos].Is_Empty() )
-                    this.Remove_FromContent( StartPos, 1, true );
-            }
-
-            this.Selection_Remove();
-            this.State.ContentPos = StartPos;
-        }
-        else
-        {
-            var ContentPos = this.State.ContentPos;
-
-            if ( true === this.Cursor_Is_Start() || true === this.Cursor_Is_End() )
-            {
-                this.Select_All();
-            }
-            else
-            {
-                while ( false === this.Content[ContentPos].Remove( Direction, bOnAddText ) )
-                {
-                    if ( Direction < 0 )
-                        ContentPos--;
-                    else
-                        ContentPos++;
-
-                    if ( ContentPos < 0 || ContentPos >= this.Content.length )
-                        break;
-
-                    if ( Direction < 0 )
-                        this.Content[ContentPos].Cursor_MoveToEndPos(false);
-                    else
-                        this.Content[ContentPos].Cursor_MoveToStartPos();
-
-                }
-
-                if ( ContentPos < 0 || ContentPos >= this.Content.length )
-                    return false;
-                else
-                {
-                    if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() )
-                        this.Remove_FromContent( ContentPos, 1, true );
-
-                    this.State.ContentPos = ContentPos;
-                }
-            }
-        }
-
-        return true;
-    },
-
-    Get_CurrentParaPos : function()
-    {
-        var CurPos = this.State.ContentPos;
-
-        if ( CurPos >= 0 && CurPos < this.Content.length )
-            return this.Content[CurPos].Get_CurrentParaPos();
-
-        return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
-    },
-
-    Apply_TextPr : function(TextPr, IncFontSize, ApplyToAll)
-    {
-        if ( true === ApplyToAll )
-        {
-            var ContentLen = this.Content.length;
-            for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-            {
-                this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, true );
-            }
-        }
-        else
-        {
-            var Selection = this.State.Selection;
-
-            if ( true === Selection.Use )
-            {
-                var StartPos = Selection.StartPos;
-                var EndPos   = Selection.EndPos;
-
-                if ( StartPos === EndPos )
-                {
-                    var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
-
-                    if ( para_Run === this.Content[EndPos].Type )
-                    {
-                        var CenterRunPos = this.Internal_ReplaceRun( EndPos, NewElements );
-
-                        if ( StartPos === this.State.ContentPos )
-                            this.State.ContentPos = CenterRunPos;
-
-                        // Подправим метки селекта
-                        Selection.StartPos = CenterRunPos;
-                        Selection.EndPos   = CenterRunPos;
-                    }
-                }
-                else
-                {
-                    var Direction = 1;
-                    if ( StartPos > EndPos )
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos = Temp;
-
-                        Direction = -1;
-                    }
-
-                    for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
-                    {
-                        this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, false );
-                    }
-
-
-                    var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
-                    if ( para_Run === this.Content[EndPos].Type )
-                        this.Internal_ReplaceRun( EndPos, NewElements );
-
-                    var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize, false );
-                    if ( para_Run === this.Content[StartPos].Type )
-                        this.Internal_ReplaceRun( StartPos, NewElements );
-
-                    // Подправим селект. Заметим, что метки выделения изменяются внутри функции Add_ToContent 
-                    // за счет того, что EndPos - StartPos > 1.
-                    if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
-                        Selection.StartPos++;
-                    else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
-                        Selection.EndPos++;
-
-                    if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
-                        Selection.EndPos--;
-                    else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
-                        Selection.StartPos--;
-                }
-            }
-            else
-            {
-                var Pos = this.State.ContentPos;
-                var Element = this.Content[Pos];
-                var NewElements = Element.Apply_TextPr( TextPr, IncFontSize, false );
-
-                if ( para_Run === Element.Type )
-                {
-                    var CenterRunPos = this.Internal_ReplaceRun( Pos, NewElements );
-                    this.State.ContentPos = CenterRunPos;
-                }
-            }
-        }
-    },
-
-    Internal_ReplaceRun : function(Pos, NewRuns)
-    {
-        // По логике, можно удалить Run, стоящий в позиции Pos и добавить все раны, которые не null в массиве NewRuns.
-        // Но, согласно работе ParaRun.Apply_TextPr, в массиве всегда идет ровно 3 рана (возможно null). Второй ран
-        // всегда не null. Первый не null ран и есть ран, идущий в позиции Pos.
-
-        var LRun = NewRuns[0];
-        var CRun = NewRuns[1];
-        var RRun = NewRuns[2];
-
-        // CRun - всегда не null
-        var CenterRunPos = Pos;
-
-        if ( null !== LRun )
-        {
-            this.Add_ToContent( Pos + 1, CRun, true );
-            CenterRunPos = Pos + 1;
-        }
-        else
-        {
-            // Если LRun - null, значит CRun - это и есть тот ран который стоит уже в позиции Pos
-        }
-
-        if ( null !== RRun )
-            this.Add_ToContent( CenterRunPos + 1, RRun, true );
-
-        return CenterRunPos;
-    },
-
-    Clear_TextPr : function()
-    {
-        var HyperlinkStyle = null;        
-        if ( undefined !== this.Paragraph && null !== this.Paragraph )
-        {
-            var Styles = this.Paragraph.Parent.Get_Styles();
-            HyperlinkStyle = Styles.Get_Default_Hyperlink();
-        }
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Item = this.Content[Index];
-            Item.Clear_TextPr();
-
-            if ( para_Run === Item.Type && null !== HyperlinkStyle )
-                Item.Set_RStyle( HyperlinkStyle );
-        }
-    },
-
-    Check_NearestPos : function(ParaNearPos, Depth)
-    {
-        var HyperNearPos = new CParagraphElementNearPos();
-        HyperNearPos.NearPos = ParaNearPos.NearPos;
-        HyperNearPos.Depth   = Depth;
-
-        this.NearPosArray.push( HyperNearPos );
-        ParaNearPos.Classes.push( this );
-
-        var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
-        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
-    },
-
-    Get_DrawingObjectRun : function(Id)
-    {
-        var Run = null;
-
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-        {
-            var Element = this.Content[CurPos];
-            Run = Element.Get_DrawingObjectRun( Id );
-            if ( null !== Run )
-                return Run;
-        }
-
-        return Run;
-    },
-
-    Get_DrawingObjectContentPos : function(Id, ContentPos, Depth)
-    {
-        var ContentLen = this.Content.length;
-        for ( var Index = 0; Index < ContentLen; Index++ )
-        {
-            var Element = this.Content[Index];
-
-            if ( true === Element.Get_DrawingObjectContentPos(Id, ContentPos, Depth + 1) )
-            {
-                ContentPos.Update2( Index, Depth );
-                return true;
-            }
-        }
-
+ParaHyperlink.prototype.Is_StartFromNewLine = function()
+{
+    if ( this.Content.length < 0 )
         return false;
-    },
 
-    Get_Layout : function(DrawingLayout, UseContentPos, ContentPos, Depth)
-    {
-        var CurLine  = DrawingLayout.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? DrawingLayout.Range - this.StartRange : DrawingLayout.Range );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        var CurContentPos = ( true === UseContentPos ? ContentPos.Get(Depth) : -1 );
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, Depth + 1 );
-
-            if ( null !== DrawingLayout.Layout )
-                return;
-        }
-    },
-
-    Get_NextRunElements : function(RunElements, UseContentPos, Depth)
-    {
-        var CurPos     = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : 0 );
-        var ContentLen = this.Content.length;
-
-        this.Content[CurPos].Get_NextRunElements( RunElements, UseContentPos,  Depth + 1 );
-
-        if ( RunElements.Count <= 0 )
-            return;
-
-        CurPos++;
-
-        while ( CurPos < ContentLen )
-        {
-            this.Content[CurPos].Get_NextRunElements( RunElements, false,  Depth + 1 );
-
-            if ( RunElements.Count <= 0 )
-                break;
-
-            CurPos++;
-        }
-    },
-
-    Get_PrevRunElements : function(RunElements, UseContentPos, Depth)
-    {
-        var CurPos = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : this.Content.length - 1 );
-
-        this.Content[CurPos].Get_PrevRunElements( RunElements, UseContentPos,  Depth + 1 );
-
-        if ( RunElements.Count <= 0 )
-            return;
-
-        CurPos--;
-
-        while ( CurPos >= 0 )
-        {
-            this.Content[CurPos].Get_PrevRunElements( RunElements, false,  Depth + 1 );
-
-            if ( RunElements.Count <= 0 )
-                break;
-
-            CurPos--;
-        }
-    },
-
-    Collect_DocumentStatistics : function(ParaStats)
-    {
-        var Count = this.Content.length;
-        for (var Index = 0; Index < Count; Index++)
-            this.Content[Index].Collect_DocumentStatistics( ParaStats );
-    },
-
-    Create_FontMap : function(Map)
-    {
-        var Count = this.Content.length;
-        for (var Index = 0; Index < Count; Index++)
-            this.Content[Index].Create_FontMap( Map );
-    },
-
-    Get_AllFontNames : function(AllFonts)
-    {
-        var Count = this.Content.length;
-        for (var Index = 0; Index < Count; Index++)
-            this.Content[Index].Get_AllFontNames( AllFonts );
-    },
-    
-    Clear_TextFormatting : function( DefHyper )
-    {
-        var Count = this.Content.length;
-                
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            var Item = this.Content[Pos];
-            Item.Clear_TextFormatting( DefHyper );
-                        
-            if ( para_Run === Item.Type )
-                Item.Set_RStyle( DefHyper );
-        }
-    },
-    
-    Can_AddDropCap : function()
-    {
-        var Count = this.Content.length;
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            var TempRes = this.Content[Pos].Can_AddDropCap();
-
-            if ( null !== TempRes )
-                return TempRes;
-        }
-        
-        return null;
-    },
-
-    Get_TextForDropCap : function(DropCapText, UseContentPos, ContentPos, Depth)
-    {
-        var EndPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
-
-        for ( var Pos = 0; Pos <= EndPos; Pos++ )
-        {
-            this.Content[Pos].Get_TextForDropCap( DropCapText, (true === UseContentPos && Pos === EndPos ? true : false), ContentPos, Depth + 1 );
-            
-            if ( true === DropCapText.Mixed && ( true === DropCapText.Check || DropCapText.Runs.length > 0 ) )
-                return;
-        }
-    },
-
-    Get_StartTabsCount : function(TabsCounter)
-    {
-        var ContentLen = this.Content.length;
-        for ( var Pos = 0; Pos < ContentLen; Pos++ )
-        {
-            var Element = this.Content[Pos];
-            if ( false === Element.Get_StartTabsCount( TabsCounter ) )
-                return false;
-        }
-
-        return true;
-    },
-
-    Remove_StartTabs : function(TabsCounter)
-    {
-        var ContentLen = this.Content.length;
-        for ( var Pos = 0; Pos < ContentLen; Pos++ )
-        {
-            var Element = this.Content[Pos];
-            if ( false === Element.Remove_StartTabs( TabsCounter ) )
-                return false;
-        }
-
-        return true;
-    },
-
-    Split : function (ContentPos, Depth)
-    {
-        var NewHyperlink = new ParaHyperlink();
-        NewHyperlink.Set_Value( this.Value );
-        NewHyperlink.Set_ToolTip( this.ToolTip );
-
-        var CurPos = ContentPos.Get(Depth);
-
-        var TextPr = this.Get_TextPr(ContentPos, Depth);
-
-        // Разделяем текущий элемент (возвращается правая, отделившаяся часть, если она null, тогда заменяем
-        // ее на пустой ран с заданными настройками).
-        var NewElement = this.Content[CurPos].Split( ContentPos, Depth + 1 );
-
-        if ( null === NewElement )
-        {
-            NewElement = new ParaRun();
-            NewElement.Set_Pr( TextPr.Copy() );
-        }        
-
-        // Теперь делим на три части:
-        // 1. До элемента с номером CurPos включительно (оставляем эту часть в исходном параграфе)
-        // 2. После элемента с номером CurPos (добавляем эту часть в новый параграф)
-        // 3. Новый элемент, полученный после разделения элемента с номером CurPos, который мы
-        //    добавляем в начало нового параграфа.
-
-        var NewContent = this.Content.slice( CurPos + 1 );
-        this.Remove_FromContent( CurPos + 1, this.Content.length - CurPos - 1, false );
-
-        // Добавляем в новую гиперссылку Right элемент и NewContent
-        var Count = NewContent.length;
-        for ( var Pos = 0; Pos < Count; Pos++ )
-            NewHyperlink.Add_ToContent( Pos, NewContent[Pos], false );
-        
-        NewHyperlink.Add_ToContent( 0, NewElement, false );
-
-        return NewHyperlink;
-    },
-
-    Split2 : function(CurPos)
-    {
-        // Создаем новый ран
-        var NewRun = new ParaRun(this.Paragraph);
-
-        // Копируем настройки
-        NewRun.Set_Pr( this.Pr.Copy() );
-
-        // TODO: Как только избавимся от para_End переделать тут
-        // Проверим, если наш ран содержит para_End, тогда мы должны para_End переметить в правый ран
-
-        var CheckEndPos = -1;
-        var CheckEndPos2 = Math.min( CurPos, this.Content.length );
-        for ( var Pos = 0; Pos < CheckEndPos2; Pos++ )
-        {
-            if ( para_End === this.Content[Pos].Type )
-            {
-                CheckEndPos = Pos;
-                break;
-            }
-        }
-
-        if ( -1 !== CheckEndPos )
-            CurPos = CheckEndPos;
-
-        // Разделяем содержимое по ранам
-        NewRun.Concat_ToContent( this.Content.slice(CurPos) );
-        this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
-
-        // Если были точки орфографии, тогда переместим их в новый ран
-        var SpellingMarksCount = this.SpellingMarks.length;
-        for ( var Index = 0; Index < SpellingMarksCount; Index++ )
-        {
-            var Mark    = this.SpellingMarks[Index];
-            var MarkPos = ( true === Mark.Start ? Mark.Element.StartPos.Get(Mark.Depth) : Mark.Element.EndPos.Get(Mark.Depth) );
-
-            if ( MarkPos >= CurPos )
-            {
-                var MarkElement = Mark.Element;
-                if ( true === Mark.Start )
-                {
-                    MarkElement.ClassesS[Mark.Depth]       = NewRun;
-                    MarkElement.StartPos.Data[Mark.Depth] -= CurPos;
-                }
-                else
-                {
-                    MarkElement.ClassesE[Mark.Depth]     = NewRun;
-                    MarkElement.EndPos.Data[Mark.Depth] -= CurPos;
-                }
-
-                NewRun.SpellingMarks.push( Mark );
-
-                this.SpellingMarks.splice( Index, 1 );
-                SpellingMarksCount--;
-                Index--;
-            }
-        }
-
-        return NewRun;
-    },
-//-----------------------------------------------------------------------------------
-// Функции пересчета
-//-----------------------------------------------------------------------------------
-
-    Recalculate_Reset : function(StartRange, StartLine)
-    {
-        this.StartLine   = StartLine;
-        this.StartRange  = StartRange;
-        this.LinesLength = 0;
-    },
-
-    Recalculate_Range : function(PRS, ParaPr, Depth)
-    {
-        if ( this.Paragraph !== PRS.Paragraph )
-        {
-            this.Paragraph = PRS.Paragraph;
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-        }
-
-        var CurLine  = PRS.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-
-        // Если это первый отрезок в данной строке, тогда нам надо добавить строку (первую строку не добавляем,
-        // т.к. она всегда есть)
-        if ( 0 === CurRange )
-        {
-            if ( 0 !== CurLine )
-            {
-                this.Lines[CurLine] = new CParaRunLine();
-                this.LinesLength    = CurLine + 1;
-            }
-            else
-            {
-                this.LinesLength  = CurLine + 1;
-            }
-        }
-
-        var RangeStartPos = 0;
-        var RangeEndPos   = 0;
-
-        // Вычислим RangeStartPos
-        if ( 0 === CurLine )
-        {
-            if ( 0 !== CurRange )
-            {
-                RangeStartPos = this.Lines[0].Ranges[CurRange - 1].EndPos;
-            }
-            else
-            {
-                RangeStartPos = 0;
-            }
-        }
-        else if ( 0 === CurRange )
-        {
-            var _Line = this.Lines[CurLine - 1];
-            RangeStartPos = _Line.Ranges[_Line.Ranges.length - 1].EndPos;
-        }
-        else
-        {
-            var _Line = this.Lines[CurLine];
-            RangeStartPos = _Line.Ranges[CurRange - 1].EndPos;
-        }
-
-        var ContentLen = this.Content.length;
-        var Pos = RangeStartPos;
-        for ( ; Pos < ContentLen; Pos++ )
-        {
-            var Item = this.Content[Pos];
-
-            if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos )
-            {
-                Item.Recalculate_Reset( PRS.Range, PRS.Line );
-            }
-
-            PRS.Update_CurPos( Pos, Depth );
-            Item.Recalculate_Range( PRS, ParaPr, Depth + 1 );
-
-            if ( true === PRS.NewRange )
-            {
-                RangeEndPos = Pos;
-                break;
-            }
-        }
-
-        if ( Pos >= ContentLen )
-        {
-            RangeEndPos = Pos - 1;
-
-            // Удаляем лишние строки, оставшиеся после предыдущего пересчета в самом конце
-            if ( this.Lines.length > this.LinesLength )
-                this.Lines.length = this.LinesLength;
-        }
-
-        if ( 0 === CurLine && 0 === CurRange )
-        {
-            this.Range.StartPos = RangeStartPos;
-            this.Range.EndPos   = RangeEndPos;
-            this.Lines[0].RangesLength = 1;
-
-            if ( this.Lines[0].Ranges.length > 1 )
-                this.Lines[0].Ranges.length = 1;
-        }
-        else
-            this.Lines[CurLine].Add_Range( CurRange, RangeStartPos, RangeEndPos );
-
-    },
-
-    Recalculate_Set_RangeEndPos : function(PRS, PRP, Depth)
-    {
-        var CurLine  = PRS.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-        var CurPos   = PRP.Get(Depth);
-
-        this.Lines[CurLine].Ranges[CurRange].EndPos = CurPos;
-
-        this.Content[CurPos].Recalculate_Set_RangeEndPos( PRS, PRP, Depth + 1 );
-    },
-
-    Recalculate_Range_Width : function(PRSC, _CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
-        }
-    },
-
-    Recalculate_Range_Spaces : function(PRSA, _CurLine, _CurRange, _CurPage)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Recalculate_Range_Spaces( PRSA, _CurLine, _CurRange, _CurPage );
-        }
-    },
-
-    Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Recalculate_PageEndInfo( PRSI, _CurLine, _CurRange );
-        }
-    },
-
-    Save_RecalculateObject : function(Copy)
-    {
-        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-        RecalcObj.Save_Lines( this, Copy );
-        RecalcObj.Save_Content( this, Copy );
-        return RecalcObj;
-    },
-
-    Load_RecalculateObject : function(RecalcObj)
-    {
-        RecalcObj.Load_Lines( this );
-        RecalcObj.Load_Content( this );
-    },
-
-    Prepare_RecalculateObject : function()
-    {
-        this.Lines       = [];
-        this.Lines[0]    = new CParaRunLine();
-        this.LinesLength = 0;
-
-        this.Range = this.Lines[0].Ranges[0];
-        
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index].Prepare_RecalculateObject();
-        }
-    },
-
-    Is_EmptyRange : function(_CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            if ( false === this.Content[CurPos].Is_EmptyRange(_CurLine, _CurRange) )
-                return false;
-        }
-
-        return true;
-    },
-
-    Check_Range_OnlyMath : function(Checker, _CurRange, _CurLine)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Check_Range_OnlyMath(Checker, _CurRange, _CurLine);
-            
-            if (false === Checker.Result)
-                break;
-        }
-    },
-
-    Check_MathPara : function(Checker)
-    {
-        var Count = this.Content.length;
-        if ( Checker.Direction > 0 )
-        {
-            for ( var CurPos = 0; CurPos < Count; CurPos++ )
-            {
-                if ( this.Content[CurPos].Check_MathPara )
-                {
-                    this.Content[CurPos].Check_MathPara( MathParaChecker );
-
-                    if ( false !== MathParaChecker.Found )
-                        break;
-                }
-            }            
-        }
-        else
-        {
-            for ( var CurPos = Count - 1; CurPos >= 0; CurPos-- )
-            {
-                if ( this.Content[CurPos].Check_MathPara )
-                {
-                    this.Content[CurPos].Check_MathPara( MathParaChecker );
-
-                    if ( false !== MathParaChecker.Found )
-                        break;
-                }
-            }
-        }
-    },
-
-    Check_PageBreak : function()
-    {
-        var Count = this.Content.length;
-        for (var Pos = 0; Pos < Count; Pos++)
-        {
-            if (true === this.Content[Pos].Check_PageBreak())
-                return true;
-        }
-
-        return false;
-    },
-
-    Check_BreakPageInRange : function(_CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            if ( true === this.Content[CurPos].Check_BreakPageInRange(_CurLine, _CurRange) )
-                return true;
-        }
-
-        return false;
-    },
-
-    Check_BreakPageEnd : function(PBChecker)
-    {
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-        {
-            var Element = this.Content[CurPos];
-
-            if ( true !== Element.Check_BreakPageEnd(PBChecker) )
-                return false;
-        }
-
-        return true;
-    },
-
-    Get_ParaPosByContentPos : function(ContentPos, Depth)
-    {
-        var Pos = ContentPos.Get(Depth);
-
-        return this.Content[Pos].Get_ParaPosByContentPos( ContentPos, Depth + 1 );
-    },
-
-    Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
-    {
-        var CurLine  = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-        var X = _X;
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            var Item = this.Content[CurPos];
-            var Res = Item.Recalculate_CurPos( X, Y, (true === CurrentRun && CurPos === this.State.ContentPos ? true : false), _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget );
-
-            if ( true === CurrentRun && CurPos === this.State.ContentPos )
-                return Res;
-            else
-                X = Res.X;
-        }
-
-        return { X : X };
-    },
-
-    Refresh_RecalcData : function(Data)
-    {
-        if (undefined !== this.Paragraph && null !== this.Paragraph)
-            this.Paragraph.Refresh_RecalcData2(0);
-    },
-
-    Recalculate_MinMaxContentWidth : function(MinMax)
-    {
-        var Count = this.Content.length;
-        for ( var Pos = 0; Pos < Count; Pos++ )
-        {
-            this.Content[Pos].Recalculate_MinMaxContentWidth(MinMax);
-        }
-    },
-
-    Get_Range_VisibleWidth : function(RangeW, _CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Get_Range_VisibleWidth(RangeW, _CurLine, _CurRange);
-        }
-    },
-
-    Shift_Range : function(Dx, Dy, _CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Shift_Range(Dx, Dy, _CurLine, _CurRange);
-        }
-    },        
-//-----------------------------------------------------------------------------------
-// Функции отрисовки
-//-----------------------------------------------------------------------------------
-    Draw_HighLights : function(PDSH)
-    {
-        var CurLine  = PDSH.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Draw_HighLights( PDSH );
-        }
-    },
-
-    Draw_Elements : function(PDSE)
-    {
-        PDSE.VisitedHyperlink = this.Visited;
+    return this.Content[0].Is_StartFromNewLine();
+};
 
-        var CurLine  = PDSE.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+ParaHyperlink.prototype.Get_SelectedText = function(bAll, bClearText)
+{
+    var Str = "";
+    var Count = this.Content.length;
 
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Draw_Elements( PDSE );
-        }
-
-        PDSE.VisitedHyperlink = false;
-    },
-
-    Draw_Lines : function(PDSL)
-    {
-        PDSL.VisitedHyperlink = this.Visited;
-
-        var CurLine  = PDSL.Line - this.StartLine;
-        var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Draw_Lines( PDSL );
-        }
-
-        PDSL.VisitedHyperlink = false;
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы с курсором
-//-----------------------------------------------------------------------------------
-    Is_CursorPlaceable : function()
-    {
-        return true;
-    },
-
-    Cursor_Is_Start : function()
-    {
-        var ContentLen = this.Content.length;
-        var CurPos = 0;
-
-        while ( CurPos < this.State.ContentPos && CurPos < this.Content.length - 1 )
-        {
-            if ( true === this.Content[CurPos].Is_Empty() )
-                CurPos++;
-            else
-                return false;
-        }
-
-        return this.Content[CurPos].Cursor_Is_Start();
-    },
-
-    Cursor_Is_NeededCorrectPos : function()
-    {
-        return false;
-    },
-
-    Cursor_Is_End : function()
-    {
-        var CurPos = this.Content.length - 1;
-
-        while ( CurPos > this.State.ContentPos && CurPos > 0 )
-        {
-            if ( true === this.Content[CurPos].Is_Empty() )
-                CurPos--;
-            else
-                return false;
-        }
-
-        return this.Content[CurPos].Cursor_Is_End();
-    },
-
-    Cursor_MoveToStartPos : function()
-    {
-        this.State.ContentPos = 0;
-
-        if ( this.Content.length > 0 )
-        {
-            this.Content[0].Cursor_MoveToStartPos();
-        }
-    },
-
-    Cursor_MoveToEndPos : function(SelectFromEnd)
-    {
-        var ContentLen = this.Content.length;
-
-        if ( ContentLen > 0 )
-        {
-            this.State.ContentPos = ContentLen - 1;
-            this.Content[ContentLen - 1].Cursor_MoveToEndPos( SelectFromEnd );
-        }
-    },
-
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-    {
-        var Result = false;
-
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            var Item = this.Content[CurPos];
-            
-            if ( false === SearchPos.InText )
-                SearchPos.InTextPos.Update2( CurPos, Depth );
-
-            if ( true === Item.Get_ParaContentPosByXY( SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd ) )
-            {
-                SearchPos.Pos.Update2( CurPos, Depth );
-                Result = true;
-            }
-        }
-
-        return Result;
-    },
-
-    Get_ParaContentPos : function(bSelection, bStart, ContentPos)
-    {
-        var Pos = ( true === bSelection ? ( true === bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) : this.State.ContentPos );
-        ContentPos.Add( Pos );
-
-        this.Content[Pos].Get_ParaContentPos( bSelection, bStart, ContentPos );
-    },
-
-    Set_ParaContentPos : function(ContentPos, Depth)
-    {
-        var Pos = ContentPos.Get(Depth);
-
-        if ( Pos >= this.Content.length )
-            Pos = this.Content.length - 1;
-
-        if ( Pos < 0 )
-            Pos = 0;
-
-        this.State.ContentPos = Pos;
-
-        this.Content[Pos].Set_ParaContentPos( ContentPos, Depth + 1 );
-    },
-
-    Get_PosByElement : function(Class, ContentPos, Depth, UseRange, Range, Line)
-    {
-        if ( this === Class )
-            return true;
-
-        var ContentPos = new CParagraphContentPos();
-
-        var StartPos = 0;
-        var EndPos   = this.Content.length - 1;
-
-        if ( true === UseRange )
-        {
-            var CurLine  = Line - this.StartLine;
-            var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
-
-            if ( CurLine >= 0 && CurLine < this.Lines.length && CurRange >= 0 && CurRange < this.Lines[CurLine].Ranges.length )
-            {
-                StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-                EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-            }
-        }
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            var Element = this.Content[CurPos];
-
-            ContentPos.Update( CurPos, Depth );
-
-            if ( true === Element.Get_PosByElement(Class, ContentPos, Depth + 1, true, CurRange, CurLine) )
-                return true;
-        }
-
-        return false;
-    },
-
-    Get_PosByDrawing : function(Id, ContentPos, Depth)
-    {
-        var Count = this.Content.length;
-        for ( var CurPos = 0; CurPos < Count; CurPos++ )
-        {
-            var Element = this.Content[CurPos];
-
-            ContentPos.Update( CurPos, Depth );
-
-            if ( true === Element.Get_PosByDrawing(Id, ContentPos, Depth + 1) )
-                return true;
-        }
-
-        return false;
-    },
-
-    Get_RunElementByPos : function(ContentPos, Depth)
-    {
-        if ( undefined !== ContentPos )
-        {
-            var Pos = ContentPos.Get(Depth);
-
-            return this.Content[Pos].Get_RunElementByPos( ContentPos, Depth + 1 );
-        }
-        else
-        {
-            var Count = this.Content.length;
-            if ( Count <= 0 )
-                return null;
-            
-            var Pos = 0;
-            var Element = this.Content[Pos];
-                        
-            while ( null === Element && Pos < Count - 1 )
-                Element = this.Content[++Pos];
-            
-            return Element;
-        } 
-    },
-
-    Get_LastRunInRange : function(_CurLine, _CurRange)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-        
-        if ( undefined !== this.Lines[CurLine] && undefined !== this.Lines[CurLine].Ranges[CurRange] )
-        {
-            var LastItem = this.Content[this.Lines[CurLine].Ranges[CurRange].EndPos];
-            if ( undefined !== LastItem )
-                return LastItem.Get_LastRunInRange(_CurLine, _CurRange);
-        }
-        
-        return null;
-    },
-
-    Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
-    {
-        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
-
-        this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
-        SearchPos.Pos.Update( CurPos, Depth );
-
-        if ( true === SearchPos.Found )
-            return true;
-
-        CurPos--;
-
-        while ( CurPos >= 0 )
-        {
-            this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
-            SearchPos.Pos.Update( CurPos, Depth );
-
-            if ( true === SearchPos.Found )
-                return true;
-
-            CurPos--;
-        }
-
-        return false;
-    },
-
-    Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
-    {
-        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
-
-        this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
-        SearchPos.Pos.Update( CurPos, Depth );
-
-        if ( true === SearchPos.Found )
-            return true;
-
-        CurPos++;
-
-        var Count = this.Content.length;
-        while ( CurPos < this.Content.length )
-        {
-            this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
-            SearchPos.Pos.Update( CurPos, Depth );
-
-            if ( true === SearchPos.Found )
-                return true;
-
-            CurPos++;
-        }
-
-        return false;
-    },
-
-    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
-    {
-        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
-
-        this.Content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
-
-        if ( true === SearchPos.UpdatePos )
-            SearchPos.Pos.Update( CurPos, Depth );
-
-        if ( true === SearchPos.Found )
-            return;
-
-        CurPos--;
-
-        var Count = this.Content.length;
-        while ( CurPos >= 0 )
-        {
-            this.Content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, false);
-
-            if ( true === SearchPos.UpdatePos )
-                SearchPos.Pos.Update( CurPos, Depth );
-
-            if ( true === SearchPos.Found )
-                return;
-
-            CurPos--;
-        }
-    },
-
-    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
-    {
-        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
-
-        this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
-
-        if ( true === SearchPos.UpdatePos )
-            SearchPos.Pos.Update( CurPos, Depth );
-
-        if ( true === SearchPos.Found )
-            return;
-
-        CurPos++;
-
-        var Count = this.Content.length;
-        while ( CurPos < Count )
-        {
-            this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
-
-            if ( true === SearchPos.UpdatePos )
-                SearchPos.Pos.Update( CurPos, Depth );
-
-            if ( true === SearchPos.Found )
-                return;
-
-            CurPos++;
-        }
-    },
-
-    Get_EndRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
-    {
-        var CurLine  = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var EndPos = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        if ( EndPos >= this.Content.length || EndPos < 0 )
-            return false;
-
-        var Result = this.Content[EndPos].Get_EndRangePos( _CurLine, _CurRange, SearchPos, Depth + 1 );
-
-        if ( true === Result )
-            SearchPos.Pos.Update( EndPos, Depth );
-
-        return Result;
-
-    },
-
-    Get_StartRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
-    {
-        var CurLine  = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-
-        if ( StartPos >= this.Content.length || StartPos < 0 )
-            return false;
-
-        var Result = this.Content[StartPos].Get_StartRangePos( _CurLine, _CurRange, SearchPos, Depth + 1 );
-
-        if ( true === Result )
-            SearchPos.Pos.Update( StartPos, Depth );
-
-        return Result;
-    },
-
-    Get_StartRangePos2 : function(_CurLine, _CurRange, ContentPos, Depth)
-    {
-        var CurLine  = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-        var Pos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        ContentPos.Update( Pos, Depth );
-
-        this.Content[Pos].Get_StartRangePos2( _CurLine, _CurRange, ContentPos, Depth + 1 );
-    },
-
-    Get_StartPos : function(ContentPos, Depth)
-    {
-        if ( this.Content.length > 0 )
-        {
-            ContentPos.Update( 0, Depth );
-
-            this.Content[0].Get_StartPos( ContentPos, Depth + 1 );
-        }
-    },
-
-    Get_EndPos : function(BehindEnd, ContentPos, Depth)
-    {
-        var ContentLen = this.Content.length;
-        if ( ContentLen > 0 )
-        {
-            ContentPos.Update( ContentLen - 1, Depth );
-
-            this.Content[ContentLen - 1].Get_EndPos( BehindEnd, ContentPos, Depth + 1 );
-        }
-    },
-//-----------------------------------------------------------------------------------
-// Функции для работы с селектом
-//-----------------------------------------------------------------------------------
-    Set_SelectionContentPos : function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
-    {
-        var Selection = this.State.Selection;
-
-        var OldStartPos = Selection.StartPos;
-        var OldEndPos   = Selection.EndPos;
-
-        if ( OldStartPos > OldEndPos )
-        {
-            OldStartPos = Selection.EndPos;
-            OldEndPos   = Selection.StartPos;
-        }
-
-        var StartPos = 0;
-        switch (StartFlag)
-        {
-            case  1: StartPos = 0; break;
-            case -1: StartPos = this.Content.length - 1; break;
-            case  0: StartPos = StartContentPos.Get(Depth); break;
-        }
-
-        var EndPos = 0;
-        switch (EndFlag)
-        {
-            case  1: EndPos = 0; break;
-            case -1: EndPos = this.Content.length - 1; break;
-            case  0: EndPos = EndContentPos.Get(Depth); break;
-        }
-
-        // Удалим отметки о старом селекте
-        if ( OldStartPos < StartPos && OldStartPos < EndPos )
-        {
-            var TempLimit = Math.min( StartPos, EndPos );
-            for ( var CurPos = OldStartPos; CurPos < TempLimit; CurPos++ )
-            {
-                this.Content[CurPos].Selection_Remove();
-            }
-        }
-
-        if ( OldEndPos > StartPos && OldEndPos > EndPos )
-        {
-            var TempLimit = Math.max( StartPos, EndPos );
-            for ( var CurPos = TempLimit + 1; CurPos <= OldEndPos; CurPos++ )
-            {
-                this.Content[CurPos].Selection_Remove();
-            }
-        }
-
-        // Выставим метки нового селекта
-
-        Selection.Use      = true;
-        Selection.StartPos = StartPos;
-        Selection.EndPos   = EndPos;
-
-        if ( StartPos != EndPos )
-        {
-            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, StartFlag, StartPos > EndPos ? 1 : -1 );
-            this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, StartPos > EndPos ? -1 : 1, EndFlag );
-
-            var _StartPos = StartPos;
-            var _EndPos   = EndPos;
-            var Direction = 1;
-
-            if ( _StartPos > _EndPos )
-            {
-                _StartPos = EndPos;
-                _EndPos   = StartPos;
-                Direction = -1;
-            }
-
-            for ( var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++ )
-            {
-                this.Content[CurPos].Select_All( Direction );
-            }
-        }
-        else
-        {
-            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, EndContentPos, Depth + 1, StartFlag, EndFlag );
-        }
-    },
-
-    Selection_IsUse : function()
-    {
-        return this.State.Selection.Use;
-    },
-
-    Selection_Stop : function()
-    {
-    },
-
-    Selection_Remove : function()
+    for ( var Pos = 0; Pos < Count; Pos++ )
     {
-        var Selection = this.State.Selection;
+        var _Str = this.Content[Pos].Get_SelectedText( bAll, bClearText );
 
-        if ( true === Selection.Use )
-        {
-            var StartPos = Selection.StartPos;
-            var EndPos   = Selection.EndPos;
+        if ( null === _Str )
+            return null;
 
-            if ( StartPos > EndPos )
-            {
-                StartPos = Selection.EndPos;
-                EndPos   = Selection.StartPos;
-            }
+        Str += _Str;
+    }
 
-            StartPos = Math.max( 0, StartPos );
-            EndPos   = Math.min( this.Content.length - 1, EndPos );
-
-            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-            {
-                this.Content[CurPos].Selection_Remove();
-            }
-        }
-
-        Selection.Use      = false;
-        Selection.StartPos = 0;
-        Selection.EndPos   = 0;
-    },
-
-    Select_All : function(Direction)
-    {
-        var ContentLen = this.Content.length;
-
-        var Selection = this.State.Selection;
-
-        Selection.Use = true;
-
-        if ( -1 === Direction )
-        {
-            Selection.StartPos = this.Content.length - 1;
-            Selection.EndPos   = 0;
-        }
-        else
-        {
-            Selection.StartPos = 0;
-            Selection.EndPos   = this.Content.length - 1;
-        }
-
-        for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
-        {
-            this.Content[CurPos].Select_All( Direction );
-        }
-    },
-
-    Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw)
-    {
-        var CurLine = _CurLine - this.StartLine;
-        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+    return Str;
+};
 
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+ParaHyperlink.prototype.Get_TextPr = function(_ContentPos, Depth)
+{
+    if ( undefined === _ContentPos )
+        return this.Content[0].Get_TextPr();
+    else
+        return this.Content[_ContentPos.Get(Depth)].Get_TextPr( _ContentPos, Depth + 1 );
+};
 
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-        {
-            this.Content[CurPos].Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
-        }
-    },
+ParaHyperlink.prototype.Get_CompiledTextPr = function(Copy)
+{
+    var TextPr = null;
 
-    Selection_IsEmpty : function(CheckEnd)
+    if ( true === this.State.Selection )
     {
         var StartPos = this.State.Selection.StartPos;
         var EndPos   = this.State.Selection.EndPos;
@@ -1973,460 +185,2151 @@ ParaHyperlink.prototype =
             EndPos   = this.State.Selection.StartPos;
         }
 
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        TextPr = this.Content[StartPos].Get_CompiledTextPr(Copy);
+
+        while ( null === TextPr && StartPos < EndPos )
         {
-            if ( false === this.Content[CurPos].Selection_IsEmpty(CheckEnd) )
-                return false;
+            StartPos++;
+            TextPr = this.Content[StartPos].Get_CompiledTextPr(Copy);
         }
 
-        return true;
-    },
+        for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
+        {
+            var CurTextPr = this.Content[CurPos].Get_CompiledPr(false);
 
-    Selection_CheckParaEnd : function()
+            if ( null !== CurTextPr )
+                TextPr = TextPr.Compare( CurTextPr );
+        }
+    }
+    else
     {
-        // В гиперссылку не должен попадать ParaEnd
+        var CurPos = this.State.ContentPos;
 
-        return false;
-    },
+        if ( CurPos >= 0 && CurPos < this.Content.length )
+            TextPr = this.Content[CurPos].Get_CompiledTextPr(Copy);
+    }
 
-    Is_SelectedAll : function(Props)
+    return TextPr;
+};
+
+ParaHyperlink.prototype.Check_Content = function()
+{
+    // Данная функция запускается при чтении файла. Заглушка, на случай, когда в Hyperlink ничего не будет
+    if ( this.Content.length <= 0 )
+        this.Add_ToContent( 0, new ParaRun(), false );
+};
+
+ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
+{
+    History.Add( this, { Type : historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+    this.Content.splice( Pos, 0, Item );
+
+    if ( true === UpdatePosition )
     {
-        var Selection = this.State.Selection;
+        // Обновляем текущую позицию
+        if ( this.State.ContentPos >= Pos )
+            this.State.ContentPos++;
 
-        if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
-            return false;
+        // Обновляем начало и конец селекта
+        if ( true === this.State.Selection.Use )
+        {
+            if ( this.State.Selection.StartPos >= Pos )
+                this.State.Selection.StartPos++;
 
+            if ( this.State.Selection.EndPos >= Pos )
+                this.State.Selection.EndPos++;
+        }
+
+        // Также передвинем всем метки переносов страниц и строк
+        var LinesCount = this.protected_GetLinesCount();
+        for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
+        {
+            var RangesCount = this.protected_GetRangesCount(CurLine);
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+                var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+                if (StartPos > Pos)
+                    StartPos++;
+
+                if (EndPos > Pos)
+                    EndPos++;
+
+                this.protected_FillRange(CurLine, CurRange, StartPos, EndPos);
+            }
+
+            // Особый случай, когда мы добавляем элемент в самый последний ран
+            if ( Pos === this.Content.length - 1 && LinesCount - 1 === CurLine )
+            {
+                this.protected_FillRangeEndPos(CurLine, RangesCount - 1, this.protected_GetRangeEndPos(CurLine, RangesCount - 1) + 1);
+            }
+        }
+    }
+
+    // Обновляем позиции в NearestPos
+    var NearPosLen = this.NearPosArray.length;
+    for ( var Index = 0; Index < NearPosLen; Index++ )
+    {
+        var HyperNearPos = this.NearPosArray[Index];
+        var ContentPos = HyperNearPos.NearPos.ContentPos;
+        var Depth      = HyperNearPos.Depth;
+
+        if ( ContentPos.Data[Depth] >= Pos )
+            ContentPos.Data[Depth]++;
+    }
+
+    // Обновляем позиции в поиске
+    var SearchMarksCount = this.SearchMarks.length;
+    for ( var Index = 0; Index < SearchMarksCount; Index++ )
+    {
+        var Mark       = this.SearchMarks[Index];
+        var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+        var Depth      = Mark.Depth;
+
+        if ( ContentPos.Data[Depth] >= Pos )
+            ContentPos.Data[Depth]++;
+    }
+};
+
+ParaHyperlink.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
+{
+    // Получим массив удаляемых элементов
+    var DeletedItems = this.Content.slice( Pos, Pos + Count );
+    History.Add( this, { Type : historyitem_Hyperlink_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+
+    this.Content.splice( Pos, Count );
+
+    if ( true === UpdatePosition )
+    {
+        // Обновим текущую позицию
+        if ( this.State.ContentPos > Pos + Count )
+            this.State.ContentPos -= Count;
+        else if ( this.State.ContentPos > Pos )
+            this.State.ContentPos = Pos;
+
+        // Обновим начало и конец селекта
+        if ( true === this.State.Selection.Use )
+        {
+            if ( this.State.Selection.StartPos <= this.State.Selection.EndPos )
+            {
+                if ( this.State.Selection.StartPos > Pos + Count )
+                    this.State.Selection.StartPos -= Count;
+                else if ( this.State.Selection.StartPos > Pos )
+                    this.State.Selection.StartPos = Pos;
+
+                if ( this.State.Selection.EndPos >= Pos + Count )
+                    this.State.Selection.EndPos -= Count;
+                else if ( this.State.Selection.EndPos >= Pos )
+                    this.State.Selection.EndPos = Math.max( 0, Pos - 1 );
+            }
+            else
+            {
+                if ( this.State.Selection.StartPos >= Pos + Count )
+                    this.State.Selection.StartPos -= Count;
+                else if ( this.State.Selection.StartPos >= Pos )
+                    this.State.Selection.StartPos = Math.max( 0, Pos - 1 );
+
+                if ( this.State.Selection.EndPos > Pos + Count )
+                    this.State.Selection.EndPos -= Count;
+                else if ( this.State.Selection.EndPos > Pos )
+                    this.State.Selection.EndPos = Pos;
+            }
+        }
+
+        // Также передвинем всем метки переносов страниц и строк
+        var LinesCount = this.protected_GetLinesCount();
+        for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
+        {
+            var RangesCount = this.protected_GetRangesCount(CurLine);
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+                var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+                if (StartPos > Pos + Count)
+                    StartPos -= Count;
+                else if (StartPos > Pos)
+                    StartPos = Math.max(0 , Pos);
+
+                if (EndPos >= Pos + Count)
+                    EndPos -= Count;
+                else if (EndPos >= Pos)
+                    EndPos = Math.max(0 , Pos);
+
+                this.protected_FillRange(CurLine, CurRange, StartPos, EndPos);
+            }
+        }
+    }
+
+    // Обновляем позиции в NearestPos
+    var NearPosLen = this.NearPosArray.length;
+    for ( var Index = 0; Index < NearPosLen; Index++ )
+    {
+        var HyperNearPos = this.NearPosArray[Index];
+        var ContentPos = HyperNearPos.NearPos.ContentPos;
+        var Depth      = HyperNearPos.Depth;
+
+        if ( ContentPos.Data[Depth] > Pos + Count )
+            ContentPos.Data[Depth] -= Count;
+        else if ( ContentPos.Data[Depth] > Pos )
+            ContentPos.Data[Depth] = Math.max( 0 , Pos );
+    }
+
+    // Обновляем позиции в поиске
+    var SearchMarksCount = this.SearchMarks.length;
+    for ( var Index = 0; Index < SearchMarksCount; Index++ )
+    {
+        var Mark       = this.SearchMarks[Index];
+        var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+        var Depth      = Mark.Depth;
+
+        if ( ContentPos.Data[Depth] > Pos + Count )
+            ContentPos.Data[Depth] -= Count;
+        else if ( ContentPos.Data[Depth] > Pos )
+            ContentPos.Data[Depth] = Math.max( 0 , Pos );
+    }
+};
+
+ParaHyperlink.prototype.Add = function(Item)
+{
+    switch (Item.Type)
+    {
+        case para_Run :
+        {
+            var CurItem = this.Content[this.State.ContentPos];
+
+            switch ( CurItem.Type )
+            {
+                case para_Run :
+                {
+                    var NewRun = CurItem.Split2(CurItem.State.ContentPos);
+
+                    this.Internal_Content_Add( CurPos + 1, Item );
+                    this.Internal_Content_Add( CurPos + 2, NewRun );
+                    this.State.ContentPos = CurPos + 1;
+                    break;
+                }
+
+                default:
+                {
+                    this.Content[this.State.ContentPos].Add( Item );
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        default :
+        {
+            this.Content[this.State.ContentPos].Add( Item );
+            break;
+        }
+    }
+};
+
+ParaHyperlink.prototype.Remove = function(Direction, bOnAddText)
+{
+    var Selection = this.State.Selection;
+
+    if ( true === Selection.Use )
+    {
         var StartPos = Selection.StartPos;
         var EndPos   = Selection.EndPos;
 
-        if ( EndPos < StartPos )
+        if ( StartPos > EndPos )
         {
             StartPos = Selection.EndPos;
             EndPos   = Selection.StartPos;
         }
 
-        for ( var Pos = 0; Pos <= StartPos; Pos++ )
+        if ( StartPos === EndPos )
         {
-            if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
-                return false;
-        }
+            this.Content[StartPos].Remove(Direction, bOnAddText);
 
-        var Count = this.Content.length;
-        for ( var Pos = EndPos; Pos < Count; Pos++ )
-        {
-            if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
-                return false;
-        }
-
-        return true;
-    },
-
-    Selection_CorrectLeftPos : function(Direction)
-    {
-        if ( false === this.Selection.Use || true === this.Is_Empty( { SkipAnchor : true } ) )
-            return true;
-
-        var Selection = this.State.Selection;
-        var StartPos = Math.min( Selection.StartPos, Selection.EndPos );
-        var EndPos   = Math.max( Selection.StartPos, Selection.EndPos );
-
-        for ( var Pos = 0; Pos < StartPos; Pos++ )
-        {
-            if ( true !== this.Content[Pos].Is_Empty( { SkipAnchor : true } ) )
-                return false;
-        }
-
-        for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
-        {
-            if ( true === this.Content[Pos].Selection_CorrectLeftPos(Direction) )
+            if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty() )
             {
-                if ( 1 === Direction )
-                    this.Selection.StartPos = Pos + 1;
-                else
-                    this.Selection.EndPos   = Pos + 1;
-
-                this.Content[Pos].Selection_Remove();
+                this.Remove_FromContent( StartPos, 1, true );
             }
-            else
-                return false;
+        }
+        else
+        {
+            this.Content[EndPos].Remove(Direction, bOnAddText);
+
+            if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty() )
+            {
+                this.Remove_FromContent( EndPos, 1, true );
+            }
+
+            for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
+            {
+                this.Remove_FromContent( CurPos, 1, true );
+            }
+
+            this.Content[StartPos].Remove(Direction, bOnAddText);
+
+            if ( true === this.Content[StartPos].Is_Empty() )
+                this.Remove_FromContent( StartPos, 1, true );
         }
 
-        return true;
-    },
-//-----------------------------------------------------------------------------------
-// Работаем со значениями
-//-----------------------------------------------------------------------------------
-    Get_Text : function(Text)
+        this.Selection_Remove();
+        this.State.ContentPos = StartPos;
+    }
+    else
+    {
+        var ContentPos = this.State.ContentPos;
+
+        if ( true === this.Cursor_Is_Start() || true === this.Cursor_Is_End() )
+        {
+            this.Select_All();
+        }
+        else
+        {
+            while ( false === this.Content[ContentPos].Remove( Direction, bOnAddText ) )
+            {
+                if ( Direction < 0 )
+                    ContentPos--;
+                else
+                    ContentPos++;
+
+                if ( ContentPos < 0 || ContentPos >= this.Content.length )
+                    break;
+
+                if ( Direction < 0 )
+                    this.Content[ContentPos].Cursor_MoveToEndPos(false);
+                else
+                    this.Content[ContentPos].Cursor_MoveToStartPos();
+
+            }
+
+            if ( ContentPos < 0 || ContentPos >= this.Content.length )
+                return false;
+            else
+            {
+                if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() )
+                    this.Remove_FromContent( ContentPos, 1, true );
+
+                this.State.ContentPos = ContentPos;
+            }
+        }
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Get_CurrentParaPos = function()
+{
+    var CurPos = this.State.ContentPos;
+
+    if ( CurPos >= 0 && CurPos < this.Content.length )
+        return this.Content[CurPos].Get_CurrentParaPos();
+
+    return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
+};
+
+ParaHyperlink.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
+{
+    if ( true === ApplyToAll )
     {
         var ContentLen = this.Content.length;
         for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
         {
-            this.Content[CurPos].Get_Text( Text );
+            this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, true );
         }
-    },
-
-    Set_Visited : function(Value)
+    }
+    else
     {
-        this.Visited = Value;
-    },
+        var Selection = this.State.Selection;
 
-    Get_Visited : function()
-    {
-        return this.Visited;
-    },
-
-    Set_ToolTip : function(ToolTip)
-    {
-        History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
-        this.ToolTip = ToolTip;
-    },
-
-    Get_ToolTip : function()
-    {
-        if ( null === this.ToolTip )
+        if ( true === Selection.Use )
         {
-            if ( "string" === typeof(this.Value) )
-                return this.Value;
+            var StartPos = Selection.StartPos;
+            var EndPos   = Selection.EndPos;
+
+            if ( StartPos === EndPos )
+            {
+                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
+
+                if ( para_Run === this.Content[EndPos].Type )
+                {
+                    var CenterRunPos = this.Internal_ReplaceRun( EndPos, NewElements );
+
+                    if ( StartPos === this.State.ContentPos )
+                        this.State.ContentPos = CenterRunPos;
+
+                    // Подправим метки селекта
+                    Selection.StartPos = CenterRunPos;
+                    Selection.EndPos   = CenterRunPos;
+                }
+            }
             else
-                return "";
+            {
+                var Direction = 1;
+                if ( StartPos > EndPos )
+                {
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos = Temp;
+
+                    Direction = -1;
+                }
+
+                for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
+                {
+                    this.Content[CurPos].Apply_TextPr( TextPr, IncFontSize, false );
+                }
+
+
+                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
+                if ( para_Run === this.Content[EndPos].Type )
+                    this.Internal_ReplaceRun( EndPos, NewElements );
+
+                var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize, false );
+                if ( para_Run === this.Content[StartPos].Type )
+                    this.Internal_ReplaceRun( StartPos, NewElements );
+
+                // Подправим селект. Заметим, что метки выделения изменяются внутри функции Add_ToContent
+                // за счет того, что EndPos - StartPos > 1.
+                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                    Selection.StartPos++;
+                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                    Selection.EndPos++;
+
+                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                    Selection.EndPos--;
+                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                    Selection.StartPos--;
+            }
         }
         else
-            return this.ToolTip;
-    },
+        {
+            var Pos = this.State.ContentPos;
+            var Element = this.Content[Pos];
+            var NewElements = Element.Apply_TextPr( TextPr, IncFontSize, false );
 
-    Get_Value : function()
-    {
-        return this.Value;
-    },
+            if ( para_Run === Element.Type )
+            {
+                var CenterRunPos = this.Internal_ReplaceRun( Pos, NewElements );
+                this.State.ContentPos = CenterRunPos;
+            }
+        }
+    }
+};
 
-    Set_Value : function(Value)
+ParaHyperlink.prototype.Internal_ReplaceRun = function(Pos, NewRuns)
+{
+    // По логике, можно удалить Run, стоящий в позиции Pos и добавить все раны, которые не null в массиве NewRuns.
+    // Но, согласно работе ParaRun.Apply_TextPr, в массиве всегда идет ровно 3 рана (возможно null). Второй ран
+    // всегда не null. Первый не null ран и есть ран, идущий в позиции Pos.
+
+    var LRun = NewRuns[0];
+    var CRun = NewRuns[1];
+    var RRun = NewRuns[2];
+
+    // CRun - всегда не null
+    var CenterRunPos = Pos;
+
+    if ( null !== LRun )
     {
-        History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
-        this.Value = Value;
-    },
+        this.Add_ToContent( Pos + 1, CRun, true );
+        CenterRunPos = Pos + 1;
+    }
+    else
+    {
+        // Если LRun - null, значит CRun - это и есть тот ран который стоит уже в позиции Pos
+    }
+
+    if ( null !== RRun )
+        this.Add_ToContent( CenterRunPos + 1, RRun, true );
+
+    return CenterRunPos;
+};
+
+ParaHyperlink.prototype.Clear_TextPr = function()
+{
+    var HyperlinkStyle = null;
+    if ( undefined !== this.Paragraph && null !== this.Paragraph )
+    {
+        var Styles = this.Paragraph.Parent.Get_Styles();
+        HyperlinkStyle = Styles.Get_Default_Hyperlink();
+    }
+
+    var Count = this.Content.length;
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var Item = this.Content[Index];
+        Item.Clear_TextPr();
+
+        if ( para_Run === Item.Type && null !== HyperlinkStyle )
+            Item.Set_RStyle( HyperlinkStyle );
+    }
+};
+
+ParaHyperlink.prototype.Check_NearestPos = function(ParaNearPos, Depth)
+{
+    var HyperNearPos = new CParagraphElementNearPos();
+    HyperNearPos.NearPos = ParaNearPos.NearPos;
+    HyperNearPos.Depth   = Depth;
+
+    this.NearPosArray.push( HyperNearPos );
+    ParaNearPos.Classes.push( this );
+
+    var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
+    this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
+};
+
+ParaHyperlink.prototype.Get_DrawingObjectRun = function(Id)
+{
+    var Run = null;
+
+    var ContentLen = this.Content.length;
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+    {
+        var Element = this.Content[CurPos];
+        Run = Element.Get_DrawingObjectRun( Id );
+        if ( null !== Run )
+            return Run;
+    }
+
+    return Run;
+};
+
+ParaHyperlink.prototype.Get_DrawingObjectContentPos = function(Id, ContentPos, Depth)
+{
+    var ContentLen = this.Content.length;
+    for ( var Index = 0; Index < ContentLen; Index++ )
+    {
+        var Element = this.Content[Index];
+
+        if ( true === Element.Get_DrawingObjectContentPos(Id, ContentPos, Depth + 1) )
+        {
+            ContentPos.Update2( Index, Depth );
+            return true;
+        }
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPos, Depth)
+{
+    var CurLine  = DrawingLayout.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? DrawingLayout.Range - this.StartRange : DrawingLayout.Range );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var CurContentPos = ( true === UseContentPos ? ContentPos.Get(Depth) : -1 );
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, Depth + 1 );
+
+        if ( null !== DrawingLayout.Layout )
+            return;
+    }
+};
+
+ParaHyperlink.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Depth)
+{
+    var CurPos     = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : 0 );
+    var ContentLen = this.Content.length;
+
+    this.Content[CurPos].Get_NextRunElements( RunElements, UseContentPos,  Depth + 1 );
+
+    if ( RunElements.Count <= 0 )
+        return;
+
+    CurPos++;
+
+    while ( CurPos < ContentLen )
+    {
+        this.Content[CurPos].Get_NextRunElements( RunElements, false,  Depth + 1 );
+
+        if ( RunElements.Count <= 0 )
+            break;
+
+        CurPos++;
+    }
+};
+
+ParaHyperlink.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Depth)
+{
+    var CurPos = ( true === UseContentPos ? RunElements.ContentPos.Get(Depth) : this.Content.length - 1 );
+
+    this.Content[CurPos].Get_PrevRunElements( RunElements, UseContentPos,  Depth + 1 );
+
+    if ( RunElements.Count <= 0 )
+        return;
+
+    CurPos--;
+
+    while ( CurPos >= 0 )
+    {
+        this.Content[CurPos].Get_PrevRunElements( RunElements, false,  Depth + 1 );
+
+        if ( RunElements.Count <= 0 )
+            break;
+
+        CurPos--;
+    }
+};
+
+ParaHyperlink.prototype.Collect_DocumentStatistics = function(ParaStats)
+{
+    var Count = this.Content.length;
+    for (var Index = 0; Index < Count; Index++)
+        this.Content[Index].Collect_DocumentStatistics( ParaStats );
+};
+
+ParaHyperlink.prototype.Create_FontMap = function(Map)
+{
+    var Count = this.Content.length;
+    for (var Index = 0; Index < Count; Index++)
+        this.Content[Index].Create_FontMap( Map );
+};
+
+ParaHyperlink.prototype.Get_AllFontNames = function(AllFonts)
+{
+    var Count = this.Content.length;
+    for (var Index = 0; Index < Count; Index++)
+        this.Content[Index].Get_AllFontNames( AllFonts );
+};
+
+ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
+{
+    var Count = this.Content.length;
+
+    for ( var Pos = 0; Pos < Count; Pos++ )
+    {
+        var Item = this.Content[Pos];
+        Item.Clear_TextFormatting( DefHyper );
+
+        if ( para_Run === Item.Type )
+            Item.Set_RStyle( DefHyper );
+    }
+};
+
+ParaHyperlink.prototype.Can_AddDropCap = function()
+{
+    var Count = this.Content.length;
+    for ( var Pos = 0; Pos < Count; Pos++ )
+    {
+        var TempRes = this.Content[Pos].Can_AddDropCap();
+
+        if ( null !== TempRes )
+            return TempRes;
+    }
+
+    return null;
+};
+
+ParaHyperlink.prototype.Get_TextForDropCap = function(DropCapText, UseContentPos, ContentPos, Depth)
+{
+    var EndPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+
+    for ( var Pos = 0; Pos <= EndPos; Pos++ )
+    {
+        this.Content[Pos].Get_TextForDropCap( DropCapText, (true === UseContentPos && Pos === EndPos ? true : false), ContentPos, Depth + 1 );
+
+        if ( true === DropCapText.Mixed && ( true === DropCapText.Check || DropCapText.Runs.length > 0 ) )
+            return;
+    }
+};
+
+ParaHyperlink.prototype.Get_StartTabsCount = function(TabsCounter)
+{
+    var ContentLen = this.Content.length;
+    for ( var Pos = 0; Pos < ContentLen; Pos++ )
+    {
+        var Element = this.Content[Pos];
+        if ( false === Element.Get_StartTabsCount( TabsCounter ) )
+            return false;
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Remove_StartTabs = function(TabsCounter)
+{
+    var ContentLen = this.Content.length;
+    for ( var Pos = 0; Pos < ContentLen; Pos++ )
+    {
+        var Element = this.Content[Pos];
+        if ( false === Element.Remove_StartTabs( TabsCounter ) )
+            return false;
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Split = function (ContentPos, Depth)
+{
+    var NewHyperlink = new ParaHyperlink();
+    NewHyperlink.Set_Value( this.Value );
+    NewHyperlink.Set_ToolTip( this.ToolTip );
+
+    var CurPos = ContentPos.Get(Depth);
+
+    var TextPr = this.Get_TextPr(ContentPos, Depth);
+
+    // Разделяем текущий элемент (возвращается правая, отделившаяся часть, если она null, тогда заменяем
+    // ее на пустой ран с заданными настройками).
+    var NewElement = this.Content[CurPos].Split( ContentPos, Depth + 1 );
+
+    if ( null === NewElement )
+    {
+        NewElement = new ParaRun();
+        NewElement.Set_Pr( TextPr.Copy() );
+    }
+
+    // Теперь делим на три части:
+    // 1. До элемента с номером CurPos включительно (оставляем эту часть в исходном параграфе)
+    // 2. После элемента с номером CurPos (добавляем эту часть в новый параграф)
+    // 3. Новый элемент, полученный после разделения элемента с номером CurPos, который мы
+    //    добавляем в начало нового параграфа.
+
+    var NewContent = this.Content.slice( CurPos + 1 );
+    this.Remove_FromContent( CurPos + 1, this.Content.length - CurPos - 1, false );
+
+    // Добавляем в новую гиперссылку Right элемент и NewContent
+    var Count = NewContent.length;
+    for ( var Pos = 0; Pos < Count; Pos++ )
+        NewHyperlink.Add_ToContent( Pos, NewContent[Pos], false );
+
+    NewHyperlink.Add_ToContent( 0, NewElement, false );
+
+    return NewHyperlink;
+};
+
+ParaHyperlink.prototype.Split2 = function(CurPos)
+{
+    // Создаем новый ран
+    var NewRun = new ParaRun(this.Paragraph);
+
+    // Копируем настройки
+    NewRun.Set_Pr( this.Pr.Copy() );
+
+    // TODO: Как только избавимся от para_End переделать тут
+    // Проверим, если наш ран содержит para_End, тогда мы должны para_End переметить в правый ран
+
+    var CheckEndPos = -1;
+    var CheckEndPos2 = Math.min( CurPos, this.Content.length );
+    for ( var Pos = 0; Pos < CheckEndPos2; Pos++ )
+    {
+        if ( para_End === this.Content[Pos].Type )
+        {
+            CheckEndPos = Pos;
+            break;
+        }
+    }
+
+    if ( -1 !== CheckEndPos )
+        CurPos = CheckEndPos;
+
+    // Разделяем содержимое по ранам
+    NewRun.Concat_ToContent( this.Content.slice(CurPos) );
+    this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
+
+    // Если были точки орфографии, тогда переместим их в новый ран
+    var SpellingMarksCount = this.SpellingMarks.length;
+    for ( var Index = 0; Index < SpellingMarksCount; Index++ )
+    {
+        var Mark    = this.SpellingMarks[Index];
+        var MarkPos = ( true === Mark.Start ? Mark.Element.StartPos.Get(Mark.Depth) : Mark.Element.EndPos.Get(Mark.Depth) );
+
+        if ( MarkPos >= CurPos )
+        {
+            var MarkElement = Mark.Element;
+            if ( true === Mark.Start )
+            {
+                MarkElement.ClassesS[Mark.Depth]       = NewRun;
+                MarkElement.StartPos.Data[Mark.Depth] -= CurPos;
+            }
+            else
+            {
+                MarkElement.ClassesE[Mark.Depth]     = NewRun;
+                MarkElement.EndPos.Data[Mark.Depth] -= CurPos;
+            }
+
+            NewRun.SpellingMarks.push( Mark );
+
+            this.SpellingMarks.splice( Index, 1 );
+            SpellingMarksCount--;
+            Index--;
+        }
+    }
+
+    return NewRun;
+};
+//-----------------------------------------------------------------------------------
+// Функции пересчета
+//-----------------------------------------------------------------------------------
+ParaHyperlink.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    if ( this.Paragraph !== PRS.Paragraph )
+    {
+        this.Paragraph = PRS.Paragraph;
+        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+    }
+
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    // Добавляем информацию о новом отрезке
+    var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
+    var RangeEndPos   = 0;
+
+    var ContentLen = this.Content.length;
+    var Pos = RangeStartPos;
+    for ( ; Pos < ContentLen; Pos++ )
+    {
+        var Item = this.Content[Pos];
+
+        if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos )
+        {
+            Item.Recalculate_Reset( PRS.Range, PRS.Line );
+        }
+
+        PRS.Update_CurPos( Pos, Depth );
+        Item.Recalculate_Range( PRS, ParaPr, Depth + 1 );
+
+        if ( true === PRS.NewRange )
+        {
+            RangeEndPos = Pos;
+            break;
+        }
+    }
+
+    if ( Pos >= ContentLen )
+    {
+        RangeEndPos = Pos - 1;
+    }
+
+    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+};
+
+ParaHyperlink.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
+{
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+    var CurPos   = PRP.Get(Depth);
+
+    this.protected_FillRangeEndPos(CurLine, CurRange, CurPos);
+
+    this.Content[CurPos].Recalculate_Set_RangeEndPos( PRS, PRP, Depth + 1 );
+};
+
+ParaHyperlink.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Recalculate_Range_Width( PRSC, _CurLine, _CurRange );
+    }
+};
+
+ParaHyperlink.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Recalculate_Range_Spaces( PRSA, _CurLine, _CurRange, _CurPage );
+    }
+};
+
+ParaHyperlink.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Recalculate_PageEndInfo( PRSI, _CurLine, _CurRange );
+    }
+};
+
+ParaHyperlink.prototype.Save_RecalculateObject = function(Copy)
+{
+    var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+    RecalcObj.Save_Lines( this, Copy );
+    RecalcObj.Save_Content( this, Copy );
+    return RecalcObj;
+};
+
+ParaHyperlink.prototype.Load_RecalculateObject = function(RecalcObj)
+{
+    RecalcObj.Load_Lines( this );
+    RecalcObj.Load_Content( this );
+};
+
+ParaHyperlink.prototype.Prepare_RecalculateObject = function()
+{
+    this.protected_ClearLines();
+
+    var Count = this.Content.length;
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        this.Content[Index].Prepare_RecalculateObject();
+    }
+};
+
+ParaHyperlink.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        if ( false === this.Content[CurPos].Is_EmptyRange(_CurLine, _CurRange) )
+            return false;
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Check_Range_OnlyMath = function(Checker, _CurRange, _CurLine)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Check_Range_OnlyMath(Checker, _CurRange, _CurLine);
+
+        if (false === Checker.Result)
+            break;
+    }
+};
+
+ParaHyperlink.prototype.Check_MathPara = function(Checker)
+{
+    var Count = this.Content.length;
+    if ( Checker.Direction > 0 )
+    {
+        for ( var CurPos = 0; CurPos < Count; CurPos++ )
+        {
+            if ( this.Content[CurPos].Check_MathPara )
+            {
+                this.Content[CurPos].Check_MathPara( MathParaChecker );
+
+                if ( false !== MathParaChecker.Found )
+                    break;
+            }
+        }
+    }
+    else
+    {
+        for ( var CurPos = Count - 1; CurPos >= 0; CurPos-- )
+        {
+            if ( this.Content[CurPos].Check_MathPara )
+            {
+                this.Content[CurPos].Check_MathPara( MathParaChecker );
+
+                if ( false !== MathParaChecker.Found )
+                    break;
+            }
+        }
+    }
+};
+
+ParaHyperlink.prototype.Check_PageBreak = function()
+{
+    var Count = this.Content.length;
+    for (var Pos = 0; Pos < Count; Pos++)
+    {
+        if (true === this.Content[Pos].Check_PageBreak())
+            return true;
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Check_BreakPageInRange = function(_CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        if ( true === this.Content[CurPos].Check_BreakPageInRange(_CurLine, _CurRange) )
+            return true;
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Check_BreakPageEnd = function(PBChecker)
+{
+    var ContentLen = this.Content.length;
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+    {
+        var Element = this.Content[CurPos];
+
+        if ( true !== Element.Check_BreakPageEnd(PBChecker) )
+            return false;
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
+{
+    var Pos = ContentPos.Get(Depth);
+
+    return this.Content[Pos].Get_ParaPosByContentPos( ContentPos, Depth + 1 );
+};
+
+ParaHyperlink.prototype.Recalculate_CurPos = function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+    var X = _X;
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        var Item = this.Content[CurPos];
+        var Res = Item.Recalculate_CurPos( X, Y, (true === CurrentRun && CurPos === this.State.ContentPos ? true : false), _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget );
+
+        if ( true === CurrentRun && CurPos === this.State.ContentPos )
+            return Res;
+        else
+            X = Res.X;
+    }
+
+    return { X : X };
+};
+
+ParaHyperlink.prototype.Refresh_RecalcData = function(Data)
+{
+    if (undefined !== this.Paragraph && null !== this.Paragraph)
+        this.Paragraph.Refresh_RecalcData2(0);
+};
+
+ParaHyperlink.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+{
+    var Count = this.Content.length;
+    for ( var Pos = 0; Pos < Count; Pos++ )
+    {
+        this.Content[Pos].Recalculate_MinMaxContentWidth(MinMax);
+    }
+};
+
+ParaHyperlink.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Get_Range_VisibleWidth(RangeW, _CurLine, _CurRange);
+    }
+};
+
+ParaHyperlink.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Shift_Range(Dx, Dy, _CurLine, _CurRange);
+    }
+};
+//-----------------------------------------------------------------------------------
+// Функции отрисовки
+//-----------------------------------------------------------------------------------
+ParaHyperlink.prototype.Draw_HighLights = function(PDSH)
+{
+    var CurLine  = PDSH.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSH.Range - this.StartRange : PDSH.Range );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Draw_HighLights( PDSH );
+    }
+};
+
+ParaHyperlink.prototype.Draw_Elements = function(PDSE)
+{
+    PDSE.VisitedHyperlink = this.Visited;
+
+    var CurLine  = PDSE.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Draw_Elements( PDSE );
+    }
+
+    PDSE.VisitedHyperlink = false;
+};
+
+ParaHyperlink.prototype.Draw_Lines = function(PDSL)
+{
+    PDSL.VisitedHyperlink = this.Visited;
+
+    var CurLine  = PDSL.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Draw_Lines( PDSL );
+    }
+
+    PDSL.VisitedHyperlink = false;
+};
+//-----------------------------------------------------------------------------------
+// Функции для работы с курсором
+//-----------------------------------------------------------------------------------
+ParaHyperlink.prototype.Is_CursorPlaceable = function()
+{
+    return true;
+};
+
+ParaHyperlink.prototype.Cursor_Is_Start = function()
+{
+    var ContentLen = this.Content.length;
+    var CurPos = 0;
+
+    while ( CurPos < this.State.ContentPos && CurPos < this.Content.length - 1 )
+    {
+        if ( true === this.Content[CurPos].Is_Empty() )
+            CurPos++;
+        else
+            return false;
+    }
+
+    return this.Content[CurPos].Cursor_Is_Start();
+};
+
+ParaHyperlink.prototype.Cursor_Is_NeededCorrectPos = function()
+{
+    return false;
+};
+
+ParaHyperlink.prototype.Cursor_Is_End = function()
+{
+    var CurPos = this.Content.length - 1;
+
+    while ( CurPos > this.State.ContentPos && CurPos > 0 )
+    {
+        if ( true === this.Content[CurPos].Is_Empty() )
+            CurPos--;
+        else
+            return false;
+    }
+
+    return this.Content[CurPos].Cursor_Is_End();
+};
+
+ParaHyperlink.prototype.Cursor_MoveToStartPos = function()
+{
+    this.State.ContentPos = 0;
+
+    if ( this.Content.length > 0 )
+    {
+        this.Content[0].Cursor_MoveToStartPos();
+    }
+};
+
+ParaHyperlink.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+{
+    var ContentLen = this.Content.length;
+
+    if ( ContentLen > 0 )
+    {
+        this.State.ContentPos = ContentLen - 1;
+        this.Content[ContentLen - 1].Cursor_MoveToEndPos( SelectFromEnd );
+    }
+};
+
+ParaHyperlink.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var Result = false;
+
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        var Item = this.Content[CurPos];
+
+        if ( false === SearchPos.InText )
+            SearchPos.InTextPos.Update2( CurPos, Depth );
+
+        if ( true === Item.Get_ParaContentPosByXY( SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd ) )
+        {
+            SearchPos.Pos.Update2( CurPos, Depth );
+            Result = true;
+        }
+    }
+
+    return Result;
+};
+
+ParaHyperlink.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+{
+    var Pos = ( true === bSelection ? ( true === bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) : this.State.ContentPos );
+    ContentPos.Add( Pos );
+
+    this.Content[Pos].Get_ParaContentPos( bSelection, bStart, ContentPos );
+};
+
+ParaHyperlink.prototype.Set_ParaContentPos = function(ContentPos, Depth)
+{
+    var Pos = ContentPos.Get(Depth);
+
+    if ( Pos >= this.Content.length )
+        Pos = this.Content.length - 1;
+
+    if ( Pos < 0 )
+        Pos = 0;
+
+    this.State.ContentPos = Pos;
+
+    this.Content[Pos].Set_ParaContentPos( ContentPos, Depth + 1 );
+};
+
+ParaHyperlink.prototype.Get_PosByElement = function(Class, ContentPos, Depth, UseRange, Range, Line)
+{
+    if ( this === Class )
+        return true;
+
+    var ContentPos = new CParagraphContentPos();
+
+    var StartPos = 0;
+    var EndPos   = this.Content.length - 1;
+
+    if ( true === UseRange )
+    {
+        var CurLine  = Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? Range - this.StartRange : Range );
+
+        if (CurLine >= 0 && CurLine < this.protected_GetLinesCount() && CurRange >= 0 && CurRange < this.protected_GetRangesCount(CurLine))
+        {
+            StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+            EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+        }
+    }
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        var Element = this.Content[CurPos];
+
+        ContentPos.Update( CurPos, Depth );
+
+        if ( true === Element.Get_PosByElement(Class, ContentPos, Depth + 1, true, CurRange, CurLine) )
+            return true;
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Get_PosByDrawing = function(Id, ContentPos, Depth)
+{
+    var Count = this.Content.length;
+    for ( var CurPos = 0; CurPos < Count; CurPos++ )
+    {
+        var Element = this.Content[CurPos];
+
+        ContentPos.Update( CurPos, Depth );
+
+        if ( true === Element.Get_PosByDrawing(Id, ContentPos, Depth + 1) )
+            return true;
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Get_RunElementByPos = function(ContentPos, Depth)
+{
+    if ( undefined !== ContentPos )
+    {
+        var Pos = ContentPos.Get(Depth);
+
+        return this.Content[Pos].Get_RunElementByPos( ContentPos, Depth + 1 );
+    }
+    else
+    {
+        var Count = this.Content.length;
+        if ( Count <= 0 )
+            return null;
+
+        var Pos = 0;
+        var Element = this.Content[Pos];
+
+        while ( null === Element && Pos < Count - 1 )
+            Element = this.Content[++Pos];
+
+        return Element;
+    }
+};
+
+ParaHyperlink.prototype.Get_LastRunInRange = function(_CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    if (CurLine < this.protected_GetLinesCount() && CurRange < this.protected_GetRangesCount(CurLine))
+    {
+        var LastItem = this.Content[this.protected_GetRangeEndPos(CurLine, CurRange)];
+        if ( undefined !== LastItem )
+            return LastItem.Get_LastRunInRange(_CurLine, _CurRange);
+    }
+
+    return null;
+};
+
+ParaHyperlink.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+
+    this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+    SearchPos.Pos.Update( CurPos, Depth );
+
+    if ( true === SearchPos.Found )
+        return true;
+
+    CurPos--;
+
+    while ( CurPos >= 0 )
+    {
+        this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
+        SearchPos.Pos.Update( CurPos, Depth );
+
+        if ( true === SearchPos.Found )
+            return true;
+
+        CurPos--;
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+
+    this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
+    SearchPos.Pos.Update( CurPos, Depth );
+
+    if ( true === SearchPos.Found )
+        return true;
+
+    CurPos++;
+
+    var Count = this.Content.length;
+    while ( CurPos < this.Content.length )
+    {
+        this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
+        SearchPos.Pos.Update( CurPos, Depth );
+
+        if ( true === SearchPos.Found )
+            return true;
+
+        CurPos++;
+    }
+
+    return false;
+};
+
+ParaHyperlink.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+
+    this.Content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+
+    if ( true === SearchPos.UpdatePos )
+        SearchPos.Pos.Update( CurPos, Depth );
+
+    if ( true === SearchPos.Found )
+        return;
+
+    CurPos--;
+
+    var Count = this.Content.length;
+    while ( CurPos >= 0 )
+    {
+        this.Content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, false);
+
+        if ( true === SearchPos.UpdatePos )
+            SearchPos.Pos.Update( CurPos, Depth );
+
+        if ( true === SearchPos.Found )
+            return;
+
+        CurPos--;
+    }
+};
+
+ParaHyperlink.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+
+    this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
+
+    if ( true === SearchPos.UpdatePos )
+        SearchPos.Pos.Update( CurPos, Depth );
+
+    if ( true === SearchPos.Found )
+        return;
+
+    CurPos++;
+
+    var Count = this.Content.length;
+    while ( CurPos < Count )
+    {
+        this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
+
+        if ( true === SearchPos.UpdatePos )
+            SearchPos.Pos.Update( CurPos, Depth );
+
+        if ( true === SearchPos.Found )
+            return;
+
+        CurPos++;
+    }
+};
+
+ParaHyperlink.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var EndPos = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    if ( EndPos >= this.Content.length || EndPos < 0 )
+        return false;
+
+    var Result = this.Content[EndPos].Get_EndRangePos( _CurLine, _CurRange, SearchPos, Depth + 1 );
+
+    if ( true === Result )
+        SearchPos.Pos.Update( EndPos, Depth );
+
+    return Result;
+
+};
+
+ParaHyperlink.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+
+    if ( StartPos >= this.Content.length || StartPos < 0 )
+        return false;
+
+    var Result = this.Content[StartPos].Get_StartRangePos( _CurLine, _CurRange, SearchPos, Depth + 1 );
+
+    if ( true === Result )
+        SearchPos.Pos.Update( StartPos, Depth );
+
+    return Result;
+};
+
+ParaHyperlink.prototype.Get_StartRangePos2 = function(_CurLine, _CurRange, ContentPos, Depth)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var Pos = this.protected_GetRangeStartPos(CurLine, CurRange);
+
+    ContentPos.Update( Pos, Depth );
+
+    this.Content[Pos].Get_StartRangePos2( _CurLine, _CurRange, ContentPos, Depth + 1 );
+};
+
+ParaHyperlink.prototype.Get_StartPos = function(ContentPos, Depth)
+{
+    if ( this.Content.length > 0 )
+    {
+        ContentPos.Update( 0, Depth );
+
+        this.Content[0].Get_StartPos( ContentPos, Depth + 1 );
+    }
+};
+
+ParaHyperlink.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
+{
+    var ContentLen = this.Content.length;
+    if ( ContentLen > 0 )
+    {
+        ContentPos.Update( ContentLen - 1, Depth );
+
+        this.Content[ContentLen - 1].Get_EndPos( BehindEnd, ContentPos, Depth + 1 );
+    }
+};
+//-----------------------------------------------------------------------------------
+// Функции для работы с селектом
+//-----------------------------------------------------------------------------------
+ParaHyperlink.prototype.Set_SelectionContentPos = function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
+{
+    var Selection = this.State.Selection;
+
+    var OldStartPos = Selection.StartPos;
+    var OldEndPos   = Selection.EndPos;
+
+    if ( OldStartPos > OldEndPos )
+    {
+        OldStartPos = Selection.EndPos;
+        OldEndPos   = Selection.StartPos;
+    }
+
+    var StartPos = 0;
+    switch (StartFlag)
+    {
+        case  1: StartPos = 0; break;
+        case -1: StartPos = this.Content.length - 1; break;
+        case  0: StartPos = StartContentPos.Get(Depth); break;
+    }
+
+    var EndPos = 0;
+    switch (EndFlag)
+    {
+        case  1: EndPos = 0; break;
+        case -1: EndPos = this.Content.length - 1; break;
+        case  0: EndPos = EndContentPos.Get(Depth); break;
+    }
+
+    // Удалим отметки о старом селекте
+    if ( OldStartPos < StartPos && OldStartPos < EndPos )
+    {
+        var TempLimit = Math.min( StartPos, EndPos );
+        for ( var CurPos = OldStartPos; CurPos < TempLimit; CurPos++ )
+        {
+            this.Content[CurPos].Selection_Remove();
+        }
+    }
+
+    if ( OldEndPos > StartPos && OldEndPos > EndPos )
+    {
+        var TempLimit = Math.max( StartPos, EndPos );
+        for ( var CurPos = TempLimit + 1; CurPos <= OldEndPos; CurPos++ )
+        {
+            this.Content[CurPos].Selection_Remove();
+        }
+    }
+
+    // Выставим метки нового селекта
+
+    Selection.Use      = true;
+    Selection.StartPos = StartPos;
+    Selection.EndPos   = EndPos;
+
+    if ( StartPos != EndPos )
+    {
+        this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, StartFlag, StartPos > EndPos ? 1 : -1 );
+        this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, StartPos > EndPos ? -1 : 1, EndFlag );
+
+        var _StartPos = StartPos;
+        var _EndPos   = EndPos;
+        var Direction = 1;
+
+        if ( _StartPos > _EndPos )
+        {
+            _StartPos = EndPos;
+            _EndPos   = StartPos;
+            Direction = -1;
+        }
+
+        for ( var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Select_All( Direction );
+        }
+    }
+    else
+    {
+        this.Content[StartPos].Set_SelectionContentPos( StartContentPos, EndContentPos, Depth + 1, StartFlag, EndFlag );
+    }
+};
+
+ParaHyperlink.prototype.Selection_IsUse = function()
+{
+    return this.State.Selection.Use;
+};
+
+ParaHyperlink.prototype.Selection_Stop = function()
+{
+};
+
+ParaHyperlink.prototype.Selection_Remove = function()
+{
+    var Selection = this.State.Selection;
+
+    if ( true === Selection.Use )
+    {
+        var StartPos = Selection.StartPos;
+        var EndPos   = Selection.EndPos;
+
+        if ( StartPos > EndPos )
+        {
+            StartPos = Selection.EndPos;
+            EndPos   = Selection.StartPos;
+        }
+
+        StartPos = Math.max( 0, StartPos );
+        EndPos   = Math.min( this.Content.length - 1, EndPos );
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            this.Content[CurPos].Selection_Remove();
+        }
+    }
+
+    Selection.Use      = false;
+    Selection.StartPos = 0;
+    Selection.EndPos   = 0;
+};
+
+ParaHyperlink.prototype.Select_All = function(Direction)
+{
+    var ContentLen = this.Content.length;
+
+    var Selection = this.State.Selection;
+
+    Selection.Use = true;
+
+    if ( -1 === Direction )
+    {
+        Selection.StartPos = this.Content.length - 1;
+        Selection.EndPos   = 0;
+    }
+    else
+    {
+        Selection.StartPos = 0;
+        Selection.EndPos   = this.Content.length - 1;
+    }
+
+    for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
+    {
+        this.Content[CurPos].Select_All( Direction );
+    }
+};
+
+ParaHyperlink.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        this.Content[CurPos].Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
+    }
+};
+
+ParaHyperlink.prototype.Selection_IsEmpty = function(CheckEnd)
+{
+    var StartPos = this.State.Selection.StartPos;
+    var EndPos   = this.State.Selection.EndPos;
+
+    if ( StartPos > EndPos )
+    {
+        StartPos = this.State.Selection.EndPos;
+        EndPos   = this.State.Selection.StartPos;
+    }
+
+    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+    {
+        if ( false === this.Content[CurPos].Selection_IsEmpty(CheckEnd) )
+            return false;
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Selection_CheckParaEnd = function()
+{
+    // В гиперссылку не должен попадать ParaEnd
+
+    return false;
+};
+
+ParaHyperlink.prototype.Is_SelectedAll = function(Props)
+{
+    var Selection = this.State.Selection;
+
+    if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
+        return false;
+
+    var StartPos = Selection.StartPos;
+    var EndPos   = Selection.EndPos;
+
+    if ( EndPos < StartPos )
+    {
+        StartPos = Selection.EndPos;
+        EndPos   = Selection.StartPos;
+    }
+
+    for ( var Pos = 0; Pos <= StartPos; Pos++ )
+    {
+        if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+            return false;
+    }
+
+    var Count = this.Content.length;
+    for ( var Pos = EndPos; Pos < Count; Pos++ )
+    {
+        if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+            return false;
+    }
+
+    return true;
+};
+
+ParaHyperlink.prototype.Selection_CorrectLeftPos = function(Direction)
+{
+    if ( false === this.Selection.Use || true === this.Is_Empty( { SkipAnchor : true } ) )
+        return true;
+
+    var Selection = this.State.Selection;
+    var StartPos = Math.min( Selection.StartPos, Selection.EndPos );
+    var EndPos   = Math.max( Selection.StartPos, Selection.EndPos );
+
+    for ( var Pos = 0; Pos < StartPos; Pos++ )
+    {
+        if ( true !== this.Content[Pos].Is_Empty( { SkipAnchor : true } ) )
+            return false;
+    }
+
+    for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+    {
+        if ( true === this.Content[Pos].Selection_CorrectLeftPos(Direction) )
+        {
+            if ( 1 === Direction )
+                this.Selection.StartPos = Pos + 1;
+            else
+                this.Selection.EndPos   = Pos + 1;
+
+            this.Content[Pos].Selection_Remove();
+        }
+        else
+            return false;
+    }
+
+    return true;
+};
+//-----------------------------------------------------------------------------------
+// Работаем со значениями
+//-----------------------------------------------------------------------------------
+ParaHyperlink.prototype.Get_Text = function(Text)
+{
+    var ContentLen = this.Content.length;
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+    {
+        this.Content[CurPos].Get_Text( Text );
+    }
+};
+
+ParaHyperlink.prototype.Set_Visited = function(Value)
+{
+    this.Visited = Value;
+};
+
+ParaHyperlink.prototype.Get_Visited = function()
+{
+    return this.Visited;
+};
+
+ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
+{
+    History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
+    this.ToolTip = ToolTip;
+};
+
+ParaHyperlink.prototype.Get_ToolTip = function()
+{
+    if ( null === this.ToolTip )
+    {
+        if ( "string" === typeof(this.Value) )
+            return this.Value;
+        else
+            return "";
+    }
+    else
+        return this.ToolTip;
+};
+
+ParaHyperlink.prototype.Get_Value = function()
+{
+    return this.Value;
+};
+
+ParaHyperlink.prototype.Set_Value = function(Value)
+{
+    History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
+    this.Value = Value;
+};
 
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Undo : function(Data)
+ParaHyperlink.prototype.Undo = function(Data)
+{
+    var Type = Data.Type;
+    switch(Type)
     {
-        var Type = Data.Type;
-        switch(Type)
+        case historyitem_Hyperlink_AddItem :
         {
-            case historyitem_Hyperlink_AddItem :
-            {
-                this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
+            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
 
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
-                break;
-            }
-
-            case historyitem_Hyperlink_RemoveItem :
-            {
-                var Pos = Data.Pos;
-
-                var Array_start = this.Content.slice( 0, Pos );
-                var Array_end   = this.Content.slice( Pos );
-
-                this.Content = Array_start.concat( Data.Items, Array_end );
-
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-                break;
-            }
-
-            case historyitem_Hyperlink_Value :
-            {
-                this.Value = Data.Old;
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                this.ToolTip = Data.Old;
-                break;
-            }
+            break;
         }
-    },
 
-    Redo : function(Data)
+        case historyitem_Hyperlink_RemoveItem :
+        {
+            var Pos = Data.Pos;
+
+            var Array_start = this.Content.slice( 0, Pos );
+            var Array_end   = this.Content.slice( Pos );
+
+            this.Content = Array_start.concat( Data.Items, Array_end );
+
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+            break;
+        }
+
+        case historyitem_Hyperlink_Value :
+        {
+            this.Value = Data.Old;
+            break;
+        }
+
+        case historyitem_Hyperlink_ToolTip :
+        {
+            this.ToolTip = Data.Old;
+            break;
+        }
+    }
+};
+
+ParaHyperlink.prototype.Redo = function(Data)
+{
+    var Type = Data.Type;
+    switch(Type)
     {
-        var Type = Data.Type;
-        switch(Type)
+        case historyitem_Hyperlink_AddItem :
         {
-            case historyitem_Hyperlink_AddItem :
-            {
-                var Pos = Data.Pos;
+            var Pos = Data.Pos;
 
-                var Array_start = this.Content.slice( 0, Pos );
-                var Array_end   = this.Content.slice( Pos );
+            var Array_start = this.Content.slice( 0, Pos );
+            var Array_end   = this.Content.slice( Pos );
 
-                this.Content = Array_start.concat( Data.Items, Array_end );
+            this.Content = Array_start.concat( Data.Items, Array_end );
 
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
-                break;
-            }
-
-            case historyitem_Hyperlink_RemoveItem :
-            {
-                this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-                break;
-            }
-
-            case historyitem_Hyperlink_Value :
-            {
-                this.Value = Data.New;
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                this.ToolTip = Data.New;
-                break;
-            }
+            break;
         }
-    },
+
+        case historyitem_Hyperlink_RemoveItem :
+        {
+            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
+
+            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+            break;
+        }
+
+        case historyitem_Hyperlink_Value :
+        {
+            this.Value = Data.New;
+            break;
+        }
+
+        case historyitem_Hyperlink_ToolTip :
+        {
+            this.ToolTip = Data.New;
+            break;
+        }
+    }
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
+ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
+{
+    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+    // Long : тип класса
+    // Long : тип изменений
+
+    Writer.WriteLong( historyitem_type_Hyperlink );
+
+    var Type = Data.Type;
+
+    // Пишем тип
+    Writer.WriteLong( Type );
+
+    switch(Type)
     {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( historyitem_type_Hyperlink );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch(Type)
+        case historyitem_Hyperlink_AddItem :
         {
-            case historyitem_Hyperlink_AddItem :
+            // Long     : Количество элементов
+            // Array of :
+            //  {
+            //    Long     : Позиция
+            //    Variable : Id элемента
+            //  }
+
+            var bArray = Data.UseArray;
+            var Count  = Data.Items.length;
+
+            Writer.WriteLong( Count );
+
+            for ( var Index = 0; Index < Count; Index++ )
             {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long     : Позиция
-                //    Variable : Id элемента
-                //  }
+                if ( true === bArray )
+                    Writer.WriteLong( Data.PosArray[Index] );
+                else
+                    Writer.WriteLong( Data.Pos + Index );
 
-                var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
+                Writer.WriteString2( Data.Items[Index].Get_Id() );
+            }
 
-                Writer.WriteLong( Count );
+            break;
+        }
 
-                for ( var Index = 0; Index < Count; Index++ )
+        case historyitem_Hyperlink_RemoveItem :
+        {
+            // Long          : Количество удаляемых элементов
+            // Array of Long : позиции удаляемых элементов
+
+            var bArray = Data.UseArray;
+            var Count  = Data.Items.length;
+
+            var StartPos = Writer.GetCurPosition();
+            Writer.Skip(4);
+            var RealCount = Count;
+
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                if ( true === bArray )
                 {
-                    if ( true === bArray )
+                    if ( false === Data.PosArray[Index] )
+                        RealCount--;
+                    else
                         Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
-
-                    Writer.WriteString2( Data.Items[Index].Get_Id() );
                 }
-
-                break;
+                else
+                    Writer.WriteLong( Data.Pos );
             }
 
-            case historyitem_Hyperlink_RemoveItem :
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
+            var EndPos = Writer.GetCurPosition();
+            Writer.Seek( StartPos );
+            Writer.WriteLong( RealCount );
+            Writer.Seek( EndPos );
 
-                var bArray = Data.UseArray;
-                var Count  = Data.Items.length;
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var RealCount = Count;
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                    {
-                        if ( false === Data.PosArray[Index] )
-                            RealCount--;
-                        else
-                            Writer.WriteLong( Data.PosArray[Index] );
-                    }
-                    else
-                        Writer.WriteLong( Data.Pos );
-                }
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( RealCount );
-                Writer.Seek( EndPos );
-
-                break;
-            }
-
-            case historyitem_Hyperlink_Value :
-            {
-                // String : Value
-                Writer.WriteString2( Data.New );
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                // String : ToolTip
-                Writer.WriteString2( Data.New );
-
-                break;
-            }
+            break;
         }
-    },
 
-    Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_Hyperlink != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
+        case historyitem_Hyperlink_Value :
         {
-            case historyitem_Hyperlink_AddItem :
-            {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long     : Позиция
-                //    Variable : Id Элемента
-                //  }
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
-                    var Element = g_oTableId.Get_ById( Reader.GetString2() );
-
-                    if ( null != Element )
-                    {
-                        this.Content.splice( Pos, 0, Element );
-                    }
-                }
-
-                if ( null !== this.Paragraph && undefined !== this.Paragraph )
-                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-                break;
-            }
-
-            case historyitem_Hyperlink_RemoveItem:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
-
-                    // действие совпало, не делаем его
-                    if ( false === ChangesPos )
-                        continue;
-
-                    this.Content.splice( ChangesPos, 1 );
-                }
-
-                if ( null !== this.Paragraph && undefined !== this.Paragraph )
-                    this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-                break;
-            }
-
-            case historyitem_Hyperlink_Value:
-            {
-                // String : Value
-                this.Value = Reader.GetString2();
-                break;
-            }
-
-            case historyitem_Hyperlink_ToolTip :
-            {
-                // String : ToolTip
-                this.ToolTip = Reader.GetString2();
-
-                break;
-            }
+            // String : Value
+            Writer.WriteString2( Data.New );
+            break;
         }
-    },
 
-    Write_ToBinary2 : function(Writer)
-    {
-        Writer.WriteLong( historyitem_type_Hyperlink );
-
-        // String : Id
-        // String : Value
-        // String : ToolTip
-        // Long   : Количество элементов
-        // Array of Strings : массив с Id элементов
-
-        Writer.WriteString2( this.Id );
-        if(!(editor && editor.isDocumentEditor))
+        case historyitem_Hyperlink_ToolTip :
         {
-            this.Write_ToBinary2SpreadSheets(Writer);
-            return;
+            // String : ToolTip
+            Writer.WriteString2( Data.New );
+
+            break;
         }
-
-        Writer.WriteString2( this.Value );
-        Writer.WriteString2( this.ToolTip );
-
-        var Count = this.Content.length;
-        Writer.WriteLong( Count );
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            Writer.WriteString2( this.Content[Index].Get_Id() );
-        }
-    },
-
-    Read_FromBinary2 : function(Reader)
-    {
-        // String : Id
-        // String : Value
-        // String : ToolTip
-        // Long   : Количество элементов
-        // Array of Strings : массив с Id элементов
-
-        this.Id      = Reader.GetString2();
-        this.Value   = Reader.GetString2();
-        this.ToolTip = Reader.GetString2();
-
-        var Count = Reader.GetLong();
-        this.Content = [];
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = g_oTableId.Get_ById( Reader.GetString2() );
-            if ( null !== Element )
-                this.Content.push( Element );
-        }
-    },
-
-    Write_ToBinary2SpreadSheets : function(Writer)
-    {
-        Writer.WriteString2("");
-        Writer.WriteString2("");
-        Writer.WriteLong(0);
     }
+};
+
+ParaHyperlink.prototype.Load_Changes = function(Reader)
+{
+    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+    // Long : тип класса
+    // Long : тип изменений
+
+    var ClassType = Reader.GetLong();
+    if ( historyitem_type_Hyperlink != ClassType )
+        return;
+
+    var Type = Reader.GetLong();
+
+    switch ( Type )
+    {
+        case historyitem_Hyperlink_AddItem :
+        {
+            // Long     : Количество элементов
+            // Array of :
+            //  {
+            //    Long     : Позиция
+            //    Variable : Id Элемента
+            //  }
+
+            var Count = Reader.GetLong();
+
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+                if ( null != Element )
+                {
+                    this.Content.splice( Pos, 0, Element );
+                }
+            }
+
+            if ( null !== this.Paragraph && undefined !== this.Paragraph )
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+            break;
+        }
+
+        case historyitem_Hyperlink_RemoveItem:
+        {
+            // Long          : Количество удаляемых элементов
+            // Array of Long : позиции удаляемых элементов
+
+            var Count = Reader.GetLong();
+
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+
+                // действие совпало, не делаем его
+                if ( false === ChangesPos )
+                    continue;
+
+                this.Content.splice( ChangesPos, 1 );
+            }
+
+            if ( null !== this.Paragraph && undefined !== this.Paragraph )
+                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+            break;
+        }
+
+        case historyitem_Hyperlink_Value:
+        {
+            // String : Value
+            this.Value = Reader.GetString2();
+            break;
+        }
+
+        case historyitem_Hyperlink_ToolTip :
+        {
+            // String : ToolTip
+            this.ToolTip = Reader.GetString2();
+
+            break;
+        }
+    }
+};
+
+ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
+{
+    Writer.WriteLong( historyitem_type_Hyperlink );
+
+    // String : Id
+    // String : Value
+    // String : ToolTip
+    // Long   : Количество элементов
+    // Array of Strings : массив с Id элементов
+
+    Writer.WriteString2( this.Id );
+    if(!(editor && editor.isDocumentEditor))
+    {
+        this.Write_ToBinary2SpreadSheets(Writer);
+        return;
+    }
+
+    Writer.WriteString2( this.Value );
+    Writer.WriteString2( this.ToolTip );
+
+    var Count = this.Content.length;
+    Writer.WriteLong( Count );
+
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        Writer.WriteString2( this.Content[Index].Get_Id() );
+    }
+};
+
+ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
+{
+    // String : Id
+    // String : Value
+    // String : ToolTip
+    // Long   : Количество элементов
+    // Array of Strings : массив с Id элементов
+
+    this.Id      = Reader.GetString2();
+    this.Value   = Reader.GetString2();
+    this.ToolTip = Reader.GetString2();
+
+    var Count = Reader.GetLong();
+    this.Content = [];
+
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var Element = g_oTableId.Get_ById( Reader.GetString2() );
+        if ( null !== Element )
+            this.Content.push( Element );
+    }
+};
+
+ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
+{
+    Writer.WriteString2("");
+    Writer.WriteString2("");
+    Writer.WriteLong(0);
 };
 
 

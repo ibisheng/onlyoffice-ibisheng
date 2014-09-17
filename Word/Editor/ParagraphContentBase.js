@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created by Ilja.Kirillov
  * Date: 27.08.14
@@ -25,9 +27,20 @@ function CParagraphContentWithContentBase()
     // Пример. 2 строки, в первой строке 3 отрезка, во второй строке 1 отрезок
     // this.Lines = [2, 0, 6, 0, 15, 15, 17, 17, 20, 20, 25];
     this.Lines = [0];
+
+    this.StartLine   = -1;
+    this.StartRange  = -1;
 }
 
 Asc.extendClass(CParagraphContentWithContentBase, CParagraphContentBase);
+
+CParagraphContentWithContentBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
+{
+    this.StartLine   = StartLine;
+    this.StartRange  = StartRange;
+
+    this.protected_ClearLines();
+};
 
 CParagraphContentWithContentBase.prototype.protected_ClearLines = function()
 {
@@ -74,8 +87,13 @@ CParagraphContentWithContentBase.prototype.protected_AddRange = function(LineInd
         var RangeOffset = this.protected_GetRangeOffset(LineIndex, 0) + RangeIndex * 2;
         this.Lines.splice(RangeOffset, this.Lines.length - RangeOffset);
 
-        if (this.Lines[0] !== LineIndex + 1)
+        if (this.Lines[0] !== LineIndex + 1 && 0 === RangeIndex)
             this.Lines.splice(LineIndex + 1, this.Lines[0] - LineIndex);
+        else if (this.Lines[0] !== LineIndex + 1 && 0 !== RangeIndex)
+        {
+            this.Lines.splice(LineIndex + 2, this.Lines[0] - LineIndex - 1);
+            this.Lines[0] = LineIndex + 1;
+        }
     }
 
     if (0 === RangeIndex)

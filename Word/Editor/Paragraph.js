@@ -2701,8 +2701,13 @@ Paragraph.prototype =
 
     },
 
-    Recalculate_Page : function(_PageIndex)
+    Recalculate_Page : function(_PageIndex, bFast)
     {
+        if (undefined === bFast)
+            bFast = false;
+
+        this.m_oPRSA.RecalcFast2 = bFast;
+
         this.Clear_NearestPosArray();
 
         // Во время пересчета сбрасываем привязку курсора к строке.
@@ -13711,6 +13716,14 @@ CDocumentBounds.prototype =
         this.Top    += Dy;
         this.Left   += Dx;
         this.Right  += Dx;
+    },
+
+    Compare : function(Other)
+    {
+        if (Math.abs(Other.Bottom - this.Bottom) > 0.001 || Math.abs(Other.Top - this.Top) > 0.001 || Math.abs(Other.Left - this.Left) > 0.001 || Math.abs(Other.Right - this.Right))
+            return false;
+
+        return true;
     }
 };
 
@@ -14256,6 +14269,7 @@ function CParagraphRecalculateStateAlign()
     this.PageY         = 0;
 
     this.RecalcFast    = false; // Если пересчет быстрый, тогда все "плавающие" объекты мы не трогаем
+    this.RecalcFast2   = false; // Второй вариант быстрого пересчета
 }
 
 function CParagraphRecalculateStateInfo()
@@ -14653,10 +14667,8 @@ function CRunRecalculateObject(StartLine, StartRange)
 {
     this.StartLine   = StartLine;
     this.StartRange  = StartRange
-
     this.Lines       = [];
-
-    this.Content = [];
+    this.Content     = [];
 }
 
 

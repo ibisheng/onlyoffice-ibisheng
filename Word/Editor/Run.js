@@ -29,9 +29,6 @@ function ParaRun(Paragraph, bMathRun)
     this.Descent     = 0; // общий descent
     this.YOffset     = 0; // смещение по Y
 
-    this.StartLine   = -1; // Строка, с которой начинается данный ран
-    this.StartRange  = -1;
-
     this.CollaborativeMarks = new CRunCollaborativeMarks();
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
 
@@ -1392,15 +1389,6 @@ ParaRun.prototype.Remove_StartTabs = function(TabsCounter)
 //-----------------------------------------------------------------------------------
 // Функции пересчета
 //-----------------------------------------------------------------------------------   
-// Выставляем начальную строку и обнуляем массив строк
-ParaRun.prototype.Recalculate_Reset = function(StartRange, StartLine)
-{
-    this.StartLine   = StartLine;
-    this.StartRange  = StartRange;
-
-    this.protected_ClearLines();
-};
-
 // Пересчитываем размеры всех элементов
 ParaRun.prototype.Recalculate_MeasureContent = function()
 {
@@ -1427,13 +1415,7 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
         var Item = this.Content[Pos];
         var ItemType = Item.Type;
 
-        /*if (para_Text === ItemType || para_Space === ItemType)
-        {
-            var ParaItem = Item.Measure(g_oTextMeasurer, Pr);
-            this.Content[Pos] = ParaItem;
-            continue;
-        }
-        else*/ if (para_Drawing === ItemType)
+        if (para_Drawing === ItemType)
         {
             Item.Parent          = this.Paragraph;
             Item.DocumentContent = this.Paragraph.Parent;
@@ -2349,6 +2331,23 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     {
                         // Если у нас быстрый пересчет, тогда мы не трогаем плавающие картинки
                         // TODO: Если здесь привязка к символу, тогда быстрый пересчет надо отменить
+                        break;
+                    }
+
+                    if (true === PRSA.RecalcFast2)
+                    {
+                        // Тут мы должны сравнить положение картинок
+
+                        var oRecalcObj = Item.Save_RecalculateObject();
+                        Item.Update_Position( new CParagraphLayout( PRSA.X, PRSA.Y , Page_abs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits);
+
+                        if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
+                        {
+                            // Положение картинок не совпало, отправляем пересчет текущей страницы.
+                            PRSA.RecalcResult = recalcresult_CurPage;
+                            return;
+                        }
+
                         break;
                     }
 

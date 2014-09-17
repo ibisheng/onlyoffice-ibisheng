@@ -642,6 +642,9 @@ function CDocument(DrawingDocument)
     // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
     this.Spelling = new CDocumentSpelling();
 
+    // Дополнительные настройки
+    this.UseTextShd = true; // Использовать ли заливку текста
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -955,7 +958,7 @@ CDocument.prototype =
                 var Res  = Para.Recalculate_Fast( SimpleChanges );
                 if ( -1 !== Res )
                 {
-                    //console.log( "Fast Recalc " + Res );
+                    //console.log( "Fast Range Recalc " + Res );
                     
                     // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
                     // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
@@ -984,7 +987,36 @@ CDocument.prototype =
                     return;
                 }
             }
+
+            if (SimpleChanges.length >= 1)
+            {
+                var Run  = SimpleChanges[0].Class;
+                var Para = Run.Paragraph;
+
+                if (1 === Para.Pages.length)
+                {
+                    var nPageNum = Para.Get_StartPage_Absolute();
+
+                    var OldBounds = Para.Pages[0].Bounds;
+                    var FastRecalcResult = Para.Recalculate_Page(nPageNum);
+
+                    if (FastRecalcResult === recalcresult_NextElement && 1 === Para.Pages.length && true === Para.Pages[0].Bounds.Compare(OldBounds))
+                    {
+                        //console.log( "Fast Paragraph Recalc " + Res );
+
+                        // Перерисуем страницу, на которой произошли изменения
+                        this.DrawingDocument.OnRecalculatePage( nPageNum, this.Pages[nPageNum] );
+                        this.DrawingDocument.OnEndRecalculate( false, true );
+
+                        History.Reset_RecalcIndex();
+
+                        return;
+                    }
+                }
+            }
         }
+
+        //console.log( "Long Recalc " + Res );
 
         // Очищаем данные пересчета
         this.RecalcInfo.Reset();
@@ -5970,7 +6002,7 @@ CDocument.prototype =
                         var StartPos = this.Selection.StartPos;
                         var EndPos   = this.Selection.EndPos;
                         
-                        if ( StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
+                        if (true === this.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
                         {
                             this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );                            
                             this.Recalculate();
@@ -13593,6 +13625,11 @@ CDocument.prototype =
         }
         
         this.Recalculate();
+    },
+
+    Set_UseTextShd : function(bUse)
+    {
+        this.UseTextShd = bUse;
     }
 };
 

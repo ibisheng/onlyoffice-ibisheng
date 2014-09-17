@@ -5484,7 +5484,7 @@ CDocumentContent.prototype =
                         var StartPos = this.Selection.StartPos;
                         var EndPos   = this.Selection.EndPos;
 
-                        if ( StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
+                        if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
                         {
                             this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );
                             this.Parent.OnContentRecalculate( false );
