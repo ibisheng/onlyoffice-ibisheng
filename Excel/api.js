@@ -569,7 +569,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isAutoSave = !!isAutoSave;
 			if (!this.isAutoSave) {
 				this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
 			}
 			// Нужно закрыть редактор
 			this.asc_closeCellEditor();
@@ -579,9 +578,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-			// Если не автосохранение, то не забываем закрыть Block-сообщение
-			if (!this.isAutoSave)
-				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 			this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			this.canSave = true;
 			this.isAutoSave = false;
@@ -1898,10 +1894,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var t = this;
 			var nState;
 			if (false == e["saveLock"]) {
-				if (this.isAutoSave) {
+				if (this.isAutoSave)
 					this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-					this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-				}
 
 				// Принимаем чужие изменения
 				t.collaborativeEditing.applyChanges();
@@ -1920,21 +1914,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wb._onWSSelectionChanged(/*info*/null);
 				}
 
-				// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
-				// Но сохранять до прихода ответа от сервера не сможет
-				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-				// Если не автосохранение, то продолжаем показывать Block-сообщение
-				if (!this.isAutoSave)
-					this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 				this.asc_OnSaveEnd(true);
 			} else {
 				nState = t.CoAuthoringApi.get_state();
 				if (3 === nState) {
 					// Отключаемся от сохранения, соединение потеряно
-					if (!this.isAutoSave) {
-						this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+					if (!this.isAutoSave)
 						this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-					}
 					this.isAutoSave = false;
 					this.canSave = true;
 				} else {
@@ -1946,12 +1932,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 
 					setTimeout(function () {
-						t.CoAuthoringApi.askSaveChanges(function (event) {
-							// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
-							window.setTimeout(function () {
-								t.onSaveCallback(event);
-							}, 10);
-						});
+						t.CoAuthoringApi.askSaveChanges(function (event) { t.onSaveCallback(event); });
 					}, 1000);
 				}
 			}
@@ -3180,10 +3161,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			}
 			var isFastSave = !this.collaborativeEditing.getCollaborativeEditing();
 			var gap = new Date() - this.lastSaveTime - (isFastSave ? this.autoSaveGapFast : this.autoSaveGapSlow);
-			if (0 <= gap) {
-				//isFastSave ? this.onSaveCallback() : this.asc_Save(true);
+			if (0 <= gap)
 				this.asc_Save(true);
-			}
 		};
 
 		spreadsheet_api.prototype._onUpdateDocumentCanSave = function () {

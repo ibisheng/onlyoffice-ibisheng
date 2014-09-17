@@ -21,8 +21,7 @@ var c_oAscAsyncAction = {
 	DownloadAs			: 6,
 	Print				: 7, // конвертация в PDF и сохранение у пользователя
 	UploadImage			: 8,
-	ApplyChanges		: 9, // применение изменений от другого пользователя.
-	PrepareToSave		: 10 // Подготовка к сохранению
+	ApplyChanges		: 9  // применение изменений от другого пользователя.
 };
 //files type for Saving & DownloadAs
 var c_oAscFileType = {

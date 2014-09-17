@@ -57,8 +57,7 @@ var c_oAscAsyncAction = {
 	Print				: 7, // конвертация в PDF и сохранение у пользователя
 	UploadImage			: 8,
     LoadTheme			: 9,
-	ApplyChanges		: 10, // применение изменений от другого пользователя.
-	PrepareToSave		: 11  // Подготовка к сохранению
+	ApplyChanges		: 10 // применение изменений от другого пользователя.
 };
 
 var c_oAscVertAlignJc = {

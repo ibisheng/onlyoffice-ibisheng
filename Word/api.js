@@ -2816,85 +2816,85 @@ function safe_Apply_Changes()
     }
 }
 
-function OnSave_Callback(e)
-{
-	var nState;
-    if ( false == e["saveLock"] ) {
-		if (editor.isAutoSave) {
-			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-		}
-
-        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
-            CollaborativeEditing.Clear_CollaborativeMarks();
-
-        // Принимаем чужие изменения
-        safe_Apply_Changes();
-
-        // Сохраняем файл на сервер
-        var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
-
-        if (undefined != window['qtDocBridge']) {
-            var data = oBinaryFileWriter.Write();
-            // push data to native QT code
-            window['qtDocBridge']['savedDocument'] (data);
-            
-        } else {
-            /*var oAdditionalData = {};
-			oAdditionalData["c"] = "save";
-			oAdditionalData["id"] = documentId;
-			oAdditionalData["userid"] = documentUserId;
-            oAdditionalData["vkey"] = documentVKey;
-            oAdditionalData["outputformat"] = documentFormatSave;
-			if(c_oAscFileType.TXT == documentFormatSaveTxtCodepage)
-				oAdditionalData["codepage"] = documentFormatSaveTxtCodepage;
-			oAdditionalData["innersave"] = true;
-			var data = oBinaryFileWriter.Write();
-			oAdditionalData["savetype"] = "completeall";
-			////uncoment to save changes only instead send file complete
-            //var data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
-			//oAdditionalData["savetype"] = "changes";
-			oAdditionalData["data"] = data;
-            sendCommand(editor, function(incomeObject){
-				if(null != incomeObject && "save" == incomeObject["type"])
-					editor.processSavedFile(incomeObject["data"], true);
-			}, oAdditionalData);*/
-        }
-
-		// Пересылаем свои изменения
-		CollaborativeEditing.Send_Changes();
-		//Обратно выставляем, что документ не модифицирован
-		editor.SetUnchangedDocument();
-
-		// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
-		// Но сохранять до прихода ответа от сервера не сможет
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-		// Если не автосохранение, то продолжаем показывать Block-сообщение
-		if (!editor.isAutoSave)
-			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-		editor.asc_OnSaveEnd(true);
-    } else {
-		nState = editor.CoAuthoringApi.get_state();
-		if (3 === nState) {
-			// Отключаемся от сохранения, соединение потеряно
-			if (!editor.isAutoSave) {
-				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-				editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			}
-			editor.isAutoSave = false;
-			editor.canSave = true;
-		} else {
-			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
-			if (editor.isAutoSave) {
-				editor.isAutoSave = false;
-				editor.canSave = true;
-				return;
-			}
-			
-        	setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback ); }, 1000 );
-		}
-    }
-}
+//function OnSave_Callback(e)
+//{
+//	var nState;
+//    if ( false == e["saveLock"] ) {
+//		if (editor.isAutoSave) {
+//			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+//			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+//		}
+//
+//        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
+//            CollaborativeEditing.Clear_CollaborativeMarks();
+//
+//        // Принимаем чужие изменения
+//        safe_Apply_Changes();
+//
+//        // Сохраняем файл на сервер
+//        var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
+//
+//        if (undefined != window['qtDocBridge']) {
+//            var data = oBinaryFileWriter.Write();
+//            // push data to native QT code
+//            window['qtDocBridge']['savedDocument'] (data);
+//
+//        } else {
+//            /*var oAdditionalData = {};
+//			oAdditionalData["c"] = "save";
+//			oAdditionalData["id"] = documentId;
+//			oAdditionalData["userid"] = documentUserId;
+//            oAdditionalData["vkey"] = documentVKey;
+//            oAdditionalData["outputformat"] = documentFormatSave;
+//			if(c_oAscFileType.TXT == documentFormatSaveTxtCodepage)
+//				oAdditionalData["codepage"] = documentFormatSaveTxtCodepage;
+//			oAdditionalData["innersave"] = true;
+//			var data = oBinaryFileWriter.Write();
+//			oAdditionalData["savetype"] = "completeall";
+//			////uncoment to save changes only instead send file complete
+//            //var data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
+//			//oAdditionalData["savetype"] = "changes";
+//			oAdditionalData["data"] = data;
+//            sendCommand(editor, function(incomeObject){
+//				if(null != incomeObject && "save" == incomeObject["type"])
+//					editor.processSavedFile(incomeObject["data"], true);
+//			}, oAdditionalData);*/
+//        }
+//
+//		// Пересылаем свои изменения
+//		CollaborativeEditing.Send_Changes();
+//		//Обратно выставляем, что документ не модифицирован
+//		editor.SetUnchangedDocument();
+//
+//		// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
+//		// Но сохранять до прихода ответа от сервера не сможет
+//		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+//		// Если не автосохранение, то продолжаем показывать Block-сообщение
+//		if (!editor.isAutoSave)
+//			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+//		editor.asc_OnSaveEnd(true);
+//    } else {
+//		nState = editor.CoAuthoringApi.get_state();
+//		if (3 === nState) {
+//			// Отключаемся от сохранения, соединение потеряно
+//			if (!editor.isAutoSave) {
+//				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+//				editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+//			}
+//			editor.isAutoSave = false;
+//			editor.canSave = true;
+//		} else {
+//			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+//			if (editor.isAutoSave) {
+//				editor.isAutoSave = false;
+//				editor.canSave = true;
+//				return;
+//			}
+//
+//        	setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback ); }, 1000 );
+//		}
+//    }
+//}
 
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);

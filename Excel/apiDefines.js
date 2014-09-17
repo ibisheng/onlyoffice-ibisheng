@@ -86,8 +86,7 @@ var c_oAscAsyncAction = {
 	Print				: 7,  //конвертация в PDF и сохранение у пользователя
 	UploadImage			: 8,
 	Recalc				: 9,
-	SlowOperation		: 10,
-	PrepareToSave		: 11  // Подготовка к сохранению
+	SlowOperation		: 10
 };
 
 var c_oAscAlignType = {
