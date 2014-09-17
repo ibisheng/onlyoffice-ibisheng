@@ -832,26 +832,50 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
     if ( para_Math_Run === this.Type )
         return false;
 
-    if ( Changes.length !== 1 || undefined === Changes[0].Data.Items || Changes[0].Data.Items.length !== 1 )
-        return false;
+    var ParaPos = null;
 
-    var Type = Changes[0].Data.Type;
-    var Item = Changes[0].Data.Items[0];
+    var Count = Changes.length;
+    for (var Index = 0; Index < Count; Index++)
+    {
+        var Data = Changes[Index].Data;
 
-    if ( undefined === Item )
-        return false;
+        if (undefined === Data.Items || 1 !== Data.Items.length)
+            return false;
 
-    // Добавление/удаление картинок может изменить размер строки. Добавление/удаление переноса строки/страницы/колонки
-    // нельзя обсчитывать функцией Recalculate_Fast.
-    // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
-    var ItemType = Item.Type;
-    if ( para_Drawing === ItemType || para_NewLine === ItemType )
-        return false;
+        var Type = Data.Type;
+        var Item = Data.Items[0];
 
-    if ( historyitem_ParaRun_AddItem === Type || historyitem_ParaRun_RemoveItem === Type )
-        return true;
+        if (undefined === Item)
+            return false;
 
-    return false;
+        if (historyitem_ParaRun_AddItem !== Type && historyitem_ParaRun_RemoveItem !== Type)
+            return false;
+
+        // Добавление/удаление картинок может изменить размер строки. Добавление/удаление переноса строки/страницы/колонки
+        // нельзя обсчитывать функцией Recalculate_Fast.
+        // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
+        var ItemType = Item.Type;
+        if (para_Drawing === ItemType || para_NewLine === ItemType)
+            return false;
+
+        // Проверяем, что все изменения произошли в одном и том же отрезке
+        var CurParaPos = this.Get_SimpleChanges_ParaPos([Changes[Index]]);
+        if (null === CurParaPos)
+            return false;
+
+        if (null === ParaPos)
+            ParaPos = CurParaPos;
+        else if (ParaPos.Line !== CurParaPos.Line || ParaPos.Range !== CurParaPos.Range)
+            return false;
+    }
+
+    if (Changes.length > 1)
+    {
+        // Все изменения одинаковые здесь, достаточно оставить одно
+        Changes.length = 1;
+    }
+
+    return true;
 };
 
 // Возвращаем строку и отрезок, в котором произошли простейшие изменения
