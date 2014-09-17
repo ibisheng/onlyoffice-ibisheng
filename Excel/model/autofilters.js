@@ -3651,7 +3651,7 @@ var gUndoInsDelCellsFlag = true;
 				for(var s = 0; s < arrLog.length; s++)
 				{
 					if(valLog[s] === undefined)
-						continue;
+						valLog[s] = "";
 					
 					var checkComplexSymbols = this._parseComplexSpecSymbols(val, arrLog[s], valLog[s],type);
 					var filterVal;
