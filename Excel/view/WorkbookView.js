@@ -340,7 +340,9 @@
 					// AutoComplete
 					"showAutoComplete":				function () {self._onShowAutoComplete.apply(self, arguments);},
 					"popUpSelectorKeyDown":			function (event) {return self._onPopUpSelectorKeyDown(event);},
-					"isPopUpSelectorOpen":			function () {return self.popUpSelector.getVisible();}
+					"isPopUpSelectorOpen":			function () {return self.popUpSelector.getVisible();},
+
+					"onContextMenu":				function (event) {self.handlers.trigger("asc_onContextMenu", event);}
 			    });
 
 				if (this.input && this.input.addEventListener) {

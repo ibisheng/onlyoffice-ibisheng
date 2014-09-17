@@ -1203,6 +1203,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		 * asc_onUpdateTabColor			(index)												- эвент об обновлении цвета иконки листа
 		 * asc_onDocumentCanSaveChanged	(bIsCanSave)										- эвент об обновлении статуса "можно ли сохранять файл"
 		 * asc_onDocumentUpdateVersion	(callback)											- эвент о том, что файл собрался и не может больше редактироваться
+		 * asc_onContextMenu			(event)												- эвент на контекстное меню
 		 */
 
 		spreadsheet_api.prototype.asc_StartAction = function (type, id) {

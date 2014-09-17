@@ -935,6 +935,11 @@
 					}
 					return true;
 
+				case 93:
+					stop();
+					this.handlers.trigger('onContextMenu', event);
+					return result;
+
 				default:
 					// При зажатом Ctrl не вводим символ
 					if (!ctrlKey) {t.skipKeyPress = false;}
