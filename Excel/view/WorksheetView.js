@@ -2651,20 +2651,24 @@
 			// ToDo в одну функцию
 			function drawBorderHor(border, x1, y, x2) {
 				if (border.s !== c_oAscBorderStyles.None) {
-					if (bc !== border.c) {
+					if (!g_oColorManager.isEqual(bc, border.c)) {
+						if (isNotFirst)
+							ctx.stroke();
+
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
 						isStroke = true;
 					}
 					if (bw !== border.w) {
+						if (isNotFirst)
+							ctx.stroke();
+
 						bw = border.w;
 						ctx.setLineWidth(border.w);
 						isStroke = true;
 					}
 
-					if (isNotFirst && isStroke)
-						ctx.stroke().beginPath();
-					else if (!isNotFirst) {
+					if (isStroke || !isNotFirst) {
 						isNotFirst = true;
 						ctx.beginPath();
 					}
@@ -2676,20 +2680,24 @@
 
 			function drawBorderVer(border, x1, y1, y2) {
 				if (border.s !== c_oAscBorderStyles.None) {
-					if (bc !== border.c) {
+					if (!g_oColorManager.isEqual(bc, border.c)) {
+						if (isNotFirst)
+							ctx.stroke();
+
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
 						isStroke = true;
 					}
 					if (bw !== border.w) {
+						if (isNotFirst)
+							ctx.stroke();
+
 						bw = border.w;
 						ctx.setLineWidth(border.w);
 						isStroke = true;
 					}
 
-					if (isNotFirst && isStroke)
-						ctx.stroke().beginPath();
-					else if (!isNotFirst) {
+					if (isStroke || !isNotFirst) {
 						isNotFirst = true;
 						ctx.beginPath();
 					}
@@ -2701,20 +2709,24 @@
 
 			function drawDiagonal(border, x1, y1, x2, y2) {
 				if (border.s !== c_oAscBorderStyles.None) {
-					if (bc !== border.c) {
+					if (!g_oColorManager.isEqual(bc, border.c)) {
+						if (isNotFirst)
+							ctx.stroke();
+
 						bc = border.c;
 						ctx.setStrokeStyle(bc);
 						isStroke = true;
 					}
 					if (bw !== border.w) {
+						if (isNotFirst)
+							ctx.stroke();
+
 						bw = border.w;
 						ctx.setLineWidth(border.w);
 						isStroke = true;
 					}
 
-					if (isNotFirst && isStroke)
-						ctx.stroke().beginPath();
-					else if (!isNotFirst) {
+					if (isStroke || !isNotFirst) {
 						isNotFirst = true;
 						ctx.beginPath();
 					}
