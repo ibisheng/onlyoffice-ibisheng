@@ -4772,6 +4772,9 @@ PasteProcessor.prototype =
                     {
                         if(-1 != text_decoration.indexOf("underline"))
                             underline = true;
+						else if(-1 != text_decoration.indexOf("none") && node.parentElement && node.parentElement.nodeName.toLowerCase() == "a")
+							underline = false;	
+							
                         if(-1 != text_decoration.indexOf("line-through"))
                             Strikeout = true;
                     }
@@ -5829,6 +5832,22 @@ PasteProcessor.prototype =
                         TextPr.Underline = true;
                         oHyperlink.Apply_TextPr( TextPr, undefined, true );
                     }
+					
+					//проставляем rStyle
+					if(oHyperlink.Content && oHyperlink.Content.length)
+					{
+						if(this.oLogicDocument && this.oLogicDocument.Styles && this.oLogicDocument.Styles.Default && this.oLogicDocument.Styles.Default.Hyperlink && this.oLogicDocument.Styles.Style)
+						{
+							var hyperLinkStyle = this.oLogicDocument.Styles.Default.Hyperlink;
+							
+							for(var k = 0; k < oHyperlink.Content.length; k++)
+							{
+								if(oHyperlink.Content[k].Type == para_Run)
+									oHyperlink.Content[k].Set_RStyle(hyperLinkStyle);
+							}
+						}
+					}
+					
                     this._Paragraph_Add(oHyperlink);
                 }
             }
