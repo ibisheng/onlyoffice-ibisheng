@@ -232,19 +232,19 @@ CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
             _len -= 2;
         }
 
-        ctx_tInactive.putImageData( _data, 0, 0 );
+        ctx_tInactive.putImageData( _data, 0, -1 );
 
-        ctx_lInactive.translate( _radx - 1, _rady + 2 );
+        ctx_lInactive.translate( _radx, _rady + 1 );
         ctx_lInactive.rotate( -Math.PI / 2 );
         ctx_lInactive.translate( -_radx, -_rady );
         ctx_lInactive.drawImage( this.ImageTop[index], 0, 0 );
 
-        ctx_rInactive.translate( _radx + 2, _rady + 1 );
+        ctx_rInactive.translate( _radx + 1, _rady );
         ctx_rInactive.rotate( Math.PI / 2 );
         ctx_rInactive.translate( -_radx, -_rady );
         ctx_rInactive.drawImage( this.ImageTop[index], 0, 0 );
 
-        ctx_bInactive.translate( _radx + 1, _rady + 3 );
+        ctx_bInactive.translate( _radx + 1, _rady + 1 );
         ctx_bInactive.rotate( Math.PI );
         ctx_bInactive.translate( -_radx, -_rady );
         ctx_bInactive.drawImage( this.ImageTop[index], 0, 0 );
@@ -265,13 +265,13 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
     var img = this.ImageTop[mode],
         x = 0, y = 0, is_vertical = true,
         bottomRightDelta = 1,
-        xDeltaIMG = 0, yDeltaIMG = 0, xDeltaBORDER = 0.5, yDeltaBORDER = 2.5;
+        xDeltaIMG = 0, yDeltaIMG = 0, xDeltaBORDER = 0.5, yDeltaBORDER = 1.5;
 
     switch ( type ) {
         case ScrollArrowType.ARROW_LEFT:
         {
             x = 1;
-            y = -2;
+            y = -1;
             is_vertical = false;
             img = this.ImageLeft[mode];
             break;
@@ -280,18 +280,18 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
         {
             is_vertical = false;
             x = w - this.SizeW - bottomRightDelta;
-            y = -2;
+            y = -1;
             img = this.ImageRight[mode];
             break;
         }
         case ScrollArrowType.ARROW_BOTTOM:
         {
-            y = h - this.SizeH - bottomRightDelta - 2;
+            y = h - this.SizeH - bottomRightDelta - 1;
             img = this.ImageBottom[mode];
             break;
         }
         default:
-            y = -1;
+            y = 0;
             break;
     }
 
@@ -301,7 +301,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
 
     ctx.fillStyle = this.ColorBackNone;
-    ctx.fillRect( x + 0, y + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+    ctx.fillRect( x, y, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
     ctx.beginPath();
 
     switch ( mode ) {
@@ -696,7 +696,7 @@ ScrollObject.prototype = {
         if ( this.isVerticalScroll ) {
             if ( this.settings.showArrows ) {
                 this.verticalTrackHeight = this.canvasH - this.arrowPosition * 2;
-                this.scroller.y = this.arrowPosition + 1;
+                this.scroller.y = this.arrowPosition;
             }
             else {
                 this.verticalTrackHeight = this.canvasH;
@@ -705,7 +705,7 @@ ScrollObject.prototype = {
             var percentInViewV;
 
             percentInViewV = (this.maxScrollY + this.paneHeight ) / this.paneHeight;
-            this.scroller.h = Math.ceil( 1 / percentInViewV * this.verticalTrackHeight ) + 1;
+            this.scroller.h = Math.ceil( 1 / percentInViewV * this.verticalTrackHeight );
 
             if ( this.scroller.h < this.settings.scrollerMinHeight )
                 this.scroller.h = this.settings.scrollerMinHeight;
@@ -715,7 +715,7 @@ ScrollObject.prototype = {
             if ( startpos ) {
                 this.scroller.y = startpos / this.scrollCoeff + this.arrowPosition;
             }
-            this.dragMaxY = this.canvasH - this.arrowPosition - this.scroller.h;
+            this.dragMaxY = this.canvasH - this.arrowPosition - this.scroller.h + 1;
             this.dragMinY = this.arrowPosition;
         }
 
@@ -812,7 +812,7 @@ ScrollObject.prototype = {
             evt.scrollD = evt.scrollPositionY = that.scrollVCurrentY;
             evt.maxScrollY = that.maxScrollY;
 
-            that._drawArrow();
+//            that._drawArrow();
             that._draw();
             that.handleEvents( "onscrollvertical", evt );
         }
@@ -856,7 +856,7 @@ ScrollObject.prototype = {
             evt.scrollD = evt.scrollPositionX = that.scrollHCurrentX;
             evt.maxScrollX = that.maxScrollX;
 
-            that._drawArrow();
+//            that._drawArrow();
             that._draw();
             that.handleEvents( "onscrollhorizontal", evt );
         }
@@ -904,9 +904,11 @@ ScrollObject.prototype = {
             this.scroller.y = this.dragMaxY;
 
         var arrow = this.settings.showArrows ? this.arrowPosition : 0;
-        if ( this.scroller.y + this.scroller.h > this.canvasH - arrow - 2 ) {
-            this.scroller.y -= Math.abs( this.canvasH - arrow - 2 - this.scroller.y - this.scroller.h );
+        if ( this.scroller.y + this.scroller.h > this.canvasH - arrow ) {
+            this.scroller.y -= Math.abs( this.canvasH - arrow - this.scroller.y - this.scroller.h );
         }
+
+        this.scroller.y = Math.round(this.scroller.y);
 
         if ( vend ) {
             this.moveble = true;
@@ -928,9 +930,11 @@ ScrollObject.prototype = {
             this.scroller.y = this.dragMaxY;
 
         var arrow = this.settings.showArrows ? this.arrowPosition : 0;
-        if ( this.scroller.y + this.scroller.h > this.canvasH - arrow - 2 ) {
-            this.scroller.y -= Math.abs( this.canvasH - arrow - 2 - this.scroller.y - this.scroller.h );
+        if ( this.scroller.y + this.scroller.h > this.canvasH - arrow ) {
+            this.scroller.y -= Math.abs( this.canvasH - arrow - this.scroller.y - this.scroller.h );
         }
+
+        this.scroller.y = Math.round(this.scroller.y);
 
         this._scrollV( this, {}, destY, false, false );
     },
@@ -962,6 +966,13 @@ ScrollObject.prototype = {
         else if ( this.scroller.x > this.dragMaxX )
             this.scroller.x = this.dragMaxX;
 
+        var arrow = this.settings.showArrows ? this.arrowPosition : 0;
+        if ( this.scroller.x + this.scroller.w > this.canvasW - arrow ) {
+            this.scroller.x -= Math.abs( this.canvasW - arrow - this.scroller.x - this.scroller.w );
+        }
+
+        this.scroller.x = Math.round(this.scroller.x);
+
         if ( hend ) {
             this.moveble = true;
         }
@@ -980,6 +991,13 @@ ScrollObject.prototype = {
             this.scroller.x = this.dragMinX + 1;
         else if ( this.scroller.x > this.dragMaxX )
             this.scroller.x = this.dragMaxX;
+
+        var arrow = this.settings.showArrows ? this.arrowPosition : 0;
+        if ( this.scroller.x + this.scroller.w > this.canvasW - arrow ) {
+            this.scroller.x -= Math.abs( this.canvasW - arrow - this.scroller.x - this.scroller.w );
+        }
+
+        this.scroller.x = Math.round(this.scroller.x);
 
         this._scrollH( this, {}, destX, false, false );
     },
@@ -1255,13 +1273,13 @@ ScrollObject.prototype = {
                 if ( _y < arrow ) {
                     _y = arrow;
                 }
-                var _b = (that.scroller.y + that.scroller.h) >> 0;
+                var _b = Math.round(that.scroller.y + that.scroller.h)// >> 0;
                 if ( _b > (that.canvasH - arrow - 1) ) {
                     _b = that.canvasH - arrow - 1;
                 }
 
                 if ( _b > _y ) {
-                    that.roundRect( that.scroller.x - 0.5, _y + 0.5, that.scroller.w - 1, _b - _y + 1 );
+                    that.roundRect( that.scroller.x - 0.5, _y + 0.5, that.scroller.w - 1, that.scroller.h - 1, 0 );
                 }
             }
             else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
@@ -1271,11 +1289,11 @@ ScrollObject.prototype = {
                 }
                 var _r = (that.scroller.x + that.scroller.w) >> 0;
                 if ( _r > (that.canvasW - arrow - 2) ) {
-                    _r = that.canvasW - arrow - 2;
+                    _r = that.canvasW - arrow - 1;
                 }
 
                 if ( _r > _x ) {
-                    that.roundRect( _x + 0.5, that.scroller.y - 0.5, _r - _x + 1, that.scroller.h - 1 );
+                    that.roundRect( _x + 0.5, that.scroller.y - 0.5, that.scroller.w - 1, that.scroller.h - 1, 0 );
                 }
             }
         }
@@ -1299,7 +1317,7 @@ ScrollObject.prototype = {
                 _h = this.canvasH - (_y << 1);
 
             if ( _h > 0 ) {
-                this.context.rect( 0, _y, this.canvasW, _h + 1 );
+                this.context.rect( 0, _y, this.canvasW, _h/* + 1*/ );
             }
         }
         else if ( this.isHorizontalScroll ) {
@@ -1307,7 +1325,7 @@ ScrollObject.prototype = {
                 _w = this.canvasW - (_x << 1);
 
             if ( _w > 0 ) {
-                this.context.rect( _x - 1, 0, _w + 1, this.canvasH );
+                this.context.rect( _x/* - 1*/, 0, _w /*+ 1*/, this.canvasH );
             }
         }
 
