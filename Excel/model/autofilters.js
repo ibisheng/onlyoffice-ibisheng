@@ -6681,6 +6681,7 @@ var gUndoInsDelCellsFlag = true;
 							findFilters[i].FilterColumns = data[i].FilterColumns;
 							
 						//при перемещении меняем массив кнопок
+						var changeButtonArray = [];
 						if(this.allButtonAF)
 						{
 							var buttons = this.allButtonAF;
@@ -6701,12 +6702,23 @@ var gUndoInsDelCellsFlag = true;
 											break;
 										}
 									}
-									buttons[n].inFilter = newRange;
-									buttons[n].id = id ? id : this._shiftId(buttons[n].id, diffCol, diffRow);
-									buttons[n].idNext = idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow);
+									
+									changeButtonArray[n] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
 								}
 							}
 						}
+						
+						//при изменении кнопок, чтобы не было наложений, создаём массив changeButtonArray и изменяем сразу все нужные кнопки
+						for(var b in changeButtonArray)
+						{
+							if(buttons && buttons[b])
+							{
+								buttons[b].inFilter = changeButtonArray[b].inFilter;
+								buttons[b].id = changeButtonArray[b].id;
+								buttons[b].idNext = changeButtonArray[b].idNext;
+							}
+						}
+						
 						if(!data)
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
@@ -7177,7 +7189,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					this.isEmptyAutoFilters(arnTo);
 				}
-				else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo))//если задеваем часть а/ф областью вставки
+				else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo) && !aWs.AutoFilter.Ref.isEqual(arnFrom))//если задеваем часть а/ф областью вставки
 				{
 					this._deleteAutoFilter();
 				}
