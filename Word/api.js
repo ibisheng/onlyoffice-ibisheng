@@ -6470,6 +6470,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         {
             this.isPasteFonts_Images = false;
             this.pasteImageMap = null;
+			History.Create_NewPoint();
             this.pasteCallback();
             window.GlobalPasteFlag = false;
             window.GlobalPasteFlagCounter = 0;
@@ -6695,6 +6696,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
     {
         // никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
         // там при LongActions теряется фокус и вставляются пробелы
+		History.Create_NewPoint();
         this.pasteCallback();
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
