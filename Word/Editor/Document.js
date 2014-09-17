@@ -955,11 +955,9 @@ CDocument.prototype =
                 var Run  = SimpleChanges[0].Class;
                 var Para = Run.Paragraph;
 
-                var Res  = Para.Recalculate_Fast( SimpleChanges );
+                var Res  = Para.Recalculate_Fast_Range( SimpleChanges );
                 if ( -1 !== Res )
                 {
-                    //console.log( "Fast Range Recalc " + Res );
-                    
                     // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
                     // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
                     if ( Res === Para.Get_StartPage_Absolute() + Para.Pages.length - 1 )
@@ -988,35 +986,48 @@ CDocument.prototype =
                 }
             }
 
+            // TODO: Тут надо вставить заглушку, что если у нас в долгом пересчете находится страница <= PageIndex + 1,
+            //       по отношению к данной, тогда не надо делать быстрый пересчет.
             if (SimpleChanges.length >= 1)
             {
                 var Run  = SimpleChanges[0].Class;
                 var Para = Run.Paragraph;
 
-                if (1 === Para.Pages.length)
+                var FastPages = Para.Recalculate_Fast_WholeParagraph();
+                var FastPagesCount = FastPages.length;
+
+                if (FastPagesCount > 0)
                 {
-                    var nPageNum = Para.Get_StartPage_Absolute();
-
-                    var OldBounds = Para.Pages[0].Bounds;
-                    var FastRecalcResult = Para.Recalculate_Page(nPageNum);
-
-                    if (FastRecalcResult === recalcresult_NextElement && 1 === Para.Pages.length && true === Para.Pages[0].Bounds.Compare(OldBounds))
+                    // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
+                    // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
+                    var NextElement = Para.Get_DocumentNext();
+                    var LastFastPage = FastPages[FastPagesCount - 1];
+                    if (null !== NextElement && true === this.Pages[LastFastPage].Check_EndSectionPara(NextElement))
                     {
-                        //console.log( "Fast Paragraph Recalc " + Res );
+                        var LastVisibleBounds = Para.Get_LastRangeVisibleBounds();
 
-                        // Перерисуем страницу, на которой произошли изменения
-                        this.DrawingDocument.OnRecalculatePage( nPageNum, this.Pages[nPageNum] );
-                        this.DrawingDocument.OnEndRecalculate( false, true );
+                        var ___X = LastVisibleBounds.X + LastVisibleBounds.W;
+                        var ___Y = LastVisibleBounds.Y;
 
-                        History.Reset_RecalcIndex();
-
-                        return;
+                        // Делаем предел по X минимум 10 мм, чтобы всегда было видно элемент разрыва секции
+                        NextElement.Reset(___X, ___Y, Math.max(___X + 10, NextElement.XLimit), 10000, LastFastPage);
+                        NextElement.Recalculate_Page(LastFastPage);
                     }
+
+                    for (var Index = 0; Index < FastPagesCount; Index++)
+                    {
+                        var PageIndex = FastPages[Index];
+                        this.DrawingDocument.OnRecalculatePage(PageIndex, this.Pages[PageIndex]);
+                    }
+
+                    this.DrawingDocument.OnEndRecalculate( false, true );
+                    History.Reset_RecalcIndex();
+                    return;
                 }
             }
         }
 
-        //console.log( "Long Recalc " + Res );
+        //console.log( "Long Recalc " );
 
         // Очищаем данные пересчета
         this.RecalcInfo.Reset();

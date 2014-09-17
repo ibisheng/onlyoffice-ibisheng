@@ -125,6 +125,7 @@
                 "../../Word/Editor/Hyperlink.js",
                 "../../Word/Editor/FlowObjects.js",
                 "../../Word/Editor/Paragraph.js",
+                "../../Word/Editor/Paragraph_Recalculate.js",
                 "../../Word/Editor/Document.js",
                 "../../Word/Editor/DocumentContent.js",
                 "../../Word/Editor/HeaderFooter.js",
