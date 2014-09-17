@@ -13627,6 +13627,10 @@ CDocument.prototype =
         this.Recalculate();
     },
 
+    /**
+     * Определяем использовать ли заливку текста в особых случаях, когда вызывается заливка параграфа.
+     * @param bUse
+     */
     Set_UseTextShd : function(bUse)
     {
         this.UseTextShd = bUse;
