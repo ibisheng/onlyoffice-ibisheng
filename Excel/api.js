@@ -1550,7 +1550,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							} else if (lockType === c_oAscLockTypeElem.Range) {
 								ws.updateSelection();
 							}
-						} else if (0 === lockSheetId.indexOf(CCellCommentator.sStartCommentId)) {
+						} else if (-1 !== lockSheetId && 0 === lockSheetId.indexOf(CCellCommentator.sStartCommentId)) {
 							// Коммментарий
 							t.handlers.trigger("asc_onLockComment", lockElem.Element["rangeOrObjectId"], e["user"]);
 						}
