@@ -1406,22 +1406,26 @@ asc_docs_api.prototype.Paste = function(){
             }
         }
     }
-}
+};
 asc_docs_api.prototype.Share = function(){
 
-}
+};
 asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 	if (true === this.canSave) {
 		this.canSave = false;
 		this.isAutoSave = !!isAutoSave;
-		if (!this.isAutoSave)
+		if (!this.isAutoSave) {
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+		}
 
 		var t = this;
 		this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
 	}
 };
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
+	if (!this.isAutoSave)
+		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	this.canSave = true;
 	this.isAutoSave = false;
@@ -1439,7 +1443,7 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	{
 		getFile(url);
 	}
-}
+};
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 	var editor = this;
@@ -1447,12 +1451,12 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 		if(null != incomeObject && "save" == incomeObject["type"])
 			editor.processSavedFile(incomeObject["data"], false);
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
-}
+};
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
 		return;
 	this.WordControl.OnResize(false);
-}
+};
 asc_docs_api.prototype.AddURL = function(url){
 
 }

@@ -569,6 +569,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isAutoSave = !!isAutoSave;
 			if (!this.isAutoSave) {
 				this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 			}
 			// Нужно закрыть редактор
 			this.asc_closeCellEditor();
@@ -578,6 +579,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
+			if (!this.isAutoSave)
+				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 			this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			this.canSave = true;
 			this.isAutoSave = false;
