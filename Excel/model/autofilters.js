@@ -625,6 +625,8 @@ var gUndoInsDelCellsFlag = true;
 								//при добавлении строки заголовков - сдвигаем диапазон на строку ниже
 								if(!isTurnOffHistory && addNameColumn)
 								{
+									//t._isShiftCells(tempCells);
+									
 									rangeShift.addCellsShiftBottom();
 									ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
 									ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
@@ -1384,7 +1386,10 @@ var gUndoInsDelCellsFlag = true;
 						currentFilter.SortState.SortConditions[0].ConditionDescending = type;
 						//сама сортировка
 						sortCol = curCell.c1;
-						sortRange.sort(type,sortCol);
+						var changes = sortRange.sort(type,sortCol);
+						
+						ws.cellCommentator.sortComments(sortRange.bbox, changes);
+						
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
@@ -1410,7 +1415,10 @@ var gUndoInsDelCellsFlag = true;
 							History.TurnOff();
 						History.Create_NewPoint();
 						History.StartTransaction();
-						sortRange.sort(type,sortCol);
+						var changes = sortRange.sort(type,sortCol);
+						
+						ws.cellCommentator.sortComments(sortRange.bbox, changes);
+						
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
 						History.EndTransaction();
@@ -7343,6 +7351,37 @@ var gUndoInsDelCellsFlag = true;
 				
 				ws.isChanged = true;
 				this._reDrawFilters();
+			},
+			
+			_isShiftCells: function(rangeShift)
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				//если на следующей строчке а/ф или форматированная таблицы
+				if(aWs.AutoFilter)
+				{
+					if((rangeShift.r2 + 1) === aWs.AutoFilter.Ref.r1)
+						return true;
+				}
+				if(aWs.TableParts && aWs.TableParts.length)
+				{
+					for(var i = 0; i < aWs.TableParts.length.length; i++)
+					{
+						if((rangeShift.r2 + 1) === aWs.TableParts[i].Ref.r1)
+							return true;
+					}
+				}
+				
+				//если  в следующей строчке есть непустая ячейка
+				var value;
+				for(var i = rangeShift.c1; i < rangeShift.c2; i++)
+				{
+					value = ws.model.getRange3(rangeShift.r2 + 1, i, rangeShift.r2 + 1, i).getValue();
+					if(value != "")
+						return true;
+				}
+				
+				return false;
 			}
 			
 		};
