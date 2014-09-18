@@ -17836,21 +17836,34 @@ CTable.prototype =
 
         // Найдем промежуток строк по PageIndex среди которых нам надо искать
         var PNum = PageIndex;// - this.PageNum;
-        if ( PNum < 0 || PNum >= this.Pages.length )
-            return;
 
-        // Определим какие строки попадают на данную страницу
-        var Row_start = this.Pages[PNum].FirstRow;
-        var Row_last  = Row_start;
+        var Row_start, Row_last;
 
-        if ( PNum + 1 < this.Pages.length )
+        if (PNum < 0)
         {
-            Row_last = this.Pages[PNum + 1].FirstRow;
-            if ( Row_last != Row_start && false === this.RowsInfo[Row_last].FirstPage )
-                Row_last--;
+            Row_start = 0;
+            Row_last  = 0;
+        }
+        else if (PNum >= this.Pages.length)
+        {
+            Row_start = this.Content.length - 1;
+            Row_last  = this.Content.length - 1;
         }
         else
-            Row_last = this.Content.length - 1;
+        {
+            // Определим какие строки попадают на данную страницу
+            Row_start = this.Pages[PNum].FirstRow;
+            Row_last = Row_start;
+
+            if (PNum + 1 < this.Pages.length)
+            {
+                Row_last = this.Pages[PNum + 1].FirstRow;
+                if (Row_last != Row_start && false === this.RowsInfo[Row_last].FirstPage)
+                    Row_last--;
+            }
+            else
+                Row_last = this.Content.length - 1;
+        }
 
         if ( Row_last < Row_start )
             return { Row : 0, Cell : 0 };
@@ -22583,6 +22596,7 @@ CTableCell.prototype =
                     this.Pr.TableCellW.Read_FromBinary( Reader );
                 }
 
+                this.Recalc_CompiledPr();
                 break;
             }
 

@@ -2449,6 +2449,7 @@ CDocumentContent.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
+                        Item.RecalculateCurPos();
                         Item.CurPos.RealX = Item.CurPos.X;
                         Item.CurPos.RealY = Item.CurPos.Y;
                     }

@@ -3194,10 +3194,10 @@ CDocument.prototype =
                     else
                     {
                         // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos;
                         this.Recalculate(true);
                     }
 
+                    Item.RecalculateCurPos();
                     Item.CurPos.RealX = Item.CurPos.X;
                     Item.CurPos.RealY = Item.CurPos.Y;
                 }
