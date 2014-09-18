@@ -7775,7 +7775,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     this.Parent    = Parent;
 
     // обновляем позиции start и end для Range
-    this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
+    //this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
 
 
     var oWPrp = this.Get_CompiledPr(true);
