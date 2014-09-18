@@ -4046,7 +4046,11 @@ CMathContent.prototype =
                     this.InfoPoints.ContentPoints.UpdatePoint(this.content[pos].size.width);
             }
             else if(this.content[pos].Type == para_Math_Run)
+            {
+                //this.content[pos].Recalculate_Range();
                 this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.InfoPoints.ContentPoints);
+            }
+
 
             this.WidthToElement[pos] = this.size.width;
 

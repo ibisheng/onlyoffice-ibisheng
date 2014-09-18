@@ -49,7 +49,6 @@ function CMathText(bJDraw)
     this.rasterOffsetY = 0;
     this.GapLeft = 0;
     this.GapRight = 0;
-    this.WidthVisible = 0;
 
     // TO DO
     // убрать
@@ -515,17 +514,13 @@ CMathText.prototype =
         this.size.height = height;
         this.size.ascent = ascent;
 
-        this.WidthVisible = this.size.width;
 
         //this.size = {width: width, widthG: width, height: height, ascent: ascent};
     },
-    /*ApplyGaps: function()
+    Get_WidthVisible: function()
     {
-        this.size.SetZero();
-
-        this.size.width = this.GapLeft + this.GapRight;
-        this.WidthVisible = this.size.width;
-    },*/
+        return this.size.width;
+    },
     draw: function(x, y, pGraphics)
     {
         var X = this.pos.x + x,
@@ -751,7 +746,10 @@ CMathAmp.prototype =
             };
         }
 
-        this.WidthVisible = this.size.width;
+    },
+    Get_WidthVisible: function()
+    {
+        return this.size.width;
     },
     setPosition: function(pos)
     {
