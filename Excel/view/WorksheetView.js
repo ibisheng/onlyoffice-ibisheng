@@ -569,7 +569,7 @@
                     if (col < c1)
                         c1 = 0;
                     else
-                        offsetFrozenX = t.cols[cFrozen].left - t.cols[0].left;
+                        offsetFrozenX = t.cols[cFrozen].left + t.cols[cFrozen].width - t.cols[0].left;
                 }
             }
 			var offsetX = t.cols[c1].left - t.cellsLeft;
@@ -577,6 +577,8 @@
 
 			var x1 = t.cols[col].left - offsetX - this.width_1px;
 			var w = Math.max(x2 - x1, 0);
+			if (w === t.cols[col].width)
+				return;
 			var cc = Math.min(t._colWidthToCharCount(w), /*max col width*/255);
 			var cw = t._charCountToModelColWidth(cc);
 
@@ -589,7 +591,7 @@
 				t.changeWorksheet("update");
 				t._updateVisibleColsCount();
 			};
-			return this._isLockedAll (onChangeWidthCallback);
+			this._isLockedAll (onChangeWidthCallback);
 		};
 
 		// mouseY - это разница стартовых координат от мыши при нажатии и границы
@@ -608,24 +610,28 @@
                     if (row < r1)
                         r1 = 0;
                     else
-                        offsetFrozenY = t.rows[rFrozen].top - t.rows[0].top;
+                        offsetFrozenY = t.rows[rFrozen].top + t.rows[rFrozen].height - t.rows[0].top;
                 }
             }
 			var offsetY = t.rows[r1].top - t.cellsTop;
 			offsetY -= offsetFrozenY;
 
 			var y1 = t.rows[row].top - offsetY - this.height_1px;
+			var newHeight = Math.min(t.maxRowHeight, Math.max(y2 - y1, 0));
+			if (newHeight === t.rows[row].height)
+				return;
 
 			var onChangeHeightCallback = function (isSuccess) {
 				if (false === isSuccess)
 					return;
 
-				t.model.setRowHeight(Math.min(t.maxRowHeight, Math.max(y2 - y1, 0)), row, row);
+				t.model.setRowHeight(newHeight, row, row);
 				t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
 				t.changeWorksheet("update");
 				t._updateVisibleRowsCount();
 			};
-			return this._isLockedAll (onChangeHeightCallback);
+
+			this._isLockedAll (onChangeHeightCallback);
 		};
 
 
