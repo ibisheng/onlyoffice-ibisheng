@@ -24,6 +24,29 @@
 
 //Типы изменений в классе CTheme
 
+function CreateFontRef(idx, color)
+{
+    var ret = new FontRef();
+    ret.idx = idx;
+    ret.Color = color;
+    return ret;
+}
+
+
+function CreateStyleRef(idx, color)
+{
+    var ret = new StyleRef();
+    ret.idx = idx;
+    ret.Color = color;
+    return ret;
+}
+
+function CreatePresetColor(id)
+{
+    var ret = new CPrstColor();
+    ret.idx = id;
+    return ret;
+}
 
 function sRGB_to_scRGB(value)
 {
@@ -1700,6 +1723,10 @@ CSchemeColor.prototype =
             RGBA =  colors[colorMap[this.id]].color.RGBA;
         else if ( colors[this.id] != null)
             RGBA = colors[this.id].color.RGBA;
+        if(!RGBA)
+        {
+            RGBA = {R: 0, G: 0, B: 0, A: 255};
+        }
         var _RGBA = this.RGBA;
         if(this.RGBA.needRecalc)
         {
@@ -1888,6 +1915,23 @@ CUniColor.prototype =
     Refresh_RecalcData: function()
     {},
 
+    checkPhColor: function(unicolor)
+    {
+        if(this.color && this.color.type === COLOR_TYPE_SCHEME && this.color.id === 14)
+        {
+            if(unicolor)
+            {
+                if(unicolor.color)
+                {
+                    this.color = unicolor.color.createDuplicate();
+                }
+                if(unicolor.Mods)
+                {
+                    this.Mods = unicolor.Mods.createDuplicate();
+                }
+            }
+        }
+    },
 
     check: function(theme, colorMap)
     {
@@ -4469,6 +4513,59 @@ CUniFill.prototype =
         if(this.fill)
         {
             this.fill.check(theme, colorMap);
+        }
+    },
+
+    checkPhColor: function(unicolor)
+    {
+        if(this.fill)
+        {
+            switch(this.fill.type)
+            {
+                case FILL_TYPE_NONE:
+                {
+                    break;
+                }
+                case FILL_TYPE_BLIP:
+                {
+                    break;
+                }
+                case FILL_TYPE_NOFILL:
+                {
+                    break;
+                }
+                case FILL_TYPE_SOLID:
+                {
+                    if(this.fill.color && this.fill.color)
+                    {
+                        this.fill.color.checkPhColor(unicolor);
+                    }
+                    break;
+                }
+                case FILL_TYPE_GRAD:
+                {
+                    for(var i = 0; i < this.fill.colors.length; ++i)
+                    {
+                        if(this.fill.colors[i] && this.fill.colors[i].color)
+                        {
+                            this.fill.colors[i].color.checkPhColor(unicolor);
+                        }
+                    }
+                    break;
+                }
+                case FILL_TYPE_PATT:
+                {
+                    if(this.fill.bgClr)
+                    {
+                        this.fill.bgClr.checkPhColor(unicolor);
+                    }
+                    if(this.fill.fgClr)
+                    {
+                        this.fill.fgClr.checkPhColor(unicolor);
+                    }
+                    break;
+                }
+            }
         }
     },
 
@@ -7863,8 +7960,8 @@ function CreateDefaultShapeStyle(preset)
     var tx_color = b_line;
     var unicolor;
     var style = new CShapeStyle();
-    style.setLnRef(new StyleRef());
-    style.lnRef.setIdx(b_line ? 1 : 2);
+    var lnRef = new StyleRef();
+    lnRef.setIdx(b_line ? 1 : 2);
 
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
@@ -7874,30 +7971,36 @@ function CreateDefaultShapeStyle(preset)
     mod.setVal(50000);
     unicolor.setMods(new CColorModifiers());
     unicolor.Mods.addMod(mod);
-    style.lnRef.setColor(unicolor);
+    lnRef.setColor(unicolor);
 
+    style.setLnRef(lnRef);
+
+
+    var fillRef = new StyleRef();
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
-    style.setFillRef(new StyleRef());
-    style.fillRef.setIdx(b_line ? 0 : 1);
-    style.fillRef.setColor(unicolor);
+    fillRef.setIdx(b_line ? 0 : 1);
+    fillRef.setColor(unicolor);
+    style.setFillRef(fillRef);
 
 
 
+    var effectRef = new StyleRef();
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
-    style.setEffectRef(new StyleRef());
-    style.effectRef.setIdx(0);
-    style.effectRef.setColor(unicolor);
+    effectRef.setIdx(0);
+    effectRef.setColor(unicolor);
+    style.setEffectRef(effectRef);
 
+    var fontRef = new FontRef();
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(tx_color ? 15 : 12);
-    style.setFontRef(new FontRef());
-    style.fontRef.setIdx(fntStyleInd_minor);
-    style.fontRef.setColor(unicolor);
+    fontRef.setIdx(fntStyleInd_minor);
+    fontRef.setColor(unicolor);
+    style.setFontRef(fontRef);
     return style;
 }
 
@@ -9187,15 +9290,6 @@ function ClrMap()
     for (var i = g_clr_MIN; i <= g_clr_MAX; i++)
         this.color_map[i] = null;
 
-    this.createDuplicate =  function()
-    {
-        var _copy = new ClrMap();
-        for(var _color_index = g_clr_MIN; _color_index <= this.color_map.length; ++_color_index)
-        {
-            _copy.color_map[_color_index] = this.color_map[_color_index];
-        }
-        return _copy;
-    };
 
     if(typeof g_oIdCounter != "undefined" && typeof g_oTableId != "undefined" && g_oTableId && g_oIdCounter)
     {
@@ -9214,6 +9308,33 @@ ClrMap.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+
+
+    createDuplicate:  function()
+    {
+        var _copy = new ClrMap();
+        for(var _color_index = g_clr_MIN; _color_index <= this.color_map.length; ++_color_index)
+        {
+            _copy.color_map[_color_index] = this.color_map[_color_index];
+        }
+        return _copy;
+    },
+
+    compare: function(other)
+    {
+        if(!other)
+            return false;
+        for(var i = g_clr_MIN; i < this.color_map.length; ++i)
+        {
+            if(this.color_map[i] !== other.color_map[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    },
+
 
     getObjectType: function()
     {
@@ -9842,25 +9963,7 @@ function FmtScheme()
     this.effectStyleLst = null;
     this.bgFillStyleLst = [];
 
-    this.GetFillStyle = function(number)
-    {
-        if (number >= 1 && number <= 999)
-        {
-            var ret = this.fillStyleLst[number - 1];
-            if (undefined === ret)
-                return null;
-            return ret.createDuplicate();
-        }
-        else if (number >= 1001)
-        {
-            var ret = this.bgFillStyleLst[number - 1001];
-            if (undefined === ret)
-                return null;
-            return ret.createDuplicate();
-        }
 
-        return null;
-    }
 
 }
 
@@ -9874,6 +9977,30 @@ FmtScheme.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    GetFillStyle: function(number, unicolor)
+    {
+        if (number >= 1 && number <= 999)
+        {
+            var ret = this.fillStyleLst[number - 1];
+            if (!ret)
+                return null;
+            var ret2 = ret.createDuplicate();
+            ret2.checkPhColor(unicolor);
+            return ret2;
+        }
+        else if (number >= 1001)
+        {
+            var ret = this.bgFillStyleLst[number - 1001];
+            if (!ret)
+                return null;
+            var ret2 = ret.createDuplicate();
+            ret2.checkPhColor(unicolor);
+            return ret2;
+        }
+        return null;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_FormatScheme;
@@ -10256,19 +10383,49 @@ CTheme.prototype =
         typeof minor_font.cs === "string" && minor_font.latin.length > 0 && (AllFonts[minor_font.cs] = 1);
     },
 
-    getFillStyle: function(idx)
+    getFillStyle: function(idx, unicolor)
     {
-        if (this.themeElements.fmtScheme.fillStyleLst[idx-1])
+        if(idx === 0 || idx === 1000)
         {
-            return this.themeElements.fmtScheme.fillStyleLst[idx-1].createDuplicate();
+            return CreateNoFillUniFill();
         }
-        return new CUniFill();
+        var ret;
+        if (idx >= 1 && idx <= 999)
+        {
+            if (this.themeElements.fmtScheme.fillStyleLst[idx-1])
+            {
+                ret = this.themeElements.fmtScheme.fillStyleLst[idx-1].createDuplicate();
+                if(ret)
+                {
+                    ret.checkPhColor(unicolor);
+                    return ret;
+                }
+            }
+        }
+        else if (idx >= 1001)
+        {
+            if (this.themeElements.fmtScheme.bgFillStyleLst[idx-1])
+            {
+                ret = this.themeElements.fmtScheme.bgFillStyleLst[idx-1].createDuplicate();
+                if(ret)
+                {
+                    ret.checkPhColor(unicolor);
+                    return ret;
+                }
+            }
+        }
+        return CreateSolidFillRGBA(0, 0, 0, 255);
     },
-    getLnStyle: function(idx)
+    getLnStyle: function(idx, unicolor)
     {
         if (this.themeElements.fmtScheme.lnStyleLst[idx-1])
         {
-            return this.themeElements.fmtScheme.lnStyleLst[idx-1].createDuplicate();
+            var ret = this.themeElements.fmtScheme.lnStyleLst[idx-1].createDuplicate();
+            if(ret.Fill)
+            {
+                ret.Fill.checkPhColor(unicolor);
+            }
+            return ret;
         }
         return new CLn();
     },
