@@ -6525,12 +6525,10 @@ Paragraph.prototype =
             this.Internal_Content_Remove( HyperPos );
 
             var TextPr = new CTextPr();
-            TextPr.RStyle = null;
-            if(!this.bFromDocument)
-            {
-                TextPr.Unifill = null;
-                TextPr.Underline = null;
-            }
+            TextPr.RStyle    = null;
+            TextPr.Underline = null;
+            TextPr.Color     = null;
+            TextPr.Unifill   = null;
 
             for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
             {
@@ -9507,8 +9505,8 @@ Paragraph.prototype =
         if ( this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use )
             this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
-        var HyperPos = -1;
-        var Math     = null;
+        var Hyperlinks = [];
+        var Math       = null;
 
         if ( true === this.Selection.Use )
         {
@@ -9525,33 +9523,27 @@ Paragraph.prototype =
                 var Element = this.Content[CurPos];
 
                 if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
-                    break;
+                    continue;
                 else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
                 {
-                    if ( -1 === HyperPos )
-                        HyperPos = CurPos;
-                    else
-                        break;
+                    Hyperlinks.push(CurPos);
                 }
             }
 
-            if ( this.Selection.StartPos === this.Selection.EndPos && para_Hyperlink === this.Content[this.Selection.StartPos].Type )
-                HyperPos = this.Selection.StartPos;
-            
             if (this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type )
                 Math = this.Content[this.Selection.EndPos];
         }
         else
         {
             if (para_Hyperlink === this.Content[this.CurPos.ContentPos].Type)
-                HyperPos = this.CurPos.ContentPos;
+                Hyperlinks.push(this.CurPos.ContentPos);
             else if (para_Math === this.Content[this.CurPos.ContentPos].Type)
                 Math = this.Content[this.CurPos.ContentPos];
         }
 
-        if ( -1 !== HyperPos )
+        for (var HyperIndex = 0, HyperCount = Hyperlinks.length; HyperIndex < HyperCount; HyperIndex++)
         {
-            var Hyperlink = this.Content[HyperPos];
+            var Hyperlink = this.Content[Hyperlinks[HyperIndex]];
 
             var HyperText = new CParagraphGetText();
             Hyperlink.Get_Text( HyperText );

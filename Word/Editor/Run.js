@@ -5038,7 +5038,10 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
     }
 
     if ( undefined !== TextPr.Unifill )
-        this.Set_Unifill( null === TextPr.Unifill ? undefined : TextPr.Unifill );
+    {
+        this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
+        this.Set_Color(undefined);
+    }
 
     if ( undefined != TextPr.VertAlign )
         this.Set_VertAlign( null === TextPr.VertAlign ? undefined : TextPr.VertAlign );

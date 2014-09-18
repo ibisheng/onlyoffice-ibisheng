@@ -2065,9 +2065,6 @@ CDocument.prototype =
         {
             // Обновляем курсор сначала, чтобы обновить текущую страницу
             this.RecalculateCurPos();
-            
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();            
             this.NeedUpdateTarget = false;
         }
     },
