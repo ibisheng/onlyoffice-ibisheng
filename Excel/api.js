@@ -577,13 +577,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-			this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			this.canSave = true;
 			this.isAutoSave = false;
 			this.lastSaveTime = null;
 			this.CoAuthoringApi.unSaveChanges();
 			if (!isDocumentSaved)
 				this.CoAuthoringApi.disconnect();
+			this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			// Обновляем состояние возможности сохранения документа
 			this._onUpdateDocumentCanSave();
 		};

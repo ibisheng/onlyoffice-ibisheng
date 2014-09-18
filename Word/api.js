@@ -2762,10 +2762,10 @@ function OnSave_Callback2(e)
 
         editor.canSave = true;
 
-        editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-
         // Снимаем лок с функции сохранения на сервере
         editor.CoAuthoringApi.unSaveChanges();
+
+		editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
 		// Обновляем состояние возможности сохранения документа
 		editor._onUpdateDocumentCanSave();
@@ -2793,14 +2793,15 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave)
 
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	// Если не автосохранение, то не забываем закрыть Block-сообщение
-	if (!this.isAutoSave)
-		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+//	if (!this.isAutoSave)
+//		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 	this.canSave = true;
 	this.isAutoSave = false;
 	this.CoAuthoringApi.unSaveChanges();
 	if (!isDocumentSaved)
 		this.CoAuthoringApi.disconnect();
+	
+	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	// Обновляем состояние возможности сохранения документа
 	this._onUpdateDocumentCanSave();
 };

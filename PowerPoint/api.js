@@ -1422,13 +1422,13 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 	}
 };
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	this.canSave = true;
 	this.isAutoSave = false;
 	this.CoAuthoringApi.unSaveChanges();
 	if (!isDocumentSaved)
 		this.CoAuthoringApi.disconnect();
 
+	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	// Обновляем состояние возможности сохранения документа
 	this._onUpdateDocumentCanSave();
 };
