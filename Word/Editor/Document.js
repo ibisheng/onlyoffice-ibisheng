@@ -592,6 +592,8 @@ function CDocument(DrawingDocument)
 
     this.NeedUpdateTarget = false;
 
+    this.ReindexStartPos = -1;
+
     // Класс для работы с колонтитулами
     this.HdrFtr = new CHeaderFooterController(this, this.DrawingDocument);
 
@@ -832,6 +834,25 @@ CDocument.prototype =
     Is_ThisElementCurrent : function()
     {
         return true;
+    },
+
+    Update_ConentIndexing : function()
+    {
+        if (-1 !== this.ReindexStartPos)
+        {
+            for (var Index = this.ReindexStartPos, Count = this.Content.length; Index < Count; Index++)
+            {
+                this.Content[Index].Index = Index;
+            }
+
+            this.ReindexStartPos = -1;
+        }
+    },
+
+    protected_ReindexContent : function(StartPos)
+    {
+        if (-1 === this.ReindexStartPos || this.ReindexStartPos > StartPos)
+            this.ReindexStartPos = StartPos;
     },
 
     Get_PageContentStartPos : function (PageIndex, ElementIndex)
@@ -10459,6 +10480,9 @@ CDocument.prototype =
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
+
+        // Запоминаем, что нам нужно произвести переиндексацию элементов
+        this.protected_ReindexContent(Position);
     },
 
     Internal_Content_Remove : function(Position, Count)
@@ -10503,6 +10527,9 @@ CDocument.prototype =
         
         // Проверим не является ли рамкой последний параграф
         this.Check_FramePrLastParagraph();
+
+        // Запоминаем, что нам нужно произвести переиндексацию элементов
+        this.protected_ReindexContent(Position);
 
         return ChangePos;
     },

@@ -578,7 +578,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Prev = null;
     this.Next = null;
 
-    this.Index  = -1;
+    this.Index  = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
     this.Inline = Inline;
 
     this.Lock = new CLock();
@@ -5088,6 +5088,7 @@ CTable.prototype =
 
     Document_SetThisElementCurrent : function(bUpdateStates)
     {
+        this.Parent.Update_ConentIndexing();
         this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 

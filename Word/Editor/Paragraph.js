@@ -23,7 +23,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.Prev = null;
     this.Next = null;
 
-    this.Index = -1;
+    this.Index = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
 
     this.Parent  = Parent;
     this.PageNum = PageNum;
@@ -9597,6 +9597,7 @@ Paragraph.prototype =
 //-----------------------------------------------------------------------------------
     Document_SetThisElementCurrent : function(bUpdateStates)
     {
+        this.Parent.Update_ConentIndexing();
         this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 
@@ -9604,6 +9605,7 @@ Paragraph.prototype =
     {
         var Parent = this.Parent;
 
+        Parent.Update_ConentIndexing();
         if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
@@ -11251,6 +11253,7 @@ Paragraph.prototype =
 
     Get_ParentObject_or_DocumentPos : function()
     {
+        this.Parent.Update_ConentIndexing();
         return this.Parent.Get_ParentObject_or_DocumentPos(this.Index);
     },
 

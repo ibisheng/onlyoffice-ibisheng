@@ -94,6 +94,8 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
     this.StartState = null;
 
+    this.ReindexStartPos = -1;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 
@@ -170,7 +172,24 @@ CDocumentContent.prototype =
     // Данную функцию используют внутренние классы, для определения следующей позиции.
     // Данный класс запрашивает следующую позицию у своего родителя.
 
+    Update_ConentIndexing : function()
+    {
+        if (-1 !== this.ReindexStartPos)
+        {
+            for (var Index = this.ReindexStartPos, Count = this.Content.length; Index < Count; Index++)
+            {
+                this.Content[Index].Index = Index;
+            }
 
+            this.ReindexStartPos = -1;
+        }
+    },
+
+    protected_ReindexContent : function(StartPos)
+    {
+        if (-1 === this.ReindexStartPos || this.ReindexStartPos > StartPos)
+            this.ReindexStartPos = StartPos;
+    },
 
     Get_PageContentStartPos : function (PageNum)
     {
@@ -8021,6 +8040,8 @@ CDocumentContent.prototype =
         // Проверим, что последний элемент не таблица
         if ( false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true ) );
+
+        this.protected_ReindexContent(Position);
     },
 
     Internal_Content_Remove : function(Position, Count)
@@ -8052,6 +8073,8 @@ CDocumentContent.prototype =
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true ) );
+
+        this.protected_ReindexContent(Position);
     },
 
     Clear_ContentChanges : function()
