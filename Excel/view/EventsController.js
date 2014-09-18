@@ -1300,6 +1300,7 @@
 			// Если нажали правую кнопку мыши, то сменим выделение только если мы не в выделенной области
 			if (2 === event.button) {
 				t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
+				t.handlers.trigger('onContextMenu', event);
 			} else {
 				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle  && false === this.settings.isViewerMode){
 					// В режиме автозаполнения
