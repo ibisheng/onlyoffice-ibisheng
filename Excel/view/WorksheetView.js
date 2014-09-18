@@ -2646,93 +2646,41 @@
 				}
 			}
 
-			var bc = null, bw = -1, isNotFirst = false, isStroke = false; // cached border color
+			var bc = null, bw = -1, isNotFirst = false; // cached border color
 
-			// ToDo в одну функцию
-			function drawBorderHor(border, x1, y, x2) {
-				if (border.s !== c_oAscBorderStyles.None) {
-					if (!g_oColorManager.isEqual(bc, border.c)) {
-						if (isNotFirst)
-							ctx.stroke();
-
-						bc = border.c;
-						ctx.setStrokeStyle(bc);
-						isStroke = true;
-					}
-					if (bw !== border.w) {
-						if (isNotFirst)
-							ctx.stroke();
-
-						bw = border.w;
-						ctx.setLineWidth(border.w);
-						isStroke = true;
-					}
-
-					if (isStroke || !isNotFirst) {
-						isNotFirst = true;
-						ctx.beginPath();
-					}
-
-					ctx.lineHor(x1, y, x2);
-					isStroke = false;
+			function drawBorder(type, border, x1, y1, x2, y2) {
+				var isStroke = false,
+					isNewColor = !g_oColorManager.isEqual(bc, border.c),
+					isNewWidth = bw !== border.w;
+				if (isNotFirst && (isNewColor || isNewWidth)) {
+					ctx.stroke();
+					isStroke = true;
 				}
-			}
 
-			function drawBorderVer(border, x1, y1, y2) {
-				if (border.s !== c_oAscBorderStyles.None) {
-					if (!g_oColorManager.isEqual(bc, border.c)) {
-						if (isNotFirst)
-							ctx.stroke();
-
-						bc = border.c;
-						ctx.setStrokeStyle(bc);
-						isStroke = true;
-					}
-					if (bw !== border.w) {
-						if (isNotFirst)
-							ctx.stroke();
-
-						bw = border.w;
-						ctx.setLineWidth(border.w);
-						isStroke = true;
-					}
-
-					if (isStroke || !isNotFirst) {
-						isNotFirst = true;
-						ctx.beginPath();
-					}
-
-					ctx.lineVer(x1, y1, y2);
-					isStroke = false;
+				if (isNewColor) {
+					bc = border.c;
+					ctx.setStrokeStyle(bc);
 				}
-			}
+				if (isNewWidth) {
+					bw = border.w;
+					ctx.setLineWidth(border.w);
+				}
 
-			function drawDiagonal(border, x1, y1, x2, y2) {
-				if (border.s !== c_oAscBorderStyles.None) {
-					if (!g_oColorManager.isEqual(bc, border.c)) {
-						if (isNotFirst)
-							ctx.stroke();
+				if (isStroke || false === isNotFirst) {
+					isNotFirst = true;
+					ctx.beginPath();
+				}
 
-						bc = border.c;
-						ctx.setStrokeStyle(bc);
-						isStroke = true;
-					}
-					if (bw !== border.w) {
-						if (isNotFirst)
-							ctx.stroke();
-
-						bw = border.w;
-						ctx.setLineWidth(border.w);
-						isStroke = true;
-					}
-
-					if (isStroke || !isNotFirst) {
-						isNotFirst = true;
-						ctx.beginPath();
-					}
-
-					ctx.lineDiag(x1, y1, x2, y2);
-					isStroke = false;
+				switch (type) {
+					case c_oAscBorderType.Hor:
+						ctx.lineHor(x1, y1, x2);
+						break;
+					case c_oAscBorderType.Ver:
+						ctx.lineVer(x1, y1, y2);
+						break;
+					case c_oAscBorderType.Diag:
+						ctx.lineDiag(x1, y1, x2, y2);
+						break;
 				}
 			}
 
@@ -2754,7 +2702,7 @@
 				var dy1 = tbw > border.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
 				var dy2 = bbw > border.w ? -2 : (bbw > 2 ? 1 : 0);
 
-				drawBorderVer(border, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
+				drawBorder(c_oAscBorderType.Ver, border, x, y1 + (-1 + dy1) * t.height_1px, x, y2 + (1 + dy2) * t.height_1px);
 			}
 
 			function drawHorizontalBorder(borderTopObject, borderBottomObject, x1, y, x2) {
@@ -2774,7 +2722,7 @@
 							borderTopObject && borderTopObject.getRightBorder());
 					var dx1 = border.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
 					var dx2 = border.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
-					drawBorderHor(border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
+					drawBorder(c_oAscBorderType.Hor, border, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px, y);
 				}
 			}
 
@@ -2909,11 +2857,11 @@
 						 */
 						if (bCur.borders.dd) {
 							// draw diagonal line l,t - r,b
-							drawDiagonal(bCur.borders.d, x1 - t.width_1px, y1 - t.height_1px, x2Diagonal, y2Diagonal);
+							drawBorder(c_oAscBorderType.Diag, bCur.borders.d, x1 - t.width_1px, y1 - t.height_1px, x2Diagonal, y2Diagonal);
 						}
 						if (bCur.borders.du) {
 							// draw diagonal line l,b - r,t
-							drawDiagonal(bCur.borders.d, x1 - t.width_1px, y2Diagonal, x2Diagonal, y1 - t.height_1px);
+							drawBorder(c_oAscBorderType.Diag, bCur.borders.d, x1 - t.width_1px, y2Diagonal, x2Diagonal, y1 - t.height_1px);
 						}
 						// ToDo Clip diagonal borders
 						//ctx.restore();

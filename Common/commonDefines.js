@@ -395,6 +395,11 @@ var c_oAscBorderStyles = {
     Medium				: 12,
     Thick				: 13
 };
+var c_oAscBorderType = {
+	Hor		: 1,
+	Ver		: 2,
+	Diag	: 3
+};
 // PageOrientation
 var c_oAscPageOrientation = {
     PagePortrait	: 1,
