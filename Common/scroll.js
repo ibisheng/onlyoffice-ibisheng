@@ -668,6 +668,10 @@ ScrollObject.prototype = {
 
         if ( this.canvas.addEventListener )
             this.canvas.addEventListener( 'DOMMouseScroll', this.evt_mousewheel, false );
+
+        this.context.fillStyle = this.settings.scrollBackgroundColor;
+        this.context.fillRect(0,0,this.canvasW,this.canvasH);
+
         this._drawArrow();
         this._draw();
 
@@ -1147,8 +1151,9 @@ ScrollObject.prototype = {
 
             }
 
-            that.context.drawImage( img, x, y );
-
+            if(img){
+                that.context.drawImage( img, x, y );
+            }
         }
 
         function fadeOut() {
@@ -1263,8 +1268,9 @@ ScrollObject.prototype = {
 
             }
 
-            that.context.drawImage( img, x, y );
-
+            if(img){
+                that.context.drawImage( img, x, y );
+            }
         }
 
         function drawScroller() {
