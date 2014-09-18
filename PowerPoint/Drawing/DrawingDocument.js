@@ -2968,120 +2968,24 @@ function CDrawingDocument()
         _div_elem.appendChild(this.GuiCanvasFillTextureSlide);
     }
 
-    this.CheckTableStyles = function(tableLook, gr_frame)
+    this.CheckTableStyles = function()
     {
         // сначала проверим, подписан ли кто на этот евент
         // а то во вьюере не стоит ничего посылать
+
         if (!this.m_oWordControl.m_oApi.asc_checkNeedCallback("asc_onInitTableTemplates"))
             return;
-
-        var bIsChanged = false;
-        if (null == this.TableStylesLastLook)
-        {
-            this.TableStylesLastLook = new CTablePropLook();
-            this.TableStylesLastLook.FirstCol = tableLook.m_bFirst_Col;
-            this.TableStylesLastLook.FirstRow = tableLook.m_bFirst_Row;
-            this.TableStylesLastLook.LastCol  = tableLook.m_bLast_Col;
-            this.TableStylesLastLook.LastRow  = tableLook.m_bLast_Row;
-            this.TableStylesLastLook.BandHor  = tableLook.m_bBand_Hor;
-            this.TableStylesLastLook.BandVer  = tableLook.m_bBand_Ver;
-            bIsChanged = true;
-        }
-        else
-        {
-            if (this.TableStylesLastLook.FirstCol != tableLook.m_bFirst_Col)
-            {
-                this.TableStylesLastLook.FirstCol = tableLook.m_bFirst_Col;
-                bIsChanged = true;
-            }
-            if (this.TableStylesLastLook.FirstRow != tableLook.m_bFirst_Row)
-            {
-                this.TableStylesLastLook.FirstRow = tableLook.m_bFirst_Row;
-                bIsChanged = true;
-            }
-            if (this.TableStylesLastLook.LastCol != tableLook.m_bLast_Col)
-            {
-                this.TableStylesLastLook.LastCol = tableLook.m_bLast_Col;
-                bIsChanged = true;
-            }
-            if (this.TableStylesLastLook.LastRow != tableLook.m_bLast_Row)
-            {
-                this.TableStylesLastLook.LastRow = tableLook.m_bLast_Row;
-                bIsChanged = true;
-            }
-            if (this.TableStylesLastLook.BandHor != tableLook.m_bBand_Hor)
-            {
-                this.TableStylesLastLook.BandHor = tableLook.m_bBand_Hor;
-                bIsChanged = true;
-            }
-            if (this.TableStylesLastLook.BandVer != tableLook.m_bBand_Ver)
-            {
-                this.TableStylesLastLook.BandVer = tableLook.m_bBand_Ver;
-                bIsChanged = true;
-            }
-        }
-
-        if (!bIsChanged)
-            return;
-
         var logicDoc = this.m_oWordControl.m_oLogicDocument;
         var _dst_styles = [];
-
-        var _styles = logicDoc.getAllTableStyles();
-        var _styles_len = _styles.length;
-
-        if (_styles_len == 0)
-            return _dst_styles;
-
-        var _x_mar = 10;
-        var _y_mar = 10;
-        var _r_mar = 10;
-        var _b_mar = 10;
         var _pageW = 297;
         var _pageH = 210;
-
-        var W = (_pageW - _x_mar - _r_mar);
-        var H = (_pageH - _y_mar - _b_mar);
-        var Grid = [];
-
-        var Rows = 5;
-        var Cols = 5;
-
-        for (var i = 0; i < Cols; i++)
-            Grid[i] = W / Cols;
-
         var _canvas = document.createElement('canvas');
         _canvas.width = TABLE_STYLE_WIDTH_PIX;
         _canvas.height = TABLE_STYLE_HEIGHT_PIX;
         var ctx = _canvas.getContext('2d');
 
-        var history_is_on = History.Is_On();
-        if(history_is_on)
-            History.TurnOff();
-        for (var i1 = 0; i1 < _styles_len; i1++)
+        for (var i = 0; i < logicDoc.TablesForInterface.length; i++)
         {
-            var _style = _styles[i1];
-
-            if (!_style || _style.Type != styletype_Table)
-                continue;
-            var table = new CTable(this, gr_frame, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
-            table.styleIndex = i1;
-
-            var table_look = {};
-            table_look.FirstCol = tableLook.m_bFirst_Col;
-            table_look.FirstRow = tableLook.m_bFirst_Row;
-            table_look.LastCol = tableLook.m_bLast_Col;
-            table_look.LastRow = tableLook.m_bLast_Row;
-            table_look.BandHor = tableLook.m_bBand_Hor;
-            table_look.BandVer = tableLook.m_bBand_Ver;
-
-            for (var j = 0; j < Rows; j++)
-                table.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
-
-            table.Set_Props({TableLook : table_look});
-
-
-
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
@@ -3089,19 +2993,14 @@ function CDrawingDocument()
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
             graphics.m_oFontManager = g_fontManager;
             graphics.transform(1,0,0,1,0,0);
-
-            table.Recalculate_Page(0);
-            table.Draw(0, graphics);
+            logicDoc.TablesForInterface[i].graphicObject.Draw(0, graphics);
 
             var _styleD = new CAscTableStyle();
             _styleD.Type = 0;
             _styleD.Image = _canvas.toDataURL("image/png");
-            _styleD.Id = _style.stylesId;
+            _styleD.Id = logicDoc.TablesForInterface[i].graphicObject.TableStyle;
             _dst_styles.push(_styleD);
         }
-        if(history_is_on)
-            History.TurnOn();
-
         this.m_oWordControl.m_oApi.sync_InitEditorTableStyles(_dst_styles);
     }
 
@@ -3421,8 +3320,8 @@ function CThumbnailsManager()
             {
                 var _data = new CContextMenuData();
                 _data.Type = c_oAscContextMenuTypes.Thumbnails;
-                _data.X_abs = global_mouseEvent.X;
-                _data.Y_abs = global_mouseEvent.Y;
+                _data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
+                _data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
                 _data.IsSlideSelect = false;
                 oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
             }
@@ -3510,8 +3409,8 @@ function CThumbnailsManager()
                 {
                     var _data = new CContextMenuData();
                     _data.Type = c_oAscContextMenuTypes.Thumbnails;
-                    _data.X_abs = global_mouseEvent.X;
-                    _data.Y_abs = global_mouseEvent.Y;
+                    _data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
+                    _data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
                     oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
                 }
 
@@ -3539,8 +3438,8 @@ function CThumbnailsManager()
         {
             var _data = new CContextMenuData();
             _data.Type = c_oAscContextMenuTypes.Thumbnails;
-            _data.X_abs = global_mouseEvent.X;
-            _data.Y_abs = global_mouseEvent.Y;
+            _data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
+            _data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
             oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
         }
 
