@@ -2816,7 +2816,7 @@ function safe_Apply_Changes()
     }
 }
 
-//function OnSave_Callback(e)
+//_*function*_ OnSave_Callback(e)
 //{
 //	var nState;
 //    if ( false == e["saveLock"] ) {
