@@ -1414,18 +1414,14 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 	if (true === this.canSave) {
 		this.canSave = false;
 		this.isAutoSave = !!isAutoSave;
-		if (!this.isAutoSave) {
+		if (!this.isAutoSave)
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-		}
 
 		var t = this;
 		this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
 	}
 };
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-	if (!this.isAutoSave)
-		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	this.canSave = true;
 	this.isAutoSave = false;
