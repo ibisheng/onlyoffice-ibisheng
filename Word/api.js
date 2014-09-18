@@ -6941,7 +6941,9 @@ asc_docs_api.prototype.SetPaintFormat = function(_value)
     var value = ( true === _value ? c_oAscFormatPainterState.kOn : ( false === _value ? c_oAscFormatPainterState.kOff : _value ) );
     
     this.isPaintFormat = value;
-    this.WordControl.m_oLogicDocument.Document_Format_Copy();
+
+    if (c_oAscFormatPainterState.kOff !== value)
+        this.WordControl.m_oLogicDocument.Document_Format_Copy();
 };
 
 asc_docs_api.prototype.ChangeShapeType = function(value)

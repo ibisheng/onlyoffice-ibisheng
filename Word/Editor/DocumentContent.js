@@ -7600,6 +7600,8 @@ CDocumentContent.prototype =
     {
         this.Selection_Remove();
 
+        this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
+
         // Прячем курсор
         this.DrawingDocument.TargetEnd();
         this.DrawingDocument.SetCurrentPage( this.Get_StartPage_Absolute() + this.CurPage );
@@ -7620,8 +7622,6 @@ CDocumentContent.prototype =
             this.LogicDocument.Selection.Use   = true;
             this.LogicDocument.Selection.Start = false;
         }
-
-        this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
 
         this.LogicDocument.DrawingObjects.selectById( Id, this.Get_StartPage_Absolute() + this.CurPage );
 
