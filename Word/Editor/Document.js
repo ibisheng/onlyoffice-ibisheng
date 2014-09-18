@@ -10181,7 +10181,6 @@ CDocument.prototype =
                     var Comment_X       = this.Get_PageLimits(PageIndex).XLimit;                    
                     var Para            = g_oTableId.Get_ById( Comment.StartId );
 
-
                     var TextTransform = Para.Get_ParentTextTransform();
                     if (TextTransform)
                     {

@@ -87,7 +87,7 @@ CHeaderFooter.prototype =
     
     Set_Page : function(Page_abs)
     {
-        if ( Page_abs !== this.RecalcInfo.CurPage )
+        if (Page_abs !== this.RecalcInfo.CurPage && undefined !== this.LogicDocument.Pages[Page_abs])
         {
             // Возможна ситуация, когда у нас колонтитул был рассчитан для заданной страницы, но на ней сейчас данный
             // колонтитул не используется. Запрещаем менять у данного колонтитула текущую страницу на заданную.

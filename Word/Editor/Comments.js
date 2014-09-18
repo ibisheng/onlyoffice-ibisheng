@@ -1023,7 +1023,9 @@ ParaComment.prototype =
         if ( comment_type_HdrFtr === Comment.m_oTypeInfo.Type )
         {
             var HdrFtr = Comment.m_oTypeInfo.Data;
-            Page = HdrFtr.RecalcInfo.CurPage;
+
+            if (-1 !== HdrFtr.RecalcInfo.CurPage)
+                Page = HdrFtr.RecalcInfo.CurPage;
         }
 
         if ( true === this.Start )
