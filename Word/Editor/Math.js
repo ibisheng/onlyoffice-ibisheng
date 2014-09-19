@@ -9,6 +9,13 @@ function MathMenu (type)
 	this.Type = para_Math;
 	this.Menu = type;
 }
+MathMenu.prototype =
+{
+	Get_Type : function()
+    {
+        return this.Type;
+    }
+}
 function ParaMath()
 {
     this.Id = g_oIdCounter.Get_NewId();
@@ -162,7 +169,7 @@ ParaMath.prototype =
 		if ( para_Text === Type)
 		{
 			var oText = new CMathText(false);
-			oText.addTxt(Item.Value);
+			oText.add(Item.Value);
 			oStartContent.Add(oText, true);
 		}
 		else if ( para_Space === Type )
