@@ -36,7 +36,8 @@ function CMathBase(bInside)
         bOutside:   false
     };
 
-    this.bSelectionUse = false;
+    this.bSelectionUse      = false;
+    this.bInsideUpperSelect = false;
 
     this.nRow = 0;
     this.nCol = 0;
@@ -630,27 +631,12 @@ CMathBase.prototype =
     {
         if( bSelection )
         {
-            //var SelectX, SelectY;
-
             var oSelect;
 
             if(bStart)
-            {
-                //SelectX = this.SelectStart_X;
-                //SelectY = this.SelectStart_Y;
-
                 oSelect = this.SelectStart;
-
-                //SelectX = this.SelectStart.X;
-                //SelectY = this.SelectStart.Y;
-            }
             else
-            {
                 oSelect = this.SelectEnd;
-
-                //SelectX = this.SelectEnd.X;
-                //SelectY = this.SelectEnd.Y;
-            }
 
             ContentPos.Add(oSelect.X);
             ContentPos.Add(oSelect.Y);
@@ -717,15 +703,19 @@ CMathBase.prototype =
 
             var bJustDraw = this.elements[this.SelectStart.X][this.SelectStart.Y].IsJustDraw();
 
-            if(startX == endX && startY == endY && !bJustDraw)
+            if(startX == endX && startY == endY)
             {
-                this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
-            }
-            else
-            {
-                this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
+                if(!bJustDraw)
+                    this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag);
+                else
+                    this.elements[startX][startY].Set_SelectionContentPos(StartContentPos, null, Depth, StartFlag, -1);
             }
         }
+
+        /*if(this.constructor.name == "CDegreeSubSup")
+        {
+            console.log("startX " +  startX + " startY " + startY + "; " + "endX " + endX + " endY " + endY);
+        }*/
 
 
         this.bSelectionUse = true;
@@ -742,7 +732,20 @@ CMathBase.prototype =
     },
     IsSelectEmpty: function()
     {
-        return (!this.SelectStart.bOutside && !this.SelectEnd.bOutside) && (this.SelectStart.X == this.SelectEnd.X) && (this.SelectStart.Y == this.SelectEnd.Y);
+        var startX = this.SelectStart.X,
+            startY = this.SelectStart.Y;
+
+        var endX = this.SelectEnd.X,
+            endY = this.SelectEnd.Y;
+
+        var bEqual = (startX == endX) && (startY == endY);
+
+        var bInsideSelect = bEqual && this.elements[startX][startY].bInside == true && !this.elements[startX][startY].IsSelectEmpty();
+
+        if(this.constructor.name == "CNary")
+            console.log("bInsideSelect " + bInsideSelect);
+
+        return (!this.SelectStart.bOutside && !this.SelectEnd.bOutside) && bEqual && !bInsideSelect;
     },
     Recalculate_CurPos: function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
@@ -782,8 +785,8 @@ CMathBase.prototype =
     {
         var start_X = this.SelectStart.X,
             start_Y = this.SelectStart.Y;
-
-        if(!this.SelectStart.bOutside)
+                                                             // проверка на bSelectionUse, чтобы избежать ситуации, когда селекта в этом элементе не было
+        if(!this.SelectStart.bOutside && this.bSelectionUse) // и нужно очистить селект у всех незаселекченных элементов контента (в тч и этом) в функции Selection_DrawRange. а стартовая и конечная позиции совпадают и в стартовой позиции находится JustDraw-элемент
             this.elements[start_X][start_Y].Selection_Remove();
 
         this.bSelectionUse = false;

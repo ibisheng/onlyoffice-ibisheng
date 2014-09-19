@@ -592,20 +592,6 @@ function CNaryUndOvr(bInside)
     this.setDimension(3,1);
 }
 Asc.extendClass(CNaryUndOvr, CMathBase);
-/*CNaryUndOvr.prototype.old_init = function(oSign)
-{
-    this.setDimension(3,1);
-
-    var iter1 = new CMathContent();
-    iter1.decreaseArgSize();
-
-    var iter2 = new CMathContent();
-    iter2.decreaseArgSize();
-
-    var base = new CMathContent();
-
-    this.addMCToContent(iter1, base, iter2);
-}*/
 CNaryUndOvr.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
@@ -653,11 +639,11 @@ CNaryUndOvr.prototype.recalculateSize = function()
 CNaryUndOvr.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
-    this.pos.y = pos.y - this.size.ascent;
+    this.pos.y = pos.y;
 
     var PosUpIter = new CMathPosition();
 
-    PosUpIter.x = pos.x + this.GapLeft + this.align(0, 0).x;
+    PosUpIter.x = pos.x + this.GapLeft + this.align(0,0).x;
     PosUpIter.y = pos.y;
 
 
