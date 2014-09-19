@@ -4050,7 +4050,7 @@
 						b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
 						i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
 						u: cTextPr.Underline ? Asc.EUnderline.underlineSingle : paragraphUnderline,
-						s: cTextPr.Strikeout ? cTextPr.Strikeout : paragraphStrikeout,
+						s: cTextPr.Strikeout ? cTextPr.Strikeout : cTextPr.DStrikeout ? cTextPr.DStrikeout : paragraphStrikeout,
 						va: verticalAlign ? verticalAlign : paragraphVertAlign
 					}
 				};
