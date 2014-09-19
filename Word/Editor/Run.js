@@ -4539,6 +4539,9 @@ ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
     if ( true !== Selection.Use )
         return true;
 
+    if(this.Type == para_Math_Run && this.IsPlaceholder())
+        return false;
+
     var StartPos = Selection.StartPos;
     var EndPos   = Selection.EndPos;
 

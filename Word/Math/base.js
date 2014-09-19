@@ -742,9 +742,6 @@ CMathBase.prototype =
 
         var bInsideSelect = bEqual && this.elements[startX][startY].bInside == true && !this.elements[startX][startY].IsSelectEmpty();
 
-        if(this.constructor.name == "CNary")
-            console.log("bInsideSelect " + bInsideSelect);
-
         return (!this.SelectStart.bOutside && !this.SelectEnd.bOutside) && bEqual && !bInsideSelect;
     },
     Recalculate_CurPos: function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
