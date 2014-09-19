@@ -941,8 +941,8 @@
 					return result;
 
 				default:
-					// При зажатом Ctrl не вводим символ
-					if (!ctrlKey) {t.skipKeyPress = false;}
+					// При зажатом Ctrl или Alt не вводим символ
+					if (!ctrlKey && !event.altKey) {t.skipKeyPress = false;}
 					return true;
 
 			} // end of switch
