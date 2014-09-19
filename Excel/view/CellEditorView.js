@@ -1617,6 +1617,10 @@
 			}
 
 			t.undoMode = true;
+			if (t.selectionBegin !== t.selectionEnd) {
+				t.selectionBegin = t.selectionEnd = -1;
+				t._cleanSelection();
+			}
 			action.fn.apply(t, action.args);
 			t.undoMode = false;
 		};
