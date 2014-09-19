@@ -2412,7 +2412,9 @@ var gUndoInsDelCellsFlag = true;
 						if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
 						{
 							result = 'changeAutoFilter';
-						}	
+						}
+						else if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTo) && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
+							result = 'changeAutoFilter'
 					}
 					//если выделенная область находится до а/ф
 					if(activeCells.c2 < tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2)
@@ -6338,16 +6340,12 @@ var gUndoInsDelCellsFlag = true;
 			//если хотя бы одна ячейка попадает внутрь tableRange
 			_rangeHitInAnRange: function(range,tableRange)
 			{
-				// ToDo стоит заменить на range.isIntersect
-				for(var r = range.r1; r <= range.r2; r++)
-				{
-					for(var c = range.c1; c <= range.c2; c++)
-					{
-						if(tableRange.r1 <= r && tableRange.r2 >= r && tableRange.c1 <= c && tableRange.c2 >= c)
-							return true;
-					}
-				}
-				return false;
+				var result = false;
+				var isIntersection = range.intersection(tableRange);
+				if(isIntersection != null)
+					result = true;
+				
+				return result;
 			},
 			
 			_generateColumnName: function(tableColumns,indexInsertColumn)
