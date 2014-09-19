@@ -1669,8 +1669,11 @@
 						pasteData = tempWorkbook.aWorksheets[0];
 					if (pasteData) {
 						History.TurnOn();
-						if(pasteData.Drawings && pasteData.Drawings.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
-							t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+						if(pasteData.Drawings && pasteData.Drawings.length)
+						{
+							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+								t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+						}
 						else {
 							var newFonts = {};
 							pasteData.generateFontMap(newFonts);
