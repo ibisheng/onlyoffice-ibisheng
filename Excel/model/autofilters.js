@@ -7166,6 +7166,31 @@ var gUndoInsDelCellsFlag = true;
 				return result;
 			},
 			
+			_intersectionRangeWithTableParts: function(range, aWs)//находим фильтры, находящиеся в данном range
+			{
+				var result = [];
+				var rangeFilter;
+				
+				if(aWs.TableParts)
+				{
+					for(var k = 0; k < aWs.TableParts.length; k++)
+					{
+						if(aWs.TableParts[k])
+						{
+							rangeFilter = aWs.TableParts[k].Ref;
+							if(range.intersection(rangeFilter) && !range.containsRange(rangeFilter))
+							{
+								result[result.length] = aWs.TableParts[k];
+							}
+						}
+					}
+				}
+				if(!result.length)
+					result = false;
+
+				return result;
+			},
+			
 			_shiftId: function(id, colShift, rowShift)
 			{
 				var result = false;
@@ -7182,11 +7207,26 @@ var gUndoInsDelCellsFlag = true;
 			_preMoveAutoFilters: function(arnFrom, arnTo)
 			{
 				var aWs = this._getCurrentWS();
+				
+				var diffCol = arnTo.c1 - arnFrom.c1;
+				var diffRow = arnTo.r1 - arnFrom.r1;
+				
 				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
 				if(findFilters)
 				{
 					for(var i = 0; i < findFilters.length; i++)
 					{
+						var ref = findFilters[i].Ref;
+						var newRange = Asc.Range(ref.c1 + diffCol, ref.r1 + diffRow, ref.c2 + diffCol, ref.r2 + diffRow);
+						
+						//если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
+						var findFiltersFromTo = this._intersectionRangeWithTableParts(newRange , aWs);
+						if(findFiltersFromTo && findFiltersFromTo.length)//удаляем данный фильтр
+						{
+							this.isEmptyAutoFilters(ref);
+							continue;
+						}
+						
 						this._openHiddenRows(findFilters[i]);
 					}
 				}
