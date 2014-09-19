@@ -1064,6 +1064,11 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
+			if (2 === event.button) {
+				this.handlers.trigger('onContextMenu', event);
+				return true;
+			}
+
 			var coord = this._getCoordinates(event);
 
 			this.isMousePressed = false;
@@ -1300,7 +1305,6 @@
 			// Если нажали правую кнопку мыши, то сменим выделение только если мы не в выделенной области
 			if (2 === event.button) {
 				t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
-				t.handlers.trigger('onContextMenu', event);
 			} else {
 				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle  && false === this.settings.isViewerMode){
 					// В режиме автозаполнения
