@@ -7667,9 +7667,9 @@ CChartSpace.prototype =
                 for(i = 0; i < series.length; ++i)
                 {
                     ser = series[i];
+                    arr_str_labels.push(ser.getSeriesName());
                     if(ser.isHidden)
                         continue;
-                    arr_str_labels.push(ser.getSeriesName());
                     calc_entry = new CalcLegendEntry(legend, this);
                     calc_entry.txBody = CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
                     entry = legend.findLegendEntryByIndex(i);
