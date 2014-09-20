@@ -3551,6 +3551,10 @@ function DrawingObjects() {
         return val * ascCvtRatio(from, to);
     };
 
+    _this.convertPixToMM = function(pix)
+    {
+        return this.convertMetric(pix, 0, 3);
+    };
     _this.getSelectedGraphicObjects = function() {
         return _this.controller.selectedObjects;
     };
