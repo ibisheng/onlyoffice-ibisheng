@@ -93,6 +93,9 @@ var ACCENT_ARROW_RIGHT          = 27;
 var ACCENT_ARROW_LR             = 28;
 var ACCENT_HALF_ARROW_LEFT      = 29;
 var ACCENT_HALF_ARROW_RIGHT     = 30;
+var PARENTHESIS_TOP             = 31;
+var PARENTHESIS_BOTTOM          = 32;
+var BRACKET_SQUARE_TOP     	    = 33;
 
 var ACCENT_ONE_DOT              = 31;
 var ACCENT_TWO_DOTS             = 32;

@@ -338,7 +338,6 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     }*/
 
 
-
     /*var shW = 0,
         shH = 0;
 
@@ -406,10 +405,6 @@ CGlyphOperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
 }
-CGlyphOperator.prototype.IsArrow = function()
-{
-    return false;
-}
 
 
 function COperatorBracket()
@@ -421,26 +416,37 @@ COperatorBracket.prototype.calcSize = function( stretch )
 {
     var betta = this.getCtrPrp().FontSize/36;
 
-    // перевернутая скобка
-    var minBoxH = 4.917529296874999 *betta, //width of 0x28
-        widthBr = 12.347222222222221*betta;
-	var maxBoxH;
+    var heightBr, widthBr;
+    var minBoxH = 4.917529296874999 *betta; //width of 0x28
 
-    var rx = stretch / widthBr;
-    if(rx < 1)
-        rx = 1;
-
-    if(rx < 2.1)
-        maxBoxH = minBoxH * 1.37;
-    else if(rx < 3.22)
-        maxBoxH = minBoxH * 1.06;
+    if(this.Parent.type == OPER_GROUP_CHAR)
+    {
+        // перевернутая скобка
+        widthBr = 7.347222222222221*betta;
+        heightBr = minBoxH;
+    }
     else
-        maxBoxH =   8.74 *betta;
+    {
+        // перевернутая скобка
+        widthBr = 12.347222222222221*betta;
+        var maxBoxH;
 
-    var delta = maxBoxH - minBoxH;
+        var rx = stretch / widthBr;
+        if(rx < 1)
+            rx = 1;
 
-    var heightBr = delta/4.3 * (rx - 1) + minBoxH;
-    heightBr = heightBr >  maxBoxH ? maxBoxH : heightBr;
+        if(rx < 2.1)
+            maxBoxH = minBoxH * 1.37;
+        else if(rx < 3.22)
+            maxBoxH = minBoxH * 1.06;
+        else
+            maxBoxH =   8.74 *betta;
+
+        var delta = maxBoxH - minBoxH;
+
+        heightBr = delta/4.3 * (rx - 1) + minBoxH;
+        heightBr = heightBr >  maxBoxH ? maxBoxH : heightBr;
+    }
 
     return {width: widthBr, height: heightBr};
 }
@@ -848,12 +854,18 @@ COperatorBracket.prototype.calcCoord = function(stretch)
 
     }
 
-    var H =  Y[53]*RX[53];
+
     for(var i = 0; i < 54; i++)
     {
-        YY[i] =  (H - Y[i]*RX[i])*alpha;
+        //YY[i] =  (H - Y[i]*RX[i])*alpha;
+        if(this.Parent.type == OPER_GROUP_CHAR)
+            YY[i] = (Y[53] - Y[i])*alpha;
+        else
+            YY[i] = (Y[53]*RX[53] - Y[i]*RX[i])*alpha;
+
         XX[i] =  XX[i]*alpha;
     }
+
 
     for(var i = 0; i < 50; i++)
         YY[54 + i] = YY[51 - i];
@@ -928,7 +940,6 @@ COperatorBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[102], YY[102], XX[103], YY[103], XX[0], YY[0]);
 }
 
-// TODO: сделать так, чтобы размер скобки совпадал в начальном случае (плейсхолдер), сейчас по размеру аргумента
 
 function COperatorParenthesis()
 {
@@ -939,15 +950,29 @@ COperatorParenthesis.prototype.calcSize = function(stretch)
 {
     var betta = this.getCtrPrp().FontSize/36;
 
-    var maxBoxH =   9.63041992187 *betta, //9.63 width of 0x239D
-        minBoxH =   5.27099609375 *betta, //width of 0x28
+    var heightBr, widthBr;
+    var minBoxH =   5.27099609375 *betta; //width of 0x28
+
+
+    if(this.Parent.type == OPER_GROUP_CHAR)
+    {
+        // перевернутая скобка
+        widthBr = 6.99444444444*betta;
+        heightBr = minBoxH;
+    }
+    else
+    {
+        var maxBoxH =   9.63041992187 *betta; //9.63 width of 0x239D
         widthBr = 11.99444444444 *betta;
 
-    var ry = stretch / widthBr,
-        delta = maxBoxH - minBoxH;
 
-    var heightBr = delta/4.3 * (ry - 1) + minBoxH;
-    heightBr = heightBr >  maxBoxH ? maxBoxH : heightBr;
+        var ry = stretch / widthBr,
+            delta = maxBoxH - minBoxH;
+
+        heightBr = delta/4.3 * (ry - 1) + minBoxH;
+        heightBr = heightBr >  maxBoxH ? maxBoxH : heightBr;
+    }
+
 
     return {height: heightBr, width : widthBr};
 }
@@ -975,15 +1000,17 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
     var aug = stretch/(X[9]*alpha)/2; //Y[9]*alpha - высота скобки
     var RX, RY;
 
+    var MIN_AUG = this.Parent.type == OPER_GROUP_CHAR ? 0.5 : 1;
+
     if(aug > 6.53)
     {
         RX = 6.53;
         RY = 2.05;
     }
-    else if(aug < 1)
+    else if(aug < MIN_AUG)
     {
-        RX = 1;
-        RY = 1;
+        RX = MIN_AUG;
+        RY = MIN_AUG;
     }
     else
     {
@@ -991,14 +1018,17 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
         RY = 1 + (aug - 1)*0.19;
     }
 
-    var DistH = [];
-    for(var i= 0; i< 5; i++)
-        DistH[i] = Y[9-i] - Y[i];
-
-    for(var i = 5; i < 10; i++)
+    if(this.Parent.type !== OPER_GROUP_CHAR)
     {
-        Y[i] = Y[i]*RY;               //точки правой дуги
-        Y[9-i] = Y[i] - DistH[9-i];   //точки левой дуги
+        var DistH = [];
+        for(var i= 0; i< 5; i++)
+            DistH[i] = Y[9-i] - Y[i];
+
+        for(var i = 5; i < 10; i++)
+        {
+            Y[i] = Y[i]*RY;               //точки правой дуги
+            Y[9-i] = Y[i] - DistH[9-i];   //точки левой дуги
+        }
     }
 
     // X
@@ -1027,8 +1057,10 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
 
     for(var i = 0; i < 10; i++)
     {
+
         YY[19 - i] = shiftY - Y[i]*alpha;
         YY[i] =  shiftY - Y[i]*alpha;
+
         XX[19 - i] =  X[i]*alpha;
         XX[i] = stretch - X[i]*alpha;
     }
@@ -1626,10 +1658,6 @@ CSingleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[9], YY[9]);
     pGraphics._l(XX[10], YY[10]);
 }
-CSingleArrow.prototype.IsArrow = function()
-{
-    return true;
-}
 
 function CLeftRightArrow()
 {
@@ -1714,10 +1742,6 @@ CLeftRightArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[15], YY[15]);
     pGraphics._l(XX[16], YY[16]);
 
-}
-CLeftRightArrow.prototype.IsArrow = function()
-{
-    return true;
 }
 
 function CDoubleArrow()
@@ -1814,10 +1838,7 @@ CDoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._m(XX[16], YY[16]);
     pGraphics._l(XX[17], YY[17]);
 }
-CDoubleArrow.prototype.IsArrow = function()
-{
-    return true;
-}
+
 
 function CLR_DoubleArrow()
 {
@@ -1923,11 +1944,6 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[22], YY[22]);
     pGraphics._l(XX[23], YY[23]);
 }
-CLR_DoubleArrow.prototype.IsArrow = function()
-{
-    return true;
-}
-
 
 
 function CCombiningArrow()
@@ -2749,6 +2765,45 @@ COperator.prototype.mergeProperties = function(properties, defaultProps)   // pr
         };
         operator.init(prp);
     }
+    else if(code === 0x23DC || type === PARENTHESIS_TOP)
+    {
+        codeChr = 0x23DC;
+        typeOper = PARENTHESIS_TOP;
+
+        operator = new COperatorParenthesis();
+        prp =
+        {
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(prp);
+    }
+    else if(code === 0x23DD || type === PARENTHESIS_BOTTOM)
+    {
+        codeChr = 0x23DD;
+        typeOper = PARENTHESIS_BOTTOM;
+
+        operator = new COperatorParenthesis();
+        prp =
+        {
+            location:   location,
+            turn:       TURN_MIRROR_0
+        };
+        operator.init(prp);
+    }
+    else if(code === 0x23E0 || type === BRACKET_SQUARE_TOP)
+    {
+        codeChr = 0x23E0;
+        typeOper = BRACKET_SQUARE_TOP;
+
+        operator = new CSquareBracket();
+        prp =
+        {
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(prp);
+    }
     else if(code === 0x2190 || type === ARROW_LEFT)
     {
         codeChr =  0x2190;
@@ -3235,7 +3290,13 @@ COperator.prototype.getChr = function()
 }
 COperator.prototype.IsArrow = function()
 {
-    return this.operator.IsArrow();
+    //return this.operator.IsArrow();
+
+    var bArrow = this.typeOper == ARROW_LEFT || this.typeOper == ARROW_RIGHT || this.typeOper == ARROW_LR,
+        bDoubleArrow = this.typeOper == DOUBLE_LEFT_ARROW || this.typeOper == DOUBLE_RIGHT_ARROW || this.typeOper == DOUBLE_ARROW_LR,
+        bAccentArrow = his.typeOper == ACCENT_ARROW_LEFT || this.typeOper == ACCENT_ARROW_RIGHT || this.typeOper == ACCENT_ARROW_LR || this.typeOper == ACCENT_HALF_ARROW_LEFT || this.typeOper == ACCENT_HALF_ARROW_RIGHT;
+
+    return bArrow || bDoubleArrow;
 }
 
 function CDelimiter(props)

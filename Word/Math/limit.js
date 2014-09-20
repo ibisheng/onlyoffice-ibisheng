@@ -60,7 +60,6 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    //this.Set_CompiledCtrPrp(ParaMath);
 
     if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
     {
@@ -125,8 +124,6 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     }
     else
     {
-        //this.setDistance();
-
         this.FName.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
         var ArgSzIter = ArgSize.Copy();
@@ -149,28 +146,6 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
         width += this.GapLeft + this.GapRight;
 
-
-        /*var width = 0;
-        var height = 0;
-
-        var maxWH = this.getWidthsHeights();
-
-        this.setDistance();
-
-        var Widths = maxWH.widths;
-        var Heights = maxWH.heights;
-
-        for( var j = 0 ; j < this.nRow; j++ )
-            height += Heights[j];
-
-        height += this.dH*(this.nRow - 1);
-
-        for(var i=0; i < this.nCol ; i++)
-            width += Widths[i];
-
-        width += this.dW*(this.nCol - 1) + this.GapLeft + this.GapRight;
-
-        var ascent = this.getAscent(oMeasure);*/
 
         this.size = {width: width, height: height, ascent: ascent};
     }
