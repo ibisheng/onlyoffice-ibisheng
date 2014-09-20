@@ -712,12 +712,6 @@ CMathBase.prototype =
             }
         }
 
-        /*if(this.constructor.name == "CDegreeSubSup")
-        {
-            console.log("startX " +  startX + " startY " + startY + "; " + "endX " + endX + " endY " + endY);
-        }*/
-
-
         this.bSelectionUse = true;
 
     },

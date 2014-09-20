@@ -3941,6 +3941,7 @@ CCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         height = base.size.height + this.operator.size.height,
         ascent = this.getAscent(oMeasure);
 
+    width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -3984,7 +3985,7 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
 }
 CCharacter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
-    var align = (this.size.width - this.elements[0][0].size.width)/2;
+    var align = (this.size.width - this.elements[0][0].size.width - this.GapLeft - this.GapRight)/2;
 
     SearchPos.CurX += this.GapLeft + align;
 

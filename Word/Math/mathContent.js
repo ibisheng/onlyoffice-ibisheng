@@ -853,8 +853,10 @@ CMPrp.prototype =
             this.sty = STY_ITALIC;
         else if(Bold == true)
             this.sty = STY_BOLD;
-        else
+        else if(Bold == false && Italic == false)
             this.sty = STY_PLAIN;
+        else
+            this.sty = undefined;
     }
 }
 
@@ -4797,6 +4799,7 @@ CMathContent.prototype =
                 ctrPrp = current.Get_CtrPrp();
 
                 mathPrp = new CMPrp();
+
                 mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
 
                 emptyRun.Set_MathPr(mathPrp);

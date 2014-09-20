@@ -560,7 +560,6 @@ ParaMath.prototype =
         if(PRS.NewRange  == false)
          this.Root.Recalculate_Reset(PRS.Range, PRS.Line);
 
-
         this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize,  TextPr);
 
         //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);

@@ -1151,6 +1151,8 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         height = base.size.height + this.operator.size.height + this.gap,
         ascent = this.operator.size.height + this.gap + this.elements[0][0].size.ascent;
 
+    width += this.GapLeft + this.GapRight;
+
 
     this.size = {height: height, width: width, ascent: ascent};
 }

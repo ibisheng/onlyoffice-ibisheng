@@ -112,7 +112,6 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     }
 
 
-
     if(RPI.bInline == true && RPI.bMathFunc == true)
     {
         this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);

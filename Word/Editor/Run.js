@@ -1559,12 +1559,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         this.Paragraph = PRS.Paragraph;
 
-        if(this.Type == para_Math_Run)
+        /*if(this.Type == para_Math_Run)
         {
             this.ArgSize   = PRS.ArgSize.value;
             this.bEqqArray = PRS.bEqqArray;
             this.Parent    = PRS.Parent;
-        }
+        }*/
         this.RecalcInfo.TextPr = true;
 
         this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
