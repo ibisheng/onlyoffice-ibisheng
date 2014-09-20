@@ -10719,6 +10719,20 @@ CPivotSource.prototype =
         }
     },
 
+    createDuplicate: function()
+    {
+        var copy = new CPivotSource();
+        if(isRealNumber(this.fmtId))
+        {
+            copy.setFmtId(this.fmtId);
+        }
+        if(typeof  this.name === "string")
+        {
+            copy.setName(this.name);
+        }
+        return copy;
+    },
+
     Save_Changes: function(data, w)
     {
         w.WriteLong(data.Type);
@@ -10819,6 +10833,17 @@ CProtection.prototype =
     {
         History.Add(this, {Type: historyitem_Protection_SetUserInterface, newPr: pr, oldPr:this.userInterface});
         this.userInterface = pr;
+    },
+
+    createDuplicate: function()
+    {
+        var c = new CProtection();
+        c.setChartObject  (this.chartObject  );
+        c.setData         (this.data);
+        c.setFormatting   (this.formatting);
+        c.setSelection    (this.selection);
+        c.setUserInterface(this.userInterface);
+        return c;
     },
 
 
