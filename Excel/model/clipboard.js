@@ -3145,6 +3145,7 @@
 					graphicObject = data[i].image.GraphicObj;
 					
 					//convert from word
+                    graphicObject.bDeleted = true;
 					graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model)
 					
 					//create new drawingBase
@@ -3212,9 +3213,9 @@
 					
 					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 					drawingObject.graphicObject.recalculate();
-					
 					drawingObject.graphicObject.addToDrawingObjects();
-					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
+                    drawingObject.graphicObject.recalculateTransform();
+                    drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
 					if(drawingObject.graphicObject.isImage())
 						aImagesSync.push(drawingObject.graphicObject.getImageUrl());

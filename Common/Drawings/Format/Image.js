@@ -381,6 +381,7 @@ CImageShape.prototype =
     {
         this.setWorksheet(worksheet);
         this.setParent(null);
+        this.setBDeleted(false);
         return this;
     },
 
