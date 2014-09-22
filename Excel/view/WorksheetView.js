@@ -7953,6 +7953,8 @@
 							range.cleanText();
 						else if (val & c_oAscCleanOptions.Format)
 							range.cleanFormat();
+						else if (val & c_oAscCleanOptions.Comments)
+							t.cellCommentator.deleteCommentsRange(arn);
 
 						// Если нужно удалить автофильтры - удаляем
 						t.autoFilters.isEmptyAutoFilters(arn);

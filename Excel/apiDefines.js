@@ -160,7 +160,8 @@ var c_oAscCleanOptions = {
 	All		: 0,
 	Text	: 1,
 	Format	: 2,
-	Formula	: 4
+	Formula	: 4,
+	Comments: 5
 };
 
 var c_oAscDrawDepOptions = {
