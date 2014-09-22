@@ -1176,6 +1176,13 @@ CDrawingDocument.prototype =
 
         var drawingFirst    = this.Native["GetDrawingFirstPage"]();
         var drawingEnd      = this.Native["GetDrawingEndPage"]();
+
+        if (-1 == drawingFirst || -1 == drawingEnd)
+        {
+            this.Native["DD_Overlay_UpdateEnd"]();
+            return true;
+        }
+
         if (this.m_bIsSelection)
         {
             this.Native["DD_Overlay_StartDrawSelection"]();
