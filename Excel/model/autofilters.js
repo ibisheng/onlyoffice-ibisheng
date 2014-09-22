@@ -459,7 +459,11 @@ var gUndoInsDelCellsFlag = true;
 										cloneAC.r1 = cloneAC.r1 + 1;
 										cloneAC.r2 = cloneAC.r1;
 										cloneAC.c2 = cloneAC.c1;
-									}	
+									}
+									
+									//делаем unmerge
+									ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
+									
 									var n = 0;
 									result = [];
 									for(col = activeCells.c1; col <= activeCells.c2; col++)
