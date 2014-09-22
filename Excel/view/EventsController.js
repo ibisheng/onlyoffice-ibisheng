@@ -1064,11 +1064,6 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
-			if (2 === event.button) {
-				this.handlers.trigger('onContextMenu', event);
-				return true;
-			}
-
 			var coord = this._getCoordinates(event);
 
 			this.isMousePressed = false;
@@ -1320,6 +1315,11 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseUp = function (event) {
+			if (2 === event.button) {
+				this.handlers.trigger('onContextMenu', event);
+				return true;
+			}
+
 			// Shapes
 			var coord = this._getCoordinates(event);
 			event.isLocked = this.isMousePressed = false;
