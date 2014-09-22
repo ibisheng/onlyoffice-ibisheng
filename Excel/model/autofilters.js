@@ -2136,7 +2136,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else
 				{
-					if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
+					if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length && this._isFilterColumnsContainFilter(aWs.AutoFilter.FilterColumns)) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
 					{
 						result = {isFilterColumns: true, isAutoFilter: true};
 					}
@@ -7416,6 +7416,20 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				return false;
+			},
+			
+			_isFilterColumnsContainFilter: function(filterColumns)
+			{
+				if(!filterColumns || !filterColumns.length)
+					return false;
+				
+				var filterColumn;
+				for(var k = 0; k < filterColumns.length; k++)
+				{
+					filterColumn = filterColumns[k];
+					if(filterColumn && (filterColumn.ColorFilter || filterColumn.ColorFilter || filterColumn.CustomFiltersObj || filterColumn.DynamicFilter || filterColumn.Filters || filterColumn.Top10))
+						return true;
+				}
 			}
 			
 		};
