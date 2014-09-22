@@ -2229,11 +2229,11 @@ var gUndoInsDelCellsFlag = true;
 					var newActiveRange;
 					if(DeleteRows)
 					{
-						newActiveRange = new Range(aWs, activeCells.r1, ws.visibleRange.c1, activeCells.r2, ws.visibleRange.c2);
+						newActiveRange = new Asc.Range(ws.visibleRange.c1, activeCells.r1, ws.visibleRange.c2, activeCells.r2);
 					}
 					else
 					{
-						newActiveRange = new Range(aWs, ws.visibleRange.r1, activeCells.c1, ws.visibleRange.r2, activeCells.c2);
+						newActiveRange = new Asc.Range(activeCells.c1, ws.visibleRange.r1, activeCells.c2, ws.visibleRange.r2);
 					}
 					//если активной областью захвачена полнотью форматированная таблица(или её часть) + часть форматированной таблицы - выдаём ошибку
 					if(tableParts)
