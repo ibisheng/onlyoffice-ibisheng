@@ -236,6 +236,14 @@ Slide.prototype =
         this.num = num;
     },
 
+    recalcText: function()
+    {
+        this.recalcInfo.recalculateSpTree = true;
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].recalcText && this.cSld.spTree[i].recalcText();
+        }
+    },
 
     addComment: function(comment)
     {
@@ -280,7 +288,6 @@ Slide.prototype =
             this.addToRecalculate();
         }
     },
-
 
     Write_ToBinary2: function(w)
     {
@@ -571,7 +578,28 @@ Slide.prototype =
             case historyitem_SlideSetBg:
             {
                 this.cSld.Bg = new CBg();
-                this.cSld.Bg.Read_FromBinary2(r);
+                this.cSld.Bg.Read_FromBinary(r);
+                this.recalcInfo.recalculateBackground = true;
+                var Fill;
+                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill)
+                {
+                    Fill = this.cSld.Bg.bgPr.Fill;
+                }
+                if(typeof CollaborativeEditing !== "undefined")
+                {
+                    if(Fill && Fill.fill && Fill.fill.type === FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
+                    {
+                        var full_image_src_func;
+                        if(typeof _getFullImageSrc === "function")
+                        {
+                            full_image_src_func = _getFullImageSrc;
+                        }
+                        if(full_image_src_func)
+                        {
+                            CollaborativeEditing.Add_NewImage(full_image_src_func(Fill.fill.RasterImageId));
+                        }
+                    }
+                }
                 break;
             }
             case historyitem_SlideSetLocks:
@@ -604,6 +632,8 @@ Slide.prototype =
             case historyitem_SlideSetClrMapOverride:
             {
                 this.clrMap = readObject(r);
+                this.recalcInfo.recalculateBackground = true;
+                this.recalcInfo.recalculateSpTree = true;
                 break;
             }
         }
@@ -785,6 +815,23 @@ Slide.prototype =
         return this.Id;
     },
 
+    Get_ColorMap: function()
+    {
+        if(this.clrMap)
+        {
+            return this.clrMap;
+        }
+        else if(this.Layout && this.Layout.clrMap)
+        {
+            return this.Layout.clrMap;
+        }
+        else if(this.Layout.Master && this.Layout.Master.clrMap)
+        {
+            return this.Layout.Master.clrMap;
+        }
+        return G_O_DEFAULT_COLOR_MAP;
+    },
+
     recalculate: function()
     {
         if(this.recalcInfo.recalculateBackground)
@@ -815,7 +862,7 @@ Slide.prototype =
             {
                 this.cSld.Bg.bgRef.Color.Calculate(_theme, this, _layout, _master, RGBA);
                 RGBA = this.cSld.Bg.bgRef.Color.RGBA;
-                _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(this.cSld.Bg.bgRef.idx);
+                _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(this.cSld.Bg.bgRef.idx, this.cSld.Bg.bgRef.Color);
             }
         }
         else
@@ -830,7 +877,7 @@ Slide.prototype =
                     {
                         _layout.cSld.Bg.bgRef.Color.Calculate(_theme, this, _layout, _master, RGBA);
                         RGBA = _layout.cSld.Bg.bgRef.Color.RGBA;
-                        _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_layout.cSld.Bg.bgRef.idx);
+                        _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_layout.cSld.Bg.bgRef.idx, _layout.cSld.Bg.bgRef.Color);
                     }
                 }
                 else if (_master != null)
@@ -843,7 +890,7 @@ Slide.prototype =
                         {
                             _master.cSld.Bg.bgRef.Color.Calculate(_theme, this, _layout, _master, RGBA);
                             RGBA = _master.cSld.Bg.bgRef.Color.RGBA;
-                            _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_master.cSld.Bg.bgRef.idx);
+                            _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_master.cSld.Bg.bgRef.idx, _master.cSld.Bg.bgRef.Color);
                         }
                     }
                     else
@@ -1154,7 +1201,6 @@ function PropLocker(objectId)
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
-
     if(typeof  objectId === "string")
     {
         this.setObjectId(objectId);
@@ -1164,6 +1210,10 @@ function PropLocker(objectId)
 
 PropLocker.prototype = {
 
+    getObjectType: function()
+    {
+        return historyitem_type_PropLocker;
+    },
     setObjectId: function(id)
     {
         History.Add(this, {Type: historyitem_PropLockerSetId, oldId: this.objectId, newId: id});

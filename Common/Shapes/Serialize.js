@@ -474,11 +474,6 @@ function BinaryPPTYLoader()
                 // tablestyles
                 s.Seek2(_main_tables["6"]);
                 this.presentation.TableStyles = this.ReadTableStyles();
-
-                if (this.presentation.globalTableStyles.length == 0)
-                {
-                    this.presentation.globalTableStyles[0] = CreateDefaultStylesForTables();
-                }
             }
         }
 
@@ -850,6 +845,7 @@ function BinaryPPTYLoader()
 
         s.Skip2(1); // start attributes
 
+        var _old_default = this.presentation.DefaultTableStyleId;
         while (true)
         {
             var _at = s.GetUChar();
@@ -879,6 +875,10 @@ function BinaryPPTYLoader()
             this.ReadTableStyle();
         }
 
+        if(!this.presentation.globalTableStyles.Style[this.presentation.DefaultTableStyleId])
+        {
+            this.presentation.DefaultTableStyleId = _old_default;
+        }
         s.Seek2(_end_rec);
     }
 
@@ -904,9 +904,9 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     var _id = s.GetString2();
-                    _style.Id = _id;
-                    this.map_table_styles[_id] = this.NextTableStyleId;
-                    this.NextTableStyleId++;
+                   // _style.Id = _id;
+                    this.presentation.TableStylesIdMap[_style.Id] = true;
+                    this.map_table_styles[_id] = _style;
                     break;
                 }
                 case 1:
@@ -967,7 +967,7 @@ function BinaryPPTYLoader()
                                     _style.TablePr.Shd = new CDocumentShd();
                                     _style.TablePr.Shd.Value = shd_Clear;
                                 }
-                                _style.TablePr.Shd.fillRef = this.ReadStyleRef();
+                                _style.TablePr.Shd.FillRef = this.ReadStyleRef();
                                 break;
                             }
                             default:
@@ -1050,6 +1050,36 @@ function BinaryPPTYLoader()
 
         s.Seek2(_end_rec);
 
+        if(_style.TableWholeTable.TableCellPr.TableCellBorders.InsideH)
+        {
+            _style.TablePr.TableBorders.InsideH = _style.TableWholeTable.TableCellPr.TableCellBorders.InsideH;
+            delete _style.TableWholeTable.TableCellPr.TableCellBorders.InsideH;
+        }
+        if(_style.TableWholeTable.TableCellPr.TableCellBorders.InsideV)
+        {
+            _style.TablePr.TableBorders.InsideV = _style.TableWholeTable.TableCellPr.TableCellBorders.InsideV;
+            delete _style.TableWholeTable.TableCellPr.TableCellBorders.InsideV;
+        }
+        if(_style.TableWholeTable.TableCellPr.TableCellBorders.Top)
+        {
+            _style.TablePr.TableBorders.Top = _style.TableWholeTable.TableCellPr.TableCellBorders.Top;
+            delete _style.TableWholeTable.TableCellPr.TableCellBorders.Top;
+        }
+        if(_style.TableWholeTable.TableCellPr.TableCellBorders.Bottom)
+        {
+            _style.TablePr.TableBorders.Bottom = _style.TableWholeTable.TableCellPr.TableCellBorders.Bottom;
+            delete _style.TableWholeTable.TableCellPr.TableCellBorders.Bottom;
+        }
+        if(_style.TableWholeTable.TableCellPr.TableCellBorders.Left)
+        {
+            _style.TablePr.TableBorders.Left = _style.TableWholeTable.TableCellPr.TableCellBorders.Left;
+            delete _style.TableWholeTable.TableCellPr.TableCellBorders.Left;
+        }
+        if(_style.TableWholeTable.TableCellPr.TableCellBorders.Right)
+        {
+            _style.TablePr.TableBorders.Right = _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
+            delete _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
+        }
         this.presentation.globalTableStyles.Add(_style);
     };
 
@@ -1127,9 +1157,13 @@ function BinaryPPTYLoader()
                             }
                             case 1:
                             {
-                                _part.TextPr.Unifill = new CUniFill();
-                                _part.TextPr.Unifill.fill = new CSolidFill();
-                                _part.TextPr.Unifill.fill.color = this.ReadUniColor();
+                                var _Unicolor = this.ReadUniColor();
+                                if(_Unicolor.color)
+                                {
+                                    _part.TextPr.Unifill = new CUniFill();
+                                    _part.TextPr.Unifill.fill = new CSolidFill();
+                                    _part.TextPr.Unifill.fill.color = _Unicolor;
+                                }
                                 break;
                             }
                             default:
@@ -4925,6 +4959,7 @@ function BinaryPPTYLoader()
         var _end_rec = _rec_start + s.GetULong() + 4;
 
         var _graphic_frame = new CGraphicFrame();
+        _graphic_frame.setParent2(this.TempMainObject);
         this.TempGroupObject = _graphic_frame;
 
         s.Skip2(1); // start attributes
@@ -5188,7 +5223,11 @@ function BinaryPPTYLoader()
         var _table = new CTable(this.presentation.DrawingDocument, _graphic_frame, true, 0, 0, 0, _xfrm.extX, 100000, rows, cols.length, cols, true);
         if (null != props)
         {
-            _table.Set_TableStyle(props.style);
+            var style;
+            if(this.map_table_styles[props.style])
+            {
+                _table.Set_TableStyle(this.map_table_styles[props.style].Id);
+            }
             _table.Set_Pr(props.props);
             _table.Set_TableLook(props.look);
         }
@@ -5326,7 +5365,8 @@ function BinaryPPTYLoader()
                 {
                     var props = new CTableCellPr();
                     this.ReadCellProps(props);
-                    cell.Copy_Pr(props);
+                    props.Merge(cell.Pr);
+                    cell.Set_Pr(props);
                     break;
                 }
                 case 1:
@@ -5352,11 +5392,11 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
-        props.TableCellMar = {};
-        props.TableCellMar.Top    = new CTableMeasurement(tblwidth_Mm, 1.27);
-        props.TableCellMar.Left   = new CTableMeasurement(tblwidth_Mm, 2.54);
-        props.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Mm, 1.27);
-        props.TableCellMar.Right  = new CTableMeasurement(tblwidth_Mm, 2.54);
+        //props.TableCellMar = {};
+        //props.TableCellMar.Top    = new CTableMeasurement(tblwidth_Mm, 1.27);
+        //props.TableCellMar.Left   = new CTableMeasurement(tblwidth_Mm, 2.54);
+        //props.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Mm, 1.27);
+        //props.TableCellMar.Right  = new CTableMeasurement(tblwidth_Mm, 2.54);
 
         s.Skip2(1); // start attributes
 
@@ -5637,12 +5677,12 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    nvPr.isPhoto = s.GetBool();
+                    nvPr.setIsPhoto(s.GetBool());
                     break;
                 }
                 case 1:
                 {
-                    nvPr.userDrawn = s.GetBool();
+                    nvPr.setUserDrawn(s.GetBool());
                     break;
                 }
                 default:
@@ -5657,7 +5697,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    nvPr.ph = this.ReadPH();
+                    nvPr.setPh(this.ReadPH());
                     break;
                 }
                 default:
@@ -5692,27 +5732,27 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    ph.hasCustomPrompt = s.GetBool();
+                    ph.setHasCustomPrompt(s.GetBool());
                     break;
                 }
                 case 1:
                 {
-                    ph.idx = s.GetString2();
+                    ph.setIdx(s.GetString2());
                     break;
                 }
                 case 2:
                 {
-                    ph.orient = s.GetUChar();
+                    ph.setOrient(s.GetUChar());
                     break;
                 }
                 case 3:
                 {
-                    ph.sz = s.GetUChar();
+                    ph.setSz(s.GetUChar());
                     break;
                 }
                 case 4:
                 {
-                    ph.type = s.GetUChar();
+                    ph.setType(s.GetUChar());
                     break;
                 }
                 default:

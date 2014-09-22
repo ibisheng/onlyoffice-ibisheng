@@ -59,7 +59,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         var style = this.style;
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
         var RGBA = style.fillRef.Color.RGBA;
-        var pen = theme.getLnStyle(style.lnRef.idx);
+        var pen = theme.getLnStyle(style.lnRef.idx, style.lnRef.Color);
         style.lnRef.Color.Calculate(theme, slide, layout, master);
         RGBA = style.lnRef.Color.RGBA;
 

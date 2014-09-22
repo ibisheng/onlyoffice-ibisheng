@@ -283,12 +283,12 @@ CTextBody.prototype =
         {
             case historyitem_TextBodySetParent:
             case historyitem_TextBodySetContent:
-            case historyitem_TextBodySetLstStyle:
             {
                 writeObject(w, data.newPr);
                 break;
             }
             case historyitem_TextBodySetBodyPr:
+            case historyitem_TextBodySetLstStyle:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -338,7 +338,16 @@ CTextBody.prototype =
                 }
                 case historyitem_TextBodySetLstStyle:
                 {
-                    this.lstStyle = readObject(r);
+                    if(r.GetBool())
+                    {
+                        this.lstStyle = new TextListStyle();
+                        this.lstStyle.Read_FromBinary(r);
+                    }
+                    else
+                    {
+                        this.bodyPr = null;
+                    }
+
                     break;
                 }
             }

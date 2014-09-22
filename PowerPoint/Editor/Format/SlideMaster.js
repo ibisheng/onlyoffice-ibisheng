@@ -154,11 +154,13 @@ MasterSlide.prototype =
     {
         w.WriteLong(historyitem_type_SlideMaster);
         w.WriteString2(this.Id);
+        writeObject(w, this.theme);
     },
 
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+        this.theme = readObject(r);
     },
 
     Save_Changes: function(data, w)
@@ -214,7 +216,27 @@ MasterSlide.prototype =
             case historyitem_SlideMasterSetBg               :
             {
                 this.cSld.Bg = new CBg();
-                this.cSld.Bg.Read_FromBinary();
+                this.cSld.Bg.Read_FromBinary(r);
+                var Fill;
+                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill)
+                {
+                    Fill = this.cSld.Bg.bgPr.Fill;
+                }
+                if(typeof CollaborativeEditing !== "undefined")
+                {
+                    if(Fill && Fill.fill && Fill.fill.type === FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
+                    {
+                        var full_image_src_func;
+                        if(typeof _getFullImageSrc === "function")
+                        {
+                            full_image_src_func = _getFullImageSrc;
+                        }
+                        if(full_image_src_func)
+                        {
+                            CollaborativeEditing.Add_NewImage(full_image_src_func(Fill.fill.RasterImageId));
+                        }
+                    }
+                }
                 break;
             }
             case historyitem_SlideMasterSetTxStyles         :
@@ -230,7 +252,7 @@ MasterSlide.prototype =
             }
             case historyitem_SlideMasterSetClrMapOverride   :
             {
-                this.clrMap = readObject(r)
+                this.clrMap = readObject(r);
                 break;
             }
             case historyitem_SlideMasterAddLayout           :
@@ -691,7 +713,7 @@ function CMasterThumbnailDrawer()
             {
                 _layout.cSld.Bg.bgRef.Color.Calculate(_theme, null, _layout, _master, RGBA);
                 RGBA = _layout.cSld.Bg.bgRef.Color.RGBA;
-                _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_layout.cSld.Bg.bgRef.idx);
+                _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_layout.cSld.Bg.bgRef.idx, _layout.cSld.Bg.bgRef.Color);
             }
         }
         else if (_master != null)
@@ -704,7 +726,7 @@ function CMasterThumbnailDrawer()
                 {
                     _master.cSld.Bg.bgRef.Color.Calculate(_theme, null, _layout, _master, RGBA);
                     RGBA = _master.cSld.Bg.bgRef.Color.RGBA;
-                    _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_master.cSld.Bg.bgRef.idx);
+                    _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_master.cSld.Bg.bgRef.idx, _master.cSld.Bg.bgRef.Color);
                 }
             }
             else

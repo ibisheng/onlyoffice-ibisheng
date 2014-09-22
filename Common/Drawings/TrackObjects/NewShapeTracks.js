@@ -56,7 +56,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 brush.fill.color = style.fillRef.Color.createDuplicate();
             }
         }
-        var pen = theme.getLnStyle(style.lnRef.idx);
+        var pen = theme.getLnStyle(style.lnRef.idx, style.lnRef.Color);
         style.lnRef.Color.Calculate(theme, slide, layout, master);
         RGBA = style.lnRef.Color.RGBA;
 

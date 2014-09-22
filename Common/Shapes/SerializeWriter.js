@@ -54,7 +54,7 @@ function GUID()
 function CBinaryFileWriter()
 {
     // temp members
-    this.tableStylesGuides = [];
+    this.tableStylesGuides = {};
 
     // memory functions ----------
     this.Init = function()
@@ -515,29 +515,51 @@ function CBinaryFileWriter()
             }
         }
 
-        var _count_table_styles = presentation.globalTableStyles.length;
-        if (0 < _count_table_styles)
+        //var _count_table_styles = presentation.globalTableStyles.length;
+        //if (0 < _count_table_styles)
+        //{
+
+        for(var key in presentation.TableStylesIdMap)
         {
-            for (var i = 0; i < _count_table_styles; i++)
+            if(presentation.TableStylesIdMap.hasOwnProperty(key))
             {
-                this.tableStylesGuides[i] = "{" + GUID() + "}";
+                this.tableStylesGuides[key] = "{" + GUID() + "}"
             }
-
-            this.StartMainRecord(c_oMainTables.TableStyles);
-            this.StartRecord(c_oMainTables.SlideRels);
-            this.WriteUChar(g_nodeAttributeStart);
-            this._WriteString1(0, this.tableStylesGuides[0]);
-            this.WriteUChar(g_nodeAttributeEnd);
-
-            this.StartRecord(0);
-            for (var i = 0; i < _count_table_styles; i++)
-            {
-                this.WriteTableStyle(i, presentation.globalTableStyles[i]);
-            }
-            this.EndRecord();
-
-            this.EndRecord();
         }
+
+
+        this.StartMainRecord(c_oMainTables.TableStyles);
+        this.StartRecord(c_oMainTables.SlideRels);
+        this.WriteUChar(g_nodeAttributeStart);
+        if(this.tableStylesGuides[presentation.DefaultTableStyleId])
+        {
+            this._WriteString1(0, this.tableStylesGuides[presentation.DefaultTableStyleId]);
+        }
+        else
+        {
+            for(key in this.tableStylesGuides)
+            {
+                if(this.tableStylesGuides.hasOwnProperty(key))
+                {
+                    this._WriteString1(0, this.tableStylesGuides[key]);
+                    break;
+                }
+            }
+        }
+        this.WriteUChar(g_nodeAttributeEnd);
+
+        this.StartRecord(0);
+        for (key in this.tableStylesGuides)
+        {
+            if(this.tableStylesGuides.hasOwnProperty(key))
+            {
+                this.WriteTableStyle(key, g_oTableId.m_aPairs[key]);
+            }
+        }
+        this.EndRecord();
+
+        this.EndRecord();
+        //}
 
         this.StartMainRecord(c_oMainTables.SlideRels);
         this.StartRecord(c_oMainTables.SlideRels);
@@ -1356,6 +1378,7 @@ function CBinaryFileWriter()
         uniPr.cNvPr.name = "";
 
         var spPr = new CSpPr();
+        spPr.xfrm = new CXfrm();
         spPr.xfrm.offX = 0;
         spPr.xfrm.offY = 0;
         spPr.xfrm.extX = 0;
@@ -1473,9 +1496,22 @@ function CBinaryFileWriter()
     {
         var _levels = styles.levels;
         var _count = _levels.length;
+        var _props_to_write;
         for (var i = 0; i < _count; ++i)
         {
-            oThis.WriteRecord2(i, _levels[i], oThis.WriteTextParagraphPr);
+            if(_levels[i])
+            {
+                _props_to_write = new CTextParagraphPr();
+                _props_to_write.bullet = _levels[i].Bullet;
+                _props_to_write.lvl = _levels[i].Lvl;
+                _props_to_write.pPr = _levels[i];
+                _props_to_write.rPr = _levels[i].DefaultRunPr;
+            }
+            else
+            {
+                _props_to_write = null;
+            }
+            oThis.WriteRecord2(i, _props_to_write, oThis.WriteTextParagraphPr);
         }
     }
     this.WriteTextParagraphPr = function(tPr)
@@ -2670,7 +2706,7 @@ function CBinaryFileWriter()
         var obj = {};
         obj.props = table.Pr;
         obj.look = table.TableLook;
-        obj.style = table.styleIndex;
+        obj.style = table.TableStyle;
 
         oThis.WriteRecord1(0, obj, oThis.WriteTableProps);
 
@@ -2885,7 +2921,7 @@ function CBinaryFileWriter()
         var shd = cell.Pr.Shd;
         if (shd !== undefined && shd != null)
         {
-            oThis.WriteRecord2(6, shd.unifill, oThis.WriteUniFill);
+            oThis.WriteRecord2(6, shd.Unifill, oThis.WriteUniFill);
         }
 
         oThis.EndRecord();
@@ -2899,8 +2935,10 @@ function CBinaryFileWriter()
     {
         oThis.WriteUChar(g_nodeAttributeStart);
 
-        if (obj.style != -1)
+        if(oThis.tableStylesGuides.hasOwnProperty(obj.style))
+        {
             oThis._WriteString1(0, oThis.tableStylesGuides[obj.style]);
+        }
         oThis._WriteBool1(2, obj.look.m_bFirst_Row);
         oThis._WriteBool1(3, obj.look.m_bFirst_Col);
         oThis._WriteBool1(4, obj.look.m_bLast_Row);
@@ -2913,11 +2951,11 @@ function CBinaryFileWriter()
         var shd = obj.props.Shd;
         if (shd !== undefined && shd != null)
         {
-            if (shd.unifill !== undefined && shd.unifill != null)
+            if (shd.Unifill !== undefined && shd.Unifill != null)
             {
-                if (shd.unifill.fill !== undefined && shd.unifill.fill != null)
+                if (shd.Unifill.fill !== undefined && shd.Unifill.fill != null)
                 {
-                    oThis.WriteRecord1(0, shd.unifill, oThis.WriteUniFill);
+                    oThis.WriteRecord1(0, shd.Unifill, oThis.WriteUniFill);
                 }
             }
         }
@@ -3490,15 +3528,15 @@ function CBinaryFileWriter()
         {
             oThis.StartRecord(0);
 
-            if (tableStyle.TablePr.Shd.unifill != null && tableStyle.TablePr.Shd.unifill !== undefined)
+            if (tableStyle.TablePr.Shd.Unifill != null && tableStyle.TablePr.Shd.Unifill !== undefined)
             {
                 oThis.StartRecord(0);
-                oThis.WriteRecord2(0, tableStyle.TablePr.Shd.unifill, oThis.WriteUniFill);
+                oThis.WriteRecord2(0, tableStyle.TablePr.Shd.Unifill, oThis.WriteUniFill);
                 oThis.EndRecord();
             }
-            if (tableStyle.TablePr.Shd.fillRef != null && tableStyle.TablePr.Shd.fillRef !== undefined)
+            if (tableStyle.TablePr.Shd.FillRef != null && tableStyle.TablePr.Shd.FillRef !== undefined)
             {
-                oThis.WriteRecord2(1, tableStyle.TablePr.Shd.fillRef, oThis.WriteStyleRef);
+                oThis.WriteRecord2(1, tableStyle.TablePr.Shd.FillRef, oThis.WriteStyleRef);
             }
 
             oThis.EndRecord();
@@ -3534,11 +3572,11 @@ function CBinaryFileWriter()
     this.WriteTableStylePart = function(_part)
     {
         var bIsFontRef = false;
-        if (_part.TextPr.fontRef !== undefined && _part.TextPr.fontRef != null)
+        if (_part.TextPr.FontRef !== undefined && _part.TextPr.FontRef != null)
             bIsFontRef = true;
 
         var bIsFill = false;
-        if (_part.TextPr.unifill !== undefined && _part.TextPr.unifill != null)
+        if (_part.TextPr.Unifill !== undefined && _part.TextPr.Unifill != null)
             bIsFill = true;
 
         if (bIsFontRef || bIsFill)
@@ -3547,10 +3585,10 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeStart);
             oThis.WriteUChar(g_nodeAttributeEnd);
 
-            oThis.WriteRecord2(0, _part.TextPr.fontRef, oThis.WriteFontRef);
+            oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
 
-            if (bIsFill && _part.TextPr.unifill.fill !== undefined && _part.TextPr.unifill.fill != null && _part.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                oThis.WriteRecord2(1, _part.TextPr.unifill.fill.color, oThis.WriteUniColor);
+            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == FILL_TYPE_SOLID)
+                oThis.WriteRecord2(1, _part.TextPr.Unifill.fill.color, oThis.WriteUniColor);
 
             oThis.EndRecord();
         }
@@ -3583,11 +3621,11 @@ function CBinaryFileWriter()
         var _Shd = _part.TableCellPr.Shd;
         if (undefined !== _Shd && null != _Shd)
         {
-            oThis.WriteRecord2(1, _Shd.fillRef, oThis.WriteStyleRef);
-            if (_Shd.unifill !== undefined && _Shd.unifill != null)
+            oThis.WriteRecord2(1, _Shd.FillRef, oThis.WriteStyleRef);
+            if (_Shd.Unifill !== undefined && _Shd.Unifill != null)
             {
                 oThis.StartRecord(2);
-                oThis.WriteRecord2(0, _Shd.unifill, oThis.WriteUniFill);
+                oThis.WriteRecord2(0, _Shd.Unifill, oThis.WriteUniFill);
                 oThis.EndRecord();
             }
         }
@@ -3598,11 +3636,11 @@ function CBinaryFileWriter()
     this.WriteTableStylePartWH = function(_part, tablePr)
     {
         var bIsFontRef = false;
-        if (_part.TextPr.fontRef !== undefined && _part.TextPr.fontRef != null)
+        if (_part.TextPr.FontRef !== undefined && _part.TextPr.FontRef != null)
             bIsFontRef = true;
 
         var bIsFill = false;
-        if (_part.TextPr.unifill !== undefined && _part.TextPr.unifill != null)
+        if (_part.TextPr.Unifill !== undefined && _part.TextPr.Unifill != null)
             bIsFill = true;
 
         if (bIsFontRef || bIsFill)
@@ -3611,10 +3649,10 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeStart);
             oThis.WriteUChar(g_nodeAttributeEnd);
 
-            oThis.WriteRecord2(0, _part.TextPr.fontRef, oThis.WriteFontRef);
+            oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
 
-            if (bIsFill && _part.TextPr.unifill.fill !== undefined && _part.TextPr.unifill.fill != null && _part.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                oThis.WriteRecord2(1, _part.TextPr.unifill.fill.color, oThis.WriteUniColor);
+            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == FILL_TYPE_SOLID)
+                oThis.WriteRecord2(1, _part.TextPr.Unifill.fill.color, oThis.WriteUniColor);
 
             oThis.EndRecord();
         }
@@ -3671,11 +3709,11 @@ function CBinaryFileWriter()
         var _Shd = _part.TableCellPr.Shd;
         if (undefined !== _Shd && null != _Shd)
         {
-            oThis.WriteRecord2(1, _Shd.fillRef, oThis.WriteStyleRef);
-            if (_Shd.unifill !== undefined && _Shd.unifill != null)
+            oThis.WriteRecord2(1, _Shd.FillRef, oThis.WriteStyleRef);
+            if (_Shd.Unifill !== undefined && _Shd.Unifill != null)
             {
                 oThis.StartRecord(2);
-                oThis.WriteRecord2(0, _Shd.unifill, oThis.WriteUniFill);
+                oThis.WriteRecord2(0, _Shd.Unifill, oThis.WriteUniFill);
                 oThis.EndRecord();
             }
         }
@@ -3702,7 +3740,7 @@ function CBinaryFileWriter()
 
         var bIsFill = false;
         var bIsSize = false;
-        if ((_border.unifill !== undefined && _border.unifill != null) || _border.Color instanceof CDocumentColor)
+        if ((_border.Unifill !== undefined && _border.Unifill != null) || _border.Color instanceof CDocumentColor)
         {
             bIsFill = true;
         }
@@ -3722,7 +3760,7 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeEnd);
 
             // TODO: потом переделать по-нормальному
-            if (!_border.unifill && _border.Color instanceof CDocumentColor)
+            if (!_border.Unifill && _border.Color instanceof CDocumentColor)
             {
                 var _unifill = new CUniFill();
                 _unifill.fill = new CSolidFill();
@@ -3735,7 +3773,7 @@ function CBinaryFileWriter()
                 oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
             }
 
-            oThis.WriteRecord2(0, _border.unifill, oThis.WriteUniFill);
+            oThis.WriteRecord2(0, _border.Unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
         }
@@ -3785,7 +3823,7 @@ function CBinaryFileWriter()
         var bIsFill = false;
         var bIsSize = false;
         var bIsLnRef = false;
-        if ((_border.unifill !== undefined && _border.unifill != null) || _border.Color instanceof CDocumentColor)
+        if ((_border.Unifill !== undefined && _border.Unifill != null) || _border.Color instanceof CDocumentColor)
         {
             bIsFill = true;
         }
@@ -3805,7 +3843,7 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeEnd);
 
             // TODO: потом переделать по-нормальному
-            if (!_border.unifill && _border.Color instanceof CDocumentColor)
+            if (!_border.Unifill && _border.Color instanceof CDocumentColor)
             {
                 var _unifill = new CUniFill();
                 _unifill.fill = new CSolidFill();
@@ -3818,12 +3856,12 @@ function CBinaryFileWriter()
                 oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
             }
 
-            oThis.WriteRecord2(0, _border.unifill, oThis.WriteUniFill);
+            oThis.WriteRecord2(0, _border.Unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
         }
 
-        oThis.WriteRecord2(1, _border.lnRef, oThis.WriteStyleRef);
+        oThis.WriteRecord2(1, _border.LnRef, oThis.WriteStyleRef);
     }
     // --------------------------------------------------------------------------
 };

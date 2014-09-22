@@ -7,7 +7,7 @@
  * Time: 11:48 AM
  * To change this template use File | Settings | File Templates.
  */
-function SlideLayout(slideMaster)
+function SlideLayout()
 {
 
     this.kind = LAYOUT_KIND;
@@ -93,7 +93,7 @@ SlideLayout.prototype =
             }
             case historyitem_SlideLayoutSetShowMasterSp  :
             {
-                this.showMasterPhAnim = data.oldPr;
+                this.showMasterSp = data.oldPr;
                 break;
             }
             case historyitem_SlideLayoutSetClrMapOverride:
@@ -150,7 +150,7 @@ SlideLayout.prototype =
             }
             case historyitem_SlideLayoutSetShowMasterSp  :
             {
-                this.showMasterPhAnim = data.newPr;
+                this.showMasterSp = data.newPr;
                 break;
             }
             case historyitem_SlideLayoutSetClrMapOverride:
@@ -234,6 +234,27 @@ SlideLayout.prototype =
             {
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary(r);
+
+                var Fill;
+                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill)
+                {
+                    Fill = this.cSld.Bg.bgPr.Fill;
+                }
+                if(typeof CollaborativeEditing !== "undefined")
+                {
+                    if(Fill && Fill.fill && Fill.fill.type === FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
+                    {
+                        var full_image_src_func;
+                        if(typeof _getFullImageSrc === "function")
+                        {
+                            full_image_src_func = _getFullImageSrc;
+                        }
+                        if(full_image_src_func)
+                        {
+                            CollaborativeEditing.Add_NewImage(full_image_src_func(Fill.fill.RasterImageId));
+                        }
+                    }
+                }
                 break;
             }
             case historyitem_SlideLayoutSetCSldName      :
@@ -253,7 +274,7 @@ SlideLayout.prototype =
             }
             case historyitem_SlideLayoutSetShowMasterSp  :
             {
-                this.showMasterPhAnim = readBool(r);
+                this.showMasterSp = readBool(r);
                 break;
             }
             case historyitem_SlideLayoutSetClrMapOverride:

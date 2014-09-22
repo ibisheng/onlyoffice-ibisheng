@@ -989,7 +989,7 @@ CImageShape.prototype =
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
                             var full_image_src_func;
-                            if((!editor || !editor.isDocumentEditor) && typeof getFullImageSrc === "function")
+                            if((!editor || !editor.isDocumentEditor && !editor.isPresentationEditor) && typeof getFullImageSrc === "function")
                             {
                                 full_image_src_func = getFullImageSrc;
                             }

@@ -147,7 +147,7 @@ CGraphicFrame.prototype =
         if(this.graphicObject)
         {
             ret.setGraphicObject(this.graphicObject.Copy(ret));
-            ret.graphicObject.Reset(0, 0, this.graphicObject.XLimit, this.graphicObject.YLimit, ret.graphicObject.PageNum)
+            ret.graphicObject.Reset(0, 0, this.graphicObject.XLimit, this.graphicObject.YLimit, ret.graphicObject.PageNum);
         }
         if(this.nvGraphicFramePr)
         {
@@ -346,7 +346,12 @@ CGraphicFrame.prototype =
         ExecuteNoHistory(function(){
             if(this.recalcInfo.recalculateTable)
             {
-                this.graphicObject && this.graphicObject.Recalculate_Page(0);
+                if(this.graphicObject)
+                {
+                    this.graphicObject.Parent = this;
+                    this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
+                    this.graphicObject.Recalculate_Page(0);
+                }
             }
             if(this.recalcInfo.recalculateSizes)
             {
@@ -701,8 +706,21 @@ CGraphicFrame.prototype =
 
     deselect: CShape.prototype.deselect,
 
+    Update_ConentIndexing: function()
+    {},
+
     draw: function(graphics)
     {
+        if (graphics.IsSlideBoundsCheckerType === true) {
+            graphics.transform3(this.transform);
+            graphics._s();
+            graphics._m(0, 0);
+            graphics._l(this.extX, 0);
+            graphics._l(this.extX, this.extY);
+            graphics._l(0, this.extY);
+            graphics._e();
+            return;
+        }
         if(this.graphicObject)
         {
             graphics.transform3(this.transform);
@@ -1169,4 +1187,69 @@ CTable.prototype.Selection_Draw_Page = function(Page_abs)
             break;
         }
     }
+};
+
+CStyle.prototype.Create_NormalTable = function()
+{
+    var TablePr =
+    {
+        TableInd :
+        {
+            W    : 0,
+            Type : tblwidth_Mm
+        },
+        TableCellMar :
+        {
+            Top :
+            {
+                W    : 1.27,
+                Type : tblwidth_Mm
+            },
+
+            Left :
+            {
+                W    : 2.54, // 5.4pt
+                Type : tblwidth_Mm
+            },
+
+            Bottom :
+            {
+                W    : 1.27,
+                Type : tblwidth_Mm
+            },
+
+            Right :
+            {
+                W    : 2.54, // 5.4pt
+                Type : tblwidth_Mm
+            }
+        }
+    };
+
+    this.Set_UiPriority( 99 );
+    this.Set_SemiHidden( true );
+    this.Set_UnhideWhenUsed( true );
+    this.Set_TablePr( TablePr );
+};
+
+CTablePr.prototype.Init_Default = function()
+{
+    this.TableStyleColBandSize = 1;
+    this.TableStyleRowBandSize = 1;
+    this.Jc                    = align_Left;
+    this.Shd                   = new CDocumentShd();
+    this.TableBorders.Bottom   = new CDocumentBorder();
+    this.TableBorders.Left     = new CDocumentBorder();
+    this.TableBorders.Right    = new CDocumentBorder();
+    this.TableBorders.Top      = new CDocumentBorder();
+    this.TableBorders.InsideH  = new CDocumentBorder();
+    this.TableBorders.InsideV  = new CDocumentBorder();
+    this.TableCellMar.Bottom   = new CTableMeasurement(tblwidth_Mm, 1.27);
+    this.TableCellMar.Left     = new CTableMeasurement(tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
+    this.TableCellMar.Right    = new CTableMeasurement(tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
+    this.TableCellMar.Top      = new CTableMeasurement(tblwidth_Mm, 1.27);
+    this.TableCellSpacing      = null;
+    this.TableInd              = 0;
+    this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
+    this.TableLayout           = tbllayout_AutoFit;
 };

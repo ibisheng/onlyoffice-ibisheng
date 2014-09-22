@@ -3957,7 +3957,6 @@ CStyles.prototype =
             Pr.TablePr.Merge( Pr.TableWholeTable.TablePr );
             Pr.TableRowPr.Merge( Pr.TableWholeTable.TableRowPr );
             Pr.TableCellPr.Merge( Pr.TableWholeTable.TableCellPr );
-            delete Pr.TableWholeTable;
         }
 
         return Pr;
@@ -4682,9 +4681,9 @@ CDocumentShd.prototype =
 
     Check_PresentationPr : function(Theme)
     {
-        if(this.FillRef)
+        if(this.FillRef && Theme)
         {
-            this.Unifill = Theme.getFillStyle(this.FillRef.idx);
+            this.Unifill = Theme.getFillStyle(this.FillRef.idx, this.FillRef.Color);
             this.FillRef = undefined;
         }
     },
@@ -4857,12 +4856,17 @@ CDocumentBorder.prototype =
 
     Check_PresentationPr : function(Theme)
     {
-        if(this.LineRef)
+        if(this.LineRef && Theme)
         {
-            var pen = Theme.getLnStyle(this.LineRef.idx);
-            this.Size = isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
+            var pen = Theme.getLnStyle(this.LineRef.idx, this.LineRef.Color);
+
             this.Unifill = pen.Fill;
             this.LineRef = undefined;
+            this.Size = isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
+        }
+        if(!this.Unifill || !this.Unifill.fill || this.Unifill.fill.type === FILL_TYPE_NOFILL)
+        {
+            this.Value = border_None;
         }
     },
 
@@ -5266,6 +5270,38 @@ CTablePr.prototype =
             this.TableW = undefined;
 
         this.TableLayout = TablePr.TableLayout;
+    },
+
+    Check_PresentationPr : function(Theme)
+    {
+        if(this.Shd)
+        {
+            this.Shd.Check_PresentationPr(Theme);
+        }
+        if(this.TableBorders.Bottom)
+        {
+            this.TableBorders.Bottom.Check_PresentationPr(Theme);
+        }
+        if(this.TableBorders.Left)
+        {
+            this.TableBorders.Left.Check_PresentationPr(Theme);
+        }
+        if(this.TableBorders.Right)
+        {
+            this.TableBorders.Right.Check_PresentationPr(Theme);
+        }
+        if(this.TableBorders.Top)
+        {
+            this.TableBorders.Top.Check_PresentationPr(Theme);
+        }
+        if(this.TableBorders.InsideH)
+        {
+            this.TableBorders.InsideH.Check_PresentationPr(Theme);
+        }
+        if(this.TableBorders.InsideV)
+        {
+            this.TableBorders.InsideV.Check_PresentationPr(Theme);
+        }
     },
 
     Write_ToBinary : function(Writer)
@@ -6842,7 +6878,7 @@ CTextPr.prototype =
 
     Check_PresentationPr: function()
     {
-        if(this.FontRef)
+        if(this.FontRef && !this.Unifill)
         {
             var prefix;
             if(this.FontRef.idx === fntStyleInd_minor)

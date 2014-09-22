@@ -1229,8 +1229,10 @@ CTable.prototype =
         else
             Pr.TableLayout = (TablePr.TableLayout === tbllayout_AutoFit ? c_oAscTableLayout.AutoFit : c_oAscTableLayout.Fixed );
 
-        this.DrawingDocument.CheckTableStyles( new CTablePropLook( this.TableLook ) );
-
+        if(!this.bPresentation)
+        {
+            this.DrawingDocument.CheckTableStyles( new CTablePropLook( this.TableLook ) );
+        }
         return Pr;
     },
 
@@ -3304,6 +3306,24 @@ CTable.prototype =
 
         // Заголовок
         var bHeader = false;
+        if(this.bPresentation)
+        {
+            var Row         = this.Content[0];
+            var CellSpacing = Row.Get_CellSpacing();
+            var CellsCount  = Row.Get_CellsCount();
+            var X_left_new  = Row.Get_CellInfo( 0 ).X_grid_start;
+            var X_right_new = Row.Get_CellInfo( CellsCount - 1 ).X_grid_end;
+            pGraphics.SaveGrState();
+            pGraphics.SetIntegerGrid(false);
+            var ShapeDrawer = new CShapeDrawer();
+            TableShd.Unifill && TableShd.Unifill.check(this.Get_Theme(), this.Get_ColorMap());
+            var Transform = this.Parent.transform.CreateDublicate();
+            global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom));
+            pGraphics.transform3(Transform, false);
+            ShapeDrawer.fromShape2(new ObjectToDraw(TableShd.Unifill, null, Math.abs(X_right_new - X_left_new), Math.abs(this.Pages[0].Bounds.Bottom - Y_top), null, Transform), pGraphics, null);
+            ShapeDrawer.draw(null);
+            pGraphics.RestoreGrState();
+        }
         if ( this.HeaderInfo.Count > 0 && PNum > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[PNum].Draw )
         {
             bHeader = true;
@@ -3371,10 +3391,25 @@ CTable.prototype =
         // Рисуем рамку и заливку самой таблицы
         if ( shd_Nil != TableShd.Value )
         {
-
-            RGBA = TableShd.Get_Color2(Theme, ColorMap);
-            pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
-            pGraphics.TableRect(Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom), Math.abs(X_right_new - X_left_new), Math.abs(Y_bottom - Y_top));
+           if(!this.bPresentation)
+           {
+                RGBA = TableShd.Get_Color2(Theme, ColorMap);
+                pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
+                pGraphics.TableRect(Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom), Math.abs(X_right_new - X_left_new), Math.abs(Y_bottom - Y_top));
+           }
+          // else
+          // {
+          //     pGraphics.SaveGrState();
+          //     pGraphics.SetIntegerGrid(false);
+          //     var ShapeDrawer = new CShapeDrawer();
+          //     TableShd.Unifill && TableShd.Unifill.check(Theme, ColorMap);
+          //     var Transform = this.Parent.transform.CreateDublicate();
+          //     global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom));
+          //     pGraphics.transform3(Transform, false);
+          //     ShapeDrawer.fromShape2(new ObjectToDraw(TableShd.Unifill, null, Math.abs(X_right_new - X_left_new), Math.abs(Y_bottom - Y_top), null, Transform), pGraphics, null);
+          //     ShapeDrawer.draw(null);
+          //     pGraphics.RestoreGrState();
+          // }
         }
 
         if ( true === bBorder )
@@ -3556,21 +3591,21 @@ CTable.prototype =
                     {
                         if(CellShd.Unifill && CellShd.Unifill.fill)
                         {
-                            if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
-                            {
-                                var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
-                                if(isRealNumber(CellShd.Unifill.transparent))
-                                {
-                                    Alpha = CellShd.Unifill.transparent;
-                                }
-                                else
-                                {
-                                    Alpha = 255;
-                                }
-                                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
-                                pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
-                            }
-                            else
+                           //if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
+                           //{
+                           //    var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
+                           //    if(isRealNumber(CellShd.Unifill.transparent))
+                           //    {
+                           //        Alpha = CellShd.Unifill.transparent;
+                           //    }
+                           //    else
+                           //    {
+                           //        Alpha = 255;
+                           //    }
+                           //    pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
+                           //    pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                           //}
+                           //else TODO: Сделать нормальную отрисовку.
                             {
                                 var ShapeDrawer = new CShapeDrawer();
                                 CellShd.Unifill.check(Theme, ColorMap);
@@ -3656,21 +3691,21 @@ CTable.prototype =
                     {
                         if(CellShd.Unifill && CellShd.Unifill.fill)
                         {
-                            if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
-                            {
-                                var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
-                                if(isRealNumber(CellShd.Unifill.transparent))
-                                {
-                                    Alpha = CellShd.Unifill.transparent;
-                                }
-                                else
-                                {
-                                    Alpha = 255;
-                                }
-                                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
-                                pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
-                            }
-                            else
+                            //if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
+                            //{
+                            //    var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
+                            //    if(isRealNumber(CellShd.Unifill.transparent))
+                            //    {
+                            //        Alpha = CellShd.Unifill.transparent;
+                            //    }
+                            //    else
+                            //    {
+                            //        Alpha = 255;
+                            //    }
+                            //    pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, Alpha );
+                            //    pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                            //}
+                            //else TODO: Сделать нормальную отрисовку.
                             {
                                 var ShapeDrawer = new CShapeDrawer();
                                 CellShd.Unifill.check(Theme, ColorMap);
@@ -10667,7 +10702,9 @@ CTable.prototype =
     Check_PresentationPr : function(Pr)
     {
         var Theme = this.Get_Theme();
+        Pr.TablePr.Check_PresentationPr(Theme);
         Pr.TextPr.Check_PresentationPr(Theme);
+        Pr.TableCellPr.Check_PresentationPr(Theme);
         Pr.TableFirstCol.Check_PresentationPr(Theme);
         Pr.TableFirstRow.Check_PresentationPr(Theme);
         Pr.TableLastCol.Check_PresentationPr(Theme);
@@ -20826,9 +20863,16 @@ CTableCell.prototype =
 
         // Сначала возьмем настройки по умолчанию для всей таблицы
         var CellPr = TablePr.TableCellPr.Copy();
-        var TextPr = TablePr.TextPr.Copy();
         var ParaPr = TablePr.ParaPr.Copy();
-
+        var TextPr;
+        if(!Table.bPresentation)
+        {
+            TextPr = TablePr.TextPr.Copy();
+        }
+        else
+        {
+            TextPr = TablePr.TableWholeTable.TextPr.Copy();
+        }
         // Совместим с настройками для групп колонок
         // Согласно спецификации DOCX, совмещать надо всегда, но для первой и последней колонок Word
         // не совмещает, поэтому делаем также.
@@ -20898,7 +20942,7 @@ CTableCell.prototype =
         }
 
         // Совместим настройки с настройками для правой нижней ячейки
-        if ( this.Row.Get_CellsCount() - 1 === CellIndex && Table.Content.length - 1 === RowIndex )
+        if ( this.Row.Get_CellsCount() - 1 === CellIndex && Table.Content.length - 1 === RowIndex && (!Table.bPresentation || true === TableLook.Is_LastRow() && true === TableLook.Is_LastCol()))
         {
             CellPr.Merge( TablePr.TableBRCell.TableCellPr );
             TextPr.Merge( TablePr.TableBRCell.TextPr );
@@ -20906,7 +20950,7 @@ CTableCell.prototype =
         }
 
         // Совместим настройки с настройками для левой нижней ячейки
-        if ( 0 === CellIndex && Table.Content.length - 1 === RowIndex )
+        if ( 0 === CellIndex && Table.Content.length - 1 === RowIndex && (!Table.bPresentation || true === TableLook.Is_LastRow() && true === TableLook.Is_FirstCol()))
         {
             CellPr.Merge( TablePr.TableBLCell.TableCellPr );
             TextPr.Merge( TablePr.TableBLCell.TextPr );
@@ -20914,7 +20958,7 @@ CTableCell.prototype =
         }
 
         // Совместим настройки с настройками для правой верхней ячейки
-        if ( this.Row.Get_CellsCount() - 1 === CellIndex && 0 === RowIndex )
+        if ( this.Row.Get_CellsCount() - 1 === CellIndex && 0 === RowIndex && (!Table.bPresentation || true === TableLook.Is_FirstRow() && true === TableLook.Is_LastCol()) )
         {
             CellPr.Merge( TablePr.TableTRCell.TableCellPr );
             TextPr.Merge( TablePr.TableTRCell.TextPr );
@@ -20922,7 +20966,7 @@ CTableCell.prototype =
         }
 
         // Совместим настройки с настройками для левой верхней ячейки
-        if ( 0 === CellIndex && 0 === RowIndex )
+        if ( 0 === CellIndex && 0 === RowIndex && (!Table.bPresentation || true === TableLook.Is_FirstRow() && true === TableLook.Is_FirstCol()))
         {
             CellPr.Merge( TablePr.TableTLCell.TableCellPr );
             TextPr.Merge( TablePr.TableTLCell.TextPr );

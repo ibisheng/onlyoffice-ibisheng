@@ -6434,14 +6434,7 @@ function CNvPr()
     this.name = "";
     this.isHidden = false;
 
-    this.createDuplicate = function()
-    {
-        var duplicate = new CNvPr();
-        duplicate.id = this.id;
-        duplicate.name = this.name;
-        duplicate.isHidden = this.isHidden;
-        return duplicate;
-    };
+
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id)
@@ -6461,6 +6454,15 @@ CNvPr.prototype =
     getObjectType: function()
     {
         return historyitem_type_CNvPr;
+    },
+
+    createDuplicate: function()
+    {
+        var duplicate = new CNvPr();
+        duplicate.setId(this.id);
+        duplicate.setName(this.name);
+        duplicate.setIsHidden(this.isHidden);
+        return duplicate;
     },
 
     setId: function(id)
@@ -6542,20 +6544,12 @@ CNvPr.prototype =
             }
             case historyitem_CNvPr_SetName:
             {
-                w.WriteBool(typeof data.newName === "string");
-                if(typeof data.newName === "string")
-                {
-                    w.WriteString2(data.newName);
-                }
+                writeString(w, data.newName);
                 break;
             }
             case historyitem_CNvPr_SetIsHidden:
             {
-                w.WriteBool(isRealBool(data.newIsHidden));
-                if(isRealBool(data.newIsHidden))
-                {
-                    w.WriteBool(data.newIsHidden);
-                }
+                writeBool(w, data.newIsHidden);
                 break;
             }
         }
@@ -6583,21 +6577,12 @@ CNvPr.prototype =
             }
             case historyitem_CNvPr_SetName:
             {
-                w.WriteBool(typeof data.newName === "string");
-                if(typeof data.newName === "string")
-                {
-                    w.WriteString2(data.newName);
-                }
-                if(r.GetBool())
-                    break;
+                this.name = readString(r);
+                break;
             }
             case historyitem_CNvPr_SetIsHidden:
             {
-                w.WriteBool(isRealBool(data.newIsHidden));
-                if(isRealBool(data.newIsHidden))
-                {
-                    w.WriteBool(data.newIsHidden);
-                }
+                this.isHidden = readBool(r);
                 break;
             }
         }
@@ -6621,39 +6606,6 @@ function NvPr()
     this.userDrawn = false;
     this.ph = null;
 
-    this.createDuplicate = function()
-    {
-        var duplicate = new NvPr();
-        duplicate.isPhoto = this.isPhoto;
-        duplicate.userDrawn = this.userDrawn;
-        if(this.ph != null)
-        {
-            duplicate.ph = this.ph.createDuplicate();
-        }
-        return duplicate;
-    };
-
-    this.Write_ToBinary2 = function(w)
-    {
-        w.WriteBool(this.isPhoto);
-        w.WriteBool(this.userDrawn);
-        w.WriteBool(isRealObject(this.ph));
-        if(isRealObject(this.ph))
-        {
-            this.ph.Write_ToBinary2(w);
-        }
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        (this.isPhoto)   = r.GetBool();
-        (this.userDrawn) = r.GetBool();
-        if(r.GetBool())
-        {
-            this.ph = new Ph();
-            this.ph.Read_FromBinary2(r);
-        }
-    };
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -6689,6 +6641,41 @@ NvPr.prototype =
     {
         History.Add(this, {Type: historyitem_NvPr_SetPh, oldPh: this.ph, newPh: ph});
         this.ph = ph;
+    },
+
+
+    createDuplicate: function()
+    {
+        var duplicate = new NvPr();
+        duplicate.setIsPhoto(this.isPhoto);
+        duplicate.setUserDrawn(this.userDrawn);
+        if(this.ph != null)
+        {
+            duplicate.setPh(this.ph.createDuplicate());
+        }
+        return duplicate;
+    },
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteBool(this.isPhoto);
+        w.WriteBool(this.userDrawn);
+        w.WriteBool(isRealObject(this.ph));
+        if(isRealObject(this.ph))
+        {
+            this.ph.Write_ToBinary2(w);
+        }
+    },
+
+    Read_FromBinary: function(r)
+    {
+        (this.isPhoto)   = r.GetBool();
+        (this.userDrawn) = r.GetBool();
+        if(r.GetBool())
+        {
+            this.ph = new Ph();
+            this.ph.Read_FromBinary2(r);
+        }
     },
 
 
@@ -6775,7 +6762,7 @@ NvPr.prototype =
 
     },
 
-    Load_Change: function(r)
+    Load_Changes: function(r)
     {
         if(this.getObjectType() !== r.GetLong())
             return;
@@ -6866,21 +6853,23 @@ function Ph()
     this.sz = null;
     this.type = null;
 
-
-    this.createDuplicate =  function()
-    {
-        var duplicate = new Ph();
-        duplicate.hasCustomPrompt = this.hasCustomPrompt;
-        duplicate.idx = this.idx;
-        duplicate.orient = this.orient;
-        duplicate.sz = this.sz;
-        duplicate.type = this.type;
-        return duplicate;
-    };
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 Ph.prototype =
 {
+    createDuplicate:  function()
+    {
+        var duplicate = new Ph();
+        duplicate.setHasCustomPrompt(this.hasCustomPrompt);
+        duplicate.setIdx(this.idx);
+        duplicate.setOrient(this.orient);
+        duplicate.setSz(this.sz);
+        duplicate.setType(this.type);
+        return duplicate;
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -7145,16 +7134,6 @@ function UniNvPr()
     this.cNvPr = new CNvPr();
     this.UniPr = null;
     this.nvPr = new NvPr();
-
-    this.createDuplicate = function()
-    {
-        var duplicate = new UniNvPr();
-        duplicate.cNvPr = this.cNvPr.createDuplicate();
-        duplicate.UniPr = this.UniPr;
-        duplicate.nvPr = this.nvPr.createDuplicate();
-        return duplicate;
-    };
-
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
@@ -7271,8 +7250,6 @@ UniNvPr.prototype =
             }
         }
     },
-
-
     Load_Changes: function(r)
     {
         if(this.getObjectType() !== r.GetLong())
@@ -7319,15 +7296,29 @@ UniNvPr.prototype =
         }
     },
 
-    Write_ToBinary2: function (w)
+    createDuplicate: function()
+    {
+        var duplicate = new UniNvPr();
+        this.cNvPr && duplicate.setCNvPr(this.cNvPr.createDuplicate());
+        duplicate.UniPr = this.UniPr;
+        duplicate.nvPr && duplicate.setNvPr(this.nvPr.createDuplicate());
+        return duplicate;
+    },
+
+
+Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Id);
+        writeObject(w, this.cNvPr);
+        writeObject(w, this.nvPr);
     },
 
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+        this.cNvPr = readObject(r);
+        this.nvPr  = readObject(r);
     }
 };
 
@@ -9023,7 +9014,7 @@ CSpPr.prototype =
                         if(this.Fill.fill && this.Fill.fill.type === FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
                         {
                             var full_image_src_func;
-                            if(typeof getFullImageSrc === "function")
+                            if((!editor || !editor.isDocumentEditor && !editor.isPresentationEditor) && typeof getFullImageSrc === "function")
                             {
                                 full_image_src_func = getFullImageSrc;
                             }
@@ -9105,40 +9096,6 @@ function ClrScheme()
     for (var i = g_clr_MIN; i <= g_clr_MAX; i++)
         this.colors[i] = null;
 
-    this.isIdentical = function(clrScheme)
-    {
-        if(clrScheme == null)
-        {
-            return false;
-        }
-        if(!(clrScheme instanceof ClrScheme) )
-        {
-            return false;
-        }
-        if(clrScheme.name != this.name)
-        {
-            return false;
-        }
-        for(var _clr_index = g_clr_MIN; _clr_index <= g_clr_MAX; ++_clr_index)
-        {
-            if(this.colors[i] != clrScheme.colors[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    this.createDuplicate = function()
-    {
-        var _duplicate = new ClrScheme();
-        _duplicate.name = this.name;
-        for(var _clr_index = 0; _clr_index <= this.colors.length; ++_clr_index)
-        {
-            _duplicate.colors[_clr_index] = this.colors[_clr_index];
-        }
-        return _duplicate;
-    };
 }
 
 ClrScheme.prototype =
@@ -9164,6 +9121,42 @@ ClrScheme.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+
+    isIdentical: function(clrScheme)
+    {
+        if(clrScheme == null)
+        {
+            return false;
+        }
+        if(!(clrScheme instanceof ClrScheme) )
+        {
+            return false;
+        }
+        if(clrScheme.name != this.name)
+        {
+            return false;
+        }
+        for(var _clr_index = g_clr_MIN; _clr_index <= g_clr_MAX; ++_clr_index)
+        {
+            if(this.colors[i] != clrScheme.colors[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    },
+
+    createDuplicate: function()
+    {
+        var _duplicate = new ClrScheme();
+        _duplicate.name = this.name;
+        for(var _clr_index = 0; _clr_index <= this.colors.length; ++_clr_index)
+        {
+            _duplicate.colors[_clr_index] = this.colors[_clr_index];
+        }
+        return _duplicate;
     },
 
     Write_ToBinary: function (w)
@@ -9198,15 +9191,15 @@ ClrScheme.prototype =
 
     setName: function(name)
     {
-        History.Add(this, {Type: historyitem_ClrScheme_SetName, oldPr: this.name, newPr: name});
+      //  History.Add(this, {Type: historyitem_ClrScheme_SetName, oldPr: this.name, newPr: name});
         this.name = name;
     },
 
     addColor: function(index, color)
     {
-        History.Add(this, {Type: historyitem_ClrScheme_AddClr, index: index, newColor: color, oldColor: this.colors[index]});
+       // History.Add(this, {Type: historyitem_ClrScheme_AddClr, index: index, newColor: color, oldColor: this.colors[index]});
         this.colors[index] = color;
-    },
+    }/*,
 
     Undo: function(data)
     {
@@ -9279,7 +9272,7 @@ ClrScheme.prototype =
                 break;
             }
         }
-    }
+    }*/
 
 };
 
@@ -9390,7 +9383,7 @@ ClrMap.prototype =
             case historyitem_ClrMap_SetClr:
             {
                 writeLong(w, data.index);
-                writeObject(w, data.newColor);
+                writeLong(w, data.newColor);
                 break;
             }
         }
@@ -9404,11 +9397,7 @@ ClrMap.prototype =
             case historyitem_ClrMap_SetClr:
             {
                 var index = readLong(r);
-                var color = readObject(r);
-                if(isRealNumber(index) && isReaObject(color))
-                {
-                    this.color_map[index] = color;
-                }
+                this.color_map[index] = readLong(r);
                 break;
             }
         }
@@ -9537,9 +9526,8 @@ function FontCollection(fontScheme)
     this.latin = null;
     this.ea   = null;
     this.cs   = null;
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+   // this.Id = g_oIdCounter.Get_NewId();
+   // g_oTableId.Add(this, this.Id);
     if(fontScheme)
     {
         this.setFontScheme(fontScheme);
@@ -9559,7 +9547,7 @@ FontCollection.prototype =
 
     setFontScheme: function(fontScheme)
     {
-        History.Add(this, {Type: historyitem_FontCollection_SetFontScheme, oldPr: this.fontScheme, newPr: fontScheme});
+       // History.Add(this, {Type: historyitem_FontCollection_SetFontScheme, oldPr: this.fontScheme, newPr: fontScheme});
         this.fontScheme = fontScheme;
     },
 
@@ -9568,9 +9556,10 @@ FontCollection.prototype =
         return historyitem_type_FontCollection;
     },
 
+
     setLatin: function(pr)
     {
-        History.Add(this, {Type: historyitem_FontCollection_SetLatin, oldPr: this.latin, newPr: pr});
+       // History.Add(this, {Type: historyitem_FontCollection_SetLatin, oldPr: this.latin, newPr: pr});
         this.latin = pr;
         if(this.fontScheme)
             this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_LT);
@@ -9578,7 +9567,7 @@ FontCollection.prototype =
 
     setEA: function(pr)
     {
-        History.Add(this, {Type: historyitem_FontCollection_SetEA, oldPr: this.ea, newPr: pr});
+      //  History.Add(this, {Type: historyitem_FontCollection_SetEA, oldPr: this.ea, newPr: pr});
         this.ea = pr;
 
         if(this.fontScheme)
@@ -9587,15 +9576,35 @@ FontCollection.prototype =
 
     setCS: function(pr)
     {
-        History.Add(this, {Type: historyitem_FontCollection_SetCS, oldPr: this.cs, newPr: pr});
+       // History.Add(this, {Type: historyitem_FontCollection_SetCS, oldPr: this.cs, newPr: pr});
         this.cs = pr;
-
-
         if(this.fontScheme)
             this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_CS);
     },
 
-    Undo: function(data)
+
+    Write_ToBinary: function (w)
+    {
+        writeString(w, this.latin);
+        writeString(w, this.ea   );
+        writeString(w, this.cs   );
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.latin = readString(r);
+        this.ea = readString(r);
+        this.cs = readString(r);
+
+        if(this.fontScheme)
+        {
+            this.fontScheme.checkFromFontCollection(this.latin, this, FONT_REGION_LT);
+            this.fontScheme.checkFromFontCollection(this.ea, this, FONT_REGION_EA);
+            this.fontScheme.checkFromFontCollection(this.cs, this, FONT_REGION_CS);
+        }
+    },
+
+   /* Undo: function(data)
     {
         switch(data.Type)
         {
@@ -9725,7 +9734,7 @@ FontCollection.prototype =
                 break;
             }
         }
-    },
+    },*/
 
     Write_ToBinary2: function (w)
     {
@@ -9777,6 +9786,18 @@ FontScheme.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+
+    Write_ToBinary: function (w)
+    {
+        this.majorFont.Write_ToBinary(w);
+        this.minorFont.Write_ToBinary(w);
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.majorFont.Read_FromBinary(r);
+        this.minorFont.Read_FromBinary(r);
     },
 
     checkFromFontCollection: function(font, fontCollection, region)
@@ -9853,18 +9874,18 @@ FontScheme.prototype =
 
     setName: function(pr)
     {
-        History.Add(this, {Type: historyitem_FontScheme_SetName, oldPr: this.name, newPr: pr});
+       // History.Add(this, {Type: historyitem_FontScheme_SetName, oldPr: this.name, newPr: pr});
         this.name = pr;
     },
 
     setMajorFont: function(pr)
     {
-        History.Add(this, {Type: historyitem_FontScheme_SetMajorFont, oldPr: this.majorFont, newPr: pr});
+        //History.Add(this, {Type: historyitem_FontScheme_SetMajorFont, oldPr: this.majorFont, newPr: pr});
         this.majorFont = pr;
     },
     setMinorFont: function(pr)
     {
-        History.Add(this, {Type: historyitem_FontScheme_SetMinorFont, oldPr: this.minorFont, newPr: pr});
+       // History.Add(this, {Type: historyitem_FontScheme_SetMinorFont, oldPr: this.minorFont, newPr: pr});
         this.minorFont = pr;
     },
 
@@ -9914,7 +9935,7 @@ FontScheme.prototype =
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(data.Type)
+        w.WriteLong(data.Type);
         switch(data.Type)
         {
             case historyitem_FontScheme_SetName:
@@ -10016,31 +10037,79 @@ FmtScheme.prototype =
         this.Id = r.GetString2();
     },
 
+    Write_ToBinary: function (w)
+    {
+        writeString(w, this.name);
+        var i;
+        w.WriteLong(this.fillStyleLst.length);
+        for(i = 0; i < this.fillStyleLst.length; ++i)
+        {
+            this.fillStyleLst[i].Write_ToBinary(w);
+        }
+
+        w.WriteLong(this.lnStyleLst.length);
+        for(i = 0; i < this.lnStyleLst.length; ++i)
+        {
+            this.lnStyleLst[i].Write_ToBinary(w);
+        }
+
+        w.WriteLong(this.bgFillStyleLst.length);
+        for(i = 0; i < this.bgFillStyleLst.length; ++i)
+        {
+            this.bgFillStyleLst[i].Write_ToBinary(w);
+        }
+    },
+
+    Read_FromBinary: function (r)
+    {
+        this.name = readString(r);
+        var _len = r.GetLong(), i;
+        for(i = 0; i < _len; ++i)
+        {
+            this.fillStyleLst[i] = new CUniFill();
+            this.fillStyleLst[i].Read_FromBinary(r);
+        }
+
+        _len = r.GetLong();
+        for(i = 0; i < _len; ++i)
+        {
+            this.lnStyleLst[i] = new CLn();
+            this.lnStyleLst[i].Read_FromBinary(r);
+        }
+
+        _len = r.GetLong();
+        for(i = 0; i < _len; ++i)
+        {
+            this.bgFillStyleLst[i] = new CUniFill();
+            this.bgFillStyleLst[i].Read_FromBinary(r);
+        }
+    },
+
     setName: function(pr)
     {
-        History.Add(this, {Type:historyitem_FormatScheme_SetName, oldPr: this.name, newPr: pr});
+       // History.Add(this, {Type:historyitem_FormatScheme_SetName, oldPr: this.name, newPr: pr});
         this.name = pr;
     },
     addFillToStyleLst: function(pr)
     {
-        History.Add(this, {Type:historyitem_FormatScheme_AddFillToStyleLst, pr: pr});
+      // History.Add(this, {Type:historyitem_FormatScheme_AddFillToStyleLst, pr: pr});
         this.fillStyleLst.push(pr);
     },
     addLnToStyleLst: function(pr)
     {
-        History.Add(this, {Type:historyitem_FormatScheme_AddLnToStyleLst, pr: pr});
+      //  History.Add(this, {Type:historyitem_FormatScheme_AddLnToStyleLst, pr: pr});
         this.lnStyleLst.push(pr);
     },
     addEffectToStyleLst: function(pr)
     {
-        History.Add(this, {Type:historyitem_FormatScheme_AddEffectToStyleLst, pr: pr});
+      //  History.Add(this, {Type:historyitem_FormatScheme_AddEffectToStyleLst, pr: pr});
         this.effectStyleLst.push(pr);
     },
     addBgFillToStyleLst: function(pr)
     {
-        History.Add(this, {Type:historyitem_FormatScheme_AddBgFillToStyleLst, pr: pr});
+        //History.Add(this, {Type:historyitem_FormatScheme_AddBgFillToStyleLst, pr: pr});
         this.bgFillStyleLst.push(pr);
-    },
+    }/*,
 
     Undo: function(data)
     {
@@ -10202,7 +10271,7 @@ FmtScheme.prototype =
                 break;
             }
         }
-    }
+    }*/
 };
 
 function ThemeElements()
@@ -10525,7 +10594,7 @@ CTheme.prototype =
             case historyitem_ThemeSetFontScheme:
             case historyitem_ThemeSetFmtScheme:
             {
-                data.newPr.Write_ToBinary2(w);
+                data.newPr.Write_ToBinary(w);
                 break;
             }
         }
@@ -10535,26 +10604,25 @@ CTheme.prototype =
     {
         if(r.GetLong() === historyitem_type_Theme)
         {
-            var _cur_slide, _cur_theme;
             var type = r.GetLong();
             switch(type)
             {
                 case historyitem_ThemeSetColorScheme:
                 {
                     this.themeElements.clrScheme = new ClrScheme();
-                    this.themeElements.clrScheme.Read_FromBinary2(r);
+                    this.themeElements.clrScheme.Read_FromBinary(r);
                     break;
                 }
                 case historyitem_ThemeSetFontScheme:
                 {
                     this.themeElements.fontScheme = new FontScheme();
-                    this.themeElements.fontScheme.Read_FromBinary2(r);
+                    this.themeElements.fontScheme.Read_FromBinary(r);
                     break;
                 }
                 case historyitem_ThemeSetFmtScheme:
                 {
                     this.themeElements.fmtScheme = new FmtScheme();
-                    this.themeElements.fmtScheme.Read_FromBinary2(r);
+                    this.themeElements.fmtScheme.Read_FromBinary(r);
                     break;
                 }
             }
@@ -10729,32 +10797,6 @@ function CBgPr()
 {
     this.Fill         = null;
     this.shadeToTitle = false;
-    this.merge = function(bgPr)
-    {
-
-        if(this.Fill == null)
-        {
-            this.Fill = new CUniFill();
-            if(bgPr.Fill != null)
-            {
-                this.Fill.merge(bgPr.Fill)
-            }
-        }
-    };
-
-    this.createFullCopy = function()
-    {
-        var _copy = new CBgPr();
-        if(this.Fill != null)
-        {
-            _copy.Fill = this.Fill.createDuplicate();
-        }
-        _copy.shadeToTitle = this.shadeToTitle;
-        return _copy;
-    };
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
 
 }
 
@@ -10765,9 +10807,33 @@ CBgPr.prototype =
         return this.Id;
     },
 
+    merge: function(bgPr)
+    {
+
+        if(this.Fill == null)
+        {
+            this.Fill = new CUniFill();
+            if(bgPr.Fill != null)
+            {
+                this.Fill.merge(bgPr.Fill)
+            }
+        }
+    },
+
+    createFullCopy: function()
+    {
+        var _copy = new CBgPr();
+        if(this.Fill != null)
+        {
+            _copy.Fill = this.Fill.createDuplicate();
+        }
+        _copy.shadeToTitle = this.shadeToTitle;
+        return _copy;
+    },
 
     Refresh_RecalcData: function()
     {},
+
     getObjectType: function()
     {
         return historyitem_type_BgPr;
@@ -10775,16 +10841,36 @@ CBgPr.prototype =
 
     setFill: function(pr)
     {
-        History.Add(this, {Type: historyitem_BgPr_SetFill, oldPr: this.Fill, newPr: pr});
+        //History.Add(this, {Type: historyitem_BgPr_SetFill, oldPr: this.Fill, newPr: pr});
         this.Fill = pr;
     },
 
     setShadeToTitle: function(pr)
     {
-        History.Add(this, {Type: historyitem_BgPr_SetShadeToTitle, oldPr: this.shadeToTitle, newPr: pr});
+        //History.Add(this, {Type: historyitem_BgPr_SetShadeToTitle, oldPr: this.shadeToTitle, newPr: pr});
         this.shadeToTitle = pr;
     },
 
+    Write_ToBinary: function (w)
+    {
+        w.WriteBool(isRealObject(this.Fill));
+        if(isRealObject(this.Fill))
+        {
+            this.Fill.Write_ToBinary(w);
+        }
+        w.WriteBool(this.shadeToTitle);
+    },
+
+    Read_FromBinary: function (r)
+    {
+        if(r.GetBool())
+        {
+            this.Fill = new CUniFill();
+            this.Fill.Read_FromBinary(r);
+        }
+        this.shadeToTitle = r.GetBool();
+    }
+/*
     Undo: function(data)
     {
         switch (data.Type)
@@ -10864,7 +10950,7 @@ CBgPr.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
-    }
+    }*/
 };
 
 function CBg()
@@ -10934,7 +11020,7 @@ CBg.prototype =
         w.WriteBool(isRealObject(this.bgPr));
         if(isRealObject(this.bgPr))
         {
-            this.bgPr.Write_ToBinary2(w);
+            this.bgPr.Write_ToBinary(w);
         }
     },
 
@@ -10943,7 +11029,7 @@ CBg.prototype =
         if(r.GetBool())
         {
             this.bgPr = new CBgPr();
-            this.bgPr.Read_FromBinary2(r);
+            this.bgPr.Read_FromBinary(r);
         }
     },
 

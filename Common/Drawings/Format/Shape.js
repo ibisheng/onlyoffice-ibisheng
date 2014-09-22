@@ -1704,7 +1704,7 @@ CShape.prototype =
             {
                 var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
                 default_style.ParaPr.Merge(default_ppt_style.Copy());
-                default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
             }
 
             var master_style;
@@ -1746,7 +1746,10 @@ CShape.prototype =
                 {
                     var master_ppt_style = master_ppt_styles.levels[level];
                     master_style.ParaPr = master_ppt_style.Copy();
-                    master_style.TextPr = master_ppt_style.DefaultRunPr.Copy();
+                    if(master_ppt_style.DefaultRunPr)
+                    {
+                        master_style.TextPr = master_ppt_style.DefaultRunPr.Copy();
+                    }
                 }
             }
 
@@ -1764,7 +1767,10 @@ CShape.prototype =
                     var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
                     var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
                     hierarchy_style.ParaPr = hierarchy_ppt_style.Copy();
-                    hierarchy_style.TextPr = hierarchy_ppt_style.DefaultRunPr.Copy();
+                    if(hierarchy_ppt_style.DefaultRunPr)
+                    {
+                        hierarchy_style.TextPr = hierarchy_ppt_style.DefaultRunPr.Copy();
+                    }
                     hierarchy_styles.push(hierarchy_style);
                 }
             }
@@ -1775,7 +1781,10 @@ CShape.prototype =
                 ownStyle = new CStyle("ownStyle", null, null, null);
                 var own_ppt_style = this.txBody.lstStyle.levels[level];
                 ownStyle.ParaPr = own_ppt_style.Copy();
-                ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
+                if(own_ppt_style.DefaultRunPr)
+                {
+                    ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
+                }
             }
             var shape_text_style;
             if (isRealObject(this.style) && isRealObject(this.style.fontRef))
@@ -1867,23 +1876,23 @@ CShape.prototype =
         var parents = this.getParentObjects();
         if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef))
         {
-            compiled_style.fillRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
-            RGBA = compiled_style.fillRef.Color.RGBA;
-            this.brush = parents.theme.getFillStyle(compiled_style.fillRef.idx);
-            if (isRealObject(this.brush))
-            {
-                if (isRealObject(compiled_style.fillRef.Color.color)
-                    && isRealObject(this.brush)
-                    && isRealObject(this.brush.fill)
-                    && this.brush.fill.type === FILL_TYPE_SOLID)
-                {
-                    this.brush.fill.color = compiled_style.fillRef.Color.createDuplicate();
-                }
-            }
-            else
-            {
-                this.brush = new CUniFill();
-            }
+            //compiled_style.fillRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
+            //RGBA = compiled_style.fillRef.Color.RGBA;
+            this.brush = parents.theme.getFillStyle(compiled_style.fillRef.idx, compiled_style.fillRef.Color);
+            //if (isRealObject(this.brush))
+            //{
+            //    if (isRealObject(compiled_style.fillRef.Color.color)
+            //        && isRealObject(this.brush)
+            //        && isRealObject(this.brush.fill)
+            //        && this.brush.fill.type === FILL_TYPE_SOLID)
+            //    {
+            //        this.brush.fill.color = compiled_style.fillRef.Color.createDuplicate();
+            //    }
+            //}
+            //else
+            //{
+            //    this.brush = new CUniFill();
+            //}
         }
         else
         {
@@ -1900,21 +1909,22 @@ CShape.prototype =
         var RGBA = { R: 0, G: 0, B: 0, A: 255 };
         var parents = this.getParentObjects();
         if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.lnRef)) {
-            compiled_style.lnRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
-            RGBA = compiled_style.lnRef.Color.RGBA;
-            this.pen = parents.theme.getLnStyle(compiled_style.lnRef.idx);
-            if (isRealObject(this.pen)) {
-                if (isRealObject(compiled_style.lnRef.Color.color)
-                    && isRealObject(this.pen)
-                    && isRealObject(this.pen.Fill)
-                    && isRealObject(this.pen.Fill.fill)
-                    && this.pen.Fill.fill.type === FILL_TYPE_SOLID) {
-                    this.pen.Fill.fill.color = compiled_style.lnRef.Color.createDuplicate();
-                }
-            }
-            else {
-                this.pen = new CLn();
-            }
+            //compiled_style.lnRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A:255});
+            //RGBA = compiled_style.lnRef.Color.RGBA;
+            this.pen = parents.theme.getLnStyle(compiled_style.lnRef.idx, compiled_style.lnRef.Color);
+           //if (isRealObject(this.pen)) {
+           //    if (isRealObject(compiled_style.lnRef.Color.color)
+           //        && isRealObject(this.pen)
+           //        && isRealObject(this.pen.Fill)
+           //        && isRealObject(this.pen.Fill.fill)
+           //        && this.pen.Fill.fill.type === FILL_TYPE_SOLID) {
+           //        this.pen.Fill.fill.color = compiled_style.lnRef.Color.createDuplicate();
+           //    }
+           //}
+           //else
+           //{
+           //    this.pen = new CLn();
+           //}
         }
         else {
             this.pen = new CLn();

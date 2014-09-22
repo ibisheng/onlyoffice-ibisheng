@@ -2,6 +2,170 @@
 
 var History = null;
 var recalcSlideInterval = 30;
+
+function CreatePresentationTableStyles(Styles, IdMap)
+{
+    function CreateMiddleStyle2(schemeId)
+    {
+        var style = new CStyle("Middle Style 2 - accent " + (schemeId + 1), null, null, styletype_Table);
+        //style.Id = "{" + GUID() + "}";
+        style.TablePr.Set_FromObject(
+            {
+                TableBorders:
+                {
+                    Left:
+                    {
+                        Color : { r : 0, g : 0, b : 0 },
+                        Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                        Space : 0,
+                        Size  : 12700/36000,
+                        Value : border_Single
+                    },
+
+                    Right:
+                    {
+                        Color : { r : 0, g : 0, b : 0 },
+                        Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                        Space : 0,
+                        Size  : 12700/36000,
+                        Value : border_Single
+                    },
+
+                    Top:
+                    {
+                        Color : { r : 0, g : 0, b : 0 },
+                        Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                        Space : 0,
+                        Size  : 12700/36000,
+                        Value : border_Single
+                    },
+
+                    Bottom:
+                    {
+                        Color : { r : 0, g : 0, b : 0 },
+                        Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                        Space : 0,
+                        Size  : 12700/36000,
+                        Value : border_Single
+                    },
+
+                    InsideH:
+                    {
+                        Color : { r : 0, g : 0, b : 0 },
+                        Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                        Space : 0,
+                        Size  : 12700/36000,
+                        Value : border_Single
+                    },
+
+                    InsideV:
+                    {
+                        Color : { r : 0, g : 0, b : 0 },
+                        Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                        Space : 0,
+                        Size  : 12700/36000,
+                        Value : border_Single
+                    }
+                }
+            }
+        );
+        style.TableWholeTable.Set_FromObject(
+            {
+                TextPr:
+                {
+                    FontRef: CreateFontRef(fntStyleInd_minor, CreatePresetColor("black")),
+                    Unifill:  CreateUnifillSolidFillSchemeColor(8, 0)
+                },
+                TableCellPr:
+                {
+                    Shd:
+                    {
+                        Unifill: CreateUnifillSolidFillSchemeColor(schemeId, 0.2)
+                    }
+                }
+            }
+        );
+        var styleObject =    {
+            TableCellPr:
+            {
+                Shd:
+                {
+                    Unifill: CreateUnifillSolidFillSchemeColor(schemeId, 0.4)
+                }
+            }
+        };
+        style.TableBand1Horz.Set_FromObject(styleObject);
+        style.TableBand1Vert.Set_FromObject(styleObject);
+
+        styleObject = {
+            TextPr:
+            {
+                Bold: true,
+                FontRef: CreateFontRef(fntStyleInd_minor, CreatePresetColor("black")),
+                Unifill:  CreateUnifillSolidFillSchemeColor(8, 0)
+            },
+            TableCellPr:
+            {
+                Shd:
+                {
+                    Unifill: CreateUnifillSolidFillSchemeColor(schemeId, 0)
+                }
+            }
+        };
+        style.TableLastCol.Set_FromObject(styleObject);
+        style.TableFirstCol.Set_FromObject(styleObject);
+
+        styleObject.TableCellPr.TableCellBorders =
+        {
+            Top:
+            {
+                Color : { r : 0, g : 0, b : 0 },
+                Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                Space : 0,
+                Size  : 38100/36000,
+                Value : border_Single
+            }
+        };
+        style.TableLastRow.Set_FromObject(styleObject);
+        styleObject.TableCellPr.TableCellBorders =
+        {
+            Bottom:
+            {
+                Color : { r : 0, g : 0, b : 0 },
+                Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
+                Space : 0,
+                Size  : 38100/36000,
+                Value : border_Single
+            }
+        };
+        styleObject.TextPr =
+        {
+            Bold: true,
+            FontRef: CreateFontRef(fntStyleInd_minor, CreatePresetColor("black")),
+            Unifill:  CreateUnifillSolidFillSchemeColor(12, 0)
+        };
+        style.TableFirstRow.Set_FromObject(styleObject);
+        return style;
+    }
+    var def = CreateMiddleStyle2(0), style;
+
+    style = CreateMiddleStyle2(8);
+    Styles.Add(style);
+    IdMap[style.Id] = true;
+
+    Styles.Add(def);
+    IdMap[def.Id] = true;
+    for(var i = 1; i < 6; ++i)
+    {
+        style = CreateMiddleStyle2(i);
+        Styles.Add(style);
+        IdMap[style.Id] = true;
+    }
+
+
+    return def.Id;
+}
+
 function CPresentation(DrawingDocument)
 {
     this.History = new CHistory(this);
@@ -20,7 +184,6 @@ function CPresentation(DrawingDocument)
 
     this.Orientation = orientation_Portrait; // ориентация страницы
 
-    // Сначала настраиваем размеры страницы и поля
     this.slidesToUnlock = [];
 
 
@@ -71,11 +234,16 @@ function CPresentation(DrawingDocument)
     this.forwardChangeThemeTimeOutId = null;
     this.backChangeThemeTimeOutId = null;
     this.startChangeThemeTimeOutId = null;
-
+    this.TablesForInterface = null;
+    this.LastTheme = null;
+    this.LastColorScheme = null;
+    this.LastColorMap = null;
+    this.LastTableLook = null;
     this.DefaultSlideTiming = new CAscSlideTiming();
     this.DefaultSlideTiming.setDefaultParams();
 
     this.DefaultTableStyleId = null;
+    this.TableStylesIdMap = {};
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -92,9 +260,10 @@ CPresentation.prototype =
 {
     createDefaultTableStyles: function()
     {
-        ExecuteNoHistory(function(){
+        //ExecuteNoHistory(function(){
             this.globalTableStyles = new CStyles();
-        }, this, []);
+            this.DefaultTableStyleId = CreatePresentationTableStyles(this.globalTableStyles, this.TableStylesIdMap);
+        //}, this, []);
     },
     // Проводим начальные действия, исходя из Документа
     Init : function()
@@ -175,12 +344,13 @@ CPresentation.prototype =
                 }
                 var oThis = this;
                 bSync = false;
-                redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, _RecalcData.Drawings.ThemeInfo.ArrInd, startRecalcIndex,  0, oThis.Slides);
+                redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, _RecalcData.Drawings.ThemeInfo.ArrInd/*TODO:Потенциальный баг. Надо копировать массив*/, startRecalcIndex,  0, oThis.Slides);
             }
             else
             {
                 for(key = 0; key < this.Slides.length; ++key)
                 {
+                    this.Slides[key].recalcText();
                     this.Slides[key].recalculate()
                 }
             }
@@ -452,42 +622,16 @@ CPresentation.prototype =
     {
         if(!this.Slides[this.CurPage])
             return;
+
         History.Create_NewPoint();
-        var graphic_frame = new CGraphicFrame();
+        var graphic_frame = this.Create_TableGraphicFrame(Rows, Cols, this.Slides[this.CurPage], this.DefaultTableStyleId);
         if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
         {
-
-            var W = this.Width*2/3;
-            var Grid = [];
-
-            for ( var Index = 0; Index < Cols; Index++ )
-                Grid[Index] = W / Cols;
-
-            graphic_frame.setParent(this.Slides[this.CurPage]);
-            graphic_frame.setSpPr(new CSpPr());
-            graphic_frame.spPr.setParent(graphic_frame);
-            graphic_frame.spPr.setXfrm(new CXfrm());
-            graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
-            graphic_frame.spPr.xfrm.setOffX((this.Width - W)/2);
-            graphic_frame.spPr.xfrm.setOffY(this.Height/5);
-            graphic_frame.spPr.xfrm.setExtX(W);
-            graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
-            graphic_frame.setNvSpPr(new UniNvPr());
-
-            var table = new CTable(this.DrawingDocument, graphic_frame, true, 0, 0, 0, W, 100000, Rows, Cols, Grid, true);
-            table.Set_TableLayout(tbllayout_Fixed);
-            if(typeof this.DefaultTableStyleId === "string")
-            {
-                table.Set_TableStyle(this.DefaultTableStyleId);
-            }
-            table.Set_TableLook(new CTableLook(false, true, false, false, true, false));
-            graphic_frame.setGraphicObject(table);
-            graphic_frame.setBDeleted(false);
             this.Slides[this.CurPage].graphicObjects.resetSelection();
             this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, this.CurPage);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
-
             this.Recalculate();
+            this.Document_UpdateInterfaceState();
             this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             this.DrawingDocument.OnEndRecalculate();
         }
@@ -495,6 +639,84 @@ CPresentation.prototype =
         {
             this.Document_Undo();
         }
+    },
+
+
+    Create_TableGraphicFrame : function(Cols, Rows, Parent, StyleId, Width, Height, PosX, PosY)
+    {
+        var W;
+        if(isRealNumber(Width))
+        {
+            W = Width;
+        }
+        else
+        {
+            W = this.Width*2/3;
+        }
+        var X, Y;
+        if(isRealNumber(PosX) && isRealNumber(PosY))
+        {
+            X = PosX;
+            Y = PosY;
+        }
+        else
+        {
+            X = 0;
+            Y = 0;
+        }
+        var Grid = [];
+
+        for ( var Index = 0; Index < Cols; Index++ )
+            Grid[Index] = W / Cols;
+
+        var RowHeight;
+        if(isRealNumber(Height))
+        {
+            RowHeight = Height / Rows;
+        }
+
+        var graphic_frame = new CGraphicFrame();
+        graphic_frame.setParent(Parent);
+        graphic_frame.setSpPr(new CSpPr());
+        graphic_frame.spPr.setParent(graphic_frame);
+        graphic_frame.spPr.setXfrm(new CXfrm());
+        graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
+        graphic_frame.spPr.xfrm.setOffX((this.Width - W)/2);
+        graphic_frame.spPr.xfrm.setOffY(this.Height/5);
+        graphic_frame.spPr.xfrm.setExtX(W);
+        graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
+        graphic_frame.setNvSpPr(new UniNvPr());
+
+        var table = new CTable(this.DrawingDocument, graphic_frame, true, 0, X, Y, W, 100000, Rows, Cols, Grid, true);
+        table.Set_TableLayout(tbllayout_Fixed);
+        if(typeof StyleId === "string")
+        {
+            table.Set_TableStyle(StyleId);
+        }
+        table.Set_TableLook(new CTableLook(false, true, false, false, true, false));
+        for(var i = 0; i < table.Content.length; ++i)
+        {
+            var Row = table.Content[i];
+            if(isRealNumber(RowHeight))
+            {
+                Row.Set_Height(RowHeight, heightrule_AtLeast);
+            }
+            //for(var j = 0; j < Row.Content.length; ++j)
+            //{
+            //    var cell = Row.Content[j];
+            //    var props = new CTableCellPr();
+            //    props.TableCellMar = {};
+            //    props.TableCellMar.Top    = new CTableMeasurement(tblwidth_Mm, 1.27);
+            //    props.TableCellMar.Left   = new CTableMeasurement(tblwidth_Mm, 2.54);
+            //    props.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Mm, 1.27);
+            //    props.TableCellMar.Right  = new CTableMeasurement(tblwidth_Mm, 2.54);
+            //    props.Merge(cell.Pr);
+            //    cell.Set_Pr(props);
+            //}
+        }
+        graphic_frame.setGraphicObject(table);
+        graphic_frame.setBDeleted(false);
+        return graphic_frame;
     },
 
 
@@ -1994,6 +2216,7 @@ CPresentation.prototype =
 
             if(drawing_props.tableProps)
             {
+                this.CheckTableStyles(this.Slides[this.CurPage], drawing_props.tableProps.TableLook);
                 editor.sync_TblPropCallback(drawing_props.tableProps);
             }
             if(target_content)
@@ -2055,6 +2278,97 @@ CPresentation.prototype =
             this.DrawingDocument.OnEndRecalculate(true, false);
             this.Document_UpdateInterfaceState();
         }
+    },
+
+    CheckTableStyles: function(Slide, TableLook)
+    {
+        if(!this.TablesForInterface)
+        {
+            this.TablesForInterface = [];
+            var _x_mar = 10;
+            var _y_mar = 10;
+            var _r_mar = 10;
+            var _b_mar = 10;
+            var _pageW = 297;
+            var _pageH = 210;
+
+            var W = (_pageW - _x_mar - _r_mar);
+            var H = (_pageH - _y_mar - _b_mar);
+            var index = 0;
+            ExecuteNoHistory(function(){
+            for(var key in this.TableStylesIdMap)
+            {
+                if(this.TableStylesIdMap[key])
+                {
+                    this.TablesForInterface[index] = this.Create_TableGraphicFrame(5, 5, Slide, key, W, H, _x_mar, _y_mar);
+                    this.TablesForInterface[index].setBDeleted(true);
+                    index++;
+                }
+            }
+            }, this, []);
+        }
+        if(this.TablesForInterface.length === 0)
+            return;
+        var b_table_look = false;
+        if(!this.LastTheme || this.LastTheme !== Slide.Layout.Master.Theme
+            || this.LastColorScheme !== Slide.Layout.Master.Theme.themeElements.clrScheme
+            || !this.LastColorMap || !this.LastColorMap.compare(Slide.Get_ColorMap())
+        || !this.LastTableLook
+        || (b_table_look = TableLook.m_bFirst_Col !== this.LastTableLook.m_bFirst_Col
+                        || TableLook.m_bFirst_Row !== this.LastTableLook.m_bFirst_Row
+                        || TableLook.m_bLast_Col  !== this.LastTableLook.m_bLast_Col
+                        || TableLook.m_bLast_Row  !== this.LastTableLook.m_bLast_Row
+                        || TableLook.m_bBand_Hor  !== this.LastTableLook.m_bBand_Hor
+                        || TableLook.m_bBand_Ver  !== this.LastTableLook.m_bBand_Ver ) )
+        {
+
+
+            var only_redraw = !b_table_look && this.LastTheme === Slide.Layout.Master.Theme /*&& this.LastColorScheme === Slide.Layout.Master.Theme.themeElements.clrScheme && Slide.Get_ColorMap().compare(this.LastColorMap)*/;
+            this.LastTheme = Slide.Layout.Master.Theme;
+            this.LastColorScheme = Slide.Layout.Master.Theme.themeElements.clrScheme;
+            this.LastColorMap = Slide.Get_ColorMap();
+            this.LastTableLook = TableLook;
+            var need_set_recalc = true, i;
+
+            ExecuteNoHistory(function(){
+                if(!only_redraw)
+                {
+                    var TableLook2;
+                    if(b_table_look)
+                    {
+                        TableLook2 = new CTableLook(TableLook.m_bFirst_Col, TableLook.m_bFirst_Row, TableLook.m_bLast_Col, TableLook.m_bLast_Row, TableLook.m_bBand_Hor, TableLook.m_bBand_Ver);
+                    }
+                    if(this.TablesForInterface[0].parent !== Slide)
+                    {
+                        need_set_recalc = false;
+                        for(i = 0; i < this.TablesForInterface.length; ++i)
+                        {
+                            this.TablesForInterface[i].setParent(Slide);
+                            this.TablesForInterface[i].handleUpdateTheme();
+                            if(TableLook2)
+                            {
+                                this.TablesForInterface[i].graphicObject.Set_TableLook(TableLook2);
+                                this.TablesForInterface[i].graphicObject.Recalculate_Page(0);
+                            }
+                        }
+                    }
+                    if(need_set_recalc)
+                    {
+                        for(i = 0; i < this.TablesForInterface.length; ++i)
+                        {
+                            if(TableLook)
+                            {
+                                this.TablesForInterface[i].graphicObject.Set_TableLook(TableLook);
+                            }
+                            this.TablesForInterface[i].handleUpdateTheme();
+                            this.TablesForInterface[i].graphicObject.Recalculate_Page(0);
+                        }
+                    }
+                }
+                this.DrawingDocument.CheckTableStyles();
+            }, this, []);
+        }
+
     },
 
     // Обновляем линейки
@@ -2830,6 +3144,7 @@ CPresentation.prototype =
         }
         History.Add(this, {Type: historyitem_Presentation_ChangeColorScheme, arrIndex: arrInd});
         this.Recalculate();
+        this.Document_UpdateInterfaceState();
     },
 
 
@@ -3151,6 +3466,19 @@ CPresentation.prototype =
                 Writer.WriteString2(Data.master.Get_Id());
                 break;
             }
+
+            case historyitem_Presentation_ChangeTheme:
+            case historyitem_Presentation_ChangeColorScheme:
+            {
+                //TODO: массив индексов возможно нужно перезаписать после принятия чужих изменений с изменением порядка слайдов
+                Writer.WriteLong(Data.arrIndex.length);
+                for(var i = 0; i < Data.arrIndex.length; ++i)
+                {
+                    Writer.WriteLong(Data.arrIndex[i]);
+                }
+                break;
+            }
+
         }
 
         return Writer;
@@ -3216,11 +3544,48 @@ CPresentation.prototype =
                 this.bGoToPage = true;
                 break;
             }
+            case historyitem_Presentation_ChangeTheme:
+            {
+                var _len = Reader.GetLong(), index;
+                for(var i = 0; i < _len; ++i)
+                {
+                    index = Reader.GetLong();
+                    this.Slides[index] && this.Slides[index].checkSlideTheme();
+                }
+                break;
+            }
+            case historyitem_Presentation_ChangeColorScheme:
+            {
+                var recalculateMaps = this.GetRecalculateMaps(), key;
+                for(key in recalculateMaps.masters)
+                {
+                    if(recalculateMaps.masters.hasOwnProperty(key))
+                    {
+                        recalculateMaps.masters[key].checkSlideColorScheme();
+                    }
+                }
+                for(key in recalculateMaps.layouts)
+                {
+                    if(recalculateMaps.layouts.hasOwnProperty(key))
+                    {
+                        recalculateMaps.layouts[key].checkSlideColorScheme();
+                    }
+                }
+                var _len = Reader.GetLong(), index;
+                for(var i = 0; i < _len; ++i)
+                {
+                    index = Reader.GetLong();
+                    this.Slides[index] && this.Slides[index].checkSlideTheme();
+                }
+                break;
+            }
         }
         return true;
     },
 
 
+    Clear_CollaborativeMarks: function()
+    {},
 
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями

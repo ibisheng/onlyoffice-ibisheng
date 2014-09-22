@@ -8253,15 +8253,17 @@ Paragraph.prototype =
         var Styles     = styleObject.styles;
 
         // Считываем свойства для текущего стиля
-        var TableStyle = this.Parent.Get_TableStyleForPara();
-        var Pr = Styles.Get_Pr( styleObject.lastId, styletype_Paragraph, TableStyle);
+        var Pr = Styles.Get_Pr( styleObject.lastId, styletype_Paragraph, null);
 
+        var TableStyle = this.Parent.Get_TableStyleForPara();
         if(TableStyle && TableStyle.TextPr)
         {
-            var TextPr2 = new CTextPr();
-            TextPr2.Unifill = TableStyle.TextPr.Unifill;
-            TextPr2.RFonts = TableStyle.TextPr.RFonts;
-            Pr.TextPr.Merge(TextPr2);
+            //var TextPr2 = new CTextPr();
+            //TextPr2.Unifill = TableStyle.TextPr.Unifill;
+            //TextPr2.RFonts = TableStyle.TextPr.RFonts;
+            //TextPr2.Bold = TableStyle.TextPr.Bold;
+            //TextPr2.Itali = TableStyle.TextPr.RFonts;
+            Pr.TextPr.Merge(TableStyle.TextPr);
         }
 
         Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
@@ -8951,14 +8953,6 @@ Paragraph.prototype =
         History.Add( this, { Type : HistoryType, New : Border, Old : OldValue } );
 
         // Надо пересчитать конечный стиль
-        this.CompiledPr.NeedRecalc = true;
-    },
-
-    Set_Bullet : function(Bullet)
-    {
-        var NewBullet = Bullet ? Bullet.createDuplicate() : null;
-        History.Add(this, {Type: historyitem_Paragraph_Bullet, Old: this.Pr.Bullet, New: NewBullet});
-        this.Pr.Bullet = NewBullet;
         this.CompiledPr.NeedRecalc = true;
     },
 
@@ -10788,13 +10782,6 @@ Paragraph.prototype =
                 this.LogicDocument.Update_SectionsInfo();
                 break;
             }
-
-            case historyitem_Paragraph_Bullet:
-            {
-                this.Pr.Bullet = Data.Old;
-                this.CompiledPr.NeedRecalc = true;
-                break;
-            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -11178,13 +11165,6 @@ Paragraph.prototype =
             {
                 this.SectPr = Data.New;
                 this.LogicDocument.Update_SectionsInfo();
-                break;
-            }
-
-            case historyitem_Paragraph_Bullet:
-            {
-                this.Pr.Bullet = Data.New;
-                this.CompiledPr.NeedRecalc = true;
                 break;
             }
         }
@@ -11764,8 +11744,15 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PresentationPr_Bullet:
             {
-                // Variable : Bullet
-                Data.New.Write_ToBinary( Writer );
+                if(Data.New)
+                {
+                    Writer.WriteBool(true);
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                {
+                    Write.WriteBool(false);
+                }
 
                 break;
             }
@@ -12448,10 +12435,15 @@ Paragraph.prototype =
             case historyitem_Paragraph_PresentationPr_Bullet:
             {
                 // Variable : Bullet
-
-                var Bullet = new CBullet();
-                Bullet.Read_FromBinary( Reader );
-                this.PresentationPr.Bullet = Bullet;
+                if(Reader.GetBool())
+                {
+                    this.Pr.Bullet = new CBullet();
+                    this.Pr.Bullet.Read_FromBinary(Reader);
+                }
+                else
+                {
+                    this.Pr.Bullet = undefined;
+                }
                 this.CompiledPr.NeedRecalc = true;
                 break;
             }
