@@ -144,6 +144,8 @@ function CTableOutlineDr()
     this.TableStylesSheckLook = null;
     this.TableStylesSheckLookFlag = false;
 
+    this.TableStylesSendOne = false;
+
     this.Native = window["native"];
 
     this.checkMouseDown = function(pos, drDoc)
@@ -588,6 +590,8 @@ function CDrawingDocument()
     // table track
     this.TableOutlineDr = new CTableOutlineDr();
 }
+
+var _table_styles = null;
 
 CDrawingDocument.prototype =
 {
@@ -1511,8 +1515,24 @@ CDrawingDocument.prototype =
         }
     },
 
+    CheckTableStylesOne : function()
+    {
+        var _tableLook = new CTablePropLook(undefined);
+
+        _tableLook.FirstRow = true;
+        _tableLook.BandHor = true;
+        _tableLook.FirstCol = true;
+
+        this.CheckTableStyles(_tableLook);
+
+        this.TableStylesSendOne = true;
+    },
+
     CheckTableStyles : function(tableLook)
     {
+        if (true === this.TableStylesSendOne)
+            return;
+
         if (this.TableStylesSheckLookFlag)
         {
             this.TableStylesSheckLook = tableLook;

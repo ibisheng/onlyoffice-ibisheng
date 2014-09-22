@@ -7802,6 +7802,9 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
     if (this.GenerateNativeStyles !== undefined)
     {
         this.GenerateNativeStyles();
+
+        if (this.WordControl.m_oDrawingDocument.CheckTableStylesOne !== undefined)
+            this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
     }
 };
 

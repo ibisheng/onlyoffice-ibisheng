@@ -17,6 +17,7 @@ asc_docs_api.prototype.Internal_Update_Ind_Right = function(Right)
 asc_docs_api.prototype["NativeAfterLoad"] = function()
 {
     this.WordControl.m_oDrawingDocument.AfterLoad();
+    this.WordControl.m_oLogicDocument.Set_UseTextShd(false);
 };
 asc_docs_api.prototype["GetNativePageMeta"] = function(pageIndex)
 {
