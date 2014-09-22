@@ -571,7 +571,11 @@
 
 		/** @param flag {Boolean} */
 		CellEditor.prototype.enableKeyEventsHandler = function (flag) {
+			var oldValue = this.enableKeyEvents;
 			this.enableKeyEvents = !!flag;
+			if (this.isOpened && oldValue !== this.enableKeyEvents) {
+				this.enableKeyEvents ? this.showCursor() : this._hideCursor();
+			}
 		};
 
 		CellEditor.prototype.isFormula = function() {
