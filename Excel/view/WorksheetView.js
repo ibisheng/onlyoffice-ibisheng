@@ -7955,6 +7955,8 @@
 							range.cleanFormat();
 						else if (val & c_oAscCleanOptions.Comments)
 							t.cellCommentator.deleteCommentsRange(arn);
+						else if (val & c_oAscCleanOptions.Hyperlinks)
+							range.cleanHyperlinks();
 
 						// Если нужно удалить автофильтры - удаляем
 						t.autoFilters.isEmptyAutoFilters(arn);

@@ -157,11 +157,12 @@ var c_oAscBorderOptions = {
 };
 
 var c_oAscCleanOptions = {
-	All		: 0,
-	Text	: 1,
-	Format	: 2,
-	Formula	: 4,
-	Comments: 5
+	All			: 0,
+	Text		: 1,
+	Format		: 2,
+	Formula		: 4,
+	Comments	: 5,
+	Hyperlinks	: 6
 };
 
 var c_oAscDrawDepOptions = {

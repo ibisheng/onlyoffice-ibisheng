@@ -6800,6 +6800,15 @@ Range.prototype.cleanAll=function(){
 	buildRecalc(this.worksheet.workbook);
 	History.EndTransaction();
 };
+Range.prototype.cleanHyperlinks=function(){
+	History.Create_NewPoint();
+	History.StartTransaction();
+	//удаляем только гиперссылки, которые полностью лежат в области
+	var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
+	for(var i = 0, length = aHyperlinks.inner.length; i < length; ++i)
+		this.removeHyperlink(aHyperlinks.inner[i].data);
+	History.EndTransaction();
+};
 Range.prototype.sort=function(nOption, nStartCol){
 	//todo горизонтальная сортировка
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
