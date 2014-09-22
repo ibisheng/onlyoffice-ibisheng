@@ -3145,8 +3145,15 @@
 					graphicObject = data[i].image.GraphicObj;
 					
 					//convert from word
-                    graphicObject.bDeleted = true;
-					graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model)
+                    if(graphicObject.setBDeleted2)
+                    {
+                        graphicObject.setBDeleted2(true);
+                    }
+                    else
+                    {
+                        graphicObject.bDeleted = true;
+                    }
+					graphicObject = graphicObject.convertToPPTX(ws.model.DrawingDocument, ws.model);
 					
 					//create new drawingBase
 					drawingObject = ws.objectRender.createDrawingObject();

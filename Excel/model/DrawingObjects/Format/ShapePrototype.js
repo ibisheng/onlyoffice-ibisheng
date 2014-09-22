@@ -303,6 +303,8 @@ CShape.prototype.recalcText = function()
 
 CShape.prototype.recalculate = function ()
 {
+    if(this.bDeleted)
+        return;
     ExecuteNoHistory(function(){
 
 

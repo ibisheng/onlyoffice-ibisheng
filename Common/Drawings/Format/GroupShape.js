@@ -83,6 +83,24 @@ CGroupShape.prototype =
         this.bDeleted = pr;
     },
 
+
+    setBDeleted2: function(pr)
+    {
+        this.bDeleted = pr;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setBDeleted2)
+            {
+                this.spTree[i].setBDeleted2(pr);
+            }
+            else
+            {
+                this.spTree[i].bDeleted = pr;
+            }
+        }
+    },
+
+
     documentUpdateSelectionState: function()
     {
         if(this.selection.textSelection)
@@ -317,6 +335,7 @@ CGroupShape.prototype =
         for(i = 0; i < sp_tree_copy.length; ++i)
         {
             this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToPPTX(drawingDocument, worksheet));
+            this.spTree[this.spTree.length - 1].setGroup(this);
         }
         return this;
     },
