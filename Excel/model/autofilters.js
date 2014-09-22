@@ -2413,7 +2413,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							result = 'changeAutoFilter';
 						}
-						else if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTo) && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
+						else if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop) && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
 							result = 'changeAutoFilter'
 					}
 					//если выделенная область находится до а/ф
@@ -5153,7 +5153,8 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else if((colEnd <= startRangeCell && val > 0) || (colEnd < startRangeCell && val < 0))
 				{
-					this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+					if((activeCells.c1 <= ref.c1 && activeCells.c2 >= ref.c2 && options.type == "insRow") || (activeCells.r1 <= ref.r1 && activeCells.r2 >= ref.r2 && options.type == "insCol"))
+						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 				}
 				else if((colStart < startRangeCell && colEnd > startRangeCell && colEnd <= endRangeCell) || (colEnd <= startRangeCell && val < 0))
 				{
