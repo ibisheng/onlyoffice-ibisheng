@@ -4207,15 +4207,17 @@
             }
 
 			var angle = c.getAngle();
-            if (this._isCellEmptyTextString(c) && !angle) {
-				// Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
-				str = c.getValue2();
-				if (0 < str.length) {
-					// Без текста не будет толка
-					strCopy = [str[0].clone()];
-					strCopy[0].text = 'A';
-					tm = this._roundTextMetrics(this.stringRender.measureString(strCopy, fl));
-					this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
+			if (this._isCellEmptyTextString(c)) {
+				if (!angle && c.isNotDefaultFont()) {
+					// Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
+					str = c.getValue2();
+					if (0 < str.length) {
+						// Без текста не будет толка
+						strCopy = [str[0].clone()];
+						strCopy[0].text = 'A';
+						tm = this._roundTextMetrics(this.stringRender.measureString(strCopy, fl));
+						this._updateRowHeight(tm, col, row, isMerged, fMergedRows);
+					}
 				}
 
 				return mc ? mc.c2 : col;
