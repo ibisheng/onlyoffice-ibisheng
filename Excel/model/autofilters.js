@@ -1184,6 +1184,8 @@ var gUndoInsDelCellsFlag = true;
 			drawAutoF: function (updatedRange, offsetX, offsetY) {
 				var buttons = this.allButtonAF;
 				var ws = this.worksheet;
+				var filters;
+				
 				//проверяем, затрагивают ли данные кнопки визуальную область
 				if (buttons) {
 					for (var i = 0; i < buttons.length; i++) {
@@ -1211,7 +1213,8 @@ var gUndoInsDelCellsFlag = true;
 						buttons[i].height = ws.rows[row].height;
 
 						var isSetFilter = false;
-
+						
+						filters = null;
 						//проверяем , применен ли фильтр
 						var activeCells = this._idToRange(buttons[i].id);
 						var indexFilter = this._findArrayFromAllFilter3(activeCells,buttons[i].id);
@@ -1227,7 +1230,7 @@ var gUndoInsDelCellsFlag = true;
 								currentFilter = aWs.TableParts[filtersOp[0]].AutoFilter;
 								curFilForSort = aWs.TableParts[filtersOp[0]];
 							}
-							var filters;
+							
 							if (currentFilter && currentFilter.FilterColumns) {
 								filters = currentFilter.FilterColumns;
 								for (var k = 0; k < filters.length; k++) {
