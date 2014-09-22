@@ -2169,6 +2169,8 @@ CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
 
 function COperator(type)
 {
+    this.ParaMath = null;
+
     this.type = type; // delimiter, separator, group character, accent
     this.operator = null;
 
@@ -2176,15 +2178,11 @@ function COperator(type)
     this.typeOper = null;   // тип скобки : круглая и т.п.
     this.defaultType = null;
 
-    //this.pos = null;
-
     this.Positions = [];
     this.coordGlyph = null;
-    this.size = {width: 0, height: 0};
 
-    this.ParaMath = null;
+    this.size = new CMathSize();
 
-    this.shiftAccent = 0;
 }
 COperator.prototype.mergeProperties = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
 {
@@ -3030,80 +3028,12 @@ COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
         }
     }
 }
-COperator.prototype.old_fixSize = function(oMeasure, stretch)
-{
-    if(this.operator !== -1)
-    {
-        var width, height, ascent;
-
-        if(this.typeOper == OPERATOR_TEXT)
-        {
-            var ctrPrp = this.getCtrPrp();
-
-            //var rPrp = new CMathTextPrp();
-            //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
-
-            var rPrp = new CTextPr();
-            //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
-            var defaultRPrp = this.Parent.Composition.Get_Default_TPrp();
-
-            rPrp.Merge(defaultRPrp);
-            rPrp.Merge(ctrPrp);
-            rPrp.Italic = false;
-
-            oMeasure.SetFont(rPrp);
-
-            this.operator.Resize(this, oMeasure);
-
-            if(this.operator.loc == 0 || this.operator.loc == 1)
-            {
-                height = this.operator.size.height;
-                width  = stretch > this.operator.size.width ? stretch : this.operator.size.width;
-                ascent = height/2;
-            }
-            else
-            {
-                width = this.operator.size.width;
-                //height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
-                height = this.operator.size.height;
-                ascent = height/2;
-            }
-        }
-        else
-        {
-            this.operator.fixSize(stretch);
-            var dims = this.operator.getCoordinateGlyph();
-            this.coordGlyph = {XX: dims.XX, YY: dims.YY};
-
-            if(this.operator.loc == 0 || this.operator.loc == 1)
-            {
-                //width = stretch > this.operator.size.width ? stretch : this.operator.size.width;
-                width = dims.Width;
-                height = this.operator.size.height;
-            }
-            else
-            {
-                width = this.operator.size.width;
-                //height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
-                height = dims.Height;
-                //height = dims.Height > stretch ? stretch : dims.Height;
-            }
-
-            var betta = this.getCtrPrp().FontSize;
-            ascent = height/2 + 0.2*betta;
-        }
-
-        this.size = { width: width, height: height, ascent: ascent};
-    }
-}
-COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
+COperator.prototype._fixSize = function(ParaMath, oMeasure, stretch)
 {
     this.ParaMath = ParaMath;
     if(this.typeOper !== OPERATOR_EMPTY)
     {
         var width, height, ascent;
-        var ascentSign = 0;
-
 
         if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
         {
@@ -3121,23 +3051,20 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
             this.operator.Resize(oMeasure, this);
 
-            if(this.operator.loc == 0 || this.operator.loc == 1)
+            width  = this.operator.size.width;
+
+            if(this.type !== OPER_ACCENT)
             {
                 height = this.operator.size.height;
-                width  = this.operator.size.width;
             }
             else
             {
-                width = this.operator.size.width;
-                height = this.operator.size.height;
+                var letterX = new CMathText(true);
+                letterX.add(0x78);
+                letterX.Resize(oMeasure, null);
+                height = this.operator.size.ascent - letterX.size.ascent;
             }
 
-            ascentSign = this.operator.size.ascent;
-
-            /*var letterX = new CMathText(true);
-            letterX.add(0x78);
-            letterX.Resize(null, oMeasure);
-            this.shiftAccent = letterX.size.ascent;*/
         }
         else
         {
@@ -3145,30 +3072,102 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
             var dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};
 
-            if(this.operator.loc == 0 || this.operator.loc == 1)
+            if(this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT)
             {
                 width = dims.Width;
-                //width = this.operator.size.width;
                 height = this.operator.size.height;
             }
             else
             {
                 width = this.operator.size.width;
                 height = dims.Height;
-                //height = this.operator.size.height;
             }
-
         }
 
         var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
         var shCenter = this.Parent.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-        if(this.operator.loc == 0 || this.operator.loc  == 1) // horizontal
+        if(this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT)// horizontal
             ascent = dims.Height/2;
         else // vertical
             ascent = height/2 + shCenter;
 
-        this.size = {width: width, height: height, ascent: ascent, ascentSign : ascentSign};
+        this.size.width  = width;
+        this.size.height = height;
+        this.size.ascent = ascent;
+    }
+}
+COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
+{
+    this.ParaMath = ParaMath;
+    if(this.typeOper !== OPERATOR_EMPTY)
+    {
+        var width, height, ascent;
+        var dims;
+
+        var ctrPrp = this.Get_CompiledCtrPrp();
+
+        var rPrp = new CTextPr();
+        //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+        var defaultRPrp = this.Parent.ParaMath.Get_Default_TPrp();
+
+        rPrp.Merge(defaultRPrp);
+        rPrp.Merge(ctrPrp);
+        rPrp.Italic = false;
+
+        oMeasure.SetFont(rPrp);
+
+        var bVertical = this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT;
+
+        // Width
+        if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
+        {
+            this.operator.Resize(oMeasure, this);
+            width  = this.operator.size.width;
+        }
+        else
+        {
+            this.operator.fixSize(stretch);
+            dims = this.operator.getCoordinateGlyph();
+            this.coordGlyph = {XX: dims.XX, YY: dims.YY};
+
+            width = bVertical ? dims.Width : this.operator.size.width;
+        }
+
+        // Height
+        if(this.type === OPER_ACCENT)
+        {
+            var letterOperator = new CMathText(true);
+            letterOperator.add(this.code);
+            letterOperator.Resize(oMeasure, null);
+
+            var letterX = new CMathText(true);
+            letterX.add(0x78);
+            letterX.Resize(oMeasure, null);
+
+            //height = this.operator.size.ascent - letterX.size.ascent;
+            height = letterOperator.size.ascent - letterX.size.ascent;
+
+        }
+        else
+        {
+            if(this.typeOper == OPERATOR_TEXT)
+                height = this.operator.size.height;
+            else
+                height = bVertical ? this.operator.size.height : dims.Height;
+        }
+
+        var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
+        var shCenter = this.Parent.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+
+        if(this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT)
+            ascent = dims.Height/2;
+        else
+            ascent = height/2 + shCenter;
+
+        this.size.width  = width;
+        this.size.height = height;
+        this.size.ascent = ascent;
     }
 }
 COperator.prototype.setPosition = function(Positions)
@@ -3186,67 +3185,39 @@ COperator.prototype.setPosition = function(Positions)
 
     if(this.typeOper == OPERATOR_TEXT)
     {
-        /*var ascent = this.size.ascent,
-            height = this.size.height;
-
-        var k = ascent/height > 0.1 ? ascent/height : 0.1;
-
-        var x = pos.x,
-            y = pos.y + ascent - k*this.operator.size.height;
-
-        this.operator.setPosition({x: x, y: y});*/
-
         var NewPos = new CMathPosition();
         NewPos.x = this.Positions[0].x;
+        NewPos.y = this.Positions[0].y;
 
-        if(this.type == OPER_ACCENT)
-            NewPos.y = this.Positions[0].y + this.shiftAccent + this.operator.size.height;
-        else
-            NewPos.y = this.Positions[0].y;
-
-
-        /*var operator = this.operator;
-        if (!operator.bJDraw)                      // for text
-        {
-            operator.pos.x = NewPos.x + operator.GapLeft;
-            operator.pos.y = NewPos.y;
-
-            //this.pos = {x : pos.x + this.GapLeft, y: pos.y};
-        }
-        else                                    // for symbol only drawing
-        {
-            operator.pos.x = NewPos.x - operator.rasterOffsetX;
-            operator.pos.y = NewPos.y - operator.rasterOffsetY;
-        }*/
 
         this.operator.setPosition(NewPos);
     }
 }
-COperator.prototype.old_setPosition = function(pos)
+COperator.prototype._setPosition = function(Positions)
 {
-    this.pos = pos; // для оператора, это будет просто позиция
+    // для оператора, это будет просто позиция
     // для сепаратора - массив позиций
+
+    if(this.type == OPER_SEPARATOR)
+        this.Positions = Positions;
+    else
+    {
+        this.Positions.length = 0;
+        this.Positions[0] = Positions;
+    }
 
     if(this.typeOper == OPERATOR_TEXT)
     {
-        /*var ascent = this.size.ascent,
-         height = this.size.height;
-
-         var k = ascent/height > 0.1 ? ascent/height : 0.1;
-
-         var x = pos.x,
-         y = pos.y + ascent - k*this.operator.size.height;
-
-         this.operator.setPosition({x: x, y: y});*/
+        var NewPos = new CMathPosition();
+        NewPos.x = this.Positions[0].x;
 
         if(this.type == OPER_ACCENT)
-        {
-            this.operator.setPosition({x: pos.x, y: pos.y + this.shiftAccent + this.operator.size.height});
-        }
+            NewPos.y = this.Positions[0].y + this.operator.size.height;
         else
-            this.operator.setPosition(pos);
-    }
+            NewPos.y = this.Positions[0].y;
 
+        this.operator.setPosition(NewPos);
+    }
 }
 COperator.prototype.IsJustDraw = function()
 {
@@ -3649,7 +3620,7 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
                 bLMinAD = deltaMinAD > 0.001,
                 bLText = deltaMinAD < - 0.001;
 
-            var bEqualOper = bLHeight,
+            var bEqualOper  = bLHeight,
                 bMiddleOper = bLMaxAD && !bLMinAD,
                 bLittleOper = bLMinAD,
                 bText = bLText;
@@ -3659,16 +3630,16 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
                 height = 2*maxAD;
                 ascent = maxAD + shCenter;
             }
-            else if(bMiddleOper)
-            {
-                height = maxDimOper.height/2 + maxAD;
-                ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
-            }
             else if(bText)
             {
                 //ascent = maxDimOper.ascent;
                 ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
                 height = maxDimOper.height;
+            }
+            else if(bMiddleOper)
+            {
+                height = maxDimOper.height/2 + maxAD;
+                ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
             }
             else
             {

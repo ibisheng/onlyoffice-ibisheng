@@ -491,7 +491,6 @@ function CAccent(props)
     };
 
     this.shiftX   = 0;
-    this.shiftX_2 = 0;
     this.gap = 0;
 
     /////////////////
@@ -546,16 +545,15 @@ CAccent.prototype.setPosition = function(pos, PosInfo)
 
     PosOper.x = this.pos.x + this.GapLeft  + alignOp;
 
-    PosOper.y = this.pos.y + this.shiftX_2 ;
+    PosOper.y = this.pos.y;
     //PosOper.y = this.pos.y + this.size.ascent - this.shiftX;
-
 
     this.operator.setPosition(PosOper);
 
     var PosBase = new CMathPosition();
 
     PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-    PosBase.y = this.pos.y + this.operator.size.height + this.gap;
+    PosBase.y = this.pos.y + this.operator.size.height;
 
     this.elements[0][0].setPosition(PosBase, PosInfo);
 }
@@ -604,16 +602,14 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         var letterX = new CMathText(true);
         letterX.add(0x78);
         letterX.Resize(oMeasure, null);
-        this.gap = this.operator.size.ascentSign - letterX.size.ascent;
+        //this.gap = this.operator.size.ascentSign - letterX.size.ascent;
 
-        //this.shiftX_2 = this.operator.size.ascentSign;
-        this.shiftX_2 = 0;
     }
 
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
-        height = base.size.height + this.operator.size.height + this.gap,
-        ascent = this.operator.size.height + this.gap + this.elements[0][0].size.ascent;
+        height = base.size.height + this.operator.size.height,
+        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
 
     width += this.GapLeft + this.GapRight;
 
