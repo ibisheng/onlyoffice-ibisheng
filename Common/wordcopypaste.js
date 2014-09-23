@@ -3064,9 +3064,39 @@ PasteProcessor.prototype =
             this._Prepeare(node,
                 function(){
                     oThis.aContent = [];
-                    //�� ����� ���������� �������� ��� ������� ��������� �������
+                    
+					//если находимся внутри текстовой области диаграммы, то не вставляем ссылки
+					if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == historyitem_type_Chart)
+					{
+						var hyperlinks = node.getElementsByTagName("a");
+						if(hyperlinks && hyperlinks.length)
+						{
+							var newElement;
+							for(var i = 0; i < hyperlinks.length; i++)
+							{
+								newElement = document.createElement("span");
+								newElement.style = hyperlinks[i].style;
+								
+								$(newElement).append(hyperlinks[i].children);
+								
+								hyperlinks[i].parentNode.replaceChild(newElement, hyperlinks[i]);
+							}
+						}
+						
+						//Todo пока сделал так, чтобы не вставлялись графические объекты в название диаграммы, потом нужно будет сделать так же запутанно, как в MS
+						var images = node.getElementsByTagName("img");
+						if(images && images.length)
+						{
+							for(var i = 0; i < images.length; i++)
+							{	
+								images[i].parentNode.removeChild(images[i]);
+							}
+						}
+					}
+					
+					//�� ����� ���������� �������� ��� ������� ��������� �������
                     oThis._Execute(node, {}, true, true, false);
-
+						
                     oThis._AddNextPrevToContent(oThis.oDocument);
                     if(false == oThis.bNested)
                     {
