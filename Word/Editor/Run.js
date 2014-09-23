@@ -2803,7 +2803,14 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
 {
     var Para = this.Paragraph;
 
-    if ( -1 !== this.StartLine && undefined !== Para )
+    if(this.Type == para_Math_Run)
+    {
+        if(this.Parent !== null && this.Parent !== undefined)
+        {
+            this.Parent.Refresh_RecalcData();
+        }
+    }
+    else if ( -1 !== this.StartLine && undefined !== Para )
     {
         var CurLine = this.StartLine;
 
@@ -7853,8 +7860,8 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     this.protected_AddRange(0, 0);
     this.protected_FillRange(0, 0, RangeStartPos, RangeEndPos);
 
-
     var oWPrp = this.Get_CompiledPr(true);
+
     this.Parent.ParaMath.ApplyArgSize(oWPrp, ArgSize.value);
 
     if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
@@ -7870,6 +7877,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     }
 
     g_oTextMeasurer.SetFont(oWPrp);
+
 
     this.bEqqArray = RPI.bEqqArray;
 

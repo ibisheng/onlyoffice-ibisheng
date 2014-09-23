@@ -345,7 +345,7 @@ CMathBase.prototype =
     {
         return this.Parent.remove(order);
     },
-    recalculateSize: function(oMeasure)
+    recalculateSize: function(oMeasure, RPI)
     {
         var width = 0;
         var height = 0;
@@ -367,7 +367,7 @@ CMathBase.prototype =
 
         width += this.dW*(this.nCol - 1) + this.GapLeft + this.GapRight;
 
-        var ascent = this.getAscent(oMeasure, height);
+        var ascent = this.getAscent(oMeasure, height, RPI);
 
         this.size = {width: width, height: height, ascent: ascent};
     },

@@ -4059,10 +4059,9 @@ CCharacter.prototype.getBase = function()
     return this.elements[0][0];
 }
 
-
 function CGroupCharacter(props)
 {
-	this.Id   = g_oIdCounter.Get_NewId();
+    this.Id   = g_oIdCounter.Get_NewId();
     this.kind = MATH_GROUP_CHARACTER;
 
     this.Pr =
@@ -4092,22 +4091,22 @@ CGroupCharacter.prototype.init = function(props)
     this.fillContent();
 
     /*var operDefaultPrp =
-    {
-        type:   BRACKET_CURLY_BOTTOM,
-        loc:    LOCATION_BOT
-    };
+     {
+     type:   BRACKET_CURLY_BOTTOM,
+     loc:    LOCATION_BOT
+     };
 
-    var operProps =
-    {
-        type:   this.Pr.chrType,
-        chr:    this.Pr.chr,
-        loc:    this.Pr.pos
-    };
+     var operProps =
+     {
+     type:   this.Pr.chrType,
+     chr:    this.Pr.chr,
+     loc:    this.Pr.pos
+     };
 
-    this.setCharacter(operProps, operDefaultPrp);
+     this.setCharacter(operProps, operDefaultPrp);
 
-    this.Pr.chrType = this.operator.typeOper;
-    this.Pr.chr     = String.fromCharCode(this.operator.code);*/
+     this.Pr.chrType = this.operator.typeOper;
+     this.Pr.chr     = String.fromCharCode(this.operator.code);*/
 
 }
 CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
@@ -4183,7 +4182,7 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
         ascent = this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
-        //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
+    //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
 
     return ascent;
 }
@@ -4353,7 +4352,7 @@ CGroupCharacter.prototype.getPropsForWrite = function()
 }
 CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
 {
-	Writer.WriteLong( historyitem_type_groupChr );
+    Writer.WriteLong( historyitem_type_groupChr );
 }
 CGroupCharacter.prototype.Load_Changes = function(Reader)
 {
@@ -4362,6 +4361,362 @@ CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
 {
 }
 CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
+{
+    Writer.WriteLong( historyitem_type_groupChr );
+    Writer.WriteString2( this.getBase().Id );
+
+    this.CtrPrp.Write_ToBinary(Writer);
+
+    var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+    if ( undefined != this.Pr.chr )
+    {
+        Writer.WriteLong(this.Pr.chr);
+        Flags |= 1;
+    }
+    if ( undefined != this.Pr.pos )
+    {
+        Writer.WriteLong(this.Pr.pos);
+        Flags |= 2;
+    }
+    if ( undefined != this.Pr.vertJc )
+    {
+        Writer.WriteLong(this.Pr.vertJc);
+        Flags |= 4;
+    }
+    var EndPos = Writer.GetCurPosition();
+    Writer.Seek( StartPos );
+    Writer.WriteLong( Flags );
+    Writer.Seek( EndPos );
+}
+CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
+{
+    var props = {ctrPrp: new CTextPr()};
+    var arrElems = [];
+
+    arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+
+    props.ctrPrp.Read_FromBinary(Reader);
+
+    var Flags = Reader.GetLong();
+    if ( Flags & 1 )
+        props.chr = Reader.GetLong();
+    if ( Flags & 2 )
+        props.pos = Reader.GetLong();
+    if ( Flags & 4 )
+        props.vertJc = Reader.GetLong();
+
+    this.fillMathComposition (props, arrElems);
+}
+CGroupCharacter.prototype.Get_Id = function()
+{
+    return this.Id;
+}
+
+function new_CGroupCharacter(props)
+{
+	this.Id   = g_oIdCounter.Get_NewId();
+    this.kind = MATH_GROUP_CHARACTER;
+
+    this.Content = new CMathContent();
+
+    this.Pr =
+    {
+        chr:      null,
+        chrType:  null,
+        vertJc:   VJUST_TOP,
+        pos:      LOCATION_BOT
+    };
+
+    CCharacter.call(this);
+
+    if(props !== null && typeof(props)!== "undefined")
+        this.init(props);
+
+    /// вызов этой функции обязательно в конце
+    g_oTableId.Add( this, this.Id );
+}
+Asc.extendClass(new_CGroupCharacter, CCharacter);
+new_CGroupCharacter.prototype.init = function(props)
+{
+    this.setProperties(props);
+    this.fillContent();
+}
+new_CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    if(this.RecalcInfo.bProps == true)
+    {
+        var operDefaultPrp =
+        {
+            type:   BRACKET_CURLY_BOTTOM,
+            loc:    LOCATION_BOT
+        };
+
+        var operProps =
+        {
+            type:   this.Pr.chrType,
+            chr:    this.Pr.chr,
+            loc:    this.Pr.pos
+        };
+
+        this.setCharacter(operProps, operDefaultPrp);
+
+        this.RecalcInfo.bProps = false;
+    }
+
+    var ArgSz = ArgSize.Copy();
+
+    if(this.Pr.pos == this.Pr.vertJc)
+    {
+        ArgSz.decrease();
+
+        if(this.Pr.pos == LOCATION_TOP)
+        {
+            var Iterator = new CDenominator(true);
+            Iterator.fillMathComposition(this.Content);
+
+            this.elements[0][0] = Iterator;
+        }
+        else
+        {
+            var Iterator = new CNumerator();
+            Iterator.fillMathComposition(this.Content);
+
+            this.elements[0][0] = Iterator;
+        }
+    }
+    else
+        this.elements[0][0] = this.Content;
+
+    new_CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
+}
+new_CGroupCharacter.prototype.getBase = function()
+{
+    return this.Content;
+}
+new_CGroupCharacter.prototype.setProperties = function(props)
+{
+    if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
+        this.Pr.vertJc = props.vertJc;
+
+    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
+        this.Pr.pos = props.pos;
+
+    this.Pr.chr     = props.chr;
+    this.Pr.chrType = props.chrType;
+
+    this.setCtrPrp(props.ctrPrp);
+}
+new_CGroupCharacter.prototype.fillContent = function()
+{
+    this.setDimension(1, 1);
+    this.setContent();
+}
+new_CGroupCharacter.prototype.fillMathComposition = function(props, contents /*array*/)
+{
+    this.setProperties(props);
+    this.fillContent();
+
+    //this.elements[0][0] = contents[0];
+    this.Content = contents[0];
+}
+new_CGroupCharacter.prototype.getAscent = function(oMeasure)
+{
+    var ascent;
+
+    //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
+
+    var ctrPrp = this.Get_CompiledCtrPrp();
+    var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
+
+    if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)
+        ascent =  this.operator.size.ascent + shCent;
+    else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_TOP )
+        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
+    else if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_BOT )
+        ascent = this.elements[0][0].size.ascent;
+    else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
+        ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
+        //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
+
+    return ascent;
+}
+new_CGroupCharacter.prototype.old_getGlyph = function(code, type)
+{
+    var operator, props, accent;
+
+    if(code === 0x23DE || type == BRACKET_CURLY_TOP)
+    {
+        operator = new COperatorBracket();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x23DF || type === BRACKET_CURLY_BOTTOM  )
+    {
+        operator = new COperatorBracket();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x2190 || type === ARROW_LEFT)
+    {
+        operator = new CSingleArrow();
+
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x2192 || type === ARROW_RIGHT)
+    {
+        operator = new CSingleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x2194 || type === ARROW_LR)
+    {
+        operator = new CLeftRightArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
+    {
+        operator = new CDoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
+    {
+        operator = new CDoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
+    {
+        operator = new CLR_DoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    /////    accents     /////
+    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
+    {
+        operator = new CCombiningArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+        accent = new COperator(operator);
+    }
+    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
+    {
+        operator = new CCombiningArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        operator.init(props);
+        accent = new COperator(operator);
+    }
+    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
+    {
+        operator = new CCombining_LR_Arrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+        accent = new COperator(operator);
+    }
+    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
+    {
+        operator = new CCombiningHalfArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+        accent = new COperator(operator);
+    }
+    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
+    {
+        operator = new CCombiningHalfArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        operator.init(props);
+        accent = new COperator(operator);
+    }
+    /////
+    else if(typeof(code) !=="undefined" && code !== null)
+    {
+        operator = new CMathText(true);
+        operator.add(code);
+    }
+    else
+    {
+        operator = new COperatorBracket();
+        props =
+        {
+            location:   LOCATION_BOT,
+            turn:       TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+
+    return operator;
+}
+new_CGroupCharacter.prototype.getPropsForWrite = function()
+{
+    return this.Pr;
+}
+new_CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
+{
+	Writer.WriteLong( historyitem_type_groupChr );
+}
+new_CGroupCharacter.prototype.Load_Changes = function(Reader)
+{
+}
+new_CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
+{
+}
+new_CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_groupChr );
 	Writer.WriteString2( this.getBase().Id );
@@ -4391,7 +4746,7 @@ CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
     Writer.WriteLong( Flags );
     Writer.Seek( EndPos );
 }
-CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
+new_CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 {
 	var props = {ctrPrp: new CTextPr()};
 	var arrElems = [];
@@ -4410,7 +4765,7 @@ CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 		
 	this.fillMathComposition (props, arrElems);
 }
-CGroupCharacter.prototype.Get_Id = function()
+new_CGroupCharacter.prototype.Get_Id = function()
 {
 	return this.Id;
 }

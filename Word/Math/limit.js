@@ -6,8 +6,8 @@ function CLimit(props)
 
     this.kind = MATH_LIMIT;
 
-    this.FName  = new CMathContent();
-    this.Iterator = new CMathContent();
+    this.ContentFName  = new CMathContent();
+    this.ContentIterator = new CMathContent();
 
     this.Pr =
     {
@@ -29,15 +29,13 @@ CLimit.prototype.init = function(props)
 }
 CLimit.prototype.getFName = function()
 {
-    return this.FName;
+    //return this.FName;
+    return this.ContentFName;
 }
 CLimit.prototype.getIterator = function()
 {
-    return this.Iterator;
-}
-CLimit.prototype.setDistance = function()
-{
-    this.dH = 0.03674768518518519*this.Get_CompiledCtrPrp().FontSize;
+    //return this.Iterator;
+    return this.ContentIterator;
 }
 CLimit.prototype.setProperties = function(props)
 {
@@ -50,8 +48,11 @@ CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
 {
     this.setProperties(props);
 
-    this.FName = contents[0];
-    this.Iterator = contents[1];
+    this.FName = null;
+    this.Iterator = null;
+
+    this.ContentFName = contents[0];
+    this.ContentIterator = contents[1];
 
     this.RecalcInfo.bProps = true;
 }
@@ -88,7 +89,10 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             }
 
             this.elements[0][0] = new CDegree(null, true);
-            this.elements[0][0].fillMathComposition(props, [this.FName, this.Iterator]);
+            this.elements[0][0].fillMathComposition(props, [this.ContentFName, this.ContentIterator]);
+
+            this.FName    = this.ContentFName;
+            this.Iterator = this.ContentIterator;
         }
         else
         {
@@ -96,11 +100,20 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
             if(this.Pr.type == LIMIT_LOW)
             {
+                this.FName = this.ContentFName;
+                //this.elements[1][0] = this.Iterator;
+
+                this.Iterator = new CDenominator(true);
+                this.Iterator.fillMathComposition(this.ContentIterator);
+
                 this.elements[0][0] = this.FName;
                 this.elements[1][0] = this.Iterator;
             }
             else
             {
+                this.FName    = this.ContentFName;
+                this.Iterator = this.ContentIterator;
+
                 this.elements[0][0] = this.Iterator;
                 this.elements[1][0] = this.FName;
             }
@@ -131,18 +144,21 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
         this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
 
-
         var SizeFName = this.FName.size,
             SizeIter  = this.Iterator.size;
 
         var width  = SizeFName.width > SizeIter.width ? SizeFName.width : SizeIter.width,
-            height = SizeFName.height + SizeIter.height + this.dH,
+            height = SizeFName.height + SizeIter.height,
             ascent;
 
         if(this.Pr.type == LIMIT_LOW)
+        {
             ascent = SizeFName.ascent;
+        }
         else if(this.Pr.type == LIMIT_UP)
+        {
             ascent = SizeIter.height + this.dH + SizeFName.ascent;
+        }
 
         width += this.GapLeft + this.GapRight;
 

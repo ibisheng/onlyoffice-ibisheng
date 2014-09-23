@@ -763,7 +763,7 @@ CMathAmp.prototype =
     {
         if(this.bEqqArray==false)
             this.AmpText.draw(x, y, pGraphics);
-        else
+        else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
         {
             var X  = x + this.pos.x,
                 Y  = y + this.pos.y,

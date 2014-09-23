@@ -390,7 +390,6 @@ CFraction.prototype.fillMathComposition = function(props, contents /*array*/)
     this.setProperties(props);
     this.fillContent();
 
-
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
     {
         // Numerator
@@ -481,6 +480,17 @@ CNumerator.prototype.init = function()
     this.setDimension(1, 1);
     this.setContent();
 }
+CNumerator.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    this.ArgSize = ArgSize.Copy();
+
+    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+
+    this.recalculateSize();
+}
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
@@ -525,9 +535,10 @@ CNumerator.prototype.getPropsForWrite = function()
     return props;
 }
 
-function CDenominator()
+function CDenominator(bLimit)
 {
     this.gap = 0;
+    this.bLimit = bLimit == true;
 
     CMathBase.call(this, true);
 
@@ -539,16 +550,32 @@ CDenominator.prototype.init = function()
     this.setDimension(1, 1);
     this.setContent();
 }
+CDenominator.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    this.ArgSize = ArgSize.Copy();
+
+    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+
+    this.recalculateSize();
+}
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
     var mgCtrPrp = this.Get_CompiledCtrPrp();
 
-
     var gapDen = 7.325682539682539 * mgCtrPrp.FontSize/36,
         Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36,
         minGap = gapDen/3;
+
+    if(this.bLimit)
+    {
+        gapDen /= 1.5;
+        minGap /= 1.5;
+    }
 
     var delta = gapDen - Ascent;
     this.gap = delta > minGap ? delta : minGap;

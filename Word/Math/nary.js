@@ -614,7 +614,6 @@ CNaryUndOvr.prototype.recalculateSize = function()
     var FontSize = this.Get_CompiledCtrPrp().FontSize;
     var zetta = FontSize*25.4/96;
     this.gapTop = zetta*0.25;
-    //this.gapBottom = zetta*0.1;
 
     var minGapBottom = zetta*0.1,
         DownBaseline = FontSize*0.23;
