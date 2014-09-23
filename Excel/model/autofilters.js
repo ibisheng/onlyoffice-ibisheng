@@ -6616,11 +6616,15 @@ var gUndoInsDelCellsFlag = true;
 								val = cell.getValue();
 								//если не пустая изменяем TableColumns
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )
+								{
 									filter.TableColumns[j - tableRange.c1].Name = val;
+									cell.setNumFormat("@");
+								}	
 								else if(val == "")//если пустая изменяем генерируем имя и добавляем его в TableColumns  
 								{
 									generateName = this._generateColumnName(filter.TableColumns);
 									cell.setValue(generateName);
+									cell.setNumFormat("@");
 									filter.TableColumns[j - tableRange.c1].Name = generateName;
 								}
 							}
