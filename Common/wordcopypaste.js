@@ -5693,12 +5693,13 @@ PasteProcessor.prototype =
                                 dScaleKoef = dScaleKoef * this.dMaxWidth / nWidth;
                                 bUseScaleKoef = true;
                             }
-                            if(bUseScaleKoef)
+                            //закомментировал, потому что при вставке получаем изображения измененного размера
+							/*if(bUseScaleKoef)
                             {
                                 var dTemp = nWidth;
                                 nWidth *= dScaleKoef;
                                 nHeight *= dScaleKoef;
-                            }
+                            }*/
                             var oTargetDocument = this.oDocument;
                             var oDrawingDocument = this.oDocument.DrawingDocument;
                             if(oTargetDocument && oDrawingDocument)
