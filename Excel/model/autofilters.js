@@ -3253,7 +3253,7 @@ var gUndoInsDelCellsFlag = true;
 							};
 						};
 						
-						if(!isEmptyCell || (valueMerg != null && valueMerg != ""))
+						if((!isEmptyCell || (valueMerg != null && valueMerg != "")) && cell.tableXfs == null)
 						{
 							if(k < cloneActiveRange.c1)
 							{
