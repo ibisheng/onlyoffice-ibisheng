@@ -28,16 +28,28 @@ var Y_Top_Field    = Y_Top_Margin;
 
 
 var GlobalSkinTeamlab = {
+    Name : "classic",
+    RulersButton : true,
+    NavigationButtons : true,
     BackgroundColor : "#B0B0B0",
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
+    RulerOutline : "#929292",
+    RulerMarkersFillColor : "#E7E7E7",
+    PageOutline : "#81878F",
     STYLE_THUMBNAIL_WIDTH : 80,
     STYLE_THUMBNAIL_HEIGHT : 40
 };
 var GlobalSkinFlat = {
+    Name : "flat",
+    RulersButton : false,
+    NavigationButtons : false,
     BackgroundColor : "#F4F4F4",
-    RulerDark : "#E5E5E5",
-    RulerLight : "#F4F4F4",
+    RulerDark : "#CFCFCF",
+    RulerLight : "#FFFFFF",
+    RulerOutline : "#BBBEC2",
+    RulerMarkersFillColor : "#FFFFFF",
+    PageOutline : "#BBBEC2",
     STYLE_THUMBNAIL_WIDTH : 109,
     STYLE_THUMBNAIL_HEIGHT : 45
 };
@@ -349,6 +361,13 @@ function CEditorPage(api)
         this.m_oPanelRight_buttonRulers.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonRulers);
 
+        var _vertScrollTop = ScrollWidthMm;
+        if (GlobalSkin.RulersButton === false)
+        {
+            this.m_oPanelRight_buttonRulers.HtmlElement.style.display = "none";
+            _vertScrollTop = 0;
+        }
+
         this.m_oPanelRight_buttonNextPage = CreateControl("id_buttonNextPage");
         this.m_oPanelRight_buttonNextPage.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,ScrollWidthMm);
         this.m_oPanelRight_buttonNextPage.Anchor = (g_anchor_left | g_anchor_bottom | g_anchor_right);
@@ -359,8 +378,16 @@ function CEditorPage(api)
         this.m_oPanelRight_buttonPrevPage.Anchor = (g_anchor_left | g_anchor_bottom | g_anchor_right);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonPrevPage);
 
+        var _vertScrollBottom = 2 * ScrollWidthMm;
+        if (GlobalSkin.NavigationButtons == false)
+        {
+            this.m_oPanelRight_buttonNextPage.HtmlElement.style.display = "none";
+            this.m_oPanelRight_buttonPrevPage.HtmlElement.style.display = "none";
+            _vertScrollBottom = 0;
+        }
+
         this.m_oPanelRight_vertScroll = CreateControl("id_vertical_scroll");
-        this.m_oPanelRight_vertScroll.Bounds.SetParams(0,ScrollWidthMm,1000,2*ScrollWidthMm,false,true,false,true,-1,-1);
+        this.m_oPanelRight_vertScroll.Bounds.SetParams(0,_vertScrollTop,1000,_vertScrollBottom,false,true,false,true,-1,-1);
         this.m_oPanelRight_vertScroll.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
         this.m_oPanelRight.AddControl(this.m_oPanelRight_vertScroll);
         // --------------------------------------------------------------------------
@@ -419,7 +446,7 @@ function CEditorPage(api)
         // ----------
 
         this.m_oMainView = CreateControlContainer("id_main_view");
-        this.m_oMainView.Bounds.SetParams(5,7,5,0,true,true,true,true,-1,-1);
+        this.m_oMainView.Bounds.SetParams(5,7,ScrollWidthMm,0,true,true,true,true,-1,-1);
         this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
         this.m_oMainContent.AddControl(this.m_oMainView);
 
@@ -2458,7 +2485,7 @@ function CEditorPage(api)
         var _width  = canvas.width;
         var _height = canvas.height;
 
-        context.fillStyle = "#B0B0B0";
+        context.fillStyle = GlobalSkin.BackgroundColor;
         context.fillRect(0, 0, _width, _height);
         //context.clearRect(0, 0, _width, _height);
 

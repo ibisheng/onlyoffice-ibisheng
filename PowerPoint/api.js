@@ -866,6 +866,11 @@ asc_docs_api.prototype.SetThemesPath = function(path)
 
 asc_docs_api.prototype.CreateCSS = function()
 {
+    if (window["flat_desine"] === true)
+    {
+        GlobalSkin = GlobalSkinFlat;
+    }
+
     var _head = document.getElementsByTagName('head')[0];
 
     var style0 = document.createElement('style');
