@@ -3857,7 +3857,18 @@ PasteProcessor.prototype =
 					
 					//aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
 					images[images.length] = imageUrl;
-				}	
+				}
+				else if(graphicObj.isGroup() && graphicObj.spTree && graphicObj.spTree.length)
+				{
+					var spTree = graphicObj.spTree;
+					for(var j = 0; j < spTree.length; j++)
+					{
+						if(spTree[j].isImage())
+						{
+							images.push(spTree[j].getImageUrl());
+						}
+					}
+				}				
 			};
 			
 			aContent = [];
