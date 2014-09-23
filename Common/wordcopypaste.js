@@ -2973,7 +2973,8 @@ PasteProcessor.prototype =
 				//если находимся внутри шейп, вставляем html
 				if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
 				{
-					base64 = null;
+					if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == historyitem_type_Chart)
+						base64 = null;
 					base64FromExcel = null;
 				}
 				else if(this.oDocument.bPresentation)
