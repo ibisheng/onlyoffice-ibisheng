@@ -1542,25 +1542,22 @@ function CBinaryFileWriter()
             var ind = pPr.Ind;
             if (ind !== undefined && ind != null)
             {
-                if (ind.FirstLine !== undefined)
+                if (ind.FirstLine != null)
                 {
-                    oThis._WriteInt1(5, ind.FirstLine * 36000);
+                    oThis._WriteInt2(5, ind.FirstLine * 36000);
                 }
-                if (ind.Left !== undefined)
+                if (ind.Left != null)
                 {
                     oThis._WriteInt1(8, ind.Left * 36000);
                 }
-                if (ind.Right !== undefined)
+                if (ind.Right != null)
                 {
                     oThis._WriteInt1(9, ind.Right * 36000);
                 }
             }
         }
 
-        if (tPr.lvl !== undefined && tPr.lvl != null)
-        {
-            oThis._WriteInt1(7, tPr.lvl);
-        }
+        oThis._WriteInt2(7, tPr.lvl);
 
         oThis.WriteUChar(g_nodeAttributeEnd);
 
@@ -3264,14 +3261,9 @@ function CBinaryFileWriter()
             this._WriteString1(0, _gd.name);
             this._WriteInt1(1, _gd.formula);
 
-            if (_gd.x !== undefined)
-                this._WriteString1(2, _gd.x);
-
-            if (_gd.y !== undefined)
-                this._WriteString1(3, _gd.y);
-
-            if (_gd.z !== undefined)
-                this._WriteString1(4, _gd.z);
+            this._WriteString2(2, _gd.x);
+            this._WriteString2(3, _gd.y);
+            this._WriteString2(4, _gd.z);
 
             this.WriteUChar(g_nodeAttributeEnd);
 
