@@ -6226,7 +6226,7 @@ function DefaultShapeDefinition()
 {
     this.spPr = new CSpPr();
     this.bodyPr = new CBodyPr();
-    this.lstStyle = new CTextStyle();
+    this.lstStyle = new TextListStyle();
     this.style = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
