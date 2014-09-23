@@ -31,7 +31,6 @@ var GlobalSkinTeamlab = {
     BackgroundColor : "#B0B0B0",
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
-    BackgroundScroll : "#F1F1F1",
     STYLE_THUMBNAIL_WIDTH : 80,
     STYLE_THUMBNAIL_HEIGHT : 40
 };
@@ -39,7 +38,6 @@ var GlobalSkinFlat = {
     BackgroundColor : "#F4F4F4",
     RulerDark : "#E5E5E5",
     RulerLight : "#F4F4F4",
-    BackgroundScroll : "#E5E5E5",
     STYLE_THUMBNAIL_WIDTH : 109,
     STYLE_THUMBNAIL_HEIGHT : 45
 };
@@ -1992,8 +1990,6 @@ function CEditorPage(api)
         var settings = {
             showArrows: true,
             animateScroll: false,
-//            scrollBackgroundColor:"#D3D3D3",
-//            scrollerColor:"#EDEDED",
             screenW: this.m_oEditor.HtmlElement.width,
             screenH: this.m_oEditor.HtmlElement.height,
             vsscrollStep: 45,

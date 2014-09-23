@@ -3826,7 +3826,6 @@ function CThumbnailsManager()
             var settings = {
                 showArrows: true,
                 animateScroll: false,
-                scrollBackgroundColor :"#FCFCFC",
                 screenW: word_control.m_oThumbnails.HtmlElement.width,
                 screenH: word_control.m_oThumbnails.HtmlElement.height
             };

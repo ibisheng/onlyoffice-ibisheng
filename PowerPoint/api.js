@@ -919,8 +919,8 @@ asc_docs_api.prototype.CreateComponents = function()
 		element.innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:#B0B0B0;border-right-width: 1px;border-right-color: #787878; border-right-style: solid;\">\
 		                            <canvas id=\"id_thumbnails_background\" class=\"block_elem\" style=\"background-color:#EBEBEB;z-index:1\"></canvas>\
 		                            <canvas id=\"id_thumbnails\" class=\"block_elem\" style=\"z-index:2\"></canvas>\
-		                            <div id=\"id_vertical_scroll_thmbnl\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
-									    <div id=\"panel_right_scroll_thmbnl\" class=\"block_elem\" style=\"left:0;top:0;width:16px;height:6000px;\"></div>\
+		                            <div id=\"id_vertical_scroll_thmbnl\" style=\"left:0;top:0;width:1px;overflow:hidden;position:absolute;\">\
+									    <div id=\"panel_right_scroll_thmbnl\" class=\"block_elem\" style=\"left:0;top:0;width:1px;height:6000px;\"></div>\
 									</div>\
 		                        </div>\
                             <div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:#B0B0B0;overflow:hidden;border-left-width: 1px;border-left-color: #787878; border-left-style: solid;border-bottom-width: 1px;border-bottom-color: #787878; border-bottom-style: solid;\" UNSELECTABLE=\"on\">\
