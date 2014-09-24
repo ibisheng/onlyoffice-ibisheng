@@ -7949,13 +7949,13 @@
 							range.cleanAll();
 							// Удаляем комментарии
 							t.cellCommentator.deleteCommentsRange(arn);
-						} else if (val & c_oAscCleanOptions.Text || val & c_oAscCleanOptions.Formula)
+						} else if (val === c_oAscCleanOptions.Text || val === c_oAscCleanOptions.Formula)
 							range.cleanText();
-						else if (val & c_oAscCleanOptions.Format)
+						else if (val === c_oAscCleanOptions.Format)
 							range.cleanFormat();
-						else if (val & c_oAscCleanOptions.Comments)
+						else if (val === c_oAscCleanOptions.Comments)
 							t.cellCommentator.deleteCommentsRange(arn);
-						else if (val & c_oAscCleanOptions.Hyperlinks)
+						else if (val === c_oAscCleanOptions.Hyperlinks)
 							range.cleanHyperlinks();
 
 						// Если нужно удалить автофильтры - удаляем
