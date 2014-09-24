@@ -976,7 +976,7 @@ CDocument.prototype =
                 var Run  = SimpleChanges[0].Class;
                 var Para = Run.Paragraph;
 
-                var Res  = Para.Recalculate_Fast_Range( SimpleChanges );
+                var Res  = Para.Recalculate_FastRange( SimpleChanges );
                 if ( -1 !== Res )
                 {
                     // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
@@ -1014,7 +1014,7 @@ CDocument.prototype =
                 var Run  = SimpleChanges[0].Class;
                 var Para = Run.Paragraph;
 
-                var FastPages = Para.Recalculate_Fast_WholeParagraph();
+                var FastPages = Para.Recalculate_FastWholeParagraph();
                 var FastPagesCount = FastPages.length;
 
                 if (FastPagesCount > 0)

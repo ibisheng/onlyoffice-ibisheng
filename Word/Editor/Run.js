@@ -104,7 +104,6 @@ ParaRun.prototype.Copy = function(Selected)
         NewRun.MathPrp = this.MathPrp.Copy();
     }
 
-
     var StartPos = 0;
     var EndPos   = this.Content.length;
 
@@ -1627,7 +1626,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaLine        = PRS.Line;
     var ParaRange       = PRS.Range;
 
-    var LineRule = ParaPr.Spacing.LineRule;
+    var LineRule        = ParaPr.Spacing.LineRule;
 
     var Pos = RangeStartPos;
 
@@ -1813,7 +1812,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     else
                     {
                         // Обновим метрики строки
-                        if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                        if ( linerule_Exact === LineRule )
                         {
                             if ( PRS.LineAscent < Item.Height )
                                 PRS.LineAscent = Item.Height;
@@ -2108,7 +2107,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         if ( PRS.LineTextDescent < this.TextDescent )
             PRS.LineTextDescent = this.TextDescent;
 
-        if ( linerule_Exact === ParaPr.Spacing.LineRule )
+        if ( linerule_Exact === LineRule )
         {
             // Смещение не учитывается в метриках строки, когда расстояние между строк точное
             if ( PRS.LineAscent < this.TextAscent )
@@ -4525,7 +4524,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
 
         if ( true === DrawSelection )
         {
-            if ( para_Drawing === ItemType && true !== Item.Is_Inline() )
+            if (true === SelectionDraw.Draw && para_Drawing === ItemType && true !== Item.Is_Inline())
                 Item.Draw_Selection();
             else if (para_Math_Ampersand === ItemType)
             {
