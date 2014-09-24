@@ -745,44 +745,32 @@ function CFontFile(fileName, faceIndex)
                     {
                         var _width_im = oSizes.oBitmap.nWidth;
                         var _height = oSizes.oBitmap.nHeight;
-                        var _temp = g_memory.Alloc(_width);
-
-                        var _data = _temp.data;
 
                         var nY, nX;
                         var pDstBuffer;
-                        var pSrcBuffer;
-                        var nPitch = pCurentGliph.bitmap.pitch;
-                        for (nY = 0, pDstBuffer = 0, pSrcBuffer = 0; nY < oSizes.oBitmap.nHeight; ++nY, pDstBuffer += (raster_memory.pitch), pSrcBuffer += nPitch)
-                        {
-                            // скопируем в темповый буфер
-                            var _input = raster_memory.m_oBuffer.data;
-                            for (var i = 0; i < _width; i++)
-                                _data[i] = _input[pDstBuffer + i * 4 + 3];
 
+                        var _input = raster_memory.m_oBuffer.data;
+                        for (nY = 0, pDstBuffer = 0; nY < _height; ++nY, pDstBuffer += (raster_memory.pitch))
+                        {
                             for (nX = _width_im - 1; nX >= 0; --nX)
                             {
-                                if (0 != nX)
+                                if (0 != nX) // иначе ничего не делаем
                                 {
-                                    var nFirstByte, nSecondByte;
+                                    var _pos_x = pDstBuffer + nX * 4 + 3;
 
-                                    if (_width - 1 == nX)
-                                        nFirstByte = 0;
+                                    if (_width_im - 1 == nX)
+                                    {
+                                        // последний - просто копируем
+                                        _input[_pos_x] = _input[_pos_x - 4];
+                                    }
                                     else
-                                        nFirstByte = _data[nX];
-
-                                    nSecondByte = _data[nX - 1];
-
-                                    _input[pDstBuffer + nX * 4 + 3] = Math.min(255, nFirstByte + nSecondByte);
-                                }
-                                else
-                                {
-                                    _input[pDstBuffer + 3] = _data[0];
+                                    {
+                                        // сдвигаем все вправо
+                                        _input[_pos_x] = Math.min(255, _input[_pos_x - 4] + _input[_pos_x]);
+                                    }
                                 }
                             }
                         }
-
-                        _temp = null;
                     }
 
                     pCurGlyph.bBitmap  = oSizes.bBitmap;
@@ -1027,44 +1015,32 @@ function CFontFile(fileName, faceIndex)
                 {
                     var _width_im = oSizes.oBitmap.nWidth;
                     var _height = oSizes.oBitmap.nHeight;
-                    var _temp = g_memory.Alloc(_width);
-
-                    var _data = _temp.data;
 
                     var nY, nX;
                     var pDstBuffer;
-                    var pSrcBuffer;
-                    var nPitch = pCurentGliph.bitmap.pitch;
-                    for (nY = 0, pDstBuffer = 0, pSrcBuffer = 0; nY < oSizes.oBitmap.nHeight; ++nY, pDstBuffer += (raster_memory.pitch), pSrcBuffer += nPitch)
-                    {
-                        // скопируем в темповый буфер
-                        var _input = raster_memory.m_oBuffer.data;
-                        for (var i = 0; i < _width; i++)
-                            _data[i] = _input[pDstBuffer + i * 4 + 3];
 
+                    var _input = raster_memory.m_oBuffer.data;
+                    for (nY = 0, pDstBuffer = 0; nY < _height; ++nY, pDstBuffer += (raster_memory.pitch))
+                    {
                         for (nX = _width_im - 1; nX >= 0; --nX)
                         {
-                            if (0 != nX)
+                            if (0 != nX) // иначе ничего не делаем
                             {
-                                var nFirstByte, nSecondByte;
+                                var _pos_x = pDstBuffer + nX * 4 + 3;
 
-                                if (_width - 1 == nX)
-                                    nFirstByte = 0;
+                                if (_width_im - 1 == nX)
+                                {
+                                    // последний - просто копируем
+                                    _input[_pos_x] = _input[_pos_x - 4];
+                                }
                                 else
-                                    nFirstByte = _data[nX];
-
-                                nSecondByte = _data[nX - 1];
-
-                                _input[pDstBuffer + nX * 4 + 3] = Math.min(255, nFirstByte + nSecondByte);
-                            }
-                            else
-                            {
-                                _input[pDstBuffer + 3] = _data[0];
+                                {
+                                    // сдвигаем все вправо
+                                    _input[_pos_x] = Math.min(255, _input[_pos_x - 4] + _input[_pos_x]);
+                                }
                             }
                         }
                     }
-
-                    _temp = null;
                 }
 
                 pCurGlyph.bBitmap  = oSizes.bBitmap;
