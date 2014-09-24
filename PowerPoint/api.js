@@ -4912,10 +4912,13 @@ function sendCommand(editor, fCallback, rdata){
 			var incomeObject = JSON.parse(msg), rData;
 			switch(incomeObject["type"]){
 				case "updateversion":
-					editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
-						editor.SetViewMode(true);
+					if (editor.isViewMode)
 						_onOpenCommand(fCallback, incomeObject);
-					});
+					else
+						editor.asc_fireCallback("asc_onDocumentUpdateVersion", function () {
+							editor.SetViewMode(true);
+							_onOpenCommand(fCallback, incomeObject);
+						});
 					break;
                 case "open":
 					_onOpenCommand(fCallback, incomeObject);

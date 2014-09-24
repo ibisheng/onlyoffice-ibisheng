@@ -807,10 +807,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						var incomeObject = JSON.parse(msg);
 						switch( incomeObject["type"] ){
 							case "updateversion":
-								oThis.handlers.trigger("asc_onDocumentUpdateVersion", function () {
-									oThis.asc_setViewerMode(true);
+								if (oThis.asc_getViewerMode())
 									oThis._onOpenCommand(callback, incomeObject["data"]);
-								});
+								else
+									oThis.handlers.trigger("asc_onDocumentUpdateVersion", function () {
+										oThis.asc_setViewerMode(true);
+										oThis._onOpenCommand(callback, incomeObject["data"]);
+									});
 								break;
 							case "open":
 								oThis._onOpenCommand(callback, incomeObject["data"]);
