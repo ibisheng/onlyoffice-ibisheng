@@ -1281,45 +1281,9 @@ Paragraph.prototype =
         return true;
     },
 
-    Start_FromNewPage : function()
-    {
-        this.Pages.length = 1;
-
-        // Добавляем разрыв страницы
-        this.Pages[0].Set_EndLine( - 1 );
-        this.Lines[-1] = new CParaLine(0);
-        this.Lines[-1].Set_EndPos( - 1, this );
-    },
-
     Reset_RecalculateCache : function()
     {
 
-    },
-
-    Recalculate_Page : function(_PageIndex, bFast)
-    {
-        if (undefined === bFast)
-            bFast = false;
-
-        this.m_oPRSA.RecalcFast2 = bFast;
-
-        this.Clear_NearestPosArray();
-
-        // Во время пересчета сбрасываем привязку курсора к строке.
-        this.CurPos.Line  = -1;
-        this.CurPos.Range = -1;
-
-        this.FontMap.NeedRecalc = true;
-
-        this.Internal_CheckSpelling();
-
-        var CurPage = _PageIndex - this.PageNum;
-        var RecalcResult = this.Recalculate_Page__( CurPage );
-
-        if ( true === this.Parent.RecalcInfo.WidowControlReset )
-            this.Parent.RecalcInfo.Reset();
-
-        return RecalcResult;
     },
 
     RecalculateCurPos : function()

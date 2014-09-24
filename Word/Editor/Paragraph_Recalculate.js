@@ -322,6 +322,18 @@ Paragraph.prototype.Prepare_RecalculateObject = function()
     }
 };
 
+/**
+ * Пересчитываем первую страницу параграфа так, чтобы он начинался с новой страницы
+ */
+Paragraph.prototype.Start_FromNewPage = function()
+{
+    this.Pages.length = 1;
+
+    // Добавляем разрыв страницы
+    this.Pages[0].Set_EndLine(- 1);
+    this.Lines[-1] = new CParaLine(0);
+};
+
 Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurLine)
 {
     var PRS = this.m_oPRSW;
