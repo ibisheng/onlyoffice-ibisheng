@@ -4853,6 +4853,46 @@ DrawingObjectsController.prototype =
                     if(!table_props)
                     {
                         table_props = new_table_props;
+                        if(new_table_props.CellsBackground)
+                        {
+                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== FILL_TYPE_NONE)
+                            {
+                                new_table_props.CellsBackground.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
+                                var RGBA = new_table_props.CellsBackground.Unifill.getRGBAColor();
+                                new_table_props.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+                                new_table_props.CellsBackground.Value = shd_Clear;
+                            }
+                            else
+                            {
+                                new_table_props.CellsBackground.Color = new CDocumentColor(0, 0, 0, false);
+                                new_table_props.CellsBackground.Value = shd_Nil;
+                            }
+                        }
+                        if(new_table_props.CellBorders)
+                        {
+                            var checkBorder = function (border)
+                            {
+                                if(!border)
+                                    return;
+                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== FILL_TYPE_NONE)
+                                {
+                                    border.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
+                                    var RGBA = border.Unifill.getRGBAColor();
+                                    border.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+                                    border.Value = border_Single;
+                                }
+                                else
+                                {
+                                    border.Color = new CDocumentColor(0, 0, 0, false);
+                                    border.Value = border_Single;
+                                }
+                            };
+                            checkBorder(new_table_props.CellBorders.Top);
+                            checkBorder(new_table_props.CellBorders.Bottom);
+                            checkBorder(new_table_props.CellBorders.Right);
+                            checkBorder(new_table_props.CellBorders.Left);
+                        }
+
                     }
                     else
                     {
