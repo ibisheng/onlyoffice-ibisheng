@@ -5336,7 +5336,8 @@ PasteProcessor.prototype =
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             var tr = node.childNodes[i];
-            if("tr" == tr.nodeName.toLowerCase())
+			//TODO временная правка в условии для того, чтобы избежать ошибки при копировании из excel мерженной ячейки
+            if("tr" == tr.nodeName.toLowerCase() && tr.childNodes && tr.childNodes.length)
             {
 				var row = table.Internal_Add_Row(table.Content.length, 0);
                 this._ExecuteTableRow(tr, row, aSumGrid, spacing, oRowSpans, bUseScaleKoef, dScaleKoef);
