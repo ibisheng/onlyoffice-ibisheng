@@ -3575,6 +3575,14 @@ function CBinaryFileWriter()
         {
             oThis.StartRecord(0);
             oThis.WriteUChar(g_nodeAttributeStart);
+            if(isRealBool(_part.TextPr.Italic))
+            {
+                oThis._WriteLimit1(0, _part.TextPr.Italic === true ? 0 : 1);
+            }
+            if(isRealBool(_part.TextPr.Bold))
+            {
+                oThis._WriteLimit1(1, _part.TextPr.Bold === true ? 0 : 1);
+            }
             oThis.WriteUChar(g_nodeAttributeEnd);
 
             oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
@@ -3673,19 +3681,19 @@ function CBinaryFileWriter()
             oThis.WriteRecord3(3, tablePr.TableBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
         */
 
-        bIsRet = oThis.WriteRecord3(0, _part.TableCellPr.TableCellBorders.Left, oThis.WriteTableCellBorderLineStyle);
+        bIsRet = oThis.WriteRecord3(0, tablePr.TableBorders.Left, oThis.WriteTableCellBorderLineStyle);
         if (!bIsRet)
             oThis.WriteTableCellBorderLineStyle2(0, tablePr.TableBorders.Left);
 
-        bIsRet = oThis.WriteRecord3(1, _part.TableCellPr.TableCellBorders.Right, oThis.WriteTableCellBorderLineStyle);
+        bIsRet = oThis.WriteRecord3(1, tablePr.TableBorders.Right, oThis.WriteTableCellBorderLineStyle);
         if (!bIsRet)
             oThis.WriteTableCellBorderLineStyle2(1, tablePr.TableBorders.Right);
 
-        bIsRet = oThis.WriteRecord3(2, _part.TableCellPr.TableCellBorders.Top, oThis.WriteTableCellBorderLineStyle);
+        bIsRet = oThis.WriteRecord3(2, tablePr.TableBorders.Top, oThis.WriteTableCellBorderLineStyle);
         if (!bIsRet)
             oThis.WriteTableCellBorderLineStyle2(2, tablePr.TableBorders.Top);
 
-        bIsRet = oThis.WriteRecord3(3, _part.TableCellPr.TableCellBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
+        bIsRet = oThis.WriteRecord3(3, tablePr.TableBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
         if (!bIsRet)
             oThis.WriteTableCellBorderLineStyle2(3, tablePr.TableBorders.Bottom);
 
@@ -3693,8 +3701,14 @@ function CBinaryFileWriter()
         oThis.WriteRecord3(4, _part.TablePr.TableBorders.InsideH, oThis.WriteTableCellBorderLineStyle);
         oThis.WriteRecord3(5, _part.TablePr.TableBorders.InsideV, oThis.WriteTableCellBorderLineStyle);
         */
-        oThis.WriteTableCellBorderLineStyle2(4, _part.TablePr.TableBorders.InsideH);
-        oThis.WriteTableCellBorderLineStyle2(5, _part.TablePr.TableBorders.InsideV);
+        if(tablePr.TableBorders.InsideH)
+        {
+            oThis.WriteTableCellBorderLineStyle2(4, tablePr.TableBorders.InsideH);
+        }
+        if(tablePr.TableBorders.InsideV)
+        {
+            oThis.WriteTableCellBorderLineStyle2(5, tablePr.TableBorders.InsideV);
+        }
 
         oThis.EndRecord();
 
@@ -3732,7 +3746,7 @@ function CBinaryFileWriter()
 
         var bIsFill = false;
         var bIsSize = false;
-        if ((_border.Unifill !== undefined && _border.Unifill != null) || _border.Color instanceof CDocumentColor)
+        if ((_border.Unifill !== undefined && _border.Unifill != null))
         {
             bIsFill = true;
         }
@@ -3752,18 +3766,18 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeEnd);
 
             // TODO: потом переделать по-нормальному
-            if (!_border.Unifill && _border.Color instanceof CDocumentColor)
-            {
-                var _unifill = new CUniFill();
-                _unifill.fill = new CSolidFill();
-                _unifill.fill.color.color = new CRGBColor();
-
-                _unifill.fill.color.color.RGBA.R = _border.Color.r;
-                _unifill.fill.color.color.RGBA.G = _border.Color.g;
-                _unifill.fill.color.color.RGBA.B = _border.Color.b;
-
-                oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
-            }
+            //if (!_border.Unifill && _border.Color instanceof CDocumentColor)
+            //{
+            //    var _unifill = new CUniFill();
+            //    _unifill.fill = new CSolidFill();
+            //    _unifill.fill.color.color = new CRGBColor();
+//
+            //    _unifill.fill.color.color.RGBA.R = _border.Color.r;
+            //    _unifill.fill.color.color.RGBA.G = _border.Color.g;
+            //    _unifill.fill.color.color.RGBA.B = _border.Color.b;
+//
+            //    oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+            //}
 
             oThis.WriteRecord2(0, _border.Unifill, oThis.WriteUniFill);
 
@@ -3815,7 +3829,7 @@ function CBinaryFileWriter()
         var bIsFill = false;
         var bIsSize = false;
         var bIsLnRef = false;
-        if ((_border.Unifill !== undefined && _border.Unifill != null) || _border.Color instanceof CDocumentColor)
+        if ((_border.Unifill !== undefined && _border.Unifill != null))
         {
             bIsFill = true;
         }
@@ -3835,25 +3849,25 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeEnd);
 
             // TODO: потом переделать по-нормальному
-            if (!_border.Unifill && _border.Color instanceof CDocumentColor)
-            {
-                var _unifill = new CUniFill();
-                _unifill.fill = new CSolidFill();
-                _unifill.fill.color.color = new CRGBColor();
-
-                _unifill.fill.color.color.RGBA.R = _border.Color.r;
-                _unifill.fill.color.color.RGBA.G = _border.Color.g;
-                _unifill.fill.color.color.RGBA.B = _border.Color.b;
-
-                oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
-            }
+            //if (!_border.Unifill && _border.Color instanceof CDocumentColor)
+            //{
+            //    var _unifill = new CUniFill();
+            //    _unifill.fill = new CSolidFill();
+            //    _unifill.fill.color.color = new CRGBColor();
+//
+            //    _unifill.fill.color.color.RGBA.R = _border.Color.r;
+            //    _unifill.fill.color.color.RGBA.G = _border.Color.g;
+            //    _unifill.fill.color.color.RGBA.B = _border.Color.b;
+//
+            //    oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+            //}
 
             oThis.WriteRecord2(0, _border.Unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
         }
 
-        oThis.WriteRecord2(1, _border.LnRef, oThis.WriteStyleRef);
+        oThis.WriteRecord2(1, _border.LineRef, oThis.WriteStyleRef);
     }
     // --------------------------------------------------------------------------
 };

@@ -1050,15 +1050,15 @@ function BinaryPPTYLoader()
 
         s.Seek2(_end_rec);
 
-        if(_style.TableWholeTable.TableCellPr.TableCellBorders.InsideH)
+        if(_style.TableWholeTable.TablePr.TableBorders.InsideH)
         {
-            _style.TablePr.TableBorders.InsideH = _style.TableWholeTable.TableCellPr.TableCellBorders.InsideH;
-            delete _style.TableWholeTable.TableCellPr.TableCellBorders.InsideH;
+            _style.TablePr.TableBorders.InsideH = _style.TableWholeTable.TablePr.TableBorders.InsideH;
+            delete _style.TableWholeTable.TablePr.TableBorders.InsideH;
         }
-        if(_style.TableWholeTable.TableCellPr.TableCellBorders.InsideV)
+        if(_style.TableWholeTable.TablePr.TableBorders.InsideV)
         {
-            _style.TablePr.TableBorders.InsideV = _style.TableWholeTable.TableCellPr.TableCellBorders.InsideV;
-            delete _style.TableWholeTable.TableCellPr.TableCellBorders.InsideV;
+            _style.TablePr.TableBorders.InsideV = _style.TableWholeTable.TablePr.TableBorders.InsideV;
+            delete _style.TableWholeTable.TablePr.TableBorders.InsideV;
         }
         if(_style.TableWholeTable.TableCellPr.TableCellBorders.Top)
         {

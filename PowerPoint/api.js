@@ -3841,6 +3841,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
         }
     }
 
+
+
+
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     this.WordControl.m_oLogicDocument.Document_UpdateRulersState();
     this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
