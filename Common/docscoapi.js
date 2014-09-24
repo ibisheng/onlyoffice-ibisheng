@@ -266,7 +266,6 @@
         this._locks = {};
         this._msgBuffer = [];
         this._lockCallbacks = {};
-		this._saveLock = false;
 		this._saveCallback = [];
 		this.saveCallbackErrorTimeOutId = null;
         this._id = "";
@@ -284,6 +283,8 @@
 		this.deleteIndex = 0;
 		// Массив изменений
 		this.arrayChanges = null;
+		// Время последнего сохранения (для разрыва соединения)
+		this.lastOtherSaveTime = -1;
 		
 		this._url = "";
 
@@ -295,6 +296,7 @@
 		this._docid = null;
 		this._token = null;
 		this._user = "Anonymous";
+		this._userId = "Anonymous";
 		this._initCallback = null;
 		this.ownedLockBlocks = [];
 		this.sockjs_url = null;
@@ -596,6 +598,7 @@
 				this.onLocksReleasedEnd();
         }
 		if (data["changes"]) {
+			this.lastOtherSaveTime = data["time"];
 			if (this.onSaveChanges) {
 				this.onSaveChanges(JSON.parse(data["changes"]), data["user"]);
 			}
@@ -635,28 +638,36 @@
 		}
 	};
 	
-	DocsCoApi.prototype._onUnSaveLock = function (data) {
-		this._saveLock = false;
+	DocsCoApi.prototype._onUnSaveLock = function () {
 		if (this.onUnSaveLock)
 			this.onUnSaveLock ();
 	};
 
+	DocsCoApi.prototype._checkSaveChangesInDisconnect = function (allServerChanges) {
+		for (var changeId in allServerChanges) {
+			var change = allServerChanges[changeId];
+			var changesOneUser = change["changes"];
+			if (changesOneUser && change["user"] !== this._userId && this.lastSaveTime !== change["time"])
+				return true;
+		}
+		return false;
+	};
+
     DocsCoApi.prototype._onFirstLoadChanges = function (allServerChanges) {
-		var t = this;
         if (allServerChanges && this.onFirstLoadChanges) {
-			var hasChanges = false;
-			for (var changeId in allServerChanges) if (allServerChanges.hasOwnProperty(changeId)){
+			for (var changeId in allServerChanges) {
 				var change = allServerChanges[changeId];
 				var changesOneUser = change["changes"];
 				if (changesOneUser) {
-					hasChanges = true;
-					t.onFirstLoadChanges(JSON.parse(changesOneUser), change["user"]);
+					if (change["user"] !== this._userId)
+						this.lastSaveTime = change["time"];
+					this.onFirstLoadChanges(JSON.parse(changesOneUser), change["user"]);
 				}
 			}
 
 			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
-			if (t.onFirstLoadChangesEnd)
-				t.onFirstLoadChangesEnd();
+			if (this.onFirstLoadChangesEnd)
+				this.onFirstLoadChangesEnd();
         }
     };
 	
@@ -758,12 +769,16 @@
 
 	DocsCoApi.prototype._onDrop = function (data) {
 		this.disconnect();
-		this.onDisconnect(data['description'], true, false);
+		this.onDisconnect(data ? data['description'] : '', true, false);
 	};
 
 	DocsCoApi.prototype._onAuth = function (data) {
 		if (true === this._isAuth) {
-			// Мы уже авторизовывались, это просто reconnect
+			// Мы уже авторизовывались, это просто reconnect и нужно проверить не было ли изменений пока не было сети
+			if (this._checkSaveChangesInDisconnect(data["changes"] || [])) {
+				// делаем drop
+				this._onDrop();
+			}
 			return;
 		}
 		if (data["result"] === 1) {
@@ -780,6 +795,8 @@
 				this._indexuser = data["indexUser"];
 				this._onSetIndexUser (this._indexuser);
 			}
+
+			this._userId = this._user.asc_getId() + this._indexuser;
 
 			if (data["messages"] && this.onMessage) {
 				this._onMessages(data);
