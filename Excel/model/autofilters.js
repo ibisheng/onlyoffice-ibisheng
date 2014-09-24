@@ -2825,10 +2825,10 @@ var gUndoInsDelCellsFlag = true;
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
 				ws.isChanged = true;
 				
-				var activeRange = ws.activeRange.clone();
+				//var activeRange = ws.activeRange.clone();
 				this._reDrawFilters();
-				ws.setSelection(activeRange);
-				//ws.changeWorksheet("update");
+				
+				//ws.setSelection(activeRange);
 			},
 			
 			_getAutoFilterArray: function(cell) {
