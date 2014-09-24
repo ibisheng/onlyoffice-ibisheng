@@ -435,7 +435,6 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
     }
 
     // TODO: Здесь пересчеты идут целиком для строки, а не для конкретного отрезка.
-    this.private_RecalculateLineWidth(CurLine, CurPage, PRS);
     if (recalcresult_NextElement !== this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, true))
         return -1;
 
@@ -736,12 +735,7 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 7. Пересчитываем ширину строки
-    //-------------------------------------------------------------------------------------------------------------
-    this.private_RecalculateLineWidth(CurLine, CurPage, PRS, ParaPr);
-
-    //-------------------------------------------------------------------------------------------------------------
-    // 8. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
+    // 7. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
     //-------------------------------------------------------------------------------------------------------------
     this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false);
 };
@@ -1333,30 +1327,6 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
     return true;
 };
 
-Paragraph.prototype.private_RecalculateLineWidth       = function(CurLine, CurPage, PRS, ParaPr)
-{
-    var Line = this.Lines[CurLine];
-    var PRSC = this.m_oPRSC;
-    var RangesCount = Line.Ranges.length;
-    for (var CurRange = 0; CurRange < RangesCount; CurRange++)
-    {
-        var Range = Line.Ranges[CurRange];
-        var StartPos = Range.StartPos;
-        var EndPos   = Range.EndPos;
-
-        PRSC.Reset( this, Range );
-
-        if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
-            PRSC.Range.W += this.Numbering.WidthVisible;
-
-        for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
-        {
-            var Item = this.Content[Pos];
-            Item.Recalculate_Range_Width( PRSC, CurLine, CurRange );
-        }
-    }
-};
-
 Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPage, PRS, ParaPr, Fast)
 {
     // Здесь мы пересчитываем ширину пробелов (и в особенных случаях дополнительное
@@ -1382,6 +1352,7 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
     //        промежутке, увеличиваем их на столько, чтобы правая граница последнего
     //        слова совпала с правой границей промежутка
     var PRSW = PRS;
+    var PRSC = this.m_oPRSC;
     var PRSA = this.m_oPRSA;
     PRSA.Paragraph    = this;
     PRSA.LastW        = 0;
@@ -1395,6 +1366,21 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
     for (var CurRange = 0; CurRange < RangesCount; CurRange++)
     {
         var Range = Line.Ranges[CurRange];
+
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        PRSC.Reset( this, Range );
+
+        PRSC.Range.W = 0;
+        if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+            PRSC.Range.W += this.Numbering.WidthVisible;
+
+        for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            Item.Recalculate_Range_Width( PRSC, CurLine, CurRange );
+        }
 
         var JustifyWord  = 0;
         var JustifySpace = 0;
@@ -1437,15 +1423,15 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                 {
                     X = Range.X;
 
-                    if ( 1 == Range.Words )
+                    if (1 == PRSC.Words)
                     {
-                        if ( 1 == RangesCount && this.Lines.length > 1 )
+                        if (1 == RangesCount && !(Line.Info & paralineinfo_End))
                         {
                             // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                            if ( RangeWidth - Range.W <= 0.05 * RangeWidth && Range.Letters > 1 )
-                                JustifyWord = (RangeWidth -  Range.W) / (Range.Letters - 1);
+                            if (RangeWidth - Range.W <= 0.05 * RangeWidth && PRSC.Letters > 1)
+                                JustifyWord = (RangeWidth -  Range.W) / (PRSC.Letters - 1);
                         }
-                        else if ( 0 == CurRange || ( CurLine == this.Lines.length - 1 && CurRange == RangesCount - 1 ) )
+                        else if (0 == CurRange || (Line.Info & paralineinfo_End && CurRange == RangesCount - 1))
                         {
                             // Ничего не делаем (выравниваем текст по левой границе)
                         }
@@ -1463,8 +1449,8 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                         // TODO: Переделать проверку последнего отрезка в последней строке (нужно выставлять флаг когда пришел PRS.End в отрезке)
 
                         // Последний промежуток последней строки не надо растягивать по ширине.
-                        if ( Range.Spaces > 0 && ( CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1 ) )
-                            JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
+                        if (PRSC.Spaces > 0 && (!(Line.Info & paralineinfo_End) || CurRange != Line.Ranges.length - 1))
+                            JustifySpace = (RangeWidth - Range.W) / PRSC.Spaces;
                         else
                             JustifySpace = 0;
                     }
@@ -1479,7 +1465,7 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
             }
 
             // В последнем отрезке последней строки не делаем текст "по ширине"
-            if ( CurLine === this.ParaEnd.Line && CurRange === this.ParaEnd.Range )
+            if (CurLine === this.ParaEnd.Line && CurRange === this.ParaEnd.Range)
             {
                 JustifyWord  = 0;
                 JustifySpace = 0;
@@ -1491,18 +1477,15 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
         PRSA.XEnd = Range.XEnd;
         PRSA.JustifyWord   = JustifyWord;
         PRSA.JustifySpace  = JustifySpace;
-        PRSA.SpacesCounter = Range.Spaces;
-        PRSA.SpacesSkip    = Range.SpacesSkip;
-        PRSA.LettersSkip   = Range.LettersSkip;
+        PRSA.SpacesCounter = PRSC.Spaces;
+        PRSA.SpacesSkip    = PRSC.SpacesSkip;
+        PRSA.LettersSkip   = PRSC.LettersSkip;
         PRSA.RecalcResult  = recalcresult_NextElement;
 
         this.Lines[CurLine].Ranges[CurRange].XVisible = X;
 
         if ( 0 === CurRange )
             this.Lines[CurLine].X = X - PRSW.XStart;
-
-        var StartPos = Range.StartPos;
-        var EndPos   = Range.EndPos;
 
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
             PRSA.X += this.Numbering.WidthVisible;
@@ -1863,15 +1846,6 @@ function CParaLineRange(X, XEnd)
     this.StartPos  = 0;    // Позиция в контенте параграфа, с которой начинается данный отрезок
     this.EndPos    = 0;    // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
     this.W         = 0;
-
-    this.Words     = 0;
-    this.Spaces    = 0;
-    this.Letters   = 0;
-
-    this.SpacesSkip  = 0;
-    this.LettersSkip = 0;
-
-    this.SpacePos  = -1; // Позиция, с которой начинаем считать пробелы
 }
 
 CParaLineRange.prototype =
@@ -1883,16 +1857,6 @@ CParaLineRange.prototype =
         this.XVisible += Dx;
     },
 
-    Reset_Width : function()
-    {
-        this.W           = 0;
-        this.Words       = 0;
-        this.Spaces      = 0;
-        this.Letters     = 0;
-        this.SpacesSkip  = 0;
-        this.LettersSkip = 0;
-    },
-
     Copy : function()
     {
         var NewRange = new CParaLineRange();
@@ -1900,19 +1864,9 @@ CParaLineRange.prototype =
         NewRange.X           = this.X;
         NewRange.XVisible    = this.XVisible;
         NewRange.XEnd        = this.XEnd;
-
-        NewRange.W           = this.W;
-        NewRange.Words       = this.Words;
-        NewRange.Spaces      = this.Spaces;
-        NewRange.Letters     = this.Letters;
-
-        NewRange.SpacesSkip  = this.SpacesSkip;
-        NewRange.LettersSkip = this.LettersSkip;
-
         NewRange.StartPos    = this.StartPos;
         NewRange.EndPos      = this.EndPos;
-
-        NewRange.SpacePos    = this.SpacePos;
+        NewRange.W           = this.W;
 
         return NewRange;
     }
@@ -2183,6 +2137,12 @@ function CParagraphRecalculateStateCounter()
     this.Word        = false;
     this.SpaceLen    = 0;
     this.SpacesCount = 0;
+
+    this.Words       = 0;
+    this.Spaces      = 0;
+    this.Letters     = 0;
+    this.SpacesSkip  = 0;
+    this.LettersSkip = 0;
 }
 
 CParagraphRecalculateStateCounter.prototype =
@@ -2194,6 +2154,12 @@ CParagraphRecalculateStateCounter.prototype =
         this.Word        = false;
         this.SpaceLen    = 0;
         this.SpacesCount = 0;
+
+        this.Words       = 0;
+        this.Spaces      = 0;
+        this.Letters     = 0;
+        this.SpacesSkip  = 0;
+        this.LettersSkip = 0;
     }
 };
 

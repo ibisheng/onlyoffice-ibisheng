@@ -2181,12 +2181,12 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_Sym:
             case para_Text:
             {
-                PRSC.Range.Letters++;
+                PRSC.Letters++;
 
                 if ( true !== PRSC.Word )
                 {
                     PRSC.Word = true;
-                    PRSC.Range.Words++;
+                    PRSC.Words++;
                 }
 
                 PRSC.Range.W += Item.Width / TEXTWIDTH_DIVIDER;//Item.Get_Width();
@@ -2195,10 +2195,10 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 PRSC.SpaceLen = 0;
 
                 // Пробелы перед первым словом в строке не считаем
-                if ( PRSC.Range.Words > 1 )
-                    PRSC.Range.Spaces += PRSC.SpacesCount;
+                if (PRSC.Words > 1)
+                    PRSC.Spaces += PRSC.SpacesCount;
                 else
-                    PRSC.Range.SpacesSkip += PRSC.SpacesCount;
+                    PRSC.SpacesSkip += PRSC.SpacesCount;
 
                 PRSC.SpacesCount = 0;
 
@@ -2226,13 +2226,13 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             }
             case para_Drawing:
             {
-                PRSC.Range.Words++;
+                PRSC.Words++;
                 PRSC.Range.W += PRSC.SpaceLen;
 
-                if ( PRSC.Range.Words > 1 )
-                    PRSC.Range.Spaces += PRSC.SpacesCount;
+                if (PRSC.Words > 1)
+                    PRSC.Spaces += PRSC.SpacesCount;
                 else
-                    PRSC.Range.SpacesSkip += PRSC.SpacesCount;
+                    PRSC.SpacesSkip += PRSC.SpacesCount;
 
                 PRSC.Word        = false;
                 PRSC.SpacesCount = 0;
@@ -2245,13 +2245,13 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             }
             case para_PageNum:
             {
-                PRSC.Range.Words++;
+                PRSC.Words++;
                 PRSC.Range.W += PRSC.SpaceLen;
 
-                if ( PRSC.Range.Words > 1 )
-                    PRSC.Range.Spaces += PRSC.SpacesCount;
+                if (PRSC.Words > 1)
+                    PRSC.Spaces += PRSC.SpacesCount;
                 else
-                    PRSC.Range.SpacesSkip += PRSC.SpacesCount;
+                    PRSC.SpacesSkip += PRSC.SpacesCount;
 
                 PRSC.Word        = false;
                 PRSC.SpacesCount = 0;
@@ -2268,12 +2268,12 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
                 // Учитываем только слова и пробелы, идущие после последнего таба
 
-                PRSC.Range.LettersSkip += PRSC.Range.Letters;
-                PRSC.Range.SpacesSkip  += PRSC.Range.Spaces;
+                PRSC.LettersSkip += PRSC.Letters;
+                PRSC.SpacesSkip  += PRSC.Spaces;
 
-                PRSC.Range.Words   = 0;
-                PRSC.Range.Spaces  = 0;
-                PRSC.Range.Letters = 0;
+                PRSC.Words   = 0;
+                PRSC.Spaces  = 0;
+                PRSC.Letters = 0;
 
                 PRSC.SpaceLen    = 0;
                 PRSC.SpacesCount = 0;
@@ -2284,8 +2284,8 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
             case para_NewLine:
             {
-                if ( true === PRSC.Word && PRSC.Range.Words > 1 )
-                    PRSC.Range.Spaces += PRSC.SpacesCount;
+                if (true === PRSC.Word && PRSC.Words > 1)
+                    PRSC.Spaces += PRSC.SpacesCount;
 
                 PRSC.SpacesCount = 0;
                 PRSC.Word        = false;
@@ -2295,7 +2295,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_End:
             {
                 if ( true === PRSC.Word )
-                    PRSC.Range.Spaces += PRSC.SpacesCount;
+                    PRSC.Spaces += PRSC.SpacesCount;
 
                 break;
             }
