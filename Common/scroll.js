@@ -132,6 +132,8 @@ function CArrowDrawer( settings ) {
     this.fadeInActive2 = false;
     this.fadeOutActive2 = false;
 
+    this.fadeInFadeOutDelay = settings.fadeInFadeOutDelay ? settings.fadeInFadeOutDelay : 30;
+
 }
 CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
     if ( ( sizeH == this.SizeH || sizeW == this.SizeW ) && is_retina == this.IsRetina && null != this.ImageLeft )
@@ -309,7 +311,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
         if ( startColorFadeIn.R >= 207 ) {
             that.startColorFadeInOutStart1 = startColorFadeIn;
-            that.fadeInTimeout = setTimeout( fadeIn, 30 );
+            that.fadeInTimeout = setTimeout( fadeIn, that.fadeInFadeOutDelay );
         }
         else {
             clearTimeout( that.fadeInTimeout );
@@ -345,7 +347,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
         if ( startColorFadeOut.R <= 241 ) {
             that.startColorFadeInOutStart1 = startColorFadeOut;
-            that.fadeOutTimeout = setTimeout( fadeOut, 30 );
+            that.fadeOutTimeout = setTimeout( fadeOut, that.fadeInFadeOutDelay );
         }
         else {
             clearTimeout( that.fadeOutTimeout );
@@ -602,7 +604,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
         if ( startColorFadeIn.R >= 207 ) {
             that.startColorFadeInOutStart1 = startColorFadeIn;
             ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
-            that.fadeInTimeout1 = setTimeout( fadeIn, 30 );
+            that.fadeInTimeout1 = setTimeout( fadeIn, that.fadeInFadeOutDelay );
         }
         else {
             clearTimeout( that.fadeInTimeout1 );
@@ -672,7 +674,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
         if ( startColorFadeOut.R <= 241 ) {
             that.startColorFadeInOutStart1 = startColorFadeOut;
             ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
-            that.fadeOutTimeout1 = setTimeout( fadeOut, 30 );
+            that.fadeOutTimeout1 = setTimeout( fadeOut, that.fadeInFadeOutDelay );
         }
         else {
             clearTimeout( that.fadeOutTimeout1 );
@@ -823,6 +825,44 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
                 fadeOut();
             }
             else{
+
+                if ( this.lastArrowStatus1 != ScrollOverType.STABLE ) {
+
+                    var im, ctx_im, px, _data, c = this.ColorGradStart[ScrollOverType.STABLE];
+
+                    switch ( type ) {
+                        case ScrollArrowType.ARROW_LEFT:
+                        {
+                            im = this.ImageLeft[ScrollOverType.STABLE];
+                            break;
+                        }
+                        default:
+                        {
+                            im = this.ImageTop[ScrollOverType.STABLE];
+                            break;
+                        }
+                    }
+
+                    ctx_im = im.getContext( '2d' );
+                    _data = ctx_im.getImageData( 0, 0, img1.width, img1.height );
+                    px = _data.data;
+
+                    _len = px.length;
+
+                    for ( var i = 0; i < _len; i += 4 ) {
+                        if ( px[i + 3] == 255 ) {
+                            px[i] = c.R;
+                            px[i + 1] = c.G;
+                            px[i + 2] = c.B;
+                        }
+                    }
+
+                    this.startColorFadeInOutStart1 = {R:-1,G:-1,B:-1};
+
+                    ctx_im.putImageData( _data, 0, 0 )
+
+                }
+
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackStable;
                 ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
@@ -989,7 +1029,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
         if ( startColorFadeIn.R >= 207 ) {
             that.startColorFadeInOutStart2 = startColorFadeIn;
             ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
-            that.fadeInTimeout2 = setTimeout( fadeIn, 30 );
+            that.fadeInTimeout2 = setTimeout( fadeIn, that.fadeInFadeOutDelay );
         }
         else {
             clearTimeout( that.fadeInTimeout2 );
@@ -1059,7 +1099,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
         if ( startColorFadeOut.R <= 241 ) {
             that.startColorFadeInOutStart2 = startColorFadeOut;
             ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
-            that.fadeOutTimeout2 = setTimeout( fadeOut, 30 );
+            that.fadeOutTimeout2 = setTimeout( fadeOut, that.fadeInFadeOutDelay );
         }
         else {
             clearTimeout( that.fadeOutTimeout2 );
@@ -1213,6 +1253,44 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
                 fadeOut();
             }
             else{
+
+                if ( this.lastArrowStatus2 != ScrollOverType.STABLE ) {
+
+                    var im, ctx_im, px, _data, c = this.ColorGradStart[ScrollOverType.STABLE];
+
+                    switch ( type ) {
+                        case ScrollArrowType.ARROW_RIGHT:
+                        {
+                            im = this.ImageRight[ScrollOverType.STABLE];
+                            break;
+                        }
+                        default:
+                        {
+                            im = this.ImageBottom[ScrollOverType.STABLE];
+                            break;
+                        }
+                    }
+
+                    ctx_im = im.getContext( '2d' );
+                    _data = ctx_im.getImageData( 0, 0, img1.width, img1.height );
+                    px = _data.data;
+
+                    _len = px.length;
+
+                    for ( var i = 0; i < _len; i += 4 ) {
+                        if ( px[i + 3] == 255 ) {
+                            px[i] = c.R;
+                            px[i + 1] = c.G;
+                            px[i + 2] = c.B;
+                        }
+                    }
+
+                    this.startColorFadeInOutStart2 = {R:-1,G:-1,B:-1};
+
+                    ctx_im.putImageData( _data, 0, 0 )
+
+                }
+
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackStable;
                 ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
@@ -1374,13 +1452,13 @@ function ScrollObject( elemID, settings, dbg ) {
         scrollerColor:"#f1f1f1",
         scrollerColorOver:"#cfcfcf",
         scrollerColorLayerOver:"#cfcfcf",
-        scrollerColorActive:"#848484",
+        scrollerColorActive:"#ADADAD",
         scrollBackgroundColor:"#F1F1F1",
         scrollBackgroundColorHover:"#F1F1F1",
         scrollBackgroundColorActive:"#F1F1F1",
         strokeStyleNone:"#cfcfcf",
         strokeStyleOver:"#cfcfcf",
-        strokeStyleActive:"#848484",
+        strokeStyleActive:"#ADADAD",
         vscrollStep:10,
         hscrollStep:10,
         wheelScrollLines:1,
@@ -1394,8 +1472,9 @@ function ScrollObject( elemID, settings, dbg ) {
         arrowOverBorderColor:"#cfcfcf",
         arrowOverBackgroundColor:"#cfcfcf",
         arrowActiveColor:"#f1f1f1",
-        arrowActiveBorderColor:"#848484",
-        arrowActiveBackgroundColor:"#848484"
+        arrowActiveBorderColor:"#ADADAD",
+        arrowActiveBackgroundColor:"#ADADAD",
+        fadeInFadeOutDelay:20
     };
 
     this.settings = extendSettings( settings, scrollSettings );
@@ -2031,7 +2110,7 @@ ScrollObject.prototype = {
 
             if ( startColorFadeIn >= 207 ) {
                 that.startColorFadeInOutStart = startColorFadeIn;
-                that.fadeInTimeout = setTimeout( fadeIn, 30 );
+                that.fadeInTimeout = setTimeout( fadeIn, that.settings.fadeInFadeOutDelay );
             }
             else {
                 clearTimeout( that.fadeInTimeout );
@@ -2151,7 +2230,7 @@ ScrollObject.prototype = {
 
             if ( startColorFadeOut <= 241 ) {
                 that.startColorFadeInOutStart = startColorFadeOut;
-                that.fadeOutTimeout = setTimeout( fadeOut, 30 );
+                that.fadeOutTimeout = setTimeout( fadeOut, that.settings.fadeInFadeOutDelay );
             }
             else {
                 clearTimeout( that.fadeOutTimeout );
@@ -2206,6 +2285,51 @@ ScrollObject.prototype = {
         }
 
         function drawScroller() {
+
+
+            that.context.beginPath();
+
+            if ( that.isVerticalScroll ) {
+                var _y = that.settings.showArrows ? that.arrowPosition : 0,
+                    _h = that.canvasH - (_y << 1);
+
+                if ( _h > 0 ) {
+                    that.context.rect( 0, _y, that.canvasW, _h );
+                }
+            }
+            else if ( that.isHorizontalScroll ) {
+                var _x = that.settings.showArrows ? that.arrowPosition : 0,
+                    _w = that.canvasW - (_x << 1);
+
+                if ( _w > 0 ) {
+                    that.context.rect( _x, 0, _w, that.canvasH );
+                }
+            }
+
+            switch ( that.scrollerStatus ) {
+
+                case ScrollOverType.OVER:
+                {
+                    that.context.fillStyle = that.settings.scrollBackgroundColorHover;
+                    break;
+                }
+                case ScrollOverType.ACTIVE:
+                {
+                    that.context.fillStyle = that.settings.scrollBackgroundColorActive;
+                    break;
+                }
+                case ScrollOverType.NONE:
+                default:
+                {
+                    that.context.fillStyle = that.settings.scrollBackgroundColor;
+                    break;
+                }
+
+            }
+
+            that.context.fill();
+            that.context.beginPath();
+
             if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
                 var _y = that.scroller.y >> 0, arrow = that.settings.showArrows ? that.arrowPosition : 0
                 if ( _y < arrow ) {
@@ -2247,49 +2371,6 @@ ScrollObject.prototype = {
 
         this.fadeInActive = false;
         this.fadeOutActive = false;
-
-        this.context.beginPath();
-
-        if ( this.isVerticalScroll ) {
-            var _y = this.settings.showArrows ? this.arrowPosition : 0,
-                _h = this.canvasH - (_y << 1);
-
-            if ( _h > 0 ) {
-                this.context.rect( 0, _y, this.canvasW, _h );
-            }
-        }
-        else if ( this.isHorizontalScroll ) {
-            var _x = this.settings.showArrows ? this.arrowPosition : 0,
-                _w = this.canvasW - (_x << 1);
-
-            if ( _w > 0 ) {
-                this.context.rect( _x, 0, _w, this.canvasH );
-            }
-        }
-
-        switch ( this.scrollerStatus ) {
-
-            case ScrollOverType.OVER:
-            {
-                this.context.fillStyle = this.settings.scrollBackgroundColorHover;
-                break;
-            }
-            case ScrollOverType.ACTIVE:
-            {
-                this.context.fillStyle = this.settings.scrollBackgroundColorActive;
-                break;
-            }
-            case ScrollOverType.NONE:
-            default:
-            {
-                this.context.fillStyle = this.settings.scrollBackgroundColor;
-                break;
-            }
-
-        }
-
-        this.context.fill();
-        this.context.beginPath();
 
         drawScroller();
 
@@ -2873,7 +2954,7 @@ ScrollObject.prototype = {
                     var _tmp = this,
                         direction = mousePos.y - this.that.scroller.y - this.that.scroller.h / 2,
                         step = this.that.paneHeight * this.that.settings.scrollPagePercent,
-                        verticalDragPosition = this.that.scroller.y,
+//                        verticalDragPosition = this.that.scroller.y,
                         isFirst = true,
                         doScroll = function () {
                             _tmp.that.lock = true;
