@@ -501,7 +501,15 @@ CNumerator.prototype.recalculateSize = function()
     var gapNum = 7.832769097222222 * mgCtrPrp.FontSize/36,
         minGap = mgCtrPrp.FontSize* 25.4/96 * 0.16;
 
-    // var delta = 0.65*gap - Descent;
+    g_oTextMeasurer.SetFont(mgCtrPrp);
+    var Height = g_oTextMeasurer.GetHeight();
+
+    if(this.Parent.kind == MATH_LIMIT || this.Parent.kind == MATH_GROUP_CHARACTER)
+    {
+        gapNum = Height/2.4;
+        minGap = Height/10;
+    }
+
     var delta = 0.8076354679802956*gapNum - Descent;
 
     this.gap = delta > minGap ? delta - 0.95*minGap: minGap;
@@ -524,10 +532,6 @@ CNumerator.prototype.fillMathComposition = function(content)
 {
     this.elements[0][0] = content;
 }
-/*CNumerator.prototype.Get_CompiledCtrPrp = function()
-{
-    return this.Parent.Get_CompiledCtrPrp();
-}*/
 CNumerator.prototype.getPropsForWrite = function()
 {
     var props = {};
@@ -535,10 +539,9 @@ CNumerator.prototype.getPropsForWrite = function()
     return props;
 }
 
-function CDenominator(bLimit)
+function CDenominator()
 {
     this.gap = 0;
-    this.bLimit = bLimit == true;
 
     CMathBase.call(this, true);
 
@@ -571,10 +574,14 @@ CDenominator.prototype.recalculateSize = function()
         Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36,
         minGap = gapDen/3;
 
-    if(this.bLimit)
+
+    g_oTextMeasurer.SetFont(mgCtrPrp);
+    var Height = g_oTextMeasurer.GetHeight();
+
+    if(this.Parent.kind == MATH_LIMIT || this.Parent.kind == MATH_GROUP_CHARACTER)
     {
-        gapDen /= 1.5;
-        minGap /= 1.5;
+        gapDen = Height/2.6;
+        minGap = Height/10;
     }
 
     var delta = gapDen - Ascent;
@@ -583,6 +590,7 @@ CDenominator.prototype.recalculateSize = function()
     var width = arg.width;
     var height = arg.height + this.gap;
     var ascent = arg.ascent + this.gap;
+
 
     this.size = {width : width, height: height, ascent: ascent};
 }
@@ -603,10 +611,6 @@ CDenominator.prototype.fillMathComposition = function(content)
 {
     this.elements[0][0] = content;
 }
-/*CDenominator.prototype.Get_CompiledCtrPrp = function()
-{
-    return this.Parent.Get_CompiledCtrPrp();
-}*/
 CDenominator.prototype.getPropsForWrite = function()
 {
     var props = {};

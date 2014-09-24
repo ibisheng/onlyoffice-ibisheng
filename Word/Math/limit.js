@@ -103,7 +103,7 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
                 this.FName = this.ContentFName;
                 //this.elements[1][0] = this.Iterator;
 
-                this.Iterator = new CDenominator(true);
+                this.Iterator = new CDenominator();
                 this.Iterator.fillMathComposition(this.ContentIterator);
 
                 this.elements[0][0] = this.FName;

@@ -2182,7 +2182,6 @@ function COperator(type)
     this.coordGlyph = null;
 
     this.size = new CMathSize();
-
 }
 COperator.prototype.mergeProperties = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
 {
@@ -3028,75 +3027,6 @@ COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
         }
     }
 }
-COperator.prototype._fixSize = function(ParaMath, oMeasure, stretch)
-{
-    this.ParaMath = ParaMath;
-    if(this.typeOper !== OPERATOR_EMPTY)
-    {
-        var width, height, ascent;
-
-        if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
-        {
-            var ctrPrp = this.Get_CompiledCtrPrp();
-
-            var rPrp = new CTextPr();
-            //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
-            var defaultRPrp = this.Parent.ParaMath.Get_Default_TPrp();
-
-            rPrp.Merge(defaultRPrp);
-            rPrp.Merge(ctrPrp);
-            rPrp.Italic = false;
-
-            oMeasure.SetFont(rPrp);
-
-            this.operator.Resize(oMeasure, this);
-
-            width  = this.operator.size.width;
-
-            if(this.type !== OPER_ACCENT)
-            {
-                height = this.operator.size.height;
-            }
-            else
-            {
-                var letterX = new CMathText(true);
-                letterX.add(0x78);
-                letterX.Resize(oMeasure, null);
-                height = this.operator.size.ascent - letterX.size.ascent;
-            }
-
-        }
-        else
-        {
-            this.operator.fixSize(stretch);
-            var dims = this.operator.getCoordinateGlyph();
-            this.coordGlyph = {XX: dims.XX, YY: dims.YY};
-
-            if(this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT)
-            {
-                width = dims.Width;
-                height = this.operator.size.height;
-            }
-            else
-            {
-                width = this.operator.size.width;
-                height = dims.Height;
-            }
-        }
-
-        var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
-        var shCenter = this.Parent.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-
-        if(this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT)// horizontal
-            ascent = dims.Height/2;
-        else // vertical
-            ascent = height/2 + shCenter;
-
-        this.size.width  = width;
-        this.size.height = height;
-        this.size.ascent = ascent;
-    }
-}
 COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 {
     this.ParaMath = ParaMath;
@@ -3108,7 +3038,6 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         var ctrPrp = this.Get_CompiledCtrPrp();
 
         var rPrp = new CTextPr();
-        //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
         var defaultRPrp = this.Parent.ParaMath.Get_Default_TPrp();
 
         rPrp.Merge(defaultRPrp);
@@ -3117,7 +3046,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
         oMeasure.SetFont(rPrp);
 
-        var bVertical = this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT;
+        var bTopBot = this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT;
 
         // Width
         if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
@@ -3131,30 +3060,43 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
             dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};
 
-            width = bVertical ? dims.Width : this.operator.size.width;
+            width = bTopBot ? dims.Width : this.operator.size.width;
         }
 
         // Height
+
+        var letterOperator = new CMathText(true);
+        letterOperator.add(this.code);
+        letterOperator.Resize(oMeasure, null);
+
         if(this.type === OPER_ACCENT)
         {
-            var letterOperator = new CMathText(true);
-            letterOperator.add(this.code);
-            letterOperator.Resize(oMeasure, null);
-
             var letterX = new CMathText(true);
             letterX.add(0x78);
             letterX.Resize(oMeasure, null);
 
-            //height = this.operator.size.ascent - letterX.size.ascent;
             height = letterOperator.size.ascent - letterX.size.ascent;
-
         }
+
         else
         {
             if(this.typeOper == OPERATOR_TEXT)
                 height = this.operator.size.height;
             else
-                height = bVertical ? this.operator.size.height : dims.Height;
+            {
+                if(bTopBot)
+                {
+                    /*if(this.type == OPER_GROUP_CHAR)
+                        height = letterOperator.size.height;
+                    else
+                        height = this.operator.size.height;*/
+
+                    height = this.operator.size.height;
+                }
+                else
+                    height = dims.Height;
+            }
+                //height = bTopBot ? this.operator.size.height : dims.Height;
         }
 
         var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
@@ -4059,10 +4001,13 @@ CCharacter.prototype.getBase = function()
     return this.elements[0][0];
 }
 
+
 function CGroupCharacter(props)
 {
-    this.Id   = g_oIdCounter.Get_NewId();
+	this.Id   = g_oIdCounter.Get_NewId();
     this.kind = MATH_GROUP_CHARACTER;
+
+    this.Content = new CMathContent();
 
     this.Pr =
     {
@@ -4071,9 +4016,6 @@ function CGroupCharacter(props)
         vertJc:   VJUST_TOP,
         pos:      LOCATION_BOT
     };
-
-    //this.vertJust = VJUST_TOP;
-    //this.loc = LOCATION_BOT;
 
     CCharacter.call(this);
 
@@ -4086,28 +4028,8 @@ function CGroupCharacter(props)
 Asc.extendClass(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)
 {
-
     this.setProperties(props);
     this.fillContent();
-
-    /*var operDefaultPrp =
-     {
-     type:   BRACKET_CURLY_BOTTOM,
-     loc:    LOCATION_BOT
-     };
-
-     var operProps =
-     {
-     type:   this.Pr.chrType,
-     chr:    this.Pr.chr,
-     loc:    this.Pr.pos
-     };
-
-     this.setCharacter(operProps, operDefaultPrp);
-
-     this.Pr.chrType = this.operator.typeOper;
-     this.Pr.chr     = String.fromCharCode(this.operator.code);*/
-
 }
 CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -4134,11 +4056,27 @@ CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, Arg
     var ArgSz = ArgSize.Copy();
 
     if(this.Pr.pos == this.Pr.vertJc)
+    {
         ArgSz.decrease();
 
-    //this.Set_CompiledCtrPrp(ParaMath);
+        var Iterator;
+
+        if(this.Pr.pos == LOCATION_TOP)
+            Iterator = new CDenominator();
+        else
+            Iterator = new CNumerator();
+
+        Iterator.fillMathComposition(this.Content);
+        this.elements[0][0] = Iterator;
+    }
+    else
+        this.elements[0][0] = this.Content;
 
     CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
+}
+CGroupCharacter.prototype.getBase = function()
+{
+    return this.Content;
 }
 CGroupCharacter.prototype.setProperties = function(props)
 {
@@ -4163,7 +4101,8 @@ CGroupCharacter.prototype.fillMathComposition = function(props, contents /*array
     this.setProperties(props);
     this.fillContent();
 
-    this.elements[0][0] = contents[0];
+    //this.elements[0][0] = contents[0];
+    this.Content = contents[0];
 }
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
@@ -4176,13 +4115,15 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
     if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)
         ascent =  this.operator.size.ascent + shCent;
+        //ascent =  this.operator.size.ascent + 1.3*shCent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_TOP )
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
-    //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
+        //ascent = this.elements[0][0].size.height + 1.55*shCent + this.operator.size.height - this.operator.size.ascent;
+
 
     return ascent;
 }
@@ -4352,7 +4293,7 @@ CGroupCharacter.prototype.getPropsForWrite = function()
 }
 CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
 {
-    Writer.WriteLong( historyitem_type_groupChr );
+	Writer.WriteLong( historyitem_type_groupChr );
 }
 CGroupCharacter.prototype.Load_Changes = function(Reader)
 {
@@ -4361,362 +4302,6 @@ CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
 {
 }
 CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
-{
-    Writer.WriteLong( historyitem_type_groupChr );
-    Writer.WriteString2( this.getBase().Id );
-
-    this.CtrPrp.Write_ToBinary(Writer);
-
-    var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-    if ( undefined != this.Pr.chr )
-    {
-        Writer.WriteLong(this.Pr.chr);
-        Flags |= 1;
-    }
-    if ( undefined != this.Pr.pos )
-    {
-        Writer.WriteLong(this.Pr.pos);
-        Flags |= 2;
-    }
-    if ( undefined != this.Pr.vertJc )
-    {
-        Writer.WriteLong(this.Pr.vertJc);
-        Flags |= 4;
-    }
-    var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
-}
-CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
-{
-    var props = {ctrPrp: new CTextPr()};
-    var arrElems = [];
-
-    arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-
-    props.ctrPrp.Read_FromBinary(Reader);
-
-    var Flags = Reader.GetLong();
-    if ( Flags & 1 )
-        props.chr = Reader.GetLong();
-    if ( Flags & 2 )
-        props.pos = Reader.GetLong();
-    if ( Flags & 4 )
-        props.vertJc = Reader.GetLong();
-
-    this.fillMathComposition (props, arrElems);
-}
-CGroupCharacter.prototype.Get_Id = function()
-{
-    return this.Id;
-}
-
-function new_CGroupCharacter(props)
-{
-	this.Id   = g_oIdCounter.Get_NewId();
-    this.kind = MATH_GROUP_CHARACTER;
-
-    this.Content = new CMathContent();
-
-    this.Pr =
-    {
-        chr:      null,
-        chrType:  null,
-        vertJc:   VJUST_TOP,
-        pos:      LOCATION_BOT
-    };
-
-    CCharacter.call(this);
-
-    if(props !== null && typeof(props)!== "undefined")
-        this.init(props);
-
-    /// вызов этой функции обязательно в конце
-    g_oTableId.Add( this, this.Id );
-}
-Asc.extendClass(new_CGroupCharacter, CCharacter);
-new_CGroupCharacter.prototype.init = function(props)
-{
-    this.setProperties(props);
-    this.fillContent();
-}
-new_CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    if(this.RecalcInfo.bProps == true)
-    {
-        var operDefaultPrp =
-        {
-            type:   BRACKET_CURLY_BOTTOM,
-            loc:    LOCATION_BOT
-        };
-
-        var operProps =
-        {
-            type:   this.Pr.chrType,
-            chr:    this.Pr.chr,
-            loc:    this.Pr.pos
-        };
-
-        this.setCharacter(operProps, operDefaultPrp);
-
-        this.RecalcInfo.bProps = false;
-    }
-
-    var ArgSz = ArgSize.Copy();
-
-    if(this.Pr.pos == this.Pr.vertJc)
-    {
-        ArgSz.decrease();
-
-        if(this.Pr.pos == LOCATION_TOP)
-        {
-            var Iterator = new CDenominator(true);
-            Iterator.fillMathComposition(this.Content);
-
-            this.elements[0][0] = Iterator;
-        }
-        else
-        {
-            var Iterator = new CNumerator();
-            Iterator.fillMathComposition(this.Content);
-
-            this.elements[0][0] = Iterator;
-        }
-    }
-    else
-        this.elements[0][0] = this.Content;
-
-    new_CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
-}
-new_CGroupCharacter.prototype.getBase = function()
-{
-    return this.Content;
-}
-new_CGroupCharacter.prototype.setProperties = function(props)
-{
-    if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
-        this.Pr.vertJc = props.vertJc;
-
-    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
-        this.Pr.pos = props.pos;
-
-    this.Pr.chr     = props.chr;
-    this.Pr.chrType = props.chrType;
-
-    this.setCtrPrp(props.ctrPrp);
-}
-new_CGroupCharacter.prototype.fillContent = function()
-{
-    this.setDimension(1, 1);
-    this.setContent();
-}
-new_CGroupCharacter.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    //this.elements[0][0] = contents[0];
-    this.Content = contents[0];
-}
-new_CGroupCharacter.prototype.getAscent = function(oMeasure)
-{
-    var ascent;
-
-    //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
-
-    var ctrPrp = this.Get_CompiledCtrPrp();
-    var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
-
-    if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)
-        ascent =  this.operator.size.ascent + shCent;
-    else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_TOP )
-        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
-    else if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_BOT )
-        ascent = this.elements[0][0].size.ascent;
-    else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
-        ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
-        //ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
-
-    return ascent;
-}
-new_CGroupCharacter.prototype.old_getGlyph = function(code, type)
-{
-    var operator, props, accent;
-
-    if(code === 0x23DE || type == BRACKET_CURLY_TOP)
-    {
-        operator = new COperatorBracket();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x23DF || type === BRACKET_CURLY_BOTTOM  )
-    {
-        operator = new COperatorBracket();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_MIRROR_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x2190 || type === ARROW_LEFT)
-    {
-        operator = new CSingleArrow();
-
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x2192 || type === ARROW_RIGHT)
-    {
-        operator = new CSingleArrow();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if(code === 0x2194 || type === ARROW_LR)
-    {
-        operator = new CLeftRightArrow();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
-    {
-        operator = new CDoubleArrow();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
-    {
-        operator = new CDoubleArrow();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
-    {
-        operator = new CLR_DoubleArrow();
-        props =
-        {
-            location:   this.loc,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    /////    accents     /////
-    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
-    {
-        operator = new CCombiningArrow();
-        props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_0
-        };
-        operator.init(props);
-        accent = new COperator(operator);
-    }
-    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
-    {
-        operator = new CCombiningArrow();
-        props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_180
-        };
-        operator.init(props);
-        accent = new COperator(operator);
-    }
-    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
-    {
-        operator = new CCombining_LR_Arrow();
-        props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_0
-        };
-        operator.init(props);
-        accent = new COperator(operator);
-    }
-    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
-    {
-        operator = new CCombiningHalfArrow();
-        props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_0
-        };
-        operator.init(props);
-        accent = new COperator(operator);
-    }
-    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
-    {
-        operator = new CCombiningHalfArrow();
-        props =
-        {
-            location:   LOCATION_TOP,
-            turn:       TURN_180
-        };
-        operator.init(props);
-        accent = new COperator(operator);
-    }
-    /////
-    else if(typeof(code) !=="undefined" && code !== null)
-    {
-        operator = new CMathText(true);
-        operator.add(code);
-    }
-    else
-    {
-        operator = new COperatorBracket();
-        props =
-        {
-            location:   LOCATION_BOT,
-            turn:       TURN_MIRROR_0
-        };
-        operator.init(props);
-    }
-
-    return operator;
-}
-new_CGroupCharacter.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
-new_CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_groupChr );
-}
-new_CGroupCharacter.prototype.Load_Changes = function(Reader)
-{
-}
-new_CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
-{
-}
-new_CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_groupChr );
 	Writer.WriteString2( this.getBase().Id );
@@ -4746,7 +4331,7 @@ new_CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
     Writer.WriteLong( Flags );
     Writer.Seek( EndPos );
 }
-new_CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
+CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 {
 	var props = {ctrPrp: new CTextPr()};
 	var arrElems = [];
@@ -4765,7 +4350,7 @@ new_CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 		
 	this.fillMathComposition (props, arrElems);
 }
-new_CGroupCharacter.prototype.Get_Id = function()
+CGroupCharacter.prototype.Get_Id = function()
 {
 	return this.Id;
 }
