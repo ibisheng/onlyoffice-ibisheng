@@ -5222,7 +5222,6 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
 	this.WordControl.Init();
 	
 	this.InitEditor();
-	this.LoadedObjectDS = Common_CopyObj(this.WordControl.m_oLogicDocument.Get_Styles().Style);
 	
 	g_oIdCounter.Set_Load(true);
 
