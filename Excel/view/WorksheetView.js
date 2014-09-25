@@ -1805,7 +1805,8 @@
 		// ----- Drawing -----
 
 		WorksheetView.prototype.draw = function (lockDraw) {
-			if( lockDraw ) return this;
+			if (lockDraw || this.model.workbook.bCollaborativeChanges)
+				return this;
 			this._clean();
 			this._drawCorner();
 			this._drawColumnHeaders(/*drawingCtx*/ undefined);
