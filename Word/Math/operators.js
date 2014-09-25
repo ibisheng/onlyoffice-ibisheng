@@ -3045,7 +3045,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         }
         else
         {
-            var StretchLng = this.grow == true ? stretch : 0;
+            var StretchLng = this.type == OPER_DELIMITER && this.grow == false ? 0 : stretch;
             this.operator.fixSize(StretchLng);
             dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};
