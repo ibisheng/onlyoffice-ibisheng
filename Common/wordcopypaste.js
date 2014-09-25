@@ -5847,18 +5847,20 @@ PasteProcessor.prototype =
                     }
                     catch(e) { sDecoded = href; }
                     href = sDecoded;
-                    var title = child.getAttribute("title");
+					if(href && href.length > 0){
+						var title = child.getAttribute("title");
 
-                    bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
-                    oHyperlink = new ParaHyperlink();
-                    oHyperlink.Set_Paragraph(this.oCurPar);
-                    oHyperlink.Set_Value( href );
-                    if(null != title)
-                        oHyperlink.Set_ToolTip(title);
-                    oOldHyperlink = this.oCurHyperlink;
-                    oOldHyperlinkContentPos = this.oCurHyperlinkContentPos;
-                    this.oCurHyperlink = oHyperlink;
-                    this.oCurHyperlinkContentPos = 0;
+						bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
+						oHyperlink = new ParaHyperlink();
+						oHyperlink.Set_Paragraph(this.oCurPar);
+						oHyperlink.Set_Value( href );
+						if(null != title)
+							oHyperlink.Set_ToolTip(title);
+						oOldHyperlink = this.oCurHyperlink;
+						oOldHyperlinkContentPos = this.oCurHyperlinkContentPos;
+						this.oCurHyperlink = oHyperlink;
+						this.oCurHyperlinkContentPos = 0;
+					}
                 }
             }
             bAddParagraph = this._Execute(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock);
