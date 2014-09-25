@@ -2177,6 +2177,7 @@ function COperator(type)
     this.code = null;
     this.typeOper = null;   // тип скобки : круглая и т.п.
     this.defaultType = null;
+    this.grow       = true;
 
     this.Positions = [];
     this.coordGlyph = null;
@@ -2186,6 +2187,8 @@ function COperator(type)
 COperator.prototype.mergeProperties = function(properties, defaultProps)   // props (chr, type, location), defaultProps (chr, location)
 {
     var props = this.getProps(properties, defaultProps);
+
+    this.grow = properties.grow;
 
     var operator = null,
         typeOper = null,
@@ -2199,7 +2202,15 @@ COperator.prototype.mergeProperties = function(properties, defaultProps)   // pr
 
     //////////    delimiters    //////////
 
-    if( code === 0x28 || type === PARENTHESIS_LEFT)
+   /* if(type == OPERATOR_GROW_TEXT) // для случая grow у Delimiters, чтобы избежать использования собственных глифов
+    {
+        codeChr  = code;
+        typeOper = OPERATOR_GROW_TEXT;
+
+        operator = new CMathText(true);
+        operator.add(code);
+    }
+    else */if( code === 0x28 || type === PARENTHESIS_LEFT)
     {
         codeChr = 0x28;
         typeOper = PARENTHESIS_LEFT;
@@ -2912,11 +2923,6 @@ COperator.prototype.getProps = function(props, defaultProps)
     var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
         bNotType   = typeof(props.type) == "undefined" ||  props.type == null,
         bUnicodeChr    = props.chr !== null && props.chr+0 == props.chr;
-        //bStr = typeof(chr) === "string",
-        //bEmptyStr = bStr && chr.length == 0,
-        //bCode = typeof(chr) === "string" && chr.length > 0;
-
-    //var code = bCode ? chr.charCodeAt(0) : null;
 
 
     if(bDelimiter && props.chr == -1) // empty operator
@@ -2927,23 +2933,6 @@ COperator.prototype.getProps = function(props, defaultProps)
     {
         type = defaultProps.type;
     }
-
-
-    /*var bDPrpDelim =  bDelimiter && bNotType && !bStr,
-        bDPrpOther =  !bDelimiter && bNotType && !bCode;
-
-    var bDefault = bDPrpDelim || bDPrpOther,
-        bEmpty = bDelimiter && bEmptyStr;
-
-
-    if(bDefault)
-    {
-        type = defaultProps.type;
-    }
-    else if(bEmpty)
-    {
-        type = OPERATOR_EMPTY;
-    }*/
 
     var bLoc        = props.loc !== null && typeof(props.loc)!== "undefined";
     var bDefaultLoc = defaultProps.loc !== null && typeof(defaultProps.loc)!== "undefined";
@@ -3056,7 +3045,8 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         }
         else
         {
-            this.operator.fixSize(stretch);
+            var StretchLng = this.grow == true ? stretch : 0;
+            this.operator.fixSize(StretchLng);
             dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};
 
@@ -3450,11 +3440,13 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         {
             chr:    this.Pr.begChr,
             type:   this.Pr.begChrType,
+            grow:   this.Pr.grow,
             loc:    LOCATION_LEFT
         };
         var begDefaultPrp =
         {
-            type:  PARENTHESIS_LEFT
+            type:  PARENTHESIS_LEFT,
+            chr:   0x28
         };
         this.begOper.mergeProperties(begPrp, begDefaultPrp);
         this.begOper.relate(this);
@@ -3463,11 +3455,13 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         {
             chr:    this.Pr.endChr,
             type:   this.Pr.endChrType,
+            grow:   this.Pr.grow,
             loc:    LOCATION_RIGHT
         };
         var endDefaultPrp =
         {
-            type:  PARENTHESIS_RIGHT
+            type:  PARENTHESIS_RIGHT,
+            chr:  0x29
         };
 
         this.endOper.mergeProperties(endPrp, endDefaultPrp);
@@ -3477,11 +3471,13 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         {
             chr:    this.Pr.sepChr,
             type:   this.Pr.sepChrType,
+            grow:   this.Pr.grow,
             loc:    LOCATION_SEP
         };
         var sepDefaultPrp =
         {
-            type:  DELIMITER_LINE
+            type:  DELIMITER_LINE,
+            chr:  0x7C
         };
 
         if(this.nCol == 1 )
@@ -3544,7 +3540,6 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     // Общие высота и ascent
     var height, ascent, descent;
 
-
     if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
     {
         var deltaHeight = heightG - maxDimOper.height;
@@ -3557,15 +3552,15 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
         var deltaMinAD = (heightG - maxAD)  - maxDimOper.height/2;
 
-            var bLHeight = deltaHeight < 0.001,
-                bLMaxAD = deltaMaxAD > 0.001,
-                bLMinAD = deltaMinAD > 0.001,
-                bLText = deltaMinAD < - 0.001;
+        var bLHeight = deltaHeight < 0.001,
+            bLMaxAD = deltaMaxAD > 0.001,
+            bLMinAD = deltaMinAD > 0.001,
+            bLText = deltaMinAD < - 0.001;
 
-            var bEqualOper  = bLHeight,
-                bMiddleOper = bLMaxAD && !bLMinAD,
-                bLittleOper = bLMinAD,
-                bText = bLText;
+        var bEqualOper  = bLHeight,
+            bMiddleOper = bLMaxAD && !bLMinAD,
+            bLittleOper = bLMinAD,
+            bText = bLText;
 
             if(bEqualOper)
             {
@@ -3592,8 +3587,19 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     }
     else
     {
-        ascent = ascentG;
-        height = ascentG + descentG;
+        g_oTextMeasurer.SetFont(mgCtrPrp);
+        var Height = g_oTextMeasurer.GetHeight();
+
+        if(heightG < Height)
+        {
+            ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
+            height = maxDimOper.height;
+        }
+        else
+        {
+            ascent = ascentG;
+            height = ascentG + descentG;
+        }
     }
 
     this.size = {width: width, height: height, ascent: ascent};

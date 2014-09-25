@@ -734,7 +734,7 @@ CMathGapsInfo.prototype =
     checkGapKind: function(kind)
     {
         var bEmptyGaps = kind == MATH_DELIMITER || kind == MATH_MATRIX,
-            bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL|| kind == MATH_BOX || kind == MATH_BORDER_BOX;
+            bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL|| kind == MATH_BOX || kind == MATH_BORDER_BOX || (kind == MATH_DELIMITER);
 
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
     }
