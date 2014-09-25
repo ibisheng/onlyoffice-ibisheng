@@ -21,6 +21,10 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
     if (true === this.Parent.Is_HdrFtr(false))
         return [];
 
+    // Если изменения происходят в специальном пустом параграфе-конце секции, тогда запускаем обычный пересчет
+    if (true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
+        return [];
+
     // Здесь мы отдельно обрабатываем случаи быстрого пересчета параграфов, которые были разбиты на 1-2
     // страницы. Если параграф был разбит более чем на 2 страницы, то такое ускорение уже не имеет смысла.
     if (1 === this.Pages.length)
@@ -139,7 +143,7 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
     }
 
     // Если у нас есть PageBreak в строке, запускаем обычный пересчет, либо если это пустой параграф.
-    if ( this.Lines[Line].LineInfo & 1 || (  this.Lines[Line].LineInfo & 2 &&  this.Lines[Line].LineInfo & 4 ) )
+    if (this.Lines[Line].Info & paralineinfo_BreakPage || (this.Lines[Line].Info & paralineinfo_Empty &&  this.Lines[Line].Info & paralineinfo_End))
         return  -1;
 
     // Если у нас отрезок, в котором произошли изменения является отрезком с нумерацией, тогда надо запустить
@@ -696,48 +700,48 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 1. Заполняем информацию о строке
+    // 5. Заполняем информацию о строке
     //-------------------------------------------------------------------------------------------------------------
     this.private_RecalculateLineInfo(CurLine, CurPage, PRS, ParaPr);
 
     //-------------------------------------------------------------------------------------------------------------
-    // 1. Пересчитываем метрики данной строки
+    // 6. Пересчитываем метрики данной строки
     //-------------------------------------------------------------------------------------------------------------
     this.private_RecalculateLineMetrics(CurLine, CurPage, PRS, ParaPr);
 
     //-------------------------------------------------------------------------------------------------------------
-    // 2. Рассчитываем высоту строки, а также положение верхней и нижней границ
+    // 7. Рассчитываем высоту строки, а также положение верхней и нижней границ
     //-------------------------------------------------------------------------------------------------------------
     this.private_RecalculateLinePosition(CurLine, CurPage, PRS, ParaPr);
 
     //-------------------------------------------------------------------------------------------------------------
-    // 3. Проверяем достигла ли данная строка конца страницы
+    // 8. Проверяем достигла ли данная строка конца страницы
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineBottomBound(CurLine, CurPage, PRS, ParaPr))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 4. Проверяем обтекание данной строки относительно плавающих объектов
+    // 9. Проверяем обтекание данной строки относительно плавающих объектов
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineCheckRanges(CurLine, CurPage, PRS, ParaPr))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 5. Выставляем вертикальное смещение данной строки
+    // 10. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
+    //-------------------------------------------------------------------------------------------------------------
+    this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false);
+
+    //-------------------------------------------------------------------------------------------------------------
+    // 11. Выставляем вертикальное смещение данной строки
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineBaseLine(CurLine, CurPage, PRS, ParaPr))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 6. Последние проверки
+    // 12. Последние проверки
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineEnd(CurLine, CurPage, PRS, ParaPr))
         return;
-
-    //-------------------------------------------------------------------------------------------------------------
-    // 7. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
-    //-------------------------------------------------------------------------------------------------------------
-    this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false);
 };
 
 Paragraph.prototype.private_RecalculateLineWidow       = function(CurLine, CurPage, PRS, ParaPr)
@@ -850,7 +854,7 @@ Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPa
     // текста, на котором закончилась данная строка.
     if ( true === PRS.EmptyLine || PRS.LineAscent < 0.001 )
     {
-        var LastItem = ( true === PRS.End ? this.Content[this.Content.length - 1] : this.Content[this.Lines[CurLine].EndPos] );
+        var LastItem = (true === PRS.End ? this.Content[this.Content.length - 1] : this.Content[this.Lines[CurLine].Ranges[this.Lines[CurLine].Ranges.length - 1].EndPos]);
 
         if ( true === PRS.End )
         {
@@ -1293,7 +1297,7 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
         if ( true === ParaPr.WidowControl && CurLine === this.Pages[CurPage].StartLine && CurLine >= 1 )
         {
             // Проверим не встречается ли в предыдущей строке BreakPage, если да, тогда не учитываем WidowControl
-            var BreakPagePrevLine = (this.Lines[CurLine].Info & paralineinfo_BreakPage) | 0;
+            var BreakPagePrevLine = (this.Lines[CurLine - 1].Info & paralineinfo_BreakPage) | 0;
 
             if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && 0 === BreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) && this.Lines[CurLine - 1].Ranges.length <= 1 )
             {

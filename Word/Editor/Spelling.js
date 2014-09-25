@@ -933,20 +933,14 @@ ParaRun.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 
                 bWord = true;
 
-                if ( true != CurTextPr.Caps )
-                    sWord = String.fromCharCode(Item.Value);
-                else
-                    sWord = (String.fromCharCode(Item.Value)).toUpperCase();
+                sWord = Item.Get_CharForSpellCheck(CurTextPr.Caps);
 
                 SpellCheckerEngine.StartPos = StartPos;
                 SpellCheckerEngine.EndPos   = EndPos;
             }
             else
             {
-                if ( true != CurTextPr.Caps )
-                    sWord += String.fromCharCode(Item.Value);
-                else
-                    sWord += (String.fromCharCode(Item.Value)).toUpperCase();
+                sWord += Item.Get_CharForSpellCheck(CurTextPr.Caps);
 
                 var EndPos = ContentPos.Copy();
                 EndPos.Update( Pos + 1, Depth );

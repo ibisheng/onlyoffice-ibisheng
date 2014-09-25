@@ -8816,6 +8816,7 @@ Paragraph.prototype =
 
             LogicDocument.Recalculate();
             LogicDocument.Document_UpdateInterfaceState();
+            LogicDocument.Document_UpdateRulersState();
         }
     },
 

@@ -80,6 +80,8 @@ g_aPunctuation[0x201C] = 1; // символ “
 g_aPunctuation[0x201D] = 1; // символ ”
 g_aPunctuation[0x2026] = 1; // символ ...
 
+
+
 var g_aNumber = [];
 g_aNumber[0x0030] = 1;
 g_aNumber[0x0031] = 1;
@@ -269,6 +271,21 @@ ParaText.prototype =
     Is_SpaceAfter : function()
     {
         return (this.Flags & PARATEXT_FLAGS_SPACEAFTER ? true : false); 
+    },
+
+    Get_CharForSpellCheck : function(bCaps)
+    {
+        // Закрывающуюся кавычку (0x2019), посылаем как апостроф
+
+        if (0x2019 === this.Value)
+            return String.fromCharCode(0x0027);
+        else
+        {
+            if (true === bCaps)
+                return (String.fromCharCode(this.Value)).toUpperCase();
+            else
+                return String.fromCharCode(this.Value);
+        }
     },
     
     Set_SpaceAfter : function(bSpaceAfter)
@@ -608,7 +625,10 @@ ParaTextPr.prototype =
             this.Set_FontSizeCS( TextPr.FontSizeCS );
 
         if ( undefined != TextPr.Color )
-            this.Set_Color( TextPr.Color );
+        {
+            this.Set_Color(TextPr.Color);
+            this.Set_Unifill(undefined);
+        }
 
         if ( undefined != TextPr.VertAlign )
             this.Set_VertAlign( TextPr.VertAlign );
@@ -643,6 +663,7 @@ ParaTextPr.prototype =
         if(undefined != TextPr.Unifill)
         {
             this.Set_Unifill(TextPr.Unifill.createDuplicate());
+            this.Set_Color(undefined);
         }
     },
 
@@ -1071,11 +1092,13 @@ ParaTextPr.prototype =
 
     Set_Unifill : function(Value)
     {
+        var OldValue = this.Value.Unifill;
+
         if ( undefined != Value )
             this.Value.Unifill = Value;
         else
             this.Value.Unifill = undefined;
-        History.Add(this, {Type: historyitem_TextPr_Unifill, New: Value, Old: this.Value.Unifill});
+        History.Add(this, {Type: historyitem_TextPr_Unifill, New: Value, Old: OldValue});
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции

@@ -1459,6 +1459,13 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
         }
 
         Item.Measure( g_oTextMeasurer, Pr );
+
+        if (para_Drawing === Item.Type)
+        {
+            // После автофигур надо заново выставлять настройки
+            g_oTextMeasurer.SetTextPr(Pr, Theme);
+            g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+        }
     }
 
     this.RecalcInfo.Recalc  = true;
@@ -3520,6 +3527,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                         EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
                         var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
                         pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+                        pGraphics.b_color1(RGBAEnd.R, RGBAEnd.G, RGBAEnd.B, 255);
                     }
                     else
                     {

@@ -12,6 +12,9 @@
 //
 // Графическая часть:
 
+// TODO: Сейчас Paragraph.Recalculate_FastWholePAragraph работает только на добавлении текста, надо переделать
+//       алгоритм определения изменений, чтобы данная функция работала и при других изменениях.
+
 var Page_Width     = 210;
 var Page_Height    = 297;
 
@@ -7524,6 +7527,7 @@ CDocument.prototype =
 
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
     },
 
     Set_DocumentPageSize : function(W, H, bNoRecalc)
@@ -7542,6 +7546,7 @@ CDocument.prototype =
 
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
         }
     },
 
@@ -7575,6 +7580,7 @@ CDocument.prototype =
 
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
         }
     },
 
@@ -8591,9 +8597,13 @@ CDocument.prototype =
             }
         }
 
+        // TODO: Пока делаем Start = true, чтобы при Ctrl+A не происходил переход к концу селекта, надо будет
+        //       сделать по нормальному
+        this.Selection.Start = true;
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
+        this.Selection.Start = false;
     },
 
     On_DragTextEnd : function(NearPos, bCopy)
@@ -9565,6 +9575,7 @@ CDocument.prototype =
         else if ( e.KeyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
         {
             this.Select_All();
+            bUpdateSelection = false;
             bRetValue = true;
         }
         else if ( e.KeyCode == 66 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + B - делаем текст жирным
@@ -11893,6 +11904,7 @@ CDocument.prototype =
 
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
     },
 
     Document_Redo : function()
@@ -11909,6 +11921,7 @@ CDocument.prototype =
 
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
     },
 
     Get_SelectionState : function()
