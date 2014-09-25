@@ -1995,7 +1995,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else if(cloneData.oldFilter)//в случае удаления/добавления строк 
 				{
-					if(aWs.AutoFilter && this._rangeHitInAnRange(cloneData.oldFilter.Ref, aWs.AutoFilter.Ref))
+					if(aWs.AutoFilter && cloneData.oldFilter.Ref.isIntersect(aWs.AutoFilter.Ref))
 					{
 						aWs.AutoFilter = cloneData.oldFilter;
 						this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
@@ -2004,7 +2004,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						for(var l = 0; l < aWs.TableParts.length; l++)
 						{
-							if(this._rangeHitInAnRange(cloneData.oldFilter.Ref, aWs.TableParts[l].Ref))
+							if(cloneData.oldFilter.Ref.isIntersect(aWs.TableParts[l].Ref))
 							{
 								aWs.TableParts[l] = cloneData.oldFilter;
 								if(aWs.TableParts[l].AutoFilter != null)
@@ -2113,7 +2113,7 @@ var gUndoInsDelCellsFlag = true;
 							var tableRange = currentFilter.Ref;
 							
 							//проверяем, попадает хотя бы одна ячейка из диапазона в область фильтра
-							if(this._rangeHitInAnRange(range, tableRange))
+							if(range.isIntersect(tableRange))
 								this._setColorStyleTable(tableRange, currentFilter);
 						}
 					}
@@ -2133,7 +2133,7 @@ var gUndoInsDelCellsFlag = true;
 							tableRange = aWs.TableParts[i].Ref;	
 						}; // ToDo ';' в конце } ставить не стоить
 						
-						if(this._rangeHitInAnRange(range,tableRange))
+						if(range.isIntersect(tableRange))
 							return {tableRange: tableRange, id: i};
 					}
 				}
@@ -2269,7 +2269,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							tableRange = tableParts[i].Ref;
 							//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
-							if(this._rangeHitInAnRange(newActiveRange, tableRange))
+							if(newActiveRange.isIntersect(tableRange))
 							{
 								if(isExp && isPart)//часть + целая
 								{
@@ -2321,7 +2321,7 @@ var gUndoInsDelCellsFlag = true;
 						tableRange = tableParts[i].Ref;
 						isExp = false;
 						//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
-						if(this._rangeHitInAnRange(activeCells, tableRange))
+						if(activeCells.isIntersect(tableRange))
 						{
 							//если селектом засхвачена не вся таблица, то выдаём ошибку и возвращаем false
 							if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
@@ -2419,7 +2419,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					tableRange = autoFilter.Ref;
 					//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
-					if(this._rangeHitInAnRange(activeCells, tableRange))
+					if(activeCells.isIntersect(tableRange))
 					{
 						if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
 						{
@@ -6349,16 +6349,6 @@ var gUndoInsDelCellsFlag = true;
 				if(!rowAdd)
 					rowAdd = 0;
 				return Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2 + rowAdd);
-			},
-			//если хотя бы одна ячейка попадает внутрь tableRange
-			_rangeHitInAnRange: function(range,tableRange)
-			{
-				var result = false;
-				var isIntersection = range.intersection(tableRange);
-				if(isIntersection != null)
-					result = true;
-				
-				return result;
 			},
 			
 			_generateColumnName: function(tableColumns,indexInsertColumn)
