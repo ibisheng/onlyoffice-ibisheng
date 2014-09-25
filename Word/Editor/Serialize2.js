@@ -3568,7 +3568,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             switch ( item.Type )
             {
                 case para_Run:
-                    if (item.Content.length > 0) 
+                    //if (item.Content.length > 0) 
                         this.WriteRun(item, bUseSelection);
                     break;
                 case para_Hyperlink:
@@ -7366,7 +7366,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadRun(t, l, oNewRun, oParStruct, oRes);
             });
-            if (oRes.bRes && oNewRun.Content.length > 0)
+            //if (oRes.bRes && oNewRun.Content.length > 0)
                 oParStruct.addToContent(oNewRun);
         }
 		else if (c_oSerParType.CommentStart === type)
