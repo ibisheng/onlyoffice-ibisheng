@@ -1052,7 +1052,7 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && (("default" == sType) || ("text" == sType)))
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainter;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
             else
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
         }

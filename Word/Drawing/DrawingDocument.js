@@ -1795,7 +1795,7 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if ( c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainter;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
             else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
             else

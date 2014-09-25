@@ -5,7 +5,8 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
  */
-(	/**
+(
+	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
@@ -76,7 +77,6 @@
 		 */
 		var kCurDefault		= "default";
 		var kCurCorner		= "pointer";
-		var kCurCells		= "cell";
 		var kCurColSelect	= "pointer";
 		var kCurColResize	= "col-resize";
 		var kCurRowSelect	= "pointer";
@@ -90,6 +90,20 @@
 		var kCurSEResize	= "se-resize";
 		var kCurNEResize	= "ne-resize";
 		var kCurAutoFilter	= "pointer";
+		var kCurCells		= '';
+		var kCurFormatPainterExcel = '';
+		if (AscBrowser.isIE) {
+			// Пути указаны относительно html в меню, не надо их исправлять
+			// и коммитить на пути относительно тестового меню
+			kCurCells = 'url(../../../sdk/Common/Images/plus.cur), pointer';
+			kCurFormatPainterExcel = 'url(../../../sdk/Common/Images/plus_copy.cur), pointer';
+		} else if (AscBrowser.isOpera) {
+			kCurCells = 'cell';
+			kCurFormatPainterExcel = 'pointer';
+		} else {
+			kCurCells = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFJJREFUeNpidHFxYcAC/qPxGdEVMDHgALt37wZjXACnRkKA/hpZsAQEMYHFwAAM1f+kApAeipzK4OrqijU6cMnBNDJSNQEMznjECnAFCgwABBgAcX1BU/hbd0sAAAAASUVORK5CYII=') 6 6, pointer";
+			kCurFormatPainterExcel = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAK1JREFUeNrUk+ESxBAMhG3Hm+GpeTfF0Eld0uLcj9uZTP3xdZMsxBjVRhXYsRNora2n5HSxbjLGtKPSX7uqCiHkD1adUlcfLnMdKw6zq94plXbOiVskKm1575GAF1iS6DQBSjECdUp+gFcoJ9LyBe6B09BuluCA09A8fwCK7AHsopiljCxOBLY5xVnVO2KWd779W/uKy2qLk5DjVyhGwz+qn7T/P1D9FPRVnQIMABDnBAmTp4GtAAAAAElFTkSuQmCC') 6 12, pointer";
+		}
 
 		var kNewLine = "\n";
 
@@ -5699,7 +5713,7 @@
 						col = c.col;
 					}
 				}
-				return {cursor: kCurFormatPainter, target: target, col: col, row: row};
+				return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
 			}
 
 			var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};

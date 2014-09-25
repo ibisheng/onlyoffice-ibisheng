@@ -5,7 +5,8 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Jan 27, 2012
  */
-(	/**
+(
+	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
