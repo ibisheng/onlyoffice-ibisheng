@@ -4497,7 +4497,7 @@ ParaDrawing.prototype =
         this.DrawingType = DrawingType;
         /*if(typeof this.graphicObjects.curState.updateAnchorPos === "function")
          this.graphicObjects.curState.updateAnchorPos();      */
-        this.updateWidthHeight();
+        //this.updateWidthHeight();
     },
 
     Set_WrappingType : function(WrapType)
@@ -4869,14 +4869,14 @@ ParaDrawing.prototype =
             case historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.Old;
-                this.updateWidthHeight();
+                //this.updateWidthHeight();
                 break;
             }
 
             case historyitem_Drawing_WrappingType:
             {
                 this.wrappingType = Data.Old;
-                this.updateWidthHeight();
+                //this.updateWidthHeight();
                 break;
             }
 
@@ -4988,14 +4988,14 @@ ParaDrawing.prototype =
             case historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.New;
-                this.updateWidthHeight();
+                //this.updateWidthHeight();
                 break;
             }
 
             case historyitem_Drawing_WrappingType:
             {
                 this.wrappingType = Data.New;
-                this.updateWidthHeight();
+                //this.updateWidthHeight();
                 break;
             }
 
