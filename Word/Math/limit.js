@@ -100,6 +100,8 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
             if(this.Pr.type == LIMIT_LOW)
             {
+                this.dH = 0;
+
                 this.FName = this.ContentFName;
                 //this.elements[1][0] = this.Iterator;
 
@@ -112,6 +114,12 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             else
             {
                 this.FName    = this.ContentFName;
+
+                /*this.Iterator = new CNumerator();
+                this.Iterator.fillMathComposition(this.ContentIterator);*/
+
+                this.dH = 0.06*this.Get_CompiledCtrPrp().FontSize;
+
                 this.Iterator = this.ContentIterator;
 
                 this.elements[0][0] = this.Iterator;
