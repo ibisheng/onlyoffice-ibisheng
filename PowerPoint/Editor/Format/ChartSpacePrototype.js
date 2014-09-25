@@ -428,6 +428,7 @@ CChartSpace.prototype.recalculate = function()
         {
             this.updateChildLabelsTransform(this.transform.tx, this.transform.ty);
         }
+        this.recalcInfo.dataLbls.length = 0;
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
 

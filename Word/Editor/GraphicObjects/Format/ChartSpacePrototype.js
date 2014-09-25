@@ -441,7 +441,6 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateWrapPolygon();
             this.recalcInfo.recalculateWrapPolygon = false;
         }
-
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
         if(isRealNumber(this.posX) && isRealNumber(this.posY))
