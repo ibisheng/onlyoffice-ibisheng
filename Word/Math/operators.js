@@ -2202,15 +2202,7 @@ COperator.prototype.mergeProperties = function(properties, defaultProps)   // pr
 
     //////////    delimiters    //////////
 
-   /* if(type == OPERATOR_GROW_TEXT) // для случая grow у Delimiters, чтобы избежать использования собственных глифов
-    {
-        codeChr  = code;
-        typeOper = OPERATOR_GROW_TEXT;
-
-        operator = new CMathText(true);
-        operator.add(code);
-    }
-    else */if( code === 0x28 || type === PARENTHESIS_LEFT)
+    if( code === 0x28 || type === PARENTHESIS_LEFT)
     {
         codeChr = 0x28;
         typeOper = PARENTHESIS_LEFT;
@@ -3045,7 +3037,7 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         }
         else
         {
-            var StretchLng = this.type == OPER_DELIMITER && this.grow == false ? 0 : stretch;
+            var StretchLng = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false ? 0 : stretch;
             this.operator.fixSize(StretchLng);
             dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};

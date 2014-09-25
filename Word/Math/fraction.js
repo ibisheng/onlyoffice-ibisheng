@@ -498,21 +498,34 @@ CNumerator.prototype.recalculateSize = function()
     var mgCtrPrp = this.Get_CompiledCtrPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
-    var gapNum = 7.832769097222222 * mgCtrPrp.FontSize/36,
-        minGap = mgCtrPrp.FontSize* 25.4/96 * 0.16;
 
     g_oTextMeasurer.SetFont(mgCtrPrp);
     var Height = g_oTextMeasurer.GetHeight();
 
+    var gapNum, minGap;
+
     if(this.Parent.kind == MATH_LIMIT || this.Parent.kind == MATH_GROUP_CHARACTER)
     {
-        gapNum = Height/2.4;
-        minGap = Height/10;
+        //gapNum = Height/2.4;
+        //gapNum = Height/2.97;
+        //gapNum = Height/2.97 - Height/10.5;
+        gapNum = Height/4.14;
+        minGap = Height/13.8;
+
+        //var delta = 0.8076354679802956*gapNum - Descent;
+        var delta = gapNum - Descent;
+        //this.gap = delta > minGap ? delta - 0.95*minGap: minGap;
+        this.gap = delta > minGap ? delta: minGap;
+    }
+    else    // Fraction
+    {
+        gapNum = Height/3.05;
+        minGap = Height/9.77;
+
+        var delta = gapNum - Descent;
+        this.gap = delta > minGap ? delta : minGap;
     }
 
-    var delta = 0.8076354679802956*gapNum - Descent;
-
-    this.gap = delta > minGap ? delta - 0.95*minGap: minGap;
 
     var width = arg.width;
     var height = arg.height + this.gap;
@@ -570,27 +583,31 @@ CDenominator.prototype.recalculateSize = function()
 
     var mgCtrPrp = this.Get_CompiledCtrPrp();
 
-    var gapDen = 7.325682539682539 * mgCtrPrp.FontSize/36,
-        Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36,
-        minGap = gapDen/3;
-
+    var Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36;
 
     g_oTextMeasurer.SetFont(mgCtrPrp);
     var Height = g_oTextMeasurer.GetHeight();
+
+    var gapDen, minGap;
 
     if(this.Parent.kind == MATH_LIMIT || this.Parent.kind == MATH_GROUP_CHARACTER)
     {
         gapDen = Height/2.6;
         minGap = Height/10;
     }
+    else // Fraction
+    {
+        gapDen = Height/2.03;
+        minGap = Height/6.1;
+    }
 
     var delta = gapDen - Ascent;
     this.gap = delta > minGap ? delta : minGap;
 
+
     var width = arg.width;
     var height = arg.height + this.gap;
     var ascent = arg.ascent + this.gap;
-
 
     this.size = {width : width, height: height, ascent: ascent};
 }
