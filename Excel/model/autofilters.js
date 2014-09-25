@@ -1572,7 +1572,7 @@ var gUndoInsDelCellsFlag = true;
 					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
-			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow)
+			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray)
 			{
 				if(turnOnHistory)
 				{
@@ -1599,6 +1599,8 @@ var gUndoInsDelCellsFlag = true;
 							
 						//заносим в историю
 						this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+						
+						this._isEmptyButtons(oldFilter.Ref);
 					}
 				}
 				if(aWs.TableParts)
@@ -1613,7 +1615,7 @@ var gUndoInsDelCellsFlag = true;
 							oCurFilter.insCells = true;
 						var bbox = oRange.getBBox0();
 						//смотрим находится ли фильтр внутри выделенного фрагмента
-						if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
+						if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2 && !this._checkExceptionArray(oCurFilter.Ref, exceptionArray))
 						{	
 							//удаляем форматирование
 							oRange.setTableStyle(null);
@@ -1621,6 +1623,8 @@ var gUndoInsDelCellsFlag = true;
 							aWs.setRowHidden(false, bbox.r1, bbox.r2);
 							//заносим в историю
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells},deleteFilterAfterDeleteColRow);
+							
+							this._isEmptyButtons(oCurFilter.Ref);
 						}
 						else
 						{
@@ -1631,7 +1635,6 @@ var gUndoInsDelCellsFlag = true;
 					aWs.TableParts = newTableParts;
 				}
 				
-				this._isEmptyButtons(ar);
 				
 				History.EndTransaction();
 				if(turnOnHistory)
@@ -1740,6 +1743,20 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				return result;
+			},
+			
+			_checkExceptionArray: function(curRange, exceptionArray)
+			{
+				if(!curRange || !exceptionArray || (exceptionArray && !exceptionArray.length))
+					return false;
+					
+				for(var e = 0; e < exceptionArray.length; e++)
+				{
+					if(exceptionArray[e] && exceptionArray[e].Ref && exceptionArray[e].Ref.isEqual(curRange))
+						return true;
+				}
+				
+				return false;
 			},
 			
 			_isEmptyButtons: function(ar)
@@ -7237,7 +7254,7 @@ var gUndoInsDelCellsFlag = true;
 				var findFiltersTo = this._searchFiltersInRange(arnTo , aWs);
 				if(arnTo && findFiltersTo)
 				{
-					this.isEmptyAutoFilters(arnTo);
+					this.isEmptyAutoFilters(arnTo, null, null, null, findFilters);
 				}
 				else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo) && !aWs.AutoFilter.Ref.isEqual(arnFrom))//если задеваем часть а/ф областью вставки
 				{
