@@ -56,6 +56,7 @@ CGraphicFrame.prototype =
 
     handleUpdateTheme: function()
     {
+        this.compiledStyles = [];
         if(this.graphicObject)
         {
             this.graphicObject.Recalc_CompiledPr2();
@@ -76,6 +77,17 @@ CGraphicFrame.prototype =
     {
         this.recalcInfo.recalculateTransform = true;
         this.addToRecalculate();
+    },
+
+    recalcText: function()
+    {
+        this.compiledStyles = [];
+        if(this.graphicObject)
+        {
+            this.graphicObject.Recalc_CompiledPr2();
+            this.graphicObject.RecalcInfo.Reset(true);
+        }
+        this.recalcInfo.recalculateTable = true;
     },
 
     Get_TextBackGroundColor: function()
@@ -486,7 +498,14 @@ CGraphicFrame.prototype =
     },
 
     changeSize: function(kw, kh)
-    {},
+    {
+        if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
+            var xfrm = this.spPr.xfrm;
+            xfrm.setOffX(xfrm.offX * kw);
+            xfrm.setOffY(xfrm.offY * kh);
+        }
+        this.recalcTransform && this.recalcTransform();
+    },
 
     getTransform: function()
     {

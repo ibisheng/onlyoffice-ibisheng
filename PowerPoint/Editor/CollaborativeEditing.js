@@ -599,7 +599,8 @@ function CCollaborativeEditing()
     this.m_aEndActions  = []; // Массив действий, которые надо выполнить после принятия чужих изменений
 
 
-    this.PosExtChanges = [];
+    this.PosExtChangesX = [];
+    this.PosExtChangesY = [];
     this.ScaleX = null;
     this.ScaleY = null;
 
@@ -1240,30 +1241,43 @@ function CCollaborativeEditing()
         this.Clear_DCChanges();
     };
 
-    this.AddPosExtChanges = function(Item)
+    this.AddPosExtChanges = function(Item, bHor)
     {
-        this.PosExtChanges.push(Item);
+        if(bHor)
+        {
+            this.PosExtChangesX.push(Item);
+        }
+        else
+        {
+            this.PosExtChangesY.push(Item);
+        }
+    };
+
+
+    this.RewriteChanges = function(changesArr, scale, Binary_Writer)
+    {
+        for(var i = 0; i < changesArr.length; ++i)
+        {
+            var changes = changesArr[i];
+            var data = changes.Data;
+            data.newPr *= scale;
+            var Binary_Pos = Binary_Writer.GetCurPosition();
+            changes.Class.Save_Changes(data, Binary_Writer);
+            var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
+            changes.Binary.Pos = Binary_Pos;
+            changes.Binary.Len = Binary_Len;
+        }
     };
 
     this.RefreshPosExtChanges = function()
     {
-        return;
-        //TODO
-       if(this.ScaleX !== null && this.ScaleY !== null)
-       {
-           var Binary_Writer = History.BinaryWriter;
-           for(var i = 0; i < this.PosExtChanges.length; ++i)
-           {
-               var changes = this.PosExtChanges[i];
-               var data = changes.Data;
-               var Binary_Pos = Binary_Writer.GetCurPosition();
-               changes.Class.Save_Changes(data, Binary_Writer);
-               var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
-               changes.Binary.Pos = Binary_Pos;
-               changes.Binary.Len = Binary_Len;
-           }
-       }
-        this.PosExtChanges.length = 0;
+        if(this.ScaleX != null && this.ScaleY != null)
+        {
+           this.RewriteChanges(this.PosExtChangesX, this.ScaleX, History.BinaryWriter);
+           this.RewriteChanges(this.PosExtChangesY, this.ScaleY, History.BinaryWriter);
+        }
+        this.PosExtChangesX.length = 0;
+        this.PosExtChangesY.length = 0;
         this.ScaleX = null;
         this.ScaleY = null;
     };

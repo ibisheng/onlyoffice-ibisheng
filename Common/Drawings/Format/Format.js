@@ -4838,7 +4838,7 @@ CUniFill.prototype =
             }
             if(this.fill.type == FILL_TYPE_NOFILL)
             {
-                return {R: 0, G: 0}
+                return {R: 0, G: 0, B: 0};
             }
         }
         return new FormatRGBAColor();
@@ -8015,29 +8015,57 @@ function CXfrm()
 
     this.parent = null;
 
-    this.isNotNull = function()
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+CXfrm.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_Xfrm;
+    },
+
+    Write_ToBinary2: function (w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function (r)
+    {
+        this.Id = r.GetString2();
+    },
+
+
+    isNotNull: function()
     {
         return isRealNumber(this.offX) && isRealNumber(this.offY) && isRealNumber(this.extX) && isRealNumber(this.extY);
-    };
+    },
 
 
-    this.isNotNullForGroup = function()
+    isNotNullForGroup: function()
     {
         return isRealNumber(this.offX) && isRealNumber(this.offY)
             && isRealNumber(this.chOffX) && isRealNumber(this.chOffY)
             && isRealNumber(this.extX) && isRealNumber(this.extY)
             && isRealNumber(this.chExtX) && isRealNumber(this.chExtY);
-    };
+    },
 
-    this.isEqual = function(xfrm)
+    isEqual: function(xfrm)
     {
 
         return xfrm && this.offX == xfrm.offX && this.offY == xfrm.offY && this.extX == xfrm.extX &&
             this.extY == xfrm.extY && this.chOffX == xfrm.chOffX && this.chOffY == xfrm.chOffY && this.chExtX == xfrm.chExtX &&
             this.chExtY == xfrm.chExtY ;
-    }
+    },
 
-    this.merge = function(xfrm)
+    merge: function(xfrm)
     {
         if(xfrm.offX != null)
         {
@@ -8092,36 +8120,7 @@ function CXfrm()
         {
             this.rot = xfrm.rot;
         }
-    }
-
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
-}
-
-CXfrm.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
     },
-
-    getObjectType: function()
-    {
-        return historyitem_type_Xfrm;
-    },
-
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
-    },
-
 
     createDuplicate: function()
     {

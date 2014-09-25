@@ -384,7 +384,7 @@ CComment.prototype =
 {
     getObjectType: function()
     {
-        return his
+        return historyitem_type_Comment;
     },
 
     hit: function(x, y)

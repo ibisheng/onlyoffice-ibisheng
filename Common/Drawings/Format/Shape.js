@@ -1815,7 +1815,7 @@ CShape.prototype =
             var last_style_id;
             var b_checked = false;
             var isPlaceholder = this.isPlaceholder();
-            if (isPlaceholder) {
+            if (isPlaceholder || this.graphicObject instanceof CTable) {
                 if (default_style) {
                     //checkTextPr(default_style.TextPr);
                     b_checked = true;
@@ -1982,6 +1982,7 @@ CShape.prototype =
             xfrm.setExtX(xfrm.extX * kw);
             xfrm.setExtY(xfrm.extY * kh);
         }
+        this.recalcTransform && this.recalcTransform();
     },
 
     recalculateTransform: function () {

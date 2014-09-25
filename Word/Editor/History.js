@@ -242,6 +242,24 @@ CHistory.prototype =
             Class.Add_ContentChanges( ContentChanges );
             CollaborativeEditing.Add_NewDC( Class );
         }
+        if(CollaborativeEditing.AddPosExtChanges && Class instanceof CXfrm)
+        {
+            if(historyitem_Xfrm_SetOffX  === Data.Type ||
+                historyitem_Xfrm_SetOffY === Data.Type ||
+                historyitem_Xfrm_SetExtX === Data.Type ||
+                historyitem_Xfrm_SetExtY === Data.Type ||
+                historyitem_Xfrm_SetChOffX === Data.Type ||
+                historyitem_Xfrm_SetChOffY === Data.Type ||
+                historyitem_Xfrm_SetChExtX === Data.Type ||
+                historyitem_Xfrm_SetChExtY  === Data.Type)
+            {
+                CollaborativeEditing.AddPosExtChanges(Item,
+                    historyitem_Xfrm_SetOffX  === Data.Type ||
+                    historyitem_Xfrm_SetExtX === Data.Type ||
+                        historyitem_Xfrm_SetChOffX === Data.Type ||
+                        historyitem_Xfrm_SetChExtX === Data.Type );
+            }
+        }
     },
 
     Internal_RecalcData_Clear : function()

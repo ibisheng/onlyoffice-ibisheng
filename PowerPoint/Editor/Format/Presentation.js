@@ -1930,11 +1930,16 @@ CPresentation.prototype =
             if(selected_objects.length  > 0)
             {
                 var last_object = selected_objects[selected_objects.length - 1];
-                return  { X0 : last_object.x, X1 : last_object.x + last_object.extX, Y : last_object.y};
+                var Coords1 = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( last_object.x, last_object.y, this.CurPage);
+                var Coords2 = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( last_object.x + last_object.extX, last_object.y, this.CurPage);
+                return  { X0 : Coords1.X, X1 : Coords2.X, Y : Coords1.Y};
             }
             else
             {
-                return  { X0 : this.Slides[this.CurPage].commentX, X1 : this.Slides[this.CurPage].commentX, Y : this.Slides[this.CurPage].commentY};
+
+                var Pos = editor.WordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+                var Coords1 = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( 0, 0, this.CurPage);
+                return  { X0 : Coords1.X, X1 : Coords1.X, Y : Coords1.Y};
             }
         }
         return { X0 : 0, X1 : 0, Y : 0};
@@ -2189,14 +2194,14 @@ CPresentation.prototype =
             }
             if(!target_content)
             {
-                    editor.UpdateParagraphProp( para_pr );
-                    editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
-                    //if(selected_objects.length === 1 )
-                    //{
-                    //    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
-                    //        editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
-                    //}
-                    editor.UpdateTextPr(text_pr);
+                editor.UpdateParagraphProp( para_pr );
+                editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
+                //if(selected_objects.length === 1 )
+                //{
+                //    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
+                //        editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
+                //}
+                editor.UpdateTextPr(text_pr);
             }
 
             if(drawing_props.imageProps)
@@ -2234,7 +2239,6 @@ CPresentation.prototype =
                 }
                 if(text_pr)
                 {
-
                     if(text_pr.RFonts)
                     {
                         var theme = graphic_objects.getTheme();
@@ -3531,6 +3535,8 @@ CPresentation.prototype =
                 var kh = h/this.Height;
                 this.Width = w;
                 this.Height = h;
+                CollaborativeEditing.ScaleX = kw;
+                CollaborativeEditing.ScaleY = kh;
                 this.changeSlideSizeFunction(kw, kh);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
 
@@ -3626,6 +3632,11 @@ CPresentation.prototype =
                 this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
                 this.DrawingDocument.OnEndRecalculate();
                 this.Document_UpdateInterfaceState();
+
+                var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( Comment.x, Comment.y, this.CurPage);
+                editor.sync_AddComment( Comment.Get_Id(), CommentData );
+                editor.sync_HideComment();
+                editor.sync_ShowComment(Comment.Id, Coords.X, Coords.Y );
                 return Comment;
             }
             else

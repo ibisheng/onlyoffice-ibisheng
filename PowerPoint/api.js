@@ -3478,8 +3478,7 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData)
     CommentData.Read_FromAscCommentData(AscCommentData);
 
     var Comment = this.WordControl.m_oLogicDocument.Add_Comment( CommentData );
-    if ( null != Comment )
-        this.sync_AddComment( Comment.Get_Id(), CommentData );
+    if (Comment )
     return Comment.Get_Id();
 }
 
@@ -4020,6 +4019,33 @@ asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)
     if (this.WordControl)
         this.WordControl.m_bDocumentPlaceChangedEnabled = bEnabled;
 }
+
+asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
+{
+    //if (false === this.bInit_word_control || true === this.isViewMode)
+    //    return;
+
+    if (this.WordControl.m_bIsRuler != bRulers)
+    {
+        this.WordControl.m_bIsRuler = bRulers;
+        this.WordControl.checkNeedRules();
+        this.WordControl.OnResize(true);
+    }
+};
+asc_docs_api.prototype.asc_SetViewRulersChange = function()
+{
+    //if (false === this.bInit_word_control || true === this.isViewMode)
+    //    return;
+
+    this.WordControl.m_bIsRuler = !this.WordControl.m_bIsRuler;
+    this.WordControl.checkNeedRules();
+    this.WordControl.OnResize(true);
+    return this.WordControl.m_bIsRuler;
+};
+asc_docs_api.prototype.asc_GetViewRulers = function()
+{
+    return this.WordControl.m_bIsRuler;
+};
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {

@@ -6253,11 +6253,24 @@ CRFonts.prototype =
     Copy : function()
     {
         var RFonts = new CRFonts();
-        RFonts.Ascii    = this.Ascii;
-        RFonts.EastAsia = this.EastAsia;
-        RFonts.HAnsi    = this.HAnsi;
-        RFonts.CS       = this.CS;
-        RFonts.Hint     = this.Hint;
+        if ( undefined !== this.Ascii )
+        {
+            RFonts.Ascii = {Name: this.Ascii.Name, Index: this.Ascii.Index};
+        }
+        if ( undefined !== this.EastAsia )
+        {
+            RFonts.EastAsia = {Name: this.EastAsia.Name, Index: this.EastAsia.Index};
+        }
+        if ( undefined !== this.HAnsi )
+        {
+            RFonts.HAnsi = {Name: this.HAnsi.Name, Index: this.HAnsi.Index};
+        }
+        if ( undefined !== this.CS )
+        {
+            RFonts.CS = {Name: this.CS.Name, Index: this.CS.Index};
+        }
+        if ( undefined != this.Hint )
+            this.Hint = RFonts.Hint;
         return RFonts;
     },
 
