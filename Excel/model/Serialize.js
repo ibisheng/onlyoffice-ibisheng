@@ -5732,6 +5732,20 @@
 						if(typeof oNewDrawing.graphicObject.setWorksheet != "undefined")
 							oNewDrawing.graphicObject.setWorksheet(ws);
                     }
+                    if(!oNewDrawing.graphicObject.spPr)
+                    {
+                        oNewDrawing.graphicObject.setSpPr(new CSpPr());
+                        oNewDrawing.graphicObject.spPr.setParent(oNewDrawing.graphicObject);
+                    }
+                    if(!oNewDrawing.graphicObject.spPr.xfrm)
+                    {
+                        oNewDrawing.graphicObject.spPr.setXfrm(new CXfrm());
+                        oNewDrawing.graphicObject.spPr.xfrm.setParent(oNewDrawing.graphicObject.spPr);
+                        oNewDrawing.graphicObject.spPr.xfrm.setOffX(0);
+                        oNewDrawing.graphicObject.spPr.xfrm.setOffY(0);
+                        oNewDrawing.graphicObject.spPr.xfrm.setExtX(0);
+                        oNewDrawing.graphicObject.spPr.xfrm.setExtY(0);
+                    }
                     aDrawings.push(oNewDrawing);
                 }
             }
