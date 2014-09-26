@@ -10910,7 +10910,6 @@ CTable.prototype =
         return this.Parent.Get_ShapeStyleForPara();
     },
 
-
     Set_TableW : function(Type, W)
     {
         if ( undefined === Type )
@@ -12826,6 +12825,7 @@ CTable.prototype =
                 {
                     this.Set_TableAlign( align_Left );
                     this.Set_TableInd( TablePr.TableInd - Dx );
+                    this.private_SetTableLayoutFixedAndUpdateGrid(-1);
                 }
                 else
                     this.Internal_UpdateFlowPosition( this.X, this.Y );
@@ -12848,23 +12848,7 @@ CTable.prototype =
 
                     this.TableGrid[Col - 1] = this.TableGridCalc[Col - 1] + Dx;
                     this.Internal_UpdateCellW(Col - 1);
-
-                    if ( tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout )
-                    {
-                        this.Set_TableLayout(tbllayout_Fixed);
-                        var ColsCount = this.TableGrid.length;
-                        for ( var CurCol = 0; CurCol < ColsCount; CurCol++ )
-                        {
-                            if ( CurCol != Col - 1 )
-                                this.TableGrid[CurCol] = this.TableGridCalc[CurCol];
-                        }
-
-                        for ( var CurCol = 0; CurCol < ColsCount; CurCol++ )
-                        {
-                            if ( CurCol != Col - 1 )
-                                this.Internal_UpdateCellW(CurCol);
-                        }
-                    }
+                    this.private_SetTableLayoutFixedAndUpdateGrid(Col - 1);
                 }
                 else
                 {
@@ -12884,23 +12868,7 @@ CTable.prototype =
                     {
                         this.TableGrid[Col - 1] = this.TableGridCalc[Col - 1] + Dx;
                         this.Internal_UpdateCellW(Col - 1);
-
-                        if ( tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout )
-                        {
-                            this.Set_TableLayout(tbllayout_Fixed);
-                            var ColsCount = this.TableGrid.length;
-                            for ( var CurCol = 0; CurCol < ColsCount; CurCol++ )
-                            {
-                                if ( CurCol != Col - 1 )
-                                    this.TableGrid[CurCol] = this.TableGridCalc[CurCol];
-                            }
-
-                            for ( var CurCol = 0; CurCol < ColsCount; CurCol++ )
-                            {
-                                if ( CurCol != Col - 1 )
-                                    this.Internal_UpdateCellW(CurCol);
-                            }
-                        }
+                        this.private_SetTableLayoutFixedAndUpdateGrid(Col - 1);
                     }
                     else
                     {
@@ -19247,6 +19215,29 @@ CTable.prototype =
         }
 
         return undefined;
+    },
+
+    private_SetTableLayoutFixedAndUpdateGrid : function(nExceptColNum)
+    {
+        if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
+        {
+            this.Set_TableLayout(tbllayout_Fixed);
+
+            // Обновляем сетку таблицы
+            var nColsCount = this.TableGrid.length;
+            for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+            {
+                if (nColIndex != nExceptColNum)
+                    this.TableGrid[nColIndex] = this.TableGridCalc[nColIndex];
+            }
+
+            // Обновляем ширины ячеек
+            for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+            {
+                if (nColIndex != nExceptColNum)
+                    this.Internal_UpdateCellW(nColIndex);
+            }
+        }
     }
 };
 

@@ -1501,6 +1501,7 @@ function CHorRuler()
             this.m_oTableMarkup.CorrectFrom();
 
             this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+            this.m_oWordControl.m_oLogicDocument.Document_UpdateRulersState();
         }
     }
 
