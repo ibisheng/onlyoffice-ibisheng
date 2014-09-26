@@ -26,6 +26,7 @@
 			this.onSaveChanges = options.onSaveChanges;
 			this.onStartCoAuthoring = options.onStartCoAuthoring;
 			this.onEndCoAuthoring = options.onEndCoAuthoring;
+			this.onUnSaveLock = options.onUnSaveLock;
 		}
 	}
 
@@ -47,6 +48,7 @@
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
+			this._CoAuthoringApi.onUnSaveLock = function (e) {t.callback_OnUnSaveLock(e);};
 
 			this._CoAuthoringApi.init(user, docid, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
@@ -234,6 +236,11 @@
 			this.onEndCoAuthoring(e);
 	};
 
+	CDocsCoApi.prototype.callback_OnUnSaveLock = function (e) {
+		if (this.onUnSaveLock)
+			this.onUnSaveLock(e);
+	};
+
     /** States
 	 * -1 - reconnect state
      *  0 - not initialized
@@ -256,6 +263,7 @@
 			this.onFirstLoadChanges = options.onFirstLoadChanges;
 			this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
+			this.onUnSaveLock = options.onUnSaveLock;
 		}
         this._state = 0;
 		// Online-пользователи в документе
@@ -640,14 +648,14 @@
 	
 	DocsCoApi.prototype._onUnSaveLock = function () {
 		if (this.onUnSaveLock)
-			this.onUnSaveLock ();
+			this.onUnSaveLock();
 	};
 
 	DocsCoApi.prototype._checkSaveChangesInDisconnect = function (allServerChanges) {
 		for (var changeId in allServerChanges) {
 			var change = allServerChanges[changeId];
 			var changesOneUser = change["changes"];
-			if (changesOneUser && change["user"] !== this._userId && this.lastSaveTime !== change["time"])
+			if (changesOneUser && change["user"] !== this._userId && this.lastOtherSaveTime !== change["time"])
 				return true;
 		}
 		return false;
@@ -660,7 +668,7 @@
 				var changesOneUser = change["changes"];
 				if (changesOneUser) {
 					if (change["user"] !== this._userId)
-						this.lastSaveTime = change["time"];
+						this.lastOtherSaveTime = change["time"];
 					this.onFirstLoadChanges(JSON.parse(changesOneUser), change["user"]);
 				}
 			}
