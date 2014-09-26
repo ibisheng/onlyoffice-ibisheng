@@ -13,9 +13,12 @@ DrawingObjectsController.prototype.getDrawingArray = function()
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args)
 {
-    History.Create_NewPoint();
-    callback.apply(this, args);
-    this.startRecalculate();
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        History.Create_NewPoint();
+        callback.apply(this, args);
+        this.startRecalculate();
+    }
 };
 DrawingObjectsController.prototype.startRecalculate = function()
 {

@@ -676,6 +676,7 @@ var historyitem_SlideLayoutSetShowPhAnim      = 2652;
 var historyitem_SlideLayoutSetShowMasterSp    = 2653;
 var historyitem_SlideLayoutSetClrMapOverride  = 2654;
 var historyitem_SlideLayoutAddToSpTree        = 2655;
+var historyitem_SlideLayoutSetSize            = 2656;
 
 var historyitem_SlideMasterAddToSpTree       = 2656;
 var historyitem_SlideMasterSetTheme          = 2657;
@@ -684,6 +685,8 @@ var historyitem_SlideMasterSetTxStyles       = 2659;
 var historyitem_SlideMasterSetCSldName       = 2660;
 var historyitem_SlideMasterSetClrMapOverride = 2661;
 var historyitem_SlideMasterAddLayout         = 2662;
+var historyitem_SlideMasterSetThemeIndex     = 2663;
+var historyitem_SlideMasterSetSize           = 2664;
 
 var historyitem_ThemeSetColorScheme           = 2663;
 var historyitem_ThemeSetFontScheme            = 2664;

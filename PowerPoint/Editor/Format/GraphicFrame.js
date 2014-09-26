@@ -88,6 +88,7 @@ CGraphicFrame.prototype =
             this.graphicObject.RecalcInfo.Reset(true);
         }
         this.recalcInfo.recalculateTable = true;
+        this.recalcInfo.recalculateSizes = true;
     },
 
     Get_TextBackGroundColor: function()
@@ -643,13 +644,19 @@ CGraphicFrame.prototype =
             {
                 if(this.graphicObject.Is_TableBorder( tx, ty, 0))
                 {
-                    History.Create_NewPoint();
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                    {
+                        History.Create_NewPoint();
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }
             this.graphicObject.Selection_SetStart(tx, ty, 0, e);
             this.graphicObject.RecalculateCurPos();
-            return
-
+            return;
         }
     },
 

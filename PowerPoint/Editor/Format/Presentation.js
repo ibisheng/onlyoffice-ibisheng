@@ -2184,17 +2184,35 @@ CPresentation.prototype =
             var graphic_objects = this.Slides[this.CurPage].graphicObjects;
             var target_content = graphic_objects.getTargetDocContent(), drawing_props = graphic_objects.getDrawingProps(), i;
             var para_pr = graphic_objects.getParagraphParaPr(), text_pr = graphic_objects.getParagraphTextPr();
+            var flag = undefined;
             if(!para_pr)
             {
                 para_pr = new CParaPr();
+                flag = true;
             }
             if(!text_pr)
             {
                 text_pr = new CTextPr();
             }
+            var theme = graphic_objects.getTheme();
+            if(text_pr.RFonts)
+            {
+                if(text_pr.RFonts.Ascii)
+                    text_pr.RFonts.Ascii.Name    = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.Ascii.Name);
+                if(text_pr.RFonts.EastAsia)
+                    text_pr.RFonts.EastAsia.Name = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.EastAsia.Name);
+                if(text_pr.RFonts.HAnsi)
+                    text_pr.RFonts.HAnsi.Name    = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.HAnsi.Name);
+                if(text_pr.RFonts.CS)
+                    text_pr.RFonts.CS.Name       = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.CS.Name);
+            }
+            if(text_pr.FontFamily)
+            {
+                text_pr.FontFamily.Name = theme.themeElements.fontScheme.checkFont(text_pr.FontFamily.Name);
+            }
             if(!target_content)
             {
-                editor.UpdateParagraphProp( para_pr );
+                editor.UpdateParagraphProp( para_pr, flag );
                 editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
                 //if(selected_objects.length === 1 )
                 //{
@@ -2228,7 +2246,7 @@ CPresentation.prototype =
             {
                 if(para_pr)
                 {
-                    editor.UpdateParagraphProp( para_pr );
+                    editor.UpdateParagraphProp( para_pr, flag );
 
                     editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
                     //if(selected_objects.length === 1 )
@@ -2239,18 +2257,6 @@ CPresentation.prototype =
                 }
                 if(text_pr)
                 {
-                    if(text_pr.RFonts)
-                    {
-                        var theme = graphic_objects.getTheme();
-                        if(text_pr.RFonts.Ascii)
-                            text_pr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.Ascii.Name);
-                        if(text_pr.RFonts.EastAsia)
-                            text_pr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.EastAsia.Name);
-                        if(text_pr.RFonts.HAnsi)
-                            text_pr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.HAnsi.Name);
-                        if(text_pr.RFonts.CS)
-                            text_pr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.CS.Name);
-                    }
                     editor.UpdateTextPr(text_pr);
                 }
             }

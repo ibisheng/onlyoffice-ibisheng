@@ -56,6 +56,12 @@ SlideLayout.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_SlideLayoutSetSize:
+            {
+                this.Width  = data.oldW;
+                this.Height = data.oldH;
+                break;
+            }
             case historyitem_SlideLayoutSetMaster      :
             {
                 this.Master = data.oldPr;
@@ -113,6 +119,12 @@ SlideLayout.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_SlideLayoutSetSize:
+            {
+                this.Width  = data.newW;
+                this.Height = data.newH;
+                break;
+            }
             case historyitem_SlideLayoutSetMaster      :
             {
                 this.Master = data.newPr;
@@ -172,6 +184,12 @@ SlideLayout.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_SlideLayoutSetSize:
+            {
+                writeDouble(w, data.newW);
+                writeDouble(w, data.newH);
+                break;
+            }
             case historyitem_SlideLayoutSetMaster      :
             case historyitem_SlideLayoutSetClrMapOverride:
             {
@@ -215,6 +233,12 @@ SlideLayout.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_SlideLayoutSetSize:
+            {
+                this.Width  = readDouble(r);
+                this.Height = readDouble(r);
+                break;
+            }
             case historyitem_SlideLayoutSetMaster      :
             {
                 this.Master = readObject(r);
@@ -364,49 +388,18 @@ SlideLayout.prototype =
     },
 
 
-    changeSize: function(kw, kh)
+    setSlideSize: function(w, h)
     {
-        this.Width *= kw;
-        this.Height *= kh;
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].changeSize(kw, kh);
-        }
+        History.Add(this, {Type: historyitem_SlideLayoutSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        this.Width = w;
+        this.Height = h;
     },
+
+    changeSize: Slide.prototype.changeSize,
 
     Get_Id: function()
     {
         return this.Id;
-    },
-
-    setSize: function(width, height)
-    {
-        var _k_h = height/this.Height;
-        var _k_w = width/this.Width;
-        this.Width = width;
-        this.Height = height;
-
-        var _graphic_objects = this.cSld.spTree;
-        var _objects_count = _graphic_objects.length;
-        var _object_index;
-        for(_object_index = 0; _object_index < _objects_count; ++_object_index)
-        {
-            _graphic_objects[_object_index].updateProportions(_k_w, _k_h);
-        }
-    },
-
-    calculateColors: function()
-    {
-        var _shapes = this.cSld.spTree;
-        var _shapes_count = _shapes.length;
-        var _shape_index;
-        for(_shape_index = 0; _shape_index < _shapes_count; ++_shape_index)
-        {
-            if(_shapes[_shape_index].calculateColors)
-            {
-                _shapes[_shape_index].calculateColors();
-            }
-        }
     },
 
     draw: function(graphics)

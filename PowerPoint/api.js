@@ -1268,7 +1268,7 @@ asc_docs_api.prototype.sync_VerticalTextAlign = function(align)
     this.asc_fireCallback("asc_onVerticalTextAlign", align);
 }
 
-asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr){
+asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
 
     ParaPr.StyleName = "";
     var TextPr = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
@@ -1367,7 +1367,8 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr){
 	this.sync_PrAlignCallBack(ParaPr.Jc);
 	this.sync_ParaStyleName(ParaPr.StyleName);
 	this.sync_ListType(ParaPr.ListType);
-	this.sync_PrPropCallback(ParaPr);
+    if(!(bParaPr === true))
+	    this.sync_PrPropCallback(ParaPr);
 }
 /*----------------------------------------------------------------*/
 /*functions for working with clipboard, document*/

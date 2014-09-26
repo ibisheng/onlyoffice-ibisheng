@@ -26,7 +26,7 @@ function CThemeLoader()
     this.CurrentLoadThemeIndex = -1;
     this.ThemesUrl = "";
 
-    this.IsReloadBinaryThemeEditor = true;
+    this.IsReloadBinaryThemeEditor = false;
     this.IsReloadBinaryThemeEditorNow = false;
 
     var oThis = this;
@@ -118,7 +118,7 @@ function CThemeLoader()
             _loader.Load(g_th, pres);
             for(var i = 0; i < pres.slideMasters.length; ++i)
             {
-                pres.slideMasters[i].ThemeIndex = oThis.CurrentLoadThemeIndex;
+                pres.slideMasters[i].setThemeIndex(oThis.CurrentLoadThemeIndex);
             }
             History.MinorChanges = false;
 

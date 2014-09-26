@@ -496,8 +496,7 @@ function BinaryPPTYLoader()
             for (var i = 0; i < _sm_count; i++)
             {
                 this.presentation.slideMasters[i] = this.ReadSlideMaster();
-                this.presentation.slideMasters[i].Width = this.presentation.Width;
-                this.presentation.slideMasters[i].Height = this.presentation.Height;
+                this.presentation.slideMasters[i].setSlideSize(this.presentation.Width, this.presentation.Height);
             }
         }
 

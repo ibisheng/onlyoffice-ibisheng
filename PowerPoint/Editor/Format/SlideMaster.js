@@ -66,10 +66,27 @@ MasterSlide.prototype =
         return historyitem_type_SlideMaster;
     },
 
+    setThemeIndex: function(index)
+    {
+        History.Add(this, {Type: historyitem_SlideMasterSetThemeIndex, oldPr: this.ThemeIndex, newPr: index});
+        this.ThemeIndex = index;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_SlideMasterSetSize:
+            {
+                this.Width  = data.oldW;
+                this.Height = data.oldH;
+                break;
+            }
+            case historyitem_SlideMasterSetThemeIndex:
+            {
+                this.ThemeIndex = data.oldPr;
+                break;
+            }
             case historyitem_SlideMasterAddToSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 1);
@@ -112,6 +129,17 @@ MasterSlide.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_SlideMasterSetSize:
+            {
+                this.Width  = data.newW;
+                this.Height = data.newH;
+                break;
+            }
+            case historyitem_SlideMasterSetThemeIndex:
+            {
+                this.ThemeIndex = data.newPr;
+                break;
+            }
             case historyitem_SlideMasterAddToSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 0, data.Item);
@@ -168,6 +196,12 @@ MasterSlide.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_SlideMasterSetSize:
+            {
+                writeDouble(w, data.newW);
+                writeDouble(w, data.newH);
+                break;
+            }
             case historyitem_SlideMasterAddToSpTree:
             case historyitem_SlideMasterAddLayout           :
             {
@@ -193,6 +227,11 @@ MasterSlide.prototype =
                 writeObject(w, data.newPr);
                 break;
             }
+            case historyitem_SlideMasterSetThemeIndex:
+            {
+                writeLong(w, data.newPr);
+                break;
+            }
         }
     },
 
@@ -201,6 +240,12 @@ MasterSlide.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_SlideMasterSetSize:
+            {
+                this.Width  = readDouble(r);
+                this.Height = readDouble(r);
+                break;
+            }
             case historyitem_SlideMasterAddToSpTree:
             {
                 var Pos = readLong(r);
@@ -262,6 +307,25 @@ MasterSlide.prototype =
                 this.sldLayoutLst.splice(Pos, 0, Item);
                 break;
             }
+            case historyitem_SlideMasterSetThemeIndex:
+            {
+                this.ThemeIndex = readLong(r);
+                if (isRealNumber(this.ThemeIndex) && editor && editor.ThemeLoader)
+                {
+                    var theme_loader = editor.ThemeLoader;
+
+                    var theme_load_info = new CThemeLoadInfo();
+                    theme_load_info.Master = this;
+                    theme_load_info.Theme = this.Theme;
+
+                    var _lay_cnt = this.sldLayoutLst.length;
+                    for (var i = 0; i < _lay_cnt; i++)
+                        theme_load_info.Layouts[i] = this.sldLayoutLst[i];
+
+                    theme_loader.themes_info_editor[this.ThemeIndex] = theme_load_info;
+                }
+                break;
+            }
         }
     },
 
@@ -274,42 +338,7 @@ MasterSlide.prototype =
         }
     },
 
-    setSize: function(width, height)
-    {
-        var _k_h = height/this.Height;
-        var _k_w = width/this.Width;
-        this.Width = width;
-        this.Height = height;
 
-        var _graphic_objects = this.cSld.spTree;
-        var _objects_count = _graphic_objects.length;
-        var _object_index;
-        for(_object_index = 0; _object_index < _objects_count; ++_object_index)
-        {
-            _graphic_objects[_object_index].updateProportions(_k_w, _k_h);
-        }
-
-        var _layouts = this.sldLayoutLst;
-        var _layout_count = _layouts.length;
-        var _layout_index;
-        for(_layout_index = 0; _layout_index < _layout_count; ++_layout_index)
-        {
-            _layouts[_layout_index].setSize(width, height);
-        }
-    },
-    calculateColors: function()
-    {
-        var _shapes = this.cSld.spTree;
-        var _shapes_count = _shapes.length;
-        var _shape_index;
-        for(_shape_index = 0; _shape_index < _shapes_count; ++_shape_index)
-        {
-            if(_shapes[_shape_index].calculateColors)
-            {
-                _shapes[_shape_index].calculateColors();
-            }
-        }
-    },
 
     getMatchingLayout: function(type, matchingName, cSldName, themeFlag)
     {
@@ -559,15 +588,14 @@ MasterSlide.prototype =
         }
     },
 
-    changeSize: function(kw, kh)
+    setSlideSize: function(w, h)
     {
-        this.Width *= kw;
-        this.Height *= kh;
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].changeSize(kw, kh);
-        }
+        History.Add(this, {Type: historyitem_SlideMasterSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        this.Width = w;
+        this.Height = h;
     },
+
+    changeSize: Slide.prototype.changeSize,
 
     setTheme: function(theme)
     {

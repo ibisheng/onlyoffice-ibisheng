@@ -81,21 +81,6 @@ Slide.prototype =
         return editor.WordControl.m_oLogicDocument.DrawingDocument;
     },
 
-    //---------------------
-    setSize: function(width, height)
-    {
-        var _k_h = height/this.Height;
-        var _k_w = width/this.Width;
-        this.Width = width;
-        this.Height = height;
-        var _graphic_objects = this.cSld.spTree;
-        var _objects_count = _graphic_objects.length;
-        var _object_index;
-        for(_object_index = 0; _object_index < _objects_count; ++_object_index)
-        {
-            _graphic_objects[_object_index].updateProportions(_k_w, _k_h);
-        }
-    },
 
     getMatchingShape: function(type, idx, bSingleBody)
     {
@@ -772,8 +757,7 @@ Slide.prototype =
 
     changeSize: function(kw, kh)
     {
-        this.Width *= kw;
-        this.Height *= kh;
+        this.setSlideSize(this.Width*kw, this.Height*kh);
         for(var i = 0; i < this.cSld.spTree.length; ++i)
         {
             this.cSld.spTree[i].changeSize(kw, kh);
