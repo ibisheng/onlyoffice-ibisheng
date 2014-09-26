@@ -123,7 +123,6 @@ function asc_docs_api(name)
     /**************************************/
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-	this.isAutoSave = false;			// Флаг, означает что запущено автосохранениеautoSaveTimeOutId
 
 	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
@@ -1436,18 +1435,20 @@ function OnSave_Callback2(e)
         // Пересылаем свои изменения
         CollaborativeEditing.Send_Changes();
 
-        // Выставляем, что документ не модифицирован
-        editor.SetUnchangedDocument();
+		editor.CoAuthoringApi.onUnSaveLock = function () {
+			editor.CoAuthoringApi.onUnSaveLock = null;
 
-        editor.canSave = true;
+			// Выставляем, что документ не модифицирован
+			editor.SetUnchangedDocument();
+			editor.canSave = true;
+			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-        editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			// Обновляем состояние возможности сохранения документа
+			editor._onUpdateDocumentCanSave();
+		};
 
         // Снимаем лок с функции сохранения на сервере
         editor.CoAuthoringApi.unSaveChanges();
-
-        // Обновляем состояние возможности сохранения документа
-        editor._onUpdateDocumentCanSave();
     }
     else
     {
@@ -1455,7 +1456,7 @@ function OnSave_Callback2(e)
     }
 }
 
-asc_docs_api.prototype.asc_Save = function (isAutoSave) {
+asc_docs_api.prototype.asc_Save = function () {
     if (true === this.canSave)
     {
         this.canSave = false;
@@ -1463,17 +1464,18 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave) {
     }
 };
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-	if (!this.isAutoSave)
-		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-	this.canSave = true;
-	this.isAutoSave = false;
+	var t = this;
+	this.CoAuthoringApi.onUnSaveLock = function () {
+		t.CoAuthoringApi.onUnSaveLock = null;
+		t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		t.canSave = true;
+
+		// Обновляем состояние возможности сохранения документа
+		t._onUpdateDocumentCanSave();
+	};
 	this.CoAuthoringApi.unSaveChanges();
 	if (!isDocumentSaved)
 		this.CoAuthoringApi.disconnect();
-
-	// Обновляем состояние возможности сохранения документа
-	this._onUpdateDocumentCanSave();
 };
 asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	if(bInner)
@@ -1815,9 +1817,6 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 	var t = this;
 	var nState;
 	if (false == e["saveLock"]) {
-		if (t.isAutoSave)
-			t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-
 		// Принимаем чужие изменения
         safe_Apply_Changes();
 
@@ -1847,18 +1846,10 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		nState = t.CoAuthoringApi.get_state();
 		if (3 === nState) {
 			// Отключаемся от сохранения, соединение потеряно
-			if (!t.isAutoSave)
-				t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			t.isAutoSave = false;
+			t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			t.canSave = true;
 		} else {
 			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
-			if (t.isAutoSave) {
-				t.isAutoSave = false;
-				t.canSave = true;
-				return;
-			}
-
 			setTimeout(function () {
 				t.CoAuthoringApi.askSaveChanges(function (event) { t.onSaveCallback(event); });
 			}, 1000);

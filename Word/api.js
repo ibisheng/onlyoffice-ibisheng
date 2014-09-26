@@ -569,7 +569,6 @@ function asc_docs_api(name)
 
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
-	this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
 
     this.bInit_word_control = false;
 	this.isDocumentModify = false;
@@ -2756,19 +2755,21 @@ function OnSave_Callback2(e)
 
         // Пересылаем свои изменения
         CollaborativeEditing.Send_Changes();
-        
-        // Выставляем, что документ не модифицирован
-        editor.SetUnchangedDocument();
 
-        editor.canSave = true;
 
+		editor.CoAuthoringApi.onUnSaveLock = function () {
+			editor.CoAuthoringApi.onUnSaveLock = null;
+
+			// Выставляем, что документ не модифицирован
+			editor.SetUnchangedDocument();
+			editor.canSave = true;
+			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+
+			// Обновляем состояние возможности сохранения документа
+			editor._onUpdateDocumentCanSave();
+		};
         // Снимаем лок с функции сохранения на сервере
         editor.CoAuthoringApi.unSaveChanges();
-
-		editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-
-		// Обновляем состояние возможности сохранения документа
-		editor._onUpdateDocumentCanSave();
     } 
     else 
     {
@@ -2776,34 +2777,31 @@ function OnSave_Callback2(e)
     }
 }
 
-asc_docs_api.prototype.asc_Save = function (isAutoSave) 
+asc_docs_api.prototype.asc_Save = function ()
 {
     this.asc_Save2();
 //	if(true === this.canSave) {
 //		this.canSave = false;
-//		this.isAutoSave = !!isAutoSave;
-//		if (!this.isAutoSave) {
-//			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-//			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-//		}
+//		this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 //
-//        this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+//      this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
 //	}
 };
 
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-	// Если не автосохранение, то не забываем закрыть Block-сообщение
-//	if (!this.isAutoSave)
-//		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-	this.canSave = true;
-	this.isAutoSave = false;
+	var t = this;
+	this.CoAuthoringApi.onUnSaveLock = function () {
+		t.CoAuthoringApi.onUnSaveLock = null;
+
+		t.canSave = true;
+
+		t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		// Обновляем состояние возможности сохранения документа
+		t._onUpdateDocumentCanSave();
+	};
 	this.CoAuthoringApi.unSaveChanges();
 	if (!isDocumentSaved)
 		this.CoAuthoringApi.disconnect();
-	
-	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-	// Обновляем состояние возможности сохранения документа
-	this._onUpdateDocumentCanSave();
 };
 
 function safe_Apply_Changes()
@@ -2821,10 +2819,6 @@ function safe_Apply_Changes()
 //{
 //	var nState;
 //    if ( false == e["saveLock"] ) {
-//		if (editor.isAutoSave) {
-//			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-//			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-//		}
 //
 //        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
 //            CollaborativeEditing.Clear_CollaborativeMarks();
@@ -2867,31 +2861,14 @@ function safe_Apply_Changes()
 //		//Обратно выставляем, что документ не модифицирован
 //		editor.SetUnchangedDocument();
 //
-//		// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
-//		// Но сохранять до прихода ответа от сервера не сможет
-//		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-//		// Если не автосохранение, то продолжаем показывать Block-сообщение
-//		if (!editor.isAutoSave)
-//			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 //		editor.asc_OnSaveEnd(true);
 //    } else {
 //		nState = editor.CoAuthoringApi.get_state();
 //		if (3 === nState) {
 //			// Отключаемся от сохранения, соединение потеряно
-//			if (!editor.isAutoSave) {
-//				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-//				editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-//			}
-//			editor.isAutoSave = false;
+//			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 //			editor.canSave = true;
 //		} else {
-//			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
-//			if (editor.isAutoSave) {
-//				editor.isAutoSave = false;
-//				editor.canSave = true;
-//				return;
-//			}
-//
 //        	setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback ); }, 1000 );
 //		}
 //    }

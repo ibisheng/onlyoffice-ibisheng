@@ -577,15 +577,21 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-			this.canSave = true;
-			this.isAutoSave = false;
-			this.lastSaveTime = null;
+			var t = this;
+			this.CoAuthoringApi.onUnSaveLock = function () {
+				t.CoAuthoringApi.onUnSaveLock = null;
+
+				t.canSave = true;
+				t.isAutoSave = false;
+				t.lastSaveTime = null;
+
+				t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+				// Обновляем состояние возможности сохранения документа
+				t._onUpdateDocumentCanSave();
+			};
 			this.CoAuthoringApi.unSaveChanges();
 			if (!isDocumentSaved)
 				this.CoAuthoringApi.disconnect();
-			this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			// Обновляем состояние возможности сохранения документа
-			this._onUpdateDocumentCanSave();
 		};
 
 		spreadsheet_api.prototype.asc_Print = function(adjustPrint){
@@ -1031,6 +1037,32 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this._asc_sendCommand (fCallback, v);
 				}
 			}
+		};
+
+		spreadsheet_api.prototype._asc_save2 = function () {
+			var oAdditionalData = {};
+			oAdditionalData["c"] = "sfct";
+			oAdditionalData["id"] = this.documentId;
+			oAdditionalData["userid"] = this.documentUserId;
+			oAdditionalData["vkey"] = this.documentVKey;
+			oAdditionalData["outputformat"] = 0x1002;
+			var data;
+			this.wb._initCommentsToSave();
+			var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+			oAdditionalData["savetype"] = "completeall";
+			data = oBinaryFileWriter.Write();
+
+			if (undefined != window['appBridge']) {
+				window['appBridge']['dummyCommandSave_CSV'] (data);
+				this.asc_OnSaveEnd(true);
+				return;
+			}
+			oAdditionalData["data"] = data;
+			var t = this;
+			this._asc_sendCommand (function (incomeObject) {
+				if(null != incomeObject && "save" == incomeObject["type"])
+					t.asc_processSavedFile(incomeObject["data"], false);
+			}, oAdditionalData);
 		};
 
 		spreadsheet_api.prototype._asc_save = function () {
