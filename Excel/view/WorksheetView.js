@@ -4252,7 +4252,7 @@
                 colWidth = this.cols[col].innerWidth;
                 // Измеряем целую часть числа
 				sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
-                if ("General" === numFormatStr) {
+                if ("General" === numFormatStr && c_oAscCanChangeColWidth.all !== canChangeColWidth) {
 					// asc.truncFracPart изменяет исходный массив, поэтому клонируем
 					var fragmentsTmp = [];
 					for (var k = 0; k < sstr.length; ++k)
