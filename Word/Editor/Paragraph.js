@@ -2130,7 +2130,7 @@ Paragraph.prototype =
         }
 
         var CurLine = this.Pages[CurPage].EndLine;
-        var bEnd = ( this.Content.length - 2 <= this.Lines[CurLine].EndPos ? true : false );
+        var bEnd    = (this.Lines[CurLine].Info & paralineinfo_End ? true : false);
 
         // Рисуем линию после параграфа
         if ( true === bEnd && true === Pr.ParaPr.Brd.Last && border_Single === Pr.ParaPr.Brd.Bottom.Value )
@@ -5710,12 +5710,12 @@ Paragraph.prototype =
                 var _StartLine = this.Pages[CurPage].StartLine;
                 var _EndLine   = this.Pages[CurPage].EndLine;
 
-                if ( StartPos > this.Lines[_EndLine].EndPos || EndPos < this.Lines[_StartLine].StartPos )
+                if ( StartPos > this.Lines[_EndLine].Get_EndPos() || EndPos < this.Lines[_StartLine].Get_StartPos() )
                     return;
                 else
                 {
-                    StartPos = Math.max( StartPos, this.Lines[_StartLine].StartPos );
-                    EndPos   = Math.min( EndPos,   ( _EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos : this.Content.length - 1 ) );
+                    StartPos = Math.max( StartPos, this.Lines[_StartLine].Get_StartPos() );
+                    EndPos   = Math.min( EndPos,   ( _EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].Get_EndPos() : this.Content.length - 1 ) );
                 }
 
                 var DrawSelection = new CParagraphDrawSelectionRange();
@@ -6022,10 +6022,10 @@ Paragraph.prototype =
             
             for (var CurLine = 0; CurLine < LinesCount; CurLine++ )
             {
-                if ( -1 === StartLine && StartPos >= this.Lines[CurLine].StartPos && StartPos <= this.Lines[CurLine].EndPos )
+                if ( -1 === StartLine && StartPos >= this.Lines[CurLine].Get_StartPos() && StartPos <= this.Lines[CurLine].Get_EndPos() )
                     StartLine = CurLine;
                 
-                if ( EndPos >= this.Lines[CurLine].StartPos && EndPos <= this.Lines[CurLine].EndPos )
+                if ( EndPos >= this.Lines[CurLine].Get_StartPos() && EndPos <= this.Lines[CurLine].Get_EndPos() )
                     EndLine = CurLine;
             }
 
@@ -10097,7 +10097,7 @@ Paragraph.prototype =
             {
                 for ( CurPage = this.Pages.length - 1; CurPage > 0; CurPage-- )
                 {
-                    if ( Data.Pos > this.Lines[this.Pages[CurPage].StartLine].StartPos )
+                    if ( Data.Pos > this.Lines[this.Pages[CurPage].StartLine].Get_StartPos() )
                         break;
                 }
 

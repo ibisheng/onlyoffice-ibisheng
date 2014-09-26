@@ -727,14 +727,14 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 10. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
+    // 10. Выставляем вертикальное смещение данной строки
     //-------------------------------------------------------------------------------------------------------------
-    this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false);
+    this.private_RecalculateLineBaseLine(CurLine, CurPage, PRS, ParaPr);
 
     //-------------------------------------------------------------------------------------------------------------
-    // 11. Выставляем вертикальное смещение данной строки
+    // 11. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
     //-------------------------------------------------------------------------------------------------------------
-    if (false === this.private_RecalculateLineBaseLine(CurLine, CurPage, PRS, ParaPr))
+    if (recalcresult_NextElement !== this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
@@ -838,7 +838,7 @@ Paragraph.prototype.private_RecalculateLineRanges      = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPage, PRS, ParaPr)
 {
-    if ( true === PRS.BreakPageLine )
+    if ( true === PRS.BreakPageLine || true === PRS.SkipPageBreak )
         this.Lines[CurLine].Info |= paralineinfo_BreakPage;
 
     if ( true === PRS.EmptyLine )
@@ -1163,6 +1163,31 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineBaseLine    = function(CurLine, CurPage, PRS, ParaPr)
 {
+    if (this.Lines[CurLine].Info & paralineinfo_RangeY)
+    {
+        this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
+    }
+    else
+    {
+        if ( CurLine > 0 )
+        {
+            // Первая линия на странице не должна двигаться
+            if ( CurLine != this.Pages[CurPage].FirstLine && ( true === PRS.End || true !== PRS.EmptyLine || PRS.RangesCount <= 0 || true === PRS.NewPage  ) )
+                PRS.Y += this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap +  this.Lines[CurLine].Metrics.Ascent;
+
+            this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
+        }
+        else
+            this.Lines[0].Y = 0;
+    }
+
+    this.Lines[CurLine].Y += PRS.BaseLineOffset;
+    if (this.Lines[CurLine].Metrics.LineGap < 0)
+        this.Lines[CurLine].Y += this.Lines[CurLine].Metrics.LineGap;
+};
+
+Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
+{
     if ( true === PRS.NewPage )
     {
         // Если это последний элемент параграфа, тогда нам не надо переносить текущий параграф
@@ -1182,62 +1207,11 @@ Paragraph.prototype.private_RecalculateLineBaseLine    = function(CurLine, CurPa
             return false;
         }
 
-        if (this.Lines[CurLine].Info & paralineinfo_RangeY)
-        {
-            this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
-        }
-        else
-        {
-            if ( CurLine > 0 )
-            {
-                // Первая линия на странице не должна двигаться
-                if ( CurLine != this.Pages[CurPage].FirstLine )
-                    PRS.Y += this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap +  this.Lines[CurLine].Metrics.Ascent;
-
-                this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
-            }
-            else
-                this.Lines[0].Y = 0;
-        }
-
-        this.Lines[CurLine].Y += PRS.BaseLineOffset;
-        if (this.Lines[CurLine].Metrics.LineGap < 0)
-            this.Lines[CurLine].Y += this.Lines[CurLine].Metrics.LineGap;
-
         this.Pages[CurPage].Set_EndLine( CurLine );
         PRS.RecalcResult = recalcresult_NextPage;
         return false;
     }
-    else
-    {
-        if (this.Lines[CurLine].Info & paralineinfo_RangeY)
-        {
-            this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
-        }
-        else
-        {
-            if ( CurLine > 0 )
-            {
-                // Первая линия на странице не должна двигаться
-                if ( CurLine != this.Pages[CurPage].FirstLine && ( true === PRS.End || true !== PRS.EmptyLine || PRS.RangesCount <= 0 ) )
-                    PRS.Y += this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap +  this.Lines[CurLine].Metrics.Ascent;
 
-                this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
-            }
-            else
-                this.Lines[0].Y = 0;
-        }
-
-        this.Lines[CurLine].Y += PRS.BaseLineOffset;
-        if (this.Lines[CurLine].Metrics.LineGap < 0)
-            this.Lines[CurLine].Y += this.Lines[CurLine].Metrics.LineGap;
-
-        return true;
-    }
-};
-
-Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
-{
     // Такое случается, когда у нас после пересчета Flow картинки, место к которому она была привязана перешло на
     // следующую страницу.
     if (recalcresult_NextPage === PRS.RecalcResult)
@@ -1664,6 +1638,16 @@ CParaLine.prototype =
         {
             this.Ranges[CurRange].Shift(Dx, Dy);
         }
+    },
+
+    Get_StartPos : function()
+    {
+        return this.Ranges[0].StartPos;
+    },
+
+    Get_EndPos : function()
+    {
+        return this.Ranges[this.Ranges.length - 1].EndPos;
     },
 
     Set_RangeStartPos : function(CurRange, StartPos)
