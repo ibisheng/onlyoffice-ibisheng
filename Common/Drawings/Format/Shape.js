@@ -2569,10 +2569,10 @@ CShape.prototype =
             new_ext_y = scale_scale_coefficients.cy * xfrm.extY;
         }
         var xfrm = this.spPr.xfrm;
-        xfrm.setOffX(new_off_x);
-        xfrm.setOffY(new_off_y);
-        xfrm.setExtX(new_ext_x);
-        xfrm.setExtY(new_ext_y);
+        Math.abs(new_off_x - xfrm.offX) > MOVE_DELTA &&  xfrm.setOffX(new_off_x);
+        Math.abs(new_off_y - xfrm.offY) > MOVE_DELTA &&  xfrm.setOffY(new_off_y);
+        Math.abs(new_ext_x - xfrm.extX) > MOVE_DELTA &&  xfrm.setExtX(new_ext_x);
+        Math.abs(new_ext_y - xfrm.extY) > MOVE_DELTA &&  xfrm.setExtY(new_ext_y);
     },
 
     check_bounds: function (checker) {
