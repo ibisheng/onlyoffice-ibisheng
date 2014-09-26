@@ -2907,7 +2907,6 @@ COperator.prototype.getProps = function(props, defaultProps)
         chr = props.chr,
         type = props.type;
 
-
     var code = props.chr;
 
     this.defaultType = defaultProps.type;
@@ -2949,6 +2948,7 @@ COperator.prototype.draw = function(x, y, pGraphics)
         rPrp.Merge(defaultRPrp);
         rPrp.Merge(ctrPrp);
         rPrp.Italic = false;
+        rPrp.Bold   = false;
         pGraphics.SetFont(rPrp);
 
         ////////////////////////////////////////////////
@@ -3037,7 +3037,14 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         }
         else
         {
-            var StretchLng = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false ? 0 : stretch;
+
+            var StretchLng = stretch;
+
+            var bNotStretchDelim = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false,
+                bNotStretchAccent = this.type == OPER_ACCENT && this.typeOper == ACCENT_TILDE;
+
+            var StretchLng = bNotStretchDelim || bNotStretchAccent ? 0 : stretch;
+
             this.operator.fixSize(StretchLng);
             dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};

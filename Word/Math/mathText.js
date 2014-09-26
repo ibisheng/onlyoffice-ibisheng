@@ -575,6 +575,20 @@ CMathText.prototype =
         }
 
     },
+    getInfoLetter: function(Info)
+    {
+        var code = this.value;
+
+        var bCapitale = (code > 0x0040 && code < 0x005B),
+            bSmall = (code > 0x0060 && code < 0x007b) || code == 0x131 || code == 0x237;
+
+        Info.Latin = bCapitale || bSmall;
+
+        var bCapGreek   = (code > 0x0390 && code < 0x03AA),
+            bSmallGreek = (code > 0x03B0 && code < 0x03CA);
+
+        Info.Greek = bCapGreek || bSmallGreek;
+    },
     setCoeffTransform: function(sx, shx, shy, sy)
     {
         this.transform = {sx: sx, shx: shx, shy: shy, sy: sy};

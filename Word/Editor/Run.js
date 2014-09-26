@@ -8044,6 +8044,18 @@ ParaRun.prototype.IsEqqArray = function()
 {
     return this.Parent.IsEqqArray();
 }
+ParaRun.prototype.Math_GetInfoLetter = function(Info)
+{
+    if(this.Content.length == 1)
+    {
+        var Compiled_MPrp = this.MathPrp.GetCompiled_ScrStyles();
+        Info.sty = Compiled_MPrp.sty;
+        Info.scr = Compiled_MPrp.scr;
+        this.Content[0].getInfoLetter(Info);
+    }
+    else
+        Info.Result = false;
+}
 
 function CParaRunStartState(Run)
 {

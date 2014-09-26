@@ -387,7 +387,7 @@ CAccentBreve.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[22], YY[22]);
 }
 
-function CSign()
+/*function CSign()
 {
     this.sign = new CMathText(true);
     this.typeOper = null;
@@ -451,10 +451,10 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 
     this.sign.Resize(oMeasure);
 
-    /*if(this.typeOper == ACCENT_THREE_DOTS)
+    *//*if(this.typeOper == ACCENT_THREE_DOTS)
      this.dH = 1.2*ctrPrp.FontSize/36;
      else
-     this.dH = 1.2*ctrPrp.FontSize/36;*/
+     this.dH = 1.2*ctrPrp.FontSize/36;*//*
 
     //var height = this.sign.size.height + this.dH,
     var height = this.sign.size.height,
@@ -476,7 +476,7 @@ CSign.prototype.relate = function(parent)
 CSign.prototype.getCodeCharacter = function()
 {
     return this.sign.value;
-}
+}*/
 
 function CAccent(props)
 {
@@ -490,7 +490,6 @@ function CAccent(props)
         chrType:    null
     };
 
-    this.shiftX   = 0;
     this.gap = 0;
 
     /////////////////
@@ -597,17 +596,7 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     this.operator.fixSize(ParaMath, oMeasure, base.size.width);
 
-    if(this.operator.typeOper == OPERATOR_TEXT)
-    {
-        var letterX = new CMathText(true);
-        letterX.add(0x78);
-        letterX.Resize(oMeasure, null);
-        //this.gap = this.operator.size.ascentSign - letterX.size.ascent;
-
-    }
-
-
-    var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
+    var width  = base.size.width, // (!)
         height = base.size.height + this.operator.size.height,
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
 
@@ -621,21 +610,36 @@ CAccent.prototype.getBase = function()
 }
 CAccent.prototype.draw = function(x, y, pGraphics)
 {
-    this.elements[0][0].draw(x, y, pGraphics);
+    var base = this.elements[0][0];
+    base.draw(x, y, pGraphics);
 
-    var MergedCtrPrp = this.Get_CompiledCtrPrp();
-    var FontSize = MergedCtrPrp.FontSize,
-        FontFamily = {Name: "Cambria Math", Index: -1};
+    var Info =
+    {
+        Result:     true,
+        sty:        null,
+        scr:        null,
+        Latin:      false,
+        Greek:      false
+    };
 
-    var obj = {FontSize: FontSize, FontFamily: FontFamily};
+    base.getInfoLetter(Info);
 
-    var accFont = new CTextPr();
-    accFont.Set_FromObject(obj);
+    if(Info.Result == true)
+    {
+        var bStyle  = Info.sty == STY_BI || Info.sty == STY_ITALIC,
+            bScript = Info.scr == TXT_ROMAN || Info.scr == TXT_SANS_SERIF;
+
+        if(bStyle && bScript && (Info.Latin || Info.Greek))
+        {
+            if(this.Pr.chr != 0x305 && this.Pr.chr >= 0x300 && this.Pr.chr <= 0x315 || this.Pr.chr == 0x20DB)
+            {
+                var ascent = this.elements[0][0].size.ascent;
+                x += ascent*0.1;
+            }
+        }
+    }
 
 
-    pGraphics.SetFont(accFont);
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
 
     this.operator.draw(x, y, pGraphics);
 }
