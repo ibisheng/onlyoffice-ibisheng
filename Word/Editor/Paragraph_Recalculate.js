@@ -732,13 +732,19 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
     this.private_RecalculateLineBaseLine(CurLine, CurPage, PRS, ParaPr);
 
     //-------------------------------------------------------------------------------------------------------------
-    // 11. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
+    // 11. Проверяем не съехала ли вся строка из-за обтекания
+    //-------------------------------------------------------------------------------------------------------------
+    if (false === this.private_RecalculateLineCheckRangeY(CurLine, CurPage, PRS, ParaPr))
+        return;
+
+    //-------------------------------------------------------------------------------------------------------------
+    // 12. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
     //-------------------------------------------------------------------------------------------------------------
     if (recalcresult_NextElement !== this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 12. Последние проверки
+    // 13. Последние проверки
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineEnd(CurLine, CurPage, PRS, ParaPr))
         return;
@@ -1186,6 +1192,47 @@ Paragraph.prototype.private_RecalculateLineBaseLine    = function(CurLine, CurPa
         this.Lines[CurLine].Y += this.Lines[CurLine].Metrics.LineGap;
 };
 
+Paragraph.prototype.private_RecalculateLineCheckRangeY = function(CurLine, CurPage, PRS, ParaPr)
+{
+    // Такое случается, когда у нас после пересчета Flow картинки, место к которому она была привязана перешло на
+    // следующую страницу.
+    if (recalcresult_NextPage === PRS.RecalcResult)
+        return false;
+
+    // Если строка пустая в следствии того, что у нас было обтекание, тогда мы не добавляем новую строку,
+    // а просто текущую смещаем ниже.
+    if (true !== PRS.End && true === PRS.EmptyLine && PRS.RangesCount > 0)
+    {
+        // Найдем верхнюю точку объектов обтекания (т.е. так чтобы при новом обсчете не учитывался только
+        // этот объект, заканчивающийся выше всех)
+
+        var Ranges = PRS.Ranges;
+
+        var RangesMaxY = Ranges[0].Y1;
+        for (var Index = 1; Index < Ranges.length; Index++)
+        {
+            if (RangesMaxY > Ranges[Index].Y1)
+                RangesMaxY = Ranges[Index].Y1;
+        }
+
+        if (Math.abs(RangesMaxY - PRS.Y) < 0.001)
+            PRS.Y = RangesMaxY + 1; // смещаемся по 1мм
+        else
+            PRS.Y = RangesMaxY + 0.001; // Добавляем 0.001, чтобы избавиться от погрешности
+
+        // Отмечаем, что данная строка переносится по Y из-за обтекания
+        PRS.RangeY = true;
+
+        // Пересчитываем заново данную строку
+        PRS.Reset_Ranges();
+        PRS.RecalcResult = recalcresult_CurLine;
+
+        return false;
+    }
+
+    return true;
+};
+
 Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
 {
     if ( true === PRS.NewPage )
@@ -1212,44 +1259,9 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
         return false;
     }
 
-    // Такое случается, когда у нас после пересчета Flow картинки, место к которому она была привязана перешло на
-    // следующую страницу.
-    if (recalcresult_NextPage === PRS.RecalcResult)
-        return false;
 
     if (true !== PRS.End)
     {
-        // Если строка пустая в следствии того, что у нас было обтекание, тогда мы не добавляем новую строку,
-        // а просто текущую смещаем ниже.
-        if ( true === PRS.EmptyLine && PRS.RangesCount > 0 )
-        {
-            // Найдем верхнюю точку объектов обтекания (т.е. так чтобы при новом обсчете не учитывался только
-            // этот объект, заканчивающийся выше всех)
-
-            var Ranges = PRS.Ranges;
-
-            var RangesMaxY = Ranges[0].Y1;
-            for ( var Index = 1; Index < Ranges.length; Index++ )
-            {
-                if ( RangesMaxY > Ranges[Index].Y1 )
-                    RangesMaxY = Ranges[Index].Y1;
-            }
-
-            if ( Math.abs(RangesMaxY - PRS.Y) < 0.001  )
-                PRS.Y = RangesMaxY + 1; // смещаемся по 1мм
-            else
-                PRS.Y = RangesMaxY + 0.001; // Добавляем 0.001, чтобы избавиться от погрешности
-
-            // Отмечаем, что данная строка переносится по Y из-за обтекания
-            PRS.RangeY = true;
-
-            // Пересчитываем заново данную строку
-            PRS.Reset_Ranges();
-            PRS.RecalcResult = recalcresult_CurLine;
-
-            return false;
-        }
-
         if ( true === PRS.ForceNewPage )
         {
             this.Pages[CurPage].Set_EndLine( CurLine - 1 );
