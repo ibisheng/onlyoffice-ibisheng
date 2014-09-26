@@ -3517,9 +3517,8 @@ CDocument.prototype =
                                 this.ContentLastChangePos = this.CurPos.ContentPos;
                                 this.Recalculate();
 
-                                this.Interface_Update_ParaPr();
-                                this.Interface_Update_TextPr();
-
+                                this.Document_UpdateInterfaceState();
+                                this.Document_UpdateRulersState();
                                 return;
                             }
                             else if ( this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType() )
@@ -3659,6 +3658,7 @@ CDocument.prototype =
             }
 
             this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
         }
     },
 
