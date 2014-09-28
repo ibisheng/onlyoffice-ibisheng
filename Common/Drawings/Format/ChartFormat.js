@@ -21876,6 +21876,7 @@ CTitle.prototype =
         }
         else if(this.txBody && this.txBody.content)
         {
+            var StartPage = this.txBody.content.StartPage;
             if(!this.tx)
             {
                 this.setTx(new CChartText());
@@ -21885,6 +21886,10 @@ CTitle.prototype =
             var selection_state = this.txBody.content.Get_SelectionState();
             this.txBody = this.tx.rich;
             this.txBody.content.Set_SelectionState(selection_state, selection_state.length - 1);
+            if(isRealNumber(StartPage))
+            {
+                this.txBody.content.Set_StartPage(StartPage);
+            }
             //if(editor && editor.isDocumentEditor)
             //{
             //    this.recalculateContent();
