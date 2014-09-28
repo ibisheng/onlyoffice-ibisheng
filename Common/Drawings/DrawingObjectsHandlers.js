@@ -205,67 +205,70 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
             case historyitem_type_ChartSpace:
             {
                 var ret, i, title;
-                var chart_titles = cur_grouped_object.getAllTitles();
-                for(i = 0; i < chart_titles.length; ++i)
+                if(cur_grouped_object.hit(x, y))
                 {
-                    title = chart_titles[i];
-                    var hit_in_inner_area = title.hitInInnerArea(x, y);
-                    var hit_in_path = title.hitInPath(x, y);
-                    var hit_in_text_rect = title.hitInTextRect(x, y);
-                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    var chart_titles = cur_grouped_object.getAllTitles();
+                    for(i = 0; i < chart_titles.length; ++i)
                     {
-                        if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                        title = chart_titles[i];
+                        var hit_in_inner_area = title.hitInInnerArea(x, y);
+                        var hit_in_path = title.hitInPath(x, y);
+                        var hit_in_text_rect = title.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
-                            drawingObjectsController.checkChartTextSelection();
-                            drawingObjectsController.resetSelection();
-                            drawingObjectsController.selectObject(drawing, pageIndex);
-                            drawingObjectsController.selection.groupSelection = drawing;
-                            drawing.selectObject(cur_grouped_object, pageIndex);
-                            drawing.chartSelection = cur_grouped_object;
-                            drawing.selection.title = title;
-                            cur_grouped_object.selectTitle(title, pageIndex);
-                            drawingObjectsController.updateSelectionState();
-                            return true;
-                        }
-                        else
-                        {
-                            return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
-                        }
-                    }
-                    else if(hit_in_text_rect)
-                    {
-                        if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                        {
-                            drawingObjectsController.checkChartTextSelection();
-                            drawingObjectsController.resetSelection();
-                            drawingObjectsController.selectObject(drawing, pageIndex);
-                            drawingObjectsController.selection.groupSelection = drawing;
-                            drawing.selectObject(cur_grouped_object, pageIndex);
-                            drawing.selection.chartSelection = cur_grouped_object;
-                            cur_grouped_object.selectTitle(title, pageIndex);
-                            cur_grouped_object.selection.textSelection = title;
-                            title.selectionSetStart(e, x, y, pageIndex);
-                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
-                            if(e.ClickCount <= 1)
+                            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                             {
+                                drawingObjectsController.checkChartTextSelection();
+                                drawingObjectsController.resetSelection();
+                                drawingObjectsController.selectObject(drawing, pageIndex);
+                                drawingObjectsController.selection.groupSelection = drawing;
+                                drawing.selectObject(cur_grouped_object, pageIndex);
+                                drawing.chartSelection = cur_grouped_object;
+                                drawing.selection.title = title;
+                                cur_grouped_object.selectTitle(title, pageIndex);
                                 drawingObjectsController.updateSelectionState();
+                                return true;
                             }
-                            return true;
-                        }
-                        else
-                        {
-                            if(drawingObjectsController.document)
+                            else
                             {
-                                var content = title.getDocContent();
-                                var invert_transform_text = title.invertTransformText, tx, ty;
-                                if(content && invert_transform_text)
-                                {
-                                    tx = invert_transform_text.TransformPointX(x, y);
-                                    ty = invert_transform_text.TransformPointY(x, y);
-                                    content.Update_CursorType(tx, ty, pageIndex);
-                                }
+                                return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
                             }
-                            return {objectId: drawing.Get_Id(), cursorType: "text"};
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                            {
+                                drawingObjectsController.checkChartTextSelection();
+                                drawingObjectsController.resetSelection();
+                                drawingObjectsController.selectObject(drawing, pageIndex);
+                                drawingObjectsController.selection.groupSelection = drawing;
+                                drawing.selectObject(cur_grouped_object, pageIndex);
+                                drawing.selection.chartSelection = cur_grouped_object;
+                                cur_grouped_object.selectTitle(title, pageIndex);
+                                cur_grouped_object.selection.textSelection = title;
+                                title.selectionSetStart(e, x, y, pageIndex);
+                                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                                if(e.ClickCount <= 1)
+                                {
+                                    drawingObjectsController.updateSelectionState();
+                                }
+                                return true;
+                            }
+                            else
+                            {
+                                if(drawingObjectsController.document)
+                                {
+                                    var content = title.getDocContent();
+                                    var invert_transform_text = title.invertTransformText, tx, ty;
+                                    if(content && invert_transform_text)
+                                    {
+                                        tx = invert_transform_text.TransformPointX(x, y);
+                                        ty = invert_transform_text.TransformPointY(x, y);
+                                        content.Update_CursorType(tx, ty, pageIndex);
+                                    }
+                                }
+                                return {objectId: drawing.Get_Id(), cursorType: "text"};
+                            }
                         }
                     }
                 }
@@ -282,66 +285,70 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 function handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
     var ret, i, title;
-    var chart_titles = drawing.getAllTitles();
-    var selector = group ? group : drawingObjectsController;
-    for(i = 0; i < chart_titles.length; ++i)
+    if(drawing.hit(x, y))
     {
-        title = chart_titles[i];
-        var hit_in_inner_area = title.hitInInnerArea(x, y);
-        var hit_in_path = title.hitInPath(x, y);
-        var hit_in_text_rect = title.hitInTextRect(x, y);
-        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+        var chart_titles = drawing.getAllTitles();
+        var selector = group ? group : drawingObjectsController;
+        for(i = 0; i < chart_titles.length; ++i)
         {
-            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            title = chart_titles[i];
+            var hit_in_inner_area = title.hitInInnerArea(x, y);
+            var hit_in_path = title.hitInPath(x, y);
+            var hit_in_text_rect = title.hitInTextRect(x, y);
+            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
             {
-                var is_selected =  drawing.selected;
-                drawingObjectsController.checkChartTextSelection();
-                selector.resetSelection();
-                selector.selectObject(drawing, pageIndex);
-                selector.selection.chartSelection = drawing;
-                drawing.selectTitle(title, pageIndex);
-                drawingObjectsController.updateSelectionState();
-                return true;
-            }
-            else
-            {
-                return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
-            }
-        }
-        else if(hit_in_text_rect)
-        {
-            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-            {
-                drawingObjectsController.checkChartTextSelection();
-                selector.resetSelection();
-                selector.selectObject(drawing, pageIndex);
-                selector.selection.chartSelection = drawing;
-                drawing.selectTitle(title, pageIndex);
-                drawing.selection.textSelection = title;
-                title.selectionSetStart(e, x, y, pageIndex);
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
-                if(e.ClickCount <= 1)
+                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
+                    var is_selected =  drawing.selected;
+                    drawingObjectsController.checkChartTextSelection();
+                    selector.resetSelection();
+                    selector.selectObject(drawing, pageIndex);
+                    selector.selection.chartSelection = drawing;
+                    drawing.selectTitle(title, pageIndex);
                     drawingObjectsController.updateSelectionState();
+                    return true;
                 }
-                return true;
-            }
-            else
-            {
-                if(drawingObjectsController.document)
+                else
                 {
-                    var content = title.getDocContent();
-                    var invert_transform_text = title.invertTransformText, tx, ty;
-                    if(content && invert_transform_text)
-                    {
-                        tx = invert_transform_text.TransformPointX(x, y);
-                        ty = invert_transform_text.TransformPointY(x, y);
-                        content.Update_CursorType(tx, ty, pageIndex);
-                    }
+                    return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
                 }
-                return {objectId: drawing.Get_Id(), cursorType: "text"};
+            }
+            else if(hit_in_text_rect)
+            {
+                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                {
+                    drawingObjectsController.checkChartTextSelection();
+                    selector.resetSelection();
+                    selector.selectObject(drawing, pageIndex);
+                    selector.selection.chartSelection = drawing;
+                    drawing.selectTitle(title, pageIndex);
+                    drawing.selection.textSelection = title;
+                    title.selectionSetStart(e, x, y, pageIndex);
+                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                    if(e.ClickCount <= 1)
+                    {
+                        drawingObjectsController.updateSelectionState();
+                    }
+                    return true;
+                }
+                else
+                {
+                    if(drawingObjectsController.document)
+                    {
+                        var content = title.getDocContent();
+                        var invert_transform_text = title.invertTransformText, tx, ty;
+                        if(content && invert_transform_text)
+                        {
+                            tx = invert_transform_text.TransformPointX(x, y);
+                            ty = invert_transform_text.TransformPointY(x, y);
+                            content.Update_CursorType(tx, ty, pageIndex);
+                        }
+                    }
+                    return {objectId: drawing.Get_Id(), cursorType: "text"};
+                }
             }
         }
+
     }
 
     ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
@@ -377,64 +384,67 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
 
 function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex)
 {
-    var ret, i, title;
-    var chart_titles = drawing.getAllTitles();
-    for(i = 0; i < chart_titles.length; ++i)
+    if(drawing.hit(x, y))
     {
-        title = chart_titles[i];
-        var hit_in_inner_area = title.hitInInnerArea(x, y);
-        var hit_in_path = title.hitInPath(x, y);
-        var hit_in_text_rect = title.hitInTextRect(x, y);
-        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+        var ret, i, title;
+        var chart_titles = drawing.getAllTitles();
+        for(i = 0; i < chart_titles.length; ++i)
         {
-            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+            title = chart_titles[i];
+            var hit_in_inner_area = title.hitInInnerArea(x, y);
+            var hit_in_path = title.hitInPath(x, y);
+            var hit_in_text_rect = title.hitInTextRect(x, y);
+            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
             {
-                var is_selected =  drawing.selected;
-                drawingObjectsController.checkChartTextSelection();
-                drawingObjectsController.resetSelection();
-                drawingObjectsController.selectObject(drawing, pageIndex);
-                drawingObjectsController.selection.chartSelection = drawing;
-                drawing.selectTitle(title, pageIndex);
-                drawingObjectsController.updateSelectionState();
-                return true;
-            }
-            else
-            {
-                return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
-            }
-        }
-        else if(hit_in_text_rect)
-        {
-            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-            {
-                drawingObjectsController.checkChartTextSelection();
-                drawingObjectsController.resetSelection();
-                drawingObjectsController.selectObject(drawing, pageIndex);
-                drawingObjectsController.selection.chartSelection = drawing;
-                drawing.selectTitle(title, pageIndex);
-                drawing.selection.textSelection = title;
-                title.selectionSetStart(e, x, y, pageIndex);
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
-                if(e.ClickCount <= 1)
+                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
+                    var is_selected =  drawing.selected;
+                    drawingObjectsController.checkChartTextSelection();
+                    drawingObjectsController.resetSelection();
+                    drawingObjectsController.selectObject(drawing, pageIndex);
+                    drawingObjectsController.selection.chartSelection = drawing;
+                    drawing.selectTitle(title, pageIndex);
                     drawingObjectsController.updateSelectionState();
+                    return true;
                 }
-                return true;
-            }
-            else
-            {
-                if(drawingObjectsController.document)
+                else
                 {
-                    var content = title.getDocContent();
-                    var invert_transform_text = title.invertTransformText, tx, ty;
-                    if(content && invert_transform_text)
-                    {
-                        tx = invert_transform_text.TransformPointX(x, y);
-                        ty = invert_transform_text.TransformPointY(x, y);
-                        content.Update_CursorType(tx, ty, pageIndex);
-                    }
+                    return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
                 }
-                return {objectId: drawing.Get_Id(), cursorType: "text"};
+            }
+            else if(hit_in_text_rect)
+            {
+                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                {
+                    drawingObjectsController.checkChartTextSelection();
+                    drawingObjectsController.resetSelection();
+                    drawingObjectsController.selectObject(drawing, pageIndex);
+                    drawingObjectsController.selection.chartSelection = drawing;
+                    drawing.selectTitle(title, pageIndex);
+                    drawing.selection.textSelection = title;
+                    title.selectionSetStart(e, x, y, pageIndex);
+                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title));
+                    if(e.ClickCount <= 1)
+                    {
+                        drawingObjectsController.updateSelectionState();
+                    }
+                    return true;
+                }
+                else
+                {
+                    if(drawingObjectsController.document)
+                    {
+                        var content = title.getDocContent();
+                        var invert_transform_text = title.invertTransformText, tx, ty;
+                        if(content && invert_transform_text)
+                        {
+                            tx = invert_transform_text.TransformPointX(x, y);
+                            ty = invert_transform_text.TransformPointY(x, y);
+                            content.Update_CursorType(tx, ty, pageIndex);
+                        }
+                    }
+                    return {objectId: drawing.Get_Id(), cursorType: "text"};
+                }
             }
         }
     }
