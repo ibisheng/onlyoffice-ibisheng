@@ -271,7 +271,29 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         shape.setStyle(CreateDefaultShapeStyle());
 
         var geometry = new Geometry();
-        geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
+        var w = xMax - xMin, h = yMax-yMin;
+        var kw, kh, pathW, pathH;
+        if(w > 0)
+        {
+            pathW = 43200;
+            kw = 43200/ w
+        }
+        else
+        {
+            pathW = 0;
+            kw = 0;
+        }
+        if(h > 0)
+        {
+            pathH = 43200;
+            kh = 43200 / h;
+        }
+        else
+        {
+            pathH = 0;
+            kh = 0;
+        }
+        geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, pathW, pathH);
         geometry.AddRect("l", "t", "r", "b");
         for(i = 0;  i< this.path.length; ++i)
         {
@@ -279,17 +301,17 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
             {
                 case 0 :
                 {
-                    geometry.AddPathCommand(1, (this.path[i].x - xMin) + "", (this.path[i].y - yMin) + "");
+                    geometry.AddPathCommand(1, (((this.path[i].x - xMin) * kw) >> 0) + "", (((this.path[i].y - yMin) * kh) >> 0) + "");
                     break;
                 }
                 case 1 :
                 {
-                    geometry.AddPathCommand(2, (this.path[i].x - xMin) + "", (this.path[i].y - yMin) + "");
+                    geometry.AddPathCommand(2, (((this.path[i].x - xMin) * kw) >> 0) + "", (((this.path[i].y - yMin) * kh) >> 0) + "");
                     break;
                 }
                 case 2:
                 {
-                    geometry.AddPathCommand(5, (this.path[i].x1 - xMin) + "", (this.path[i].y1 - yMin) + "", (this.path[i].x2 - xMin) + "", (this.path[i].y2 - yMin) + "", (this.path[i].x3 - xMin) + "", (this.path[i].y3 - yMin) + "");
+                    geometry.AddPathCommand(5, (((this.path[i].x1 - xMin) * kw) >> 0) + "", (((this.path[i].y1 - yMin) * kh) >> 0) + "", (((this.path[i].x2 - xMin)* kw) >> 0) + "", (((this.path[i].y2 - yMin) * kh) >> 0) + "", (((this.path[i].x3 - xMin) * kw) >> 0) + "", (((this.path[i].y3 - yMin) * kh) >> 0) + "");
                     break;
                 }
             }

@@ -174,12 +174,35 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         shape.setStyle(CreateDefaultShapeStyle());
         var geometry = new Geometry();
 
-        geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
+
+        var w = xMax - xMin, h = yMax-yMin;
+        var kw, kh, pathW, pathH;
+        if(w > 0)
+        {
+            pathW = 43200;
+            kw = 43200/ w
+        }
+        else
+        {
+            pathW = 0;
+            kw = 0;
+        }
+        if(h > 0)
+        {
+            pathH = 43200;
+            kh = 43200 / h;
+        }
+        else
+        {
+            pathH = 0;
+            kh = 0;
+        }
+        geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, pathW, pathH);
         geometry.AddRect("l", "t", "r", "b");
-        geometry.AddPathCommand(1, (this.arrPoint[0].x - xMin) + "", (this.arrPoint[0].y - yMin) + "");
+        geometry.AddPathCommand(1, (((this.arrPoint[0].x - xMin) * kw) >> 0) + "", (((this.arrPoint[0].y - yMin) * kh) >> 0) + "");
         for(i = 1;  i< _n; ++i)
         {
-            geometry.AddPathCommand(2, (this.arrPoint[i].x - xMin) + "", (this.arrPoint[i].y - yMin) + "");
+            geometry.AddPathCommand(2, (((this.arrPoint[i].x - xMin) * kw) >> 0) + "", (((this.arrPoint[i].y - yMin) * kh) >> 0) + "");
         }
         if(bClosed)
         {

@@ -422,7 +422,14 @@ Path.prototype = {
         var ch, cw;
         if(this.pathW!=undefined)
         {
-            cw = (gdLst["w"]/this.pathW);
+            if(this.pathW > MOVE_DELTA)
+            {
+                cw = (gdLst["w"]/this.pathW);
+            }
+            else
+            {
+                cw = 0;
+            }
         }
         else
         {
@@ -430,7 +437,14 @@ Path.prototype = {
         }
         if(this.pathH!=undefined)
         {
-            ch = (gdLst["h"]/this.pathH);
+            if(this.pathH > MOVE_DELTA)
+            {
+                ch = (gdLst["h"]/this.pathH);
+            }
+            else
+            {
+                ch = 0;
+            }
         }
         else
         {
