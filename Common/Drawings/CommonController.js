@@ -1789,7 +1789,10 @@ DrawingObjectsController.prototype =
             {
                 chart.setTitle(new CTitle());
             }
-            chart.title.setOverlay(title_show_settings === c_oAscChartTitleShowSettings.overlay);
+            if(chart.title.overlay !== (title_show_settings === c_oAscChartTitleShowSettings.overlay))
+            {
+                chart.title.setOverlay(title_show_settings === c_oAscChartTitleShowSettings.overlay);
+            }
         }
         var plot_area = chart.plotArea;
         //horAxisLabel
@@ -1814,7 +1817,7 @@ DrawingObjectsController.prototype =
                 }
                 if(isRealNumber(LEGEND_POS_MAP[legend_pos_settings]))
                 {
-                    if(chart.legendPos !== LEGEND_POS_MAP[legend_pos_settings])
+                    if(chart.legend.legendPos !== LEGEND_POS_MAP[legend_pos_settings])
                         chart.legend.setLegendPos(LEGEND_POS_MAP[legend_pos_settings]);
                     var b_overlay = c_oAscChartLegendShowSettings.leftOverlay === legend_pos_settings || legend_pos_settings === c_oAscChartLegendShowSettings.rightOverlay;
                     if(chart.legend.overlay !== b_overlay)
@@ -2027,7 +2030,7 @@ DrawingObjectsController.prototype =
                 else
                     need_num_fmt = "0%";
 
-                var b_marker = type ===  c_oAscChartTypeSettings.lineNormalMarker|| type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker;
+                var b_marker = chartSettings.getShowMarker();
 
                 if(chart_type.getObjectType() === historyitem_type_LineChart)
                 {
@@ -2044,8 +2047,8 @@ DrawingObjectsController.prototype =
                             val_axis[i].numFmt.setFormatCode(need_num_fmt);
                     }
 
-                    if(chart_type.marker !== b_marker)
-                        chart_type.setMarker(b_marker);
+                   // if((isRealBool(chart_type.marker) && chart_type.marker) !== b_marker)
+                   //     chart_type.setMarker(b_marker);
                 }
                 else
                 {
@@ -2356,9 +2359,8 @@ DrawingObjectsController.prototype =
 
         chart_type = plot_area.charts[0];
         //подписи данных
-        if(typeof chart_type.setDLbls === "function")
+        if(typeof chart_type.setDLbls === "function" && isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
         {
-            var data_lbls;
             var checkDataLabels = function(chartType)
             {
                 chartType.removeDataLabels();
@@ -2381,13 +2383,17 @@ DrawingObjectsController.prototype =
         {
             if(isRealBool(chartSettings.showMarker))
             {
-                for(var j = 0; j < chart_type.series.length; ++j)
+                //for(var j = 0; j < chart_type.series.length; ++j)
+                //{
+                //    chart_type.series[j].setMarker(null);
+                //}
+                if(chartSettings.showMarker === true)
                 {
-                    chart_type.series[j].setMarker(null);
+                    if(!chart_type.marker)
+                    {
+                        chart_type.setMarker(true);
+                    }
                 }
-                var prop_to_set = chartSettings.showMarker === false ? null : true;
-                chart_type.setMarker(prop_to_set);
-
                 if(chartSettings.showMarker)
                 {
                     for(var j = 0; j < chart_type.series.length; ++j)
@@ -2404,12 +2410,17 @@ DrawingObjectsController.prototype =
                     {
                         if(!chart_type.series[j].marker)
                         {
-                            chart_type.series[j].setMarker(new CMarker());
-                            chart_type.series[j].marker.setSymbol(SYMBOL_NONE);
+                            if(!chart_type.series[j].marker)
+                            {
+                                chart_type.series[j].setMarker(new CMarker());
+                            }
+                            if(chart_type.series[j].marker.symbol !== SYMBOL_NONE)
+                            {
+                                chart_type.series[j].marker.setSymbol(SYMBOL_NONE);
+                            }
                         }
                     }
                 }
-
             }
             if(isRealBool(chartSettings.bLine))
             {
@@ -2435,17 +2446,26 @@ DrawingObjectsController.prototype =
                     for(var j = 0; j < chart_type.series.length; ++j)
                     {
                         removeDPtsFromSeries(chart_type.series[j]);
-                        chart_type.series[j].setSmooth(chartSettings.smooth === true ? true : null);
+                        if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
+                        {
+                            chart_type.series[j].setSmooth(chartSettings.smooth === true);
+                        }
                         if(chart_type.series[j].spPr && chart_type.series[j].spPr.ln)
                         {
                             chart_type.series[j].spPr.setLn(null);
                         }
                     }
                 }
-                chart_type.setSmooth(chartSettings.smooth === true);
+                if(chart_type.smooth !== (chartSettings.smooth === true))
+                {
+                    chart_type.setSmooth(chartSettings.smooth === true);
+                }
                 for(var j = 0; j < chart_type.series.length; ++j)
                 {
-                    chart_type.series[j].setSmooth(chartSettings.smooth === true);
+                    if(chart_type.series[j].smooth !== (chartSettings.smooth === true))
+                    {
+                        chart_type.series[j].setSmooth(chartSettings.smooth === true);
+                    }
                 }
             }
         }
@@ -2662,7 +2682,14 @@ DrawingObjectsController.prototype =
             ret.putSeparator(data_labels.separator);
             ret.putDataLabelsPos(isRealNumber(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]) ? REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos] :  c_oAscChartDataLabelsPos.none);
         }
-
+        else
+        {
+            ret.putShowSerName(false);
+            ret.putShowCatName(false);
+            ret.putShowVal(false);
+            ret.putSeparator("");
+            ret.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
+        }
 
         if(chart.legend)
         {
@@ -2785,7 +2812,27 @@ DrawingObjectsController.prototype =
                     break;
                 }
             }
-            ret.putShowMarker(chart_type.marker === true);
+            var bShowMarker = false;
+            if(chart_type.marker !== false)
+            {
+                for(var j = 0; j < chart_type.series.length; ++j)
+                {
+                    if(!chart_type.series[j].marker)
+                    {
+                        if(!chart_type.series[j].marker)
+                        {
+                            bShowMarker = true;
+                            break;
+                        }
+                        if(chart_type.series[j].marker.symbol !== SYMBOL_NONE)
+                        {
+                            bShowMarker = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            ret.putShowMarker(bShowMarker);
             var b_no_line = true;
             for(var i = 0; i < chart_type.series.length; ++i)
             {

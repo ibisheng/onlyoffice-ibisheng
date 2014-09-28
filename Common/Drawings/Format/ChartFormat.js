@@ -4118,7 +4118,7 @@ CCatAx.prototype =
         var  labelsPosition            = props.getLabelsPosition();
 
 
-        if(isRealNumber(intervalBetweenTick))
+        if(isRealNumber(intervalBetweenTick) && this.tickMarkSkip !== intervalBetweenTick)
             this.setTickMarkSkip(intervalBetweenTick);
 
         if(isRealNumber(intervalBetweenLabelsRule))
@@ -4130,7 +4130,7 @@ CCatAx.prototype =
                     this.setTickLblSkip(null);
                 }
             }
-            else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels))
+            else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels) && this.tickLblSkip !== intervalBetweenLabels)
             {
                 this.setTickLblSkip(intervalBetweenLabels);
             }
@@ -4140,8 +4140,14 @@ CCatAx.prototype =
             this.setScaling(new CScaling());
         var scaling = this.scaling;
         if(isRealBool(invertCatOrder))
-            scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
-        if(isRealNumber(labelsAxisDistance))
+        {
+            var new_orientation = invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX;
+            if(scaling.orientation !== new_orientation)
+            {
+                scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+            }
+        }
+        if(isRealNumber(labelsAxisDistance) && this.lblOffset !== labelsAxisDistance)
             this.setLblOffset(labelsAxisDistance);
 
         if(isRealNumber(axisType))
@@ -4149,13 +4155,13 @@ CCatAx.prototype =
             //TODO
         }
 
-        if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]))
+        if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]) && this.majorTickMark !== MENU_SETTINGS_TICK_MARK[majorTickMark])
             this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
 
-        if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]))
+        if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]) && this.minorTickMark !== MENU_SETTINGS_TICK_MARK[minorTickMark])
             this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
 
-        if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]))
+        if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]) && this.tickLblPos !== MENU_SETTINGS_LABELS_POS[tickLabelsPos])
             this.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
 
 
@@ -4163,26 +4169,50 @@ CCatAx.prototype =
         {
             if(crossesRule === c_oAscCrossesRule.auto)
             {
-                this.crossAx.setCrossesAt(null);
-                this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                if(this.crossAx.crossesAt !== null)
+                {
+                    this.crossAx.setCrossesAt(null);
+                }
+                if(this.crossAx.crosses !== CROSSES_AUTO_ZERO)
+                {
+                    this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                }
             }
             else if(crossesRule === c_oAscCrossesRule.value)
             {
                 if(isRealNumber(crosses))
                 {
-                    this.crossAx.setCrossesAt(crosses);
-                    this.crossAx.setCrosses(null);
+                    if(this.crossAx.crossesAt !== crosses)
+                    {
+                        this.crossAx.setCrossesAt(crosses);
+                    }
+                    if(this.crossAx !== null)
+                    {
+                        this.crossAx.setCrosses(null);
+                    }
                 }
             }
             else if(crossesRule === c_oAscCrossesRule.maxValue)
             {
-                this.crossAx.setCrossesAt(null);
-                this.crossAx.setCrosses(CROSSES_MAX);
+                if(this.crossAx.crossesAt !== null)
+                {
+                    this.crossAx.setCrossesAt(null);
+                }
+                if(this.crossAx.crosses !== CROSSES_MAX)
+                {
+                    this.crossAx.setCrosses(CROSSES_MAX);
+                }
             }
         }
 
         if(isRealNumber(labelsPosition) && isRealObject(this.crossAx) && this.crossAx.setCrossBetween)
-            this.crossAx.setCrossBetween(labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN);
+        {
+            var new_lbl_position = labelsPosition === c_oAscLabelsPosition.byDivisions ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN;
+            if(this.crossAx.crossBetween !== new_lbl_position)
+            {
+                this.crossAx.setCrossBetween(new_lbl_position);
+            }
+        }
     },
 
     getObjectType: function()
@@ -5068,7 +5098,7 @@ CCatAx.prototype =
             }
             case historyitem_CatAxSetMinorGridlines:
             {
-                this.majorGridlines = readObject(r);
+                this.minorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
                     this.parent.parent.parent.handleUpdateGridlines();
@@ -8392,16 +8422,28 @@ CValAx.prototype =
         }
 
         if(isRealBool(props.invertValOrder))
-            scaling.setOrientation(props.invertValOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+        {
+            var new_or = props.invertValOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX;
+            if(scaling.orientation !== new_or)
+            {
+                scaling.setOrientation(new_or);
+            }
+        }
 
 
         if(isRealBool(props.logScale))
         {
-
             if(props.logScale && isRealNumber(props.logBase) && props.logBase >= 2 && props.logBase <=1000)
-                scaling.setLogBase(props.logBase);
-            else if(!props.logBase)
+            {
+                if(scaling.logBase !== props.logBase)
+                {
+                    scaling.setLogBase(props.logBase);
+                }
+            }
+            else if(!props.logBase && scaling.logBase !== null)
+            {
                 scaling.setLogBase(null);
+            }
         }
 
         if(isRealNumber(props.units))
@@ -8421,34 +8463,52 @@ CValAx.prototype =
             }
         }
 
-        if(isRealNumber(props.majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.majorTickMark]))
+        if(isRealNumber(props.majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.majorTickMark]) && this.majorTickMark !== MENU_SETTINGS_TICK_MARK[props.majorTickMark])
             this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[props.majorTickMark]);
 
-        if(isRealNumber(props.minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.minorTickMark]))
+        if(isRealNumber(props.minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.minorTickMark]) && this.minorTickMark !== MENU_SETTINGS_TICK_MARK[props.minorTickMark])
             this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[props.minorTickMark]);
 
-        if(isRealNumber(props.tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]))
+        if(isRealNumber(props.tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]) && this.tickLblPos !== MENU_SETTINGS_LABELS_POS[props.tickLabelsPos])
             this.setTickLblPos(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]);
 
         if(isRealNumber(props.crossesRule) && isRealObject(this.crossAx))
         {
             if(props.crossesRule === c_oAscCrossesRule.auto)
             {
-                this.crossAx.setCrossesAt(null);
-                this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                if(this.crossAx.crossesAt !== null)
+                {
+                    this.crossAx.setCrossesAt(null);
+                }
+                if(this.crossAx.crosses !== CROSSES_AUTO_ZERO)
+                {
+                    this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                }
             }
             else if(props.crossesRule === c_oAscCrossesRule.value)
             {
                 if(isRealNumber(props.crosses))
                 {
-                    this.crossAx.setCrossesAt(props.crosses);
-                    this.crossAx.setCrosses(null);
+                    if(this.crossAx.crossesAt !== props.crosses)
+                    {
+                        this.crossAx.setCrossesAt(props.crosses);
+                    }
+                    if(this.crossAx.crosses !== null)
+                    {
+                        this.crossAx.setCrosses(null);
+                    }
                 }
             }
             else if(props.crossesRule === c_oAscCrossesRule.maxValue)
             {
-                this.crossAx.setCrossesAt(null);
-                this.crossAx.setCrosses(CROSSES_MAX);
+                if(this.crossAx.crossesAt !== null)
+                {
+                    this.crossAx.setCrossesAt(null);
+                }
+                if(this.crossAx.crosses !== CROSSES_MAX)
+                {
+                    this.crossAx.setCrosses(CROSSES_MAX);
+                }
             }
         }
     }
