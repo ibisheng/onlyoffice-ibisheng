@@ -587,7 +587,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 				// Обновляем состояние возможности сохранения документа
-				t._onUpdateDocumentCanSave();
+				t.onUpdateDocumentModified(false);
 			};
 			this.CoAuthoringApi.unSaveChanges();
 			if (!isDocumentSaved)
@@ -3218,6 +3218,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.handlers.trigger("asc_onUnLockComment", lockElem["rangeOrObjectId"]);
 			}
 			return res;
+		};
+
+		spreadsheet_api.prototype.onUpdateDocumentModified = function (bIsModified) {
+			// Обновляем только после окончания сохранения
+			if (this.canSave) {
+				this.handlers.trigger("asc_onDocumentModifiedChanged", bIsModified);
+				this._onUpdateDocumentCanSave();
+			}
 		};
 
 		// offline mode

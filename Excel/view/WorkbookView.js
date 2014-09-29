@@ -474,8 +474,7 @@
 				self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
 			});
 			this.model.handlers.add("setDocumentModified", function (bIsModified) {
-				self.handlers.trigger("asc_onDocumentModifiedChanged", bIsModified);
-				self.Api._onUpdateDocumentCanSave();
+				self.Api.onUpdateDocumentModified(bIsModified);
 			});
 			this.model.handlers.add("initCommentsToSave", function () {
 				self._initCommentsToSave();
