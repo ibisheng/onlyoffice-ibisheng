@@ -2123,28 +2123,33 @@ var gUndoInsDelCellsFlag = true;
 			searchRangeInTableParts: function(range)
 			{
 				var aWs = this._getCurrentWS();
-				var tableRange;
 				var isIntersect = false;
-				var containRange;
 				
-				if(aWs.TableParts)
+				var containRange, tableRange;
+				var tableParts = aWs.TableParts;
+				
+				if(tableParts)
 				{
-					for(var i = 0; i < aWs.TableParts.length; i++)
+					for(var i = 0; i < tableParts.length; i++)
 					{
-						if(aWs.TableParts[i].Ref)
-						{
-							tableRange = aWs.TableParts[i].Ref;	
-						}
+						if(!tableParts[i].Ref)
+							continue;
 						
-						if(tableRange.containsRange(range))
+						tableRange = tableParts[i].Ref;	
+						
+						if(range.isIntersect(tableRange))
 						{
-							containRange = {tableRange: tableRange, id: i};
-							break;
-						}	
-						else if(range.isIntersect(tableRange))
-						{
-							isIntersect = true;
-							break;
+							if(tableRange.containsRange(range))
+							{
+								containRange = {id: i};
+								break;
+							}
+							else
+							{
+								isIntersect = true;
+								break;
+							}
+							
 						}	
 					}
 				}
