@@ -9042,6 +9042,10 @@
 											numFor++;
 										}
 									}
+									else if(isOneMerge && range && range.bbox)
+									{
+										this._getCell(range.bbox.c1, range.bbox.r1).setValue(value2[numStyle].text);
+									}
 									else
 										range.setValue(value2[numStyle].text);
 
