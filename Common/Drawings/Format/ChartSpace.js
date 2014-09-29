@@ -1298,6 +1298,7 @@ CChartSpace.prototype =
         this.recalcInfo.recalculateSeriesColors = true;
         this.recalcInfo.recalculateDLbls = true;
         this.recalcInfo.recalculateAxisLabels = true;
+        this.recalcInfo.recalculateMarkers = true;
         //this.recalcInfo.dataLbls.length = 0;
         //this.recalcInfo.axisLabels.length = 0;
         this.recalcInfo.recalculateAxisVal = true;
