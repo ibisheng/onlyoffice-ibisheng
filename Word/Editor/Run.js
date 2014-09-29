@@ -7967,7 +7967,7 @@ ParaRun.prototype.Math_Apply_Style = function(Value)
 ParaRun.prototype.IsNormalText = function()
 {
     var comp_MPrp = this.MathPrp.GetCompiled_ScrStyles();
-    return comp_MPrp.nor == true;
+    return (comp_MPrp.nor === true);
 }
 ParaRun.prototype.getPropsForWrite = function()
 {
@@ -7981,16 +7981,6 @@ ParaRun.prototype.Math_SetGaps = function(GapsInfo)
     this.Parent = GapsInfo.Parent;
     this.Paragraph = GapsInfo.ParaMath.Paragraph;
     var oWPrp = this.Get_CompiledPr(true);
-
-    //this.Parent.ParaMath.ApplyArgSize(oWPrp, this.Parent.argSize);
-
-    /*if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
-     {
-     oWPrp.Italic = false;
-     oWPrp.Bold   = false;
-     }*/
-
-    //g_oTextMeasurer.SetFont(oWPrp);
 
     for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
     {
@@ -8027,14 +8017,6 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
 ParaRun.prototype.IsAccent = function()
 {
     return this.Parent.IsAccent();
-}
-ParaRun.prototype.Math_ApplyGaps = function()
-{
-    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
-    {
-        this.Content[Pos].ApplyGaps();
-        this.size.width += this.Content[Pos].GapLeft + this.Content[Pos].GapRight;
-    }
 }
 ParaRun.prototype.GetCompiled_ScrStyles = function()
 {

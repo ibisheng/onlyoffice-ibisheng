@@ -830,8 +830,17 @@ CMPrp.prototype =
     {
         var textPrp = new CTextPr();
 
-        textPrp.Italic = this.sty == STY_BI || this.sty == STY_ITALIC;
-        textPrp.Bold   = this.sty == STY_BI || this.sty == STY_BOLD;
+        if(this.sty == undefined)
+        {
+            textPrp.Italic = true;
+            textPrp.Bold   = false;
+        }
+        else
+        {
+            textPrp.Italic = this.sty == STY_BI || this.sty == STY_ITALIC;
+            textPrp.Bold   = this.sty == STY_BI || this.sty == STY_BOLD;
+        }
+
 
         return textPrp;
     },
