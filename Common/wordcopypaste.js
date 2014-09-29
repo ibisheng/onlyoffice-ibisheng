@@ -560,7 +560,7 @@ CopyProcessor.prototype =
         {
             case para_Text:
                 //���������� �����������
-                var sValue = String.fromCharCode(ParaItem.Value);
+                var sValue = encodeSurrogateChar(ParaItem.Value);
                 if(sValue)
                     sRes += CopyPasteCorrectString(sValue);
                 break;
@@ -5602,14 +5602,27 @@ PasteProcessor.prototype =
                         this._commit_rPr(oTargetNode, bUseOnlyInherit);
                         for(var i = 0, length = value.length; i < length; i++)
                         {
-                            var Char = value.charAt(i);
-                            var Code = value.charCodeAt(i);
-                            var Item;
-                            if(32 == Code || 160 == Code) //160 - nbsp
-                                Item = new ParaSpace();
+                            var nUnicode = null;
+                            var nCharCode = value.charCodeAt(i);
+                            if (isLeadingSurrogateChar(nCharCode)) {
+                                if (i + 1 < length) {
+                                    i++;
+                                    var nTrailingChar = value.charCodeAt(i);
+                                    nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+                                }
+                            }
                             else
-                                Item = new ParaText( value[i] );
-                            this._Paragraph_Add( Item );
+                                nUnicode = nCharCode;
+                            if (null != nUnicode) {
+                                var Item;
+                                if (0x20 != nUnicode && 0xA0 != nUnicode) {
+                                    Item = new ParaText();
+                                    Item.Value = nUnicode;
+                                }
+                                else
+                                    Item = new ParaSpace();
+                                this._Paragraph_Add(Item);
+                            }
                         }
                     }
                 }
@@ -5968,14 +5981,27 @@ PasteProcessor.prototype =
 						}
                         for(var i = 0, length = value.length; i < length; i++)
                         {
-                            var Char = value.charAt(i);
-                            var Code = value.charCodeAt(i);
-                            var Item;
-                            if(32 == Code || 160 == Code) //160 - nbsp
-                                Item = new ParaSpace();
+                            var nUnicode = null;
+                            var nCharCode = value.charCodeAt(i);
+                            if (isLeadingSurrogateChar(nCharCode)) {
+                                if (i + 1 < length) {
+                                    i++;
+                                    var nTrailingChar = value.charCodeAt(i);
+                                    nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+                                }
+                            }
                             else
-                                Item = new ParaText( value[i] );
-                            shape.paragraphAdd(Item);
+                                nUnicode = nCharCode;
+                            if (null != nUnicode) {
+                                var Item;
+                                if (0x20 != nUnicode && 0xA0 != nUnicode) {
+                                    Item = new ParaText();
+                                    Item.Value = nUnicode;
+                                }
+                                else
+                                    Item = new ParaSpace();
+                                shape.paragraphAdd(Item);
+                            }
                         }
 
                     }

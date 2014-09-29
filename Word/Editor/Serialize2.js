@@ -3748,7 +3748,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             switch ( item.Type )
             {
                 case para_Text:
-                    sCurText += String.fromCharCode(item.Value);
+                    sCurText += encodeSurrogateChar(item.Value);
                     break;
                 case para_Space:
                     sCurText += " ";
@@ -7542,12 +7542,30 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					this.oCurComments[i] += text;
 			}
 			for (var i = 0; i < text.length; ++i)
-            {
-                if (text[i] != ' ')
-                    oPos.run.Add_ToContent(oPos.pos, new ParaText(text[i]), false);
-                else
-                    oPos.run.Add_ToContent(oPos.pos, new ParaSpace(), false);
-                oPos.pos++;
+			{
+			    var nUnicode = null;
+			    var nCharCode = text.charCodeAt(i);
+			    if (isLeadingSurrogateChar(nCharCode))
+			    {
+			        if(i + 1 < text.length)
+			        {
+			            i++;
+			            var nTrailingChar = text.charCodeAt(i);
+			            nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+			        }
+			    }
+			    else
+			        nUnicode = nCharCode;
+			    if (null != nUnicode) {
+			        if (0x20 != nUnicode) {
+			            var oNewParaText = new ParaText();
+			            oNewParaText.Value = nUnicode;
+			            oPos.run.Add_ToContent(oPos.pos, oNewParaText, false);
+			        }
+			        else
+			            oPos.run.Add_ToContent(oPos.pos, new ParaSpace(), false);
+			        oPos.pos++;
+			    }
             }
         }
         else if (c_oSerRunType.tab === type)
