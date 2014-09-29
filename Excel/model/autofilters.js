@@ -2123,43 +2123,27 @@ var gUndoInsDelCellsFlag = true;
 			searchRangeInTableParts: function(range)
 			{
 				var aWs = this._getCurrentWS();
-				var isIntersect = false;
-				
-				var containRange, tableRange;
+				var containRangeId = -1, tableRange;
 				var tableParts = aWs.TableParts;
 				
 				if(tableParts)
 				{
-					for(var i = 0; i < tableParts.length; i++)
+					for(var i = 0; i < tableParts.length; ++i)
 					{
-						if(!tableParts[i].Ref)
+						if (!(tableRange = tableParts[i].Ref))
 							continue;
 						
-						tableRange = tableParts[i].Ref;	
-						
-						if(range.isIntersect(tableRange))
-						{
-							if(tableRange.containsRange(range))
-							{
-								containRange = {id: i};
-								break;
-							}
-							else
-							{
-								isIntersect = true;
-								break;
-							}
-							
+						if (range.isIntersect(tableRange)) {
+							containRangeId = tableRange.containsRange(range) ? i : -2;
+							break;
 						}	
 					}
 				}
-				
-				if(isIntersect === true)//если выделена часть форматир. таблицы, то отправляем false
-					return  false;
-				else if(containRange)//если форматировання таблица входит в данный диапазон
-					return containRange;
-				else//если диапазон не затрагивает форматированную таблицу
-					return null;
+
+				//если выделена часть форматир. таблицы, то отправляем -2
+				//если форматировання таблица входит в данный диапазон, то id
+				//если диапазон не затрагивает форматированную таблицу, то -1
+				return containRangeId;
 			},
 			
 			checkApplyFilterOrSort: function(tablePartId)
@@ -2167,7 +2151,7 @@ var gUndoInsDelCellsFlag = true;
 				var aWs = this._getCurrentWS();
 				var result = false;
 				
-				if(tablePartId !== undefined)
+				if(-1 !== tablePartId)
 				{
 					var tablePart = aWs.TableParts[tablePartId];
 					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))

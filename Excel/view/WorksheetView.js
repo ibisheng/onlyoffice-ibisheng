@@ -6404,25 +6404,15 @@
 
 			cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
 			cell_info.valign = c.getAlignVertical().toLowerCase();
-			
-			//null - disable, true - pressed button, false - unpressed button
-			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
+
 			var checkApplyFilterOrSort;
-			cell_info.isFormatTable = (null !== tablePartsOptions);
-			if(tablePartsOptions === null)
-			{
-				checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort();
-				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
-				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
-			}
-			else if(tablePartsOptions === false)
-			{
+			var tablePartsOptions = this.autoFilters.searchRangeInTableParts(activeCell);
+			cell_info.isFormatTable = (-1 !== tablePartsOptions);
+			if (-2 === tablePartsOptions) {
 				cell_info.isAutoFilter = null;
 				cell_info.clearFilter = false;
-			}
-			else
-			{
-				checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id);
+			} else {
+				checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions);
 				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
 				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
