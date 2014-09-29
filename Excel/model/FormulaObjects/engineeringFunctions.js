@@ -644,7 +644,7 @@ Complex.prototype = {
             return new cError( cErrorType.not_numeric );
         }
 
-        switch ( pStr.pStr[0] ) {
+        switch ( pStr.pStr[0]+"" ) {
             case '-':   // imag part follows
             case '+':
             {
@@ -677,7 +677,7 @@ Complex.prototype = {
                     return this;
                 }
                 break;
-            case 0:     // only real-part
+            case "undefined":     // only real-part
                 this.real = f.f;
                 this.img = 0.0;
                 return this;
@@ -686,22 +686,22 @@ Complex.prototype = {
     },
     ParseDouble:function ( rp, rRet ) {
 
-        function IsNum( c ) {
+        function isnum( c ) {
             return c >= '0' && c <= '9';
         }
 
 
-        function IsComma( c ) {
+        function iscomma( c ) {
             return c == '.' || c == ',';
         }
 
 
-        function IsExpStart( c ) {
+        function isexpstart( c ) {
             return c == 'e' || c == 'E';
         }
 
 
-        function IsImagUnit( c ) {
+        function isimagunit( c ) {
             return c == 'i' || c == 'j';
         }
 
@@ -712,16 +712,16 @@ Complex.prototype = {
             nMaxExp = 307,
             nDigCnt = 18, // max. number of digits to read in, rest doesn't matter
             State = {
-                S_End:0,
-                S_Sign:1,
-                S_IntStart:2,
-                S_Int:3,
-                S_IgnoreIntDigs:4,
-                S_Frac:5,
-                S_IgnoreFracDigs:6,
-                S_ExpSign:7,
-                S_Exp:8
-            }, eS = State.S_Sign,
+                end:0,
+                sign:1,
+                intstart:2,
+                int:3,
+                ignoreintdigs:4,
+                frac:5,
+                ignorefracdigs:6,
+                expsign:7,
+                exp:8
+            }, eS = State.sign,
             bNegNum = false,
             bNegExp = false,
             p = rp.pStr, c, i = 0;
@@ -729,36 +729,36 @@ Complex.prototype = {
         while ( eS ) {
             c = p[i];
             switch ( eS ) {
-                case State.S_Sign:
-                    if ( IsNum( c ) ) {
+                case State.sign:
+                    if ( isnum( c ) ) {
                         fInt = parseFloat( c );
                         nDigCnt--;
-                        eS = State.S_Int;
+                        eS = State.int;
                     }
                     else if ( c == '-' ) {
                         bNegNum = true;
-                        eS = State.S_IntStart;
+                        eS = State.intstart;
                     }
                     else if ( c == '+' ) {
-                        eS = State.S_IntStart;
+                        eS = State.intstart;
                     }
-                    else if ( IsComma( c ) ) {
-                        eS = State.S_Frac;
+                    else if ( iscomma( c ) ) {
+                        eS = State.frac;
                     }
                     else {
                         return false;
                     }
                     break;
-                case State.S_IntStart:
-                    if ( IsNum( c ) ) {
+                case State.intstart:
+                    if ( isnum( c ) ) {
                         fInt = parseFloat( c );
                         nDigCnt--;
-                        eS = State.S_Int;
+                        eS = State.int;
                     }
-                    else if ( IsComma( c ) ) {
-                        eS = State.S_Frac;
+                    else if ( iscomma( c ) ) {
+                        eS = State.frac;
                     }
-                    else if ( IsImagUnit( c ) ) {
+                    else if ( isimagunit( c ) ) {
                         rRet.f = 0.0;
                         return true;
                     }
@@ -766,80 +766,80 @@ Complex.prototype = {
                         return false;
                     }
                     break;
-                case State.S_Int:
-                    if ( IsNum( c ) ) {
+                case State.int:
+                    if ( isnum( c ) ) {
                         fInt *= 10.0;
                         fInt += parseFloat( c );
                         nDigCnt--;
                         if ( !nDigCnt ) {
-                            eS = State.S_IgnoreIntDigs;
+                            eS = State.ignoreintdigs;
                         }
                     }
-                    else if ( IsComma( c ) ) {
-                        eS = State.S_Frac;
+                    else if ( iscomma( c ) ) {
+                        eS = State.frac;
                     }
-                    else if ( IsExpStart( c ) ) {
-                        eS = State.S_ExpSign;
+                    else if ( isexpstart( c ) ) {
+                        eS = State.expsign;
                     }
                     else {
-                        eS = State.S_End;
+                        eS = State.end;
                     }
                     break;
-                case State.S_IgnoreIntDigs:
-                    if ( IsNum( c ) ) {
+                case State.ignoreintdigs:
+                    if ( isnum( c ) ) {
                         nExp++;
                     }     // just multiply num with 10... ;-)
-                    else if ( IsComma( c ) ) {
-                        eS = State.S_Frac;
+                    else if ( iscomma( c ) ) {
+                        eS = State.frac;
                     }
-                    else if ( IsExpStart( c ) ) {
-                        eS = State.S_ExpSign;
+                    else if ( isexpstart( c ) ) {
+                        eS = State.expsign;
                     }
                     else {
-                        eS = State.S_End;
+                        eS = State.end;
                     }
                     break;
-                case State.S_Frac:
-                    if ( IsNum( c ) ) {
+                case State.frac:
+                    if ( isnum( c ) ) {
                         fFrac += parseFloat( c ) * fMult;
                         nDigCnt--;
                         if ( nDigCnt ) {
                             fMult *= 0.1;
                         }
                         else {
-                            eS = State.S_IgnoreFracDigs;
+                            eS = State.ignorefracdigs;
                         }
                     }
-                    else if ( IsExpStart( c ) ) {
-                        eS = State.S_ExpSign;
+                    else if ( isexpstart( c ) ) {
+                        eS = State.expsign;
                     }
                     else {
-                        eS = State.S_End;
+                        eS = State.end;
                     }
                     break;
-                case State.S_IgnoreFracDigs:
-                    if ( IsExpStart( c ) ) {
-                        eS = State.S_ExpSign;
+                case State.ignorefracdigs:
+                    if ( isexpstart( c ) ) {
+                        eS = State.expsign;
                     }
-                    else if ( !IsNum( c ) ) {
-                        eS = State.S_End;
+                    else if ( !isnum( c ) ) {
+                        eS = State.end;
                     }
                     break;
-                case State.S_ExpSign:
-                    if ( IsNum( c ) ) {
+                case State.expsign:
+                    if ( isnum( c ) ) {
                         nExp = parseFloat( c );
-                        eS = State.S_Exp;
+                        eS = State.exp;
                     }
                     else if ( c == '-' ) {
                         bNegExp = true;
-                        eS = State.S_Exp;
+                        eS = State.exp;
                     }
                     else if ( c != '+' ) {
-                        eS = State.S_End;
+                        eS = State.end;
                     }
                     break;
-                case State.S_Exp:
-                    if ( IsNum( c ) ) {
+                case State.exp:
+                    if ( isnum( c ) ) {
                         nExp *= 10;
                         nExp += parseFloat( c );
                         if ( nExp > nMaxExp ) {
@@ -847,10 +847,10 @@ Complex.prototype = {
                         }
                     }
                     else {
-                        eS = State.S_End;
+                        eS = State.end;
                     }
                     break;
-                case State.S_End:     // to avoid compiler warning
+                case State.end:     // to avoid compiler warning
                     break;      // loop exits anyway
             }
 
