@@ -294,18 +294,7 @@ CCoeffGaps.prototype =
         return coeff;
 
     },
-    checkOperSign: function(code) // "+", "-", "<", ">", "±"
-    {
-        var PLUS       = 0x2B,
-            //MINUS    = 0x2212,
-            MINUS      = 0x2D,
-            LESS       = 0x3C,
-            GREATER    = 0x3E,
-            PLUS_MINUS = 0xB1;
-
-        return code == PLUS || code == MINUS || code == LESS || code == GREATER || code == PLUS_MINUS;
-    },
-    new_checkOperSign: function(code) // "+", "-", "±"
+    checkOperSign: function(code) // "+", "-", "±"
     {
         var PLUS       = 0x2B,
             MINUS      = 0x2D,
