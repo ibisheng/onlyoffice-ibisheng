@@ -232,8 +232,6 @@ function CCoeffGaps()
     {
         left:   new CGaps(0.52, 0.26, 0, 0.52),
         right:  new CGaps(0.49, 0, 0, 0.49)
-        //left:   new CGaps(0.52, 0.26, 0, 2.5),
-        //right:  new CGaps(0.49, 0, 0, 2)
     };
 
     this.Mult =
@@ -266,7 +264,6 @@ CCoeffGaps.prototype =
     {
         var operator = null;
 
-        //if(codeCurr == 0x3D)
         if(this.checkEqualSign(codeCurr))
             operator = this.Equal;
         else if(this.checkOperSign(codeCurr))
@@ -283,7 +280,6 @@ CCoeffGaps.prototype =
             coeff = part.letters;
         else if(this.checkOperSign(codeLR))
             coeff = part.sign;
-        //else if(codeLR == 0x3D )
         else if(this.checkEqualSign(codeLR))
             coeff = part.equal;
         else if(this.checkZeroSign(codeLR, direct))
@@ -292,7 +288,6 @@ CCoeffGaps.prototype =
             coeff = part.letters;
 
         return coeff;
-
     },
     checkOperSign: function(code) // "+", "-", "±"
     {
@@ -317,7 +312,6 @@ CCoeffGaps.prototype =
     },
     checkZeroSign: function(code, direct) // "*", "/", "\"
     {
-        //var MULT     = 0x2217,
         var MULT     = 0x2A,
             DIVISION = 0x2F,
             B_SLASH  = 0x5C;
@@ -933,62 +927,6 @@ CMathContent.prototype =
     init: function()
     {
 
-    },
-    addTxt: function(txt)
-    {
-        var Pos = this.CurPos;
-
-        for(var i = 0; i < txt.length; i++)
-        {
-            this.addLetter( txt.charCodeAt(i));
-        }
-
-        this.setLogicalPosition(this.CurPos);
-        //this.setStart_Selection(this.CurPos);
-        //this.selection.active = false;
-
-        var EndPos = this.CurPos;
-
-        var items = this.content.slice(Pos, EndPos);
-
-        return items;
-    },
-    addLetter: function(code)
-    {
-        this.verifyRPrp_Letter();
-
-        /*var gps = null;
-        if(code == 0x002B || code == 0x002F || code == 0x002A || code == 0x002D)
-        {
-            //l_gap = r_gap = Math.floor( this.font.FontSize / 5 ) *g_dKoef_pix_to_mm;
-            l_gap = r_gap = 0;
-            gps = new dist(l_gap, r_gap, 0, 0);
-        }
-        else
-            gps = new dist(0,0,0,0);*/
-
-        //собственно добавляем сам элемент
-
-        if(code == 42)      // "*"
-            code = 8727;
-        else if(code == 45) // "-"
-            code = 8722;
-
-        if(this.bDot)
-        {
-            if(code === 0x69)
-                code = 0x1D6A4;
-            if(code === 0x6A)
-                code =  0x1D6A5;
-        }
-
-        var symb = new CMathText(false);
-        symb.add(code);
-
-        this.addToContent(symb);
-        var item = this.content[this.CurPos];
-
-        return [item];
     },
     addElementToContent: function(obj)   //for "read"
     {
@@ -4309,10 +4247,6 @@ CMathContent.prototype =
 
         return flag;
     },
-    IsCurrentPlh: function()
-    {
-        return this.IsPlaceholder();
-    },
     IsJustDraw: function()
     {
         return false;
@@ -4389,47 +4323,6 @@ CMathContent.prototype =
 
     /// For Para Math
 
-    old_Recalculate_CurPos : function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
-    {
-        var result;
-
-        var PointInfo = new CMathPointInfo();
-        PointInfo.SetInfoPoints(this.InfoPoints);
-
-        if(this.RecalcInfo.bEqqArray)
-        {
-            _X = this.pos.x + this.ParaMath.X + PointInfo.GetAlign();
-            Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-
-            for(var i = 0; i < this.CurPos; i++)
-            {
-                if(this.content[this.CurPos].Type == para_Math_Run)
-                    this.content[i].Recalculate_CurPos(_X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-                else
-                    _X += this.content[i].size.width;
-            }
-
-            result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-
-        }
-        else
-        {
-            if(this.content[this.CurPos].Type == para_Math_Composition)
-            {
-                result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-            }
-            else if(this.content[this.CurPos].Type == para_Math_Run)
-            {
-                Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-                _X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos];
-
-
-                result = this.content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
-            }
-        }
-
-        return result;
-    },
     Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         X = this.pos.x + this.ParaMath.X;
@@ -4489,7 +4382,6 @@ CMathContent.prototype =
     {
         this.ArgSize.SetValue(val);
     },
-
 
     /////////   Перемещение     ////////////
 

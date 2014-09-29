@@ -782,10 +782,6 @@ CMathBase.prototype =
 
         this.bSelectionUse = false;
     },
-    IsCurrentPlh:   function()
-    {
-        return this.elements[this.CurPos_X][this.CurPos_Y].IsCurrentPlh();
-    },
     SetGaps:  function(GapsInfo)
     {
         this.Parent   = GapsInfo.Parent;
