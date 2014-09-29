@@ -2124,6 +2124,9 @@ var gUndoInsDelCellsFlag = true;
 			{
 				var aWs = this._getCurrentWS();
 				var tableRange;
+				var isIntersect = false;
+				var containRange;
+				
 				if(aWs.TableParts)
 				{
 					for(var i = 0; i < aWs.TableParts.length; i++)
@@ -2131,13 +2134,27 @@ var gUndoInsDelCellsFlag = true;
 						if(aWs.TableParts[i].Ref)
 						{
 							tableRange = aWs.TableParts[i].Ref;	
-						}; // ToDo ';' в конце } ставить не стоить
+						}
 						
-						if(range.isIntersect(tableRange))
-							return {tableRange: tableRange, id: i};
+						if(tableRange.containsRange(range))
+						{
+							containRange = {tableRange: tableRange, id: i};
+							break;
+						}	
+						else if(range.isIntersect(tableRange))
+						{
+							isIntersect = true;
+							break;
+						}	
 					}
 				}
-				return null;
+				
+				if(isIntersect === true)//если выделена часть форматир. таблицы, то отправляем false
+					return  false;
+				else if(containRange)//если форматировання таблица входит в данный диапазон
+					return containRange;
+				else//если диапазон не затрагивает форматированную таблицу
+					return null;
 			},
 			
 			checkApplyFilterOrSort: function(tablePartId)
@@ -2151,9 +2168,9 @@ var gUndoInsDelCellsFlag = true;
 					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
 						result = {isFilterColumns: true, isAutoFilter: true};
 					else if(tablePart.Ref && tablePart.AutoFilter && tablePart.AutoFilter !== null)
-						result = {isFilterColumns: null, isAutoFilter: true};
+						result = {isFilterColumns: false, isAutoFilter: true};
 					else
-						result = {isFilterColumns: null, isAutoFilter: false};
+						result = {isFilterColumns: false, isAutoFilter: false};
 				}
 				else
 				{
@@ -2163,11 +2180,11 @@ var gUndoInsDelCellsFlag = true;
 					}
 					else if(aWs.AutoFilter)
 					{
-						result = {isFilterColumns: null, isAutoFilter: true};
+						result = {isFilterColumns: false, isAutoFilter: true};
 					}
 					else
 					{
-						result = {isFilterColumns: null, isAutoFilter: false};
+						result = {isFilterColumns: false, isAutoFilter: false};
 					}
 				}
 				

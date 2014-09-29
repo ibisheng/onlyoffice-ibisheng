@@ -6415,19 +6415,16 @@
 				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
 				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
+			else if(tablePartsOptions === false)
+			{
+				cell_info.isAutoFilter = null;
+				cell_info.clearFilter = false;
+			}
 			else
 			{
-				if(tablePartsOptions.tableRange.containsRange(activeCell))
-				{
-					checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id);
-					cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
-					cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
-				}
-				else
-				{
-					cell_info.isAutoFilter = null;
-					cell_info.clearFilter = null;
-				}
+				checkApplyFilterOrSort = this.autoFilters.checkApplyFilterOrSort(tablePartsOptions.id);
+				cell_info.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
+				cell_info.clearFilter = checkApplyFilterOrSort.isFilterColumns;
 			}
 			
 			cell_info.styleName = c.getStyleName();
