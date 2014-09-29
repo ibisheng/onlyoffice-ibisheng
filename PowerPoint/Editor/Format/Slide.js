@@ -755,9 +755,10 @@ Slide.prototype =
         }
     },
 
-    changeSize: function(kw, kh)
+    changeSize: function(width, height)
     {
-        this.setSlideSize(this.Width*kw, this.Height*kh);
+        var kw = width/this.Width, kh = height/this.Height;
+        this.setSlideSize(width, height);
         for(var i = 0; i < this.cSld.spTree.length; ++i)
         {
             this.cSld.spTree[i].changeSize(kw, kh);

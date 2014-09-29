@@ -507,7 +507,10 @@ function BinaryPPTYLoader()
 
             var _sl_count = s.GetULong();
             for (var i = 0; i < _sl_count; i++)
+            {
                 this.presentation.slideLayouts[i] = this.ReadSlideLayout();
+                this.presentation.slideLayouts[i].setSlideSize(this.presentation.Width, this.presentation.Height);
+            }
         }
 
         if (!this.IsThemeLoader)
@@ -519,7 +522,10 @@ function BinaryPPTYLoader()
 
                 var _s_count = s.GetULong();
                 for (var i = 0; i < _s_count; i++)
+                {
                     this.presentation.insertSlide(i, this.ReadSlide(i)) ;
+                    this.presentation.Slides[i].setSlideSize(this.presentation.Width, this.presentation.Height);
+                }
             }
 
             if (undefined != _main_tables["25"])

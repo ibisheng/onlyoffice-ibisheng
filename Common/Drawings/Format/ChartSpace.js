@@ -11978,7 +11978,7 @@ CPageSetup.prototype =
 
 };
 
-function CreateLineChart(chartSeries, type)
+function CreateLineChart(chartSeries, type, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12039,16 +12039,19 @@ function CreateLineChart(chartSeries, type)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
         if(parsedHeaders.bTop)
         {
@@ -12057,16 +12060,19 @@ function CreateLineChart(chartSeries, type)
             cat.setStrRef(new CStrRef());
             var str_ref = cat.strRef;
             str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
+            if(bUseCache)
             {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                var cat_num_cache = asc_series[i].Cat.NumCache;
+                str_cache.setPtCount(cat_num_cache.length);
+                for(var j= 0; j < cat_num_cache.length; ++j)
+                {
+                    var string_pt = new CStringPoint();
+                    string_pt.setIdx(j);
+                    string_pt.setVal(cat_num_cache[j].val);
+                    str_cache.addPt(string_pt);
+                }
             }
         }
         if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
@@ -12076,13 +12082,16 @@ function CreateLineChart(chartSeries, type)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
         line_chart.addSer(series);
     }
@@ -12143,7 +12152,7 @@ function CreateLineChart(chartSeries, type)
     return chart_space;
 }
 
-function CreateBarChart(chartSeries, type)
+function CreateBarChart(chartSeries, type, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12192,16 +12201,19 @@ function CreateBarChart(chartSeries, type)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
         if(parsedHeaders.bTop)
         {
@@ -12210,16 +12222,19 @@ function CreateBarChart(chartSeries, type)
             cat.setStrRef(new CStrRef());
             var str_ref = cat.strRef;
             str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
+            if(bUseCache)
             {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
+               str_ref.setStrCache(new CStrCache());
+               var str_cache = str_ref.strCache;
+               var cat_num_cache = asc_series[i].Cat.NumCache;
+               str_cache.setPtCount(cat_num_cache.length);
+               for(var j= 0; j < cat_num_cache.length; ++j)
+               {
+                   var string_pt = new CStringPoint();
+                   string_pt.setIdx(j);
+                   string_pt.setVal(cat_num_cache[j].val);
+                   str_cache.addPt(string_pt);
+               }
             }
         }
         if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
@@ -12229,13 +12244,16 @@ function CreateBarChart(chartSeries, type)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
         bar_chart.addSer(series);
     }
@@ -12300,7 +12318,7 @@ function CreateBarChart(chartSeries, type)
     return chart_space;
 }
 
-function CreateHBarChart(chartSeries, type)
+function CreateHBarChart(chartSeries, type, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12347,16 +12365,19 @@ function CreateHBarChart(chartSeries, type)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
 
         if(parsedHeaders.bTop)
@@ -12366,16 +12387,19 @@ function CreateHBarChart(chartSeries, type)
             cat.setStrRef(new CStrRef());
             var str_ref = cat.strRef;
             str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
+            if(bUseCache)
             {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                var cat_num_cache = asc_series[i].Cat.NumCache;
+                str_cache.setPtCount(cat_num_cache.length);
+                for(var j= 0; j < cat_num_cache.length; ++j)
+                {
+                    var string_pt = new CStringPoint();
+                    string_pt.setIdx(j);
+                    string_pt.setVal(cat_num_cache[j].val);
+                    str_cache.addPt(string_pt);
+                }
             }
         }
         if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
@@ -12385,13 +12409,16 @@ function CreateHBarChart(chartSeries, type)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
 
         bar_chart.addSer(series);
@@ -12462,7 +12489,7 @@ function CreateHBarChart(chartSeries, type)
     return chart_space;
 }
 
-function CreateAreaChart(chartSeries, type)
+function CreateAreaChart(chartSeries, type, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12509,16 +12536,19 @@ function CreateAreaChart(chartSeries, type)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
 
         if(parsedHeaders.bTop)
@@ -12528,16 +12558,19 @@ function CreateAreaChart(chartSeries, type)
             cat.setStrRef(new CStrRef());
             var str_ref = cat.strRef;
             str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
+            if(bUseCache)
             {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                var cat_num_cache = asc_series[i].Cat.NumCache;
+                str_cache.setPtCount(cat_num_cache.length);
+                for(var j= 0; j < cat_num_cache.length; ++j)
+                {
+                    var string_pt = new CStringPoint();
+                    string_pt.setIdx(j);
+                    string_pt.setVal(cat_num_cache[j].val);
+                    str_cache.addPt(string_pt);
+                }
             }
         }
         if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
@@ -12547,13 +12580,16 @@ function CreateAreaChart(chartSeries, type)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
 
         area_chart.addSer(series);
@@ -12620,7 +12656,7 @@ function CreateAreaChart(chartSeries, type)
     return chart_space;
 }
 
-function CreatePieChart(chartSeries, bDoughnut)
+function CreatePieChart(chartSeries, bDoughnut, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12648,16 +12684,19 @@ function CreatePieChart(chartSeries, bDoughnut)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
 
         if(parsedHeaders.bTop)
@@ -12667,16 +12706,19 @@ function CreatePieChart(chartSeries, bDoughnut)
             cat.setStrRef(new CStrRef());
             var str_ref = cat.strRef;
             str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
+            if(bUseCache)
             {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                var cat_num_cache = asc_series[i].Cat.NumCache;
+                str_cache.setPtCount(cat_num_cache.length);
+                for(var j= 0; j < cat_num_cache.length; ++j)
+                {
+                    var string_pt = new CStringPoint();
+                    string_pt.setIdx(j);
+                    string_pt.setVal(cat_num_cache[j].val);
+                    str_cache.addPt(string_pt);
+                }
             }
         }
         if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
@@ -12686,13 +12728,16 @@ function CreatePieChart(chartSeries, bDoughnut)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
 
         pie_chart.addSer(series);
@@ -12726,7 +12771,7 @@ function CreatePieChart(chartSeries, bDoughnut)
     return chart_space;
 }
 
-function CreateScatterChart(chartSeries)
+function CreateScatterChart(chartSeries, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12773,16 +12818,19 @@ function CreateScatterChart(chartSeries)
             x_val.setNumRef(new CNumRef());
             var num_ref = x_val.numRef;
             num_ref.setF(first_series.Val.Formula);
-            num_ref.setNumCache(new CNumLit());
-            var num_cache = num_ref.numCache;
-            num_cache.setPtCount(first_series.Val.NumCache.length);
-            for(var j = 0; j < first_series.Val.NumCache.length; ++j)
+            if(bUseCache)
             {
-                var pt = new CNumericPoint();
-                pt.setIdx(j);
-                pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
-                pt.setVal(first_series.Val.NumCache[j].val);
-                num_cache.addPt(pt);
+                num_ref.setNumCache(new CNumLit());
+                var num_cache = num_ref.numCache;
+                num_cache.setPtCount(first_series.Val.NumCache.length);
+                for(var j = 0; j < first_series.Val.NumCache.length; ++j)
+                {
+                    var pt = new CNumericPoint();
+                    pt.setIdx(j);
+                    pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
+                    pt.setVal(first_series.Val.NumCache[j].val);
+                    num_cache.addPt(pt);
+                }
             }
         }
         series.setYVal(new CYVal());
@@ -12790,16 +12838,19 @@ function CreateScatterChart(chartSeries)
         y_val.setNumRef(new CNumRef());
         var num_ref = y_val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
         //if(parsedHeaders.bTop)
         //{
@@ -12879,15 +12930,10 @@ function CreateScatterChart(chartSeries)
     page_margins.setT(0.75);
     page_margins.setHeader(0.3);
     page_margins.setFooter(0.3);
-
-
-
-
-
     return chart_space;
 }
 
-function CreateStockChart(chartSeries)
+function CreateStockChart(chartSeries, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -12949,16 +12995,19 @@ function CreateStockChart(chartSeries)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
 
         if(parsedHeaders.bTop)
@@ -12971,21 +13020,24 @@ function CreateStockChart(chartSeries)
                 cat.setNumRef(new CNumRef());
                 var num_ref = cat.numRef;
                 num_ref.setF(asc_series[i].Cat.Formula);
-                num_ref.setNumCache(new CNumLit());
-                var num_cache = num_ref.numCache;
-                var cat_num_cache = asc_series[i].Cat.NumCache;
-                num_cache.setPtCount(cat_num_cache.length);
-                num_cache.setFormatCode(asc_series[i].Cat.formatCode);
-                for(var j= 0; j < cat_num_cache.length; ++j)
+                if(bUseCache)
                 {
-                    var pt = new CNumericPoint();
-                    pt.setIdx(j);
-                    pt.setVal(cat_num_cache[j].val);
-                    if(cat_num_cache[j].numFormatStr !== asc_series[i].Cat.formatCode)
+                    num_ref.setNumCache(new CNumLit());
+                    var num_cache = num_ref.numCache;
+                    var cat_num_cache = asc_series[i].Cat.NumCache;
+                    num_cache.setPtCount(cat_num_cache.length);
+                    num_cache.setFormatCode(asc_series[i].Cat.formatCode);
+                    for(var j= 0; j < cat_num_cache.length; ++j)
                     {
-                        pt.setFormatCode(cat_num_cache[j].numFormatStr);
+                        var pt = new CNumericPoint();
+                        pt.setIdx(j);
+                        pt.setVal(cat_num_cache[j].val);
+                        if(cat_num_cache[j].numFormatStr !== asc_series[i].Cat.formatCode)
+                        {
+                            pt.setFormatCode(cat_num_cache[j].numFormatStr);
+                        }
+                        num_cache.addPt(pt);
                     }
-                    num_cache.addPt(pt);
                 }
             }
             else
@@ -12993,16 +13045,19 @@ function CreateStockChart(chartSeries)
                 cat.setStrRef(new CStrRef());
                 var str_ref = cat.strRef;
                 str_ref.setF(asc_series[i].Cat.Formula);
-                str_ref.setStrCache(new CStrCache());
-                var str_cache = str_ref.strCache;
-                var cat_num_cache = asc_series[i].Cat.NumCache;
-                str_cache.setPtCount(cat_num_cache.length);
-                for(var j= 0; j < cat_num_cache.length; ++j)
+                if(bUseCache)
                 {
-                    var string_pt = new CStringPoint();
-                    string_pt.setIdx(j);
-                    string_pt.setVal(cat_num_cache[j].val);
-                    str_cache.addPt(string_pt);
+                    str_ref.setStrCache(new CStrCache());
+                    var str_cache = str_ref.strCache;
+                    var cat_num_cache = asc_series[i].Cat.NumCache;
+                    str_cache.setPtCount(cat_num_cache.length);
+                    for(var j= 0; j < cat_num_cache.length; ++j)
+                    {
+                        var string_pt = new CStringPoint();
+                        string_pt.setIdx(j);
+                        string_pt.setVal(cat_num_cache[j].val);
+                        str_cache.addPt(string_pt);
+                    }
                 }
             }
 
@@ -13014,13 +13069,16 @@ function CreateStockChart(chartSeries)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
 
         line_chart.addSer(series);
@@ -13164,7 +13222,7 @@ function CreateScatterAxis()
     return {valAx: val_ax, catAx: cat_ax};
 }
 
-function CreateRadarChart(chartSeries)
+function CreateRadarChart(chartSeries, bUseCache)
 {
     var asc_series = chartSeries.series;
     var chart_space = new CChartSpace();
@@ -13209,16 +13267,19 @@ function CreateRadarChart(chartSeries)
         val.setNumRef(new CNumRef());
         var num_ref = val.numRef;
         num_ref.setF(asc_series[i].Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
-        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        if(bUseCache)
         {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
-            pt.setVal(asc_series[i].Val.NumCache[j].val);
-            num_cache.addPt(pt);
+            num_ref.setNumCache(new CNumLit());
+            var num_cache = num_ref.numCache;
+            num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+            for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+            {
+                var pt = new CNumericPoint();
+                pt.setIdx(j);
+                pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+                pt.setVal(asc_series[i].Val.NumCache[j].val);
+                num_cache.addPt(pt);
+            }
         }
         if(parsedHeaders.bTop)
         {
@@ -13227,17 +13288,21 @@ function CreateRadarChart(chartSeries)
             cat.setStrRef(new CStrRef());
             var str_ref = cat.strRef;
             str_ref.setF(asc_series[i].Cat.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            var cat_num_cache = asc_series[i].Cat.NumCache;
-            str_cache.setPtCount(cat_num_cache.length);
-            for(var j= 0; j < cat_num_cache.length; ++j)
+            if(bUseCache)
             {
-                var string_pt = new CStringPoint();
-                string_pt.setIdx(j);
-                string_pt.setVal(cat_num_cache[j].val);
-                str_cache.addPt(string_pt);
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                var cat_num_cache = asc_series[i].Cat.NumCache;
+                str_cache.setPtCount(cat_num_cache.length);
+                for(var j= 0; j < cat_num_cache.length; ++j)
+                {
+                    var string_pt = new CStringPoint();
+                    string_pt.setIdx(j);
+                    string_pt.setVal(cat_num_cache[j].val);
+                    str_cache.addPt(string_pt);
+                }
             }
+
         }
         if(parsedHeaders.bLeft && asc_series[i].TxCache && typeof asc_series[i].TxCache.Formula === "string" && asc_series[i].TxCache.Formula.length > 0)
         {
@@ -13246,13 +13311,16 @@ function CreateRadarChart(chartSeries)
             tx.setStrRef(new CStrRef());
             var str_ref = tx.strRef;
             str_ref.setF(asc_series[i].TxCache.Formula);
-            str_ref.setStrCache(new CStrCache());
-            var str_cache = str_ref.strCache;
-            str_cache.setPtCount(1);
-            str_cache.addPt(new CStringPoint());
-            var pt = str_cache.pt[0];
-            pt.setIdx(0);
-            pt.setVal(asc_series[i].TxCache.Tx);
+            if(bUseCache)
+            {
+                str_ref.setStrCache(new CStrCache());
+                var str_cache = str_ref.strCache;
+                str_cache.setPtCount(1);
+                str_cache.addPt(new CStringPoint());
+                var pt = str_cache.pt[0];
+                pt.setIdx(0);
+                pt.setVal(asc_series[i].TxCache.Tx);
+            }
         }
         bar_chart.addSer(series);
     }

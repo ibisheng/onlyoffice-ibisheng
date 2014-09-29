@@ -2945,41 +2945,41 @@ DrawingObjectsController.prototype =
         ret.type = calc_chart_type;
         return ret;
     },
-	_getChartSpace: function (chartSeries, options) {
+	_getChartSpace: function (chartSeries, options, bUseCache) {
 		switch (options.type) {
 			case c_oAscChartTypeSettings.lineNormal:
 			case c_oAscChartTypeSettings.lineNormalMarker:
-				return CreateLineChart(chartSeries, GROUPING_STANDARD);
+				return CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache);
 			case c_oAscChartTypeSettings.lineStacked:
 			case c_oAscChartTypeSettings.lineStackedMarker:
-				return CreateLineChart(chartSeries, GROUPING_STACKED);
+				return CreateLineChart(chartSeries, GROUPING_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.lineStackedPer:
 			case c_oAscChartTypeSettings.lineStackedPerMarker:
-				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED);
+				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.barNormal:
-				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED);
+				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache);
 			case c_oAscChartTypeSettings.barStacked:
-				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED);
+				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.barStackedPer:
-				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED);
+				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.hBarNormal:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED);
+				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache);
 			case c_oAscChartTypeSettings.hBarStacked:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED);
+				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.hBarStackedPer:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED);
+				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.areaNormal:
-				return CreateAreaChart(chartSeries, GROUPING_STANDARD);
+				return CreateAreaChart(chartSeries, GROUPING_STANDARD, bUseCache);
 			case c_oAscChartTypeSettings.areaStacked:
-				return CreateAreaChart(chartSeries, GROUPING_STACKED);
+				return CreateAreaChart(chartSeries, GROUPING_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.areaStackedPer:
-				return CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED);
+				return CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache);
 			case c_oAscChartTypeSettings.stock:
-				return CreateStockChart(chartSeries);
+				return CreateStockChart(chartSeries, bUseCache);
 			case c_oAscChartTypeSettings.doughnut:
-				return CreatePieChart(chartSeries, true);
+				return CreatePieChart(chartSeries, true, bUseCache);
 			case c_oAscChartTypeSettings.pie:
-				return CreatePieChart(chartSeries, false);
+				return CreatePieChart(chartSeries, false, bUseCache);
 			case c_oAscChartTypeSettings.scatter:
 			case c_oAscChartTypeSettings.scatterLine:
 			case c_oAscChartTypeSettings.scatterLineMarker:
@@ -2987,7 +2987,7 @@ DrawingObjectsController.prototype =
 			case c_oAscChartTypeSettings.scatterNone:
 			case c_oAscChartTypeSettings.scatterSmooth:
 			case c_oAscChartTypeSettings.scatterSmoothMarker:
-				return CreateScatterChart(chartSeries);
+				return CreateScatterChart(chartSeries, bUseCache);
 			// radar return CreateRadarChart(chartSeries);
 		}
 
@@ -3017,7 +3017,7 @@ DrawingObjectsController.prototype =
         }
         else if(isRealObject(chart))
         {
-            ret = DrawingObjectsController.prototype._getChartSpace.call(this, chart, options);
+            ret = DrawingObjectsController.prototype._getChartSpace.call(this, chart, options, true);
             ret.setBDeleted(false);
             ret.setStyle(2);
             ret.setSpPr(new CSpPr());

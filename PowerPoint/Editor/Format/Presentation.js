@@ -2552,7 +2552,7 @@ CPresentation.prototype =
 
                 this.Width = Data.oldW;
                 this.Height = Data.oldH;
-                this.changeSlideSizeFunction(kw, kh);
+                this.changeSlideSizeFunction(this.Width, this.Height);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
 
                 break;
@@ -2595,7 +2595,7 @@ CPresentation.prototype =
                 var kh = Data.newH/this.Height;
                 this.Width = Data.newW;
                 this.Height = Data.newH;
-                this.changeSlideSizeFunction(kw, kh);
+                this.changeSlideSizeFunction(this.Width, this.Height);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
@@ -3056,15 +3056,10 @@ CPresentation.prototype =
         _new_master.presentation = this;
         var _master_width = _new_master.Width;
         var _master_height = _new_master.Height;
-        if(_master_height !== this.Height || _master_width !== this.Width)
+        themeInfo.Master.changeSize(this.Width, this.Height);
+        for(i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
         {
-            var kw = this.Width/_master_width;
-            var kh = this.Height/_master_height;
-            themeInfo.Master.changeSize(kw, kh);
-            for(i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
-            {
-                themeInfo.Master.sldLayoutLst[i].changeSize(kw, kh);
-            }
+            themeInfo.Master.sldLayoutLst[i].changeSize(this.Width, this.Height);
         }
         var slides_array = [];
         for(i = 0; i < arr_ind.length; ++i)
@@ -3092,22 +3087,22 @@ CPresentation.prototype =
         this.Document_UpdateInterfaceState();
     },
 
-    changeSlideSizeFunction: function(kw, kh)
+    changeSlideSizeFunction: function(width, height)
     {
         ExecuteNoHistory(function()
         {
             for(var i = 0; i < this.slideMasters.length; ++i)
             {
-                this.slideMasters[i].changeSize(kw, kh);
+                this.slideMasters[i].changeSize(width, height);
                 var master = this.slideMasters[i];
                 for(var j = 0; j < master.sldLayoutLst.length; ++j)
                 {
-                    master.sldLayoutLst[j].changeSize(kw, kh);
+                    master.sldLayoutLst[j].changeSize(width, height);
                 }
             }
             for(var i = 0; i < this.Slides.length; ++i)
             {
-                this.Slides[i].changeSize(kw, kh);
+                this.Slides[i].changeSize(width, height);
             }
         }, this, []);
     },
@@ -3118,11 +3113,9 @@ CPresentation.prototype =
         {
             History.Create_NewPoint();
             History.Add(this, {Type: historyitem_Presentation_SlideSize, oldW: this.Width, newW: width, oldH: this.Height, newH:  height});
-            var kw = width/this.Width;
-            var kh = height/this.Height;
             this.Width = width;
             this.Height = height;
-            this.changeSlideSizeFunction(kw, kh);
+            this.changeSlideSizeFunction(this.Width, this.Height);
             this.Recalculate();
         }
     },
@@ -3543,9 +3536,8 @@ CPresentation.prototype =
                 this.Height = h;
                 CollaborativeEditing.ScaleX = kw;
                 CollaborativeEditing.ScaleY = kh;
-                this.changeSlideSizeFunction(kw, kh);
+                this.changeSlideSizeFunction(this.Width, this.Height);
                 editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
-
                 break;
             }
             case historyitem_Presentation_AddSlideMaster:
