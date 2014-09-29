@@ -3038,12 +3038,10 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         else
         {
 
-            var StretchLng = stretch;
+            var bNotStretchDelim = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false;
+                //bNotStretchAccent = this.type == OPER_ACCENT && this.typeOper == ACCENT_TILDE;
 
-            var bNotStretchDelim = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false,
-                bNotStretchAccent = this.type == OPER_ACCENT && this.typeOper == ACCENT_TILDE;
-
-            var StretchLng = bNotStretchDelim || bNotStretchAccent ? 0 : stretch;
+            var StretchLng = bNotStretchDelim /*|| bNotStretchAccent*/ ? 0 : stretch;
 
             this.operator.fixSize(StretchLng);
             dims = this.operator.getCoordinateGlyph();

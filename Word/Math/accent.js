@@ -233,6 +233,15 @@ CAccentTilde.prototype.calcSize = function(stretch)
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
 
+    var augm = 0.9*stretch/width;
+
+    if(augm < 1)
+        augm = 1;
+    else if (augm > 2)
+        augm = 2;
+
+    width *= augm;
+
     return {width: width, height: height};
 }
 CAccentTilde.prototype.calcCoord = function(stretch)
@@ -276,15 +285,19 @@ CAccentTilde.prototype.calcCoord = function(stretch)
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
+    var Width = stretch/alpha;
+    var augm = Width/X[13] * 0.5;
+
 
     for(var i = 0; i < X.length; i++)
     {
-        XX[i] = X[i]*alpha;
+        XX[i] = X[i]*alpha*augm;
         YY[i] = (Y[5] - Y[i])*alpha*0.65; // сжали !
     }
 
-    var W = XX[13],
-        H = YY[5];
+    var H = YY[5];
+    var W = XX[13];
+
 
     return {XX: XX, YY: YY, W: W, H: H};
 }
