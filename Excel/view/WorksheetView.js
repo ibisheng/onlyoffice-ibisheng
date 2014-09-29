@@ -9026,7 +9026,9 @@
 									var numStyle = 0;
 									if(skipFormat != null && noSkipVal!= null)
 										numStyle = noSkipVal;
-									if(newVal.getFormula()){
+										
+									//formula	
+									if(newVal.getFormula() && !isOneMerge){
 										var offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId),
 											assemb,
 											_p_ = new parserFormula(value2[numFormula].sFormula,"",range.worksheet);
@@ -9043,44 +9045,58 @@
 									else
 										range.setValue(value2[numStyle].text);
 
-									range.setBold(value2[numStyle].format.b);
-									range.setItalic(value2[numStyle].format.i);
-									range.setStrikeout(value2[numStyle].format.s);
-									if(!isOneMerge && value2[numStyle].format && null != value2[numStyle].format.c)
-										range.setFontcolor(value2[numStyle].format.c);
-									range.setUnderline(value2[numStyle].format.u);
-									range.setFontname(value2[numStyle].format.fn);
-									range.setFontsize(value2[numStyle].format.fs);
+									if(!isOneMerge)//settings for text
+									{
+										range.setBold(value2[numStyle].format.b);
+										range.setItalic(value2[numStyle].format.i);
+										range.setStrikeout(value2[numStyle].format.s);
+										if(value2[numStyle].format && null != value2[numStyle].format.c)
+											range.setFontcolor(value2[numStyle].format.c);
+										range.setUnderline(value2[numStyle].format.u);
+										range.setFontname(value2[numStyle].format.fn);
+										range.setFontsize(value2[numStyle].format.fs);
+									}
 								}
 								else
 									range.setValue2(value2);
 
-								range.setAlignVertical(newVal.getAlignVertical());
-								if(!isOneMerge)
-									range.setAlignHorizontal(newVal.getAlignHorizontal());
-								if(!isOneMerge)
-									range.setBorderSrc(newVal.getBorderFull());
-
-								var numFormat = newVal.getNumFormat();
-								var nameFormat;
-								if(numFormat && numFormat.sFormat)
-									nameFormat = numFormat.sFormat;
-								if(nameFormat)
-									range.setNumFormat(nameFormat);
-
-								range.setFill(newVal.getFill());
-
-								range.setWrap(newVal.getWrap());
-
-								var angle = newVal.getAngle();
-								if(angle)
-									range.setAngle(angle);
-
-								var hyperLink =  newVal.getHyperlink();
-								if(hyperLink != null)
+								
+								if(!isOneMerge)//settings for cell
 								{
-									hyperLink.Ref = range;
-									range.setHyperlink(hyperLink);
+									//vertical align
+									range.setAlignVertical(newVal.getAlignVertical());
+									
+									//horizontal align
+									range.setAlignHorizontal(newVal.getAlignHorizontal());
+									//borders
+									range.setBorderSrc(newVal.getBorderFull());
+									
+									//format
+									var numFormat = newVal.getNumFormat();
+									var nameFormat;
+									if(numFormat && numFormat.sFormat)
+										nameFormat = numFormat.sFormat;
+									if(nameFormat)
+										range.setNumFormat(nameFormat);
+
+									//fill
+									range.setFill(newVal.getFill());
+
+									//wrap
+									range.setWrap(newVal.getWrap());
+
+									//angle
+									var angle = newVal.getAngle();
+									if(angle)
+										range.setAngle(angle);
+
+									//hyperLink
+									var hyperLink =  newVal.getHyperlink();
+									if(hyperLink != null)
+									{
+										hyperLink.Ref = range;
+										range.setHyperlink(hyperLink);
+									}
 								}
 							}
 						}
