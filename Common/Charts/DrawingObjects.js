@@ -3927,7 +3927,7 @@ function DrawingObjects() {
             }
             if(bNeedRecalc)
             {
-                _this.controller.recalculate();
+                _this.controller.recalculate2();
                 _this.showDrawingObjects(true);
             }
         }, _this, []);

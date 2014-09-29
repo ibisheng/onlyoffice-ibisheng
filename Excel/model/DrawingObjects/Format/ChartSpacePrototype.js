@@ -152,17 +152,19 @@ CChartSpace.prototype.handleUpdateStyle = function()
     this.recalcInfo.recalculatePen = true;
     this.addToRecalculate();
 };
+
 CChartSpace.prototype.handleUpdateFill = function()
 {
     this.recalcInfo.recalculatePenBrush = true;
+    this.recalcInfo.recalculateBrush = true;
     this.recalcInfo.recalculateChart = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateLn = function()
 {
     this.recalcInfo.recalculatePenBrush = true;
+    this.recalcInfo.recalculatePen = true;
     this.recalcInfo.recalculateChart = true;
-    this.setRecalculateInfo();
     this.addToRecalculate();
 };
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
