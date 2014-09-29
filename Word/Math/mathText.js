@@ -67,13 +67,7 @@ CMathText.prototype =
     constructor: CMathText,
     add: function(code)
     {
-        if(code == 0x2A)      // "*"
-            code = 0x2217;
-        else if(code == 0x2D) // "-"
-            code = 0x2212;
-
         this.value = code;
-
     },
 	addTxt: function(txt)
 	{
@@ -104,7 +98,12 @@ CMathText.prototype =
         // Mathematical Alphanumeric Characters
         // http://www.w3.org/TR/2014/REC-xml-entity-names-20140410/Overview.html#alphabets
 
-        if(Scr == TXT_ROMAN)
+        if(code == 0x2A)      // "*"
+            code = 0x2217;
+        else if(code == 0x2D) // "-"
+            code = 0x2212;
+
+        else if(Scr == TXT_ROMAN)
         {
             if(Sty == STY_ITALIC)
             {

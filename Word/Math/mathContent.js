@@ -242,10 +242,16 @@ function CCoeffGaps()
         right:  new CGaps(0, 0, 0, 0.49)
     };
 
-    this.Equal =
+    /*this.Equal =
     {
         left:   new CGaps(0.35, 0, 0, 0.7),
         right:  new CGaps(0.25, 0, 0, 0.5)
+    };*/
+
+    this.Equal =
+    {
+        left:   new CGaps(0, 0, 0, 0.7),
+        right:  new CGaps(0, 0, 0, 0.5)
     };
 
     this.Default =
@@ -260,11 +266,12 @@ CCoeffGaps.prototype =
     {
         var operator = null;
 
-        if(codeCurr == 0x3D)
+        //if(codeCurr == 0x3D)
+        if(this.checkEqualSign(codeCurr))
             operator = this.Equal;
         else if(this.checkOperSign(codeCurr))
             operator = this.Sign;
-        else if(codeCurr == 0x2217)
+        else if(codeCurr == 0x2A)
             operator = this.Mult;
         else
             operator = this.Default;
@@ -276,9 +283,10 @@ CCoeffGaps.prototype =
             coeff = part.letters;
         else if(this.checkOperSign(codeLR))
             coeff = part.sign;
-        else if(codeLR == 0x3D )
+        //else if(codeLR == 0x3D )
+        else if(this.checkEqualSign(codeLR))
             coeff = part.equal;
-        else if(codeLR == this.checkZEROSign(codeLR))
+        else if(this.checkZeroSign(codeLR, direct))
             coeff = part.zeroOper;
         else
             coeff = part.letters;
@@ -289,42 +297,44 @@ CCoeffGaps.prototype =
     checkOperSign: function(code) // "+", "-", "<", ">", "±"
     {
         var PLUS       = 0x2B,
-            MINUS      = 0x2212,
+            //MINUS    = 0x2212,
+            MINUS      = 0x2D,
             LESS       = 0x3C,
             GREATER    = 0x3E,
             PLUS_MINUS = 0xB1;
 
         return code == PLUS || code == MINUS || code == LESS || code == GREATER || code == PLUS_MINUS;
     },
-    new_checkOperSign: function(code) // "+", "-", "<", ">", "±"
+    new_checkOperSign: function(code) // "+", "-", "±"
     {
         var PLUS       = 0x2B,
-            MINUS      = 0x2212,
-            LESS       = 0x3C,
-            GREATER    = 0x3E,
+            MINUS      = 0x2D,
             PLUS_MINUS = 0xB1;
 
-        var MATH_SiGN     = code == PLUS || code == MINUS || code == LESS || code == GREATER || code == PLUS_MINUS;
-        var ARROWS        = (code >= 0x2190 && code <= 0x21B3) || (code == 0x21B6) || (code == 0x21B7) || (code >= 0x21BA && code <= 0x21E9) && (code >=0x21F4 && code <=0x21FF);
+        return code == PLUS || code == MINUS || code == PLUS_MINUS;
+    },
+    checkEqualSign: function(code)
+    {
+        var COMPARE       = code == 0x3C || code == 0x3E; // LESS, GREATER
+        var ARROWS        = (code >= 0x2190 && code <= 0x21B3) || (code == 0x21B6) || (code == 0x21B7) || (code >= 0x21BA && code <= 0x21E9) || (code >=0x21F4 && code <= 0x21FF);
+        var INTERSECTION  = code >= 0x2223 && code <= 0x222A;
         var EQUALS        = (code >= 0x2234 && code <= 0x22BD) || (code >= 0x22C4 && code <= 0x22FF);
         var ARR_FISHES    = (code >= 0x27DA && code <= 0x27E5) || (code >= 0x27EC && code <= 0x297F);
         var TRIANGLE_SYMB = code >= 0x29CE && code <= 0x29D7;
-        var OTH_SYMB      = code == 0x29DF || (code >= 0x29E1 && code <= 0x29E7) || (code >= 0x29F4 && code <= 0x29F8) || (code >= 0x2A22 && code <= 0x2AF0) || (code >= 0x2AF2 && code <= 0x2AFB)|| code == 0x2AFD || code == 0x2AFE;
+        var OTH_SYMB      = code == 0x29DF || (code >= 0x29E1 && code <= 0x29E7) || (code >= 0x29F4 && code <= 0x29F8) || (code >= 0x2A22 && code <= 0x2AF0) || (code >= 0x2AF2 && code <= 0x2AFB) || code == 0x2AFD || code == 0x2AFE;
 
 
-        return MATH_SiGN || ARROWS || EQUALS || ARR_FISHES || TRIANGLE_SYMB || OTH_SYMB;
-        //return code == PLUS || code == MINUS || code == LESS || code == GREATER || code == PLUS_MINUS;
+        return COMPARE || ARROWS || INTERSECTION || EQUALS || ARR_FISHES || TRIANGLE_SYMB || OTH_SYMB;
     },
-    checkZEROSign: function(code, direct) // "*", "/", "\"
+    checkZeroSign: function(code, direct) // "*", "/", "\"
     {
-        var MULT     = 0x2217,
+        //var MULT     = 0x2217,
+        var MULT     = 0x2A,
             DIVISION = 0x2F,
             B_SLASH  = 0x5C;
 
         var bOper = code == MULT || code == DIVISION || code == B_SLASH;
-
         var bLeftBracket = direct == -1 && (code == 0x28 || code == 0x5B || code == 0x7B);
-
         var bRightBracket = direct == 1 && (code == 0x29 || code == 0x5D || code == 0x7D);
 
 
@@ -394,7 +404,7 @@ function CMathGapsInfo(oMeasure, Parent, argSize)
 }
 CMathGapsInfo.prototype =
 {
-    old_checkGapsSign: function(oMeasure, posCurr)
+    /*old_checkGapsSign: function(oMeasure, posCurr)
     {
         var left = null,
             right = null;
@@ -473,7 +483,7 @@ CMathGapsInfo.prototype =
 
                     if(bLeft)
                     {
-                        if(this.checkZEROSign(leftCode))
+                        if(this.checkZeroSign(leftCode))
                             coeffLeft = 0;
                         else if(leftCode == EQUAL)
                             coeffLeft = 0.26;
@@ -483,7 +493,7 @@ CMathGapsInfo.prototype =
 
                     if(bRight)
                     {
-                        var bZero = this.checkZEROSign(rightCode);
+                        var bZero = this.checkZeroSign(rightCode);
                         if(rightCode == EQUAL || bZero)
                             coeffRight = 0;
                         else
@@ -496,7 +506,7 @@ CMathGapsInfo.prototype =
 
                     if(bLeft)
                     {
-                        var bZeroLeft = this.checkZEROSign(leftCode),
+                        var bZeroLeft = this.checkZeroSign(leftCode),
                             bOperLeft = this.checkOperSign(leftCode);
 
                         if(leftCode == EQUAL || bOperLeft || bZeroLeft)
@@ -507,7 +517,7 @@ CMathGapsInfo.prototype =
 
                     if(bRight)
                     {
-                        var bZeroRight = this.checkZEROSign(rightCode),
+                        var bZeroRight = this.checkZeroSign(rightCode),
                             bOperRight = this.checkOperSign(rightCode);
 
                         if(rightCode == EQUAL || bOperRight || bZeroRight)
@@ -523,7 +533,7 @@ CMathGapsInfo.prototype =
 
                     if(bLeft)
                     {
-                        var bZero = this.checkZEROSign(leftCode);
+                        var bZero = this.checkZeroSign(leftCode);
                         if(leftCode == EQUAL || bZero)
                             coeffLeft = 0;
                         else if(this.checkOperSign(leftCode))
@@ -534,7 +544,7 @@ CMathGapsInfo.prototype =
 
                     if(bRight)
                     {
-                        var bZero = this.checkZEROSign(rightCode);
+                        var bZero = this.checkZeroSign(rightCode);
                         if(rightCode == EQUAL || bZero)
                             coeffRight = 0;
                         else if(this.checkOperSign(rightCode))
@@ -602,7 +612,7 @@ CMathGapsInfo.prototype =
             this.content[posCurr].gaps.left  = Math.ceil(coeffLeft*gapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
             this.content[posCurr].gaps.right = Math.ceil(coeffRight*gapSign*10)/10;
 
-            /*if(this.bRoot)
+            *//*if(this.bRoot)
              {
              if(bSign)
              {
@@ -620,10 +630,10 @@ CMathGapsInfo.prototype =
              console.log("gap left :  " + this.content[posCurr].gaps.left + ",  gap right :  " + this.content[posCurr].gaps.right);
              console.log("");
              }
-             }*/
+             }*//*
         }
 
-    },
+    },*/
     setGaps: function()
     {
         if(this.argSize < 0)
@@ -643,7 +653,6 @@ CMathGapsInfo.prototype =
             if(this.Current.Type == para_Math_Text)
             {
                 var currCode = this.Current.getCodeChr();
-
 
                 if(this.Left !== null)
                 {
@@ -882,7 +891,6 @@ CMPrp.prototype =
 
 //TODO
 //пересмотреть this.dW и this.dH
-
 
 
 function CMathContent()
