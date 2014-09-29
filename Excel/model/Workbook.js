@@ -2904,7 +2904,7 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop){
 		History.SetSelectionRedo(oSelection);
 	}
 	var fProcessRow = function(row){
-		if(row && row.h != height)
+		if(row)
 		{
 			var oOldProps = row.getHeightProp();
 			row.h = height;
