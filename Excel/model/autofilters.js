@@ -2168,15 +2168,14 @@ var gUndoInsDelCellsFlag = true;
 					else
 					{
 						result = {isFilterColumns: null, isAutoFilter: false};
-					};
-				};
+					}
+				}
 				
 				return result;
 			},
 			
 			getAddFormatTableOptions: function(activeCells)
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var objOptions = new AddFormatTableOptions();
 				/*var isMAddFilter = this._searchFilters(activeCells,false,ws,aWs);
@@ -2301,7 +2300,7 @@ var gUndoInsDelCellsFlag = true;
 									{
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
-									};
+									}
 								}
 								else	
 									isPart = true;	
@@ -2724,7 +2723,7 @@ var gUndoInsDelCellsFlag = true;
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**(для пользовательского фильтра они уже туда добавлены выше)
 				var isPress;
 				if(customFilter)
-					isPress = true
+					isPress = true;
 				else
 				{
 					//массив преобразован в нужный вид true/false/hidden, здесь получаем Dates или Values
@@ -2765,7 +2764,7 @@ var gUndoInsDelCellsFlag = true;
 							{
 								if(this._dataFilterParse(arrVal[h],valActive))
 									isConsist = h;
-							};
+							}
 							
 							if(isConsist == undefined)//создаём новый элемент дата
 							{
@@ -2775,7 +2774,7 @@ var gUndoInsDelCellsFlag = true;
 								valActive.Day = dataVal.d;
 								valActive.Month = dataVal.month + 1;
 								valActive.Year = dataVal.year;
-							};
+							}
 							
 							if(array[i] == true && isConsist == undefined)//добавляем значение в конец
 								arrVal[arrVal.length] = valActive;

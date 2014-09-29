@@ -161,12 +161,14 @@
 			this.hyperlink = null;
 			this.comments = [];
 			this.isLocked = false;
-			this.isFormatTable = false;
+			this.isFormatTable = false;	// Нужен для disable возможности делать merge
 			this.styleName = null;
 			this.numFormatType = null;
 			this.angle = null;
-			this.clearFilter = null;
-			this.isAutoFilter = false;
+			this.clearFilter = false;	// Кнопка очистить фильтр: false - disable, true - pressed button
+			this.isAutoFilter = false;	// Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
+										// - null - мы в пересечении с таблицой (но не полностью в ней)
+										// - true/false - когда мы полностью в таблице или вне ее (true/false в зависимости от того применен фильтр или нет)
 		}
 
 		asc_CCellInfo.prototype = {
