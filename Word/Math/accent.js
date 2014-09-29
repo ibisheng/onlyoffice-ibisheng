@@ -27,7 +27,7 @@ CAccentCircumflex.prototype.calcSize = function(stretch)
     var width = 3.88*alpha;
     var height = 3.175*alpha;
 
-    var augm = 0.9*stretch/width;
+    var augm = 0.8*stretch/width;
 
     if(augm < 1)
         augm = 1;
