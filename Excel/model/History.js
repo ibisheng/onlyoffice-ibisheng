@@ -270,11 +270,11 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 				wsViews[i].objectRender.controller.recalculate2(true);
 			}
 		}
-		var wsView = window["Asc"]["editor"].wb.getWorksheet();
-		if(wsView && wsView.objectRender && wsView.objectRender.controller)
-		{
-			wsView.objectRender.controller.updateOverlay();
-		}
+		//var wsView = window["Asc"]["editor"].wb.getWorksheet();
+		//if(wsView && wsView.objectRender && wsView.objectRender.controller)
+		//{
+		//	wsView.objectRender.controller.updateOverlay();
+		//}
 	}
 
 	if (null != Point) {
