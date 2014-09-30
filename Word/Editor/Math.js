@@ -341,8 +341,10 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 Items.push(oElem.Parent.content[oContent.Start]);
                 oElem.Parent.content.splice( oContent.Start, 1 );
                 History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
-                if (Direction < 0)
-                    oContent.Content.CurPos--;
+                oContent.Content.CurPos--;
+				if (oContent.Content.CurPos < 0)
+					oContent.Content.CurPos = 0;				
+				oContent.Content.SetRunEmptyToContent(true);
             }
         }
     }
@@ -356,20 +358,26 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         var start = oContent.Start,
             end   = oContent.End,
             oMathContent = oContent.Content;
+			
+		if(start > end)
+		{
+			start = oContent.End;
+            end   = oContent.Start;
+		}
         var len = end - start + 1;
 
         History.Create_NewPoint();
-        History.Create_NewPoint();
-        var oStartContent = oContent.Content.content[start];
-        var oEndContent = oContent.Content.content[end];
         var Items = [];
         for (var i=start; i<=end; i++)
             Items.push(oContent.Content.content[i]);
 
         oContent.Content.CurPos -= len;
+		if (oContent.Content.CurPos < 0)
+			oContent.Content.CurPos = 0;
 
-        oContent.Content.content.splice( oContent.Start, len );
-        History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
+        oContent.Content.content.splice( start, len );
+		oContent.Content.SetRunEmptyToContent(true);
+        History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: start});
         return;
     };
 
