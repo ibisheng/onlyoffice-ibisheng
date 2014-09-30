@@ -289,7 +289,8 @@ var c_oSerRunType = {
     fldend: 10,
 	CommentReference: 11,
 	pptxDrawing: 12,
-	_LastRun: 13 //для копирования через бинарник
+	_LastRun: 13, //для копирования через бинарник
+	object: 14
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -7701,6 +7702,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
+		else if (c_oSerRunType.object === type)
+		{			
+			res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadObject(t,l,oParStruct);
+			});
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         if (null != oNewElem)
@@ -7710,6 +7717,23 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
         return res;
     };
+	this.ReadObject = function (type, length, oParStruct)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSerParType.OMath === type)
+		{
+			if ( length > 0 )
+			{
+				var oMathPara = new ParaMath();
+				oParStruct.addToContent(oMathPara);
+				
+				res = this.bcr.Read1(length, function(t, l){
+					return oThis.boMathr.ReadMathArg(t,l,oMathPara.Root);
+				});
+			}
+		}
+	}
     this.parseField = function(hyp, fld)
     {
         if(-1 != fld.indexOf("HYPERLINK"))
@@ -9025,6 +9049,8 @@ function Binary_oMathReader(stream)
                 return oThis.ReadMathEqArrPr(t,l,props);
             });
 			
+			if (!props.ctrPrp)
+				props.ctrPrp = new CTextPr();
 			props.counter = 0;
 			var oEqArr = new CEqArray(props);
 			oElem.addElementToContent(oEqArr);			
@@ -9816,6 +9842,8 @@ function Binary_oMathReader(stream)
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathNaryPr(t,l,props);
             });
+			if (!props.ctrPrp)
+				props.ctrPrp = new CTextPr();
 			var oNary = new CNary(props);
 			if (oParent)
 				oParent.addElementToContent(oNary);
@@ -9847,6 +9875,13 @@ function Binary_oMathReader(stream)
                 return oThis.ReadMathArg(t,l,oContent.content);
             });			
         }
+		else if (c_oSer_OMathContentType.CtrlPr)
+		{			
+			res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathCtrlPr(t,l,props);
+            });
+			oParent.content[oParent.content.length-1].setCtrPrp(props.ctrPrp);
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
