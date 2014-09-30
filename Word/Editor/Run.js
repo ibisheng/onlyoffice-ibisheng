@@ -5067,17 +5067,17 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             {
                 if(TextPr.Bold == true)
                 {
-                    if(this.MathPrp.sty == STY_ITALIC)
+                    if(this.MathPrp.sty == STY_ITALIC || this.MathPrp.sty == undefined)
                         this.Math_Apply_Style(STY_BI);
-                    else if(this.MathPrp.sty == STY_PLAIN || this.MathPrp.sty == undefined)
+                    else if(this.MathPrp.sty == STY_PLAIN)
                         this.Math_Apply_Style(STY_BOLD);
 
                 }
                 else if(TextPr.Bold == false || TextPr.Bold == null)
                 {
-                    if(this.MathPrp.sty == STY_BI)
+                    if(this.MathPrp.sty == STY_BI || this.MathPrp.sty == undefined)
                         this.Math_Apply_Style(STY_ITALIC);
-                    else if(this.MathPrp.sty == STY_BOLD || this.MathPrp.sty == undefined)
+                    else if(this.MathPrp.sty == STY_BOLD)
                         this.Math_Apply_Style(STY_PLAIN);
                 }
             }
