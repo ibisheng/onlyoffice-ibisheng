@@ -290,8 +290,10 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                         return;
                     }
                 }
-                else //переходим на уровень выше и выделяем композицию
+                else if (!oElem.Selection.Use)//переходим на уровень выше и выделяем композицию
                 {
+					if (oContent.Content.bRoot) //мы находмися на выходе из формулы
+						return; //TODO 
                     var Comp = oContent.Content.GetParent();
                     Comp.SetSelectAll();
                     Comp.SelectToParent();
@@ -300,14 +302,16 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             }
             else if (Direction > 0 && oElem.State.ContentPos + 1 > oElem.Content.length) //delete
             {
-                if (oContent.Content.CurPos + 1 >= oContent.Content.content.length) //переходим на уровень выше и выделяем композицию
+                if (oContent.Content.CurPos + 1 >= oContent.Content.content.length && !oElem.Selection.Use) //переходим на уровень выше и выделяем композицию
                 {
+					if (oContent.Content.bRoot) //мы находмися на выходе из формулы
+						return; //TODO 
                     var Comp = oContent.Content.GetParent();
                     Comp.SetSelectAll();
                     Comp.SelectToParent();
                     this.bSelectionUse = true;
                 }
-                else //справа есть элемент
+                else if (!oElem.Selection.Use)//справа есть элемент
                 {
                     var nNextElem = oContent.Start + 1;
                     var nextElem = oContent.Content.getElem(nNextElem);
@@ -364,6 +368,11 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
 			start = oContent.End;
             end   = oContent.Start;
 		}
+		var oStartContent = oContent.Content.content[start];
+		if ( para_Math_Run == oStartContent.Type)
+			if (oStartContent.Selection.StartPos == oStartContent.Selection.EndPos == oStartContent.Content.length)
+				start++;
+		
         var len = end - start + 1;
 
         History.Create_NewPoint();
@@ -378,6 +387,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         oContent.Content.content.splice( start, len );
 		oContent.Content.SetRunEmptyToContent(true);
         History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: start});
+		this.Selection_Remove();
         return;
     };
 
