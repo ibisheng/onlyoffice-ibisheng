@@ -3660,7 +3660,7 @@ function CEditorPage(api)
                 {
                     if (History.Have_Changes() == true)
                     {
-                        oWordControl.m_oApi.asc_Save2();
+                        oWordControl.m_oApi.asc_Save();
                     }
                     oWordControl.m_nLastAutosaveTime = _curTime;
                 }

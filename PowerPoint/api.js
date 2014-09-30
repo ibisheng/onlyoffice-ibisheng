@@ -1420,21 +1420,15 @@ asc_docs_api.prototype.Share = function(){
 };
 
 
-function OnSave_Callback2(e)
-{
-    if ( false == e["saveLock"] )
-    {
-        editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+function OnSave_Callback(e) {
+	if (false == e["saveLock"]) {
+		editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
-            CollaborativeEditing.Clear_CollaborativeMarks();
+		if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType)
+			CollaborativeEditing.Clear_CollaborativeMarks();
 
-        // Принимаем чужие изменения
-        //safe_Apply_Changes();
-        CollaborativeEditing.Apply_Changes();
-
-        // Пересылаем свои изменения
-        CollaborativeEditing.Send_Changes();
+		// Принимаем чужие изменения
+		CollaborativeEditing.Apply_Changes();
 
 		editor.CoAuthoringApi.onUnSaveLock = function () {
 			editor.CoAuthoringApi.onUnSaveLock = null;
@@ -1448,35 +1442,27 @@ function OnSave_Callback2(e)
 			editor._onUpdateDocumentCanSave();
 		};
 
-        // Снимаем лок с функции сохранения на сервере
-        editor.CoAuthoringApi.unSaveChanges();
-    }
-    else
-    {
-        setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback2 ); }, 1000 );
-    }
+		// Пересылаем свои изменения
+		CollaborativeEditing.Send_Changes();
+	} else {
+		var nState = editor.CoAuthoringApi.get_state();
+		if (3 === nState) {
+			// Отключаемся от сохранения, соединение потеряно
+			editor.canSave = true;
+		} else {
+			setTimeout(function () {
+				editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+			}, 1000);
+		}
+	}
 }
 
 asc_docs_api.prototype.asc_Save = function () {
     if (true === this.canSave)
     {
         this.canSave = false;
-        this.CoAuthoringApi.askSaveChanges(OnSave_Callback2);
+        this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
     }
-};
-asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-	var t = this;
-	this.CoAuthoringApi.onUnSaveLock = function () {
-		t.CoAuthoringApi.onUnSaveLock = null;
-		t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-		t.canSave = true;
-
-		// Обновляем состояние возможности сохранения документа
-		t._onUpdateDocumentCanSave();
-	};
-	this.CoAuthoringApi.unSaveChanges();
-	if (!isDocumentSaved)
-		this.CoAuthoringApi.disconnect();
 };
 asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	if(bInner)
@@ -1801,61 +1787,6 @@ asc_docs_api.prototype.sync_InitEditorThemes = function(gui_editor_themes, gui_d
 }
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
     this.asc_fireCallback("asc_onInitTableTemplates",styles);
-};
-
-function safe_Apply_Changes()
-{
-    try
-    {
-        CollaborativeEditing.Apply_Changes();
-    }
-    catch(err)
-    {
-    }
-}
-
-asc_docs_api.prototype.onSaveCallback = function (e) {
-	var t = this;
-	var nState;
-	if (false == e["saveLock"]) {
-		// Принимаем чужие изменения
-        safe_Apply_Changes();
-
-		// Сохраняем файл на сервер
-		/*var data = this.WordControl.SaveDocument();
-		var oAdditionalData = {};
-		oAdditionalData["c"] = "save";
-		oAdditionalData["id"] = documentId;
-		oAdditionalData["userid"] = documentUserId;
-		oAdditionalData["vkey"] = documentVKey;
-		oAdditionalData["outputformat"] = documentFormatSave;
-		oAdditionalData["innersave"] = true;
-		oAdditionalData["savetype"] = "completeall";
-		oAdditionalData["data"] = data;
-		sendCommand(editor, function(incomeObject){
-			if(null != incomeObject && "save" == incomeObject["type"])
-				editor.processSavedFile(incomeObject["data"], true);
-		}, oAdditionalData);*/
-
-		// Пересылаем свои изменения (ToDo)
-		CollaborativeEditing.Send_Changes();
-		//Обратно выставляем, что документ не модифицирован
-		t.SetUnchangedDocument();
-
-		t.asc_OnSaveEnd(true);
-	} else {
-		nState = t.CoAuthoringApi.get_state();
-		if (3 === nState) {
-			// Отключаемся от сохранения, соединение потеряно
-			t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			t.canSave = true;
-		} else {
-			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
-			setTimeout(function () {
-				t.CoAuthoringApi.askSaveChanges(function (event) { t.onSaveCallback(event); });
-			}, 1000);
-		}
-	}
 };
 
 /*----------------------------------------------------------------*/

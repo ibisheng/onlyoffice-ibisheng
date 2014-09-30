@@ -2731,31 +2731,15 @@ asc_docs_api.prototype.Share = function(){
 
 }
 
-asc_docs_api.prototype.asc_Save2 = function()
-{
-    if (true === this.canSave)
-    {
-        this.canSave = false;
-        this.CoAuthoringApi.askSaveChanges(OnSave_Callback2);
-    }
-}
+function OnSave_Callback(e) {
+	if (false == e["saveLock"]) {
+		editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-function OnSave_Callback2(e)
-{
-    if ( false == e["saveLock"] ) 
-    {
-        editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType)
+			CollaborativeEditing.Clear_CollaborativeMarks();
 
-        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
-            CollaborativeEditing.Clear_CollaborativeMarks();
-
-        // Принимаем чужие изменения
-        //safe_Apply_Changes();
-        CollaborativeEditing.Apply_Changes();
-
-        // Пересылаем свои изменения
-        CollaborativeEditing.Send_Changes();
-
+		// Принимаем чужие изменения
+		CollaborativeEditing.Apply_Changes();
 
 		editor.CoAuthoringApi.onUnSaveLock = function () {
 			editor.CoAuthoringApi.onUnSaveLock = null;
@@ -2768,111 +2752,30 @@ function OnSave_Callback2(e)
 			// Обновляем состояние возможности сохранения документа
 			editor._onUpdateDocumentCanSave();
 		};
-        // Снимаем лок с функции сохранения на сервере
-        editor.CoAuthoringApi.unSaveChanges();
-    } 
-    else 
-    {
-        setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback2 ); }, 1000 );
-    }
+
+		// Пересылаем свои изменения
+		CollaborativeEditing.Send_Changes();
+	} else {
+		var nState = editor.CoAuthoringApi.get_state();
+		if (3 === nState) {
+			// Отключаемся от сохранения, соединение потеряно
+			editor.canSave = true;
+		} else {
+			setTimeout(function () {
+				editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+			}, 1000);
+		}
+	}
 }
 
 asc_docs_api.prototype.asc_Save = function ()
 {
-    this.asc_Save2();
-//	if(true === this.canSave) {
-//		this.canSave = false;
-//		this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-//
-//      this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
-//	}
+	if (true === this.canSave)
+	{
+		this.canSave = false;
+		this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+	}
 };
-
-asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-	var t = this;
-	this.CoAuthoringApi.onUnSaveLock = function () {
-		t.CoAuthoringApi.onUnSaveLock = null;
-
-		t.canSave = true;
-
-		t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-		// Обновляем состояние возможности сохранения документа
-		t._onUpdateDocumentCanSave();
-	};
-	this.CoAuthoringApi.unSaveChanges();
-	if (!isDocumentSaved)
-		this.CoAuthoringApi.disconnect();
-};
-
-function safe_Apply_Changes()
-{
-    try
-    {
-        CollaborativeEditing.Apply_Changes();
-    }
-    catch(err)
-    {
-    }
-}
-
-//_*function*_ OnSave_Callback(e)
-//{
-//	var nState;
-//    if ( false == e["saveLock"] ) {
-//
-//        if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
-//            CollaborativeEditing.Clear_CollaborativeMarks();
-//
-//        // Принимаем чужие изменения
-//        safe_Apply_Changes();
-//
-//        // Сохраняем файл на сервер
-//        var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
-//
-//        if (undefined != window['qtDocBridge']) {
-//            var data = oBinaryFileWriter.Write();
-//            // push data to native QT code
-//            window['qtDocBridge']['savedDocument'] (data);
-//
-//        } else {
-//            /*var oAdditionalData = {};
-//			oAdditionalData["c"] = "save";
-//			oAdditionalData["id"] = documentId;
-//			oAdditionalData["userid"] = documentUserId;
-//            oAdditionalData["vkey"] = documentVKey;
-//            oAdditionalData["outputformat"] = documentFormatSave;
-//			if(c_oAscFileType.TXT == documentFormatSaveTxtCodepage)
-//				oAdditionalData["codepage"] = documentFormatSaveTxtCodepage;
-//			oAdditionalData["innersave"] = true;
-//			var data = oBinaryFileWriter.Write();
-//			oAdditionalData["savetype"] = "completeall";
-//			////uncoment to save changes only instead send file complete
-//            //var data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
-//			//oAdditionalData["savetype"] = "changes";
-//			oAdditionalData["data"] = data;
-//            sendCommand(editor, function(incomeObject){
-//				if(null != incomeObject && "save" == incomeObject["type"])
-//					editor.processSavedFile(incomeObject["data"], true);
-//			}, oAdditionalData);*/
-//        }
-//
-//		// Пересылаем свои изменения
-//		CollaborativeEditing.Send_Changes();
-//		//Обратно выставляем, что документ не модифицирован
-//		editor.SetUnchangedDocument();
-//
-//		editor.asc_OnSaveEnd(true);
-//    } else {
-//		nState = editor.CoAuthoringApi.get_state();
-//		if (3 === nState) {
-//			// Отключаемся от сохранения, соединение потеряно
-//			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-//			editor.canSave = true;
-//		} else {
-//        	setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback ); }, 1000 );
-//		}
-//    }
-//}
 
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
@@ -7340,15 +7243,6 @@ function sendCommand(editor, fCallback, rdata){
 						
                     setTimeout( function(){sendCommand(editor, fCallback,  rData)}, 3000);
                 break;
-				case "changes":
-					//rData = {"id":documentId, "c":"sfc", "outputformat": c_oAscFileType.DOCX};
-					//sendCommand(editor, fCallback,  rData);
-					if(fCallback)
-						fCallback(incomeObject);
-
-					// Важно: потом сверху этот эвент придти не должен (т.е. мы не отправляем ссылку на документ наверх)
-					editor.asc_OnSaveEnd(/*isDocumentSaved*/true);
-				break;
                 case "save":
 					if(fCallback)
 						fCallback(incomeObject);
@@ -7486,14 +7380,6 @@ function _addImageUrl2 (url)
 function _isDocumentModified2 ()
 {
 	return editor.isDocumentModified();
-}
-function _asc_Save2 ()
-{
-	editor.asc_Save();
-}
-function _asc_SavingEnd ()
-{
-	editor.asc_OnSaveEnd(true);
 }
 function  _asc_scrollTo (x,y)
 {

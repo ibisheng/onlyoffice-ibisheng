@@ -4,7 +4,7 @@
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_coAuthV	= '3.0.2';
+	var asc_coAuthV	= '3.0.3';
 
 	// Класс надстройка, для online и offline работы
 	function CDocsCoApi (options) {
@@ -48,7 +48,7 @@
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
-			this._CoAuthoringApi.onUnSaveLock = function (e) {t.callback_OnUnSaveLock(e);};
+			this._CoAuthoringApi.onUnSaveLock = function () {t.callback_OnUnSaveLock();};
 
 			this._CoAuthoringApi.init(user, docid, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
@@ -117,12 +117,6 @@
 					callback({"saveLock": false});
 				}
 			}, 100);
-		}
-	};
-	
-	CDocsCoApi.prototype.unSaveChanges = function () {
-		if (this._CoAuthoringApi && this._onlineWork) {
-			this._CoAuthoringApi.unSaveChanges();
 		}
 	};
 
@@ -236,9 +230,9 @@
 			this.onEndCoAuthoring(e);
 	};
 
-	CDocsCoApi.prototype.callback_OnUnSaveLock = function (e) {
+	CDocsCoApi.prototype.callback_OnUnSaveLock = function () {
 		if (this.onUnSaveLock)
-			this.onUnSaveLock(e);
+			this.onUnSaveLock();
 	};
 
     /** States
@@ -275,6 +269,7 @@
         this._msgBuffer = [];
         this._lockCallbacks = {};
 		this._saveCallback = [];
+		this.saveLockCallbackErrorTimeOutId = null;
 		this.saveCallbackErrorTimeOutId = null;
         this._id = "";
 		this._indexuser = -1;
@@ -401,12 +396,12 @@
 		}
 
 		// Очищаем предыдущий таймер
-		if (null !== this.saveCallbackErrorTimeOutId)
-			clearTimeout(this.saveCallbackErrorTimeOutId);
+		if (null !== this.saveLockCallbackErrorTimeOutId)
+			clearTimeout(this.saveLockCallbackErrorTimeOutId);
 
 		// Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
 		if (-1 === this.get_state()) {
-			this.saveCallbackErrorTimeOutId = window.setTimeout(function () {
+			this.saveLockCallbackErrorTimeOutId = window.setTimeout(function () {
 				if (callback && _.isFunction(callback)) {
 					// Фиктивные вызовы
 					callback({error: "No connection"});
@@ -420,8 +415,8 @@
 			this._saveCallback[indexCallback] = callback;
 				
 			//Set reconnectTimeout
-			window.setTimeout(function () {
-				t.saveCallbackErrorTimeOutId = null;
+			this.saveLockCallbackErrorTimeOutId = window.setTimeout(function () {
+				t.saveLockCallbackErrorTimeOutId = null;
 				var oTmpCallback = t._saveCallback[indexCallback];
 				if (oTmpCallback) {
 					t._saveCallback[indexCallback] = null;
@@ -432,10 +427,6 @@
 		}
 		this._send({"type": "isSaveLock"});
 	};
-	
-	DocsCoApi.prototype.unSaveChanges = function () {
-		this._send({"type": "unSaveLock"});
-	};
 
     DocsCoApi.prototype.releaseLocks = function (blockId) {
         if (this._locks[blockId] && 2 === this._locks[blockId].state /*lock is ours*/) {
@@ -443,7 +434,11 @@
             this._locks[blockId] = {"state": 0};//0-released
         }
     };
-	
+
+	DocsCoApi.prototype._reSaveChanges = function () {
+		this.saveChanges(this.arrayChanges, this.currentIndex);
+	};
+
 	DocsCoApi.prototype.saveChanges = function (arrayChanges, currentIndex, deleteIndex) {
 		if (null === currentIndex) {
 			this.deleteIndex = deleteIndex;
@@ -460,6 +455,13 @@
 					delete this._locks[key];
 			}
 		}
+
+		//Set errorTimeout
+		var t = this;
+		this.saveCallbackErrorTimeOutId = window.setTimeout(function () {
+			t.saveCallbackErrorTimeOutId = null;
+			t._reSaveChanges();
+		}, 5000);
 
 		this._send({"type": "saveChanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
@@ -637,8 +639,8 @@
 			var oTmpCallback = this._saveCallback[indexCallback];
 			if (oTmpCallback) {
 				// Очищаем предыдущий таймер
-				if (null !== this.saveCallbackErrorTimeOutId)
-					clearTimeout(this.saveCallbackErrorTimeOutId);
+				if (null !== this.saveLockCallbackErrorTimeOutId)
+					clearTimeout(this.saveLockCallbackErrorTimeOutId);
 
 				this._saveCallback[indexCallback] = null;
 				oTmpCallback(data);
@@ -647,6 +649,10 @@
 	};
 	
 	DocsCoApi.prototype._onUnSaveLock = function () {
+		// Очищаем предыдущий таймер
+		if (null !== this.saveCallbackErrorTimeOutId)
+			clearTimeout(this.saveCallbackErrorTimeOutId);
+
 		if (this.onUnSaveLock)
 			this.onUnSaveLock();
 	};
@@ -686,7 +692,11 @@
 	};
 	
 	DocsCoApi.prototype._onSavePartChanges = function () {
-		this.saveChanges (this.arrayChanges, this.currentIndex + 1);
+		// Очищаем предыдущий таймер
+		if (null !== this.saveCallbackErrorTimeOutId)
+			clearTimeout(this.saveCallbackErrorTimeOutId);
+
+		this.saveChanges(this.arrayChanges, this.currentIndex + 1);
 	};
 
     DocsCoApi.prototype._onPreviousLocks = function (locks, previousLocks) {
@@ -907,7 +917,7 @@
 				case 'connectState'		: t._onConnectionStateChanged(dataObject); break;
 				case 'saveChanges'		: t._onSaveChanges(dataObject); break;
 				case 'saveLock'			: t._onSaveLock(dataObject); break;
-				case 'unSaveLock'		: t._onUnSaveLock(dataObject); break;
+				case 'unSaveLock'		: t._onUnSaveLock(); break;
 				case 'savePartChanges'	: t._onSavePartChanges(); break;
 				case 'drop'				: t._onDrop(dataObject); break;
 				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;

@@ -576,24 +576,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
 		};
 
-		spreadsheet_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
-			var t = this;
-			this.CoAuthoringApi.onUnSaveLock = function () {
-				t.CoAuthoringApi.onUnSaveLock = null;
-
-				t.canSave = true;
-				t.isAutoSave = false;
-				t.lastSaveTime = null;
-
-				t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-				// Обновляем состояние возможности сохранения документа
-				t.onUpdateDocumentModified(false);
-			};
-			this.CoAuthoringApi.unSaveChanges();
-			if (!isDocumentSaved)
-				this.CoAuthoringApi.disconnect();
-		};
-
 		spreadsheet_api.prototype.asc_Print = function(adjustPrint){
 			if (adjustPrint)
 				this.adjustPrint = adjustPrint;
@@ -1052,11 +1034,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			oAdditionalData["savetype"] = "completeall";
 			data = oBinaryFileWriter.Write();
 
-			if (undefined != window['appBridge']) {
-				window['appBridge']['dummyCommandSave_CSV'] (data);
-				this.asc_OnSaveEnd(true);
-				return;
-			}
 			oAdditionalData["data"] = data;
 			var t = this;
 			this._asc_sendCommand (function (incomeObject) {
@@ -1156,7 +1133,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				if (undefined != window['appBridge']) {
 					window['appBridge']['dummyCommandSave_CSV'] (data);
-					this.asc_OnSaveEnd(true);
 					return;
 				}
 			}
@@ -1940,15 +1916,26 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				// Cбросим флаги модификации
 				History.Save();
 
+				this.CoAuthoringApi.onUnSaveLock = function () {
+					t.CoAuthoringApi.onUnSaveLock = null;
+
+					if (t.collaborativeEditing.getCollaborativeEditing()) {
+						// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+						t.wb._onWSSelectionChanged(/*info*/null);
+					}
+
+					t.canSave = true;
+					t.isAutoSave = false;
+					t.lastSaveTime = null;
+
+					t.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+					// Обновляем состояние возможности сохранения документа
+					t.onUpdateDocumentModified(false);
+				};
+
 				// Пересылаем всегда, но чистим только если началось совместное редактирование
 				// Пересылаем свои изменения
 				this.collaborativeEditing.sendChanges();
-				if (this.collaborativeEditing.getCollaborativeEditing()) {
-					// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-					this.wb._onWSSelectionChanged(/*info*/null);
-				}
-
-				this.asc_OnSaveEnd(true);
 			} else {
 				nState = t.CoAuthoringApi.get_state();
 				if (3 === nState) {
@@ -3301,14 +3288,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						oAdditionalData["savetype"] = "completeall";
 
 						var data = oBinaryFileWriter.Write();
-						t.asc_OnSaveEnd(true);
 						return data;
-					}
-				}
-
-				if (!window['scriptBridge']['saveEnd']) {
-					window['scriptBridge']['saveEnd'] = function() {
-						t.asc_OnSaveEnd(true);
 					}
 				}
 
@@ -3619,7 +3599,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
 		prot["asc_DownloadAs"] = prot.asc_DownloadAs;
 		prot["asc_Save"] = prot.asc_Save;
-		prot["asc_OnSaveEnd"] = prot.asc_OnSaveEnd;
 		prot["asc_Print"] = prot.asc_Print;
 		prot["asc_Resize"] = prot.asc_Resize;
 		prot["asc_Copy"] = prot.asc_Copy;
