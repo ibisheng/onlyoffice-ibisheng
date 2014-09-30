@@ -484,11 +484,11 @@ CMathBase.prototype =
         {
             for(var j = 0; j < this.nCol; j++)
             {
-                if( !this.elements[0][j].IsOneLineText() )
-                {
-                    bOneLineText = false;
-                    break;
-                }
+                if(!this.elements[0][j].IsJustDraw() && !this.elements[0][j].IsOneLineText())
+                    {
+                        bOneLineText = false;
+                        break;
+                    }
             }
         }
         else
