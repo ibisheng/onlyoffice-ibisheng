@@ -397,6 +397,10 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY)
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
 }
+CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics)
+{
+    this.draw(x, y, pGraphics);
+}
 CGlyphOperator.prototype.getCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
@@ -2527,7 +2531,6 @@ COperator.prototype.mergeProperties = function(properties, defaultProps)   // pr
     else if(code === 0x305 || type === ACCENT_LINE)
     {
         typeOper = ACCENT_LINE;
-        //codeChr = 0x332;
         codeChr = 0x305;
 
         operator = new CAccentLine();
@@ -2541,7 +2544,6 @@ COperator.prototype.mergeProperties = function(properties, defaultProps)   // pr
     else if(code === 0x33F || type === ACCENT_DOUBLE_LINE)
     {
         typeOper = ACCENT_DOUBLE_LINE;
-        //codeChr = 0x333;
         codeChr = 0x33F;
 
         operator = new CAccentDoubleLine();
@@ -2957,10 +2959,12 @@ COperator.prototype.draw = function(x, y, pGraphics)
     }
     else
     {
-        if(this.type === OPER_SEPARATOR)
+        var bLine = this.typeOper == ACCENT_LINE || this.typeOper == ACCENT_DOUBLE_LINE;
+
+        if(bLine)
+            this.drawLines(x, y, pGraphics);
+        else if(this.type === OPER_SEPARATOR)
             this.drawSeparator(x, y, pGraphics);
-        /*else if(this.type == OPER_ACCENT)
-            this.drawAccent(x, y, pGraphics);*/
         else
             this.drawOperator(x, y, pGraphics);
     }
@@ -3008,6 +3012,14 @@ COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
         }
     }
 }
+COperator.prototype.drawLines = function(absX, absY, pGraphics)
+{
+    if(this.typeOper !== OPERATOR_EMPTY)
+    {
+        var PosOper = this.Positions[0];
+        this.operator.drawOnlyLines(PosOper.x + absX, PosOper.y + absY, pGraphics);
+    }
+}
 COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 {
     this.ParaMath = ParaMath;
@@ -3039,9 +3051,8 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         {
 
             var bNotStretchDelim = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false;
-                //bNotStretchAccent = this.type == OPER_ACCENT && this.typeOper == ACCENT_TILDE;
 
-            var StretchLng = bNotStretchDelim /*|| bNotStretchAccent*/ ? 0 : stretch;
+            var StretchLng = bNotStretchDelim ? 0 : stretch;
 
             this.operator.fixSize(StretchLng);
             dims = this.operator.getCoordinateGlyph();
@@ -3064,7 +3075,6 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
             height = letterOperator.size.ascent - letterX.size.ascent;
         }
-
         else
         {
             if(this.typeOper == OPERATOR_TEXT)

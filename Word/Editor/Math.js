@@ -77,7 +77,7 @@ function ParaMath()
 	g_oTableId.Add( this, this.Id );
 }
 
-Asc.extendClass(ParaMath, CParagraphContentWithContentBase)
+Asc.extendClass(ParaMath, CParagraphContentWithContentBase);
 
 ParaMath.prototype.Get_Type = function()
 {

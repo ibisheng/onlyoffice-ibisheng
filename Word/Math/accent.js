@@ -46,6 +46,7 @@ CAccentCircumflex.prototype.calcCoord = function(stretch)
 
     // g_dKoef_px_to_mm = 25.4/96
 
+
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
@@ -141,6 +142,8 @@ CAccentLine.prototype.calcCoord = function(stretch)
     var X = [],
         Y = [];
 
+    //stretch *= 0.9;
+
     X[0] = 0;          Y[0] = 0;
     X[1] = stretch;    Y[1] = 0;
     X[2] = stretch;    Y[2] = 0.011*fontSize;
@@ -160,10 +163,22 @@ CAccentLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[3], YY[3]);
     pGraphics._l(XX[4], YY[4]);
 }
+CAccentLine.prototype.draw = function(x, y, pGraphics)
+{
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+
+    var penW = fontSize*0.067 * 25.4/96;
+    var x1 = x + 25.4/96,
+        x2 = x +  this.stretch - 25.4/96;
+
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.drawHorLine(0, y, x1, x2, penW);
+}
 
 
 function CAccentDoubleLine()
 {
+    this.diff = 0;
     CGlyphOperator.call(this);
 }
 Asc.extendClass(CAccentDoubleLine, CGlyphOperator);
@@ -175,6 +190,16 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
     var width  = 4.938*alpha;
 
     width = stretch > width ? stretch : width;
+
+    var Line = new CMathText(true);
+    Line.add(0x305);
+    Line.Resize(g_oTextMeasurer);
+
+    var DoubleLine = new CMathText(true);
+    DoubleLine.add(0x33F);
+    DoubleLine.Resize(g_oTextMeasurer);
+
+    this.diff = DoubleLine.size.ascent - Line.size.ascent;
 
     return {width: width, height: height};
 }
@@ -218,6 +243,26 @@ CAccentDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[8], YY[8]);
     pGraphics._l(XX[9], YY[9]);
 
+}
+CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
+{
+    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+
+    var diff = this.diff;
+
+    if(diff < 2*25.4/96)
+        diff = 2*25.4/96;
+
+    var penW = fontSize*0.067 * 25.4/96;
+    var x1 = x + 25.4/96,
+        x2 = x +  this.stretch - 25.4/96,
+        y1 = y,
+        y2 = y + diff;
+
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.drawHorLine(0, y1, x1, x2, penW);
+
+    pGraphics.drawHorLine(0, y2, x1, x2, penW);
 }
 
 
@@ -560,8 +605,6 @@ CAccent.prototype.draw = function(x, y, pGraphics)
             }
         }
     }
-
-
 
     this.operator.draw(x, y, pGraphics);
 }
