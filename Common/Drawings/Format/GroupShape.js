@@ -83,7 +83,6 @@ CGroupShape.prototype =
         this.bDeleted = pr;
     },
 
-
     setBDeleted2: function(pr)
     {
         this.bDeleted = pr;
@@ -99,7 +98,6 @@ CGroupShape.prototype =
             }
         }
     },
-
 
     documentUpdateSelectionState: function()
     {
@@ -134,6 +132,7 @@ CGroupShape.prototype =
             this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
         }
     },
+
     Write_ToBinary2: function(w)
     {
         w.WriteLong(historyitem_type_GroupShape);
@@ -198,7 +197,6 @@ CGroupShape.prototype =
         this.handleUpdateSpTree();
         return this.spTree.splice(pos, 1)[0];
     },
-
 
     handleUpdateSpTree: function()
     {
@@ -524,7 +522,6 @@ CGroupShape.prototype =
         object.select(this, pageIndex);
     },
 
-
     recalculate: function()
     {
         var recalcInfo = this.recalcInfo;
@@ -577,7 +574,6 @@ CGroupShape.prototype =
         }
     },
 
-
     canRotate: function()
     {
         //TODO: сделать еще проверку SpLock
@@ -612,11 +608,11 @@ CGroupShape.prototype =
         return true;//TODO
     },
 
-
     canChangeAdjustments: function()
     {
         return false;
     },
+
     drawAdjustments: function()
     {},
 

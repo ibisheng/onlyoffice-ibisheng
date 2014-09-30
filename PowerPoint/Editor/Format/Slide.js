@@ -4,7 +4,7 @@ function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;
 
-    this.presentation = editor.WordControl.m_oLogicDocument;
+    this.presentation = editor && editor.WordControl && editor.WordControl.m_oLogicDocument;
     this.graphicObjects = new DrawingObjectsController(this);
     this.maxId = 0;
     this.cSld = new CSld();
@@ -79,6 +79,45 @@ Slide.prototype =
     getDrawingDocument: function()
     {
         return editor.WordControl.m_oLogicDocument.DrawingDocument;
+    },
+
+    createDuplicate: function()
+    {
+        var copy = new Slide(this.presentation, this.Layout, 0), i;
+        if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
+        {
+            copy.setCSldName(this.cSld.name);
+        }
+        if(this.cSld.Bg)
+        {
+            this.changeBackground(this.cSld.Bg.createFullCopy());
+        }
+        for(i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            copy.shapeAdd(copy.cSld.spTree.length, this.cSld.spTree[i].copy());
+            copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
+        }
+
+        if(this.clrMap)
+        {
+            copy.setClMapOverride(this.clrMap.createDuplicate());
+        }
+        if(isRealBool(this.show))
+        {
+            copy.setShow(this.show);
+        }
+        if(isRealBool(this.showMasterPhAnim))
+        {
+            copy.setShowPhAnim(this.showMasterPhAnim);
+        }
+        if(isRealBool(this.showMasterSp))
+        {
+            copy.setShowMasterSp(this.showMasterSp);
+        }
+
+        copy.applyTiming(this.timing.createDuplicate());
+        copy.setSlideSize(this.Width, this.Height);
+        return copy;
     },
 
 

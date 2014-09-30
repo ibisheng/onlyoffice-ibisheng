@@ -1983,8 +1983,8 @@ CShape.prototype =
         this.recalcTransform && this.recalcTransform();
     },
 
-    recalculateTransform: function () {
-
+    recalculateTransform: function ()
+    {
         this.cachedImage = null;
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);

@@ -4092,18 +4092,7 @@ asc_docs_api.prototype.DeleteSlide = function()
 }
 asc_docs_api.prototype.DublicateSlide = function()
 {
-    var selectionArray = this.WordControl.Thumbnails.GetSelectedArray();
-    var _presentation = this.WordControl.m_oLogicDocument;
-
-    var div = document.createElement("div");
-    var copy_processor = new CopyProcessor(editor, div);
-    copy_processor.oPresentationWriter.End_UseFullUrl();
-    copy_processor.Start();
-    var oPasteProcessor = new PasteProcessor(this, true, true, false);
-    //oPasteProcessor.End_UseFullUrl();
-    History.Create_NewPoint();
-    oPasteProcessor.Start(copy_processor.ElemToSelect, copy_processor.ElemToSelect, true);
-    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    this.WordControl.m_oLogicDocument.DublicateSlide();
 }
 
 asc_docs_api.prototype.SelectAllSlides = function(layoutType)
