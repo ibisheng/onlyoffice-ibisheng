@@ -354,14 +354,11 @@ CTextBody.prototype =
         }
     },
 
-
-
     Write_ToBinary2: function(w)
     {
         w.WriteLong(historyitem_type_TextBody);
         w.WriteString2(this.Id);
     },
-
 
     Read_FromBinary2: function(r)
     {
@@ -372,7 +369,6 @@ CTextBody.prototype =
     {
 
     },
-
 
     recalculateBodyPr: function()
     {
@@ -413,8 +409,6 @@ CTextBody.prototype =
         }
     },
 
-
-
     isEmpty: function()
     {
         return this.content.Is_Empty();
@@ -422,7 +416,6 @@ CTextBody.prototype =
 
     OnContentReDraw: function()
     {},
-
 
     Get_StartPage_Absolute: function()
     {
@@ -444,7 +437,6 @@ CTextBody.prototype =
         return {X: 0, Y: 0, XLimit: this.contentWidth, YLimit: 20000};
     },
 
-
     Get_Numbering: function()
     {
         return new CNumbering();
@@ -458,11 +450,11 @@ CTextBody.prototype =
         }
     },
 
-
     checkDocContent: function()
     {
         this.parent && this.parent.checkDocContent && this.parent.checkDocContent();
     },
+
     getBodyPr: function()
     {
         if(this.recalcInfo.recalculateBodyPr)
@@ -473,12 +465,10 @@ CTextBody.prototype =
         return this.compiledBodyPr;
     },
 
-
     getSummaryHeight: function()
     {
         return this.content.Get_SummaryHeight();
     },
-
 
     getSummaryHeight2: function()
     {
@@ -490,9 +480,6 @@ CTextBody.prototype =
         this.recalculateBodyPr();
         return this.compiledBodyPr;
     },
-
-    addPhContent: function(phType)
-    {},
 
     Get_TableStyleForPara: function()
     {
@@ -545,10 +532,9 @@ CTextBody.prototype =
     {
         return false;
     },
+
     OnContentRecalculate: function()
     {},
-
-
 
     getMargins: function ()
     {
@@ -591,7 +577,6 @@ CTextBody.prototype =
 
         return {L : xc - hc , T: yc - vc , R : xc + hc , B : yc + vc, textMatrix : this.parent.transform};
     },
-
 
     Refresh_RecalcData2: function(pageIndex)
     {
@@ -638,17 +623,6 @@ CTextBody.prototype =
             }
         }
         return max_width + 2 + r_ins + l_ins;
-    },
-
-    getRectHeight: function(maxHeight, width)
-    {
-        this.content.RecalculateNumbering();
-        this.content.Reset(0, 0, width, 20000);
-        this.content.Recalculate_Page(0, true);
-        var content_height = this.getSummaryHeight();
-        var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
-        var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
-        return content_height + t_ins + b_ins;
     },
 
     getMaxContentWidth: function(maxWidth, bLeft)

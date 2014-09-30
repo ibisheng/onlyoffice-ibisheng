@@ -1113,6 +1113,7 @@ CChartSpace.prototype =
         copy.setUserShapes(this.userShapes);
         copy.setThemeOverride(this.themeOverride);
         copy.setBDeleted(this.bDeleted);
+        copy.cachedImage = this.getBase64Img();
         return copy;
     },
 
@@ -1123,10 +1124,11 @@ CChartSpace.prototype =
 
     convertToPPTX: function(drawingDocument, worksheet)
     {
-        this.setBDeleted(false);
-        this.setWorksheet(worksheet);
-        this.setParent(null);
-        return this;
+        var copy = this.copy(drawingDocument)
+        copy.setBDeleted(false);
+        copy.setWorksheet(worksheet);
+        copy.setParent(null);
+        return copy;
     },
 
     rebuildSeriesFromAsc: function(asc_chart)
@@ -1761,8 +1763,22 @@ CChartSpace.prototype =
         this.group = group;
     },
 
-    getBase64Img: function () {
-        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    getBase64Img: function ()
+    {
+        if(typeof this.cachedImage === "string")
+        {
+            return this.cachedImage;
+        }
+        var img_object = ShapeToImageConverter(this, this.pageIndex);
+        if(img_object)
+        {
+            return img_object.ImageUrl;
+        }
+        else
+        {
+
+            return "";
+        }
     },
 
     getRangeObjectStr: function()
@@ -9747,9 +9763,6 @@ CChartSpace.prototype =
                 || bounds.y + bounds.h < rect.y)
                 return;
         }
-
-        var pix= 3*this.convertPixToMM(1);
-        var intGrid = graphics.GetIntegerGrid();
         graphics.SaveGrState();
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);

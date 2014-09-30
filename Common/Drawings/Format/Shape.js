@@ -161,6 +161,7 @@ function CShape()
     this.localTransform = new CMatrix();
     this.localTransformText = new CMatrix();
     this.worksheet = null;
+    this.cachedImage = null;
 
     this.setRecalculateInfo();
 
@@ -638,7 +639,6 @@ CShape.prototype =
         return false;
     },
 
-
     isShape: function () {
         return true;
     },
@@ -784,7 +784,6 @@ CShape.prototype =
         }
     },
 
-
     getSelectedTextInfo: function(info)
     {
         var content = this.getDocContent();
@@ -866,8 +865,6 @@ CShape.prototype =
     isPlaceholder: function () {
         return isRealObject(this.nvSpPr) && isRealObject(this.nvSpPr.nvPr) && isRealObject(this.nvSpPr.nvPr.ph);
     },
-
-
 
     getPlaceholderType: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
@@ -1672,6 +1669,7 @@ CShape.prototype =
         }
         copy.setWordShape(this.bWordShape);
         copy.setBDeleted(this.bDeleted);
+        copy.cachedImage = this.getBase64Img();
         return copy;
     },
 
@@ -1987,6 +1985,7 @@ CShape.prototype =
 
     recalculateTransform: function () {
 
+        this.cachedImage = null;
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         if(this.drawingBase && !this.group)
@@ -2150,18 +2149,6 @@ CShape.prototype =
         return { x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV };
     },
 
-    getRotateTrackObject: function () {
-        return new RotateTrackShape(this);
-    },
-
-    getResizeTrackObject: function (cardDirection) {
-        return new CResizeShapeTrack(this, cardDirection);
-    },
-
-    getCardDirection: function (num) {
-
-    },
-
     getAngle: function (x, y) {
         var px = this.invertTransform.TransformPointX(x, y);
         var py = this.invertTransform.TransformPointY(x, y);
@@ -2303,7 +2290,6 @@ CShape.prototype =
         }
         return { kd1: 1, kd2: 1 };
     },
-
 
     select: function (drawingObjectsController, pageIndex)
     {
@@ -2550,8 +2536,6 @@ CShape.prototype =
         }
     },
 
-
-
     normalize: function () {
         var new_off_x, new_off_y, new_ext_x, new_ext_y;
         var xfrm = this.spPr.xfrm;
@@ -2591,21 +2575,28 @@ CShape.prototype =
     },
 
 
-    getBase64Img: function () {
-        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
-    },
 
+    getBase64Img: function ()
+    {
+        if(typeof this.cachedImage === "string")
+        {
+            return this.cachedImage;
+        }
+        var img_object = ShapeToImageConverter(this, this.pageIndex);
+        if(img_object)
+        {
+            return img_object.ImageUrl;
+        }
+        else
+        {
 
-    onParagraphChanged: function () {
-        this.recalcInfo.recalculateContent = true;
-        this.recalcInfo.recalculateTransformText = true;
+            return "";
+        }
     },
 
     isSimpleObject: function () {
         return true;
     },
-
-
 
     draw: function (graphics, transform, transformText, pageIndex) {
 
@@ -2921,7 +2912,6 @@ CShape.prototype =
         }
         return { minX: min_x, maxX: max_x, minY: min_y, maxY: max_y };
     },
-
 
     getInvertTransform: function ()
     {
@@ -3266,16 +3256,6 @@ CShape.prototype =
         this.spPr.setLn(stroke);
     },
 
-    setLine: function (line) {
-        var old_line = this.spPr.ln;
-        var new_line = line;
-        this.spPr.ln = line;
-
-        this.recalcInfo.recalculateLine = true;
-        this.recalcInfo.recalculatePen = true;
-    },
-
-
     hitToAdjustment: function (x, y) {
         var invert_transform = this.getInvertTransform();
         var t_x, t_y;
@@ -3320,7 +3300,6 @@ CShape.prototype =
         }
         return false;
     },
-
 
     hitInBoundingRect: function (x, y) {
         var invert_transform = this.getInvertTransform();
@@ -3383,8 +3362,6 @@ CShape.prototype =
     createMoveInGroupTrack: function () {
         return new MoveShapeImageTrackInGroup(this);
     },
-
-
 
     remove: function (Count, bOnlyText, bRemoveOnlySelection) {
         if (this.txBody) {

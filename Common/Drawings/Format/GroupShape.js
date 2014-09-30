@@ -234,6 +234,7 @@ CGroupShape.prototype =
             copy.spTree[copy.spTree.length-1].setGroup(copy);
         }
         copy.setBDeleted(this.bDeleted);
+        copy.cachedImage = this.getBase64Img();
         return copy;
     },
 
@@ -266,45 +267,27 @@ CGroupShape.prototype =
         return commonSearchResults.length > 0 ? commonSearchResults : null;
     },
 
-    getSelectedArraysByTypes: function()
-    {
-        var selected_objects = this.selectedObjects;
-        var tables = [], charts = [], shapes = [], images = [], groups = [];
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            var selected_object = selected_objects[i];
-            if(typeof  selected_object.isTable === "function" && selected_object.isTable())
-            {
-                tables.push(selected_object);
-            }
-            else if(typeof  selected_object.isChart === "function" && selected_object.isChart())
-            {
-                charts.push(selected_object);
-            }
-            else if(selected_object.isShape())
-            {
-                shapes.push(selected_object);
-            }
-            else if(selected_object.isImage())
-            {
-                images.push(selected_object);
-            }
-            else if(typeof  selected_object.isGroup())
-            {
-                groups.push(selected_object);
-            }
-        }
-        return {tables: tables, charts: charts, shapes: shapes, images: images, groups: groups};
-    },
-
     getBoundsInGroup: function()
     {
         return getBoundsInGroup(this);
     },
 
-    getBase64Img: function()
+    getBase64Img: function ()
     {
-        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+        if(typeof this.cachedImage === "string")
+        {
+            return this.cachedImage;
+        }
+        var img_object = ShapeToImageConverter(this, this.pageIndex);
+        if(img_object)
+        {
+            return img_object.ImageUrl;
+        }
+        else
+        {
+
+            return "";
+        }
     },
 
     convertToWord: function(document)
@@ -325,13 +308,14 @@ CGroupShape.prototype =
     convertToPPTX: function(drawingDocument, worksheet)
     {
         var sp_tree_copy = [].concat(this.spTree), i;
-        this.setWorksheet(worksheet);
-        this.setParent(null);
-        this.setBDeleted(false);
         for(i = this.spTree.length-1; i > -1; --i)
         {
             this.removeFromSpTreeByPos(i);
         }
+
+        this.setWorksheet(worksheet);
+        this.setParent(null);
+        this.setBDeleted(false);
         for(i = 0; i < sp_tree_copy.length; ++i)
         {
             this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToPPTX(drawingDocument, worksheet));
@@ -780,6 +764,7 @@ CGroupShape.prototype =
 
     recalculateTransform: function()
     {
+        this.cachedImage = null;
         var xfrm;
         if(this.spPr.xfrm.isNotNullForGroup())
             xfrm = this.spPr.xfrm;
@@ -1075,88 +1060,6 @@ CGroupShape.prototype =
         return null;
     },
 
-    getArraysByTypes: function()
-    {
-        var selected_objects = this.arrGraphicObjects;
-        var tables = [], charts = [], shapes = [], images = [];
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            var selected_object = selected_objects[i];
-            if(typeof  selected_object.isTable === "function" && selected_object.isTable())
-            {
-                tables.push(selected_object);
-            }
-            else if(typeof  selected_object.isChart === "function" && selected_object.isChart())
-            {
-                charts.push(selected_object);
-            }
-            else if(selected_object.isShape())
-            {
-                shapes.push(selected_object);
-            }
-            else if(typeof  selected_object.isImage())
-            {
-                images.push(selected_object);
-            }
-        }
-        return {tables: tables, charts: charts, shapes: shapes, images: images};
-    },
-
-    calculateCompiledVerticalAlign: function()
-    {
-        var _shapes = this.spTree;
-        var _shape_index;
-        var _result_align = null;
-        var _cur_align;
-        for(_shape_index = 0; _shape_index < _shapes.length; ++ _shape_index)
-        {
-            var _shape = _shapes[_shape_index];
-            if(_shape instanceof  CShape)
-            {
-                if(_shape.txBody && _shape.txBody.compiledBodyPr && typeof (_shape.txBody.compiledBodyPr.anchor) == "number")
-                {
-                    _cur_align = _shape.txBody.compiledBodyPr.anchor;
-                    if(_result_align === null)
-                    {
-                        _result_align = _cur_align;
-                    }
-                    else
-                    {
-                        if(_result_align !== _cur_align)
-                        {
-                            return null;
-                        }
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            if(_shape instanceof CGroupShape)
-            {
-                _cur_align = _shape.calculateCompiledVerticalAlign();
-                if(_cur_align === null)
-                {
-                    return null;
-                }
-                if(_result_align === null)
-                {
-                    _result_align = _cur_align;
-                }
-                else
-                {
-                    if(_result_align !== _cur_align)
-                    {
-                        return null;
-                    }
-                }
-            }
-        }
-        return _result_align;
-    },
-
-
     setVerticalAlign : function(align)
     {
         for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
@@ -1211,9 +1114,6 @@ CGroupShape.prototype =
         return {kd1: 1, kd2: 1};
     },
 
-
-
-
     changePresetGeom: function(preset)
     {
         for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
@@ -1235,7 +1135,6 @@ CGroupShape.prototype =
             }
         }
     },
-
 
     changeLine: function(line)
     {
@@ -1414,7 +1313,6 @@ CGroupShape.prototype =
         }
     },
 
-
     select: CShape.prototype.select,
 
     deselect: function(drawingObjectsController)
@@ -1442,7 +1340,6 @@ CGroupShape.prototype =
         return parents;
     },
 
-
     getCardDirectionByNum: function(num)
     {
         var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
@@ -1454,7 +1351,6 @@ CGroupShape.prototype =
 
         return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
     },
-
 
     getNumByCardDirection: function(cardDirection)
     {
@@ -1506,7 +1402,6 @@ CGroupShape.prototype =
         var _tmp_y = this.extY != 0 ? this.extY : 0.1;
         return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
     },
-
 
     getFullFlipH: function()
     {

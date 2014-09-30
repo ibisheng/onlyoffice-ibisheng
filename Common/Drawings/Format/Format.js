@@ -11106,48 +11106,8 @@ function CSld()
     this.name = "";
     this.Bg = null;
     this.spTree = [];//new GroupShape();
-
-    this.merge = function(cSld)
-    {
-    };
-    this.createFullCopy = function(parent, elementsManipulator)
-    {
-        var _copy = new CSld();
-        _copy.name = this.name;
-
-        if(this.Bg != null)
-        {
-            _copy.Bg = this.Bg.createFullCopy();
-        }
-
-        var _glyph_index;
-        for(_glyph_index = 0; _glyph_index < this.spTree.length; ++_glyph_index)
-        {
-            if(typeof this.spTree[_glyph_index].createFullCopy === "function")
-            {
-                _copy.spTree[_glyph_index] = this.spTree[_glyph_index].createFullCopy(parent, elementsManipulator);
-                _copy.spTree[_glyph_index].Recalculate();
-                _copy.spTree[_glyph_index].updateCursorTypes();
-            }
-        }
-        return _copy;
-    };
-
 }
 
-
-CSld.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-    Refresh_RecalcData: function()
-    {}
-
-
-};
 // ----------------------------------
 
 // MASTERSLIDE ----------------------

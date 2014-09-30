@@ -35,7 +35,6 @@ function CImageShape()
     g_oTableId.Add( this, this.Id );
 }
 
-
 CImageShape.prototype =
 {
     Get_Id: function()
@@ -112,6 +111,7 @@ CImageShape.prototype =
             copy.setBlipFill(this.blipFill.createDuplicate());
         }
         copy.setBDeleted(this.bDeleted);
+        copy.cachedImage = this.getBase64Img();
         return copy;
     },
 
@@ -178,8 +178,6 @@ CImageShape.prototype =
         return false;
     },
 
-
-
     isShape: function()
     {
         return false;
@@ -189,7 +187,6 @@ CImageShape.prototype =
     {
         return true;
     },
-
 
     isChart: function()
     {
@@ -207,17 +204,11 @@ CImageShape.prototype =
         return {hit: false, num: -1, polar: false};
     },
 
-
-
     getParentObjects: CShape.prototype.getParentObjects,
-
     hitInPath: CShape.prototype.hitInPath,
     hitInInnerArea: CShape.prototype.hitInInnerArea,
     getRotateAngle: CShape.prototype.getRotateAngle,
-
     changeSize: CShape.prototype.changeSize,
-
-
 
     getFullFlipH: function()
     {
@@ -275,24 +266,6 @@ CImageShape.prototype =
         return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
     },
 
-    getImageProps: function()
-    {
-        var _result_image_props = {};
-        _result_image_props.Width = this.extX;
-        _result_image_props.Height = this.extY;
-        _result_image_props.Position = {X: this.x, Y: this.y};
-        _result_image_props.Paddings = {Left: this.x, Top: this.y, Right: this.x + this.extX, Bottom: this.y + this.extY};
-        if(this.blipFill && this.blipFill.fill && this.blipFill.fill.RasterImageId)
-        {
-            _result_image_props.ImageUrl = this.blipFill.fill.RasterImageId;
-        }
-        if(!isRealObject(this.group))
-        {
-            _result_image_props.IsLocked = !(this.Lock.Type === locktype_None || this.Lock.Type === locktype_Mine);
-        }
-
-        return _result_image_props;
-    },
 
     canRotate: function()
     {
@@ -366,10 +339,22 @@ CImageShape.prototype =
         return false;
     },
 
-
-    getBase64Img: function()
+    getBase64Img: function ()
     {
-        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+        if(typeof this.cachedImage === "string")
+        {
+            return this.cachedImage;
+        }
+        var img_object = ShapeToImageConverter(this, this.pageIndex);
+        if(img_object)
+        {
+            return img_object.ImageUrl;
+        }
+        else
+        {
+
+            return "";
+        }
     },
 
     convertToWord: function(document)
@@ -439,6 +424,7 @@ CImageShape.prototype =
     },
     recalculateTransform: function()
     {
+        this.cachedImage = null;
         if(!isRealObject(this.group))
         {
             if(this.spPr.xfrm.isNotNull())
@@ -718,9 +704,6 @@ CImageShape.prototype =
     {
     },
 
-
-
-
     hitToAdjustment: function()
     {
         return {hit:false};
@@ -746,20 +729,10 @@ CImageShape.prototype =
         return this.isPlaceholder() ? this.nvPicPr.nvPr.ph.idx : null;
     },
 
-
-
-
     setNvSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
         this.nvPicPr = pr;
-    },
-
-
-    setStyle: function(style)
-    {
-        History.Add(this, {Type:historyitem_SetSetStyle, oldPr: this.style, newPr:style});
-        this.style = style;
     },
 
     getAllImages: function(images)
@@ -1023,7 +996,6 @@ CImageShape.prototype =
             }
         }
     },
-
 
     Load_LinkData: function(linkData)
     {
