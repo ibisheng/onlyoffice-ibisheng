@@ -317,7 +317,7 @@ function CChartSpace()
 
     this.setRecalculateInfo();
 
-
+    this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
