@@ -2283,7 +2283,7 @@ drawBarChart.prototype =
 			seriesHeight[i] = [];
 			tempValues[i]   = [];
 			
-			if(numCache == null)
+			if(numCache == null || this.chartProp.series[i].isHidden)
 				continue;
 			
 			for (var j = 0; j < seria.length; j++) {
@@ -3410,7 +3410,7 @@ drawHBarChart.prototype =
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			
-			if(!numCache)
+			if(!numCache || this.chartProp.series[i].isHidden)
 				continue;
 			
 			seria = this.chartProp.series[i].val.numRef.numCache.pts;
