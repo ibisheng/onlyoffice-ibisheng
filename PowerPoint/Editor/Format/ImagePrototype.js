@@ -44,6 +44,8 @@ CImageShape.prototype.recalcBrush = function()
     this.recalcInfo.recalculateBrush = true;
 };
 
+
+
 CImageShape.prototype.recalcPen = function()
 {
     this.recalcInfo.recalculatePen = true;

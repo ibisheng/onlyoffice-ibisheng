@@ -1660,8 +1660,18 @@ asc_docs_api.prototype.stopSearchText = function(){
 
     this.WordControl.m_oLogicDocument.Search_Stop();
 }
-asc_docs_api.prototype.findText = function(text, scanForward){
-    return this.WordControl.m_oLogicDocument.findText(text, scanForward);
+asc_docs_api.prototype.findText = function(text, isNext){
+
+    var SearchEngine = editor.WordControl.m_oLogicDocument.Search(text, {MatchCase: false});
+
+    var Id = this.WordControl.m_oLogicDocument.Search_GetId( isNext );
+
+    if ( null != Id )
+        this.WordControl.m_oLogicDocument.Search_Select( Id );
+
+    return SearchEngine.Count;
+
+    //return this.WordControl.m_oLogicDocument.findText(text, scanForward);
 }
 
 asc_docs_api.prototype.asc_searchEnabled = function(bIsEnabled)

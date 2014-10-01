@@ -121,10 +121,6 @@ CImageShape.prototype =
             return this.blipFill.RasterImageId;
         return null;
     },
-    getSearchResults: function()
-    {
-        return null;
-    },
     isSimpleObject: function()
     {
         return true;

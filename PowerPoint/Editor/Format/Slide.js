@@ -121,6 +121,49 @@ Slide.prototype =
     },
 
 
+    Search: function( Str, Props, Engine, Type )
+    {
+        var sp_tree = this.cSld.spTree;
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            sp_tree[i].Search(Str, Props, Engine, Type);
+        }
+    },
+
+    Search_GetId: function(isNext, StartPos)
+    {
+        var sp_tree = this.cSld.spTree, i, Id;
+        if(isNext)
+        {
+            for(i = StartPos; i < sp_tree.length; ++i)
+            {
+                if(sp_tree[i].Search_GetId)
+                {
+                    Id = sp_tree[i].Search_GetId(isNext, false);
+                    if(Id !== null)
+                    {
+                        return Id;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for(i = StartPos; i > -1; --i)
+            {
+                if(sp_tree[i].Search_GetId)
+                {
+                    Id = sp_tree[i].Search_GetId(isNext, false);
+                    if(Id !== null)
+                    {
+                        return Id;
+                    }
+                }
+            }
+        }
+        return null;
+    },
+
     getMatchingShape: function(type, idx, bSingleBody)
     {
         var _input_reduced_type;

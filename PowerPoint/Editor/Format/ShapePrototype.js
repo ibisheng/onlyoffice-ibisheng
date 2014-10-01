@@ -742,6 +742,32 @@ CShape.prototype.getIsSingleBody = function(x, y)
     return true;
 };
 
+CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
+{
+    if(this.parent)
+    {
+        var drawing_objects = this.parent.graphicObjects;
+        drawing_objects.resetSelection();
+        if(this.group)
+        {
+            var main_group = this.group.getMainGroup();
+            drawing_objects.selectObject(main_group, 0);
+            main_group.selectObject(this, 0);
+            main_group.selection.textSelection = this;
+            drawing_objects.selection.groupSelection = main_group;
+        }
+        else
+        {
+            drawing_objects.selectObject(this, 0);
+            drawing_objects.selection.textSelection = this;
+        }
+        //var content = this.getDocContent();
+        //content && content.Set_StartPage(this.parent.num);
+        editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
+        editor.WordControl.GoToPage(this.parent.num);
+    }
+};
+
 CTextBody.prototype.Get_Worksheet = function()
 {
     return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();

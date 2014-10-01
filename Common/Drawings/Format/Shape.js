@@ -526,12 +526,24 @@ CShape.prototype =
             this.textBoxContent.Search(Str, Props, SearchEngine, Type);
             dd.EndSearchTransform();
         }
+        else if(this.txBody && this.txBody.content)
+        {
+            //var dd = this.getDrawingDocument();
+            //dd.StartSearchTransform(this.transformText);
+            this.txBody.content.Search(Str, Props, SearchEngine, Type);
+            //dd.EndSearchTransform();
+        }
     },
     
     Search_GetId : function(bNext, bCurrent)
     {
         if(this.textBoxContent)
             return this.textBoxContent.Search_GetId(bNext, bCurrent);
+
+        else if(this.txBody && this.txBody.content)
+        {
+            return this.txBody.content.Search_GetId(bNext, bCurrent);
+        }
         
         return null;
     },

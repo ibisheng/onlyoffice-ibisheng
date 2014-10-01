@@ -247,24 +247,6 @@ CGroupShape.prototype =
         }
     },
 
-    getSearchResults : function(str, num)
-    {
-        var commonSearchResults = [];
-        for(var i = 0; i< this.arrGraphicObjects.length; ++i)
-        {
-            var searchResults;
-            if((searchResults = this.arrGraphicObjects[i].getSearchResults(str, i))!=null)
-            {
-                for(var j = 0; j < searchResults.length; ++j)
-                {
-                    searchResults[j].shapeIndex = i;
-                }
-                commonSearchResults = commonSearchResults.concat(searchResults)
-            }
-        }
-        return commonSearchResults.length > 0 ? commonSearchResults : null;
-    },
-
     getBoundsInGroup: function()
     {
         return getBoundsInGroup(this);

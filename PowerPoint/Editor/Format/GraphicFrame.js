@@ -154,6 +154,24 @@ CGraphicFrame.prototype =
         return historyitem_type_GraphicFrame;
     },
 
+    Search : function(Str, Props, SearchEngine, Type)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Search(Str, Props, SearchEngine, Type);
+        }
+    },
+
+    Search_GetId : function(bNext, bCurrent)
+    {
+        if(this.graphicObject)
+        {
+            return this.graphicObject.Search_GetId(bNext, bCurrent);
+        }
+
+        return null;
+    },
+
     copy: function()
     {
         var ret = new CGraphicFrame();
@@ -225,67 +243,6 @@ CGraphicFrame.prototype =
             this.graphicObject.RecalculateCurPos();
 
         }
-    },
-
-    getSearchResults: function(str)
-    {
-        if(this.graphicObject instanceof CTable)
-        {
-            var ret = [];
-            var rows = this.graphicObject.Content;
-            for(var i = 0; i < rows.length; ++i)
-            {
-                var cells = rows[i].Content;
-                for(var j = 0; j < cells.length; ++j)
-                {
-                    var cell = cells[j];
-                    var s_arr = cell.Content.getSearchResults(str);
-                    if(Array.isArray(s_arr) && s_arr.length > 0)
-                    {
-                        for(var t = 0; t < s_arr.length; ++t)
-                        {
-
-                            var s = {};
-                            s.id = STATES_ID_TEXT_ADD;
-                            s.textObject = this;
-
-
-
-                            var TableState = {};
-                            TableState.Selection =
-                            {
-                                Start    : true,
-                                Use      : true,
-                                StartPos :
-                                {
-                                    Pos : { Row : i, Cell : j },
-                                    X   : this.graphicObject.Selection.StartPos.X,
-                                    Y   : this.graphicObject.Selection.StartPos.Y
-                                },
-                                EndPos   :
-                                {
-                                    Pos : { Row : i, Cell : j },
-                                    X   : this.graphicObject.Selection.EndPos.X,
-                                    Y   : this.graphicObject.Selection.EndPos.Y
-                                },
-                                Type     : table_Selection_Text,
-                                Data     : null,
-                                Type2    : table_Selection_Common,
-                                Data2    : null
-                            };
-                            TableState.Selection.Data = [];
-                            TableState.CurCell = { Row : i, Cell : j};
-                            s_arr[t].push( TableState );
-                            s.textSelectionState = s_arr[t];
-                            ret.push(s);
-                        }
-                    }
-
-                }
-            }
-            return ret;
-        }
-        return [];
     },
 
     hitInPath: function()
@@ -771,15 +728,17 @@ CGraphicFrame.prototype =
             if(this.group)
             {
                 var main_group = this.group.getMainGroup();
-                this.parent.graphicObjects.selectObject(main_group, this.parent.num);
+                this.parent.graphicObjects.selectObject(main_group, 0);
                 main_group.selectObject(this, this.parent.num);
                 main_group.selection.textSelection = this;
             }
             else
             {
-                this.parent.graphicObjects.selectObject(this, this.parent.num);
+                this.parent.graphicObjects.selectObject(this, 0);
                 this.parent.graphicObjects.selection.textSelection = this;
             }
+            editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
+            editor.WordControl.GoToPage(this.parent.num);
         }
     },
 

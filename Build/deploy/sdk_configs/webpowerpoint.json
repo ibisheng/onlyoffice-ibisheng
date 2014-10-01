@@ -131,6 +131,7 @@
                 "../../Word/Editor/Table.js",
                 "../../Word/Editor/Math.js",
                 "../../Word/Editor/Spelling.js",
+                "../../Word/Editor/Search.js",
                 "../../Word/Editor/FontClassification.js",
                 "../../PowerPoint/Editor/Format/ShapePrototype.js",
                 "../../PowerPoint/Editor/Format/ImagePrototype.js",

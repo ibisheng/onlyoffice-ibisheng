@@ -117,11 +117,6 @@ function CTextBody()
 
 CTextBody.prototype =
 {
-    getSearchResults : function(str)
-    {
-        return this.content != null ? this.content.getSearchResults(str) : [];
-    },
-
     createDuplicate: function()
     {
         var ret = new CTextBody();
