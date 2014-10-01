@@ -747,7 +747,11 @@ Paragraph.prototype.Restart_CheckSpelling = function()
     
     // Пересчитываем скомпилированный стиль для самого параграфа и для всех ранов в данном параграфе
     this.Recalc_CompiledPr();
-    this.Recalc_RunsCompiledPr();
+
+    for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
+    {
+        this.Content[nIndex].Restart_CheckSpelling();
+    }
 
     this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
 };
@@ -891,6 +895,19 @@ Paragraph.prototype.Add_SpellCheckerElement = function(Element)
 //----------------------------------------------------------------------------------------------------------------------
 // ParaRun
 //----------------------------------------------------------------------------------------------------------------------
+ParaRun.prototype.Restart_CheckSpelling = function()
+{
+    this.Recalc_CompiledPr(false);
+
+    for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
+    {
+        var Item = this.Content[nIndex];
+
+        if (para_Drawing === Item.Type)
+            Item.Restart_CheckSpelling();
+    }
+};
+
 ParaRun.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
     this.SpellingMarks = [];
@@ -998,6 +1015,14 @@ ParaRun.prototype.Clear_SpellingMarks = function()
 //----------------------------------------------------------------------------------------------------------------------
 // ParaHyperlink
 //----------------------------------------------------------------------------------------------------------------------
+ParaHyperlink.prototype.Restart_CheckSpelling = function()
+{
+    for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
+    {
+        this.Content[nIndex].Restart_CheckSpelling();
+    }
+};
+
 ParaHyperlink.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
     this.SpellingMarks = [];
@@ -1050,6 +1075,10 @@ ParaHyperlink.prototype.Clear_SpellingMarks = function()
 //----------------------------------------------------------------------------------------------------------------------
 // ParaComment
 //----------------------------------------------------------------------------------------------------------------------
+ParaComment.prototype.Restart_CheckSpelling = function()
+{
+};
+
 ParaComment.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
 };
@@ -1068,6 +1097,10 @@ ParaComment.prototype.Clear_SpellingMarks = function()
 //----------------------------------------------------------------------------------------------------------------------
 // ParaMath
 //----------------------------------------------------------------------------------------------------------------------
+ParaMath.prototype.Restart_CheckSpelling = function()
+{
+};
+
 ParaMath.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
     if ( true === SpellCheckerEngine.bWord )

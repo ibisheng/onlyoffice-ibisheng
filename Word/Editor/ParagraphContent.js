@@ -6549,6 +6549,11 @@ ParaDrawing.prototype =
             }
         }
         return false;
+    },
+
+    Restart_CheckSpelling : function()
+    {
+        // TODO: Реализовать
     }
 };
 
