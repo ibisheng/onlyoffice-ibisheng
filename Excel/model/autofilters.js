@@ -294,7 +294,7 @@ var gUndoInsDelCellsFlag = true;
                     addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
 					
 					//TODO пересмотреть _refToRange
-					var newRange = this._refToRange(ref);
+					var newRange = Asc.g_oRangeCache.getAscRange(ref);
 					if(newRange)
 						activeCells = newRange;
 				}
