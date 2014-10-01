@@ -9078,9 +9078,7 @@
 									range.setWrap(newVal.getWrap());
 
 									//angle
-									var angle = newVal.getAngle();
-									if(angle)
-										range.setAngle(angle);
+									range.setAngle(newVal.getAngle());
 
 									//hyperLink
 									var hyperLink =  newVal.getHyperlink();
