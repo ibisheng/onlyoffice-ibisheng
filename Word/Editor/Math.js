@@ -293,7 +293,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 else if (!oElem.Selection.Use)//переходим на уровень выше и выделяем композицию
                 {
 					if (oContent.Content.bRoot) //мы находмися на выходе из формулы
-						return; //TODO 
+						return false;
                     var Comp = oContent.Content.GetParent();
                     Comp.SetSelectAll();
                     Comp.SelectToParent();
@@ -305,7 +305,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 if (oContent.Content.CurPos + 1 >= oContent.Content.content.length && !oElem.Selection.Use) //переходим на уровень выше и выделяем композицию
                 {
 					if (oContent.Content.bRoot) //мы находмися на выходе из формулы
-						return; //TODO 
+						return false; 
                     var Comp = oContent.Content.GetParent();
                     Comp.SetSelectAll();
                     Comp.SelectToParent();
@@ -359,34 +359,94 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
 
     ParaMath.prototype.RemoveElem = function(oContent, Direction, bOnAdd)
     {
-        var start = oContent.Start,
-            end   = oContent.End,
-            oMathContent = oContent.Content;
+		var oMath = oContent.Content;
+		var oMathContent = oMath.content;
+		
+        var start = oMath.Selection.Start,
+            end   = oMath.Selection.End;
+			
+		var bRightSelect = true;
 			
 		if(start > end)
 		{
-			start = oContent.End;
-            end   = oContent.Start;
+			bRightSelect = false;
+			start = oMath.Selection.End;
+            end   = oMath.Selection.Start;
 		}
-		var oStartContent = oContent.Content.content[start];
+		
+		var oStartContent = oMathContent[start]; 
 		if ( para_Math_Run == oStartContent.Type)
 			if (oStartContent.Selection.StartPos == oStartContent.Selection.EndPos == oStartContent.Content.length)
-				start++;
+				start++;//у левого рана буквы не заселекчены, но в селект он попал, так что его удалять не надо
+			
+		var oEndContent = oMathContent[end];
+		if ( para_Math_Run == oEndContent.Type && !bRightSelect)
+			if (oEndContent.Selection.StartPos == oEndContent.Selection.EndPos &&  oEndContent.Selection.EndPos == oEndContent.Content.length)
+				end--;//у правого рана буквы не заселекчены, но в селект он попал, так что его удалять не надо
 		
-        var len = end - start + 1;
+		var nStartContent 	= start;
+		var nEndContent 	= end;
 
         History.Create_NewPoint();
         var Items = [];
-        for (var i=start; i<=end; i++)
-            Items.push(oContent.Content.content[i]);
+        
+		var oElem = oMathContent[start];		
+		if ( para_Math_Run == oElem.Type && oElem.Selection.Use)
+		{
+			oElem.Remove(Direction,false);
+			start++;
+			if (!bRightSelect)
+				oMath.CurPos++;
+		}
+		else
+		{
+			Items.push(oElem);			
+			History.Add(oMath, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: start});
+		}
+		
+		Items = [];
+		for (var i=nStartContent+1; i<nEndContent; i++)
+		{
+			oElem = oMathContent[i];
+            Items.push(oElem);
+		}
+		if (Items.length > 0)
+			History.Add(oMath, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: nStartContent+1});
+		
+		Items = [];
+		var oElem = oMathContent[end];
+		if ( para_Math_Run == oElem.Type && oElem.Selection.Use)
+		{
+			oElem.Remove(Direction,false);
+			end--;
+			if (bRightSelect)
+				oMath.CurPos--;
+		}
+		else
+		{
+			Items.push(oElem);			 
+			History.Add(oMath, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: end});
+		}
+		
+		var len = end - start + 1;
+		oMathContent.splice( start, len );
+		
+		if (bRightSelect)
+			oMath.CurPos = oMath.CurPos - len + 1;
+		
+		//добавляем пустой ран на месте удаленных элементов, и ставим на него селект		
+		var oMRun = new ParaRun(this.Paragraph, true);
+        //oMRun.Pr = oStartContent.Pr;		
+		var items = [];
+        oMathContent.splice(oMath.CurPos, 0, oMRun);
+        items.push(oMRun);
+        var Pos = oMath.CurPos,
+            PosEnd = Pos + 1;
+        History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});		
 
-        oContent.Content.CurPos -= len;
-		if (oContent.Content.CurPos < 0)
-			oContent.Content.CurPos = 0;
+		if (oMath.CurPos < 0)
+			oMath.CurPos = 0;
 
-        oContent.Content.content.splice( start, len );
-		oContent.Content.SetRunEmptyToContent(true);
-        History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: start});
 		this.Selection_Remove();
         return;
     };
