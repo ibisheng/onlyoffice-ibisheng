@@ -33,6 +33,8 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     {
         this.ext.cx = extX;
         this.ext.cy = extY;
+        this.extX = extX;
+        this.extY = extY;
         this.transform = transform;
     };
 
@@ -40,6 +42,8 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     {
         this.ext.cx = extX;
         this.ext.cy = extY;
+        this.extX = extX;
+        this.extY = extY;
         this.geometry && this.geometry.Recalculate(extX, extY);
     };
 
