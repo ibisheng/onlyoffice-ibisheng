@@ -1086,7 +1086,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
     var Bottom2 = PRS.LineBottom2;
 
     // Переносим строку по PageBreak. Если в строке ничего нет, кроме PageBreak, тогда нам не надо проверять высоту строки и обтекание.
-    var BreakPageLineEmpty = ( true === PRS.BreakPageLine && true === PRS.EmptyLine );
+    var BreakPageLineEmpty = (this.Lines[CurLine].Info & paralineinfo_BreakPage && this.Lines[CurLine].Info & paralineinfo_Empty ? true : false);
     PRS.BreakPageLineEmpty = BreakPageLineEmpty;
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
