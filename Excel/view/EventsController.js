@@ -885,7 +885,7 @@
 						t.__handlers = {
 							53: function () {t.handlers.trigger("setFontAttributes", "s");},
 							65: function () {t.handlers.trigger("changeSelection", /*isStartPoint*/true,
-								0, 0, /*isCoord*/true, /*isSelectMode*/false);},
+								-1, -1, /*isCoord*/true, /*isSelectMode*/false);},
 							66: function () {t.handlers.trigger("setFontAttributes", "b");},
 							73: function () {t.handlers.trigger("setFontAttributes", "i");},
 							85: function () {t.handlers.trigger("setFontAttributes", "u");},
