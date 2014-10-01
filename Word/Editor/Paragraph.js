@@ -941,26 +941,6 @@ Paragraph.prototype =
         return false;
     },
 
-    Check_BreakPageInLine : function(CurLine)
-    {
-        var RangesCount = this.Lines[CurLine].Ranges.length;
-        for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-        {
-            var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-            var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-            {
-                var Element = this.Content[CurPos];
-
-                if ( true === Element.Check_BreakPageInRange( CurLine, CurRange ) )
-                    return true;
-            }
-        }
-
-        return false;
-    },
-
     Check_BreakPageEnd : function(Item)
     {
         var PBChecker = new CParagraphCheckPageBreakEnd( Item );

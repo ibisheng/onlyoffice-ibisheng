@@ -2937,24 +2937,6 @@ ParaRun.prototype.Check_PageBreak = function()
     return false;
 };
 
-ParaRun.prototype.Check_BreakPageInRange = function(_CurLine, _CurRange)
-{
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
-    {
-        var Element = this.Content[CurPos];
-        if ( para_NewLine === Element.Type && break_Page === Element.BreakType )
-            return true;
-    }
-
-    return false;
-};
-
 ParaRun.prototype.Check_BreakPageEnd = function(PBChecker)
 {
     var ContentLen = this.Content.length;

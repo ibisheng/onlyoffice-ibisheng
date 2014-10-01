@@ -16101,6 +16101,26 @@ CTable.prototype =
                 CurGridCol += GridSpan;
             }
 
+            if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowH.Value > Y_content_end )
+            {
+                bNextPage = true;
+
+                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+                {
+                    var Cell   = Row.Get_Cell( CurCell );
+                    var Vmerge = Cell.Get_VMerge();
+
+                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
+
+                    // Проверяем только начальные ячейки вертикального объединения..
+                    if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
+                        continue;
+
+                    Cell.Content.Start_FromNewPage();
+                    Cell.PagesCount = 2;
+                }
+            }
+
             // Данная строка разбилась на несколько страниц. Нам нужно сделать несколько дополнительных действий:
             // 1. Проверяем есть ли хоть какой-либо контент данной строки на первой странице, т.е. реально данная
             //    строка начинается со 2-ой страницы.

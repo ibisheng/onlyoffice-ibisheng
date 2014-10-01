@@ -813,11 +813,6 @@ ParaMath.prototype.Check_PageBreak = function()
     return false;
 };
 
-ParaMath.prototype.Check_BreakPageInRange = function(_CurLine, _CurRange)
-{
-    return false;
-};
-
 ParaMath.prototype.Check_BreakPageEnd = function(PBChecker)
 {
     return false;

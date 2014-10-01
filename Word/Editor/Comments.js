@@ -1088,11 +1088,6 @@ ParaComment.prototype =
         return false;
     },
 
-    Check_BreakPageInRange : function(_CurLine, _CurRange)
-    {
-        return false;
-    },
-
     Check_BreakPageEnd : function(PBChecker)
     {
         return true;

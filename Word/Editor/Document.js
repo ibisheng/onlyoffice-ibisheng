@@ -2115,6 +2115,9 @@ CDocument.prototype =
         {
             this.HdrFtr.RecalculateCurPos();
         }
+
+        // TODO: Здесь добавлено обновление линейки, чтобы обновлялись границы рамки при наборе текста
+        this.Document_UpdateRulersState();
     },
 
     Internal_CheckCurPage : function()
@@ -2754,7 +2757,7 @@ CDocument.prototype =
                     NewTable.Set_ParagraphPrOnAdd( Item );
 
                     // Проверим позицию в текущем параграфе
-                    if ( true === Item.Cursor_IsEnd() )
+                    if (true === Item.Cursor_IsEnd() && undefined === Item.Get_SectionPr())
                     {
                         // Выставляем курсор в начало таблицы
                         NewTable.Cursor_MoveToStartPos();
@@ -10598,24 +10601,28 @@ CDocument.prototype =
         if ( true === Value )
         {
             // Если мы добавляем разные колонтитулы для первой страницы, а этих колонтитулов нет, тогда создаем их
-            var FirstSectPr = this.SectionsInfo.Get_SectPr2( 0).SectPr;
+            var FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
+            var FirstHeader = FirstSectPr.Get_Header_First();
+            var FirstFooter = FirstSectPr.Get_Footer_First();
 
-            if ( null === FirstSectPr.Get_Header_First() )
+            if (null === FirstHeader)
             {
                 var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
                 FirstSectPr.Set_Header_First( Header );
                 
                 this.HdrFtr.CurHdrFtr = Header;
             }
+            else
+                this.HdrFtr.CurHdrFtr = FirstHeader;
 
-            if ( null === FirstSectPr.Get_Footer_First() )
+            if (null === FirstFooter)
             {
                 var Footer = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Footer );
                 FirstSectPr.Set_Footer_First( Footer );
-            }                       
+            }
         }
-       
-        CurHdrFtr.Content.Cursor_MoveToStartPos();
+
+        this.HdrFtr.CurHdrFtr.Content.Cursor_MoveToStartPos();
         
         this.Recalculate();
 

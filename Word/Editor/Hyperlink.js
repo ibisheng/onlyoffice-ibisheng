@@ -1165,23 +1165,6 @@ ParaHyperlink.prototype.Check_PageBreak = function()
     return false;
 };
 
-ParaHyperlink.prototype.Check_BreakPageInRange = function(_CurLine, _CurRange)
-{
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-    {
-        if ( true === this.Content[CurPos].Check_BreakPageInRange(_CurLine, _CurRange) )
-            return true;
-    }
-
-    return false;
-};
-
 ParaHyperlink.prototype.Check_BreakPageEnd = function(PBChecker)
 {
     var ContentLen = this.Content.length;
