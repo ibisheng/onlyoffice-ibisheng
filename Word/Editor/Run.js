@@ -5523,7 +5523,7 @@ ParaRun.prototype.Set_RFonts_Hint = function(Value)
         var OldValue = this.Pr.RFonts.Hint;
         this.Pr.RFonts.Hint = Value;
 
-        Hstory.Add( this, { Type : historyitem_ParaRun_RFonts_Hint, New : Value, Old : OldValue } );
+        History.Add( this, { Type : historyitem_ParaRun_RFonts_Hint, New : Value, Old : OldValue } );
         this.Recalc_CompiledPr(true);
     }
 };

@@ -9787,7 +9787,7 @@ CTable.prototype =
             }
 
             if ( MinAfter > 0 )
-                TableGrid.splice( TableGrid.length - MinAfter - 1, MinAfter );
+                TableGrid.splice( TableGrid.length - MinAfter, MinAfter ); // TableGrid.length - (MinAfter - 1) - 1
 
             if ( MinBefore > 0 )
                 TableGrid.splice( 0, MinBefore );
@@ -12655,6 +12655,15 @@ CTable.prototype =
                     var FirstPara = NextCell.Content.Get_FirstParagraph();
                     var TextPr = FirstPara.Get_FirstRunPr();
                     NewCell.Content.Set_ApplyToAll( true );
+
+                    // Добавляем стиль во все параграфы
+                    var PStyleId = FirstPara.Style_Get();
+                    if ( undefined !== PStyleId && null !== this.LogicDocument )
+                    {
+                        var Styles = this.LogicDocument.Get_Styles();
+                        NewCell.Content.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
+                    }
+
                     NewCell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
                     NewCell.Content.Set_ApplyToAll( false );
 
@@ -12728,6 +12737,15 @@ CTable.prototype =
                     var FirstPara = NextCell.Content.Get_FirstParagraph();
                     var TextPr = FirstPara.Get_FirstRunPr();
                     NewCell.Content.Set_ApplyToAll( true );
+
+                    // Добавляем стиль во все параграфы
+                    var PStyleId = FirstPara.Style_Get();
+                    if ( undefined !== PStyleId && null !== this.LogicDocument )
+                    {
+                        var Styles = this.LogicDocument.Get_Styles();
+                        NewCell.Content.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
+                    }
+
                     NewCell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
                     NewCell.Content.Set_ApplyToAll( false );
 

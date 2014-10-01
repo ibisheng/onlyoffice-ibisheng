@@ -1462,6 +1462,8 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
             }
         }
 
+        Range.Spaces = PRSC.Spaces + PRSC.SpacesSkip;
+
         PRSA.X    = X;
         PRSA.Y    = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
         PRSA.XEnd = Range.XEnd;
@@ -1846,6 +1848,7 @@ function CParaLineRange(X, XEnd)
     this.StartPos  = 0;    // Позиция в контенте параграфа, с которой начинается данный отрезок
     this.EndPos    = 0;    // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
     this.W         = 0;
+    this.Spaces    = 0;    // Количество пробелов в отрезке, без учета пробелов в конце отрезка
 }
 
 CParaLineRange.prototype =
@@ -1867,6 +1870,7 @@ CParaLineRange.prototype =
         NewRange.StartPos    = this.StartPos;
         NewRange.EndPos      = this.EndPos;
         NewRange.W           = this.W;
+        NewRange.Spaces      = this.Spaces;
 
         return NewRange;
     }

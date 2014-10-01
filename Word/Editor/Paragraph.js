@@ -1483,7 +1483,7 @@ Paragraph.prototype =
                 // сохраним позиции начала и конца продолжительных одинаковых настроек
                 // выделения, совместного редактирования и поиска соответственно.
 
-                PDSH.Reset_Range( CurPage, CurLine, CurRange, X, Y0, Y1, _Range.SpacesSkip + _Range.Spaces );
+                PDSH.Reset_Range( CurPage, CurLine, CurRange, X, Y0, Y1, _Range.Spaces );
 
                 if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
                 {
@@ -1977,7 +1977,7 @@ Paragraph.prototype =
                 var Range = Line.Ranges[CurRange];
                 var X = Range.XVisible;
 
-                PDSL.Reset_Range( CurRange, X, Range.SpacesSkip + Range.Spaces );
+                PDSL.Reset_Range( CurRange, X, Range.Spaces );
 
                 var StartPos = Range.StartPos;
                 var EndPos   = Range.EndPos;
