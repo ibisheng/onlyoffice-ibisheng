@@ -2533,7 +2533,7 @@
                 this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
             if (null !== oSheetView.showRowColHeaders)
                 this.bs.WriteItem(c_oSer_SheetView.ShowRowColHeaders, function(){oThis.memory.WriteBool(oSheetView.showRowColHeaders);});
-            if (null !== oSheetView.pane)
+            if (null !== oSheetView.pane && oSheetView.pane.isInit())
                 this.bs.WriteItem(c_oSer_SheetView.Pane, function(){oThis.WriteSheetViewPane(oSheetView.pane);});
         };
         this.WriteSheetViewPane = function (oPane) {

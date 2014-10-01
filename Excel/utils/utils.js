@@ -1165,6 +1165,9 @@
 
 			return this;
 		}
+		asc_CPane.prototype.isInit = function () {
+			return null !== this.topLeftFrozenCell;
+		};
 		asc_CPane.prototype.clone = function() {
 			var res = new asc_CPane();
 			res.state = this.state;

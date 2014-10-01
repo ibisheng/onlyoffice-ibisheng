@@ -1142,7 +1142,8 @@
 
 		WorksheetView.prototype._initPane = function () {
 			var pane = this.model.sheetViews[0].pane;
-			if (null !== pane && null !== (this.topLeftFrozenCell = pane.topLeftFrozenCell)) {
+			if (null !== pane && pane.isInit()) {
+				this.topLeftFrozenCell = pane.topLeftFrozenCell;
 				this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
 				this.visibleRange.c1 = this.topLeftFrozenCell.getCol0();
 			}
