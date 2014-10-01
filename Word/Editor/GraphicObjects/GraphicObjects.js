@@ -2146,7 +2146,7 @@ CGraphicObjects.prototype =
 
     isPointInDrawingObjects2: function(x, y, pageIndex)
     {
-        return this.isPointInDrawingObjects(x, y, pageIndex) > 0;
+        return this.isPointInDrawingObjects(x, y, pageIndex) > -1;
     },
 
 
