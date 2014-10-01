@@ -1,5 +1,6 @@
 "use strict";
 
+
 function HitInLine(context, px, py, x0, y0, x1, y1)
 {
    /* var l = Math.min(x0, x1);
@@ -13,6 +14,11 @@ function HitInLine(context, px, py, x0, y0, x1, y1)
     ty=y1-y0;
 
     d=1.5/Math.sqrt(tx*tx+ty*ty);
+
+    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    {
+        d *= global_mouseEvent.KoefPixToMM;
+    }
 
     dx=-ty*d;
     dy=tx*d;
@@ -41,6 +47,11 @@ function HitInBezier4(context, px, py, x0, y0, x1, y1, x2, y2, x3, y3)
 
     d=1.5/Math.sqrt(tx*tx+ty*ty);
 
+    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    {
+        d *= global_mouseEvent.KoefPixToMM;
+    }
+
     dx=-ty*d;
     dy=tx*d;
 
@@ -67,6 +78,11 @@ function HitInBezier3(context, px, py, x0, y0, x1, y1, x2, y2)
     ty=y2-y0;
 
     d=1.5/Math.sqrt(tx*tx+ty*ty);
+
+    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    {
+        d *= global_mouseEvent.KoefPixToMM;
+    }
 
     dx=-ty*d;
     dy=tx*d;

@@ -14,6 +14,11 @@ function hitToHandles(x, y, object)
     t_y = invert_transform.TransformPointY(x, y);
     var radius = object.convertPixToMM(TRACK_CIRCLE_RADIUS);
 
+    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    {
+        radius *= global_mouseEvent.KoefPixToMM;
+    }
+
     var check_line = CheckObjectLine(object);
     var sqr_x = t_x * t_x, sqr_y = t_y * t_y;
     if (Math.sqrt(sqr_x + sqr_y) < radius)
