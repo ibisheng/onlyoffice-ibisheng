@@ -1110,11 +1110,15 @@ CMathBase.prototype =
     },
     Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
     {
-        if(TextPr.FontSize !== undefined)
+        if(TextPr == undefined)
         {
-            History.Add( this, { Type : historyitem_Math_CtrPrpFSize, New : TextPr.FontSize, Old : this.CtrPrp.FontSize } );
-            this.CtrPrp.FontSize = TextPr.FontSize;
-            this.RecalcInfo.bCtrPrp = true;
+            var CtrPrp = this.Get_CompiledCtrPrp_2();
+            this.Set_FontSizeCtrPrp(FontSize_IncreaseDecreaseValue( IncFontSize, CtrPrp.FontSize ));
+        }
+        else
+        {
+            if(TextPr.FontSize !== undefined)
+                this.Set_FontSizeCtrPrp(TextPr.FontSize);
         }
 
         for(var i=0; i < this.nRow; i++)
@@ -1125,6 +1129,12 @@ CMathBase.prototype =
                     this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
             }
         }
+    },
+    Set_FontSizeCtrPrp: function(Value)
+    {
+        History.Add( this, { Type : historyitem_Math_CtrPrpFSize, New : Value, Old : this.CtrPrp.FontSize } );
+        this.CtrPrp.FontSize = Value;
+        this.RecalcInfo.bCtrPrp = true;
     },
     Set_Select_ToMComp: function(Direction)
     {
