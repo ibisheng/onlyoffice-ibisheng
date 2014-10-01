@@ -1963,6 +1963,14 @@ DrawingObjectsController.prototype =
                             for(i = 0; i < axis_by_types.catAx.length; ++i)
                                 axis_by_types.catAx[i].setAxPos(AX_POS_L);
                         }
+                        else
+                        {
+                            for(i = 0; i < val_axis.length; ++i)
+                                val_axis[i].setAxPos(AX_POS_L);
+
+                            for(i = 0; i < axis_by_types.catAx.length; ++i)
+                                axis_by_types.catAx[i].setAxPos(AX_POS_B);
+                        }
                         chart_type.setBarDir(need_bar_dir);
                     }
 
