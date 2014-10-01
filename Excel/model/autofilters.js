@@ -293,8 +293,12 @@ var gUndoInsDelCellsFlag = true;
 					ref = addFormatTableOptionsObj.asc_getRange();
                     addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
 					
-					//TODO пересмотреть _refToRange
-					var newRange = Asc.g_oRangeCache.getAscRange(ref);
+					var newRange;
+					if(ref && ref.Ref)
+						newRange = ref.Ref;
+					else
+						newRange = Asc.g_oRangeCache.getAscRange(ref);
+
 					if(newRange)
 						activeCells = newRange;
 				}
@@ -504,7 +508,7 @@ var gUndoInsDelCellsFlag = true;
 										if(isAll) {
 											aWs.AutoFilter = new AutoFilter();
 											aWs.AutoFilter.result = result;
-											aWs.AutoFilter.Ref = t._refToRange(result[0].id + ':' + result[result.length -1].idNext);
+											aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
 										}
 									}
 									newRes = 
@@ -512,7 +516,7 @@ var gUndoInsDelCellsFlag = true;
 										result: result,
 										isVis:  true
 									};
-									changesElemHistory.refTable = t._refToRange(result[0].id + ':' + result[result.length -1].idNext);
+									changesElemHistory.refTable = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
 									if(addNameColumn)
 										changesElemHistory.addColumn = true;
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
@@ -693,7 +697,7 @@ var gUndoInsDelCellsFlag = true;
 								if(!aWs.AutoFilter)
 									aWs.AutoFilter = new AutoFilter();
 								aWs.AutoFilter.result = result;
-								aWs.AutoFilter.Ref = t._refToRange(result[0].id + ':' + result[result.length -1].idNext);
+								aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
 							}
 						};
 						
@@ -705,7 +709,7 @@ var gUndoInsDelCellsFlag = true;
 						
 						var ref = 
 						{
-							Ref: t._refToRange(result[0].id + ':' + result[result.length -1].idNext)
+							Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext)
 						};
 						
 						if(addNameColumn && addFormatTableOptionsObj)
@@ -4080,7 +4084,7 @@ var gUndoInsDelCellsFlag = true;
 											if(this.allButtonAF[aF].id == arr.result[i].id)
 											{
 												this.allButtonAF[aF] = arr.result[i];
-												this.allButtonAF[aF].inFilter = this._refToRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext);
+												this.allButtonAF[aF].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext);
 												isInsert = true;
 												break;
 											}
@@ -4089,7 +4093,7 @@ var gUndoInsDelCellsFlag = true;
 									if(!isInsert)
 									{
 										this.allButtonAF[leng + n] = arr.result[i];
-										this.allButtonAF[leng + n].inFilter = this._refToRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext);
+										this.allButtonAF[leng + n].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext);
 										n++;
 									}
 								}
@@ -4692,7 +4696,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						newFilter = new AutoFilter();
 						newFilter.result = val;
-						ref = this._refToRange(val[0].id + ':' + val[val.length - 1].idNext);
+						ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext);
 						newFilter.Ref =  ref;
 						aWs.AutoFilter = newFilter;
 					}
@@ -4724,7 +4728,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					if(!aWs.TableParts)
 						aWs.TableParts = [];
-					ref = this._refToRange(val[0].id + ':' + val[val.length - 1].idNext);
+					ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext);
 					
 					newFilter = new TablePart();
 					newFilter.Ref = ref;
@@ -6758,37 +6762,6 @@ var gUndoInsDelCellsFlag = true;
 				
 				if(isUpdate)
 					ws.changeWorksheet("update");
-			},
-			
-			_refToRange: function(ref)
-			{
-				if(typeof ref != 'string')
-					return false;
-				var splitRef = ref.split("!");
-				if(splitRef[1])
-					ref = splitRef[1];
-				var parseRef = ref.split(":");
-				
-				if(parseRef[0] && parseRef[1])
-				{
-					var startRange, endRange, range;
-					
-					if(!this._isStringContainDigit(parseRef[1]))
-					{
-						startRange = this._idToRange(parseRef[0]);
-						endRange = this._idToRange((this.worksheet.rows.length - 1).toString());
-						range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
-					}
-					else
-					{
-						startRange = this._idToRange(parseRef[0]);
-						endRange = this._idToRange(parseRef[1]);
-						range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
-					};
-					
-					return range;
-				}
-				return false;
 			},
 			
 			_rangeToRef: function(range)
