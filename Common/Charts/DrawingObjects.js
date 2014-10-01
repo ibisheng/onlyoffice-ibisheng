@@ -1458,7 +1458,7 @@ function DrawingObjects() {
 
         if ( _t.isGraphicObject() ) {
 
-            if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
+            if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX < 0) || (_t.graphicObject.extY < 0) )
                 return;
 
             var fromX =  mmToPt(_t.graphicObject.x), fromY =  mmToPt(_t.graphicObject.y),
