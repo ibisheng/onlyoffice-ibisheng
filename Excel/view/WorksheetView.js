@@ -8114,7 +8114,7 @@
 				var range;
 				var tablePartRange;
 				var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
-				var refInsertBinary = t.autoFilters._refToRange(activeRange);
+				var refInsertBinary = Asc.g_oRangeCache.getAscRange(activeRange);
 				var diffRow;
 				var diffCol;
 				for(var aF = 0; aF < aFilters.length; aF++)
@@ -8782,7 +8782,7 @@
 			var numFor = 0;
 
 			var pasteRange = window["Asc"]["editor"].wb.clipboard.activeRange;
-			var activeCellsPasteFragment = this.autoFilters._refToRange(pasteRange);
+			var activeCellsPasteFragment = Asc.g_oRangeCache.getAscRange(pasteRange);
 			var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
 			var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
 

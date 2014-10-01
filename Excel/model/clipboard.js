@@ -2811,13 +2811,11 @@
 							var ref;
 							var style;
 							var range;
-							var tempRange;
 							t.lStorage.autoFilters = [];
 							for(var i = 0; i < findFilter.length; i++)
 							{
 								ref = findFilter[i].Ref;
-								tempRange = autoFiltersObj._refToRange(ref);
-								range = {r1: tempRange.r1 - activeRange.r1, c1: tempRange.c1 -  activeRange.c1, r2: tempRange.r2 - activeRange.r1, c2: tempRange.c2 -  activeRange.c1};
+								range = {r1: ref.r1 - activeRange.r1, c1: ref.c1 -  activeRange.c1, r2: ref.r2 - activeRange.r1, c2: ref.c2 -  activeRange.c1};
 								style = findFilter[i].TableStyleInfo ? findFilter[i].TableStyleInfo.Name : null;
 								t.lStorage.autoFilters[i] = 
 								{
