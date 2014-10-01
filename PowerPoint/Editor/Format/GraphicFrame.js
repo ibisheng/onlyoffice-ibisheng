@@ -41,6 +41,7 @@ CGraphicFrame.prototype =
     Get_ColorMap: CShape.prototype.Get_ColorMap,
 
     setBDeleted: CShape.prototype.setBDeleted,
+    getBase64Img: CShape.prototype.getBase64Img,
 
 
     Is_DrawingShape: function()

@@ -2802,7 +2802,7 @@ CPresentation.prototype =
                                 var Table = SelectedContent.Elements[0].Element;
                                 GraphicFrame.setGraphicObject(Table);
                                 Table.Set_Parent(GraphicFrame);
-                                ret.Drawings.push(GraphicFrame);
+                                ret.Drawings.push(new DrawingCopyObject(GraphicFrame, target_text_object.x, target_text_object.y, target_text_object.extX, target_text_object.extY, target_text_object.getBase64Img()) );
                             }
                         }
                         else
@@ -2847,7 +2847,7 @@ CPresentation.prototype =
                     var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
                     for(i = 0; i < selected_slides.length; ++i)
                     {
-                        ret.SlideObjects.push(new SlideCopyObject(this.Slides[selected_slides[i]], this.Slides[selected_slides[i]].getBase64Img()));
+                        ret.SlideObjects.push(new SlideCopyObject(this.Slides[selected_slides[i]].copy(), this.Slides[selected_slides[i]].getBase64Img()));
                     }
                 }
             }
@@ -2872,8 +2872,8 @@ CPresentation.prototype =
             {
                 for(i = 0; i < Content.Drawings.length; ++i)
                 {
-                    Content.Drawings[i].setParent(this.Slides[this.CurPage]);
-                    Content.Drawings[i].addToDrawingObjects();
+                    Content.Drawings[i].Drawing.setParent(this.Slides[this.CurPage]);
+                    Content.Drawings[i].Drawing.addToDrawingObjects();
                 }
             }
             else if(Content.DocContent)
