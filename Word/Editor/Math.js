@@ -226,262 +226,145 @@ ParaMath.prototype.Add = function(Item)
 
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
-    var oContent = this.GetSelectContent();
-    if (oContent.Start == oContent.End)
+    var oSelectedContent = this.GetSelectContent();
+
+    var nStartPos = oSelectedContent.Start;
+    var nEndPos = oSelectedContent.End;
+    var oContent = oSelectedContent.Content;
+
+    if (nStartPos === nEndPos)
     {
-        var oElem = oContent.Content.getElem(oContent.Start);
+        var oElement = oContent.getElem(nStartPos);
 
-        if (oElem.Type == para_Math_Composition)
-            this.RemoveElem(oContent, Direction, bOnAddText);
-        else if (oElem.Type == para_Math_Run && oElem.IsPlaceholder() && bOnAddText == false)
+        // Если данный элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
+        if (para_Math_Run === oElement.Type)
         {
-            var Comp = oContent.Content.GetParent();
-            Comp.SetSelectAll();
-            Comp.SelectToParent();
-            this.bSelectionUse = true;
-        }
-        else if (oElem.Type == para_Math_Run && oElem.IsPlaceholder() && bOnAddText == true)
-        {
-            var Items = [];
-            Items.push(oContent.Content.content[0]);
-            oContent.Content.content.splice( 0, 1 );
-            History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
-
-            var oMRun = new ParaRun(this.Paragraph, true);
-            oMRun.StartLine = 0; oMRun.StartRange = 0;
-            oContent.Content.addElementToContent(oMRun);
-            var items = [];
-            items.push(oMRun);
-            var Pos = oContent.Content.CurPos,
-                PosEnd = Pos + 1;
-            History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
-        }
-        else	//pararun
-        {
-            if (Direction < 0 && oElem.State.ContentPos - 1 < 0) //backspase
+            if (false === oElement.Remove(Direction) && true !== this.bSelectionUse)
             {
-                if (oContent.Content.CurPos - 1 >= 0)//слева есть элементы
+                if ((Direction > 0 && oContent.content.length - 1 === nStartPos) || (Direction < 0 && 0 === nStartPos))
                 {
-                    var prevElem = oContent.Content.getElem(oContent.Start - 1);
-                    if (prevElem.Type == para_Math_Composition) //слева композиция
-                    {
-                        this.Set_Select_ToMComp(Direction);
-						oContent.Content.CurPos--;
-                        return;
-                    }
-                    else //слева ран
-                    {
-						if(prevElem.Content.length == 0 && !bOnAddText)
-						{
-							this.RemoveEmptyRun(prevElem);
-							this.Remove( Direction, bOnAddText );
-							return;
-						}
-						prevElem.State.ContentPos = prevElem.Content.length;
-                        prevElem.Remove(Direction, bOnAddText);
+                    // Проверяем находимся ли мы на верхнем уровне
+                    if (oContent.bRoot)
+                        return false;
 
-                        if(prevElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
-							this.RemoveEmptyRun(prevElem);
-                        return;
-                    }
-                }
-                else if (!oElem.Selection.Use)//переходим на уровень выше и выделяем композицию
-                {
-					if (oContent.Content.bRoot) //мы находмися на выходе из формулы
-						return false;
-                    var Comp = oContent.Content.GetParent();
-                    Comp.SetSelectAll();
-                    Comp.SelectToParent();
+                    var oParent = oContent.GetParent();
+                    oParent.SetSelectAll();
+                    oParent.SelectToParent();
                     this.bSelectionUse = true;
+
+                    return true;
                 }
-            }
-            else if (Direction > 0 && oElem.State.ContentPos + 1 > oElem.Content.length) //delete
-            {
-                if (oContent.Content.CurPos + 1 >= oContent.Content.content.length && !oElem.Selection.Use) //переходим на уровень выше и выделяем композицию
+
+                if (Direction > 0)
                 {
-					if (oContent.Content.bRoot) //мы находмися на выходе из формулы
-						return false; 
-                    var Comp = oContent.Content.GetParent();
-                    Comp.SetSelectAll();
-                    Comp.SelectToParent();
-                    this.bSelectionUse = true;
-                }
-                else if (!oElem.Selection.Use)//справа есть элемент
-                {
-                    var nNextElem = oContent.Start + 1;
-                    var nextElem = oContent.Content.getElem(nNextElem);
-                    if (nextElem.Type == para_Math_Composition) //справа композиция
+                    var oNextElement = oContent.getElem(nStartPos + 1);
+                    if (para_Math_Run === oNextElement.Type)
                     {
-                        this.Set_Select_ToMComp(Direction);
-						oContent.Content.CurPos++;
-                        return;
-                    }
-                    else //справа ран
-                    {
-                        nextElem.State.ContentPos = 0;
-                        nextElem.Remove(Direction, bOnAddText);
-                        if(nextElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
+                        // Здесь мы не проверяем результат Remove, потому что ран не должен быть пустым после
+                        // Correct_Content
+                        oNextElement.Cursor_MoveToStartPos();
+                        oNextElement.Remove(1);
+
+                        if (oNextElement.Is_Empty())
                         {
-                            var Items = [];
-                            Items.push(nextElem);
-                            nextElem.Parent.content.splice( nNextElem, 1 );
-                            History.Add(nextElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+                            oContent.Correct_Content();
+                            oContent.Correct_ContentPos(1);
                         }
-                        return;
+
+                        this.Selection_Remove();
+                    }
+                    else
+                    {
+                        oContent.SelectElement(nStartPos + 1);
+                        oContent.SelectToParent();
+                        this.bSelectionUse = true;
+                    }
+                }
+                else //if (Direction < 0)
+                {
+                    var oPrevElement = oContent.getElem(nStartPos - 1);
+                    if (para_Math_Run === oPrevElement.Type)
+                    {
+                        // Здесь мы не проверяем результат Remove, потому что ран не должен быть пустым после
+                        // Correct_Content
+                        oPrevElement.Cursor_MoveToEndPos();
+                        oPrevElement.Remove(-1);
+
+                        if (oPrevElement.Is_Empty())
+                        {
+                            oContent.Correct_Content();
+                            oContent.Correct_ContentPos(-1);
+                        }
+
+                        this.Selection_Remove();
+                    }
+                    else
+                    {
+                        oContent.SelectElement(nStartPos - 1);
+                        oContent.SelectToParent();
+                        this.bSelectionUse = true;
                     }
                 }
             }
-
-            oElem.Remove(Direction, bOnAddText);		
-			
-			if (oElem.Content.length == 0 && oContent.Start == oContent.Content.content.length - 1 &&
-				oContent.Start >0 && oContent.Content.content[oContent.Start-1].Type == para_Math_Composition) //тк это крайний правый пустой ран и слева композиция, он остается.
-					return;
-            else if( oElem.Content.length == 0 && !bOnAddText) //тк pararun пустой, удаляем его
+            else
             {
-                var Items = [];
-                Items.push(oElem.Parent.content[oContent.Start]);
-                oElem.Parent.content.splice( oContent.Start, 1 );
-                History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oContent.Start});
-				this.PosTransitLeft(oContent.Content);
-				oContent.Content.SetRunEmptyToContent(true);
+                if (oElement.Is_Empty())
+                {
+                    oContent.CurPos = nStartPos;
+                    oContent.Correct_Content();
+                    oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
+                }
+
+                this.Selection_Remove();
             }
+
+            return true;
+        }
+        else
+        {
+            oContent.Remove_FromContent(nStartPos, 1);
+
+            oContent.CurPos = nStartPos;
+            oContent.Correct_Content();
+            oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
+
+            this.Selection_Remove();
         }
     }
     else
-        return this.RemoveElem(oContent, Direction, bOnAddText);
+    {
+        if (nStartPos > nEndPos)
+        {
+            var nTemp = nEndPos;
+            nEndPos = nStartPos;
+            nStartPos = nTemp;
+        }
 
-},
+        // Проверяем начальный и конечный элементы
+        var oStartElement = oContent.getElem(nStartPos);
+        var oEndElement = oContent.getElem(nEndPos);
 
-ParaMath.prototype.RemoveElem = function(oContent, Direction, bOnAdd)
-{
-	var oMath = oContent.Content;
-	var oMathContent = oMath.content;
-	
-    var start = oMath.Selection.Start,
-        end   = oMath.Selection.End;
-		
-	var bRightSelect = true;
-		
-	if(start > end)
-	{
-		bRightSelect = false;
-		start = oMath.Selection.End;
-        end   = oMath.Selection.Start;
-	}
-	
-	var oStartContent = oMathContent[start]; 
-	if ( para_Math_Run == oStartContent.Type)
-		if (oStartContent.Selection.StartPos == oStartContent.Selection.EndPos == oStartContent.Content.length)
-			start++;//у левого рана буквы не заселекчены, но в селект он попал, так что его удалять не надо
-		
-	var oEndContent = oMathContent[end];
-	if ( para_Math_Run == oEndContent.Type && !bRightSelect)
-		if (oEndContent.Selection.StartPos == oEndContent.Selection.EndPos &&  oEndContent.Selection.EndPos == oEndContent.Content.length)
-			end--;//у правого рана буквы не заселекчены, но в селект он попал, так что его удалять не надо
-	
-	var nStartContent 	= start;
-	var nEndContent 	= end;
+        // Если последний элемент - ран, удаляем внутри, если нет, тогда удаляем целиком элемент
+        if (para_Math_Run === oEndElement.Type)
+            oEndElement.Remove(Direction);
+        else
+            oContent.Remove_FromContent(nEndPos, 1);
 
-    var Items = [];
-    
-	var oElem = oMathContent[start];		
-	if ( para_Math_Run == oElem.Type && oElem.Selection.Use)
-	{
-		if  (oElem.Selection.EndPos - oElem.Selection.StartPos != oElem.Content.length)
-		{
-			oElem.Remove(Direction,false);
-			start++;
-			if (!bRightSelect)
-				oMath.CurPos++;
-		}
-		else 
-			nStartContent--;
-	}
-	else
-	{
-		Items.push(oElem);			
-		History.Add(oMath, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: start});
-	}
-	
-	if ( start != end)
-	{
-		Items = [];
-		for (var i=nStartContent+1; i<nEndContent; i++)
-		{
-			oElem = oMathContent[i];
-			Items.push(oElem);
-		}
-		if (Items.length > 0)
-			History.Add(oMath, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: nStartContent+1});		
-		
-		Items = [];
-		var oElem = oMathContent[end];
-		if ( para_Math_Run == oElem.Type && oElem.Selection.Use)
-		{
-			if  (oElem.Selection.EndPos - oElem.Selection.StartPos != oElem.Content.length)
-			{
-				oElem.Remove(Direction,false);
-				end--;
-				if (bRightSelect)
-					this.PosTransitLeft(oMath);
-			}
-			else
-				nEndContent++;
-		}
-		else
-		{
-			Items.push(oElem);			 
-			History.Add(oMath, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: end});
-		}
-	}
-	
-	var len = end - start + 1;
-	oMathContent.splice( start, len );
-	
-	if (bRightSelect)
-		oMath.CurPos = oMath.CurPos - len + 1;
-	
-	oContent.Content.SetRunEmptyToContent(true);
-	//добавляем пустой ран на месте удаленных элементов, и ставим на него селект		
-	var oMRun = new ParaRun(this.Paragraph, true);
-    //oMRun.Pr = oStartContent.Pr;		
-	var items = [];
-    oMathContent.splice(oMath.CurPos, 0, oMRun);
-    items.push(oMRun);
-    var Pos = oMath.CurPos,
-        PosEnd = Pos + 1;
-    History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});		
+        // Удаляем все промежуточные элементы
+        oContent.Remove_FromContent(nStartPos + 1, nEndPos - nStartPos - 1);
 
-	
-	if (oMath.CurPos < 0)
-		oMath.CurPos = 0;
+        // Если первый элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
+        if (para_Math_Run === oStartElement.Type)
+            oStartElement.Remove(Direction);
+        else
+            oContent.Remove_FromContent(nStartPos, 1);
 
-	this.Selection_Remove();
-    return;
+        oContent.CurPos = nStartPos;
+        oContent.Correct_Content();
+        oContent.Correct_ContentPos(Direction);
+        this.Selection_Remove();
+    }
 };
-
-ParaMath.prototype.RemoveEmptyRun = function(oElem)
- {
-    var Items = [];
-    Items.push(oElem.Parent.content[oElem.Parent.CurPos]);
-    oElem.Parent.content.splice( oElem.Parent.CurPos, 1 );
-    History.Add(oElem.Parent, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: oElem.Parent.CurPos});
-    this.PosTransitLeft(oElem.Parent)
-}
-
-ParaMath.prototype.PosTransitLeft = function(oElem)
-{
-	var oPreElem;
-	if (oElem.CurPos > 0)
-	{
-		oElem.CurPos--;
-		oPreElem = oElem.content[oElem.CurPos];		
-		if (oPreElem.Type == para_Math_Run)
-			oPreElem.State.ContentPos = oPreElem.Content.length;
-	}
-	
-}
 
 ParaMath.prototype.GetSelectContent = function()
 {

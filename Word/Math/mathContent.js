@@ -4503,6 +4503,20 @@ CMathContent.prototype =
             this.content[this.Selection.End].Select_All();
 
     },
+
+    SelectElement : function(nPos)
+    {
+        this.Selection.Start = nPos;
+        this.Selection.End   = nPos;
+
+        this.Selection.Use = true;
+
+        if(para_Math_Run === this.content[this.Selection.Start].Type)
+            this.content[this.Selection.Start].Select_All();
+        else
+            this.content[this.Selection.Start].SetSelectAll();
+    },
+
     Is_SelectedAll: function(Props)
     {
         var bFirst = false, bEnd = false;
@@ -4768,6 +4782,62 @@ CMathContent.prototype =
 
 
     },
+    Correct_Content : function()
+    {
+        this.SetRunEmptyToContent(true);
+
+        // Удаляем лишние пустые раны
+        for (var nPos = 0, nLen = this.content.length; nPos < nLen - 1; nPos++)
+        {
+            var oCurrElement = this.content[nPos];
+            var oNextElement = this.content[nPos + 1];
+            if (para_Math_Run === oCurrElement.Type && para_Math_Run === oNextElement.Type)
+            {
+                if (oCurrElement.Is_Empty())
+                {
+                    this.Remove_FromContent(nPos);
+                    nPos--;
+                    nLen--;
+                }
+                else if (oNextElement.Is_Empty())
+                {
+                    this.Remove_FromContent(nPos + 1);
+                    nPos--;
+                    nLen--;
+                }
+            }
+        }
+    },
+
+    Correct_ContentPos : function(nDirection)
+    {
+        var nCurPos = this.CurPos;
+
+        if (nCurPos < 0)
+        {
+            this.CurPos = 0;
+            this.content[0].Cursor_MoveToStartPos();
+        }
+        else if (nCurPos > this.content.length - 1)
+        {
+            this.CurPos = this.content.length - 1;
+            this.content[this.CurPos].Cursor_MoveToEndPos();
+        }
+        else if (para_Math_Run !== this.content[nCurPos].Type)
+        {
+            if (nDirection > 0)
+            {
+                this.CurPos = nCurPos + 1;
+                this.content[this.CurPos].Cursor_MoveToStartPos();
+            }
+            else
+            {
+                this.CurPos = nCurPos - 1;
+                this.content[this.CurPos].Cursor_MoveToEndPos();
+            }
+        }
+    },
+
     Create_FontMap : function(Map)
     {
         for (var index = 0; index < this.content.length; index++)
@@ -5222,6 +5292,12 @@ CMathContent.prototype =
             this.Selection.End++;
 
     },
+
+    Add_ToContent : function(Pos, Item)
+    {
+        this.Internal_Content_Add(Pos, Item);
+    },
+
     Remove_FromContent : function(Pos, Count)
     {
         var DeletedItems = this.content.splice(Pos, Count);
@@ -5255,6 +5331,7 @@ CMathContent.prototype =
         }
 
     },
+
     Get_Default_TPrp: function()
     {
         return this.ParaMath.Get_Default_TPrp();
