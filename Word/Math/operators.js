@@ -1352,10 +1352,6 @@ function COperatorLine()
     CGlyphOperator.call(this);
 }
 Asc.extendClass(COperatorLine, CGlyphOperator);
-COperatorLine.prototype.setContent = function()
-{
-    COperatorLine.superclass.setContent.call(this, this.calcSize, this.calcCoord, this.drawPath);
-}
 COperatorLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1382,7 +1378,6 @@ COperatorLine.prototype.calcCoord = function(stretch)
     var XX = [],
         YY = [];
 
-    //var shY = 2*Y[1]*alpha;
     var shY = 0;
 
     for(var i = 0; i < X.length; i++)
@@ -2959,9 +2954,7 @@ COperator.prototype.draw = function(x, y, pGraphics)
     }
     else
     {
-        var bLine = this.typeOper == ACCENT_LINE || this.typeOper == ACCENT_DOUBLE_LINE;
-
-        if(bLine)
+        if(this.IsLineGlyph())
             this.drawLines(x, y, pGraphics);
         else if(this.type === OPER_SEPARATOR)
             this.drawSeparator(x, y, pGraphics);
@@ -3020,6 +3013,10 @@ COperator.prototype.drawLines = function(absX, absY, pGraphics)
         this.operator.drawOnlyLines(PosOper.x + absX, PosOper.y + absY, pGraphics);
     }
 }
+COperator.prototype.IsLineGlyph = function()
+{
+    return this.typeOper == ACCENT_LINE || this.typeOper == ACCENT_DOUBLE_LINE;
+}
 COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 {
     this.ParaMath = ParaMath;
@@ -3039,6 +3036,8 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
         oMeasure.SetFont(rPrp);
 
+        var bLine = this.IsLineGlyph();
+
         var bTopBot = this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT;
 
         // Width
@@ -3049,16 +3048,23 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
         }
         else
         {
+            if(bLine)
+            {
+                this.operator.fixSize(stretch);
+                width = this.operator.size.width;
+            }
+            else
+            {
+                var bNotStretchDelim = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false;
 
-            var bNotStretchDelim = (this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR) && this.grow == false;
+                var StretchLng = bNotStretchDelim ? 0 : stretch;
 
-            var StretchLng = bNotStretchDelim ? 0 : stretch;
+                this.operator.fixSize(StretchLng);
+                dims = this.operator.getCoordinateGlyph();
+                this.coordGlyph = {XX: dims.XX, YY: dims.YY};
 
-            this.operator.fixSize(StretchLng);
-            dims = this.operator.getCoordinateGlyph();
-            this.coordGlyph = {XX: dims.XX, YY: dims.YY};
-
-            width = bTopBot ? dims.Width : this.operator.size.width;
+                width = bTopBot ? dims.Width : this.operator.size.width;
+            }
         }
 
         // Height
@@ -3082,24 +3088,18 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
             else
             {
                 if(bTopBot)
-                {
-                    /*if(this.type == OPER_GROUP_CHAR)
-                        height = letterOperator.size.height;
-                    else
-                        height = this.operator.size.height;*/
-
                     height = this.operator.size.height;
-                }
                 else
                     height = dims.Height;
             }
-                //height = bTopBot ? this.operator.size.height : dims.Height;
         }
+
+        // Ascent
 
         var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
         var shCenter = this.Parent.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-        if(this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT)
+        if(!bLine && (this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT))
             ascent = dims.Height/2;
         else
             ascent = height/2 + shCenter;
