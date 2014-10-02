@@ -3782,7 +3782,7 @@ drawPieChart.prototype =
 	
 	_drawPie: function ()
     {
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
+		var numCache = this._getFirstRealNumCache();
 		var brush, pen, val;
 		var path;
         for (var i = 0,len = numCache.length; i < len; i++) {
@@ -3800,7 +3800,7 @@ drawPieChart.prototype =
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
+		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
 		
         var radius = Math.min(trueHeight, trueWidth)/2;
@@ -3820,6 +3820,20 @@ drawPieChart.prototype =
 				this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
         };
     },
+	
+	_getFirstRealNumCache: function()
+	{
+		var series = this.chartProp.series;
+		var numCache;
+		for(var i = 0; i < series.length; i++)
+		{
+			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache.pts : this.chartProp.series[i].val.numLit.pts;
+			if(numCache && numCache.length)
+				return numCache;
+		}
+		
+		return series[0].val.numRef ? series[0].val.numRef.numCache.pts : series[0].val.numLit.pts;
+	},
 	
 	_calculateSegment: function (angle, radius, xCenter, yCenter)
     {
