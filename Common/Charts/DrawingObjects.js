@@ -1670,8 +1670,13 @@ function DrawingObjects() {
     // Constructor
     //-----------------------------------------------------------------------------------
 
-    _this.createDrawingObject = function() {
-        return new DrawingBase(worksheet);
+    _this.createDrawingObject = function(type) {
+        var drawingBase = new DrawingBase(worksheet);
+        if(isRealNumber(type))
+        {
+            drawingBase.Type = type;
+        }
+        return drawingBase;
     };
 
     _this.cloneDrawingObject = function(object) {

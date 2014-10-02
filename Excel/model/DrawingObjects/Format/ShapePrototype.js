@@ -44,7 +44,7 @@ CShape.prototype.getDrawingObjectsController = function()
 };
 
 
-function addToDrawings(worksheet, graphic, position, lockByDefault)
+function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
 {
 
     var drawingObjects;
@@ -62,7 +62,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
         drawingObjects = new DrawingObjects();
     }
 
-    var drawingObject = drawingObjects.createDrawingObject();
+    var drawingObject = drawingObjects.createDrawingObject(anchor);
     drawingObject.graphicObject = graphic;
     graphic.setDrawingBase(drawingObject);
     if(!worksheet)
@@ -107,7 +107,7 @@ function deleteDrawingBase(aObjects, graphicId)
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
     var controller = this.getDrawingObjectsController();
-    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined);
+    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, c_oAscCellAnchorType.cellanchorAbsolute);
     var data = {Type: historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(this, data);
     this.worksheet.addContentChanges(new CContentChangesElement(contentchanges_Add, data.Pos, 1, data));
