@@ -747,7 +747,9 @@ function CCommandsType()
     // text
     this.ctDrawText						= 80;
     this.ctDrawTextEx					= 81;
-
+	this.ctDrawTextCode					= 82;
+	this.ctDrawTextCodeGid				= 83;
+		
     // pathcommands
     this.ctPathCommandMoveTo			= 91;
     this.ctPathCommandLineTo			= 92;
@@ -1279,6 +1281,20 @@ CMetafile.prototype =
         this.Memory.WriteDouble(x);
         this.Memory.WriteDouble(y);
     },
+	FillTextCode : function(x,y,code)
+    {
+        this.Memory.WriteByte(CommandType.ctDrawTextCode);
+        this.Memory.WriteLong(code);
+        this.Memory.WriteDouble(x);
+        this.Memory.WriteDouble(y);
+    },
+	tg : function(gid,x,y)
+    {
+        this.Memory.WriteByte(CommandType.ctDrawTextCodeGid);
+        this.Memory.WriteLong(gid);
+        this.Memory.WriteDouble(x);
+        this.Memory.WriteDouble(y);
+    },
     charspace : function(space)
     {
     },
@@ -1751,6 +1767,16 @@ CDocumentRenderer.prototype =
     {
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].FillText(x,y,text);
+    },
+	FillTextCode : function(x,y,text,cropX,cropW)
+    {
+        if (0 != this.m_lPagesCount)
+            this.m_arrayPages[this.m_lPagesCount - 1].FillTextCode(x,y,text);
+    },
+	tg : function(gid,x,y)
+    {
+		if (0 != this.m_lPagesCount)
+            this.m_arrayPages[this.m_lPagesCount - 1].tg(gid,x,y);
     },
     FillText2 : function(x,y,text)
     {
