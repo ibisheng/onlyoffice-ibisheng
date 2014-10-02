@@ -1283,10 +1283,11 @@
 				ws.setSelectionDialogMode(this.selectionDialogType, selectionRange);
 				this.handlers.trigger("asc_onSelectionRangeChanged", ws.getSelectionRangeValue());
 			}
-
-            ws.objectRender.controller.updateSelectionState();
-            ws.objectRender.controller.updateOverlay();
-
+            if (!bLockDraw)
+            {
+                ws.objectRender.controller.updateSelectionState();
+                ws.objectRender.controller.updateOverlay();
+            }
 			if (isSendInfo) {
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				this._onWSSelectionChanged(ws.getSelectionInfo());
