@@ -1127,7 +1127,7 @@
 			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
-			asc_getIsFreezePane: function () { return null !== this.pane; },
+			asc_getIsFreezePane: function () { return null !== this.pane && this.pane.isInit(); },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
 			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
 			getType : function () {
