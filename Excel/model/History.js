@@ -696,6 +696,10 @@ CHistory.prototype.EndTransaction = function()
 	if(this.Transaction < 0)
 		this.Transaction = 0;
 };
+CHistory.prototype.IsEndTransaction = function()
+{
+	return (0 === this.Transaction);
+};
 /** @returns {boolean} */
 CHistory.prototype.Is_On = function()
 {

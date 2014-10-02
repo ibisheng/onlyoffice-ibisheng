@@ -3174,7 +3174,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		////////////////////////////AutoSave api/////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////
 		spreadsheet_api.prototype._autoSave = function () {
-			if (0 === this.autoSaveGap || this.asc_getCellEditMode() || !History.Is_Modified() || !this.canSave)
+			if (0 === this.autoSaveGap || this.asc_getCellEditMode() ||
+				!History.Is_Modified() || !History.IsEndTransaction() || !this.canSave)
 				return;
 			if (null === this.lastSaveTime) {
 				this.lastSaveTime = new Date();
