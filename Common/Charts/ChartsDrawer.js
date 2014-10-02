@@ -2087,6 +2087,18 @@ CChartsDrawer.prototype =
 		}
 	},
 	
+	getPtCount: function(series)
+	{
+		var numCache;
+		for(var i = 0; i < series.length; i++)
+		{
+			numCache = series[i].val.numRef ? series[i].val.numRef.numCache : series[i].val.numLit;
+			if(numCache.ptCount)
+				return numCache.ptCount;
+		}
+		
+		return 0;
+	},
 	
 	
 	//***spline functions***
@@ -3393,11 +3405,10 @@ drawHBarChart.prototype =
 		var xaxispos      = this.chartProp.xaxispos;
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
-		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
-		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
-        var height         = heightGraph / numCache.ptCount;
+		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
+        var height         = heightGraph / ptCount;
 		
 		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
 		
@@ -3405,7 +3416,7 @@ drawHBarChart.prototype =
 		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (gapWidth / 100 * individualBarHeight) / 2;
 		
-		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0;
+		var width, startX, startY, diffYVal, val, paths, seriesHeight = [], seria, startXColumnPosition, startYPosition, newStartX, newStartY, idx, seriesCounter = 0, numCache;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
