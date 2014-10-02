@@ -2624,7 +2624,7 @@
 				nextCell = this._getCell(col + 1, row);
 				bg = null !== nextCell ? nextCell.getFill() : null;
 				if (bg !== null) {continue;}
-				
+
 				ctx.fillRect(
 					this.cols[col].left + this.cols[col].width - offsetX - this.width_1px,
 					this.rows[row].top - offsetY,
@@ -10769,6 +10769,11 @@
 				t.autoFilters.isApplyAutoFilterInCell(ar, true);
 			};
 			this._isLockedAll (onChangeAutoFilterCallback);
+		};
+
+		// При добавлении форматированной таблицы расширяем, автоподбор по названию столбца
+		WorksheetView.prototype._onEndAddFormatTable = function () {
+			
 		};
 
 		WorksheetView.prototype._loadFonts = function (fonts, callback) {
