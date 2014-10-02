@@ -153,6 +153,11 @@ function CTextMeasurer()
         this.m_oManager.Initialize();
     }
 
+    this.SetStringGid = function(bGID)
+    {
+        this.m_oManager.SetStringGID(bGID);
+    }
+
     this.SetFont = function(font)
     {
         if (!font)

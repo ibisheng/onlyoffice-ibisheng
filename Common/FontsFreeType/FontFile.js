@@ -49,6 +49,7 @@ function CFontFile(fileName, faceIndex)
     this.m_lUnits_Per_Em = 0;
 
     this.m_arrCacheSizes = [];
+    this.m_arrCacheSizesGid = [];
 
     this.m_bUseDefaultFont = false;
     this.m_pDefaultFont = null;
@@ -309,6 +310,17 @@ function CFontFile(fileName, faceIndex)
 	
 	this.ClearCache = function()
 	{
+        this.Destroy();
+        this.ClearCacheNoAttack();
+	}
+    this.ClearCacheNoAttack = function()
+    {
+        this.m_arrCacheSizes = [];
+        this.m_arrCacheSizesGid = [];
+    }
+
+    this.Destroy = function()
+    {
         if (this.m_oFontManager != null && this.m_oFontManager.RasterMemory != null)
         {
             var _arr = this.m_arrCacheSizes;
@@ -317,20 +329,7 @@ function CFontFile(fileName, faceIndex)
                 if (_arr[i].oBitmap != null)
                     _arr[i].oBitmap.Free();
             }
-        }
-
-        this.m_arrCacheSizes = [];
-	}
-    this.ClearCacheNoAttack = function()
-    {
-        this.m_arrCacheSizes = [];
-    }
-
-    this.Destroy = function()
-    {
-        if (this.m_oFontManager != null && this.m_oFontManager.RasterMemory != null)
-        {
-            var _arr = this.m_arrCacheSizes;
+            _arr = this.m_arrCacheSizesGid;
             for (var i in _arr)
             {
                 if (_arr[i].oBitmap != null)
@@ -409,6 +408,8 @@ function CFontFile(fileName, faceIndex)
             this.UpdateMatrix1();
         }
 
+        var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
+
         for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
 		{
             nCMapIndex.index = 0;
@@ -419,7 +420,7 @@ function CFontFile(fileName, faceIndex)
 			var ushUnicode = pCurGlyph.lUnicode;
 
             var unGID = 0;
-            var charSymbolObj = this.m_arrCacheSizes[ushUnicode];
+            var charSymbolObj = _cache_array[ushUnicode];
             if (undefined == charSymbolObj)
             {
                 var nCMapIndex = new CCMapIndex();
@@ -512,7 +513,7 @@ function CFontFile(fileName, faceIndex)
                 oSizes.bBitmap = false;
                 oSizes.oBitmap = null;
 
-                this.m_arrCacheSizes[oSizes.ushUnicode] = oSizes;
+                _cache_array[oSizes.ushUnicode] = oSizes;
 			}
 			else
 			{
@@ -601,6 +602,8 @@ function CFontFile(fileName, faceIndex)
 		var unPrevGID = 0;
 		var fPenX = 0, fPenY = 0;
 
+        var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
+
 		for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
 		{
             // Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
@@ -618,7 +621,7 @@ function CFontFile(fileName, faceIndex)
 			var ushUnicode = pCurGlyph.lUnicode;
 			
 			var unGID = 0;
-            var charSymbolObj = this.m_arrCacheSizes[ushUnicode];
+            var charSymbolObj = _cache_array[ushUnicode];
 			if (undefined == charSymbolObj || null == charSymbolObj.oBitmap)
 			{
                 var nCMapIndex = new CCMapIndex();
@@ -781,7 +784,7 @@ function CFontFile(fileName, faceIndex)
                     // ----------------------------------------
                 }
 
-                this.m_arrCacheSizes[oSizes.ushUnicode] = oSizes;
+                _cache_array[oSizes.ushUnicode] = oSizes;
 				charSymbolObj = oSizes;
 			}
 			if (null != charSymbolObj)
@@ -882,8 +885,10 @@ function CFontFile(fileName, faceIndex)
         var pCurGlyph = pString.m_pGlyphsBuffer[0];
         var ushUnicode = pCurGlyph.lUnicode;
 
+        var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
+
         var unGID = 0;
-        var charSymbolObj = this.m_arrCacheSizes[ushUnicode];
+        var charSymbolObj = _cache_array[ushUnicode];
         if (undefined == charSymbolObj || (null == charSymbolObj.oBitmap && charSymbolObj.bBitmap === false))
         {
             var nCMapIndex = new CCMapIndex();
@@ -1051,7 +1056,7 @@ function CFontFile(fileName, faceIndex)
                 // ----------------------------------------
             }
 
-            this.m_arrCacheSizes[oSizes.ushUnicode] = oSizes;
+            _cache_array[oSizes.ushUnicode] = oSizes;
             charSymbolObj = oSizes;
         }
         else
@@ -1216,7 +1221,10 @@ function CFontFile(fileName, faceIndex)
         }
 
         var unGID = 0;
-        var charSymbolObj = this.m_arrCacheSizes[ushUnicode];
+
+        var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
+
+        var charSymbolObj = _cache_array[ushUnicode];
         if (undefined == charSymbolObj)
         {
             var nCMapIndex = new CCMapIndex();
@@ -1317,7 +1325,7 @@ function CFontFile(fileName, faceIndex)
                 }
             }
 
-            this.m_arrCacheSizes[oSizes.ushUnicode] = oSizes;
+            _cache_array[oSizes.ushUnicode] = oSizes;
             Result = oSizes;
         }
         else
