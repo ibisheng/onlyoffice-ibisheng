@@ -2412,7 +2412,11 @@ Woorksheet.prototype.setSheetViewSettings = function (options) {
 	    this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
 };
 Woorksheet.prototype.getRowsCount=function(){
-	return this.nRowsCount;
+	var result = this.nRowsCount;
+	var pane = this.sheetViews[0].pane;
+	if (null !== pane && null !== pane.topLeftFrozenCell)
+		result = Math.max(result, pane.topLeftFrozenCell.getRow0());
+	return result;
 };
 Woorksheet.prototype.removeRows=function(start, stop){
 	var oRange = this.getRange(new CellAddress(start, 0, 0), new CellAddress(stop, gc_nMaxCol0, 0));
@@ -2536,7 +2540,11 @@ Woorksheet.prototype.insertRowsAfter=function(index, count){
 	return this.insertRowsBefore(index + 1, count);
 };
 Woorksheet.prototype.getColsCount=function(){
-	return this.nColsCount;
+	var result = this.nColsCount;
+	var pane = this.sheetViews[0].pane;
+	if (null !== pane && null !== pane.topLeftFrozenCell)
+		result = Math.max(result, pane.topLeftFrozenCell.getCol0());
+	return result;
 };
 Woorksheet.prototype.removeCols=function(start, stop){
 	var oRange = this.getRange(new CellAddress(0, start, 0), new CellAddress(gc_nMaxRow0, stop, 0));

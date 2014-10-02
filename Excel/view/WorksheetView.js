@@ -3187,6 +3187,10 @@
 			}
 			this.visibleRange.c1 = col;
 			this.visibleRange.r1 = row;
+			if (col >= this.nColsCount)
+				this.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+			if (row >= this.nRowsCount)
+				this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 
 			this.objectRender.drawingArea.init();
 			if (!lockDraw)
@@ -10773,7 +10777,7 @@
 
 		// При добавлении форматированной таблицы расширяем, автоподбор по названию столбца
 		WorksheetView.prototype._onEndAddFormatTable = function () {
-			
+
 		};
 
 		WorksheetView.prototype._loadFonts = function (fonts, callback) {
