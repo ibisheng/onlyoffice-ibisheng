@@ -2613,12 +2613,18 @@
 		/** Удаляет вертикальные границы ячейки, если текст выходит за границы и соседние ячейки пусты */
 		WorksheetView.prototype._eraseCellRightBorder = function (drawingCtx, colBeg, colEnd, row, offsetX, offsetY) {
 			if (colBeg >= colEnd) {return;}
+			var nextCell = -1;
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
 			ctx.setFillStyle(this.settings.cells.defaultState.background);
 			for (var col = colBeg; col < colEnd; ++col) {
-				var c = this._getCell(col, row);
+				var c = -1 !== nextCell ? nextCell : this._getCell(col, row);
 				var bg = null !== c ? c.getFill() : null;
 				if (bg !== null) {continue;}
+
+				nextCell = this._getCell(col + 1, row);
+				bg = null !== nextCell ? nextCell.getFill() : null;
+				if (bg !== null) {continue;}
+				
 				ctx.fillRect(
 					this.cols[col].left + this.cols[col].width - offsetX - this.width_1px,
 					this.rows[row].top - offsetY,
