@@ -1474,7 +1474,9 @@ function ScrollObject( elemID, settings, dbg ) {
         arrowActiveColor:"#f1f1f1",
         arrowActiveBorderColor:"#ADADAD",
         arrowActiveBackgroundColor:"#ADADAD",
-        fadeInFadeOutDelay:20
+        fadeInFadeOutDelay:20,
+        piperColor:"#cfcfcf",
+        piperColorHover:"#f1f1f1"
     };
 
     this.settings = extendSettings( settings, scrollSettings );
@@ -1556,7 +1558,7 @@ function ScrollObject( elemID, settings, dbg ) {
     this.piperImgHor[1].height = 5;
 
     var r, g, b, ctx_piperImg, _data, px;
-    r = _HEXTORGB_( "#CFCFCF" );
+    r = _HEXTORGB_( this.settings.piperColor );
     g = r.G;
     b = r.B;
     r = r.R;
@@ -1591,7 +1593,7 @@ function ScrollObject( elemID, settings, dbg ) {
 
         ctx_piperImg.putImageData( _data, 0, 0 )
 
-        r = _HEXTORGB_( "#F1F1F1" );
+        r = _HEXTORGB_( this.settings.piperColorHover );
         g = r.G;
         b = r.B;
         r = r.R;
@@ -2413,6 +2415,39 @@ ScrollObject.prototype = {
                     this.context.fillStyle = this.settings.scrollerColor;
                     this.context.strokeStyle = this.settings.strokeStyleNone;
                     piperImgIndex = 0;
+
+                    var r, g, b, ctx_piperImg, _data, px, _len
+                    r = _HEXTORGB_( this.settings.piperColor );
+                    g = r.G;
+                    b = r.B;
+                    r = r.R;
+
+                    if ( this.isVerticalScroll ) {
+                        ctx_piperImg = this.piperImgVert[piperImgIndex].getContext( '2d' );
+                        _data = ctx_piperImg.getImageData( 0, 0, this.piperImgVert[piperImgIndex].width, this.piperImgVert[piperImgIndex].height );
+                    }
+                    else if ( this.isHorizontalScroll ) {
+                        ctx_piperImg = this.piperImgHor[piperImgIndex].getContext( '2d' );
+                        _data = ctx_piperImg.getImageData( 0, 0, this.piperImgHor[piperImgIndex].width, this.piperImgHor[piperImgIndex].height );
+                    }
+
+                    if( this.isVerticalScroll || this.isHorizontalScroll ){
+
+                        px = _data.data;
+                        _len = px.length;
+
+                        for ( var i = 0; i < _len; i += 4 ) {
+                            if ( px[i + 3] == 255 ) {
+                                px[i] = r;
+                                px[i + 1] = g;
+                                px[i + 2] = b;
+                            }
+                        }
+
+                        ctx_piperImg.putImageData( _data, 0, 0 );
+
+                    }
+
                 }
                 break;
             }
