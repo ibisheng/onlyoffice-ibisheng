@@ -21,6 +21,10 @@ var StartTextElement = 0x2B1A; // Cambria Math
 // смена хентов
 // editor.SetFontRenderingMode(2);
 
+//change FontSize
+//editor.put_TextPrFontSize(parseInt("37"));
+
+
 function CMathSize()
 {
     this.width  = 0;
@@ -109,10 +113,14 @@ CMathText.prototype =
             {
                 if(code == 0x68)            // h
                     code = 0x210E;
-                else if((code == 0x69 && bAccent) || code == 0x131) // "i" with dot || "i" dotless plain => "i" dotless italic
+                /*else if((code == 0x69 && bAccent) || code == 0x131) // "i" with dot || "i" dotless plain => "i" dotless italic
                     code = 0x1D6A4;
-                else if((code == 0x6A && bAccent) ||code == 0x237)      // "j" with dot || "j" dotless plain => "j" dotless italic
-                    code = 0x1D6A5;
+                else if((code == 0x6A && bAccent) ||code == 0x237)   // "j" with dot || "j" dotless plain => "j" dotless italic
+                    code = 0x1D6A5;*/
+                else if(code == 0x69 && bAccent)
+                    code = 2835;
+                else if(code == 0x6A && bAccent)
+                    code = 2836;
                 else if(bCapitale)
                     code  = code + 0x1D3F3;
                 else if(bSmall)
@@ -143,7 +151,11 @@ CMathText.prototype =
             }
             else if(Sty == STY_BI)
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2841;
+                else if(code == 0x6A && bAccent)
+                    code = 2842;
+                else if(bCapitale)
                     code = code + 0x1D427;
                 else if(bSmall)
                     code = code + 0x1D421;
@@ -174,7 +186,11 @@ CMathText.prototype =
             }
             else if(Sty == STY_BOLD)
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2829;
+                else if(code == 0x6A && bAccent)
+                    code = 2830;
+                else if(bCapitale)
                     code = code + 0x1D3BF;
                 else if(bSmall)
                     code = code + 0x1D3B9;
@@ -211,16 +227,26 @@ CMathText.prototype =
             {
                 if(bAccent)
                 {
-                    if(code == 0x69)    // "i" with dot  => "i" dotless plain
+                    /*if(code == 0x69)    // "i" with dot  => "i" dotless plain
                         code = 0x131;
                     else if(code == 0x6A)      //  "j" with dot => "j" dotless plain
-                        code = 0x237;
+                        code = 0x237;*/
+
+                    if(code == 0x69 && bAccent)
+                        code = 199;
+                    else if(code == 0x6A && bAccent)
+                        code = 2828;
+
                 }
             }
         }
         else if(Scr == TXT_DOUBLE_STRUCK)
         {
-            if(code == 0x43)        // C
+            if(code == 0x69 && bAccent)
+                code = 2851;
+            else if(code == 0x6A && bAccent)
+                code = 2852;
+            else if(code == 0x43)   // C
                 code = 0x2102;
             else if(code == 0x48)   // H
                 code = 0x210D;
@@ -299,7 +325,11 @@ CMathText.prototype =
         }
         else if(Scr == TXT_MONOSPACE)
         {
-            if(bCapitale)
+            if(code == 0x69 && bAccent)
+                code = 4547;
+            else if(code == 0x6A && bAccent)
+                code = 4548;
+            else if(bCapitale)
                 code  = code + 0x1D62F;
             else if(bSmall)
                 code  = code + 0x1D629;
@@ -310,14 +340,22 @@ CMathText.prototype =
         {
             if(Sty == STY_BOLD ||Sty == STY_BI)
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2849;
+                else if(code == 0x6A && bAccent)
+                    code = 2850;
+                else if(bCapitale)
                     code = code + 0x1D52B;
                 else if(bSmall)
                     code = code + 0x1D525;
             }
             else
             {
-                if(code == 0x43)        // C
+                if(code == 0x69 && bAccent)
+                    code = 2847;
+                else if(code == 0x6A && bAccent)
+                    code = 2848;
+                else if(code == 0x43)   // C
                     code = 0x212D;
                 else if(code == 0x48)   // H
                     code = 0x210C;
@@ -338,7 +376,11 @@ CMathText.prototype =
         {
             if(Sty == STY_ITALIC)
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2857;
+                else if(code == 0x6A && bAccent)
+                    code = 2858;
+                else if(bCapitale)
                     code = code + 0x1D5C7;
                 else if(bSmall)
                     code = code + 0x1D5C1;
@@ -347,7 +389,11 @@ CMathText.prototype =
             }
             else if(Sty == STY_BOLD)
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2855;
+                else if(code == 0x6A && bAccent)
+                    code = 2856;
+                else if(bCapitale)
                     code = code + 0x1D593;
                 else if(bSmall)
                     code = code + 0x1D58D;
@@ -378,7 +424,11 @@ CMathText.prototype =
             }
             else if(Sty == STY_BI)
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2859;
+                else if(code == 0x6A && bAccent)
+                    code = 2860;
+                else if(bCapitale)
                     code = code + 0x1D5FB;
                 else if(bSmall)
                     code = code + 0x1D5F5;
@@ -409,7 +459,11 @@ CMathText.prototype =
             }
             else
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2853;
+                else if(code == 0x6A && bAccent)
+                    code = 2854;
+                else if(bCapitale)
                     code = code + 0x1D55F;
                 else if(bSmall)
                     code = code + 0x1D559;
@@ -422,7 +476,11 @@ CMathText.prototype =
         {
             if(Sty == STY_ITALIC || Sty == STY_PLAIN)
             {
-                if(code == 0x42)        // B
+                if(code == 0x69 && bAccent)
+                    code = 2843;
+                else if(code == 0x6A && bAccent)
+                    code = 2844;
+                else if(code == 0x42)   // B
                     code = 0x212C;
                 else if(code == 0x45)   // E
                     code = 0x2130;
@@ -451,7 +509,11 @@ CMathText.prototype =
             }
             else
             {
-                if(bCapitale)
+                if(code == 0x69 && bAccent)
+                    code = 2845;
+                else if(code == 0x6A && bAccent)
+                    code = 2846;
+                else if(bCapitale)
                     code = code + 0x1D48F;
                 else if(bSmall)
                     code = code + 0x1D489;
@@ -485,12 +547,22 @@ CMathText.prototype =
 
         var letter = this.getCode();
 
+        var bAccentIJ = this.bJDraw ? false : this.Parent.IsAccent();
+
+        bAccentIJ = bAccentIJ && (this.value == 0x69 || this.value == 0x6A);
+
+        if(bAccentIJ)
+            oMeasure.SetStringGid(true);
+
         var metricsTxt;
 
         if(this.bJDraw)
             metricsTxt = oMeasure.Measure2Code(letter);
         else
             metricsTxt = oMeasure.MeasureCode(letter);
+
+        if(bAccentIJ)
+            oMeasure.SetStringGid(false);
 
         //  смещения
         this.rasterOffsetX = metricsTxt.rasterOffsetX;
@@ -550,7 +622,12 @@ CMathText.prototype =
 
         pGraphics.transform(sx, shy, shx, sy, 0, 0);*/
 
-        pGraphics.FillTextCode(X, Y, this.getCode());    //на отрисовку символа отправляем положение baseLine
+        var bAccent = this.bJDraw ? false : this.Parent.IsAccent();
+
+        if(bAccent && (this.value == 0x69 || this.value == 0x6A))
+            pGraphics.tg(this.getCode(), X, Y);
+        else
+            pGraphics.FillTextCode(X, Y, this.getCode());    //на отрисовку символа отправляем положение baseLine
 
     },
     setPosition: function(pos)

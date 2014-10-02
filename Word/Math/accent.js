@@ -135,7 +135,7 @@ CAccentLine.prototype.calcSize = function(stretch)
 
     return {width: width, height: height};
 }
-CAccentLine.prototype.calcCoord = function(stretch)
+CAccentLine.prototype.old_calcCoord = function(stretch)
 {
     var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
 
@@ -155,7 +155,7 @@ CAccentLine.prototype.calcCoord = function(stretch)
 
     return {XX: X, YY: Y, W: W, H: H};
 }
-CAccentLine.prototype.drawPath = function(pGraphics, XX, YY)
+CAccentLine.prototype.old_drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
     pGraphics._l(XX[1], YY[1]);
@@ -203,7 +203,7 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
 
     return {width: width, height: height};
 }
-CAccentDoubleLine.prototype.calcCoord = function(stretch)
+CAccentDoubleLine.prototype.old_calcCoord = function(stretch)
 {
     var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
 
@@ -227,7 +227,7 @@ CAccentDoubleLine.prototype.calcCoord = function(stretch)
 
     return {XX: X, YY: Y, W: W, H: H};
 }
-CAccentDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
+CAccentDoubleLine.prototype.old_drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
     pGraphics._l(XX[1], YY[1]);
@@ -593,10 +593,11 @@ CAccent.prototype.draw = function(x, y, pGraphics)
 
     if(Info.Result == true)
     {
-        var bStyle  = Info.sty == STY_BI || Info.sty == STY_ITALIC,
-            bScript = Info.scr == TXT_ROMAN || Info.scr == TXT_SANS_SERIF;
+        var bAlphabet    = Info.Latin || Info.Greek;
+        var bRomanSerif  = (Info.sty == STY_BI || Info.sty == STY_ITALIC) && (Info.scr == TXT_ROMAN || Info.scr == TXT_SANS_SERIF),
+            bScript      = Info.scr == TXT_SCRIPT;
 
-        if(bStyle && bScript && (Info.Latin || Info.Greek))
+        if(bAlphabet && (bRomanSerif || bScript))
         {
             if(this.Pr.chr != 0x305 && this.Pr.chr >= 0x300 && this.Pr.chr <= 0x315 || this.Pr.chr == 0x20DB)
             {
@@ -614,7 +615,7 @@ CAccent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
     SearchPos.CurX += this.GapLeft + align;
 
-    var result =  this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
+    var result = this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
 
     if(result)
     {
