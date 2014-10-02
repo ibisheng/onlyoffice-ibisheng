@@ -5719,7 +5719,6 @@
                 });
                 if(null != oNewDrawing.graphicObject)
                 {
-                    oNewDrawing.graphicObject.fromSerialize = true;
                     if(false != oFlags.from && false != oFlags.to)
                         oNewDrawing.Type = ECellAnchorType.cellanchorTwoCell;
                     else if(false != oFlags.from && false != oFlags.ext)
@@ -5746,6 +5745,7 @@
                         oNewDrawing.graphicObject.spPr.xfrm.setExtX(0);
                         oNewDrawing.graphicObject.spPr.xfrm.setExtY(0);
                     }
+                    oNewDrawing.graphicObject.fromSerialize = true;
                     aDrawings.push(oNewDrawing);
                 }
             }
