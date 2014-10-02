@@ -121,6 +121,7 @@ CChartSpace.prototype.handleUpdatePosition = function()
   //  this.recalcDLbls();
     //this.setRecalculateInfo();
     this.addToRecalculate();
+    delete this.fromSerialize;
 };
 CChartSpace.prototype.handleUpdateExtents = function()
 {
@@ -129,12 +130,14 @@ CChartSpace.prototype.handleUpdateExtents = function()
     this.recalcTransform();
     this.recalcTitles();
     this.handleUpdateInternalChart();
+    delete this.fromSerialize;
 };
 CChartSpace.prototype.handleUpdateFlip = function()
 {
     this.recalcTransform();
     //this.setRecalculateInfo();
     this.addToRecalculate();
+    delete this.fromSerialize;
 };
 CChartSpace.prototype.handleUpdateChart = function()
 {
