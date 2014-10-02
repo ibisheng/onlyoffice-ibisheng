@@ -9350,7 +9350,7 @@
 				t._prepareCellTextMetricsCache();
 				t.objectRender.setScrollOffset();
                 t.objectRender.rebuildChartGraphicObjects(oChangeData);
-				t.draw();
+				t.draw(lockDraw);
 
 				t.handlers.trigger("reinitializeScroll");
 
@@ -9734,7 +9734,7 @@
 								t.handlers.trigger("reinitializeScrollY");
 						}
 
-						t._updateCellsRange(val.range, val.canChangeColWidth, val.isLockDraw);
+						t._updateCellsRange(val.range, val.canChangeColWidth, val.lockDraw);
 					}
 					break;
 			}
@@ -10137,8 +10137,10 @@
 		WorksheetView.prototype._replaceCellText = function (aReplaceCells, valueForSearching, options,
 															 lockDraw, callback) {
 			var t = this;
-			if (options.indexInArray >= aReplaceCells.length)
+			if (options.indexInArray >= aReplaceCells.length) {
+				this.draw(lockDraw);
 				return callback(options);
+			}
 
 			var onReplaceCallback = function (isSuccess) {
 				var cell = aReplaceCells[options.indexInArray];
@@ -10163,7 +10165,7 @@
 						newValue[0] = new Fragment({text: cellValue, format: v[0].format.clone()});
 
 						t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
-							/*isNotHistory*/true, lockDraw);
+							/*isNotHistory*/true, /*lockDraw*/true);
 					}
 				}
 

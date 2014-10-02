@@ -426,7 +426,7 @@
 				var ws = self.getWorksheetById(wsId);
 				if (ws)
 					ws.changeWorksheet("updateRange", {range: range,
-						isLockDraw: bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(),
+						lockDraw: bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(),
 						canChangeColWidth: canChangeColWidth});
 			});
 			this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
@@ -712,7 +712,7 @@
 						ct.hyperlink.hyperlinkModel.setVisited(true);
 						if (ct.hyperlink.hyperlinkModel.Ref)
 							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(),
-								isLockDraw: false, canChangeColWidth: false});
+								lockDraw: false, canChangeColWidth: false});
 					}
 					switch (ct.hyperlink.asc_getType()) {
 						case c_oAscHyperlinkType.WebLink:
