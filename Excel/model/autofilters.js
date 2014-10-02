@@ -296,7 +296,7 @@ var gUndoInsDelCellsFlag = true;
 					var newRange;
 					if(ref && ref.Ref)
 						newRange = ref.Ref;
-					else
+					else if(typeof ref == "string")
 						newRange = Asc.g_oRangeCache.getAscRange(ref);
 
 					if(newRange)
