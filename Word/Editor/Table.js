@@ -10042,7 +10042,7 @@ CTable.prototype =
 
     Set_ParagraphShd : function(Shd)
     {
-        if ( true === this.ApplyToAll )
+        if (true === this.ApplyToAll || (this.LogicDocument && true !== this.LogicDocument.UseTextShd && true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
         {
             var Cells_array = this.Internal_Get_SelectionArray();
             for ( var Index = 0; Index < Cells_array.length; Index++ )
@@ -10065,7 +10065,7 @@ CTable.prototype =
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
         }
-        else if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 )
+        else if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0)
         {
             var Cells_array = this.Internal_Get_SelectionArray();
             for ( var Index = 0; Index < Cells_array.length; Index++ )
@@ -10082,7 +10082,7 @@ CTable.prototype =
         else
         {
             var CellContent = this.CurCell.Content;
-            if ( docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType() )
+            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
             {
                 this.CurCell.Set_Shd( Shd );
                 this.CurCell.Content.ReDraw();                

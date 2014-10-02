@@ -3908,11 +3908,15 @@ asc_docs_api.prototype.put_TextColor = function(color)
             this.sync_MarkerFormatCallback( false );
     }
 }
-asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color)
+asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color, isOnlyPara)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
+        if (true === isOnlyPara)
+            this.WordControl.m_oLogicDocument.Set_UseTextShd(false);
+
         if (false === is_flag)
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Nil  }  );
         else
@@ -3922,6 +3926,8 @@ asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color)
             Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : shd_Clear, Color : { r : color.get_r(), g : color.get_g(), b : color.get_b() }, Unifill: Unifill } );
         }
+
+        this.WordControl.m_oLogicDocument.Set_UseTextShd(true);
     }
 }
 asc_docs_api.prototype.put_PrIndent = function(value,levelValue)

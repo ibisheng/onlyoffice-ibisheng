@@ -327,7 +327,7 @@ Paragraph.prototype.Prepare_RecalculateObject = function()
 };
 
 /**
- * Пересчитываем первую страницу параграфа так, чтобы он начинался с новой страницы
+ * Пересчитываем первую страницу параграфа так, чтобы он начинался с новой страницы.
  */
 Paragraph.prototype.Start_FromNewPage = function()
 {
@@ -774,12 +774,6 @@ Paragraph.prototype.private_RecalculateLineFillRanges  = function(CurLine, CurPa
 {
     this.Lines[CurLine].Info = 0;
 
-    if (true === PRS.RangeY)
-    {
-        PRS.RangeY = false;
-        this.Lines[CurLine].Info |= paralineinfo_RangeY;
-    }
-
     // Параметры Ranges и RangesCount не обнуляются здесь, они задаются выше
     var Ranges      = PRS.Ranges;
     var RangesCount = PRS.RangesCount;
@@ -807,6 +801,12 @@ Paragraph.prototype.private_RecalculateLineFillRanges  = function(CurLine, CurPa
     for ( var Index = 1; Index < Ranges.length + 1; Index++ )
     {
         this.Lines[CurLine].Add_Range( Ranges[Index - 1].X1, (RangesCount == Index ? PRS.XLimit : Ranges[Index].X0) );
+    }
+
+    if (true === PRS.RangeY)
+    {
+        PRS.RangeY = false;
+        this.Lines[CurLine].Info |= paralineinfo_RangeY;
     }
 };
 
@@ -844,13 +844,13 @@ Paragraph.prototype.private_RecalculateLineRanges      = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPage, PRS, ParaPr)
 {
-    if ( true === PRS.BreakPageLine || true === PRS.SkipPageBreak )
+    if (true === PRS.BreakPageLine || true === PRS.SkipPageBreak)
         this.Lines[CurLine].Info |= paralineinfo_BreakPage;
 
-    if ( true === PRS.EmptyLine )
+    if (true === PRS.EmptyLine)
         this.Lines[CurLine].Info |= paralineinfo_Empty;
 
-    if ( true === PRS.End )
+    if (true === PRS.End)
         this.Lines[CurLine].Info |= paralineinfo_End;
 };
 

@@ -543,7 +543,7 @@ CHistory.prototype =
             }
 
             if (Class instanceof ParaRun && Class.Is_SimpleChanges(Items))
-                return Items;
+                return [Items[0]];
         }
 
         return [];

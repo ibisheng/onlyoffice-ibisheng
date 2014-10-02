@@ -869,12 +869,6 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
             return false;
     }
 
-    if (Changes.length > 1)
-    {
-        // Все изменения одинаковые здесь, достаточно оставить одно
-        Changes.length = 1;
-    }
-
     return true;
 };
 
@@ -1744,7 +1738,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         WordLen += LetterLen;
 
                         // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                        if (0 !== Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                        if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
                         {
                             // Добавляем длину пробелов до слова и ширину самого слова.
                             X += SpaceLen + WordLen;
@@ -2210,7 +2204,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 PRSC.SpacesCount = 0;
 
                 // Если текущий символ, например, дефис, тогда на нем заканчивается слово
-                if (0 !== Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
                     PRSC.Word = false;
 
                 break;
@@ -2997,7 +2991,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 {
                     nWordLen += ItemWidth;
 
-                    if (0 !== Item.Flags & PARATEXT_FLAGS_SPACEAFTER)
+                    if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)
                     {
                         if ( nMinWidth < nWordLen )
                             nMinWidth = nWordLen;

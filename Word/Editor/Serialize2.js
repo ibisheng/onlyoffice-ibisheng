@@ -7560,7 +7560,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			    if (null != nUnicode) {
 			        if (0x20 != nUnicode) {
 			            var oNewParaText = new ParaText();
-			            oNewParaText.Value = nUnicode;
+			            oNewParaText.Set_CharCode(nUnicode);
 			            oPos.run.Add_ToContent(oPos.pos, oNewParaText, false);
 			        }
 			        else

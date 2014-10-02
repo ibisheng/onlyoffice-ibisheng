@@ -129,6 +129,12 @@ ParaText.prototype =
     {
         return para_Text;
     },
+
+    Set_CharCode : function(CharCode)
+    {
+        this.Value = CharCode;
+        this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
+    },
     
     Draw : function(X, Y, Context)
     {

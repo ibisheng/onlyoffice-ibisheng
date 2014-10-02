@@ -5617,7 +5617,7 @@ PasteProcessor.prototype =
                                 var Item;
                                 if (0x20 != nUnicode && 0xA0 != nUnicode) {
                                     Item = new ParaText();
-                                    Item.Value = nUnicode;
+                                    Item.Set_CharCode(nUnicode);
                                 }
                                 else
                                     Item = new ParaSpace();
