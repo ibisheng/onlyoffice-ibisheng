@@ -373,12 +373,19 @@ ParaMath.prototype.GetSelectContent = function()
 
 ParaMath.prototype.Get_CurrentParaPos = function()
 {
-    //var CurPos = this.State.ContentPos;
+    var nLinesCount = this.protected_GetLinesCount();
+    for (var nLineIndex = 0; nLineIndex < nLinesCount; nLineIndex++)
+    {
+        var nRangesCount = this.protected_GetRangesCount(nLineIndex);
+        for (var nRangeIndex = 0; nRangeIndex < nRangesCount; nRangeIndex++)
+        {
+            var nEndPos = this.protected_GetRangeEndPos(nLineIndex, nRangeIndex);
+            if (nEndPos > 0)
+                return new CParaPos(0 === nLineIndex ? this.StartRange + nRangeIndex : nRangeIndex, this.StartLine + nLineIndex, 0, 0);
+        }
+    }
 
-    /*if ( CurPos >= 0 && CurPos < this.Content.length )
-     return this.Content[CurPos].Get_CurrentParaPos();*/
-
-    return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
+    return new CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
 
 ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
@@ -1579,4 +1586,14 @@ ParaMath.prototype.Read_FromBinary2 = function(Reader)
     Element.bRoot = true;
     this.Root = Element;
 
+};
+
+ParaMath.prototype.Get_ContentSelection = function()
+{
+    var oContent = this.GetSelectContent().Content;
+
+    if (oContent.bRoot || true === this.bSelectionUse)
+        return null;
+
+    return {X : oContent.pos.x + this.X, Y : oContent.pos.y + this.Y, W : oContent.size.width, H : oContent.size.height};
 };

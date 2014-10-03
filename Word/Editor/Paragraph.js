@@ -8372,11 +8372,8 @@ Paragraph.prototype =
             editor.sync_HyperlinkPropCallback( HyperProps );
         }
         
-        if ( null !== Math )
-        {
-            var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1) * 3;
-            this.Parent.DrawingDocument.Update_MathTrack(true, Math.X - PixelError, Math.Y - PixelError, Math.Width + 2 * PixelError, Math.Height + 2 * PixelError, this.CurPos.PagesPos + this.Get_StartPage_Absolute());
-        }
+        if (null !== Math)
+            this.Parent.DrawingDocument.Update_MathTrack(true, Math, Math.X, Math.Y, Math.Width, Math.Height, this.CurPos.PagesPos + this.Get_StartPage_Absolute());
         else
             this.Parent.DrawingDocument.Update_MathTrack(false);
     },

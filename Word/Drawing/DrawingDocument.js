@@ -1692,7 +1692,7 @@ function CDrawingDocument()
     this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
 
-    this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 } };
+    this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 }, ContentSelection : null };
 
     this.m_oCacheManager    = new CCacheManager();
 
@@ -3359,6 +3359,35 @@ function CDrawingDocument()
         this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0);
         ctx.stroke();
         ctx.beginPath();
+
+        if (null !== this.MathRect.ContentSelection)
+        {
+            var _x = (drPage.left + dKoefX * this.MathRect.ContentSelection.X);
+            var _y = (drPage.top  + dKoefY * this.MathRect.ContentSelection.Y);
+            var _r = (drPage.left + dKoefX * (this.MathRect.ContentSelection.X + this.MathRect.ContentSelection.W));
+            var _b = (drPage.top  + dKoefY * (this.MathRect.ContentSelection.Y + this.MathRect.ContentSelection.H));
+
+            if (_x < overlay.min_x)
+                overlay.min_x = _x;
+            if (_r > overlay.max_x)
+                overlay.max_x = _r;
+
+            if (_y < overlay.min_y)
+                overlay.min_y = _y;
+            if (_b > overlay.max_y)
+                overlay.max_y = _b;
+
+            var ctx = overlay.m_oContext;
+            ctx.fillStyle = "#939393";
+
+            ctx.beginPath();
+            this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
+
+            ctx.globalAlpha = 0.2;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+        }
     }
 
     this.DrawTableTrack = function(overlay)
@@ -4176,16 +4205,21 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateVerRuler();
     }
 
-    this.Update_MathTrack = function(IsActive, X, Y, W, H, PageIndex)
+    this.Update_MathTrack = function(IsActive, Math, X, Y, W, H, PageIndex)
     {       
         this.MathRect.IsActive = IsActive;
         
         if (true === IsActive)
         {
-            this.MathRect.Rect.X = X;
-            this.MathRect.Rect.Y = Y;
-            this.MathRect.Rect.R = X + W;
-            this.MathRect.Rect.B = Y + H;
+            if (null !== Math)
+                this.MathRect.ContentSelection = Math.Get_ContentSelection();
+
+            var PixelError = this.GetMMPerDot(1) * 3;
+
+            this.MathRect.Rect.X = X - PixelError;
+            this.MathRect.Rect.Y = Y - PixelError;
+            this.MathRect.Rect.R = X + W + PixelError;
+            this.MathRect.Rect.B = Y + H + PixelError;
             this.MathRect.Rect.PageIndex = PageIndex;
         }
     }
