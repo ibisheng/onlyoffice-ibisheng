@@ -9898,13 +9898,15 @@
 				return false;
 
 			History.Create_NewPoint();
-			var oSelection = History.GetSelection();
-			if (null != oSelection) {
-				oSelection = oSelection.clone();
-				oSelection.assign(col, 0, col, gc_nMaxRow0);
-				oSelection.type = c_oAscSelectionType.RangeCol;
-				History.SetSelection(oSelection);
-				History.SetSelectionRedo(oSelection);
+			if (!onlyIfMore) {
+				var oSelection = History.GetSelection();
+				if (null != oSelection) {
+					oSelection = oSelection.clone();
+					oSelection.assign(col, 0, col, gc_nMaxRow0);
+					oSelection.type = c_oAscSelectionType.RangeCol;
+					History.SetSelection(oSelection);
+					History.SetSelectionRedo(oSelection);
+				}
 			}
 			History.StartTransaction();
 			// Выставляем, что это bestFit
@@ -10788,9 +10790,9 @@
 
 		// При добавлении форматированной таблицы расширяем, автоподбор по названию столбца
 		WorksheetView.prototype._onEndAddFormatTable = function (range) {
-			var i, r = range.r1, bIsUpdate = false, t = this;
+			var i, r = range.r1, bIsUpdate = false;
 			for (i = range.c1; i <= range.c2; ++i) {
-				if (t.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true)) {
+				if (this.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true)) {
 					this._cleanCache(new asc_Range(i, 0, i, this.rows.length - 1));
 					bIsUpdate = true;
 				}
