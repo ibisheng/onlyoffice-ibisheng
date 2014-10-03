@@ -1530,7 +1530,7 @@ SlideComments.prototype =
             case historyitem_SlideCommentsRemoveComment:
             {
                 this.comments.splice(data.Pos, 0, g_oTableId.Get_ById(data.id));
-                editor.sync_AddComment( this.comments[data.index].Get_Id(), this.comments[data.index].Data);
+                editor.sync_AddComment( this.comments[data.Pos].Get_Id(), this.comments[data.Pos].Data);
                 break;
             }
         }
