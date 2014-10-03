@@ -10006,7 +10006,7 @@ Paragraph.prototype =
             X          : this.CurPos.X,
             Y          : this.CurPos.Y,
             Line       : this.CurPos.Line,
-            ContentPos : ( true === this.Selection.Use ?  this.Get_ParaContentPos( true, false ) :  this.Get_ParaContentPos( false, false ) ),
+            ContentPos : this.Get_ParaContentPos(false, false),
             RealX      : this.CurPos.RealX,
             RealY      : this.CurPos.RealY,
             PagesPos   : this.CurPos.PagesPos

@@ -1150,10 +1150,10 @@ CMathBase.prototype =
 
         this.bSelectionUse = true;
     },
-    SelectToParent: function()
+    SelectToParent: function(bCorrect)
     {
         this.bSelectionUse = true;
-        this.Parent.SelectToParent();
+        this.Parent.SelectToParent(bCorrect);
     },
     Check_NearestPos: function(ParaNearPos, Depth)
     {

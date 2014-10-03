@@ -4343,6 +4343,16 @@ ParaRun.prototype.Set_SelectionContentPos = function(StartContentPos, EndContent
     Selection.Use      = true;
 };
 
+ParaRun.prototype.Set_SelectionAtEndPos = function()
+{
+    this.Set_SelectionContentPos(null, null, 0, -1, -1);
+};
+
+ParaRun.prototype.Set_SelectionAtStartPos = function()
+{
+    this.Set_SelectionContentPos(null, null, 0, 1, 1);
+};
+
 ParaRun.prototype.Selection_IsUse = function()
 {
     return this.State.Selection.Use;

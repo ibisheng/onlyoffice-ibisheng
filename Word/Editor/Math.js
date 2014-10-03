@@ -249,7 +249,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
 
                     var oParent = oContent.GetParent();
                     oParent.SetSelectAll();
-                    oParent.SelectToParent();
+                    oParent.SelectToParent(true);
                     this.bSelectionUse = true;
 
                     return true;
@@ -276,7 +276,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     else
                     {
                         oContent.SelectElement(nStartPos + 1);
-                        oContent.SelectToParent();
+                        oContent.SelectToParent(true);
                         this.bSelectionUse = true;
                     }
                 }
@@ -301,7 +301,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     else
                     {
                         oContent.SelectElement(nStartPos - 1);
-                        oContent.SelectToParent();
+                        oContent.SelectToParent(true);
                         this.bSelectionUse = true;
                     }
                 }

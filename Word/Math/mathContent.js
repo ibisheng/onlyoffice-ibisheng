@@ -3902,7 +3902,7 @@ CMathContent.prototype =
         {
             History.Create_NewPoint();
             var Items = this.content.slice(Pos, EndPos);
-            History.Add(this, {Type: historyitem_Math_AddItem, Items: Items, Pos: Pos, PosEnd: EndPos});
+            History.Add(this, {Type: historyitem_Math_AddItem, Items: Items, Pos: Pos, PosEnd: EndPos, EndPos: EndPos});
         }
 
         var items = this.content.slice(Pos, EndPos);
@@ -4454,7 +4454,6 @@ CMathContent.prototype =
         }
 
         this.Selection.Use = true;
-
     },
     GetSelectContent: function()
     {
@@ -4517,6 +4516,42 @@ CMathContent.prototype =
             this.content[this.Selection.Start].SetSelectAll();
     },
 
+    Correct_Selection : function()
+    {
+        if (true !== this.Selection.Use)
+            return;
+
+        // Здесь мы делаем так, чтобы селект всегда начинался и заканчивался в ране.
+        // Предполагается, что контент скорректирован верно до выполнения данной функции.
+
+        var nContentLen = this.content.length;
+        var nStartPos = Math.max(0, Math.min(this.Selection.Start, nContentLen - 1));
+        var nEndPos   = Math.max(0, Math.min(this.Selection.End,   nContentLen - 1));
+
+        if (nStartPos > nEndPos)
+        {
+            var nTemp = nStartPos;
+            nStartPos = nEndPos;
+            nEndPos   = nTemp;
+        }
+
+        var oStartElement = this.content[nStartPos];
+        if (para_Math_Run !== oStartElement.Type)
+        {
+            // Предыдущий элемент должен быть раном
+            this.Selection.Start = nStartPos - 1;
+            this.content[this.Selection.Start].Set_SelectionAtEndPos();
+        }
+
+        var oEndElement = this.content[nEndPos];
+        if (para_Math_Run !== oEndElement.Type)
+        {
+            // Следующий элемент должен быть раном
+            this.Selection.End = nEndPos + 1;
+            this.content[this.Selection.End].Set_SelectionAtStartPos();
+        }
+    },
+
     Is_SelectedAll: function(Props)
     {
         var bFirst = false, bEnd = false;
@@ -4548,12 +4583,15 @@ CMathContent.prototype =
 
         return result;
     },
-    SelectToParent : function()
+    SelectToParent : function(bCorrect)
     {
         this.Selection.Use = true;
 
+        if (true === bCorrect)
+            this.Correct_Selection();
+
         if(!this.bRoot)
-            this.Parent.SelectToParent();
+            this.Parent.SelectToParent(false);
 
     },
     Selection_DrawRange: function(_CurLine, _CurRange, SelectionDraw)
@@ -5279,7 +5317,7 @@ CMathContent.prototype =
     },
     Internal_Content_Add : function(Pos, Item)
     {
-        History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos + 1, Items : [ Item ] } );
+        History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.content.splice( Pos, 0, Item );
 
         if ( this.CurPos >= Pos )
@@ -5301,7 +5339,7 @@ CMathContent.prototype =
     Remove_FromContent : function(Pos, Count)
     {
         var DeletedItems = this.content.splice(Pos, Count);
-        History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count, Items : DeletedItems } );
+        History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
         if(this.CurPos > Pos)
         {
@@ -5660,33 +5698,17 @@ CMathContent.prototype =
         {
             case historyitem_Math_AddItem:
             {
-                var Pos = Data.Pos,
-                    PosEnd = Data.PosEnd;
-
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(PosEnd);
-
-                this.content = Content_start.concat(Content_end);
-                this.CurPos = Pos - 1;
-                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
-
+                this.content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
                 break;
             }
             case historyitem_Math_RemoveItem:
             {
                 var Pos = Data.Pos;
 
-                if( this.IsPlaceholder() ) //удаляем тагет
-                {
-                    var empty = this.content[0]; //CEmpty
-                    this.content.length = 0;
-                    this.content.push( empty );
-                }
+                var Array_start = this.content.slice(0, Pos);
+                var Array_end   = this.content.slice(Pos);
 
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(Pos);
-
-                this.content = Content_start.concat(Data.Items, Content_end);
+                this.content = Array_start.concat(Data.Items, Array_end);
                 break;
             }
         }
@@ -5701,39 +5723,16 @@ CMathContent.prototype =
             {
                 var Pos = Data.Pos;
 
-                if( this.IsPlaceholder() ) //удаляем тагет
-                {
-                    var empty = this.content[0]; //CEmpty
-                    this.content.length = 0;
-                    this.content.push( empty );
-                }
+                var Array_start = this.content.slice(0, Pos);
+                var Array_end   = this.content.slice(Pos);
 
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(Pos);
-
-                this.setStartPos_Selection(Pos);
-                //this.selection.active = false;
-
-                this.content = Content_start.concat(Data.Items, Content_end);
+                this.content = Array_start.concat(Data.Items, Array_end);
                 break;
             }
             case historyitem_Math_RemoveItem:
             {
-
-                var Pos = Data.Pos,
-                    PosEnd = Pos + Data.Items.length;
-
-                var Content_start = this.content.slice(0, Pos);
-                var Content_end   = this.content.slice(PosEnd);
-                this.setStartPos_Selection(Pos);
-                //this.selection.active = false;
-
-                this.content = Content_start.concat(Content_end);
-                this.CurPos = Pos - 1;
-                this.setPlaceholderAfterRemove(); // выставляем placeholder после удаления всех остальных элементов
-
+                this.content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
                 break;
-
             }
         }
     },	
