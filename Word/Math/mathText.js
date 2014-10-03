@@ -787,7 +787,7 @@ CMathText.prototype =
     },
     Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
-        SearchPos.Pos.Update(0, Depth);
+        SearchPos.Pos.Update2(0, Depth);
         SearchPos.Pos.bPlaceholder = true;
     },
     Copy: function()

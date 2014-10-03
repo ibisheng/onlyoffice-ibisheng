@@ -1180,8 +1180,8 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
         SearchPos.CurX += this.size.width - this.Base.size.width - this.GapRight;
         if(this.Base.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
         {
-            SearchPos.Pos.Update(0, Depth);
-            SearchPos.Pos.Update(0, Depth + 1);
+            SearchPos.Pos.Update2(0, Depth);
+            SearchPos.Pos.Update2(0, Depth + 1);
             result = true;
         }
         SearchPos.CurX += this.GapRight;
@@ -1191,8 +1191,8 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
         SearchPos.CurX += this.GapLeft;
         if(this.Iterator.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
         {
-            SearchPos.Pos.Update(0, Depth);
-            SearchPos.Pos.Update(0, Depth + 1);
+            SearchPos.Pos.Update2(0, Depth);
+            SearchPos.Pos.Update2(0, Depth + 1);
             result = true;
         }
 
@@ -1200,8 +1200,8 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 
         if(this.Base.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
         {
-            SearchPos.Pos.Update(0, Depth);
-            SearchPos.Pos.Update(1, Depth + 1);
+            SearchPos.Pos.Update2(0, Depth);
+            SearchPos.Pos.Update2(1, Depth + 1);
             result = true;
         }
 

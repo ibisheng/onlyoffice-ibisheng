@@ -285,8 +285,8 @@ CBorderBox.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
 
     if(result)
     {
-        SearchPos.Pos.Update(0, Depth);
-        SearchPos.Pos.Update(0, Depth + 1);
+        SearchPos.Pos.Update2(0, Depth);
+        SearchPos.Pos.Update2(0, Depth + 1);
     }
 
     SearchPos.CurX += this.GapRight + alignRight;

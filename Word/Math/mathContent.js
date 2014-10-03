@@ -4991,7 +4991,7 @@ CMathContent.prototype =
                 {
                     if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
                     {
-                        SearchPos.Pos.Update(pos, Depth);
+                        SearchPos.Pos.Update2(pos, Depth);
                         result = true;
                     }
 
@@ -5003,7 +5003,7 @@ CMathContent.prototype =
 
                             if( this.content[pos-1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
                             {
-                                SearchPos.Pos.Update(pos-1, Depth);
+                                SearchPos.Pos.Update2(pos-1, Depth);
                                 result = true;
                             }
 
@@ -5014,7 +5014,7 @@ CMathContent.prototype =
                         {
                             if( this.content[pos+1].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
                             {
-                                SearchPos.Pos.Update(pos, Depth);
+                                SearchPos.Pos.Update2(pos, Depth);
                                 result = true;
                             }
                         }*/
@@ -5024,7 +5024,7 @@ CMathContent.prototype =
                 {
                     if(this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd, PointInfo))
                     {
-                        SearchPos.Pos.Update(pos, Depth);
+                        SearchPos.Pos.Update2(pos, Depth);
                         result = true;
                     }
                 }
