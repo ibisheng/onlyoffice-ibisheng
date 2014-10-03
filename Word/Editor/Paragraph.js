@@ -6133,7 +6133,7 @@ Paragraph.prototype =
 
         if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type)
             Info.Set_Math(this.Content[this.Selection.EndPos]);
-        else (false === this.Selection.Use && para_Math === this.Content[this.CurPos.ContentPos].Type)
+        else if (false === this.Selection.Use && para_Math === this.Content[this.CurPos.ContentPos].Type)
             Info.Set_Math(this.Content[this.CurPos.ContentPos]);
     },
 
