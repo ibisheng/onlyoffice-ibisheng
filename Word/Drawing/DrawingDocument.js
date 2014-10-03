@@ -3322,6 +3322,8 @@ function CDrawingDocument()
         if (!this.MathRect.IsActive)
             return;
 
+        overlay.Show();
+
         var _page = this.m_arrPages[this.MathRect.Rect.PageIndex];
         var drPage = _page.drawingPage;
 
@@ -3348,7 +3350,7 @@ function CDrawingDocument()
         ctx.lineWidth = 1;
 
         ctx.beginPath();
-        this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);        
+        this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, true);
         ctx.stroke();
         ctx.beginPath();
 
@@ -3356,7 +3358,7 @@ function CDrawingDocument()
         ctx.lineWidth = 1;
 
         ctx.beginPath();
-        this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0);
+        this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0, true);
         ctx.stroke();
         ctx.beginPath();
 
@@ -3378,7 +3380,7 @@ function CDrawingDocument()
                 overlay.max_y = _b;
 
             var ctx = overlay.m_oContext;
-            ctx.fillStyle = "#939393";
+            ctx.fillStyle = "#375082";
 
             ctx.beginPath();
             this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
