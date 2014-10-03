@@ -98,6 +98,7 @@ StartAddNewShape.prototype =
                         shape.setRecalculateInfo();
                     }
                     shape.addToDrawingObjects();
+                    shape.checkDrawingBaseCoords();
                     oThis.drawingObjects.checkChartTextSelection();
                     oThis.drawingObjects.resetSelection();
                     shape.select(oThis.drawingObjects, 0);
@@ -549,6 +550,7 @@ RotateState.prototype =
                                 {
                                     drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
                                 }
+                                drawing.checkDrawingBaseCoords();
                             }
                             oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
                         }

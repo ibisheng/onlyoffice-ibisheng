@@ -1632,6 +1632,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.shapes[i].group.updateCoordinatesAfterInternalResize();
                 }
+                objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
             for(i = 0; i < objects_by_type.images.length; ++i)
             {
@@ -1642,6 +1643,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.images[i].group.updateCoordinatesAfterInternalResize();
                 }
+                objects_by_type.images[i].checkDrawingBaseCoords();
             }
             for(i = 0; i < objects_by_type.charts.length; ++i)
             {
@@ -1652,6 +1654,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.charts[i].group.updateCoordinatesAfterInternalResize();
                 }
+                objects_by_type.charts[i].checkDrawingBaseCoords();
             }
             //if(this.selection.groupSelection)
             //{
@@ -1670,6 +1673,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.shapes[i].group.updateCoordinatesAfterInternalResize();
                 }
+                objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
             for(i = 0; i < objects_by_type.images.length; ++i)
             {
@@ -1680,6 +1684,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.images[i].group.updateCoordinatesAfterInternalResize();
                 }
+                objects_by_type.images[i].checkDrawingBaseCoords();
             }
             for(i = 0; i < objects_by_type.charts.length; ++i)
             {
@@ -1690,6 +1695,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.charts[i].group.updateCoordinatesAfterInternalResize();
                 }
+                objects_by_type.charts[i].checkDrawingBaseCoords();
             }
             //if(this.selection.groupSelection)
             //{
@@ -3295,6 +3301,7 @@ DrawingObjectsController.prototype =
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(null);
                                 sp.addToDrawingObjects();
+                                sp.checkDrawingBaseCoords();
                                 cur_group.deleteDrawingBase();
                                 this.resetSelection();
                                 this.selectObject(sp, cur_group.selectStartPage);
@@ -4187,7 +4194,7 @@ DrawingObjectsController.prototype =
             {
                 if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
                 {
-                    this.selection.groupSelection.selectedObjects[0].theme = this.document.theme;
+                    this.selection.groupSelection.selectedObjects[0].theme = this.getTheme();
                     ExecuteNoHistory(function()
                     {
                         CheckSpPrXfrm2(this.selection.groupSelection.selectedObjects[0]);
@@ -4485,6 +4492,7 @@ DrawingObjectsController.prototype =
                     sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                     sp.setGroup(null);
                     sp.addToDrawingObjects();
+                    sp.checkDrawingBaseCoords();
                     this.selectObject(sp, 0);
                 }
                 cur_group.deleteDrawingBase();

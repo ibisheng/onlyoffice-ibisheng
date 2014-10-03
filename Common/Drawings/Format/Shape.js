@@ -2156,6 +2156,34 @@ CShape.prototype =
     },
 
 
+    checkDrawingBaseCoords: function()
+    {
+        if(this.drawingBase && this.spPr && this.spPr.xfrm && !this.group)
+        {
+            var oldX = this.x, oldY = this.y, oldExtX = this.extX, oldExtY = this.extY;
+            this.x = this.spPr.xfrm.offX;
+            this.y = this.spPr.xfrm.offY;
+            this.extX = this.spPr.xfrm.extX;
+            this.extY = this.spPr.xfrm.extY;
+            this.drawingBase.setGraphicObjectCoords();
+            this.x = oldX;
+            this.y = oldY;
+            this.extX = oldExtX;
+            this.extY = oldExtY;
+            var from = this.drawingBase.from, to = this.drawingBase.to;
+            History.Add(this, {Type: historyitem_AutoShapes_SetDrawingBaseCoors,
+                fromCol: from.col,
+                fromColOff: from.colOff,
+                fromRow   : from.row,
+                fromRowOff: from.rowOff,
+                toCol: to.col,
+                toColOff: to.colOff,
+                toRow   : to.row,
+                toRowOff: to.rowOff
+            });
+        }
+    },
+
     getTransformMatrix: function ()
     {
         return this.transform;
@@ -3420,6 +3448,11 @@ CShape.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
@@ -3586,6 +3619,18 @@ CShape.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                writeDouble(w, data.fromCol   );
+                writeDouble(w, data.fromColOff);
+                writeDouble(w, data.fromRow   );
+                writeDouble(w, data.fromRowOff);
+                writeDouble(w, data.toCol);
+                writeDouble(w, data.toColOff);
+                writeDouble(w, data.toRow   );
+                writeDouble(w, data.toRowOff);
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
@@ -3642,6 +3687,21 @@ CShape.prototype =
             var type = r.GetLong();
             switch (type)
             {
+                case historyitem_AutoShapes_SetDrawingBaseCoors:
+                {
+                    if(this.drawingBase)
+                    {
+                        this.drawingBase.from.col    = readDouble(r);
+                        this.drawingBase.from.colOff = readDouble(r);
+                        this.drawingBase.from.row    = readDouble(r);
+                        this.drawingBase.from.rowOff = readDouble(r);
+                        this.drawingBase.to.col      = readDouble(r);
+                        this.drawingBase.to.colOff   = readDouble(r);
+                        this.drawingBase.to.row      = readDouble(r);
+                        this.drawingBase.to.rowOff   = readDouble(r);
+                    }
+                    break;
+                }
                 case historyitem_AutoShapes_RemoveFromDrawingObjects:
                 {
                     deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());

@@ -107,7 +107,7 @@ function deleteDrawingBase(aObjects, graphicId)
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
     var controller = this.getDrawingObjectsController();
-    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, c_oAscCellAnchorType.cellanchorAbsolute);
+    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
     var data = {Type: historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(this, data);
     this.worksheet.addContentChanges(new CContentChangesElement(contentchanges_Add, data.Pos, 1, data));

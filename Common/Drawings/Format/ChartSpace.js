@@ -332,6 +332,7 @@ CChartSpace.prototype =
     select: CShape.prototype.select,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,
+    checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
 
 
     recalculateTextPr: function()
@@ -10071,6 +10072,18 @@ CChartSpace.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                writeDouble(w, data.fromCol   );
+                writeDouble(w, data.fromColOff);
+                writeDouble(w, data.fromRow   );
+                writeDouble(w, data.fromRowOff);
+                writeDouble(w, data.toCol);
+                writeDouble(w, data.toColOff);
+                writeDouble(w, data.toRow   );
+                writeDouble(w, data.toRowOff);
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
@@ -10186,6 +10199,21 @@ CChartSpace.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                if(this.drawingBase)
+                {
+                    this.drawingBase.from.col    = readDouble(r);
+                    this.drawingBase.from.colOff = readDouble(r);
+                    this.drawingBase.from.row    = readDouble(r);
+                    this.drawingBase.from.rowOff = readDouble(r);
+                    this.drawingBase.to.col      = readDouble(r);
+                    this.drawingBase.to.colOff   = readDouble(r);
+                    this.drawingBase.to.row      = readDouble(r);
+                    this.drawingBase.to.rowOff   = readDouble(r);
+                }
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());

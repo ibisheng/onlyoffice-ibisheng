@@ -42,6 +42,7 @@ CGraphicFrame.prototype =
 
     setBDeleted: CShape.prototype.setBDeleted,
     getBase64Img: CShape.prototype.getBase64Img,
+    checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
 
 
     Is_DrawingShape: function()

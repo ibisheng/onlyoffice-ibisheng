@@ -2826,6 +2826,7 @@ function DrawingObjects() {
                     }
                     oNewChartSpace.spPr.xfrm.setOffX(pos_x);
                     oNewChartSpace.spPr.xfrm.setOffY(pos_y);
+                    oNewChartSpace.checkDrawingBaseCoords();
                     oNewChartSpace.recalculate();
                     _this.showDrawingObjects(false);
                     _this.controller.selectObject(oNewChartSpace, 0);
@@ -3123,6 +3124,7 @@ function DrawingObjects() {
                         var coords = _this.coordsManager.calculateCoords(obj.from);
                         obj.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
                         obj.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y));
+                        obj.graphicObject.checkDrawingBaseCoords();
                         obj.graphicObject.recalculate();
                         bNeedRedraw = true;
                     }
@@ -3911,6 +3913,7 @@ function DrawingObjects() {
                         CheckSpPrXfrm(drawingObject.graphicObject);
                         drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+                        drawingObject.graphicObject.checkDrawingBaseCoords();
                         bNeedRecalc = true;
                     }
                 }
@@ -3926,6 +3929,7 @@ function DrawingObjects() {
                         CheckSpPrXfrm(drawingObject.graphicObject);
                         drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+                        drawingObject.graphicObject.checkDrawingBaseCoords();
                         bNeedRecalc = true;
                     }
                 }

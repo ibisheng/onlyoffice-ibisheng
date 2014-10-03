@@ -754,6 +754,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
             xfrm.setFlipH(this.resizedflipH);
             xfrm.setFlipV(this.resizedflipV);
+            this.originalObject.checkDrawingBaseCoords();
         };
     }, this, []);
 }
@@ -1413,6 +1414,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             {
                 this.childs[i].trackEnd();
             }
+            this.original.checkDrawingBaseCoords();
 
         };
     }, this, []);

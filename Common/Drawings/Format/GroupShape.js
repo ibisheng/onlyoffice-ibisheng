@@ -1289,6 +1289,7 @@ CGroupShape.prototype =
             sp_tree[i].spPr.xfrm.setOffX(sp_tree[i].spPr.xfrm.offX - x_min_clear);
             sp_tree[i].spPr.xfrm.setOffY(sp_tree[i].spPr.xfrm.offY - y_min_clear);
         }
+        this.checkDrawingBaseCoords();
     },
 
     select: CShape.prototype.select,
@@ -1438,6 +1439,7 @@ CGroupShape.prototype =
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
+    checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
 
     calculateSnapArrays: function(snapArrayX, snapArrayY)
     {
@@ -1683,6 +1685,19 @@ CGroupShape.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                writeDouble(w, data.fromCol   );
+                writeDouble(w, data.fromColOff);
+                writeDouble(w, data.fromRow   );
+                writeDouble(w, data.fromRowOff);
+                writeDouble(w, data.toCol);
+                writeDouble(w, data.toColOff);
+                writeDouble(w, data.toRow   );
+                writeDouble(w, data.toRowOff);
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
@@ -1731,6 +1746,21 @@ CGroupShape.prototype =
         var type  = r.GetLong();
         switch (type)
         {
+            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            {
+                if(this.drawingBase)
+                {
+                    this.drawingBase.from.col    = readDouble(r);
+                    this.drawingBase.from.colOff = readDouble(r);
+                    this.drawingBase.from.row    = readDouble(r);
+                    this.drawingBase.from.rowOff = readDouble(r);
+                    this.drawingBase.to.col      = readDouble(r);
+                    this.drawingBase.to.colOff   = readDouble(r);
+                    this.drawingBase.to.row      = readDouble(r);
+                    this.drawingBase.to.rowOff   = readDouble(r);
+                }
+                break;
+            }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());

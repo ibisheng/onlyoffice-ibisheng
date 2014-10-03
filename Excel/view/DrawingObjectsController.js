@@ -398,6 +398,7 @@ DrawingObjectsController.prototype.createGroup = function()
             group.setParent(this.drawingObjects);
         }
         group.addToDrawingObjects();
+        group.checkDrawingBaseCoords();
         this.selectObject(group, 0);
         group.addToRecalculate();
         this.startRecalculate();
@@ -474,6 +475,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
             options.putRange(old_range);
         }
         chart.addToRecalculate();
+        chart.checkDrawingBaseCoords();
         this.startRecalculate();
         this.drawingObjects.sendGraphicObjectProps();
     }
@@ -500,6 +502,7 @@ DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, 
     image.setWorksheet(this.drawingObjects.getWorksheetModel());
     image.setDrawingObjects(this.drawingObjects);
     image.addToDrawingObjects();
+    image.checkDrawingBaseCoords();
     this.selectObject(image, 0);
     image.addToRecalculate();
     this.startRecalculate();

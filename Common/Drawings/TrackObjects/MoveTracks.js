@@ -113,6 +113,7 @@ function MoveShapeImageTrack(originalObject)
         }
         this.originalObject.spPr.xfrm.setOffX(this.x/scale_coefficients.cx + ch_off_x);
         this.originalObject.spPr.xfrm.setOffY(this.y/scale_coefficients.cy + ch_off_y);
+        this.originalObject.checkDrawingBaseCoords();
     };
 }
 
@@ -310,6 +311,7 @@ function MoveGroupTrack(originalObject)
             if(this.originalObject.selectStartPage !== this.pageIndex)
                 this.originalObject.selectStartPage = this.pageIndex;
         }
+        this.originalObject.checkDrawingBaseCoords();
     };
 }
 
