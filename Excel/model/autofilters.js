@@ -743,7 +743,7 @@ var gUndoInsDelCellsFlag = true;
 							ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 						};
 						
-						if(paramsForCallBackAdd && !bIsOpenFilter && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
+						if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
 							ws._onEndAddFormatTable(rangeFilter);
 						
 						History.EndTransaction();
