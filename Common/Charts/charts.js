@@ -364,42 +364,45 @@ ChartPreviewManager.prototype.clearPreviews = function()
 	this.previewGroups.length = 0;
 };
 ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
-	if(!this.chartsByTypes[type])
-		this.chartsByTypes[type] = this.getChartByType(type);
-	var chart_space = this.chartsByTypes[type];
-	if(chart_space.style !== styleIndex)
-	{
-		chart_space.style = styleIndex;
-		chart_space.recalculateMarkers();
-		chart_space.recalculateSeriesColors();
-		chart_space.recalculatePlotAreaChartBrush();
-		chart_space.recalculatePlotAreaChartPen();
-        chart_space.recalculateChartBrush();
-        chart_space.recalculateChartPen();
-        chart_space.recalculateUpDownBars();
-	}
-	chart_space.recalculatePenBrush();
+    return ExecuteNoHistory(function(){
+        if(!this.chartsByTypes[type])
+            this.chartsByTypes[type] = this.getChartByType(type);
+        var chart_space = this.chartsByTypes[type];
+        if(chart_space.style !== styleIndex)
+        {
+            chart_space.style = styleIndex;
+            chart_space.recalculateMarkers();
+            chart_space.recalculateSeriesColors();
+            chart_space.recalculatePlotAreaChartBrush();
+            chart_space.recalculatePlotAreaChartPen();
+            chart_space.recalculateChartBrush();
+            chart_space.recalculateChartPen();
+            chart_space.recalculateUpDownBars();
+        }
+        chart_space.recalculatePenBrush();
 
 
-	if (null === this._canvas_charts) {
-		this._canvas_charts = document.createElement('canvas');
-		this._canvas_charts.width = this.CHART_PREVIEW_WIDTH_PIX;
-		this._canvas_charts.height = this.CHART_PREVIEW_HEIGHT_PIX;
+        if (null === this._canvas_charts) {
+            this._canvas_charts = document.createElement('canvas');
+            this._canvas_charts.width = this.CHART_PREVIEW_WIDTH_PIX;
+            this._canvas_charts.height = this.CHART_PREVIEW_HEIGHT_PIX;
 
-		if (AscBrowser.isRetina) {
-			this._canvas_charts.width <<= 1;
-			this._canvas_charts.height <<= 1;
-		}
-	}
+            if (AscBrowser.isRetina) {
+                this._canvas_charts.width <<= 1;
+                this._canvas_charts.height <<= 1;
+            }
+        }
 
-	var _canvas = this._canvas_charts;
-	var ctx = _canvas.getContext('2d');
-	var graphics = new CGraphics();
-	graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
-	graphics.m_oFontManager = g_fontManager;
-	graphics.transform(1,0,0,1,0,0);
-	chart_space.draw(graphics);
-	return _canvas.toDataURL("image/png");
+        var _canvas = this._canvas_charts;
+        var ctx = _canvas.getContext('2d');
+        var graphics = new CGraphics();
+        graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
+        graphics.m_oFontManager = g_fontManager;
+        graphics.transform(1,0,0,1,0,0);
+        chart_space.draw(graphics);
+        return _canvas.toDataURL("image/png");
+    }, this, []);
+
 };
 
 ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
