@@ -2164,7 +2164,7 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		for(var i = nStart; i < nEnd; i++)	
 		{
-			var oElem = oEqArr.getBase(i);
+			var oElem = oEqArr.getElement(i);
 			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		}
 	}
