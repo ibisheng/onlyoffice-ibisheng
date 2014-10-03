@@ -415,7 +415,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
         if ( para_Math === Item.Type )
         {
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
-            Item.MathPara = this.Check_MathPara(Pos);
+            Item.SetInline(true === this.Check_MathPara(Pos)? false : true);
         }
 
         PRS.Update_CurPos( Pos, 0 );
@@ -1542,7 +1542,7 @@ Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurL
         if ( para_Math === Item.Type )
         {
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
-            Item.MathPara = this.Check_MathPara(Pos);
+            Item.SetInline(true === this.Check_MathPara(Pos)? false : true);
         }
 
         if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )

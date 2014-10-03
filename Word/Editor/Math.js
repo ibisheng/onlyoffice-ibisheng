@@ -1621,3 +1621,42 @@ ParaMath.prototype.Get_ContentSelection = function()
     return {X : oContent.pos.x + this.X, Y : oContent.pos.y + this.Y, W : oContent.size.width, H : oContent.size.height};
 };
 
+/**
+ * Проверяем находимся ли мы во внутреннем (не самом верхнем) контенте формулы.
+ */
+ParaMath.prototype.Is_InInnerContent = function()
+{
+    var oContent = this.GetSelectContent().Content;
+
+    if (oContent.bRoot)
+        return false;
+
+    return true;
+};
+
+/**
+ * Обработка нажатия Enter внутри формулы
+ */
+ParaMath.prototype.Handle_AddNewLine = function()
+{
+};
+
+/**
+ * Разделение формулы на 2 части в заданной позиции. В текущем объекте остается левая часть формулы.
+ * @param ContentPos Позиция
+ * @param Depth
+ * @returns Возвращается правая часть формулы.
+ */
+ParaMath.prototype.Split = function (ContentPos, Depth)
+{
+    return null;
+};
+
+/**
+ * Пытаемся выполнить автозамену в формуле.
+ * @returns {boolean} Выполнилась ли автозамена.
+ */
+ParaMath.prototype.Make_AutoCorrect = function()
+{
+    return false;
+};

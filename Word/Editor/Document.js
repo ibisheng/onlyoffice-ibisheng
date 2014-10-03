@@ -664,6 +664,7 @@ function CSelectedElementsInfo()
     this.m_bMixedSelection = false; // Попадает ли в выделение одновременно несколько элементов
     this.m_nDrawing        = selected_None;
     this.m_pParagraph      = null;  // Параграф, в котором находится выделение
+    this.m_oMath           = null;  // Формула, в которой находится выделение
 
     this.Reset = function()
     {
@@ -678,9 +679,19 @@ function CSelectedElementsInfo()
         this.m_pParagraph = Para;
     };
 
+    this.Set_Math = function(Math)
+    {
+        this.m_oMath = Math;
+    };
+
     this.Get_Paragraph = function()
     {
         return this.m_pParagraph;
+    };
+
+    this.Get_Math = function()
+    {
+        return this.m_oMath;
     };
 
     this.Set_Table = function()
@@ -9139,17 +9150,27 @@ CDocument.prototype =
                     if (false === this.Document_Is_SelectionLocked(CheckType))
                     {
                         this.Create_NewHistoryPoint();
-                        if (e.ShiftKey)
+
+                        var oSelectedInfo = this.Get_SelectedElementsInfo();
+                        var oMath = oSelectedInfo.Get_Math();
+                        if (null !== oMath && oMath.Is_InInnerContent())
                         {
-                            this.Paragraph_Add(new ParaNewLine(break_Line));
-                        }
-                        else if (e.CtrlKey)
-                        {
-                            this.Paragraph_Add(new ParaNewLine(break_Page));
+                            oMath.Handle_AddNewLine();
                         }
                         else
                         {
-                            this.Add_NewParagraph();
+                            if (e.ShiftKey)
+                            {
+                                this.Paragraph_Add(new ParaNewLine(break_Line));
+                            }
+                            else if (e.CtrlKey)
+                            {
+                                this.Paragraph_Add(new ParaNewLine(break_Page));
+                            }
+                            else
+                            {
+                                this.Add_NewParagraph();
+                            }
                         }
                     }
                 }
@@ -9190,23 +9211,36 @@ CDocument.prototype =
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
                 this.Create_NewHistoryPoint();
-                if ( true === e.ShiftKey && true === e.CtrlKey )
-                {
-                    this.DrawingDocument.TargetStart();
-                    this.DrawingDocument.TargetShow();
 
-                    this.Paragraph_Add( new ParaText(String.fromCharCode(0x00A0)) );
-                }
-                else if ( true === e.CtrlKey )
+                // Если мы находимся в формуле, тогда пытаемся выполнить автозамену
+
+                var oSelectedInfo = this.Get_SelectedElementsInfo();
+                var oMath = oSelectedInfo.Get_Math();
+
+                if (null !== oMath && true === oMath.Make_AutoCorrect())
                 {
-                    this.Paragraph_ClearFormatting();
+                    // Ничего тут не делаем. Все делается в автозамене
                 }
                 else
                 {
-                    this.DrawingDocument.TargetStart();
-                    this.DrawingDocument.TargetShow();
+                    if (true === e.ShiftKey && true === e.CtrlKey)
+                    {
+                        this.DrawingDocument.TargetStart();
+                        this.DrawingDocument.TargetShow();
 
-                    this.Paragraph_Add(new ParaSpace());
+                        this.Paragraph_Add(new ParaText(String.fromCharCode(0x00A0)));
+                    }
+                    else if (true === e.CtrlKey)
+                    {
+                        this.Paragraph_ClearFormatting();
+                    }
+                    else
+                    {
+                        this.DrawingDocument.TargetStart();
+                        this.DrawingDocument.TargetShow();
+
+                        this.Paragraph_Add(new ParaSpace());
+                    }
                 }
             }
 
