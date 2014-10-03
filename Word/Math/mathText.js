@@ -38,15 +38,30 @@ CMathSize.prototype.SetZero = function()
     this.ascent = 0;
 }
 
+function CMathRecalcTextInfo()
+{
+    this.StyleCode =   null;
+    this.bAccentIJ =  false;
+}
+
 function CMathText(bJDraw)
 {
     // для Para_Run
     this.Type = para_Math_Text;
 
     this.bJDraw = bJDraw;
-    this.size = new CMathSize();
+
     this.value = null;
+
+    this.RecalcInfo =
+    {
+        //NewLetter:  true,
+        StyleCode:  null,
+        bAccentIJ:  false
+    };
+
     this.Parent = null;
+    this.size = new CMathSize();
     this.pos = new CMathPosition();
 
     this.rasterOffsetX = 0;
@@ -547,9 +562,18 @@ CMathText.prototype =
 
         var letter = this.getCode();
 
-        var bAccentIJ = this.bJDraw ? false : this.Parent.IsAccent();
+        /*if(this.bJDraw)
+            letter = this.code;
+        else if(RPI.UpdateMathPr || Math_NeedResize == false || this.RecalcInfo.NewLetter == true)
+            letter = this.getCode();
+        else
+            letter = this.RecalcInfo.StyleCode;*/
 
+        var bAccentIJ = this.bJDraw ? false : this.Parent.IsAccent();
         bAccentIJ = bAccentIJ && (this.value == 0x69 || this.value == 0x6A);
+
+        this.RecalcInfo.StyleCode = letter;
+        this.RecalcInfo.bAccentIJ = bAccentIJ;
 
         if(bAccentIJ)
             oMeasure.SetStringGid(true);
@@ -576,17 +600,14 @@ CMathText.prototype =
 
         if(this.bJDraw)
             width = metricsTxt.WidthG;
-            //width = metricsTxt.WidthG + this.GapLeft + this.GapRight;
         else
             width = metricsTxt.Width;
-            //width = metricsTxt.Width + this.GapLeft + this.GapRight;
 
         this.size.width  = this.GapLeft + this.GapRight + width;
         this.size.height = height;
         this.size.ascent = ascent;
 
-
-        //this.size = {width: width, widthG: width, height: height, ascent: ascent};
+        //this.RecalcInfo.NewLetter = false;
     },
     Get_WidthVisible: function()
     {
@@ -622,12 +643,12 @@ CMathText.prototype =
 
         pGraphics.transform(sx, shy, shx, sy, 0, 0);*/
 
-        var bAccent = this.bJDraw ? false : this.Parent.IsAccent();
 
-        if(bAccent && (this.value == 0x69 || this.value == 0x6A))
-            pGraphics.tg(this.getCode(), X, Y);
+        if(this.RecalcInfo.bAccentIJ)
+            pGraphics.tg(this.RecalcInfo.StyleCode, X, Y);
         else
-            pGraphics.FillTextCode(X, Y, this.getCode());    //на отрисовку символа отправляем положение baseLine
+            pGraphics.FillTextCode(X, Y, this.RecalcInfo.StyleCode);    //на отрисовку символа отправляем положение baseLine
+
 
     },
     setPosition: function(pos)

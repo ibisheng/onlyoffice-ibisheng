@@ -37,6 +37,8 @@ var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
 
 function CRPI()
 {
+    //this.UpdateMathPr    = true;
+    this.NeedResize      = true;
     this.bInsideFraction = false;
     this.bInline         = false;
     this.bChangeInline   = false;
@@ -4030,6 +4032,17 @@ CMathContent.prototype =
             this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
         }
     },
+    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)    // особый случай: вызываем, когда пересчет всей формулы не нужен, а нужно выставить только Lines (Реализована, чтобы не править Resize у каждого элемента)
+    {
+        var lng = this.content.length;
+        for(var i = 0; i < lng; i++)
+        {
+            if(this.content[i].Type == para_Math_Composition)
+                this.content[i].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
+            else
+                this.content[i].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, ArgSize, null);
+        }
+    },
     M_Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // если делать один цикл for для Resize, то надо избавиться от WidthToElement,
                                                                       // т.к. корректно рассчитывать не получается, либо выставлять WidthToElement для пустыx Run (которые идут после мат объекта) на recalculateSize_2 мат объекта
     {
@@ -5061,7 +5074,6 @@ CMathContent.prototype =
         {
             var len = this.content.length - 1;
             this.CurPos = len;
-
 
             this.content[len].Cursor_MoveToEndPos(SelectFromEnd);
         }

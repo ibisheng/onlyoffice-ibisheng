@@ -456,17 +456,6 @@ CBox.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.setContent();
 }
-CBox.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    //this.Set_CompiledCtrPrp(ParaMath);
-
-    var ArgSizeBox = ArgSize.Copy();
-
-    /*if(this.Pr.opEmu)
-        ArgSizeBox.decrease();*/
-
-    CBox.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSizeBox);
-}
 CBox.prototype.setProperties = function(props)
 {
     if(props.opEmu === true || props.opEmu === false)

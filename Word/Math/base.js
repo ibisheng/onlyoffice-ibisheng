@@ -2,7 +2,6 @@
 
 function CMathBase(bInside)
 {
-    //this.typeObj = MATH_COMP;
     this.Type = para_Math_Composition;
 
     this.pos = new CMathPosition();
@@ -37,7 +36,6 @@ function CMathBase(bInside)
     };
 
     this.bSelectionUse      = false;
-    this.bInsideUpperSelect = false;
 
     this.nRow = 0;
     this.nCol = 0;
@@ -383,6 +381,13 @@ CMathBase.prototype =
                 this.elements[i][j].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
         this.recalculateSize(oMeasure, RPI);
+    },
+    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
     },
     Set_CompiledCtrPrp: function(ParaMath)
     {

@@ -1,5 +1,10 @@
 "use strict";
 
+/*var Math_Draw_Time  = false;
+var Math_Date = 0;
+var Math_NeedResize = true;
+var Math_Date_Draw = 0;*/
+
 /**
  * Created by Ilja.Kirillov on 18.03.14.
  */
@@ -40,6 +45,7 @@ function ParaMath()
 
     //this.CurrentContent    = this.RootComposition;
     //this.SelectContent     = this.RootComposition;
+    this.NeedResize = true;
     this.bSelectionUse     = false;
 
 
@@ -155,6 +161,8 @@ ParaMath.prototype.Get_CompiledTextPr = function(Copy)
 
 ParaMath.prototype.Add = function(Item)
 {
+    this.NeedResize = true;
+
     var Type = Item.Type;
     var oContent = this.GetSelectContent();
     var oStartContent = oContent.Content.content[oContent.Start];
@@ -226,6 +234,7 @@ ParaMath.prototype.Add = function(Item)
 
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
+	this.NeedResize = true;
     var oSelectedContent = this.GetSelectContent();
 
     var nStartPos = oSelectedContent.Start;
@@ -534,29 +543,37 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaLine  = PRS.Line;
     var ParaRange = PRS.Range;
 
-    var TextPr = new CTextPr();
-    TextPr.Init_Default();
 
     var RPI = new CRPI();
     RPI.bInline       = this.MathPara === false;
     RPI.bChangeInline = this.MathPara != this.OldMathPara;
+    RPI.NeedResize    = this.NeedResize;
 
     var ArgSize = new CMathArgSize();
 
     if(PRS.NewRange  == false)
         this.Root.Recalculate_Reset(PRS.Range, PRS.Line);
 
-    this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize,  TextPr);
+    if(RPI.NeedResize)
+    {
+        this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
+        // когда формула будеат разбиваться на строки, Position придется перерасчитывать
+        var pos = new CMathPosition();
+        pos.x = 0;
+        pos.y = 0;
 
-    //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
+        this.Root.setPosition(pos);
+    }
+    else
+        this.Root.Resize_2(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
+
+
+    this.NeedResize = false;
+
     this.OldMathPara = this.MathPara;
 
+    //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
 
-    var pos = new CMathPosition();
-    pos.x = 0;
-    pos.y = 0;
-
-    this.Root.setPosition(pos);
 
     this.Width        = this.Root.size.width;
     this.Height       = this.Root.size.height;
@@ -662,6 +679,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     }
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 };
 
@@ -908,6 +926,11 @@ ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 // Функция для работы с формулой
 // в тч с  дефолтными текстовыми настройками и argSize
 //-----------------------------------------------------------------------------------
+ParaMath.prototype.SetInline = function(value)
+{
+    this.bInline = value;
+    this.NeedResize = true;
+};
 ParaMath.prototype.MathToImageConverter= function()
 {
     window.IsShapeToImageConverter = true;
@@ -975,23 +998,23 @@ ParaMath.prototype.ApplyArgSize = function(oWPrp, argSize)
     oWPrp.Merge(tPrp);
 
 };
+ParaMath.prototype.ApplyArgSize_2 = function(oWPrp, argSize)
+{
+    if(argSize == -1)
+    {
+        //FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
+        oWPrp.FontSize   = 0.76*oWPrp.FontSize;
+        oWPrp.FontSizeCS = 0.76*oWPrp.FontSizeCS;
+    }
+    else if(argSize == -2)
+    {
+        //FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
+        oWPrp.FontSize   = 0.76*0.855*oWPrp.FontSize;
+        oWPrp.FontSizeCS = 0.76*0.855*oWPrp.FontSizeCS;
+    }
 
-/*ParaMath.prototype.GetDefaultTxtPrp= function()
- {
- var txtPrp = new CTextPr();
 
- var defaultTxtPr =
- {
- FontFamily:     {Name  : "Cambria Math", Index : -1 },
- FontSize:       11,
- Italic:         true,
- Bold:           false
- };
-
- txtPrp.Set_FromObject(defaultTxtPr);
-
- return txtPrp;
- };*/
+};
 
 ParaMath.prototype.GetFirstRPrp = function()
 {
@@ -1597,3 +1620,4 @@ ParaMath.prototype.Get_ContentSelection = function()
 
     return {X : oContent.pos.x + this.X, Y : oContent.pos.y + this.Y, W : oContent.size.width, H : oContent.size.height};
 };
+

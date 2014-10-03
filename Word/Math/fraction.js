@@ -225,6 +225,10 @@ CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     {
         this.ArgSize.SetValue(-1); // для CtrPrp
     }
+    else
+    {
+        this.ArgSize.SetValue(0);
+    }
 
     if(this.Pr.type == NO_BAR_FRACTION)
     {
