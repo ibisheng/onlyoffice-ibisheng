@@ -209,11 +209,12 @@ ParaMath.prototype.Add = function(Item)
                     var EndPos = Pos + 1;
                     var oItem = oStartContent.Content[i];
                     oMRun.Add(oItem, true);
-                    oStartContent.Remove_FromContent(i, 1, false);
+                    oStartContent.Remove_FromContent(i, 1, false);					
                 }
                 oStartContent.Selection_Remove();
+				oMRun.State.ContentPos = 0;
             }
-
+			
             oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
 
             if(nPosStart != nLenStart)
@@ -225,6 +226,8 @@ ParaMath.prototype.Add = function(Item)
                     PosEnd = Pos + 1;
                 History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
             }
+			else
+				oContent.Content.CurPos++;
 
 
         }

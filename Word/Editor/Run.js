@@ -7330,7 +7330,10 @@ ParaRun.prototype.Read_FromBinary2 = function(Reader)
     this.Pr.Read_FromBinary( Reader );
 
     if (para_Math_Run == this.Type)
+	{
         this.MathPrp = new CMPrp();
+		this.size    = new CMathSize();
+	}
 
     if(undefined !== editor && true === editor.isDocumentEditor)
     {
