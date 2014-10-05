@@ -10396,6 +10396,17 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Sub === type)
         {
+			if (undefined == oContent.content)
+			{
+				props.type = DEGREE_SubSup;
+				var oSSubSup = new CDegreeSubSup(props);
+				if (oParent)
+					oParent.addElementToContent(oSSubSup);
+				oSub.content = oSSubSup.getLowerIterator();
+				oSup.content = oSSubSup.getUpperIterator();
+				oContent.content = oSSubSup.getBase();
+			}
+			
 			if (oSub.content && length == 0)
 				oSub.content.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
@@ -10404,6 +10415,17 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Sup === type)
         {
+			if (undefined == oContent.content)
+			{
+				props.type = DEGREE_SubSup;
+				var oSSubSup = new CDegreeSubSup(props);
+				if (oParent)
+					oParent.addElementToContent(oSSubSup);
+				oSub.content = oSSubSup.getLowerIterator();
+				oSup.content = oSSubSup.getUpperIterator();
+				oContent.content = oSSubSup.getBase();
+			}
+			
 			if (oSup.content && length == 0)
 				oSup.content.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
@@ -10412,6 +10434,17 @@ function Binary_oMathReader(stream)
         }
 		else if (c_oSer_OMathContentType.Element === type)
         {
+			if (undefined == oContent.content)
+			{
+				props.type = DEGREE_SubSup;
+				var oSSubSup = new CDegreeSubSup(props);
+				if (oParent)
+					oParent.addElementToContent(oSSubSup);
+				oSub.content = oSSubSup.getLowerIterator();
+				oSup.content = oSSubSup.getUpperIterator();
+				oContent.content = oSSubSup.getBase();
+			}
+			
 			if (oContent.content && length == 0)
 				oContent.content.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
