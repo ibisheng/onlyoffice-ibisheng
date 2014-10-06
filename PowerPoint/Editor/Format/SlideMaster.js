@@ -688,8 +688,8 @@ function CMasterThumbnailDrawer()
 
     this.GetThumbnail = function(_master, use_background, use_master_shapes)
     {
-        var h_px = 45;
-        var w_px = 109;//(this.WidthMM * h_px / this.HeightMM) >> 0;
+        var h_px = 38;
+        var w_px = 104;//(this.WidthMM * h_px / this.HeightMM) >> 0;
 
         // пока не будем генерить для ретины
         /*
@@ -716,6 +716,8 @@ function CMasterThumbnailDrawer()
         g.m_oFontManager = g_fontManager;
 
         g.transform(1,0,0,1,0,0);
+
+        var dKoefPixToMM = this.HeightMM / h_px;
 
         // background
         var _back_fill = null;
@@ -795,13 +797,18 @@ function CMasterThumbnailDrawer()
         g.SetIntegerGrid(true);
 
         // цвета
-        var _color_w = (7 * w_px / 75) >> 0;
-        var _color_h = (6 * h_px / 55) >> 0;
-        var _color_x = (5 * w_px / 75) >> 0;
-        var _text_x = _color_x / _sx;
-        var _text_y = (22 * h_px / (40 * _sy));
-        var _color_y = (42 * h_px / 55) >> 0;
+        var _color_w = 6;
+        var _color_h = 4;
+        var _color_x = 4;
+        var _text_x = 8 * dKoefPixToMM;
+        var _text_y = (h_px - 10) * dKoefPixToMM;
+        var _color_y = 30;
         var _color_delta = 1;
+
+        _ctx.beginPath();
+        _ctx.fillStyle = "#FFFFFF";
+        _ctx.fillRect(_color_x - _color_delta, _color_y - _color_delta, _color_w * 6 + 7 * _color_delta, 6);
+        _ctx.beginPath();
 
         var _color = new CSchemeColor();
         for (var i = 0; i < 6; i++)
@@ -823,18 +830,17 @@ function CMasterThumbnailDrawer()
         var _oldTurn = _api.isViewMode;
         _api.isViewMode = true;
 
-
         _color.id = 15;
         _color.Calculate(_theme, null, null, _master, RGBA);
 
-
         var _textPr1 = new CTextPr();
         _textPr1.FontFamily = { Name : _theme.themeElements.fontScheme.majorFont.latin, Index : -1 };
-        _textPr1.FontSize = 250;
+        _textPr1.FontSize = 18;
         _textPr1.Color = new CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
         var _textPr2 = new CTextPr();
         _textPr2.FontFamily = { Name : _theme.themeElements.fontScheme.minorFont.latin, Index : -1 };
-        _textPr2.FontSize = 250;
+        _textPr2.FontSize = 18;
+        _textPr2.Color = new CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
 
 
         /*
@@ -897,10 +903,19 @@ function CMasterThumbnailDrawer()
         par.Add_ToContent(1, parRun);
 
         par.Recalculate_Page(0);
-        par.Lines[0].Y = 0;
+
+        // сбрасываем дпи
+        g.init(_ctx, w_px, h_px, w_px * g_dKoef_pix_to_mm,  h_px * g_dKoef_pix_to_mm);
+        g.CalculateFullTransform();
+        _text_x = 8 * g_dKoef_pix_to_mm;
+        _text_y = (h_px - 11) * g_dKoef_pix_to_mm;
+
+        par.Lines[0].Ranges[0].XVisible = _text_x;
+        par.Lines[0].Y = _text_y;
 
         var old_marks = _api.ShowParaMarks;
         _api.ShowParaMarks = false;
+
         par.Draw(0, g);
         _api.ShowParaMarks = old_marks;
 
