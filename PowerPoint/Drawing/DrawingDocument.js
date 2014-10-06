@@ -3824,7 +3824,7 @@ function CThumbnailsManager()
 
             // теперь нужно выставить размеры
             var settings = {
-                showArrows: true,
+                showArrows: false,
                 animateScroll: false,
                 screenW: word_control.m_oThumbnails.HtmlElement.width,
                 screenH: word_control.m_oThumbnails.HtmlElement.height

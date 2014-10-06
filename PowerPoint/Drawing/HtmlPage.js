@@ -320,6 +320,7 @@ function CEditorPage(api)
         this.Splitter2PosMax = 100;
 
         var ScrollWidthMm = this.ScrollWidthPx * g_dKoef_pix_to_mm;
+        var ScrollWidthMm9 = 9 * g_dKoef_pix_to_mm;
 
         this.Thumbnails.m_oWordControl = this;
 
@@ -340,7 +341,7 @@ function CEditorPage(api)
         this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails);
 
         this.m_oThumbnails_scroll = CreateControl("id_vertical_scroll_thmbnl");
-        this.m_oThumbnails_scroll.Bounds.SetParams(0,0,1000,1000,false,false,false,false,ScrollWidthMm,-1);
+        this.m_oThumbnails_scroll.Bounds.SetParams(0,0,4 * g_dKoef_pix_to_mm,1000,false,false,true,false,ScrollWidthMm9,-1);
         this.m_oThumbnails_scroll.Anchor = (g_anchor_top | g_anchor_right |g_anchor_bottom);
         this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails_scroll);
         // ----------------
