@@ -920,7 +920,7 @@ asc_docs_api.prototype.CreateComponents = function()
 
 	var element = document.getElementById(this.HtmlElementName);
 	if (element != null)
-		element.innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + GlobalSkin.BackgroundColor + ";border-right-width: 1px;border-right-color: #787878; border-right-style: solid;\">\
+		element.innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + GlobalSkin.BackgroundColor + ";border-right-width: 1px;border-right-color:" + GlobalSkin.BorderSplitterColor + "; border-right-style: solid;\">\
 		                            <canvas id=\"id_thumbnails_background\" class=\"block_elem\" style=\"background-color:#EBEBEB;z-index:1\"></canvas>\
 		                            <canvas id=\"id_thumbnails\" class=\"block_elem\" style=\"z-index:2\"></canvas>\
 		                            <div id=\"id_vertical_scroll_thmbnl\" style=\"left:0;top:0;width:1px;overflow:hidden;position:absolute;\">\
