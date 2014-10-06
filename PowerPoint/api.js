@@ -918,16 +918,22 @@ asc_docs_api.prototype.CreateComponents = function()
 {
     this.CreateCSS();
 
-	var element = document.getElementById(this.HtmlElementName);
-	if (element != null)
-		element.innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + GlobalSkin.BackgroundColor + ";border-right-width: 1px;border-right-color:" + GlobalSkin.BorderSplitterColor + "; border-right-style: solid;\">\
+    var _main_border_style = "border-bottom-width: 1px;border-bottom-color:" + GlobalSkin.BorderSplitterColor + "; border-bottom-style: solid;";
+    var _thumbnail_style_right = "border-right-width: 1px;border-right-color:" + GlobalSkin.BorderSplitterColor + "; border-right-style: solid;";
+    if (!GlobalSkin.SupportNotes)
+    {
+        _main_border_style = "";
+        _thumbnail_style_right = "";
+    }
+
+    var _innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + GlobalSkin.BackgroundColorThumbnails + ";" + _thumbnail_style_right + "\">\
 		                            <canvas id=\"id_thumbnails_background\" class=\"block_elem\" style=\"background-color:#EBEBEB;z-index:1\"></canvas>\
 		                            <canvas id=\"id_thumbnails\" class=\"block_elem\" style=\"z-index:2\"></canvas>\
 		                            <div id=\"id_vertical_scroll_thmbnl\" style=\"left:0;top:0;width:1px;overflow:hidden;position:absolute;\">\
 									    <div id=\"panel_right_scroll_thmbnl\" class=\"block_elem\" style=\"left:0;top:0;width:1px;height:6000px;\"></div>\
 									</div>\
 		                        </div>\
-                            <div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;border-left-width: 1px;border-left-color:" + GlobalSkin.BorderSplitterColor + "; border-left-style: solid;border-bottom-width: 1px;border-bottom-color:" + GlobalSkin.BorderSplitterColor + "; border-bottom-style: solid;\" UNSELECTABLE=\"on\">\
+                            <div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;border-left-width: 1px;border-left-color:" + GlobalSkin.BorderSplitterColor + "; border-left-style: solid;" + _main_border_style + "\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<div id=\"id_buttonTabs\" class=\"block_elem buttonTabs\"></div>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
@@ -953,13 +959,26 @@ asc_docs_api.prototype.CreateComponents = function()
                                         <div id=\"panel_hor_scroll\" class=\"block_elem\" style=\"left:0;top:0;width:6000px;height:1px;\"></div>\
                                     </div>\
                                 </div>\
-                            </div>\
-                            <div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;border-left-width: 1px;border-left-color:" + GlobalSkin.BorderSplitterColor + "; border-left-style: solid;border-top-width: 1px;border-top-color:" + GlobalSkin.BorderSplitterColor + "; border-top-style: solid;\">\
+                            </div>";
+
+    if (true)
+    {
+        _innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;border-left-width: 1px;border-left-color:" + GlobalSkin.BorderSplitterColor + "; border-left-style: solid;border-top-width: 1px;border-top-color:" + GlobalSkin.BorderSplitterColor + "; border-top-style: solid;\">\
                                 <canvas id=\"id_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;z-index:1\"></canvas>\
                                 <div id=\"id_vertical_scroll_notes\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
                                     <div id=\"panel_right_scroll_notes\" class=\"block_elem\" style=\"left:0;top:0;width:16px;height:6000px;\"></div>\
                                 </div>\
                             </div>";
+    }
+
+	var element = document.getElementById(this.HtmlElementName);
+	if (element != null)
+    {
+        if (GlobalSkin.Name == "flat")
+            element.style.backgroundColor = GlobalSkin.BackgroundColorThumbnails;
+
+        element.innerHTML = _innerHTML;
+    }
 }
 
 asc_docs_api.prototype.InitEditor = function()

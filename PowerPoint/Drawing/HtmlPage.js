@@ -32,6 +32,7 @@ var GlobalSkinTeamlab = {
     RulersButton : true,
     NavigationButtons : true,
     BackgroundColor : "#B0B0B0",
+    BackgroundColorThumbnails : "#EBEBEB",
     RulerDark : "#B0B0B0",
     RulerLight : "EDEDED",
     RulerOutline : "#929292",
@@ -39,13 +40,17 @@ var GlobalSkinTeamlab = {
     PageOutline : "#81878F",
     STYLE_THUMBNAIL_WIDTH : 80,
     STYLE_THUMBNAIL_HEIGHT : 40,
-    BorderSplitterColor : "#787878"
+    BorderSplitterColor : "#787878",
+    SupportNotes : true,
+    SplitterWidthMM : 1.5,
+    ThumbnailScrollWidthNullIfNoScrolling : true
 };
 var GlobalSkinFlat = {
     Name : "flat",
     RulersButton : false,
     NavigationButtons : false,
     BackgroundColor : "#F4F4F4",
+    BackgroundColorThumbnails : "#EBEBEB",
     RulerDark : "#CFCFCF",
     RulerLight : "#FFFFFF",
     RulerOutline : "#BBBEC2",
@@ -53,7 +58,10 @@ var GlobalSkinFlat = {
     PageOutline : "#BBBEC2",
     STYLE_THUMBNAIL_WIDTH : 109,
     STYLE_THUMBNAIL_HEIGHT : 45,
-    BorderSplitterColor : "#CBCBCB"
+    BorderSplitterColor : "#CBCBCB",
+    SupportNotes : false,
+    SplitterWidthMM : 1,
+    ThumbnailScrollWidthNullIfNoScrolling : false
 };
 
 var GlobalSkin = GlobalSkinTeamlab;
@@ -106,7 +114,6 @@ function CEditorPage(api)
     this.m_oTopRuler_horRuler           = null;
 
     this.ScrollWidthPx      = 14;
-    this.ScrollWidthPxThmbnl= 10;
 
     // main view
     this.m_oMainView        = null;
@@ -342,14 +349,19 @@ function CEditorPage(api)
         this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails);
 
         this.m_oThumbnails_scroll = CreateControl("id_vertical_scroll_thmbnl");
-        this.m_oThumbnails_scroll.Bounds.SetParams(0,0,4 * g_dKoef_pix_to_mm,1000,false,false,true,false,ScrollWidthMm9,-1);
+        this.m_oThumbnails_scroll.Bounds.SetParams(0,0,1000,1000,false,false,false,false,ScrollWidthMm9,-1);
         this.m_oThumbnails_scroll.Anchor = (g_anchor_top | g_anchor_right |g_anchor_bottom);
         this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails_scroll);
         // ----------------
 
         // main content -------------------------------------------------------------
         this.m_oMainContent = CreateControlContainer("id_main");
-        this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + 1.5,0,g_dKoef_pix_to_mm,this.Splitter2Pos + 1.5,true,false,true,true,-1,-1);
+
+        if (GlobalSkin.SupportNotes)
+            this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM,0,g_dKoef_pix_to_mm,this.Splitter2Pos + GlobalSkin.SplitterWidthMM,true,false,true,true,-1,-1);
+        else
+            this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM,0,g_dKoef_pix_to_mm,1000,true,false,true,false,-1,-1);
+
         this.m_oMainContent.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
         this.m_oBody.AddControl(this.m_oMainContent);
 
@@ -434,7 +446,7 @@ function CEditorPage(api)
 
         // notes ----
         this.m_oNotesContainer = CreateControlContainer("id_panel_notes");
-        this.m_oNotesContainer.Bounds.SetParams(this.Splitter1Pos + 1.5, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
+        this.m_oNotesContainer.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
         this.m_oNotesContainer.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
         this.m_oBody.AddControl(this.m_oNotesContainer);
 
@@ -447,6 +459,12 @@ function CEditorPage(api)
         this.m_oNotes_scroll.Bounds.SetParams(0,0,1000,1000,false,false,false,false,ScrollWidthMm,-1);
         this.m_oNotes_scroll.Anchor = (g_anchor_top | g_anchor_right |g_anchor_bottom);
         this.m_oNotesContainer.AddControl(this.m_oNotes_scroll);
+
+        if (!GlobalSkin.SupportNotes)
+        {
+            this.m_oNotesContainer.HtmlElement.style.display = "none";
+        }
+
         // ----------
 
         this.m_oMainView = CreateControlContainer("id_main_view");
@@ -1179,7 +1197,7 @@ function CEditorPage(api)
         {
             Splitter.style.left = parseInt(this.Splitter1Pos * g_dKoef_mm_to_pix) + "px";
             Splitter.style.top = "0px";
-            Splitter.style.width = parseInt(1.5 * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.width = parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix) + "px";
             Splitter.style.height = this.Height + "px";
             this.SplitterType = 1;
 
@@ -1187,10 +1205,10 @@ function CEditorPage(api)
         }
         else
         {
-            Splitter.style.left = parseInt((this.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix) + "px";
-            Splitter.style.top = this.Height - parseInt((this.Splitter2Pos + 1.5) * g_dKoef_mm_to_pix) + "px";
-            Splitter.style.width = this.Width - parseInt((this.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix) + "px";
-            Splitter.style.height = parseInt(1.5 * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.left = parseInt((this.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.top = this.Height - parseInt((this.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.width = this.Width - parseInt((this.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.height = parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix) + "px";
             this.SplitterType = 2;
 
             Splitter.style.backgroundRepeat = "repeat-x";
@@ -1222,8 +1240,8 @@ function CEditorPage(api)
         var oWordControl = oThis;
 
         var x1 = oWordControl.Splitter1Pos * g_dKoef_mm_to_pix;
-        var x2 = (oWordControl.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix;
-        var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + 1.5) * g_dKoef_mm_to_pix);
+        var x2 = (oWordControl.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix;
+        var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix);
         var y2 = oWordControl.Height - (oWordControl.Splitter2Pos * g_dKoef_mm_to_pix);
 
         var _x = global_mouseEvent.X - oWordControl.X;
@@ -1262,8 +1280,8 @@ function CEditorPage(api)
         if (null == oWordControl.SplitterDiv)
         {
             var x1 = oWordControl.Splitter1Pos * g_dKoef_mm_to_pix;
-            var x2 = (oWordControl.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix;
-            var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + 1.5) * g_dKoef_mm_to_pix);
+            var x2 = (oWordControl.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix;
+            var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix);
             var y2 = oWordControl.Height - (oWordControl.Splitter2Pos * g_dKoef_mm_to_pix);
 
             var _x = global_mouseEvent.X - oWordControl.X;
@@ -1311,7 +1329,7 @@ function CEditorPage(api)
                     _y = _max;
 
                 oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
-                oWordControl.SplitterDiv.style.top = (_y - parseInt(1.5 * g_dKoef_mm_to_pix)) + "px";
+                oWordControl.SplitterDiv.style.top = (_y - parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix)) + "px";
             }
         }
     }
@@ -1328,10 +1346,10 @@ function CEditorPage(api)
 
         if (this.IsUseNullThumbnailsSplitter || (0 != this.Splitter1Pos))
         {
-            this.m_oMainContent.Bounds.L = this.Splitter1Pos + 1.5;
-            this.m_oMainContent.Bounds.B = this.Splitter2Pos + 1.5;
+            this.m_oMainContent.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
+            this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
 
-            this.m_oNotesContainer.Bounds.L = this.Splitter1Pos + 1.5;
+            this.m_oNotesContainer.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
             this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
@@ -1339,7 +1357,7 @@ function CEditorPage(api)
         else
         {
             this.m_oMainContent.Bounds.L = 0;
-            this.m_oMainContent.Bounds.B = this.Splitter2Pos + 1.5;
+            this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
 
             this.m_oNotesContainer.Bounds.L = 0;
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
@@ -1382,7 +1400,7 @@ function CEditorPage(api)
             }
             else
             {
-                var _posY = (oWordControl.Height - _y) * g_dKoef_pix_to_mm - 1.5;
+                var _posY = (oWordControl.Height - _y) * g_dKoef_pix_to_mm - GlobalSkin.SplitterWidthMM;
                 if (Math.abs(oWordControl.Splitter2Pos - _posY) > 1)
                 {
                     oWordControl.Splitter2Pos = _posY;

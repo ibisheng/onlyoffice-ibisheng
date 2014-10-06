@@ -3787,13 +3787,17 @@ function CThumbnailsManager()
         if (nHeightPix < heightThumbs)
         {
             // все убралось. скролл не нужен
-            if (this.m_bIsScrollVisible)
+            if (this.m_bIsScrollVisible && GlobalSkin.ThumbnailScrollWidthNullIfNoScrolling)
             {
                 word_control.m_oThumbnails.Bounds.R = 0;
                 word_control.m_oThumbnailsBack.Bounds.R = 0;
                 word_control.m_oThumbnails_scroll.Bounds.AbsW = 0;
 
                 word_control.m_oThumbnailsContainer.Resize(__w, __h);
+            }
+            else
+            {
+                word_control.m_oThumbnails_scroll.HtmlElement.style.display = "none";
             }
             this.m_bIsScrollVisible = false;
             this.m_dScrollY = 0;
@@ -3803,9 +3807,18 @@ function CThumbnailsManager()
             // нужен скролл
             if (!this.m_bIsScrollVisible)
             {
-                word_control.m_oThumbnailsBack.Bounds.R = word_control.ScrollWidthPxThmbnl * g_dKoef_pix_to_mm;
-                word_control.m_oThumbnails.Bounds.R = word_control.ScrollWidthPxThmbnl * g_dKoef_pix_to_mm;
-                word_control.m_oThumbnails_scroll.Bounds.AbsW = word_control.ScrollWidthPxThmbnl * g_dKoef_pix_to_mm;
+                if (GlobalSkin.ThumbnailScrollWidthNullIfNoScrolling)
+                {
+                    word_control.m_oThumbnailsBack.Bounds.R         = word_control.ScrollWidthPx * g_dKoef_pix_to_mm;
+                    word_control.m_oThumbnails.Bounds.R             = word_control.ScrollWidthPx * g_dKoef_pix_to_mm;
+
+                    var _width_mm_scroll = (GlobalSkin.Name == "flat") ? 10 : word_control.ScrollWidthPx;
+                    word_control.m_oThumbnails_scroll.Bounds.AbsW   = _width_mm_scroll * g_dKoef_pix_to_mm;
+                }
+                else
+                {
+                    word_control.m_oThumbnails_scroll.HtmlElement.style.display = "block";
+                }
 
                 word_control.m_oThumbnailsContainer.Resize(__w, __h);
             }
@@ -3829,7 +3842,10 @@ function CThumbnailsManager()
                 screenW: word_control.m_oThumbnails.HtmlElement.width,
                 screenH: word_control.m_oThumbnails.HtmlElement.height,
                 cornerRadius: 1,
-                slimScroll: true
+                slimScroll: true,
+                scrollBackgroundColor : GlobalSkin.BackgroundColorThumbnails,
+                scrollBackgroundColorHover : GlobalSkin.BackgroundColorThumbnails,
+                scrollBackgroundColorActive : GlobalSkin.BackgroundColorThumbnails
             };
 
             document.getElementById('panel_right_scroll_thmbnl').style.height = parseInt(nHeightPix) + "px";
