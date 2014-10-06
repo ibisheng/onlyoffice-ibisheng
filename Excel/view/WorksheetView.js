@@ -3859,7 +3859,7 @@
 				}
 
 				// Вышли из редактора, очистим массив
-				if (false === this.isFormulaEditMode) {
+				if (false === this.isFormulaEditMode && !isFrozen) {
 					this.arrActiveFormulaRanges = [];
 				}
 			}
