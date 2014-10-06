@@ -2,6 +2,8 @@
 
 function CBorderBox(props)
 {
+    CBorderBox.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BORDER_BOX;
 
@@ -19,7 +21,7 @@ function CBorderBox(props)
         strikeV:        false
     };
 
-    CMathBase.call(this);
+    this.baseContent = new CMathContent();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -35,7 +37,7 @@ CBorderBox.prototype.init = function(props)
 CBorderBox.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.elements[0][0] = this.baseContent;
 }
 CBorderBox.prototype.setProperties = function(props)
 {
@@ -302,14 +304,6 @@ CBorderBox.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
-CBorderBox.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // Base
-    this.elements[0][0] = contents[0];
-}
 CBorderBox.prototype.getPropsForWrite = function()
 {
     /*var props = {};
@@ -340,8 +334,9 @@ CBorderBox.prototype.Refresh_RecalcData = function(Data)
 }
 CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 {
-	Writer.WriteLong( historyitem_type_borderBox );
-	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteLong(historyitem_type_borderBox);
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -395,12 +390,11 @@ CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 }
 CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-		
-	props.ctrPrp.Read_FromBinary(Reader);
+    this.Id = Reader.GetString2();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
+
+    var props = {ctrPrp: new CTextPr()};
+    props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
@@ -419,8 +413,8 @@ CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 		props.strikeTLBR = Reader.GetBool();
 	if ( Flags & 128 )
 		props.strikeV = Reader.GetBool();
-		
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
 }
 CBorderBox.prototype.Get_Id = function()
 {
@@ -428,9 +422,10 @@ CBorderBox.prototype.Get_Id = function()
 }
 
 
-
 function CBox(props)
 {
+    CBox.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BOX;
 
@@ -443,7 +438,7 @@ function CBox(props)
         brk:        false
     };
 
-    CMathBase.call(this);
+    this.baseContent = new CMathContent();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -459,7 +454,7 @@ CBox.prototype.init = function(props)
 CBox.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.elements[0][0] = this.baseContent;
 }
 CBox.prototype.setProperties = function(props)
 {
@@ -482,14 +477,6 @@ CBox.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 }
-CBox.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // Base
-    this.elements[0][0] = contents[0];
-}
 CBox.prototype.getBase = function()
 {
     return this.elements[0][0];
@@ -510,8 +497,9 @@ CBox.prototype.Refresh_RecalcData = function(Data)
 }
 CBox.prototype.Write_ToBinary2 = function( Writer )
 {
-	Writer.WriteLong( historyitem_type_box );
-	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteLong(historyitem_type_box);
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -550,11 +538,10 @@ CBox.prototype.Write_ToBinary2 = function( Writer )
 }
 CBox.prototype.Read_FromBinary2 = function( Reader )
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+    this.Id = Reader.GetString2();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
+	var props = {ctrPrp: new CTextPr()};
 	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
@@ -568,8 +555,8 @@ CBox.prototype.Read_FromBinary2 = function( Reader )
 		props.noBreak = Reader.GetBool();
 	if ( Flags & 16 )
 		props.opEmu = Reader.GetBool();
-		
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
 }
 CBox.prototype.Get_Id = function()
 {
@@ -578,6 +565,8 @@ CBox.prototype.Get_Id = function()
 
 function CBar(props)
 {
+    CBar.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BAR;
 
@@ -586,10 +575,10 @@ function CBar(props)
         pos: LOCATION_BOT
     };
 
+    this.baseContent = new CMathContent();
+
     //this.loc = LOCATION_BOT;
     this.operator = new COperator(OPER_BAR);
-
-    CCharacter.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -605,7 +594,7 @@ CBar.prototype.init = function(props)
 CBar.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.elements[0][0] = this.baseContent;
 }
 CBar.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -650,14 +639,6 @@ CBar.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 }
-CBar.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // Base
-    this.elements[0][0] = contents[0];
-}
 CBar.prototype.getPropsForWrite = function()
 {
     return this.Pr;
@@ -674,8 +655,9 @@ CBar.prototype.Refresh_RecalcData = function(Data)
 }
 CBar.prototype.Write_ToBinary2 = function( Writer )
 {
-	Writer.WriteLong( historyitem_type_bar );
-	Writer.WriteString2( this.getBase().Id );	
+	Writer.WriteLong(historyitem_type_bar);
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -695,18 +677,17 @@ CBar.prototype.Write_ToBinary2 = function( Writer )
 }
 CBar.prototype.Read_FromBinary2 = function( Reader )
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+    this.Id = Reader.GetString2();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
+	var props = {ctrPrp: new CTextPr()};
 	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
 	if ( Flags & 1 )
 		props.pos = Reader.GetLong();
-		
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
 }
 CBar.prototype.Get_Id = function()
 {
@@ -715,8 +696,9 @@ CBar.prototype.Get_Id = function()
 
 function CPhantom(props)
 {
+    CPhantom.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
-    CMathBase.call(this);
 
     this.Pr =
     {
@@ -726,6 +708,8 @@ function CPhantom(props)
         zeroDesc:   false,
         zeroWid:    false
     };
+
+    this.baseContent = new CMathContent();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -741,7 +725,7 @@ CPhantom.prototype.init = function(props)
 CPhantom.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.elements[0][0] = this.baseContent;
 }
 CPhantom.prototype.getBase = function()
 {
@@ -769,14 +753,6 @@ CPhantom.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 }
-CPhantom.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // Base
-    this.elements[0][0] = contents[0];
-}
 CPhantom.prototype.getPropsForWrite = function()
 {
     return this.Pr;
@@ -793,8 +769,9 @@ CPhantom.prototype.Refresh_RecalcData = function(Data)
 }
 CPhantom.prototype.Write_ToBinary2 = function( Writer )
 {
-	Writer.WriteLong( historyitem_type_phant );
-	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteLong(historyitem_type_phant);
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -833,11 +810,10 @@ CPhantom.prototype.Write_ToBinary2 = function( Writer )
 }
 CPhantom.prototype.Read_FromBinary2 = function( Reader )
 {
+    this.Id = Reader.GetString2();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
+
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-		
 	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
@@ -851,8 +827,8 @@ CPhantom.prototype.Read_FromBinary2 = function( Reader )
 		props.zeroDesc = Reader.GetBool();
 	if ( Flags & 16 )
 		props.zeroWid = Reader.GetBool();
-		
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
 }
 CPhantom.prototype.Get_Id = function()
 {

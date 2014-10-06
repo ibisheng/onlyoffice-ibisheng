@@ -2,6 +2,8 @@
 
 function CDegree(props, bInside)
 {
+    CDegree.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DEGREE;
 
@@ -13,7 +15,8 @@ function CDegree(props, bInside)
         type:   DEGREE_SUPERSCRIPT
     };
 
-    CMathBase.call(this, bInside);
+    this.baseContent = new CMathContent();
+    this.iterContent = new CMathContent();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -29,7 +32,8 @@ CDegree.prototype.init = function(props)
 CDegree.prototype.fillContent = function()
 {
     this.setDimension(1, 2);
-    this.setContent();
+    this.elements[0][0] = this.baseContent;
+    this.elements[0][1] = this.iterContent;
 };
 CDegree.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -277,17 +281,6 @@ CDegree.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 };
-CDegree.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // Base
-    this.elements[0][0] = contents[0];
-
-    // Iterator
-    this.elements[0][1] = contents[1];
-};
 CDegree.prototype.setBase = function(base)
 {
     this.elements[0][0] = base;
@@ -312,26 +305,25 @@ CDegree.prototype.Refresh_RecalcData = function(Data)
 };
 CDegree.prototype.Write_ToBinary2 = function( Writer )
 {
-	Writer.WriteLong( historyitem_type_deg );
-	Writer.WriteString2( this.getBase().Id );
-	Writer.WriteString2( this.getLowerIterator().Id );
+	Writer.WriteLong(historyitem_type_deg);
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
+	Writer.WriteString2(this.iterContent.Id);
 
 	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.Pr.type );
-
 };
 CDegree.prototype.Read_FromBinary2 = function( Reader )
 {
+    this.Id = Reader.GetLong();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetLong());
+    this.iterContent = g_oTableId.Get_ById(Reader.GetLong());
+
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-
 	props.ctrPrp.Read_FromBinary(Reader);
     props.type = Reader.GetLong();
 
-	this.fillMathComposition (props, arrElems);
+    this.init(props);
 };
 CDegree.prototype.Get_Id = function()
 {

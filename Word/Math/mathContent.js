@@ -1793,8 +1793,17 @@ CMathContent.prototype =
         }
 
     },
-    Correct_Content : function()
+    Correct_Content : function(bInnerCorrection)
     {
+        if (true === bInnerCorrection)
+        {
+            for (var nPos = 0, nCount = this.content.length; nPos < nCount; nPos++)
+            {
+                if (para_Math_Composition === this.content[nPos].Type)
+                    this.content[nPos].Correct_Content(true);
+            }
+        }
+
         this.SetRunEmptyToContent(false);
 
         // Удаляем лишние пустые раны
@@ -1820,7 +1829,12 @@ CMathContent.prototype =
 
             if(para_Math_Run === oCurrElement.Type)
                 oCurrElement.Math_Correct_Content();
+        }
 
+        // Если в контенте ничего нет, тогда добавляем пустой ран
+        if (this.content.length < 1)
+        {
+            this.Add_ToContent(0, new ParaRun(null, true));
         }
 
         if (this.content.length == 1)

@@ -6751,6 +6751,9 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             if ( undefined !== this.Paragraph && null !== this.Paragraph )
                 this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
+            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
+                this.Parent.ParaMath.SetNeedResize();
+
             break;
         }
 
@@ -6775,8 +6778,11 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             this.RecalcInfo.Measure = true;
 
-            if ( undefined !== this.Paragraph && null !== this.Paragraph )
+            if (undefined !== this.Paragraph && null !== this.Paragraph)
                 this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+
+            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
+                this.Parent.ParaMath.SetNeedResize();
 
             break;
         }

@@ -781,6 +781,13 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].SetRunEmptyToContent(bAll);
     },
+    Correct_Content: function(bInnerCorrection)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].Correct_Content(bInnerCorrection);
+    },
     Selection_Remove: function()
     {
         var start_X = this.SelectStart.X,

@@ -461,6 +461,7 @@ function CAccent(props)
 
     /////////////////
 
+    this.baseContent = new CMathContent();
     this.operator = new COperator(OPER_ACCENT);
 
     CAccent.superclass.constructor.call(this);
@@ -477,8 +478,7 @@ CAccent.prototype.init = function(props)
     this.setProperties(props);
 
     this.setDimension(1, 1);
-    this.setContent();
-
+    this.elements[0][0] = this.baseContent;
     this.elements[0][0].SetDot(true);
 }
 CAccent.prototype.setChr = function(chr)
@@ -660,36 +660,35 @@ CAccent.prototype.Refresh_RecalcData = function(Data)
 }
 CAccent.prototype.Write_ToBinary2 = function( Writer )
 {
-	Writer.WriteLong( historyitem_type_acc );
-	Writer.WriteString2( this.getBase().Id );
+	Writer.WriteLong(historyitem_type_acc);
+
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.Pr.chr )
+
+    if (undefined !== this.Pr.chr)
     {
-		Writer.WriteLong(this.Pr.chr);	
-		Flags |= 1;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
+        Writer.WriteBool(true);
+        Writer.WriteLong(this.Pr.chr);
+    }
+    else
+        Writer.WriteBool(false);
 }
 CAccent.prototype.Read_FromBinary2 = function( Reader )
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+    this.Id = Reader.GetString2();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
+	var props = {ctrPrp: new CTextPr()};
 	props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.chr = Reader.GetLong();	
-		
-	this.fillMathComposition (props, arrElems);
+
+    if (true === Reader.GetBool())
+		props.chr = Reader.GetLong();
+
+    this.init(props);
 }
+CAccent.prototype.Get_Id = function()
+{
+    return this.Id;
+};
