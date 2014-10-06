@@ -7971,6 +7971,14 @@ ParaRun.prototype.fillPlaceholders = function()
 
     this.Add_ToContent(0, placeholder, false);
 }
+ParaRun.prototype.Math_Correct_Content = function()
+{
+    for(var i = 0; i < this.Content.length; i++)
+    {
+        if(this.Content[i].Type == para_Math_Placeholder)
+            this.Remove_FromContent(i, 1, true);
+    }
+}
 ParaRun.prototype.Set_MathPr = function(MPrp)
 {
     var OldValue = this.MathPrp;

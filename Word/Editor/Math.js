@@ -28,14 +28,7 @@ function ParaMath()
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
 
-    //this.MathPara = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)
-
-    //this.OldMathPara = null;
-
     this.Jc       = undefined;
-    //this.Math = new CMathComposition();
-    //this.Math.Parent = this;
-    //this.Root = this.Math.Root;
 
     this.Root       = new CMathContent();
     this.Root.bRoot = true;
@@ -43,13 +36,10 @@ function ParaMath()
     this.X          = 0;
     this.Y          = 0;
 
-    //this.CurrentContent    = this.RootComposition;
-    //this.SelectContent     = this.RootComposition;
     this.bInline           = false;
     this.bChangeInline      = true;
     this.NeedResize        = true;
     this.bSelectionUse     = false;
-
 
     //this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
     this.Paragraph  = null;
@@ -63,7 +53,6 @@ function ParaMath()
     this.Descent      = 0;
 
     this.DefaultTextPr = new CTextPr();
-    //this.DefaultTextPr.Init_Default();
 
     this.DefaultTextPr.Italic     = true;
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
@@ -170,6 +159,8 @@ ParaMath.prototype.Add = function(Item)
     var oStartContent = oContent.Content.content[oContent.Start];
     var oEndContent = oContent.Content.content[oContent.End];
 
+
+
     if ( para_Text === Type)
     {
         var oText = new CMathText(false);
@@ -233,8 +224,11 @@ ParaMath.prototype.Add = function(Item)
 
 
         }
+
         oContent.Content.SetRunEmptyToContent(true);
     }
+
+    oContent.Content.Correct_Content();
 };
 
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
@@ -406,6 +400,8 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     // TODO: ParaMath.Apply_TextPr
 
+    this.NeedResize = true;
+
     if(ApplyToAll == true) // для ситуации, когда ApplyToAll = true, в Root формулы при этом позиции селекта не проставлены
     {
         this.Root.Apply_TextPr(TextPr, IncFontSize, true);
@@ -572,12 +568,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     else
         this.Root.Resize_2(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
 
-
     this.NeedResize = false;
-
-    //this.OldMathPara = this.MathPara;
-
-    //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
 
 
     this.Width        = this.Root.size.width;

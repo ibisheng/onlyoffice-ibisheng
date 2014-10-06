@@ -3975,9 +3975,6 @@ CMathContent.prototype =
 
         var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
 
-        if (!this.bRoot && this.content.length == 0)
-            this.fillPlaceholders();
-
         this.RecalcInfo.bEqqArray = RPI.bEqqArray;
 
         var lng = this.content.length;
@@ -4438,7 +4435,7 @@ CMathContent.prototype =
         }
 
         this.Selection.Start = posStart;
-        this.Selection.End = posEnd;
+        this.Selection.End   = posEnd;
         Depth++;
 
         if(this.IsPlaceholder())
@@ -4831,7 +4828,6 @@ CMathContent.prototype =
             this.Internal_Content_Add(len, emptyRun);
         }
 
-
     },
     Correct_Content : function()
     {
@@ -4857,6 +4853,19 @@ CMathContent.prototype =
                     nLen--;
                 }
             }
+
+            if(para_Math_Run === oCurrElement.Type)
+                oCurrElement.Math_Correct_Content();
+
+        }
+
+        if (this.content.length == 1)
+        {
+            if(para_Math_Run === this.content[0].Type)
+                this.content[0].Math_Correct_Content();
+
+            if(this.content[0].Is_Empty())
+                this.content[0].fillPlaceholders();
         }
     },
 
