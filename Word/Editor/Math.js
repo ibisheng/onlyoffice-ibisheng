@@ -88,20 +88,17 @@ ParaMath.prototype.Get_Id = function()
 
 ParaMath.prototype.Copy = function(Selected)
 {
-    // TODO: ParaMath.Copy
-
     var NewMath = new ParaMath();
+    NewMath.Root.bRoot = true;
 
     if(Selected)
     {
         var result = this.GetSelectContent();
-        NewMath.Root = result.Content.Copy(Selected);
-        NewMath.Root.bRoot = true;
+        result.Content.CopyTo(NewMath.Root, Selected);
     }
     else
     {
-        NewMath.Root = this.Root.Copy(Selected);
-        NewMath.Root.bRoot = true;
+        this.Root.CopyTo(NewMath.Root, Selected);
     }
 
     /// argSize, bDot и bRoot выставить на объединении контентов
@@ -1596,26 +1593,29 @@ ParaMath.prototype.Load_Changes = function(Reader)
 
 };
 
-ParaMath.prototype.Write_ToBinary = function(Writer)
-{
-    // Long   : Type
-    // String : Id
-    Writer.WriteLong( this.Type );
-    Writer.WriteString2( this.Id );
-};
-
 ParaMath.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong( historyitem_type_Math );
-    Writer.WriteString2( this.Root.Id );
+
+    // String : this.Id
+    // Long   : this.Type
+    // String : Root.Id
+
+    Writer.WriteString2(this.Id);
+    Writer.WriteLong(this.Type);
+    Writer.WriteString2(this.Root.Id);
 };
 
 ParaMath.prototype.Read_FromBinary2 = function(Reader)
 {
-    var Element = g_oTableId.Get_ById( Reader.GetString2() );
-    Element.bRoot = true;
-    this.Root = Element;
+    // String : this.Id
+    // Long   : this.Type
+    // String : Root.Id
 
+    this.Id   = Reader.GetString2();
+    this.Type = Reader.GetLong();
+    this.Root = g_oTableId.Get_ById(Reader.GetString2());
+    this.Root.bRoot = true;
 };
 
 ParaMath.prototype.Get_ContentSelection = function()

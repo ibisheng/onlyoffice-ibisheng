@@ -2,8 +2,13 @@
 
 function CFraction(props)
 {
+    CFraction.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_FRACTION;
+
+    this.Numerator   = new CNumerator();
+    this.Denominator = new CDenominator();
 
     this.Pr =
     {
@@ -11,8 +16,6 @@ function CFraction(props)
     };
 
     this.bHideBar =   false;
-
-    CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -367,50 +370,26 @@ CFraction.prototype.fillContent = function()
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
     {
-        var num = new CNumerator();
-
-        var den = new CDenominator();
-
         this.setDimension(2, 1);
 
         if(this.Pr.type == NO_BAR_FRACTION)
             this.bHideBar = true;
 
-        this.addMCToContent([num, den]);
+        this.elements[0][0] = this.Numerator;
+        this.elements[1][0] = this.Denominator;
     }
     else if(this.Pr.type == SKEWED_FRACTION)
     {
         this.setDimension(1, 2);
-        this.setContent();
+        this.elements[0][0] = this.Numerator.getElement();
+        this.elements[0][1] = this.Denominator.getElement();
     }
     else if(this.Pr.type == LINEAR_FRACTION)
     {
         this.setDimension(1, 2);
-        this.setContent();
+        this.elements[0][0] = this.Numerator.getElement();
+        this.elements[0][1] = this.Denominator.getElement();
     }
-}
-CFraction.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
-    {
-        // Numerator
-        this.elements[0][0].fillMathComposition(contents[0]);
-
-        // Denominator
-        this.elements[1][0].fillMathComposition(contents[1]);
-    }
-    else
-    {
-        // Numerator
-        this.elements[0][0] = contents[0];
-
-        // Denominator
-        this.elements[0][1] = contents[1];
-    }
-
 }
 CFraction.prototype.getPropsForWrite = function()
 {
@@ -426,65 +405,61 @@ CFraction.prototype.Load_Changes = function(Reader)
 CFraction.prototype.Refresh_RecalcData = function(Data)
 {
 }
-CFraction.prototype.Write_ToBinary2 = function( Writer )
+CFraction.prototype.Write_ToBinary2 = function(Writer)
 {
+    // Long       : historyitem_type_frac
+    // String     : Numerator Id
+    // String     : Denominator Id
+    // Variable   : CtrlPr
+    // Bool->Long : Type
+
 	Writer.WriteLong( historyitem_type_frac );
 	
-	Writer.WriteString2( this.getNumerator().Id );
-	Writer.WriteString2( this.getDenominator().Id );
+	Writer.WriteString2(this.Numerator.Get_Id());
+	Writer.WriteString2(this.Denominator.Get_Id());
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.Pr.type )
+
+    if (undefined !== this.Pr.type)
     {
-		Writer.WriteLong( this.Pr.type );	
-		Flags |= 1;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
+        Writer.WriteBool(true);
+        Writer.WriteLong(this.Pr.type);
+    }
+    else
+        Writer.WriteBool(false);
 }
-CFraction.prototype.Read_FromBinary2 = function( Reader )
+CFraction.prototype.Read_FromBinary2 = function(Reader)
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	
+    this.Numerator.setElement(g_oTableId.Get_ById(Reader.GetString2()));
+    this.Denominator.setElement(g_oTableId.Get_ById(Reader.GetString2()));
+
+    var props = {ctrPrp: new CTextPr()};
 	props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.type = Reader.GetLong();
-	
-	this.fillMathComposition (props, arrElems);
+
+    if (true === Reader.GetBool())
+        props.type = Reader.GetLong();
+
+    this.setProperties(props);
+    this.fillContent();
 }
 CFraction.prototype.Get_Id = function()
 {
 	return this.Id;
 }
 
-
-function CNumerator()
+function CFractionBase()
 {
+    CFractionBase.superclass.constructor.call(this);
     this.gap = 0;
-
-    CMathBase.call(this, true);
-
     this.init();
 }
-Asc.extendClass(CNumerator, CMathBase);
-CNumerator.prototype.init = function()
+Asc.extendClass(CFractionBase, CMathBase);
+CFractionBase.prototype.init = function()
 {
     this.setDimension(1, 1);
     this.setContent();
 }
-CNumerator.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CFractionBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
@@ -495,6 +470,34 @@ CNumerator.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     this.recalculateSize();
 }
+CFractionBase.prototype.getElement = function()
+{
+    return this.elements[0][0];
+}
+CFractionBase.prototype.setElement = function(Element)
+{
+    this.elements[0][0] = Element;
+};
+CFractionBase.prototype.getPropsForWrite = function()
+{
+    var props = {};
+
+    return props;
+}
+CFractionBase.prototype.Get_Id = function()
+{
+    return this.elements[0][0].Get_Id();
+};
+CFractionBase.prototype.fillMathComposition = function(content)
+{
+    this.elements[0][0] = content;
+}
+
+function CNumerator()
+{
+    CNumerator.superclass.constructor.call(this);
+}
+Asc.extendClass(CNumerator, CFractionBase);
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
@@ -541,46 +544,12 @@ CNumerator.prototype.setPosition = function(pos, PosInfo)
 {
     this.elements[0][0].setPosition(pos, PosInfo);
 }
-CNumerator.prototype.getElement = function()
-{
-    return this.elements[0][0];
-}
-CNumerator.prototype.fillMathComposition = function(content)
-{
-    this.elements[0][0] = content;
-}
-CNumerator.prototype.getPropsForWrite = function()
-{
-    var props = {};
-
-    return props;
-}
 
 function CDenominator()
 {
-    this.gap = 0;
-
-    CMathBase.call(this, true);
-
-    this.init();
+    CDenominator.superclass.constructor.call(this);
 }
-Asc.extendClass(CDenominator, CMathBase);
-CDenominator.prototype.init = function()
-{
-    this.setDimension(1, 1);
-    this.setContent();
-}
-CDenominator.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    this.ArgSize = ArgSize.Copy();
-
-    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-
-    this.recalculateSize();
-}
+Asc.extendClass(CDenominator, CFractionBase);
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
@@ -623,19 +592,5 @@ CDenominator.prototype.setPosition = function(pos, PosInfo)
     NewPos.y = pos.y + this.gap;
 
     this.elements[0][0].setPosition(NewPos, PosInfo);
-}
-CDenominator.prototype.getElement = function(txt)
-{
-    return this.elements[0][0];
-}
-CDenominator.prototype.fillMathComposition = function(content)
-{
-    this.elements[0][0] = content;
-}
-CDenominator.prototype.getPropsForWrite = function()
-{
-    var props = {};
-
-    return props;
 }
 //////////

@@ -9748,7 +9748,7 @@ function Binary_oMathReader(stream)
 					oText = new ParaSpace(1)
 				*/
 				if (oText)
-					oMRun.Content.splice( i, 0, oText );
+                    oMRun.Add_ToContent(i, oText, false, true);
             }
 
 			if (oParent)	
