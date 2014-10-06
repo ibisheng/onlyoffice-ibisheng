@@ -28,9 +28,9 @@ function ParaMath()
     this.Id = g_oIdCounter.Get_NewId();
     this.Type  = para_Math;
 
-    this.MathPara = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)
+    //this.MathPara = true;  // false - внутристроковая формула, true - формула на отдельной строке (w:oMath/w:oMathPara)
 
-    this.OldMathPara = null;
+    //this.OldMathPara = null;
 
     this.Jc       = undefined;
     //this.Math = new CMathComposition();
@@ -45,7 +45,9 @@ function ParaMath()
 
     //this.CurrentContent    = this.RootComposition;
     //this.SelectContent     = this.RootComposition;
-    this.NeedResize = true;
+    this.bInline           = false;
+    this.bChangeInline      = true;
+    this.NeedResize        = true;
     this.bSelectionUse     = false;
 
 
@@ -548,8 +550,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 
     var RPI = new CRPI();
-    RPI.bInline       = this.MathPara === false;
-    RPI.bChangeInline = this.MathPara != this.OldMathPara;
+    RPI.bInline       = this.bInline;
+    RPI.bChangeInline = this.bChangeInline;
     RPI.NeedResize    = this.NeedResize;
 
     var ArgSize = new CMathArgSize();
@@ -573,7 +575,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.NeedResize = false;
 
-    this.OldMathPara = this.MathPara;
+    //this.OldMathPara = this.MathPara;
 
     //this.Root.Resize(null, this, g_oTextMeasurer, RPI/*recalculate properties info*/, TextPr);
 
@@ -931,8 +933,13 @@ ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 //-----------------------------------------------------------------------------------
 ParaMath.prototype.SetInline = function(value)
 {
+    if(value !== this.bInline)
+    {
+        this.bChangeInline = true;
+        this.NeedResize   = true;
+    }
+
     this.bInline = value;
-    this.NeedResize = true;
 };
 ParaMath.prototype.MathToImageConverter= function()
 {
