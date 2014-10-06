@@ -71,13 +71,12 @@
 			this.isFillHandleMode = false;
 			this.isMoveRangeMode = false;
 			this.isMoveResizeRange = false;
-			this.isMoveResizeChartsRange = false;
 			// Режим select-а для диалогов
 			this.isSelectionDialogMode = false;
 			// Режим формулы
 			this.isFormulaEditMode = false;
 			// Режим установки закреплённых областей
-			this.isFrozenAnchorMode = false;
+			this.frozenAnchorMode = false;
 			
 			// Обработчик кликов для граф.объектов
 			this.clickCounter = new ClickCounter();
@@ -575,23 +574,23 @@
 
 		/**
 		 * @param event {MouseEvent}
-		 * @param targetInfo
+		 * @param target
 		 */
-		asc_CEventsController.prototype._moveFrozenAnchorHandle = function (event, targetInfo) {
+		asc_CEventsController.prototype._moveFrozenAnchorHandle = function (event, target) {
 			var t = this;
 			var coord = t._getCoordinates(event);
-			t.handlers.trigger("moveFrozenAnchorHandle", coord.x, coord.y, targetInfo);
+			t.handlers.trigger("moveFrozenAnchorHandle", coord.x, coord.y, target);
 		};
 		
 		/**
 		 * @param event {MouseEvent}
-		 * @param targetInfo
+		 * @param target
 		 */
-		asc_CEventsController.prototype._moveFrozenAnchorHandleDone = function (event, targetInfo) {
+		asc_CEventsController.prototype._moveFrozenAnchorHandleDone = function (event, target) {
 			// Закрепляем область
 			var t = this;
 			var coord = t._getCoordinates(event);
-			t.handlers.trigger("moveFrozenAnchorHandleDone", coord.x, coord.y, targetInfo);
+			t.handlers.trigger("moveFrozenAnchorHandleDone", coord.x, coord.y, target);
 		};
 
 		/**
@@ -1049,8 +1048,8 @@
                 this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
 				
 			// Режим установки закреплённых областей
-			if (this.isFrozenAnchorMode) {
-				this._moveFrozenAnchorHandle(event, { target: this.isFrozenAnchorMode });
+			if (this.frozenAnchorMode) {
+				this._moveFrozenAnchorHandle(event, this.frozenAnchorMode);
 				return true;
 			}
 
@@ -1102,13 +1101,12 @@
 
 			if (this.isMoveResizeRange) {
 				this.isMoveResizeRange = false;
-				this.isMoveResizeChartsRange = false;
 				this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
 			}
 			// Режим установки закреплённых областей
-			if (this.isFrozenAnchorMode) {
-				this._moveFrozenAnchorHandleDone(event, {target: this.isFrozenAnchorMode});
-				this.isFrozenAnchorMode = false;
+			if (this.frozenAnchorMode) {
+				this._moveFrozenAnchorHandleDone(event, this.frozenAnchorMode);
+				this.frozenAnchorMode = false;
 			}
 
 			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
@@ -1249,14 +1247,13 @@
 						t._commentCellClick(event);
 					} else if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 						this.isMoveResizeRange = true;
-						this.isMoveResizeChartsRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
 					} else if (t.targetInfo && (t.targetInfo.target === c_oTargetType.FrozenAnchorV ||
 						t.targetInfo.target === c_oTargetType.FrozenAnchorH) && false === this.settings.isViewerMode) {
 						// Режим установки закреплённых областей
-						this.isFrozenAnchorMode = t.targetInfo.target;
-						t._moveFrozenAnchorHandle(event, t.targetInfo);
+						this.frozenAnchorMode = t.targetInfo.target;
+						t._moveFrozenAnchorHandle(event, this.frozenAnchorMode);
 						return;
 					}
 				}
@@ -1358,14 +1355,13 @@
 
 			if (this.isMoveResizeRange) {
 				this.isMoveResizeRange = false;
-				this.isMoveResizeChartsRange = false;
 				this._moveResizeRangeHandleDone(event, this.targetInfo);
 				return true;
 			}
 			// Режим установки закреплённых областей
-			if (this.isFrozenAnchorMode) {
-				this.isFrozenAnchorMode = false;
-				this._moveFrozenAnchorHandleDone(event, this.targetInfo);
+			if (this.frozenAnchorMode) {
+				this._moveFrozenAnchorHandleDone(event, this.frozenAnchorMode);
+				this.frozenAnchorMode = false;
 			}
 
 			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
@@ -1415,8 +1411,8 @@
 			}
 			
 			// Режим установки закреплённых областей
-			if (t.isFrozenAnchorMode) {
-				t._moveFrozenAnchorHandle(event, this.targetInfo);
+			if (t.frozenAnchorMode) {
+				t._moveFrozenAnchorHandle(event, this.frozenAnchorMode);
 				return true;
 			}
 
@@ -1453,7 +1449,7 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseWheel = function (event) {
-			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeChartsRange || this.isMoveResizeRange) {
+			if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeRange) {
 				return true;
 			}
 			var delta = 0;

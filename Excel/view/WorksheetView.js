@@ -2977,9 +2977,9 @@
 		};
 
 		/** Рисует закрепление областей */
-		WorksheetView.prototype._drawFrozenPaneLines = function (canvas) {
+		WorksheetView.prototype._drawFrozenPaneLines = function (drawingCtx) {
 			// Возможно стоит отрисовывать на overlay, а не на основной канве
-			var ctx = canvas ? canvas : this.drawingCtx;
+			var ctx = drawingCtx ? drawingCtx : this.drawingCtx;
 			var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null,
 				this.model.getId(), c_oAscLockNameFrozenPane);
 			var isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
@@ -3015,39 +3015,42 @@
 			ctx.stroke();
 		};
 
-		WorksheetView.prototype.drawFrozenGuides = function (x, y, targetInfo) {
-			if (!targetInfo)
-				return;
-
+		WorksheetView.prototype.drawFrozenGuides = function (x, y, target) {
 			var data, offsetFrozen;
 			var ctx = this.overlayCtx;
 
 			ctx.clear();
 			this._drawSelection();
 
-			switch (targetInfo.target) {
+			switch (target) {
 				case c_oTargetType.FrozenAnchorV:
 					x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-					data = this._findColUnderCursor(x, true);
-					if (data && 0 <= data.col) {
-						var h = ctx.getHeight();
-						var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-						offsetFrozen = this.getFrozenPaneOffset(false, true);
-						offsetX -= offsetFrozen.offsetX;
-						ctx.setFillPattern(this.settings.ptrnLineDotted1)
-							.fillRect(this.cols[data.col].left - offsetX - this.width_1px, 0, this.width_1px, h);
+					data = this._findColUnderCursor(x, true, true);
+					if (data) {
+						data.col += 1;
+						if (0 <= data.col && data.col < this.cols.length) {
+							var h = ctx.getHeight();
+							var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+							offsetFrozen = this.getFrozenPaneOffset(false, true);
+							offsetX -= offsetFrozen.offsetX;
+							ctx.setFillPattern(this.settings.ptrnLineDotted1)
+								.fillRect(this.cols[data.col].left - offsetX - this.width_1px, 0, this.width_1px, h);
+						}
 					}
 					break;
 				case c_oTargetType.FrozenAnchorH:
 					y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
-					data = this._findRowUnderCursor(y, true);
-					if (data && 0 <= data.row) {
-						var w = ctx.getWidth();
-						var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-						offsetFrozen = this.getFrozenPaneOffset(true, false);
-						offsetY -= offsetFrozen.offsetY;
-						ctx.setFillPattern(this.settings.ptrnLineDotted1)
-							.fillRect(0, this.rows[data.row].top - offsetY - this.height_1px, w, this.height_1px);
+					data = this._findRowUnderCursor(y, true, true);
+					if (data) {
+						data.row += 1;
+						if (0 <= data.row && data.row < this.rows.length) {
+							var w = ctx.getWidth();
+							var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+							offsetFrozen = this.getFrozenPaneOffset(true, false);
+							offsetY -= offsetFrozen.offsetY;
+							ctx.setFillPattern(this.settings.ptrnLineDotted1)
+								.fillRect(0, this.rows[data.row].top - offsetY - this.height_1px, w, this.height_1px);
+						}
 					}
 					break;
 			}
@@ -3093,10 +3096,7 @@
 			return result;
 		};
 		
-		WorksheetView.prototype.applyFrozenAnchor = function(x, y, targetInfo) {
-			if (!targetInfo)
-				return;
-
+		WorksheetView.prototype.applyFrozenAnchor = function(x, y, target) {
 			var t = this;
 			var onChangeFrozenCallback = function (isSuccess) {
 				if (false === isSuccess) {
@@ -3109,18 +3109,24 @@
 					lastCol = t.topLeftFrozenCell.getCol0();
 					lastRow = t.topLeftFrozenCell.getRow0();
 				}
-				switch (targetInfo.target) {
+				switch (target) {
 					case c_oTargetType.FrozenAnchorV:
 						x *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIX());
-						data = t._findColUnderCursor(x, true);
-						if (data && 0 <= data.col)
-							lastCol = data.col;
+						data = t._findColUnderCursor(x, true, true);
+						if (data) {
+							data.col += 1;
+							if (0 <= data.col && data.col < t.cols.length)
+								lastCol = data.col;
+						}
 						break;
 					case c_oTargetType.FrozenAnchorH:
 						y *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIY());
-						data = t._findRowUnderCursor(y, true);
-						if (data && 0 <= data.row)
-							lastRow = data.row;
+						data = t._findRowUnderCursor(y, true, true);
+						if (data) {
+							data.row += 1;
+							if (0 <= data.row && data.row < t.rows.length)
+								lastRow = data.row;
+						}
 						break;
 				}
 				t._updateFreezePane(lastCol, lastRow);

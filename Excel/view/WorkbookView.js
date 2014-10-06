@@ -893,15 +893,15 @@
 		};
 		
 		// Frozen anchor
-		WorkbookView.prototype._onMoveFrozenAnchorHandle = function (x, y, targetInfo) {
+		WorkbookView.prototype._onMoveFrozenAnchorHandle = function (x, y, target) {
 			var ws = this.getWorksheet();
-			ws.drawFrozenGuides(x, y, targetInfo);
+			ws.drawFrozenGuides(x, y, target);
 		};
 		
-		WorkbookView.prototype._onMoveFrozenAnchorHandleDone = function (x, y, targetInfo) {
+		WorkbookView.prototype._onMoveFrozenAnchorHandleDone = function (x, y, target) {
 			// Закрепляем область
 			var ws = this.getWorksheet();
-			ws.applyFrozenAnchor(x, y, targetInfo);
+			ws.applyFrozenAnchor(x, y, target);
 		};
 
 		WorkbookView.prototype._onShowAutoComplete = function () {
