@@ -1454,9 +1454,9 @@ function ScrollObject( elemID, settings, dbg ) {
         scrollerColorOver:"#cfcfcf",
         scrollerColorLayerOver:"#cfcfcf",
         scrollerColorActive:"#ADADAD",
-        scrollBackgroundColor:"#F1F1F1",
-        scrollBackgroundColorHover:"#F1F1F1",
-        scrollBackgroundColorActive:"#F1F1F1",
+        scrollBackgroundColor:"#f4f4f4",
+        scrollBackgroundColorHover:"#f4f4f4",
+        scrollBackgroundColorActive:"#f4f4f4",
         strokeStyleNone:"#cfcfcf",
         strokeStyleOver:"#cfcfcf",
         strokeStyleActive:"#ADADAD",
@@ -1519,8 +1519,8 @@ function ScrollObject( elemID, settings, dbg ) {
     this.paneHeight = 0;
     this.paneWidth = 0;
 
-    this.maxScrollY = 2000;
-    this.maxScrollX = 2000;
+    this.maxScrollY = 0;
+    this.maxScrollX = 0;
 
     this.scrollCoeff = 0;
 
@@ -1795,11 +1795,23 @@ ScrollObject.prototype = {
         this.RecalcScroller();
         if ( this.isVerticalScroll ) {
             this.scrollToY( this.scrollVCurrentY );
+            if(this.maxScrollY == 0){
+                this.canvas.style.display = "none";
+            }
+            else{
+                this.canvas.style.display = "";
+            }
+        }
+        else if ( this.isHorizontalScroll ) {
+            this.scrollToX( this.scrollHCurrentX );
+            if(this.maxScrollX == 0){
+                this.canvas.style.display = "none";
+            }
+            else{
+                this.canvas.style.display = "";
+            }
         }
 
-        if ( this.isHorizontalScroll ) {
-            this.scrollToX( this.scrollHCurrentX );
-        }
         this._drawArrow();
         this._draw();
     },
