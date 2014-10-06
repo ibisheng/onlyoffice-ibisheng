@@ -689,7 +689,7 @@ function CMasterThumbnailDrawer()
     this.GetThumbnail = function(_master, use_background, use_master_shapes)
     {
         var h_px = 38;
-        var w_px = 104;//(this.WidthMM * h_px / this.HeightMM) >> 0;
+        var w_px = 85;//(this.WidthMM * h_px / this.HeightMM) >> 0;
 
         // пока не будем генерить для ретины
         /*
@@ -798,16 +798,16 @@ function CMasterThumbnailDrawer()
 
         // цвета
         var _color_w = 6;
-        var _color_h = 4;
+        var _color_h = 3;
         var _color_x = 4;
         var _text_x = 8 * dKoefPixToMM;
         var _text_y = (h_px - 10) * dKoefPixToMM;
-        var _color_y = 30;
+        var _color_y = 31;
         var _color_delta = 1;
 
         _ctx.beginPath();
         _ctx.fillStyle = "#FFFFFF";
-        _ctx.fillRect(_color_x - _color_delta, _color_y - _color_delta, _color_w * 6 + 7 * _color_delta, 6);
+        _ctx.fillRect(_color_x - _color_delta, _color_y - _color_delta, _color_w * 6 + 7 * _color_delta, 5);
         _ctx.beginPath();
 
         var _color = new CSchemeColor();
