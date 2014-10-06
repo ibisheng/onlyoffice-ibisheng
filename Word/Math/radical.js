@@ -1182,6 +1182,12 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
         {
             SearchPos.Pos.Update2(0, Depth);
             SearchPos.Pos.Update2(0, Depth + 1);
+
+
+            SearchPos.InTextPos.Update(0, Depth);
+            SearchPos.InTextPos.Update(0, Depth + 1);
+
+
             result = true;
         }
         SearchPos.CurX += this.GapRight;
@@ -1193,6 +1199,12 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
         {
             SearchPos.Pos.Update2(0, Depth);
             SearchPos.Pos.Update2(0, Depth + 1);
+
+
+            SearchPos.InTextPos.Update(0, Depth);
+            SearchPos.InTextPos.Update(0, Depth + 1);
+
+
             result = true;
         }
 
@@ -1202,6 +1214,11 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
         {
             SearchPos.Pos.Update2(0, Depth);
             SearchPos.Pos.Update2(1, Depth + 1);
+
+
+            SearchPos.InTextPos.Update(0, Depth);
+            SearchPos.InTextPos.Update(1, Depth + 1);
+
             result = true;
         }
 

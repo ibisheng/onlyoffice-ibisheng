@@ -3590,6 +3590,10 @@ CDelimiter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
         {
             SearchPos.Pos.Update2(0, Depth);
             SearchPos.Pos.Update2(j, Depth+1);
+
+            SearchPos.InTextPos.Update(0, Depth);
+            SearchPos.InTextPos.Update(j, Depth + 1);
+
             result = true;
         }
 
@@ -3815,6 +3819,11 @@ CCharacter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLin
     {
         SearchPos.Pos.Update2(0, Depth);
         SearchPos.Pos.Update2(0, Depth+1);
+
+
+        SearchPos.InTextPos.Update(0, Depth);
+        SearchPos.InTextPos.Update(0, Depth + 1);
+
     }
 
     SearchPos.CurX += this.GapRight + align;

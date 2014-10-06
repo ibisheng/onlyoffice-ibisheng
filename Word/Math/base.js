@@ -626,6 +626,10 @@ CMathBase.prototype =
         {
             SearchPos.Pos.Update2(CurrX, Depth);
             SearchPos.Pos.Update2(CurrY, Depth + 1);
+
+            SearchPos.InTextPos.Update(CurrX, Depth);
+            SearchPos.InTextPos.Update(CurrY, Depth + 1);
+
         }
 
         SearchPos.CurX = SearchCurX + this.size.width;

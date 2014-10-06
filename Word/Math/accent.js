@@ -621,6 +621,11 @@ CAccent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
     {
         SearchPos.Pos.Update2(0, Depth);
         SearchPos.Pos.Update2(0, Depth+1);
+
+
+        SearchPos.InTextPos.Update(0, Depth);
+        SearchPos.InTextPos.Update(0, Depth + 1);
+
     }
 
     SearchPos.CurX += this.GapRight + align;

@@ -1899,6 +1899,8 @@ CMathContent.prototype =
                 {
                     if( this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd))
                     {
+
+                        SearchPos.InTextPos.Update(pos, Depth);
                         SearchPos.Pos.Update2(pos, Depth);
                         result = true;
                     }
@@ -1932,6 +1934,8 @@ CMathContent.prototype =
                 {
                     if(this.content[pos].Get_ParaContentPosByXY(SearchPos, Depth+1, _CurLine, _CurRange, StepEnd, PointInfo))
                     {
+
+                        SearchPos.InTextPos.Update(pos, Depth);
                         SearchPos.Pos.Update2(pos, Depth);
                         result = true;
                     }
@@ -2401,13 +2405,6 @@ CMathContent.prototype =
             var curType = this.content[CurPos].Type,
                 prevType = CurPos > 0 ? this.content[CurPos - 1].Type : null;
 
-            /*if(curType == MATH_PLACEHOLDER)
-            {
-                SearchPos.Pos.Update(0, Depth + 1);
-                SearchPos.Found = true;
-
-            }
-            else*/
             if(curType == para_Math_Composition)
             {
                 var bNotshift     = SearchPos.ForSelection == false,
@@ -2451,13 +2448,6 @@ CMathContent.prototype =
         {
             var curType = this.content[CurPos].Type,
                 nextType = CurPos < this.content.length - 1 ? this.content[CurPos + 1].Type : null;
-
-            /*if(curType == MATH_PLACEHOLDER)
-            {
-                SearchPos.Pos.Update(0, Depth + 1);
-                SearchPos.Found = true;
-            }
-            else */
 
             if(curType == para_Math_Composition)
             {
