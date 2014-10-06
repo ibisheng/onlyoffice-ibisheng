@@ -1057,12 +1057,6 @@ CMathBase.prototype =
 
         var NewObj = new this.constructor();
         NewObj.init(props);
-        //NewObj.argSize = this.argSize;
-
-        //NewObj.Composition = Composition;
-        //var CtrPrp = this.CtrPrp.Copy();
-
-        //NewObj.setCtrPrp(CtrPrp);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)

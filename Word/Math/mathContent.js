@@ -906,7 +906,6 @@ function CMathContent()
     this.InfoPoints = new CInfoPoints();
     ///////////////
 
-    this.bDot       = false;
     this.plhHide    = false;
     this.bRoot      = false;
     //////////////////
@@ -941,7 +940,7 @@ CMathContent.prototype =
     },
     addElementToContent: function(obj)   //for "read"
     {
-        this.Internal_Content_Add(this.content.length, obj);
+        this.Internal_Content_Add(this.content.length, obj, false);
         this.CurPos = this.content.length-1;
     },
     fillPlaceholders: function()
@@ -2253,25 +2252,40 @@ CMathContent.prototype =
         }
 
     },
-    Internal_Content_Add : function(Pos, Item)
+    Internal_Content_Add : function(Pos, Item, bUpdatePosition)
     {
         History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.content.splice( Pos, 0, Item );
 
-        if ( this.CurPos >= Pos )
-            this.CurPos++;
+        if(bUpdatePosition !== false)
+        {
+            if ( this.CurPos >= Pos )
+                this.CurPos++;
 
-        if ( this.Selection.Start >= Pos )
-            this.Selection.Start++;
+            if ( this.Selection.Start >= Pos )
+                this.Selection.Start++;
 
-        if ( this.Selection.End >= Pos )
-            this.Selection.End++;
+            if ( this.Selection.End >= Pos )
+                this.Selection.End++;
+        }
 
+        if(this.ParaMath !== null)
+            this.ParaMath.SetNeedResize();
     },
 
     Add_ToContent : function(Pos, Item)
     {
         this.Internal_Content_Add(Pos, Item);
+    },
+    Concat_ToContent: function(NewItems)
+    {
+        var StartPos = this.content.length;
+        this.content = this.content.concat( NewItems );
+
+        History.Add( this, { Type : historyitem_Math_AddItem, Pos : StartPos, EndPos : this.content.length - 1, Items : NewItems } );
+
+        if(this.ParaMath !== null)
+            this.ParaMath.SetNeedResize();
     },
 
     Remove_FromContent : function(Pos, Count)
@@ -2305,6 +2319,9 @@ CMathContent.prototype =
                     this.Selection.End = Pos;
             }
         }
+
+        if(this.ParaMath !== null)
+            this.ParaMath.SetNeedResize();
 
     },
 
@@ -2626,6 +2643,8 @@ CMathContent.prototype =
             case historyitem_Math_AddItem:
             {
                 this.content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
+
+                this.ParaMath.SetNeedResize();
                 break;
             }
             case historyitem_Math_RemoveItem:
@@ -2636,6 +2655,8 @@ CMathContent.prototype =
                 var Array_end   = this.content.slice(Pos);
 
                 this.content = Array_start.concat(Data.Items, Array_end);
+
+                this.ParaMath.SetNeedResize();
                 break;
             }
         }
@@ -2654,11 +2675,15 @@ CMathContent.prototype =
                 var Array_end   = this.content.slice(Pos);
 
                 this.content = Array_start.concat(Data.Items, Array_end);
+
+                this.ParaMath.SetNeedResize();
                 break;
             }
             case historyitem_Math_RemoveItem:
             {
                 this.content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
+
+                this.ParaMath.SetNeedResize();
                 break;
             }
         }

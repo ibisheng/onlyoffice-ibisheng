@@ -919,10 +919,14 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 ParaRun.prototype.Split2 = function(CurPos)
 {
     // Создаем новый ран
-    var NewRun = new ParaRun(this.Paragraph);
+    var bMathRun = this.Type == para_Math_Run;
+    var NewRun = new ParaRun(this.Paragraph, bMathRun);
 
     // Копируем настройки
     NewRun.Set_Pr( this.Pr.Copy() );
+
+    if(bMathRun)
+        NewRun.Set_MathPr(this.MathPrp.Copy());
 
     // TODO: Как только избавимся от para_End переделать тут
     // Проверим, если наш ран содержит para_End, тогда мы должны para_End переметить в правый ран
@@ -4899,7 +4903,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 ParaRun.prototype.Split_Run = function(Pos)
 {
     // Создаем новый ран
-    var bMathRun = this.Type == para_Math_Run
+    var bMathRun = this.Type == para_Math_Run;
     var NewRun = new ParaRun(this.Paragraph, bMathRun);
 
     // Копируем настройки

@@ -1659,10 +1659,31 @@ ParaMath.prototype.Handle_AddNewLine = function()
  */
 ParaMath.prototype.Split = function (ContentPos, Depth)
 {
-    var NewParaMath = new ParaMath();
+    var NewParaMath = null;
 
+    var Pos = ContentPos.Get(Depth);
 
-    return null;
+    if(this.Root.content[Pos].Type == para_Math_Run)
+    {
+        NewParaMath = new ParaMath();
+
+        var NewRun = this.Root.content[Pos].Split(ContentPos, Depth+1);
+        NewParaMath.Root.Add_ToContent(0, NewRun);
+
+        var len = this.Root.content.length;
+
+        if(Pos < len - 1)
+        {
+            NewParaMath.Root.Concat_ToContent( this.Root.content.slice(Pos + 1) );
+            this.Root.Remove_FromContent(Pos+1, len - Pos - 1);
+        }
+
+        this.SetNeedResize();
+        NewParaMath.SetNeedResize();
+
+    }
+
+    return NewParaMath;
 };
 
 /**
