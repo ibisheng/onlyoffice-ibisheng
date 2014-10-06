@@ -106,6 +106,7 @@ function CEditorPage(api)
     this.m_oTopRuler_horRuler           = null;
 
     this.ScrollWidthPx      = 14;
+    this.ScrollWidthPxThmbnl= 10;
 
     // main view
     this.m_oMainView        = null;
@@ -320,7 +321,7 @@ function CEditorPage(api)
         this.Splitter2PosMax = 100;
 
         var ScrollWidthMm = this.ScrollWidthPx * g_dKoef_pix_to_mm;
-        var ScrollWidthMm9 = 9 * g_dKoef_pix_to_mm;
+        var ScrollWidthMm9 = 10 * g_dKoef_pix_to_mm;
 
         this.Thumbnails.m_oWordControl = this;
 

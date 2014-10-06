@@ -3803,9 +3803,9 @@ function CThumbnailsManager()
             // нужен скролл
             if (!this.m_bIsScrollVisible)
             {
-                word_control.m_oThumbnailsBack.Bounds.R = word_control.ScrollWidthPx * g_dKoef_pix_to_mm;
-                word_control.m_oThumbnails.Bounds.R = word_control.ScrollWidthPx * g_dKoef_pix_to_mm;
-                word_control.m_oThumbnails_scroll.Bounds.AbsW = word_control.ScrollWidthPx * g_dKoef_pix_to_mm;
+                word_control.m_oThumbnailsBack.Bounds.R = word_control.ScrollWidthPxThmbnl * g_dKoef_pix_to_mm;
+                word_control.m_oThumbnails.Bounds.R = word_control.ScrollWidthPxThmbnl * g_dKoef_pix_to_mm;
+                word_control.m_oThumbnails_scroll.Bounds.AbsW = word_control.ScrollWidthPxThmbnl * g_dKoef_pix_to_mm;
 
                 word_control.m_oThumbnailsContainer.Resize(__w, __h);
             }
@@ -3827,7 +3827,9 @@ function CThumbnailsManager()
                 showArrows: false,
                 animateScroll: false,
                 screenW: word_control.m_oThumbnails.HtmlElement.width,
-                screenH: word_control.m_oThumbnails.HtmlElement.height
+                screenH: word_control.m_oThumbnails.HtmlElement.height,
+                cornerRadius: 1,
+                slimScroll: true
             };
 
             document.getElementById('panel_right_scroll_thmbnl').style.height = parseInt(nHeightPix) + "px";

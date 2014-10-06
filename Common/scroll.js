@@ -1449,6 +1449,7 @@ function ScrollObject( elemID, settings, dbg ) {
         trackClickRepeatFreq:70,
         scrollPagePercent:1. / 8,
         arrowDim:13,
+        marginScroller:4,
         scrollerColor:"#f1f1f1",
         scrollerColorOver:"#cfcfcf",
         scrollerColorLayerOver:"#cfcfcf",
@@ -1476,7 +1477,11 @@ function ScrollObject( elemID, settings, dbg ) {
         arrowActiveBackgroundColor:"#ADADAD",
         fadeInFadeOutDelay:20,
         piperColor:"#cfcfcf",
-        piperColorHover:"#f1f1f1"
+        piperColorHover:"#f1f1f1",
+        arrowSizeW: 13,
+        arrowSizeH: 13,
+        cornerRadius: 0,
+        slimScroll: false
     };
 
     this.settings = extendSettings( settings, scrollSettings );
@@ -1547,21 +1552,30 @@ function ScrollObject( elemID, settings, dbg ) {
     this.piperImgVert = [document.createElement( 'canvas' ), document.createElement( 'canvas' )]
     this.piperImgHor = [document.createElement( 'canvas' ), document.createElement( 'canvas' )]
 
-    this.piperImgVert[0].width = 5;
     this.piperImgVert[0].height = 13;
-    this.piperImgVert[1].width = 5;
     this.piperImgVert[1].height = 13;
+    this.piperImgVert[0].width = 5;
+    this.piperImgVert[1].width = 5;
 
     this.piperImgHor[0].width = 13;
-    this.piperImgHor[0].height = 5;
     this.piperImgHor[1].width = 13;
+    this.piperImgHor[0].height = 5;
     this.piperImgHor[1].height = 5;
 
-    var r, g, b, ctx_piperImg, _data, px;
+    if(this.settings.slimScroll){
+        this.piperImgVert[0].width =
+        this.piperImgVert[1].width =
+        this.piperImgHor[0].height =
+        this.piperImgHor[1].height = 3;
+    }
+
+    var r, g, b, ctx_piperImg, _data, px, k;
     r = _HEXTORGB_( this.settings.piperColor );
     g = r.G;
     b = r.B;
     r = r.R;
+
+    k = this.piperImgVert[0].width * 4;
 
     for ( var index = 0; index < this.piperImgVert.length; index++ ) {
         ctx_piperImg = this.piperImgVert[index].getContext( '2d' );
@@ -1573,8 +1587,8 @@ function ScrollObject( elemID, settings, dbg ) {
             px[i++] = g;
             px[i++] = b;
             px[i++] = 255;
-            i = ( i % 20 === 0 ) ? i + 20 : i
-        }
+            i = ( i % k === 0 ) ? i + k : i
+        }_
 
         ctx_piperImg.putImageData( _data, 0, 0 )
 
@@ -1637,6 +1651,9 @@ ScrollObject.prototype = {
 
         if ( this.settings.showArrows ){
             this.arrowPosition = this.settings.arrowDim + 2;
+        }
+        else{
+            this.arrowPosition = this.settings.marginScroller;
         }
 
         this._setDimension( holder.clientHeight, holder.clientWidth );
@@ -2070,19 +2087,19 @@ ScrollObject.prototype = {
             startColorFadeIn -= 2;
 
             if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
-                x = that.scroller.x + 3;
+                x = that.scroller.x + (that.settings.slimScroll ? 2 : 3);
                 y = (that.scroller.y >> 0) + Math.floor( that.scroller.h / 2 ) - 6;
 
                 ctx_piperImg = that.piperImgVert[0].getContext( '2d' );
                 _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
                 px = _data.data;
 
-                for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; ) {
-                    px[i++] += 2;
-                    px[i++] += 2;
-                    px[i++] += 2;
-                    i++;
-                    i = ( i % 20 === 0 ) ? i + 20 : i;
+                for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; i += 4 ) {
+                    if ( px[i + 3] == 255 ) {
+                        px[i] += 2;
+                        px[i + 1] += 2;
+                        px[i + 2] += 2;
+                    }
                 }
 
                 ctx_piperImg.putImageData( _data, 0, 0 );
@@ -2091,18 +2108,18 @@ ScrollObject.prototype = {
             }
             else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
                 x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
-                y = that.scroller.y + 3;
+                y = that.scroller.y + (that.settings.slimScroll ? 2 : 3);
 
                 ctx_piperImg = that.piperImgHor[0].getContext( '2d' );
                 _data = ctx_piperImg.getImageData( 0, 0, that.piperImgHor[0].width, that.piperImgHor[0].height );
                 px = _data.data;
 
-                for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; ) {
-                    px[i++] += 2;
-                    px[i++] += 2;
-                    px[i++] += 2;
-                    i++;
-                    i = ( i % 4 === 0 && i % 52 !== 0 ) ? i + 4 : i;
+                for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; i += 4) {
+                    if ( px[i + 3] == 255 ) {
+                        px[i] += 2;
+                        px[i + 1] += 2;
+                        px[i + 2] += 2;
+                    }
                 }
 
                 ctx_piperImg.putImageData( _data, 0, 0 )
@@ -2126,12 +2143,12 @@ ScrollObject.prototype = {
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
                     px = _data.data;
 
-                    for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; ) {
-                        px[i++] -= 2;
-                        px[i++] -= 2;
-                        px[i++] -= 2;
-                        i++;
-                        i = ( i % 20 === 0 ) ? i + 20 : i;
+                    for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; i += 4 ) {
+                        if ( px[i + 3] == 255 ) {
+                            px[i] -= 2;
+                            px[i + 1] -= 2;
+                            px[i + 2] -= 2;
+                        }
                     }
 
                     ctx_piperImg.putImageData( _data, 0, 0 );
@@ -2145,12 +2162,12 @@ ScrollObject.prototype = {
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgHor[0].width, that.piperImgHor[0].height );
                     px = _data.data;
 
-                    for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; ) {
-                        px[i++] -= 2;
-                        px[i++] -= 2;
-                        px[i++] -= 2;
-                        i++;
-                        i = ( i % 4 === 0 && i % 52 !== 0 ) ? i + 4 : i;
+                    for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; i += 4) {
+                        if ( px[i + 3] == 255 ) {
+                            px[i] -= 2;
+                            px[i + 1] -= 2;
+                            px[i + 2] -= 2;
+                        }
                     }
 
                     ctx_piperImg.putImageData( _data, 0, 0 )
@@ -2188,20 +2205,20 @@ ScrollObject.prototype = {
             startColorFadeOut += 2;
 
             if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
-                x = that.scroller.x + 3;
+                x = that.scroller.x + (that.settings.slimScroll ? 2 : 3);
                 y = (that.scroller.y >> 0) + Math.floor( that.scroller.h / 2 ) - 6;
 
                 ctx_piperImg = that.piperImgVert[0].getContext( '2d' );
                 _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
                 px = _data.data;
 
-                for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; ) {
+                for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; i += 4) {
 
-                    px[i++] -= 2;
-                    px[i++] -= 2;
-                    px[i++] -= 2;
-                    i++;
-                    i = ( i % 20 === 0 ) ? i + 20 : i
+                    if ( px[i + 3] == 255 ) {
+                        px[i] -= 2;
+                        px[i + 1] -= 2;
+                        px[i + 2] -= 2;
+                    }
                 }
 
                 ctx_piperImg.putImageData( _data, 0, 0 );
@@ -2211,18 +2228,18 @@ ScrollObject.prototype = {
             }
             else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
                 x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
-                y = that.scroller.y + 3;
+                y = that.scroller.y + (that.settings.slimScroll ? 2 : 3);
 
                 ctx_piperImg = that.piperImgHor[0].getContext( '2d' );
                 _data = ctx_piperImg.getImageData( 0, 0, that.piperImgHor[0].width, that.piperImgHor[0].height );
                 px = _data.data;
 
-                for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; ) {
-                    px[i++] -= 2;
-                    px[i++] -= 2;
-                    px[i++] -= 2;
-                    i++;
-                    i = ( i % 4 === 0 && i % 52 !== 0 ) ? i + 4 : i
+                for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; i+=4 ) {
+                    if ( px[i + 3] == 255 ) {
+                        px[i] -= 2;
+                        px[i + 1] -= 2;
+                        px[i + 2] -= 2;
+                    }
                 }
 
                 ctx_piperImg.putImageData( _data, 0, 0 )
@@ -2246,12 +2263,12 @@ ScrollObject.prototype = {
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
                     px = _data.data;
 
-                    for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; ) {
-                        px[i++] += 2;
-                        px[i++] += 2;
-                        px[i++] += 2;
-                        i++;
-                        i = ( i % 20 === 0 ) ? i + 20 : i
+                    for ( var i = 0; i < that.piperImgVert[0].width * that.piperImgVert[0].height * 4; i+= 4 ) {
+                        if ( px[i + 3] == 255 ) {
+                            px[i] += 2;
+                            px[i + 1] += 2;
+                            px[i + 2] += 2;
+                        }
                     }
 
                     ctx_piperImg.putImageData( _data, 0, 0 );
@@ -2267,12 +2284,12 @@ ScrollObject.prototype = {
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgHor[0].width, that.piperImgHor[0].height );
                     px = _data.data;
 
-                    for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; ) {
-                        px[i++] += 2;
-                        px[i++] += 2;
-                        px[i++] += 2;
-                        i++;
-                        i = ( i % 4 === 0 && i % 52 !== 0 ) ? i + 4 : i
+                    for ( var i = 0; i < that.piperImgHor[0].width * that.piperImgHor[0].height * 4; i+=4 ) {
+                        if ( px[i + 3] == 255 ) {
+                            px[i] += 2;
+                            px[i + 1] += 2;
+                            px[i + 2] += 2;
+                        }
                     }
 
                     ctx_piperImg.putImageData( _data, 0, 0 )
@@ -2343,7 +2360,7 @@ ScrollObject.prototype = {
                 }
 
                 if ( _b > _y ) {
-                    that.roundRect( that.scroller.x - 0.5, _y + 0.5, that.scroller.w - 1, that.scroller.h - 1, 0 );
+                    that.roundRect( that.scroller.x - 0.5, _y + 0.5, that.scroller.w - 1, that.scroller.h - 1, that.settings.cornerRadius );
                 }
             }
             else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
@@ -2357,7 +2374,7 @@ ScrollObject.prototype = {
                 }
 
                 if ( _r > _x ) {
-                    that.roundRect( _x + 0.5, that.scroller.y - 0.5, that.scroller.w - 1, that.scroller.h - 1, 0 );
+                    that.roundRect( _x + 0.5, that.scroller.y - 0.5, that.scroller.w - 1, that.scroller.h - 1, that.settings.cornerRadius );
                 }
             }
         }
@@ -2459,10 +2476,10 @@ ScrollObject.prototype = {
             this.context.stroke();
 
             if ( this.isVerticalScroll && this.maxScrollY != 0 ) {
-                this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + 3, (this.scroller.y >> 0) + Math.floor( this.scroller.h / 2 ) - 6 );
+                this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + (this.settings.slimScroll ? 2 : 3), (this.scroller.y >> 0) + Math.floor( this.scroller.h / 2 ) - 6 );
             }
             else if ( this.isHorizontalScroll && this.maxScrollX != 0 ) {
-                this.context.drawImage( this.piperImgHor[piperImgIndex], (this.scroller.x >> 0) + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + 3 );
+                this.context.drawImage( this.piperImgHor[piperImgIndex], (this.scroller.x >> 0) + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + (this.settings.slimScroll ? 2 : 3) );
             }
 
         }
@@ -2633,15 +2650,15 @@ ScrollObject.prototype = {
     _setScrollerHW:function () {
         if ( this.isVerticalScroll ) {
             this.scroller.x = 1;//0;
-            this.scroller.w = 13;//this.canvasW - 1;
+            this.scroller.w = this.canvasW - 1;
             if ( this.settings.showArrows )
-                this.ArrowDrawer.InitSize( 13, 13, this.IsRetina );
+                this.ArrowDrawer.InitSize( this.settings.arrowSizeW, this.settings.arrowSizeH, this.IsRetina );
         }
         else if ( this.isHorizontalScroll ) {
             this.scroller.y = 1;//0;
-            this.scroller.h = 13;//this.canvasH - 1;
+            this.scroller.h = this.canvasH - 1;
             if ( this.settings.showArrows )
-                this.ArrowDrawer.InitSize( 13, 13, this.IsRetina );
+                this.ArrowDrawer.InitSize( this.settings.arrowSizeH, this.settings.arrowSizeW, this.IsRetina );
         }
     },
     _MouseHoverOnScroller:function ( mp ) {
