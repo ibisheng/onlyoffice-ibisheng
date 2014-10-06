@@ -38,7 +38,8 @@ var GlobalSkinTeamlab = {
     RulerMarkersFillColor : "#E7E7E7",
     PageOutline : "#81878F",
     STYLE_THUMBNAIL_WIDTH : 80,
-    STYLE_THUMBNAIL_HEIGHT : 40
+    STYLE_THUMBNAIL_HEIGHT : 40,
+    BorderSplitterColor : "#787878"
 };
 var GlobalSkinFlat = {
     Name : "flat",
@@ -51,7 +52,8 @@ var GlobalSkinFlat = {
     RulerMarkersFillColor : "#FFFFFF",
     PageOutline : "#BBBEC2",
     STYLE_THUMBNAIL_WIDTH : 109,
-    STYLE_THUMBNAIL_HEIGHT : 45
+    STYLE_THUMBNAIL_HEIGHT : 45,
+    BorderSplitterColor : "#CBCBCB"
 };
 
 var GlobalSkin = GlobalSkinTeamlab;
