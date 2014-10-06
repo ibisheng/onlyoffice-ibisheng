@@ -37,7 +37,7 @@ function ParaMath()
     this.Y          = 0;
 
     this.bInline           = false;
-    this.bChangeInline      = true;
+    this.bChangeInline     = true;
     this.NeedResize        = true;
     this.bSelectionUse     = false;
 
@@ -57,7 +57,6 @@ function ParaMath()
     this.DefaultTextPr.Italic     = true;
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
-
 
     /*this.MathPr =
     {
@@ -929,6 +928,10 @@ ParaMath.prototype.SetInline = function(value)
 
     this.bInline = value;
 };
+ParaMath.prototype.SetNeedResize = function()
+{
+    this.NeedResize = true;
+}
 ParaMath.prototype.MathToImageConverter= function()
 {
     window.IsShapeToImageConverter = true;
@@ -1656,6 +1659,9 @@ ParaMath.prototype.Handle_AddNewLine = function()
  */
 ParaMath.prototype.Split = function (ContentPos, Depth)
 {
+    var NewParaMath = new ParaMath();
+
+
     return null;
 };
 
