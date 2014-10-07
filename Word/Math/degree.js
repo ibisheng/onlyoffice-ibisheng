@@ -475,7 +475,7 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
 };
 CDegreeSubSupBase.prototype.setPosition = function(pos, PosInfo)
 {
-    CDegreeSubSup.superclass.setPosition.call(this, pos, PosInfo);
+    CDegreeSubSupBase.superclass.setPosition.call(this, pos, PosInfo);
 };
 CDegreeSubSupBase.prototype.align = function(x, y)
 {
