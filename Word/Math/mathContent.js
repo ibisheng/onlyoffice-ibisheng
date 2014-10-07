@@ -2268,9 +2268,6 @@ CMathContent.prototype =
             if ( this.Selection.End >= Pos )
                 this.Selection.End++;
         }
-
-        if(this.ParaMath !== null)
-            this.ParaMath.SetNeedResize();
     },
 
     Add_ToContent : function(Pos, Item)
@@ -2283,9 +2280,6 @@ CMathContent.prototype =
         this.content = this.content.concat( NewItems );
 
         History.Add( this, { Type : historyitem_Math_AddItem, Pos : StartPos, EndPos : this.content.length - 1, Items : NewItems } );
-
-        if(this.ParaMath !== null)
-            this.ParaMath.SetNeedResize();
     },
 
     Remove_FromContent : function(Pos, Count)
@@ -2320,8 +2314,6 @@ CMathContent.prototype =
             }
         }
 
-        if(this.ParaMath !== null)
-            this.ParaMath.SetNeedResize();
 
     },
 
