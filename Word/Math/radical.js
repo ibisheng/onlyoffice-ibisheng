@@ -1,39 +1,7 @@
 "use strict";
 
-/*var SIGN_GAP = 0;
-var RADICAL_GAP = 0.2513;
-var RADICAL_H4  = 1.1715;
-var RADICAL_H0 = 0;
-var RADICAL_H1  = 0;
-var RADICAL_H2 = 0;
-var RADICAL_H3 = 0;
-var RADICAL_H5 = 0;*/
-
-/*var SIGN_GAP = 0.05;
-var RADICAL_GAP = 0.1216;
-var RADICAL_H4  = 1.2393;
-var RADICAL_H0 = 0;
-var RADICAL_H1 = 1.1588;
-var RADICAL_H2 = 1.1673;
-var RADICAL_H3 = 1.0232;
-var RADICAL_H5 = 0;*/
-
-//var SIGN_GAP = 0.05;
-//var RADICAL_GAP =  0.1216;
-
-//var GAP_TOP = 0.05;
-//var SIGN_GAP = 0.1216;
-
-//var GAP_TOP = 0.01822;
 var GAP_TOP = 0.094492;
 var SIGN_GAP = 0.077108;
-
-/*var RADICAL_H0 =  0;
-var RADICAL_H1 = 0.1589;
-var RADICAL_H2 = 0.1674;
-var RADICAL_H3 = 0.038;
-var RADICAL_H4 = 0.303;
-var RADICAL_H5 = 0.2394;*/
 
 var RADICAL_H0 = 1.2;
 var RADICAL_H1 = 1.50732421875;
