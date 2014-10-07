@@ -148,6 +148,7 @@ CNary.prototype.fillContent = function(PropsInfo)
             base.setBase(Sign);
             base.setIterator(this.LowerIterator);
             base.fillContent();
+            base.Set_CompiledCtrPrp(this.ParaMath);
         }
         else if( !PropsInfo.supHide && PropsInfo.subHide )
         {
@@ -155,7 +156,10 @@ CNary.prototype.fillContent = function(PropsInfo)
             base = new CDegreeBase(prp, true);
             base.setBase(Sign);
             base.setIterator(this.UpperIterator);
+
             base.fillContent();
+            base.Set_CompiledCtrPrp(this.ParaMath);
+
         }
         else if(PropsInfo.supHide && PropsInfo.subHide)
         {
@@ -168,7 +172,9 @@ CNary.prototype.fillContent = function(PropsInfo)
             base.setBase(Sign);
             base.setLowerIterator(this.LowerIterator);
             base.setUpperIterator(this.UpperIterator);
+            
             base.fillContent();
+            base.Set_CompiledCtrPrp(this.ParaMath);
         }
     }
 

@@ -5,6 +5,7 @@ function CDegreeBase(props, bInside)
     CDegreeBase.superclass.constructor.call(this);
 
     this.kind = MATH_DEGREE;
+    this.bInside = bInside;
 
     this.upBase = 0; // отступ сверху для основания
     this.upIter = 0; // отступ сверху для итератора
@@ -227,7 +228,6 @@ function CDegree(props, bInside)
 
     g_oTableId.Add( this, this.Id );
 }
-
 Asc.extendClass(CDegree, CDegreeBase);
 CDegree.prototype.init = function(props)
 {
@@ -278,6 +278,7 @@ CDegree.prototype.Get_Id = function()
 function CIterators(iterUp, iterDn)
 {
     CIterators.superclass.constructor.call(this);
+    this.bInside = true;
 
     this.lUp = 0;   // центр основания
     this.lD = 0;    // высота - центр основания
@@ -323,6 +324,7 @@ function CDegreeSubSupBase(props, bInside)
     CDegreeSubSupBase.superclass.constructor.call(this);
 
     this.kind = MATH_DEGREESubSup;
+    this.bInside = bInside;
 
     this.gapBase = 0;
 
