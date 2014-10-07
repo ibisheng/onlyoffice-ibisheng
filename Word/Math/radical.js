@@ -1267,4 +1267,3 @@ CRadical.prototype.Get_Id = function()
 {
 	return this.Id;
 }
-

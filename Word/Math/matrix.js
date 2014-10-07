@@ -209,7 +209,6 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     if(this.nCol > 1)
     {
-        //var gapsCol = this.getLineGap(txtPrp);
         var gapsCol = this.getLineGap(this.spaceColumn, txtPrp);
 
         for(var i = 0; i < this.nCol - 1; i++)
