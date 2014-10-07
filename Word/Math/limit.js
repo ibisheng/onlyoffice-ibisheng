@@ -2,19 +2,19 @@
 
 function CLimit(props)
 {
+    CLimit.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
 
     this.kind = MATH_LIMIT;
 
-    this.ContentFName  = new CMathContent();
+    this.ContentFName    = new CMathContent();
     this.ContentIterator = new CMathContent();
 
     this.Pr =
     {
         type: LIMIT_LOW
     };
-
-    CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -43,18 +43,6 @@ CLimit.prototype.setProperties = function(props)
         this.Pr.type = props.type;
 
     this.setCtrPrp(props.ctrPrp);
-}
-CLimit.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-
-    this.FName = null;
-    this.Iterator = null;
-
-    this.ContentFName = contents[0];
-    this.ContentIterator = contents[1];
-
-    this.RecalcInfo.bProps = true;
 }
 CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -186,24 +174,24 @@ CLimit.prototype.Refresh_RecalcData = function(Data)
 CLimit.prototype.Write_ToBinary2 = function( Writer )
 {	
 	Writer.WriteLong( historyitem_type_lim );
-	Writer.WriteString2( this.getFName().Id );
-	Writer.WriteString2( this.getIterator().Id );
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.getFName().Id);
+	Writer.WriteString2(this.getIterator().Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong(this.Pr.type);
 }
 CLimit.prototype.Read_FromBinary2 = function( Reader )
-{	
+{
+    this.Id = Reader.GetString2();
+    this.ContentFName    = g_oTableId.Get_ById(Reader.GetString2());
+    this.ContentIterator = g_oTableId.Get_ById(Reader.GetString2());
+
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	
 	props.ctrPrp.Read_FromBinary(Reader);
 	props.type = Reader.GetLong();
-	
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
 }
 CLimit.prototype.Get_Id = function()
 {
@@ -212,12 +200,15 @@ CLimit.prototype.Get_Id = function()
 
 function CMathFunc(props)
 {
+    CMathFunc.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_FUNCTION;
 
     this.Pr = {};
 
-    CMathBase.call(this);
+    this.fnameContent    = new CMathContent();
+    this.argumentContent = new CMathContent();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -258,19 +249,8 @@ CMathFunc.prototype.setProperties = function(props)
 CMathFunc.prototype.fillContent = function()
 {
     this.setDimension(1, 2);
-    this.setContent();
-}
-CMathFunc.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // FName
-    this.elements[0][0] = contents[0];
-
-    // Argument
-    this.elements[0][1] = contents[1];
-
+    this.elements[0][0] = this.fnameContent;
+    this.elements[0][1] = this.argumentContent;
 }
 CMathFunc.prototype.getPropsForWrite = function()
 {
@@ -289,22 +269,22 @@ CMathFunc.prototype.Refresh_RecalcData = function(Data)
 CMathFunc.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_mathFunc );
-	Writer.WriteString2( this.getFName().Id );
-	Writer.WriteString2( this.getArgument().Id );
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.fnameContent.Id);
+	Writer.WriteString2(this.argumentContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 }
 CMathFunc.prototype.Read_FromBinary2 = function( Reader )
 {
+    this.Id = Reader.GetString2();
+    this.fnameContent    = g_oTableId.Get_ById(Reader.GetString2());
+    this.argumentContent = g_oTableId.Get_ById(Reader.GetString2());
+
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	
 	props.ctrPrp.Read_FromBinary(Reader);
-	
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
 }
 CMathFunc.prototype.Get_Id = function()
 {

@@ -488,10 +488,6 @@ CFractionBase.prototype.Get_Id = function()
 {
     return this.elements[0][0].Get_Id();
 };
-CFractionBase.prototype.fillMathComposition = function(content)
-{
-    this.elements[0][0] = content;
-}
 
 function CNumerator()
 {

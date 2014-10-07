@@ -641,13 +641,6 @@ CAccent.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 }
-CAccent.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.init(props);
-
-    // Base
-    this.elements[0][0] = contents[0];
-}
 CAccent.prototype.Save_Changes = function(Data, Writer)
 {
 	Writer.WriteLong( historyitem_type_acc );

@@ -332,16 +332,21 @@ CDegree.prototype.Get_Id = function()
 
 function CIterators()
 {
+    CIterators.superclass.constructor.call(this);
+
     this.lUp = 0;   // центр основания
     this.lD = 0;    // высота - центр основания
     this.upper = 0; // смещение сверху для позиции основания
-    CMathBase.call(this, true);
+
+    this.iterUp = new CMathContent();
+    this.iterDn = new CMathContent();
 }
 Asc.extendClass(CIterators, CMathBase);
 CIterators.prototype.init = function()
 {
     this.setDimension(2, 1);
-    this.setContent();
+    this.elements[0][0] = this.iterUp;
+    this.elements[1][0] = this.iterDn;
 };
 CIterators.prototype.old_old_setDistanceIters = function(oMeasure)
 {
@@ -468,11 +473,6 @@ CIterators.prototype.Get_CompiledCtrPrp = function()
 {
     return this.Parent.Get_CompiledCtrPrp();
 };
-CIterators.prototype.fillMathComposition = function(upperIterator, lowerIterator)
-{
-    this.elements[0][0] = upperIterator;
-    this.elements[1][0] = lowerIterator;
-};
 CIterators.prototype.alignIterators = function(mcJc)
 {
     this.alignment.wdt[0] = mcJc;
@@ -481,6 +481,8 @@ CIterators.prototype.alignIterators = function(mcJc)
 
 function CDegreeSubSup(props, bInside)
 {
+    CDegreeSubSup.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_DEGREESubSup;
 
@@ -492,10 +494,11 @@ function CDegreeSubSup(props, bInside)
         alnScr:     false
     };
 
+    this.baseContent = new CMathContent();
+    this.iters       = new CIterators();
+
     //this.type = DEGREE_SubSup;
     //this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
-
-    CMathBase.call(this, bInside);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -510,14 +513,13 @@ CDegreeSubSup.prototype.init = function(props)
 };
 CDegreeSubSup.prototype.fillContent = function()
 {
-    var oBase = new CMathContent();
+    var oBase  = this.baseContent;
+    var oIters = this.iters;
 
     this.setDimension(1, 2);
 
-    var oIters = new CIterators();
     oIters.init();
     //oIters.decreaseArgSize();
-
 
     oIters.lUp = 0;
     oIters.lD = 0;
@@ -999,28 +1001,6 @@ CDegreeSubSup.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 };
-CDegreeSubSup.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    if(this.Pr.type == DEGREE_SubSup)
-    {
-        // Base
-        this.elements[0][0] = contents[0];
-
-        // Iterators
-        this.elements[0][1].fillMathComposition(contents[1]/*upper iterator*/, contents[2]/*lower iterator*/);
-    }
-    else
-    {
-        // Base
-        this.elements[0][1] = contents[0];
-
-        // Iterators
-        this.elements[0][0].fillMathComposition(contents[1]/*upper iterator*/, contents[2]/*lower iterator*/);
-    }
-};
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
     return this.Pr;
@@ -1038,9 +1018,10 @@ CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
 CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_deg_subsup );
-	Writer.WriteString2( this.getBase().Id );
-	Writer.WriteString2( this.getUpperIterator().Id );
-	Writer.WriteString2( this.getLowerIterator().Id );
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.baseContent.Id);
+	Writer.WriteString2(this.iters.iterDn.Id);
+	Writer.WriteString2(this.iters.iterUp.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	Writer.WriteLong( this.Pr.type );
@@ -1062,13 +1043,13 @@ CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
 };
 CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 {
+    this.Id = Reader.GetString2();
+
+    this.baseContent  = g_oTableId.Get_ById(Reader.GetString2());
+    this.iters.iterDn = g_oTableId.Get_ById(Reader.GetString2());
+    this.iters.iterUp = g_oTableId.Get_ById(Reader.GetString2());
+
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	
 	props.ctrPrp.Read_FromBinary(Reader);
     props.type = Reader.GetLong();
 	if ( props.type == DEGREE_SubSup )
@@ -1077,7 +1058,9 @@ CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
 		if ( Flags & 1 )
 			props.alnScr = Reader.GetBool();	
 	}
-	this.fillMathComposition (props, arrElems);
+
+    this.init(props);
+    this.iters.init();
 };
 CDegreeSubSup.prototype.Get_Id = function()
 {

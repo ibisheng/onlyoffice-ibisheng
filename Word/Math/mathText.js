@@ -17,14 +17,6 @@ var DIV_CENT = 0.1386;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
-
-// смена хентов
-// editor.SetFontRenderingMode(2);
-
-//change FontSize
-//editor.put_TextPrFontSize(parseInt("37"));
-
-
 function CMathSize()
 {
     this.width  = 0;
