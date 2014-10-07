@@ -1908,8 +1908,6 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteMRun = function(oMRun)
 	{
 		var oThis = this;
-		//var oText = {Text: ""};
-		//oMRun.Get_Text(oText);
 		var props = oMRun.getPropsForWrite();
 		var oText = "";
 		var ContentLen = oMRun.Content.length;
@@ -2001,9 +1999,10 @@ function Binary_oMathWriter(memory, oMathPara)
 	}
 	this.WriteBegChr = function(BegChr)
 	{
+		var str = String.fromCharCode(BegChr);		
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(BegChr);
+		this.memory.WriteString2(str);
 	}	
 	this.WriteBorderBox = function(oBorderBox)
 	{
@@ -2081,9 +2080,10 @@ function Binary_oMathWriter(memory, oMathPara)
 	}
 	this.WriteChr = function(Chr)
 	{
+		var str = String.fromCharCode(Chr);	
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(Chr);
+		this.memory.WriteString2(str);
 	}
 	this.WriteCount = function(Count)
 	{
@@ -2149,9 +2149,10 @@ function Binary_oMathWriter(memory, oMathPara)
 	}		
 	this.WriteEndChr = function(EndChr)
 	{
+		var str = String.fromCharCode(EndChr);	
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(EndChr);
+		this.memory.WriteString2(str);
 	}
 	this.WriteEqArr = function(oEqArr)
 	{
@@ -2626,9 +2627,10 @@ function Binary_oMathWriter(memory, oMathPara)
 	}	
 	this.WriteSepChr = function(SepChr)
 	{
+		var str = String.fromCharCode(SepChr);	
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(SepChr);
+		this.memory.WriteString2(str);
 	}
 	this.WriteShow = function(Show)
 	{
