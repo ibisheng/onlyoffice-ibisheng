@@ -228,7 +228,7 @@ function CDegree(props, bInside)
     g_oTableId.Add( this, this.Id );
 }
 
-Asc.extend(CDegree, CDegreeBase);
+Asc.extendClass(CDegree, CDegreeBase);
 CDegree.prototype.init = function(props)
 {
     this.setProperties(props);
