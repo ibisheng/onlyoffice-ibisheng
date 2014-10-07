@@ -220,7 +220,6 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     if(this.nRow > 1)
     {
-        //var intervalRow = this.getRowSpace(txtPrp);
         var intervalRow = this.getRowSpace(this.spaceRow, txtPrp);
 
         var divCenter = 0;
@@ -583,68 +582,6 @@ CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
     if(minGap !== null && typeof(minGap) !== "undefined")
         this.spaceColumn.minGap = minGap;
 };
-/*CMathMatrix.prototype.getLineGap = function(txtPrp)
-{
-    var spLine;
-
-    if(this.spaceColumn.rule == 0)
-        spLine = 1;             //em
-    else if(this.spaceColumn.rule == 1)
-        spLine = 1.5;           //em
-    else if(this.spaceColumn.rule == 2)
-        spLine = 2;             //em
-    else if(this.spaceColumn.rule == 3)
-        spLine = this.spaceColumn.gap/20;  //pt
-    else if(this.spaceColumn.rule == 4)
-        spLine = this.spaceColumn.gap/2;   //em
-    else
-        spLine = 1;
-
-    var lineGap;
-
-    if(this.spaceColumn.rule == 3)
-        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
-    else
-        lineGap = spLine*txtPrp.FontSize*g_dKoef_pt_to_mm;           //em
-
-    var wPlh = 0.3241834852430555 * txtPrp.FontSize;
-
-    var min = this.spaceColumn.minGap / 20 * g_dKoef_pt_to_mm - wPlh;
-    lineGap = Math.max(lineGap, min);
-    //lineGap += this.params.font.metrics.Placeholder.Height; // для случая, когда gapRow - (аскент + дескент) > minGap, вычитаем из gap строки, а здесь прибавляем стандартный metrics.Height
-
-    return lineGap;
-};
-CMathMatrix.prototype.getRowSpace = function(txtPrp)
-{
-    var spLine;
-
-    if(this.spaceRow.rule == 0)
-        spLine = 7/6;                 //em
-    else if(this.spaceRow.rule == 1)
-        spLine = 7/6 *1.5;            //em
-    else if(this.spaceRow.rule == 2)
-        spLine = 7/6 *2;              //em
-    else if(this.spaceRow.rule == 3)
-        spLine = this.spaceRow.gap/20;         //pt
-    else if(this.spaceRow.rule == 4)
-        spLine = 7/6 * this.spaceRow.gap/2;    //em
-    else
-        spLine = 7/6;
-
-    var lineGap;
-
-    if(this.spaceRow.rule == 3)
-        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
-    else
-        lineGap = spLine*txtPrp.FontSize*g_dKoef_pt_to_mm; //em
-
-
-    var min = this.spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
-    lineGap = Math.max(lineGap, min);
-
-    return lineGap;
-};*/
 ////
 CMathMatrix.prototype.setProperties = function(props)
 {
