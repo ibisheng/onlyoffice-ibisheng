@@ -2313,8 +2313,6 @@ CMathContent.prototype =
                     this.Selection.End = Pos;
             }
         }
-
-
     },
 
     Get_Default_TPrp: function()

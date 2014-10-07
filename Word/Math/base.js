@@ -101,7 +101,10 @@ CMathBase.prototype =
     setCtrPrp: function(txtPrp) // выставляем ctrPrp на чтение
     {
         if(txtPrp !== null && typeof(txtPrp) !== "undefined")
+        {
             this.CtrPrp.Merge(txtPrp);
+            this.CtrPrp.FontFamily = {Name  : "Cambria Math", Index : -1 };
+        }
     },
     Get_CtrPrp: function()
     {

@@ -7779,9 +7779,12 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 
     var oWPrp = this.Get_CompiledPr(false);
     var Bold = oWPrp.Bold,
-        Italic = oWPrp.Italic,
-        FontSize = oWPrp.FontSize,
-        FontSizeCS = oWPrp.FontSizeCS;
+        Italic = oWPrp.Italic;
+
+    var FontFamily = oWPrp.FontFamily,
+        FontSize   = oWPrp.FontSize,
+        FontSizeCS = oWPrp.FontSizeCS,
+        RFonts     = oWPrp.RFonts.Copy();
 
     this.Parent.ParaMath.ApplyArgSize_2(oWPrp, this.Parent.Compiled_ArgSz.value);
 
@@ -7806,6 +7809,8 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     for(var i=0; i < this.Content.length;i++)
         this.Content[i].draw(X, Y, pGraphics);
 
+    oWPrp.RFonts     = RFonts;
+    oWPrp.FontFamily = FontFamily;
     oWPrp.Bold     = Bold;
     oWPrp.Italic   = Italic;
     oWPrp.FontSize = FontSize;
@@ -7841,14 +7846,16 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     {
         //RPI.UpdateMathPr = this.UpdateMathPr;
 
-
         var oWPrp = this.Get_CompiledPr(false);
         var Bold = oWPrp.Bold;
         var Italic = oWPrp.Italic;
-        var FontSize = oWPrp.FontSize;
-        var FontSizeCS = oWPrp.FontSizeCS;
-        this.Parent.ParaMath.ApplyArgSize_2(oWPrp, this.Parent.Compiled_ArgSz.value);
 
+        var FontFamily = oWPrp.FontFamily,
+            FontSize   = oWPrp.FontSize,
+            FontSizeCS = oWPrp.FontSizeCS,
+            RFonts     = oWPrp.RFonts.Copy();
+
+        this.Parent.ParaMath.ApplyArgSize_2(oWPrp, this.Parent.Compiled_ArgSz.value);
 
 
         if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
@@ -7860,6 +7867,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
             var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
 
             oWPrp.FontFamily  = defaultTxtPrp.FontFamily;
+
             oWPrp.RFonts.Set_All(defaultTxtPrp.FontFamily.Name, defaultTxtPrp.FontFamily.Index);
         }
 
@@ -7904,6 +7912,8 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
         this.size.height = ascent + descent;
 
 
+        oWPrp.RFonts     = RFonts;
+        oWPrp.FontFamily = FontFamily;
         oWPrp.Bold       = Bold;
         oWPrp.Italic     = Italic;
         oWPrp.FontSize   = FontSize;
@@ -8038,7 +8048,6 @@ ParaRun.prototype.Math_GetInfoLetter = function(Info)
 
 function CParaRunStartState(Run)
 {
-
     this.Paragraph = Run.Paragraph;
     this.Pr = Run.Pr.Copy();
     this.Content = [];
