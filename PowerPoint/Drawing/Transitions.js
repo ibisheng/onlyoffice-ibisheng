@@ -355,7 +355,7 @@ function CTransitionAnimation(htmlpage)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -492,7 +492,7 @@ function CTransitionAnimation(htmlpage)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 var _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -626,7 +626,7 @@ function CTransitionAnimation(htmlpage)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -1201,7 +1201,7 @@ function CTransitionAnimation(htmlpage)
             if (null == oThis.DemonstrationObject)
             {
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -1529,7 +1529,7 @@ function CTransitionAnimation(htmlpage)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -1678,7 +1678,7 @@ function CTransitionAnimation(htmlpage)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -1827,7 +1827,7 @@ function CTransitionAnimation(htmlpage)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                _ctx1.fillStyle = "#B0B0B0";
+                _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
             }
             else
@@ -2298,7 +2298,7 @@ function CTransitionAnimation(htmlpage)
                 {
                     // отрисовываем на основной канве картинку первого слайда
                     _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                     _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
                 }
                 else
@@ -2357,7 +2357,7 @@ function CTransitionAnimation(htmlpage)
                 {
                     // отрисовываем на основной канве картинку первого слайда
                     _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                     _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
                 }
                 else
@@ -2418,7 +2418,7 @@ function CTransitionAnimation(htmlpage)
                     {
                         // отрисовываем на основной канве картинку первого слайда
                         _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                        _ctx1.fillStyle = "#B0B0B0";
+                        _ctx1.fillStyle = GlobalSkin.BackgroundColor;
                         _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
                     }
                     else
