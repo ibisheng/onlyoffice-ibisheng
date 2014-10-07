@@ -4,29 +4,88 @@
 //если не выставлено в настройках
 /////////////////////****//////////////////////////
 
+function CMathNaryPr()
+{
+    this.chr     = null;
+    this.chrType = NARY_INTEGRAL;
+    this.grow    = false;
+    this.limLoc  = null;
+    this.subHide = false;
+    this.supHide = false;
+}
+
+CMathNaryPr.prototype.Set_FromObject = function(Obj)
+{
+    this.chr     = Obj.chr;
+    this.chrType = Obj.chrType;
+
+    if(true === Obj.grow === true || 1 === Obj.grow)
+        this.grow = true;
+
+    if(NARY_UndOvr === Obj.limLoc || NARY_SubSup === Obj.limLoc)
+        this.limLoc = Obj.limLoc;
+
+    if(true === Obj.subHide === true || 1 === Obj.subHide)
+        this.subHide = true;
+
+    if(true === Obj.supHide === true || 1 === Obj.supHide)
+        this.supHide = true;
+};
+
+CMathNaryPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : chr
+    // Long : chrType
+    // Bool : grow
+    // Long : limLoc
+    // Bool : subHide
+    // Bool : supHide
+
+    Writer.WriteLong(this.chr === null ? -1 : this.chr);
+    Writer.WriteLong(this.chrType);
+    Writer.WriteBool(this.grow);
+    Writer.WriteLong(this.limLoc === null ? -1 : this.limLoc);
+    Writer.WriteBool(this.subHide);
+    Writer.WriteBool(this.supHide);
+};
+
+CMathNaryPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : chr
+    // Long : chrType
+    // Bool : grow
+    // Long : limLoc
+    // Bool : subHide
+    // Bool : supHide
+
+    this.chr     = Reader.GetLong();
+    this.chrType = Reader.GetLong();
+    this.grow    = Reader.GetBool();
+    this.limLoc  = Reader.GetLong();
+    this.subHide = Reader.GetBool();
+    this.supHide = Reader.GetBool();
+
+    if (-1 === this.chr)
+        this.chr = null;
+
+    if (-1 === this.limLoc)
+        this.limLoc = null;
+};
 
 function CNary(props)
 {
+    CNary.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_NARY;
 
-    this.Pr =
-    {
-        chr:        null,
-        chrType:    NARY_INTEGRAL,
-        supHide:    false,
-        subHide:    false,
-        grow:       false,
-        limLoc:     null
-    };
+    this.Pr = new CMathNaryPr();
 
     this.Base = null;
     this.Sign = null;
     this.LowerIterator = new CMathContent();
     this.UpperIterator = new CMathContent();
     this.Arg           = new CMathContent();
-
-    CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -37,27 +96,11 @@ Asc.extendClass(CNary, CMathBase);
 CNary.prototype.init = function(props)
 {
     this.setProperties(props);
-    //this.fillContent();
 }
 CNary.prototype.setProperties = function(props)
 {
     this.setCtrPrp(props.ctrPrp);
-
-    if(props.supHide === true || props.supHide === 1)
-        this.Pr.supHide = true;
-
-    if(props.subHide === true || props.subHide === 1)
-        this.Pr.subHide = true;
-
-    if(props.grow === true || props.grow === 1)
-        this.Pr.grow = true;
-
-    this.Pr.chrType = props.chrType;
-    this.Pr.chr =     props.chr;
-
-
-    if(props.limLoc == NARY_UndOvr || props.limLoc  == NARY_SubSup)
-        this.Pr.limLoc = props.limLoc;
+    this.Pr.Set_FromObject(props);
 }
 CNary.prototype.fillContent = function(PropsInfo)
 {
@@ -101,14 +144,15 @@ CNary.prototype.fillContent = function(PropsInfo)
         if( PropsInfo.supHide && !PropsInfo.subHide )
         {
             prp = {type: DEGREE_SUBSCRIPT, ctrPrp:  ctrPrp};
-            base = new CDegree(prp, true);
+            base = new CDegreeBase(prp, true);
             base.setBase(Sign);
             base.setIterator(this.LowerIterator);
+            base.fillContent();
         }
         else if( !PropsInfo.supHide && PropsInfo.subHide )
         {
             prp = {type: DEGREE_SUPERSCRIPT, ctrPrp: ctrPrp};
-            base = new CDegree(prp, true);
+            base = new CDegreeBase(prp, true);
             base.setBase(Sign);
             base.setIterator(this.UpperIterator);
         }
@@ -119,46 +163,17 @@ CNary.prototype.fillContent = function(PropsInfo)
         else
         {
             prp = {type: DEGREE_SubSup, ctrPrp: ctrPrp};
-            base = new CDegreeSubSup(prp, true);
+            base = new CDegreeSubSupBase(prp, true);
             base.setBase(Sign);
             base.setLowerIterator(this.LowerIterator);
             base.setUpperIterator(this.UpperIterator);
+            base.fillContent();
         }
     }
 
     this.Base = base;
 
     this.addMCToContent( [base, this.Arg] );
-
-}
-CNary.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-
-    this.RecalcInfo.bProps = true;
-
-    this.Arg          = contents[0];
-
-    this.UpperIterator = contents[1];
-    this.LowerIterator = contents[2];
-
-}
-CNary.prototype.old_fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    // Base
-    this.elements[0][1] = contents[0];
-
-
-    // Upper iterator
-    if(!this.Pr.subHide)
-        this.elements[0][0].changeUpperIterator(contents[1]);
-
-    // Lower iterator
-    if(!this.Pr.subHide)
-        this.elements[0][0].changeLowerIterator(contents[2]);
 
 }
 CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
@@ -342,19 +357,16 @@ CNary.prototype.setDistance = function()
 CNary.prototype.getBase = function()
 {
     return this.Arg;
-    //return this.elements[0][1];
 }
 CNary.prototype.getUpperIterator = function()
 {
 	if (!this.Pr.supHide)
 		return this.UpperIterator;
-		//return this.elements[0][0].getUpperIterator();
 }
 CNary.prototype.getLowerIterator = function()
 {
 	if (!this.Pr.subHide)
 		return this.LowerIterator;
-		//return this.elements[0][0].getLowerIterator();
 }
 CNary.prototype.getPropsForWrite = function()
 {
@@ -373,82 +385,27 @@ CNary.prototype.Refresh_RecalcData = function(Data)
 CNary.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_nary );
-	Writer.WriteString2( this.getBase().Id );
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.getUpperIterator() )
-    {
-		Writer.WriteString2(this.getUpperIterator().Id);
-		Flags |= 1;
-	}
-	if ( undefined != this.getLowerIterator())
-    {
-		Writer.WriteString2(this.getLowerIterator().Id);
-		Flags |= 2;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
 
-	
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.Arg.Id);
+    Writer.WriteString2(this.LowerIterator.Id);
+    Writer.WriteString2(this.UpperIterator.Id);
+
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.Pr.chr )
-    {
-		Writer.WriteLong(this.Pr.chr);
-		Flags |= 1;
-	}
-	if ( undefined != this.Pr.limLoc )
-    {
-		Writer.WriteLong(this.Pr.limLoc);
-		Flags |= 2;
-	}
-	if ( undefined != this.Pr.subHide )
-    {
-		Writer.WriteBool(this.Pr.subHide);
-		Flags |= 4;
-	}
-	if ( undefined != this.Pr.supHide )
-    {
-		Writer.WriteBool(this.Pr.supHide);
-		Flags |= 8;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
+    this.Pr.Write_ToBinary(Writer);
 }
 CNary.prototype.Read_FromBinary2 = function( Reader )
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	if ( Flags & 2 )
-		arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
+    this.Id = Reader.GetString2();
 
-	props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.chr = Reader.GetLong();
-	if ( Flags & 2 )
-		props.limLoc = Reader.GetLong();
-	if ( Flags & 4 )
-		props.subHide = Reader.GetBool();
-	if ( Flags & 8 )
-		props.supHide = Reader.GetBool();
-		
-	this.fillMathComposition (props, arrElems);
+    this.Arg           = g_oTableId.Get_ById(Reader.GetString2());
+    this.LowerIterator = g_oTableId.Get_ById(Reader.GetString2());
+    this.UpperIterator = g_oTableId.Get_ById(Reader.GetString2());
+
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
+
+    this.RecalcInfo.bProps = true;
 }
 CNary.prototype.Get_Id = function()
 {
@@ -464,16 +421,6 @@ function CNaryUnd(bInside)
     //this.init();
 }
 Asc.extendClass(CNaryUnd, CMathBase);
-/*CNaryUnd.prototype.old_init = function()
-{
-    this.setDimension(2,1);
-    var iter = new CMathContent();
-    iter.decreaseArgSize();
-
-    var base = new CMathContent();
-
-    this.addMCToContent(iter, base);
-}*/
 CNaryUnd.prototype.setDistance = function()
 {
     var zetta = this.Get_CompiledCtrPrp().FontSize*25.4/96;
@@ -517,16 +464,6 @@ function CNaryOvr(bInside)
     this.setDimension(2, 1);
 }
 Asc.extendClass(CNaryOvr, CMathBase);
-/*CNaryOvr.prototype.old_init = function()
-{
-    this.setDimension(2,1);
-    var iter = new CMathContent();
-    iter.decreaseArgSize();
-
-    var base = new CMathContent();
-
-    this.addMCToContent(base, iter);
-}*/
 CNaryOvr.prototype.old_setDistance = function()
 {
     var zetta = this.Get_CompiledCtrPrp().FontSize* 25.4/96;
