@@ -1597,4 +1597,32 @@ function CFontManager()
 
 		this.m_pFont.SetStringGID(this.m_bStringGID);
 	}
+
+    this.SetHintsProps = function(bIsHinting, bIsSubpixHinting)
+    {
+        if (undefined === g_fontManager.m_oLibrary.tt_hint_props)
+            return;
+
+        if (bIsHinting && bIsSubpixHinting)
+        {
+            this.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
+            this.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = true;
+
+            this.LOAD_MODE = 40968;
+        }
+        else if (bIsHinting)
+        {
+            this.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
+            this.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
+
+            this.LOAD_MODE = 40968;
+        }
+        else
+        {
+            this.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
+            this.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
+
+            this.LOAD_MODE = 40970;
+        }
+    }
 }

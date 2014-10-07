@@ -3101,16 +3101,11 @@ function CThPage()
 
         if (null != this.cachedImage)
         {
-            context.strokeStyle = "#81878F";
-            context.strokeRect(xDst, yDst, wDst, hDst);
-
             context.drawImage(this.cachedImage.image, xDst, yDst, wDst, hDst);
         }
         else
         {
-            context.fillStyle = "#B0B0B0";
-            context.strokeStyle = "#81878F";
-            context.strokeRect(xDst, yDst, wDst, hDst);
+            context.fillStyle = "#FFFFFF";
             context.fillRect(xDst, yDst, wDst, hDst);
         }
     }
@@ -3143,7 +3138,10 @@ function CThumbnailsManager()
     this.m_lDrawingFirst = -1;
     this.m_lDrawingEnd = -1;
 
-    this.const_offsetX = 0;
+    this.const_offset_x = 0;
+    this.const_offset_y = 0;
+    this.const_offset_r = 4;
+    this.const_offset_b = 0;
     this.const_border_w = 4;
 
     this.bIsEmptyDrawed = false;
@@ -3732,6 +3730,7 @@ function CThumbnailsManager()
     this.Init = function()
     {
         this.m_oFontManager.Initialize(true);
+        this.m_oFontManager.SetHintsProps(true, true);
 
         var font = { FontFamily : { Name : "Arial", Index : -1}, Italic : false, Bold : false, FontSize : 10 };
         this.SetFont(font);
@@ -3745,6 +3744,14 @@ function CThumbnailsManager()
             else
                 this.DigitWidths[i] = 10;
         }
+
+        if (GlobalSkin.Name == "flat")
+        {
+            this.const_offset_y = 17;
+            this.const_offset_b = this.const_offset_y;
+            this.const_offset_r = 4;
+            this.const_border_w = 7;
+        }
     }
 
     this.CheckSizes = function()
@@ -3753,7 +3760,7 @@ function CThumbnailsManager()
 
         var __w = word_control.m_oThumbnailsContainer.AbsolutePosition.R - word_control.m_oThumbnailsContainer.AbsolutePosition.L;
         var __h = word_control.m_oThumbnailsContainer.AbsolutePosition.B - word_control.m_oThumbnailsContainer.AbsolutePosition.T;
-        var nWidthSlide = __w * g_dKoef_mm_to_pix;
+        var nWidthSlide = (__w * g_dKoef_mm_to_pix) >> 0;
 
         if (__w < 1 || __h < 0)
         {
@@ -3762,20 +3769,22 @@ function CThumbnailsManager()
         }
         this.m_bIsVisible = true;
 
-        nWidthSlide -= (2 * this.const_border_w);
+        nWidthSlide -= this.const_offset_r;
 
         var _tmpDig = 0;
         if (this.DigitWidths.length > 5)
             _tmpDig = this.DigitWidths[5];
 
-        this.const_offsetX = (_tmpDig * g_dKoef_mm_to_pix * (("") + (this.SlidesCount + 1)).length) >> 0;
-        nWidthSlide -= this.const_offsetX;
+        this.const_offset_x = (_tmpDig * g_dKoef_mm_to_pix * (("") + (this.SlidesCount + 1)).length) >> 0;
+        if (this.const_offset_x < 25)
+            this.const_offset_x = 25;
 
-        var nHeightSlide = nWidthSlide * this.SlideHeight / this.SlideWidth;
-        var nHeightPix = (nHeightSlide + 2 * this.const_border_w) * this.SlidesCount;
+        nWidthSlide -= this.const_offset_x;
 
-        nWidthSlide = parseInt(nWidthSlide);
-        nHeightSlide = parseInt(nHeightSlide);
+        var nHeightSlide = (nWidthSlide * this.SlideHeight / this.SlideWidth) >> 0;
+        var nHeightPix = this.const_offset_y + this.const_offset_y + nHeightSlide * this.SlidesCount;
+        if (this.SlidesCount > 0)
+            nHeightPix += (this.SlidesCount - 1) * 3 * this.const_border_w;
 
         var dPosition = 0;
         if (this.m_dScrollY_max != 0)
@@ -3783,7 +3792,7 @@ function CThumbnailsManager()
             dPosition = this.m_dScrollY / this.m_dScrollY_max;
         }
 
-        var heightThumbs = __h * g_dKoef_mm_to_pix;
+        var heightThumbs = (__h * g_dKoef_mm_to_pix) >> 0;
         if (nHeightPix < heightThumbs)
         {
             // все убралось. скролл не нужен
@@ -3826,14 +3835,14 @@ function CThumbnailsManager()
 
             __w = word_control.m_oThumbnails.AbsolutePosition.R - word_control.m_oThumbnails.AbsolutePosition.L;
             __h = word_control.m_oThumbnails.AbsolutePosition.B - word_control.m_oThumbnails.AbsolutePosition.T;
-            nWidthSlide = __w * g_dKoef_mm_to_pix;
+            nWidthSlide = (__w * g_dKoef_mm_to_pix) >> 0;
 
-            nWidthSlide -= (2 * this.const_border_w);
-            this.const_offsetX = parseInt(this.DigitWidths[5] * g_dKoef_mm_to_pix * (("") + (this.SlidesCount + 1)).length + 6);
-            nWidthSlide -= this.const_offsetX;
+            nWidthSlide -= (this.const_offset_x + this.const_offset_r);
 
-            nHeightSlide = nWidthSlide * this.SlideHeight / this.SlideWidth;
-            nHeightPix = (nHeightSlide + 2 * this.const_border_w) * this.SlidesCount + this.const_border_w * (this.SlidesCount + 1);
+            var nHeightSlide = (nWidthSlide * this.SlideHeight / this.SlideWidth) >> 0;
+            var nHeightPix = this.const_offset_y + this.const_offset_y + nHeightSlide * this.SlidesCount;
+            if (this.SlidesCount > 0)
+                nHeightPix += (this.SlidesCount - 1) * 3 * this.const_border_w;
 
             // теперь нужно выставить размеры
             var settings = {
@@ -3868,7 +3877,7 @@ function CThumbnailsManager()
 
         if (this.m_bIsScrollVisible)
         {
-            var lPosition = parseInt(dPosition * word_control.m_oScrollThumbApi.getMaxScrolledY());
+            var lPosition = (dPosition * word_control.m_oScrollThumbApi.getMaxScrolledY()) >> 0;
             word_control.m_oScrollThumbApi.scrollToY(lPosition);
         }
 
@@ -3907,22 +3916,16 @@ function CThumbnailsManager()
         var bIsFoundFirst = false;
         var bIsFoundEnd = false;
 
-        var lCurrentTopInDoc = parseInt(this.m_dScrollY);
+        var lCurrentTopInDoc = (this.m_dScrollY) >> 0;
 
         var __w = word_control.m_oThumbnails.AbsolutePosition.R - word_control.m_oThumbnails.AbsolutePosition.L;
         var __h = word_control.m_oThumbnails.AbsolutePosition.B - word_control.m_oThumbnails.AbsolutePosition.T;
-        var nWidthSlide = __w * g_dKoef_mm_to_pix;
+        var nWidthSlide = (__w * g_dKoef_mm_to_pix) >> 0;
 
-        nWidthSlide -= (2 * this.const_border_w);
-        this.const_offsetX = parseInt(this.DigitWidths[5] * g_dKoef_mm_to_pix * (("") + (this.SlidesCount + 1)).length + 6);
-        nWidthSlide -= this.const_offsetX;
+        nWidthSlide -= (this.const_offset_x + this.const_offset_r);
+        var nHeightSlide = (nWidthSlide * this.SlideHeight / this.SlideWidth) >> 0;
 
-        var nHeightSlide = nWidthSlide * this.SlideHeight / this.SlideWidth;
-
-        nWidthSlide = parseInt(nWidthSlide);
-        nHeightSlide = parseInt(nHeightSlide);
-
-        var lStart = 2 * this.const_border_w;
+        var lStart = this.const_offset_y;
         for (var i = 0; i < this.SlidesCount; i++)
         {
             if (i >= this.m_arrPages.length)
@@ -3941,7 +3944,7 @@ function CThumbnailsManager()
 
             var drawRect = this.m_arrPages[i];
 
-            drawRect.left   = this.const_offsetX + this.const_border_w;
+            drawRect.left   = this.const_offset_x;
             drawRect.top    = lStart - lCurrentTopInDoc;
             drawRect.right  = drawRect.left + nWidthSlide;
             drawRect.bottom = drawRect.top + nHeightSlide;
@@ -3985,8 +3988,7 @@ function CThumbnailsManager()
 
         context.clearRect(0, 0, _width, _height);
 
-        var _digit_distance = (this.const_offsetX + this.const_border_w) * g_dKoef_pix_to_mm;
-        var d_offStart = 0;//this.const_border_w * g_dKoef_pix_to_mm;
+        var _digit_distance = this.const_offset_x * g_dKoef_pix_to_mm;
 
         for (var i = 0; i < this.SlidesCount; i++)
         {
@@ -4022,7 +4024,10 @@ function CThumbnailsManager()
 
             if (!page.IsSelected)
                 g.b_color1(0, 0, 0, 255);
-            g.t("" + (i+1), (_digit_distance - num_slide_text_width + d_offStart) / 2, (page.top * g_dKoef_pix_to_mm + 5));
+            else
+                g.b_color1(210, 72, 72, 255);
+
+            g.t("" + (i+1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3));
         }
 
         this.OnUpdateOverlay();
@@ -4044,12 +4049,13 @@ function CThumbnailsManager()
         context.fillStyle = "#EBEBEB";
         context.fillRect(0, 0, _width, _height);
 
-        //var _style_select = "#FFE063";
-        //var _style_focus = "#E8EAEC";
+        //var _style_select     = "#FFE063";
+        //var _style_focus      = "#E8EAEC";
         //var _style_select_focus = "#FFEF9D";
 
-        var _style_select = "#E98859";
-        var _style_focus = "#B0B0B0";
+        //var _style_select       = "#E98859";
+        var _style_select       = "#D24848";
+        var _style_focus        = "#B0B0B0";
         var _style_select_focus = "#ED9870";
 
         // selected pages
@@ -4063,60 +4069,34 @@ function CThumbnailsManager()
             {
                 if (page.IsSelected && page.IsFocused)
                 {
-                    context.fillStyle = "#CA2B1F";
-                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                    context.fill();
-                    context.beginPath();
-                    context.fillStyle = _style_select;
+                    this.FocusRectFlat("#CA2B1F", context, page.left, page.top, page.right, page.bottom);
                 }
                 else if (page.IsSelected)
                 {
-                    context.fillStyle = "#9F1F15";
-                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                    context.fill();
-                    context.beginPath();
-                    context.fillStyle = _style_select;
+                    this.FocusRectFlat("#9F1F15", context, page.left, page.top, page.right, page.bottom);
                 }
                 else if (page.IsFocused)
                 {
-                    context.fillStyle = "#FF5E52";
-                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                    context.fill();
-                    context.beginPath();
-                    context.fillStyle = _style_select;
+                    this.FocusRectFlat("#FF5E52", context, page.left, page.top, page.right, page.bottom);
                 }
                 else
                 {
-                    context.fillStyle = "#EE3525";
-                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                    context.fill();
-                    context.beginPath();
-                    context.fillStyle = _style_select;
+                    this.FocusRectFlat("#EE3525", context, page.left, page.top, page.right, page.bottom);
                 }
                 continue;
             }
 
             if (page.IsSelected && page.IsFocused)
             {
-                context.fillStyle = _style_select_focus;
-                this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                context.fill();
-                context.beginPath();
-                context.fillStyle = _style_select;
+                this.FocusRectFlat(_style_select_focus, context, page.left, page.top, page.right, page.bottom);
             }
             else if (page.IsSelected)
             {
-                this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                context.fill();
-                context.beginPath();
+                this.FocusRectFlat(_style_select, context, page.left, page.top, page.right, page.bottom);
             }
             else if (page.IsFocused)
             {
-                context.fillStyle = _style_focus;
-                this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
-                context.fill();
-                context.beginPath();
-                context.fillStyle = _style_select;
+                this.FocusRectFlat(_style_focus, context, page.left, page.top, page.right, page.bottom);
             }
         }
 
@@ -4124,10 +4104,11 @@ function CThumbnailsManager()
         {
             // теперь нужно просто нарисовать линию
             context.strokeStyle = "#0000FF";
-            var y = (0.5 * this.const_border_w) >> 0;
+            var y = (0.5 * this.const_offset_x) >> 0;
             if (this.MouseDownTrackPosition != 0)
                 y = (this.m_arrPages[this.MouseDownTrackPosition - 1].bottom + 1.5 * this.const_border_w) >> 0;
 
+            context.lineWidth = 1;
             context.beginPath();
             context.moveTo(0, y + 0.5);
             context.lineTo(_width, y + 0.5);
@@ -4138,25 +4119,22 @@ function CThumbnailsManager()
     this.FocusRectDraw = function(ctx, x, y, r, b)
     {
         ctx.rect(x - this.const_border_w, y, r-x + this.const_border_w, b-y);
-        return;
+    }
+    this.FocusRectFlat = function(_color, ctx, x, y, r, b)
+    {
+        ctx.beginPath();
+        ctx.strokeStyle = _color;
+        ctx.lineWidth   = 2;
 
-        var rad = 2;
+        ctx.rect(x - 2, y - 2, r - x + 4, b - y + 4);
+        ctx.stroke();
 
-        ctx.moveTo(x, y + rad);
-        ctx.lineTo(x + rad, y);
-        ctx.lineTo(r - rad, y);
-        ctx.lineTo(r, y + rad);
-        ctx.lineTo(r, b - rad);
-        ctx.lineTo(r - rad, b);
-        ctx.lineTo(x + rad, b);
-        ctx.lineTo(x, b - rad);
-        ctx.closePath();
-
+        ctx.beginPath();
     }
 
     this.onCheckUpdate = function()
     {
-        if (!this.m_bIsVisible)
+        if (!this.m_bIsVisible || 0 == this.DigitWidths.length)
             return;
 
         if (this.m_lDrawingFirst == -1 || this.m_lDrawingEnd == -1)
