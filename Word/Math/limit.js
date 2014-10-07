@@ -78,7 +78,7 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
             this.elements[0][0] = new CDegreeBase(null, true);
             this.elements[0][0].setBase(this.ContentFName);
-            this.elements[0][0].setBase(this.ContentIterator);
+            this.elements[0][0].setIterator(this.ContentIterator);
             this.elements[0][0].fillContent();
 
             this.FName    = this.ContentFName;
