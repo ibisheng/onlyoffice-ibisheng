@@ -554,6 +554,8 @@
 		};
 
 		CCollaborativeEditing.prototype.addRecalcIndex = function (type, oRecalcIndex) {
+			if (null == oRecalcIndex)
+				return null;
 			var nIndex = 0;
 			var nRecalcType = c_oAscRecalcIndexTypes.RecalcIndexAdd;
 			var oRecalcIndexElement = null;

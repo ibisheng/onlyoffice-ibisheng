@@ -1442,18 +1442,21 @@ CChatMessage.prototype.get_Message = function() { return this.Message; }
     ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
  */
 // Init CoAuthoring
+asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
+{
+	var oChange = new CCollaborativeChanges();
+	oChange.Set_Id( change["Id"] );
+	oChange.Set_Data( change["Data"] );
+	oChange.Set_Color( oColor );
+	CollaborativeEditing.Add_Changes( oChange );
+};
+
 asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 {
-    var Count = e.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Changes = new CCollaborativeChanges();
-        Changes.Set_Id( e[Index]["Id"] );
-        Changes.Set_Data( e[Index]["Data"] );
-        Changes.Set_Color( oColor );
-        CollaborativeEditing.Add_Changes( Changes );
-    }
-}
+	var Count = e.length;
+	for (var Index = 0; Index < Count; ++Index)
+		this._coAuthoringSetChange(e[Index], oColor);
+};
 
 asc_docs_api.prototype._coAuthoringInit = function()
 {
@@ -1565,8 +1568,11 @@ asc_docs_api.prototype._coAuthoringInit = function()
             CollaborativeEditing.Remove_NeedLock(Id);
         }
     };
-	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent, bUseColor)
+	this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad)
 	{
+		var bUseColor;
+		if (bFirstLoad)
+			bUseColor = -1 === CollaborativeEditing.m_nUseType;
         if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None)
             bUseColor = false;
         
@@ -1574,16 +1580,10 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		var nColor = oUser ? oUser.asc_getColorValue() :  null;
         var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
 
-        t._coAuthoringSetChanges(e, oColor);
-		var Count = e.length;
-        // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
-        if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
+        t._coAuthoringSetChange(e, oColor);
+		// т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
+        if (!bFirstLoad && t.bInit_word_control)
             t.sync_CollaborativeChanges();
-	};
-	this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId)
-	{
-        t.CoAuthoringApi.onSaveChanges(e, userId, false, (-1 === CollaborativeEditing.m_nUseType ? true : false));
-        //CollaborativeEditing.Apply_Changes();
 	};
 	this.CoAuthoringApi.onFirstLoadChangesEnd		= function () {
 		t.asyncServerIdEndLoaded ();

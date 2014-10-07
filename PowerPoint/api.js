@@ -461,24 +461,16 @@ asc_docs_api.prototype._coAuthoringInit = function () {
             }
         }
     };
-    this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent) {
+    this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad) {
 		// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
-		var Count = e.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Changes = new CCollaborativeChanges();
-            Changes.Set_Id( e[Index]["Id"]);
-            Changes.Set_Data( e[Index]["Data"]);
-            CollaborativeEditing.Add_Changes( Changes );
-        }
+		var Changes = new CCollaborativeChanges();
+		Changes.Set_Id(e["Id"]);
+		Changes.Set_Data(e["Data"]);
+		CollaborativeEditing.Add_Changes(Changes);
 
         // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
-        if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
+        if (!bFirstLoad && t.bInit_word_control)
             t.sync_CollaborativeChanges();
-    };
-    this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId) {
-        t.CoAuthoringApi.onSaveChanges(e, userId, false);
-        //CollaborativeEditing.Apply_Changes();
     };
 	this.CoAuthoringApi.onFirstLoadChangesEnd		= function () {
 		t.asyncServerIdEndLoaded ();

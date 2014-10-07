@@ -1618,28 +1618,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					worksheet.objectRender.showDrawingObjects(true);
 				}
 			};
-			this.CoAuthoringApi.onSaveChanges				= function (e, userId, bSendEvent) {
+			this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad) {
 				// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
 				var bAddChanges = false;
-				var nCount = e.length;
-				var nIndex = 0;
-				var oElement = null;
 				var oRecalcIndexColumns = null, oRecalcIndexRows = null;
-				for (; nIndex < nCount; ++nIndex) {
-					oElement = e[nIndex];
-					if (!oElement.hasOwnProperty("type")) {
-						t.collaborativeEditing.addChanges(oElement);
-						bAddChanges = true;
-					} else if (false !== bSendEvent) {
-						if ("0" === oElement["type"]) {
-							// Это мы получили recalcIndexColumns
-							oRecalcIndexColumns = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
-						} else if ("1" === oElement["type"]) {
-							// Это мы получили recalcIndexRows
-							oRecalcIndexRows = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
-						}
+				if (!e.hasOwnProperty("type")) {
+					t.collaborativeEditing.addChanges(e);
+					bAddChanges = true;
+				} else if (!bFirstLoad) {
+					if ("10" === e["type"]) {
+						// Это мы получили recalcIndexColumns и recalcIndexRows
+						oRecalcIndexColumns = t.collaborativeEditing.addRecalcIndex('0', e['indexCols']);
+						oRecalcIndexRows = t.collaborativeEditing.addRecalcIndex('1', e['indexRows']);
 					}
-
 				}
 
 				// Теперь нужно пересчитать индексы для lock-элементов
@@ -1649,14 +1640,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 
 				// т.е. если bSendEvent не задан, то посылаем  сообщение + если мы уже открыли документ
-				if (true === bAddChanges && false !== bSendEvent && t.IsSendDocumentLoadCompleate)
+				if (true === bAddChanges && !bFirstLoad && t.IsSendDocumentLoadCompleate)
 					t.syncCollaborativeChanges();
 			};
-			this.CoAuthoringApi.onFirstLoadChanges			= function (e, userId) {
-				t.CoAuthoringApi.onSaveChanges(e, userId, false);
-			};
 			this.CoAuthoringApi.onFirstLoadChangesEnd			= function () {
-				t.asyncServerIdEndLoaded ();
+				t.asyncServerIdEndLoaded();
 			};
 			this.CoAuthoringApi.onSetIndexUser				= function (e) {
 				g_oIdCounter.Set_UserId("" + e);
@@ -1717,10 +1705,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var arrChanges = this.wbModel.SerializeHistory();
 				if (this.collaborativeEditing.getCollaborativeEditing()) {
 					// Пересчетные индексы добавляем только если мы не одни
-					if (recalcIndexColumns)
-						arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
-					if (recalcIndexRows)
-						arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
+					if (recalcIndexColumns || recalcIndexRows)
+						arrChanges.push({"indexCols" : recalcIndexColumns, "indexRows" : recalcIndexRows, "type" : "10"});
 				}
 				if (0 < arrChanges.length || null !== deleteIndex)
 					this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex);

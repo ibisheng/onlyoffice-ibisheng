@@ -4,7 +4,7 @@
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_coAuthV	= '3.0.3';
+	var asc_coAuthV	= '3.0.4';
 
 	// Класс надстройка, для online и offline работы
 	function CDocsCoApi (options) {
@@ -19,7 +19,6 @@
 			this.onLocksReleased = options.onLocksReleased;
 			this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
 			this.onDisconnect = options.onDisconnect;
-			this.onFirstLoadChanges = options.onFirstLoadChanges;
 			this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 			this.onSetIndexUser = options.onSetIndexUser;
@@ -40,11 +39,10 @@
 			this._CoAuthoringApi.onLocksReleased = function (e, bChanges) {t.callback_OnLocksReleased(e, bChanges);};
 			this._CoAuthoringApi.onLocksReleasedEnd = function () {t.callback_OnLocksReleasedEnd();};
 			this._CoAuthoringApi.onDisconnect = function (e, isDisconnectAtAll, isCloseCoAuthoring) {t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);};
-			this._CoAuthoringApi.onFirstLoadChanges = function (e, userId) {t.callback_OnFirstLoadChanges(e, userId);};
 			this._CoAuthoringApi.onFirstLoadChangesEnd = function () {t.callback_OnFirstLoadChangesEnd();};
 			this._CoAuthoringApi.onConnectionStateChanged = function (e) {t.callback_OnConnectionStateChanged(e);};
 			this._CoAuthoringApi.onSetIndexUser = function (e) {t.callback_OnSetIndexUser(e);};
-			this._CoAuthoringApi.onSaveChanges = function (e, userId) {t.callback_OnSaveChanges(e, userId);};
+			this._CoAuthoringApi.onSaveChanges = function (e, userId, bFirstLoad) {t.callback_OnSaveChanges(e, userId, bFirstLoad);};
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
@@ -197,11 +195,6 @@
 			this.onDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);
 	};
 
-	CDocsCoApi.prototype.callback_OnFirstLoadChanges = function (e, userId) {
-		if (this.onFirstLoadChanges)
-			this.onFirstLoadChanges(e, userId);
-	};
-
 	CDocsCoApi.prototype.callback_OnFirstLoadChangesEnd = function () {
 		if (this.onFirstLoadChangesEnd)
 			this.onFirstLoadChangesEnd();
@@ -217,9 +210,9 @@
 			this.onSetIndexUser(e);
 	};
 
-	CDocsCoApi.prototype.callback_OnSaveChanges = function (e, userId) {
+	CDocsCoApi.prototype.callback_OnSaveChanges = function (e, userId, bFirstLoad) {
 		if (this.onSaveChanges)
-			this.onSaveChanges(e, userId);
+			this.onSaveChanges(e, userId, bFirstLoad);
 	};
 	CDocsCoApi.prototype.callback_OnStartCoAuthoring = function (e) {
 		if (this.onStartCoAuthoring)
@@ -254,7 +247,6 @@
 			this.onDisconnect = options.onDisconnect;
 			this.onConnect = options.onConnect;
 			this.onSaveChanges = options.onSaveChanges;
-			this.onFirstLoadChanges = options.onFirstLoadChanges;
 			this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 			this.onUnSaveLock = options.onUnSaveLock;
@@ -288,6 +280,8 @@
 		this.arrayChanges = null;
 		// Время последнего сохранения (для разрыва соединения)
 		this.lastOtherSaveTime = -1;
+		// Локальный индекс изменений
+		this.changesIndex = 0;
 		
 		this._url = "";
 
@@ -442,6 +436,8 @@
 	DocsCoApi.prototype.saveChanges = function (arrayChanges, currentIndex, deleteIndex) {
 		if (null === currentIndex) {
 			this.deleteIndex = deleteIndex;
+			if (null != this.deleteIndex && -1 !== this.deleteIndex)
+				this.deleteIndex += this.changesIndex;
 			this.currentIndex = 0;
 			this.arrayChanges = arrayChanges;
 		} else {
@@ -607,12 +603,7 @@
 			if (bSendEnd && this.onLocksReleasedEnd)
 				this.onLocksReleasedEnd();
         }
-		if (data["changes"]) {
-			this.lastOtherSaveTime = data["time"];
-			if (this.onSaveChanges) {
-				this.onSaveChanges(JSON.parse(data["changes"]), data["user"]);
-			}
-		}
+		this._updateChanges(data["changes"], false);
     };
 	
 	DocsCoApi.prototype._onStartCoAuthoring = function (isStartEvent) {
@@ -648,10 +639,13 @@
 		}
 	};
 	
-	DocsCoApi.prototype._onUnSaveLock = function () {
+	DocsCoApi.prototype._onUnSaveLock = function (data) {
 		// Очищаем предыдущий таймер
 		if (null !== this.saveCallbackErrorTimeOutId)
 			clearTimeout(this.saveCallbackErrorTimeOutId);
+
+		if (-1 !== data['index'])
+			this.changesIndex = data['index'];
 
 		if (this.onUnSaveLock)
 			this.onUnSaveLock();
@@ -667,23 +661,23 @@
 		return false;
 	};
 
-    DocsCoApi.prototype._onFirstLoadChanges = function (allServerChanges) {
-        if (allServerChanges && this.onFirstLoadChanges) {
-			for (var changeId in allServerChanges) {
-				var change = allServerChanges[changeId];
-				var changesOneUser = change["changes"];
-				if (changesOneUser) {
-					if (change["user"] !== this._userId)
-						this.lastOtherSaveTime = change["time"];
-					this.onFirstLoadChanges(JSON.parse(changesOneUser), change["user"]);
+	DocsCoApi.prototype._updateChanges = function (allServerChanges, bFirstLoad) {
+		if (this.onSaveChanges) {
+			if (allServerChanges) {
+				this.changesIndex = allServerChanges['index'];
+				var arrChanges = allServerChanges['arrChanges'];
+				for (var changeId in arrChanges) {
+					var change = arrChanges[changeId];
+					var changesOneUser = change["change"];
+					if (changesOneUser) {
+						if (change["user"] !== this._userId)
+							this.lastOtherSaveTime = change["time"];
+						this.onSaveChanges(JSON.parse(changesOneUser), change["user"], bFirstLoad);
+					}
 				}
 			}
-
-			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
-			if (this.onFirstLoadChangesEnd)
-				this.onFirstLoadChangesEnd();
-        }
-    };
+		}
+	};
 	
 	DocsCoApi.prototype._onSetIndexUser = function (data) {
 		if (data && this.onSetIndexUser) {
@@ -825,8 +819,10 @@
 				}
 				this._onGetLock(data);
 			}
-			// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
-			this._onFirstLoadChanges(data["changes"] || []);
+			this._updateChanges(data["changes"], true);
+			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
+			if (this.onFirstLoadChangesEnd)
+				this.onFirstLoadChangesEnd();
 
 			//Send prebuffered
 			this._sendPrebuffered();
@@ -892,12 +888,8 @@
 					},
 					'locks'		: t.ownedLockBlocks,
 					'sessionId'	: t._id,
-					'server'	: {
-						'https'	: 'https:' === window.location.protocol,
-						'host'	: window.location.hostname,
-						'port'	: window.location.port || '',
-						'path'	: g_sMainServiceLocalUrl
-					},
+					'server'	: window.location.protocol + '//' + window.location.hostname +
+						(window.location.port || '') + g_sMainServiceLocalUrl,
 					'documentFormatSave'	: t._documentFormatSave,
 					'isViewer'	: t._isViewer,
 					'version'	: asc_coAuthV
@@ -917,7 +909,7 @@
 				case 'connectState'		: t._onConnectionStateChanged(dataObject); break;
 				case 'saveChanges'		: t._onSaveChanges(dataObject); break;
 				case 'saveLock'			: t._onSaveLock(dataObject); break;
-				case 'unSaveLock'		: t._onUnSaveLock(); break;
+				case 'unSaveLock'		: t._onUnSaveLock(dataObject); break;
 				case 'savePartChanges'	: t._onSavePartChanges(); break;
 				case 'drop'				: t._onDrop(dataObject); break;
 				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;
