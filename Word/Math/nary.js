@@ -155,6 +155,7 @@ CNary.prototype.fillContent = function(PropsInfo)
             base = new CDegreeBase(prp, true);
             base.setBase(Sign);
             base.setIterator(this.UpperIterator);
+            base.fillContent();
         }
         else if(PropsInfo.supHide && PropsInfo.subHide)
         {

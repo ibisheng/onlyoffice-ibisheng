@@ -958,15 +958,6 @@ CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
 }
-CEqArray.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.setDimension(this.nRow, this.nCol);
-    this.setContent();
-
-    for(var i = 0; i < this.nRow; i++)
-        this.elements[i][0] = contents[i];
-}
 CEqArray.prototype.getPropsForWrite = function()
 {
     return this.Pr;

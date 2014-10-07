@@ -421,7 +421,6 @@ CBorderBox.prototype.Get_Id = function()
 	return this.Id;
 }
 
-
 function CBox(props)
 {
     CBox.superclass.constructor.call(this);

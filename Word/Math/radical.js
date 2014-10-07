@@ -847,11 +847,10 @@ CSignRadical.prototype.relate = function(parent)
     this.Parent = parent;
 }
 
-//context.fill() для заливки
-//Graphics : df()
-
 function CRadical(props)
 {
+    CRadical.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_RADICAL;
 
@@ -872,11 +871,8 @@ function CRadical(props)
     this.gapDegree = 0;
     this.gapWidth = 0; //  в случае со степенью, если ширина степени не нулевая, добавляется расстояние для ширины
 
-    CMathBase.call(this);
-
     if(props !== null && typeof(props)!== "undefined")
         this.init(props);
-
 
 	g_oTableId.Add( this, this.Id );
 }
@@ -884,28 +880,6 @@ Asc.extendClass(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
     this.setProperties(props);
-
-
-    /////
-    //TEST
-    /*var contents = new Array();
-
-    if(props.degHide)
-    {
-        contents.push(new CMathContent());
-        contents.push(new CMathContent());
-    }
-    else
-    {
-        contents.push(new CMathContent());
-        contents.push(new CMathContent());
-    }
-
-    this.fillMathComposition(props, contents);*/
-    //
-    /////
-
-    //this.fillContent();
 }
 CRadical.prototype.setProperties = function(props)
 {
@@ -942,24 +916,6 @@ CRadical.prototype.fillContent = function()
 
         this.addMCToContent([oDegree, oBase]);*/
     }
-}
-CRadical.prototype.fillMathComposition = function(props, contents /*array*/)
-{
-    this.setProperties(props);
-    this.fillContent();
-
-    this.Iterator = contents[0];
-    this.Base     = contents[1];
-
-    //if(this.Iterator != null && props.degHide == false)
-
-    /*if(this.Pr.type == SQUARE_RADICAL)
-        this.elements[0][0] = contents[0];
-    else if(this.Pr.type == DEGREE_RADICAL)
-        this.elements[0][1] = contents[0];
-
-    if(this.Pr.degHide == false)
-        this.elements[0][0] = contents[1];*/
 }
 CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -1226,8 +1182,9 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
 {
 	Writer.WriteLong( historyitem_type_rad );
 
-	Writer.WriteString2( this.getDegree().Id );
-	Writer.WriteString2( this.getBase().Id );	
+    Writer.WriteString2(this.Id);
+	Writer.WriteString2(this.getDegree().Id);
+	Writer.WriteString2(this.getBase().Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
 	
@@ -1246,12 +1203,12 @@ CRadical.prototype.Write_ToBinary2 = function( Writer )
 }
 CRadical.prototype.Read_FromBinary2 = function( Reader )
 {
+
+    this.Id = Reader.GetString2();
+    this.Iterator = g_oTableId.Get_ById( Reader.GetString2());
+    this.Base     = g_oTableId.Get_ById( Reader.GetString2());
+
 	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	
 	props.ctrPrp.Read_FromBinary(Reader);
 	
 	var Flags = Reader.GetLong();
@@ -1260,8 +1217,8 @@ CRadical.prototype.Read_FromBinary2 = function( Reader )
 	
 	if (props.degHide == true)
 		this.Iterator = null;
-	
-	this.fillMathComposition (props, arrElems);
+
+    this.setProperties(props);
 }
 CRadical.prototype.Get_Id = function()
 {

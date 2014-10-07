@@ -76,8 +76,10 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
                 };
             }
 
-            this.elements[0][0] = new CDegree(null, true);
-            this.elements[0][0].fillMathComposition(props, [this.ContentFName, this.ContentIterator]);
+            this.elements[0][0] = new CDegreeBase(null, true);
+            this.elements[0][0].setBase(this.ContentFName);
+            this.elements[0][0].setBase(this.ContentIterator);
+            this.elements[0][0].fillContent();
 
             this.FName    = this.ContentFName;
             this.Iterator = this.ContentIterator;
@@ -93,7 +95,7 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
                 this.FName = this.ContentFName;
 
                 this.Iterator = new CDenominator();
-                this.Iterator.fillMathComposition(this.ContentIterator);
+                this.Iterator.setElement(this.ContentIterator);
 
                 this.elements[0][0] = this.FName;
                 this.elements[1][0] = this.Iterator;
