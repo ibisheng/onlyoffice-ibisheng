@@ -398,6 +398,10 @@ window.native.Call_OnMouseMove = function(e)
 {
     return _api.Call_OnMouseMove(e);
 };
+window.native.Call_OnCheckMouseDown = function(e)
+{
+    return _api.Call_OnCheckMouseDown(e);
+};
 
 window.native.Call_OnKeyDown = function(e)
 {

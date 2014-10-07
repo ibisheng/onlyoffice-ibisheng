@@ -43,6 +43,10 @@ asc_docs_api.prototype["Call_OnMouseMove"] = function(e)
 {
     this.WordControl.m_oDrawingDocument.OnMouseMove(e);
 };
+asc_docs_api.prototype["Call_OnCheckMouseDown"] = function(e)
+{
+    this.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
+};
 
 asc_docs_api.prototype["Call_OnKeyDown"] = function(e)
 {
@@ -3455,7 +3459,7 @@ function asc_menu_ReadAscFill(_params, _cursor)
 {
     var _fill = new CAscFill();
 
-    _fill.type = c_oAscFill.FILL_TYPE_NOFILL;
+    //_fill.type = c_oAscFill.FILL_TYPE_NOFILL;
     var _continue = true;
     while (_continue)
     {

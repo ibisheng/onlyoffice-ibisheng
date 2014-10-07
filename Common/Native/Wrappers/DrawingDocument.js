@@ -1263,6 +1263,22 @@ CDrawingDocument.prototype =
         return true;
     },
 
+    OnCheckMouseDown : function(e)
+    {
+        check_MouseDownEvent(e, true);
+
+        var pos = null;
+        if (this.AutoShapesTrackLockPageNum == -1)
+            pos = this.__DD_ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
+        else
+            pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
+
+        global_mouseEvent.KoefPixToMM = 5;
+        var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page);
+        global_mouseEvent.KoefPixToMM = 1;
+        return _isDrawings;
+    },
+
     OnMouseDown : function(e)
     {
         check_MouseDownEvent(e, true);
@@ -1304,7 +1320,9 @@ CDrawingDocument.prototype =
                 return;
 
             this.Native["DD_NeedScrollToTargetFlag"](true);
+            //global_mouseEvent.KoefPixToMM = 5;
             this.LogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            //global_mouseEvent.KoefPixToMM = 1;
             this.Native["DD_NeedScrollToTargetFlag"](false);
         }
 
