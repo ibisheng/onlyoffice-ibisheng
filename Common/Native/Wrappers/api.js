@@ -1489,7 +1489,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 10:
                     {
-                        _tablePr.TablePaddings = asc_menu_ReadCellBorders(_params, _current);
+                        _tablePr.TableBorders = asc_menu_ReadCellBorders(_params, _current);
                         break;
                     }
                     case 11:
