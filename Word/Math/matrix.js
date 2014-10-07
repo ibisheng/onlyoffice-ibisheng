@@ -2,33 +2,179 @@
 
 var MATH_MC_JC = MCJC_CENTER;
 
-
-function CMColumsPr()
+function CMathMatrixColumnPr()
 {
     this.count = 1;
     this.mcJc  = MCJC_CENTER;
 }
 
+CMathMatrixColumnPr.prototype.Set_FromObject = function(Obj)
+{
+    if (undefined !== Obj.count && null !== Obj.count)
+        this.count = Obj.count;
+    else
+        this.count = 1;
+
+    if (MCJC_LEFT === Obj.mcJc || MCJC_RIGHT === Obj.mcJc || MCJC_CENTER === Obj.mcJc)
+        this.mcJc = Obj.mcJc;
+    else
+        this.mcJc = MCJC_CENTER;
+};
+
+CMathMatrixColumnPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : count
+    // Long : mcJc
+
+    Writer.WriteLong(this.count);
+    Writer.WriteLong(this.mcJc);
+};
+
+CMathMatrixColumnPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : count
+    // Long : mcJc
+
+    this.count = Reader.GetLong();
+    this.mcJc  = Reader.GetLong();
+};
+
+function CMathMatrixPr()
+{
+    this.row     = 1;
+
+    this.cGp     = 0;
+    this.cGpRule = 0;
+    this.cSp     = 0;
+
+    this.rSp     = 0;
+    this.rSpRule = 0;
+
+    this.mcs     = [];
+    this.baseJc  = BASEJC_CENTER;
+    this.plcHide = false;
+}
+
+CMathMatrixPr.prototype.Set_FromObject = function(Obj)
+{
+    if (undefined !== Obj.row && null !== Obj.row)
+        this.row = Obj.row;
+
+    if (undefined !== Obj.cGp && null !== Obj.cGp)
+        this.cGp = Obj.cGp;
+
+    if (undefined !== Obj.cGpRule && null !== Obj.cGpRule)
+        this.cGpRule = Obj.cGpRule;
+
+    if (undefined !== Obj.cSp && null !== Obj.cSp)
+        this.cSp = Obj.cSp;
+
+    if (undefined !== Obj.rSpRule && null !== Obj.rSpRule)
+        this.rSpRule = Obj.rSpRule;
+
+    if (undefined !== Obj.rSp && null !== Obj.rSp)
+        this.rSp = Obj.rSp;
+
+    if(true === Obj.plcHide || 1 === Obj.plcHide)
+        this.plcHide = true;
+    else
+        this.plcHide = false;
+
+    if(BASEJC_CENTER === Obj.baseJc || BASEJC_TOP === Obj.baseJc || BASEJC_BOTTOM === Obj.baseJc)
+        this.baseJc = Obj.baseJc;
+
+    var nColumnsCount = 0;
+    if (undefined !== Obj.mcs.length)
+    {
+        var nMcsCount = Obj.mcs.length;
+        this.mcs.length = nMcsCount;
+
+        for (var nMcsIndex = 0; nMcsIndex < nMcsCount; nMcsIndex++)
+        {
+            this.mcs[nMcsIndex] = new CMathMatrixColumnPr();
+            this.mcs[nMcsIndex].Set_FromObject(Obj.mcs[nMcsIndex]);
+            nColumnsCount += this.mcs[nMcsIndex].count;
+        }
+    }
+
+    return nColumnsCount;
+};
+
+CMathMatrixPr.prototype.Get_ColumnsCount = function()
+{
+    var nColumnsCount = 0;
+    for (var nMcsIndex = 0, nMcsCount = this.mcs.length; nMcsIndex < nMcsCount; nMcsIndex++)
+    {
+        nColumnsCount += this.mcs[nMcsIndex].count;
+    }
+    return nColumnsCount;
+};
+
+CMathMatrixPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long  : row
+    // Long  : cGp
+    // Long  : cGpRule
+    // Long  : rSp
+    // Long  : rSpRule
+    // Long  : baseJc
+    // Bool  : plcHide
+    // Long  : count of mcs
+    // Array : mcs (CMathMatrixColumnPr)
+
+    Writer.WriteLong(this.row);
+    Writer.WriteLong(this.cGp);
+    Writer.WriteLong(this.cGpRule);
+    Writer.WriteLong(this.rSp);
+    Writer.WriteLong(this.rSpRule);
+    Writer.WriteLong(this.baseJc);
+    Writer.WriteBool(this.plcHide);
+
+    var nMcsCount = this.mcs.length;
+    Writer.WriteLong(nMcsCount);
+    for (var nIndex = 0; nIndex < nMcsCount; nIndex++)
+    {
+        this.mcs[nIndex].Write_ToBinary(Writer);
+    }
+};
+
+CMathMatrixPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long  : row
+    // Long  : cGp
+    // Long  : cGpRule
+    // Long  : rSp
+    // Long  : rSpRule
+    // Long  : baseJc
+    // Bool  : plcHide
+    // Long  : count of mcs
+    // Array : mcs (CMColumnsPr)
+
+    this.row = Reader.GetLong();
+    this.cGp = Reader.GetLong();
+    this.cGpRule = Reader.GetLong();
+    this.rSp     = Reader.GetLong();
+    this.rSpRule = Reader.GetLong();
+    this.baseJc  = Reader.GetLong();
+    this.plcHide = Reader.GetBool();
+
+    var nMcsCount = Reader.GetLong();;
+    this.mcs.length = nMcsCount;
+    for (var nIndex = 0; nIndex < nMcsCount; nIndex++)
+    {
+        this.mcs[nIndex] = new CMathMatrixColumnPr();
+        this.mcs[nIndex].Read_FromBinary(Reader);
+    }
+};
+
 function CMathMatrix(props)
 {
+    CMathMatrix.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_MATRIX;
 
-    this.Pr =
-    {
-        row:        1,
-
-        cGp:        0,
-        cGpRule:    0,
-        cSp:        0,
-
-        rSp:        0,
-        rSpRule:    0,
-
-        mcs:        [],
-        baseJc:     BASEJC_CENTER,
-        plcHide:    false
-    };
+    this.Pr = new CMathMatrixPr();
 
     this.spaceRow    = null;
     this.spaceColumn = null;
@@ -37,8 +183,6 @@ function CMathMatrix(props)
     this.column     = 0;
 
     this.setDefaultSpace();
-
-    CMathMatrix.superclass.constructor.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -345,20 +489,6 @@ CMathMatrix.prototype.findDistance = function() // для получения п�
 
     return {w : w, h: h };
 }
-CMathMatrix.prototype.addRow = function()
-{
-    this.nRow++;
-
-    for(var j = 0; j < this.nCol; j++)
-    {
-        this.elements[this.nRow-1][j] = new CMathContent();
-        //this.elements[this.nRow-1][j].relate(this);
-        //this.elements[this.nRow-1][j].setComposition(this.Composition);
-    }
-
-    // не будет работать, т.к. нужен для пересчета oMeasure
-    this.recalculateSize();
-}
 CMathMatrix.prototype.setRowGapRule = function(rule, gap)
 {
     this.spaceRow.rule = rule;
@@ -441,96 +571,24 @@ CMathMatrix.prototype.baseJustification = function(type)
 CMathMatrix.prototype.setProperties = function(props)
 {
     this.setCtrPrp(props.ctrPrp);
+    this.Pr.Set_FromObject(props);
 
-    if(typeof(props.row) !== "undefined" && props.row !== null)
-        this.Pr.row = props.row;
-
-    /*if(typeof(props.column) !== "undefined" && props.column !== null)
-        this.nCol = props.column;*/
-
-    if(props.plcHide === true || props.plcHide === 1)
-        this.Pr.plcHide = true;
-
-    if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
-        this.Pr.baseJc = props.baseJc;
-
-    if(props.mcs.length == 0) // ни одного элемента нет, а колонки могут быть
-    {
-        // TODO
-    }
-    else
-    {
-        this.column = 0;
-        this.Pr.mcs.length = 0;
-
-        var lng = props.mcs.length;
-
-        for(var i = 0; i < lng; i++)
-        {
-            var MC = props.mcs[i];
-            this.Pr.mcs[i] = new CMColumsPr();
-
-            if(MC.count !== null && MC.count + 0 == MC.count)
-                this.Pr.mcs[i].count = MC.count;
-            else
-                this.Pr.mcs[i].count = 1;
-
-            if(MC.mcJc == MCJC_LEFT || MC.mcJc == MCJC_RIGHT || MC.mcJc == MCJC_CENTER)
-                this.Pr.mcs[i].mcJc = MC.mcJc;
-            else
-                this.Pr.mcs[i].mcJc = MCJC_CENTER;
-
-            this.column += this.Pr.mcs[i].count;
-
-        }
-    }
-
-
-    /*if(typeof(props.mcJc) !== "undefined" && props.mcJc !== null && props.mcJc.constructor.name == "Array" && props.mcJc.length == props.column)
-    {
-        for(var i = 0; i < this.nCol; i++)
-        {
-            if(props.mcJc[i] == MCJC_LEFT || props.mcJc[i] == MCJC_RIGHT || props.mcJc[i] == MCJC_CENTER)
-                this.Pr.mcJc[i] = props.mcJc[i];
-            else
-                this.Pr.mcJc[i] = MCJC_CENTER;
-        }
-    }
-    else
-    {
-        for(var j = 0; j < this.nCol; j++)
-            this.Pr.mcJc[j] = MCJC_CENTER;
-    }*/
-
-
-    this.Pr.cGpRule = props.cGpRule;
-    this.Pr.cGp     = props.cGp;
-    this.Pr.cSp     = props.cSp;
-
-    this.Pr.rSpRule = props.rSpRule;
-    this.Pr.rSp     = props.rSp;
+    this.column = this.Pr.Get_ColumnsCount();
 }
 CMathMatrix.prototype.fillContent = function()
 {
-    /*if(this.nRow == 0)
-        this.nRow = 1;
-
-    if(this.nCol == 0)
-        this.nCol = 1;*/
-
     this.setDimension(this.Pr.row, this.column);
     this.setContent();
 }
-CMathMatrix.prototype.fillMathComposition = function(props, contents /*array*/)
+
+CMathMatrix.prototype.getRowsCount = function()
 {
-    this.setProperties(props);
-    this.fillContent();
-
-    for(var i = 0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            this.elements[i][j] = contents[j + i*this.nCol];
-
-}
+    return this.Pr.row;
+};
+CMathMatrix.prototype.getColsCount = function()
+{
+    return this.column;
+};
 CMathMatrix.prototype.getPropsForWrite = function()
 {
     var props = {};
@@ -560,97 +618,63 @@ CMathMatrix.prototype.Refresh_RecalcData = function(Data)
 {
 }
 CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
-{	
+{
+    var nRowsCount = this.getRowsCount();
+    var nColsCount = this.getColsCount();
+
 	Writer.WriteLong( historyitem_type_matrix );
 
-	Writer.WriteLong( this.nRow );
-	Writer.WriteLong( this.nCol );
-	for(var i=0; i<this.nRow; i++)
-		for(var j=0; j<this.nCol; j++)
-			Writer.WriteString2( this.getElement(i,j).Id );
+    // String : Id
+    // Long   : Rows count
+    // Long   : Cols count
+    // Array[Rows * Cols] of Strings : Id
+    // Variable : CtrlPr
+    // Variable : MathPr
+
+    Writer.WriteString2(this.Id);
+	Writer.WriteLong(nRowsCount);
+	Writer.WriteLong(nColsCount);
+
+	for(var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
+    {
+        for (var nColsIndex = 0; nColsIndex < nColsCount; nColsIndex++)
+        {
+            Writer.WriteString2(this.getElement(nRowIndex, nColsIndex).Id);
+        }
+    }
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.Pr.baseJc )
-    {
-		Writer.WriteLong( this.Pr.baseJc );
-		Flags |= 1;
-	}
-	if ( undefined != this.Pr.cGp )
-    {
-		Writer.WriteLong( this.Pr.cGp );
-		Flags |= 2;
-	}
-	if ( undefined != this.Pr.cGpRule )
-    {
-		Writer.WriteLong( this.Pr.cGpRule );
-		Flags |= 4;
-	}
-	if ( undefined != this.Pr.cSp )
-    {
-		Writer.WriteLong( this.Pr.cSp );
-		Flags |= 8;
-	}
-	if ( undefined != this.Pr.mcs )
-    {
-		Writer.WriteLong( this.Pr.mcs );
-		Flags |= 16;
-	}
-	if ( undefined != this.Pr.plcHide )
-    {
-		Writer.WriteBool( this.Pr.plcHide );
-		Flags |= 32;
-	}
-	if ( undefined != this.Pr.rSp )
-    {
-		Writer.WriteLong( this.Pr.rSp );
-		Flags |= 64;
-	}
-	if ( undefined != this.Pr.rSpRule )
-    {
-		Writer.WriteLong( this.Pr.rSpRule );
-		Flags |= 128;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
+    this.Pr.Write_ToBinary(Writer);
 }
 CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
 {
-	var props = {ctrPrp: new CTextPr()};
-	var arrElems = [];
-	
-	props.row = Reader.GetLong();
-	props.col = Reader.GetLong();
-	for(var i=0; i<props.row; i++)
-		for(var j=0; j<props.col; j++)
-			arrElems.push(g_oTableId.Get_ById( Reader.GetString2()));
-	
-	props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.baseJc = Reader.GetLong();
-	if ( Flags & 2 )
-		props.cGp = Reader.GetLong();
-	if ( Flags & 4 )
-		props.cGpRule = Reader.GetLong();
-	if ( Flags & 8 )
-		props.cSp = Reader.GetLong();
-	if ( Flags & 16 )
-		props.mcs = Reader.GetLong();
-	if ( Flags & 32 )
-		props.plcHide = Reader.GetBool();
-	if ( Flags & 64 )
-		props.rSp = Reader.GetLong();
-	if ( Flags & 128 )
-		props.rSpRule = Reader.GetLong()
-		
-	this.fillMathComposition (props, arrElems);
+    // String : Id
+    // Long   : Rows count
+    // Long   : Cols count
+    // Array[Rows * Cols] of Strings : Id
+    // Variable : CtrlPr
+    // Variable : MathPr
+
+    this.Id = Reader.GetString2();
+    var nRowsCount = Reader.GetLong();
+    var nColsCount = Reader.GetLong();
+
+    this.setDimension(nRowsCount, nColsCount);
+
+    this.elements = [];
+    for (var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
+    {
+        this.elements[nRowIndex] = [];
+        for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+        {
+            this.elements[nRowIndex][nColIndex] = g_oTableId.Get_ById(Reader.GetString2());
+        }
+    }
+
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
+
+    this.column = this.Pr.Get_ColumnsCount();
 }
 CMathMatrix.prototype.Get_Id = function()
 {
@@ -897,7 +921,7 @@ CEqArray.prototype.setProperties = function(props)
         this.Pr.objDist = props.objDist;
 
     var mcs = [];
-    mcs.push(new CMColumsPr());
+    mcs.push(new CMathMatrixColumnPr());
 
     var Pr =
     {
