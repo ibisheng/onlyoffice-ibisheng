@@ -3483,7 +3483,7 @@ function CThumbnailsManager()
 
             this.m_bIsUpdate = bIsUpdate;
 
-            if (bIsUpdate)
+            if (bIsUpdate && this.m_oWordControl.m_oScrollThumbApi != null)
             {
                 var y1 = this.m_arrPages[pageNum].top - this.const_border_w;
                 var y2 = this.m_arrPages[pageNum].bottom + this.const_border_w;
