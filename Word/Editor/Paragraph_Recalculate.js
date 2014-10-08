@@ -34,15 +34,15 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         // смотрим изменяeтся ли положение flow-объектов, привязанных к данному параграфу, кроме того, если по какой-то
         // причине пересчет возвращает не recalcresult_NextElement, тогда тоже отменяем быстрый пересчет
 
-        var PageNum          = this.Get_StartPage_Absolute();
+        var PageNum          = this.Get_StartPage_Relative();
         var OldBounds        = this.Pages[0].Bounds;
         var FastRecalcResult = this.Recalculate_Page(PageNum, true);
 
         if (FastRecalcResult === recalcresult_NextElement && 1 === this.Pages.length && true === this.Pages[0].Bounds.Compare(OldBounds))
         {
             //console.log("Recalc Fast WholeParagraph 1 page");
-
-            return [PageNum];
+            var PageNum_abs = this.Get_StartPage_Absolute();
+            return [PageNum_abs];
         }
     }
     else if (2 === this.Pages.length)
@@ -65,7 +65,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         var OldLinesCount_0 = this.Pages[0].EndLine - this.Pages[0].StartLine + 1;
         var OldLinesCount_1 = this.Pages[1].EndLine - this.Pages[1].StartLine + 1;
 
-        var PageNum = this.Get_StartPage_Absolute();
+        var PageNum = this.Get_StartPage_Relative();
         var FastRecalcResult = this.Recalculate_Page(PageNum, true);
 
         if (FastRecalcResult !== recalcresult_NextPage)
@@ -101,10 +101,13 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
 
         // Если параграф начинается с новой страницы, тогда не надо перерисовывать первую страницу, т.к. она
         // изначально была пустая, и сейчас пустая.
+
+        var PageNum_abs = this.Get_StartPage_Absolute();
+
         if (true === StartFromNewPage)
-            return [PageNum + 1];
+            return [PageNum_abs + 1];
         else
-            return [PageNum, PageNum + 1];
+            return [PageNum_abs, PageNum_abs + 1];
     }
 
     return [];
