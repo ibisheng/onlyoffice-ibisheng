@@ -3418,7 +3418,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype.asc_nativeApplyChanges = function(changes)
 		{
-			this.CoAuthoringApi.onSaveChanges(changes, null, false);
+			for (var i = 0, l = changes.length; i < l; ++i) {
+				this.CoAuthoringApi.onSaveChanges(changes[i], null, true);
+			}
 			this.collaborativeEditing.applyChanges();
 		};
 
