@@ -4207,14 +4207,16 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateVerRuler();
     }
 
-    this.Update_MathTrack = function(IsActive, Math, X, Y, W, H, PageIndex)
+    this.Update_MathTrack = function(IsActive, IsContentActive, Math, X, Y, W, H, PageIndex)
     {       
         this.MathRect.IsActive = IsActive;
         
         if (true === IsActive)
         {
-            if (null !== Math)
+            if (null !== Math && true === IsContentActive)
                 this.MathRect.ContentSelection = Math.Get_ContentSelection();
+            else
+                this.MathRect.ContentSelection = null;
 
             var PixelError = this.GetMMPerDot(1) * 3;
 

@@ -8376,11 +8376,6 @@ Paragraph.prototype =
 
             editor.sync_HyperlinkPropCallback( HyperProps );
         }
-        
-        if (null !== Math)
-            this.Parent.DrawingDocument.Update_MathTrack(true, Math, Math.X, Math.Y, Math.Width, Math.Height, this.CurPos.PagesPos + this.Get_StartPage_Absolute());
-        else
-            this.Parent.DrawingDocument.Update_MathTrack(false);
     },
 
     // Функция, которую нужно вызвать перед удалением данного элемента

@@ -11569,11 +11569,6 @@ CDocument.prototype =
                 else
                     this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
             }
-            else
-            {
-                // Если выделено больше 1 элемента отключаем рамку формул
-                this.DrawingDocument.Update_MathTrack(false);
-            }
         }
 
         // Сообщаем, что список составлен
@@ -11716,15 +11711,16 @@ CDocument.prototype =
                 {
                     if ( false === this.Selection_IsEmpty() )
                     {
-                        this.DrawingDocument.TargetEnd();
-                        this.DrawingDocument.SelectEnabled(true);
-                        this.DrawingDocument.SelectShow();
-
                         if ( true !== this.Selection.Start )
                         {
                             this.Internal_CheckCurPage();
                             this.RecalculateCurPos();
                         }
+                        this.private_UpdateTracks(true, false);
+
+                        this.DrawingDocument.TargetEnd();
+                        this.DrawingDocument.SelectEnabled(true);
+                        this.DrawingDocument.SelectShow();
                     }
                     else
                     {
@@ -11733,11 +11729,11 @@ CDocument.prototype =
                             this.Selection_Remove();
                         }
                         
-                        this.DrawingDocument.SelectEnabled(false);
-
                         this.Internal_CheckCurPage();
                         this.RecalculateCurPos();
+                        this.private_UpdateTracks(true, true);
 
+                        this.DrawingDocument.SelectEnabled(false);
                         this.DrawingDocument.TargetStart();
                         this.DrawingDocument.TargetShow();
                     }
@@ -11745,18 +11741,29 @@ CDocument.prototype =
             }
             else
             {
-                this.DrawingDocument.SelectEnabled(false);
-
                 this.Selection_Remove();
                 this.Internal_CheckCurPage();
                 this.RecalculateCurPos();
+                this.private_UpdateTracks(false, false);
 
+                this.DrawingDocument.SelectEnabled(false);
                 this.DrawingDocument.TargetShow();
             }
         }
         
         // Обновим состояние кнопок Copy/Cut
         this.Document_UpdateCopyCutState();
+    },
+
+    private_UpdateTracks : function(bSelection, bEmptySelection)
+    {
+        // Обновляем трэк формул
+        var oSelectedInfo = this.Get_SelectedElementsInfo();
+        var Math = oSelectedInfo.Get_Math();
+        if (null !== Math)
+            this.DrawingDocument.Update_MathTrack(true, (false === bSelection || true === bEmptySelection ? true : false), Math, Math.X, Math.Y, Math.Width, Math.Height, Math.Paragraph.CurPos.PagesPos + Math.Paragraph.Get_StartPage_Absolute());
+        else
+            this.DrawingDocument.Update_MathTrack(false);
     },
 
     Document_UpdateUndoRedoState : function()

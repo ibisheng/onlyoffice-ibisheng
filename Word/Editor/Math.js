@@ -1625,7 +1625,7 @@ ParaMath.prototype.Get_ContentSelection = function()
 {
     var oContent = this.GetSelectContent().Content;
 
-    if (oContent.bRoot || true === this.bSelectionUse)
+    if (oContent.bRoot)
         return null;
 
     return {X : oContent.pos.x + this.X, Y : oContent.pos.y + this.Y, W : oContent.size.width, H : oContent.size.height};
