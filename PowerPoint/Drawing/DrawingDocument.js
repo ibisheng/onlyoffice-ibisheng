@@ -4022,10 +4022,16 @@ function CThumbnailsManager()
 
             page.Draw(context, page.left, page.top, page.right - page.left, page.bottom - page.top);
 
+            /*
             if (!page.IsSelected)
                 g.b_color1(0, 0, 0, 255);
             else
                 g.b_color1(210, 72, 72, 255);
+            */
+            if (!page.IsLocked)
+                g.b_color1(0, 0, 0, 255);
+            else
+                g.b_color1(211, 79, 79, 255);
 
             g.t("" + (i+1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3));
         }
@@ -4054,9 +4060,9 @@ function CThumbnailsManager()
         //var _style_select_focus = "#FFEF9D";
 
         //var _style_select       = "#E98859";
-        var _style_select       = "#D24848";
-        var _style_focus        = "#B0B0B0";
-        var _style_select_focus = "#ED9870";
+        var _style_select       = "#848484";
+        var _style_focus        = "#CFCFCF";
+        var _style_select_focus = "#CFCFCF";
 
         // selected pages
         context.fillStyle = _style_select;
@@ -4067,6 +4073,9 @@ function CThumbnailsManager()
 
             if (page.IsLocked)
             {
+                var _lock_focus = "#CFCFCF";
+                var _lock_color = "#D34F4F";
+                /*
                 if (page.IsSelected && page.IsFocused)
                 {
                     this.FocusRectFlat("#CA2B1F", context, page.left, page.top, page.right, page.bottom);
@@ -4083,6 +4092,17 @@ function CThumbnailsManager()
                 {
                     this.FocusRectFlat("#EE3525", context, page.left, page.top, page.right, page.bottom);
                 }
+                */
+
+                if (page.IsFocused)
+                {
+                    this.FocusRectFlat(_lock_focus, context, page.left, page.top, page.right, page.bottom);
+                }
+                else
+                {
+                    this.FocusRectFlat(_lock_color, context, page.left, page.top, page.right, page.bottom);
+                }
+
                 continue;
             }
 
@@ -4130,6 +4150,15 @@ function CThumbnailsManager()
         ctx.stroke();
 
         ctx.beginPath();
+
+        if (true)
+        {
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.rect(x - 0.5, y - 0.5, r - x + 1, b - y + 1);
+            ctx.stroke();
+            ctx.beginPath();
+        }
     }
 
     this.onCheckUpdate = function()
