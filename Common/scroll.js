@@ -61,6 +61,10 @@ function CArrowDrawer( settings ) {
     this.Size = 16;
     this.SizeW = 16;
     this.SizeH = 16;
+
+    this.SizeNaturalW = this.SizeW;
+    this.SizeNaturalH = this.SizeH;
+
     this.IsRetina = false;
 
     // просто рисовать - неправильно. рисуется с антиалиазингом - и получается некрасиво
@@ -143,9 +147,15 @@ CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
     this.SizeH = Math.max( sizeH, 1 );
     this.IsRetina = is_retina;
 
+    this.SizeNaturalW = this.SizeW;
+    this.SizeNaturalH = this.SizeH;
+
     if ( this.IsRetina ) {
         this.SizeW <<= 1;
         this.SizeH <<= 1;
+
+        this.SizeNaturalW <<= 1;
+        this.SizeNaturalH <<= 1;
     }
 
     this.ImageLeft = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
@@ -193,6 +203,10 @@ CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
     var len = 6;
     if ( this.SizeH < 6 )
         return;
+
+    if (this.IsRetina)
+        len <<= 1;
+
 //        else (this.SizeH > 12)
 //        len = this.Size - 8;
 
@@ -281,13 +295,19 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
         tempIMG1 = document.createElement( 'canvas' ),
         tempIMG2 = document.createElement( 'canvas' );
 
-    tempIMG1.width = 14;
-    tempIMG1.height = 15;
-    tempIMG2.width = 14;
-    tempIMG2.height = 15;
+    tempIMG1.width = this.SizeNaturalW;
+    tempIMG1.height = this.SizeNaturalH;
+    tempIMG2.width = this.SizeNaturalW;
+    tempIMG2.height = this.SizeNaturalH;
 
     var ctx1 = tempIMG1.getContext('2d'),
         ctx2 = tempIMG2.getContext('2d');
+
+    if (this.IsRetina)
+    {
+        ctx1.setTransform(2, 0, 0, 2, 0, 0);
+        ctx2.setTransform(2, 0, 0, 2, 0, 0);
+    }
 
     function fadeIn(){
 
@@ -499,10 +519,10 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
                 // slow method
                 var _ctx = img.getContext( "2d" );
 
-                var _data = _ctx.getImageData( 0, 0, this.SizeW, this.SizeH );
-                var _data2 = _ctx.getImageData( 0, 0, this.SizeW, this.SizeH );
+                var _data = _ctx.getImageData( 0, 0, this.SizeNaturalW, this.SizeNaturalH );
+                var _data2 = _ctx.getImageData( 0, 0, this.SizeNaturalW, this.SizeNaturalH );
 
-                var _len = 4 * this.SizeW * this.SizeH;
+                var _len = 4 * this.SizeNaturalW * this.SizeNaturalH;
                 for ( var i = 0; i < _len; i += 4 ) {
                     if ( _data.data[i + 3] == 255 ) {
                         _data.data[i] = 255;// - _data.data[i];
@@ -559,10 +579,14 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
         xDeltaIMG = 0, yDeltaIMG = 0, xDeltaBORDER = 0.5, yDeltaBORDER = 1.5,
         tempIMG1 = document.createElement( 'canvas' );
 
-    tempIMG1.width = 14;
-    tempIMG1.height = 15;
+    tempIMG1.width = this.SizeNaturalW;
+    tempIMG1.height = this.SizeNaturalH;
 
     var ctx1 = tempIMG1.getContext('2d');
+    if (this.IsRetina)
+    {
+        ctx1.setTransform(2, 0, 0, 2, 0, 0);
+    }
 
     function fadeIn(){
 
@@ -603,7 +627,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
 
         if ( startColorFadeIn.R >= 207 ) {
             that.startColorFadeInOutStart1 = startColorFadeIn;
-            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
+            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG, that.SizeW, that.SizeH);
             that.fadeInTimeout1 = setTimeout( fadeIn, that.fadeInFadeOutDelay );
         }
         else {
@@ -673,7 +697,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
 
         if ( startColorFadeOut.R <= 241 ) {
             that.startColorFadeInOutStart1 = startColorFadeOut;
-            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
+            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG, that.SizeW, that.SizeH);
             that.fadeOutTimeout1 = setTimeout( fadeOut, that.fadeInFadeOutDelay );
         }
         else {
@@ -984,10 +1008,15 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
         xDeltaIMG = 0, yDeltaIMG = 0, xDeltaBORDER = 0.5, yDeltaBORDER = 1.5,
         tempIMG1 = document.createElement( 'canvas' );
 
-    tempIMG1.width = 14;
-    tempIMG1.height = 15;
+    tempIMG1.width = this.SizeNaturalW;
+    tempIMG1.height = this.SizeNaturalH;
 
     var ctx1 = tempIMG1.getContext('2d');
+
+    if (this.IsRetina)
+    {
+        ctx1.setTransform(2, 0, 0, 2, 0, 0);
+    }
 
     function fadeIn(){
 
@@ -1028,7 +1057,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
 
         if ( startColorFadeIn.R >= 207 ) {
             that.startColorFadeInOutStart2 = startColorFadeIn;
-            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
+            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG, that.SizeW, that.SizeH);
             that.fadeInTimeout2 = setTimeout( fadeIn, that.fadeInFadeOutDelay );
         }
         else {
@@ -1098,7 +1127,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
 
         if ( startColorFadeOut.R <= 241 ) {
             that.startColorFadeInOutStart2 = startColorFadeOut;
-            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG);
+            ctx.drawImage(tempIMG1,x1 + xDeltaIMG,y1 + yDeltaIMG, that.SizeW, that.SizeH);
             that.fadeOutTimeout2 = setTimeout( fadeOut, that.fadeInFadeOutDelay );
         }
         else {
