@@ -515,6 +515,7 @@ function CEditorPage(api)
         if (old != this.bIsRetinaSupport)
         {
             // сбросить кэш страниц
+            this.onButtonTabsDraw();
         }
     }
 
@@ -522,7 +523,7 @@ function CEditorPage(api)
     {
         if (this.bIsRetinaSupport)
         {
-            if (htmlElem.id == "id_viewer" || htmlElem.id == "id_hor_ruler" || htmlElem.id == "id_vert_ruler")
+            if (htmlElem.id == "id_viewer" || htmlElem.id == "id_hor_ruler" || htmlElem.id == "id_vert_ruler" || htmlElem.id == "id_buttonTabs")
                 return true;
         }
         return false;
@@ -968,25 +969,72 @@ function CEditorPage(api)
 
     this.onButtonTabsClick = function()
     {
-        if (false === oThis.m_oApi.bInit_word_control)
-            return;
-
         var oWordControl = oThis;
         if (oWordControl.m_nTabsType == g_tabtype_left)
         {
             oWordControl.m_nTabsType = g_tabtype_center;
-            oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px -37px";
+            oWordControl.onButtonTabsDraw();
         }
         else if (oWordControl.m_nTabsType == g_tabtype_center)
         {
             oWordControl.m_nTabsType = g_tabtype_right;
-            oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px -18px";
+            oWordControl.onButtonTabsDraw();
         }
         else
         {
             oWordControl.m_nTabsType = g_tabtype_left;
-            oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px 0px";
+            oWordControl
+                .onButtonTabsDraw();
         }
+    }
+
+    this.onButtonTabsDraw = function()
+    {
+        var _ctx = this.m_oLeftRuler_buttonsTabs.HtmlElement.getContext('2d');
+        if (this.bIsRetinaSupport)
+        {
+            _ctx.setTransform(2, 0, 0, 2, 0, 0);
+        }
+        else
+        {
+            _ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+
+        var _width = 19;
+        var _height = 19;
+
+        _ctx.clearRect(0, 0, 19, 19);
+
+        _ctx.lineWidth = 1;
+        _ctx.strokeStyle = "#BBBEC2";
+        _ctx.strokeRect(2.5, 3.5, 14, 14);
+        _ctx.beginPath();
+
+        _ctx.strokeStyle = "#3E3E3E";
+
+        _ctx.lineWidth = 2;
+        if (this.m_nTabsType == g_tabtype_left)
+        {
+            _ctx.moveTo(8, 9);
+            _ctx.lineTo(8, 14);
+            _ctx.lineTo(13, 14);
+        }
+        else if (this.m_nTabsType == g_tabtype_center)
+        {
+            _ctx.moveTo(6, 14);
+            _ctx.lineTo(14, 14);
+            _ctx.moveTo(10, 9);
+            _ctx.lineTo(10, 14);
+        }
+        else
+        {
+            _ctx.moveTo(12, 9);
+            _ctx.lineTo(12, 14);
+            _ctx.lineTo(7, 14);
+        }
+
+        _ctx.stroke();
+        _ctx.beginPath();
     }
 
     this.onPrevPage = function()
@@ -2146,6 +2194,7 @@ function CEditorPage(api)
         //console.log("resize");
         this.CheckRetinaDisplay();
         this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
+        this.onButtonTabsDraw();
         this.DemonstrationManager.Resize();
 
         if (this.checkNeedHorScroll())
@@ -2193,6 +2242,7 @@ function CEditorPage(api)
     this.OnResize2 = function(isAttack)
     {
         this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
+        this.onButtonTabsDraw();
         this.DemonstrationManager.Resize();
 
         if (this.checkNeedHorScroll())

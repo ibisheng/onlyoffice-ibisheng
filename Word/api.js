@@ -1107,15 +1107,6 @@ asc_docs_api.prototype.CreateCSS = function()
     style0.innerHTML = ".block_elem { position:absolute;padding:0;margin:0; }";
     _head.appendChild(style0);
 
-    var style1 = document.createElement('style');
-    style1.type = 'text/css';
-    style1.innerHTML = ".buttonTabs {\
-background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA5CAMAAADjueCuAAAABGdBTUEAALGPC/xhBQAAAEhQTFRFAAAAWFhYZWVlSEhIY2NjV1dXQ0NDYWFhYmJiTk5OVlZWYGBgVFRUS0tLbGxsRERETExMZmZmVVVVXl5eR0dHa2trPj4+u77CpAZQrwAAAAF0Uk5TAEDm2GYAAABwSURBVDjL1dHHDoAgEEVR7NLr4P//qQm6EMaFxtje8oTF5ELIpU35Fstf3GegsPEBG+uwSYpNB1qNKreoDeNw/r6dLr/tnFpbbNZj8wKbk8W/1d6ZPjfrhdHx9c4fbA9wzMYWm3OFhbQmbC2ue6z9DCH/Exf/mU3YAAAAAElFTkSuQmCC);\
-background-position: 0px 0px;\
-background-repeat: no-repeat;\
-}";
-    _head.appendChild(style1);
-
     var style2 = document.createElement('style');
     style2.type = 'text/css';
     style2.innerHTML = ".buttonRuler {\
@@ -1152,7 +1143,7 @@ asc_docs_api.prototype.CreateComponents = function()
 	if (element != null)
 		element.innerHTML = "<div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
-									<div id=\"id_buttonTabs\" class=\"block_elem buttonTabs\"></div>\
+									<canvas id=\"id_buttonTabs\" class=\"block_elem\"></canvas>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
 								</div>\
 									<div id=\"id_panel_top\" class=\"block_elem\">\
