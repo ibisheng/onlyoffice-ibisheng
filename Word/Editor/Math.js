@@ -1694,3 +1694,61 @@ ParaMath.prototype.Make_AutoCorrect = function()
 {
     return false;
 };
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Классы с изменениями
+//----------------------------------------------------------------------------------------------------------------------
+var historyitem_Math_AddItem                   =  1; // Добавляем элемент
+var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
+var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
+
+function ReadChanges_FromBinary(Reader, Class)
+{
+    var Type = Reader.GetLong();
+    var Changes = null;
+
+    switch(Type)
+    {
+        case historyitem_Math_CtrPrpFSize: Changes = new CChangesMathFontSize(); break;
+    }
+
+    if (null !== Changes)
+        Changes.Load_Changes(Reader, Class);
+}
+
+function WriteChanges_ToBinary(Changes, Writer)
+{
+    Writer.WriteLong(Changes.Type);
+    Changes.Save_Changes(Writer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Классы с изменениями
+//----------------------------------------------------------------------------------------------------------------------
+function CChangesMathFontSize(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+
+CChangesMathFontSize.prototype.Type = historyitem_Math_CtrPrpFSize;
+
+CChangesMathFontSize.prototype.Undo = function(Class)
+{
+    Class.raw_SetFontSize(this.Old);
+};
+CChangesMathFontSize.prototype.Redo = function(Class)
+{
+    Class.raw_SetFontSize(this.New);
+};
+CChangesMathFontSize.prototype.Save_Changes = function(Writer)
+{
+    // Long : New
+    Writer.WriteLong(this.New);
+};
+CChangesMathFontSize.prototype.Load_Changes = function(Reader, Class)
+{
+    this.New = Reader.GetLong();
+    this.Redo(Class);
+};

@@ -163,13 +163,6 @@ CLimit.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CLimit.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_lim );
-}
-CLimit.prototype.Load_Changes = function(Reader)
-{
-}
 CLimit.prototype.Refresh_RecalcData = function(Data)
 {
 }

@@ -641,13 +641,6 @@ CAccent.prototype.setProperties = function(props)
 
     this.RecalcInfo.bProps = true;
 }
-CAccent.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_acc );
-}
-CAccent.prototype.Load_Changes = function(Reader)
-{
-}
 CAccent.prototype.Refresh_RecalcData = function(Data)
 {
 }

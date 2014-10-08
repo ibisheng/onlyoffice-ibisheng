@@ -1145,9 +1145,17 @@ CMathBase.prototype =
     },
     Set_FontSizeCtrPrp: function(Value)
     {
-        History.Add( this, { Type : historyitem_Math_CtrPrpFSize, New : Value, Old : this.CtrPrp.FontSize } );
-        this.CtrPrp.FontSize = Value;
+        History.Add(this, new CChangesMathFontSize(Value, this.CtrPrp.FontSize));
+        this.raw_SetFontSize(Value);
+    },
+
+    raw_SetFontSize : function(Value)
+    {
+        this.CtrPrp.FontSize    = Value;
         this.RecalcInfo.bCtrPrp = true;
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
     },
     Set_Select_ToMComp: function(Direction)
     {
@@ -1209,33 +1217,11 @@ CMathBase.prototype =
     },
     Undo: function(Data)
     {
-        var type = Data.Type;
-
-        switch(type)
-        {
-            case historyitem_Math_CtrPrpFSize:
-            {
-                this.CtrPrp.FontSize = Data.Old;
-                this.RecalcInfo.bCtrPrp = true;
-
-                break;
-            }
-        }
+        Data.Undo(this);
     },
     Redo: function(Data)
     {
-        var type = Data.Type;
-
-        switch(type)
-        {
-            case historyitem_Math_CtrPrpFSize:
-            {
-                this.CtrPrp.FontSize = Data.New;
-                this.RecalcInfo.bCtrPrp = true;
-
-                break;
-            }
-        }
+        Data.Redo(this);
     },
     Refresh_RecalcData: function()
     {
@@ -1244,11 +1230,11 @@ CMathBase.prototype =
     },
     Save_Changes: function(Data, Writer)
     {
-
+        WriteChanges_ToBinary(Data, Writer);
     },
     Load_Changes : function(Reader)
     {
-
+        ReadChanges_FromBinary(Reader, this);
     }
 
     //////////////////////////

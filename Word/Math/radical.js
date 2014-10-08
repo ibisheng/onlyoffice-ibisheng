@@ -1168,13 +1168,6 @@ CRadical.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CRadical.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_rad );
-}
-CRadical.prototype.Load_Changes = function(Reader)
-{
-}
 CRadical.prototype.Refresh_RecalcData = function(Data)
 {
 }

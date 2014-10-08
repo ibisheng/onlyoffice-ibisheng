@@ -322,13 +322,6 @@ CBorderBox.prototype.getPropsForWrite = function()
 
     return this.Pr;
 }
-CBorderBox.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_borderBox );
-}
-CBorderBox.prototype.Load_Changes = function(Reader)
-{
-}
 CBorderBox.prototype.Refresh_RecalcData = function(Data)
 {
 }

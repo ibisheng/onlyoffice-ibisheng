@@ -30,11 +30,6 @@
 // 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
 // 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выравнено как alignTop)
 
-var historyitem_Math_AddItem                   =  1; // Добавляем элемент
-var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
-var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
-
-
 function CRPI()
 {
     //this.UpdateMathPr    = true;

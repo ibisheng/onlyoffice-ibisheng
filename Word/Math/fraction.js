@@ -395,13 +395,6 @@ CFraction.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CFraction.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_frac );
-}
-CFraction.prototype.Load_Changes = function(Reader)
-{
-}
 CFraction.prototype.Refresh_RecalcData = function(Data)
 {
 }

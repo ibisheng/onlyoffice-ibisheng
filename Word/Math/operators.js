@@ -3691,13 +3691,6 @@ CDelimiter.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CDelimiter.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_delimiter );
-}
-CDelimiter.prototype.Load_Changes = function(Reader)
-{
-}
 CDelimiter.prototype.Refresh_RecalcData = function(Data)
 {
 }

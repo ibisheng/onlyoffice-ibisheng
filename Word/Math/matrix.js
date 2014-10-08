@@ -620,13 +620,6 @@ CMathMatrix.prototype.getPropsForWrite = function()
 
     return props;
 };
-CMathMatrix.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_matrix );
-};
-CMathMatrix.prototype.Load_Changes = function(Reader)
-{
-};
 CMathMatrix.prototype.Refresh_RecalcData = function(Data)
 {
 };

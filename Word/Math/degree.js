@@ -238,13 +238,6 @@ CDegree.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 };
-CDegree.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_deg );
-};
-CDegree.prototype.Load_Changes = function(Reader)
-{
-};
 CDegree.prototype.Refresh_RecalcData = function(Data)
 {
 };
@@ -558,13 +551,6 @@ CDegreeSubSup.prototype.init = function(props)
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
     return this.Pr;
-};
-CDegreeSubSup.prototype.Save_Changes = function(Data, Writer)
-{
-    Writer.WriteLong( historyitem_type_deg_subsup );
-};
-CDegreeSubSup.prototype.Load_Changes = function(Reader)
-{
 };
 CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
 {

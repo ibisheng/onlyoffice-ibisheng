@@ -379,13 +379,6 @@ CNary.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CNary.prototype.Save_Changes = function(Data, Writer)
-{
-	Writer.WriteLong( historyitem_type_nary );
-}
-CNary.prototype.Load_Changes = function(Reader)
-{
-}
 CNary.prototype.Refresh_RecalcData = function(Data)
 {
 }
