@@ -441,6 +441,10 @@ ParaMath.prototype.Get_DrawingObjectContentPos = function(Id, ContentPos, Depth)
 
 ParaMath.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPos, Depth)
 {
+    if (true === UseContentPos)
+        DrawingLayout.Layout = true;
+    else
+        DrawingLayout.X += this.Width;
 };
 
 ParaMath.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Depth)

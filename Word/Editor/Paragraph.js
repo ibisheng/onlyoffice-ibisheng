@@ -8003,11 +8003,59 @@ Paragraph.prototype =
         {
             this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, 1);
 
-            if ( null !== DrawingLayout.Layout )
-                return { ParagraphLayout : DrawingLayout.Layout, PageLimits : DrawingLayout.Limits };
+            if (true === DrawingLayout.Layout)
+            {
+                var LogicDocument = this.LogicDocument;
+                var LD_PageLimits = LogicDocument.Get_PageLimits( CurPage );
+                var LD_PageFields = LogicDocument.Get_PageFields( CurPage );
+
+                var Page_Width  = LD_PageLimits.XLimit;
+                var Page_Height = LD_PageLimits.YLimit;
+
+                var X_Left_Field   = LD_PageFields.X;
+                var Y_Top_Field    = LD_PageFields.Y;
+                var X_Right_Field  = LD_PageFields.XLimit;
+                var Y_Bottom_Field = LD_PageFields.YLimit;
+
+                var X_Left_Margin   = X_Left_Field;
+                var X_Right_Margin  = Page_Width  - X_Right_Field;
+                var Y_Bottom_Margin = Page_Height - Y_Bottom_Field;
+                var Y_Top_Margin    = Y_Top_Field;
+
+                var Para    = DrawingLayout.Paragraph;
+                var CurPage = DrawingLayout.Page;
+                var Drawing = DrawingLayout.Drawing;
+
+                var DrawingObjects = this.Parent.DrawingObjects;
+                var PageLimits     = this.Parent.Get_PageLimits(this.PageNum + CurPage);
+                var PageFields     = this.Parent.Get_PageFields(this.PageNum + CurPage);
+
+                var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
+                var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[CurPage].XLimit);
+
+                var Top_Margin    = Y_Top_Margin;
+                var Bottom_Margin = Y_Bottom_Margin;
+                var Page_H        = Page_Height;
+
+                if ( true === this.Parent.Is_TableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap() )
+                {
+                    Top_Margin    = 0;
+                    Bottom_Margin = 0;
+                    Page_H        = 0;
+                }
+
+                if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
+                {
+                    PageFields = LD_PageFields;
+                    PageLimits = LD_PageLimits;
+                }
+
+                var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y);
+                return {ParagraphLayout : Layout, PageLimits : PageLimits};
+            }
         }
 
-        return undefined;
+        return null;
     },
 
     Get_AnchorPos : function(Drawing)
@@ -12522,8 +12570,7 @@ function CParagraphDrawingLayout(Drawing, Paragraph, X, Y, Line, Range, Page)
     this.Y         = Y;
     this.LastW     = 0;
 
-    this.Layout    = null;
-    this.Limits    = null;
+    this.Layout    = false;
 }
 
 function CParagraphGetDropCapText()

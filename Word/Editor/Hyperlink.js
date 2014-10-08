@@ -726,7 +726,7 @@ ParaHyperlink.prototype.Get_Layout = function(DrawingLayout, UseContentPos, Cont
     {
         this.Content[CurPos].Get_Layout(DrawingLayout, ( CurPos === CurContentPos ? true : false ), ContentPos, Depth + 1 );
 
-        if ( null !== DrawingLayout.Layout )
+        if (true === DrawingLayout.Layout)
             return;
     }
 };
