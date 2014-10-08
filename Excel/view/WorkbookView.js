@@ -142,6 +142,7 @@
 			this.canvasGraphic = undefined;
 			this.canvasGraphicOverlay = undefined;
 			this.wsActive = -1;
+			this.wsMustDraw = false; // Означает, что мы выставили активный, но не отрисовали его
 			this.wsViews = [];
 			this.cellEditor = undefined;
 			this.fontRenderingMode = null;
@@ -430,7 +431,9 @@
 						canChangeColWidth: canChangeColWidth});
 			});
 			this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
-				self.getWorksheetById(wsId).changeWorksheet("update", val);
+				var ws = self.getWorksheetById(wsId);
+				if (ws)
+					ws.changeWorksheet("update", val);
 			});
 			this.model.handlers.add("insertCell", function (wsId, val, range) {
 				self.getWorksheetById(wsId).changeWorksheet("insCell", {val: val, range: range});
@@ -1265,6 +1268,7 @@
 				index = wb.getActive();
 			}
 			this.wsActive = index;
+			this.wsMustDraw = bLockDraw;
 
 			ws = this.getWorksheet(index);
 			// Мы делали resize или меняли zoom, но не перерисовывали данный лист (он был не активный)
@@ -1439,9 +1443,10 @@
 				this.showWorksheet(undefined, true);
 			} else {
 				// ToDo не должно происходить ничего, но нам приходит resize сверху, поэтому проверим отрисовывали ли мы
-				if (-1 === this.wsActive)
+				if (-1 === this.wsActive || this.wsMustDraw)
 					this.showWorksheet(undefined, true);
 			}
+			this.wsMustDraw = false;
 		};
 
 		WorkbookView.prototype.getFormulasInfo = function () {
