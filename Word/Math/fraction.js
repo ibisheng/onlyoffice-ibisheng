@@ -457,9 +457,9 @@ CFraction.prototype.Get_Id = function()
 	return this.Id;
 }
 
-function CFractionBase()
+function CFractionBase(bInside)
 {
-    CFractionBase.superclass.constructor.call(this);
+    CFractionBase.superclass.constructor.call(this, bInside);
     this.gap = 0;
     this.init();
 }
@@ -501,7 +501,7 @@ CFractionBase.prototype.Get_Id = function()
 
 function CNumerator()
 {
-    CNumerator.superclass.constructor.call(this);
+    CNumerator.superclass.constructor.call(this, true);
 }
 Asc.extendClass(CNumerator, CFractionBase);
 CNumerator.prototype.recalculateSize = function()
@@ -553,7 +553,7 @@ CNumerator.prototype.setPosition = function(pos, PosInfo)
 
 function CDenominator()
 {
-    CDenominator.superclass.constructor.call(this);
+    CDenominator.superclass.constructor.call(this, true);
 }
 Asc.extendClass(CDenominator, CFractionBase);
 CDenominator.prototype.recalculateSize = function()

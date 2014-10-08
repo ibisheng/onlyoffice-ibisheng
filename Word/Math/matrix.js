@@ -180,6 +180,8 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
         {
             this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
 
+
+            // выставим выравнивание для столбцов
             var lng = this.Pr.mcs.length;
             var col = 0;
 
@@ -585,9 +587,11 @@ CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
 CMathMatrix.prototype.setProperties = function(props)
 {
     this.setCtrPrp(props.ctrPrp);
-    this.Pr.Set_FromObject(props);
+    this.column = this.Pr.Set_FromObject(props);
 
-    this.column = this.Pr.Get_ColumnsCount();
+    if(props.mcs.length == 0)
+        this.column = props.column;
+    //this.column = this.Pr.Get_ColumnsCount();
 };
 CMathMatrix.prototype.fillContent = function()
 {
@@ -610,6 +614,7 @@ CMathMatrix.prototype.getPropsForWrite = function()
     props.row     = this.Pr.nRow;
     props.column  = this.Pr.nCol;
     props.plcHide = this.Pr.plcHide;
+    props.mcs     = this.Pr.mcs;
 
     props.cGpRule = this.spaceColumn.rule;
     props.cGp     = this.spaceColumn.gap;

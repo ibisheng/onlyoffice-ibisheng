@@ -3869,7 +3869,6 @@ CMathGroupChrPr.prototype.Set_FromObject = function(Obj)
     if(LOCATION_TOP === Obj.pos || LOCATION_BOT === Obj.pos)
         this.pos = Obj.pos;
 };
-
 CMathGroupChrPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : chr
@@ -3882,7 +3881,6 @@ CMathGroupChrPr.prototype.Write_ToBinary = function(Writer)
     Writer.WriteLong(this.vertJc);
     Writer.WriteLong(this.pos);
 };
-
 CMathGroupChrPr.prototype.Read_FromBinary = function(Reader)
 {
     // Long : chr

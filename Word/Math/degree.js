@@ -2,10 +2,7 @@
 
 function CDegreeBase(props, bInside)
 {
-    CDegreeBase.superclass.constructor.call(this);
-
-    this.kind = MATH_DEGREE;
-    this.bInside = bInside;
+    CDegreeBase.superclass.constructor.call(this, bInside);
 
     this.upBase = 0; // отступ сверху для основания
     this.upIter = 0; // отступ сверху для итератора
@@ -18,6 +15,7 @@ function CDegreeBase(props, bInside)
     this.baseContent = null;
     this.iterContent = null;
 
+
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
@@ -29,7 +27,6 @@ CDegreeBase.prototype.init = function(props)
 };
 CDegreeBase.prototype.fillContent = function()
 {
-    this.setDimension(1, 2);
     this.elements[0][0] = this.baseContent;
     this.elements[0][1] = this.iterContent;
 };
@@ -192,7 +189,7 @@ CDegreeBase.prototype.getBase = function()
 };
 CDegreeBase.prototype.IsPlhIterator = function()
 {
-    return this.elements[0][1].IsPlaceholder();
+    return this.iterContent.IsPlaceholder();
 };
 CDegreeBase.prototype.setProperties = function(props)
 {
@@ -217,6 +214,7 @@ CDegreeBase.prototype.setIterator = function(iterator)
 function CDegree(props, bInside)
 {
     this.Id = g_oIdCounter.Get_NewId();
+    this.kind = MATH_DEGREE;
 
     CDegree.superclass.constructor.call(this, props, bInside);
 
@@ -270,8 +268,7 @@ CDegree.prototype.Get_Id = function()
 
 function CIterators(iterUp, iterDn)
 {
-    CIterators.superclass.constructor.call(this);
-    this.bInside = true;
+    CIterators.superclass.constructor.call(this, true);
 
     this.lUp = 0;   // центр основания
     this.lD = 0;    // высота - центр основания
@@ -314,10 +311,7 @@ CIterators.prototype.alignIterators = function(mcJc)
 
 function CDegreeSubSupBase(props, bInside)
 {
-    CDegreeSubSupBase.superclass.constructor.call(this);
-
-    this.kind = MATH_DEGREESubSup;
-    this.bInside = bInside;
+    CDegreeSubSupBase.superclass.constructor.call(this, bInside);
 
     this.gapBase = 0;
 
@@ -372,16 +366,8 @@ CDegreeSubSupBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, A
     var ArgSzIters = ArgSize.Copy();
     ArgSzIters.decrease();
 
-    if(this.Pr.type == DEGREE_SubSup)
-    {
-        this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-        this.elements[0][1].Resize(oMeasure, this, ParaMath, RPI, ArgSzIters);
-    }
-    else
-    {
-        this.elements[0][1].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-        this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzIters);
-    }
+    this.baseContent.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    this.iters.Resize(oMeasure, this, ParaMath, RPI, ArgSzIters);
 
     this.recalculateSize(oMeasure, RPI);
 };
@@ -468,10 +454,6 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
     this.size = {width: width, height: height, ascent: ascent};
 
 };
-CDegreeSubSupBase.prototype.setPosition = function(pos, PosInfo)
-{
-    CDegreeSubSupBase.superclass.setPosition.call(this, pos, PosInfo);
-};
 CDegreeSubSupBase.prototype.align = function(x, y)
 {
     var _x = 0, _y = 0;
@@ -531,6 +513,7 @@ CDegreeSubSupBase.prototype.setProperties = function(props)
 function CDegreeSubSup(props, bInside)
 {
     this.Id = g_oIdCounter.Get_NewId();
+    this.kind = MATH_DEGREESubSup;
 
     CDegreeSubSup.superclass.constructor.call(this, props, bInside);
 

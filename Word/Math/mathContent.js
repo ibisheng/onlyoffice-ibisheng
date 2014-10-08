@@ -56,7 +56,6 @@ CRPI.prototype.Copy = function()
     return RPI;
 }
 
-
 function CMathPointInfo()
 {
     this.x    = 0;
@@ -214,7 +213,6 @@ AmperWidths.prototype.SetDefault = function()
 }
 
 
-
 function CGaps(oSign, oEqual, oZeroOper, oLett)
 {
     this.sign = oSign;
@@ -299,7 +297,7 @@ CCoeffGaps.prototype =
         var COMPARE       = code == 0x3C || code == 0x3E; // LESS, GREATER
         var ARROWS        = (code >= 0x2190 && code <= 0x21B3) || (code == 0x21B6) || (code == 0x21B7) || (code >= 0x21BA && code <= 0x21E9) || (code >=0x21F4 && code <= 0x21FF);
         var INTERSECTION  = code >= 0x2223 && code <= 0x222A;
-        var EQUALS        = (code >= 0x2234 && code <= 0x22BD) || (code >= 0x22C4 && code <= 0x22FF);
+        var EQUALS        = code == 0x3D || (code >= 0x2234 && code <= 0x22BD) || (code >= 0x22C4 && code <= 0x22FF);
         var ARR_FISHES    = (code >= 0x27DA && code <= 0x27E5) || (code >= 0x27EC && code <= 0x297F);
         var TRIANGLE_SYMB = code >= 0x29CE && code <= 0x29D7;
         var OTH_SYMB      = code == 0x29DF || (code >= 0x29E1 && code <= 0x29E7) || (code >= 0x29F4 && code <= 0x29F8) || (code >= 0x2A22 && code <= 0x2AF0) || (code >= 0x2AF2 && code <= 0x2AFB) || code == 0x2AFD || code == 0x2AFE;
