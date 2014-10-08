@@ -1542,8 +1542,8 @@ function ScrollObject( elemID, settings, dbg ) {
     this.fadeOutActive = false;
     this.fadeInTimeout = null;
     this.fadeOutTimeout = null;
-    this.startColorFadeInStart = 241;
-    this.startColorFadeOutStart = 207;
+    this.startColorFadeInStart = _HEXTORGB_(this.settings.scrollerColor).R;
+    this.startColorFadeOutStart = _HEXTORGB_(this.settings.scrollerColorOver).R;
     this.startColorFadeInOutStart = -1;
 
     if ( window.devicePixelRatio == 2 )
@@ -2139,7 +2139,7 @@ ScrollObject.prototype = {
                 img = that.piperImgHor[0];
             }
 
-            if ( startColorFadeIn >= 207 ) {
+            if ( startColorFadeIn >= _HEXTORGB_(that.settings.scrollerColorOver).R ) {
                 that.startColorFadeInOutStart = startColorFadeIn;
                 that.fadeInTimeout = setTimeout( fadeIn, that.settings.fadeInFadeOutDelay );
             }
@@ -2259,7 +2259,7 @@ ScrollObject.prototype = {
                 img = that.piperImgHor[0];
             }
 
-            if ( startColorFadeOut <= 241 ) {
+            if ( startColorFadeOut <= _HEXTORGB_(that.settings.scrollerColor).R ) {
                 that.startColorFadeInOutStart = startColorFadeOut;
                 that.fadeOutTimeout = setTimeout( fadeOut, that.settings.fadeInFadeOutDelay );
             }
@@ -2443,6 +2443,10 @@ ScrollObject.prototype = {
                 else{
                     this.context.fillStyle = this.settings.scrollerColor;
                     this.context.strokeStyle = this.settings.strokeStyleNone;
+
+                    this.startColorFadeInOutStart = this.startColorFadeInStart = _HEXTORGB_(this.settings.scrollerColor).R;
+                    this.startColorFadeOutStart = _HEXTORGB_(this.settings.scrollerColorOver).R;
+
                     piperImgIndex = 0;
 
                     var r, g, b, ctx_piperImg, _data, px, _len
