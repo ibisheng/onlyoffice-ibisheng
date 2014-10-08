@@ -4098,7 +4098,7 @@ drawDoughnutChart.prototype =
 			this.tempAngle = Math.PI/2;
 			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
 			
-			if(!numCache)
+			if(!numCache || this.chartProp.series[n].isHidden)
 				continue;
 			
 			sumData = this.cChartDrawer._getSumArray(numCache.pts, true);
