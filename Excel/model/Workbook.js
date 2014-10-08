@@ -1978,6 +1978,13 @@ function Woorksheet(wb, _index, sId){
 				oHistoryRange = to;
 			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeMerge, oThis.getId(), oHistoryRange, new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
 		}
+		//расширяем границы
+		if(null != to){
+			if(to.r2 > oThis.nRowsCount)
+				oThis.nRowsCount = to.r2 + 1;
+			if(to.c2 > oThis.nColsCount)
+				oThis.nColsCount = to.c2 + 1;
+		}
 	});
 	this.hyperlinkManager = new RangeDataManager(function(data, from, to, oChangeParam){
 		if(History.Is_On() && (null != from || null != to))
@@ -1998,6 +2005,13 @@ function Woorksheet(wb, _index, sId){
 		    data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
 		else if (oChangeParam && oChangeParam.removeStyle && null != data.Ref)
 		    data.Ref.cleanFormat();
+		//расширяем границы
+		if(null != to){
+			if(to.r2 > oThis.nRowsCount)
+				oThis.nRowsCount = to.r2 + 1;
+			if(to.c2 > oThis.nColsCount)
+				oThis.nColsCount = to.c2 + 1;
+		}
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
     this.DrawingDocument = new CDrawingDocument();
