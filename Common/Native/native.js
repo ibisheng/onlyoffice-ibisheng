@@ -41,6 +41,22 @@ function _image_data()
     this.length = 0;
 }
 
+function native_pattern_fill()
+{
+}
+native_pattern_fill.prototype =
+{
+    setTransform : function(transform) {}
+};
+
+function native_gradient_fill()
+{
+}
+native_gradient_fill.prototype =
+{
+    addColorStop : function(offset,color) {}
+};
+
 function native_context2d(parent)
 {
     this.canvas = parent;
@@ -73,9 +89,9 @@ native_context2d.prototype =
     transform : function(m11,m12,m21,m22,dx,dy) {},
     setTransform : function(m11,m12,m21,m22,dx,dy) {},
 
-    createLinearGradient : function(x0,y0,x1,y1) { return null; },
+    createLinearGradient : function(x0,y0,x1,y1) { return new native_gradient_fill(); },
     createRadialGradient : function(x0,y0,r0,x1,y1,r1) { return null; },
-    createPattern : function(image,repetition) { return null; },
+    createPattern : function(image,repetition) { return new native_pattern_fill(); },
 
     clearRect : function(x,y,w,h) {},
     fillRect : function(x,y,w,h) {},
