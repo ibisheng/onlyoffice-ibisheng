@@ -7657,6 +7657,13 @@ CDocument.prototype =
                 }
             }
 
+            var oSelectedInfo = this.Get_SelectedElementsInfo();
+            var Math = oSelectedInfo.Get_Math();
+            if (null !== Math)
+                ParaPr.CanAddImage = false;
+            else
+                ParaPr.CanAddImage = true;
+
             if ( undefined != ParaPr.Tabs )
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 

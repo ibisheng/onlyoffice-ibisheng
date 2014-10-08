@@ -1566,7 +1566,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 			bUseColor = -1 === CollaborativeEditing.m_nUseType;
         if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None)
             bUseColor = false;
-        
+
 		var oUser = t.CoAuthoringApi.getUser(userId);
 		var nColor = oUser ? oUser.asc_getColorValue() :  null;
         var oColor = false === bUseColor ? null : (null !== nColor ? new CDocumentColor( (nColor >> 16) & 0xFF, (nColor >> 8) & 0xFF, nColor & 0xFF ) : new CDocumentColor( 191, 255, 199 ));
@@ -2044,6 +2044,7 @@ function CParagraphProp (obj)
         this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
         this.FramePr           = (undefined != obj.FramePr )                       ? new CParagraphFrame( obj.FramePr ) : undefined;
         this.CanAddDropCap     = (undefined != obj.CanAddDropCap )                 ? obj.CanAddDropCap : false;
+        this.CanAddImage       = (undefined != obj.CanAddImage )                   ? obj.CanAddImage   : false;
 
         this.Subscript         = (undefined != obj.Subscript)                      ? obj.Subscript   : undefined;
         this.Superscript       = (undefined != obj.Superscript)                    ? obj.Superscript : undefined;
@@ -2086,6 +2087,7 @@ function CParagraphProp (obj)
         this.CanAddTable       = true;
         this.Tabs              = undefined;
         this.CanAddDropCap     = false;
+        this.CanAddImage       = false;
 
         this.Subscript         = undefined;
         this.Superscript       = undefined;
@@ -2141,6 +2143,7 @@ CParagraphProp.prototype.put_DefaultTab = function (v) { this.DefaultTab = v; }
 CParagraphProp.prototype.get_FramePr = function () { return this.FramePr; }
 CParagraphProp.prototype.put_FramePr = function (v) { this.FramePr = v; }
 CParagraphProp.prototype.get_CanAddDropCap = function() { return this.CanAddDropCap; }
+CParagraphProp.prototype.get_CanAddImage = function() { return this.CanAddImage; }
 
 // Paragraph properties
 function CParagraphPropEx (obj)

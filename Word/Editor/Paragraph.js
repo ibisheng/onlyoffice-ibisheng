@@ -7910,7 +7910,9 @@ Paragraph.prototype =
         this.Set_ParaContentPos( SearchPosXY.Pos, true, SearchPosXY.Line, SearchPosXY.Range );
         var ContentPos = this.Get_ParaContentPos( false, false );
 
-        var Result = this.Internal_Recalculate_CurPos( ContentPos, false, false, true );
+        ContentPos = this.private_CorrectNearestPos(ContentPos, bAnchor, Drawing);
+
+        var Result = this.Internal_Recalculate_CurPos(ContentPos, false, false, true );
 
         // Сохраняем параграф и найденное место в параграфе
         Result.ContentPos = ContentPos;
@@ -7921,6 +7923,37 @@ Paragraph.prototype =
             this.Internal_CorrectAnchorPos( Result, Drawing );
 
         return Result;
+    },
+
+    private_CorrectNearestPos : function(ContentPos, Anchor, Drawing)
+    {
+        if (true !== Anchor && undefined !== Drawing && null !== Drawing)
+        {
+            var CurPos = ContentPos.Get(0);
+            if (para_Math === this.Content[CurPos].Type)
+            {
+                if (CurPos > 0)
+                {
+                    CurPos--;
+
+                    ContentPos = new CParagraphContentPos();
+                    ContentPos.Update(CurPos, 0);
+                    this.Content[CurPos].Get_EndPos(false, ContentPos, 1);
+                    this.Set_ParaContentPos(ContentPos, false, -1, -1);
+                }
+                else
+                {
+                    CurPos++;
+
+                    ContentPos = new CParagraphContentPos();
+                    ContentPos.Update(CurPos, 0);
+                    this.Content[CurPos].Get_StartPos(ContentPos, 1);
+                    this.Set_ParaContentPos(ContentPos, false, -1, -1);
+                }
+            }
+        }
+
+        return ContentPos;
     },
 
     Check_NearestPos : function(NearPos)
