@@ -9733,24 +9733,23 @@
 						// Для принятия изменения нужно делать расширение диапазона
 						if (this.model.workbook.bCollaborativeChanges) {
 							var bIsUpdateX = false, bIsUpdateY = false;
-							if (val.range.c2 >= t.nColsCount) {
-								t.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+							if (val.range.c2 >= this.nColsCount) {
+								this.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 								bIsUpdateX = true;
 							}
-							if (val.range.r2 >= t.nRowsCount) {
-								t.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+							if (val.range.r2 >= this.nRowsCount) {
+								this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 								bIsUpdateY = true;
 							}
 
 							if (bIsUpdateX && bIsUpdateY)
-								t.handlers.trigger("reinitializeScroll");
+								this.handlers.trigger("reinitializeScroll");
 							else if (bIsUpdateX)
-								t.handlers.trigger("reinitializeScrollX");
+								this.handlers.trigger("reinitializeScrollX");
 							else if (bIsUpdateY)
-								t.handlers.trigger("reinitializeScrollY");
+								this.handlers.trigger("reinitializeScrollY");
 						}
-
-						t._updateCellsRange(val.range, val.canChangeColWidth, val.lockDraw);
+						this._updateCellsRange(val.range, val.canChangeColWidth, val.lockDraw);
 					}
 					break;
 			}

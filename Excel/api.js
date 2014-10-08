@@ -1725,13 +1725,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.collaborativeEditing.clearRecalcIndex();
 				this.IsSendDocumentLoadCompleate = true;
 				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			}
-
-			if (this.wb) {
-				// Нужно послать обновить свойства (иначе для удаления данных не обновится строка формул).
+			} else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
+				// Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
 				// ToDo Возможно стоит обновлять только строку формул
 				this.wb._onWSSelectionChanged(null);
-
 				this.wb.getWorksheet().updateVisibleRange();
 			}
 		};
