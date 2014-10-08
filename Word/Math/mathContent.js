@@ -2262,7 +2262,21 @@ CMathContent.prototype =
 
             if ( this.Selection.End >= Pos )
                 this.Selection.End++;
+
+            this.private_CorrectSelectionPos();
+            this.private_CorrectCurPos();
         }
+    },
+
+    private_CorrectSelectionPos : function()
+    {
+        this.Selection.Start = Math.max(0, Math.min(this.content.length - 1, this.Selection.Start));
+        this.Selection.End   = Math.max(0, Math.min(this.content.length - 1, this.Selection.End));
+    },
+
+    private_CorrectCurPos : function()
+    {
+        this.CurPos = Math.max(0, Math.min(this.content.length - 1, this.CurPos));
     },
 
     Add_ToContent : function(Pos, Item)
@@ -2288,6 +2302,8 @@ CMathContent.prototype =
                 this.CurPos -= Count;
             else
                 this.CurPos = Pos;
+
+            this.private_CorrectCurPos();
         }
 
         if ( true === this.Selection.Use )
@@ -2307,6 +2323,8 @@ CMathContent.prototype =
                 else
                     this.Selection.End = Pos;
             }
+
+            this.private_CorrectSelectionPos();
         }
     },
 
@@ -2546,9 +2564,10 @@ CMathContent.prototype =
             else
                 oElement = this.content[nPos].Copy(false);
 
-            OtherContent.Internal_Content_Add(OtherContent.length, oElement);
+            OtherContent.Internal_Content_Add(OtherContent.content.length, oElement);
         }
     },
+
     Selection_Remove: function()
     {
         var start = this.Selection.Start,

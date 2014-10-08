@@ -102,6 +102,8 @@ ParaMath.prototype.Copy = function(Selected)
 
     /// argSize, bDot и bRoot выставить на объединении контентов
 
+    NewMath.SetNeedResize();
+
     return NewMath;
 };
 
@@ -112,7 +114,13 @@ ParaMath.prototype.Set_Paragraph = function(Paragraph)
 
 ParaMath.prototype.Is_Empty = function()
 {
-    return this.Root.content.length == 0;
+    if (this.Root.content.length <= 0)
+        return true;
+
+    if (1 === this.Root.content.length)
+        return this.Root.content[0].Is_Empty({SkipPlcHldr : true});
+
+    return false;
 };
 
 ParaMath.prototype.Is_StartFromNewLine = function()

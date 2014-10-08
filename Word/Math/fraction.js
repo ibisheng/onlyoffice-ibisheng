@@ -395,6 +395,23 @@ CFraction.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
+CFraction.prototype.Copy = function()
+{
+    var oProps =
+    {
+        ctrPrp : this.CtrPrp.Copy(),
+        type   : this.Pr.Type
+    };
+
+    var NewFraction = new CFraction(oProps);
+
+    this.Denominator.getElement().CopyTo(NewFraction.Denominator.getElement(), false);
+    this.Numerator.getElement().CopyTo(NewFraction.Numerator.getElement(), false);
+
+    NewFraction.fillContent();
+
+    return NewFraction;
+};
 CFraction.prototype.Refresh_RecalcData = function(Data)
 {
 }

@@ -2321,8 +2321,7 @@ Paragraph.prototype =
             if ( true !== this.Content[this.CurPos.ContentPos].Selection_IsUse() )
             {
                 this.Selection_Remove();
-                this.Correct_Content(StartPos, EndPos);
-
+                this.Correct_Content();
             }
             else
             {
@@ -2332,7 +2331,7 @@ Paragraph.prototype =
                 this.Selection.StartPos = this.CurPos.ContentPos;
                 this.Selection.EndPos   = this.CurPos.ContentPos;
 
-                this.Correct_Content(StartPos, EndPos);
+                this.Correct_Content();
 
                 this.Document_SetThisElementCurrent(false);
 
@@ -4813,7 +4812,7 @@ Paragraph.prototype =
     {
         // В данной функции мы корректируем содержимое параграфа:
         // 1. Спаренные пустые раны мы удаляем (удаляем 1 ран)
-        // 2. Удаляем пустые гиперссылки
+        // 2. Удаляем пустые гиперссылки и пустые формулы
         // 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
         // 4. Удаляем пустые комментарии
 
@@ -4825,7 +4824,7 @@ Paragraph.prototype =
         {
             var CurElement = this.Content[CurPos];
 
-            if ( para_Hyperlink === CurElement.Type && true === CurElement.Is_Empty() )
+            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type) && true === CurElement.Is_Empty())
             {
                 this.Internal_Content_Remove( CurPos );
                 CurPos++;
@@ -4865,7 +4864,7 @@ Paragraph.prototype =
             else
             {
                 // TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
-                if ( true === CurElement.Is_Empty() && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type )
+                if ( true === CurElement.Is_Empty() && CurPos < this.Content.length - 1 && para_Run === this.Content[CurPos + 1].Type )
                     this.Internal_Content_Remove( CurPos );
             }
         }
@@ -4874,6 +4873,13 @@ Paragraph.prototype =
         for ( var CommentIndex = 0; CommentIndex < CommentsCount; CommentIndex++ )
         {
             this.LogicDocument.Remove_Comment( CommentsToDelete[CommentIndex], true, false );
+        }
+
+        // Проверим, чтобы предпоследний элемент был Run
+        if (1 === this.Content.length || para_Run !== this.Content[this.Content.length - 2].Type)
+        {
+            var NewRun = new ParaRun(this);
+            this.Internal_Content_Add(this.Content.length - 1, NewRun);
         }
 
         this.Correct_ContentPos2();
