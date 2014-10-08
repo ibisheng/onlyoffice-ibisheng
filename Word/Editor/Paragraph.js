@@ -5399,7 +5399,7 @@ Paragraph.prototype =
                 for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                 {
                     var Element = this.Content[CurPos];
-                    if ( para_Hyperlink === Element.Type /*|| true === Element.Selection_CheckParaEnd()*/ )
+                    if (para_Hyperlink === Element.Type || para_Math === Element.Type /*|| true === Element.Selection_CheckParaEnd()*/ )
                         return false;
                 }
 
@@ -5408,7 +5408,8 @@ Paragraph.prototype =
             else
             {
                 // Внутри гиперссылки мы не можем задать ниперссылку
-                if ( para_Hyperlink === this.Content[this.CurPos.ContentPos].Type )
+                var CurType = this.Content[this.CurPos.ContentPos].Type;
+                if (para_Hyperlink === CurType || para_Math === CurType)
                     return false;
                 else
                     return true;
@@ -5434,9 +5435,9 @@ Paragraph.prototype =
                 for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
                 {
                     var Element = this.Content[CurPos];
-                    if ( (true === bHyper && para_Hyperlink === Element.Type) /*|| true === Element.Selection_CheckParaEnd()*/ )
+                    if ((true === bHyper && para_Hyperlink === Element.Type) || para_Math === Element.Type /*|| true === Element.Selection_CheckParaEnd()*/)
                         return false;
-                    else if ( true !== bHyper && para_Hyperlink === Element.Type )
+                    else if (true !== bHyper && para_Hyperlink === Element.Type)
                         bHyper = true;
                 }
 
@@ -5444,7 +5445,12 @@ Paragraph.prototype =
             }
             else
             {
-                return true;
+                // Внутри гиперссылки мы не можем задать ниперссылку
+                var CurType = this.Content[this.CurPos.ContentPos].Type;
+                if (para_Math === CurType)
+                    return false;
+                else
+                    return true;
             }
         }
     },
