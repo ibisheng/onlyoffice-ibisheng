@@ -284,8 +284,8 @@ function CIterators(iterUp, iterDn)
     this.lD = 0;    // высота - центр основания
     this.upper = 0; // смещение сверху для позиции основания
 
-    this.iterUp = new CMathContent();
-    this.iterDn = new CMathContent();
+    this.iterUp = iterUp;
+    this.iterDn = iterDn;
 }
 Asc.extendClass(CIterators, CMathBase);
 CIterators.prototype.init = function()
