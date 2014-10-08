@@ -6725,8 +6725,6 @@ var gUndoInsDelCellsFlag = true;
 										{
 											id = this._shiftId(buttons[n].id, diffCol, diffRow);
 											idNext = this._shiftId(buttons[n].idNext, diffCol, diffRow);
-											findFilters[i].result[b].id = id;
-											findFilters[i].result[b].idNext = idNext;
 											break;
 										}
 									}
@@ -6734,6 +6732,15 @@ var gUndoInsDelCellsFlag = true;
 									changeButtonArray[n] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
 								}
 							}
+						}
+						
+						//изменяем result у фильтра
+						for(var b = 0; b < findFilters[i].result.length; b++)
+						{
+							id = this._shiftId(findFilters[i].result[b].id, diffCol, diffRow);
+							idNext = this._shiftId(findFilters[i].result[b].idNext, diffCol, diffRow);
+							findFilters[i].result[b].id = id;
+							findFilters[i].result[b].idNext = idNext;
 						}
 						
 						//при изменении кнопок, чтобы не было наложений, создаём массив changeButtonArray и изменяем сразу все нужные кнопки
