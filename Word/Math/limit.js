@@ -1,5 +1,35 @@
 "use strict";
 
+function CMathLimitPr()
+{
+    this.type = LIMIT_LOW;
+}
+
+CMathLimitPr.prototype.Set_FromObject = function(Obj)
+{
+    if (undefined !== Obj.type && null !== Obj.type)
+        this.type = Obj.type;
+};
+
+CMathLimitPr.prototype.Copy = function()
+{
+    var NewPr = new CMathLimitPr();
+    NewPr.type = this.type;
+    return NewPr;
+};
+
+CMathLimitPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : type
+    Writer.WriteLong(this.type);
+};
+
+CMathLimitPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : type
+    this.type = Reader.GetLong();
+};
+
 function CLimit(props)
 {
     CLimit.superclass.constructor.call(this);
@@ -11,10 +41,7 @@ function CLimit(props)
     this.ContentFName    = new CMathContent();
     this.ContentIterator = new CMathContent();
 
-    this.Pr =
-    {
-        type: LIMIT_LOW
-    };
+    this.Pr = new CMathLimitPr();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -39,9 +66,7 @@ CLimit.prototype.getIterator = function()
 }
 CLimit.prototype.setProperties = function(props)
 {
-    if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
-        this.Pr.type = props.type;
-
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
 }
 CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
@@ -163,6 +188,21 @@ CLimit.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
+CLimit.prototype.Correct_Content = function(bInnerCorrection)
+{
+    this.ContentFName.Correct_Content(bInnerCorrection);
+    this.ContentIterator.Correct_Content(bInnerCorrection);
+};
+CLimit.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewLimit = new CLimit(oProps);
+    this.ContentFName.CopyTo(NewLimit.ContentFName, false);
+    this.ContentIterator.CopyTo(NewLimit.ContentIterator, false);
+    return NewLimit;
+};
 CLimit.prototype.Refresh_RecalcData = function(Data)
 {
 }
@@ -174,7 +214,7 @@ CLimit.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2(this.getIterator().Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	Writer.WriteLong(this.Pr.type);
+	this.Pr.Write_ToBinary(Writer);
 }
 CLimit.prototype.Read_FromBinary2 = function( Reader )
 {
@@ -182,11 +222,8 @@ CLimit.prototype.Read_FromBinary2 = function( Reader )
     this.ContentFName    = g_oTableId.Get_ById(Reader.GetString2());
     this.ContentIterator = g_oTableId.Get_ById(Reader.GetString2());
 
-	var props = {ctrPrp: new CTextPr()};
-	props.ctrPrp.Read_FromBinary(Reader);
-	props.type = Reader.GetLong();
-
-    this.init(props);
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
 }
 CLimit.prototype.Get_Id = function()
 {
@@ -251,13 +288,18 @@ CMathFunc.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CMathFunc.prototype.Save_Changes = function(Data, Writer)
+CMathFunc.prototype.Copy = function()
 {
-	Writer.WriteLong( historyitem_type_mathFunc );
-}
-CMathFunc.prototype.Load_Changes = function(Reader)
-{
-}
+    var oProps =
+    {
+        ctrPrp : this.CtrPrp.Copy()
+    };
+
+    var NewMathFunc = new CMathFunc(oProps);
+    this.fnameContent.CopyTo(NewMathFunc.fnameContent, false);
+    this.argumentContent.CopyTo(NewMathFunc.argumentContent, false);
+    return NewMathFunc;
+};
 CMathFunc.prototype.Refresh_RecalcData = function(Data)
 {
 }
@@ -276,10 +318,9 @@ CMathFunc.prototype.Read_FromBinary2 = function( Reader )
     this.fnameContent    = g_oTableId.Get_ById(Reader.GetString2());
     this.argumentContent = g_oTableId.Get_ById(Reader.GetString2());
 
-	var props = {ctrPrp: new CTextPr()};
-	props.ctrPrp.Read_FromBinary(Reader);
+    this.CtrPrp.Read_FromBinary(Reader);
 
-    this.init(props);
+    this.fillContent();
 }
 CMathFunc.prototype.Get_Id = function()
 {

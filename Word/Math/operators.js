@@ -3869,6 +3869,18 @@ CMathGroupChrPr.prototype.Set_FromObject = function(Obj)
     if(LOCATION_TOP === Obj.pos || LOCATION_BOT === Obj.pos)
         this.pos = Obj.pos;
 };
+
+CMathGroupChrPr.prototype.Copy = function()
+{
+    var NewPr = new CMathGroupChrPr();
+
+    NewPr.chr     = this.chr    ;
+    NewPr.chrType = this.chrType;
+    NewPr.vertJc  = this.vertJc ;
+    NewPr.pos     = this.pos    ;
+
+    return NewPr;
+};
 CMathGroupChrPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : chr
@@ -3903,20 +3915,14 @@ CMathGroupChrPr.prototype.Read_FromBinary = function(Reader)
 
 function CGroupCharacter(props)
 {
+    CGroupCharacter.superclass.constructor.call(this);
+
 	this.Id   = g_oIdCounter.Get_NewId();
     this.kind = MATH_GROUP_CHARACTER;
 
     this.Content = new CMathContent();
 
-    this.Pr =
-    {
-        chr:      null,
-        chrType:  null,
-        vertJc:   VJUST_TOP,
-        pos:      LOCATION_BOT
-    };
-
-    CCharacter.call(this);
+    this.Pr = new CMathGroupChrPr();
 
     if(props !== null && typeof(props)!== "undefined")
         this.init(props);
@@ -3979,15 +3985,7 @@ CGroupCharacter.prototype.getBase = function()
 }
 CGroupCharacter.prototype.setProperties = function(props)
 {
-    if(props.vertJc === VJUST_TOP || props.vertJc === VJUST_BOT)
-        this.Pr.vertJc = props.vertJc;
-
-    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
-        this.Pr.pos = props.pos;
-
-    this.Pr.chr     = props.chr;
-    this.Pr.chrType = props.chrType;
-
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
 }
 CGroupCharacter.prototype.fillContent = function()
@@ -4022,13 +4020,15 @@ CGroupCharacter.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CGroupCharacter.prototype.Save_Changes = function(Data, Writer)
+CGroupCharacter.prototype.Copy = function()
 {
-	Writer.WriteLong( historyitem_type_groupChr );
-}
-CGroupCharacter.prototype.Load_Changes = function(Reader)
-{
-}
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewGroupChar = new CGroupCharacter(oProps);
+    this.Content.CopyTo(NewGroupChar.Content, false);
+    return NewGroupChar;
+};
 CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
 {
 }

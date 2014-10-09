@@ -237,6 +237,21 @@ CDegree.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 };
+CDegree.prototype.Copy = function()
+{
+    var oProps =
+    {
+        ctrPrp : this.CtrPrp.Copy(),
+        type   : this.Pr.type
+    };
+
+    var NewDegree = new CDegree(oProps);
+
+    this.baseContent.CopyTo(NewDegree.baseContent, false);
+    this.iterContent.CopyTo(NewDegree.iterContent, false);
+
+    return NewDegree;
+};
 CDegree.prototype.Refresh_RecalcData = function(Data)
 {
 };
@@ -535,6 +550,21 @@ CDegreeSubSup.prototype.init = function(props)
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
     return this.Pr;
+};
+CDegreeSubSup.prototype.Copy = function()
+{
+    var oProps =
+    {
+        ctrPrp : this.CtrPrp.Copy()
+    };
+
+    var NewDegree = new CDegreeSubSup(oProps);
+
+    this.baseContent.CopyTo(NewDegree.baseContent, false);
+    this.iters.iterDn.CopyTo(NewDegree.iters.iterDn, false);
+    this.iters.iterUp.CopyTo(NewDegree.iters.iterUp, false);
+
+    return NewDegree;
 };
 CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
 {
