@@ -304,9 +304,6 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else if(addFormatTableOptionsObj)
 					addNameColumn = false;
-					
-				ws.expandColsOnScroll(true);
-				ws.expandRowsOnScroll(true);
 				
 				//callback
 				var onAddAutoFiltersCallback = function(success)
