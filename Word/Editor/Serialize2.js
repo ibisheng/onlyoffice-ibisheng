@@ -8572,7 +8572,7 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
 			
 		if (oElem && bLast)
-			oElem.SetRunEmptyToContent(false);
+			oElem.Correct_Content(false);
 
         return res;
     };		
