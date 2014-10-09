@@ -445,17 +445,65 @@ CAccentBreve.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[22], YY[22]);
 }
 
+function CMathAccentPr()
+{
+    this.chr     = null;
+    this.chrType = null;
+}
+
+CMathAccentPr.prototype.Set_FromObject = function(Obj)
+{
+    if (undefined !== Obj.chr && null !== Obj.chr)
+        this.chr = Obj.chr;
+    else
+        this.chr = null;
+
+    if (undefined !== Obj.chrType && null !== Obj.chrType)
+        this.chrType = Obj.chrType;
+    else
+        this.chrType = null;
+};
+
+CMathAccentPr.prototype.Copy = function()
+{
+    var NewPr = new CMathAccentPr();
+
+    NewPr.chr     = this.chr;
+    NewPr.chrType = this.chrType;
+
+    return NewPr;
+};
+
+CMathAccentPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : chr     (-1 : null)
+    // Long : chrType (-1 : null)
+
+    Writer.WriteLong(null === this.chr ? -1 : this.chr);
+    Writer.WriteLong(null === this.chrType ? -1 : this.chrType);
+};
+
+CMathAccentPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : chr     (-1 : null)
+    // Long : chrType (-1 : null)
+
+    var chr     = Reader.GetLong();
+    var chrType = Reader.GetLong();
+
+    this.chr     = -1 === chr ? null : chr;
+    this.chrType = -1 === chrType ? null : chrType;
+};
+
 function CAccent(props)
 {
-	this.Id = g_oIdCounter.Get_NewId();
+    CAccent.superclass.constructor.call(this);
+
+    this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_ACCENT;
 
     //// Properties
-    this.Pr =
-    {
-        chr:        null,
-        chrType:    null
-    };
+    this.Pr = new CMathAccentPr();
 
     this.gap = 0;
 
@@ -463,9 +511,6 @@ function CAccent(props)
 
     this.baseContent = new CMathContent();
     this.operator = new COperator(OPER_ACCENT);
-
-    CAccent.superclass.constructor.call(this);
-    //CMathBase.call(this);
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -476,7 +521,10 @@ Asc.extendClass(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
     this.setProperties(props);
-
+    this.fillContent();
+}
+CAccent.prototype.fillContent = function()
+{
     this.setDimension(1, 1);
     this.elements[0][0] = this.baseContent;
     this.elements[0][0].SetDot(true);
@@ -634,13 +682,22 @@ CAccent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 }
 CAccent.prototype.setProperties = function(props)
 {
-    this.Pr.chr     = props.chr;
-    this.Pr.chrType = props.chrType;
-
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;
 }
+CAccent.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewAccent = new CAccent(oProps);
+
+    this.baseContent.CopyTo(NewAccent.baseContent, false);
+
+    return NewAccent;
+};
 CAccent.prototype.Refresh_RecalcData = function(Data)
 {
 }
@@ -652,27 +709,17 @@ CAccent.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-
-    if (undefined !== this.Pr.chr)
-    {
-        Writer.WriteBool(true);
-        Writer.WriteLong(this.Pr.chr);
-    }
-    else
-        Writer.WriteBool(false);
-}
+    this.Pr.Write_ToBinary(Writer);
+};
 CAccent.prototype.Read_FromBinary2 = function( Reader )
 {
     this.Id = Reader.GetString2();
     this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
-	var props = {ctrPrp: new CTextPr()};
-	props.ctrPrp.Read_FromBinary(Reader);
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
 
-    if (true === Reader.GetBool())
-		props.chr = Reader.GetLong();
-
-    this.init(props);
+    this.fillContent();
 }
 CAccent.prototype.Get_Id = function()
 {

@@ -1,5 +1,100 @@
 "use strict";
 
+function CMathBorderBoxPr()
+{
+    strikeVthis.hideBot    = false;
+    this.hideLeft   = false;
+    this.hideRight  = false;
+    this.hideTop    = false;
+    this.strikeBLTR = false;
+    this.strikeH    = false;
+    this.strikeTLBR = false;
+    this.strikeV    = false;
+}
+
+CMathBorderBoxPr.prototype.Set_FromObject = function(Obj)
+{
+    if (undefined !== Obj.hideBot && null !== Obj.hideBot)
+        this.hideBot = Obj.hideBot;
+
+    if (undefined !== Obj.hideLeft && null !== Obj.hideLeft)
+        this.hideLeft = Obj.hideLeft;
+
+    if (undefined !== Obj.hideRight && null !== Obj.hideRight)
+        this.hideRight = Obj.hideRight;
+
+    if (undefined !== Obj.hideTop && null !== Obj.hideTop)
+        this.hideTop = Obj.hideTop;
+
+    if (undefined !== Obj.strikeBLTR && null !== Obj.strikeBLTR)
+        this.strikeBLTR = Obj.strikeBLTR;
+
+    if (undefined !== Obj.strikeH && null !== Obj.strikeH)
+        this.strikeH = Obj.strikeH;
+
+    if (undefined !== Obj.strikeTLBR && null !== Obj.strikeTLBR)
+        this.strikeTLBR = Obj.strikeTLBR;
+
+    if (undefined !== Obj.strikeV && null !== Obj.strikeV)
+        this.strikeV = Obj.strikeV;
+};
+
+CMathBorderBoxPr.prototype.Copy = function()
+{
+    var NewPr = new CMathBorderBoxPr();
+
+    NewPr.hideLeft   = this.hideLeft;
+    NewPr.hideRight  = this.hideRight;
+    NewPr.hideTop    = this.hideTop;
+    NewPr.strikeBLTR = this.strikeBLTR;
+    NewPr.strikeH    = this.strikeH;
+    NewPr.strikeTLBR = this.strikeTLBR;
+    NewPr.strikeV    = this.strikeV;
+
+    return NewPr;
+};
+
+CMathBorderBoxPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Bool : hideBot
+    // Bool : hideLeft
+    // Bool : hideRight
+    // Bool : hideTop
+    // Bool : strikeBLTR
+    // Bool : strikeH
+    // Bool : strikeTLBR
+    // Bool : strikeV
+
+    Writer.WriteBool(this.hideBot);
+    Writer.WriteBool(this.hideLeft);
+    Writer.WriteBool(this.hideRight);
+    Writer.WriteBool(this.hideTop);
+    Writer.WriteBool(this.strikeBLTR);
+    Writer.WriteBool(this.strikeH);
+    Writer.WriteBool(this.strikeTLBR);
+    Writer.WriteBool(this.strikeV);
+};
+
+CMathBorderBoxPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Bool : hideBot
+    // Bool : hideLeft
+    // Bool : hideRight
+    // Bool : hideTop
+    // Bool : strikeBLTR
+    // Bool : strikeH
+    // Bool : strikeTLBR
+    // Bool : strikeV
+
+    this.hideLeft   = Reader.GetBool();
+    this.hideRight  = Reader.GetBool();
+    this.hideTop    = Reader.GetBool();
+    this.strikeBLTR = Reader.GetBool();
+    this.strikeH    = Reader.GetBool();
+    this.strikeTLBR = Reader.GetBool();
+    this.strikeV    = Reader.GetBool();
+};
+
 function CBorderBox(props)
 {
     CBorderBox.superclass.constructor.call(this);
@@ -9,17 +104,7 @@ function CBorderBox(props)
 
     this.gapBrd = 0;
 
-    this.Pr =
-    {
-        hideLeft:       false,
-        hideRight:      false,
-        hideTop:        false,
-        hideBot:        false,
-        strikeBLTR:     false,
-        strikeTLBR:     false,
-        strikeH:        false,
-        strikeV:        false
-    };
+    this.Pr = new CMathBorderBoxPr();
 
     this.baseContent = new CMathContent();
 
@@ -41,32 +126,8 @@ CBorderBox.prototype.fillContent = function()
 }
 CBorderBox.prototype.setProperties = function(props)
 {
-    if(typeof(props.hideLeft) !== "undefined" && props.hideLeft !== null)
-        this.Pr.hideLeft = props.hideLeft;
-
-    if(typeof(props.hideRight) !== "undefined" && props.hideRight !== null)
-        this.Pr.hideRight = props.hideRight;
-
-    if(typeof(props.hideTop) !== "undefined" && props.hideTop !== null)
-        this.Pr.hideTop = props.hideTop;
-
-    if(typeof(props.hideBot) !== "undefined" && props.hideBot !== null)
-        this.Pr.hideBot = props.hideBot;
-
-    if(typeof(props.strikeBLTR) !== "undefined" && props.strikeBLTR !== null) // right diagonal
-        this.Pr.strikeBLTR = props.strikeBLTR;
-
-    if(typeof(props.strikeTLBR) !== "undefined" && props.strikeTLBR !== null) // left diagonal
-        this.Pr.strikeTLBR = props.strikeTLBR;
-
-    if(typeof(props.strikeH) !== "undefined" && props.strikeH !== null)
-        this.Pr.strikeH = props.strikeH;
-
-    if(typeof(props.strikeV) !== "undefined" && props.strikeV !== null)
-        this.Pr.strikeV = props.strikeV;
-
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
-
 
     this.RecalcInfo.bProps = true;
 }
@@ -306,22 +367,17 @@ CBorderBox.prototype.getBase = function()
 }
 CBorderBox.prototype.getPropsForWrite = function()
 {
-    /*var props = {};
-
-    props.hideLeft  = !this.bLeft;
-    props.hideRight = !this.bRight;
-    props.hideTop   = !this.bTop;
-    props.hideBot   = !this.bBot;
-
-    props.strikeBLTR = this.bRDiag;
-    props.strikeTLBR = this.bLDiag;
-    props.strikeH    = this.bHor;
-    props.strikeV    = this.bVert;
-
-    return props;*/
-
     return this.Pr;
 }
+CBorderBox.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewBorderBox = new CBorderBox(oProps);
+    this.baseContent.CopyTo(NewBorderBox.baseContent, false);
+    return NewBorderBox;
+};
 CBorderBox.prototype.Refresh_RecalcData = function(Data)
 {
 }
@@ -332,87 +388,102 @@ CBorderBox.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.Pr.hideBot )
-    {
-		Writer.WriteBool( this.Pr.hideBot );	
-		Flags |= 1;
-	}
-	if ( undefined != this.Pr.hideLeft )
-    {
-		Writer.WriteBool( this.Pr.hideLeft );	
-		Flags |= 2;
-	}
-	if ( undefined != this.Pr.hideRight )
-    {
-		Writer.WriteBool( this.Pr.hideRight );	
-		Flags |= 4;
-	}
-	if ( undefined != this.Pr.hideTop )
-    {
-		Writer.WriteBool( this.Pr.hideTop );
-		Flags |= 8;
-	}
-	if ( undefined != this.Pr.strikeBLTR )
-    {
-		Writer.WriteBool( this.Pr.strikeBLTR );	
-		Flags |= 16;
-	}
-	if ( undefined != this.Pr.strikeH )
-    {
-		Writer.WriteBool( this.Pr.strikeH );
-		Flags |= 32;
-	}
-	if ( undefined != this.Pr.strikeTLBR )
-    {
-		Writer.WriteBool( this.Pr.strikeTLBR );	
-		Flags |= 64;
-	}
-	if ( undefined != this.Pr.strikeV )
-    {
-		Writer.WriteBool( this.Pr.strikeV );
-		Flags |= 128;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
-}
+    this.Pr.Write_ToBinary(Writer);
+};
 CBorderBox.prototype.Read_FromBinary2 = function( Reader )
 {
     this.Id = Reader.GetString2();
     this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
-    var props = {ctrPrp: new CTextPr()};
-    props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.hideBot = Reader.GetBool();
-	if ( Flags & 2 )
-		props.hideLeft = Reader.GetBool();
-	if ( Flags & 4 )
-		props.hideRight = Reader.GetBool();
-	if ( Flags & 8 )
-		props.hideTop = Reader.GetBool();
-	if ( Flags & 16 )
-		props.strikeBLTR = Reader.GetBool();
-	if ( Flags & 32 )
-		props.strikeH = Reader.GetBool();
-	if ( Flags & 64 )
-		props.strikeTLBR = Reader.GetBool();
-	if ( Flags & 128 )
-		props.strikeV = Reader.GetBool();
+    this.CtrlPr.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
 
-    this.init(props);
+    this.fillContent();
 }
 CBorderBox.prototype.Get_Id = function()
 {
 	return this.Id;
 }
+
+function CMathBoxPr()
+{
+    this.aln     = false;
+    this.brk     = false;
+    this.diff    = false;
+    this.noBreak = false;
+    this.opEmu   = false;
+};
+
+CMathBoxPr.prototype.Set_FromObject = function(Obj)
+{
+    if(true === Obj.aln || 1 === Obj.aln)
+        this.Pr.aln = true;
+    else
+        this.Pr.aln = false;
+
+    if(true === Obj.brk || 1 === Obj.brk)
+        this.Pr.brk = true;
+    else
+        this.Pr.brk = false;
+
+    if(true === Obj.diff || 1 === Obj.diff)
+        this.Pr.diff = true;
+    else
+        this.Pr.diff = false;
+
+    if(true === Obj.noBreak || 1 === Obj.noBreak)
+        this.Pr.noBreak = true;
+    else
+        this.Pr.noBreak = false;
+
+    if(true === Obj.opEmu || 1 === Obj.opEmu)
+        this.Pr.opEmu = true;
+    else
+        this.Pr.opEmu = false;
+};
+
+CMathBoxPr.prototype.Copy = function()
+{
+    var NewPr = new CMathBoxPr();
+
+    NewPr.aln     = this.aln    ;
+    NewPr.brk     = this.brk    ;
+    NewPr.diff    = this.diff   ;
+    NewPr.noBreak = this.noBreak;
+    NewPr.opEmu   = this.opEmu  ;
+
+    return NewPr;
+};
+
+CMathBoxPr.prototype.Write_ToBinary = function(Wrtier)
+{
+    // Bool : aln
+    // Bool : brk
+    // Bool : diff
+    // Bool : noBreak
+    // Bool : opEmu
+
+    Writer.WriteBool(aln);
+    Writer.WriteBool(brk);
+    Writer.WriteBool(diff);
+    Writer.WriteBool(noBreak);
+    Writer.WriteBool(opEmu);
+};
+
+CMathBoxPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Bool : aln
+    // Bool : brk
+    // Bool : diff
+    // Bool : noBreak
+    // Bool : opEmu
+
+    this.aln     = Reader.GetBool();
+    this.brk     = Reader.GetBool();
+    this.diff    = Reader.GetBool();
+    this.noBreak = Reader.GetBool();
+    this.opEmu   = Reader.GetBool();
+};
 
 function CBox(props)
 {
@@ -421,14 +492,7 @@ function CBox(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BOX;
 
-    this.Pr =
-    {
-        aln:        false,
-        opEmu:      false,
-        diff:       false,
-        noBreak:    false,
-        brk:        false
-    };
+    this.Pr = new CMathBoxPr();
 
     this.baseContent = new CMathContent();
 
@@ -450,21 +514,7 @@ CBox.prototype.fillContent = function()
 }
 CBox.prototype.setProperties = function(props)
 {
-    if(props.opEmu === true || props.opEmu === false)
-        this.Pr.opEmu = props.opEmu;
-
-    if(props.diff === true || props.diff === false)
-        this.Pr.diff = props.diff;
-
-    if(props.noBreak === true || props.noBreak === false)
-        this.Pr.noBreak = props.noBreak;
-
-    if(props.brk === true || props.brk === false)
-        this.Pr.brk = props.brk;
-
-    if(props.aln === true || props.aln === false)
-        this.Pr.aln = props.aln;
-
+    this.Pr.Set_FromObject(Obj);
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;
@@ -477,13 +527,14 @@ CBox.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CBox.prototype.Save_Changes = function(Data, Writer)
+CBox.prototype.Copy = function()
 {
-	Writer.WriteLong( historyitem_type_box );
-}
-CBox.prototype.Load_Changes = function(Reader)
-{
-}
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+    var NewBox = new CBox(oProps);
+    this.baseContent.CopyTo(NewBox.baseContent, false);
+    return NewBox;
+};
 CBox.prototype.Refresh_RecalcData = function(Data)
 {
 }
@@ -494,66 +545,52 @@ CBox.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.aln )
-    {
-		Writer.WriteBool(this.aln);	
-		Flags |= 1;
-	}
-	if ( undefined != this.brk )
-    {
-		Writer.WriteLong(this.brk);	
-		Flags |= 2;
-	}
-	if ( undefined != this.diff )
-    {
-		Writer.WriteBool(this.diff);	
-		Flags |= 4;
-	}
-	if ( undefined != this.noBreak )
-    {
-		Writer.WriteBool(this.noBreak);	
-		Flags |= 8;
-	}
-	if ( undefined != this.opEmu )
-    {
-		Writer.WriteBool(this.opEmu);	
-		Flags |= 16;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
-}
+    this.Pr.Write_ToBinary(Writer);
+};
 CBox.prototype.Read_FromBinary2 = function( Reader )
 {
     this.Id = Reader.GetString2();
     this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
-	var props = {ctrPrp: new CTextPr()};
-	props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.aln = Reader.GetBool();
-	if ( Flags & 2 )
-		props.brk = Reader.GetLong();
-	if ( Flags & 4 )
-		props.diff = Reader.GetBool();
-	if ( Flags & 8 )
-		props.noBreak = Reader.GetBool();
-	if ( Flags & 16 )
-		props.opEmu = Reader.GetBool();
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
 
-    this.init(props);
+    this.fillContent();
 }
 CBox.prototype.Get_Id = function()
 {
 	return this.Id;
 }
+
+function CMathBarPr()
+{
+    this.pos = LOCATION_BOT;
+}
+
+CMathBarPr.prototype.Set_FromObject = function(Obj)
+{
+    if(LOCATION_TOP === Obj.pos || LOCATION_BOT === Obj.pos)
+        this.pos = Obj.pos;
+};
+
+CMathBarPr.prototype.Copy = function()
+{
+    var NewPr = new CMathBarPr();
+    NewPr.pos = this.pos;
+    return NewPr;
+};
+
+CMathBarPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : pos
+    Writer.WriteLong(this.pos);
+};
+
+CMathBarPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : pos
+    this.pos = Reader.GetLong();
+};
 
 function CBar(props)
 {
@@ -562,14 +599,10 @@ function CBar(props)
 	this.Id = g_oIdCounter.Get_NewId();
     this.kind = MATH_BAR;
 
-    this.Pr =
-    {
-        pos: LOCATION_BOT
-    };
+    this.Pr = new CMathBarPr();
 
     this.baseContent = new CMathContent();
 
-    //this.loc = LOCATION_BOT;
     this.operator = new COperator(OPER_BAR);
 
     if(props !== null && typeof(props) !== "undefined")
@@ -624,9 +657,7 @@ CBar.prototype.getAscent = function()
 }
 CBar.prototype.setProperties = function(props)
 {
-    if(props.pos === LOCATION_TOP || props.pos === LOCATION_BOT)
-        this.Pr.pos = LOCATION_TOP;
-
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;
@@ -635,6 +666,14 @@ CBar.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
+CBar.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+    var NewBar = new CBar(oProps);
+    this.baseContent.CopyTo(NewBar.baseContent, false);
+    return NewBar;
+};
 CBar.prototype.Save_Changes = function(Data, Writer)
 {
 	Writer.WriteLong( historyitem_type_bar );
@@ -686,20 +725,93 @@ CBar.prototype.Get_Id = function()
 	return this.Id;
 }
 
+function CMathPhantomPr()
+{
+    this.show     = true;
+    this.transp   = false;
+    this.zeroAsc  = false;
+    this.zeroDesc = false;
+    this.zeroWid  = false;
+}
+
+CMathPhantomPr.prototype.Set_FromObject = function(Obj)
+{
+    if (true === Obj.show || 1 === Obj.show)
+        this.show = true;
+    else
+        this.show = false;
+
+    if (true === Obj.transp || 1 === Obj.transp)
+        this.transp = true;
+    else
+        this.transp = false;
+
+    if (true === Obj.zeroAsc || 1 === Obj.zeroAsc)
+        this.zeroAsc = true;
+    else
+        this.zeroAsc = false;
+
+    if (true === Obj.zeroDesc || 1 === Obj.zeroDesc)
+        this.zeroDesc = true;
+    else
+        this.zeroDesc = false;
+
+    if (true === Obj.zeroWid || 1 === Obj.zeroWid)
+        this.zeroWid = true;
+    else
+        this.zeroWid = false;
+};
+
+CMathPhantomPr.prototype.Copy = function()
+{
+    var NewPr = new CMathPhantomPr();
+
+    NewPr.show     = this.show    ;
+    NewPr.transp   = this.transp  ;
+    NewPr.zeroAsc  = this.zeroAsc ;
+    NewPr.zeroDesc = this.zeroDesc;
+    NewPr.zeroWid  = this.zeroWid ;
+
+    return NewPr;
+};
+
+CMathPhantomPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Bool : show
+    // Bool : transp
+    // Bool : zeroAsc
+    // Bool : zeroDesc
+    // Bool : zeroWid
+
+    Writer.WriteBool(show);
+    Writer.WriteBool(transp);
+    Writer.WriteBool(zeroAsc);
+    Writer.WriteBool(zeroDesc);
+    Writer.WriteBool(zeroWid);
+};
+
+CMathPhantomPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Bool : show
+    // Bool : transp
+    // Bool : zeroAsc
+    // Bool : zeroDesc
+    // Bool : zeroWid
+
+    this.show     = Reader.GetBool();
+    this.transp   = Reader.GetBool();
+    this.zeroAsc  = Reader.GetBool();
+    this.zeroDesc = Reader.GetBool();
+    this.zeroWid  = Reader.GetBool();
+};
+
 function CPhantom(props)
 {
     CPhantom.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
 
-    this.Pr =
-    {
-        show:       true,
-        transp:     false,
-        zeroAsc:    false,
-        zeroDesc:   false,
-        zeroWid:    false
-    };
+    this.Pr = new CMathPhantomPr();
 
     this.baseContent = new CMathContent();
 
@@ -725,22 +837,7 @@ CPhantom.prototype.getBase = function()
 }
 CPhantom.prototype.setProperties = function(props)
 {
-    if(props.show == true || props.show == false)
-        this.Pr.show = props.show;
-
-    if(props.transp == false || props.transp == true)
-        this.Pr.transp = props.transp;
-
-    if(props.zeroAsc == false || props.zeroAsc == true)
-        this.Pr.zeroAsc = props.zeroAsc;
-
-    if(props.zeroDesc == false || props.zeroDesc == true)
-        this.Pr.zeroDesc = props.zeroDesc;
-
-    if(props.zeroWid == false || props.zeroWid == true)
-        this.Pr.zeroWid = props.zeroWid;
-
-
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;
@@ -749,13 +846,15 @@ CPhantom.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CPhantom.prototype.Save_Changes = function(Data, Writer)
+CPhantom.prototype.Copy = function()
 {
-	Writer.WriteLong( historyitem_type_phant );
-}
-CPhantom.prototype.Load_Changes = function(Reader)
-{
-}
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewPhant = new CPhantom(oProps);
+    this.baseContent.CopyTo(NewPhant.baseContent, false);
+    return NewPhant;
+};
 CPhantom.prototype.Refresh_RecalcData = function(Data)
 {
 }
@@ -766,61 +865,17 @@ CPhantom.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
-	
-	var StartPos = Writer.GetCurPosition();
-    Writer.Skip(4);
-    var Flags = 0;
-	if ( undefined != this.Pr.show )
-    {
-		Writer.WriteBool( this.Pr.show );
-		Flags |= 1;
-	}
-	if ( undefined != this.Pr.transp )
-    {
-		Writer.WriteBool( this.Pr.transp );
-		Flags |= 2;
-	}
-	if ( undefined != this.Pr.zeroAsc )
-    {
-		Writer.WriteBool( this.Pr.zeroAsc );
-		Flags |= 4;
-	}
-	if ( undefined != this.Pr.zeroDesc )
-    {
-		Writer.WriteBool( this.Pr.zeroDesc );
-		Flags |= 8;
-	}
-	if ( undefined != this.Pr.zeroWid )
-    {
-		Writer.WriteBool( this.Pr.zeroWid );
-		Flags |= 16;
-	}
-	var EndPos = Writer.GetCurPosition();
-    Writer.Seek( StartPos );
-    Writer.WriteLong( Flags );
-    Writer.Seek( EndPos );
+    this.Pr.Write_ToBinary(Writer);
 }
 CPhantom.prototype.Read_FromBinary2 = function( Reader )
 {
     this.Id = Reader.GetString2();
     this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
-	var props = {ctrPrp: new CTextPr()};
-	props.ctrPrp.Read_FromBinary(Reader);
-	
-	var Flags = Reader.GetLong();
-	if ( Flags & 1 )
-		props.show = Reader.GetBool();
-	if ( Flags & 2 )
-		props.transp = Reader.GetBool();
-	if ( Flags & 4 )
-		props.zeroAsc = Reader.GetBool();
-	if ( Flags & 8 )
-		props.zeroDesc = Reader.GetBool();
-	if ( Flags & 16 )
-		props.zeroWid = Reader.GetBool();
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.Read_FromBinary(Reader);
 
-    this.init(props);
+    this.fillContent();
 }
 CPhantom.prototype.Get_Id = function()
 {
