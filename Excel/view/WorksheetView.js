@@ -10798,7 +10798,16 @@
 		};
 
 		// При добавлении форматированной таблицы расширяем, автоподбор по названию столбца
-		WorksheetView.prototype._onEndAddFormatTable = function (range) {
+		WorksheetView.prototype._onEndAddFormatTable = function (range, recalc) {
+			if (!recalc) {
+				// Пока вызовем updateRange, но стоит делать просто draw
+				this._updateCellsRange(range);
+				return;
+			}
+
+			if (!this.activeRange.isEqual(range))
+				this.setSelection(range);
+
 			var i, r = range.r1, bIsUpdate = false;
 			for (i = range.c1; i <= range.c2; ++i) {
 				if (this.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true)) {
@@ -10812,6 +10821,9 @@
 				this._calcColumnWidths(/*fullRecalc*/0);
 				this._updateVisibleColsCount();
 				this.changeWorksheet("update");
+			} else {
+				// Просто отрисуем
+				this.draw();
 			}
 		};
 
