@@ -39,6 +39,8 @@ function COverlay()
 
     this.DashLineColor = "#000000";
     this.ClearAll = false;
+
+    this.IsRetina = AscBrowser.isRetina;
 }
 
 COverlay.prototype =
@@ -54,6 +56,8 @@ COverlay.prototype =
             this.m_oContext.oImageSmoothingEnabled = false;
             this.m_oContext.webkitImageSmoothingEnabled = false;
         }
+
+        this.SetBaseTransform();
 
         this.m_oContext.beginPath();
         if (this.max_x != -0xFFFF && this.max_y != -0xFFFF)
@@ -73,6 +77,21 @@ COverlay.prototype =
         this.min_y = 0xFFFF;
         this.max_x = -0xFFFF;
         this.max_y = -0xFFFF;
+    },
+
+    SetTransform : function(sx, shy, shx, sy, tx, ty)
+    {
+        this.SetBaseTransform();
+        this.m_oContext.setTransform(sx, shy, shx, sy, tx, ty);
+
+    },
+
+    SetBaseTransform : function()
+    {
+        if (this.IsRetina)
+            this.m_oContext.setTransform(2, 0, 0, 2, 0, 0);
+        else
+            this.m_oContext.setTransform(1, 0, 0, 1, 0, 0);
     },
 
     Show : function()
@@ -605,7 +624,10 @@ CAutoshapeTrack.prototype =
         this.m_oContext = this.m_oOverlay.m_oContext;
 
         this.Graphics = new CGraphics();
-        this.Graphics.init(this.m_oContext, r - x, b - y, w_mm, h_mm);
+        this.Graphics.init(this.m_oContext,
+            !overlay.IsRetina ? (r - x) : 2 * (r - x),
+            !overlay.IsRetina ? (b - y) : 2 * (b - y),
+            w_mm, h_mm);
 
         this.Graphics.m_oCoordTransform.tx = x;
         this.Graphics.m_oCoordTransform.ty = y;
@@ -768,7 +790,7 @@ CAutoshapeTrack.prototype =
     },
     CorrectOverlayBounds : function()
     {
-        this.m_oContext.setTransform(1,0,0,1,0,0);
+        this.m_oOverlay.SetBaseTransform();
 
         this.m_oOverlay.min_x -= this.MaxEpsLine;
         this.m_oOverlay.min_y -= this.MaxEpsLine;
@@ -787,10 +809,13 @@ CAutoshapeTrack.prototype =
         var drawPage = oPage.drawingPage;
 
         this.Graphics = new CGraphics();
-        this.Graphics.init(this.m_oContext, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, oPage.width_mm, oPage.height_mm);
 
-        this.Graphics.m_oCoordTransform.tx = drawPage.left;
-        this.Graphics.m_oCoordTransform.ty = drawPage.top;
+        var _scale = this.m_oOverlay.IsRetina? 2 : 1;
+
+        this.Graphics.init(this.m_oContext, _scale * (drawPage.right - drawPage.left), _scale * (drawPage.bottom - drawPage.top), oPage.width_mm, oPage.height_mm);
+
+        this.Graphics.m_oCoordTransform.tx = _scale * drawPage.left;
+        this.Graphics.m_oCoordTransform.ty = _scale * drawPage.top;
 
         this.Graphics.SetIntegerGrid(false);
 
@@ -1262,7 +1287,8 @@ CAutoshapeTrack.prototype =
 								ctx.translate(_xI, _yI);
 								ctx.transform(_px, _py, -_py, _px, 0, 0);
                                 ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                                overlay.SetBaseTransform();
 
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
@@ -1617,7 +1643,8 @@ CAutoshapeTrack.prototype =
 								ctx.translate(_xI, _yI);
 								ctx.transform(_px, _py, -_py, _px, 0, 0);
 								ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-								ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                                overlay.SetBaseTransform();
 
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
@@ -1887,9 +1914,9 @@ CAutoshapeTrack.prototype =
                             var _w = IMAGE_ROTATE_TRACK_W;
                             var _w2 = IMAGE_ROTATE_TRACK_W / 2;
 
-                            ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+                            overlay.SetTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
                             ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                            ctx.setTransform(1, 0, 0, 1, 0, 0);
+                            overlay.SetBaseTransform();
 
                             overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                         }
@@ -1981,7 +2008,7 @@ CAutoshapeTrack.prototype =
 
         overlay.CheckRect(x1, y1, x2 - x1, y2 - y1);
         var ctx = overlay.m_oContext;
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        overlay.SetBaseTransform();
 
         var globalAlphaOld = ctx.globalAlpha;
         ctx.globalAlpha = 0.5;
@@ -2454,7 +2481,7 @@ CAutoshapeTrack.prototype =
         var _oldAlpha = ctx.globalAlpha;
         ctx.globalAlpha = 1;
 
-        ctx.setTransform(1,0,0,1,0,0);
+        overlay.SetBaseTransform();
 
         ctx.drawImage(window.g_flow_anchor, __x, __y);
         ctx.globalAlpha = _oldAlpha;
@@ -2485,7 +2512,7 @@ CAutoshapeTrack.prototype =
         var _oldAlpha = ctx.globalAlpha;
         ctx.globalAlpha = 0.5;
 
-        ctx.setTransform(1,0,0,1,0,0);
+        overlay.SetBaseTransform();
 
         var _index = 0;
         if ((type & 0x02) == 0x02)

@@ -3423,7 +3423,11 @@ function CEditorPage(api)
     {
         if (this.bIsRetinaSupport)
         {
-            if (htmlElem.id == "id_viewer" || htmlElem.id == "id_hor_ruler" || htmlElem.id == "id_vert_ruler" || htmlElem.id == "id_buttonTabs")
+            if (htmlElem.id == "id_viewer" ||
+                htmlElem.id == "id_viewer_overlay" ||
+                htmlElem.id == "id_hor_ruler" ||
+                htmlElem.id == "id_vert_ruler" ||
+                htmlElem.id == "id_buttonTabs")
                 return true;
         }
         return false;

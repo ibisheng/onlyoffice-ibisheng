@@ -3799,6 +3799,7 @@ function CDrawingDocument()
 
         if (this.IsTextMatrixUse)
         {
+            ctx.lineWidth = 1;
             ctx.globalAlpha = 1.0;
             ctx.stroke();
         }
@@ -3879,6 +3880,21 @@ function CDrawingDocument()
 
             var x4 = drawPage.left + dKoefX * _x4;
             var y4 = drawPage.top + dKoefY * _y4;
+
+            if (global_MatrixTransformer.IsIdentity2(this.TextMatrix))
+            {
+                x1 = (x1 >> 0) + 0.5;
+                y1 = (y1 >> 0) + 0.5;
+
+                x2 = (x2 >> 0) + 0.5;
+                y2 = (y2 >> 0) + 0.5;
+
+                x3 = (x3 >> 0) + 0.5;
+                y3 = (y3 >> 0) + 0.5;
+
+                x4 = (x4 >> 0) + 0.5;
+                y4 = (y4 >> 0) + 0.5;
+            }
 
             this.Overlay.CheckPoint(x1, y1);
             this.Overlay.CheckPoint(x2, y2);
