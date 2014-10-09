@@ -578,8 +578,8 @@ var gUndoInsDelCellsFlag = true;
 								else
 									rangeFilter = ws.visibleRange;
 
-								isUpdateRange = rangeFilter;
-								recalc = true;
+								//isUpdateRange = rangeFilter;
+								//recalc = true;
 
 							}
 						} 
@@ -701,7 +701,7 @@ var gUndoInsDelCellsFlag = true;
 								rangeFilter =  new Asc.Range(arn.c1, arn.r1, arn.c2, arn.r2);
 							}
 							
-							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
+							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
 								ws._onEndAddFormatTable(rangeFilter, true);
 							
 							History.EndTransaction();
@@ -710,14 +710,13 @@ var gUndoInsDelCellsFlag = true;
 						}
 						else
 						{
-							if(isUpdateRange != null)
+							if(isUpdateRange != null && !bIsOpenFilter && !aWs.workbook.bCollaborativeChange && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
 								ws._onEndAddFormatTable(isUpdateRange, recalc);
 								
 							History.EndTransaction();
 							if(isTurnOffHistory)
 								History.TurnOn();
 						}
-						
 							
 						return true;
 					}
