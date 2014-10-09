@@ -206,7 +206,7 @@ var gUndoInsDelCellsFlag = true;
 		
 		function AddFormatTableOptions () {
 
-			if ( !(this instanceof AddFormatTableOptions) ) {return new AddFormatTableOptions();};
+			if ( !(this instanceof AddFormatTableOptions) ) {return new AddFormatTableOptions();}
 
 			this.Properties = {
 				range		: 0,
@@ -283,8 +283,8 @@ var gUndoInsDelCellsFlag = true;
 				if(openFilter != undefined)
 					History.TurnOff();
 				
-				var paramsForCallBack, paramsForCallBackAdd, filterChange, t  = this, newRes, rangeShift1, rangeShift, selectionTable, result, isInsertButton = true, startCell, endCell;
-				var rangeFilter, splitRange, addNameColumn, ref;
+				var paramsForCallBack, paramsForCallBackAdd, filterChange, t  = this, newRes, rangeShift1, rangeShift, selectionTable, result, isInsertButton = true;
+				var rangeFilter, addNameColumn, ref;
 
 				if(!addFormatTableOptionsObj)
 					addNameColumn = true;
@@ -341,7 +341,7 @@ var gUndoInsDelCellsFlag = true;
 									filterChange.TableStyleInfo.Name = lTable;
 									
 									rangeFilter = filterChange.Ref;
-									t._setColorStyleTable(rangeFilter, filterChange)
+									t._setColorStyleTable(rangeFilter, filterChange);
 									
 									isUpdateRange = rangeFilter;
 
@@ -386,7 +386,7 @@ var gUndoInsDelCellsFlag = true;
 											delete aWs.TableParts[apocal.num].AutoFilter;
 											isReDrawFilter = aWs.TableParts[apocal.num].clone(aWs);
 										}	
-									};
+									}
 									
 									t._showButtonFlag(newRes.result);
 									
@@ -407,17 +407,11 @@ var gUndoInsDelCellsFlag = true;
 									}	
 
 									if (bIsActiveSheet)
-										t._addButtonAF(newRes, bIsOpenFilter);
+										t._addButtonAF(newRes, true);
 									//перерисовываем форматированную таблиц
 									if(isReDrawFilter && isReDrawFilter.TableColumns && isReDrawFilter.result)
 										t._reDrawCurrentFilter(null, null, isReDrawFilter);
-									if(!apocal.changeAllFOnTable)
-									{
-										if(isInsert && bIsActiveSheet && !bIsOpenFilter)
-										{
-											ws.isChanged = true;
-										}
-									}
+
 									break;
 								}
 								case 'changeAllFOnTable':
@@ -508,7 +502,7 @@ var gUndoInsDelCellsFlag = true;
 									
 									if(isInsertButton){
 										if (bIsActiveSheet)
-											t._addButtonAF(newRes, bIsOpenFilter);
+											t._addButtonAF(newRes, true);
 									}
 									else if(!t.allButtonAF)
 										t.allButtonAF = [];
@@ -517,7 +511,6 @@ var gUndoInsDelCellsFlag = true;
 									{
 										if(openFilter == undefined)
 										{
-											ws.isChanged = true;
 											arn.c1 = arn.c1 - 1;
 											arn.c2 = arn.c2 - 1;
 											arn.r1 = arn.r1 - 1;
@@ -568,7 +561,7 @@ var gUndoInsDelCellsFlag = true;
 
 									break;
 								}
-							};
+							}
 							
 							if(paramsForCallBack == "setStyleTableForAutoFilter1" || paramsForCallBack == "setStyleTableForAutoFilter")
 							{
@@ -576,7 +569,7 @@ var gUndoInsDelCellsFlag = true;
 								{activeCells: activeCells, lTable: lTable});
 
 								if (bIsActiveSheet)
-									t._addButtonAF(newRes, bIsOpenFilter);
+									t._addButtonAF(newRes, true);
 								
 								if(ref)
 								{
@@ -588,7 +581,7 @@ var gUndoInsDelCellsFlag = true;
 								isUpdateRange = rangeFilter;
 								recalc = true;
 
-							};
+							}
 						} 
 						else if(paramsForCallBackAdd)//добавляем а/ф
 						{
@@ -622,7 +615,7 @@ var gUndoInsDelCellsFlag = true;
 								
 								if(addNameColumn && !isTurnOffHistory)
 									tempCells.r2 = tempCells.r2 + 1;
-							};
+							}
 							
 							
 							result = t._getResultAddFilter(paramsForCallBackAdd, activeCells, mainAdjacentCells, lTable);
@@ -639,7 +632,7 @@ var gUndoInsDelCellsFlag = true;
 									History.TurnOn();
 								return false;
 							}	
-						};
+						}
 						
 						
 						if(paramsForCallBackAdd)
@@ -670,7 +663,7 @@ var gUndoInsDelCellsFlag = true;
 									aWs.AutoFilter.result = result;
 									aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
 								}
-							};
+							}
 							
 							newRes = 
 							{
@@ -681,7 +674,7 @@ var gUndoInsDelCellsFlag = true;
 							var ref = 
 							{
 								Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext)
-							};
+							}
 							
 							if(addNameColumn && addFormatTableOptionsObj)
 								addFormatTableOptionsObj.range = ref;
@@ -689,10 +682,7 @@ var gUndoInsDelCellsFlag = true;
 									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
 							
 							if(isInsertButton){
-								if (bIsActiveSheet)
-									t._addButtonAF(newRes, bIsOpenFilter);
-								else
-									t._addButtonAF(newRes, true);
+								t._addButtonAF(newRes, true);
 							}
 							else if(!t.allButtonAF)
 								t.allButtonAF = [];
@@ -702,7 +692,6 @@ var gUndoInsDelCellsFlag = true;
 							{
 								if(openFilter == undefined)
 								{
-									ws.isChanged = true;
 									arn.c1 = arn.c1 - 1;
 									arn.c2 = arn.c2 - 1;
 									arn.r1 = arn.r1 - 1;
@@ -710,7 +699,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								// ToDo - и еще это обновление стоит после switch, в котором тоже происходит обновление - возможно будет 2 раза
 								rangeFilter =  new Asc.Range(arn.c1, arn.r1, arn.c2, arn.r2);
-							};
+							}
 							
 							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
 								ws._onEndAddFormatTable(rangeFilter, true);
@@ -773,8 +762,7 @@ var gUndoInsDelCellsFlag = true;
 						rangeShift = filterChange.Ref;
 						
 						paramsForCallBack = 'changeStyle';
-						
-						//rangeShift1 = t._getAscRange(rangeShift.bbox);
+
 						rangeShift1 = rangeShift;
 						
 						if(isTurnOffHistory)
@@ -866,8 +854,7 @@ var gUndoInsDelCellsFlag = true;
 							rangeShift = filterChange.Ref;
 							
 							paramsForCallBack = 'changeStyleWithoutFilter';
-							
-							//rangeShift1 = t._getAscRange(rangeShift.bbox);
+
 							rangeShift1 = rangeShift;
 							
 							if(isTurnOffHistory)
@@ -914,8 +901,7 @@ var gUndoInsDelCellsFlag = true;
 							rangeShift = ourFilter.Ref;
 							
 							paramsForCallBack = 'setStyleTableForAutoFilter1';
-							
-							//rangeShift1 = t._getAscRange(rangeShift.bbox);
+
 							rangeShift1 = rangeShift;
 							
 							if(isTurnOffHistory)
@@ -932,13 +918,13 @@ var gUndoInsDelCellsFlag = true;
 						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return true;
 					}
-				};
+				}
 				
 				
 				
 				var mergedRange;
 				if(activeCells && activeCells != null)
-					mergedRange = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).hasMerged()
+					mergedRange = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).hasMerged();
 				
 				//при открытии
 				if(openFilter != undefined)
@@ -1115,17 +1101,17 @@ var gUndoInsDelCellsFlag = true;
 							isInsertButton = false;
 						}
 						aWs.TableParts[openFilter].result = result;
-					};
+					}
 
 					newRes =
 					{
 						result: result,
 						isVis:  true
-					};
+					}
 					
 					if(isInsertButton){
 						//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
-						this._addButtonAF(newRes, bIsOpenFilter);
+						this._addButtonAF(newRes, true);
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
