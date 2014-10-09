@@ -3198,6 +3198,9 @@
 			if (row >= this.nRowsCount)
 				this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 
+			this._initCellsArea();
+			this.handlers.trigger("reinitializeScroll");
+
 			this.objectRender.drawingArea.init();
 			if (!lockDraw)
 				this.draw();
@@ -7903,7 +7906,7 @@
 					case "a":  range.setAlignHorizontal(val); break;
 					case "va": range.setAlignVertical(val); break;
 					case "c":  range.setFontcolor(val); break;
-					case "bc": range.setFill((val) ? (val) : null); break;
+					case "bc": range.setFill((val) ? (val) : null); break; // ToDo можно делать просто отрисовку
 					case "wrap":   range.setWrap(val); break;
 					case "shrink": range.setShrinkToFit(val); break;
 					case "value":  range.setValue(val); break;
@@ -8012,6 +8015,7 @@
 					case "paste":
 						// Вставляем текст из локального буфера или нет
 						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive);
+						bIsUpdate = false;
 						break;
 					case "hyperlink":
 						if (val && val.hyperlinkModel) {
