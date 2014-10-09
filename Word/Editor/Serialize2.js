@@ -597,9 +597,8 @@ var c_oSer_OMathContentType = {
 	Sup: 56,
 	MText: 57,
 	CtrlPr: 58,
-	Id: 59,	
-	pagebreak: 60,
-	linebreak: 61
+	pagebreak: 59,
+	linebreak: 60
 };
 var c_oSer_HyperlinkType = {
     Content: 0,
@@ -7445,7 +7444,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oParStruct.addToContent(oMath);
 			
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.boMathr.ReadMathArg(t,l,oMath.Root);
+                return oThis.boMathr.ReadMathArg(t,l,oMath.Root, oParStruct);
 			});			
 		}
 		else if (c_oSerParType.Hyperlink == type) {
@@ -8392,7 +8391,7 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathArg = function(type, length, oElem)
+	this.ReadMathArg = function(type, length, oElem, oParStruct)
     {
 		var bLast = this.bcr.stream.bLast;
 			
@@ -8529,7 +8528,7 @@ function Binary_oMathReader(stream)
         {
 			var oMRun = new ParaRun(null, true);
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathMRun(t,l,oMRun,props,oElem);
+                return oThis.ReadMathMRun(t,l,oMRun,props,oElem,oParStruct);
             });
 			if (oElem)	
 				oElem.addElementToContent(oMRun);
@@ -9736,7 +9735,7 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathMRun = function(type, length, oMRun, props, oParent)
+	this.ReadMathMRun = function(type, length, oMRun, props, oParent, oParStruct)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -9781,21 +9780,22 @@ function Binary_oMathReader(stream)
 			res = this.brPrr.Read(length, rPr);	
 			oMRun.Set_Pr(rPr);
 		}
-		else if (c_oSer_OMathContentType.pagenum === type)
-        {
-            oNewElem = new ParaPageNum();
-        }
-        else if (c_oSer_OMathContentType.pagebreak === type)
+		else if (c_oSer_OMathContentType.pagebreak === type)
         {
             oNewElem = new ParaNewLine( break_Page );
+        }
+        else if (c_oSer_OMathContentType.linebreak === type)
+        {
+            oNewElem = new ParaNewLine();
         }
         else
             res = c_oSerConstants.ReadUnknown;
 			
 		if (null != oNewElem)
         {
-			//TODO обработка переноса
-			//oMRun.Add_ToContent(0, oNewElem, false);
+			var oNewRun = new ParaRun(oParStruct.paragraph);
+			oNewRun.Add_ToContent(0, oNewElem, false);
+			oParStruct.addToContent(oNewRun);
         }
 		
         return res;
@@ -9987,7 +9987,7 @@ function Binary_oMathReader(stream)
 			var oMath = new ParaMath(props);
 			oParStruct.addToContent(oMath);
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathArg(t,l,oMath.Root);
+                return oThis.ReadMathArg(t,l,oMath.Root,oParStruct);
             });
         }
 		else if (c_oSer_OMathContentType.OMathParaPr === type)
