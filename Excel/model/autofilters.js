@@ -328,6 +328,9 @@ var gUndoInsDelCellsFlag = true;
 						if(rangeShift && rangeShift.r1 != undefined)
 							rangeShift = ws.model.getRange3(rangeShift.r1, rangeShift.c1, rangeShift.r1, rangeShift.c2);
 						
+						
+						var isUpdateRange = null;
+						var recalc = false;
 						if(paramsForCallBack)//меняем/удаляем/устанавливаем стиль для а/ф
 						{
 							switch(paramsForCallBack)
@@ -336,26 +339,16 @@ var gUndoInsDelCellsFlag = true;
 								{
 									var cloneFilterOld = filterChange.clone(aWs);
 									filterChange.TableStyleInfo.Name = lTable;
-									/*splitRange = filterChange.Ref.split(':');
-									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
-									startCell = t._idToRange(splitRange[0]);
-									endCell = t._idToRange(splitRange[1]);
-									rangeFilter =  new Asc.Range(startCell.c1, startCell.r1, endCell.c1, endCell.r1);*/
 									
 									rangeFilter = filterChange.Ref;
 									t._setColorStyleTable(rangeFilter, filterChange)
 									
-									if (bIsActiveSheet && !bIsOpenFilter) {
-										// ToDo нужно обновлять не весь видимый диапазон, а только диапазон фильтра
-										ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
-									}
+									isUpdateRange = rangeFilter;
+
 									// Смена стиля
 									t._addHistoryObj(cloneFilterOld, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
-									History.EndTransaction();
-									if(isTurnOffHistory)
-										History.TurnOn();
-									return true;
+										
 									break;
 								}
 								case 'deleteFilter':
@@ -423,13 +416,7 @@ var gUndoInsDelCellsFlag = true;
 										if(isInsert && bIsActiveSheet && !bIsOpenFilter)
 										{
 											ws.isChanged = true;
-											// ToDo - тоже стоит посмотреть, нужна ли общая перерисовка
-											ws.changeWorksheet("update");
 										}
-										History.EndTransaction();
-										if(isTurnOffHistory)
-											History.TurnOn();
-										return true;
 									}
 									break;
 								}
@@ -535,14 +522,13 @@ var gUndoInsDelCellsFlag = true;
 											arn.c2 = arn.c2 - 1;
 											arn.r1 = arn.r1 - 1;
 											arn.r2 = arn.r2 - 1;
-											ws.setSelection(arn,true);
 										}
-										ws._updateCellsRange(activeCells, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 									}
-									History.EndTransaction();
-									if(isTurnOffHistory)
-										History.TurnOn();
-									return true;
+									
+									isUpdateRange = activeCells;
+									recalc = true;
+									
+									break;
 								}
 								case 'changeStyleWithoutFilter':
 								{
@@ -559,13 +545,10 @@ var gUndoInsDelCellsFlag = true;
 									
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
-									if (bIsActiveSheet && !bIsOpenFilter) {
-										ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
-									}
-									History.EndTransaction();
-									if(isTurnOffHistory)
-										History.TurnOn();
-									return true;
+									
+									isUpdateRange = rangeFilter;
+									
+									break;
 								}
 								case 'setStyleTableForAutoFilter':
 								{
@@ -573,10 +556,7 @@ var gUndoInsDelCellsFlag = true;
 									var ref = allAutoFilters[apocal.num - 1].Ref;
 									allAutoFilters[apocal.num - 1].AutoFilter = new AutoFilter();
 									allAutoFilters[apocal.num - 1].AutoFilter.Ref = ref;
-									/*allAutoFilters[apocal.num - 1].AutoFilter = 
-									{
-										Ref: allAutoFilters[apocal.num - 1].Ref
-									};*/
+
 									break;
 								}
 								case 'setStyleTableForAutoFilter1':
@@ -600,23 +580,14 @@ var gUndoInsDelCellsFlag = true;
 								
 								if(ref)
 								{
-									/*splitRange = ref.split(':');
-									startCell = t._idToRange(splitRange[0]);
-									endCell = t._idToRange(splitRange[1]);
-									rangeFilter =  new Asc.Range(startCell.c1, startCell.r1, endCell.c1, endCell.r1);*/
-									
 									rangeFilter = ref;
 								}
 								else
 									rangeFilter = ws.visibleRange;
-								//обновляем
-								if(arn && bIsActiveSheet && !bIsOpenFilter) {
-									ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
-								}
-								History.EndTransaction();
-								if(isTurnOffHistory)
-									History.TurnOn();
-								return true;
+
+								isUpdateRange = rangeFilter;
+								recalc = true;
+
 							};
 						} 
 						else if(paramsForCallBackAdd)//добавляем а/ф
@@ -670,82 +641,94 @@ var gUndoInsDelCellsFlag = true;
 							}	
 						};
 						
-						//добавляем структуру нового фильтра
-						if(openFilter == undefined)
-							t._addNewFilter(result,tableColumns,aWs,isAll,lTable);
 						
-						//устанавливаем стиль для таблицы
-						if(!isAll)
+						if(paramsForCallBackAdd)
 						{
-							t._setColorStyleTable(aWs.TableParts[aWs.TableParts.length - 1].Ref, aWs.TableParts[aWs.TableParts.length - 1], null,true);
-							var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
-							var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
-							var arn = 
-							{
-								r1: firstCell.first.row,
-								r2: endCell.first.row,
-								c1: firstCell.first.col,
-								c2: endCell.first.col
-							}
-						}
-						
-						if(openFilter == undefined) {
-							if(isAll) {
-								if(!aWs.AutoFilter)
-									aWs.AutoFilter = new AutoFilter();
-								aWs.AutoFilter.result = result;
-								aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
-							}
-						};
-						
-						newRes = 
-						{
-							result: result,
-							isVis:  true
-						};
-						
-						var ref = 
-						{
-							Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext)
-						};
-						
-						if(addNameColumn && addFormatTableOptionsObj)
-							addFormatTableOptionsObj.range = ref;
-						t._addHistoryObj(ref, historyitem_AutoFilter_Add,
-								{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
-						
-						if(isInsertButton){
-							if (bIsActiveSheet)
-								t._addButtonAF(newRes, bIsOpenFilter);
-							else
-								t._addButtonAF(newRes, true);
-						}
-						else if(!t.allButtonAF)
-							t.allButtonAF = [];
-							
-						//обновляем
-						if(arn && bIsActiveSheet && !bIsOpenFilter)
-						{
+							//добавляем структуру нового фильтра
 							if(openFilter == undefined)
+								t._addNewFilter(result,tableColumns,aWs,isAll,lTable);
+							
+							//устанавливаем стиль для таблицы
+							if(!isAll)
 							{
-								ws.isChanged = true;
-								arn.c1 = arn.c1 - 1;
-								arn.c2 = arn.c2 - 1;
-								arn.r1 = arn.r1 - 1;
-								arn.r2 = arn.r2 - 1;
-								ws.setSelection(arn,true);
+								t._setColorStyleTable(aWs.TableParts[aWs.TableParts.length - 1].Ref, aWs.TableParts[aWs.TableParts.length - 1], null,true);
+								var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
+								var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
+								var arn = 
+								{
+									r1: firstCell.first.row,
+									r2: endCell.first.row,
+									c1: firstCell.first.col,
+									c2: endCell.first.col
+								}
 							}
-							// ToDo - и еще это обновление стоит после switch, в котором тоже происходит обновление - возможно будет 2 раза
-							rangeFilter =  new Asc.Range(arn.c1, arn.r1, arn.c2, arn.r2);
-							ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
-						};
+							
+							if(openFilter == undefined) {
+								if(isAll) {
+									if(!aWs.AutoFilter)
+										aWs.AutoFilter = new AutoFilter();
+									aWs.AutoFilter.result = result;
+									aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
+								}
+							};
+							
+							newRes = 
+							{
+								result: result,
+								isVis:  true
+							};
+							
+							var ref = 
+							{
+								Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext)
+							};
+							
+							if(addNameColumn && addFormatTableOptionsObj)
+								addFormatTableOptionsObj.range = ref;
+							t._addHistoryObj(ref, historyitem_AutoFilter_Add,
+									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
+							
+							if(isInsertButton){
+								if (bIsActiveSheet)
+									t._addButtonAF(newRes, bIsOpenFilter);
+								else
+									t._addButtonAF(newRes, true);
+							}
+							else if(!t.allButtonAF)
+								t.allButtonAF = [];
+								
+							//обновляем
+							if(arn && bIsActiveSheet && !bIsOpenFilter)
+							{
+								if(openFilter == undefined)
+								{
+									ws.isChanged = true;
+									arn.c1 = arn.c1 - 1;
+									arn.c2 = arn.c2 - 1;
+									arn.r1 = arn.r1 - 1;
+									arn.r2 = arn.r2 - 1;
+								}
+								// ToDo - и еще это обновление стоит после switch, в котором тоже происходит обновление - возможно будет 2 раза
+								rangeFilter =  new Asc.Range(arn.c1, arn.r1, arn.c2, arn.r2);
+							};
+							
+							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
+								ws._onEndAddFormatTable(rangeFilter, true);
+							
+							History.EndTransaction();
+							if(isTurnOffHistory)
+								History.TurnOn();
+						}
+						else
+						{
+							if(isUpdateRange != null)
+								ws._onEndAddFormatTable(isUpdateRange, recalc);
+								
+							History.EndTransaction();
+							if(isTurnOffHistory)
+								History.TurnOn();
+						}
 						
-						if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
-							ws._onEndAddFormatTable(rangeFilter);
-						
-						History.EndTransaction();
-						if(isTurnOffHistory)
-							History.TurnOn();
 							
 						return true;
 					}
@@ -2853,8 +2836,6 @@ var gUndoInsDelCellsFlag = true;
 				
 				//var activeRange = ws.activeRange.clone();
 				this._reDrawFilters();
-				
-				//ws.setSelection(activeRange);
 			},
 			
 			_getAutoFilterArray: function(cell) {
