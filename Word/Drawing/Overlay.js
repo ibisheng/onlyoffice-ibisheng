@@ -624,13 +624,13 @@ CAutoshapeTrack.prototype =
         this.m_oContext = this.m_oOverlay.m_oContext;
 
         this.Graphics = new CGraphics();
-        this.Graphics.init(this.m_oContext,
-            !overlay.IsRetina ? (r - x) : 2 * (r - x),
-            !overlay.IsRetina ? (b - y) : 2 * (b - y),
-            w_mm, h_mm);
 
-        this.Graphics.m_oCoordTransform.tx = x;
-        this.Graphics.m_oCoordTransform.ty = y;
+        var _scale = this.m_oOverlay.IsRetina? 2 : 1;
+
+        this.Graphics.init(this.m_oContext, _scale * (r - x), _scale * (b - y), w_mm, h_mm);
+
+        this.Graphics.m_oCoordTransform.tx = _scale * x;
+        this.Graphics.m_oCoordTransform.ty = _scale * y;
 
         this.Graphics.SetIntegerGrid(false);
 

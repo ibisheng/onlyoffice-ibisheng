@@ -1550,6 +1550,21 @@ function CDrawingDocument()
                 var x4 = xDst + dKoefX * _x4;
                 var y4 = yDst + dKoefY * _y4;
 
+                if (global_MatrixTransformer.IsIdentity2(this.TextMatrix))
+                {
+                    x1 = (x1 >> 0) + 0.5;
+                    y1 = (y1 >> 0) + 0.5;
+
+                    x2 = (x2 >> 0) + 0.5;
+                    y2 = (y2 >> 0) + 0.5;
+
+                    x3 = (x3 >> 0) + 0.5;
+                    y3 = (y3 >> 0) + 0.5;
+
+                    x4 = (x4 >> 0) + 0.5;
+                    y4 = (y4 >> 0) + 0.5;
+                }
+
                 overlay.CheckPoint(x1, y1);
                 overlay.CheckPoint(x2, y2);
                 overlay.CheckPoint(x3, y3);
