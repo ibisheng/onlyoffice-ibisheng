@@ -27,6 +27,7 @@ CDegreeBase.prototype.init = function(props)
 };
 CDegreeBase.prototype.fillContent = function()
 {
+    this.setDimension(1, 2);
     this.elements[0][0] = this.baseContent;
     this.elements[0][1] = this.iterContent;
 };

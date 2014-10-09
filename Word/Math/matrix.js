@@ -86,14 +86,19 @@ CMathMatrixPr.prototype.Set_FromObject = function(Obj)
     if (undefined !== Obj.mcs.length)
     {
         var nMcsCount = Obj.mcs.length;
-        this.mcs.length = nMcsCount;
 
-        for (var nMcsIndex = 0; nMcsIndex < nMcsCount; nMcsIndex++)
+        if (0 !== nMcsCount)
         {
-            this.mcs[nMcsIndex] = new CMathMatrixColumnPr();
-            this.mcs[nMcsIndex].Set_FromObject(Obj.mcs[nMcsIndex]);
-            nColumnsCount += this.mcs[nMcsIndex].count;
+            this.mcs.length = nMcsCount;
+            for (var nMcsIndex = 0; nMcsIndex < nMcsCount; nMcsIndex++)
+            {
+                this.mcs[nMcsIndex] = new CMathMatrixColumnPr();
+                this.mcs[nMcsIndex].Set_FromObject(Obj.mcs[nMcsIndex]);
+                nColumnsCount += this.mcs[nMcsIndex].count;
+            }
         }
+        else if (undefined !== Obj.column)
+            nColumnsCount = Obj.column;
     }
 
     return nColumnsCount;
@@ -588,10 +593,6 @@ CMathMatrix.prototype.setProperties = function(props)
 {
     this.setCtrPrp(props.ctrPrp);
     this.column = this.Pr.Set_FromObject(props);
-
-    if(props.mcs.length == 0)
-        this.column = props.column;
-    //this.column = this.Pr.Get_ColumnsCount();
 };
 CMathMatrix.prototype.fillContent = function()
 {
