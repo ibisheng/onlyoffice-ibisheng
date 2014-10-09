@@ -245,6 +245,7 @@ function NumFormat(bAddMinusIfNes)
 	this.bCurrency = false;
 	this.bNumber = false;
 	this.bInteger = false;
+	this.bRepeat = false;
     this.Color = -1;
 	this.ComporationOperator = null;
     
@@ -510,7 +511,7 @@ NumFormat.prototype =
             if(numFormat_Bracket == oCurItem.type && null != oCurItem.color)
                 this.Color = oCurItem.color;
         }
-        var bRepeat = false;
+        this.bRepeat = false;
         var nFormatLength = this.aRawFormat.length;
 
         //Группируем несколько элемнтов подряд в один спецсимвол
@@ -520,8 +521,8 @@ NumFormat.prototype =
             if(numFormat_Repeat == item.type)
             {
                 //Оставляем только последний numFormat_Repeat
-                if(false == bRepeat)
-                    bRepeat = true;
+                if(false == this.bRepeat)
+                    this.bRepeat = true;
                 else
                 {
                     this.aRawFormat.splice(i, 1);
@@ -1926,8 +1927,12 @@ NumFormat.prototype =
 			nType = c_oAscNumFormatType.Percent;
 		else if(this.bScientific)
 			nType = c_oAscNumFormatType.Scientific;
-		else if(this.bCurrency)
-			nType = c_oAscNumFormatType.Currency;
+		else if(this.bCurrency){
+			if(this.bRepeat)
+				nType = c_oAscNumFormatType.Accounting;
+			else
+				nType = c_oAscNumFormatType.Currency;
+		}
 		else if(this.bSlash)
 			nType = c_oAscNumFormatType.Fraction;
 		else if(this.bNumber)

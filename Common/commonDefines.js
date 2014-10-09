@@ -22,7 +22,8 @@ var c_oAscNumFormatType = {
 	Date : 7,
 	Time : 8,
 	Percent : 9,
-	Fraction : 10
+	Fraction : 10,
+	Accounting : 11
 };
  
  var c_oAscDrawingLayerType = {
