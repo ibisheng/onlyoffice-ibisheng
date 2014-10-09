@@ -2176,8 +2176,13 @@ function Editor_Paste_GetElem(api, bClean)
         pastebin.style.overflow = 'hidden';
         pastebin.style.zIndex = -1000;
         //��������� ������ ������������, ����� �������� �������� ����� pastebin �������� span � ������� ��� �������� ������ � computedStyle ���������� ����������� ��������� ��������� �� ���������
-        var Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
-        pastebin.style.fontFamily = Def_rPr.FontFamily.Name;
+        var Def_rPr;
+		if(g_bIsDocumentCopyPaste)
+			Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
+		else	
+			Def_rPr = oWordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
+			
+		pastebin.style.fontFamily = Def_rPr.FontFamily.Name;
 
         if (!api.DocumentReaderMode)
             pastebin.style.fontSize = Def_rPr.FontSize + "pt";
@@ -6775,7 +6780,12 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.style["-webkit-user-select"] = "text";
     ElemToSelect.setAttribute("contentEditable", true);
 
-    var Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
+	var Def_rPr;
+	if(g_bIsDocumentCopyPaste)
+		Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
+	else	
+		Def_rPr = oWordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
+		
     ElemToSelect.style.fontFamily = Def_rPr.FontFamily.Name;
 
     if (!api.DocumentReaderMode)
