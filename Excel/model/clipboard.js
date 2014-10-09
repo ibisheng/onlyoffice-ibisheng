@@ -2451,7 +2451,14 @@
 						}
 					}
 					f = val[i].format;
-					if (f.c) {span.style.color = number2color(f.c);}
+					if (f.c) 
+					{
+						if(f.c && f.c.rgb)
+							span.style.color = number2color(f.c.rgb);
+						else
+							span.style.color = number2color(f.c);
+					}
+					
 					if (f.fn !== defFN) {span.style.fontFamily = f.fn;}
 					if (f.fs !== defFS) {span.style.fontSize = f.fs + 'pt';}
 					if (f.b) {span.style.fontWeight = 'bold';}
