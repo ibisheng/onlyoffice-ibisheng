@@ -2808,22 +2808,6 @@ CMathContent.prototype =
         if(this.ParaMath !== null)
             this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
     },
-    _Check_HistoryUninon: function(Data1, Data2)
-    {
-        var Type1 = Data1.Type;
-        var Type2 = Data2.Type;
-
-        if ( historyitem_Paragraph_AddItem === Type1 && historyitem_Paragraph_AddItem === Type2 )
-        {
-            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && !this.content[Data1.Pos].typeObj === MATH_COMP && !this.content[Data2.Pos].typeObj === MATH_COMP )
-                return true;
-        }
-        return false
-    },
-    Check_HistoryUninon: function(Data1, Data2)
-    {
-        return false;
-    },
 	Load_FromMenu: function(Type, Paragraph)
 	{
 		var oFName;
@@ -4547,80 +4531,38 @@ CMathContent.prototype =
 						break;
 		}
 	},
-	Add: function (oElem, Pos)
-	{
-        oElem.Parent = this;
 
-        if(oElem.Type === para_Math_Composition)
-        {
-            //oElem.setArgSize(this.argSize);
-            this.content.splice(Pos,0,oElem);
-        }
-        else
-        {
-           this.content.splice(Pos,0,oElem);
-        }
-		if (this.content.length != 1)
-			this.CurPos++;
-    },
-	AddText : function(oElem, sText)
+    AddText : function(oElem, sText)
     {		
         if(sText)
         {			
             var MathRun = new ParaRun(this.Paragraph, true);
 			
-			var Pos = oElem.CurPos + 1,
-				PosEnd = Pos + 1;
-			var items = [];
-            for (var i=0; i < sText.length; i++)
+            for (var nCharPos = 0, nTextLen = sText.length; nCharPos < nTextLen; nCharPos++)
             {
                 var oText = null;
-				if ( 0x0026 == sText[i].charCodeAt(0))
+				if ( 0x0026 == sText.charCodeAt(nCharPos))
 					oText = new CMathAmp();
 				else
 				{
 					oText = new CMathText(false);
-					oText.addTxt(sText[i]);
+					oText.addTxt(sText[nCharPos]);
 				}
 				MathRun.Add(oText, true);
-            }			
-			oElem.DeleteEmptyRuns();
-            oElem.Add(MathRun,Pos);
-			items.push(MathRun);
-			History.Add(oElem, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});	
-			
-			oElem.SetRunEmptyToContent(true);
-        }        
+            }
+
+            oElem.Internal_Content_Add(oElem.CurPos + 1, MathRun, true);
+        }
     },
 
-	DeleteEmptyRuns : function ()
-	{
-		var nLen = this.content.length;
-		while(nLen >= 0 )
-		{
-			var oElem = this.content[nLen];
-			if (oElem && oElem.typeObj == MATH_PARA_RUN && oElem.Content.length == 0)
-				this.content.splice(nLen, 1);
-			nLen--;
-		}
-	},
     CreateElem : function (oElem, oParent)
     {
 		oElem.Parent = oParent;
-		var Pos = oParent.CurPos + 1,
-				PosEnd = Pos + 1;
-		var items = [];
-		
-        if (oParent)
-		{
-			oParent.DeleteEmptyRuns();
-            oParent.Add(oElem,Pos);
-			items.push(oElem);
-			History.Add(oParent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 
-			oParent.SetRunEmptyToContent(true);
-		}
+		var Pos = oParent.CurPos + 1;
+        oParent.Internal_Content_Add(Pos, oElem, true);
     },
+
     CreateFraction : function (oFraction,oParentElem,sNumText,sDenText)
     {
         this.CreateElem(oFraction, oParentElem);

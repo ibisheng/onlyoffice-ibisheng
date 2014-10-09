@@ -2,7 +2,7 @@
 
 function CMathBorderBoxPr()
 {
-    strikeVthis.hideBot    = false;
+    this.hideBot    = false;
     this.hideLeft   = false;
     this.hideRight  = false;
     this.hideTop    = false;
@@ -417,29 +417,29 @@ function CMathBoxPr()
 CMathBoxPr.prototype.Set_FromObject = function(Obj)
 {
     if(true === Obj.aln || 1 === Obj.aln)
-        this.Pr.aln = true;
+        this.aln = true;
     else
-        this.Pr.aln = false;
+        this.aln = false;
 
     if(true === Obj.brk || 1 === Obj.brk)
-        this.Pr.brk = true;
+        this.brk = true;
     else
-        this.Pr.brk = false;
+        this.brk = false;
 
     if(true === Obj.diff || 1 === Obj.diff)
-        this.Pr.diff = true;
+        this.diff = true;
     else
-        this.Pr.diff = false;
+        this.diff = false;
 
     if(true === Obj.noBreak || 1 === Obj.noBreak)
-        this.Pr.noBreak = true;
+        this.noBreak = true;
     else
-        this.Pr.noBreak = false;
+        this.noBreak = false;
 
     if(true === Obj.opEmu || 1 === Obj.opEmu)
-        this.Pr.opEmu = true;
+        this.opEmu = true;
     else
-        this.Pr.opEmu = false;
+        this.opEmu = false;
 };
 
 CMathBoxPr.prototype.Copy = function()
@@ -514,7 +514,7 @@ CBox.prototype.fillContent = function()
 }
 CBox.prototype.setProperties = function(props)
 {
-    this.Pr.Set_FromObject(Obj);
+    this.Pr.Set_FromObject(props);
     this.setCtrPrp(props.ctrPrp);
 
     this.RecalcInfo.bProps = true;

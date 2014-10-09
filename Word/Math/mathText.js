@@ -41,7 +41,7 @@ function CMathText(bJDraw)
     // для Para_Run
     this.Type = para_Math_Text;
 
-    this.bJDraw = bJDraw;
+    this.bJDraw = (undefined === bJDraw ? false : bJDraw);
 
     this.value = null;
 
@@ -785,22 +785,26 @@ CMathText.prototype =
     Copy: function()
     {
         var NewLetter = new CMathText(this.bJDraw);
-        NewLetter.add(this.value);
-
+        NewLetter.Type  = this.Type;
+        NewLetter.value = this.value;
         return NewLetter;
     },
     Write_ToBinary : function(Writer)
     {
+        // Пишем тип дла раза, 1 раз для общей функции чтения, второй раз
+        // для разделения обычного MathText от PlaceHolder
+        Writer.WriteLong(this.Type);
+
         // Long : Type
         // Long : value
-
-        Writer.WriteLong( this.Type );
-        Writer.WriteLong( this.value );
+        Writer.WriteLong(this.Type);
+        Writer.WriteLong(this.value) ;
     },
 
     Read_FromBinary : function(Reader)
     {
-        this.value      = Reader.GetLong();
+        this.Type  = Reader.GetLong();
+        this.value = Reader.GetLong();
     }
 
 }
