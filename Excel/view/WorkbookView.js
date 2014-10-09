@@ -186,6 +186,8 @@
 
 			// Флаг о подписке на эвенты о смене позиции документа (скролл) для меню
 			this.isDocumentPlaceChangedEnabled = false;
+			// Константы для подстановке формулы (что не нужно добавлять скобки)
+			this.arrExcludeFormulas = ['TRUE', 'FALSE'];
 
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
@@ -1542,9 +1544,11 @@
 			return this.popUpSelector.onKeyDown(event);
 		};
 		WorkbookView.prototype._onPopUpSelectorInsert = function (value) {
-			if (this.controller.isCellEditMode)
+			if (this.controller.isCellEditMode) {
+				if (-1 === this.arrExcludeFormulas.indexOf(value))
+					value += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
 				this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaName.length, value);
-			else
+			} else
 				this.getWorksheet().setSelectionInfo("value", value, /*onlyActive*/true);
 		};
 

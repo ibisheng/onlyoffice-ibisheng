@@ -238,7 +238,7 @@
 				this._onMouseDown(event);
 				return;
 			}
-			var elementVal = (event ? event.currentTarget : this.selectElement).getAttribute('val') + '(';
+			var elementVal = (event ? event.currentTarget : this.selectElement).getAttribute('val');
 			this._onInsert(elementVal);
 		};
 		PopUpSelector.prototype._onMouseOver = function (event) {
