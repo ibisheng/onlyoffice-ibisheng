@@ -1010,9 +1010,10 @@ CMathContent.prototype =
 
         for(var pos = 0; pos < lng; pos++)
         {
+            this.content[pos].ParaMath = ParaMath;
+
             if(this.content[pos].Type == para_Math_Composition)
             {
-                this.content[pos].Set_CompiledCtrPrp(this.ParaMath);
                 this.content[pos].SetGaps(GapsInfo);
             }
             else if(this.content[pos].Type == para_Math_Run)
@@ -1106,7 +1107,6 @@ CMathContent.prototype =
 
             if(this.content[pos].Type == para_Math_Composition)
             {
-                this.content[pos].Set_CompiledCtrPrp(this.ParaMath);
                 this.content[pos].SetGaps(GapsInfo);
             }
             else if(this.content[pos].Type == para_Math_Run)

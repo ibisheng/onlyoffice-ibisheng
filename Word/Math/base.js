@@ -131,6 +131,8 @@ CMathBase.prototype =
     },*/
     Get_CompiledCtrPrp: function()
     {
+        this.Set_CompiledCtrPrp(this.ParaMath);
+
         var CompiledCtrPrp;
 
         if(this.bInside === true)
@@ -140,15 +142,17 @@ CMathBase.prototype =
         else
         {
             CompiledCtrPrp = this.Get_CompiledCtrPrp_2();
-            this.ParaMath.ApplyArgSize(CompiledCtrPrp, this.Parent.Get_CompiledArgSize().value);
+            CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
         }
 
-        this.ParaMath.ApplyArgSize(CompiledCtrPrp, this.ArgSize.value); // для настроек inline формул
+        CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
 
         return CompiledCtrPrp;
     },
     Get_CompiledCtrPrp_2: function() // without arg Size
     {
+        this.Set_CompiledCtrPrp(this.ParaMath);
+
         var CompiledCtrPrp;
 
         if(this.bInside === true)
@@ -396,15 +400,9 @@ CMathBase.prototype =
     {
         if(this.RecalcInfo.bCtrPrp == true)
         {
-            var defaultRPrp = ParaMath.GetFirstRPrp();
-
-            this.CompiledCtrPrp.Merge(defaultRPrp);
+            this.CompiledCtrPrp = ParaMath.GetFirstRPrp();
             this.CompiledCtrPrp.Merge(this.CtrPrp);
 
-            for(var i=0; i < this.nRow; i++)
-                for(var j = 0; j < this.nCol; j++)
-                    if(this.elements[i][j].Type === para_Math_Composition)
-                        this.elements[i][j].Set_CompiledCtrPrp(ParaMath);
             this.RecalcInfo.bCtrPrp = false;
         }
     },

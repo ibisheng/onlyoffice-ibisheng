@@ -45,7 +45,7 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
     //var mgCtrPrp = this.Get_CompiledCtrPrp();
     var mgCtrPrp = this.Get_CompiledCtrPrp_2();
-    this.ParaMath.ApplyArgSize(mgCtrPrp, this.Parent.Get_CompiledArgSize().value);
+    mgCtrPrp.FontSize = this.ParaMath.ApplyArgSize(mgCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
 
     var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 

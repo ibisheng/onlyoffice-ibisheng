@@ -40,6 +40,7 @@ function ParaRun(Paragraph, bMathRun)
     {
         this.Type = para_Math_Run;
 
+        this.ParaMath     = null;
         this.Parent       = null;
         this.ArgSize      = 0;
         this.bEqqArray    = false;
@@ -1175,16 +1176,16 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
         if(this.Type === para_Math_Run)
         {
             TextPr = this.Get_CompiledPr(false);
+
             FontSize   = TextPr.FontSize;
-            FontSizeCS = TextPr.FontSizeCS;
 
             if(this.Parent !== null)
-                this.Parent.ParaMath.ApplyArgSize_2(TextPr, ArgSize.value);
+                TextPr.FontSize = this.Parent.ParaMath.ApplyArgSize(TextPr.FontSize, ArgSize.value);
         }
         else
             TextPr = this.Get_CompiledPr(false);
 
-        TextPr.Document_CreateFontMap( Map, this.Paragraph.Get_Theme().themeElements.fontScheme);
+        TextPr.Document_CreateFontMap(Map, this.Paragraph.Get_Theme().themeElements.fontScheme);
         var Count = this.Content.length;
         for (var Index = 0; Index < Count; Index++)
         {
@@ -4604,6 +4605,15 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
     if(this.Type == para_Math_Run)
     {
+        if (undefined === this.Parent || null === this.Parent)
+        {
+            // Сюда мы никогда не должны попадать, но на всякий случай,
+            // чтобы не выпадало ошибок сгенерим дефолтовые настройки
+            var TextPr = new CTextPr();
+            TextPr.Init_Default();
+            return new CTextPr();
+        }
+
         // Not Apply ArgSize !
         var oWPrp = this.Parent.Get_Default_TPrp();
         TextPr.Merge(oWPrp);
@@ -7731,44 +7741,30 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     var Y = y + this.size.ascent;
 
     var oWPrp = this.Get_CompiledPr(false);
-    var Bold = oWPrp.Bold,
-        Italic = oWPrp.Italic;
 
-    var FontFamily = oWPrp.FontFamily,
-        FontSize   = oWPrp.FontSize,
-        FontSizeCS = oWPrp.FontSizeCS,
-        RFonts     = oWPrp.RFonts.Copy();
-
-    this.Parent.ParaMath.ApplyArgSize_2(oWPrp, this.Parent.Compiled_ArgSz.value);
+    var Font =
+    {
+        Bold       : oWPrp.Bold,
+        Italic     : oWPrp.Italic,
+        FontFamily : {Name : oWPrp.FontFamily.Name, Index : oWPrp.FontFamily.Index},
+        FontSize   : this.Parent.ParaMath.ApplyArgSize(oWPrp.FontSize, this.Parent.Compiled_ArgSz.value)
+    };
 
     if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
     {
-        oWPrp.Italic = false;
-        oWPrp.Bold   = false;
-
-        // TO DO
-        // реализовать получше
-        // пока так
+        Font.Italic = false;
+        Font.Bold   = false;
 
         var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
-
-        oWPrp.FontFamily = defaultTxtPrp.FontFamily;
-        oWPrp.RFonts.Set_All(defaultTxtPrp.FontFamily.Name, defaultTxtPrp.FontFamily.Index);
+        Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
+        Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
     }
 
-    pGraphics.SetFont(oWPrp);
+    pGraphics.SetFont(Font);
     pGraphics.b_color1(0,0,0,255);
 
     for(var i=0; i < this.Content.length;i++)
         this.Content[i].draw(X, Y, pGraphics);
-
-    oWPrp.RFonts     = RFonts;
-    oWPrp.FontFamily = FontFamily;
-    oWPrp.Bold     = Bold;
-    oWPrp.Italic   = Italic;
-    oWPrp.FontSize = FontSize;
-    oWPrp.FontSizeCS = FontSizeCS;
-
 }
 ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, ArgSize, WidthPoints)
 {
@@ -7797,34 +7793,28 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
 
     if(RPI.NeedResize)
     {
-        //RPI.UpdateMathPr = this.UpdateMathPr;
-
         var oWPrp = this.Get_CompiledPr(false);
-        var Bold = oWPrp.Bold;
-        var Italic = oWPrp.Italic;
 
-        var FontFamily = oWPrp.FontFamily,
-            FontSize   = oWPrp.FontSize,
-            FontSizeCS = oWPrp.FontSizeCS,
-            RFonts     = oWPrp.RFonts.Copy();
-
-        this.Parent.ParaMath.ApplyArgSize_2(oWPrp, this.Parent.Compiled_ArgSz.value);
+        var Font =
+        {
+            Bold       : oWPrp.Bold,
+            Italic     : oWPrp.Italic,
+            FontFamily : {Name : oWPrp.FontFamily.Name, Index : oWPrp.FontFamily.Index},
+            FontSize   : this.Parent.ParaMath.ApplyArgSize(oWPrp.FontSize, this.Parent.Compiled_ArgSz.value)
+        };
 
 
         if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
         {
-            oWPrp.Italic = false;
-            oWPrp.Bold   = false;
-
+            Font.Italic = false;
+            Font.Bold   = false;
 
             var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
-
-            oWPrp.FontFamily  = defaultTxtPrp.FontFamily;
-
-            oWPrp.RFonts.Set_All(defaultTxtPrp.FontFamily.Name, defaultTxtPrp.FontFamily.Index);
+            Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
+            Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
         }
 
-        g_oTextMeasurer.SetFont(oWPrp);
+        g_oTextMeasurer.SetFont(Font);
 
 
         this.bEqqArray = RPI.bEqqArray;
@@ -7863,17 +7853,6 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
 
         this.size.ascent = ascent;
         this.size.height = ascent + descent;
-
-
-        oWPrp.RFonts     = RFonts;
-        oWPrp.FontFamily = FontFamily;
-        oWPrp.Bold       = Bold;
-        oWPrp.Italic     = Italic;
-        oWPrp.FontSize   = FontSize;
-        oWPrp.FontSizeCS = FontSizeCS;
-
-
-        //this.UpdateMathPr = false;
     }
 }
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)

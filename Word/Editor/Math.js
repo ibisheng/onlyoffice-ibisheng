@@ -8,6 +8,10 @@ var Math_Date_Draw = 0;*/
 /**
  * Created by Ilja.Kirillov on 18.03.14.
  */
+
+var g_dMathArgSizeKoeff_1 = 0.76;
+var g_dMathArgSizeKoeff_2 = 0.76 * 0.855;
+
 var g_oMathSettings = {};
 function MathMenu (type)
 {
@@ -103,6 +107,7 @@ ParaMath.prototype.Copy = function(Selected)
     /// argSize, bDot и bRoot выставить на объединении контентов
 
     NewMath.SetNeedResize();
+    NewMath.Root.Correct_Content(true);
 
     return NewMath;
 };
@@ -984,49 +989,19 @@ ParaMath.prototype.MathToImageConverter= function()
     return _ret;
 };
 
-ParaMath.prototype.ApplyArgSize = function(oWPrp, argSize)
+ParaMath.prototype.ApplyArgSize = function(FontSize, argSize)
 {
-    var tPrp = new CTextPr();
-
-    tPrp.Merge(this.DefaultTextPr);
-    tPrp.Merge(oWPrp);
-
-    //var FSize = tPrp.FontSize;
-
+    var ResultFontSize = FontSize;
     if(argSize == -1)
     {
-        //FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-        tPrp.FontSize   = 0.76*tPrp.FontSize;
-        tPrp.FontSizeCS = 0.76*tPrp.FontSizeCS;
+        ResultFontSize *= g_dMathArgSizeKoeff_1;
     }
     else if(argSize == -2)
     {
-        //FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-        tPrp.FontSize   = 0.76*0.855*tPrp.FontSize;
-        tPrp.FontSizeCS = 0.76*0.855*tPrp.FontSizeCS;
+        ResultFontSize *= g_dMathArgSizeKoeff_2;
     }
 
-    //tPrp.FontSize = FSize;
-
-    oWPrp.Merge(tPrp);
-
-};
-ParaMath.prototype.ApplyArgSize_2 = function(oWPrp, argSize)
-{
-    if(argSize == -1)
-    {
-        //FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
-        oWPrp.FontSize   = 0.76*oWPrp.FontSize;
-        oWPrp.FontSizeCS = 0.76*oWPrp.FontSizeCS;
-    }
-    else if(argSize == -2)
-    {
-        //FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
-        oWPrp.FontSize   = 0.76*0.855*oWPrp.FontSize;
-        oWPrp.FontSizeCS = 0.76*0.855*oWPrp.FontSizeCS;
-    }
-
-
+    return ResultFontSize;
 };
 
 ParaMath.prototype.GetFirstRPrp = function()
@@ -1143,45 +1118,7 @@ ParaMath.prototype.GetMathPr = function()
 
 ParaMath.prototype.Get_Default_TPrp = function()
 {
-    /*var TextPrp = new CTextPr();
-     TextPrp.Init_Default();
-
-     var mathFont = new CTextPr();
-
-     var obj =
-     {
-     FontFamily:     {Name  : "Cambria Math", Index : -1 },
-     RFonts:
-     {
-     Ascii:      {Name  : "Cambria Math", Index : -1 }
-     }
-     };
-
-     mathFont.Set_FromObject(obj);
-
-
-     TextPrp.Merge(mathFont);*/
-
-
-    /*var DefaultPrp =
-     {
-     FontFamily:     {Name  : "Cambria Math", Index : -1 },
-     RFonts:
-     {
-     Ascii:      {Name  : "Cambria Math", Index : -1 }
-     },
-     FontSize:       11,
-     FontSizeCS:     11,
-     Italic:         true,
-     Bold:           false
-     };
-
-     TextPrp.Set_FromObject(DefaultPrp);*/
-
-    var DefaultTextPrp = this.DefaultTextPr.Copy();
-    DefaultTextPrp.Italic = false;
-
-    return DefaultTextPrp;
+    return this.DefaultTextPr;
 };
 
 ParaMath.prototype.Set_Select_ToMComp = function(Direction)
