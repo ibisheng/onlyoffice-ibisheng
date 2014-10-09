@@ -40,7 +40,7 @@ function COverlay()
     this.DashLineColor = "#000000";
     this.ClearAll = false;
 
-    this.IsRetina = AscBrowser.isRetina;
+    this.IsRetina = false;
 }
 
 COverlay.prototype =

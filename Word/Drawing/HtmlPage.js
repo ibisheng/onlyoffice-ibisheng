@@ -460,6 +460,7 @@ function CEditorPage(api)
         if (!this.bIsRetinaNoSupportAttack)
         {
 			this.bIsRetinaSupport = AscBrowser.isRetina;
+            this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
         }
         else
         {
@@ -3424,7 +3425,7 @@ function CEditorPage(api)
         if (this.bIsRetinaSupport)
         {
             if (htmlElem.id == "id_viewer" ||
-                htmlElem.id == "id_viewer_overlay" ||
+                (htmlElem.id == "id_viewer_overlay" && this.m_oOverlayApi.IsRetina) ||
                 htmlElem.id == "id_hor_ruler" ||
                 htmlElem.id == "id_vert_ruler" ||
                 htmlElem.id == "id_buttonTabs")
