@@ -503,7 +503,7 @@ var gUndoInsDelCellsFlag = true;
 									
 									if(isInsertButton){
 										if (bIsActiveSheet)
-											t._addButtonAF(newRes, true);
+											t._addButtonAF(newRes);
 									}
 									else if(!t.allButtonAF)
 										t.allButtonAF = [];
@@ -567,7 +567,7 @@ var gUndoInsDelCellsFlag = true;
 							if(paramsForCallBack == "setStyleTableForAutoFilter1" || paramsForCallBack == "setStyleTableForAutoFilter")
 							{
 								if (bIsActiveSheet)
-									t._addButtonAF(newRes, true);
+									t._addButtonAF(newRes);
 								
 								if(ref)
 								{
@@ -680,7 +680,7 @@ var gUndoInsDelCellsFlag = true;
 									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, ref.Ref);
 							
 							if(isInsertButton){
-								t._addButtonAF(newRes, true);
+								t._addButtonAF(newRes);
 							}
 							else if(!t.allButtonAF)
 								t.allButtonAF = [];
@@ -1103,7 +1103,7 @@ var gUndoInsDelCellsFlag = true;
 					
 					if(isInsertButton){
 						//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
-						this._addButtonAF(newRes, true);
+						this._addButtonAF(newRes);
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
@@ -1587,7 +1587,7 @@ var gUndoInsDelCellsFlag = true;
 							//открываем скрытые строки
 							aWs.setRowHidden(false, bbox.r1, bbox.r2);
 							//заносим в историю
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, oRange);
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
 							
 							this._isEmptyButtons(oCurFilter.Ref);
 						}
