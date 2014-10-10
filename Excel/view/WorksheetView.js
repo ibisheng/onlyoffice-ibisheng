@@ -1028,7 +1028,7 @@
 					// ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
 					// ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
 					switch (oRule.Type) {
-						case "colorScale":
+						case Asc.ECfType.colorScale:
 							if (1 !== oRule.aRuleElements.length)
 								break;
 							oRuleElement = oRule.aRuleElements[0];

@@ -7716,6 +7716,7 @@
     window["Asc"].ETableStyleType = ETableStyleType;
     window["Asc"].EFontScheme = EFontScheme;
     window["Asc"].EIconSetType = EIconSetType;
+	window["Asc"].ECfType = ECfType;
 
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;
