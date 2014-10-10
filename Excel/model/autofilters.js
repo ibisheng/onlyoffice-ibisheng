@@ -5666,27 +5666,20 @@ var gUndoInsDelCellsFlag = true;
 			},
 
 			// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-			_reDrawFilters: function(turnOffHistory, isNUpdate)
+			_reDrawFilters: function(isNUpdate)
 			{
-				if(turnOffHistory)
-					History.TurnOff();
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
 					for(var tP = 0; tP < aWs.TableParts.length; tP++)
 					{
-						//var ref = aWs.TableParts[tP].Ref.split(':');
-						
 						var ref = aWs.TableParts[tP].Ref;
-						
-						this._setColorStyleTable(ref, aWs.TableParts[tP])
+						this._setColorStyleTable(ref, aWs.TableParts[tP]);
 					}
 				}
 				if(!isNUpdate)
 					ws._updateCellsRange(ws.visibleRange, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
-				if(turnOffHistory)
-					History.TurnOn();
 			},
 			
 			_sortArrayMinMax: function(elements)
@@ -6660,7 +6653,7 @@ var gUndoInsDelCellsFlag = true;
 					
 					this._cleanStyleTable(aWs, arnFrom);
 					
-					this._reDrawFilters(null, true);
+					this._reDrawFilters(true);
 				}
 				else
 				{
