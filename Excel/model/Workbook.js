@@ -7292,6 +7292,11 @@ Range.prototype._canPromote=function(from, to, bIsPromote, nWidth, nHeight, bVer
 	return oRes;
 };
 Range.prototype.promoteFromTo=function(from, to){
+	if(to.isOneCell())
+	{
+		to = to.clone();
+		to.setOffsetLast({offsetCol: (from.c2 - from.c1) - (to.c2 - to.c1), offsetRow: (from.r2 - from.r1) - (to.r2 - to.r1)});
+	}
 	if(!from.isIntersect(to))
 	{
 		var bFromWholeCol = (0 == from.c1 && gc_nMaxCol0 == from.c2);
@@ -7300,11 +7305,6 @@ Range.prototype.promoteFromTo=function(from, to){
 		var bToWholeRow = (0 == to.r1 && gc_nMaxRow0 == to.r2);
 		if(((bFromWholeCol && bToWholeCol) == (bFromWholeCol || bToWholeCol)) && ((bFromWholeRow && bToWholeRow) == (bFromWholeRow || bToWholeRow)))
 		{
-			if(to.isOneCell())
-			{
-				to = to.clone();
-				to.setOffsetLast({offsetCol: (from.c2 - from.c1) - (to.c2 - to.c1), offsetRow: (from.r2 - from.r1) - (to.r2 - to.r1)});
-			}
 			var bVertical = true;
 			var nIndex = 1;
 			//проверяем можно ли осуществить promote
