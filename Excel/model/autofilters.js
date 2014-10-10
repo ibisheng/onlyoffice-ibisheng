@@ -1653,7 +1653,6 @@ var gUndoInsDelCellsFlag = true;
 			isApplyAutoFilterInCell: function(activeCell, clean)
 			{
 				var aWs = this._getCurrentWS();
-				var tableRange;
 				if(aWs.TableParts)
 				{
 					var tablePart;
@@ -1676,9 +1675,9 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(tablePart.Ref.containsRange(activeCell, activeCell))
 								return false;
-						};
-					};
-				};
+						}
+					}
+				}
 				
 				if(aWs.AutoFilter && ((aWs.AutoFilter.FilterColumns && aWs.AutoFilter.FilterColumns.length) || (aWs.AutoFilter.SortState && aWs.AutoFilter.SortState.SortConditions && aWs.AutoFilter.SortState.SortConditions[0])))
 				{
@@ -1838,7 +1837,6 @@ var gUndoInsDelCellsFlag = true;
 			
 			// Undo
 			Undo: function (type, data) {
-				var ws  = data.worksheet;
 				var aWs = this._getCurrentWS();
 				data = data.undo;
 				var cloneData;
@@ -1929,7 +1927,7 @@ var gUndoInsDelCellsFlag = true;
 									break;
 								}	
 							}
-						};
+						}
 						
 						if(!isEn)//добавляем фильтр
 						{
@@ -1961,9 +1959,9 @@ var gUndoInsDelCellsFlag = true;
 							{
 								aWs.AutoFilter = cloneData;
 								this._addButtonAF({result: cloneData.result,isVis: true});
-							};
-						};
-					};
+							}
+						}
+					}
 				}
 				else if(cloneData.oldFilter)//в случае удаления/добавления строк 
 				{
@@ -1992,7 +1990,7 @@ var gUndoInsDelCellsFlag = true;
 								break;
 							}	
 						}
-					};
+					}
 				}
 				else
 				{
@@ -2022,10 +2020,6 @@ var gUndoInsDelCellsFlag = true;
 						}
 					}
 				}
-				
-				ws.changeWorksheet("update");
-				ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
-				ws.isChanged = true;
 			},
 			
 			getSizeButton: function(range)
@@ -2072,16 +2066,6 @@ var gUndoInsDelCellsFlag = true;
 						var currentFilter = tableParts[i];
 						if(currentFilter && currentFilter.Ref)
 						{
-							/*var ref = currentFilter.Ref.split(':');
-							var startId = this._idToRange(ref[0]);
-							var endId = this._idToRange(ref[1]);					
-							var tableRange = 
-							{
-								r1: startId.r1,
-								c1: startId.c1,
-								r2: endId.r1,
-								c2: endId.c1
-							};*/
 							var tableRange = currentFilter.Ref;
 							
 							//проверяем, попадает хотя бы одна ячейка из диапазона в область фильтра
@@ -4026,7 +4010,6 @@ var gUndoInsDelCellsFlag = true;
 			{
 				if(arr.result)
 				{
-					var ws = this.worksheet;
 					if(!this.allButtonAF)
 						this.allButtonAF = [];
 					if(arr.isVis)
@@ -4089,14 +4072,8 @@ var gUndoInsDelCellsFlag = true;
 						
 						if(!this.allButtonAF[0] && this.allButtonAF.length)
 							this.allButtonAF.length = 0;
-							
-					}
-					if (!bIsOpenFilter) {
-						ws.changeWorksheet("update");
-						ws.isChanged = true;
 					}
 				}
-				
 			},
 			
 			_cleanStyleTable : function(aWs, sRef)
@@ -5343,7 +5320,7 @@ var gUndoInsDelCellsFlag = true;
 					//filter.Ref = this._rangeToId(cRange.start) + ":" + this._rangeToId(cRange.end);
 					
 					//change result into filter and change info in button
-					filter = this._changeInfoFilterAfterInsertCols(filter, type, col, cRange, val, filterColums, activeCells);
+					filter = this._changeInfoFilterAfterInsertCols(filter, type, col, cRange, val, filterColums);
 					
 					//записываем в историю, если активная область касается данных фильтров
 					if(!bUndoChanges && !bRedoChanges && val < 0)
@@ -5354,11 +5331,11 @@ var gUndoInsDelCellsFlag = true;
 						var changeElement = 
 						{
 							oldFilter: oldFilter
-						}
+						};
 						this._addHistoryObj(changeElement, null, null, true);
 						History.EndTransaction();
 					}
-				};
+				}
 				
 				if(cRange.index == 'all')
 				{
@@ -5367,10 +5344,10 @@ var gUndoInsDelCellsFlag = true;
 				else
 				{
 					aWs.TableParts[cRange.index] = filter;
-				};
+				}
 			},
 			
-			_changeInfoFilterAfterInsertCols: function(filter, type, col, cRange, val, filterColums, activeCells)
+			_changeInfoFilterAfterInsertCols: function(filter, type, col, cRange, val, filterColums)
 			{
 				var ws = this.worksheet;
 				var inFilter = Asc.Range(cRange.start.c1, cRange.start.r1, cRange.end.c1, cRange.end.r1);
@@ -5383,16 +5360,13 @@ var gUndoInsDelCellsFlag = true;
 					{
 						cloneFilterColums[k] = filterColums[k].clone();
 					}
-				};
+				}
 				
 				if(filter.result && filter.result.length > 0)
 				{
 					//change array
-					var changeNum = [];
 					var newResult = [];
 					var n = 0;
-					var isChangeColumn  = false;
-					var insertIndexes = [];
 					for(var filR = 0; filR < filter.result.length; filR++)
 					{
 						var endCount = 0;
@@ -5435,7 +5409,6 @@ var gUndoInsDelCellsFlag = true;
 								var num = 1;
 								if(filter.AutoFilter !== null)
 									this._changeContentButton(newResult[n],num,'add',inFilter);
-								//changeNum[insCol - 1] = n;
 								n++;
 							}
 							
@@ -5555,7 +5528,7 @@ var gUndoInsDelCellsFlag = true;
 							
 							n++;
 						}
-					};
+					}
 					
 					if(type == 'insCol' && filter.AutoFilter !== null)
 					{
@@ -5563,7 +5536,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							this._changeContentButton(newResult[n], 1, 'add', inFilter);
 						}
-					};
+					}
 					
 					if(cloneFilterColums)
 					{
@@ -5578,9 +5551,9 @@ var gUndoInsDelCellsFlag = true;
 							{
 								filter.AutoFilter.FilterColumns = cloneFilterColums;
 								filter.AutoFilter.Ref = inFilter;
-							};	
-						};
-					};
+							}
+						}
+					}
 					
 					//change tableColumn
 					if(filter.TableColumns && type != 'insRow')
@@ -5622,7 +5595,7 @@ var gUndoInsDelCellsFlag = true;
 							}
 							filter.TableColumns = newTableColumn;
 						}
-					};
+					}
 					
 					filter.result = newResult;
 					filter.Ref = inFilter;
@@ -5631,7 +5604,7 @@ var gUndoInsDelCellsFlag = true;
 						this._addButtonAF(newResult);
 						
 					return filter;
-				};
+				}
 			},
 			
 			_changeContentButton: function(array, val, type, inFilter, oldId)
