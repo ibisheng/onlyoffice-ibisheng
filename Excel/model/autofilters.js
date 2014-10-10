@@ -391,7 +391,7 @@ var gUndoInsDelCellsFlag = true;
 									t._showButtonFlag(newRes.result);
 									
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
-										{activeCells: activeCells, lTable: lTable}, null, activeCells);
+										{activeCells: activeCells, lTable: lTable}, null, changesElemHistory.Ref);
 									//открываем скрытые строки
 									var isHidden;
 									var isInsert = false;
@@ -411,7 +411,11 @@ var gUndoInsDelCellsFlag = true;
 									//перерисовываем форматированную таблиц
 									if(isReDrawFilter && isReDrawFilter.TableColumns && isReDrawFilter.result)
 										t._reDrawCurrentFilter(null, null, isReDrawFilter);
-
+									
+									t.drawAutoF();
+									
+									isUpdateRange = changesElemHistory.Ref;
+									
 									break;
 								}
 								case 'changeAllFOnTable':
@@ -550,6 +554,8 @@ var gUndoInsDelCellsFlag = true;
 									var ref = allAutoFilters[apocal.num - 1].Ref;
 									allAutoFilters[apocal.num - 1].AutoFilter = new AutoFilter();
 									allAutoFilters[apocal.num - 1].AutoFilter.Ref = ref;
+									
+									isUpdateRange = ref;
 
 									break;
 								}
@@ -559,6 +565,8 @@ var gUndoInsDelCellsFlag = true;
 									var ref = allAutoFilters[apocal.num].Ref;
 									allAutoFilters[apocal.num].AutoFilter = new AutoFilter();
 									allAutoFilters[apocal.num].AutoFilter.Ref = allAutoFilters[apocal.num].Ref;
+									
+									isUpdateRange = allAutoFilters[apocal.num].Ref;
 
 									break;
 								}
@@ -622,6 +630,14 @@ var gUndoInsDelCellsFlag = true;
 								activeCells = result.activeCells;
 								mainAdjacentCells = result.mainAdjacentCells;
 								result = result.result;
+								
+								if(!(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
+								{
+									if(mainAdjacentCells)
+										isUpdateRange = mainAdjacentCells;
+									else
+										isUpdateRange = activeCells;
+								}	
 							}
 							else
 							{
@@ -701,6 +717,8 @@ var gUndoInsDelCellsFlag = true;
 							
 							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
 								ws._onEndAddFormatTable(rangeFilter, true);
+							else if(isUpdateRange != null && paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+								ws._onEndAddFormatTable(rangeFilter);
 							
 							History.EndTransaction();
 							if(isTurnOffHistory)
@@ -1158,7 +1176,7 @@ var gUndoInsDelCellsFlag = true;
 				//проверяем, затрагивают ли данные кнопки визуальную область
 				if (buttons) {
 					for (var i = 0; i < buttons.length; i++) {
-						if (!this._isNeedDrawButton(buttons[i], updatedRange))
+						if (updatedRange && !this._isNeedDrawButton(buttons[i], updatedRange))
 							continue;
 
 						var range = ws.model.getCell(new CellAddress(buttons[i].id)).getCells();
@@ -6195,7 +6213,7 @@ var gUndoInsDelCellsFlag = true;
 							{
 								var cell = ws.model.getCell(new CellAddress(row,col,0));
 								var type = cell.getType();
-								if(type == 1)
+								if(type == CellValueType.String)
 								{
 									result = true;
 									break;
