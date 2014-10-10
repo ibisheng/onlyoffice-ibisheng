@@ -3220,6 +3220,7 @@ CDocument.prototype =
                     Item.CurPos.RealY = Item.CurPos.Y;
                 }
 
+                this.Document_UpdateSelectionState();
                 this.Document_UpdateInterfaceState();
             }
 

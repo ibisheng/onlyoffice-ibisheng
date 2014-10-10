@@ -164,80 +164,43 @@ ParaMath.prototype.Add = function(Item)
     this.NeedResize = true;
 
     var Type = Item.Type;
-    var oContent = this.GetSelectContent();
-    var oStartContent = oContent.Content.content[oContent.Start];
-    var oEndContent = oContent.Content.content[oContent.End];
+    var oSelectedContent = this.GetSelectContent();
 
+    var oContent = oSelectedContent.Content;
 
+    var StartPos = oSelectedContent.Start;
+    var Run = oContent.content[StartPos];
 
-    if ( para_Text === Type)
+    // Мы вставляем только в Run
+    if (para_Math_Run !== Run.Type)
+        return;
+
+    if (para_Text === Type)
     {
         var oText = new CMathText(false);
         oText.add(Item.Value);
-        oStartContent.Add(oText, true);
+        Run.Add(oText, true);
     }
-    else if ( para_Space === Type )
+    else if (para_Space === Type)
     {
-        //var oSpace = new ParaSpace(1);
         var oText = new CMathText(false);
         oText.addTxt(" ");
-        oStartContent.Add(oText, true);
+        Run.Add(oText, true);
     }
-    else if ( para_Math === Type )
+    else if (para_Math === Type)
     {
-        if (oStartContent.Type == para_Math_Run && oStartContent.IsPlaceholder())
-        {
-            var Items = [];
-            Items.push(oContent.Content.content[0]);
-            oContent.Content.content.splice( 0, 1 );
-            History.Add(oContent.Content, {Type: historyitem_Math_RemoveItem, Items:Items, Pos: 0});
+        // Нам нужно разделить данный Run на 2 части
+        var RightRun = Run.Split2(Run.State.ContentPos);
 
-            oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
-        }
-        else
-        {
-            var nPosStart = oStartContent.State.ContentPos,
-                nLenStart = oStartContent.Content.length,
-                nPosEnd = oEndContent.State.ContentPos;
-				
-            if(nPosStart != nLenStart) //вставка идет в mathcontent
-            {
-                var oMRun = new ParaRun(this.Paragraph, true);
-                oMRun.Pr = oStartContent.Pr;
-
-                for (var i=nLenStart-1; i>=nPosStart; i--)
-                {
-                    var Pos = oMRun.Content.length;
-                    var EndPos = Pos + 1;
-                    var oItem = oStartContent.Content[i];
-                    oMRun.Add(oItem, true);
-                    oStartContent.Remove_FromContent(i, 1, false);					
-                }
-                oStartContent.Selection_Remove();
-				oMRun.State.ContentPos = 0;
-            }
-			
-            oContent.Content.Load_FromMenu(Item.Menu, this.Paragraph);
-
-            if(nPosStart != nLenStart)
-            {
-                var items = [];
-                oContent.Content.Add(oMRun,oContent.Content.CurPos+1);
-                items.push(oMRun);
-                var Pos = oContent.Content.CurPos,
-                    PosEnd = Pos + 1;
-                History.Add(oContent.Content, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
-            }
-			else
-				oContent.Content.CurPos++;
-
-
-        }
-
-        oContent.Content.SetRunEmptyToContent(true);
+        oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
+        oContent.CurPos = StartPos;
+        oContent.Load_FromMenu(Item.Menu, this.Paragraph);
+        oContent.CurPos = StartPos + 2; // позиция RightRun
+        RightRun.Cursor_MoveToStartPos();
     }
 
-    oContent.Content.Correct_Content();
+    // Корректируем данный контент
+    oContent.Correct_Content(true);
 };
 
 ParaMath.prototype.Remove = function(Direction, bOnAddText)

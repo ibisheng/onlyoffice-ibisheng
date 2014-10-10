@@ -125,7 +125,6 @@ function CTableId()
 //-----------------------------------------------------------------------------------
     this.Read_Class_FromBinary = function(Reader)
     {
-		var props = null;
         var ElementType = Reader.GetLong();
         var Element = null;
 

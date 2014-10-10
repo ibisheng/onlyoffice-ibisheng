@@ -394,7 +394,6 @@ CMathRadicalPr.prototype.Read_FromBinary = function(Reader)
     this.degHide = Reader.GetBool();
 };
 
-
 function CRadical(props)
 {
     CRadical.superclass.constructor.call(this);
@@ -441,21 +440,29 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         {
             this.setDimension(1, 1);
 
-            if(this.Iterator !== null)
-            {
-                var Item = new CMathBase(true);
-                Item.setDimension(1, 2);
-                Item.elements[0][0] = this.Iterator;
-                Item.elements[0][1] = this.Base;
+            // TODO: IlyaKirillov: Пока убрал данный вариант, потому что у обычного пользователя он
+            //       не встретится с вероятностью 99%, а обработка данного случая в текущей реализации
+            //       приводит к багам в совместном редактировании.
 
-                //Item.addMCToContent(this.Iterator, this.Base);
+//            if(this.Iterator !== null)
+//            {
+//                var Item = new CMathBase(true);
+//                Item.setDimension(1, 2);
+//                Item.elements[0][0] = this.Iterator;
+//                Item.elements[0][1] = this.Base;
+//
+//                //Item.addMCToContent(this.Iterator, this.Base);
+//
+//                this.elements[0][0] = Item;
+//            }
+//            else
+//            {
+//                this.elements[0][0] = this.Base;
+//            }
 
-                this.elements[0][0] = Item;
-            }
-            else
-            {
-                this.elements[0][0] = this.Base;
-            }
+            this.elements[0][0] = this.Base;
+
+            //---------------------
 
             this.RealBase = this.elements[0][0];
         }

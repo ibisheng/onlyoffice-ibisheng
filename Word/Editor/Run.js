@@ -564,7 +564,8 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
             ContentPos.Data[Depth] = Math.max( 0 , Pos );
     }
 
-    this.Paragraph.SpellChecker.Update_OnRemove( this, Pos, Count );
+    if(null !== this.Paragraph)
+        this.Paragraph.SpellChecker.Update_OnRemove( this, Pos, Count );
 
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnRemove( Pos, Count );

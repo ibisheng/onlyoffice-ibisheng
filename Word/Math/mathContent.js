@@ -1267,11 +1267,6 @@ CMathContent.prototype =
 
         return result;
     },
-    setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
-    {
-        if(this.content.length == 1 && !this.bRoot )//только CEmpty
-            this.fillPlaceholders();
-    },
     setCtrPrp: function()
     {
 
@@ -1508,7 +1503,6 @@ CMathContent.prototype =
         }
         else
             startPos = endPos = this.CurPos;
-
 
         var bEqual = startPos == endPos,
             bNotSelectComp = bEqual ? this.content[startPos].Type === para_Math_Composition && this.content[startPos].IsSelectEmpty() : false;
@@ -2916,7 +2910,6 @@ CMathContent.prototype =
 			case 18:	props = {ctrPrp: new CTextPr(), type:SQUARE_RADICAL, degHide:true};					
 						var oRadical = new CRadical(props);
 						this.CreateRadical(oRadical, this, null, null);
-						oRadical.Iterator = null;
 						break;
 			case 19:	props = {ctrPrp: new CTextPr(), type:DEGREE_RADICAL};					
 						var oRadical = new CRadical(props);
@@ -2945,7 +2938,6 @@ CMathContent.prototype =
 						var oRadical = new CRadical(props);
 						this.CreateElem(oRadical, oElemNum);						
 						var oElem = oRadical.getBase();
-						oRadical.Iterator = null;
 						
 						props = {ctrPrp: new CTextPr(), type:DEGREE_SUPERSCRIPT};
 						var oDegree = new CDegree(props);
@@ -2963,7 +2955,6 @@ CMathContent.prototype =
 			case 23:	props = {ctrPrp: new CTextPr(), type:SQUARE_RADICAL, degHide:true};
 						var oRadical = new CRadical(props);
 						this.CreateElem(oRadical, this);
-						oRadical.Iterator = null;
 						
 						var oElem = oRadical.getBase();
 						props = {ctrPrp: new CTextPr(), type:DEGREE_SUPERSCRIPT};
