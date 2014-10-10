@@ -804,7 +804,6 @@ var gUndoInsDelCellsFlag = true;
 
 							var rowAdd = 0;
 							var tableColumns = [];
-							var j = 0;
 							
 							//rangeShift = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r1, activeCells.c2);
 							rangeShift = activeCells;
@@ -1015,8 +1014,6 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else if((activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2) || (!lTable && mergedRange && activeCells.r1 == mergedRange.r1 && activeCells.c1 == mergedRange.c1 && activeCells.r2 == mergedRange.r2 && activeCells.c2 == mergedRange.c2))//если ячейка выделенная одна
 				{
-					var mainCell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1, 0)).getCells();
-					var val = mainCell[0].getValue();
 					var mainAdjacentCells = this._getAdjacentCellsAF(activeCells, aWs);
 					rangeShift = ws.model.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r1, mainAdjacentCells.c2);
 					var rowAdd = 0;
@@ -1026,7 +1023,6 @@ var gUndoInsDelCellsFlag = true;
 						if(!mainAdjacentCells)
 							mainAdjacentCells = activeCells;
 						var tableColumns = [];
-						var j = 0;
 						//проверка на добавлять/не добавлять название столбцов
 						if(addNameColumn && !isTurnOffHistory)
 						{
@@ -1056,7 +1052,6 @@ var gUndoInsDelCellsFlag = true;
 					if(lTable)
 					{
 						var tableColumns = [];
-						var j = 0;
 						//проверка на добавлять/не добавлять название столбцов
 						if(addNameColumn && !isTurnOffHistory)
 						{
@@ -1106,7 +1101,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						result: result,
 						isVis:  true
-					}
+					};
 					
 					if(isInsertButton){
 						//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
@@ -1134,7 +1129,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					x = checkFrozenArea.x;
 					y = checkFrozenArea.y;
-				};
+				}
 				
 				var button;
 				for (var i = 0; i < this.allButtonAF.length; i++) {
@@ -2742,7 +2737,6 @@ var gUndoInsDelCellsFlag = true;
 						{
 							arrVal = currentFilter[isCurFilter].Filters.Values;
 							var isConsist = undefined;
-							var isBlank;
 							for(var h = 0; h < arrVal.length; h++)
 							{
 								if(arrVal[h] == valActive)
@@ -2812,7 +2806,7 @@ var gUndoInsDelCellsFlag = true;
 				var ws = this.worksheet;
 				var cell = ws.model._getCell(n, k);
 				var isEmptyCell = cell.isEmptyText();
-				var isEnd = true, cell, range, merged, valueMerg, isEmptyCell;
+				var isEnd = true, range, merged, valueMerg;
 				
 				//если мерженная ячейка
 				if(isEmptyCell)
@@ -2850,30 +2844,29 @@ var gUndoInsDelCellsFlag = true;
 								n = 0;
 							if(k < 0)
 								k = 0;
-							cell = ws.model._getCell(n,k);	
-						};
-					};
-				};
+						}
+					}
+				}
 				
 				if(!isEmptyCell || (valueMerg != null && valueMerg != ""))
 				{
 					if(k < cloneActiveRange.c1)
 					{
 						cloneActiveRange.c1 = k; isEnd = false;
-					}	
+					}
 					else if(k > cloneActiveRange.c2)
 					{
 						cloneActiveRange.c2 = k; isEnd = false;
-					}	
+					}
 					if(n < cloneActiveRange.r1)
 					{
 						cloneActiveRange.r1 = n; isEnd = false;
-					}	
+					}
 					else if(n > cloneActiveRange.r2)
 					{
 						cloneActiveRange.r2 = n; isEnd = false;
-					};	
-				};
+					}
+				}
 				
 				return {isEmptyCell: isEmptyCell, isEnd: isEnd, cloneActiveRange: cloneActiveRange};
 			},
@@ -2915,7 +2908,7 @@ var gUndoInsDelCellsFlag = true;
 							isEndWhile = true;
 						else 
 							k++;
-					};
+					}
 					
 					//bottom
 					isEndWhile = false;
