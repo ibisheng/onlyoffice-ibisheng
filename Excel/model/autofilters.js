@@ -6634,11 +6634,15 @@ var gUndoInsDelCellsFlag = true;
 							}
 						}
 						
+						if(oCurFilter[i].TableColumns && oCurFilter[i] && findFilters[i])
+						{
+							this._cleanStyleTable(aWs, oCurFilter[i].Ref);
+							this._setColorStyleTable(findFilters[i].Ref, findFilters[i]);
+						}
+						
 						if(!data)
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
-					
-					this._cleanStyleTable(aWs, arnFrom);
 				}
 			},
 			
