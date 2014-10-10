@@ -6646,19 +6646,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					
 					this._cleanStyleTable(aWs, arnFrom);
-					
-					this._reDrawFilters(true);
 				}
-				else
-				{
-					if(arnTo)
-						this.reDrawFilter(arnTo);
-					if(arnFrom)
-						this.reDrawFilter(arnFrom);
-				}
-				
-				if(isUpdate)
-					ws.changeWorksheet("update");
 			},
 			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
