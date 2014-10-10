@@ -756,7 +756,6 @@ var gUndoInsDelCellsFlag = true;
 					if(apocal == 'error')
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
 					}
 					else if(apocal && apocal.changeStyle)
@@ -784,8 +783,7 @@ var gUndoInsDelCellsFlag = true;
 							onAddAutoFiltersCallback(true);
 						else
 							ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-							
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
+
 						return;
 					}
 					else if((apocal && apocal.containsFilter != false && !lTable) || (apocal && apocal.changeAllFOnTable))
@@ -842,8 +840,6 @@ var gUndoInsDelCellsFlag = true;
 							onAddAutoFiltersCallback(true);
 						else
 							ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-							
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return;
 					}
 					else if(apocal && apocal.containsFilter == false)
@@ -875,8 +871,6 @@ var gUndoInsDelCellsFlag = true;
 								onAddAutoFiltersCallback(true);
 							else
 								ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-								
-							ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							return;
 						}
 						else if(aWs.AutoFilter)
@@ -899,8 +893,6 @@ var gUndoInsDelCellsFlag = true;
 								onAddAutoFiltersCallback(true);
 							else
 								ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-								
-							ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							return;
 						}
 						else
@@ -922,16 +914,11 @@ var gUndoInsDelCellsFlag = true;
 								onAddAutoFiltersCallback(true);
 							else
 								ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-								
-							ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							return;
 						}
 					}
 					else if(apocal && apocal.containsFilter == false && lTable)
-					{
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return true;
-					}
 				}
 				
 				
@@ -1057,8 +1044,6 @@ var gUndoInsDelCellsFlag = true;
 						onAddAutoFiltersCallback(true);
 					else
 						ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-						
-					ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 					return;
 				}
 				else//выделено > 1 ячейки
@@ -1086,13 +1071,9 @@ var gUndoInsDelCellsFlag = true;
 						onAddAutoFiltersCallback(true);
 					else
 						ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
-						
-					ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
+
 					return;
 				}
-				
-				if(openFilter == undefined)
-					ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 				
 				//устанавливаем стиль для таблицы
 				if(!isAll && openFilter != undefined)
@@ -1391,8 +1372,6 @@ var gUndoInsDelCellsFlag = true;
 						ws.changeWorksheet("update");
 						if(isTurnOffHistory)
 							History.TurnOn();
-							
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 					}
 					else
 						return false;
@@ -6407,7 +6386,6 @@ var gUndoInsDelCellsFlag = true;
 					if(paramsForCallBackAdd == "addAutoFilterOneCell" && this._isEmptyRange(activeCells, true))
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
 					}
 					
@@ -6478,7 +6456,6 @@ var gUndoInsDelCellsFlag = true;
 						else
 						{
 							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-							//ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							History.EndTransaction();
 							return false;
 						}
@@ -6493,7 +6470,6 @@ var gUndoInsDelCellsFlag = true;
 					if(paramsForCallBackAdd == "addAutoFilterManyCells" && this._isEmptyRange(activeCells))
 					{
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
 					}
 					

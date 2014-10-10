@@ -5,7 +5,7 @@ var g_bDate1904 = false;
 var CellValueType = 
 {
 	Number:0,
-	String:1,	
+	String:1,
 	Bool:2,
 	Error:3
 };
