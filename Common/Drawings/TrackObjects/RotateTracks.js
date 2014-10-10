@@ -108,7 +108,8 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
                 overlay._e();
                 overlay.RestoreGrState();
 				
-				overlay.m_oOverlay.ClearAll = true;
+				if (overlay.m_oOverlay)
+					overlay.m_oOverlay.ClearAll = true;
             }
         }
         if(transform)
