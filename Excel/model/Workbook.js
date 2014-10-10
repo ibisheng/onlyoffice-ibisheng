@@ -3324,13 +3324,14 @@ Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 	var res = 0;
 	if(oBBoxFrom.isEqual(oBBoxTo))
 		return res;
+	var range = this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2);
+	var aMerged = this.mergeManager.get(range.getBBox0());
+	if(aMerged.outer.length > 0)
+		return -2;
 	var aRangesToCheck = this._prepareMoveRangeGetCleanRanges(oBBoxFrom, oBBoxTo);
 	for(var i = 0, length = aRangesToCheck.length; i < length; i++)
 	{
-		var range = aRangesToCheck[i];
-		var aMerged = this.mergeManager.get(range.getBBox0());
-		if(aMerged.outer.length > 0)
-			return -2;
+		range = aRangesToCheck[i];
 		range._foreachNoEmpty(
 			function(cell){
 				if(!cell.isEmptyTextString())
@@ -3352,6 +3353,10 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	History.StartTransaction();
 	
 	var offset = { offsetRow : oBBoxTo.r1 - oBBoxFrom.r1, offsetCol : oBBoxTo.c1 - oBBoxFrom.c1 };
+	var intersection = oBBoxFrom.intersectionSimple(oBBoxTo);
+	var oRangeIntersection = null;
+	if(null != intersection)
+		oRangeIntersection = this.getRange3(intersection.r1, intersection.c1, intersection.r2, intersection.c2 );
 	//запоминаем то что нужно переместить
 	var aTempObj = {cells: {}, merged: null, hyperlinks: null};
 	for(var i = oBBoxFrom.r1; i <= oBBoxFrom.r2; i++)
@@ -3373,27 +3378,39 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 			}
 		}
 	}
-	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges) && !copyRange)
+	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
 	{
 	    History.LocalChange = true;
 		var aMerged = this.mergeManager.get(oBBoxFrom);
 		if(aMerged.inner.length > 0)
-		{
 			aTempObj.merged = aMerged.inner;
-			for(var i = 0, length = aTempObj.merged.length; i < length; i++)
+		var aHyperlinks = this.hyperlinkManager.get(oBBoxFrom);
+		if(aHyperlinks.inner.length > 0)
+			aTempObj.hyperlinks = aHyperlinks.inner;
+		var aMergedToRemove = null;
+		if(!copyRange){
+			aMergedToRemove = aTempObj.merged;
+		}
+		else if(null != intersection){
+			var aMergedIntersection = this.mergeManager.get(intersection);
+			if(aMergedIntersection.all.length > 0)
+				aMergedToRemove = aMergedIntersection.all;
+		}
+		if(null != aMergedToRemove){
+			for(var i = 0, length = aMergedToRemove.length; i < length; i++)
 			{
-				var elem = aTempObj.merged[i];
+				var elem = aMergedToRemove[i];
 				this.mergeManager.removeElement(elem);
 			}
 		}
-		var aHyperlinks = this.hyperlinkManager.get(oBBoxFrom);
-		if(aHyperlinks.inner.length > 0)
-		{
-			aTempObj.hyperlinks = aHyperlinks.inner;
-			for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
+		if(!copyRange){
+			if(null != aTempObj.hyperlinks)
 			{
-				var elem = aTempObj.hyperlinks[i];
-				this.hyperlinkManager.removeElement(elem);
+				for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
+				{
+					var elem = aTempObj.hyperlinks[i];
+					this.hyperlinkManager.removeElement(elem);
+				}
 			}
 		}
 		History.LocalChange = false;
@@ -3407,18 +3424,25 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	    if (!copyRange)
 	        this.workbook.dependencyFormulas.deleteNodes(this.getId(), range.getBBox0());
 	}
-	//перемещаем без истории
-	History.TurnOff();
 	//удаляем from без истории, потому что эти данные не терются а перемещаются
     if(!copyRange || (copyRange && this.workbook.bUndoChanges)){
-		var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2 )
+		var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2 );
         oRangeFrom._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
             var row = oThis._getRowNoEmpty(nRow0);
             if(null != row)
                 delete row.c[nCol0];
         });
     }
-	History.TurnOn();
+	else{
+		//в случае копирования удаляем пересечение, чтобы затирались значения, если мы копируем пустые ячейки(все что не входит в пересечение удалилось выше через историю)
+		if(null != intersection){
+			oRangeIntersection._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
+				var row = oThis._getRowNoEmpty(nRow0);
+				if(null != row)
+					delete row.c[nCol0];
+			});
+		}
+	}
     if(!copyRange){
         this.workbook.dependencyFormulas.helper(oBBoxFrom, oBBoxTo,this.Id);
     }
@@ -3455,17 +3479,34 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 			for(var i = 0, length = aTempObj.merged.length; i < length; i++)
 			{
 				var elem = aTempObj.merged[i];
-				elem.bbox.setOffset(offset);
-				this.mergeManager.add(elem.bbox, elem.data);
+				var oNewBBox;
+				var oNewData = elem.data;
+				if(copyRange)
+					oNewBBox = elem.bbox.clone();
+				else
+					oNewBBox = elem.bbox;
+				oNewBBox.setOffset(offset);
+				this.mergeManager.add(oNewBBox, oNewData);
 			}
 		}
-		if(null != aTempObj.hyperlinks)
+		//todo сделать для пересечения
+		if(null != aTempObj.hyperlinks && (!copyRange || null == intersection))
 		{
 			for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
 			{
 				var elem = aTempObj.hyperlinks[i];
-				elem.bbox.setOffset(offset);
-				this.hyperlinkManager.add(elem.bbox, elem.data);
+				var oNewBBox;
+				var oNewData;
+				if(copyRange){
+					oNewBBox = elem.bbox.clone();
+					oNewData = elem.data.clone();
+				}
+				else{
+					oNewBBox = elem.bbox;
+					oNewData = elem.data;
+				}
+				oNewBBox.setOffset(offset);
+				this.hyperlinkManager.add(oNewBBox, oNewData);
 			}
 		}
 		History.LocalChange = false;
