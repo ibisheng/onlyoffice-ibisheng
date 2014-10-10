@@ -679,7 +679,7 @@ var gUndoInsDelCellsFlag = true;
 							if(addNameColumn && addFormatTableOptionsObj)
 								addFormatTableOptionsObj.range = ref;
 							t._addHistoryObj(ref, historyitem_AutoFilter_Add,
-									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, ref);
+									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, ref.Ref);
 							
 							if(isInsertButton){
 								t._addButtonAF(newRes, true);
