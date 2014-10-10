@@ -1366,10 +1366,6 @@ var gUndoInsDelCellsFlag = true;
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
 							{activeCells: activeCells, type: type, cellId: cellId}, null, currentFilter.Ref);
 						History.EndTransaction();
-						// ToDo может хватит просто почистить selectionRange или нужно делать полный "update" ?
-						ws._cleanCache(selectionRange);
-						ws.isChanged = true;
-						ws.changeWorksheet("update");
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
@@ -1391,9 +1387,6 @@ var gUndoInsDelCellsFlag = true;
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
 						History.EndTransaction();
-						ws._cleanCache(selectionRange);
-						ws.isChanged = true;
-						ws.changeWorksheet("update");
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
