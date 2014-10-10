@@ -595,7 +595,7 @@ var gUndoInsDelCellsFlag = true;
 								if(!isTurnOffHistory && addNameColumn)
 								{
 									//t._isShiftCells(tempCells);
-									
+
 									rangeShift.addCellsShiftBottom();
 									ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
 									ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
@@ -674,7 +674,7 @@ var gUndoInsDelCellsFlag = true;
 							var ref = 
 							{
 								Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext)
-							}
+							};
 							
 							if(addNameColumn && addFormatTableOptionsObj)
 								addFormatTableOptionsObj.range = ref;
@@ -710,7 +710,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 						else
 						{
-							if(isUpdateRange != null && !bIsOpenFilter && !aWs.workbook.bCollaborativeChange && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+							if(isUpdateRange != null && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
 								ws._onEndAddFormatTable(isUpdateRange, recalc);
 								
 							History.EndTransaction();
@@ -2638,9 +2638,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				//**открываем/закрываем строки, скрытые фильтром**
 				var row;
-				var newArray = [];
 				var cellAdd = 1;
-				var rowNew = 0;
 				for(var i = 0; i < array.length; i++)
 				{
 					row = i + activeCells.r1 + cellAdd;
@@ -2674,8 +2672,6 @@ var gUndoInsDelCellsFlag = true;
 					else if(array[i] == true)
 					{
 						var isHidden = ws.model._getRow(row).hd;
-						var alreadyHidden = false;
-						
 						if(isHidden)
 							ws.model.setRowHidden(/*bHidden*/false, row, row);
 					}
@@ -2683,10 +2679,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**(для пользовательского фильтра они уже туда добавлены выше)
-				var isPress;
-				if(customFilter)
-					isPress = true;
-				else
+				if(!customFilter)
 				{
 					//массив преобразован в нужный вид true/false/hidden, здесь получаем Dates или Values
 					var allVis = true;
@@ -2773,8 +2766,7 @@ var gUndoInsDelCellsFlag = true;
 								allVis = false;
 						}
 					}
-					
-					isPress = true;
+
 					//в случае всех открытых строк - убираем фильтр из aWs
 					if(allVis || allFilterOpenElements)
 					{
@@ -2785,15 +2777,6 @@ var gUndoInsDelCellsFlag = true;
 						}	
 						else
 							currentFilter.splice(isCurFilter,1);
-						/*if(currentFilter[isCurFilter - 1] && currentFilter[isCurFilter - 1].ShowButton == false)
-						{	
-							for(var l = isCurFilter - 1; l >= 0 ;l--)
-							{
-								if(currentFilter[l].ShowButton == false)
-									currentFilter[l].Filters = null;
-							}
-						}*/
-						isPress = false;
 					}
 				}
 				if(!customFilter)
@@ -4224,7 +4207,7 @@ var gUndoInsDelCellsFlag = true;
 					if(!currentFilter.AutoFilter.FilterColumns)
 						currentFilter.AutoFilter.FilterColumns = [];
 					opFil = currentFilter.AutoFilter.FilterColumns;
-				};
+				}
 					
 				//анализируем структуру фильтра
 				//проверяем какие параметры применены к данному столбцу и к другим в этом фильтре
@@ -4233,7 +4216,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					var result = this._getOpenAndClosedValues(numFilter, currentFilter, opFil, buttonId);
 					return result;
-				};
+				}
 			},
 			
 			_getOpenAndClosedValues: function(numFilter, currentFilter, opFil, buttonId)
@@ -4613,7 +4596,7 @@ var gUndoInsDelCellsFlag = true;
 						else
 							nC++;
 					}
-				};
+				}
 					
 				for(var i = 0; i < result.length; i++)
 				{
@@ -4622,7 +4605,7 @@ var gUndoInsDelCellsFlag = true;
 						result.splice(i,1);
 						i--;
 					}
-				};
+				}
 				
 				if(idDigitalFilter)
 					result.dF = true;
@@ -4738,7 +4721,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					else
 					{
-						curFilter.FilterColumns[isEn] =  this._addNewCustomFilter(valFilter,parIndex[1])
+						curFilter.FilterColumns[isEn] =  this._addNewCustomFilter(valFilter,parIndex[1]);
 						if(isMerged)
 							curFilter.FilterColumns[isEn].ShowButton = false;
 					}
@@ -4844,7 +4827,7 @@ var gUndoInsDelCellsFlag = true;
 					
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var cell = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0]
+						var cell = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0];
 						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValue();
 						var type = cell.getType();
 						var valWithFormat = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValueWithFormat();
@@ -5076,8 +5059,8 @@ var gUndoInsDelCellsFlag = true;
 				/*var startRange = this._idToRange(ref[0]);
 				var endRange = this._idToRange(ref[1]);*/
 				
-				var startRange =  Asc.Range(ref.c1, ref.r1, ref.c1, ref.r1);;
-				var endRange =  Asc.Range(ref.c2, ref.r2, ref.c2, ref.r2);;
+				var startRange =  Asc.Range(ref.c1, ref.r1, ref.c1, ref.r1);
+				var endRange =  Asc.Range(ref.c2, ref.r2, ref.c2, ref.r2);
 				
 				range.start = startRange;
 				range.end = endRange;
@@ -5180,7 +5163,7 @@ var gUndoInsDelCellsFlag = true;
 					filter = aWs.TableParts[cRange.index].clone(aWs);
 					if(filter.AutoFilter)
 						filterColums = filter.AutoFilter.FilterColumns;
-				};
+				}
 				
 				var oldFilter = filter.clone(aWs);
 				
@@ -5688,7 +5671,7 @@ var gUndoInsDelCellsFlag = true;
 						//if(!isChange)
 							//buttons[buttons.length] = array;
 					}
-				};
+				}
 			},
 
 			// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
@@ -5720,7 +5703,7 @@ var gUndoInsDelCellsFlag = true;
 				elements.sort (function sortArr(a, b)
 				{
 					return a.val2 - b.val2;
-				})
+				});
 				return elements;
 			},
 			
@@ -6142,7 +6125,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					ctx.stroke();
 					ctx.closePath();  
-				};
+				}
 				
 				return canvas.toDataURL("image/png");
 			},
@@ -6269,7 +6252,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 						if(result[index] && result[index].hiddenRows && result[index].hiddenRows.length != 0)
 						{
-							var arrHiddens = result[index].hiddenRows
+							var arrHiddens = result[index].hiddenRows;
 							for(var row = 0; row < arrHiddens.length; row++)
 							{
 								if(arrHiddens[row] != undefined && arrHiddens[row] == true && !ws.model._getRow(row).hd)
@@ -6285,12 +6268,7 @@ var gUndoInsDelCellsFlag = true;
 				//перерисовываем таблицу со стилем 
 				if(tableParts)
 				{
-					var aWs = this._getCurrentWS();
-					
-					//var ref = tableParts.Ref.split(':');
-					
 					var ref = tableParts.Ref;
-					
 					this._setColorStyleTable(ref, tableParts)
 				}		
 			},
@@ -6363,7 +6341,6 @@ var gUndoInsDelCellsFlag = true;
 				var tableColumns = [];
 				var cell;
 				var val;
-				var index;
 				for(var col1 = range.c1; col1 <= range.c2; col1++)
 				{
 					cell = ws.model.getCell(new CellAddress(range.r1,col1, 0));
@@ -6381,8 +6358,8 @@ var gUndoInsDelCellsFlag = true;
 							valNew = val + index;
 							index++;
 							s = -1;
-						};
-					};
+						}
+					}
 					//if(!isTurnOffHistory)
 						//cell.setNumFormat("@");
 					newTableColumn = new TableColumn();
@@ -6410,7 +6387,7 @@ var gUndoInsDelCellsFlag = true;
 						tableColumns[j].Name = strNum;
 
 						j++;
-					};
+					}
 				}
 				else
 					tableColumns = this._generateColumnNameWithoutTitle(tempCells, isTurnOffHistory);
@@ -6431,7 +6408,7 @@ var gUndoInsDelCellsFlag = true;
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
-					};
+					}
 					
 					//в случае если добавляем фильтр общий, то откидываем пустую строку или столбец в конце
 					isEndRowEmpty = true;
@@ -6441,7 +6418,7 @@ var gUndoInsDelCellsFlag = true;
 						 {
 							isEndRowEmpty = false;
 						 }
-					};
+					}
 					if(isEndRowEmpty && !lTable && mainAdjacentCells.r1 != mainAdjacentCells.r2)
 						mainAdjacentCells.r2 = mainAdjacentCells.r2 - 1;
 					
@@ -6503,8 +6480,8 @@ var gUndoInsDelCellsFlag = true;
 							//ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 							History.EndTransaction();
 							return false;
-						};
-					};
+						}
+					}
 					
 					if(mainAdjacentCells)
 						activeCells = mainAdjacentCells;
@@ -6517,7 +6494,7 @@ var gUndoInsDelCellsFlag = true;
 						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 						return false;
-					};
+					}
 					
 					var n = 0;
 					for(var col = activeCells.c1; col <= activeCells.c2; col++)
@@ -6534,8 +6511,8 @@ var gUndoInsDelCellsFlag = true;
 						result[n].idNext = idCellNext.getID();
 						
 						n++;
-					};
-				};
+					}
+				}
 				
 				return {result: result, mainAdjacentCells: mainAdjacentCells, activeCells: activeCells};
 			},
@@ -6613,10 +6590,8 @@ var gUndoInsDelCellsFlag = true;
 					var diffCol = arnTo.c1 - arnFrom.c1;
 					var diffRow = arnTo.r1 - arnFrom.r1;
 					var ref;
-					var parseRef;
 					var range;
 					var newRange;
-					var newRef;
 					var oCurFilter;
 					//у найденных фильтров меняем Ref + скрытые строчки открываем
 					for(var i = 0; i < findFilters.length; i++)
@@ -6627,7 +6602,6 @@ var gUndoInsDelCellsFlag = true;
 						ref = findFilters[i].Ref;
 						range = ref;
 						newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);
-						//newRef = this._rangeToRef(newRange);
 						findFilters[i].Ref = newRange;
 						if(findFilters[i].AutoFilter)
 							findFilters[i].AutoFilter.Ref = newRange;
@@ -6713,18 +6687,6 @@ var gUndoInsDelCellsFlag = true;
 					ws.changeWorksheet("update");
 			},
 			
-			_rangeToRef: function(range)
-			{
-				if(range)
-				{
-					var startId = this._rangeToId({r1: range.r1, c1: range.c1});
-					var endId = this._rangeToId({r1: range.r2, c1: range.c2});
-					var ref = startId + ":" + endId;
-					return ref;
-				}
-				return false;
-			},
-			
 			_isStringContainDigit: function(str)
 			{
 				var regexp = /[1-9]/gi;
@@ -6764,7 +6726,6 @@ var gUndoInsDelCellsFlag = true;
 					return;
 				var filters = [autoFiltersOptions.filter1,autoFiltersOptions.filter2];
 				var valFilters = [autoFiltersOptions.valFilter1,autoFiltersOptions.valFilter2];
-				var result = null;
 				var filterVal;
 				var filter;
 				for(var fil = 0;  fil <  filters.length; fil++)
@@ -7275,14 +7236,12 @@ var gUndoInsDelCellsFlag = true;
 				{
 					if(result[i].showButton ===  false)
 						result[i].showButton = true;
-				};
+				}
 			},
 			
 			_checkShowButtonsFlag: function(autoFilter)
 			{
 				//добавлена в связи с проблемами, возникающими при undo удаления столбца форматированной таблицы со скрытой кнопкой
-				var ws = this.worksheet;
-				var aWs = this._getCurrentWS();
 				var button;
 				var result = autoFilter.result;
 				
@@ -7298,9 +7257,9 @@ var gUndoInsDelCellsFlag = true;
 						{
 							this.allButtonAF.splice(i, 1);
 							i--;
-						};
-					};
-				};
+						}
+					}
+				}
 			},
 			
 			_cleanFilterColumnsAndSortState: function(autoFilterElement, activeCells)
@@ -7321,7 +7280,7 @@ var gUndoInsDelCellsFlag = true;
 				else if(autoFilterElement.FilterColumns)
 				{
 					autoFilterElement.FilterColumns = null;
-				};
+				}
 				
 				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells}, null, activeCells);
 				
