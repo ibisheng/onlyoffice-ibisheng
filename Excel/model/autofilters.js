@@ -347,7 +347,7 @@ var gUndoInsDelCellsFlag = true;
 
 									// Смена стиля
 									t._addHistoryObj(cloneFilterOld, historyitem_AutoFilter_Add,
-										{activeCells: activeCells, lTable: lTable});
+										{activeCells: activeCells, lTable: lTable}, null, rangeFilter);
 										
 									break;
 								}
@@ -391,7 +391,7 @@ var gUndoInsDelCellsFlag = true;
 									t._showButtonFlag(newRes.result);
 									
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
-										{activeCells: activeCells, lTable: lTable});
+										{activeCells: activeCells, lTable: lTable}, null, activeCells);
 									//открываем скрытые строки
 									var isHidden;
 									var isInsert = false;
@@ -494,11 +494,12 @@ var gUndoInsDelCellsFlag = true;
 										result: result,
 										isVis:  true
 									};
+									
 									changesElemHistory.refTable = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
 									if(addNameColumn)
 										changesElemHistory.addColumn = true;
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
-											{activeCells: cloneAC, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
+											{activeCells: cloneAC, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, changesElemHistory.refTable);
 									
 									if(isInsertButton){
 										if (bIsActiveSheet)
@@ -537,7 +538,7 @@ var gUndoInsDelCellsFlag = true;
 									t._setColorStyleTable(rangeFilter, filterChange);
 									
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
-										{activeCells: activeCells, lTable: lTable});
+										{activeCells: activeCells, lTable: lTable}, rangeFilter);
 									
 									isUpdateRange = rangeFilter;
 									
@@ -565,9 +566,6 @@ var gUndoInsDelCellsFlag = true;
 							
 							if(paramsForCallBack == "setStyleTableForAutoFilter1" || paramsForCallBack == "setStyleTableForAutoFilter")
 							{
-								t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
-								{activeCells: activeCells, lTable: lTable});
-
 								if (bIsActiveSheet)
 									t._addButtonAF(newRes, true);
 								
@@ -580,7 +578,9 @@ var gUndoInsDelCellsFlag = true;
 
 								//isUpdateRange = rangeFilter;
 								//recalc = true;
-
+								
+								t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
+								{activeCells: activeCells, lTable: lTable}, null, rangeFilter);
 							}
 						} 
 						else if(paramsForCallBackAdd)//добавляем а/ф
@@ -679,7 +679,7 @@ var gUndoInsDelCellsFlag = true;
 							if(addNameColumn && addFormatTableOptionsObj)
 								addFormatTableOptionsObj.range = ref;
 							t._addHistoryObj(ref, historyitem_AutoFilter_Add,
-									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
+									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, ref);
 							
 							if(isInsertButton){
 								t._addButtonAF(newRes, true);
@@ -1372,7 +1372,7 @@ var gUndoInsDelCellsFlag = true;
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
-							{activeCells: activeCells, type: type, cellId: cellId});
+							{activeCells: activeCells, type: type, cellId: cellId}, null, currentFilter.Ref);
 						History.EndTransaction();
 						// ToDo может хватит просто почистить selectionRange или нужно делать полный "update" ?
 						ws._cleanCache(selectionRange);
@@ -1570,7 +1570,7 @@ var gUndoInsDelCellsFlag = true;
 							oldFilter.insCells = true;
 							
 						//заносим в историю
-						this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+						this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 						
 						this._isEmptyButtons(oldFilter.Ref);
 					}
@@ -1594,7 +1594,7 @@ var gUndoInsDelCellsFlag = true;
 							//открываем скрытые строки
 							aWs.setRowHidden(false, bbox.r1, bbox.r2);
 							//заносим в историю
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells},deleteFilterAfterDeleteColRow);
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, oRange);
 							
 							this._isEmptyButtons(oCurFilter.Ref);
 						}
@@ -1638,7 +1638,7 @@ var gUndoInsDelCellsFlag = true;
 					aWs.setRowHidden(false, bbox.r1, bbox.r2);
 						
 					//заносим в историю
-					this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+					this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, aWs.AutoFilter.Ref);
 				}
 				
 				if(activeCells)
@@ -5332,7 +5332,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							oldFilter: oldFilter
 						};
-						this._addHistoryObj(changeElement, null, null, true);
+						this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref);
 						History.EndTransaction();
 					}
 				}
@@ -6182,7 +6182,7 @@ var gUndoInsDelCellsFlag = true;
 					
 			},
 			
-			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow) {
+			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange) {
 				var ws = this.worksheet;
 				var oHistoryObject = new UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
@@ -6204,7 +6204,10 @@ var gUndoInsDelCellsFlag = true;
 					type = null;
 				}
 				
-				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
+				if(!activeHistoryRange)
+					activeHistoryRange = null;
+				
+				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), activeHistoryRange, oHistoryObject);
 				if(deleteFilterAfterDeleteColRow)
 					History.ChangeActionsEndToStart();
 			},
@@ -7320,7 +7323,7 @@ var gUndoInsDelCellsFlag = true;
 					autoFilterElement.FilterColumns = null;
 				};
 				
-				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells});
+				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells}, null, activeCells);
 				
 				ws.isChanged = true;
 				this._reDrawFilters();
