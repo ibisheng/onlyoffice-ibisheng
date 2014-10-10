@@ -594,8 +594,6 @@ var gUndoInsDelCellsFlag = true;
 								//при добавлении строки заголовков - сдвигаем диапазон на строку ниже
 								if(!isTurnOffHistory && addNameColumn)
 								{
-									//t._isShiftCells(tempCells);
-
 									rangeShift.addCellsShiftBottom();
 									ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
 									ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
@@ -3982,7 +3980,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			
-			_addButtonAF: function(arr, bIsOpenFilter)
+			_addButtonAF: function(arr)
 			{
 				if(arr.result)
 				{
@@ -6680,18 +6678,6 @@ var gUndoInsDelCellsFlag = true;
 					ws.changeWorksheet("update");
 			},
 			
-			_isStringContainDigit: function(str)
-			{
-				var regexp = /[1-9]/gi;
-				var matches = str.match(regexp);
-				var result = false;
-				
-				if(matches && matches.length)
-					result = true;
-					
-				return result;
-			},
-			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
 			_isShowButton: function(autoFilter, colId)
 			{
@@ -7279,37 +7265,6 @@ var gUndoInsDelCellsFlag = true;
 				
 				ws.isChanged = true;
 				this._reDrawFilters();
-			},
-			
-			_isShiftCells: function(rangeShift)
-			{
-				var ws = this.worksheet;
-				var aWs = this._getCurrentWS();
-				//если на следующей строчке а/ф или форматированная таблицы
-				if(aWs.AutoFilter)
-				{
-					if((rangeShift.r2 + 1) === aWs.AutoFilter.Ref.r1)
-						return true;
-				}
-				if(aWs.TableParts && aWs.TableParts.length)
-				{
-					for(var i = 0; i < aWs.TableParts.length.length; i++)
-					{
-						if((rangeShift.r2 + 1) === aWs.TableParts[i].Ref.r1)
-							return true;
-					}
-				}
-				
-				//если  в следующей строчке есть непустая ячейка
-				var value;
-				for(var i = rangeShift.c1; i < rangeShift.c2; i++)
-				{
-					value = ws.model.getRange3(rangeShift.r2 + 1, i, rangeShift.r2 + 1, i).getValue();
-					if(value != "")
-						return true;
-				}
-				
-				return false;
 			},
 			
 			_isFilterColumnsContainFilter: function(filterColumns)
