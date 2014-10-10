@@ -6782,9 +6782,9 @@ function Editor_CopyPaste_Create(api)
 
 	var Def_rPr;
 	if(g_bIsDocumentCopyPaste)
-		Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
+		Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
 	else	
-		Def_rPr = oWordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
+		Def_rPr = api.WordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
 		
     ElemToSelect.style.fontFamily = Def_rPr.FontFamily.Name;
 
