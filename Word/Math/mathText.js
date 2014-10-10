@@ -900,6 +900,10 @@ CMathAmp.prototype =
     {
         return this.Type == para_Math_Ampersand;
     },
+    Copy : function()
+    {
+        return new CMathAmp();
+    },
 	Write_ToBinary : function(Writer)
     {
         // Long : Type

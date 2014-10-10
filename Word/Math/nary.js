@@ -6,10 +6,10 @@
 
 function CMathNaryPr()
 {
-    this.chr     = null;
+    this.chr     = undefined;
     this.chrType = NARY_INTEGRAL;
     this.grow    = false;
-    this.limLoc  = null;
+    this.limLoc  = undefined;
     this.subHide = false;
     this.supHide = false;
 }
@@ -32,44 +32,96 @@ CMathNaryPr.prototype.Set_FromObject = function(Obj)
         this.supHide = true;
 };
 
+CMathNaryPr.prototype.Copy = function()
+{
+    var NewPr = new CMathNaryPr();
+
+    NewPr.chr     = this.chr    ;
+    NewPr.chrType = this.chrType;
+    NewPr.grow    = this.grow   ;
+    NewPr.limLoc  = this.limLoc ;
+    NewPr.subHide = this.subHide;
+    NewPr.supHide = this.supHide;
+
+    return NewPr;
+};
+
 CMathNaryPr.prototype.Write_ToBinary = function(Writer)
 {
+    // Long : flags
+
     // Long : chr
     // Long : chrType
-    // Bool : grow
     // Long : limLoc
+
+    // Bool : grow
     // Bool : subHide
     // Bool : supHide
 
-    Writer.WriteLong(this.chr === null ? -1 : this.chr);
-    Writer.WriteLong(this.chrType);
+    var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+
+    if (undefined !== this.chr)
+    {
+        Writer.WriteLong(this.chr);
+        Flags |= 1;
+    }
+
+    if (undefined !== this.chrType)
+    {
+        Writer.WriteLong(this.chrType);
+        Flags |= 2;
+    }
+
+    if (undefined !== this.limLoc)
+    {
+        Writer.WriteLong(this.limLoc);
+        Flags |= 4;
+    }
+
+    var EndPos = Writer.GetCurPosition();
+    Writer.Seek(StartPos);
+    Writer.WriteLong(Flags);
+    Writer.Seek(EndPos);
+
     Writer.WriteBool(this.grow);
-    Writer.WriteLong(this.limLoc === null ? -1 : this.limLoc);
     Writer.WriteBool(this.subHide);
     Writer.WriteBool(this.supHide);
 };
 
 CMathNaryPr.prototype.Read_FromBinary = function(Reader)
 {
+    // Long : flags
+
     // Long : chr
     // Long : chrType
-    // Bool : grow
     // Long : limLoc
+
+    // Bool : grow
     // Bool : subHide
     // Bool : supHide
 
-    this.chr     = Reader.GetLong();
-    this.chrType = Reader.GetLong();
+    var Flags = Reader.GetLong();
+
+    if (Flags & 1)
+        this.chr = Reader.GetLong();
+    else
+        this.chr = undefined;
+
+    if (Flags & 2)
+        this.chrType = Reader.GetLong();
+    else
+        this.chrType = undefined;
+
+    if (Flags & 4)
+        this.limLoc = Reader.GetLong();
+    else
+        this.limLoc = undefined;
+
     this.grow    = Reader.GetBool();
-    this.limLoc  = Reader.GetLong();
     this.subHide = Reader.GetBool();
     this.supHide = Reader.GetBool();
-
-    if (-1 === this.chr)
-        this.chr = null;
-
-    if (-1 === this.limLoc)
-        this.limLoc = null;
 };
 
 function CNary(props)
@@ -379,6 +431,25 @@ CNary.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
+CNary.prototype.Correct_Content = function(bInnerCorrection)
+{
+    this.LowerIterator.Correct_Content(bInnerCorrection);
+    this.UpperIterator.Correct_Content(bInnerCorrection);
+    this.Arg.Correct_Content(bInnerCorrection);
+};
+CNary.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewNAry = new CNary(oProps);
+
+    this.LowerIterator.CopyTo(NewNAry.LowerIterator, false);
+    this.UpperIterator.CopyTo(NewNAry.UpperIterator, false);
+    this.Arg.CopyTo(NewNAry.Arg, false);
+
+    return NewNAry;
+};
 CNary.prototype.Refresh_RecalcData = function(Data)
 {
 }

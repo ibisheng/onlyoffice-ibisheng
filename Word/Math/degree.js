@@ -267,15 +267,14 @@ CDegree.prototype.Write_ToBinary2 = function( Writer )
 };
 CDegree.prototype.Read_FromBinary2 = function( Reader )
 {
-    this.Id = Reader.GetLong();
-    this.baseContent = g_oTableId.Get_ById(Reader.GetLong());
-    this.iterContent = g_oTableId.Get_ById(Reader.GetLong());
+    this.Id = Reader.GetString2();
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
+    this.iterContent = g_oTableId.Get_ById(Reader.GetString2());
 
-	var props = {ctrPrp: new CTextPr()};
-	props.ctrPrp.Read_FromBinary(Reader);
-    props.type = Reader.GetLong();
+    this.CtrPrp.Read_FromBinary(Reader);
+    this.Pr.type = Reader.GetLong();
 
-    this.init(props);
+    this.fillContent();
 };
 CDegree.prototype.Get_Id = function()
 {

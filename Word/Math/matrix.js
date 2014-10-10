@@ -21,6 +21,16 @@ CMathMatrixColumnPr.prototype.Set_FromObject = function(Obj)
         this.mcJc = MCJC_CENTER;
 };
 
+CMathMatrixColumnPr.prototype.Copy = function()
+{
+    var NewPr = new CMathMatrixColumnPr();
+
+    NewPr.count = this.count;
+    NewPr.mcJc  = this.mcJc;
+
+    return NewPr;
+};
+
 CMathMatrixColumnPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : count
@@ -102,6 +112,27 @@ CMathMatrixPr.prototype.Set_FromObject = function(Obj)
     }
 
     return nColumnsCount;
+};
+CMathMatrixPr.prototype.Copy = function()
+{
+    var NewPr = new CMathMatrixPr();
+
+    NewPr.row     = this.row    ;
+    NewPr.cGp     = this.cGp    ;
+    NewPr.cGpRule = this.cGpRule;
+    NewPr.cSp     = this.cSp    ;
+    NewPr.rSp     = this.rSp    ;
+    NewPr.rSpRule = this.rSpRule;
+    NewPr.baseJc  = this.baseJc ;
+    NewPr.plcHide = this.plcHide;
+
+    var nCount = this.mcs.length;
+    for (var nMcsIndex = 0; nMcsIndex < nCount; nMcsIndex++)
+    {
+        NewPr.mcs[nMcsIndex] = this.mcs[nMcsIndex].Copy();
+    }
+
+    return NewPr;
 };
 CMathMatrixPr.prototype.Get_ColumnsCount = function()
 {
@@ -626,6 +657,26 @@ CMathMatrix.prototype.getPropsForWrite = function()
 
     return props;
 };
+CMathMatrix.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewMatrix = new CMathMatrix(oProps);
+
+    var nRowsCount = this.getRowsCount();
+    var nColsCount = this.getColsCount();
+
+    for(var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
+    {
+        for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+        {
+            this.elements[nRowIndex][nColIndex].CopyTo(NewMatrix.elements[nRowIndex][nColIndex], false);
+        }
+    }
+
+    return NewMatrix;
+};
 CMathMatrix.prototype.Refresh_RecalcData = function(Data)
 {
 };
@@ -724,6 +775,19 @@ CMathEqArrPr.prototype.Set_FromObject = function(Obj)
 
     if(undefined !== Obj.baseJc && null !== Obj.baseJc)
         this.baseJc = Obj.baseJc;
+};
+
+CMathEqArrPr.prototype.Copy = function()
+{
+    var NewPr = new CMathEqArrPr();
+
+    NewPr.maxDist = this.maxDist;
+    NewPr.objDist = this.objDist;
+    NewPr.rSp     = this.rSp    ;
+    NewPr.rSpRule = this.rSpRule;
+    NewPr.baseJc  = this.baseJc ;
+
+    return NewPr;
 };
 
 CMathEqArrPr.prototype.Write_ToBinary = function(Writer)
@@ -971,13 +1035,21 @@ CEqArray.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
-CEqArray.prototype.Save_Changes = function(Data, Writer)
+CEqArray.prototype.Copy = function()
 {
-	Writer.WriteLong( historyitem_type_eqArr );
-}
-CEqArray.prototype.Load_Changes = function(Reader)
-{
-}
+    var oProps = this.Pr.Copy();
+    var NewEqArray = new CEqArray(oProps);
+
+    var nRowsCount = this.elements.length;
+    NewEqArray.setDimension(nRowsCount, 1);
+    NewEqArray.setContent();
+    for (var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
+    {
+        this.elements[nRowIndex][0].CopyTo(NewEqArray.elements[nRowIndex][0], false);
+    }
+
+    return NewEqArray;
+};
 CEqArray.prototype.Refresh_RecalcData = function(Data)
 {
 }

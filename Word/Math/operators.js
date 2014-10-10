@@ -3211,12 +3211,12 @@ COperator.prototype.IsArrow = function()
 
 function CMathDelimiterPr()
 {
-    this.begChr     = null;
-    this.begChrType = null;
-    this.endChr     = null;
-    this.endChrType = null;
-    this.sepChr     = null;
-    this.sepChrType = null;
+    this.begChr     = undefined;
+    this.begChrType = undefined;
+    this.endChr     = undefined;
+    this.endChrType = undefined;
+    this.sepChr     = undefined;
+    this.sepChrType = undefined;
     this.shp        = DELIMITER_SHAPE_CENTERED;
     this.grow       = true;
 
@@ -3244,24 +3244,83 @@ CMathDelimiterPr.prototype.Set_FromObject = function(Obj)
         this.column = 1;
 };
 
+CMathDelimiterPr.prototype.Copy = function()
+{
+    var NewPr = new CMathDelimiterPr();
+
+    NewPr.begChr     = this.begChr    ;
+    NewPr.begChrType = this.begChrType;
+    NewPr.endChr     = this.endChr    ;
+    NewPr.endChrType = this.endChrType;
+    NewPr.sepChr     = this.sepChr    ;
+    NewPr.sepChrType = this.sepChrType;
+    NewPr.shp        = this.shp       ;
+    NewPr.grow       = this.grow      ;
+    NewPr.column     = this.column    ;
+
+    return NewPr;
+};
+
 CMathDelimiterPr.prototype.Write_ToBinary = function(Writer)
 {
+    // Long : Flag
+
     // Long : begChr
     // Long : begChrType
     // Long : endChr
     // Long : endChrType
     // Long : sepChr
     // Long : sepChrType
+
     // Long : shp
     // Bool : grow
     // Long : column
 
-    Writer.WriteLong(null === this.begChr ? -1 : this.begChr);
-    Writer.WriteLong(null === this.begChrType ? -1 : this.begChrType);
-    Writer.WriteLong(null === this.endChr ? -1 : this.endChr);
-    Writer.WriteLong(null === this.endChrType ? -1 : this.endChrType);
-    Writer.WriteLong(null === this.sepChr ? -1 : this.sepChr);
-    Writer.WriteLong(null === this.sepChrType ? -1 : this.sepChrType);
+    var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+
+    if (undefined !== this.begChr)
+    {
+        Writer.WriteLong(this.begChr);
+        Flags |= 1;
+    }
+
+    if (undefined !== this.begChrType)
+    {
+        Writer.WriteLong(this.begChrType);
+        Flags |= 2;
+    }
+
+    if (undefined !== this.endChr)
+    {
+        Writer.WriteLong(this.endChr);
+        Flags |= 4;
+    }
+
+    if (undefined !== this.endChrType)
+    {
+        Writer.WriteLong(this.endChrType);
+        Flags |= 8;
+    }
+
+    if (undefined !== this.sepChr)
+    {
+        Writer.WriteLong(this.sepChr);
+        Flags |= 16;
+    }
+
+    if (undefined !== this.sepChrType)
+    {
+        Writer.WriteLong(this.sepChrType);
+        Flags |= 32;
+    }
+
+    var EndPos = Writer.GetCurPosition();
+    Writer.Seek(StartPos);
+    Writer.WriteLong(Flags);
+    Writer.Seek(EndPos);
+
     Writer.WriteLong(this.shp);
     Writer.WriteBool(this.grow);
     Writer.WriteLong(this.column);
@@ -3269,43 +3328,54 @@ CMathDelimiterPr.prototype.Write_ToBinary = function(Writer)
 
 CMathDelimiterPr.prototype.Read_FromBinary = function(Reader)
 {
+    // Long : Flags
+
     // Long : begChr
     // Long : begChrType
     // Long : endChr
     // Long : endChrType
     // Long : sepChr
     // Long : sepChrType
+
     // Long : shp
     // Bool : grow
     // Long : column
 
-    this.begChr     = Reader.GetLong();
-    this.begChrType = Reader.GetLong();
-    this.endChr     = Reader.GetLong();
-    this.endChrType = Reader.GetLong();
-    this.sepChr     = Reader.GetLong();
-    this.sepChrType = Reader.GetLong();
+    var Flags = Reader.GetLong();
+
+    if (Flags & 1)
+        this.begChr = Reader.GetLong();
+    else
+        this.begChr = undefined;
+
+    if (Flags & 2)
+        this.begChrType = Reader.GetLong();
+    else
+        this.begChrType = undefined;
+
+    if (Flags & 4)
+        this.endChr = Reader.GetLong();
+    else
+        this.endChr = undefined;
+
+    if (Flags & 8)
+        this.endChrType = Reader.GetLong();
+    else
+        this.endChrType = undefined;
+
+    if (Flags & 16)
+        this.sepChr = Reader.GetLong();
+    else
+        this.sepChr = undefined;
+
+    if (Flags & 32)
+        this.sepChrType = Reader.GetLong();
+    else
+        this.sepChrType = undefined;
+
     this.shp        = Reader.GetLong();
     this.grow       = Reader.GetBool();
     this.column     = Reader.GetLong();
-
-    if (-1 === this.begChr)
-        this.begChr = null;
-
-    if (-1 === this.begChrType)
-        this.begChrType = null;
-
-    if (-1 === this.endChr)
-        this.endChr = null;
-
-    if (-1 === this.endChrType)
-        this.endChrType = null;
-
-    if (-1 === this.sepChr)
-        this.sepChr = null;
-
-    if (-1 === this.sepChrType)
-        this.sepChrType = null;
 };
 
 function CDelimiter(props)
@@ -3335,9 +3405,7 @@ CDelimiter.prototype.init = function(props)
 CDelimiter.prototype.setProperties = function(props)
 {
     this.Pr.Set_FromObject(props);
-
-    if(props.ctrPrp !== null && typeof(props.ctrPrp) !== "undefined")
-        this.setCtrPrp(props.ctrPrp);
+    this.setCtrPrp(props.ctrPrp);
 }
 CDelimiter.prototype.getColumnsCount = function()
 {
@@ -3691,6 +3759,23 @@ CDelimiter.prototype.getPropsForWrite = function()
 {
     return this.Pr;
 }
+CDelimiter.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewDelimiter = new CDelimiter(oProps);
+
+    var nColsCount = this.getColumnsCount();
+
+    NewDelimiter.setDimension(1, nColsCount);
+    NewDelimiter.setContent();
+
+    for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+        this.elements[0][nColIndex].CopyTo(NewDelimiter.elements[0][nColIndex], false);
+
+    return NewDelimiter;
+};
 CDelimiter.prototype.Refresh_RecalcData = function(Data)
 {
 }
