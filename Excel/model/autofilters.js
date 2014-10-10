@@ -407,7 +407,7 @@ var gUndoInsDelCellsFlag = true;
 									}	
 
 									if (bIsActiveSheet)
-										t._addButtonAF(newRes, true);
+										t._addButtonAF(newRes);
 									//перерисовываем форматированную таблиц
 									if(isReDrawFilter && isReDrawFilter.TableColumns && isReDrawFilter.result)
 										t._reDrawCurrentFilter(null, null, isReDrawFilter);
@@ -6386,7 +6386,6 @@ var gUndoInsDelCellsFlag = true;
 				return tableColumns;
 			},
 			
-			
 			_getResultAddFilter: function(paramsForCallBackAdd, activeCells, mainAdjacentCells, lTable)
 			{
 				var result = [], isEndRowEmpty, ws = this.worksheet, idCell, idCellNext;
@@ -6507,10 +6506,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				return {result: result, mainAdjacentCells: mainAdjacentCells, activeCells: activeCells};
 			},
-							
-							
-			
-			
+
 			_renameTableColumn: function(range)
 			{
 				var ws = this.worksheet;
