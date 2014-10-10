@@ -3568,254 +3568,287 @@ CStyle.prototype =
     }
 };
 
-function CStyles()
+function CStyles(bCreateDefault)
 {
-    this.Id = g_oIdCounter.Get_NewId();
-
-    this.Default =
+    if (bCreateDefault !== false)
     {
-        ParaPr      : new CParaPr(),
-        TextPr      : new CTextPr(),
-        TablePr     : new CTablePr(),
-        TableRowPr  : new CTableRowPr(),
-        TableCellPr : new CTableCellPr(),
-        Paragraph : null,
-        Character : null,
-        Numbering : null,
-        Table     : null,
-        TableGrid : null,
-        Headings  : [],
-        ParaList  : null,
-        Header    : null,
-        Footer    : null,
-        Hyperlink : null
-    };
+        this.Id = g_oIdCounter.Get_NewId();
 
-    // Заполняем значения по умолчанию
-    this.Default.ParaPr.Init_Default();
-    this.Default.TextPr.Init_Default();
-    this.Default.TablePr.Init_Default();
-    this.Default.TableRowPr.Init_Default();
-    this.Default.TableCellPr.Init_Default();
+        this.Default =
+        {
+            ParaPr      : new CParaPr(),
+            TextPr      : new CTextPr(),
+            TablePr     : new CTablePr(),
+            TableRowPr  : new CTableRowPr(),
+            TableCellPr : new CTableCellPr(),
+            Paragraph : null,
+            Character : null,
+            Numbering : null,
+            Table     : null,
+            TableGrid : null,
+            Headings  : [],
+            ParaList  : null,
+            Header    : null,
+            Footer    : null,
+            Hyperlink : null
+        };
 
-    this.Style = [];
+        // Заполняем значения по умолчанию
+        this.Default.ParaPr.Init_Default();
+        this.Default.TextPr.Init_Default();
+        this.Default.TablePr.Init_Default();
+        this.Default.TableRowPr.Init_Default();
+        this.Default.TableCellPr.Init_Default();
 
-    // Создадим стандартные стили
+        this.Style = [];
 
-    // Дефолтовый стиль для параграфа
-    var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
-    Style_Para_Def.Create_Default_Paragraph();
-    this.Default.Paragraph = this.Add( Style_Para_Def );
+        // Создадим стандартные стили
 
-    // Дефолтовый стиль для текста
-    var Style_Char_Def = new CStyle( "Default Paragraph Font", null, null, styletype_Character );
-    Style_Char_Def.Create_Default_Character();
-    this.Default.Character = this.Add( Style_Char_Def );
+        // Дефолтовый стиль для параграфа
+        var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
+        Style_Para_Def.Create_Default_Paragraph();
+        this.Default.Paragraph = this.Add( Style_Para_Def );
 
-    // Дефолтовый стиль для нумерации в списках
-    var Style_Num_Def = new CStyle( "No List", null, null, styletype_Numbering );
-    Style_Num_Def.Create_Default_Numbering();
-    this.Default.Numbering = this.Add( Style_Num_Def );
+        // Дефолтовый стиль для текста
+        var Style_Char_Def = new CStyle( "Default Paragraph Font", null, null, styletype_Character );
+        Style_Char_Def.Create_Default_Character();
+        this.Default.Character = this.Add( Style_Char_Def );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H1 = new CStyle("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H1.Create_Heading1();
-    this.Default.Headings[0] = this.Add( Style_H1 );
+        // Дефолтовый стиль для нумерации в списках
+        var Style_Num_Def = new CStyle( "No List", null, null, styletype_Numbering );
+        Style_Num_Def.Create_Default_Numbering();
+        this.Default.Numbering = this.Add( Style_Num_Def );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H2 = new CStyle("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H2.Create_Heading2();
-    this.Default.Headings[1] = this.Add( Style_H2 );
+        // Создаем стандартные стили для заголовков
+        var Style_H1 = new CStyle("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H1.Create_Heading1();
+        this.Default.Headings[0] = this.Add( Style_H1 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H3 = new CStyle("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H3.Create_Heading3();
-    this.Default.Headings[2] = this.Add( Style_H3 );
+        // Создаем стандартные стили для заголовков
+        var Style_H2 = new CStyle("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H2.Create_Heading2();
+        this.Default.Headings[1] = this.Add( Style_H2 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H4 = new CStyle("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H4.Create_Heading4();
-    this.Default.Headings[3] = this.Add( Style_H4 );
+        // Создаем стандартные стили для заголовков
+        var Style_H3 = new CStyle("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H3.Create_Heading3();
+        this.Default.Headings[2] = this.Add( Style_H3 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H5 = new CStyle("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H5.Create_Heading5();
-    this.Default.Headings[4] = this.Add( Style_H5 );
+        // Создаем стандартные стили для заголовков
+        var Style_H4 = new CStyle("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H4.Create_Heading4();
+        this.Default.Headings[3] = this.Add( Style_H4 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H6 = new CStyle("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H6.Create_Heading6();
-    this.Default.Headings[5] = this.Add( Style_H6 );
+        // Создаем стандартные стили для заголовков
+        var Style_H5 = new CStyle("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H5.Create_Heading5();
+        this.Default.Headings[4] = this.Add( Style_H5 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H7 = new CStyle("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H7.Create_Heading7();
-    this.Default.Headings[6] = this.Add( Style_H7 );
+        // Создаем стандартные стили для заголовков
+        var Style_H6 = new CStyle("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H6.Create_Heading6();
+        this.Default.Headings[5] = this.Add( Style_H6 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H8 = new CStyle("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H8.Create_Heading8();
-    this.Default.Headings[7] = this.Add( Style_H8 );
+        // Создаем стандартные стили для заголовков
+        var Style_H7 = new CStyle("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H7.Create_Heading7();
+        this.Default.Headings[6] = this.Add( Style_H7 );
 
-    // Создаем стандартные стили для заголовков
-    var Style_H9 = new CStyle("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_H9.Create_Heading9();
-    this.Default.Headings[8] = this.Add( Style_H9 );
+        // Создаем стандартные стили для заголовков
+        var Style_H8 = new CStyle("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H8.Create_Heading8();
+        this.Default.Headings[7] = this.Add( Style_H8 );
 
-    // Создаем стандартный стиль для нумерованных параграфов
-    var Style_Para_List = new CStyle("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph );
-    Style_Para_List.Create_ListParagraph();
-    this.Default.ParaList = this.Add( Style_Para_List );
+        // Создаем стандартные стили для заголовков
+        var Style_H9 = new CStyle("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_H9.Create_Heading9();
+        this.Default.Headings[8] = this.Add( Style_H9 );
 
-    // Создаем стандартный стиль для таблиц
-    var Style_Table = new CStyle("Normal Table", null, null, styletype_Table );
-    Style_Table.Create_NormalTable();
-    this.Default.Table = this.Add( Style_Table );
+        // Создаем стандартный стиль для нумерованных параграфов
+        var Style_Para_List = new CStyle("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph );
+        Style_Para_List.Create_ListParagraph();
+        this.Default.ParaList = this.Add( Style_Para_List );
 
-    // Создаем стиль "Без интервала"
-    var Style_NoSpacing = new CStyle("No Spacing", null, null, styletype_Paragraph );
-    Style_NoSpacing.Create_NoSpacing();
-    this.Add( Style_NoSpacing );
+        // Создаем стандартный стиль для таблиц
+        var Style_Table = new CStyle("Normal Table", null, null, styletype_Table );
+        Style_Table.Create_NormalTable();
+        this.Default.Table = this.Add( Style_Table );
 
-    // Создаем стиль "Заголовок"
-    var Style_Title = new CStyle("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_Title.Create_Title();
-    this.Add( Style_Title );
+        // Создаем стиль "Без интервала"
+        var Style_NoSpacing = new CStyle("No Spacing", null, null, styletype_Paragraph );
+        Style_NoSpacing.Create_NoSpacing();
+        this.Add( Style_NoSpacing );
 
-    // Создаем стиль "Подзаголовок"
-    var Style_Subtitle = new CStyle("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_Subtitle.Create_Subtitle();
-    this.Add( Style_Subtitle );
+        // Создаем стиль "Заголовок"
+        var Style_Title = new CStyle("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_Title.Create_Title();
+        this.Add( Style_Title );
 
-    // Создаем стиль "Цитата"
-    var Style_Quote = new CStyle("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_Quote.Create_Quote();
-    this.Add( Style_Quote );
+        // Создаем стиль "Подзаголовок"
+        var Style_Subtitle = new CStyle("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_Subtitle.Create_Subtitle();
+        this.Add( Style_Subtitle );
 
-    // Создаем стиль "Выделенная цитата"
-    var Style_IntenseQuote = new CStyle("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-    Style_IntenseQuote.Create_IntenseQuote();
-    this.Add( Style_IntenseQuote );
+        // Создаем стиль "Цитата"
+        var Style_Quote = new CStyle("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_Quote.Create_Quote();
+        this.Add( Style_Quote );
 
-    // Создаем стандартный стиль верхнего колонтитула
-    var Style_Header = new CStyle("Header", this.Default.Paragraph, null, styletype_Paragraph );
-    Style_Header.Create_Header();
-    this.Default.Header = this.Add( Style_Header );
+        // Создаем стиль "Выделенная цитата"
+        var Style_IntenseQuote = new CStyle("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+        Style_IntenseQuote.Create_IntenseQuote();
+        this.Add( Style_IntenseQuote );
 
-    // Создаем стандартный стиль нижнего колонтитула
-    var Style_Footer = new CStyle("Footer", this.Default.Paragraph, null, styletype_Paragraph );
-    Style_Footer.Create_Footer();
-    this.Default.Footer = this.Add( Style_Footer );
+        // Создаем стандартный стиль верхнего колонтитула
+        var Style_Header = new CStyle("Header", this.Default.Paragraph, null, styletype_Paragraph );
+        Style_Header.Create_Header();
+        this.Default.Header = this.Add( Style_Header );
 
-    // Создаем стиль для таблиц, который будет применяться к новым таблицам
-    var Style_TableGrid = new CStyle("Table Grid", this.Default.Table, null, styletype_Table );
-    Style_TableGrid.Create_TableGrid();
-    this.Default.TableGrid = this.Add( Style_TableGrid );
+        // Создаем стандартный стиль нижнего колонтитула
+        var Style_Footer = new CStyle("Footer", this.Default.Paragraph, null, styletype_Paragraph );
+        Style_Footer.Create_Footer();
+        this.Default.Footer = this.Add( Style_Footer );
 
-    /*
-     // Создаем стандартный стиль для таблиц
-     var Style_Table = new CStyle("LightShading", this.Default.Table, null, styletype_Table );
-     Style_Table.Create_Table_LightShading();
-     this.Add( Style_Table );
+        // Создаем стиль для таблиц, который будет применяться к новым таблицам
+        var Style_TableGrid = new CStyle("Table Grid", this.Default.Table, null, styletype_Table );
+        Style_TableGrid.Create_TableGrid();
+        this.Default.TableGrid = this.Add( Style_TableGrid );
 
-     // Создаем стандартный стиль для таблиц
-     var Style_Table = new CStyle("ColorfulListAccent6", this.Default.Table, null, styletype_Table );
-     Style_Table.Create_Table_ColorfulListAccent6();
-     this.Add( Style_Table );
-     */
+        /*
+         // Создаем стандартный стиль для таблиц
+         var Style_Table = new CStyle("LightShading", this.Default.Table, null, styletype_Table );
+         Style_Table.Create_Table_LightShading();
+         this.Add( Style_Table );
 
-    // Стандартные стили таблиц
-    var Style_Table_Lined = new CStyle("Lined", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined.Create_Table_Lined( new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
-    this.Add( Style_Table_Lined );
+         // Создаем стандартный стиль для таблиц
+         var Style_Table = new CStyle("ColorfulListAccent6", this.Default.Table, null, styletype_Table );
+         Style_Table.Create_Table_ColorfulListAccent6();
+         this.Add( Style_Table );
+         */
 
-    var Style_Table_Lined_Accent1 = new CStyle("Lined - Accent 1", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor( 0x95, 0xB3, 0xD7 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
-    this.Add( Style_Table_Lined_Accent1 );
+        // Стандартные стили таблиц
+        var Style_Table_Lined = new CStyle("Lined", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined.Create_Table_Lined( new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
+        this.Add( Style_Table_Lined );
 
-    var Style_Table_Lined_Accent2 = new CStyle("Lined - Accent 2", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
-    this.Add( Style_Table_Lined_Accent2 );
+        var Style_Table_Lined_Accent1 = new CStyle("Lined - Accent 1", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor( 0x95, 0xB3, 0xD7 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
+        this.Add( Style_Table_Lined_Accent1 );
 
-    var Style_Table_Lined_Accent3 = new CStyle("Lined - Accent 3", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
-    this.Add( Style_Table_Lined_Accent3 );
+        var Style_Table_Lined_Accent2 = new CStyle("Lined - Accent 2", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
+        this.Add( Style_Table_Lined_Accent2 );
 
-    var Style_Table_Lined_Accent4 = new CStyle("Lined - Accent 4", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
-    this.Add( Style_Table_Lined_Accent4 );
+        var Style_Table_Lined_Accent3 = new CStyle("Lined - Accent 3", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
+        this.Add( Style_Table_Lined_Accent3 );
 
-    var Style_Table_Lined_Accent5 = new CStyle("Lined - Accent 5", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
-    this.Add( Style_Table_Lined_Accent5 );
+        var Style_Table_Lined_Accent4 = new CStyle("Lined - Accent 4", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
+        this.Add( Style_Table_Lined_Accent4 );
 
-    var Style_Table_Lined_Accent6 = new CStyle("Lined - Accent 6", this.Default.Table, null, styletype_Table );
-    Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xE9 ) );
-    this.Add( Style_Table_Lined_Accent6 );
+        var Style_Table_Lined_Accent5 = new CStyle("Lined - Accent 5", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
+        this.Add( Style_Table_Lined_Accent5 );
 
-    var Style_Table_Bordered = new CStyle("Bordered", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor( 0xBF, 0xBF, 0xBF ), new CDocumentColor( 0x00, 0x00, 0x00 ) );
-    this.Add( Style_Table_Bordered );
+        var Style_Table_Lined_Accent6 = new CStyle("Lined - Accent 6", this.Default.Table, null, styletype_Table );
+        Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xE9 ) );
+        this.Add( Style_Table_Lined_Accent6 );
 
-    var Style_Table_Bordered_Accent_1 = new CStyle("Bordered - Accent 1", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor( 0xB8, 0xCC, 0xE4 ), new CDocumentColor( 0x36, 0x5F, 0x91 ) );
-    this.Add( Style_Table_Bordered_Accent_1 );
+        var Style_Table_Bordered = new CStyle("Bordered", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor( 0xBF, 0xBF, 0xBF ), new CDocumentColor( 0x00, 0x00, 0x00 ) );
+        this.Add( Style_Table_Bordered );
 
-    var Style_Table_Bordered_Accent_2 = new CStyle("Bordered - Accent 2", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor( 0xE5, 0xB8, 0xB7 ), new CDocumentColor( 0x94, 0x36, 0x34 ) );
-    this.Add( Style_Table_Bordered_Accent_2 );
+        var Style_Table_Bordered_Accent_1 = new CStyle("Bordered - Accent 1", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor( 0xB8, 0xCC, 0xE4 ), new CDocumentColor( 0x36, 0x5F, 0x91 ) );
+        this.Add( Style_Table_Bordered_Accent_1 );
 
-    var Style_Table_Bordered_Accent_3 = new CStyle("Bordered - Accent 3", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor( 0xD6, 0xE3, 0xBC ), new CDocumentColor( 0x76, 0x92, 0x3C ) );
-    this.Add( Style_Table_Bordered_Accent_3 );
+        var Style_Table_Bordered_Accent_2 = new CStyle("Bordered - Accent 2", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor( 0xE5, 0xB8, 0xB7 ), new CDocumentColor( 0x94, 0x36, 0x34 ) );
+        this.Add( Style_Table_Bordered_Accent_2 );
 
-    var Style_Table_Bordered_Accent_4 = new CStyle("Bordered - Accent 4", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor( 0xCC, 0xC0, 0xD9 ), new CDocumentColor( 0x5F, 0x49, 0x7A ) );
-    this.Add( Style_Table_Bordered_Accent_4 );
+        var Style_Table_Bordered_Accent_3 = new CStyle("Bordered - Accent 3", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor( 0xD6, 0xE3, 0xBC ), new CDocumentColor( 0x76, 0x92, 0x3C ) );
+        this.Add( Style_Table_Bordered_Accent_3 );
 
-    var Style_Table_Bordered_Accent_5 = new CStyle("Bordered - Accent 5", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor( 0xB6, 0xDD, 0xE8 ), new CDocumentColor( 0x31, 0x84, 0x9B ) );
-    this.Add( Style_Table_Bordered_Accent_5 );
+        var Style_Table_Bordered_Accent_4 = new CStyle("Bordered - Accent 4", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor( 0xCC, 0xC0, 0xD9 ), new CDocumentColor( 0x5F, 0x49, 0x7A ) );
+        this.Add( Style_Table_Bordered_Accent_4 );
 
-    var Style_Table_Bordered_Accent_6 = new CStyle("Bordered - Accent 6", this.Default.Table, null, styletype_Table );
-    Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor( 0xFB, 0xD4, 0xB4 ), new CDocumentColor( 0xE3, 0x6C, 0x0A ) );
-    this.Add( Style_Table_Bordered_Accent_6 );
+        var Style_Table_Bordered_Accent_5 = new CStyle("Bordered - Accent 5", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor( 0xB6, 0xDD, 0xE8 ), new CDocumentColor( 0x31, 0x84, 0x9B ) );
+        this.Add( Style_Table_Bordered_Accent_5 );
 
-    var Style_Table_BorderedLined = new CStyle("Bordered & Lined", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined.Create_Table_BorderedAndLined( new CDocumentColor( 0x00, 0x00, 0x00 ), new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
-    this.Add( Style_Table_BorderedLined );
+        var Style_Table_Bordered_Accent_6 = new CStyle("Bordered - Accent 6", this.Default.Table, null, styletype_Table );
+        Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor( 0xFB, 0xD4, 0xB4 ), new CDocumentColor( 0xE3, 0x6C, 0x0A ) );
+        this.Add( Style_Table_Bordered_Accent_6 );
 
-    var Style_Table_BorderedLined_Accent1 = new CStyle("Bordered & Lined - Accent 1", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined( new CDocumentColor( 0x17, 0x36, 0x5D ), new CDocumentColor( 0x8D, 0xB3, 0xE2 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
-    this.Add( Style_Table_BorderedLined_Accent1 );
+        var Style_Table_BorderedLined = new CStyle("Bordered & Lined", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined.Create_Table_BorderedAndLined( new CDocumentColor( 0x00, 0x00, 0x00 ), new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
+        this.Add( Style_Table_BorderedLined );
 
-    var Style_Table_BorderedLined_Accent2 = new CStyle("Bordered & Lined - Accent 2", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor( 0x94, 0x36, 0x34 ), new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
-    this.Add( Style_Table_BorderedLined_Accent2 );
+        var Style_Table_BorderedLined_Accent1 = new CStyle("Bordered & Lined - Accent 1", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined( new CDocumentColor( 0x17, 0x36, 0x5D ), new CDocumentColor( 0x8D, 0xB3, 0xE2 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
+        this.Add( Style_Table_BorderedLined_Accent1 );
 
-    var Style_Table_BorderedLined_Accent3 = new CStyle("Bordered & Lined - Accent 3", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor( 0x76, 0x92, 0x3C ), new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
-    this.Add( Style_Table_BorderedLined_Accent3 );
+        var Style_Table_BorderedLined_Accent2 = new CStyle("Bordered & Lined - Accent 2", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor( 0x94, 0x36, 0x34 ), new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
+        this.Add( Style_Table_BorderedLined_Accent2 );
 
-    var Style_Table_BorderedLined_Accent4 = new CStyle("Bordered & Lined - Accent 4", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor( 0x5F, 0x49, 0x7A ), new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
-    this.Add( Style_Table_BorderedLined_Accent4 );
+        var Style_Table_BorderedLined_Accent3 = new CStyle("Bordered & Lined - Accent 3", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor( 0x76, 0x92, 0x3C ), new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
+        this.Add( Style_Table_BorderedLined_Accent3 );
 
-    var Style_Table_BorderedLined_Accent5 = new CStyle("Bordered & Lined - Accent 5", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor( 0x31, 0x84, 0x9B ), new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
-    this.Add( Style_Table_BorderedLined_Accent5 );
+        var Style_Table_BorderedLined_Accent4 = new CStyle("Bordered & Lined - Accent 4", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor( 0x5F, 0x49, 0x7A ), new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
+        this.Add( Style_Table_BorderedLined_Accent4 );
 
-    var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", this.Default.Table, null, styletype_Table );
-    Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
-    this.Add( Style_Table_BorderedLined_Accent6 );
+        var Style_Table_BorderedLined_Accent5 = new CStyle("Bordered & Lined - Accent 5", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor( 0x31, 0x84, 0x9B ), new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
+        this.Add( Style_Table_BorderedLined_Accent5 );
 
-    // Создаем стиль гиперссылки
-    var Style_Hyperlink = new CStyle("Hyperlink", null, null, styletype_Character );
-    Style_Hyperlink.Create_Character_Hyperlink();
-    this.Default.Hyperlink = this.Add( Style_Hyperlink );
+        var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", this.Default.Table, null, styletype_Table );
+        Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
+        this.Add( Style_Table_BorderedLined_Accent6 );
 
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+        // Создаем стиль гиперссылки
+        var Style_Hyperlink = new CStyle("Hyperlink", null, null, styletype_Character );
+        Style_Hyperlink.Create_Character_Hyperlink();
+        this.Default.Hyperlink = this.Add( Style_Hyperlink );
+
+        // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+        g_oTableId.Add( this, this.Id );
+    }
+    else
+    {
+        this.Default =
+        {
+            ParaPr      : new CParaPr(),
+            TextPr      : new CTextPr(),
+            TablePr     : new CTablePr(),
+            TableRowPr  : new CTableRowPr(),
+            TableCellPr : new CTableCellPr(),
+            Paragraph : null,
+            Character : null,
+            Numbering : null,
+            Table     : null,
+            TableGrid : null,
+            Headings  : [],
+            ParaList  : null,
+            Header    : null,
+            Footer    : null,
+            Hyperlink : null
+        };
+
+        // Заполняем значения по умолчанию
+        this.Default.ParaPr.Init_Default();
+        this.Default.TextPr.Init_Default();
+        this.Default.TablePr.Init_Default();
+        this.Default.TableRowPr.Init_Default();
+        this.Default.TableCellPr.Init_Default();
+
+        this.Style = [];
+    }
 }
 
 CStyles.prototype =
