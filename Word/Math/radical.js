@@ -399,10 +399,9 @@ function CRadical(props)
     CRadical.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_RADICAL;
 
-    this.Iterator = new CMathContent();
-    this.Base     = new CMathContent();
+    this.Iterator = null;
+    this.Base     = null;
 
     this.RealBase = null;
 
@@ -420,15 +419,22 @@ function CRadical(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CRadical, CMathBase);
+
+CRadical.prototype.ClassType = historyitem_type_rad;
+CRadical.prototype.kind      = MATH_RADICAL;
+
 CRadical.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(2);
+
     this.setProperties(props);
+    this.fillContent();
 }
-CRadical.prototype.setProperties = function(props)
+CRadical.prototype.fillContent = function()
 {
-    this.Pr.Set_FromObject(props);
-    this.setCtrPrp(props.ctrPrp);
-}
+    this.Iterator = this.getDegree();
+    this.Base     = this.getBase();
+};
 CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
@@ -678,56 +684,14 @@ CRadical.prototype.draw = function(x, y, pGraphics)
 }
 CRadical.prototype.getBase = function()
 {
-    return this.Base;
+    return this.Content[1];
 }
 CRadical.prototype.getDegree = function()
 {
-    return this.Iterator;
-}
-CRadical.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
+    return this.Content[0];
 }
 CRadical.prototype.Correct_Content = function(bInnerCorrection)
 {
-    this.Iterator.Correct_Content(bInnerCorrection);
-    this.Base.Correct_Content(bInnerCorrection);
+    this.Content[0].Correct_Content(bInnerCorrection);
+    this.Content[1].Correct_Content(bInnerCorrection);
 };
-CRadical.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-    var NewRadical = new CRadical(oProps);
-
-    this.Base.CopyTo(NewRadical.Base, false);
-    this.Iterator.CopyTo(NewRadical.Iterator, false);
-
-    return NewRadical;
-};
-CRadical.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CRadical.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_rad );
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.getDegree().Id);
-	Writer.WriteString2(this.getBase().Id);
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-}
-CRadical.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-    this.Iterator = g_oTableId.Get_ById( Reader.GetString2());
-    this.Base     = g_oTableId.Get_ById( Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-}
-CRadical.prototype.Get_Id = function()
-{
-	return this.Id;
-}

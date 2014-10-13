@@ -516,7 +516,6 @@ function CMathMatrix(props)
     CMathMatrix.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_MATRIX;
 
     this.Pr = new CMathMatrixPr();
 
@@ -534,9 +533,20 @@ function CMathMatrix(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CMathMatrix, CMatrixBase);
+
+CMathMatrix.prototype.ClassType = historyitem_type_matrix;
+CMathMatrix.prototype.kind      = MATH_MATRIX;
+
 CMathMatrix.prototype.init = function(props)
 {
     this.setProperties(props);
+    this.column = this.Pr.Get_ColumnsCount();
+
+    var nRowsCount = this.getRowsCount();
+    var nColsCount = this.getColsCount();
+
+    this.Fill_LogicalContent(nRowsCount * nColsCount);
+
     this.fillContent();
 }
 CMathMatrix.prototype.setPosition = function(pos, PosInfo)
@@ -619,16 +629,26 @@ CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
     if(minGap !== null && typeof(minGap) !== "undefined")
         this.spaceColumn.minGap = minGap;
 };
-////
-CMathMatrix.prototype.setProperties = function(props)
+CMathMatrix.prototype.getContentElement = function(nRowIndex, nColIndex)
 {
-    this.setCtrPrp(props.ctrPrp);
-    this.column = this.Pr.Set_FromObject(props);
+    return this.Content[nRowIndex * this.getColsCount() + nColIndex];
 };
 CMathMatrix.prototype.fillContent = function()
 {
-    this.setDimension(this.Pr.row, this.column);
-    this.setContent();
+    this.column = this.Pr.Get_ColumnsCount();
+
+    var nRowsCount = this.getRowsCount();
+    var nColsCount = this.getColsCount();
+
+    this.setDimension(nRowsCount, nColsCount);
+
+    for(var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
+    {
+        for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
+        {
+            this.elements[nRowIndex][nColIndex] = this.getContentElement(nRowIndex, nColIndex);
+        }
+    }
 };
 CMathMatrix.prototype.getRowsCount = function()
 {
@@ -638,111 +658,7 @@ CMathMatrix.prototype.getColsCount = function()
 {
     return this.column;
 };
-CMathMatrix.prototype.getPropsForWrite = function()
-{
-    var props = {};
 
-    props.baseJc  = this.Pr.baseJc;
-    props.row     = this.Pr.nRow;
-    props.column  = this.Pr.nCol;
-    props.plcHide = this.Pr.plcHide;
-    props.mcs     = this.Pr.mcs;
-
-    props.cGpRule = this.spaceColumn.rule;
-    props.cGp     = this.spaceColumn.gap;
-    props.cSp     = this.spaceColumn.minGap;
-
-    props.rSpRule = this.spaceRow.rule;
-    props.rSp     = this.spaceRow.gap;
-
-    return props;
-};
-CMathMatrix.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-
-    var NewMatrix = new CMathMatrix(oProps);
-
-    var nRowsCount = this.getRowsCount();
-    var nColsCount = this.getColsCount();
-
-    for(var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
-    {
-        for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-        {
-            this.elements[nRowIndex][nColIndex].CopyTo(NewMatrix.elements[nRowIndex][nColIndex], false);
-        }
-    }
-
-    return NewMatrix;
-};
-CMathMatrix.prototype.Refresh_RecalcData = function(Data)
-{
-};
-CMathMatrix.prototype.Write_ToBinary2 = function( Writer )
-{
-    var nRowsCount = this.getRowsCount();
-    var nColsCount = this.getColsCount();
-
-	Writer.WriteLong( historyitem_type_matrix );
-
-    // String : Id
-    // Long   : Rows count
-    // Long   : Cols count
-    // Array[Rows * Cols] of Strings : Id
-    // Variable : CtrlPr
-    // Variable : MathPr
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteLong(nRowsCount);
-	Writer.WriteLong(nColsCount);
-
-	for(var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
-    {
-        for (var nColsIndex = 0; nColsIndex < nColsCount; nColsIndex++)
-        {
-            Writer.WriteString2(this.getElement(nRowIndex, nColsIndex).Id);
-        }
-    }
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-};
-CMathMatrix.prototype.Read_FromBinary2 = function( Reader )
-{
-    // String : Id
-    // Long   : Rows count
-    // Long   : Cols count
-    // Array[Rows * Cols] of Strings : Id
-    // Variable : CtrlPr
-    // Variable : MathPr
-
-    this.Id = Reader.GetString2();
-    var nRowsCount = Reader.GetLong();
-    var nColsCount = Reader.GetLong();
-
-    this.setDimension(nRowsCount, nColsCount);
-
-    this.elements = [];
-    for (var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
-    {
-        this.elements[nRowIndex] = [];
-        for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-        {
-            this.elements[nRowIndex][nColIndex] = g_oTableId.Get_ById(Reader.GetString2());
-        }
-    }
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-
-    this.column = this.Pr.Get_ColumnsCount();
-};
-CMathMatrix.prototype.Get_Id = function()
-{
-	return this.Id;
-};
 
 function CMathPoint()
 {
