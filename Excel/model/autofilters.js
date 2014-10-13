@@ -412,7 +412,8 @@ var gUndoInsDelCellsFlag = true;
 									if(isReDrawFilter && isReDrawFilter.TableColumns && isReDrawFilter.result)
 										t._reDrawCurrentFilter(null, null, isReDrawFilter);
 									
-									t.drawAutoF();
+									if(openFilter == undefined)
+										t.drawAutoF();
 									
 									isUpdateRange = changesElemHistory.Ref;
 									
@@ -1152,6 +1153,11 @@ var gUndoInsDelCellsFlag = true;
 			drawAutoF: function (updatedRange, offsetX, offsetY) {
 				var buttons = this.allButtonAF;
 				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
+				if(aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges)
+					return;
+				
 				var filters;
 				
 				//проверяем, затрагивают ли данные кнопки визуальную область
@@ -6634,7 +6640,7 @@ var gUndoInsDelCellsFlag = true;
 							}
 						}
 						
-						if(oCurFilter[i].TableColumns && oCurFilter[i] && findFilters[i])
+						if(oCurFilter[i].TableStyleInfo && oCurFilter[i] && findFilters[i])
 						{
 							this._cleanStyleTable(aWs, oCurFilter[i].Ref);
 							this._setColorStyleTable(findFilters[i].Ref, findFilters[i]);
