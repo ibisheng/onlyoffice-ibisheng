@@ -757,6 +757,8 @@ function CMathEqArrPr()
     this.rSp     = 0;
     this.rSpRule = 0;
     this.baseJc  = BASEJC_CENTER;
+
+    this.row     = 1;
 }
 
 CMathEqArrPr.prototype.Set_FromObject = function(Obj)
@@ -775,6 +777,8 @@ CMathEqArrPr.prototype.Set_FromObject = function(Obj)
 
     if(undefined !== Obj.baseJc && null !== Obj.baseJc)
         this.baseJc = Obj.baseJc;
+
+    this.row = Obj.row;
 };
 
 CMathEqArrPr.prototype.Copy = function()
@@ -786,6 +790,7 @@ CMathEqArrPr.prototype.Copy = function()
     NewPr.rSp     = this.rSp    ;
     NewPr.rSpRule = this.rSpRule;
     NewPr.baseJc  = this.baseJc ;
+    NewPr.row     = this.row;
 
     return NewPr;
 };
@@ -797,12 +802,14 @@ CMathEqArrPr.prototype.Write_ToBinary = function(Writer)
     // Long : rSp
     // Long : rSpRule
     // Long : baseJc
+    // Long : row
 
     Writer.WriteLong(this.maxDist);
     Writer.WriteLong(this.objDist);
     Writer.WriteLong(this.rSp);
     Writer.WriteLong(this.rSpRule);
     Writer.WriteLong(this.baseJc);
+    Writer.WriteLong(this.row);
 };
 
 CMathEqArrPr.prototype.Read_FromBinary = function(Reader)
@@ -812,12 +819,14 @@ CMathEqArrPr.prototype.Read_FromBinary = function(Reader)
     // Long : rSp
     // Long : rSpRule
     // Long : baseJc
+    // Long : row
 
     this.maxDist = Reader.GetLong();
     this.objDist = Reader.GetLong();
     this.rSp     = Reader.GetLong();
     this.rSpRule = Reader.GetLong();
     this.baseJc  = Reader.GetLong();
+    this.row     = Reader.GetLong();
 };
 
 ////
@@ -826,7 +835,6 @@ function CEqArray(props)
     CEqArray.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_EQ_ARRAY;
 
     this.Pr = new CMathEqArrPr();
 
@@ -848,12 +856,27 @@ function CEqArray(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CEqArray, CMatrixBase);
+
+CEqArray.prototype.ClassType = historyitem_type_eqArr;
+CEqArray.prototype.kind      = MATH_EQ_ARRAY;
+
 CEqArray.prototype.init = function(props)
 {
+    var nRowsCount = props.row;
+
+    this.Fill_LogicalContent(nRowsCount);
+
     this.setProperties(props);
-    this.setDimension(props.row, 1);
-    this.setContent();
+    this.fillContent();
 }
+CEqArray.prototype.fillContent = function()
+{
+    var nRowsCount = this.Content.length;
+    this.setDimension(nRowsCount, 1);
+
+    for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
+        this.elements[nIndex][0] = this.Content[nIndex];
+};
 CEqArray.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     // на случай, чтобы не затереть массив
@@ -1023,68 +1046,7 @@ CEqArray.prototype.setPosition = function(pos)
     //PosInfo.Points.length = 0;
 
 }
-CEqArray.prototype.setProperties = function(props)
-{
-    this.Pr.Set_FromObject(props);
-}
 CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
-}
-CEqArray.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
-CEqArray.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    var NewEqArray = new CEqArray(oProps);
-
-    var nRowsCount = this.elements.length;
-    NewEqArray.setDimension(nRowsCount, 1);
-    NewEqArray.setContent();
-    for (var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
-    {
-        this.elements[nRowIndex][0].CopyTo(NewEqArray.elements[nRowIndex][0], false);
-    }
-
-    return NewEqArray;
-};
-CEqArray.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CEqArray.prototype.Write_ToBinary2 = function( Writer )
-{
-    var nRowsCount = this.elements.length;
-
-	Writer.WriteLong( historyitem_type_eqArr );
-
-    Writer.WriteString2(this.Id);
-    Writer.WriteLong(nRowsCount);
-
-    for (var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
-    {
-        Writer.WriteString2(this.getElement(nRowIndex).Id);
-    }
-
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-}
-CEqArray.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-    var nRowsCount = Reader.GetLong();
-    this.setDimension(nRowsCount, 1);
-
-    for (var nRowIndex = 0; nRowIndex < nRowsCount; nRowIndex++)
-    {
-        this.elements[nRowIndex][0] = g_oTableId.Get_ById(Reader.GetString2());
-    }
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-}
-CEqArray.prototype.Get_Id = function()
-{
-	return this.Id;
 }

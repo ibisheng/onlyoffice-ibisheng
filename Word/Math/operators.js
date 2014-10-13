@@ -3383,7 +3383,6 @@ function CDelimiter(props)
     CDelimiter.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_DELIMITER;
 
     this.begOper = new COperator (OPER_DELIMITER);
     this.endOper = new COperator (OPER_DELIMITER);
@@ -3397,15 +3396,17 @@ function CDelimiter(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CDelimiter, CMathBase);
+
+CDelimiter.prototype.ClassType = historyitem_type_delimiter;
+CDelimiter.prototype.kind      = MATH_DELIMITER;
+
 CDelimiter.prototype.init = function(props)
 {
     this.setProperties(props);
+
+    this.Fill_LogicalContent(this.getColumnsCount());
+
     this.fillContent();
-}
-CDelimiter.prototype.setProperties = function(props)
-{
-    this.Pr.Set_FromObject(props);
-    this.setCtrPrp(props.ctrPrp);
 }
 CDelimiter.prototype.getColumnsCount = function()
 {
@@ -3413,8 +3414,12 @@ CDelimiter.prototype.getColumnsCount = function()
 };
 CDelimiter.prototype.fillContent = function()
 {
-    this.setDimension(1, this.Pr.column);
-    this.setContent();
+    var nColumnsCount = this.getColumnsCount();
+
+    this.setDimension(1, nColumnsCount);
+
+    for (var nIndex = 0; nIndex < nColumnsCount; nIndex++)
+        this.elements[0][nIndex] = this.Content[nIndex];
 }
 CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -3755,62 +3760,6 @@ CDelimiter.prototype.getBase = function(numb)
 
     return this.elements[0][numb];
 }
-CDelimiter.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
-CDelimiter.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-
-    var NewDelimiter = new CDelimiter(oProps);
-
-    var nColsCount = this.getColumnsCount();
-
-    NewDelimiter.setDimension(1, nColsCount);
-    NewDelimiter.setContent();
-
-    for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-        this.elements[0][nColIndex].CopyTo(NewDelimiter.elements[0][nColIndex], false);
-
-    return NewDelimiter;
-};
-CDelimiter.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CDelimiter.prototype.Write_ToBinary2 = function( Writer )
-{
-    var nColsCount = this.getColumnsCount();
-
-	Writer.WriteLong( historyitem_type_delimiter );
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteLong(nColsCount);
-	
-	for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-		Writer.WriteString2(this.getBase(nColIndex).Id);
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-}
-CDelimiter.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id        = Reader.GetString2();
-    var nColsCount = Reader.GetLong();
-
-    this.setDimension(1, nColsCount);
-
-    for (var nColIndex = 0; nColIndex < nColsCount; nColIndex++)
-        this.elements[0][nColIndex] = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-}
-CDelimiter.prototype.Get_Id = function()
-{
-	return this.Id;
-}
 
 function CCharacter()
 {
@@ -4005,7 +3954,7 @@ function CGroupCharacter(props)
 	this.Id   = g_oIdCounter.Get_NewId();
     this.kind = MATH_GROUP_CHARACTER;
 
-    this.Content = new CMathContent();
+    this.baseContent = new CMathContent();
 
     this.Pr = new CMathGroupChrPr();
 
@@ -4056,17 +4005,17 @@ CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, Arg
         else
             Iterator = new CNumerator();
 
-        Iterator.setElement(this.Content);
+        Iterator.setElement(this.baseContent);
         this.elements[0][0] = Iterator;
     }
     else
-        this.elements[0][0] = this.Content;
+        this.elements[0][0] = this.baseContent;
 
     CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
 }
 CGroupCharacter.prototype.getBase = function()
 {
-    return this.Content;
+    return this.baseContent;
 }
 CGroupCharacter.prototype.setProperties = function(props)
 {
@@ -4076,7 +4025,7 @@ CGroupCharacter.prototype.setProperties = function(props)
 CGroupCharacter.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.elements[0][0] = this.Content;
+    this.elements[0][0] = this.baseContent;
 }
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
@@ -4111,7 +4060,7 @@ CGroupCharacter.prototype.Copy = function()
     oProps.ctrPrp = this.CtrPrp.Copy();
 
     var NewGroupChar = new CGroupCharacter(oProps);
-    this.Content.CopyTo(NewGroupChar.Content, false);
+    this.baseContent.CopyTo(NewGroupChar.baseContent, false);
     return NewGroupChar;
 };
 CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
@@ -4122,7 +4071,7 @@ CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
 	Writer.WriteLong( historyitem_type_groupChr );
 
     Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.Content.Id);
+	Writer.WriteString2(this.baseContent.Id);
 	
 	this.CtrPrp.Write_ToBinary(Writer);
     this.Pr.Write_ToBinary(Writer);
@@ -4131,7 +4080,7 @@ CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
 {
     this.Id = Reader.GetString2();
 
-    this.Content = g_oTableId.Get_ById(Reader.GetString2());
+    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
     this.CtrPrp.Read_FromBinary(Reader);
     this.Pr.Read_FromBinary(Reader);

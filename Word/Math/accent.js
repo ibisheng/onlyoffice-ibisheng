@@ -500,7 +500,6 @@ function CAccent(props)
     CAccent.superclass.constructor.call(this);
 
     this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_ACCENT;
 
     //// Properties
     this.Pr = new CMathAccentPr();
@@ -509,7 +508,6 @@ function CAccent(props)
 
     /////////////////
 
-    this.baseContent = new CMathContent();
     this.operator = new COperator(OPER_ACCENT);
 
     if(props !== null && typeof(props) !== "undefined")
@@ -518,28 +516,26 @@ function CAccent(props)
 	g_oTableId.Add( this, this.Id );	
 }
 Asc.extendClass(CAccent, CMathBase);
+
+CAccent.prototype.ClassType = historyitem_type_acc;
+CAccent.prototype.kind      = MATH_ACCENT;
+
 CAccent.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(1);
+
     this.setProperties(props);
     this.fillContent();
 }
+CAccent.prototype.getBase = function()
+{
+    return this.Content[0];
+};
 CAccent.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.elements[0][0] = this.baseContent;
+    this.elements[0][0] = this.getBase();
     this.elements[0][0].SetDot(true);
-}
-CAccent.prototype.setChr = function(chr)
-{
-    this.Pr.chr = chr;
-    this.Pr.chrType = null;
-    this.RecalcInfo.bProps = true;
-}
-CAccent.prototype.setChrType = function(chrType)
-{
-    this.Pr.chr = null;
-    this.Pr.chrType = chrType;
-    this.RecalcInfo.bProps = true;
 }
 CAccent.prototype.IsAccent = function()
 {
@@ -570,10 +566,6 @@ CAccent.prototype.setPosition = function(pos, PosInfo)
     PosBase.y = this.pos.y + this.operator.size.height;
 
     this.elements[0][0].setPosition(PosBase, PosInfo);
-}
-CAccent.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
 }
 CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -618,10 +610,6 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
-}
-CAccent.prototype.getBase = function()
-{
-    return this.elements[0][0];
 }
 CAccent.prototype.draw = function(x, y, pGraphics)
 {
@@ -680,48 +668,3 @@ CAccent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
     return result;
 }
-CAccent.prototype.setProperties = function(props)
-{
-    this.Pr.Set_FromObject(props);
-    this.setCtrPrp(props.ctrPrp);
-
-    this.RecalcInfo.bProps = true;
-}
-CAccent.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-
-    var NewAccent = new CAccent(oProps);
-
-    this.baseContent.CopyTo(NewAccent.baseContent, false);
-
-    return NewAccent;
-};
-CAccent.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CAccent.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong(historyitem_type_acc);
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.baseContent.Id);
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-};
-CAccent.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-
-    this.fillContent();
-}
-CAccent.prototype.Get_Id = function()
-{
-    return this.Id;
-};

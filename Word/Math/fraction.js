@@ -35,7 +35,6 @@ function CFraction(props)
     CFraction.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_FRACTION;
 
     this.Numerator   = new CNumerator();
     this.Denominator = new CDenominator();
@@ -50,6 +49,10 @@ function CFraction(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CFraction, CMathBase);
+
+CFraction.prototype.ClassType = historyitem_type_frac;
+CFraction.prototype.kind      = MATH_FRACTION;
+
 CFraction.prototype.init = function(props)
 {
     this.setProperties(props);

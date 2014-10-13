@@ -18,6 +18,7 @@ function CMathBase(bInside)
 
     /////////////////
 
+
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
 
@@ -63,11 +64,15 @@ function CMathBase(bInside)
         bProps:      true
     };
 
+
+    this.Content = [];
+
     return this;
 }
 CMathBase.prototype =
 {
     constructor: CMathBase,
+
     setContent: function()
     {
         for(var i=0; i < this.nRow; i++)
@@ -1236,4 +1241,86 @@ CMathBase.prototype =
     }
 
     //////////////////////////
+};
+
+CMathBase.prototype.Fill_LogicalContent = function(nCount)
+{
+    for (var nIndex = 0; nIndex < nCount; nIndex++)
+        this.Content[nIndex] = new CMathContent();
+};
+CMathBase.prototype.Copy = function()
+{
+    var oProps = this.Pr.Copy();
+    oProps.ctrPrp = this.CtrPrp.Copy();
+
+    var NewElement = new this.constructor(oProps);
+
+    for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
+    {
+        this.Content[nIndex].CopyTo(NewElement.Content[nIndex], false);
+    }
+
+    return NewElement;
+};
+CMathBase.prototype.Refresh_RecalcData = function(Data)
+{
+};
+CMathBase.prototype.Write_ToBinary2 = function( Writer )
+{
+    Writer.WriteLong(this.ClassType);
+
+    // String           : Id
+    // Long             : Content.length
+    // Array of Strings : Content[Index].Id
+    // Variable         : Pr
+    // Variable(CTextPr): CtrPrp
+
+    Writer.WriteString2(this.Id);
+
+    var nCount = this.Content.length;
+    Writer.WriteLong(nCount);
+    for (var nIndex = 0; nIndex < nCount; nIndex++)
+    {
+        Writer.WriteString2(this.Content[nIndex].Id);
+    }
+
+    this.Pr.Write_ToBinary(Writer);
+    this.CtrPrp.Write_ToBinary(Writer);
+};
+CMathBase.prototype.Read_FromBinary2 = function( Reader )
+{
+    // String           : Id
+    // Long             : Content.length
+    // Array of Strings : Content[Index].Id
+    // Variable         : Pr
+    // Variable(CTextPr): CtrPrp
+
+    this.Id = Reader.GetString2();
+
+    var nCount = Reader.GetLong();
+    this.Content = [];
+    for (var nIndex = 0; nIndex < nCount; nIndex++)
+    {
+        this.Content[nIndex] = g_oTableId.Get_ById(Reader.GetString2());
+    }
+
+    this.Pr.Read_FromBinary(Reader);
+    this.CtrPrp.Read_FromBinary(Reader);
+
+    this.fillContent();
+}
+CMathBase.prototype.Get_Id = function()
+{
+    return this.Id;
+};
+CMathBase.prototype.getPropsForWrite = function()
+{
+    return this.Pr;
+};
+CMathBase.prototype.setProperties = function(oProps)
+{
+    this.Pr.Set_FromObject(oProps);
+    this.setCtrPrp(oProps.ctrPrp);
+
+    this.RecalcInfo.bProps = true;
 }
