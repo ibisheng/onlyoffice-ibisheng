@@ -1282,7 +1282,7 @@
             if(null != sortState.Ref)
             {
                 this.memory.WriteByte(c_oSer_SortState.Ref);
-                this.memory.WriteString2(sortState.Ref);
+                this.memory.WriteString2(sortState.Ref.getName());
             }
             if(null != sortState.CaseSensitive)
                 this.bs.WriteItem(c_oSer_SortState.CaseSensitive, function(){oThis.memory.WriteBool(sortState.CaseSensitive);});
@@ -2386,10 +2386,9 @@
             //activeRange(serialize activeRange)
             if(oThis.isCopyPaste)
             {
-                var activeRange = (new CellAddress(oThis.isCopyPaste.r1, oThis.isCopyPaste.c1, 0)).getID() + ":" + (new CellAddress(oThis.isCopyPaste.r2, oThis.isCopyPaste.c2, 0)).getID();
                 this.memory.WriteByte(c_oSerWorksheetPropTypes.Ref);
                 this.memory.WriteByte(c_oSerPropLenType.Variable);
-                this.memory.WriteString2(activeRange);
+                this.memory.WriteString2(oThis.isCopyPaste.getName());
             }
         };
         this.WriteWorksheetCols = function(ws)
