@@ -412,7 +412,7 @@ CMathBoxPr.prototype.Copy = function()
     return NewPr;
 };
 
-CMathBoxPr.prototype.Write_ToBinary = function(Wrtier)
+CMathBoxPr.prototype.Write_ToBinary = function(Writer)
 {
     // Bool : aln
     // Bool : brk
@@ -420,11 +420,11 @@ CMathBoxPr.prototype.Write_ToBinary = function(Wrtier)
     // Bool : noBreak
     // Bool : opEmu
 
-    Writer.WriteBool(aln);
-    Writer.WriteBool(brk);
-    Writer.WriteBool(diff);
-    Writer.WriteBool(noBreak);
-    Writer.WriteBool(opEmu);
+    Writer.WriteBool(this.aln);
+    Writer.WriteBool(this.brk);
+    Writer.WriteBool(this.diff);
+    Writer.WriteBool(this.noBreak);
+    Writer.WriteBool(this.opEmu);
 };
 
 CMathBoxPr.prototype.Read_FromBinary = function(Reader)
@@ -639,11 +639,11 @@ CMathPhantomPr.prototype.Write_ToBinary = function(Writer)
     // Bool : zeroDesc
     // Bool : zeroWid
 
-    Writer.WriteBool(show);
-    Writer.WriteBool(transp);
-    Writer.WriteBool(zeroAsc);
-    Writer.WriteBool(zeroDesc);
-    Writer.WriteBool(zeroWid);
+    Writer.WriteBool(this.show);
+    Writer.WriteBool(this.transp);
+    Writer.WriteBool(this.zeroAsc);
+    Writer.WriteBool(this.zeroDesc);
+    Writer.WriteBool(this.zeroWid);
 };
 
 CMathPhantomPr.prototype.Read_FromBinary = function(Reader)

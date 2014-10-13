@@ -3886,8 +3886,8 @@ CCharacter.prototype.getBase = function()
 
 function CMathGroupChrPr()
 {
-    this.chr     = null;
-    this.chrType = null;
+    this.chr     = undefined;
+    this.chrType = undefined;
     this.vertJc  = VJUST_TOP;
     this.pos     = LOCATION_BOT;
 }
@@ -3917,33 +3917,62 @@ CMathGroupChrPr.prototype.Copy = function()
 };
 CMathGroupChrPr.prototype.Write_ToBinary = function(Writer)
 {
+    // Long : Flag
+
     // Long : chr
     // Long : chrType
+
     // Long : vertJc
     // Long : pos
 
-    Writer.WriteLong(null === this.chr ? -1 : this.chr);
-    Writer.WriteLong(null === this.chrType ? -1 : this.chrType);
+    var StartPos = Writer.GetCurPosition();
+    Writer.Skip(4);
+    var Flags = 0;
+
+    if (undefined !== this.chr)
+    {
+        Writer.WriteLong(this.chr);
+        Flags |= 1;
+    }
+
+    if (undefined !== this.chrType)
+    {
+        Writer.WriteLong(this.chrType);
+        Flags |= 2;
+    }
+
+    var EndPos = Writer.GetCurPosition();
+    Writer.Seek(StartPos);
+    Writer.WriteLong(Flags);
+    Writer.Seek(EndPos);
+
     Writer.WriteLong(this.vertJc);
     Writer.WriteLong(this.pos);
 };
 CMathGroupChrPr.prototype.Read_FromBinary = function(Reader)
 {
+    // Long : Flag
+
     // Long : chr
     // Long : chrType
+
     // Long : vertJc
     // Long : pos
 
-    this.chr     = Reader.GetLong();
-    this.chrType = Reader.GetLong();
+    var Flags = Reader.GetLong();
+
+    if (Flags & 1)
+        this.chr = Reader.GetLong();
+    else
+        this.chr = undefined;
+
+    if (Flags & 2)
+        this.chrType = Reader.GetLong();
+    else
+        this.chrType = undefined;
+
     this.vertJc  = Reader.GetLong();
     this.pos     = Reader.GetLong();
-
-    if (-1 === this.chr)
-        this.chr = null;
-
-    if (-1 === this.chrType)
-        this.chrType = null;
 };
 
 
@@ -3952,9 +3981,6 @@ function CGroupCharacter(props)
     CGroupCharacter.superclass.constructor.call(this);
 
 	this.Id   = g_oIdCounter.Get_NewId();
-    this.kind = MATH_GROUP_CHARACTER;
-
-    this.baseContent = new CMathContent();
 
     this.Pr = new CMathGroupChrPr();
 
@@ -3965,8 +3991,14 @@ function CGroupCharacter(props)
     g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CGroupCharacter, CCharacter);
+
+CGroupCharacter.prototype.ClassType = historyitem_type_groupChr;
+CGroupCharacter.prototype.kind      = MATH_GROUP_CHARACTER;
+
 CGroupCharacter.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(1);
+
     this.setProperties(props);
     this.fillContent();
 }
@@ -4001,31 +4033,25 @@ CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, Arg
         var Iterator;
 
         if(this.Pr.pos == LOCATION_TOP)
-            Iterator = new CDenominator();
+            Iterator = new CDenominator(this.getBase());
         else
-            Iterator = new CNumerator();
+            Iterator = new CNumerator(this.getBase());
 
-        Iterator.setElement(this.baseContent);
         this.elements[0][0] = Iterator;
     }
     else
-        this.elements[0][0] = this.baseContent;
+        this.elements[0][0] = this.getBase();
 
     CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
 }
 CGroupCharacter.prototype.getBase = function()
 {
-    return this.baseContent;
-}
-CGroupCharacter.prototype.setProperties = function(props)
-{
-    this.Pr.Set_FromObject(props);
-    this.setCtrPrp(props.ctrPrp);
+    return this.Content[0];
 }
 CGroupCharacter.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
-    this.elements[0][0] = this.baseContent;
+    this.elements[0][0] = this.getBase();
 }
 CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
@@ -4049,45 +4075,4 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
 
     return ascent;
-}
-CGroupCharacter.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
-CGroupCharacter.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-
-    var NewGroupChar = new CGroupCharacter(oProps);
-    this.baseContent.CopyTo(NewGroupChar.baseContent, false);
-    return NewGroupChar;
-};
-CGroupCharacter.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CGroupCharacter.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_groupChr );
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.baseContent.Id);
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-}
-CGroupCharacter.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-
-    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-
-    this.fillContent();
-}
-CGroupCharacter.prototype.Get_Id = function()
-{
-	return this.Id;
 }

@@ -36,8 +36,8 @@ function CFraction(props)
 
 	this.Id = g_oIdCounter.Get_NewId();
 
-    this.Numerator   = new CNumerator();
-    this.Denominator = new CDenominator();
+    this.Numerator   = null;
+    this.Denominator = null;
 
     this.Pr = new CMathFractionPr();
 
@@ -55,6 +55,8 @@ CFraction.prototype.kind      = MATH_FRACTION;
 
 CFraction.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(2);
+
     this.setProperties(props);
     this.fillContent();
 }
@@ -385,13 +387,11 @@ CFraction.prototype.setPosition = function(pos, PosInfo)
     else
         CFraction.superclass.setPosition.call(this, pos, PosInfo);
 }
-CFraction.prototype.setProperties = function(props)
-{
-    this.Pr.Set_FromObject(props);
-    this.setCtrPrp(props.ctrPrp);
-}
 CFraction.prototype.fillContent = function()
 {
+    this.Numerator   = new CNumerator(this.Content[0]);
+    this.Denominator = new CDenominator(this.Content[1]);
+
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
     {
         this.setDimension(2, 1);
@@ -415,63 +415,18 @@ CFraction.prototype.fillContent = function()
         this.elements[0][1] = this.Denominator.getElement();
     }
 }
-CFraction.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
-CFraction.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
 
-    var NewFraction = new CFraction(oProps);
-
-    this.Denominator.getElement().CopyTo(NewFraction.Denominator.getElement(), false);
-    this.Numerator.getElement().CopyTo(NewFraction.Numerator.getElement(), false);
-
-    return NewFraction;
-};
-CFraction.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CFraction.prototype.Write_ToBinary2 = function(Writer)
-{
-	Writer.WriteLong( historyitem_type_frac );
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.Numerator.Get_Id());
-	Writer.WriteString2(this.Denominator.Get_Id());
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-}
-CFraction.prototype.Read_FromBinary2 = function(Reader)
-{
-    this.Id = Reader.GetString2();
-    this.Numerator.setElement(g_oTableId.Get_ById(Reader.GetString2()));
-    this.Denominator.setElement(g_oTableId.Get_ById(Reader.GetString2()));
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-
-    this.fillContent();
-}
-CFraction.prototype.Get_Id = function()
-{
-	return this.Id;
-}
-
-function CFractionBase(bInside)
+function CFractionBase(bInside, MathContent)
 {
     CFractionBase.superclass.constructor.call(this, bInside);
     this.gap = 0;
-    this.init();
+    this.init(MathContent);
 }
 Asc.extendClass(CFractionBase, CMathBase);
-CFractionBase.prototype.init = function()
+CFractionBase.prototype.init = function(MathContent)
 {
     this.setDimension(1, 1);
-    this.setContent();
+    this.elements[0][0] = MathContent;
 }
 CFractionBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -494,18 +449,16 @@ CFractionBase.prototype.setElement = function(Element)
 };
 CFractionBase.prototype.getPropsForWrite = function()
 {
-    var props = {};
-
-    return props;
+    return {};
 }
 CFractionBase.prototype.Get_Id = function()
 {
     return this.elements[0][0].Get_Id();
 };
 
-function CNumerator()
+function CNumerator(MathContent)
 {
-    CNumerator.superclass.constructor.call(this, true);
+    CNumerator.superclass.constructor.call(this, true, MathContent);
 }
 Asc.extendClass(CNumerator, CFractionBase);
 CNumerator.prototype.recalculateSize = function()
@@ -555,9 +508,9 @@ CNumerator.prototype.setPosition = function(pos, PosInfo)
     this.elements[0][0].setPosition(pos, PosInfo);
 }
 
-function CDenominator()
+function CDenominator(MathContent)
 {
-    CDenominator.superclass.constructor.call(this, true);
+    CDenominator.superclass.constructor.call(this, true, MathContent);
 }
 Asc.extendClass(CDenominator, CFractionBase);
 CDenominator.prototype.recalculateSize = function()
