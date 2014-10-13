@@ -393,16 +393,14 @@ ParaMath.prototype.Clear_TextPr = function()
 
 ParaMath.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 {
-    /*var MathNearPos = new CParagraphElementNearPos();
-     MathNearPos.NearPos = ParaNearPos.NearPos;
-     MathNearPos.Depth   = Depth;
+    this.Selection_Remove();
+    this.Set_ParaContentPos(ParaNearPos.NearPos.ContentPos, Depth);
 
-     // CParagraphNearPos for ParaNearPos
-     this.NearPosArray.push( MathNearPos );
-     ParaNearPos.Classes.push( this );
+    var oSelectedContent = this.GetSelectContent();
+    var oContent = oSelectedContent.Content;
 
-     var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
-     this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );*/
+    ParaNearPos.Classes.push(oContent);
+    ParaNearPos.Classes.push(oContent.content[oContent.CurPos]);
 };
 
 ParaMath.prototype.Get_DrawingObjectRun = function(Id)

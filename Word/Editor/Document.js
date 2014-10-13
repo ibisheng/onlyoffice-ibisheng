@@ -8676,9 +8676,60 @@ CDocument.prototype =
                 return;
             }
 
+            // В формулу вставляем только формулу
+            var ParaNearPos = NearPos.Paragraph.Get_ParaNearestPos(NearPos);
+            if (null === ParaNearPos || ParaNearPos.Classes.length < 2)
+            {
+                History.Remove_LastPoint();
+                return;
+            }
+
+            var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+            if (para_Math_Run === LastClass.Type)
+            {
+                // Проверяем, что вставляемый контент тоже формула
+                var Element = DocContent.Elements[0].Element;
+                var MathRun = LastClass;
+                if (1 !== DocContent.Elements.length || type_Paragraph !== Element.Get_Type() || 2 !== Element.Content.length || para_Math !== Element.Content[0].Type || null === MathRun.Parent)
+                {
+                    History.Remove_LastPoint();
+                    return;
+                }
+
+                // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
+                if ( true !== bCopy )
+                {
+                    this.TurnOffRecalc = true;
+                    this.Remove(1, false, false, false);
+                    this.TurnOffRecalc = false;
+                }
+
+                this.Selection_Remove();
+
+                var NewMathRun     = MathRun.Split2(ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.NearPos.ContentPos.Depth - 1]);
+                var MathContent    = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
+                var MathContentPos = MathContent.CurPos; // TODO: текущая позиция выставилась в функции Check_NearestPos
+
+                MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
+                MathContent.Insert_MathContent(Element.Content[0].Root, MathContentPos + 1);
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
+                this.Document_UpdateRulersState();
+
+                return;
+            }
+            else if (para_Run !== LastClass.Type)
+            {
+                History.Remove_LastPoint();
+                return;
+            }
+
+
             // Если мы копируем, тогда не надо проверять выделенные параграфы, а если переносим, тогда проверяем 
             var CheckChangesType = (true !== bCopy ? changestype_Document_Content : changestype_None);
-
             if ( false === this.Document_Is_SelectionLocked( CheckChangesType, { Type : changestype_2_ElementsArray_and_Type, Elements : [Para], CheckType : changestype_Paragraph_Content } ) )
             {
                 // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)

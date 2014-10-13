@@ -395,7 +395,7 @@ CBorderBox.prototype.Read_FromBinary2 = function( Reader )
     this.Id = Reader.GetString2();
     this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
 
-    this.CtrlPr.Read_FromBinary(Reader);
+    this.CtrPrp.Read_FromBinary(Reader);
     this.Pr.Read_FromBinary(Reader);
 
     this.fillContent();

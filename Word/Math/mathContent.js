@@ -2640,7 +2640,9 @@ CMathContent.prototype =
             {
                 this.content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
 
-                this.ParaMath.SetNeedResize();
+                if (null !== this.ParaMath)
+                    this.ParaMath.SetNeedResize();
+
                 break;
             }
             case historyitem_Math_RemoveItem:
@@ -2652,7 +2654,9 @@ CMathContent.prototype =
 
                 this.content = Array_start.concat(Data.Items, Array_end);
 
-                this.ParaMath.SetNeedResize();
+                if (null !== this.ParaMath)
+                    this.ParaMath.SetNeedResize();
+
                 break;
             }
         }
@@ -2672,14 +2676,18 @@ CMathContent.prototype =
 
                 this.content = Array_start.concat(Data.Items, Array_end);
 
-                this.ParaMath.SetNeedResize();
+                if (null !== this.ParaMath)
+                    this.ParaMath.SetNeedResize();
+
                 break;
             }
             case historyitem_Math_RemoveItem:
             {
                 this.content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
 
-                this.ParaMath.SetNeedResize();
+                if (null !== this.ParaMath)
+                    this.ParaMath.SetNeedResize();
+
                 break;
             }
         }
@@ -2802,6 +2810,25 @@ CMathContent.prototype =
         if(this.ParaMath !== null)
             this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
     },
+
+    Insert_MathContent : function(oMathContent, Pos)
+    {
+        if (undefined === Pos)
+            Pos = this.CurPos;
+
+        var nCount = oMathContent.content.length;
+        for (var nIndex = 0; nIndex < nCount; nIndex++)
+        {
+            this.Internal_Content_Add(Pos + nIndex, oMathContent.content[nIndex], false);
+        }
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+
+        this.CurPos = Pos + 1 + nCount;
+        this.Correct_Content(true);
+    },
+
 	Load_FromMenu: function(Type, Paragraph)
 	{
 		var oFName;
