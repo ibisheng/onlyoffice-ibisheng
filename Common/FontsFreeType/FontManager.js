@@ -1476,6 +1476,39 @@ function CFontManager()
         return string.m_fEndX;
     }
 
+    this.LoadStringPathCode = function(code, isGid, fX, fY, worker)
+    {
+        if (!this.m_pFont)
+            return false;
+
+        this.SetStringGID(isGid);
+
+        // это SetString
+        var string = this.m_oGlyphString;
+
+        string.m_fX = fX + string.m_fTransX;
+        string.m_fY = fY + string.m_fTransY;
+
+        string.m_nGlyphsCount = 1;
+        string.m_nGlyphIndex  = 0;
+
+        var buffer = string.m_pGlyphsBuffer;
+        if (buffer[0] == undefined)
+            buffer[0] = new TGlyph();
+
+        var _g = buffer[0];
+        _g.bBitmap = false;
+        _g.oBitmap = null;
+        _g.eState = EGlyphState.glyphstateNormal;
+        _g.lUnicode = code;
+
+        this.m_pFont.GetStringPath(string, worker);
+
+        this.SetStringGID(false);
+
+        return true;
+    }
+
     this.LoadChar = function(lUnicode)
     {
         if (!this.m_pFont)

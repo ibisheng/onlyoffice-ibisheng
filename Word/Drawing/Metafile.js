@@ -313,12 +313,6 @@ CGrState.prototype =
                             var _r = _c[j].Rect;
                             //this.Parent.AddClipRect(_r.x, _r.y, _r.w, _r.h);
 
-                            var _restoreDumpedVectors = null;
-                            if (this.Parent.private_removeVectors !== undefined)
-                            {
-                                _restoreDumpedVectors = this.Parent.private_removeVectors();
-                            }
-
                             this.Parent.StartClipPath();
 
                             this.Parent._s();
@@ -329,9 +323,6 @@ CGrState.prototype =
                             this.Parent._l(_r.x, _r.y);
 
                             this.Parent.EndClipPath();
-
-                            if (null != _restoreDumpedVectors)
-                                this.Parent.private_restoreVectors(_restoreDumpedVectors);
                         }
                     }
                 }
@@ -1126,6 +1117,13 @@ CMetafile.prototype =
             this.Memory.WriteLong(256);
         }
     },
+    WriteVectorMemoryForPrint : function()
+    {
+        if (null != this.VectorMemoryForPrint)
+        {
+            this.Memory.Copy(this.VectorMemoryForPrint, 0, this.VectorMemoryForPrint.pos);
+        }
+    },
     drawpath : function(type)
     {
         if (null == this.VectorMemoryForPrint)
@@ -1221,6 +1219,13 @@ CMetafile.prototype =
         if (font.FontFamily.Name == "" && 0 <= font.FontFamily.Index)
             font.FontFamily.Name = window.g_font_infos[font.FontFamily.Index].Name;
 
+        if (font.FontFamily.Index == -1 || font.FontFamily.Index === undefined)
+        {
+            if (undefined !== window.g_map_font_index[font.FontFamily.Name])
+                font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
+        }
+
+
         var style = 0;
         if (font.Italic == true)
             style += 2;
@@ -1283,17 +1288,54 @@ CMetafile.prototype =
     },
 	FillTextCode : function(x,y,code)
     {
+        if (code < 0xFFFF)
+            return this.FillText(x, y, String.fromCharCode(code));
+
+        var _font = this.m_oLastFont;
+
+        var _old_pos = this.Memory.pos;
+
+        window.g_font_infos[_font.SetUpIndex].LoadFont(window.g_font_loader,
+            g_oTextMeasurer.m_oManager,
+            _font.SetUpSize,
+            _font.SetUpStyle, 72, 72);
+
+        g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
+
+        // start (1) + draw(1) + typedraw(4) + end(1) = 7!
+        if ((this.Memory.pos - _old_pos) < 8)
+            this.Memory.pos = _old_pos;
+
+        /*
         this.Memory.WriteByte(CommandType.ctDrawTextCode);
         this.Memory.WriteLong(code);
         this.Memory.WriteDouble(x);
         this.Memory.WriteDouble(y);
+        */
     },
 	tg : function(gid,x,y)
     {
+        var _font = this.m_oLastFont;
+
+        var _old_pos = this.Memory.pos;
+
+        window.g_font_infos[_font.SetUpIndex].LoadFont(window.g_font_loader,
+            g_oTextMeasurer.m_oManager,
+            _font.SetUpSize,
+            _font.SetUpStyle, 72, 72);
+
+        g_oTextMeasurer.m_oManager.LoadStringPathCode(gid, true, x, y, this);
+
+        // start (1) + draw(1) + typedraw(4) + end(1) = 7!
+        if ((this.Memory.pos - _old_pos) < 8)
+            this.Memory.pos = _old_pos;
+
+        /*
         this.Memory.WriteByte(CommandType.ctDrawTextCodeGid);
         this.Memory.WriteLong(gid);
         this.Memory.WriteDouble(x);
         this.Memory.WriteDouble(y);
+        */
     },
     charspace : function(space)
     {
@@ -1492,6 +1534,8 @@ function CDocumentRenderer()
     this.m_oPen = null;
     this.m_oBrush = null;
     this.m_oTransform = null;
+
+    this._restoreDumpedVectors = null;
 }
 
 CDocumentRenderer.prototype =
@@ -2112,6 +2156,8 @@ CDocumentRenderer.prototype =
 
     StartClipPath : function()
     {
+        this.private_removeVectors();
+
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].beginCommand(32);
     },
@@ -2120,6 +2166,8 @@ CDocumentRenderer.prototype =
     {
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].endCommand(32);
+
+        this.private_restoreVectors();
     },
 
     SetTextPr : function(textPr, theme)
@@ -2156,25 +2204,24 @@ CDocumentRenderer.prototype =
 
     private_removeVectors : function()
     {
-        var _ret = this.VectorMemoryForPrint;
+        this._restoreDumpedVectors = this.VectorMemoryForPrint;
 
-        if (_ret != null)
+        if (this._restoreDumpedVectors != null)
         {
             this.VectorMemoryForPrint = null;
             if (0 != this.m_lPagesCount)
                 this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = null;
         }
-
-        return _ret;
     },
 
-    private_restoreVectors : function(_vectors)
+    private_restoreVectors : function()
     {
-        if (null != _vectors)
+        if (null != this._restoreDumpedVectors)
         {
-            this.VectorMemoryForPrint = _vectors;
+            this.VectorMemoryForPrint = this._restoreDumpedVectors;
             if (0 != this.m_lPagesCount)
-                this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = _vectors;
+                this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = this._restoreDumpedVectors;
         }
+        this._restoreDumpedVectors = null;
     }
 };

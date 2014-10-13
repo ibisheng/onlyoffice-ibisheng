@@ -5,6 +5,117 @@ function CCMapIndex()
     this.index = 0;
 }
 
+function CGlyphVectorPainter()
+{
+    // сдвиг
+    this.X          = 0;
+    this.Y          = 0;
+
+    // scale
+    this.KoefX      = 25.4 / 72;
+    this.KoefY      = 25.4 / 72;
+
+    this.NeedClosed = false;
+
+    this.shift      = 0;
+    this.delta      = 0;
+
+    this.CurX       = 0;
+    this.CurY       = 0;
+}
+
+CGlyphVectorPainter.prototype =
+{
+    start : function()
+    {
+
+    },
+
+    move_to : function(to, worker)
+    {
+        if (this.NeedClosed)
+        {
+            worker._z();
+            this.NeedClosed = false;
+        }
+
+        this.CurX = this.X + this.KoefX * (to.x / 64.0);
+        this.CurY = this.Y - this.KoefY * (to.y / 64.0);
+
+        worker._m(this.CurX, this.CurY);
+
+        return 0;
+    },
+
+    line_to : function(to, worker)
+    {
+        this.CurX = this.X + this.KoefX * (to.x / 64.0);
+        this.CurY = this.Y - this.KoefY * (to.y / 64.0);
+
+        worker._l(this.CurX, this.CurY);
+
+        this.NeedClosed = true;
+        return 0;
+    },
+
+    conic_to : function(control, to, worker)
+    {
+        var dX0 = this.CurX;
+        var dY0 = this.CurY;
+
+        var dXc = this.X + this.KoefX * (control.x / 64.0);
+        var dYc = this.Y - this.KoefY * (control.y / 64.0);
+        var dX3 = this.X + this.KoefX * (to.x / 64.0);
+        var dY3 = this.Y - this.KoefY * (to.y / 64.0);
+
+        // Строим кривую Безье второго порядка, с помощью кривой Безье третего порядка. Если p0, pC, p3 -
+        // начальная, контрольная и конечная точки, соответственно, для кривой Безье второго порядка. Тогда
+        // для этой же кривой, рассматриваемой как кривая Безье третьего порядка, точки p0, p1, p2, p3 будут
+        // начальной, две контрольные, конечная точки. Где p1 и p2 рассчитываются по следующим формулам:
+        //     p1 = (1/3) * (p0 + 2pС)
+        //     p2 = (1/3) * (2pС + p3)
+
+        var dX1 = (1.0 / 3.0) * (dX0 + 2 * dXc);
+        var dY1 = (1.0 / 3.0) * (dY0 + 2 * dYc);
+        var dX2 = (1.0 / 3.0) * (2 * dXc + dX3);
+        var dY2 = (1.0 / 3.0) * (2 * dYc + dY3);
+
+        worker._c(dX1, dY1, dX2, dY2, dX3, dY3);
+
+        this.CurX = dX3;
+        this.CurY = dY3;
+
+        this.NeedClosed = true;
+        return 0;
+    },
+
+    cubic_to : function(control1, control2, to, worker)
+    {
+        this.CurX = this.X + this.KoefX * (to.x / 64.0);
+        this.CurY = this.Y - this.KoefY * (to.y / 64.0);
+
+        worker._c(
+            this.X + this.KoefX * (control1.x / 64.0),
+            this.Y - this.KoefY * (control1.y / 64.0),
+            this.X + this.KoefX * (control2.x / 64.0),
+            this.Y - this.KoefY * (control2.y / 64.0),
+            this.CurX,
+            this.CurY);
+
+        this.NeedClosed = true;
+        return 0;
+    },
+
+    end : function(worker)
+    {
+        if (this.NeedClosed)
+        {
+            worker._z();
+            this.NeedClosed = false;
+        }
+    }
+};
+
 function CFontFile(fileName, faceIndex)
 {
     this.m_arrdFontMatrix = new Array(6);
@@ -1520,5 +1631,99 @@ function CFontFile(fileName, faceIndex)
 
         if (this.m_pFace.family_name == "MS Mincho" || this.m_pFace.family_name == "Castellar")
             this.HintsSupport = false;
+    }
+
+    this.GetCharPath = function(lUnicode, worker, x, y)
+    {
+        var pFace = this.m_pFace;
+        var pCurentGliph = pFace.glyph;
+
+        var Result;
+        var ushUnicode = lUnicode;
+
+        // Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
+        if (this.m_bIsNeedUpdateMatrix12)
+        {
+            if (this.m_pDefaultFont)
+                this.m_pDefaultFont.UpdateMatrix1();
+            this.UpdateMatrix1();
+        }
+
+        var unGID = 0;
+        var nCMapIndex = new CCMapIndex();
+        unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
+
+        if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) &&
+            0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
+        {
+            // Пробуем загрузить через стандартный шрифт
+            if (false === this.m_bUseDefaultFont || null == this.m_pDefaultFont ||
+                0 >= (unGID = this.m_pDefaultFont.SetCMapForCharCode(ushUnicode, nCMapIndex)))
+            {
+                if (this.m_nDefaultChar < 0)
+                {
+                    return;
+                }
+                else
+                {
+                    unGID = this.m_nDefaultChar;
+
+                    pFace           = this.m_pFace;
+                    pCurentGliph    = pFace.glyph;
+                }
+            }
+            else
+            {
+                pFace           = this.m_pDefaultFont.m_pFace;
+                pCurentGliph    = this.m_pDefaultFont.m_pGlyph;
+            }
+        }
+
+        var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+        if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
+            return;
+
+        var pGlyph = FT_Get_Glyph(pCurentGliph);
+        if (null == pGlyph)
+            return;
+
+        var _painter = new CGlyphVectorPainter();
+        _painter.KoefX = 25.4 / this.m_unHorDpi;
+        _painter.KoefY = 25.4 / this.m_unVerDpi;
+
+        if (x !== undefined)
+            _painter.X = x;
+        if (y !== undefined)
+            _painter.Y = y;
+
+        _painter.start(worker);
+        FT_Outline_Decompose(pGlyph.outline, _painter, worker);
+        _painter.end(worker);
+
+        if (this.m_bIsNeedUpdateMatrix12)
+        {
+            if (this.m_pDefaultFont)
+                this.m_pDefaultFont.UpdateMatrix2();
+            this.UpdateMatrix2();
+        }
+    }
+
+    this.GetStringPath = function(string, worker)
+    {
+        var _len = string.GetLength();
+        if (_len <= 0)
+            return true;
+
+       for (var nIndex = 0; nIndex < _len; ++nIndex)
+       {
+           var _glyph = string.m_pGlyphsBuffer[nIndex];
+           var _x = string.m_fX + 25.4 * _glyph.fX / this.m_unHorDpi;
+           var _y = string.m_fY + 25.4 * _glyph.fY / this.m_unVerDpi;
+
+           worker._s();
+           this.GetCharPath(_glyph.lUnicode, worker, _x, _y);
+           worker.df();
+           worker._e();
+       }
     }
 };
