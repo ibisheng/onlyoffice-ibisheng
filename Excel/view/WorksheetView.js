@@ -6952,13 +6952,13 @@
 		WorksheetView.prototype.applyFormatPainter = function () {
 			var t = this;
 			var from = t.copyActiveRange.getAllRange(), to = t.activeRange.getAllRange();
-
+			var oTmpRange = this._getRange(0, 0, 0, 0);
 			var onApplyFormatPainterCallback = function (isSuccess) {
 				// Очищаем выделение
 				t.cleanSelection();
 
 				if (true === isSuccess)
-					t._getRange(0, 0, 0, 0).promoteFromTo(from, to);
+					oTmpRange.promoteFromTo(from, to);
 
 				// Сбрасываем параметры
 				t._updateCellsRange(t.activeRange, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
@@ -6967,6 +6967,13 @@
 				// Перерисовываем
 				t.draw();
 			};
+
+			var result = oTmpRange.preparePromoteFromTo(from, to);
+			if (!result) {
+				// ToDo вывести ошибку
+				onApplyFormatPainterCallback(false);
+				return;
+			}
 
 			this._isLockedCells (to, null, onApplyFormatPainterCallback);
 		};

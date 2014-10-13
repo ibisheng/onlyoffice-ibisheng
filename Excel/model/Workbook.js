@@ -7291,46 +7291,48 @@ Range.prototype._canPromote=function(from, to, bIsPromote, nWidth, nHeight, bVer
 	}
 	return oRes;
 };
-Range.prototype.promoteFromTo=function(from, to){
-	if(to.isOneCell())
-	{
-		to = to.clone();
+// Подготовка Copy Style
+Range.prototype.preparePromoteFromTo = function (from, to) {
+	var bSuccess = true;
+	if (to.isOneCell())
 		to.setOffsetLast({offsetCol: (from.c2 - from.c1) - (to.c2 - to.c1), offsetRow: (from.r2 - from.r1) - (to.r2 - to.r1)});
-	}
-	if(!from.isIntersect(to))
-	{
+
+	if(!from.isIntersect(to)) {
 		var bFromWholeCol = (0 == from.c1 && gc_nMaxCol0 == from.c2);
 		var bFromWholeRow = (0 == from.r1 && gc_nMaxRow0 == from.r2);
 		var bToWholeCol = (0 == to.c1 && gc_nMaxCol0 == to.c2);
 		var bToWholeRow = (0 == to.r1 && gc_nMaxRow0 == to.r2);
-		if(((bFromWholeCol && bToWholeCol) == (bFromWholeCol || bToWholeCol)) && ((bFromWholeRow && bToWholeRow) == (bFromWholeRow || bToWholeRow)))
+		bSuccess = (bFromWholeCol === bToWholeCol && bFromWholeRow === bToWholeRow);
+	} else
+		bSuccess = false;
+	return bSuccess;
+};
+// Перед promoteFromTo обязательно должна быть вызывана функция preparePromoteFromTo
+Range.prototype.promoteFromTo=function(from, to){
+	var bVertical = true;
+	var nIndex = 1;
+	//проверяем можно ли осуществить promote
+	var oCanPromote = this._canPromote(from, to, false, 1, 1, bVertical, nIndex);
+	if(null != oCanPromote)
+	{
+		History.Create_NewPoint();
+		var oSelection = History.GetSelection();
+		if(null != oSelection)
 		{
-			var bVertical = true;
-			var nIndex = 1;
-			//проверяем можно ли осуществить promote
-			var oCanPromote = this._canPromote(from, to, false, 1, 1, bVertical, nIndex);
-			if(null != oCanPromote)
-			{
-				History.Create_NewPoint();
-				var oSelection = History.GetSelection();
-				if(null != oSelection)
-				{
-					oSelection = oSelection.clone();
-					oSelection.assign(from.c1, from.r1, from.c2, from.r2);
-					History.SetSelection(oSelection);
-				}
-				var oSelectionRedo = History.GetSelectionRedo();
-				if(null != oSelectionRedo)
-				{
-					oSelectionRedo = oSelectionRedo.clone();
-					oSelectionRedo.assign(to.c1, to.r1, to.c2, to.r2);
-					History.SetSelectionRedo(oSelectionRedo);
-				}
-			    //удаляем merge ячейки в to(после _canPromote должны остаться только inner)
-				this.worksheet.mergeManager.remove(to, true);
-				this._promoteFromTo(from, to, false, oCanPromote, false, bVertical, nIndex);
-			}
+			oSelection = oSelection.clone();
+			oSelection.assign(from.c1, from.r1, from.c2, from.r2);
+			History.SetSelection(oSelection);
 		}
+		var oSelectionRedo = History.GetSelectionRedo();
+		if(null != oSelectionRedo)
+		{
+			oSelectionRedo = oSelectionRedo.clone();
+			oSelectionRedo.assign(to.c1, to.r1, to.c2, to.r2);
+			History.SetSelectionRedo(oSelectionRedo);
+		}
+		//удаляем merge ячейки в to(после _canPromote должны остаться только inner)
+		this.worksheet.mergeManager.remove(to, true);
+		this._promoteFromTo(from, to, false, oCanPromote, false, bVertical, nIndex);
 	}
 };
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){

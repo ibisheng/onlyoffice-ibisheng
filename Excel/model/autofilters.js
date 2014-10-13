@@ -4042,7 +4042,7 @@ var gUndoInsDelCellsFlag = true;
 			
 			_cleanStyleTable : function(aWs, sRef)
 			{
-				var oRange = new Range(aWs, sRef.r1, sRef.c1, sRef.r2, sRef.c2)
+				var oRange = new Range(aWs, sRef.r1, sRef.c1, sRef.r2, sRef.c2);
 				oRange.setTableStyle(null);
 			},
 			
@@ -6243,7 +6243,7 @@ var gUndoInsDelCellsFlag = true;
 				if(tableParts)
 				{
 					var ref = tableParts.Ref;
-					this._setColorStyleTable(ref, tableParts)
+					this._setColorStyleTable(ref, tableParts);
 				}		
 			},
 			
