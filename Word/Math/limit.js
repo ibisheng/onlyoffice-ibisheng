@@ -36,11 +36,6 @@ function CLimit(props)
 
 	this.Id = g_oIdCounter.Get_NewId();
 
-    this.kind = MATH_LIMIT;
-
-    this.ContentFName    = new CMathContent();
-    this.ContentIterator = new CMathContent();
-
     this.Pr = new CMathLimitPr();
 
     if(props !== null && typeof(props) !== "undefined")
@@ -49,25 +44,28 @@ function CLimit(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CLimit, CMathBase);
+
+CLimit.prototype.ClassType = historyitem_type_lim;
+CLimit.prototype.kind      = MATH_LIMIT;
+
 CLimit.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(2);
+
     // посмотреть GetAllFonts
     this.setProperties(props);
+    this.fillContent();
 }
+CLimit.prototype.fillContent = function()
+{
+};
 CLimit.prototype.getFName = function()
 {
-    //return this.FName;
-    return this.ContentFName;
+    return this.Content[0];
 }
 CLimit.prototype.getIterator = function()
 {
-    //return this.Iterator;
-    return this.ContentIterator;
-}
-CLimit.prototype.setProperties = function(props)
-{
-    this.Pr.Set_FromObject(props);
-    this.setCtrPrp(props.ctrPrp);
+    return this.Content[1];
 }
 CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -102,12 +100,12 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             }
 
             this.elements[0][0] = new CDegreeBase(null, true);
-            this.elements[0][0].setBase(this.ContentFName);
-            this.elements[0][0].setIterator(this.ContentIterator);
+            this.elements[0][0].setBase(this.getFName());
+            this.elements[0][0].setIterator(this.getIterator());
             this.elements[0][0].fillContent();
 
-            this.FName    = this.ContentFName;
-            this.Iterator = this.ContentIterator;
+            this.FName    = this.getFName();
+            this.Iterator = this.getIterator();
         }
         else
         {
@@ -117,18 +115,17 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             {
                 this.dH = 0;
 
-                this.FName = this.ContentFName;
+                this.FName = this.getFName();
 
-                this.Iterator = new CDenominator();
-                this.Iterator.setElement(this.ContentIterator);
+                this.Iterator = new CDenominator(this.getIterator());
 
                 this.elements[0][0] = this.FName;
                 this.elements[1][0] = this.Iterator;
             }
             else
             {
-                this.FName    = this.ContentFName;
-                this.Iterator = this.ContentIterator;
+                this.FName    = this.getFName();
+                this.Iterator = this.getIterator();
                 this.dH = 0.06*this.Get_CompiledCtrPrp().FontSize;
 
                 this.elements[0][0] = this.Iterator;
@@ -184,63 +181,19 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     }
 
 }
-CLimit.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
 CLimit.prototype.Correct_Content = function(bInnerCorrection)
 {
-    this.ContentFName.Correct_Content(bInnerCorrection);
-    this.ContentIterator.Correct_Content(bInnerCorrection);
+    this.Content[0].Correct_Content(bInnerCorrection);
+    this.Content[1].Correct_Content(bInnerCorrection);
 };
-CLimit.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-
-    var NewLimit = new CLimit(oProps);
-    this.ContentFName.CopyTo(NewLimit.ContentFName, false);
-    this.ContentIterator.CopyTo(NewLimit.ContentIterator, false);
-    return NewLimit;
-};
-CLimit.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CLimit.prototype.Write_ToBinary2 = function( Writer )
-{	
-	Writer.WriteLong( historyitem_type_lim );
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.getFName().Id);
-	Writer.WriteString2(this.getIterator().Id);
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-	this.Pr.Write_ToBinary(Writer);
-}
-CLimit.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-    this.ContentFName    = g_oTableId.Get_ById(Reader.GetString2());
-    this.ContentIterator = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-}
-CLimit.prototype.Get_Id = function()
-{
-	return this.Id;
-}
 
 function CMathFunc(props)
 {
     CMathFunc.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_FUNCTION;
 
-    this.Pr = {};
-
-    this.fnameContent    = new CMathContent();
-    this.argumentContent = new CMathContent();
+    this.Pr = new CMathBasePr();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -248,8 +201,14 @@ function CMathFunc(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CMathFunc, CMathBase);
+
+CMathFunc.prototype.ClassType = historyitem_type_mathFunc;
+CMathFunc.prototype.kind      = MATH_FUNCTION;
+
 CMathFunc.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(2);
+
     this.setProperties(props);
     this.fillContent();
 }
@@ -268,62 +227,16 @@ CMathFunc.prototype.setDistance = function()
 }
 CMathFunc.prototype.getFName = function()
 {
-    return this.elements[0][0];
+    return this.Content[0];
 }
 CMathFunc.prototype.getArgument = function()
 {
-    return this.elements[0][1];
-}
-CMathFunc.prototype.setProperties = function(props)
-{
-    this.setCtrPrp(props.ctrPrp);
+    return this.Content[1];
 }
 CMathFunc.prototype.fillContent = function()
 {
     this.setDimension(1, 2);
-    this.elements[0][0] = this.fnameContent;
-    this.elements[0][1] = this.argumentContent;
-}
-CMathFunc.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
-CMathFunc.prototype.Copy = function()
-{
-    var oProps =
-    {
-        ctrPrp : this.CtrPrp.Copy()
-    };
-
-    var NewMathFunc = new CMathFunc(oProps);
-    this.fnameContent.CopyTo(NewMathFunc.fnameContent, false);
-    this.argumentContent.CopyTo(NewMathFunc.argumentContent, false);
-    return NewMathFunc;
-};
-CMathFunc.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CMathFunc.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_mathFunc );
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.fnameContent.Id);
-	Writer.WriteString2(this.argumentContent.Id);
-	
-	this.CtrPrp.Write_ToBinary(Writer);
-}
-CMathFunc.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-    this.fnameContent    = g_oTableId.Get_ById(Reader.GetString2());
-    this.argumentContent = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-
-    this.fillContent();
-}
-CMathFunc.prototype.Get_Id = function()
-{
-	return this.Id;
+    this.elements[0][0] = this.getFName();
+    this.elements[0][1] = this.getArgument();
 }
 

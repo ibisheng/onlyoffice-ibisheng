@@ -1324,3 +1324,13 @@ CMathBase.prototype.setProperties = function(oProps)
 
     this.RecalcInfo.bProps = true;
 }
+
+
+function CMathBasePr()
+{
+};
+
+CMathBasePr.prototype.Set_FromObject  = function(Obj){};
+CMathBasePr.prototype.Copy            = function(){return new CMathBasePr();};
+CMathBasePr.prototype.Write_ToBinary  = function(Writer){};
+CMathBasePr.prototype.Read_FromBinary = function(Reader){};
