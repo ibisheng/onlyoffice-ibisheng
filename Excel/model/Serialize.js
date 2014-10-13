@@ -4161,7 +4161,7 @@
         };
     }
     /** @constructor */
-    function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
+    function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs, isCopyPaste)
     {
         this.stream = stream;
         this.wb = wb;
@@ -4170,6 +4170,7 @@
         this.Dxfs = Dxfs;
         this.bcr = new Binary_CommonReader(this.stream);
         this.bssr = new Binary_SharedStringTableReader(this.stream, wb);
+		this.isCopyPaste = isCopyPaste;
         this.Read = function()
         {
             var oThis = this;
@@ -4318,7 +4319,7 @@
                     oNewXfs.XfId = XfIdTmp;
                 }
 
-                if(0 == this.aCellXfs.length)
+                if(0 == this.aCellXfs.length && !this.isCopyPaste)
                     this.oStyleManager.init(oNewXfs);
                 this.minimizeXfs(oNewXfs);
                 // При открытии стиль будет ссылкой
@@ -6756,7 +6757,7 @@
             {
                 res = this.stream.Seek(nStyleTableOffset);
                 if(c_oSerConstants.ReadOk == res)
-                    res = (new Binary_StylesTableReader(this.stream, wb, aCellXfs, aDxfs)).Read();
+                    res = (new Binary_StylesTableReader(this.stream, wb, aCellXfs, aDxfs, this.copyPasteObj.isCopyPaste)).Read();
             }
             if(c_oSerConstants.ReadOk == res)
             {
