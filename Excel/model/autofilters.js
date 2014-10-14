@@ -5660,9 +5660,8 @@ var gUndoInsDelCellsFlag = true;
 			},
 
 			// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-			_reDrawFilters: function(isNUpdate)
+			_reDrawFilters: function()
 			{
-				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
