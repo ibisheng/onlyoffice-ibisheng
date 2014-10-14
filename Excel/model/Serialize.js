@@ -3948,7 +3948,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_SortState.Ref == type )
-                oSortState.Ref = this.stream.GetString2LE(length);
+                oSortState.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_SortState.CaseSensitive == type )
                 oSortState.CaseSensitive = this.stream.GetBool();
             else if ( c_oSer_SortState.SortConditions == type )
