@@ -6201,6 +6201,8 @@ var gUndoInsDelCellsFlag = true;
 			_reDrawCurrentFilter: function(fColumns, result, tableParts)
 			{
 				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
 				if(result && result[0])
 				{
 					var startRow = this._idToRange(result[0].id).r1;
@@ -6244,6 +6246,7 @@ var gUndoInsDelCellsFlag = true;
 				if(tableParts)
 				{
 					var ref = tableParts.Ref;
+					this._cleanStyleTable(aWs, ref);
 					this._setColorStyleTable(ref, tableParts);
 				}		
 			},
