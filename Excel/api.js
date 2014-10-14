@@ -732,6 +732,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 						this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
 					} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
+						t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 						this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject){
 							if(null != incomeObject && "save" == incomeObject["type"])
 								t.asc_processSavedFile(incomeObject["data"], false);
@@ -1112,6 +1113,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				}
 			} else if (c_oAscFileType.CSV === sFormat && !options) {
+				// Мы открывали команду, надо ее закрыть.
+				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 				var v = {
 					"id":this.documentId,
 					"userid": this.documentUserId,
