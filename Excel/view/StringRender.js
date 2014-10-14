@@ -390,20 +390,14 @@
                 }
             }
 
-            var bound = {};
-
-            bound.dx   =   dx;
-            bound.dy   =   dy;
-            bound.x    =   x;
-            bound.y    =   y;
-
-            bound.sx   =   sx;
-            bound.sw   =   sw;
+            var bound = { dx: dx, dy: dy, x: x, y: y, sx: sx, sw: sw, height: 0 };
 
             if (angle === 90 || angle === -90) {
                 bound.height = textW;
             } else {
                 bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
+				// Делаем кратным 1pt
+				bound.height = asc_calcnpt(bound.height, 96);
             }
 
             return bound;
