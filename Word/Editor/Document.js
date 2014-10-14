@@ -8072,7 +8072,7 @@ CDocument.prototype =
             }
         }
 
-        return this.Content[0].Get_SelectionBounds();
+        return null;
     },
 
     Selection_Clear : function()

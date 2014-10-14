@@ -9077,7 +9077,7 @@ CDocumentContent.prototype =
             }
         }
 
-        return this.Content[0].Get_SelectionBounds();
+        return null;
     },
 
     Get_SelectionAnchorPos : function()
