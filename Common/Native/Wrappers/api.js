@@ -1923,6 +1923,14 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 
             break;
         }
+        case 200: // ASC_MENU_EVENT_TYPE_DOCUMENT_BASE64
+        {
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](this["asc_nativeGetFile"]());
+            _return = _stream;
+            break;
+        }
         default:
             break;
     }
