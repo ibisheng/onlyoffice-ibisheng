@@ -594,7 +594,8 @@
 				info = ws.getSelectionInfo();
 			}
 			// При редактировании ячейки не нужно пересылать изменения
-			if (this.input && false === ws.getCellEditMode()) {
+			if (this.input && false === ws.getCellEditMode() &&
+				c_oAscSelectionDialogType.None === this.selectionDialogType) {
 				// Сами запретим заходить в строку формул, когда выделен shape
 				if (this.lastSendInfoRangeIsSelectOnShape) {
 					this.input.disabled = true;
@@ -1771,6 +1772,7 @@
 					this.handlers.trigger("asc_onActiveSheetChanged", this.copyActiveSheet);
 				}
 				this.copyActiveSheet = -1;
+				this.input.disabled = false;
 			} else {
 				this.copyActiveSheet = this.wsActive;
 
@@ -1800,6 +1802,7 @@
 				this.getWorksheet().setSelectionDialogMode(selectionDialogType, tmpSelectRange);
 				// Нужно выставить после, т.к. при смене листа не должны проставлять режим
 				this.selectionDialogType = selectionDialogType;
+				this.input.disabled = true;
 			}
 		};
 
