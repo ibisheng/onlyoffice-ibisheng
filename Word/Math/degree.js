@@ -1,5 +1,37 @@
 "use strict";
 
+function CMathDegreePr()
+{
+    this.type = DEGREE_SUPERSCRIPT;
+}
+
+CMathDegreePr.prototype.Set_FromObject = function(Obj)
+{
+    if (DEGREE_SUPERSCRIPT === Obj.type || DEGREE_SUBSCRIPT === Obj.type)
+        this.type = Obj.type;
+    else
+        this.type = DEGREE_SUPERSCRIPT;
+};
+
+CMathDegreePr.prototype.Copy = function()
+{
+    var NewPr = new CMathDegreePr();
+    NewPr.type = this.type;
+    return NewPr;
+};
+
+CMathDegreePr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : type
+    Writer.WriteLong(this.type);
+};
+
+CMathDegreePr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : type
+    this.type = Reader.GetLong(Reader);
+};
+
 function CDegreeBase(props, bInside)
 {
     CDegreeBase.superclass.constructor.call(this, bInside);
@@ -7,14 +39,10 @@ function CDegreeBase(props, bInside)
     this.upBase = 0; // отступ сверху для основания
     this.upIter = 0; // отступ сверху для итератора
 
-    this.Pr =
-    {
-        type:   DEGREE_SUPERSCRIPT
-    };
+    this.Pr = new CMathDegreePr();
 
     this.baseContent = null;
     this.iterContent = null;
-
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -192,17 +220,6 @@ CDegreeBase.prototype.IsPlhIterator = function()
 {
     return this.iterContent.IsPlaceholder();
 };
-CDegreeBase.prototype.setProperties = function(props)
-{
-    if(props.type === DEGREE_SUPERSCRIPT || props.type === DEGREE_SUBSCRIPT)
-        this.Pr.type = props.type;
-    else
-        this.Pr.type = DEGREE_SUPERSCRIPT;
-
-    this.setCtrPrp(props.ctrPrp);
-
-    this.RecalcInfo.bProps = true;
-};
 CDegreeBase.prototype.setBase = function(base)
 {
     this.baseContent = base;
@@ -214,13 +231,9 @@ CDegreeBase.prototype.setIterator = function(iterator)
 
 function CDegree(props, bInside)
 {
-    this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_DEGREE;
-
     CDegree.superclass.constructor.call(this, props, bInside);
 
-    this.baseContent = new CMathContent();
-    this.iterContent = new CMathContent();
+    this.Id = g_oIdCounter.Get_NewId();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -228,57 +241,23 @@ function CDegree(props, bInside)
     g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CDegree, CDegreeBase);
+
+CDegree.prototype.ClassType = historyitem_type_deg;
+CDegree.prototype.kind      = MATH_DEGREE;
+
 CDegree.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(2);
+
     this.setProperties(props);
     this.fillContent();
 };
-CDegree.prototype.getPropsForWrite = function()
+CDegree.prototype.fillContent = function()
 {
-    return this.Pr;
-};
-CDegree.prototype.Copy = function()
-{
-    var oProps =
-    {
-        ctrPrp : this.CtrPrp.Copy(),
-        type   : this.Pr.type
-    };
+    this.iterContent = this.Content[0];
+    this.baseContent = this.Content[1];
 
-    var NewDegree = new CDegree(oProps);
-
-    this.baseContent.CopyTo(NewDegree.baseContent, false);
-    this.iterContent.CopyTo(NewDegree.iterContent, false);
-
-    return NewDegree;
-};
-CDegree.prototype.Refresh_RecalcData = function(Data)
-{
-};
-CDegree.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong(historyitem_type_deg);
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.baseContent.Id);
-	Writer.WriteString2(this.iterContent.Id);
-
-	this.CtrPrp.Write_ToBinary(Writer);
-	Writer.WriteLong( this.Pr.type );
-};
-CDegree.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-    this.baseContent = g_oTableId.Get_ById(Reader.GetString2());
-    this.iterContent = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.type = Reader.GetLong();
-
-    this.fillContent();
-};
-CDegree.prototype.Get_Id = function()
-{
-	return this.Id;
+    CDegree.superclass.fillContent.apply(this, arguments);
 };
 
 function CIterators(iterUp, iterDn)
@@ -324,17 +303,59 @@ CIterators.prototype.alignIterators = function(mcJc)
     this.alignment.wdt[0] = mcJc;
 };
 
+function CMathDegreeSubSupPr()
+{
+    this.type   = DEGREE_SubSup;
+    this.alnScr = false;// не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
+}
+
+CMathDegreeSubSupPr.prototype.Set_FromObject = function(Obj)
+{
+    if (true === Obj.alnScr || 1 === Obj.alnScr)
+        this.alnScr = true;
+    else
+        this.alnScr = false;
+
+    if (DEGREE_SubSup === Obj.type || DEGREE_PreSubSup === Obj.type)
+        this.type = Obj.type;
+};
+
+CMathDegreeSubSupPr.prototype.Copy = function()
+{
+    var NewPr = new CMathDegreeSubSupPr();
+
+    NewPr.type   = this.type;
+    NewPr.alnScr = this.alnScr;
+
+    return NewPr;
+};
+
+CMathDegreeSubSupPr.prototype.Write_ToBinary = function(Writer)
+{
+    // Long : type
+    // Bool : alnScr
+
+    Writer.WriteLong(this.type);
+    Writer.WriteBool(this.alnScr);
+};
+
+CMathDegreeSubSupPr.prototype.Read_FromBinary = function(Reader)
+{
+    // Long : type
+    // Bool : alnScr
+
+    this.type   = Reader.GetLong();
+    this.alnScr = Reader.GetBool();
+};
+
+
 function CDegreeSubSupBase(props, bInside)
 {
     CDegreeSubSupBase.superclass.constructor.call(this, bInside);
 
     this.gapBase = 0;
 
-    this.Pr =
-    {
-        type:       DEGREE_SubSup,
-        alnScr:     false  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
-    };
+    this.Pr = new CMathDegreeSubSupPr();
 
     this.baseContent = null;
     this.iters       = new CIterators(null, null);
@@ -510,30 +531,12 @@ CDegreeSubSupBase.prototype.setLowerIterator = function(iterator)
 {
     this.iters.iterDn = iterator;
 };
-CDegreeSubSupBase.prototype.setProperties = function(props)
-{
-    if(props.alnScr === true || props.alnScr === 1)
-        this.Pr.alnScr = true;
-    else if(props.alnScr === false || props.alnScr === 0)
-        this.Pr.alnScr = false;
-
-    if(props.type === DEGREE_SubSup || props.type === DEGREE_PreSubSup)
-        this.Pr.type = props.type;
-
-    this.setCtrPrp(props.ctrPrp);
-
-    this.RecalcInfo.bProps = true;
-};
 
 function CDegreeSubSup(props, bInside)
 {
-    this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_DEGREESubSup;
-
     CDegreeSubSup.superclass.constructor.call(this, props, bInside);
 
-    this.baseContent = new CMathContent();
-    this.iters       = new CIterators(new CMathContent(), new CMathContent());
+    this.Id = g_oIdCounter.Get_NewId();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -541,81 +544,22 @@ function CDegreeSubSup(props, bInside)
     g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CDegreeSubSup, CDegreeSubSupBase);
+
+CDegreeSubSup.prototype.ClassType = historyitem_type_deg_subsup;
+CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
+
 CDegreeSubSup.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(3);
+
     this.setProperties(props);
     this.fillContent();
 };
-CDegreeSubSup.prototype.getPropsForWrite = function()
+
+CDegreeSubSup.prototype.fillContent = function()
 {
-    return this.Pr;
-};
-CDegreeSubSup.prototype.Copy = function()
-{
-    var oProps =
-    {
-        ctrPrp : this.CtrPrp.Copy()
-    };
+    this.baseContent = this.Content[2];
+    this.iters       = new CIterators(this.Content[1], this.Content[0]);
 
-    var NewDegree = new CDegreeSubSup(oProps);
-
-    this.baseContent.CopyTo(NewDegree.baseContent, false);
-    this.iters.iterDn.CopyTo(NewDegree.iters.iterDn, false);
-    this.iters.iterUp.CopyTo(NewDegree.iters.iterUp, false);
-
-    return NewDegree;
-};
-CDegreeSubSup.prototype.Refresh_RecalcData = function(Data)
-{
-};
-CDegreeSubSup.prototype.Write_ToBinary2 = function( Writer )
-{
-    Writer.WriteLong( historyitem_type_deg_subsup );
-    Writer.WriteString2(this.Id);
-    Writer.WriteString2(this.baseContent.Id);
-    Writer.WriteString2(this.iters.iterDn.Id);
-    Writer.WriteString2(this.iters.iterUp.Id);
-
-    this.CtrPrp.Write_ToBinary(Writer);
-    Writer.WriteLong( this.Pr.type );
-    if ( this.Pr.type == DEGREE_SubSup )
-    {
-        var StartPos = Writer.GetCurPosition();
-        Writer.Skip(4);
-        var Flags = 0;
-        if ( undefined != this.Pr.alnScr )
-        {
-            Writer.WriteBool( this.Pr.alnScr );
-            Flags |= 1;
-        }
-        var EndPos = Writer.GetCurPosition();
-        Writer.Seek( StartPos );
-        Writer.WriteLong( Flags );
-        Writer.Seek( EndPos );
-    }
-};
-CDegreeSubSup.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-
-    this.baseContent  = g_oTableId.Get_ById(Reader.GetString2());
-    this.iters.iterDn = g_oTableId.Get_ById(Reader.GetString2());
-    this.iters.iterUp = g_oTableId.Get_ById(Reader.GetString2());
-
-    var props = {ctrPrp: new CTextPr()};
-    props.ctrPrp.Read_FromBinary(Reader);
-    props.type = Reader.GetLong();
-    if ( props.type == DEGREE_SubSup )
-    {
-        var Flags = Reader.GetLong();
-        if ( Flags & 1 )
-            props.alnScr = Reader.GetBool();
-    }
-
-    this.init(props);
-    this.iters.init();
-};
-CDegreeSubSup.prototype.Get_Id = function()
-{
-    return this.Id;
+    CDegreeSubSup.superclass.fillContent.apply(this, arguments);
 };

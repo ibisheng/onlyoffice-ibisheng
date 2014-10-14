@@ -129,15 +129,14 @@ function CNary(props)
     CNary.superclass.constructor.call(this);
 
 	this.Id = g_oIdCounter.Get_NewId();
-    this.kind = MATH_NARY;
 
     this.Pr = new CMathNaryPr();
 
     this.Base = null;
     this.Sign = null;
-    this.LowerIterator = new CMathContent();
-    this.UpperIterator = new CMathContent();
-    this.Arg           = new CMathContent();
+    this.LowerIterator = null;
+    this.UpperIterator = null;
+    this.Arg           = null;
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -145,16 +144,24 @@ function CNary(props)
 	g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CNary, CMathBase);
+
+CNary.prototype.ClassType = historyitem_type_nary;
+CNary.prototype.kind      = MATH_NARY;
+
 CNary.prototype.init = function(props)
 {
+    this.Fill_LogicalContent(3);
+
     this.setProperties(props);
+    this.fillContent();
 }
-CNary.prototype.setProperties = function(props)
+CNary.prototype.fillContent = function()
 {
-    this.setCtrPrp(props.ctrPrp);
-    this.Pr.Set_FromObject(props);
-}
-CNary.prototype.fillContent = function(PropsInfo)
+    this.LowerIterator = this.Content[0];
+    this.UpperIterator = this.Content[1];
+    this.Arg           = this.Content[2];
+};
+CNary.prototype.fillBase = function(PropsInfo)
 {
     this.setDimension(1, 2);
 
@@ -233,7 +240,6 @@ CNary.prototype.fillContent = function(PropsInfo)
     this.Base = base;
 
     this.addMCToContent( [base, this.Arg] );
-
 }
 CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
@@ -277,7 +283,7 @@ CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         // пока оставим так, chrType сейчас нигде не используется
         this.Pr.chrType = oSign.chrType;
 
-        this.fillContent(PropsInfo);
+        this.fillBase(PropsInfo);
 
         this.RecalcInfo.bProps = false;
     }
@@ -427,62 +433,12 @@ CNary.prototype.getLowerIterator = function()
 	if (!this.Pr.subHide)
 		return this.LowerIterator;
 }
-CNary.prototype.getPropsForWrite = function()
-{
-    return this.Pr;
-}
 CNary.prototype.Correct_Content = function(bInnerCorrection)
 {
-    this.LowerIterator.Correct_Content(bInnerCorrection);
-    this.UpperIterator.Correct_Content(bInnerCorrection);
-    this.Arg.Correct_Content(bInnerCorrection);
+    this.Content[0].Correct_Content(bInnerCorrection);
+    this.Content[1].Correct_Content(bInnerCorrection);
+    this.Content[2].Correct_Content(bInnerCorrection);
 };
-CNary.prototype.Copy = function()
-{
-    var oProps = this.Pr.Copy();
-    oProps.ctrPrp = this.CtrPrp.Copy();
-
-    var NewNAry = new CNary(oProps);
-
-    this.LowerIterator.CopyTo(NewNAry.LowerIterator, false);
-    this.UpperIterator.CopyTo(NewNAry.UpperIterator, false);
-    this.Arg.CopyTo(NewNAry.Arg, false);
-
-    return NewNAry;
-};
-CNary.prototype.Refresh_RecalcData = function(Data)
-{
-}
-CNary.prototype.Write_ToBinary2 = function( Writer )
-{
-	Writer.WriteLong( historyitem_type_nary );
-
-    Writer.WriteString2(this.Id);
-	Writer.WriteString2(this.Arg.Id);
-    Writer.WriteString2(this.LowerIterator.Id);
-    Writer.WriteString2(this.UpperIterator.Id);
-
-	this.CtrPrp.Write_ToBinary(Writer);
-    this.Pr.Write_ToBinary(Writer);
-}
-CNary.prototype.Read_FromBinary2 = function( Reader )
-{
-    this.Id = Reader.GetString2();
-
-    this.Arg           = g_oTableId.Get_ById(Reader.GetString2());
-    this.LowerIterator = g_oTableId.Get_ById(Reader.GetString2());
-    this.UpperIterator = g_oTableId.Get_ById(Reader.GetString2());
-
-    this.CtrPrp.Read_FromBinary(Reader);
-    this.Pr.Read_FromBinary(Reader);
-
-    this.RecalcInfo.bProps = true;
-}
-CNary.prototype.Get_Id = function()
-{
-	return this.Id;
-}
-
 
 function CNaryUnd(bInside)
 {
