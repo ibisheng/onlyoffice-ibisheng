@@ -297,7 +297,7 @@ var gUndoInsDelCellsFlag = true;
 					if(ref && ref.Ref)
 						newRange = ref.Ref;
 					else if(typeof ref == "string")
-						newRange = Asc.g_oRangeCache.getAscRange(ref);
+						newRange = Asc.g_oRangeCache.getAscRange(ref).clone();
 
 					if(newRange)
 						activeCells = newRange;
@@ -469,7 +469,7 @@ var gUndoInsDelCellsFlag = true;
 									}
 									//добавляем структуру нового фильтра
 									if(openFilter == undefined)
-										t._addNewFilter(result,tableColumns,aWs,isAll,lTable);
+										t._addNewFilter(result, tableColumns, aWs, isAll, lTable);
 									
 									//устанавливаем стиль для таблицы
 									if(!isAll)
@@ -491,7 +491,7 @@ var gUndoInsDelCellsFlag = true;
 										if(isAll) {
 											aWs.AutoFilter = new AutoFilter();
 											aWs.AutoFilter.result = result;
-											aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
+											aWs.AutoFilter.Ref = new Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
 										}
 									}
 									newRes = 
@@ -500,7 +500,7 @@ var gUndoInsDelCellsFlag = true;
 										isVis:  true
 									};
 									
-									changesElemHistory.refTable = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
+									changesElemHistory.refTable = new Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
 									if(addNameColumn)
 										changesElemHistory.addColumn = true;
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
@@ -676,7 +676,8 @@ var gUndoInsDelCellsFlag = true;
 									if(!aWs.AutoFilter)
 										aWs.AutoFilter = new AutoFilter();
 									aWs.AutoFilter.result = result;
-									aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext);
+									//TODO пересмотреть Asc.g_oRangeCache.getAscRange
+									aWs.AutoFilter.Ref = Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext).clone();
 								}
 							}
 							
@@ -686,9 +687,10 @@ var gUndoInsDelCellsFlag = true;
 								isVis:  true
 							};
 							
+							//TODO пересмотреть Asc.g_oRangeCache.getAscRange
 							var ref = 
 							{
-								Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext)
+								Ref: Asc.g_oRangeCache.getAscRange(result[0].id + ':' + result[result.length -1].idNext).clone()
 							};
 							
 							if(addNameColumn && addFormatTableOptionsObj)
@@ -4003,7 +4005,7 @@ var gUndoInsDelCellsFlag = true;
 											if(this.allButtonAF[aF].id == arr.result[i].id)
 											{
 												this.allButtonAF[aF] = arr.result[i];
-												this.allButtonAF[aF].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext);
+												this.allButtonAF[aF].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext).clone();
 												isInsert = true;
 												break;
 											}
@@ -4012,7 +4014,7 @@ var gUndoInsDelCellsFlag = true;
 									if(!isInsert)
 									{
 										this.allButtonAF[leng + n] = arr.result[i];
-										this.allButtonAF[leng + n].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext);
+										this.allButtonAF[leng + n].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext).clone();
 										n++;
 									}
 								}
@@ -4609,7 +4611,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						newFilter = new AutoFilter();
 						newFilter.result = val;
-						ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext);
+						ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
 						newFilter.Ref =  ref;
 						aWs.AutoFilter = newFilter;
 					}
@@ -4641,7 +4643,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					if(!aWs.TableParts)
 						aWs.TableParts = [];
-					ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext);
+					ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
 					
 					newFilter = new TablePart();
 					newFilter.Ref = ref;
