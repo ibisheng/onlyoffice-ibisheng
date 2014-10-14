@@ -4133,20 +4133,24 @@ Cell.prototype.setFormula=function(val, bAddToHistory){
 	this.sFormula = val;
 	this.oValue.cleanCache();
 };
-Cell.prototype.setValue=function(val,callback){
+Cell.prototype.setValue=function(val,callback, isCopyPaste){
 	var ret = true;
 	var DataOld = null;
 	if(History.Is_On())
 		DataOld = this.getValueData();
-    var sNumFormat;
-    if(null != this.xfs && null != this.xfs.num)
-        sNumFormat = this.xfs.num.f;
-    else
-        sNumFormat = g_oDefaultNum.f;
-	var numFormat = oNumFormatCache.get(sNumFormat);
+	var bIsTextFormat = false;
+	if(!isCopyPaste){
+		var sNumFormat;
+		if(null != this.xfs && null != this.xfs.num)
+			sNumFormat = this.xfs.num.f;
+		else
+			sNumFormat = g_oDefaultNum.f;
+		var numFormat = oNumFormatCache.get(sNumFormat);
+		bIsTextFormat = numFormat.isTextFormat();
+	}
 	var wb = this.ws.workbook;
 	var ws = this.ws;
-	if(false == numFormat.isTextFormat())
+	if(false == bIsTextFormat)
 	{
 		/*
 			Устанавливаем значение в Range ячеек. При этом происходит проверка значения на формулу.
@@ -4192,7 +4196,7 @@ Cell.prototype.setValue=function(val,callback){
 	var sheetId = this.ws.getId();
 	if (this.sFormula)
 		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID() );
-	if( !(null != val && val[0] != "=" || true == numFormat.isTextFormat()))
+	if( !(null != val && val[0] != "=" || true == bIsTextFormat))
 		addToArrRecalc(this.ws.getId(), this);
 	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
         wb.needRecalc.length++;
@@ -4200,7 +4204,7 @@ Cell.prototype.setValue=function(val,callback){
 	this.sFormula = null;
 	this.setFormulaCA(false);
 	if(val){
-		if(false == numFormat.isTextFormat() && val[0] == "=" && val.length > 1){
+		if(false == bIsTextFormat && val[0] == "=" && val.length > 1){
 			this.setFormula( val.substring(1) );
 		}
 		else {
@@ -5002,11 +5006,11 @@ Range.prototype.getCells=function(){
 	}
 	return aResult;
 };
-Range.prototype.setValue=function(val,callback){
+Range.prototype.setValue=function(val,callback, isCopyPaste){
 	History.Create_NewPoint();
 	History.StartTransaction();
 	this._foreach(function(cell){
-		cell.setValue(val,callback);
+		cell.setValue(val,callback, isCopyPaste);
 		// if(cell.isEmpty())
 			// cell.Remove();
 	});
