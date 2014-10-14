@@ -2772,11 +2772,7 @@ var gUndoInsDelCellsFlag = true;
 				if(!customFilter)
 					this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyMF,
 						{activeCells: ar, autoFiltersObject: autoFiltersObject});
-				// ToDo - здесь вызывается и _updateCellsRange в _reDrawFilters, и делается changeWorksheet
-				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-				ws.isChanged = true;
-				
-				//var activeRange = ws.activeRange.clone();
+
 				this._reDrawFilters();
 			},
 			
@@ -5676,8 +5672,6 @@ var gUndoInsDelCellsFlag = true;
 						this._setColorStyleTable(ref, aWs.TableParts[tP]);
 					}
 				}
-				if(!isNUpdate)
-					ws._updateCellsRange(ws.visibleRange, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 			},
 			
 			_sortArrayMinMax: function(elements)
@@ -7238,8 +7232,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells}, null, activeCells);
-				
-				ws.isChanged = true;
+
 				this._reDrawFilters();
 			},
 			

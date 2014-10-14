@@ -8820,7 +8820,7 @@
 			var isOneMerge = false;
 
 
-			var startCell = val.getCell( new CellAddress(activeCellsPasteFragment.r1, activeCellsPasteFragment.c1, 0));
+			var startCell = val.getCell3(activeCellsPasteFragment.r1, activeCellsPasteFragment.c1);
 			var isMergedStartCell = startCell.hasMerged();
 
 			var firstValuesCol;
