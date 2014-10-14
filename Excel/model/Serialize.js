@@ -3422,7 +3422,7 @@
                 this.memory.WriteString2(sText);
             }
             var sTime = oCommentData.asc_getTime();
-            if(null != sTime)
+            if(null != sTime && "" !== sTime)
             {
                 var oDate = new Date(sTime - 0);
 
