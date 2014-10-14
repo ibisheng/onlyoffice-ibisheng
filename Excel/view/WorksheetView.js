@@ -8108,10 +8108,10 @@
 				var rangeF = arrFormula[i].range;
 				var valF = arrFormula[i].val;
 				if(rangeF.isOneCell())
-					rangeF.setValue(valF);
+					rangeF.setValue(valF, null, true);
 				else {
 					var oBBox = rangeF.getBBox0();
-					t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF);
+					t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF, null, true);
 				}
 			};
 			
@@ -9033,7 +9033,19 @@
 									else if(value2[nF] && value2[nF].format && !value2[nF].format.skip)
 										noSkipVal = nF;
 								}
-
+								
+								
+								if(!isOneMerge)//settings for cell(format)
+								{
+									//format
+									var numFormat = newVal.getNumFormat();
+									var nameFormat;
+									if(numFormat && numFormat.sFormat)
+										nameFormat = numFormat.sFormat;
+									if(nameFormat)
+										range.setNumFormat(nameFormat);
+								}
+								
 								if(value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal!= null))
 								{
 									if(numFormula == null)
@@ -9089,14 +9101,6 @@
 									range.setAlignHorizontal(newVal.getAlignHorizontal());
 									//borders
 									range.setBorderSrc(newVal.getBorderFull());
-									
-									//format
-									var numFormat = newVal.getNumFormat();
-									var nameFormat;
-									if(numFormat && numFormat.sFormat)
-										nameFormat = numFormat.sFormat;
-									if(nameFormat)
-										range.setNumFormat(nameFormat);
 
 									//fill
 									range.setFill(newVal.getFill());
