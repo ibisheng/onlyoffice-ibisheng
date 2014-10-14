@@ -5989,6 +5989,129 @@ Paragraph.prototype =
         this.Set_SelectionContentPos( StartPos, EndPos );
     },
 
+    Get_SelectionBounds : function()
+    {
+        var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_StartPage_Absolute();
+
+        var BeginRect = null;
+        var EndRect   = null;
+
+        var StartPage_abs = this.Get_StartPage_Absolute();
+
+        if (true === this.Selection.Use)
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            var LinesCount = this.Lines.length;
+            var StartLine = -1;
+            var EndLine   = -1;
+
+            for (var CurLine = 0; CurLine < LinesCount; CurLine++ )
+            {
+                if ( -1 === StartLine && StartPos >= this.Lines[CurLine].Get_StartPos() && StartPos <= this.Lines[CurLine].Get_EndPos() )
+                    StartLine = CurLine;
+
+                if ( EndPos >= this.Lines[CurLine].Get_StartPos() && EndPos <= this.Lines[CurLine].Get_EndPos() )
+                    EndLine = CurLine;
+            }
+
+            StartLine = Math.min( Math.max( 0, StartLine ), LinesCount - 1 );
+            EndLine   = Math.min( Math.max( 0, EndLine   ), LinesCount - 1 );
+
+            var PagesCount = this.Pages.length;
+            var DrawSelection = new CParagraphDrawSelectionRange();
+            DrawSelection.Draw = false;
+
+            for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
+            {
+                var Line = this.Lines[CurLine];
+                var RangesCount = Line.Ranges.length;
+
+                // Определим номер страницы
+                var CurPage = 0;
+                for (; CurPage < PagesCount; CurPage++ )
+                {
+                    if ( CurLine >= this.Pages[CurPage].StartLine && CurLine <= this.Pages[CurPage].EndLine )
+                        break;
+                }
+
+                CurPage = Math.min( PagesCount - 1, CurPage );
+
+                // Определяем позицию и высоту строки
+                DrawSelection.StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
+                DrawSelection.H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                var Result = null;
+
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    var Range = Line.Ranges[CurRange];
+
+                    var RStartPos = Range.StartPos;
+                    var REndPos   = Range.EndPos;
+
+                    // Если пересечение пустое с селектом, тогда пропускаем данный отрезок
+                    if ( StartPos > REndPos || EndPos < RStartPos )
+                        continue;
+
+                    DrawSelection.StartX    = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    DrawSelection.W         = 0;
+                    DrawSelection.FindStart = true;
+
+                    if ( CurLine === this.Numbering.Line && CurRange === this.Numbering.Range )
+                        DrawSelection.StartX += this.Numbering.WidthVisible;
+
+                    for ( var CurPos = RStartPos; CurPos <= REndPos; CurPos++ )
+                    {
+                        var Item = this.Content[CurPos];
+                        Item.Selection_DrawRange( CurLine, CurRange, DrawSelection );
+                    }
+
+                    var StartX = DrawSelection.StartX;
+                    var W      = DrawSelection.W;
+
+                    var StartY = DrawSelection.StartY;
+                    var H      = DrawSelection.H;
+
+                    var StartX = DrawSelection.StartX;
+                    var W      = DrawSelection.W;
+
+                    var StartY = DrawSelection.StartY;
+                    var H      = DrawSelection.H;
+
+                    if ( W > 0.001 )
+                    {
+                        X0 = StartX;
+                        X1 = StartX + W;
+                        Y  = StartY;
+
+                        Page = CurPage + StartPage_abs;
+
+                        if (null === BeginRect)
+                            BeginRect = { X : StartX, Y : StartY, W : W, H : H, Page : Page };
+
+                        EndRect = { X : StartX, Y : StartY, W : W, H : H, Page : Page };
+                    }
+                }
+            }
+        }
+
+        if (null === BeginRect)
+            BeginRect = { X : this.X, Y : this.Y, W : 0, H : 0, Page : StartPage_abs };
+
+        if (null === EndRect)
+            EndRect = { X : this.X, Y : this.Y, W : 0, H : 0, Page : StartPage_abs };
+
+        return { Start : BeginRect, End : EndRect };
+    },
+
     Get_SelectionAnchorPos : function()
     {
         var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_StartPage_Absolute();

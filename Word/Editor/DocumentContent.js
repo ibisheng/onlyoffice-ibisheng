@@ -9053,6 +9053,33 @@ CDocumentContent.prototype =
         return false;
     },
 
+    Get_SelectionBounds : function()
+    {
+        if (true === this.Selection.Use)
+        {
+            var Start = this.Selection.StartPos;
+            var End   = this.Selection.EndPos;
+
+            if (Start > End)
+            {
+                Start = this.Selection.EndPos;
+                End   = this.Selection.StartPos;
+            }
+
+            if (Start === End)
+                return this.Content[Start].Get_SelectionBounds();
+            else
+            {
+                var Result = {};
+                Result.Start = this.Content[Start].Get_SelectionBounds().Start;
+                Result.End   = this.Content[End].Get_SelectionBounds().End;
+                return Result;
+            }
+        }
+
+        return this.Content[0].Get_SelectionBounds();
+    },
+
     Get_SelectionAnchorPos : function()
     {
         var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos )  : this.CurPos.ContentPos );

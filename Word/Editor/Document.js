@@ -8035,6 +8035,46 @@ CDocument.prototype =
         }
     },
 
+    Get_SelectionBounds : function()
+    {
+        // Работаем с колонтитулом
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            return this.HdrFtr.CurHdrFtr.Content.Get_SelectionBounds();
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            return this.DrawingObjects.Get_SelectionBounds();
+        }
+        else
+        {
+            if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
+            {
+                var Start = this.Selection.StartPos;
+                var End   = this.Selection.EndPos;
+
+                if ( Start > End )
+                {
+                    Start = this.Selection.EndPos;
+                    End   = this.Selection.StartPos;
+                }
+
+                if (Start === End)
+                    return this.Content[Start].Get_SelectionBounds();
+                else
+                {
+                    var Result = {};
+                    Result.Start = this.Content[Start].Get_SelectionBounds().Start;
+                    Result.End   = this.Content[End].Get_SelectionBounds().End;
+
+                    return Result;
+                }
+            }
+        }
+
+        return this.Content[0].Get_SelectionBounds();
+    },
+
     Selection_Clear : function()
     {
         if ( true === this.Selection.Use )

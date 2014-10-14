@@ -7518,6 +7518,50 @@ CTable.prototype =
         }
     },
 
+    Get_SelectionBounds : function()
+    {
+        if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )
+        {
+            var Cells_array = this.Internal_Get_SelectionArray();
+
+            var StartPos = Cells_array[0];
+
+            var Row  = this.Content[StartPos.Row];
+            var Cell = Row.Get_Cell(StartPos.Cell);
+
+            var X0 = Cell.Metrics.X_cell_start;
+            var X1 = Cell.Metrics.X_cell_end;
+
+            var CurPage = this.RowsInfo[StartPos.Row].StartPage;
+
+            var Y = this.RowsInfo[StartPos.Row].Y[CurPage];
+            var H = this.RowsInfo[StartPos.Row].H[CurPage];
+
+            var BeginRect = { X : X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
+
+            var EndPos = Cells_array[Cells_array.length - 1];
+
+            Row  = this.Content[EndPos.Row];
+            Cell = Row.Get_Cell(EndPos.Cell);
+
+            X0 = Cell.Metrics.X_cell_start;
+            X1 = Cell.Metrics.X_cell_end;
+
+            CurPage = this.RowsInfo[EndPos.Row].StartPage + this.RowsInfo[EndPos.Row].Pages - 1;
+
+            Y = this.RowsInfo[EndPos.Row].Y[CurPage];
+            H = this.RowsInfo[EndPos.Row].H[CurPage];
+
+            var EndRect = { X : X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
+
+            return { Start : BeginRect, End : EndRect };
+        }
+        else
+        {
+            return this.CurCell.Content.Get_SelectionBounds();
+        }
+    },
+
     Get_SelectionAnchorPos : function()
     {
         if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )

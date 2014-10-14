@@ -181,11 +181,6 @@ CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     }
 
 }
-CLimit.prototype.Correct_Content = function(bInnerCorrection)
-{
-    this.Content[0].Correct_Content(bInnerCorrection);
-    this.Content[1].Correct_Content(bInnerCorrection);
-};
 
 function CMathFunc(props)
 {

@@ -433,12 +433,6 @@ CNary.prototype.getLowerIterator = function()
 	if (!this.Pr.subHide)
 		return this.LowerIterator;
 }
-CNary.prototype.Correct_Content = function(bInnerCorrection)
-{
-    this.Content[0].Correct_Content(bInnerCorrection);
-    this.Content[1].Correct_Content(bInnerCorrection);
-    this.Content[2].Correct_Content(bInnerCorrection);
-};
 
 function CNaryUnd(bInside)
 {

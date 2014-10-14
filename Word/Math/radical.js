@@ -690,8 +690,3 @@ CRadical.prototype.getDegree = function()
 {
     return this.Content[0];
 }
-CRadical.prototype.Correct_Content = function(bInnerCorrection)
-{
-    this.Content[0].Correct_Content(bInnerCorrection);
-    this.Content[1].Correct_Content(bInnerCorrection);
-};
