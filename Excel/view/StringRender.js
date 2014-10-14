@@ -300,9 +300,6 @@
                     if (angle > 0) {
                         dy = h - mul * tm.height;
                     }
-                    else {
-
-                    }
                 }
             }
             else if ("center" === alignVertical) {
@@ -348,9 +345,6 @@
                 } else {
                     if (angle > 0) {
                         dy = h - mul * tm.height;
-                    }
-                    else {
-
                     }
                 }
             }
