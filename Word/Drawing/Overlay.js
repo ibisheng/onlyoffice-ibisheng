@@ -7,7 +7,7 @@ var TRACK_DISTANCE_ROTATE   = 25;
 var TRACK_DISTANCE_ROTATE2  = 25;
 var TRACK_ADJUSTMENT_SIZE   = 10;
 var TRACK_WRAPPOINTS_SIZE   = 6;
-var IMAGE_ROTATE_TRACK_W    = 17;
+var IMAGE_ROTATE_TRACK_W    = 21;
 
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
@@ -17,9 +17,17 @@ if (bIsUseImageRotateTrack)
     window.g_track_rotate_marker.onload = function(){
         window.g_track_rotate_marker.asc_complete = true;
     };
-    window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAbBJREFUeNqsVM1qwkAQnnry71BopUVRFKoeUrx48yF8gKbtE3iRPoBP0Kdo0pM+gtBexJsgyUHswYtWggERf0HczkyzkqbGttAPvmx2duZjdnZ2QQgBHkaRVeQL0hafsJ151Vn/EnNCH4Ku66Cq6g3+PiIvwR9j5AP6P+8tLsWa+BtqmqYBUWZCGehSeLFYgGmaMBqNYLVaQSgUgng8DoqiQCQScWd1hxlpJBLFyRvygqwU2Gq1IJ/PQzqdhnA4DMvlEgaDAfR6PSiVSizowEZe0TYqMr/5fC4ajYawLOtg/mSv1+vs50IlgEplKWsYBmSzWYjFYgcrSvZcLsdbdaFMIoqc0VYymQwcA62TnwvXJHIuZ+v1mmvgh36/D5vNhmtk2zbXCHEWcIrDCAaD7OCHRCIBzWaT/2lMJpNcXBIxpBNVnU7BD5RloVDgvqLRydr8djpUfb/TIex2O9Fut3mUpyPvylhahsMhC3W7XTGbzcR2uxXT6VR0Op1DmhPkqexYFal5OxYF9x2bSqWgWCx6d3iPHfv0L3fH+wyoyPcfgmn91h0HR96T19++Jx8CDABSF1tWsa6kaQAAAABJRU5ErkJggg==";
+    window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAMAAACeyVWkAAAAVFBMVEUAAAD///////////////////////////////////////////////////////98fHy2trb09PTT09OysrKqqqqJiYng4ODr6+uamprGxsbi4uKGhoYjgM0eAAAADnRSTlMAy00k7/z0jbeuMzDljsugwZgAAACpSURBVBjTdZHbEoMgDESDAl6bgIqX9v//s67UYpm6D0xyYMImoaiuUr3pVdVRUtnwqaY8YaE5SRcfaPgqc+DSIh7WIGGaEVoUqRGN4oZlcDIiqYlaPjQz5CNu6cFJwLiuSO3nlLBDrKhn3l4rcnH4NcAdGd5EZMfCsoMFBxM6CD57G+u6vC48PMVnHtrYhP/x+7+3cw7zdJnD3cyA7QXa4nYXaW+a9Xdvb6zqE5Jb7LmzAAAAAElFTkSuQmCC";
 
-    TRACK_DISTANCE_ROTATE2 = 20;
+    window.g_track_rotate_marker2 = new Image();
+    window.g_track_rotate_marker2.asc_complete = false;
+    window.g_track_rotate_marker2.onload = function(){
+        window.g_track_rotate_marker2.asc_complete = true;
+    };
+    window.g_track_rotate_marker2.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAAAeFBMVEUAAAD///////////////////////////////////////////////////////////////////////////+Tk5Obm5v8/PzAwMD5+fmWlpbt7e3k5OSfn5/z8/PLy8vn5+fExMSsrKyqqqrf39+vr6+9vb2urq7c3NxSmuRpAAAAE3RSTlMA+u2XA+PTrId4WBwTN7EKtLY4iqQP6AAAAWhJREFUOMudVe2SgjAMLN+goN51CxTLp3r3/m943BAqIJTR/RU6O02yTRY2g5tEgW9blu0HUeKyLRxDj0/ghcdVWuxYfAHLiV95B5uvwD4saK7DN+DMSj1f+CYu58l9J27A6XnnJG9R3ZWU6l4Vk+y6D310baHRXvUxdRSP/aYZILJbmebFLRNAlo69x7PEeQdZ5Xz8qiS6fJr8aOnEquATFApdSsr/v1HINUo+Q6nwoDDspfH4JmoJ6shzWcINaNBSlLCI6uvLfyXmAlR2xIKBB/A1ZKiGIGA+8QCtphBawRt+hsBnNvE0M0OPZmwcijRnFvE0U6CuIcbrIUlJRnJL9L0YifTQCgU3p/aH4I7fnWaCIajwMMszCl5A7Aj+TWctGuMT6qG4QtbGodBj9oAyjpke3LSDYXCXq9A8V6GZrsLGcqXlcrneW9elAQgpxdwA3rcUdv4ymdQHtrdvpPvW/LHZ7/8+/gBTWGFPbAkGiAAAAABJRU5ErkJggg==";
+
+
+    TRACK_DISTANCE_ROTATE2 = 18;
 }
 
 function COverlay()
@@ -77,6 +85,11 @@ COverlay.prototype =
         this.min_y = 0xFFFF;
         this.max_x = -0xFFFF;
         this.max_y = -0xFFFF;
+    },
+
+    GetImageTrackRotationImage : function()
+    {
+        return this.IsRetina ? window.g_track_rotate_marker2 : window.g_track_rotate_marker;
     },
 
     SetTransform : function(sx, shy, shx, sy, tx, ty)
@@ -1067,14 +1080,15 @@ CAutoshapeTrack.prototype =
                         }
                         else
                         {
-                            if (window.g_track_rotate_marker.asc_complete)
+                            var _image_track_rotate = overlay.GetImageTrackRotationImage();
+                            if (_image_track_rotate.asc_complete)
                             {
                                 var _w = IMAGE_ROTATE_TRACK_W;
-                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
+                                var _xI = (xC + 0.5 - _w / 2) >> 0;
                                 var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
 
                                 overlay.CheckRect(_xI, _yI, _w, _w);
-                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+                                ctx.drawImage(_image_track_rotate, _xI, _yI, _w, _w);
                             }
                         }
 
@@ -1258,7 +1272,8 @@ CAutoshapeTrack.prototype =
                         }
                         else
                         {
-                            if (window.g_track_rotate_marker.asc_complete)
+                            var _image_track_rotate = overlay.GetImageTrackRotationImage();
+                            if (_image_track_rotate.asc_complete)
                             {
                                 var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
                                 var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
@@ -1286,7 +1301,7 @@ CAutoshapeTrack.prototype =
 
 								ctx.translate(_xI, _yI);
 								ctx.transform(_px, _py, -_py, _px, 0, 0);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+                                ctx.drawImage(_image_track_rotate, -_w2, -_w2, _w, _w);
 
                                 overlay.SetBaseTransform();
 
@@ -1426,6 +1441,8 @@ CAutoshapeTrack.prototype =
 
                     if (isCanRotate)
                     {
+                        var xC = ((x1 + x2) / 2) >> 0;
+
                         if (!bIsUseImageRotateTrack)
                         {
                             ctx.beginPath();
@@ -1437,20 +1454,20 @@ CAutoshapeTrack.prototype =
                         }
                         else
                         {
-                            if (window.g_track_rotate_marker.asc_complete)
+                            var _image_track_rotate = overlay.GetImageTrackRotationImage();
+                            if (_image_track_rotate.asc_complete)
                             {
                                 var _w = IMAGE_ROTATE_TRACK_W;
-                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
+                                var _xI = (xC + 0.5 - _w / 2) >> 0;
                                 var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
 
                                 overlay.CheckRect(_xI, _yI, _w, _w);
-                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+                                ctx.drawImage(_image_track_rotate, _xI, _yI, _w, _w);
                             }
                         }
 
                         ctx.beginPath();
 
-                        var xC = ((x1 + x2) / 2) >> 0;
                         ctx.moveTo(xC + 0.5, y1);
                         ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
                         ctx.stroke();
@@ -1614,7 +1631,8 @@ CAutoshapeTrack.prototype =
                         }
                         else
                         {
-                            if (window.g_track_rotate_marker.asc_complete)
+                            var _image_track_rotate = overlay.GetImageTrackRotationImage();
+                            if (_image_track_rotate.asc_complete)
                             {
                                 var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
                                 var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
@@ -1642,7 +1660,7 @@ CAutoshapeTrack.prototype =
 
 								ctx.translate(_xI, _yI);
 								ctx.transform(_px, _py, -_py, _px, 0, 0);
-								ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+								ctx.drawImage(_image_track_rotate, -_w2, -_w2, _w, _w);
 
                                 overlay.SetBaseTransform();
 
@@ -1781,14 +1799,15 @@ CAutoshapeTrack.prototype =
                     }
                     else
                     {
-                        if (window.g_track_rotate_marker.asc_complete)
+                        var _image_track_rotate = overlay.GetImageTrackRotationImage();
+                        if (_image_track_rotate.asc_complete)
                         {
                             var _w = IMAGE_ROTATE_TRACK_W;
-                            var _xI = ((x1 + x2 - _w) / 2) >> 0;
+                            var _xI = (xC + 0.5 - _w / 2) >> 0;
                             var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
 
                             overlay.CheckRect(_xI, _yI, _w, _w);
-                            ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+                            ctx.drawImage(_image_track_rotate, _xI, _yI, _w, _w);
                         }
                     }
 
@@ -1907,7 +1926,8 @@ CAutoshapeTrack.prototype =
                     }
                     else
                     {
-                        if (window.g_track_rotate_marker.asc_complete)
+                        var _image_track_rotate = overlay.GetImageTrackRotationImage();
+                        if (_image_track_rotate.asc_complete)
                         {
                             var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
                             var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
@@ -1915,7 +1935,7 @@ CAutoshapeTrack.prototype =
                             var _w2 = IMAGE_ROTATE_TRACK_W / 2;
 
                             overlay.SetTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                            ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+                            ctx.drawImage(_image_track_rotate, -_w2, -_w2, _w, _w);
                             overlay.SetBaseTransform();
 
                             overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
@@ -2454,7 +2474,8 @@ CAutoshapeTrack.prototype =
 
     drawFlowAnchor : function(x, y)
     {
-        if (!window.g_flow_anchor || !window.g_flow_anchor.asc_complete || (!editor || !editor.ShowParaMarks))
+        var _flow_anchor = this.m_oOverlay.IsRetina ? window.g_flow_anchor2 : window.g_flow_anchor;
+        if (!_flow_anchor || !_flow_anchor.asc_complete || (!editor || !editor.ShowParaMarks))
             return;
 
         var overlay = this.m_oOverlay;
@@ -2475,7 +2496,7 @@ CAutoshapeTrack.prototype =
 
         __x -= 8;
 
-        overlay.CheckRect(__x,__y,16,17);
+        overlay.CheckRect(__x,__y,13,15);
 
         var ctx = overlay.m_oContext;
         var _oldAlpha = ctx.globalAlpha;
@@ -2483,7 +2504,7 @@ CAutoshapeTrack.prototype =
 
         overlay.SetBaseTransform();
 
-        ctx.drawImage(window.g_flow_anchor, __x, __y);
+        ctx.drawImage(_flow_anchor, __x, __y, 13, 15);
         ctx.globalAlpha = _oldAlpha;
     },
 

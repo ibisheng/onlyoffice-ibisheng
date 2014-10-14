@@ -723,7 +723,14 @@
     window.g_flow_anchor.onload = function(){
         window.g_flow_anchor.asc_complete = true;
     };
-    window.g_flow_anchor.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAARCAYAAADUryzEAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB90FEQkoAWe6v2gAAABoSURBVDjLzZRBDsAgCAQd0v9/eXpqokaxrWlSjgLL7kJELTsRWRIQ8BUAoIpKBhJlM8g8uCarfMbgJwCrVWX+HE8MGw1rJKyaRzVRP96R0jONFcVVrjmku2bWMrY9mJ5yz2YGzu5/cAJM80IX4Fh6ugAAAABJRU5ErkJggg==";
+    window.g_flow_anchor.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPBAMAAADNDVhEAAAAIVBMVEUAAAANDQ0NDQ0NDQ0NDQ0NDQ0AAAANDQ0NDQ0NDQ0NDQ1jk7YPAAAACnRSTlMAGkD4mb9c5s9TDghpXQAAAFZJREFUCNdjYGBgW8YABlxcIBLBZ1gAEfZa5QWiGRkWMAIpAaA4iHQE0YwODEtANMsChkIwv4BBWQBICyswMC1iWADEDAzKoUuDFUAGNC9uABvIaQkkABpxD6lFb9lRAAAAAElFTkSuQmCC";
+
+    window.g_flow_anchor2 = new Image();
+    window.g_flow_anchor2.asc_complete = false;
+    window.g_flow_anchor2.onload = function(){
+        window.g_flow_anchor2.asc_complete = true;
+    };
+    window.g_flow_anchor2.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAMAAAAFBf7qAAAAOVBMVEUAAAAAAAAAAAAAAAAJCQkAAAAJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQknI0ZQAAAAEnRSTlMAx9ITlAfyPHxn68yecTAl5qt6y0BvAAAAt0lEQVQoz8WS0QrDIAxFk0ajtlXb+/8fuzAprltg7Gnn4aIcvAgJTSSoBiGPoIAGV60qoquvIIL110IJgPONmKIlMI73MiwGRoZvahbKVSizcDKU8QeVPDXEIr6ShVB9VUEn2FOMkwL8VwjUtuypvDWiHeVTFeyWkZHfVQZHGm4XMhKQyJB9GKMxuHQSBlioF7u2q7kzgO2AcWwW3F8mWRmGKgyu91mK1Tzh4ixVVkBzJI/EnGjyACbfCaO3eIWRAAAAAElFTkSuQmCC";
 
 window['CGlobalFontLoader'] = CGlobalFontLoader;
 CGlobalFontLoader.prototype['SetStreamIndexEmb'] = CGlobalFontLoader.prototype.SetStreamIndexEmb;
