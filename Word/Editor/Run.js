@@ -3748,8 +3748,14 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         if(para_Math_Ampersand === ItemType)
         {
-            PointsInfo.NextAlignRange();
-            TempDx = PointsInfo.GetAlign();
+            if (null !== this.Parent)
+            {
+                var PointsInfo = new CMathPointInfo();
+                PointsInfo.SetInfoPoints(this.Parent.InfoPoints);
+
+                PointsInfo.NextAlignRange();
+                TempDx = PointsInfo.GetAlign();
+            }
         }
         else if ( para_Drawing != ItemType || true === Item.Is_Inline() )
         {
