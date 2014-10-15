@@ -1131,50 +1131,6 @@ CMathContent.prototype =
     ////////////////////////
 
     /// For Para Math
-
-    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
-    {
-        X = this.pos.x + this.ParaMath.X;
-        Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-
-        if(this.RecalcInfo.bEqqArray)
-        {
-            var PointInfo = new CMathPointInfo();
-            PointInfo.SetInfoPoints(this.InfoPoints);
-
-            X += PointInfo.GetAlign();
-
-            for(var i = 0; i < this.CurPos; i++)
-            {
-                if(this.content[i].Type == para_Math_Run)
-                {
-                    var res = this.content[i].Recalculate_CurPos(X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
-                    X = res.X;
-                }
-                else
-                    X += this.content[i].size.width;
-            }
-        }
-        else
-            X += this.WidthToElement[this.CurPos];
-
-
-        return this.content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
-
-    },
-    Check_NearestPos: function(ParaNearPos, Depth)
-    {
-        var ContentNearPos = new CParagraphElementNearPos();
-        ContentNearPos.NearPos = ParaNearPos.NearPos;
-        ContentNearPos.Depth   = Depth;
-
-        // CParagraphNearPos for ParaNearPos
-        this.NearPosArray.push( ContentNearPos );
-        ParaNearPos.Classes.push( this );
-
-        var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
-        this.Content[CurPos].Check_NearestPos( ParaNearPos, Depth + 1 );
-    },
     GetParent: function()
     {
         return this.Parent.GetParent();
@@ -1187,42 +1143,6 @@ CMathContent.prototype =
     /////////   Перемещение     ////////////
 
     // Поиск позиции, селект
-
-    Correct_Selection : function()
-    {
-        if (true !== this.Selection.Use)
-            return;
-
-        // Здесь мы делаем так, чтобы селект всегда начинался и заканчивался в ране.
-        // Предполагается, что контент скорректирован верно до выполнения данной функции.
-
-        var nContentLen = this.content.length;
-        var nStartPos = Math.max(0, Math.min(this.Selection.Start, nContentLen - 1));
-        var nEndPos   = Math.max(0, Math.min(this.Selection.End,   nContentLen - 1));
-
-        if (nStartPos > nEndPos)
-        {
-            var nTemp = nStartPos;
-            nStartPos = nEndPos;
-            nEndPos   = nTemp;
-        }
-
-        var oStartElement = this.content[nStartPos];
-        if (para_Math_Run !== oStartElement.Type)
-        {
-            // Предыдущий элемент должен быть раном
-            this.Selection.Start = nStartPos - 1;
-            this.content[this.Selection.Start].Set_SelectionAtEndPos();
-        }
-
-        var oEndElement = this.content[nEndPos];
-        if (para_Math_Run !== oEndElement.Type)
-        {
-            // Следующий элемент должен быть раном
-            this.Selection.End = nEndPos + 1;
-            this.content[this.Selection.End].Set_SelectionAtStartPos();
-        }
-    },
 
     Is_SelectedAll: function(Props)
     {
@@ -1254,7 +1174,8 @@ CMathContent.prototype =
     {
         return this.Id;
     },
-    SetRunEmptyToContent: function(bAll)
+
+    private_CorrectContent : function()
     {
         var len = this.content.length;
 
@@ -1274,9 +1195,6 @@ CMathContent.prototype =
                 bCurrEmptyRun = current.Type == para_Math_Run && current.Is_Empty();
 
             var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
-
-            if(bCurrComp && bAll == true)
-                this.content[currPos].SetRunEmptyToContent(bAll);
 
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
@@ -1327,8 +1245,8 @@ CMathContent.prototype =
 
             this.Internal_Content_Add(len, emptyRun);
         }
-
     },
+
     Correct_Content : function(bInnerCorrection)
     {
         if (true === bInnerCorrection)
@@ -1340,7 +1258,7 @@ CMathContent.prototype =
             }
         }
 
-        this.SetRunEmptyToContent(false);
+        this.private_CorrectContent();
 
         // Удаляем лишние пустые раны
         for (var nPos = 0, nLen = this.content.length; nPos < nLen - 1; nPos++)
@@ -1410,17 +1328,6 @@ CMathContent.prototype =
                 this.content[this.CurPos].Cursor_MoveToEndPos();
             }
         }
-    },
-
-    Create_FontMap : function(Map)
-    {
-        for (var index = 0; index < this.content.length; index++)
-            this.content[index].Create_FontMap( Map, this.Compiled_ArgSz ); // ArgSize компилируется только тогда, когда выставлены все ссылки на родительские классы
-    },
-    Get_AllFontNames: function(AllFonts)
-    {
-        for (var index = 0; index < this.content.length; index++)
-            this.content[index].Get_AllFontNames(AllFonts);
     },
 
     /// функции для работы с курсором
@@ -3853,6 +3760,30 @@ CMathContent.prototype.Get_Bounds = function()
 
     return {X : X, Y : Y, W : W, H : H};
 };
+CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+{
+    var X = this.pos.x + this.ParaMath.X;
+    var Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
+
+    if(this.RecalcInfo.bEqqArray)
+    {
+        var PointInfo = new CMathPointInfo();
+        PointInfo.SetInfoPoints(this.InfoPoints);
+        X += PointInfo.GetAlign();
+
+        for(var nPos = 0; nPos < this.CurPos; nPos++)
+        {
+            if(para_Math_Run === this.content[nPos].Type)
+                X = this.content[nPos].Recalculate_CurPos(X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo).X;
+            else
+                X += this.content[nPos].size.width;
+        }
+    }
+    else
+        X += this.WidthToElement[this.CurPos];
+
+    return this.content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+};
 CMathContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
     var nLength = this.content.length;
@@ -4383,4 +4314,51 @@ CMathContent.prototype.Select_Element = function(Element)
         this.Selection.Start = nPos;
         this.Selection.End   = nPos;
     }
+};
+CMathContent.prototype.Correct_Selection = function()
+{
+    if (true !== this.Selection.Use)
+        return;
+
+    // Здесь мы делаем так, чтобы селект всегда начинался и заканчивался в ране.
+    // Предполагается, что контент скорректирован верно до выполнения данной функции.
+
+    var nContentLen = this.content.length;
+    var nStartPos = Math.max(0, Math.min(this.Selection.Start, nContentLen - 1));
+    var nEndPos   = Math.max(0, Math.min(this.Selection.End,   nContentLen - 1));
+
+    if (nStartPos > nEndPos)
+    {
+        var nTemp = nStartPos;
+        nStartPos = nEndPos;
+        nEndPos   = nTemp;
+    }
+
+    var oStartElement = this.content[nStartPos];
+    if (para_Math_Run !== oStartElement.Type)
+    {
+        // Предыдущий элемент должен быть раном
+        this.Selection.Start = nStartPos - 1;
+        this.content[this.Selection.Start].Set_SelectionAtEndPos();
+    }
+
+    var oEndElement = this.content[nEndPos];
+    if (para_Math_Run !== oEndElement.Type)
+    {
+        // Следующий элемент должен быть раном
+        this.Selection.End = nEndPos + 1;
+        this.content[this.Selection.End].Set_SelectionAtStartPos();
+    }
+};
+
+CMathContent.prototype.Create_FontMap = function(Map)
+{
+    for (var nIndex = 0, nCount = this.content.length; nIndex < nCount; nIndex++)
+        this.content[nIndex].Create_FontMap(Map, this.Compiled_ArgSz); // ArgSize компилируется только тогда, когда выставлены все ссылки на родительские классы
+};
+
+CMathContent.prototype.Get_AllFontNames = function(AllFonts)
+{
+    for (var nIndex = 0, nCount = this.content.length; nIndex < nCount; nIndex++)
+        this.content[nIndex].Get_AllFontNames(AllFonts);
 };

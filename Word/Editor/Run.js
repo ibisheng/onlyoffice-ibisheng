@@ -786,6 +786,21 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
                     Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
                 }
+
+                if (para_Math_Run === this.Type && null !== this.Parent && true !== this.Parent.bRoot)
+                {
+                    var oBounds = this.Parent.Get_Bounds();
+
+                    var __Y0 = TargetY, __Y1 = TargetY + Height;
+                    var ___Y0 = oBounds.Y - 0.2 * oBounds.H;
+                    var ___Y1 = oBounds.Y + 1.4 * oBounds.H;
+
+                    __Y0 = Math.max( __Y0, ___Y0 );
+                    __Y1 = Math.min( __Y1, ___Y1 );
+
+                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+                    Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
+                }
             }
         }
 
