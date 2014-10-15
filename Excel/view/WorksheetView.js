@@ -5223,6 +5223,7 @@
 				oldW = ctxW;
 			}
 
+			// Перемещаем область
 			var moveHeight = oldH - lastRowHeight;
 			if (moveHeight > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight);
@@ -5234,22 +5235,33 @@
 				else
 					this.drawingGraphicCtx.moveImageData(x, y, oldW, moveHeight, x + dx, y - dy);
 			}
-			var clearTop = y + (scrollDown ? moveHeight - dy : 0);
-			moveHeight = Math.abs(dy) + lastRowHeight;
+			// Очищаем область
+			var clearTop = this.cellsTop + diffHeight + (scrollDown && moveHeight > 0 ? moveHeight : 0);
+			var clearHeight = (moveHeight > 0) ? Math.abs(dy) + lastRowHeight : ctxH - (this.cellsTop + diffHeight);
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(this.headersLeft, clearTop, ctxW, moveHeight);
-			this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, moveHeight);
+				.fillRect(this.headersLeft, clearTop, ctxW, clearHeight);
+			this.drawingGraphicCtx.clearRect(this.headersLeft, clearTop, ctxW, clearHeight);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
 
-			if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
-				var c1 = vr.c1;
-				var r1 = scrollDown ? oldEnd + (oldVRE_isPartial ? 0 : 1) : vr.r1;
-				var c2 = vr.c2;
-				var r2 = dy > 0 || oldH <= 0 ? vr.r2 : vr.r1 - 1 - delta; /* delta < 0 here */
-				var range = new asc_Range(c1, r1, c2, r2);
-				// Это необходимо для того, чтобы строки, у которых высота по тексту рассчитались (баг http://bugzserver/show_bug.cgi?id=21552)
+			// Дорисовываем необходимое
+			if (dy < 0 || vr.r2 !== oldEnd || oldVRE_isPartial || dx !== 0) {
+				var r1, r2;
+				if (moveHeight > 0) {
+					if (scrollDown) {
+						r1 = oldEnd + (oldVRE_isPartial ? 0 : 1);
+						r2 = vr.r2;
+					} else {
+						r1 = vr.r1;
+						r2 = vr.r1 - 1 - delta;
+					}
+				} else {
+					r1 = vr.r1;
+					r2 = vr.r2;
+				}
+				var range = new asc_Range(vr.c1, r1, vr.c2, r2);
+				// Это необходимо для того, чтобы строки, у которых высота по тексту, рассчитались (баг http://bugzserver/show_bug.cgi?id=21552)
 				this._prepareCellTextMetricsCache(range);
 				if (dx === 0) {
 					this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2);
@@ -5358,6 +5370,7 @@
 
 			this.objectRender.setScrollOffset();
 
+			// Перемещаем область
 			var moveWidth = oldW - lastColWidth;
 			if (moveWidth > 0) {
 				ctx.drawImage(ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH);
@@ -5369,22 +5382,32 @@
 				else
 					this.drawingGraphicCtx.moveImageData(x, y, moveWidth, ctxH, x - dx, y);
 			}
-
-			var clearLeft = x + (scrollRight > 0 ? moveWidth - dx : 0);
-			moveWidth = Math.abs(dx) + lastColWidth;
+			// Очищаем область
+			var clearLeft = this.cellsLeft + diffWidth + (scrollRight && moveWidth > 0 ? moveWidth : 0);
+			var clearWidth = (moveWidth > 0) ? Math.abs(dx) + lastColWidth : ctxW - (this.cellsLeft + diffWidth);
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
-				.fillRect(clearLeft, y, moveWidth, ctxH);
-			this.drawingGraphicCtx.clearRect(clearLeft, y, moveWidth, ctxH);
+				.fillRect(clearLeft, y, clearWidth, ctxH);
+			this.drawingGraphicCtx.clearRect(clearLeft, y, clearWidth, ctxH);
 
 			if(this.objectRender && this.objectRender.drawingArea)
 				this.objectRender.drawingArea.reinitRanges();
 
-			if ( !(dx > 0 && vr.c2 === oldEnd && !oldVCE_isPartial) ) {
-				var c1 = scrollRight ? oldEnd + (oldVCE_isPartial ? 0 : 1) : vr.c1;
-				var r1 = vr.r1;
-				var c2 = dx > 0 || oldW <= 0 ? vr.c2 : vr.c1 - 1 - delta; /* delta < 0 here */
-				var r2 = vr.r2;
-				var range = new asc_Range(c1, r1, c2, r2);
+			// Дорисовываем необходимое
+			if (dx < 0 || vr.c2 !== oldEnd || oldVCE_isPartial) {
+				var c1, c2;
+				if (moveWidth > 0) {
+					if (scrollRight) {
+						c1 = oldEnd + (oldVCE_isPartial ? 0 : 1);
+						c2 = vr.c2;
+					} else {
+						c1 = vr.c1;
+						c2 = vr.c1 - 1 - delta;
+					}
+				} else {
+					c1 = vr.c1;
+					c2 = vr.c2;
+				}
+				var range = new asc_Range(c1, vr.r1, c2, vr.r2);
 				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 				this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
