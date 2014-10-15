@@ -1374,6 +1374,10 @@ var gUndoInsDelCellsFlag = true;
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
 							{activeCells: activeCells, type: type, cellId: cellId}, null, currentFilter.Ref);
 						History.EndTransaction();
+						
+						if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+							ws._onUpdateFormatTable(sortRange.bbox, false);
+						
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
@@ -1395,6 +1399,10 @@ var gUndoInsDelCellsFlag = true;
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
 						History.EndTransaction();
+						
+						if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+							ws._onUpdateFormatTable(sortRange.bbox, false);
+						
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
@@ -2772,8 +2780,11 @@ var gUndoInsDelCellsFlag = true;
 				if(!customFilter)
 					this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyMF,
 						{activeCells: ar, autoFiltersObject: autoFiltersObject});
-
+				
 				this._reDrawFilters();
+				
+				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+					ws._onUpdateFormatTable(ar, false, true);
 			},
 			
 			_getAutoFilterArray: function(cell) {
