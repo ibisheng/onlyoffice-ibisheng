@@ -719,9 +719,9 @@ var gUndoInsDelCellsFlag = true;
 							}
 							
 							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
-								ws._onEndAddFormatTable(rangeFilter, true);
+								ws._onUpdateFormatTable(rangeFilter, true);
 							else if(isUpdateRange != null && paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
-								ws._onEndAddFormatTable(rangeFilter);
+								ws._onUpdateFormatTable(rangeFilter);
 							
 							History.EndTransaction();
 							if(isTurnOffHistory)
@@ -730,7 +730,7 @@ var gUndoInsDelCellsFlag = true;
 						else
 						{
 							if(isUpdateRange != null && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
-								ws._onEndAddFormatTable(isUpdateRange, recalc);
+								ws._onUpdateFormatTable(isUpdateRange, recalc);
 								
 							History.EndTransaction();
 							if(isTurnOffHistory)

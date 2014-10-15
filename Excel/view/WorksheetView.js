@@ -10808,9 +10808,17 @@
 			this._isLockedAll (onChangeAutoFilterCallback);
 		};
 
-		// При добавлении форматированной таблицы расширяем, автоподбор по названию столбца
-		WorksheetView.prototype._onEndAddFormatTable = function (range, recalc) {
+		/**
+		 * Обновление при изменениях форматированной таблицы
+		 * @param range - обновляемый диапазон (он же диапазон для выделения)
+		 * @param recalc - делать ли автоподбор по названию столбца
+		 * @private
+		 */
+		WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRows) {
 			if (!recalc) {
+				// При скрытии/открытии строк стоит делать update всему
+				if (changeRows)
+					this.isChanged = true;
 				// Пока вызовем updateRange, но стоит делать просто draw
 				this._updateCellsRange(range);
 				return;
