@@ -10812,6 +10812,7 @@
 		 * Обновление при изменениях форматированной таблицы
 		 * @param range - обновляемый диапазон (он же диапазон для выделения)
 		 * @param recalc - делать ли автоподбор по названию столбца
+		 * @param changeRows - менялись ли строки (скрытие раскрытие)
 		 * @private
 		 */
 		WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRows) {
