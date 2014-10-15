@@ -633,6 +633,13 @@ Complex.prototype = {
 
         var pStr = {pStr:rStr}, f = {f:undefined};
 
+        if ( rStr.length == 0 ) {
+            this.real = 0;
+            this.img = 0;
+            this.suffix = "i";
+            return this;
+        }
+
         if ( this.isImagUnit( pStr.pStr[0] ) && rStr.length == 1 ) {
             this.real = 0;
             this.img = 1;
@@ -644,7 +651,7 @@ Complex.prototype = {
             return new cError( cErrorType.not_numeric );
         }
 
-        switch ( pStr.pStr[0]+"" ) {
+        switch ( pStr.pStr[0] + "" ) {
             case '-':   // imag part follows
             case '+':
             {
@@ -1010,11 +1017,15 @@ cBIN2DEC.prototype.Calculate = function ( arg ) {
         arg0 = arg0.getElementRowCol( 0, 0 );
     }
 
-    arg0 = arg0.tocNumber();
+    arg0 = arg0.tocString();
 
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
 
     arg0 = arg0.getValue();
+
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
 
     if ( validBINNumber( arg0 ) ) {
         var substr = arg0.toString();
@@ -1063,9 +1074,13 @@ cBIN2HEX.prototype.Calculate = function ( arg ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
-    arg0 = arg0.tocNumber();
+    arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
     arg0 = arg0.getValue();
+
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
 
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
@@ -1121,9 +1136,13 @@ cBIN2OCT.prototype.Calculate = function ( arg ) {
         arg1 = arg1.getElementRowCol( 0, 0 );
     }
 
-    arg0 = arg0.tocNumber();
+    arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.not_numeric );
     arg0 = arg0.getValue();
+
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
 
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
@@ -1597,6 +1616,10 @@ cHEX2BIN.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
+
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
@@ -1659,6 +1682,10 @@ cHEX2DEC.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.getValue();
 
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
+
     if ( validHEXNumber( arg0 ) ) {
 
         arg0 = parseInt( arg0, NumberBase.HEX );
@@ -1706,6 +1733,10 @@ cHEX2OCT.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
+
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
 
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
@@ -2573,6 +2604,10 @@ cOCT2BIN.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
 
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
+
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
         if ( arg1 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
@@ -2635,6 +2670,10 @@ cOCT2DEC.prototype.Calculate = function ( arg ) {
 
     arg0 = arg0.getValue();
 
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
+
     if ( validOCTNumber( arg0 ) ) {
 
         arg0 = parseInt( arg0, NumberBase.OCT );
@@ -2682,6 +2721,10 @@ cOCT2HEX.prototype.Calculate = function ( arg ) {
     arg0 = arg0.tocString();
     if ( arg0 instanceof cError ) return this.value = new cError( cErrorType.wrong_value_type );
     arg0 = arg0.getValue();
+
+    if ( arg0.length == 0 ) {
+        arg0 = 0;
+    }
 
     if ( !(arg1 instanceof cUndefined) ) {
         arg1 = arg1.tocNumber();
