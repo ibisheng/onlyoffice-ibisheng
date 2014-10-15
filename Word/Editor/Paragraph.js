@@ -12367,6 +12367,8 @@ CParagraphContentPos.prototype =
             PRPos.Add( this.Data[Index] );
         }
 
+        PRPos.Depth = this.Depth;
+
         return PRPos;
     },
 
@@ -12669,6 +12671,7 @@ function CParagraphSearchPosXY()
     this.CurX           = 0;
     this.CurY           = 0;
     this.X              = 0;
+    this.Y              = 0;
     this.DiffX          = 1000000; // километра для ограничения должно хватить
     this.NumberingDiffX = 1000000; // километра для ограничения должно хватить
 

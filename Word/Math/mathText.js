@@ -749,39 +749,6 @@ CMathText.prototype =
         return false;
     },
     ////
-
-    // for Para Math
-    // for placeholder
-    Set_SelectionContentPos: function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
-    {
-        if(StartFlag == 0)
-            StartContentPos.Update2(0, Depth);
-
-
-        if(EndFlag == 0)
-            EndContentPos.Update2(1, Depth);
-    },
-    Selection_DrawRange : function(_CurLine, _CurRange, SelectionDraw)
-    {
-        SelectionDraw.W += this.size.width;
-        SelectionDraw.FindStart = false;
-    },
-    Get_ParaContentPos: function(bSelection, bStart, ContentPos)
-    {
-        if(bSelection)
-        {
-            var pos = bStart ? 0 : 1;
-            ContentPos.Add(pos);
-        }
-        else
-            ContentPos.Add(0);
-
-    },
-    Get_ParaContentPosByXY: function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-    {
-        SearchPos.Pos.Update2(0, Depth);
-        SearchPos.Pos.bPlaceholder = true;
-    },
     Copy: function()
     {
         var NewLetter = new CMathText(this.bJDraw);

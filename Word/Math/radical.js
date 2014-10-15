@@ -425,9 +425,13 @@ CRadical.prototype.kind      = MATH_RADICAL;
 
 CRadical.prototype.init = function(props)
 {
-    this.Fill_LogicalContent(2);
-
     this.setProperties(props);
+
+    if (true === this.Pr.degHide)
+        this.Fill_LogicalContent(1);
+    else
+        this.Fill_LogicalContent(2);
+
     this.fillContent();
 }
 CRadical.prototype.fillContent = function()
@@ -622,61 +626,6 @@ CRadical.prototype.setPosition = function(pos, PosInfo)
         this.RealBase.setPosition(PosBase, PosInfo);
     }
 }
-CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-{
-    var result = false;
-    if(this.Pr.type == SQUARE_RADICAL)
-    {
-        SearchPos.CurX += this.size.width - this.Base.size.width - this.GapRight;
-        if(this.Base.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
-        {
-            SearchPos.Pos.Update2(0, Depth);
-            SearchPos.Pos.Update2(0, Depth + 1);
-
-
-            SearchPos.InTextPos.Update(0, Depth);
-            SearchPos.InTextPos.Update(0, Depth + 1);
-
-
-            result = true;
-        }
-        SearchPos.CurX += this.GapRight;
-    }
-    else
-    {
-        SearchPos.CurX += this.GapLeft;
-        if(this.Iterator.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
-        {
-            SearchPos.Pos.Update2(0, Depth);
-            SearchPos.Pos.Update2(0, Depth + 1);
-
-
-            SearchPos.InTextPos.Update(0, Depth);
-            SearchPos.InTextPos.Update(0, Depth + 1);
-
-
-            result = true;
-        }
-
-        SearchPos.CurX += this.size.width - this.Iterator.size.width - this.Base.size.width - this.GapRight;
-
-        if(this.Base.Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
-        {
-            SearchPos.Pos.Update2(0, Depth);
-            SearchPos.Pos.Update2(1, Depth + 1);
-
-
-            SearchPos.InTextPos.Update(0, Depth);
-            SearchPos.InTextPos.Update(1, Depth + 1);
-
-            result = true;
-        }
-
-        SearchPos.CurX += this.GapRight;
-    }
-
-    return result;
-}
 CRadical.prototype.draw = function(x, y, pGraphics)
 {
     this.signRadical.draw(x, y, pGraphics);
@@ -684,7 +633,10 @@ CRadical.prototype.draw = function(x, y, pGraphics)
 }
 CRadical.prototype.getBase = function()
 {
-    return this.Content[1];
+    if (true === this.Pr.degHide)
+        return this.Content[0];
+    else
+        return this.Content[1];
 }
 CRadical.prototype.getDegree = function()
 {

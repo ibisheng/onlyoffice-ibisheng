@@ -417,99 +417,6 @@ CMatrixBase.prototype.getRowSpace = function(spaceRow, txtPrp)
 
     return lineGap;
 };
-CMatrixBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-{
-    var maxWH = this.getWidthsHeights();
-    var Widths = maxWH.widths;
-    var Heights = maxWH.heights;
-
-    var X = this.ParaMath.X + this.pos.x + this.GapLeft, // this.ParaMath.X + this.pos.x  совпадает с  SearchPos.CurX
-        Y = this.ParaMath.Y + this.pos.y;
-
-    var CurrX, CurrY,
-        W_CurX,
-        Diff = 100000000;
-
-    var W = 0, H = 0;
-
-    var rX, rY,
-        minR;
-
-    for(var i=0; i < this.nRow; i++)
-    {
-        for(var j=0; j < this.nCol; j++)
-        {
-            if(!this.elements[i][j].IsJustDraw())
-            {
-                var x1 = SearchPos.X - X - W,
-                    x2 = SearchPos.X - X - W - Widths[j],
-                    y1 = SearchPos.Y - Y - H,
-                    y2 = SearchPos.Y - Y - H - Heights[i];
-
-
-                var bInY = 0 < y1 && y2 < 0,
-                    bInX = 0 < x1 && x2 < 0;
-
-                rX = x1*x1 < x2*x2 ? x1 : x2;
-                rY = y1*y1 < y2*y2 ? y1 : y2;
-
-
-                if(bInY && bInX)
-                    minR = 0;
-                else if(!bInY && !bInX)
-                    minR = rX*rX + rY*rY;
-                else if(bInY)
-                    minR = rX*rX;
-                else
-                    minR = rY*rY;
-
-
-                if(Diff > minR)
-                {
-                    Diff = minR;
-
-                    CurrX = i;
-                    CurrY = j;
-                    W_CurX  = W;
-                }
-            }
-
-            W += Widths[j] + this.gaps.column[j];
-
-        }
-
-        W = 0;
-        H += Heights[i] + this.gaps.row[i];
-    }
-
-    var PrevSearchCurX = SearchPos.CurX;
-
-    SearchPos.CurX += this.GapLeft + W_CurX;
-
-    //var SearchCurX = SearchPos.CurX + this.GapLeft + W_CurX ;
-
-    if(this.kind === MATH_MATRIX)
-    {
-        SearchPos.CurX += this.align(CurrX, CurrY).x;
-    }
-
-
-    var result =  this.elements[CurrX][CurrY].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
-
-    if(result)
-    {
-        SearchPos.Pos.Update2(CurrX, Depth);
-        SearchPos.Pos.Update2(CurrY, Depth + 1);
-
-        SearchPos.InTextPos.Update(CurrX, Depth);
-        SearchPos.InTextPos.Update(CurrY, Depth + 1);
-
-    }
-
-    SearchPos.CurX = PrevSearchCurX + this.size.width;
-
-    return result;
-};
 
 function CMathMatrix(props)
 {
@@ -605,18 +512,6 @@ CMathMatrix.prototype.getMetrics = function(RPI)
 
     return {ascents: Ascents, descents: Descents, widths: Widths}
 };
-CMathMatrix.prototype.findDistance = function() // для получения позиции тагета
-{
-    var w = 0, h = 0;
-    //кол-во элементов gap равно кол-ву элементов в строке/столбце для удобства подсчета
-    for(var i = 0; i < this.CurPos_X; i++)
-        w += this.gaps.column[i];
-
-    for(var j = 0; j < this.CurPos_Y; j++)
-        h += this.gaps.row[j];
-
-    return {w : w, h: h };
-}
 CMathMatrix.prototype.setRowGapRule = function(rule, gap)
 {
     this.spaceRow.rule = rule;

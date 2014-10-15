@@ -1693,7 +1693,7 @@ ParaHyperlink.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 //-----------------------------------------------------------------------------------
 ParaHyperlink.prototype.Set_SelectionContentPos = function(StartContentPos, EndContentPos, Depth, StartFlag, EndFlag)
 {
-    var Selection = this.State.Selection;
+    var Selection = this.Selection;
 
     var OldStartPos = Selection.StartPos;
     var OldEndPos   = Selection.EndPos;
@@ -1783,7 +1783,7 @@ ParaHyperlink.prototype.Selection_Stop = function()
 
 ParaHyperlink.prototype.Selection_Remove = function()
 {
-    var Selection = this.State.Selection;
+    var Selection = this.Selection;
 
     if ( true === Selection.Use )
     {
@@ -1814,22 +1814,22 @@ ParaHyperlink.prototype.Select_All = function(Direction)
 {
     var ContentLen = this.Content.length;
 
-    var Selection = this.State.Selection;
+    var Selection = this.Selection;
 
     Selection.Use = true;
 
     if ( -1 === Direction )
     {
-        Selection.StartPos = this.Content.length - 1;
+        Selection.StartPos = ContentLen - 1;
         Selection.EndPos   = 0;
     }
     else
     {
         Selection.StartPos = 0;
-        Selection.EndPos   = this.Content.length - 1;
+        Selection.EndPos   = ContentLen - 1;
     }
 
-    for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
     {
         this.Content[CurPos].Select_All( Direction );
     }

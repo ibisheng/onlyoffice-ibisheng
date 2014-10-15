@@ -254,8 +254,8 @@ CDegree.prototype.init = function(props)
 };
 CDegree.prototype.fillContent = function()
 {
-    this.iterContent = this.Content[0];
-    this.baseContent = this.Content[1];
+    this.iterContent = this.Content[1];
+    this.baseContent = this.Content[0];
 
     CDegree.superclass.fillContent.apply(this, arguments);
 };
@@ -558,8 +558,16 @@ CDegreeSubSup.prototype.init = function(props)
 
 CDegreeSubSup.prototype.fillContent = function()
 {
-    this.baseContent = this.Content[2];
-    this.iters       = new CIterators(this.Content[1], this.Content[0]);
+    if (DEGREE_SubSup === this.Pr.type)
+    {
+        this.baseContent = this.Content[0];
+        this.iters = new CIterators(this.Content[2], this.Content[1]);
+    }
+    else
+    {
+        this.baseContent = this.Content[2];
+        this.iters = new CIterators(this.Content[1], this.Content[0]);
+    }
 
     CDegreeSubSup.superclass.fillContent.apply(this, arguments);
 };

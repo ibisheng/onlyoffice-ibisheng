@@ -3701,38 +3701,6 @@ CDelimiter.prototype.setPosition = function(position, PosInfo)
     content.setPosition(PosContent); // CMathContent*/
 
 }
-CDelimiter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-{
-    var begWidth = this.begOper.size.width,
-        sepWidth = this.sepOper.size.width,
-        endWidth = this.endOper.size.width;
-
-    SearchPos.CurX += begWidth + this.GapLeft;
-
-    var result;
-
-    for(var j = 0; j < this.nCol; j++)
-    {
-        if(this.elements[0][j].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd))
-        {
-            SearchPos.Pos.Update2(0, Depth);
-            SearchPos.Pos.Update2(j, Depth+1);
-
-            SearchPos.InTextPos.Update(0, Depth);
-            SearchPos.InTextPos.Update(j, Depth + 1);
-
-            result = true;
-        }
-
-        if(j < this.nCol - 1)
-            SearchPos.CurX += sepWidth;
-    }
-
-    SearchPos.CurX += endWidth + this.GapRight;
-
-    return result;
-
-}
 CDelimiter.prototype.draw = function(x, y, pGraphics)
 {
     this.begOper.draw(x, y, pGraphics);
@@ -3834,29 +3802,6 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
 
         this.operator.setPosition(PosOper);
     }
-}
-CCharacter.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
-{
-    var align = (this.size.width - this.elements[0][0].size.width - this.GapLeft - this.GapRight)/2;
-
-    SearchPos.CurX += this.GapLeft + align;
-
-    var result = this.elements[0][0].Get_ParaContentPosByXY(SearchPos, Depth+2, _CurLine, _CurRange, StepEnd);
-
-    if(result)
-    {
-        SearchPos.Pos.Update2(0, Depth);
-        SearchPos.Pos.Update2(0, Depth+1);
-
-
-        SearchPos.InTextPos.Update(0, Depth);
-        SearchPos.InTextPos.Update(0, Depth + 1);
-
-    }
-
-    SearchPos.CurX += this.GapRight + align;
-
-    return result;
 }
 CCharacter.prototype.draw = function(x, y, pGraphics)
 {
