@@ -5015,12 +5015,63 @@ CChartSpace.prototype =
         {
             var b_checkEmpty = this.checkEmptySeries();
             this.bEmptySeries = b_checkEmpty;
-            if(b_checkEmpty)
-                return;
+
             var plot_area = this.chart.plotArea;
             var chart_object = plot_area.chart;
             var i;
             var chart_type = chart_object.getObjectType();
+            if(b_checkEmpty)
+            {
+                if(chart_type === historyitem_type_ScatterChart)
+                {
+                    var axis = chart_object.axId;
+                    var x_ax, y_ax;
+                    y_ax = this.chart.plotArea.valAx;
+                    x_ax = this.chart.plotArea.catAx;
+                    y_ax.labels  = null;
+                    x_ax.labels  = null;
+                    y_ax.posX  = null;
+                    x_ax.posY  = null;
+                    y_ax.posY  = null;
+                    x_ax.posX  = null;
+                }
+                else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
+                    || (chart_type === historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
+                {
+                    var axis = chart_object.axId;
+                    var cat_ax, val_ax;
+                    val_ax = this.chart.plotArea.valAx;
+                    cat_ax = this.chart.plotArea.catAx;
+                    if(val_ax && cat_ax)
+                    {
+                        val_ax.labels  = null;
+                        cat_ax.labels  = null;
+
+                        val_ax.posX  = null;
+                        cat_ax.posY  = null;
+                        val_ax.posY  = null;
+                        cat_ax.posX  = null;
+                    }
+                }
+                else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
+                {
+                    var cat_ax, val_ax;
+                    var axis_by_types = chart_object.getAxisByTypes();
+                    cat_ax = axis_by_types.catAx[0];
+                    val_ax = axis_by_types.valAx[0];
+                    if(cat_ax && val_ax)
+                    {
+                        val_ax.labels  = null;
+                        cat_ax.labels  = null;
+
+                        val_ax.posX  = null;
+                        cat_ax.posY  = null;
+                        val_ax.posY  = null;
+                        cat_ax.posX  = null;
+                    }
+                }
+                return;
+            }
             if(chart_type === historyitem_type_ScatterChart)
             {
                 var gap_hor_axis = 4;
