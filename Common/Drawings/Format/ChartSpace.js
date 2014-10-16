@@ -897,11 +897,16 @@ CChartSpace.prototype =
     {
         if( this.checkIntersectionChangedRange(data))
         {
-            this.handleUpdateInternalChart();
-            this.recalcInfo.recalculateReferences = true;
-            this.checkSeriesRefs(this.clearCacheVal);
+            this.checkRemoveCache();
             this.recalculate();
         }
+    },
+
+    checkRemoveCache: function()
+    {
+        this.handleUpdateInternalChart();
+        this.recalcInfo.recalculateReferences = true;
+        this.checkSeriesRefs(this.clearCacheVal);
     },
 
     getTypeSubType: function()

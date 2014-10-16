@@ -83,6 +83,8 @@ CGroupShape.prototype =
         this.bDeleted = pr;
     },
 
+
+
     setBDeleted2: function(pr)
     {
         this.bDeleted = pr;
@@ -96,6 +98,14 @@ CGroupShape.prototype =
             {
                 this.spTree[i].bDeleted = pr;
             }
+        }
+    },
+
+    checkRemoveCache: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].checkRemoveCache && this.spTree[i].checkRemoveCache();
         }
     },
 

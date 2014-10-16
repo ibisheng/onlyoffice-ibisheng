@@ -3102,7 +3102,8 @@
 					
 					drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
 					drawingObject.graphicObject.setWorksheet(ws.model);
-					
+
+                    drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
 					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 
 					drawingObject.graphicObject.addToDrawingObjects();
@@ -3222,8 +3223,9 @@
 					
 					drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
 					drawingObject.graphicObject.setWorksheet(ws.model);
-					
-					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
+
+                    drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
+                    //drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 					drawingObject.graphicObject.recalculate();
 					drawingObject.graphicObject.addToDrawingObjects();
                     drawingObject.graphicObject.recalculateTransform();
