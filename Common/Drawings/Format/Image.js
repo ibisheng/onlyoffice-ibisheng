@@ -150,10 +150,8 @@ CImageShape.prototype =
 
     sendMouseData: function()
     {
-
         if ( true === this.Lock.Is_Locked() )
         {
-
             var MMData = new CMouseMoveData();
             var Coords = editor.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(this.x, this.y, this.parent.num, null);
             MMData.X_abs            = Coords.X - 5;

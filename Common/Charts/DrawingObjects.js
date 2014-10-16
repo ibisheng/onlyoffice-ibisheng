@@ -2658,8 +2658,6 @@ function DrawingObjects() {
             window["Asc"]["editor"]._loadFonts(font_map,
                 function()
                 {
-
-
                     var min_r = 0, max_r = 0, min_c = 0, max_c = 0;
 
                     var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
