@@ -8070,7 +8070,8 @@ Paragraph.prototype =
 
     private_CorrectNearestPos : function(ContentPos, Anchor, Drawing)
     {
-        if (true !== Anchor && undefined !== Drawing && null !== Drawing)
+        // Не разрешаем вставлять и привязывать любые объекты к формуле
+        if (undefined !== Drawing && null !== Drawing)
         {
             var CurPos = ContentPos.Get(0);
             if (para_Math === this.Content[CurPos].Type)

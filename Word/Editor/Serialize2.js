@@ -7259,6 +7259,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadParagraph(t,l, oNewParagraph, Content);
             });
+            oNewParagraph.Correct_Content();
             //Prev/Next
             if(null != this.lastPar)
             {
