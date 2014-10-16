@@ -3198,7 +3198,10 @@
 			if (row >= this.nRowsCount)
 				this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
 
-			this._initCellsArea();
+			this.visibleRange.r2 = 0;
+			this._calcVisibleRows();
+			this.visibleRange.c2 = 0;
+			this._calcVisibleColumns();
 			this.handlers.trigger("reinitializeScroll");
 
 			this.objectRender.drawingArea.init();
