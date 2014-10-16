@@ -7262,7 +7262,8 @@ var gUndoInsDelCellsFlag = true;
 
 				this._reDrawFilters();
 				
-				ws._onUpdateFormatTable(oldFilter.Ref, false, true);
+				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+					ws._onUpdateFormatTable(oldFilter.Ref, false, true);
 			},
 			
 			_isFilterColumnsContainFilter: function(filterColumns)
