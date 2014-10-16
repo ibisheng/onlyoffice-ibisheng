@@ -1244,6 +1244,21 @@ Paragraph.prototype.private_RecalculateLineCheckRangeY = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineBreakPageEnd= function(CurLine, CurPage, PRS, ParaPr)
 {
+    // Здесь проверяем специальный случай, когда у нас после PageBreak в параграфе ничего не идет кроме
+    // плавающих объектов. В такой ситуации мы располагаем эти объекты на текущей странице (см. DemoHyden v2).
+
+    if (true === PRS.NewPage && true === this.Check_BreakPageEnd(PRS.PageBreak))
+    {
+        PRS.PageBreak.Flags.NewLine = false;
+        PRS.ExtendBoundToBottom     = true;
+        PRS.SkipPageBreak           = true;
+        PRS.RecalcResult            = recalcresult_CurLine;
+        return false;
+    }
+};
+
+Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
+{
     if ( true === PRS.NewPage )
     {
         // Если это последний элемент параграфа, тогда нам не надо переносить текущий параграф
@@ -1267,10 +1282,7 @@ Paragraph.prototype.private_RecalculateLineBreakPageEnd= function(CurLine, CurPa
         PRS.RecalcResult = recalcresult_NextPage;
         return false;
     }
-};
 
-Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
-{
     if (true !== PRS.End)
     {
         if ( true === PRS.ForceNewPage )

@@ -16145,7 +16145,7 @@ CTable.prototype =
                 CurGridCol += GridSpan;
             }
 
-            if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowH.Value > Y_content_end )
+            if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowH.Value > Y_content_end && ((0 === CurRow && 0 === CurPage) || CurRow != FirstRow))
             {
                 bNextPage = true;
 
