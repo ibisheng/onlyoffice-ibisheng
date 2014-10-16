@@ -4181,6 +4181,10 @@ drawDoughnutChart.prototype =
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var pxToMm = this.chartProp.pxToMM;
+		
+		if(!this.paths.series[ser][val])
+			return;
+		
 		var path = this.paths.series[ser][val].ArrPathCommand;
 		var x1 = path[0].X;
 		var y1 = path[0].Y;
