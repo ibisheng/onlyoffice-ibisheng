@@ -5850,7 +5850,7 @@ Paragraph.prototype =
 
         if ( undefined !== NearPos )
         {
-            if ( this === NearPos.Paragraph && ( ( true === this.Selection.Use && ((NearPos.ContentPos.Compare( SelSP ) >= 0 && NearPos.ContentPos.Compare( SelEP ) <= 0) || (NearPos.SearchPos.Compare( SelSP ) >= 0 && NearPos.SearchPos.Compare( SelEP ) <= 0)) ) || true === this.ApplyToAll ) )
+            if (this === NearPos.Paragraph && ((true === this.Selection.Use && true === this.Selection_CheckParaContentPos(NearPos.ContentPos)) || true === this.ApplyToAll))
                 return true;
 
             return false;
@@ -5865,16 +5865,30 @@ Paragraph.prototype =
             
             if ( true === SearchPosXY.InText )
             {
-                var CurPos = SearchPosXY.InTextPos.Get(0);
-
-                if ( SearchPosXY.InTextPos.Compare( SelSP ) >= 0 && SearchPosXY.InTextPos.Compare( SelEP ) <= 0 && ( para_Math !== this.Content[CurPos].Type || true !== this.Content[CurPos].Selection_IsPlaceholder() ) )
-                    return true;
+                return this.Selection_CheckParaContentPos(SearchPosXY.InTextPos);
             }
 
             return false;
         }
 
         return false;
+    },
+
+    /**
+     * Проверяем попадание заданной позиции в селект. Сравнение стартовой и конечной позиций с заданной не совпадает
+     * с работой данной функии, например в формулах.
+     * @param ContentPos Заданная позиция в параграфе.
+     */
+    Selection_CheckParaContentPos : function(ContentPos)
+    {
+        var CurPos = ContentPos.Get(0);
+
+        if (this.Selection.StartPos <= CurPos && CurPos <= this.Selection.EndPos)
+            return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, 1, this.Selection.StartPos === CurPos, CurPos === this.Selection.EndPos);
+        else (this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
+            return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, 1, this.Selection.EndPos === CurPos, CurPos === this.Selection.StartPos);
+
+       return false;
     },
 
     Selection_CalculateTextPr : function()
@@ -12370,6 +12384,17 @@ CParagraphContentPos.prototype =
         PRPos.Depth = this.Depth;
 
         return PRPos;
+    },
+
+    Copy_FromDepth : function(ContentPos, Depth)
+    {
+        var Count = ContentPos.Data.length;
+        for (var CurDepth = Depth; CurDepth < Count; CurDepth++)
+        {
+            this.Update2(ContentPos.Data[CurDepth], CurDepth);
+        }
+
+        this.Depth = ContentPos.Depth;
     },
 
     Compare : function(Pos)

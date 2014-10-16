@@ -1206,14 +1206,14 @@ ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 
         var CurX = SearchPos.CurX;
 
-        Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-
         if ( D >= - 0.001 && D <= Dx + 0.001 )
         {
+            Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+
             SearchPos.InText = true;
             SearchPos.DiffX  = 0.001;
 
-            SearchPos.InTextPos = SearchPos.Pos.Copy();
+            SearchPos.InTextPos.Copy_FromDepth(SearchPos.Pos, Depth);
         }
 
         SearchPos.CurX = CurX + Dx;
@@ -1411,6 +1411,11 @@ ParaMath.prototype.Selection_IsPlaceholder = function()
 ParaMath.prototype.Selection_CheckParaEnd = function()
 {
     return false;
+};
+
+ParaMath.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
+{
+    return this.Root.Selection_CheckParaContentPos(ContentPos, Depth, bStart, bEnd);
 };
 
 ParaMath.prototype.Is_SelectedAll = function(Props)

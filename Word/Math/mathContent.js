@@ -4362,3 +4362,14 @@ CMathContent.prototype.Get_AllFontNames = function(AllFonts)
     for (var nIndex = 0, nCount = this.content.length; nIndex < nCount; nIndex++)
         this.content[nIndex].Get_AllFontNames(AllFonts);
 };
+CMathContent.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
+{
+    var CurPos = ContentPos.Get(Depth);
+
+    if (this.Selection.Start <= CurPos && CurPos <= this.Selection.End)
+        return this.content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.Start === CurPos, bEnd && CurPos === this.Selection.End);
+    else if (this.Selection.End <= CurPos && CurPos <= this.Selection.Start)
+        return this.content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.End === CurPos, bEnd && CurPos === this.Selection.Start);
+
+    return false;
+};

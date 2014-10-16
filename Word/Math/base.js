@@ -613,7 +613,6 @@ CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
         this.Content[nPos].Recalculate_Reset(StartRange, StartLine);
     }
 };
-
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
 {
     for (var nIndex = 0; nIndex < nCount; nIndex++)
@@ -741,7 +740,6 @@ CMathBase.prototype.Create_FontMap = function(Map)
     for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
         this.Content[nIndex].Create_FontMap(Map);
 };
-
 CMathBase.prototype.Recalculate_CurPos = function(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
 {
     return this.Content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
@@ -849,13 +847,28 @@ CMathBase.prototype.Select_WholeElement = function()
     if (null !== this.Parent)
         this.Parent.Select_Element(this);
 };
-CMathBase.prototype.Set_SelectionContentPos = ParaHyperlink.prototype.Set_SelectionContentPos;
-CMathBase.prototype.Get_LeftPos             = ParaHyperlink.prototype.Get_LeftPos;
-CMathBase.prototype.Get_RightPos            = ParaHyperlink.prototype.Get_RightPos;
-CMathBase.prototype.Get_WordStartPos        = ParaHyperlink.prototype.Get_WordStartPos;
-CMathBase.prototype.Get_WordEndPos          = ParaHyperlink.prototype.Get_WordEndPos;
-CMathBase.prototype.Selection_Remove        = ParaHyperlink.prototype.Selection_Remove;
-CMathBase.prototype.Select_All              = ParaHyperlink.prototype.Select_All;
+CMathBase.prototype.Set_SelectionContentPos       = ParaHyperlink.prototype.Set_SelectionContentPos;
+CMathBase.prototype.Get_LeftPos                   = ParaHyperlink.prototype.Get_LeftPos;
+CMathBase.prototype.Get_RightPos                  = ParaHyperlink.prototype.Get_RightPos;
+CMathBase.prototype.Get_WordStartPos              = ParaHyperlink.prototype.Get_WordStartPos;
+CMathBase.prototype.Get_WordEndPos                = ParaHyperlink.prototype.Get_WordEndPos;
+CMathBase.prototype.Selection_Remove              = ParaHyperlink.prototype.Selection_Remove;
+CMathBase.prototype.Select_All                    = ParaHyperlink.prototype.Select_All;
+CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
+{
+    if (true !== this.Selection.Use)
+        return false;
+
+    var CurPos = ContentPos.Get(Depth);
+
+    if (this.Selection.StartPos === this.Selection.EndPos && this.Selection.StartPos === CurPos)
+        return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart, bEnd);
+
+    if (this.Selection.StartPos !== this.Selection.EndPos)
+        return true;
+
+    return false;
+};
 
 function CMathBasePr()
 {

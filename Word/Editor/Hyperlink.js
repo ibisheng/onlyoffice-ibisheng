@@ -1876,6 +1876,18 @@ ParaHyperlink.prototype.Selection_CheckParaEnd = function()
     return false;
 };
 
+ParaHyperlink.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
+{
+    var CurPos = ContentPos.Get(Depth);
+
+    if (this.Selection.StartPos <= CurPos && CurPos <= this.Selection.EndPos)
+        return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.StartPos === CurPos, bEnd && CurPos === this.Selection.EndPos);
+    else if (this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
+        return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.EndPos === CurPos, bEnd && CurPos === this.Selection.StartPos);
+
+    return false;
+};
+
 ParaHyperlink.prototype.Is_SelectedAll = function(Props)
 {
     var Selection = this.State.Selection;

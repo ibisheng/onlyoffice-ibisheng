@@ -4524,6 +4524,26 @@ ParaRun.prototype.Selection_CheckParaEnd = function()
 
     return false;
 };
+
+ParaRun.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
+{
+    var CurPos = ContentPos.Get(Depth);
+
+    if (this.Selection.StartPos <= this.Selection.EndPos && this.Selection.StartPos <= CurPos && CurPos <= this.Selection.EndPos)
+    {
+        if (((true !== bEnd)   || (true === bEnd   && CurPos !== this.Selection.EndPos)) &&
+            ((true !== bStart) || (true === bStart && CurPos !== this.Selection.StartPos)))
+            return true;
+    }
+    else if (this.Selection.StartPos > this.Selection.EndPos && this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
+    {
+        if (((true !== bEnd)   || (true === bEnd   && CurPos !== this.Selection.StartPos)) &&
+            ((true !== bStart) || (true === bStart && CurPos !== this.Selection.EndPos)))
+            return true;
+    }
+
+    return false;
+};
 //-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
 //-----------------------------------------------------------------------------------
