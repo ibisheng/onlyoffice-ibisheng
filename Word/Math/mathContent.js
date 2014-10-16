@@ -32,9 +32,8 @@
 
 function CRPI()
 {
-    //this.UpdateMathPr    = true;
     this.NeedResize      = true;
-    this.bInsideFraction = false;
+    this.bDecreasedComp  = false;
     this.bInline         = false;
     this.bChangeInline   = false;
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
@@ -46,8 +45,9 @@ CRPI.prototype.Copy = function()
 {
     var RPI = new CRPI();
 
+    RPI.NeedResize      = this.NeedResize;
     RPI.bInline         = this.bInline;
-    RPI.bInsideFraction = this.bInsideFraction;
+    RPI.bDecreasedComp  = this.bDecreasedComp;
     RPI.bChangeInline   = this.bChangeInline;
     RPI.bNaryInline     = this.bNaryInline;
     RPI.bEqqArray       = this.bEqqArray;
@@ -324,17 +324,23 @@ var COEFF_GAPS = new CCoeffGaps();
 
 function CMathArgSize()
 {
-    this.value       = 0;
+    this.value       = undefined;
 }
 CMathArgSize.prototype =
 {
     decrease: function()
     {
+        if(this.value == undefined)
+            this.value = 0;
+
         if( this.value > -2 )
             this.value--;
     },
     increase: function()
     {
+        if(this.value == undefined)
+            this.value = 0;
+
         if(this.value < 2)
             this.value++;
     },
@@ -361,29 +367,44 @@ CMathArgSize.prototype =
     },
     Merge: function(ArgSize)
     {
+        if(this.value == undefined)
+            this.value = 0;
+
+        if(ArgSize.value == undefined)
+            ArgSize.value = 0;
+
         this.SetValue(this.value + ArgSize.value);
     }
 }
 
-function CMathGapsInfo(oMeasure, Parent, argSize)
+function CMathGapsInfo(argSize)
 {
-    this.measure = oMeasure;
+    //this.measure = oMeasure;
 
-    this.Parent   = Parent;
-    this.ParaMath = this.Parent.ParaMath; // для Para_Run
+    //this.Parent   = Parent;
+    //this.ParaMath = this.Parent.ParaMath; // для Para_Run
 
     this.argSize = argSize; // argSize выставляем один раз для всего контента
-    this.leftRunPrp = null; // Run_Prp левого элемента
-    this.currRunPrp = null;
+    //this.leftRunPrp = null; // Run_Prp левого элемента
+    //this.currRunPrp = null;
 
-    this.Left = null;       // элемент слева
+    this.Left    = null;    // элемент слева
     this.Current = null;    // текущий элемент
+
+    this.LeftFontSize    = null;
+    this.CurrentFontSize = null;
 
 }
 CMathGapsInfo.prototype =
 {
-    setGaps: function()
+    setGaps: function(Current, CurrentFontSize)
     {
+        this.Left = this.Current;
+        this.LeftFontSize = this.CurrentFontSize;
+
+        this.Current = Current;
+        this.CurrentFontSize = CurrentFontSize;
+
         if(this.argSize < 0)
         {
             this.Current.GapLeft = 0;
@@ -458,12 +479,12 @@ CMathGapsInfo.prototype =
             leftCoeff = Math.ceil(leftCoeff*10)/10;
             rightCoeff = Math.ceil(rightCoeff*10)/10;
 
-            var LGapSign = 0.1513*this.currRunPrp.FontSize;
+            var LGapSign = 0.1513*this.CurrentFontSize;
             this.Current.GapLeft = Math.ceil(leftCoeff*LGapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
 
             if(this.Left != null)
             {
-                var RGapSign = 0.1513*this.leftRunPrp.FontSize;
+                var RGapSign = 0.1513*this.LeftFontSize;
                 this.Left.GapRight = Math.ceil(rightCoeff*RGapSign*10)/10;
             }
         }
@@ -752,7 +773,7 @@ CMathContent.prototype =
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },*/
 
-    Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // пересчитываем всю формулу
+    old_Resize: function(oMeasure, Parent, ParaMath, ArgSize, RPI)      // пересчитываем всю формулу
     {
         if(ArgSize !== null && ArgSize !== undefined)
         {
@@ -826,19 +847,7 @@ CMathContent.prototype =
             this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
         }
     },
-    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)    // особый случай: вызываем, когда пересчет всей формулы не нужен, а нужно выставить только Lines (Реализована, чтобы не править Resize у каждого элемента)
-    {
-        var lng = this.content.length;
-        for(var i = 0; i < lng; i++)
-        {
-            if(this.content[i].Type == para_Math_Composition)
-                this.content[i].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
-            else
-                this.content[i].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, ArgSize, null);
-        }
-    },
-    M_Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)      // если делать один цикл for для Resize, то надо избавиться от WidthToElement,
-                                                                      // т.к. корректно рассчитывать не получается, либо выставлять WidthToElement для пустыx Run (которые идут после мат объекта) на recalculateSize_2 мат объекта
+    PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {
         if(ArgSize !== null && ArgSize !== undefined)
         {
@@ -853,83 +862,82 @@ CMathContent.prototype =
             this.Parent = Parent;
         }
 
-        this.WidthToElement.length = 0;
-
-        var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
-
-		if (!this.bRoot && this.content.length == 0)
-			this.fillPlaceholders();
-
-        this.RecalcInfo.bEqqArray = RPI.bEqqArray;
+        if(ArgSize !== null && ArgSize !== undefined)
+        {
+            this.Compiled_ArgSz.value = this.ArgSize.value;
+            this.Compiled_ArgSz.Merge(ArgSize);
+        }
 
         var lng = this.content.length;
 
-        this.size.SetZero();
-
-        this.InfoPoints.SetDefault();
-
-        var PosUpdate = -1;
-
-        var bEmptyRun;
+        var GapsInfo = new CMathGapsInfo(this.Compiled_ArgSz.value);
 
         for(var pos = 0; pos < lng; pos++)
         {
-            bEmptyRun = this.content[pos].Type == para_Math_Run && this.content[pos].Is_Empty();
-
             if(this.content[pos].Type == para_Math_Composition)
             {
-                this.content[pos].SetGaps(GapsInfo);
+                this.content[pos].PreRecalc(this, ParaMath, this.Compiled_ArgSz, RPI, GapsInfo);
             }
             else if(this.content[pos].Type == para_Math_Run)
-                this.content[pos].Math_SetGaps(GapsInfo);
-
-            // если пропускаем расчет одного из элементов, то WidthToElement будет неправильно выставлен
-            // если выставлять WidthToElement на recalculateSize_2, то WidthToElement не будет выставлен для пустых Run
-            this.WidthToElement[pos] = this.size.width;
-
-            // для случая если между двумя мат объектами стоит пустой Run, то Gaps должны рассчитываться между двумя этими мат объектами
-            // и при расчете должны сначала выставиться у правого мат объекта Gaps, а потом рассчитываться размер левого объекта
-            if(!bEmptyRun)
-            {
-                if(PosUpdate >= 0)
-                    this.recalculateSize_2(PosUpdate, oMeasure, Parent, ParaMath, RPI);
-
-                PosUpdate = pos;
-            }
+                this.content[pos].Math_PreRecalc(this, ParaMath, this.Compiled_ArgSz, RPI, GapsInfo);
         }
 
         if(GapsInfo.Current !== null)
             GapsInfo.Current.GapRight = 0;
 
-        if(PosUpdate != -1)
-            this.recalculateSize_2(PosUpdate, oMeasure, Parent, ParaMath, RPI);
-
     },
-    recalculateSize_2: function(pos, oMeasure, Parent, ParaMath, RPI)
+    Resize: function(oMeasure, RPI)      // пересчитываем всю формулу
     {
-        if(this.content[pos].Type == para_Math_Composition)
+        this.WidthToElement.length = 0;
+        this.RecalcInfo.bEqqArray = RPI.bEqqArray;
+
+        var lng = this.content.length;
+
+        this.size.SetZero();
+        this.InfoPoints.SetDefault();
+
+        for(var pos = 0; pos < lng; pos++)
         {
-            var NewRPI = RPI.Copy();
-            NewRPI.bEqqArray    = false;
+            if(this.content[pos].Type == para_Math_Composition)
+            {
+                var NewRPI = RPI.Copy();
+                NewRPI.bEqqArray    = false;
 
-            this.content[pos].Resize(oMeasure, this, ParaMath, NewRPI, this.Compiled_ArgSz);
+                this.content[pos].Resize(oMeasure, NewRPI);
 
-            if(RPI.bEqqArray)
-                this.InfoPoints.ContentPoints.UpdatePoint(this.content[pos].size.width);
+                if(RPI.bEqqArray)
+                    this.InfoPoints.ContentPoints.UpdatePoint(this.content[pos].size.width);
+            }
+            else if(this.content[pos].Type == para_Math_Run)
+            {
+                //this.content[pos].Recalculate_Range();
+                this.content[pos].Math_Recalculate(oMeasure, RPI, this.InfoPoints.ContentPoints);
+            }
+
+            this.WidthToElement[pos] = this.size.width;
+
+            var oSize = this.content[pos].size;
+            this.size.width += oSize.width;
+
+            var oDescent = oSize.height - oSize.ascent,
+                SizeDescent = this.size.height - this.size.ascent;
+
+            this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
+
+            this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
         }
-        else if(this.content[pos].Type == para_Math_Run)
-            this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.InfoPoints.ContentPoints);
-
-        var oSize = this.content[pos].size;
-        this.size.width += oSize.width;
-
-        var oDescent = oSize.height - oSize.ascent,
-            SizeDescent = this.size.height - this.size.ascent;
-
-        this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
-
-        this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
-
+    },
+    // особый случай: вызываем, когда пересчет всей формулы не нужен, а нужно выставить только Lines (Реализована, чтобы не править Resize у каждого элемента)
+    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+    {
+        var lng = this.content.length;
+        for(var i = 0; i < lng; i++)
+        {
+            if(this.content[i].Type == para_Math_Composition)
+                this.content[i].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
+            else
+                this.content[i].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, ArgSize, null);
+        }
     },
     getWidthsPoints: function()
     {
@@ -1139,6 +1147,10 @@ CMathContent.prototype =
     SetArgSize: function(val)
     {
         this.ArgSize.SetValue(val);
+    },
+    GetArgSize: function()
+    {
+        return this.ArgSize.value;
     },
 
     /////////   Перемещение     ////////////
@@ -1429,7 +1441,8 @@ CMathContent.prototype =
 
             while ( null === TextPr && StartPos <= EndPos )
             {
-                TextPr = this.content[StartPos].Get_CompiledTextPr(Copy);
+                TextPr = this.content[StartPos].Get_CompiledTextPr(true); // true для пустых ранов
+                                                                          // т.к. если пустой ран входит в селект, текстовый настройки не скопируются в ране
                 StartPos++;
             }
 
@@ -1467,6 +1480,11 @@ CMathContent.prototype =
             var LRun, CRun, RRun;
 
             var bSelectOneElement = this.Selection.Use && StartPos == EndPos;
+
+            var FirstPos = this.Selection.Use ? Math.min(StartPos, EndPos) : this.CurPos;
+
+            if(FirstPos == 0)
+                this.ParaMath.NeedCompiledCtrPr();
 
             if( !this.Selection.Use || (bSelectOneElement && this.content[StartPos].Type == para_Math_Run) ) // TextPr меняем только в одном Run
             {
@@ -1576,6 +1594,37 @@ CMathContent.prototype =
         }
 
     },
+    IsNormalTextInRuns: function()
+    {
+        var flag = true;
+
+        if(this.Selection.Use)
+        {
+            var StartPos = this.Selection.Start,
+                EndPos   = this.Selection.End;
+
+                if ( StartPos > EndPos )
+                {
+                    StartPos = this.Selection.End;
+                    EndPos   = this.Selection.Start;
+                }
+
+            for(var i = StartPos; i < EndPos+1; i++)
+            {
+                var curr = this.content[i],
+                    currType = curr.Type;
+                if(currType == para_Math_Composition || (currType == para_Math_Run && false == curr.IsNormalText()))
+                {
+                    flag = false;
+                    break;
+                }
+            }
+        }
+        else
+            flag = false;
+
+        return flag;
+    },
     Internal_Content_Add : function(Pos, Item, bUpdatePosition)
     {
         History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
@@ -1608,7 +1657,13 @@ CMathContent.prototype =
                 ContentPos.Data[Depth]++;
         }
     },
+    NeedCompiledCtrPr: function()
+    {
+        for(var i = 0; i < this.content.length; i++)
+            if(this.content[i].Type == para_Math_Composition)
+                this.content[i].NeedCompiledCtrPr();
 
+    },
     private_CorrectSelectionPos : function()
     {
         this.Selection.Start = Math.max(0, Math.min(this.content.length - 1, this.Selection.Start));

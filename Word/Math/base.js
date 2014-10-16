@@ -13,6 +13,7 @@ function CMathBase(bInside)
 
     this.CtrPrp = new CTextPr();
     this.CompiledCtrPrp = new CTextPr();
+    this.TextPrControlLetter = new CTextPr();
 
     this.ArgSize = new CMathArgSize();
 
@@ -97,7 +98,6 @@ CMathBase.prototype =
         if(txtPrp !== null && typeof(txtPrp) !== "undefined")
         {
             this.CtrPrp.Merge(txtPrp);
-            this.CtrPrp.FontFamily = {Name  : "Cambria Math", Index : -1 };
         }
     },
     Get_CtrPrp: function()
@@ -109,6 +109,16 @@ CMathBase.prototype =
             CtrPrp = this.CtrPrp.Copy();
 
         return CtrPrp;
+    },
+    NeedCompiledCtrPr: function()
+    {
+        this.RecalcInfo.bCtrPrp = true;
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].NeedCompiledCtrPr();
+
     },
     /*Set_CompiledCtrPrp: function(ParaMath)
     {
@@ -125,7 +135,7 @@ CMathBase.prototype =
     },*/
     Get_CompiledCtrPrp: function()
     {
-        this.Set_CompiledCtrPrp(this.ParaMath);
+        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
 
         var CompiledCtrPrp;
 
@@ -145,7 +155,7 @@ CMathBase.prototype =
     },
     Get_CompiledCtrPrp_2: function() // without arg Size
     {
-        this.Set_CompiledCtrPrp(this.ParaMath);
+        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
 
         var CompiledCtrPrp;
 
@@ -172,12 +182,11 @@ CMathBase.prototype =
     },
     // для управляющих символов в приоритете GetFirstRunPrp
     // если первый элемент - мат объект, то берутся его CtrPrp
-    getPrpToControlLetter: function()
+    GetTPrpToControlLetter: function()
     {
-        var rPrp = new CTextPr();
-        rPrp.Merge( this.ParaMath.GetFirstRPrp() );
+        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
 
-        return rPrp;
+        return this.TextPrControlLetter;
     },
     fillPlaceholders: function()
     {
@@ -344,6 +353,26 @@ CMathBase.prototype =
     {
         return this.Parent.remove(order);
     },
+    ApplyProperties: function(RPI)
+    {},
+    PreRecalc: function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+    {
+        this.Parent = Parent;
+        this.ParaMath = ParaMath;
+
+        this.Set_CompiledCtrPrp(Parent, ParaMath);
+
+        this.ApplyProperties(RPI);
+
+        // setGaps обязательно после того как смержили CtrPrp (Set_CompiledCtrPrp)
+        if(this.bInside == false)
+            GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].PreRecalc(this, ParaMath, ArgSize, RPI);
+
+    },
     recalculateSize: function(oMeasure, RPI)
     {
         var width = 0;
@@ -366,20 +395,16 @@ CMathBase.prototype =
 
         width += this.dW*(this.nCol - 1) + this.GapLeft + this.GapRight;
 
-        var ascent = this.getAscent(oMeasure, height, RPI);
+        var ascent = this.getAscent(oMeasure, height);
 
         this.size = {width: width, height: height, ascent: ascent};
     },
-    Resize: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+    Resize: function(oMeasure, RPI)
     {
-        this.Parent = Parent;
-        this.ParaMath = ParaMath;
-
-        //this.Set_CompiledCtrPrp(ParaMath);
-
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+                this.elements[i][j].Resize(oMeasure, RPI);
+
 
         this.recalculateSize(oMeasure, RPI);
     },
@@ -390,7 +415,58 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
     },
-    Set_CompiledCtrPrp: function(ParaMath)
+    Set_CompiledCtrPrp: function(Parent, ParaMath)
+    {
+        if(this.RecalcInfo.bCtrPrp == true)
+        {
+            // for Ctr Prp
+
+            //this.CompiledCtrPrp = ParaMath.GetFirstRPrp();
+            var defaultTxtPrp = ParaMath.Get_Default_TPrp();
+
+            this.CompiledCtrPrp.FontFamily =
+            {
+                Name:       defaultTxtPrp.FontFamily.Name,
+                Index:      defaultTxtPrp.FontFamily.Index
+            };
+            this.CompiledCtrPrp.FontSize = defaultTxtPrp.FontSize;
+
+            this.CompiledCtrPrp.Merge(this.CtrPrp);
+
+            // for Control Letter
+
+            var FontSize = ParaMath.GetFirstRPrp().FontSize;
+
+            if(this.bInside == true)
+            {
+                var TxtPr = Parent.Get_TxtPrControlLetter();
+                FontSize = TxtPr.FontSize;
+                FontSize = ParaMath.ApplyArgSize(FontSize, this.ArgSize.value);
+            }
+            else
+            {
+                FontSize = ParaMath.ApplyArgSize(FontSize, Parent.Get_CompiledArgSize().value);
+                FontSize = ParaMath.ApplyArgSize(FontSize, this.ArgSize.value);
+            }
+
+            this.TextPrControlLetter.FontSize = FontSize;
+            this.TextPrControlLetter.FontFamily =
+            {
+                Name:       defaultTxtPrp.FontFamily.Name,
+                Index:      defaultTxtPrp.FontFamily.Index
+            };
+
+
+            this.RecalcInfo.bCtrPrp = false;
+        }
+    },
+    Get_TxtPrControlLetter: function() // TextPrControlLetter не копируются !
+    {
+        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
+
+        return this.TextPrControlLetter;
+    },
+    old_Set_CompiledCtrPrp: function(ParaMath)
     {
         if(this.RecalcInfo.bCtrPrp == true)
         {
@@ -488,8 +564,8 @@ CMathBase.prototype =
     },
     SetGaps:  function(GapsInfo)
     {
-        this.Parent   = GapsInfo.Parent;
-        this.ParaMath = GapsInfo.ParaMath;
+        //this.Parent   = GapsInfo.Parent;
+        //this.ParaMath = GapsInfo.ParaMath;
 
 
         GapsInfo.Left       = GapsInfo.Current;
@@ -566,6 +642,9 @@ CMathBase.prototype =
     },
     Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
     {
+        if(ApplyToAll == true)
+            this.RecalcInfo.bCtrPrp = true;
+
         if(TextPr == undefined)
         {
             var CtrPrp = this.Get_CompiledCtrPrp_2();

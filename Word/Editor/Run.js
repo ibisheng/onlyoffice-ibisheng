@@ -7793,7 +7793,7 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     for(var i=0; i < this.Content.length;i++)
         this.Content[i].draw(X, Y, pGraphics);
 }
-ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, ArgSize, WidthPoints)
+ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
 {
     // пересчет элементов контента в Run
     // Recalculate_MeasureContent
@@ -7809,8 +7809,8 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
     var RangeEndPos = this.Content.length;
 
 
-    this.Paragraph = Paragraph;
-    this.Parent    = Parent;
+    //this.Paragraph = Paragraph;
+    //this.Parent    = Parent;
 
     // обновляем позиции start и end для Range
     //this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
@@ -7857,7 +7857,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, Parent, Paragraph, RPI, 
 
         for (var i = 0 ; i < Lng; i++)
         {
-            this.Content[i].Resize(oMeasure, this, RPI);
+            this.Content[i].Resize(oMeasure, RPI);
 
             var oSize = this.Content[i].size;
 
@@ -7951,6 +7951,21 @@ ParaRun.prototype.Math_SetGaps = function(GapsInfo)
         }
     }
 }
+ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.Parent    = Parent;
+    this.Paragraph = ParaMath.Paragraph;
+
+    var FontSize = this.Get_CompiledPr(false).FontSize;
+
+    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
+    {
+        if( !this.Content[Pos].IsAlignPoint() )
+            GapsInfo.setGaps(this.Content[Pos], FontSize);
+
+        this.Content[Pos].PreRecalc(this);
+    }
+}
 ParaRun.prototype.IsPlaceholder = function()
 {
     return this.Content.length == 1 && this.Content[0].IsPlaceholder();
@@ -8003,6 +8018,10 @@ ParaRun.prototype.Math_GetInfoLetter = function(Info)
     }
     else
         Info.Result = false;
+}
+ParaRun.IsNormalText = function()
+{
+    return this.MathPrp.nor === true;
 }
 
 function CParaRunStartState(Run)

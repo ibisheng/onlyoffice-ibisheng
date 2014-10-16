@@ -22,7 +22,7 @@ function CAccentCircumflex()
 Asc.extendClass(CAccentCircumflex, CGlyphOperator);
 CAccentCircumflex.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
+    var alpha = this.Parent.GetTPrpToControlLetter().FontSize/36;
 
     var width = 3.88*alpha;
     var height = 3.175*alpha;
@@ -40,7 +40,7 @@ CAccentCircumflex.prototype.calcSize = function(stretch)
 }
 CAccentCircumflex.prototype.calcCoord = function(stretch)
 {
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
     //var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
@@ -126,7 +126,7 @@ function CAccentLine()
 Asc.extendClass(CAccentLine, CGlyphOperator);
 CAccentLine.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
+    var alpha = this.Parent.GetTPrpToControlLetter().FontSize/36;
 
     var height = 1.68*alpha;
     var width  = 4.938*alpha;
@@ -135,37 +135,9 @@ CAccentLine.prototype.calcSize = function(stretch)
 
     return {width: width, height: height};
 }
-CAccentLine.prototype.old_calcCoord = function(stretch)
-{
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
-
-    var X = [],
-        Y = [];
-
-    //stretch *= 0.9;
-
-    X[0] = 0;          Y[0] = 0;
-    X[1] = stretch;    Y[1] = 0;
-    X[2] = stretch;    Y[2] = 0.011*fontSize;
-    X[3] = 0;          Y[3] = Y[2];
-    X[4] = 0;          Y[4] = 0;
-
-    var W = X[2],
-        H = Y[2];
-
-    return {XX: X, YY: Y, W: W, H: H};
-}
-CAccentLine.prototype.old_drawPath = function(pGraphics, XX, YY)
-{
-    pGraphics._m(XX[0], YY[0]);
-    pGraphics._l(XX[1], YY[1]);
-    pGraphics._l(XX[2], YY[2]);
-    pGraphics._l(XX[3], YY[3]);
-    pGraphics._l(XX[4], YY[4]);
-}
 CAccentLine.prototype.draw = function(x, y, pGraphics)
 {
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
 
     var penW = fontSize*0.067 * 25.4/96;
     var x1 = x + 25.4/96,
@@ -184,7 +156,7 @@ function CAccentDoubleLine()
 Asc.extendClass(CAccentDoubleLine, CGlyphOperator);
 CAccentDoubleLine.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.Get_CompiledCtrPrp().FontSize/36;
+    var alpha = this.Parent.GetTPrpToControlLetter().FontSize/36;
 
     var height = 2.843*alpha;
     var width  = 4.938*alpha;
@@ -205,7 +177,7 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
 }
 CAccentDoubleLine.prototype.old_calcCoord = function(stretch)
 {
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
 
     var X = [],
         Y = [];
@@ -246,7 +218,7 @@ CAccentDoubleLine.prototype.old_drawPath = function(pGraphics, XX, YY)
 }
 CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
 {
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
 
     var diff = this.diff;
 
@@ -273,7 +245,7 @@ function CAccentTilde()
 Asc.extendClass(CAccentTilde, CGlyphOperator);
 CAccentTilde.prototype.calcSize = function(stretch)
 {
-    var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
+    var betta = this.Parent.GetTPrpToControlLetter().FontSize/36;
 
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
@@ -326,7 +298,7 @@ CAccentTilde.prototype.calcCoord = function(stretch)
     var XX = [],
         YY = [];
 
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -373,7 +345,7 @@ function CAccentBreve()
 Asc.extendClass(CAccentBreve, CGlyphOperator);
 CAccentBreve.prototype.calcSize = function(stretch)
 {
-    var betta = this.Parent.Get_CompiledCtrPrp().FontSize/36;
+    var betta = this.Parent.GetTPrpToControlLetter().FontSize/36;
 
     var width =  4.2333333333333325*betta;
     var height = 2.469444444444445*betta;
@@ -413,7 +385,7 @@ CAccentBreve.prototype.calcCoord = function(stretch)
     var XX = [],
         YY = [];
 
-    var fontSize = this.Parent.Get_CompiledCtrPrp().FontSize;
+    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -567,13 +539,8 @@ CAccent.prototype.setPosition = function(pos, PosInfo)
 
     this.elements[0][0].setPosition(PosBase, PosInfo);
 }
-CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CAccent.prototype.ApplyProperties = function(RPI)
 {
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    this.Set_CompiledCtrPrp(ParaMath);
-
     if(this.RecalcInfo.bProps == true)
     {
         var prp =
@@ -583,25 +550,26 @@ CAccent.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             loc:    LOCATION_TOP
         };
 
-        var defaultPrp =
-        {
-            type:   ACCENT_CIRCUMFLEX
-        };
+        var defaultPrp = {type:   ACCENT_CIRCUMFLEX };
 
         this.operator.mergeProperties(prp, defaultPrp);
 
         this.RecalcInfo.bProps = false;
     }
+}
+CAccent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.ApplyProperties(RPI);
+    this.operator.PreRecalc(this, ParaMath);
 
-    this.operator.relate(this);
+    CAccent.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+}
+CAccent.prototype.Resize = function(oMeasure, RPI)
+{
+    var base = this.getBase();
+    base.Resize(oMeasure, RPI);
 
-    var base = this.elements[0][0];
-    base.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-
-    var ctrPrp = this.Get_CompiledCtrPrp();
-    oMeasure.SetFont(ctrPrp);
-
-    this.operator.fixSize(ParaMath, oMeasure, base.size.width);
+    this.operator.fixSize(oMeasure, base.size.width);
 
     var width  = base.size.width, // (!)
         height = base.size.height + this.operator.size.height,

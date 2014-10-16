@@ -75,9 +75,7 @@ CFraction.prototype.draw = function(x, y, pGraphics)
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
-    //var mgCtrPrp = this.Get_CompiledCtrPrp();
-    var mgCtrPrp = this.Get_CompiledCtrPrp_2();
-    mgCtrPrp.FontSize = this.ParaMath.ApplyArgSize(mgCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 
@@ -102,8 +100,7 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 }
 CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 {
-    //var ctrPrp = this.Get_CompiledCtrPrp();
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
@@ -208,8 +205,7 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
         x2 = X + this.elements[0][0].size.width + shift,
         y2 = Y + this.size.height;
 
-    //var ctrPrp = this.Get_CompiledCtrPrp();
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
     pGraphics.SetFont(mgCtrPrp);
@@ -247,7 +243,45 @@ CFraction.prototype.getDenominator = function()
 
     return denominator;
 }
-CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.Parent   = Parent;
+    this.ParaMath = ParaMath;
+
+    var ArgSzNumDen = ArgSize.Copy();
+
+    if(RPI.bInline == true && (this.Pr.type === BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)) // уменьшае размер числителя и знаменателя
+    {
+        ArgSzNumDen.decrease();        // для контентов числителя и знаменателя
+        this.ArgSize.SetValue(-1);     // для CtrPrp
+    }
+    else if(RPI.bDecreasedComp == true)    // уменьшаем  расстояние между числителем и знаменателем (размер FontSize для TxtPr ControlLetter)
+                                            // this.ArgSize отвечает за TxtPr ControlLetter
+    {
+        this.ArgSize.SetValue(-1); // для CtrPrp
+    }
+    else
+    {
+        this.ArgSize.SetValue(0);
+    }
+
+    this.Set_CompiledCtrPrp(Parent, ParaMath);
+
+    this.ApplyProperties(RPI);
+
+    var NewRPI = RPI.Copy();
+    if(this.Pr.type !== LINEAR_FRACTION)
+        NewRPI.bDecreasedComp = true;
+
+    // setGaps обязательно после того как смержили CtrPrp (Set_CompiledCtrPrp)
+
+    if(this.bInside == false)
+        GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
+
+    this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
+    this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
+}
+/*CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     var ArgSzFr = ArgSize.Copy();
 
@@ -265,6 +299,8 @@ CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         this.ArgSize.SetValue(0);
     }
 
+
+    // ??!!
     if(this.Pr.type == NO_BAR_FRACTION)
     {
         ArgSzFr.decrease();
@@ -279,10 +315,11 @@ CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     //this.Set_CompiledCtrPrp(ParaMath);
 
     var NewRPI = RPI.Copy();
-    NewRPI.bInsideFraction = true;
+    if(this.Pr.type !== LINEAR_FRACTION)
+        NewRPI.bInsideFraction = true;
 
     CFraction.superclass.Resize.call(this, oMeasure, Parent, ParaMath, NewRPI, ArgSzFr);
-}
+}*/
 CFraction.prototype.recalculateSize = function(oMeasure)
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
@@ -297,8 +334,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;
 
-    //var ctrPrp =  this.Get_CompiledCtrPrp();
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
@@ -310,8 +346,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
 }
 CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
-    //var ctrPrp = this.Get_CompiledCtrPrp();
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     //this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
     this.dW = 5.011235894097222 * mgCtrPrp.FontSize/36;
@@ -331,8 +366,8 @@ CFraction.prototype.recalculateLinear = function()
         DescentSecond = this.elements[0][1].size.height - this.elements[0][1].size.ascent;
 
     var H = AscentFirst + DescentSecond;
-    //var ctrPrp = this.Get_CompiledCtrPrp();
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     var gap = 5.011235894097222*mgCtrPrp.FontSize/36;
 
@@ -428,7 +463,7 @@ CFractionBase.prototype.init = function(MathContent)
     this.setDimension(1, 1);
     this.elements[0][0] = MathContent;
 }
-CFractionBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+/*CFractionBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
@@ -438,7 +473,7 @@ CFractionBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSi
     this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
 
     this.recalculateSize();
-}
+}*/
 CFractionBase.prototype.getElement = function()
 {
     return this.elements[0][0];
@@ -465,7 +500,7 @@ CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     var Descent = arg.height - arg.ascent; // baseLine
 
@@ -517,7 +552,7 @@ CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
 
     var Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36;
 

@@ -403,11 +403,11 @@ CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics)
 }
 CGlyphOperator.prototype.getCtrPrp = function()
 {
-    return this.Parent.Get_CompiledCtrPrp();
+    return this.Parent.GetTPrpToControlLetter();
 }
-CGlyphOperator.prototype.relate = function(parent)
+CGlyphOperator.prototype.PreRecalc = function(Parent)
 {
-    this.Parent = parent;
+    this.Parent = Parent;
 }
 
 
@@ -2937,16 +2937,19 @@ COperator.prototype.draw = function(x, y, pGraphics)
     {
         // выставляем font, если нужно отрисовать текст
         pGraphics.b_color1(0,0,0,255);
-        var ctrPrp = this.Get_CompiledCtrPrp();
 
-        var rPrp = new CTextPr();
-        //var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
-        var defaultRPrp = this.Parent.ParaMath.Get_Default_TPrp();
-        rPrp.Merge(defaultRPrp);
-        rPrp.Merge(ctrPrp);
-        rPrp.Italic = false;
-        rPrp.Bold   = false;
-        pGraphics.SetFont(rPrp);
+        var ctrPrp =  this.GetTPrpToControlLetter();
+
+        var Font =
+        {
+            FontSize:   ctrPrp.FontSize,
+            FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+            Italic:     false,
+            Bold:       false
+        };
+
+
+        pGraphics.SetFont(Font);
 
         ////////////////////////////////////////////////
 
@@ -3017,24 +3020,25 @@ COperator.prototype.IsLineGlyph = function()
 {
     return this.typeOper == ACCENT_LINE || this.typeOper == ACCENT_DOUBLE_LINE;
 }
-COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
+COperator.prototype.fixSize = function(oMeasure, stretch)
 {
-    this.ParaMath = ParaMath;
     if(this.typeOper !== OPERATOR_EMPTY)
     {
         var width, height, ascent;
         var dims;
 
-        var ctrPrp = this.Get_CompiledCtrPrp();
+        var ctrPrp =  this.GetTPrpToControlLetter();
 
-        var rPrp = new CTextPr();
-        var defaultRPrp = this.Parent.ParaMath.Get_Default_TPrp();
+        var Font =
+        {
+            FontSize:   ctrPrp.FontSize,
+            FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+            Italic:     false,
+            Bold:       false //ctrPrp.Bold
+        };
 
-        rPrp.Merge(defaultRPrp);
-        rPrp.Merge(ctrPrp);
-        rPrp.Italic = false;
 
-        oMeasure.SetFont(rPrp);
+        oMeasure.SetFont(Font);
 
         var bLine = this.IsLineGlyph();
 
@@ -3096,8 +3100,8 @@ COperator.prototype.fixSize = function(ParaMath, oMeasure, stretch)
 
         // Ascent
 
-        var mgCtrPrp = this.Parent.Get_CompiledCtrPrp();
-        var shCenter = this.Parent.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+        var mgCtrPrp = this.Parent.GetTPrpToControlLetter();
+        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
         if(!bLine && (this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT))
             ascent = dims.Height/2;
@@ -3162,30 +3166,28 @@ COperator.prototype.IsJustDraw = function()
 {
     return true;
 }
-COperator.prototype.Resize = function(Parent, ParaMath, oMeasure)
+COperator.prototype.Resize = function(oMeasure)
 {
-    this.ParaMath = ParaMath;
-    this.Parent   = Parent;
-
     if(this.typeOper !== OPERATOR_EMPTY)
     {
         var bHor = this.operator.loc == 0 || this.operator.loc  == 1;
 
         if(bHor)
-            this.fixSize(ParaMath, oMeasure, this.size.width);
+            this.fixSize(oMeasure, this.size.width);
         else
-            this.fixSize(ParaMath, oMeasure, this.size.height);
+            this.fixSize(oMeasure, this.size.height);
     }
 }
-COperator.prototype.relate = function(parent)
+COperator.prototype.PreRecalc = function(Parent, ParaMath)
 {
-    this.Parent = parent;
+    this.Parent   = Parent;
+    this.ParaMath = ParaMath;
     if(this.typeOper !== OPERATOR_EMPTY)
-        this.operator.relate(this);
+        this.operator.PreRecalc(this); // в данном случае mathText нужен только один параметр
 }
-COperator.prototype.Get_CompiledCtrPrp = function()
+COperator.prototype.GetTPrpToControlLetter = function()
 {
-    return this.Parent.Get_CompiledCtrPrp();
+    return this.Parent.GetTPrpToControlLetter();
 }
 COperator.prototype.getChr = function()
 {
@@ -3235,8 +3237,8 @@ CMathDelimiterPr.prototype.Set_FromObject = function(Obj)
     if(DELIMITER_SHAPE_MATH === Obj.shp || DELIMITER_SHAPE_CENTERED === Obj.shp)
         this.shp = Obj.shp;
 
-    if(true === Obj.grow || 1 === Obj.grow)
-        this.grow = true;
+    if(false === Obj.grow || 0 === Obj.grow)
+        this.grow = false;
 
     if(undefined !== Obj.column && null !== Obj.column)
         this.column = Obj.column;
@@ -3421,12 +3423,8 @@ CDelimiter.prototype.fillContent = function()
     for (var nIndex = 0; nIndex < nColumnsCount; nIndex++)
         this.elements[0][nIndex] = this.Content[nIndex];
 }
-CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CDelimiter.prototype.ApplyProperties = function(RPI)
 {
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-
     if(this.RecalcInfo.bProps == true)
     {
         var begPrp =
@@ -3442,7 +3440,6 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             chr:   0x28
         };
         this.begOper.mergeProperties(begPrp, begDefaultPrp);
-        this.begOper.relate(this);
 
         var endPrp =
         {
@@ -3458,7 +3455,6 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
         };
 
         this.endOper.mergeProperties(endPrp, endDefaultPrp);
-        this.endOper.relate(this);
 
         var sepPrp =
         {
@@ -3477,12 +3473,22 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
             sepPrp.type = OPERATOR_EMPTY;
 
         this.sepOper.mergeProperties(sepPrp, sepDefaultPrp);
-        this.sepOper.relate(this);
-
 
         this.RecalcInfo.bProps = false;
     }
+}
+CDelimiter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.ApplyProperties(RPI);
 
+    this.begOper.PreRecalc(this, ParaMath);
+    this.endOper.PreRecalc(this, ParaMath);
+    this.sepOper.PreRecalc(this, ParaMath);
+
+    CDelimiter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+}
+CDelimiter.prototype.Resize = function(oMeasure, RPI)
+{
     // размеры аргумента
     var heightG = 0, widthG = 0,
         ascentG = 0, descentG = 0;
@@ -3491,7 +3497,7 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     for(var j = 0; j < this.nCol; j++)
     {
-        this.elements[0][j].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+        this.elements[0][j].Resize(oMeasure, RPI);
         var content = this.elements[0][j].size;
         widthG += content.width;
         ascentG = content.ascent > ascentG ? content.ascent : ascentG;
@@ -3500,7 +3506,7 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     heightG = ascentG + descentG;
 
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
 
@@ -3514,9 +3520,9 @@ CDelimiter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
     var heightStretch = b2Max && !bTextContent ? 2*maxAD : ascentG + descentG;
 
-    this.begOper.fixSize(ParaMath, oMeasure, heightStretch);
-    this.endOper.fixSize(ParaMath, oMeasure, heightStretch);
-    this.sepOper.fixSize(ParaMath, oMeasure, heightStretch);
+    this.begOper.fixSize(oMeasure, heightStretch);
+    this.endOper.fixSize(oMeasure, heightStretch);
+    this.sepOper.fixSize(oMeasure, heightStretch);
 
     // Общая ширина
     var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
@@ -3732,30 +3738,19 @@ CDelimiter.prototype.getBase = function(numb)
 function CCharacter()
 {
     this.operator = new COperator(OPER_GROUP_CHAR);
-
     CMathBase.call(this);
 }
 Asc.extendClass(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
-    this.operator.relate(this);
-
-    //this.setDimension(1, 1);
-    //this.setContent();
 }
-CCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CCharacter.prototype.Resize = function(oMeasure, RPI)
 {
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
     var base = this.elements[0][0];
-    base.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    base.Resize(oMeasure, RPI);
 
-    this.operator.fixSize(ParaMath, oMeasure, base.size.width);
-
-    var ctrPrp = this.Get_CompiledCtrPrp();
-    oMeasure.SetFont(ctrPrp);
+    this.operator.fixSize(oMeasure, base.size.width);
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height,
@@ -3807,17 +3802,18 @@ CCharacter.prototype.draw = function(x, y, pGraphics)
 {
     this.elements[0][0].draw(x, y, pGraphics);
 
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
-    var FontSize = mgCtrPrp.FontSize,
-        FontFamily = {Name: "Cambria Math", Index: -1};
+    var ctrPrp =  this.GetTPrpToControlLetter();
 
-    var obj = {FontSize: FontSize, FontFamily: FontFamily};
+    var Font =
+    {
+        FontSize:   ctrPrp.FontSize,
+        FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+        Italic:     false,
+        Bold:       false
+    };
 
-    var accFont = new CTextPr();
-    accFont.Set_FromObject(obj);
 
-
-    pGraphics.SetFont(accFont);
+    pGraphics.SetFont(Font);
     pGraphics.p_color(0,0,0, 255);
     pGraphics.b_color1(0,0,0, 255);
 
@@ -3848,7 +3844,6 @@ CMathGroupChrPr.prototype.Set_FromObject = function(Obj)
     if(LOCATION_TOP === Obj.pos || LOCATION_BOT === Obj.pos)
         this.pos = Obj.pos;
 };
-
 CMathGroupChrPr.prototype.Copy = function()
 {
     var NewPr = new CMathGroupChrPr();
@@ -3947,7 +3942,7 @@ CGroupCharacter.prototype.init = function(props)
     this.setProperties(props);
     this.fillContent();
 }
-CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CGroupCharacter.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true)
     {
@@ -3967,27 +3962,35 @@ CGroupCharacter.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, Arg
         this.setCharacter(operProps, operDefaultPrp);
 
         this.RecalcInfo.bProps = false;
+
+        if(this.Pr.pos == this.Pr.vertJc)
+        {
+            var Iterator;
+
+            if(this.Pr.pos == LOCATION_TOP)
+                Iterator = new CDenominator(this.getBase());
+            else
+                Iterator = new CNumerator(this.getBase());
+
+            this.elements[0][0] = Iterator;
+        }
+        else
+            this.elements[0][0] = this.getBase();
+
     }
+}
+CGroupCharacter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.ApplyProperties(RPI);
+
+    this.operator.PreRecalc(this, ParaMath);
 
     var ArgSz = ArgSize.Copy();
 
     if(this.Pr.pos == this.Pr.vertJc)
-    {
         ArgSz.decrease();
 
-        var Iterator;
-
-        if(this.Pr.pos == LOCATION_TOP)
-            Iterator = new CDenominator(this.getBase());
-        else
-            Iterator = new CNumerator(this.getBase());
-
-        this.elements[0][0] = Iterator;
-    }
-    else
-        this.elements[0][0] = this.getBase();
-
-    CGroupCharacter.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSz);
+    CGroupCharacter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSz, RPI, GapsInfo);
 }
 CGroupCharacter.prototype.getBase = function()
 {
@@ -4004,7 +4007,7 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
     //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
 
-    var ctrPrp = this.Get_CompiledCtrPrp();
+    var ctrPrp = this.GetTPrpToControlLetter();
     var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
 
     if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)

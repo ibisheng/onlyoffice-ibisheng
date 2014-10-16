@@ -242,12 +242,12 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
         this.RecalcInfo.bProps = false;
     }
 
-    var txtPrp = this.Get_CompiledCtrPrp();
+    var FontSize = this.GetTPrpToControlLetter().FontSize;
     var metrics = this.getMetrics();
 
     if(this.nCol > 1)
     {
-        var gapsCol = this.getLineGap(this.spaceColumn, txtPrp);
+        var gapsCol = this.getLineGap(this.spaceColumn, FontSize);
 
         for(var i = 0; i < this.nCol - 1; i++)
             this.gaps.column[i] = gapsCol;
@@ -257,12 +257,12 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     if(this.nRow > 1)
     {
-        var intervalRow = this.getRowSpace(this.spaceRow, txtPrp);
+        var intervalRow = this.getRowSpace(this.spaceRow, FontSize);
 
         var divCenter = 0;
 
-        var plH = 0.2743827160493827 * txtPrp.FontSize;
-        var minGp = this.spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
+        var plH = 0.2743827160493827*FontSize;
+        var minGp = this.spaceRow.minGap*FontSize*g_dKoef_pt_to_mm;
         minGp -= plH;
 
         for(var j = 0; j < this.nRow - 1; j++)
@@ -355,7 +355,7 @@ CMatrixBase.prototype.setRuleGap = function(oSpace, rule, gap, minGap)
     if(minGap == minGap - 0 && minGap == minGap^0)
         oSpace.minGap = minGap;
 };
-CMatrixBase.prototype.getLineGap = function(spaceColumn, txtPrp)
+CMatrixBase.prototype.getLineGap = function(spaceColumn, FontSize)
 {
     var spLine;
 
@@ -377,9 +377,9 @@ CMatrixBase.prototype.getLineGap = function(spaceColumn, txtPrp)
     if(spaceColumn.rule == 3)
         lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
     else
-        lineGap = spLine*txtPrp.FontSize*g_dKoef_pt_to_mm;           //em
+        lineGap = spLine*FontSize*g_dKoef_pt_to_mm;           //em
 
-    var wPlh = 0.3241834852430555 * txtPrp.FontSize;
+    var wPlh = 0.3241834852430555*FontSize;
 
     var min = spaceColumn.minGap / 20 * g_dKoef_pt_to_mm - wPlh;
     lineGap = Math.max(lineGap, min);
@@ -387,7 +387,7 @@ CMatrixBase.prototype.getLineGap = function(spaceColumn, txtPrp)
 
     return lineGap;
 };
-CMatrixBase.prototype.getRowSpace = function(spaceRow, txtPrp)
+CMatrixBase.prototype.getRowSpace = function(spaceRow, FontSize)
 {
     var spLine;
 
@@ -409,10 +409,10 @@ CMatrixBase.prototype.getRowSpace = function(spaceRow, txtPrp)
     if(spaceRow.rule == 3)
         lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
     else
-        lineGap = spLine*txtPrp.FontSize*g_dKoef_pt_to_mm; //em
+        lineGap = spLine*FontSize*g_dKoef_pt_to_mm; //em
 
 
-    var min = spaceRow.minGap*txtPrp.FontSize*g_dKoef_pt_to_mm;
+    var min = spaceRow.minGap*FontSize*g_dKoef_pt_to_mm;
     lineGap = Math.max(lineGap, min);
 
     return lineGap;
@@ -688,30 +688,22 @@ CEqArray.prototype.fillContent = function()
     for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
         this.elements[nIndex][0] = this.Content[nIndex];
 };
-CEqArray.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
     // на случай, чтобы не затереть массив
     //var CurrAmperWPoints = RPI.AmperWPoints,
     //    CurrEqqArray     = RPI.bEqqArray;
 
-    RPI.bEqqArray = true;
+    var NewRPI = RPI.Copy();
+    NewRPI.bEqqArray = true;
 
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
 
     for(var i = 0; i < this.nRow; i++)
     {
-        this.elements[i][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+        this.elements[i][0].Resize(oMeasure, NewRPI);
     }
 
-    this.recalculateSize(oMeasure, RPI);
-
-    RPI.bEqqArray = false;
-
-    //RPI.AmperWPoints = CurrAmperWPoints;
-    //RPI.bEqqArray    = CurrEqqArray;
-
-    //CEqArray.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
+    this.recalculateSize(oMeasure);
 }
 CEqArray.prototype.getMetrics = function()
 {

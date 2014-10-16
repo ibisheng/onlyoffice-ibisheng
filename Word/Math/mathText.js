@@ -539,7 +539,7 @@ CMathText.prototype =
         this.Type = para_Math_Placeholder;
         this.value = StartTextElement;
     },
-    Resize: function(oMeasure, Parent, RPI)
+    Resize: function(oMeasure, RPI)
     {
         /*
          var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
@@ -547,10 +547,10 @@ CMathText.prototype =
          height = g_oTextMeasurer.GetHeight();
         */
 
-        if(!this.bJDraw)
+        /*if(!this.bJDraw)
             this.Parent = Parent;
         else
-            this.Parent = null;
+            this.Parent = null;*/
 
         var letter = this.getCode();
 
@@ -600,6 +600,13 @@ CMathText.prototype =
         this.size.ascent = ascent;
 
         //this.RecalcInfo.NewLetter = false;
+    },
+    PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
+    {
+        if(!this.bJDraw)
+            this.Parent = Parent;
+        else
+            this.Parent = null;
     },
     Get_WidthVisible: function()
     {
@@ -786,7 +793,7 @@ function CMathAmp()
 
     this.pos = new CMathPosition();
 
-    this.AmpText = new CMathText(false);
+    this.AmpText = new CMathText(true);
     this.AmpText.add(0x26);
 
     this.size = null;
@@ -794,9 +801,8 @@ function CMathAmp()
 }
 CMathAmp.prototype =
 {
-    Resize: function(oMeasure, Parent, RPI)
+    Resize: function(oMeasure, RPI)
     {
-        this.Parent = Parent;
         this.bEqqArray = RPI.bEqqArray;
 
         this.AmpText.Resize(oMeasure, this, RPI);
@@ -820,6 +826,13 @@ CMathAmp.prototype =
             };
         }
 
+    },
+    PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
+    {
+        if(!this.bJDraw)
+            this.Parent = Parent;
+        else
+            this.Parent = null;
     },
     Get_WidthVisible: function()
     {

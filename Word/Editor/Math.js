@@ -58,7 +58,7 @@ function ParaMath()
 
     this.DefaultTextPr = new CTextPr();
 
-    this.DefaultTextPr.Italic     = true;
+    this.DefaultTextPr.FontSize   = 11;
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
 
@@ -150,13 +150,13 @@ ParaMath.prototype.Get_CompiledTextPr = function(Copy)
 {
     // TODO: ParaMath.Get_CompiledTextPr
 
-    var TextPr = new CTextPr();
+    //var TextPr = new CTextPr();
 
     var oContent = this.GetSelectContent();
     var mTextPr = oContent.Content.Get_CompiledTextPr(Copy);
-    TextPr.Merge( mTextPr );
+    //TextPr.Merge( mTextPr );
 
-    return TextPr;
+    return mTextPr;
 };
 
 ParaMath.prototype.Add = function(Item)
@@ -379,11 +379,23 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
     else
     {
         var content = this.GetSelectContent().Content;
+        var FontSize = TextPr.FontSize;
+
+        if(TextPr.FontSize !== undefined && content.IsNormalTextInRuns() == false)
+        {
+            var NewTextPr = new CTextPr();
+            NewTextPr.FontSize = FontSize;
+
+            this.Root.Apply_TextPr(NewTextPr, IncFontSize, true);
+
+            TextPr.FontSize = undefined;
+        }
+
         content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+
+        TextPr.FontSize = FontSize;
     }
-
 };
-
 ParaMath.prototype.Clear_TextPr = function()
 {
 
@@ -522,7 +534,8 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     if(RPI.NeedResize)
     {
-        this.Root.Resize(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
+        this.Root.PreRecalc(null, this, ArgSize, RPI);
+        this.Root.Resize(g_oTextMeasurer, RPI/*recalculate properties info*/);
         // когда формула будеат разбиваться на строки, Position придется перерасчитывать
         var pos = new CMathPosition();
         pos.x = 0;
@@ -900,7 +913,11 @@ ParaMath.prototype.SetInline = function(value)
 ParaMath.prototype.SetNeedResize = function()
 {
     this.NeedResize = true;
-}
+};
+ParaMath.prototype.NeedCompiledCtrPr = function()
+{
+    this.Root.NeedCompiledCtrPr();
+};
 ParaMath.prototype.MathToImageConverter= function()
 {
     window.IsShapeToImageConverter = true;
@@ -1497,6 +1514,7 @@ ParaMath.prototype.Split = function (ContentPos, Depth)
     if(this.Root.content[Pos].Type == para_Math_Run)
     {
         NewParaMath = new ParaMath();
+        NewParaMath.Jc = this.Jc;
 
         var NewRun = this.Root.content[Pos].Split(ContentPos, Depth+1);
         NewParaMath.Root.Add_ToContent(0, NewRun);

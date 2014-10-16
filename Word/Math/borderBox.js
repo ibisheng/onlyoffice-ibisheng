@@ -1,5 +1,18 @@
 "use strict";
 
+function CMathBreak()
+{
+    this.AlnAt = undefined;
+}
+CMathBreak.prototype.Set_FromObj = function(Obj)
+{
+    if(Obj.AlnAt !== undefined && Obj.AlnAt !== null && Obj.AlnAt - 0 == 0)
+    {
+        if(Obj.AlnAt >= 0 && Obj.AlnAt <= 255)
+            this.AlnAt = Obj.AlnAt;
+    }
+}
+
 function CMathBorderBoxPr()
 {
     this.hideBot    = false;
@@ -139,7 +152,7 @@ CBorderBox.prototype.recalculateSize = function()
     var height = base.height;
     var ascent = base.ascent;
 
-    this.gapBrd = this.Get_CompiledCtrPrp().FontSize*0.08104587131076388;
+    this.gapBrd = this.GetTPrpToControlLetter().FontSize*0.08104587131076388;
 
     if(this.Pr.hideTop == false)
     {
@@ -162,7 +175,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 {
     this.elements[0][0].draw(x, y, pGraphics);
 
-    var penW = this.Get_CompiledCtrPrp().FontSize*0.02;
+    var penW = this.GetTPrpToControlLetter().FontSize*0.02;
 
     var Width  = this.size.width - this.GapLeft - this.GapRight,
         Height = this.size.height;
@@ -523,28 +536,24 @@ CBar.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
 }
-CBar.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CBar.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true)
     {
-        var prp =
-        {
-            loc:    this.Pr.pos,
-            type:   DELIMITER_LINE
-        };
+        var prp = {loc:    this.Pr.pos, type:   DELIMITER_LINE };
 
-        var defaultProps =
-        {
-            loc:   LOCATION_BOT
-        };
+        var defaultProps = { loc:   LOCATION_BOT};
 
         this.setCharacter(prp, defaultProps);
         this.RecalcInfo.bProps = false;
     }
+}
+CBar.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.ApplyProperties(RPI);
+    this.operator.PreRecalc(this, ParaMath);
 
-    //this.Set_CompiledCtrPrp(ParaMath);
-
-    CBar.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
+    CBar.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 }
 CBar.prototype.getAscent = function()
 {

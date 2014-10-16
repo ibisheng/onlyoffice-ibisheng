@@ -439,11 +439,31 @@ CRadical.prototype.fillContent = function()
     this.Iterator = this.getDegree();
     this.Base     = this.getBase();
 };
-CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CRadical.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
+    this.Set_CompiledCtrPrp(Parent, ParaMath);
+
+    this.ApplyProperties(RPI);
+
+    if(this.Pr.type == SQUARE_RADICAL)
+        this.RealBase.PreRecalc(this, ParaMath, ArgSize, RPI);
+    else
+    {
+        var ArgSzIter = new CMathArgSize();
+        ArgSzIter.SetValue(-2);
+
+        this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, RPI);
+        this.RealBase.PreRecalc(this, ParaMath, ArgSize, RPI);
+    }
+
+    if(this.bInside == false)
+        GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
+}
+CRadical.prototype.ApplyProperties = function(RPI)
+{
     if(this.RecalcInfo.bProps)
     {
         if(this.Pr.degHide == true)
@@ -490,20 +510,16 @@ CRadical.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 
         this.RecalcInfo.bProps = false;
     }
-
-    //this.Set_CompiledCtrPrp(ParaMath);
+}
+CRadical.prototype.Resize = function(oMeasure, RPI)
+{
 
     if(this.Pr.type == SQUARE_RADICAL)
-        this.RealBase.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+        this.RealBase.Resize(oMeasure, RPI);
     else
     {
-        var ArgSzIter = new CMathArgSize();
-        ArgSzIter.SetValue(-2);
-        //ArgSzIter.Merge(ArgSize);
-
-
-        this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
-        this.RealBase.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+        this.Iterator.Resize(oMeasure, RPI);
+        this.RealBase.Resize(oMeasure, RPI);
     }
 
     var shTop,

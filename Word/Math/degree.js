@@ -46,6 +46,7 @@ function CDegreeBase(props, bInside)
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
+        //CDegreeBase.prototype.init.call(this, props);
 }
 Asc.extendClass(CDegreeBase, CMathBase);
 CDegreeBase.prototype.init = function(props)
@@ -59,19 +60,41 @@ CDegreeBase.prototype.fillContent = function()
     this.elements[0][0] = this.baseContent;
     this.elements[0][1] = this.iterContent;
 };
-CDegreeBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CDegreeBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    //this.Set_CompiledCtrPrp(ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath);
 
-    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
+    this.ApplyProperties(RPI);
+
+    if(this.bInside == false)
+        GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
+
+    this.baseContent.PreRecalc(this, ParaMath, ArgSize, RPI);
 
     var ArgSzDegr = ArgSize.Copy();
     ArgSzDegr.decrease();
 
-    this.elements[0][1].Resize(oMeasure, this, ParaMath, RPI, ArgSzDegr);
+    var RPIDegr = RPI.Copy();
+    RPIDegr.bDecreasedComp = true;
+
+    this.iterContent.PreRecalc(this, ParaMath, ArgSzDegr, RPIDegr);
+}
+CDegreeBase.prototype.Resize = function(oMeasure, RPI)
+{
+    //this.Parent = Parent;
+    //this.ParaMath = ParaMath;
+
+    //this.Set_CompiledCtrPrp(ParaMath);
+
+    this.baseContent.Resize(oMeasure, RPI);
+
+    //var ArgSzDegr = ArgSize.Copy();
+    //ArgSzDegr.decrease();
+
+    this.iterContent.Resize(oMeasure, RPI);
 
     if(this.Pr.type === DEGREE_SUPERSCRIPT)
         this.recalculateSup(oMeasure);
@@ -83,23 +106,19 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     this.upBase = 0;
     this.upIter = 0;
 
     var oBase = this.elements[0][0];
-    //var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
 
     var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
 
     if(bOneLineText)
     {
-        //var UpBaseline =  1.786*shCenter; // baseline итератора
         var UpBaseline = 1.65*shCenter; // baseline итератора
-
-        // iter.height - UpBaseline - iter.ascent + base.ascent  > 2/3 * base.height
 
         if(iter.height - UpBaseline - iter.ascent + base.ascent  > 2/3 * base.ascent)
             this.upBase = iter.height - 2/3*base.ascent;
@@ -138,15 +157,13 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    var mgCtrPrp = this.GetTPrpToControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
     var oBase = this.elements[0][0];
-    //var bBaseOnlyText = oBase.IsJustDraw() ? false : oBase.IsOnlyText();    // у Just-Draw элементов нет ф-ии IsOnlyText
-
     var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
 
     if(bOneLineText)
@@ -278,6 +295,24 @@ CIterators.prototype.init = function()
     this.elements[0][0] = this.iterUp;
     this.elements[1][0] = this.iterDn;
 };
+CIterators.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    this.ArgSize.SetValue(-1);
+
+    var ArgSzIters = ArgSize.Copy();
+    ArgSzIters.Merge(this.ArgSize);
+
+    this.Set_CompiledCtrPrp(Parent, ParaMath);
+
+    var RPI_ITER = RPI.Copy();
+    RPI_ITER.bDecreasedComp = true;
+
+    this.iterUp.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
+    this.iterDn.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
+};
 CIterators.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
@@ -293,10 +328,6 @@ CIterators.prototype.setUpperIterator = function(iterator)
 CIterators.prototype.setLowerIterator = function(iterator)
 {
     this.elements[1][0] = iterator;
-};
-CIterators.prototype.Get_CompiledCtrPrp = function()
-{
-    return this.Parent.Get_CompiledCtrPrp();
 };
 CIterators.prototype.alignIterators = function(mcJc)
 {
@@ -354,6 +385,7 @@ function CDegreeSubSupBase(props, bInside)
     CDegreeSubSupBase.superclass.constructor.call(this, bInside);
 
     this.gapBase = 0;
+    this.bNaryInline = false;
 
     this.Pr = new CMathDegreeSubSupPr();
 
@@ -392,7 +424,29 @@ CDegreeSubSupBase.prototype.fillContent = function()
         oIters.alignIterators(MCJC_RIGHT);
     }
 };
-CDegreeSubSupBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.bNaryInline = RPI.bNaryInline;
+
+    CDegreeSubSupBase.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+};
+/*CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    this.Set_CompiledCtrPrp(Parent, ParaMath);
+
+    var ArgSzIters = ArgSize.Copy();
+    ArgSzIters.decrease();
+
+    if(this.bInside == false)
+        GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
+
+    this.baseContent.PreRecalc(this, ParaMath, ArgSize, RPI);
+    this.iters.PreRecalc(this, ParaMath, ArgSzIters, RPI);
+};*/
+/*CDegreeSubSupBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
 {
     this.Parent = Parent;
     this.ParaMath = ParaMath;
@@ -406,10 +460,14 @@ CDegreeSubSupBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, A
     this.iters.Resize(oMeasure, this, ParaMath, RPI, ArgSzIters);
 
     this.recalculateSize(oMeasure, RPI);
-};
+};*/
 CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
-    var mgCtrPrp = this.Get_CompiledCtrPrp();
+    //var mgCtrPrp = this.GetTPrpToControlLetter();
+
+    var mgCtrPrp = this.Get_CompiledCtrPrp(); // Get_CompiledCtrPrp -  чтобы итераторы не разъезжались
+                                              // половину ascent брать нельзя, т.к. черта дроби будет разделительной для верхнего и нижнего итератора => соответственно
+                                              // если числитель меньше/больше знаменателя расположение итераторов у степени будет неправильным
 
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     shCenter *= 1.4;
@@ -433,16 +491,17 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
         iterDown = iters.elements[1][0].size;
 
     var lUp    = base.size.ascent - shCenter; // center of base
+    //var lUp    = base.size.height/2; // center of base
     var lDown  = base.size.height - lUp; // height - center of base
 
-    var ctrPrpIter = iters.Get_CompiledCtrPrp();
+    var ctrPrpIter = iters.GetTPrpToControlLetter();
     var shIter = this.ParaMath.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
 
     var minGap =  0.7*shIter;
 
     var up, down;
 
-    if(RPI.bNaryInline == true)
+    if(this.bNaryInline)
     {
         up = down = 0;
     }
@@ -465,7 +524,6 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
         up = lUp > upDesc ? lUp - upDesc : 0;     // расстояние от центра основания до верхнего итератора
         down = lDown > downAsc ? lDown - downAsc : 0;   // расстояние от центра основания до нижнего итератора
     }
-
 
 
     if(up + down > minGap)

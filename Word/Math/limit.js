@@ -30,6 +30,87 @@ CMathLimitPr.prototype.Read_FromBinary = function(Reader)
     this.type = Reader.GetLong();
 };
 
+function CLimitPrimary(bInside, Type, FName, Iterator)
+{
+    CLimitPrimary.superclass.constructor.call(this, bInside);
+
+    this.Type = Type;
+    this.FName = null;
+    this.Iterator = null;
+
+    this.init(FName, Iterator);
+}
+Asc.extendClass(CLimitPrimary, CMathBase);
+CLimitPrimary.prototype.init = function(FName, Iterator)
+{
+    this.setDimension(2, 1);
+
+    if(this.Type == LIMIT_LOW)
+    {
+        this.FName  = FName;
+        this.Iterator = new CDenominator(Iterator);
+
+        this.elements[0][0] = this.FName;
+        this.elements[1][0] = this.Iterator;
+    }
+    else
+    {
+        this.Iterator = Iterator;
+        this.FName    = FName;
+
+        this.elements[0][0] = this.Iterator;
+        this.elements[1][0] = this.FName;
+    }
+}
+CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    this.Parent = Parent;
+    this.ParaMath = ParaMath;
+
+    this.Set_CompiledCtrPrp(Parent, ParaMath);
+
+    if(this.bInside == false)
+        GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
+
+    this.FName.PreRecalc(this, ParaMath, ArgSize, RPI);
+
+    var ArgSzIter = ArgSize.Copy();
+    ArgSzIter.decrease();
+
+    var NewRPI = RPI.Copy();
+    NewRPI.bDecreasedComp = true;
+
+    this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, NewRPI);
+}
+CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
+{
+    if(this.Type == LIMIT_LOW)
+        this.dH = 0;
+    else
+        this.dH = 0.06*this.GetTPrpToControlLetter().FontSize;
+
+    this.FName.Resize(oMeasure, RPI);
+
+    this.Iterator.Resize(oMeasure, RPI);
+
+    var SizeFName = this.FName.size,
+        SizeIter  = this.Iterator.size;
+
+    var width  = SizeFName.width > SizeIter.width ? SizeFName.width : SizeIter.width,
+        height = SizeFName.height + SizeIter.height,
+        ascent;
+
+    if(this.Type == LIMIT_LOW)
+        ascent = SizeFName.ascent;
+    else if(this.Type == LIMIT_UP)
+        ascent = SizeIter.height + this.dH + SizeFName.ascent;
+
+
+    width += this.GapLeft + this.GapRight;
+
+    this.size = {width: width, height: height, ascent: ascent};
+}
+
 function CLimit(props)
 {
     CLimit.superclass.constructor.call(this);
@@ -67,121 +148,35 @@ CLimit.prototype.getIterator = function()
 {
     return this.Content[1];
 }
-CLimit.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CLimit.prototype.ApplyProperties = function(RPI)
 {
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-
     if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
     {
+        this.setDimension(1, 1);
+
         if(RPI.bInline == true && RPI.bMathFunc == true)
         {
-            this.setDimension(1, 1);
-
-
             var props;
 
             if(this.Pr.type == LIMIT_LOW)
-            {
-                props =
-                {
-                    type:   DEGREE_SUBSCRIPT,
-                    ctrPrp: this.CtrPrp
-                };
-            }
+                props = {type:   DEGREE_SUBSCRIPT, ctrPrp: this.CtrPrp};
             else
-            {
-                props =
-                {
-                    type:   DEGREE_SUPERSCRIPT,
-                    ctrPrp: this.CtrPrp
-                };
-            }
+                props = {type:   DEGREE_SUPERSCRIPT, ctrPrp: this.CtrPrp};
 
-            this.elements[0][0] = new CDegreeBase(null, true);
+            this.elements[0][0] = new CDegreeBase(props, true);
             this.elements[0][0].setBase(this.getFName());
             this.elements[0][0].setIterator(this.getIterator());
             this.elements[0][0].fillContent();
-
-            this.FName    = this.getFName();
-            this.Iterator = this.getIterator();
         }
         else
         {
-            this.setDimension(2, 1);
-
-            if(this.Pr.type == LIMIT_LOW)
-            {
-                this.dH = 0;
-
-                this.FName = this.getFName();
-
-                this.Iterator = new CDenominator(this.getIterator());
-
-                this.elements[0][0] = this.FName;
-                this.elements[1][0] = this.Iterator;
-            }
-            else
-            {
-                this.FName    = this.getFName();
-                this.Iterator = this.getIterator();
-                this.dH = 0.06*this.Get_CompiledCtrPrp().FontSize;
-
-                this.elements[0][0] = this.Iterator;
-                this.elements[1][0] = this.FName;
-            }
+            this.elements[0][0] = new CLimitPrimary(true, this.Pr.type, this.getFName(), this.getIterator());
         }
-
 
         this.RecalcInfo.bProps = false;
     }
 
-
-    if(RPI.bInline == true && RPI.bMathFunc == true)
-    {
-        this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-
-        this.size =
-        {
-            width: this.elements[0][0].size.width,
-            height: this.elements[0][0].size.height,
-            ascent: this.elements[0][0].size.ascent
-        };
-    }
-    else
-    {
-        this.FName.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-
-        var ArgSzIter = ArgSize.Copy();
-        ArgSzIter.decrease();
-
-        this.Iterator.Resize(oMeasure, this, ParaMath, RPI, ArgSzIter);
-
-        var SizeFName = this.FName.size,
-            SizeIter  = this.Iterator.size;
-
-        var width  = SizeFName.width > SizeIter.width ? SizeFName.width : SizeIter.width,
-            height = SizeFName.height + SizeIter.height,
-            ascent;
-
-        if(this.Pr.type == LIMIT_LOW)
-        {
-            ascent = SizeFName.ascent;
-        }
-        else if(this.Pr.type == LIMIT_UP)
-        {
-            ascent = SizeIter.height + this.dH + SizeFName.ascent;
-        }
-
-        width += this.GapLeft + this.GapRight;
-
-
-        this.size = {width: width, height: height, ascent: ascent};
-    }
-
 }
-
 function CMathFunc(props)
 {
     CMathFunc.superclass.constructor.call(this);
@@ -207,18 +202,16 @@ CMathFunc.prototype.init = function(props)
     this.setProperties(props);
     this.fillContent();
 }
-CMathFunc.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
-    RPI.bMathFunc = true;
+    var NewRPI = RPI.Copy();
+    NewRPI.bMathFunc = true;
 
-    CMathFunc.superclass.Resize.call(this, oMeasure, Parent, ParaMath, RPI, ArgSize);
-
-    RPI.bMathFunc = false;
-
+    CMathFunc.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
 }
 CMathFunc.prototype.setDistance = function()
 {
-    this.dW = this.Get_CompiledCtrPrp().FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.GetTPrpToControlLetter().FontSize/6*g_dKoef_pt_to_mm;
 }
 CMathFunc.prototype.getFName = function()
 {
