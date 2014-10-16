@@ -1016,7 +1016,62 @@ CGraphicObjects.prototype =
     Get_SelectedContent: function(SelectedContent)
     {
         var content = this.getTargetDocContent();
-        return content && content.Get_SelectedContent(SelectedContent);
+        if(content)
+        {
+            content.Get_SelectedContent(SelectedContent);
+        }
+        else
+        {
+            var para = new Paragraph(this.document.DrawingDocument, this.document, 0, 0, 0, 0, 0);
+            var selectedObjects, run, drawing, i;
+            if(this.selection.groupSelection)
+            {
+                selectedObjects = this.selection.groupSelection.selectedObjects;
+                var groupParaDrawing = this.selection.groupSelection.parent;
+                //TODO: в случае инлановой группы для определения позиции нужно чтобы докуметн был рассчитан. Не понятно можно ли использовать рассчитаные позиции. Пока создаем инлайновые ParaDrawing.
+                for(i = 0; i < selectedObjects.length; ++i)
+                {
+                    run =  new ParaRun(para, false);
+                    selectedObjects[i].recalculate();
+                    drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
+                    drawing.Set_DrawingType(groupParaDrawing.DrawingType);
+                    drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
+                    if(groupParaDrawing.DrawingType === drawing_Anchor)
+                    {
+                        drawing.Set_Distance(groupParaDrawing.Distance.L, groupParaDrawing.Distance.T, groupParaDrawing.Distance.R, groupParaDrawing.Distance.B);
+                        drawing.Set_WrappingType(groupParaDrawing.wrappingType);
+                        drawing.Set_BehindDoc(groupParaDrawing.behindDoc);
+                        drawing.Set_PositionH(groupParaDrawing.PositionH.RelativeFrom, groupParaDrawing.PositionH.Align, groupParaDrawing.PositionH.Value + selectedObjects[i].bounds.x);
+                        drawing.Set_PositionV(groupParaDrawing.PositionV.RelativeFrom, groupParaDrawing.PositionV.Align, groupParaDrawing.PositionV.Value + selectedObjects[i].bounds.y);
+                    }
+                    run.Add_ToContent(run.State.ContentPos, drawing, true, false);
+                    para.Internal_Content_Add(para.CurPos.ContentPos, run, true);
+                }
+            }
+            else
+            {
+                selectedObjects = this.selectedObjects;
+                for(i = 0; i < selectedObjects.length; ++i)
+                {
+                    run =  new ParaRun(para, false);
+                    selectedObjects[i].recalculate();
+                    drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
+                    drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
+                    drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
+                    if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
+                    {
+                        drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
+                        drawing.Set_WrappingType(selectedObjects[i].parent.wrappingType);
+                        drawing.Set_BehindDoc(selectedObjects[i].parent.behindDoc);
+                        drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x);
+                        drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y);
+                    }
+                    run.Add_ToContent(run.State.ContentPos, drawing, true, false);
+                    para.Internal_Content_Add(para.CurPos.ContentPos, run, true);
+                }
+            }
+            SelectedContent.Add( new CSelectedElement( para, true ) );
+        }
     },
 
     getCurrentPageAbsolute: function()
