@@ -10772,7 +10772,7 @@ CDocument.prototype =
         {
             // Если мы добавляем разные колонтитулы для четных и нечетных страниц, а этих колонтитулов нет, тогда
             // создаем их в самой первой секции            
-            var FirstSectPr = this.SectionsInfo.Get_SectPr2( 0).SectPr;
+            var FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
             if ( null === FirstSectPr.Get_Header_Even() )
             {
                 var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
@@ -10783,9 +10783,17 @@ CDocument.prototype =
             {
                 var Footer = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Footer );
                 FirstSectPr.Set_Footer_Even( Footer );
-            }            
+            }
+
+            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_Default();
         }
-                
+        else
+        {
+            var FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
+            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_Default();
+        }
+
+
         this.Recalculate();
 
         if ( null !== this.HdrFtr.CurHdrFtr )
