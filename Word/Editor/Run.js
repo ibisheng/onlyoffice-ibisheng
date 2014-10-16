@@ -109,17 +109,19 @@ ParaRun.prototype.Copy = function(Selected)
     var StartPos = 0;
     var EndPos   = this.Content.length;
 
-    if ( true === Selected && true === this.State.Selection.Use )
+    if (true === Selected && true === this.State.Selection.Use)
     {
         StartPos = this.State.Selection.StartPos;
         EndPos   = this.State.Selection.EndPos;
 
-        if ( StartPos > EndPos )
+        if (StartPos > EndPos)
         {
             StartPos = this.State.Selection.EndPos;
             EndPos   = this.State.Selection.StartPos;
         }
     }
+    else if (true === Selected && true !== this.State.Selection.Use)
+        EndPos = -1;
 
     for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
     {

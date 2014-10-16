@@ -228,10 +228,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                         return false;
 
                     // Значит мы в каком-то элементе, тогда надо выделить данный элемент
-                    var oParent = oContent.GetParent();
-                    oParent.Select_WholeElement();
-                    oParent.Select_ToRoot();
-                    this.bSelectionUse = true;
+                    oContent.ParentElement.Select_WholeElement();
 
                     return true;
                 }
@@ -256,9 +253,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     }
                     else
                     {
-                        oContent.Select_ElementByPos(nStartPos + 1);
-                        oContent.Select_ToRoot();
-                        this.bSelectionUse = true;
+                        oContent.Select_ElementByPos(nStartPos + 1, true);
                     }
                 }
                 else //if (Direction < 0)
@@ -281,9 +276,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     }
                     else
                     {
-                        oContent.Select_ElementByPos(nStartPos - 1);
-                        oContent.Select_ToRoot();
-                        this.bSelectionUse = true;
+                        oContent.Select_ElementByPos(nStartPos - 1, true);
                     }
                 }
             }
@@ -398,14 +391,7 @@ ParaMath.prototype.Clear_TextPr = function()
 
 ParaMath.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 {
-    this.Selection_Remove();
-    this.Set_ParaContentPos(ParaNearPos.NearPos.ContentPos, Depth);
-
-    var oSelectedContent = this.GetSelectContent();
-    var oContent = oSelectedContent.Content;
-
-    ParaNearPos.Classes.push(oContent);
-    ParaNearPos.Classes.push(oContent.content[oContent.CurPos]);
+    this.Root.Check_NearestPos(ParaNearPos, Depth);
 };
 
 ParaMath.prototype.Get_DrawingObjectRun = function(Id)

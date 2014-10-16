@@ -8746,12 +8746,12 @@ CDocument.prototype =
 
                 this.Selection_Remove();
 
-                var NewMathRun     = MathRun.Split2(ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.NearPos.ContentPos.Depth - 1]);
+                var NewMathRun     = MathRun.Split(ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1);
                 var MathContent    = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
-                var MathContentPos = MathContent.CurPos; // TODO: текущая позиция выставилась в функции Check_NearestPos
+                var MathContentPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
 
                 MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
-                MathContent.Insert_MathContent(Element.Content[0].Root, MathContentPos + 1);
+                MathContent.Insert_MathContent(Element.Content[0].Root, MathContentPos + 1, true);
 
                 this.Recalculate();
 

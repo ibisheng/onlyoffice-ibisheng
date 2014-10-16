@@ -6003,6 +6003,25 @@ Paragraph.prototype =
         this.Set_SelectionContentPos( StartPos, EndPos );
     },
 
+    Select_Math : function(ParaMath)
+    {
+        for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
+        {
+            if (this.Content[nPos] === ParaMath)
+            {
+                this.Selection.Use           = true;
+                this.Selection.StartManually = false;
+                this.Selection.EndManually   = false;
+                this.Selection.StartPos      = nPos;
+                this.Selection.EndPos        = nPos;
+                this.Selection.Flag          = selectionflag_Common;
+
+                this.Document_SetThisElementCurrent(false);
+                return;
+            }
+        }
+    },
+
     Get_SelectionBounds : function()
     {
         var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_StartPage_Absolute();

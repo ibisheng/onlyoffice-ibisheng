@@ -688,6 +688,7 @@ function CMathContent()
     };
 
     this.NearPosArray = [];
+    this.ParentElement = null;
 
     this.size = new CMathSize();
 	
@@ -1291,11 +1292,14 @@ CMathContent.prototype =
             this.Add_ToContent(0, new ParaRun(null, true));
         }
 
+        for (var nPos = 0, nCount = this.content.length; nPos < nCount; nPos++)
+        {
+            if(para_Math_Run === this.content[nPos].Type)
+                this.content[nPos].Math_Correct_Content();
+        }
+
         if (this.content.length == 1)
         {
-            if(para_Math_Run === this.content[0].Type)
-                this.content[0].Math_Correct_Content();
-
             if(this.content[0].Is_Empty())
                 this.content[0].fillPlaceholders();
         }
@@ -1591,6 +1595,18 @@ CMathContent.prototype =
             this.private_CorrectSelectionPos();
             this.private_CorrectCurPos();
         }
+
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for ( var Index = 0; Index < NearPosLen; Index++ )
+        {
+            var HyperNearPos = this.NearPosArray[Index];
+            var ContentPos = HyperNearPos.NearPos.ContentPos;
+            var Depth      = HyperNearPos.Depth;
+
+            if (ContentPos.Data[Depth] >= Pos)
+                ContentPos.Data[Depth]++;
+        }
     },
 
     private_CorrectSelectionPos : function()
@@ -1621,35 +1637,55 @@ CMathContent.prototype =
         var DeletedItems = this.content.splice(Pos, Count);
         History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
-        if(this.CurPos > Pos)
-        {
-            if(this.CurPos >= Pos + Count)
-                this.CurPos -= Count;
-            else
-                this.CurPos = Pos;
+        // Обновим текущую позицию
+        if (this.CurPos > Pos + Count)
+            this.CurPos -= Count;
+        else if (this.CurPos > Pos )
+            this.CurPos = Pos;
 
-            this.private_CorrectCurPos();
-        }
+        this.private_CorrectCurPos();
 
-        if ( true === this.Selection.Use )
+        // Обновим начало и конец селекта
+        if (true === this.Selection.Use)
         {
-            if(this.Selection.Start > Pos)
+            if (this.Selection.Start <= this.Selection.End)
             {
-                if(this.Selection.Start >= Pos + Count)
+                if (this.Selection.Start > Pos + Count)
                     this.Selection.Start -= Count;
-                else
+                else if (this.Selection.Start > Pos)
                     this.Selection.Start = Pos;
-            }
 
-            if(this.Selection.End > Pos)
-            {
-                if(this.Selection.End >= Pos + Count)
+                if (this.Selection.End >= Pos + Count)
                     this.Selection.End -= Count;
-                else
+                else if (this.Selection.End >= Pos)
+                    this.Selection.End = Math.max(0, Pos - 1);
+            }
+            else
+            {
+                if (this.Selection.Start >= Pos + Count)
+                    this.Selection.Start -= Count;
+                else if (this.Selection.Start >= Pos)
+                    this.Selection.Start = Math.max(0, Pos - 1);
+
+                if (this.Selection.End > Pos + Count)
+                    this.Selection.End -= Count;
+                else if (this.Selection.End > Pos)
                     this.Selection.End = Pos;
             }
+        }
 
-            this.private_CorrectSelectionPos();
+        // Обновляем позиции в NearestPos
+        var NearPosLen = this.NearPosArray.length;
+        for (var Index = 0; Index < NearPosLen; Index++)
+        {
+            var HyperNearPos = this.NearPosArray[Index];
+            var ContentPos = HyperNearPos.NearPos.ContentPos;
+            var Depth      = HyperNearPos.Depth;
+
+            if (ContentPos.Data[Depth] > Pos + Count)
+                ContentPos.Data[Depth] -= Count;
+            else if (ContentPos.Data[Depth] > Pos)
+                ContentPos.Data[Depth] = Math.max(0 , Pos);
         }
     },
 
@@ -1910,8 +1946,11 @@ CMathContent.prototype =
             this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
     },
 
-    Insert_MathContent : function(oMathContent, Pos)
+    Insert_MathContent : function(oMathContent, Pos, bSelect)
     {
+        if (null === this.ParaMath || null === this.ParaMath.Paragraph)
+            bSelect = false;
+
         if (undefined === Pos)
             Pos = this.CurPos;
 
@@ -1919,12 +1958,32 @@ CMathContent.prototype =
         for (var nIndex = 0; nIndex < nCount; nIndex++)
         {
             this.Internal_Content_Add(Pos + nIndex, oMathContent.content[nIndex], false);
+
+            if (true === bSelect)
+            {
+                oMathContent.content[nIndex].Select_All();
+            }
         }
 
         if (null !== this.ParaMath)
             this.ParaMath.SetNeedResize();
 
         this.CurPos = Pos + 1 + nCount;
+
+        if (true === bSelect)
+        {
+            this.Selection.Use = true;
+            this.Selection.Start = Pos;
+            this.Selection.End   = Pos + nCount - 1;
+
+            if (!this.bRoot)
+                this.ParentElement.Select_MathContent(this);
+            else
+                this.ParaMath.bSelectionUse = true;
+
+            this.ParaMath.Paragraph.Select_Math(this.ParaMath);
+        }
+
         this.Correct_Content(true);
     },
 
@@ -3837,8 +3896,8 @@ CMathContent.prototype.Set_SelectionContentPos = function(StartContentPos, EndCo
 
     if (OldStartPos > OldEndPos)
     {
-        OldStartPos = this.Selection.EndPos;
-        OldEndPos   = this.Selection.StartPos;
+        OldStartPos = this.Selection.End;
+        OldEndPos   = this.Selection.Start;
     }
 
     var StartPos = 0;
@@ -4279,24 +4338,23 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
         SelectionDraw.H      = this.size.height;
     }
 };
-CMathContent.prototype.Select_ToRoot = function()
-{
-    this.Selection.Use = true;
-
-    this.Correct_Selection();
-
-    if(!this.bRoot)
-        this.Parent.Select_ToRoot();
-};
-CMathContent.prototype.Select_ElementByPos = function(nPos)
+CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)
 {
     this.Selection.Use   = true;
     this.Selection.Start = nPos;
     this.Selection.End   = nPos;
 
-    this.content[this.Selection.Start].Select_All();
+    this.content[nPos].Select_All();
+
+    if (bWhole)
+        this.Correct_Selection();
+
+    if (!this.bRoot)
+        this.ParentElement.Select_MathContent(this);
+    else
+        this.ParaMath.bSelectionUse = true;
 };
-CMathContent.prototype.Select_Element = function(Element)
+CMathContent.prototype.Select_Element = function(Element, bWhole)
 {
     var nPos = -1;
     for (var nCurPos = 0, nCount = this.content.length; nCurPos < nCount; nCurPos++)
@@ -4313,6 +4371,14 @@ CMathContent.prototype.Select_Element = function(Element)
         this.Selection.Use   = true;
         this.Selection.Start = nPos;
         this.Selection.End   = nPos;
+
+        if (bWhole)
+            this.Correct_Selection();
+
+        if (!this.bRoot)
+            this.ParentElement.Select_MathContent(this);
+        else
+            this.ParaMath.bSelectionUse = true;
     }
 };
 CMathContent.prototype.Correct_Selection = function()
@@ -4350,13 +4416,11 @@ CMathContent.prototype.Correct_Selection = function()
         this.content[this.Selection.End].Set_SelectionAtStartPos();
     }
 };
-
 CMathContent.prototype.Create_FontMap = function(Map)
 {
     for (var nIndex = 0, nCount = this.content.length; nIndex < nCount; nIndex++)
         this.content[nIndex].Create_FontMap(Map, this.Compiled_ArgSz); // ArgSize компилируется только тогда, когда выставлены все ссылки на родительские классы
 };
-
 CMathContent.prototype.Get_AllFontNames = function(AllFonts)
 {
     for (var nIndex = 0, nCount = this.content.length; nIndex < nCount; nIndex++)
@@ -4372,4 +4436,16 @@ CMathContent.prototype.Selection_CheckParaContentPos = function(ContentPos, Dept
         return this.content[CurPos].Selection_CheckParaContentPos(ContentPos, Depth + 1, bStart && this.Selection.End === CurPos, bEnd && CurPos === this.Selection.Start);
 
     return false;
+};
+CMathContent.prototype.Check_NearestPos = function(ParaNearPos, Depth)
+{
+    var HyperNearPos = new CParagraphElementNearPos();
+    HyperNearPos.NearPos = ParaNearPos.NearPos;
+    HyperNearPos.Depth   = Depth;
+
+    this.NearPosArray.push(HyperNearPos);
+    ParaNearPos.Classes.push(this);
+
+    var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
+    this.content[CurPos].Check_NearestPos(ParaNearPos, Depth + 1);
 };

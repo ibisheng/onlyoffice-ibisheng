@@ -54,6 +54,8 @@ function CMathBase(bInside)
         Use      : false
     };
 
+    this.NearPosArray = [];
+
     return this;
 }
 CMathBase.prototype =
@@ -616,7 +618,10 @@ CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
 {
     for (var nIndex = 0; nIndex < nCount; nIndex++)
+    {
         this.Content[nIndex] = new CMathContent();
+        this.Content[nIndex].ParentElement = this;
+    }
 };
 CMathBase.prototype.Copy = function()
 {
@@ -674,6 +679,7 @@ CMathBase.prototype.Read_FromBinary2 = function( Reader )
     for (var nIndex = 0; nIndex < nCount; nIndex++)
     {
         this.Content[nIndex] = g_oTableId.Get_ById(Reader.GetString2());
+        this.Content[nIndex].ParentElement = this;
     }
 
     this.Pr.Read_FromBinary(Reader);
@@ -837,15 +843,27 @@ CMathBase.prototype.Is_InnerSelection = function()
 
     return false;
 };
-CMathBase.prototype.Select_ToRoot = function()
-{
-    if (null !== this.Parent)
-        this.Parent.Select_ToRoot();
-};
 CMathBase.prototype.Select_WholeElement = function()
 {
     if (null !== this.Parent)
-        this.Parent.Select_Element(this);
+        this.Parent.Select_Element(this, true);
+};
+CMathBase.prototype.Select_MathContent = function(MathContent)
+{
+    for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
+    {
+        if (this.Content[nPos] === MathContent)
+        {
+            if (null !== this.Parent)
+            {
+                this.Selection.Use      = true;
+                this.Selection.StartPos = nPos;
+                this.Selection.EndPos   = nPos;
+                this.Parent.Select_Element(this, false);
+            }
+            break;
+        }
+    }
 };
 CMathBase.prototype.Set_SelectionContentPos       = ParaHyperlink.prototype.Set_SelectionContentPos;
 CMathBase.prototype.Get_LeftPos                   = ParaHyperlink.prototype.Get_LeftPos;
@@ -854,6 +872,7 @@ CMathBase.prototype.Get_WordStartPos              = ParaHyperlink.prototype.Get_
 CMathBase.prototype.Get_WordEndPos                = ParaHyperlink.prototype.Get_WordEndPos;
 CMathBase.prototype.Selection_Remove              = ParaHyperlink.prototype.Selection_Remove;
 CMathBase.prototype.Select_All                    = ParaHyperlink.prototype.Select_All;
+CMathBase.prototype.Check_NearestPos              = ParaHyperlink.prototype.Check_NearestPos;
 CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
 {
     if (true !== this.Selection.Use)
