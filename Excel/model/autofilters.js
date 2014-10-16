@@ -331,6 +331,7 @@ var gUndoInsDelCellsFlag = true;
 						
 						var isUpdateRange = null;
 						var recalc = false;
+						var changeRows = null;
 						if(paramsForCallBack)//меняем/удаляем/устанавливаем стиль для а/ф
 						{
 							switch(paramsForCallBack)
@@ -416,6 +417,7 @@ var gUndoInsDelCellsFlag = true;
 										t.drawAutoF();
 									
 									isUpdateRange = changesElemHistory.Ref;
+									changeRows = true;
 									
 									break;
 								}
@@ -730,7 +732,7 @@ var gUndoInsDelCellsFlag = true;
 						else
 						{
 							if(isUpdateRange != null && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
-								ws._onUpdateFormatTable(isUpdateRange, recalc);
+								ws._onUpdateFormatTable(isUpdateRange, recalc, changeRows);
 								
 							History.EndTransaction();
 							if(isTurnOffHistory)
@@ -7247,6 +7249,8 @@ var gUndoInsDelCellsFlag = true;
 				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells}, null, activeCells);
 
 				this._reDrawFilters();
+				
+				ws._onUpdateFormatTable(oldFilter.Ref, false, true);
 			},
 			
 			_isFilterColumnsContainFilter: function(filterColumns)
