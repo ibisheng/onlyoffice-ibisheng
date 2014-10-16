@@ -1209,10 +1209,10 @@ ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 
         var CurX = SearchPos.CurX;
 
+        Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+
         if ( D >= - 0.001 && D <= Dx + 0.001 )
         {
-            Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
-
             SearchPos.InText = true;
             SearchPos.DiffX  = 0.001;
 
