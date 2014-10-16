@@ -466,16 +466,6 @@ CMathBase.prototype =
 
         return this.TextPrControlLetter;
     },
-    old_Set_CompiledCtrPrp: function(ParaMath)
-    {
-        if(this.RecalcInfo.bCtrPrp == true)
-        {
-            this.CompiledCtrPrp = ParaMath.GetFirstRPrp();
-            this.CompiledCtrPrp.Merge(this.CtrPrp);
-
-            this.RecalcInfo.bCtrPrp = false;
-        }
-    },
     getAscent: function(oMeasure, _height)
     {
         var Ascent = 0;
@@ -590,11 +580,9 @@ CMathBase.prototype =
     },
     Get_TextPr: function(ContentPos, Depth)
     {
-        var row = ContentPos.Get(Depth),
-            col = ContentPos.Get(Depth+1);
+        var pos = ContentPos.Get(Depth);
 
-
-        return this.elements[row][col].Get_TextPr(ContentPos, Depth + 2);
+        return this.Content[pos].Get_TextPr(ContentPos, Depth+1);
     },
     Get_CompiledTextPr : function(Copy)
     {
@@ -664,6 +652,19 @@ CMathBase.prototype =
                     this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
             }
         }
+    },
+    GetMathTextPr: function(ContentPos, Depth)
+    {
+        var pos = ContentPos.Get(Depth);
+
+        return this.Content[pos].GetMathTextPr(ContentPos, Depth+1);
+    },
+    Set_MathTextPr2: function(TextPr, MathPr, bAll)
+    {
+        this.Set_FontSizeCtrPrp(TextPr.FontSize);
+
+        for(var i = 0; i < this.Content.length; i++)
+            this.Content[i].Set_MathTextPr2(TextPr, MathPr, bAll);
     },
     Set_FontSizeCtrPrp: function(Value)
     {

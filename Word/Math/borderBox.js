@@ -359,7 +359,7 @@ function CMathBoxPr()
     this.diff    = false;
     this.noBreak = false;
     this.opEmu   = false;
-};
+}
 
 CMathBoxPr.prototype.Set_FromObject = function(Obj)
 {

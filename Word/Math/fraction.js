@@ -281,45 +281,6 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
     this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
     this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
 }
-/*CFraction.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    var ArgSzFr = ArgSize.Copy();
-
-    if(RPI.bInline == true && this.Pr.type === BAR_FRACTION)
-    {
-        ArgSzFr.decrease();        // для контентов числителя и знаменателя
-        this.ArgSize.SetValue(-1); // для CtrPrp
-    }
-    else if(RPI.bInsideFraction == true)
-    {
-        this.ArgSize.SetValue(-1); // для CtrPrp
-    }
-    else
-    {
-        this.ArgSize.SetValue(0);
-    }
-
-
-    // ??!!
-    if(this.Pr.type == NO_BAR_FRACTION)
-    {
-        ArgSzFr.decrease();
-        this.ArgSize.SetValue(-1);
-    }
-
-    // компилируем CtrPrp после того, как выставим ArgSize
-    // т.к. при компиляции CtrPrp для дроби важен this.Argsize  (NO_BAR_FRACTION)
-
-    // на Set_CompiledCtrPrp компилярются ctrPrp без учета ArgSize
-    // поэтому необязательно вызывать ее на Resize
-    //this.Set_CompiledCtrPrp(ParaMath);
-
-    var NewRPI = RPI.Copy();
-    if(this.Pr.type !== LINEAR_FRACTION)
-        NewRPI.bInsideFraction = true;
-
-    CFraction.superclass.Resize.call(this, oMeasure, Parent, ParaMath, NewRPI, ArgSzFr);
-}*/
 CFraction.prototype.recalculateSize = function(oMeasure)
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
@@ -463,17 +424,6 @@ CFractionBase.prototype.init = function(MathContent)
     this.setDimension(1, 1);
     this.elements[0][0] = MathContent;
 }
-/*CFractionBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    this.ArgSize = ArgSize.Copy();
-
-    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-
-    this.recalculateSize();
-}*/
 CFractionBase.prototype.getElement = function()
 {
     return this.elements[0][0];

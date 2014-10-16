@@ -430,37 +430,6 @@ CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI,
 
     CDegreeSubSupBase.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 };
-/*CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
-{
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
-
-    var ArgSzIters = ArgSize.Copy();
-    ArgSzIters.decrease();
-
-    if(this.bInside == false)
-        GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
-
-    this.baseContent.PreRecalc(this, ParaMath, ArgSize, RPI);
-    this.iters.PreRecalc(this, ParaMath, ArgSzIters, RPI);
-};*/
-/*CDegreeSubSupBase.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    //this.Set_CompiledCtrPrp(ParaMath);
-
-    var ArgSzIters = ArgSize.Copy();
-    ArgSzIters.decrease();
-
-    this.baseContent.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-    this.iters.Resize(oMeasure, this, ParaMath, RPI, ArgSzIters);
-
-    this.recalculateSize(oMeasure, RPI);
-};*/
 CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
     //var mgCtrPrp = this.GetTPrpToControlLetter();

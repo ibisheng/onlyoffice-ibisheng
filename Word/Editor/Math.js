@@ -62,17 +62,6 @@ function ParaMath()
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
 
-    /*this.MathPr =
-    {
-        naryLim:    NARY_UndOvr,
-        intLim:     NARY_SubSup,
-        brkBin:     BREAK_BEFORE,
-        brkSubBin:  BREAK_MIN_MIN,
-        wrapIndent: 0,
-        smallFrac:  false,
-        wrapRight:  false
-    };*/
-
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
 }
@@ -189,12 +178,27 @@ ParaMath.prototype.Add = function(Item)
     }
     else if (para_Math === Type)
     {
+        var ContentPos = new CParagraphContentPos();
+
+        if(this.bSelectionUse == true)
+            this.Get_ParaContentPos(true, true, ContentPos);
+        else
+            this.Get_ParaContentPos(false, false, ContentPos);
+
+        var MathTxtPr = this.Root.GetMathTextPr(ContentPos, 0);
+        var lng = oContent.content.length;
+
         // Нам нужно разделить данный Run на 2 части
         var RightRun = Run.Split2(Run.State.ContentPos);
 
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
         oContent.CurPos = StartPos;
+
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
+
+        var lng2 = oContent.content.length;
+        oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos, lng2 - lng + 1);
+
         oContent.CurPos = StartPos + 2; // позиция RightRun
         RightRun.Cursor_MoveToStartPos();
     }

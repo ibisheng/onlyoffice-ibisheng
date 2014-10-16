@@ -7991,7 +7991,12 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
     History.Add( this, { Type : historyitem_ParaRun_MathPrp, New : MPrp, Old : OldValue } );
     this.Recalc_CompiledPr(true);
 
-    //this.UpdateMathPr = true;
+}
+
+ParaRun.prototype.Set_MathTextPr2 = function(TextPr, MathPr)
+{
+    this.Set_Pr(TextPr);
+    this.Set_MathPr(MathPr);
 }
 ParaRun.prototype.IsAccent = function()
 {
@@ -8017,9 +8022,20 @@ ParaRun.prototype.Math_GetInfoLetter = function(Info)
     else
         Info.Result = false;
 }
-ParaRun.IsNormalText = function()
+ParaRun.prototype.IsNormalText = function()
 {
     return this.MathPrp.nor === true;
+}
+ParaRun.prototype.GetMathTextPr = function()
+{
+    var TextPr = new CTextPr();
+
+    if(this.IsPlaceholder())
+        TextPr.Merge(this.Parent.GetCtrPrp());
+
+    TextPr.Merge(this.Pr);
+
+    return {TextPr: TextPr, MathPr: this.MathPrp.Copy()};
 }
 
 function CParaRunStartState(Run)

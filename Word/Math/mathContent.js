@@ -773,80 +773,6 @@ CMathContent.prototype =
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },*/
 
-    old_Resize: function(oMeasure, Parent, ParaMath, ArgSize, RPI)      // пересчитываем всю формулу
-    {
-        if(ArgSize !== null && ArgSize !== undefined)
-        {
-            this.Compiled_ArgSz.value = this.ArgSize.value;
-            this.Compiled_ArgSz.Merge(ArgSize);
-        }
-
-        this.ParaMath = ParaMath;
-        if(Parent !== null)
-        {
-            this.bRoot = false;
-            this.Parent = Parent;
-        }
-
-        this.WidthToElement.length = 0;
-
-        var GapsInfo = new CMathGapsInfo(oMeasure, this, this.Compiled_ArgSz.value);
-
-        this.RecalcInfo.bEqqArray = RPI.bEqqArray;
-
-        var lng = this.content.length;
-
-        this.size.SetZero();
-
-        this.InfoPoints.SetDefault();
-
-        for(var pos = 0; pos < lng; pos++)
-        {
-            this.content[pos].ParaMath = ParaMath;
-
-            if(this.content[pos].Type == para_Math_Composition)
-            {
-                this.content[pos].SetGaps(GapsInfo);
-            }
-            else if(this.content[pos].Type == para_Math_Run)
-                this.content[pos].Math_SetGaps(GapsInfo);
-        }
-
-        if(GapsInfo.Current !== null)
-            GapsInfo.Current.GapRight = 0;
-
-        for(var pos = 0; pos < lng; pos++)
-        {
-            if(this.content[pos].Type == para_Math_Composition)
-            {
-                var NewRPI = RPI.Copy();
-                NewRPI.bEqqArray    = false;
-
-                this.content[pos].Resize(oMeasure, this, ParaMath, NewRPI, this.Compiled_ArgSz);
-
-                if(RPI.bEqqArray)
-                    this.InfoPoints.ContentPoints.UpdatePoint(this.content[pos].size.width);
-            }
-            else if(this.content[pos].Type == para_Math_Run)
-            {
-                //this.content[pos].Recalculate_Range();
-                this.content[pos].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, this.Compiled_ArgSz, this.InfoPoints.ContentPoints);
-            }
-
-
-            this.WidthToElement[pos] = this.size.width;
-
-            var oSize = this.content[pos].size;
-            this.size.width += oSize.width;
-
-            var oDescent = oSize.height - oSize.ascent,
-                SizeDescent = this.size.height - this.size.ascent;
-
-            this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
-
-            this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
-        }
-    },
     PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {
         if(ArgSize !== null && ArgSize !== undefined)
@@ -1464,6 +1390,12 @@ CMathContent.prototype =
 
         return TextPr;
     },
+    GetMathTextPr: function(ContentPos, Depth)
+    {
+        var pos = ContentPos.Get(Depth);
+
+        return this.content[pos].GetMathTextPr(ContentPos, Depth + 1);
+    },
     Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
     {
         if ( true === ApplyToAll )
@@ -1592,6 +1524,21 @@ CMathContent.prototype =
 
             }
         }
+
+    },
+    Set_MathTextPr2: function(TextPr, MathPr, bAll, StartPos, Count)
+    {
+        if(bAll)
+        {
+            StartPos = 0;
+            Count = this.content.length - 1;
+        }
+
+        if(Count < 0 || StartPos + Count > this.content.length - 1)
+            return;
+
+        for(var pos = StartPos; pos <= StartPos + Count; pos++)
+            this.content[pos].Set_MathTextPr2(TextPr, MathPr, true);
 
     },
     IsNormalTextInRuns: function()
@@ -3866,7 +3813,6 @@ CMathContent.prototype =
         this.AddText(oElem, sElemText);
     }
 };
-
 
 CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {

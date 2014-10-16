@@ -61,7 +61,7 @@ CLimitPrimary.prototype.init = function(FName, Iterator)
         this.elements[0][0] = this.Iterator;
         this.elements[1][0] = this.FName;
     }
-}
+};
 CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.Parent = Parent;
@@ -81,7 +81,7 @@ CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gap
     NewRPI.bDecreasedComp = true;
 
     this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, NewRPI);
-}
+};
 CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
 {
     if(this.Type == LIMIT_LOW)
@@ -109,7 +109,7 @@ CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
     width += this.GapLeft + this.GapRight;
 
     this.size = {width: width, height: height, ascent: ascent};
-}
+};
 
 function CLimit(props)
 {
@@ -136,18 +136,18 @@ CLimit.prototype.init = function(props)
     // посмотреть GetAllFonts
     this.setProperties(props);
     this.fillContent();
-}
+};
 CLimit.prototype.fillContent = function()
 {
 };
 CLimit.prototype.getFName = function()
 {
     return this.Content[0];
-}
+};
 CLimit.prototype.getIterator = function()
 {
     return this.Content[1];
-}
+};
 CLimit.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true || RPI.bChangeInline == true)
@@ -176,7 +176,7 @@ CLimit.prototype.ApplyProperties = function(RPI)
         this.RecalcInfo.bProps = false;
     }
 
-}
+};
 function CMathFunc(props)
 {
     CMathFunc.superclass.constructor.call(this);
@@ -201,30 +201,30 @@ CMathFunc.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     var NewRPI = RPI.Copy();
     NewRPI.bMathFunc = true;
 
     CMathFunc.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
-}
+};
 CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.GetTPrpToControlLetter().FontSize/6*g_dKoef_pt_to_mm;
-}
+};
 CMathFunc.prototype.getFName = function()
 {
     return this.Content[0];
-}
+};
 CMathFunc.prototype.getArgument = function()
 {
     return this.Content[1];
-}
+};
 CMathFunc.prototype.fillContent = function()
 {
     this.setDimension(1, 2);
     this.elements[0][0] = this.getFName();
     this.elements[0][1] = this.getArgument();
-}
+};
 

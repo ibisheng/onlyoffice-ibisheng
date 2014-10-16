@@ -175,47 +175,6 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
 
     return {width: width, height: height};
 }
-CAccentDoubleLine.prototype.old_calcCoord = function(stretch)
-{
-    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
-
-    var X = [],
-        Y = [];
-
-    X[0] = 0;          Y[0] = 0;
-    X[1] = stretch;    Y[1] = 0;
-    X[2] = stretch;    Y[2] = 0.011*fontSize;
-    X[3] = 0;          Y[3] = Y[2];
-    X[4] = 0;          Y[4] = 0;
-
-    X[5] = 0;          Y[5] = 0.039486*fontSize;
-    X[6] = stretch;    Y[6] = Y[5];
-    X[7] = stretch;    Y[7] = 0.0503*fontSize;
-    X[8] = 0;          Y[8] = Y[7];
-    X[9] = 0;          Y[9] = Y[5];
-
-    var W = X[7],
-        H = Y[7];
-
-    return {XX: X, YY: Y, W: W, H: H};
-}
-CAccentDoubleLine.prototype.old_drawPath = function(pGraphics, XX, YY)
-{
-    pGraphics._m(XX[0], YY[0]);
-    pGraphics._l(XX[1], YY[1]);
-    pGraphics._l(XX[2], YY[2]);
-    pGraphics._l(XX[3], YY[3]);
-    pGraphics._l(XX[4], YY[4]);
-    pGraphics.df();
-
-    pGraphics._s();
-    pGraphics._m(XX[5], YY[5]);
-    pGraphics._l(XX[6], YY[6]);
-    pGraphics._l(XX[7], YY[7]);
-    pGraphics._l(XX[8], YY[8]);
-    pGraphics._l(XX[9], YY[9]);
-
-}
 CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
 {
     var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
@@ -508,11 +467,11 @@ CAccent.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
     this.elements[0][0].SetDot(true);
-}
+};
 CAccent.prototype.IsAccent = function()
 {
     return true;
-}
+};
 CAccent.prototype.setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
@@ -538,7 +497,7 @@ CAccent.prototype.setPosition = function(pos, PosInfo)
     PosBase.y = this.pos.y + this.operator.size.height;
 
     this.elements[0][0].setPosition(PosBase, PosInfo);
-}
+};
 CAccent.prototype.ApplyProperties = function(RPI)
 {
     if(this.RecalcInfo.bProps == true)
@@ -556,14 +515,14 @@ CAccent.prototype.ApplyProperties = function(RPI)
 
         this.RecalcInfo.bProps = false;
     }
-}
+};
 CAccent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.ApplyProperties(RPI);
     this.operator.PreRecalc(this, ParaMath);
 
     CAccent.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
-}
+};
 CAccent.prototype.Resize = function(oMeasure, RPI)
 {
     var base = this.getBase();
@@ -578,7 +537,7 @@ CAccent.prototype.Resize = function(oMeasure, RPI)
     width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
-}
+};
 CAccent.prototype.draw = function(x, y, pGraphics)
 {
     var base = this.elements[0][0];
@@ -612,4 +571,4 @@ CAccent.prototype.draw = function(x, y, pGraphics)
     }
 
     this.operator.draw(x, y, pGraphics);
-}
+};

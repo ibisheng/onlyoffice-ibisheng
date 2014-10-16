@@ -293,64 +293,6 @@ CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 
     CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
 }
-/*CNary.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    this.Parent   = Parent;
-    this.ParaMath = ParaMath;
-
-    //this.Set_CompiledCtrPrp(ParaMath);
-
-    if(this.RecalcInfo.bProps || RPI.bChangeInline == true)
-    {
-        var oSign = this.getSign(this.Pr.chr, this.Pr.chrType);
-        this.Sign = oSign.operator;
-
-        var limLoc         = this.Pr.limLoc;
-
-        if(RPI.bInline == true || RPI.bInsideFraction == true)
-        {
-            limLoc = NARY_SubSup;
-            this.Sign = new CMathText(true);
-            this.Sign.add(oSign.chrCode);
-        }
-
-        if(limLoc == null || typeof(limLoc) == "undefined")
-        {
-            var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
-
-            if(bIntegral)
-                limLoc = g_oMathSettings.intLim;
-            else
-                limLoc = g_oMathSettings.naryLim;
-        }
-
-        var PropsInfo =
-        {
-            limLoc :    limLoc,
-            sign:       this.Sign,
-            supHide:    this.Pr.supHide,
-            subHide:    this.Pr.subHide
-        };
-
-        // пока оставим так, chrType сейчас нигде не используется
-        this.Pr.chrType = oSign.chrType;
-
-        this.fillBase(PropsInfo);
-
-        this.RecalcInfo.bProps = false;
-    }
-
-    var NewRPI = RPI.Copy();
-
-    if(RPI.bInline || RPI.bInsideFraction)
-        NewRPI.bNaryInline = true;
-
-
-    this.Base.Resize(oMeasure, this, ParaMath, NewRPI, ArgSize);
-    this.Arg.Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-
-    this.recalculateSize(oMeasure);
-}*/
 CNary.prototype.getSign = function(chrCode, chrType)
 {    
     var result = 
@@ -523,13 +465,6 @@ CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSzUnd, RPIUnd);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
 }
-/*CNaryUnd.prototype.Resize = function(oMeasure, RPI)
-{
-    this.elements[0][0].Resize(oMeasure, RPI);
-    this.elements[1][0].Resize(oMeasure, RPI);
-
-    this.recalculateSize(oMeasure);
-}*/
 CNaryUnd.prototype.setBase = function(base)
 {
     this.elements[1][0] = base;
@@ -568,19 +503,6 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSzOvr, RPIOvr);
 }
-/*CNaryOvr.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    var ArgSzOvr = ArgSize.Copy();
-    ArgSzOvr.decrease();
-
-    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-    this.elements[1][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzOvr);
-
-    this.recalculateSize(oMeasure);
-}*/
 CNaryOvr.prototype.recalculateSize = function()
 {
     var FontSize = this.GetTPrpToControlLetter().FontSize;
@@ -646,23 +568,6 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
     this.elements[2][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
 }
-/*CNaryUndOvr.prototype.Resize = function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-{
-    this.Parent = Parent;
-    this.ParaMath = ParaMath;
-
-    var ArgSzUnd = ArgSize.Copy();
-    ArgSzUnd.decrease();
-
-    var ArgSzOvr = ArgSize.Copy();
-    ArgSzOvr.decrease();
-
-    this.elements[0][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzUnd);
-    this.elements[1][0].Resize(oMeasure, this, ParaMath, RPI, ArgSize);
-    this.elements[2][0].Resize(oMeasure, this, ParaMath, RPI, ArgSzOvr);
-
-    this.recalculateSize(oMeasure);
-}*/
 CNaryUndOvr.prototype.recalculateSize = function()
 {
     var FontSize = this.GetTPrpToControlLetter().FontSize;
