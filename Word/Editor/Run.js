@@ -3729,7 +3729,7 @@ ParaRun.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
     }
 };
 
-ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, PointsInfo)
+ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
     var Result = false;
 
@@ -3766,7 +3766,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         // Проверяем, попали ли мы в данный элемент
         var Diff = SearchPos.X - SearchPos.CurX;
-        if (Math.abs( Diff ) < SearchPos.DiffX + 0.001 && !bNotUpdate)
+        if ((Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)) && !bNotUpdate)
         {
             SearchPos.DiffX = Math.abs( Diff );
             SearchPos.Pos.Update( CurPos, Depth );
@@ -4533,14 +4533,12 @@ ParaRun.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bS
 
     if (this.Selection.StartPos <= this.Selection.EndPos && this.Selection.StartPos <= CurPos && CurPos <= this.Selection.EndPos)
     {
-        if (((true !== bEnd)   || (true === bEnd   && CurPos !== this.Selection.EndPos)) &&
-            ((true !== bStart) || (true === bStart && CurPos !== this.Selection.StartPos)))
+        if ((true !== bEnd)   || (true === bEnd   && CurPos !== this.Selection.EndPos))
             return true;
     }
     else if (this.Selection.StartPos > this.Selection.EndPos && this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
     {
-        if (((true !== bEnd)   || (true === bEnd   && CurPos !== this.Selection.StartPos)) &&
-            ((true !== bStart) || (true === bStart && CurPos !== this.Selection.EndPos)))
+        if ((true !== bEnd)   || (true === bEnd   && CurPos !== this.Selection.StartPos))
             return true;
     }
 

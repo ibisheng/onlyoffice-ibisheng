@@ -3512,9 +3512,10 @@ Paragraph.prototype =
         }
     },
 
-    Get_ParaContentPosByXY : function(X, Y, PageNum, bYLine, StepEnd)
+    Get_ParaContentPosByXY : function(X, Y, PageNum, bYLine, StepEnd, bCenterMode)
     {
         var SearchPos = new CParagraphSearchPosXY();
+        SearchPos.CenterMode = (undefined === bCenterMode ? true : bCenterMode);
 
         if ( this.Lines.length <= 0 )
             return SearchPos;
@@ -5861,7 +5862,7 @@ Paragraph.prototype =
             if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
                 return false;
 
-            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false );
+            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageIndex + this.PageNum, false, false, false );
             
             if ( true === SearchPosXY.InText )
             {
@@ -12713,6 +12714,7 @@ function CParagraphSearchPosXY()
     this.Pos       = new CParagraphContentPos();
     this.InTextPos = new CParagraphContentPos();
 
+    this.CenterMode     = true; // Ищем ближайший (т.е. ориентируемся по центру элемента), или ищем именно прохождение через элемент
     this.CurX           = 0;
     this.CurY           = 0;
     this.X              = 0;
