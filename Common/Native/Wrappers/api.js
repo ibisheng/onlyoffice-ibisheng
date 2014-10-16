@@ -1931,6 +1931,36 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             _return = _stream;
             break;
         }
+        case 110: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_COPY
+        {
+            _return = this.Call_Menu_Context_Copy();
+            break;
+        }
+        case 111 : // ASC_MENU_EVENT_TYPE_CONTEXTMENU_CUT
+        {
+            _return = this.Call_Menu_Context_Cut();
+            break;
+        }
+        case 112: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_PASTE
+        {
+            this.Call_Menu_Context_Paste(_params[0], _params[1]);
+            break;
+        }
+        case 113: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_DELETE
+        {
+            this.Call_Menu_Context_Delete();
+            break;
+        }
+        case 114: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_SELECT
+        {
+            this.Call_Menu_Context_Select();
+            break;
+        }
+        case 115: // ASC_MENU_EVENT_TYPE_CONTEXTMENU_SELECTALL
+        {
+            this.Call_Menu_Context_SelectAll();
+            break;
+        }
         default:
             break;
     }
@@ -4904,3 +4934,109 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
         }
     }
 };
+
+/***************************** COPY|PASTE *******************************/
+asc_docs_api.prototype.Call_Menu_Context_Copy = function()
+{
+    var oCopyProcessor = new CopyProcessor(this, null, true);
+    var _binaty_data = oCopyProcessor.getSelectedBinary();
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (!_binaty_data)
+    {
+        _stream["WriteByte"](255);
+        return _stream;
+    }
+
+    // text format
+    _stream["WriteByte"](0);
+    _stream["WriteString2"](_binary_data.text);
+
+    // image
+    if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteString2"](_binary_data.drawingUrls[0]);
+    }
+
+    // owner format
+    _stream["WriteByte"](2);
+    _stream["WriteStringA"](_binaty_data.sBase64);
+
+    _stream["WriteByte"](255);
+    return _stream;
+};
+asc_docs_api.prototype.Call_Menu_Context_Cut = function()
+{
+    var oCopyProcessor = new CopyProcessor(this, null);
+    var _binaty_data = oCopyProcessor.getSelectedBinary();
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (!_binaty_data)
+    {
+        _stream["WriteByte"](255);
+        return _stream;
+    }
+
+    // text format
+    _stream["WriteByte"](0);
+    _stream["WriteString2"](_binary_data.text);
+
+    // image
+    if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteString2"](_binary_data.drawingUrls[0]);
+    }
+
+    // owner format
+    _stream["WriteByte"](2);
+    _stream["WriteStringA"](_binaty_data.sBase64);
+
+    _stream["WriteByte"](255);
+
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Remove(1, true, true);
+    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+
+    return _stream;
+};
+asc_docs_api.prototype.Call_Menu_Context_Paste = function(type, param)
+{
+    if (0 == type)
+    {
+        this.WordControl.m_oLogicDocument.TextBox_Put(param, undefined);
+    }
+    else if (1 == type)
+    {
+        // TODO:
+    }
+    else if (2 == type)
+    {
+        var oPasteProcessor = new PasteProcessor(this, true, true, false);
+        oPasteProcessor.Start(null, null, false, param);
+    }
+};
+asc_docs_api.prototype.Call_Menu_Context_Delete = function()
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Delete) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Remove( 1, true );
+    }
+};
+asc_docs_api.prototype.Call_Menu_Context_Select = function()
+{
+    this.WordControl.m_oLogicDocument.Cursor_MoveLeft(false, true);
+    this.WordControl.m_oLogicDocument.Cursor_MoveRight(true, true);
+    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+};
+asc_docs_api.prototype.Call_Menu_Context_SelectAll = function()
+{
+    this.WordControl.m_oLogicDocument.Select_All();
+};
+/************************************************************************/
