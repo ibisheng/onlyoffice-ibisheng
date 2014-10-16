@@ -6661,6 +6661,18 @@ var gUndoInsDelCellsFlag = true;
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
 				}
+				else
+				{
+					var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnTo, aWs);
+					if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
+					{
+						for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
+						{
+							this._setColorStyleTable(intersectionRangeWithTableParts[i].Ref, intersectionRangeWithTableParts[i]);
+						}
+					}
+				}
+				
 			},
 			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
