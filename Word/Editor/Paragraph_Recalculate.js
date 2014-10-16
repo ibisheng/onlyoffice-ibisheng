@@ -741,13 +741,19 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 12. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
+    // 12. Проверяем особую ситуацию, когда у нас параграф заканчивается элементом PageBreak
+    //-------------------------------------------------------------------------------------------------------------
+    if (false === this.private_RecalculateLineBreakPageEnd(CurLine, CurPage, PRS, ParaPr))
+        return;
+
+    //-------------------------------------------------------------------------------------------------------------
+    // 13. Пересчитываем сдвиги элементов внутри параграфа и видимые ширины пробелов, в зависимости от align.
     //-------------------------------------------------------------------------------------------------------------
     if (recalcresult_NextElement !== this.private_RecalculateLineAlign(CurLine, CurPage, PRS, ParaPr, false))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
-    // 13. Последние проверки
+    // 14. Последние проверки
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineEnd(CurLine, CurPage, PRS, ParaPr))
         return;
@@ -1236,7 +1242,7 @@ Paragraph.prototype.private_RecalculateLineCheckRangeY = function(CurLine, CurPa
     return true;
 };
 
-Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
+Paragraph.prototype.private_RecalculateLineBreakPageEnd= function(CurLine, CurPage, PRS, ParaPr)
 {
     if ( true === PRS.NewPage )
     {
@@ -1261,8 +1267,10 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
         PRS.RecalcResult = recalcresult_NextPage;
         return false;
     }
+};
 
-
+Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPage, PRS, ParaPr)
+{
     if (true !== PRS.End)
     {
         if ( true === PRS.ForceNewPage )
