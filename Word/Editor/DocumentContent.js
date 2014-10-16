@@ -6824,12 +6824,15 @@ CDocumentContent.prototype =
         {
             ParaPr.CanAddDropCap = false;
 
-            var oSelectedInfo = this.LogicDocument.Get_SelectedElementsInfo();
-            var Math = oSelectedInfo.Get_Math();
-            if (null !== Math)
-                ParaPr.CanAddImage = false;
-            else
-                ParaPr.CanAddImage = true;
+            if(this.LogicDocument)
+            {
+                var oSelectedInfo = this.LogicDocument.Get_SelectedElementsInfo();
+                var Math = oSelectedInfo.Get_Math();
+                if (null !== Math)
+                    ParaPr.CanAddImage = false;
+                else
+                    ParaPr.CanAddImage = true;
+            }
 
             if ( undefined != ParaPr.Tabs  && editor)
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
