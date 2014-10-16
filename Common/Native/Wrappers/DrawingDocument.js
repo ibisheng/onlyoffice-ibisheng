@@ -589,6 +589,12 @@ function CDrawingDocument()
 
     // table track
     this.TableOutlineDr = new CTableOutlineDr();
+
+    this.IsRetina = false;
+    this.IsMobile = false;
+
+    this.SelectRect1 = null;
+    this.SelectRect2 = null;
 }
 
 var _table_styles = null;
@@ -856,6 +862,29 @@ CDrawingDocument.prototype =
     {
         // none
     },
+
+    CheckSelectMobile : function()
+    {
+        this.SelectRect1 = null;
+        this.SelectRect2 = null;
+
+        var _select = this.LogicDocument.Get_SelectionBounds();
+        if (!_select)
+            return;
+
+        var _rect1 = _select.Start;
+        var _rect2 = _select.End;
+
+        if (!_rect1 || !_rect2)
+            return;
+
+        this.SelectRect1 = _rect1;
+        this.SelectRect2 = _rect2;
+
+        this.Native["DD_DrawMobileSelection"](_rect1.X, _rect1.Y, _rect1.W, _rect1.H, _rect1.Page,
+            _rect2.X, _rect2.Y, _rect2.W, _rect2.H, _rect2.Page);
+    },
+
     SelectShow : function()
     {
         this.OnUpdateOverlay();
@@ -1120,7 +1149,7 @@ CDrawingDocument.prototype =
 
     IsMobileVersion : function()
     {
-        return false;
+        return this.IsMobile;
     },
 
     DrawVerAnchor : function(pageNum, xPos)
@@ -1198,6 +1227,9 @@ CDrawingDocument.prototype =
             }
 
             this.Native["DD_Overlay_EndDrawSelection"]();
+
+            if (this.IsMobile)
+                this.CheckSelectMobile();
         }
 
         var _table_outline = this.TableOutlineDr.TableOutline;

@@ -4885,6 +4885,16 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
                 TABLE_STYLE_HEIGHT_PIX = _params[_current.pos++];
                 break;
             }
+            case 100:
+            {
+                this.WordControl.m_oDrawingDocument.IsRetina = _params[_current.pos++];
+                break;
+            }
+            case 101:
+            {
+                this.WordControl.m_oDrawingDocument.IsMobile = _params[_current.pos++];
+                break;
+            }
             case 255:
             default:
             {

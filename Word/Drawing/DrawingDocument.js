@@ -2480,13 +2480,13 @@ function CDrawingDocument()
         return false;
     }
 
-    this.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform)
+    this.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform, id_ruler_no_use)
     {
         var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
         var _x = 0;
         var _y = 0;
-        if (true == this.m_oWordControl.m_bIsRuler)
+        if (true == this.m_oWordControl.m_bIsRuler && (id_ruler_no_use !== false))
         {
             _x = 5 * g_dKoef_mm_to_pix;
             _y = 7 * g_dKoef_mm_to_pix;
@@ -3966,6 +3966,122 @@ function CDrawingDocument()
 
             this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
             this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
+        }
+    }
+
+    this.CheckSelectMobile = function(overlay)
+    {
+        var _select = this.m_oWordControl.m_oLogicDocument.Get_SelectionBounds();
+        if (!_select)
+            return;
+
+        var _rect1 = _select.Start;
+        var _rect2 = _select.End;
+
+        if (!_rect1 || !_rect2)
+            return;
+
+        var _matrix = this.TextMatrix;
+
+        var ctx = overlay.m_oContext;
+
+        var pos1, pos2, pos3, pos4;
+
+        if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+        {
+            pos1 = this.ConvertCoordsToCursorWR(_rect1.X, _rect1.Y, _rect1.Page, undefined, false);
+            pos2 = this.ConvertCoordsToCursorWR(_rect1.X, _rect1.Y + _rect1.H, _rect1.Page, undefined, false);
+
+            pos3 = this.ConvertCoordsToCursorWR(_rect2.X + _rect2.W, _rect2.Y, _rect2.Page, undefined, false);
+            pos4 = this.ConvertCoordsToCursorWR(_rect2.X + _rect2.W, _rect2.Y + _rect2.H, _rect2.Page, undefined, false);
+
+            ctx.strokeStyle = "#1B63BA";
+
+            ctx.moveTo(pos1.X >> 0, pos1.Y >> 0);
+            ctx.lineTo(pos2.X >> 0, pos2.Y >> 0);
+
+            ctx.moveTo(pos3.X >> 0, pos3.Y >> 0);
+            ctx.lineTo(pos4.X >> 0, pos4.Y >> 0);
+
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            /*
+            ctx.beginPath();
+
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            overlay.AddEllipse(pos1.X, pos1.Y - 5, 6.5);
+            overlay.AddEllipse(pos4.X, pos4.Y + 5, 6.5);
+            ctx.fill();
+
+            ctx.beginPath();
+
+            ctx.fillStyle = "#FFFFFF";
+            overlay.AddEllipse(pos1.X, pos1.Y - 5, 6);
+            overlay.AddEllipse(pos4.X, pos4.Y + 5, 6);
+            ctx.fill();
+            */
+
+            ctx.beginPath();
+
+            ctx.fillStyle = "#1B63BA";
+            overlay.AddEllipse(pos1.X, pos1.Y - 5, 5);
+            overlay.AddEllipse(pos4.X, pos4.Y + 5, 5);
+            ctx.fill();
+        }
+        else
+        {
+            var _xx11 = _matrix.TransformPointX(_rect1.X, _rect1.Y);
+            var _yy11 = _matrix.TransformPointY(_rect1.X, _rect1.Y);
+
+            var _xx12 = _matrix.TransformPointX(_rect1.X, _rect1.Y + _rect1.H);
+            var _yy12 = _matrix.TransformPointY(_rect1.X, _rect1.Y + _rect1.H);
+
+            var _xx21 = _matrix.TransformPointX(_rect2.X + _rect2.W, _rect2.Y);
+            var _yy21 = _matrix.TransformPointY(_rect2.X + _rect2.W, _rect2.Y);
+
+            var _xx22 = _matrix.TransformPointX(_rect2.X + _rect2.W, _rect2.Y + _rect2.H);
+            var _yy22 = _matrix.TransformPointY(_rect2.X + _rect2.W, _rect2.Y + _rect2.H);
+
+            pos1 = this.ConvertCoordsToCursorWR(_xx11, _yy11, _rect1.Page, undefined, false);
+            pos2 = this.ConvertCoordsToCursorWR(_xx12, _yy12, _rect1.Page, undefined, false);
+
+            pos3 = this.ConvertCoordsToCursorWR(_xx21, _yy21, _rect2.Page, undefined, false);
+            pos4 = this.ConvertCoordsToCursorWR(_xx22, _yy22, _rect2.Page, undefined, false);
+
+            ctx.strokeStyle = "#1B63BA";
+
+            ctx.moveTo(pos1.X, pos1.Y);
+            ctx.lineTo(pos2.X, pos2.Y);
+
+            ctx.moveTo(pos3.X, pos3.Y);
+            ctx.lineTo(pos4.X, pos4.Y);
+
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            /*
+            ctx.beginPath();
+
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            overlay.AddEllipse(pos1.X, pos1.Y - 5, 6.5);
+            overlay.AddEllipse(pos4.X, pos4.Y + 5, 6.5);
+            ctx.fill();
+
+            ctx.beginPath();
+
+            ctx.fillStyle = "#FFFFFF";
+            overlay.AddEllipse(pos1.X, pos1.Y - 5, 6);
+            overlay.AddEllipse(pos4.X, pos4.Y + 5, 6);
+            ctx.fill();
+            */
+
+            ctx.beginPath();
+
+            ctx.fillStyle = "#1B63BA";
+            overlay.AddEllipse(pos1.X, pos1.Y - 5, 5);
+            overlay.AddEllipse(pos4.X, pos4.Y + 5, 5);
+            ctx.fill();
         }
     }
 
