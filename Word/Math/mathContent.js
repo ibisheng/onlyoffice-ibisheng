@@ -1617,7 +1617,21 @@ CMathContent.prototype =
 
     private_CorrectCurPos : function()
     {
-        this.CurPos = Math.max(0, Math.min(this.content.length - 1, this.CurPos));
+        if (this.CurPos > this.content.length - 1)
+        {
+            this.CurPos = this.content.length - 1;
+
+            if (para_Math_Run === this.content[this.CurPos].Type)
+                this.content[this.CurPos].Cursor_MoveToEndPos(false);
+        }
+
+        if (this.CurPos < 0)
+        {
+            this.CurPos = this.content.length - 1;
+
+            if (para_Math_Run === this.content[this.CurPos].Type)
+                this.content[this.CurPos].Cursor_MoveToStartPos();
+        }
     },
 
     Add_ToContent : function(Pos, Item)
@@ -4267,6 +4281,9 @@ CMathContent.prototype.Selection_Remove = function()
         StartPos = this.Selection.End;
         EndPos   = this.Selection.Start;
     }
+
+    StartPos = Math.max(0, StartPos);
+    EndPos   = Math.min(this.content.length - 1, EndPos);
 
     for (var nPos = StartPos; nPos <= EndPos; nPos++)
     {

@@ -1493,7 +1493,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         }*/
         this.RecalcInfo.TextPr = true;
 
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        this.private_UpdateSpellChecking();
     }
 
     // Сначала измеряем элементы (можно вызывать каждый раз, внутри разруливается, чтобы измерялось 1 раз)
@@ -4716,9 +4716,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
     History.Add( this, { Type : historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue } );
     this.Recalc_CompiledPr(true);
 
-    // TODO: Орфография: пока сделаем так, в будущем надо будет переделать
-    if(undefined !== this.Paragraph && this.Paragraph !== null)
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+    this.private_UpdateSpellChecking();
 };
 
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
@@ -5499,8 +5497,7 @@ ParaRun.prototype.Set_Lang2 = function(Lang)
         if ( undefined != Lang.Val )
             this.Set_Lang_Val( Lang.Val );
 
-        // TODO: Орфография: пока сделаем так, в будущем надо будет переделать
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        this.private_UpdateSpellChecking();
     }
 };
 
@@ -5573,10 +5570,8 @@ ParaRun.prototype.Undo = function(Data)
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
 
             this.RecalcInfo.Measure = true;
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-                this.Parent.ParaMath.SetNeedResize();
+            this.private_UpdateSpellChecking();
+            this.private_UpdateMathResize();
 
             break;
         }
@@ -5591,10 +5586,8 @@ ParaRun.prototype.Undo = function(Data)
             this.Content = Array_start.concat( Data.Items, Array_end );
 
             this.RecalcInfo.Measure = true;
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-                this.Parent.ParaMath.SetNeedResize();
+            this.private_UpdateSpellChecking();
+            this.private_UpdateMathResize();
 
             break;
         }
@@ -5866,7 +5859,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Lang = new CLang();
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -5879,7 +5872,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Lang.Bidi = undefined;
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -5892,7 +5885,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Lang.EastAsia = undefined;
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -5905,7 +5898,7 @@ ParaRun.prototype.Undo = function(Data)
                 this.Pr.Lang.Val = undefined;
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -5952,10 +5945,8 @@ ParaRun.prototype.Redo = function(Data)
             this.Content = Array_start.concat( Data.Items, Array_end );
 
             this.RecalcInfo.Measure = true;
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-                this.Parent.ParaMath.SetNeedResize();
+            this.private_UpdateSpellChecking();
+            this.private_UpdateMathResize();
 
             break;
 
@@ -5966,10 +5957,8 @@ ParaRun.prototype.Redo = function(Data)
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
 
             this.RecalcInfo.Measure = true;
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-                this.Parent.ParaMath.SetNeedResize();
+            this.private_UpdateSpellChecking();
+            this.private_UpdateMathResize();
 
             break;
         }
@@ -6241,7 +6230,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Lang = new CLang();
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -6254,7 +6243,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Lang.Bidi = undefined;
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -6267,7 +6256,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Lang.EastAsia = undefined;
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -6280,7 +6269,7 @@ ParaRun.prototype.Redo = function(Data)
                 this.Pr.Lang.Val = undefined;
 
             this.Recalc_CompiledPr(false);
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -6770,12 +6759,8 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             }
 
             this.RecalcInfo.Measure = true;
-
-            if ( undefined !== this.Paragraph && null !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-                this.Parent.ParaMath.SetNeedResize();
+            this.private_UpdateSpellChecking();
+            this.private_UpdateMathResize();
 
             break;
         }
@@ -6800,12 +6785,8 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             }
 
             this.RecalcInfo.Measure = true;
-
-            if (undefined !== this.Paragraph && null !== this.Paragraph)
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
-            if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
-                this.Parent.ParaMath.SetNeedResize();
+            this.private_UpdateSpellChecking();
+            this.private_UpdateMathResize();
 
             break;
         }
@@ -7191,9 +7172,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Lang = new CLang();
 
             this.Recalc_CompiledPr(true);
-
-            if ( undefined !== this.Paragraph && null !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -7209,9 +7188,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Lang.Bidi = undefined;
 
             this.Recalc_CompiledPr(true);
-
-            if ( undefined !== this.Paragraph && null !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -7227,9 +7204,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Lang.EastAsia = undefined;
 
             this.Recalc_CompiledPr(true);
-
-            if ( undefined !== this.Paragraph && null !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -7245,9 +7220,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Lang.Val = undefined;
 
             this.Recalc_CompiledPr(true);
-
-            if ( undefined !== this.Paragraph && null !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            this.private_UpdateSpellChecking();
 
             break;
         }
@@ -7380,6 +7353,16 @@ ParaRun.prototype.Read_FromBinary2 = function(Reader)
 ParaRun.prototype.Clear_CollaborativeMarks = function()
 {
     this.CollaborativeMarks.Clear();
+};
+ParaRun.prototype.private_UpdateSpellChecking = function()
+{
+    if(undefined !== this.Paragraph && null !== this.Paragraph)
+        this.Paragraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+};
+ParaRun.prototype.private_UpdateMathResize = function()
+{
+    if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
+        this.Parent.ParaMath.SetNeedResize();
 };
 
 function CParaRunSelection()
