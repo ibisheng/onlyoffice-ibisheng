@@ -1440,6 +1440,7 @@ CGroupShape.prototype =
     recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
+    setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,
 
     calculateSnapArrays: function(snapArrayX, snapArrayY)
     {

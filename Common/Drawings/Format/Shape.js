@@ -2184,6 +2184,32 @@ CShape.prototype =
         }
     },
 
+    setDrawingBaseCoords: function(fromCol, fromColOff, fromRow, fromRowOff, toCol, toColOff, toRow, toRowOff)
+    {
+        if(this.drawingBase)
+        {
+            this.drawingBase.from.col = fromCol;
+            this.drawingBase.from.colOff = fromColOff;
+            this.drawingBase.from.row = fromRow;
+            this.drawingBase.from.rowOff = fromRowOff;
+
+            this.drawingBase.to.col = toCol;
+            this.drawingBase.to.colOff = toColOff;
+            this.drawingBase.to.row = toRow;
+            this.drawingBase.to.rowOff = toRowOff;
+            History.Add(this, {Type: historyitem_AutoShapes_SetDrawingBaseCoors,
+                fromCol:    fromCol,
+                fromColOff: fromColOff,
+                fromRow   : fromRow,
+                fromRowOff: fromRowOff,
+                toCol:    toCol,
+                toColOff: toColOff,
+                toRow   : toRow,
+                toRowOff: toRowOff
+            });
+        }
+    },
+
     getTransformMatrix: function ()
     {
         return this.transform;

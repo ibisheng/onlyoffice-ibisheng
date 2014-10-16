@@ -146,6 +146,7 @@ CImageShape.prototype =
     checkHitToBounds: CShape.prototype.checkHitToBounds,
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
+    setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,
 
     sendMouseData: function()
     {

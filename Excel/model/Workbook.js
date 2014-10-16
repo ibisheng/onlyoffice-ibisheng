@@ -2156,6 +2156,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         {
             var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
             drawingObject.graphicObject = this.Drawings[i].graphicObject.copy();
+            drawingObject.graphicObject.setDrawingBaseCoords(this.Drawings[i].from.col, this.Drawings[i].from.colOff, this.Drawings[i].from.row, this.Drawings[i].from.rowOff, this.Drawings[i].to.col, this.Drawings[i].to.colOff, this.Drawings[i].to.row, this.Drawings[i].to.rowOff)
             drawingObject.graphicObject.setWorksheet(oNewWs);
             drawingObject.graphicObject.addToDrawingObjects();
             oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
