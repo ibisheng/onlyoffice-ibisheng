@@ -4939,12 +4939,12 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
 asc_docs_api.prototype.Call_Menu_Context_Copy = function()
 {
     var oCopyProcessor = new CopyProcessor(this, null, true);
-    var _binaty_data = oCopyProcessor.getSelectedBinary();
+    var _binary_data = oCopyProcessor.getSelectedBinary();
 
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
 
-    if (!_binaty_data)
+    if (!_binary_data)
     {
         _stream["WriteByte"](255);
         return _stream;
@@ -4963,20 +4963,24 @@ asc_docs_api.prototype.Call_Menu_Context_Copy = function()
 
     // owner format
     _stream["WriteByte"](2);
-    _stream["WriteStringA"](_binaty_data.sBase64);
+    _stream["WriteStringA"](_binary_data.sBase64);
 
     _stream["WriteByte"](255);
     return _stream;
 };
 asc_docs_api.prototype.Call_Menu_Context_Cut = function()
 {
-    var oCopyProcessor = new CopyProcessor(this, null);
-    var _binaty_data = oCopyProcessor.getSelectedBinary();
+    var oCopyProcessor = new CopyProcessor(this, null, true);
+    var _binary_data = oCopyProcessor.getSelectedBinary();
+
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    this.WordControl.m_oLogicDocument.Remove(1, true, true);
+    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
 
-    if (!_binaty_data)
+    if (!_binary_data)
     {
         _stream["WriteByte"](255);
         return _stream;
@@ -4995,14 +4999,9 @@ asc_docs_api.prototype.Call_Menu_Context_Cut = function()
 
     // owner format
     _stream["WriteByte"](2);
-    _stream["WriteStringA"](_binaty_data.sBase64);
+    _stream["WriteStringA"](_binary_data.sBase64);
 
     _stream["WriteByte"](255);
-
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Remove(1, true, true);
-    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-
     return _stream;
 };
 asc_docs_api.prototype.Call_Menu_Context_Paste = function(type, param)
@@ -5039,4 +5038,18 @@ asc_docs_api.prototype.Call_Menu_Context_SelectAll = function()
 {
     this.WordControl.m_oLogicDocument.Select_All();
 };
+asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
+{
+    History.Create_NewPoint();
+    callback();
+};
 /************************************************************************/
+
+window.NativeCorrectImageUrlOnPaste = function(url)
+{
+    return url;
+};
+window.NativeCorrectImageUrlOnCopy = function(url)
+{
+    return url;
+};

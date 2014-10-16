@@ -541,6 +541,7 @@ function CDrawingDocument()
 {
     this.Native = window["native"];
     this.Api    = window.editor;
+    this.m_oApi = this.Api;
 
     this.IsLockObjectsEnable    = false;
     this.LogicDocument          = null;
@@ -605,6 +606,8 @@ CDrawingDocument.prototype =
     {
         this.m_oWordControl = this;
 		this.Api = window.editor;
+        this.m_oApi = this.Api;
+        this.m_oApi.DocumentUrl = "";
         this.LogicDocument  = window.editor.WordControl.m_oLogicDocument;
         this.LogicDocument.DrawingDocument = this;        
     },
