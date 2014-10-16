@@ -775,9 +775,9 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
         }
         else
         {
-            var dCurDiffX = Math.min(Math.abs(X - oBounds.X), Math.abs(X - oBounds.X - oBounds.W));
-            var dCurDiffY = Math.min(Math.abs(Y - oBounds.Y), Math.abs(Y - oBounds.Y - oBounds.H));
-            var dCurDiff = Math.min(dCurDiffX, dCurDiffY);
+            var dCurDiffX = X - (oBounds.X + oBounds.W / 2);
+            var dCurDiffY = Y - (oBounds.Y + oBounds.H / 2);
+            var dCurDiff = dCurDiffX * dCurDiffX + dCurDiffY * dCurDiffY;
 
             if (null === dDiff || dDiff > dCurDiff)
             {

@@ -1728,6 +1728,9 @@ CAbstractNum.prototype =
 	
 	_isEqualLvlText: function(LvlTextOld, LvlTextNew)
 	{
+        if (LvlTextOld.length !== LvlTextNew.length)
+            return false;
+
 		for(var LvlText = 0; LvlText < LvlTextOld.length; LvlText++)
 		{
 			if(LvlTextOld[LvlText].Type != LvlTextNew[LvlText].Type || LvlTextOld[LvlText].Value != LvlTextNew[LvlText].Value)
