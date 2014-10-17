@@ -2258,6 +2258,7 @@ function Editor_Paste_Button(api)
         document.body.style["-webkit-user-select"] = "none";
 
 		History.Create_NewPoint();
+        editor.waitSave = true;
         Editor_Paste(api, false);
         return true;
     }
@@ -2267,6 +2268,7 @@ function Editor_Paste_Button(api)
 		if(ElemToSelect)
 		{
 			History.Create_NewPoint();
+            editor.waitSave = true;
 			Editor_Paste_Exec(api, ElemToSelect);
 		}
 		else

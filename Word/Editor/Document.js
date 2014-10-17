@@ -9639,7 +9639,10 @@ CDocument.prototype =
                     {
                         if (!window.USER_AGENT_SAFARI_MACOS)
                         {
+                            this.Create_NewHistoryPoint();
+
                             window.GlobalPasteFlag = true;
+                            editor.waitSave = true;
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
@@ -9647,8 +9650,11 @@ CDocument.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
+                                this.Create_NewHistoryPoint();
+
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
+                                editor.waitSave = true;
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 //не возвращаем true чтобы не было preventDefault
                             }
@@ -9911,6 +9917,7 @@ CDocument.prototype =
                             this.Create_NewHistoryPoint();
 
                             window.GlobalPasteFlag = true;
+                            editor.waitSave = true;
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
@@ -9922,6 +9929,7 @@ CDocument.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
+                                editor.waitSave = true;
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 //не возвращаем true чтобы не было preventDefault
                             }
