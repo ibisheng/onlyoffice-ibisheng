@@ -2810,7 +2810,7 @@ function DrawingObjects() {
                                                 for(j = range.c1;  j <= range.c2; ++j)
                                                 {
 
-                                                    cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                                    cell = source_worksheet.getCell3(range.r1, j);
                                                     pt = cache.getPtByIndex(pt_index);
                                                     if(pt)
                                                     {
@@ -2824,7 +2824,7 @@ function DrawingObjects() {
                                             {
                                                 for(j = range.r1; j <= range.r2; ++j)
                                                 {
-                                                    cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
+                                                    cell = source_worksheet.getCell3(j, range.c1);
                                                     pt = cache.getPtByIndex(pt_index);
                                                     if(pt)
                                                     {

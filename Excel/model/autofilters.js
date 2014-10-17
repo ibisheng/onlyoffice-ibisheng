@@ -331,7 +331,7 @@ var gUndoInsDelCellsFlag = true;
 						
 						var isUpdateRange = null;
 						var recalc = false;
-						var changeRows = null;
+						var changeRows = false;
 						if(paramsForCallBack)//меняем/удаляем/устанавливаем стиль для а/ф
 						{
 							switch(paramsForCallBack)
@@ -394,13 +394,11 @@ var gUndoInsDelCellsFlag = true;
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable}, null, changesElemHistory.Ref);
 									//открываем скрытые строки
-									var isHidden;
 									var isInsert = false;
 									
 									for(var i = apocal.range.r1; i <= apocal.range.r2; i++)
 									{
-										isHidden = ws.model._getRow(i).hd;
-										if(isHidden)
+										if(ws.model.getRowHidden(i))
 										{
 											ws.model.setRowHidden(/*bHidden*/false, i, i);
 											isInsert = true;
@@ -438,7 +436,7 @@ var gUndoInsDelCellsFlag = true;
 									}
 									
 									//добавляем название колонок
-									tableColumns = t._generateColumnNameWithoutTitle(activeCells, isTurnOffHistory);
+									tableColumns = t._generateColumnNameWithoutTitle(activeCells);
 
 									var cloneAC = activeCells.clone();
 									
@@ -940,17 +938,10 @@ var gUndoInsDelCellsFlag = true;
 						if(aWs.AutoFilter.Ref == "" || !aWs.AutoFilter.Ref)
 							return;
 						
-						/*var allFil = aWs.AutoFilter.Ref.split(':');
-						var sCell = ws.model.getCell( new CellAddress(allFil[0]));
-						var eCell = ws.model.getCell( new CellAddress(allFil[1]));*/
-						
 						allFil = aWs.AutoFilter.Ref;
 						
 						var n = 0;
 						result = [];
-						
-						/*var startCol = sCell.first.col - 1;
-						var endCol = eCell.first.col - 1;*/
 						
 						var startCol = allFil.c1;
 						var endCol = allFil.c2;
@@ -990,9 +981,6 @@ var gUndoInsDelCellsFlag = true;
 						if(aWs.TableParts[openFilter].Ref == "" || !aWs.TableParts[openFilter].Ref)
 							return;
 						var allFil = aWs.TableParts[openFilter].Ref;
-						
-						//var sCell = ws.model.getCell( new CellAddress(allFil[0]));
-						//var eCell = ws.model.getCell( new CellAddress(allFil[1]));
 						
 						var n = 0;
 						result = [];
@@ -1170,9 +1158,9 @@ var gUndoInsDelCellsFlag = true;
 						if (updatedRange && !this._isNeedDrawButton(buttons[i], updatedRange))
 							continue;
 
-						var range = ws.model.getCell(new CellAddress(buttons[i].id)).getCells();
-						var col = range[0].oId.col - 1;
-						var row = range[0].oId.row - 1;
+						var oCell = new CellAddress(buttons[i].id);
+						var col = oCell.getCol0();
+						var row = oCell.getRow0();
 						//считаем сдвиг для скролла
 						var width = 13;
 						var height = 13;
@@ -2469,7 +2457,7 @@ var gUndoInsDelCellsFlag = true;
 				//this._isSpecValueCustomFilter(conFilter);
 				for(var i = startRange.first.row; i < endRange.first.row; i++)
 				{
-					var cell = ws.model.getCell(new CellAddress(i,startRange.first.col - 1,0));
+					var cell = ws.model.getCell3(i,startRange.first.col - 1);
 					var val = cell.getValue();
 					var type = cell.getType();
 					var valWithFormat = cell.getValueWithFormat();
@@ -2556,7 +2544,7 @@ var gUndoInsDelCellsFlag = true;
 					filterObj = aWs.TableParts[filtersOp[0]];
 				}
 				var oldFilter = filterObj.clone(aWs);
-				var cell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1,0));
+				var cell = ws.model.getCell3(activeCells.r1, activeCells.c1);
 				
 				var filterRange = ref;
 				var rangeStart = filterRange;
@@ -2648,12 +2636,12 @@ var gUndoInsDelCellsFlag = true;
 					//проверка на повторяющиеся элементы
 					if(array[i] == 'rep')
 					{
-						var mainVal = ws.model.getCell( new CellAddress(activeCells.r1 + i + 1, activeCells.c1,0)).getCells()[0].getValue();
+						var mainVal = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1).getValue();
 						for(var k = 0;k < array.length; k++)
 						{							
 							if(array[k] == false || array[k] == true)
 							{
-								var val2 = ws.model.getCell( new CellAddress(activeCells.r1 + k + 1, activeCells.c1,0)).getCells()[0].getValue();
+								var val2 = ws.model.getCell3(activeCells.r1 + k + 1, activeCells.c1).getValue();
 								if(val2 == mainVal)
 								{
 									array[i] = array[k];
@@ -2667,13 +2655,12 @@ var gUndoInsDelCellsFlag = true;
 					//схлопываем строки 
 					if(array[i] == false || array[i] == 'hidden')
 					{
-						if(!ws.model._getRow(row).hd)
+						if(!ws.model.getRowHidden(row))
 							ws.model.setRowHidden(/*bHidden*/true, row, row);
 					}
 					else if(array[i] == true)
 					{
-						var isHidden = ws.model._getRow(row).hd;
-						if(isHidden)
+						if(ws.model.getRowHidden(row))
 							ws.model.setRowHidden(/*bHidden*/false, row, row);
 					}
 				}
@@ -2688,7 +2675,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(allFilterOpenElements)
 							break;
-						var cell = ws.model.getCell( new CellAddress(activeCells.r1 + i + 1, activeCells.c1,0));
+						var cell = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1);
 						var valActive = cell.getValue();
 						var arrVal;
 						if(isCurFilter == undefined || !currentFilter[isCurFilter].Filters)//создаём, если его ещё нет
@@ -3078,20 +3065,8 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(!oldFilters[i].Ref || oldFilters[i].Ref == "")
 							continue;
-						/*var fromCellId = oldFilters[i].Ref.split(':')[0];
-						var toCellId = oldFilters[i].Ref.split(':')[1];
-						var startId = ws.model.getCell( new CellAddress(fromCellId));
-						var endId = ws.model.getCell( new CellAddress(toCellId));
-						var oldRange = 
-						{
-							r1: startId.first.row - 1,
-							c1: startId.first.col - 1,
-							r2: endId.first.row - 1,
-							c2: endId.first.col - 1
-						};*/
-						
+
 						oldRange = oldFilters[i].Ref;
-						
 						if(cloneActiveRange.r1 <= oldRange.r1 && cloneActiveRange.r2 >= oldRange.r2 && cloneActiveRange.c1 <= oldRange.c1 && cloneActiveRange.c2 >= oldRange.c2)
 						{
 							if(oldRange.r2 > ar.r1 && ar.c2 >= oldRange.c1 && ar.c2 <= oldRange.c2)//top
@@ -3312,20 +3287,8 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(!oldFilters[i].Ref || oldFilters[i].Ref == "")
 							continue;
-						/*var fromCellId = oldFilters[i].Ref.split(':')[0];
-						var toCellId = oldFilters[i].Ref.split(':')[1];
-						var startId = ws.model.getCell( new CellAddress(fromCellId));
-						var endId = ws.model.getCell( new CellAddress(toCellId));
-						var oldRange = 
-						{
-							r1: startId.first.row - 1,
-							c1: startId.first.col - 1,
-							r2: endId.first.row - 1,
-							c2: endId.first.col - 1
-						};*/
-						
+
 						var oldRange = oldFilters[i].Ref;
-						
 						if(cloneActiveRange.r1 <= oldRange.r1 && cloneActiveRange.r2 >= oldRange.r2 && cloneActiveRange.c1 <= oldRange.c1 && cloneActiveRange.c2 >= oldRange.c2)
 						{
 							if(oldRange.r2 > ar.r1 && ar.c2 >= oldRange.c1 && ar.c2 <= oldRange.c2)//top
@@ -3806,12 +3769,8 @@ var gUndoInsDelCellsFlag = true;
 				{
 					if(!allF[i].Ref || allF[i].Ref == "")
 						continue;
-					/*var cCell = allF[i].Ref.split(':');
-					var fromCell = ws.model.getCell(new CellAddress(cCell[0]));
-					var toCell = ws.model.getCell(new CellAddress(cCell[1]));*/
-					
+
 					var cCell = allF[i].Ref;
-					
 					var range = cCell;
 					
 					if(!allF[i].AutoFilter && !allF[i].TableStyleInfo)
@@ -3917,17 +3876,6 @@ var gUndoInsDelCellsFlag = true;
 				var index = undefined;
 				if(aWs.AutoFilter)
 				{
-					/*var ref = aWs.AutoFilter.Ref.split(':');
-					var sCell = ws.model.getCell( new CellAddress(ref[0]));
-					var eCell = ws.model.getCell( new CellAddress(ref[1]));
-					var rangeFilter = 
-					{
-						c1: sCell.first.col - 1,
-						c2: eCell.first.col - 1 ,
-						r1: sCell.first.row - 1,
-						r2: eCell.first.row - 1
-					};*/
-					
 					var rangeFilter = aWs.AutoFilter.Ref;
 					
 					if(range.r1 >=  rangeFilter.r1 && range.c1 >=  rangeFilter.c1 && range.r2 <=  rangeFilter.r2 && range.c2 <=  rangeFilter.c2)
@@ -3951,17 +3899,6 @@ var gUndoInsDelCellsFlag = true;
 					var tableParts = aWs.TableParts;
 					for(var tP = 0; tP < tableParts.length; tP++)
 					{
-						/*var ref = tableParts[tP].Ref.split(':');
-						var sCell = ws.model.getCell( new CellAddress(ref[0]));
-						var eCell = ws.model.getCell( new CellAddress(ref[1]));
-						var rangeFilter = 
-						{
-							c1: sCell.first.col - 1,
-							c2: eCell.first.col - 1 ,
-							r1: sCell.first.row - 1,
-							r2: eCell.first.row - 1
-						};*/
-						
 						var rangeFilter = tableParts[tP].Ref;
 						
 						if(range.r1 >=  rangeFilter.r1 && range.c1 >=  rangeFilter.c1 && range.r2 <=  rangeFilter.r2 && range.c2 <=  rangeFilter.c2)
@@ -4107,8 +4044,7 @@ var gUndoInsDelCellsFlag = true;
 					var aNoHiddenCol = [];
 					for(var i = bbox.c1; i <= bbox.c2; i++)
 					{
-						var col = ws.model._getColNoEmpty(i);
-						if(null == col || true != col.hd)
+						if (!ws.model.getColHidden(i))
 							aNoHiddenCol.push(i);
 					}
 					aNoHiddenCol.sort(fSortAscending);
@@ -4124,7 +4060,7 @@ var gUndoInsDelCellsFlag = true;
 					for(var i = bbox.r1; i <= bbox.r2; i++)
 					{
 						var row = ws.model._getRowNoEmpty(i);
-						if(null == row || true != row.hd)
+						if (!ws.model.getRowHidden(i))
 							aNoHiddenRow.push(i);
 					}
 					aNoHiddenRow.sort(fSortAscending);
@@ -4257,9 +4193,9 @@ var gUndoInsDelCellsFlag = true;
 							var visible;
 							for(var nRow = startRow + 1; nRow <= endRow; nRow++)
 							{
-								var cell = ws.model.getCell(new CellAddress(nRow,col,0));
-								var val = cell.getValueWithFormat();
-								var val2 = cell.getValueWithoutFormat();
+								var cell = ws.model.getCell3(nRow,col);
+								var val, val2;
+								val = val2 = cell.getValueWithFormat();
 								if(!result[nC])
 									result[nC] = new AutoFiltersOptionsElements();
 								if(curFilter.ColId == numFilter)//щёлкнули по кнопке данного фильтра
@@ -4408,9 +4344,9 @@ var gUndoInsDelCellsFlag = true;
 						var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
 						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
-							var cell = ws.model.getCell(new CellAddress(nRow,col,0));
-							var val = cell.getValueWithFormat();
-							var val2 = cell.getValueWithoutFormat();
+							var cell = ws.model.getCell3(nRow,col);
+							var val, val2;
+							val = val2 = cell.getValueWithFormat();
 							var type = cell.getType();
 							if(!result[nC])
 								result[nC] = new AutoFiltersOptionsElements();
@@ -4465,9 +4401,9 @@ var gUndoInsDelCellsFlag = true;
 						var top10Arr = [];
 						for(nRow = startRow + 1; nRow <= endRow; nRow++)
 						{
-							var cell = ws.model.getCell(new CellAddress(nRow,col,0));
-							var val = cell.getValueWithFormat();
-							var val2 = cell.getValueWithoutFormat();
+							var cell = ws.model.getCell3(nRow,col);
+							var val, val2;
+							val = val2 = cell.getValueWithoutFormat();
 							if(!result[nC])
 								result[nC] = new AutoFiltersOptionsElements();
 							if(curFilter.ColId == numFilter)
@@ -4514,7 +4450,7 @@ var gUndoInsDelCellsFlag = true;
 								var limit = sortTop10[top10Filter.Val - 1];
 								for(nRow = startRow + 1; nRow <= endRow; nRow++)
 								{
-									var cell = ws.model.getCell(new CellAddress(nRow,col,0));
+									var cell = ws.model.getCell3(nRow,col);
 									var val2 = cell.getValueWithoutFormat();
 									if(!isNaN(parseFloat(val2)))
 										val2 = parseFloat(val2);
@@ -4550,9 +4486,6 @@ var gUndoInsDelCellsFlag = true;
 					
 					var rangeFilter = ref;
 					
-					//var filterStart = ws.model.getCell(new CellAddress(ref.split(':')[0]));
-					//var filterEnd = ws.model.getCell(new CellAddress(ref.split(':')[1]));
-					
 					//если есть мерженные ячейки в головной строке
 					var cell = ws.model.getCell(new CellAddress(buttonId));
 					var isMerged = cell.hasMerged();
@@ -4565,27 +4498,21 @@ var gUndoInsDelCellsFlag = true;
 					
 					var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
 					
-					//var startRow = filterStart.first.row;
-					//var endRow = filterEnd.first.row - 1;
-					
 					var startRow = rangeFilter.r1 + 1;
 					var endRow = rangeFilter.r2;
 					
 					var nC = 0;
 					for(var s = startRow; s <= endRow; s++)
 					{
-						var cell = ws.model.getCell(new CellAddress(s,col,0));
+						var cell = ws.model.getCell3(s,col);
 						if(!result[nC])
 							result[nC] = new AutoFiltersOptionsElements();
 
-						result[nC].val = cell.getValueWithFormat();
-						result[nC].val2 = cell.getValueWithoutFormat();
-						if(result[nC].visible != 'hidden')
-							result[nC].visible = true;
+						result[nC].val2 = result[nC].val = cell.getValueWithFormat();
 						if(result[nC].visible != 'hidden')
 						{
-							if(ws.model._getRow(s).hd)
-								result[nC].visible = 'hidden';
+							// ToDo неправильно использовате string и bool в качестве значений одной переменной (смена типа)
+							result[nC].visible = ws.model.getRowHidden(s) ? 'hidden' : true;
 						}
 						if(nC >= 1000)
 						{
@@ -4632,7 +4559,7 @@ var gUndoInsDelCellsFlag = true;
 					var cell, filterColumn;
 					for(var col = startCol.c1; col <= endCol.c1; col++)
 					{
-						cell = aWs.getCell( new CellAddress(row, col, 0) );
+						cell = aWs.getCell3(row, col);
 						var isMerged = cell.hasMerged();
 						if(isMerged && isMerged.c2 != col)
 						{
@@ -4816,7 +4743,7 @@ var gUndoInsDelCellsFlag = true;
 					//для головных мерженных ячеек
 					if(filter.ShowButton == false)
 					{
-						var isMerged = ws.model.getCell( new CellAddress(startCell.r1, startCell.c1, 0)).hasMerged();
+						var isMerged = ws.model.getCell3(startCell.r1, startCell.c1).hasMerged();
 						if(isMerged)
 						{
 							startCell.c1 = isMerged.c1;
@@ -4825,10 +4752,10 @@ var gUndoInsDelCellsFlag = true;
 					
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var cell = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0];
-						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValue();
+						var cell = ws.model.getCell3(m, startCell.c1);
+						var val = cell.getValue();
 						var type = cell.getType();
-						var valWithFormat = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValueWithFormat();
+						var valWithFormat = cell.getValueWithFormat();
 						if(!isNaN(parseFloat(val)))
 							val = parseFloat(val);
 						if(!this._getLogical(filterCust,{val: val, type: type, valWithFormat: valWithFormat}))
@@ -4842,7 +4769,7 @@ var gUndoInsDelCellsFlag = true;
 					//для головных мерженных ячеек
 					if(filter.ShowButton == false)
 					{
-						var isMerged = ws.model.getCell( new CellAddress(startCell.r1, startCell.c1, 0)).hasMerged();
+						var isMerged = ws.model.getCell3(startCell.r1, startCell.c1).hasMerged();
 						if(isMerged)
 						{
 							startCell.c1 = isMerged.c1;
@@ -4850,7 +4777,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValue();
+						var val = ws.model.getCell3(m, startCell.c1).getValue();
 						var isVis = false;
 						var dataVal = NumFormat.prototype.parseDate(val);
 						for(var k = 0; k < customFilter.length;k++)
@@ -4871,7 +4798,7 @@ var gUndoInsDelCellsFlag = true;
 					//для головных мерженных ячеек
 					if(filter.ShowButton == false)
 					{
-						var isMerged = ws.model.getCell( new CellAddress(startCell.r1, startCell.c1, 0)).hasMerged();
+						var isMerged = ws.model.getCell3(startCell.r1, startCell.c1).hasMerged();
 						if(isMerged)
 						{
 							startCell.c1 = isMerged.c1;
@@ -4879,7 +4806,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0].getValue();
+						var val = ws.model.getCell3(m, startCell.c1).getValue();
 						var isVis = false;
 						for(var k = 0; k < customFilter.length;k++)
 						{
@@ -5562,7 +5489,7 @@ var gUndoInsDelCellsFlag = true;
 										newTableColumn[l] = new TableColumn();
 										newTableColumn[l].Name = newNameColumn;
 
-										ws.model.getCell(new CellAddress(range2.r1,range2.c1 + l,0)).setValue(newNameColumn);
+										ws.model.getCell3(range2.r1,range2.c1 + l).setValue(newNameColumn);
 									}
 								}
 								else
@@ -5644,8 +5571,7 @@ var gUndoInsDelCellsFlag = true;
 									var result = this._getArrayOpenCells(indexFilter,buttons[but].id);
 									for(var rez = 0; rez < result.length;rez++)
 									{
-										var isHidden = ws.model._getRow(rez + cells.r1 + 1).hd;
-										if(result[rez].visible == false && isHidden)
+										if(result[rez].visible == false && ws.model.getRowHidden(rez + cells.r1 + 1))
 											ws.model.setRowHidden(/*bHidden*/false, rez + cells.r1 + 1, rez + cells.r1 + 1);
 									}
 								}
@@ -6192,12 +6118,12 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var col = range.c1; col <= range.c2; col++)
 					{	
-						var valFirst = ws.model.getCell(new CellAddress(range.r1,col,0));
+						var valFirst = ws.model.getCell3(range.r1,col);
 						if(valFirst != '')
 						{
 							for(var row = range.r1; row <= range.r1 + 2; row++)
 							{
-								var cell = ws.model.getCell(new CellAddress(row,col,0));
+								var cell = ws.model.getCell3(row,col);
 								var type = cell.getType();
 								if(type == CellValueType.String)
 								{
@@ -6223,7 +6149,7 @@ var gUndoInsDelCellsFlag = true;
 					for(var row = startRow; row <= endRow; row++)
 					{
 						//все открываем
-						if(ws.model._getRow(row).hd)
+						if(ws.model.getRowHidden(row))
 							ws.model.setRowHidden(/*bHidden*/false, row, row);
 					}
 				}
@@ -6245,7 +6171,7 @@ var gUndoInsDelCellsFlag = true;
 							var arrHiddens = result[index].hiddenRows;
 							for(var row = 0; row < arrHiddens.length; row++)
 							{
-								if(arrHiddens[row] != undefined && arrHiddens[row] == true && !ws.model._getRow(row).hd)
+								if(arrHiddens[row] != undefined && arrHiddens[row] == true && !ws.model.getRowHidden(row))
 								{
 									ws.model.setRowHidden(true, row, row);
 								}
@@ -6325,7 +6251,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			
-			_generateColumnNameWithoutTitle: function(range, isTurnOffHistory)
+			_generateColumnNameWithoutTitle: function(range)
 			{
 				var ws = this.worksheet;
 				var newTableColumn;
@@ -6334,7 +6260,7 @@ var gUndoInsDelCellsFlag = true;
 				var val;
 				for(var col1 = range.c1; col1 <= range.c2; col1++)
 				{
-					cell = ws.model.getCell(new CellAddress(range.r1,col1, 0));
+					cell = ws.model.getCell3(range.r1, col1);
 					val = cell.getValue();
 					//если ячейка пустая, то генерируем название
 					if(val == '')
@@ -6351,8 +6277,6 @@ var gUndoInsDelCellsFlag = true;
 							s = -1;
 						}
 					}
-					//if(!isTurnOffHistory)
-						//cell.setNumFormat("@");
 					newTableColumn = new TableColumn();
 					newTableColumn.Name = valNew;
 					
@@ -6381,7 +6305,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 				}
 				else
-					tableColumns = this._generateColumnNameWithoutTitle(tempCells, isTurnOffHistory);
+					tableColumns = this._generateColumnNameWithoutTitle(tempCells);
 					
 				return tableColumns;
 			},
@@ -6403,7 +6327,8 @@ var gUndoInsDelCellsFlag = true;
 					isEndRowEmpty = true;
 					for(var col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
 					{
-						 if(isEndRowEmpty && ws.model.getCell(new CellAddress(mainAdjacentCells.r2, col, 0)).getCells()[0].getValue() != '')
+						// ToDo стоит использовать isEmptyText или isEmptyTextString
+						 if(isEndRowEmpty && ws.model.getCell3(mainAdjacentCells.r2, col).getValue() != '')
 						 {
 							isEndRowEmpty = false;
 						 }
@@ -6414,13 +6339,11 @@ var gUndoInsDelCellsFlag = true;
 					//если она пустая и имеет непустые смежные
 					if(mainAdjacentCells)
 					{
-						var curCell;
 						var n = 0;
 						for(var col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
 						{
 							idCell = new CellAddress(mainAdjacentCells.r1, col, 0);
 							idCellNext = new CellAddress(mainAdjacentCells.r2, col, 0);
-							curCell = ws.model.getCell( idCell ).getCells();
 							
 							result[n] = new Result();
 							result[n].x = ws.cols[col] ? ws.cols[col].left : null;
@@ -6531,7 +6454,7 @@ var gUndoInsDelCellsFlag = true;
 							//проходимся по всем заголовкам
 							for(var j = tableRange.c1; j <= tableRange.c2; j++)
 							{
-								cell = ws.model.getCell(new CellAddress(ref.r1, j, 0));
+								cell = ws.model.getCell3(ref.r1, j);
 								val = cell.getValue();
 								//если не пустая изменяем TableColumns
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )

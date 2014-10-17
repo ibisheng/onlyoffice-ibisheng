@@ -2632,7 +2632,7 @@
 							nLoc++;
 							isImage = true;
 						
-						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox, image.from.row, image.from.col, worksheet, isCut);
+						t._addLocalStorage(isImage,isChart,range.worksheet.getCell3(row, col),bbox, image.from.row, image.from.col, worksheet, isCut);
 					}
 
 				}
@@ -2648,7 +2648,7 @@
 							for (col = bbox.c1; col <= bbox.c2; ++col) {
 								if(col != bbox.c1)
 									localStText += ' ';
-								var currentRange = range.worksheet.getCell( new CellAddress(row, col, 0) );
+								var currentRange = range.worksheet.getCell3(row, col);
 								//добавляем текст
 								var textRange = currentRange.getValue();
 								if(textRange == '')
@@ -2670,7 +2670,7 @@
 						for (col = bbox.c1; col <= bbox.c2; ++col) {
 							if (skipMerged()) {continue;}
 
-							cell = range.worksheet.getCell( new CellAddress(row, col, 0) );
+							cell = range.worksheet.getCell3(row, col);
 							td = doc.createElement("TD");
 
 							mbbox = cell.hasMerged();
@@ -2695,7 +2695,7 @@
 							b = cell.getBorderFull();
 							if(mbbox)
 							{
-								var cellMergeFinish = range.worksheet.getCell( new CellAddress(mbbox.r2, mbbox.c2, 0) );
+								var cellMergeFinish = range.worksheet.getCell3(mbbox.r2, mbbox.c2);
 								var borderMergeCell = cellMergeFinish.getBorderFull();
 								td.style.borderRight = makeBorder(borderMergeCell.r);
 								td.style.borderBottom = makeBorder(borderMergeCell.b);

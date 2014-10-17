@@ -8,11 +8,6 @@ var EFFECT_INTENSE = 3;
 var CHART_STYLE_MANAGER = null;
 var SKIP_LBL_LIMIT = 100;
 
-function checkStrToRegExp(str)
-{
-
-}
-
 
 function checkBlackUnifill(unifill, bLines)
 {
@@ -255,7 +250,7 @@ function checkPointInMap(map, worksheet, row, col)
 {
     if(map[worksheet.getId() + ""] && map[worksheet.getId() + ""][row] && map[worksheet.getId() + ""][row][col])
     {
-        var cell = worksheet.getCell( new CellAddress(row, col, 0) );
+        var cell = worksheet.getCell3(row, col);
         var pts = map[worksheet.getId() + ""][row][col];
         for(var i = 0; i < pts.length; ++i)
         {
@@ -2245,16 +2240,14 @@ CChartSpace.prototype =
                                 var range = range1.bbox;
                                 if(range.r1 === range.r2)
                                 {
-                                    var row = source_worksheet._getRowNoEmpty(range.r1);
-                                    if(row && !row.hd)
+                                    if(!source_worksheet.getRowHidden(range.r1))
                                     {
                                         for(j = range.c1;  j <= range.c2; ++j)
                                         {
-                                            var col = source_worksheet._getColNoEmpty(j);
-                                            if(!col || !col.hd)
+                                            if(!source_worksheet.getColHidden(j))
                                             {
                                                 hidden = false;
-                                                cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                                cell = source_worksheet.getCell3(range.r1, j);
                                                 pt = new CNumericPoint();
                                                 pt.setIdx(pt_index++);
                                                 pt.setVal(parseFloat(cell.getValue()));
@@ -2270,16 +2263,14 @@ CChartSpace.prototype =
                                 }
                                 else
                                 {
-                                    var col = source_worksheet._getColNoEmpty(range.c1);
-                                    if(!col || !col.hd)
+                                    if(!source_worksheet.getColHidden(range.c1))
                                     {
                                         for(j = range.r1; j <= range.r2; ++j)
                                         {
-                                            var row = source_worksheet._getRowNoEmpty(j);
-                                            if(!row || !row.hd)
+                                            if(!source_worksheet.getRowHidden(j))
                                             {
                                                 hidden = false;
-                                                cell = source_worksheet.getCell( new CellAddress(j, range.c1, 0) );
+                                                cell = source_worksheet.getCell3(j, range.c1);
                                                 pt = new CNumericPoint();
                                                 pt.setIdx(pt_index++);
                                                 pt.setVal(parseFloat(cell.getValue()));
@@ -2325,7 +2316,6 @@ CChartSpace.prototype =
                 var str_cache = new CStrCache();
                 //str_cache.setFormatCode("General");
                 var pt_index = 0, i, j, cell, pt;
-                var checked_hided_rows = [], checked_hided_cols = [];
                 for(i = 0; i < arr_f.length; ++i)
                 {
                     var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2340,15 +2330,13 @@ CChartSpace.prototype =
                                 var range = range1.bbox;
                                 if(range.r1 === range.r2)
                                 {
-                                    var row = source_worksheet._getRowNoEmpty(range.r1);
-                                    if(!row || !row.hd)
+                                    if(!source_worksheet.getRowHidden(range.r1))
                                     {
                                         for(j = range.c1;  j <= range.c2; ++j)
                                         {
-                                            var col = source_worksheet._getColNoEmpty(j);
-                                            if(!col || !col.hd)
+                                            if(!source_worksheet.getColHidden(j))
                                             {
-                                                cell = source_worksheet.getCell( new CellAddress(range.r1, j, 0) );
+                                                cell = source_worksheet.getCell3(range.r1, j);
                                                 pt = new CStringPoint();
                                                 pt.setIdx(pt_index++);
                                                 pt.setVal(cell.getValueWithFormat());
@@ -2361,15 +2349,13 @@ CChartSpace.prototype =
                                 }
                                 else
                                 {
-                                    var col = source_worksheet._getColNoEmpty(range.c1);
-                                    if(!col || !col.hd)
+                                    if(!source_worksheet.getColHidden(range.c1))
                                     {
                                         for(j = range.r1;  j <= range.r2; ++j)
                                         {
-                                            var row = source_worksheet._getRowNoEmpty(j);
-                                            if(!row || !row.hd)
+                                            if(!source_worksheet.getRowHidden(j))
                                             {
-                                                cell = source_worksheet.getCell(new CellAddress(j, range.c1, 0));
+                                                cell = source_worksheet.getCell3(j, range.c1);
                                                 pt = new CStringPoint();
                                                 pt.setIdx(pt_index++);
                                                 pt.setVal(cell.getValueWithFormat());
@@ -2389,7 +2375,7 @@ CChartSpace.prototype =
             }
         };
 
-        var charts, series, i, j, ser, val;
+        var charts, series, i, j, ser;
         charts = this.chart.plotArea.charts;
         for(i = 0; i < charts.length; ++i)
         {
@@ -2480,7 +2466,6 @@ CChartSpace.prototype =
             var chart_type = chart_object.getObjectType();
             if(chart_type === historyitem_type_ScatterChart)
             {
-                var gap_hor_axis = 4;
                 var axis = chart_object.axId;
                 var x_ax, y_ax;
                 y_ax = this.chart.plotArea.valAx;
@@ -3139,7 +3124,6 @@ CChartSpace.prototype =
             else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
                 || (chart_type === historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
             {
-                var gap_hor_axis = 4;
                 var axis = chart_object.axId;
                 var cat_ax, val_ax;
                 val_ax = this.chart.plotArea.valAx;
@@ -5029,7 +5013,6 @@ CChartSpace.prototype =
             {
                 if(chart_type === historyitem_type_ScatterChart)
                 {
-                    var axis = chart_object.axId;
                     var x_ax, y_ax;
                     y_ax = this.chart.plotArea.valAx;
                     x_ax = this.chart.plotArea.catAx;
@@ -5043,7 +5026,6 @@ CChartSpace.prototype =
                 else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
                     || (chart_type === historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
                 {
-                    var axis = chart_object.axId;
                     var cat_ax, val_ax;
                     val_ax = this.chart.plotArea.valAx;
                     cat_ax = this.chart.plotArea.catAx;
@@ -5079,8 +5061,6 @@ CChartSpace.prototype =
             }
             if(chart_type === historyitem_type_ScatterChart)
             {
-                var gap_hor_axis = 4;
-                var axis = chart_object.axId;
                 var x_ax, y_ax;
                 y_ax = this.chart.plotArea.valAx;
                 x_ax = this.chart.plotArea.catAx;
@@ -5738,8 +5718,6 @@ CChartSpace.prototype =
             else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
                 || (chart_type === historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
             {
-                var gap_hor_axis = 4;
-                var axis = chart_object.axId;
                 var cat_ax, val_ax;
                 val_ax = this.chart.plotArea.valAx;
                 cat_ax = this.chart.plotArea.catAx;
@@ -8936,7 +8914,6 @@ CChartSpace.prototype =
             };
             var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.style);
             var parent_objects = this.getParentObjects();
-            var RGBA = {R:0, G:0, B:0, A: 255};
             var subtle_line;
             if(parent_objects.theme  && parent_objects.theme.themeElements
                 && parent_objects.theme.themeElements.fmtScheme
@@ -13485,7 +13462,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
 	if (rangeBBox) {
 		if (rangeBBox.c2 - rangeBBox.c1 > 0) {
 			for (i = rangeBBox.r1 + 1; i <= rangeBBox.r2; i++) {
-				cell = ws.getCell( new CellAddress(i, rangeBBox.c1, 0) );
+				cell = ws.getCell3(i, rangeBBox.c1);
 				value = cell.getValue();
 				if (!isNumber(value) && (value != ""))
 					cntLeft++;
@@ -13497,7 +13474,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
 		if (rangeBBox.r2 - rangeBBox.r1 > 0) {
 			for (i = rangeBBox.c1 + 1; i <= rangeBBox.c2; i++) {
 
-				cell = ws.getCell( new CellAddress(rangeBBox.r1, i, 0) );
+				cell = ws.getCell3(rangeBBox.r1, i);
 				value = cell.getValue();
 				if (!isNumber(value) && (value != ""))
 					cntTop++;
@@ -13534,31 +13511,27 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 	function getNumCache(c1, c2, r1, r2) {
 
 		// (c1 == c2) || (r1 == r2)
-		var cache = [], cell, item, colObject, rowObject;
+		var cache = [], cell, item;
 
 		if ( c1 == c2 ) {		// vertical cache
 			for (var row = r1; row <= r2; row++) {
-				cell = ws.getCell( new CellAddress(row, c1, 0) );
+				cell = ws.getCell3(row, c1);
 
 				item = {};
 				item.numFormatStr = cell.getNumFormatStr();
 				item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 				item.val = cell.getValue();
-                colObject = ws._getColNoEmpty(c1);
-                rowObject = ws._getRowNoEmpty(row);
-				item.isHidden =   !colObject || (colObject.hd === true) ||  !rowObject ||  (rowObject.hd === true);
+				item.isHidden = ws.getColHidden(c1) || ws.getRowHidden(row);
 				cache.push(item);
 			}
 		} else /*r1 == r2*/ {		// horizontal cache
 			for (var col = c1; col <= c2; col++) {
-				cell = ws.getCell( new CellAddress(r1, col, 0) );
+				cell = ws.getCell3(r1, col, 0);
 				item = {};
 				item.numFormatStr = cell.getNumFormatStr();
 				item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 				item.val = cell.getValue();
-                colObject = ws._getColNoEmpty(col);
-                rowObject = ws._getRowNoEmpty(r1);
-				item.isHidden = !colObject || (colObject.hd === true) || !rowObject || (rowObject.hd === true);
+				item.isHidden = ws.getColHidden || ws.getRowHidden(r1);
 				cache.push(item);
 			}
 		}
@@ -13574,7 +13547,6 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 		c2: bbox.c2
 	};
 
-    var colObject, rowObject;
 	var bIsScatter = (c_oAscChartTypeSettings.scatter <= options.type && options.type <= c_oAscChartTypeSettings.scatterSmoothMarker);
 	var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, seriaName, start, end, formula, numCache;
 	if (!options.getInColumns()) {
@@ -13593,9 +13565,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 			startCell = new CellAddress(i, data_bbox.c1, 0);
 			endCell = new CellAddress(i, data_bbox.c2, 0);
 
-            rowObject = ws._getRowNoEmpty(i);
-			if (!rowObject || rowObject.hd === true)
-				ser.isHidden = true;
+			ser.isHidden = !!ws.getRowHidden(i);
 
 			// Val
 			if (startCell && endCell) {
@@ -13631,7 +13601,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				}
 			}
 
-			seriaName = left_header_bbox ? (ws.getCell(new CellAddress(i, left_header_bbox.c1, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
+			seriaName = left_header_bbox ? (ws.getCell3(i, left_header_bbox.c1).getValue()) : (api.chartTranslate.series + " " + nameIndex);
 			ser.TxCache.Tx = seriaName;
 			series.push(ser);
 			nameIndex++;
@@ -13654,9 +13624,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 			startCell = new CellAddress(data_bbox.r1, i, 0);
 			endCell = new CellAddress(data_bbox.r2, i, 0);
 
-            colObject = ws._getColNoEmpty(i);
-			if (!colObject || colObject.hd === true)
-				ser.isHidden = true;
+			ser.isHidden = !!ws.getColHidden(i);
 
 			// Val
 			if (startCell && endCell) {
@@ -13692,7 +13660,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getID());
 			}
 
-			seriaName = top_header_bbox ? (ws.getCell(new CellAddress(top_header_bbox.r1, i, 0)).getValue()) : (api.chartTranslate.series + " " + nameIndex);
+			seriaName = top_header_bbox ? (ws.getCell3(top_header_bbox.r1, i).getValue()) : (api.chartTranslate.series + " " + nameIndex);
 			ser.TxCache.Tx = seriaName;
 			series.push(ser);
 			nameIndex++;

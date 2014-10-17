@@ -2789,6 +2789,10 @@ Woorksheet.prototype.setColWidth=function(width, start, stop){
 		}
 	}
 };
+Woorksheet.prototype.getColHidden=function(index){
+	var col = this._getColNoEmptyWithAll(index);
+	return col ? col.hd : false;
+};
 Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 	//start, stop 0 based
 	if(null == start)
@@ -2970,6 +2974,10 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop){
 			fProcessRow(row);
 		}
 	}
+};
+Woorksheet.prototype.getRowHidden=function(index){
+	var row = this._getRowNoEmptyWithAll(index);
+	return row ? row.hd : false;
 };
 Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 	//start, stop 0 based
@@ -3190,8 +3198,8 @@ Woorksheet.prototype._getRowNoEmpty=function(row){
 		return oCurRow;
 	return null;
 };
-Woorksheet.prototype._getRowNoEmptyWithAll=function(col){
-	var oRes = this._getRowNoEmpty(col);
+Woorksheet.prototype._getRowNoEmptyWithAll=function(row){
+	var oRes = this._getRowNoEmpty(row);
 	if(null == oRes)
 		oRes = this.oSheetFormatPr.oAllRow;
 	return oRes;
@@ -6336,7 +6344,7 @@ Range.prototype.merge=function(type){
 		oLeftTopCell.setValueData(oFirstCellValue);
 		if(null != oFirstCellHyperlink)
 		{
-			var oLeftTopRange = this.worksheet.getCell(new CellAddress(oBBox.r1, oBBox.c1, 0));
+			var oLeftTopRange = this.worksheet.getCell3(oBBox.r1, oBBox.c1);
 			oLeftTopRange.setHyperlink(oFirstCellHyperlink, true);
 		}
 	}

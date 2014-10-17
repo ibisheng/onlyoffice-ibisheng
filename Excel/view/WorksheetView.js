@@ -8971,7 +8971,7 @@
 						for (var c = arn.c1; c < cMax; ++c) {
 							var pasteRow = r - arn.r1 + activeCellsPasteFragment.r1;
 							var pasteCol = c - arn.c1 + activeCellsPasteFragment.c1;
-							newVal = val.getCell( new CellAddress(pasteRow, pasteCol, 0));
+							newVal = val.getCell3(pasteRow, pasteCol);
 
 							curMerge = newVal.hasMerged();
 
