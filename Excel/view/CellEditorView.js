@@ -2040,6 +2040,10 @@
 
 		/** @param event {MouseEvent} */
 		CellEditor.prototype._onMouseUp = function (event) {
+			if (2 === event.button) {
+				this.handlers.trigger('onContextMenu', event);
+				return true;
+			}
 			this.isSelectMode = false;
 			return true;
 		};

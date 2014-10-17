@@ -394,7 +394,8 @@
 						"popUpSelectorKeyDown"		: function (event) {return self._onPopUpSelectorKeyDown(event);},
 						"getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();},
 						"setStrictClose"			: function (val) {self.controller.setStrictClose(val);},
-						"updateEditorSelectionInfo"	: function (info) {self.handlers.trigger("asc_onEditorSelectionChanged", info);}
+						"updateEditorSelectionInfo"	: function (info) {self.handlers.trigger("asc_onEditorSelectionChanged", info);},
+						"onContextMenu"				: function (event) {self.handlers.trigger("asc_onContextMenu", event);}
 					},
 					/*settings*/{
 						font: this.defaultFont,
