@@ -798,7 +798,11 @@ function CCollaborativeEditing()
         this.m_aNeedUnlock.length  = 0;
         this.m_aNeedUnlock2.length = 0;
 
-        editor.CoAuthoringApi.saveChanges(aChanges, ( null === History.SavedIndex ? null : SumIndex ) );
+		var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
+		if (0 < aChanges.length || null !== deleteIndex)
+        	editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex);
+		else
+			editor.CoAuthoringApi.unLockDocument(true);
 
         if ( -1 === this.m_nUseType )
         {
