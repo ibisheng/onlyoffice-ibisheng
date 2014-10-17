@@ -6402,7 +6402,7 @@ Paragraph.prototype =
                 else
                 {
                     var bCheckParaEnd = false;
-                    if ( this.Content.length - 1 === EndPos )
+                    if ( this.Content.length - 1 === EndPos && true !== this.Content[EndPos].Selection_IsEmpty(true))
                     {
                         EndPos--;
                         bCheckParaEnd = true;

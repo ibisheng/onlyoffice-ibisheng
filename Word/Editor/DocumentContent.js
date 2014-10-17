@@ -2089,10 +2089,14 @@ CDocumentContent.prototype =
             else
                 NewParagraph.Style_Add_Open( NextId );
 
-            if ( undefined != LastPara.TextPr.Value.FontSize )
+            if ( undefined != LastPara.TextPr.Value.FontSize || undefined !== LastPara.TextPr.Value.RFonts.Ascii )
             {
-                NewParagraph.TextPr.Set_FontSize(LastPara.TextPr.Value.FontSize);
-                NewParagraph.Internal_Content_Add( 0, new ParaTextPr( { FontSize : LastPara.TextPr.Value.FontSize, FontSizeCS : LastPara.TextPr.Value.FontSize } ) );
+                var TextPr = new CTextPr();
+                TextPr.FontSize   = LastPara.TextPr.Value.FontSize;
+                TextPr.FontSizeCS = LastPara.TextPr.Value.FontSize;
+                TextPr.RFonts     = LastPara.TextPr.Value.RFonts.Copy();
+                NewParagraph.Select_All();
+                NewParagraph.Apply_TextPr( TextPr );
             }
 
             LastPara.Set_DocumentNext( NewParagraph );

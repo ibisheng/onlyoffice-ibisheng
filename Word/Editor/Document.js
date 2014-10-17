@@ -13138,6 +13138,7 @@ CDocument.prototype =
 
             // TODO: Продумать, как избавиться от пересчета
             this.Recalculate();
+            this.Document_UpdateInterfaceState();
         }
 
         return Comment;
@@ -13164,6 +13165,8 @@ CDocument.prototype =
 
             if ( true === bSendEvent )
                 editor.sync_RemoveComment( Id );
+
+            this.Document_UpdateInterfaceState();
         }
     },
 
