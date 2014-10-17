@@ -1984,7 +1984,7 @@ CMathContent.prototype =
         if (null !== this.ParaMath)
             this.ParaMath.SetNeedResize();
 
-        this.CurPos = Pos + 1 + nCount;
+        this.CurPos = Pos + nCount;
 
         if (true === bSelect)
         {
@@ -2001,6 +2001,7 @@ CMathContent.prototype =
         }
 
         this.Correct_Content(true);
+        this.Correct_ContentPos(-1);
     },
 
 	Load_FromMenu: function(Type, Paragraph)

@@ -8742,9 +8742,11 @@ CDocument.prototype =
                 // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
                 if ( true !== bCopy )
                 {
-                    this.TurnOffRecalc = true;
+                    this.TurnOff_Recalculate();
+                    this.TurnOff_InterfaceEvents();
                     this.Remove(1, false, false, false);
-                    this.TurnOffRecalc = false;
+                    this.TurnOn_Recalculate(false);
+                    this.TurnOn_InterfaceEvents(false);
                 }
 
                 this.Selection_Remove();
@@ -8778,9 +8780,11 @@ CDocument.prototype =
                 // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
                 if ( true !== bCopy )
                 {
-                    this.TurnOffRecalc = true;
+                    this.TurnOff_Recalculate();
+                    this.TurnOff_InterfaceEvents();
                     this.Remove(1, false, false, false);
-                    this.TurnOffRecalc = false;
+                    this.TurnOn_Recalculate(false);
+                    this.TurnOn_InterfaceEvents(false);
                 }
 
                 this.Selection_Remove();
