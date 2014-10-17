@@ -1002,9 +1002,9 @@ CChartSpace.prototype =
         return {type: type, subtype: subtype};
     },
 
-    clearFormatting: function()
+    clearFormatting: function(bNoClearShapeProps)
     {
-        if(this.spPr)
+        if(this.spPr && !(bNoClearShapeProps === true))
         {
             this.spPr.Fill && this.spPr.setFill(null);
             this.spPr.ln && this.spPr.setLn(null);
@@ -2246,17 +2246,20 @@ CChartSpace.prototype =
                                         {
                                             if(!source_worksheet.getColHidden(j))
                                             {
-                                                hidden = false;
                                                 cell = source_worksheet.getCell3(range.r1, j);
-                                                pt = new CNumericPoint();
-                                                pt.setIdx(pt_index++);
-                                                pt.setVal(parseFloat(cell.getValue()));
-                                                if(cell.getNumFormatStr() !== lit_format_code)
+                                                if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
                                                 {
-                                                    pt.setFormatCode(cell.getNumFormatStr())
+                                                    hidden = false;
+                                                    pt = new CNumericPoint();
+                                                    pt.setIdx(pt_index++);
+                                                    pt.setVal(parseFloat(cell.getValue()));
+                                                    if(cell.getNumFormatStr() !== lit_format_code)
+                                                    {
+                                                        pt.setFormatCode(cell.getNumFormatStr())
+                                                    }
+                                                    num_cache.addPt(pt);
+                                                    addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
                                                 }
-                                                num_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
                                             }
                                         }
                                     }
@@ -2269,17 +2272,20 @@ CChartSpace.prototype =
                                         {
                                             if(!source_worksheet.getRowHidden(j))
                                             {
-                                                hidden = false;
                                                 cell = source_worksheet.getCell3(j, range.c1);
-                                                pt = new CNumericPoint();
-                                                pt.setIdx(pt_index++);
-                                                pt.setVal(parseFloat(cell.getValue()));
-                                                if(cell.getNumFormatStr() !== lit_format_code)
+                                                if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
                                                 {
-                                                    pt.setFormatCode(cell.getNumFormatStr())
+                                                    hidden = false;
+                                                    pt = new CNumericPoint();
+                                                    pt.setIdx(pt_index++);
+                                                    pt.setVal(parseFloat(cell.getValue()));
+                                                    if(cell.getNumFormatStr() !== lit_format_code)
+                                                    {
+                                                        pt.setFormatCode(cell.getNumFormatStr())
+                                                    }
+                                                    num_cache.addPt(pt);
+                                                    addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1, pt);
                                                 }
-                                                num_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1, pt);
                                             }
                                         }
                                     }
@@ -2315,7 +2321,7 @@ CChartSpace.prototype =
                 var arr_f = f1.split(",");
                 var str_cache = new CStrCache();
                 //str_cache.setFormatCode("General");
-                var pt_index = 0, i, j, cell, pt;
+                var pt_index = 0, i, j, cell, pt, value_width_format;
                 for(i = 0; i < arr_f.length; ++i)
                 {
                     var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2337,12 +2343,16 @@ CChartSpace.prototype =
                                             if(!source_worksheet.getColHidden(j))
                                             {
                                                 cell = source_worksheet.getCell3(range.r1, j);
-                                                pt = new CStringPoint();
-                                                pt.setIdx(pt_index++);
-                                                pt.setVal(cell.getValueWithFormat());
+                                                value_width_format = cell.getValueWithFormat();
+                                                if(typeof value_width_format === "string" && value_width_format.length > 0)
+                                                {
+                                                    pt = new CStringPoint();
+                                                    pt.setIdx(pt_index++);
+                                                    pt.setVal(value_width_format);
 
-                                                str_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
+                                                    str_cache.addPt(pt);
+                                                    addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
+                                                }
                                             }
                                         }
                                     }
@@ -2356,12 +2366,15 @@ CChartSpace.prototype =
                                             if(!source_worksheet.getRowHidden(j))
                                             {
                                                 cell = source_worksheet.getCell3(j, range.c1);
-                                                pt = new CStringPoint();
-                                                pt.setIdx(pt_index++);
-                                                pt.setVal(cell.getValueWithFormat());
-
-                                                str_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
+                                                value_width_format = cell.getValueWithFormat();
+                                                if(typeof value_width_format === "string" && value_width_format.length > 0)
+                                                {
+                                                    pt = new CStringPoint();
+                                                    pt.setIdx(pt_index++);
+                                                    pt.setVal(cell.getValueWithFormat());
+                                                    str_cache.addPt(pt);
+                                                    addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
+                                                }
                                             }
                                         }
                                     }
