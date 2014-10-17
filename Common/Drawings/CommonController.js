@@ -1763,7 +1763,7 @@ DrawingObjectsController.prototype =
 								c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
                     }
 					var chartSeries = getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
-                    chart_space.clearFormatting();
+                    chart_space.clearFormatting(true);
                     b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
                 }
