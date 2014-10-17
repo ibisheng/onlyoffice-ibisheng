@@ -570,34 +570,6 @@ function CMPrp()
 }
 CMPrp.prototype =
 {
-    setMathProps: function(props)
-    {
-        if(props.aln === true || props.aln == false)
-            this.aln = props.aln;
-
-        if(props.brk === true || props.brk == false)
-            this.brk = props.brk;
-
-        if(props.lit === true || props.lit == false)
-            this.lit = props.lit;
-
-        if(props.nor === true || props.nor == false)
-            this.nor = props.nor;
-
-
-        if(props.sty !== null && props.sty !== undefined)
-            this.sty = props.sty;
-
-        // TXT_DOUBLE_STRUCK        U+1D538 - U+1D56B
-        // TXT_MONOSPACE            U+1D670 - U+1D6A3
-        // TXT_FRAKTUR              U+1D504 - U+1D537
-        // TXT_SANS_SERIF           U+1D608 - U+1D63B
-        // TXT_SCRIPT               U+1D49C - U+1D4CF
-
-        if(props.scr !== null && props.scr !== undefined)
-            this.scr = props.scr;
-
-    },
     getPropsForWrite: function()
     {
         var props =
@@ -635,11 +607,13 @@ CMPrp.prototype =
         var NewMPrp = new CMPrp();
         
         NewMPrp.aln      = this.aln;
-        NewMPrp.brk      = this.brk;
         NewMPrp.lit      = this.lit;
         NewMPrp.nor      = this.nor;
         NewMPrp.sty      = this.sty;
         NewMPrp.scr      = this.scr;
+
+        if(this.brk !== undefined)
+            NewPr.brk = this.brk.Copy();
         
         return NewMPrp;
     },

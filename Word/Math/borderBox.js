@@ -4,13 +4,20 @@ function CMathBreak()
 {
     this.AlnAt = undefined;
 }
-CMathBreak.prototype.Set_FromObj = function(Obj)
+CMathBreak.prototype.Set_FromObject = function(Obj)
 {
     if(Obj.AlnAt !== undefined && Obj.AlnAt !== null && Obj.AlnAt - 0 == 0)
     {
-        if(Obj.AlnAt >= 0 && Obj.AlnAt <= 255)
+        if(Obj.AlnAt >= 1 && Obj.AlnAt <= 255)
             this.AlnAt = Obj.AlnAt;
     }
+}
+CMathBreak.prototype.Copy = function()
+{
+    var NewMBreak = new CMathBreak();
+    NewMBreak.AlnAt = this.AlnAt;
+
+    return NewMBreak;
 }
 
 function CMathBorderBoxPr()
@@ -354,8 +361,8 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 
 function CMathBoxPr()
 {
+    this.brk     = undefined;
     this.aln     = false;
-    this.brk     = false;
     this.diff    = false;
     this.noBreak = false;
     this.opEmu   = false;
@@ -368,10 +375,11 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     else
         this.aln = false;
 
-    if(true === Obj.brk || 1 === Obj.brk)
-        this.brk = true;
-    else
-        this.brk = false;
+    if(Obj.brk !== null && Obj.brk !== undefined)
+    {
+        this.brk = new CMathBreak();
+        this.brk.Set_FromObject(Obj);
+    }
 
     if(true === Obj.diff || 1 === Obj.diff)
         this.diff = true;
@@ -394,10 +402,13 @@ CMathBoxPr.prototype.Copy = function()
     var NewPr = new CMathBoxPr();
 
     NewPr.aln     = this.aln    ;
-    NewPr.brk     = this.brk    ;
     NewPr.diff    = this.diff   ;
     NewPr.noBreak = this.noBreak;
     NewPr.opEmu   = this.opEmu  ;
+
+    if(this.brk !== undefined)
+        NewPr.brk = this.brk.Copy();
+
 
     return NewPr;
 };
