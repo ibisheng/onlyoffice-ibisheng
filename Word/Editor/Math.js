@@ -793,7 +793,7 @@ ParaMath.prototype.Check_PageBreak = function()
 
 ParaMath.prototype.Check_BreakPageEnd = function(PBChecker)
 {
-    return false;
+    return true;
 };
 
 ParaMath.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)

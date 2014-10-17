@@ -8667,6 +8667,9 @@ CDocument.prototype =
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
         this.Selection.Start = false;
+
+        // Отдельно обрабатываем это событие, потому что внутри него идет проверка на this.Selection.Start !== true
+        this.Document_UpdateCopyCutState();
     },
 
     On_DragTextEnd : function(NearPos, bCopy)
