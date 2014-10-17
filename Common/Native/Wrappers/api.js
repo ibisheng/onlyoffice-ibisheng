@@ -5012,7 +5012,7 @@ asc_docs_api.prototype.Call_Menu_Context_Paste = function(type, param)
     }
     else if (1 == type)
     {
-        // TODO:
+        this.AddImageUrlNative(param, 50, 50);
     }
     else if (2 == type)
     {
@@ -5047,9 +5047,9 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 
 window.NativeCorrectImageUrlOnPaste = function(url)
 {
-    return url;
+    return window.native.CorrectImageUrlOnPaste(url);
 };
 window.NativeCorrectImageUrlOnCopy = function(url)
 {
-    return url;
+    return window.native.CorrectImageUrlOnCopy(url);
 };
