@@ -793,7 +793,7 @@ function CMathAmp()
 
     this.pos = new CMathPosition();
 
-    this.AmpText = new CMathText(true);
+    this.AmpText = new CMathText(false);
     this.AmpText.add(0x26);
 
     this.size = null;
@@ -805,7 +805,7 @@ CMathAmp.prototype =
     {
         this.bEqqArray = RPI.bEqqArray;
 
-        this.AmpText.Resize(oMeasure, this, RPI);
+        this.AmpText.Resize(oMeasure, RPI);
 
         if(this.bEqqArray)
         {
@@ -829,10 +829,9 @@ CMathAmp.prototype =
     },
     PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {
-        if(!this.bJDraw)
-            this.Parent = Parent;
-        else
-            this.Parent = null;
+        this.Parent = Parent;
+
+        this.AmpText.PreRecalc(Parent, ParaMath, ArgSize, RPI);
     },
     Get_WidthVisible: function()
     {

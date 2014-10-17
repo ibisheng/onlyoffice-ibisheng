@@ -681,8 +681,15 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             }
             case para_Math_Ampersand:
             {
-                PointsInfo.NextAlignRange();
-                X += PointsInfo.GetAlign();
+                if(this.bEqqArray)
+                {
+                    PointsInfo.NextAlignRange();
+                    X += PointsInfo.GetAlign();
+                }
+                else
+                    X += Item.Get_WidthVisible();
+
+                break;
             }
         }
     }
@@ -3748,7 +3755,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         var TempDx = 0;
 
-        if(para_Math_Ampersand === ItemType)
+        if(para_Math_Ampersand === ItemType && this.bEqqArray)
         {
             if (null !== this.Parent)
             {
@@ -4430,7 +4437,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
             }
             else
             {
-                if(para_Math_Ampersand == ItemType)
+                if(para_Math_Ampersand == ItemType && this.bEqqArray)
                 {
                     PointsInfo.NextAlignRange();
                     SelectionDraw.StartX += PointsInfo.GetAlign();
@@ -4451,7 +4458,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
         {
             if (true === SelectionDraw.Draw && para_Drawing === ItemType && true !== Item.Is_Inline())
                 Item.Draw_Selection();
-            else if (para_Math_Ampersand === ItemType)
+            else if (para_Math_Ampersand === ItemType && this.bEqqArray)
             {
                 PointsInfo.NextAlignRange();
                 SelectionDraw.W += PointsInfo.GetAlign();
@@ -4493,7 +4500,7 @@ ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
         for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
         {
             var ItemType = this.Content[CurPos].Type;
-            if (para_End !== ItemType  && para_Math_Ampersand !== ItemType) // para_math_Ampersand имеет нулевую ширину, поэтому чтобы не случилось так что не было ни селекта, ни курсора, не учитываем para_Math_Ampersand
+            if (para_End !== ItemType  && !(para_Math_Ampersand == ItemType && this.bEqqArray)) // para_math_Ampersand имеет нулевую ширину, поэтому чтобы не случилось так что не было ни селекта, ни курсора, не учитываем para_Math_Ampersand
                 return false;
         }
     }

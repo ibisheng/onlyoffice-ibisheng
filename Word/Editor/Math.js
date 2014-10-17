@@ -166,9 +166,19 @@ ParaMath.prototype.Add = function(Item)
 
     if (para_Text === Type)
     {
-        var oText = new CMathText(false);
-        oText.add(Item.Value);
-        Run.Add(oText, true);
+        if(Item.Value == 38)
+        {
+            var Amper = new CMathAmp();
+            Run.Add(Amper, true);
+        }
+        else
+        {
+            var oText = new CMathText(false);
+            oText.add(Item.Value);
+            Run.Add(oText, true);
+        }
+
+
     }
     else if (para_Space === Type)
     {
@@ -186,7 +196,6 @@ ParaMath.prototype.Add = function(Item)
             this.Get_ParaContentPos(false, false, ContentPos);
 
         var MathTxtPr = this.Root.GetMathTextPr(ContentPos, 0);
-        var lng = oContent.content.length;
 
         // Нам нужно разделить данный Run на 2 части
         var RightRun = Run.Split2(Run.State.ContentPos);
@@ -194,10 +203,11 @@ ParaMath.prototype.Add = function(Item)
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
         oContent.CurPos = StartPos;
 
+        var lng = oContent.content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
 
         var lng2 = oContent.content.length;
-        oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos, lng2 - lng + 1);
+        oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
 
         oContent.CurPos = StartPos + 2; // позиция RightRun
         RightRun.Cursor_MoveToStartPos();
