@@ -45,7 +45,6 @@ StartAddNewShape.prototype =
     {
         if(this.bStart)
         {
-
             if(this.drawingObjects.drawingObjects.objectLocker)
             {
                 this.drawingObjects.drawingObjects.objectLocker.reset();
