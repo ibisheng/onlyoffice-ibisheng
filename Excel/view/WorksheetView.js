@@ -1817,7 +1817,6 @@
 			this._drawFrozenPane();
 			this._drawFrozenPaneLines();
 			this._fixSelectionOfMergedCells();
-			this._fixSelectionOfHiddenCells();
 			this._drawAutoF();
 			this.cellCommentator.drawCommentCells();
 			this.objectRender.showDrawingObjectsEx(true);
@@ -6117,6 +6116,10 @@
 			var ar = this.activeRange;
 			var arn = this.activeRange.clone(true);
 
+			// Если мы на скрытой строке или ячейке, то двигаться в выделении нельзя (так делает и Excel)
+			if (this.width_1px > this.cols[ar.startCol].width || this.height_1px > this.rows[ar.startRow].height)
+				return;
+
 			// Set active cell
 			ar.startCol += dc;
 			ar.startRow += dr;
@@ -6170,13 +6173,13 @@
 				if (!done) { continue; }
 
 				// Обработка движения через скрытые столбцы/строки
-				while (ar.startCol >= arn.c1 && ar.startCol <= arn.c2 && this.cols[ar.startCol].width < 0.000001) {
+				while (ar.startCol >= arn.c1 && ar.startCol <= arn.c2 && this.cols[ar.startCol].width < this.width_1px) {
 					ar.startCol += dc || (dr > 0 ? +1 : -1);
 					done = false;
 				}
 				if (!done) { continue; }
 
-				while (ar.startRow >= arn.r1 && ar.startRow <= arn.r2 && this.rows[ar.startRow].height < 0.000001) {
+				while (ar.startRow >= arn.r1 && ar.startRow <= arn.r2 && this.rows[ar.startRow].height < this.height_1px) {
 					ar.startRow += dr || (dc > 0 ? +1 : -1);
 					done = false;
 				}
