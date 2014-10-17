@@ -1957,6 +1957,25 @@ DrawingObjectsController.prototype =
                     if(chart_type.grouping !== need_groupping)
                         chart_type.setGrouping(need_groupping);
 
+                    if(chart_type.gapWidth !== 150)
+                    {
+                        chart_type.setGapWidth(150);
+                    }
+                    if(BAR_GROUPING_PERCENT_STACKED === need_groupping || BAR_GROUPING_STACKED === need_groupping)
+                    {
+                        if(chart_type.overlap !== 100)
+                        {
+                            chart_type.setOverlap(100);
+                        }
+                    }
+                    else
+                    {
+                        if(chart_type.overlap !== null)
+                        {
+                            chart_type.setOverlap(null);
+                        }
+                    }
+
                     axis_by_types = chart_type.getAxisByTypes();
                     if(chart_type.barDir !== need_bar_dir)
                     {
