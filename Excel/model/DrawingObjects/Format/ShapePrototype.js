@@ -365,6 +365,10 @@ CShape.prototype.recalculateBounds = function()
     this.bounds.b = boundsChecker.Bounds.max_y;
     this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
     this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+    if(this.drawingBase && !this.group)
+    {
+        this.drawingBase.checkBoundsFromTo();
+    }
 };
 
 CShape.prototype.recalculateContent = function()

@@ -398,7 +398,8 @@ function FrozenPlace(ws, type) {
 	_this.isObjectInside = function(object) {
 		// TODO Нужно учитывать collOff, rowOff
 
-		var objectRange = new asc_Range(object.from.col, object.from.row, object.to.col, object.to.row);
+        var boundsFromTo = object.boundsFromTo;
+		var objectRange = new asc_Range(boundsFromTo.from.col, boundsFromTo.from.row, boundsFromTo.to.col, boundsFromTo.to.row);
 		return _this.range.isIntersect(objectRange);
 	};
 	

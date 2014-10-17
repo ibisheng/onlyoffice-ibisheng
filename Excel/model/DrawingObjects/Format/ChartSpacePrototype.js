@@ -224,6 +224,10 @@ CChartSpace.prototype.recalculateBounds = function()
     this.bounds.h = this.bounds.b - this.bounds.t;
     this.bounds.x = this.bounds.l;
     this.bounds.y = this.bounds.t;
+    if(this.drawingBase && !this.group)
+    {
+        this.drawingBase.checkBoundsFromTo();
+    }
 };
 
 

@@ -120,8 +120,6 @@ CGroupShape.prototype.recalculateBounds = function()
         y_arr_max.push(b);
         y_arr_min.push(t);
     }
-
-
     if(!this.group)
     {
         var tr = this.localTransform;
@@ -141,7 +139,6 @@ CGroupShape.prototype.recalculateBounds = function()
         y_arr_max = y_arr_max.concat(arr_p_y);
         y_arr_min = y_arr_min.concat(arr_p_y);
     }
-
     this.bounds.x = Math.min.apply(Math, x_arr_min);
     this.bounds.y = Math.min.apply(Math, y_arr_min);
     this.bounds.l = this.bounds.x;
@@ -150,6 +147,10 @@ CGroupShape.prototype.recalculateBounds = function()
     this.bounds.b = Math.max.apply(Math, y_arr_max);
     this.bounds.w = this.bounds.r - this.bounds.l;
     this.bounds.h = this.bounds.b - this.bounds.t;
+    if(this.drawingBase && !this.group)
+    {
+        this.drawingBase.checkBoundsFromTo();
+    }
 };
 
 CGroupShape.prototype.deselect = CShape.prototype.deselect;
@@ -167,12 +168,14 @@ CGroupShape.prototype.handleUpdatePosition = function()
             this.spTree[i].handleUpdatePosition();
         }
     }
+    this.recalcBounds();
     this.addToRecalculate();
     delete this.fromSerialize;
 };
 CGroupShape.prototype.handleUpdateExtents = function()
 {
     this.recalcTransform();
+    this.recalcBounds();
     this.addToRecalculate();
     delete this.fromSerialize;
 };

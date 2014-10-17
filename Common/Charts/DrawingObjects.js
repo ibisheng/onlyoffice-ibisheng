@@ -1365,6 +1365,12 @@ function DrawingObjects() {
 
 		this.graphicObject = null; // CImage, CShape, GroupShape or CChartAsGroup
 
+        this.boundsFromTo =
+        {
+            from: new CCellObjectInfo(),
+            to  : new CCellObjectInfo()
+        };
+
 		this.flags = {
             anchorUpdated: false,
             lockState: c_oAscLockTypes.kLockTypeNone
@@ -1523,6 +1529,89 @@ function DrawingObjects() {
             _t.to.colOff = ptToMm(toColCell.colOff);
             _t.to.row = toRowCell.row;
             _t.to.rowOff = ptToMm(toRowCell.rowOff);
+            if(bReinitHorScroll)
+            {
+                worksheet.handlers.trigger("reinitializeScrollX");
+            }
+            if(bReinitVertScroll)
+            {
+                worksheet.handlers.trigger("reinitializeScrollY");
+            }
+        }
+    };
+
+
+    DrawingBase.prototype.checkBoundsFromTo = function() {
+        var _t = this;
+
+        if ( _t.isGraphicObject() && _t.graphicObject.bounds) {
+
+            var bounds = _t.graphicObject.bounds;
+            if ( (bounds.x < 0) || (bounds.y < 0) || (bounds.w < 0) || (bounds.h < 0) )
+                return;
+
+            var fromX =  mmToPt(bounds.x), fromY =  mmToPt(bounds.y),
+                toX = mmToPt(bounds.x + bounds.w), toY = mmToPt(bounds.y + bounds.h);
+            var bReinitHorScroll = false, bReinitVertScroll = false;
+
+            var fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
+            while(fromColCell.col === null && worksheet.cols.length < gc_nMaxCol)
+            {
+                worksheet.expandColsOnScroll(true);
+                fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
+                bReinitHorScroll = true;
+            }
+            if(fromColCell.col === null)
+            {
+                fromColCell.col = gc_nMaxCol;
+            }
+            var fromRowCell = worksheet.findCellByXY(fromX, fromY, true, true, false);
+
+            while(fromRowCell.row === null && worksheet.rows.length < gc_nMaxRow)
+            {
+                worksheet.expandRowsOnScroll(true);
+                fromRowCell = worksheet.findCellByXY(fromX, fromY, true, true, false);
+                bReinitVertScroll = true;
+            }
+            if(fromRowCell.row === null)
+            {
+                fromRowCell.row = gc_nMaxRow;
+            }
+
+
+            var toColCell = worksheet.findCellByXY(toX, toY, true, false, true);
+            while(toColCell.col === null && worksheet.cols.length < gc_nMaxCol)
+            {
+                worksheet.expandColsOnScroll(true);
+                toColCell = worksheet.findCellByXY(toX, toY, true, false, true);
+                bReinitHorScroll = true;
+            }
+            if(toColCell.col === null)
+            {
+                toColCell.col = gc_nMaxCol;
+            }
+            var toRowCell = worksheet.findCellByXY(toX, toY, true, true, false);
+
+            while(toRowCell.row === null && worksheet.rows.length < gc_nMaxRow)
+            {
+                worksheet.expandRowsOnScroll(true);
+                toRowCell = worksheet.findCellByXY(toX, toY, true, true, false);
+                bReinitVertScroll = true;
+            }
+            if(toRowCell.row === null)
+            {
+                toRowCell.row = gc_nMaxRow;
+            }
+
+            _t.boundsFromTo.from.col = fromColCell.col;
+            _t.boundsFromTo.from.colOff = ptToMm(fromColCell.colOff);
+            _t.boundsFromTo.from.row = fromRowCell.row;
+            _t.boundsFromTo.from.rowOff = ptToMm(fromRowCell.rowOff);
+
+            _t.boundsFromTo.to.col = toColCell.col;
+            _t.boundsFromTo.to.colOff = ptToMm(toColCell.colOff);
+            _t.boundsFromTo.to.row = toRowCell.row;
+            _t.boundsFromTo.to.rowOff = ptToMm(toRowCell.rowOff);
             if(bReinitHorScroll)
             {
                 worksheet.handlers.trigger("reinitializeScrollX");
