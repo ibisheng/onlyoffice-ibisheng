@@ -11805,11 +11805,13 @@ CDocument.prototype =
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            this.HdrFtr.Document_UpdateSelectionState();                        
+            this.HdrFtr.Document_UpdateSelectionState();
+            this.private_UpdateTracks(this.Is_SelectionUse(), this.Selection_IsEmpty());
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             this.DrawingObjects.documentUpdateSelectionState();
+            this.private_UpdateTracks(this.Is_SelectionUse(), this.Selection_IsEmpty());
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {

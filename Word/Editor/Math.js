@@ -907,7 +907,8 @@ ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 
     if ( EndPos >= 1 )
     {
-        // TODO: Сделать смещение на Dx, Dy
+        this.X += Dx;
+        this.Y += Dy;
     }
 };
 //-----------------------------------------------------------------------------------

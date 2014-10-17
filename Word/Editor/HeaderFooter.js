@@ -2056,6 +2056,14 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Selection_Check( X, Y, Page_Abs, NearPos );
     },
 
+    Selection_IsEmpty : function(bCheckHidden)
+    {
+        if (null !== this.CurHdrFtr)
+            return this.CurHdrFtr.Content.Selection_IsEmpty(bCheckHidden);
+
+        return true;
+    },
+
     // Селектим весь параграф
     Select_All : function()
     {
