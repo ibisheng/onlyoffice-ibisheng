@@ -2330,7 +2330,7 @@ CBarChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CBarSeries;
+        return new CBarSeries();
     },
 
     removeSeries: function(idx)
@@ -2850,7 +2850,7 @@ CAreaChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CAreaSeries;
+        return new CAreaSeries();
     },
     createDuplicate: function()
     {
@@ -9243,7 +9243,7 @@ CBubbleChart.prototype =
     },
     getSeriesConstructor: function()
     {
-        return CBubbleSeries;
+        return new CBubbleSeries();
     },
     getObjectType: function()
     {
@@ -11991,7 +11991,7 @@ CDoughnutChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CPieSeries;
+        return new CPieSeries();
     },
     createDuplicate: function()
     {
@@ -13890,7 +13890,7 @@ CLineChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CLineSeries;
+        return new CLineSeries();
     },
 
     getObjectType: function()
@@ -16252,7 +16252,7 @@ COfPieChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CPieSeries;
+        return new CPieSeries();
     },
     removeSeries: function(idx)
     {
@@ -17001,7 +17001,7 @@ CPieChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CPieSeries;
+        return new CPieSeries();
     },
 
     createDuplicate: function()
@@ -18027,7 +18027,7 @@ CRadarChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CRadarSeries;
+        return new CRadarSeries();
     },
 
     Refresh_RecalcData: function()
@@ -19020,7 +19020,7 @@ CScatterChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CScatterSeries;
+        return new CScatterSeries();
     },
 
     createDuplicate: function()
@@ -20174,7 +20174,7 @@ CStockChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CLineSeries;
+        return new CLineSeries();
     },
     createDuplicate: function()
     {
@@ -21087,7 +21087,7 @@ CSurfaceChart.prototype =
 
     getSeriesConstructor: function()
     {
-        return CSurfaceSeries;
+        return new CSurfaceSeries();
     },
 
     createDuplicate: function()

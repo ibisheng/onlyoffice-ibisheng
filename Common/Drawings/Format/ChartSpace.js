@@ -1139,7 +1139,7 @@ CChartSpace.prototype =
         {
             var  asc_series = asc_chart.series;
             var chart_type = this.chart.plotArea.charts[0];
-            var first_series = chart_type.series[0] ? chart_type.series[0] : new chart_type.getSeriesConstructor()();
+            var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
             var first_series2 = chart_type.series[0] ? chart_type.series[0] : null;
             removeAllSeriesFromChart(chart_type);
             if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
