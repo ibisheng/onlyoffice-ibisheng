@@ -7342,6 +7342,14 @@ CValAx.prototype =
         }
         c.setMajorTickMark(this.majorTickMark);
         c.setMajorUnit(this.majorUnit);
+
+        if(this.minorGridlines)
+        {
+            c.setMinorGridlines(this.minorGridlines.createDuplicate());
+        }
+        c.setMinorTickMark(this.minorTickMark);
+        c.setMinorUnit(this.minorUnit);
+
         this.numFmt && c.setNumFmt(this.numFmt.createDuplicate());
         this.scaling && c.setScaling(this.scaling.createDuplicate());
         if(this.spPr)
