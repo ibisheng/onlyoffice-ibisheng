@@ -6706,6 +6706,13 @@ CChartSpace.prototype =
                             var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
                             var ser = series[i];
                             var pts = getPtsFromSeries(ser);
+                            var compiled_line = new CLn();
+                            compiled_line.merge(default_line);
+                            compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                            compiled_line.w *= style.line3;
+                            if(ser.spPr && ser.spPr.ln)
+                                compiled_line.merge(ser.spPr.ln);
+                            ser.compiledSeriesPen = compiled_line.createDuplicate();
                             for(var j = 0; j < pts.length; ++j)
                             {
                                 var compiled_line = new CLn();
@@ -6714,8 +6721,6 @@ CChartSpace.prototype =
                                 compiled_line.w *= style.line3;
                                 if(ser.spPr && ser.spPr.ln)
                                     compiled_line.merge(ser.spPr.ln);
-                                if(j === 0)
-                                    ser.compiledSeriesPen = compiled_line.createDuplicate();
                                 if(Array.isArray(ser.dPt))
                                 {
                                     for(var k = 0; k < ser.dPt.length; ++k)
@@ -6766,6 +6771,14 @@ CChartSpace.prototype =
                                 default_line.Fill.setFill(new CNoFill());
                             }
 
+                            var compiled_line = new CLn();
+                            compiled_line.merge(default_line);
+                            if(!(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
+                                compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                            compiled_line.w *= style.line3;
+                            if(ser.spPr && ser.spPr.ln)
+                                compiled_line.merge(ser.spPr.ln);
+                            ser.compiledSeriesPen = compiled_line.createDuplicate();
                             for(var j = 0; j < pts.length; ++j)
                             {
                                 var compiled_line = new CLn();
@@ -6775,8 +6788,6 @@ CChartSpace.prototype =
                                 compiled_line.w *= style.line3;
                                 if(ser.spPr && ser.spPr.ln)
                                     compiled_line.merge(ser.spPr.ln);
-                                if(j === 0)
-                                    ser.compiledSeriesPen = compiled_line.createDuplicate();
                                 if(Array.isArray(ser.dPt))
                                 {
                                     for(var k = 0; k < ser.dPt.length; ++k)
@@ -6872,6 +6883,19 @@ CChartSpace.prototype =
                                 if(this.style === 34)
                                     base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
 
+
+                                var compiled_line = new CLn();
+                                compiled_line.merge(default_line);
+                                compiled_line.Fill = new CUniFill();
+                                if(this.style !== 34)
+                                    compiled_line.Fill.merge(style.line2[0]);
+                                else
+                                    compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                                if(ser.spPr && ser.spPr.ln)
+                                {
+                                    compiled_line.merge(ser.spPr.ln);
+                                }
+                                ser.compiledSeriesPen = compiled_line.createDuplicate();
                                 for(var j = 0; j < pts.length; ++j)
                                 {
                                     var compiled_line = new CLn();
@@ -6885,8 +6909,6 @@ CChartSpace.prototype =
                                     {
                                         compiled_line.merge(ser.spPr.ln);
                                     }
-                                    if(j === 0)
-                                        ser.compiledSeriesPen = compiled_line.createDuplicate();
                                     if(Array.isArray(ser.dPt))
                                     {
                                         for(var k = 0; k < ser.dPt.length; ++k)
