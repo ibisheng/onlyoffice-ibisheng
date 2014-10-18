@@ -2662,13 +2662,29 @@ DrawingObjectsController.prototype =
                 return c_oAscGridLinesSettings.minor;
             return c_oAscGridLinesSettings.majorMinor;
         };
+
+        var chart_type = plot_area.charts[0];
+        var chart_type_object_type = chart_type.getObjectType();
+
         if(hor_axis)
             ret.putHorAxisProps(hor_axis.getMenuProps());
         ret.putHorGridLines(calc_grid_lines(vert_axis));
 
         if(vert_axis)
+        {
             ret.putVertAxisProps(vert_axis.getMenuProps());
+            if(chart_type.getObjectType() === historyitem_type_AreaChart && !isRealNumber(vert_axis.crossBetween))
+            {
+                if(ret.horAxisProps)
+                {
+                    ret.horAxisProps.putLabelsPosition(c_oAscLabelsPosition.byDivisions);
+                }
+            }
+        }
         ret.putVertGridLines(calc_grid_lines(hor_axis));
+
+
+
 
 
         ret.putHorAxisLabel(hor_axis && hor_axis.title ? c_oAscChartHorAxisLabelShowSettings.noOverlay : c_oAscChartTitleShowSettings.none);
@@ -2759,8 +2775,6 @@ DrawingObjectsController.prototype =
             ret.putLegendPos(c_oAscChartLegendShowSettings.none);
         }
 
-        var chart_type = plot_area.charts[0];
-        var chart_type_object_type = chart_type.getObjectType();
 
         var calc_chart_type;
         if(chart_type_object_type === historyitem_type_PieChart)

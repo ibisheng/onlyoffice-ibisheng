@@ -10446,10 +10446,10 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         if (null != oNewVal.axId)
             oIdToAxisMap[oNewVal.axId] = oNewVal;
         val.addAxis(oNewVal);
-        if(!isRealNumber(oNewVal.crossBetween))
-        {
-            oNewVal.setCrossBetween(CROSS_BETWEEN_BETWEEN);
-        }
+        //if(!isRealNumber(oNewVal.crossBetween))
+        //{
+        //    oNewVal.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+        //}
     }
     else if (c_oserct_plotareaDTABLE === type) {
         var oNewVal = new CDTable();
@@ -10773,7 +10773,19 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         for(var nChartIndex = 0; nChartIndex < aChartWithAxis.length; ++nChartIndex)
         {
             var oCurChartWithAxis = aChartWithAxis[nChartIndex];
-            oCurChartWithAxis.chart.addAxId(oIdToAxisMap[oCurChartWithAxis.axisId]);
+            var axis = oIdToAxisMap[oCurChartWithAxis.axisId];
+            oCurChartWithAxis.chart.addAxId(axis);
+            if(axis && axis.getObjectType() === historyitem_type_ValAx && !isRealNumber(axis.crossBetween))
+            {
+                if(oCurChartWithAxis.chart.getObjectType() === historyitem_type_AreaChart)
+                {
+                    axis.setCrossBetween(CROSS_BETWEEN_MID_CAT);
+                }
+                else
+                {
+                    axis.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+                }
+            }
         }
         val.setPlotArea(oNewVal);
     }

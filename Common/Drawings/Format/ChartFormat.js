@@ -4074,7 +4074,7 @@ CCatAx.prototype =
         }
         else
         {
-            ret.putLabelsPosition(CROSS_BETWEEN_BETWEEN);
+            ret.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
         }
         if(isRealNumber(this.tickLblPos) && isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
             ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
