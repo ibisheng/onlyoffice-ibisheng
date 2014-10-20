@@ -2847,7 +2847,7 @@ CPresentation.prototype =
                     var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
                     for(i = 0; i < selected_slides.length; ++i)
                     {
-                        ret.SlideObjects.push(new SlideCopyObject(this.Slides[selected_slides[i]].copy(), this.Slides[selected_slides[i]].getBase64Img()));
+                        ret.SlideObjects.push(new SlideCopyObject(this.Slides[selected_slides[i]].createDuplicate(), this.Slides[selected_slides[i]].getBase64Img()));
                     }
                 }
             }
