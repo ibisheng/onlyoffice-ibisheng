@@ -245,6 +245,8 @@ ParaRun.prototype.Is_Empty = function(Props)
     }
 };
 
+ParaRun.prototype.Is_CheckingNearestPos = ParaHyperlink.prototype.Is_CheckingNearestPos;
+
 // Начинается ли данный ран с новой строки
 ParaRun.prototype.Is_StartFromNewLine = function()
 {
@@ -7885,7 +7887,23 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
 
         this.size.ascent = ascent;
         this.size.height = ascent + descent;
+
+        // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
+        this.TextHeight  = g_oTextMeasurer.GetHeight();
+        this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
+        this.TextAscent  = this.TextHeight - this.TextDescent;
+        this.TextAscent2 = g_oTextMeasurer.GetAscender();
     }
+
+    // Пересчитаем метрику строки относительно размера данного текста
+    if (RPI.PRS.LineTextAscent < this.TextAscent)
+        RPI.PRS.LineTextAscent = this.TextAscent;
+
+    if (RPI.PRS.LineTextAscent2 < this.TextAscent2)
+        RPI.PRS.LineTextAscent2 = this.TextAscent2;
+
+    if (RPI.PRS.LineTextDescent < this.TextDescent)
+        RPI.PRS.LineTextDescent = this.TextDescent;
 }
 ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
 {

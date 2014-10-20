@@ -117,6 +117,11 @@ ParaMath.prototype.Is_Empty = function()
     return false;
 };
 
+ParaMath.prototype.Is_CheckingNearestPos = function()
+{
+    return this.Root.Is_CheckingNearestPos();
+};
+
 ParaMath.prototype.Is_StartFromNewLine = function()
 {
     return false;
@@ -540,6 +545,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     RPI.bInline       = this.bInline;
     RPI.bChangeInline = this.bChangeInline;
     RPI.NeedResize    = this.NeedResize;
+    RPI.PRS           = PRS;
 
     var ArgSize = new CMathArgSize();
 
@@ -558,10 +564,15 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.setPosition(pos);
     }
     else
+    {
         this.Root.Resize_2(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
+    }
 
     this.NeedResize = false;
 
+    var OldLineTextAscent  = PRS.LineTextAscent;
+    var OldLineTextAscent2 = PRS.LineTextAscent2;
+    var OldLineTextDescent = PRS.LineTextDescent;
 
     this.Width        = this.Root.size.width;
     this.Height       = this.Root.size.height;
@@ -664,6 +675,12 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         if ( PRS.LineDescent < this.Descent )
             PRS.LineDescent = this.Descent;
+    }
+    else
+    {
+        PRS.LineTextAscent  = OldLineTextAscent ;
+        PRS.LineTextAscent2 = OldLineTextAscent2;
+        PRS.LineTextDescent = OldLineTextDescent;
     }
 
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);

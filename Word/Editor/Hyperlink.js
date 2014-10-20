@@ -136,6 +136,14 @@ ParaHyperlink.prototype.Is_Empty = function()
     return true;
 };
 
+ParaHyperlink.prototype.Is_CheckingNearestPos = function()
+{
+    if (this.NearPosArray.length > 0)
+        return true;
+
+    return false;
+};
+
 ParaHyperlink.prototype.Is_StartFromNewLine = function()
 {
     if ( this.Content.length < 0 )

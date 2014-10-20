@@ -2259,7 +2259,7 @@ Paragraph.prototype =
 
                 // TODO: Как только избавимся от para_End переделать здесь
                 // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
-                if ( StartPos < this.Content.length - 2 && true === this.Content[StartPos].Is_Empty() )
+                if (StartPos < this.Content.length - 2 && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos())
                 {
                     if ( this.Selection.StartPos === this.Selection.EndPos )
                         this.Selection.Use = false;
@@ -2288,7 +2288,7 @@ Paragraph.prototype =
 
                 // TODO: Как только избавимся от para_End переделать здесь
                 // Последние 2 элемента не удаляем (один для para_End, второй для всего остального)
-                if ( EndPos < this.Content.length - 2 && true === this.Content[EndPos].Is_Empty() )
+                if (EndPos < this.Content.length - 2 && true === this.Content[EndPos].Is_Empty() && true !== this.Content[EndPos].Is_CheckingNearestPos())
                 {
                     this.Internal_Content_Remove( EndPos );
 
@@ -2302,7 +2302,7 @@ Paragraph.prototype =
                 this.Content[StartPos].Remove(nCount, bOnAddText);
 
                 // Мы не удаляем последний элемент с ParaEnd
-                if ( StartPos < this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() )
+                if (StartPos < this.Content.length - 2  && true === this.Content[StartPos].Is_Empty() && true !== this.Content[StartPos].Is_CheckingNearestPos())
                 {
                     if ( this.Selection.StartPos === this.Selection.EndPos )
                         this.Selection.Use = false;
@@ -4825,7 +4825,7 @@ Paragraph.prototype =
         {
             var CurElement = this.Content[CurPos];
 
-            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type) && true === CurElement.Is_Empty())
+            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
             {
                 this.Internal_Content_Remove( CurPos );
                 CurPos++;

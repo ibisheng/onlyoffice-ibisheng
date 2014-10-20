@@ -39,7 +39,7 @@ function CRPI()
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
     this.bEqqArray       = false; /*для амперсанда*/
     this.bMathFunc       = false;
-
+    this.PRS             = null;
 }
 CRPI.prototype.Copy = function()
 {
@@ -52,6 +52,7 @@ CRPI.prototype.Copy = function()
     RPI.bNaryInline     = this.bNaryInline;
     RPI.bEqqArray       = this.bEqqArray;
     RPI.bMathFunc       = this.bMathFunc;
+    RPI.PRS             = this.PRS;
 
     return RPI;
 }
@@ -836,7 +837,7 @@ CMathContent.prototype =
             if(this.content[i].Type == para_Math_Composition)
                 this.content[i].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
             else
-                this.content[i].Math_Recalculate(oMeasure, this, ParaMath.Paragraph, RPI, ArgSize, null);
+                this.content[i].Math_Recalculate(oMeasure, RPI, null);
         }
     },
     getWidthsPoints: function()
@@ -4464,3 +4465,4 @@ CMathContent.prototype.private_SetNeedResize = function()
     if (null !== this.ParaMath)
         this.ParaMath.SetNeedResize();
 };
+CMathContent.prototype.Is_CheckingNearestPos = ParaHyperlink.prototype.Is_CheckingNearestPos;

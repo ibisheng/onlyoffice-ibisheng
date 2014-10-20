@@ -885,6 +885,11 @@ ParaComment.prototype =
         return true;
     },
 
+    Is_CheckingNearestPos : function()
+    {
+        return false;
+    },
+
     Get_CompiledTextPr : function()
     {
         return null;
