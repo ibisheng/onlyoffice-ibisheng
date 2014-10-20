@@ -10925,6 +10925,8 @@ Paragraph.prototype =
                     }
                 }
 
+                this.private_ResetSelection();
+
                 break;
             }
 
@@ -10945,6 +10947,8 @@ Paragraph.prototype =
 
                     this.Content.splice( ChangesPos, 1 );
                 }
+
+                this.private_ResetSelection();
 
                 break;
             }
@@ -12067,6 +12071,16 @@ Paragraph.prototype =
 
         return { X : X, Y : Y, W : W, H : H, BaseLine : B, XLimit : XLimit };
     }
+};
+
+Paragraph.prototype.private_ResetSelection = function()
+{
+    this.Selection.StartPos      = 0;
+    this.Selection.EndPos        = 0;
+    this.Selection.StartManually = false;
+    this.Selection.EndManually   = false;
+
+    this.CurPos.ContentPos  = 0;
 };
 
 var pararecalc_0_All  = 0;

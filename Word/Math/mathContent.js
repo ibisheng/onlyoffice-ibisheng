@@ -1899,6 +1899,8 @@ CMathContent.prototype =
                         this.content.splice(Pos, 0, Element);
                 }
 
+                this.private_SetNeedResize();
+
                 break;
             }
 			case historyitem_Math_RemoveItem:
@@ -1913,6 +1915,8 @@ CMathContent.prototype =
                     var ChangesPos = Reader.GetLong();
                     this.content.splice(ChangesPos, 1);
                 }
+
+                this.private_SetNeedResize();
 
                 break;
             }
@@ -3872,10 +3876,23 @@ CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, Content
 };
 CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {
-    this.CurPos = ContentPos.Get(Depth);
+    var CurPos = ContentPos.Get(Depth);
 
-    if(undefined  !== this.content[this.CurPos])
+    // Делаем такие проверки, потому что после совместного редактирования, позиция может остаться старой, а
+    // контент измениться.
+    if (CurPos >= this.content.length - 1)
     {
+        this.CurPos = this.content.length - 1;
+        this.content[this.CurPos].Cursor_MoveToEndPos(false);
+    }
+    else if (CurPos < 0)
+    {
+        this.CurPos = 0;
+        this.content[this.CurPos].Cursor_MoveToStartPos();
+    }
+    else
+    {
+        this.CurPos = ContentPos.Get(Depth);
         this.content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
 };
@@ -4441,4 +4458,9 @@ CMathContent.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 
     var CurPos = ParaNearPos.NearPos.ContentPos.Get(Depth);
     this.content[CurPos].Check_NearestPos(ParaNearPos, Depth + 1);
+};
+CMathContent.prototype.private_SetNeedResize = function()
+{
+    if (null !== this.ParaMath)
+        this.ParaMath.SetNeedResize();
 };
