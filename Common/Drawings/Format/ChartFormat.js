@@ -4378,6 +4378,10 @@ CCatAx.prototype =
     {
         History.Add(this, {Type: historyitem_CatAxSetScaling, oldPr: this.scaling, newPr:pr});
         this.scaling = pr;
+        if(this.scaling)
+        {
+            this.scaling.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
@@ -5491,6 +5495,10 @@ CDateAx.prototype =
     {
         History.Add(this, {Type:historyitem_DateAxScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
+        if(this.scaling)
+        {
+            this.scaling.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
@@ -6549,6 +6557,10 @@ CSerAx.prototype =
     {
         History.Add(this, {Type: historyitem_SerAxSetScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
+        if(this.scaling)
+        {
+            this.scaling.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
@@ -7452,7 +7464,10 @@ CValAx.prototype =
     {
         History.Add(this, {Type: historyitem_ValAxSetDispUnits, oldPr: this.dispUnits, newPr: pr});
         this.dispUnits = pr;
-
+        if(this.dispUnits)
+        {
+            this.dispUnits.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
@@ -7534,7 +7549,10 @@ CValAx.prototype =
     {
         History.Add(this, {Type: historyitem_ValAxSetScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
-
+        if(this.scaling)
+        {
+            this.scaling.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateInternalChart();
@@ -8454,9 +8472,9 @@ CValAx.prototype =
             }
         }
 
-        if(isRealNumber(props.units))
+        if(isRealNumber(props.dispUnitsRule))
         {
-            if(props.units === c_oAscValAxUnits.none)
+            if(props.dispUnitsRule === c_oAscValAxUnits.none)
             {
                 if(this.dispUnits)
                     this.setDispUnits(null);
@@ -11810,6 +11828,7 @@ function CDispUnits()
     this.builtInUnit  = null;
     this.custUnit     = null;
     this.dispUnitsLbl = null;
+    this.parent       = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -11835,6 +11854,13 @@ CDispUnits.prototype =
         return c;
     },
 
+
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_DispUnitsSetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     getMultiplier: function()
     {
         if(isRealNumber(this.builtInUnit))
@@ -11856,35 +11882,64 @@ CDispUnits.prototype =
     {
         History.Add(this, {Type: historyitem_DispUnitsSetBuiltInUnit, oldPr: this.builtInUnit, newPr: pr});
         this.builtInUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setCustUnit: function(pr)
     {
         History.Add(this, {Type: historyitem_DispUnitsSetCustUnit, oldPr: this.custUnit, newPr: pr});
         this.custUnit = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setDispUnitsLbl: function(pr)
     {
         History.Add(this, {Type: historyitem_DispUnitsSetDispUnitsLbl, oldPr: this.dispUnitsLbl, newPr: pr});
         this.dispUnitsLbl = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_DispUnitsSetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_DispUnitsSetBuiltInUnit:
             {
                 this.builtInUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DispUnitsSetCustUnit:
             {
                 this.custUnit = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DispUnitsSetDispUnitsLbl:
             {
                 this.dispUnitsLbl = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -11894,19 +11949,36 @@ CDispUnits.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_DispUnitsSetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_DispUnitsSetBuiltInUnit:
             {
                 this.builtInUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DispUnitsSetCustUnit:
             {
                 this.custUnit = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DispUnitsSetDispUnitsLbl:
             {
                 this.dispUnitsLbl = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -11927,6 +11999,7 @@ CDispUnits.prototype =
                 writeDouble(w, data.newPr);
                 break;
             }
+            case historyitem_DispUnitsSetParent:
             case historyitem_DispUnitsSetDispUnitsLbl:
             {
                 writeObject(w, data.newPr);
@@ -11940,19 +12013,36 @@ CDispUnits.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_DispUnitsSetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_DispUnitsSetBuiltInUnit:
             {
                 this.builtInUnit = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DispUnitsSetCustUnit:
             {
                 this.custUnit = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_DispUnitsSetDispUnitsLbl:
             {
                 this.dispUnitsLbl = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -18796,6 +18886,7 @@ function CScaling()
     this.max = null;
     this.min = null;
     this.orientation = null;
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -18838,52 +18929,95 @@ CScaling.prototype =
         this.Id = r.GetString2();
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_Scaling_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     setLogBase: function(pr)
     {
         History.Add(this, {Type: historyitem_Scaling_SetLogBase, oldPr: this.logBase, newPr: pr});
         this.logBase = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     setMax: function(pr)
     {
         History.Add(this, {Type: historyitem_Scaling_SetMax, oldPr: this.max, newPr: pr});
         this.max = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     setMin: function(pr)
     {
         History.Add(this, {Type: historyitem_Scaling_SetMin, oldPr: this.min, newPr: pr});
         this.min = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     setOrientation: function(pr)
     {
         History.Add(this, {Type: historyitem_Scaling_SetOrientation, oldPr: this.orientation, newPr: pr});
         this.orientation = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     Undo: function(data)
     {
         switch (data.Type)
         {
+            case historyitem_Scaling_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
             case historyitem_Scaling_SetLogBase:
             {
                 this.logBase = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetMax:
             {
                 this.max = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetMin:
             {
                 this.min = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetOrientation:
             {
                 this.orientation = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -18893,24 +19027,45 @@ CScaling.prototype =
     {
         switch (data.Type)
         {
+            case historyitem_Scaling_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
             case historyitem_Scaling_SetLogBase:
             {
                 this.logBase = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetMax:
             {
                 this.max = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetMin:
             {
                 this.min = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetOrientation:
             {
                 this.orientation = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }
@@ -18921,6 +19076,11 @@ CScaling.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
+            case historyitem_Scaling_SetParent:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
             case historyitem_Scaling_SetLogBase:
             case historyitem_Scaling_SetMax:
             case historyitem_Scaling_SetMin:
@@ -18941,24 +19101,45 @@ CScaling.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_Scaling_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
+            }
             case historyitem_Scaling_SetLogBase:
             {
                 this.logBase = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetMax:
             {
                 this.max = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetMin:
             {
                 this.min = readDouble(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_Scaling_SetOrientation:
             {
                 this.orientation = readLong(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
         }

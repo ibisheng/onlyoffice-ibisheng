@@ -6514,8 +6514,8 @@ function CreateAscStrokeEx(ln, _canChangeArrows) {
     if (ln.cap != null)
         ret.asc_putLinecap(ln.cap);
 
-    if (ln.LineJoin != null)
-        ret.asc_putLinejoin(ln.LineJoin.type);
+    if (ln.Join != null)
+        ret.asc_putLinejoin(ln.Join.type);
 
     if (ln.headEnd != null)
     {
@@ -6584,8 +6584,8 @@ function CorrectUniStrokeEx(asc_stroke, unistroke) {
     var _join = asc_stroke.asc_getLinejoin();
     if (null != _join)
     {
-        ret.LineJoin = new LineJoin();
-        ret.LineJoin.type = _join;
+        ret.Join = new LineJoin();
+        ret.Join.type = _join;
     }
 
     var _cap = asc_stroke.asc_getLinecap();

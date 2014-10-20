@@ -663,8 +663,8 @@ function CreateAscStroke(ln, _canChangeArrows)
     if (ln.cap != null)
         ret.put_linecap(ln.cap);
 
-    if (ln.LineJoin != null)
-        ret.put_linejoin(ln.LineJoin.type);
+    if (ln.Join != null)
+        ret.put_linejoin(ln.Join.type);
 
     if (ln.headEnd != null)
     {
@@ -735,8 +735,8 @@ function CorrectUniStroke(asc_stroke, unistroke)
     var _join = asc_stroke.LineJoin;
     if (null != _join)
     {
-        ret.LineJoin = new LineJoin();
-        ret.LineJoin.type = _join;
+        ret.Join = new LineJoin();
+        ret.Join.type = _join;
     }
 
     var _cap = asc_stroke.LineCap;

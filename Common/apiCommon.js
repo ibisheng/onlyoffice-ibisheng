@@ -490,6 +490,17 @@
                         }
                         this.putHorGridLines(c_oAscGridLinesSettings.major);
                         this.putVertGridLines(c_oAscGridLinesSettings.none);
+                        if( type === c_oAscChartTypeSettings.lineNormal          ||
+                            type === c_oAscChartTypeSettings.lineStacked                  ||
+                            type === c_oAscChartTypeSettings.lineStackedPer               ||
+                            type === c_oAscChartTypeSettings.lineNormalMarker             ||
+                            type === c_oAscChartTypeSettings.lineStackedMarker            ||
+                            type === c_oAscChartTypeSettings.lineStackedPerMarker      )
+                        {
+                            this.putShowMarker(false);
+                            this.putSmooth(null);
+                            this.putLine(true);
+                        }
                         break;
                     }
                     case c_oAscChartTypeSettings.hBarNormal          :
