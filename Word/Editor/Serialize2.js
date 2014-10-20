@@ -846,13 +846,13 @@ function BinaryFileWriter(doc)
 		this.copyParams.nDocumentWriterTablePos = this.WriteTableStart(c_oSerTableTypes.Document);
 		this.copyParams.nDocumentWriterPos = this.bs.WriteItemWithLengthStart();
 	}
-	this.CopyParagraph = function(Item)
+	this.CopyParagraph = function(Item, selectedAll)
     {
 		//сами параграфы скопируются в методе CopyTable, нужно только проанализировать стили
 		if(this.copyParams.bLockCopyElems > 0)
 			return;
 		var oThis = this;
-        this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, true);});
+        this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, false, selectedAll);});
 		this.copyParams.itemCount++;
 	}
 	this.CopyTable = function(Item, aRowElems, nMinGrid, nMaxGrid)
@@ -3489,7 +3489,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             this.bs.WriteItem(c_oSerParType.sectPr, function(){oThis.bpPrs.WriteSectPr(oThis.Document.SectPr, oThis.Document);});
         }
     };
-    this.WriteParapraph = function(par, bUseSelection)
+    this.WriteParapraph = function(par, bUseSelection, selectedAll)
     {
         var oThis = this;
 		if(null != this.copyParams)
@@ -3547,10 +3547,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         if(null != par.Content)
         {
             this.memory.WriteByte(c_oSerParType.Content);
-            this.bs.WriteItemWithLength(function(){oThis.WriteParagraphContent(par, bUseSelection ,true);});
+            this.bs.WriteItemWithLength(function(){oThis.WriteParagraphContent(par, bUseSelection ,true, selectedAll);});
         }
     };
-    this.WriteParagraphContent = function (par, bUseSelection, bLastRun)
+    this.WriteParagraphContent = function (par, bUseSelection, bLastRun, selectedAll)
     {
         var ParaStart = 0;
         var ParaEnd = par.Content.length - 1;
@@ -3628,7 +3628,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				
             }
         }
-        if (bLastRun && bUseSelection && !par.Selection_CheckParaEnd() )
+        if ((bLastRun && bUseSelection && !par.Selection_CheckParaEnd()) || (selectedAll != undefined && selectedAll === false) )
 		{
             this.WriteRun2( function () {
                 oThis.memory.WriteByte(c_oSerRunType._LastRun);
