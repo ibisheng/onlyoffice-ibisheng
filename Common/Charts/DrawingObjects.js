@@ -1987,7 +1987,6 @@ function DrawingObjects() {
         _this.zoom.current = factor;
 
         _this.resizeCanvas();
-        _this.setScrollOffset();
     };
 
     _this.resizeCanvas = function() {
@@ -3527,34 +3526,6 @@ function DrawingObjects() {
             response.x = Math.abs(x);
         }
 
-        /* Проверки на максимум в листе */
-      //  function isMaxCol() {
-      //      var result = false;
-      //      if ( worksheet.cols.length >= gc_nMaxCol ) {
-      //          var lastCol = worksheet.cols[gc_nMaxCol - 1];
-      //          if ( mmToPt(x + w) + scrollX > lastCol.left ) {
-      //              response.result = false;
-      //              response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
-      //              result = true;
-      //          }
-      //      }
-      //      return result;
-      //  }
-      //
-      //  function isMaxRow() {
-      //      var result = false;
-      //      if ( worksheet.rows.length >= gc_nMaxRow ) {
-      //          var lastRow = worksheet.rows[gc_nMaxRow - 1];
-      //          if ( mmToPt(y + h) + scrollY > lastRow.top ) {
-      //              response.result = false;
-      //              response.y = ptToMm( lastRow.top - (mmToPt(y + h) + scrollY) );
-      //              result = true;
-      //          }
-      //      }
-      //      return result;
-      //  }
-        //
-
         // выход за границу справа
         if ( x + w > right ) {
             var scrollX = scrollOffset.getX();
@@ -3597,16 +3568,6 @@ function DrawingObjects() {
         return response;
     };
 
-  // _this.setGraphicObjectLockState = function(id, state) {
-  //
-  //     for (var i = 0; i < aObjects.length; i++) {
-  //         if ( id == aObjects[i].graphicObject.Id ) {
-  //             aObjects[i].graphicObject.lockType = state;
-  //             break;
-  //         }
-  //     }
-  // };
-
     _this.resetLockedGraphicObjects = function() {
 
         for (var i = 0; i < aObjects.length; i++) {
@@ -3627,14 +3588,6 @@ function DrawingObjects() {
         return bObjectFound;
     };
 
-    _this.setScrollOffset = function() {
-        /*if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
-         for (var i = 0; i < _this.drawingArea.frozenPlaces.length; i++) {
-         _this.drawingArea.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack);
-         }
-         }*/
-    };
-
     _this.getDrawingCanvas = function() {
         return { shapeCtx: shapeCtx, shapeOverlayCtx: shapeOverlayCtx, autoShapeTrack: autoShapeTrack, trackOverlay: trackOverlay };
     };
@@ -3648,7 +3601,7 @@ function DrawingObjects() {
 
     _this.convertPixToMM = function(pix)
     {
-        return this.convertMetric(pix, 0, 3);
+        return _this.convertMetric(pix, 0, 3);
     };
     _this.getSelectedGraphicObjects = function() {
         return _this.controller.selectedObjects;
@@ -4353,7 +4306,6 @@ function CoordsManager(ws) {
         var coords = { x: 0, y: 0 };
         //0 - px, 1 - pt, 2 - in, 3 - mm
         if ( cell ) {
-            var rowOffset;
             var rowHeight = worksheet.getRowHeight(cell.row, 3);
             var colWidth = worksheet.getColumnWidth(cell.col, 3);
             var resultRowOff = cell.rowOff > rowHeight ? rowHeight : cell.rowOff;

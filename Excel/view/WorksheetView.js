@@ -498,7 +498,6 @@
 				this.updateResize = false;
 				
 				this.objectRender.resizeCanvas();
-				this.objectRender.setScrollOffset();
 			} else {
 				this.updateResize = true;
 			}
@@ -602,7 +601,7 @@
 
 				t.model.setColWidth(cw, col, col);
 				t._cleanCache(new asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
-				t.changeWorksheet("update");
+				t.changeWorksheet("update", {reinitRanges: true});
 				t._updateVisibleColsCount();
 			};
 			this._isLockedAll (onChangeWidthCallback);
@@ -641,7 +640,7 @@
 
 				t.model.setRowHeight(newHeight, row, row);
 				t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
-				t.changeWorksheet("update");
+				t.changeWorksheet("update", {reinitRanges: true});
 				t._updateVisibleRowsCount();
 			};
 
@@ -3706,15 +3705,6 @@
 				arrayCells = this.collaborativeEditing.getLockCellsOther(currentSheetId);
 			}
 
-			///if (bIsDrawObjects) {
-			///	var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ?
-			///		this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
-            ///
-			///	for (i = 0; i < arrayObjects.length; ++i) {
-			///		this.objectRender.setGraphicObjectLockState(arrayObjects[i], type);
-			///	}
-			///}
-
 			for (i = 0; i < arrayCells.length; ++i) {
 				oCellTmp = new asc_Range(arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
 				this._drawElements(this, this._drawSelectionElement, oCellTmp, isDashLine, lineWidth, strokeColor);
@@ -5199,8 +5189,6 @@
 			vr.r1 = start;
 			this._updateVisibleRowsCount();
 
-			this.objectRender.setScrollOffset();
-
 			var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
 			if (widthChanged) {
 				x = this.cellsLeft;
@@ -5369,8 +5357,6 @@
 
 			vr.c1 = start;
             this._updateVisibleColsCount();
-
-			this.objectRender.setScrollOffset();
 
 			// Перемещаем область
 			var moveWidth = oldW - lastColWidth;
@@ -9384,7 +9370,8 @@
 			var checkRange = arn.getAllRange();
 
 			var range;
-			var fullRecalc = undefined;
+			var fullRecalc = false;
+			var reinitRanges = false;
 			var cw;
 			var isUpdateCols = false, isUpdateRows = false;
 			var cleanCacheCols = false, cleanCacheRows = false;
@@ -9408,7 +9395,8 @@
 				}
 				t._cleanCellsTextMetricsCache();
 				t._prepareCellTextMetricsCache();
-				t.objectRender.setScrollOffset();
+				if (reinitRanges)
+					t.objectRender.drawingArea.reinitRanges();
                 t.objectRender.rebuildChartGraphicObjects(oChangeData);
 				t.draw(lockDraw);
 
@@ -9428,6 +9416,7 @@
 						t.model.setColWidth(cw, checkRange.c1, checkRange.c2);
 						isUpdateCols = true;
 						fullRecalc = true;
+						reinitRanges = true;
 					};
 					this._isLockedAll(onChangeWorksheetCallback);
 					break;
@@ -9483,6 +9472,7 @@
 						t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2);
 						isUpdateRows = true;
 						fullRecalc = true;
+						reinitRanges = true;
 					};
 					return this._isLockedAll(onChangeWorksheetCallback);
 				case "insRowBefore":
@@ -9768,6 +9758,7 @@
 					if (val !== undefined) {
 						fullRecalc = !!val.fullRecalc;
 						lockDraw = true === val.lockDraw;
+						reinitRanges = !!val.reinitRanges;
 					}
 					onChangeWorksheetCallback(true);
 					break;
