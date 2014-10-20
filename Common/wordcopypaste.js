@@ -1437,7 +1437,7 @@ CopyProcessor.prototype =
 				else if ( type_Paragraph === Item.GetType() )
 				{
 					//todo ����� ������ ��� �������� ������ ���� Index == End
-					this.oBinaryFileWriter.CopyParagraph(Item, elementsContent[Index].SelectedAll);
+					this.oBinaryFileWriter.CopyParagraph(Item);
 					if(!this.onlyBinaryCopy)
 						this.CopyParagraph(oDomTarget, Item, true, false);
 				}
