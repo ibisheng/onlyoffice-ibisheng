@@ -6686,7 +6686,6 @@ CChartSpace.prototype =
                 {
                     if(pts[j].compiledMarker)
                     {
-
                         pts[j].compiledMarker.pen &&  pts[j].compiledMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                         pts[j].compiledMarker.brush &&  pts[j].compiledMarker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 

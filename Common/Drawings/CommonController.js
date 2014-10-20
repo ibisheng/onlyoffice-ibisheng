@@ -1892,6 +1892,7 @@ DrawingObjectsController.prototype =
                     if(cat_ax.axPos !== AX_POS_L)
                     {
                         cat_ax.setAxPos(AX_POS_L);
+                       // if(cat_ax.title && cat_ax.title.tx && cat_ax.title.tx.rich)
                     }
                     if(val_ax.axPos !== AX_POS_B)
                     {
@@ -2244,24 +2245,39 @@ DrawingObjectsController.prototype =
                     }
                     case c_oAscChartHorAxisLabelShowSettings.noOverlay:
                     {
-                        if(!hor_axis.title)
+                        var _text_body;
+                        if(hor_axis.title && hor_axis.title.tx && hor_axis.title.tx.rich)
                         {
-                            hor_axis.setTitle(new CTitle());
+                            _text_body = hor_axis.title.tx.rich;
                         }
-                        if(!hor_axis.title.txPr)
+                        else
                         {
-                            hor_axis.title.setTxPr(new CTextBody());
-                        }
-                        if(!hor_axis.title.txPr.bodyPr)
-                        {
-                            hor_axis.title.txPr.setBodyPr(new CBodyPr());
-                        }
-                        if(!hor_axis.title.txPr.content)
-                        {
-                            hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                            if(!hor_axis.title)
+                            {
+                                hor_axis.setTitle(new CTitle());
+                            }
+                            if(!hor_axis.title.txPr)
+                            {
+                                hor_axis.title.setTxPr(new CTextBody());
+                            }
+                            if(!hor_axis.title.txPr.bodyPr)
+                            {
+                                hor_axis.title.txPr.setBodyPr(new CBodyPr());
+                            }
+                            if(!hor_axis.title.txPr.content)
+                            {
+                                hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                            }
+                            _text_body = hor_axis.title.txPr;
                         }
                         if(hor_axis.title.overlay !== false)
                             hor_axis.title.setOverlay(false);
+
+                        if(!_text_body.bodyPr || _text_body.bodyPr.isNotNull())
+                        {
+                            _text_body.setBodyPr(new CBodyPr());
+                        }
+
                         break;
                     }
                 }

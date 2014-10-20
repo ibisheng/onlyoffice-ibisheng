@@ -11554,20 +11554,61 @@ function CBodyPr()
 
 
     this.parent = null;
+  // this.Id = g_oIdCounter.Get_NewId();
+  // g_oTableId.Add(this, this.Id);
+}
 
+CBodyPr.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
 
+    Refresh_RecalcData: function()
+    {},
 
-    this.setVert = function(val)
+    isNotNull: function()
+    {
+        return this.flatTx          !== null ||
+        this.anchor           !== null ||
+        this.anchorCtr        !== null ||
+        this.bIns             !== null ||
+        this.compatLnSpc      !== null ||
+        this.forceAA          !== null ||
+        this.fromWordArt      !== null ||
+        this.horzOverflow     !== null ||
+        this.lIns             !== null ||
+        this.numCol           !== null ||
+        this.rIns             !== null ||
+        this.rot              !== null ||
+        this.rtlCol           !== null ||
+        this.spcCol           !== null ||
+        this.spcFirstLastPara !== null ||
+        this.tIns             !== null ||
+        this.upright          !== null ||
+        this.vert             !== null ||
+        this.vertOverflow     !== null ||
+        this.wrap             !== null ||
+        this.textFit          !== null;
+    },
+
+    setAnchor: function(val)
+    {
+        this.anchor = val;
+    },
+
+    setVert: function(val)
     {
         this.vert = val;
-    };
+    },
 
-    this.setRot = function(val)
+    setRot: function(val)
     {
         this.rot = val;
-    };
+    },
 
-    this.reset = function()
+    reset: function()
     {
         this.flatTx           = null;
         this.anchor           = null;
@@ -11590,10 +11631,10 @@ function CBodyPr()
         this.vertOverflow     = null;
         this.wrap             = null;
         this.textFit          = null;
-    };
+    },
 
 
-    this.Write_ToBinary2 = function(w)
+    Write_ToBinary2: function(w)
     {
         var flag = this.flatTx != null;
         w.WriteBool(flag);
@@ -11736,9 +11777,9 @@ function CBodyPr()
         {
             w.WriteLong(this.wrap);
         }
-    };
+    },
 
-    this.Read_FromBinary2 = function(r)
+    Read_FromBinary2: function(r)
     {
         var flag = r.GetBool();
         if(flag)
@@ -11881,9 +11922,9 @@ function CBodyPr()
         {
             this.wrap = r.GetLong();
         }
-    };
+    },
 
-    this.setDefault =  function()
+    setDefault:  function()
     {
         this.flatTx         = null;
         this.anchor         = 4;
@@ -11905,9 +11946,9 @@ function CBodyPr()
         this.vert           = nVertTThorz;
         this.vertOverflow   = nOTOwerflow;
         this.wrap           = nTWTSquare;
-    };
+    },
 
-    this.createDuplicate = function()
+    createDuplicate: function()
     {
 
         var duplicate = new CBodyPr();
@@ -11932,9 +11973,9 @@ function CBodyPr()
         duplicate.wrap           = this.wrap;
 
         return duplicate;
-    };
+    },
 
-    this.merge = function(bodyPr)
+    merge: function(bodyPr)
     {
         if(!bodyPr)
             return;
@@ -12023,25 +12064,6 @@ function CBodyPr()
             this.wrap = bodyPr.wrap;
         }
         return this;
-    }
-
-  // this.Id = g_oIdCounter.Get_NewId();
-  // g_oTableId.Add(this, this.Id);
-}
-
-CBodyPr.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    } ,
-
-    Refresh_RecalcData: function()
-    {},
-
-    setAnchor: function(val)
-    {
-        this.anchor = val;
     },
 
     Write_ToBinary: function(w)
