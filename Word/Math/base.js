@@ -896,10 +896,23 @@ CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos
 };
 CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {
-    this.CurPos = ContentPos.Get(Depth);
+    var CurPos = ContentPos.Get(Depth);
 
-    if (undefined !== this.Content[this.CurPos])
+    if (CurPos > this.Content.length - 1)
+    {
+        this.CurPos = this.Content.length - 1;
+        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+    }
+    else if (this.CurPos < 0)
+    {
+        this.CurPos = 0;
+        this.Content[this.CurPos].Cursor_MoveToStartPos();
+    }
+    else
+    {
+        this.CurPos = CurPos;
         this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
+    }
 };
 CMathBase.prototype.Selection_IsEmpty = function()
 {

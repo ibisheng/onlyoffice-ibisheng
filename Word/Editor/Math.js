@@ -1576,6 +1576,28 @@ ParaMath.prototype.Make_AutoCorrect = function()
     return false;
 };
 
+/**
+ * Получаем рект формулы
+ * @constructor
+ */
+ParaMath.prototype.Get_Bounds = function()
+{
+    if (undefined === this.Paragraph || null === this.Paragraph)
+        return {X : this.X, Y : this.Y, W : this.Width, H : this.Height, Page : 0};
+    else
+    {
+        var LinesCount = this.protected_GetLinesCount();
+        var CurLine = this.StartLine + LinesCount - 1;
+
+        var CurPage = this.Paragraph.Get_PageByLine(CurLine);
+
+        var Y = this.Paragraph.Pages[CurPage].Y      + this.Paragraph.Lines[CurLine].Top;
+        var H = this.Paragraph.Lines[CurLine].Bottom - this.Paragraph.Lines[CurLine].Top;
+
+        return {X : this.X, Y : Y, W : this.Width, H : H, Page : this.Paragraph.Get_StartPage_Absolute() + CurPage};
+    }
+};
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Классы с изменениями

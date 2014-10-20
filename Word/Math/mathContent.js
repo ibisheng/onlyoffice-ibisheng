@@ -3881,7 +3881,7 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 
     // Делаем такие проверки, потому что после совместного редактирования, позиция может остаться старой, а
     // контент измениться.
-    if (CurPos >= this.content.length - 1)
+    if (CurPos > this.content.length - 1)
     {
         this.CurPos = this.content.length - 1;
         this.content[this.CurPos].Cursor_MoveToEndPos(false);

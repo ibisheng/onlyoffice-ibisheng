@@ -738,21 +738,21 @@ Paragraph.prototype =
             ParaPos.Range = this.CurPos.Range;
         }
 
-        var CurLine = ParaPos.Line;
-
-        // Определим страницу
-        var PagesCount = this.Pages.length;
-        for ( var CurPage = PagesCount - 1; CurPage >= 0; CurPage-- )
-        {
-            var Page = this.Pages[CurPage];
-            if ( CurLine >= Page.StartLine && CurLine <= Page.EndLine )
-            {
-                ParaPos.Page = CurPage;
-                return ParaPos;
-            }
-        }
+        ParaPos.Page = this.Get_PageByLine(ParaPos.Line);
 
         return ParaPos;
+    },
+
+    Get_PageByLine : function(LineIndex)
+    {
+        for (var CurPage = this.Pages.length - 1; CurPage >= 0; CurPage--)
+        {
+            var Page = this.Pages[CurPage];
+            if (LineIndex >= Page.StartLine && LineIndex <= Page.EndLine)
+                return CurPage;
+        }
+
+        return 0;
     },
 
     Get_ParaPosByContentPos : function(ContentPos)

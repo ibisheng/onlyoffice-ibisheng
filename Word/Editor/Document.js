@@ -11885,7 +11885,10 @@ CDocument.prototype =
         var oSelectedInfo = this.Get_SelectedElementsInfo();
         var Math = oSelectedInfo.Get_Math();
         if (null !== Math)
-            this.DrawingDocument.Update_MathTrack(true, (false === bSelection || true === bEmptySelection ? true : false), Math, Math.X, Math.Y, Math.Width, Math.Height, Math.Paragraph.CurPos.PagesPos + Math.Paragraph.Get_StartPage_Absolute());
+        {
+            var Bounds = Math.Get_Bounds();
+            this.DrawingDocument.Update_MathTrack(true, (false === bSelection || true === bEmptySelection ? true : false), Math, Bounds.X, Bounds.Y, Bounds.W, Bounds.H, Bounds.Page);
+        }
         else
             this.DrawingDocument.Update_MathTrack(false);
     },
