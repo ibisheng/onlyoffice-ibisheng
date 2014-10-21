@@ -3050,6 +3050,7 @@ CDocument.prototype =
             var bRetValue = this.DrawingObjects.paragraphAdd(ParaItem, bRecalculate);
             this.Document_UpdateSelectionState();
             this.Document_UpdateUndoRedoState();
+            this.Document_UpdateInterfaceState();
             return bRetValue;
         }
         else //if ( docpostype === this.CurPos.Type )
