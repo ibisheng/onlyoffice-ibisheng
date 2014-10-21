@@ -4708,69 +4708,78 @@ CDocument.prototype =
 
     Set_ParagraphAlign : function(Align)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        var SelectedInfo = this.Get_SelectedElementsInfo();
+        var Math = SelectedInfo.Get_Math();
+        if (null !== Math)
         {
-            this.HdrFtr.Set_ParagraphAlign(Align);
+            Math.Set_Align(Align);
         }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        else
         {
-            if ( true != this.DrawingObjects.isSelectedText() )
+            // Работаем с колонтитулом
+            if (docpostype_HdrFtr === this.CurPos.Type)
             {
-                var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-                if ( null != ParaDrawing )
-                {
-                    var Paragraph = ParaDrawing.Parent;
-                    Paragraph.Set_Align(Align);
-                }
+                this.HdrFtr.Set_ParagraphAlign(Align);
             }
-            else
+            else if (docpostype_DrawingObjects === this.CurPos.Type)
             {
-                this.DrawingObjects.setParagraphAlign(Align);
-            }
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( this.CurPos.ContentPos < 0 )
-                return false;
-
-            if ( true === this.Selection.Use )
-            {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-                if ( EndPos < StartPos )
+                if (true != this.DrawingObjects.isSelectedText())
                 {
-                    var Temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos   = Temp;
-                }
-
-                for ( var Index = StartPos; Index <= EndPos; Index++ )
-                {
-                    var Item = this.Content[Index];
-                    if ( type_Paragraph == Item.GetType() )
-                        Item.Set_Align( Align, true );
-                    else if ( type_Table == Item.GetType() )
+                    var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+                    if (null != ParaDrawing)
                     {
-                        Item.TurnOff_RecalcEvent();
-                        Item.Set_ParagraphAlign( Align );
-                        Item.TurnOn_RecalcEvent();
+                        var Paragraph = ParaDrawing.Parent;
+                        Paragraph.Set_Align(Align);
                     }
                 }
+                else
+                {
+                    this.DrawingObjects.setParagraphAlign(Align);
+                }
             }
-            else
+            else //if ( docpostype_Content === this.CurPos.Type )
             {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Paragraph == Item.GetType() )
-                {
-                    Item.Set_Align( Align, true );
-                }
-                else if ( type_Table == Item.GetType() )
-                {
-                    Item.Set_ParagraphAlign( Align );
-                }
-            }
+                if (this.CurPos.ContentPos < 0)
+                    return false;
 
+                if (true === this.Selection.Use)
+                {
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos = this.Selection.EndPos;
+                    if (EndPos < StartPos)
+                    {
+                        var Temp = StartPos;
+                        StartPos = EndPos;
+                        EndPos = Temp;
+                    }
+
+                    for (var Index = StartPos; Index <= EndPos; Index++)
+                    {
+                        var Item = this.Content[Index];
+                        if (type_Paragraph == Item.GetType())
+                            Item.Set_Align(Align, true);
+                        else if (type_Table == Item.GetType())
+                        {
+                            Item.TurnOff_RecalcEvent();
+                            Item.Set_ParagraphAlign(Align);
+                            Item.TurnOn_RecalcEvent();
+                        }
+                    }
+                }
+                else
+                {
+                    var Item = this.Content[this.CurPos.ContentPos];
+                    if (type_Paragraph == Item.GetType())
+                    {
+                        Item.Set_Align(Align, true);
+                    }
+                    else if (type_Table == Item.GetType())
+                    {
+                        Item.Set_ParagraphAlign(Align);
+                    }
+                }
+
+            }
         }
 
         this.Recalculate();
@@ -7673,6 +7682,12 @@ CDocument.prototype =
             {
                 ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
             }
+
+            var SelectedInfo = this.Get_SelectedElementsInfo();
+            var Math = SelectedInfo.Get_Math();
+            if (null !== Math)
+                ParaPr.Jc = Math.Get_Align();
+
             editor.UpdateParagraphProp( ParaPr );
         }
     },

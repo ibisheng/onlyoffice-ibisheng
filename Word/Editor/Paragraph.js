@@ -790,7 +790,7 @@ Paragraph.prototype =
                 break;
         }
         
-        if ( true !== Checker.Result || null === Checker.Math || true !== Checker.Math.MathPara )
+        if (true !== Checker.Result || null === Checker.Math || true === Checker.Math.Get_Inline())
             return null;
                 
         return Checker.Math;
@@ -1280,8 +1280,8 @@ Paragraph.prototype =
         {
             var Item = this.Content[Pos];
 
-            Item.Set_Paragraph( this );
-            Item.Recalculate_MinMaxContentWidth( MinMax );
+            Item.Set_Paragraph(this);
+            Item.Recalculate_MinMaxContentWidth(MinMax);
         }
 
         // добавляем 0.001, чтобы избавиться от погрешностей

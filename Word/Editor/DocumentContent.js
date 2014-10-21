@@ -6841,6 +6841,14 @@ CDocumentContent.prototype =
             if ( undefined != ParaPr.Tabs  && editor)
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
+            if (this.LogicDocument)
+            {
+                var SelectedInfo = this.LogicDocument.Get_SelectedElementsInfo();
+                var Math = SelectedInfo.Get_Math();
+                if (null !== Math)
+                    ParaPr.Jc = Math.Get_Align();
+            }
+
             if(editor)
                 editor.UpdateParagraphProp( ParaPr );
         }

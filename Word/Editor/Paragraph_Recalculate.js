@@ -418,7 +418,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
         if ( para_Math === Item.Type )
         {
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
-            Item.SetInline(true === this.Check_MathPara(Pos)? false : true);
+            Item.Set_Inline(true === this.Check_MathPara(Pos)? false : true);
         }
 
         PRS.Update_CurPos( Pos, 0 );
@@ -1414,14 +1414,19 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
 
         // Если данный отрезок содержит только формулу, тогда прилегание данного отрезка определяется формулой
         var ParaMath = this.Check_Range_OnlyMath(CurRange, CurLine);
-        if ( null !== ParaMath )
+        if (null !== ParaMath)
         {
-            var Math_Jc = ParaMath.Jc;
+            var Math_Jc = ParaMath.Get_Align();
 
-            var Math_X      = ( 1 === RangesCount ? this.Pages[CurPage].X : Range.X );
-            var Math_XLimit = ( 1 === RangesCount ? this.Pages[CurPage].XLimit : Range.XEnd );
+            var Math_X      = ( 1 === RangesCount ? this.Pages[CurPage].X      + ParaPr.Ind.Left  : Range.X );
+            var Math_XLimit = ( 1 === RangesCount ? this.Pages[CurPage].XLimit - ParaPr.Ind.Right : Range.XEnd );
 
-            X = Math.max( Math_X +  (Math_XLimit + Math_X - ParaMath.Width) / 2, Math_X );
+            switch(Math_Jc)
+            {
+                case align_Left   : X = Math_X; break;
+                case align_Right  : X = Math_XLimit - ParaMath.Width; break;
+                case align_Center : X = Math.max(Math_X + (Math_XLimit - Math_X - ParaMath.Width) / 2, Math_X); break;
+            }
         }
         else
         {
@@ -1576,7 +1581,7 @@ Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurL
         if ( para_Math === Item.Type )
         {
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
-            Item.SetInline(true === this.Check_MathPara(Pos)? false : true);
+            Item.Set_Inline(true === this.Check_MathPara(Pos)? false : true);
         }
 
         if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== StartPos )

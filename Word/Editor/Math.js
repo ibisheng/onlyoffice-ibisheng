@@ -879,7 +879,18 @@ ParaMath.prototype.Refresh_RecalcData2 = function(Data)
 
 ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 {
-    // TODO: Если формула не измерена, тогда здесь её надо измерить
+    if (true === this.NeedResize)
+    {
+        var RPI = new CRPI();
+        RPI.bInline       = this.bInline;
+        RPI.bChangeInline = this.bChangeInline;
+        RPI.PRS           = this.Paragraph.m_oPRSW;
+
+        this.Root.PreRecalc(null, this,  new CMathArgSize(), RPI);
+        this.Root.Resize(g_oTextMeasurer, RPI);
+
+        this.Width        = this.Root.size.width;
+    }
 
     if ( false === MinMax.bWord )
     {
@@ -932,7 +943,7 @@ ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 // Функция для работы с формулой
 // в тч с  дефолтными текстовыми настройками и argSize
 //-----------------------------------------------------------------------------------
-ParaMath.prototype.SetInline = function(value)
+ParaMath.prototype.Set_Inline = function(value)
 {
     if(value !== this.bInline)
     {
@@ -941,6 +952,33 @@ ParaMath.prototype.SetInline = function(value)
     }
 
     this.bInline = value;
+};
+ParaMath.prototype.Get_Inline = function()
+{
+    return this.bInline;
+};
+ParaMath.prototype.Get_Align = function()
+{
+    if (undefined !== this.Jc)
+        return this.Jc;
+
+    return align_Center;
+};
+ParaMath.prototype.Set_Align = function(Align)
+{
+    if (align_Center !== Align && align_Left !== Align && align_Right !== Align)
+        Align = align_Center;
+
+    if (this.Jc !== Align)
+    {
+        History.Add(this, new CChangesMathParaJc(Align, this.Jc));
+        this.raw_SetAlign(Align);
+    }
+};
+ParaMath.prototype.raw_SetAlign = function(Align)
+{
+    this.Jc = Align;
+    this.SetNeedResize();
 };
 ParaMath.prototype.SetNeedResize = function()
 {
@@ -1466,14 +1504,24 @@ ParaMath.prototype.Selection_CorrectLeftPos = function(Direction)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
+ParaMath.prototype.Undo = function(Data)
+{
+    Data.Undo(this);
+};
+
+ParaMath.prototype.Redo = function(Data)
+{
+    Data.Redo(this);
+};
+
 ParaMath.prototype.Save_Changes = function(Data, Writer)
 {
-    Writer.WriteLong( historyitem_type_Math );
+    WriteChanges_ToBinary(Data, Writer);
 };
 
 ParaMath.prototype.Load_Changes = function(Reader)
 {
-
+    ReadChanges_FromBinary(Reader, this);
 };
 
 ParaMath.prototype.Write_ToBinary2 = function(Writer)
@@ -1605,6 +1653,7 @@ ParaMath.prototype.Get_Bounds = function()
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
+var hisotryitem_Math_ParaJc                    =  4; // ParaMath.Jc
 
 function ReadChanges_FromBinary(Reader, Class)
 {
@@ -1614,6 +1663,7 @@ function ReadChanges_FromBinary(Reader, Class)
     switch(Type)
     {
         case historyitem_Math_CtrPrpFSize: Changes = new CChangesMathFontSize(); break;
+        case hisotryitem_Math_ParaJc     : Changes = new CChangesMathParaJc(); break;
     }
 
     if (null !== Changes)
@@ -1653,5 +1703,46 @@ CChangesMathFontSize.prototype.Save_Changes = function(Writer)
 CChangesMathFontSize.prototype.Load_Changes = function(Reader, Class)
 {
     this.New = Reader.GetLong();
+    this.Redo(Class);
+};
+
+function CChangesMathParaJc(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+
+CChangesMathParaJc.prototype.Type = hisotryitem_Math_ParaJc;
+
+CChangesMathParaJc.prototype.Undo = function(Class)
+{
+    Class.raw_SetAlign(this.Old);
+};
+
+CChangesMathParaJc.prototype.Redo = function(Class)
+{
+    Class.raw_SetAlign(this.New);
+};
+
+CChangesMathParaJc.prototype.Save_Changes = function(Writer)
+{
+    // Bool : undefined?
+    // Long : value
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.New);
+    }
+};
+
+CChangesMathParaJc.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
     this.Redo(Class);
 };
