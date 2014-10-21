@@ -2424,6 +2424,22 @@ DrawingObjectsController.prototype =
             if(isRealBool(chartSettings.showVal))
                 checkDataLabels(chart_type).setShowVal(chartSettings.showVal);
 
+            var d_lbls2 = chart_type.dLbls;
+            if(d_lbls2)
+            {
+                if(!isRealBool(d_lbls2.showLegendKey) || d_lbls2.showLegendKey === true)
+                {
+                    d_lbls2.setShowLegendKey(false);
+                }
+                if(!isRealBool(d_lbls2.showPercent) || d_lbls2.showPercent === true)
+                {
+                    d_lbls2.setShowPercent(false);
+                }
+                if(!isRealBool(d_lbls2.showBubbleSize) || d_lbls2.showBubbleSize === true)
+                {
+                    d_lbls2.setShowBubbleSize(false);
+                }
+            }
             if(typeof chartSettings.separator === "string" && chartSettings.separator.length > 0)
                 checkDataLabels(chart_type).setSeparator(chartSettings.separator);
         }

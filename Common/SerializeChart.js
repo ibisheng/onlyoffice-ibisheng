@@ -3908,7 +3908,10 @@ BinaryChartWriter.prototype.WriteCT_DoughnutChart = function (oVal) {
     }
     if (null != oVal.dLbls) {
         this.bs.WriteItem(c_oserct_doughnutchartDLBLS, function () {
+            var oldDlblPos = oVal.dLbls.dLblPos;
+            oVal.dLbls.dLblPos = null;
             oThis.WriteCT_DLbls(oVal.dLbls);
+            oVal.dLbls.dLblPos = oldDlblPos;
         });
     }
     if (null != oVal.firstSliceAng) {
