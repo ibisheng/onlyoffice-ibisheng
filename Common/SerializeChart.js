@@ -6165,7 +6165,7 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         });
         if(!isRealBool(oNewVal.overlay))
         {
-            oNewVal.setOverlay(true);
+            oNewVal.setOverlay(false);
         }
         val.setTitle(oNewVal);
     }
@@ -6632,7 +6632,7 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         });
         if(!isRealBool(oNewVal.overlay))
         {
-            oNewVal.setOverlay(true);
+            oNewVal.setOverlay(false);
         }
         val.setTitle(oNewVal);
     }
@@ -10701,7 +10701,7 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         });
         if(!isRealBool(oNewVal.overlay))
         {
-            oNewVal.setOverlay(true);
+            oNewVal.setOverlay(false);
         }
         val.setTitle(oNewVal);
     }

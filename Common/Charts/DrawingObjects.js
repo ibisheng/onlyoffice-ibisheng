@@ -2764,7 +2764,13 @@ function DrawingObjects() {
                             {
                                 lit_format_code = "General"
                             }
-                            var f1 = ref.f.replace(/\(|\)/g,"");
+                            var sFormula = ref.f + "";
+                            if(sFormula[0] === '(')
+                                sFormula = sFormula.slice(1);
+                            if(sFormula[sFormula.length-1] === ')')
+                                sFormula = sFormula.slice(0, -1);
+                            var f1 = sFormula;
+
                             var arr_f = f1.split(",");
                             var pt_index = 0, i, j, cell, pt;
                             for(i = 0; i < arr_f.length; ++i)
