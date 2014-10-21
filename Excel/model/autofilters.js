@@ -2773,7 +2773,7 @@ var gUndoInsDelCellsFlag = true;
 				this._reDrawFilters();
 				
 				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
-					ws._onUpdateFormatTable(ar, false, true);
+					ws._onUpdateFormatTable(oldFilter.Ref, false, true);
 			},
 			
 			_getAutoFilterArray: function(cell) {
