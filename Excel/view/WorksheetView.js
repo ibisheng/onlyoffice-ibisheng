@@ -8167,9 +8167,12 @@
 					range = t.model.getRange3(diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1));
 					if(aFilters[aF].style)
 						range.cleanFormat();
-					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true);
+						
+					var bWithoutFilter = false;
 					if(!aFilters[aF].AutoFilter)
-						t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
+						bWithoutFilter = true;
+						
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter);
 				}
 			}
 

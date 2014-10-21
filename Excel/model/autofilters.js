@@ -274,7 +274,7 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//добавляем кнопки или удаляем (вызывается из меню при нажатии на кнопку добавления фильтра)
-			addAutoFilter: function (lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj) {
+			addAutoFilter: function (lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj, bWithoutFilter) {
 				var ws = this.worksheet;
 				var bIsActiveSheet = this._isActiveSheet();
 				var bIsOpenFilter = undefined !== openFilter && null !== openFilter;
@@ -654,7 +654,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							//добавляем структуру нового фильтра
 							if(openFilter == undefined)
-								t._addNewFilter(result,tableColumns,aWs,isAll,lTable);
+								t._addNewFilter(result, tableColumns, aWs, isAll, lTable, bWithoutFilter);
 							
 							//устанавливаем стиль для таблицы
 							if(!isAll)
@@ -695,10 +695,11 @@ var gUndoInsDelCellsFlag = true;
 							
 							if(addNameColumn && addFormatTableOptionsObj)
 								addFormatTableOptionsObj.range = ref;
+								
 							t._addHistoryObj(ref, historyitem_AutoFilter_Add,
-									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, ref.Ref);
+									{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj}, null, ref.Ref, bWithoutFilter);
 							
-							if(isInsertButton){
+							if(isInsertButton && !bWithoutFilter){
 								t._addButtonAF(newRes);
 							}
 							else if(!t.allButtonAF)
@@ -1798,7 +1799,7 @@ var gUndoInsDelCellsFlag = true;
 				History.TurnOff();
 				switch (type) {
 					case historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.lTable, data.activeCells, /*openFilter*/undefined, true, data.addFormatTableOptionsObj);
+						this.addAutoFilter(data.lTable, data.activeCells, /*openFilter*/undefined, true, data.addFormatTableOptionsObj, data.bWithoutFilter);
 						break;
 					case historyitem_AutoFilter_Sort:
 						this.sortColFilter(data.type, data.cellId, data.activeCells, true);
@@ -4538,7 +4539,7 @@ var gUndoInsDelCellsFlag = true;
 				return result;
 			},
 			
-			_addNewFilter: function(val,tableColumns,aWs,isAll,style)
+			_addNewFilter: function(val, tableColumns, aWs, isAll, style, bWithoutFilter)
 			{
 				var newFilter, ref;
 				if(isAll)
@@ -4585,8 +4586,11 @@ var gUndoInsDelCellsFlag = true;
 					newFilter.Ref = ref;
 					newFilter.result = val;
 					
-					newFilter.AutoFilter = new AutoFilter();
-					newFilter.AutoFilter.Ref = ref;
+					if(!bWithoutFilter)
+					{
+						newFilter.AutoFilter = new AutoFilter();
+						newFilter.AutoFilter.Ref = ref;
+					}
 					
 					newFilter.DisplayName = aWs.workbook.oNameGenerator.getNextTableName(aWs, ref);
 					
@@ -6079,7 +6083,7 @@ var gUndoInsDelCellsFlag = true;
 					
 			},
 			
-			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange) {
+			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange, bWithoutFilter) {
 				var ws = this.worksheet;
 				var oHistoryObject = new UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
@@ -6094,6 +6098,7 @@ var gUndoInsDelCellsFlag = true;
 					oHistoryObject.addFormatTableOptionsObj = redoObject.addFormatTableOptionsObj;
 					oHistoryObject.moveFrom             = redoObject.arnFrom;
 					oHistoryObject.moveTo               = redoObject.arnTo;
+					oHistoryObject.bWithoutFilter       = bWithoutFilter ? bWithoutFilter : false;
 				}
 				else
 				{

@@ -1594,7 +1594,8 @@ function UndoRedoData_AutoFilter() {
 		autoFiltersObject	: 4,
 		addFormatTableOptionsObj: 5,
 		moveFrom            : 6,
-		moveTo              : 7
+		moveTo              : 7,
+		bWithoutFilter      : 8
 	};
 
 	this.undo				= null;
@@ -1607,6 +1608,7 @@ function UndoRedoData_AutoFilter() {
 	this.addFormatTableOptionsObj = null;
 	this.moveFrom           = null;
 	this.moveTo             = null;
+	this.bWithoutFilter     = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1629,6 +1631,7 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.addFormatTableOptionsObj: return this.addFormatTableOptionsObj; break;
 			case this.Properties.moveFrom: return new UndoRedoData_BBox(this.moveFrom); break;
 			case this.Properties.moveTo: return new UndoRedoData_BBox(this.moveTo); break;
+			case this.Properties.bWithoutFilter: return this.bWithoutFilter; break;
 		}
 
 		return null;
@@ -1645,6 +1648,7 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.addFormatTableOptionsObj: return this.addFormatTableOptionsObj = value; break;
 			case this.Properties.moveFrom: this.moveFrom = value;break;
 			case this.Properties.moveTo: this.moveTo = value;break;
+			case this.Properties.bWithoutFilter: this.bWithoutFilter = value;break;
 		}
 		return null;
 	},
