@@ -554,6 +554,8 @@ Paragraph.prototype =
         for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
         {
             this.Content[CurPos].Set_Paragraph( this );
+            if (this.Content[CurPos].Recalc_RunsCompiledPr)
+                this.Content[CurPos].Recalc_RunsCompiledPr();
         }
 
         // Обновлять позиции в NearestPos не надо, потому что мы добавляем новые элементы в конец массива
@@ -10922,6 +10924,9 @@ Paragraph.prototype =
                         }
 
                         this.Content.splice( Pos, 0, Element );
+
+                        if (Element.Recalc_RunsCompiledPr)
+                            Element.Recalc_RunsCompiledPr();
                     }
                 }
 
