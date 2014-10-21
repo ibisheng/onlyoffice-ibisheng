@@ -3455,6 +3455,13 @@ CShape.prototype =
         }
     },
 
+    Restart_CheckSpelling: function()
+    {
+        this.recalcInfo.recalculateShapeStyleForParagraph = true;
+        var content = this.getDocContent();
+        content && content.Restart_CheckSpelling();
+    },
+
     Refresh_RecalcData: function (data)
     {
         //this.recalcTxBoxContent();

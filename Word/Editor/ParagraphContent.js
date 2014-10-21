@@ -6559,7 +6559,7 @@ ParaDrawing.prototype =
 
     Restart_CheckSpelling : function()
     {
-        // TODO: Реализовать
+        this.GraphicObj && this.GraphicObj.Restart_CheckSpelling && this.GraphicObj.Restart_CheckSpelling();
     }
 };
 

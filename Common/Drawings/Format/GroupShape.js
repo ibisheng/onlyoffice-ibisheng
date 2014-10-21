@@ -1476,6 +1476,15 @@ CGroupShape.prototype =
         this.nvGrpSpPr = pr;
     },
 
+
+    Restart_CheckSpelling: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].Restart_CheckSpelling && this.spTree[i].Restart_CheckSpelling();
+        }
+    },
+
     recalculateLocalTransform: CShape.prototype.recalculateLocalTransform,
 
     bringToFront : function()//перемещаем заселекченые объекты наверх
