@@ -277,7 +277,7 @@ var gUndoInsDelCellsFlag = true;
 			addAutoFilter: function (lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj) {
 				var ws = this.worksheet;
 				var bIsActiveSheet = this._isActiveSheet();
-				var bIsOpenFilter = undefined !== openFilter;
+				var bIsOpenFilter = undefined !== openFilter && null !== openFilter;
 				var activeCells = null === ar ? null : ar.clone(); // ToDo Слишком много клонирования, это долгая операция
 				var aWs = this._getCurrentWS();
 				if(openFilter != undefined)
@@ -1627,7 +1627,7 @@ var gUndoInsDelCellsFlag = true;
 					aWs.setRowHidden(false, bbox.r1, bbox.r2);
 						
 					//заносим в историю
-					this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, aWs.AutoFilter.Ref);
+					this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, activeCells);
 				}
 				
 				if(activeCells)
