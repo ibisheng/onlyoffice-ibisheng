@@ -3269,7 +3269,7 @@ Paragraph.prototype =
             }
         }
 
-        while ( CurPos > 0 && true === this.Content[CurPos].Cursor_Is_NeededCorrectPos() )
+        while (CurPos > 0 && true === this.Content[CurPos].Cursor_Is_NeededCorrectPos() && para_Run === this.Content[CurPos - 1].Type)
         {
             CurPos--;
             this.Content[CurPos].Cursor_MoveToEndPos();
@@ -3964,6 +3964,15 @@ Paragraph.prototype =
 
         CurPos--;
 
+        if (CurPos >= 0 && para_Math === this.Content[CurPos + 1].Type)
+        {
+            // При выходе из формулы встаем в конец рана
+            this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+            SearchPos.Pos.Update(CurPos, Depth);
+            SearchPos.Found = true;
+            return true;
+        }
+
         while ( CurPos >= 0 )
         {
             this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
@@ -3992,7 +4001,16 @@ Paragraph.prototype =
         CurPos++;
 
         var Count = this.Content.length;
-        while ( CurPos < this.Content.length )
+        if (CurPos < Count && para_Math === this.Content[CurPos - 1].Type)
+        {
+            // При выходе из формулы встаем в конец рана
+            this.Content[CurPos].Get_StartPos(SearchPos.Pos, Depth + 1);
+            SearchPos.Pos.Update(CurPos, Depth);
+            SearchPos.Found = true;
+            return true;
+        }
+
+        while (CurPos < Count)
         {
             this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
             SearchPos.Pos.Update( CurPos, Depth );
@@ -9398,6 +9416,7 @@ Paragraph.prototype =
         NewParagraph.Internal_Content_Remove2( 0, NewParagraph.Content.length );
         NewParagraph.Internal_Content_Concat( NewContent );
         NewParagraph.Internal_Content_Add( 0, NewElement );
+        NewParagraph.Correct_Content();
 
         // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
         NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
@@ -9470,6 +9489,7 @@ Paragraph.prototype =
         NewRun.Set_Pr( TextPr );
 
         NewParagraph.Internal_Content_Add( 0, NewRun );
+        NewParagraph.Correct_Content();
         NewParagraph.Cursor_MoveToStartPos( false );
 
         // Копируем настройки знака конца параграфа
