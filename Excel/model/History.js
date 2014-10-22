@@ -263,29 +263,34 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		this._checkCurPoint();
 		Point = this.Points[this.Index];
 		CollaborativeEditing.Apply_LinkData();
-		this.Get_RecalcData(Point);
-		wsViews = Asc["editor"].wb.wsViews;
-		for (i = 0; i < wsViews.length; ++i) {
-			if (wsViews[i]) {
-				wsViews[i].objectRender.controller.recalculate2(true);
-			}
-		}
-		//var wsView = window["Asc"]["editor"].wb.getWorksheet();
-		//if(wsView && wsView.objectRender && wsView.objectRender.controller)
-		//{
-		//	wsView.objectRender.controller.updateOverlay();
-		//}
+        if(!window["NATIVE_EDITOR_ENJINE"]) {
+            this.Get_RecalcData(Point);
+            wsViews = Asc["editor"].wb.wsViews;
+            for (i = 0; i < wsViews.length; ++i) {
+                if (wsViews[i]) {
+                    wsViews[i].objectRender.controller.recalculate2(true);
+                }
+            }
+            //var wsView = window["Asc"]["editor"].wb.getWorksheet();
+            //if(wsView && wsView.objectRender && wsView.objectRender.controller)
+            //{
+            //	wsView.objectRender.controller.updateOverlay();
+            //}
+        }
 	}
 
 	if (null != Point) {
 		if (bUndo) {
-			this.Get_RecalcData(Point);
-			wsViews = Asc["editor"].wb.wsViews;
-			for (i = 0; i < wsViews.length; ++i) {
-				if (wsViews[i]) {
-					wsViews[i].objectRender.controller.recalculate2(undefined);
-				}
-			}
+
+            if(!window["NATIVE_EDITOR_ENJINE"]) {
+                this.Get_RecalcData(Point);
+                wsViews = Asc["editor"].wb.wsViews;
+                for (i = 0; i < wsViews.length; ++i) {
+                    if (wsViews[i]) {
+                        wsViews[i].objectRender.controller.recalculate2(undefined);
+                    }
+                }
+            }
 
 			gUndoInsDelCellsFlag = true;
 		}
