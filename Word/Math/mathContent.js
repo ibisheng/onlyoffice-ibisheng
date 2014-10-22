@@ -4157,6 +4157,7 @@ CMathContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth,
 
     CurPos--;
 
+    var bStepStartRun = false;
     if (true === UseContentPos && para_Math_Composition === this.content[CurPos + 1].Type)
     {
         // При выходе из формулы встаем в конец рана
@@ -4166,17 +4167,37 @@ CMathContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth,
         SearchPos.UpdatePos = true;
         return true;
     }
+    else if (para_Math_Run === this.content[CurPos + 1].Type && true === SearchPos.Shift)
+        bStepStartRun = true;
 
     while (CurPos >= 0)
     {
-        this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, false);
+        if (true !== bStepStartRun || para_Math_Run === this.content[CurPos].Type)
+        {
+            var OldUpdatePos = SearchPos.UpdatePos;
 
-        if (true === SearchPos.UpdatePos)
-            SearchPos.Pos.Update( CurPos, Depth );
+            this.content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, false);
 
-        if (true === SearchPos.Found)
-            return;
+            if (true === SearchPos.UpdatePos)
+                SearchPos.Pos.Update(CurPos, Depth);
+            else
+                SearchPos.UpdatePos = OldUpdatePos;
 
+            if (true === SearchPos.Found)
+                return;
+
+            if (true === SearchPos.Shift)
+                bStepStartRun = true;
+        }
+        else
+        {
+            // Встаем в начало рана перед формулой
+            this.content[CurPos + 1].Get_StartPos(SearchPos.Pos, Depth + 1);
+            SearchPos.Pos.Update(CurPos + 1, Depth);
+            SearchPos.Found     = true;
+            SearchPos.UpdatePos = true;
+            return true;
+        }
         CurPos--;
     }
 
@@ -4219,6 +4240,7 @@ CMathContent.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, U
 
     CurPos++;
 
+    var bStepEndRun = false;
     if (true === UseContentPos && para_Math_Composition === this.content[CurPos - 1].Type)
     {
         // При выходе из формулы встаем в начало рана
@@ -4228,16 +4250,37 @@ CMathContent.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, U
         SearchPos.UpdatePos = true;
         return true;
     }
+    else if (para_Math_Run === this.content[CurPos - 1].Type && true === SearchPos.Shift)
+        bStepEndRun = true;
 
     while (CurPos < Count)
     {
-        this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
+        if (true !== bStepEndRun || para_Math_Run === this.content[CurPos].Type)
+        {
+            var OldUpdatePos = SearchPos.UpdatePos;
 
-        if (true === SearchPos.UpdatePos)
-            SearchPos.Pos.Update(CurPos, Depth);
+            this.content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
 
-        if (true === SearchPos.Found)
-            return;
+            if (true === SearchPos.UpdatePos)
+                SearchPos.Pos.Update(CurPos, Depth);
+            else
+                SearchPos.UpdatePos = OldUpdatePos;
+
+            if (true === SearchPos.Found)
+                return;
+
+            if (true === SearchPos.Shift)
+                bStepEndRun = true;
+        }
+        else
+        {
+            // Встаем в конец рана перед формулой
+            this.content[CurPos - 1].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+            SearchPos.Pos.Update(CurPos - 1, Depth);
+            SearchPos.Found     = true;
+            SearchPos.UpdatePos = true;
+            return true;
+        }
 
         CurPos++;
     }

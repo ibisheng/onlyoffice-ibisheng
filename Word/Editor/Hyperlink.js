@@ -1586,10 +1586,14 @@ ParaHyperlink.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth
     var Count = this.Content.length;
     while ( CurPos >= 0 )
     {
+        var OldUpdatePos = SearchPos.UpdatePos;
+
         this.Content[CurPos].Get_WordStartPos(SearchPos, ContentPos, Depth + 1, false);
 
-        if ( true === SearchPos.UpdatePos )
+        if (true === SearchPos.UpdatePos)
             SearchPos.Pos.Update( CurPos, Depth );
+        else
+            SearchPos.UpdatePos = OldUpdatePos;
 
         if ( true === SearchPos.Found )
             return;
@@ -1615,10 +1619,14 @@ ParaHyperlink.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, 
     var Count = this.Content.length;
     while ( CurPos < Count )
     {
+        var OldUpdatePos = SearchPos.UpdatePos;
+
         this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
 
-        if ( true === SearchPos.UpdatePos )
+        if (true === SearchPos.UpdatePos)
             SearchPos.Pos.Update( CurPos, Depth );
+        else
+            SearchPos.UpdatePos = OldUpdatePos;
 
         if ( true === SearchPos.Found )
             return;
