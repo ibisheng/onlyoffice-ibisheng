@@ -3909,7 +3909,13 @@ drawPieChart.prototype =
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var pxToMm = this.chartProp.pxToMM;
+		
+		//TODO сделать через idx как у drawDoughnutChart!!!
+		if(!this.paths.series[val])
+			return;
+		
 		var path = this.paths.series[val].ArrPathCommand;
+		
 		var centerX = path[0].X;
 		var centerY = path[0].Y;
 		
@@ -3918,6 +3924,9 @@ drawPieChart.prototype =
 		var swAng = path[2].swAng;
 		
 		var point = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts[val] : this.chartProp.series[0].val.numLit.pts[val];
+		
+		if(!point)
+			return;
 		
 		var constMargin = 5 / pxToMm;
 		
