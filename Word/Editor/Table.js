@@ -3097,7 +3097,9 @@ CTable.prototype =
     RecalculateCurPos : function()
     {
         if ( null != this.CurCell )
-            this.CurCell.Content.RecalculateCurPos();
+            return this.CurCell.Content.RecalculateCurPos();
+
+        return null;
     },
 
     Recalculate_MinMaxContentWidth : function()
@@ -7552,9 +7554,15 @@ CTable.prototype =
             Y = this.RowsInfo[EndPos.Row].Y[CurPage];
             H = this.RowsInfo[EndPos.Row].H[CurPage];
 
+            var Direction = 1;
+            if (this.Selection.StartPos.Row < this.Selection.EndPos.Row || (this.Selection.StartPos.Row === this.Selection.EndPos.Row && this.Selection.StartPos.Cell <= this.Selection.EndPos.Cell))
+                Direction = 1;
+            else
+                Direction = -1;
+
             var EndRect = { X : X0, Y : Y, W : X1 - X0, H : H, Page : CurPage + this.Get_StartPage_Absolute() };
 
-            return { Start : BeginRect, End : EndRect };
+            return { Start : BeginRect, End : EndRect, Direction : Direction };
         }
         else
         {

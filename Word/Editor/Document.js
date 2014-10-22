@@ -1014,9 +1014,8 @@ CDocument.prototype =
                     // Перерисуем страницу, на которой произошли изменения
                     this.DrawingDocument.OnRecalculatePage( Res, this.Pages[Res] );
                     this.DrawingDocument.OnEndRecalculate( false, true );
-
                     History.Reset_RecalcIndex();
-
+                    this.private_UpdateCursorXY(true, true);
                     return;
                 }
             }
@@ -1057,6 +1056,7 @@ CDocument.prototype =
 
                     this.DrawingDocument.OnEndRecalculate( false, true );
                     History.Reset_RecalcIndex();
+                    this.private_UpdateCursorXY(true, true);
                     return;
                 }
             }
@@ -1947,6 +1947,8 @@ CDocument.prototype =
                     this.CurPage = Element.PageNum + Element.CurPos.PagesPos;
                 else
                     this.CurPage = Element.PageNum; // TODO: переделать
+
+                this.private_UpdateCursorXY(true, true);
             }
         }
 
@@ -3783,6 +3785,8 @@ CDocument.prototype =
                 this.Content[0].Cursor_MoveToStartPos(false);
             }
         }
+
+        this.private_UpdateCursorXY(true, true);
     },
 
     Cursor_MoveToEndPos : function(AddToSelect)
@@ -3860,6 +3864,8 @@ CDocument.prototype =
                 this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
             }
         }
+
+        this.private_UpdateCursorXY(true, true);
     },
 
     Cursor_MoveLeft : function(AddToSelect, Word)
@@ -3873,6 +3879,7 @@ CDocument.prototype =
             var RetValue = this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
@@ -3880,6 +3887,7 @@ CDocument.prototype =
             var RetValue = this.DrawingObjects.cursorMoveLeft(AddToSelect, Word);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -4032,6 +4040,7 @@ CDocument.prototype =
 
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
+            this.private_UpdateCursorXY(true, true);
         }
     },
 
@@ -4046,6 +4055,7 @@ CDocument.prototype =
             var RetValue = this.HdrFtr.Cursor_MoveRight(AddToSelect, Word);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
@@ -4053,6 +4063,7 @@ CDocument.prototype =
             var RetValue = this.DrawingObjects.cursorMoveRight(AddToSelect, Word);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -4236,245 +4247,76 @@ CDocument.prototype =
 
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
+            this.private_UpdateCursorXY(true, true);
         }
     },
 
     Cursor_MoveUp : function(AddToSelect)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if (docpostype_HdrFtr === this.CurPos.Type && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
         {
             var RetValue = this.HdrFtr.Cursor_MoveUp(AddToSelect);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
             return RetValue;
         }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        else if (docpostype_DrawingObjects === this.CurPos.Type)
         {
             var RetValue = this.DrawingObjects.cursorMoveUp(AddToSelect);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
             return RetValue;
         }
-        else //if ( docpostype_Content === this.CurPos.Type )
+
+        if (true === this.Is_SelectionUse() && true !== AddToSelect)
+            this.Cursor_MoveLeft(false, false);
+
+        var bStopSelection = false;
+        if (true !== this.Is_SelectionUse() && true === AddToSelect)
         {
-            if ( this.CurPos.ContentPos < 0 )
-                return false;
-
-            this.Remove_NumberingSelection();
-            if ( true === this.Selection.Use )
-            {
-                if ( true === AddToSelect )
-                {
-                    // Добавляем к селекту
-                    var Item = this.Content[this.Selection.EndPos];
-                    if ( false === Item.Cursor_MoveUp( 1, true ) && 0 != this.Selection.EndPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.Selection.EndPos--;
-                        Item = this.Content[this.Selection.EndPos];
-                        Item.Cursor_MoveUp_To_LastRow( this.CurPos.RealX, this.CurPos.RealY, true );
-                    }
-
-                    // Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-                    if ( this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse() )
-                        this.Selection.Use = false;
-
-                    this.CurPos.ContentPos = this.Selection.EndPos;
-                }
-                else
-                {
-                    // Мы должны переместиться на строку выше, чем начало селекта
-                    var Start = this.Selection.StartPos;
-                    if ( Start > this.Selection.EndPos )
-                        Start = this.Selection.EndPos;
-
-                    this.CurPos.ContentPos = Start;
-
-                    var Item = this.Content[this.CurPos.ContentPos];
-                    if ( false === this.Content[this.CurPos.ContentPos].Cursor_MoveUp( 1, false ) && 0 != this.CurPos.ContentPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.CurPos.ContentPos--;
-                        Item = this.Content[this.CurPos.ContentPos];
-                        Item.Cursor_MoveUp_To_LastRow( this.CurPos.RealX, this.CurPos.RealY, false );
-                    }
-
-                    this.Selection_Remove();
-                }
-            }
-            else
-            {
-                if ( true === AddToSelect )
-                {
-                    this.Selection.Use      = true;
-                    this.Selection.StartPos = this.CurPos.ContentPos;
-                    this.Selection.EndPos   = this.CurPos.ContentPos;
-
-                    var Item = this.Content[this.CurPos.ContentPos];
-                    if ( false === Item.Cursor_MoveUp( 1, true ) && 0 != this.CurPos.ContentPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.CurPos.ContentPos--;
-                        Item = this.Content[this.CurPos.ContentPos];
-                        Item.Cursor_MoveUp_To_LastRow( this.CurPos.RealX, this.CurPos.RealY, true );
-                        this.Selection.EndPos = this.CurPos.ContentPos;
-                    }
-
-                    // Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-                    if ( this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use )
-                        this.Selection.Use = false;
-
-                    this.CurPos.ContentPos = this.Selection.EndPos;
-                }
-                else
-                {
-                    var Item = this.Content[this.CurPos.ContentPos];
-                    if ( false === Item.Cursor_MoveUp( 1, false ) && 0 != this.CurPos.ContentPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.CurPos.ContentPos--;
-                        Item = this.Content[this.CurPos.ContentPos];
-                        Item.Cursor_MoveUp_To_LastRow( this.CurPos.RealX, this.CurPos.RealY, false );
-                    }
-                }
-            }
-
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
+            bStopSelection = true;
+            this.private_StartSelectionFromCurPos();
         }
+
+        this.private_UpdateCursorXY(false, true);
+        this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+
+        if (bStopSelection)
+            this.private_StopSelection();
     },
 
     Cursor_MoveDown : function(AddToSelect)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if (docpostype_HdrFtr === this.CurPos.Type && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
         {
             var RetValue = this.HdrFtr.Cursor_MoveDown(AddToSelect);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
             return RetValue;
         }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        else if (docpostype_DrawingObjects === this.CurPos.Type)
         {
             var RetValue = this.DrawingObjects.cursorMoveDown(AddToSelect);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
             return RetValue;
         }
-        else //if ( docpostype_Content === this.CurPos.Type )
+
+        if (true === this.Is_SelectionUse() && true !== AddToSelect)
+            this.Cursor_MoveRight(false, false);
+
+        var bStopSelection = false;
+        if (true !== this.Is_SelectionUse() && true === AddToSelect)
         {
-            if ( this.CurPos.ContentPos < 0 )
-                return false;
-
-            this.Remove_NumberingSelection();
-            if ( true === this.Selection.Use )
-            {
-                if ( true === AddToSelect )
-                {
-                    // Добавляем к селекту
-                    var Item = this.Content[this.Selection.EndPos];
-                    if ( false === Item.Cursor_MoveDown( 1, true ) && this.Content.length - 1 != this.Selection.EndPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.Selection.EndPos++;
-                        Item = this.Content[this.Selection.EndPos];
-                        Item.Cursor_MoveDown_To_FirstRow( this.CurPos.RealX, this.CurPos.RealY, true );
-                    }
-
-                    // Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-                    if ( this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse() )
-                        this.Selection.Use = false;
-
-                    this.CurPos.ContentPos = this.Selection.EndPos;
-                }
-                else
-                {
-                    // Мы должны переместиться на строку ниже, чем конец селекта
-                    var End = this.Selection.EndPos;
-                    if ( End < this.Selection.StartPos )
-                        End = this.Selection.StartPos;
-
-                    this.CurPos.ContentPos = End;
-
-                    var Item = this.Content[this.CurPos.ContentPos];
-
-                    if ( false === this.Content[this.CurPos.ContentPos].Cursor_MoveDown( 1, false ) && this.Content.length - 1 != this.CurPos.ContentPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.CurPos.ContentPos++;
-                        Item = this.Content[this.CurPos.ContentPos];
-                        Item.Cursor_MoveDown_To_FirstRow( this.CurPos.RealX, this.CurPos.RealY, false );
-                    }
-
-                    this.Selection_Remove();
-                }
-            }
-            else
-            {
-                if ( true === AddToSelect )
-                {
-                    this.Selection.Use      = true;
-                    this.Selection.StartPos = this.CurPos.ContentPos;
-                    this.Selection.EndPos   = this.CurPos.ContentPos;
-
-                    var Item = this.Content[this.CurPos.ContentPos];
-                    if ( false === Item.Cursor_MoveDown( 1, true ) && this.Content.length - 1 != this.CurPos.ContentPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.CurPos.ContentPos++;
-                        Item = this.Content[this.CurPos.ContentPos];
-                        Item.Cursor_MoveDown_To_FirstRow( this.CurPos.RealX, this.CurPos.RealY, true );
-                        this.Selection.EndPos = this.CurPos.ContentPos;
-                    }
-
-                    // Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-                    if ( this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse() )
-                        this.Selection.Use = false;
-
-                    this.CurPos.ContentPos = this.Selection.EndPos;
-                }
-                else
-                {
-                    var Item = this.Content[this.CurPos.ContentPos];
-
-                    if ( false === Item.Cursor_MoveDown( 1, AddToSelect ) && this.Content.length - 1 != this.CurPos.ContentPos )
-                    {
-                        var TempXY = Item.Get_CurPosXY();
-                        this.CurPos.RealX = TempXY.X;
-                        this.CurPos.RealY = TempXY.Y;
-
-                        this.CurPos.ContentPos++;
-                        Item = this.Content[this.CurPos.ContentPos];
-                        Item.Cursor_MoveDown_To_FirstRow( this.CurPos.RealX, this.CurPos.RealY, false );
-                    }
-                }
-            }
-
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
+            bStopSelection = true;
+            this.private_StartSelectionFromCurPos();
         }
+
+        this.private_UpdateCursorXY(false, true);
+        this.private_MoveCursorDown(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+
+        if (bStopSelection)
+            this.private_StopSelection();
     },
 
     Cursor_MoveEndOfLine : function(AddToSelect)
@@ -4484,12 +4326,14 @@ CDocument.prototype =
         {
             var RetValue = this.HdrFtr.Cursor_MoveEndOfLine(AddToSelect);
             this.Document_UpdateInterfaceState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var RetValue = this.DrawingObjects.cursorMoveEndOfLine(AddToSelect);
             this.Document_UpdateInterfaceState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -4549,6 +4393,7 @@ CDocument.prototype =
             }
 
             this.Document_UpdateInterfaceState();
+            this.private_UpdateCursorXY(true, true);
         }
     },
 
@@ -4559,12 +4404,14 @@ CDocument.prototype =
         {
             var RetValue = this.HdrFtr.Cursor_MoveStartOfLine(AddToSelect);
             this.Document_UpdateInterfaceState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var RetValue = this.DrawingObjects.cursorMoveStartOfLine(AddToSelect);
             this.Document_UpdateInterfaceState();
+            this.private_UpdateCursorXY(true, true);
             return RetValue;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -4624,6 +4471,7 @@ CDocument.prototype =
             }
 
             this.Document_UpdateInterfaceState();
+            this.private_UpdateCursorXY(true, true);
         }
     },
 
@@ -8080,9 +7928,9 @@ CDocument.prototype =
                 else
                 {
                     var Result = {};
-                    Result.Start = this.Content[Start].Get_SelectionBounds().Start;
-                    Result.End   = this.Content[End].Get_SelectionBounds().End;
-
+                    Result.Start     = this.Content[Start].Get_SelectionBounds().Start;
+                    Result.End       = this.Content[End].Get_SelectionBounds().End;
+                    Result.Direction = (this.Selection.StartPos > this.Selection.EndPos ? -1 : 1);
                     return Result;
                 }
             }
@@ -10343,6 +10191,7 @@ CDocument.prototype =
             }
 
             editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
+            this.private_UpdateCursorXY(true, true);
 
             return;
         }
@@ -10423,6 +10272,8 @@ CDocument.prototype =
                 }
             }
         }
+
+        this.private_UpdateCursorXY(true, true);
     },
 
     OnMouseMove : function(e, X, Y, PageIndex)
@@ -13873,6 +13724,166 @@ CDocument.prototype =
     {
         this.UseTextShd = bUse;
     }
+};
+
+CDocument.prototype.private_StartSelectionFromCurPos = function()
+{
+    this.private_UpdateCursorXY(true, true);
+    var CurPara = this.Get_CurrentParagraph();
+
+    if ( null !== CurPara )
+    {
+        var MouseEvent = new CMouseEventHandler();
+
+        MouseEvent.ClickCount = 1;
+        MouseEvent.Type = g_mouse_event_type_down;
+
+        var X = CurPara.CurPos.RealX;
+        var Y = CurPara.CurPos.RealY;
+
+        var DrawMatrix = CurPara.Get_ParentTextTransform();
+        if (DrawMatrix)
+        {
+            var _X = DrawMatrix.TransformPointX(X, Y);
+            var _Y = DrawMatrix.TransformPointY(X, Y);
+
+            X = _X;
+            Y = _Y;
+        }
+
+        this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
+        this.Selection_SetStart(X, Y, MouseEvent);
+        MouseEvent.Type = g_mouse_event_type_move;
+        this.Selection_SetEnd(X, Y, MouseEvent);
+    }
+};
+CDocument.prototype.private_StopSelection = function()
+{
+    this.Selection.Start = false;
+};
+CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
+{
+    var NewCursorPos = null;
+
+    if (true !== this.Is_SelectionUse() || true === this.Selection_IsEmpty())
+    {
+        if (docpostype_Content === this.CurPos.Type)
+        {
+            var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
+            if (Pos >= 0 && undefined !== this.Content[Pos].RecalculateCurPos && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ))
+            {
+                this.Internal_CheckCurPage();
+                NewCursorPos = this.Content[Pos].RecalculateCurPos();
+            }
+        }
+        else if (docpostype_DrawingObjects === this.CurPos.Type)
+        {
+            NewCursorPos = this.DrawingObjects.recalculateCurPos();
+        }
+        else if (docpostype_HdrFtr === this.CurPos.Type)
+        {
+            NewCursorPos = this.HdrFtr.RecalculateCurPos();
+        }
+    }
+    else
+    {
+        // Обновляем всегда по концу селекта
+        var SelectionBounds = this.Get_SelectionBounds();
+        if (null !== SelectionBounds)
+        {
+            NewCursorPos = {};
+            if (-1 === SelectionBounds.Direction)
+            {
+                NewCursorPos.X = SelectionBounds.Start.X;
+                NewCursorPos.Y = SelectionBounds.Start.Y;
+            }
+            else
+            {
+                NewCursorPos.X = SelectionBounds.End.X + SelectionBounds.End.W;
+                NewCursorPos.Y = SelectionBounds.End.Y + SelectionBounds.End.H;
+            }
+        }
+    }
+
+    if (null === NewCursorPos || undefined === NewCursorPos)
+        return;
+
+    var RealX = NewCursorPos.X;
+    var RealY = NewCursorPos.Y;
+
+    if (bUpdateX)
+        this.CurPos.RealX = RealX;
+
+    if (bUpdateY)
+        this.CurPos.RealY = RealY;
+};
+CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelect)
+{
+    var CurY = StartY;
+
+    var PageH = this.Pages[this.CurPage].Height;
+
+    this.TurnOff_InterfaceEvents();
+
+    while (true)
+    {
+        CurY += 0.1;
+
+        if (CurY > PageH)
+        {
+            if (this.Pages.length - 1 <= this.CurPage)
+                break;
+            else
+            {
+                this.CurPage++;
+                CurY  = 0;
+                PageH = this.Pages[this.CurPage].Height;
+            }
+        }
+
+
+        this.Cursor_MoveAt(StartX, CurY, AddToSelect);
+        this.private_UpdateCursorXY(false, true);
+
+        if (this.CurPos.RealY > StartY + 0.001)
+            break;
+    }
+
+    this.TurnOn_InterfaceEvents(true);
+};
+CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
+{
+    var CurY = StartY;
+
+    var PageH = this.Pages[this.CurPage].Height;
+
+    this.TurnOff_InterfaceEvents();
+
+    while (true)
+    {
+        CurY -= 0.1;
+
+        if (CurY < 0)
+        {
+            if (0 === this.CurPage)
+                break;
+            else
+            {
+                this.CurPage--;
+                CurY = this.Pages[this.CurPage].Height;
+            }
+        }
+
+        this.Cursor_MoveAt(StartX, CurY, AddToSelect);
+        this.private_UpdateCursorXY(false, true);
+
+        if (this.CurPos.RealY < StartY - 0.001)
+            break;
+    }
+
+    this.TurnOn_InterfaceEvents(true);
+
+    return;
 };
 
 //-----------------------------------------------------------------------------------

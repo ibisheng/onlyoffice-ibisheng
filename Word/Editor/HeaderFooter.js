@@ -352,7 +352,9 @@ CHeaderFooter.prototype =
     RecalculateCurPos : function()
     {
         if ( -1 !== this.RecalcInfo.CurPage )
-            this.Content.RecalculateCurPos();
+            return this.Content.RecalculateCurPos();
+
+        return null;
     },
 
     Get_NearestPos : function(X, Y, bAnchor, Drawing)
@@ -1308,6 +1310,8 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.RecalculateCurPos();
+
+        return null;
     },
 
     Recalculate : function(PageIndex)    

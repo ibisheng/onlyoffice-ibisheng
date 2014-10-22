@@ -966,6 +966,7 @@ CMathBase.prototype.Get_WordEndPos                = ParaHyperlink.prototype.Get_
 CMathBase.prototype.Selection_Remove              = ParaHyperlink.prototype.Selection_Remove;
 CMathBase.prototype.Select_All                    = ParaHyperlink.prototype.Select_All;
 CMathBase.prototype.Check_NearestPos              = ParaHyperlink.prototype.Check_NearestPos;
+CMathBase.prototype.Get_SelectionDirection        = ParaHyperlink.prototype.Get_SelectionDirection;
 CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
 {
     if (true !== this.Selection.Use)

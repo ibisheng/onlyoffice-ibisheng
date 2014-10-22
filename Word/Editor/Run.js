@@ -245,7 +245,13 @@ ParaRun.prototype.Is_Empty = function(Props)
     }
 };
 
-ParaRun.prototype.Is_CheckingNearestPos = ParaHyperlink.prototype.Is_CheckingNearestPos;
+ParaRun.prototype.Is_CheckingNearestPos = function()
+{
+    if (this.NearPosArray.length > 0)
+        return true;
+
+    return false;
+};
 
 // Начинается ли данный ран с новой строки
 ParaRun.prototype.Is_StartFromNewLine = function()
@@ -1295,6 +1301,17 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
     }
 
     return Str;
+};
+
+ParaRun.prototype.Get_SelectionDirection = function()
+{
+    if (true !== this.Selection.Use)
+        return 0;
+
+    if (this.Selection.StartPos <= this.Selection.EndPos)
+        return 1;
+
+    return -1;
 };
 
 ParaRun.prototype.Can_AddDropCap = function()
@@ -4476,11 +4493,11 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
 ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
 {
     var Selection = this.State.Selection;
-    if ( true !== Selection.Use )
+    if (true !== Selection.Use)
         return true;
 
     if(this.Type == para_Math_Run && this.IsPlaceholder())
-        return false;
+        return true;
 
     var StartPos = Selection.StartPos;
     var EndPos   = Selection.EndPos;

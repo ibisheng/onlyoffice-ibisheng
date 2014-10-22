@@ -1270,7 +1270,7 @@ Paragraph.prototype =
 
     RecalculateCurPos : function()
     {
-        this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, true, false );
+        return this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, true, false );
     },
 
     Recalculate_MinMaxContentWidth : function()
@@ -6163,7 +6163,20 @@ Paragraph.prototype =
         if (null === EndRect)
             EndRect = { X : this.X, Y : this.Y, W : 0, H : 0, Page : StartPage_abs };
 
-        return { Start : BeginRect, End : EndRect };
+        return { Start : BeginRect, End : EndRect, Direction : this.Get_SelectionDirection() };
+    },
+
+    Get_SelectionDirection : function()
+    {
+        if (true !== this.Selection.Use)
+            return 0;
+
+        if (this.Selection.StartPos < this.Selection.EndPos)
+            return 1;
+        else if (this.Selection.StartPos > this.Selection.EndPos)
+            return -1;
+
+        return this.Content[this.Selection.StartPos].Get_SelectionDirection();
     },
 
     Get_SelectionAnchorPos : function()

@@ -4508,4 +4508,17 @@ CMathContent.prototype.private_SetNeedResize = function()
     if (null !== this.ParaMath)
         this.ParaMath.SetNeedResize();
 };
-CMathContent.prototype.Is_CheckingNearestPos = ParaHyperlink.prototype.Is_CheckingNearestPos;
+CMathContent.prototype.Is_CheckingNearestPos  = ParaHyperlink.prototype.Is_CheckingNearestPos;
+CMathContent.prototype.Get_SelectionDirection = function()
+{
+    if (true !== this.Selection.Use)
+        return 0;
+
+    if (this.Selection.Start < this.Selection.End)
+        return 1;
+    else if (this.Selection.Start > this.Selection.End)
+        return -1;
+
+    return this.content[this.Selection.Start].Get_SelectionDirection();
+};
+

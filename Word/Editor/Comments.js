@@ -944,6 +944,11 @@ ParaComment.prototype =
         return "";
     },
 
+    Get_SelectionDirection : function()
+    {
+        return 1;
+    },
+
     Clear_TextFormatting : function( DefHyper )
     {
         var Count = this.Content.length;

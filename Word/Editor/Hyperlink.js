@@ -170,6 +170,19 @@ ParaHyperlink.prototype.Get_SelectedText = function(bAll, bClearText)
     return Str;
 };
 
+ParaHyperlink.prototype.Get_SelectionDirection = function()
+{
+    if (true !== this.Selection.Use)
+        return 0;
+
+    if (this.Selection.StartPos < this.Selection.EndPos)
+        return 1;
+    else if (this.Selection.StartPos > this.Selection.EndPos)
+        return -1;
+
+    return this.Content[this.Selection.StartPos].Get_SelectionDirection();
+};
+
 ParaHyperlink.prototype.Get_TextPr = function(_ContentPos, Depth)
 {
     if ( undefined === _ContentPos )

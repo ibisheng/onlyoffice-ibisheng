@@ -1302,13 +1302,15 @@ CDocumentContent.prototype =
                     this.DrawingDocument.TargetEnd();
                 }
                 else
-                    this.Content[this.CurPos.ContentPos].RecalculateCurPos();
+                    return this.Content[this.CurPos.ContentPos].RecalculateCurPos();
             }
         }
         else // if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            this.LogicDocument.DrawingObjects.recalculateCurPos();
+            return this.LogicDocument.DrawingObjects.recalculateCurPos();
         }
+
+        return null;
     },
 
     Get_PageBounds : function(PageNum, Height, bForceCheckDrawings)
@@ -9086,8 +9088,9 @@ CDocumentContent.prototype =
             else
             {
                 var Result = {};
-                Result.Start = this.Content[Start].Get_SelectionBounds().Start;
-                Result.End   = this.Content[End].Get_SelectionBounds().End;
+                Result.Start     = this.Content[Start].Get_SelectionBounds().Start;
+                Result.End       = this.Content[End].Get_SelectionBounds().End;
+                Result.Direction = (this.Selection.StartPos > this.Selection.EndPos ? -1 : 1);
                 return Result;
             }
         }

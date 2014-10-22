@@ -490,6 +490,11 @@ ParaMath.prototype.Get_SelectedText = function(bAll, bClearText)
     return "";
 };
 
+ParaMath.prototype.Get_SelectionDirection = function()
+{
+    return this.Root.Get_SelectionDirection();
+};
+
 ParaMath.prototype.Clear_TextFormatting = function( DefHyper )
 {
 };
