@@ -4628,6 +4628,10 @@ ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)
     // Если изменение какой-то текстовой настройки требует пересчета элементов
     if ( true === RecalcMeasure )
         this.RecalcInfo.Measure = true;
+
+
+    // Если мы в формуле, тогда ее надо пересчитывать
+    this.private_UpdateMathResize();
 };
 
 ParaRun.prototype.Recalc_RunsCompiledPr = function()
