@@ -2899,6 +2899,8 @@ PasteProcessor.prototype =
                         }
                     }
 					
+					//проверяем список фонтов
+					aContent.fonts = oThis._checkFontsOnLoad(aContent.fonts);
 					
 					var aImagesToDownload = [];
 					for(var i in oImagesToDownload)
@@ -3998,6 +4000,18 @@ PasteProcessor.prototype =
 			return aPrepeareFonts;
 		};
     },
+	_checkFontsOnLoad: function(fonts)
+	{
+		for(var i = 0; i < fonts.length; i++)
+		{
+			var index = this.map_font_index[fonts[i].name];
+			if(null == index ||  undefined == index)
+			{
+				fonts[i] = new CFont("Arial", 0, "", 0);
+			}
+		}
+		return fonts;
+	},
     _IsBlockElem : function(name)
     {
         if( "p" == name || "div" == name || "ul" == name || "ol" == name || "li" == name || "table" == name || "tbody" == name || "tr" == name || "td" == name || "th" == name ||
