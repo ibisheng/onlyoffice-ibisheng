@@ -10564,6 +10564,9 @@ DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.outEnd]  =   DLBL_POS_OUT_END;
 DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.r]       =   DLBL_POS_R;
 DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.t]       =   DLBL_POS_T;
 
+var BAR_DATA_LABELS_POS_MAP = {};
+
+
 
 
 var REV_DLBL_POS_DEFINES_MAP = [];

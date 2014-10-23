@@ -1837,29 +1837,6 @@ DrawingObjectsController.prototype =
 
         var chart_type = plot_area.charts[0];
         //Data Labels
-        var data_labels_pos_setting = chartSettings.getDataLabelsPos();
-        if(isRealNumber(data_labels_pos_setting))
-        {
-            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none)
-            {
-                if(chart_type.dLbls)
-                    chart_type.setDLbls(null);
-            }
-            else
-            {
-                if(isRealNumber(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]))
-                {
-                    if(!chart_type.dLbls)
-                    {
-                        var d_lbls = new CDLbls();
-                        d_lbls.setShowVal(true);
-                        chart_type.setDLbls(d_lbls);
-                    }
-                    if(chart_type.dLbls.dLblPos !== DLBL_POS_DEFINES_MAP[data_labels_pos_setting])
-                        chart_type.dLbls.setDLblPos(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]);
-                }
-            }
-        }
         var i;
         var type = chartSettings.getType();
         var need_groupping, need_num_fmt, need_bar_dir;
@@ -2407,6 +2384,99 @@ DrawingObjectsController.prototype =
         setAxisGridLines(plot_area.getHorizontalAxis(), chartSettings.getVertGridLines());
 
         chart_type = plot_area.charts[0];
+
+        var data_labels_pos_setting = chartSettings.getDataLabelsPos();
+        if(isRealNumber(data_labels_pos_setting))
+        {
+            if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none)
+            {
+                if(chart_type.dLbls)
+                    chart_type.setDLbls(null);
+            }
+            else
+            {
+                if(isRealNumber(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]))
+                {
+                    if(!chart_type.dLbls)
+                    {
+                        var d_lbls = new CDLbls();
+                        d_lbls.setShowVal(true);
+                        chart_type.setDLbls(d_lbls);
+                    }
+                    var finish_dlbl_pos =  DLBL_POS_DEFINES_MAP[data_labels_pos_setting];
+                    //var DLBL_POS_DEFINES_MAP = [];
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.b]       =   DLBL_POS_B;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.bestFit] =   DLBL_POS_BEST_FIT;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.ctr]     =   DLBL_POS_CTR;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.inBase]  =   DLBL_POS_IN_BASE;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.inEnd]   =   DLBL_POS_IN_END;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.l]       =   DLBL_POS_L;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.outEnd]  =   DLBL_POS_OUT_END;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.r]       =   DLBL_POS_R;
+                    //DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.t]       =   DLBL_POS_T;
+
+                    switch (chart_type.getObjectType())
+                    {
+                        case historyitem_type_BarChart:
+                        {
+                            if(BAR_GROUPING_CLUSTERED === chart_type.grouping)
+                            {
+                                if(!(finish_dlbl_pos === DLBL_POS_CTR
+                                    || finish_dlbl_pos === DLBL_POS_IN_END
+                                    || finish_dlbl_pos === DLBL_POS_IN_BASE
+                                    || finish_dlbl_pos === DLBL_POS_OUT_END))
+                                {
+                                    finish_dlbl_pos = DLBL_POS_CTR;
+                                }
+                            }
+                            else
+                            {
+                                if(!(finish_dlbl_pos === DLBL_POS_CTR
+                                    || finish_dlbl_pos === DLBL_POS_IN_END
+                                    || finish_dlbl_pos === DLBL_POS_IN_BASE))
+                                {
+                                    finish_dlbl_pos = DLBL_POS_CTR;
+                                }
+                            }
+                            break;
+                        }
+                        case historyitem_type_LineChart:
+                        case historyitem_type_ScatterChart:
+                        {
+                            if(!(finish_dlbl_pos === DLBL_POS_CTR
+                                || finish_dlbl_pos === DLBL_POS_L
+                                || finish_dlbl_pos === DLBL_POS_T
+                                || finish_dlbl_pos === DLBL_POS_R
+                                || finish_dlbl_pos === DLBL_POS_B))
+                            {
+                                finish_dlbl_pos = DLBL_POS_CTR;
+                            }
+                            break;
+                        }
+                        case historyitem_type_PieChart:
+                        {
+                            if(!(finish_dlbl_pos === DLBL_POS_CTR
+                                || finish_dlbl_pos === DLBL_POS_IN_END
+                                || finish_dlbl_pos === DLBL_POS_OUT_END))
+                            {
+                                finish_dlbl_pos = DLBL_POS_CTR;
+                            }
+                            break;
+                        }
+                        case historyitem_type_AreaChart:
+                        case historyitem_type_DoughnutChart:
+                        case historyitem_type_StockChart:
+                        {
+                            finish_dlbl_pos = null;
+                            break;
+                        }
+                    }
+
+                    if(chart_type.dLbls.dLblPos !== finish_dlbl_pos)
+                        chart_type.dLbls.setDLblPos(finish_dlbl_pos);
+                }
+            }
+        }
         //подписи данных
         if(typeof chart_type.setDLbls === "function" && isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
         {
