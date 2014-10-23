@@ -5262,7 +5262,7 @@
 						// draw last column
 						var r1_ = dy > 0 ? vr.r1 : r2 + 1;
 						var r2_ = dy > 0 ? r1 - 1 : vr.r2;
-						var r_ = new asc_Range(c2, r1_, c2, r2_);
+						var r_ = new asc_Range(vr.c1, r1_, vr.c2, r2_);
 						if (r2_ >= r1_) {
 							this._drawGrid(/*drawingCtx*/ undefined, r_);
 							this._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
