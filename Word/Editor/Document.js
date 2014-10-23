@@ -1941,15 +1941,16 @@ CDocument.prototype =
                 Y = Bounds.Bottom;
             }
 
-            if ( docpostype_Content == this.CurPos.Type && Index >= this.ContentLastChangePos && Index == this.CurPos.ContentPos )
+            if ( docpostype_Content == this.CurPos.Type && Index >= this.ContentLastChangePos && Index === this.CurPos.ContentPos )
             {
                 if ( type_Paragraph === Element.GetType() )
                     this.CurPage = Element.PageNum + Element.CurPos.PagesPos;
                 else
                     this.CurPage = Element.PageNum; // TODO: переделать
-
-                this.private_UpdateCursorXY(true, true);
             }
+
+            if (docpostype_Content === this.CurPos.Type && ((true !== this.Selection.Use && Index > this.CurPos.ContentPos) || (true === this.Selection.Use && Index > this.Selection.EndPos && Index > this.Selection.StartPos)))
+                this.private_UpdateCursorXY(true, true);
         }
 
         if ( Index >= Count )
