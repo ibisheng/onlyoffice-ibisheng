@@ -776,9 +776,56 @@ Slide.prototype =
 
     shapeAdd: function(pos, item)
     {
+        this.checkDrawingUniNvPr(item);
         var _pos = isRealNumber(pos) ? pos : this.cSld.spTree.length;
         History.Add(this, {Type: historyitem_SlideAddToSpTree, Pos: _pos, Item: item});
         this.cSld.spTree.splice(_pos, 0, item);
+    },
+
+    checkDrawingUniNvPr: function(drawing)
+    {
+        return;
+        var nv_sp_pr;
+        if(drawing)
+        {
+            switch (drawing.getObjectType())
+            {
+                case historyitem_type_ChartSpace:
+                {
+                    break;
+                }
+                case historyitem_type_GroupShape:
+                {
+                    if(!drawing.nvGrpSpPr)
+                    {
+                        nv_sp_pr = new UniNvPr();
+                        nv_sp_pr.cNvPr.setId(++this.maxId);
+                        drawing.setNvSpPr(nv_sp_pr);
+                    }
+                    break;
+                }
+                case historyitem_type_ImageShape:
+                {
+                    if(!drawing.nvPicPr)
+                    {
+                        nv_sp_pr = new UniNvPr();
+                        nv_sp_pr.cNvPr.setId(++this.maxId);
+                        drawing.setNvSpPr(nv_sp_pr);
+                    }
+                    break;
+                }
+                case historyitem_type_Shape:
+                {
+                    if(!drawing.nvSpPr)
+                    {
+                        nv_sp_pr = new UniNvPr();
+                        nv_sp_pr.cNvPr.setId(++this.maxId);
+                        drawing.setNvSpPr(nv_sp_pr);
+                    }
+                    break;
+                }
+            }
+        }
     },
 
     removeFromSpTreeById: function(id)

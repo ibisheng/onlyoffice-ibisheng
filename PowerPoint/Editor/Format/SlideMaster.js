@@ -574,6 +574,7 @@ MasterSlide.prototype =
     },
 
     checkSlideSize:  Slide.prototype.checkSlideSize,
+    checkDrawingUniNvPr:  Slide.prototype.checkDrawingUniNvPr,
     checkSlideColorScheme: function()
     {
         this.recalcInfo.recalculateSpTree = true;
@@ -605,6 +606,7 @@ MasterSlide.prototype =
 
     shapeAdd: function(pos, item)
     {
+        this.checkDrawingUniNvPr(item);
         History.Add(this, {Type: historyitem_SlideMasterAddToSpTree, Pos: pos, Item: item});
         this.cSld.spTree.splice(pos, 0, item);
     },

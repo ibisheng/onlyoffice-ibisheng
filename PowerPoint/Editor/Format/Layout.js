@@ -383,6 +383,8 @@ SlideLayout.prototype =
 
     shapeAdd: function(pos, item)
     {
+
+        this.checkDrawingUniNvPr(item);
         History.Add(this, {Type: historyitem_SlideLayoutAddToSpTree, Pos: pos, Item: item});
         this.cSld.spTree.splice(pos, 0, item);
     },
@@ -396,6 +398,7 @@ SlideLayout.prototype =
     },
 
     changeSize: Slide.prototype.changeSize,
+    checkDrawingUniNvPr: Slide.prototype.checkDrawingUniNvPr,
 
     Get_Id: function()
     {
