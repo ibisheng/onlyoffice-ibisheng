@@ -4994,7 +4994,7 @@ asc_docs_api.prototype.Call_Menu_Context_Cut = function()
     if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
     {
         _stream["WriteByte"](1);
-        _stream["WriteString2"](_binary_data.drawingUrls[0]);
+        _stream["WriteStringA"](_binary_data.drawingUrls[0]);
     }
 
     // owner format
@@ -5012,7 +5012,7 @@ asc_docs_api.prototype.Call_Menu_Context_Paste = function(type, param)
     }
     else if (1 == type)
     {
-        this.AddImageUrlNative(param, 50, 50);
+        this.AddImageUrlNative(param, 200, 200);
     }
     else if (2 == type)
     {
