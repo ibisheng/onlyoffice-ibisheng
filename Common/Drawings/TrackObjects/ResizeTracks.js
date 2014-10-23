@@ -752,8 +752,11 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
             xfrm.setExtX(this.resizedExtX/scale_coefficients.cx);
             xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
-            xfrm.setFlipH(this.resizedflipH);
-            xfrm.setFlipV(this.resizedflipV);
+            if(this.originalObject.getObjectType() !== historyitem_type_ChartSpace)
+            {
+                xfrm.setFlipH(this.resizedflipH);
+                xfrm.setFlipV(this.resizedflipV);
+            }
             this.originalObject.checkDrawingBaseCoords();
         };
     }, this, []);
