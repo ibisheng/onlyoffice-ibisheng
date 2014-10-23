@@ -50,7 +50,7 @@ var GlobalSkinFlat = {
     RulersButton : false,
     NavigationButtons : false,
     BackgroundColor : "#F4F4F4",
-    BackgroundColorThumbnails : "#EBEBEB",
+    BackgroundColorThumbnails : "#F4F4F4",
     RulerDark : "#CFCFCF",
     RulerLight : "#FFFFFF",
     RulerOutline : "#BBBEC2",
@@ -339,12 +339,12 @@ function CEditorPage(api)
         this.m_oBody.AddControl(this.m_oThumbnailsContainer);
 
         this.m_oThumbnailsBack = CreateControl("id_thumbnails_background");
-        this.m_oThumbnailsBack.Bounds.SetParams(0,0,ScrollWidthMm,1000,false,false,true,false,-1,-1);
+        this.m_oThumbnailsBack.Bounds.SetParams(0,0,ScrollWidthMm9,1000,false,false,true,false,-1,-1);
         this.m_oThumbnailsBack.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
         this.m_oThumbnailsContainer.AddControl(this.m_oThumbnailsBack);
 
         this.m_oThumbnails = CreateControl("id_thumbnails");
-        this.m_oThumbnails.Bounds.SetParams(0,0,ScrollWidthMm,1000,false,false,true,false,-1,-1);
+        this.m_oThumbnails.Bounds.SetParams(0,0,ScrollWidthMm9,1000,false,false,true,false,-1,-1);
         this.m_oThumbnails.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
         this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails);
 

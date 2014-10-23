@@ -3175,6 +3175,8 @@ function CThumbnailsManager()
     this.MouseDownTrackY = -1;
     this.MouseDownTrackPosition = 0; // это для трека, актуально только когда (this.IsMouseDownTrack == true && this.IsMouseDownTrackSimple = false)
 
+    this.MouseTrackCommonImage = null;
+
     this.m_oWordControl = null;
     var oThis = this;
 
@@ -3584,6 +3586,15 @@ function CThumbnailsManager()
                     setTimeout(oThis.OnScrollTrackBottom, 10);
                 }
             }
+
+            var cursor_dragged = "default";
+            if (AscBrowser.isWebkit)
+                cursor_dragged = "-webkit-grabbing";
+            else if (AscBrowser.isMozilla)
+                cursor_dragged = "-moz-grabbing";
+
+            oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_dragged;
+
             return;
         }
 
@@ -3601,15 +3612,21 @@ function CThumbnailsManager()
             }
         }
 
+        var cursor_moved = "default";
+
         if (pos.Page != -1)
         {
             oThis.m_arrPages[pos.Page].IsFocused = true;
             oThis.OnUpdateOverlay();
+
+            cursor_moved = "pointer";
         }
         else if (_is_old_focused)
         {
             oThis.OnUpdateOverlay();
         }
+
+        oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_moved;
     }
 
     this.OnScrollTrackTop = function()
@@ -3764,9 +3781,46 @@ function CThumbnailsManager()
         {
             this.const_offset_y = 17;
             this.const_offset_b = this.const_offset_y;
-            this.const_offset_r = 4;
+            this.const_offset_r = 8;
             this.const_border_w = 7;
         }
+
+        this.MouseTrackCommonImage = document.createElement("canvas");
+
+        var _im_w = 9;
+        var _im_h = 9;
+
+        this.MouseTrackCommonImage.width = _im_w;
+        this.MouseTrackCommonImage.height = _im_h;
+
+        var _ctx = this.MouseTrackCommonImage.getContext('2d');
+        var _data = _ctx.createImageData(_im_w, _im_h);
+        var _pixels = _data.data;
+
+        var _ind = 0;
+        for (var j = 0; j < _im_h; ++j)
+        {
+            var _off1 = (j > (_im_w >> 1)) ? (_im_w - j - 1) : j;
+            var _off2 = _im_w - _off1 - 1;
+
+            for (var r = 0; r < _im_w; ++r)
+            {
+                if (r <= _off1 || r >= _off2)
+                {
+                    _pixels[_ind++] = 183;
+                    _pixels[_ind++] = 183;
+                    _pixels[_ind++] = 183;
+                    _pixels[_ind++] = 255;
+                }
+                else
+                {
+                    _pixels[_ind + 3] = 0;
+                    _ind += 4;
+                }
+            }
+        }
+
+        _ctx.putImageData(_data, 0, 0);
     }
 
     this.CheckSizes = function()
@@ -4044,7 +4098,12 @@ function CThumbnailsManager()
                 g.b_color1(210, 72, 72, 255);
             */
             if (!page.IsLocked)
-                g.b_color1(0, 0, 0, 255);
+            {
+                if (i == this.m_oWordControl.m_oDrawingDocument.SlideCurrent || !page.IsSelected)
+                    g.b_color1(0, 0, 0, 255);
+                else
+                    g.b_color1(191, 191, 191, 255);
+            }
             else
                 g.b_color1(211, 79, 79, 255);
 
@@ -4067,7 +4126,7 @@ function CThumbnailsManager()
         var _width  = canvas.width;
         var _height = canvas.height;
 
-        context.fillStyle = "#EBEBEB";
+        context.fillStyle = GlobalSkin.BackgroundColorThumbnails;
         context.fillRect(0, 0, _width, _height);
 
         //var _style_select     = "#FFE063";
@@ -4077,7 +4136,7 @@ function CThumbnailsManager()
         //var _style_select       = "#E98859";
         var _style_select       = "#848484";
         var _style_focus        = "#CFCFCF";
-        var _style_select_focus = "#CFCFCF";
+        var _style_select_focus = "#848484";
 
         // selected pages
         context.fillStyle = _style_select;
@@ -4088,7 +4147,7 @@ function CThumbnailsManager()
 
             if (page.IsLocked)
             {
-                var _lock_focus = "#CFCFCF";
+                var _lock_focus = "#D34F4F";
                 var _lock_color = "#D34F4F";
                 /*
                 if (page.IsSelected && page.IsFocused)
@@ -4138,16 +4197,40 @@ function CThumbnailsManager()
         if (this.IsMouseDownTrack && !this.IsMouseDownTrackSimple && -1 != this.MouseDownTrackPosition)
         {
             // теперь нужно просто нарисовать линию
-            context.strokeStyle = "#0000FF";
-            var y = (0.5 * this.const_offset_x) >> 0;
+            context.strokeStyle = "#DEDEDE";
+            var y = (0.5 * this.const_offset_y) >> 0;
             if (this.MouseDownTrackPosition != 0)
                 y = (this.m_arrPages[this.MouseDownTrackPosition - 1].bottom + 1.5 * this.const_border_w) >> 0;
 
-            context.lineWidth = 1;
+            var _left_pos = 0;
+            var _right_pos = _width;
+            if (this.m_arrPages.length > 0)
+            {
+                _left_pos = this.m_arrPages[0].left + 4;
+                _right_pos = this.m_arrPages[0].right - 4;
+            }
+
+            context.lineWidth = 3;
             context.beginPath();
-            context.moveTo(0, y + 0.5);
-            context.lineTo(_width, y + 0.5);
+            context.moveTo(_left_pos, y + 0.5);
+            context.lineTo(_right_pos, y + 0.5);
             context.stroke();
+            context.beginPath();
+
+            if (null != this.MouseTrackCommonImage)
+            {
+                context.drawImage(this.MouseTrackCommonImage, 0, 0,
+                    (this.MouseTrackCommonImage.width + 1) >> 1, this.MouseTrackCommonImage.height,
+                    _left_pos - this.MouseTrackCommonImage.width,
+                    y - (this.MouseTrackCommonImage.height >> 1),
+                    (this.MouseTrackCommonImage.width + 1) >> 1, this.MouseTrackCommonImage.height);
+
+                context.drawImage(this.MouseTrackCommonImage, this.MouseTrackCommonImage.width >> 1, 0,
+                    (this.MouseTrackCommonImage.width + 1) >> 1, this.MouseTrackCommonImage.height,
+                    _right_pos + (this.MouseTrackCommonImage.width >> 1),
+                    y - (this.MouseTrackCommonImage.height >> 1),
+                    (this.MouseTrackCommonImage.width + 1) >> 1, this.MouseTrackCommonImage.height);
+            }
         }
     }
 
