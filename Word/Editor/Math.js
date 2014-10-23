@@ -169,27 +169,26 @@ ParaMath.prototype.Add = function(Item)
     if (para_Math_Run !== Run.Type)
         return;
 
+    var NewElement = null;
     if (para_Text === Type)
     {
         if(Item.Value == 38)
         {
-            var Amper = new CMathAmp();
-            Run.Add(Amper, true);
+            NewElement = new CMathAmp();
+            Run.Add(NewElement, true);
         }
         else
         {
-            var oText = new CMathText(false);
-            oText.add(Item.Value);
-            Run.Add(oText, true);
+            NewElement = new CMathText(false);
+            NewElement.add(Item.Value);
+            Run.Add(NewElement, true);
         }
-
-
     }
     else if (para_Space === Type)
     {
-        var oText = new CMathText(false);
-        oText.addTxt(" ");
-        Run.Add(oText, true);
+        NewElement = new CMathText(false);
+        NewElement.addTxt(" ");
+        Run.Add(NewElement, true);
     }
     else if (para_Math === Type)
     {
@@ -216,6 +215,12 @@ ParaMath.prototype.Add = function(Item)
 
         oContent.CurPos = StartPos + 2; // позиция RightRun
         RightRun.Cursor_MoveToStartPos();
+    }
+
+    if ((para_Text === Type || para_Space === Type) && null !== NewElement)
+    {
+        // Пробуем произвести автозамену
+        oContent.Process_AutoCorrect(NewElement);
     }
 
     // Корректируем данный контент

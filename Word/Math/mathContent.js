@@ -1133,6 +1133,20 @@ CMathContent.prototype =
             else if(bDeleteEmptyRun)
             {
                 this.Remove_FromContent(currPos, 1);
+
+                if (this.CurPos === currPos)
+                {
+                    if (bLeftRun)
+                    {
+                        this.CurPos = currPos - 1;
+                        this.content[this.CurPos].Cursor_MoveToEndPos(false);
+                    }
+                    else //if (bRightRun)
+                    {
+                        this.CurPos = currPos;
+                        this.content[this.CurPos].Cursor_MoveToStartPos();
+                    }
+                }
             }
             else
                 currPos++;
@@ -4520,5 +4534,655 @@ CMathContent.prototype.Get_SelectionDirection = function()
         return -1;
 
     return this.content[this.Selection.Start].Get_SelectionDirection();
+};
+CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
+{
+    if (false === this.private_NeedAutoCorrect(ActionElement))
+        return;
+
+    var AutoCorrectEngine = new CMathAutoCorrectEngine(ActionElement);
+
+    var nCount = this.content.length;
+    for (var nPos = 0; nPos < nCount; nPos++)
+    {
+        var Element = this.content[nPos];
+
+        if (para_Math_Run === Element.Type)
+            Element.Get_TextForAutoCorrect(AutoCorrectEngine, nPos);
+        else
+            AutoCorrectEngine.Add_Element(Element, nPos);
+
+        if (false === AutoCorrectEngine.CollectText)
+            break;
+    }
+
+    var bCursorStepRight = false;
+    // Смотрим возможно ли выполнить автозамену, если нет, тогда пробуем произвести автозамену пропуская последний символ
+    var CanMakeAutoCorrect = this.private_CanAutoCorrection(AutoCorrectEngine, false);
+
+    if (false === CanMakeAutoCorrect)
+    {
+        // Пробуем произвести автозамену без последнего добавленного символа
+        if (0x20 === ActionElement.value)
+            CanMakeAutoCorrect = this.private_CanAutoCorrection(AutoCorrectEngine, true);
+        else
+        {
+            AutoCorrectEngine.Elements.splice(AutoCorrectEngine.Elements.length - 1, 1);
+            CanMakeAutoCorrect = this.private_CanAutoCorrection(AutoCorrectEngine, false);
+            bCursorStepRight = true;
+        }
+    }
+
+
+    if (true === CanMakeAutoCorrect)
+    {
+        History.Create_NewPoint();
+
+        var ElementsCount = AutoCorrectEngine.Elements.length;
+        var LastElement = null;
+
+        var FirstElement    = AutoCorrectEngine.Elements[ElementsCount - 1];
+        var FirstElementPos = FirstElement.ElementPos;
+        FirstElement.Pos++;
+        for (var nPos = 0, nCount = AutoCorrectEngine.RemoveCount; nPos < nCount; nPos++)
+        {
+            LastElement = AutoCorrectEngine.Elements[ElementsCount - nPos - 1];
+
+            if (undefined !== LastElement.Run)
+            {
+                if (FirstElement.Run === LastElement.Run)
+                    FirstElement.Pos--;
+
+                LastElement.Run.Remove_FromContent(LastElement.Pos, 1);
+            }
+            else
+            {
+                this.Remove_FromContent(LastElement.ElementPos, 1);
+                FirstElementPos--;
+            }
+        }
+
+        var NewRun = FirstElement.Run.Split2(FirstElement.Pos);
+
+        this.Internal_Content_Add(FirstElementPos + 1, NewRun, false);
+
+        var NewElementsCount = AutoCorrectEngine.ReplaceContent.length;
+        for (var nPos = 0; nPos < NewElementsCount; nPos++)
+        {
+            this.Internal_Content_Add(nPos + FirstElementPos + 1, AutoCorrectEngine.ReplaceContent[nPos], false);
+        }
+
+        this.CurPos = FirstElementPos + NewElementsCount + 1;
+        this.content[this.CurPos].Cursor_MoveToStartPos();
+
+        if (true === bCursorStepRight)
+        {
+            // TODO: Переделать через функцию в ране
+            if (this.content[this.CurPos].Content.length >= 1)
+                this.content[this.CurPos].State.ContentPos = 1;
+        }
+    }
+};
+
+CMathContent.prototype.private_NeedAutoCorrect = function(ActionElement)
+{
+    var CharCode = ActionElement.value;
+    if (1 === g_aMathAutoCorrectTriggerCharCodes[CharCode])
+        return true;
+
+    return false;
+};
+
+CMathContent.prototype.private_CanAutoCorrection = function(AutoCorrectionEngine, bSkipLast)
+{
+    var IndexAdd = (true === bSkipLast ? 1 : 0);
+
+    var ElementsCount = AutoCorrectionEngine.Elements.length;
+    if (AutoCorrectionEngine.Elements.length < 2 + IndexAdd)
+        return false;
+
+    var Result = false;
+
+    var RemoveCount = 0;
+    var ReplaceChar = ' ';
+    var AutoCorrectCount = g_aAutoCorrectMathSymbols.length;
+    for (var nIndex = 0; nIndex < AutoCorrectCount; nIndex++)
+    {
+        var AutoCorrectElement = g_aAutoCorrectMathSymbols[nIndex];
+        var CheckString = AutoCorrectElement[0];
+        var CheckStringLen = CheckString.length;
+
+        if (ElementsCount < CheckStringLen)
+            continue;
+
+        var Found = true;
+
+        // Начинаем проверять с конца строки
+        for (var nStringPos = 0; nStringPos < CheckStringLen; nStringPos++)
+        {
+            var LastElement = AutoCorrectionEngine.Elements[ElementsCount - nStringPos - 1 - IndexAdd];
+            if (undefined === LastElement.Text || LastElement.Text !== CheckString.charAt(CheckStringLen - nStringPos - 1))
+            {
+                Found = false;
+                break;
+            }
+        }
+
+        if (true === Found)
+        {
+            RemoveCount = CheckStringLen + IndexAdd;
+            ReplaceChar = AutoCorrectElement[1];
+        }
+    }
+
+    if (RemoveCount > 0)
+    {
+        var ReplaceText = new CMathText();
+        ReplaceText.add(ReplaceChar);
+
+        var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+        MathRun.Add(ReplaceText, true);
+
+        AutoCorrectionEngine.RemoveCount = RemoveCount;
+        AutoCorrectionEngine.ReplaceContent.push(MathRun);
+
+        Result = true;
+    }
+
+    return Result;
+};
+
+function CMathAutoCorrectEngine(Element)
+{
+    this.ActionElement  = Element; // Элемент на которотом срабатывает автодополнение
+    this.Elements       = [];
+
+    this.CollectText    = true;
+
+    this.RemoveCount    = 0;
+    this.ReplaceContent = [];
+}
+
+CMathAutoCorrectEngine.prototype.Add_Element = function(Element, ElementPos)
+{
+    this.Elements.push({Element : Element, ElementPos : ElementPos});
+};
+
+CMathAutoCorrectEngine.prototype.Add_Text = function(Text, Run, Pos, ElementPos)
+{
+    this.Elements.push({Text : Text, Run : Run, Pos : Pos, ElementPos : ElementPos});
+};
+
+CMathAutoCorrectEngine.prototype.Get_ActionElement = function()
+{
+    return this.ActionElement;
+};
+
+CMathAutoCorrectEngine.prototype.Stop_CollectText = function()
+{
+    this.CollectText = false;
+};
+
+var g_aAutoCorrectMathSymbols =
+[
+        ['!!', 0x203C],
+        ['...', 0x2026],
+        ['::', 0x2237],
+        [':=', 0x2254],
+        ['\\above', 0x2534],
+        ['\\acute', 0x0301],
+        ['\\aleph', 0x2135],
+        ['\\alpha', 0x03B1],
+        ['\\Alpha', 0x0391],
+        ['\\amalg', 0x2210],
+        ['\\angle', 0x2220],
+        ['\\aoint', 0x2233],
+        ['\\approx', 0x2248],
+        ['\\asmash', 0x2B06],
+        ['\\ast', 0x2217],
+        ['\\asymp', 0x224D],
+        ['\\atop', 0x00A6],
+        ['\\bar', 0x0305],
+        ['\\Bar', 0x033F],
+        ['\\because', 0x2235],
+        ['\\begin', 0x3016],
+        ['\\below', 0x252C],
+        ['\\bet', 0x2136],
+        ['\\beta', 0x03B2],
+        ['\\Beta', 0x0392],
+        ['\\beth', 0x2136],
+        ['\\bigcap', 0x22C2],
+        ['\\bigcup', 0x22C3],
+        ['\\bigodot', 0x2A00],
+        ['\\bigoplus', 0x2A01],
+        ['\\bigotimes', 0x2A02],
+        ['\\bigsqcup', 0x2A06],
+        ['\\biguplus', 0x2A04],
+        ['\\bigvee', 0x22C1],
+        ['\\bigwedge', 0x22C0],
+        ['\\bot', 0x22A5],
+        ['\\bowtie', 0x22C8],
+        ['\\box', 0x25A1],
+        ['\\bra', 0x27E8],
+        ['\\breve', 0x0306],
+        ['\\bullet', 0x2219],
+        ['\\cap', 0x2229],
+        ['\\cbrt', 0x221B],
+        ['\\cdot', 0x22C5],
+        ['\\cdots', 0x22EF],
+        ['\\check', 0x030C],
+        ['\\chi', 0x03C7],
+        ['\\Chi', 0x03A7],
+        ['\\circ', 0x2218],
+        ['\\close', 0x2524],
+        ['\\clubsuit', 0x2663],
+        ['\\coint', 0x2232],
+        ['\\cong', 0x2245],
+        ['\\coprod', 0x2210],
+        ['\\cup', 0x222A],
+        ['\\dalet', 0x2138],
+        ['\\daleth', 0x2138],
+        ['\\dashv', 0x22A3],
+        ['\\dd', 0x2146],
+        ['\\Dd', 0x2145],
+        ['\\ddddot', 0x20DC],
+        ['\\dddot', 0x20DB],
+        ['\\ddot', 0x0308],
+        ['\\ddots', 0x22F1],
+        ['\\degree', 0x00B0],
+        ['\\delta', 0x03B4],
+        ['\\Delta', 0x0394],
+        ['\\diamond', 0x22C4],
+        ['\\diamondsuit', 0x2662],
+        ['\\div', 0x00F7],
+        ['\\dot', 0x0307],
+        ['\\doteq', 0x2250],
+        ['\\dots', 0x2026],
+        ['\\doublea', 0x1D552],
+        ['\\doubleA', 0x1D538],
+        ['\\doubleb', 0x1D553],
+        ['\\doubleB', 0x1D539],
+        ['\\doublec', 0x1D554],
+        ['\\doubleC', 0x2102],
+        ['\\doubled', 0x1D555],
+        ['\\doubleD', 0x1D53B],
+        ['\\doublee', 0x1D556],
+        ['\\doubleE', 0x1D53C],
+        ['\\doublef', 0x1D557],
+        ['\\doubleF', 0x1D53D],
+        ['\\doubleg', 0x1D558],
+        ['\\doubleG', 0x1D53E],
+        ['\\doubleh', 0x1D559],
+        ['\\doubleH', 0x210D],
+        ['\\doublei', 0x1D55A],
+        ['\\doubleI', 0x1D540],
+        ['\\doublej', 0x1D55B],
+        ['\\doubleJ', 0x1D541],
+        ['\\doublek', 0x1D55C],
+        ['\\doubleK', 0x1D542],
+        ['\\doublel', 0x1D55D],
+        ['\\doubleL', 0x1D543],
+        ['\\doublem', 0x1D55E],
+        ['\\doubleM', 0x1D544],
+        ['\\doublen', 0x1D55F],
+        ['\\doubleN', 0x2115],
+        ['\\doubleo', 0x1D560],
+        ['\\doubleO', 0x1D546],
+        ['\\doublep', 0x1D561],
+        ['\\doubleP', 0x2119],
+        ['\\doubleq', 0x1D562],
+        ['\\doubleQ', 0x211A],
+        ['\\doubler', 0x1D563],
+        ['\\doubleR', 0x211D],
+        ['\\doubles', 0x1D564],
+        ['\\doubleS', 0x1D54A],
+        ['\\doublet', 0x1D565],
+        ['\\doubleT', 0x1D54B],
+        ['\\doubleu', 0x1D566],
+        ['\\doubleU', 0x1D54C],
+        ['\\doublev', 0x1D567],
+        ['\\doubleV', 0x1D54D],
+        ['\\doublew', 0x1D568],
+        ['\\doubleW', 0x1D54E],
+        ['\\doublex', 0x1D569],
+        ['\\doubleX', 0x1D54F],
+        ['\\doubley', 0x1D56A],
+        ['\\doubleY', 0x1D550],
+        ['\\doublez', 0x1D56B],
+        ['\\doubleZ', 0x2124],
+        ['\\downarrow', 0x2193],
+        ['\\Downarrow', 0x21D3],
+        ['\\dsmash', 0x2B07],
+        ['\\ee', 0x2147],
+        ['\\ell', 0x2113],
+        ['\\emptyset', 0x2205],
+        ['\\end', 0x3017],
+        ['\\ensp', 0x2002],
+        ['\\epsilon', 0x03F5],
+        ['\\Epsilon', 0x0395],
+        ['\\eqarray', 0x2588],
+        ['\\equiv', 0x2261],
+        ['\\eta', 0x03B7],
+        ['\\Eta', 0x0397],
+        ['\\exists', 0x2203],
+        ['\\forall', 0x2200],
+        ['\\fraktura', 0x1D51E],
+        ['\\frakturA', 0x1D504],
+        ['\\frakturb', 0x1D51F],
+        ['\\frakturB', 0x1D505],
+        ['\\frakturc', 0x1D520],
+        ['\\frakturC', 0x212D],
+        ['\\frakturd', 0x1D521],
+        ['\\frakturD', 0x1D507],
+        ['\\frakture', 0x1D522],
+        ['\\frakturE', 0x1D508],
+        ['\\frakturf', 0x1D523],
+        ['\\frakturF', 0x1D509],
+        ['\\frakturg', 0x1D524],
+        ['\\frakturG', 0x1D50A],
+        ['\\frakturh', 0x1D525],
+        ['\\frakturH', 0x210C],
+        ['\\frakturi', 0x1D526],
+        ['\\frakturI', 0x2111],
+        ['\\frakturj', 0x1D527],
+        ['\\frakturJ', 0x1D50D],
+        ['\\frakturk', 0x1D528],
+        ['\\frakturK', 0x1D50E],
+        ['\\frakturl', 0x1D529],
+        ['\\frakturL', 0x1D50F],
+        ['\\frakturm', 0x1D52A],
+        ['\\frakturM', 0x1D510],
+        ['\\frakturn', 0x1D52B],
+        ['\\frakturN', 0x1D511],
+        ['\\frakturo', 0x1D52C],
+        ['\\frakturO', 0x1D512],
+        ['\\frakturp', 0x1D52D],
+        ['\\frakturP', 0x1D513],
+        ['\\frakturq', 0x1D52E],
+        ['\\frakturQ', 0x1D514],
+        ['\\frakturr', 0x1D52F],
+        ['\\frakturR', 0x211C],
+        ['\\frakturs', 0x1D530],
+        ['\\frakturS', 0x1D516],
+        ['\\frakturt', 0x1D531],
+        ['\\frakturT', 0x1D517],
+        ['\\frakturu', 0x1D532],
+        ['\\frakturU', 0x1D518],
+        ['\\frakturv', 0x1D533],
+        ['\\frakturV', 0x1D519],
+        ['\\frakturw', 0x1D534],
+        ['\\frakturW', 0x1D51A],
+        ['\\frakturx', 0x1D535],
+        ['\\frakturX', 0x1D51B],
+        ['\\fraktury', 0x1D536],
+        ['\\frakturY', 0x1D51C],
+        ['\\frakturz', 0x1D537],
+        ['\\frakturZ', 0x2128],
+        ['\\funcapply', 0x2061],
+        ['\\gamma', 0x03B3],
+        ['\\Gamma', 0x0393],
+        ['\\ge', 0x2265],
+        ['\\geq', 0x2265],
+        ['\\gets', 0x2190],
+        ['\\gg', 0x226B],
+        ['\\gimel', 0x2137],
+        ['\\grave', 0x0300],
+        ['\\hairsp', 0x200A],
+        ['\\hat', 0x0302],
+        ['\\hbar', 0x210F],
+        ['\\heartsuit', 0x2661],
+        ['\\hookleftarrow', 0x21A9],
+        ['\\hookrightarrow', 0x21AA],
+        ['\\hphantom', 0x2B04],
+        ['\\hvec', 0x20D1],
+        ['\\ii', 0x2148],
+        ['\\iiint', 0x222D],
+        ['\\iint', 0x222C],
+        ['\\Im', 0x2111],
+        ['\\in', 0x2208],
+        ['\\inc', 0x2206],
+        ['\\infty', 0x221E],
+        ['\\int', 0x222B],
+        ['\\iota', 0x03B9],
+        ['\\Iota', 0x0399],
+        ['\\jj', 0x2149],
+        ['\\kappa', 0x03BA],
+        ['\\Kappa', 0x039A],
+        ['\\ket', 0x27E9],
+        ['\\lambda', 0x03BB],
+        ['\\Lambda', 0x039B],
+        ['\\langle', 0x2329],
+        ['\\lbrace', 0x007B],
+        ['\\lbrack', 0x005B],
+        ['\\lceil', 0x2308],
+        ['\\ldiv', 0x2215],
+        ['\\ldivide', 0x2215],
+        ['\\ldots', 0x2026],
+        ['\\le', 0x2264],
+        ['\\left', 0x251C],
+        ['\\leftarrow', 0x2190],
+        ['\\Leftarrow', 0x21D0],
+        ['\\leftharpoondown', 0x21BD],
+        ['\\leftharpoonup', 0x21BC],
+        ['\\leftrightarrow', 0x2194],
+        ['\\Leftrightarrow', 0x21D4],
+        ['\\leq', 0x2264],
+        ['\\lfloor', 0x230A],
+        ['\\ll', 0x226A],
+        ['\\mapsto', 0x21A6],
+        ['\\matrix', 0x25A0],
+        ['\\medsp', 0x205F],
+        ['\\mid', 0x2223],
+        ['\\models', 0x22A8],
+        ['\\mp', 0x2213],
+        ['\\mu', 0x03BC],
+        ['\\Mu', 0x039C],
+        ['\\nabla', 0x2207],
+        ['\\naryand', 0x2592],
+        ['\\nbsp', 0x00A0],
+        ['\\ne', 0x2260],
+        ['\\nearrow', 0x2197],
+        ['\\neq', 0x2260],
+        ['\\ni', 0x220B],
+        ['\\norm', 0x2016],
+        ['\\notcontain', 0x220C],
+        ['\\notelement', 0x2209],
+        ['\\nu', 0x03BD],
+        ['\\Nu', 0x039D],
+        ['\\nwarrow', 0x2196],
+        ['\\o', 0x03BF],
+        ['\\O', 0x039F],
+        ['\\odot', 0x2299],
+        ['\\of', 0x2592],
+        ['\\oiiint', 0x2230],
+        ['\\oiint', 0x222F],
+        ['\\oint', 0x222E],
+        ['\\omega', 0x03C9],
+        ['\\Omega', 0x03A9],
+        ['\\ominus', 0x2296],
+        ['\\open', 0x251C],
+        ['\\oplus', 0x2295],
+        ['\\otimes', 0x2297],
+        ['\\over', 0x002F],
+        ['\\overbar', 0x00AF],
+        ['\\overbrace', 0x23DE],
+        ['\\overparen', 0x23DC],
+        ['\\parallel', 0x2225],
+        ['\\partial', 0x2202],
+        ['\\phantom', 0x27E1],
+        ['\\phi', 0x03D5],
+        ['\\Phi', 0x03A6],
+        ['\\pi', 0x03C0],
+        ['\\Pi', 0x03A0],
+        ['\\pm', 0x00B1],
+        ['\\pppprime', 0x2057],
+        ['\\ppprime', 0x2034],
+        ['\\pprime', 0x2033],
+        ['\\prec', 0x227A],
+        ['\\preceq', 0x227C],
+        ['\\prime', 0x2032],
+        ['\\prod', 0x220F],
+        ['\\propto', 0x221D],
+        ['\\psi', 0x03C8],
+        ['\\Psi', 0x03A8],
+        ['\\qdrt', 0x221C],
+        // TODO: \\quadratic
+        ['\\rangle', 0x232A],
+        ['\\ratio', 0x2236],
+        ['\\rbrace', 0x007D],
+        ['\\rbrack', 0x005D],
+        ['\\rceil', 0x2309],
+        ['\\rddots', 0x22F0],
+        ['\\Re', 0x211C],
+        ['\\rect', 0x25AD],
+        ['\\rfloor', 0x230B],
+        ['\\rho', 0x03C1],
+        ['\\Rho', 0x03A1],
+        ['\\right', 0x2524],
+        ['\\rightarrow', 0x2192],
+        ['\\Rightarrow', 0x21D2],
+        ['\\rightharpoondown', 0x21C1],
+        ['\\rightharpoonup', 0x21C0],
+        ['\\scripta', 0x1D4B6],
+        ['\\scriptA', 0x1D49C],
+        ['\\scriptb', 0x1D4B7],
+        ['\\scriptB', 0x212C],
+        ['\\scriptc', 0x1D4B8],
+        ['\\scriptC', 0x1D49E],
+        ['\\scriptd', 0x1D4B9],
+        ['\\scriptD', 0x1D49F],
+        ['\\scripte', 0x212F],
+        ['\\scriptE', 0x2130],
+        ['\\scriptf', 0x1D4BB],
+        ['\\scriptF', 0x2131],
+        ['\\scriptg', 0x210A],
+        ['\\scriptG', 0x1D4A2],
+        ['\\scripth', 0x1D4BD],
+        ['\\scriptH', 0x210B],
+        ['\\scripti', 0x1D4BE],
+        ['\\scriptI', 0x2110],
+        ['\\scriptj', 0x1D4BF],
+        ['\\scriptJ', 0x1D4A5],
+        ['\\scriptk', 0x1D4C0],
+        ['\\scriptK', 0x1D4A6],
+        ['\\scriptl', 0x2113],
+        ['\\scriptL', 0x2112],
+        ['\\scriptm', 0x1D4C2],
+        ['\\scriptM', 0x2133],
+        ['\\scriptn', 0x1D4C3],
+        ['\\scriptN', 0x1D4A9],
+        ['\\scripto', 0x2134],
+        ['\\scriptO', 0x1D4AA],
+        ['\\scriptp', 0x1D4C5],
+        ['\\scriptP', 0x1D4AB],
+        ['\\scriptq', 0x1D4C6],
+        ['\\scriptQ', 0x1D4AC],
+        ['\\scriptr', 0x1D4C7],
+        ['\\scriptR', 0x211B],
+        ['\\scripts', 0x1D4C8],
+        ['\\scriptS', 0x1D4AE],
+        ['\\scriptt', 0x1D4C9],
+        ['\\scriptT', 0x1D4AF],
+        ['\\scriptu', 0x1D4CA],
+        ['\\scriptU', 0x1D4B0],
+        ['\\scriptv', 0x1D4CB],
+        ['\\scriptV', 0x1D4B1],
+        ['\\scriptw', 0x1D4CC],
+        ['\\scriptW', 0x1D4B2],
+        ['\\scriptx', 0x1D4CD],
+        ['\\scriptX', 0x1D4B3],
+        ['\\scripty', 0x1D4CE],
+        ['\\scriptY', 0x1D4B4],
+        ['\\scriptz', 0x1D4CF],
+        ['\\scriptZ', 0x1D4B5],
+        ['\\sdiv', 0x2044],
+        ['\\sdivide', 0x2044],
+        ['\\searrow', 0x2198],
+        ['\\setminus', 0x2216],
+        ['\\sigma', 0x03C3],
+        ['\\Sigma', 0x03A3],
+        ['\\sim', 0x223C],
+        ['\\simeq', 0x2243],
+        ['\\smash', 0x2B0D],
+        ['\\spadesuit', 0x2660],
+        ['\\sqcap', 0x2293],
+        ['\\sqcup', 0x2294],
+        ['\\sqrt', 0x221A],
+        ['\\sqsubseteq', 0x2291],
+        ['\\sqsuperseteq', 0x2292],
+        ['\\star', 0x22C6],
+        ['\\subset', 0x2282],
+        ['\\subseteq', 0x2286],
+        ['\\succ', 0x227B],
+        ['\\succeq', 0x227D],
+        ['\\sum', 0x2211],
+        ['\\superset', 0x2283],
+        ['\\superseteq', 0x2287],
+        ['\\swarrow', 0x2199],
+        ['\\tau', 0x03C4],
+        ['\\Tau', 0x03A4],
+        ['\\therefore', 0x2234],
+        ['\\theta', 0x03B8],
+        ['\\Theta', 0x0398],
+        ['\\thicksp', 0x2005],
+        ['\\thinsp', 0x2006],
+        ['\\tilde', 0x0303],
+        ['\\times', 0x00D7],
+        ['\\to', 0x2192],
+        ['\\top', 0x22A4],
+        ['\\tvec', 0x20E1],
+        ['\\ubar', 0x0332],
+        ['\\Ubar', 0x0333],
+        ['\\underbar', 0x2581],
+        ['\\underbrace', 0x23DF],
+        ['\\underparen', 0x23DD],
+        ['\\uparrow', 0x2191],
+        ['\\Uparrow', 0x21D1],
+        ['\\updownarrow', 0x2195],
+        ['\\Updownarrow', 0x21D5],
+        ['\\uplus', 0x228E],
+        ['\\upsilon', 0x03C5],
+        ['\\Upsilon', 0x03A5],
+        ['\\varepsilon', 0x03B5],
+        ['\\varphi', 0x03C6],
+        ['\\varpi', 0x03D6],
+        ['\\varrho', 0x03F1],
+        ['\\varsigma', 0x03C2],
+        ['\\vartheta', 0x03D1],
+        ['\\vbar', 0x2502],
+        ['\\vdash', 0x22A2],
+        ['\\vdots', 0x22EE],
+        ['\\vec', 0x20D7],
+        ['\\vee', 0x2228],
+        ['\\vert', 0x007C],
+        ['\\Vert', 0x2016],
+        ['\\vphantom', 0x21F3],
+        ['\\vthicksp', 0x2004],
+        ['\\wedge', 0x2227],
+        ['\\wp', 0x2118],
+        ['\\wr', 0x2240],
+        ['\\xi', 0x03BE],
+        ['\\Xi', 0x039E],
+        ['\\zeta', 0x03B6],
+        ['\\Zeta', 0x0396],
+        ['\\zwnj', 0x200C],
+        ['\\zwsp', 0x200B],
+        ['~=', 0x2245],
+        ['-+', 0x2213],
+        ['+-', 0x00B1],
+        ['<<', 0x226A],
+        ['<=', 0x2264],
+        ['->', 0x2192],
+        ['>=', 0x2265],
+        ['>>', 0x226B]
+];
+
+var g_aMathAutoCorrectTriggerCharCodes =
+{
+    0x20 : 1, 0x21 : 1, 0x22 : 1, 0x23 : 1, 0x24 : 1, 0x25 : 1, 0x26 : 1,
+    0x27 : 1, 0x28 : 1, 0x29 : 1, 0x2A : 1, 0x2B : 1, 0x2C : 1, 0x2D : 1,
+    0x2E : 1, 0x2F : 1, 0x3A : 1, 0x3B : 1, 0x3C : 1, 0x3D : 1, 0x3E : 1,
+    0x3F : 1, 0x40 : 1, 0x5B : 1, 0x5C : 1, 0x5D : 1, 0x5E : 1, 0x5F : 1,
+    0x60 : 1, 0x7B : 1, 0x7C : 1, 0x7D : 1, 0x7E : 1
 };
 
