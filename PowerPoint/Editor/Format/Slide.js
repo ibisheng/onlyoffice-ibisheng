@@ -784,7 +784,6 @@ Slide.prototype =
 
     checkDrawingUniNvPr: function(drawing)
     {
-        return;
         var nv_sp_pr;
         if(drawing)
         {
