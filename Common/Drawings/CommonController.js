@@ -3330,7 +3330,8 @@ DrawingObjectsController.prototype =
     remove: function(dir)
     {
         var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-        if(asc["editor"] && asc["editor"].isChartEditor)
+        var content = this.getTargetDocContent();
+        if(asc["editor"] && asc["editor"].isChartEditor && !content)
         {
             return;
         }
