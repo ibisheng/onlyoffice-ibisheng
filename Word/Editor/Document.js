@@ -9126,7 +9126,8 @@ CDocument.prototype =
                         var oMath = oSelectedInfo.Get_Math();
                         if (null !== oMath && oMath.Is_InInnerContent())
                         {
-                            oMath.Handle_AddNewLine();
+                            if (oMath.Handle_AddNewLine())
+                                this.Recalculate();
                         }
                         else
                         {
