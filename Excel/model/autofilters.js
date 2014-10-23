@@ -6226,7 +6226,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(tableColumns[i].Name)
 							name = tableColumns[i].Name.split("Column");
-						if(name[1] && !isNaN(parseFloat(name[1])) && index == parseFloat(name[1]))
+						if(name && name[1] && !isNaN(parseFloat(name[1])) && index == parseFloat(name[1]))
 						{
 							index++;
 							i = -1;
@@ -6239,14 +6239,14 @@ var gUndoInsDelCellsFlag = true;
 					var name;
 					if(tableColumns[indexInsertColumn] && tableColumns[indexInsertColumn].Name)
 						name = tableColumns[indexInsertColumn].Name.split("Column");
-					if(name[1] && !isNaN(parseFloat(name[1])))
+					if(name && name[1] && !isNaN(parseFloat(name[1])))
 						index = parseFloat(name[1]) + 1;
 					
 					for(var i = 0; i < tableColumns.length; i++)
 					{
 						if(tableColumns[i].Name)
 							name = tableColumns[i].Name.split("Column");
-						if(name[1] && !isNaN(parseFloat(name[1])) && index == parseFloat(name[1]))
+						if(name && name[1] && !isNaN(parseFloat(name[1])) && index == parseFloat(name[1]))
 						{
 							index = parseInt((index - 1) + "2"); 
 							i = -1;
@@ -6469,6 +6469,7 @@ var gUndoInsDelCellsFlag = true;
 								}	
 								else if(val == "")//если пустая изменяем генерируем имя и добавляем его в TableColumns  
 								{
+									filter.TableColumns[j - tableRange.c1].Name = "";
 									generateName = this._generateColumnName(filter.TableColumns);
 									cell.setValue(generateName);
 									cell.setNumFormat("@");
