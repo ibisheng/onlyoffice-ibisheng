@@ -3177,6 +3177,9 @@ function CThumbnailsManager()
 
     this.MouseTrackCommonImage = null;
 
+    this.MouseThumbnailsAnimateScrollTopTimer = -1;
+    this.MouseThumbnailsAnimateScrollBottomTimer = -1;
+
     this.m_oWordControl = null;
     var oThis = this;
 
@@ -3317,6 +3320,8 @@ function CThumbnailsManager()
             return false;
         }
         check_MouseDownEvent(e);
+        global_mouseEvent.LockMouse();
+
         if (global_mouseEvent.Sender != control)
         {
             // такого быть не должно
@@ -3577,23 +3582,30 @@ function CThumbnailsManager()
                 var _Y = global_mouseEvent.Y - oThis.m_oWordControl.Y;
                 var _abs_pos = oThis.m_oWordControl.m_oThumbnails.AbsolutePosition;
                 var _YMax = (_abs_pos.B - _abs_pos.T) * g_dKoef_mm_to_pix;
-                if (oThis.MouseDownTrackPosition != -1 && _Y >= 0 && _Y < 30)
+
+                var _check_type = -1;
+                if (/*oThis.MouseDownTrackPosition != -1 && _Y >= 0 && */_Y < 30)
                 {
-                    setTimeout(oThis.OnScrollTrackTop, 10);
+                    _check_type = 0;
                 }
-                else if (oThis.MouseDownTrackPosition != -1 && _Y >= (_YMax - 30) && _Y < _YMax)
+                else if (/*oThis.MouseDownTrackPosition != -1 &&*/_Y >= (_YMax - 30)/* && _Y < _YMax*/)
                 {
-                    setTimeout(oThis.OnScrollTrackBottom, 10);
+                    _check_type = 1;
                 }
+
+                oThis.CheckNeedAnimateScrolls(_check_type);
             }
 
-            var cursor_dragged = "default";
-            if (AscBrowser.isWebkit)
-                cursor_dragged = "-webkit-grabbing";
-            else if (AscBrowser.isMozilla)
-                cursor_dragged = "-moz-grabbing";
+            if (!oThis.IsMouseDownTrackSimple)
+            {
+                var cursor_dragged = "default";
+                if (AscBrowser.isWebkit)
+                    cursor_dragged = "-webkit-grabbing";
+                else if (AscBrowser.isMozilla)
+                    cursor_dragged = "-moz-grabbing";
 
-            oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_dragged;
+                oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_dragged;
+            }
 
             return;
         }
@@ -3629,6 +3641,54 @@ function CThumbnailsManager()
         oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_moved;
     }
 
+    this.CheckNeedAnimateScrolls = function(type)
+    {
+        if (type == -1)
+        {
+            // нужно застопить все
+            if (this.MouseThumbnailsAnimateScrollTopTimer != -1)
+            {
+                clearInterval(this.MouseThumbnailsAnimateScrollTopTimer);
+                this.MouseThumbnailsAnimateScrollTopTimer = -1;
+            }
+
+            if (this.MouseThumbnailsAnimateScrollBottomTimer != -1)
+            {
+                clearInterval(this.MouseThumbnailsAnimateScrollBottomTimer);
+                this.MouseThumbnailsAnimateScrollBottomTimer = -1;
+            }
+        }
+
+        if (type == 0)
+        {
+            if (this.MouseThumbnailsAnimateScrollBottomTimer != -1)
+            {
+                clearInterval(this.MouseThumbnailsAnimateScrollBottomTimer);
+                this.MouseThumbnailsAnimateScrollBottomTimer = -1;
+            }
+
+            if (-1 == this.MouseThumbnailsAnimateScrollTopTimer)
+            {
+                this.MouseThumbnailsAnimateScrollTopTimer = setInterval(this.OnScrollTrackTop, 50);
+            }
+            return;
+        }
+        if (type == 1)
+        {
+            if (this.MouseThumbnailsAnimateScrollTopTimer != -1)
+            {
+                clearInterval(this.MouseThumbnailsAnimateScrollTopTimer);
+                this.MouseThumbnailsAnimateScrollTopTimer = -1;
+            }
+
+            if (-1 == this.MouseThumbnailsAnimateScrollBottomTimer)
+            {
+                this.MouseThumbnailsAnimateScrollBottomTimer = setInterval(this.OnScrollTrackBottom, 50);
+            }
+            return;
+        }
+    }
+
     this.OnScrollTrackTop = function()
     {
         oThis.m_oWordControl.m_oScrollThumbApi.scrollByY(-45);
@@ -3641,12 +3701,16 @@ function CThumbnailsManager()
     this.onMouseUp = function(e)
     {
         check_MouseUpEvent(e);
+        global_mouseEvent.UnLockMouse();
+
         var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
         if (global_mouseEvent.Sender != control)
         {
             // такого быть не должно
             return;
         }
+
+        oThis.CheckNeedAnimateScrolls(-1);
 
         if (!oThis.IsMouseDownTrack)
             return;
