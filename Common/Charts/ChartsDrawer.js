@@ -34,7 +34,7 @@ CChartsDrawer.prototype =
 			this.calcProp.pxToMM = 1 / chartSpace.convertPixToMM(1);
 			this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
 			this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
-		};
+		}
 		
 		//создаём область
 		this.allAreaChart = new allAreaChart();
@@ -119,7 +119,7 @@ CChartsDrawer.prototype =
 		
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 				this.gridChart.reCalculate(this.calcProp, this, chartSpace);
-		};
+		}
 		
 		this.allAreaChart.reCalculate(this.calcProp);
 		
@@ -127,7 +127,7 @@ CChartsDrawer.prototype =
 		{
 			this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
 			this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
-		};
+		}
 		
 		if(!chartSpace.bEmptySeries)
 			this.chart.reCalculate(this, chartSpace);
@@ -158,7 +158,7 @@ CChartsDrawer.prototype =
 			}
 			
 			this.chart.draw(this, cShapeDrawer, chartSpace);
-		};
+		}
 	},
 	
 	
@@ -202,8 +202,8 @@ CChartsDrawer.prototype =
 					pos = {x: 0, y: 0};
 					break;
 				}
-			};
-		};
+			}
+		}
 		
 		return {x: pos ? pos.x : undefined, y : pos ? pos.y : undefined};
 	},
@@ -862,8 +862,8 @@ CChartsDrawer.prototype =
 				for (var j = 0; j < this.calcProp.data.length; j++) {
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						this.calcProp.data[j][i] = this._findPrevValue(originalData, j, i)
-					};
-				};
+					}
+				}
 				
 				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
 				this.calcProp.max = maxMinObj.max;
@@ -876,11 +876,11 @@ CChartsDrawer.prototype =
 					summ = 0;
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						summ += Math.abs(this.calcProp.data[j][i]);
-					};
+					}
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
 						this.calcProp.data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
-					};
-				};
+					}
+				}
 				
 				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
 				this.calcProp.max = maxMinObj.max;
@@ -4216,6 +4216,9 @@ drawDoughnutChart.prototype =
 		
 		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
 		
+		if(!point)
+			return;
+		
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
 		
@@ -6011,11 +6014,14 @@ catAxisChart.prototype =
 	_calculateTickMark : function()
 	{
 		var widthLine = 0, widthMinorLine = 0;
+		var crossMajorStep = 0, crossMinorStep = 0;
+		
 		switch ( this.chartSpace.chart.plotArea.catAx.majorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
 				widthLine = 5;
+				crossMajorStep = 5;
 				break;
 			}
 			case TICK_MARK_IN:
@@ -6040,6 +6046,7 @@ catAxisChart.prototype =
 			case TICK_MARK_CROSS:
 			{
 				widthMinorLine = 3;
+				crossMinorStep = 3;
 				break;
 			}
 			case TICK_MARK_IN:
@@ -6063,6 +6070,8 @@ catAxisChart.prototype =
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
+			crossMajorStep = - crossMajorStep;
+			crossMinorStep = - crossMinorStep;
 		}
 		
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.valAx ? this.chartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
@@ -6070,6 +6079,8 @@ catAxisChart.prototype =
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
+			crossMajorStep = - crossMajorStep;
+			crossMinorStep = - crossMinorStep;
 		}
 		
 		if(!(widthLine === 0 && widthMinorLine === 0))
@@ -6077,17 +6088,17 @@ catAxisChart.prototype =
 			//исчключение для вертикальной оси
 			if(this.chartProp.type == "HBar")
 			{
-				this._calculateVerticalTickMarks(widthLine, widthMinorLine);
+				this._calculateVerticalTickMarks(widthLine, widthMinorLine, crossMajorStep, crossMinorStep);
 				
 			}
 			else//для горизонтальной оси
 			{
-				this._calculateHorisontalTickMarks(widthLine, widthMinorLine);
+				this._calculateHorisontalTickMarks(widthLine, widthMinorLine, crossMajorStep, crossMinorStep);
 			}
 		}
 	},
 	
-	_calculateVerticalTickMarks: function(widthLine, widthMinorLine)
+	_calculateVerticalTickMarks: function(widthLine, widthMinorLine, crossMajorStep, crossMinorStep)
 	{
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		var yPoints = this.chartSpace.chart.plotArea.catAx.yPoints;
@@ -6120,7 +6131,7 @@ catAxisChart.prototype =
 				if(i == yPoints.length - 1)
 				{
 					posYtemp = yPoints[i].pos - firstDiff / 2;
-					this.paths.tickMarks[i + 1] = this._calculateLine(posX, posYtemp, posX + widthLine / this.chartProp.pxToMM, posYtemp);
+					this.paths.tickMarks[i + 1] = this._calculateLine(posX - crossMajorStep / this.chartProp.pxToMM, posYtemp, posX + widthLine / this.chartProp.pxToMM, posYtemp);
 				}
 					
 				
@@ -6139,7 +6150,7 @@ catAxisChart.prototype =
 						if(!this.paths.minorTickMarks[i])
 							this.paths.minorTickMarks[i] = [];
 						
-						this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
+						this.paths.minorTickMarks[i][n] = this._calculateLine(posX - crossMinorStep / this.chartProp.pxToMM, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
 					}
 				}
 			}
@@ -6153,12 +6164,12 @@ catAxisChart.prototype =
 				
 				if(!this.paths.tickMarks)
 					this.paths.tickMarks = [];
-				this.paths.tickMarks[i + 1] = this._calculateLine(posX, posY, posX + widthLine / this.chartProp.pxToMM, posY);
+				this.paths.tickMarks[i + 1] = this._calculateLine(posX - crossMajorStep / this.chartProp.pxToMM, posY, posX + widthLine / this.chartProp.pxToMM, posY);
 				
 				if(i == 0)
 				{
 					posYtemp = yPoints[i].pos - firstDiff / 2;
-					this.paths.tickMarks[i] = this._calculateLine(posX, posYtemp, posX + widthLine / this.chartProp.pxToMM, posYtemp);
+					this.paths.tickMarks[i] = this._calculateLine(posX - crossMajorStep / this.chartProp.pxToMM, posYtemp, posX + widthLine / this.chartProp.pxToMM, posYtemp);
 				}
 					
 				
@@ -6177,14 +6188,14 @@ catAxisChart.prototype =
 						if(!this.paths.minorTickMarks[i])
 							this.paths.minorTickMarks[i] = [];
 						
-						this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
+						this.paths.minorTickMarks[i][n] = this._calculateLine(posX - crossMinorStep / this.chartProp.pxToMM, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
 					}
 				}
 			}
 		}
 	},
 	
-	_calculateHorisontalTickMarks: function(widthLine, widthMinorLine)
+	_calculateHorisontalTickMarks: function(widthLine, widthMinorLine, crossMajorStep, crossMinorStep)
 	{
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		var xPoints = this.chartSpace.chart.plotArea.catAx.xPoints;
@@ -6218,7 +6229,7 @@ catAxisChart.prototype =
 				if(i == xPoints.length - 1)
 				{
 					posXtemp = xPoints[i].pos + firstDiff / 2;
-					this.paths.tickMarks[i + 1] = this._calculateLine(posXtemp, posY, posXtemp, posY + widthLine / this.chartProp.pxToMM);
+					this.paths.tickMarks[i + 1] = this._calculateLine(posXtemp, posY - crossMajorStep / this.chartProp.pxToMM, posXtemp, posY + widthLine / this.chartProp.pxToMM);
 				}
 				
 				//промежуточные линии
@@ -6236,7 +6247,7 @@ catAxisChart.prototype =
 						if(!this.paths.minorTickMarks[i])
 							this.paths.minorTickMarks[i] = [];
 						
-						this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
+						this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY - crossMinorStep / this.chartProp.pxToMM, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
 					}
 				}
 			}
@@ -6248,12 +6259,12 @@ catAxisChart.prototype =
 				posX = xPoints[i].pos - firstDiff / 2;
 				if(!this.paths.tickMarks)
 					this.paths.tickMarks = [];
-				this.paths.tickMarks[i + 1] = this._calculateLine(posX, posY, posX, posY + widthLine / this.chartProp.pxToMM);
+				this.paths.tickMarks[i + 1] = this._calculateLine(posX, posY - crossMajorStep / this.chartProp.pxToMM, posX, posY + widthLine / this.chartProp.pxToMM);
 				
 				if(i == 0)
 				{
 					posXtemp = xPoints[i].pos + firstDiff / 2;
-					this.paths.tickMarks[i] = this._calculateLine(posXtemp, posY, posXtemp, posY + widthLine / this.chartProp.pxToMM);;
+					this.paths.tickMarks[i] = this._calculateLine(posXtemp, posY - crossMajorStep / this.chartProp.pxToMM, posXtemp, posY + widthLine / this.chartProp.pxToMM);;
 				}
 				
 				//промежуточные линии
@@ -6271,7 +6282,7 @@ catAxisChart.prototype =
 						if(!this.paths.minorTickMarks[i])
 							this.paths.minorTickMarks[i] = [];
 						
-						this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
+						this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY - crossMinorStep / this.chartProp.pxToMM, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
 					}
 				}
 			}
@@ -6391,11 +6402,14 @@ valAxisChart.prototype =
 	_calculateTickMark : function()
 	{
 		var widthLine = 0, widthMinorLine = 0;
+		var crossMajorStep = 0;
+		var crossMinorStep = 0;
 		switch ( this.chartSpace.chart.plotArea.valAx.majorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
-				widthLine = 0;
+				widthLine = 5;
+				crossMajorStep = 5;
 				break;
 			}
 			case TICK_MARK_IN:
@@ -6420,6 +6434,7 @@ valAxisChart.prototype =
 			case TICK_MARK_CROSS:
 			{
 				widthMinorLine = 3;
+				crossMinorStep = 3;
 				break;
 			}
 			case TICK_MARK_IN:
@@ -6443,6 +6458,8 @@ valAxisChart.prototype =
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
+			crossMajorStep = - crossMajorStep;
+			crossMinorStep = - crossMinorStep;
 		}
 		
 		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
@@ -6450,6 +6467,8 @@ valAxisChart.prototype =
 		{
 			widthMinorLine = - widthMinorLine;
 			widthLine = - widthLine;
+			crossMajorStep = - crossMajorStep;
+			crossMinorStep = - crossMinorStep;
 		}
 		
 		if(!(widthLine === 0 && widthMinorLine === 0))
@@ -6469,7 +6488,7 @@ valAxisChart.prototype =
 					posX = yPoints[i].pos;
 					if(!this.paths.tickMarks)
 						this.paths.tickMarks = [];
-					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX, posY + widthLine / this.chartProp.pxToMM);
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY - crossMajorStep / this.chartProp.pxToMM, posX, posY + widthLine / this.chartProp.pxToMM);
 					
 					//промежуточные линии
 					if(widthMinorLine !== 0)
@@ -6482,7 +6501,7 @@ valAxisChart.prototype =
 							if(!this.paths.minorTickMarks[i])
 								this.paths.minorTickMarks[i] = [];
 							
-							this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY - crossMinorStep / this.chartProp.pxToMM, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
 						}
 					}
 				}
@@ -6505,7 +6524,7 @@ valAxisChart.prototype =
 					
 					if(!this.paths.tickMarks)
 						this.paths.tickMarks = [];
-					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX + widthLine / this.chartProp.pxToMM, posY);
+					this.paths.tickMarks[i] = this._calculateLine(posX - crossMajorStep / this.chartProp.pxToMM, posY, posX + widthLine / this.chartProp.pxToMM, posY);
 					
 					//промежуточные линии
 					if(widthMinorLine !== 0)
@@ -6518,7 +6537,7 @@ valAxisChart.prototype =
 							if(!this.paths.minorTickMarks[i])
 								this.paths.minorTickMarks[i] = [];
 							
-							this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posX - crossMinorStep / this.chartProp.pxToMM, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
 						}
 					}
 				}
