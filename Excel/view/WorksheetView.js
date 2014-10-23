@@ -8107,7 +8107,9 @@
 				selectData = t._pasteFromLS(val);
 			else
 				selectData = t._setInfoAfterPaste(val,onlyActive);
-
+			
+			t.autoFilters._renameTableColumn(t.activeRange);
+			
 			if (!selectData) {
 				bIsUpdate = false;
 				History.EndTransaction();
