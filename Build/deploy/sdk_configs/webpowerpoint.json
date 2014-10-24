@@ -46,10 +46,12 @@
                 "../../Common/NumFormat.js",
                 "../../Word/Editor/Serialize2.js",
                 "../../Common/trackFile.js",
+
                 "../../Word/Editor/Styles.js",
                 "../../Word/Editor/Numbering.js",
                 "../../Word/Drawing/Metafile.js",
                 "../../PowerPoint/Editor/CollaborativeEditing.js",
+
                 "../../Word/Drawing/GraphicsEvents.js",
                 "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Controls.js",
@@ -58,6 +60,7 @@
                 "../../Word/Editor/Common.js",
                 "../../Word/Editor/Sections.js",
                 "../../Common/scroll.js",
+
                 "../../Word/Editor/History.js",
                 "../../Common/Drawings/Hit.js",
                 "../../Common/Drawings/States.js",
@@ -69,6 +72,7 @@
                 "../../Common/Drawings/TrackObjects/PolyLine.js",
                 "../../Common/Drawings/TrackObjects/Spline.js",
                 "../../Common/Drawings/TrackObjects/MoveTracks.js",
+
                 "../../Word/Drawing/HatchPattern.js",
                 "../../Word/Drawing/Graphics.js",
                 "../../Word/Drawing/Overlay.js",
@@ -77,18 +81,25 @@
                 "../../PowerPoint/Drawing/DrawingDocument.js",
                 "../../PowerPoint/Drawing/HtmlPage.js",
                 "../../PowerPoint/apiDefines.js",
+
                 "../../Common/Drawings/Format/Constants.js",
+
+                "../../PowerPoint/themes/Themes.js",
                 "../../Common/Shapes/Serialize.js",
                 "../../Common/Shapes/SerializeWriter.js",
                 "../../Word/Editor/SerializeCommon.js",
+
                 "../../Common/Drawings/Math.js",
                 "../../Common/Drawings/ArcTo.js",
                 "../../Word/Drawing/ColorArray.js",
+                "../../Word/apiCommon.js",
+
+
                 "../../PowerPoint/Editor/Format/Presentation.js",
                 "../../Common/Drawings/CommonController.js",
                 "../../Excel/view/DrawingObjectsController.js",
                 "../../PowerPoint/Editor/DrawingObjectsController.js",
-                "../../Common/Drawings/Format/Constants.js",
+
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/Drawings/Format/CreateGeometry.js",
                 "../../Common/Drawings/Format/Geometry.js",
@@ -103,6 +114,14 @@
                 "../../PowerPoint/Editor/Format/SlideMaster.js",
                 "../../PowerPoint/Editor/Format/Layout.js",
                 "../../PowerPoint/Editor/Format/Comments.js",
+
+                "../../Word/Editor/Styles.js",
+                "../../Word/Editor/Numbering.js",
+                "../../Word/Editor/ParagraphContent.js",
+                "../../Word/Editor/ParagraphContentBase.js",
+                "../../Word/Editor/Hyperlink.js",
+                "../../Word/Editor/Run.js",
+
                 "../../Word/Math/mathTypes.js",
                 "../../Word/Math/mathText.js",
                 "../../Word/Math/mathContent.js",
@@ -116,12 +135,7 @@
                 "../../Word/Math/operators.js",
                 "../../Word/Math/accent.js",
                 "../../Word/Math/borderBox.js",
-                "../../Word/Editor/Styles.js",
-                "../../Word/Editor/Numbering.js",
-                "../../Word/Editor/ParagraphContent.js",
-                "../../Word/Editor/ParagraphContentBase.js",
-                "../../Word/Editor/Run.js",
-                "../../Word/Editor/Hyperlink.js",
+
                 "../../Word/Editor/FlowObjects.js",
                 "../../Word/Editor/Paragraph.js",
                 "../../Word/Editor/Paragraph_Recalculate.js",
@@ -133,11 +147,13 @@
                 "../../Word/Editor/Spelling.js",
                 "../../Word/Editor/Search.js",
                 "../../Word/Editor/FontClassification.js",
+
                 "../../PowerPoint/Editor/Format/ShapePrototype.js",
                 "../../PowerPoint/Editor/Format/ImagePrototype.js",
                 "../../PowerPoint/Editor/Format/GroupPrototype.js",
                 "../../PowerPoint/Editor/Format/ChartSpacePrototype.js",
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
+
                 "../../PowerPoint/api-all.js",
                 "../../PowerPoint/Build/Log/apiExport.js"
             ],
