@@ -2096,7 +2096,7 @@ function CDrawingDocument()
     }
     this.DrawTarget = function()
     {
-        if ( "block" != oThis.TargetHtmlElement.style.display && oThis.NeedTarget )
+        if ( "block" != oThis.TargetHtmlElement.style.display && oThis.NeedTarget && !oThis.TransitionSlide.IsPlaying())
             oThis.TargetHtmlElement.style.display = "block";
         else
             oThis.TargetHtmlElement.style.display = "none";

@@ -1474,6 +1474,9 @@ function CEditorPage(api)
 
         var oWordControl = oThis;
 
+        if (oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying())
+            oWordControl.m_oDrawingDocument.TransitionSlide.End(true);
+
         if (!oThis.m_bIsIE)
         {
             if (e.preventDefault)
@@ -1793,6 +1796,9 @@ function CEditorPage(api)
             if (undefined === ret)
                 return;
         }
+
+        if (oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying())
+            oWordControl.m_oDrawingDocument.TransitionSlide.End(true);
 
         if (oThis.TextBoxInputMode)
         {

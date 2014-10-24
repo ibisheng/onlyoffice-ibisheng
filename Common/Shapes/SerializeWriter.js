@@ -1765,6 +1765,11 @@ function CBinaryFileWriter()
         else if (rPr.DStrikeout === false && rPr.Strikeout === false)
             _strike = 1;
 
+        if (undefined !== rPr.Spacing && null != rPr.Spacing)
+        {
+            oThis._WriteInt1(15, (rPr.Spacing * 7200 / 25.4) >> 0);
+        }
+
         if (null != _strike)
         {
             oThis._WriteUChar1(16, _strike);
