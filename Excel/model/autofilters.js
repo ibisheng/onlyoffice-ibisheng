@@ -1872,47 +1872,26 @@ var gUndoInsDelCellsFlag = true;
 							{
 								if(cloneData.Ref.isEqual(aWs.TableParts[l].Ref))
 								{
-									/*if(cloneData.AutoFilter)
-									{*/
-										var cloneResult = [];
-										for(var k = 0; k < cloneData.result.length; k++)
-										{
-											cloneResult[k] = cloneData.result[k].clone();
-										}
-										if(!aWs.TableParts[l].AutoFilter && cloneData.AutoFilter)
-											this._addButtonAF({result: cloneResult,isVis: true});
-										else if(aWs.TableParts[l].AutoFilter && !cloneData.AutoFilter)
-											this._addButtonAF({result: aWs.TableParts[l].result,isVis: false});
-										aWs.TableParts[l] = cloneData;
-										if(cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns)
-											this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns, cloneData.result, aWs.TableParts[l]);
-										else
-											this._reDrawCurrentFilter(null, cloneData.result, aWs.TableParts[l]);
-										isEn = true;
-									/*}
-									else
+
+									var cloneResult = [];
+									for(var k = 0; k < cloneData.result.length; k++)
 									{
-										var cloneResult = [];
-										for(var k = 0; k < cloneData.result.length; k++)
-										{
-											cloneResult[k] = cloneData.result[k].clone();
-										};
-										
-										this._cleanStyleTable(aWs, cloneData.Ref);
-										
-										if(!aWs.TableParts[l].AutoFilter && cloneData.AutoFilter)
-											this._addButtonAF({result: cloneResult,isVis: true});
-										else if(aWs.TableParts[l].AutoFilter && !cloneData.AutoFilter)
-											this._addButtonAF({result: aWs.TableParts[l].result,isVis: false});
-										
-										aWs.AutoFilter = cloneData;
-										
-										//if(cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns)
-											//this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns, cloneData.result, aWs.TableParts[l]);
-										//else
-											//this._reDrawCurrentFilter(null, cloneData.result, aWs.TableParts[l]);
-										isEn = false;
-									};	*/
+										cloneResult[k] = cloneData.result[k].clone();
+									}
+									if(!aWs.TableParts[l].AutoFilter && cloneData.AutoFilter)
+										this._addButtonAF({result: cloneResult,isVis: true});
+									else if(aWs.TableParts[l].AutoFilter && !cloneData.AutoFilter)
+										this._addButtonAF({result: aWs.TableParts[l].result,isVis: false});
+									aWs.TableParts[l] = cloneData;
+									if(cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns)
+										this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns, cloneData.result, aWs.TableParts[l]);
+									else
+										this._reDrawCurrentFilter(null, cloneData.result, aWs.TableParts[l]);
+									isEn = true;
+
+									
+									//перерисовываем фильтры, находящиеся на одном уровне с данным фильтром
+									this._reDrawFilters(aWs.TableParts[l].Ref);
 									
 									break;
 								}	
@@ -5603,7 +5582,7 @@ var gUndoInsDelCellsFlag = true;
 			},
 
 			// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-			_reDrawFilters: function()
+			_reDrawFilters: function(exceptionRange)
 			{
 				var aWs = this._getCurrentWS();
 				if(aWs.TableParts && aWs.TableParts.length > 0)
@@ -5611,7 +5590,11 @@ var gUndoInsDelCellsFlag = true;
 					for(var tP = 0; tP < aWs.TableParts.length; tP++)
 					{
 						var ref = aWs.TableParts[tP].Ref;
-						this._setColorStyleTable(ref, aWs.TableParts[tP]);
+						
+						if(exceptionRange && !exceptionRange.isEqual(ref) && ((ref.r1 >= exceptionRange.r1 && ref.r1 <= exceptionRange.r2) || (ref.r2 >= exceptionRange.r1 && ref.r2 <= exceptionRange.r2)))
+							this._setColorStyleTable(ref, aWs.TableParts[tP]);
+						else if(!exceptionRange)
+							this._setColorStyleTable(ref, aWs.TableParts[tP]);
 					}
 				}
 			},
