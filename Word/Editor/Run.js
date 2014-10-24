@@ -4692,8 +4692,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
         if(this.IsPlaceholder())
         {
-            /*oWPrp = this.Parent.Get_Default_TPrp();
-             TextPr.Merge(oWPrp);*/
+
             TextPr.Merge(this.Parent.GetCtrPrp());
             TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
 
@@ -4702,12 +4701,9 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             TextPr.Italic = false;
             TextPr.Bold   = false;
 
-            //this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
         }
         else
         {
-            /*oWPrp = this.Parent.Get_Default_TPrp();
-             TextPr.Merge(oWPrp);*/
             TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
 
             if(!this.IsNormalText()) // math text
@@ -4715,8 +4711,6 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
                 var MPrp = this.MathPrp.GetTxtPrp();
                 TextPr.Merge(MPrp); // bold, italic
             }
-
-            //this.Parent.ParaMath.ApplyArgSize(TextPr, this.Parent.argSize);
         }
     }
     else
@@ -5128,7 +5122,21 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         this.Set_Position( null === TextPr.Position ? undefined : TextPr.Position );
 
     if ( undefined != TextPr.RFonts )
-        this.Set_RFonts2( TextPr.RFonts );
+    {
+        if(this.Type == para_Math_Run && !this.IsNormalText()) // при смене Font в этом случае (даже на Cambria Math) cs, eastAsia не меняются
+        {
+            var RFonts =
+            {
+                Ascii:  {Name: "Cambria Math", Index: -1},
+                HAnsi:  {Name: "Cambria Math", Index: -1}
+            };
+
+            this.Set_RFonts2(RFonts);
+        }
+        else
+            this.Set_RFonts2(TextPr.RFonts);
+    }
+
 
     if ( undefined != TextPr.Lang )
         this.Set_Lang2( TextPr.Lang );
@@ -7805,14 +7813,14 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
         FontSize   : this.Parent.ParaMath.ApplyArgSize(oWPrp.FontSize, this.Parent.Compiled_ArgSz.value)
     };
 
-    if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
+    if(this.IsMathematicalText()) // выставляем false, чтобы не применился наклон к спец символам
     {
         Font.Italic = false;
         Font.Bold   = false;
 
-        var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
-        Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
-        Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
+        //var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
+        //Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
+        //Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
     }
 
     pGraphics.SetFont(Font);
@@ -7859,14 +7867,14 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
         };
 
 
-        if(!this.IsNormalText()) // выставляем false, чтобы не применился наклон к спец символам
+        if(this.IsMathematicalText()) // выставляем false, чтобы не применился наклон к спец символам
         {
             Font.Italic = false;
             Font.Bold   = false;
 
-            var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
-            Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
-            Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
+            //var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
+            //Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
+            //Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
         }
 
         g_oTextMeasurer.SetFont(Font);
@@ -7966,7 +7974,14 @@ ParaRun.prototype.Math_Apply_Style = function(Value)
 ParaRun.prototype.IsNormalText = function()
 {
     var comp_MPrp = this.MathPrp.GetCompiled_ScrStyles();
-    return (comp_MPrp.nor === true);
+    return comp_MPrp.nor === true;
+}
+ParaRun.prototype.IsMathematicalText = function()
+{
+    var MathText = !this.IsNormalText();
+    var bMFont = this.Get_CompiledPr(false).FontFamily.Name == "Cambria Math";
+
+    return MathText && bMFont;
 }
 ParaRun.prototype.getPropsForWrite = function()
 {
@@ -8038,7 +8053,6 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
     this.Recalc_CompiledPr(true);
 
 }
-
 ParaRun.prototype.Set_MathTextPr2 = function(TextPr, MathPr)
 {
     this.Set_Pr(TextPr);
@@ -8067,10 +8081,6 @@ ParaRun.prototype.Math_GetInfoLetter = function(Info)
     }
     else
         Info.Result = false;
-}
-ParaRun.prototype.IsNormalText = function()
-{
-    return this.MathPrp.nor === true;
 }
 ParaRun.prototype.GetMathTextPr = function()
 {

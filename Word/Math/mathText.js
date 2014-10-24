@@ -89,11 +89,13 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        var Compiled_MPrp = this.bJDraw ? null : this.Parent.GetCompiled_ScrStyles();
+        var bMathText = this.bJDraw ? null : this.Parent.IsMathematicalText();
+        var bNormal = this.bJDraw ? null : this.Parent.IsNormalText();
 
-        if(this.Type === para_Math_Placeholder || this.bJDraw || Compiled_MPrp.nor)
+        if(this.Type === para_Math_Placeholder || this.bJDraw || bNormal)
             return code;
 
+        var Compiled_MPrp = this.Parent.GetCompiled_ScrStyles();
         var bAccent = this.Parent.IsAccent();
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
@@ -741,7 +743,11 @@ CMathText.prototype =
     },
     IsAlignPoint: function()
     {
-        return false
+        return false;
+    },
+    IsText: function()
+    {
+        return true;
     },
     // For ParaRun
     Is_Punctuation: function()
@@ -820,7 +826,7 @@ CMathAmp.prototype =
         {
             this.size =
             {
-                width:          this.AmpText.size.width,
+                width:          this.AmpText.size.width + this.GapLeft + this.GapRight,
                 height:         this.AmpText.size.height,
                 ascent:         this.AmpText.size.ascent
             };
@@ -832,6 +838,18 @@ CMathAmp.prototype =
         this.Parent = Parent;
 
         this.AmpText.PreRecalc(Parent, ParaMath, ArgSize, RPI);
+    },
+    getCodeChr: function()
+    {
+        var code = null;
+        if(!this.bEqqArray)
+            code = this.AmpText.getCodeChr();
+
+        return code;
+    },
+    IsText: function()
+    {
+        return !this.bEqqArray;
     },
     Get_WidthVisible: function()
     {
@@ -848,7 +866,7 @@ CMathAmp.prototype =
     draw: function(x, y, pGraphics)
     {
         if(this.bEqqArray==false)
-            this.AmpText.draw(x, y, pGraphics);
+            this.AmpText.draw(x + this.GapLeft, y, pGraphics);
         else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
         {
             var X  = x + this.pos.x,
@@ -877,7 +895,7 @@ CMathAmp.prototype =
     },
     IsAlignPoint: function()
     {
-        return this.Type == para_Math_Ampersand;
+        return this.bEqqArray;
     },
     Copy : function()
     {

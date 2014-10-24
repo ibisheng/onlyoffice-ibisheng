@@ -403,21 +403,34 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
     else
     {
         var content = this.GetSelectContent().Content;
-        var FontSize = TextPr.FontSize;
 
-        if(TextPr.FontSize !== undefined && content.IsNormalTextInRuns() == false)
+        if(IncFontSize == undefined)
         {
-            var NewTextPr = new CTextPr();
-            NewTextPr.FontSize = FontSize;
+            var FontSize = TextPr.FontSize;
 
-            this.Root.Apply_TextPr(NewTextPr, IncFontSize, true);
+            if(TextPr.FontSize !== undefined && content.IsNormalTextInRuns() == false)
+            {
+                var NewTextPr = new CTextPr();
+                NewTextPr.FontSize   = FontSize;
 
-            TextPr.FontSize = undefined;
+                this.Root.Apply_TextPr(NewTextPr, IncFontSize, true);
+
+                TextPr.FontSize   = undefined;
+            }
+
+            content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+
+            TextPr.FontSize   = FontSize;
+
+        }
+        else
+        {
+            if(content.IsNormalTextInRuns() == false)
+                this.Root.Apply_TextPr(TextPr, IncFontSize, true);
+            else
+                content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
         }
 
-        content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-
-        TextPr.FontSize = FontSize;
     }
 };
 ParaMath.prototype.Clear_TextPr = function()
@@ -574,9 +587,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.setPosition(pos);
     }
     else
-    {
         this.Root.Resize_2(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
-    }
 
     this.NeedResize = false;
 
@@ -1587,6 +1598,60 @@ ParaMath.prototype.Is_InInnerContent = function()
  */
 ParaMath.prototype.Handle_AddNewLine = function()
 {
+    var ContentPos = new CParagraphContentPos();
+
+    var CurrContent = this.GetSelectContent().Content;
+    CurrContent.Get_ParaContentPos(this.bSelectionUse, true, ContentPos);
+
+    var NeedRecalculate = false;
+
+    if(CurrContent.ParentElement.kind == MATH_EQ_ARRAY)
+    {
+        var NewContent = CurrContent.ParentElement.addRow();
+        CurrContent.SplitContent(NewContent, ContentPos, 0);
+        NewContent.Correct_Content(true);
+        CurrContent.Correct_Content(true);
+
+        NeedRecalculate = true;
+    }
+    else if(CurrContent.bRoot == false && CurrContent.ParentElement.kind !== MATH_MATRIX)
+    {
+        var ctrPrp = CurrContent.ParentElement.CtrPrp.Copy();
+        var props = {row: 2, ctrPrp: ctrPrp};
+        var EqArray = new CEqArray(props);
+
+        var FirstContent = EqArray.getElement(0),
+            SecondContent = EqArray.getElement(1);
+
+        CurrContent.SplitContent(SecondContent, ContentPos, 0);
+        CurrContent.CopyTo(FirstContent, false);
+
+        // остаим пустой Run в Content, чтобы не упала ф-ия Remove_FromContent
+        // первый элемент всегда Run
+
+        var Run = CurrContent.getElem(0);
+        Run.Remove_FromContent(0, Run.Content.length, true);
+
+        CurrContent.Remove_FromContent(1, CurrContent.content.length);
+
+        CurrContent.Add_ToContent(1, EqArray);
+
+        CurrContent.Correct_Content(true);
+
+        var CurrentContent = new CParagraphContentPos();
+        this.Get_ParaContentPos(false, false, CurrentContent);
+
+        var RightContentPos = new CParagraphSearchPos();
+        this.Get_RightPos(RightContentPos, CurrentContent, 0, true);
+        this.Set_ParaContentPos(RightContentPos.Pos, 0);
+
+        NeedRecalculate = true;
+    }
+
+    this.SetNeedResize();
+
+    return NeedRecalculate;
+
 };
 
 /**
@@ -1597,14 +1662,16 @@ ParaMath.prototype.Handle_AddNewLine = function()
  */
 ParaMath.prototype.Split = function (ContentPos, Depth)
 {
-    var NewParaMath = null;
+    var NewParaMath = new ParaMath();
+    NewParaMath.Jc = this.Jc;
 
-    var Pos = ContentPos.Get(Depth);
+    this.Root.SplitContent(NewParaMath.Root, ContentPos, Depth);
 
-    if(this.Root.content[Pos].Type == para_Math_Run)
+    //var Pos = ContentPos.Get(Depth);
+
+    /*if(this.Root.content[Pos].Type == para_Math_Run)
     {
-        NewParaMath = new ParaMath();
-        NewParaMath.Jc = this.Jc;
+
 
         var NewRun = this.Root.content[Pos].Split(ContentPos, Depth+1);
         NewParaMath.Root.Add_ToContent(0, NewRun);
@@ -1620,7 +1687,7 @@ ParaMath.prototype.Split = function (ContentPos, Depth)
         this.SetNeedResize();
         NewParaMath.SetNeedResize();
 
-    }
+    }*/
 
     return NewParaMath;
 };

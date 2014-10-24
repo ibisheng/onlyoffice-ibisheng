@@ -640,6 +640,11 @@ CMathEqArrPr.prototype.Read_FromBinary = function(Reader)
     this.row     = Reader.GetLong();
 };
 
+CMathEqArrPr.prototype.DecreaseCountRow = function()
+{
+    this.row++;
+}
+
 ////
 function CEqArray(props)
 {
@@ -654,6 +659,8 @@ function CEqArray(props)
     this.gaps        = null;
 
     this.setDefaultSpace();
+
+    this.bDecreaseRow = false;
 
     // for ampersand in Run
     this.WidthsPoints = [];
@@ -680,6 +687,17 @@ CEqArray.prototype.init = function(props)
     this.setProperties(props);
     this.fillContent();
 }
+CEqArray.prototype.addRow = function()
+{
+    this.Content.splice( this.CurPos + 1, 0, new CMathContent() );
+    this.Content[this.CurPos + 1].ParentElement = this;
+
+    this.Pr.DecreaseCountRow();
+
+    this.bDecreaseRow = true;
+
+    return this.Content[this.CurPos + 1];
+}
 CEqArray.prototype.fillContent = function()
 {
     var nRowsCount = this.Content.length;
@@ -688,6 +706,20 @@ CEqArray.prototype.fillContent = function()
     for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
         this.elements[nIndex][0] = this.Content[nIndex];
 };
+CEqArray.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
+{
+    if(this.bDecreaseRow)
+    {
+        this.elements.splice(this.CurPos + 1, 0, []);
+        this.elements[this.CurPos + 1][0] = this.Content[this.CurPos + 1];
+        this.alignment.hgt[this.CurPos + 1] = MCJC_CENTER;
+
+        this.nRow++;
+        this.bDecreaseRow = false;
+    }
+
+    CEqArray.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+}
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
     // на случай, чтобы не затереть массив
@@ -697,11 +729,8 @@ CEqArray.prototype.Resize = function(oMeasure, RPI)
     var NewRPI = RPI.Copy();
     NewRPI.bEqqArray = true;
 
-
     for(var i = 0; i < this.nRow; i++)
-    {
         this.elements[i][0].Resize(oMeasure, NewRPI);
-    }
 
     this.recalculateSize(oMeasure);
 }

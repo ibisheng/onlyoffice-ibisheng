@@ -454,7 +454,7 @@ CMathBase.prototype =
             {
                 Name:       defaultTxtPrp.FontFamily.Name,
                 Index:      defaultTxtPrp.FontFamily.Index
-            };
+            }; // Cambria Math
 
 
             this.RecalcInfo.bCtrPrp = false;
@@ -557,7 +557,6 @@ CMathBase.prototype =
         //this.Parent   = GapsInfo.Parent;
         //this.ParaMath = GapsInfo.ParaMath;
 
-
         GapsInfo.Left       = GapsInfo.Current;
         GapsInfo.leftRunPrp = GapsInfo.currRunPrp;
 
@@ -574,6 +573,10 @@ CMathBase.prototype =
     {
         return false;
     },
+    IsText: function()
+    {
+        return false;
+    },
     GetParent: function()
     {
         return (this.Parent.Type !== para_Math_Composition ? this : this.Parent.GetParent());
@@ -584,7 +587,7 @@ CMathBase.prototype =
 
         return this.Content[pos].Get_TextPr(ContentPos, Depth+1);
     },
-    Get_CompiledTextPr : function(Copy)
+    Get_CompiledTextPr_11100 : function(Copy)
     {
         var start_x = 0,
             start_y = 0;
@@ -620,6 +623,20 @@ CMathBase.prototype =
                         TextPr = TextPr.Compare( CurTextPr );
                 }
             }
+        }
+
+        return TextPr;
+    },
+    Get_CompiledTextPr : function(Copy)
+    {
+        var  TextPr = this.Content[0].Get_CompiledTextPr(true, true);
+
+        for(var i = 1; i < this.Content.length; i++)
+        {
+            var CurTextPr = this.Content[i].Get_CompiledTextPr(false, true);
+
+            if ( null !== CurTextPr )
+                TextPr = TextPr.Compare( CurTextPr );
         }
 
         return TextPr;
@@ -958,6 +975,14 @@ CMathBase.prototype.Select_MathContent = function(MathContent)
         }
     }
 };
+CMathBase.prototype.Test_Math_SetStyleNormal = function(Value, bAll)
+{
+    for(var i = 0; i < this.Content.length; i++)
+    {
+        this.Content[i].Test_Math_SetStyleNormal(Value, bAll);
+    }
+}
+
 CMathBase.prototype.Set_SelectionContentPos       = ParaHyperlink.prototype.Set_SelectionContentPos;
 CMathBase.prototype.Get_LeftPos                   = ParaHyperlink.prototype.Get_LeftPos;
 CMathBase.prototype.Get_RightPos                  = ParaHyperlink.prototype.Get_RightPos;

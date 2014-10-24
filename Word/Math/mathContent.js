@@ -420,7 +420,8 @@ CMathGapsInfo.prototype =
 
             var leftCode;
 
-            if(this.Current.Type == para_Math_Text)
+
+            if(this.Current.IsText())
             {
                 var currCode = this.Current.getCodeChr();
 
@@ -434,7 +435,7 @@ CMathGapsInfo.prototype =
                         if(leftCoeff > rightCoeff)
                             leftCoeff -= rightCoeff;
                     }
-                    else if(this.Left.Type == para_Math_Text)
+                    else if(this.Left.IsText())
                     {
                         leftCode = this.Left.getCodeChr();
                         leftCoeff = COEFF_GAPS.getCoeff(currCode, leftCode, -1);
@@ -465,7 +466,7 @@ CMathGapsInfo.prototype =
                         else
                             leftCoeff -= rightCoeff/2;
                     }
-                    else if(this.Left.Type == para_Math_Text)
+                    else if(this.Left.IsText())
                     {
                         leftCode = this.Left.getCodeChr();
                         rightCoeff = COEFF_GAPS.getCoeff(leftCode, -1, 1);
@@ -748,7 +749,7 @@ CMathContent.prototype =
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },*/
 
-    PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
+    PreRecalc: function(ParentElement, ParaMath, ArgSize, RPI)
     {
         if(ArgSize !== null && ArgSize !== undefined)
         {
@@ -757,10 +758,10 @@ CMathContent.prototype =
         }
 
         this.ParaMath = ParaMath;
-        if(Parent !== null)
+        if(ParentElement !== null)
         {
             this.bRoot = false;
-            this.Parent = Parent;
+            this.ParentElement = ParentElement;
         }
 
         if(ArgSize !== null && ArgSize !== undefined)
@@ -829,7 +830,7 @@ CMathContent.prototype =
         }
     },
     // особый случай: вызываем, когда пересчет всей формулы не нужен, а нужно выставить только Lines (Реализована, чтобы не править Resize у каждого элемента)
-    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
+    Resize_2: function(oMeasure, ParentElement, ParaMath, RPI, ArgSize)
     {
         var lng = this.content.length;
         for(var i = 0; i < lng; i++)
@@ -846,7 +847,7 @@ CMathContent.prototype =
     },
     IsEqqArray: function()
     {
-        return this.Parent.IsEqqArray();
+        return this.ParentElement.IsEqqArray();
     },
     Get_CompiledArgSize: function()
     {
@@ -981,9 +982,9 @@ CMathContent.prototype =
 
         if(this.RecalcInfo.bEqqArray)
         {
-            this.InfoPoints.GWidths       = this.Parent.WidthsPoints;
-            this.InfoPoints.GPoints       = this.Parent.Points;
-            this.InfoPoints.GMaxDimWidths = this.Parent.MaxDimWidths;
+            this.InfoPoints.GWidths       = this.ParentElement.WidthsPoints;
+            this.InfoPoints.GPoints       = this.ParentElement.Points;
+            this.InfoPoints.GMaxDimWidths = this.ParentElement.MaxDimWidths;
 
             PosInfo.SetInfoPoints(this.InfoPoints);
             PosInfo.ApplyAlign();
@@ -1025,7 +1026,7 @@ CMathContent.prototype =
     {
         var ctrPrp = new CTextPr();
         if(!this.bRoot)
-            ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
+            ctrPrp.Merge( this.ParentElement.Get_CompiledCtrPrp_2() );
 
         return ctrPrp;
     },
@@ -1034,7 +1035,7 @@ CMathContent.prototype =
         var result = false;
 
         if(!this.bRoot)
-            result = this.Parent.IsAccent();
+            result = this.ParentElement.IsAccent();
 
         return result;
     },
@@ -1043,7 +1044,7 @@ CMathContent.prototype =
     /// For Para Math
     GetParent: function()
     {
-        return this.Parent.GetParent();
+        return this.ParentElement.GetParent();
     },
     SetArgSize: function(val)
     {
@@ -1320,7 +1321,7 @@ CMathContent.prototype =
         var TextPr;
 
         if(this.IsPlaceholder())
-            TextPr = this.Parent.Get_CtrPrp();
+            TextPr = this.ParentElement.Get_CtrPrp();
         else
             TextPr = this.content[pos].Get_TextPr(ContentPos, Depth + 1);
 
@@ -1332,12 +1333,18 @@ CMathContent.prototype =
 
         if(this.IsPlaceholder())
         {
-            TextPr = this.Parent.Get_CompiledCtrPrp_2();
+            TextPr = this.ParentElement.Get_CompiledCtrPrp_2();
         }
         else if (this.Selection.Use || bAll == true)
         {
             var StartPos, EndPos;
-            if(this.Selection.Use)
+
+            if(bAll == true)
+            {
+                StartPos = 0;
+                EndPos = this.content.length - 1;
+            }
+            else
             {
                 StartPos = this.Selection.Start;
                 EndPos   = this.Selection.End;
@@ -1348,22 +1355,31 @@ CMathContent.prototype =
                     EndPos   = this.Selection.Start;
                 }
             }
-            else
-            {
-                StartPos = 0;
-                EndPos = this.content.length - 1;
-            }
+
+
+            // пропускаем пустые рана только для случая, когда есть селект
 
             while ( null === TextPr && StartPos <= EndPos )
             {
-                TextPr = this.content[StartPos].Get_CompiledTextPr(true); // true для пустых ранов
-                                                                          // т.к. если пустой ран входит в селект, текстовый настройки не скопируются в ране
+                var bComp = this.content[StartPos].Type == para_Math_Composition,
+                    bEmptyRun = this.content[StartPos].Type == para_Math_Run && true === this.content[StartPos].Selection_IsEmpty();
+
+                if(bComp || !bEmptyRun || bAll)    //пропускаем пустые Run
+                    TextPr = this.content[StartPos].Get_CompiledTextPr(true);
+
                 StartPos++;
             }
 
-            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+            while(this.content[EndPos].Type == para_Math_Run && true === this.content[EndPos].Selection_IsEmpty() && StartPos < EndPos + 1 && bAll == false) //пропускаем пустые Run
             {
-                var CurTextPr = this.content[CurPos].Get_CompiledPr(true);
+                EndPos--;
+            }
+
+
+            for ( var CurPos = StartPos; CurPos < EndPos + 1; CurPos++ )
+            {
+                //var CurTextPr = this.content[CurPos].Get_CompiledPr(false);
+                var CurTextPr = this.content[CurPos].Get_CompiledTextPr(false);
 
                 if ( null !== CurTextPr )
                     TextPr = TextPr.Compare( CurTextPr );
@@ -1625,6 +1641,27 @@ CMathContent.prototype =
         }
     },
 
+    SplitContent: function(NewContent, ContentPos, Depth)
+    {
+        var Pos = ContentPos.Get(Depth);
+
+        if(this.content[Pos].Type == para_Math_Run)
+        {
+            var NewRun = this.content[Pos].Split(ContentPos, Depth+1);
+            NewContent.Add_ToContent(0, NewRun);
+
+            var len = this.content.length;
+
+            if(Pos < len - 1)
+            {
+                NewContent.Concat_ToContent( this.content.slice(Pos + 1) );
+                this.Remove_FromContent(Pos+1, len - Pos - 1);
+            }
+        }
+
+        this.ParaMath.SetNeedResize();
+
+    },
     Add_ToContent : function(Pos, Item)
     {
         this.Internal_Content_Add(Pos, Item);
@@ -3743,7 +3780,7 @@ CMathContent.prototype =
 
     CreateElem : function (oElem, oParent)
     {
-		oElem.Parent = oParent;
+		oElem.ParentElement = oParent;
 
 		var Pos = oParent.CurPos + 1;
         oParent.Internal_Content_Add(Pos, oElem, true);
