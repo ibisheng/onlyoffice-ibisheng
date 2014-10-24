@@ -6360,7 +6360,7 @@ Paragraph.prototype =
         }
         else
         {
-            Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
+            Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0, !this.bFromDocument);
 
             // Копируем настройки
             Para.Set_Pr(this.Pr.Copy());
