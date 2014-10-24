@@ -84,7 +84,6 @@
 
                 "../../Common/Drawings/Format/Constants.js",
 
-                "../../PowerPoint/themes/Themes.js",
                 "../../Common/Shapes/Serialize.js",
                 "../../Common/Shapes/SerializeWriter.js",
                 "../../Word/Editor/SerializeCommon.js",
@@ -92,8 +91,6 @@
                 "../../Common/Drawings/Math.js",
                 "../../Common/Drawings/ArcTo.js",
                 "../../Word/Drawing/ColorArray.js",
-                "../../Word/apiCommon.js",
-
 
                 "../../PowerPoint/Editor/Format/Presentation.js",
                 "../../Common/Drawings/CommonController.js",
