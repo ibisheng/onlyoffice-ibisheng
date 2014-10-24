@@ -5228,6 +5228,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
                 if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
                 {
                     this.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError,c_oAscError.Level.NoCritical);
+                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                     return;
                 }
             }
