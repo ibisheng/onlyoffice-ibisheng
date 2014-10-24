@@ -4002,6 +4002,8 @@ PasteProcessor.prototype =
     },
 	_checkFontsOnLoad: function(fonts)
 	{
+		if(!fonts)
+			return;
 		for(var i = 0; i < fonts.length; i++)
 		{
 			var index = this.map_font_index[fonts[i].name];
