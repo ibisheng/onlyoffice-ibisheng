@@ -1406,6 +1406,8 @@ function CEditorPage(api)
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
             this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
+
+            this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " solid";
         }
         else
         {
@@ -1416,6 +1418,8 @@ function CEditorPage(api)
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
             this.m_oThumbnailsContainer.HtmlElement.style.display = "none";
+
+            this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " none";
         }
 
         this.OnResize2(true);
