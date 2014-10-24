@@ -2922,6 +2922,7 @@ function DrawingObjects() {
                     oNewChartSpace.checkDrawingBaseCoords();
                     oNewChartSpace.recalculate();
                     _this.showDrawingObjects(false);
+                    _this.controller.resetSelection();
                     _this.controller.selectObject(oNewChartSpace, 0);
                     _this.sendGraphicObjectProps();
                     History.TurnOn();
