@@ -1200,12 +1200,12 @@ CGraphicObjects.prototype =
             var para_pr = DrawingObjectsController.prototype.getParagraphParaPr.call(this);
             if(!para_pr)
             {
-                if(this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
-                {
-                    var parent_para = this.selectedObjects[0].parent.Get_ParentParagraph();
-                    if(parent_para)
-                        para_pr = parent_para.Get_CompiledPr2(true).ParaPr;
-                }
+                //if(this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
+                //{
+                //    var parent_para = this.selectedObjects[0].parent.Get_ParentParagraph();
+                //    if(parent_para)
+                //        para_pr = parent_para.Get_CompiledPr2(true).ParaPr;
+                //}
             }
             if(para_pr)
             {
