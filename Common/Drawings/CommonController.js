@@ -22,6 +22,21 @@ function CheckLinePreset(preset)
     return preset === "line";
 }
 
+function CheckLinePresetForParagraphAdd(preset)
+{
+    return preset === "line" ||
+    preset === "bentConnector2" ||
+    preset === "bentConnector3" ||
+    preset === "bentConnector4" ||
+    preset === "bentConnector5" ||
+    preset === "curvedConnector2" ||
+    preset === "curvedConnector3" ||
+    preset === "curvedConnector4" ||
+    preset === "curvedConnector5" ||
+    preset === "straightConnector1";
+
+}
+
 function CompareGroups(a, b)
 {
     if(a.group == null && b.group == null)
@@ -1021,7 +1036,7 @@ DrawingObjectsController.prototype =
             {
                 this.applyDocContentFunction(docContentFunction, args, tableFunction);
             }
-            else if(this.selectedObjects.length === 1 && ((this.selectedObjects[0].getObjectType() === historyitem_type_Shape && !CheckLinePreset(this.selectedObjects[0].getPresetGeom())) || this.selectedObjects[0].getObjectType() === historyitem_type_GraphicFrame))
+            else if(this.selectedObjects.length === 1 && ((this.selectedObjects[0].getObjectType() === historyitem_type_Shape && !CheckLinePresetForParagraphAdd(this.selectedObjects[0].getPresetGeom())) || this.selectedObjects[0].getObjectType() === historyitem_type_GraphicFrame))
             {
                 this.selection.textSelection = this.selectedObjects[0];
                 if(this.selectedObjects[0].getObjectType() === historyitem_type_GraphicFrame)
