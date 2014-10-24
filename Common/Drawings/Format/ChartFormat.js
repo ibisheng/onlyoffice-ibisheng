@@ -187,6 +187,11 @@ CDLbl.prototype =
         this.updatePosition(this.posX, this.posY);
         global_MatrixTransformer.MultiplyAppend(this.transform, transform);
         global_MatrixTransformer.MultiplyAppend(this.transformText, transform);
+        if(this instanceof CTitle)
+        {
+            this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+            this.invertTransformText = global_MatrixTransformer.Invert(this.transform);
+        }
     },
 
     getCompiledFill: function()
