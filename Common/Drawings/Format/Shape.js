@@ -3077,6 +3077,14 @@ CShape.prototype =
     {
         if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof this.spPr.Fill.fill.RasterImageId === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
             images.push(this.spPr.Fill.fill.RasterImageId);
+        if(this.textBoxContent)
+        {
+            var drawings = this.textBoxContent.Get_AllDrawingObjects();
+            for(var i = 0; i < drawings.length; ++i)
+            {
+                drawings[i].GraphicObj && drawings[i].GraphicObj.getAllRasterImages && drawings[i].GraphicObj.getAllRasterImages(images);
+            }
+        }
     },
 
     changePresetGeom: function (sPreset) {
