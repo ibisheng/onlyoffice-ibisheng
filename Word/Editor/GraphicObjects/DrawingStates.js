@@ -575,7 +575,7 @@ RotateState.prototype =
                             original.parent.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], original.selectStartPage);
                         }
 
-                        if(!(this instanceof RotateState))
+                        if(!(this instanceof RotateState || this instanceof ResizeState))
                         {
                             for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                             {
@@ -586,6 +586,24 @@ RotateState.prototype =
                         {
                             for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                             {
+                                this.drawingObjects.arrTrackObjects[i].originalObject.parent.Set_Props(new CImgProperty(
+                                    {
+                                        PositionH:
+                                        {
+                                            RelativeFrom: c_oAscRelativeFromH.Page,
+                                            UseAlign : false,
+                                            Align    : undefined,
+                                            Value    : arr_bounds[i].min_x
+                                        },
+
+                                        PositionV:
+                                        {
+                                            RelativeFrom: c_oAscRelativeFromV.Page,
+                                            UseAlign    : false,
+                                            Align       : undefined,
+                                            Value       : arr_bounds[i].min_y
+                                        }
+                                    }));
                                 this.drawingObjects.arrTrackObjects[i].originalObject.parent.Add_ToDocument2(arr_parent_paragraphs[i]);
                             }
                         }
