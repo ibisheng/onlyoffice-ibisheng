@@ -517,6 +517,13 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
 {
     var styles = editor.WordControl.m_oLogicDocument.Styles;
     this.textStyleForParagraph = {TextPr: styles.Default.TextPr.Copy(), ParaPr: styles.Default.ParaPr.Copy()};
+    var DefId = styles.Default.Paragraph;
+    var DefaultStyle = styles.Style[DefId];
+    if(DefaultStyle)
+    {
+        this.textStyleForParagraph.ParaPr.Merge( DefaultStyle.ParaPr );
+        this.textStyleForParagraph.TextPr.Merge( DefaultStyle.TextPr );
+    }
     //this.textStyleForParagraph.ParaPr.Spacing.Line = 1;
     this.textStyleForParagraph.TextPr.Color.Auto = false;
     if(this.style && this.style.fontRef)
