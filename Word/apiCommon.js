@@ -394,6 +394,12 @@ function CreateAscFill(unifill)
             ret.fill.type = (_fill.tile == null) ? c_oAscFillBlipType.STRETCH : c_oAscFillBlipType.TILE;
             break;
         }
+        case FILL_TYPE_NOFILL:
+        case FILL_TYPE_NONE:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_NOFILL;
+            break;
+        }
         default:
             break;
     }
