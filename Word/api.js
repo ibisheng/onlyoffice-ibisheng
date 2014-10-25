@@ -5001,7 +5001,13 @@ asc_docs_api.prototype.sync_TblPropCallback = function(tblProp)
     //    tblProp.Locked = true;
 
     // TODO: вызвать функцию asc_onInitTableTemplatesв зависимости от TableLook
-
+    if(tblProp.CellsBackground && tblProp.CellsBackground.Unifill)
+    {
+        var LogicDocument = this.WordControl.m_oLogicDocument;
+        tblProp.CellsBackground.Unifill.check(LogicDocument.Get_Theme(), LogicDocument.Get_ColorMap());
+        var RGBA = tblProp.CellsBackground.Unifill.getRGBAColor();
+        tblProp.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+    }
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Table, new CTableProp( tblProp ));
 };
 asc_docs_api.prototype.sync_TblWrapStyleChangedCallback = function(style){
