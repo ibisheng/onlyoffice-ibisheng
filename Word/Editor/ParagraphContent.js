@@ -4431,7 +4431,7 @@ ParaDrawing.prototype =
         }
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
-            this.GraphicObj.setStartPage(pageIndex);
+            this.GraphicObj.setStartPage(pageIndex, this.DocumentContent && this.DocumentContent.Is_HdrFtr());
         var _x = !this.PositionH.Align ? x - this.GraphicObj.bounds.x : x;
         var _y = !this.PositionV.Align ? y - this.GraphicObj.bounds.y : y;
         this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);

@@ -928,9 +928,10 @@ CShape.prototype.setRecalcObject =  function(object)
 };
 
 
-CShape.prototype.setStartPage = function(pageIndex)
+CShape.prototype.setStartPage = function(pageIndex, bNoResetSelectPage)
 {
-    this.selectStartPage = pageIndex;
+    if(!(bNoResetSelectPage === true))
+        this.selectStartPage = pageIndex;
     var content = this.getDocContent && this.getDocContent();
     content && content.Set_StartPage(pageIndex);
     if(Array.isArray(this.spTree))
