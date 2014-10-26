@@ -3680,9 +3680,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         }
         return sCurText;
     };
-    this.WriteRun2 = function (fWriter) {
+    this.WriteRun2 = function (fWriter, oRun) {
         var oThis = this;
         this.bs.WriteItem(c_oSerParType.Run, function () {
+            //rPr
+            if (null != oRun && null != oRun.Pr)
+                oThis.bs.WriteItem(c_oSerRunType.rPr, function () { oThis.brPrs.Write_rPr(oRun.Pr); });
+            //Content
             oThis.bs.WriteItem(c_oSerRunType.Content, function () {
                 fWriter();
             });
@@ -3738,12 +3742,16 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                 this.WriteRun2(function () {
                     oThis.memory.WriteByte(c_oSerRunType.fldstart);
                     oThis.memory.WriteString2(sField);
-                });
-                this.WriteText((item.CurPage + 1) + "");
+                }, oRun);
+				if(null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)){
+					this.WriteRun2(function () {
+						oThis.WriteText(elem.pageNum.String);
+					}, oRun);
+				}
                 this.WriteRun2(function () {
                     oThis.memory.WriteByte(c_oSerRunType.fldend);
                     oThis.memory.WriteLong(c_oSerPropLenType.Null);
-                });
+                }, oRun);
             }
         }
     }
