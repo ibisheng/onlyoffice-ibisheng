@@ -2731,6 +2731,7 @@
         this.WriteMergeCells = function(ws)
         {
             var oMerged = ws.mergeManager.getAll();
+			var aMergedUsed = {};//защита чтобы не писать один и тотже диапазон несколько раз
             for(var i in oMerged)
             {
                 var elem = oMerged[i];
@@ -2740,10 +2741,12 @@
                     //write only active merge, if copy/paste
                     if(!this.isCopyPaste || (this.isCopyPaste && this.isCopyPaste.containsRange(bbox)))
                     {
-                        var oFirst = new CellAddress(bbox.r1, bbox.c1, 0);
-                        var oLast = new CellAddress(bbox.r2, bbox.c2, 0);
-                        this.memory.WriteByte(c_oSerWorksheetsTypes.MergeCell);
-                        this.memory.WriteString2(oFirst.getID() + ":" + oLast.getID());
+						var sCurMerged = bbox.getName();
+						if(null == aMergedUsed[sCurMerged]){
+							aMergedUsed[sCurMerged] = 1;
+							this.memory.WriteByte(c_oSerWorksheetsTypes.MergeCell);
+							this.memory.WriteString2(sCurMerged);
+						}
                     }
                 }
             }
