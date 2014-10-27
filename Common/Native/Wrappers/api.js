@@ -4394,9 +4394,15 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
             {
                 _stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
                 asc_menu_WriteHyperPr(this.SelectedObjectsStack[i].Value, _stream);
+                break;
+            }
+            case c_oAscTypeSelectElement.SpellCheck:
+            {
+                // none
+                break;
             }
             default:
-            {  
+            {
                 _stream["WriteLong"](255);
                 break;
             }
