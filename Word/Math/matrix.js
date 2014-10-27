@@ -882,3 +882,7 @@ CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
 }
+CEqArray.prototype.getElementMathContent = function(Index)
+{
+    return this.Content[Index];
+};

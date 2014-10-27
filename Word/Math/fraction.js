@@ -243,6 +243,14 @@ CFraction.prototype.getDenominator = function()
 
     return denominator;
 }
+CFraction.prototype.getNumeratorMathContent = function()
+{
+    return this.Content[0];
+};
+CFraction.prototype.getDenominatorMathContent = function()
+{
+    return this.Content[1];
+};
 CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
     this.Parent   = Parent;

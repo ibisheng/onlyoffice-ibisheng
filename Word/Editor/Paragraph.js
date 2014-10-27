@@ -2771,17 +2771,14 @@ Paragraph.prototype =
                         this.Internal_Content_Add( CurPos + 1, NewElement );
 
 					var Elem = new ParaMath();
-					//Elem.Set_Paragraph(this);
 					Elem.Root.Load_FromMenu(Item.Menu, this);
 					Elem.Root.Correct_Content(true);
                     // Добавляем гиперссылку в содержимое параграфа
                     this.Internal_Content_Add( CurPos + 1, Elem );
 
-                    // TODO: ParaMath Сделать перемещение курсора в формулу
-
-                    // Перемещаем кусор в конец гиперссылки
-                    this.CurPos.ContentPos = CurPos;
-                    this.Content[CurPos].Cursor_MoveToEndPos( false );
+                    // Перемещаем кусор в конец формулы
+                    this.CurPos.ContentPos = CurPos + 1;
+                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
                 }
                 else
                     this.Content[CurPos].Add( Item );

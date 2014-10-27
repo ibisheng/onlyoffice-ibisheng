@@ -452,8 +452,7 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition, bMath)
             ContentPos.Data[Depth]++;
     }
 
-    if(this.Paragraph !== null)
-        this.Paragraph.SpellChecker.Update_OnAdd( this, Pos, Item );
+    this.private_UpdateSpellChecking();
 
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnAdd( Pos );
@@ -574,8 +573,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
             ContentPos.Data[Depth] = Math.max( 0 , Pos );
     }
 
-    if(null !== this.Paragraph)
-        this.Paragraph.SpellChecker.Update_OnRemove( this, Pos, Count );
+    this.private_UpdateSpellChecking();
 
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnRemove( Pos, Count );

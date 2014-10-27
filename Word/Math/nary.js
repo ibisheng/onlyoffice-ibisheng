@@ -427,6 +427,18 @@ CNary.prototype.getLowerIterator = function()
 	if (!this.Pr.subHide)
 		return this.LowerIterator;
 }
+CNary.prototype.getBaseMathContent = function()
+{
+    return this.Arg;
+};
+CNary.prototype.getSupMathContent = function()
+{
+    return this.UpperIterator;
+};
+CNary.prototype.getSubMathContent = function()
+{
+    return this.LowerIterator;
+};
 
 function CNaryUnd(bInside)
 {

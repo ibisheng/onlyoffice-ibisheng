@@ -3734,6 +3734,10 @@ CDelimiter.prototype.getBase = function(numb)
 
     return this.elements[0][numb];
 }
+CDelimiter.prototype.getElementMathContent = function(Index)
+{
+    return this.Content[Index];
+};
 
 function CCharacter()
 {
