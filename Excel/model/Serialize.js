@@ -5833,6 +5833,7 @@
                 res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.curWorksheet);
                 oDrawing.graphicObject = oNewChartSpace;
                 oNewChartSpace.setBDeleted(false);
+                oNewChartSpace.setDrawingBase(oDrawing);
             }
             else
                 res = c_oSerConstants.ReadUnknown;
