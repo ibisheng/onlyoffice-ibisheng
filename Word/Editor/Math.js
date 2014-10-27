@@ -1009,8 +1009,55 @@ ParaMath.prototype.NeedCompiledCtrPr = function()
 {
     this.Root.NeedCompiledCtrPr();
 };
-ParaMath.prototype.MathToImageConverter= function()
+ParaMath.prototype.MathToImageConverter = function(bCopy)
 {
+    g_oTableId.m_bTurnOff = true;
+    History.TurnOff();
+
+    var oldDefTabStop = Default_Tab_Stop;
+    Default_Tab_Stop = 1;
+
+    var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, hdrftr_Header);
+    var _dc = hdr.Content;
+
+    var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+
+    if (bCopy)
+        par.Internal_Content_Add(0, this.Copy(false), false);
+    else
+        par.Internal_Content_Add(0, this, false);
+
+    _dc.Internal_Content_Add(0, par, false);
+
+    par.Set_Align(align_Left);
+    par.Set_Tabs(new CParaTabs());
+
+    var _ind = new CParaInd();
+    _ind.FirstLine = 0;
+    _ind.Left = 0;
+    _ind.Right = 0;
+    par.Set_Ind(_ind, false);
+
+    var _sp = new CParaSpacing();
+    _sp.Line              = 1;
+    _sp.LineRule          = linerule_Auto;
+    _sp.Before            = 0;
+    _sp.BeforeAutoSpacing = false;
+    _sp.After             = 0;
+    _sp.AfterAutoSpacing  = false;
+    par.Set_Spacing(_sp, false);
+
+    _dc.Reset(0, 0, 10000, 10000);
+    _dc.Recalculate_Page(0, true);
+
+    _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
+    _dc.Recalculate_Page(0, true);
+
+    Default_Tab_Stop = oldDefTabStop;
+
+    g_oTableId.m_bTurnOff = false;
+    History.TurnOn();
+
     window.IsShapeToImageConverter = true;
 
     var dKoef = g_dKoef_mm_to_pix;
