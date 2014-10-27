@@ -4,7 +4,7 @@
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_coAuthV	= '3.0.4';
+	var asc_coAuthV	= '3.0.5';
 
 	// Класс надстройка, для online и offline работы
 	function CDocsCoApi (options) {
@@ -603,7 +603,7 @@
 			if (bSendEnd && this.onLocksReleasedEnd)
 				this.onLocksReleasedEnd();
         }
-		this._updateChanges(data["changes"], false);
+		this._updateChanges(data["changes"], data["changesIndex"], false);
     };
 	
 	DocsCoApi.prototype._onStartCoAuthoring = function (isStartEvent) {
@@ -661,13 +661,12 @@
 		return false;
 	};
 
-	DocsCoApi.prototype._updateChanges = function (allServerChanges, bFirstLoad) {
+	DocsCoApi.prototype._updateChanges = function (allServerChanges, changesIndex, bFirstLoad) {
 		if (this.onSaveChanges) {
+			this.changesIndex = changesIndex;
 			if (allServerChanges) {
-				this.changesIndex = allServerChanges['index'];
-				var arrChanges = allServerChanges['arrChanges'];
-				for (var changeId in arrChanges) {
-					var change = arrChanges[changeId];
+				for (var changeId in allServerChanges) {
+					var change = allServerChanges[changeId];
 					var changesOneUser = change["change"];
 					if (changesOneUser) {
 						if (change["user"] !== this._userId)
@@ -819,7 +818,7 @@
 				}
 				this._onGetLock(data);
 			}
-			this._updateChanges(data["changes"], true);
+			this._updateChanges(data["changes"], data["changesIndex"], true);
 			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
 			if (this.onFirstLoadChangesEnd)
 				this.onFirstLoadChangesEnd();
@@ -846,7 +845,7 @@
 		this._documentFormatSave = documentFormatSave;
 		this._isViewer = isViewer;
 
-		this._initSocksJs()
+		this._initSocksJs();
     };
 
 	DocsCoApi.prototype._initSocksJs = function ()  {
