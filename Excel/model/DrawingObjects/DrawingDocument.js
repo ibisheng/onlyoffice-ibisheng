@@ -2684,6 +2684,8 @@ function CDrawingDocument(drawingObjects)
             _offY = this.AutoShapesTrack.Graphics.m_oCoordTransform.ty;
         }
 
+        var _factor = AscBrowser.isRetina ? 1 : 0;
+
         if (null != this.TextMatrix && !global_MatrixTransformer.IsIdentity2(this.TextMatrix))
         {
             var _x1 = this.TextMatrix.TransformPointX(x, y);
@@ -2695,8 +2697,8 @@ function CDrawingDocument(drawingObjects)
             var pos1 = { X : _offX + dKoef * _x1, Y : _offY + dKoef * _y1 };
             var pos2 = { X : _offX + dKoef * _x2, Y : _offY + dKoef * _y2 };
 
-            _newW = (Math.abs(pos1.X - pos2.X) >> 0) + 1;
-            _newH = (Math.abs(pos1.Y - pos2.Y) >> 0) + 1;
+            _newW = (((Math.abs(pos1.X - pos2.X) >> 0) + 1) >> 1) << 1;
+            _newH = (((Math.abs(pos1.Y - pos2.Y) >> 0) + 1) >> 1) << 1;
 
             if (2 > _newW)
                 _newW = 2;
@@ -2710,8 +2712,8 @@ function CDrawingDocument(drawingObjects)
             }
             else
             {
-                this.TargetHtmlElement.style.width = _newW + "px";
-                this.TargetHtmlElement.style.height = _newH + "px";
+                this.TargetHtmlElement.style.width = (_newW >> _factor) + "px";
+                this.TargetHtmlElement.style.height = (_newH >> _factor) + "px";
 
                 this.TargetHtmlElement.width = _newW;
                 this.TargetHtmlElement.height = _newH;
@@ -2743,8 +2745,8 @@ function CDrawingDocument(drawingObjects)
                 ctx.stroke();
             }
 
-            this.TargetHtmlElement.style.left = Math.min(pos1.X, pos2.X) + "px";
-            this.TargetHtmlElement.style.top = Math.min(pos1.Y, pos2.Y) + "px";
+            this.TargetHtmlElement.style.left = (Math.min(pos1.X, pos2.X) >> _factor) + "px";
+            this.TargetHtmlElement.style.top = (Math.min(pos1.Y, pos2.Y) >> _factor) + "px";
         }
         else
         {
@@ -2755,8 +2757,8 @@ function CDrawingDocument(drawingObjects)
             }
             else
             {
-                this.TargetHtmlElement.style.width = _newW + "px";
-                this.TargetHtmlElement.style.height = _newH + "px";
+                this.TargetHtmlElement.style.width = (_newW >> _factor) + "px";
+                this.TargetHtmlElement.style.height = (_newH >> _factor) + "px";
 
                 this.TargetHtmlElement.width = _newW;
                 this.TargetHtmlElement.height = _newH;
@@ -2775,8 +2777,8 @@ function CDrawingDocument(drawingObjects)
 
             var pos = { X : _offX + dKoef * x, Y : _offY + dKoef * y };
 
-            this.TargetHtmlElement.style.left = pos.X + "px";
-            this.TargetHtmlElement.style.top = pos.Y + "px";
+            this.TargetHtmlElement.style.left = (pos.X >> _factor) + "px";
+            this.TargetHtmlElement.style.top = (pos.Y >> _factor) + "px";
         }
     }
 
