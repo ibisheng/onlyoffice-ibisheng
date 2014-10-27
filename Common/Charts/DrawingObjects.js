@@ -2921,6 +2921,8 @@ function DrawingObjects() {
                     oNewChartSpace.spPr.xfrm.setOffY(pos_y);
                     oNewChartSpace.checkDrawingBaseCoords();
                     oNewChartSpace.recalculate();
+                   //window["Asc"]["editor"].wb._onScrollY(0);
+                   //window["Asc"]["editor"].wb._onScrollX(0);
                     _this.showDrawingObjects(false);
                     _this.controller.resetSelection();
                     _this.controller.selectObject(oNewChartSpace, 0);

@@ -128,6 +128,58 @@ function CreateUniFillByUniColorCopy(uniColor)
     return ret;
 }
 
+function CopyRunToPPTX(Run, Paragraph)
+{
+    var NewRun = new ParaRun(Paragraph, false);
+    NewRun.Set_Pr( Run.Pr.Copy() );
+
+    var PosToAdd = 0;
+    for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
+    {
+        var Item = Run.Content[CurPos];
+        if ( para_End !== Item.Type && Item.Type !== para_Drawing)
+        {
+            NewRun.Add_ToContent( PosToAdd, Item.Copy(), false );
+            ++PosToAdd;
+        }
+    }
+    return NewRun;
+};
+
+function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
+{
+    var _drawing_document = isRealObject(drawingDocument) ? drawingDocument : paragraph.DrawingDocument;
+    var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
+
+    var new_paragraph = new Paragraph(_drawing_document, _new_parent, 0, 0, 0, 0, 0, true);
+    new_paragraph.Set_Pr(paragraph.Pr.Copy());
+    new_paragraph.TextPr.Set_Value( paragraph.TextPr.Value );
+    new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
+    var Count = paragraph.Content.length;
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var Item = paragraph.Content[Index];
+        if(Item.Type === para_Run)
+        {
+            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, CopyRunToPPTX(Item, new_paragraph), false);
+        }
+    }
+    var EndRun = new ParaRun(new_paragraph);
+    EndRun.Add_ToContent( 0, new ParaEnd() );
+    new_paragraph.Internal_Content_Add( new_paragraph.Content.length, EndRun, false );
+    return new_paragraph;
+}
+
+function ConvertParagraphToWord(paragraph, docContent)
+{
+    var _docContent = isRealObject(docContent) ? docContent : paragraph.Parent;
+    var oldFlag = paragraph.bFromDocument;
+    paragraph.bFromDocument = true;
+    var new_paragraph = paragraph.Copy(_docContent);
+    paragraph.bFromDocument = oldFlag;
+    return new_paragraph;
+}
+
 function CShape()
 {
     this.nvSpPr         = null;
@@ -232,9 +284,7 @@ CShape.prototype =
                 for(var i = 0; i < paragraphs.length; ++i)
                 {
                     var cur_par = paragraphs[i];
-                    cur_par.bFromDocument = true;
-                    var new_paragraph = cur_par.Copy(new_content);
-                    cur_par.bFromDocument = false;
+                    var new_paragraph = ConvertParagraphToWord(cur_par, new_content);
                     new_content.Internal_Content_Add( i, new_paragraph, false );
                     /*var bullet = cur_par.Pr.Bullet;
                     if(bullet && bullet.bulletType && bullet.bulletType.type !== BULLET_TYPE_BULLET_NONE)
@@ -295,43 +345,11 @@ CShape.prototype =
             var new_content = new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true);
             new_content.Internal_Content_RemoveAll();
             var paragraphs = this.textBoxContent.Content;
-            var CopyRunToPPTX = function(Run, Paragraph)
-            {
-                var NewRun = new ParaRun(Paragraph, false);
-                NewRun.Set_Pr( Run.Pr.Copy() );
-
-                var PosToAdd = 0;
-                for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
-                {
-                    var Item = Run.Content[CurPos];
-                    if ( para_End !== Item.Type && Item.Type !== para_Drawing)
-                    {
-                        NewRun.Add_ToContent( PosToAdd, Item.Copy(), false );
-                        ++PosToAdd;
-                    }
-                }
-                return NewRun;
-            };
 
             for(var i = 0; i < paragraphs.length; ++i)
             {
                 var cur_par = paragraphs[i];
-                var new_paragraph = new Paragraph(drawingDocument, tx_body, 0, 0, 0, 0, 0, true);
-                new_paragraph.Set_Pr(cur_par.Pr.Copy());
-                new_paragraph.TextPr.Set_Value( cur_par.TextPr.Value );
-                new_paragraph.Internal_Content_Remove2(0, new_paragraph.Content.length);
-                var Count = cur_par.Content.length;
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Item = cur_par.Content[Index];
-                    if(Item.Type === para_Run)
-                    {
-                        new_paragraph.Internal_Content_Add(new_paragraph.Content.length, CopyRunToPPTX(Item, new_paragraph), false);
-                    }
-                }
-                var EndRun = new ParaRun(new_paragraph);
-                EndRun.Add_ToContent( 0, new ParaEnd() );
-                new_paragraph.Internal_Content_Add( new_paragraph.Content.length, EndRun, false );
+                var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
                 new_content.Internal_Content_Add( i, new_paragraph, false );
             }
             tx_body.setContent(new_content);
