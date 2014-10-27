@@ -3226,9 +3226,8 @@
 
                     drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
                     //drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
-					drawingObject.graphicObject.recalculate();
 					drawingObject.graphicObject.addToDrawingObjects();
-                    drawingObject.graphicObject.recalculateTransform();
+					drawingObject.graphicObject.recalculate();
                     drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
 					if(drawingObject.graphicObject.isImage())
