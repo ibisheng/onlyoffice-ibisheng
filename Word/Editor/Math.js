@@ -1011,8 +1011,18 @@ ParaMath.prototype.NeedCompiledCtrPr = function()
 };
 ParaMath.prototype.MathToImageConverter = function(bCopy)
 {
-    g_oTableId.m_bTurnOff = true;
-    History.TurnOff();
+    var bTurnOnId = false, bTurnOnHistory = false;
+    if (false === g_oTableId.m_bTurnOff)
+    {
+        g_oTableId.m_bTurnOff = true;
+        bTurnOnId = true;
+    }
+
+    if (true === History.Is_On())
+    {
+        bTurnOnHistory = true;
+        History.TurnOff();
+    }
 
     var oldDefTabStop = Default_Tab_Stop;
     Default_Tab_Stop = 1;
@@ -1055,7 +1065,10 @@ ParaMath.prototype.MathToImageConverter = function(bCopy)
 
     Default_Tab_Stop = oldDefTabStop;
 
-    g_oTableId.m_bTurnOff = false;
+    if (true === bTurnOnId)
+        g_oTableId.m_bTurnOff = false;
+
+    if (true === bTurnOnHistory)
     History.TurnOn();
 
     window.IsShapeToImageConverter = true;
