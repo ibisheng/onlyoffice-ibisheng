@@ -3956,6 +3956,29 @@ function asc_menu_ReadHyperPr(_params, _cursor)
     return _settings;
 };
 
+function asc_menu_WriteHyperPr(_hyperPr, _stream)
+{
+    if (_hyperPr.Text !== undefined && _hyperPr.Text !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](_hyperPr.Text);
+    }
+
+    if (_hyperPr.Value !== undefined && _hyperPr.Value !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteString2"](_hyperPr.Value);
+    }
+
+    if (_hyperPr.ToolTip !== undefined && _hyperPr.ToolTip !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteString2"](_hyperPr.ToolTip);
+    }
+
+    _stream["WriteByte"](255);
+};
+
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -4366,6 +4389,11 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
                 _stream["WriteLong"](c_oAscTypeSelectElement.Image);
                 asc_menu_WriteImagePr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
+            }
+            case c_oAscTypeSelectElement.Hyperlink:
+            {
+                _stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
+                asc_menu_WriteHyperPr(this.SelectedObjectsStack[i].Value, _stream);
             }
             default:
             {  
