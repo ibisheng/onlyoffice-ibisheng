@@ -7707,6 +7707,12 @@ CTable.prototype =
                 this.Selection.Data2.Min = Y_min;
                 this.Selection.Data2.Max = Y_max;
 
+                this.Selection.Data2.Pos =
+                {
+                    Row  : Pos.Row,
+                    Cell : Pos.Cell
+                };
+
                 if ( null != this.Selection.Data2.Min )
                     _Y = Math.max( _Y, this.Selection.Data2.Min );
 
@@ -7808,26 +7814,10 @@ CTable.prototype =
             }
 
             if ( true === this.Selection.Data2.bCol )
-            {
-                if ( null != this.Selection.Data2.Min )
-                    _X = Math.max( _X, this.Selection.Data2.Min );
-
-                if ( null != this.Selection.Data2.Max )
-                    _X = Math.min( _X, this.Selection.Data2.Max );
-
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _X );
-            }
+                _X = this.private_UpdateTableRulerOnBorderMove(_X);
             else
-            {
-                if ( null != this.Selection.Data2.Min )
-                    _Y = Math.max( _Y, this.Selection.Data2.Min );
+                _Y = this.private_UpdateTableRulerOnBorderMove(_Y);
 
-                if ( null != this.Selection.Data2.Max )
-                    _Y = Math.min( _Y, this.Selection.Data2.Max );
-
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _Y );
-            }
-            
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
 
@@ -19328,6 +19318,23 @@ CTable.prototype =
                     this.Internal_UpdateCellW(nColIndex);
             }
         }
+    },
+
+    private_UpdateTableRulerOnBorderMove : function(Pos)
+    {
+        if (null != this.Selection.Data2.Min)
+            Pos = Math.max(Pos, this.Selection.Data2.Min);
+
+        if (null != this.Selection.Data2.Max)
+            Pos = Math.min(Pos, this.Selection.Data2.Max);
+
+        // Обновляем Markup по ячейке в которой мы двигаем границу. Так делаем, потому что мы можем находится изначально
+        // на другой странице данной таблице, а там Markup может быть совершенно другим. В конце движения границы
+        // произойдет обновление селекта, и Markup обновится по текущему положению курсора.
+        this.Internal_Update_TableMarkup(this.Selection.Data2.Pos.Row, this.Selection.Data2.Pos.Cell, this.Selection.Data2.PageNum);
+        this.DrawingDocument.UpdateTableRuler(this.Selection.Data2.bCol, this.Selection.Data2.Index, Pos);
+
+        return Pos;
     }
 };
 

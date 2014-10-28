@@ -3747,8 +3747,8 @@ CMathContent.prototype.private_CanAutoCorrectText = function(AutoCorrectionEngin
 
     var Result = false;
 
-    var RemoveCount = 0;
-    var ReplaceChar = ' ';
+    var RemoveCount  = 0;
+    var ReplaceChars = [0x0020];
     var AutoCorrectCount = g_aAutoCorrectMathSymbols.length;
     for (var nIndex = 0; nIndex < AutoCorrectCount; nIndex++)
     {
@@ -3774,18 +3774,31 @@ CMathContent.prototype.private_CanAutoCorrectText = function(AutoCorrectionEngin
 
         if (true === Found)
         {
-            RemoveCount = CheckStringLen + IndexAdd;
-            ReplaceChar = AutoCorrectElement[1];
+            RemoveCount   = CheckStringLen + IndexAdd;
+
+            if (undefined === AutoCorrectElement[1].length)
+                ReplaceChars[0] = AutoCorrectElement[1];
+            else
+            {
+                for (var Index = 0, Len = AutoCorrectElement[1].length; Index < Len; Index++)
+                {
+                    ReplaceChars[Index] = AutoCorrectElement[1][Index];
+                }
+            }
+
         }
     }
 
     if (RemoveCount > 0)
     {
-        var ReplaceText = new CMathText();
-        ReplaceText.add(ReplaceChar);
-
         var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
-        MathRun.Add(ReplaceText, true);
+
+        for (var Index = 0, Count = ReplaceChars.length; Index < Count; Index++)
+        {
+            var ReplaceText = new CMathText();
+            ReplaceText.add(ReplaceChars[Index]);
+            MathRun.Add(ReplaceText, true);
+        }
 
         AutoCorrectionEngine.RemoveCount = RemoveCount;
         AutoCorrectionEngine.ReplaceContent.push(MathRun);
@@ -4220,7 +4233,7 @@ var g_aAutoCorrectMathSymbols =
         ['\\psi', 0x03C8],
         ['\\Psi', 0x03A8],
         ['\\qdrt', 0x221C],
-        // TODO: \\quadratic
+        ['\\quadratic', [0x0078, 0x003d, 0x0028, 0x002d, 0x0062, 0x00B1, 0x221A, 0x0020, 0x0028, 0x0062, 0x005e, 0x0032, 0x002d, 0x0034, 0x0061, 0x0063, 0x0029, 0x0029, 0x002f, 0x0032, 0x0061]],
         ['\\rangle', 0x232A],
         ['\\ratio', 0x2236],
         ['\\rbrace', 0x007D],
