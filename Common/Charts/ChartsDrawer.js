@@ -1600,11 +1600,11 @@ CChartsDrawer.prototype =
 		
 		if(this.calcProp.type == "Scatter")
 		{
-			this.calcProp.scale = this._getAxisData2(false, this.calcProp.ymin, this.calcProp.ymax, chartProp);	
-			this.calcProp.xScale = this._getAxisData2(true, this.calcProp.min, this.calcProp.max, chartProp);
+			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.ymin, this.calcProp.ymax, chartProp));	
+			this.calcProp.xScale = this._roundValues(this._getAxisData2(true, this.calcProp.min, this.calcProp.max, chartProp));
 		}
 		else
-			this.calcProp.scale = this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp);	
+			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp));	
 		
 		
 		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
@@ -2098,6 +2098,20 @@ CChartsDrawer.prototype =
 		}
 		
 		return 0;
+	},
+	
+	_roundValues: function(values)
+	{
+		var kF = 1000000000;
+		if(values.length)
+		{
+			for(var i = 0; i < values.length; i++)
+			{
+				values[i] = parseInt(values[i] * kF) / kF;
+			}
+		}
+		
+		return values;
 	},
 	
 	
