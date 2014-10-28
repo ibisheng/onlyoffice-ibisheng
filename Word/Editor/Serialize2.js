@@ -805,7 +805,7 @@ function BinaryFileWriter(doc)
         //Write StyleTable
         this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, oNumIdMap));
         //Write DocumentTable
-		var oBinaryHeaderFooterTableWriter = new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap);
+		var oBinaryHeaderFooterTableWriter = new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap, oMapCommentId);
         this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap, null, oBinaryHeaderFooterTableWriter));
         //Write HeaderFooter
         this.WriteTable(c_oSerTableTypes.HdrFtr, oBinaryHeaderFooterTableWriter);
@@ -3208,11 +3208,12 @@ Binary_tblPrWriter.prototype =
         }
     }
 };
-function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap)
+function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap, oMapCommentId)
 {
     this.memory = memory;
     this.Document = doc;
 	this.oNumIdMap = oNumIdMap;
+	this.oMapCommentId = oMapCommentId;
 	this.aHeaders = [];
 	this.aFooters = [];
     this.bs = new BinaryCommonWriter(this.memory);
@@ -3244,7 +3245,7 @@ function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap)
     {
         var oThis = this;
         //Content
-        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.oNumIdMap, null, null);
+        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, null, null);
         this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Content, function(){dtw.WriteDocumentContent(item.Content);});
     };
 };
@@ -7137,7 +7138,7 @@ function Binary_HdrFtrTableReader(doc, oReadResult, openParams, stream)
 	this.openParams = openParams;
     this.stream = stream;
     this.bcr = new Binary_CommonReader(this.stream);
-    this.bdtr = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, true, {});
+    this.bdtr = new Binary_DocumentTableReader(this.Document, this.oReadResult, this.openParams, this.stream, true, this.oReadResult.oCommentsPlaces);
     this.Read = function()
     {
         var oThis = this;
