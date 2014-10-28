@@ -4386,7 +4386,7 @@ function FilterColumns() {
 FilterColumns.prototype.clone = function() {
 	var res = new FilterColumns();
 	res.ColId = this.ColId;
-	res.CustomFiltersObj = this.CustomFiltersObj;
+	res.CustomFiltersObj = this.CustomFiltersObj.clone();
 	
 	return res;
 };
@@ -4526,6 +4526,7 @@ CustomFilters.prototype.clone = function() {
 	var i, res = new CustomFilters();
 	res.And = this.And;
 	if (this.CustomFilters) {
+		res.CustomFilters = [];
 		for (i = 0; i < this.CustomFilters.length; ++i)
 			res.CustomFilters.push(this.CustomFilters[i].clone());
 	}
