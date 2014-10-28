@@ -1255,7 +1255,7 @@ var gUndoInsDelCellsFlag = true;
 			insertColumn: function(type, val, ar, insertType)
 			{
 				var activeCells;
-				var DeleteColumns = (insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') ? true : false;
+				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
                 if(typeof val == 'object')
 				{
 					activeCells = val.clone();
@@ -1289,7 +1289,7 @@ var gUndoInsDelCellsFlag = true;
 			insertRows: function(type, val, ar, insertType)
 			{
                 var activeCells;
-				var DeleteRows = (insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') ? true : false;
+				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
                 if(typeof val == 'object')
 				{
 					activeCells = val.clone();
