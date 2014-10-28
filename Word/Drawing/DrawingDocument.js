@@ -6400,7 +6400,7 @@ function CMathPainter(_api)
             { w : 100, h : 100 }, // Accent
             { w : 100, h : 100 }, // LimitLog
             { w : 100, h : 100 }, // Operator
-            { w : 100, h : 100 }, // Matrix
+            { w : 100, h : 100 } // Matrix
         ];
 
         var _types = [];
