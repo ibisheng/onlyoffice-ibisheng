@@ -1317,8 +1317,8 @@ function DrawingObjects() {
     var autoShapeTrack = null;
     var scrollOffset = new ScrollOffset();
 
-    var aObjects = null;
-    var aImagesSync = null;
+    var aObjects = [];
+    var aImagesSync = [];
     var aBoundsCheckers = [];
 
     _this.zoom = { last: 1, current: 1 };
@@ -1411,11 +1411,6 @@ function DrawingObjects() {
     DrawingBase.prototype.isLocked = function() {
         var _t = this;
         return ( (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeNone) && (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeMine) )
-    };
-
-    DrawingBase.prototype.getWorkbook = function() {
-        var _t = this;
-        return (_t.worksheet ? _t.worksheet.model.workbook : null);
     };
 
     DrawingBase.prototype.getCanvasContext = function() {
@@ -2001,10 +1996,6 @@ function DrawingObjects() {
         trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-graphic-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
         autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
         autoShapeTrack.Graphics.CalculateFullTransform();
-    };
-
-    _this.getWorkbook = function() {
-        return (worksheet ? worksheet.model.workbook : null);
     };
 
     _this.getCanvasContext = function() {

@@ -1076,7 +1076,8 @@
 
 		WorksheetView.prototype._prepareDrawingObjects = function () {
 			this.objectRender = new DrawingObjects();
-			this.objectRender.init(this);
+			if (!window["NATIVE_EDITOR_ENJINE"])
+				this.objectRender.init(this);
 		};
 
 		WorksheetView.prototype._initWorksheetDefaultWidth = function () {

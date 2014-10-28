@@ -934,28 +934,3 @@ function isRealObject(obj)
 {
     return obj !== null && typeof obj === "object";
 }
-function WriteObjectLong(Writer, Object)
-{
-    var field_count = 0;
-    for(var key in Object)
-    {
-        ++field_count;
-    }
-    Writer.WriteLong(field_count);
-    for(key in Object)
-    {
-        Writer.WriteString2(key);
-        Writer.WriteLong(Object[key]);
-    }
-}
-function ReadObjectLong(Reader)
-{
-    var ret = {};
-    var field_count = Reader.GetLong();
-    for(var index =0; index < field_count; ++index)
-    {
-        var key = Reader.GetString2();
-        ret[key] = Reader.GetLong();
-    }
-    return ret;
-}
