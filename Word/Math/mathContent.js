@@ -2022,27 +2022,29 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
 
     var Pr = {ctrPrp: new CTextPr()};
 
-    if (Type & c_oAscMathTypeBits.Fraction)
+    var MainType = Type >> 24;
+
+    if (MainType === c_oAscMathMainType.Fraction)
         this.private_LoadFromMenuFraction(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Script)
+    else if (MainType === c_oAscMathMainType.Script)
         this.private_LoadFromMenuScript(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Radical)
+    else if (MainType === c_oAscMathMainType.Radical)
         this.private_LoadFromMenuRadical(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Integral)
+    else if (MainType === c_oAscMathMainType.Integral)
         this.private_LoadFromMenuIntegral(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.LargeOperator)
+    else if (MainType === c_oAscMathMainType.LargeOperator)
         this.private_LoadFromMenuLargeOperator(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Bracket)
+    else if (MainType === c_oAscMathMainType.Bracket)
         this.private_LoadFromMenuBracket(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Function)
+    else if (MainType === c_oAscMathMainType.Function)
         this.private_LoadFromMenuFunction(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Accent)
+    else if (MainType === c_oAscMathMainType.Accent)
         this.private_LoadFromMenuAccent(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.LimitLog)
+    else if (MainType === c_oAscMathMainType.LimitLog)
         this.private_LoadFromMenuLimitLog(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Operator)
+    else if (MainType === c_oAscMathMainType.Operator)
         this.private_LoadFromMenuOperator(Type, Pr);
-    else if (Type & c_oAscMathTypeBits.Matrix)
+    else if (MainType === c_oAscMathMainType.Matrix)
         this.private_LoadFromMenuMatrix(Type, Pr);
 };
 CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
