@@ -3190,6 +3190,7 @@ var gUndoInsDelCellsFlag = true;
 				};
 				
 				//проверяем есть ли пустые строчки и столбцы в диапазоне
+				var mergeCells;
 				if(ar.r1 == cloneActiveRange.r1)
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
@@ -3232,7 +3233,13 @@ var gUndoInsDelCellsFlag = true;
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.c2 > cloneActiveRange.c1)
-							cloneActiveRange.c2--;
+						{
+							mergeCells = ws.model.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2).hasMerged();
+							if(!mergeCells || mergeCells === null)//если не мерженная ячейка
+								cloneActiveRange.c2--;
+							else if(ws.model.getRange3(mergeCells.r1, mergeCells.c1, mergeCells.r2, mergeCells.c2).getValue() == "")//если мерженная ячейка пустая
+								cloneActiveRange.c2--;
+						}
 					}
 				}
 				
@@ -3296,14 +3303,10 @@ var gUndoInsDelCellsFlag = true;
 					cloneActiveRange = newRange;
 				}
 			
-				//if(ar.r1 == cloneActiveRange.r1 && ar.r2 == cloneActiveRange.r2 && ar.c1 == cloneActiveRange.c1 && ar.c2 == cloneActiveRange.c2)
-					//return false;
-				//else
-					if(cloneActiveRange)
-						return cloneActiveRange;
-					else
-						return ar;
-
+				if(cloneActiveRange)
+					return cloneActiveRange;
+				else
+					return ar;
 			},
 			
 			_showAutoFilterDialog: function(cell,kF) {
