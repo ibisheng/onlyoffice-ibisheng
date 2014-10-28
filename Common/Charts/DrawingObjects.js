@@ -1942,7 +1942,7 @@ function DrawingObjects() {
 
     _this.recalculate =  function(all)
     {
-        _this.controller.recalculate(all);
+        _this.controller.recalculate2(all);
     };
 
     _this.preCopy = function() {
