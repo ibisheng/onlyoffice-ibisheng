@@ -1082,3 +1082,21 @@ var g_oArrUserColors = [15064320, 58807, 16724950, 1759488, 9981439, 56805, 1505
 	8571904, 1490688, 16711884, 8991743, 13407488, 41932, 11010303, 7978752, 15028480, 52387, 15007927, 52325, 47295,
 	14549247, 12552960, 12564480, 39359, 15007852, 12114176, 1421824, 55726, 13041893, 10665728, 30924, 49049,
 	14251264, 48990, 14241024, 36530, 11709440, 13369507, 44210, 11698688, 7451136, 13397504, 45710, 34214];
+
+function CAscMathType()
+{
+    this.Id     = 0;
+    this.Image  = "";
+}
+CAscMathType.prototype.get_Id = function(){ return this.Id; };
+CAscMathType.prototype.get_Image = function(){ return this.Image; };
+
+function CAscMathCategory()
+{
+    this.Id     = 0;
+    this.Data   = [];
+}
+
+CAscMathCategory.prototype.get_Id = function(){ return this.Id; };
+CAscMathCategory.prototype.get_Data = function(){ return this.Data; };
+CAscMathCategory.prototype.private_Sort = function(){ this.Data.sort( function(a,b){ return a.Id- b.Id; } ); };

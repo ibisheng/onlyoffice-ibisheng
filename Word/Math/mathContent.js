@@ -2167,7 +2167,7 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
         case c_oAscMathType.Symbol_Omega         : Code = 0x03A9; break;
     }
 
-    if (-1 !== nCode)
+    if (-1 !== Code)
         this.Add_Symbol(Code);
 };
 CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
@@ -2707,12 +2707,9 @@ CMathContent.prototype.Add_Symbol = function(Code)
 {
     var MathRun = new ParaRun(this.Paragraph, true);
 
-    for (var nCharPos = 0, nTextLen = sText.length; nCharPos < nTextLen; nCharPos++)
-    {
-        var Symbol = new CMathText(false);
-        Symbol.add(Code);
-        MathRun.Add(Symbol, true);
-    }
+    var Symbol = new CMathText(false);
+    Symbol.add(Code);
+    MathRun.Add(Symbol, true);
 
     this.Internal_Content_Add(this.content.length, MathRun, true);
 };

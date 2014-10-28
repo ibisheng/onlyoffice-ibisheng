@@ -6337,3 +6337,127 @@ CStylesPainter.prototype =
         }
     }
 }
+
+function CMathPainter(_api)
+{
+    this.Api = _api;
+
+    this.StartLoad = function()
+    {
+        var loader = window.g_font_loader;
+        var nIndex = loader.map_font_index["Cambria Math"];
+
+        if (undefined === nIndex)
+        {
+            // нет Cambria Math - нет и формул
+            return;
+        }
+
+        var fontinfo = loader.fontInfos[nIndex];
+        if (undefined === fontinfo)
+        {
+            // нет Cambria Math - нет и формул
+            return;
+        }
+
+        var isasync = loader.LoadFont(fontinfo, this.Api.asyncFontEndLoaded_MathDraw, null);
+
+        if (false === isasync)
+        {
+            this.Generate();
+        }
+    }
+
+    this.Generate = function()
+    {
+        var bTurnOnId = false, bTurnOnHistory = false;
+        if (false === g_oTableId.m_bTurnOff)
+        {
+            g_oTableId.m_bTurnOff = true;
+            bTurnOnId = true;
+        }
+
+        if (true === History.Is_On())
+        {
+            bTurnOnHistory = true;
+            History.TurnOff();
+        }
+
+        var _math = new CAscMathCategory();
+
+        var _canvas = document.createElement('canvas');
+
+        var _sizes =
+        [
+            { w : 100, h : 100 }, // Symbols
+            { w : 100, h : 100 }, // Fraction
+            { w : 100, h : 100 }, // Script
+            { w : 100, h : 100 }, // Radical
+            { w : 100, h : 100 }, // Integral
+            { w : 100, h : 100 }, // LargeOperator
+            { w : 100, h : 100 }, // Bracket
+            { w : 100, h : 100 }, // Function
+            { w : 100, h : 100 }, // Accent
+            { w : 100, h : 100 }, // LimitLog
+            { w : 100, h : 100 }, // Operator
+            { w : 100, h : 100 }, // Matrix
+        ];
+
+        var _types = [];
+        for (var _name in c_oAscMathType)
+        {
+            _types.push(c_oAscMathType[_name]);
+        }
+        _types.sort( function(a,b){ return a-b; } );
+
+        //var _time1 = new Date().getTime();
+
+        var _types_len = _types.length;
+        for (var t = 0; t < _types_len; t++)
+        {
+            var _type = _types[t];
+            var _category1 = (_type >> 24) & 0xFF;
+            var _category2 = (_type >> 16) & 0xFF;
+            _type &= 0xFFFF;
+
+            if (undefined == _math.Data[_category1])
+            {
+                _math.Data[_category1] = new CAscMathCategory();
+                _math.Data[_category1].Id = _category1;
+            }
+
+            if (undefined == _math.Data[_category1].Data[_category2])
+            {
+                _math.Data[_category1].Data[_category2] = new CAscMathCategory();
+                _math.Data[_category1].Data[_category2].Id = _category2;
+            }
+
+            var _menuType = new CAscMathType();
+            _menuType.Id = _type;
+
+            var _paraMath = new ParaMath();
+            _paraMath.Root.Load_FromMenu(_types[t]);
+            _paraMath.Root.Correct_Content(true);
+
+            _menuType.Image = _paraMath.MathToImageConverter(false, _canvas, _sizes[_category1].w, _sizes[_category1].h);
+
+            var tt = new Image();
+            tt.src = _menuType.Image;
+
+            _math.Data[_category1].Data[_category2].Data.push(_menuType);
+        }
+
+        _canvas = null;
+
+        //var _time2 = new Date().getTime();
+        //alert("" + (_time2 - _time1));
+
+        if (true === bTurnOnId)
+            g_oTableId.m_bTurnOff = false;
+
+        if (true === bTurnOnHistory)
+            History.TurnOn();
+
+        this.Api.sendMathTypesToMenu(_math);
+    }
+}

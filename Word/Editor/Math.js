@@ -1009,7 +1009,7 @@ ParaMath.prototype.NeedCompiledCtrPr = function()
 {
     this.Root.NeedCompiledCtrPr();
 };
-ParaMath.prototype.MathToImageConverter = function(bCopy)
+ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx, _heightPx)
 {
     var bTurnOnId = false, bTurnOnHistory = false;
     if (false === g_oTableId.m_bTurnOff)
@@ -1069,7 +1069,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy)
         g_oTableId.m_bTurnOff = false;
 
     if (true === bTurnOnHistory)
-    History.TurnOn();
+        History.TurnOn();
 
     window.IsShapeToImageConverter = true;
 
@@ -1079,9 +1079,10 @@ ParaMath.prototype.MathToImageConverter = function(bCopy)
     var w_px = (w_mm * dKoef) >> 0;
     var h_px = (h_mm * dKoef) >> 0;
 
-    var _canvas = document.createElement('canvas');
-    _canvas.width = w_px;
-    _canvas.height = h_px;
+    var _canvas = (_canvasInput === undefined) ? document.createElement('canvas') : _canvasInput;
+
+    _canvas.width   = (undefined == _widthPx) ? w_px : _widthPx;
+    _canvas.height  = (undefined == _heightPx) ? h_px : _heightPx;
 
     var _ctx = _canvas.getContext('2d');
 
@@ -1091,22 +1092,43 @@ ParaMath.prototype.MathToImageConverter = function(bCopy)
 
     g.m_oCoordTransform.tx = 0;
     g.m_oCoordTransform.ty = 0;
+
+    if (_widthPx !== undefined && _heightPx !== undefined)
+    {
+        g.m_oCoordTransform.tx = (_widthPx - w_px) / 2;
+        g.m_oCoordTransform.ty = (_heightPx - h_px) / 2;
+    }
+
     g.transform(1,0,0,1,0,0);
 
     this.Root.draw(0, 0, g);
 
     window.IsShapeToImageConverter = false;
 
-    var _ret = { ImageNative : _canvas, ImageUrl : "" };
-    try
+    if (undefined === _canvasInput)
     {
-        _ret.ImageUrl = _canvas.toDataURL("image/png");
+        var _ret = { ImageNative: _canvas, ImageUrl: "" };
+        try
+        {
+            _ret.ImageUrl = _canvas.toDataURL("image/png");
+        }
+        catch (err)
+        {
+            _ret.ImageUrl = "";
+        }
+        return _ret;
     }
-    catch (err)
+    else
     {
-        _ret.ImageUrl = "";
+        try
+        {
+            return _canvas.toDataURL("image/png");
+        }
+        catch (err)
+        {
+        }
+        return "";
     }
-    return _ret;
 };
 
 ParaMath.prototype.ApplyArgSize = function(FontSize, argSize)

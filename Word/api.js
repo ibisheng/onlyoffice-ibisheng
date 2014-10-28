@@ -641,6 +641,8 @@ function asc_docs_api(name)
 	
 	this.TrackFile = null;
 
+    this.MathDrawer = new CMathPainter(this);
+
 	var oThis = this;
 	if(window.addEventListener)
 		window.addEventListener("message", function(){
@@ -2003,6 +2005,17 @@ asc_docs_api.prototype.put_FramePr = function(Obj)
             this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( Obj );
         }
     }
+}
+
+asc_docs_api.prototype.asyncFontEndLoaded_MathDraw = function(Obj)
+{
+    this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+    this.MathDrawer.Generate();
+}
+asc_docs_api.prototype.sendMathTypesToMenu = function(_math)
+{
+    this.asc_fireCallback("asc_onMathTypes", _math);
+    this.MathDrawer = null;
 }
 
 asc_docs_api.prototype.asyncFontEndLoaded_DropCap = function(Obj)
@@ -6469,6 +6482,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     }
 
     this.WordControl.InitControl();
+    //this.MathDrawer.StartLoad();
 
     if (this.isViewMode)
         this.SetViewMode(true);

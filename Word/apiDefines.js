@@ -342,7 +342,7 @@ var c_oAscSectionBreakType =
 
 var c_oAscMathMainType =
 {
-    Symbols      :  0x00,
+    Symbol       :  0x00,
     Fraction     :  0x01,
     Script       :  0x02,
     Radical      :  0x03,
@@ -357,7 +357,7 @@ var c_oAscMathMainType =
 };
 
 var c_oAscMathMainTypeStrings = {};
-c_oAscMathMainTypeStrings[c_oAscMathMainType.Symbols      ] = "Symbols";
+c_oAscMathMainTypeStrings[c_oAscMathMainType.Symbol       ] = "Symbols";
 c_oAscMathMainTypeStrings[c_oAscMathMainType.Fraction     ] = "Fraction";
 c_oAscMathMainTypeStrings[c_oAscMathMainType.Script       ] = "Script";
 c_oAscMathMainTypeStrings[c_oAscMathMainType.Radical      ] = "Radical";
