@@ -981,7 +981,7 @@ ParaRun.prototype.Search = function(ParaSearch, Depth)
             ParaSearch.Reset();
         }
 
-        if ( (" " === Str[ParaSearch.SearchIndex] && para_Space === Item.Type) || ( para_Text === Item.Type && (  ( true != MatchCase && (String.fromCharCode(Item.Value)).toLowerCase() === Str[ParaSearch.SearchIndex].toLowerCase() ) || ( true === MatchCase && Item.Value === Str.charCodeAt(ParaSearch.SearchIndex) ) ) ) )
+        if ( (" " === Str[ParaSearch.SearchIndex] && para_Space === Item.Type)|| (para_Math_Text == Item.Type && Item.value === Str.charCodeAt(ParaSearch.SearchIndex)) || ( para_Text === Item.Type && (  ( true != MatchCase && (String.fromCharCode(Item.Value)).toLowerCase() === Str[ParaSearch.SearchIndex].toLowerCase() ) || ( true === MatchCase && Item.Value === Str.charCodeAt(ParaSearch.SearchIndex) ) ) ) )
         {
             if ( 0 === ParaSearch.SearchIndex )
             {
@@ -1253,24 +1253,33 @@ ParaComment.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos,
 ParaMath.prototype.Search = function(ParaSearch, Depth)
 {
     // Обнуляем поиск
-    ParaSearch.Reset();
+    //ParaSearch.Reset();
+
+    this.SearchMarks = [];
+    this.Root.Search(ParaSearch, Depth);
+
+
 };
 
 ParaMath.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
 {
+    this.Root.Add_SearchResult(SearchResult, Start, ContentPos, Depth);
 };
 
 ParaMath.prototype.Clear_SearchResults = function()
 {
+    this.Root.Clear_SearchResults();
 };
 
 ParaMath.prototype.Remove_SearchResult = function(SearchResult)
 {
+    this.Root.Remove_SearchResult(SearchResult);
 };
 
 ParaMath.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
 {
-    return null;
+    return this.Root.Search_GetId(bNext, bUseContentPos, ContentPos, Depth);
+    //return null;
 };
 
 //----------------------------------------------------------------------------------------------------------------------

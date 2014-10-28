@@ -466,7 +466,6 @@ CAccent.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
-    this.elements[0][0].SetDot(true);
 };
 CAccent.prototype.IsAccent = function()
 {

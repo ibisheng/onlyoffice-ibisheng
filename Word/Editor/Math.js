@@ -108,11 +108,11 @@ ParaMath.prototype.Set_Paragraph = function(Paragraph)
 
 ParaMath.prototype.Is_Empty = function()
 {
-    if (this.Root.content.length <= 0)
+    if (this.Root.Content.length <= 0)
         return true;
 
-    if (1 === this.Root.content.length)
-        return this.Root.content[0].Is_Empty({SkipPlcHldr : true});
+    if (1 === this.Root.Content.length)
+        return this.Root.Content[0].Is_Empty({SkipPlcHldr : true});
 
     return false;
 };
@@ -163,7 +163,7 @@ ParaMath.prototype.Add = function(Item)
     var oContent = oSelectedContent.Content;
 
     var StartPos = oSelectedContent.Start;
-    var Run = oContent.content[StartPos];
+    var Run = oContent.Content[StartPos];
 
     // Мы вставляем только в Run
     if (para_Math_Run !== Run.Type)
@@ -207,10 +207,10 @@ ParaMath.prototype.Add = function(Item)
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
         oContent.CurPos = StartPos;
 
-        var lng = oContent.content.length;
+        var lng = oContent.Content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
 
-        var lng2 = oContent.content.length;
+        var lng2 = oContent.Content.length;
         oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
 
         oContent.CurPos = StartPos + 2; // позиция RightRun
@@ -245,7 +245,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         {
             if (false === oElement.Remove(Direction) && true !== this.bSelectionUse)
             {
-                if ((Direction > 0 && oContent.content.length - 1 === nStartPos) || (Direction < 0 && 0 === nStartPos))
+                if ((Direction > 0 && oContent.Content.length - 1 === nStartPos) || (Direction < 0 && 0 === nStartPos))
                 {
                     // Проверяем находимся ли мы на верхнем уровне
                     if (oContent.bRoot)
@@ -324,8 +324,8 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
 
             oContent.CurPos = nStartPos;
 
-            if (para_Math_Run === oContent.content[nStartPos].Type)
-                oContent.content[nStartPos].Cursor_MoveToStartPos();
+            if (para_Math_Run === oContent.Content[nStartPos].Type)
+                oContent.Content[nStartPos].Cursor_MoveToStartPos();
 
             oContent.Correct_Content();
             oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
@@ -688,7 +688,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     if ( true !== PRS.NewRange )
     {
-        RangeEndPos = this.Root.content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
+        RangeEndPos = this.Root.Content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
 
         // Обновляем метрику строки
         if ( PRS.LineAscent < this.Ascent )
@@ -1273,12 +1273,13 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
+    var X = PDSH.X;
+
     if ( EndPos >= 1 )
     {
-        PDSH.X += this.Width;
+      this.Root.Draw_HighLights(PDSH, false);
     }
 };
-
 ParaMath.prototype.Draw_Elements = function(PDSE)
 {
     var CurLine  = PDSE.Line - this.StartLine;
@@ -1714,7 +1715,7 @@ ParaMath.prototype.Handle_AddNewLine = function()
         var Run = CurrContent.getElem(0);
         Run.Remove_FromContent(0, Run.Content.length, true);
 
-        CurrContent.Remove_FromContent(1, CurrContent.content.length);
+        CurrContent.Remove_FromContent(1, CurrContent.Content.length);
 
         CurrContent.Add_ToContent(1, EqArray);
 
@@ -1751,18 +1752,18 @@ ParaMath.prototype.Split = function (ContentPos, Depth)
 
     //var Pos = ContentPos.Get(Depth);
 
-    /*if(this.Root.content[Pos].Type == para_Math_Run)
+    /*if(this.Root.Content[Pos].Type == para_Math_Run)
     {
 
 
-        var NewRun = this.Root.content[Pos].Split(ContentPos, Depth+1);
+        var NewRun = this.Root.Content[Pos].Split(ContentPos, Depth+1);
         NewParaMath.Root.Add_ToContent(0, NewRun);
 
-        var len = this.Root.content.length;
+        var len = this.Root.Content.length;
 
         if(Pos < len - 1)
         {
-            NewParaMath.Root.Concat_ToContent( this.Root.content.slice(Pos + 1) );
+            NewParaMath.Root.Concat_ToContent( this.Root.Content.slice(Pos + 1) );
             this.Root.Remove_FromContent(Pos+1, len - Pos - 1);
         }
 

@@ -368,9 +368,12 @@ CMathBase.prototype =
         if(this.bInside == false)
             GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
 
+        for(var Pos = 0; Pos < this.Content.length; Pos++)
+                this.Content[Pos].SetParent(this, ParaMath);
+
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].PreRecalc(this, ParaMath, ArgSize, RPI);
+                    this.elements[i][j].PreRecalc(this, ParaMath, ArgSize, RPI);
 
     },
     recalculateSize: function(oMeasure, RPI)
@@ -659,6 +662,8 @@ CMathBase.prototype =
         {
             if(TextPr.FontSize !== undefined)
                 this.Set_FontSizeCtrPrp(TextPr.FontSize);
+            else if(TextPr.Shd !== undefined)
+                this.Set_Shd(TextPr.Shd);
         }
 
         for(var i=0; i < this.nRow; i++)
@@ -670,6 +675,7 @@ CMathBase.prototype =
             }
         }
     },
+
     GetMathTextPr: function(ContentPos, Depth)
     {
         var pos = ContentPos.Get(Depth);
@@ -688,7 +694,26 @@ CMathBase.prototype =
         History.Add(this, new CChangesMathFontSize(Value, this.CtrPrp.FontSize));
         this.raw_SetFontSize(Value);
     },
+    Set_Shd: function(Shd)
+    {
+        if ( (undefined === this.CtrPrp.Shd && undefined === Shd) || (undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare( Shd ) ) )
+            return;
 
+        //var OldShd = this.CtrPrp.Shd;
+
+        if ( undefined !== Shd )
+        {
+            this.CtrPrp.Shd = new CDocumentShd();
+            this.CtrPrp.Shd.Set_FromObject( Shd );
+        }
+        else
+            this.CtrPrp.Shd = undefined;
+
+        this.RecalcInfo.bCtrPrp = true;
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
     raw_SetFontSize : function(Value)
     {
         this.CtrPrp.FontSize    = Value;
@@ -975,13 +1000,33 @@ CMathBase.prototype.Select_MathContent = function(MathContent)
         }
     }
 };
-CMathBase.prototype.Test_Math_SetStyleNormal = function(Value, bAll)
+CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
 {
-    for(var i = 0; i < this.Content.length; i++)
-    {
-        this.Content[i].Test_Math_SetStyleNormal(Value, bAll);
-    }
-}
+    var oShd = this.Get_CompiledCtrPrp().Shd;
+    var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
+    var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
+
+    var X = PDSH.X,
+        Y0 = PDSH.Y0,
+        Y1 = PDSH.Y1;
+
+    var bAllCont = this.Selection.StartPos !== this.Selection.EndPos;
+
+    for (var CurPos = 0; CurPos < this.Content.length; CurPos++)
+        this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
+
+    if (true === bDrawShd)
+        PDSH.Shd.Add(Y0, Y1, X, X + this.size.width, 0, ShdColor.r, ShdColor.g, ShdColor.b );
+
+    PDSH.X = this.pos.x + this.ParaMath.X + this.size.width;
+
+};
+CMathBase.prototype.Search                        = ParaHyperlink.prototype.Search;
+CMathBase.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
+CMathBase.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
+CMathBase.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
+CMathBase.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
+
 
 CMathBase.prototype.Set_SelectionContentPos       = ParaHyperlink.prototype.Set_SelectionContentPos;
 CMathBase.prototype.Get_LeftPos                   = ParaHyperlink.prototype.Get_LeftPos;

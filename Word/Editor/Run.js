@@ -1126,7 +1126,7 @@ ParaRun.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Dep
         var Item = this.Content[CurPos];
         var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType )
+        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType)
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;
@@ -3235,6 +3235,8 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Drawing:
             case para_Tab:
             case para_Text:
+            case para_Math_Text:
+            case para_Math_Ampersand:
             case para_Sym:
             {
                 if ( para_Drawing === ItemType && drawing_Anchor === Item.DrawingType )
@@ -5121,15 +5123,19 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
 
     if ( undefined != TextPr.RFonts )
     {
-        if(this.Type == para_Math_Run && !this.IsNormalText()) // при смене Font в этом случае (даже на Cambria Math) cs, eastAsia не меняются
+       if(this.Type == para_Math_Run && !this.IsNormalText()) // при смене Font в этом случае (даже на Cambria Math) cs, eastAsia не меняются
         {
-            var RFonts =
+            // делаем так для проверки действительно ли нужно сменить Font, чтобы при смене других текстовых настроек не выставился Cambria Math (TextPr.RFonts приходит всегда в виде объекта)
+            if(TextPr.RFonts.Ascii !== undefined || TextPr.RFonts.HAnsi !== undefined)
             {
-                Ascii:  {Name: "Cambria Math", Index: -1},
-                HAnsi:  {Name: "Cambria Math", Index: -1}
-            };
+                var RFonts =
+                {
+                    Ascii:  {Name: "Cambria Math", Index: -1},
+                    HAnsi:  {Name: "Cambria Math", Index: -1}
+                };
 
-            this.Set_RFonts2(RFonts);
+                this.Set_RFonts2(RFonts);
+            }
         }
         else
             this.Set_RFonts2(TextPr.RFonts);
