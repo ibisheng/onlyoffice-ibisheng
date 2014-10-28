@@ -2024,7 +2024,9 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
 
     var MainType = Type >> 24;
 
-    if (MainType === c_oAscMathMainType.Fraction)
+    if (MainType === c_oAscMathMainType.Symbol)
+        this.private_LoadFromMenuSymbol(Type, Pr);
+    else if (MainType === c_oAscMathMainType.Fraction)
         this.private_LoadFromMenuFraction(Type, Pr);
     else if (MainType === c_oAscMathMainType.Script)
         this.private_LoadFromMenuScript(Type, Pr);
@@ -2046,6 +2048,127 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
         this.private_LoadFromMenuOperator(Type, Pr);
     else if (MainType === c_oAscMathMainType.Matrix)
         this.private_LoadFromMenuMatrix(Type, Pr);
+};
+CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
+{
+    var Code = -1;
+
+    switch (Type)
+    {
+        case c_oAscMathType.Symbol_pm            : Code = 0x00B1; break;
+        case c_oAscMathType.Symbol_infinity      : Code = 0x221E; break;
+        case c_oAscMathType.Symbol_equals        : Code = 0x003D; break;
+        case c_oAscMathType.Symbol_neq           : Code = 0x2260; break;
+        case c_oAscMathType.Symbol_about         : Code = 0x007E; break;
+        case c_oAscMathType.Symbol_times         : Code = 0x00D7; break;
+        case c_oAscMathType.Symbol_div           : Code = 0x00F7; break;
+        case c_oAscMathType.Symbol_factorial     : Code = 0x0021; break;
+        case c_oAscMathType.Symbol_propto        : Code = 0x221D; break;
+        case c_oAscMathType.Symbol_less          : Code = 0x003C; break;
+        case c_oAscMathType.Symbol_ll            : Code = 0x226A; break;
+        case c_oAscMathType.Symbol_greater       : Code = 0x003E; break;
+        case c_oAscMathType.Symbol_gg            : Code = 0x226B; break;
+        case c_oAscMathType.Symbol_leq           : Code = 0x2264; break;
+        case c_oAscMathType.Symbol_geq           : Code = 0x2265; break;
+        case c_oAscMathType.Symbol_mp            : Code = 0x2213; break;
+        case c_oAscMathType.Symbol_cong          : Code = 0x2245; break;
+        case c_oAscMathType.Symbol_approx        : Code = 0x2248; break;
+        case c_oAscMathType.Symbol_equiv         : Code = 0x2261; break;
+        case c_oAscMathType.Symbol_forall        : Code = 0x2200; break;
+        case c_oAscMathType.Symbol_additional    : Code = 0x2201; break;
+        case c_oAscMathType.Symbol_partial       : Code = 0x1D715; break;
+        case c_oAscMathType.Symbol_sqrt          : this.Add_Radical(Pr, null, null); break;
+        case c_oAscMathType.Symbol_cbrt          : this.Add_Radical({ctrPrp : Pr.ctrPrp, type : DEGREE_RADICAL}, null, "3"); break;
+        case c_oAscMathType.Symbol_qdrt          : this.Add_Radical({ctrPrp : Pr.ctrPrp, type : DEGREE_RADICAL}, null, "4"); break;
+        case c_oAscMathType.Symbol_cup           : Code = 0x222A; break;
+        case c_oAscMathType.Symbol_cap           : Code = 0x2229; break;
+        case c_oAscMathType.Symbol_emptyset      : Code = 0x2205; break;
+        case c_oAscMathType.Symbol_percent       : Code = 0x0025; break;
+        case c_oAscMathType.Symbol_degree        : Code = 0x00B0; break;
+        case c_oAscMathType.Symbol_fahrenheit    : Code = 0x2109; break;
+        case c_oAscMathType.Symbol_celsius       : Code = 0x2103; break;
+        case c_oAscMathType.Symbol_inc           : Code = 0x2206; break;
+        case c_oAscMathType.Symbol_nabla         : Code = 0x2207; break;
+        case c_oAscMathType.Symbol_exists        : Code = 0x2203; break;
+        case c_oAscMathType.Symbol_notexists     : Code = 0x2204; break;
+        case c_oAscMathType.Symbol_in            : Code = 0x2208; break;
+        case c_oAscMathType.Symbol_ni            : Code = 0x220B; break;
+        case c_oAscMathType.Symbol_leftarrow     : Code = 0x2190; break;
+        case c_oAscMathType.Symbol_uparrow       : Code = 0x2191; break;
+        case c_oAscMathType.Symbol_rightarrow    : Code = 0x2192; break;
+        case c_oAscMathType.Symbol_downarrow     : Code = 0x2193; break;
+        case c_oAscMathType.Symbol_leftrightarrow: Code = 0x2194; break;
+        case c_oAscMathType.Symbol_therefore     : Code = 0x2234; break;
+        case c_oAscMathType.Symbol_plus          : Code = 0x002B; break;
+        case c_oAscMathType.Symbol_minus         : Code = 0x2212; break;
+        case c_oAscMathType.Symbol_not           : Code = 0x00AC; break;
+        case c_oAscMathType.Symbol_ast           : Code = 0x2217; break;
+        case c_oAscMathType.Symbol_bullet        : Code = 0x2219; break;
+        case c_oAscMathType.Symbol_vdots         : Code = 0x22EE; break;
+        case c_oAscMathType.Symbol_cdots         : Code = 0x22EF; break;
+        case c_oAscMathType.Symbol_rddots        : Code = 0x22F0; break;
+        case c_oAscMathType.Symbol_ddots         : Code = 0x22F1; break;
+        case c_oAscMathType.Symbol_aleph         : Code = 0x2135; break;
+        case c_oAscMathType.Symbol_beth          : Code = 0x2136; break;
+        case c_oAscMathType.Symbol_QED           : Code = 0x220E; break;
+        case c_oAscMathType.Symbol_alpha         : Code = 0x1D6FC; break;
+        case c_oAscMathType.Symbol_beta          : Code = 0x1D6FD; break;
+        case c_oAscMathType.Symbol_gamma         : Code = 0x1D6FE; break;
+        case c_oAscMathType.Symbol_delta         : Code = 0x1D6FF; break;
+        case c_oAscMathType.Symbol_varepsilon    : Code = 0x1D700; break;
+        case c_oAscMathType.Symbol_epsilon       : Code = 0x1D716; break;
+        case c_oAscMathType.Symbol_zeta          : Code = 0x1D701; break;
+        case c_oAscMathType.Symbol_eta           : Code = 0x1D702; break;
+        case c_oAscMathType.Symbol_theta         : Code = 0x1D703; break;
+        case c_oAscMathType.Symbol_vartheta      : Code = 0x1D717; break;
+        case c_oAscMathType.Symbol_iota          : Code = 0x1D704; break;
+        case c_oAscMathType.Symbol_kappa         : Code = 0x1D705; break;
+        case c_oAscMathType.Symbol_lambda        : Code = 0x1D706; break;
+        case c_oAscMathType.Symbol_mu            : Code = 0x1D707; break;
+        case c_oAscMathType.Symbol_nu            : Code = 0x1D708; break;
+        case c_oAscMathType.Symbol_xsi           : Code = 0x1D709; break;
+        case c_oAscMathType.Symbol_o             : Code = 0x1D70A; break;
+        case c_oAscMathType.Symbol_pi            : Code = 0x1D70B; break;
+        case c_oAscMathType.Symbol_varpi         : Code = 0x1D71B; break;
+        case c_oAscMathType.Symbol_rho           : Code = 0x1D70C; break;
+        case c_oAscMathType.Symbol_varrho        : Code = 0x1D71A; break;
+        case c_oAscMathType.Symbol_sigma         : Code = 0x1D70E; break;
+        case c_oAscMathType.Symbol_varsigma      : Code = 0x1D70D; break;
+        case c_oAscMathType.Symbol_tau           : Code = 0x1D70F; break;
+        case c_oAscMathType.Symbol_upsilon       : Code = 0x1D710; break;
+        case c_oAscMathType.Symbol_varphi        : Code = 0x1D711; break;
+        case c_oAscMathType.Symbol_phi           : Code = 0x1D719; break;
+        case c_oAscMathType.Symbol_chi           : Code = 0x1D712; break;
+        case c_oAscMathType.Symbol_psi           : Code = 0x1D713; break;
+        case c_oAscMathType.Symbol_omega         : Code = 0x1D714; break;
+        case c_oAscMathType.Symbol_Alpha         : Code = 0x0391; break;
+        case c_oAscMathType.Symbol_Beta          : Code = 0x0392; break;
+        case c_oAscMathType.Symbol_Gamma         : Code = 0x0393; break;
+        case c_oAscMathType.Symbol_Delta         : Code = 0x0394; break;
+        case c_oAscMathType.Symbol_Epsilon       : Code = 0x0395; break;
+        case c_oAscMathType.Symbol_Zeta          : Code = 0x0396; break;
+        case c_oAscMathType.Symbol_Eta           : Code = 0x0397; break;
+        case c_oAscMathType.Symbol_Theta         : Code = 0x0398; break;
+        case c_oAscMathType.Symbol_Iota          : Code = 0x0399; break;
+        case c_oAscMathType.Symbol_Kappa         : Code = 0x039A; break;
+        case c_oAscMathType.Symbol_Lambda        : Code = 0x039B; break;
+        case c_oAscMathType.Symbol_Mu            : Code = 0x039C; break;
+        case c_oAscMathType.Symbol_Nu            : Code = 0x039D; break;
+        case c_oAscMathType.Symbol_Xsi           : Code = 0x039E; break;
+        case c_oAscMathType.Symbol_O             : Code = 0x039F; break;
+        case c_oAscMathType.Symbol_Pi            : Code = 0x03A0; break;
+        case c_oAscMathType.Symbol_Rho           : Code = 0x03A1; break;
+        case c_oAscMathType.Symbol_Sigma         : Code = 0x03A3; break;
+        case c_oAscMathType.Symbol_Tau           : Code = 0x03A4; break;
+        case c_oAscMathType.Symbol_Upsilon       : Code = 0x03A5; break;
+        case c_oAscMathType.Symbol_Phi           : Code = 0x03A6; break;
+        case c_oAscMathType.Symbol_Chi           : Code = 0x03A7; break;
+        case c_oAscMathType.Symbol_Psi           : Code = 0x03A8; break;
+        case c_oAscMathType.Symbol_Omega         : Code = 0x03A9; break;
+    }
+
+    if (-1 !== nCode)
+        this.Add_Symbol(Code);
 };
 CMathContent.prototype.private_LoadFromMenuFraction = function(Type, Pr)
 {
@@ -2579,6 +2702,19 @@ CMathContent.prototype.Add_Text = function(sText, MathStyle)
 
         this.Internal_Content_Add(this.content.length, MathRun, true);
     }
+};
+CMathContent.prototype.Add_Symbol = function(Code)
+{
+    var MathRun = new ParaRun(this.Paragraph, true);
+
+    for (var nCharPos = 0, nTextLen = sText.length; nCharPos < nTextLen; nCharPos++)
+    {
+        var Symbol = new CMathText(false);
+        Symbol.add(Code);
+        MathRun.Add(Symbol, true);
+    }
+
+    this.Internal_Content_Add(this.content.length, MathRun, true);
 };
 CMathContent.prototype.Add_Fraction = function(Pr, NumText, DenText)
 {
