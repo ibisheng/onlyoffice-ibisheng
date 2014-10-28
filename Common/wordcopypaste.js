@@ -1411,7 +1411,7 @@ CopyProcessor.prototype =
         this.CommitList(oDomTarget);
     },
 	
-	CopyDocument2 : function(oDomTarget, oDocument, bUseSelection, elementsContent)
+	CopyDocument2 : function(oDomTarget, oDocument, bUseSelection, elementsContent, bFromPresentation)
     {	
         if(g_bIsDocumentCopyPaste)
 		{
@@ -1432,12 +1432,16 @@ CopyProcessor.prototype =
 					if(!this.onlyBinaryCopy)
 						this.CopyTable(oDomTarget, Item, null);
 					this.oBinaryFileWriter.copyParams.bLockCopyElems--;
-					this.oBinaryFileWriter.CopyTable(Item, null);
+					
+					if(!bFromPresentation)
+						this.oBinaryFileWriter.CopyTable(Item, null);
 				}
 				else if ( type_Paragraph === Item.GetType() )
 				{
 					//todo ����� ������ ��� �������� ������ ���� Index == End
-					this.oBinaryFileWriter.CopyParagraph(Item, elementsContent[Index].SelectedAll);
+					if(!bFromPresentation)
+						this.oBinaryFileWriter.CopyParagraph(Item, elementsContent[Index].SelectedAll);
+						
 					if(!this.onlyBinaryCopy)
 						this.CopyParagraph(oDomTarget, Item, true, false);
 				}
@@ -1632,6 +1636,7 @@ CopyProcessor.prototype =
     Start : function(node)
     {
 		var oDocument = this.oDocument;
+		var bFromPresentation;
 		
 		if(g_bIsDocumentCopyPaste)
 		{
@@ -1642,12 +1647,21 @@ CopyProcessor.prototype =
 				elementsContent = selectedContent.Elements;
 			else 
 				return;
+				
+			//TODO заглушка для презентационных параграфов(выделен текст внутри диаграммы) - пока не пишем в бинарник
+			if(selectedContent.Elements[0].Element && selectedContent.Elements[0].Element.bFromDocument === false)
+				bFromPresentation = true;
+			
 			//подменяем Document для копирования(если не подменить, то commentId будет не соответствовать)
 			this.oBinaryFileWriter.Document = elementsContent[0].Element.LogicDocument;
 			
-			this.oBinaryFileWriter.CopyStart();
-			this.CopyDocument2(this.ElemToSelect, oDocument, false, elementsContent);
-			this.oBinaryFileWriter.CopyEnd();			
+			if(!bFromPresentation)
+				this.oBinaryFileWriter.CopyStart();
+				
+			this.CopyDocument2(this.ElemToSelect, oDocument, false, elementsContent, bFromPresentation);
+			
+			if(!bFromPresentation)
+				this.oBinaryFileWriter.CopyEnd();			
 		}
         else
         {
@@ -1668,7 +1682,7 @@ CopyProcessor.prototype =
                 $(this.ElemToSelect.children[0]).addClass("pptData;" + sBase64);
         }
 		
-		if(g_bIsDocumentCopyPaste && copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0)
+		if(g_bIsDocumentCopyPaste && copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0 && !bFromPresentation)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
 			if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
