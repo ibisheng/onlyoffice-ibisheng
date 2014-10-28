@@ -4359,7 +4359,27 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
     _stream["ClearNoAttack"]();
 
     var _count = this.SelectedObjectsStack.length;
-    _stream["WriteLong"](_count);
+    var _naturalCount = 0;
+
+    for (var i = 0; i < _count; i++)
+    {
+        switch (this.SelectedObjectsStack[i].Type)
+        {
+            case c_oAscTypeSelectElement.Paragraph:
+            case c_oAscTypeSelectElement.Header:
+            case c_oAscTypeSelectElement.Table:
+            case c_oAscTypeSelectElement.Image:
+            case c_oAscTypeSelectElement.Hyperlink:
+            {
+                ++_naturalCount;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    _stream["WriteLong"](_naturalCount);
 
     for (var i = 0; i < _count; i++)
     {
@@ -4397,13 +4417,9 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
                 break;
             }
             case c_oAscTypeSelectElement.SpellCheck:
-            {
-                // none
-                break;
-            }
             default:
             {
-                _stream["WriteLong"](255);
+                // none
                 break;
             }
         }
