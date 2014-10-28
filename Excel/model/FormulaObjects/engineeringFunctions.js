@@ -443,7 +443,7 @@ Complex.prototype = {
     },
     Arg:function () {
         if ( this.real == 0.0 && this.img == 0.0 ) {
-            return Number.NaN;
+            return new cError( cErrorType.division_by_zero );
         }
 
         var phi = Math.acos( this.real / this.Abs() );
@@ -483,6 +483,10 @@ Complex.prototype = {
             c = comp.real, d = comp.img,
             f = 1 / (c * c + d * d)
 
+        if( Math.abs(f) == Infinity ){
+            return new cError( cErrorType.division_by_zero );
+        }
+
         return new Complex( (a * c + b * d) * f, (b * c - a * d) * f, this.suffix );
 
     },
@@ -501,6 +505,10 @@ Complex.prototype = {
         var abs = this.Abs(),
             arg = this.Arg();
 
+        if( abs == 0 || arg instanceof cError){
+            return new cError(cErrorType.not_numeric);
+        }
+
         this.real = Math.ln( abs );
         this.img = arg;
 
@@ -508,8 +516,17 @@ Complex.prototype = {
     Log10:function () {
 
         var c = new Complex( Math.ln( 10 ), 0 )
-        this.Ln();
+        var r = this.Ln();
+
+        if( r instanceof cError ){
+            return r;
+        }
+
         c = this.Div( c );
+
+        if(c instanceof cError ){
+            return c;
+        }
 
         this.real = c.real;
         this.img = c.img;
@@ -518,8 +535,17 @@ Complex.prototype = {
     Log2:function () {
 
         var c = new Complex( Math.ln( 2 ), 0 )
-        this.Ln();
+        var r = this.Ln();
+
+        if( r instanceof cError ){
+            return r;
+        }
+
         c = this.Div( c );
+
+        if(c instanceof cError ){
+            return c;
+        }
 
         this.real = c.real;
         this.img = c.img;
@@ -2085,7 +2111,11 @@ cIMLN.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    c.Ln();
+    var r = c.Ln();
+
+    if( r instanceof cError ){
+        return r;
+    }
 
     this.value = new cString( c.toString() );
     this.value.numFormat = 0;
@@ -2125,7 +2155,11 @@ cIMLOG10.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    c.Log10();
+    var r = c.Log10();
+
+    if( r instanceof cError ){
+        return r;
+    }
 
     this.value = new cString( c.toString() );
     this.value.numFormat = 0;
@@ -2165,7 +2199,11 @@ cIMLOG2.prototype.Calculate = function ( arg ) {
         return this.value = c;
     }
 
-    c.Log2();
+    var r = c.Log2();
+
+    if( r instanceof cError ){
+        return r;
+    }
 
     this.value = new cString( c.toString() );
     this.value.numFormat = 0;
