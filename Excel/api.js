@@ -731,15 +731,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							"codepage": option.asc_getCodePage()};
 
 						this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
-					} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
-						t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-						this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject){
-							if(null != incomeObject && "save" == incomeObject["type"])
+					} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
+						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+						this._asc_downloadAs(c_oAscFileType.CSV, function (incomeObject) {
+							if (null != incomeObject && "save" == incomeObject["type"])
 								t.asc_processSavedFile(incomeObject["data"], false);
 							// Меняем тип состояния (на никакое)
 							t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 							t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 						}, true, option);
+					}
 					break;
 			}
 		};
