@@ -6275,7 +6275,7 @@ Range.prototype.merge=function(type){
 				}
 			}
 			return oRes;
-		}
+		};
 		oLeftBorder = fGetBorder(false, oBBox.r1, oBBox.r2, oBBox.c1, 1);
 		oTopBorder = fGetBorder(true, oBBox.c1, oBBox.c2, oBBox.r1, 2);
 		oRightBorder = fGetBorder(false, oBBox.r1, oBBox.r2, oBBox.c2, 3);
@@ -6307,7 +6307,6 @@ Range.prototype.merge=function(type){
 	}
 	
 	var bFirst = true;
-	var oThis = this;
 	var oLeftTopCellStyle = null;
 	var oFirstCellStyle = null;
 	var oFirstCellValue = null;
@@ -6377,8 +6376,6 @@ Range.prototype.merge=function(type){
 	}
 	else if(null != oLeftBorder || null != oTopBorder || null != oRightBorder || null != oBottomBorder)
 		oTargetStyle = new CellXfs();
-	var bEmptyStyle = true;
-	var bEmptyBorder = true;
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
 	if(c_oRangeType.All == nRangeType)
