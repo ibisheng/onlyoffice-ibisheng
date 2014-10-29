@@ -13,7 +13,6 @@ var gUndoInsDelCellsFlag = true;
 		 * -----------------------------------------------------------------------------
 		 */
 		var prot;
-		var turnOnProcessingSpecSymbols = true;
 		var startRedo = false;
 
 		function AutoFiltersOptionsElements (val, visible) {
@@ -3534,10 +3533,11 @@ var gUndoInsDelCellsFlag = true;
 				var valLog = [];
 				valLog[0] = conFilter.valFilter1;
 				valLog[1] = conFilter.valFilter2;
-                var trueStr;
+
+
 				//пока в случае появления спецсимволов, игнорируем их
-				var turnOnAllSym = true;
-				if(!turnOnAllSym && valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[0]) != null))
+				var trueStr;
+				if(false && valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[0]) != null))
 				{
 					trueStr = "";
 					for(var i = 0; i < valLog[0].length; i++)
@@ -3547,7 +3547,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					valLog[0] = trueStr;
 				}
-				if(!turnOnAllSym && typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[1]) != null))
+				if(false && typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[1]) != null))
 				{
 					trueStr = "";
 					for(var i = 0; i < valLog[1].length; i++)
@@ -6613,8 +6613,6 @@ var gUndoInsDelCellsFlag = true;
 			//проверка на предмет наличия спец. символов ? и *
 			_isSpecValueCustomFilter: function(autoFiltersOptions)
 			{
-				if(!turnOnProcessingSpecSymbols)
-					return;
 				var filters = [autoFiltersOptions.filter1,autoFiltersOptions.filter2];
 				var valFilters = [autoFiltersOptions.valFilter1,autoFiltersOptions.valFilter2];
 				var filterVal;
@@ -6676,8 +6674,7 @@ var gUndoInsDelCellsFlag = true;
 			_getPositionSpecSymbols: function(filterVal)
 			{
 				var position = null;
-				if(!turnOnProcessingSpecSymbols)
-					return position;
+
 				var firstLetter;
 				var firstSpecSymbol;
 				var endLetter;
@@ -6717,8 +6714,7 @@ var gUndoInsDelCellsFlag = true;
 			_parseComplexSpecSymbols: function(val, filter, filterVal, type)
 			{
 				var result = null;
-				if(!turnOnProcessingSpecSymbols)
-					return result;
+
 				if(filterVal != undefined && filter != undefined && (filterVal.indexOf("?") != -1 || filterVal.indexOf("*") != -1))
 				{
 					var isEqual = false;
