@@ -2296,7 +2296,6 @@ Paragraph.prototype =
 
                     this.CurPos.ContentPos = EndPos;
                     this.Content[EndPos].Cursor_MoveToStartPos();
-                    this.Correct_ContentPos2();
                 }
 
                 this.Internal_Content_Remove2( StartPos + 1, EndPos - StartPos - 1 );
@@ -2309,9 +2308,11 @@ Paragraph.prototype =
                     if ( this.Selection.StartPos === this.Selection.EndPos )
                         this.Selection.Use = false;
 
-                    this.Internal_Content_Remove( StartPos );                    
+                    this.Internal_Content_Remove( StartPos );
                 }
-                
+
+                this.Correct_ContentPos2();
+
                 this.DeleteCommentOnRemove = true;
 
                 for (var CommentId in CommentsToDelete)

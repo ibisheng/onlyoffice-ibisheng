@@ -824,6 +824,7 @@ CDocument.prototype =
 
         if ( true === this.Content[ContentPos].Is_SelectionUse() )
         {
+            this.Selection.Flag     = selectionflag_Common;
             this.Selection.Use      = true;
             this.Selection.StartPos = ContentPos;
             this.Selection.EndPos   = ContentPos;
