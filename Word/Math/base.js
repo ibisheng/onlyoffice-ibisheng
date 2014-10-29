@@ -425,6 +425,7 @@ CMathBase.prototype =
             // for Ctr Prp
 
             //this.CompiledCtrPrp = ParaMath.GetFirstRPrp();
+            this.CompiledCtrPrp = new CTextPr();
             var defaultTxtPrp = ParaMath.Get_Default_TPrp();
 
             this.CompiledCtrPrp.FontFamily =
@@ -699,8 +700,19 @@ CMathBase.prototype =
         if ( (undefined === this.CtrPrp.Shd && undefined === Shd) || (undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare( Shd ) ) )
             return;
 
-        //var OldShd = this.CtrPrp.Shd;
+        History.Add(this, new CChangesMathShd(Shd, this.CtrPrp.Shd));
+        this.raw_SetShd(Shd);
+    },
+    raw_SetFontSize : function(Value)
+    {
+        this.CtrPrp.FontSize    = Value;
+        this.RecalcInfo.bCtrPrp = true;
 
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
+    raw_SetShd: function(Shd)
+    {
         if ( undefined !== Shd )
         {
             this.CtrPrp.Shd = new CDocumentShd();
@@ -711,15 +723,7 @@ CMathBase.prototype =
 
         this.RecalcInfo.bCtrPrp = true;
 
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
-    },
-    raw_SetFontSize : function(Value)
-    {
-        this.CtrPrp.FontSize    = Value;
-        this.RecalcInfo.bCtrPrp = true;
-
-        if (null !== this.ParaMath)
+        if(null !== this.ParaMath)
             this.ParaMath.SetNeedResize();
     },
     SelectToParent: function(bCorrect)

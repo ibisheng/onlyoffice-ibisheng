@@ -396,6 +396,7 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
     this.NeedResize = true;
 
+
     if(ApplyToAll == true) // для ситуации, когда ApplyToAll = true, в Root формулы при этом позиции селекта не проставлены
     {
         this.Root.Apply_TextPr(TextPr, IncFontSize, true);
@@ -1814,6 +1815,7 @@ var historyitem_Math_AddItem                   =  1; // Добавляем эл�
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
 var hisotryitem_Math_ParaJc                    =  4; // ParaMath.Jc
+var historyitem_Math_CtrPrpShd                 =  5;
 
 function ReadChanges_FromBinary(Reader, Class)
 {
@@ -1824,6 +1826,7 @@ function ReadChanges_FromBinary(Reader, Class)
     {
         case historyitem_Math_CtrPrpFSize: Changes = new CChangesMathFontSize(); break;
         case hisotryitem_Math_ParaJc     : Changes = new CChangesMathParaJc(); break;
+        case historyitem_Math_CtrPrpShd: Changes = new CChangesMathShd(); break;
     }
 
     if (null !== Changes)
@@ -1863,6 +1866,52 @@ CChangesMathFontSize.prototype.Save_Changes = function(Writer)
 CChangesMathFontSize.prototype.Load_Changes = function(Reader, Class)
 {
     this.New = Reader.GetLong();
+    this.Redo(Class);
+};
+
+function CChangesMathShd(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathShd.prototype.Type = historyitem_Math_CtrPrpShd;
+CChangesMathShd.prototype.Undo = function(Class)
+{
+    Class.raw_SetShd(this.Old);
+};
+CChangesMathShd.prototype.Redo = function(Class)
+{
+    Class.raw_SetShd(this.New);
+};
+CChangesMathShd.prototype.Save_Changes = function(Writer)
+{
+    // Long : New
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+        Writer.WriteBool(true);
+
+    //Writer.WriteLong(this.New);
+};
+CChangesMathShd.prototype.Load_Changes = function(Reader, Class)
+{
+    /*this.New = Reader.GetLong();
+    this.Redo(Class);*/
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CDocumentShd();
+        this.New.Read_FromBinary( Reader );
+    }
+    else
+    {
+        this.New = undefined;
+    }
+
     this.Redo(Class);
 };
 
