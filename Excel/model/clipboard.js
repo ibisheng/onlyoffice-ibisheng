@@ -3075,8 +3075,6 @@
 				
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
-					//if(i == 0)
-					//	window["Asc"]["editor"].isStartAddShape = true;
                     data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
 					drawingObject = data.Drawings[i];
 
@@ -3204,10 +3202,6 @@
 							}	
 						}
 					};
-					
-					
-					//if(i == 0)
-					//	window["Asc"]["editor"].isStartAddShape = true;
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;

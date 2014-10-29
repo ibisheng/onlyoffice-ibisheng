@@ -707,169 +707,137 @@ CCellCommentator.prototype.updateCommentPosition = function() {
 };
 
 CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operType, updateRange) {
+	// ToDo переделать функцию, странная какая-то
 	var t = this;
-	var UpdatePair = function(comment, bChange) {
+	var UpdatePair = function (comment, bChange) {
 		this.comment = comment;
 		this.bChange = bChange;
 	};
 	var aChangedComments = [];		// Array of UpdatePair
 
 	function updateCommentsList(aComments) {
-		if ( aComments.length ) {
+		if (aComments.length) {
 
 			t.bSaveHistory = false;
 			var changeArray = [];
 			var removeArray = [];
 
 			for (var i = 0; i < aComments.length; i++) {
-				if ( aComments[i].bChange ) {
-					t.asc_changeComment(aComments[i].comment.asc_getId(), aComments[i].comment, /*bChangeCoords*/true, /*bNoEvent*/true);
+				if (aComments[i].bChange) {
+					t.asc_changeComment(aComments[i].comment.asc_getId(), aComments[i].comment,
+						/*bChangeCoords*/true, /*bNoEvent*/true, /*bNoAscLock*/true, /*bNoDraw*/false);
 					changeArray.push({"Id": aComments[i].comment.asc_getId(), "Comment": aComments[i].comment});
-				}
-				else {
-					t.asc_removeComment(aComments[i].comment.asc_getId(), /*bNoEvent*/true);
+				} else {
+					t.asc_removeComment(aComments[i].comment.asc_getId(), /*bNoEvent*/true,
+						/*bNoAscLock*/true, /*bNoDraw*/false);
 					removeArray.push(aComments[i].comment.asc_getId());
 				}
 			}
 
-			if ( changeArray.length )
+			if (changeArray.length)
 				t.worksheet.model.workbook.handlers.trigger("asc_onChangeComments", changeArray);
-			if ( removeArray.length )
+			if (removeArray.length)
 				t.worksheet.model.workbook.handlers.trigger("asc_onRemoveComments", removeArray);
 
 			t.bSaveHistory = true;
-			t.drawCommentCells();
 		}
 	}
 
 	var i, comment;
-	if ( bInsert ) {
+	if (bInsert) {
 		switch (operType) {
-
-			case c_oAscInsertOptions.InsertCellsAndShiftDown: {
+			case c_oAscInsertOptions.InsertCellsAndShiftDown:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
-					if ( (comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
+					if ((comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
 						comment.nRow += updateRange.r2 - updateRange.r1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
+						aChangedComments.push(new UpdatePair(comment, true));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 
-			case c_oAscInsertOptions.InsertCellsAndShiftRight: {
+			case c_oAscInsertOptions.InsertCellsAndShiftRight:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
-					if ( (comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+					if ((comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
 						comment.nCol += updateRange.c2 - updateRange.c1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
+						aChangedComments.push(new UpdatePair(comment, true));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 
-			case c_oAscInsertOptions.InsertColumns: {
+			case c_oAscInsertOptions.InsertColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol >= updateRange.c1) {
 						comment.nCol += updateRange.c2 - updateRange.c1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
+						aChangedComments.push(new UpdatePair(comment, true));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 
-			case c_oAscInsertOptions.InsertRows: {
+			case c_oAscInsertOptions.InsertRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow >= updateRange.r1) {
 						comment.nRow += updateRange.r2 - updateRange.r1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
+						aChangedComments.push(new UpdatePair(comment, true));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 		}
-	}
-	else {
+	} else {
 		switch (operType) {
-
-			case "deleteAllComments": {
+			case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
-					if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-						aChangedComments.push( new UpdatePair(comment, false) );
-					}
-				}
-				updateCommentsList(aChangedComments);
-			}
-				break;
-
-			case c_oAscDeleteOptions.DeleteCellsAndShiftTop: {
-				for (i = 0; i < this.aComments.length; i++) {
-					comment = new asc_CCommentData(this.aComments[i]);
-					if ( (comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2) ) {
+					if ((comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
 						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
-					}
-					else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-						aChangedComments.push( new UpdatePair(comment, false) );
+						aChangedComments.push(new UpdatePair(comment, true));
+					} else if ((updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
+						aChangedComments.push(new UpdatePair(comment, false));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 
-			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft: {
+			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
-					if ( (comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
+					if ((comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
 						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
-					}
-					else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2) ) {
-						aChangedComments.push( new UpdatePair(comment, false) );
+						aChangedComments.push(new UpdatePair(comment, true));
+					} else if ((updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
+						aChangedComments.push(new UpdatePair(comment, false));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 
-			case c_oAscDeleteOptions.DeleteColumns: {
+			case c_oAscDeleteOptions.DeleteColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol > updateRange.c2) {
 						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
-					}
-					else if ( (updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol) ) {
-						aChangedComments.push( new UpdatePair(comment, false) );
+						aChangedComments.push(new UpdatePair(comment, true));
+					} else if ((updateRange.c1 <= comment.nCol) && (updateRange.c2 >= comment.nCol)) {
+						aChangedComments.push(new UpdatePair(comment, false));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 
-			case c_oAscDeleteOptions.DeleteRows: {
+			case c_oAscDeleteOptions.DeleteRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow > updateRange.r2) {
 						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
-						aChangedComments.push( new UpdatePair(comment, true) );
-					}
-					else if ( (updateRange.r1 <= comment.nRow) && (updateRange.r2 >= comment.nRow) ) {
-						aChangedComments.push( new UpdatePair(comment, false) );
+						aChangedComments.push(new UpdatePair(comment, true));
+					} else if ((updateRange.r1 <= comment.nRow) && (updateRange.r2 >= comment.nRow)) {
+						aChangedComments.push(new UpdatePair(comment, false));
 					}
 				}
-				updateCommentsList(aChangedComments);
-			}
 				break;
 		}
 	}
+	updateCommentsList(aChangedComments);
 };
 
 CCellCommentator.prototype.sortComments = function(activeRange, changes) {
@@ -1284,7 +1252,7 @@ CCellCommentator.prototype.asc_addComment = function(comment, bIsNotUpdate) {
 	this.isLockedComment(oComment, onAddCommentCallback);
 };
 
-CCellCommentator.prototype.asc_changeComment = function(id, oComment, bChangeCoords, bNoEvent) {
+CCellCommentator.prototype.asc_changeComment = function(id, oComment, bChangeCoords, bNoEvent, bNoAscLock, bNoDraw) {
 	var t = this;
 	var comment = this.asc_findComment(id);
 	if (null === comment)
@@ -1333,13 +1301,17 @@ CCellCommentator.prototype.asc_changeComment = function(id, oComment, bChangeCoo
 			History.Add(g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
 		}
 
-		t.drawCommentCells();
+		if (!bNoDraw)
+			t.drawCommentCells();
 	};
 
-	this.isLockedComment(comment, onChangeCommentCallback);
+	if (bNoAscLock)
+		onChangeCommentCallback(true);
+	else
+		this.isLockedComment(comment, onChangeCommentCallback);
 };
 
-CCellCommentator.prototype.asc_removeComment = function(id, bNoEvent) {
+CCellCommentator.prototype.asc_removeComment = function(id, bNoEvent, bNoAscLock, bNoDraw) {
 	var t = this;
 	var comment = this.asc_findComment(id);
 	if (null === comment)
@@ -1349,10 +1321,13 @@ CCellCommentator.prototype.asc_removeComment = function(id, bNoEvent) {
 		if (false === isSuccess)
 			return;
 
-		t._removeComment(comment, bNoEvent, true);
+		t._removeComment(comment, bNoEvent, !bNoDraw);
 	};
 
-	this.isLockedComment(comment, onRemoveCommentCallback);
+	if (bNoAscLock)
+		onRemoveCommentCallback(true);
+	else
+		this.isLockedComment(comment, onRemoveCommentCallback);
 };
 
 // Extra functions

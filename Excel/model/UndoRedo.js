@@ -94,9 +94,6 @@ UndoRedoItemSerializable.prototype = {
             oBinaryWriter.WriteBool(false);
             oBinaryWriter.WriteString2(this.oClass.Get_Id());
 
-            /*var api = window["Asc"]["editor"];
-            var userId =
-            oBinaryWriter.WriteLong()     */
             this.oClass.Save_Changes(this.oData, oBinaryWriter);
         }
 	},
@@ -2896,6 +2893,7 @@ UndoRedoWoorksheet.prototype = {
 	UndoRedo : function(Type, Data, nSheetId, bUndo)
 	{
 		var worksheetView, nRow, nCol, oLockInfo, cell, index, from, to, range, r1, c1, r2, c2, temp, i, length, data;
+		var bInsert, operType; // ToDo избавиться от этого
 		var ws = this.wb.getWorksheetById(nSheetId);
 		if(null == ws)
 			return;
@@ -2944,7 +2942,6 @@ UndoRedoWoorksheet.prototype = {
 			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
 			{
-			    var range;
 			    if (g_nAllColIndex == index) {
 			        range = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 			    }
@@ -3058,10 +3055,23 @@ UndoRedoWoorksheet.prototype = {
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
-			if((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type))
-				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertCellsAndShiftRight, Asc.Range(c1, r1, c2, r2));
-			else
-				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, Asc.Range(c1, r1, c2, r2));
+
+			range = ws.getRange3(r1, c1, r2, c2);
+			if((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type)) {
+				range.addCellsShiftRight();
+				bInsert = true;
+				operType = c_oAscInsertOptions.InsertCellsAndShiftRight;
+			}  else {
+				range.deleteCellsShiftLeft();
+				bInsert = false;
+				operType = c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
+			}
+
+			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range.bbox, operType);
+			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
+			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
 		{
@@ -3084,10 +3094,23 @@ UndoRedoWoorksheet.prototype = {
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
-			if((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type))
-				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertCellsAndShiftDown, Asc.Range(c1, r1, c2, r2));
-			else
-				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteCellsAndShiftTop, Asc.Range(c1, r1, c2, r2));
+
+			range = ws.getRange3(r1, c1, r2, c2);
+			if((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type)) {
+				range.addCellsShiftBottom();
+				bInsert = true;
+				operType = c_oAscInsertOptions.InsertCellsAndShiftDown;
+			} else {
+				range.deleteCellsShiftUp();
+				bInsert = false;
+				operType = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
+			}
+
+			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell",range.bbox, operType);
+			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
+			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_Sort == Type)
 		{
@@ -3111,7 +3134,7 @@ UndoRedoWoorksheet.prototype = {
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
-			range = ws.getRange(new CellAddress(bbox.r1, bbox.c1, 0), new CellAddress(bbox.r2, bbox.c2, 0));
+			range = ws.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
 			range._sortByArray(bbox, places);
 		}
 		else if(historyitem_Worksheet_MoveRange == Type)

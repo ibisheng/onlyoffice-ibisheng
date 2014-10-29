@@ -2647,7 +2647,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	return true;
 };
 Woorksheet.prototype.insertColsBefore=function(index, count){
-	var oRange = this.getRange(new CellAddress(0, index, 0), new CellAddress(gc_nMaxRow0, index + count - 1, 0));
+	var oRange = this.getRange3(0, index, gc_nMaxRow0, index + count - 1);
 	oRange.addCellsShiftRight();
 };
 Woorksheet.prototype._insertColsBefore=function(index, count){
@@ -3665,7 +3665,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 
-	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);;
+	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
 
 		
 //	for(var id  in res)

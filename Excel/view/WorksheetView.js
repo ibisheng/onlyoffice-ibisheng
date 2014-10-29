@@ -7799,7 +7799,7 @@
 
 		WorksheetView.prototype.applyMoveResizeRangeHandle = function (target){
 			if( -1 == target.targetArr && !this.startCellMoveResizeRange.isEqual(this.moveRangeDrawingObjectTo) ) {
-                this.objectRender.moveRangeDrawingObject( this.startCellMoveResizeRange, this.moveRangeDrawingObjectTo, true );
+                this.objectRender.moveRangeDrawingObject( this.startCellMoveResizeRange, this.moveRangeDrawingObjectTo);
             }
 
 			this.startCellMoveResizeRange = null;
@@ -7827,7 +7827,7 @@
 					t.autoFilters._preMoveAutoFilters(arnFrom, arnTo);
 				t.model._moveRange(arnFrom, arnTo, copyRange);
 				t.cellCommentator.moveRangeComments(arnFrom, arnTo);
-				t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
+				t.objectRender.moveRangeDrawingObject(arnFrom, arnTo);
 				if (!copyRange) {
 					t.autoFilters._moveAutoFilters(arnTo, arnFrom);
 					// Вызываем функцию пересчета для заголовков форматированной таблицы
@@ -9380,7 +9380,6 @@
 			var reinitRanges = false;
 			var cw;
 			var isUpdateCols = false, isUpdateRows = false;
-			var cleanCacheCols = false, cleanCacheRows = false;
 			var _updateRangeIns, _updateRangeDel, bUndoRedo;
 			var functionModelAction = null;
 			var lockDraw = false;	// Параметр, при котором не будет отрисовки (т.к. мы просто обновляем информацию на неактивном листе)
@@ -9393,12 +9392,8 @@
 				asc_applyFunction(functionModelAction);
 
 				t._initCellsArea(fullRecalc);
-				if (fullRecalc) {
+				if (fullRecalc)
 					t.cache.reset();
-				} else {
-					if (cleanCacheCols) { t._cleanCache(new asc_Range(arn.c1, 0, arn.c2, t.rows.length - 1)); }
-					if (cleanCacheRows) { t._cleanCache(new asc_Range(0, arn.r1, t.cols.length - 1, arn.r2)); }
-				}
 				t._cleanCellsTextMetricsCache();
 				t._prepareCellTextMetricsCache();
 				if (reinitRanges)
@@ -9542,24 +9537,21 @@
 								return;
 
 							functionModelAction = function () {
+								History.Create_NewPoint();
+								History.StartTransaction();
 								if (range.addCellsShiftRight()) {
-									fullRecalc = true;
+									t._cleanCache(oChangeData.changedRange);
 									if(isCheckChangeAutoFilter === true)
-									{
 										t.autoFilters.insertColumn(prop, _updateRangeIns);
-									}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 								}
+								History.EndTransaction();
 							};
 
-							if(bUndoRedo)
-								onChangeWorksheetCallback(true);
-							else {
-								oChangeData.changedRange = new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
-									gc_nMaxCol0, _updateRangeIns.r2);
-								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
-							}
+							oChangeData.changedRange = new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
+								gc_nMaxCol0, _updateRangeIns.r2);
+							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscInsertOptions.InsertCellsAndShiftDown:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
@@ -9567,24 +9559,21 @@
 								return;
 
 							functionModelAction = function () {
+								History.Create_NewPoint();
+								History.StartTransaction();
 								if (range.addCellsShiftBottom()) {
-									fullRecalc = true;
+									t._cleanCache(oChangeData.changedRange);
 									if(isCheckChangeAutoFilter === true)
-									{
 										t.autoFilters.insertRows(prop,_updateRangeIns);
-									}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 								}
+								History.EndTransaction();
 							};
 
-							if(bUndoRedo)
-								onChangeWorksheetCallback(true);
-							else {
-								oChangeData.changedRange = new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
-									_updateRangeIns.c2, gc_nMaxRow0);
-								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
-							}
+							oChangeData.changedRange = new asc_Range(_updateRangeIns.c1, _updateRangeIns.r1,
+								_updateRangeIns.c2, gc_nMaxRow0);
+							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscInsertOptions.InsertColumns:
 							functionModelAction = function () {
@@ -9646,9 +9635,8 @@
 							functionModelAction = function () {
 								History.Create_NewPoint();
 								History.StartTransaction();
-								//t.autoFilters.isEmptyAutoFilters(arn);
 								if (range.deleteCellsShiftLeft()) {
-									fullRecalc = true;
+									t._cleanCache(oChangeData.changedRange);
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertColumn(prop, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
@@ -9657,13 +9645,9 @@
 								History.EndTransaction();
 							};
 
-							if(bUndoRedo)
-								onChangeWorksheetCallback(true);
-							else {
-								oChangeData.changedRange = new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
-									gc_nMaxCol0, _updateRangeDel.r2);
-								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
-							}
+							oChangeData.changedRange = new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
+								gc_nMaxCol0, _updateRangeDel.r2);
+							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
@@ -9673,9 +9657,8 @@
 							functionModelAction = function () {
 									History.Create_NewPoint();
 									History.StartTransaction();
-									//t.autoFilters.isEmptyAutoFilters(arn);
 									if (range.deleteCellsShiftUp()) {
-										fullRecalc = true;
+										t._cleanCache(oChangeData.changedRange);
 										if(isCheckChangeAutoFilter === true)
 											t.autoFilters.insertRows(prop, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
@@ -9684,13 +9667,9 @@
 									History.EndTransaction();
 							};
 
-							if(bUndoRedo)
-								onChangeWorksheetCallback(true);
-							else {
-								oChangeData.changedRange = new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
-									_updateRangeDel.c2, gc_nMaxRow0);
-								this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
-							}
+							oChangeData.changedRange = new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1,
+								_updateRangeDel.c2, gc_nMaxRow0);
+							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscDeleteOptions.DeleteColumns:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop);
@@ -9703,10 +9682,9 @@
 								History.StartTransaction();
 								t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
 								t.autoFilters.insertColumn(prop,_updateRangeDel, c_oAscDeleteOptions.DeleteColumns);
-								History.EndTransaction();
-
 								t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 								t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
+								History.EndTransaction();
 							};
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
@@ -9728,10 +9706,9 @@
 								History.StartTransaction();
 								t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
 								t.autoFilters.insertRows(prop,_updateRangeDel, c_oAscDeleteOptions.DeleteRows);
-								History.EndTransaction();
-
 								t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 								t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
+								History.EndTransaction();
 							};
 							if(bUndoRedo)
 								onChangeWorksheetCallback(true);
