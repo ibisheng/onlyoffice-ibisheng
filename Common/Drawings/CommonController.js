@@ -3297,18 +3297,7 @@ DrawingObjectsController.prototype =
     changeCurrentState: function(newState)
     {
         this.curState = newState;
-       // this.sendDrawingObjectsProps();
     },
-
-
-   // sendDrawingObjectsProps: function()
-   // {
-   //     //var objects_by_types = this.getSelectedObjectsByTypes();
-   //     var ret = {};
-   //     ret.chartProps = this.getChartProps();
-   //     window["Asc"]["editor"].handlers.trigger("asc_onChangeSelectDrawingObjects", ret);
-   // },
-
 
     updateSelectionState: function(bNoCheck)
     {

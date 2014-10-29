@@ -3221,7 +3221,7 @@ function DrawingObjects() {
         bNeedRedraw && _this.showDrawingObjects(true);
     };
 
-    _this.moveRangeDrawingObject = function(oBBoxFrom, oBBoxTo, bResize) {
+    _this.moveRangeDrawingObject = function(oBBoxFrom, oBBoxTo) {
 
         if ( oBBoxFrom && oBBoxTo )
         {
