@@ -9538,7 +9538,7 @@
 					switch (val) {
 						case c_oAscInsertOptions.InsertCellsAndShiftRight:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop, bUndoRedo);
-							if(!isCheckChangeAutoFilter)
+							if(isCheckChangeAutoFilter === false)
 								return;
 
 							functionModelAction = function () {
@@ -9567,7 +9567,7 @@
 							break;
 						case c_oAscInsertOptions.InsertCellsAndShiftDown:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop, bUndoRedo);
-							if(!isCheckChangeAutoFilter)
+							if(isCheckChangeAutoFilter === false)
 								return;
 
 							functionModelAction = function () {
@@ -9650,7 +9650,7 @@
 					switch (val) {
 						case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop, bUndoRedo);
-							if(!isCheckChangeAutoFilter)
+							if(isCheckChangeAutoFilter === false)
 								return;
 
 							functionModelAction = function () {
@@ -9677,7 +9677,7 @@
 							break;
 						case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop, bUndoRedo);
-							if(!isCheckChangeAutoFilter)
+							if(isCheckChangeAutoFilter === false)
 								return;
 
 							functionModelAction = function () {
@@ -9704,7 +9704,7 @@
 							break;
 						case c_oAscDeleteOptions.DeleteColumns:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop, bUndoRedo);
-							if(!isCheckChangeAutoFilter)
+							if(isCheckChangeAutoFilter === false)
 								return;
 
 							functionModelAction = function () {
@@ -9729,7 +9729,7 @@
 							break;
 						case c_oAscDeleteOptions.DeleteRows:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteRows, prop, bUndoRedo);
-							if(!isCheckChangeAutoFilter)
+							if(isCheckChangeAutoFilter === false)
 								return;
 
 							functionModelAction = function () {
