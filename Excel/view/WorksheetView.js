@@ -9537,7 +9537,7 @@
 					range = t.model.getRange3(_updateRangeIns.r1, _updateRangeIns.c1, _updateRangeIns.r2, _updateRangeIns.c2);
 					switch (val) {
 						case c_oAscInsertOptions.InsertCellsAndShiftRight:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop, bUndoRedo);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9562,7 +9562,7 @@
 							}
 							break;
 						case c_oAscInsertOptions.InsertCellsAndShiftDown:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop, bUndoRedo);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9639,7 +9639,7 @@
 					range = t.model.getRange3(_updateRangeDel.r1, _updateRangeDel.c1, _updateRangeDel.r2, _updateRangeDel.c2);
 					switch (val) {
 						case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop, bUndoRedo);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9666,7 +9666,7 @@
 							}
 							break;
 						case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop, bUndoRedo);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9693,7 +9693,7 @@
 							}
 							break;
 						case c_oAscDeleteOptions.DeleteColumns:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop, bUndoRedo);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9718,7 +9718,7 @@
 							}
 							break;
 						case c_oAscDeleteOptions.DeleteRows:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteRows, prop, bUndoRedo);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteRows, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
