@@ -3450,6 +3450,15 @@ CCellValue.prototype =
 	{
 		return this._setFontProp(function(format){return val != format.va;}, function(format){format.va = val;});
 	},
+	setValueType : function(type)
+	{
+		if(CellValueType.String == type && null != this.number)
+		{
+			this.text = this.number.toString();
+			this.number = null;
+		}
+		this.type = type;
+	},
 	getType : function()
 	{
 		return UndoRedoDataTypes.CellValue;

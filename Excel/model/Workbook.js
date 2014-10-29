@@ -4280,7 +4280,13 @@ Cell.prototype.setValueCleanFormula = function (array) {
     wb.needRecalc.length++;
 };
 Cell.prototype.setType=function(type){
-	return this.oValue.type = type;
+	if(type != this.oValue.type){
+		var DataOld = this.getValueData();
+		this.oValue.setValueType(type);
+		var DataNew = this.getValueData();
+		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+	}
+	return this.oValue.type;
 };
 Cell.prototype.getType=function(){
 	return this.oValue.type;
@@ -5656,6 +5662,18 @@ Range.prototype.setVerticalText=function(val){
 	},
 	function(cell){
 		cell.setVerticalText(val);
+	});
+};
+Range.prototype.setType=function(type){
+    History.Create_NewPoint();
+	this.createCellOnRowColCross();
+	var fSetProperty = this._setProperty;
+	var nRangeType = this._getRangeType();
+	if(c_oRangeType.All == nRangeType)
+		fSetProperty = this._setPropertyNoEmpty;
+	fSetProperty.call(this, null, null,
+	function(cell){
+		cell.setType(type);
 	});
 };
 Range.prototype.getType=function(){

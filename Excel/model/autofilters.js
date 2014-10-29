@@ -4020,7 +4020,7 @@ var gUndoInsDelCellsFlag = true;
 							if(null != tableColumn && null != tableColumn.Name && !startRedo && isSetVal)
 							{
 								range.setValue(tableColumn.Name);
-								range.setNumFormat("@");
+								range.setType(CellValueType.String);
 							}
 						}
 					}
@@ -6452,14 +6452,14 @@ var gUndoInsDelCellsFlag = true;
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )
 								{
 									filter.TableColumns[j - tableRange.c1].Name = val;
-									cell.setNumFormat("@");
+									cell.setType(CellValueType.String);
 								}	
 								else if(val == "")//если пустая изменяем генерируем имя и добавляем его в TableColumns  
 								{
 									filter.TableColumns[j - tableRange.c1].Name = "";
 									generateName = this._generateColumnName(filter.TableColumns);
 									cell.setValue(generateName);
-									cell.setNumFormat("@");
+									cell.setType(CellValueType.String);
 									filter.TableColumns[j - tableRange.c1].Name = generateName;
 								}
 							}
