@@ -205,7 +205,7 @@ ParaMath.prototype.Add = function(Item)
         var RightRun = Run.Split2(Run.State.ContentPos);
 
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
-        oContent.CurPos = StartPos;
+        oContent.CurPos = StartPos + 1;
 
         var lng = oContent.Content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);

@@ -2677,7 +2677,8 @@ CMathContent.prototype.private_LoadFromMenuMatrix = function(Type, Pr)
 };
 CMathContent.prototype.Add_Element = function(Element)
 {
-    this.Internal_Content_Add(this.Content.length, Element, true);
+    this.Internal_Content_Add(this.CurPos, Element, false);
+    this.CurPos++;
 };
 CMathContent.prototype.Add_Text = function(sText, MathStyle)
 {
@@ -2701,7 +2702,8 @@ CMathContent.prototype.Add_Text = function(sText, MathStyle)
         if (undefined !== MathStyle && null !== MathStyle)
             MathRun.Math_Apply_Style(MathStyle);
 
-        this.Internal_Content_Add(this.Content.length, MathRun, true);
+        this.Internal_Content_Add(this.CurPos, MathRun, false);
+        this.CurPos++;
     }
 };
 CMathContent.prototype.Add_Symbol = function(Code)
@@ -2712,7 +2714,8 @@ CMathContent.prototype.Add_Symbol = function(Code)
     Symbol.add(Code);
     MathRun.Add(Symbol, true);
 
-    this.Internal_Content_Add(this.Content.length, MathRun, true);
+    this.Internal_Content_Add(this.CurPos, MathRun, false);
+    this.CurPos++;
 };
 CMathContent.prototype.Add_Fraction = function(Pr, NumText, DenText)
 {
