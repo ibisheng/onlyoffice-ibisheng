@@ -2944,6 +2944,8 @@ function DrawingObjects() {
 
     _this.rebuildChartGraphicObjects = function(data)
     {
+        if(!worksheet)
+            return;
         ExecuteNoHistory(function(){
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];
@@ -2970,7 +2972,7 @@ function DrawingObjects() {
             {
                 if(wsViews[i])
                 {
-                    wsViews[i].objectRender.rebuildCharts(changedArr);
+                    wsViews[i].objectRender && wsViews[i].objectRender.rebuildCharts(changedArr);
                 }
             }
         }, _this, []);
@@ -3374,7 +3376,6 @@ function DrawingObjects() {
                     graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
                 }
             }
-
         }, this, []);
 
     };
@@ -3608,7 +3609,7 @@ function DrawingObjects() {
     };
 
     _this.selectedGraphicObjectsExists = function() {
-        return _this.controller.selectedObjects.length > 0;
+        return _this.controller && _this.controller.selectedObjects.length > 0;
     };
 
     _this.loadImageRedraw = function(imageUrl) {
