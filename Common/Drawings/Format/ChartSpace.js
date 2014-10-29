@@ -4808,6 +4808,8 @@ CChartSpace.prototype =
                                 arr_min_max_min[i] = min_max.Min;
 
                                 dlbl.getMaxWidth = function(){return 20000};
+                                dlbl.recalcInfo.recalculatePen = false;
+                                dlbl.recalcInfo.recalculateBrush = false;
                                 dlbl.recalculate();
                                 delete dlbl.getMaxWidth;
                                 if(dlbl.tx.rich.content.XLimit > max_content_width)
