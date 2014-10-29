@@ -2174,7 +2174,7 @@ var gUndoInsDelCellsFlag = true;
 				var aWs = this._getCurrentWS();
 				var tableParts = aWs.TableParts;
 				var autoFilter = aWs.AutoFilter;
-				var result = true;
+				var result = null;
 				
 				if(DeleteColumns || DeleteRows)
 				{
@@ -2255,7 +2255,7 @@ var gUndoInsDelCellsFlag = true;
 							//если селектом засхвачена не вся таблица, то выдаём ошибку и возвращаем false
 							if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
 							{	
-								result = 'changeAutoFilter';
+								result = true;
 							}
 							else
 							{
@@ -2326,19 +2326,19 @@ var gUndoInsDelCellsFlag = true;
 						//если сдвигаем данный фильтр
 						if(DeleteCellsAndShiftLeft && tableRange.c1 > activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
 						{
-							result = 'changeAutoFilter';
+							result = true;
 						}
 						else if(DeleteCellsAndShiftTop && tableRange.r1 > activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
 						{
-							result = 'changeAutoFilter';
+							result = true;
 						}
 						else if(InsertCellsAndShiftRight && tableRange.c1 >= activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
 						{
-							result = 'changeAutoFilter';
+							result = true;
 						}
 						else if(InsertCellsAndShiftDown && tableRange.r1 >= activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
 						{
-							result = 'changeAutoFilter';
+							result = true;
 						}
 					}
 				}
@@ -2352,17 +2352,18 @@ var gUndoInsDelCellsFlag = true;
 					{
 						if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
 						{
-							result = 'changeAutoFilter';
+							result = true;
 						}
 						else if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop) && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
-							result = 'changeAutoFilter'
+							result = true;
 					}
 					//если выделенная область находится до а/ф
 					if(activeCells.c2 < tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2)
-						result = 'changeAutoFilter';
+						result = true;
 					else if(activeCells.r2 < tableRange.r1 && activeCells.c1 <= tableRange.c1 && activeCells.c2 >= tableRange.c2)
-						result = 'changeAutoFilter';
+						result = true;
 				}
+
 				return result;
 			},
 			//если активная область полностью лежит внутри форматированной таблицы, но не равно ей

@@ -9537,13 +9537,14 @@
 					range = t.model.getRange3(_updateRangeIns.r1, _updateRangeIns.c1, _updateRangeIns.r2, _updateRangeIns.c2);
 					switch (val) {
 						case c_oAscInsertOptions.InsertCellsAndShiftRight:
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop, bUndoRedo);
+							if(!isCheckChangeAutoFilter)
+								return;
+
 							functionModelAction = function () {
-								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop, bUndoRedo);
-								if(!isCheckChangeAutoFilter)
-									return;
 								if (range.addCellsShiftRight()) {
 									fullRecalc = true;
-									if(isCheckChangeAutoFilter == 'changeAutoFilter')
+									if(isCheckChangeAutoFilter === true)
 									{
 										if(gUndoInsDelCellsFlag == true)
 											t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
@@ -9565,13 +9566,14 @@
 							}
 							break;
 						case c_oAscInsertOptions.InsertCellsAndShiftDown:
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop, bUndoRedo);
+							if(!isCheckChangeAutoFilter)
+								return;
+
 							functionModelAction = function () {
-								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop, bUndoRedo);
-								if(!isCheckChangeAutoFilter)
-									return;
 								if (range.addCellsShiftBottom()) {
 									fullRecalc = true;
-									if(isCheckChangeAutoFilter == 'changeAutoFilter')
+									if(isCheckChangeAutoFilter === true)
 									{
 										if(gUndoInsDelCellsFlag == true)
 											t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
@@ -9657,7 +9659,7 @@
 								//t.autoFilters.isEmptyAutoFilters(arn);
 								if (range.deleteCellsShiftLeft()) {
 									fullRecalc = true;
-									if(isCheckChangeAutoFilter == 'changeAutoFilter')
+									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertColumn(prop, _updateRangeDel, arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
@@ -9684,7 +9686,7 @@
 									//t.autoFilters.isEmptyAutoFilters(arn);
 									if (range.deleteCellsShiftUp()) {
 										fullRecalc = true;
-										if(isCheckChangeAutoFilter == 'changeAutoFilter')
+										if(isCheckChangeAutoFilter === true)
 											t.autoFilters.insertRows(prop, _updateRangeDel, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
@@ -9704,6 +9706,7 @@
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop, bUndoRedo);
 							if(!isCheckChangeAutoFilter)
 								return;
+
 							functionModelAction = function () {
 								fullRecalc = true;
 								History.Create_NewPoint();
@@ -9728,6 +9731,7 @@
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteRows, prop, bUndoRedo);
 							if(!isCheckChangeAutoFilter)
 								return;
+
 							functionModelAction = function () {
 								fullRecalc = true;
 								History.Create_NewPoint();
