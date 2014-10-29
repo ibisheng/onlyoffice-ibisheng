@@ -481,6 +481,8 @@ function CRasterHeapChuck()
     this.LinesBusy = [];
 
     this.CurLine = null;
+
+    this.FindOnlyEqualHeight = false;
 }
 CRasterHeapChuck.prototype =
 {
@@ -537,6 +539,9 @@ CRasterHeapChuck.prototype =
         // линию не нашли. Начинаем искать из свободной памяти
         // ищем 3/2 от нужного размера. и параллельно 1
         var _need_height1 = (3 * _need_height) >> 1;
+        if (this.FindOnlyEqualHeight)
+            _need_height1 = _need_height;
+
         var _free_len = this.LinesFree.length;
         var _index_found_koef1 = -1;
         for (var i = 0; i < _free_len; i++)
@@ -572,7 +577,7 @@ CRasterHeapChuck.prototype =
         // 3/2 не нашли. если нашли для 1, то выделяем там
         if (-1 != _index_found_koef1)
         {
-            var _line = this.LinesFree[i];
+            var _line = this.LinesFree[_index_found_koef1];
 
             var _new_line = new CRasterHeapLine();
             _new_line.CreatePlaces(_need_height, _need_height, this.Width);
@@ -666,9 +671,9 @@ CRasterHeapChuck.prototype =
     }
 };
 
-function CRasterHeapTotal()
+function CRasterHeapTotal(_size)
 {
-    this.ChunkHeapSize = 3000; // 4 * 3000 * 3000 = 36Mb
+    this.ChunkHeapSize = (undefined === _size) ? 3000 : _size; // 4 * 3000 * 3000 = 36Mb
     this.Chunks = [];
 }
 CRasterHeapTotal.prototype =
@@ -706,12 +711,12 @@ CRasterHeapTotal.prototype =
         this.Chunks[this.Chunks.length] = _chunk;
     },
 
-    CreateFirstChuck : function()
+    CreateFirstChuck : function(_w, _h)
     {
         if (0 == this.Chunks.length)
         {
             this.Chunks[0] = new CRasterHeapChuck();
-            this.Chunks[0].Create(this.ChunkHeapSize, this.ChunkHeapSize);
+            this.Chunks[0].Create((undefined == _w) ? this.ChunkHeapSize : _w, (undefined == _h) ? this.ChunkHeapSize : _h);
         }
     }
 };

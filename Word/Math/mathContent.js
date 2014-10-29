@@ -2712,7 +2712,7 @@ CMathContent.prototype.Add_Symbol = function(Code)
     Symbol.add(Code);
     MathRun.Add(Symbol, true);
 
-    this.Internal_Content_Add(this.content.length, MathRun, true);
+    this.Internal_Content_Add(this.Content.length, MathRun, true);
 };
 CMathContent.prototype.Add_Fraction = function(Pr, NumText, DenText)
 {

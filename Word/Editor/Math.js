@@ -1118,17 +1118,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
         }
         return _ret;
     }
-    else
-    {
-        try
-        {
-            return _canvas.toDataURL("image/png");
-        }
-        catch (err)
-        {
-        }
-        return "";
-    }
+    return null;
 };
 
 ParaMath.prototype.ApplyArgSize = function(FontSize, argSize)

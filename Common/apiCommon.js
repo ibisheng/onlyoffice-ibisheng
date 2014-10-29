@@ -1086,17 +1086,25 @@ var g_oArrUserColors = [15064320, 58807, 16724950, 1759488, 9981439, 56805, 1505
 function CAscMathType()
 {
     this.Id     = 0;
-    this.Image  = "";
+
+    this.X = 0;
+    this.Y = 0;
 }
 CAscMathType.prototype.get_Id = function(){ return this.Id; };
-CAscMathType.prototype.get_Image = function(){ return this.Image; };
+CAscMathType.prototype.get_X = function(){ return this.X; };
+CAscMathType.prototype.get_Y = function(){ return this.Y; };
 
 function CAscMathCategory()
 {
     this.Id     = 0;
     this.Data   = [];
+
+    this.W      = 0;
+    this.H      = 0;
 }
 
 CAscMathCategory.prototype.get_Id = function(){ return this.Id; };
 CAscMathCategory.prototype.get_Data = function(){ return this.Data; };
+CAscMathCategory.prototype.get_W = function(){ return this.W; };
+CAscMathCategory.prototype.get_H = function(){ return this.H; };
 CAscMathCategory.prototype.private_Sort = function(){ this.Data.sort( function(a,b){ return a.Id- b.Id; } ); };
