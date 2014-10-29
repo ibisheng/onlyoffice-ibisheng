@@ -3040,10 +3040,18 @@ CMathContent.prototype.Get_Bounds = function()
     var X = 0, Y = 0, W = 0, H = 0;
     if (null !== this.ParaMath)
     {
+
         X = this.ParaMath.X + this.pos.x;
         Y = this.ParaMath.Y + this.pos.y;
         W = this.size.width;
         H = this.size.height;
+
+        if (this.RecalcInfo.bEqqArray)
+        {
+            var PointInfo = new CMathPointInfo();
+            PointInfo.SetInfoPoints(this.InfoPoints);
+            X += PointInfo.GetAlign();
+        }
     }
 
     return {X : X, Y : Y, W : W, H : H};
@@ -3079,11 +3087,13 @@ CMathContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurL
     if (nLength <= 0)
         return false;
 
-    var PointInfo = new CMathPointInfo();
-    PointInfo.SetInfoPoints(this.InfoPoints);
-
-    if(this.RecalcInfo.bEqqArray)
-        SearchPos.CurX += PointInfo.GetAlign();
+    if (this.RecalcInfo.bEqqArray)
+    {
+        SearchPos.EqArrayInfoPoints = new CMathPointInfo();
+        SearchPos.EqArrayInfoPoints.SetInfoPoints(this.InfoPoints);
+    }
+    else
+        SearchPos.EqArrayInfoPoints = null;
 
     var bResult = false;
     for (var nPos = 0; nPos < nLength; nPos++)

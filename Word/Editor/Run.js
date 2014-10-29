@@ -3774,18 +3774,12 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         var TempDx = 0;
 
-        if(para_Math_Ampersand === ItemType && this.bEqqArray)
+        if(para_Math_Ampersand === ItemType && null !== SearchPos.EqArrayInfoPoints)
         {
-            if (null !== this.Parent)
-            {
-                var PointsInfo = new CMathPointInfo();
-                PointsInfo.SetInfoPoints(this.Parent.InfoPoints);
-
-                PointsInfo.NextAlignRange();
-                TempDx = PointsInfo.GetAlign();
-            }
+            SearchPos.EqArrayInfoPoints.NextAlignRange();
+            TempDx = SearchPos.EqArrayInfoPoints.GetAlign();
         }
-        else if ( para_Drawing != ItemType || true === Item.Is_Inline() )
+        else if (para_Drawing != ItemType || true === Item.Is_Inline())
         {
             TempDx = Item.Get_WidthVisible();
         }
