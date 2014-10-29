@@ -9546,11 +9546,7 @@
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
 									{
-										if(gUndoInsDelCellsFlag == true)
-											t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
-										else if(gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
-											t.autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
-										gUndoInsDelCellsFlag = true;
+										t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
 									}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -9575,11 +9571,7 @@
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
 									{
-										if(gUndoInsDelCellsFlag == true)
-											t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
-										else if(gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
-											t.autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
-										gUndoInsDelCellsFlag = true;
+										t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
 									}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -9598,11 +9590,11 @@
 							functionModelAction = function () {
 								fullRecalc = true;
 								t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
-								if(gUndoInsDelCellsFlag == true)
-									t.autoFilters.insertColumn(prop, _updateRangeIns, arn, c_oAscInsertOptions.InsertColumns);
-								else if(gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
-									t.autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
-								gUndoInsDelCellsFlag = true;
+
+
+								t.autoFilters.insertColumn(prop, _updateRangeIns, arn, c_oAscInsertOptions.InsertColumns);
+
+
 								t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 								t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 							};
@@ -9619,11 +9611,9 @@
 							functionModelAction = function () {
 								fullRecalc = true;
 								t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
-								if(gUndoInsDelCellsFlag == true)
-									t.autoFilters.insertRows(prop,_updateRangeIns, arn, c_oAscInsertOptions.InsertRows);
-								else if(gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
-									t.autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
-								gUndoInsDelCellsFlag = true;
+
+								t.autoFilters.insertRows(prop,_updateRangeIns, arn, c_oAscInsertOptions.InsertRows);
+
 								t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 								t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 							};
