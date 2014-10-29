@@ -1090,9 +1090,9 @@ function CAscMathType()
     this.X = 0;
     this.Y = 0;
 }
-CAscMathType.prototype.get_Id = function(){ return this.Id; };
-CAscMathType.prototype.get_X = function(){ return this.X; };
-CAscMathType.prototype.get_Y = function(){ return this.Y; };
+CAscMathType.prototype["get_Id"] = function(){ return this.Id; };
+CAscMathType.prototype["get_X"] = function(){ return this.X; };
+CAscMathType.prototype["get_Y"] = function(){ return this.Y; };
 
 function CAscMathCategory()
 {
@@ -1103,8 +1103,8 @@ function CAscMathCategory()
     this.H      = 0;
 }
 
-CAscMathCategory.prototype.get_Id = function(){ return this.Id; };
-CAscMathCategory.prototype.get_Data = function(){ return this.Data; };
-CAscMathCategory.prototype.get_W = function(){ return this.W; };
-CAscMathCategory.prototype.get_H = function(){ return this.H; };
+CAscMathCategory.prototype["get_Id"] = function(){ return this.Id; };
+CAscMathCategory.prototype["get_Data"] = function(){ return this.Data; };
+CAscMathCategory.prototype["get_W"] = function(){ return this.W; };
+CAscMathCategory.prototype["get_H"] = function(){ return this.H; };
 CAscMathCategory.prototype.private_Sort = function(){ this.Data.sort( function(a,b){ return a.Id- b.Id; } ); };
