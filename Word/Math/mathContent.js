@@ -749,7 +749,7 @@ CMathContent.prototype =
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },*/
 
-    PreRecalc: function(ParentElement, ParaMath, ArgSize, RPI)
+    PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {
         if(ArgSize !== null && ArgSize !== undefined)
         {
@@ -758,10 +758,10 @@ CMathContent.prototype =
         }
 
         this.ParaMath = ParaMath;
-        if(ParentElement !== null)
+        if(Parent !== null)
         {
             this.bRoot = false;
-            this.ParentElement = ParentElement;
+            this.Parent = Parent;
         }
 
         if(ArgSize !== null && ArgSize !== undefined)
@@ -830,7 +830,7 @@ CMathContent.prototype =
         }
     },
     // особый случай: вызываем, когда пересчет всей формулы не нужен, а нужно выставить только Lines (Реализована, чтобы не править Resize у каждого элемента)
-    Resize_2: function(oMeasure, ParentElement, ParaMath, RPI, ArgSize)
+    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
     {
         var lng = this.Content.length;
         for(var i = 0; i < lng; i++)
@@ -847,7 +847,7 @@ CMathContent.prototype =
     },
     IsEqqArray: function()
     {
-        return this.ParentElement.IsEqqArray();
+        return this.Parent.IsEqqArray();
     },
     Get_CompiledArgSize: function()
     {
@@ -982,9 +982,9 @@ CMathContent.prototype =
 
         if(this.RecalcInfo.bEqqArray)
         {
-            this.InfoPoints.GWidths       = this.ParentElement.WidthsPoints;
-            this.InfoPoints.GPoints       = this.ParentElement.Points;
-            this.InfoPoints.GMaxDimWidths = this.ParentElement.MaxDimWidths;
+            this.InfoPoints.GWidths       = this.Parent.WidthsPoints;
+            this.InfoPoints.GPoints       = this.Parent.Points;
+            this.InfoPoints.GMaxDimWidths = this.Parent.MaxDimWidths;
 
             PosInfo.SetInfoPoints(this.InfoPoints);
             PosInfo.ApplyAlign();
@@ -1027,7 +1027,7 @@ CMathContent.prototype =
     {
         var ctrPrp = new CTextPr();
         if(!this.bRoot)
-            ctrPrp.Merge( this.ParentElement.Get_CompiledCtrPrp_2() );
+            ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
 
         return ctrPrp;
     },
@@ -1036,7 +1036,7 @@ CMathContent.prototype =
         var result = false;
 
         if(!this.bRoot)
-            result = this.ParentElement.IsAccent();
+            result = this.Parent.IsAccent();
 
         return result;
     },
@@ -1045,7 +1045,7 @@ CMathContent.prototype =
     /// For Para Math
     GetParent: function()
     {
-        return this.ParentElement.GetParent();
+        return this.Parent.GetParent();
     },
     SetArgSize: function(val)
     {
@@ -1303,7 +1303,7 @@ CMathContent.prototype =
         var TextPr;
 
         if(this.IsPlaceholder())
-            TextPr = this.ParentElement.Get_CtrPrp();
+            TextPr = this.Parent.Get_CtrPrp();
         else
             TextPr = this.Content[pos].Get_TextPr(ContentPos, Depth + 1);
 
@@ -1315,7 +1315,7 @@ CMathContent.prototype =
 
         if(this.IsPlaceholder())
         {
-            TextPr = this.ParentElement.Get_CompiledCtrPrp_2();
+            TextPr = this.Parent.Get_CompiledCtrPrp_2();
         }
         else if (this.Selection.Use || bAll == true)
         {
