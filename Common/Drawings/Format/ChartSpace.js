@@ -5552,6 +5552,8 @@ CChartSpace.prototype =
                                 break;
                             }
                         }
+
+
                         if(isRealNumber(cut_index))
                         {
                             if(cut_index > 0)
@@ -5573,19 +5575,59 @@ CChartSpace.prototype =
                         legend.extX = legend_width;
                         legend.extY = legend_height;
                         var summ_h = 0;
-                        calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                        for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
+
+
+                        var b_reverse_order = false;
+                        var chart_object, cat_ax, start_index, end_index;
+                        if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0])
                         {
-                            calc_entry = calc_entryes[i];
-                            if(calc_entry.calcMarkerUnion.marker)
+                            chart_object = this.chart.plotArea.charts[0];
+                            if(chart_object && chart_object.getAxisByTypes)
                             {
-                                calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                var axis_by_types = chart_object.getAxisByTypes();
+                                cat_ax = axis_by_types.catAx[0];
                             }
-                            calc_entry.localX = 2*distance_to_text + marker_size;
-                            calc_entry.localY = summ_h;
-                            summ_h+=arr_heights[i];
                         }
+                        if(chart_object && chart_object.getObjectType() === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR &&
+                            (cat_ax && cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX) === ORIENTATION_MIN_MAX)
+                        {
+                            b_reverse_order = true;
+                        }
+
+
+                        if(!b_reverse_order)
+                        {
+                            calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
+                            for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
+                            {
+                                calc_entry = calc_entryes[i];
+                                if(calc_entry.calcMarkerUnion.marker)
+                                {
+                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                }
+                                calc_entry.localX = 2*distance_to_text + marker_size;
+                                calc_entry.localY = summ_h;
+                                summ_h+=arr_heights[i];
+                            }
+                        }
+                        else
+                        {
+                            calc_entryes.splice(0, calc_entryes.length - cut_index);
+                            for(i = calc_entryes.length-1; i > -1; --i)
+                            {
+                                calc_entry = calc_entryes[i];
+                                if(calc_entry.calcMarkerUnion.marker)
+                                {
+                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                }
+                                calc_entry.localX = 2*distance_to_text + marker_size;
+                                calc_entry.localY = summ_h;
+                                summ_h+=arr_heights[i];
+                            }
+                        }
+
                         legend.setPosition(0, 0);
                     }
                 }
