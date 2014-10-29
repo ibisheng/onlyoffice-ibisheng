@@ -2997,14 +2997,25 @@ UndoRedoWoorksheet.prototype = {
 				}
 			}
 			range = Asc.Range(0, from, gc_nMaxCol0, to);
-			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type))
-				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteRows, range);
-			else
-				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertRows, range);
+			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type)) {
+				ws.removeRows(from, to);
+				bInsert = false;
+				operType = c_oAscDeleteOptions.DeleteRows;
+			} else {
+				ws.insertRowsBefore(from, to - from + 1);
+				bInsert = true;
+				operType = c_oAscInsertOptions.InsertRows;
+			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
 			if (true !== this.wb.bCollaborativeChanges)
 				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
+
+			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell", range, operType);
+			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range);
+			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
 		{
@@ -3025,14 +3036,25 @@ UndoRedoWoorksheet.prototype = {
 			}
 
 			range = Asc.Range(from, 0, to, gc_nMaxRow0);
-			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type))
-				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteColumns, range);
-			else
-				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertColumns, range);
+			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type)) {
+				ws.removeCols(from, to);
+				bInsert = false;
+				operType = c_oAscDeleteOptions.DeleteColumns;
+			} else {
+				ws.insertColsBefore(from, to - from + 1);
+				bInsert = true;
+				operType = c_oAscInsertOptions.InsertColumns;
+			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
 			if (true !== this.wb.bCollaborativeChanges)
 				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
+
+			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range, operType);
+			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range);
+			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
 		{

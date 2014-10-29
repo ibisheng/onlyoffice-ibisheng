@@ -438,12 +438,6 @@
 				if (ws)
 					ws.changeWorksheet("update", val);
 			});
-			this.model.handlers.add("insertCell", function (wsId, val, range) {
-				self.getWorksheetById(wsId).changeWorksheet("insCell", {val: val, range: range});
-			});
-			this.model.handlers.add("deleteCell", function (wsId, val, range) {
-				self.getWorksheetById(wsId).changeWorksheet("delCell", {val: val, range: range});
-			});
 			this.model.handlers.add("showWorksheet", function (wsId) {
 				var wsModel = self.model.getWorksheetById(wsId), index;
 				if (wsModel) {
