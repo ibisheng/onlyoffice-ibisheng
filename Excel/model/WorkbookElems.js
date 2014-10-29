@@ -4395,7 +4395,8 @@ function FilterColumns() {
 FilterColumns.prototype.clone = function() {
 	var res = new FilterColumns();
 	res.ColId = this.ColId;
-	res.CustomFiltersObj = this.CustomFiltersObj.clone();
+	if(this.CustomFiltersObj)
+		res.CustomFiltersObj = this.CustomFiltersObj.clone();
 	
 	return res;
 };
