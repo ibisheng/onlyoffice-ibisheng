@@ -2417,6 +2417,7 @@ DrawingObjectsController.prototype =
                         var d_lbls = new CDLbls();
                         d_lbls.setShowVal(true);
                         chart_type.setDLbls(d_lbls);
+                        chart_type.dLbls.setParent(chart_type);
                     }
                     var finish_dlbl_pos =  DLBL_POS_DEFINES_MAP[data_labels_pos_setting];
                     //var DLBL_POS_DEFINES_MAP = [];
@@ -2499,7 +2500,10 @@ DrawingObjectsController.prototype =
             {
                 chartType.removeDataLabels();
                 if(!chartType.dLbls)
+                {
                     chartType.setDLbls(new CDLbls());
+                    chartType.dLbls.setParent(chartType);
+                }
                 return chartType.dLbls;
             };
             if(isRealBool(chartSettings.showCatName))
