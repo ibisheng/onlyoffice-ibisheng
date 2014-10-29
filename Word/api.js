@@ -760,9 +760,14 @@ asc_docs_api.prototype.TranslateStyleName = function(style_name)
 
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
-    this.isDocumentModify = false;
+    this.SetDocumentModified(false);
+    this._onUpdateDocumentCanSave();
+};
+
+asc_docs_api.prototype.SetDocumentModified = function(bValue)
+{
+    this.isDocumentModify = bValue;
     this.asc_fireCallback("asc_onDocumentModifiedChanged");
-	this._onUpdateDocumentCanSave();
 };
 
 asc_docs_api.prototype.isDocumentModified = function()

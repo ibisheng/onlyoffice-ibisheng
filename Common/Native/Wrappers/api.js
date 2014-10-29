@@ -4473,6 +4473,16 @@ asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
     window["native"]["OnCallMenuEvent"](61, _stream); // ASC_MENU_EVENT_TYPE_CAN_REDO
 };
 
+asc_docs_api.prototype.SetDocumentModified = function(bValue)
+{
+    this.isDocumentModify = bValue;
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteBool"](this.isDocumentModify);
+    window["native"]["OnCallMenuEvent"](66, _stream); // ASC_MENU_EVENT_TYPE_DOCUMETN_MODIFITY
+};
+
 // find -------------------------------------------------------------------------------------------------
 asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
 {

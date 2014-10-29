@@ -11779,11 +11779,9 @@ CDocument.prototype =
 
         if ( true === History.Have_Changes() )
         {
-            editor.isDocumentModify = true;
-
             // дублирование евента. когда будет undo-redo - тогда
             // эти евенты начнут отличаться
-            editor.asc_fireCallback("asc_onDocumentModifiedChanged");
+            editor.SetDocumentModified(true);
 			editor._onUpdateDocumentCanSave();
         }
         else
