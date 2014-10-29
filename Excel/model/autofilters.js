@@ -1250,21 +1250,14 @@
 				}
 			},
 			//при вставке пользователем колонки изменяем фильтры
-			insertColumn: function(type, val, ar, insertType)
+			insertColumn: function(type, val, insertType)
 			{
 				var activeCells;
 				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
-                if(typeof val == 'object')
-				{
-					activeCells = val.clone();
-					val = activeCells.c2 - activeCells.c1 + 1;
-				}
-				else
-				{	
-				    activeCells = ar;
-					if(!val)
-						val = activeCells.c2 - activeCells.c1 + 1;
-				}
+
+				activeCells = val.clone();
+				val = activeCells.c2 - activeCells.c1 + 1;
+
 				
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
@@ -1284,22 +1277,14 @@
 				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells, insertType);
 			},
 			//при вставке пользователем строки изменяем фильтры
-			insertRows: function(type, val, ar, insertType)
+			insertRows: function(type, val, insertType)
 			{
                 var activeCells;
 				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
-                if(typeof val == 'object')
-				{
-					activeCells = val.clone();
-					val = activeCells.r2 - activeCells.r1 + 1;
-				}
-				else
-				{	
-					activeCells = ar;
-					if(!val)
-						val = activeCells.r2 - activeCells.r1 + 1;
-				}
-				
+
+				activeCells = val.clone();
+				val = activeCells.r2 - activeCells.r1 + 1;
+
 				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
 				{
 					activeCells.c1 = 0;

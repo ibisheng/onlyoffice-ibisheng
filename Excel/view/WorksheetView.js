@@ -9429,7 +9429,7 @@
 				case "insColBefore":
 					functionModelAction = function () {
 						fullRecalc = true;
-						t.autoFilters.insertColumn(prop, val, arn);
+						t.autoFilters.insertColumn(prop, val);
 						t.model.insertColsBefore(arn.c1, val);
 					};
 					oChangeData.added = new asc_Range(arn.c1, 0, arn.c1 + val - 1, gc_nMaxRow0);
@@ -9439,7 +9439,7 @@
 				case "insColAfter":
 					functionModelAction = function () {
 						fullRecalc = true;
-						t.autoFilters.insertColumn(prop, val, arn);
+						t.autoFilters.insertColumn(prop, val);
 						t.model.insertColsAfter(arn.c2, val);
 					};
 					oChangeData.added = new asc_Range(arn.c2, 0, arn.c2 + val - 1, gc_nMaxRow0);
@@ -9546,7 +9546,7 @@
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
 									{
-										t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
+										t.autoFilters.insertColumn(prop, _updateRangeIns);
 									}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -9571,7 +9571,7 @@
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
 									{
-										t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
+										t.autoFilters.insertRows(prop,_updateRangeIns);
 									}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -9592,7 +9592,7 @@
 								t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
 
 
-								t.autoFilters.insertColumn(prop, _updateRangeIns, arn, c_oAscInsertOptions.InsertColumns);
+								t.autoFilters.insertColumn(prop, _updateRangeIns, c_oAscInsertOptions.InsertColumns);
 
 
 								t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -9612,7 +9612,7 @@
 								fullRecalc = true;
 								t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
 
-								t.autoFilters.insertRows(prop,_updateRangeIns, arn, c_oAscInsertOptions.InsertRows);
+								t.autoFilters.insertRows(prop,_updateRangeIns, c_oAscInsertOptions.InsertRows);
 
 								t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 								t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
@@ -9650,7 +9650,7 @@
 								if (range.deleteCellsShiftLeft()) {
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
-										t.autoFilters.insertColumn(prop, _updateRangeDel, arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
+										t.autoFilters.insertColumn(prop, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 								}
@@ -9677,7 +9677,7 @@
 									if (range.deleteCellsShiftUp()) {
 										fullRecalc = true;
 										if(isCheckChangeAutoFilter === true)
-											t.autoFilters.insertRows(prop, _updateRangeDel, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
+											t.autoFilters.insertRows(prop, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
@@ -9702,7 +9702,7 @@
 								History.Create_NewPoint();
 								History.StartTransaction();
 								t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
-								t.autoFilters.insertColumn(prop,_updateRangeDel, arn, c_oAscDeleteOptions.DeleteColumns);
+								t.autoFilters.insertColumn(prop,_updateRangeDel, c_oAscDeleteOptions.DeleteColumns);
 								History.EndTransaction();
 
 								t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
@@ -9727,7 +9727,7 @@
 								History.Create_NewPoint();
 								History.StartTransaction();
 								t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
-								t.autoFilters.insertRows(prop,_updateRangeDel, arn, c_oAscDeleteOptions.DeleteRows);
+								t.autoFilters.insertRows(prop,_updateRangeDel, c_oAscDeleteOptions.DeleteRows);
 								History.EndTransaction();
 
 								t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
