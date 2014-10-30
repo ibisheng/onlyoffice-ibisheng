@@ -578,6 +578,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     if(RPI.NeedResize)
     {
+        this.Root.Set_Paragraph(Para);
         this.Root.PreRecalc(null, this, ArgSize, RPI);
         this.Root.Resize(g_oTextMeasurer, RPI/*recalculate properties info*/);
         // когда формула будеат разбиваться на строки, Position придется перерасчитывать

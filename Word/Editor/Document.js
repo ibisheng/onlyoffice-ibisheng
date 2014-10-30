@@ -10491,6 +10491,7 @@ CDocument.prototype =
         if ( "undefined" == typeof(NextObj) )
             NextObj = null;
 
+
         this.History.Add( this, { Type : historyitem_Document_AddItem, Pos : Position, Item : NewObject } );
         this.Content.splice( Position, 0, NewObject );
         NewObject.Set_Parent( this );
@@ -12730,7 +12731,7 @@ CDocument.prototype =
 
                     if ( null != Element )
                     {
-                        if ( Pos > 0 )
+                        if (Pos > 0)
                         {
                             this.Content[Pos - 1].Next = Element;
                             Element.Prev = this.Content[Pos - 1];
@@ -12738,7 +12739,7 @@ CDocument.prototype =
                         else
                             Element.Prev = null;
 
-                        if ( Pos <= this.Content.length - 1 )
+                        if (Pos <= this.Content.length - 1)
                         {
                             this.Content[Pos].Prev = Element;
                             Element.Next = this.Content[Pos];
@@ -12773,7 +12774,7 @@ CDocument.prototype =
                     if ( false === Pos )
                         continue;
 
-                    this.Content.splice( Pos, 1 );
+                    this.Content.splice(Pos, 1);
 
                     if ( Pos > 0 )
                     {
@@ -13837,8 +13838,8 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
             else
             {
                 this.CurPage++;
-                CurY  = 0;
-                PageH = this.Pages[this.CurPage].Height;
+                StartY = 0;
+                CurY   = 0;
             }
         }
 
@@ -13871,7 +13872,8 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
             else
             {
                 this.CurPage--;
-                CurY = this.Pages[this.CurPage].Height;
+                StartY = this.Pages[this.CurPage].Height;
+                CurY   = this.Pages[this.CurPage].Height;
             }
         }
 

@@ -4655,7 +4655,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
         // чтобы не выпадало ошибок сгенерим дефолтовые настройки
         var TextPr = new CTextPr();
         TextPr.Init_Default();
-        return new CTextPr();
+        return TextPr;
     }
 
     // Получим настройки текста, для данного параграфа
@@ -4677,7 +4677,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             // чтобы не выпадало ошибок сгенерим дефолтовые настройки
             var TextPr = new CTextPr();
             TextPr.Init_Default();
-            return new CTextPr();
+            return TextPr;
         }
 
         // Not Apply ArgSize !

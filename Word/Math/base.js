@@ -4,8 +4,8 @@ function CMathBase(bInside)
 {
     this.Type = para_Math_Composition;
 
-    this.pos = new CMathPosition();
-    this.size = null;
+    this.pos  = new CMathPosition();
+    this.size = new CMathSize();
 
     //  Properties
     this.Parent = null;
@@ -369,7 +369,7 @@ CMathBase.prototype =
             GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
 
         for(var Pos = 0; Pos < this.Content.length; Pos++)
-                this.Content[Pos].SetParent(this, ParaMath);
+            this.Content[Pos].SetParent(this, ParaMath);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
@@ -733,7 +733,7 @@ CMathBase.prototype =
     }
     //////////////////////////
 };
-
+CMathBase.prototype.Set_Paragraph = ParaHyperlink.prototype.Set_Paragraph;
 CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
     for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
@@ -883,10 +883,13 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
         return false;
 
     var aBounds = [];
-
     for (var nIndex = 0; nIndex < nCount; nIndex++)
     {
-        aBounds.push(this.Content[nIndex].Get_Bounds());
+        var oBounds = this.Content[nIndex].Get_Bounds();
+        if (oBounds.W > 0.001 && oBounds.H > 0.001)
+            aBounds.push(oBounds);
+        else
+            aBounds.push(null);
     }
 
     var X = SearchPos.X;
@@ -900,21 +903,25 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
     while (nCurIndex < nCount)
     {
         var oBounds = aBounds[nCurIndex];
-        if (oBounds.X <= X && X <= oBounds.X + oBounds.W && oBounds.Y <= Y && Y <= oBounds.Y + oBounds.H)
-        {
-            nFindIndex = nCurIndex;
-            break;
-        }
-        else
-        {
-            var dCurDiffX = X - (oBounds.X + oBounds.W / 2);
-            var dCurDiffY = Y - (oBounds.Y + oBounds.H / 2);
-            var dCurDiff = dCurDiffX * dCurDiffX + dCurDiffY * dCurDiffY;
 
-            if (null === dDiff || dDiff > dCurDiff)
+        if (null !== oBounds)
+        {
+            if (oBounds.X <= X && X <= oBounds.X + oBounds.W && oBounds.Y <= Y && Y <= oBounds.Y + oBounds.H)
             {
-                dDiff = dCurDiff;
                 nFindIndex = nCurIndex;
+                break;
+            }
+            else
+            {
+                var dCurDiffX = X - (oBounds.X + oBounds.W / 2);
+                var dCurDiffY = Y - (oBounds.Y + oBounds.H / 2);
+                var dCurDiff = dCurDiffX * dCurDiffX + dCurDiffY * dCurDiffY;
+
+                if (null === dDiff || dDiff > dCurDiff)
+                {
+                    dDiff = dCurDiff;
+                    nFindIndex = nCurIndex;
+                }
             }
         }
 
