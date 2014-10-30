@@ -1040,6 +1040,41 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     PDSH.X = this.pos.x + this.ParaMath.X + this.size.width;
 
 };
+CMathBase.prototype.Internal_Content_Add = function(Pos, Items, bUpdatePosition)
+{
+    History.Add(this, new CChangesMathAddItems(Pos, Items));
+    //History.Add( this, { Type : historyitem_Math_AddItems_ToMathBase, Pos : Pos, EndPos : Pos, Items : Items } );
+    this.raw_Internal_Content_Add(Pos, Items, bUpdatePosition);
+};
+CMathBase.prototype.raw_Internal_Content_Add = function(Pos, Items, bUpdatePosition)
+{
+    for(var Index = 0; Index < Items.length; Index++)
+        this.Content.splice(Pos + Index, 0, Items[Index]);
+
+    this.Update_Pos_After_AddItems(Pos, bUpdatePosition);
+    this.fillContent();
+
+    this.private_SetNeedResize();
+}
+CMathBase.prototype.Update_Pos_After_AddItems   = CMathContent.prototype.Update_Pos_After_AddItems;
+CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
+CMathBase.prototype.private_SetNeedResize       = CMathContent.prototype.private_SetNeedResize;
+
+CMathBase.prototype.private_CorrectCurPos = function()
+{
+    if (this.CurPos > this.Content.length - 1)
+    {
+        this.CurPos = this.Content.length - 1;
+        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+    }
+
+    if (this.CurPos < 0)
+    {
+        this.CurPos = this.Content.length - 1;
+        this.Content[this.CurPos].Cursor_MoveToStartPos();
+    }
+}
+
 CMathBase.prototype.Search                        = ParaHyperlink.prototype.Search;
 CMathBase.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
 CMathBase.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;

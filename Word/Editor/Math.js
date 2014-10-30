@@ -1817,6 +1817,7 @@ var historyitem_Math_RemoveItem                =  2; // Удаляем элем�
 var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
 var hisotryitem_Math_ParaJc                    =  4; // ParaMath.Jc
 var historyitem_Math_CtrPrpShd                 =  5;
+var historyitem_Math_AddItems_ToMathBase       =  6;
 
 function ReadChanges_FromBinary(Reader, Class)
 {
@@ -1825,9 +1826,10 @@ function ReadChanges_FromBinary(Reader, Class)
 
     switch(Type)
     {
-        case historyitem_Math_CtrPrpFSize: Changes = new CChangesMathFontSize(); break;
-        case hisotryitem_Math_ParaJc     : Changes = new CChangesMathParaJc(); break;
-        case historyitem_Math_CtrPrpShd: Changes = new CChangesMathShd(); break;
+        case historyitem_Math_CtrPrpFSize         : Changes = new CChangesMathFontSize(); break;
+        case hisotryitem_Math_ParaJc              : Changes = new CChangesMathParaJc(); break;
+        case historyitem_Math_CtrPrpShd           : Changes = new CChangesMathShd(); break;
+        case historyitem_Math_AddItems_ToMathBase : Changes = new CChangesMathAddItems(); break;
     }
 
     if (null !== Changes)
@@ -1930,24 +1932,64 @@ CChangesMathShd.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
+function CChangesMathAddItems(Pos, Items)
+{
+    this.Pos   = Pos;
+    this.Items = Items;
+}
+CChangesMathAddItems.prototype.Type = historyitem_Math_AddItems_ToMathBase;
+CChangesMathAddItems.prototype.Undo = function(Class)
+{
+
+};
+CChangesMathAddItems.prototype.Redo = function(Class)
+{
+    Class.raw_Internal_Content_Add(this.Pos, this.Items, false);
+};
+CChangesMathAddItems.prototype.Save_Changes = function(Writer)
+{
+    var Count = this.Items.length;
+    Writer.WriteLong(Count);
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        Writer.WriteLong(this.Pos + Index);
+        Writer.WriteString2(this.Items[Index].Get_Id());
+    }
+};
+CChangesMathAddItems.prototype.Load_Changes = function(Reader, Class)
+{
+    var Count = Reader.GetLong();
+    this.Pos = Reader.GetLong();
+
+    if(this.Items == undefined)
+        this.Items = [];
+
+    for(var Index = 0; Index < Count; Index++)
+    {
+        var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+        if ( null != Element )
+            this.Items.push(Element);
+    }
+
+    this.Redo(Class);
+};
+
 function CChangesMathParaJc(NewValue, OldValue)
 {
     this.New = NewValue;
     this.Old = OldValue;
 }
-
 CChangesMathParaJc.prototype.Type = hisotryitem_Math_ParaJc;
-
 CChangesMathParaJc.prototype.Undo = function(Class)
 {
     Class.raw_SetAlign(this.Old);
 };
-
 CChangesMathParaJc.prototype.Redo = function(Class)
 {
     Class.raw_SetAlign(this.New);
 };
-
 CChangesMathParaJc.prototype.Save_Changes = function(Writer)
 {
     // Bool : undefined?
@@ -1960,7 +2002,6 @@ CChangesMathParaJc.prototype.Save_Changes = function(Writer)
         Writer.WriteLong(this.New);
     }
 };
-
 CChangesMathParaJc.prototype.Load_Changes = function(Reader, Class)
 {
     if (true === Reader.GetBool())

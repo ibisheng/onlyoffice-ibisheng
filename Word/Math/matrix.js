@@ -640,10 +640,6 @@ CMathEqArrPr.prototype.Read_FromBinary = function(Reader)
     this.row     = Reader.GetLong();
 };
 
-CMathEqArrPr.prototype.DecreaseCountRow = function()
-{
-    this.row++;
-}
 
 ////
 function CEqArray(props)
@@ -689,15 +685,22 @@ CEqArray.prototype.init = function(props)
 }
 CEqArray.prototype.addRow = function()
 {
+    this.bDecreaseRow = true;
+    var NewContent = new CMathContent();
+    this.Internal_Content_Add(this.CurPos + 1, [NewContent], true);
+
+    return NewContent;
+}
+/*CEqArray.prototype.addRow = function()
+{
     this.Content.splice( this.CurPos + 1, 0, new CMathContent() );
     this.Content[this.CurPos + 1].ParentElement = this;
 
-    this.Pr.DecreaseCountRow();
-
-    this.bDecreaseRow = true;
+    //this.Pr.DecreaseCountRow();
+    //this.bDecreaseRow = true;
 
     return this.Content[this.CurPos + 1];
-}
+}*/
 CEqArray.prototype.fillContent = function()
 {
     var nRowsCount = this.Content.length;
@@ -710,11 +713,7 @@ CEqArray.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo
 {
     if(this.bDecreaseRow)
     {
-        this.elements.splice(this.CurPos + 1, 0, []);
-        this.elements[this.CurPos + 1][0] = this.Content[this.CurPos + 1];
-        this.alignment.hgt[this.CurPos + 1] = MCJC_CENTER;
-
-        this.nRow++;
+        this.fillContent();
         this.bDecreaseRow = false;
     }
 

@@ -1564,6 +1564,10 @@ CMathContent.prototype =
         History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
 
+        this.Update_Pos_After_AddItems(Pos, bUpdatePosition);
+    },
+    Update_Pos_After_AddItems: function(Pos, bUpdatePosition)
+    {
         if(bUpdatePosition !== false)
         {
             if ( this.CurPos >= Pos )
