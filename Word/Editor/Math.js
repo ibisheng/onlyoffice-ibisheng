@@ -554,7 +554,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if ( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        this.protected_UpdateSpellChecking();
     }
 
     var CurLine  = PRS.Line - this.StartLine;

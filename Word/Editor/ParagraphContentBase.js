@@ -132,3 +132,9 @@ CParagraphContentWithContentBase.prototype.protected_FillRangeEndPos = function(
     var RangeOffset = this.protected_GetRangeOffset(LineIndex, RangeIndex);
     this.Lines[RangeOffset + 1] = EndPos;
 };
+
+CParagraphContentWithContentBase.prototype.protected_UpdateSpellChecking = function()
+{
+    if(undefined !== this.Paragraph && null !== this.Paragraph)
+        this.Paragraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+};

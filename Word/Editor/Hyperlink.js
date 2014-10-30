@@ -992,7 +992,7 @@ ParaHyperlink.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if ( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+        this.protected_UpdateSpellChecking();
     }
 
     var CurLine  = PRS.Line - this.StartLine;
@@ -2045,8 +2045,7 @@ ParaHyperlink.prototype.Undo = function(Data)
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
 
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
+            this.protected_UpdateSpellChecking();
             break;
         }
 
@@ -2059,8 +2058,7 @@ ParaHyperlink.prototype.Undo = function(Data)
 
             this.Content = Array_start.concat( Data.Items, Array_end );
 
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
+            this.protected_UpdateSpellChecking();
             break;
         }
 
@@ -2092,8 +2090,7 @@ ParaHyperlink.prototype.Redo = function(Data)
 
             this.Content = Array_start.concat( Data.Items, Array_end );
 
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
+            this.protected_UpdateSpellChecking();
             break;
         }
 
@@ -2101,8 +2098,7 @@ ParaHyperlink.prototype.Redo = function(Data)
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
 
-            this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
+            this.protected_UpdateSpellChecking();
             break;
         }
 
@@ -2250,9 +2246,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                 }
             }
 
-            if ( null !== this.Paragraph && undefined !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
+            this.protected_UpdateSpellChecking();
             break;
         }
 
@@ -2274,9 +2268,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                 this.Content.splice( ChangesPos, 1 );
             }
 
-            if ( null !== this.Paragraph && undefined !== this.Paragraph )
-                this.Paragraph.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
-
+            this.protected_UpdateSpellChecking();
             break;
         }
 
