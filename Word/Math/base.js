@@ -418,6 +418,11 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
     },
+    SetParent: function(Parent, ParaMath)
+    {
+        this.Parent = Parent;
+        this.ParaMath = ParaMath;
+    },
     Set_CompiledCtrPrp: function(Parent, ParaMath)
     {
         if(this.RecalcInfo.bCtrPrp == true)

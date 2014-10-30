@@ -1690,18 +1690,18 @@ ParaMath.prototype.Handle_AddNewLine = function()
 
     var NeedRecalculate = false;
 
-    if(CurrContent.ParentElement.kind == MATH_EQ_ARRAY)
+    if(CurrContent.Parent.kind == MATH_EQ_ARRAY)
     {
-        var NewContent = CurrContent.ParentElement.addRow();
+        var NewContent = CurrContent.Parent.addRow();
         CurrContent.SplitContent(NewContent, ContentPos, 0);
         NewContent.Correct_Content(true);
         CurrContent.Correct_Content(true);
 
         NeedRecalculate = true;
     }
-    else if(CurrContent.bRoot == false && CurrContent.ParentElement.kind !== MATH_MATRIX)
+    else if(CurrContent.bRoot == false && CurrContent.Parent.kind !== MATH_MATRIX)
     {
-        var ctrPrp = CurrContent.ParentElement.CtrPrp.Copy();
+        var ctrPrp = CurrContent.Parent.CtrPrp.Copy();
         var props = {row: 2, ctrPrp: ctrPrp};
         var EqArray = new CEqArray(props);
 

@@ -8051,8 +8051,8 @@ ParaRun.prototype.Set_MathPr = function(MPrp)
 }
 ParaRun.prototype.Set_MathTextPr2 = function(TextPr, MathPr)
 {
-    this.Set_Pr(TextPr);
-    this.Set_MathPr(MathPr);
+    this.Set_Pr(TextPr.Copy());
+    this.Set_MathPr(MathPr.Copy());
 }
 ParaRun.prototype.IsAccent = function()
 {

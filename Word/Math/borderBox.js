@@ -6,7 +6,7 @@ function CMathBreak()
 }
 CMathBreak.prototype.Set_FromObject = function(Obj)
 {
-    if(Obj.AlnAt !== undefined && Obj.AlnAt !== null && Obj.AlnAt - 0 == 0)
+    if(Obj.AlnAt !== undefined && Obj.AlnAt !== null && Obj.AlnAt - 0 == Obj.AlnAt)
     {
         if(Obj.AlnAt >= 1 && Obj.AlnAt <= 255)
             this.AlnAt = Obj.AlnAt;
@@ -18,6 +18,29 @@ CMathBreak.prototype.Copy = function()
     NewMBreak.AlnAt = this.AlnAt;
 
     return NewMBreak;
+}
+CMathBreak.prototype.Write_ToBinary = function(Writer)
+{
+    if(this.AlnAt !== undefined)
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.AlnAt);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+}
+CMathBreak.prototype.Read_FromBinary = function(Reader)
+{
+    if(Reader.GetBool() == false)
+    {
+        this.AlnAt = Reader.GetLong();
+    }
+    else
+    {
+        this.AlnAt = undefined;
+    }
 }
 
 function CMathBorderBoxPr()
@@ -134,7 +157,6 @@ Asc.extendClass(CBorderBox, CMathBase);
 
 CBorderBox.prototype.ClassType = historyitem_type_borderBox;
 CBorderBox.prototype.kind      = MATH_BORDER_BOX;
-
 CBorderBox.prototype.init = function(props)
 {
     this.Fill_LogicalContent(1);
@@ -378,7 +400,7 @@ CMathBoxPr.prototype.Set_FromObject = function(Obj)
     if(Obj.brk !== null && Obj.brk !== undefined)
     {
         this.brk = new CMathBreak();
-        this.brk.Set_FromObject(Obj);
+        this.brk.Set_FromObject(Obj.brk);
     }
 
     if(true === Obj.diff || 1 === Obj.diff)
@@ -422,12 +444,19 @@ CMathBoxPr.prototype.Write_ToBinary = function(Writer)
     // Bool : opEmu
 
     Writer.WriteBool(this.aln);
-    Writer.WriteBool(this.brk);
+    //Writer.WriteBool(this.brk);
     Writer.WriteBool(this.diff);
     Writer.WriteBool(this.noBreak);
     Writer.WriteBool(this.opEmu);
-};
 
+    if ( undefined !== this.brk )
+    {
+        Writer.WriteBool(false);
+        this.brk.Write_ToBinary(Writer);
+    }
+    else
+        Writer.WriteBool(true);
+};
 CMathBoxPr.prototype.Read_FromBinary = function(Reader)
 {
     // Bool : aln
@@ -437,10 +466,20 @@ CMathBoxPr.prototype.Read_FromBinary = function(Reader)
     // Bool : opEmu
 
     this.aln     = Reader.GetBool();
-    this.brk     = Reader.GetBool();
+    //this.brk     = Reader.GetBool();
     this.diff    = Reader.GetBool();
     this.noBreak = Reader.GetBool();
     this.opEmu   = Reader.GetBool();
+
+    if(Reader.GetBool() == false)
+    {
+        this.brk = new CMathBreak();
+        this.brk.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.brk = undefined;
+    }
 };
 
 function CBox(props)
@@ -485,7 +524,6 @@ function CMathBarPr()
 {
     this.pos = LOCATION_BOT;
 }
-
 CMathBarPr.prototype.Set_FromObject = function(Obj)
 {
     if(LOCATION_TOP === Obj.pos || LOCATION_BOT === Obj.pos)
