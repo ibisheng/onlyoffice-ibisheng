@@ -928,6 +928,9 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
         nCurIndex++;
     }
 
+    if (null === aBounds[nFindIndex])
+        return false;
+
     SearchPos.CurX = aBounds[nFindIndex].X;
     SearchPos.CurY = aBounds[nFindIndex].Y;
 

@@ -1203,14 +1203,14 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
     if ( undefined !== this.Paragraph && null !== this.Paragraph )
     {
         var TextPr;
-        var FontSize, FontSizeCS;
+        var FontSize;
         if(this.Type === para_Math_Run)
         {
             TextPr = this.Get_CompiledPr(false);
 
             FontSize   = TextPr.FontSize;
 
-            if(this.Parent !== null)
+            if(null !== this.Parent && undefined !== this.Paragraph)
                 TextPr.FontSize = this.Parent.ParaMath.ApplyArgSize(TextPr.FontSize, ArgSize.value);
         }
         else
@@ -1229,7 +1229,6 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
         if(this.Type === para_Math_Run)
         {
             TextPr.FontSize = FontSize;
-            TextPr.FontSizeCS = FontSizeCS;
         }
     }
 };
@@ -4622,7 +4621,6 @@ ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)
     // Если изменение какой-то текстовой настройки требует пересчета элементов
     if ( true === RecalcMeasure )
         this.RecalcInfo.Measure = true;
-
 
     // Если мы в формуле, тогда ее надо пересчитывать
     this.private_UpdateMathResize();

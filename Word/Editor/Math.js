@@ -1861,12 +1861,26 @@ CChangesMathFontSize.prototype.Redo = function(Class)
 };
 CChangesMathFontSize.prototype.Save_Changes = function(Writer)
 {
+    // Bool : IsUndefined
     // Long : New
-    Writer.WriteLong(this.New);
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.New);
+    }
 };
 CChangesMathFontSize.prototype.Load_Changes = function(Reader, Class)
 {
-    this.New = Reader.GetLong();
+    // Bool : IsUndefined
+    // Long : New
+
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
     this.Redo(Class);
 };
 
