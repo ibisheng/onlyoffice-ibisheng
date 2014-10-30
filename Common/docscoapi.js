@@ -289,6 +289,7 @@
 		this.attemptCount = 0;
 		this.maxAttemptCount = 50;
 		this.reconnectInterval = 2000;
+		this.errorTimeOut = 10000;
 
 		this._docid = null;
 		this._token = null;
@@ -365,7 +366,7 @@
                         callback({error: "Timed out"});
                         delete lockCalbacks[idLockInArray];
                     }
-                }, 5000);//5 sec to signal lock failure
+                }, this.errorTimeOut);
             }
 			if (this._isExcel)
 				this._send({"type": "getLockRange", "block": arrayBlockId});
@@ -417,7 +418,7 @@
 					//Not signaled already
 					oTmpCallback({error: "Timed out"});
 				}
-			}, 5000);//5 sec to signal lock failure
+			}, this.errorTimeOut);
 		}
 		this._send({"type": "isSaveLock"});
 	};
@@ -457,7 +458,7 @@
 		this.saveCallbackErrorTimeOutId = window.setTimeout(function () {
 			t.saveCallbackErrorTimeOutId = null;
 			t._reSaveChanges();
-		}, 5000);
+		}, this.errorTimeOut);
 
 		this._send({"type": "saveChanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
