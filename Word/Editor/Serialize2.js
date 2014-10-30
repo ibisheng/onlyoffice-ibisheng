@@ -1894,11 +1894,11 @@ function Binary_oMathWriter(memory, oMathPara)
 		{			
 			var oThis = this;
 			var nStart = 0;
-			var nEnd   = oElem.content.length;		
+			var nEnd   = oElem.Content.length;		
 
 			for(var i = nStart; i <= nEnd - 1; i++)
 			{
-				var item = oElem.content[i];
+				var item = oElem.Content[i];
 				this.WriteMathElem(item);
 			}
 		}
