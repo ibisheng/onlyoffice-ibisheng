@@ -6264,26 +6264,46 @@ function Binary_rPrReader(doc, stream)
             case c_oSerProp_rPrType.FontAscii:
                 if ( undefined === rPr.RFonts )
                     rPr.RFonts = {};
-
-                rPr.RFonts.Ascii = { Name : this.stream.GetString2LE(length), Index : -1 };
+				
+				//проверка на то, что может не быть данного шрифта в g_map_font_index
+				var nameFont = this.stream.GetString2LE(length);
+				if(window.g_map_font_index && window.g_map_font_index[nameFont] === undefined)
+					nameFont = "Arial";
+				
+                rPr.RFonts.Ascii = { Name : nameFont, Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontHAnsi:
                 if ( undefined === rPr.RFonts )
                     rPr.RFonts = {};
-
-                rPr.RFonts.HAnsi = { Name : this.stream.GetString2LE(length), Index : -1 };
+				
+				//проверка на то, что может не быть данного шрифта в g_map_font_index
+				var nameFont = this.stream.GetString2LE(length);
+				if(window.g_map_font_index && window.g_map_font_index[nameFont] === undefined)
+					nameFont = "Arial";
+				
+                rPr.RFonts.HAnsi = { Name : nameFont, Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontAE:
                 if ( undefined === rPr.RFonts )
                     rPr.RFonts = {};
-
-                rPr.RFonts.EastAsia = { Name : this.stream.GetString2LE(length), Index : -1 };
+				
+				//проверка на то, что может не быть данного шрифта в g_map_font_index
+				var nameFont = this.stream.GetString2LE(length);
+				if(window.g_map_font_index && window.g_map_font_index[nameFont] === undefined)
+					nameFont = "Arial";
+				
+                rPr.RFonts.EastAsia = { Name : nameFont, Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontCS:
                 if ( undefined === rPr.RFonts )
                     rPr.RFonts = {};
-
-                rPr.RFonts.CS = { Name : this.stream.GetString2LE(length), Index : -1 };
+				
+				//проверка на то, что может не быть данного шрифта в g_map_font_index
+				var nameFont = this.stream.GetString2LE(length);
+				if(window.g_map_font_index && window.g_map_font_index[nameFont] === undefined)
+					nameFont = "Arial";
+				
+                rPr.RFonts.CS = { Name : nameFont, Index : -1 };
                 break;
             case c_oSerProp_rPrType.FontSize:
                 rPr.FontSize = this.stream.GetULongLE() / 2;
