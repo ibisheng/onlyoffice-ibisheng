@@ -601,9 +601,31 @@
 								//при добавлении строки заголовков - сдвигаем диапазон на строку ниже
 								if(!isTurnOffHistory && addNameColumn)
 								{
-									rangeShift.addCellsShiftBottom();
-									ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
-									ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
+									var isAddCellsShiftBottom = t._isAddCellsShiftBottom(rangeShift, tempCells);
+									if(isAddCellsShiftBottom === true)
+									{
+										//TODO пока обрубаем в случае если нужно сдвинуть таблицу внизу, затем нужно обрабатывать сдвиг и грамотно записывать в историю
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										return false;
+										
+										//меняем selection
+										var selection = ws.activeRange;
+										ws.setSelection(rangeShift.bbox);
+										ws.changeWorksheet("insCell", 2);
+										ws.setSelection(selection);
+										
+										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
+									}
+									else if(isAddCellsShiftBottom === "error")
+									{
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										return false;
+									}
+									else
+									{
+										ws.model._moveRange(tempCells,  new Asc.Range(tempCells.c1, tempCells.r1 + 1, tempCells.c2, tempCells.r2 + 1));
+									}	
 								}
 								
 								//в случае добавления форматированной таблицы делаем unmerge
@@ -3287,10 +3309,14 @@
 					cloneActiveRange = newRange;
 				}
 			
-				if(cloneActiveRange)
-					return cloneActiveRange;
-				else
-					return ar;
+				//if(ar.r1 == cloneActiveRange.r1 && ar.r2 == cloneActiveRange.r2 && ar.c1 == cloneActiveRange.c1 && ar.c2 == cloneActiveRange.c2)
+					//return false;
+				//else
+					if(cloneActiveRange)
+						return cloneActiveRange;
+					else
+						return ar;
+
 			},
 			
 			_showAutoFilterDialog: function(cell,kF) {
@@ -7174,6 +7200,56 @@
 					if(filterColumn && (filterColumn.ColorFilter || filterColumn.ColorFilter || filterColumn.CustomFiltersObj || filterColumn.DynamicFilter || filterColumn.Filters || filterColumn.Top10))
 						return true;
 				}
+			},
+			
+			_isAddCellsShiftBottom: function(rangeShift, tempCells)
+			{
+				//проверяем, все ли под таблицей ячейки пустые
+				var cell, isEmptyCell, result = true;
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
+				for(var i = tempCells.c1; i <= tempCells.c2; i++)
+				{
+					cell = ws.model._getCell(tempCells.r2 + 1, i);
+					isEmptyCell = cell.isEmptyText();
+					if(!isEmptyCell)
+					{
+						break;
+					}
+				}
+				
+				//если все ячейки пустый - расширяем даиапзон на строчку вниз
+				if(isEmptyCell)
+				{
+					result = false;
+				}
+				else//иначе дополнительные проверки
+				{
+					//если внизу целиком форматированная таблицы(либо её вообще нет), то сдвигаем диапазон вниз. если часть форматированной таблицы - то ошибку выдаём
+					if(aWs.TableParts && aWs.TableParts.length)
+					{
+						for(var i = 0; i < aWs.TableParts.length; i++)
+						{
+							//находимся под tempCells
+							if((aWs.TableParts[i].Ref.c1 < tempCells.c1 || aWs.TableParts[i].Ref.c2 > tempCells.c2) && aWs.TableParts[i].Ref.r1 >= tempCells.r2)
+							{
+								result = "error";
+								break;
+							}
+						}
+					}
+					
+					if(aWs.AutoFilter && result !== "error")
+					{
+						if((aWs.AutoFilter.Ref.c1 < tempCells.c1 || aWs.AutoFilter.Ref.c2 > tempCells.c2) && aWs.AutoFilter.Ref.r1 >= tempCells.r2)
+						{
+							result = "error";
+						}
+					}
+				}
+				
+				return result;
 			}
 			
 		};
