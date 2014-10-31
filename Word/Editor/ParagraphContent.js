@@ -694,6 +694,9 @@ ParaTextPr.prototype =
         if ( undefined != this.Value.Color )
             this.Set_Color( undefined );
 
+        if ( undefined != this.Value.Unifill )
+            this.Set_Unifill( undefined );
+
         if ( undefined != this.Value.VertAlign )
             this.Set_VertAlign( undefined );
 

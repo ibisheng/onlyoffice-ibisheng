@@ -2408,8 +2408,8 @@ CMathContent.prototype.private_LoadFromMenuBracket = function(Type, Pr)
         case c_oAscMathType.Bracket_Square                : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    91,    93); break;
         case c_oAscMathType.Bracket_Curve                 : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],   123,   125); break;
         case c_oAscMathType.Bracket_Angle                 : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null], 10216, 10217); break;
-        case c_oAscMathType.Bracket_LowLim                : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],  9123,  9126); break;
-        case c_oAscMathType.Bracket_UppLim                : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],  9121,  9124); break;
+        case c_oAscMathType.Bracket_LowLim                : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null], 0x230A, 0x230B); break;
+        case c_oAscMathType.Bracket_UppLim                : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null], 0x2308, 0x2309); break;
         case c_oAscMathType.Bracket_Line                  : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],   124,   124); break;
         case c_oAscMathType.Bracket_LineDouble            : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],  8214,  8214); break;
         case c_oAscMathType.Bracket_Square_OpenOpen       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    91,    91); break;
@@ -2430,10 +2430,10 @@ CMathContent.prototype.private_LoadFromMenuBracket = function(Type, Pr)
         case c_oAscMathType.Bracket_Curve_NoneOpen        : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1,   125); break;
         case c_oAscMathType.Bracket_Angle_OpenNone        : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null], 10216,    -1); break;
         case c_oAscMathType.Bracket_Angle_NoneOpen        : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1, 10217); break;
-        case c_oAscMathType.Bracket_LowLim_OpenNone       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],  9123,    -1); break;
-        case c_oAscMathType.Bracket_LowLim_NoneNone       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1,  9126); break;
-        case c_oAscMathType.Bracket_UppLim_OpenNone       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],  9121,    -1); break;
-        case c_oAscMathType.Bracket_UppLim_NoneOpen       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1,  9124); break;
+        case c_oAscMathType.Bracket_LowLim_OpenNone       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null], 0x230A,    -1); break;
+        case c_oAscMathType.Bracket_LowLim_NoneNone       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1,  0x230B); break;
+        case c_oAscMathType.Bracket_UppLim_OpenNone       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null], 0x2308,    -1); break;
+        case c_oAscMathType.Bracket_UppLim_NoneOpen       : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1,  0x2309); break;
         case c_oAscMathType.Bracket_Line_OpenNone         : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],   124,    -1); break;
         case c_oAscMathType.Bracket_Line_NoneOpen         : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],    -1,   124); break;
         case c_oAscMathType.Bracket_LineDouble_OpenNone   : this.Add_DelimiterEx(Pr.ctrPrp, 1, [null],  8214,    -1); break;
@@ -2627,7 +2627,7 @@ CMathContent.prototype.private_LoadFromMenuLimitLog = function(Type, Pr)
             break;
 
         case c_oAscMathType.LimitLog_Custom_2:
-            var Function = this.Add_FunctionWithLimit(Pr, "lim", "0" + String.fromCharCode(8804) + "x" + String.fromCharCode(8804) + "1", null);
+            var Function = this.Add_FunctionWithLimit(Pr, "max", "0" + String.fromCharCode(8804) + "x" + String.fromCharCode(8804) + "1", null);
             var MathContent = Function.getArgument();
             MathContent.Add_Text("x");
             var Script = MathContent.Add_Script(false, {ctrPrp : Pr.ctrPrp, type : DEGREE_SUPERSCRIPT}, "e", null, null);

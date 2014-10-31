@@ -1730,14 +1730,11 @@ ParaMath.prototype.Handle_AddNewLine = function()
 
         // остаим пустой Run в Content, чтобы не упала ф-ия Remove_FromContent
         // первый элемент всегда Run
-
         var Run = CurrContent.getElem(0);
         Run.Remove_FromContent(0, Run.Content.length, true);
 
         CurrContent.Remove_FromContent(1, CurrContent.Content.length);
-
         CurrContent.Add_ToContent(1, EqArray);
-
         CurrContent.Correct_Content(true);
 
         var CurrentContent = new CParagraphContentPos();
@@ -1746,6 +1743,9 @@ ParaMath.prototype.Handle_AddNewLine = function()
         var RightContentPos = new CParagraphSearchPos();
         this.Get_RightPos(RightContentPos, CurrentContent, 0, true);
         this.Set_ParaContentPos(RightContentPos.Pos, 0);
+
+        EqArray.CurPos = 1;
+        SecondContent.Cursor_MoveToStartPos();
 
         NeedRecalculate = true;
     }
