@@ -155,7 +155,7 @@ ParaText.prototype =
         if ( true === this.Is_NBSP() && editor && editor.ShowParaMarks )
             Context.FillText(X, Y, String.fromCharCode(0x00B0));
         else
-            Context.FillText(X, Y, String.fromCharCode(ResultCharCode));
+            Context.FillTextCode(X, Y, ResultCharCode);
     },
 
     Measure : function(Context, TextPr)
@@ -207,7 +207,7 @@ ParaText.prototype =
             FontKoef = smallcaps_Koef;
 
         Context.SetFontSlot(FontSlot, FontKoef);
-        var Temp = Context.Measure(String.fromCharCode(ResultCharCode));
+        var Temp = Context.MeasureCode(ResultCharCode);
         
         var ResultWidth   = (Math.max((Temp.Width + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
                 
