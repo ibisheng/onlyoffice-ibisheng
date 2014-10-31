@@ -1832,9 +1832,10 @@ ParaMath.prototype.Get_Bounds = function()
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
-var hisotryitem_Math_ParaJc                    =  4; // ParaMath.Jc
+var historyitem_Math_ParaJc                    =  4; // ParaMath.Jc
 var historyitem_Math_CtrPrpShd                 =  5;
 var historyitem_Math_AddItems_ToMathBase       =  6;
+var historyitem_Math_EqArrayPr                 =  7; // Изменение настроек у CEqArray
 
 function ReadChanges_FromBinary(Reader, Class)
 {
@@ -1844,7 +1845,7 @@ function ReadChanges_FromBinary(Reader, Class)
     switch(Type)
     {
         case historyitem_Math_CtrPrpFSize         : Changes = new CChangesMathFontSize(); break;
-        case hisotryitem_Math_ParaJc              : Changes = new CChangesMathParaJc(); break;
+        case historyitem_Math_ParaJc              : Changes = new CChangesMathParaJc(); break;
         case historyitem_Math_CtrPrpShd           : Changes = new CChangesMathShd(); break;
         case historyitem_Math_AddItems_ToMathBase : Changes = new CChangesMathAddItems(); break;
     }
@@ -2004,7 +2005,7 @@ function CChangesMathParaJc(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathParaJc.prototype.Type = hisotryitem_Math_ParaJc;
+CChangesMathParaJc.prototype.Type = historyitem_Math_ParaJc;
 CChangesMathParaJc.prototype.Undo = function(Class)
 {
     Class.raw_SetAlign(this.Old);
@@ -2031,6 +2032,46 @@ CChangesMathParaJc.prototype.Load_Changes = function(Reader, Class)
         this.New = undefined;
     else
         this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+function CChangesMathEqArrayPr(NewPr, OldPr)
+{
+    this.New = NewPr;
+    this.Old = OldPr;
+}
+
+CChangesMathEqArrayPr.prototype.Type = historyitem_Math_EqArrayPr;
+CChangesMathEqArrayPr.prototype.Undo = function(Class)
+{
+    Class.raw_SetPr(this.Old);
+};
+CChangesMathEqArrayPr.prototype.Redo = function(Class)
+{
+    Class.raw_SetPr(this.New);
+};
+CChangesMathEqArrayPr.prototype.Save_Changes = function(Writer)
+{
+    // Bool : undefined?
+    // Long : value
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+};
+CChangesMathEqArrayPr.prototype.Load_Changes = function(Reader, Class)
+{
+    if (true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New = new CMathEqArrPr();
+        this.New.Read_FromBinary(Reader);
+    }
 
     this.Redo(Class);
 };

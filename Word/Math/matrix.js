@@ -689,7 +689,21 @@ CEqArray.prototype.addRow = function()
     this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
     this.CurPos++;
 
+    var NewPr = this.Pr.Copy();
+    NewPr.row = this.Content.length;
+    this.setPr(NewPr);
+
     return NewContent;
+}
+CEqArray.prototype.setPr = function(NewPr)
+{
+    History.Add(this, new CChangesMathEqArrayPr(NewPr, this.Pr));
+    this.raw_SetPr(NewPr);
+};
+CEqArray.prototype.raw_SetPr = function(NewPr)
+{
+    this.Pr = NewPr;
+    this.private_SetNeedResize();
 }
 CEqArray.prototype.fillContent = function()
 {
