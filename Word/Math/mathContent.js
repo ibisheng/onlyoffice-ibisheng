@@ -158,8 +158,6 @@ function CMathPosition()
     this.x  = 0;
     this.y  = 0;
 }
-
-
 function AmperWidths()
 {
     this.bEven     = true; // является ли текущая точка нечетной
@@ -971,42 +969,56 @@ CMathContent.prototype =
     {
         return false;
     },
+    ApplyPoints: function(WidthsPoints, Points, MaxDimWidths)
+    {
+        this.InfoPoints.GWidths       = WidthsPoints;
+        this.InfoPoints.GPoints       = Points;
+        this.InfoPoints.GMaxDimWidths = MaxDimWidths;
+        // точки выравнивания данного контента содержатся в ContentPoints
+
+        var PosInfo = new CMathPointInfo();
+        PosInfo.SetInfoPoints(this.InfoPoints);
+
+        this.size.width = 0;
+
+        for(var i = 0 ; i < this.Content.length; i++)
+        {
+            if(this.Content[i].Type === para_Math_Run)
+            {
+                this.Content[i].ApplyPoints(PosInfo);
+            }
+
+            this.size.width += this.Content[i].size.width;
+        }
+
+    },
     setPosition: function(pos)
     {
         this.pos.x = pos.x;
         this.pos.y = pos.y;
 
-        var PosInfo = new CMathPointInfo();
-        PosInfo.x = this.pos.x;
-        PosInfo.y = this.pos.y + this.size.ascent;
-
         if(this.RecalcInfo.bEqqArray)
         {
-            this.InfoPoints.GWidths       = this.Parent.WidthsPoints;
-            this.InfoPoints.GPoints       = this.Parent.Points;
-            this.InfoPoints.GMaxDimWidths = this.Parent.MaxDimWidths;
-
+            var PosInfo = new CMathPointInfo();
             PosInfo.SetInfoPoints(this.InfoPoints);
-            PosInfo.ApplyAlign();
 
+            this.pos.x += PosInfo.GetAlign();
         }
 
         for(var i=0; i < this.Content.length; i++)
         {
-            if(this.Content[i].Type == para_Math_Run)
-            {
-                this.Content[i].Math_SetPosition(PosInfo);
-            }
-            else
-            {
-                var NewPos = new CMathPosition();
-                NewPos.x = PosInfo.x;
-                NewPos.y = PosInfo.y;
+            var NewPos = new CMathPosition();
+            NewPos.x = this.pos.x;
+            NewPos.y = this.pos.y + this.size.ascent;
 
+            if(this.Content[i].Type == para_Math_Run)
+                this.Content[i].Math_SetPosition(NewPos);
+            else
                 this.Content[i].setPosition(NewPos);
-                PosInfo.UpdateX(this.Content[i].size.width);
-            }
+
+            this.pos.x += this.Content[i].size.width;
         }
+
     },
     SetParent: function(Parent, ParaMath)
     {

@@ -685,7 +685,6 @@ CEqArray.prototype.init = function(props)
 }
 CEqArray.prototype.addRow = function()
 {
-    this.bDecreaseRow = true;
     var NewContent = new CMathContent();
     this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
 
@@ -699,16 +698,6 @@ CEqArray.prototype.fillContent = function()
     for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
         this.elements[nIndex][0] = this.Content[nIndex];
 };
-CEqArray.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
-{
-    if(this.bDecreaseRow)
-    {
-        this.fillContent();
-        this.bDecreaseRow = false;
-    }
-
-    CEqArray.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
-}
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
     // на случай, чтобы не затереть массив
@@ -803,6 +792,9 @@ CEqArray.prototype.getMetrics = function()
 
         Pos++;
     }
+
+    for(var i = 0; i < this.nRow; i++)
+        this.elements[i][0].ApplyPoints(this.WidthsPoints, this.Points, this.MaxDimWidths);
 
 
     for(var i = 0; i < this.nRow; i++)

@@ -869,7 +869,7 @@ CMathAmp.prototype =
             this.AmpText.draw(x + this.GapLeft, y, pGraphics);
         else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
         {
-            var X  = x + this.pos.x,
+            var X  = x + this.pos.x + this.size.width,
                 Y  = y + this.pos.y,
                 Y2 = y + this.pos.y - this.AmpText.size.height;
             pGraphics.p_color(0,0,0, 255);

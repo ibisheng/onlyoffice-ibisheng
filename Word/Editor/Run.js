@@ -3775,7 +3775,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         var TempDx = 0;
 
-        if(para_Math_Ampersand === ItemType && null !== SearchPos.EqArrayInfoPoints)
+        if(para_Math_Ampersand === ItemType && this.bEqqArray && null !== SearchPos.EqArrayInfoPoints)
         {
             SearchPos.EqArrayInfoPoints.NextAlignRange();
             TempDx = SearchPos.EqArrayInfoPoints.GetAlign();
@@ -7746,55 +7746,19 @@ function CRunCollaborativeRange(PosS, PosE, Color)
     this.PosE  = PosE;
     this.Color = Color;
 }
-
-
-ParaRun.prototype.Math_SetPosition = function(PosInfo)
+ParaRun.prototype.Math_SetPosition = function(pos)
 {
-    var NewPos;
-
-    if(this.bEqqArray)
+    var w = 0;
+    for(var i = 0; i < this.Content.length; i++)
     {
-        for(var Pos = 0; Pos < this.Content.length; Pos++)
-        {
-            var CurrElem = this.Content[Pos];
+        var NewPos = new CMathPosition();
 
-            NewPos = new CMathPosition();
+        NewPos.x = pos.x + w;
+        NewPos.y = pos.y - this.size.ascent;
 
-            if(this.Content[Pos].Type == para_Math_Ampersand)
-            {
-                PosInfo.NextAlignRange();
-                PosInfo.ApplyAlign();
-
-                NewPos.x = PosInfo.x;
-                NewPos.y = PosInfo.y - this.size.ascent;
-                CurrElem.setPosition(NewPos);
-            }
-            else
-            {
-                NewPos.x = PosInfo.x;
-                NewPos.y = PosInfo.y - this.size.ascent;
-
-                CurrElem.setPosition(NewPos);
-            }
-
-            PosInfo.UpdateX(CurrElem.size.width);
-
-        }
+        this.Content[i].setPosition(NewPos);
+        w += this.Content[i].size.width;
     }
-    else
-    {
-        for(var i = 0; i < this.Content.length; i++)
-        {
-            NewPos = new CMathPosition();
-
-            NewPos.x = PosInfo.x;
-            NewPos.y = PosInfo.y - this.size.ascent;
-
-            this.Content[i].setPosition(NewPos);
-            PosInfo.x += this.Content[i].size.width;
-        }
-    }
-
 }
 ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
 {
@@ -8091,7 +8055,24 @@ ParaRun.prototype.GetMathTextPr = function()
 
     return {TextPr: TextPr, MathPr: this.MathPrp.Copy()};
 }
+ParaRun.prototype.ApplyPoints = function(PointsInfo)
+{
+    if(this.bEqqArray)
+    {
+        this.size.width = 0;
 
+        for(var Pos = 0; Pos < this.Content.length; Pos++)
+        {
+            if(this.Content[Pos].Type == para_Math_Ampersand)
+            {
+                PointsInfo.NextAlignRange();
+                this.Content[Pos].size.width = PointsInfo.GetAlign();
+            }
+
+            this.size.width += this.Content[Pos].size.width;
+        }
+    }
+}
 ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
 {
     var ActionElement = AutoCorrectEngine.Get_ActionElement();
