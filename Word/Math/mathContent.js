@@ -997,18 +997,19 @@ CMathContent.prototype =
         this.pos.x = pos.x;
         this.pos.y = pos.y;
 
+        var w = 0;
         if(this.RecalcInfo.bEqqArray)
         {
             var PosInfo = new CMathPointInfo();
             PosInfo.SetInfoPoints(this.InfoPoints);
 
-            this.pos.x += PosInfo.GetAlign();
+            w += PosInfo.GetAlign();
         }
 
         for(var i=0; i < this.Content.length; i++)
         {
             var NewPos = new CMathPosition();
-            NewPos.x = this.pos.x;
+            NewPos.x = this.pos.x + w;
             NewPos.y = this.pos.y + this.size.ascent;
 
             if(this.Content[i].Type == para_Math_Run)
@@ -1016,7 +1017,7 @@ CMathContent.prototype =
             else
                 this.Content[i].setPosition(NewPos);
 
-            this.pos.x += this.Content[i].size.width;
+            w += this.Content[i].size.width;
         }
 
     },
