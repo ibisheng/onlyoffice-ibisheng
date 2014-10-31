@@ -1199,6 +1199,11 @@ ParaComment.prototype =
 
         return false;
     },
+
+    Get_ElementByPos : function(ContentPos, Depth)
+    {
+        return this;
+    },
     
     Get_PosByDrawing : function(Id, ContentPos, Depth)
     {

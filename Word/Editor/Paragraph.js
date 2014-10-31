@@ -3314,6 +3314,8 @@ Paragraph.prototype =
             this.Content[CurPos].Cursor_MoveToStartPos(false);
         }
 
+        this.private_CorrectCurPosRangeLine();
+
         this.CurPos.ContentPos = CurPos;
     },
 
@@ -12117,6 +12119,65 @@ Paragraph.prototype.private_ResetSelection = function()
     this.Selection.EndManually   = false;
 
     this.CurPos.ContentPos  = 0;
+};
+
+Paragraph.prototype.private_CorrectCurPosRangeLine = function()
+{
+    if (-1 !== this.CurPos.Line)
+        return;
+
+    // В данной функции мы подбираем для курсора подходящие физическое расположение, если логическое расположение
+    // предполагает несколько физических позиций (например начало/конец строки или попадание между обтеканием).
+    var ParaCurPos = this.Get_ParaContentPos(false, false);
+
+    var Ranges = this.Get_RangesByPos(ParaCurPos);
+
+    this.CurPos.Line  = -1;
+    this.CurPos.Range = -1;
+
+    for (var Index = 0, Count = Ranges.length; Index < Count; Index++)
+    {
+        var RangeIndex = Ranges[Index].Range;
+        var LineIndex  = Ranges[Index].Line;
+
+        var Range = this.Lines[LineIndex].Ranges[RangeIndex];
+        if (Range.W > 0)
+        {
+            this.CurPos.Line  = LineIndex;
+            this.CurPos.Range = RangeIndex;
+            break;
+        }
+    }
+};
+
+/**
+ * Получаем массив отрезков, в которые попадает заданная позиция. Их может быть больше 1, например,
+ * на месте разрыва строки.
+ * @param ContentPos - заданная позиция
+ * @returns массив отрезков
+ */
+Paragraph.prototype.Get_RangesByPos = function(ContentPos)
+{
+    var Run = this.Get_ElementByPos(ContentPos);
+
+    if (null === Run || para_Run !== Run.Type)
+        return [];
+
+    return Run.Get_RangesByPos(ContentPos.Get(ContentPos.Depth - 1));
+};
+
+/**
+ * Получаем элемент по заданной позиции
+ * @param ContentPos - заданная позиция
+ * @returns ссылка на элемент
+ */
+Paragraph.prototype.Get_ElementByPos = function(ContentPos)
+{
+    if (ContentPos.Depth <= 1)
+        return this;
+
+    var CurPos = ContentPos.Get(0);
+    return this.Content[CurPos].Get_ElementByPos(ContentPos, 1);
 };
 
 var pararecalc_0_All  = 0;

@@ -2020,7 +2020,8 @@ CMathContent.prototype =
         this.Correct_ContentPos(-1);
     }
 };
-CMathContent.prototype.Set_Paragraph = ParaHyperlink.prototype.Set_Paragraph;
+CMathContent.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
+CMathContent.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
 CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
 {
     this.Paragraph = Paragraph;

@@ -1474,6 +1474,15 @@ ParaHyperlink.prototype.Get_PosByElement = function(Class, ContentPos, Depth, Us
     return false;
 };
 
+ParaHyperlink.prototype.Get_ElementByPos = function(ContentPos, Depth)
+{
+    if (Depth + 1 >= ContentPos.Depth)
+        return this;
+
+    var CurPos = ContentPos.Get(Depth);
+    return this.Content[CurPos].Get_ElementByPos(ContentPos, Depth + 1);
+};
+
 ParaHyperlink.prototype.Get_PosByDrawing = function(Id, ContentPos, Depth)
 {
     var Count = this.Content.length;
@@ -2347,7 +2356,6 @@ ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
     Writer.WriteString2("");
     Writer.WriteLong(0);
 };
-
 
 function CParaHyperLinkStartState(HyperLink)
 {

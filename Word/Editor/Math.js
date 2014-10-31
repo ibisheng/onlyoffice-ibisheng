@@ -1407,6 +1407,13 @@ ParaMath.prototype.Get_PosByElement = function(Class, ContentPos, Depth, UseRang
         return true;
 
     // TODO: ParaMath.Get_PosByElement
+
+    return false;
+};
+
+ParaMath.prototype.Get_ElementByPos = function(ContentPos, Depth)
+{
+    return this.Root.Get_ElementByPos(ContentPos, Depth);
 };
 
 ParaMath.prototype.Get_PosByDrawing = function(Id, ContentPos, Depth)

@@ -738,7 +738,8 @@ CMathBase.prototype =
     }
     //////////////////////////
 };
-CMathBase.prototype.Set_Paragraph = ParaHyperlink.prototype.Set_Paragraph;
+CMathBase.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
+CMathBase.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
 CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
     for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
