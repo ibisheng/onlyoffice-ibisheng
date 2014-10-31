@@ -44,7 +44,6 @@ function ParaRun(Paragraph, bMathRun)
         this.Parent       = null;
         this.ArgSize      = 0;
         this.bEqqArray    = false;
-        //this.UpdateMathPr = true;
         this.size         = new CMathSize();
         this.MathPrp      = new CMPrp();
     }
@@ -673,6 +672,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             case para_NewLine:
             case para_Math_Text:
             case para_Math_Placeholder:
+            case para_Math_Ampersand:
             {
                 X += Item.Get_WidthVisible();
                 break;
@@ -683,18 +683,6 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     break;
 
                 X += Item.Get_WidthVisible();
-                break;
-            }
-            case para_Math_Ampersand:
-            {
-                if(this.bEqqArray)
-                {
-                    PointsInfo.NextAlignRange();
-                    X += PointsInfo.GetAlign();
-                }
-                else
-                    X += Item.Get_WidthVisible();
-
                 break;
             }
         }
@@ -1507,13 +1495,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if ( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
-
-        /*if(this.Type == para_Math_Run)
-        {
-            this.ArgSize   = PRS.ArgSize.value;
-            this.bEqqArray = PRS.bEqqArray;
-            this.Parent    = PRS.Parent;
-        }*/
         this.RecalcInfo.TextPr = true;
 
         this.protected_UpdateSpellChecking();
@@ -3775,12 +3756,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
         var TempDx = 0;
 
-        if(para_Math_Ampersand === ItemType && this.bEqqArray && null !== SearchPos.EqArrayInfoPoints)
-        {
-            SearchPos.EqArrayInfoPoints.NextAlignRange();
-            TempDx = SearchPos.EqArrayInfoPoints.GetAlign();
-        }
-        else if (para_Drawing != ItemType || true === Item.Is_Inline())
+        if (para_Drawing != ItemType || true === Item.Is_Inline())
         {
             TempDx = Item.Get_WidthVisible();
         }
@@ -4456,12 +4432,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
             }
             else
             {
-                if(para_Math_Ampersand == ItemType && this.bEqqArray)
-                {
-                    PointsInfo.NextAlignRange();
-                    SelectionDraw.StartX += PointsInfo.GetAlign();
-                }
-                else if ( para_Drawing !== ItemType || true === Item.Is_Inline() )
+                if ( para_Drawing !== ItemType || true === Item.Is_Inline() )
                     SelectionDraw.StartX += Item.Get_WidthVisible();
             }
         }
@@ -4477,11 +4448,6 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
         {
             if (true === SelectionDraw.Draw && para_Drawing === ItemType && true !== Item.Is_Inline())
                 Item.Draw_Selection();
-            else if (para_Math_Ampersand === ItemType && this.bEqqArray)
-            {
-                PointsInfo.NextAlignRange();
-                SelectionDraw.W += PointsInfo.GetAlign();
-            }
             else
                 SelectionDraw.W += Item.Get_WidthVisible();
         }
@@ -4519,7 +4485,7 @@ ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
         for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
         {
             var ItemType = this.Content[CurPos].Type;
-            if (para_End !== ItemType  && !(para_Math_Ampersand == ItemType && this.bEqqArray)) // para_math_Ampersand имеет нулевую ширину, поэтому чтобы не случилось так что не было ни селекта, ни курсора, не учитываем para_Math_Ampersand
+            if (para_End !== ItemType)
                 return false;
         }
     }
