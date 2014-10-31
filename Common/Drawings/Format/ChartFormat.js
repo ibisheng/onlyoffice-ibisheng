@@ -3611,6 +3611,10 @@ CAreaSeries.prototype =
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
         this.val = pr;
+        if(this.val && this.val.setParent)
+        {
+            this.val.setParent(this);
+        }
     },
 
     setParent: function(pr)
@@ -8924,6 +8928,10 @@ CBarSeries.prototype =
     {
         History.Add(this, {Type: historyitem_BarSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
+        if(this.val && this.val.setParent)
+        {
+            this.val.setParent(this);
+        }
     },
 
     setParent: function(pr)
@@ -10111,6 +10119,10 @@ CBubbleSeries.prototype =
     {
         History.Add(this, {Type: historyitem_BubbleSeries_SetYVal, oldPr: this.yVal, newPr: pr});
         this.yVal = pr;
+        if(this.yVal && this.yVal.setParent)
+        {
+            this.yVal.setParent(this);
+        }
     }
 };
 
@@ -14729,6 +14741,10 @@ CLineSeries.prototype =
     {
         History.Add(this, {Type: historyitem_LineSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
+        if(this.val && this.val.setParent)
+        {
+            this.val.setParent(this);
+        }
     },
 
     Undo: function(data)
@@ -15650,6 +15666,7 @@ function CNumRef()
 {
     this.f = null;
     this.numCache = null;
+    this.parent = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -15663,8 +15680,16 @@ CNumRef.prototype =
     },
 
 
-    Refresh_RecalcData: function()
-    {},
+    Refresh_RecalcData: function(data)
+    {
+        if(data && data.Type === historyitem_NumRef_SetF && this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
+            && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+            this.parent.parent.parent.parent.parent.parent.recalcInfo.recalculateReferences = true;
+            this.parent.parent.parent.parent.parent.parent.addToRecalculate();
+        }
+    },
 
     createDuplicate: function()
     {
@@ -15693,10 +15718,24 @@ CNumRef.prototype =
         this.Id = r.GetString2();
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
+
     setF: function(pr)
     {
         History.Add(this, {Type: historyitem_NumRef_SetF, oldPr: this.f, newPr: pr });
         this.f = pr;
+
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
+            && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+            this.parent.parent.parent.parent.parent.parent.recalcInfo.recalculateReferences = true;
+            this.parent.parent.parent.parent.parent.parent.addToRecalculate();
+        }
     },
 
     setNumCache: function(pr)
@@ -15717,6 +15756,12 @@ CNumRef.prototype =
             case historyitem_NumRef_SetNumCache:
             {
                 this.numCache = data.oldPr;
+                break;
+            }
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
+                break;
             }
         }
     },
@@ -15733,6 +15778,12 @@ CNumRef.prototype =
             case historyitem_NumRef_SetNumCache:
             {
                 this.numCache = data.newPr;
+                break;
+            }
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
             }
         }
     },
@@ -15748,6 +15799,7 @@ CNumRef.prototype =
                 break;
             }
             case historyitem_NumRef_SetNumCache:
+            case historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -15768,6 +15820,12 @@ CNumRef.prototype =
             case historyitem_NumRef_SetNumCache:
             {
                 this.numCache = readObject(r);
+                break;
+            }
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
+                break;
             }
         }
     }
@@ -16170,7 +16228,7 @@ CNumLit.prototype =
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type:historyitem_NumLit_SetPtCount, oldPr: this.pts, newPr: pr});
+        History.Add(this, {Type:historyitem_NumLit_SetPtCount, oldPr: this.ptCount, newPr: pr});
         this.ptCount = pr;
     },
 
@@ -17614,6 +17672,10 @@ CPieSeries.prototype =
     {
         History.Add(this, {Type: historyitem_PieSeries_SetVal, oldPr: this.val, newPr:pr});
         this.val = pr;
+        if(this.val && this.val.setParent)
+        {
+            this.val.setParent(this);
+        }
     },
 
     setParent: function(pr)
@@ -18648,6 +18710,10 @@ CRadarSeries.prototype =
     {
         History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.val, newPr: pr});
         this.val = pr;
+        if(this.val && this.val.setParent)
+        {
+            this.val.setParent(this);
+        }
     },
 
     setParent: function(pr)
@@ -19787,6 +19853,10 @@ CScatterSeries.prototype =
     {
         History.Add(this, {Type: historyitem_ScatterSer_SetYVal, oldPr: this.yVal, newPr:pr});
         this.yVal = pr;
+        if(this.yVal && this.yVal.setParent)
+        {
+            this.yVal.setParent(this);
+        }
     },
 
     Undo: function(data)
@@ -21906,6 +21976,10 @@ CSurfaceSeries.prototype =
     {
         History.Add(this, {Type: historyitem_SurfaceSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
+        if(this.val && this.val.setParent)
+        {
+            this.val.setParent(this);
+        }
     }
 };
 
@@ -23285,6 +23359,8 @@ function CYVal()
     this.numLit = null;
     this.numRef = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -23319,6 +23395,11 @@ CYVal.prototype =
         return historyitem_type_YVal;
     },
 
+    setParent: function(pr)
+    {
+        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        this.parent = pr;
+    },
 
     setFromOtherObject: function(o)
     {
@@ -23349,6 +23430,10 @@ CYVal.prototype =
     {
         History.Add(this, {Type:historyitem_YVal_SetNumRef, oldPr: this.numRef, newPr: pr});
         this.numRef = pr;
+        if(this.numRef && this.numRef.setParent)
+        {
+            this.numRef.setParent(this);
+        }
     },
 
     Undo: function(data)
@@ -23363,6 +23448,11 @@ CYVal.prototype =
             case historyitem_YVal_SetNumRef:
             {
                 this.numRef = data.oldPr;
+                break;
+            }
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.oldPr;
                 break;
             }
         }
@@ -23382,6 +23472,11 @@ CYVal.prototype =
                 this.numRef = data.newPr;
                 break;
             }
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
         }
     },
 
@@ -23392,9 +23487,10 @@ CYVal.prototype =
         {
             case historyitem_YVal_SetNumLit:
             case historyitem_YVal_SetNumRef:
+            case historyitem_CommonChartFormat_SetParent:
             {
-                writeObject(w, data.newPr);
-                break;
+                    writeObject(w, data.newPr);
+                    break;
             }
         }
     },
@@ -23412,6 +23508,11 @@ CYVal.prototype =
             case historyitem_YVal_SetNumRef:
             {
                 this.numRef = readObject(r);
+                break;
+            }
+            case historyitem_CommonChartFormat_SetParent:
+            {
+                this.parent = readObject(r);
                 break;
             }
         }

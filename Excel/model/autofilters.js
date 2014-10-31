@@ -430,7 +430,7 @@
 									{
 										rangeShift.addCellsShiftBottom();
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
-										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
+                                        ws.objectRender && ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
 									
 									//добавляем название колонок
@@ -615,7 +615,7 @@
 										ws.setSelection(selection);
 										
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
-										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
+                                        ws.objectRender && ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
 									else if(isAddCellsShiftBottom === "error")
 									{

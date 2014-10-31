@@ -476,7 +476,7 @@ function CCollaborativeEditing()
                 CollaborativeEditing.m_aNewImages.length = 0;
                 Asc["editor"]._onShowDrawingObjects();
                 var worksheet = Asc["editor"].wb.getWorksheet();
-                worksheet && worksheet.objectRender.controller.getGraphicObjectProps();
+                worksheet && worksheet.objectRender && worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
             });
 
         }

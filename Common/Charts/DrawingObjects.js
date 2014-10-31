@@ -2970,9 +2970,10 @@ function DrawingObjects() {
 
             for(var i = 0; i < wsViews.length; ++i)
             {
-                if(wsViews[i])
+                if(wsViews[i] && wsViews[i].objectRender)
                 {
-                    wsViews[i].objectRender && wsViews[i].objectRender.rebuildCharts(changedArr);
+                    wsViews[i].objectRender.rebuildCharts(changedArr);
+                    wsViews[i].objectRender.recalculate(true);
                 }
             }
         }, _this, []);

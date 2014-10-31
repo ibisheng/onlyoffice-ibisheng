@@ -9396,7 +9396,7 @@
 					t.cache.reset();
 				t._cleanCellsTextMetricsCache();
 				t._prepareCellTextMetricsCache();
-				if (reinitRanges)
+				if (reinitRanges && t.objectRender && t.objectRender.drawingArea)
 					t.objectRender.drawingArea.reinitRanges();
                 t.objectRender.rebuildChartGraphicObjects(oChangeData);
 				t.draw(lockDraw);

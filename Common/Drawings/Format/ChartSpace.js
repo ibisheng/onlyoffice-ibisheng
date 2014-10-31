@@ -397,6 +397,7 @@ CChartSpace.prototype =
 
     getDocContent: function()
     {
+        return null;
         if(!this.txPr)
         {
             this.setTxPr(CreateTextBodyFromString("", this.getDrawingDocument(), this));
@@ -892,8 +893,12 @@ CChartSpace.prototype =
     {
         if( this.checkIntersectionChangedRange(data))
         {
-            this.checkRemoveCache();
-            this.recalculate();
+            ExecuteNoHistory(function(){
+                this.checkRemoveCache();
+                this.recalculateReferences();
+                // this.recalculate();
+            }, this, [])
+
         }
     },
 
@@ -1307,6 +1312,7 @@ CChartSpace.prototype =
         //this.recalcInfo.axisLabels.length = 0;
         this.recalcInfo.recalculateAxisVal = true;
         this.recalcInfo.recalculateLegend = true;
+        this.recalcInfo.recalculateBBox = true;
         this.chartObj = null;
         this.addToRecalculate();
 
@@ -2195,7 +2201,7 @@ CChartSpace.prototype =
 
         var checkValByNumRef = function(oThis, ser, val)
         {
-            if(val && val.numRef && (!val.numRef.numCache || val.numRef.numCache.pts.length === 0))
+            if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
             {
                 var first_slice = 0, last_slice = 0;
                 if(val.numRef.f[0] === "(")
@@ -2222,6 +2228,7 @@ CChartSpace.prototype =
                 else
                 {
                     num_cache = val.numRef.numCache;
+                    removePtsFromLit(num_cache);
                 }
                 var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
                 var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden;
@@ -2300,7 +2307,7 @@ CChartSpace.prototype =
 
         var checkCatByNumRef = function(oThis, ser, cat)
         {
-            if(cat && cat.strRef && (!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0))
+            if(cat && cat.strRef && typeof cat.strRef.f === "string" /*(!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0)*/)
             {
                 var first_slice = 0, last_slice = 0;
                 if(cat.strRef.f[0] === "(")

@@ -657,7 +657,7 @@
 		WorkbookView.prototype._onSetSelectionState = function (state) {
             if (null !== state) {
                 var ws = this.getWorksheetById(state[0].worksheetId);
-                if (ws) {
+                if (ws && ws.objectRender && ws.objectRender.controller) {
                     ws.objectRender.controller.setSelectionState(state);
                     ws.setSelectionShape(true);
                     var d = ws._calcActiveCellOffset(ws.objectRender.getSelectedDrawingsRange());
@@ -841,14 +841,20 @@
 		WorkbookView.prototype._onResizeElementDone = function (target, x, y, isResizeModeMove) {
 			var ws = this.getWorksheet();
 			if (isResizeModeMove) {
-				ws.objectRender.saveSizeDrawingObjects();
+                if(ws.objectRender)
+                {
+                    ws.objectRender.saveSizeDrawingObjects();
+                }
 				if (target.target === c_oTargetType.ColumnResize) {
 					ws.changeColumnWidth(target.col, x, target.mouseX);
 				} else if (target.target === c_oTargetType.RowResize) {
 					ws.changeRowHeight(target.row, y, target.mouseY);
 				}
 				// ToDo Нужна ли тут updateSizeDrawingObjects
-				ws.objectRender.updateSizeDrawingObjects(target);
+                if(ws.objectRender)
+                {
+				    ws.objectRender.updateSizeDrawingObjects(target);
+                }
 				ws.cellCommentator.updateCommentPosition();
 				this._onDocumentPlaceChanged();
 			}

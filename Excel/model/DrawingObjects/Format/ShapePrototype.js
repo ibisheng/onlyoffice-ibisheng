@@ -36,7 +36,7 @@ CShape.prototype.getDrawingObjectsController = function()
     {
         for(var i = 0; i < wsViews.length; ++i)
         {
-            if(wsViews[i] && wsViews[i].model === this.worksheet)
+            if(wsViews[i] && wsViews[i].model === this.worksheet && wsViews[i].objectRender)
                 return wsViews[i].objectRender.controller;
         }
     }

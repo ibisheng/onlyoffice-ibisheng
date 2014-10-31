@@ -3021,7 +3021,6 @@ UndoRedoWoorksheet.prototype = {
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell", range, operType);
-			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
@@ -3060,7 +3059,6 @@ UndoRedoWoorksheet.prototype = {
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range, operType);
-			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
@@ -3100,7 +3098,6 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
-			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
 		{
@@ -3139,7 +3136,6 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell",range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
-			worksheetView.objectRender.updateDrawingObject(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_Sort == Type)
 		{
@@ -3259,7 +3255,7 @@ UndoRedoWoorksheet.prototype = {
 		else if(historyitem_Worksheet_Rename == Type)
 		{
 			if(bUndo)
-				ws.setName(Data.from);
+				ws.setName(Data.from, true);
 			else
 			{
 				var name = Data.to;
@@ -3273,7 +3269,7 @@ UndoRedoWoorksheet.prototype = {
 							oConflictWs.renameWsToCollaborate(this.wb.getUniqueSheetNameFrom(oConflictWs.getName(), true));
 					}
 				}
-				ws.setName(name);
+				ws.setName(name, true);
 			}
 		}
 		else if(historyitem_Worksheet_Hide == Type)

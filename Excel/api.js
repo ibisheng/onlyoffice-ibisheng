@@ -1557,7 +1557,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								if (t._onUpdateFrozenPane(lockElem))
 									ws.draw();
 								else if (drawing && ws.model === drawing.worksheet)
-									ws.objectRender.showDrawingObjects(true);
+                                {
+                                    if(ws.objectRender)
+                                    {
+                                        ws.objectRender.showDrawingObjects(true);
+                                    }
+                                }
 							} else if (lockType === c_oAscLockTypeElem.Range) {
 								ws.updateSelection();
 							}
@@ -1619,7 +1624,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var worksheet = t.wb.getWorksheet();
 					worksheet._drawSelection();
 					worksheet._drawFrozenPaneLines();
-					worksheet.objectRender.showDrawingObjects(true);
+                    if(worksheet.objectRender)
+                    {
+                        worksheet.objectRender.showDrawingObjects(true);
+                    }
 				}
 			};
 			this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad) {
@@ -1768,7 +1776,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype._onShowDrawingObjects = function () {
 			if (this.wb) {
-				this.wb.getWorksheet().objectRender.showDrawingObjects(true);
+                var ws = this.wb.getWorksheet();
+                if(ws && ws.objectRender)
+                {
+                    ws.objectRender.showDrawingObjects(true);
+                }
 			}
 		};
 
@@ -2208,17 +2220,23 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					History.StartTransaction();
 
 					// Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
-					for (var key in t.wb.model.aWorksheets) {
+					for (var key in t.wb.model.aWorksheets)
+					{
 						var wsModel = t.wb.model.aWorksheets[key];
-						var history_is_on = History.Is_On();
-						if ( history_is_on )
-							History.TurnOff();
-						var ws = t.wb.getWorksheet(wsModel.index);
-						if ( history_is_on )
-							History.TurnOn();
-
-						if ( ws )
-							ws.objectRender.updateChartReferences(parserHelp.getEscapeSheetName(activeName), parserHelp.getEscapeSheetName(ws.model.sName));
+						if ( wsModel )
+						{
+							var history_is_on = History.Is_On();
+							if ( history_is_on )
+								History.TurnOff();
+							var ws = t.wb.getWorksheet(wsModel.index);
+							if ( history_is_on )
+								History.TurnOn();
+							wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(parserHelp.getEscapeSheetName(activeName), parserHelp.getEscapeSheetName(wsModel.sName));
+							if(ws && ws.objectRender && ws.objectRender.controller)
+							{
+								ws.objectRender.controller.recalculate2(true);
+							}
+						}
 					}
 
 					// Удаляем Worksheet и получаем новый активный индекс (-1 означает, что ничего не удалилось)
@@ -2229,7 +2247,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						// Посылаем callback об изменении списка листов
 						t.sheetsChanged();
 					}
-
 					History.EndTransaction();
 				}
 			};
@@ -2522,7 +2539,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype.asc_cleanWorksheet = function() {
 			var ws = this.wb.getWorksheet();	// Для удаления данных листа и диаграмм
-			ws.objectRender.cleanWorksheet();
+            if(ws.objectRender)
+            {
+                ws.objectRender.cleanWorksheet();
+            }
 		};
 
 		// Cell comment interface
@@ -2651,7 +2671,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype.asc_getGraphicObjectProps = function() {
 			var ws = this.wb.getWorksheet();
-			return ws.objectRender.controller.getGraphicObjectProps();
+            if(ws && ws.objectRender && ws.objectRender.controller)
+			    return ws.objectRender.controller.getGraphicObjectProps();
+            return null;
 		};
 
 		spreadsheet_api.prototype.asc_setGraphicObjectProps = function(props) {

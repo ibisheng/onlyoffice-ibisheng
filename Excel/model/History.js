@@ -251,7 +251,7 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 	this.Get_RecalcData(Point);
 	for(var i = 0; i < wsViews.length; ++i)
 	{
-		if(wsViews[i])
+		if(wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller)
 		{
 			wsViews[i].objectRender.controller.recalculate2(undefined);
 		}
@@ -267,7 +267,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
             this.Get_RecalcData(Point);
             wsViews = Asc["editor"].wb.wsViews;
             for (i = 0; i < wsViews.length; ++i) {
-                if (wsViews[i]) {
+                if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
                     wsViews[i].objectRender.controller.recalculate2(true);
                 }
             }
@@ -281,7 +281,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
                 this.Get_RecalcData(Point);
                 wsViews = Asc["editor"].wb.wsViews;
                 for (i = 0; i < wsViews.length; ++i) {
-                    if (wsViews[i]) {
+                    if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
                         wsViews[i].objectRender.controller.recalculate2(undefined);
                     }
                 }
@@ -426,7 +426,7 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 						var wsViews = Asc["editor"].wb.wsViews;
 						for(var i = 0; i < wsViews.length; ++i)
 						{
-							if(wsViews[i])
+							if(wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller)
 							{
 								wsViews[i].objectRender.controller.RefreshAfterChangeColorScheme();
 							}

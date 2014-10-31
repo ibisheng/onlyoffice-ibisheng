@@ -2022,6 +2022,8 @@ function Woorksheet(wb, _index, sId){
 	this.nMaxRowId = 1;
 	this.nMaxColId = 1;
 
+
+    this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
 }
 
@@ -2315,7 +2317,7 @@ Woorksheet.prototype.getIndex=function(){
 Woorksheet.prototype.getName=function(){
 	return this.sName !== undefined && this.sName.length > 0 ? this.sName : "";
 };
-Woorksheet.prototype.setName=function(name){
+Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 	if(name.length <= g_nSheetNameMaxLength)
 	{
 		var lastName = this.sName;
@@ -2328,15 +2330,17 @@ Woorksheet.prototype.setName=function(name){
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
 		}
 
-        var _lastName = parserHelp.getEscapeSheetName(lastName);
-        var _newName = parserHelp.getEscapeSheetName(this.sName);
-
-        for (var key in this.workbook.aWorksheets)
+        if(!bFromUndoRedo)
         {
-            var wsModel = this.workbook.aWorksheets[key];
-            var ws = this.workbook.oApi.wb.getWorksheet(wsModel.index);
-            if ( ws )
-                ws.objectRender.updateChartReferences(_lastName, _newName);
+            var _lastName = parserHelp.getEscapeSheetName(lastName);
+            var _newName = parserHelp.getEscapeSheetName(this.sName);
+
+            for (var key in this.workbook.aWorksheets)
+            {
+                var wsModel = this.workbook.aWorksheets[key];
+                if ( wsModel )
+                    wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(_lastName, _newName);
+            }
         }
 	}
 };
@@ -8227,4 +8231,48 @@ NameGenerator.prototype = {
 		this.addTableName(sNewName, ws, Ref);
 		return sNewName;
 	}
+};
+
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * @constructor
+ */
+
+function DrawingObjectsManager(worksheet)
+{
+    this.worksheet = worksheet;
+}
+
+DrawingObjectsManager.prototype.updateChartReferences = function(oldWorksheet, newWorksheet)
+{
+    ExecuteNoHistory(function(){
+        this.updateChartReferencesWidthHistory(oldWorksheet, newWorksheet);
+    }, this, []);
+};
+
+DrawingObjectsManager.prototype.updateChartReferencesWidthHistory = function(oldWorksheet, newWorksheet)
+{
+    var aObjects = this.worksheet.Drawings;
+    for (var i = 0; i < aObjects.length; i++) {
+        var graphicObject = aObjects[i].graphicObject;
+        if ( graphicObject.updateChartReferences )
+        {
+            graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
+        }
+    }
+};
+
+
+DrawingObjectsManager.prototype.rebuildCharts = function(data)
+{
+    var aObjects = this.worksheet.Drawings;
+    for(var i = 0; i < aObjects.length; ++i)
+    {
+        if(aObjects[i].graphicObject.rebuildSeries)
+        {
+            aObjects[i].graphicObject.rebuildSeries(data);
+        }
+    }
 };

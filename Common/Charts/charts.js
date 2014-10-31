@@ -353,6 +353,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		new_line.setFill(new CUniFill());
 		new_line.Fill.setFill(new CNoFill());
 		chart_space.spPr.setLn(new_line);
+        chart_space.recalcInfo.recalculateReferences = false;
 		chart_space.recalculate();
 
 		return chart_space;
