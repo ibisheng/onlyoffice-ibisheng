@@ -1003,7 +1003,7 @@ CMathContent.prototype =
             var PosInfo = new CMathPointInfo();
             PosInfo.SetInfoPoints(this.InfoPoints);
 
-            w += PosInfo.GetAlign();
+            this.pos.x += PosInfo.GetAlign();
         }
 
         for(var i=0; i < this.Content.length; i++)
@@ -3584,8 +3584,8 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
     PointsInfo.SetInfoPoints(this.InfoPoints);
 
 
-    if(this.RecalcInfo.bEqqArray)
-        PDSH.X += PointsInfo.GetAlign();
+    /*if(this.RecalcInfo.bEqqArray)
+        PDSH.X += PointsInfo.GetAlign();*/
 
     var len = this.Content.length;
 
