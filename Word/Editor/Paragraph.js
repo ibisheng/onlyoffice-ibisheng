@@ -12140,12 +12140,15 @@ Paragraph.prototype.private_CorrectCurPosRangeLine = function()
         var RangeIndex = Ranges[Index].Range;
         var LineIndex  = Ranges[Index].Line;
 
-        var Range = this.Lines[LineIndex].Ranges[RangeIndex];
-        if (Range.W > 0)
+        if (undefined !== this.Lines[LineIndex] && undefined !== this.Lines[LineIndex].Ranges[RangeIndex])
         {
-            this.CurPos.Line  = LineIndex;
-            this.CurPos.Range = RangeIndex;
-            break;
+            var Range = this.Lines[LineIndex].Ranges[RangeIndex];
+            if (Range.W > 0)
+            {
+                this.CurPos.Line = LineIndex;
+                this.CurPos.Range = RangeIndex;
+                break;
+            }
         }
     }
 };

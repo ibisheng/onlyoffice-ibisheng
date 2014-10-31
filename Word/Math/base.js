@@ -1041,23 +1041,33 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     PDSH.X = this.pos.x + this.ParaMath.X + this.size.width;
 
 };
-CMathBase.prototype.Internal_Content_Add = function(Pos, Items, bUpdatePosition)
+CMathBase.prototype.protected_AddToContent = function(Pos, Items, bUpdatePosition)
 {
     History.Add(this, new CChangesMathAddItems(Pos, Items));
-    //History.Add( this, { Type : historyitem_Math_AddItems_ToMathBase, Pos : Pos, EndPos : Pos, Items : Items } );
-    this.raw_Internal_Content_Add(Pos, Items, bUpdatePosition);
+    this.raw_AddToContent(Pos, Items, bUpdatePosition);
+    this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
 };
-CMathBase.prototype.raw_Internal_Content_Add = function(Pos, Items, bUpdatePosition)
+CMathBase.prototype.raw_AddToContent = function(Pos, Items, bUpdatePosition)
 {
-    for(var Index = 0; Index < Items.length; Index++)
-        this.Content.splice(Pos + Index, 0, Items[Index]);
+    for(var Index = 0, Count = Items.length; Index < Count; Index++)
+    {
+        var Item = Items[Index];
+        this.Content.splice(Pos + Index, 0, Item);
+        Item.ParentElement = this;
+    }
 
-    this.Update_Pos_After_AddItems(Pos, bUpdatePosition);
     this.fillContent();
-
     this.private_SetNeedResize();
 }
-CMathBase.prototype.Update_Pos_After_AddItems   = CMathContent.prototype.Update_Pos_After_AddItems;
+CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
+{
+    this.Content.splice(Pos, Count);
+
+    this.fillContent();
+    this.private_SetNeedResize();
+};
+CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
+CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_SetNeedResize       = CMathContent.prototype.private_SetNeedResize;
 

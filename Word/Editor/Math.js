@@ -1693,11 +1693,15 @@ ParaMath.prototype.Handle_AddNewLine = function()
     var ContentPos = new CParagraphContentPos();
 
     var CurrContent = this.GetSelectContent().Content;
+
+    if (true === CurrContent.bRoot)
+        return false;
+
     CurrContent.Get_ParaContentPos(this.bSelectionUse, true, ContentPos);
 
     var NeedRecalculate = false;
 
-    if(CurrContent.Parent.kind == MATH_EQ_ARRAY)
+    if(MATH_EQ_ARRAY === CurrContent.ParentElement.kind)
     {
         var NewContent = CurrContent.Parent.addRow();
         CurrContent.SplitContent(NewContent, ContentPos, 0);
@@ -1706,14 +1710,14 @@ ParaMath.prototype.Handle_AddNewLine = function()
 
         NeedRecalculate = true;
     }
-    else if(CurrContent.bRoot == false && CurrContent.Parent.kind !== MATH_MATRIX)
+    else if(MATH_MATRIX !== CurrContent.ParentElement.kind)
     {
         var ctrPrp = CurrContent.Parent.CtrPrp.Copy();
         var props = {row: 2, ctrPrp: ctrPrp};
         var EqArray = new CEqArray(props);
 
-        var FirstContent = EqArray.getElement(0),
-            SecondContent = EqArray.getElement(1);
+        var FirstContent  = EqArray.getElementMathContent(0);
+        var SecondContent = EqArray.getElementMathContent(1);
 
         CurrContent.SplitContent(SecondContent, ContentPos, 0);
         CurrContent.CopyTo(FirstContent, false);
@@ -1740,10 +1744,10 @@ ParaMath.prototype.Handle_AddNewLine = function()
         NeedRecalculate = true;
     }
 
-    this.SetNeedResize();
+    if (true === NeedRecalculate)
+        this.SetNeedResize();
 
     return NeedRecalculate;
-
 };
 
 /**
@@ -1947,36 +1951,42 @@ function CChangesMathAddItems(Pos, Items)
 CChangesMathAddItems.prototype.Type = historyitem_Math_AddItems_ToMathBase;
 CChangesMathAddItems.prototype.Undo = function(Class)
 {
-
+    Class.raw_RemoveFromContent(this.Pos, this.Items.length);
 };
 CChangesMathAddItems.prototype.Redo = function(Class)
 {
-    Class.raw_Internal_Content_Add(this.Pos, this.Items, false);
+    Class.raw_AddToContent(this.Pos, this.Items, false);
 };
 CChangesMathAddItems.prototype.Save_Changes = function(Writer)
 {
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
     var Count = this.Items.length;
     Writer.WriteLong(Count);
+    Writer.WriteLong(this.Pos);
 
     for(var Index = 0; Index < Count; Index++)
     {
-        Writer.WriteLong(this.Pos + Index);
         Writer.WriteString2(this.Items[Index].Get_Id());
     }
 };
 CChangesMathAddItems.prototype.Load_Changes = function(Reader, Class)
 {
+    // Long : Count
+    // Long : Pos
+    // Array of String : Id
+
     var Count = Reader.GetLong();
-    this.Pos = Reader.GetLong();
+    this.Pos  = Reader.GetLong();
 
-    if(this.Items == undefined)
-        this.Items = [];
-
+    this.Items = [];
     for(var Index = 0; Index < Count; Index++)
     {
-        var Element = g_oTableId.Get_ById( Reader.GetString2() );
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
 
-        if ( null != Element )
+        if (null !== Element)
             this.Items.push(Element);
     }
 

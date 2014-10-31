@@ -1564,9 +1564,10 @@ CMathContent.prototype =
         History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
 
-        this.Update_Pos_After_AddItems(Pos, bUpdatePosition);
+        this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
     },
-    Update_Pos_After_AddItems: function(Pos, bUpdatePosition)
+
+    private_UpdatePosOnAdd: function(Pos, bUpdatePosition)
     {
         if(bUpdatePosition !== false)
         {
@@ -1631,13 +1632,12 @@ CMathContent.prototype =
     {
         var Pos = ContentPos.Get(Depth);
 
-        if(this.Content[Pos].Type == para_Math_Run)
+        if(para_Math_Run === this.Content[Pos].Type)
         {
             var NewRun = this.Content[Pos].Split(ContentPos, Depth+1);
             NewContent.Add_ToContent(0, NewRun);
 
             var len = this.Content.length;
-
             if(Pos < len - 1)
             {
                 NewContent.Concat_ToContent( this.Content.slice(Pos + 1) );
@@ -1645,8 +1645,7 @@ CMathContent.prototype =
             }
         }
 
-        this.ParaMath.SetNeedResize();
-
+        this.private_SetNeedResize();
     },
     Add_ToContent : function(Pos, Item)
     {
@@ -1672,7 +1671,11 @@ CMathContent.prototype =
             this.CurPos = Pos;
 
         this.private_CorrectCurPos();
+        this.private_UpdatePosOnRemove(Pos, Count);
+    },
 
+    private_UpdatePosOnRemove : function(Pos, Count)
+    {
         // Обновим начало и конец селекта
         if (true === this.Selection.Use)
         {
