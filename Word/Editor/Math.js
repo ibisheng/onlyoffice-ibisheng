@@ -1673,13 +1673,6 @@ ParaMath.prototype.Get_ContentSelection = function()
     var X = oContent.pos.x + this.X;
     var Y = oContent.pos.y + this.Y;
 
-    if(oContent.RecalcInfo.bEqqArray)
-    {
-        var PointInfo = new CMathPointInfo();
-        PointInfo.SetInfoPoints(oContent.InfoPoints);
-        X += PointInfo.GetAlign();
-    }
-
     return {X : X, Y : Y, W : oContent.size.width, H : oContent.size.height};
 };
 
@@ -1718,6 +1711,8 @@ ParaMath.prototype.Handle_AddNewLine = function()
         CurrContent.SplitContent(NewContent, ContentPos, 0);
         NewContent.Correct_Content(true);
         CurrContent.Correct_Content(true);
+
+        NewContent.Cursor_MoveToStartPos();
 
         NeedRecalculate = true;
     }

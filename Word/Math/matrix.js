@@ -687,6 +687,7 @@ CEqArray.prototype.addRow = function()
 {
     var NewContent = new CMathContent();
     this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
+    this.CurPos++;
 
     return NewContent;
 }

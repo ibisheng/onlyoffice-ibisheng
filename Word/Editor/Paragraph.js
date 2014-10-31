@@ -12836,8 +12836,6 @@ function CParagraphSearchPosXY()
     this.DiffX          = 1000000; // километра для ограничения должно хватить
     this.NumberingDiffX = 1000000; // километра для ограничения должно хватить
 
-    this.EqArrayInfoPoints = null; // Специальный параметр для EqArray в формулах
-
     this.Line      = 0;
     this.Range     = 0;
 

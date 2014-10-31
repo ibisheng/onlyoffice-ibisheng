@@ -3069,13 +3069,6 @@ CMathContent.prototype.Get_Bounds = function()
         Y = this.ParaMath.Y + this.pos.y;
         W = this.size.width;
         H = this.size.height;
-
-        if (this.RecalcInfo.bEqqArray)
-        {
-            var PointInfo = new CMathPointInfo();
-            PointInfo.SetInfoPoints(this.InfoPoints);
-            X += PointInfo.GetAlign();
-        }
     }
 
     return {X : X, Y : Y, W : W, H : H};
@@ -3087,14 +3080,10 @@ CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRan
 
     if(this.RecalcInfo.bEqqArray)
     {
-        var PointInfo = new CMathPointInfo();
-        PointInfo.SetInfoPoints(this.InfoPoints);
-        X += PointInfo.GetAlign();
-
         for(var nPos = 0; nPos < this.CurPos; nPos++)
         {
             if(para_Math_Run === this.Content[nPos].Type)
-                X = this.Content[nPos].Recalculate_CurPos(X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo).X;
+                X = this.Content[nPos].Recalculate_CurPos(X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget).X;
             else
                 X += this.Content[nPos].size.width;
         }
@@ -3102,7 +3091,7 @@ CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRan
     else
         X += this.WidthToElement[this.CurPos];
 
-    return this.Content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget, PointInfo);
+    return this.Content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 };
 CMathContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
@@ -3110,14 +3099,6 @@ CMathContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurL
 
     if (nLength <= 0)
         return false;
-
-    if (this.RecalcInfo.bEqqArray)
-    {
-        SearchPos.EqArrayInfoPoints = new CMathPointInfo();
-        SearchPos.EqArrayInfoPoints.SetInfoPoints(this.InfoPoints);
-    }
-    else
-        SearchPos.EqArrayInfoPoints = null;
 
     var bResult = false;
     for (var nPos = 0; nPos < nLength; nPos++)
@@ -3580,13 +3561,6 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 {
     PDSH.X = this.ParaMath.X + this.pos.x;
 
-    var PointsInfo = new CMathPointInfo();
-    PointsInfo.SetInfoPoints(this.InfoPoints);
-
-
-    /*if(this.RecalcInfo.bEqqArray)
-        PDSH.X += PointsInfo.GetAlign();*/
-
     var len = this.Content.length;
 
     for ( var CurPos = 0; CurPos < len; CurPos++ )
@@ -3651,14 +3625,6 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
 
     var PointsInfo = new CMathPointInfo();
     PointsInfo.SetInfoPoints(this.InfoPoints);
-
-    if(this.RecalcInfo.bEqqArray)
-    {
-        if(SelectionDraw.FindStart == true)
-            SelectionDraw.StartX += PointsInfo.GetAlign();
-        else
-            SelectionDraw.W += PointsInfo.GetAlign();
-    }
 
     var bDrawSelection = false;
     for(var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
