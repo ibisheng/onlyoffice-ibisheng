@@ -1011,7 +1011,7 @@ ParaMath.prototype.NeedCompiledCtrPr = function()
 {
     this.Root.NeedCompiledCtrPr();
 };
-ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx, _heightPx)
+ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx, _heightPx, raster_koef)
 {
     var bTurnOnId = false, bTurnOnHistory = false;
     if (false === g_oTableId.m_bTurnOff)
@@ -1080,6 +1080,17 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     var h_mm = this.Height;
     var w_px = (w_mm * dKoef) >> 0;
     var h_px = (h_mm * dKoef) >> 0;
+
+    if (undefined !== raster_koef)
+    {
+        w_px *= raster_koef;
+        h_px *= raster_koef;
+
+        if (undefined !== _widthPx)
+            _widthPx *= raster_koef;
+        if (undefined !== _heightPx)
+            _heightPx *= raster_koef;
+    }
 
     var _canvas = (_canvasInput === undefined) ? document.createElement('canvas') : _canvasInput;
 
