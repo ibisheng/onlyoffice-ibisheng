@@ -356,6 +356,16 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		}
 	}
 
+
+    if(!window["NATIVE_EDITOR_ENJINE"])
+    {
+        var wsView = window["Asc"]["editor"].wb.getWorksheet();
+        if(wsView && wsView.objectRender && wsView.objectRender.controller)
+        {
+        	wsView.objectRender.controller.updateOverlay();
+        }
+    }
+
 	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
