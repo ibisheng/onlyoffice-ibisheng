@@ -2180,6 +2180,8 @@ function Binary_oMathWriter(memory, oMathPara)
 	this.WriteEqArrPr = function(props,oEqArr)
 	{
 		var oThis = this;
+		if (null != props.row)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Row, function(){oThis.WriteCount(props.row);});
 		if (null != props.baseJc)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BaseJc, function(){oThis.WriteBaseJc(props.baseJc);});
 		if (null != props.maxDist)
