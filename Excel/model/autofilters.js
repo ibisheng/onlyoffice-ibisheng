@@ -5031,7 +5031,7 @@
 					{
 						var valNew = startRangeCell - colEnd - 1;
 						var val2 = colStart - startRangeCell;
-						var retVal = this._editFilterAfterInsertColumn(range,valNew,startRangeCell,type);
+						var retVal = this._editFilterAfterInsertColumn(range, valNew, startRangeCell, type, activeCells);
 						if(!retVal)
 							this._editFilterAfterInsertColumn(range,val2,undefined,type,activeCells);
 					}
