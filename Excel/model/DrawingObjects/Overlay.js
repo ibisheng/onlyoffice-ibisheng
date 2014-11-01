@@ -2631,6 +2631,12 @@ CSlideBoundsChecker.prototype =
         var _y = this.m_oFullTransform.TransformPointY(x, y);
         this.Bounds.CheckRect(_x, _y, 1, 1);
     },
+
+    FillTextCode : function()
+    {
+        
+    },
+
     t : function(text,x,y)
     {
         if (this.m_bIsBreak)
