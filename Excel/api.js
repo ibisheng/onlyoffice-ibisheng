@@ -3123,16 +3123,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 		spreadsheet_api.prototype.asc_ApplyColorScheme = function(bRedraw) {
 
-			var wsViews = Asc["editor"].wb.wsViews;
-			for(var i = 0; i < wsViews.length; ++i)
-			{
-				if(wsViews[i])
-				{
-					wsViews[i].objectRender.controller.startRecalculate();
-				}
-			}
-
-			this.chartPreviewManager.clearPreviews();
+            if(!window["NATIVE_EDITOR_ENJINE"])
+            {
+                var wsViews = Asc["editor"].wb.wsViews;
+                for(var i = 0; i < wsViews.length; ++i)
+                {
+                    if(wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller)
+                    {
+                        wsViews[i].objectRender.controller.startRecalculate();
+                    }
+                }
+                this.chartPreviewManager.clearPreviews();
+            }
 			var ws = this.wb.getWorksheet();
 			//ws.objectRender.controller.applyColorScheme();
 
