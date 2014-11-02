@@ -3064,6 +3064,7 @@ CDocument.prototype =
                 var Type = ParaItem.Get_Type();
                 switch ( Type )
                 {
+                    case para_Math:
                     case para_NewLine:
                     case para_Text:
                     case para_Space:

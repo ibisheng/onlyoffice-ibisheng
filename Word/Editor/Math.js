@@ -205,16 +205,15 @@ ParaMath.prototype.Add = function(Item)
         var RightRun = Run.Split2(Run.State.ContentPos);
 
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
+        // Выставляем позицию в начало этого рана
         oContent.CurPos = StartPos + 1;
+        RightRun.Cursor_MoveToStartPos();
 
         var lng = oContent.Content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
 
         var lng2 = oContent.Content.length;
         oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
-
-        oContent.CurPos = StartPos + 2; // позиция RightRun
-        RightRun.Cursor_MoveToStartPos();
     }
 
     if ((para_Text === Type || para_Space === Type) && null !== NewElement)
