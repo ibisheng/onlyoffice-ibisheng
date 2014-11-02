@@ -3332,44 +3332,12 @@ function CDrawingDocument()
         var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
         var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-        var _x = (drPage.left + dKoefX * this.MathRect.Rect.X);
-        var _y = (drPage.top  + dKoefY * this.MathRect.Rect.Y);
-        var _r = (drPage.left + dKoefX * this.MathRect.Rect.R);
-        var _b = (drPage.top  + dKoefY * this.MathRect.Rect.B);
-
-        if (_x < overlay.min_x)
-            overlay.min_x = _x;
-        if (_r > overlay.max_x)
-            overlay.max_x = _r;
-
-        if (_y < overlay.min_y)
-            overlay.min_y = _y;
-        if (_b > overlay.max_y)
-            overlay.max_y = _b;
-
-        var ctx = overlay.m_oContext;
-        ctx.strokeStyle = "#939393";
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-        this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, true);
-        ctx.stroke();
-        ctx.beginPath();
-
-        ctx.strokeStyle = "#FFFFFF";
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-        this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0, true);
-        ctx.stroke();
-        ctx.beginPath();
-
-        if (null !== this.MathRect.ContentSelection)
+        if (null == this.TextMatrix || global_MatrixTransformer.IsIdentity(this.TextMatrix))
         {
-            var _x = (drPage.left + dKoefX * this.MathRect.ContentSelection.X);
-            var _y = (drPage.top  + dKoefY * this.MathRect.ContentSelection.Y);
-            var _r = (drPage.left + dKoefX * (this.MathRect.ContentSelection.X + this.MathRect.ContentSelection.W));
-            var _b = (drPage.top  + dKoefY * (this.MathRect.ContentSelection.Y + this.MathRect.ContentSelection.H));
+            var _x = (drPage.left + dKoefX * this.MathRect.Rect.X);
+            var _y = (drPage.top  + dKoefY * this.MathRect.Rect.Y);
+            var _r = (drPage.left + dKoefX * this.MathRect.Rect.R);
+            var _b = (drPage.top  + dKoefY * this.MathRect.Rect.B);
 
             if (_x < overlay.min_x)
                 overlay.min_x = _x;
@@ -3382,15 +3350,128 @@ function CDrawingDocument()
                 overlay.max_y = _b;
 
             var ctx = overlay.m_oContext;
-            ctx.fillStyle = "#375082";
+            ctx.strokeStyle = "#939393";
+            ctx.lineWidth = 1;
 
             ctx.beginPath();
-            this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
-
-            ctx.globalAlpha = 0.2;
-            ctx.fill();
-            ctx.globalAlpha = 1;
+            this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, true);
+            ctx.stroke();
             ctx.beginPath();
+
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            this.AutoShapesTrack.AddRect(ctx, (_x - 1) >> 0, (_y - 1) >> 0, (_r + 1) >> 0, (_b + 1) >> 0, true);
+            ctx.stroke();
+            ctx.beginPath();
+
+            if (null !== this.MathRect.ContentSelection)
+            {
+                _x = (drPage.left + dKoefX * this.MathRect.ContentSelection.X);
+                _y = (drPage.top  + dKoefY * this.MathRect.ContentSelection.Y);
+                _r = (drPage.left + dKoefX * (this.MathRect.ContentSelection.X + this.MathRect.ContentSelection.W));
+                _b = (drPage.top  + dKoefY * (this.MathRect.ContentSelection.Y + this.MathRect.ContentSelection.H));
+
+                if (_x < overlay.min_x)
+                    overlay.min_x = _x;
+                if (_r > overlay.max_x)
+                    overlay.max_x = _r;
+
+                if (_y < overlay.min_y)
+                    overlay.min_y = _y;
+                if (_b > overlay.max_y)
+                    overlay.max_y = _b;
+
+                var ctx = overlay.m_oContext;
+                ctx.fillStyle = "#375082";
+
+                ctx.beginPath();
+                this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
+
+                ctx.globalAlpha = 0.2;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+            }
+        }
+        else
+        {
+            var _arrBorderBlack = TransformRectByMatrix(this.TextMatrix,
+                [this.MathRect.Rect.X, this.MathRect.Rect.Y, this.MathRect.Rect.R, this.MathRect.Rect.B],
+                drPage.left, drPage.top, dKoefX, dKoefY);
+
+            var _1px_mm_x = 1 / Math.max(dKoefX, 0.001);
+            var _1px_mm_y = 1 / Math.max(dKoefY, 0.001);
+            var _arrBorderWhite = TransformRectByMatrix(this.TextMatrix,
+                [this.MathRect.Rect.X - _1px_mm_x, this.MathRect.Rect.Y - _1px_mm_y, this.MathRect.Rect.R - _1px_mm_x, this.MathRect.Rect.B - _1px_mm_y],
+                drPage.left, drPage.top, dKoefX, dKoefY);
+
+            overlay.CheckPoint(_arrBorderWhite[0], _arrBorderWhite[1]);
+            overlay.CheckPoint(_arrBorderWhite[2], _arrBorderWhite[3]);
+            overlay.CheckPoint(_arrBorderWhite[4], _arrBorderWhite[5]);
+            overlay.CheckPoint(_arrBorderWhite[6], _arrBorderWhite[7]);
+
+            var ctx = overlay.m_oContext;
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(_arrBorderWhite[0], _arrBorderWhite[1]);
+            ctx.lineTo(_arrBorderWhite[2], _arrBorderWhite[3]);
+            ctx.lineTo(_arrBorderWhite[4], _arrBorderWhite[5]);
+            ctx.lineTo(_arrBorderWhite[6], _arrBorderWhite[7]);
+            ctx.closePath();
+
+            ctx.stroke();
+            ctx.beginPath();
+
+            ctx.strokeStyle = "#939393";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(_arrBorderBlack[0], _arrBorderBlack[1]);
+            ctx.lineTo(_arrBorderBlack[2], _arrBorderBlack[3]);
+            ctx.lineTo(_arrBorderBlack[4], _arrBorderBlack[5]);
+            ctx.lineTo(_arrBorderBlack[6], _arrBorderBlack[7]);
+            ctx.closePath();
+
+            ctx.stroke();
+            ctx.beginPath();
+
+            if (null !== this.MathRect.ContentSelection)
+            {
+                var _arrSelect = TransformRectByMatrix(this.TextMatrix,
+                    [this.MathRect.ContentSelection.X, this.MathRect.ContentSelection.Y,
+                    this.MathRect.ContentSelection.X + this.MathRect.ContentSelection.W,
+                    this.MathRect.ContentSelection.Y + this.MathRect.ContentSelection.H],
+                    drPage.left, drPage.top, dKoefX, dKoefY);
+
+                overlay.CheckPoint(_arrSelect[0], _arrSelect[1]);
+                overlay.CheckPoint(_arrSelect[2], _arrSelect[3]);
+                overlay.CheckPoint(_arrSelect[4], _arrSelect[5]);
+                overlay.CheckPoint(_arrSelect[6], _arrSelect[7]);
+
+                var ctx = overlay.m_oContext;
+                ctx.fillStyle = "#375082";
+
+                ctx.beginPath();
+
+                ctx.moveTo(_arrSelect[0], _arrSelect[1]);
+                ctx.lineTo(_arrSelect[2], _arrSelect[3]);
+                ctx.lineTo(_arrSelect[4], _arrSelect[5]);
+                ctx.lineTo(_arrSelect[6], _arrSelect[7]);
+                ctx.closePath();
+
+                ctx.globalAlpha = 0.2;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+            }
+
+
         }
     }
 
@@ -6566,4 +6647,21 @@ function CMathPainter(_api)
 
         this.Api.sendMathTypesToMenu(_math);
     }
+}
+
+function TransformRectByMatrix(m, arr, offX, offY, koefX, koefY)
+{
+    var ret = [];
+    ret.push(offX + koefX * m.TransformPointX(arr[0], arr[1]));
+    ret.push(offY + koefY * m.TransformPointY(arr[0], arr[1]));
+
+    ret.push(offX + koefX * m.TransformPointX(arr[2], arr[1]));
+    ret.push(offY + koefY * m.TransformPointY(arr[2], arr[1]));
+
+    ret.push(offX + koefX * m.TransformPointX(arr[2], arr[3]));
+    ret.push(offY + koefY * m.TransformPointY(arr[2], arr[3]));
+
+    ret.push(offX + koefX * m.TransformPointX(arr[0], arr[3]));
+    ret.push(offY + koefY * m.TransformPointY(arr[0], arr[3]));
+    return ret;
 }
