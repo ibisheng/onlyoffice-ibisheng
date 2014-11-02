@@ -4561,7 +4561,7 @@ CDocument.prototype =
     {
         var SelectedInfo = this.Get_SelectedElementsInfo();
         var Math = SelectedInfo.Get_Math();
-        if (null !== Math)
+        if (null !== Math && true !== Math.Is_Inline())
         {
             Math.Set_Align(Align);
         }
@@ -7536,7 +7536,7 @@ CDocument.prototype =
 
             var SelectedInfo = this.Get_SelectedElementsInfo();
             var Math = SelectedInfo.Get_Math();
-            if (null !== Math)
+            if (null !== Math && true !== Math.Is_Inline())
                 ParaPr.Jc = Math.Get_Align();
 
             editor.UpdateParagraphProp( ParaPr );

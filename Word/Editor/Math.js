@@ -980,6 +980,10 @@ ParaMath.prototype.Get_Inline = function()
 {
     return this.bInline;
 };
+ParaMath.prototype.Is_Inline = function()
+{
+    return this.bInline;
+};
 ParaMath.prototype.Get_Align = function()
 {
     if (undefined !== this.Jc)

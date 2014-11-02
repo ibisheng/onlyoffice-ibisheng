@@ -6867,7 +6867,7 @@ CDocumentContent.prototype =
             {
                 var SelectedInfo = this.LogicDocument.Get_SelectedElementsInfo();
                 var Math = SelectedInfo.Get_Math();
-                if (null !== Math)
+                if (null !== Math && true !== Math.Is_Inline())
                     ParaPr.Jc = Math.Get_Align();
             }
 

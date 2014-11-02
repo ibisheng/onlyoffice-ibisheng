@@ -2626,6 +2626,7 @@ PasteProcessor.prototype =
             }
             
             this.oLogicDocument.Document_UpdateInterfaceState();
+            this.oLogicDocument.Document_UpdateSelectionState();
         }
 
         window.GlobalPasteFlagCounter = 0;

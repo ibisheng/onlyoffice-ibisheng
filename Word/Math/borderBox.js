@@ -129,6 +129,7 @@ CMathBorderBoxPr.prototype.Read_FromBinary = function(Reader)
     // Bool : strikeTLBR
     // Bool : strikeV
 
+    this.hideBot    = Reader.GetBool();
     this.hideLeft   = Reader.GetBool();
     this.hideRight  = Reader.GetBool();
     this.hideTop    = Reader.GetBool();
