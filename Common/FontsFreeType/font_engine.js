@@ -15377,7 +15377,7 @@ function tt_cmap4_char_map_linear(cmap, _charcode, next)
 
                 if (i >= num_segs - 1 && start == 0xFFFF && end == 0xFFFF)
                 {
-                    var face = cmap.cmap.charmap.face;
+                    var face = cmap.cmap.cmap.charmap.face;
                     var limit = face.cmap_table.pos + face.cmap_size;
                     if (offset != 0 && p.pos + offset + 2 > limit)
                     {
@@ -15461,7 +15461,7 @@ function tt_cmap4_char_map_binary(cmap, _charcode, next)
 
             if (mid >= num_segs - 1 && start == 0xFFFF && end == 0xFFFF)
             {
-                var face = cmap.cmap.charmap.face;
+                var face = cmap.cmap.cmap.charmap.face;
                 var limit = face.cmap_table.pos + face.cmap_size;
                 if (offset && p.pos + offset + 2 > limit)
                 {
