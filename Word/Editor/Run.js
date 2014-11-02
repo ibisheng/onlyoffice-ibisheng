@@ -87,6 +87,10 @@ ParaRun.prototype.Set_Paragraph = function(Paragraph)
     this.Paragraph = Paragraph;
 };
 
+ParaRun.prototype.Set_ParaMath = function(ParaMath)
+{
+    this.ParaMath = ParaMath;
+};
 ParaRun.prototype.Save_StartState = function()
 {
     this.StartState = new CParaRunStartState(this);

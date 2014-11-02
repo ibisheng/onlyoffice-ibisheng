@@ -8577,7 +8577,10 @@ CDocument.prototype =
             var DocContent = this.Get_SelectedContent();
 
             if (false === this.Can_InsertContent(DocContent, NearPos))
+            {
                 History.Remove_LastPoint();
+                return;
+            }
 
             var Para = NearPos.Paragraph;
             
@@ -8666,8 +8669,19 @@ CDocument.prototype =
         {
             // Проверяем, что вставляемый контент тоже формула
             var Element = SelectedContent.Elements[0].Element;
-            if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.Get_Type() || 2 !== Element.Content.length || para_Math !== Element.Content[0].Type || null === LastClass.Parent)
+            if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.Get_Type()|| null === LastClass.Parent)
                 return false;
+
+            var Math = null;
+            var Count = Element.Content.length;
+            for (var Index = 0; Index < Count; Index++)
+            {
+                var Item = Element.Content[Index];
+                if (para_Math === Item.Type && null === Math)
+                    Math = Element.Content[Index];
+                else if (true !== Item.Is_Empty({SkipEnd : true}))
+                    return false;
+            }
         }
         else if (para_Run !== LastClass.Type)
             return false;

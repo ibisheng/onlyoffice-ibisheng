@@ -1574,6 +1574,9 @@ CMathContent.prototype =
     },
     Internal_Content_Add : function(Pos, Item, bUpdatePosition)
     {
+        Item.Set_ParaMath(this.ParaMath);
+        Item.Parent = this;
+
         History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
 
@@ -2038,6 +2041,15 @@ CMathContent.prototype =
 };
 CMathContent.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
 CMathContent.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
+CMathContent.prototype.Set_ParaMath = function(ParaMath)
+{
+    this.ParaMath = ParaMath;
+
+    for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+    {
+        this.Content[Index].Set_ParaMath(ParaMath);
+    }
+};
 CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
 {
     this.Paragraph = Paragraph;
