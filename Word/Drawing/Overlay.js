@@ -2812,6 +2812,17 @@ CSlideBoundsChecker.prototype =
         var _y = this.m_oFullTransform.TransformPointY(x, y);
         this.Bounds.CheckRect(_x, _y, 1, 1);
     },
+    FillTextCode : function(x, y, lUnicode)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
     t : function(text,x,y)
     {
         if (this.m_bIsBreak)
