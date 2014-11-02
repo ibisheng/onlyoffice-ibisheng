@@ -754,6 +754,7 @@ CMathBase.prototype.Fill_LogicalContent = function(nCount)
     {
         this.Content[nIndex] = new CMathContent();
         this.Content[nIndex].ParentElement = this;
+        this.Content[nIndex].Parent        = this;
     }
 };
 CMathBase.prototype.Copy = function()
@@ -813,6 +814,7 @@ CMathBase.prototype.Read_FromBinary2 = function( Reader )
     {
         this.Content[nIndex] = g_oTableId.Get_ById(Reader.GetString2());
         this.Content[nIndex].ParentElement = this;
+        this.Content[nIndex].Parent        = this;
     }
 
     this.Pr.Read_FromBinary(Reader);

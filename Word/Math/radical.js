@@ -426,11 +426,7 @@ CRadical.prototype.kind      = MATH_RADICAL;
 CRadical.prototype.init = function(props)
 {
     this.setProperties(props);
-
-    if (true === this.Pr.degHide)
-        this.Fill_LogicalContent(1);
-    else
-        this.Fill_LogicalContent(2);
+    this.Fill_LogicalContent(2);
 
     this.fillContent();
 }
@@ -649,10 +645,7 @@ CRadical.prototype.draw = function(x, y, pGraphics)
 }
 CRadical.prototype.getBase = function()
 {
-    if (true === this.Pr.degHide)
-        return this.Content[0];
-    else
-        return this.Content[1];
+    return this.Content[1];
 }
 CRadical.prototype.getDegree = function()
 {
