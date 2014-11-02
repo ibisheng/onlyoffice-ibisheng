@@ -3203,7 +3203,10 @@
 			this._calcVisibleColumns();
 			this.handlers.trigger("reinitializeScroll");
 
-			this.objectRender.drawingArea.init();
+            if(this.objectRender && this.objectRender.drawingArea)
+            {
+                this.objectRender.drawingArea.init();
+            }
 			if (!lockDraw)
 				this.draw();
 
