@@ -37,6 +37,44 @@ function encodeSurrogateChar(nUnicode) {
     }
 }
 
+function convertUnicodeToUTF16(sUnicode)
+{
+    var sUTF16 = "";
+    var nLength = sUnicode.length;
+    for (var nPos = 0; nPos < nLength; nPos++)
+    {
+        sUTF16 += encodeSurrogateChar(sUnicode[nPos]);
+    }
+
+    return sUTF16;
+}
+function convertUTF16toUnicode(sUTF16)
+{
+    var sUnicode = [];
+    var nLength = sUTF16.length;
+    for (var nPos = 0; nPos < nLength; nPos++)
+    {
+        var nUnicode = null;
+        var nCharCode = sUTF16.charCodeAt(nPos);
+        if (isLeadingSurrogateChar(nCharCode))
+        {
+            if (nPos + 1 < nLength)
+            {
+                nPos++;
+                var nTrailingChar = sUTF16.charCodeAt(nPos);
+                nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+            }
+        }
+        else
+            nUnicode = nCharCode;
+
+        if (null !== nUnicode)
+            sUnicode.push(nUnicode);
+    }
+
+    return sUnicode;
+}
+
 /**
  * @constructor
  */

@@ -1879,7 +1879,7 @@ function Binary_oMathWriter(memory, oMathPara)
 					break;
 				}		
 			case para_Math_Text:
-				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(String.fromCharCode(item.value));}); //m:t
+				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(convertUnicodeToUTF16([item.value]));}); //m:t
 				break;
 			case para_Math_Run:
 				this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});
@@ -1916,7 +1916,7 @@ function Binary_oMathWriter(memory, oMathPara)
 			switch ( Item.Type )
             {	
 				case para_Math_Ampersand :	oText += "&"; break;
-				case para_Math_Text :		oText += String.fromCharCode(Item.value); break;
+				case para_Math_Text :		oText += convertUnicodeToUTF16([Item.value]); break;
             	case para_Space:
             	case para_Tab : 			oText += " "; break;
             }
@@ -1996,13 +1996,6 @@ function Binary_oMathWriter(memory, oMathPara)
 		}
 		this.memory.WriteByte(val);
 	}
-	this.WriteBegChr = function(BegChr)
-	{
-		var str = String.fromCharCode(BegChr);		
-		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(str);
-	}	
 	this.WriteBorderBox = function(oBorderBox)
 	{
 		var oThis = this;
@@ -2088,10 +2081,9 @@ function Binary_oMathWriter(memory, oMathPara)
 	}
 	this.WriteChr = function(Chr)
 	{
-		var str = String.fromCharCode(Chr);	
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(str);
+		this.memory.WriteString2(convertUnicodeToUTF16([Chr]));
 	}
 	this.WriteCount = function(Count)
 	{
@@ -2143,24 +2135,17 @@ function Binary_oMathWriter(memory, oMathPara)
 		if (null != props.column)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Column, function(){oThis.WriteCount(props.column);});
 		if (null != props.begChr)
-			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BegChr, function(){oThis.WriteBegChr(props.begChr);});
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BegChr, function(){oThis.WriteChr(props.begChr);});
 		if (null != props.endChr)
-			this.bs.WriteItem(c_oSer_OMathBottomNodesType.EndChr, function(){oThis.WriteEndChr(props.endChr);});
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.EndChr, function(){oThis.WriteChr(props.endChr);});
 		if (null != props.grow)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Grow, function(){oThis.WriteGrow(props.grow);});
 		if (null != props.sepChr)
-			this.bs.WriteItem(c_oSer_OMathBottomNodesType.SepChr, function(){oThis.WriteSepChr(props.sepChr);});
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.SepChr, function(){oThis.WriteChr(props.sepChr);});
 		if (null != props.shp)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Shp, function(){oThis.WriteShp(props.shp);});
 		if (null != oDelimiter.CtrPrp)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.CtrlPr, function(){oThis.WriteCtrlPr(oDelimiter);});
-	}		
-	this.WriteEndChr = function(EndChr)
-	{
-		var str = String.fromCharCode(EndChr);	
-		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(str);
 	}
 	this.WriteEqArr = function(oEqArr)
 	{
@@ -2634,13 +2619,6 @@ function Binary_oMathWriter(memory, oMathPara)
 			case TXT_SCRIPT: 		val = c_oAscScript.Script; break;
 		}
 		this.memory.WriteByte(val);
-	}	
-	this.WriteSepChr = function(SepChr)
-	{
-		var str = String.fromCharCode(SepChr);	
-		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(str);
 	}
 	this.WriteShow = function(Show)
 	{
@@ -7584,6 +7562,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				for(var i in this.oCurComments)
 					this.oCurComments[i] += text;
 			}
+
 			for (var i = 0; i < text.length; ++i)
 			{
 			    var nUnicode = null;
@@ -8644,22 +8623,6 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathBegChr = function(type, length, props)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var oThis = this;
-		if (c_oSer_OMathBottomNodesValType.Val === type)
-        {
-			var text = this.stream.GetString2LE(length);
-			if (text == "")
-				props.begChr = OPERATOR_EMPTY;
-			else 
-				props.begChr = text.charCodeAt(0);
-        }
-		else
-            res = c_oSerConstants.ReadUnknown;
-        return res;
-    };
 	this.ReadMathBar = function(type, length,props, oParent, oContent)
     {
         var res = c_oSerConstants.ReadOk;
@@ -8949,10 +8912,12 @@ function Binary_oMathReader(stream)
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
 			var text = this.stream.GetString2LE(length);
-			if (text == "")
+            var aUnicode = convertUTF16toUnicode(text);
+
+            if (aUnicode.length <= 0)
 				props.chr = OPERATOR_EMPTY;
 			else 
-				props.chr = text.charCodeAt(0);
+				props.chr = aUnicode[0];
         }
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -9013,7 +8978,7 @@ function Binary_oMathReader(stream)
 		else if (c_oSer_OMathBottomNodesType.BegChr === type)
         {
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadMathBegChr(t,l,props);
+                return oThis.ReadMathChr(t,l,props);
             });			
         }
 		else if (c_oSer_OMathBottomNodesType.CtrlPr === type)
@@ -9025,7 +8990,7 @@ function Binary_oMathReader(stream)
 		else if (c_oSer_OMathBottomNodesType.EndChr === type)
         {
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadMathEndChr(t,l,props);
+                return oThis.ReadMathChr(t,l,props);
             });			
         }
 		else if (c_oSer_OMathBottomNodesType.Grow === type)
@@ -9037,7 +9002,7 @@ function Binary_oMathReader(stream)
 		else if (c_oSer_OMathBottomNodesType.SepChr === type)
         {
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadMathSepChr(t,l,props);
+                return oThis.ReadMathChr(t,l,props);
             });			
         }
 		else if (c_oSer_OMathBottomNodesType.Shp === type)
@@ -9155,22 +9120,6 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathEndChr = function(type, length, props)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var oThis = this;
-		if (c_oSer_OMathBottomNodesValType.Val === type)
-        {
-			var text = this.stream.GetString2LE(length);
-			if (text == "")
-				props.endChr = OPERATOR_EMPTY;
-			else 
-				props.endChr = text.charCodeAt(0);
-        }
-		else
-            res = c_oSerConstants.ReadUnknown;
-        return res;
-    };		
 	this.ReadMathFraction = function(type, length, props, oParent, oElemDen, oElemNum)
     {
         var res = c_oSerConstants.ReadOk;
@@ -9742,28 +9691,27 @@ function Binary_oMathReader(stream)
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		var oNewElem = null;
-		
+
 		if (c_oSer_OMathContentType.MText === type)
         {
-			var text = "";
-			if (length > 0)
-				text = this.stream.GetString2();
-			for (var i = 0; i < text.length; ++i)
+            var aUnicodes = [];
+            if (length > 0)
+                aUnicodes = convertUTF16toUnicode(this.stream.GetString2());
+
+			for (var nPos = 0, nCount = aUnicodes.length; nPos < nCount; ++nPos)
             {
-				var oText = null;
-				if ( 0x0026 == text[i].charCodeAt(0))
-					oText = new CMathAmp();				
-				else if (0x001F < text[i].charCodeAt(0)) //управляющие символы
-				{
-					oText = new CMathText(false);					
-					oText.addTxt(text[i]);					
-				}
-				/*в будущем переделка под para_space
-				else if (text[i] == ' ')
-					oText = new ParaSpace(1)
-				*/
-				if (oText)
-                    oMRun.Add_ToContent(i, oText, false, true);
+                var nUnicode = aUnicodes[nPos];
+
+                var oText = null;
+                if (0x0026 == nUnicode)
+                    oText = new CMathAmp();
+                else if (0x001F < nUnicode) //управляющие символы
+                {
+                    oText = new CMathText(false);
+                    oText.add(nUnicode);
+                }
+                if (oText)
+                    oMRun.Add_ToContent(nPos, oText, false, true);
             }
         }
 		else if (c_oSer_OMathContentType.MRPr === type)
@@ -10219,22 +10167,6 @@ function Binary_oMathReader(stream)
 				case c_oAscScript.Script:		props.scr = TXT_SCRIPT; break;
 				default: props.scr = TXT_ROMAN;
 			}
-        }
-		else
-            res = c_oSerConstants.ReadUnknown;
-        return res;
-    };
-	this.ReadMathSepChr = function(type, length, props)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var oThis = this;
-		if (c_oSer_OMathBottomNodesValType.Val === type)
-        {
-			var text = this.stream.GetString2LE(length);
-			if (text == "")
-				props.sepChr = OPERATOR_EMPTY;
-			else 
-				props.sepChr = text.charCodeAt(0);
         }
 		else
             res = c_oSerConstants.ReadUnknown;
