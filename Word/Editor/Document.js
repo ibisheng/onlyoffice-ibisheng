@@ -9875,21 +9875,38 @@ CDocument.prototype =
             bUpdateSelection = false;
             bRetValue = true;
         }
-        else if ( e.KeyCode == 187 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
+        else if ( e.KeyCode == 187 && false === editor.isViewMode) // =
         {
-            var TextPr = this.Get_Paragraph_TextPr();
-            if ( null != TextPr )
+            if (true === e.CtrlKey) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+                var TextPr = this.Get_Paragraph_TextPr();
+                if (null != TextPr)
                 {
-                    this.Create_NewHistoryPoint();
-                    if ( true === e.ShiftKey )
-                        this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
-                    else
-                        this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
-                    this.Document_UpdateInterfaceState();
+                    if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+                    {
+                        this.Create_NewHistoryPoint();
+                        if (true === e.ShiftKey)
+                            this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript }));
+                        else
+                            this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript }));
+                        this.Document_UpdateInterfaceState();
+                    }
+                    bRetValue = true;
                 }
-                bRetValue = true;
+            }
+            else if (true === e.AltKey) // Alt + =
+            {
+                var oSelectedInfo = this.Get_SelectedElementsInfo();
+                var oMath = oSelectedInfo.Get_Math();
+                if (null === oMath)
+                {
+                    if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+                    {
+                        this.Create_NewHistoryPoint();
+                        this.Paragraph_Add(new MathMenu (-1));
+                        bRetValue = true;
+                    }
+                }
             }
         }
         else if ( e.KeyCode == 188 && true === e.CtrlKey ) // Ctrl + ,
