@@ -1905,6 +1905,10 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                 {
                     if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
                     {
+                        if ( wsViews[i].isChartAreaEditMode ) {
+                            wsViews[i].isChartAreaEditMode = false;
+                            wsViews[i].arrActiveChartsRanges = [];
+                        }
                         wsViews[i].objectRender.controller.resetSelection();
                     }
                 }
