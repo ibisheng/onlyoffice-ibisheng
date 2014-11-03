@@ -61,6 +61,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     {
         drawingObjects = new DrawingObjects();
     }
+    var oldDrawingBase = graphic.drawingBase;
 
     var drawingObject = drawingObjects.createDrawingObject(anchor);
     drawingObject.graphicObject = graphic;
@@ -83,11 +84,28 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
      _this.objectLocker.checkObjects( function(result) {} );
      }
      worksheet.setSelectionShape(true);  */
+    if(oldDrawingBase)
+    {
+        drawingObject.from.col = oldDrawingBase.from.col;
+        drawingObject.from.colOff = oldDrawingBase.from.colOff;
+        drawingObject.from.row = oldDrawingBase.from.row;
+        drawingObject.from.rowOff = oldDrawingBase.from.rowOff;
+
+        drawingObject.to.col = oldDrawingBase.to.col;
+        drawingObject.to.colOff = oldDrawingBase.to.colOff;
+        drawingObject.to.row = oldDrawingBase.to.row;
+        drawingObject.to.rowOff = oldDrawingBase.to.rowOff;
+    }
     if(graphic.recalcTransform)
     {
         graphic.recalcTransform();
+        if(graphic.recalcBounds)
+        {
+            graphic.recalcBounds();
+        }
         graphic.addToRecalculate();
     }
+
     return ret;
 }
 

@@ -3023,7 +3023,7 @@
 			_insertImagesFromBinary: function(ws, data, isIntoShape)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr;
+				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr, offX, offY, rot;
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3035,20 +3035,44 @@
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 					if(xfrm)
 					{
+						offX = 0;
+						offY = 0;
+						rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+						rot = normalizeRotate(rot);
+						if ((rot >= 0 && rot < Math.PI * 0.25)
+							|| (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
+							|| (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+						{
+							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY))
+							{
+								offX = xfrm.offX;
+								offY = xfrm.offY;
+							}
+						}
+						else
+						{
+							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY)
+							&& isRealNumber(xfrm.extX) && isRealNumber(xfrm.extY))
+							{
+								offX = xfrm.offX + xfrm.extX/2 - xfrm.extY/2;
+								offY = xfrm.offY + xfrm.extY/2 - xfrm.extX/2;
+							}
+						}
+
 						if(i == 0)
 						{
-							startCol = xfrm.offX;
-							startRow = xfrm.offY;
+							startCol = offX;
+							startRow = offY;
 						}
 						else 
 						{
-							if(startCol > xfrm.offX)
+							if(startCol > offX)
 							{
-								startCol = xfrm.offX;
+								startCol = offX;
 							}	
-							if(startRow > xfrm.offY)
+							if(startRow > offY)
 							{
-								startRow = xfrm.offY;
+								startRow = offY;
 							}	
 						}
 					}
@@ -3072,7 +3096,16 @@
 						}
 					}
 				};
-				
+
+				if(startRow < 0)
+				{
+					startRow = 0;
+				}
+				if(startCol < 0)
+				{
+					startCol = 0;
+				}
+
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
                     data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
@@ -3105,6 +3138,10 @@
 					//drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 
 					drawingObject.graphicObject.addToDrawingObjects();
+                    if(drawingObject.graphicObject.checkDrawingBaseCoords)
+                    {
+                        drawingObject.graphicObject.checkDrawingBaseCoords();
+                    }
                     drawingObject.graphicObject.recalculate();
 					drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					
@@ -3138,7 +3175,7 @@
 			_insertImagesFromBinaryWord: function(ws, data)
 			{
 				var activeRange = ws.activeRange;
-				var curCol, drawingObject, curRow, startCol, startRow, xfrm, drawingBase, graphicObject, aImagesSync = [];
+				var curCol, drawingObject, curRow, startCol = 0, startRow = 0, xfrm, drawingBase, graphicObject, aImagesSync = [], offX, offY, rot;
 
 				History.Create_NewPoint();
 				History.StartTransaction();
@@ -3162,24 +3199,48 @@
 					//create new drawingBase
 					drawingObject = ws.objectRender.createDrawingObject();
 					drawingObject.graphicObject = graphicObject;
-					
-					xfrm = drawingObject.graphicObject.spPr.xfrm;
-					if(xfrm)
+
+					if(drawingObject.graphicObject.spPr && drawingObject.graphicObject.spPr.xfrm)
 					{
+						xfrm = drawingObject.graphicObject.spPr.xfrm;
+						offX = 0;
+						offY = 0;
+						rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+						rot = normalizeRotate(rot);
+						if ((rot >= 0 && rot < Math.PI * 0.25)
+							|| (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
+							|| (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+						{
+							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY))
+							{
+								offX = xfrm.offX;
+								offY = xfrm.offY;
+							}
+						}
+						else
+						{
+							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY)
+								&& isRealNumber(xfrm.extX) && isRealNumber(xfrm.extY))
+							{
+								offX = xfrm.offX + xfrm.extX/2 - xfrm.extY/2;
+								offY = xfrm.offY + xfrm.extY/2 - xfrm.extX/2;
+							}
+						}
+
 						if(i == 0)
 						{
-							startCol = xfrm.offX;
-							startRow = xfrm.offY;
+							startCol = offX;
+							startRow = offY;
 						}
 						else 
 						{
-							if(startCol > xfrm.offX)
+							if(startCol > offX)
 							{
-								startCol = xfrm.offX;
+								startCol = offX;
 							}	
-							if(startRow > xfrm.offY)
+							if(startRow > offY)
 							{
-								startRow = xfrm.offY;
+								startRow = offY;
 							}	
 						}
 					}
@@ -3221,6 +3282,10 @@
                     drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
                     //drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 					drawingObject.graphicObject.addToDrawingObjects();
+                    if(drawingObject.graphicObject.checkDrawingBaseCoords)
+                    {
+                        drawingObject.graphicObject.checkDrawingBaseCoords();
+                    }
 					drawingObject.graphicObject.recalculate();
                     drawingObject.graphicObject.select(ws.objectRender.controller, 0);
 					

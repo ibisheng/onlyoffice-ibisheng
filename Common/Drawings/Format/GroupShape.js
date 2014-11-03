@@ -1,6 +1,6 @@
 ﻿"use strict";
 
-function CGroupShape(parent)
+function CGroupShape()
 {
 
     this.nvGrpSpPr = null;
@@ -297,21 +297,25 @@ CGroupShape.prototype =
 
     convertToPPTX: function(drawingDocument, worksheet)
     {
-        var sp_tree_copy = [].concat(this.spTree), i;
-        for(i = this.spTree.length-1; i > -1; --i)
+        var c = new CGroupShape();
+        c.setBDeleted(false);
+        c.setWorksheet(worksheet);
+        if(this.nvGrpSpPr)
         {
-            this.removeFromSpTreeByPos(i);
+            c.setNvSpPr(this.nvGrpSpPr.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+            c.spPr.setParent(c);
         }
 
-        this.setWorksheet(worksheet);
-        this.setParent(null);
-        this.setBDeleted(false);
-        for(i = 0; i < sp_tree_copy.length; ++i)
+        for(var i = 0; i < this.spTree.length; ++i)
         {
-            this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToPPTX(drawingDocument, worksheet));
-            this.spTree[this.spTree.length - 1].setGroup(this);
+            c.addToSpTree(c.spTree.length, this.spTree[i].convertToPPTX(drawingDocument, worksheet));
+            c.spTree[c.spTree.length - 1].setGroup(c);
         }
-        return this;
+        return c;
     },
 
     isSimpleObject: function()
