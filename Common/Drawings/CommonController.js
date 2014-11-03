@@ -4270,6 +4270,8 @@ DrawingObjectsController.prototype =
             return;
         this.checkChartTextSelection();
         this.resetSelection();
+        this.clearPreTrackObjects();
+        this.clearTrackObjects();
         this.changeCurrentState(new NullState(this, this.drawingObjects));
         this.updateSelectionState();
         var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
@@ -4753,6 +4755,8 @@ DrawingObjectsController.prototype =
     {
         var _state_index = isRealNumber(stateIndex) ? stateIndex : state.length-1;
         var selection_state = state[_state_index];
+        this.clearPreTrackObjects();
+        this.clearTrackObjects();
         this.resetSelection();
         if(selection_state.textObject)
         {
