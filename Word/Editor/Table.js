@@ -2438,7 +2438,7 @@ CTable.prototype =
 
         // Из полученной позиции нас интересуют только Y и YLimit, потому что
         // позиция по X у нас не должна меняться от страницы к странице
-        var Pos = this.Parent.Get_PageContentStartPos(PageNum);
+        var Pos = this.Parent.Get_PageContentStartPos(PageNum + this.PageNum);
 
         // На момент обращения к данной функции, у всех ячеек всех строк до текущей (включительно) должны быть
         // просчитаны верхние границы. И также должен быть просчитан заголовок на данной странице, если он есть.
@@ -2700,9 +2700,9 @@ CTable.prototype =
         var Table = new CTable( this.DrawingDocument, Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid, this.bPresentation);
 
         // Копируем настройки
-        Table.Set_Pr( this.Pr.Copy() );
         Table.Set_TableStyle( this.TableStyle );
         Table.Set_TableLook( this.TableLook.Copy() );
+        Table.Set_Pr( this.Pr.Copy() );
 
         Table.Rows = this.Rows;
         Table.Cols = this.Cols;
@@ -16601,7 +16601,7 @@ CTable.prototype =
         this.Internal_OnContentRecalculate( true, 0, this.Index );
         return;
         */
-        
+
         this.TurnOffRecalc = true;
 
         if ( false === bChange )
@@ -17616,7 +17616,7 @@ CTable.prototype =
             this.TableRowsBottom = TableRowsBottom_new;
             this.Pages           = Pages_new;
             this.RowsInfo        = RowsInfo_new;
-           
+
             for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
             {
                 var Row         = this.Content[CurRow];

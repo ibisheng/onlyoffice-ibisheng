@@ -2397,7 +2397,12 @@ CDocument.prototype =
 
     },
 
-    Add_NewParagraph : function(bRecalculate)
+    /**
+     *
+     * @param bRecalculate
+     * @param bForceAdd - добавляем параграф, пропуская всякие проверки типа пустого параграфа с нумерацией.
+     */
+    Add_NewParagraph : function(bRecalculate, bForceAdd)
     {
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -2434,7 +2439,7 @@ CDocument.prototype =
             if ( type_Paragraph == Item.GetType() )
             {
                 // Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
-                if ( undefined != Item.Numbering_Get() && true === Item.IsEmpty() )
+                if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty())
                 {
                     Item.Numbering_Remove();
                     Item.Set_Ind( { FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right }, true );
@@ -3170,7 +3175,7 @@ CDocument.prototype =
                 {
                     if ( true === Item.Cursor_IsStart() )
                     {
-                        this.Add_NewParagraph();
+                        this.Add_NewParagraph(undefined, true);
                         this.Content[this.CurPos.ContentPos - 1].Cursor_MoveToStartPos();
                         this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
                         this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
@@ -3179,8 +3184,8 @@ CDocument.prototype =
                     }
                     else
                     {
-                        this.Add_NewParagraph();
-                        this.Add_NewParagraph();
+                        this.Add_NewParagraph(undefined, true);
+                        this.Add_NewParagraph(undefined, true);
                         this.Content[this.CurPos.ContentPos - 1].Cursor_MoveToStartPos();
                         this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
                         this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();

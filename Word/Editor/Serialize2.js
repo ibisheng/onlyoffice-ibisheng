@@ -7285,6 +7285,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
+            oNewTable.ReIndexing(0);
 			if(2 == g_nCurFileVersion && false == oNewTable.Inline)
 			{
 				//делаем смещение левой границы
@@ -7669,6 +7670,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
+            oNewTable.ReIndexing(0);
             if(2 == g_nCurFileVersion && false == oNewTable.Inline)
             {
                 //делаем смещение левой границы
