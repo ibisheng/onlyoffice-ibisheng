@@ -8540,7 +8540,13 @@ CDocument.prototype =
     },
 
     On_DragTextEnd : function(NearPos, bCopy)
-    {       
+    {
+        if ( true === this.Comments.Is_Use() )
+        {
+            this.Select_Comment( null, false );
+            editor.sync_HideComment();
+        }
+
         // Сначала нам надо проверить попадаем ли мы обратно в выделенный текст, если да, тогда ничего не делаем,
         // а если нет, тогда удаляем выделенный текст и вставляем его в заданное место.
 
@@ -8552,12 +8558,6 @@ CDocument.prototype =
             var Paragraph = NearPos.Paragraph;
             Paragraph.Cursor_MoveToNearPos( NearPos );
             Paragraph.Document_SetThisElementCurrent(false);
-
-            if ( true === this.Comments.Is_Use() )
-            {
-                this.Select_Comment( null, false );
-                editor.sync_HideComment();
-            }
 
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
@@ -8906,13 +8906,15 @@ CDocument.prototype =
         }
     },
 
-    Document_SelectNumbering : function(NumPr)
+    Document_SelectNumbering : function(NumPr, Index)
     {
         this.Selection_Remove();
 
         this.Selection.Use  = true;
         this.Selection.Flag = selectionflag_Numbering;
         this.Selection.Data = [];
+        this.Selection.StartPos = Index;
+        this.Selection.EndPos   = Index;
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {

@@ -6883,6 +6883,16 @@ CDocumentContent.prototype =
                 var Math = SelectedInfo.Get_Math();
                 if (null !== Math && true !== Math.Is_Inline())
                     ParaPr.Jc = Math.Get_Align();
+
+                // Если мы находимся внутри автофигуры, тогда нам надо проверить лок параграфа, в котором находится автофигура
+                if (docpostype_DrawingObjects === this.LogicDocument.CurPos.Type && true !== ParaPr.Locked)
+                {
+                    var ParaDrawing = this.LogicDocument.DrawingObjects.getMajorParaDrawing();
+                    if (ParaDrawing.Parent instanceof Paragraph)
+                    {
+                        ParaPr.Locked = ParaDrawing.Parent.Lock.Is_Locked();
+                    }
+                }
             }
 
             if(editor)
@@ -7688,13 +7698,15 @@ CDocumentContent.prototype =
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     },
 
-    Document_SelectNumbering : function(NumPr)
+    Document_SelectNumbering : function(NumPr, Index)
     {
         this.Selection_Remove();
 
         this.Selection.Use  = true;
         this.Selection.Flag = selectionflag_Numbering;
         this.Selection.Data = [];
+        this.Selection.StartPos = Index;
+        this.Selection.EndPos   = Index;
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {

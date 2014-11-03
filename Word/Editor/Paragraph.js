@@ -4885,7 +4885,7 @@ Paragraph.prototype =
             else
             {
                 // TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
-                if ( true === CurElement.Is_Empty() && CurPos < this.Content.length - 1 && para_Run === this.Content[CurPos + 1].Type )
+                if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type)  && CurPos < this.Content.length - 1 && para_Run === this.Content[CurPos + 1].Type)
                     this.Internal_Content_Remove( CurPos );
             }
         }
@@ -4900,6 +4900,7 @@ Paragraph.prototype =
         if (1 === this.Content.length || para_Run !== this.Content[this.Content.length - 2].Type)
         {
             var NewRun = new ParaRun(this);
+            NewRun.Set_Pr(this.TextPr.Value.Copy());
             this.Internal_Content_Add(this.Content.length - 1, NewRun);
         }
 
@@ -5605,7 +5606,8 @@ Paragraph.prototype =
                 this.Set_ParaContentPos(this.Get_StartPos(), true, -1, -1);
 
                 // Производим выделение нумерации
-                this.Parent.Document_SelectNumbering( NumPr );
+                this.Parent.Update_ConentIndexing();
+                this.Parent.Document_SelectNumbering(NumPr, this.Index);
             }
             else
             {
@@ -9496,8 +9498,8 @@ Paragraph.prototype =
         // Копируем настройки параграфа
         this.CopyPr( NewParagraph );
 
-        // Копируем последние настройки текста
-        var TextPr = this.Get_TextPr();
+        var TextPr = this.Get_TextPr(this.Get_EndPos(false));
+
         var NewRun = new ParaRun( NewParagraph );
         NewRun.Set_Pr( TextPr );
 
