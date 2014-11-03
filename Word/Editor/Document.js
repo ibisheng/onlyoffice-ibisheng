@@ -8808,6 +8808,8 @@ CDocument.prototype =
                 Para.Cursor_MoveToNearPos(NearPos);
                 Para.Selection_Remove();
 
+                var bAddEmptyPara = false;
+
                 if (true === Para.Cursor_IsEnd())
                 {
                     bConcatE = false;
@@ -8819,6 +8821,8 @@ CDocument.prototype =
                         if (type_Paragraph !== this.Content[DstIndex].Get_Type() || true !== this.Content[DstIndex].Is_Empty())
                             DstIndex++;
                     }
+                    else if (true === Elements[ElementsCount - 1].SelectedAll)
+                        bAddEmptyPara = true;
                 }
                 else if (true === Para.Cursor_IsStart())
                 {
@@ -8835,12 +8839,23 @@ CDocument.prototype =
                     ParaEIndex = DstIndex + 1;
                 }
 
+                if (true === bAddEmptyPara)
+                {
+                    // Создаем новый параграф
+                    var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+                    NewParagraph.Set_Pr(ParaS.Pr);
+                    NewParagraph.TextPr.Apply_TextPr(ParaS.TextPr.Value);
+                    this.Internal_Content_Add(DstIndex + 1, NewParagraph);
+                }
+
                 var StartIndex = 0;
                 if (true === bConcatS)
                 {
                     // Если мы присоединяем новый параграф, то и копируем все настройки параграфа (так делает Word)
                     ParaS.Concat(Elements[0].Element);
                     ParaS.Set_Pr(Elements[0].Element.Pr);
+                    ParaS.TextPr.Clear_Style();
+                    ParaS.TextPr.Apply_TextPr(Elements[0].Element.TextPr.Value);
 
                     StartIndex++;
 
@@ -8858,9 +8873,7 @@ CDocument.prototype =
                 if (true === bConcatE && StartIndex < EndIndex)
                 {
                     var _ParaE = Elements[ElementsCount - 1].Element;
-
                     var TempCount = _ParaE.Content.length - 1;
-
 
                     _ParaE.Select_All();
                     _ParaE.Concat(ParaE);

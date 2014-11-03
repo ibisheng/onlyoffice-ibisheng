@@ -7608,6 +7608,7 @@ CTable.prototype =
         this.Selection.Type2 = table_Selection_Common;
         this.Selection.StartPos.Pos = { Row : Pos.Row, Cell : Pos.Cell };
         this.Selection.EndPos.Pos   = { Row : Pos.Row, Cell : Pos.Cell };
+        this.Selection.CurRow = Pos.Row;
 
         // Устанавливаем найденную ячейку текущей и перемещаемся в контент ячейки по координатам X,Y
         this.CurCell = Cell;
