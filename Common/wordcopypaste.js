@@ -833,6 +833,9 @@ CopyProcessor.prototype =
                         break;
                 }
             }
+			//если меняется тип списка
+			if((bBullet && this.Ol.childNodes.length > 0) || (!bBullet && this.Ul.childNodes.length > 0))
+                this.CommitList(oDomTarget);
             var Li = document.createElement( "li" );
             Li.setAttribute("style", "list-style-type: " + sListStyle);
             Li.appendChild( this.Para );
