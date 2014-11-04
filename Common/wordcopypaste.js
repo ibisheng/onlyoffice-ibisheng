@@ -200,7 +200,10 @@ function Editor_Copy_Button(api, bCut)
 }
 function Editor_Copy(api, bCut)
 {
-    //todo ��������� �����
+    if(window.USER_AGENT_SAFARI_MACOS)
+		return;
+	
+	//todo ��������� �����
     //������� ������� ����� ����������� ����������
     var ElemToSelect = Editor_Copy_GetElem(api);
     ElemToSelect.style.display  = "block";
@@ -330,7 +333,81 @@ function Editor_Copy(api, bCut)
      var setStatus = window.clipboardData.setData('Text', 'This is not the text you copied, it was changed by the copy event handler');
      }
      */
-};
+}
+function Editor_Copy_Event(e, ElemToSelect)
+{
+	var api = editor;
+	var oWordControl = api.WordControl;
+	
+	if (oWordControl.m_oApi.IsLongActionCurrent)
+	{
+		e.preventDefault();
+		return;
+	}
+
+	if (oWordControl.TextBoxInputMode)
+	{
+		oWordControl.onKeyDownTBIM(e);
+		return;
+	}
+
+	if (false === oWordControl.m_oApi.bInit_word_control)
+	{
+		e.preventDefault();
+		return;
+	}
+
+	if (oWordControl.m_bIsRuler && oWordControl.m_oHorRuler.m_bIsMouseDown)
+	{
+		e.preventDefault();
+		return;
+	}
+
+	if (oWordControl.m_bIsMouseLock === true)
+	{
+		if (!window.USER_AGENT_MACOS)
+		{
+			e.preventDefault();
+			return;
+		}
+
+		// на масОс есть мега выделение на трекпаде. там моусАп приходит с задержкой.
+		// нужно лдибо копить команды клавиатуры, либо насильно заранее сделать моусАп самому.
+		// мы выбараем второе
+
+		oWordControl.onMouseUpExternal(global_mouseEvent.X, global_mouseEvent.Y);
+	}
+
+	if (oWordControl.IsFocus === false)
+	{
+		// некоторые команды нужно продолжать обрабатывать
+		if (!oWordControl.onKeyDownNoActiveControl(global_keyboardEvent))
+			return;
+	}
+
+	if (null == oWordControl.m_oLogicDocument)
+	{
+		var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+		if (false === bIsPrev)
+		{
+			e.preventDefault();
+		}
+		return;
+	}
+
+	if (oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
+		return;
+	
+	if(!ElemToSelect)
+		ElemToSelect = document.createElement("div");
+		
+	var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+	var sBase64 = oCopyProcessor.Start();
+	
+	e.clipboardData.setData("text/x-custom", sBase64);
+	e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
+	e.preventDefault();
+}
 function CopyProcessor(api, ElemToSelect, onlyBinaryCopy)
 {
 	this.api = api;
@@ -1696,6 +1773,8 @@ CopyProcessor.prototype =
 			if(this.ElemToSelect.children[0])
 				$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 		}
+		
+		return sBase64;
     },
 
 
@@ -2310,7 +2389,7 @@ function Body_Paste(api, e)
         var is_chrome = AscBrowser.isChrome;
         var sHtml = null;
 
-        var fPasteHtml = function(sHtml)
+        var fPasteHtml = function(sHtml, sBase64)
         {
             if(null != sHtml)
             {
@@ -2344,7 +2423,11 @@ function Body_Paste(api, e)
 					}
                 }
             }
-
+			else if(sBase64)
+			{
+				Editor_Paste_Exec(api, null, null, sBase64);
+			}
+			
             if(bExist)
             {
                 oWordControl.bIsEventPaste = true;
@@ -2367,9 +2450,19 @@ function Body_Paste(api, e)
 			}
 			return false;
 		}
-        if (fTest(e.clipboardData.types, "text/html"))
-        {
-            var sHtml = e.clipboardData.getData('text/html');
+		
+		
+		//TODO сделать тоже самое для xslxData
+		var sBase64 = e.clipboardData.getData("text/x-custom");
+		var html = e.clipboardData.getData("text/html");
+		if(sBase64 && sBase64 != '' && sBase64.indexOf("docData;") > -1)
+		{
+			fPasteHtml(null, sBase64);
+			return;
+		}
+		else if(html)
+		{
+			var sHtml = e.clipboardData.getData('text/html');
             //������ ��� ��������� ����� ������ �� Word � chrome ��������� ���������� ������� ����� </html>, �������� ��.
             var nIndex = sHtml.lastIndexOf("</html>");
             if(-1 != nIndex)
@@ -2447,10 +2540,10 @@ function Body_Paste(api, e)
         }
     }
 }
-function Editor_Paste_Exec(api, pastebin, nodeDisplay)
+function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
-    oPasteProcessor.Start(pastebin, nodeDisplay);
+    oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
 };
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
@@ -2898,8 +2991,11 @@ PasteProcessor.prototype =
                         if(false == oThis.bNested)
                         {
                             oThis.InsertInDocument();
-                            nodeDisplay.blur();
-                            nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+							if(nodeDisplay)
+							{
+								nodeDisplay.blur();
+								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+							}
                             if(aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
                         }
@@ -6683,33 +6779,44 @@ function Editor_CopyPaste_Create(api)
             if (window.GlobalPasteFlag)
                 window.GlobalPasteFlagCounter = 2;
         }
-    };
+    }
 
-    var TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
-    // не разобравшись не править!
-    // эти евенты приходят дважды. так как операции могут быть длительтными,
-    // то смотрится время окончания предыдущего и начало следующего евента
+	ElemToSelect.oncopy = function(e){
+		ElemToSelect.innerHTML = "";
+		Editor_Copy_Event(e, ElemToSelect);
+	}
+	
+	ElemToSelect.oncut = function(e){
+		ElemToSelect.innerHTML = "";
+		Editor_Copy_Event(e, ElemToSelect);
+		
+		api.WordControl.m_oLogicDocument.Remove(1, true, true);
+        api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+	}
 
     ElemToSelect["onbeforecut"] = function(e){
-        var _time = new Date().getTime();
-        if (_time - TIME_PREVIOS_ONBEFORE_EVENTS < 100)
-            return;
+        var selection = window.getSelection();
+		var rangeToSelect = document.createRange();
 
-        api.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        Editor_Copy(api,true);
+		ElemToSelect.innerHTML = "&nbsp;";
+		
+        rangeToSelect.selectNodeContents (ElemToSelect);
 
-        TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
-    };
+        selection.removeAllRanges ();
+        selection.addRange (rangeToSelect);
+    }
 
     ElemToSelect["onbeforecopy"] = function(e){
-        var _time = new Date().getTime();
-        if (_time - TIME_PREVIOS_ONBEFORE_EVENTS < 100)
-            return;
+		var selection = window.getSelection();
+		var rangeToSelect = document.createRange();
+		
+		ElemToSelect.innerHTML = "&nbsp;";
 
-        Editor_Copy(api,false);
+        rangeToSelect.selectNodeContents (ElemToSelect);
 
-        TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
-    };
+        selection.removeAllRanges ();
+        selection.addRange (rangeToSelect);
+    }
 
     document.body.appendChild( ElemToSelect );
 }
