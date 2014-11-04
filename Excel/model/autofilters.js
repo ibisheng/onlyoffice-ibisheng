@@ -308,6 +308,13 @@
 				{
 					if(success || isTurnOffHistory)
 					{
+						//TODO правка для того, чтобы срочно поправить критичные баги! пересмотреть!!!!!!!!!
+						if(addNameColumn)
+						{
+							ws.expandColsOnScroll(true);
+							ws.expandRowsOnScroll(true);
+						}
+						
 						if(isTurnOffHistory)
 							History.TurnOff();
 						History.Create_NewPoint();
@@ -5044,7 +5051,7 @@
 				{
 					this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 				}
-				else if((colStart >= startRangeCell && colStart <= endRangeCell && colEnd >= endRangeCell) || (colStart >= startRangeCell && colStart <= endRangeCell && colEnd > endRangeCell && val < 0))
+				else if((colStart > startRangeCell && colStart <= endRangeCell && colEnd >= endRangeCell &&  val > 0) || (colStart >= startRangeCell && colStart <= endRangeCell && colEnd > endRangeCell && val < 0))
 				{
 					if(val < 0)
 						valNew = colStart - endRangeCell - 1;
@@ -5052,7 +5059,7 @@
 						valNew = val;
 					this._editFilterAfterInsertColumn(range,valNew,colStart,type,activeCells);
 				}
-				else if(colStart < startRangeCell && colEnd > endRangeCell)
+				else if(colStart <= startRangeCell && colEnd > endRangeCell)
 				{
 					if(val < 0)
 					{
