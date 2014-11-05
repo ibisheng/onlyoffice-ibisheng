@@ -9502,12 +9502,17 @@ Paragraph.prototype =
 
         var TextPr = this.Get_TextPr(this.Get_EndPos(false));
 
-        var NewRun = new ParaRun( NewParagraph );
-        NewRun.Set_Pr( TextPr );
-
-        NewParagraph.Internal_Content_Add( 0, NewRun );
+        NewParagraph.Internal_Content_Add(0, new ParaRun(NewParagraph));
         NewParagraph.Correct_Content();
-        NewParagraph.Cursor_MoveToStartPos( false );
+        NewParagraph.Cursor_MoveToStartPos(false);
+
+        // Выставляем настройки у всех ранов
+        // TODO: Вообще рана тут 2, 1 который только что создали, второй с para_End. как избавимся от второго тут переделать.
+        for (var Pos = 0, Count = NewParagraph.Content.length; Pos < Count; Pos++)
+        {
+            if (para_Run === NewParagraph.Content[Pos].Type)
+                NewParagraph.Content[Pos].Set_Pr(TextPr);
+        }
 
         // Копируем настройки знака конца параграфа
         NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
