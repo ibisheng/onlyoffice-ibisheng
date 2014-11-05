@@ -9537,7 +9537,7 @@
 								History.Create_NewPoint();
 								History.StartTransaction();
 								if (range.addCellsShiftRight()) {
-									t._cleanCache(oChangeData.changedRange);
+									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertColumn(prop, arn);
 									t.cellCommentator.updateCommentsDependencies(true, val, arn);
@@ -9558,7 +9558,7 @@
 								History.Create_NewPoint();
 								History.StartTransaction();
 								if (range.addCellsShiftBottom()) {
-									t._cleanCache(oChangeData.changedRange);
+									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
 										t.autoFilters.insertRows(prop,arn);
 									t.cellCommentator.updateCommentsDependencies(true, val, arn);
