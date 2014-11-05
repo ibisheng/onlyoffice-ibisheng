@@ -4114,8 +4114,9 @@
 		 * @param {Asc.Range} range  description
 		 */
 		WorksheetView.prototype._calcCellsTextMetrics = function (range) {
+			var colsLength = this.cols.length;
 			if (range === undefined) {
-				range = new Asc.Range(0, 0, this.cols.length - 1, this.rows.length - 1);
+				range = new Asc.Range(0, 0, colsLength - 1, this.rows.length - 1);
 			}
 			var rowModel, rowCells, cellColl;
 			for (var row = range.r1; row <= range.r2; ++row) {
@@ -4127,7 +4128,7 @@
 				rowCells = rowModel.getCells();
 				for (cellColl in rowCells) {
 					cellColl = cellColl - 0;
-					if (this.width_1px > this.cols[cellColl].width) {continue;}
+					if (colsLength <= cellColl || this.width_1px > this.cols[cellColl].width) {continue;}
 
 					this._addCellTextToCache(cellColl, row);
 				}

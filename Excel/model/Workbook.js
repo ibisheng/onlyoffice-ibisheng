@@ -5080,7 +5080,7 @@ Range.prototype.setTableStyle=function(val){
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
-	if(c_oRangeType.All == nRangeType)
+	if(c_oRangeType.All == nRangeType || null === val)
 	{
 		//this.worksheet.getAllCol().setCellStyle(val);
 		fSetProperty = this._setPropertyNoEmpty;
