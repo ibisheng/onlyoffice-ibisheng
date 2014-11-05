@@ -4071,7 +4071,7 @@ CDocumentContent.prototype =
                 if (true === bAddEmptyPara)
                 {
                     // Создаем новый параграф
-                    var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+                    var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
                     NewParagraph.Set_Pr(ParaS.Pr);
                     NewParagraph.TextPr.Apply_TextPr(ParaS.TextPr.Value);
                     this.Internal_Content_Add(DstIndex + 1, NewParagraph);
