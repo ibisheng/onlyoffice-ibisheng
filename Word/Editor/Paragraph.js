@@ -9511,7 +9511,7 @@ Paragraph.prototype =
         for (var Pos = 0, Count = NewParagraph.Content.length; Pos < Count; Pos++)
         {
             if (para_Run === NewParagraph.Content[Pos].Type)
-                NewParagraph.Content[Pos].Set_Pr(TextPr);
+                NewParagraph.Content[Pos].Set_Pr(TextPr.Copy());
         }
 
         // Копируем настройки знака конца параграфа
