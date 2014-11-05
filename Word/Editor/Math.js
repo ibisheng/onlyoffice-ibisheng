@@ -1284,7 +1284,32 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
 
     if ( EndPos >= 1 )
     {
-      this.Root.Draw_HighLights(PDSH, false);
+        var Comm = PDSH.Save_Comm();
+        var Coll = PDSH.Save_Coll();
+
+        this.Root.Draw_HighLights(PDSH, false);
+
+        var CommFirst = PDSH.Comm.Get_Next();
+        var CollFirst = PDSH.Coll.Get_Next();
+
+        PDSH.Load_Comm(Comm);
+        PDSH.Load_Coll(Coll);
+
+        if (null !== CommFirst)
+        {
+            var CommentsCount = PDSH.Comments.length;
+            var CommentId     = ( CommentsCount > 0 ? PDSH.Comments[CommentsCount - 1] : null );
+            var CommentsFlag  = PDSH.CommentsFlag;
+
+            var Bounds = this.Root.Get_Bounds();
+            Comm.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
+        }
+
+        if (null !== CollFirst)
+        {
+            var Bounds = this.Root.Get_Bounds();
+            Coll.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, CollFirst.r, CollFirst.g, CollFirst.b);
+        }
     }
 };
 ParaMath.prototype.Draw_Elements = function(PDSE)

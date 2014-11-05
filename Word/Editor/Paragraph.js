@@ -12687,6 +12687,30 @@ CParagraphDrawStateHightlights.prototype =
                 break
             }
         }
+    },
+
+    Save_Coll : function()
+    {
+        var Coll = this.Coll;
+        this.Coll = new CParaDrawingRangeLines();
+        return Coll;
+    },
+
+    Save_Comm : function()
+    {
+        var Comm = this.Comm;
+        this.Comm = new CParaDrawingRangeLines();
+        return Comm;
+    },
+
+    Load_Coll : function(Coll)
+    {
+        this.Coll = Coll;
+    },
+
+    Load_Comm : function(Comm)
+    {
+        this.Comm = Comm;
     }
 };
 

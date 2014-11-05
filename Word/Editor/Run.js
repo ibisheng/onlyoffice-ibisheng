@@ -1202,7 +1202,7 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
 
             FontSize   = TextPr.FontSize;
 
-            if(null !== this.Parent && undefined !== this.Paragraph)
+            if(null !== this.Parent && undefined !== this.Parent && null !== this.Parent.ParaMath && undefined !== this.Parent.ParaMath)
                 TextPr.FontSize = this.Parent.ParaMath.ApplyArgSize(TextPr.FontSize, ArgSize.value);
         }
         else
