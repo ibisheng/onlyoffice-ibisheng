@@ -2371,9 +2371,9 @@
 							result = true;
 					}
 					//если выделенная область находится до а/ф
-					if(activeCells.c2 < tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2 /*&& (DeleteCellsAndShiftLeft || InsertCellsAndShiftRight)*/)
+					if(activeCells.c2 < tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2 && (DeleteCellsAndShiftLeft || InsertCellsAndShiftRight))
 						result = true;
-					else if(activeCells.r2 < tableRange.r1 && activeCells.c1 <= tableRange.c1 && activeCells.c2 >= tableRange.c2 /*&& (InsertCellsAndShiftDown || DeleteCellsAndShiftTop)*/)
+					else if(activeCells.r2 < tableRange.r1 && activeCells.c1 <= tableRange.c1 && activeCells.c2 >= tableRange.c2 && (InsertCellsAndShiftDown || DeleteCellsAndShiftTop))
 						result = true;
 				}
 
