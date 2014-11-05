@@ -2284,21 +2284,6 @@ function Binary_oMathWriter(memory, oMathPara)
 			this.memory.WriteBool(HideTop);
 		}
 	}
-	this.WriteMcJc = function(MJc)
-	{
-		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Byte);
-		var val = c_oAscXAlign.Left;
-		switch (MJc)
-		{
-			case MCJC_CENTER: 	val = c_oAscXAlign.Center; break;
-			case MCJC_INSIDE: 	val = c_oAscXAlign.Inside; break;
-			case MCJC_LEFT: 	val = c_oAscXAlign.Left; break;
-			case MCJC_OUTSIDE: 	val = c_oAscXAlign.Outside; break;
-			case MCJC_RIGHT: 	val = c_oAscXAlign.Right;
-		}
-		this.memory.WriteByte(val);
-	}
 	this.WriteLimLoc = function(LimLoc)
 	{
 		if (LimLoc != 1)
@@ -2399,30 +2384,22 @@ function Binary_oMathWriter(memory, oMathPara)
 		if (null != props.count)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Count, function(){oThis.WriteCount(props.count);});
 	}
-	this.WriteMcJc = function(McJc)
-	{
-		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
-		this.memory.WriteByte(c_oSerPropLenType.Byte);
-		var val = c_oAscXAlign.Center;
-		switch (McJc)
-		{
-			case MCJC_CENTER:	val = c_oAscXAlign.Center; break;
-			case MCJC_INSIDE:	val = c_oAscXAlign.Inside; break;
-			case MCJC_LEFT:		val = c_oAscXAlign.Left; break;
-			case MCJC_OUTSIDE:	val = c_oAscXAlign.Outside; break;
-			case MCJC_RIGHT:	val = c_oAscXAlign.Right; break;
-		}
-		this.memory.WriteByte(val);
-	}
+    this.WriteMcJc = function(MJc)
+    {
+        this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+        this.memory.WriteByte(c_oSerPropLenType.Byte);
+        this.memory.WriteByte(MJc);
+    }
 	this.WriteMcs = function(props)
 	{
 		var oThis = this;
-		for(var i = 0; i < props.mcs.length; i++)	
-			this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMc(props.mcs[i]);});
+		for(var Index = 0, Count = props.mcs.length; Index < Count; Index++)
+			this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMc(props.mcs[Index]);});
 	}
 	this.WriteMPr = function(props,oMatrix)
 	{
 		var oThis = this;
+
 		if (null != props.row)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Row, function(){oThis.WriteCount(props.row);});
 		if (null != props.baseJc)
