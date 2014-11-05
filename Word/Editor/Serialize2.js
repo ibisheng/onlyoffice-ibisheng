@@ -2403,22 +2403,28 @@ function Binary_oMathWriter(memory, oMathPara)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Byte);
-		var val = c_oAscLimLoc.SubSup;
-		switch (LimLoc)
+		var val = c_oAscXAlign.Center;
+		switch (McJc)
 		{
-			case NARY_SubSup: val = c_oAscLimLoc.SubSup; break;
-			case NARY_UndOvr: val = c_oAscLimLoc.UndOvr;
+			case MCJC_CENTER:	val = c_oAscXAlign.Center; break;
+			case MCJC_INSIDE:	val = c_oAscXAlign.Inside; break;
+			case MCJC_LEFT:		val = c_oAscXAlign.Left; break;
+			case MCJC_OUTSIDE:	val = c_oAscXAlign.Outside; break;
+			case MCJC_RIGHT:	val = c_oAscXAlign.Right; break;
 		}
+		this.memory.WriteByte(val);
 	}
 	this.WriteMcs = function(props)
 	{
 		var oThis = this;
-		for(var i = nStart; i < props.mc.length; i++)	
-			this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMc(props.mc[i]);});
+		for(var i = 0; i < props.mcs.length; i++)	
+			this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMc(props.mcs[i]);});
 	}
 	this.WriteMPr = function(props,oMatrix)
 	{
 		var oThis = this;
+		if (null != props.row)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Row, function(){oThis.WriteCount(props.row);});
 		if (null != props.baseJc)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BaseJc, function(){oThis.WriteBaseJc(props.baseJc);});
 		if (null != props.cGp)
@@ -2427,7 +2433,7 @@ function Binary_oMathWriter(memory, oMathPara)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.CGpRule, function(){oThis.WriteCGpRule(props.cGpRule);});
 		if (null != props.cSp)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.CSp, function(){oThis.WriteCSp(props.cSp);});
-		if (null != props.column || null != props.mcJc)
+		if (null != props.mcs)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Mcs, function(){oThis.WriteMcs(props);});
 		if (null != props.plcHide)
 			this.bs.WriteItem(c_oSer_OMathBottomNodesType.PlcHide, function(){oThis.WritePlcHide(props.plcHide);});
