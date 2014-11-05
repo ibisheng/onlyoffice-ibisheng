@@ -12362,8 +12362,17 @@ CDocument.prototype =
     Hyperlink_Add : function(HyperProps)
     {
         // Проверку, возможно ли добавить гиперссылку, должны были вызвать до этой функции
-        if ( null != HyperProps.Text && "" != HyperProps.Text && true === this.Is_SelectionUse() )
+        if (null != HyperProps.Text && "" != HyperProps.Text && true === this.Is_SelectionUse())
+        {
+            // Корректировка в данном случае пройдет при добавлении гиперссылки.
+            var SelectionInfo = this.Get_SelectedElementsInfo();
+            var Para = SelectionInfo.Get_Paragraph();
+            if (null !== Para)
+                HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
+
             this.Remove();
+            this.Selection_Remove();
+        }
 
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )

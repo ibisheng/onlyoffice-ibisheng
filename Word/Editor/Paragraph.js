@@ -5152,6 +5152,8 @@ Paragraph.prototype =
             var CurPos = ContentPos.Get(0);
 
             var TextPr = this.Get_TextPr(ContentPos);
+            if (undefined !== HyperProps.TextPr && null !== HyperProps.TextPr)
+                TextPr = HyperProps.TextPr;
 
             // Создаем гиперссылку
             var Hyperlink = new ParaHyperlink();
