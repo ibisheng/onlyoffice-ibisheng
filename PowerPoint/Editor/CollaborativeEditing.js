@@ -678,20 +678,21 @@ function CCollaborativeEditing()
         // Чтобы заново созданные параграфы не отображались залоченными
         g_oIdCounter.Set_Load( true );
 
-        // Применяем изменения, пока они есть
-        while ( this.m_aChanges.length > 0 )
+		// Применяем изменения, пока они есть
+		var _count = this.m_aChanges.length;
+		for (var i = 0; i < _count; i++)
         {
             if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"])
             {
                 if (!window["native"]["CheckNextChange"]())
                     break;
             }
-
-            var Changes = this.m_aChanges[0];
+        
+            var Changes = this.m_aChanges[i];
             Changes.Apply_Data();
-
-            this.m_aChanges.splice( 0, 1 );
         }
+		
+		this.m_aChanges = [];
 
         // У новых элементов выставляем указатели на другие классы
         this.Apply_LinkData();
