@@ -1829,18 +1829,16 @@ function Binary_oMathWriter(memory, oMathPara)
     this.bs = new BinaryCommonWriter(this.memory);
 	this.brPrs = new Binary_rPrWriter(this.memory);
 	
-	this.WriteMathElem = function(mathElem)
+	this.WriteMathElem = function(item)
 	{
 		var oThis = this;
-		var item = mathElem;
-		switch ( item.Type)
+		switch ( item.Type )
 		{
 			case para_Math_Composition:
 				{
 					switch (item.kind)
 					{
 						case MATH_ACCENT			: this.bs.WriteItem(c_oSer_OMathContentType.Acc, function(){oThis.WriteAcc(item);});			break;
-						case "ArgPr"				: this.bs.WriteItem(c_oSer_OMathContentType.ArgPr, function(){oThis.WriteArgPr(item);});		break;//нет обертки
 						case MATH_BAR				: this.bs.WriteItem(c_oSer_OMathContentType.Bar, function(){oThis.WriteBar(item);});			break;
 						case MATH_BORDER_BOX		: this.bs.WriteItem(c_oSer_OMathContentType.BorderBox, function(){oThis.WriteBorderBox(item);});break;
 						case MATH_BOX				: this.bs.WriteItem(c_oSer_OMathContentType.Box, function(){oThis.WriteBox(item);});			break;
@@ -1894,7 +1892,12 @@ function Binary_oMathWriter(memory, oMathPara)
 		{			
 			var oThis = this;
 			var nStart = 0;
-			var nEnd   = oElem.Content.length;		
+			var nEnd   = oElem.Content.length;
+			
+			var argSz = oElem.GetArgSize();
+			if (argSz)
+				this.bs.WriteItem(c_oSer_OMathContentType.ArgPr, function(){oThis.WriteArgPr(argSz);});
+			
 
 			for(var i = nStart; i <= nEnd - 1; i++)
 			{
@@ -1955,10 +1958,10 @@ function Binary_oMathWriter(memory, oMathPara)
 		this.memory.WriteByte(c_oSerPropLenType.Byte);
 		this.memory.WriteBool(AlnScr);
 	}
-	this.WriteArgPr = function(oArgPr)
+	this.WriteArgPr = function(nArgSz)
 	{
 		var oThis = this;
-		this.bs.WriteItem(c_oSer_OMathBottomNodesType.ArgSz, function(){oThis.WriteArgSz(oArgPr.argSz);});
+		this.bs.WriteItem(c_oSer_OMathBottomNodesType.ArgSz, function(){oThis.WriteArgSz(nArgSz);});
 	}
 	this.WriteArgSz = function(ArgSz)
 	{
