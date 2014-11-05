@@ -7592,7 +7592,7 @@ CTable.prototype =
             H = this.RowsInfo[EndPos.Row].H[CurPage];
 
             var Direction = 1;
-            if (this.Selection.StartPos.Row < this.Selection.EndPos.Row || (this.Selection.StartPos.Row === this.Selection.EndPos.Row && this.Selection.StartPos.Cell <= this.Selection.EndPos.Cell))
+            if (this.Selection.StartPos.Pos.Row < this.Selection.EndPos.Pos.Row || (this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell <= this.Selection.EndPos.Pos.Cell))
                 Direction = 1;
             else
                 Direction = -1;
