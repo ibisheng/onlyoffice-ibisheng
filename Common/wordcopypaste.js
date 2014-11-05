@@ -2747,6 +2747,11 @@ PasteProcessor.prototype =
                     oSelectedElement.SelectedAll = true;
                 oSelectedContent.Add(oSelectedElement);
             }
+			
+			//проверка на возможность втавки в формулу
+			if(!oDoc.Can_InsertContent(oSelectedContent, NearPos))
+				return;
+			
             oDoc.Insert_Content(oSelectedContent, NearPos);
 			
 			this._selectShapesBeforeInsert(aNewContent, oDoc);
