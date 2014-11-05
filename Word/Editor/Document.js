@@ -12210,6 +12210,7 @@ CDocument.prototype =
             case historyitem_Document_DefaultLanguage:
             {
                 this.Styles.Default.TextPr.Lang.Val = Data.Old;
+                this.Restart_CheckSpelling();
                 break;
             }
         }
@@ -12258,6 +12259,7 @@ CDocument.prototype =
             case historyitem_Document_DefaultLanguage:
             {
                 this.Styles.Default.TextPr.Lang.Val = Data.New;
+                this.Restart_CheckSpelling();
                 break;
             }
         }

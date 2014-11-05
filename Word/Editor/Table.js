@@ -1834,7 +1834,19 @@ CTable.prototype =
             if ( true === bSpacing )
             {
                 if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
-                    Cells_array = this.Selection.Data;
+                {
+                    Cells_array = [];
+                    for (var Index = 0, Count = this.Selection.Data.length; Index < Count; Index++)
+                    {
+                        var RowIndex  = this.Selection.Data[Index].Row;
+                        var CellIndex = this.Selection.Data[Index].Cell;
+
+                        var StartGridCol    = this.Content[RowIndex].Get_CellInfo(CellIndex).StartGridCol;
+                        var GridSpan        = this.Content[RowIndex].Get_Cell(CellIndex).Get_GridSpan();
+                        var TempCells_array = this.private_GetCellsPosArrayByCellsArray(this.private_GetMergedCells(RowIndex, StartGridCol, GridSpan));
+                        Cells_array = Cells_array.concat(TempCells_array);
+                    }
+                }
                 else if ( false === Props.CellSelect )
                 {
                     Cells_array = [];
@@ -1847,22 +1859,47 @@ CTable.prototype =
                             var Cell = Row.Get_Cell( CurCell );
                             if ( vmerge_Continue === Cell.Get_VMerge() )
                                 continue;
-                            Cells_array.push( { Cell : CurCell, Row : CurRow } );
+
+                            var StartGridCol = this.Content[CurRow].Get_CellInfo(CurCell).StartGridCol;
+                            var GridSpan     = this.Content[CurRow].Get_Cell(CurCell).Get_GridSpan();
+                            var TempCells_array = this.private_GetCellsPosArrayByCellsArray(this.private_GetMergedCells(CurRow, StartGridCol, GridSpan));
+
+                            Cells_array = Cells_array.concat(TempCells_array);
                         }
                     }
                 }
                 else
-                    Cells_array = [ { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index } ];
+                {
+                    var RowIndex     = this.CurCell.Row.Index;
+                    var CellIndex    = this.CurCell.Index;
+                    var StartGridCol = this.Content[RowIndex].Get_CellInfo(CellIndex).StartGridCol;
+                    var GridSpan     = this.Content[RowIndex].Get_Cell(CellIndex).Get_GridSpan();
+                    Cells_array      = this.private_GetCellsPosArrayByCellsArray(this.private_GetMergedCells(RowIndex, StartGridCol, GridSpan));
+                }
             }
             else
             {
                 if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
-                    Cells_array = this.Selection.Data;
+                {
+                    Cells_array = [];
+                    for (var Index = 0, Count = this.Selection.Data.length; Index < Count; Index++)
+                    {
+                        var RowIndex  = this.Selection.Data[Index].Row;
+                        var CellIndex = this.Selection.Data[Index].Cell;
+
+                        var StartGridCol    = this.Content[RowIndex].Get_CellInfo(CellIndex).StartGridCol;
+                        var GridSpan        = this.Content[RowIndex].Get_Cell(CellIndex).Get_GridSpan();
+                        var TempCells_array = this.private_GetCellsPosArrayByCellsArray(this.private_GetMergedCells(RowIndex, StartGridCol, GridSpan));
+                        Cells_array = Cells_array.concat(TempCells_array);
+                    }
+                }
                 else
                 {
-                    // TODO: Если данная ячейка имеет вертикальное объединение, тогда нам надо добавить
-                    //       все ячейки в него попадающие
-                    Cells_array = [ { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index } ];
+                    var RowIndex     = this.CurCell.Row.Index;
+                    var CellIndex    = this.CurCell.Index;
+                    var StartGridCol = this.Content[RowIndex].Get_CellInfo(CellIndex).StartGridCol;
+                    var GridSpan     = this.Content[RowIndex].Get_Cell(CellIndex).Get_GridSpan();
+                    Cells_array      = this.private_GetCellsPosArrayByCellsArray(this.private_GetMergedCells(RowIndex, StartGridCol, GridSpan));
                 }
             }
 
@@ -15028,11 +15065,11 @@ CTable.prototype =
                                 var Prev_GridSpan  = Prev_Cell.Get_GridSpan();
 
                                 // Если данная ячейка учавствует в вертикальном объединении,
-                                // тогда найдем левую верхнюю ячейку.
+                                // тогда найдем нижнюю ячейку.
 
                                 var Prev_VMerge = Prev_Cell.Get_VMerge();
                                 if ( vmerge_Continue === Prev_VMerge )
-                                    Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
+                                    Prev_Cell = this.Internal_Get_EndMergedCell(CurRow - 1, Prev_GridCol, Prev_GridSpan);
 
                                 var PrevBorders = Prev_Cell.Get_Borders();
 
@@ -15084,19 +15121,28 @@ CTable.prototype =
                     }
                 }
 
+                var CellBordersBottom = CellBorders.Bottom;
+                if (VMergeCount > 1)
+                {
+                    // Берем нижнюю границу нижней ячейки вертикального объединения.
+                    var BottomCell = this.Internal_Get_EndMergedCell(CurRow, CurGridCol, GridSpan);
+                    if (null !== BottomCell)
+                        CellBordersBottom = BottomCell.Get_Borders().Bottom;
+                }
+
                 if ( true === bSpacing_Bot )
                 {
-                    Cell.Set_BorderInfo_Bottom( [ CellBorders.Bottom ], -1, -1 );
+                    Cell.Set_BorderInfo_Bottom( [CellBordersBottom], -1, -1 );
 
-                    if ( border_Single === CellBorders.Bottom.Value && CellBorders.Bottom.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
-                        MaxBotBorder[CurRow + VMergeCount - 1] = CellBorders.Bottom.Size;
+                    if ( border_Single === CellBordersBottom.Value && CellBordersBottom.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
+                        MaxBotBorder[CurRow + VMergeCount - 1] = CellBordersBottom.Size;
                 }
                 else
                 {
                     if ( this.Content.length - 1 === CurRow + VMergeCount - 1 )
                     {
                         // Сравним границы
-                        var Result_Border = this.Internal_CompareBorders( TableBorders.Bottom, CellBorders.Bottom, true, false );
+                        var Result_Border = this.Internal_CompareBorders( TableBorders.Bottom, CellBordersBottom, true, false );
 
                         if ( border_Single === Result_Border.Value && Result_Border.Size > MaxBotBorder[CurRow + VMergeCount - 1] )
                             MaxBotBorder[CurRow + VMergeCount - 1] = Result_Border.Size;
@@ -15128,7 +15174,7 @@ CTable.prototype =
                         var BeforeCount = 0;
                         if ( CurGridCol <= Next_BeforeInfo.GridBefore - 1 )
                         {
-                            var Result_Border = this.Internal_CompareBorders( TableBorders.Left, CellBorders.Bottom, true, false );
+                            var Result_Border = this.Internal_CompareBorders( TableBorders.Left, CellBordersBottom, true, false );
                             BeforeCount = Math.min( Next_BeforeInfo.GridBefore - CurGridCol, GridSpan );
 
                             for ( var TempIndex = 0; TempIndex < BeforeCount; TempIndex++ )
@@ -15151,7 +15197,7 @@ CTable.prototype =
 
                             if ( CurGridCol + GridSpan - 1 >= StartAfterGrid )
                             {
-                                var Result_Border = this.Internal_CompareBorders( TableBorders.Right, CellBorders.Bottom, true, false );
+                                var Result_Border = this.Internal_CompareBorders( TableBorders.Right, CellBordersBottom, true, false );
                                 AfterCount = Math.min( CurGridCol + GridSpan - StartAfterGrid, GridSpan );
                                 for ( var TempIndex = 0; TempIndex < AfterCount; TempIndex++ )
                                     Border_Bottom_Info.push( Result_Border );
@@ -18637,6 +18683,117 @@ CTable.prototype =
 
             if ( false === bWasMerged )
                 break;
+        }
+
+        return Result;
+    },
+
+    // Получаем левую верхнюю ячейку в текущем объединении
+    Internal_Get_EndMergedCell : function(StartRow, StartGridCol, GridSpan)
+    {
+        var Result = null;
+        for (var Index = StartRow, Count = this.Content.length; Index < Count; Index++)
+        {
+            var Row = this.Content[Index];
+            var BeforeInfo = Row.Get_Before();
+            var CurGridCol = BeforeInfo.GridBefore;
+            var CurCell = 0;
+            var CellsCount = Row.Get_CellsCount();
+
+            var bWasMerged = false;
+            while (CurGridCol <= StartGridCol && CurCell < CellsCount)
+            {
+                var Cell = Row.Get_Cell( CurCell );
+                var CellGridSpan = Cell.Get_GridSpan();
+                var Vmerge = Cell.Get_VMerge();
+
+                if (CurGridCol === StartGridCol && GridSpan === CellGridSpan)
+                {
+                    if (vmerge_Continue === Vmerge || Index === StartRow)
+                    {
+                        bWasMerged = true;
+                        Result = Cell;
+                        break;
+                    }
+                    else
+                        return Result;
+                }
+                // Если данная ячейка имеет пересечение с заданным промежутком, но польностью с ним не совпадает
+                else if (CurGridCol <= StartGridCol + GridSpan - 1 && CurGridCol + CellGridSpan - 1 >= StartGridCol)
+                    break;
+
+                CurGridCol += CellGridSpan;
+                CurCell++;
+            }
+
+            if (false === bWasMerged)
+                break;
+        }
+
+        return Result;
+    },
+
+    // Получаем массив ячеек попадающих в заданное вертикальное объединение
+    private_GetMergedCells : function(RowIndex, StartGridCol, GridSpan)
+    {
+        // Сначала проверим данну строку
+        var Row = this.Content[RowIndex];
+        var CellIndex = this.Internal_Get_Cell_ByStartGridCol(RowIndex, StartGridCol);
+        if (-1 === CellIndex)
+            return [];
+
+        var Cell = Row.Get_Cell(CellIndex);
+        if (GridSpan !== Cell.Get_GridSpan())
+            return [];
+
+        var CellsArray = [Cell];
+
+        // Ищем ячейки вверх
+        for (var Index = RowIndex - 1; Index >= 0; Index--)
+        {
+            var CellIndex = this.Internal_Get_Cell_ByStartGridCol(Index, StartGridCol);
+            if (-1 === CellIndex)
+                break;
+
+            var Cell = this.Content[Index].Get_Cell(CellIndex);
+            if (GridSpan !== Cell.Get_GridSpan())
+                break;
+
+            CellsArray.splice(0, 0, Cell);
+
+            var Vmerge = Cell.Get_VMerge();
+            if (vmerge_Continue !== Vmerge)
+                break;
+        }
+
+        // Ищем ячейки вниз
+        for (var Index = RowIndex + 1, Count = this.Content.length; Index < Count; Index++)
+        {
+            var CellIndex = this.Internal_Get_Cell_ByStartGridCol(Index, StartGridCol);
+            if (-1 === CellIndex)
+                break;
+
+            var Cell = this.Content[Index].Get_Cell(CellIndex);
+            if (GridSpan !== Cell.Get_GridSpan())
+                break;
+
+            var Vmerge = Cell.Get_VMerge();
+            if (vmerge_Continue !== Vmerge)
+                break;
+
+            CellsArray.push(Cell);
+        }
+
+        return CellsArray;
+    },
+
+    private_GetCellsPosArrayByCellsArray : function(CellsArray)
+    {
+        var Result = [];
+        for (var Index = 0, Count = CellsArray.length; Index < Count; Index++)
+        {
+            var Cell = CellsArray[Index];
+            Result.push({Cell : Cell.Index, Row : Cell.Row.Index});
         }
 
         return Result;
