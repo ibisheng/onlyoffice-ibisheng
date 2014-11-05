@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+var gUndoInsDelCellsFlag = true;
 (	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
@@ -1851,7 +1851,9 @@
 					return;
 				if(cloneData.insCells)
 					delete cloneData.insCells;
-
+				
+				gUndoInsDelCellsFlag = false;
+				
 				if(cloneData.refTable)
 				{
 					if(aWs.TableParts)

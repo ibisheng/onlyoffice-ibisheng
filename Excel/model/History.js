@@ -286,6 +286,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
                     }
                 }
             }
+			gUndoInsDelCellsFlag = true;
 		}
 		//синхронизация index и id worksheet
 		if (oRedoObjectParam.bUpdateWorksheetByModel)

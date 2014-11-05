@@ -3020,7 +3020,8 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell", range, operType);
+			if(gUndoInsDelCellsFlag)
+				worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell", range, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
@@ -3058,7 +3059,8 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range, operType);
+			if(gUndoInsDelCellsFlag)
+				worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
@@ -3096,7 +3098,8 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range.bbox, operType);
+			if(gUndoInsDelCellsFlag)
+				worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
@@ -3134,7 +3137,8 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell",range.bbox, operType);
+			if(gUndoInsDelCellsFlag)
+				worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell",range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_Sort == Type)
