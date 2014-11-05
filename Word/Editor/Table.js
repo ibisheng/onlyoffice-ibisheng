@@ -16326,6 +16326,9 @@ CTable.prototype =
                 this.RowsInfo[CurRow].FirstPage = bContentOnFirstPage;
             }
 
+            // Выставляем так, чтобы высота была равна 0
+            if (true !== this.RowsInfo[CurRow].FirstPage && CurPage === this.RowsInfo[CurRow].StartPage)
+                this.TableRowsBottom[CurRow][CurPage] = Y;
 
             // Здесь мы выставляем только начальную координату строки (для каждой страницы)
             // высоту строки(для каждой страницы) мы должны обсчитать после общего цикла, т.к.
@@ -16436,15 +16439,16 @@ CTable.prototype =
                 if ( CellPageIndex >= Cell.PagesCount )
                     continue;
 
+                // Рассчитаем имеющуюся в распоряжении высоту ячейки
+                var TempCurRow = Cell.Row.Index;
+
                 // Для прилегания к верху или для второй страницы ничего не делаем (так изначально рассчитывалось)
-                if ( vertalignjc_Top === VAlign || CellPageIndex > 1 || (1 === CellPageIndex && true === this.RowsInfo[CurRow].FirstPage ) )
+                if ( vertalignjc_Top === VAlign || CellPageIndex > 1 || (1 === CellPageIndex && true === this.RowsInfo[TempCurRow].FirstPage ) )
                 {
                     Cell.Temp.Y_VAlign_offset[CellPageIndex] = 0;
                     continue;
                 }
 
-                // Рассчитаем имеющуюся в распоряжении высоту ячейки
-                var TempCurRow = Cell.Row.Index;
                 var TempCellSpacing = this.Content[TempCurRow].Get_CellSpacing();
                 var Y_0 = this.RowsInfo[TempCurRow].Y[CurPage];
 
