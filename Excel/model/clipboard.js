@@ -272,63 +272,21 @@
 				
 				if(text == false)
 					return;
+				
+				if(window.USER_AGENT_SAFARI_MACOS && !worksheet.isCellEditMode)
+				{
+					this._startCopyOrPaste();
 					
-				this._startCopyOrPaste();
-				//исключения для opera в случае копирования пустой html
-				if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && AscBrowser.isOpera)
-					$(text).find('td')[0].innerHTML = '&nbsp;';
-				t.element.appendChild(text);
-				
-				if(!copyPasteUseBinary)
-				{
-					t.copyText = t._getTextFromTable(t.element.children[0]);
-					var randomVal = Math.floor(Math.random()*10000000);
-					t.copyText.pasteFragment = "pasteFragment_" + randomVal;
-					if(text)
-						$(text).addClass("pasteFragment_" + randomVal);
-				}
-				
-
-				if($(text).find('img')[0] && AscBrowser.isOpera)
-				{
-					$(text)[0].innerHTML = "<tr><td>&nbsp;</td></tr>";
-					if(t.copyText.isImage)
-						t.copyText.text = ' ';
-				}
-				History.TurnOff();
-				
-				//use binary strings
-				if(copyPasteUseBinary)
-				{	
+					this.element.appendChild(text);
+					
+					History.TurnOff();
+					var sBase64 = this._getBinaryForCopy(worksheet);
+					
 					if(isIntoShape)
+						sBase64 = null;
+					
+					if(sBase64)
 					{
-						this.lStorage = {};
-						this.lStorage.htmlInShape = text;
-					}	
-					else
-					{
-						var fullUrl = this._getUseFullUrl();
-						window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
-						
-						//TODO стоит убрать заглушку при правке бага с activeRange
-						var cloneActiveRange = worksheet.activeRange.clone();
-						var temp;
-						if(cloneActiveRange.c1 > cloneActiveRange.c2)
-						{
-							temp = cloneActiveRange.c1;
-							cloneActiveRange.c1 = cloneActiveRange.c2;
-							cloneActiveRange.c2 = temp;
-						};
-						
-						if(cloneActiveRange.r1 > cloneActiveRange.r2)
-						{
-							temp = cloneActiveRange.r1;
-							cloneActiveRange.r1 = cloneActiveRange.r2;
-							cloneActiveRange.r2 = temp;
-						};
-						
-						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
-						var sBase64 = oBinaryFileWriter.Write();
 						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
@@ -339,19 +297,102 @@
 						
 						//for buttons copy/paste
 						this.lStorage = sBase64;
-						
-						window.global_pptx_content_writer.End_UseFullUrl()
 					}
-				};
-							
-				History.TurnOn();
-				
-				if(AscBrowser.isMozilla)
-					t._selectElement(t._getStylesSelect);
+					
+					History.TurnOn();
+					this._endCopyOrPaste();
+					
+					return sBase64;
+				}
 				else
-					t._selectElement();
+				{
+					this._startCopyOrPaste();
+					//исключения для opera в случае копирования пустой html
+					if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && AscBrowser.isOpera)
+						$(text).find('td')[0].innerHTML = '&nbsp;';
+					t.element.appendChild(text);
+					
+					if(!copyPasteUseBinary)
+					{
+						t.copyText = t._getTextFromTable(t.element.children[0]);
+						var randomVal = Math.floor(Math.random()*10000000);
+						t.copyText.pasteFragment = "pasteFragment_" + randomVal;
+						if(text)
+							$(text).addClass("pasteFragment_" + randomVal);
+					}
+					
+
+					if($(text).find('img')[0] && AscBrowser.isOpera)
+					{
+						$(text)[0].innerHTML = "<tr><td>&nbsp;</td></tr>";
+						if(t.copyText.isImage)
+							t.copyText.text = ' ';
+					}
+					History.TurnOff();
+					
+					//use binary strings
+					if(copyPasteUseBinary)
+					{	
+						if(isIntoShape)
+						{
+							this.lStorage = {};
+							this.lStorage.htmlInShape = text;
+						}	
+						else
+						{
+							var sBase64 = this._getBinaryForCopy(worksheet);
+							if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+							{
+								$(this.element.children[0]).css("font-weight", "normal");
+								$(this.element.children[0]).wrap(document.createElement("b"));
+							}
+							if(this.element.children[0])
+								$(this.element.children[0]).addClass("xslData;" + sBase64);
+							
+							//for buttons copy/paste
+							this.lStorage = sBase64;
+						}
+					}
+								
+					History.TurnOn();
+					
+					if(AscBrowser.isMozilla)
+						t._selectElement(t._getStylesSelect);
+					else
+						t._selectElement();
+					
+					this._endCopyOrPaste();
+				}
+			},
+			
+			_getBinaryForCopy: function(worksheet)
+			{
+				var fullUrl = this._getUseFullUrl();
+				window.global_pptx_content_writer.Start_UseFullUrl(fullUrl);
 				
-				this._endCopyOrPaste();
+				//TODO стоит убрать заглушку при правке бага с activeRange
+				var cloneActiveRange = worksheet.activeRange.clone();
+				var temp;
+				if(cloneActiveRange.c1 > cloneActiveRange.c2)
+				{
+					temp = cloneActiveRange.c1;
+					cloneActiveRange.c1 = cloneActiveRange.c2;
+					cloneActiveRange.c2 = temp;
+				};
+				
+				if(cloneActiveRange.r1 > cloneActiveRange.r2)
+				{
+					temp = cloneActiveRange.r1;
+					cloneActiveRange.r1 = cloneActiveRange.r2;
+					cloneActiveRange.r2 = temp;
+				};
+				
+				var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
+				var sBase64 = oBinaryFileWriter.Write();
+				
+				window.global_pptx_content_writer.End_UseFullUrl();
+				
+				return sBase64;
 			},
 			
 
@@ -817,7 +858,10 @@
 			},
 			
             _editorPaste: function (worksheet,callback) {
-                var t = this;
+                if(window.USER_AGENT_SAFARI_MACOS)
+					return;
+					
+				var t = this;
 				window.GlobalPasteFlagCounter = 1;
 				isTruePaste = false;
                 var is_chrome = AscBrowser.isChrome;
@@ -1096,7 +1140,7 @@
                         if(-1 != nIndex)
                             sHtml = sHtml.substring(0, nIndex + "</html>".length);
                     }
-                    else if (is_chrome && fTest(e.clipboardData.types, "text/plain"))
+                    else if (fTest(e.clipboardData.types, "text/plain"))
                     {
                         bExist = true;
                         var sText = e.clipboardData.getData('text/plain');
@@ -5235,6 +5279,22 @@ function SafariIntervalFocus2()
     }
 }
 
+function Editor_Copy_Event_Excel(e, ElemToSelect, isCut)
+{	
+	var api = window["Asc"]["editor"];
+	var wb = api.wb;
+	var ws = wb.getWorksheet();
+	
+	var sBase64 = wb.clipboard.copyRange(ws.getSelectedRange(), ws, isCut, true);
+	
+	if(isCut)
+		ws.emptySelection(c_oAscCleanOptions.All);
+	
+	if(sBase64)
+		e.clipboardData.setData("text/x-custom", sBase64);
+	e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
+}
+
 function Editor_CopyPaste_Create2(api)
 {
     var ElemToSelect = document.createElement("div");
@@ -5261,43 +5321,69 @@ function Editor_CopyPaste_Create2(api)
 
     ElemToSelect.style.lineHeight = "1px";
 
-    ElemToSelect["onpaste"] = function(e){
-		if (!window.GlobalPasteFlag)
-				return;
+    ElemToSelect.oncopy = function(e){
+		var api = window["Asc"]["editor"];
+		if(api.controller.isCellEditMode)
+			return;
+		
+		Editor_Copy_Event_Excel(e, ElemToSelect);
+		e.preventDefault();
+	}
+	
+	ElemToSelect.oncut = function(e){
+		var api = window["Asc"]["editor"];
+		if(api.controller.isCellEditMode)
+			return;
+		
+		Editor_Copy_Event_Excel(e, ElemToSelect, true);
+		e.preventDefault();
+	}
+	
+	ElemToSelect.onpaste = function(e){
+		var api = window["Asc"]["editor"];
+		var wb = api.wb;
+		var ws = wb.getWorksheet();
+	
+		wb.clipboard._bodyPaste(ws,e);
+		e.preventDefault();
+	}
 
-        // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
-        if (window.GlobalPasteFlagCounter == 1)
-        {
-            api.wb.clipboard._bodyPaste(api.wb.getWorksheet(), e);
-			if (window.GlobalPasteFlag)
-				window.GlobalPasteFlagCounter = 2;
-        }
-    };
+    ElemToSelect["onbeforecut"] = function(e){
+        var api = window["Asc"]["editor"];
+		if(api.controller.isCellEditMode)
+			return;
+		
+		var selection = window.getSelection();
+		var rangeToSelect = document.createRange();
+
+		ElemToSelect.innerText = "&nbsp";
+		
+        rangeToSelect.selectNodeContents (ElemToSelect);
+
+        selection.removeAllRanges ();
+        selection.addRange (rangeToSelect);
+    }
 
     ElemToSelect["onbeforecopy"] = function(e){
-		var ws = api.wb.getWorksheet();
-		if(!ws.isCellEditMode)
-			api.wb.clipboard.copyRange(ws.getSelectedRange(), ws);
-    };
-	
-	ElemToSelect["onbeforecut"] = function(e){
-		if(!api.isCellEdited)
-		{
-			var ws = api.wb.getWorksheet();
-			api.wb.clipboard.copyRange(ws.getSelectedRange(), ws);
-			if(isNeedEmptyAfterCut)
-			{
-				isNeedEmptyAfterCut = false;
-				ws.emptySelection(c_oAscCleanOptions.All);
-			}
-			else
-				isNeedEmptyAfterCut = true;		
-		}
-    };
+		var api = window["Asc"]["editor"];
+		if(api.controller.isCellEditMode)
+			return;
+		
+		var selection = window.getSelection();
+		var rangeToSelect = document.createRange();
+		
+		ElemToSelect.innerText = "&nbsp";
 
+        rangeToSelect.selectNodeContents (ElemToSelect);
+
+        selection.removeAllRanges ();
+        selection.addRange (rangeToSelect);
+    }
+	
     document.body.appendChild( ElemToSelect );
 	
-	//для редактора ячейки
+	
+	//******для редактора ячейки
 	var elementText = document.createElement("textarea");
 
 	elementText.id = kElementTextId;
