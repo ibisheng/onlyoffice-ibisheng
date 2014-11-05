@@ -4010,8 +4010,29 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
         var Element = AutoCorrectionEngine.Elements[CurPos];
         if (undefined === Element.Text)
             TempElements.splice(0, 0, Element);
+		else if ('(' === Element.Text)
+			TempElements.splice(0, 0, Element);
+		else if (')' === Element.Text)
+			TempElements.splice(0, 0, Element);
         else if ('/' === Element.Text)
         {
+			AutoCorrectionEngine.Type = MATH_FRACTION;
+            CurPos--;
+            break;
+        }
+		else if  ('^' === Element.Text)
+		{
+			TempElements.Type = DEGREE_SUPERSCRIPT;
+			AutoCorrectionEngine.Kind = DEGREE_SUPERSCRIPT;
+			AutoCorrectionEngine.Type = MATH_DEGREE;
+            CurPos--;
+            break;
+        }
+		else if  ('_' === Element.Text)
+		{
+			TempElements.Type = DEGREE_SUBSCRIPT;
+			AutoCorrectionEngine.Kind = DEGREE_SUBSCRIPT;
+			AutoCorrectionEngine.Type = MATH_DEGREE;
             CurPos--;
             break;
         }
@@ -4029,6 +4050,31 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
         var Element = AutoCorrectionEngine.Elements[CurPos];
         if (undefined === Element.Text)
             TempElements2.splice(0, 0, Element);
+		else if ('(' === Element.Text)
+			TempElements2.splice(0, 0, Element);
+		else if (')' === Element.Text)
+			TempElements2.splice(0, 0, Element);
+		else if  ('_' === Element.Text)
+		{
+			if (TempElements2.length == 0)
+				break;
+			TempElements2.Type = DEGREE_SUBSCRIPT;
+			AutoCorrectionEngine.Kind = DEGREE_SubSup;
+			AutoCorrectionEngine.Type = MATH_DEGREESubSup;
+            CurPos--;
+            break;
+        }
+		else if  ('^' === Element.Text)
+		{
+			if (TempElements2.length == 0)
+				break;
+			
+			TempElements2.Type = DEGREE_SUPERSCRIPT;
+			AutoCorrectionEngine.Kind = DEGREE_SubSup;
+			AutoCorrectionEngine.Type = MATH_DEGREESubSup;
+            CurPos--;
+            break;
+        }
         else if (g_aMathAutoCorrectTriggerCharCodes[Element.Text.charCodeAt(0)])
             break;
         else
@@ -4037,48 +4083,119 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
         CurPos--;
     }
 
-    if (TempElements2.length > 0)
-    {
-        var Fraction = new CFraction(new CMathFractionPr());
+	var TempElements3 = [];
+	if (AutoCorrectionEngine.Type == MATH_DEGREESubSup)
+	{
+		 while (CurPos >= 0)
+		{
+			var Element = AutoCorrectionEngine.Elements[CurPos];
+			if (undefined === Element.Text)
+				TempElements3.splice(0, 0, Element);
+			else if (g_aMathAutoCorrectTriggerCharCodes[Element.Text.charCodeAt(0)])
+				break;
+			else
+				TempElements3.splice(0, 0, Element);
 
-        var DenMathContent = Fraction.Content[0];
-        var NumMathContent = Fraction.Content[1];
+			CurPos--;
+		}
+	}
+	
+	if (AutoCorrectionEngine.Type == MATH_FRACTION)
+	{
+		if (TempElements2.length > 0)
+		{
+			var Fraction = new CFraction(new CMathFractionPr());
 
-        for (var nPos = 0; nPos < TempElements2.length; nPos++)
-        {
-            if (undefined === TempElements2[nPos].Text)
-                DenMathContent.Internal_Content_Add(nPos, TempElements2[nPos].Element);
-            else
-            {
-                var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
-                var MathText = new CMathText();
-                MathText.add(TempElements2[nPos].Text.charCodeAt(0));
-                MathRun.Add_ToContent(nPos, MathText);
-                DenMathContent.Internal_Content_Add(nPos, MathRun);
-            }
-        }
+			var DenMathContent = Fraction.Content[0];
+			var NumMathContent = Fraction.Content[1];
 
-        for (var nPos = 0; nPos < TempElements.length; nPos++)
-        {
-            if (undefined === TempElements[nPos].Text)
-                NumMathContent.Internal_Content_Add(nPos, TempElements[nPos]);
-            else
-            {
-                var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
-                var MathText = new CMathText();
-                MathText.add(TempElements[nPos].Text.charCodeAt(0));
-                MathRun.Add_ToContent(nPos, MathText);
-                NumMathContent.Internal_Content_Add(nPos, MathRun);
-            }
-        }
+			this.PackTextToContent(DenMathContent, TempElements2);
+			this.PackTextToContent(NumMathContent, TempElements);	
 
-        AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
-        AutoCorrectionEngine.ReplaceContent.push(Fraction);
+			AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+			AutoCorrectionEngine.ReplaceContent.push(Fraction);
 
-        return true;
-    }
+			return true;
+		}
+	}
+	else if (AutoCorrectionEngine.Type == MATH_DEGREE)
+	{
+		//if (TempElements2.length > 0)
+		//{
+			var props = new CMathDegreePr();
+			props.type = AutoCorrectionEngine.Kind;
+			var oDegree = new CDegree(props)
+
+			var BaseContent = oDegree.Content[0];
+			var IterContent = oDegree.Content[1];
+
+			this.PackTextToContent(BaseContent, TempElements2);	
+			this.PackTextToContent(IterContent, TempElements);			
+
+			AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+			AutoCorrectionEngine.ReplaceContent.push(oDegree);
+
+			return true;
+		//}
+	}
+	else if (AutoCorrectionEngine.Type == MATH_DEGREESubSup)
+	{
+		if (TempElements2.length > 0 || TempElements3.length > 0)
+		{
+			var props = new CMathDegreePr();
+			props.type = AutoCorrectionEngine.Kind;
+			var oDegree = new CDegreeSubSup(props)
+
+			var BaseContent = oDegree.Content[0];
+			var IterUpContent = oDegree.Content[1];
+			var IterDnContent = oDegree.Content[2];
+			
+			if (TempElements.Type == DEGREE_SUPERSCRIPT)
+			{
+				this.PackTextToContent(IterUpContent, TempElements2);
+				this.PackTextToContent(IterDnContent, TempElements);
+			}
+			else if (TempElements.Type == DEGREE_SUBSCRIPT)
+			{
+				this.PackTextToContent(IterUpContent, TempElements);
+				this.PackTextToContent(IterDnContent, TempElements2);
+			}
+			
+			this.PackTextToContent(BaseContent, TempElements3);			
+			
+			AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
+			AutoCorrectionEngine.ReplaceContent.push(oDegree);
+
+			return true;
+		}
+	}
 
     return false;
+};
+CMathContent.prototype.PackTextToContent = function(Element, TempElements)
+{
+	var len = TempElements.length;
+	if (len > 1)	
+		if (TempElements[0].Text === '(' && TempElements[len-1].Text === ')')
+		{
+			TempElements.splice(len-1,1);
+			TempElements.splice(0,1);
+			len -= 2 ;
+		}
+	
+	for (var nPos = 0; nPos < len; nPos++)
+	{
+		if (undefined === TempElements[nPos].Text)
+			Element.Internal_Content_Add(nPos, TempElements[nPos].Element);
+		else
+		{
+			var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+			var MathText = new CMathText();
+			MathText.add(TempElements[nPos].Text.charCodeAt(0));
+			MathRun.Add_ToContent(nPos, MathText);
+			Element.Internal_Content_Add(nPos, MathRun);
+		}
+	}
 };
 
 function CMathAutoCorrectEngine(Element)
@@ -4087,6 +4204,8 @@ function CMathAutoCorrectEngine(Element)
     this.Elements       = [];
 
     this.CollectText    = true;
+	this.Type			= null;
+	this.Kind			= null;
 
     this.RemoveCount    = 0;
     this.ReplaceContent = [];
