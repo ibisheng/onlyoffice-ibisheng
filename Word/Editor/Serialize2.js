@@ -2306,8 +2306,8 @@ function Binary_oMathWriter(memory, oMathPara)
 		var oLim  = oLimLow.getIterator();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteLimLowPr(oLimLow);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodes(oLim);});
+		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});		
 	}
 	this.WriteLimLowPr = function(oLimLow)
 	{
@@ -2322,8 +2322,8 @@ function Binary_oMathWriter(memory, oMathPara)
 		var oLim  = oLimUpp.getIterator();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.LimUppPr, function(){oThis.WriteLimUppPr(oLimUpp);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteArgNodes(oLim);});
+		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});		
 	}
 	this.WriteLimUppPr = function(oLimUpp)
 	{
@@ -2442,9 +2442,9 @@ function Binary_oMathWriter(memory, oMathPara)
 		var props = oNary.getPropsForWrite();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.NaryPr, function(){oThis.WriteNaryPr(props, oNary);});
-		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Sub, function(){oThis.WriteArgNodes(oSub);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Sup, function(){oThis.WriteArgNodes(oSup);});
+		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteArgNodes(oElem);});		
 	}
 	this.WriteNaryPr = function(props,oNary)
 	{
