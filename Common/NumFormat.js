@@ -3262,7 +3262,7 @@ FormatParser.prototype =
 		        oDataType = oDataTypes.digit;
 		    else if(" " == sChar)
 		        oDataType = oDataTypes.space;
-		    else if ("/" == sChar || "." == sChar || "-" == sChar || ":" == sChar || cultureInfo.DateSeparator == sChar || cultureInfo.TimeSeparator == sChar)
+		    else if ("/" == sChar || "-" == sChar || ":" == sChar || cultureInfo.DateSeparator == sChar || cultureInfo.TimeSeparator == sChar)
 		        oDataType = oDataTypes.delimiter;
 		    else
 		        oDataType = oDataTypes.letter;
