@@ -1617,7 +1617,7 @@ function ScrollObject( elemID, settings, dbg ) {
             px[i++] = b;
             px[i++] = 255;
             i = ( i % k === 0 ) ? i + k : i
-        }_
+        }
 
         ctx_piperImg.putImageData( _data, 0, 0 )
 
