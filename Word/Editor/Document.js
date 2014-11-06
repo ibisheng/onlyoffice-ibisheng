@@ -13889,11 +13889,24 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
     var RealX = NewCursorPos.X;
     var RealY = NewCursorPos.Y;
 
+    var CurPara = this.Get_CurrentParagraph();
+
     if (bUpdateX)
+    {
         this.CurPos.RealX = RealX;
 
+        if (null !== CurPara)
+            CurPara.CurPos.RealX = RealX;
+    }
+
     if (bUpdateY)
+    {
         this.CurPos.RealY = RealY;
+
+        if (null !== CurPara)
+            CurPara.CurPos.RealY = RealY;
+    }
+
 };
 CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelect)
 {

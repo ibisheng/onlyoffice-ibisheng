@@ -6617,10 +6617,14 @@ Paragraph.prototype =
         var ParaPr = this.Get_CompiledPr2(false).ParaPr;
         var NumPr_old = this.Numbering_Get();
 
-        this.Numbering_Remove();
-
         var SelectionUse       = this.Is_SelectionUse();
         var SelectedOneElement = (this.Parent.Selection_Is_OneElement() === 0 ? true : false );
+
+        // Когда выделено больше 1 параграфа, нумерация не добавляется к пустым параграфам.
+        if (true === SelectionUse && true !== SelectedOneElement && true === this.Is_Empty())
+            return;
+
+        this.Numbering_Remove();
 
         // Рассчитаем количество табов, идущих в начале параграфа
         var TabsCounter = new CParagraphTabsCounter();
