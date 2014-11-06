@@ -1236,6 +1236,21 @@ CDocumentContent.prototype =
 
         return AllComments;
     },
+
+    Get_AllMaths : function(AllMaths)
+    {
+        if ( undefined === AllMaths )
+            AllMaths = [];
+
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            Item.Get_AllMaths( AllMaths );
+        }
+
+        return AllMaths;
+    },
     
     Get_AllFloatElements : function(FloatObjs)
     {

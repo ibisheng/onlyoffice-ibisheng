@@ -106,6 +106,11 @@ ParaMath.prototype.Set_Paragraph = function(Paragraph)
     this.Paragraph = Paragraph;
 };
 
+ParaMath.prototype.Get_Text = function(Text)
+{
+    Text.Text = null;
+};
+
 ParaMath.prototype.Is_Empty = function()
 {
     if (this.Root.Content.length <= 0)
@@ -493,6 +498,11 @@ ParaMath.prototype.Get_AllFontNames = function(AllFonts)
     AllFonts["Cambria Math"] = true;
 
     this.Root.Get_AllFontNames(AllFonts);
+};
+
+ParaMath.prototype.Get_SelectedElementsInfo = function(Info)
+{
+    Info.Set_Math(this);
 };
 
 ParaMath.prototype.Get_SelectedText = function(bAll, bClearText)

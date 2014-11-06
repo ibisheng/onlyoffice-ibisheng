@@ -82,9 +82,11 @@ function CSelectedContent()
     
     this.DrawingObjects = [];
     this.Comments       = [];
+    this.Maths          = [];
     
     this.HaveShape   = false;
     this.MoveDrawing = false; // Только для переноса автофигур
+    this.HaveMath    = false;
 }
 
 CSelectedContent.prototype =
@@ -119,7 +121,10 @@ CSelectedContent.prototype =
             var Element = this.Elements[Pos].Element;
             Element.Get_AllDrawingObjects(this.DrawingObjects);
             Element.Get_AllComments(this.Comments);
+            Element.Get_AllMaths(this.Maths);
         }
+
+        this.HaveMath = (this.Maths.length > 0 ? true : false);
 
         // Относительно картинок нас интересует только наличие автофигур с текстом.
         Count = this.DrawingObjects.length;
@@ -665,6 +670,7 @@ function CSelectedElementsInfo()
     this.m_nDrawing        = selected_None;
     this.m_pParagraph      = null;  // Параграф, в котором находится выделение
     this.m_oMath           = null;  // Формула, в которой находится выделение
+    this.m_oHyperlink      = null;  // Гиперссылка, в которой находится выделение
 
     this.Reset = function()
     {
@@ -684,6 +690,11 @@ function CSelectedElementsInfo()
         this.m_oMath = Math;
     };
 
+    this.Set_Hyperlink = function(Hyperlink)
+    {
+        this.m_oHyperlink = Hyperlink;
+    };
+
     this.Get_Paragraph = function()
     {
         return this.m_pParagraph;
@@ -692,6 +703,11 @@ function CSelectedElementsInfo()
     this.Get_Math = function()
     {
         return this.m_oMath;
+    };
+
+    this.Get_Hyperlink = function()
+    {
+        return this.m_oHyperlink;
     };
 
     this.Set_Table = function()

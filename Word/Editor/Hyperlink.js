@@ -152,6 +152,18 @@ ParaHyperlink.prototype.Is_StartFromNewLine = function()
     return this.Content[0].Is_StartFromNewLine();
 };
 
+ParaHyperlink.prototype.Get_SelectedElementsInfo = function(Info)
+{
+    Info.Set_Hyperlink(this);
+
+    var Selection = this.State.Selection;
+
+    if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].Get_SelectedElementsInfo)
+        this.Content[Selection.EndPos].Get_SelectedElementsInfo(Info);
+    else if (false === Selection.Use && this.Content[this.State.ContentPos].Get_SelectedElementsInfo)
+        this.Content[this.State.ContentPos].Get_SelectedElementsInfo(Info);
+};
+
 ParaHyperlink.prototype.Get_SelectedText = function(bAll, bClearText)
 {
     var Str = "";
@@ -242,6 +254,17 @@ ParaHyperlink.prototype.Check_Content = function()
 
 ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
+    if (para_Hyperlink === Item.Type)
+    {
+        // При добавлении гиперссылки в гиперссылку мы добавляем контент гиперссылки, а не ее целиком
+        for (var ItemPos = 0, Count = Item.Content.length; ItemPos < Count; ItemPos++)
+        {
+            this.Add_ToContent(Pos + ItemPos, Item.Content[ItemPos], UpdatePosition);
+        }
+
+        return;
+    }
+
     History.Add( this, { Type : historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     this.Content.splice( Pos, 0, Item );
 
@@ -438,6 +461,35 @@ ParaHyperlink.prototype.Add = function(Item)
                     break;
                 }
             }
+
+            break;
+        }
+
+        case para_Math :
+        {
+            var ContentPos = new CParagraphContentPos();
+            this.Get_ParaContentPos(false, false, ContentPos);
+            var CurPos = ContentPos.Get(0);
+
+            if ( para_Math !== this.Content[CurPos].Type )
+            {
+                // Разделяем текущий элемент (возвращается правая часть)
+                var NewElement = this.Content[CurPos].Split(ContentPos, 1);
+
+                if (null !== NewElement)
+                    this.Add_ToContent(CurPos + 1, NewElement, true);
+
+                var Elem = new ParaMath();
+                Elem.Root.Load_FromMenu(Item.Menu, this);
+                Elem.Root.Correct_Content(true);
+                this.Add_ToContent(CurPos + 1, Elem, true);
+
+                // Перемещаем кусор в конец формулы
+                this.State.ContentPos = CurPos + 1;
+                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+            }
+            else
+                this.Content[CurPos].Add(Item);
 
             break;
         }
@@ -1008,6 +1060,9 @@ ParaHyperlink.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         var Item = this.Content[Pos];
 
+        if (para_Math === Item.Type)
+            Item.Set_Inline(true);
+
         if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos )
         {
             Item.Recalculate_Reset( PRS.Range, PRS.Line );
@@ -1145,33 +1200,8 @@ ParaHyperlink.prototype.Check_Range_OnlyMath = function(Checker, _CurRange, _Cur
 
 ParaHyperlink.prototype.Check_MathPara = function(Checker)
 {
-    var Count = this.Content.length;
-    if ( Checker.Direction > 0 )
-    {
-        for ( var CurPos = 0; CurPos < Count; CurPos++ )
-        {
-            if ( this.Content[CurPos].Check_MathPara )
-            {
-                this.Content[CurPos].Check_MathPara( MathParaChecker );
-
-                if ( false !== MathParaChecker.Found )
-                    break;
-            }
-        }
-    }
-    else
-    {
-        for ( var CurPos = Count - 1; CurPos >= 0; CurPos-- )
-        {
-            if ( this.Content[CurPos].Check_MathPara )
-            {
-                this.Content[CurPos].Check_MathPara( MathParaChecker );
-
-                if ( false !== MathParaChecker.Found )
-                    break;
-            }
-        }
-    }
+    Checker.Result = false;
+    Checker.Found  = true;
 };
 
 ParaHyperlink.prototype.Check_PageBreak = function()

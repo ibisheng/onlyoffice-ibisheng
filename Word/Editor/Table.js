@@ -2437,6 +2437,26 @@ CTable.prototype =
         return AllComments;
     },
 
+    Get_AllMaths : function(AllMaths)
+    {
+        if ( undefined === AllMaths )
+            AllMaths = [];
+
+        var Rows_Count = this.Content.length;
+        for ( var CurRow = 0; CurRow < Rows_Count; CurRow++ )
+        {
+            var Row = this.Content[CurRow];
+            var Cells_Count = Row.Get_CellsCount();
+            for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
+            {
+                var Cell = Row.Get_Cell( CurCell );
+                Cell.Content.Get_AllMaths( AllMaths );
+            }
+        }
+
+        return AllMaths;
+    },
+
     Get_AllFloatElements : function(FloatObjs)
     {
         if ( undefined === FloatObjs )

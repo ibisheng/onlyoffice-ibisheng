@@ -344,6 +344,22 @@ Paragraph.prototype =
         return List;
     },
 
+    Get_AllMaths : function(List)
+    {
+        if (undefined === List)
+            List = [];
+
+        var Len = this.Content.length;
+        for (var Pos = 0; Pos < Len; Pos++)
+        {
+            var Item = this.Content[Pos];
+            if (para_Math === Item.Type)
+                List.push({Math : Item, Paragraph : this});
+        }
+
+        return List;
+    },
+
     Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
     {
         var _NumPr = this.Numbering_Get();
@@ -2763,7 +2779,7 @@ Paragraph.prototype =
                 var ContentPos = this.Get_ParaContentPos(false, false);
                 var CurPos = ContentPos.Get(0);
 
-                if ( para_Math !== this.Content[CurPos].Type )
+                if ( para_Math !== this.Content[CurPos].Type && para_Hyperlink !== this.Content[CurPos].Type )
                 {
                     // Разделяем текущий элемент (возвращается правая часть)
                     var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
@@ -6335,12 +6351,12 @@ Paragraph.prototype =
 
     Get_SelectedElementsInfo : function(Info)
     {
-        Info.Set_Paragraph( this );
+        Info.Set_Paragraph(this);
 
-        if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type)
-            Info.Set_Math(this.Content[this.Selection.EndPos]);
-        else if (false === this.Selection.Use && para_Math === this.Content[this.CurPos.ContentPos].Type)
-            Info.Set_Math(this.Content[this.CurPos.ContentPos]);
+        if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].Get_SelectedElementsInfo)
+            this.Content[this.Selection.EndPos].Get_SelectedElementsInfo(Info);
+        else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo)
+            this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
     },
 
     Get_SelectedContent : function(DocContent)
