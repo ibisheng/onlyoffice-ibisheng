@@ -276,16 +276,6 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 
 	if (null != Point) {
 		if (bUndo) {
-
-            if(!window["NATIVE_EDITOR_ENJINE"]) {
-                this.Get_RecalcData(Point);
-                wsViews = Asc["editor"].wb.wsViews;
-                for (i = 0; i < wsViews.length; ++i) {
-                    if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
-                        wsViews[i].objectRender.controller.recalculate2(undefined);
-                    }
-                }
-            }
 			gUndoInsDelCellsFlag = true;
 		}
 		//синхронизация index и id worksheet
@@ -309,25 +299,8 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		for (i in Point.UpdateRigions)
 			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i], false, true);
 
-		if (bUndo) {
-			if (Point.SelectionState) {
-				this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
-			} else {
-				this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
-			}
-		} else {
-			if (null !== oState && oState[0] && oState[0].focus) {
-				this.workbook.handlers.trigger("setSelectionState", oState);
-			} else {
-				var oSelectRange = null;
-				if (null != Point.SelectRangeRedo)
-					oSelectRange = Point.SelectRangeRedo;
-				else if (null != Point.SelectRange)
-					oSelectRange = Point.SelectRange;
-				if (null != oSelectRange)
-					this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
-			}
-		}
+
+
 		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
 			this.workbook.handlers.trigger("changeWorksheetUpdate",
 				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true});
@@ -338,6 +311,37 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 			if (curSheet)
 				this.workbook.handlers.trigger("asc_onUpdateTabColor", curSheet.getIndex());
 		}
+
+        if(!window["NATIVE_EDITOR_ENJINE"]) {
+            this.Get_RecalcData(Point);
+            wsViews = Asc["editor"].wb.wsViews;
+            for (i = 0; i < wsViews.length; ++i) {
+                if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
+                    wsViews[i].objectRender.controller.recalculate2(undefined);
+                }
+            }
+        }
+
+        if (bUndo) {
+            if (Point.SelectionState) {
+                this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+            } else {
+                this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
+            }
+        } else {
+            if (null !== oState && oState[0] && oState[0].focus) {
+                this.workbook.handlers.trigger("setSelectionState", oState);
+            } else {
+                var oSelectRange = null;
+                if (null != Point.SelectRangeRedo)
+                    oSelectRange = Point.SelectRangeRedo;
+                else if (null != Point.SelectRange)
+                    oSelectRange = Point.SelectRange;
+                if (null != oSelectRange)
+                    this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
+            }
+        }
+
 		if (oRedoObjectParam.oOnUpdateSheetViewSettings[this.workbook.getWorksheet(this.workbook.getActive()).getId()])
 			this.workbook.handlers.trigger("asc_onUpdateSheetViewSettings");
 
