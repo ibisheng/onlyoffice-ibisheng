@@ -8602,6 +8602,13 @@ CDocument.prototype =
                     this.Remove(1, false, false, false);
                     this.TurnOn_Recalculate(false);
                     this.TurnOn_InterfaceEvents(false);
+
+                    if (false === Para.Is_UseInDocument())
+                    {
+                        this.Document_Undo();
+                        History.Clear_Redo();
+                        return;
+                    }
                 }
 
                 this.Selection_Remove();

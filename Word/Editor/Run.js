@@ -3783,7 +3783,8 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
         SearchPos.CurX += TempDx;
 
         // Заглушка для знака параграфа и конца строки
-        if (Math.abs(SearchPos.X - SearchPos.CurX) < SearchPos.DiffX && !bNotUpdate)
+        Diff = SearchPos.X - SearchPos.CurX;
+        if ((Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)) && !bNotUpdate)
         {
             if ( para_End === ItemType )
             {
@@ -3815,7 +3816,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
     if (this.Type == para_Math_Run) // не только для пустых Run, но и для проверки на конец Run (т.к. Diff не обновляется)
     {
         var Diff = SearchPos.X - SearchPos.CurX;
-        if (Math.abs( Diff ) < SearchPos.DiffX + 0.001 && !bNotUpdate)
+        if ((Math.abs( Diff ) < SearchPos.DiffX + 0.001 && (SearchPos.CenterMode || SearchPos.X > SearchPos.CurX)) && !bNotUpdate)
         {
             SearchPos.DiffX = Math.abs( Diff );
             SearchPos.Pos.Update( CurPos, Depth );
