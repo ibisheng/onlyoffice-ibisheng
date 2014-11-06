@@ -1785,6 +1785,14 @@ CParaLineMetrics.prototype =
             this.Descent = this.TextDescent;
 
         this.LineGap = this.Recalculate_LineGap( ParaPr, this.TextAscent, this.TextDescent );
+
+        if (linerule_AtLeast === ParaPr.Spacing.LineRule && (this.Ascent + this.Descent + this.LineGap) > (this.TextAscent + this.TextDescent))
+        {
+            // В такой ситуации Word располагает текст внизу строки
+            this.Ascent  = this.Ascent + this.Descent + this.LineGap - this.TextDescent;
+            this.Descent = this.TextDescent;
+            this.LineGap = 0;
+        }
     },
 
     Recalculate_LineGap : function(ParaPr, TextAscent, TextDescent)

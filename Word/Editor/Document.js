@@ -11638,6 +11638,7 @@ CDocument.prototype =
         {
             // Вызываем данную функцию, чтобы убрать рамку буквицы
             this.DrawingDocument.Set_RulerState_Paragraph( null );
+            this.Document_UpdateRulersStateBySection(this.CurPos.ContentPos);
             return this.DrawingObjects.documentUpdateRulersState();
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -11697,10 +11698,10 @@ CDocument.prototype =
             }
         }
     },
-    Document_UpdateRulersStateBySection : function()
+    Document_UpdateRulersStateBySection : function(Pos)
     {
         // В данной функции мы уже точно знаем, что нам секцию нужно выбирать исходя из текущего параграфа
-        var CurPos = ( this.Selection.Use === true ? this.Selection.EndPos : this.CurPos.ContentPos );
+        var CurPos = undefined === Pos ? ( this.Selection.Use === true ? this.Selection.EndPos : this.CurPos.ContentPos ) : Pos;
 
         var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
@@ -13099,12 +13100,11 @@ CDocument.prototype =
             {
                 // TODO: Продумать как избавиться от пересчета при удалении комментария
                 this.Recalculate();
+                this.Document_UpdateInterfaceState();
             }
 
             if ( true === bSendEvent )
                 editor.sync_RemoveComment( Id );
-
-            this.Document_UpdateInterfaceState();
         }
     },
 
