@@ -276,6 +276,11 @@ CDegree.prototype.fillContent = function()
 
     CDegree.superclass.fillContent.apply(this, arguments);
 };
+CDegree.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Script;
+    MathProps.Pr   = null;
+};
 
 function CIterators(iterUp, iterDn)
 {
@@ -597,4 +602,9 @@ CDegreeSubSup.prototype.fillContent = function()
     }
 
     CDegreeSubSup.superclass.fillContent.apply(this, arguments);
+};
+CDegreeSubSup.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Script;
+    MathProps.Pr   = null;
 };

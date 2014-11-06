@@ -651,3 +651,8 @@ CRadical.prototype.getDegree = function()
 {
     return this.Content[0];
 }
+CRadical.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Radical;
+    MathProps.Pr   = null;
+};

@@ -1120,6 +1120,9 @@ CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, 
 
     return false;
 };
+CMathBase.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+};
 
 function CMathBasePr()
 {

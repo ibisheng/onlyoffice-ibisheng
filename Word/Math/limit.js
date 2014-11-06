@@ -178,6 +178,12 @@ CLimit.prototype.ApplyProperties = function(RPI)
     }
 
 };
+CLimit.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Limit;
+    MathProps.Pr   = null;
+};
+
 function CMathFunc(props)
 {
     CMathFunc.superclass.constructor.call(this);
@@ -228,4 +234,10 @@ CMathFunc.prototype.fillContent = function()
     this.elements[0][0] = this.getFName();
     this.elements[0][1] = this.getArgument();
 };
+CMathFunc.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Function;
+    MathProps.Pr   = null;
+};
+
 

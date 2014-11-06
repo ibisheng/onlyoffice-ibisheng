@@ -571,3 +571,8 @@ CAccent.prototype.draw = function(x, y, pGraphics)
 
     this.operator.draw(x, y, pGraphics);
 };
+CAccent.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Accent;
+    MathProps.Pr   = null;
+};

@@ -439,6 +439,12 @@ CNary.prototype.getSubMathContent = function()
 {
     return this.LowerIterator;
 };
+CNary.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.LargeOperator;
+    MathProps.Pr   = null;
+};
+
 
 function CNaryUnd(bInside)
 {

@@ -419,6 +419,11 @@ CFraction.prototype.fillContent = function()
         this.elements[0][1] = this.Denominator.getElement();
     }
 }
+CFraction.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Fraction;
+    MathProps.Pr   = null;
+};
 
 function CFractionBase(bInside, MathContent)
 {

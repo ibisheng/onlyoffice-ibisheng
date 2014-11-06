@@ -99,16 +99,18 @@ var c_oAscError = {
 	}
 };
 
-var c_oAscTypeSelectElement = {
+var c_oAscTypeSelectElement =
+{
     Paragraph  : 0,
     Table      : 1,
     Image      : 2,
     Header     : 3,
     Hyperlink  : 4,
     SpellCheck : 5,
-    Shape:6,
-    Slide:7,
-    Chart: 8
+    Shape      : 6,
+    Slide      : 7,
+    Chart      : 8,
+    Math       : 9
 };
 
 var c_oAscTableBordersType = {
@@ -724,6 +726,26 @@ var c_oAscMathType =
     Matrix_2_2_DLineBracket                 : 0x0b030003,
     Matrix_Flat_Round                       : 0x0b040000,
     Matrix_Flat_Square                      : 0x0b040001
+};
+
+var c_oAscMathInterfaceType =
+{
+    Common        : 0x00,
+    Fraction      : 0x01,
+    Script        : 0x02,
+    Radical       : 0x03,
+    LargeOperator : 0x04,
+    Delimiter     : 0x05,
+    Function      : 0x06,
+    Accent        : 0x07,
+    BorderBox     : 0x08,
+    Bar           : 0x09,
+    Box           : 0x0a,
+    Limit         : 0x0b,
+    GroupChar     : 0x0c,
+    Matrix        : 0x0d,
+    EqArray       : 0x0e,
+    Phantom       : 0x0f
 };
 
 window["flat_desine"] = false;

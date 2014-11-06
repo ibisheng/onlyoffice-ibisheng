@@ -553,6 +553,11 @@ CMathMatrix.prototype.getColsCount = function()
 {
     return this.column;
 };
+CMathMatrix.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Matrix;
+    MathProps.Pr   = null;
+};
 
 
 function CMathPoint()
@@ -882,3 +887,9 @@ CEqArray.prototype.getElementMathContent = function(Index)
 {
     return this.Content[Index];
 };
+CEqArray.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.EqArray;
+    MathProps.Pr   = null;
+};
+

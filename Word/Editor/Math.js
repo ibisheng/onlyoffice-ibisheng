@@ -1864,6 +1864,28 @@ ParaMath.prototype.Get_Bounds = function()
     }
 };
 
+/**
+ * Обновляем состояние интерфейса.
+ */
+ParaMath.prototype.Document_UpdateInterfaceState = function()
+{
+    var SelectedContent = this.GetSelectContent();
+    var MathContent = SelectedContent.Content;
+
+    var MathProps = new CMathProp();
+
+    if (MathContent.bRoot)
+    {
+        MathProps.Type = c_oAscMathInterfaceType.Common;
+        MathProps.Pr   = null;
+    }
+    else if (undefined !== MathContent.ParentElement && null !== MathContent.ParentElement)
+    {
+        MathContent.ParentElement.Document_UpdateInterfaceState(MathProps);
+    }
+
+    editor.sync_MathPropCallback(MathProps);
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Классы с изменениями

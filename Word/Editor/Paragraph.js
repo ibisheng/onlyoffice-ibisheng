@@ -8636,9 +8636,6 @@ Paragraph.prototype =
         if ( this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use )
             this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
-        var Hyperlinks = [];
-        var Math       = null;
-
         if ( true === this.Selection.Use )
         {
             var StartPos = this.Selection.StartPos;
@@ -8653,36 +8650,15 @@ Paragraph.prototype =
             {
                 var Element = this.Content[CurPos];
 
-                if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
-                    continue;
-                else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
-                {
-                    Hyperlinks.push(CurPos);
-                }
+                if (true !== Element.Selection_IsEmpty() && (para_Hyperlink === Element.Type || para_Math === Element.Type))
+                    Element.Document_UpdateInterfaceState();
             }
-
-            if (this.Selection.StartPos === this.Selection.EndPos && para_Math === this.Content[this.Selection.EndPos].Type )
-                Math = this.Content[this.Selection.EndPos];
         }
         else
         {
-            if (para_Hyperlink === this.Content[this.CurPos.ContentPos].Type)
-                Hyperlinks.push(this.CurPos.ContentPos);
-            else if (para_Math === this.Content[this.CurPos.ContentPos].Type)
-                Math = this.Content[this.CurPos.ContentPos];
-        }
-
-        for (var HyperIndex = 0, HyperCount = Hyperlinks.length; HyperIndex < HyperCount; HyperIndex++)
-        {
-            var Hyperlink = this.Content[Hyperlinks[HyperIndex]];
-
-            var HyperText = new CParagraphGetText();
-            Hyperlink.Get_Text( HyperText );
-
-            var HyperProps = new CHyperlinkProperty( Hyperlink );
-            HyperProps.put_Text( HyperText.Text );
-
-            editor.sync_HyperlinkPropCallback( HyperProps );
+            var CurType = this.Content[this.CurPos.ContentPos].Type;
+            if (para_Hyperlink === CurType || para_Math === CurType)
+                this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
         }
     },
 

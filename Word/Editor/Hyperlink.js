@@ -2387,6 +2387,42 @@ ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
     Writer.WriteLong(0);
 };
 
+ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
+{
+    var HyperText = new CParagraphGetText();
+    this.Get_Text( HyperText );
+
+    var HyperProps = new CHyperlinkProperty(this);
+    HyperProps.put_Text( HyperText.Text );
+
+    editor.sync_HyperlinkPropCallback(HyperProps);
+
+    if ( true === this.Selection.Use )
+    {
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if (StartPos > EndPos)
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+        {
+            var Element = this.Content[CurPos];
+
+            if (true !== Element.Selection_IsEmpty() && (para_Hyperlink === Element.Type || para_Math === Element.Type))
+                Element.Document_UpdateInterfaceState();
+        }
+    }
+    else
+    {
+        var CurType = this.Content[this.State.ContentPos].Type;
+        if (para_Hyperlink === CurType || para_Math === CurType)
+            this.Content[this.State.ContentPos].Document_UpdateInterfaceState();
+    }
+};
+
 function CParaHyperLinkStartState(HyperLink)
 {
     this.Value = HyperLink.Value;

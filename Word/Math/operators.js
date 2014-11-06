@@ -3738,6 +3738,12 @@ CDelimiter.prototype.getElementMathContent = function(Index)
 {
     return this.Content[Index];
 };
+CDelimiter.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Delimiter;
+    MathProps.Pr   = null;
+};
+
 
 function CCharacter()
 {
@@ -4028,3 +4034,8 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
     return ascent;
 }
+CGroupCharacter.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.GroupChar;
+    MathProps.Pr   = null;
+};

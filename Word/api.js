@@ -2041,6 +2041,20 @@ asc_docs_api.prototype.removeDropcap = function(bDropCap)
     this.WordControl.m_oLogicDocument.Remove_DropCap( bDropCap );
 }
 
+function CMathProp(obj)
+{
+    this.Type = c_oAscMathInterfaceType.Common;
+    this.Pr   = null;
+
+    if (obj)
+    {
+        this.Type = (undefined !== obj.Type);
+        this.Pr   = (undefined !== obj.Pr)
+    }
+}
+
+CMathProp.prototype.get_Type = function() {return this.Type;}
+
 function CParagraphProp (obj)
 {
 	if (obj)
@@ -4090,6 +4104,11 @@ asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
     }
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Paragraph, new CParagraphProp( prProp ) );
+}
+
+asc_docs_api.prototype.sync_MathPropCallback = function(MathProp)
+{
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject(c_oAscTypeSelectElement.Math, new CMathProp(MathProp));
 }
 
 asc_docs_api.prototype.sync_EndAddShape = function()

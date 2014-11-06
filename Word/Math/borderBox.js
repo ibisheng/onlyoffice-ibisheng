@@ -381,6 +381,11 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 
     this.elements[0][0].setPosition(NewPos, PosInfo);
 }
+CBorderBox.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.BorderBox;
+    MathProps.Pr   = null;
+};
 
 function CMathBoxPr()
 {
@@ -519,6 +524,11 @@ CBox.prototype.getBase = function()
 {
     return this.Content[0];
 }
+CBox.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Box;
+    MathProps.Pr   = null;
+};
 
 
 function CMathBarPr()
@@ -616,6 +626,11 @@ CBar.prototype.getAscent = function()
 
     return ascent;
 }
+CBar.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Bar;
+    MathProps.Pr   = null;
+};
 
 function CMathPhantomPr()
 {
@@ -731,3 +746,8 @@ CPhantom.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
 }
+CPhantom.prototype.Document_UpdateInterfaceState = function(MathProps)
+{
+    MathProps.Type = c_oAscMathInterfaceType.Phantom;
+    MathProps.Pr   = null;
+};
