@@ -1298,7 +1298,7 @@
 			}
 
 			if (1 === fullRecalc)
-				this.nColsCount = Math.max(this.nColsCount, i);
+				this.nColsCount = Math.min(Math.max(this.nColsCount, i), gc_nMaxCol);
 		};
 
 		/**
@@ -1350,7 +1350,7 @@
 			}
 
 			if (1 === fullRecalc)
-				this.nRowsCount = Math.max(this.nRowsCount, i);
+				this.nRowsCount = Math.min(Math.max(this.nRowsCount, i), gc_nMaxRow);
 		};
 
 		/** Вычисляет диапазон индексов видимых колонок */
@@ -4569,8 +4569,8 @@
 		 * @return {Range}
 		 */
 		WorksheetView.prototype._getCell = function (col, row) {
-			this.nRowsCount = Math.max(this.model.getRowsCount() + 1, this.rows.length);
-			this.nColsCount = Math.max(this.model.getColsCount() + 1, this.cols.length);
+			this.nRowsCount = Math.min(Math.max(this.model.getRowsCount() + 1, this.rows.length), gc_nMaxRow);
+			this.nColsCount = Math.min(Math.max(this.model.getColsCount() + 1, this.cols.length), gc_nMaxCol);
 			if (col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount)
 				return null;
 
