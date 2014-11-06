@@ -8835,12 +8835,12 @@ function Binary_oMathReader(stream)
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
 			var brk = this.stream.GetBool();
-			props.brk = {brk: true };
+			props.brk = {};
         }
 		else if (c_oSer_OMathBottomNodesValType.AlnAt === type)
         {
 			var aln = this.stream.GetULongLE();
-			props.brk = {brk: true, alnAt:aln};
+			props.brk = { alnAt:aln};
         }
 		else
             res = c_oSerConstants.ReadUnknown;
