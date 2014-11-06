@@ -297,6 +297,17 @@ function NativeCalculateFile()
 	_api.asc_nativeCalculateFile();
 }
 
+function NativeApplyChangesData(data)
+{
+    if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
+    {
+        _api.asc_nativeApplyChanges2(data);
+    }
+    else
+    {
+    }
+}
+
 function NativeApplyChanges()
 {
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
