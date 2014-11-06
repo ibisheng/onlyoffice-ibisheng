@@ -151,6 +151,11 @@ CTextBody.prototype =
         return false;
     },
 
+    Is_DrawingShape: function()
+    {
+        return true;
+    },
+
     Get_Theme : function()
     {
         return this.parent.Get_Theme();
