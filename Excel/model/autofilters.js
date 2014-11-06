@@ -6620,7 +6620,8 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else
 				{
-					var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnTo, aWs);
+					var arnToRange = new Asc.Range(arnTo.c1, arnTo.r1, arnTo.c2, arnTo.r2);;
+					var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnToRange, aWs);
 					if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
 					{
 						for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
