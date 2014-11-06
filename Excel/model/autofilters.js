@@ -1027,7 +1027,7 @@ var gUndoInsDelCellsFlag = true;
 							result[n].x = ws.cols[col].left;
 							result[n].y = ws.rows[allFil.r1].top;
 							result[n].width = ws.cols[col].width;
-							result[n].height = ws.rows[startCol].height;
+							result[n].height = ws.rows[allFil.r1].height;
 							result[n].id = cellId;
 							result[n].idNext = idCellNext.getID();
 							result[n].showButton = this._isShowButton(aWs.TableParts[openFilter].AutoFilter, col - startCol);
@@ -6384,7 +6384,7 @@ var gUndoInsDelCellsFlag = true;
 						result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
 						result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
 						result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
-						result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
+						result[0].height = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null;
 						result[0].id = idCell.getID();
 						result[0].idNext = idCellNext.getID();
 						
@@ -6400,7 +6400,7 @@ var gUndoInsDelCellsFlag = true;
 							result[0].x = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null;
 							result[0].y = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null;
 							result[0].width = ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null;
-							result[0].height = ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null;
+							result[0].height = ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null;
 							result[0].id = idCell.getID();
 							result[0].idNext = idCellNext.getID();
 							
