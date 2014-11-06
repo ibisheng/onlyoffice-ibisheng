@@ -3961,7 +3961,7 @@ var gUndoInsDelCellsFlag = true;
 											//проверка на то, что эти кнопки уже имеются
 											if(this.allButtonAF[aF].id == arr.result[i].id)
 											{
-												this.allButtonAF[aF] = arr.result[i];
+												this.allButtonAF[aF] = arr.result[i].clone();
 												this.allButtonAF[aF].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext).clone();
 												isInsert = true;
 												break;
@@ -3970,7 +3970,7 @@ var gUndoInsDelCellsFlag = true;
 									}
 									if(!isInsert)
 									{
-										this.allButtonAF[leng + n] = arr.result[i];
+										this.allButtonAF[leng + n] = arr.result[i].clone();;
 										this.allButtonAF[leng + n].inFilter = Asc.g_oRangeCache.getAscRange(arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext).clone();
 										n++;
 									}
@@ -6511,6 +6511,8 @@ var gUndoInsDelCellsFlag = true;
 						return;
 				}
 				
+				var addRedo = false;
+				
 				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
 				if(findFilters)
 				{
@@ -6570,6 +6572,8 @@ var gUndoInsDelCellsFlag = true;
 									}
 									
 									changeButtonArray[n] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
+									if(findFilters[i].result.length == changeButtonArray.length)
+										break;
 								}
 							}
 						}
@@ -6600,8 +6604,13 @@ var gUndoInsDelCellsFlag = true;
 							this._setColorStyleTable(findFilters[i].Ref, findFilters[i]);
 						}
 						
-						if(!data)
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
+						if(!addRedo && !data)
+						{
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange});
+							addRedo = true;
+						}
+						else if(!data && addRedo)
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move);
 					}
 				}
 				else
@@ -6991,7 +7000,7 @@ var gUndoInsDelCellsFlag = true;
 							rangeFilter = aWs.TableParts[k].Ref;
 							if(range.intersection(rangeFilter) && !range.containsRange(rangeFilter))
 							{
-								if(!exceptionRange || !(exceptionRange && exceptionRange.isEqual(rangeFilter)))
+								if(!exceptionRange || !(exceptionRange && exceptionRange.containsRange(rangeFilter)))
 									result[result.length] = aWs.TableParts[k];
 							}
 						}
@@ -7032,7 +7041,7 @@ var gUndoInsDelCellsFlag = true;
 						var newRange = Asc.Range(ref.c1 + diffCol, ref.r1 + diffRow, ref.c2 + diffCol, ref.r2 + diffRow);
 						
 						//если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
-						var findFiltersFromTo = this._intersectionRangeWithTableParts(newRange , aWs, ref);
+						var findFiltersFromTo = this._intersectionRangeWithTableParts(newRange , aWs, arnFrom);
 						if(findFiltersFromTo && findFiltersFromTo.length)//удаляем данный фильтр
 						{
 							this.isEmptyAutoFilters(ref);
