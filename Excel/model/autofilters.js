@@ -996,7 +996,7 @@ var gUndoInsDelCellsFlag = true;
 							result[n].y = ws.rows[allFil.r1].top;
 							
 							result[n].width = ws.cols[col].width;
-							result[n].height = ws.rows[startCol].height;
+							result[n].height = ws.rows[allFil.r1].height;
 							result[n].id = cellId;
 							result[n].idNext = idCellNext.getID();
 							result[n].showButton = this._isShowButton(aWs.AutoFilter, col - startCol);
