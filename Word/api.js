@@ -7721,6 +7721,58 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
             this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
     }
 };
+window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, version)
+{
+    this.DocumentUrl = "TeamlabNative";
+
+    window.g_cAscCoAuthoringUrl = "";
+    window.g_cAscSpellCheckUrl = "";
+
+    this.User = new Asc.asc_CUser();
+    this.User.asc_setId("TM");
+    this.User.asc_setUserName("native");
+
+    this.WordControl.m_bIsRuler = false;
+    this.WordControl.Init();
+
+    this.InitEditor();
+    this.DocumentType = 2;
+    this.LoadedObjectDS = Common_CopyObj(this.WordControl.m_oLogicDocument.Get_Styles().Style);
+
+    g_oIdCounter.Set_Load(true);
+
+    var openParams = {checkFileSize: this.isMobileVersion, charCount: 0, parCount: 0};
+    var oBinaryFileReader = new BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
+
+	g_nCurFileVersion = version;
+    if(oBinaryFileReader.ReadData(base64File))
+    {
+        g_oIdCounter.Set_Load(false);
+        this.LoadedObject = 1;
+
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+    }
+    else
+        this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+
+    //callback
+    this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+    var sizeMM;
+    if(this.DocumentOrientation)
+        sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
+    else
+        sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
+    this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
+    this.sync_PageOrientCallback(editor.get_DocumentOrientation());
+
+    if (this.GenerateNativeStyles !== undefined)
+    {
+        this.GenerateNativeStyles();
+
+        if (this.WordControl.m_oDrawingDocument.CheckTableStylesOne !== undefined)
+            this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
+    }
+};
 
 window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 {
@@ -7759,7 +7811,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 	CollaborativeEditing.Apply_OtherChanges();
 };
 
-window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data)
+window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
 {
     // Чтобы заново созданные параграфы не отображались залоченными
     g_oIdCounter.Set_Load( true );
@@ -7810,15 +7862,18 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data)
 		stream.size = data.length;
     }
 
-    CollaborativeEditing.m_aChanges = [];
+    if (isFull)
+    {
+        CollaborativeEditing.m_aChanges = [];
 
-    // У новых элементов выставляем указатели на другие классы
-    CollaborativeEditing.Apply_LinkData();
+        // У новых элементов выставляем указатели на другие классы
+        CollaborativeEditing.Apply_LinkData();
 
-    // Делаем проверки корректности новых изменений
-    CollaborativeEditing.Check_MergeData();
+        // Делаем проверки корректности новых изменений
+        CollaborativeEditing.Check_MergeData();
 
-    CollaborativeEditing.OnEnd_ReadForeignChanges();
+        CollaborativeEditing.OnEnd_ReadForeignChanges();
+    }
 
     g_oIdCounter.Set_Load( false );
 };
@@ -7827,6 +7882,19 @@ window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
 {
 	var oBinaryFileWriter = new BinaryFileWriter(this.WordControl.m_oLogicDocument);
     return oBinaryFileWriter.Write();
+};
+
+window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
+{
+    var oBinaryFileWriter = new BinaryFileWriter(this.WordControl.m_oLogicDocument);
+    var _memory = oBinaryFileWriter.memory;
+
+    oBinaryFileWriter.Write2();
+
+	var _header = c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + _memory.GetCurPosition() + ";";
+	window["native"]["Save_End"](_header, _memory.GetCurPosition());
+	
+	return _memory.ImData.data;
 };
 
 window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)

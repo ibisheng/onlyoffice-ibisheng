@@ -247,6 +247,22 @@ var native_renderer = null;
 var _api = null;
 var Asc = window["Asc"];
 
+function NativeOpenFileData(data, version)
+{
+    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+
+    if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
+    {
+        _api = new window["asc_docs_api"]("");
+        _api.asc_nativeOpenFile2(data, version);
+    }
+    else
+    {
+        _api = new window["Asc"]["spreadsheet_api"]();
+        _api.asc_nativeOpenFile2(data, version);
+    }
+}
+
 function NativeOpenFile()
 {
     var doc_bin = window.native.GetFileString(window.native.GetFilePath());
@@ -297,11 +313,11 @@ function NativeCalculateFile()
 	_api.asc_nativeCalculateFile();
 }
 
-function NativeApplyChangesData(data)
+function NativeApplyChangesData(data, isFull)
 {
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api.asc_nativeApplyChanges2(data);
+        _api.asc_nativeApplyChanges2(data, isFull);
     }
     else
     {
@@ -347,6 +363,10 @@ function NativeApplyChanges()
 function NativeGetFileString()
 {
     return _api.asc_nativeGetFile();
+}
+function NativeGetFileData()
+{
+    return _api.asc_nativeGetFileData();
 }
 
 function GetNativeCountPages()

@@ -763,6 +763,12 @@ function BinaryFileWriter(doc)
         window.global_pptx_content_writer._End();
         return this.GetResult();
     }
+    this.Write2 = function()
+    {
+        window.global_pptx_content_writer._Start();
+        this.WriteMainTable();
+        window.global_pptx_content_writer._End();
+    }
 	this.GetResult = function()
 	{
 		return this.WriteFileHeader(this.memory.GetCurPosition()) + this.memory.GetBase64Memory();
@@ -4663,6 +4669,23 @@ function BinaryFileReader(doc, openParams)
 		//		throw e;
 		//}
 		return true;
+    };
+    this.ReadData = function(data)
+    {
+        //try{
+        this.stream = new FT_Stream2(data, data.length);        
+        this.PreLoadPrepare();
+        this.ReadMainTable();
+        this.PostLoadPrepare();
+        //}
+        //catch(e)
+        //{
+        //	if(e.message == g_sErrorCharCountMessage)
+        //		return false;
+        //	else
+        //		throw e;
+        //}
+        return true;
     };
 	this.PreLoadPrepare = function()
 	{
