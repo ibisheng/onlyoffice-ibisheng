@@ -977,9 +977,9 @@ var gUndoInsDelCellsFlag = true;
 						
 						//проверяем диапазон
 						if (ws.cols.length < endCol)
-						    ws.expandColsOnScroll(false, true, endCol);
+						    ws.expandColsOnScroll(false, true, endCol + 1);
 						if (ws.rows.length < endRow)
-						    ws.expandRowsOnScroll(false, true, endRow);
+						    ws.expandRowsOnScroll(false, true, endRow + 1);
 						for(var col = startCol; col <= endCol; col++)
 						{
 							var idCell = new CellAddress(allFil.r1, col, 0);
