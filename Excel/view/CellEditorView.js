@@ -1133,6 +1133,10 @@
 
 			if (dy !== undefined || redrawText) {this._renderText(y);}
 
+			if (AscBrowser.isRetina) {
+				curLeft >>= 1;
+				curTop >>= 1;
+			}
 			this.cursorStyle.left = curLeft + "px";
 			this.cursorStyle.top = curTop + "px";
 			this.cursorStyle.height = curHeight + "px";
