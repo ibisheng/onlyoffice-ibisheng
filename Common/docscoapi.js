@@ -26,6 +26,7 @@
 			this.onStartCoAuthoring = options.onStartCoAuthoring;
 			this.onEndCoAuthoring = options.onEndCoAuthoring;
 			this.onUnSaveLock = options.onUnSaveLock;
+			this.onRecalcLocks = options.onRecalcLocks;
 		}
 	}
 
@@ -47,6 +48,7 @@
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 			this._CoAuthoringApi.onEndCoAuthoring = function (e) {t.callback_OnEndCoAuthoring(e);};
 			this._CoAuthoringApi.onUnSaveLock = function () {t.callback_OnUnSaveLock();};
+			this._CoAuthoringApi.onRecalcLocks = function (e) {t.callback_OnRecalcLocks(e);};
 
 			this._CoAuthoringApi.init(user, docid, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
@@ -118,9 +120,9 @@
 		}
 	};
 
-	CDocsCoApi.prototype.saveChanges = function (arrayChanges, deleteIndex) {
+	CDocsCoApi.prototype.saveChanges = function (arrayChanges, deleteIndex, excelAdditionalInfo) {
 		if (this._CoAuthoringApi && this._onlineWork) {
-			this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex);
+			this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex, excelAdditionalInfo);
 		}
 	};
 
@@ -228,6 +230,11 @@
 			this.onUnSaveLock();
 	};
 
+	CDocsCoApi.prototype.callback_OnRecalcLocks = function (e) {
+		if (this.onRecalcLocks)
+			this.onRecalcLocks(e);
+	};
+
     /** States
 	 * -1 - reconnect state
      *  0 - not initialized
@@ -250,6 +257,7 @@
 			this.onFirstLoadChangesEnd = options.onFirstLoadChangesEnd;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
 			this.onUnSaveLock = options.onUnSaveLock;
+			this.onRecalcLocks = options.onRecalcLocks;
 		}
         this._state = 0;
 		// Online-пользователи в документе
@@ -282,6 +290,8 @@
 		this.lastOtherSaveTime = -1;
 		// Локальный индекс изменений
 		this.changesIndex = 0;
+		// Дополнительная информация для Excel
+		this.excelAdditionalInfo = null;
 		
 		this._url = "";
 
@@ -434,13 +444,14 @@
 		this.saveChanges(this.arrayChanges, this.currentIndex);
 	};
 
-	DocsCoApi.prototype.saveChanges = function (arrayChanges, currentIndex, deleteIndex) {
+	DocsCoApi.prototype.saveChanges = function (arrayChanges, currentIndex, deleteIndex, excelAdditionalInfo) {
 		if (null === currentIndex) {
 			this.deleteIndex = deleteIndex;
 			if (null != this.deleteIndex && -1 !== this.deleteIndex)
 				this.deleteIndex += this.changesIndex;
 			this.currentIndex = 0;
 			this.arrayChanges = arrayChanges;
+			this.excelAdditionalInfo = excelAdditionalInfo;
 		} else {
 			this.currentIndex = currentIndex;
 		}
@@ -460,10 +471,11 @@
 			t._reSaveChanges();
 		}, this.errorTimeOut);
 
-		this._send({"type": "saveChanges", "changes": JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
-			"startSaveChanges": (startIndex === 0), "endSaveChanges": (endIndex === arrayChanges.length),
-			"isCoAuthoring": this.isCoAuthoring, "isExcel": this._isExcel, "deleteIndex": this.deleteIndex,
-			"startIndex": startIndex});
+		this._send({'type': 'saveChanges', 'changes': JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
+			'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
+			'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
+			'startIndex': startIndex,
+			'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null});
 	};
 
 	DocsCoApi.prototype.unLockDocument = function (isSave) {
@@ -605,6 +617,8 @@
 				this.onLocksReleasedEnd();
         }
 		this._updateChanges(data["changes"], data["changesIndex"], false);
+		if (this.onRecalcLocks)
+			this.onRecalcLocks(data["excelAdditionalInfo"]);
     };
 	
 	DocsCoApi.prototype._onStartCoAuthoring = function (isStartEvent) {

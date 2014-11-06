@@ -4957,7 +4957,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(ref)
 							{
-								var clearRange = new Range(aWs, ref.r1, ref.c1, ref.r2, ref.c2)
+								var clearRange = new Range(aWs, ref.r1, ref.c1, ref.r2, ref.c2);
 								clearRange.setTableStyle(null);
 							}
 								
