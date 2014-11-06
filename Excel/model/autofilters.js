@@ -2247,6 +2247,11 @@ var gUndoInsDelCellsFlag = true;
 										return false;
 									}
 								}
+								else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 > tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									return false;
+								}
 								else	
 									isPart = true;	
 							}
