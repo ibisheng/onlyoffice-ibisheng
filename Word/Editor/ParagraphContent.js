@@ -4313,7 +4313,7 @@ ParaDrawing.prototype =
         return false;
     },
 
-    Update_Position : function(ParaLayout, PageLimits)
+    Update_Position : function(Paragraph, ParaLayout, PageLimits)
     {
         if ( undefined != this.PositionH_Old )
         {
@@ -4329,7 +4329,8 @@ ParaDrawing.prototype =
             this.PositionV.Value        = this.PositionV_Old.Value2;
         }
 
-        this.DocumentContent   = this.Parent.Parent;
+        this.Parent          = Paragraph;
+        this.DocumentContent = this.Parent.Parent;
         //this.GraphicObj.parent = this;
         
     //    if ( this.GraphicObj.arrGraphicObjects )
