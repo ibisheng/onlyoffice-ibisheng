@@ -1983,10 +1983,11 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 					break;
 			}
 			
-			var _len = Loader.Reader.GetLong();
+			var _len = stream.GetLong();
 
 			_pos += 4;
 			stream.size = _pos + _len;
+            stream.Seek(_pos);
 			stream.Seek2(_pos);
 			
 			var item = new UndoRedoItemSerializable();

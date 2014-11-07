@@ -3472,7 +3472,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
             oBinaryFileWriter.Write2();
 
-            var _header = c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + oBinaryFileWriter.Memory.GetCurPosition() + ";";
+            var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition());
             window["native"]["Save_End"](_header, oBinaryFileWriter.Memory.GetCurPosition());
 
             return oBinaryFileWriter.Memory.ImData.data;

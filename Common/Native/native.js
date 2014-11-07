@@ -321,6 +321,7 @@ function NativeApplyChangesData(data, isFull)
     }
     else
     {
+		_api.asc_nativeApplyChanges2(data, isFull);
     }
 }
 

@@ -6713,6 +6713,8 @@
         this.ReadData = function(data, wb)
         {
             History.TurnOff();
+
+            this.stream = new FT_Stream2(data, data.length);
             this.ReadFile(wb);
 
             ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
