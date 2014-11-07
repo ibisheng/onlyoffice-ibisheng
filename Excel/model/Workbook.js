@@ -1991,7 +1991,7 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 			
 			var item = new UndoRedoItemSerializable();
 			item.Deserialize(stream);
-			if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
+			if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType)
 				History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
 
 			_pos += _len;
