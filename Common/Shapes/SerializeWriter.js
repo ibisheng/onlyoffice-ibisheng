@@ -408,7 +408,7 @@ function CBinaryFileWriter()
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
 
-    this.WriteDocument = function(presentation)
+    this.WriteDocument2 = function(presentation)
     {
         this.font_map = {};
         this.image_map = {};
@@ -674,6 +674,11 @@ function CBinaryFileWriter()
 
         // теперь запишем информацию о главных таблицах
         this.WriteMainPart();
+    }
+
+    this.WriteDocument = function(presentation)
+    {
+        this.WriteDocument2(presentation);
 
         // и скинем все в base64
         var ret = "PPTY;v1;" + this.pos + ";";

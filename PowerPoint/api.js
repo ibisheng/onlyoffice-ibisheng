@@ -5165,7 +5165,7 @@ function asc_ajax(obj){
 }
 //test
 window["asc_docs_api"] = asc_docs_api;
-window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
+window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
 {
 	this.DocumentUrl = "TeamlabNative";
 
@@ -5185,7 +5185,15 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
 
 	var _loader = new BinaryPPTYLoader();
     _loader.Api = this;
-    _loader.Load(base64File, this.WordControl.m_oLogicDocument);
+
+    if (version === undefined)
+    {
+        loader.Load(base64File, this.WordControl.m_oLogicDocument);
+    }
+    else
+    {
+        loader.Load2(base64File, this.WordControl.m_oLogicDocument);
+    }
     
     this.LoadedObject = 1;
     g_oIdCounter.Set_Load(false);
@@ -5214,11 +5222,90 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 	CollaborativeEditing.Apply_OtherChanges();
 }
 
+window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
+{
+    // Чтобы заново созданные параграфы не отображались залоченными
+    g_oIdCounter.Set_Load( true );
+
+    var stream = new FT_Stream2(data, data.length);
+    stream.obj = null;
+    var Loader = { Reader : stream, Reader2 : null };
+    var _color = new CDocumentColor( 191, 255, 199 );
+
+    // Применяем изменения, пока они есть
+    var _count = Loader.Reader.GetLong();
+    //console.log("count:" + _count);
+
+    var _pos = 4;
+    for (var i = 0; i < _count; i++)
+    {
+        if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"])
+        {
+            if (!window["native"]["CheckNextChange"]())
+                break;
+        }
+
+        var _id  = Loader.Reader.GetLong();
+        var _len = Loader.Reader.GetLong();
+
+        //console.log("change: [" + _id + ", " + _len + "]");
+
+        _pos += 8;
+        stream.size = _pos + _len;
+
+        var Type = Loader.Reader.GetLong();
+        var Class = null;
+
+        if ( historyitem_type_HdrFtr === Type )
+        {
+            Class = editor.WordControl.m_oLogicDocument.HdrFtr;
+        }
+        else
+            Class = g_oTableId.Get_ById( "" + _id );
+
+        stream.Seek2(_pos);
+
+        if ( null != Class )
+            Class.Load_Changes( Loader.Reader, Loader.Reader2, _color );
+
+        _pos += _len;
+        stream.Seek2(_pos);
+        stream.size = data.length;
+    }
+
+    if (isFull)
+    {
+        CollaborativeEditing.m_aChanges = [];
+
+        // У новых элементов выставляем указатели на другие классы
+        CollaborativeEditing.Apply_LinkData();
+
+        // Делаем проверки корректности новых изменений
+        CollaborativeEditing.Check_MergeData();
+
+        CollaborativeEditing.OnEnd_ReadForeignChanges();
+    }
+
+    g_oIdCounter.Set_Load( false );
+}
+
 window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
 {
 	var writer = new CBinaryFileWriter();
     this.WordControl.m_oLogicDocument.CalculateComments();
     return writer.WriteDocument(this.WordControl.m_oLogicDocument);
+}
+
+window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
+{
+    var writer = new CBinaryFileWriter();
+    this.WordControl.m_oLogicDocument.CalculateComments();
+    writer.WriteDocument2(this.WordControl.m_oLogicDocument);
+
+    var _header = "PPTY;v1;" + writer.pos + ";";
+    window["native"]["Save_End"](_header, writer.pos);
+
+    return writer.ImData.data;
 }
 
 window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
