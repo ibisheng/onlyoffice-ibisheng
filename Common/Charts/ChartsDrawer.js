@@ -4081,7 +4081,7 @@ drawDoughnutChart.prototype =
 			
 			for (var k = 0; k < numCache.ptCount; k++) {
 				
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[0], k);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[n], k);
 				
 				brush = idxPoint ? idxPoint.brush : null;
 				pen = idxPoint ? idxPoint.pen : null;
