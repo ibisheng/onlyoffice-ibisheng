@@ -1,0 +1,130 @@
+Java	=	["package" Name ";"]
+		{"import" Name ["." "*"] ";"}
+		{ClassDecl | InterfaceDecl | ";"}.
+
+ClassDecl	=	{Modifyer} "class" ident
+		["extends" Name]
+		["implements" Name {"," Name} ]
+		"{"	{	FieldDecl
+				|	MethodDecl
+				|	ConstructorDecl
+				|	"static" Block
+				}
+		"}".
+
+InterfaceDecl	=	{Modifyer} "interface" ident
+		["extends" Name {"," Name} ]
+		"{"	{	FieldDecl
+				|	MethodHeader ";"
+				}
+		"}".
+
+FieldDecl	=	{Modifyer} Type Var {"," Var} ";".
+Var	=	ident {"[" "]"} ["=" VarInit].
+VarInit	=	Expr | ArrayInit.
+ArrayInit	=	"{" VarInit {"," VarInit} "}".
+
+MethodDecl	=	MethodHeader (Block | ";").
+MethodHeader	=	{Modifyer} (Type | "void") ident "(" [FormPars] ")"
+{"[" "]"}
+		["throws" Name {"," Name} ].
+FormPars	=	FormPar {"," FormPar}.
+FormPar	=	Type ident {"[" "]"}.
+
+ConstructorDecl	=	{Modifyer} ident "(" [FormPars] ")"
+		["throws" Name {"," Name} ]
+		"{" [ConstructorCall] {BlockStatement} "}".
+ConstructorCall	=	("this" | "super") "(" [ActPars] ")".
+
+Modifyer	=	"public" | "protected" | "private"
+	|	"static"
+	|	"abstract" | "final" | "native" | "synchronized" |
+"transient" | "volatile".
+
+
+
+Block	=	"{" {BlockStatement} "}".
+BlockStatement	=	Type Var {"," Var} ";"
+	|	Statement.
+Statement	=	{ident ":"}
+		(	Block
+		|	[StatExpr] ";"
+		|	"if" "(" Expr ")" Statement ["else" Statement]
+		|	"while" "(" Expr ")" Statement
+		|	"for" "(" [ForInit] ";" [Expr] ";" [ForUpdate] ")"
+Statement
+		|	"do" Statement "while" "(" Expr ")" ";"
+		|	"switch" "(" Expr ")" "{" {SwitchGroup}
+{SwitchLabel} "}"
+		|	"break" [ident] ";"
+		|	"continue" [ident] ";"
+		|	"return" [Expr] ";"
+		|	"synchronized" "(" Expr ")" Block
+		|	"throw" Expr ";"
+		|	"try" Block {CatchClause} ["finally" Block]
+		).
+StatExpr	=	Assignment
+	|	Designator "(" [ActPars] ")"
+	|	Expr.
+
+SwitchGroup	=	SwitchLabel {SwitchLabel} BlockStatement
+{BlockStatement}.
+SwitchLabel	=	"case" ConstExpr ":" | "default" ":".
+
+ForInit	=	StatExpr {"," StatExpr}
+	|	Type Var {"," Var} ";".
+ForUpdate	=	StatExpr {"," StatExpr}.
+
+CatchClause	=	"catch" "(" FormPar ")" Block.
+
+ConstExpr	=	Expr.
+Expr	=	CondExpr | Assignment.
+CondExpr	=	CondOrExpr ["?" Expr ":" CondExpr].
+CondOrExpr	=	CondAndExpr {"||" CondAndExpr}.
+CondAndExpr	=	OrExpr {"&&" OrExpr}.
+OrExpr	=	XorExpr {"|" XorExpr}.
+XorExpr	=	AndExpr {"^" AndExpr}.
+AndExpr	=	EqualExpr {"&" EqualExpr}.
+EqualExpr	=	RelExpr {("==" | "!=") RelExpr}.
+RelExpr	=	ShiftExpr {("<" | ">" | "<=" | ">=") ShiftExpr}
+	|	ShiftExpr "instanceof" RefType.
+ShiftExpr	=	AddExpr {("<<" | ">>" | ">>>") AddExpr}.
+AddExpr	=	MulExpr {("+" | "-") MulExpr}.
+MulExpr	=	Unary {("*" | "/" | "%") Unary}.
+
+Unary	=	{"+" | "-" | "++" | "--" | "!" | "~"} Primary {"++" | "--"}.
+
+Primary	=
+	(	Literal
+	|	ident
+	|	"this"
+	|	"super"
+	|	"(" Expr ")"
+	|	"(" Type ")" Primary
+	|	"new"	(	PrimitiveType "[" Expr "]"
+					|	Name	( "[" Expr "]" |
+"(" [ActPars] ")"  )
+                       					 )
+	)
+	{	"." ident
+        	|	"[" [Expr] "]"
+	|	"(" [ActPars] ")"
+	}.
+
+
+ActPars	=	Expr {"," Expr}.
+
+Assignment	=	Designator AssignOp Expr.
+Designator	=	(ident | "this" | "super") {"." ident | "[" Expr "]"}.
+AssignOp	=	"=" | "*=" | "/=" | "+=" | "-=" | "<<=" | ">>=" |
+">>>="
+	|	"&=" | "^=" | "|=".
+
+Type	=	(PrimitiveType | Name) {"[" "]"}.
+PrimitiveType	=	"byte " | "short" | "int" | "long" | "char"
+	|	"float"| "double"
+	|	"boolean".
+RefType	=	Name {"[" "]"}
+	|	PrimitiveType "[" "]" {"[" "]"}.
+Name	=	{ident "."} ident.
+Literal 	=	number | string | char.

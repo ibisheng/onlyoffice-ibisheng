@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>EBNF-Visualizer - Manual</title>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta content="EBNF, GIF, Visualizer, Grafik, Syntax, Diagramm" name="keywords">
+</head>
+<body>
+
+<h1>EBNF Visualizer - Manual</h1>
+
+<h2>Content</h2>
+
+<a href="#Introduction">	Introduction			</a><br>
+<a href="#Simple">		Simple example			</a><br>
+<a href="#EBNF">		EBNF - Extended Backus Naur Form</a><br>
+<a href="#Writing">		Writing an .ebnf-file		</a><br>
+<a href="#Menu">		Menu				</a><br>
+<a href="#Functions">		Functions			</a><br>
+<a href="#License">		License & Copyright		</a><br>
+<a href="#Contact">		Contact				</a><br>
+
+<h2><a name="Introduction">Introduction</a></h2>
+
+This program visualizes EBNF (Extended Backus Naur Form). Therefore an .ebnf  File is required, which contains rules written in EBNF. The program parses the rules, visualizes them in form of syntax diagrams and is able to generate .gif files for further use. Furthermore the program allows to manipulate the look of the generated syntax diagrams.
+
+<h2><a name="Simple">Simple example</a></h2>
+
+<h3>Step 1:</h3>
+Create a .ebnf file with a rule just like “A= a [b] c.”. A .ebnf file is just a simple .txt file, just change the ending of the file.
+
+<h3>Step 2:</h3>
+Start the program and open the .ebnf file via the menu entry “Load Grammar…”. The program parses it. If there exist errors in the .ebnf file, it would be reported in the log window. Otherwise the rule menu will be activated.<p><img src="Manual\open.JPG" alt="Open a .ebnf file">
+
+<h3>Step 3:</h3>
+Choose a rule from the loaded grammar in the rule menu. The chosen rule will be drawn.
+<p><img src="Manual\choose.JPG" alt="Chose a rule">
+
+<h3>Step 4 (optional):</h3>
+Change the look of the syntax diagram in the menu File/Settings.
+<p><img src="Manual\settings.JPG" alt="Settings">
+
+<h3>Step 5 (optional):</h3>
+Save the syntax diagram or just copy/paste it.
+
+<h2><a name="EBNF">EBNF - Extended Backus Naur Form</a></h2>
+
+EBNF is used to define the grammar of programming languages.
+<br>Therefore a set of rules is specified. These are known as production rules.
+They define the patterns or sequences of symbols allowed in the language. Each production rule defines the pattern that represents a named structured part of the language, such as an expression or a statement.
+The name of such a part is called a non-terminal symbol in the language. The basic building blocks of the language are symbols which stand for themselves.
+These can be individual characters or combinations such as keywords and arithmetic operators. These basic elements of the language are called terminal symbols.
+
+<h2><a name="Writing">Writing an .ebnf-file</a></h2>
+
+The following description is informal but will allow you to write EBNF that works with this program.<p>
+A grammar consists of a set of rules. A rule consist of an identifier, followed by “=”, a sequence of meta, terminal and nonterminal symbols and ends with “.” (e.g. “A= a b [c].”)
+
+ 
+<h3>Terminal symbol:</h3>
+
+A terminal symbol can be any string. They are separated by space characters. <br>For example in the rule “A = a b [c].” a, b and c are terminal symbols. 
+<p><img src="Manual\terminal.GIF" alt="Simple example"><p>
+It is also possible to put a terminal symbol under quotes (“) or apostrophes (‘) which is required in some cases. 
+(eg. Quote = "'" a "'".)<p>
+<img src="Manual\Quote.GIF" alt="Simple example"><p>It’s also needed for numbers, because identifiers must begin with a character.
+
+
+<h3>Nonterminal symbol:</h3>
+
+A nonterminal symbol can’t be created in an explicit way.<br>If a terminal symbol matches the string of an rule identifier, it is automatically considered as a nonterminal symbol.<br>
+For example, in the rule “A = a A | b.” A is a nonterminal symbol.
+<p><img src="Manual\nonterminal.GIF" alt="Simple example">
+
+<h3>Meta symbols:</h3>
+
+<h4>- option “[“ “]”</h4>
+The sequence of symbols within these brackets are optional.<br>
+(e.g. Rule1 = “begin [optional things] end.”)
+<p><img src="Manual\Rule1.GIF" alt="Simple example">
+
+<h4>-iteration “{“ “}”</h4>
+The sequence of symbols within these brackets can occur from zero to infinite times.<br>
+(e.g. Rule2 = “begin {and again} end.”)
+<p><img src="Manual\Rule2.GIF" alt="Simple example">
+
+<h4>-alternative “|”</h4>
+It allows to choose a sequence of symbols.<br>
+(e.g. Rule3 = “I am a (good | bad) programmer.”)
+<p><img src="Manual\Rule3.GIF" alt="Simple example">
+
+<h4>-grouping “(“ “)”</h4>
+These brackets are used to group sequences of symbols in a mathematical way.
+
+
+
+<h3>Special symbol – Line break:</h3>
+This program allows to make explicit line breaks within a syntax diagram. To do this, use “\n” in the outer structure of the rule. That means, it will be ignored within an option, iteration or alternative.<br>
+(e.g. “Linebreak = First line \n Second line \n End.”)
+<p><img src="Manual\Linebreak.GIF" alt="Simple example">
+
+
+
+<h2><a name="Menu">Menu</a></h2>
+<p><img src="Manual\open.JPG" alt="Menu">
+<h3>File:</h3>
+
+<h4>Load Grammar… :</h4>
+Allows to load a grammar file (*.ebnf). 
+
+<h4>Save As… :</h4>
+The current rule can be stored as .GIF file or as .EMF file.
+The Windows Enhanced Metafile Format .EMF is based on vectorgraphics and
+therefore better suitable for printing or zooming.
+
+<h4>Copy:</h4>
+The current rule is copied to the clipboard as a picture. It is possible to paste it into any program which allows to paste from the clipboard.
+	
+<h4>Settings… :</h4>
+<p><img src="Manual\settings.JPG" alt="Settings"><br>
+In the menu settings the look of the syntax diagrams can be changed.
+
+<h5>Font</h5>
+
+Change the font of terminal and nonterminal symbols.
+
+<h5>Line</h5>
+
+Change the thickness and the color of the line. It is also possible to increase or decrease the size of the arrows.
+
+<h5>Dimensions</h5>
+
+It is possible to increase or decrease the horizontal and vertical gap between the symbols.
+The look of the terminal and nonterminal symbols can be changed by increasing or decreasing the gap between the line of the symbol and its name.
+
+<h5>Optimizations</h5>
+
+If the checkbox "Enable optimizations" is activated, the syntaxgraph will be optimized. Any change of this option requires to reload the actual grammar.
+
+
+<h2><a name="Functions">Functions</a></h2>
+<h3>Optimizations:</h3>
+This happens implicitly. It is possible to disable them in the settings menu.<br>
+If the syntax graph is optimized, redundant und needless productions within a rule are deleted. That means empty nodes, iterations, options and alternatives are removed. If there is an empty alternative, it is moved to the first position. Already existing alternatives are removed.
+Furthermore some productions are visualized in a more elegant way,
+<br> for example “A = ab {ab}.”
+<p><img src="Manual\optimize1not.GIF" alt="Optimize"><img src="Manual\optimize1.GIF" alt="Optimize"><p>
+or “B = ab { cd ab}.”
+<p><img src="Manual\optimize2not.GIF" alt="Optimize"><img src="Manual\optimize2.GIF" alt="Optimize"><p>
+
+<h3>Navigation:</h3>
+It is possible to navigate through an grammar by left-clicking on nonterminal symbols. Right-clicking allows to go back.
+
+<h2><a name="License">License & Copyright</a></h2>
+
+EBNF Visualizer<br>
+Copyright (c) 2005 Stefan Schoergenhumer, Markus Dopler<br>
+supported by Hanspeter Moessenboeck, University of Linz<br>
+<p>
+This program is free software; you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the 
+Free Software Foundation; either version 2, or (at your option) any 
+later version.
+<p>
+This program is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+<p>
+You should have received a copy of the GNU General Public License along 
+with this program; if not, write to the Free Software Foundation, Inc., 
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+<h2><a name="Contact">Contact</a></h2>
+
+For further questions, please write an Email to:<p>
+Markus Dopler, k0156207@students.jku.at or<br>
+Stefan Schörgenhumer, k0155531@students.jku.at
+
+
+</body>
+</html>
+
+

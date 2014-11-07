@@ -1,0 +1,9 @@
+logic = "TRUE" | "FALSE".
+numConst = DecimalIntegerLiteral "." {decDig} {ExponentPart} | "." decDig {ExponentPart} | DecimalIntegerLiteral {ExponentPart}.
+
+DecimalIntegerLiteral = "0" | NonZeroDigit {decDig}.
+NonZeroDigit = {[+-]}[1-9].
+ExponentPart = "e"i SignedInteger.
+SignedInteger = {[+-]}decDig.
+digSeq = decDig {decDig}.
+decDig = [0-9].

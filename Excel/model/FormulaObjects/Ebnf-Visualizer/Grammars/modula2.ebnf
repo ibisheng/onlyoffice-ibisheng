@@ -1,0 +1,103 @@
+Ident = letter { letter | digit } .
+QualIdent = { Ident "." } Ident .
+Number = Integer | Real .
+Integer = DecInteger | OctInteger | HexInteger .
+DecInteger = digit { digit } .
+OctInteger = ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" )
+             { "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" } "B" .
+HexInteger = digit { digit | "A" | "B" | "C" | "D" | "E" | "F" } "H" .
+Real = digit { digit } "." { digit }
+       [ "E" [ "+" | "-" ] digit { digit } ] .
+String = "'" { character } "'" | '"' { character } '"' | OctChar .
+OctChar = ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" )
+          { "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" } "C" .
+ProgramModule = "MODULE" Ident [ Priority ] ";"
+                { Import } Block "END" Ident "." .
+Block = { Declaration } [ BEGIN StatementSequence ] .
+Declaration = CONST { ConstDeclaration }
+            | TYPE { TypeDeclaration }
+            | VAR { VariableDeclaration }
+            | ProcedureDeclaration
+            | ModuleDeclaration .
+StatementSequence = Statement { ";" Statement } .
+Enumeration = "(" Ident { "," Ident } ")" .
+Subrange = [ QualIdent ] "[" ConstExpr ".." ConstExpr "]" .
+SetType = SET OF SimpleType .
+SimpleType = QualIdent | Enumeration | Subrange .
+ArrayType = ARRAY SimpleType { "," SimpleType } OF Type .
+RecordType = "RECORD" FieldList { ";" FieldList } "END" .
+FieldList = [ Ident { "," Ident } ":" Type
+            | VariantFieldList ] .
+VariantFieldList = CASE [ Ident ] ":" QualIdent OF
+                   ( Variant { "|" Variant }
+                   [ ELSE FieldList { ";" FieldList } ] END ) .
+Variant = [ CaseLabelList ":" FieldList { ";" FieldList } ] .
+CaseLabelList = ConstExpr [ ".." ConstExpr ]
+              { "," ConstExpr [ ".." ConstExpr ] } .
+PointerType = "POINTER" "TO" Type .
+ConstantDeclaration = Ident "=" ConstExpr ";" .
+ConstExpr = Expression .
+TypeDeclaration = Ident "=" type .
+Type = SetType | SimpleType | ArrayType | RecordType
+     | PointerType | ProcedureType .
+VariableDeclaration = Ident { "," Ident } ":" Type ";" .
+Designator = QualIdent { "^" | "." ident
+                       | "[" Expression {"," Expression } "]" } .
+Expression = SimpleExpression [ Relation SimpleExpression ] .
+Relation = "="|"<>"|"#"|"<"|"<="|">"|">="|"IN".
+SimpleExpression = [ "+" | "-" ] Term { ( "+" | "-" | "OR" ) Term } .
+Term = Factor { MulOperator Factor } .
+MulOperator = "*" | "/" | "DIV" | "MOD" | "AND" | "&" .
+Factor = Designator [ "(" [ Expression { "," Expression } ] ")" ]
+       | Number
+       | String
+       | Set
+       | "(" expression ")"
+       | ( "NOT" | "~" ) Factor.
+Set = [ QualIdent ] "{" [ Element { "," Element } ] "}" .
+Element = Expression [ ".." Expression ] .
+Statement = [ Assignment | IfStatement | CaseStatement |
+            WhileStatement | RepeatStatement | ForStatement | LoopStatement |
+            ExitStatement | WithStatement | ProcedureCall | ReturnStatement ] .
+Assignment = Designator ":=" Expression .
+IfStatement = "IF" Expression "THEN" StatementSequence
+              { "ELSIF" Expression "THEN" StatementSequence }
+              [ "ELSE" StatementSequence ] "END" .
+CaseStatement = "CASE" expression "OF"
+                [ CaseLabelList ":" StatementSequence ]
+                { "|" [CaseLabelList ":" StatementSequence ] }
+                [ "ELSE" StatementSequence ] "END" .
+WhileStatement = "WHILE" Expression "DO" StatementSequence "END" .
+RepeatStatement = "REPEAT" StatementSequence "UNTIL" Expression .
+ForStatement = "FOR" Ident ":=" Expression "TO" Expression
+               [ "BY" ConstExpression]
+               ( "DO" StatementSequence "END" ) .
+LoopStatement = "LOOP" StatementSequence "END" .
+ExitStatement = "EXIT".
+WithStatement = "WITH" Designator "DO" StatementSequence "END" .
+ProcedureDeclaration = ProcedureHeading Block END Ident ";" .
+ProcedureHeading = "PROCEDURE" ident [ FormalParameters ] ";" .
+FormalParameters = "(" [ ParamSection { ";" ParamSection } ] ")"
+                   [ ":" QualIdent ] .
+ParamSection = [ "VAR" ] Ident { "," Ident } ":" FormalType .
+FormalType = [ "ARRAY" "OF" ] QualIdent .
+ProcedureCall = Designator [ "(" [ Expression {"," Expression} ] ")" ] .
+ReturnStatement = RETURN [ Expression ] .
+ProcedureType = "PROCEDURE" [ FormalTypeList ].
+FormalTypeList = "(" [ [ "VAR" ] FormalType
+                 { "," [ "VAR" ] FormalType } ] ")" [ ":" QualIdent ] .
+ModuleDeclaration = "MODULE" Ident [ Priority ] ";"
+                    ( { Import } [ Export ] )
+                    Block "END" Ident ";" .
+Import = [ "FROM" ident ] "IMPORT" Ident { "," Ident } ";" .
+Export = "EXPORT" [ "QUALIFIED" ] Ident { "," Ident } ";" .
+DefinitionModule = "DEFINITION" "MODULE" Ident ";"
+                   { Import } { Definition } "END" Ident "." .
+Definition = "CONST" { ConstantDeclaration }
+           | "TYPE" { TypeDefinition }
+           | "VAR" { VariableDeclaration }
+           | ProcedureHeading.
+TypeDefinition = Ident [ "=" Type ] ";" .
+ImplementationModule = "IMPLEMENTATION" ProgramModule .
+TypeTransfer = QualIdent "(" Expression ")" .
+Priority = "[" ConstExpression "]" .

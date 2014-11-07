@@ -1,0 +1,108 @@
+COMPILER EBNF
+
+CHARACTERS
+	letter = 'A'..'Z' + 'a'..'z' + '_'.
+	digit  = '0'..'9'.
+	importantascii  = ' '..'~' .
+	noquote = importantascii - '"'.
+	noapostrophe = importantascii - '\''.
+
+TOKENS
+	ident = letter {letter | digit}.
+	terminal = '"' {noquote} '"' | '\'' {noapostrophe} '\''.
+	wrap = '\\' 'n'.
+
+IGNORE '\t' + '\r' + '\n'
+
+PRODUCTIONS
+	
+	EBNF 
+	= Rule
+		{Rule}.
+
+	Rule
+	= ident						(.	Node n;
+									Symbol s=Symbol.Find(t.val);	//look if already known
+					
+									if(s==null) n=new Node(new Symbol(Node.nt,t.val));
+									else {
+										if(s.typ==Node.nt) {
+											String message="ERROR: Nonterminal symbol "+t.val+" has been defined multiple times.";
+											EbnfForm.WriteLine(message);
+											n=new Node(new Symbol(0,"BUG"));
+										} else { //if only considered as terminal symbol until now
+											s.typ=Node.nt;
+											Symbol.terminalToNt(s.name);
+											Symbol.terminalToNt(s.name);
+											Node.terminalToNt(s.name);
+											n=Node.Find(s.name);	
+										}
+									}
+								 .)
+		"=" 
+		Expr <out n.sym.graph>
+		"."	
+		
+								(.	Graph.Finish(n.sym.graph); .)
+		
+		.
+
+	Expr <out Graph g>
+	= 							(.	Graph g1; .)
+		Alt <out g>
+								(.	bool first = true; 	.)
+		{ '|' 
+			Alt <out g1>
+								(.	if (first) { Graph.MakeFirstAlt(g); first = false; }
+									Graph.MakeAlternative(g, g1); 
+							 	 .)			
+		}		
+		.
+
+	Alt <out Graph g> 
+	= 
+								(.	Graph g1; g=new Graph();  .)
+	{Sym <out g1>
+								(.	Graph.MakeSequence(g, g1); 	.)
+	}
+								(. 	if(g.l==null && g.r==null)
+										g=new Graph(new Node(Node.eps,null));
+							 	 .)
+	.
+
+	Sym <out Graph g> 
+								(.	Graph g1;g=new Graph();	 .)
+	= 
+	ident 						(.	Symbol s=Symbol.Find(t.val);
+									Node n;
+									if(s!=null)	n= new Node(s);
+									else n=new Node(new Symbol(Node.t,t.val)); //type could be nt, but not known yet
+									g=new Graph(n);				
+								 .)
+	|  terminal					(.	
+									char[] trim=new char[1];
+									trim[0]=t.val[0];
+									String temp=t.val.Trim(trim);
+									
+									Node n =new Node(new Symbol(Node.t,temp));
+									g=new Graph(n);				
+								 .)
+
+	|  wrap						(.
+									Node n =new Node(Node.wrap,null);
+									g=new Graph(n);
+								.)
+	
+	| '(' Expr <out g1>')'
+								(.	g=g1;  .)
+	
+	| '[' Expr <out g1>']'
+								(.	Graph.MakeOption(g1);
+									g=g1;
+								 .)
+	| '{' Expr <out g1>'}'
+								(.	Graph.MakeIteration(g1);
+									g=g1;
+								 .)			
+	.
+END EBNF.

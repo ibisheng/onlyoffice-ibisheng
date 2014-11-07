@@ -567,10 +567,18 @@ cArea.prototype.tocBool = function () {
     return this.getValue()[0].tocBool();
 };
 cArea.prototype.toString = function () {
+    var _c;
+
     if( this.getRange() ){
-        return this.getRange().getName();
+        _c = this.getRange().getName();
     }
-    return this._cells;
+    else{
+        _c = this._cells;
+    }
+    if( _c.indexOf(":") < 0 ){
+        _c = _c + ":" + _c;
+    }
+    return _c;
 };
 cArea.prototype.setRange = function ( cell ) {
     this._cells = this.value = cell;
@@ -711,8 +719,6 @@ cArea.prototype.index = function ( r, c, n ) {
     if( r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2 ){
         return new cError( cErrorType.bad_reference );
     }
-
-
 
 };
 
@@ -4585,7 +4591,7 @@ function gaussinv( x ) {
     return z;
 }
 
-function lcl_getLanczosSum( fZ ) {
+function getLanczosSum( fZ ) {
     var num = [
             23531376880.41075968857200767445163675473,
             42919803642.64909876895789904700198885093,
@@ -4645,8 +4651,8 @@ function lcl_getLanczosSum( fZ ) {
 }
 
 /** You must ensure fZ>0; fZ>171.624376956302 will overflow. */
-function lcl_GetGammaHelper( fZ ) {
-    var gamma = lcl_getLanczosSum( fZ ),
+function getGammaHelper( fZ ) {
+    var gamma = getLanczosSum( fZ ),
         fg = 6.024680040776729583740234375,
         zgHelp = fZ + fg - 0.5;
     // avoid intermediate overflow
@@ -4660,17 +4666,17 @@ function lcl_GetGammaHelper( fZ ) {
 }
 
 /** You must ensure fZ>0 */
-function lcl_GetLogGammaHelper( fZ ) {
+function getLogGammaHelper( fZ ) {
     var _fg = 6.024680040776729583740234375, zgHelp = fZ + _fg - 0.5;
-    return Math.log( lcl_getLanczosSum( fZ ) ) + (fZ - 0.5) * Math.log( zgHelp ) - zgHelp;
+    return Math.log( getLanczosSum( fZ ) ) + (fZ - 0.5) * Math.log( zgHelp ) - zgHelp;
 }
 
 function getLogGamma( fZ ) {
     if ( fZ >= maxGammaArgument )
-        return lcl_GetLogGammaHelper( fZ );
+        return getLogGammaHelper( fZ );
     if ( fZ >= 0 )
-        return Math.log( lcl_GetGammaHelper( fZ ) );
+        return Math.log( getGammaHelper( fZ ) );
     if ( fZ >= 0.5 )
-        return Math.log( lcl_GetGammaHelper( fZ + 1 ) / fZ );
-    return lcl_GetLogGammaHelper( fZ + 2 ) - Math.log( fZ + 1 ) - Math.log( fZ );
+        return Math.log( getGammaHelper( fZ + 1 ) / fZ );
+    return getLogGammaHelper( fZ + 2 ) - Math.log( fZ + 1 ) - Math.log( fZ );
 }
