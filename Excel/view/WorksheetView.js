@@ -3870,7 +3870,7 @@
 			}
 
 			if (0 < this.arrActiveChartsRanges.length) {
-				for (i in this.arrActiveChartsRanges ) {
+				for (i = 0; i <  this.arrActiveChartsRanges.length; ++i) {
 					var activeFormula = this.arrActiveChartsRanges[i].clone(true);
 
 					activeFormula = activeFormula.intersection(range);
@@ -3891,11 +3891,6 @@
 					y1 = Math.min(y1, yF1);
 					y2 = Math.max(y2, yF2);
 				}
-
-				// Вышли из редактора, очистим массив
-				// if (false === this.isFormulaEditMode) {
-					// this.arrActiveFormulaRanges = [];
-				// }
 			}
 
 			if (null !== this.activeMoveRange) {
@@ -5604,16 +5599,16 @@
 			return null;
 		};
 
-		WorksheetView.prototype._getCursorFormulaOrChart = function (x, y, offsetX, offsetY) {
-			var i;
-			if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-				var cursor, oFormulaRange, xFormula1, xFormula2, yFormula1, yFormula2;
-				var col = -1, row = -1;
-				var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
-					targetArr = this.isFormulaEditMode ? 0 : -1;
-				for (i in arrRanges) {
-					oFormulaRange = arrRanges[i].clone(true);
-
+		WorksheetView.prototype._getCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
+			var i, l;
+			var cursor, oFormulaRange, xFormula1, xFormula2, yFormula1, yFormula2;
+			var col = -1, row = -1;
+			var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
+				targetArr = this.isFormulaEditMode ? 0 : -1;
+			for (i = 0, l = arrRanges.length; i < l; ++i) {
+				oFormulaRange = arrRanges[i].clone(true);
+				oFormulaRange = oFormulaRange.intersectionSimple(vr);
+				if (oFormulaRange) {
 					xFormula1 = this.cols[oFormulaRange.c1].left - offsetX;
 					xFormula2 = this.cols[oFormulaRange.c2].left + this.cols[oFormulaRange.c2].width - offsetX;
 					yFormula1 = this.rows[oFormulaRange.r1].top - offsetY;
@@ -5623,7 +5618,7 @@
 						(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
 						||
 						(y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px))
-						){
+					){
 						cursor = kCurMove;
 						break;
 					} else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
@@ -5648,12 +5643,9 @@
 						break;
 					}
 				}
-				if (cursor) {
-					return {cursor: cursor, target: c_oTargetType.MoveResizeRange, col: col, row: row,
-						formulaRange: oFormulaRange, indexFormulaRange: i, targetArr: targetArr};
-				}
 			}
-			return null;
+			return cursor ? {cursor: cursor, target: c_oTargetType.MoveResizeRange, col: col, row: row,
+				formulaRange: oFormulaRange, indexFormulaRange: i, targetArr: targetArr} : null;
 		};
 		WorksheetView.prototype._isCursorOnSelectionBorder = function (ar, vr, x, y) {
 			var arIntersection = ar.intersectionSimple(vr);
@@ -5802,9 +5794,11 @@
 				};
 			}
 
-			var oFormulaOrChartCursor = this._getCursorFormulaOrChart(x, y, offsetX, offsetY);
-			if (oFormulaOrChartCursor)
-				return oFormulaOrChartCursor;
+			if (this.isFormulaEditMode || this.isChartAreaEditMode) {
+				var oFormulaOrChartCursor = this._getCursorFormulaOrChart(this.visibleRange, x, y, offsetX, offsetY);
+				if (oFormulaOrChartCursor)
+					return oFormulaOrChartCursor;
+			}
 
 			var xWithOffset = x + offsetX;
 			var yWithOffset = y + offsetY;
@@ -5824,7 +5818,7 @@
 					return {cursor: kCurFillHandle, target: c_oTargetType.FillHandle, col: -1, row: -1};
 				}
 
-				// Навели на выделение
+				// Навели на выделение (стоит вынести в отдельный метод)
 				if (this._isCursorOnSelectionBorder(ar, this.visibleRange, xWithOffset, yWithOffset))
 					return {cursor: kCurMove, target: c_oTargetType.MoveRange, col: -1, row: -1};
 				if (this.topLeftFrozenCell) {
@@ -10372,8 +10366,8 @@
 				// Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
 				var bIsSetWrap = false;
 				if (!skipNLCheck) {
-					for (var key in val) {
-						if (val[key].text.indexOf(kNewLine) >= 0) {
+					for (var i = 0; i < val.length; ++i) {
+						if (val[i].text.indexOf(kNewLine) >= 0) {
 							bIsSetWrap = true;
 							break;
 						}
