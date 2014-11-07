@@ -3508,6 +3508,13 @@
             window.global_pptx_content_writer._End();
             return this.WriteFileHeader(this.Memory.GetCurPosition()) + this.Memory.GetBase64Memory();
         };
+        this.Write2 = function(idWorksheet)
+        {
+            //если idWorksheet не null, то надо серализовать только его.
+            window.global_pptx_content_writer._Start();
+            this.WriteMainTable(idWorksheet);
+            window.global_pptx_content_writer._End();
+        };
         this.WriteFileHeader = function(nDataSize)
         {
             return c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + nDataSize  + ";";
@@ -6702,6 +6709,17 @@
             }
 			if(!pasteBinaryFromExcel)
 				History.TurnOn();
+        };
+        this.ReadData = function(data, wb)
+        {
+            History.TurnOff();
+            this.ReadFile(wb);
+
+            ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
+            ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
+            wb.TableStyles.concatStyles();
+
+            History.TurnOn();
         };
         this.ReadFile = function(wb)
         {

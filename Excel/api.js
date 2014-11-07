@@ -3397,7 +3397,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			return nRes;
 		};
 
-		spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File)
+		spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version)
 		{
 			this.DocumentUrl = "TeamlabNative";
 
@@ -3414,7 +3414,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.initGlobalObjects(this.wbModel);
 
 			var oBinaryFileReader = new Asc.BinaryFileReader(this.DocumentUrl);
-			oBinaryFileReader.Read(base64File, this.wbModel);
+
+            if (undefined === version)
+            {
+                oBinaryFileReader.Read(base64File, this.wbModel);
+            }
+            else
+            {
+                g_nCurFileVersion = version;
+                oBinaryFileReader.ReadData(base64File, this.wbModel);
+            }
 			g_oIdCounter.Set_Load(false);
 
 			this._coAuthoringInit();
@@ -3441,12 +3450,28 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.collaborativeEditing.applyChanges();
 		};
 
+        spreadsheet_api.prototype.asc_nativeApplyChanges2 = function(data, isFull)
+        {
+            // TODO:
+        };
+
 		spreadsheet_api.prototype.asc_nativeGetFile = function()
 		{
 			this.wb._initCommentsToSave();
 			var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
 			return oBinaryFileWriter.Write();
 		};
+        spreadsheet_api.prototype.asc_nativeGetFileData = function()
+        {
+            this.wb._initCommentsToSave();
+            var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+            oBinaryFileWriter.Write2();
+
+            var _header = c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + oBinaryFileWriter.Memory.GetCurPosition() + ";";
+            window["native"]["Save_End"](_header, oBinaryFileWriter.Memory.GetCurPosition());
+
+            return oBinaryFileWriter.Memory.ImData.data;
+        };
 
 		spreadsheet_api.prototype.asc_nativeCheckPdfRenderer = function(_memory1, _memory2)
 		{
