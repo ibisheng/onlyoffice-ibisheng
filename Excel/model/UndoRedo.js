@@ -3020,7 +3020,7 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(gUndoInsDelCellsFlag)
+			if(!bUndo)
 				worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell", range, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
@@ -3059,7 +3059,7 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(gUndoInsDelCellsFlag)
+			if(!bUndo)
 				worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
@@ -3098,7 +3098,7 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(gUndoInsDelCellsFlag)
+			if(!bUndo)
 				worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
@@ -3137,7 +3137,7 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(gUndoInsDelCellsFlag)
+			if(!bUndo)
 				worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell",range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}

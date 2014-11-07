@@ -1946,6 +1946,32 @@ var gUndoInsDelCellsFlag = true;
 						}
 					}
 				}
+				else if(cloneData.oldFilter && cloneData.newFilterRef)//при наличии newFilterRef
+				{
+					if(aWs.AutoFilter && cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.AutoFilter.Ref))
+					{
+						aWs.AutoFilter = cloneData.oldFilter;
+						this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
+					}
+					else if(aWs.TableParts)
+					{
+						for(var l = 0; l < aWs.TableParts.length; l++)
+						{
+							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
+							{
+								aWs.TableParts[l] = cloneData.oldFilter;
+								if(aWs.TableParts[l].AutoFilter != null)
+									this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
+								
+								var splitRange = cloneData.oldFilter.Ref;
+								this._setColorStyleTable(splitRange, cloneData.oldFilter, null, true);
+								this._checkShowButtonsFlag(aWs.TableParts[l]);
+								
+								break;
+							}	
+						}
+					}
+				}
 				else if(cloneData.oldFilter)//в случае удаления/добавления строк 
 				{
 					if(aWs.AutoFilter && cloneData.oldFilter.Ref.isIntersect(aWs.AutoFilter.Ref))
@@ -2246,8 +2272,13 @@ var gUndoInsDelCellsFlag = true;
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
+									else if(activeCells.r1 < tableRange.r1 && activeCells.r2 >= tableRange.r1 && activeCells.r2 < tableRange.r2)//TODO заглушка!!!
+									{
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										return false;
+									}
 								}
-								else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 > tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
+								else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 >= tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
 								{
 									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
@@ -5055,7 +5086,7 @@ var gUndoInsDelCellsFlag = true;
 						var val2 = colStart - startRangeCell;
 						var retVal = this._editFilterAfterInsertColumn(range, valNew, startRangeCell, type, activeCells);
 						if(!retVal)
-							this._editFilterAfterInsertColumn(range,val2,undefined,type,activeCells);
+							this._editFilterAfterInsertColumn(range,val2,undefined,type,activeCells, true);
 					}
 					else
 					{
@@ -5088,7 +5119,7 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//change current filter after insert column
-			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells)
+			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells, notAddToHistory)
 			{
 				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
 				var bRedoChanges = this.worksheet.model.workbook.bRedoChanges;
@@ -5248,20 +5279,21 @@ var gUndoInsDelCellsFlag = true;
 					
 					//change result into filter and change info in button
 					filter = this._changeInfoFilterAfterInsertCols(filter, type, col, cRange, val, filterColums);
-					
-					//записываем в историю, если активная область касается данных фильтров
-					if(!bUndoChanges && !bRedoChanges && val < 0)
+				}
+				
+				//записываем в историю, если активная область касается данных фильтров
+				if(!bUndoChanges && !bRedoChanges && !notAddToHistory)
+				{
+					History.TurnOn();
+					//History.Create_NewPoint();
+					History.StartTransaction();
+					var changeElement = 
 					{
-						History.TurnOn();
-						//History.Create_NewPoint();
-						History.StartTransaction();
-						var changeElement = 
-						{
-							oldFilter: oldFilter
-						};
-						this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref);
-						History.EndTransaction();
-					}
+						oldFilter: oldFilter,
+						newFilterRef: filter.Ref
+					};
+					this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref);
+					History.EndTransaction();
 				}
 				
 				if(cRange.index == 'all')
