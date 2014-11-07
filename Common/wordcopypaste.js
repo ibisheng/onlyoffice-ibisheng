@@ -2750,6 +2750,7 @@ PasteProcessor.prototype =
 			
 			//проверка на возможность втавки в формулу
 			//TODO проверку на excel пеерсмотреть!!!!
+			oSelectedContent.On_EndCollectElements(this.oLogicDocument);
 			if(!this.pasteInExcel && !this.oLogicDocument.Can_InsertContent(oSelectedContent, NearPos))
 				return;
 			
