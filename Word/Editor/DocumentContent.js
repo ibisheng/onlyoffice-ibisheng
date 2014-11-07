@@ -6583,7 +6583,7 @@ CDocumentContent.prototype =
                 Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
             Result_ParaPr = Pr;
-            Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
+            Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true ) && !(this.bPresentation === true);
             if(Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
             {
                 Result_ParaPr.Shd.Unifill.check(this.Get_Theme(), this.Get_ColorMap());
@@ -6648,7 +6648,7 @@ CDocumentContent.prototype =
                     Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
                 Result_ParaPr = Pr;
-                Result_ParaPr.CanAddTable = ( true === Locked ? false : true );
+                Result_ParaPr.CanAddTable = ( true === Locked ? false : true ) && !(this.bPresentation === true);
             }
             else
             {
@@ -6660,7 +6660,7 @@ CDocumentContent.prototype =
 
                     Result_ParaPr         = ParaPr.Copy();
                     Result_ParaPr.Locked  = Locked;
-                    Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
+                    Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true ) && !(this.bPresentation === true);
                 }
                 else if ( type_Table == Item.GetType() )
                 {
