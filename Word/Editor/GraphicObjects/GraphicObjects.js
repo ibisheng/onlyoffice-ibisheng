@@ -1057,6 +1057,7 @@ CGraphicObjects.prototype =
                     selectedObjects[i].recalculate();
                     drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
                     drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
+                    drawing.GraphicObj.setParent(drawing);
                     drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
                     if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
                     {

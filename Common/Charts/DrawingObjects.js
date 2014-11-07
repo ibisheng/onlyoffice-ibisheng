@@ -4027,78 +4027,79 @@ function DrawingObjects() {
 
     _this.updateSizeDrawingObjects = function(target) {
 
-        ExecuteNoHistory(function(){
+       // ExecuteNoHistory(function(){
+        if(History.TurnOffHistory > 0)
+            return;
+        var i, bNeedRecalc = false, drawingObject, coords, cellTo;
+        if(target.target === c_oTargetType.RowResize)
+        {
+            for (i = 0; i < aObjects.length; i++) {
+                drawingObject = aObjects[i];
 
-            var i, bNeedRecalc = false, drawingObject, coords, cellTo;
-            if(target.target === c_oTargetType.RowResize)
-            {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
+                if(drawingObject.from.row >= target.row)
+                {
+                    coords = _this.coordsManager.calculateCoords(drawingObject.from);
+                    CheckSpPrXfrm(drawingObject.graphicObject);
 
-                    if(drawingObject.from.row >= target.row)
+                    var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
+                    rot = normalizeRotate(rot);
+                    if ((rot >= 0 && rot < Math.PI * 0.25)
+                        || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
+                        || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
                     {
-                        coords = _this.coordsManager.calculateCoords(drawingObject.from);
-                        CheckSpPrXfrm(drawingObject.graphicObject);
-
-                        var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                        rot = normalizeRotate(rot);
-                        if ((rot >= 0 && rot < Math.PI * 0.25)
-                            || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                            || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
-                        {
-                            drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
-                            drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
-                        }
-                        else
-                        {
-                            drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX/2 + drawingObject.graphicObject.spPr.xfrm.extY/2);
-                            drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY/2 + drawingObject.graphicObject.spPr.xfrm.extX/2);
-                        }
-                        //drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
-                        //drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
-                        drawingObject.graphicObject.checkDrawingBaseCoords();
-                        bNeedRecalc = true;
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
                     }
+                    else
+                    {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX/2 + drawingObject.graphicObject.spPr.xfrm.extY/2);
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY/2 + drawingObject.graphicObject.spPr.xfrm.extX/2);
+                    }
+                    //drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
+                    //drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+                    drawingObject.graphicObject.checkDrawingBaseCoords();
+                    bNeedRecalc = true;
                 }
             }
-            else
-            {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
+        }
+        else
+        {
+            for (i = 0; i < aObjects.length; i++) {
+                drawingObject = aObjects[i];
 
-                    if(drawingObject.from.col >= target.col)
+                if(drawingObject.from.col >= target.col)
+                {
+                    coords = _this.coordsManager.calculateCoords(drawingObject.from);
+                    CheckSpPrXfrm(drawingObject.graphicObject);
+
+                    var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
+                    rot = normalizeRotate(rot);
+                    if ((rot >= 0 && rot < Math.PI * 0.25)
+                        || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
+                        || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
                     {
-                        coords = _this.coordsManager.calculateCoords(drawingObject.from);
-                        CheckSpPrXfrm(drawingObject.graphicObject);
-
-                        var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                        rot = normalizeRotate(rot);
-                        if ((rot >= 0 && rot < Math.PI * 0.25)
-                            || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                            || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
-                        {
-                            drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
-                            drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
-                        }
-                        else
-                        {
-                            drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX/2 + drawingObject.graphicObject.spPr.xfrm.extY/2);
-                            drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY/2 + drawingObject.graphicObject.spPr.xfrm.extX/2);
-                        }
-
-                        //drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
-                        //drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
-                        drawingObject.graphicObject.checkDrawingBaseCoords();
-                        bNeedRecalc = true;
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
                     }
+                    else
+                    {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX/2 + drawingObject.graphicObject.spPr.xfrm.extY/2);
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY/2 + drawingObject.graphicObject.spPr.xfrm.extX/2);
+                    }
+
+                    //drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
+                    //drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
+                    drawingObject.graphicObject.checkDrawingBaseCoords();
+                    bNeedRecalc = true;
                 }
             }
-            if(bNeedRecalc)
-            {
-                _this.controller.recalculate2();
-                _this.showDrawingObjects(true);
-            }
-        }, _this, []);
+        }
+        if(bNeedRecalc)
+        {
+            _this.controller.recalculate2();
+            _this.showDrawingObjects(true);
+        }
+       // }, _this, []);
     };
 
     _this.checkCursorDrawingObject = function(x, y) {

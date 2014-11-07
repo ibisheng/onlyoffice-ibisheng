@@ -113,6 +113,10 @@ CWrapPolygon.prototype =
         var cur_max_x;
         var cur_min_x;
         var point_count = this.calculatedPoints.length;
+        if(point_count === 0)
+        {
+            return {max: null, min: null};
+        }
         for(var point_index = 1; point_index < point_count; ++point_index)
         {
             var point0 = this.calculatedPoints[point_index-1];
