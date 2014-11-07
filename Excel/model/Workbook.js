@@ -1942,6 +1942,72 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 			});
 	}
 };
+Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, isFull){
+	if(null != data)
+	{
+		this.bCollaborativeChanges = true;
+		
+		if(null == oRedoObjectParam)
+		{
+			var wsViews = window["Asc"]["editor"].wb.wsViews;
+			for(var i in wsViews)
+			{
+				if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
+				{
+					if ( wsViews[i].isChartAreaEditMode ) {
+						wsViews[i].isChartAreaEditMode = false;
+						wsViews[i].arrActiveChartsRanges = [];
+					}
+					wsViews[i].objectRender.controller.resetSelection();
+				}
+			}
+			
+			History.Clear();
+			History.Create_NewPoint();
+			History.SetSelection(null);
+			History.SetSelectionRedo(null);
+			oRedoObjectParam = new Asc.RedoObjectParam();
+			History.UndoRedoPrepare(oRedoObjectParam, false);
+		}
+		
+		var stream = new FT_Stream2(data, data.length);
+		stream.obj = null;
+		// Применяем изменения, пока они есть
+		var _count = stream.GetLong();
+		var _pos = 4;
+		for (var i = 0; i < _count; i++)
+		{
+			if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"])
+			{
+				if (!window["native"]["CheckNextChange"]())
+					break;
+			}
+			
+			var _len = Loader.Reader.GetLong();
+
+			_pos += 4;
+			stream.size = _pos + _len;
+			stream.Seek2(_pos);
+			
+			var item = new UndoRedoItemSerializable();
+			item.Deserialize(stream);
+			if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
+				History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+
+			_pos += _len;
+			stream.Seek2(_pos);
+			stream.size = data.length;
+		}
+				
+		if(isFull){
+			History.UndoRedoEnd(null, oRedoObjectParam, false);
+			History.Clear();
+			oRedoObjectParam = null;
+		}
+		this.bCollaborativeChanges = false;
+	}
+	return oRedoObjectParam;
+}
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor

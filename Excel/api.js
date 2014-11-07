@@ -88,6 +88,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.DocumentLoadComplete = false;
 			// Переменная, которая отвечает, послали ли мы окончание открытия документа
 			this.IsSendDocumentLoadCompleate = false;
+			//текущий обьект куда записываются информация для update, когда принимаются изменения в native редакторе
+			this.oRedoObjectParamNative = null;
 
 			// CoAuthoring and Chat
 			this.User = undefined;
@@ -3452,7 +3454,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
         spreadsheet_api.prototype.asc_nativeApplyChanges2 = function(data, isFull)
         {
-            // TODO:
+			if(null != this.wbModel)
+				this.oRedoObjectParamNative = this.wbModel.DeserializeHistoryNative(this.oRedoObjectParamNative, data, isFull);
+			if(isFull)
+				this._onUpdateAfterApplyChanges();
         };
 
 		spreadsheet_api.prototype.asc_nativeGetFile = function()
