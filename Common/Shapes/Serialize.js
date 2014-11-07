@@ -374,7 +374,7 @@ function BinaryPPTYLoader()
         this.presentation = presentation;
         this.ImageMapChecker = {};
 
-        this.stream = new FileStream(data, data,length);
+        this.stream = new FileStream(data, data.length);
         this.stream.obj = null;
 
         this.presentation.ImageMap = {};

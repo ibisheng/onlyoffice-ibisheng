@@ -5188,11 +5188,11 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 
     if (version === undefined)
     {
-        loader.Load(base64File, this.WordControl.m_oLogicDocument);
+        _loader.Load(base64File, this.WordControl.m_oLogicDocument);
     }
     else
     {
-        loader.Load2(base64File, this.WordControl.m_oLogicDocument);
+        _loader.Load2(base64File, this.WordControl.m_oLogicDocument);
     }
     
     this.LoadedObject = 1;
