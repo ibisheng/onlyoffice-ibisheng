@@ -4297,7 +4297,7 @@
                 }
             } else {
                 // Замерженная ячейка, нужна сумма столбцов
-                for (var i = mc.c1; i <= mc.c2 && i < this.nColsCount; ++i) {
+                for (var i = mc.c1; i <= mc.c2 && i < this.cols.length; ++i) {
                     colWidth += this.cols[i].width;
 					dDigitsCount += this.cols[i].charCount;
                 }
@@ -4431,7 +4431,7 @@
 			if (null === mc) {return this.cols[col].innerWidth;}
 
 			var width = this.cols[mc.c1].innerWidth;
-			for (var c = mc.c1 + 1; c <= mc.c2 && c < this.nColsCount; ++c) {
+			for (var c = mc.c1 + 1; c <= mc.c2 && c < this.cols.length; ++c) {
 				width += this.cols[c].width;
 			}
 			return width;
