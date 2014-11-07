@@ -764,45 +764,6 @@
 				c[channel].apply(this, Array.prototype.slice.call(arguments, 1));
 			}
 		}
-
-
-		function isEqual(Obj1, Obj2)
-		{
-			if(null == Obj1 && null == Obj2)
-				return true;
-		    if(!Obj1 || !Obj2 || typeof(Obj1) != typeof(Obj2))
-		        return false;
-		    var p, v1, v2;
-		    //проверяем чтобы Obj1 имел теже свойства что и Obj2
-		    for(p in Obj2)
-		    {
-		        if(Obj2.hasOwnProperty(p) &&  !Obj1.hasOwnProperty(p))
-		            return false;
-		    }
-		    //проверяем чтобы Obj2 имел теже свойства что и Obj1 и сравниваем их
-		    for(p in Obj1)
-		    {
-		        if(Obj1.hasOwnProperty(p))
-				{
-					if(!Obj2.hasOwnProperty(p))
-						return false;
-					
-					v1 = Obj1[p];
-					v2 = Obj2[p];
-					if(v1 && v2 && kObjectL === typeof(v1) && kObjectL === typeof(v2) )
-					{
-						if( false == isEqual(v1, v2))
-							return false;
-					}
-					else
-					{
-						if(v1 != v2)
-							return false;
-					}
-				}
-		    }
-		    return true;
-		}
 		
 		function trim(val)
 		{
@@ -1490,7 +1451,6 @@
 		window["Asc"].ceil = ceil;
 		window["Asc"].incDecFonSize = incDecFonSize;
 		window["Asc"].outputDebugStr = outputDebugStr;
-		window["Asc"].isEqual = isEqual;
 		window["Asc"].profileTime = profileTime;
 		window["Asc"].isNumber = isNumber;
 		window["Asc"].isNumberInfinity = isNumberInfinity;

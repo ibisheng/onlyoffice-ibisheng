@@ -2532,19 +2532,19 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	History.Create_NewPoint();
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
-	var aIndexes = [];
-	for(var i in this.aGCells)
+	var i, j, length, nIndex, aIndexes = [];
+	for(i in this.aGCells)
 	{
-		var nIndex = i - 0;
+		nIndex = i - 0;
 		if(nIndex >= start)
 			aIndexes.push(nIndex);
 	}
 	//По возрастанию
 	aIndexes.sort(fSortAscending);
 	var oDefRowPr = new UndoRedoData_RowProp();
-	for(var i = 0, length = aIndexes.length; i < length; ++i)
+	for(i = 0, length = aIndexes.length; i < length; ++i)
 	{
-		var nIndex = aIndexes[i];
+		nIndex = aIndexes[i];
 		var row = this.aGCells[nIndex];
 		if(nIndex > stop)
 		{
@@ -2553,16 +2553,16 @@ Woorksheet.prototype._removeRows=function(start, stop){
 				var oTargetRow = this._getRow(nIndex + nDif);
 				oTargetRow.copyProperty(row);
 			}
-			for(var j in row.c)
-				this._moveCellVer(nIndex, j - 0, nDif);	
+			for(j in row.c)
+				this._moveCellVer(nIndex, j - 0, nDif);
 		}
 		else
 		{
 			var oOldProps = row.getHeightProp();
-			if(false == Asc.isEqual(oOldProps, oDefRowPr))
+			if (false === oOldProps.isEqual(oDefRowPr))
 			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(nIndex, true, oOldProps, oDefRowPr));
 			row.setStyle(null);
-			for(var j in row.c)
+			for(j in row.c)
 			{
 				var nColIndex = j - 0;
 				//удаляем ячейку
@@ -2574,12 +2574,9 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 
 	var oActualRange = {r1: start, c1: 0, r2: stop, c2: gc_nMaxCol0};
-	var res = this.renameDependencyNodes( {offsetRow:nDif,offsetCol:0}, oActualRange );
+	this.renameDependencyNodes({offsetRow:nDif,offsetCol:0}, oActualRange);
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
-		
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
 	return true;
 };
@@ -2629,15 +2626,12 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
         }
         History.LocalChange = false;
     }
-	var res = this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
+	this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
 	this.nRowsCount += count;
 	
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-
 	return true;
 };
 Woorksheet.prototype.insertRowsAfter=function(index, count){
@@ -2659,23 +2653,23 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
 	//start, stop 0 based
-	var nDif = -(stop - start + 1);
-	for(var i in this.aGCells)
+	var nDif = -(stop - start + 1), i, j, length, nIndex;
+	for(i in this.aGCells)
 	{
 		var nRowIndex = i - 0;
 		var row = this.aGCells[i];
 		var aIndexes = [];
-		for(var j in row.c)
+		for(j in row.c)
 		{
-			var nIndex = j - 0;
+			nIndex = j - 0;
 			if(nIndex >= start)
 				aIndexes.push(nIndex);
 		}
 		//сортируем по возрастанию
 		aIndexes.sort(fSortAscending);
-		for(var j = 0, length = aIndexes.length; j < length; ++j)
+		for(j = 0, length = aIndexes.length; j < length; ++j)
 		{
-			var nIndex = aIndexes[j];
+			nIndex = aIndexes[j];
 			if(nIndex > stop)
 			{
 				this._moveCellHor(nRowIndex, nIndex, nDif, {r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop});
@@ -2689,19 +2683,19 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	}
 	
 	var oDefColPr = new UndoRedoData_ColProp();
-	for(var i = start; i <= stop; ++i)
+	for(i = start; i <= stop; ++i)
 	{
 		var col = this.aCols[i];
 		if(null != col)
 		{
 			var oOldProps = col.getWidthProp();
-			if(false == Asc.isEqual(oOldProps, oDefColPr))
+			if(false === oOldProps.isEqual(oDefColPr))
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.getId(), new Asc.Range(i, 0, i, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(i, false, oOldProps, oDefColPr));
 			col.setStyle(null);
 		}
 	}
 	this.aCols.splice(start, stop - start + 1);
-	for(var i = start, length = this.aCols.length; i < length; ++i)
+	for(i = start, length = this.aCols.length; i < length; ++i)
 	{
 		var elem = this.aCols[i];
 		if(null != elem)
@@ -2711,13 +2705,10 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 
 	var oActualRange = { r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop };
-	var res = this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
+	this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
-	
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-		
+
 	return true;
 };
 Woorksheet.prototype.insertColsBefore=function(index, count){
@@ -2750,7 +2741,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 		}
 	}
 	
-	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
+	this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
@@ -2780,10 +2771,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 			elem.moveHor(count);
 	}
 	this.nColsCount += count;
-	
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-	
+
 	return true;
 };
 Woorksheet.prototype.insertColsAfter=function(index, count){
@@ -3010,7 +2998,7 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	var oThis = this;
+	var oThis = this, i;
 	var oSelection = History.GetSelection();
 	if(null != oSelection)
 	{
@@ -3028,24 +3016,21 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop){
 			row.CustomHeight = true;
 			row.hd = null;
 			var oNewProps = row.getHeightProp();
-			if(false == Asc.isEqual(oOldProps, oNewProps))
+			if(false === oOldProps.isEqual(oNewProps))
 			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
 	{
-		var row = this.getAllRow();
-		fProcessRow(row);
-		for(var i in this.aGCells){
-			var row = this.aGCells[i];
-			fProcessRow(row);
+		fProcessRow(this.getAllRow());
+		for(i in this.aGCells){
+			fProcessRow(this.aGCells[i]);
 		}
 	}
 	else
 	{
-		for(var i = start; i <= stop; i++){
-			var row = this._getRow(i);
-			fProcessRow(row);
+		for(i = start; i <= stop; ++i){
+			fProcessRow(this._getRow(i));
 		}
 	}
 };
@@ -3060,7 +3045,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	var oThis = this;
+	var oThis = this, i;
 	var fProcessRow = function(row){
 		if(row && row.hd != bHidden)
 		{
@@ -3070,34 +3055,21 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 			else
 				row.hd = null;
 			var oNewProps = row.getHeightProp();
-			if(false == Asc.isEqual(oOldProps, oNewProps))
+			if(false === oOldProps.isEqual(oNewProps))
 			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
 	{
-		var row = null;
-		if(false == bHidden)
-			row = this.oSheetFormatPr.oAllRow;
-		else
-			row = this.getAllRow();
-		if(null != row)
-			fProcessRow(row);
-		for(var i in this.aGCells){
-			var row = this.aGCells[i];
-			fProcessRow(row);
-		}
+        fProcessRow(false == bHidden ? this.oSheetFormatPr.oAllRow : this.getAllRow());
+
+		for(i in this.aGCells)
+			fProcessRow(this.aGCells[i]);
 	}
 	else
 	{
-		for(var i = start; i <= stop; i++){
-			var row = null;
-			if(false == bHidden)
-				row = this._getRowNoEmpty(i);
-			else
-				row = this._getRow(i);
-			fProcessRow(row);
-		}
+		for(i = start; i <= stop; ++i)
+			fProcessRow(false == bHidden ? this._getRowNoEmpty(i) : this._getRow(i));
 	}
 };
 Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
@@ -3107,7 +3079,8 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	var oThis = this;
+	var oThis = this, i;
+    var isDefaultProp = (true == bBestFit && gc_dDefaultRowHeightAttribute == height);
 	var fProcessRow = function(row){
 		if(row)
 		{
@@ -3118,32 +3091,18 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 				row.CustomHeight = true;
 			row.height = height;
 			var oNewProps = row.getHeightProp();
-			if(false == Asc.isEqual(oOldProps, oNewProps))
+			if(false == oOldProps.isEqual(oOldProps))
 			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
 	{
-		var row = null;
-		if(true == bBestFit && gc_dDefaultRowHeightAttribute == height)
-			row = this.oSheetFormatPr.oAllRow;
-		else
-			row = this.getAllRow();
-		if(null != row)
-			fProcessRow(row);
-		for(var i in this.aGCells){
-			var row = this.aGCells[i];
-			fProcessRow(row);
-		}
+		fProcessRow(isDefaultProp ? this.oSheetFormatPr.oAllRow : this.getAllRow());
+		for(i in this.aGCells)
+			fProcessRow(this.aGCells[i]);
 	}
-	for(var i = start; i <= stop; i++){
-		var row = null;
-		if(true == bBestFit && gc_dDefaultRowHeightAttribute == height)
-			row = this._getRowNoEmpty(i);
-		else
-			row = this._getRow(i);
-		fProcessRow(row);
-	}
+	for(i = start; i <= stop; ++i)
+		fProcessRow(isDefaultProp ? this._getRowNoEmpty(i) : this._getRow(i));
 };
 Woorksheet.prototype.getCell=function(oCellAdd){
 	return this.getRange(oCellAdd, oCellAdd);
@@ -3658,13 +3617,8 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	}
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 
-	var res = this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );	
+	this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
 	//todo проверить не уменьшились ли границы таблицы
-	
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-	
-
 };
 Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	var nTop = oBBox.r1;
@@ -3702,12 +3656,8 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 
-	var res = this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );	
+	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
 	//todo проверить не уменьшились ли границы таблицы
-	
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	var nLeft = oBBox.c1;
@@ -3739,11 +3689,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 
-	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
-
-		
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+	this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
 };
 Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	var nTop = oBBox.r1;
@@ -3773,10 +3719,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	}
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 
-	var res = this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
-		
-//	for(var id  in res)
-//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
@@ -4047,7 +3990,7 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 };
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	this.workbook.dependencyFormulas.checkOffset(oBBox, offset, this.Id, noDelete);
-			};
+};
 Woorksheet.prototype.getAllCol = function(){
 	if(null == this.oAllCol)
 		this.oAllCol = new Col(this, g_nAllColIndex);
@@ -7569,7 +7512,7 @@ Range.prototype._promoteFromTo=function(from, to, bIsPromote, oCanPromote, bCtrl
 		                if (null != propElem.prop) {
 		                    var oNewProps = propElem.prop;
 		                    var oOldProps = row.getHeightProp();
-		                    if (false == Asc.isEqual(oOldProps, oNewProps)) {
+		                    if (false === oOldProps.isEqual(oNewProps)) {
 		                        row.setHeightProp(oNewProps);
 		                        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.worksheet.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(nCurIndex, true, oOldProps, oNewProps));
 		                    }
