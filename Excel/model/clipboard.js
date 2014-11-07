@@ -536,8 +536,6 @@
 			pasteRange: function (worksheet) {
 				var t = this;
 				
-				this._startCopyOrPaste();
-				
 				if(AscBrowser.isMozilla)
 					t._editorPaste(worksheet,t._getStylesSelect);
 				else
@@ -860,7 +858,9 @@
             _editorPaste: function (worksheet,callback) {
                 if(window.USER_AGENT_SAFARI_MACOS)
 					return;
-					
+				
+				this._startCopyOrPaste();
+				
 				var t = this;
 				window.GlobalPasteFlagCounter = 1;
 				isTruePaste = false;
