@@ -8688,6 +8688,11 @@ CDocument.prototype =
         if (true === Para.Parent.Is_DrawingShape() && true === SelectedContent.HaveShape)
             return false;
 
+
+        //В заголовки диаграмм не вставляем формулы и любые DrawingObjects
+        if(Para.bFromDocument === false && (SelectedContent.DrawingObjects.length > 0 || SelectedContent.HaveMath))
+            return false;
+
         // Проверяем корректность места, куда вставляем
         var ParaNearPos = NearPos.Paragraph.Get_ParaNearestPos(NearPos);
         if (null === ParaNearPos || ParaNearPos.Classes.length < 2)
