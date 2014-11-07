@@ -7670,7 +7670,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 };
 
 window["asc_docs_api"] = asc_docs_api;
-window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
+window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
 {
 	this.DocumentUrl = "TeamlabNative";
 
@@ -7692,16 +7692,32 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
 
 	var openParams = {checkFileSize: this.isMobileVersion, charCount: 0, parCount: 0};
 	var oBinaryFileReader = new BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
-	
-	if(oBinaryFileReader.Read(base64File))
-	{
-		g_oIdCounter.Set_Load(false);
-		this.LoadedObject = 1;
 
-		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-	}
-	else
-		this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+    if (undefined === version)
+    {
+        if (oBinaryFileReader.Read(base64File))
+        {
+            g_oIdCounter.Set_Load(false);
+            this.LoadedObject = 1;
+
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+        }
+        else
+            this.asc_fireCallback("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
+    }
+    else
+    {
+        g_nCurFileVersion = version;		
+        if(oBinaryFileReader.ReadData(base64File))
+        {
+            g_oIdCounter.Set_Load(false);
+            this.LoadedObject = 1;
+
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+        }
+        else
+            this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+    }
 		
 	//callback
 	this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
@@ -7721,59 +7737,6 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
             this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
     }
 };
-window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, version)
-{
-    this.DocumentUrl = "TeamlabNative";
-
-    window.g_cAscCoAuthoringUrl = "";
-    window.g_cAscSpellCheckUrl = "";
-
-    this.User = new Asc.asc_CUser();
-    this.User.asc_setId("TM");
-    this.User.asc_setUserName("native");
-
-    this.WordControl.m_bIsRuler = false;
-    this.WordControl.Init();
-
-    this.InitEditor();
-    this.DocumentType = 2;
-    this.LoadedObjectDS = Common_CopyObj(this.WordControl.m_oLogicDocument.Get_Styles().Style);
-
-    g_oIdCounter.Set_Load(true);
-
-    var openParams = {checkFileSize: this.isMobileVersion, charCount: 0, parCount: 0};
-    var oBinaryFileReader = new BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
-
-	g_nCurFileVersion = version;
-    if(oBinaryFileReader.ReadData(base64File))
-    {
-        g_oIdCounter.Set_Load(false);
-        this.LoadedObject = 1;
-
-        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-    }
-    else
-        this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
-
-    //callback
-    this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
-    var sizeMM;
-    if(this.DocumentOrientation)
-        sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
-    else
-        sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
-    this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
-    this.sync_PageOrientCallback(editor.get_DocumentOrientation());
-
-    if (this.GenerateNativeStyles !== undefined)
-    {
-        this.GenerateNativeStyles();
-
-        if (this.WordControl.m_oDrawingDocument.CheckTableStylesOne !== undefined)
-            this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
-    }
-};
-
 window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 {
     if (null == this.WordControl.m_oLogicDocument)

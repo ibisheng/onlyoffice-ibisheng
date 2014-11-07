@@ -254,12 +254,12 @@ function NativeOpenFileData(data, version)
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["asc_docs_api"]("");
-        _api.asc_nativeOpenFile2(data, version);
+        _api.asc_nativeOpenFile(data, version);
     }
     else
     {
         _api = new window["Asc"]["spreadsheet_api"]();
-        _api.asc_nativeOpenFile2(data, version);
+        _api.asc_nativeOpenFile(data, version);
     }
 }
 
