@@ -197,6 +197,11 @@ XYAdjustmentTrack.prototype.getBounds = function()
     bounds_checker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
     bounds_checker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
 
+    bounds_checker.Bounds.posX = this.originalShape.x;
+    bounds_checker.Bounds.posY = this.originalShape.y;
+    bounds_checker.Bounds.extX = this.originalShape.extY;
+    bounds_checker.Bounds.extY = this.originalShape.extY;
+
     return bounds_checker.Bounds;
 };
 

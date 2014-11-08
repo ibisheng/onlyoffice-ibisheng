@@ -283,6 +283,11 @@ function RotateTrackShapeImage(originalObject)
         boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
         boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
         boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+
+        boundsChecker.Bounds.posX = this.originalObject.x;
+        boundsChecker.Bounds.posY = this.originalObject.y;
+        boundsChecker.Bounds.extX = this.originalObject.extX;
+        boundsChecker.Bounds.extY = this.originalObject.extY;
         return boundsChecker.Bounds;
     }
 }
@@ -348,6 +353,10 @@ function RotateTrackGroup(originalObject)
         boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
         boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
         boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+        boundsChecker.Bounds.posX = this.originalObject.x;
+        boundsChecker.Bounds.posY = this.originalObject.y;
+        boundsChecker.Bounds.extX = this.originalObject.extX;
+        boundsChecker.Bounds.extY = this.originalObject.extY;
         return boundsChecker.Bounds;
     };
 

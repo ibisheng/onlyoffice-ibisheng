@@ -63,40 +63,14 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
     {
         var boundsChecker = new  CSlideBoundsChecker();
         this.draw(boundsChecker);
+        boundsChecker.Bounds.posX = boundsChecker.Bounds.min_x;
+        boundsChecker.Bounds.posY = boundsChecker.Bounds.min_y;
+        boundsChecker.Bounds.extX = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+        boundsChecker.Bounds.extY = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
         return boundsChecker.Bounds;
     };
 
-    this.getLeftTopPoint = function()
-    {
-        if(this.arrPoint.length  < 1)
-            return {x: 0, y: 0};
-        var xMax = this.arrPoint[0].x, yMax = this.arrPoint[0].y, xMin = xMax, yMin = yMax;
-        var i;
-        for( i = 1; i<this.arrPoint.length; ++i)
-        {
-            if(this.arrPoint[i].x > xMax)
-            {
-                xMax = this.arrPoint[i].x;
-            }
-            if(this.arrPoint[i].y > yMax)
-            {
-                yMax = this.arrPoint[i].y;
-            }
-
-            if(this.arrPoint[i].x < xMin)
-            {
-                xMin = this.arrPoint[i].x;
-            }
-
-            if(this.arrPoint[i].y < yMin)
-            {
-                yMin = this.arrPoint[i].y;
-            }
-        }
-
-        return {x: xMin, y: yMin};
-    };
-
+    
     this.getShape =  function(bWord, drawingDocument, drawingObjects)
     {
         var xMax = this.arrPoint[0].x, yMax = this.arrPoint[0].y, xMin = xMax, yMin = yMax;
@@ -212,6 +186,8 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         shape.spPr.setGeometry(geometry);
         shape.setBDeleted(false);
         shape.recalculate();
+        shape.x = xMin;
+        shape.y = yMin;
         return shape;
     }
 }

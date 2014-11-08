@@ -4436,8 +4436,8 @@ ParaDrawing.prototype =
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex, this.DocumentContent && this.DocumentContent.Is_HdrFtr());
-        var _x = !this.PositionH.Align ? x - this.GraphicObj.bounds.x : x;
-        var _y = !this.PositionV.Align ? y - this.GraphicObj.bounds.y : y;
+        var _x = this.PositionH.Align ? x - this.GraphicObj.bounds.x : x;
+        var _y = this.PositionV.Align ? y - this.GraphicObj.bounds.y : y;
         this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
         this.selectX = x;
         this.selectY = y;
@@ -5464,11 +5464,12 @@ ParaDrawing.prototype =
             }
             case historyitem_SetWrapPolygon:
             {
-                Writer.WriteBool(Data.newW !== null && typeof Data.newW === "object");
-                if(Data.newW !== null && typeof Data.newW === "object")
-                {
-                    Writer.WriteString2(Data.newW);
-                }
+                writeObject(Writer, Data.newW);
+               // Writer.WriteBool(Data.newW !== null && typeof Data.newW === "object");
+               // if(Data.newW !== null && typeof Data.newW === "object")
+               // {
+               //     Writer.WriteString2(Data.newW);
+               // }
                 break;
             }
         }
@@ -5644,14 +5645,7 @@ ParaDrawing.prototype =
             }
             case historyitem_SetWrapPolygon:
             {
-                if(Reader.GetBool())
-                {
-                    this.wrappingPolygon = g_oTableId.Get_ById(Reader.GetString2());
-                }
-                else
-                {
-                    this.wrappingPolygon = null;
-                }
+                this.wrappingPolygon = readObject(Reader);
                 break;
             }
         }
@@ -6509,7 +6503,7 @@ ParaDrawing.prototype =
 
     addWrapPolygon: function(wrapPolygon)
     {
-        History.Add(this,  {Type: historyitem_SetExtent, oldW: this.wrappingPolygon, newW: wrapPolygon});
+        History.Add(this,  {Type: historyitem_SetWrapPolygon, oldW: this.wrappingPolygon, newW: wrapPolygon});
         this.wrappingPolygon = wrapPolygon;
     },
 

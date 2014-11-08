@@ -87,7 +87,7 @@ StartAddNewShape.prototype =
             History.Create_NewPoint();
             var bounds = this.drawingObjects.arrTrackObjects[0].getBounds();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
-            var drawing = new ParaDrawing(bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
+            var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
             var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.pageIndex, bounds.min_x, bounds.min_y, true, drawing);
             if(false === editor.isViewMode && nearest_pos && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : nearest_pos.Paragraph, CheckType : changestype_Paragraph_Content} ) && false === editor.isViewMode)
             {
@@ -99,7 +99,7 @@ StartAddNewShape.prototype =
                 nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                 nearest_pos.Page = this.pageIndex;
 
-                drawing.Set_XYForAdd(bounds.min_x, bounds.min_y, nearest_pos, this.pageIndex);
+                drawing.Set_XYForAdd(shape.x, shape.y, nearest_pos, this.pageIndex);
                 drawing.Add_ToDocument(nearest_pos, false);
                 this.drawingObjects.resetSelection();
                 shape.select(this.drawingObjects, this.pageIndex);
@@ -429,7 +429,7 @@ ChangeAdjState.prototype =
                 this.drawingObjects.arrTrackObjects[0].trackEnd();
                 if(!this.majorObject.parent.Is_Inline())
                 {
-                    this.majorObject.parent.OnEnd_ChangeFlow(bounds.min_x, bounds.min_y, this.majorObject.parent.pageIndex, bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, nearest_pos, true, true);
+                    this.majorObject.parent.OnEnd_ChangeFlow(this.majorObject.x, this.majorObject.y, this.majorObject.parent.pageIndex, this.majorObject.extX, this.majorObject.extY, nearest_pos, true, true);
                 }
                 else
                 {
@@ -569,10 +569,10 @@ RotateState.prototype =
                             bounds = arr_bounds[i];
                             this.drawingObjects.arrTrackObjects[i].trackEnd(true);
                             var original = this.drawingObjects.arrTrackObjects[i].originalObject;
-                            original.parent.Update_Size(bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y);
+                            original.parent.Update_Size(bounds.extX, bounds.extY);
                             arr_nearest_pos[i].Paragraph.Check_NearestPos(arr_nearest_pos[i]);
                             original.parent.Remove_FromDocument(false);
-                            original.parent.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], original.selectStartPage);
+                            original.parent.Set_XYForAdd(bounds.posX, bounds.posY, arr_nearest_pos[i], original.selectStartPage);
                         }
 
                         if(!(this instanceof RotateState || this instanceof ResizeState))
@@ -593,7 +593,7 @@ RotateState.prototype =
                                             RelativeFrom: c_oAscRelativeFromH.Page,
                                             UseAlign : false,
                                             Align    : undefined,
-                                            Value    : arr_bounds[i].min_x
+                                            Value    : arr_bounds[i].posX
                                         },
 
                                         PositionV:
@@ -601,7 +601,7 @@ RotateState.prototype =
                                             RelativeFrom: c_oAscRelativeFromV.Page,
                                             UseAlign    : false,
                                             Align       : undefined,
-                                            Value       : arr_bounds[i].min_y
+                                            Value       : arr_bounds[i].posY
                                         }
                                     }));
                                 this.drawingObjects.arrTrackObjects[i].originalObject.parent.Add_ToDocument2(arr_parent_paragraphs[i]);
@@ -620,7 +620,7 @@ RotateState.prototype =
                             para_drawing.Set_GraphicObject(this.drawingObjects.arrTrackObjects[i].originalObject.copy());
                             para_drawing.GraphicObj.setParent(para_drawing);
                             bounds = arr_bounds[i];
-                            para_drawing.Set_XYForAdd(bounds.min_x, bounds.min_y, arr_nearest_pos[i], pageIndex);
+                            para_drawing.Set_XYForAdd(bounds.posX, bounds.posY, arr_nearest_pos[i], pageIndex);
                             arr_para_drawings.push(para_drawing);
                             this.drawingObjects.selectObject(para_drawing.GraphicObj, pageIndex);
                         }
@@ -1060,6 +1060,8 @@ MoveInGroupState.prototype =
         var bounds = this.group.bounds;
         var check_paragraphs = [];
         check_paragraphs.push(this.group.parent.Get_ParentParagraph());
+        var posX = this.group.spPr.xfrm.offX;
+        var posY = this.group.spPr.xfrm.offY;
         this.group.spPr.xfrm.setOffX(0);
         this.group.spPr.xfrm.setOffY(0);
         if(this.group.parent.Is_Inline())
@@ -1072,7 +1074,7 @@ MoveInGroupState.prototype =
             if(nearest_pos.Paragraph !== check_paragraphs[0])
                 check_paragraphs.push(nearest_pos.Paragraph);
 
-            this.group.parent.OnEnd_ChangeFlow(this.group.parent.X + (bounds.x - old_x), this.group.parent.Y + (bounds.y - old_y), this.group.parent.pageIndex, bounds.w, bounds.h, nearest_pos, true, false);
+            this.group.parent.OnEnd_ChangeFlow(this.group.posX + posX, this.group.posY + posY, this.group.parent.pageIndex, this.group.spPr.xfrm.extX, this.group.spPr.xfrm.extY, nearest_pos, true, false);
         }
         if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
         {
@@ -1326,7 +1328,7 @@ ChangeWrapContour.prototype.onMouseUp = function(e, x, y, pageIndex)
         var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.majorObject.selectStartPage, this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, true, this.majorObject.parent);
         nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
         this.majorObject.parent.Remove_FromDocument(false);
-        this.majorObject.parent.Set_XYForAdd(this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, nearest_pos, this.majorObject.selectStartPage);
+        this.majorObject.parent.Set_XYForAdd(this.majorObject.posX, this.majorObject.posY, nearest_pos, this.majorObject.selectStartPage);
         this.majorObject.parent.Add_ToDocument2(this.majorObject.parent.Get_ParentParagraph());
         this.drawingObjects.document.Recalculate();
     }
@@ -1415,7 +1417,7 @@ ChangeWrapContourAddPoint.prototype.onMouseUp = function(e, x, y, pageIndex)
         var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.majorObject.selectStartPage, this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, true, this.majorObject.parent);
         nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
         this.majorObject.parent.Remove_FromDocument(false);
-        this.majorObject.parent.Set_XYForAdd(this.majorObject.posX + this.majorObject.bounds.x, this.majorObject.posY + this.majorObject.bounds.y, nearest_pos, this.majorObject.selectStartPage);
+        this.majorObject.parent.Set_XYForAdd(this.majorObject.posX, this.majorObject.posY, nearest_pos, this.majorObject.selectStartPage);
         this.majorObject.parent.Add_ToDocument2(this.majorObject.parent.Get_ParentParagraph());
         this.drawingObjects.document.Recalculate();
     }

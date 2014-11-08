@@ -722,6 +722,11 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
             boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
             boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+
+            boundsChecker.Bounds.posX = this.resizedPosX;
+            boundsChecker.Bounds.posY = this.resizedPosY;
+            boundsChecker.Bounds.extX = this.resizedExtX;
+            boundsChecker.Bounds.extY = this.resizedExtY;
             return boundsChecker.Bounds;
         };
 
@@ -1377,6 +1382,14 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
             boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
             boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+
+
+            boundsChecker.Bounds.posX = this.resizedPosX;
+            boundsChecker.Bounds.posY = this.resizedPosY;
+
+            boundsChecker.Bounds.extX = this.resizedExtX;
+            boundsChecker.Bounds.extY = this.resizedExtY;
+
             return boundsChecker.Bounds;
         };
 

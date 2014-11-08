@@ -119,51 +119,6 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         g.ds();
     };
 
-    this.getLeftTopPoint = function()
-    {
-        if(this.path.length < 1)
-            return {x: 0, y: 0};
-
-        var min_x = this.path[0].x;
-        var max_x = min_x;
-        var min_y = this.path[0].y;
-        var max_y = min_y;
-        var last_x = this.path[0].x, last_y = this.path[0].y;
-        for(var index = 1; index < this.path.length; ++index)
-        {
-            var path_command = this.path[index];
-            if(path_command.id === 1)
-            {
-                if(min_x > path_command.x)
-                    min_x = path_command.x;
-                if(max_x < path_command.x)
-                    max_x = path_command.x;
-                if(min_y > path_command.y)
-                    min_y = path_command.y;
-                if(max_y < path_command.y)
-                    max_y = path_command.y;
-            }
-            else
-            {
-                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, APPROXIMATE_EPSILON);
-                for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
-                {
-                    var cur_point = bezier_polygon[point_index];
-                    if(min_x > cur_point.x)
-                        min_x = cur_point.x;
-                    if(max_x < cur_point.x)
-                        max_x = cur_point.x;
-                    if(min_y > cur_point.y)
-                        min_y = cur_point.y;
-                    if(max_y < cur_point.y)
-                        max_y = cur_point.y;
-
-                }
-            }
-        }
-        return {x: min_x, y: min_y};
-    };
-
     this.getShape =  function(bWord, drawingDocument, drawingObjects)
     {
         var xMax = this.path[0].x, yMax = this.path[0].y, xMin = xMax, yMin = yMax;
@@ -323,6 +278,8 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         shape.spPr.setGeometry(geometry);
         shape.setBDeleted(false);
         shape.recalculate();
+        shape.x = xMin;
+        shape.y = yMin;
         return shape;
     };
 
@@ -334,6 +291,10 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
     {
         var boundsChecker = new  CSlideBoundsChecker();
         this.draw(boundsChecker);
+        boundsChecker.Bounds.posX = boundsChecker.Bounds.min_x;
+        boundsChecker.Bounds.posY = boundsChecker.Bounds.min_y;
+        boundsChecker.Bounds.extX = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+        boundsChecker.Bounds.extY = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
         return boundsChecker.Bounds;
     };
 }

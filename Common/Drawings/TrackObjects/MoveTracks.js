@@ -142,6 +142,10 @@ MoveShapeImageTrack.prototype.getBounds = function()
     boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
     boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
     boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+    boundsChecker.Bounds.posX = this.x;
+    boundsChecker.Bounds.posY = this.y;
+    boundsChecker.Bounds.extX =  this.originalObject.extX;
+    boundsChecker.Bounds.extY =  this.originalObject.extY;
     return boundsChecker.Bounds;
 };
 
@@ -292,6 +296,10 @@ function MoveGroupTrack(originalObject)
         {
             this.overlayObjects[i].draw(bounds_checker);
         }
+        bounds_checker.Bounds.posX = this.x;
+        bounds_checker.Bounds.posY = this.y;
+        bounds_checker.Bounds.extX = this.originalObject.extX;
+        bounds_checker.Bounds.extY = this.originalObject.extY;
         return bounds_checker.Bounds;
     };
 

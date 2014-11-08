@@ -477,6 +477,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 }
             }
         }
+        shape.x = this.x;
+        shape.y = this.y;
         return shape;
     };
 
@@ -506,6 +508,10 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         boundsChecker.Bounds.max_x = Math.max.apply(Math, arr_p_x);
         boundsChecker.Bounds.min_y = Math.min.apply(Math, arr_p_y);
         boundsChecker.Bounds.max_y = Math.max.apply(Math, arr_p_y);
+        boundsChecker.Bounds.posX = this.x;
+        boundsChecker.Bounds.posY = this.y;
+        boundsChecker.Bounds.extX = this.extX;
+        boundsChecker.Bounds.extY = this.extY;
         return boundsChecker.Bounds;
     }
 }
