@@ -5800,8 +5800,8 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-
-    if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    // Комментарий без цитаты позволяем добавить всегда
+    if (true !== this.can_AddQuotedComment() || false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
     {
         var CommentData = new CCommentData();
         CommentData.Read_FromAscCommentData(AscCommentData);

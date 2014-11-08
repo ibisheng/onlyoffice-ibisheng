@@ -1499,7 +1499,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if ( this.Paragraph !== PRS.Paragraph )
     {
         this.Paragraph = PRS.Paragraph;
-        this.RecalcInfo.TextPr = true;
+        this.RecalcInfo.TextPr  = true;
+        this.RecalcInfo.Measure = true;
 
         this.protected_UpdateSpellChecking();
     }

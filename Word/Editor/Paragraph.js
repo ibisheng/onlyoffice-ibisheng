@@ -9454,6 +9454,7 @@ Paragraph.prototype =
     Concat : function(Para)
     {
         this.DeleteCommentOnRemove = false;
+        Para.DeleteCommentOnRemove = false;
 
         // Убираем метку конца параграфа у данного параграфа
         this.Remove_ParaEnd();
@@ -9476,6 +9477,9 @@ Paragraph.prototype =
         var NewContent = Para.Content.slice(0); // чтобы передать новый массив, а не ссылку на старый
         this.Internal_Content_Concat( NewContent );
 
+        // Удалим из параграфа все элементы (это нужно, чтобы не лежали ссылки на одинаковые объекты в разных параграфах)
+        Para.Internal_Content_Remove2(0, Para.Content.length);
+
         // Если на данном параграфе оканчивалась секция, тогда удаляем эту секцию
         this.Set_SectionPr( undefined );
 
@@ -9488,6 +9492,7 @@ Paragraph.prototype =
         }
 
         this.DeleteCommentOnRemove = true;
+        Para.DeleteCommentOnRemove = true;
     },
 
     // Копируем настройки параграфа и последние текстовые настройки в новый параграф

@@ -7627,7 +7627,7 @@ CDocumentContent.prototype =
 
     Selection_IsEmpty : function(bCheckHidden)
     {
-        if ( docpostype_DrawingObjects === this.DrawingObjects )
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
             return this.LogicDocument.DrawingObjects.selectionIsEmpty(bCheckHidden);
         else //if ( docpostype_Content === this.CurPos.Type )
         {
