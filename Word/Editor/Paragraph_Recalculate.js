@@ -431,7 +431,11 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
             return -1;
         else if ( Pos === EndPos && true === PRS.NewRange && true === PRS.MoveToLBP )
         {
-            Item.Recalculate_Set_RangeEndPos(PRS, PRS.LineBreakPos, 1);
+            var BreakPos = PRS.LineBreakPos.Get(0);
+            if (BreakPos !== Pos)
+                return -1;
+            else
+                Item.Recalculate_Set_RangeEndPos(PRS, PRS.LineBreakPos, 1);
         }
 
         // Нам нужно проверить только строку с номером CurLine

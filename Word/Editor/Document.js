@@ -1217,6 +1217,21 @@ CDocument.prototype =
         else if ( ChangeIndex >= this.Content.length )
             ChangeIndex = this.Content.length - 1;
 
+        // Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
+        while (ChangeIndex > 0)
+        {
+            var PrevElement = this.Content[ChangeIndex - 1];
+            if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
+            {
+                ChangeIndex--;
+                RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем, что изменилась последняя страница
+            }
+            else
+            {
+                break;
+            }
+        }
+
         // Найдем начальную страницу, с которой мы начнем пересчет
         var StartPage  = 0;
         var StartIndex = 0;
@@ -10723,12 +10738,13 @@ CDocument.prototype =
     Document_SetHdrFtrEvenAndOddHeaders : function(Value)
     {
         this.Set_DocumentEvenAndOddHeaders( Value );
-        
+
+        var FirstSectPr;
         if ( true === Value )
         {
             // Если мы добавляем разные колонтитулы для четных и нечетных страниц, а этих колонтитулов нет, тогда
             // создаем их в самой первой секции            
-            var FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
+            FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
             if ( null === FirstSectPr.Get_Header_Even() )
             {
                 var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
@@ -10740,14 +10756,16 @@ CDocument.prototype =
                 var Footer = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Footer );
                 FirstSectPr.Set_Footer_Even( Footer );
             }
-
-            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_Default();
         }
         else
         {
-            var FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
-            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_Default();
+            FirstSectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;
         }
+
+        if (null !== FirstSectPr.Get_Header_First() && true === FirstSectPr.TitlePage)
+            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_First();
+        else
+            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_Default();
 
 
         this.Recalculate();
