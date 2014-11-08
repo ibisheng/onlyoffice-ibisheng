@@ -2048,8 +2048,8 @@ function CMathProp(obj)
 
     if (obj)
     {
-        this.Type = (undefined !== obj.Type);
-        this.Pr   = (undefined !== obj.Pr)
+        this.Type = (undefined !== obj.Type ? obj.Type : this.Type);
+        this.Pr   = (undefined !== obj.Pr   ? obj.Pr   : this.Pr);
     }
 }
 
