@@ -1066,6 +1066,10 @@ CGraphicObjects.prototype =
                     drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
                     drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
+                    if(selectedObjects[i].parent.Extent)
+                    {
+                        drawing.setExtent(selectedObjects[i].parent.Extent.W, selectedObjects[i].parent.Extent.H)
+                    }
                     if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
