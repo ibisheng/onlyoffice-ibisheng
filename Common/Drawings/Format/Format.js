@@ -5144,13 +5144,13 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     }
     _result_shape_prop.canFill = shapeProp1.canFill === true || shapeProp2.canFill === true;
 
-    if(!shapeProp1.bFromChart || !shapeProp2.bFromChart)
+    if(shapeProp1.bFromChart || shapeProp2.bFromChart)
     {
-        _result_shape_prop.bFromChart = false;
+        _result_shape_prop.bFromChart = true;
     }
     else
     {
-        _result_shape_prop.bFromChart = true;
+        _result_shape_prop.bFromChart = false;
     }
 
     if(shapeProp1.locked || shapeProp1.locked)
