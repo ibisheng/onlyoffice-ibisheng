@@ -7637,7 +7637,25 @@ Paragraph.prototype =
     {
         if(this.bFromDocument)
         {
-            this.Style_Remove();
+            var HdrFtr = this.Parent.Is_HdrFtr(true);
+            if (null !== HdrFtr)
+            {
+                var Styles = this.Parent.Get_Styles();
+
+                var HdrFtrStyle = null;
+                if (hdrftr_Header === HdrFtr.Type)
+                    HdrFtrStyle = Styles.Get_Default_Header();
+                else
+                    HdrFtrStyle = Styles.Get_Default_Footer();
+
+                if (null !== HdrFtrStyle)
+                    this.Style_Add(HdrFtrStyle, true);
+                else
+                    this.Style_Remove();
+            }
+            else
+                this.Style_Remove();
+
             this.Numbering_Remove();
         }
 
