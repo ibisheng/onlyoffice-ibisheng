@@ -4101,6 +4101,8 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
             return this.GraphicObj.spPr.xfrm.extX;
+        if(isRealNumber(this.W))
+            return this.W;
         return 0;
     },
 
@@ -4108,6 +4110,8 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
             return this.GraphicObj.spPr.xfrm.extY;
+        if(isRealNumber(this.H))
+            return this.H;
         return 0;
     },
 
