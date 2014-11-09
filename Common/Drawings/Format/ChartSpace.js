@@ -2682,6 +2682,10 @@ CChartSpace.prototype =
                         dlbl.txPr = x_ax.txPr;
                         dlbl.tx = new CChartText();
                         dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
+                        if(x_ax.labels.arrLabels[0])
+                        {
+                            dlbl.lastStyleObject = x_ax.labels.arrLabels[0].lastStyleObject;
+                        }
                         var cur_height = dlbl.tx.rich.recalculateByMaxWord().h;
                         if(cur_height > max_height)
                             max_height = cur_height;
@@ -3290,9 +3294,14 @@ CChartSpace.prototype =
                     val_ax.yPoints = [];
 
                     var max_val_labels_text_height = 0;
+                    var lastStyleObject = null;
                     for(i = 0; i < arr_strings.length; ++i)
                     {
                         var dlbl = new CDLbl();
+                        if(lastStyleObject)
+                        {
+                            dlbl.lastStyleObject = lastStyleObject;
+                        }
                         dlbl.parent = val_ax;
                         dlbl.chart = this;
                         dlbl.spPr = val_ax.spPr;
@@ -3300,6 +3309,10 @@ CChartSpace.prototype =
                         dlbl.tx = new CChartText();
                         dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
                         var t = dlbl.tx.rich.recalculateByMaxWord();
+                        if(!lastStyleObject)
+                        {
+                            lastStyleObject = dlbl.lastStyleObject;
+                        }
                         var cur_width = t.w;
                         if(cur_width > max_width)
                             max_width = cur_width;
@@ -3712,7 +3725,10 @@ CChartSpace.prototype =
                                 content.Set_ParagraphAlign(align_Center);
                                 content.Set_ApplyToAll(false);
                                 dlbl.txBody = dlbl.tx.rich;
-
+                                if(cat_ax.labels.arrLabels.length > 0)
+                                {
+                                    dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
+                                }
                                 var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
                                 var max_min_content_width = min_max.Min;
                                 if(max_min_content_width > max_min_width)
@@ -4379,6 +4395,10 @@ CChartSpace.prototype =
                         dlbl.tx = new CChartText();
                         dlbl.tx.rich = CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
                         dlbl.txBody = dlbl.tx.rich;
+                        if(val_ax.labels.arrLabels[0])
+                        {
+                            dlbl.lastStyleObject = val_ax.labels.arrLabels[0].lastStyleObject;
+                        }
                         var t = dlbl.tx.rich.recalculateByMaxWord();
                         var h = t.h;
                         if(t.w > max_val_ax_label_width)
@@ -4801,6 +4821,10 @@ CChartSpace.prototype =
                                 dlbl.txPr = cat_ax.txPr;
                                 dlbl.tx = new CChartText();
                                 dlbl.tx.rich = CreateTextBodyFromString(string_pts[i].val, this.getDrawingDocument(), dlbl);
+                                if(cat_ax.labels.arrLabels[0])
+                                {
+                                    dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
+                                }
                                 dlbl.tx.rich.content.Set_ApplyToAll(true);
                                 dlbl.tx.rich.content.Set_ParagraphAlign(align_Center);
                                 dlbl.tx.rich.content.Set_ApplyToAll(false);
@@ -5258,8 +5282,12 @@ CChartSpace.prototype =
                     entry = legend.findLegendEntryByIndex(i);
                     if(entry)
                         calc_entry.txPr = entry.txPr;
-                    calc_entryes.push(calc_entry);
 
+                    if(calc_entryes[0])
+                    {
+                        calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
+                    }
+                    calc_entryes.push(calc_entry);
                     cur_width = calc_entry.txBody.getRectWidth(2000);
                     if(cur_width > max_width)
                         max_width = cur_width;
@@ -5335,6 +5363,10 @@ CChartSpace.prototype =
                     entry = legend.findLegendEntryByIndex(i);
                     if(entry)
                         calc_entry.txPr = entry.txPr;
+                    if(calc_entryes[0])
+                    {
+                        calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
+                    }
                     calc_entryes.push(calc_entry);
 
                     cur_width = calc_entry.txBody.getRectWidth(2000);
@@ -5808,8 +5840,11 @@ CChartSpace.prototype =
                             for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                if(calc_entry.calcMarkerUnion.marker)
+                                {
+                                    calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
+                                    calc_entry.calcMarkerUnion.marker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                                }
                                 calc_entry.localX = 2*distance_to_text + marker_size;
                                 calc_entry.localY = summ_h;
                                 summ_h+=arr_heights[i];
