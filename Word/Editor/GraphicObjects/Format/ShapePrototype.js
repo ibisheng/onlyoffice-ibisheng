@@ -524,10 +524,10 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
         this.textStyleForParagraph.ParaPr.Merge( DefaultStyle.ParaPr );
         this.textStyleForParagraph.TextPr.Merge( DefaultStyle.TextPr );
     }
-    //this.textStyleForParagraph.ParaPr.Spacing.Line = 1;
-    this.textStyleForParagraph.TextPr.Color.Auto = false;
     if(this.style && this.style.fontRef)
     {
+        //this.textStyleForParagraph.ParaPr.Spacing.Line = 1;
+        this.textStyleForParagraph.TextPr.Color.Auto = false;
         var shape_text_pr = new CTextPr();
         if(this.style.fontRef.Color)
         {
