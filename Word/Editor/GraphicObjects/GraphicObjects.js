@@ -2608,13 +2608,19 @@ CGraphicObjects.prototype =
 function ComparisonByZIndexSimpleParent(obj1, obj2)
 {
     if(obj1.parent && obj2.parent)
-        return obj1.parent.RelativeHeight - obj2.parent.RelativeHeight;
+        return ComparisonByZIndexSimple(obj1.parent, obj2.parent);
     return 0;
 }
 
 function ComparisonByZIndexSimple(obj1, obj2)
 {
-    return obj1.RelativeHeight - obj2.RelativeHeight;
+    if(isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+        return obj1.RelativeHeight - obj2.RelativeHeight;
+    if(!isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+        return -1;
+    if(isRealNumber(obj1.RelativeHeight) && !isRealNumber(obj2.RelativeHeight))
+        return 1;
+    return 0;
 }
 
 
