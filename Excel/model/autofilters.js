@@ -248,6 +248,7 @@ var gUndoInsDelCellsFlag = true;
 		/** @constructor */
 		function AutoFilters(currentSheet) {
 			this.worksheet = currentSheet;
+			this.changeFilters = null;
 
 			this.m_oColor = new CColor(120, 120, 120);
 			return this;
@@ -1288,6 +1289,8 @@ var gUndoInsDelCellsFlag = true;
 				val = activeCells.c2 - activeCells.c1 + 1;
 
 				
+				this.changeFilters = {};
+				
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
 					activeCells.r1 = 0;
@@ -1304,13 +1307,17 @@ var gUndoInsDelCellsFlag = true;
 					val = activeCells.c1 - activeCells.c2 - 1;
 				//val > 0 - добавление, < 0 - удаление
 				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells, insertType);
+				
+				this._changeFiltersApply();
 			},
 			//при вставке пользователем строки изменяем фильтры
 			insertRows: function(type, val, insertType)
 			{
                 var activeCells;
 				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
-
+				
+				this.changeFilters = {};
+				
 				activeCells = val.clone();
 				val = activeCells.r2 - activeCells.r1 + 1;
 
@@ -1330,7 +1337,62 @@ var gUndoInsDelCellsFlag = true;
 					val = activeCells.r1 - activeCells.r2 - 1;
 				//val > 0 - добавление, < 0 - удаление
 				this._changeFiltersAfterColumn(colInsert,val,'insRow',activeCells, insertType);
+				
+				this._changeFiltersApply();
 			},
+			
+			_changeFiltersApply: function()
+			{
+				var aWs = this._getCurrentWS();
+				//меняем автофильтры
+				if(this.changeFilters.AutoFilter)
+				{
+					aWs.AutoFilter = this.changeFilters.AutoFilter;
+				}
+				
+				if(this.changeFilters.TableParts && this.changeFilters.TableParts.length && aWs.TableParts && aWs.TableParts.length)
+				{
+					for(var i = 0; i < this.changeFilters.TableParts.length; i++)
+					{
+						for(var j = 0; j < aWs.TableParts.length; j++)
+						{
+							if(this.changeFilters.TableParts[i].DisplayName == aWs.TableParts[j].DisplayName)
+							{
+								aWs.TableParts[j] = this.changeFilters.TableParts[i].filter;
+								break;
+							}
+						}
+					}
+				}
+				
+				//удаляем автофильтры
+				if(this.changeFilters.deleteFilters && this.changeFilters.deleteFilters.length)
+				{
+					for(var i = 0; i < this.changeFilters.deleteFilters.length; i++)
+					{
+						if(this.changeFilters.deleteFilters[i] === undefined)
+						{
+							aWs.AutoFilter = null;
+						}
+						else if(aWs.TableParts)
+						{
+							for(var j = 0; j < aWs.TableParts.length; j++)
+							{
+								if(aWs.TableParts[j].DisplayName == this.changeFilters.deleteFilters[i])
+								{
+									aWs.TableParts.splice(j, 1);
+									break;
+								}
+							}
+						}
+					}
+				}
+				
+				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
+				this._reDrawFilters();
+				this.changeFilters = null;
+			},
+			
 			//применяем сортировку из меню фильтра
 			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
 				var aWs = this._getCurrentWS();
@@ -1546,7 +1608,7 @@ var gUndoInsDelCellsFlag = true;
 					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
-			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray)
+			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)
 			{
 				if(turnOnHistory)
 				{
@@ -1564,7 +1626,16 @@ var gUndoInsDelCellsFlag = true;
 					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r1 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 					{
 						var oldFilter = aWs.AutoFilter.clone();
-						aWs.AutoFilter = null;
+						
+						if(doNotChangeFilters)
+						{
+							if(!this.changeFilters.deleteFilters)
+								this.changeFilters.deleteFilters = [];
+							this.changeFilters.deleteFilters[this.changeFilters.deleteFilters.length] = oldFilter.name;
+						}
+						else
+							aWs.AutoFilter = null;
+							
 						//открываем скрытые строки
 						aWs.setRowHidden(false, bbox.r1, bbox.r2);
 						
@@ -1599,6 +1670,13 @@ var gUndoInsDelCellsFlag = true;
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
 							
 							this._isEmptyButtons(oCurFilter.Ref);
+							
+							if(doNotChangeFilters)
+							{
+								if(!this.changeFilters.deleteFilters)
+									this.changeFilters.deleteFilters = [];
+								this.changeFilters.deleteFilters[this.changeFilters.deleteFilters.length] = aWs.TableParts[i].DisplayName;
+							}
 						}
 						else
 						{
@@ -1606,7 +1684,9 @@ var gUndoInsDelCellsFlag = true;
 							k++;
 						}
 					}
-					aWs.TableParts = newTableParts;
+					
+					if(!doNotChangeFilters)
+						aWs.TableParts = newTableParts;
 				}
 				
 				
@@ -5004,8 +5084,6 @@ var gUndoInsDelCellsFlag = true;
 							lT--;
 					}
 				}
-				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-				this._reDrawFilters();
 				History.TurnOn();
 			},
 			
@@ -5183,7 +5261,7 @@ var gUndoInsDelCellsFlag = true;
 						
 						activeRange = splitRefFilter;
 						
-						this.isEmptyAutoFilters(activeRange, true, true, true);
+						this.isEmptyAutoFilters(activeRange, true, true, true, null, true);
 						return true;
 					}
 				}
@@ -5298,11 +5376,14 @@ var gUndoInsDelCellsFlag = true;
 				
 				if(cRange.index == 'all')
 				{
-					aWs.AutoFilter = filter;
+					this.changeFilters.AutoFilter = filter;
 				}
 				else
 				{
-					aWs.TableParts[cRange.index] = filter;
+					this.changeFilters.TableParts;
+					if(!this.changeFilters.TableParts)
+						this.changeFilters.TableParts = [];
+					this.changeFilters.TableParts[this.changeFilters.TableParts.length] = {DisplayName: aWs.TableParts[cRange.index].DisplayName, filter: filter};
 				}
 			},
 			

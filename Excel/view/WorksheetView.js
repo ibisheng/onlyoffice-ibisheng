@@ -9533,7 +9533,7 @@
 								if (range.addCellsShiftRight()) {
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
-										t.autoFilters.insertColumn(prop, arn);
+										t.autoFilters.insertColumn(prop, arn, c_oAscInsertOptions.InsertCellsAndShiftRight);
 									t.cellCommentator.updateCommentsDependencies(true, val, arn);
 									t.objectRender.updateDrawingObject(true, val, arn);
 								}
@@ -9554,7 +9554,7 @@
 								if (range.addCellsShiftBottom()) {
 									fullRecalc = true;
 									if(isCheckChangeAutoFilter === true)
-										t.autoFilters.insertRows(prop,arn);
+										t.autoFilters.insertRows(prop, arn, c_oAscInsertOptions.InsertCellsAndShiftDown);
 									t.cellCommentator.updateCommentsDependencies(true, val, arn);
 									t.objectRender.updateDrawingObject(true, val, arn);
 								}
