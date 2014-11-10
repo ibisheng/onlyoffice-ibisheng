@@ -7780,7 +7780,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
 	
     var stream = new FT_Stream2(data, data.length);
     stream.obj = null;
-    var Loader = { Reader : stream };
+    var Loader = { Reader : stream, Reader2 : null };
     var _color = new CDocumentColor( 191, 255, 199 );
 
     // Применяем изменения, пока они есть

@@ -5234,7 +5234,6 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
 
     // Применяем изменения, пока они есть
     var _count = Loader.Reader.GetLong();
-    //console.log("count:" + _count);
 
     var _pos = 4;
     for (var i = 0; i < _count; i++)
@@ -5245,13 +5244,12 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
                 break;
         }
 
-        var _id  = Loader.Reader.GetLong();
         var _len = Loader.Reader.GetLong();
-
-        //console.log("change: [" + _id + ", " + _len + "]");
-
-        _pos += 8;
+        _pos += 4;
         stream.size = _pos + _len;
+
+        var _id  = Loader.Reader.GetString2();
+        var _read_pos = Loader.Reader.GetCurPos();
 
         var Type = Loader.Reader.GetLong();
         var Class = null;
@@ -5261,9 +5259,10 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
             Class = editor.WordControl.m_oLogicDocument.HdrFtr;
         }
         else
-            Class = g_oTableId.Get_ById( "" + _id );
+            Class = g_oTableId.Get_ById( _id );
 
-        stream.Seek2(_pos);
+        stream.Seek(_read_pos);
+        stream.Seek2(_read_pos);
 
         if ( null != Class )
             Class.Load_Changes( Loader.Reader, Loader.Reader2, _color );
