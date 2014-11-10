@@ -316,6 +316,22 @@ var gUndoInsDelCellsFlag = true;
 							ws.expandRowsOnScroll(true);
 						}
 						
+						//TODO временна правка. переделать проверку!!!!
+						if(paramsForCallBack && paramsForCallBack === "changeAllFOnTable" && addNameColumn && !isTurnOffHistory)
+						{
+							var isAddCellsShiftBottom = t._isAddCellsShiftBottom(activeCells);
+							if(isAddCellsShiftBottom === true)
+							{
+								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+								return false;
+							}
+							else if(isAddCellsShiftBottom === "error")
+							{
+								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+								return false;
+							}
+						}
+						
 						if(isTurnOffHistory)
 							History.TurnOff();
 						History.Create_NewPoint();
@@ -431,12 +447,13 @@ var gUndoInsDelCellsFlag = true;
 									newRes = {
 										result: allAutoFilters[apocal.num].result,
 										isVis:  false
-									};
+									}
 									changesElemHistory = aWs.AutoFilter.clone();
 									delete aWs.AutoFilter;
 									if(addNameColumn && rangeShift && !isTurnOffHistory)
 									{
-										rangeShift.addCellsShiftBottom();
+										ws.model._moveRange(activeCells,  new Asc.Range(activeCells.c1, activeCells.r1 + 1, activeCells.c2, activeCells.r2 + 1));
+
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
                                         ws.objectRender && ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
@@ -609,11 +626,14 @@ var gUndoInsDelCellsFlag = true;
 								//при добавлении строки заголовков - сдвигаем диапазон на строку ниже
 								if(!isTurnOffHistory && addNameColumn)
 								{
-									var isAddCellsShiftBottom = t._isAddCellsShiftBottom(rangeShift, tempCells);
+									var isAddCellsShiftBottom = t._isAddCellsShiftBottom(tempCells);
 									if(isAddCellsShiftBottom === true)
 									{
 										//TODO пока обрубаем в случае если нужно сдвинуть таблицу внизу, затем нужно обрабатывать сдвиг и грамотно записывать в историю
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										History.EndTransaction();
+										if(isTurnOffHistory)
+											History.TurnOn();
 										return false;
 										
 										//меняем selection
@@ -628,6 +648,9 @@ var gUndoInsDelCellsFlag = true;
 									else if(isAddCellsShiftBottom === "error")
 									{
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+										History.EndTransaction();
+										if(isTurnOffHistory)
+											History.TurnOn();
 										return false;
 									}
 									else
@@ -7354,7 +7377,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			
-			_isAddCellsShiftBottom: function(rangeShift, tempCells)
+			_isAddCellsShiftBottom: function(tempCells)
 			{
 				//проверяем, все ли под таблицей ячейки пустые
 				var cell, isEmptyCell, result = true;
