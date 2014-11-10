@@ -8899,6 +8899,11 @@ CDocument.prototype =
                 var StartIndex = 0;
                 if (true === bConcatS)
                 {
+                    // Вызываем так, чтобы выделить все внутренние элементы
+                    var _ParaS = Elements[0].Element;
+                    _ParaS.Select_All();
+                    var _ParaSContentLen = _ParaS.Content.length;
+
                     // Если мы присоединяем новый параграф, то и копируем все настройки параграфа (так делает Word)
                     ParaS.Concat(Elements[0].Element);
                     ParaS.Set_Pr(Elements[0].Element.Pr);
@@ -8907,14 +8912,9 @@ CDocument.prototype =
 
                     StartIndex++;
 
-                    var TempPara = Elements[0].Element;
-
-                    // Вызываем так, чтобы выделить все внутренние элементы
-                    TempPara.Select_All();
-
                     ParaS.Selection.Use = true;
-                    ParaS.Selection.StartPos = ParaS.Content.length - TempPara.Content.length;
-                    ParaS.Selection.EndPos = ParaS.Content.length - 1;
+                    ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
+                    ParaS.Selection.EndPos   = ParaS.Content.length - 1;
                 }
 
                 var EndIndex = ElementsCount - 1;
