@@ -3316,6 +3316,27 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var CurTextPr = this.Get_CompiledPr( false );
     pGraphics.SetTextPr( CurTextPr, Theme );
 
+    if(this.Type == para_Math_Run)
+    {
+        Y += this.size.ascent;
+
+        var Font =
+        {
+            Bold       : CurTextPr.Bold,
+            Italic     : CurTextPr.Italic,
+            FontFamily : {Name : CurTextPr.FontFamily.Name, Index : CurTextPr.FontFamily.Index},
+            FontSize   : this.Parent.ParaMath.ApplyArgSize(CurTextPr.FontSize, this.Parent.Compiled_ArgSz.value)
+        };
+
+        if(this.IsMathematicalText()) // выставляем false, чтобы не применился наклон к спец символам
+        {
+            Font.Italic = false;
+            Font.Bold   = false;
+        }
+
+        pGraphics.SetFont(Font);
+    }
+
     if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
         BgColor = CurTextPr.Shd.Get_Color( Para );
 
@@ -3347,7 +3368,9 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
         }
         else if ( true === CurTextPr.Color.Auto )
+        {
             pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+        }
         else
         {
             pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
@@ -3471,6 +3494,13 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             {
                 Item.Draw( X, Y - this.YOffset, pGraphics );
                 X += Item.WidthVisible;
+                break;
+            }
+            case para_Math_Ampersand:
+            case para_Math_Text:
+            case para_Math_Placeholder:
+            {
+                Item.draw(X, Y, pGraphics );
                 break;
             }
         }

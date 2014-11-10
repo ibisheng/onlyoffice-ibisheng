@@ -1340,11 +1340,12 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
         // this.absPos.x ~> this.X
         // this.absPos.y ~> this.Y
 
-        this.Root.draw( PDSE.X, PDSE.Y - this.Ascent, PDSE.Graphics);
+        PDSE.Y -= this.Ascent;
 
+        this.Root.draw( PDSE.X, PDSE.Y, PDSE.Graphics, PDSE);
+
+        PDSE.Y += this.Ascent;
         PDSE.X += this.Width;
-
-
     }
 
     /*PDSE.Graphics.p_color(255,0,0, 255);

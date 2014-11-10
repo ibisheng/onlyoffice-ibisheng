@@ -9,7 +9,6 @@ function CGlyphOperator()
     this.stretch = 0;
     this.bStretch = true;
 
-    this.MIN_AUG = 1;
 
     this.penW = 1; // px
 }
@@ -33,10 +32,6 @@ CGlyphOperator.prototype.init = function(props)
     this.turn = props.turn;
     this.bStretch = (props.bStretch == true || props.bStretch == false) ? props.bStretch : true;
 
-    if(this.loc == LOCATION_TOP || this.loc  == LOCATION_BOT)
-        this.MIN_AUG = 0.8;
-    else
-        this.MIN_AUG = 1;
 }
 CGlyphOperator.prototype.fixSize = function(stretch)
 {
@@ -383,16 +378,17 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
 
     return {XX: XX, YY: YY, Width: glW, Height: glH};
 }
-CGlyphOperator.prototype.draw = function(pGraphics, XX, YY)
+CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
 {
+    this.Parent.Make_ShdColor(PDSE);
+
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
     pGraphics.p_width(this.penW*1000);
-    pGraphics.b_color1(0,0,0, 255);
     pGraphics._s();
 
-    this.drawPath(pGraphics, XX,YY);
+    this.drawPath(pGraphics, XX,YY, PDSE);
 
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
@@ -1487,8 +1483,9 @@ CWhiteSquareBracket.prototype.calcCoord = function(stretch)
 
     return {XX: XX, YY: YY, W: W, H: H};
 }
-CWhiteSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
+CWhiteSquareBracket.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
 {
+
     pGraphics._m(XX[0], YY[0]);
     pGraphics._l(XX[1], YY[1]);
     pGraphics._l(XX[2], YY[2]);
@@ -1500,7 +1497,8 @@ CWhiteSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[8], YY[8]);
     pGraphics.df();
 
-    pGraphics.b_color1(255,255,255, 255);
+    var BgColor = this.Parent.Make_ShdColor(PDSE);
+    pGraphics.b_color1(BgColor.r , BgColor.g , BgColor.b , 255);
     pGraphics._s();
     pGraphics._m(XX[9], YY[9]);
     pGraphics._l(XX[10], YY[10]);
@@ -1912,7 +1910,7 @@ CLR_DoubleArrow.prototype.calcCoord = function(stretch)
 
     return {XX: XX, YY: YY, W: W, H: H};
 }
-CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
+CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY, PDSE)
 {
     pGraphics._m(XX[0], YY[0]);
     pGraphics._l(XX[1], YY[1]);
@@ -1933,7 +1931,10 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[16], YY[16]);
     pGraphics.df();
 
-    pGraphics.b_color1(255,255,255, 255);
+    var BgColor = this.Parent.Make_ShdColor(PDSE);
+    //pGraphics.b_color1(255,255,255, 255);
+    pGraphics.b_color1(BgColor.r , BgColor.g , BgColor.b , 255);
+
     pGraphics._s();
     pGraphics._m(XX[17], YY[17]);
     pGraphics._l(XX[18], YY[18]);
@@ -2931,12 +2932,12 @@ COperator.prototype.getProps = function(props, defaultProps)
 
     return  {loc: location, type: type, code: code};
 }
-COperator.prototype.draw = function(x, y, pGraphics)
+COperator.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     if(this.typeOper === OPERATOR_TEXT)
     {
         // выставляем font, если нужно отрисовать текст
-        pGraphics.b_color1(0,0,0,255);
+        //pGraphics.b_color1(0,0,0,255);
 
         var ctrPrp =  this.GetTPrpToControlLetter();
 
@@ -2948,24 +2949,27 @@ COperator.prototype.draw = function(x, y, pGraphics)
             Bold:       false
         };
 
-
         pGraphics.SetFont(Font);
 
         ////////////////////////////////////////////////
 
-        this.operator.draw(x, y, pGraphics);
+        this.operator.draw(x, y, pGraphics, PDSE);
     }
     else
     {
         if(this.IsLineGlyph())
-            this.drawLines(x, y, pGraphics);
+            this.drawLines(x, y, pGraphics, PDSE);
         else if(this.type === OPER_SEPARATOR)
-            this.drawSeparator(x, y, pGraphics);
+            this.drawSeparator(x, y, pGraphics, PDSE);
         else
-            this.drawOperator(x, y, pGraphics);
+            this.drawOperator(x, y, pGraphics, PDSE);
     }
 }
-COperator.prototype.drawOperator = function(absX, absY, pGraphics)
+COperator.prototype.Make_ShdColor = function(PDSE)
+{
+    return this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
+}
+COperator.prototype.drawOperator = function(absX, absY, pGraphics, PDSE)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
     {
@@ -2982,10 +2986,10 @@ COperator.prototype.drawOperator = function(absX, absY, pGraphics)
             Y.push(PosOper.y + absY + this.coordGlyph.YY[j]);
         }
 
-        this.operator.draw(pGraphics, X, Y);
+        this.operator.draw(pGraphics, X, Y, PDSE);
     }
 }
-COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
+COperator.prototype.drawSeparator = function(absX, absY, pGraphics, PDSE)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
     {
@@ -3004,16 +3008,16 @@ COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
                 Y.push(PosOper.y + absY + this.coordGlyph.YY[j]);
             }
 
-            this.operator.draw(pGraphics, X, Y);
+            this.operator.draw(pGraphics, X, Y, PDSE);
         }
     }
 }
-COperator.prototype.drawLines = function(absX, absY, pGraphics)
+COperator.prototype.drawLines = function(absX, absY, pGraphics, PDSE)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
     {
         var PosOper = this.Positions[0];
-        this.operator.drawOnlyLines(PosOper.x + absX, PosOper.y + absY, pGraphics);
+        this.operator.drawOnlyLines(PosOper.x + absX, PosOper.y + absY, pGraphics, PDSE);
     }
 }
 COperator.prototype.IsLineGlyph = function()
@@ -3707,14 +3711,14 @@ CDelimiter.prototype.setPosition = function(position, PosInfo)
     content.setPosition(PosContent); // CMathContent*/
 
 }
-CDelimiter.prototype.draw = function(x, y, pGraphics)
+CDelimiter.prototype.draw = function(x, y, pGraphics, PDSE)
 {
-    this.begOper.draw(x, y, pGraphics);
-    this.sepOper.draw(x, y, pGraphics);
-    this.endOper.draw(x, y, pGraphics);
+    this.begOper.draw(x, y, pGraphics, PDSE);
+    this.sepOper.draw(x, y, pGraphics, PDSE);
+    this.endOper.draw(x, y, pGraphics, PDSE);
 
     for(var j = 0; j < this.nCol; j++)
-        this.elements[0][j].draw(x, y,pGraphics);
+        this.elements[0][j].draw(x, y,pGraphics, PDSE);
 }
 CDelimiter.prototype.align_2 = function(element)
 {
@@ -3808,9 +3812,9 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
         this.operator.setPosition(PosOper);
     }
 }
-CCharacter.prototype.draw = function(x, y, pGraphics)
+CCharacter.prototype.draw = function(x, y, pGraphics, PDSE)
 {
-    this.elements[0][0].draw(x, y, pGraphics);
+    this.elements[0][0].draw(x, y, pGraphics, PDSE);
 
     var ctrPrp =  this.GetTPrpToControlLetter();
 
@@ -3824,10 +3828,10 @@ CCharacter.prototype.draw = function(x, y, pGraphics)
 
 
     pGraphics.SetFont(Font);
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
 
-    this.operator.draw(x, y, pGraphics);
+    //this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
+
+    this.operator.draw(x, y, pGraphics, PDSE);
 
 }
 CCharacter.prototype.getBase = function()

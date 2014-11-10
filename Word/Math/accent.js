@@ -143,7 +143,7 @@ CAccentLine.prototype.draw = function(x, y, pGraphics)
     var x1 = x + 25.4/96,
         x2 = x +  this.stretch - 25.4/96;
 
-    pGraphics.p_color(0,0,0, 255);
+    //pGraphics.p_color(0,0,0, 255);
     pGraphics.drawHorLine(0, y, x1, x2, penW);
 }
 
@@ -190,7 +190,7 @@ CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
         y1 = y,
         y2 = y + diff;
 
-    pGraphics.p_color(0,0,0, 255);
+    //pGraphics.p_color(0,0,0, 255);
     pGraphics.drawHorLine(0, y1, x1, x2, penW);
 
     pGraphics.drawHorLine(0, y2, x1, x2, penW);
@@ -537,10 +537,10 @@ CAccent.prototype.Resize = function(oMeasure, RPI)
 
     this.size = {height: height, width: width, ascent: ascent};
 };
-CAccent.prototype.draw = function(x, y, pGraphics)
+CAccent.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var base = this.elements[0][0];
-    base.draw(x, y, pGraphics);
+    base.draw(x, y, pGraphics, PDSE);
 
     var Info =
     {
@@ -569,7 +569,7 @@ CAccent.prototype.draw = function(x, y, pGraphics)
         }
     }
 
-    this.operator.draw(x, y, pGraphics);
+    this.operator.draw(x, y, pGraphics, PDSE);
 };
 CAccent.prototype.Document_UpdateInterfaceState = function(MathProps)
 {

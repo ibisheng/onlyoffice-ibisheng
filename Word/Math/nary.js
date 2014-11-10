@@ -667,8 +667,10 @@ function CNaryOperator(flip)
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
 }
-CNaryOperator.prototype.draw = function(x, y, pGraphics)
+CNaryOperator.prototype.draw = function(x, y, pGraphics, PDSE)
 {
+    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
+
     if(this.Type == para_Math_Text)
         this.drawTextElem(x, y, pGraphics);
     else
@@ -712,8 +714,8 @@ CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
 
     pGraphics.p_width(1000);
 
-    pGraphics.b_color1(0,0,0, 255);
-    pGraphics.p_color(0,0,0, 255);
+    //pGraphics.b_color1(0,0,0, 255);
+    //pGraphics.p_color(0,0,0, 255);
     pGraphics._s();
 
     this.drawPath(pGraphics, XX,YY);
@@ -723,7 +725,7 @@ CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
 }
 CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
 {
-    pGraphics.b_color1(0,0,0,255);
+    //pGraphics.b_color1(0,0,0,255);
 
     var ctrPrp = this.GetTPrpToControlLetter();
 
@@ -1449,69 +1451,6 @@ CIntegral.prototype.getCoord = function()
 
     return {X: X, Y: Y, W : W, H: H};
 }
-CIntegral.prototype.old_getCoord = function()
-{
-    var X = [],
-        Y = [];
-
-    X[0] = 20407; Y[0] = 65723;
-    X[1] = 20407; Y[1] = 60840;
-    X[2] = 20407; Y[2] = 37013;
-    X[3] = 24333; Y[3] = 18507;
-    X[4] = 28260; Y[4] = 0;
-    X[5] = 40590; Y[5] = 0;
-    X[6] = 42142; Y[6] = 0;
-    X[7] = 43604; Y[7] = 383;
-    X[8] = 45067; Y[8] = 765;
-    X[9] = 46215; Y[9] = 1305;
-    X[10] = 45180; Y[10] = 9225;
-    X[11] = 41760; Y[11] = 9225;
-    X[12] = 41512; Y[12] = 7335;
-    X[13] = 40724; Y[13] = 6064;
-    X[14] = 39937; Y[14] = 4793;
-    X[15] = 37935; Y[15] = 4793;
-    X[16] = 30465; Y[16] = 4793;
-    X[17] = 28406; Y[17] = 23086;
-    X[18] = 26347; Y[18] = 41378;
-    X[19] = 26347; Y[19] = 60840;
-    X[20] = 26347; Y[20] = 65723;
-
-    X[21] = 26325; Y[21] = 65723;
-
-    X[22] = 26325; Y[22] = 99091;
-    X[23] = 21622; Y[23] = 115404;
-    X[24] = 16920; Y[24] = 131716;
-    X[25] = 5467; Y[25] = 131716;
-    X[26] = 4387; Y[26] = 131716;
-    X[27] = 2947; Y[27] = 131356;
-    X[28] = 1507; Y[28] = 130996;
-    X[29] = 0; Y[29] = 130276;
-    X[30] = 1147; Y[30] = 121388;
-    X[31] = 4770; Y[31] = 121388;
-    X[32] = 4927; Y[32] = 123773;
-    X[33] = 5782; Y[33] = 125135;
-    X[34] = 6637; Y[34] = 126496;
-    X[35] = 8775; Y[35] = 126496;
-    X[36] = 13365; Y[36] = 126496;
-    X[37] = 16886; Y[37] = 116506;
-    X[38] = 20407; Y[38] = 106516;
-    X[39] = 20407; Y[39] = 70606;
-    X[40] = 20407; Y[40] = 65723;
-
-    var shX = X[9]*0.025;
-    for(var i = 0; i < 21; i++)
-    {
-        X[i] +=shX;
-    }
-
-    var shY = Y[24]*0.1692;
-    for(var i = 0; i < 21; i++)
-    {
-        Y[21+i] += shY;
-    }
-
-    return {X: X, Y: Y};
-}
 CIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1545,36 +1484,6 @@ CIntegral.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[42], YY[42]);
 
     pGraphics._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] );
-
-}
-CIntegral.prototype.old_drawPath = function(XX, YY)
-{
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
-    MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
-    MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
-    MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
-    MathControl.pGraph._l(XX[10], YY[10]);
-    MathControl.pGraph._l(XX[11], YY[11]);
-    MathControl.pGraph._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13] );
-    MathControl.pGraph._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
-    MathControl.pGraph._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
-    MathControl.pGraph._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
-    MathControl.pGraph._l(XX[20], YY[20]);
-    MathControl.pGraph._l(XX[21], YY[21]);
-
-    MathControl.pGraph._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23] );
-    MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
-    MathControl.pGraph._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27] );
-    MathControl.pGraph._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
-    MathControl.pGraph._l(XX[30], YY[30]);
-    MathControl.pGraph._l(XX[31], YY[31]);
-    MathControl.pGraph._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33] );
-    MathControl.pGraph._c(XX[33], YY[33], XX[34], YY[34], XX[35], YY[35] );
-    MathControl.pGraph._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
-    MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
-    MathControl.pGraph._l(XX[40], YY[40]);
 
 }
 CIntegral.prototype.calculateSizeGlyph = function()
@@ -2017,7 +1926,7 @@ function CContourIntegral()
     CNaryOperator.call(this);
 }
 Asc.extendClass(CContourIntegral, CNaryOperator);
-CContourIntegral.prototype.draw = function(x, y, pGraphics)
+CContourIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var circle = new CCircle();
     var coord = circle.getCoord();
@@ -2062,23 +1971,23 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics)
     var intGrid = pGraphics.GetIntegerGrid();
     pGraphics.SetIntegerGrid(false);
 
-    //pGraphics.p_width(750);
+
     pGraphics.p_width(penCircle);
 
-    pGraphics.b_color1(0,0,0, 255);
-    pGraphics.p_color(0,0,0, 255);
+    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
+    //pGraphics.b_color1(0,0,0, 255);
+    //pGraphics.p_color(0,0,0, 255);
 
     circle.drawPath(pGraphics, X, Y);
 
     pGraphics.p_width(1000);
-    pGraphics.b_color1(0,0,0, 255);
+
     pGraphics._s();
 
     integr.drawPath(pGraphics, XX, YY);
 
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
-
 
 }
 CContourIntegral.prototype.calculateSizeGlyph = function()
@@ -2103,7 +2012,7 @@ function CSurfaceIntegral()
     CNaryOperator.call(this);
 }
 Asc.extendClass(CSurfaceIntegral, CNaryOperator);
-CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
+CSurfaceIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var surf = new CSurface();
     var coord = surf.getCoord();
@@ -2150,13 +2059,14 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
 
     pGraphics.p_width(penSurface);
 
-    pGraphics.b_color1(0,0,0, 255);
-    pGraphics.p_color(0,0,0, 255);
+    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
+    //pGraphics.b_color1(0,0,0, 255);
+    //pGraphics.p_color(0,0,0, 255);
 
     surf.drawPath(pGraphics, X, Y);
 
     pGraphics.p_width(1000);
-    pGraphics.b_color1(0,0,0, 255);
+
     pGraphics._s();
 
     integr.drawPath(pGraphics, XX, YY);
@@ -2187,7 +2097,7 @@ function CVolumeIntegral()
     CNaryOperator.call(this);
 }
 Asc.extendClass(CVolumeIntegral, CNaryOperator);
-CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
+CVolumeIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var volume = new CVolume();
     var coord = volume.getCoord();
@@ -2233,13 +2143,14 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
 
     pGraphics.p_width(penVolume);
 
-    pGraphics.b_color1(0,0,0, 255);
-    pGraphics.p_color(0,0,0, 255);
+    this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
+    //pGraphics.b_color1(0,0,0, 255);
+    //pGraphics.p_color(0,0,0, 255);
 
     volume.drawPath(pGraphics, X, Y);
 
     pGraphics.p_width(1000);
-    pGraphics.b_color1(0,0,0, 255);
+
     pGraphics._s();
 
     integr.drawPath(pGraphics, XX, YY);

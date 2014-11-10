@@ -113,7 +113,7 @@ CSignRadical.prototype.new_draw = function(x, y, pGraphics)
     pGraphics.ds();
 
 }
-CSignRadical.prototype.draw = function(x, y, pGraphics)
+CSignRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var txtPrp = this.Parent.Get_CompiledCtrPrp();
     //var txtPrp = this.Parent.getTxtPrp();
@@ -179,8 +179,8 @@ CSignRadical.prototype.draw = function(x, y, pGraphics)
 
     pGraphics.p_width(penW*0.8*1000);
 
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
+    this.Parent.Make_ShdColor(PDSE, txtPrp);
+    //pGraphics.p_color(0,0,0, 255);
 
     pGraphics._s();
     pGraphics._m(x1, y1);
@@ -638,10 +638,10 @@ CRadical.prototype.setPosition = function(pos, PosInfo)
         this.RealBase.setPosition(PosBase, PosInfo);
     }
 }
-CRadical.prototype.draw = function(x, y, pGraphics)
+CRadical.prototype.draw = function(x, y, pGraphics, PDSE)
 {
-    this.signRadical.draw(x, y, pGraphics);
-    CRadical.superclass.draw.call(this, x, y, pGraphics);
+    this.signRadical.draw(x, y, pGraphics, PDSE);
+    CRadical.superclass.draw.call(this, x, y, pGraphics, PDSE);
 }
 CRadical.prototype.getBase = function()
 {

@@ -74,10 +74,6 @@ CMathPointInfo.prototype.SetInfoPoints = function(InfoPoints)
     this.InfoPoints.ContentPoints = InfoPoints.ContentPoints.Widths;
     this.InfoPoints.GMaxDimWidths = InfoPoints.GMaxDimWidths;
 }
-CMathPointInfo.prototype.UpdateX = function(value)
-{
-    this.x += value;
-}
 CMathPointInfo.prototype.NextAlignRange = function()
 {
     if(this.bEven)
@@ -87,10 +83,6 @@ CMathPointInfo.prototype.NextAlignRange = function()
         this.CurrPoint++;
         this.bEven = true;
     }
-}
-CMathPointInfo.prototype.ApplyAlign = function()
-{
-    this.x += this.GetAlign();
 }
 CMathPointInfo.prototype.GetAlign = function()
 {
@@ -746,7 +738,6 @@ CMathContent.prototype =
 
         this.size = {width: width, height: ascent + descent, ascent: ascent};
     },*/
-
     PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {
         if(ArgSize !== null && ArgSize !== undefined)
@@ -912,7 +903,7 @@ CMathContent.prototype =
 
         return bOneLineText;
     },
-    draw: function(x, y, pGraphics)
+    draw: function(x, y, pGraphics, PDSE)
     {
         var bHidePlh = this.plhHide && this.IsPlaceholder();
 
@@ -922,10 +913,11 @@ CMathContent.prototype =
             {
                 if(this.Content[i].Type == para_Math_Composition)
                 {
-                    this.Content[i].draw(x, y, pGraphics);
+                    this.Content[i].draw(x, y, pGraphics, PDSE);
                 }
                 else
-                    this.Content[i].Math_Draw(x, y, pGraphics);
+                    this.Content[i].Draw_Elements(PDSE);
+                    //this.Content[i].Math_Draw(x, y, pGraphics);
             }
         }
     },
@@ -1054,7 +1046,6 @@ CMathContent.prototype =
         return result;
     },
     ////////////////////////
-
     /// For Para Math
     GetParent: function()
     {
@@ -1068,11 +1059,9 @@ CMathContent.prototype =
     {
         return this.ArgSize.value;
     },
-
     /////////   Перемещение     ////////////
 
     // Поиск позиции, селект
-
     Is_SelectedAll: function(Props)
     {
         var bFirst = false, bEnd = false;

@@ -118,21 +118,7 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].NeedCompiledCtrPr();
-
     },
-    /*Set_CompiledCtrPrp: function(ParaMath)
-    {
-        var defaultRPrp = ParaMath.GetFirstRPrp();
-
-        this.CompiledCtrPrp.Merge(defaultRPrp);
-        this.CompiledCtrPrp.Merge(this.CtrPrp);
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                if(this.elements[i][j].Type === para_Math_Composition)
-                    this.elements[i][j].Set_CompiledCtrPrp(ParaMath);
-
-    },*/
     Get_CompiledCtrPrp: function()
     {
         this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
@@ -169,16 +155,6 @@ CMathBase.prototype =
     Get_CompiledArgSize: function()
     {
         return this.Parent.Get_CompiledArgSize();
-    },
-    getCtrPrpForFirst: function(ParaMath)
-    {
-        var ctrPrp = new CTextPr();
-        var defaultRPrp = ParaMath.Get_Default_TPrp();
-        //var gWPrp = defaultRPrp.getMergedWPrp();
-        ctrPrp.Merge(defaultRPrp);
-        ctrPrp.Merge(this.CtrPrp);
-
-        return ctrPrp;
     },
     // для управляющих символов в приоритете GetFirstRunPrp
     // если первый элемент - мат объект, то берутся его CtrPrp
@@ -343,11 +319,13 @@ CMathBase.prototype =
             h += Heights[i];
         }
     },
-    draw: function(x, y, pGraphics)
+    draw: function(x, y, pGraphics, PDSE)
     {
+        this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp()); // для Just-Draw элементов
+
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].draw(x, y, pGraphics);
+                this.elements[i][j].draw(x, y, pGraphics, PDSE);
     },
     remove: function(order)
     {
@@ -430,7 +408,20 @@ CMathBase.prototype =
             // for Ctr Prp
 
             //this.CompiledCtrPrp = ParaMath.GetFirstRPrp();
-            this.CompiledCtrPrp = new CTextPr();
+			//this.CompiledCtrPrp = new CTextPr();
+            // Получим настройки текста, для данного параграфа
+            this.CompiledCtrPrp = this.ParaMath.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
+
+            this.CompiledCtrPrp.Merge(this.ParaMath.Get_Default_TPrp());
+
+            // Если в прямых настройках задан стиль, тогда смержим настройки стиля
+            if ( undefined != this.CtrPrp.RStyle )
+            {
+                var Styles = this.ParaMath.Paragraph.Parent.Get_Styles();
+                var StyleTextPr = Styles.Get_Pr( this.CtrPrp.RStyle, styletype_Character ).TextPr;
+                this.CompiledCtrPrp.Merge( StyleTextPr );
+            }
+
             var defaultTxtPrp = ParaMath.Get_Default_TPrp();
 
             this.CompiledCtrPrp.FontFamily =
@@ -681,7 +672,6 @@ CMathBase.prototype =
             }
         }
     },
-
     GetMathTextPr: function(ContentPos, Depth)
     {
         var pos = ContentPos.Get(Depth);
@@ -1044,6 +1034,59 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     PDSH.X = this.pos.x + this.ParaMath.X + this.size.width;
 
 };
+CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
+{
+    var Para      = PDSE.Paragraph;
+    var pGraphics = PDSE.Graphics;
+    var BgColor   = PDSE.BgColor;
+
+    if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+        BgColor = CurTextPr.Shd.Get_Color( Para );
+
+    var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+
+    var RGBA;
+    if(CurTextPr.Unifill)
+    {
+        CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+        RGBA = CurTextPr.Unifill.getRGBAColor();
+
+        if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        {
+            G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+            pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+        }
+        else
+        {
+            pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
+        }
+    }
+    else
+    {
+        if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        {
+            G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+            pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+        }
+        else if ( true === CurTextPr.Color.Auto )
+        {
+            pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+        }
+        else
+        {
+            pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+        }
+    }
+
+    return BgColor;
+};
 CMathBase.prototype.protected_AddToContent = function(Pos, Items, bUpdatePosition)
 {
     History.Add(this, new CChangesMathAddItems(Pos, Items));
@@ -1073,7 +1116,6 @@ CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_SetNeedResize       = CMathContent.prototype.private_SetNeedResize;
-
 CMathBase.prototype.private_CorrectCurPos = function()
 {
     if (this.CurPos > this.Content.length - 1)
@@ -1088,14 +1130,11 @@ CMathBase.prototype.private_CorrectCurPos = function()
         this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
 }
-
 CMathBase.prototype.Search                        = ParaHyperlink.prototype.Search;
 CMathBase.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
 CMathBase.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
 CMathBase.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
 CMathBase.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
-
-
 CMathBase.prototype.Set_SelectionContentPos       = ParaHyperlink.prototype.Set_SelectionContentPos;
 CMathBase.prototype.Get_LeftPos                   = ParaHyperlink.prototype.Get_LeftPos;
 CMathBase.prototype.Get_RightPos                  = ParaHyperlink.prototype.Get_RightPos;
@@ -1127,7 +1166,6 @@ CMathBase.prototype.Document_UpdateInterfaceState = function(MathProps)
 function CMathBasePr()
 {
 };
-
 CMathBasePr.prototype.Set_FromObject  = function(Obj){};
 CMathBasePr.prototype.Copy            = function(){return new CMathBasePr();};
 CMathBasePr.prototype.Write_ToBinary  = function(Writer){};

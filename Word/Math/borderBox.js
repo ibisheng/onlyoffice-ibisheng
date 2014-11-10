@@ -201,9 +201,9 @@ CBorderBox.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CBorderBox.prototype.draw = function(x, y, pGraphics)
+CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
 {
-    this.elements[0][0].draw(x, y, pGraphics);
+    this.elements[0][0].draw(x, y, pGraphics, PDSE);
 
     var penW = this.GetTPrpToControlLetter().FontSize*0.02;
 
@@ -213,14 +213,16 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     var X = this.pos.x + x + this.GapLeft,
         Y = this.pos.y + y;
 
+
+    this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
+
     if(!this.Pr.hideTop)
     {
         var x1 = X,
             x2 = X + Width,
             y1 = Y;
 
-         pGraphics.p_color(0,0,0, 255);
-         pGraphics.drawHorLine(0, y1, x1, x2, penW);
+        pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
     if(!this.Pr.hideBot)
@@ -229,8 +231,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             x2 = X + Width,
             y1 = Y + Height;
 
-            pGraphics.p_color(0,0,0, 255);
-            pGraphics.drawHorLine(2, y1, x1, x2, penW);
+        pGraphics.drawHorLine(2, y1, x1, x2, penW);
     }
 
     if(!this.Pr.hideLeft)
@@ -239,7 +240,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             y1 = Y,
             y2 = Y + Height;
 
-        pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
@@ -249,7 +249,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             y1 = Y,
             y2 = Y + Height;
 
-        pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(2, x1, y1, y2, penW);
     }
 
@@ -261,7 +260,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
                 x2 = X + Width, y2 = Y + Height;
 
             pGraphics.p_width(180);
-            pGraphics.b_color1(0,0,0, 255);
 
             pGraphics._s();
             pGraphics._m(x1, y1);
@@ -281,7 +279,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
                 x7 = X,                 y7 = Y;
 
             pGraphics.p_width(1000);
-            pGraphics.b_color1(0,0,0, 255);
 
             pGraphics._s();
             pGraphics._m(x1, y1);
@@ -304,7 +301,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
                 x2 = X,              y2 = Y + Height;
 
             pGraphics.p_width(180);
-            pGraphics.b_color1(0,0,0, 255);
 
             pGraphics._s();
             pGraphics._m(x1, y1);
@@ -325,7 +321,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
 
             pGraphics.p_width(1000);
-            pGraphics.b_color1(0,0,0, 255);
 
             pGraphics._s();
             pGraphics._m(x1, y1);
@@ -346,7 +341,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             x2 = X + Width,
             y1 = Y + Height/2 - penW/2;
 
-        pGraphics.p_color(0,0,0, 255);
         pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
@@ -356,7 +350,6 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
             y1 = Y,
             y2 = Y + Height;
 
-        pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
@@ -381,11 +374,6 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 
     this.elements[0][0].setPosition(NewPos, PosInfo);
 }
-CBorderBox.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
-    MathProps.Type = c_oAscMathInterfaceType.BorderBox;
-    MathProps.Pr   = null;
-};
 
 function CMathBoxPr()
 {
@@ -436,7 +424,6 @@ CMathBoxPr.prototype.Copy = function()
 
     if(this.brk !== undefined)
         NewPr.brk = this.brk.Copy();
-
 
     return NewPr;
 };
@@ -524,11 +511,6 @@ CBox.prototype.getBase = function()
 {
     return this.Content[0];
 }
-CBox.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
-    MathProps.Type = c_oAscMathInterfaceType.Box;
-    MathProps.Pr   = null;
-};
 
 
 function CMathBarPr()
@@ -626,11 +608,6 @@ CBar.prototype.getAscent = function()
 
     return ascent;
 }
-CBar.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
-    MathProps.Type = c_oAscMathInterfaceType.Bar;
-    MathProps.Pr   = null;
-};
 
 function CMathPhantomPr()
 {
@@ -746,8 +723,3 @@ CPhantom.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
 }
-CPhantom.prototype.Document_UpdateInterfaceState = function(MathProps)
-{
-    MathProps.Type = c_oAscMathInterfaceType.Phantom;
-    MathProps.Pr   = null;
-};

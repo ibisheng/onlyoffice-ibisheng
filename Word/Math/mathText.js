@@ -872,7 +872,7 @@ CMathAmp.prototype =
             var X  = x + this.pos.x + this.size.width,
                 Y  = y + this.pos.y,
                 Y2 = y + this.pos.y - this.AmpText.size.height;
-            pGraphics.p_color(0,0,0, 255);
+
             pGraphics.drawVerLine(0, X, Y, Y2, 0.1);
         }
     },

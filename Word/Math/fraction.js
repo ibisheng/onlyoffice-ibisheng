@@ -4,26 +4,22 @@ function CMathFractionPr()
 {
     this.type = BAR_FRACTION;
 }
-
 CMathFractionPr.prototype.Set_FromObject = function(Obj)
 {
     if (undefined !== Obj.type && null !== Obj.type)
         this.type = Obj.type;
 };
-
 CMathFractionPr.prototype.Copy = function(Obj)
 {
     var NewPr = new CMathFractionPr();
     NewPr.type = this.type;
     return NewPr;
 };
-
 CMathFractionPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : type
     Writer.WriteLong(this.type);
 };
-
 CMathFractionPr.prototype.Read_FromBinary = function(Reader)
 {
     // Long : type
@@ -64,16 +60,16 @@ CFraction.prototype.getType = function()
 {
     return this.Pr.type;
 }
-CFraction.prototype.draw = function(x, y, pGraphics)
+CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
-        this.drawBarFraction(x, y, pGraphics);
+        this.drawBarFraction(x, y, pGraphics, PDSE);
     else if(this.Pr.type == SKEWED_FRACTION)
-        this.drawSkewedFraction(x, y, pGraphics);
+        this.drawSkewedFraction(x, y, pGraphics, PDSE);
     else if(this.Pr.type == LINEAR_FRACTION)
-        this.drawLinearFraction(x, y, pGraphics);
+        this.drawLinearFraction(x, y, pGraphics, PDSE);
 }
-CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
+CFraction.prototype.drawBarFraction = function(x, y, pGraphics, PDSE)
 {
     var mgCtrPrp = this.GetTPrpToControlLetter();
 
@@ -91,14 +87,13 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
     {
         pGraphics.SetFont(mgCtrPrp);
 
-        pGraphics.p_color(0,0,0, 255);
-        pGraphics.b_color1(0,0,0, 255);
+        this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
         pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    CFraction.superclass.draw.call(this, x, y, pGraphics);
+    CFraction.superclass.draw.call(this, x, y, pGraphics, PDSE);
 }
-CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
+CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics, PDSE)
 {
     var mgCtrPrp = this.GetTPrpToControlLetter();
 
@@ -184,16 +179,15 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 
     pGraphics.p_width(penW*1000);
 
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
+    this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
     pGraphics._s();
     pGraphics._m(xx1, yy1);
     pGraphics._l(xx2, yy2);
     pGraphics.ds();
 
-    CFraction.superclass.draw.call(this, x, y, pGraphics);
+    CFraction.superclass.draw.call(this, x, y, pGraphics, PDSE);
 }
-CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
+CFraction.prototype.drawLinearFraction = function(x, y, pGraphics, PDSE)
 {
     var shift = 0.1*this.dW;
 
@@ -211,15 +205,14 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
     pGraphics.SetFont(mgCtrPrp);
     pGraphics.p_width(penW*1000);
 
-    pGraphics.p_color(0,0,0, 255);
-    pGraphics.b_color1(0,0,0, 255);
+    this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
 
     pGraphics._s();
     pGraphics._m(x1, y1);
     pGraphics._l(x2, y2);
     pGraphics.ds();
 
-    CFraction.superclass.draw.call(this, x, y, pGraphics);
+    CFraction.superclass.draw.call(this, x, y, pGraphics, PDSE);
 }
 CFraction.prototype.getNumerator = function()
 {
