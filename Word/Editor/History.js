@@ -193,6 +193,7 @@ CHistory.prototype =
 
         var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
+        this.BinaryWriter.WriteString2(Class.Get_Id());
         Class.Save_Changes( Data, this.BinaryWriter );
 
         var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;

@@ -377,14 +377,8 @@ var g_oTableId = null;
 
 function CCollaborativeChanges()
 {
-    this.m_sId           = null;
     this.m_pData         = null;
     this.m_oColor        = null;
-
-    this.Set_Id = function(sId)
-    {
-        this.m_sId = sId;
-    };
 
     this.Set_Data = function(pData)
     {
@@ -401,8 +395,6 @@ function CCollaborativeChanges()
         if ( "undefined" === typeof(Class.Get_Id) )
             return false;
 
-        this.m_sId    = Class.Get_Id();
-
         // Преобразуем данные в бинарный файл
         this.m_pData  = this.Internal_Save_Data( Class, Data, Binary );
 
@@ -411,21 +403,21 @@ function CCollaborativeChanges()
 
     this.Apply_Data = function()
     {
-        var LoadData = this.Internal_Load_Data( this.m_pData );
-        var Type = LoadData.Reader.GetLong();
-        var Class = null;
+        var LoadData  = this.Internal_Load_Data(this.m_pData);
+        var ClassId   = LoadData.Reader.GetString2();
+        var ReaderPos = LoadData.Reader.GetCurPos();
+        var Type      = LoadData.Reader.GetLong();
+        var Class     = null;
 
-        if ( historyitem_type_HdrFtr === Type )
-        {
+        if (historyitem_type_HdrFtr === Type)
             Class = editor.WordControl.m_oLogicDocument.HdrFtr;
-        }
         else
-            Class = g_oTableId.Get_ById( this.m_sId );
+            Class = g_oTableId.Get_ById(ClassId);
 
-        LoadData.Reader.Seek2(0);
+        LoadData.Reader.Seek2(ReaderPos);
 
-        if ( null != Class )
-            return Class.Load_Changes( LoadData.Reader, LoadData.Reader2, this.m_oColor );
+        if (null != Class)
+            return Class.Load_Changes(LoadData.Reader, LoadData.Reader2, this.m_oColor);
         else
             return false;
     };
@@ -771,7 +763,6 @@ function CCollaborativeEditing()
                 oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
 
                 var oChanges2 = {};
-                oChanges2["Id"]   = oChanges.m_sId;
                 oChanges2["Data"] = oChanges.m_pData;
                 aChanges.push( oChanges2 );
             }
@@ -1321,6 +1312,7 @@ CContentChangesElement.prototype =
         this.m_pData.Data.UseArray = true;
         this.m_pData.Data.PosArray = this.m_aPositions;
 
+        Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
         this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
 
         var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
