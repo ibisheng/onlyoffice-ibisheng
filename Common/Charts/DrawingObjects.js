@@ -1182,12 +1182,13 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 //-----------------------------------------------------------------------------------
 
 
-function CChangeTableData(changedRange, added, hided, removed)
+function CChangeTableData(changedRange, added, hided, removed, arrChanged)
 {
     this.changedRange = changedRange;
     this.added = added;
     this.hided = hided;
     this.removed = removed;
+    this.arrChanged = arrChanged;
 }
 
 function GraphicOption(ws, type, range, aId, offset) {
@@ -3017,6 +3018,7 @@ function DrawingObjects() {
         if(!worksheet)
             return;
         ExecuteNoHistory(function(){
+            var i;
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];
             if(data.changedRange)
@@ -3037,8 +3039,15 @@ function DrawingObjects() {
             {
                 changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.removed.c1, data.removed.r1, data.removed.c2, data.removed.r2)))
             }
+            if(Array.isArray(data.arrChanged))
+            {
+                for(i = 0; i < data.arrChanged.length; ++i)
+                {
+                    changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.arrChanged[i].c1, data.arrChanged[i].r1, data.arrChanged[i].c2, data.arrChanged[i].r2)))
+                }
+            }
 
-            for(var i = 0; i < wsViews.length; ++i)
+            for(i = 0; i < wsViews.length; ++i)
             {
                 if(wsViews[i] && wsViews[i].objectRender)
                 {
