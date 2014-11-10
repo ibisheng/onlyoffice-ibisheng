@@ -3131,15 +3131,15 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 
     // Делаем такие проверки, потому что после совместного редактирования, позиция может остаться старой, а
     // контент измениться.
-    if (CurPos > this.Content.length - 1)
-    {
-        this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
-    }
-    else if (CurPos < 0)
+    if (undefined === CurPos || CurPos < 0)
     {
         this.CurPos = 0;
         this.Content[this.CurPos].Cursor_MoveToStartPos();
+    }
+    else if (CurPos > this.Content.length - 1)
+    {
+        this.CurPos = this.Content.length - 1;
+        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
     }
     else
     {

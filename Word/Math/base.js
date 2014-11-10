@@ -953,15 +953,15 @@ CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {
     var CurPos = ContentPos.Get(Depth);
 
-    if (CurPos > this.Content.length - 1)
-    {
-        this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
-    }
-    else if (this.CurPos < 0)
+    if (undefined === CurPos || this.CurPos < 0)
     {
         this.CurPos = 0;
         this.Content[this.CurPos].Cursor_MoveToStartPos();
+    }
+    else if (CurPos > this.Content.length - 1)
+    {
+        this.CurPos = this.Content.length - 1;
+        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
     }
     else
     {
