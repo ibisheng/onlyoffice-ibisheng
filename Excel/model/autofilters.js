@@ -2030,6 +2030,9 @@ var gUndoInsDelCellsFlag = true;
 				{
 					if(aWs.AutoFilter && cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.AutoFilter.Ref))
 					{
+						if(aWs.AutoFilter.result)
+							this._addButtonAF({result: aWs.AutoFilter.result,isVis: false});
+						
 						aWs.AutoFilter = cloneData.oldFilter;
 						this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
 					}
@@ -2039,7 +2042,11 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
 							{
+								if(aWs.TableParts[l].AutoFilter != null)
+									this._addButtonAF({result: aWs.TableParts[l].result,isVis: false});
+									
 								aWs.TableParts[l] = cloneData.oldFilter;
+								
 								if(aWs.TableParts[l].AutoFilter != null)
 									this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
 								
