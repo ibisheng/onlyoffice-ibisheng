@@ -484,7 +484,7 @@ Complex.prototype = {
             f = 1 / (c * c + d * d)
 
         if( Math.abs(f) == Infinity ){
-            return new cError( cErrorType.division_by_zero );
+            return new cError( cErrorType.not_numeric );
         }
 
         return new Complex( (a * c + b * d) * f, (b * c - a * d) * f, this.suffix );
