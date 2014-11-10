@@ -1933,7 +1933,11 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.RPr,	function(){oThis.brPrs.Write_rPr(props.wRPrp);}); // w:rPr
 		this.bs.WriteItem(c_oSer_OMathContentType.MRPr,	function(){oThis.WriteMRPr(props.mathRPrp);}); // m:rPr
-		this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText);});	
+		if ("" != oText)
+		{
+			this.memory.WriteByte(c_oSer_OMathContentType.MText);
+			this.memory.WriteString2(oText.toString());
+		}
 	}
 	this.WriteAcc = function(oAcc)
 	{
@@ -9846,7 +9850,7 @@ function Binary_oMathReader(stream)
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathCtrlPr(t,l,props);
             });
-			oParent.content[oParent.content.length-1].setCtrPrp(props.ctrPrp);
+			oParent.Content[oParent.Content.length-1].setCtrPrp(props.ctrPrp);
 		}
         else
             res = c_oSerConstants.ReadUnknown;
