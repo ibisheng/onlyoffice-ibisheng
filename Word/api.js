@@ -1442,7 +1442,7 @@ CChatMessage.prototype.get_Message = function() { return this.Message; }
 asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
 {
 	var oChange = new CCollaborativeChanges();
-	oChange.Set_Data( change["Data"] );
+	oChange.Set_Data( change );
 	oChange.Set_Color( oColor );
 	CollaborativeEditing.Add_Changes( oChange );
 };
