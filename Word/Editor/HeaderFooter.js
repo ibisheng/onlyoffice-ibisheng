@@ -1160,6 +1160,14 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с колонтитулами
 //-----------------------------------------------------------------------------------        
+    Set_CurHdrFtr : function(HdrFtr)
+    {
+        if (null !== this.CurHdrFtr)
+            this.CurHdrFtr.Selection_Remove();
+
+        this.CurHdrFtr = HdrFtr;
+    },
+
     GoTo_NextHdrFtr : function()
     {
         var CurHdrFtr = this.CurHdrFtr;

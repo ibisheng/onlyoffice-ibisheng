@@ -4318,7 +4318,10 @@ CDocument.prototype =
         }
 
         this.private_UpdateCursorXY(false, true);
-        this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+        var Result = this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+
+        if (true === AddToSelect && true !== Result)
+            this.Cursor_MoveToStartPos(true);
 
         if (bStopSelection)
             this.private_StopSelection();
@@ -4352,7 +4355,10 @@ CDocument.prototype =
         }
 
         this.private_UpdateCursorXY(false, true);
-        this.private_MoveCursorDown(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+        var Result = this.private_MoveCursorDown(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+
+        if (true === AddToSelect && true !== Result)
+            this.Cursor_MoveToEndPos(true);
 
         if (bStopSelection)
             this.private_StopSelection();
@@ -8040,7 +8046,7 @@ CDocument.prototype =
             //       его можно здесь вставить.
             
             this.Selection.DragDrop.Flag = 1;
-            this.Selection.DragDrop.Data = { X : X, Y : Y };            
+            this.Selection.DragDrop.Data = { X : X, Y : Y, PageNum : this.CurPage };
             return;
         }
 
@@ -9240,6 +9246,7 @@ CDocument.prototype =
                 this.DrawingObjects.resetSelection2();
                 this.Document_UpdateInterfaceState();
                 this.Document_UpdateSelectionState();
+                this.private_UpdateCursorXY(true, true);
             }
             else if ( docpostype_HdrFtr == this.CurPos.Type )
             {
@@ -10192,7 +10199,7 @@ CDocument.prototype =
 
             this.Selection_SetStart( X, Y, e );
 
-            if ( e.ClickCount <= 1 )
+            if (e.ClickCount <= 1 && 1 !== this.Selection.DragDrop.Flag)
             {
                 this.RecalculateCurPos();
                 this.Document_UpdateSelectionState();
@@ -10208,6 +10215,8 @@ CDocument.prototype =
         if ( 1 === this.Selection.DragDrop.Flag )
         {
             this.Selection.DragDrop.Flag = -1;
+            var OldCurPage = this.CurPage;
+            this.CurPage = this.Selection.DragDrop.Data.PageNum;
             this.Selection_SetStart( this.Selection.DragDrop.Data.X, this.Selection.DragDrop.Data.Y, e );
             this.Selection.DragDrop.Flag = 0;
             this.Selection.DragDrop.Data = null;
@@ -10715,10 +10724,10 @@ CDocument.prototype =
                 var Header = new CHeaderFooter( this.HdrFtr, this, this.DrawingDocument, hdrftr_Header );
                 FirstSectPr.Set_Header_First( Header );
                 
-                this.HdrFtr.CurHdrFtr = Header;
+                this.HdrFtr.Set_CurHdrFtr(Header);
             }
             else
-                this.HdrFtr.CurHdrFtr = FirstHeader;
+                this.HdrFtr.Set_CurHdrFtr(FirstHeader);
 
             if (null === FirstFooter)
             {
@@ -10763,9 +10772,9 @@ CDocument.prototype =
         }
 
         if (null !== FirstSectPr.Get_Header_First() && true === FirstSectPr.TitlePage)
-            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_First();
+            this.HdrFtr.Set_CurHdrFtr(FirstSectPr.Get_Header_First());
         else
-            this.HdrFtr.CurHdrFtr = FirstSectPr.Get_Header_Default();
+            this.HdrFtr.Set_CurHdrFtr(FirstSectPr.Get_Header_Default());
 
 
         this.Recalculate();
@@ -10898,7 +10907,7 @@ CDocument.prototype =
             }
 
 
-            this.HdrFtr.CurHdrFtr = CurHdrFtr;
+            this.HdrFtr.Set_CurHdrFtr(CurHdrFtr);
             this.HdrFtr.CurHdrFtr.Cursor_MoveToStartPos(false);
         }
         else
@@ -10909,7 +10918,7 @@ CDocument.prototype =
             
             var NewHdrFtr = CurHdrFtr.Copy();
             SectPr.Set_HdrFtr( bHeader, bFirst, bEven, NewHdrFtr );
-            this.HdrFtr.CurHdrFtr = NewHdrFtr;
+            this.HdrFtr.Set_CurHdrFtr(NewHdrFtr);
             this.HdrFtr.CurHdrFtr.Cursor_MoveToStartPos(false);
         }
                 
@@ -13939,6 +13948,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 
     this.TurnOff_InterfaceEvents();
 
+    var Result = false;
     while (true)
     {
         CurY += 0.1;
@@ -13946,7 +13956,10 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
         if (CurY > PageH)
         {
             if (this.Pages.length - 1 <= this.CurPage)
+            {
+                Result = false;
                 break;
+            }
             else
             {
                 this.CurPage++;
@@ -13960,10 +13973,14 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
         this.private_UpdateCursorXY(false, true);
 
         if (this.CurPos.RealY > StartY + 0.001)
+        {
+            Result = true;
             break;
+        }
     }
 
     this.TurnOn_InterfaceEvents(true);
+    return Result;
 };
 CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 {
@@ -13973,6 +13990,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 
     this.TurnOff_InterfaceEvents();
 
+    var Result = false;
     while (true)
     {
         CurY -= 0.1;
@@ -13980,7 +13998,10 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
         if (CurY < 0)
         {
             if (0 === this.CurPage)
+            {
+                Result = false;
                 break;
+            }
             else
             {
                 this.CurPage--;
@@ -13993,12 +14014,14 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
         this.private_UpdateCursorXY(false, true);
 
         if (this.CurPos.RealY < StartY - 0.001)
+        {
+            Result = true;
             break;
+        }
     }
 
     this.TurnOn_InterfaceEvents(true);
-
-    return;
+    return Result;
 };
 
 //-----------------------------------------------------------------------------------
