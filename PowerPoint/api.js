@@ -464,8 +464,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
     this.CoAuthoringApi.onSaveChanges				= function (e, userId, bFirstLoad) {
 		// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
 		var Changes = new CCollaborativeChanges();
-		Changes.Set_Id(e["Id"]);
-		Changes.Set_Data(e["Data"]);
+		Changes.Set_Data(e);
 		CollaborativeEditing.Add_Changes(Changes);
 
         // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
@@ -5215,8 +5214,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 	for (var i = 0; i < _len; i++)
 	{
 	    var Changes = new CCollaborativeChanges();
-        Changes.Set_Id( changes[i]["Id"] );
-        Changes.Set_Data( changes[i]["Data"] );
+        Changes.Set_Data( changes[i]);
 	    CollaborativeEditing.Add_Changes( Changes );
 	}
 	CollaborativeEditing.Apply_OtherChanges();
