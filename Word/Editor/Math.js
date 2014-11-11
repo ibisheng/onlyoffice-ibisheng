@@ -1898,6 +1898,9 @@ var historyitem_Math_ParaJc                    =  4; // ParaMath.Jc
 var historyitem_Math_CtrPrpShd                 =  5;
 var historyitem_Math_AddItems_ToMathBase       =  6;
 var historyitem_Math_EqArrayPr                 =  7; // Изменение настроек у CEqArray
+var historyitem_Math_CtrPrpColor               =  8;
+var historyitem_Math_CtrPrpUnifill             =  9;
+
 
 function ReadChanges_FromBinary(Reader, Class)
 {
@@ -1910,6 +1913,8 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_ParaJc              : Changes = new CChangesMathParaJc(); break;
         case historyitem_Math_CtrPrpShd           : Changes = new CChangesMathShd(); break;
         case historyitem_Math_AddItems_ToMathBase : Changes = new CChangesMathAddItems(); break;
+        case historyitem_Math_CtrPrpColor         : Changes = new CChangesMathColor(); break;
+        case historyitem_Math_CtrPrpUnifill       : Changes = new CChangesMathUnifill(); break;
     }
 
     if (null !== Changes)
@@ -1982,7 +1987,7 @@ CChangesMathShd.prototype.Redo = function(Class)
 };
 CChangesMathShd.prototype.Save_Changes = function(Writer)
 {
-    // Long : New
+    // Bool : IsUndefined
 
     if ( undefined !== this.New )
     {
@@ -1992,17 +1997,105 @@ CChangesMathShd.prototype.Save_Changes = function(Writer)
     else
         Writer.WriteBool(true);
 
-    //Writer.WriteLong(this.New);
 };
 CChangesMathShd.prototype.Load_Changes = function(Reader, Class)
 {
-    /*this.New = Reader.GetLong();
-    this.Redo(Class);*/
+    // Bool : IsUndefined
 
     if ( Reader.GetBool() == false)
     {
         this.New = new CDocumentShd();
         this.New.Read_FromBinary( Reader );
+    }
+    else
+    {
+        this.New = undefined;
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathColor(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathColor.prototype.Type = historyitem_Math_CtrPrpColor;
+CChangesMathColor.prototype.Undo = function(Class)
+{
+    Class.raw_SetColor(this.Old);
+};
+CChangesMathColor.prototype.Redo = function(Class)
+{
+    Class.raw_SetColor(this.New);
+};
+CChangesMathColor.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathColor.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CDocumentColor(0, 0, 0, false);
+        this.New.Read_FromBinary(Reader);
+    }
+    else
+    {
+        this.New = undefined;
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMathUnifill(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathUnifill.prototype.Type = historyitem_Math_CtrPrpUnifill;
+CChangesMathUnifill.prototype.Undo = function(Class)
+{
+    Class.raw_SetUnifill(this.Old);
+};
+CChangesMathUnifill.prototype.Redo = function(Class)
+{
+    Class.raw_SetUnifill(this.New);
+};
+CChangesMathUnifill.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+
+    if ( undefined !== this.New )
+    {
+        Writer.WriteBool(false);
+        this.New.Write_ToBinary(Writer);
+    }
+    else
+    {
+        Writer.WriteBool(true);
+    }
+};
+CChangesMathUnifill.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+
+    if ( Reader.GetBool() == false)
+    {
+        this.New = new CUniFill();
+        this.New.Read_FromBinary(Reader);
     }
     else
     {

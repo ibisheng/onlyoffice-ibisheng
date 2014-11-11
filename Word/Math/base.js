@@ -659,8 +659,21 @@ CMathBase.prototype =
         {
             if(TextPr.FontSize !== undefined)
                 this.Set_FontSizeCtrPrp(TextPr.FontSize);
-            else if(TextPr.Shd !== undefined)
+
+            if(TextPr.Shd !== undefined)
                 this.Set_Shd(TextPr.Shd);
+
+            if ( undefined !== TextPr.Color && undefined === TextPr.Unifill )
+            {
+                this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
+                this.Set_Unifill( undefined );
+            }
+
+            if ( undefined !== TextPr.Unifill )
+            {
+                this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
+                this.Set_Color(undefined);
+            }
         }
 
         for(var i=0; i < this.nRow; i++)
@@ -690,6 +703,22 @@ CMathBase.prototype =
         History.Add(this, new CChangesMathFontSize(Value, this.CtrPrp.FontSize));
         this.raw_SetFontSize(Value);
     },
+    Set_Color: function(Value)
+    {
+        if ( ( undefined === Value && undefined !== this.CtrPrp.Color ) || ( Value instanceof CDocumentColor && ( undefined === this.CtrPrp.Color || false === Value.Compare(this.CtrPrp.Color) ) ) )
+        {
+            History.Add( this,  new CChangesMathColor(Value, this.CtrPrp.Color));
+            this.raw_SetColor(Value);
+        }
+    },
+    Set_Unifill: function(Value)
+    {
+        if ( ( undefined === Value && undefined !== this.CtrPrp.Unifill ) || ( Value instanceof CUniFill && ( undefined === this.CtrPrp.Unifill || false === CompareUnifillBool(this.CtrPrp.Unifill, Value) ) ) )
+        {
+            History.Add(this, new CChangesMathUnifill(Value, this.CtrPrp.Unifill));
+            this.raw_SetUnifill(Value);
+        }
+    },
     Set_Shd: function(Shd)
     {
         if ( (undefined === this.CtrPrp.Shd && undefined === Shd) || (undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare( Shd ) ) )
@@ -698,6 +727,7 @@ CMathBase.prototype =
         History.Add(this, new CChangesMathShd(Shd, this.CtrPrp.Shd));
         this.raw_SetShd(Shd);
     },
+
     raw_SetFontSize : function(Value)
     {
         this.CtrPrp.FontSize    = Value;
@@ -715,6 +745,24 @@ CMathBase.prototype =
         }
         else
             this.CtrPrp.Shd = undefined;
+
+        this.RecalcInfo.bCtrPrp = true;
+
+        if(null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
+    raw_SetColor: function(Value)
+    {
+        this.CtrPrp.Color = Value;
+
+        this.RecalcInfo.bCtrPrp = true;
+
+        if(null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
+    raw_SetUnifill: function(Value)
+    {
+        this.CtrPrp.Unifill = Value;
 
         this.RecalcInfo.bCtrPrp = true;
 
@@ -1051,7 +1099,7 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
         CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
         RGBA = CurTextPr.Unifill.getRGBAColor();
 
-        if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        if ( true === PDSE.VisitedHyperlink && ( undefined === this.CtrPrp.Color && undefined === this.CtrPrp.Unifill ) )
         {
             G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
             RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
@@ -1066,7 +1114,7 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
     }
     else
     {
-        if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        if ( true === PDSE.VisitedHyperlink && ( undefined === this.CtrPrp.Color && undefined === this.CtrPrp.Unifill ) )
         {
             G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
             RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
@@ -1084,6 +1132,10 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
             pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
         }
     }
+
+
+    if(BgColor == undefined)
+        BgColor = new CDocumentColor( 255, 255, 255, false );
 
     return BgColor;
 };
