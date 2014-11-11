@@ -4616,7 +4616,7 @@ PasteProcessor.prototype =
 						}
                     }
                 }
-				if(this.pasteInExcel !== true)
+				if(this.pasteInExcel !== true && Para.bFromDocument === true)
 					Para.Numbering_Add( NumId, 0 );
             }
             else
