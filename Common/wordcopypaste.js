@@ -6794,11 +6794,14 @@ function Editor_CopyPaste_Create(api)
 	}
 	
 	ElemToSelect.oncut = function(e){
-		ElemToSelect.innerHTML = "";
-		Editor_Copy_Event(e, ElemToSelect);
-		
-		api.WordControl.m_oLogicDocument.Remove(1, true, true);
-        api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+		if(false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		{	
+			ElemToSelect.innerHTML = "";
+			Editor_Copy_Event(e, ElemToSelect);
+			
+			api.WordControl.m_oLogicDocument.Remove(1, true, true);
+			api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+		}
 	}
 
     ElemToSelect["onbeforecut"] = function(e){
