@@ -342,6 +342,25 @@ CPresentation.prototype =
 
     Recalculate : function(RecalcData)
     {
+        if (undefined === RecalcData)
+        {
+            // Проверяем можно ли сделать быстрый пересчет
+            var SimpleChanges = History.Is_SimpleChanges();
+            if ( 1 === SimpleChanges.length )
+            {
+                var Run  = SimpleChanges[0].Class;
+                var Para = Run.Paragraph;
+
+                var Res  = Para.Recalculate_FastRange( SimpleChanges );
+                if ( -1 !== Res )
+                {
+                    this.DrawingDocument.OnRecalculatePage(Res, this.Slides[Res]);
+                    this.DrawingDocument.OnEndRecalculate();
+                    return;
+                }
+            }
+        }
+
         if(this.bClearSearch)
         {
             this.SearchEngine.Clear();

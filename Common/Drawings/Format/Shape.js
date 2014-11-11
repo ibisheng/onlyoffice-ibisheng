@@ -2845,6 +2845,8 @@ CShape.prototype =
             }
             if (graphics.CheckUseFonts2 !== undefined)
                 graphics.CheckUseFonts2(transform_text);
+
+            graphics.SetIntegerGrid(true);
             this.txBody.draw(graphics);
             if (graphics.UncheckUseFonts2 !== undefined)
                 graphics.UncheckUseFonts2(transform_text);

@@ -567,7 +567,10 @@ CShape.prototype.recalculateContent2 = function()
         if(this.isPlaceholder())
         {
             var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
-            this.txBody.content2 = CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
+
+            if (!this.txBody.content2)
+                this.txBody.content2 = CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
+
             var content = this.txBody.content2;
             if(content)
             {
@@ -653,18 +656,24 @@ CShape.prototype.recalculateContent2 = function()
             this.contentWidth2 = this.txBody.contentWidth2;
             this.contentHeight2 = this.txBody.contentHeight2;
 
-            var content_ = this.getDocContent();
-            if(content_ && content_.Content[0])
+
+            if (w !== this.contentWidth3)
             {
-                content.Content[0].Pr  = content_.Content[0].Pr;
-                var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
-                content.Set_ApplyToAll(true);
-                content.Paragraph_Add(para_text_pr);
-                content.Set_ApplyToAll(false);
+                var content_ = this.getDocContent();
+                if(content_ && content_.Content[0])
+                {
+                    content.Content[0].Pr  = content_.Content[0].Pr;
+                    var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
+                    content.Set_ApplyToAll(true);
+                    content.Paragraph_Add(para_text_pr);
+                    content.Set_ApplyToAll(false);
+                }
+                content.Set_StartPage(0);
+                content.Reset(0, 0, w, 20000);
+                content.Recalculate_Page(content.StartPage, true);
+
+                this.contentWidth3 = w;
             }
-            content.Set_StartPage(0);
-            content.Reset(0, 0, w, 20000);
-            content.Recalculate_Page(content.StartPage, true);
         }
         else
         {

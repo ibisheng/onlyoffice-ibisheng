@@ -1054,10 +1054,17 @@ Slide.prototype =
         }
     },
 
-    drawSelect: function()
+    drawSelect: function(_type)
     {
-        this.graphicObjects.drawTextSelection(this.num);
-        this.graphicObjects.drawSelect(0, this.presentation.DrawingDocument);
+        if (_type === undefined)
+        {
+            this.graphicObjects.drawTextSelection(this.num);
+            this.graphicObjects.drawSelect(0, this.presentation.DrawingDocument);
+        }
+        else if (_type == 1)
+            this.graphicObjects.drawTextSelection(this.num);
+        else if (_type == 2)
+            this.graphicObjects.drawSelect(0, this.presentation.DrawingDocument);
     },
 
     getDrawingObjects: function()

@@ -1483,102 +1483,6 @@ function CDrawingDocument()
         editor.isViewMode = _oldTurn;
     }
 
-    this.DrawSelection = function(overlay)
-    {
-        var xDst = this.SlideCurrectRect.left;
-        var yDst = this.SlideCurrectRect.top;
-        var wDst = this.SlideCurrectRect.right - this.SlideCurrectRect.left;
-        var hDst = this.SlideCurrectRect.bottom - this.SlideCurrectRect.top;
-
-        var dKoefX = wDst / this.m_oLogicDocument.Width;
-        var dKoefY = hDst / this.m_oLogicDocument.Height;
-
-        var selectionArray = this.m_oLogicDocument.Slides[this.SlideCurrent].selectionArray;
-
-        if (null == this.TextMatrix || global_MatrixTransformer.IsIdentity(this.TextMatrix))
-        {
-            for (var i = 0; i < selectionArray.length; i++)
-            {
-                var r = selectionArray[i];
-
-                var _x = ((xDst + dKoefX * r.x + 0.5) >> 0) - 0.5;
-                var _y = ((yDst + dKoefY * r.y + 0.5) >> 0) - 0.5;
-
-                var _r = ((xDst + dKoefX * r.w + 0.5) >> 0) - 0.5;
-                var _b = ((yDst + dKoefY * r.h + 0.5) >> 0) - 0.5;
-
-                if (_x < overlay.min_x)
-                    overlay.min_x = _x;
-                if (_r > overlay.max_x)
-                    overlay.max_x = _r;
-
-                if (_y < overlay.min_y)
-                    overlay.min_y = _y;
-                if (_b > overlay.max_y)
-                    overlay.max_y = _b;
-
-                overlay.m_oContext.rect(_x, _y, _r - _x + 1,_b - _y + 1);
-            }
-        }
-        else
-        {
-            for (var i = 0; i < selectionArray.length; i++)
-            {
-                var r = selectionArray[i];
-
-                var _x1 = this.TextMatrix.TransformPointX(r.x, r.y);
-                var _y1 = this.TextMatrix.TransformPointY(r.x, r.y);
-
-                var _x2 = this.TextMatrix.TransformPointX(r.w, r.y);
-                var _y2 = this.TextMatrix.TransformPointY(r.w, r.y);
-
-                var _x3 = this.TextMatrix.TransformPointX(r.w, r.h);
-                var _y3 = this.TextMatrix.TransformPointY(r.w, r.h);
-
-                var _x4 = this.TextMatrix.TransformPointX(r.x, r.h);
-                var _y4 = this.TextMatrix.TransformPointY(r.x, r.h);
-
-                var x1 = xDst + dKoefX * _x1;
-                var y1 = yDst + dKoefY * _y1;
-
-                var x2 = xDst + dKoefX * _x2;
-                var y2 = yDst + dKoefY * _y2;
-
-                var x3 = xDst + dKoefX * _x3;
-                var y3 = yDst + dKoefY * _y3;
-
-                var x4 = xDst + dKoefX * _x4;
-                var y4 = yDst + dKoefY * _y4;
-
-                if (global_MatrixTransformer.IsIdentity2(this.TextMatrix))
-                {
-                    x1 = (x1 >> 0) + 0.5;
-                    y1 = (y1 >> 0) + 0.5;
-
-                    x2 = (x2 >> 0) + 0.5;
-                    y2 = (y2 >> 0) + 0.5;
-
-                    x3 = (x3 >> 0) + 0.5;
-                    y3 = (y3 >> 0) + 0.5;
-
-                    x4 = (x4 >> 0) + 0.5;
-                    y4 = (y4 >> 0) + 0.5;
-                }
-
-                overlay.CheckPoint(x1, y1);
-                overlay.CheckPoint(x2, y2);
-                overlay.CheckPoint(x3, y3);
-                overlay.CheckPoint(x4, y4);
-
-                var ctx = overlay.m_oContext;
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.lineTo(x3, y3);
-                ctx.lineTo(x4, y4);
-                ctx.closePath();
-            }
-        }
-    }
     this.DrawSearch = function(overlay)
     {
         var xDst = this.SlideCurrectRect.left;
@@ -2152,10 +2056,6 @@ function CDrawingDocument()
     }
 	this.SelectClear = function()
     {
-        for (var i = 0; i < this.m_oLogicDocument.Slides.length; i++)
-        {
-            this.m_oLogicDocument.Slides[i].selectionArray.splice(0, this.m_oLogicDocument.Slides[i].selectionArray.length);
-        }
         this.m_oWordControl.OnUpdateOverlay();
     }
     this.SearchClear = function()
@@ -2227,21 +2127,91 @@ function CDrawingDocument()
     }
     this.AddPageSelection = function(pageIndex, x, y, width, height)
     {
-        if (pageIndex < 0 || pageIndex >= this.SlidesCount || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
+        if (pageIndex < 0 || pageIndex != this.SlideCurrent || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
             return;
 
-        if (this.m_bIsSelection && (this.m_oWordControl.m_oOverlay.HtmlElement.style.display == "none"))
-        {
-            this.m_oWordControl.ShowOverlay();
-            this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 0.2;
-        }
+        var xDst = this.SlideCurrectRect.left;
+        var yDst = this.SlideCurrectRect.top;
+        var wDst = this.SlideCurrectRect.right - this.SlideCurrectRect.left;
+        var hDst = this.SlideCurrectRect.bottom - this.SlideCurrectRect.top;
 
-        var r = new _rect();
-        r.x = x;
-        r.y = y;
-        r.w = x + width;
-        r.h = y + height;
-        this.m_oLogicDocument.Slides[pageIndex].selectionArray[this.m_oLogicDocument.Slides[pageIndex].selectionArray.length] = r;
+        var dKoefX = wDst / this.m_oLogicDocument.Width;
+        var dKoefY = hDst / this.m_oLogicDocument.Height;
+
+        var overlay = this.m_oWordControl.m_oOverlayApi;
+        if (null == this.TextMatrix || global_MatrixTransformer.IsIdentity(this.TextMatrix))
+        {
+            var _x = ((xDst + dKoefX * x + 0.5) >> 0) - 0.5;
+            var _y = ((yDst + dKoefY * y + 0.5) >> 0) - 0.5;
+
+            var _r = ((xDst + dKoefX * (x + width) + 0.5) >> 0) - 0.5;
+            var _b = ((yDst + dKoefY * (y + height) + 0.5) >> 0) - 0.5;
+
+            if (_x < overlay.min_x)
+                overlay.min_x = _x;
+            if (_r > overlay.max_x)
+                overlay.max_x = _r;
+
+            if (_y < overlay.min_y)
+                overlay.min_y = _y;
+            if (_b > overlay.max_y)
+                overlay.max_y = _b;
+
+            overlay.m_oContext.rect(_x, _y, _r - _x + 1,_b - _y + 1);
+        }
+        else
+        {
+            var _x1 = this.TextMatrix.TransformPointX(x, y);
+            var _y1 = this.TextMatrix.TransformPointY(x, y);
+
+            var _x2 = this.TextMatrix.TransformPointX(x + width, y);
+            var _y2 = this.TextMatrix.TransformPointY(x + width, y);
+
+            var _x3 = this.TextMatrix.TransformPointX(x + width, y + height);
+            var _y3 = this.TextMatrix.TransformPointY(x + width, y + height);
+
+            var _x4 = this.TextMatrix.TransformPointX(x, y + height);
+            var _y4 = this.TextMatrix.TransformPointY(x, y + height);
+
+            var x1 = xDst + dKoefX * _x1;
+            var y1 = yDst + dKoefY * _y1;
+
+            var x2 = xDst + dKoefX * _x2;
+            var y2 = yDst + dKoefY * _y2;
+
+            var x3 = xDst + dKoefX * _x3;
+            var y3 = yDst + dKoefY * _y3;
+
+            var x4 = xDst + dKoefX * _x4;
+            var y4 = yDst + dKoefY * _y4;
+
+            if (global_MatrixTransformer.IsIdentity2(this.TextMatrix))
+            {
+                x1 = (x1 >> 0) + 0.5;
+                y1 = (y1 >> 0) + 0.5;
+
+                x2 = (x2 >> 0) + 0.5;
+                y2 = (y2 >> 0) + 0.5;
+
+                x3 = (x3 >> 0) + 0.5;
+                y3 = (y3 >> 0) + 0.5;
+
+                x4 = (x4 >> 0) + 0.5;
+                y4 = (y4 >> 0) + 0.5;
+            }
+
+            overlay.CheckPoint(x1, y1);
+            overlay.CheckPoint(x2, y2);
+            overlay.CheckPoint(x3, y3);
+            overlay.CheckPoint(x4, y4);
+
+            var ctx = overlay.m_oContext;
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.lineTo(x3, y3);
+            ctx.lineTo(x4, y4);
+            ctx.closePath();
+        }
     }
     this.SelectShow = function()
     {
