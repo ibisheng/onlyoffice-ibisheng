@@ -9017,6 +9017,9 @@ function CreateGeometry(prst){
             break;
         }
     }
-    f.setPreset(prst);
+    if(typeof prst === "string" && prst.length > 0)
+    {
+        f.setPreset(prst);
+    }
     return f;
 }

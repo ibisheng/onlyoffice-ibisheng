@@ -3197,7 +3197,7 @@ function CBinaryFileWriter()
         if (undefined === geom || null == geom)
             return;
 
-        if (geom.preset != null && geom.preset != null)
+        if (typeof geom.preset === "string" && geom.preset.length > 0)
         {
             oThis.StartRecord(1);
 
