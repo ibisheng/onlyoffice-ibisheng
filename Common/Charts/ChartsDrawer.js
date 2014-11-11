@@ -2207,9 +2207,10 @@ CChartsDrawer.prototype =
 			{
 				if(!this.calcProp.ptCount)
 					this.calcProp.ptCount = numCache.ptCount;
+				
+				//TODO возможно нужно будет проверку добавить на isHidden
+				counter++;
 			}
-			//TODO возможно нужно будет проверку добавить на isHidden
-			counter++;
 		}
 		
 		return counter;
@@ -2391,7 +2392,8 @@ drawBarChart.prototype =
 				//}
 			}
 			
-			seriesCounter++;
+			if(seria.length)
+				seriesCounter++;
 		}
     },
 	
@@ -3514,8 +3516,8 @@ drawHBarChart.prototype =
 				}
 			}
 			
-			seriesCounter++;
-			
+			if(seria.length)
+				seriesCounter++;
         }
     },
 	
