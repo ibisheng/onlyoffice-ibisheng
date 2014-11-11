@@ -389,6 +389,12 @@ CGrState.prototype =
 };
 
 var g_stringBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+var g_arrayBase64 = [];
+for (var index64 = 0; index64 < g_stringBase64.length; index64++)
+{
+    g_arrayBase64.push(g_stringBase64.charAt(index64));
+}
+
 function Base64Encode(srcData, nSrcLen, nOffset)
 {
     if ( "undefined" === typeof(nOffset) )
@@ -399,8 +405,9 @@ function Base64Encode(srcData, nSrcLen, nOffset)
     var nLen2 = (nLen1 / 76) >> 0;
     var nLen3 = 19;
     var srcInd = 0;
-    var dstStr = "";
+    var dstStr = [];
 
+    var _s = "";
     for (var i=0; i<=nLen2; i++)
     {
         if (i == nLen2)
@@ -414,13 +421,16 @@ function Base64Encode(srcData, nSrcLen, nOffset)
                 dwCurr |= srcData[srcInd++ + nOffset];
                 dwCurr <<= 8;
             }
+
+            _s = "";
             for (var k=0; k<4; k++)
             {
                 var b = (dwCurr>>>26)&0xFF;
-                dstStr += g_stringBase64[b];
+                _s += g_arrayBase64[b];
                 dwCurr <<= 6;
                 dwCurr &= 0xFFFFFFFF;
             }
+            dstStr.push(_s);
         }
     }
     nLen2 = (nSrcLen%3 != 0) ? (nSrcLen%3 + 1) : 0;
@@ -433,20 +443,24 @@ function Base64Encode(srcData, nSrcLen, nOffset)
                 dwCurr |= srcData[srcInd++ + nOffset];
             dwCurr <<= 8;
         }
+
+        _s = "";
         for (var k=0; k<nLen2; k++)
         {
             var b = (dwCurr>>>26)&0xFF;
-            dstStr += g_stringBase64[b];
+            _s += g_arrayBase64[b];
             dwCurr <<= 6;
         }
 
         nLen3 = (nLen2 != 0) ? 4-nLen2 : 0;
         for (var j=0; j<nLen3; j++)
         {
-            dstStr += '=';
+            _s += '=';
         }
+        dstStr.push(_s);
     }
-    return dstStr;
+	
+	return dstStr.join("");
 }
 
 function CMemory(bIsNoInit)
