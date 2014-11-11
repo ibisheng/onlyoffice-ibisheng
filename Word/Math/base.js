@@ -429,7 +429,6 @@ CMathBase.prototype =
                 Name:       defaultTxtPrp.FontFamily.Name,
                 Index:      defaultTxtPrp.FontFamily.Index
             };
-            this.CompiledCtrPrp.FontSize = defaultTxtPrp.FontSize;
 
             this.CompiledCtrPrp.Merge(this.CtrPrp);
 

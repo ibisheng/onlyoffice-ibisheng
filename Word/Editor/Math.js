@@ -58,7 +58,6 @@ function ParaMath()
 
     this.DefaultTextPr = new CTextPr();
 
-    this.DefaultTextPr.FontSize   = 11;
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
 
