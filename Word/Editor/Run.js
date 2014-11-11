@@ -4644,8 +4644,8 @@ ParaRun.prototype.Get_CompiledPr = function(bCopy)
 {
     if ( true === this.RecalcInfo.TextPr )
     {
-        this.CompiledPr = this.Internal_Compile_Pr();
         this.RecalcInfo.TextPr = false;
+        this.CompiledPr = this.Internal_Compile_Pr();
     }
     
     if ( false === bCopy )
@@ -4662,6 +4662,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
         // чтобы не выпадало ошибок сгенерим дефолтовые настройки
         var TextPr = new CTextPr();
         TextPr.Init_Default();
+        this.RecalcInfo.TextPr = true;
         return TextPr;
     }
 
@@ -4684,6 +4685,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
             // чтобы не выпадало ошибок сгенерим дефолтовые настройки
             var TextPr = new CTextPr();
             TextPr.Init_Default();
+            this.RecalcInfo.TextPr = true;
             return TextPr;
         }
 

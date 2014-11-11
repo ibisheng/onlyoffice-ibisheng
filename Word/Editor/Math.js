@@ -1128,7 +1128,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     g.transform(1,0,0,1,0,0);
 
-    this.Root.draw(0, 0, g);
+    par.Draw(0, g);
 
     window.IsShapeToImageConverter = false;
 
