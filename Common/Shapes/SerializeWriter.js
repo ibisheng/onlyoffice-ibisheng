@@ -118,7 +118,8 @@ function CBinaryFileWriter()
             var oldData = this.data;
             var oldPos = this.pos;
 
-            this.len *= 2;
+            this.len = Math.max(this.len * 2, this.pos + ((3 * count / 2) >> 0));
+			
             this.ImData = _ctx.createImageData(this.len / 4, 1);
             this.data = this.ImData.data;
             var newData = this.data;
