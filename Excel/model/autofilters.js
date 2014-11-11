@@ -385,7 +385,7 @@ var gUndoInsDelCellsFlag = true;
 										};
 										result = newRes.result;
 										changesElemHistory = aWs.AutoFilter.clone();
-										delete aWs.AutoFilter;
+										aWs.AutoFilter = null;
 									}
 									else
 									{
@@ -396,7 +396,7 @@ var gUndoInsDelCellsFlag = true;
 												isVis:  false
 											};
 											changesElemHistory = aWs.TableParts[apocal.num - 1].clone(aWs);
-											delete aWs.TableParts[apocal.num - 1].AutoFilter;
+											aWs.TableParts[apocal.num - 1].AutoFilter = null;
 											isReDrawFilter = aWs.TableParts[apocal.num - 1].clone(aWs);
 										}
 										else
@@ -406,7 +406,7 @@ var gUndoInsDelCellsFlag = true;
 												isVis:  false
 											};
 											changesElemHistory = aWs.TableParts[apocal.num].clone(aWs);
-											delete aWs.TableParts[apocal.num].AutoFilter;
+											aWs.TableParts[apocal.num].AutoFilter = null;
 											isReDrawFilter = aWs.TableParts[apocal.num].clone(aWs);
 										}	
 									}
@@ -449,7 +449,7 @@ var gUndoInsDelCellsFlag = true;
 										isVis:  false
 									}
 									changesElemHistory = aWs.AutoFilter.clone();
-									delete aWs.AutoFilter;
+									aWs.AutoFilter = null;
 									if(addNameColumn && rangeShift && !isTurnOffHistory)
 									{
 										ws.model._moveRange(activeCells,  new Asc.Range(activeCells.c1, activeCells.r1 + 1, activeCells.c2, activeCells.r2 + 1));
@@ -2120,7 +2120,7 @@ var gUndoInsDelCellsFlag = true;
 							if(aWs.AutoFilter.result)
 								this._addButtonAF({result: aWs.AutoFilter.result, isVis: false});
 								
-							delete aWs.AutoFilter;
+							aWs.AutoFilter = null;
 						}
 						else if(aWs.TableParts)
 						{
@@ -6690,9 +6690,9 @@ var gUndoInsDelCellsFlag = true;
 						}
 
 						if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
-							delete findFilters[i].AutoFilter.FilterColumns;
+							findFilters[i].AutoFilter.FilterColumns = null;
 						else if(!data && findFilters[i] && findFilters[i].FilterColumns)
-							delete findFilters[i].FilterColumns;
+							findFilters[i].FilterColumns = null;
 						else if(data && data[i] && data[i].AutoFilter && data[i].AutoFilter.FilterColumns)
 							findFilters[i].AutoFilter.FilterColumns = data[i].AutoFilter.FilterColumns;
 						else if(data && data[i] && data[i].FilterColumns)
