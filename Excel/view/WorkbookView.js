@@ -426,12 +426,11 @@
 				"onScroll"					: function (d) {self.controller.scroll(d);}
 			});
 
-			this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
+			this.model.handlers.add("cleanCellCache", function (wsId, oRanges, canChangeColWidth, bLockDraw) {
 				var ws = self.getWorksheetById(wsId);
 				if (ws)
-					ws.changeWorksheet("updateRange", {range: range,
-						lockDraw: bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(),
-						canChangeColWidth: canChangeColWidth});
+					ws.updateRanges(oRanges, canChangeColWidth,
+						bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId());
 			});
 			this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
 				var ws = self.getWorksheetById(wsId);
@@ -714,8 +713,7 @@
 					if (false === ct.hyperlink.hyperlinkModel.getVisited() && !isSelectOnShape) {
 						ct.hyperlink.hyperlinkModel.setVisited(true);
 						if (ct.hyperlink.hyperlinkModel.Ref)
-							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(),
-								lockDraw: false, canChangeColWidth: false});
+							ws.updateRange(ct.hyperlink.hyperlinkModel.Ref.getBBox0(), false, false);
 					}
 					switch (ct.hyperlink.asc_getType()) {
 						case c_oAscHyperlinkType.WebLink:

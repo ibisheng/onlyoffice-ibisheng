@@ -1076,51 +1076,41 @@ function sortDependency( wb, setCellFormat ) {
 		buildRecalc(wb, true);
 		arrRecalc = {};
 	}
+    var i;
     var nR = wb.needRecalc;
 	if(nR && (nR.length > 0))
 	{
 	    var oCleanCellCacheArea = {};
 	    var oNodeDependence = wb.dependencyFormulas.getNodeDependence(nR.nodes);
-        for ( var i in oNodeDependence.oMasterNodes ) {
-            var node = oNodeDependence.oMasterNodes[i];
-            _sortDependency(wb, node, oNodeDependence, oNodeDependence.oMasterAreaNodes, false, oCleanCellCacheArea, setCellFormat);
-        }
+        for (i in oNodeDependence.oMasterNodes)
+            _sortDependency(wb, oNodeDependence.oMasterNodes[i], oNodeDependence, oNodeDependence.oMasterAreaNodes,
+                false, oCleanCellCacheArea, setCellFormat);
 	    //те AreaNodes 
         var oCurMasterAreaNodes = oNodeDependence.oMasterAreaNodes;
         while (true) {
             var bEmpty = true;
             var oNewMasterAreaNodes = {};
-            for (var i in oCurMasterAreaNodes) {
+            for (i in oCurMasterAreaNodes) {
                 bEmpty = false;
-                var node = oCurMasterAreaNodes[i];
-                _sortDependency(wb, node, oNodeDependence, oNewMasterAreaNodes, false, oCleanCellCacheArea, setCellFormat);
+                _sortDependency(wb, oCurMasterAreaNodes[i], oNodeDependence, oNewMasterAreaNodes, false,
+                    oCleanCellCacheArea, setCellFormat);
             }
             oCurMasterAreaNodes = oNewMasterAreaNodes;
             if (bEmpty) {
                 //все оставшиеся считаем как bad
                 //todo сделать как в Excel, которой определяет циклические ссылки на момент подсчета(пример A1=VLOOKUP(1,B1:D2,2),B2 = 1, D1=A1 - это не циклическая ссылка)
-                for (var i in oNodeDependence.oMasterAreaNodesRestricted) {
-                    var node = oNodeDependence.oMasterAreaNodesRestricted[i].node;
-                    _sortDependency(wb, node, oNodeDependence, null, true, oCleanCellCacheArea, setCellFormat);
+                for (i in oNodeDependence.oMasterAreaNodesRestricted) {
+                    _sortDependency(wb, oNodeDependence.oMasterAreaNodesRestricted[i].node, oNodeDependence, null,
+                        true, oCleanCellCacheArea, setCellFormat);
                 }
                 break;
             }
         }
-        for ( var sheetId in oCleanCellCacheArea ) {
-            var sheetArea = oCleanCellCacheArea[sheetId];
-			var nPrevCellId = null;
-			var nMinRow = Number.MAX_VALUE;
-			var nMaxRow = 0;
-            for ( var cellId in sheetArea ) {
-				if(null != nPrevCellId)
-					wb.handlers.trigger( "cleanCellCache", sheetId, sheetArea[nPrevCellId], c_oAscCanChangeColWidth.numbers, true );
-				nPrevCellId = cellId;
-            }
-			if(null != nPrevCellId)
-				wb.handlers.trigger( "cleanCellCache", sheetId, sheetArea[nPrevCellId], c_oAscCanChangeColWidth.numbers );
-        }
+        for (i in oCleanCellCacheArea)
+            wb.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], c_oAscCanChangeColWidth.numbers);
+
 		g_oVLOOKUPCache.clean();
-        g_oHLOOKUPCache.clean()
+        g_oHLOOKUPCache.clean();
     }
 	wb.needRecalc = {nodes: {}, length:0};
 }

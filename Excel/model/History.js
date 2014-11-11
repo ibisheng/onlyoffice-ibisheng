@@ -297,9 +297,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		}
 
 		for (i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i], false, true);
-
-
+			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, false, true);
 
 		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
 			this.workbook.handlers.trigger("changeWorksheetUpdate",

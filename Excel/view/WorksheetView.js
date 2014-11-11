@@ -6979,7 +6979,7 @@
 				if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter)
 					t.formatPainter();
 				// Перерисовываем
-				t.draw();
+				t._recalculateAfterUpdate([t.activeRange]);
 			};
 
 			var result = oTmpRange.preparePromoteFromTo(from, to);
@@ -7840,8 +7840,9 @@
 				// Сбрасываем параметры
 				t.activeMoveRange = null;
 				t.startCellMoveRange = null;
+				t._updateCellsRange(arnFrom, false, true);
 				// Тут будет отрисовка select-а
-				t._updateCellsRange(arnFrom);
+				t._recalculateAfterUpdate([arnFrom, arnTo]);
 
 				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
 				t.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
@@ -9701,31 +9702,6 @@
 					}
 					onChangeWorksheetCallback(true);
 					break;
-
-				case "updateRange":
-					if (val && val.range) {
-						// Для принятия изменения нужно делать расширение диапазона
-						if (this.model.workbook.bCollaborativeChanges) {
-							var bIsUpdateX = false, bIsUpdateY = false;
-							if (val.range.c2 >= this.nColsCount) {
-								this.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
-								bIsUpdateX = true;
-							}
-							if (val.range.r2 >= this.nRowsCount) {
-								this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
-								bIsUpdateY = true;
-							}
-
-							if (bIsUpdateX && bIsUpdateY)
-								this.handlers.trigger("reinitializeScroll");
-							else if (bIsUpdateX)
-								this.handlers.trigger("reinitializeScrollX");
-							else if (bIsUpdateY)
-								this.handlers.trigger("reinitializeScrollY");
-						}
-						this._updateCellsRange(val.range, val.canChangeColWidth, val.lockDraw);
-					}
-					break;
 			}
 		};
 
@@ -10574,6 +10550,46 @@
 			return this.arrActiveFormulaRanges;
 		};
 
+		/**
+		 *
+		 * @param {Object} ranges
+		 * @param canChangeColWidth
+		 * @param lockDraw
+		 */
+		WorksheetView.prototype.updateRanges = function (ranges, canChangeColWidth, lockDraw) {
+			var arrRanges = [], range;
+			for (var i in ranges) {
+				range = ranges[i];
+				this.updateRange(range, canChangeColWidth, true);
+				arrRanges.push(range);
+			}
+
+			if (0 < arrRanges.length)
+				this._recalculateAfterUpdate(arrRanges, lockDraw);
+		};
+		WorksheetView.prototype.updateRange = function (range, canChangeColWidth, lockDraw) {
+			// Для принятия изменения нужно делать расширение диапазона
+			if (this.model.workbook.bCollaborativeChanges) {
+				var bIsUpdateX = false, bIsUpdateY = false;
+				if (range.c2 >= this.nColsCount) {
+					this.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+					bIsUpdateX = true;
+				}
+				if (range.r2 >= this.nRowsCount) {
+					this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+					bIsUpdateY = true;
+				}
+
+				if (bIsUpdateX && bIsUpdateY)
+					this.handlers.trigger("reinitializeScroll");
+				else if (bIsUpdateX)
+					this.handlers.trigger("reinitializeScrollX");
+				else if (bIsUpdateY)
+					this.handlers.trigger("reinitializeScrollY");
+			}
+			this._updateCellsRange(range, canChangeColWidth, lockDraw);
+		};
+
 		WorksheetView.prototype._updateCellsRange = function (range, canChangeColWidth, lockDraw) {
 			var r, c, h, d, ct, isMerged;
 			var mergedRange, bUpdateRowHeight;
@@ -10652,6 +10668,11 @@
 				}
 			}
 
+			if (!lockDraw)
+				this._recalculateAfterUpdate([range]);
+		};
+
+		WorksheetView.prototype._recalculateAfterUpdate = function (arrChanged, lockDraw) {
 			if (this.isChanged) {
 				this.isChanged = false;
 				this._initCellsArea(true);
@@ -10664,7 +10685,7 @@
 				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			}
 
-			this.objectRender.rebuildChartGraphicObjects(new CChangeTableData(range, null, null, null));
+			this.objectRender.rebuildChartGraphicObjects(new CChangeTableData(null, null, null, null, arrChanged));
 			this.cellCommentator.updateCommentPosition();
 			this.handlers.trigger("onDocumentPlaceChanged");
 			this.draw(lockDraw);
