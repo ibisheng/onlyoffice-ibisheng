@@ -191,6 +191,8 @@ asc_CChartBinary.prototype = {
     {
         var binary = this["binary"];
         var stream = CreateBinaryReader(this["binary"], 0, this["binary"].length);
+        //надо сбросить то, что остался после открытия документа
+        window.global_pptx_content_loader.Clear();
         var oNewChartSpace = new CChartSpace();
         var oBinaryChartReader = new BinaryChartReader(stream);
         oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
