@@ -5142,7 +5142,6 @@
         this.bcr = new Binary_CommonReader(this.stream);
         this.aMerged = [];
         this.aHyperlinks = [];
-        this.oPPTXContentLoader = new CPPTXContentLoader();
         this.copyPasteObj = copyPasteObj;
         this.curWorksheet = null;
         this.Read = function()
@@ -5819,7 +5818,7 @@
             {
 
                // res = c_oSerConstants.ReadUnknown;
-                var oGraphicObject = this.oPPTXContentLoader.ReadGraphicObject(this.stream, this.curWorksheet);
+                var oGraphicObject = window.global_pptx_content_loader.ReadGraphicObject(this.stream, this.curWorksheet);
                 if(null != oGraphicObject && !((oGraphicObject.getObjectType() === historyitem_type_Shape || oGraphicObject.getObjectType() === historyitem_type_ImageShape) && !oGraphicObject.spPr))
                 {
                     oDrawing.graphicObject = oGraphicObject;

@@ -5361,8 +5361,7 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
     return res;
 }
 BinaryChartReader.prototype.ReadSpPr = function (length) {
-    var oPPTXContentLoader = new CPPTXContentLoader();
-    return oPPTXContentLoader.ReadShapeProperty(this.stream);
+    return window.global_pptx_content_loader.ReadShapeProperty(this.stream);
 }
 
 BinaryChartReader.prototype.ReadClrOverride = function(lenght)
@@ -5389,9 +5388,8 @@ BinaryChartReader.prototype.ReadClrOverride = function(lenght)
 };
 
 BinaryChartReader.prototype.ReadTxPr = function (length) {
-    var oPPTXContentLoader = new CPPTXContentLoader();
     var cur = this.stream.cur;
-    var ret = oPPTXContentLoader.ReadTextBody(null, this.stream, null, this.curWorksheet);
+    var ret = window.global_pptx_content_loader.ReadTextBody(null, this.stream, null, this.curWorksheet);
     this.stream.cur = cur + length;
     return ret;
 }
