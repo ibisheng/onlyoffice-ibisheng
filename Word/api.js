@@ -3596,7 +3596,21 @@ asc_docs_api.prototype.paraApply = function(Props)
             this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( Props.Spacing );
 
         if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
-            this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
+        {
+            var Unifill = new CUniFill();
+            Unifill.fill = new CSolidFill();
+            Unifill.fill.color = CorrectUniColor(Props.Shd.Color, Unifill.fill.color, 1);
+            this.WordControl.m_oLogicDocument.Set_ParagraphShd(
+                {
+                    Value : Props.Shd.Value,
+                    Color: {
+                        r : Props.Shd.Color.get_r(),
+                        g : Props.Shd.Color.get_g(),
+                        b : Props.Shd.Color.get_b()
+                    },
+                    Unifill: Unifill
+                } );
+        }
 
         if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
         {
@@ -4767,7 +4781,14 @@ function CBorder (obj)
 {
 	if (obj)
 	{
-		this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        if(obj.Color instanceof CAscColor)
+        {
+            this.Color = obj.Color;
+        }
+        else
+        {
+            this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        }
 		this.Size = (undefined != obj.Size) ? obj.Size : null;
 		this.Value = (undefined != obj.Value) ? obj.Value : null;
 		this.Space = (undefined != obj.Space) ? obj.Space : null;
