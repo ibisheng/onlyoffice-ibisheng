@@ -3577,6 +3577,10 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
     }
 
 };
+CMathContent.prototype.Draw_Lines = function(PDSL)
+{
+
+};
 CMathContent.prototype.Selection_Remove = function()
 {
     var StartPos = this.Selection.Start;

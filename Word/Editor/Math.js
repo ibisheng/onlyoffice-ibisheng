@@ -1,10 +1,5 @@
 "use strict";
 
-/*var Math_Draw_Time  = false;
-var Math_Date = 0;
-var Math_NeedResize = true;
-var Math_Date_Draw = 0;*/
-
 /**
  * Created by Ilja.Kirillov on 18.03.14.
  */
@@ -408,7 +403,44 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
     {
         var content = this.GetSelectContent().Content;
 
+        var NewTextPr = new CTextPr();
+        var bSetInRoot = false;
+
+
         if(IncFontSize == undefined)
+        {
+            if(TextPr.Underline !== undefined)
+            {
+
+                NewTextPr.Underline   = TextPr.Underline;
+                bSetInRoot            = true;
+            }
+
+            if(TextPr.FontSize !== undefined && content.IsNormalTextInRuns() == false)
+            {
+                NewTextPr.FontSize    = TextPr.FontSize;
+                bSetInRoot            = true;
+
+            }
+
+            content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+
+            if(bSetInRoot)
+                this.Root.Apply_TextPr(NewTextPr, IncFontSize, true);
+        }
+        else
+        {
+
+            if(content.IsNormalTextInRuns() == false)
+                this.Root.Apply_TextPr(TextPr, IncFontSize, true);
+            else
+                content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+        }
+
+
+
+
+        /*if(IncFontSize == undefined)
         {
             var FontSize = TextPr.FontSize;
 
@@ -429,11 +461,12 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
         }
         else
         {
+
             if(content.IsNormalTextInRuns() == false)
                 this.Root.Apply_TextPr(TextPr, IncFontSize, true);
             else
                 content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }
+        }*/
 
     }
 };
@@ -1361,8 +1394,51 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
 
     if ( EndPos >= 1 )
     {
-        PDSL.X += this.Width;
+        // Underline всей формулы
+        var FirstRPrp = this.GetFirstRPrp();
 
+        var aUnderline  = PDSL.Underline;
+
+        var X          = PDSL.X;
+        var Y          = PDSL.Baseline;
+        var UndOff     = PDSL.UnderlineOffset;
+        var UnderlineY = Y + UndOff;
+        var LineW      = (FirstRPrp.FontSize / 18) * g_dKoef_pt_to_mm;
+
+
+        var BgColor = PDSL.BgColor;
+        if ( undefined !== FirstRPrp.Shd && shd_Nil !== FirstRPrp.Shd.Value )
+            BgColor = FirstRPrp.Shd.Get_Color( Para );
+        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+        var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
+
+        // Выставляем цвет обводки
+        if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+            CurColor = new CDocumentColor( 128, 0, 151 );
+        else if ( true === FirstRPrp.Color.Auto && !FirstRPrp.Unifill)
+            CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
+        else
+        {
+            if(FirstRPrp.Unifill)
+            {
+                FirstRPrp.Unifill.check(Theme, ColorMap);
+                RGBA = FirstRPrp.Unifill.getRGBAColor();
+                CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B );
+            }
+            else
+            {
+                CurColor = new CDocumentColor( FirstRPrp.Color.r, FirstRPrp.Color.g, FirstRPrp.Color.b );
+            }
+        }
+
+        if ( true === FirstRPrp.Underline )
+            aUnderline.Add( UnderlineY, UnderlineY, X, X + this.Width, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+
+
+        //this.Root.Draw_Lines(PDSL);
+
+        PDSL.X += this.Width;
     }
 };
 
