@@ -6691,7 +6691,8 @@
         };
         this.Read = function(data, wb)
         {
-            var pasteBinaryFromExcel = false;
+            window.global_pptx_content_loader.Clear();
+			var pasteBinaryFromExcel = false;
 			if(this.copyPasteObj && this.copyPasteObj.isCopyPaste && typeof editor != "undefined" && editor)
 				pasteBinaryFromExcel = true;
 			
