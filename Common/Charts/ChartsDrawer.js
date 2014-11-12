@@ -2874,7 +2874,7 @@ drawLineChart.prototype =
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
 		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
@@ -4852,7 +4852,7 @@ drawScatterChart.prototype =
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
 		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
