@@ -3776,6 +3776,7 @@ CMathContent.prototype.Add_SearchResult              = ParaHyperlink.prototype.A
 CMathContent.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
 CMathContent.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
 CMathContent.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
+CMathContent.prototype.Recalc_RunsCompiledPr         = ParaHyperlink.prototype.Recalc_RunsCompiledPr;
 
 
 CMathContent.prototype.Get_SelectionDirection = function()

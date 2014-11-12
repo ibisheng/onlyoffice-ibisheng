@@ -1163,6 +1163,12 @@ CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
     this.fillContent();
     this.private_SetNeedResize();
 };
+CMathBase.prototype.Recalc_RunsCompiledPr = function()
+{
+    this.RecalcInfo.bCtrPrp = true;
+    ParaHyperlink.prototype.Recalc_RunsCompiledPr.call(this);
+}
+
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
@@ -1181,6 +1187,8 @@ CMathBase.prototype.private_CorrectCurPos = function()
         this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
 }
+
+
 CMathBase.prototype.Search                        = ParaHyperlink.prototype.Search;
 CMathBase.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
 CMathBase.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;

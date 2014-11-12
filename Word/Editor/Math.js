@@ -1715,6 +1715,11 @@ ParaMath.prototype.Get_ContentSelection = function()
     return {X : X, Y : Y, W : oContent.size.width, H : oContent.size.height};
 };
 
+ParaMath.prototype.Recalc_RunsCompiledPr = function()
+{
+    this.Root.Recalc_RunsCompiledPr();
+};
+
 /**
  * Проверяем находимся ли мы во внутреннем (не самом верхнем) контенте формулы.
  */
