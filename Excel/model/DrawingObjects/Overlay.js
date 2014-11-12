@@ -7,7 +7,7 @@ var TRACK_DISTANCE_ROTATE   = 25;
 var TRACK_DISTANCE_ROTATE2  = 25;
 var TRACK_ADJUSTMENT_SIZE   = 10;
 var TRACK_WRAPPOINTS_SIZE   = 6;
-var IMAGE_ROTATE_TRACK_W    = 17;
+var IMAGE_ROTATE_TRACK_W    = 21;
 
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
@@ -17,9 +17,9 @@ if (bIsUseImageRotateTrack)
     window.g_track_rotate_marker.onload = function(){
         window.g_track_rotate_marker.asc_complete = true;
     };
-    window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAbBJREFUeNqsVM1qwkAQnnry71BopUVRFKoeUrx48yF8gKbtE3iRPoBP0Kdo0pM+gtBexJsgyUHswYtWggERf0HczkyzkqbGttAPvmx2duZjdnZ2QQgBHkaRVeQL0hafsJ151Vn/EnNCH4Ku66Cq6g3+PiIvwR9j5AP6P+8tLsWa+BtqmqYBUWZCGehSeLFYgGmaMBqNYLVaQSgUgng8DoqiQCQScWd1hxlpJBLFyRvygqwU2Gq1IJ/PQzqdhnA4DMvlEgaDAfR6PSiVSizowEZe0TYqMr/5fC4ajYawLOtg/mSv1+vs50IlgEplKWsYBmSzWYjFYgcrSvZcLsdbdaFMIoqc0VYymQwcA62TnwvXJHIuZ+v1mmvgh36/D5vNhmtk2zbXCHEWcIrDCAaD7OCHRCIBzWaT/2lMJpNcXBIxpBNVnU7BD5RloVDgvqLRydr8djpUfb/TIex2O9Fut3mUpyPvylhahsMhC3W7XTGbzcR2uxXT6VR0Op1DmhPkqexYFal5OxYF9x2bSqWgWCx6d3iPHfv0L3fH+wyoyPcfgmn91h0HR96T19++Jx8CDABSF1tWsa6kaQAAAABJRU5ErkJggg==";
+    window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAMAAACeyVWkAAAAVFBMVEUAAAD///////////////////////////////////////////////////////98fHy2trb09PTT09OysrKqqqqJiYng4ODr6+uamprGxsbi4uKGhoYjgM0eAAAADnRSTlMAy00k7/z0jbeuMzDljsugwZgAAACpSURBVBjTdZHbEoMgDESDAl6bgIqX9v//s67UYpm6D0xyYMImoaiuUr3pVdVRUtnwqaY8YaE5SRcfaPgqc+DSIh7WIGGaEVoUqRGN4oZlcDIiqYlaPjQz5CNu6cFJwLiuSO3nlLBDrKhn3l4rcnH4NcAdGd5EZMfCsoMFBxM6CD57G+u6vC48PMVnHtrYhP/x+7+3cw7zdJnD3cyA7QXa4nYXaW+a9Xdvb6zqE5Jb7LmzAAAAAElFTkSuQmCC";
 
-    TRACK_DISTANCE_ROTATE2 = 20;
+    TRACK_DISTANCE_ROTATE2 = 18;
 }
 
 // заглушка
