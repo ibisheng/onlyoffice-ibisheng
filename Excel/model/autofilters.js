@@ -382,7 +382,17 @@ var gUndoInsDelCellsFlag = true;
 										newRes = {
 											result: allAutoFilters[apocal.num].result,
 											isVis:  false
-										};
+										}
+										
+										if(!aWs.AutoFilter)
+										{
+											console.log("Ahtung");
+											History.EndTransaction();
+											if(isTurnOffHistory)
+												History.TurnOn();
+											return;
+										}
+										
 										result = newRes.result;
 										changesElemHistory = aWs.AutoFilter.clone();
 										aWs.AutoFilter = null;
