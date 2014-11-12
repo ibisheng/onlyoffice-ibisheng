@@ -386,7 +386,6 @@ var gUndoInsDelCellsFlag = true;
 										
 										if(!aWs.AutoFilter)
 										{
-											console.log("Ahtung");
 											History.EndTransaction();
 											if(isTurnOffHistory)
 												History.TurnOn();
