@@ -1389,7 +1389,7 @@ CDocument.prototype =
                 {
                     if ( PageIndex + 1 > this.FullRecalc.StartPage + 2 )
                     {
-                        if (window["native"]["WC_CheckSuspendRecalculate"]())
+                        if (window["native"]["WC_CheckSuspendRecalculate"] && window["native"]["WC_CheckSuspendRecalculate"]())
                             return;
                     }
 
@@ -2027,7 +2027,7 @@ CDocument.prototype =
             {
                 if ( _PageIndex > this.FullRecalc.StartPage + 2 )
                 {
-					if (window["native"]["WC_CheckSuspendRecalculate"]())
+					if (window["native"]["WC_CheckSuspendRecalculate"] && window["native"]["WC_CheckSuspendRecalculate"]())
 						return;                    
                 }
 

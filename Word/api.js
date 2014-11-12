@@ -7774,17 +7774,23 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
             CollaborativeEditing.Release_Locks();
             return;
         }
-    }    
+    }
 
-    History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
-
-    //Recalculate для Document
     Document.CurPos.ContentPos = 0;
-    History.RecalcData_Add({Type: historyrecalctype_Drawing, All: true});
-    Document.DrawingObjects.addToZIndexManagerAfterOpen();
 
-    Document.Recalculate();
-    
+    var RecalculateData =
+    {
+        Inline : { Pos : 0, PageNum : 0 },
+        Flow   : [],
+        HdrFtr : [],
+        Drawings: {
+            All: true,
+            Map:{}
+        }
+    };
+
+    Document.Recalculate(false, false, RecalculateData);
+
     this.ShowParaMarks = false;
 };
 
