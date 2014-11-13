@@ -2663,11 +2663,11 @@ ScrollObject.prototype = {
                         }
                         break;
                     case ArrowStatus.arrowHover://upArrow stable, downArrow mouse down
-                        if ( ScrollOverType.OVER != this.ScrollOverType1 ) {
+                        if ( ScrollOverType.STABLE != this.ScrollOverType1 ) {
                             this.ArrowDrawer.drawTopLeftArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.STABLE, this.context, w, h);
                             this.ScrollOverType1 = ScrollOverType.STABLE;
                         }
-                        if ( ScrollOverType.OVER != this.ScrollOverType2 ) {
+                        if ( ScrollOverType.STABLE != this.ScrollOverType2 ) {
                             this.ArrowDrawer.drawBottomRightArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.STABLE, this.context, w, h);
                             this.ScrollOverType2 = ScrollOverType.STABLE;
                         }
