@@ -1633,8 +1633,11 @@ CDocumentContent.prototype =
             return this.LogicDocument.DrawingObjects.getCurrentPageAbsolute();
         else //if ( docpostype_Content === this.CurPos.Type )
         {
-            if ( this.CurPos.ContentPos >= 0 )
-                return this.Content[this.CurPos.ContentPos].Get_CurrentPage_Absolute();
+            var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
+            if (Pos >= 0 && Pos < this.Content.length)
+            {
+                return this.Content[Pos].Get_CurrentPage_Absolute();
+            }
         }
     },
 

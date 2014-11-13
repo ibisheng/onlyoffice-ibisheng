@@ -12072,8 +12072,11 @@ Paragraph.prototype =
             this.LogicDocument.Update_SectionsInfo();
 
             // TODO: Когда избавимся от ParaEnd переделать тут
-            var LastRun = this.Content[this.Content.length - 1];
-            LastRun.RecalcInfo.Measure = true;
+            if (this.Content.length > 0 && para_Run === this.Content[this.Content.length - 1].Type)
+            {
+                var LastRun = this.Content[this.Content.length - 1];
+                LastRun.RecalcInfo.Measure = true;
+            }
         }
     },
 

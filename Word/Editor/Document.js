@@ -13871,8 +13871,14 @@ CDocument.prototype.private_StopSelection = function()
 {
     this.Selection.Start = false;
 };
+CDocument.prototype.private_UpdateCurPage = function()
+{
+    this.Internal_CheckCurPage();
+};
 CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 {
+    this.private_UpdateCurPage();
+
     var NewCursorPos = null;
 
     if (true !== this.Is_SelectionUse() || true === this.Selection_IsEmpty())

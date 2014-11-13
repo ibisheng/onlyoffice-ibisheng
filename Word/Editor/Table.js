@@ -4976,9 +4976,12 @@ CTable.prototype =
     Get_CurrentPage_Absolute : function()
     {
         if ( true === this.Selection.Use )
-            return 0;
-
-        return this.CurCell.Content.Get_CurrentPage_Absolute();
+        {
+            var Pos = this.Selection.EndPos.Pos;
+            return this.Content[Pos.Row].Get_Cell(Pos.Cell).Content.Get_CurrentPage_Absolute();
+        }
+        else
+            return this.CurCell.Content.Get_CurrentPage_Absolute();
     },
 
     Get_CurrentPage_Relative : function()

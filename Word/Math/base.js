@@ -405,19 +405,22 @@ CMathBase.prototype =
     {
         if(this.RecalcInfo.bCtrPrp == true)
         {
-            // for Ctr Prp
+            if (undefined === ParaMath || null === ParaMath)
+            {
+                this.CompiledCtrPrp = new CTextPr();
+                this.CompiledCtrPrp.Init_Default();
+                return;
+            }
 
-            //this.CompiledCtrPrp = ParaMath.GetFirstRPrp();
-			//this.CompiledCtrPrp = new CTextPr();
             // Получим настройки текста, для данного параграфа
-            this.CompiledCtrPrp = this.ParaMath.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
+            this.CompiledCtrPrp = ParaMath.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
-            this.CompiledCtrPrp.Merge(this.ParaMath.Get_Default_TPrp());
+            this.CompiledCtrPrp.Merge(ParaMath.Get_Default_TPrp());
 
             // Если в прямых настройках задан стиль, тогда смержим настройки стиля
             if ( undefined != this.CtrPrp.RStyle )
             {
-                var Styles = this.ParaMath.Paragraph.Parent.Get_Styles();
+                var Styles = ParaMath.Paragraph.Parent.Get_Styles();
                 var StyleTextPr = Styles.Get_Pr( this.CtrPrp.RStyle, styletype_Character ).TextPr;
                 this.CompiledCtrPrp.Merge( StyleTextPr );
             }
