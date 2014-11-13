@@ -9724,7 +9724,7 @@ function Binary_oMathReader(stream)
         {
             var aUnicodes = [];
             if (length > 0)
-                aUnicodes = convertUTF16toUnicode(this.stream.GetString2());
+                aUnicodes = convertUTF16toUnicode(this.stream.GetString2LE(length));
 
 			for (var nPos = 0, nCount = aUnicodes.length; nPos < nCount; ++nPos)
             {
