@@ -10793,13 +10793,13 @@
 		 * Обновление при изменениях форматированной таблицы
 		 * @param range - обновляемый диапазон (он же диапазон для выделения)
 		 * @param recalc - делать ли автоподбор по названию столбца
-		 * @param changeRows - менялись ли строки (скрытие раскрытие)
+		 * @param changeRowsOrMerge - менялись ли строки (скрытие раскрытие) или был unmerge
 		 * @private
 		 */
-		WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRows) {
+		WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRowsOrMerge) {
 			if (!recalc) {
 				// При скрытии/открытии строк стоит делать update всему
-				if (changeRows)
+				if (changeRowsOrMerge)
 					this.isChanged = true;
 				// Пока вызовем updateRange, но стоит делать просто draw
 				this._updateCellsRange(range);
@@ -10822,10 +10822,14 @@
 				this._calcColumnWidths(/*fullRecalc*/0);
 				this._updateVisibleColsCount();
 				this.changeWorksheet("update");
+			} else if (changeRowsOrMerge) {
+				// Был merge, нужно обновить
+				this._updateCellsRange(range);
 			} else {
 				// Просто отрисуем
 				this.draw();
 			}
+
 		};
 
 		WorksheetView.prototype._loadFonts = function (fonts, callback) {
