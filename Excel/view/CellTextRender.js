@@ -77,7 +77,7 @@
 
 		CellTextRender.prototype.getNextWord = function (pos) {
 			var i = this.chars.slice(pos).search(this.reWordBegining);
-			return pos + (i >= 0 ? i + 1 : 0);
+			return i >= 0 ? pos + (i + 1) : this.getEndOfLine(pos);
 		};
 
 		CellTextRender.prototype.getBeginOfLine = function (pos) {

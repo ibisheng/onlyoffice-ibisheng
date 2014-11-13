@@ -2072,10 +2072,6 @@
 			var t = this;
 			// Окончание слова
 			var endWord = t.textRender.getNextWord(t.cursorPos);
-			if (endWord === t.cursorPos){
-				// Мы в последнем слове
-				endWord = t.textRender.getEndOfLine(t.cursorPos);
-			}
 			// Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
 			var startWord = t.textRender.getPrevWord(endWord);
 
