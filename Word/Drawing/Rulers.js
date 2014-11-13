@@ -1035,7 +1035,17 @@ function CHorRuler()
             _margin_right = this.TableMarginRight;
         }
 
-        if (this.IsCanMoveAnyMarkers)
+        var posL = _margin_left;
+        if ((_margin_left + this.m_dIndentLeft) > posL)
+            posL = _margin_left + this.m_dIndentLeft;
+        if ((_margin_left + this.m_dIndentLeftFirst) > posL)
+            posL = _margin_left + this.m_dIndentLeftFirst;
+
+        var posR = _margin_right;
+        if (this.m_dIndentRight > 0)
+            posR = _margin_right - this.m_dIndentRight;
+
+        if (this.IsCanMoveAnyMarkers && posL < posR)
         {
             // tabs
             if (y >= 3 && y <= _bottom)
