@@ -6975,11 +6975,11 @@
 					oTmpRange.promoteFromTo(from, to);
 
 				// Сбрасываем параметры
-				t._updateCellsRange(t.activeRange, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
+				t._updateCellsRange(to, /*canChangeColWidth*/c_oAscCanChangeColWidth.none, /*lockDraw*/true);
 				if (c_oAscFormatPainterState.kMultiple !== t.stateFormatPainter)
 					t.formatPainter();
 				// Перерисовываем
-				t._recalculateAfterUpdate([t.activeRange]);
+				t._recalculateAfterUpdate([to]);
 			};
 
 			var result = oTmpRange.preparePromoteFromTo(from, to);
