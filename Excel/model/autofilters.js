@@ -482,6 +482,7 @@ var gUndoInsDelCellsFlag = true;
 									
 									//делаем unmerge
 									ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
+									changeRows = true;
 									
 									var n = 0;
 									result = [];
@@ -675,6 +676,8 @@ var gUndoInsDelCellsFlag = true;
 										ws.model.getRange3(tempCells.r1, tempCells.c1, tempCells.r2 + 1, tempCells.c2).unmerge();
 									else
 										ws.model.getRange3(tempCells.r1, tempCells.c1, tempCells.r2, tempCells.c2).unmerge();
+									
+									changeRows = true;
 								}
 								
 								//генерируем строку заголовков
@@ -780,9 +783,9 @@ var gUndoInsDelCellsFlag = true;
 							}
 							
 							if(paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges && (paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addTableFilterManyCells"))
-								ws._onUpdateFormatTable(rangeFilter, true);
+								ws._onUpdateFormatTable(rangeFilter, true, changeRows);
 							else if(isUpdateRange != null && paramsForCallBackAdd && !bIsOpenFilter && !aWs.workbook.bCollaborativeChanges && !aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
-								ws._onUpdateFormatTable(rangeFilter);
+								ws._onUpdateFormatTable(rangeFilter, null, changeRows);
 							
 							History.EndTransaction();
 							if(isTurnOffHistory)
