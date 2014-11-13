@@ -11116,14 +11116,15 @@ function CreateRadarChart(chartSeries, bUseCache)
 function parseSeriesHeaders (ws, rangeBBox) {
 	var cntLeft = 0, cntTop = 0;
 	var headers = { bLeft: false, bTop: false };
-	var i, cell, value;
+	var i, cell, value, numFormatType;
 
 	if (rangeBBox) {
 		if (rangeBBox.c2 - rangeBBox.c1 > 0) {
 			for (i = rangeBBox.r1 + 1; i <= rangeBBox.r2; i++) {
 				cell = ws.getCell3(i, rangeBBox.c1);
 				value = cell.getValue();
-				if (!isNumber(value) && (value != ""))
+                numFormatType = cell.getNumFormatType();
+				if (!isNumber(value) && (value != "") || numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date )
 					cntLeft++;
 			}
 			if ((cntLeft > 0) && (cntLeft >= rangeBBox.r2 - rangeBBox.r1))
@@ -11135,7 +11136,8 @@ function parseSeriesHeaders (ws, rangeBBox) {
 
 				cell = ws.getCell3(rangeBBox.r1, i);
 				value = cell.getValue();
-				if (!isNumber(value) && (value != ""))
+                numFormatType= cell.getNumFormatType();
+				if (!isNumber(value) && (value != "") || numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date)
 					cntTop++;
 			}
 			if ((cntTop > 0) && (cntTop >= rangeBBox.c2 - rangeBBox.c1))
