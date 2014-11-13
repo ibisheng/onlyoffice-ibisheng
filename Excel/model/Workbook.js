@@ -2400,7 +2400,7 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
             {
                 var wsModel = this.workbook.aWorksheets[key];
                 if ( wsModel )
-                    wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(_lastName, _newName);
+                    wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(_lastName, _newName, true);
             }
         }
 	}
@@ -8256,14 +8256,14 @@ DrawingObjectsManager.prototype.updateChartReferences = function(oldWorksheet, n
     }, this, []);
 };
 
-DrawingObjectsManager.prototype.updateChartReferencesWidthHistory = function(oldWorksheet, newWorksheet)
+DrawingObjectsManager.prototype.updateChartReferencesWidthHistory = function(oldWorksheet, newWorksheet, bNoRebuildCache)
 {
     var aObjects = this.worksheet.Drawings;
     for (var i = 0; i < aObjects.length; i++) {
         var graphicObject = aObjects[i].graphicObject;
         if ( graphicObject.updateChartReferences )
         {
-            graphicObject.updateChartReferences(oldWorksheet, newWorksheet);
+            graphicObject.updateChartReferences(oldWorksheet, newWorksheet, bNoRebuildCache);
         }
     }
 };

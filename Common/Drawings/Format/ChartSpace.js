@@ -769,12 +769,20 @@ CChartSpace.prototype =
         return this.checkSeriesRefs(this.checkListName, oldWorksheetName);
     },
 
-    updateChartReferences: function(oldWorksheetName, newWorksheetName)
+    updateChartReferences: function(oldWorksheetName, newWorksheetName, bNoRebuildCache)
     {
         if(this.checkChartReferences(oldWorksheetName))
         {
+            if(bNoRebuildCache === true)
+            {
+                this.bNoHandleRecalc = true;
+            }
             this.changeChartReferences(oldWorksheetName, newWorksheetName);
-            this.rebuildSeries();
+            if(!(bNoRebuildCache === true))
+            {
+                this.rebuildSeries();
+            }
+            this.bNoHandleRecalc = false;
         }
     },
 
@@ -1281,6 +1289,10 @@ CChartSpace.prototype =
 
     handleUpdateType: function()
     {
+        if(this.bNoHandleRecalc === true)
+        {
+            return;
+        }
         this.recalcInfo.recalculateChart =  true;
         this.recalcInfo.recalculateSeriesColors = true;
         this.recalcInfo.recalculateMarkers = true;
@@ -1303,6 +1315,10 @@ CChartSpace.prototype =
 
     handleUpdateInternalChart: function()
     {
+        if(this.bNoHandleRecalc === true)
+        {
+            return;
+        }
         this.recalcInfo.recalculateChart =  true;
         this.recalcInfo.recalculateSeriesColors = true;
         this.recalcInfo.recalculateDLbls = true;

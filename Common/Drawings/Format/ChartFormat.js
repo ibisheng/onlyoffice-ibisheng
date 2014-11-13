@@ -15776,9 +15776,12 @@ CNumRef.prototype =
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
             && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
         {
-            this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+            if(this.parent.parent.parent.parent.parent.parent.bNoHandleRecalc === true)
+            {
+                return;
+            }
             this.parent.parent.parent.parent.parent.parent.recalcInfo.recalculateReferences = true;
-            this.parent.parent.parent.parent.parent.parent.addToRecalculate();
+            this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
         }
     },
 
@@ -15795,6 +15798,12 @@ CNumRef.prototype =
             case historyitem_NumRef_SetF:
             {
                 this.f = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
+                    && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.parent.parent.recalcInfo.recalculateReferences = true;
+                    this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_NumRef_SetNumCache:
@@ -15817,6 +15826,12 @@ CNumRef.prototype =
             case historyitem_NumRef_SetF:
             {
                 this.f = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
+                    && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.parent.parent.recalcInfo.recalculateReferences = true;
+                    this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_NumRef_SetNumCache:
@@ -15859,6 +15874,12 @@ CNumRef.prototype =
             case historyitem_NumRef_SetF:
             {
                 this.f = readString(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
+                    && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.parent.parent.recalcInfo.recalculateReferences = true;
+                    this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_NumRef_SetNumCache:

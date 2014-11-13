@@ -918,12 +918,12 @@ CGroupShape.prototype =
             this.selectedObjects[0].documentUpdateRulersState();
     },
 
-    updateChartReferences: function(oldWorksheet, newWorksheet)
+    updateChartReferences: function(oldWorksheet, newWorksheet, bNoRebuildCache)
     {
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(this.spTree[i].updateChartReferences)
-                this.spTree[i].updateChartReferences(oldWorksheet, newWorksheet);
+                this.spTree[i].updateChartReferences(oldWorksheet, newWorksheet, bNoRebuildCache);
         }
     },
 
