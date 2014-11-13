@@ -6667,142 +6667,146 @@ CChartSpace.prototype =
             var RGBA = {R: 0, G: 0, B: 0, A: 255};
             if(this.chart.plotArea.chart.varyColors && (series.length === 1 || this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
             {
-                var ser = series[0];
-                var pts = getPtsFromSeries(ser);
-                if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_LineChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart))
+                for(var ii = 0; ii < series.length; ++ ii)
                 {
-                    var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
-                    for(var i = 0; i < pts.length; ++i)
+                    var ser = series[ii];
+                    var pts = getPtsFromSeries(ser);
+                    if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_LineChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart))
                     {
-                        var compiled_brush = new CUniFill();
-                        compiled_brush.merge(base_fills[pts[i].idx]);
-                        if(ser.spPr && ser.spPr.Fill)
+                        var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
+                        for(var i = 0; i < pts.length; ++i)
                         {
-                            compiled_brush.merge(ser.spPr.Fill);
-                        }
-                        if(Array.isArray(ser.dPt))
-                        {
-                            for(var j = 0; j < ser.dPt.length; ++j)
+                            var compiled_brush = new CUniFill();
+                            compiled_brush.merge(base_fills[pts[i].idx]);
+                            if(ser.spPr && ser.spPr.Fill)
                             {
-                                if(ser.dPt[j].idx === pts[i].idx)
+                                compiled_brush.merge(ser.spPr.Fill);
+                            }
+                            if(Array.isArray(ser.dPt))
+                            {
+                                for(var j = 0; j < ser.dPt.length; ++j)
                                 {
-                                    if(ser.dPt[j].spPr)
+                                    if(ser.dPt[j].idx === pts[i].idx)
                                     {
-                                        compiled_brush.merge(ser.dPt[j].spPr.Fill);
+                                        if(ser.dPt[j].spPr)
+                                        {
+                                            compiled_brush.merge(ser.dPt[j].spPr.Fill);
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
                             }
+                            pts[i].brush = compiled_brush;
+                            pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                         }
-                        pts[i].brush = compiled_brush;
-                        pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                    }
 
-                    default_line =  new CLn();
-                    if(style.line1 === EFFECT_NONE)
-                    {
-                        default_line.w = 0;
-                    }
-                    else if(style.line1 === EFFECT_SUBTLE)
-                    {
-                        default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
-                    }
-                    else if(style.line1 === EFFECT_MODERATE)
-                    {
-                        default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
-                    }
-                    else if(style.line1 === EFFECT_INTENSE)
-                    {
-                        default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
-                    }
-                    var base_line_fills;
-                    if(this.style === 34)
-                        base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
-                    for(i = 0; i < pts.length; ++i)
-                    {
-                        var compiled_line = new CLn();
-                        compiled_line.merge(default_line);
-                        compiled_line.Fill = new CUniFill();
-                        if(this.style !== 34)
+                        default_line =  new CLn();
+                        if(style.line1 === EFFECT_NONE)
                         {
-                            compiled_line.Fill.merge(style.line2[0]);
+                            default_line.w = 0;
                         }
-                        else
+                        else if(style.line1 === EFFECT_SUBTLE)
                         {
-                            compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
+                            default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
                         }
-                        if(ser.spPr && ser.spPr.ln)
-                            compiled_line.merge(ser.spPr.ln);
-                        if(Array.isArray(ser.dPt))
+                        else if(style.line1 === EFFECT_MODERATE)
                         {
-                            for(var j = 0; j < ser.dPt.length; ++j)
+                            default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[1]);
+                        }
+                        else if(style.line1 === EFFECT_INTENSE)
+                        {
+                            default_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[2]);
+                        }
+                        var base_line_fills;
+                        if(this.style === 34)
+                            base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
+                        for(i = 0; i < pts.length; ++i)
+                        {
+                            var compiled_line = new CLn();
+                            compiled_line.merge(default_line);
+                            compiled_line.Fill = new CUniFill();
+                            if(this.style !== 34)
                             {
-                                if(ser.dPt[j].idx === pts[i].idx)
+                                compiled_line.Fill.merge(style.line2[0]);
+                            }
+                            else
+                            {
+                                compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
+                            }
+                            if(ser.spPr && ser.spPr.ln)
+                                compiled_line.merge(ser.spPr.ln);
+                            if(Array.isArray(ser.dPt))
+                            {
+                                for(var j = 0; j < ser.dPt.length; ++j)
                                 {
-                                    if(ser.dPt[j].spPr)
+                                    if(ser.dPt[j].idx === pts[i].idx)
                                     {
-                                        compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        if(ser.dPt[j].spPr)
+                                        {
+                                            compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
                             }
+                            pts[i].pen = compiled_line;
+                            pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                         }
-                        pts[i].pen = compiled_line;
-                        pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                    }
-                }
-                else
-                {
-                    var default_line;
-                    if(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
-                    {
-                        default_line = new CLn();
-                        default_line.setFill(new CUniFill());
-                        default_line.Fill.setFill(new CNoFill());
                     }
                     else
                     {
-                        default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
-                    }
-                    var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(pts));
-                    for(var i = 0; i < pts.length; ++i)
-                    {
-                        var compiled_line = new CLn();
-                        compiled_line.merge(default_line);
-                        if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
-                            compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
-                        compiled_line.w *= style.line3;
-                        if(ser.spPr && ser.spPr.ln)
+                        var default_line;
+                        if(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
                         {
-                            compiled_line.merge(ser.spPr.ln);
+                            default_line = new CLn();
+                            default_line.setFill(new CUniFill());
+                            default_line.Fill.setFill(new CNoFill());
                         }
-                        if(Array.isArray(ser.dPt))
+                        else
                         {
-                            for(var j = 0; j < ser.dPt.length; ++j)
+                            default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+                        }
+                        var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(pts));
+                        for(var i = 0; i < pts.length; ++i)
+                        {
+                            var compiled_line = new CLn();
+                            compiled_line.merge(default_line);
+                            if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
+                                compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
+                            compiled_line.w *= style.line3;
+                            if(ser.spPr && ser.spPr.ln)
                             {
-                                if(ser.dPt[j].idx === pts[i].idx)
+                                compiled_line.merge(ser.spPr.ln);
+                            }
+                            if(Array.isArray(ser.dPt))
+                            {
+                                for(var j = 0; j < ser.dPt.length; ++j)
                                 {
-                                    if(ser.dPt[j].spPr)
+                                    if(ser.dPt[j].idx === pts[i].idx)
                                     {
-                                        compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        if(ser.dPt[j].spPr)
+                                        {
+                                            compiled_line.merge(ser.dPt[j].spPr.ln);
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
                             }
+                            pts[i].brush = null;
+                            pts[i].pen = compiled_line;
+                            pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                         }
-                        pts[i].brush = null;
-                        pts[i].pen = compiled_line;
-                        pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                     }
-                }
-                for(var j = 0; j < pts.length; ++j)
-                {
-                    if(pts[j].compiledMarker)
+                    for(var j = 0; j < pts.length; ++j)
                     {
-                        pts[j].compiledMarker.pen &&  pts[j].compiledMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-                        pts[j].compiledMarker.brush &&  pts[j].compiledMarker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                        if(pts[j].compiledMarker)
+                        {
+                            pts[j].compiledMarker.pen &&  pts[j].compiledMarker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+                            pts[j].compiledMarker.brush &&  pts[j].compiledMarker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 
+                        }
                     }
+
                 }
             }
             else
