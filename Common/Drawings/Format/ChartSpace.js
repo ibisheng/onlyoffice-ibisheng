@@ -2312,6 +2312,7 @@ CChartSpace.prototype =
                 num_cache.setPtCount(pt_index);
                 val.numRef.setNumCache(num_cache);
                 ser.isHidden = hidden;
+                ser.isHiddenForLegend = hidden;
             }
         };
 
@@ -5285,7 +5286,7 @@ CChartSpace.prototype =
                 {
                     ser = series[i];
                     arr_str_labels.push(ser.getSeriesName());
-                    if(ser.isHidden)
+                    if(ser.isHiddenForLegend)
                         continue;
                     calc_entry = new CalcLegendEntry(legend, this);
                     calc_entry.txBody = CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
