@@ -3579,6 +3579,16 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 };
 CMathContent.prototype.Draw_Lines = function(PDSL)
 {
+    var lng = this.Content.length;
+
+    var X = PDSL.X        = this.pos.x + this.ParaMath.X,
+        Y = PDSL.Baseline = this.pos.y + this.ParaMath.Y + this.size.ascent;
+
+    for ( var CurPos = 0; CurPos < lng; CurPos++ )
+    {
+        this.Content[CurPos].Draw_Lines(PDSL);
+        PDSL.Baseline = Y;
+    }
 
 };
 CMathContent.prototype.Selection_Remove = function()

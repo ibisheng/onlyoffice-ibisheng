@@ -436,38 +436,6 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             else
                 content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
         }
-
-
-
-
-        /*if(IncFontSize == undefined)
-        {
-            var FontSize = TextPr.FontSize;
-
-            if(TextPr.FontSize !== undefined && content.IsNormalTextInRuns() == false)
-            {
-                var NewTextPr = new CTextPr();
-                NewTextPr.FontSize   = FontSize;
-
-                this.Root.Apply_TextPr(NewTextPr, IncFontSize, true);
-
-                TextPr.FontSize   = undefined;
-            }
-
-            content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-
-            TextPr.FontSize   = FontSize;
-
-        }
-        else
-        {
-
-            if(content.IsNormalTextInRuns() == false)
-                this.Root.Apply_TextPr(TextPr, IncFontSize, true);
-            else
-                content.Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }*/
-
     }
 };
 ParaMath.prototype.Clear_TextPr = function()
@@ -1436,9 +1404,9 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
 
 
 
-        //this.Root.Draw_Lines(PDSL);
+        this.Root.Draw_Lines(PDSL);
 
-        PDSL.X += this.Width;
+        PDSL.X = this.X + this.Width;
     }
 };
 

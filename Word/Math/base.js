@@ -1081,6 +1081,55 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     PDSH.X = this.pos.x + this.ParaMath.X + this.size.width;
 
 };
+CMathBase.prototype.Draw_Lines = function(PDSL)
+{
+    var CtrPrp = this.Get_CompiledCtrPrp();
+
+    var aStrikeout  = PDSL.Strikeout;
+    var aDStrikeout = PDSL.DStrikeout;
+
+    var X          = PDSL.X;
+    var Y          = PDSL.Baseline - CtrPrp.FontSize * g_dKoef_pt_to_mm * 0.27;
+
+    var LineW      = (CtrPrp.FontSize / 18) * g_dKoef_pt_to_mm;
+
+    var Para       = PDSL.Paragraph;
+
+    var BgColor = PDSL.BgColor;
+    if ( undefined !== CtrPrp.Shd && shd_Nil !== CtrPrp.Shd.Value )
+        BgColor = CtrPrp.Shd.Get_Color( Para );
+    var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+    var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
+
+    // Выставляем цвет обводки
+    if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        CurColor = new CDocumentColor( 128, 0, 151 );
+    else if ( true === CtrPrp.Color.Auto && !CtrPrp.Unifill)
+        CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
+    else
+    {
+        if(CtrPrp.Unifill)
+        {
+            CtrPrp.Unifill.check(Theme, ColorMap);
+            RGBA = CtrPrp.Unifill.getRGBAColor();
+            CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B );
+        }
+        else
+        {
+            CurColor = new CDocumentColor( CtrPrp.Color.r, CtrPrp.Color.g, CtrPrp.Color.b );
+        }
+    }
+
+    if ( true === CtrPrp.DStrikeout )
+        aDStrikeout.Add( Y, Y, X, X + this.size.width, LineW, CurColor.r, CurColor.g, CurColor.b );
+    else if ( true === CtrPrp.Strikeout )
+        aStrikeout.Add( Y, Y, X, X + this.size.width, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+    for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
+        this.Content[CurPos].Draw_Lines(PDSL);
+
+    PDSL.X = this.pos.x + this.ParaMath.X + this.size.width;
+};
 CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
 {
     var Para      = PDSE.Paragraph;

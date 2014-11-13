@@ -3664,6 +3664,19 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
                 break;
             }
+            case para_Math_Text:
+            case para_Math_Ampersand:
+            case para_Math_Placeholder:
+            {
+                if ( true === CurTextPr.DStrikeout )
+                    aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                else if ( true === CurTextPr.Strikeout )
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+
+                X += ItemWidthVisible;
+                break;
+            }
         }
 
         if ( 2 === SpellingMarksArray[Pos + 1] || 3 === SpellingMarksArray[Pos + 1] )
