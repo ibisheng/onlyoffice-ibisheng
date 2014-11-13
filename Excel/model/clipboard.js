@@ -3389,24 +3389,24 @@
 			{
 				if(window.USER_AGENT_MACOS)
 				{
-					this.element.style.width = "10000px";
-					this.elementText.style.width = "10000px";
-					var ifr = document.getElementById("pasteFrame");
-					if(ifr)
-						ifr.style.width = "10000px";
-				};
+					//this.element.style.width = "10000px";
+					//this.elementText.style.width = "10000px";
+					//var ifr = document.getElementById("pasteFrame");
+					//if(ifr)
+						//ifr.style.width = "10000px";
+				}
 			},
 			
 			_endCopyOrPaste: function()
 			{
 				if(window.USER_AGENT_MACOS)
 				{
-					this.element.style.width = "100px";
-					this.elementText.style.width = "100px";
-					var ifr = document.getElementById("pasteFrame");
-					if(ifr)
-						ifr.style.width = "100px";
-				};
+					//this.element.style.width = "100px";
+					//this.elementText.style.width = "100px";
+					//var ifr = document.getElementById("pasteFrame");
+					//if(ifr)
+						//ifr.style.width = "100px";
+				}
 			}
 
 		};
@@ -5289,6 +5289,8 @@ function Editor_Copy_Event_Excel(e, ElemToSelect, isCut)
 	if(sBase64)
 		e.clipboardData.setData("text/x-custom", sBase64);
 	e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
+	//TODO для вставки в ячейку(пересмотреть!!!)
+	e.clipboardData.setData("text/plain", ElemToSelect.innerText);
 }
 
 function Editor_CopyPaste_Create2(api)
