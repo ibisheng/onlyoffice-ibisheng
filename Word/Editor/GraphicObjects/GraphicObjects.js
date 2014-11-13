@@ -2281,7 +2281,7 @@ CGraphicObjects.prototype =
         if(ret)
         {
             var object = g_oTableId.Get_ById(ret.objectId);
-            if(object && object.selected && object.selectStartPage === pageIndex)
+            if(object && object.selected /*&& object.selectStartPage === pageIndex*/)
                 return true;
         }
         return false;
@@ -2334,6 +2334,22 @@ CGraphicObjects.prototype =
         }
     },
 
+    removeFromAllHdrFtrPages: function(id, drawingType)
+    {
+        for(var i = 0; i < this.graphicPages.length; ++i)
+        {
+            this.removeFromHdrFrtPage(i, id, drawingType);
+        }
+    },
+
+    removeFromHdrFrtPage: function(pageIndex, id, drawingType)
+    {
+        if(this.graphicPages[pageIndex] && this.graphicPages[pageIndex].hdrFtrPage)
+        {
+            this.graphicPages[pageIndex].hdrFtrPage.delObjectById(id, drawingType);
+        }
+    },
+
     Remove_ById: function(id)
     {
         for(var i = 0; i < this.graphicPages.length; ++i)
@@ -2341,6 +2357,7 @@ CGraphicObjects.prototype =
             this.removeById(i, id)
         }
     },
+
 
     selectById: function(id, pageIndex)
     {
