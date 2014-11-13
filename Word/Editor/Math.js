@@ -1365,6 +1365,8 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
         // Underline всей формулы
         var FirstRPrp = this.GetFirstRPrp();
 
+        var Para = PDSL.Paragraph;
+
         var aUnderline  = PDSL.Underline;
 
         var X          = PDSL.X;

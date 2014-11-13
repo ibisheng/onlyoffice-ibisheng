@@ -9247,13 +9247,8 @@ Paragraph.prototype =
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
         var TMetrics = { Ascent : null, Descent : null };
+        this.private_RecalculateTextMetrics(TMetrics);
 
-        var TempCount = this.Content.length;
-        for ( var Index = 0; Index < TempCount; Index++ )
-        {
-            this.Content[Index].Recalculate_Measure2( TMetrics );
-        }
-        
         var TDescent = TMetrics.Descent;
         var TAscent  = TMetrics.Ascent;
 
@@ -9275,11 +9270,7 @@ Paragraph.prototype =
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
         var TNewMetrics = { Ascent : null, Descent : null };
-        var TempCount = this.Content.length;
-        for ( var Index = 0; Index < TempCount; Index++ )
-        {
-            this.Content[Index].Recalculate_Measure2( TNewMetrics );
-        }
+        this.private_RecalculateTextMetrics(TNewMetrics);
 
         var TNewDescent = TNewMetrics.Descent;
         var TNewAscent  = TNewMetrics.Ascent;        
@@ -9326,11 +9317,7 @@ Paragraph.prototype =
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
         var TMetrics = { Ascent : null, Descent : null };
-        var TempCount = this.Content.length;
-        for ( var Index = 0; Index < TempCount; Index++ )
-        {
-            this.Content[Index].Recalculate_Measure2( TMetrics );
-        }
+        this.private_RecalculateTextMetrics(TMetrics);
 
         var TDescent = TMetrics.Descent;
         var TAscent  = TMetrics.Ascent;
@@ -9350,11 +9337,7 @@ Paragraph.prototype =
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
         var TNewMetrics = { Ascent : null, Descent : null };
-        var TempCount = this.Content.length;
-        for ( var Index = 0; Index < TempCount; Index++ )
-        {
-            this.Content[Index].Recalculate_Measure2( TNewMetrics );
-        }
+        this.private_RecalculateTextMetrics(TNewMetrics);
 
         var TNewDescent = TNewMetrics.Descent;
         var TNewAscent  = TNewMetrics.Ascent;
@@ -12209,6 +12192,16 @@ Paragraph.prototype.Get_ElementByPos = function(ContentPos)
 
     var CurPos = ContentPos.Get(0);
     return this.Content[CurPos].Get_ElementByPos(ContentPos, 1);
+};
+
+Paragraph.prototype.private_RecalculateTextMetrics = function(TextMetrics)
+{
+    for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+    {
+        // TODO: Пока данная функция реализована только в ранах, ее надо реализовать во всех остальных классах
+        if (this.Content[Index].Recalculate_Measure2)
+            this.Content[Index].Recalculate_Measure2(TextMetrics);
+    }
 };
 
 var pararecalc_0_All  = 0;

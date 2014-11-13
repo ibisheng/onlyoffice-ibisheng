@@ -3158,6 +3158,9 @@ CMathContent.prototype.Set_SelectionContentPos = function(StartContentPos, EndCo
         OldEndPos   = this.Selection.Start;
     }
 
+    OldStartPos = Math.min(this.Content.length - 1, Math.max(0, OldStartPos));
+    OldEndPos   = Math.min(this.Content.length - 1, Math.max(0, OldEndPos));
+
     var StartPos = 0;
     switch(StartFlag)
     {
