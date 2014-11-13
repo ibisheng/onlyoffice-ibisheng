@@ -9283,12 +9283,13 @@
 			var t = this;
 
 			this.collaborativeEditing.onStartCheckLock();
-			var nLength = ("array" === asc_typeof(range)) ? range.length : 1;
+			var isArrayRange = Array.isArray(range);
+			var nLength = isArrayRange ? range.length : 1;
 			var nIndex = 0;
 			var ar = null;
 
 			for (; nIndex < nLength; ++nIndex) {
-				ar = ("array" === asc_typeof(range)) ? range[nIndex].clone(true) : range.clone(true);
+				ar = isArrayRange ? range[nIndex].clone(true) : range.clone(true);
 
 				if (c_oAscLockTypeElemSubType.InsertColumns !== subType && c_oAscLockTypeElemSubType.InsertRows !== subType) {
 					// Пересчет для входящих ячеек в добавленные строки/столбцы
@@ -10092,6 +10093,7 @@
 		};
 
 		WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options, lockDraw, callback) {
+			var t = this;
 			var findFlags = "g"; // Заменяем все вхождения
 			if (true !== options.isMatchCase)
 				findFlags += "i"; // Не чувствителен к регистру
@@ -10110,11 +10112,16 @@
 			options.indexInArray = 0;
 			options.countFind = aReplaceCells.length;
 			options.countReplace = 0;
-			this._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback);
+			if (options.isReplaceAll && false === this.collaborativeEditing.getCollaborativeEditing())
+				this._isLockedCells (aReplaceCells, /*subType*/null, function () {
+					t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, true);
+				});
+			else
+				this._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, false);
 		};
 
 		WorksheetView.prototype._replaceCellText = function (aReplaceCells, valueForSearching, options,
-															 lockDraw, callback) {
+															 lockDraw, callback, oneUser) {
 			var t = this;
 			if (options.indexInArray >= aReplaceCells.length) {
 				this.draw(lockDraw);
@@ -10149,11 +10156,11 @@
 				}
 
 				window.setTimeout(function () {
-					t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback);
+					t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, oneUser);
 				}, 1);
 			};
 
-			return this._isLockedCells (aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
+			return oneUser ? onReplaceCallback(true) : this._isLockedCells(aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
 		};
 
 		WorksheetView.prototype.findCell = function (reference) {
