@@ -1950,6 +1950,9 @@ var historyitem_Math_AddItems_ToMathBase       =  6;
 var historyitem_Math_EqArrayPr                 =  7; // Изменение настроек у CEqArray
 var historyitem_Math_CtrPrpColor               =  8;
 var historyitem_Math_CtrPrpUnifill             =  9;
+var historyitem_Math_CtrPrpUnderline           =  10;
+var historyitem_Math_CtrPrpStrikeout           =  11;
+var historyitem_Math_CtrPrpDoubleStrikeout     =  12;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -1959,20 +1962,22 @@ function ReadChanges_FromBinary(Reader, Class)
 
     switch(Type)
     {
-        case historyitem_Math_CtrPrpFSize         : Changes = new CChangesMathFontSize(); break;
-        case historyitem_Math_ParaJc              : Changes = new CChangesMathParaJc(); break;
-        case historyitem_Math_CtrPrpShd           : Changes = new CChangesMathShd(); break;
-        case historyitem_Math_AddItems_ToMathBase : Changes = new CChangesMathAddItems(); break;
-        case historyitem_Math_CtrPrpColor         : Changes = new CChangesMathColor(); break;
-        case historyitem_Math_CtrPrpUnifill       : Changes = new CChangesMathUnifill(); break;
+        case historyitem_Math_CtrPrpFSize           : Changes = new CChangesMathFontSize(); break;
+        case historyitem_Math_ParaJc                : Changes = new CChangesMathParaJc(); break;
+        case historyitem_Math_CtrPrpShd             : Changes = new CChangesMathShd(); break;
+        case historyitem_Math_AddItems_ToMathBase   : Changes = new CChangesMathAddItems(); break;
+        case historyitem_Math_CtrPrpColor           : Changes = new CChangesMathColor(); break;
+        case historyitem_Math_CtrPrpUnifill         : Changes = new CChangesMathUnifill(); break;
+        case historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
+        case historyitem_Math_CtrPrpStrikeout       : Changes = new CChangesMathStrikeout(); break;
+        case historyitem_Math_CtrPrpDoubleStrikeout : Changes = new CChangesMath_DoubleStrikeout(); break;
     }
 
     if (null !== Changes)
         Changes.Load_Changes(Reader, Class);
 }
 
-function WriteChanges_ToBinary(Changes, Writer)
-{
+function WriteChanges_ToBinary(Changes, Writer){
     Writer.WriteLong(Changes.Type);
     Changes.Save_Changes(Writer);
 }
@@ -2151,6 +2156,127 @@ CChangesMathUnifill.prototype.Load_Changes = function(Reader, Class)
     {
         this.New = undefined;
     }
+
+    this.Redo(Class);
+};
+
+function CChangesMathUnderline(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathUnderline.prototype.Type = historyitem_Math_CtrPrpUnderline;
+CChangesMathUnderline.prototype.Undo = function(Class)
+{
+    Class.raw_SetUnderline(this.Old);
+};
+CChangesMathUnderline.prototype.Redo = function(Class)
+{
+    Class.raw_SetUnderline(this.New);
+};
+CChangesMathUnderline.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsUnderline
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+
+};
+CChangesMathUnderline.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsUnderline
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+}
+
+function CChangesMathStrikeout(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathStrikeout.prototype.Type = historyitem_Math_CtrPrpStrikeout;
+CChangesMathStrikeout.prototype.Undo = function(Class)
+{
+    Class.raw_SetStrikeout(this.Old);
+};
+CChangesMathStrikeout.prototype.Redo = function(Class)
+{
+    Class.raw_SetStrikeout(this.New);
+};
+CChangesMathStrikeout.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsStrikeOut
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+};
+CChangesMathStrikeout.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsStrikeOut
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+};
+
+function CChangesMath_DoubleStrikeout(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_DoubleStrikeout.prototype.Type = historyitem_Math_CtrPrpDoubleStrikeout;
+CChangesMath_DoubleStrikeout.prototype.Undo = function(Class)
+{
+    Class.raw_Set_DoubleStrikeout(this.Old);
+};
+CChangesMath_DoubleStrikeout.prototype.Redo = function(Class)
+{
+    Class.raw_Set_DoubleStrikeout(this.New);
+};
+CChangesMath_DoubleStrikeout.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsDoubleStrikeOut
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+};
+CChangesMath_DoubleStrikeout.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsDoubleStrikeOut
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
 
     this.Redo(Class);
 };

@@ -676,6 +676,21 @@ CMathBase.prototype =
                 this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
                 this.Set_Color(undefined);
             }
+
+            if(undefined !== TextPr.Underline)
+            {
+                this.Set_Underline(TextPr.Underline);
+            }
+
+            if(undefined !== TextPr.Strikeout)
+            {
+                this.Set_Strikeout(TextPr.Strikeout);
+            }
+
+            if(undefined !== TextPr.DStrikeout)
+            {
+                this.Set_DoubleStrikeout(TextPr.DStrikeout);
+            }
         }
 
         for(var i=0; i < this.nRow; i++)
@@ -702,8 +717,11 @@ CMathBase.prototype =
     },
     Set_FontSizeCtrPrp: function(Value)
     {
-        History.Add(this, new CChangesMathFontSize(Value, this.CtrPrp.FontSize));
-        this.raw_SetFontSize(Value);
+        if ( Value !== this.CtrPrp.FontSize )
+        {
+            History.Add(this, new CChangesMathFontSize(Value, this.CtrPrp.FontSize));
+            this.raw_SetFontSize(Value);
+        }
     },
     Set_Color: function(Value)
     {
@@ -723,13 +741,60 @@ CMathBase.prototype =
     },
     Set_Shd: function(Shd)
     {
-        if ( (undefined === this.CtrPrp.Shd && undefined === Shd) || (undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare( Shd ) ) )
-            return;
-
-        History.Add(this, new CChangesMathShd(Shd, this.CtrPrp.Shd));
-        this.raw_SetShd(Shd);
+        if ( !(undefined === this.CtrPrp.Shd && undefined === Shd) && !(undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare( Shd ) ) )
+        {
+            History.Add(this, new CChangesMathShd(Shd, this.CtrPrp.Shd));
+            this.raw_SetShd(Shd);
+        }
     },
+    Set_Underline: function(Value)
+    {
+        if ( Value !== this.CtrPrp.Underline )
+        {
+            History.Add(this, new CChangesMathUnderline(Value, this.CtrPrp.Underline));
+            this.raw_SetUnderline(Value);
+        }
+    },
+    Set_Strikeout: function(Value)
+    {
+        if ( Value !== this.CtrPrp.Strikeout )
+        {
+            History.Add(this, new CChangesMathStrikeout(Value, this.CtrPrp.Strikeout));
+            this.raw_SetStrikeout(Value);
+        }
+    },
+    Set_DoubleStrikeout: function(Value)
+    {
+        if(Value !== this.CtrPrp.DStrikeout)
+        {
+            History.Add(this, new CChangesMath_DoubleStrikeout(Value, this.CtrPrp.DStrikeout));
+            this.raw_Set_DoubleStrikeout(Value);
+        }
+    },
+    raw_SetUnderline : function(Value)
+    {
+        this.CtrPrp.Underline = Value;
+        this.RecalcInfo.bCtrPrp = true;
 
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
+    raw_SetStrikeout: function(Value)
+    {
+        this.CtrPrp.Strikeout = Value;
+        this.RecalcInfo.bCtrPrp = true;
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
+    raw_Set_DoubleStrikeout: function(Value)
+    {
+        this.CtrPrp.DStrikeout = Value;
+        this.RecalcInfo.bCtrPrp = true;
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
     raw_SetFontSize : function(Value)
     {
         this.CtrPrp.FontSize    = Value;
