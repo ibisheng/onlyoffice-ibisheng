@@ -2757,7 +2757,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					for(var m = 0; m < lengthRows; m++)
 					{
-						var val = ws.model._getCell(activeCells.r1 + m + 1,activeCells.c1).getValue();
+						var val = ws.model.getCell3(activeCells.r1 + m + 1,activeCells.c1).getValueWithFormat();
 						var anotherFilterHidden = this._isHiddenAnotherFilter2(curCellId,activeCells.r1 + m + 1,ref);
 						if(anotherFilterHidden == 'hidden')
 							newArray[m] = 'hidden';
@@ -2797,12 +2797,12 @@ var gUndoInsDelCellsFlag = true;
 					//проверка на повторяющиеся элементы
 					if(array[i] == 'rep')
 					{
-						var mainVal = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1).getValue();
+						var mainVal = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1).getValueWithFormat();
 						for(var k = 0;k < array.length; k++)
 						{							
 							if(array[k] == false || array[k] == true)
 							{
-								var val2 = ws.model.getCell3(activeCells.r1 + k + 1, activeCells.c1).getValue();
+								var val2 = ws.model.getCell3(activeCells.r1 + k + 1, activeCells.c1).getValueWithFormat();
 								if(val2 == mainVal)
 								{
 									array[i] = array[k];
@@ -2837,7 +2837,7 @@ var gUndoInsDelCellsFlag = true;
 						if(allFilterOpenElements)
 							break;
 						var cell = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1);
-						var valActive = cell.getValue();
+						var valActive = cell.getValueWithFormat();
 						var arrVal;
 						if(isCurFilter == undefined || !currentFilter[isCurFilter].Filters)//создаём, если его ещё нет
 						{
@@ -4978,7 +4978,7 @@ var gUndoInsDelCellsFlag = true;
 					}
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						var val = ws.model.getCell3(m, startCell.c1).getValue();
+						var val = ws.model.getCell3(m, startCell.c1).getValueWithFormat();
 						var isVis = false;
 						for(var k = 0; k < customFilter.length;k++)
 						{
