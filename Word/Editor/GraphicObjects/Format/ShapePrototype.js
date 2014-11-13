@@ -242,9 +242,7 @@ CShape.prototype.recalculateTxBoxContent = function()
     else
     {
         var _full_rotate = this.getFullRotate();
-        if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-            || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-            || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
+        if(checkNormalRotate(_full_rotate))
         {
             if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
             {

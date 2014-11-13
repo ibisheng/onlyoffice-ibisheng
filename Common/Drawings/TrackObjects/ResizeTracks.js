@@ -790,7 +790,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         this.flipH = originalObject.flipH;
         this.flipV = originalObject.flipV;
         this.transform = originalObject.transform.CreateDublicate();
-        this.bSwapCoef = !(this.rot < Math.PI*0.25 || this.rot>Math.PI*1.75 || (this.rot>Math.PI*0.75 && this.rot<Math.PI*1.25));
+        this.bSwapCoef = !(checkNormalRotate(this.rot));
         this.childs = [];
         var a = originalObject.spTree;
         for(var i = 0; i < a.length; ++i)
@@ -1452,7 +1452,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.flipH = originalObject.flipH;
         this.flipV = originalObject.flipV;
         this.transform = originalObject.transform.CreateDublicate();
-        this.bSwapCoef = !(this.rot < Math.PI*0.25 || this.rot>Math.PI*1.75 || (this.rot>Math.PI*0.75 && this.rot<Math.PI*1.25));
+        this.bSwapCoef = !(checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
         this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;

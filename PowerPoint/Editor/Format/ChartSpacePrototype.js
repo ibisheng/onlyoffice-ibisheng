@@ -14,6 +14,7 @@ CChartSpace.prototype.setParent2 = CShape.prototype.setParent2;
 CChartSpace.prototype.getDrawingObjectsController = CShape.prototype.getDrawingObjectsController;
 CChartSpace.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CChartSpace.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
+CChartSpace.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 
 
 CChartSpace.prototype.recalculateTransform = function()

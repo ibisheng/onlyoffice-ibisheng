@@ -1470,9 +1470,7 @@ function DrawingObjects() {
             rot = normalizeRotate(rot);
 
             var fromX, fromY, toX, toY;
-            if ((rot >= 0 && rot < Math.PI * 0.25)
-                || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+            if (checkNormalRotate(rot))
             {
                 fromX =  mmToPt(_t.graphicObject.x);
                 fromY =  mmToPt(_t.graphicObject.y);
@@ -1891,9 +1889,7 @@ function DrawingObjects() {
                 {
                     metricExtX = metrics.extX;
                     metricExtY = metrics.extY;
-                    if ((rot >= 0 && rot < Math.PI * 0.25)
-                        || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                        || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+                    if (checkNormalRotate(rot))
                     {
                         drawingObject.graphicObject.spPr.xfrm.setExtX(metrics.extX);
                         drawingObject.graphicObject.spPr.xfrm.setExtY(metrics.extY);
@@ -1918,9 +1914,7 @@ function DrawingObjects() {
                     }
                 }
 
-                if ((rot >= 0 && rot < Math.PI * 0.25)
-                    || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                    || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+                if (checkNormalRotate(rot))
                 {
                     drawingObject.graphicObject.spPr.xfrm.setOffX(metrics.x);
                     drawingObject.graphicObject.spPr.xfrm.setOffY(metrics.y);
@@ -3298,9 +3292,7 @@ function DrawingObjects() {
 
                         var rot = isRealNumber(obj.graphicObject.spPr.xfrm.rot) ? obj.graphicObject.spPr.xfrm.rot : 0;
                         rot = normalizeRotate(rot);
-                        if ((rot >= 0 && rot < Math.PI * 0.25)
-                            || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                            || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+                        if (checkNormalRotate(rot))
                         {
                             obj.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                             obj.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
@@ -4054,9 +4046,7 @@ function DrawingObjects() {
 
                     var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = normalizeRotate(rot);
-                    if ((rot >= 0 && rot < Math.PI * 0.25)
-                        || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                        || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+                    if (checkNormalRotate(rot))
                     {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
@@ -4085,9 +4075,7 @@ function DrawingObjects() {
 
                     var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = normalizeRotate(rot);
-                    if ((rot >= 0 && rot < Math.PI * 0.25)
-                        || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                        || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+                    if (checkNormalRotate(rot))
                     {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));

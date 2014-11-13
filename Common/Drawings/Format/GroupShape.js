@@ -1201,7 +1201,7 @@ CGroupShape.prototype =
         var xfrm  = sp.spPr.xfrm;
         var rot = xfrm.rot == null ? 0 : xfrm.rot;
         var xc, yc;
-        if(rot < Math.PI*0.25 || rot>Math.PI*1.75 || (rot>Math.PI*0.75 && rot<Math.PI*1.25))
+        if(checkNormalRotate(rot))
         {
             min_x = xfrm.offX;
             min_y = xfrm.offY;
@@ -1224,7 +1224,7 @@ CGroupShape.prototype =
             xfrm  = sp.spPr.xfrm;
             rot = xfrm.rot == null ? 0 : xfrm.rot;
 
-            if(rot < Math.PI*0.25 || rot>Math.PI*1.75 || (rot>Math.PI*0.75 && rot<Math.PI*1.25))
+            if(checkNormalRotate(rot))
             {
                 cur_min_x = xfrm.offX;
                 cur_min_y = xfrm.offY;

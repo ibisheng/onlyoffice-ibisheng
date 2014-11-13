@@ -43,7 +43,7 @@ CGraphicFrame.prototype =
     setBDeleted: CShape.prototype.setBDeleted,
     getBase64Img: CShape.prototype.getBase64Img,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
-
+    getSlideIndex: CShape.prototype.getSlideIndex,
 
     Is_DrawingShape: function()
     {
@@ -634,10 +634,10 @@ CGraphicFrame.prototype =
             var tx, ty;
             tx = this.invertTransform.TransformPointX(x, y);
             ty = this.invertTransform.TransformPointY(x, y);
+            var bBorder = this.graphicObject.Selection.Type2 === table_Selection_Border;
             this.graphicObject.Selection_SetEnd(tx, ty, 0, e);
-            if(g_mouse_event_type_up === e.Type)
-                editor.WordControl.m_oLogicDocument.Recalculate();
-          //  this.recalculate();
+            //if(g_mouse_event_type_up === e.Type && bBorder)
+            //    editor.WordControl.m_oLogicDocument.Recalculate();  TODO: пересчет вызывается в CTable
         }
     },
 

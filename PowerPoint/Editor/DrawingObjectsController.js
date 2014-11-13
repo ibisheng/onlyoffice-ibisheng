@@ -23,7 +23,6 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
 DrawingObjectsController.prototype.startRecalculate = function()
 {
     editor.WordControl.m_oLogicDocument.Recalculate();
-    this.drawingObjects.showDrawingObjects(true);
     editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 };
 
@@ -135,12 +134,17 @@ DrawingObjectsController.prototype.editChart = function(binary)
 DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pageIndex)
 {
 
-    var comments = this.drawingObjects.slideComments.comments, i;
+    var comments = this.drawingObjects.slideComments.comments, i, index_selected = -1;
+    var ret = {result: null, selectedIndex: -1};
     if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
     {
         editor.asc_hideComments();
         for(i = comments.length - 1; i > -1; --i)
         {
+            if(comments[i].selected)
+            {
+                index_selected = i;
+            }
             comments[i].selected = false;
         }
     }
@@ -154,23 +158,33 @@ DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pag
                 comments[i].selected = true;
                 this.addPreTrackObject(new MoveComment(comments[i]));
                 this.changeCurrentState(new PreMoveCommentState(this, x, y, comments[i]));
-                this.drawingObjects.showDrawingObjects(true);
-                return true;
+                if(i !== index_selected)
+                {
+                    this.drawingObjects.showDrawingObjects(true);
+                }
+                ret.result = true;
+                ret.selectedIndex = index_selected;
+                return ret;
             }
             else
             {
-                return {objectId: comments[i], cursorType: "move"}
+                ret.result = {objectId: comments[i], cursorType: "move"};
+                ret.selectedIndex = index_selected;
+                return ret;
             }
         }
     }
     if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
     {
-        this.drawingObjects.showDrawingObjects(true);
-        return false;
+        ret.result = false;
+        ret.selectedIndex = index_selected;
+        return ret;
     }
     else
     {
-        return null;
+        ret.result = null;
+        ret.selectedIndex = index_selected;
+        return ret;
     }
 
 };

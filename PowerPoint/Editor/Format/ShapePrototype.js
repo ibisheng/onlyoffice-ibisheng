@@ -248,6 +248,14 @@ CShape.prototype.addToRecalculate = function()
 {
     History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: this});
 };
+CShape.prototype.getSlideIndex = function()
+{
+    if(this.parent && isRealNumber(this.parent.num))
+    {
+        return this.parent.num;
+    }
+    return null;
+};
 CShape.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
@@ -519,9 +527,7 @@ CShape.prototype.recalculateContent = function()
             else
             {
                 var _full_rotate = this.getFullRotate();
-                if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                    || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                    || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
+                if(checkNormalRotate(_full_rotate))
                 {
                     if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
                     {
@@ -621,9 +627,7 @@ CShape.prototype.recalculateContent2 = function()
                 else
                 {
                     var _full_rotate = this.getFullRotate();
-                    if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                        || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                        || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
+                    if(checkNormalRotate(_full_rotate))
                     {
                         if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
                         {

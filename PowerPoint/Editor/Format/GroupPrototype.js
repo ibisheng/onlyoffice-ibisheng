@@ -2,6 +2,7 @@
 
 CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CGroupShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
+CGroupShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 
 CGroupShape.prototype.handleUpdateFill = function()
 {

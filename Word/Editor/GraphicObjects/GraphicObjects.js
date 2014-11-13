@@ -1757,9 +1757,7 @@ CGraphicObjects.prototype =
         for(var i = 0; i < arrDrawings.length; ++i)
         {
             var rot = normalizeRotate(isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
-            if ((rot >= 0 && rot < Math.PI * 0.25)
-                || (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-                || (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+            if (checkNormalRotate(rot))
             {
                 l = arrDrawings[i].posX;
                 r = arrDrawings[i].extX + arrDrawings[i].posX;

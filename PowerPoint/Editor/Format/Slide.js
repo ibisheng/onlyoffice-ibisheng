@@ -1131,6 +1131,11 @@ Slide.prototype =
     },
 
 
+    getSlideIndex: function()
+    {
+        return this.num;
+    },
+
 
     getWorksheet: function()
     {

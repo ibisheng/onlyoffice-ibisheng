@@ -151,16 +151,20 @@ NullState.prototype =
 {
     onMouseDown: function(e, x, y, pageIndex, bTextFlag)
     {
-        var start_target_doc_content, end_target_doc_content;
+        var start_target_doc_content, end_target_doc_content, selected_comment_index = -1;
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
         }
         var ret;
         ret = this.drawingObjects.handleSlideComments(e, x, y, pageIndex);
-        if(ret)
+        if(ret )
         {
-            return ret;
+            if(ret.result)
+            {
+                return ret.result;
+            }
+            selected_comment_index = ret.selectedIndex;
         }
         var selection = this.drawingObjects.selection;
         var b_no_handle_selected = false;
@@ -202,10 +206,13 @@ NullState.prototype =
             ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, false);
             if(ret)
             {
-                end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-                if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                    end_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
+                    if((start_target_doc_content || end_target_doc_content) && (start_target_doc_content !== end_target_doc_content))
+                    {
+                        this.drawingObjects.drawingObjects.showDrawingObjects(true);
+                    }
                 }
                 return ret;
             }

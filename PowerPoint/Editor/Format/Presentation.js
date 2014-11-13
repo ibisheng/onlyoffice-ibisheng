@@ -350,23 +350,26 @@ CPresentation.prototype =
             {
                 var Run  = SimpleChanges[0].Class;
                 var Para = Run.Paragraph;
-
                 var Res  = Para.Recalculate_FastRange( SimpleChanges );
                 if ( -1 !== Res )
                 {
-                    this.DrawingDocument.OnRecalculatePage(Res, this.Slides[Res]);
-                    this.DrawingDocument.OnEndRecalculate();
+                    if( this.Slides[this.CurPage])
+                    {
+                        this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                        this.DrawingDocument.OnEndRecalculate();
+                    }
+                    History.Reset_RecalcIndex();
                     return;
                 }
             }
         }
-
         if(this.bClearSearch)
         {
             this.SearchEngine.Clear();
             this.bClearSearch = false;
         }
-        var _RecalcData = RecalcData ? RecalcData : History.Get_RecalcData(), key, recalcMap, bSync = true;
+        var _RecalcData = RecalcData ? RecalcData : History.Get_RecalcData(), key, recalcMap, bSync = true, i, bRedrawAllSlides = false, aToRedrawSlides = [], redrawSlideIndexMap = {}, slideIndex;
+        this.updateSlideIndexes();
         if(_RecalcData.Drawings.All || _RecalcData.Drawings.ThemeInfo)
         {
             recalcMap = this.GetRecalculateMaps();
@@ -394,10 +397,12 @@ CPresentation.prototype =
                 }
                 var oThis = this;
                 bSync = false;
-                redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, _RecalcData.Drawings.ThemeInfo.ArrInd/*TODO:Потенциальный баг. Надо копировать массив*/, startRecalcIndex,  0, oThis.Slides);
+                aToRedrawSlides = [].concat(_RecalcData.Drawings.ThemeInfo.ArrInd);
+                redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, aToRedrawSlides, startRecalcIndex,  0, oThis.Slides);
             }
             else
             {
+                bRedrawAllSlides = true;
                 for(key = 0; key < this.Slides.length; ++key)
                 {
                     this.Slides[key].recalcText();
@@ -412,18 +417,39 @@ CPresentation.prototype =
                 if(_RecalcData.Drawings.Map.hasOwnProperty(key))
                 {
                     _RecalcData.Drawings.Map[key].recalculate();
+                    if(_RecalcData.Drawings.Map[key].getSlideIndex)
+                    {
+                        slideIndex = _RecalcData.Drawings.Map[key].getSlideIndex();
+                        if(slideIndex !== null)
+                        {
+                            if(redrawSlideIndexMap[slideIndex] !== true )
+                            {
+                                redrawSlideIndexMap[slideIndex] = true;
+                                aToRedrawSlides.push(slideIndex);
+                            }
+                        }
+                    }
                 }
             }
         }
         History.Reset_RecalcIndex();
-
-        this.updateSlideIndexes();
         this.RecalculateCurPos();
         if(bSync)
         {
-            for(var i = 0; i < this.Slides.length; ++i)
+            if(bRedrawAllSlides)
             {
-                this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
+                for(i = 0; i < this.Slides.length; ++i)
+                {
+                    this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
+                }
+            }
+            else
+            {
+                aToRedrawSlides.sort(fSortAscending);
+                for(i = 0; i < aToRedrawSlides.length; ++i)
+                {
+                    this.DrawingDocument.OnRecalculatePage(aToRedrawSlides[i], this.Slides[aToRedrawSlides[i]]);
+                }
             }
             this.DrawingDocument.OnEndRecalculate();
         }
@@ -443,7 +469,7 @@ CPresentation.prototype =
         }
         if(this.Slides[this.CurPage])
             this.Slides[this.CurPage].graphicObjects.updateSelectionState();
-        for(var i = 0; i < this.slidesToUnlock.length; ++i)
+        for(i = 0; i < this.slidesToUnlock.length; ++i)
         {
             this.DrawingDocument.UnLockSlide(this.slidesToUnlock[i]);
         }
@@ -925,8 +951,6 @@ CPresentation.prototype =
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
             this.Recalculate();
             this.Document_UpdateInterfaceState();
-            this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-            this.DrawingDocument.OnEndRecalculate();
         }
         else
         {

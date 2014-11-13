@@ -106,9 +106,7 @@ function getRotateAngle(x, y, object)
 function getBoundsInGroup(shape)
 {
     var r = shape.rot;
-    if (!isRealNumber(r) || (r >= 0 && r < Math.PI * 0.25)
-        || (r > 3 * Math.PI * 0.25 && r < 5 * Math.PI * 0.25)
-        || (r > 7 * Math.PI * 0.25 && r < 2 * Math.PI)) {
+    if (!isRealNumber(r) || checkNormalRotate(r)) {
         return { minX: shape.x, minY: shape.y, maxX: shape.x + shape.extX, maxY: shape.y + shape.extY };
     }
     else {
@@ -1179,9 +1177,8 @@ CShape.prototype =
 
 
             var _content_width, content_height2;
-            if ((_full_rotate >= 0 && _full_rotate < Math.PI * 0.25)
-                || (_full_rotate > 3 * Math.PI * 0.25 && _full_rotate < 5 * Math.PI * 0.25)
-                || (_full_rotate > 7 * Math.PI * 0.25 && _full_rotate < 2 * Math.PI)) {
+            if (checkNormalRotate(_full_rotate))
+            {
                 if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
@@ -1535,9 +1532,8 @@ CShape.prototype =
 
 
             var _content_width, content_height2;
-            if ((_full_rotate >= 0 && _full_rotate < Math.PI * 0.25)
-                || (_full_rotate > 3 * Math.PI * 0.25 && _full_rotate < 5 * Math.PI * 0.25)
-                || (_full_rotate > 7 * Math.PI * 0.25 && _full_rotate < 2 * Math.PI)) {
+            if (checkNormalRotate(_full_rotate))
+            {
                 if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;

@@ -488,14 +488,15 @@ CDLbl.prototype =
 
 
             var _content_width, content_height2;
-            if ((_full_rotate >= 0 && _full_rotate < Math.PI * 0.25)
-                || (_full_rotate > 3 * Math.PI * 0.25 && _full_rotate < 5 * Math.PI * 0.25)
-                || (_full_rotate > 7 * Math.PI * 0.25 && _full_rotate < 2 * Math.PI)) {
-                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
+            if (checkNormalRotate(_full_rotate) )
+            {
+                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
-                else {
+                else
+                {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
                 }

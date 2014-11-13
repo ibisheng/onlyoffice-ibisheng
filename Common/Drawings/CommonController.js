@@ -79,8 +79,8 @@ function CheckSpPrXfrm(object)
         object.spPr.xfrm.setExtX(object.extX);
         object.spPr.xfrm.setExtY(object.extY);
     }
-
 }
+
 
 function CheckSpPrXfrm2(object)
 {
@@ -103,6 +103,12 @@ function CheckSpPrXfrm2(object)
 
 }
 
+
+function checkNormalRotate(rot)
+{
+    var _rot = normalizeRotate(rot);
+    return (_rot >= 0 && _rot < Math.PI * 0.25) || (_rot >= 3 * Math.PI * 0.25 && _rot < 5 * Math.PI * 0.25) || (_rot >= 7 * Math.PI * 0.25 && _rot < 2 * Math.PI);
+}
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
@@ -256,11 +262,11 @@ DrawingObjectsController.prototype =
     {
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            return null;
+            return {result: null, selectedIndex: -1};
         }
         else
         {
-            return false;
+            return {result: false, selectedIndex: -1};
         }
     },
 
@@ -4902,7 +4908,7 @@ DrawingObjectsController.prototype =
 
     drawTextSelection: function(num)
     {
-        var content = this.getTargetDocContent();
+        var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
             this.drawingObjects.getDrawingDocument().UpdateTargetTransform(this.getTargetTransform());

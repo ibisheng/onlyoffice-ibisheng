@@ -3083,9 +3083,7 @@
 						offY = 0;
 						rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 						rot = normalizeRotate(rot);
-						if ((rot >= 0 && rot < Math.PI * 0.25)
-							|| (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-							|| (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+						if (checkNormalRotate(rot))
 						{
 							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY))
 							{
@@ -3251,9 +3249,7 @@
 						offY = 0;
 						rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 						rot = normalizeRotate(rot);
-						if ((rot >= 0 && rot < Math.PI * 0.25)
-							|| (rot > 3 * Math.PI * 0.25 && rot < 5 * Math.PI * 0.25)
-							|| (rot > 7 * Math.PI * 0.25 && rot < 2 * Math.PI))
+						if (checkNormalRotate(rot))
 						{
 							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY))
 							{
