@@ -3504,16 +3504,15 @@ drawHBarChart.prototype =
 				if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
 					newStartX = startX - width;
 				
+				paths = this._calculateRect(newStartX, newStartY / this.chartProp.pxToMM, width, individualBarHeight / this.chartProp.pxToMM);
+				
+				if(!this.paths.series)
+					this.paths.series = [];
+				if(!this.paths.series[i])
+					this.paths.series[i] = [];
+
 				if(height != 0)
-				{
-					paths = this._calculateRect(newStartX, newStartY / this.chartProp.pxToMM, width, individualBarHeight / this.chartProp.pxToMM);
-					
-					if(!this.paths.series)
-						this.paths.series = [];
-					if(!this.paths.series[i])
-						this.paths.series[i] = [];
 					this.paths.series[i][idx] = paths;
-				}
 			}
 			
 			if(seria.length)
