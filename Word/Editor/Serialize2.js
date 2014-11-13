@@ -3628,8 +3628,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         var nAnchorIndex = sLink.indexOf("#");
         if(-1 != nAnchorIndex)
         {
+			sAnchor = sLink.substring(nAnchorIndex + 1);
             sLink = sLink.substring(0, nAnchorIndex);
-            sAnchor = sLink.substring(nAnchorIndex + 1);
         }
         //Link
         this.memory.WriteByte(c_oSer_HyperlinkType.Link);
