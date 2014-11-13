@@ -1801,30 +1801,40 @@ CChartSpace.prototype =
         {
             var r1 = this.bbox.seriesBBox.r1, r2 = this.bbox.seriesBBox.r2, c1 = this.bbox.seriesBBox.c1, c2 = this.bbox.seriesBBox.c2;
             ret.bVert = this.bbox.seriesBBox.bVert;
-           //if(this.bbox.seriesBBox.bVert)
-           //{
-           //    ret.bVert = true;
-           //    if(this.bbox.catBBox)
-           //    {
-           //        --r1;
-           //    }
-           //    if(this.bbox.serBBox)
-           //    {
-           //        --c1;
-           //    }
-           //}
-           //else
-           //{
-           //    ret.bVert = false;
-           //    if(this.bbox.catBBox)
-           //    {
-           //        --c1;
-           //    }
-           //    if(this.bbox.serBBox)
-           //    {
-           //        --r1;
-           //    }
-           //}
+           if(this.bbox.seriesBBox.bVert)
+           {
+               if(this.bbox.catBBox)
+               {
+                   if(r1 > 0)
+                   {
+                       --r1;
+                   }
+               }
+               if(this.bbox.serBBox)
+               {
+                   if(c1 > 0)
+                   {
+                       --c1;
+                   }
+               }
+           }
+           else
+           {
+               if(this.bbox.catBBox)
+               {
+                   if(c1 > 0)
+                   {
+                       --c1;
+                   }
+               }
+               if(this.bbox.serBBox)
+               {
+                   if(r1 > 0)
+                   {
+                       --r1;
+                   }
+               }
+           }
             var startCell = new CellAddress(r1, c1, 0);
             var endCell = new CellAddress(r2, c2, 0);
 
