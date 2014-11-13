@@ -4595,6 +4595,12 @@ Cell.prototype.getNumFormatStr=function(){
             return this.xfs.num.f;
 	return g_oDefaultNum.f;
 };
+Cell.prototype.getNumFormat=function(){
+    return oNumFormatCache.get(this.getNumFormatStr());
+};
+Cell.prototype.getNumFormatType=function(){
+    return this.getNumFormat().getType();
+};
 Cell.prototype.moveHor=function(val){
 	//копируем потому что изначально обьект ыбл получен из g_oCellAddressUtils
 	this.oId = new CellAddress(this.oId.getRow0(), this.oId.getCol0(), 0);
