@@ -14711,6 +14711,10 @@ CLineSeries.prototype =
     {
         History.Add(this, {Type: historyitem_LineSeries_SetMarker, oldPr: this.marker, newPr: pr});
         this.marker = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setOrder: function(pr)
     {
@@ -14721,11 +14725,19 @@ CLineSeries.prototype =
     {
         History.Add(this, {Type: historyitem_LineSeries_SetSmooth, oldPr: this.smooth, newPr: pr});
         this.smooth = pr;
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
+        }
     },
     setSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_LineSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
+        if(this.spPr && this.spPr.parent !== this)
+        {
+            this.spPr.setParent(this);
+        }
     },
     setTrendline: function(pr)
     {
@@ -14744,6 +14756,14 @@ CLineSeries.prototype =
         if(this.val && this.val.setParent)
         {
             this.val.setParent(this);
+        }
+    },
+
+    handleUpdateLn: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+        {
+            this.parent.parent.parent.parent.handleUpdateInternalChart();
         }
     },
 
@@ -14789,6 +14809,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetMarker:
             {
                 this.marker = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_LineSeries_SetOrder:
@@ -14799,6 +14823,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetSmooth:
             {
                 this.smooth = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_LineSeries_SetSpPr:
@@ -14866,6 +14894,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetMarker:
             {
                 this.marker = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_LineSeries_SetOrder:
@@ -14876,6 +14908,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetSmooth:
             {
                 this.smooth = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_LineSeries_SetSpPr:
@@ -14981,6 +15017,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetMarker:
             {
                 this.marker = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_LineSeries_SetOrder:
@@ -14991,6 +15031,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetSmooth:
             {
                 this.smooth = readBool(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
+                {
+                    this.parent.parent.parent.parent.handleUpdateInternalChart();
+                }
                 break;
             }
             case historyitem_LineSeries_SetSpPr:
