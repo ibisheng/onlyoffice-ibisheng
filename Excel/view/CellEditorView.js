@@ -411,22 +411,24 @@
 		};
 
 		CellEditor.prototype.enterCellRange = function (rangeStr) {
-			var t = this;
-			var res = t._findRangeUnderCursor();
+			var res = this._findRangeUnderCursor();
 
 			if (res.range) {
-				t._moveCursor(kPosition, res.index);
-				t._selectChars(kPosition, res.index + res.length);
+				this._moveCursor(kPosition, res.index);
+				this._selectChars(kPosition, res.index + res.length);
 			}
 
-			var lastAction = t.undoList.length > 0 ? t.undoList[t.undoList.length - 1] : null;
+			var lastAction = this.undoList.length > 0 ? this.undoList[this.undoList.length - 1] : null;
 
 			while (lastAction && lastAction.isRange) {
-				t.undoList.pop();
-				lastAction = t.undoList.length > 0 ? t.undoList[t.undoList.length - 1] : null;
+				this.undoList.pop();
+				lastAction = this.undoList.length > 0 ? this.undoList[this.undoList.length - 1] : null;
 			}
 
-			t._addChars(rangeStr, undefined, /*isRange*/true);
+			var tmp = this.skipTLUpdate;
+			this.skipTLUpdate = false;
+			this._addChars(rangeStr, undefined, /*isRange*/true);
+			this.skipTLUpdate = tmp;
 		};
 
 		CellEditor.prototype.changeCellRange = function (range) {
