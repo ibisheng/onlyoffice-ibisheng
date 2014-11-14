@@ -723,11 +723,6 @@ CMathContent.prototype =
         oMRun.fillPlaceholders();
         this.addElementToContent(oMRun);
 
-        /*var placeholder = new CMathText(false);
-        //placeholder.relate(this);
-        placeholder.fillPlaceholders();
-
-        this.Content.push( placeholder );*/
     },
     //////////////////////////////////////
     /*recalculateSize: function()
@@ -3299,7 +3294,7 @@ CMathContent.prototype.GetSelectContent = function()
 };
 CMathContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
-    if (true !== this.ParentElement.Is_ContentUse(this))
+    if (!this.bRoot && true !== this.ParentElement.Is_ContentUse(this))
         return false;
 
     if (false === UseContentPos && para_Math_Run === this.Content[this.Content.length - 1].Type)
@@ -3361,7 +3356,7 @@ CMathContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseC
 };
 CMathContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
-    if (true !== this.ParentElement.Is_ContentUse(this))
+    if (!this.bRoot && true !== this.ParentElement.Is_ContentUse(this))
         return false;
 
     if (false === UseContentPos && para_Math_Run === this.Content[0].Type)
@@ -3423,7 +3418,7 @@ CMathContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, Use
 };
 CMathContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
-    if (true !== this.ParentElement.Is_ContentUse(this))
+    if (!this.bRoot && true !== this.ParentElement.Is_ContentUse(this))
         return false;
 
     if (false === UseContentPos && para_Math_Run === this.Content[this.Content.length - 1].Type)
@@ -3509,7 +3504,7 @@ CMathContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth,
 };
 CMathContent.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
-    if (true !== this.ParentElement.Is_ContentUse(this))
+    if (!this.bRoot && true !== this.ParentElement.Is_ContentUse(this))
         return false;
 
     if (false === UseContentPos && para_Math_Run === this.Content[0].Type)
