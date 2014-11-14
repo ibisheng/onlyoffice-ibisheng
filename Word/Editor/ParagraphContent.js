@@ -4133,6 +4133,13 @@ ParaDrawing.prototype =
             }
 
             this.Set_DrawingType( c_oAscWrapStyle2.Inline === Props.WrappingStyle ? drawing_Inline : drawing_Anchor );
+            if(c_oAscWrapStyle2.Inline === Props.WrappingStyle)
+            {
+                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h))
+                {
+                    this.Update_Size(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
+                }
+            }
             if ( c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle )
             {
                 this.Set_WrappingType( WRAPPING_TYPE_NONE );
@@ -4159,11 +4166,35 @@ ParaDrawing.prototype =
         if ( undefined != Props.AllowOverlap )
             this.Set_AllowOverlap( Props.AllowOverlap );
 
+        var bNeedUpdateWH = false, newW = this.W, newH = this.H;
         if ( undefined != Props.PositionH )
+        {
             this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ) );
-
+            if(Props.PositionH.UseAlign)
+            {
+                bNeedUpdateWH = true;
+                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w))
+                {
+                    newW = this.GraphicObj.bounds.w;
+                }
+            }
+        }
         if ( undefined != Props.PositionV )
+        {
             this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ) );
+            if(this.PositionV.UseAlign)
+            {
+                bNeedUpdateWH = true;
+                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.h))
+                {
+                    newH = this.GraphicObj.bounds.h;
+                }
+            }
+        }
+        if(bNeedUpdateWH)
+        {
+            this.Update_Size(newW, newH);
+        }
     },
 
     Draw : function( X, Y, pGraphics, pageIndex, align)
@@ -4440,11 +4471,14 @@ ParaDrawing.prototype =
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex, this.DocumentContent && this.DocumentContent.Is_HdrFtr());
-        var _x = this.PositionH.Align ? x - this.GraphicObj.bounds.x : x;
-        var _y = this.PositionV.Align ? y - this.GraphicObj.bounds.y : y;
+        var bInline = this.Is_Inline();
+        var _x = (this.PositionH.Align || bInline) ? x - this.GraphicObj.bounds.x : x;
+        var _y = (this.PositionV.Align || bInline) ? y - this.GraphicObj.bounds.y : y;
+
         this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
         this.selectX = x;
         this.selectY = y;
+
 
         if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.GraphicObj.posX) && isRealNumber(this.GraphicObj.posY)) ||
             !(Math.abs(this.GraphicObj.posX-_x) < MOVE_DELTA && Math.abs(this.GraphicObj.posY-_y) < MOVE_DELTA))
