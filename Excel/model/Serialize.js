@@ -6521,7 +6521,7 @@
         var sMinorFont = null;
         if(null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme && null != wb.theme.themeElements.fontScheme.minorFont)
             sMinorFont = wb.theme.themeElements.fontScheme.minorFont.latin;
-        var sDefFont = "Calibri";
+        var sDefFont = "Arial";
         if(null != sMinorFont && "" != sMinorFont)
             sDefFont = sMinorFont;
         g_oDefaultFont = g_oDefaultFontAbs = new Font({

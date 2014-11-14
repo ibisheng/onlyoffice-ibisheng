@@ -1656,7 +1656,6 @@ Workbook.prototype.getUniqueSheetNameFrom=function(name, bCopy){
 };
 Workbook.prototype._generateFontMap=function(){
 	var oFontMap = {
-		"Calibri"	: 1,
 		"Arial"		: 1
 	};
 
