@@ -1784,6 +1784,9 @@ function CDrawingDocument()
 
     this.MathMenuLoad = false;
 
+    this.UpdateRulerStateFlag = false;
+    this.UpdateRulerStateParams = [];
+
     // массивы ректов для поиска
     this._search_HdrFtr_All          = []; // Поиск в колонтитуле, который находится на всех страницах
     this._search_HdrFtr_All_no_First = []; // Поиск в колонтитуле, который находится на всех страницах, кроме первой
@@ -4213,8 +4216,58 @@ function CDrawingDocument()
         this.m_oWordControl.OnUpdateOverlay();
     }
 
+    this.Set_RulerState_Start = function()
+    {
+        this.UpdateRulerStateFlag = true;
+    }
+    this.Set_RulerState_End = function()
+    {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateFlag = false;
+            if (this.UpdateRulerStateParams.length > 0)
+            {
+                switch (this.UpdateRulerStateParams[0])
+                {
+                    case 0:
+                    {
+                        this.Set_RulerState_Table(this.UpdateRulerStateParams[1],
+                            this.UpdateRulerStateParams[2]);
+                        break;
+                    }
+                    case 1:
+                    {
+                        this.Set_RulerState_Paragraph(this.UpdateRulerStateParams[1],
+                            this.UpdateRulerStateParams[2]);
+                        break;
+                    }
+                    case 2:
+                    {
+                        this.Set_RulerState_HdrFtr(this.UpdateRulerStateParams[1],
+                            this.UpdateRulerStateParams[2],
+                            this.UpdateRulerStateParams[3]);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                this.UpdateRulerStateParams = [];
+            }
+        }
+    }
+
     this.Set_RulerState_Table = function(markup, transform)
     {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(0);
+            this.UpdateRulerStateParams.push(markup);
+            this.UpdateRulerStateParams.push(transform);
+            return;
+        }
+
         this.FrameRect.IsActive = false;
 
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
@@ -4263,6 +4316,15 @@ function CDrawingDocument()
 
     this.Set_RulerState_Paragraph = function(margins, isCanTrackMargins)
     {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(1);
+            this.UpdateRulerStateParams.push(margins);
+            this.UpdateRulerStateParams.push(isCanTrackMargins);
+            return;
+        }
+
         if (margins && margins.Frame !== undefined)
         {
             var bIsUpdate = false;
@@ -4397,6 +4459,16 @@ function CDrawingDocument()
 
     this.Set_RulerState_HdrFtr = function(bHeader, Y0, Y1)
     {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(2);
+            this.UpdateRulerStateParams.push(bHeader);
+            this.UpdateRulerStateParams.push(Y0);
+            this.UpdateRulerStateParams.push(Y1);
+            return;
+        }
+
         this.FrameRect.IsActive = false;
 
         var hor_ruler = this.m_oWordControl.m_oHorRuler;

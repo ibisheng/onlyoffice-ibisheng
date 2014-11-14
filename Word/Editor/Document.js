@@ -11677,17 +11677,19 @@ CDocument.prototype =
         if ( true === CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
+        this.DrawingDocument.Set_RulerState_Start();
+
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            return this.HdrFtr.Document_UpdateRulersState(this.CurPage);
+            this.HdrFtr.Document_UpdateRulersState(this.CurPage);
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             // Вызываем данную функцию, чтобы убрать рамку буквицы
             this.DrawingDocument.Set_RulerState_Paragraph( null );
             this.Document_UpdateRulersStateBySection(this.CurPos.ContentPos);
-            return this.DrawingObjects.documentUpdateRulersState();
+            this.DrawingObjects.documentUpdateRulersState();
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
@@ -11745,6 +11747,8 @@ CDocument.prototype =
                     Item.Document_UpdateRulersState();
             }
         }
+
+        this.DrawingDocument.Set_RulerState_End();
     },
     Document_UpdateRulersStateBySection : function(Pos)
     {
