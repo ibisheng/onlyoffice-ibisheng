@@ -2263,9 +2263,10 @@ CGraphics.prototype =
     // smart methods for horizontal / vertical lines
     drawHorLine : function(align, y, x, r, penW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
-            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            if (_check_transform)
             {
                 this.SetIntegerGrid(true);
                 this.drawHorLine(align, y, x, r, penW);
@@ -2344,9 +2345,10 @@ CGraphics.prototype =
     },
     drawHorLine2 : function(align, y, x, r, penW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
-            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            if (_check_transform)
             {
                 this.SetIntegerGrid(true);
                 this.drawHorLine2(align, y, x, r, penW);
@@ -2420,9 +2422,10 @@ CGraphics.prototype =
     },
     drawVerLine : function(align, x, y, b, penW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
-            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            if (_check_transform)
             {
                 this.SetIntegerGrid(true);
                 this.drawVerLine(align, x, y, b, penW);
@@ -2500,9 +2503,10 @@ CGraphics.prototype =
     // мега крутые функции для таблиц
     drawHorLineExt : function(align, y, x, r, penW, leftMW, rightMW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
-            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            if (_check_transform)
             {
                 this.SetIntegerGrid(true);
                 this.drawHorLineExt(align, y, x, r, penW, leftMW, rightMW);
