@@ -2063,13 +2063,14 @@ CMathContent.prototype =
 };
 CMathContent.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
 CMathContent.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
-CMathContent.prototype.Set_ParaMath = function(ParaMath)
+CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
 {
+    this.Parent   = Parent;
     this.ParaMath = ParaMath;
 
     for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
     {
-        this.Content[Index].Set_ParaMath(ParaMath);
+        this.Content[Index].Set_ParaMath(ParaMath, this);
     }
 };
 CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)

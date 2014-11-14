@@ -356,9 +356,6 @@ CMathBase.prototype =
         if(this.bInside == false)
             GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
 
-        for(var Pos = 0; Pos < this.Content.length; Pos++)
-            this.Content[Pos].SetParent(this, ParaMath);
-
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
                     this.elements[i][j].PreRecalc(this, ParaMath, ArgSize, RPI);
@@ -405,11 +402,6 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
-    },
-    SetParent: function(Parent, ParaMath)
-    {
-        this.Parent = Parent;
-        this.ParaMath = ParaMath;
     },
     Set_CompiledCtrPrp: function(Parent, ParaMath)
     {
