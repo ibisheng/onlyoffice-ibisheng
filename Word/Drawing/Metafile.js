@@ -1303,17 +1303,29 @@ CMetafile.prototype =
     },
 	FillTextCode : function(x,y,code)
     {
-        if (code < 0xFFFF)
-            return this.FillText(x, y, String.fromCharCode(code));
-
         var _font = this.m_oLastFont;
+        if (!_font)
+            return;
+
+        var _index = _font.SetUpIndex;
+        if (_index < 0)
+            _index = g_map_font_index[_font.Name];
+
+        var _font_info = window.g_font_infos[_index];
+        if (!_font_info)
+            return;
+
+        var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
+
+        if (code < 0xFFFF && _is_face_index_no_0)
+            return this.FillText(x, y, String.fromCharCode(code));
 
         var _old_pos = this.Memory.pos;
 
-        window.g_font_infos[_font.SetUpIndex].LoadFont(window.g_font_loader,
+        window.g_font_infos[_index].LoadFont(window.g_font_loader,
             g_oTextMeasurer.m_oManager,
             _font.SetUpSize,
-            _font.SetUpStyle, 72, 72);
+            Math.max(_font.SetUpStyle, 0), 72, 72);
 
         g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
 
@@ -1526,6 +1538,10 @@ CMetafile.prototype =
             Bold     : _lastFont.Bold,
             Italic   : _lastFont.Italic
         };
+
+        this.m_oLastFont.SetUpIndex = this.m_oFont.FontFamily.Index;
+        this.m_oLastFont.SetUpSize = this.m_oFont.FontSize;
+        this.m_oLastFont.SetUpStyle = style;
     }
 };
 
