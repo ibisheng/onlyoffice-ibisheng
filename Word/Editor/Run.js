@@ -8072,7 +8072,10 @@ ParaRun.prototype.GetMathTextPrForMenu = function()
 
     var MathTextPr = this.MathPrp.Copy();
 
-    TextPr.Set_FromObject(MathTextPr.GetBoldItalic());
+
+    TextPr.Italic = MathTextPr.Italic;
+    TextPr.Bold   = MathTextPr.Bold;
+    //TextPr.Set_FromObject(MathTextPr.GetBoldItalic());
 
     return TextPr;
 }
