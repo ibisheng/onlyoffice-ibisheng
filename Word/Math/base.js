@@ -160,9 +160,19 @@ CMathBase.prototype =
     // если первый элемент - мат объект, то берутся его CtrPrp
     GetTPrpToControlLetter: function()
     {
-        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
+        var TextPrControlLetter;
 
-        return this.TextPrControlLetter;
+        if(this.bInside)
+        {
+            TextPrControlLetter = this.Parent.GetTPrpToControlLetter();
+        }
+        else
+        {
+            this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
+            TextPrControlLetter = this.TextPrControlLetter;
+        }
+
+        return TextPrControlLetter;
     },
     fillPlaceholders: function()
     {

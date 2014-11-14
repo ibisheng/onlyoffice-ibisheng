@@ -8083,7 +8083,6 @@ ParaRun.prototype.GetMathTextPrForMenu = function()
 
     TextPr.Italic = BI.Italic;
     TextPr.Bold   = BI.Bold;
-    //TextPr.Set_FromObject(MathTextPr.GetBoldItalic());
 
     return TextPr;
 }
