@@ -22802,6 +22802,55 @@ CTrendLine.prototype =
         this.trendlineType = pr;
     },
 
+    createDuplicate: function()
+    {
+        var c = new CTrendLine();
+
+        if(isRealNumber(this.backward))
+        {
+            c.setBackward(this.backward);
+        }
+        if(isRealBool(this.dispEq))
+        {
+            c.setDispEq(this.dispEq);
+        }
+        if(isRealBool(this.dispRSqr))
+        {
+            c.setDispRSqr(this.dispRSqr);
+        }
+        if(isRealNumber(this.forward))
+        {
+            c.setForward(this.forward);
+        }
+        if(isRealNumber(this.intercept))
+        {
+            c.setIntercept(this.intercept);
+        }
+        if(typeof this.name === "string")
+        {
+            c.setName(this.name);
+        }
+        if(isRealNumber(this.order))
+        {
+            c.setOrder(this.order);
+        }
+        if(isRealNumber(this.period))
+        {
+            c.setPeriod(this.period);
+        }
+        if(isRealObject(this.spPr))
+        {
+            c.setSpPr(this.spPr.createDuplicate());
+        }
+        //this.trendlineLbl   = null;
+
+        if(isRealNumber(this.trendlineType))
+        {
+            c.setTrendlineType(this.trendlineType);
+        }
+        return c;
+    },
+
     Undo: function(data)
     {
         switch (data.Type)
