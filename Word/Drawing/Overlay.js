@@ -2383,6 +2383,8 @@ CAutoshapeTrack.prototype =
             }
         }
 
+        overlay.SetBaseTransform();
+
         if (bIsIdentMatr)
         {
             var __x = (xDst + dKoefX * x) >> 0;
