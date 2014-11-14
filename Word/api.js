@@ -7798,6 +7798,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
     this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
 	CollaborativeEditing.Apply_OtherChanges();
+    this.WordControl.m_oLogicDocument.DrawingObjects.zIndexManager.recalculate();
 };
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
@@ -7861,6 +7862,8 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
         CollaborativeEditing.Check_MergeData();
 
         CollaborativeEditing.OnEnd_ReadForeignChanges();
+
+        this.WordControl.m_oLogicDocument.DrawingObjects.zIndexManager.recalculate();
     }
 
     g_oIdCounter.Set_Load( false );
