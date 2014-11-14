@@ -87,8 +87,24 @@ CTableMarkup.prototype =
         {
             this.Rows[i].Y -= this.TransformY;
         }
+    },
+
+    Get_X : function()
+    {
+        return this.X;
+    },
+
+    Get_Y : function()
+    {
+        var _Y = 0;
+        if (this.Rows.length > 0)
+        {
+            _Y = this.Rows[0].Y;
+        }
+        return _Y;
     }
 };
+
 function CTableOutline(Table, PageNum, X, Y, W, H)
 {
     this.Table = Table;
@@ -2218,17 +2234,31 @@ function CDrawingDocument()
         this.m_oWordControl.OnUpdateOverlay();
     }
 
-    this.Set_RulerState_Table = function(markup)
+    this.Set_RulerState_Table = function(markup, transform)
     {
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
         var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
         hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_TABLE;
-        hor_ruler.m_oTableMarkup = markup;//markup.CreateDublicate(); // один дубликат уже делается выше
+        hor_ruler.m_oTableMarkup = markup.CreateDublicate();
         hor_ruler.CalculateMargins();
 
         ver_ruler.CurrentObjectType = RULER_OBJECT_TYPE_TABLE;
         ver_ruler.m_oTableMarkup = markup.CreateDublicate();
+
+        if (transform)
+        {
+            hor_ruler.m_oTableMarkup.TransformX = transform.tx;
+            hor_ruler.m_oTableMarkup.TransformY = transform.ty;
+
+            ver_ruler.m_oTableMarkup.TransformX = transform.tx;
+            ver_ruler.m_oTableMarkup.TransformY = transform.ty;
+
+            hor_ruler.m_oTableMarkup.CorrectFrom();
+            ver_ruler.m_oTableMarkup.CorrectFrom();
+        }
+
+        hor_ruler.CalculateMargins();
 
         if (0 <= this.SlideCurrent && this.SlideCurrent < this.SlidesCount)
         {
@@ -2352,6 +2382,10 @@ function CDrawingDocument()
         if (false === isCols)
         {
             var markup = this.m_oWordControl.m_oVerRuler.m_oTableMarkup;
+            if (markup == null)
+                return;
+
+            position += markup.TransformY;
             if (0 == index)
             {
                 var delta = position - markup.Rows[0].Y;
@@ -2380,6 +2414,10 @@ function CDrawingDocument()
         else
         {
             var markup = this.m_oWordControl.m_oHorRuler.m_oTableMarkup;
+            if (markup == null)
+                return;
+
+            position += markup.TransformX;
 
             if (0 == index)
             {
