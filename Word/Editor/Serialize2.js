@@ -2103,7 +2103,11 @@ function Binary_oMathWriter(memory, oMathPara)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
-		this.memory.WriteString2(convertUnicodeToUTF16([Chr]));
+
+        if (OPERATOR_EMPTY === Chr)
+            this.memory.WriteString2("");
+        else
+		    this.memory.WriteString2(convertUnicodeToUTF16([Chr]));
 	}
 	this.WriteCount = function(Count)
 	{

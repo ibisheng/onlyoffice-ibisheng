@@ -590,7 +590,7 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     var StartPos = this.Content.length;
     this.Content = this.Content.concat( NewItems );
 
-    History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems } );
+    History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems, Color : false } );
 
     // Отмечаем, что надо перемерить элементы в данном ране
     this.RecalcInfo.Measure = true;
@@ -6389,6 +6389,7 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
     {
         case historyitem_ParaRun_AddItem:
         {
+            // Bool     : Подсвечивать ли данные изменения
             // Long     : Количество элементов
             // Array of :
             //  {
@@ -6398,6 +6399,11 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
 
             var bArray = Data.UseArray;
             var Count  = Data.Items.length;
+
+            if (false === Data.Color)
+                Writer.WriteBool(false);
+            else
+                Writer.WriteBool(true);
 
             Writer.WriteLong( Count );
 
@@ -6787,6 +6793,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
     {
         case historyitem_ParaRun_AddItem :
         {
+            // Bool     : Подсвечивать ли данные изменения
             // Long     : Количество элементов
             // Array of :
             //  {
@@ -6794,6 +6801,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             //    Variable : Id Элемента
             //  }
 
+            var bColorChanges = Reader.GetBool();
             var Count = Reader.GetLong();
 
             for ( var Index = 0; Index < Count; Index++ )
@@ -6803,7 +6811,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
                 if ( null != Element )
                 {
-                    if (null !== Color)
+                    if (true === bColorChanges && null !== Color)
                     {
                         this.CollaborativeMarks.Update_OnAdd( Pos );
                         this.CollaborativeMarks.Add( Pos, Pos + 1, Color );

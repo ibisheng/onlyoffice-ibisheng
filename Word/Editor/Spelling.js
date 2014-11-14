@@ -15,6 +15,12 @@
 var DOCUMENT_SPELLING_MAX_PARAGRAPHS = 50;  // максимальное количество параграфов, которые мы проверяем в таймере
 var DOCUMENT_SPELLING_MAX_ERRORS     = 2000; // максимальное количество ошибок, которые отрисовываются
 
+var DOCUMENT_SPELLING_EXCEPTIONAL_WORDS =
+{
+    "Teamlab" : true,  "teamlab" : true, "OnlyOffice" : true, "ONLYOFFICE" : true, "API" : true
+};
+
+
 function CDocumentSpelling()
 {
     this.Use          = true; 
@@ -26,10 +32,9 @@ function CDocumentSpelling()
     
     this.WaitingParagraphs      = {}; // Параграфы, которые ждут ответа от сервера
     this.WaitingParagraphsCount = 0; 
-    
-    // Добавим в список исключений слово Teamlab
-    this.Words["Teamlab"] = true;
-    this.Words["teamlab"] = true;
+
+    // Заполним начальный список исключений
+    this.Words = DOCUMENT_SPELLING_EXCEPTIONAL_WORDS;
 }
 
 CDocumentSpelling.prototype =

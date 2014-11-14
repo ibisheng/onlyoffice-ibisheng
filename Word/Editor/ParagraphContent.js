@@ -349,7 +349,7 @@ ParaSpace.prototype =
 
         Context.SetFontSlot( fontslot_ASCII, this.Get_FontKoef() );
 
-        var Temp = Context.Measure(" ");
+        var Temp = Context.MeasureCode(0x20);
 
         var ResultWidth = (Math.max((Temp.Width + TextPr.Spacing), 0) * 16384) | 0;
         this.Width      = ResultWidth;
