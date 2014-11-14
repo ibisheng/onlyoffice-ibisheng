@@ -18940,6 +18940,10 @@ CTable.prototype =
                 transform = cur_doc_content.Parent.transformText;
             }
         }
+        else if(cur_doc_content.getObjectType && cur_doc_content.getObjectType() === historyitem_type_GraphicFrame)
+        {
+            transform = cur_doc_content.transform;
+        }
         this.DrawingDocument.Set_RulerState_Table( this.Markup, transform );
     },
 

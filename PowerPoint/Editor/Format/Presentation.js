@@ -2695,7 +2695,6 @@ CPresentation.prototype =
                 this.DrawingDocument.CheckTableStyles();
             }, this, []);
         }
-
     },
 
     // Обновляем линейки
@@ -2703,10 +2702,14 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
-            var target_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+            var target_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(undefined, true);
             if(target_content && target_content.Parent && target_content.Parent.getObjectType && target_content.Parent.getObjectType() === historyitem_type_TextBody)
             {
                 return this.DrawingDocument.Set_RulerState_Paragraph( null , target_content.Parent.getMargins());
+            }
+            else if(target_content instanceof CTable)
+            {
+                return target_content.Document_UpdateRulersState(this.CurPage);
             }
         }
         this.DrawingDocument.Set_RulerState_Paragraph(null);
