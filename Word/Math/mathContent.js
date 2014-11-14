@@ -629,6 +629,27 @@ CMPrp.prototype =
             this.sty = STY_PLAIN;
         else
             this.sty = undefined;
+    },
+    GetBoldItalic: function()
+    {
+        var Object =
+        {
+            Italic: undefined,
+            Bold:   undefined
+        };
+
+        if(this.sty == STY_BI)
+        {
+            Object.Bold   = true;
+
+        }
+        else if(this.sty == STY_BOLD)
+        {
+            Object.Bold   = true;
+            Object.Italic = false;
+        }
+
+        return Object;
     }
 }
 
@@ -1379,13 +1400,13 @@ CMathContent.prototype =
 
         return TextPr;
     },
-    GetMathTextPr: function(ContentPos, Depth)
+    GetMathTextPrForMenu: function(ContentPos, Depth)
     {
         var pos = ContentPos.Get(Depth);
 
-        return this.Content[pos].GetMathTextPr(ContentPos, Depth + 1);
+        return this.Content[pos].GetMathTextPrForMenu(ContentPos, Depth + 1);
     },
-    Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll)
+    Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll, PosForMenu)
     {
         if ( true === ApplyToAll )
         {
@@ -1394,8 +1415,20 @@ CMathContent.prototype =
         }
         else
         {
-            var StartPos = this.Selection.Start;
-            var EndPos   = this.Selection.End;
+            var StartPos, EndPos, bMenu = false;
+
+            if(PosForMenu !== undefined)
+            {
+                StartPos = PosForMenu.StartPos;
+                EndPos   = PosForMenu.EndPos;
+
+                bMenu = true;
+            }
+            else
+            {
+                StartPos = this.Selection.Start;
+                EndPos   = this.Selection.End;
+            }
 
             var NewRuns;
             var LRun, CRun, RRun;
@@ -1407,7 +1440,7 @@ CMathContent.prototype =
             if(FirstPos == 0)
                 this.ParaMath.NeedCompiledCtrPr();
 
-            if( !this.Selection.Use || (bSelectOneElement && this.Content[StartPos].Type == para_Math_Run) ) // TextPr меняем только в одном Run
+            if( ( !this.Selection.Use && !bMenu ) || (bSelectOneElement && this.Content[StartPos].Type == para_Math_Run) ) // TextPr меняем только в одном Run
             {
                 var Pos = !this.Selection.Use ? this.CurPos :  StartPos;
 

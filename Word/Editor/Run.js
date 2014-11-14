@@ -8061,7 +8061,7 @@ ParaRun.prototype.Math_GetInfoLetter = function(Info)
     else
         Info.Result = false;
 }
-ParaRun.prototype.GetMathTextPr = function()
+ParaRun.prototype.GetMathTextPrForMenu = function()
 {
     var TextPr = new CTextPr();
 
@@ -8070,7 +8070,11 @@ ParaRun.prototype.GetMathTextPr = function()
 
     TextPr.Merge(this.Pr);
 
-    return {TextPr: TextPr, MathPr: this.MathPrp.Copy()};
+    var MathTextPr = this.MathPrp.Copy();
+
+    TextPr.Set_FromObject(MathTextPr.GetBoldItalic());
+
+    return TextPr;
 }
 ParaRun.prototype.ApplyPoints = function(PointsInfo)
 {

@@ -198,7 +198,7 @@ ParaMath.prototype.Add = function(Item)
         else
             this.Get_ParaContentPos(false, false, ContentPos);
 
-        var MathTxtPr = this.Root.GetMathTextPr(ContentPos, 0);
+        var TextPr = this.Root.GetMathTextPrForMenu(ContentPos, 0);
 
         // Нам нужно разделить данный Run на 2 части
         var RightRun = Run.Split2(Run.State.ContentPos);
@@ -212,7 +212,14 @@ ParaMath.prototype.Add = function(Item)
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
 
         var lng2 = oContent.Content.length;
-        oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
+        var Pos_ApplyTextPr =
+        {
+            StartPos:   StartPos + 1,
+            EndPos:     lng2 - lng
+        };
+
+        oContent.Apply_TextPr(TextPr, undefined, false, Pos_ApplyTextPr);
+        //oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
     }
 
     if ((para_Text === Type || para_Space === Type) && null !== NewElement)

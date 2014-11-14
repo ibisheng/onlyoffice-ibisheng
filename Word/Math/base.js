@@ -693,20 +693,20 @@ CMathBase.prototype =
             }
         }
 
-        for(var i=0; i < this.nRow; i++)
+
+        // если у нас вложенный мат объект, то CtrPrp возьмутся у родительского класса
+
+        for(var i = 0 ; i < this.Content.length; i++)
         {
-            for(var j = 0; j < this.nCol; j++)
-            {
-                if(!this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-            }
+            this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
         }
+
     },
-    GetMathTextPr: function(ContentPos, Depth)
+    GetMathTextPrForMenu: function(ContentPos, Depth)
     {
         var pos = ContentPos.Get(Depth);
 
-        return this.Content[pos].GetMathTextPr(ContentPos, Depth+1);
+        return this.Content[pos].GetMathTextPrForMenu(ContentPos, Depth+1);
     },
     Set_MathTextPr2: function(TextPr, MathPr, bAll)
     {
