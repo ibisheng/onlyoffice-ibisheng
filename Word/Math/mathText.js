@@ -30,12 +30,6 @@ CMathSize.prototype.SetZero = function()
     this.ascent = 0;
 }
 
-function CMathRecalcTextInfo()
-{
-    this.StyleCode =   null;
-    this.bAccentIJ =  false;
-}
-
 function CMathText(bJDraw)
 {
     // для Para_Run
@@ -549,19 +543,7 @@ CMathText.prototype =
          height = g_oTextMeasurer.GetHeight();
         */
 
-        /*if(!this.bJDraw)
-            this.Parent = Parent;
-        else
-            this.Parent = null;*/
-
         var letter = this.getCode();
-
-        /*if(this.bJDraw)
-            letter = this.code;
-        else if(RPI.UpdateMathPr || Math_NeedResize == false || this.RecalcInfo.NewLetter == true)
-            letter = this.getCode();
-        else
-            letter = this.RecalcInfo.StyleCode;*/
 
         var bAccentIJ = this.bJDraw ? false : this.Parent.IsAccent();
         bAccentIJ = bAccentIJ && (this.value == 0x69 || this.value == 0x6A);
@@ -601,7 +583,6 @@ CMathText.prototype =
         this.size.height = height;
         this.size.ascent = ascent;
 
-        //this.RecalcInfo.NewLetter = false;
     },
     PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {

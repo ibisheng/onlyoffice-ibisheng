@@ -393,8 +393,10 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
 }
-CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics)
+CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics, PDSE)
 {
+    this.Parent.Make_ShdColor(PDSE);
+
     this.draw(x, y, pGraphics);
 }
 CGlyphOperator.prototype.getCtrPrp = function()
@@ -2938,6 +2940,8 @@ COperator.prototype.draw = function(x, y, pGraphics, PDSE)
     {
         // выставляем font, если нужно отрисовать текст
         //pGraphics.b_color1(0,0,0,255);
+
+        this.Make_ShdColor(PDSE);
 
         var ctrPrp =  this.GetTPrpToControlLetter();
 
