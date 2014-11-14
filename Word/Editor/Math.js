@@ -31,6 +31,7 @@ function ParaMath()
 
     this.Root       = new CMathContent();
     this.Root.bRoot = true;
+    this.Root.ParentElement = this;
 
     this.X          = 0;
     this.Y          = 0;
@@ -1943,6 +1944,18 @@ ParaMath.prototype.Document_UpdateInterfaceState = function()
     }
 
     editor.sync_MathPropCallback(MathProps);
+};
+
+/**
+ * Проверяем используется ли заданный MathContent на текущем уровне формулы
+ * @param MathContent
+ */
+ParaMath.prototype.Is_ContentUse  = function(MathContent)
+{
+    if (this.Root === MathContent)
+        return true;
+
+    return false;
 };
 
 //----------------------------------------------------------------------------------------------------------------------

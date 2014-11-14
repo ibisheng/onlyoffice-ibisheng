@@ -444,6 +444,19 @@ CNary.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Type = c_oAscMathInterfaceType.LargeOperator;
     MathProps.Pr   = null;
 };
+CNary.prototype.Is_ContentUse = function(MathContent)
+{
+    if (MathContent === this.getBaseMathContent())
+        return true;
+
+    if (true !== this.Pr.subHide && MathContent === this.getSubMathContent())
+        return true;
+
+    if (true !== this.Pr.supHide && MathContent === this.getSupMathContent())
+        return true;
+
+    return false;
+};
 
 
 function CNaryUnd(bInside)

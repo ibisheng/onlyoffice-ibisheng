@@ -656,3 +656,14 @@ CRadical.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Type = c_oAscMathInterfaceType.Radical;
     MathProps.Pr   = null;
 };
+CRadical.prototype.Is_ContentUse = function(MathContent)
+{
+    if (MathContent === this.Content[1])
+        return true;
+
+    if(DEGREE_RADICAL === this.Pr.type && MathContent === this.Content[0])
+        return true;
+
+    return false;
+};
+

@@ -1349,6 +1349,17 @@ CMathBase.prototype.Document_UpdateInterfaceState = function(MathProps)
 {
 };
 
+CMathBase.prototype.Is_ContentUse = function(MathContent)
+{
+    for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
+    {
+        if (MathContent === this.Content[Pos])
+            return true;
+    }
+
+    return false;
+};
+
 function CMathBasePr()
 {
 };

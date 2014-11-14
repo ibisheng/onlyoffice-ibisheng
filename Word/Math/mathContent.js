@@ -3298,6 +3298,9 @@ CMathContent.prototype.GetSelectContent = function()
 };
 CMathContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
+    if (true !== this.ParentElement.Is_ContentUse(this))
+        return false;
+
     if (false === UseContentPos && para_Math_Run === this.Content[this.Content.length - 1].Type)
     {
         // При переходе в новый контент встаем в его конец
@@ -3357,6 +3360,9 @@ CMathContent.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseC
 };
 CMathContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
+    if (true !== this.ParentElement.Is_ContentUse(this))
+        return false;
+
     if (false === UseContentPos && para_Math_Run === this.Content[0].Type)
     {
         // При переходе в новый контент встаем в его начало
@@ -3416,6 +3422,9 @@ CMathContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, Use
 };
 CMathContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
+    if (true !== this.ParentElement.Is_ContentUse(this))
+        return false;
+
     if (false === UseContentPos && para_Math_Run === this.Content[this.Content.length - 1].Type)
     {
         // При переходе в новый контент встаем в его конец
@@ -3499,6 +3508,9 @@ CMathContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth,
 };
 CMathContent.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
+    if (true !== this.ParentElement.Is_ContentUse(this))
+        return false;
+
     if (false === UseContentPos && para_Math_Run === this.Content[0].Type)
     {
         // При переходе в новый контент встаем в его начало
@@ -3872,6 +3884,11 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
             break;
     }
 
+    if (null == AutoCorrectEngine.TextPr)
+        AutoCorrectEngine.TextPr = new CTextPr();
+    if (null == AutoCorrectEngine.MathPr)
+        AutoCorrectEngine.MathPr = new CMPrp();
+
     // Создаем новую точку здесь, потому что если автозамену можно будет сделать классы сразу будут создаваться
     History.Create_NewPoint();
 
@@ -4014,6 +4031,8 @@ CMathContent.prototype.private_CanAutoCorrectText = function(AutoCorrectionEngin
     if (RemoveCount > 0)
     {
         var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+        MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
+        MathRun.Set_MathPr(AutoCorrectionEngine.MathPr.Copy());
 
         for (var Index = 0, Count = ReplaceChars.length; Index < Count; Index++)
         {
@@ -4144,13 +4163,15 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 	{
 		if (TempElements2.length > 0)
 		{
-			var Fraction = new CFraction(new CMathFractionPr());
+            var props = new CMathFractionPr();
+            props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
+			var Fraction = new CFraction(props);
 
 			var DenMathContent = Fraction.Content[0];
 			var NumMathContent = Fraction.Content[1];
 
-			this.PackTextToContent(DenMathContent, TempElements2);
-			this.PackTextToContent(NumMathContent, TempElements);	
+			this.PackTextToContent(DenMathContent, TempElements2, AutoCorrectionEngine);
+			this.PackTextToContent(NumMathContent, TempElements, AutoCorrectionEngine);
 
 			AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
 			AutoCorrectionEngine.ReplaceContent.push(Fraction);
@@ -4163,14 +4184,15 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		//if (TempElements2.length > 0)
 		//{
 			var props = new CMathDegreePr();
+            props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
 			props.type = AutoCorrectionEngine.Kind;
 			var oDegree = new CDegree(props)
 
 			var BaseContent = oDegree.Content[0];
 			var IterContent = oDegree.Content[1];
 
-			this.PackTextToContent(BaseContent, TempElements2);	
-			this.PackTextToContent(IterContent, TempElements);			
+			this.PackTextToContent(BaseContent, TempElements2, AutoCorrectionEngine);
+			this.PackTextToContent(IterContent, TempElements, AutoCorrectionEngine);
 
 			AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
 			AutoCorrectionEngine.ReplaceContent.push(oDegree);
@@ -4183,6 +4205,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		if (TempElements2.length > 0 || TempElements3.length > 0)
 		{
 			var props = new CMathDegreePr();
+            props.ctrPrp = AutoCorrectionEngine.TextPr.Copy();
 			props.type = AutoCorrectionEngine.Kind;
 			var oDegree = new CDegreeSubSup(props)
 
@@ -4192,16 +4215,16 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 			
 			if (TempElements.Type == DEGREE_SUPERSCRIPT)
 			{
-				this.PackTextToContent(IterUpContent, TempElements2);
-				this.PackTextToContent(IterDnContent, TempElements);
+				this.PackTextToContent(IterUpContent, TempElements2, AutoCorrectionEngine);
+				this.PackTextToContent(IterDnContent, TempElements, AutoCorrectionEngine);
 			}
 			else if (TempElements.Type == DEGREE_SUBSCRIPT)
 			{
-				this.PackTextToContent(IterUpContent, TempElements);
-				this.PackTextToContent(IterDnContent, TempElements2);
+				this.PackTextToContent(IterUpContent, TempElements, AutoCorrectionEngine);
+				this.PackTextToContent(IterDnContent, TempElements2, AutoCorrectionEngine);
 			}
 			
-			this.PackTextToContent(BaseContent, TempElements3);			
+			this.PackTextToContent(BaseContent, TempElements3, AutoCorrectionEngine);
 			
 			AutoCorrectionEngine.RemoveCount = ElementsCount - CurPos - 1;
 			AutoCorrectionEngine.ReplaceContent.push(oDegree);
@@ -4212,7 +4235,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 
     return false;
 };
-CMathContent.prototype.PackTextToContent = function(Element, TempElements)
+CMathContent.prototype.PackTextToContent = function(Element, TempElements, AutoCorrectionEngine)
 {
 	var len = TempElements.length;
 	if (len > 1)	
@@ -4230,6 +4253,10 @@ CMathContent.prototype.PackTextToContent = function(Element, TempElements)
 		else
 		{
 			var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
+
+            MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
+            MathRun.Set_MathPr(AutoCorrectionEngine.MathPr.Copy());
+
 			var MathText = new CMathText();
 			MathText.add(TempElements[nPos].Text.charCodeAt(0));
 			MathRun.Add_ToContent(nPos, MathText);
@@ -4249,6 +4276,9 @@ function CMathAutoCorrectEngine(Element)
 
     this.RemoveCount    = 0;
     this.ReplaceContent = [];
+
+    this.TextPr         = null;
+    this.MathPr         = null;
 }
 
 CMathAutoCorrectEngine.prototype.Add_Element = function(Element, ElementPos)

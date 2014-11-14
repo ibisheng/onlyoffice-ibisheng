@@ -8122,6 +8122,12 @@ ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
             break;
         }
     }
+
+    if (null === AutoCorrectEngine.TextPr)
+        AutoCorrectEngine.TextPr = this.Pr.Copy();
+
+    if (null == AutoCorrectEngine.MathPr)
+        AutoCorrectEngine.MathPr = this.MathPrp.Copy();
 };
 
 ParaRun.prototype.Get_RangesByPos = function(Pos)
