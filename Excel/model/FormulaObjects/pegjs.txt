@@ -1,22 +1,26 @@
-﻿formula = "="? space* ex:expression {return ex;}
+﻿{
+  var arrObjRef = {};
+}
 
-expression = fC:functionCall e1:E1 {return [].concat(fC).concat(e1);}
-/ "(" e:expression ")" e1:E1 {return ["("].concat(e).concat(")").concat(e1);}
-/ prOp:prefOper e:expression e1:E1 {return [].concat(prOp).concat(e).concat(e1);}
-/ con:const e1:E1 {return [].concat(con).concat(e1);}
-/ cR:cellRef e1:E1 {return [].concat(cR).concat(e1);}
-/ functionCall
-/ "(" expression ")"
-/ const
-/ cellRef
-/ prOp:prefOper e:expression {return [].concat(prOp).concat(e);}
+formula = "="? space* ex:expression {console.log(arrObjRef); return ex;}
 
-E1 = inOp:infOper e:expression e1:E1{return [].concat(inOp).concat(e).concat(e1);}
-   / pOp:postOper e1:E1{return [].concat(pOp).concat(e1);}
-   / infOper expression
-   / postOper
+expression = fC:functionCall e1:(E1 / EOF?) {var res = [].concat(fC);if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
 
-functionCall = space* fC:(functionName "(" (aL:(arg:argumentList?{return arg;}) {console.log(aL ? aL.length : 0);return aL;} )")"){return fC;} /*{return [fC,"("].concat(aL).concat([")"]);}*/
+/ "(" e:expression ")" e1:(E1 / EOF?) {var res = ["("].concat(e).concat(")");if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
+
+/ prOp:prefOper e:expression e1:(E1 / EOF?) {var res = [].concat(prOp).concat(e); if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
+
+/ con:const e1:(E1 / EOF?){var res = [].concat(con); if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
+
+/ cR:cellRef e1:(E1 / EOF?) {var res = [].concat(cR); if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
+
+E1 = inOp:infOper e:expression e1:(E1 / EOF?){var res = [].concat(inOp).concat(e); if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
+
+/ pOp:postOper e1:(E1 / EOF?){var res = [].concat(pOp); if(e1 != null && e1 != "EOF" ){res = res.concat(e1);} return res;}
+
+EOF = !.{return "EOF";}
+
+functionCall = space* fC:(functionName "(" (aL:(arg:argumentList?{return arg;}) {console.log(aL ? aL.length : 0);return aL;} )(rB:")"?{return ")";})){return fC;} /*{return [fC,"("].concat(aL).concat([")"]);}*/
 
 functionName = (letter (udn)*){return text();}
 
@@ -26,14 +30,15 @@ argumentList = a1:argument a2:(delim:(comma / semicolon) arg:argument?{console.l
 
 argument = space* exp:expression space* {return exp;}
 
-cellRef = ((wSP:workSheetPrefix? ((A1ref ":" A1ref) / A1ref)){return text();/*return cellA1Ref*/} / name) {return text()+"_";/*cellRef do somethink*/}
+cellRef = table / (wSP:workSheetPrefix? ((A1ref ":" A1ref) / A1ref)){arrObjRef[text()] = text(); return text()+"_ref";/*return cellA1Ref*/} / name {arrObjRef[text()] = text(); return text()+"_name";/*cellRef do somethink*/}
+
+table = (name "[" name "]") {arrObjRef[text()] = text(); return text()+"_table";}
 
 A1ref = ((A1c ":" A1c) / (A1r ":" A1r) / (A1c A1r)){return text();}
 A1c = A1rc / ("$" A1rc)
 A1rc = [a-z]i+ {return text();}
 
-A1r = A1rr / ("$" A1rr)
-A1rr = digSeq
+A1r = digSeq / ("$" digSeq)
 
 workSheetPrefix = ( workSheetPrefixSpecial / sheetName sheetNameCellRefDelim / sheetName ":" sheetName sheetNameCellRefDelim){return text();}
 
@@ -42,7 +47,7 @@ workSheetPrefixSpecial = apostrophe sheetNameSpecial apostrophe sheetNameCellRef
 sheetNameSpecial = sheetNameStartCharacterSpecial sheetNameCharactersSpecial? sheetNameEndCharacterSpecial?
 
 sheetNameStartCharacterSpecial = [^'\*\][\\:\?\/]
-sheetNameEndCharacterSpecial = sheetNameStartCharacterSpecial 
+sheetNameEndCharacterSpecial = sheetNameStartCharacterSpecial
 sheetNameCharactersSpecial = sheetNameCharacterSpecial*
 sheetNameCharacterSpecial = ((apostrophe apostrophe) / [^'\*\][\\:\?\/])
 
@@ -57,18 +62,18 @@ nameStartChar = letter / underscore / backslash
 nameChars = nameChar+{return text();}
 nameChar = letter / decDig / underscore / fullStop
 
-const = space* cnst:(errConst / logConst / strConst / numConst / arrConst) space* {return cnst;}
+const = space* cnst:(errConst / logConst / strConst / numConst / arrConst) space* {return cnst+"_const";}
 
-errConst = ("#DIV/0!" / "#N/A" / "#NAME?" / "#NULL!" / "#NUM!" / "#REF!" / "#VALUE!" / "#GETTING_DATA"){return text();/*erroconst do somethink*/}
+errConst = ("#DIV/0!"i / "#N/A"i / "#NAME?"i / "#NULL!"i / "#NUM!"i / "#REF!"i / "#VALUE!"i / "#GETTING_DATA"i)i{return text();/*erroconst do somethink*/}
 
 logConst = "TRUE"i / "FALSE"i {return text(); /*logconst do somethink*/}
 
 strConst = d1:dblQuote sc:strChars? d2:dblQuote {return text();/*strconst do somethink*/}
 dblQuote = "\""
-strChars = ([\u0009\u000A\u000D\u0020\u0021\u0023-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF] / "\"\"")+ {return text();}
+strChars = (([\u0009\u000A\u000D\u0020\u0021\u0023-\uD7FF\uE000-\uFFFD] / [^\u0000-\uFFFF]) / "\"\"")+ {return text();}
 
-numConst = (DecimalIntegerLiteral "." decDig* ExponentPart? 
-/ "." decDig+ ExponentPart? 
+numConst = (DecimalIntegerLiteral "." decDig* ExponentPart?
+/ "." decDig+ ExponentPart?
 / DecimalIntegerLiteral ExponentPart?) {return text();/*numconst do somethink*/}
 
 DecimalIntegerLiteral = "0" / NonZeroDigit decDig*
