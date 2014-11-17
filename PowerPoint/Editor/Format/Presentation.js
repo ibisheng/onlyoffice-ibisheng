@@ -2130,6 +2130,11 @@ CPresentation.prototype =
         Default_Tab_Stop = DTab;
     },
 
+    Set_DocumentMargin: function()
+    {
+
+    },
+
     OnKeyPress : function(e)
     {
         if ( true === editor.isViewMode )
@@ -3660,6 +3665,10 @@ CPresentation.prototype =
             return true;
         if(this.Slides.length === 0)
             return false;
+        if(changestype_Document_SectPr === CheckType)
+        {
+            return true;
+        }
 
         var cur_slide = this.Slides[this.CurPage];
         var slide_id = cur_slide.deleteLock.Get_Id();
