@@ -2974,7 +2974,7 @@ PasteProcessor.prototype =
 						base64 = null;
 						base64FromExcel = null;
 						this.pasteInPresentationShape = true;
-					};
+					}
 					
 					var isImageInNode = node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
 					if(base64 != null)
@@ -5612,7 +5612,7 @@ PasteProcessor.prototype =
                 return bAddParagraph;
             }
             var sNodeName = node.nodeName.toLowerCase();
-            if("table" == sNodeName && this.pasteInExcel !== true)
+            if("table" == sNodeName && this.pasteInExcel !== true && this.pasteInPresentationShape !== true)
             {
                 if(g_bIsDocumentCopyPaste)
                 {
