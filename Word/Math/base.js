@@ -119,7 +119,7 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].NeedCompiledCtrPr();
     },
-    Get_CompiledCtrPrp: function()
+    Get_CompiledCtrPrp: function(bAllowInline)
     {
         this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
 
@@ -132,10 +132,13 @@ CMathBase.prototype =
         else
         {
             CompiledCtrPrp = this.Get_CompiledCtrPrp_2();
-            CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
+
+            if(bAllowInline !== false)
+                CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
         }
 
-        CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
+        if(bAllowInline !== false)
+            CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
 
         return CompiledCtrPrp;
     },
@@ -1153,7 +1156,7 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
 };
 CMathBase.prototype.Draw_Lines = function(PDSL)
 {
-    var CtrPrp = this.Get_CompiledCtrPrp();
+    var CtrPrp = this.Get_CompiledCtrPrp(false);
 
     var aStrikeout  = PDSL.Strikeout;
     var aDStrikeout = PDSL.DStrikeout;
