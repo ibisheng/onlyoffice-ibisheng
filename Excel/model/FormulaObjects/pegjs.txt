@@ -64,7 +64,7 @@ nameChar = letter / decDig / underscore / fullStop
 
 const = space* cnst:(errConst / logConst / strConst / numConst / arrConst) space* {return cnst+"_const";}
 
-errConst = ("#DIV/0!"i / "#N/A"i / "#NAME?"i / "#NULL!"i / "#NUM!"i / "#REF!"i / "#VALUE!"i / "#GETTING_DATA"i)i{return text();/*erroconst do somethink*/}
+errConst = ("#DIV/0!"i / "#N/A"i / "#NAME?"i / "#NULL!"i / "#NUM!"i / "#REF!"i / "#VALUE!"i / "#GETTING_DATA"i){return text();/*erroconst do somethink*/}
 
 logConst = "TRUE"i / "FALSE"i {return text(); /*logconst do somethink*/}
 
