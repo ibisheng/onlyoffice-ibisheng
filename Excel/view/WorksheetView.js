@@ -2319,8 +2319,8 @@
 
 				if (null !== mc) {
 					if (col !== mc.c1 || row !== mc.r1) {continue;}
-					for (var i = mc.c1 + 1; i <= mc.c2 && i < this.nColsCount; ++i) {mwidth += this.cols[i].width;}
-					for (var j = mc.r1 + 1; j <= mc.r2 && j < this.nRowsCount; ++j) {mheight += this.rows[j].height;}
+					for (var i = mc.c1 + 1; i <= mc.c2 && i < this.cols.length; ++i) {mwidth += this.cols[i].width;}
+					for (var j = mc.r1 + 1; j <= mc.r2 && j < this.rows.length; ++j) {mheight += this.rows[j].height;}
 				} else {
 					if (bg === null) {
 						if (col === colEnd && col < this.cols.length - 1 && row < this.rows.length - 1) {
