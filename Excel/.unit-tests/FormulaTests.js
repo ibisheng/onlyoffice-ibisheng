@@ -4083,7 +4083,7 @@
 
         oParser = new parserFormula( "COUPDAYBS(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupdaybs( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), 71 );
 
         oParser = new parserFormula( "COUPDAYBS(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
         ok( oParser.parse() );
@@ -4129,7 +4129,7 @@
 
         oParser = new parserFormula( "COUPDAYSNC(DATE(2007,1,25),DATE(2008,11,15),2,1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), coupdaysnc( new Date(2007,0,25), new Date(2008,10,15), 2, 1 ) );
+        strictEqual( oParser.calculate().getValue(), 110 );
 
         oParser = new parserFormula( "COUPDAYSNC(DATE(2007,1,25),DATE(2008,11,15),2)", "A2", ws );
         ok( oParser.parse() );
@@ -4799,7 +4799,7 @@
         oParser = new parserFormula( "BIN2DEC(\"Hello World!\")", "A2", ws );
         ok( oParser.parse() );
         ok( oParser.assemble() == "BIN2DEC(\"Hello World!\")" );
-        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
 
     })
 
