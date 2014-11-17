@@ -4145,7 +4145,8 @@ drawDoughnutChart.prototype =
 					this.paths.series[n][k] = null;
 			}
 			
-			seriesCounter++;
+			if(numCache.pts.length)
+				seriesCounter++;
 			
 		}
     },
