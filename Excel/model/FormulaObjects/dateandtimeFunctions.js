@@ -78,11 +78,11 @@ function diffDate( d1, d2, mode ) {
         case DayCountBasis.Actual360:
             var dayDiff = d2 - d1;
             dayDiff /= c_msPerDay;
-            return new cNumber( dayDiff );
+            return new cNumber( (d2 - d1)/c_msPerDay );
         case DayCountBasis.Actual365:
             var dayDiff = d2 - d1;
             dayDiff /= c_msPerDay;
-            return new cNumber( dayDiff );
+            return new cNumber( (d2 - d1)/c_msPerDay );
         case DayCountBasis.Europ30_360:
             return new cNumber( GetDiffDate360( date1, month1, year1, date2, month2, year2, false ) );
         default:

@@ -3712,38 +3712,6 @@ parserFormula.prototype = {
     },
 
     /* Сборка функции в инфиксную форму */
-    /*assemble:function (rFormula) {*//*При сборке формул вида A1+A2+A3 формула получает вид (A1+A2)+A3. Добавить проверку приоритета операций.*//*
-        if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length-1] instanceof cError ) {
-            return this.Formula;
-        }
-        var elemArr = [],
-            stack = [];
-        for ( var i = 0; i < this.outStack.length; i++ )
-            stack[i] = this.outStack[i];
-        var currentElement = null;
-        while ( stack.length != 0 ) {
-            currentElement = stack.shift();
-            if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
-                var arg = [];
-                for ( var ind = 0; ind < currentElement.getArguments(); ind++ ) {
-                    arg.unshift( elemArr.pop() );
-                }
-                elemArr.push( currentElement.Assemble( arg ) );
-            }
-            else {
-                if ( currentElement instanceof cString ) {
-                    currentElement = new cString( "\"" + currentElement.toString() + "\"" );
-                }
-                elemArr.push( currentElement );
-            }
-        }
-        var res = elemArr.pop();
-        if ( res != undefined && res != null )
-            return res.toString();
-        else
-            return this.Formula;
-    },*/
-
     assemble:function ( rFormula ) {
         if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
             return this.Formula;
