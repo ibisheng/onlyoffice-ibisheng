@@ -3079,9 +3079,9 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 				row.CustomHeight = null;
 			else
 				row.CustomHeight = true;
-			row.height = height;
+			row.h = height;
 			var oNewProps = row.getHeightProp();
-			if(false == oOldProps.isEqual(oOldProps))
+			if(false == oOldProps.isEqual(oNewProps))
 			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
 		}
 	};
