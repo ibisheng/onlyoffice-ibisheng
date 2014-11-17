@@ -243,16 +243,6 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
         H5 = plH*7.15;
 
 
-    /*console.log("heightArg :" + heightArg);
-     console.log("plH :" + plH);
-     console.log("ShiftCenter: " + shCenter);
-
-     var k1 = heightArg/plH,
-     k2 = heightArg/shCenter;
-
-     console.log("heightArg/plH :" + k1);
-     console.log("heightArg/shCenter :" + k2);*/
-
     this.measure.bHigh = false;
 
     var bDescentArg = sizeArg.height - sizeArg.ascent > 0.4*txtPrp.FontSize/11; // т.к. у нас почему-то для строчных букв "а" и тп descent не нулевой, см метрики в mathText.js
@@ -261,8 +251,8 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg)
         height = H0*1.12;
     //height = H0*1.058;
     else if( heightArg < H1)
-        height = H1*0.9284532335069441;
-    //height = H1;
+        //height = H1*0.9284532335069441;
+        height = H1;
     else if( heightArg < H2 )
         height = H2;
     else if( heightArg < H3 )
@@ -526,7 +516,7 @@ CRadical.prototype.Resize = function(oMeasure, RPI)
     var txtPrp = this.Get_CompiledCtrPrp();
     var sign = this.signRadical.size,
         gSign = this.signRadical.gapSign,
-    // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за аграницы)
+    // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за границы)
         gArg = this.signRadical.gapArg > 2*g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
     // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
 
@@ -538,9 +528,12 @@ CRadical.prototype.Resize = function(oMeasure, RPI)
         shTop = (sign.height - gSign - this.RealBase.size.height)/2;
         shTop = shTop > 0 ? shTop : 0;
 
-        height = sign.height;
-        width  = sign.width;
         ascent = gapBase + shTop + this.RealBase.size.ascent;
+
+        height = sign.height > ascent - this.RealBase.size.ascent + this.RealBase.size.height ? sign.height : ascent - this.RealBase.size.ascent + this.RealBase.size.height ;
+        width  = sign.width;
+
+
         //ascent = height - (base.height - base.ascent);
 
         width += this.GapLeft + this.GapRight;
