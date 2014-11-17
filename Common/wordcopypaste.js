@@ -4007,6 +4007,9 @@ PasteProcessor.prototype =
 			if(aImagesToDownload.length > 0)
 			{
 				var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+				
+				//плашка для отправки изображений на сервер
+				oThis.api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				sendCommand( this.api, function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
 						{
@@ -4018,6 +4021,7 @@ PasteProcessor.prototype =
 								if(sTo)
 								{									oThis.oImages[sFrom] = sTo;									oPrepeareImages[i] = sTo;								}							}
 						}
+						oThis.api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 						oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
 					}, rData );
 			}
