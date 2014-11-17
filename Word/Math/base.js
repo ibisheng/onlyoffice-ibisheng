@@ -133,11 +133,11 @@ CMathBase.prototype =
         {
             CompiledCtrPrp = this.Get_CompiledCtrPrp_2();
 
-            if(bAllowInline !== false)
+            if(bAllowInline !== false && this.ParaMath)
                 CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
         }
 
-        if(bAllowInline !== false)
+        if(bAllowInline !== false && this.ParaMath)
             CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
 
         return CompiledCtrPrp;
