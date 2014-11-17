@@ -3481,6 +3481,7 @@ CPresentation.prototype =
                 slide.setLayout(layout);
             }
             this.Recalculate();
+            this.Document_UpdateInterfaceState();
         }
     },
 
