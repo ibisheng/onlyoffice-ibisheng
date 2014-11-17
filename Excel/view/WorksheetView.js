@@ -5607,7 +5607,7 @@
 				targetArr = this.isFormulaEditMode ? 0 : -1;
 			for (i = 0, l = arrRanges.length; i < l; ++i) {
 				oFormulaRange = arrRanges[i].clone(true);
-				oFormulaRange = oFormulaRange.intersectionSimple(vr);
+//				oFormulaRange = oFormulaRange.intersectionSimple(vr);
 				if (oFormulaRange) {
 					xFormula1 = this.cols[oFormulaRange.c1].left - offsetX;
 					xFormula2 = this.cols[oFormulaRange.c2].left + this.cols[oFormulaRange.c2].width - offsetX;
@@ -7670,11 +7670,12 @@
 			this.overlayCtx.clear();
 
 			if (targetInfo.cursor == kCurNEResize || targetInfo.cursor == kCurSEResize) {
+
 				if (colByX < this.startCellMoveResizeRange2.c1) {
-					ar.c2 = this.startCellMoveResizeRange2.c1;
+                    ar.c2 = this.startCellMoveResizeRange2.c1;
 					ar.c1 = colByX;
 				} else if (colByX > this.startCellMoveResizeRange2.c1) {
-					ar.c1 = this.startCellMoveResizeRange2.c1;
+                    ar.c1 = this.startCellMoveResizeRange2.c1;
 					ar.c2 = colByX;
 				} else {
 					ar.c1 = this.startCellMoveResizeRange2.c1;
@@ -7683,12 +7684,12 @@
 
 				if (rowByY < this.startCellMoveResizeRange2.r1) {
                     ar.r2 = this.startCellMoveResizeRange2.r2;
-					ar.r1 = rowByY;
+            	    ar.r1 = rowByY;
 				} else if (rowByY > this.startCellMoveResizeRange2.r1) {
                     ar.r1 = this.startCellMoveResizeRange2.r1;
                     ar.r2 = rowByY;
 				} else {
-					ar.r1 = this.startCellMoveResizeRange2.r1;
+                    ar.r1 = this.startCellMoveResizeRange2.r1;
 					ar.r2 = this.startCellMoveResizeRange2.r1;
 				}
 
