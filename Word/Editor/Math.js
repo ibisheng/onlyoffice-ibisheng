@@ -1763,6 +1763,7 @@ ParaMath.prototype.Read_FromBinary2 = function(Reader)
     this.Type = Reader.GetLong();
     this.Root = g_oTableId.Get_ById(Reader.GetString2());
     this.Root.bRoot = true;
+    this.Root.ParentElement = this;
 };
 
 ParaMath.prototype.Get_ContentSelection = function()

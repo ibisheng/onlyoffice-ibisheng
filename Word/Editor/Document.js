@@ -8617,7 +8617,7 @@ CDocument.prototype =
             // Получим копию выделенной части документа, которую надо перенести в новое место, одновременно с этим
             // удаляем эту выделенную часть (если надо).
 
-            var DocContent = this.Get_SelectedContent();
+            var DocContent = this.Get_SelectedContent(true);
 
             if (false === this.Can_InsertContent(DocContent, NearPos))
             {
@@ -8664,8 +8664,17 @@ CDocument.prototype =
         }
     },
 
-    Get_SelectedContent : function()
+    /**
+     * В данной функции мы получаем выделенную часть документа в формате класса CSelectedContent.
+     * @param bUseHistory - нужна ли запись в историю созданных классов. (при drag-n-drop нужна, при копировании не нужна)
+     * @returns {CSelectedContent}
+     */
+    Get_SelectedContent : function(bUseHistory)
     {
+        var bNeedTurnOffHistory = (History.Is_On() && true !== bUseHistory);
+        if (bNeedTurnOffHistory)
+            History.TurnOff();
+
         var SelectedContent = new CSelectedContent();
         
         // Заполняем выделенный контент
@@ -8692,8 +8701,11 @@ CDocument.prototype =
             }
         }
         
-        SelectedContent.On_EndCollectElements(this);               
-        
+        SelectedContent.On_EndCollectElements(this);
+
+        if (bNeedTurnOffHistory)
+            History.TurnOn();
+
         return SelectedContent;
     },
 
@@ -11854,6 +11866,10 @@ CDocument.prototype =
 
     private_UpdateTracks : function(bSelection, bEmptySelection)
     {
+        var Pos = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos);
+        if (docpostype_Content === this.CurPos.Type && !(Pos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos)))
+            return;
+
         // Обновляем трэк формул
         var oSelectedInfo = this.Get_SelectedElementsInfo();
         var Math = oSelectedInfo.Get_Math();
