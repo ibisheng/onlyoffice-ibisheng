@@ -4128,10 +4128,10 @@ CCatAx.prototype =
         var  labelsPosition            = props.getLabelsPosition();
 
 
-        if(isRealNumber(intervalBetweenTick) && this.tickMarkSkip !== intervalBetweenTick)
+        if(isRealNumber(intervalBetweenTick) && this.tickMarkSkip !== intervalBetweenTick && this.setTickMarkSkip)
             this.setTickMarkSkip(intervalBetweenTick);
 
-        if(isRealNumber(intervalBetweenLabelsRule))
+        if(isRealNumber(intervalBetweenLabelsRule) && this.setTickLblSkip)
         {
             if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.auto)
             {
@@ -5280,6 +5280,7 @@ CDateAx.prototype =
     },
 
     getMenuProps: CCatAx.prototype.getMenuProps,
+    setMenuProps: CCatAx.prototype.setMenuProps,
 
     createDuplicate: function()
     {
