@@ -5374,6 +5374,12 @@ CChartSpace.prototype =
             else
             {
                 ser = series[0];
+                i = 1;
+                while(ser && ser.isHiddenForLegend)
+                {
+                    ser = series[i];
+                    ++i;
+                }
                 var pts = getPtsFromSeries(ser), pt;
                 var cat_str_lit = getCatStringPointsFromSeries(ser);
                 for(i = 0; i < pts.length; ++i)
