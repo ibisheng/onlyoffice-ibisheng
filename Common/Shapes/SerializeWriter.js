@@ -567,7 +567,7 @@ function CBinaryFileWriter()
         this.WriteUChar(g_nodeAttributeStart);
         for (var i = 0; i < _slide_count; i++)
         {
-            this._WriteInt1(i, _slides_rels[i]);
+            this._WriteInt1(0, _slides_rels[i]);
         }
         this.WriteUChar(g_nodeAttributeEnd);
         this.EndRecord();
