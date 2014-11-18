@@ -2644,6 +2644,10 @@
 				this._fixSelectionOfMergedCells(range);
 				// ToDo убрать это и переделать!!!
 				range.normalize();
+				// ToDo Точно нужно с этим разобраться!!!
+				range = range.intersectionSimple(this.visibleRange);
+				if (null === range)
+					return;
 			}
 
 			//TODO: использовать стили линий при рисовании границ
