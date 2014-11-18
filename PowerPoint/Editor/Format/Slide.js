@@ -55,7 +55,7 @@ function Slide(presentation, slideLayout, slideNum)
     {
         this.Width = presentation.Width;
         this.Height = presentation.Height;
-        this.setSlideComments(new SlideComments());
+        this.setSlideComments(new SlideComments(this));
         this.setLocks(new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id));
     }
 
@@ -1442,10 +1442,11 @@ CTextBody.prototype.checkCurrentPlaceholder = function()
 };
 
 
-function SlideComments()
+function SlideComments(slide)
 {
     this.comments = [];
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.slide = slide;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1481,6 +1482,17 @@ SlideComments.prototype =
     {
         History.Add(this, {Type: historyitem_SlideCommentsAddComment, objectId: comment.Get_Id(), Pos:this.comments.length});
         this.comments.splice(this.comments.length, 0, comment);
+        comment.slideComments = this;
+    },
+
+
+    getSlideIndex: function()
+    {
+        if(this.slide)
+        {
+            return this.slide.num;
+        }
+        return null;
     },
 
 
@@ -1505,25 +1517,53 @@ SlideComments.prototype =
             {
                 History.Add(this, {Type: historyitem_SlideCommentsRemoveComment, Pos: i, id: id});
                 this.comments.splice(i, 1);
+                editor.sync_RemoveComment(id);
                 return;
             }
         }
     },
 
+    removeSelectedComment: function()
+    {
+        var comment = this.getSelectedComment();
+        if(comment)
+        {
+            this.removeComment(comment.Get_Id());
+        }
+    },
+
+    getSelectedComment: function()
+    {
+        for(var i = 0; i < this.comments.length; ++i)
+        {
+            if(this.comments[i].selected)
+            {
+                return this.comments[i];
+            }
+        }
+        return null;
+    },
+
+    recalculate: function()
+    {},
 
     Write_ToBinary2: function(w)
     {
         w.WriteLong(historyitem_type_SlideComments);
         w.WriteString2(this.Id);
+        writeObject(w, this.slide);
     },
 
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+        this.slide = readObject(r);
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: this});
+    },
 
     Save_Changes: function(data, w)
     {
@@ -1558,6 +1598,7 @@ SlideComments.prototype =
                 var id = r.GetString2();
                 var pos2 = this.m_oContentChanges.Check( contentchanges_Add, pos);
                 this.comments.splice(pos2, 0,  g_oTableId.Get_ById(id));
+                this.comments[pos2].slideComments = this;
                 editor.sync_AddComment( id, this.comments[pos2].Data);
                 break;
             }

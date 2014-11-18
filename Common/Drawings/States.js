@@ -233,7 +233,7 @@ NullState.prototype =
         }
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            if(start_target_doc_content)
+            if(start_target_doc_content || selected_comment_index > -1)
             {
                 this.drawingObjects.drawingObjects.showDrawingObjects(true);
             }

@@ -172,10 +172,10 @@ function asc_CChartBinary(chart) {
             pptx_writer.WriteTheme(chart.theme);
             this["themeBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
-        if(chart.colorMap)
+        if(chart.colorMapOverride)
         {
             pptx_writer = new CBinaryFileWriter();
-            pptx_writer.WriteClrMap(chart.colorMap);
+            pptx_writer.WriteRecord1(1, chart.colorMapOverride, pptx_writer.WriteClrMap);
             this["colorMapBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
     }
@@ -187,6 +187,8 @@ asc_CChartBinary.prototype = {
     asc_setBinary: function(val) { this["binary"] = val; },
     asc_getThemeBinary: function() { return this["themeBinary"]; },
     asc_setThemeBinary: function(val) { this["themeBinary"] = val; },
+    asc_setColorMapBinary: function(val){this["colorMapBinary"] = val;},
+    asc_getColorMapBinary: function(){return this["colorMapBinary"];},
     getChartSpace: function(workSheet)
     {
         var binary = this["binary"];
@@ -232,6 +234,7 @@ asc_CChartBinary.prototype = {
             oBinaryReader.stream.size   = stream.size;
             oBinaryReader.stream.pos    = stream.pos;
             oBinaryReader.stream.cur    = stream.cur;
+            var _rec = oBinaryReader.stream.GetUChar();
             var ret = new ClrMap();
             oBinaryReader.ReadClrMap(ret);
             return ret;
@@ -250,6 +253,8 @@ prot["asc_getBinary"] = prot.asc_getBinary;
 prot["asc_setBinary"] = prot.asc_setBinary;
 prot["asc_getThemeBinary"] = prot.asc_getThemeBinary;
 prot["asc_setThemeBinary"] = prot.asc_setThemeBinary;
+prot["asc_setColorMapBinary"] = prot.asc_setColorMapBinary;
+prot["asc_getColorMapBinary"] = prot.asc_getColorMapBinary;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -2792,11 +2797,17 @@ function DrawingObjects() {
             var asc_chart_binary = new Asc.asc_CChartBinary();
             asc_chart_binary.asc_setBinary(chart["binary"]);
             asc_chart_binary.asc_setThemeBinary(chart["themeBinary"]);
+            asc_chart_binary.asc_setColorMapBinary(chart["colorMapBinary"]);
             var oNewChartSpace = asc_chart_binary.getChartSpace(worksheet.model);
             var theme = asc_chart_binary.getTheme();
             if(theme)
             {
                 worksheet.model.workbook.theme = theme;
+            }
+            var colorMapOverride = asc_chart_binary.getColorMap();
+            if(colorMapOverride)
+            {
+                DEFAULT_COLOR_MAP = colorMapOverride;
             }
             var font_map = {};
             oNewChartSpace.documentGetAllFontNames(font_map);

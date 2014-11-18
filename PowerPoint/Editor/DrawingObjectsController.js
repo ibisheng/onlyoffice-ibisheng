@@ -13,7 +13,17 @@ DrawingObjectsController.prototype.getDrawingArray = function()
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args)
 {
-    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    var check_type = changestype_Drawing_Props, comment;
+    if(this.drawingObjects.slideComments)
+    {
+        comment = this.drawingObjects.slideComments.getSelectedComment();
+        if(comment)
+        {
+            check_type = changestype_MoveComment;
+            comment = comment.Get_Id();
+        }
+    }
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
     {
         History.Create_NewPoint();
         callback.apply(this, args);
@@ -92,6 +102,10 @@ DrawingObjectsController.prototype.showChartSettings  =  function()
     editor.asc_doubleClickOnChart(this.getChartObject());
     this.changeCurrentState(new NullState(this));
 };
+DrawingObjectsController.prototype.getColorMapOverride  =  function()
+{
+    return this.drawingObjects.Get_ColorMap();
+};
 DrawingObjectsController.prototype.editChart = function(binary)
 {
     var bin_object = {"binary":binary};
@@ -126,8 +140,11 @@ DrawingObjectsController.prototype.editChart = function(binary)
         chart_space.spPr.xfrm.setOffY(this.selectedObjects[0].y);
         var pos = this.selectedObjects[0].deleteDrawingBase();
         chart_space.addToDrawingObjects(pos);
+        this.resetSelection();
+        this.selectObject(chart_space, this.drawingObjects.num);
         this.startRecalculate();
         this.sendGraphicObjectProps();
+        this.updateOverlay();
     }
 };
 
@@ -265,7 +282,11 @@ MoveCommentState.prototype =
         if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, this.comment.Get_Id()) === false)
         {
             History.Create_NewPoint();
-            this.drawingObjects.trackEnd();
+            var tracks = this.drawingObjects.arrTrackObjects;
+            for(var i = 0; i < tracks.length; ++i)
+            {
+                tracks[i].trackEnd();
+            }
             this.drawingObjects.startRecalculate();
         }
         this.drawingObjects.clearTrackObjects();

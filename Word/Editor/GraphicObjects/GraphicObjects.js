@@ -113,6 +113,11 @@ CGraphicObjects.prototype =
         return this.document.theme;
     },
 
+    getColorMapOverride: function()
+    {
+        return null;
+    },
+
     isViewMode: function()
     {
         return editor.isViewMode;

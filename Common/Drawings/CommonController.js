@@ -3481,6 +3481,10 @@ DrawingObjectsController.prototype =
             }
             this.updateOverlay();
         }
+        else if(this.drawingObjects.slideComments)
+        {
+            this.drawingObjects.slideComments.removeSelectedComment();
+        }
     },
 
 
@@ -4293,9 +4297,13 @@ DrawingObjectsController.prototype =
             --count;
         }
         this.changeCurrentState(new NullState(this, this.drawingObjects));
-
-
     },
+
+    getColorMapOverride: function()
+    {
+        return null;
+    },
+
     Document_UpdateInterfaceState: function()
     {},
 
@@ -4337,6 +4345,7 @@ DrawingObjectsController.prototype =
                 ret.spPr.xfrm.setOffX(0);
                 ret.spPr.xfrm.setOffY(0);
                 ret.theme = this.getTheme();
+                ret.colorMapOverride = this.getColorMapOverride();
                 return ret;
             }, this, []);
         }
@@ -4347,6 +4356,7 @@ DrawingObjectsController.prototype =
                 if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
                 {
                     this.selection.groupSelection.selectedObjects[0].theme = this.getTheme();
+                    this.selection.groupSelection.selectedObjects[0].colorMapOverride = this.getColorMapOverride();
                     ExecuteNoHistory(function()
                     {
                         CheckSpPrXfrm2(this.selection.groupSelection.selectedObjects[0]);
@@ -4359,6 +4369,7 @@ DrawingObjectsController.prototype =
                 if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
                 {
                     this.selectedObjects[0].theme = this.getTheme();
+                    this.selectedObjects[0].colorMapOverride = this.getColorMapOverride();
                     ExecuteNoHistory(function()
                     {
                         CheckSpPrXfrm2(this.selectedObjects[0]);
