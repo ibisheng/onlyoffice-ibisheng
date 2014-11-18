@@ -3532,6 +3532,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
     var CurTextPr = this.Get_CompiledPr( false );
 
+
     var StrikeoutY = Y - this.YOffset;
 
     switch(CurTextPr.VertAlign)
@@ -3616,7 +3617,6 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_NewLine:
             {
                 X += ItemWidthVisible;
-
                 break;
             }
 
@@ -3666,13 +3666,23 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             }
             case para_Math_Text:
             case para_Math_Ampersand:
-            case para_Math_Placeholder:
             {
                 if ( true === CurTextPr.DStrikeout )
                     aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
                 else if ( true === CurTextPr.Strikeout )
                     aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
 
+
+                X += ItemWidthVisible;
+                break;
+            }
+            case para_Math_Placeholder:
+            {
+                var ctrPrp = this.Parent.GetCtrPrp();
+                if(true === ctrPrp.DStrikeout)
+                    aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                else if(true === ctrPrp.Strikeout)
+                    aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
 
                 X += ItemWidthVisible;
                 break;
@@ -7804,10 +7814,6 @@ ParaRun.prototype.Math_Draw = function(x, y, pGraphics)
     {
         Font.Italic = false;
         Font.Bold   = false;
-
-        //var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
-        //Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
-        //Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
     }
 
     pGraphics.SetFont(Font);
@@ -7858,10 +7864,6 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
         {
             Font.Italic = false;
             Font.Bold   = false;
-
-            //var defaultTxtPrp = this.Parent.ParaMath.Get_Default_TPrp();
-            //Font.FontFamily.Name  = defaultTxtPrp.FontFamily.Name;
-            //Font.FontFamily.Index = defaultTxtPrp.FontFamily.Index;
         }
 
         g_oTextMeasurer.SetFont(Font);
@@ -7921,31 +7923,6 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
     if (RPI.PRS.LineTextDescent < this.TextDescent)
         RPI.PRS.LineTextDescent = this.TextDescent;
 }
-ParaRun.prototype.Math_Update_Cursor = function(X, Y, CurPage, UpdateTarget)
-{
-    // TODO
-    // поставить заглушку на плейсхолдер, когда при перемещении всегда будет отрисовываться селект на плейсхолдере
-    var runPrp = this.Get_CompiledPr(false);
-    //this.Parent.ParaMath.ApplyArgSize(runPrp, this.Parent.argSize);
-
-    var sizeCursor = runPrp.FontSize*g_dKoef_pt_to_mm;
-
-    Y -= sizeCursor*0.8;
-
-    for(var i = 0; i < this.State.ContentPos; i++)
-        X += this.Content[i].size.width;
-
-
-    if ( null !== this.Paragraph && undefined !== this.Paragraph && UpdateTarget == true)
-    {
-        this.Paragraph.DrawingDocument.SetTargetSize(sizeCursor);
-        //Para.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Paragraph.DrawingDocument.UpdateTarget(X, Y, this.Paragraph.Get_StartPage_Absolute() + CurPage );
-        //Para.DrawingDocument.UpdateTargetFromPaint = false;
-    }
-
-    return {X: X, Y: Y, Height: sizeCursor};
-}
 ParaRun.prototype.Math_Apply_Style = function(Value)
 {
     if(Value !== this.MathPrp.sty)
@@ -7976,26 +7953,6 @@ ParaRun.prototype.getPropsForWrite = function()
         mathRPrp = this.MathPrp.getPropsForWrite();
 
     return {wRPrp: wRPrp, mathRPrp: mathRPrp};
-}
-ParaRun.prototype.Math_SetGaps = function(GapsInfo)
-{
-    this.Parent = GapsInfo.Parent;
-    this.Paragraph = GapsInfo.ParaMath.Paragraph;
-
-    var oWPrp = this.Get_CompiledPr(false);
-
-    for (var Pos = 0 ; Pos < this.Content.length; Pos++ )
-    {
-        if( !this.Content[Pos].IsAlignPoint() )
-        {
-            GapsInfo.leftRunPrp = GapsInfo.currRunPrp;
-            GapsInfo.Left       = GapsInfo.Current;
-
-            GapsInfo.currRunPrp = oWPrp;
-            GapsInfo.Current = this.Content[Pos];
-            GapsInfo.setGaps();
-        }
-    }
 }
 ParaRun.prototype.Math_PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {

@@ -381,7 +381,6 @@ function CMathAccentPr()
     this.chr     = null;
     this.chrType = null;
 }
-
 CMathAccentPr.prototype.Set_FromObject = function(Obj)
 {
     if (undefined !== Obj.chr && null !== Obj.chr)
@@ -394,7 +393,6 @@ CMathAccentPr.prototype.Set_FromObject = function(Obj)
     else
         this.chrType = null;
 };
-
 CMathAccentPr.prototype.Copy = function()
 {
     var NewPr = new CMathAccentPr();
@@ -404,7 +402,6 @@ CMathAccentPr.prototype.Copy = function()
 
     return NewPr;
 };
-
 CMathAccentPr.prototype.Write_ToBinary = function(Writer)
 {
     // Long : chr     (-1 : null)
@@ -413,7 +410,6 @@ CMathAccentPr.prototype.Write_ToBinary = function(Writer)
     Writer.WriteLong(null === this.chr ? -1 : this.chr);
     Writer.WriteLong(null === this.chrType ? -1 : this.chrType);
 };
-
 CMathAccentPr.prototype.Read_FromBinary = function(Reader)
 {
     // Long : chr     (-1 : null)

@@ -937,23 +937,6 @@ CMathContent.prototype =
             }
         }
     },
-    update_Cursor: function(CurPage, UpdateTarget)
-    {
-        var result;
-        if(this.Content[this.CurPos].Type == para_Math_Composition)
-        {
-            result = this.Content[this.CurPos].update_Cursor(CurPage, UpdateTarget);
-        }
-        else
-        {
-            var X = this.pos.x + this.ParaMath.X + this.WidthToElement[this.CurPos],
-                Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-
-            result = this.Content[this.CurPos].Math_Update_Cursor(X, Y, CurPage, UpdateTarget);
-        }
-
-        return result;
-    },
     setCtrPrp: function()
     {
 
