@@ -2389,7 +2389,7 @@ var gUndoInsDelCellsFlag = true;
 								}
 								else if(DeleteRows)
 								{
-									if(!this.checkRemoveTableParts(activeCells, tableRange))
+									if(!this.checkRemoveTableParts(newActiveRange, tableRange))
 									{
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
@@ -5288,6 +5288,10 @@ var gUndoInsDelCellsFlag = true;
 					}
 					//else if(type != 'insRow' && activeRange.c1 == startCell.c1 && activeRange.c2 == endCell.c1 && activeRange.r1 >= startCell.r1 && activeRange.r2 <= endCell.r1)//выделена одина из строк и удаляем столбцы
 					else if(type != 'insRow' && activeRange.c1 == splitRefFilter.c1 && activeRange.c2 == splitRefFilter.c2 && activeRange.r1 >= splitRefFilter.r1 && activeRange.r2 <= splitRefFilter.r2)//выделена одина из строк и удаляем столбцы
+					{
+						isDelFilter = true;
+					}
+					else if(type === 'insRow' && activeRange.c1 <= splitRefFilter.c1 && activeRange.c2 >= splitRefFilter.c2 && activeRange.r1 <= splitRefFilter.r1 && activeRange.r2 >= splitRefFilter.r1)//под удаление попадает первая строка
 					{
 						isDelFilter = true;
 					}
