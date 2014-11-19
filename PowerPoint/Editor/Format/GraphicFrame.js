@@ -596,6 +596,11 @@ CGraphicFrame.prototype =
 
     selectionSetStart: function(e, x, y, slideIndex)
     {
+        if ( g_mouse_button_right === e.Button )
+        {
+            this.rightButtonFlag = true;
+            return;
+        }
         if(isRealObject(this.graphicObject))
         {
             var tx, ty;
@@ -621,16 +626,17 @@ CGraphicFrame.prototype =
         }
     },
 
-    isTableBorder: function(x, y)
-    {
-        var tx, ty;
-        tx = this.invertTransform.TransformPointX(x, y);
-        ty = this.invertTransform.TransformPointY(x, y);
-        return this.graphicObject.Is_TableBorder( tx, ty, 0);
-    },
-
     selectionSetEnd: function(e, x, y, slideIndex)
     {
+        if(g_mouse_event_type_move === e.Type)
+        {
+            this.rightButtonFlag = false;
+        }
+        if(this.rightButtonFlag && g_mouse_event_type_up === e.Type)
+        {
+            this.rightButtonFlag = false;
+            return;
+        }
         if(isRealObject(this.graphicObject))
         {
             var tx, ty;
