@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="parserTest5.js" ></script>
+    <!--<script type="text/javascript" src="parserTest3.js" ></script>-->
+    <script type="text/javascript" src="parserTest.js" ></script>
+
+    <script>
+        function parseFormula1(){
+            var parse = parserTest.parse, i = 0, r, v;
+            v = document.getElementById("formula1").value;
+            var s = new Date().getTime();
+            r = parse(v);
+            var e = new Date().getTime();
+            console.log("e-s "+ (e - s));
+            console.log(r);
+        }
+        function parseFormula2(){
+            var r,v = document.getElementById("formula2").value;
+            var s = new Date().getTime();
+            r = getTokens(v);
+            var e = new Date().getTime();
+            console.log(r.items);
+            console.log("e-s "+ (e - s));
+        }
+    </script>
+
+</head>
+<body>
+
+<p>
+<input type="text" id="formula1" style="width: 500px" onkeyup="parseFormula1()"/>
+<input type="submit" value="parse it" onclick="parseFormula1()"/>
+</p>
+<p>
+    <input type="text" id="formula2" style="width: 500px" onkeyup="parseFormula2()"/>
+    <input type="submit" value="parse it" onclick="parseFormula2()"/>
+</p>
+</body>
+</html>
