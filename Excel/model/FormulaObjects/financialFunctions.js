@@ -883,55 +883,102 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var per = 1 / rate, coeff;
-
     if ( cost == salvage /*|| period > per*/ ) {
         return this.value = new cNumber( 0 );
     }
 
-    if( per < 3){
-        coeff = 1;
-    }
-    else if ( per >= 3 && per <= 4 ) {
-        coeff = 1.5;
-    }
-    else if ( per >= 5 && per <= 6 ) {
-        coeff = 2;
-    }
-    else if ( per > 6 ) {
-        coeff = 2.5;
-    }
-    else {
-        return this.value = new cError( cErrorType.not_numeric );
+    datePurch = Date.prototype.getDateFromExcel( datePurch );
+    firstPer = Date.prototype.getDateFromExcel( firstPer );
+
+    function findDepr( countedPeriod, depr, rate, cost ){
+
+        if (countedPeriod > period) {
+            return new cNumber(Math.round(depr));
+        }
+        else{
+            countedPeriod++;
+        }
+
+        var calcT = assetLife - countedPeriod, deprTemp = calcT == 2 ? cost * 0.5 : rate * cost;
+
+        rate = (calcT == 2 ? 1 : rate);
+
+        if (cost < salvage){
+            if (cost - salvage < 0) {
+                depr = 0;
+            }
+            else {
+                depr = cost - salvage;
+            }
+        }
+        else {
+            depr = deprTemp;
+        }
+
+        cost -= depr;
+
+        return findDepr( countedPeriod, depr, rate, cost );
     }
 
-    rate *= coeff;
-
-    var val0 = Date.prototype.getDateFromExcel( datePurch ),
-        val1 = Date.prototype.getDateFromExcel( firstPer );
-
-    var _rate = Math.round( yearFrac( val0, val1, basis ) * rate * cost ), rest;
-    cost -= _rate;
-    rest = cost - salvage;
-
-    for ( var n = 0; n < period; n++ ) {
-        _rate = Math.round( rate * cost );
-        rest -= _rate;
-
-        if ( rest < 0 ) {
-            switch ( period - n ) {
-                case 0:
-                case 1:
-                    return this.value = new cNumber( Math.round( cost * 0.5 ) );
-                default:
-                    return this.value = new cNumber( 0 );
+    function firstDeprLinc( cost, datePurch, firstP, salvage, rate, per, basis){
+        function fix29February (d){
+            if ( (basis == DayCountBasis.ActualActual || basis == DayCountBasis.Actual365) && d.isLeapYear() && d.getUTCMonth() == 2 && d.getUTCDate() >= 28){
+                return new Date(d.getUTCFullYear(), d.getUTCMonth(), 28);
+            }
+            else{
+                return d;
             }
         }
 
-        cost -= _rate;
+        var firstLen = diffDate( fix29February (datePurch), fix29February(firstP), basis),
+            firstDeprTemp = firstLen / daysInYear( datePurch, basis ) * rate * cost,
+            firstDepr = firstDeprTemp == 0 ? cost * rate : firstDeprTemp,
+            period = firstDeprTemp == 0 ? per : per + 1,
+            availDepr = cost - salvage;
+
+        if (firstDepr > availDepr) {
+            return [availDepr,period];
+        }
+        else {
+            return [firstDepr,period];
+        }
     }
 
-    return this.value = new cNumber( _rate )
+    var per = Math.ceil(1 / rate ), coeff;
+
+    if (cost == salvage || period > per){
+        this.value = new cNumber(0);
+    }
+    else{
+
+        if ( per >= 3 && per < 5 ) {
+            coeff = 1.5;
+        }
+        else if ( per >= 5 && per < 6 ) {
+            coeff = 2;
+        }
+        else if ( per >= 6 ) {
+            coeff = 2.5;
+        }
+        else{
+            this.value = new cError( cErrorType.not_numeric );
+        }
+
+        var deprR = rate * coeff,
+            o = firstDeprLinc(cost, datePurch, firstPer, salvage, deprR, per, basis);
+
+        var firstDeprLinc = o[0], assetLife = o[1],
+            firstDepr = Math.round(firstDeprLinc);//round excelComplaint firstDeprLinc
+
+        if ( period == 0 ){
+            this.value = new cNumber( firstDepr );
+        }
+        else{
+            this.value = findDepr(1, 0, deprR,(cost - firstDepr));
+        }
+    }
+
+    return this.value;
 
 };
 cAMORDEGRC.prototype.getInfo = function () {
