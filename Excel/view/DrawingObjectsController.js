@@ -24,7 +24,7 @@ function CContentChangesElement(Type, Pos, Count, Data)
 
             this.m_pData.Data.UseArray = true;
             this.m_pData.Data.PosArray = this.m_aPositions;
-
+            Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
             this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
 
             var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;

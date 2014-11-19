@@ -809,7 +809,7 @@ CPresentation.prototype =
 
         this.Document_UpdateInterfaceState();
         this.Document_UpdateSelectionState();
-        this.Document_UpdateRulersState();
+       // this.Document_UpdateRulersState();
         editor.WordControl.OnUpdateOverlay();
     },
 
@@ -959,7 +959,7 @@ CPresentation.prototype =
     },
 
 
-    Create_TableGraphicFrame : function(Cols, Rows, Parent, StyleId, Width, Height, PosX, PosY)
+    Create_TableGraphicFrame : function(Cols, Rows, Parent, StyleId, Width, Height, PosX, PosY, bInline)
     {
         var W;
         if(isRealNumber(Width))
@@ -980,6 +980,11 @@ CPresentation.prototype =
         {
             X = 0;
             Y = 0;
+        }
+        var Inline = false;
+        if(isRealBool(bInline))
+        {
+            Inline = bInline;
         }
         var Grid = [];
 
@@ -1004,7 +1009,12 @@ CPresentation.prototype =
         graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
         graphic_frame.setNvSpPr(new UniNvPr());
 
-        var table = new CTable(this.DrawingDocument, graphic_frame, true, 0, X, Y, W, 100000, Rows, Cols, Grid, true);
+        var table = new CTable(this.DrawingDocument, graphic_frame, Inline, 0, X, Y, W, 100000, Rows, Cols, Grid, true);
+        if(!Inline)
+        {
+            table.Set_PositionH(c_oAscHAnchor.Page, false, 0);
+            table.Set_PositionV(c_oAscVAnchor.Page, false, 0);
+        }
         table.Set_TableLayout(tbllayout_Fixed);
         if(typeof StyleId === "string")
         {
@@ -2632,7 +2642,7 @@ CPresentation.prototype =
             {
                 if(this.TableStylesIdMap[key])
                 {
-                    this.TablesForInterface[index] = this.Create_TableGraphicFrame(5, 5, Slide, key, W, H, _x_mar, _y_mar);
+                    this.TablesForInterface[index] = this.Create_TableGraphicFrame(5, 5, Slide, key, W, H, _x_mar, _y_mar, true);
                     this.TablesForInterface[index].setBDeleted(true);
                     index++;
                 }

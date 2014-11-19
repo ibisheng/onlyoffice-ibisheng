@@ -562,7 +562,7 @@ function CCollaborativeChanges()
     this.Internal_Save_Data = function(Class, Data, Binary)
     {
         var Writer = History.BinaryWriter;
-        var Pos = Binary.Pos
+        var Pos = Binary.Pos;
         var Len = Binary.Len;
 
         if ( "undefined" != typeof(Class.Save_Changes2) )

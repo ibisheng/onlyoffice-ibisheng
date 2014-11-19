@@ -15535,7 +15535,7 @@ CTable.prototype =
             var OffsetCorrection_Left  = 0;
             var OffsetCorrection_Right = 0;
 
-            if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0 )
+            if ( this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0  && !(this.bPresentation === true))
             {
                 var FirstRow   = this.Content[0];
                 var Cell_Left  = FirstRow.Get_Cell( 0 );
