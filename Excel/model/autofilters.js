@@ -3342,9 +3342,9 @@ var gUndoInsDelCellsFlag = true;
 									if(k < 0)
 										k = 0;
 									cell = ws.model._getCell(n,k);	
-								};
-							};
-						};
+								}
+							}
+						}
 						
 						if((!isEmptyCell || (valueMerg != null && valueMerg != "")) && cell.tableXfs == null)
 						{
@@ -3365,10 +3365,10 @@ var gUndoInsDelCellsFlag = true;
 							else if(n > cloneActiveRange.r2)
 							{
 								cloneActiveRange.r2 = n;isEnd = false;
-							};	
-						};
-					};
-				};
+							}
+						}
+					}
+				}
 				
 				//проверяем есть ли пустые строчки и столбцы в диапазоне
 				var mergeCells;
@@ -3457,6 +3457,7 @@ var gUndoInsDelCellsFlag = true;
 							continue;
 
 						var oldRange = oldFilters[i].Ref;
+						var intersection = oldRange.intersection ? oldRange.intersection(cloneActiveRange) : null;
 						if(cloneActiveRange.r1 <= oldRange.r1 && cloneActiveRange.r2 >= oldRange.r2 && cloneActiveRange.c1 <= oldRange.c1 && cloneActiveRange.c2 >= oldRange.c2)
 						{
 							if(oldRange.r2 > ar.r1 && ar.c2 >= oldRange.c1 && ar.c2 <= oldRange.c2)//top
@@ -3466,7 +3467,16 @@ var gUndoInsDelCellsFlag = true;
 							else if(oldRange.c2 < ar.c1)//left
 								newRange.c1 = oldRange.c2 + 1;
 							else if(oldRange.c1 > ar.c2)//right
-								newRange.c2 = oldRange.c1 - 1
+								newRange.c2 = oldRange.c1 - 1;
+						}
+						else if(intersection)
+						{
+							if(intersection.r1 >= cloneActiveRange.r1 && intersection.r1 <= cloneActiveRange.r2)//место пересечения ниже
+							{
+								cloneActiveRange.r2 = intersection.r1 - 1;
+								if(cloneActiveRange.r2 < cloneActiveRange.r1)
+									cloneActiveRange.r1 = cloneActiveRange.r2;
+							}
 						}
 					}
 					
