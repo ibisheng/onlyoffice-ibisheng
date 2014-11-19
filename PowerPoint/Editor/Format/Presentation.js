@@ -1577,8 +1577,8 @@ CPresentation.prototype =
             }
             else
             {
-                this.DrawingDocument.TargetStart();
-                this.DrawingDocument.TargetShow();
+               // this.DrawingDocument.TargetStart();
+               // this.DrawingDocument.TargetShow();
 
                 this.Paragraph_Add( new ParaSpace( 1 ) );
             }
