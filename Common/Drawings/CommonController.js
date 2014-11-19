@@ -540,7 +540,7 @@ DrawingObjectsController.prototype =
             {
                 tx = invert_transform_text.TransformPointX(x, y);
                 ty = invert_transform_text.TransformPointY(x, y);
-                if(this.document || this.drawingObjects.cSld)
+                if(this.document || (this.drawingObjects.cSld && !(this.noNeedUpdateCursorType === true)))
                 {
                     content.Update_CursorType(tx, ty, pageIndex);
                     ret.updated = true;

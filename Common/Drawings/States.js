@@ -1185,11 +1185,13 @@ TextAddState.prototype =
         this.drawingObjects.drawingObjects.sendGraphicObjectProps();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
         this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        this.drawingObjects.noNeedUpdateCursorType = true;
         var cursor_type = this.drawingObjects.onMouseDown(e, x, y, pageIndex);
         if(cursor_type && cursor_type.hyperlink)
         {
             this.drawingObjects.drawingObjects.showDrawingObjects(true);
         }
+        this.drawingObjects.noNeedUpdateCursorType = false;
         this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
         if(editor && editor.isPaintFormat)
         {

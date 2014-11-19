@@ -2936,6 +2936,17 @@ CPresentation.prototype =
             {
                 for(i = 0; i < Content.Drawings.length; ++i)
                 {
+                    if(Content.Drawings[i].Drawing.bDeleted)
+                    {
+                        if(Content.Drawings[i].Drawing.setBDeleted2)
+                        {
+                            Content.Drawings[i].Drawing.setBDeleted2(false);
+                        }
+                        else if(Content.Drawings[i].Drawing.setBDeleted)
+                        {
+                            Content.Drawings[i].Drawing.setBDeleted(false);
+                        }
+                    }
                     Content.Drawings[i].Drawing.setParent(this.Slides[this.CurPage]);
                     Content.Drawings[i].Drawing.addToDrawingObjects();
                 }
