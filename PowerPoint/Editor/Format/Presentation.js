@@ -3451,6 +3451,7 @@ CPresentation.prototype =
                 this.DrawingDocument.m_oWordControl.GoToPage(this.Slides.length -1);
 
             }
+            editor.sync_HideComment();
             this.Document_UpdateUndoRedoState();
             this.DrawingDocument.OnEndRecalculate();
             this.DrawingDocument.UpdateThumbnailsAttack();

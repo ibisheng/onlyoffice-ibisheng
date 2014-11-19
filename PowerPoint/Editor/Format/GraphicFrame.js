@@ -642,7 +642,7 @@ CGraphicFrame.prototype =
             var tx, ty;
             tx = this.invertTransform.TransformPointX(x, y);
             ty = this.invertTransform.TransformPointY(x, y);
-            var bBorder = this.graphicObject.Selection.Type2 === table_Selection_Border;
+            //var bBorder = this.graphicObject.Selection.Type2 === table_Selection_Border;
             this.graphicObject.Selection_SetEnd(tx, ty, 0, e);
             //if(g_mouse_event_type_up === e.Type && bBorder)
             //    editor.WordControl.m_oLogicDocument.Recalculate();  TODO: пересчет вызывается в CTable
