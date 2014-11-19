@@ -3686,8 +3686,9 @@ PasteProcessor.prototype =
                         presentation.addNextSlide();
                         b_add_slide = true;
                     }
-                    var shape = new CShape(presentation.Slides[presentation.CurPage]);
-                    shape.setTxBody(new CTextBody(shape));
+                    var shape = new CShape();
+                    shape.setParent(presentation.Slides[presentation.CurPage]);
+                    shape.setTxBody(CreateTextBodyFromString("", presentation.DrawingDocument, shape));
                     var dd = presentation.DrawingDocument;
                     arrShapes.push(shape);
                     //shape.setXfrm(dd.GetMMPerDot(node["offsetLeft"]), dd.GetMMPerDot(node["offsetTop"]), null, null, null, null, null);
@@ -3701,8 +3702,10 @@ PasteProcessor.prototype =
                             shape.txBody.content.Internal_Content_Remove(0, 1);
                         }
                         var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
-                        var h = shape.txBody.getRectHeight(2000, w);
-                        shape.setXfrm(null, null, w, h, null, null, null);
+                        var h = shape.txBody.content.Get_SummaryHeight();
+                        CheckSpPrXfrm(shape);
+                        shape.spPr.xfrm.setExtX(w);
+                        shape.spPr.xfrm.setExtY(h);
                     }
                      //oThis._AddNextPrevToContent(oThis.oDocument);
                      if(false == oThis.bNested)
