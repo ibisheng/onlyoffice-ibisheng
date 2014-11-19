@@ -15460,7 +15460,7 @@ CMinusPlus.prototype =
 
 function CMultiLvlStrCache()
 {
-    this.lvl     = null;
+    this.lvl     = [];
     this.ptCount = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -15481,9 +15481,10 @@ CMultiLvlStrCache.prototype =
     createDuplicate: function()
     {
         var c = new CMultiLvlStrCache();
-        if(this.lvl)
+
+        for(var i = 0; i < this.lvl.length; ++i)
         {
-            c.setLvl(this.lvl.createDuplicate());
+            c.setLvl(this.lvl[i].createDuplicate());
         }
         c.setPtCount(this.ptCount);
         return c;
@@ -15496,8 +15497,8 @@ CMultiLvlStrCache.prototype =
 
     setLvl: function(pr)
     {
-        History.Add(this, {Type: historyitem_MultiLvlStrCache_SetLvl, newPr: pr, oldPr: this.lvl});
-        this.lvl = pr;
+        History.Add(this, {Type: historyitem_MultiLvlStrCache_SetLvl, newPr: pr, oldPr: this.lvl.length});
+        this.lvl.push(pr);
     },
 
     setPtCount: function(pr)
@@ -15512,7 +15513,7 @@ CMultiLvlStrCache.prototype =
         {
             case historyitem_MultiLvlStrCache_SetLvl:
             {
-                this.lvl = data.oldPr;
+                this.lvl.splice(data.oldPr, 1);
                 break;
             }
             case historyitem_MultiLvlStrCache_SetPtCount:
@@ -15529,7 +15530,7 @@ CMultiLvlStrCache.prototype =
         {
             case historyitem_MultiLvlStrCache_SetLvl:
             {
-                this.lvl = data.newPr;
+                this.lvl.splice(data.oldPr, 0, data.newPr);
                 break;
             }
             case historyitem_MultiLvlStrCache_SetPtCount:
@@ -15548,6 +15549,7 @@ CMultiLvlStrCache.prototype =
             case historyitem_MultiLvlStrCache_SetLvl:
             {
                 writeObject(w, data.newPr);
+                writeLong(w, data.oldPr);
                 break;
             }
             case historyitem_MultiLvlStrCache_SetPtCount:
@@ -15565,7 +15567,9 @@ CMultiLvlStrCache.prototype =
         {
             case historyitem_MultiLvlStrCache_SetLvl:
             {
-                this.lvl = readObject(r);
+                var str_pt = readObject(r);
+                var pos = readLong(r);
+                this.lvl.splice(pos, 0, str_pt);
                 break;
             }
             case historyitem_MultiLvlStrCache_SetPtCount:

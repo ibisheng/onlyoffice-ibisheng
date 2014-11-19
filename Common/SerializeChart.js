@@ -8356,7 +8356,10 @@ BinaryChartReader.prototype.ReadCT_MultiLvlStrData = function (type, length, val
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_lvl(t, l, oNewVal);
         });
-        val.setLvl(oNewVal);
+        for(var i = 0; i < oNewVal.length; ++i)
+        {
+            val.setLvl(oNewVal[i]);
+        }
     }
     else if (c_oserct_multilvlstrdataEXTLST === type) {
         var oNewVal = {};
