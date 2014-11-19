@@ -15483,7 +15483,7 @@ CMultiLvlStrCache.prototype =
         var c = new CMultiLvlStrCache();
         if(this.lvl)
         {
-            c.setLvl(this.lv.createDuplicate());
+            c.setLvl(this.lvl.createDuplicate());
         }
         c.setPtCount(this.ptCount);
         return c;

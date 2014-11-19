@@ -1883,14 +1883,14 @@ DrawingObjectsController.prototype =
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
             }
-            else
+            if(cat_ax && val_ax)
             {
                 if(newChartType.getObjectType() === historyitem_type_BarChart && newChartType.barDir === BAR_DIR_BAR)
                 {
                     if(cat_ax.axPos !== AX_POS_L)
                     {
                         cat_ax.setAxPos(AX_POS_L);
-                       // if(cat_ax.title && cat_ax.title.tx && cat_ax.title.tx.rich)
+                        // if(cat_ax.title && cat_ax.title.tx && cat_ax.title.tx.rich)
                     }
                     if(val_ax.axPos !== AX_POS_B)
                     {
@@ -1908,11 +1908,11 @@ DrawingObjectsController.prototype =
                         val_ax.setAxPos(AX_POS_L);
                     }
                 }
+                newChartType.addAxId(cat_ax);
+                newChartType.addAxId(val_ax);
+                plotArea.addAxis(cat_ax);
+                plotArea.addAxis(val_ax);
             }
-            newChartType.addAxId(cat_ax);
-            newChartType.addAxId(val_ax);
-            plotArea.addAxis(cat_ax);
-            plotArea.addAxis(val_ax);
         };
 
         var replaceChart = function(plotArea, chartType, newChartType)
