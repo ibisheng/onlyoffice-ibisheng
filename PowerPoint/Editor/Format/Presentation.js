@@ -3462,6 +3462,10 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(changestype_Layout) === false)
         {
             History.Create_NewPoint();
+            if(this.Slides[this.CurPage])
+            {
+                this.Slides[this.CurPage].graphicObjects.resetSelection();
+            }
             var layout = MasterLayouts.sldLayoutLst[layout_index];
             for(var i = 0; i < _array.length; ++i)
             {
