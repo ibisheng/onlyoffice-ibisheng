@@ -406,7 +406,7 @@ CShape.prototype.recalcText = function()
 
 CShape.prototype.recalculate = function ()
 {
-    if(this.bDeleted)
+    if(this.bDeleted || !this.parent)
         return;
     var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === historyitem_type_Slide);
     ExecuteNoHistory(function(){

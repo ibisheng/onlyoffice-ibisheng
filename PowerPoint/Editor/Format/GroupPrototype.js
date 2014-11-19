@@ -180,7 +180,7 @@ CGroupShape.prototype.updatePosition = CShape.prototype.updatePosition;
 CGroupShape.prototype.setParent2 = CShape.prototype.setParent2;
 CGroupShape.prototype.recalculate = function()
 {
-    if(this.bDeleted)
+    if(this.bDeleted || !this.parent)
         return;
     ExecuteNoHistory(function()
     {

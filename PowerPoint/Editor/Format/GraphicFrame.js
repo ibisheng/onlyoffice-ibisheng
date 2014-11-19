@@ -313,7 +313,7 @@ CGraphicFrame.prototype =
     getHierarchy: CShape.prototype.getHierarchy,
     recalculate: function()
     {
-        if(this.bDeleted)
+        if(this.bDeleted  || !this.parent)
             return;
         ExecuteNoHistory(function(){
             if(this.recalcInfo.recalculateTable)

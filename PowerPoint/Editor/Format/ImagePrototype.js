@@ -126,6 +126,8 @@ CImageShape.prototype.getHierarchy = CShape.prototype.getHierarchy;
 CImageShape.prototype.getParentObjects = CShape.prototype.getParentObjects;
 CImageShape.prototype.recalculate = function ()
 {
+    if(this.bDeleted || !this.parent)
+        return;
     ExecuteNoHistory(function(){
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();

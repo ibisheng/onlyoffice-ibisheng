@@ -223,7 +223,7 @@ CChartSpace.prototype.recalculateBounds = function()
 
 CChartSpace.prototype.recalculate = function()
 {
-    if(this.bDeleted)
+    if(this.bDeleted || !this.parent)
         return;
     ExecuteNoHistory(function()
     {
