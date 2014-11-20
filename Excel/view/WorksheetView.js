@@ -1096,8 +1096,8 @@
 			// ToDo разобраться со значениями
 			this.maxRowHeight = asc_calcnpt(409, this._getPPIY());
 			this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
-			this.defaultRowHeight = asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
-			gc_dDefaultRowHeightAttribute = this.model.getDefaultHeight() || this.defaultRowHeight;
+			gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() ||
+				asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
 
 			this._setFont(undefined, this.model.getDefaultFontName(), defaultFontSize);
 			var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
@@ -1310,7 +1310,7 @@
 			var visibleH = this.drawingCtx.getHeight();
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 			var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, obr.maxRow);
-			var defaultH = this.model.getDefaultHeight() || this.defaultRowHeight;
+			var defaultH = this.defaultRowHeight;
 			var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 
 			if (1 === fullRecalc) {

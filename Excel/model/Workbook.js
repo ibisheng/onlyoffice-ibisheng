@@ -2965,6 +2965,7 @@ Woorksheet.prototype.isDefaultWidthHidden=function(){
 	return null != this.oAllCol && this.oAllCol.hd;
 };
 Woorksheet.prototype.getDefaultHeight=function(){
+    // ToDo http://bugzserver/show_bug.cgi?id=19666 (флага CustomHeight нет)
 	var dRes = null;
 	// Нужно возвращать выставленную, только если флаг CustomHeight = true
 	if(null != this.oSheetFormatPr.oAllRow && this.oSheetFormatPr.oAllRow.CustomHeight)
