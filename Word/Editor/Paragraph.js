@@ -8468,6 +8468,10 @@ Paragraph.prototype =
         {
             return CurDocContent.Parent.transformText;
         }
+        if(CurDocContent.Parent && CurDocContent.Parent.parent && CurDocContent.Parent.parent.transformText)
+        {
+            return CurDocContent.Parent.parent.transformText;
+        }
         return null;
     },
 

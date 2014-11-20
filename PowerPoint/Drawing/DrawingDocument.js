@@ -1063,7 +1063,7 @@ function CDrawingDocument()
         return {X: x, Y: y};
     };
 
-    this.SetCursorType = function(sType)
+    this.SetCursorType = function(sType, Data)
     {
         if ("" == this.m_sLockedCursorType)
         {
@@ -1074,6 +1074,10 @@ function CDrawingDocument()
         }
         else
             this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+        if ( "undefined" === typeof(Data) || null === Data )
+            Data = new CMouseMoveData();
+
+        editor.sync_MouseMoveCallback( Data );
     }
     this.LockCursorType = function(sType)
     {
@@ -1715,13 +1719,21 @@ function CDrawingDocument()
         return false;
     }
 
-    this.ConvertCoordsToCursorWR = function(x, y)
+    this.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform)
     {
         var _word_control = this.m_oWordControl;
         var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-        var x_pix = (this.SlideCurrectRect.left + x * dKoef + _word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0;
-        var y_pix = (this.SlideCurrectRect.top  + y * dKoef + _word_control.m_oMainContent.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0;
+        var __x = x;
+        var __y = y;
+        if (transform)
+        {
+            __x = transform.TransformPointX(x, y);
+            __y = transform.TransformPointY(x, y);
+        }
+
+        var x_pix = (this.SlideCurrectRect.left + __x * dKoef + _word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0;
+        var y_pix = (this.SlideCurrectRect.top  + __y * dKoef + _word_control.m_oMainContent.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
