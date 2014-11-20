@@ -429,9 +429,9 @@ asc_docs_api.prototype._coAuthoringInit = function () {
                         if(object instanceof Slide && Class === object.deleteLock)
                         {
                             if(NewType !== locktype_Mine && NewType !== locktype_None)
-                                editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(Class.num);
+                                editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
                             else
-                                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
+                                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
                         }
                         if(object instanceof CPresentation)
                         {

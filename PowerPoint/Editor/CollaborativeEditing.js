@@ -798,6 +798,14 @@ function CCollaborativeEditing()
             {
                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
             }
+            if(Class instanceof PropLocker)
+            {
+                var Class2 = g_oTableId.Get_ById(Class.objectId);
+                if(Class2.getObjectType && Class2.getObjectType() === historyitem_type_Slide && Class2.deleteLock === Class)
+                {
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class2.num);
+                }
+            }
 
             var check_obj = null;
             if(Class.getObjectType)
