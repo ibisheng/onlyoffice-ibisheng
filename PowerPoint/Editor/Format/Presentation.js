@@ -3376,7 +3376,7 @@ CPresentation.prototype =
             this.insertSlide(this.CurPage+1,  new_slide);
             this.Recalculate();
         }
-
+        this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage + 1);
         this.Document_UpdateInterfaceState();
     },
 
