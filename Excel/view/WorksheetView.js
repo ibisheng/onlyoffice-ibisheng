@@ -6679,9 +6679,7 @@
 			this.isSelectOnShape = isSelectOnShape;
 			// отправляем евент для получения свойств картинки, шейпа или группы
             this.model.workbook.handlers.trigger("asc_onHideComment");
-			this.handlers.trigger("selectionNameChanged", this.getSelectionName());
-			this.handlers.trigger("selectionChanged", this.getSelectionInfo());
-			this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+			this._updateSelectionNameAndInfo();
 		};
 		WorksheetView.prototype.getActiveRangeObj = function (){
 			return this.activeRange.clone(true);
@@ -6718,10 +6716,7 @@
 			this.activeRange.normalize();
 			this._drawSelection();
 
-			this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-			this.handlers.trigger("selectionChanged", this.getSelectionInfo());
-			this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
-
+			this._updateSelectionNameAndInfo();
 			return this._calcActiveCellOffset();
 		};
 
@@ -6743,10 +6738,7 @@
 				this.activeRange = ar;
 				this._drawSelection();
 
-				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
-				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
-
+				this._updateSelectionNameAndInfo();
 				oRes = this._calcActiveCellOffset();
 			}
 			return oRes;
@@ -7851,9 +7843,7 @@
 				t._recalculateAfterUpdate([arnFrom, arnTo]);
 
 				// Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
-				t.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
-				t.handlers.trigger("selectionChanged", t.getSelectionInfo());
-				t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
+				t._updateSelectionNameAndInfo();
 			};
 
 			this._isLockedCells ([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
@@ -10624,9 +10614,7 @@
 			if (this._isLargeRange(range)) {
 				this.changeWorksheet("update", {lockDraw: lockDraw});
 
-				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
-				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+				this._updateSelectionNameAndInfo();
 				return;
 			}
 
@@ -10693,10 +10681,9 @@
 				this._cleanCellsTextMetricsCache();
 				this._prepareCellTextMetricsCache();
 				this.handlers.trigger("reinitializeScroll");
-				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
-				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			}
+			if (!lockDraw)
+				this._updateSelectionNameAndInfo();
 
 			this.objectRender.rebuildChartGraphicObjects(new CChangeTableData(null, null, null, null, arrChanged));
 			this.cellCommentator.updateCommentPosition();
