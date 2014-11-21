@@ -7536,6 +7536,11 @@ CChartSpace.prototype =
             }
         }
 
+        if (this.Lock && locktype_None != this.Lock.Get_Type())
+        {
+            graphics.transform3(this.transform);
+            graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
+        }
         graphics.RestoreGrState();
        // graphics.reset();
     },

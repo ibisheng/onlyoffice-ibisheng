@@ -126,6 +126,7 @@
                 "../../Excel/model/DrawingObjects/Format/ImagePrototype.js",
                 "../../Excel/model/DrawingObjects/Format/GroupPrototype.js",
                 "../../Excel/model/DrawingObjects/Format/ChartSpacePrototype.js",
+                "../../PowerPoint/Editor/Format/GraphicFrame.js",
 
 
 				"../../Word/Editor/Comments.js",

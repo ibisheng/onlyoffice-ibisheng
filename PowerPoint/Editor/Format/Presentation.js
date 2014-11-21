@@ -2948,7 +2948,7 @@ CPresentation.prototype =
                             Content.Drawings[i].Drawing.setBDeleted(false);
                         }
                     }
-                    Content.Drawings[i].Drawing.setParent(this.Slides[this.CurPage]);
+                    Content.Drawings[i].Drawing.setParent2(this.Slides[this.CurPage]);
                     Content.Drawings[i].Drawing.addToDrawingObjects();
                     this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, this.CurPage);
                 }

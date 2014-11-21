@@ -472,7 +472,7 @@ RotateState.prototype =
                     this.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
                     if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
                     {
-                        copy.setParent(this.drawingObjects.drawingObjects);
+                        copy.setParent2(this.drawingObjects.drawingObjects);
                         if(!copy.spPr || !copy.spPr.xfrm
                             || (copy.getObjectType() === historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNullForGroup() || copy.getObjectType() !== historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNull()))
                         {
@@ -500,9 +500,9 @@ RotateState.prototype =
                             {
                                 var copy = tracks[i].originalObject.copy();
                                 oThis.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
-                                if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
+                                if(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld)
                                 {
-                                    copy.setParent(this.drawingObjects.drawingObjects);
+                                    copy.setParent2(oThis.drawingObjects.drawingObjects);
                                 }
                                 copy.setGroup(tracks[i].originalObject.group);
                                 copy.group.addToSpTree(copy.group.length, copy);

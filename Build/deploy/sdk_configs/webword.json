@@ -88,6 +88,7 @@
                "../../Word/Editor/GraphicObjects/Format/ImagePrototype.js",
                "../../Word/Editor/GraphicObjects/Format/GroupPrototype.js",
                "../../Word/Editor/GraphicObjects/Format/ChartSpacePrototype.js",
+               "../../PowerPoint/Editor/Format/GraphicFrame.js",
                "../../Word/Editor/GraphicObjects/DrawingStates.js",
                "../../Word/Editor/GraphicObjects/GraphicObjects.js",
                "../../Word/Editor/GraphicObjects/GraphicPage.js",

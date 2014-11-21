@@ -444,3 +444,132 @@ CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLo
 
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+
+CTable.prototype.Get_TableOffsetCorrection = function()
+{
+    return 0;
+};
+
+CTable.prototype.Selection_Draw_Page = function(Page_abs)
+{
+    if ( false === this.Selection.Use )
+        return;
+
+    var CurPage = Page_abs - this.Get_StartPage_Absolute();
+    if ( CurPage < 0 || CurPage >= this.Pages.length )
+        return;
+
+    switch( this.Selection.Type )
+    {
+        case table_Selection_Cell:
+        {
+            var Row_prev_index = -1;
+            for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+            {
+                var Pos = this.Selection.Data[Index];
+                var Row = this.Content[Pos.Row];
+                var Cell = Row.Get_Cell( Pos.Cell );
+                var CellInfo = Row.Get_CellInfo( Pos.Cell );
+                var CellMar = Cell.Get_Margins();
+
+                if ( -1 === Row_prev_index || Row_prev_index != Pos.Row )
+                    Row_prev_index = Pos.Row;
+
+                var X_start = CellInfo.X_cell_start;
+                var X_end   = CellInfo.X_cell_end;
+
+                var Cell_Pages   = Cell.Content_Get_PagesCount();
+                var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
+                if ( Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages )
+                    continue;
+
+                var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
+                var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
+
+                if ( 0 != Cell_PageRel )
+                {
+                    // мы должны определить ряд, на котором случился перенос на новую страницу
+                    var TempRowIndex = this.Pages[CurPage].FirstRow;
+                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] +  Y_offset, X_end - X_start, this.RowsInfo[TempRowIndex].H[CurPage] );
+                }
+                else
+                {
+                    this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] +  Y_offset, X_end - X_start, this.RowsInfo[Pos.Row].H[CurPage] );
+                }
+            }
+            break;
+        }
+        case table_Selection_Text:
+        {
+            var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
+            Cell.Content.Selection_Draw_Page(Page_abs);
+
+            break;
+        }
+    }
+};
+
+CStyle.prototype.Create_NormalTable = function()
+{
+    var TablePr =
+    {
+        TableInd :
+        {
+            W    : 0,
+            Type : tblwidth_Mm
+        },
+        TableCellMar :
+        {
+            Top :
+            {
+                W    : 1.27,
+                Type : tblwidth_Mm
+            },
+
+            Left :
+            {
+                W    : 2.54, // 5.4pt
+                Type : tblwidth_Mm
+            },
+
+            Bottom :
+            {
+                W    : 1.27,
+                Type : tblwidth_Mm
+            },
+
+            Right :
+            {
+                W    : 2.54, // 5.4pt
+                Type : tblwidth_Mm
+            }
+        }
+    };
+
+    this.Set_UiPriority( 99 );
+    this.Set_SemiHidden( true );
+    this.Set_UnhideWhenUsed( true );
+    this.Set_TablePr( TablePr );
+};
+
+CTablePr.prototype.Init_Default = function()
+{
+    this.TableStyleColBandSize = 1;
+    this.TableStyleRowBandSize = 1;
+    this.Jc                    = align_Left;
+    this.Shd                   = new CDocumentShd();
+    this.TableBorders.Bottom   = new CDocumentBorder();
+    this.TableBorders.Left     = new CDocumentBorder();
+    this.TableBorders.Right    = new CDocumentBorder();
+    this.TableBorders.Top      = new CDocumentBorder();
+    this.TableBorders.InsideH  = new CDocumentBorder();
+    this.TableBorders.InsideV  = new CDocumentBorder();
+    this.TableCellMar.Bottom   = new CTableMeasurement(tblwidth_Mm, 1.27);
+    this.TableCellMar.Left     = new CTableMeasurement(tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
+    this.TableCellMar.Right    = new CTableMeasurement(tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
+    this.TableCellMar.Top      = new CTableMeasurement(tblwidth_Mm, 1.27);
+    this.TableCellSpacing      = null;
+    this.TableInd              = 0;
+    this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
+    this.TableLayout           = tbllayout_AutoFit;
+};
