@@ -776,8 +776,11 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
         }
         //var content = this.getDocContent();
         //content && content.Set_StartPage(this.parent.num);
-        editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
-        editor.WordControl.GoToPage(this.parent.num);
+        if(editor.WordControl.m_oLogicDocument.CurPage !== this.parent.num)
+        {
+            editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
+            editor.WordControl.GoToPage(this.parent.num);
+        }
     }
 };
 

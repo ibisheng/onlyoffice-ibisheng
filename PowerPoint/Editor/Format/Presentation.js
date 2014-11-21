@@ -2934,6 +2934,7 @@ CPresentation.prototype =
         {
             if(Content.Drawings.length > 0)
             {
+                this.Slides[this.CurPage].graphicObjects.resetSelection();
                 for(i = 0; i < Content.Drawings.length; ++i)
                 {
                     if(Content.Drawings[i].Drawing.bDeleted)
@@ -2949,17 +2950,22 @@ CPresentation.prototype =
                     }
                     Content.Drawings[i].Drawing.setParent(this.Slides[this.CurPage]);
                     Content.Drawings[i].Drawing.addToDrawingObjects();
+                    this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, this.CurPage);
                 }
             }
             else if(Content.DocContent)
             {
-                var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
+                var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
                 if(target_doc_content)
                 {
-                    var paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+                    if(target_doc_content.Selection.Use)
+                    {
+                        this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                    }
+                    paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
                     if (null != paragraph && type_Paragraph == paragraph.GetType())
                     {
-                        var NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                        NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                         paragraph.Check_NearestPos(NearPos);
                         target_doc_content.Insert_Content(Content.DocContent, NearPos);
                     }
@@ -2969,6 +2975,14 @@ CPresentation.prototype =
                     var track_object = new NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
                     track_object.track({}, 0, 0);
                     var shape = track_object.getShape(false, this.DrawingDocument, this.Slides[this.CurPage]);
+                    shape.setParent(this.Slides[this.CurPage]);
+                    paragraph = shape.txBody.content.Content[0];
+                    NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                    paragraph.Check_NearestPos(NearPos);
+                    var old_val = Content.DocContent.MoveDrawing;
+                    Content.DocContent.MoveDrawing = true;
+                    shape.txBody.content.Insert_Content(Content.DocContent, NearPos);
+                    Content.DocContent.MoveDrawing = old_val;
                     var body_pr = shape.getBodyPr();
                     var w = shape.txBody.getMaxContentWidth(this.Width/2, true) + body_pr.lIns + body_pr.rIns;
                     var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
@@ -2978,10 +2992,11 @@ CPresentation.prototype =
                     shape.spPr.xfrm.setOffY((this.Height - h) / 2);
                     shape.setParent(this.Slides[this.CurPage]);
                     shape.addToDrawingObjects();
+                    this.Slides[this.CurPage].graphicObjects.resetSelection();
+                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, this.CurPage);
                 }
             }
         }
-        this.Recalculate();
     },
 
     Set_SelectionState : function(State)
@@ -3011,6 +3026,7 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
+                this.DrawingDocument.OnEndRecalculate();
                 break;
             }
             case historyitem_Presentation_RemoveSlide:
@@ -3020,6 +3036,7 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
+                this.DrawingDocument.OnEndRecalculate();
                 break;
             }
             case historyitem_Presentation_SlideSize:
@@ -3055,6 +3072,7 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
+                this.DrawingDocument.OnEndRecalculate();
                 break;
             }
             case historyitem_Presentation_RemoveSlide:
@@ -3064,6 +3082,7 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
+                this.DrawingDocument.OnEndRecalculate();
                 break;
             }
             case historyitem_Presentation_SlideSize:

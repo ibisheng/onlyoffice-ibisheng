@@ -2104,6 +2104,10 @@ CopyProcessor.prototype =
             {
                 this.oPresentationWriter.WriteChart(oGraphicObj);
             }
+            else if(oGraphicObj instanceof CGraphicFrame)
+            {
+                this.oPresentationWriter.WriteTable(oGraphicObj);
+            }
         }
     }
 };

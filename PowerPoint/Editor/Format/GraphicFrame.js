@@ -192,6 +192,7 @@ CGraphicFrame.prototype =
             ret.spPr.setParent(ret);
         }
         ret.setBDeleted(false);
+        ret.cachedImage = this.getBase64Img();
         return ret;
     },
 
@@ -311,6 +312,14 @@ CGraphicFrame.prototype =
 
     getIsSingleBody: CShape.prototype.getIsSingleBody,
     getHierarchy: CShape.prototype.getHierarchy,
+
+
+    getAllImages: function (images) {
+        ///if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
+        ///    images[_getFullImageSrc(this.spPr.Fill.fill.RasterImageId)] = true;
+        ///}
+    },
+
     recalculate: function()
     {
         if(this.bDeleted  || !this.parent)
@@ -339,6 +348,7 @@ CGraphicFrame.prototype =
                 this.recalcInfo.recalculateTransform = false;
                 this.transformText = this.transform;
                 this.invertTransformText = this.invertTransform;
+                this.cachedImage = null;
             }
         }, this, []);
 
