@@ -3485,6 +3485,7 @@ asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
     if(this.bNoSendComments === false)
     {
         var AscCommentData = new asc_CCommentData(CommentData);
+        AscCommentData.asc_putQuoteText("");
         this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
     }
 }
