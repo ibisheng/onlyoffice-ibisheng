@@ -42,8 +42,10 @@ function CMathText(bJDraw)
     this.RecalcInfo =
     {
         //NewLetter:  true,
-        StyleCode:  null,
-        bAccentIJ:  false
+        StyleCode:      null,
+        bAccentIJ:      false,
+        SpaceSpecial:   false,
+        bApostrophe:    false
     };
 
     this.Parent = null;
@@ -524,6 +526,12 @@ CMathText.prototype =
             }
         }
 
+        /*if(bMathText && code == 0x27)
+        {
+            code = 0x7F0;
+            this.RecalcInfo.bApostrophe = true;
+        }*/
+
         return code;
     },
     getCodeChr: function()
@@ -556,28 +564,42 @@ CMathText.prototype =
 
         var metricsTxt;
 
-        if(this.bJDraw)
-            metricsTxt = oMeasure.Measure2Code(letter);
+        var ascent, width, height, descent;
+
+        if(letter == 0x2061)
+        {
+            width = 0;
+            height = 0;
+            ascent = 0;
+
+            this.RecalcInfo.SpaceSpecial = true;
+        }
         else
-            metricsTxt = oMeasure.MeasureCode(letter);
+        {
 
-        if(bAccentIJ)
-            oMeasure.SetStringGid(false);
+            if(this.bJDraw)
+                metricsTxt = oMeasure.Measure2Code(letter);
+            else
+                metricsTxt = oMeasure.MeasureCode(letter);
 
-        //  смещения
-        this.rasterOffsetX = metricsTxt.rasterOffsetX;
-        this.rasterOffsetY = metricsTxt.rasterOffsetY;
+            if(bAccentIJ)
+                oMeasure.SetStringGid(false);
 
-        var ascent  =  metricsTxt.Ascent;
-        var descent = (metricsTxt.Height - metricsTxt.Ascent);
-        var height  =  ascent + descent;
+            //  смещения
+            this.rasterOffsetX = metricsTxt.rasterOffsetX;
+            this.rasterOffsetY = metricsTxt.rasterOffsetY;
 
-        var width;
+            ascent  =  metricsTxt.Ascent;
+            descent = (metricsTxt.Height - metricsTxt.Ascent);
+            height  =  ascent + descent;
 
-        if(this.bJDraw)
-            width = metricsTxt.WidthG;
-        else
-            width = metricsTxt.Width;
+
+            if(this.bJDraw)
+                width = metricsTxt.WidthG;
+            else
+                width = metricsTxt.Width;
+        }
+
 
         this.size.width  = this.GapLeft + this.GapRight + width;
         this.size.height = height;
@@ -626,11 +648,13 @@ CMathText.prototype =
         pGraphics.transform(sx, shy, shx, sy, 0, 0);*/
 
 
-        if(this.RecalcInfo.bAccentIJ)
-            pGraphics.tg(this.RecalcInfo.StyleCode, X, Y);
-        else
-            pGraphics.FillTextCode(X, Y, this.RecalcInfo.StyleCode);    //на отрисовку символа отправляем положение baseLine
-
+        if(this.RecalcInfo.SpaceSpecial == false)
+        {
+            if(this.RecalcInfo.bAccentIJ ||  this.RecalcInfo.bApostrophe)
+                pGraphics.tg(this.RecalcInfo.StyleCode, X, Y);
+            else
+                pGraphics.FillTextCode(X, Y, this.RecalcInfo.StyleCode);    //на отрисовку символа отправляем положение baseLine
+        }
 
     },
     setPosition: function(pos)
@@ -741,6 +765,19 @@ CMathText.prototype =
     Is_NBSP: function()
     {
         return false;
+    },
+    Is_SpecilalOperator: function()
+    {
+        var val = this.value,
+            bSpecialOperator = val == 0x21 || val == 0x23 || (val >= 0x28 && val <= 0x2F) || (val >= 0x3A && val <= 0x3F) || (val >=0x5B && val <= 0x5F) || (val >= 0x7B && val <= 0xA1) || val == 0xAC || val == 0xB1 || val == 0xB7 || val == 0xBF || val == 0xD7 || val == 0xF7 || (val >= 0x2010 && val <= 0x2014) || val == 0x2016 || (val >= 0x2020 && val <= 0x2022) || val == 0x2026 /*|| (val >= 0x2153 && val <= 0xA64D)*/,
+            bSpecialArrow    = val >= 0x2190 && val <= 0x21FF,
+            bSpecialSymbols  = val == 0x2200 || val == 0x2201 || val == 0x2203 || val == 0x2204 || val == 0x2206|| (val >= 0x2208 && val <= 0x220D) || (val >= 0x220F && val <= 0x221E) || (val >= 0x2223 && val <= 0x223E) || (val >= 0x223F && val <= 0x22BD) || (val >= 0x22C0 && val <= 0x22FF) || val == 0x2305 || val == 0x2306 || (val >= 0x2308 && val <= 0x230B) || (val >= 0x231C && val <= 0x231F) || val == 0x2322 || val == 0x2323 || val == 0x2329 || val == 0x232A ||val == 0x233F || val == 0x23B0 || val == 0x23B1,
+            bOtherArrows     = (val >= 0x27D1 && val <= 0x2980) || (val >= 0x2982 && val <= 0x299A) || (val >= 0x29B6 &&  val <= 0x29B9) || val == 0x29C0 || val == 0x29C1 || (val >= 0x29C4 && val <= 0x29C8) || (val >= 0x29CE && val <= 0x29DB) || val == 0x29DF || (val >= 0x29E1 && val <= 0x29E6) || val == 0x29EB || (val >= 0x29F4 && val <= 0x2AFF && val !== 0x2AE1 && val !== 0x2AF1) || (val >= 0x3014 && val <= 0x3017);
+
+        // apostrophe
+        // отдельно Cambria Math 0x27
+
+        return bSpecialOperator || bSpecialArrow || bSpecialSymbols || bOtherArrows;
     },
     ////
     Copy: function()
@@ -861,11 +898,10 @@ CMathAmp.prototype =
     {
         return false;
     },
-    /*ApplyGaps: function()
+    Is_SpecilalOperator: function()
     {
-        if(this.bEqqArray==false)
-            this.AmpText.ApplyGaps();
-    },*/
+        return false;
+    },
     GetCompiled_ScrStyles: function()
     {
         return this.Parent.GetCompiled_ScrStyles();

@@ -776,6 +776,38 @@ CMathBase.prototype =
             this.raw_Set_DoubleStrikeout(Value);
         }
     },
+    Set_Bold:   function(Value)
+    {
+        if(Value !== this.CtrPrp.Bold)
+        {
+            History.Add(this, new CChangesMathBold(Value, this.CtrPrp.Bold));
+            this.raw_SetBold(Value);
+        }
+    },
+    Set_Italic: function(Value)
+    {
+        if(Value !== this.CtrPrp.Italic)
+        {
+            History.Add(this, new CChangesMathItalic(Value, this.CtrPrp.Italic));
+            this.raw_SetItalic(Value);
+        }
+    },
+    raw_SetBold: function(Value)
+    {
+        this.CtrPrp.Bold = Value;
+        this.RecalcInfo.bCtrPrp = true;
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
+    raw_SetItalic: function(Value)
+    {
+        this.CtrPrp.Italic = Value;
+        this.RecalcInfo.bCtrPrp = true;
+
+        if (null !== this.ParaMath)
+            this.ParaMath.SetNeedResize();
+    },
     raw_SetUnderline : function(Value)
     {
         this.CtrPrp.Underline = Value;

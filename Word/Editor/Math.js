@@ -1308,6 +1308,8 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
     var X = PDSH.X;
+    var Y0 = PDSH.Y0;
+    var Y1 = PDSH.Y1;
 
     if ( EndPos >= 1 )
     {
@@ -1338,6 +1340,9 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
             Coll.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, CollFirst.r, CollFirst.g, CollFirst.b);
         }
     }
+
+    PDSH.Y0 = Y0;
+    PDSH.Y1 = Y1;
 };
 ParaMath.prototype.Draw_Elements = function(PDSE)
 {
@@ -1983,6 +1988,8 @@ var historyitem_Math_CtrPrpUnifill             =  9;
 var historyitem_Math_CtrPrpUnderline           =  10;
 var historyitem_Math_CtrPrpStrikeout           =  11;
 var historyitem_Math_CtrPrpDoubleStrikeout     =  12;
+var historyitem_Math_CtrPrpItalic              =  13;
+var historyitem_Math_CtrPrpBold                =  14;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -2001,6 +2008,8 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
         case historyitem_Math_CtrPrpStrikeout       : Changes = new CChangesMathStrikeout(); break;
         case historyitem_Math_CtrPrpDoubleStrikeout : Changes = new CChangesMath_DoubleStrikeout(); break;
+        case historyitem_Math_CtrPrpItalic          : Changes = new CChangesMathItalic(); break;
+        case historyitem_Math_CtrPrpBold            : Changes = new CChangesMathBold(); break;
     }
 
     if (null !== Changes)
@@ -2310,6 +2319,91 @@ CChangesMath_DoubleStrikeout.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 };
+
+function CChangesMathItalic(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathItalic.prototype.Type = historyitem_Math_CtrPrpItalic;
+CChangesMathItalic.prototype.Undo = function(Class)
+{
+    Class.raw_SetItalic(this.Old);
+};
+CChangesMathItalic.prototype.Redo = function(Class)
+{
+    Class.raw_SetItalic(this.New);
+};
+CChangesMathItalic.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsItalic
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+
+};
+CChangesMathItalic.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsItalic
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+
+};
+
+function CChangesMathBold(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMathBold.prototype.Type = historyitem_Math_CtrPrpBold;
+CChangesMathBold.prototype.Undo = function(Class)
+{
+    Class.raw_SetBold(this.Old);
+};
+CChangesMathBold.prototype.Redo = function(Class)
+{
+    Class.raw_SetBold(this.New);
+};
+CChangesMathBold.prototype.Save_Changes = function(Writer)
+{
+    // Bool : IsUndefined
+    // Bool : IsBold
+
+    if (undefined === this.New)
+        Writer.WriteBool(true);
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteBool(this.New);
+    }
+
+};
+CChangesMathBold.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool : IsUndefined
+    // Bool : IsBold
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetBool();
+
+    this.Redo(Class);
+
+};
+
 
 function CChangesMathAddItems(Pos, Items)
 {

@@ -3591,11 +3591,23 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 
     var len = this.Content.length;
 
+    var H = 0;
+
+    var Y0 = PDSH.Y0,
+        Y1 = PDSH.Y1;
+
+    var FirstRootRunNotShd = this.bRoot && this.Content.length > 0 && !this.Content[0].IsShade();
+
+    if( FirstRootRunNotShd || !this.bRoot)
+    {
+        Y0 = this.ParaMath.Y + this.pos.y;
+        Y1 = this.ParaMath.Y + this.pos.y + this.size.height;
+    }
+
     for ( var CurPos = 0; CurPos < len; CurPos++ )
     {
-        PDSH.Y0 = this.ParaMath.Y + this.pos.y;
-        PDSH.Y1 = this.ParaMath.Y + this.pos.y + this.size.height;
-
+        PDSH.Y0 = Y0;
+        PDSH.Y1 = Y1;
 
         if(bAll && this.Content[CurPos].Type == para_Math_Run)
             this.Content[CurPos].Select_All();

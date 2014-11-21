@@ -3177,6 +3177,9 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
     var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
     var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
 
+    if(this.Type == para_Math_Run && this.IsPlaceholder())
+        bDrawShd = false;
+
     var X  = PDSH.X;
     var Y0 = PDSH.Y0;
     var Y1 = PDSH.Y1;
@@ -3316,11 +3319,12 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var CurTextPr = this.Get_CompiledPr( false );
     pGraphics.SetTextPr( CurTextPr, Theme );
 
+    var Font;
     if(this.Type == para_Math_Run)
     {
         Y += this.size.ascent;
 
-        var Font =
+        Font =
         {
             Bold       : CurTextPr.Bold,
             Italic     : CurTextPr.Italic,
@@ -3500,7 +3504,28 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Math_Text:
             case para_Math_Placeholder:
             {
+                var bChangeFont = Item.Is_SpecilalOperator() && !this.IsNormalText() && Font.FontFamily.Name !== "Cambria Math",
+                    FFont = {};
+
+                // опред набор символов, если Font не Cambria Math, рисуется все равно Font Cambria Math
+
+                if(bChangeFont) // для математического текста
+                {
+                    FFont.FontFamily = {Name : "Cambria Math", Index : -1};
+                    FFont.FontSize   = Font.FontSize;
+                    FFont.Bold       = false;
+                    FFont.Italic     = false;
+
+                    pGraphics.SetFont(FFont);
+                }
+
                 Item.draw(X, Y, pGraphics );
+
+                if(bChangeFont)
+                {
+                    pGraphics.SetFont(Font);
+                }
+
                 break;
             }
         }
@@ -3909,6 +3934,8 @@ ParaRun.prototype.Set_ParaContentPos = function(ContentPos, Depth)
         Pos = 0;
 
     this.State.ContentPos = Pos;
+
+    TEST_MATH_RUN = this;
 };
 
 ParaRun.prototype.Get_PosByElement = function(Class, ContentPos, Depth, UseRange, Range, Line)
@@ -7879,10 +7906,28 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
 
         var Lng = this.Content.length;
 
+        var FontFamily;
 
         for (var i = 0 ; i < Lng; i++)
         {
+            var bChangeFont = this.Content[i].Is_SpecilalOperator() && Font.FontFamily.Name !== "Cambria Math";
+
+            if(bChangeFont)
+            {
+                FontFamily = Font.FontFamily;
+                Font.FontFamily = {Name : "Cambria Math", Index : -1};
+
+                g_oTextMeasurer.SetFont(Font);
+            }
+
             this.Content[i].Resize(oMeasure, RPI);
+
+            if(bChangeFont)
+            {
+                Font.FontFamily = FontFamily;
+
+                g_oTextMeasurer.SetFont(Font);
+            }
 
             var oSize = this.Content[i].size;
 
@@ -8086,6 +8131,11 @@ ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
     if (null == AutoCorrectEngine.MathPr)
         AutoCorrectEngine.MathPr = this.MathPrp.Copy();
 };
+ParaRun.prototype.IsShade = function()
+{
+    var oShd = this.Get_CompiledPr(false).Shd;
+    return !(oShd === undefined || shd_Nil === oShd.Value);
+};
 
 ParaRun.prototype.Get_RangesByPos = function(Pos)
 {
@@ -8116,4 +8166,60 @@ function CParaRunStartState(Run)
     {
         this.Content.push(Run.Content[i]);
     }
+}
+
+var TEST_MATH_RUN = null;
+
+function TEST_SYMBOLS()
+{
+    //var Arr = [0x2398, 0x23CF, 0x23DC, 0x23E0, 0x2460, 0x2473, 0x24EA, 0x24F4, 0x24FF, 0x2500];
+    var Arr = [0x2776, 0x277F, 0x27D0, 0x27EB, 0x27F0, 0x27FF, 0x2900, 0x2AFF];
+
+
+    for(var k = 0; k < Arr.length; k += 2)
+    {
+        for(var i = Arr[k]; i <= Arr[k+1]; i++ )
+        {
+            AddItemToRun(TEST_MATH_RUN, i);
+        }
+    }
+
+    /*for(var i = 0x239B; i <= 0x23E0; i++)
+    {
+        AddItemToRun(Run, i);
+    }
+
+    //0x2C77
+
+    AddItemToRun(Run, 0x2E17);
+
+    for(var i = 0x3014; i <= 0x3017; i++)
+    {
+        AddItemToRun(Run, i);
+    }
+
+    for(var i = 0xFB00; i <= 0xFB04; i++)
+    {
+        AddItemToRun(Run, i);
+    }
+
+    AddItemToRun(Run, 0xFE00);*/
+}
+
+function AddItemToRun(Run, code)
+{
+    var NewText = null;
+    var bMath = Run.Type == para_Math_Run;
+    if(bMath)
+    {
+        NewText = new CMathText(false);
+        NewText.add(code);
+    }
+    else
+    {
+        NewText = new ParaText();
+        NewText.Set_CharCode(code);
+    }
+
+    Run.Add(NewText, bMath);
 }

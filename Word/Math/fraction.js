@@ -266,6 +266,8 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
         this.ArgSize.SetValue(0);
     }
 
+    this.RecalcInfo.bCtrPrp = true;
+
     this.Set_CompiledCtrPrp(Parent, ParaMath);
 
     this.ApplyProperties(RPI);
