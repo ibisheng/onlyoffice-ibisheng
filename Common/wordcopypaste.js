@@ -5884,7 +5884,7 @@ PasteProcessor.prototype =
                     }
 					
 					//проставляем rStyle
-					if(oHyperlink.Content && oHyperlink.Content.length)
+					if(oHyperlink.Content && oHyperlink.Content.length && oHyperlink.Paragraph.bFromDocument)
 					{
 						if(this.oLogicDocument && this.oLogicDocument.Styles && this.oLogicDocument.Styles.Default && this.oLogicDocument.Styles.Default.Hyperlink && this.oLogicDocument.Styles.Style)
 						{
@@ -6785,7 +6785,9 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.onpaste = function(e){
         if (!window.GlobalPasteFlag)
             return;
-
+		
+		console.log("onpaste");
+		
         // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
         if (window.GlobalPasteFlagCounter == 1)
         {
