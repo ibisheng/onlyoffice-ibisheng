@@ -4568,8 +4568,11 @@
 		 * @return {Range}
 		 */
 		WorksheetView.prototype._getCell = function (col, row) {
-			this.nRowsCount = Math.min(Math.max(this.model.getRowsCount() + 1, this.rows.length), gc_nMaxRow);
-			this.nColsCount = Math.min(Math.max(this.model.getColsCount() + 1, this.cols.length), gc_nMaxCol);
+			if (this.nRowsCount < this.model.getRowsCount() + 1)
+				this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+			if (this.nColsCount < this.model.getColsCount() + 1)
+				this.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+
 			if (col < 0 || col >= this.nColsCount || row < 0 || row >= this.nRowsCount)
 				return null;
 
@@ -8112,7 +8115,7 @@
 				buildRecalc(t.model.workbook);
 				unLockDraw(t.model.workbook);
 				return;
-			};
+			}
 			t.expandColsOnScroll();
 			t.expandRowsOnScroll();
 			
@@ -8126,7 +8129,7 @@
 					var oBBox = rangeF.getBBox0();
 					t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF, null, true);
 				}
-			};
+			}
 			
 			buildRecalc(t.model.workbook);
 			unLockDraw(t.model.workbook);
