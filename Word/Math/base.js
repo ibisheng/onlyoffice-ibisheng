@@ -338,7 +338,24 @@ CMathBase.prototype =
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
+            {
+                if(this.elements[i][j].IsJustDraw()) // для Just-Draw элементов надо выставить Font
+                {
+                    var ctrPrp = this.GetTPrpToControlLetter();
+
+                    var Font =
+                    {
+                        FontSize:   ctrPrp.FontSize,
+                        FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+                        Italic:     false,
+                        Bold:       false //ctrPrp.Bold
+                    };
+
+                    pGraphics.SetFont(Font);
+                }
+
                 this.elements[i][j].draw(x, y, pGraphics, PDSE);
+            }
     },
     remove: function(order)
     {
@@ -394,7 +411,24 @@ CMathBase.prototype =
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
+            {
+                if(this.elements[i][j].IsJustDraw()) // для Just-Draw элементов надо выставить Font
+                {
+                    var ctrPrp = this.GetTPrpToControlLetter();
+
+                    var Font =
+                    {
+                        FontSize:   ctrPrp.FontSize,
+                        FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+                        Italic:     false,
+                        Bold:       false //ctrPrp.Bold
+                    };
+
+                    g_oTextMeasurer.SetFont(Font);
+                }
+
                 this.elements[i][j].Resize(oMeasure, RPI);
+            }
 
 
         this.recalculateSize(oMeasure, RPI);

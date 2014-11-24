@@ -225,7 +225,7 @@ ParaMath.prototype.Add = function(Item)
         var Pos_ApplyTextPr =
         {
             StartPos:   StartPos + 1,
-            EndPos:     lng2 - lng
+            EndPos:     StartPos + lng2 - lng
         };
 
         oContent.Apply_TextPr(TextPr, undefined, false, Pos_ApplyTextPr);
