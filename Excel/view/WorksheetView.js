@@ -1404,7 +1404,7 @@
 			var lc = this.cols[i - 1];
 			var done = false;
 
-			for (var x = lc.left + lc.width; x < rightSide || !done; ++i) {
+			for (var x = lc.left + lc.width; i < gc_nMaxCol && (x < rightSide || !done); ++i) {
 				if (x >= rightSide) {
 					// add +1 column at the end and exit cycle
 					done = true;
