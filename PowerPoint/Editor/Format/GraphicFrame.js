@@ -342,6 +342,7 @@ CGraphicFrame.prototype =
                     this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
                     this.graphicObject.Recalculate_Page(0);
                 }
+                this.recalcInfo.recalculateTable = false;
             }
             if(this.recalcInfo.recalculateSizes)
             {
