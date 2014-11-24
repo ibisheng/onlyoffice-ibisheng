@@ -10579,10 +10579,22 @@
 				var bIsUpdateX = false, bIsUpdateY = false;
 				if (range.c2 >= this.nColsCount) {
 					this.expandColsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+					// Проверка, вдруг пришел диапазон за пределами существующей области
+					if (range.c2 >= this.nColsCount) {
+						if (range.c1 >= this.nColsCount)
+							return;
+						range.c2 = this.nColsCount - 1;
+					}
 					bIsUpdateX = true;
 				}
 				if (range.r2 >= this.nRowsCount) {
 					this.expandRowsOnScroll(false, true, 0); // Передаем 0, чтобы увеличить размеры
+					// Проверка, вдруг пришел диапазон за пределами существующей области
+					if (range.r2 >= this.nRowsCount) {
+						if (range.r1 >= this.nRowsCount)
+							return;
+						range.r2 = this.nRowsCount - 1;
+					}
 					bIsUpdateY = true;
 				}
 
