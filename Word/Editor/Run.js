@@ -3936,7 +3936,6 @@ ParaRun.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 
     this.State.ContentPos = Pos;
 
-    TEST_MATH_RUN = this;
 };
 
 ParaRun.prototype.Get_PosByElement = function(Class, ContentPos, Depth, UseRange, Range, Line)
@@ -8169,43 +8168,6 @@ function CParaRunStartState(Run)
     }
 }
 
-var TEST_MATH_RUN = null;
-
-function TEST_SYMBOLS()
-{
-    //var Arr = [0x2398, 0x23CF, 0x23DC, 0x23E0, 0x2460, 0x2473, 0x24EA, 0x24F4, 0x24FF, 0x2500];
-    var Arr = [0x2776, 0x277F, 0x27D0, 0x27EB, 0x27F0, 0x27FF, 0x2900, 0x2AFF];
-
-
-    for(var k = 0; k < Arr.length; k += 2)
-    {
-        for(var i = Arr[k]; i <= Arr[k+1]; i++ )
-        {
-            AddItemToRun(TEST_MATH_RUN, i);
-        }
-    }
-
-    /*for(var i = 0x239B; i <= 0x23E0; i++)
-    {
-        AddItemToRun(Run, i);
-    }
-
-    //0x2C77
-
-    AddItemToRun(Run, 0x2E17);
-
-    for(var i = 0x3014; i <= 0x3017; i++)
-    {
-        AddItemToRun(Run, i);
-    }
-
-    for(var i = 0xFB00; i <= 0xFB04; i++)
-    {
-        AddItemToRun(Run, i);
-    }
-
-    AddItemToRun(Run, 0xFE00);*/
-}
 
 function AddItemToRun(Run, code)
 {
