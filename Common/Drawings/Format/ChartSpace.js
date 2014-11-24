@@ -226,6 +226,15 @@ function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
 }
 
 
+function checkFiniteNumber(num)
+{
+    if(isRealNumber(num) && isFinite(num))
+    {
+        return num;
+    }
+    return num;
+}
+
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
 
 function addPointToMap(map, worksheet, row, col, pt)
@@ -2754,8 +2763,8 @@ CChartSpace.prototype =
                     }
 
 
-                    var hor_interval_width = rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
-                    var vert_interval_height = rect.h/(arr_val[arr_val.length-1] - arr_val[0]);
+                    var hor_interval_width = checkFiniteNumber(rect.w/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
+                    var vert_interval_height = checkFiniteNumber(rect.h/(arr_val[arr_val.length-1] - arr_val[0]));
                     var arr_x_points = [], arr_y_points = [];
                     var labels_pos = y_ax.tickLblPos;
 
@@ -2771,7 +2780,7 @@ CChartSpace.prototype =
                                 left_align_labels = false;
 
                                 right_gap = Math.max(last_hor_label_half_width, y_ax.labels.extX);
-                                hor_interval_width = (rect.w - right_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                hor_interval_width = checkFiniteNumber((rect.w - right_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
                                     arr_x_points[i] = rect.x + first_hor_label_half_width + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
@@ -2783,7 +2792,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_LOW:
                             {
                                 left_gap = Math.max(first_hor_label_half_width, y_ax.labels.extX);
-                                hor_interval_width = (rect.w-left_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                hor_interval_width = checkFiniteNumber((rect.w-left_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
                                     arr_x_points[i] = rect.x + left_gap + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
@@ -2795,7 +2804,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_NONE:
                             {
                                 y_ax.labels = null;
-                                hor_interval_width = (rect.w- first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                hor_interval_width = checkFiniteNumber((rect.w- first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
                                     arr_x_points[i] = rect.x + first_hor_label_half_width + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
@@ -2812,7 +2821,7 @@ CChartSpace.prototype =
 
                                     y_ax.labels.x = rect.x + rect.w - right_gap;
                                     y_ax.xPos = rect.x + rect.w - right_gap;
-                                    hor_interval_width = (rect.w - right_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                    hor_interval_width = checkFiniteNumber((rect.w - right_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     for(i = 0; i < arr_x_val.length; ++i)
                                     {
                                         arr_x_points[i] = rect.x + first_hor_label_half_width + hor_interval_width*(arr_x_val[i] - arr_x_val[0]);
@@ -2820,10 +2829,10 @@ CChartSpace.prototype =
                                 }
                                 else
                                 {
-                                    hor_interval_width = (rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                    hor_interval_width = checkFiniteNumber((rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     if(first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width < y_ax.labels.extX)
                                     {
-                                        hor_interval_width = (rect.w - y_ax.labels.extX - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - crosses);
+                                        hor_interval_width = checkFiniteNumber((rect.w - y_ax.labels.extX - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - crosses));
                                     }
                                     y_ax.xPos = rect.x+ rect.w - last_hor_label_half_width - (arr_x_val[arr_x_val.length-1] - crosses)*hor_interval_width;
                                     for(i = 0; i < arr_x_val.length; ++i)
@@ -2843,7 +2852,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_HIGH:
                             {
                                 left_gap = Math.max(y_ax.labels.extX, last_hor_label_half_width);
-                                hor_interval_width = (rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                hor_interval_width = checkFiniteNumber((rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
 
                                 y_ax.xPos = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width - first_hor_label_half_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
@@ -2858,7 +2867,7 @@ CChartSpace.prototype =
                                 left_align_labels = false;
 
                                 right_gap = Math.max(y_ax.labels.extX, first_hor_label_half_width);
-                                hor_interval_width = (rect.w - right_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                hor_interval_width = checkFiniteNumber((rect.w - right_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 y_ax.xPos = rect.x + rect.w - right_gap - (crosses - arr_x_val[0])*hor_interval_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
@@ -2870,7 +2879,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_NONE:
                             {
                                 y_ax.labels = null;
-                                hor_interval_width = (rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                hor_interval_width = checkFiniteNumber((rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 y_ax.xPos = rect.x + rect.w - first_hor_label_half_width - (crosses - arr_x_val[0])*hor_interval_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
@@ -2884,17 +2893,17 @@ CChartSpace.prototype =
                                 if(y_ax.crosses === CROSSES_MAX)
                                 {
                                     left_gap = Math.max(y_ax.labels.extX, last_hor_label_half_width);
-                                    hor_interval_width = (rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                    hor_interval_width = checkFiniteNumber((rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     y_ax.xPos = rect.x + rect.w - first_hor_label_half_width - (crosses-arr_x_val[0])*hor_interval_width;
                                     y_ax.labels.x = y_ax.xPos - ((arr_x_val[arr_x_val.length-1] - crosses)*hor_interval_width) - y_ax.labels.extX;
                                 }
                                 else
                                 {
                                     left_align_labels = false;
-                                    hor_interval_width = (rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]);
+                                    hor_interval_width = checkFiniteNumber((rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     if(first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width < y_ax.labels.extX)
                                     {
-                                        hor_interval_width = (rect.w - y_ax.labels.extX - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - crosses);
+                                        hor_interval_width = checkFiniteNumber((rect.w - y_ax.labels.extX - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - crosses));
                                     }
                                     left_align_labels = false;
                                     y_ax.xPos = rect.x + last_hor_label_half_width + hor_interval_width*(arr_x_val[arr_x_val.length-1] - crosses);
@@ -2965,7 +2974,7 @@ CChartSpace.prototype =
 
 
                                 top_height = Math.max(x_ax.labels.extY, last_vert_label_half_height);
-                                vert_interval_height = (rect.h - top_height - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                vert_interval_height = checkFiniteNumber((rect.h - top_height - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
 
                                 x_ax.labels.y = bottom_start_point - (arr_val[arr_val.length - 1] - arr_val[0])*vert_interval_height - x_ax.labels.extY;
 
@@ -2980,7 +2989,7 @@ CChartSpace.prototype =
                             {
                                 bottom_gap = Math.max(x_ax.labels.extY, first_vert_label_half_height);
                                 x_ax.labels.y = rect.y + rect.h - bottom_gap;
-                                vert_interval_height = (rect.h - bottom_gap - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                vert_interval_height = checkFiniteNumber((rect.h - bottom_gap - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
 
                                 for(i = 0; i < arr_val.length; ++i)
                                 {
@@ -2992,7 +3001,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_NONE:
                             {
                                 x_ax.labels = null;
-                                vert_interval_height = (rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                vert_interval_height = checkFiniteNumber((rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                 for(i = 0; i < arr_val.length; ++i)
                                 {
                                     arr_y_points[i] = rect.y + rect.h - first_vert_label_half_height - (arr_val[i] - arr_val[0])*vert_interval_height;
@@ -3007,7 +3016,7 @@ CChartSpace.prototype =
                                     bottom_align_labels = false;
                                     top_height = Math.max(x_ax.labels.extY, last_vert_label_half_height);
 
-                                    vert_interval_height = (rect.h - top_height - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                    vert_interval_height = checkFiniteNumber((rect.h - top_height - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                     for(i = 0; i < arr_val.length; ++i)
                                     {
                                         arr_y_points[i] = rect.y + rect.h - first_vert_label_half_height - (arr_val[i] - arr_val[0])*vert_interval_height;
@@ -3017,10 +3026,10 @@ CChartSpace.prototype =
                                 }
                                 else
                                 {
-                                    vert_interval_height = (rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                    vert_interval_height = checkFiniteNumber((rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                     if(first_vert_label_half_height + (crosses_x-arr_val[0])*vert_interval_height < x_ax.labels.extY)
                                     {
-                                        vert_interval_height = (rect.h - x_ax.labels.extY - last_vert_label_half_height)/(arr_val[arr_val.length-1] - crosses_x);
+                                        vert_interval_height = checkFiniteNumber((rect.h - x_ax.labels.extY - last_vert_label_half_height)/(arr_val[arr_val.length-1] - crosses_x));
                                     }
 
                                     x_ax.yPos = rect.y + last_vert_label_half_height+ (arr_val[arr_val.length-1] - crosses_x)*vert_interval_height;
@@ -3041,7 +3050,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_HIGH:
                             {
                                 bottom_gap = Math.max(last_vert_label_half_height, x_ax.labels.extY);
-                                vert_interval_height = (rect.h - bottom_gap - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                vert_interval_height = checkFiniteNumber((rect.h - bottom_gap - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                 x_ax.yPos = rect.y + first_vert_label_half_height + (crosses_x - arr_val[0])*vert_interval_height;
                                 for(i = 0; i < arr_val.length; ++i)
                                 {
@@ -3055,7 +3064,7 @@ CChartSpace.prototype =
                                 top_height = Math.max(x_ax.labels.extY, first_vert_label_half_height);
 
                                 bottom_align_labels = false;
-                                vert_interval_height = (rect.h - top_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                vert_interval_height = checkFiniteNumber((rect.h - top_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                 x_ax.yPos = rect.y + top_height + (crosses_x- arr_val[0])*vert_interval_height;
                                 for(i = 0; i < arr_val.length; ++i)
                                 {
@@ -3067,7 +3076,7 @@ CChartSpace.prototype =
                             case TICK_LABEL_POSITION_NONE:
                             {
                                 x_ax.labels = null;
-                                vert_interval_height = (rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                vert_interval_height = checkFiniteNumber((rect.h - first_vert_label_half_height - last_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                 x_ax.yPos = rect.y + first_vert_label_half_height + (crosses_x-arr_val[0])*vert_interval_height;
                                 for(i = 0; i < arr_val.length;++i)
                                 {
@@ -3082,7 +3091,7 @@ CChartSpace.prototype =
                                     bottom_gap = Math.max(x_ax.labels.extY, last_vert_label_half_height);
 
 
-                                    vert_interval_height = (rect.h - bottom_gap - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                    vert_interval_height = checkFiniteNumber((rect.h - bottom_gap - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                     x_ax.yPos = rect.y + first_vert_label_half_height + (crosses_x-arr_val[0])*vert_interval_height;
                                     for(i = 0; i < arr_val.length; ++i)
                                     {
@@ -3094,11 +3103,11 @@ CChartSpace.prototype =
                                 {
                                     bottom_align_labels = false;
 
-                                    vert_interval_height = (rect.h - last_vert_label_half_height - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                                    vert_interval_height = checkFiniteNumber((rect.h - last_vert_label_half_height - first_vert_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                                     if(first_vert_label_half_height + (crosses_x-arr_val[0])*vert_interval_height < x_ax.labels.extY)
                                     {
                                         x_ax.yPos = rect.y + x_ax.labels.extY;
-                                        vert_interval_height = (rect.h-x_ax.labels.extY - last_vert_label_half_height)/(arr_val[arr_val.length-1] - crosses_x);
+                                        vert_interval_height = checkFiniteNumber((rect.h-x_ax.labels.extY - last_vert_label_half_height)/(arr_val[arr_val.length-1] - crosses_x));
                                     }
                                     else
                                     {
@@ -3489,9 +3498,9 @@ CChartSpace.prototype =
                     var point_interval  = rect.w/intervals_count;//интервал между точками. Зависит от crossBetween, а также будет потом корректироваться в зависимости от подписей вертикальной и горизонтальной оси.
 
                     if(cross_between === CROSS_BETWEEN_MID_CAT)
-                        point_interval = rect.w/(string_pts.length - 1);
+                        point_interval = checkFiniteNumber(rect.w/(string_pts.length - 1));
                     else
-                        point_interval = rect.w/string_pts.length;
+                        point_interval = checkFiniteNumber(rect.w/string_pts.length);
 
                     var left_points_width, right_point_width;
                     var arr_cat_labels_points = [];//массив середин подписей горизонтальной оси; i-й элемент - x-координата центра подписи категории с номером i;
@@ -3798,17 +3807,17 @@ CChartSpace.prototype =
                                     {
                                         if(val_ax.labels)//скорректируем позицию подписей вертикальной оси, если они есть
                                         {
-                                            val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                            val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                         }
                                         //скорректируем point_interval
-                                        point_interval *= (rect.w/(rect.x + rect.w - left_gap_point));
+                                        point_interval *= checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                         //скорректируем arr_cat_labels_points
                                         for(i = 0; i < arr_cat_labels_points.length; ++i)
                                         {
-                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                         }
                                         //скорректируем позицию вертикальной оси
-                                        val_ax.posX =  rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                        val_ax.posX =  rect.x + (val_ax.posX - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                     }
 
                                     //смотри выходит ли подпись последней категории за пределы области построения
@@ -3817,16 +3826,16 @@ CChartSpace.prototype =
                                     {
                                         if(val_ax.labels)//скорректируем позицию подписей вертикальной оси
                                         {
-                                            val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                            val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                         }
                                         //скорректируем point_interval
-                                        point_interval *= (rect.w/(right_gap_point - rect.x));
+                                        point_interval *= checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                         for(i = 0; i < arr_cat_labels_points.length; ++i)
                                         {
-                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                         }
                                         //скорректируем позицию вертикальной оси
-                                        val_ax.posX = rect.x + (val_ax.posX - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                        val_ax.posX = rect.x + (val_ax.posX - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
 
                                     }
                                 }
@@ -3840,33 +3849,33 @@ CChartSpace.prototype =
                                     {
                                         if(val_ax.labels)//скорректируем позицию подписей вертикальной оси, если они есть
                                         {
-                                            val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                            val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                         }
                                         //скорректируем point_interval
-                                        point_interval *= (rect.w/(rect.x + rect.w - left_gap_point));
+                                        point_interval *= checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                         //скорректируем arr_cat_labels_points
                                         for(i = 0; i < arr_cat_labels_points.length; ++i)
                                         {
-                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                         }
 
                                         //скорректируем позицию вертикальной оси
-                                        val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                        val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                     }
                                     if(right_gap_point > rect.x + rect.w)
                                     {
                                         if(val_ax.labels)//скорректируем позицию подписей вертикальной оси
                                         {
-                                            val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                            val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                         }
                                         //скорректируем point_interval
-                                        point_interval *= (rect.w/(right_gap_point - rect.x));
+                                        point_interval *= checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                         for(i = 0; i < arr_cat_labels_points.length; ++i)
                                         {
-                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                            arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                         }
                                         //скорректируем позицию вертикальной оси
-                                        val_ax.posX = rect.x + (val_ax.posX - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                        val_ax.posX = rect.x + (val_ax.posX - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                     }
                                 }
                             }
@@ -3910,36 +3919,36 @@ CChartSpace.prototype =
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси, если они есть
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= rect.w/(rect.x + rect.w - left_gap_point);
+                                    point_interval *= checkFiniteNumber(rect.w/(rect.x + rect.w - left_gap_point));
                                     //скорректируем arr_cat_labels_points
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                     }
 
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                    val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                 }
                                 //смотри выходит ли подпись последней категории за пределы области построения
                                 if(right_gap_point > rect.x + rect.w)
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (right_gap_point - rect.x)/(rect.x + rect.w - rect.x);
+                                    point_interval *= checkFiniteNumber((right_gap_point - rect.x)/(rect.x + rect.w - rect.x));
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                     }
 
 
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                 }
                             }
                             else
@@ -3948,34 +3957,34 @@ CChartSpace.prototype =
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси, если они есть
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (rect.w)/(rect.x + rect.w - left_gap_point);
+                                    point_interval *= (rect.w)/checkFiniteNumber((rect.x + rect.w - left_gap_point));
                                     //скорректируем arr_cat_labels_points
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                     }
 
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*(rect.w/(rect.x + rect.w - left_gap_point));
+                                    val_ax.posX = rect.x + (val_ax.posX - left_gap_point)*checkFiniteNumber((rect.w/(rect.x + rect.w - left_gap_point)));
                                 }
                                 if(right_gap_point > rect.x + rect.w)
                                 {
                                     if(val_ax.labels)//скорректируем позицию подписей вертикальной оси
                                     {
-                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                        val_ax.labels.x = rect.x + (val_ax.labels.x - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                     }
                                     //скорректируем point_interval
-                                    point_interval *= (right_gap_point - rect.x)/(rect.x + rect.w - rect.x);
+                                    point_interval *= checkFiniteNumber((right_gap_point - rect.x)/(rect.x + rect.w - rect.x));
                                     for(i = 0; i < arr_cat_labels_points.length; ++i)
                                     {
-                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)(rect.w/(right_gap_point - rect.x));
+                                        arr_cat_labels_points[i] = rect.x + (arr_cat_labels_points[i] - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                     }
 
                                     //скорректируем позицию вертикальной оси
-                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)*(rect.w/(right_gap_point - rect.x));
+                                    val_ax.posX = rect.x + (val_ax.posX - rect.x)*checkFiniteNumber((rect.w/(right_gap_point - rect.x)));
                                 }
                             }
                         }
@@ -4026,7 +4035,7 @@ CChartSpace.prototype =
                     var first_val_axis_label_half_height =0; //TODO  (val_ax.bDelete || val_ax.tickLblPos ===TICK_LABEL_POSITION_NONE) ? 0 :val_ax.labels.arrLabels[0].tx.rich.content.Get_SummaryHeight()/2;
                     var last_val_axis_label_half_height = 0; //TODO (val_ax.bDelete || val_ax.tickLblPos ===TICK_LABEL_POSITION_NONE) ? 0 : val_ax.labels.arrLabels[val_ax.labels.arrLabels.length-1].tx.rich.content.Get_SummaryHeight()/2;
 
-                    var unit_height = (rect.h - first_val_axis_label_half_height - last_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]);//высота единицы измерения на вертикальной оси
+                    var unit_height = checkFiniteNumber((rect.h - first_val_axis_label_half_height - last_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]));//высота единицы измерения на вертикальной оси
 
                     var cat_ax_ext_y = cat_ax.labels ? cat_ax.labels.extY : 0;
                     if(val_ax_orientation === ORIENTATION_MIN_MAX)
@@ -4037,7 +4046,7 @@ CChartSpace.prototype =
                             {
                                 cat_labels_align_bottom = false;
                                 top_val_axis_gap = Math.max(last_val_axis_label_half_height, cat_ax_ext_y);
-                                unit_height = (rect.h - top_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                                unit_height = checkFiniteNumber((rect.h - top_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 cat_labels_align_bottom = false;//в данном случае подписи будут выравниваться по верхнему краю блока с подписями
                                 cat_ax.posY = rect.y + rect.h - first_val_axis_label_half_height - (crosses_val_ax - arr_val[0])*unit_height;
                                 if(cat_ax.labels)
@@ -4048,7 +4057,7 @@ CChartSpace.prototype =
                                 var bottom_points_height = first_val_axis_label_half_height + (crosses_val_ax - arr_val[0])*unit_height;//высота области под горизонтальной осью
                                 if(bottom_points_height < cat_ax_ext_y)
                                 {
-                                    unit_height = (rect.h - last_val_axis_label_half_height - cat_ax_ext_y)/(arr_val[arr_val.length-1] - crosses_val_ax);
+                                    unit_height = checkFiniteNumber((rect.h - last_val_axis_label_half_height - cat_ax_ext_y)/(arr_val[arr_val.length-1] - crosses_val_ax));
                                 }
                                 cat_ax.posY = rect.y + last_val_axis_label_half_height + (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
                                 if(cat_ax.labels)
@@ -4060,7 +4069,7 @@ CChartSpace.prototype =
                         else if(hor_labels_pos === TICK_LABEL_POSITION_LOW)
                         {
                             bottom_val_axis_gap = Math.max(cat_ax_ext_y, first_val_axis_label_half_height);
-                            unit_height = (rect.h - bottom_val_axis_gap - last_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_height = checkFiniteNumber((rect.h - bottom_val_axis_gap - last_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.posY = rect.y + last_val_axis_label_half_height + (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
                             if(cat_ax.labels)
                                 cat_ax.labels.y = rect.y + rect.h - bottom_val_axis_gap;
@@ -4070,7 +4079,7 @@ CChartSpace.prototype =
                         else if(hor_labels_pos === TICK_LABEL_POSITION_HIGH)
                         {
                             top_val_axis_gap = Math.max(last_val_axis_label_half_height, cat_ax_ext_y);
-                            unit_height = (rect.h - top_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_height = checkFiniteNumber((rect.h - top_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_labels_align_bottom = false;//в данном случае подписи будут выравниваться по верхнему краю блока с подписями
                             cat_ax.posY = rect.y + rect.h - first_val_axis_label_half_height - (crosses_val_ax - arr_val[0])*unit_height;
                             if(cat_ax.labels)
@@ -4094,7 +4103,7 @@ CChartSpace.prototype =
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
                                 bottom_val_axis_gap = Math.max(cat_ax_ext_y, last_val_axis_label_half_height);
-                                unit_height = (rect.h - bottom_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                                unit_height = checkFiniteNumber((rect.h - bottom_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 cat_ax.posY = rect.y + first_val_axis_label_half_height + (crosses_val_ax - arr_val[0])*unit_height;
                                 if(cat_ax.labels)
                                     cat_ax.labels.y = rect.y + rect.h - bottom_val_axis_gap;
@@ -4105,7 +4114,7 @@ CChartSpace.prototype =
                                 var top_points_height = first_val_axis_label_half_height + (crosses_val_ax - arr_val[0])*unit_height;
                                 if(top_points_height < cat_ax_ext_y)
                                 {
-                                    unit_height = (rect.h - cat_ax_ext_y - last_val_axis_label_half_height)/(arr_val[arr_val.length-1] - crosses_val_ax);
+                                    unit_height = checkFiniteNumber((rect.h - cat_ax_ext_y - last_val_axis_label_half_height)/(arr_val[arr_val.length-1] - crosses_val_ax));
                                 }
                                 cat_ax.posY = rect.y + rect.h - last_val_axis_label_half_height - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
                                 if(cat_ax.labels)
@@ -4118,7 +4127,7 @@ CChartSpace.prototype =
                         {
                             cat_labels_align_bottom = false;
                             top_val_axis_gap = Math.max(first_val_axis_label_half_height, cat_ax_ext_y);
-                            unit_height = (rect.h  - top_val_axis_gap - last_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                            unit_height = checkFiniteNumber((rect.h  - top_val_axis_gap - last_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                             cat_ax.yPos = rect.y + rect.h - last_val_axis_label_half_height - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_height;
 
 
@@ -4131,7 +4140,7 @@ CChartSpace.prototype =
                         {
 
                             bottom_val_axis_gap = Math.max(cat_ax_ext_y, last_val_axis_label_half_height);
-                            unit_height = (rect.h  - bottom_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                            unit_height = checkFiniteNumber((rect.h  - bottom_val_axis_gap - first_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                             cat_ax.yPos = rect.y + first_val_axis_label_half_height + (crosses_val_ax - arr_val[0])*unit_height;
                             for(i = 0; i < arr_val.length; ++i)
                                 arr_val_labels_points[i] = cat_ax.posY + (arr_val[i] - crosses_val_ax)*unit_height;
@@ -4141,7 +4150,7 @@ CChartSpace.prototype =
                         else
                         {//подписей осей нет
                             cat_ax.labels = null;
-                            unit_height = (rect.h  - last_val_axis_label_half_height - first_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]);
+                            unit_height = checkFiniteNumber((rect.h  - last_val_axis_label_half_height - first_val_axis_label_half_height)/(arr_val[arr_val.length-1] - arr_val[0]));
                             for(i = 0; i < arr_val.length; ++i)
                                 arr_val_labels_points[i] = rect.y + first_val_axis_label_half_height + (arr_val[i] - arr_val[0])*unit_height;
                         }
@@ -4941,7 +4950,7 @@ CChartSpace.prototype =
                     var right_gap, left_gap;
 
                     var arr_val_labels_points = [];//массив середин подписей вертикальной оси; i-й элемент - x-координата центра подписи i-огто значения;
-                    var unit_width = (rect.w - first_val_lbl_half_width - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);//ширина единицы измерения на вертикальной оси
+                    var unit_width = checkFiniteNumber((rect.w - first_val_lbl_half_width - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));//ширина единицы измерения на вертикальной оси
                     var cat_ax_ext_x = cat_ax.labels ? cat_ax.labels.extX : 0;
                     if(val_ax_orientation === ORIENTATION_MIN_MAX)
                     {
@@ -4953,14 +4962,14 @@ CChartSpace.prototype =
                                 cat_labels_align_left = false;//в данном случае подписи будут выравниваться по верхнему краю блока с подписями
                                 if(cat_ax.labels)
                                     cat_ax.labels.x = rect.x + rect.w - right_gap;
-                                unit_width = (rect.w - right_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                                unit_width = checkFiniteNumber((rect.w - right_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 cat_ax.posX = rect.x + first_val_lbl_half_width + (crosses_val_ax - arr_val[0])*unit_width;
                             }
                             else
                             {
                                 if((crosses_val_ax - arr_val[0])*unit_width + first_val_lbl_half_width  < cat_ax_ext_x)
                                 {
-                                    unit_width = (rect.w -  cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length-1] - crosses_val_ax);
+                                    unit_width = checkFiniteNumber((rect.w -  cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length-1] - crosses_val_ax));
                                 }
                                 cat_ax.posX = rect.x + rect.w - last_val_lbl_half_width - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width;
                                 if(cat_ax.labels)
@@ -4973,7 +4982,7 @@ CChartSpace.prototype =
                         {
                             left_gap = Math.max(first_val_lbl_half_width, cat_ax_ext_x);
 
-                            unit_width = (rect.w - left_gap - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_width = checkFiniteNumber((rect.w - left_gap - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
 
                             cat_ax.posX = rect.x + rect.w - (arr_val[arr_val.length-1] - crosses_val_ax )*unit_width - last_val_lbl_half_width;
 
@@ -4987,7 +4996,7 @@ CChartSpace.prototype =
                             cat_labels_align_left = false;
 
                             right_gap = Math.max(last_val_lbl_half_width, cat_ax_ext_x);
-                            unit_width = (rect.w - right_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_width = checkFiniteNumber((rect.w - right_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.posX = rect.x +  first_val_lbl_half_width + (crosses_val_ax - arr_val[0])*unit_width;
 
                             for(i = 0; i < arr_val.length; ++i)
@@ -4997,7 +5006,7 @@ CChartSpace.prototype =
                         {
                             //подписей осей нет
                             cat_ax.labels = null;
-                            unit_width = (rect.w - last_val_lbl_half_width - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_width = checkFiniteNumber((rect.w - last_val_lbl_half_width - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.posX = rect.x +  first_val_lbl_half_width + (crosses_val_ax - arr_val[0])*unit_width;
                             for(i = 0; i < arr_val.length; ++i)
                                 arr_val_labels_points[i] = cat_ax.posX + (arr_val[i] - crosses_val_ax)*unit_width;
@@ -5010,7 +5019,7 @@ CChartSpace.prototype =
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
                                 left_gap = Math.max(cat_ax_ext_x, last_val_lbl_half_width);
-                                unit_width = (rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                                unit_width = checkFiniteNumber((rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                                 if(cat_ax.labels)
                                     cat_ax.labels.x = cat_ax.xPos - cat_ax_ext_x;
@@ -5020,7 +5029,7 @@ CChartSpace.prototype =
                                 cat_labels_align_left = false;
                                 if(first_val_lbl_half_width < cat_ax_ext_x)
                                 {
-                                    unit_width = (rect.w - cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                                    unit_width = checkFiniteNumber((rect.w - cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 }
                                 cat_ax.xPos = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width;
                                 if(cat_ax.labels)
@@ -5033,7 +5042,7 @@ CChartSpace.prototype =
                         {
                             cat_labels_align_left = false;
                             right_gap = Math.max(first_val_lbl_half_width, cat_ax_ext_x);
-                            unit_width = (rect.w - last_val_lbl_half_width - right_gap)/(arr_val[arr_val.length-1] - arr_val[0]);
+                            unit_width = checkFiniteNumber((rect.w - last_val_lbl_half_width - right_gap)/(arr_val[arr_val.length-1] - arr_val[0]));
                             cat_ax.xPos = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*crosses_val_ax;
                             if(cat_ax.labels)
                                 cat_ax.labels.x = cat_ax.xPos - (arr_val[0] - crosses_val_ax)*unit_width;
@@ -5044,7 +5053,7 @@ CChartSpace.prototype =
                         else if(hor_labels_pos === TICK_LABEL_POSITION_HIGH)
                         {
                             left_gap = Math.max(cat_ax_ext_x, last_val_lbl_half_width);
-                            unit_width = (rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_width = checkFiniteNumber((rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                             if(cat_ax.labels)
                                 cat_ax.labels.x = cat_ax.xPos - (arr_val[arr_val.length-1] - crosses_val_ax)*unit_width - cat_ax_ext_x;
@@ -5054,7 +5063,7 @@ CChartSpace.prototype =
                         else
                         {//подписей осей нет
                             cat_ax.labels = null;
-                            unit_width = (rect.w - last_val_lbl_half_width - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]);
+                            unit_width = checkFiniteNumber((rect.w - last_val_lbl_half_width - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                             for(i = 0; i < arr_val.length; ++i)
                                 arr_val_labels_points[i] = cat_ax.xPos - (arr_val[i] - crosses_val_ax)*unit_width;

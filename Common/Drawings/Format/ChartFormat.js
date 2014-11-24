@@ -8454,7 +8454,12 @@ CValAx.prototype =
             else
             {
                 if(isRealNumber(props.maxVal))
-                    scaling.setMax(props.maxVal);
+                {
+                    if(!isRealNumber(scaling.min) || scaling.min < props.maxVal)
+                    {
+                        scaling.setMax(props.maxVal);
+                    }
+                }
             }
         }
 
