@@ -530,16 +530,16 @@ function cINDIRECT() {
 
 }
 
-cINDIRECT.prototype = Object.create( cBaseFunction.prototype )
+cINDIRECT.prototype = Object.create( cBaseFunction.prototype );
 cINDIRECT.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new cBool( true ), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
+    var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new cBool( true ), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
 
     function parseReference() {
         if ( (ref = parserHelp.is3DRef.call( o, o.Formula, o.pCurrPos ))[0] ) {
             var _wsFrom = ref[1],
                 _wsTo = ( (ref[2] !== null) && (ref[2] !== undefined) ) ? ref[2] : _wsFrom;
             if ( !(wb.getWorksheetByName( _wsFrom ) && wb.getWorksheetByName( _wsTo )) ) {
-                return this.value = new cError( cErrorType.bad_reference );
+                return t.value = new cError( cErrorType.bad_reference );
             }
             if ( parserHelp.isArea.call( o, o.Formula, o.pCurrPos ) ) {
                 found_operand = new cArea3D( o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb );
@@ -580,7 +580,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
             if ( !ret.array[r] )
                 ret.addRow();
             ret.addElement( found_operand )
-        } )
+        } );
         return this.value = ret;
     }
     else {
@@ -615,13 +615,13 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
 
     return this.value = new cError( cErrorType.bad_reference );
 
-}
+};
 cINDIRECT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( ref-text [ , [ A1-ref-style-flag ] ] )"
     };
-}
+};
 
 function cLOOKUP() {
 //    cBaseFunction.call( this, "LOOKUP" );
@@ -642,7 +642,7 @@ function cLOOKUP() {
 
 }
 
-cLOOKUP.prototype = Object.create( cBaseFunction.prototype )
+cLOOKUP.prototype = Object.create( cBaseFunction.prototype );
 cLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2],
         resC = -1, resR = -1;
