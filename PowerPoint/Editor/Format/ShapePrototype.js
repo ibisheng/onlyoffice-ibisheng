@@ -445,10 +445,6 @@ CShape.prototype.recalculate = function ()
             this.recalcInfo.recalculateTransformText = false;
             this.clipRect = null;
         }
-       // if (this.recalcInfo.recalculateCursorTypes) {
-       //     this.recalculateCursorTypes();
-       //     this.recalcInfo.recalculateCursorTypes = false;
-       // }
         if(this.recalcInfo.recalculateBounds)
         {
             this.recalculateBounds();

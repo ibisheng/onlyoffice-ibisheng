@@ -1223,73 +1223,7 @@ GraphicOption.prototype.isScrollType = function() {
 };
 
 GraphicOption.prototype.getUpdatedRange = function() {
-
-	var vr = new Asc.Range(this.ws.getFirstVisibleCol(true), this.ws.getFirstVisibleRow(true), this.ws.visibleRange.c2, this.ws.visibleRange.r2);
-
-	//var vr = _this.ws.visibleRange.clone();
-	if ( this.isScrollType() && !this.range )
-		return vr;
-
-	var checker, coords;
-	switch (this.type) {
-		case c_oAscGraphicOption.ScrollVertical:
-		case c_oAscGraphicOption.ScrollHorizontal: {
-			vr = this.range.clone();
-            var col = vr.c2, row;
-            if(col < gc_nMaxCol - 1)
-                ++col;
-            if(row < gc_nMaxRow - 1)
-                ++row;
-
-			this.checkCol(col);
-			this.checkRow(row);
-		}
-			break;
-
-		case c_oAscGraphicOption.AddText: {
-			if ( this.ws ) {
-				var controller = this.ws.objectRender.controller;
-				var selectedObjects = controller.selectedObjects;
-
-				if ( selectedObjects.length === 1 ) {
-					if ( selectedObjects[0].isGroup() ) {
-						var groupSelectedObjects = selectedObjects[0].selectedObjects;
-						if ( groupSelectedObjects.length === 1 ) {
-							checker = this.ws.objectRender.getBoundsChecker(groupSelectedObjects[0]);
-							coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
-							if ( coords ) {
-								vr.c1 = Math.max(coords.from.col, vr.c1);
-								vr.r1 = Math.max(coords.from.row, vr.r1);
-
-								this.checkCol(coords.to.col + 1);
-								vr.c2 = Math.min(coords.to.col + 1, vr.c2);
-
-								this.checkRow(coords.to.row + 1);
-								vr.r2 = Math.min(coords.to.row + 1, vr.r2);
-							}
-						}
-					}
-					else {
-						var drawingObject = selectedObjects[0].drawingBase;
-						checker = this.ws.objectRender.getBoundsChecker(drawingObject.graphicObject);
-						coords = this.ws.objectRender.getBoundsCheckerCoords(checker);
-						if ( coords ) {
-							vr.c1 = Math.max(coords.from.col, vr.c1);
-							vr.r1 = Math.max(coords.from.row, vr.r1);
-
-							this.checkCol(coords.to.col + 1);
-							vr.c2 = Math.min(coords.to.col + 1, vr.c2);
-
-							this.checkRow(coords.to.row + 1);
-							vr.r2 = Math.min(coords.to.row + 1, vr.r2);
-						}
-					}
-				}
-			}
-		}
-			break;
-	}
-	return vr;
+	return this.range;
 };
 GraphicOption.prototype.getOffset = function () {
 	return this.offset;
@@ -1580,11 +1514,18 @@ function DrawingObjects() {
         if ( _t.isGraphicObject() && _t.graphicObject.bounds) {
 
             var bounds = _t.graphicObject.bounds;
-            if ( (bounds.x < 0) || (bounds.y < 0) || (bounds.w < 0) || (bounds.h < 0) )
-                return;
 
-            var fromX =  mmToPt(bounds.x), fromY =  mmToPt(bounds.y),
+
+            var fromX =  mmToPt(bounds.x > 0 ? bounds.x : 0), fromY =  mmToPt(bounds.y > 0 ? bounds.y : 0),
                 toX = mmToPt(bounds.x + bounds.w), toY = mmToPt(bounds.y + bounds.h);
+            if(toX < 0)
+            {
+                toX = 0;
+            }
+            if(toY < 0)
+            {
+                toY = 0;
+            }
             var bReinitHorScroll = false, bReinitVertScroll = false;
 
             var fromColCell = worksheet.findCellByXY(fromX, fromY, true, false, true);
@@ -2308,8 +2249,8 @@ function DrawingObjects() {
 
 					var x1 = worksheet.getCellLeft(updatedRange.c1, 1);// - offsetX;
                     var y1 = worksheet.getCellTop(updatedRange.r1, 1) ;//- offsetY;
-                    var x2 = worksheet.getCellLeft(updatedRange.c2, 1);// - offsetX;
-                    var y2 = worksheet.getCellTop(updatedRange.r2, 1);//- offsetY;
+                    var x2 = worksheet.getCellLeft(updatedRange.c2, 1) + worksheet.getColumnWidth(updatedRange.c2, 1);// - offsetX;
+                    var y2 = worksheet.getCellTop(updatedRange.r2, 1) + worksheet.getRowHeight(updatedRange.r2, 1);//- offsetY;
                     var w = x2 - x1;
                     var h = y2 - y1;
 					var offset = worksheet.getCellsOffset(1);

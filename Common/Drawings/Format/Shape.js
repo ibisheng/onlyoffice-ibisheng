@@ -2247,46 +2247,6 @@ CShape.prototype =
         return Math.PI * 0.5 + Math.atan2(px - this.extX * 0.5, py - this.extY * 0.5);
     },
 
-    recalculateCursorTypes: function () {
-        var transform_matrix = this.getTransformMatrix();
-        var transform = this.getTransformMatrix();
-        var hc = transform.extX * 0.5;
-        var vc = transform.extY * 0.5;
-        var xc = transform_matrix.TransformPointX(hc, vc);
-        var yc = transform_matrix.TransformPointY(hc, vc);
-        var xt = transform_matrix.TransformPointX(hc, 0);
-        var yt = transform_matrix.TransformPointY(hc, 0);
-        var vx = xt - xc;
-        var vy = yc - yt;
-        var angle = Math.atan2(vy, vx) + Math.PI / 8;
-        while (angle < 0)
-            angle += 2 * Math.PI;
-        while (angle >= 2 * Math.PI)
-            angle -= 2 * Math.PI;
-
-        var xlt = transform_matrix.TransformPointX(0, 0);
-        var ylt = transform_matrix.TransformPointY(0, 0);
-        var vx_lt = xlt - xc;
-        var vy_lt = yc - ylt;
-        var _index = Math.floor(angle / (Math.PI / 4));
-        var _index2, t;
-        if (vx_lt * vy - vx * vy_lt < 0) // нумерация якорьков по часовой стрелке
-        {
-            for (var i = 0; i < 8; ++i) {
-                t = i - _index + 17;
-                _index2 = t - ((t / 8) >> 0) * 8;
-                this.cursorTypes[i] = DEFAULT_CURSOR_TYPES[_index2];
-            }
-        }
-        else {
-            for (i = 0; i < 8; ++i) {
-                t = -i - _index + 19;
-                _index2 = t - ((t / 8) >> 0) * 8;
-                this.cursorTypes[i] = DEFAULT_CURSOR_TYPES[_index2];
-            }
-        }
-        this.recalcInfo.recalculateCursorTypes = false;
-    },
 
     recalculateGeometry: function () {
         if (this.spPr && isRealObject(this.spPr.geometry)) {

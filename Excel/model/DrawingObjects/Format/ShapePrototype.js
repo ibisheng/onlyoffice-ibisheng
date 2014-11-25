@@ -357,10 +357,7 @@ CShape.prototype.recalculate = function ()
         if (this.recalcInfo.recalculateTransformText) {
             this.recalculateTransformText();
         }
-        if (this.recalcInfo.recalculateCursorTypes) {
-            this.recalculateCursorTypes();
-            this.recalcInfo.recalculateCursorTypes = false;
-        }
+
         if(this.recalcInfo.recalculateBounds)
         {
             this.recalculateBounds();

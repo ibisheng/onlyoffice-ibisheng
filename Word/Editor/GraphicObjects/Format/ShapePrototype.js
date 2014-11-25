@@ -305,11 +305,6 @@ CShape.prototype.recalculate = function ()
             this.recalcInfo.recalculateGeometry = false;
         }
 
-
-        if (this.recalcInfo.recalculateCursorTypes) {
-            this.recalculateCursorTypes();
-            this.recalcInfo.recalculateCursorTypes = false;
-        }
         if(this.recalcInfo.recalculateBounds)
         {
             this.recalculateBounds();
