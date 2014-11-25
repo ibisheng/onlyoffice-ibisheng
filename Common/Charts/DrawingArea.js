@@ -39,10 +39,6 @@ function FrozenPlace(ws, type) {
 		
 	// Methods	
 	_this.initRange = function() {
-		
-		checkCol(_this.worksheet.getLastVisibleCol());
-		checkRow(_this.worksheet.getLastVisibleRow());
-		
 		switch (_this.type) {
 		
 			case FrozenAreaType.Top: {
@@ -676,18 +672,6 @@ function FrozenPlace(ws, type) {
 	
 	// Range constructor	
 	_this.initRange();
-	
-	// Misc
-	
-	function checkCol(col) {
-		while ( (col > 0) && !_this.worksheet.cols[col] )
-			_this.worksheet.expandColsOnScroll(true);
-	}
-	
-	function checkRow(row) {
-		while ( (row > 0) && !_this.worksheet.rows[row] )
-			_this.worksheet.expandRowsOnScroll(true);
-	}
 }
 
 // Container
