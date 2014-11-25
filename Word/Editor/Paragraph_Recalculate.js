@@ -1793,8 +1793,7 @@ CParaLineMetrics.prototype =
         if (linerule_AtLeast === ParaPr.Spacing.LineRule && (this.Ascent + this.Descent + this.LineGap) > (this.TextAscent + this.TextDescent))
         {
             // В такой ситуации Word располагает текст внизу строки
-            this.Ascent  = this.Ascent + this.Descent + this.LineGap - this.TextDescent;
-            this.Descent = this.TextDescent;
+            this.Ascent  = this.Ascent + this.LineGap;
             this.LineGap = 0;
         }
     },

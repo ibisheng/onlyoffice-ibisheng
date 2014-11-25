@@ -8684,8 +8684,13 @@ CDocument.prototype =
             this.DrawingObjects.Get_SelectedContent(SelectedContent);
         else
         {
-            if ( true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common )
-                return;
+            if (true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common)
+            {
+                if (bNeedTurnOffHistory)
+                    History.TurnOn();
+
+                return null;
+            }
 
             var StartPos = this.Selection.StartPos;
             var EndPos   = this.Selection.EndPos;
