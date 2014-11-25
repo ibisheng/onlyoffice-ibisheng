@@ -1655,7 +1655,7 @@
 			
 			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage, isIntoShape)
 			{
-				var base64 = null, base64FromWord = null, t = this;
+				var base64 = null, base64FromWord = null, base64FromPresentation = null, t = this;
 				
 				if(onlyFromLocalStorage)
 				{
@@ -1680,11 +1680,11 @@
 				else//find class xslData or docData
 				{
 					var classNode;
-					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
+					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
 						classNode = node.children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
 						classNode = node.children[0].children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
 						classNode = node.children[0].children[0].children[0].getAttribute("class");
 					
 					if( classNode != null ){
@@ -1697,6 +1697,10 @@
 							else if(cL[i].indexOf("docData;") > -1)
 							{
 								base64FromWord = cL[i].split('docData;')[1];
+							}
+							else if(cL[i].indexOf("pptData;") > -1)
+							{
+								base64FromPresentation = cL[i].split('pptData;')[1];
 							}
 						}
 					}
@@ -1742,9 +1746,128 @@
 					window.GlobalPasteFlagCounter = 0;
 					
 					return true;
-				};
+				}
+				else if(base64FromPresentation)
+				{
+					window.global_pptx_content_loader.Clear();
+
+					var _stream = CreateBinaryReader(base64FromPresentation, 0, base64FromPresentation.length);
+                    var stream = new FileStream(_stream.data, _stream.size);
+                    var p_url = stream.GetString2();
+                    var p_width = stream.GetULong()/100000;
+                    var p_height = stream.GetULong()/100000;
+                    var fonts = [];
+					
+					var first_string = stream.GetString2();
+					
+                    switch(first_string)
+                    {
+                        case "Content":
+                        {
+							//пока вставляем через html
+							return false;
+							
+							//TODO вставка через бинарник требует переконвертировать контент в вордовский, либо сделать парсинг из презентационных параграфов
+							var docContent = this.ReadPresentationText(stream, worksheet);
+							var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
+							
+							pasteFromBinaryWord._paste(worksheet, {DocumentContent: docContent});
+							
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+							
+							return true;
+                        }
+                        case "Drawings":
+                        {
+                            var objects = this.ReadPresentationShapes(stream, worksheet);
+                            var arr_shapes = objects.arrShapes;
+							if(arr_shapes && arr_shapes.length)
+							{
+								if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+							}
+							
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+							
+							return true;
+                        }
+                        case "SlideObjects":
+                        {
+							break;
+						}
+                    }
+				}
 				
 				return false;
+			},
+			
+			ReadPresentationShapes: function(stream, worksheet)
+			{
+				var loader = new BinaryPPTYLoader();
+				loader.presentation = worksheet.model;
+				loader.Start_UseFullUrl();
+				loader.stream = stream;
+				//loader.presentation = editor.WordControl.m_oLogicDocument;
+				//var presentation = editor.WordControl.m_oLogicDocument;
+				var count = stream.GetULong();
+				var arr_shapes = [];
+				var arr_transforms = [];
+				
+				for(var i = 0; i < count; ++i)
+				{
+					//loader.TempMainObject = presentation.Slides[presentation.CurPage];
+					var style_index = null;
+					if(!loader.stream.GetBool())
+					{
+						if(loader.stream.GetBool())
+						{
+							style_index = stream.GetULong();
+						}
+					}
+					
+					var drawing = loader.ReadGraphicObject();
+					
+					var x = stream.GetULong()/100000;
+					var y = stream.GetULong()/100000;
+					var extX = stream.GetULong()/100000;
+					var extY = stream.GetULong()/100000;
+					
+					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
+					arr_shapes[i].graphicObject = drawing;
+					
+					
+					/*arr_shapes[i].Drawing = drawing;
+					arr_shapes[i].X = x;
+					arr_shapes[i].Y = y;
+					arr_shapes[i].ExtX = extX;
+					arr_shapes[i].ExtY = extY;*/
+				}
+
+				return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
+			},
+			
+			ReadPresentationText: function(stream, worksheet)
+			{
+				var loader = new BinaryPPTYLoader();
+				loader.Start_UseFullUrl();
+				loader.stream = stream;
+				loader.presentation = worksheet.model;
+
+				var count = stream.GetULong() / 100000;
+				
+				//читаем контент, здесь только параграфы
+				//var newDocContent = new CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
+				var elements = [], paragraph, selectedElement;
+				for(var i = 0; i < count; ++i)
+				{
+					loader.stream.Skip2(1); // must be 0
+					paragraph = loader.ReadParagraph(worksheet.model);
+					
+					elements.push(paragraph);
+				}
+				return elements;
 			},
 			
 			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)

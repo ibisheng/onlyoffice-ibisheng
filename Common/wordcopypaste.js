@@ -2960,13 +2960,13 @@ PasteProcessor.prototype =
 				}
 				else
 				{
-					var base64 = null, base64FromExcel = null,classNode, aContent, aContentExcel, pasteFromBinary = false;
+					var base64 = null, base64FromExcel = null, base64FromPresentation,classNode, aContent, aContentExcel, pasteFromBinary = false;
 				
-					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
+					if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
 						classNode = node.children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
 						classNode = node.children[0].children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
 						classNode = node.children[0].children[0].children[0].getAttribute("class");
 					
 					if( classNode != null ){
@@ -2980,8 +2980,12 @@ PasteProcessor.prototype =
 							{
 								base64 = cL[i].split('docData;')[1];
 							}
+							else if(cL[i].indexOf("pptData;") > -1)
+							{
+								base64FromPresentation = cL[i].split('pptData;')[1];
+							}
 						}
-					};
+					}
 					
 					//если находимся внутри шейп, вставляем html
 					if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
@@ -3098,8 +3102,65 @@ PasteProcessor.prototype =
 					else
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 					return;
-				}   
-            };
+				}
+				else if(base64FromPresentation)
+				{
+					var fPrepasteCallback = function(){
+                        if(false == oThis.bNested)
+                        {
+                            oThis.InsertInDocument();
+							if(nodeDisplay)
+							{
+								nodeDisplay.blur();
+								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+							}
+                            if(aContent.bAddNewStyles)
+                                oThis.api.GenerateStyles();
+                        }
+                    }
+					
+					
+					window.global_pptx_content_loader.Clear();
+
+					var _stream = CreateBinaryReader(base64FromPresentation, 0, base64FromPresentation.length);
+                    var stream = new FileStream(_stream.data, _stream.size);
+                    var p_url = stream.GetString2();
+                    var p_width = stream.GetULong()/100000;
+                    var p_height = stream.GetULong()/100000;
+                    //var kw = presentation.Width/p_width;
+                    //var kh = presentation.Height/p_height;
+                    var fonts = [];
+					
+					var first_string = stream.GetString2();
+					
+                    switch(first_string)
+                    {
+                        case "Content":
+                        {
+							var docContent = this.ReadPresentationText(stream);
+							var aContent = [];
+							for(var i = 0; i < docContent.length; i++)
+							{
+								aContent[i] = docContent[i].Element;
+							}						
+							this.aContent = aContent;
+	
+							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+							return;
+						}
+						case "Drawings":
+                        {
+							var objects = this.ReadPresentationShapes(stream);
+                            var arr_shapes = objects.arrShapes;
+							var aContent = oThis._convertExcelBinary(null, arr_shapes);
+							this.aContent = aContent.content;
+							
+							oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+							return;
+						}
+					}
+				}
+            }
 
             var presentation = editor.WordControl.m_oLogicDocument;
             this.oRootNode = node;
@@ -3155,7 +3216,7 @@ PasteProcessor.prototype =
             var presentation = editor.WordControl.m_oLogicDocument;
             if(copyPasteUseBinary)
             {
-                var base64 = null;
+                var base64 = null, base64FromWord = null, base64FromExcel = null;
                 var classNode;
                 if(node.children[0] && node.children[0].getAttribute("class") != null)
                     classNode = node.children[0].getAttribute("class");
@@ -3168,9 +3229,17 @@ PasteProcessor.prototype =
                         {
                             base64 = cL[i].split('pptData;')[1];
                         }
+						else if(cL[i].indexOf("docData;") > -1)
+                        {
+                            base64FromWord = cL[i].split('docData;')[1];
+                        }
+						else if(cL[i].indexOf("xslData;") > -1)
+                        {
+                            base64FromExcel = cL[i].split('xslData;')[1];
+                        }
                     }
                 }
-                if(typeof base64 === "string")
+                if(typeof base64 === "string")//вставляем в презентации из презентаций
                 {
                     window.global_pptx_content_loader.Clear();
 
@@ -3262,7 +3331,7 @@ PasteProcessor.prototype =
                                     nodeDisplay.blur();
                                     nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
-                            };
+                            }
 
                             var oImagesToDownload = {};
                             if(objects.arrImages.length > 0)
@@ -3694,6 +3763,216 @@ PasteProcessor.prototype =
                         }
                     }
                 }
+				else if(base64FromWord)//вставляем в презентации из документов
+				{
+					var trueDocument = this.oDocument;
+					
+					//создаём темповый CDocumentContent
+					this.oDocument = new CDocumentContent(trueDocument, this.oDocument.DrawingDocument, 0 , 0, 0, 0, false, false);
+					var aContent = ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
+					this.oDocument = trueDocument;
+					
+					var presentationSelectedContent = new PresentationSelectedContent();
+					presentationSelectedContent.DocContent = new CSelectedContent();
+					
+					var elements = [], selectedElement, element, drawings, pDrawings = [], drawingCopyObject;
+					for(var i = 0; i < aContent.content.length; ++i)
+					{
+						selectedElement = new CSelectedElement();
+						element = aContent.content[i];
+						
+						//drawings
+						drawings = element.Get_AllDrawingObjects();
+						if(drawings && drawings.length)
+						{
+							for(var j = 0; j < drawings.length; j++)
+							{
+								drawingCopyObject = new DrawingCopyObject();
+								drawingCopyObject.Drawing = drawings[j].GraphicObj.convertToPPTX(this.oDocument.DrawingDocument);
+								pDrawings.push(drawingCopyObject);
+							}
+						}
+						else if(type_Paragraph == element.GetType())//paragraph
+						{
+							selectedElement.Element = ConvertParagraphToPPTX(element);
+							elements.push(selectedElement);
+						}
+						else if(type_Table == element.GetType())//table
+						{
+							selectedElement.Element = ConvertParagraphToPPTX(element);
+							elements.push(selectedElement);
+						}							
+					}
+					
+					presentationSelectedContent.DocContent.Elements = elements;
+					presentationSelectedContent.Drawings = pDrawings;
+
+					var font_map = {};
+					var images = [];
+					//shape.getAllFonts(font_map);
+					
+					//перебираем шрифты
+					var fonts = []; 
+					for(var i in font_map)
+						fonts.push(new CFont(i, 0, "", 0));
+					
+					/*if(shape.getAllImages)
+						shape.getAllImages(images);*/
+					var presentation = editor.WordControl.m_oLogicDocument;
+					oThis = this;
+					
+					//вставка
+					var paste_callback = function()
+					{
+						if(false == oThis.bNested)
+						{
+							presentation.Insert_Content(presentationSelectedContent);
+							presentation.Recalculate();
+							presentation.Document_UpdateInterfaceState();
+
+							nodeDisplay.blur();
+							nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+						}
+					}
+
+					var oPrepeareImages = {};
+					this.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
+					return;
+				}
+				else if(base64FromExcel)//вставляем в презентации из таблиц
+				{	
+					var aContentExcel = this._readFromBinaryExcel(base64FromExcel);
+					
+					//если есть шейпы, то вставляем их их excel
+					if(aContentExcel && aContentExcel.aWorksheets && aContentExcel.aWorksheets[0] && aContentExcel.aWorksheets[0].Drawings)
+					{
+						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
+						var arrImages = [];
+						var shape;
+						
+						for(var i = 0; i < arr_shapes.length; ++i)
+						{
+							shape = arr_shapes[i].graphicObject;
+							
+							/*if(shape.txBody.content.Content.length > 1)
+							{
+								shape.txBody.content.Internal_Content_Remove(0, 1);
+							}
+							var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
+							var h = shape.txBody.content.Get_SummaryHeight();
+							CheckSpPrXfrm(shape);
+							shape.spPr.xfrm.setExtX(w);
+							shape.spPr.xfrm.setExtY(h);
+							shape.spPr.xfrm.setOffX(0);
+							shape.spPr.xfrm.setOffY(0);*/
+							
+							shape.worksheet = null;
+							shape.drawingBase = null;
+							
+							arr_shapes[i] = new DrawingCopyObject(shape, 0, 0, 0, 0);
+						}
+						
+						
+						//var arrTransforms = objects.arrTransforms;
+						var presentation = editor.WordControl.m_oLogicDocument;
+						oThis = this;
+						var font_map = {};
+						var images = [];
+						for(var i = 0; i < arr_shapes.length; ++i)
+						{
+							if(arr_shapes[i].Drawing.getAllFonts)
+								arr_shapes[i].Drawing.getAllFonts(font_map);
+							if(arr_shapes[i].Drawing.getAllImages)
+								arr_shapes[i].Drawing.getAllImages(images);
+						}
+					   
+						var paste_callback = function()
+						{
+							if(false == oThis.bNested)
+							{
+								var presentationSelectedContent = new PresentationSelectedContent();
+								presentationSelectedContent.Drawings = arr_shapes;
+						
+								presentation.Insert_Content(presentationSelectedContent);
+								
+								
+								presentation.Recalculate();
+								presentation.Document_UpdateInterfaceState();
+
+								nodeDisplay.blur();
+								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+							}
+						}
+
+						var oImagesToDownload = {};
+						if(arrImages.length > 0)
+						{
+							for(var i = 0, length = arrImages.length; i < length; ++i)
+							{
+								var imageElem = arrImages[i];
+								var src = imageElem.Url;
+								//TODO!!!!!!!!!!
+								//if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+									oImagesToDownload[src] = 1;
+							}
+						}
+						
+						
+						//грузим картинки и фонты
+						for(var i in font_map)
+							fonts.push(new CFont(i, 0, "", 0));
+						var aImagesToDownload = [];
+						for(var i in oImagesToDownload)
+							aImagesToDownload.push(i);
+						if(aImagesToDownload.length > 0)
+						{
+							var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
+							sendCommand( this.api, function(incomeObject){
+								if(incomeObject && "imgurls" == incomeObject.type)
+								{
+									var oFromTo = JSON.parse(incomeObject.data);
+
+									var arr_images =[];
+									var image_map = {};
+									for(var i = 0, length = arrImages.length; i < length; ++i)
+									{
+										var sFrom = arrImages[i].Url;
+										var sTo = oFromTo[sFrom];
+										if(sTo)
+											arr_images.push(sTo);
+									}
+									for(var i = 0, length = arrImages.length; i < length; ++i)
+									{
+										var imageElem = arrImages[i];
+										if(null != imageElem)
+										{
+											var sNewSrc = oFromTo[imageElem.Url];
+											if(null != sNewSrc)
+											{
+												image_map[sNewSrc] = sNewSrc;
+												imageElem.SetUrl(sNewSrc);
+											}
+											else
+											{
+												image_map[imageElem.Url] = imageElem.Url;
+											}
+										}
+									}
+								}
+								oThis.api.pre_Paste(fonts, image_map, paste_callback);
+							}, rData );
+						}
+						else
+						{
+							var im_arr = [];
+							for(var key  in images)
+								im_arr.push(key);
+							this.api.pre_Paste(fonts, im_arr, paste_callback);
+						}
+						
+						return;
+					}
+				}
             }
 
             this.oRootNode = node;
@@ -3786,14 +4065,14 @@ PasteProcessor.prototype =
         }
     },
 	
-	_convertExcelBinary: function(aContentExcel)
+	_convertExcelBinary: function(aContentExcel, pDrawings)
 	{
 		//пока только распознаём только графические объекты
 		var aContent = null;
 		var aPastedImages = [];
 		var imageUrl, images = [];
 		
-		var drawings = aContentExcel.aWorksheets[0].Drawings;
+		var drawings = pDrawings ? pDrawings : aContentExcel.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
 		{
 			var drawing, graphicObj, paraRun, tempParaRun;
@@ -3806,8 +4085,8 @@ PasteProcessor.prototype =
 			//из excel в word они вставляются в один параграф
 			for(var i = 0; i < drawings.length; i++)
 			{
-				drawing = drawings[i];
-				graphicObj = drawing.graphicObject.convertToWord(this.oLogicDocument);
+				drawing = drawings[i] && drawings[i].Drawing ? drawings[i].Drawing : drawings[i];
+				graphicObj = drawing.graphicObject ? drawing.graphicObject.convertToWord(this.oLogicDocument) : drawing.convertToWord(this.oLogicDocument) ;
 				
 				tempParaRun = new ParaRun();
 				tempParaRun.Paragraph = null;
@@ -3832,7 +4111,6 @@ PasteProcessor.prototype =
 				{
 					imageUrl = graphicObj.spPr.Fill.fill.RasterImageId;
 					
-					//aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
 					images[images.length] = imageUrl;
 				}
 				else if(graphicObj.isGroup() && graphicObj.spTree && graphicObj.spTree.length)
@@ -3846,7 +4124,7 @@ PasteProcessor.prototype =
 						}
 					}
 				}				
-			};
+			}
 			
 			aContent = [];
 			aContent[0] = tempParagraph;
@@ -3854,7 +4132,7 @@ PasteProcessor.prototype =
 		
 		return {content: aContent, aPastedImages: aPastedImages, images: images};			
 	},
-	
+
 	_selectShapesBeforeInsert: function(aNewContent, oDoc)
 	{
 		var content, drawingObj, allDrawingObj = [];
@@ -3884,6 +4162,9 @@ PasteProcessor.prototype =
 		var oBinaryFileReader = new Asc.BinaryFileReader(null, true);
 		var tempWorkbook = new Workbook();
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
+		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])
+			tempWorkbook.theme = this.oLogicDocument.themes[0];
+		
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		oBinaryFileReader.Read(base64, tempWorkbook);
 		
@@ -3897,7 +4178,13 @@ PasteProcessor.prototype =
         loader.stream = stream;
         loader.presentation = editor.WordControl.m_oLogicDocument;
         var presentation = editor.WordControl.m_oLogicDocument;
-        var shape = new CShape(presentation.Slides[presentation.CurPage]);
+		
+		var shape;
+		if(presentation.Slides)
+			shape = new CShape(presentation.Slides[presentation.CurPage]);
+		else	
+			shape = new CShape(presentation);
+		
         shape.setTxBody(new CTextBody(shape));
 		
         var count = stream.GetULong() / 100000;
@@ -3932,7 +4219,7 @@ PasteProcessor.prototype =
 		
         for(var i = 0; i < count; ++i)
         {
-            loader.TempMainObject = presentation.Slides[presentation.CurPage];
+            loader.TempMainObject = presentation && presentation.Slides ? presentation.Slides[presentation.CurPage] : presentation;
             var style_index = null;
             if(!loader.stream.GetBool())
             {
@@ -3949,7 +4236,11 @@ PasteProcessor.prototype =
             var extX = stream.GetULong()/100000;
             var extY = stream.GetULong()/100000;
 			
-			arr_shapes[i] = new DrawingCopyObject();
+			if(presentation.Slides)
+				arr_shapes[i] = new DrawingCopyObject();
+			else
+				arr_shapes[i] = {};
+
 			arr_shapes[i].Drawing = drawing;
 			arr_shapes[i].X = x;
 			arr_shapes[i].Y = y;

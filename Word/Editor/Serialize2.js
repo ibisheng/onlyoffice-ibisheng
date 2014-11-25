@@ -5288,14 +5288,27 @@ function BinaryFileReader(doc, openParams)
             bInBlock = true;
         //создаем список используемых шрифтов
         var AllFonts = {};
-        this.Document.Numbering.Document_Get_AllFontNames(AllFonts);
+		
+		if(this.Document.Numbering)
+			this.Document.Numbering.Document_Get_AllFontNames(AllFonts);	
+		if(this.Document.Styles)	
         this.Document.Styles.Document_Get_AllFontNames(AllFonts);
+		
         for (var Index = 0, Count = aContent.length; Index < Count; Index++)
             aContent[Index].Document_Get_AllFontNames(AllFonts);
         var aPrepeareFonts = [];
 		
 		var oDocument = this.Document && this.Document.LogicDocument ? this.Document.LogicDocument : this.Document;
-		checkThemeFonts(AllFonts, oDocument.theme.themeElements.fontScheme)
+		
+		var fontScheme;
+		var m_oLogicDocument = editor.WordControl.m_oLogicDocument;
+		//для презентаций находим fontScheme
+		if(m_oLogicDocument && m_oLogicDocument.slideMasters && m_oLogicDocument.slideMasters[0] && m_oLogicDocument.slideMasters[0].Theme && m_oLogicDocument.slideMasters[0].Theme.themeElements)
+			fontScheme = m_oLogicDocument.slideMasters[0].Theme.themeElements.fontScheme;
+		else
+			fontScheme = oDocument.theme.themeElements.fontScheme;
+		
+		checkThemeFonts(AllFonts, fontScheme);
 		
         for (var i in AllFonts)
             aPrepeareFonts.push(new CFont(i, 0, "", 0));

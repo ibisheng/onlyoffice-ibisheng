@@ -152,7 +152,15 @@
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
 
                 "../../PowerPoint/api-all.js",
-                "../../PowerPoint/Build/Log/apiExport.js"
+                "../../PowerPoint/Build/Log/apiExport.js",
+				
+				"../../Excel/utils/utils.js",
+				"../../Excel/model/CellComment.js",
+				"../../Excel/model/Serialize.js",
+				"../../Excel/model/WorkbookElems.js",
+				"../../Excel/model/Workbook.js",
+				"../../Excel/model/CellInfo.js",
+				"../../Excel/model/AdvancedOptions.js"
             ],
             "dst": "../../PowerPoint/sdk-all.js",
             "externs": [
