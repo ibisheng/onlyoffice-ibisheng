@@ -1235,8 +1235,14 @@ GraphicOption.prototype.getUpdatedRange = function() {
 		case c_oAscGraphicOption.ScrollVertical:
 		case c_oAscGraphicOption.ScrollHorizontal: {
 			vr = this.range.clone();
-			this.checkCol(++vr.c2);
-			this.checkRow(++vr.r2);
+            var col = vr.c2, row;
+            if(col < gc_nMaxCol - 1)
+                ++col;
+            if(row < gc_nMaxRow - 1)
+                ++row;
+
+			this.checkCol(col);
+			this.checkRow(row);
 		}
 			break;
 
