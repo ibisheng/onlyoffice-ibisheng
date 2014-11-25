@@ -1209,12 +1209,12 @@ function GraphicOption(ws, type, range, aId, offset) {
 	this.offset = offset;
 }
 GraphicOption.prototype.checkCol = function (col) {
-	while ((col > 0) && !this.ws.cols[col])
+	while ((col > 0) && !this.ws.cols[col] && this.ws.cols < gc_nMaxCol)
 		this.ws.expandColsOnScroll(true);
 };
 
 GraphicOption.prototype.checkRow = function (row) {
-	while ((row > 0) && !this.ws.rows[row])
+	while ((row > 0) && !this.ws.rows[row] && this.ws.rows < gc_nMaxRow)
 		this.ws.expandRowsOnScroll(true);
 };
 

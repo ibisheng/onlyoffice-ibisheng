@@ -8472,6 +8472,10 @@ Paragraph.prototype =
         {
             return CurDocContent.Parent.parent.transformText;
         }
+        if(CurDocContent.transformText)
+        {
+            return CurDocContent.transformText;
+        }
         return null;
     },
 
