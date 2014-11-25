@@ -6788,7 +6788,7 @@ function BinaryPPTYLoader()
                             _last_field_type = true;
                         }
                     }
-                    if((this.TempMainObject instanceof  Slide && shape.isPlaceholder() && (shape.getPlaceholderType() === phType_sldNum || shape.getPlaceholderType() === phType_dt)) && _last_field_type)
+                    if(shape && (this.TempMainObject instanceof  Slide && shape.isPlaceholder && shape.isPlaceholder() && (shape.getPlaceholderType() === phType_sldNum || shape.getPlaceholderType() === phType_dt)) && _last_field_type)
                     {
                        /// txbody.textFieldFlag = true;
 
