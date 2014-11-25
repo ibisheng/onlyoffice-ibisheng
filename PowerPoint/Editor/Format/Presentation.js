@@ -2880,7 +2880,7 @@ CPresentation.prototype =
                         }
                         else
                         {
-                            var selector = this.Slides[this.CurPage].graphicObjects.groupSelection ? this.Slides[this.CurPage].graphicObjects.groupSelection : this.Slides[this.CurPage].graphicObjects;
+                            var selector = this.Slides[this.CurPage].graphicObjects.selection.groupSelection ? this.Slides[this.CurPage].graphicObjects.selection.groupSelection : this.Slides[this.CurPage].graphicObjects;
                             if(selector.selection.chartSelection && selector.selection.chartSelection.selection.title)
                             {
                                 var doc_content = selector.selection.chartSelection.selection.title.getDocContent();
