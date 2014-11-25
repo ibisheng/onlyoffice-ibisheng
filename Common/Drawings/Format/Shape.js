@@ -1712,7 +1712,11 @@ CShape.prototype =
             this.recalculateTextStyles(_level);
             this.recalcInfo.recalculateTextStyles[_level] = false;
         }
-        return this.compiledStyles[_level];
+        this.recalcInfo.recalculateTextStyles[_level] = true;
+        var ret = this.compiledStyles[_level];
+        this.compiledStyles[_level] = undefined;
+        return ret;
+     //   return this.compiledStyles[_level];
     },
 
 
@@ -1723,7 +1727,7 @@ CShape.prototype =
         {
 
             var parent_objects = this.getParentObjects();
-            var default_style = new CStyle("defaultStyle", null, null, null);
+            var default_style = new CStyle("defaultStyle", null, null, null, true);
             default_style.ParaPr.Spacing.LineRule = linerule_Auto;
             default_style.ParaPr.Spacing.Line = 1;
             default_style.ParaPr.Spacing.Before = 0;
@@ -1740,7 +1744,7 @@ CShape.prototype =
             if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles))
             {
                 var master_ppt_styles;
-                master_style = new CStyle("masterStyele", null, null, null);
+                master_style = new CStyle("masterStyele", null, null, null, true);
                 if (this.isPlaceholder())
                 {
                     switch (this.getPlaceholderType())
@@ -1794,7 +1798,7 @@ CShape.prototype =
                     && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level]))
                 {
                     var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
-                    var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
+                    var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null, true);
                     hierarchy_style.ParaPr = hierarchy_ppt_style.Copy();
                     if(hierarchy_ppt_style.DefaultRunPr)
                     {
@@ -1807,7 +1811,7 @@ CShape.prototype =
             var ownStyle;
             if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle.levels[level]))
             {
-                ownStyle = new CStyle("ownStyle", null, null, null);
+                ownStyle = new CStyle("ownStyle", null, null, null, true);
                 var own_ppt_style = this.txBody.lstStyle.levels[level];
                 ownStyle.ParaPr = own_ppt_style.Copy();
                 if(own_ppt_style.DefaultRunPr)
@@ -1818,7 +1822,7 @@ CShape.prototype =
             var shape_text_style;
             if (isRealObject(this.style) && isRealObject(this.style.fontRef))
             {
-                shape_text_style = new CStyle("shapeTextStyle", null, null, null);
+                shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
                 var first_name;
                 if(this.style.fontRef.idx === fntStyleInd_major)
                     first_name = "+mj-";
@@ -1838,7 +1842,7 @@ CShape.prototype =
                     shape_text_style.TextPr.Unifill = unifill;
                 }
             }
-            var Styles = new CStyles();
+            var Styles = new CStyles(false);
 
 
             var last_style_id;
@@ -2917,7 +2921,6 @@ CShape.prototype =
         if (this.Lock && locktype_None != this.Lock.Get_Type())
         {
             graphics.transform3(_transform);
-            graphics.SetIntegerGrid(false);
             graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
         }
         graphics.SetIntegerGrid(true);

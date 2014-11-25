@@ -145,7 +145,7 @@ CTableStylePr.prototype =
     }
 }
 
-function CStyle(Name, BasedOnId, NextId, type)
+function CStyle(Name, BasedOnId, NextId, type, bNoCreateTablePr)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -170,20 +170,23 @@ function CStyle(Name, BasedOnId, NextId, type)
     this.TableRowPr  = new CTableRowPr();
     this.TableCellPr = new CTableCellPr();
 
-    // Условные типы форматирования стилей таблицы
-    this.TableBand1Horz  = new CTableStylePr();
-    this.TableBand1Vert  = new CTableStylePr();
-    this.TableBand2Horz  = new CTableStylePr();
-    this.TableBand2Vert  = new CTableStylePr();
-    this.TableFirstCol   = new CTableStylePr();
-    this.TableFirstRow   = new CTableStylePr();
-    this.TableLastCol    = new CTableStylePr();
-    this.TableLastRow    = new CTableStylePr();
-    this.TableTLCell     = new CTableStylePr();
-    this.TableTRCell     = new CTableStylePr();
-    this.TableBLCell     = new CTableStylePr();
-    this.TableBRCell     = new CTableStylePr();
-    this.TableWholeTable = new CTableStylePr();
+    if(bNoCreateTablePr !== true)
+    {
+        // Условные типы форматирования стилей таблицы
+        this.TableBand1Horz  = new CTableStylePr();
+        this.TableBand1Vert  = new CTableStylePr();
+        this.TableBand2Horz  = new CTableStylePr();
+        this.TableBand2Vert  = new CTableStylePr();
+        this.TableFirstCol   = new CTableStylePr();
+        this.TableFirstRow   = new CTableStylePr();
+        this.TableLastCol    = new CTableStylePr();
+        this.TableLastRow    = new CTableStylePr();
+        this.TableTLCell     = new CTableStylePr();
+        this.TableTRCell     = new CTableStylePr();
+        this.TableBLCell     = new CTableStylePr();
+        this.TableBRCell     = new CTableStylePr();
+        this.TableWholeTable = new CTableStylePr();
+    }
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
