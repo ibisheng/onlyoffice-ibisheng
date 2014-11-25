@@ -371,6 +371,40 @@ CTextBody.prototype =
 
     },
 
+
+    getFieldText: function(fieldType, slide)
+    {
+        var ret = "";
+        if(this.parent && this.parent.isPlaceholder())
+        {
+            var _ph_type = this.parent.getPlaceholderType();
+            switch (_ph_type)
+            {
+                case phType_dt :
+                {
+                    var _cur_date = new Date();
+                    var _cur_year = _cur_date.getFullYear();
+                    var _cur_month = _cur_date.getMonth();
+                    var _cur_month_day = _cur_date.getDate();
+                    //TODO: switch по fieldType
+                    ret += (_cur_month_day > 9 ? _cur_month_day : "0" + _cur_month_day)
+                                +  "." +   ((_cur_month +1) > 9 ? (_cur_month + 1) : "0" + (_cur_month +1))
+                                + "." + _cur_year;
+                    break;
+                }
+                case phType_sldNum :
+                {
+                    if(slide instanceof Slide)
+                    {
+                        ret += "" + (slide.num+1);
+                    }
+                    break;
+                }
+            }
+        }
+        return ret;
+    },
+
     recalculateBodyPr: function()
     {
         ExecuteNoHistory(function()

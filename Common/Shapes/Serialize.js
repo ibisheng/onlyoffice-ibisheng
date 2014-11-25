@@ -6788,9 +6788,18 @@ function BinaryPPTYLoader()
                             _last_field_type = true;
                         }
                     }
-                    if(_last_field_type)
+                    if((this.TempMainObject instanceof  Slide && shape.isPlaceholder() && (shape.getPlaceholderType() === phType_sldNum || shape.getPlaceholderType() === phType_dt)) && _last_field_type)
                     {
-                        txbody.textFieldFlag = true;
+                       /// txbody.textFieldFlag = true;
+
+                        var str_field = txbody.getFieldText(_last_field_type, this.TempMainObject);
+                        if(str_field.length > 0)
+                        {
+                            txbody.content.Internal_Content_RemoveAll();
+                            txbody.content.Internal_Content_Add(txbody.content.Content.length,  new Paragraph(txbody.content.DrawingDocument, txbody.content, 0, 0, 0, 0, 0, true));
+                            AddToContentFromString(txbody.content, str_field);
+                        }
+
                     }
                     break;
                 }
@@ -6813,7 +6822,7 @@ function BinaryPPTYLoader()
             txbody = shape.txPr;
         else
         {
-            shape.txPr = new CTextBody(shape);
+            shape.txPr = new CTextBody();
             txbody = shape.txPr;
         }
         var s = this.stream;
@@ -6866,12 +6875,13 @@ function BinaryPPTYLoader()
 
                     if(_last_field_type)
                     {
-                        txbody.textFieldFlag = true;
+                       // var str_field = txbody.getFieldText(_last_field_type);
+                       // if(str_field.length > 0)
+                       // {
+                       //     txbody.content.Internal_Content_RemoveAll();
+                       //     AddToContentFromString(txbody.content, str_field);
+                       // }
                     }
-                    /*if(History != null)
-                     {
-                     History.TurnOn();
-                     }*/
                     break;
                 }
                 default:

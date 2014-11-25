@@ -22159,42 +22159,63 @@ CTitle.prototype =
     Set_CurrentElement: function(bUpdate, pageIndex)
     {
 
-        var chart = this.chart;
-        if(typeof editor !== "undefined" && editor && editor.WordControl && chart)
+        var chart = this.chart, controller;
+        if(chart && typeof editor !== "undefined" && editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
         {
-            var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-            drawing_objects.resetSelection();
-            var para_drawing;
-            if(chart.group)
+            var bDocument = false, bPresentation = false, drawing_objects;
+            if(editor.WordControl.m_oLogicDocument instanceof CDocument)
             {
-                var main_group = chart.group.getMainGroup();
-                drawing_objects.selectObject(main_group, pageIndex);
-                main_group.selectObject(chart, pageIndex);
-                main_group.selection.chartSelection = chart;
+                bDocument = true;
+                drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
+            }
+            else if(editor.WordControl.m_oLogicDocument instanceof CPresentation)
+            {
+                bPresentation = true;
+                if(chart.parent)
+                {
+                    drawing_objects = chart.parent.graphicObject;
+                }
+            }
+            if(drawing_objects)
+            {
+                drawing_objects.resetSelection();
+                var para_drawing;
+                if(chart.group)
+                {
+                    var main_group = chart.group.getMainGroup();
+                    drawing_objects.selectObject(main_group, pageIndex);
+                    main_group.selectObject(chart, pageIndex);
+                    main_group.selection.chartSelection = chart;
 
-                chart.selection.textSelection = this;
-                chart.selection.title = this;
-                drawing_objects.selection.groupSelection = main_group;
-                para_drawing = main_group.parent;
+                    chart.selection.textSelection = this;
+                    chart.selection.title = this;
+                    drawing_objects.selection.groupSelection = main_group;
+                    para_drawing = main_group.parent;
+                }
+                else
+                {
+                    drawing_objects.selectObject(chart, pageIndex);
+                    drawing_objects.selection.chartSelection = chart;
+                    chart.selection.textSelection = this;
+                    chart.selection.title = this;
+                    para_drawing = chart.parent;
+                }
+                if(bDocument && para_drawing instanceof ParaDrawing)
+                {
+
+                    var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
+                    if(hdr_ftr)
+                    {
+                        hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
+                        hdr_ftr.Set_CurrentElement(bUpdate);
+                    }
+                    else
+                    {
+                        drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
+                    }
+                }
             }
-            else
-            {
-                drawing_objects.selectObject(chart, pageIndex);
-                drawing_objects.selection.chartSelection = chart;
-                chart.selection.textSelection = this;
-                chart.selection.title = this;
-                para_drawing = chart.parent;
-            }
-            var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
-            if(hdr_ftr)
-            {
-                hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
-                hdr_ftr.Set_CurrentElement(bUpdate);
-            }
-            else
-            {
-                drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
-            }
+
         }
     },
 
@@ -24576,6 +24597,13 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
 function CreateDocContentFromString(str, drawingDocument, parent)
 {
     var content = new CDocumentContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
+    AddToContentFromString(content, str);
+    return content;
+}
+
+
+function AddToContentFromString(content, str)
+{
     for(var i = 0; i < str.length; ++i)
     {
         var ch = str[i];
@@ -24598,7 +24626,6 @@ function CreateDocContentFromString(str, drawingDocument, parent)
             content.Paragraph_Add(new ParaSpace(1), false );
         }
     }
-    return content;
 }
 
 function CValAxisLabels(chart)
