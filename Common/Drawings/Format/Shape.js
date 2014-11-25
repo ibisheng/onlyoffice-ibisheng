@@ -1732,6 +1732,7 @@ CShape.prototype =
             default_style.ParaPr.Spacing.Line = 1;
             default_style.ParaPr.Spacing.Before = 0;
             default_style.ParaPr.Spacing.After = 0;
+            default_style.ParaPr.Align = align_Center;
             if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
                 && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
             {
@@ -1818,6 +1819,7 @@ CShape.prototype =
                 {
                     ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
                 }
+                hierarchy_styles.push(ownStyle);
             }
             var shape_text_style;
             if (isRealObject(this.style) && isRealObject(this.style.fontRef))
@@ -1890,6 +1892,7 @@ CShape.prototype =
                     last_style_id = hierarchy_styles[i].Id;
                 }
             }
+
 
             if (shape_text_style) {
                 //checkTextPr(shape_text_style.TextPr);
