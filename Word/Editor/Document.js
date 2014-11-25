@@ -5465,7 +5465,10 @@ CDocument.prototype =
                     Item.Numbering_Remove();
 
                     if ( selectionflag_Numbering === this.Selection.Flag )
+                    {
+                        this.Selection_Remove();
                         Item.Document_SetThisElementCurrent(true);
+                    }
                 }
                 else
                 {
