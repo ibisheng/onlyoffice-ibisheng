@@ -2237,7 +2237,7 @@
 				range = this.visibleRange;
 			}
 
-			var ctx, left, top, cFrozen, rFrozen;
+			var left, top, cFrozen, rFrozen;
 			var offsetX = (undefined === offsetXForDraw) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetXForDraw;
 			var offsetY = (undefined === offsetYForDraw) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetYForDraw;
 			if (undefined === drawingCtx && this.topLeftFrozenCell) {
@@ -5282,7 +5282,7 @@
 				this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
 				this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
-					c_oAscGraphicOption.ScrollVertical, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
+					c_oAscGraphicOption.ScrollVertical, range, {offsetX: offsetX, offsetY: offsetY}));
 				if (0 < cFrozen) {
 					range.c1 = 0;
 					range.c2 = cFrozen - 1;
@@ -5291,7 +5291,7 @@
 					this._drawCellsAndBorders(/*drawingCtx*/undefined, range, offsetX);
 					this._drawAutoF(range, offsetX, offsetY);
 					this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
-						c_oAscGraphicOption.ScrollVertical, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
+						c_oAscGraphicOption.ScrollVertical, range, {offsetX: offsetX, offsetY: offsetY}));
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();
@@ -5410,7 +5410,7 @@
 				this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
 				this._drawAutoF(range, offsetX, offsetY);
 				this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
-					c_oAscGraphicOption.ScrollHorizontal, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
+					c_oAscGraphicOption.ScrollHorizontal, range, {offsetX: offsetX, offsetY: offsetY}));
 				if (rFrozen) {
 					range.r1 = 0;
 					range.r2 = rFrozen - 1;
@@ -5419,7 +5419,7 @@
 					this._drawCellsAndBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
 					this._drawAutoF(range, offsetX, offsetY);
 					this.objectRender.showDrawingObjectsEx(false, new GraphicOption(this,
-						c_oAscGraphicOption.ScrollHorizontal, range, undefined, {offsetX: offsetX, offsetY: offsetY}));
+						c_oAscGraphicOption.ScrollHorizontal, range, {offsetX: offsetX, offsetY: offsetY}));
 				}
 				// Отрисовывать нужно всегда, вдруг бордеры
 				this._drawFrozenPaneLines();

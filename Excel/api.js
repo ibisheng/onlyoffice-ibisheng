@@ -2739,7 +2739,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 {
                     for(var i = 0; i < drawing_area.frozenPlaces.length; ++i)
                     {
-                        worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, null, {offsetX: 0, offsetY: 0}));
+                        worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
                     }
                 }
 

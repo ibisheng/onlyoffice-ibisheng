@@ -1198,25 +1198,13 @@ function CChangeTableData(changedRange, added, hided, removed, arrChanged)
     this.arrChanged = arrChanged;
 }
 
-function GraphicOption(ws, type, range, aId, offset) {
+function GraphicOption(ws, type, range, offset) {
     this.ws = ws;
 	this.type = type;
 	this.range = range;
-	this.aId = [];
-    if (aId && Array.isArray(aId))
-		this.aId = aId.concat();
 
 	this.offset = offset;
 }
-GraphicOption.prototype.checkCol = function (col) {
-	while ((col > 0) && !this.ws.cols[col] && this.ws.cols < gc_nMaxCol)
-		this.ws.expandColsOnScroll(true);
-};
-
-GraphicOption.prototype.checkRow = function (row) {
-	while ((row > 0) && !this.ws.rows[row] && this.ws.rows < gc_nMaxRow)
-		this.ws.expandRowsOnScroll(true);
-};
 
 GraphicOption.prototype.isScrollType = function() {
 	return ((this.type === c_oAscGraphicOption.ScrollVertical) || (this.type === c_oAscGraphicOption.ScrollHorizontal));
@@ -1267,7 +1255,6 @@ function DrawingObjects() {
 
     var aObjects = [];
     var aImagesSync = [];
-    var aBoundsCheckers = [];
 
     _this.zoom = { last: 1, current: 1 };
     _this.isViewerMode = null;
@@ -1597,70 +1584,6 @@ function DrawingObjects() {
         }
     };
 
-    // Проверяет выход за границы
-    DrawingBase.prototype.inVisibleArea = function(scrollType) {
-        var _t = this;
-        var result = true;
-        var fvc, fvr, lvc, lvr;
-
-        var checker = _this.getBoundsChecker(_t.graphicObject);
-        var coords = _this.getBoundsCheckerCoords(checker);
-        if ( coords ) {
-            if ( scrollType ) {
-                var updatedRange = scrollType.getUpdatedRange();
-                fvc = updatedRange.c1;
-                fvr = updatedRange.r1;
-                lvc = updatedRange.c2;
-                lvr = updatedRange.r2;
-            }
-            else {
-                fvc = _t.worksheet.getFirstVisibleCol(true);
-                fvr = _t.worksheet.getFirstVisibleRow(true);
-                lvc = _t.worksheet.getLastVisibleCol();
-                lvr = _t.worksheet.getLastVisibleRow();
-
-            }
-            if ( (fvr >= coords.to.row + 1) || (lvr <= coords.from.row - 1) || (fvc >= coords.to.col + 1) || (lvc <= coords.from.col - 1) )
-                result = false;
-        }
-
-        return result;
-    };
-
-    DrawingBase.prototype.calculateCell = function(x, y)//pix
-    {
-
-    };
-
-    DrawingBase.prototype.getColUnderCursor = function(x)
-    {
-        var col = worksheet._findColUnderCursor(x, true);
-        while(!col)
-        {
-            if ( worksheet.cols.length >= gc_nMaxCol ) {
-               return null;
-            }
-            worksheet.expandColsOnScroll(true);
-            col = worksheet._findColUnderCursor(x, true);
-        }
-        return col;
-    };
-
-
-    DrawingBase.prototype.getRowUnderCursor = function(y)
-    {
-        var row = worksheet._findRowUnderCursor(y, true);
-        while(!row)
-        {
-            if ( worksheet.rows.length >= gc_nMaxRow ) {
-                return null;
-            }
-            worksheet.expandRowsOnScroll(true);
-            row = worksheet._findRowUnderCursor(y, true);
-        }
-        return row;
-    };
-
     // Реальное смещение по высоте
     DrawingBase.prototype.getRealTopOffset = function() {
         var _t = this;
@@ -1705,22 +1628,6 @@ function DrawingObjects() {
         var off = _t.getRealLeftOffset() - fvc;
         off = (off > 0) ? off : 0;
         return withHeader ? headerColOff + off : off;
-    };
-
-    // смещение по высоте внутри объекта
-    DrawingBase.prototype.getInnerOffsetTop = function() {
-        var _t = this;
-        var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(true), 0);
-        var off = _t.getRealTopOffset() - fvr;
-        return (off > 0) ? 0 : asc.round( Math.abs(off) );
-    };
-
-    // смещение по ширине внутри объекта
-    DrawingBase.prototype.getInnerOffsetLeft = function() {
-        var _t = this;
-        var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(true), 0);
-        var off = _t.getRealLeftOffset() - fvc;
-        return (off > 0) ? 0 : asc.round( Math.abs(off) );
     };
 
     DrawingBase.prototype.getDrawingObjects = function() {
@@ -1907,12 +1814,6 @@ function DrawingObjects() {
 
 		_this.recalculate(true);
 
-        for (i = 0; i < currentSheet.model.Drawings.length; ++i)
-        {
-            var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-            aBoundsCheckers.push(boundsChecker);
-        }
-
 
         // Upload event
         if (window.addEventListener) {
@@ -2078,110 +1979,6 @@ function DrawingObjects() {
     _this.callTrigger = function(triggerName, param) {
         if ( triggerName )
             worksheet.model.workbook.handlers.trigger(triggerName, param);
-    };
-
-    _this.getBoundsChecker = function(graphicObject) {
-        if ( graphicObject ) {
-            // Коррекция для селекта при блокировке
-            var delta = 4;
-            var boundsChecker = new  CSlideBoundsChecker();
-            boundsChecker.objectId = graphicObject.Id;
-
-            if ( graphicObject.bounds ) {
-                boundsChecker.Bounds.min_x = Math.max(1, graphicObject.bounds.x - delta);
-                boundsChecker.Bounds.min_y = Math.max(1, graphicObject.bounds.y - delta);
-                boundsChecker.Bounds.max_x = graphicObject.bounds.x + graphicObject.bounds.w + delta;
-                boundsChecker.Bounds.max_y = graphicObject.bounds.y + graphicObject.bounds.h + delta;
-            }
-            else {
-                boundsChecker.init(1, 1, 1, 1);
-                boundsChecker.transform3(graphicObject.transform);
-                boundsChecker.rect(0,0, graphicObject.extX, graphicObject.extY);
-                graphicObject.draw(boundsChecker);
-                boundsChecker.CorrectBounds();
-                boundsChecker.Bounds.min_x = Math.max(1, boundsChecker.Bounds.min_x - delta);
-                boundsChecker.Bounds.min_y = Math.max(1, boundsChecker.Bounds.min_y - delta);
-                boundsChecker.Bounds.max_x += delta;
-                boundsChecker.Bounds.max_y += delta;
-            }
-
-            return boundsChecker;
-        }
-        return null;
-    };
-
-    _this.getBoundsCheckerCoords = function(checker) {
-
-        if ( checker ) {
-            var coords = { from: null, to: null };
-
-            //coords.from = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
-            //coords.to = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
-
-            coords.from = _this.drawingArea.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
-            coords.to = _this.drawingArea.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
-
-            return coords;
-        }
-        return null;
-    };
-
-    _this.clearDrawingObjects = function(graphicOption) {
-		var i;
-        // Чистим предыдущие области
-        for (i = 0; i < aBoundsCheckers.length; i++) {
-
-            var bSkip = false;
-            if ( graphicOption && (graphicOption.type === c_oAscGraphicOption.ChangePosition) && graphicOption.aId.length ) {
-                if ( graphicOption.aId.indexOf(aBoundsCheckers[i].objectId) === -1 )
-                    bSkip = true;
-            }
-            if ( !bSkip )
-                _this.restoreSheetArea(aBoundsCheckers[i]);
-        }
-        aBoundsCheckers = [];
-
-        // Сохраняем текущие области
-        for (i = 0; i < aObjects.length; i++ ) {
-            if ( !aObjects[i].inVisibleArea() )
-                continue;
-            var boundsChecker = _this.getBoundsChecker(aObjects[i].graphicObject);
-            aBoundsCheckers.push(boundsChecker);
-        }
-    };
-
-    _this.restoreSheetArea = function(checker) {
-
-        var coords = _this.getBoundsCheckerCoords(checker);
-        if ( coords ) {
-
-            var range = asc_Range( coords.from.col, coords.from.row, coords.to.col, coords.to.row );
-            var r_ = range.intersection(worksheet.visibleRange);
-
-            if ( r_ ) {
-                var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
-                var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
-
-                while ( !worksheet.cols[r_.c2 + 1] ) {
-                    worksheet.expandColsOnScroll(true);
-                }
-                while ( !worksheet.rows[r_.r2 + 1] ) {
-                    worksheet.expandRowsOnScroll(true);
-                }
-
-                var x1 = worksheet.cols[r_.c1].left - offsetX;
-                var y1 = worksheet.rows[r_.r1].top - offsetY;
-                var x2 = worksheet.cols[r_.c2 + 1].left - offsetX;
-                var y2 = worksheet.rows[r_.r2 + 1].top - offsetY;
-                var w = x2 - x1;
-                var h = y2 - y1;
-
-                drawingCtx.clearRect( x1, y1, w, h );
-                drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
-                worksheet._drawGrid(/*drawingCtx*/undefined, r_);
-                worksheet._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
-            }
-        }
     };
 
     _this.getDrawingObjectsBounds = function()
@@ -3465,9 +3262,6 @@ function DrawingObjects() {
         }
         worksheet.setSelectionShape(true);
 
-        /*var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-         aBoundsCheckers.push(boundsChecker);*/
-
         return ret;
     };
 
@@ -3809,7 +3603,6 @@ function DrawingObjects() {
         for (var i = 0; i < aObjects.length; i++) {
             aObjects[i].graphicObject.deleteDrawingBase();
         }
-        aBoundsCheckers = [];
 
         worksheet._clean();
         var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
@@ -3988,75 +3781,57 @@ function DrawingObjects() {
 
     _this.updateSizeDrawingObjects = function(target) {
 
-       // ExecuteNoHistory(function(){
-        if(History.TurnOffHistory > 0)
+        if (History.TurnOffHistory > 0)
             return;
-        var i, bNeedRecalc = false, drawingObject, coords, cellTo;
-        if(target.target === c_oTargetType.RowResize)
-        {
+        var i, bNeedRecalc = false, drawingObject, coords;
+        if (target.target === c_oTargetType.RowResize) {
             for (i = 0; i < aObjects.length; i++) {
                 drawingObject = aObjects[i];
 
-                if(drawingObject.from.row >= target.row)
-                {
+                if (drawingObject.from.row >= target.row) {
                     coords = _this.coordsManager.calculateCoords(drawingObject.from);
                     CheckSpPrXfrm(drawingObject.graphicObject);
 
                     var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = normalizeRotate(rot);
-                    if (checkNormalRotate(rot))
-                    {
+                    if (checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
+                    } else {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX / 2 + drawingObject.graphicObject.spPr.xfrm.extY / 2);
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY / 2 + drawingObject.graphicObject.spPr.xfrm.extX / 2);
                     }
-                    else
-                    {
-                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX/2 + drawingObject.graphicObject.spPr.xfrm.extY/2);
-                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY/2 + drawingObject.graphicObject.spPr.xfrm.extX/2);
-                    }
-                    //drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
-                    //drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
                     drawingObject.graphicObject.checkDrawingBaseCoords();
                     bNeedRecalc = true;
                 }
             }
-        }
-        else
-        {
+        } else {
             for (i = 0; i < aObjects.length; i++) {
                 drawingObject = aObjects[i];
 
-                if(drawingObject.from.col >= target.col)
-                {
+                if (drawingObject.from.col >= target.col) {
                     coords = _this.coordsManager.calculateCoords(drawingObject.from);
                     CheckSpPrXfrm(drawingObject.graphicObject);
 
                     var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = normalizeRotate(rot);
-                    if (checkNormalRotate(rot))
-                    {
+                    if (checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
-                    }
-                    else
-                    {
-                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX/2 + drawingObject.graphicObject.spPr.xfrm.extY/2);
-                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY/2 + drawingObject.graphicObject.spPr.xfrm.extX/2);
+                    } else {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX / 2 + drawingObject.graphicObject.spPr.xfrm.extY / 2);
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY / 2 + drawingObject.graphicObject.spPr.xfrm.extX / 2);
                     }
 
-                    //drawingObject.graphicObject.spPr.xfrm.setOffX( pxToMm(coords.x));
-                    //drawingObject.graphicObject.spPr.xfrm.setOffY( pxToMm(coords.y) );
                     drawingObject.graphicObject.checkDrawingBaseCoords();
                     bNeedRecalc = true;
                 }
             }
         }
-        if(bNeedRecalc)
-        {
+        if (bNeedRecalc) {
             _this.controller.recalculate2();
             _this.showDrawingObjects(true);
         }
-       // }, _this, []);
     };
 
     _this.checkCursorDrawingObject = function(x, y) {

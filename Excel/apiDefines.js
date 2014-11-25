@@ -193,9 +193,7 @@ var c_oAscSelectionDialogType = {
 
 var c_oAscGraphicOption = {
 	ScrollVertical			: 1,
-	ScrollHorizontal		: 2,
-	AddText					: 3,
-	ChangePosition			: 4
+	ScrollHorizontal		: 2
 };
 
 var c_oAscHyperlinkType = {
