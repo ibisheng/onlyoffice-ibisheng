@@ -206,6 +206,12 @@ ParaText.prototype =
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             FontKoef = smallcaps_Koef;
 
+        // Разрешенные размеры шрифта только либо целое, либо целое/2. Даже после применения FontKoef, поэтому
+        // мы должны подкрутить коэффициент так, чтобы после домножения на него, у на получался разрешенный размер.
+        var FontSize = TextPr.FontSize;
+        if (1 !== FontKoef)
+            FontKoef = (((FontSize * FontKoef * 2 + 0.5) | 0) / 2) / FontSize;
+
         Context.SetFontSlot(FontSlot, FontKoef);
         var Temp = Context.MeasureCode(ResultCharCode);
         
@@ -347,7 +353,14 @@ ParaSpace.prototype =
         this.Set_FontKoef_Script( TextPr.VertAlign !== vertalign_Baseline ? true : false );
         this.Set_FontKoef_SmallCaps( true != TextPr.Caps && true === TextPr.SmallCaps ? true : false );
 
-        Context.SetFontSlot( fontslot_ASCII, this.Get_FontKoef() );
+        // Разрешенные размеры шрифта только либо целое, либо целое/2. Даже после применения FontKoef, поэтому
+        // мы должны подкрутить коэффициент так, чтобы после домножения на него, у на получался разрешенный размер.
+        var FontKoef = this.Get_FontKoef();
+        var FontSize = TextPr.FontSize;
+        if (1 !== FontKoef)
+            FontKoef = (((FontSize * FontKoef * 2 + 0.5) | 0) / 2) / FontSize;
+
+        Context.SetFontSlot(fontslot_ASCII, FontKoef);
 
         var Temp = Context.MeasureCode(0x20);
 
