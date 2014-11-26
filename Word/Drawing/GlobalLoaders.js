@@ -197,7 +197,7 @@
         this.SetStandartFonts = function()
         {
             //В стандартных шрифтах закоментированы те шрифты, которые были добавлены на docs.teamlab.com
-            var standarts = window.standarts;
+            var standarts = window["standarts"];
 
             if (undefined == standarts)
             {
