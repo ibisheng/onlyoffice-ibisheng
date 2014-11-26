@@ -2263,8 +2263,8 @@
 					.clip();
 			}
 
-			this._drawCells(drawingCtx, range, offsetX, offsetY);
-			this._drawCellsBorders(drawingCtx, range, offsetX, offsetY);
+			var mergedCells = this._drawCells(drawingCtx, range, offsetX, offsetY);
+			this._drawCellsBorders(drawingCtx, range, offsetX, offsetY, mergedCells);
 
 			if (!drawingCtx) {
 				// restore canvas' original clipping range
@@ -2279,8 +2279,8 @@
 			var mergedCells = {}, mc, i;
 			for (var row = range.r1; row <= range.r2; ++row) {
 				$.extend( mergedCells,
-				          this._drawRowBG(drawingCtx, row, range.c1, range.c2, offsetX, offsetY, null),
-				          this._drawRowText(drawingCtx, row, range.c1, range.c2, offsetX, offsetY) );
+					this._drawRowBG(drawingCtx, row, range.c1, range.c2, offsetX, offsetY, null),
+					this._drawRowText(drawingCtx, row, range.c1, range.c2, offsetX, offsetY) );
 			}
 			// draw merged cells at last stage to fix cells background issue
 			for (i in mergedCells) {
@@ -2288,6 +2288,7 @@
 				this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
 				this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
 			}
+			return mergedCells;
 		};
 
 		/** Рисует фон ячеек в строке */
@@ -2633,47 +2634,25 @@
 		};
 
 		/** Рисует рамки для ячеек */
-		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, offsetX, offsetY) {
-			// ToDo убрать эту проверку (есть в функции выше!)
-			if (range === undefined) {
-				range = this.visibleRange;
-			} else {
-				// Если пришел диапазон не всего экрана, то нужно учитывать merge для бордеров
-				// ToDo возможно стоит оптимизировать, если будет тормозить
-				range = range.clone(true);
-				this._fixSelectionOfMergedCells(range);
-				// ToDo убрать это и переделать!!!
-				range.normalize();
-				// ToDo Точно нужно с этим разобраться!!!
-				range = range.intersectionSimple(this.visibleRange);
-				if (null === range)
-					return;
-			}
-
+		WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, offsetX, offsetY, mergedCells) {
 			//TODO: использовать стили линий при рисовании границ
 			var t = this;
 			var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
 			var c = this.cols;
 			var r = this.rows;
-			var mergedCells = this.model.getMergedByRange(range);
+
 			var objectMergedCells = {}; // Двумерный map вида строка-колонка {1: {1: range, 4: range}}
-			var i, length, arrMerged, mergeElem, col, row;
-			for (i = 0, arrMerged = mergedCells.inner, length = arrMerged.length; i < length; ++i) {
-				for (mergeElem = arrMerged[i].bbox, row = mergeElem.r1;
-					 row <= mergeElem.r2 && row < this.nRowsCount; ++row) {
+			var i, mergeCellInfo, startCol, endRow, endCol, col, row;
+			for (i in mergedCells) {
+				mergeCellInfo = mergedCells[i];
+				startCol = Math.max(range.c1, mergeCellInfo.c1);
+				endRow = Math.min(mergeCellInfo.r2, range.r2, this.nRowsCount);
+				endCol = Math.min(mergeCellInfo.c2, range.c2, this.nColsCount);
+				for (row = Math.max(range.r1, mergeCellInfo.r1); row <= endRow; ++row) {
 					if (!objectMergedCells.hasOwnProperty(row))
 						objectMergedCells[row] = {};
-					for (col = mergeElem.c1; col <= mergeElem.c2 && col < this.nColsCount; ++col)
-						objectMergedCells[row][col] = arrMerged[i].bbox;
-				}
-			}
-			for (i = 0, arrMerged = mergedCells.outer, length = arrMerged.length; i < length; ++i) {
-				for (mergeElem = range.intersectionSimple(arrMerged[i].bbox), row = mergeElem.r1;
-					 row <= mergeElem.r2 && row < this.nRowsCount; ++row) {
-					if (!objectMergedCells.hasOwnProperty(row))
-						objectMergedCells[row] = {};
-					for (col = mergeElem.c1; col <= mergeElem.c2 && col < this.nColsCount; ++col)
-						objectMergedCells[row][col] = arrMerged[i].bbox;
+					for (col = startCol; col <= endCol; ++col)
+						objectMergedCells[row][col] = mergeCellInfo;
 				}
 			}
 
