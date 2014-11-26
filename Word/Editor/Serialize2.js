@@ -605,7 +605,8 @@ var c_oSer_OMathContentType = {
 	MText: 57,
 	CtrlPr: 58,
 	pagebreak: 59,
-	linebreak: 60
+	linebreak: 60,
+	Run: 61
 };
 var c_oSer_HyperlinkType = {
     Content: 0,
@@ -1940,10 +1941,15 @@ function Binary_oMathWriter(memory, oMathPara)
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.RPr,	function(){oThis.brPrs.Write_rPr(props.wRPrp);}); // w:rPr
 		this.bs.WriteItem(c_oSer_OMathContentType.MRPr,	function(){oThis.WriteMRPr(props.mathRPrp);}); // m:rPr
-		if ("" != oText)
+		this.bs.WriteItem(c_oSer_OMathContentType.MText,function(){oThis.WriteMText(oText.toString());}); // m:t
+	}
+	this.WriteMText = function(sText)
+	{
+		if ("" != sText)
 		{
-			this.memory.WriteByte(c_oSer_OMathContentType.MText);
-			this.memory.WriteString2(oText.toString());
+			this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.memory.WriteString2(sText);
 		}
 	}
 	this.WriteAcc = function(oAcc)
@@ -2507,7 +2513,8 @@ function Binary_oMathWriter(memory, oMathPara)
 		var props = {};//oOMathPara.getPropsForWrite();
 		
 		oThis.bs.WriteItem(c_oSer_OMathContentType.OMathParaPr, function(){oThis.WriteOMathParaPr(props);});	
-		oThis.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodes(oOMathPara.Root);});			
+		oThis.bs.WriteItem(c_oSer_OMathContentType.OMath, function(){oThis.WriteArgNodes(oOMathPara.Root);});
+		//oThis.bs.WriteRun(item, bUseSelection);
 	};
 	this.WriteOMathParaPr = function(props)
 	{
@@ -7793,6 +7800,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				});
 			}
 		}
+		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
 	}
     this.parseField = function(hyp, fld)
     {
@@ -8367,10 +8377,95 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
     };
 };
 function Binary_oMathReader(stream)
-{
+{	
     this.stream = stream;
 	this.bcr = new Binary_CommonReader(this.stream);
 	this.brPrr = new Binary_rPrReader(null, this.stream);
+	
+	this.ReadRun = function (type, length, oRunObject, oParStruct, oRes)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSerRunType.rPr === type)
+        {
+            var rPr = new CTextPr();
+            res = this.brPrr.Read(length, rPr);
+            oRunObject.Set_Pr(rPr);
+        }
+        else if (c_oSerRunType.Content === type)
+        {
+            var oPos = { run: oRunObject , pos: 0};
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadRunContent(t, l, oPos, oParStruct, oRes);
+            });
+        }
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadRunContent = function (type, length, oPos, oParStruct, oRes)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        var oNewElem = null;
+        if (c_oSerRunType.run === type)
+        {
+            var text = this.stream.GetString2LE(length);
+
+			for (var i = 0; i < text.length; ++i)
+			{
+			    var nUnicode = null;
+			    var nCharCode = text.charCodeAt(i);
+			    if (isLeadingSurrogateChar(nCharCode))
+			    {
+			        if(i + 1 < text.length)
+			        {
+			            i++;
+			            var nTrailingChar = text.charCodeAt(i);
+			            nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+			        }
+			    }
+			    else
+			        nUnicode = nCharCode;
+			    if (null != nUnicode) {
+			        if (0x20 != nUnicode) {
+			            var oNewParaText = new ParaText();
+			            oNewParaText.Set_CharCode(nUnicode);
+			            oPos.run.Add_ToContent(oPos.pos, oNewParaText, false);
+			        }
+			        else
+			            oPos.run.Add_ToContent(oPos.pos, new ParaSpace(), false);
+			        oPos.pos++;
+			    }
+            }
+        }
+        else if (c_oSerRunType.tab === type)
+        {
+            oNewElem = new ParaTab();
+        }
+        else if (c_oSerRunType.pagenum === type)
+        {
+            oNewElem = new ParaPageNum();
+        }
+        else if (c_oSerRunType.pagebreak === type)
+        {
+            oNewElem = new ParaNewLine( break_Page );
+        }
+        else if (c_oSerRunType.linebreak === type)
+        {
+            oNewElem = new ParaNewLine( break_Line );
+        }
+        else if (c_oSerRunType._LastRun === type)
+            this.oReadResult.bLastRun = true;
+        else
+            res = c_oSerConstants.ReadUnknown;
+        if (null != oNewElem)
+        {
+            oPos.run.Add_ToContent(oPos.pos, oNewElem, false);
+            oPos.pos++;
+        }
+        return res;
+    };
 	
 	this.ReadMathAcc = function(type, length, props, oParent, oContent)
     {
@@ -9731,15 +9826,13 @@ function Binary_oMathReader(stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathMRun = function(type, length, oMRun, props, oParent, oParStruct)
+	this.ReadMathText = function(type, length, oMRun)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-		var oNewElem = null;
-
-		if (c_oSer_OMathContentType.MText === type)
+		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-            var aUnicodes = [];
+			var aUnicodes = [];
             if (length > 0)
                 aUnicodes = convertUTF16toUnicode(this.stream.GetString2LE(length));
 
@@ -9750,7 +9843,7 @@ function Binary_oMathReader(stream)
                 var oText = null;
                 if (0x0026 == nUnicode)
                     oText = new CMathAmp();
-                else if (0x001F < nUnicode) //управляющие символы
+                else
                 {
                     oText = new CMathText(false);
                     oText.add(nUnicode);
@@ -9758,6 +9851,22 @@ function Binary_oMathReader(stream)
                 if (oText)
                     oMRun.Add_ToContent(nPos, oText, false, true);
             }
+        }
+		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathMRun = function(type, length, oMRun, props, oParent, oParStruct)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		var oNewElem = null;
+
+		if (c_oSer_OMathContentType.MText === type)
+        {
+			res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathText(t,l,oMRun);
+            });            
         }
 		else if (c_oSer_OMathContentType.MRPr === type)
         {
@@ -9987,6 +10096,16 @@ function Binary_oMathReader(stream)
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathOMathParaPr(t,l,props);
             });
+		}
+		else if (c_oSer_OMathContentType.Run === type)
+		{
+			var oNewRun = new ParaRun(oParStruct.paragraph);
+            var oRes = { bRes: true };
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadRun(t, l, oNewRun, oParStruct, oRes);
+            });
+            //if (oRes.bRes && oNewRun.Content.length > 0)
+                oParStruct.addToContent(oNewRun);
 		}
         else
             res = c_oSerConstants.ReadUnknown;
