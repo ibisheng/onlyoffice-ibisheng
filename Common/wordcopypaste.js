@@ -1590,7 +1590,7 @@ CopyProcessor.prototype =
 					{
 						this.oPresentationWriter.WriteBool(true);
 
-						this.CopyGraphicObject(this.ElemToSelect, elements[i].Drawing);
+						this.CopyGraphicObject(this.ElemToSelect, elements[i].Drawing, elements[i]);
 						this.oPresentationWriter.WriteDouble(elements[i].X);
 						this.oPresentationWriter.WriteDouble(elements[i].Y);
 						this.oPresentationWriter.WriteDouble(elements[i].ExtX);
@@ -2074,7 +2074,7 @@ CopyProcessor.prototype =
     },
 
 
-    CopyGraphicObject: function(oDomTarget, oGraphicObj)
+    CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
         var sSrc = oGraphicObj.getBase64Img();
         if(sSrc.length > 0)
@@ -2082,11 +2082,22 @@ CopyProcessor.prototype =
             sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             oGraphicObj.draw(_bounds_cheker, 0);
-
+			
+			var width, height;
+			if(drawingCopyObject && drawingCopyObject.ExtX)
+				width = Math.round(drawingCopyObject.ExtX * g_dKoef_mm_to_pix);
+			else
+				width = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
+			
+			if(drawingCopyObject && drawingCopyObject.ExtY)
+				height = Math.round(drawingCopyObject.ExtY * g_dKoef_mm_to_pix);
+			else
+				height = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);		
+			
             if (this.api.DocumentReaderMode)
-                this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+                this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+ width +"\" height=\""+ height +"\" src=\""+sSrc+"\" />";
             else
-                this.Para.innerHTML += "<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+                this.Para.innerHTML += "<img width=\""+ width +"\" height=\""+ height +"\" src=\""+sSrc+"\" />";
 
             if(oGraphicObj instanceof CShape)
             {
