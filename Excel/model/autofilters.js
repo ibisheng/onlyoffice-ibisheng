@@ -2964,9 +2964,7 @@ var gUndoInsDelCellsFlag = true;
 				//если мерженная ячейка
 				if(isEmptyCell)
 				{
-					range = ws.model.getRange3(n, k, n, k);
-					
-					merged = range.hasMerged();
+					merged = cell.hasMerged();
 					valueMerg = null;
 					if(merged)
 					{
