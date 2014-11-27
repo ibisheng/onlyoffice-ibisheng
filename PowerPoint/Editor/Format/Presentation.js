@@ -4203,7 +4203,10 @@ CPresentation.prototype =
                 }
                 if(isRealObject(check_slide))
                 {
-                    this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    if(slide_num !== this.CurPage)
+                    {
+                        this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    }
                     this.Slides[this.CurPage].changeComment( Id, CommentData );
                     editor.sync_ChangeCommentData( Id, CommentData );
                     this.Recalculate()
@@ -4264,7 +4267,10 @@ CPresentation.prototype =
                 if(comments[j].Id === Id)
                 {
                     //this.Set_CurPage(i);
-                    this.DrawingDocument.m_oWordControl.GoToPage(i);
+                    if(this.CurPage !== i)
+                    {
+                        this.DrawingDocument.m_oWordControl.GoToPage(i);
+                    }
 
                     var Coords = this.DrawingDocument.ConvertCoordsToCursorWR_Comment(comments[j].x, comments[j].y, i);
                     this.Slides[i].showComment(Id, Coords.X, Coords.Y);
