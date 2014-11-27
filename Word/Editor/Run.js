@@ -5374,7 +5374,7 @@ ParaRun.prototype.Set_RStyle = function(Value)
 
 ParaRun.prototype.Set_Spacing = function(Value)
 {
-    if ( Value !== this.Pr.Value )
+    if (Value !== this.Pr.Spacing)
     {
         var OldValue = this.Pr.Spacing;
         this.Pr.Spacing = Value;

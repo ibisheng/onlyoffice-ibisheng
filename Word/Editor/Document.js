@@ -5229,10 +5229,25 @@ CDocument.prototype =
                                 // создаем новую нумерацию (стандартную маркированный список)
                                 if ( null === NumId )
                                 {
-                                    NumId  = this.Numbering.Create_AbstractNum();
-                                    NumLvl = 0;
+                                    // Если у нас выделен только 1 параграф, тогда посмотрим на следующий параграф, возможно у него есть нумерованный список.
+                                    var Next = this.Content[StartPos + 1];
+                                    if (StartPos === EndPos && undefined !== Next && null !== Next && type_Paragraph === Next.GetType())
+                                    {
+                                        var NextNumPr = Next.Numbering_Get();
+                                        if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, numbering_numfmt_Decimal))
+                                        {
+                                            NumId  = NextNumPr.NumId;
+                                            NumLvl = NextNumPr.Lvl;
+                                        }
+                                    }
 
-                                    this.Numbering.Get_AbstractNum( NumId ).Create_Default_Numbered();
+                                    if (null === NumId)
+                                    {
+                                        NumId = this.Numbering.Create_AbstractNum();
+                                        NumLvl = 0;
+
+                                        this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+                                    }
                                 }
 
                                 // Параграфы, которые не содержали списка у них уровень выставляем NumLvl,
@@ -5699,8 +5714,8 @@ CDocument.prototype =
                                     // есть список, и этот список нумерованный)
 
                                     // Проверяем предыдущий элемент
-                                    var Prev = this.Content[this.CurPos.ContentPos - 1];
-                                    var NumId  = undefined;
+                                    var Prev   = this.Content[this.CurPos.ContentPos - 1];
+                                    var NumId  = null;
                                     var NumLvl = 0;
 
                                     if ( "undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType() )
@@ -5715,12 +5730,27 @@ CDocument.prototype =
 
                                     // Предыдущий параграф не содержит списка, либо список не того формата
                                     // создаем новую нумерацию (стандартную маркированный список)
-                                    if ( undefined === NumId )
+                                    if (null === NumId)
                                     {
-                                        NumId  = this.Numbering.Create_AbstractNum();
-                                        NumLvl = 0;
+                                        // Посмотрим на следующий параграф, возможно у него есть нумерованный список.
+                                        var Next = this.Content[this.CurPos.ContentPos + 1];
+                                        if (undefined !== Next && null !== Next && type_Paragraph === Next.GetType())
+                                        {
+                                            var NextNumPr = Next.Numbering_Get();
+                                            if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, numbering_numfmt_Decimal))
+                                            {
+                                                NumId  = NextNumPr.NumId;
+                                                NumLvl = NextNumPr.Lvl;
+                                            }
+                                        }
 
-                                        this.Numbering.Get_AbstractNum( NumId ).Create_Default_Numbered();
+                                        if (null === NumId)
+                                        {
+                                            NumId = this.Numbering.Create_AbstractNum();
+                                            NumLvl = 0;
+
+                                            this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+                                        }
                                     }
 
 
@@ -12662,6 +12692,9 @@ CDocument.prototype =
                                 var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
                                 AbstrNum.Document_Is_SelectionLocked(CheckType);
                             }
+
+                            this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
+
                             break;
                         }
                     }

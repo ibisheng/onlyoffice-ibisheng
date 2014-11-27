@@ -248,11 +248,12 @@ Paragraph.prototype =
         }
         
         // TODO: Как только переделаем para_End, переделать тут
-        // Поскольку в ране не купируется элемент para_End добавим его здесь отдельно
+        // Поскольку в ране не копируется элемент para_End добавим его здесь отдельно
 
         var EndRun = new ParaRun(Para);
         EndRun.Add_ToContent( 0, new ParaEnd() );
         Para.Internal_Content_Add( Para.Content.length, EndRun, false );
+        EndRun.Set_Pr(this.TextPr.Value.Copy());
 
         // Добавляем секцию в конце
         if ( undefined !== this.SectPr )
