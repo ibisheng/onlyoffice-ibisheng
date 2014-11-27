@@ -360,10 +360,11 @@ CImageShape.prototype =
 
     convertToPPTX: function(drawingDocument, worksheet)
     {
-        this.setWorksheet(worksheet);
-        this.setParent(null);
-        this.setBDeleted(false);
-        return this;
+        var ret = this.copy();
+        ret.setWorksheet(worksheet);
+        ret.setParent(null);
+        ret.setBDeleted(false);
+        return ret;
     },
 
     recalculateBrush: function()
