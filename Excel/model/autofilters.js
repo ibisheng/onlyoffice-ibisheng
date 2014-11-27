@@ -2957,7 +2957,7 @@ var gUndoInsDelCellsFlag = true;
 			_checkValueInCells: function(n, k, cloneActiveRange)
 			{
 				var ws = this.worksheet;
-				var cell = ws.model._getCell(n, k);
+				var cell = ws.model.getRange3(n, k, n, k);
 				var isEmptyCell = cell.isEmptyText();
 				var isEnd = true, range, merged, valueMerg;
 				
@@ -3152,7 +3152,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
 					{
-						cell = ws.model._getCell(cloneActiveRange.r1, n);
+						cell = ws.model.getRange3(cloneActiveRange.r1, n, cloneActiveRange.r1, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.c2 && cloneActiveRange.c2 > cloneActiveRange.c1)
@@ -3163,7 +3163,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
 					{
-						cell = ws.model._getCell(cloneActiveRange.r2, n);
+						cell = ws.model.getRange3(cloneActiveRange.r2, n, cloneActiveRange.r2, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1)
@@ -3175,7 +3175,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
 					{
-						cell = ws.model._getCell(n, cloneActiveRange.c1);
+						cell = ws.model.getRange3(n, cloneActiveRange.c1, n, cloneActiveRange.c1);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.r2 > cloneActiveRange.r1)
@@ -3186,7 +3186,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
 					{
-						cell = ws.model._getCell(n, cloneActiveRange.c2);
+						cell = ws.model.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.c2 > cloneActiveRange.c1)
@@ -3301,15 +3301,13 @@ var gUndoInsDelCellsFlag = true;
 						if(k >= cloneActiveRange.c1 && k <= cloneActiveRange.c2 && n >= cloneActiveRange.r1 && n <= cloneActiveRange.r2)
 							continue;
 							
-						cell = ws.model._getCell(n,k);
+						cell = ws.model.getRange3(n, k, n, k);
 						isEmptyCell = cell.isEmptyText();
 						
 						//если мерженная ячейка
 						if(!(n == ar.r1 && k == ar.c1) && isMergedCells != null && isEmptyCell)
 						{
-							range = ws.model.getRange3(n, k, n, k);
-							
-							merged = range.hasMerged();
+							merged = cell.hasMerged();
 							valueMerg = null;
 							if(merged)
 							{
@@ -3340,12 +3338,13 @@ var gUndoInsDelCellsFlag = true;
 										n = 0;
 									if(k < 0)
 										k = 0;
-									cell = ws.model._getCell(n,k);	
+										
+									cell = ws.model.getRange3(n, k, n, k);	
 								}
 							}
 						}
 						
-						if((!isEmptyCell || (valueMerg != null && valueMerg != "")) && cell.tableXfs == null)
+						if((!isEmptyCell || (valueMerg != null && valueMerg != "")) && cell.getTableStyle() == null)
 						{
 							if(k < cloneActiveRange.c1)
 							{
@@ -3375,7 +3374,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
 					{
-						cell = ws.model._getCell(cloneActiveRange.r1, n);
+						cell = ws.model.getRange3(cloneActiveRange.r1, n, cloneActiveRange.r1, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1/*&& cloneActiveRange.c2 > cloneActiveRange.c1*/)
@@ -3386,7 +3385,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
 					{
-						cell = ws.model._getCell(cloneActiveRange.r2, n);
+						cell = ws.model.getRange3(cloneActiveRange.r2, n, cloneActiveRange.r2, n);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1)
@@ -3398,7 +3397,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
 					{
-						cell = ws.model._getCell(n, cloneActiveRange.c1);
+						cell = ws.model.getRange3(n, cloneActiveRange.c1, n, cloneActiveRange.c1);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.r2 > cloneActiveRange.r1)
@@ -3409,7 +3408,7 @@ var gUndoInsDelCellsFlag = true;
 				{
 					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
 					{
-						cell = ws.model._getCell(n, cloneActiveRange.c2);
+						cell = ws.model.getRange3(n, cloneActiveRange.c2, n, cloneActiveRange.c2);
 						if(cell.getValueWithoutFormat() != '')
 							break;
 						if(n == cloneActiveRange.r2 && cloneActiveRange.c2 > cloneActiveRange.c1)
@@ -4258,7 +4257,7 @@ var gUndoInsDelCellsFlag = true;
 						for(var j = 0, length2 = aNoHiddenCol.length; j < length2; j++)
 						{
 							var nColIndexAbs = aNoHiddenCol[j];
-							var cell = ws.model._getCell(nRowIndexAbs, nColIndexAbs);
+							var cell = ws.model.getRange3(nRowIndexAbs, nColIndexAbs, nRowIndexAbs, nColIndexAbs);
 							var dxf = styleForCurTable.getStyle(bbox, i, j, style, headerRowCount, totalsRowCount);
 							if(null != dxf)
 								cell.setTableStyle(dxf);
@@ -7278,7 +7277,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(k < 0)
 								k = 0;
-							cell = ws.model._getCell(n,k);
+							cell = ws.model.getRange3(n,k, n,k);
 							if(cell.getValueWithoutFormat() != '')
 							{
 								return false;	
@@ -7292,7 +7291,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						for(var k = activeCells.c1; k <= activeCells.c2; k++)
 						{
-							cell = ws.model._getCell(n,k);
+							cell = ws.model.getRange3(n,k, n,k);
 							if(cell.getValueWithoutFormat() != '')
 							{
 								return false;	
@@ -7318,7 +7317,7 @@ var gUndoInsDelCellsFlag = true;
 					{
 						for(var n = range.c1; n <= range.c2; n++)
 						{
-							var cell = ws.model._getCell(i, n);
+							var cell = ws.model.getRange3(i, n, i, n);
 							cell.setTableStyle(null);
 						}
 					}
@@ -7411,7 +7410,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				for(var i = tempCells.c1; i <= tempCells.c2; i++)
 				{
-					cell = ws.model._getCell(tempCells.r2 + 1, i);
+					cell = ws.model.getRange3(tempCells.r2 + 1, i, tempCells.r2 + 1, i);
 					isEmptyCell = cell.isEmptyText();
 					if(!isEmptyCell)
 					{
