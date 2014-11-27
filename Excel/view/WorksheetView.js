@@ -5587,18 +5587,18 @@
 
 		WorksheetView.prototype._getCursorFormulaOrChart = function (vr, x, y, offsetX, offsetY) {
 			var i, l;
-			var cursor, oFormulaRange, xFormula1, xFormula2, yFormula1, yFormula2;
+			var cursor, oFormulaRange, oFormulaRangeIn, xFormula1, xFormula2, yFormula1, yFormula2;
 			var col = -1, row = -1;
 			var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
 				targetArr = this.isFormulaEditMode ? 0 : -1;
 			for (i = 0, l = arrRanges.length; i < l; ++i) {
 				oFormulaRange = arrRanges[i].clone(true);
-//				oFormulaRange = oFormulaRange.intersectionSimple(vr);
-				if (oFormulaRange) {
-					xFormula1 = this.cols[oFormulaRange.c1].left - offsetX;
-					xFormula2 = this.cols[oFormulaRange.c2].left + this.cols[oFormulaRange.c2].width - offsetX;
-					yFormula1 = this.rows[oFormulaRange.r1].top - offsetY;
-					yFormula2 = this.rows[oFormulaRange.r2].top + this.rows[oFormulaRange.r2].height - offsetY;
+				oFormulaRangeIn = oFormulaRange.intersectionSimple(vr);
+				if (oFormulaRangeIn) {
+					xFormula1 = this.cols[oFormulaRangeIn.c1].left - offsetX;
+					xFormula2 = this.cols[oFormulaRangeIn.c2].left + this.cols[oFormulaRangeIn.c2].width - offsetX;
+					yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
+					yFormula2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
 
 					if (
 						(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
