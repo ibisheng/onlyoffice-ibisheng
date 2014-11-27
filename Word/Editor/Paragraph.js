@@ -834,6 +834,10 @@ Paragraph.prototype =
                     break;
             }
         }
+
+        // Нумерация привязанная к формуле делает ее inline.
+        if (true !== MathParaChecker.Found && undefined !== this.Numbering_Get())
+            return false;
         
         if ( true !== MathParaChecker.Result )
             return false;
@@ -855,7 +859,7 @@ Paragraph.prototype =
         
         if ( true !== MathParaChecker.Result )
             return false;
-        
+
         return true;
     },
 

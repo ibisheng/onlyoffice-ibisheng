@@ -4068,7 +4068,7 @@ CDocumentContent.prototype =
                         if (type_Paragraph !== this.Content[DstIndex].Get_Type() || true !== this.Content[DstIndex].Is_Empty())
                             DstIndex++;
                     }
-                    else if (true === Elements[ElementsCount - 1].SelectedAll)
+                    else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
                         bAddEmptyPara = true;
                 }
                 else if (true === Para.Cursor_IsStart())
