@@ -5345,7 +5345,8 @@
             {
                 oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
                 oBinary_TableReader.Read(length, oWorksheet.TableParts);
-            } else if ( c_oSerWorksheetsTypes.Comments == type ) {
+            } else if ( c_oSerWorksheetsTypes.Comments == type
+                && !(typeof editor !== "undefined" && editor.WordControl && editor.WordControl.m_oLogicDocument && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))) {
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadComments(t,l, oWorksheet);
                 });
