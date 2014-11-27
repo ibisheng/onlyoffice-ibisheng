@@ -727,7 +727,7 @@ function CCollaborativeEditing()
     this.Apply_Changes = function()
     {
         var OtherChanges = ( this.m_aChanges.length > 0 ? true : false );
-     //   if(OtherChanges === true)
+        if(OtherChanges === true)
         {
             editor.WordControl.m_oLogicDocument.Stop_Recalculate();
 
@@ -743,8 +743,8 @@ function CCollaborativeEditing()
             this.Apply_OtherChanges();
             // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые били залочены
             this.Lock_NeedLock();
-            this.OnStart_Load_Objects();
         }
+        this.OnStart_Load_Objects();
     };
 
     this.Send_Changes = function()
