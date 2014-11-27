@@ -36,9 +36,21 @@
             min-height:62px;
             vertical-align: top;
             background-image: url('./resources/img/loading-logo.gif');
-            background-image: -webkit-image-set(url('./resources/img/loading-logo.gif') 1x, url('./resources/img/loading-logo@2x.gif') 2x);
             background-repeat: no-repeat;
         }
+
+        @media only screen and (min-resolution: 192dpi) {
+            .loadmask-logo {
+                background-image: url('./resources/img/loading-logo@2x.gif');
+                background-size: 220px auto;
+
+                @media (-webkit-min-device-pixel-ratio: 0) {
+                    background-image: -webkit-image-set(url('./resources/img/loading-logo.gif') 1x, url('./resources/img/loading-logo@2x.gif') 2x);
+                    background-size: auto;
+                }
+            }
+        }
+
     </style>
 </head>
 <body>
