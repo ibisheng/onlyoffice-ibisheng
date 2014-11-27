@@ -3030,7 +3030,7 @@ var gUndoInsDelCellsFlag = true;
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
 				
-				var isEnd = false, cell, isEndWhile, result;
+				var isEnd = false, cell, result;
 				
 				var prevActiveRange = {r1: cloneActiveRange.r1, c1: cloneActiveRange.c1, r2: cloneActiveRange.r2, c2: cloneActiveRange.c2};
 				
@@ -3088,7 +3088,7 @@ var gUndoInsDelCellsFlag = true;
 							isEndWhile = true;
 						else
 							k++;
-					};
+					}
 					
 					//left
 					isEndWhile = false;
@@ -3113,8 +3113,7 @@ var gUndoInsDelCellsFlag = true;
 						}
 						else if(n == cloneActiveRange.r2 + 1)
 							isEndWhile = true;
-					};
-					
+					}
 					
 					//right
 					isEndWhile = false;
@@ -3139,13 +3138,13 @@ var gUndoInsDelCellsFlag = true;
 						}
 						else if(n == cloneActiveRange.r2 + 1)
 							isEndWhile = true;
-					};
+					}
 					
 					if(prevActiveRange.r1 == cloneActiveRange.r1 && prevActiveRange.c1 == cloneActiveRange.c1 && prevActiveRange.r2 == cloneActiveRange.r2 && prevActiveRange.c2 == cloneActiveRange.c2)
 						isEnd = true;
 					
 					prevActiveRange = {r1: cloneActiveRange.r1, c1: cloneActiveRange.c1, r2: cloneActiveRange.r2, c2: cloneActiveRange.c2};
-				};
+				}
 				
 
 				//проверяем есть ли пустые строчки и столбцы в диапазоне
@@ -3287,7 +3286,7 @@ var gUndoInsDelCellsFlag = true;
 							n = cloneActiveRange.r1 - 1;
 						if(cloneActiveRange.c1 > 0)
 							k = cloneActiveRange.c1 - 1;
-					};
+					}
 					
 					if(n > cloneActiveRange.r1 && n < cloneActiveRange.r2 && k > cloneActiveRange.c1 && k < cloneActiveRange.c2)
 						continue;

@@ -3201,10 +3201,6 @@ Woorksheet.prototype._getCell=function(row, col){
 	}
 	return oCurCell;
 };
-Woorksheet.prototype._getCell2=function(cellId){
-	var oCellAddress = g_oCellAddressUtils.getCellAddress(cellId);
-	return this._getCell(oCellAddress.getRow0(), oCellAddress.getCow0());
-};
 Woorksheet.prototype._getCellNoEmpty=function(row, col){
 	//0-based
 	var oCurRow = this.aGCells[row];
@@ -4540,7 +4536,7 @@ Cell.prototype.setTableStyle=function(xfs){
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
-Cell.prototype.getTableStyle=function(xfs){
+Cell.prototype.getTableStyle=function(){
     return this.tableXfs;
 };
 Cell.prototype.setStyle=function(xfs){
@@ -5807,6 +5803,10 @@ Range.prototype.getStyleName=function(){
 
 	// ToDo убрать эту заглушку (нужно делать на открытии) в InitStyleManager
 	return res || this.worksheet.workbook.CellStyles.getStyleNameByXfId(g_oDefaultXfId);
+};
+Range.prototype.getTableStyle=function(){
+    var cell = this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1);
+    return cell ? cell.getTableStyle() : null;
 };
 Range.prototype.getNumFormat=function(){
 	return oNumFormatCache.get(this.getNumFormatStr());
