@@ -79,7 +79,7 @@
 
 
 		function round(x) {
-			var y = x + (x >= 0 ? .5 : -.4);
+			var y = x + (x >= 0 ? .5 : -.5);
 			return y | y;
 			//return Math.round(x);
 		}
