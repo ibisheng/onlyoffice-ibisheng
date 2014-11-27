@@ -727,7 +727,7 @@ function CCollaborativeEditing()
     this.Apply_Changes = function()
     {
         var OtherChanges = ( this.m_aChanges.length > 0 ? true : false );
-        if(OtherChanges === true)
+     //   if(OtherChanges === true)
         {
             editor.WordControl.m_oLogicDocument.Stop_Recalculate();
 
