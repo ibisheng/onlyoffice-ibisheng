@@ -726,21 +726,25 @@ function CCollaborativeEditing()
 
     this.Apply_Changes = function()
     {
-        editor.WordControl.m_oLogicDocument.Stop_Recalculate();
-
-        editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
-
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-
-        if(LogicDocument.Slides[LogicDocument.CurPage])
+        var OtherChanges = ( this.m_aChanges.length > 0 ? true : false );
+        if(OtherChanges === true)
         {
-            LogicDocument.Slides[LogicDocument.CurPage].graphicObjects.resetSelection();
+            editor.WordControl.m_oLogicDocument.Stop_Recalculate();
+
+            editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
+
+            var LogicDocument = editor.WordControl.m_oLogicDocument;
+
+            if(LogicDocument.Slides[LogicDocument.CurPage])
+            {
+                LogicDocument.Slides[LogicDocument.CurPage].graphicObjects.resetSelection();
+            }
+            this.Clear_NewImages();
+            this.Apply_OtherChanges();
+            // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые били залочены
+            this.Lock_NeedLock();
+            this.OnStart_Load_Objects();
         }
-        this.Clear_NewImages();
-        this.Apply_OtherChanges();
-        // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые били залочены
-        this.Lock_NeedLock();
-        this.OnStart_Load_Objects();
     };
 
     this.Send_Changes = function()
