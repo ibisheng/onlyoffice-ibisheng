@@ -459,18 +459,16 @@ function cINDEX() {
 
 }
 
-cINDEX.prototype = Object.create( cBaseFunction.prototype )
+cINDEX.prototype = Object.create( cBaseFunction.prototype );
 cINDEX.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0],
-        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber( 1 ),
-        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber( 1 ),
-        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber( 1 ),
-        isArrayForm = false, res;
+        arg1 = arg[1] && !(arg[1] instanceof cEmpty) ? arg[1] : new cNumber(1),
+        arg2 = arg[2] && !(arg[2] instanceof cEmpty) ? arg[2] : new cNumber(1),
+        arg3 = arg[3] && !(arg[3] instanceof cEmpty) ? arg[3] : new cNumber(1), res;
 
-    if ( arg0 instanceof cArea3D ) {
-        return this.value = new cError( cErrorType.not_available );
-    }
-    else if ( arg0 instanceof cError ) {
+    if (arg0 instanceof cArea3D) {
+        return this.value = new cError(cErrorType.not_available);
+    } else if (arg0 instanceof cError) {
         return this.value = arg0;
     }
 
@@ -478,32 +476,22 @@ cINDEX.prototype.Calculate = function ( arg ) {
     arg2 = arg2.tocNumber();
     arg3 = arg3.tocNumber();
 
-    if ( arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+    if (arg1 instanceof cError || arg2 instanceof cError || arg3 instanceof cError) {
+        return this.value = new cError(cErrorType.wrong_value_type);
     }
 
-    if ( arg1.getValue() < 0 || arg2.getValue() < 0 ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+    if (arg1.getValue() < 0 || arg2.getValue() < 0) {
+        return this.value = new cError(cErrorType.wrong_value_type);
     }
 
-    if ( arg0 instanceof cArray ) {
-        arg0 = arg0.getMatrix();
-    }
-    else if ( arg0 instanceof cArea ) {
-        arg0 = arg0.getMatrix();
-    }
-    else {
-        arg0 = [[arg0.tryConvert()]];
+    if (arg0 instanceof cArray || arg0 instanceof cArea) {
+        res = arg0.getValue(arg1.getValue() - 1, arg2.getValue() - 1);
+    } else {
+        res = arg0.tryConvert();
     }
 
-    res = arg0[arg1.getValue() - 1];
-    if ( res ){
-        res = res[arg2.getValue() - 1];
-    }
-
-    return this.value = res ? res : new cError( cErrorType.bad_reference );
-
-}
+    return this.value = res ? res : new cError(cErrorType.bad_reference);
+};
 cINDEX.prototype.getInfo = function () {
     return {
         name:this.name,

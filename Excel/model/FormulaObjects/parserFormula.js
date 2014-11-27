@@ -633,93 +633,57 @@ cArea.prototype.foreach = function ( action ) {
         r._foreach2( action );
     }
 };
+cArea.prototype._parseCellValue = function (cell) {
+    var result, cellType, cellValue;
+    if (cell) {
+        cellType = cell.getType();
+        cellValue = cell.getValueWithoutFormat();
+        if (cellType === CellValueType.Number) {
+            result = cell.isEmptyTextString() ? new cEmpty() : new cNumber(cellValue);
+        } else if (cellType === CellValueType.Bool) {
+            result = new cBool(cellValue);
+        } else if (cellType === CellValueType.Error) {
+            result = new cError(cellValue);
+        } else if (cellType === CellValueType.String) {
+            result = new cString(cellValue);
+        } else {
+            result = cell.isEmptyTextString() ? checkTypeCell("" + cellValue) : new cNumber(cellValue);
+        }
+    } else {
+        result = new cEmpty();
+    }
+    return result;
+};
 cArea.prototype.foreach2 = function ( action ) {
-    var r = this.getRange();
-    if ( r ) {
-        r._foreach2( function ( cell ) {
-            var val, cellType;
-            if ( cell ) {
-                cellType = cell.getType();
-                switch( cellType ){
-                    case CellValueType.Number:{
-                        cell.getValueWithoutFormat() === "" ? val = new cEmpty() : val = new cNumber( cell.getValueWithoutFormat() );
-                        break;
-                    }
-                    case CellValueType.Bool:{
-                        val = new cBool( cell.getValueWithoutFormat() );
-                        break;
-                    }
-                    case CellValueType.Error:{
-                        val = new cError( cell.getValueWithoutFormat() );
-                        break;
-                    }
-                    case CellValueType.String:{
-                        val = new cString( cell.getValueWithoutFormat() );
-                        break;
-                    }
-                    default:{
-                        if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
-                            val = new cNumber( cell.getValueWithoutFormat() );
-                        }
-                        else {
-                            val = checkTypeCell( "" + cell.getValueWithoutFormat() );
-                        }
-                    }
-                }
-            }
-            else {
-                val = new cEmpty();
-            }
-            action( val );
-        } );
+    var t = this, r = this.getRange();
+    if (r) {
+        r._foreach2(function (cell) {
+            action(t._parseCellValue(cell));
+        });
     }
 };
+cArea.prototype.getValue = function (i, j) {
+    var r = this.getRange();
+    var cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
+    return this._parseCellValue(cell);
+};
 cArea.prototype.getMatrix = function () {
-    var arr = [],
-        r = this.getRange();
+    var t = this, arr = [], r = this.getRange();
     r._foreach2( function ( cell, i, j, r1, c1 ) {
-        if ( !arr[i - r1] ) {
+        if (!arr[i - r1])
             arr[i - r1] = [];
-        }
-        if ( cell ) {
-            var cellType = cell.getType();
-            if ( cellType === CellValueType.Number ) {
-                arr[i - r1][j - c1] = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() );
-            }
-            else if ( cellType === CellValueType.Bool ) {
-                arr[i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
-            }
-            else if ( cellType === CellValueType.Error ) {
-                arr[i - r1][j - c1] = new cError( cell.getValueWithoutFormat() );
-            }
-            else if ( cellType === CellValueType.String ) {
-                arr[i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
-            }
-            else {
-                if ( !cell.isEmptyTextString() ) {
-                    arr[i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() );
-                }
-                else {
-                    arr[i - r1][j - c1] = checkTypeCell( "" + cell.getValueWithoutFormat() );
-                }
-            }
-        }
-        else {
-            arr[i - r1][j - c1] = new cEmpty();
-        }
+        arr[i - r1][j - c1] = t._parseCellValue();
     } );
     return arr;
 };
 cArea.prototype.index = function ( r, c, n ) {
-
     var bbox = this.getBBox();
     bbox.normalize();
-    var box = {c1:1, c2:bbox.c2-bbox.c1+1, r1:1, r2:bbox.r2-bbox.r1+1}
+    var box = {c1:1, c2:bbox.c2-bbox.c1+1, r1:1, r2:bbox.r2-bbox.r1+1};
 
     if( r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2 ){
         return new cError( cErrorType.bad_reference );
     }
-
 };
 
 /** @constructor */
@@ -1436,6 +1400,10 @@ cArray.prototype.isValidArray = function () {
         }
     }
     return true;
+};
+cArray.prototype.getValue = function (i, j) {
+    var result = this.array[i];
+    return result ? result[j] : result;
 };
 cArray.prototype.getMatrix = function () {
     return this.array;
