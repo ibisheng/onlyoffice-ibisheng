@@ -4217,7 +4217,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 	if( !(null != val && val[0] != "=" || true == bIsTextFormat))
 		addToArrRecalc(this.ws.getId(), this);
 	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
-        wb.needRecalc.length++;
+    wb.needRecalc.length++;
 	
 	this.sFormula = null;
 	this.setFormulaCA(false);

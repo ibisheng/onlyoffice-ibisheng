@@ -593,7 +593,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
             found_operand = found_operand.toRef();
         }
 
-        var cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
+        var cellName = r.getFirst().getID(), wsId = r.worksheet.getId();
 
         if ( (found_operand instanceof cRef || found_operand instanceof cRef3D || found_operand instanceof cArea) && found_operand.isValid() ) {
             var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
@@ -919,16 +919,8 @@ function cOFFSET() {
 
 }
 
-cOFFSET.prototype = Object.create( cBaseFunction.prototype )
+cOFFSET.prototype = Object.create( cBaseFunction.prototype );
 cOFFSET.prototype.Calculate = function ( arg ) {
-
-    function validCol( nCol ) {
-        return 0 <= nCol && nCol <= gc_nMaxCol;
-    }
-
-    function validRow( nRow ) {
-        return 0 <= nRow && nRow <= gc_nMaxRow;
-    }
 
     function validBBOX( bbox ) {
         return  0 <= bbox.r1 && bbox.r1 <= gc_nMaxRow0 &&
@@ -1022,7 +1014,7 @@ cOFFSET.prototype.Calculate = function ( arg ) {
     }
 
     if( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ){
-        var r = arguments[1], wb = r.worksheet.workbook, cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
+        var r = arguments[1], wb = r.worksheet.workbook, cellName = r.getFirst().getID(), wsId = r.worksheet.getId();
 
         if ( (this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea) && this.value.isValid() ) {
             var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
@@ -1042,13 +1034,13 @@ cOFFSET.prototype.Calculate = function ( arg ) {
 
     return this.value;
 
-}
+};
 cOFFSET.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
     };
-}
+};
 
 function cROW() {
 //    cBaseFunction.call( this, "ROW" );

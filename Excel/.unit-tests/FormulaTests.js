@@ -567,7 +567,7 @@
         var r = ws.getRange2( "K1" );
         ws.getRange2( "A1" ).setValue( "#N/A" );
         r.setValue( "=ISNA(A1)" );
-        strictEqual( ws.getCell2( "K1" ).getCells()[0].getValue(), "TRUE" );
+        strictEqual( ws.getCell2( "K1" ).getValueWithFormat(), "TRUE" );
     } )
 
     test( "Test: \"ROUNDUP(31415.92654;-2)\"", function () {
@@ -778,7 +778,7 @@
         ws.getRange2( "S8" ).setValue( "2" );
         ws.getRange2( "S9" ).setValue( "3" );
         ws.getRange2( "S10" ).setValue( "=SUM(S7:S9,{1,2,3})" );
-        strictEqual( ws.getCell2( "S10" ).getCells()[0].getValue(), "12" );
+        strictEqual( ws.getCell2( "S10" ).getValueWithFormat(), "12" );
     } )
 
     test( "Test: ISREF", function () {
@@ -811,11 +811,11 @@
         ws.getRange2( "S95" ).setValue( "2" );
         ws = wb.getWorksheet( 1 );
         ws.getRange2( "S100" ).setValue( "=" + wb.getWorksheet( 0 ).getName() + "!S95" );
-        strictEqual( ws.getCell2( "S100" ).getCells()[0].getValue(), "2" );
+        strictEqual( ws.getCell2( "S100" ).getValueWithFormat(), "2" );
 
         wb.getWorksheet( 0 ).setName( "ЛистTEMP" );
 
-        strictEqual( ws.getCell2( "S100" ).getCells()[0].getFormula(), wb.getWorksheet( 0 ).getName() + "!S95" );
+        strictEqual( ws.getCell2( "S100" ).getFormula(), wb.getWorksheet( 0 ).getName() + "!S95" );
 
     } )
 
