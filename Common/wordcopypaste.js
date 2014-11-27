@@ -7180,8 +7180,6 @@ function Editor_CopyPaste_Create(api)
         if (!window.GlobalPasteFlag)
             return;
 		
-		console.log("onpaste");
-		
         // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
         if (window.GlobalPasteFlagCounter == 1)
         {
