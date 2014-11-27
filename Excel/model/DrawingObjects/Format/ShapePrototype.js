@@ -232,7 +232,7 @@ CShape.prototype.recalcTextStyles = function()
 };
 CShape.prototype.addToRecalculate = function()
 {
-    var controller = this.getDrawingObjectsController();
+    var controller = this.getDrawingObjectsController && this.getDrawingObjectsController();
     if(controller)
     {
         controller.objectsForRecalculate[this.Id] = this;

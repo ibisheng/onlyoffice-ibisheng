@@ -7813,10 +7813,10 @@ CChartSpace.prototype =
             }
             case historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(w,isRealObject(data.newPr));
-                if(isRealObject(w,data.newPr))
+                writeBool(w, isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
                 {
-                    writeString(w,data.newPr.getId());
+                    writeString(w, data.newPr.getId());
                 }
                 break;
             }
