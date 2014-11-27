@@ -925,6 +925,27 @@ CGraphicFrame.prototype =
         this.parent = parent;
     },
 
+    setWordFlag: function(bPresentation)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.bPresentation = bPresentation;
+            for(var i = 0; i < this.graphicObject.Content.length; ++i)
+            {
+                var row = this.graphicObject.Content[i];
+                for(var j = 0; j < row.Content.length; ++j)
+                {
+                    var content = row.Content[j].Content;
+                    content.bPresentation = bPresentation;
+                    for(var k = 0; k < content.Content.length; ++k)
+                    {
+                        content.Content[k].bFromDocument = !bPresentation;
+                    }
+                }
+            }
+        }
+    },
+
 
     Get_Styles: function(level)
     {
