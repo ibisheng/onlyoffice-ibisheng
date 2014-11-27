@@ -1691,7 +1691,9 @@ NumFormat.prototype =
                         dMs = dTemp * Math.pow(10, 3 - nMsFormatLength);
                     }
                     var nExponent = 0;
-                    if (dMs < 10)
+                    if(0 == dMs)
+                        nExponent = -1;
+                    else if (dMs < 10)
                         nExponent = -2;
                     else if (dMs < 100)
                         nExponent = -1;
