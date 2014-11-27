@@ -214,6 +214,15 @@ function CFontFileLoader(id)
                 g_fonts_streams[__font_data_idx] = CreateFontData3(this.responseText);
                 oThis.SetStreamIndex(__font_data_idx);
             }
+
+            // decode
+            var guidOdttf = [0xA0, 0x66, 0xD6, 0x20, 0x14, 0x96, 0x47, 0xfa, 0x95, 0x69, 0xB8, 0x50, 0xB0, 0x41, 0x49, 0x48];
+            var _stream = g_fonts_streams[g_fonts_streams.length - 1];
+            var _data = _stream.data;
+
+            var _count_decode = Math.min(32, _stream.size);
+            for (var i = 0; i < _count_decode; ++i)
+                _data[i] ^= guidOdttf[i % 16];
         };
 
         xhr.send(null);
