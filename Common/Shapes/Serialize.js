@@ -7090,10 +7090,33 @@ function BinaryPPTYLoader()
                                     else
                                         var f_text = s.GetString2();
                                 }
-                                //todo
+
+                                while (s.cur < _end)
+                                {
+                                    var _at2 = s.GetUChar();
+                                    switch (_at2)
+                                    {
+                                        case 0:
+                                        {
+                                            var _rPr = this.ReadRunProperties();
+                                            break;
+                                        }
+                                        case 1:
+                                        {
+                                            var _pPr = this.ReadTextParagraphPr();
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+
                                 par.f_id = f_id;
                                 par.f_type = f_type;
                                 par.f_text = f_text;
+
                                 s.Seek2(_end);
                                 break;
                             }
