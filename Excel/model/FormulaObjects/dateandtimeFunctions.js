@@ -293,7 +293,7 @@ function cDATE() {
 
 }
 
-cDATE.prototype = Object.create( cBaseFunction.prototype )
+cDATE.prototype = Object.create( cBaseFunction.prototype );
 cDATE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
@@ -343,13 +343,13 @@ cDATE.prototype.Calculate = function ( arg ) {
     this.value.numFormat = 14;
     this.value.ca = true;
     return this.value;
-}
+};
 cDATE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( year, month, day )"
     };
-}
+};
 
 function cDATEDIF() {
 //    cBaseFunction.call( this, "DATEDIF" );
@@ -371,7 +371,7 @@ function cDATEDIF() {
 
 }
 
-cDATEDIF.prototype = Object.create( cBaseFunction.prototype )
+cDATEDIF.prototype = Object.create( cBaseFunction.prototype );
 cDATEDIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -459,13 +459,13 @@ cDATEDIF.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.not_numeric )
     }
 
-}
+};
 cDATEDIF.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( start-date , end-date , unit )"
     };
-}
+};
 
 function cDATEVALUE() {
 //    cBaseFunction.call( this, "DATEVALUE" );
@@ -487,7 +487,7 @@ function cDATEVALUE() {
 
 }
 
-cDATEVALUE.prototype = Object.create( cBaseFunction.prototype )
+cDATEVALUE.prototype = Object.create( cBaseFunction.prototype );
 cDATEVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -512,13 +512,13 @@ cDATEVALUE.prototype.Calculate = function ( arg ) {
         return this.value = new cNumber( parseInt( res.value ) );
     else
         return this.value = new cError( cErrorType.wrong_value_type );
-}
+};
 cDATEVALUE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( date-time-string )"
     };
-}
+};
 
 function cDAY() {
 //    cBaseFunction.call( this, "DAY" );
@@ -540,7 +540,7 @@ function cDAY() {
 
 }
 
-cDAY.prototype = Object.create( cBaseFunction.prototype )
+cDAY.prototype = Object.create( cBaseFunction.prototype );
 cDAY.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
     if ( arg0 instanceof cArray ) {
@@ -589,13 +589,13 @@ cDAY.prototype.Calculate = function ( arg ) {
     }
     else
         return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
-}
+};
 cDAY.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( date-value )"
     };
-}
+};
 
 function cDAYS360() {
 //    cBaseFunction.call( this, "DAYS360" );
@@ -617,7 +617,7 @@ function cDAYS360() {
 
 }
 
-cDAYS360.prototype = Object.create( cBaseFunction.prototype )
+cDAYS360.prototype = Object.create( cBaseFunction.prototype );
 cDAYS360.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cBool( false );
 
@@ -657,13 +657,13 @@ cDAYS360.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( days360( date1, date2, arg2.toBool() ) );
 
-}
+};
 cDAYS360.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(  start-date , end-date [ , method-flag ] )"
     };
-}
+};
 
 function cEDATE() {
 //    cBaseFunction.call( this, "EDATE" );
@@ -685,7 +685,7 @@ function cEDATE() {
 
 }
 
-cEDATE.prototype = Object.create( cBaseFunction.prototype )
+cEDATE.prototype = Object.create( cBaseFunction.prototype );
 cEDATE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
@@ -739,13 +739,13 @@ cEDATE.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) )
-}
+};
 cEDATE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( start-date , month-offset )"
     };
-}
+};
 
 function cEOMONTH() {
 //    cBaseFunction.call( this, "EOMONTH" );
@@ -767,7 +767,7 @@ function cEOMONTH() {
 
 }
 
-cEOMONTH.prototype = Object.create( cBaseFunction.prototype )
+cEOMONTH.prototype = Object.create( cBaseFunction.prototype );
 cEOMONTH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
 
@@ -791,7 +791,7 @@ cEOMONTH.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = arg0;
     if ( arg1 instanceof cError ) return this.value = arg1;
 
-    var val = arg0.getValue(), date, _date;
+    var val = arg0.getValue();
 
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
@@ -806,20 +806,18 @@ cEOMONTH.prototype.Calculate = function ( arg ) {
     else
         val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
 
-    date = new Date( val );
-
     val.setUTCDate( 1 );
     val.setUTCMonth( val.getUTCMonth() + arg1.getValue() );
     val.setUTCDate( val.getDaysInMonth() );
 
     return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) );
-}
+};
 cEOMONTH.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( start-date , month-offset )"
     };
-}
+};
 
 function cHOUR() {
 //    cBaseFunction.call( this, "HOUR" );
@@ -841,7 +839,7 @@ function cHOUR() {
 
 }
 
-cHOUR.prototype = Object.create( cBaseFunction.prototype )
+cHOUR.prototype = Object.create( cBaseFunction.prototype );
 cHOUR.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
     if ( arg0 instanceof cArray ) {
@@ -887,13 +885,13 @@ cHOUR.prototype.Calculate = function ( arg ) {
         return this.setCA( new cError( cErrorType.not_numeric ), true );
     else                             //1		 2 3 4					   4	3		 	 					2 1
         return this.setCA( new cNumber( parseInt( ( ( val - Math.floor( val ) ) * 24 ).toFixed( cExcelDateTimeDigits ) ) ), true, 0 );
-}
+};
 cHOUR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( time-value )"
     };
-}
+};
 
 function cMINUTE() {
 //    cBaseFunction.call( this, "MINUTE" );
@@ -915,7 +913,7 @@ function cMINUTE() {
 
 }
 
-cMINUTE.prototype = Object.create( cBaseFunction.prototype )
+cMINUTE.prototype = Object.create( cBaseFunction.prototype );
 cMINUTE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
     if ( arg0 instanceof cArray ) {
@@ -963,13 +961,13 @@ cMINUTE.prototype.Calculate = function ( arg ) {
         val = parseInt( ( ( val * 24 - Math.floor( val * 24 ) ) * 60 ).toFixed( cExcelDateTimeDigits ) ) % 60;
         return this.setCA( new cNumber( val ), true, 0 );
     }
-}
+};
 cMINUTE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( time-value )"
     };
-}
+};
 
 function cMONTH() {
 //    cBaseFunction.call( this, "MONTH" );
@@ -991,7 +989,7 @@ function cMONTH() {
 
 }
 
-cMONTH.prototype = Object.create( cBaseFunction.prototype )
+cMONTH.prototype = Object.create( cBaseFunction.prototype );
 cMONTH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
     if ( arg0 instanceof cArray ) {
@@ -1039,13 +1037,13 @@ cMONTH.prototype.Calculate = function ( arg ) {
     }
     else
         return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
-}
+};
 cMONTH.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( date-value )"
     };
-}
+};
 
 function cNETWORKDAYS() {
 //    cBaseFunction.call( this, "NETWORKDAYS" );
@@ -1067,9 +1065,9 @@ function cNETWORKDAYS() {
 
 }
 
-cNETWORKDAYS.prototype = Object.create( cBaseFunction.prototype )
+cNETWORKDAYS.prototype = Object.create( cBaseFunction.prototype );
 cNETWORKDAYS.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arrDateIncl = [];
+    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -1162,7 +1160,7 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
         return true;
     }
 
-    dif = ( val1 - val0 )
+    dif = ( val1 - val0 );
     dif = ( dif + (dif >= 0 ? c_msPerDay : 0 ) ) / c_msPerDay;
     for ( var i = 0; i < Math.abs( dif ); i++ ) {
         var date = new Date( val0 );
@@ -1171,19 +1169,19 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
             count++;
     }
     return this.value = new cNumber( (dif < 0 ? -1 : 1) * count );
-}
+};
 cNETWORKDAYS.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( start-date , end-date [ , holidays ] )"
     };
-}
+};
 
 function cNETWORKDAYS_INTL() {
     cBaseFunction.call( this, "NETWORKDAYS.INTL" );
 }
 
-cNETWORKDAYS_INTL.prototype = Object.create( cBaseFunction.prototype )
+cNETWORKDAYS_INTL.prototype = Object.create( cBaseFunction.prototype );
 
 function cNOW() {
 //    cBaseFunction.call( this, "NOW" );
@@ -1238,7 +1236,7 @@ function cSECOND() {
 
 }
 
-cSECOND.prototype = Object.create( cBaseFunction.prototype )
+cSECOND.prototype = Object.create( cBaseFunction.prototype );
 cSECOND.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], val;
     if ( arg0 instanceof cArray ) {
@@ -1286,13 +1284,13 @@ cSECOND.prototype.Calculate = function ( arg ) {
         val = parseInt( (( val * 24 * 60 - Math.floor( val * 24 * 60 ) ) * 60).toFixed( cExcelDateTimeDigits ) ) % 60;
         return this.setCA( new cNumber( val ), true, 0 );
     }
-}
+};
 cSECOND.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( time-value )"
     };
-}
+};
 
 function cTIME() {
 //    cBaseFunction.call( this, "TIME" );

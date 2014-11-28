@@ -4015,12 +4015,14 @@ cQUARTILE.prototype.getInfo = function () {
     };
 };
 
+/** @constructor */
 function cRANK() {
     cBaseFunction.call( this, "RANK" );
 }
 
-cRANK.prototype = Object.create( cBaseFunction.prototype )
+cRANK.prototype = Object.create( cBaseFunction.prototype );
 
+/** @constructor */
 function cRSQ() {
 //    cBaseFunction.call( this, "RSQ" );
 //    this.setArgumentsMin( 2 );
@@ -4040,7 +4042,7 @@ function cRSQ() {
 
 }
 
-cRSQ.prototype = Object.create( cBaseFunction.prototype )
+cRSQ.prototype = Object.create( cBaseFunction.prototype );
 cRSQ.prototype.Calculate = function ( arg ) {
 
     function rsq( x, y ) {
@@ -4093,7 +4095,7 @@ cRSQ.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -4104,18 +4106,19 @@ cRSQ.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = cError( cErrorType.wrong_value_type );
 
     return this.value = rsq( arr0, arr1 );
 
-}
+};
 cRSQ.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array-1 , array-2 )"
     };
-}
+};
 
+/** @constructor */
 function cSKEW() {
 //    cBaseFunction.call( this, "SKEW" );
 //    this.setArgumentsMin( 1 );
@@ -4135,7 +4138,7 @@ function cSKEW() {
 
 }
 
-cSKEW.prototype = Object.create( cBaseFunction.prototype )
+cSKEW.prototype = Object.create( cBaseFunction.prototype );
 cSKEW.prototype.Calculate = function ( arg ) {
 
     function skew( x ) {
@@ -4151,7 +4154,7 @@ cSKEW.prototype.Calculate = function ( arg ) {
         }
 
         if ( xLength <= 2 )
-            return new cError( cErrorType.not_available )
+            return new cError( cErrorType.not_available );
 
         _x /= xLength;
 
@@ -4209,15 +4212,15 @@ cSKEW.prototype.Calculate = function ( arg ) {
 
     }
     return this.value = skew( arr0 );
-
-}
+};
 cSKEW.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
+/** @constructor */
 function cSLOPE() {
 //    cBaseFunction.call( this, "SLOPE" );
 //    this.setArgumentsMin( 2 );
@@ -4237,7 +4240,7 @@ function cSLOPE() {
 
 }
 
-cSLOPE.prototype = Object.create( cBaseFunction.prototype )
+cSLOPE.prototype = Object.create( cBaseFunction.prototype );
 cSLOPE.prototype.Calculate = function ( arg ) {
 
     function slope( y, x ) {
@@ -4304,14 +4307,15 @@ cSLOPE.prototype.Calculate = function ( arg ) {
 
     return this.value = slope( arr0, arr1 );
 
-}
+};
 cSLOPE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array-1 , array-2 )"
     };
-}
+};
 
+/** @constructor */
 function cSMALL() {
 //    cBaseFunction.call( this, "SMALL" );
 //    this.setArgumentsMin( 2 );
@@ -4332,7 +4336,7 @@ function cSMALL() {
 
 }
 
-cSMALL.prototype = Object.create( cBaseFunction.prototype )
+cSMALL.prototype = Object.create( cBaseFunction.prototype );
 cSMALL.prototype.Calculate = function ( arg ) {
 
     function frequency( A, k ) {
@@ -4391,7 +4395,7 @@ cSMALL.prototype.getInfo = function () {
         name:this.name,
         args:"(  array , k )"
     };
-}
+};
 
 function cSTANDARDIZE() {
 //    cBaseFunction.call( this, "STANDARDIZE" );
@@ -4412,7 +4416,7 @@ function cSTANDARDIZE() {
 
 }
 
-cSTANDARDIZE.prototype = Object.create( cBaseFunction.prototype )
+cSTANDARDIZE.prototype = Object.create( cBaseFunction.prototype );
 cSTANDARDIZE.prototype.Calculate = function ( arg ) {
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -4454,13 +4458,13 @@ cSTANDARDIZE.prototype.Calculate = function ( arg ) {
     if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = standardize( arg0.getValue(), arg1.getValue(), arg2.getValue() );
-}
+};
 cSTANDARDIZE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , mean , standard-deviation )"
     };
-}
+};
 
 function cSTDEV() {
 //    cBaseFunction.call( this, "STDEV" );
@@ -4482,7 +4486,7 @@ function cSTDEV() {
 
 }
 
-cSTDEV.prototype = Object.create( cBaseFunction.prototype )
+cSTDEV.prototype = Object.create( cBaseFunction.prototype );
 cSTDEV.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), member = [];
     for ( var i = 0; i < arg.length; i++ ) {
@@ -4537,7 +4541,7 @@ cSTDEV.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cSTDEVA() {
 //    cBaseFunction.call( this, "STDEVA" );

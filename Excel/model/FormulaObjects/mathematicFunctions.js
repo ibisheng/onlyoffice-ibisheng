@@ -92,7 +92,7 @@ function cABS() {
 
 }
 
-cABS.prototype = Object.create( cBaseFunction.prototype )
+cABS.prototype = Object.create( cBaseFunction.prototype );
 cABS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -115,13 +115,13 @@ cABS.prototype.Calculate = function ( arg ) {
         return this.value = new cNumber( Math.abs( arg0.getValue() ) );
     }
     return this.value = arg0;
-}
+};
 cABS.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x )"
     }
-}
+};
 
 function cACOS() {
 //    cBaseFunction.call( this, "ACOS" );
@@ -142,7 +142,7 @@ function cACOS() {
 
 }
 
-cACOS.prototype = Object.create( cBaseFunction.prototype )
+cACOS.prototype = Object.create( cBaseFunction.prototype );
 cACOS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -167,13 +167,13 @@ cACOS.prototype.Calculate = function ( arg ) {
         return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
-}
+};
 cACOS.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x )"
     };
-}
+};
 
 function cACOSH() {
 //    cBaseFunction.call( this, "ACOSH" );

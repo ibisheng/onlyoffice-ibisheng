@@ -32,7 +32,7 @@ cFormulaFunction.LookupAndReference = {
     'RTD':cRTD,
     'TRANSPOSE':cTRANSPOSE,
     'VLOOKUP':cVLOOKUP
-}
+};
 
 function cADDRESS() {
 //    cBaseFunction.call( this, "ADDRESS" );
@@ -161,7 +161,7 @@ function cCHOOSE() {
 
 }
 
-cCHOOSE.prototype = Object.create( cBaseFunction.prototype )
+cCHOOSE.prototype = Object.create( cBaseFunction.prototype );
 cCHOOSE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -183,13 +183,13 @@ cCHOOSE.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cError( cErrorType.wrong_value_type );
-}
+};
 cCHOOSE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( index , argument-list )"
     };
-}
+};
 
 function cCOLUMN() {
 //    cBaseFunction.call( this, "COLUMN" );
@@ -210,7 +210,7 @@ function cCOLUMN() {
 
 }
 
-cCOLUMN.prototype = Object.create( cBaseFunction.prototype )
+cCOLUMN.prototype = Object.create( cBaseFunction.prototype );
 cCOLUMN.prototype.Calculate = function ( arg ) {
     var arg0;
     if ( this.argumentsCurrent == 0 ) {
@@ -236,13 +236,13 @@ cCOLUMN.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cError( cErrorType.bad_reference );
-}
+};
 cCOLUMN.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( [ reference ] )"
     };
-}
+};
 
 function cCOLUMNS() {
 //    cBaseFunction.call( this, "COLUMNS" );
@@ -263,7 +263,7 @@ function cCOLUMNS() {
 
 }
 
-cCOLUMNS.prototype = Object.create( cBaseFunction.prototype )
+cCOLUMNS.prototype = Object.create( cBaseFunction.prototype );
 cCOLUMNS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArray ) {
@@ -282,13 +282,13 @@ cCOLUMNS.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cError( cErrorType.wrong_value_type );
-}
+};
 cCOLUMNS.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array )"
     };
-}
+};
 
 function cGETPIVOTDATA() {
     cBaseFunction.call( this, "GETPIVOTDATA" );
@@ -317,7 +317,7 @@ function cHLOOKUP() {
 
 }
 
-cHLOOKUP.prototype = Object.create( cBaseFunction.prototype )
+cHLOOKUP.prototype = Object.create( cBaseFunction.prototype );
 cHLOOKUP.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
     var numberRow = arg2.getValue() - 1, valueForSearching = arg0.getValue(), resC = -1, min, regexp;
@@ -354,7 +354,7 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
 //        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
     }
     else if ( arg1 instanceof cArea3D ) {
-        var range = arg1.getRange()[0], ws = arg1.getWS()
+        var range = arg1.getRange()[0], ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberRow > bb.r2 - bb.r1 )
             return this.value = new cError( cErrorType.bad_reference );
@@ -393,7 +393,7 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
             }
 
             min = Math.min( min, elem.getValue() );
-        } )
+        } );
 
         if ( min > valueForSearching ) {
             return this.value = new cError( cErrorType.not_available );
@@ -421,27 +421,28 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
 
     var c = new CellAddress( bb.r1 + numberRow, resC, 0 );
 
-    var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() )
+    var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() );
     if ( v )
         v = v.getValueWithoutFormat();
     else
         v = "";
 
     return this.value = checkTypeCell( v );
-}
+};
 cHLOOKUP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( lookup-value  ,  table-array  ,  row-index-num  [  ,  [  range-lookup-flag  ] ] )"
     };
-}
+};
 
 function cHYPERLINK() {
     cBaseFunction.call( this, "HYPERLINK" );
 }
 
-cHYPERLINK.prototype = Object.create( cBaseFunction.prototype )
+cHYPERLINK.prototype = Object.create( cBaseFunction.prototype );
 
+/** @constructor */
 function cINDEX() {
 //    cBaseFunction.call( this, "INDEX" );
 
@@ -485,7 +486,7 @@ cINDEX.prototype.Calculate = function ( arg ) {
     }
 
     if (arg0 instanceof cArray || arg0 instanceof cArea) {
-        res = arg0.getValue(arg1.getValue() - 1, arg2.getValue() - 1);
+        res = arg0.getValue2(arg1.getValue() - 1, arg2.getValue() - 1);
     } else {
         res = arg0.tryConvert();
     }
@@ -497,8 +498,9 @@ cINDEX.prototype.getInfo = function () {
         name:this.name,
         args:"( array , [ row-number ] [ , [ column-number ] ] ) " + this.name + "( reference , [ row-number ] [ , [ column-number ] [ , [ area-number ] ] ] )"
     };
-}
+};
 
+/** @constructor */
 function cINDIRECT() {
 //    cBaseFunction.call( this, "INDIRECT" );
 //    this.setArgumentsMin( 1 );
@@ -695,10 +697,8 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.not_available );
         }
 
-        var c = new CellAddress( BBox.r1 + resR, BBox.c1 + resC )
-
+        var c = new CellAddress( BBox.r1 + resR, BBox.c1 + resC );
         return this.value = checkTypeCell( _arg2.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() ).getValueWithoutFormat() );
-
     }
     else {
         var arg1Range = arg1.getRange(), arg2Range = arg2.getRange();
@@ -708,28 +708,25 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
 
         if ( arg1 instanceof cArea3D ) {
             arg1Range = arg1.getMatrix()[0];
-//                    arg1Range = arg1Range[0];
         }
         else if ( arg1 instanceof cArea ) {
             arg1Range = arg1.getMatrix();
         }
 
-
         if ( arg2 instanceof cArea3D ) {
             arg2Range = arg2.getMatrix()[0];
-//                    arg2Range = arg2Range[0];
         }
         else if ( arg2 instanceof cArea ) {
             arg2Range = arg2.getMatrix();
         }
 
         var index = _func.binarySearch( arg0, function () {
-            var a = []
+            var a = [];
             for ( var i = 0; i < arg1Range.length; i++ ) {
                 a.push( arg1Range[i][0] )
             }
             return a;
-        }() )
+        }() );
 
 
         if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
@@ -749,17 +746,14 @@ cLOOKUP.prototype.Calculate = function ( arg ) {
             else
                 return this.value = new cRef( arg1.ws.getCell3( (b.r1 - 1) + index, (b.c1 - 1) + 0 ).getName(), arg1.ws );
         }
-
-        return this.value = arg2.getValue()[index];
     }
-
-}
+};
 cLOOKUP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(  lookup-value  ,  lookup-vector  ,  result-vector  )"
     };
-}
+};
 
 function cMATCH() {
 
@@ -778,7 +772,7 @@ function cMATCH() {
     this.numFormat = this.formatType.def;
 }
 
-cMATCH.prototype = Object.create( cBaseFunction.prototype )
+cMATCH.prototype = Object.create( cBaseFunction.prototype );
 cMATCH.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 1 );
 
@@ -882,13 +876,13 @@ cMATCH.prototype.Calculate = function ( arg ) {
 
     return this.value = findMatch( arg0, arg1, arg2 )
 
-}
+};
 cMATCH.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(  lookup-value  ,  lookup-array [ , [ match-type ]] )"
     };
-}
+};
 
 function cOFFSET() {
 //    cBaseFunction.call( this, "OFFSET" );
@@ -1049,7 +1043,7 @@ function cROW() {
 
 }
 
-cROW.prototype = Object.create( cBaseFunction.prototype )
+cROW.prototype = Object.create( cBaseFunction.prototype );
 cROW.prototype.Calculate = function ( arg ) {
     var arg0;
     if ( this.argumentsCurrent == 0 ) {
@@ -1075,13 +1069,13 @@ cROW.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cError( cErrorType.bad_reference );
-}
+};
 cROW.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( [ reference ] )"
     };
-}
+};
 
 function cROWS() {
 //    cBaseFunction.call( this, "ROWS" );
@@ -1102,7 +1096,7 @@ function cROWS() {
 
 }
 
-cROWS.prototype = Object.create( cBaseFunction.prototype )
+cROWS.prototype = Object.create( cBaseFunction.prototype );
 cROWS.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArray ) {
@@ -1121,19 +1115,19 @@ cROWS.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cError( cErrorType.wrong_value_type );
-}
+};
 cROWS.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array )"
     };
-}
+};
 
 function cRTD() {
     cBaseFunction.call( this, "RTD" );
 }
 
-cRTD.prototype = Object.create( cBaseFunction.prototype )
+cRTD.prototype = Object.create( cBaseFunction.prototype );
 
 function cTRANSPOSE() {
 //    cBaseFunction.call( this, "TRANSPOSE" );
@@ -1152,7 +1146,7 @@ function cTRANSPOSE() {
 
 }
 
-cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype )
+cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype );
 cTRANSPOSE.prototype.Calculate = function ( arg ) {
 
     function TransposeMatrix( A ) {
@@ -1186,13 +1180,13 @@ cTRANSPOSE.prototype.Calculate = function ( arg ) {
 
 
     return this.value = TransposeMatrix( arg0 );
-}
+};
 cTRANSPOSE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array )"
     };
-}
+};
 
 function VHLOOKUPCache( bHor ) {
     this.cacheId = {};

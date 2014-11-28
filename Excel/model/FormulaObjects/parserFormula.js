@@ -503,46 +503,10 @@ cArea.prototype.getValue = function () {
     }
     return val;
 };
-cArea.prototype.getValue2 = function ( cell ) {
-    var val = [], r = this.getRange();
-    if ( !r ) {
-        val.push( new cError( cErrorType.bad_reference ) );
-    }
-    else {
-        r._foreachNoEmpty( function ( cellData ) {
-            if ( cell.getID() === cellData.getName() ) {
-                var cellType = cellData.getType();
-                switch(cellType){
-                    case CellValueType.Number:
-                        cellData.getValueWithoutFormat() === "" ? val.push( new cEmpty() ) : val.push( new cNumber( cellData.getValueWithoutFormat() ) );
-                        break;
-                    case CellValueType.Bool:
-                        val.push( new cBool( cellData.getValueWithoutFormat() ) );
-                        break;
-                    case CellValueType.Error:
-                        val.push( new cError( cellData.getValueWithoutFormat() ) );
-                        break;
-                    case CellValueType.String:
-                        val.push( new cString( cellData.getValueWithoutFormat() ) );
-                        break;
-                    default:
-                        if ( cellData.getValueWithoutFormat() && cellData.getValueWithoutFormat() !== "" ) {
-                            val.push( new cNumber( cellData.getValueWithoutFormat() ) );
-                        }
-                        else {
-                            val.push( checkTypeCell( "" + cellData.getValueWithoutFormat() ) );
-                        }
-                }
-            }
-        } );
-    }
-
-    if ( val[0] === undefined || val[0] === null ) {
-        return new cEmpty();
-    }
-    else {
-        return val[0];
-    }
+cArea.prototype.getValue2 = function (i, j) {
+    var r = this.getRange();
+    var cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
+    return this._parseCellValue(cell);
 };
 cArea.prototype.getRange = function () {
     if( !this.range ){
@@ -596,24 +560,18 @@ cArea.prototype.getBBox0 = function () {
 };
 cArea.prototype.cross = function ( arg ) {
     var r = this.getRange(), cross;
-    if ( !r ) {
-        return new cError( cErrorType.wrong_name );
+    if (!r) {
+        return new cError(cErrorType.wrong_name);
     }
-    cross = r.cross( arg );
-    if ( cross ) {
-        if ( cross.r != undefined ) {
-            return this.getValue2( new CellAddress( cross.r, this.getBBox().c1 ) );
-        }
-        else if ( cross.c != undefined ) {
-            return this.getValue2( new CellAddress( this.getBBox().r1, cross.c ) );
-        }
-        else {
-            return new cError( cErrorType.wrong_value_type );
+    cross = r.cross(arg);
+    if (cross) {
+        if (cross.r != undefined) {
+            return this.getValue2(cross.r - this.getBBox().r1, 0);
+        } else if (cross.c != undefined) {
+            return this.getValue2(0, cross.c - this.getBBox().c1);
         }
     }
-    else {
-        return new cError( cErrorType.wrong_value_type );
-    }
+    return new cError(cErrorType.wrong_value_type);
 };
 cArea.prototype.isValid = function () {
     var r = this.getRange();
@@ -662,17 +620,12 @@ cArea.prototype.foreach2 = function ( action ) {
         });
     }
 };
-cArea.prototype.getValue = function (i, j) {
-    var r = this.getRange();
-    var cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
-    return this._parseCellValue(cell);
-};
 cArea.prototype.getMatrix = function () {
     var t = this, arr = [], r = this.getRange();
     r._foreach2( function ( cell, i, j, r1, c1 ) {
         if (!arr[i - r1])
             arr[i - r1] = [];
-        arr[i - r1][j - c1] = t._parseCellValue();
+        arr[i - r1][j - c1] = t._parseCellValue(cell);
     } );
     return arr;
 };
@@ -1401,7 +1354,7 @@ cArray.prototype.isValidArray = function () {
     }
     return true;
 };
-cArray.prototype.getValue = function (i, j) {
+cArray.prototype.getValue2 = function (i, j) {
     var result = this.array[i];
     return result ? result[j] : result;
 };
@@ -1417,6 +1370,7 @@ cArray.prototype.fillFromArray = function ( arr ) {
     }
 };
 
+/** @constructor */
 function cUndefined(){this.value = undefined;}
 cUndefined.prototype = Object.create( cBaseType.prototype );
 
@@ -1603,6 +1557,7 @@ cBaseFunction.prototype = {
     }
 };
 
+/** @constructor */
 function parentLeft() {
     this.name = "(";
     this.type = cElementType.operator;
@@ -1629,6 +1584,7 @@ parentLeft.prototype.Assemble2 = function ( arg, start, count ) {
     return new cString( "(" + arg[start + count - 1] + ")" );
 };
 
+/** @constructor */
 function parentRight() {
     this.name = ")";
     this.type = cElementType.operator;
@@ -1639,6 +1595,7 @@ parentRight.prototype.toString = function () {
     return this.name;
 };
 
+/** @constructor */
 function cUnarMinusOperator() {
     cBaseOperator.apply( this, ['un_minus'/**name operator*/, 50/**priority of operator*/, 1/**count arguments*/] );
     this.isRightAssociative = true;
@@ -1672,6 +1629,7 @@ cUnarMinusOperator.prototype.Assemble2 = function ( arg, start, count ) {
     return new cString( "-" + arg[start + count - 1] );
 };
 
+/** @constructor */
 function cUnarPlusOperator() {
     cBaseOperator.apply( this, ['un_plus', 50, 1] );
     this.isRightAssociative = true;
@@ -1696,6 +1654,7 @@ cUnarPlusOperator.prototype.Assemble2 = function ( arg, start, count ) {
     return new cString( "+" + arg[start + count - 1] );
 };
 
+/** @constructor */
 function cAddOperator() {
     cBaseOperator.apply( this, ['+', 20] );
 }
@@ -1715,6 +1674,7 @@ cAddOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
 };
 
+/** @constructor */
 function cMinusOperator() {
     cBaseOperator.apply( this, ['-', 20] );
 }
@@ -1733,6 +1693,7 @@ cMinusOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "-", arguments[1].first );
 };
 
+/** @constructor */
 function cPercentOperator() {
     cBaseOperator.apply( this, ['%', 45, 1] );
     this.isRightAssociative = true;
@@ -1765,6 +1726,7 @@ cPercentOperator.prototype.Assemble2 = function ( arg, start, count ) {
     return new cString( arg[start + count - 1] + this.name );
 };
 
+/** @constructor */
 function cPowOperator() {
     cBaseOperator.apply( this, ['^', 40] );
 }
@@ -1797,6 +1759,7 @@ cPowOperator.prototype.Calculate = function ( arg ) {
     return this.value = new cNumber( _v );
 };
 
+/** @constructor */
 function cMultOperator() {
     cBaseOperator.apply( this, ['*', 30] );
 }
@@ -1815,6 +1778,7 @@ cMultOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "*", arguments[1].first );
 };
 
+/** @constructor */
 function cDivOperator() {
     cBaseOperator.apply( this, ['/', 30] );
 }
@@ -1833,6 +1797,7 @@ cDivOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "/", arguments[1].first );
 };
 
+/** @constructor */
 function cConcatSTROperator() {
     cBaseOperator.apply( this, ['&', 15] );
 }
@@ -1854,6 +1819,7 @@ cConcatSTROperator.prototype.Calculate = function ( arg ) {
             new cString( arg0.toString().concat( arg1.toString() ) );
 };
 
+/** @constructor */
 function cEqualsOperator() {
     cBaseOperator.apply( this, ['=', 10] );
 }
@@ -1872,6 +1838,7 @@ cEqualsOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "=", arguments[1].first );
 };
 
+/** @constructor */
 function cNotEqualsOperator() {
     cBaseOperator.apply( this, ['<>', 10] );
 }
@@ -1890,6 +1857,7 @@ cNotEqualsOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<>", arguments[1].first );
 };
 
+/** @constructor */
 function cLessOperator() {
     cBaseOperator.apply( this, ['<', 10] );
 }
@@ -1908,6 +1876,7 @@ cLessOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<", arguments[1].first );
 };
 
+/** @constructor */
 function cLessOrEqualOperator() {
     cBaseOperator.apply( this, ['<=', 10] );
 }
@@ -1926,6 +1895,7 @@ cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<=", arguments[1].first );
 };
 
+/** @constructor */
 function cGreaterOperator() {
     cBaseOperator.apply( this, ['>', 10] );
 }
@@ -1944,6 +1914,7 @@ cGreaterOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
 };
 
+/** @constructor */
 function cGreaterOrEqualOperator() {
     cBaseOperator.apply( this, ['>=', 10] );
 }
