@@ -643,7 +643,7 @@ function cFIXED() {
 
 }
 
-cFIXED.prototype = Object.create( cBaseFunction.prototype )
+cFIXED.prototype = Object.create( cBaseFunction.prototype );
 cFIXED.prototype.Calculate = function ( arg ) {
 
     function SignZeroPositive( number ) {
@@ -695,7 +695,7 @@ cFIXED.prototype.Calculate = function ( arg ) {
     }
 
     function toFix( str, skip ) {
-        var res, _int, _dec, _tmp = ""
+        var res, _int, _dec, _tmp = "";
 
         if ( skip )
             return str;
@@ -770,7 +770,7 @@ cFIXED.prototype.Calculate = function ( arg ) {
                 }
                 else
                     this.array[r][c] = new cError( cErrorType.wrong_value_type );
-            } )
+            } );
             return this.value = arg0;
         }
     }
@@ -784,7 +784,7 @@ cFIXED.prototype.Calculate = function ( arg ) {
             }
             else
                 this.array[r][c] = new cError( cErrorType.wrong_value_type );
-        } )
+        } );
         return this.value = arg0;
     }
     else if ( arg1 instanceof cArray ) {
@@ -797,13 +797,13 @@ cFIXED.prototype.Calculate = function ( arg ) {
             }
             else
                 this.array[r][c] = new cError( cErrorType.wrong_value_type );
-        } )
+        } );
         return this.value = arg1;
     }
 
     var number = arg0.getValue(), num_digits = arg1.getValue();
 
-    var cNull = ""
+    var cNull = "";
 
     if ( num_digits > 0 ) {
         cNull = ".";
@@ -811,19 +811,19 @@ cFIXED.prototype.Calculate = function ( arg ) {
         }
     }
     return this.value = new cString( oNumFormatCache.get( "#" + (arg2.toBool() ? "" : ",") + "##0" + cNull ).format( roundHelper( number, num_digits ).getValue(), CellValueType.Number, gc_nMaxDigCount )[0].text )
-}
+};
 cFIXED.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number [ , [ num-decimal ] [ , suppress-commas-flag ] ] )"
     };
-}
+};
 
 function cJIS() {
     cBaseFunction.call( this, "JIS" );
 }
 
-cJIS.prototype = Object.create( cBaseFunction.prototype )
+cJIS.prototype = Object.create( cBaseFunction.prototype );
 
 function cLEFT() {
 //    cBaseFunction.call( this, "LEFT" );
@@ -844,7 +844,7 @@ function cLEFT() {
 
 }
 
-cLEFT.prototype = Object.create( cBaseFunction.prototype )
+cLEFT.prototype = Object.create( cBaseFunction.prototype );
 cLEFT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber( 1 ) : arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -875,13 +875,13 @@ cLEFT.prototype.Calculate = function ( arg ) {
 
     return this.value = new cString( arg0.getValue().substring( 0, arg1.getValue() ) )
 
-}
+};
 cLEFT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string [ , number-chars ] )"
     };
-}
+};
 
 function cLEFTB() {
     var r = new cFormulaFunction.TextAndData["LEFT"]()
@@ -908,7 +908,7 @@ function cLEN() {
 
 }
 
-cLEN.prototype = Object.create( cBaseFunction.prototype )
+cLEN.prototype = Object.create( cBaseFunction.prototype );
 cLEN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -925,13 +925,13 @@ cLEN.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( arg0.getValue().length )
 
-}
+};
 cLEN.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string )"
     };
-}
+};
 
 function cLENB() {
     var r = new cFormulaFunction.TextAndData["LEN"]();
@@ -958,7 +958,7 @@ function cLOWER() {
 
 }
 
-cLOWER.prototype = Object.create( cBaseFunction.prototype )
+cLOWER.prototype = Object.create( cBaseFunction.prototype );
 cLOWER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -972,13 +972,13 @@ cLOWER.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError ) return this.value = arg0;
 
     return this.value = new cString( arg0.getValue().toLowerCase() );
-}
+};
 cLOWER.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(text)"
     };
-}
+};
 
 function cMID() {
 //    cBaseFunction.call( this, "MID" );
@@ -999,7 +999,7 @@ function cMID() {
 
 }
 
-cMID.prototype = Object.create( cBaseFunction.prototype )
+cMID.prototype = Object.create( cBaseFunction.prototype );
 cMID.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -1121,7 +1121,7 @@ cPROPER.prototype.Calculate = function ( arg ) {
                 ret.addElement( _elem );
             else
                 ret.addElement( new cString( proper( _elem.toString() ) ) );
-        } )
+        } );
         return this.value = ret;
     }
 
@@ -1159,7 +1159,7 @@ function cREPLACE() {
 
 }
 
-cREPLACE.prototype = Object.create( cBaseFunction.prototype )
+cREPLACE.prototype = Object.create( cBaseFunction.prototype );
 cREPLACE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -1327,7 +1327,7 @@ function cRIGHT() {
 
 }
 
-cRIGHT.prototype = Object.create( cBaseFunction.prototype )
+cRIGHT.prototype = Object.create( cBaseFunction.prototype );
 cRIGHT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber( 1 ) : arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -1391,7 +1391,7 @@ function cSEARCH() {
 
 }
 
-cSEARCH.prototype = Object.create( cBaseFunction.prototype )
+cSEARCH.prototype = Object.create( cBaseFunction.prototype );
 cSEARCH.prototype.Calculate = function ( arg ) {
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber( 1 );
@@ -1498,7 +1498,7 @@ function cSUBSTITUTE() {
 
 }
 
-cSUBSTITUTE.prototype = Object.create( cBaseFunction.prototype )
+cSUBSTITUTE.prototype = Object.create( cBaseFunction.prototype );
 cSUBSTITUTE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber( 0 );
 
@@ -1591,7 +1591,7 @@ function cT() {
 
 }
 
-cT.prototype = Object.create( cBaseFunction.prototype )
+cT.prototype = Object.create( cBaseFunction.prototype );
 cT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
@@ -1610,13 +1610,13 @@ cT.prototype.Calculate = function ( arg ) {
         return this.value = arg[0];
     else
         return this.value = new cEmpty();
-}
+};
 cT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( value )"
     };
-}
+};
 
 function cTEXT() {
 //    cBaseFunction.call( this, "TEXT" );
@@ -1637,7 +1637,7 @@ function cTEXT() {
 
 }
 
-cTEXT.prototype = Object.create( cBaseFunction.prototype )
+cTEXT.prototype = Object.create( cBaseFunction.prototype );
 cTEXT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
@@ -1716,7 +1716,7 @@ function cTRIM() {
 
 }
 
-cTRIM.prototype = Object.create( cBaseFunction.prototype )
+cTRIM.prototype = Object.create( cBaseFunction.prototype );
 cTRIM.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -1737,13 +1737,13 @@ cTRIM.prototype.Calculate = function ( arg ) {
         rx_space.test( $2[$1 + 1] ) ? res = "" : res = $2[$1];
         return res;
     } ).replace( /^\s|\s$/g, "" ) )
-}
+};
 cTRIM.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string )"
     };
-}
+};
 
 function cUPPER() {
 //    cBaseFunction.call( this, "UPPER" );
@@ -1764,7 +1764,7 @@ function cUPPER() {
 
 }
 
-cUPPER.prototype = Object.create( cBaseFunction.prototype )
+cUPPER.prototype = Object.create( cBaseFunction.prototype );
 cUPPER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -1777,13 +1777,13 @@ cUPPER.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cError ) return this.value = arg0;
     return this.value = new cString( arg0.getValue().toUpperCase() );
-}
+};
 cUPPER.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(text)"
     };
-}
+};
 
 function cVALUE() {
 //    cBaseFunction.call( this, "VALUE" );
@@ -1805,7 +1805,7 @@ function cVALUE() {
 
 }
 
-cVALUE.prototype = Object.create( cBaseFunction.prototype )
+cVALUE.prototype = Object.create( cBaseFunction.prototype );
 cVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -1828,10 +1828,10 @@ cVALUE.prototype.Calculate = function ( arg ) {
     else
         return this.value = new cError( cErrorType.wrong_value_type );
 
-}
+};
 cVALUE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string )"
     };
-}
+};

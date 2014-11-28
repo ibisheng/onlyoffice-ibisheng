@@ -853,19 +853,15 @@ cMATCH.prototype.Calculate = function ( arg ) {
     else if ( arg0 instanceof cError ) {
         return this.value = arg0;
     }
-    /*    else{
 
-     }*/
-
-    if ( !(arg1 instanceof cArray || arg1 instanceof cArea) ) {
-        return this.value = new cError( cErrorType.not_available );
-    }
-    else {
+    if (arg1 instanceof cArray || arg1 instanceof cArea)
         arg1 = arg1.getMatrix();
-    }
+    else if (arg1 instanceof  cArea3D && arg1.wsFrom == arg1.wsTo)
+        arg1 = arg1.getMatrix()[0];
+    else
+        return this.value = new cError( cErrorType.not_available );
 
     if ( arg2 instanceof cNumber || arg2 instanceof cBool ) {
-
     }
     else if ( arg2 instanceof cError ) {
         return this.value = arg2;
