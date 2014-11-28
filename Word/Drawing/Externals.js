@@ -3,7 +3,7 @@
 function ZBase32Encoder()
 {
     this.EncodingTable = "ybndrfg8ejkmcpqxot1uwisza345h769";
-    this.DecodingTable = (undefined == typeof Uint8Array) ? new Array(128) : new Uint8Array(128);
+    this.DecodingTable = ("undefined" == typeof Uint8Array) ? new Array(128) : new Uint8Array(128);
 
     var ii =  0;
     for (ii = 0; ii < 128; ii++)
