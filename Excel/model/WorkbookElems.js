@@ -2670,7 +2670,7 @@ Row.prototype =
 	},
     setAngle: function(val)
     {
-        var oRes = this.sm.setFontname(this, val);
+        var oRes = this.sm.setAngle(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
     },
