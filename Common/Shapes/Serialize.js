@@ -6799,6 +6799,28 @@ function BinaryPPTYLoader()
                             txbody.content.Internal_Content_RemoveAll();
                             txbody.content.Internal_Content_Add(txbody.content.Content.length,  new Paragraph(txbody.content.DrawingDocument, txbody.content, 0, 0, 0, 0, 0, true));
                             AddToContentFromString(txbody.content, str_field);
+
+                            if(_paragraph.f_runPr || _paragraph.f_paraPr)
+                            {
+                                txbody.content.Set_ApplyToAll(true);
+                                if(_paragraph.f_runPr)
+                                {
+                                    var _value_text_pr = new CTextPr();
+                                    if(_paragraph.f_runPr.Unifill && !_paragraph.f_runPr.Unifill.fill)
+                                    {
+                                        _paragraph.f_runPr.Unifill = undefined;
+                                    }
+                                    _value_text_pr.Set_FromObject(_paragraph.f_runPr);
+                                    txbody.content.Paragraph_Add( new ParaTextPr(_value_text_pr), false );
+                                    delete _paragraph.f_runPr;
+                                }
+                                if(_paragraph.f_paraPr)
+                                {
+                                    txbody.content.Content[0].Set_Pr(_paragraph.f_paraPr);
+                                    delete _paragraph.f_paraPr;
+                                }
+                                txbody.content.Set_ApplyToAll(false);
+                            }
                         }
 
                     }
@@ -7091,6 +7113,7 @@ function BinaryPPTYLoader()
                                         var f_text = s.GetString2();
                                 }
 
+                                var _rPr = null, _pPr = null;
                                 while (s.cur < _end)
                                 {
                                     var _at2 = s.GetUChar();
@@ -7098,12 +7121,12 @@ function BinaryPPTYLoader()
                                     {
                                         case 0:
                                         {
-                                            var _rPr = this.ReadRunProperties();
+                                            _rPr = this.ReadRunProperties();
                                             break;
                                         }
                                         case 1:
                                         {
-                                            var _pPr = this.ReadTextParagraphPr();
+                                            _pPr = this.ReadTextParagraphPr();
                                             break;
                                         }
                                         default:
@@ -7116,6 +7139,8 @@ function BinaryPPTYLoader()
                                 par.f_id = f_id;
                                 par.f_type = f_type;
                                 par.f_text = f_text;
+                                par.f_runPr = _rPr;
+                                par.f_paraPr = _pPr;
 
                                 s.Seek2(_end);
                                 break;

@@ -1819,7 +1819,7 @@ CShape.prototype =
                 {
                     ownStyle.TextPr = own_ppt_style.DefaultRunPr.Copy();
                 }
-                hierarchy_styles.push(ownStyle);
+                hierarchy_styles.splice(0, 0, ownStyle);
             }
             var shape_text_style;
             if (isRealObject(this.style) && isRealObject(this.style.fontRef))
