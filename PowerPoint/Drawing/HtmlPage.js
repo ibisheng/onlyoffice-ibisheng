@@ -3167,6 +3167,8 @@ function CEditorPage(api)
     {
         var drDoc = this.m_oDrawingDocument;
 
+        var _old_empty = this.m_oDrawingDocument.IsEmptyPresentation;
+
         this.m_oDrawingDocument.IsEmptyPresentation = false;
         if (-1 == lPageNum)
         {
@@ -3237,6 +3239,9 @@ function CEditorPage(api)
         this.m_oLogicDocument.Document_UpdateSelectionState();
 
         this.Thumbnails.LockMainObjType = false;
+
+        if (this.m_oDrawingDocument.IsEmptyPresentation != _old_empty)
+            this.OnScroll();
     }
 
     this.GetVerticalScrollTo = function(y)
