@@ -1175,7 +1175,7 @@ function CDrawingDocument()
         var ret = Renderer.Memory.GetBase64Memory();
 
         // DEBUG
-        console.log(ret);
+        //console.log(ret);
 
         return ret;
     }
