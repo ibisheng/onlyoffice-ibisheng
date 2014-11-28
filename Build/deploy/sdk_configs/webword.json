@@ -209,14 +209,7 @@
                 "cwd": "../../Fonts/",
                 "src": [
                     "js/*.js",
-                    "native/*.ttf",
-                    "native/*.ttc",
-                    "native/*.otf",
-                    "native/*.TTF",
-                    "native/*.TTC",
-                    "native/*.OTF",
-                    "native/*.bin",
-                    "native/*.BIN"
+                    "odttf/*.js"
                 ],
                 "dest": "<%= pkg.menu_path %>/Fonts/"
             },
