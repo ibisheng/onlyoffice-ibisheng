@@ -5245,7 +5245,7 @@ function BinaryFileReader(doc, openParams)
                 var elem = aStyles[i];
                 var stylePaste = oReadResult.styles[elem.style];
                 var isEqualName = null;
-                if (null != stylePaste && null != stylePaste.style) {
+                if (null != stylePaste && null != stylePaste.style && oDocumentStyles) {
                     for (var j in oDocumentStyles.Style) {
                         var styleDoc = oDocumentStyles.Style[j];
                         isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);

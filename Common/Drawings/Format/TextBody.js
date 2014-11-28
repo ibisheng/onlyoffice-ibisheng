@@ -372,7 +372,7 @@ CTextBody.prototype =
     },
 
 
-    getFieldText: function(fieldType, slide)
+    getFieldText: function(fieldType, slide, firstSlideNum)
     {
         var ret = "";
         if(this.parent && this.parent.isPlaceholder())
@@ -394,9 +394,10 @@ CTextBody.prototype =
                 }
                 case phType_sldNum :
                 {
+                    var _firstSlideNum = isRealNumber(firstSlideNum) ? firstSlideNum : 1;
                     if(slide instanceof Slide)
                     {
-                        ret += "" + (slide.num+1);
+                        ret += "" + (slide.num+_firstSlideNum);
                     }
                     break;
                 }

@@ -6792,7 +6792,8 @@ function BinaryPPTYLoader()
                     {
                        /// txbody.textFieldFlag = true;
 
-                        var str_field = txbody.getFieldText(_last_field_type, this.TempMainObject);
+
+                        var str_field = txbody.getFieldText(_last_field_type, this.TempMainObject, (this.presentation && this.presentation.pres && isRealNumber(this.presentation.pres.attrFirstSlideNum)) ? this.presentation.pres.attrFirstSlideNum : 1);
                         if(str_field.length > 0)
                         {
                             txbody.content.Internal_Content_RemoveAll();
@@ -7018,15 +7019,18 @@ function BinaryPPTYLoader()
                                 var new_run = new ParaRun(par, false), hyperlink = null;
                                 if (null != _run)
                                 {
-                                    if (_run.hlink !== undefined)
-                                    {
-                                        hyperlink = new ParaHyperlink();
-                                        hyperlink.Set_Value(_run.hlink.url);
-                                    }
+
                                     var text_pr = new CTextPr();
                                     if(_run.Unifill && !_run.Unifill.fill)
                                     {
                                         _run.Unifill = undefined;
+                                    }
+                                    if (_run.hlink !== undefined)
+                                    {
+                                        hyperlink = new ParaHyperlink();
+                                        hyperlink.Set_Value(_run.hlink.url);
+                                        _run.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                                        _run.Underline = true;
                                     }
                                     text_pr.Set_FromObject(_run);
                                     new_run.Set_Pr(text_pr)

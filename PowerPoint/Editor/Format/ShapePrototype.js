@@ -495,13 +495,13 @@ CShape.prototype.recalculateContent = function()
             && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
             && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
         {
-            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
-            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
+            w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins) + 1;
+            h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins) + 1;
         }
         else
         {
-            w = this.extX - (l_ins + r_ins);
-            h = this.extY - (t_ins + b_ins);
+            w = this.extX - (l_ins + r_ins) + 1;
+            h = this.extY - (t_ins + b_ins) + 1;
         }
 
         if(this.txBody)
