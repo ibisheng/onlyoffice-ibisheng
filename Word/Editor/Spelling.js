@@ -166,6 +166,15 @@ CDocumentSpelling.prototype =
             this.WaitingParagraphsCount++;
         }
     },
+
+    Check_WaitingParagraph : function(Para)
+    {
+        var ParaId = Para.Get_Id();
+        if (undefined === this.WaitingParagraphs[ParaId])
+            return false;
+
+        return true;
+    },
     
     Remove_WaitingParagraph : function(Para)
     {
@@ -290,6 +299,7 @@ CParaSpellChecker.prototype =
         if ( 0 < usrWords.length )        
         {
             editor.WordControl.m_oLogicDocument.Spelling.Add_WaitingParagraph(this.Paragraph);
+            this.RecalcId += "_checked";
             spellCheck(editor, {"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang });            
         }
         else if ( undefined != ParagraphForceRedraw )
@@ -418,7 +428,7 @@ CParaSpellChecker.prototype =
             Variants = FoundElement.Variants;
             Checked  = FoundElement.Checked;
 
-            if ( null === Variants )
+            if (null === Variants && false === editor.WordControl.m_oLogicDocument.Spelling.Check_WaitingParagraph(this.Paragraph))
             {
                 spellCheck(editor, {"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] });
             }

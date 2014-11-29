@@ -3316,7 +3316,6 @@ Paragraph.prototype =
         }
 
         // Если курсор находится в начале или конце гиперссылки, тогда выводим его из гиперссылки
-        // TODO: Из каки
         while ( CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start() )
         {
             if ( false === this.Content[CurPos - 1].Is_CursorPlaceable() )
