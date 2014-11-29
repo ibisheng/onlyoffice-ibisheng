@@ -9085,7 +9085,8 @@ Paragraph.prototype =
                     var PageH = this.LogicDocument.Get_PageLimits( PageIndex).YLimit;
                     var _H = Math.min( H, PageH );
                     NewFramePr.Lines = this.Update_DropCapByHeight( _H );
-                    NewFramePr.HRule = linerule_Auto;
+                    NewFramePr.HRule = linerule_Exact;
+                    NewFramePr.H     = H;
                 }
                 else
                 {

@@ -1405,7 +1405,7 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
         var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
 
         // Выставляем цвет обводки
-        if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        if ( true === PDSL.VisitedHyperlink && ( undefined === FirstRPrp.Color && undefined === FirstRPrp.Unifill ) )
             CurColor = new CDocumentColor( 128, 0, 151 );
         else if ( true === FirstRPrp.Color.Auto && !FirstRPrp.Unifill)
             CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
