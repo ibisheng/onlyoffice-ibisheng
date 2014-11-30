@@ -1048,6 +1048,11 @@ CGraphicObjects.prototype =
                     drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
                     drawing.Set_DrawingType(groupParaDrawing.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
+                    if(drawing.GraphicObj.spPr && drawing.GraphicObj.spPr.xfrm && isRealNumber(drawing.GraphicObj.spPr.xfrm.offX) && isRealNumber(drawing.GraphicObj.spPr.xfrm.offY))
+                    {
+                        drawing.GraphicObj.spPr.xfrm.setOffX(0);
+                        drawing.GraphicObj.spPr.xfrm.setOffY(0);
+                    }
                     drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
                     if(groupParaDrawing.DrawingType === drawing_Anchor)
                     {
