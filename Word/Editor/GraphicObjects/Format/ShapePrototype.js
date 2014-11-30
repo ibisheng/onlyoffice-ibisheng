@@ -168,6 +168,7 @@ CShape.prototype.handleUpdateLn = function()
 CShape.prototype.handleUpdateGeometry = function()
 {
     this.recalcGeometry();
+    this.recalcBounds();
     this.recalcWrapPolygon();
     this.addToRecalculate();
 };

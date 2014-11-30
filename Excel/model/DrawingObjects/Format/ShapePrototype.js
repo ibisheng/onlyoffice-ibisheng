@@ -291,6 +291,7 @@ CShape.prototype.handleUpdateLn = function()
 };
 CShape.prototype.handleUpdateGeometry = function()
 {
+    this.recalcBounds();
     this.recalcGeometry();
     this.addToRecalculate();
 };
