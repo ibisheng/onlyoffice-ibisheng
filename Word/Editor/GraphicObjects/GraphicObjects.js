@@ -118,6 +118,8 @@ CGraphicObjects.prototype =
         return null;
     },
 
+    getDocumentUrl: DrawingObjectsController.prototype.getDocumentUrl,
+
     isViewMode: function()
     {
         return editor.isViewMode;
