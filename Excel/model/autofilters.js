@@ -5376,7 +5376,7 @@ var gUndoInsDelCellsFlag = true;
 							
 							var id = this._rangeToId(newFirstCol);
 							var nextId = this._rangeToId(newNextCol);
-							if(buttons && buttons.length)
+							if(buttons && buttons.length && ((filter.TableColumns && filter.TableColumns.length && filter.AutoFilter) || (!filter.TableColumns)))//либо а/ф, либо форматированная таблицы с примененным фильтром
 							{
 								for(var b = 0; b < buttons.length; b++)
 								{
