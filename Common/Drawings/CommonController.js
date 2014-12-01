@@ -1920,6 +1920,13 @@ DrawingObjectsController.prototype =
             plotArea.addChart(newChartType, 0);
             plotArea.removeCharts(1, plotArea.charts.length - 1);
             newChartType.setFromOtherChart(chartType);
+            if(newChartType.getObjectType() !== historyitem_type_PieChart && newChartType.getObjectType() !== historyitem_type_DoughnutChart)
+            {
+                if(newChartType.setVaryColors && newChartType.varyColors === true)
+                {
+                    newChartType.setVaryColors(false);
+                }
+            }
         };
 
         switch(type)
