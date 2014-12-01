@@ -8810,6 +8810,11 @@
 			var activeCellsPasteFragment = Asc.g_oRangeCache.getAscRange(pasteRange);
 			var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
 			var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
+			
+			if(cMax > gc_nMaxCol0)
+				cMax = gc_nMaxCol0;	
+			if(rMax > gc_nMaxRow0)
+				rMax = gc_nMaxRow0;
 
 			var isMultiple = false;
 			var firstCell = t.model.getRange3(arn.r1, arn.c1, arn.r1, arn.c1);
@@ -8937,6 +8942,7 @@
 
 			var newVal;
 			var curMerge;
+			var nRow, nCol;
 			for (var autoR = 0;autoR < maxARow; ++autoR) {
 				for (var autoC = 0;autoC < maxACol; ++autoC) {
 					for (var r = arn.r1;r < rMax; ++r) {
@@ -8950,7 +8956,16 @@
 							if(undefined !== newVal)
 							{
 								var isMerged = false, mergeCheck;
-								var range = t.model.getRange3(r + autoR*plRow, c + autoC*plCol, r + autoR*plRow, c + autoC*plCol);
+								
+								nRow =  r + autoR*plRow;
+								if(nRow > gc_nMaxRow0)
+									nRow = gc_nMaxRow0;
+								nCol = c + autoC*plCol;
+								if(nCol > gc_nMaxCol0)
+									nCol = gc_nMaxCol0;
+									
+								var range = t.model.getRange3(nRow, nCol, nRow, nCol);
+								
 								//****paste comments****
 								if(val.aComments && val.aComments.length)
 								{
@@ -8977,7 +8992,15 @@
 									}
 									if(curMerge != null && !isMerged)
 									{
-										range.setOffsetLast({offsetCol: (curMerge.c2 - curMerge.c1), offsetRow: (curMerge.r2 - curMerge.r1)});
+										var offsetCol = curMerge.c2 - curMerge.c1;
+										if(offsetCol + c + autoC*plCol >= gc_nMaxCol0)
+											offsetCol = gc_nMaxCol0 - (c + autoC*plCol);
+
+										var offsetRow = curMerge.r2 - curMerge.r1;
+										if(offsetRow + r + autoR*plRow >= gc_nMaxRow0)
+											offsetRow = gc_nMaxRow0 - (r + autoR*plRow);
+										
+										range.setOffsetLast({offsetCol: offsetCol, offsetRow: offsetRow});
 										range.merge(c_oAscMergeOptions.Merge);
 										mergeArr[n] = {
 											r1: curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + autoR*plRow,
@@ -9007,7 +9030,7 @@
 										};
 										n++;
 									}
-								};
+								}
 								
 								//set style
 								var cellStyle = newVal.getStyleName();
@@ -9117,6 +9140,8 @@
 										range.setHyperlink(hyperLink);
 									}
 								}
+								//если замержили range
+								//c = range.bbox.c2 - autoC*plCol;
 							}
 						}
 					}
