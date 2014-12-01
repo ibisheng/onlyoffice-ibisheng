@@ -4144,8 +4144,13 @@
             }
             else if ( c_oSerFontTypes.Italic == type )
                 rPr.i = this.stream.GetBool();
-            else if ( c_oSerFontTypes.RFont == type )
-                rPr.fn = this.stream.GetString2LE(length);
+            else if ( c_oSerFontTypes.RFont == type ){
+				//проверка на то, что может не быть данного шрифта в g_map_font_index
+				var nameFont = this.stream.GetString2LE(length);
+				if(window.g_map_font_index && window.g_map_font_index[nameFont] === undefined)
+					nameFont = "Arial";
+                rPr.fn = nameFont;
+			}
             else if ( c_oSerFontTypes.Strike == type )
                 rPr.s = this.stream.GetBool();
             else if ( c_oSerFontTypes.Sz == type )
