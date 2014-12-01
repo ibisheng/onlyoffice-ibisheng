@@ -2796,6 +2796,8 @@
                 this.bs.WriteItem(c_oSer_DrawingType.To, function(){oThis.WriteFromTo(oDrawing.to);});
             // if(null != oDrawing.Pos)
             // this.bs.WriteItem(c_oSer_DrawingType.Pos, function(){oThis.WritePos(oDrawing.Pos);});
+            // if(null != oDrawing.ext)
+            // this.bs.WriteItem(c_oSer_DrawingType.Ext, function(){oThis.WriteExt(oDrawing.ext);});
             if (oDrawing.isChart())
             {
                 this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function () { oThis.WriteGraphicFrame(oDrawing); });
@@ -2849,6 +2851,21 @@
                 this.memory.WriteByte(c_oSer_DrawingPosType.Y);
                 this.memory.WriteByte(c_oSerPropLenType.Double);
                 this.memory.WriteDouble2(oPos.Y);
+            }
+        };
+        this.WriteExt = function(oExt)
+        {
+            if(null != oExt.cx)
+            {
+                this.memory.WriteByte(c_oSer_DrawingExtType.Cx);
+                this.memory.WriteByte(c_oSerPropLenType.Double);
+                this.memory.WriteDouble2(oExt.cx);
+            }
+            if(null != oExt.cy)
+            {
+                this.memory.WriteByte(c_oSer_DrawingExtType.Cy);
+                this.memory.WriteByte(c_oSerPropLenType.Double);
+                this.memory.WriteDouble2(oExt.cy);
             }
         };
         this.WriteSheetData = function(ws)
