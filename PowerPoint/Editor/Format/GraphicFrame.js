@@ -925,7 +925,7 @@ CGraphicFrame.prototype =
         this.parent = parent;
     },
 
-    setWordFlag: function(bPresentation)
+    setWordFlag: function(bPresentation, Document)
     {
         if(this.graphicObject)
         {
@@ -936,6 +936,14 @@ CGraphicFrame.prototype =
                 for(var j = 0; j < row.Content.length; ++j)
                 {
                     var content = row.Content[j].Content;
+                    if(!bPresentation && Document)
+                    {
+                        content.Styles = Document.Styles;
+                    }
+                    else
+                    {
+                        content.Styles = null;
+                    }
                     content.bPresentation = bPresentation;
                     for(var k = 0; k < content.Content.length; ++k)
                     {
