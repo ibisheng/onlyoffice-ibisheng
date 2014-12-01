@@ -2016,7 +2016,8 @@ function ReadChanges_FromBinary(Reader, Class)
         Changes.Load_Changes(Reader, Class);
 }
 
-function WriteChanges_ToBinary(Changes, Writer){
+function WriteChanges_ToBinary(Changes, Writer)
+{
     Writer.WriteLong(Changes.Type);
     Changes.Save_Changes(Writer);
 }
