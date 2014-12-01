@@ -4128,8 +4128,12 @@ CCatAx.prototype =
         var  labelsPosition            = props.getLabelsPosition();
 
 
+        var bChanged = false;
         if(isRealNumber(intervalBetweenTick) && this.tickMarkSkip !== intervalBetweenTick && this.setTickMarkSkip)
+        {
             this.setTickMarkSkip(intervalBetweenTick);
+            bChanged = true;
+        }
 
         if(isRealNumber(intervalBetweenLabelsRule) && this.setTickLblSkip)
         {
@@ -4138,11 +4142,13 @@ CCatAx.prototype =
                 if(isRealNumber(this.tickLblSkip))
                 {
                     this.setTickLblSkip(null);
+                    bChanged = true;
                 }
             }
             else if(intervalBetweenLabelsRule === c_oAscBetweenLabelsRule.manual && isRealNumber(intervalBetweenLabels) && this.tickLblSkip !== intervalBetweenLabels)
             {
                 this.setTickLblSkip(intervalBetweenLabels);
+                bChanged = true;
             }
         }
 
@@ -4155,10 +4161,14 @@ CCatAx.prototype =
             if(scaling.orientation !== new_orientation)
             {
                 scaling.setOrientation(invertCatOrder ? ORIENTATION_MAX_MIN : ORIENTATION_MIN_MAX);
+                bChanged = true;
             }
         }
         if(isRealNumber(labelsAxisDistance) && this.lblOffset !== labelsAxisDistance)
+        {
             this.setLblOffset(labelsAxisDistance);
+            bChanged = true;
+        }
 
         if(isRealNumber(axisType))
         {
@@ -4166,13 +4176,22 @@ CCatAx.prototype =
         }
 
         if(isRealNumber(majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]) && this.majorTickMark !== MENU_SETTINGS_TICK_MARK[majorTickMark])
+        {
             this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
+            bChanged = true;
+        }
 
         if(isRealNumber(minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]) && this.minorTickMark !== MENU_SETTINGS_TICK_MARK[minorTickMark])
+        {
             this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
+            bChanged = true;
+        }
 
         if(isRealNumber(tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]) && this.tickLblPos !== MENU_SETTINGS_LABELS_POS[tickLabelsPos])
+        {
             this.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
+            bChanged = true;
+        }
 
 
         if(isRealNumber(crossesRule) && isRealObject(this.crossAx))
@@ -4182,10 +4201,12 @@ CCatAx.prototype =
                 if(this.crossAx.crossesAt !== null)
                 {
                     this.crossAx.setCrossesAt(null);
+                    bChanged = true;
                 }
                 if(this.crossAx.crosses !== CROSSES_AUTO_ZERO)
                 {
                     this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                    bChanged = true;
                 }
             }
             else if(crossesRule === c_oAscCrossesRule.value)
@@ -4195,10 +4216,12 @@ CCatAx.prototype =
                     if(this.crossAx.crossesAt !== crosses)
                     {
                         this.crossAx.setCrossesAt(crosses);
+                        bChanged = true;
                     }
                     if(this.crossAx !== null)
                     {
                         this.crossAx.setCrosses(null);
+                        bChanged = true;
                     }
                 }
             }
@@ -4207,10 +4230,12 @@ CCatAx.prototype =
                 if(this.crossAx.crossesAt !== null)
                 {
                     this.crossAx.setCrossesAt(null);
+                    bChanged = true;
                 }
                 if(this.crossAx.crosses !== CROSSES_MAX)
                 {
                     this.crossAx.setCrosses(CROSSES_MAX);
+                    bChanged = true;
                 }
             }
         }
@@ -4221,6 +4246,14 @@ CCatAx.prototype =
             if(this.crossAx.crossBetween !== new_lbl_position)
             {
                 this.crossAx.setCrossBetween(new_lbl_position);
+                bChanged = true;
+            }
+        }
+        if(bChanged)
+        {
+            if(this.bDelete === true)
+            {
+                this.setDelete(false);
             }
         }
     },
@@ -8424,6 +8457,7 @@ CValAx.prototype =
 
     setMenuProps: function(props)
     {
+        var bChanged = false;
         if(!(isRealObject(props) && typeof props.getAxisType === "function" && props.getAxisType() === c_oAscAxisType.val))
             return;
         if(!this.scaling)
@@ -8435,12 +8469,18 @@ CValAx.prototype =
             if(props.minValRule === c_oAscValAxisRule.auto)
             {
                 if(isRealNumber(scaling.min))
+                {
                     scaling.setMin(null);
+                    bChanged = true;
+                }
             }
             else
             {
                 if(isRealNumber(props.minVal))
+                {
                     scaling.setMin(props.minVal);
+                    bChanged = true;
+                }
             }
         }
 
@@ -8449,7 +8489,10 @@ CValAx.prototype =
             if(props.maxValRule === c_oAscValAxisRule.auto)
             {
                 if(isRealNumber(scaling.max))
+                {
                     scaling.setMax(null);
+                    bChanged = true;
+                }
             }
             else
             {
@@ -8458,6 +8501,7 @@ CValAx.prototype =
                     if(!isRealNumber(scaling.min) || scaling.min < props.maxVal)
                     {
                         scaling.setMax(props.maxVal);
+                        bChanged = true;
                     }
                 }
             }
@@ -8469,6 +8513,7 @@ CValAx.prototype =
             if(scaling.orientation !== new_or)
             {
                 scaling.setOrientation(new_or);
+                bChanged = true;
             }
         }
 
@@ -8480,11 +8525,13 @@ CValAx.prototype =
                 if(scaling.logBase !== props.logBase)
                 {
                     scaling.setLogBase(props.logBase);
+                    bChanged = true;
                 }
             }
             else if(!props.logBase && scaling.logBase !== null)
             {
                 scaling.setLogBase(null);
+                bChanged = true;
             }
         }
 
@@ -8493,26 +8540,48 @@ CValAx.prototype =
             if(props.dispUnitsRule === c_oAscValAxUnits.none)
             {
                 if(this.dispUnits)
+                {
                     this.setDispUnits(null);
+                    bChanged = true;
+                }
             }
             else if(isRealNumber(MENU_SETTINGS_MAP[props.dispUnitsRule]))
             {
                 if(!this.dispUnits)
+                {
                     this.setDispUnits(new CDispUnits());
-                this.dispUnits.setBuiltInUnit(MENU_SETTINGS_MAP[props.dispUnitsRule]);
+                    bChanged = true;
+                }
+                if(this.dispUnits.builtInUnit !== MENU_SETTINGS_MAP[props.dispUnitsRule])
+                {
+                    this.dispUnits.setBuiltInUnit(MENU_SETTINGS_MAP[props.dispUnitsRule]);
+                    bChanged = true;
+                }
                 if(isRealBool(this.showUnitsOnChart))
+                {
                     this.dispUnits.setDispUnitsLbl(new CDLbl());
+                    bChanged = true;
+                }
             }
         }
 
         if(isRealNumber(props.majorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.majorTickMark]) && this.majorTickMark !== MENU_SETTINGS_TICK_MARK[props.majorTickMark])
+        {
             this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[props.majorTickMark]);
+            bChanged = true;
+        }
 
         if(isRealNumber(props.minorTickMark) && isRealNumber(MENU_SETTINGS_TICK_MARK[props.minorTickMark]) && this.minorTickMark !== MENU_SETTINGS_TICK_MARK[props.minorTickMark])
+        {
             this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[props.minorTickMark]);
+            bChanged = true;
+        }
 
         if(isRealNumber(props.tickLabelsPos) && isRealNumber(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]) && this.tickLblPos !== MENU_SETTINGS_LABELS_POS[props.tickLabelsPos])
+        {
             this.setTickLblPos(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]);
+            bChanged = true;
+        }
 
         if(isRealNumber(props.crossesRule) && isRealObject(this.crossAx))
         {
@@ -8521,10 +8590,12 @@ CValAx.prototype =
                 if(this.crossAx.crossesAt !== null)
                 {
                     this.crossAx.setCrossesAt(null);
+                    bChanged = true;
                 }
                 if(this.crossAx.crosses !== CROSSES_AUTO_ZERO)
                 {
                     this.crossAx.setCrosses(CROSSES_AUTO_ZERO);
+                    bChanged = true;
                 }
             }
             else if(props.crossesRule === c_oAscCrossesRule.value)
@@ -8534,10 +8605,12 @@ CValAx.prototype =
                     if(this.crossAx.crossesAt !== props.crosses)
                     {
                         this.crossAx.setCrossesAt(props.crosses);
+                        bChanged = true;
                     }
                     if(this.crossAx.crosses !== null)
                     {
                         this.crossAx.setCrosses(null);
+                        bChanged = true;
                     }
                 }
             }
@@ -8546,11 +8619,21 @@ CValAx.prototype =
                 if(this.crossAx.crossesAt !== null)
                 {
                     this.crossAx.setCrossesAt(null);
+                    bChanged = true;
                 }
                 if(this.crossAx.crosses !== CROSSES_MAX)
                 {
                     this.crossAx.setCrosses(CROSSES_MAX);
+                    bChanged = true;
                 }
+            }
+        }
+
+        if(bChanged)
+        {
+            if(this.bDelete === true)
+            {
+                this.setDelete(false);
             }
         }
     }
