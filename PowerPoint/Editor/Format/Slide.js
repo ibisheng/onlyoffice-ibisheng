@@ -117,6 +117,13 @@ Slide.prototype =
 
         copy.applyTiming(this.timing.createDuplicate());
         copy.setSlideSize(this.Width, this.Height);
+
+
+        if(!this.recalcInfo.recalculateBackground && !this.recalcInfo.recalculateSpTree)
+        {
+            copy.cachedImage = this.getBase64Img();
+        }
+
         return copy;
     },
 
@@ -957,6 +964,7 @@ Slide.prototype =
             this.recalculateSpTree();
             this.recalcInfo.recalculateSpTree = false;
         }
+        this.cachedImage = null;
     },
 
     recalculateBackground: function()
@@ -1185,6 +1193,8 @@ Slide.prototype =
 
     getBase64Img: function()
     {
+        if(typeof this.cachedImage === "string" && this.cachedImage.length > 0)
+            return this.cachedImage;
         return ShapeToImageConverter(this, 0).ImageUrl;
     },
 
