@@ -1031,10 +1031,16 @@ CMathBase.prototype.Redo = function(Data)
 };
 CMathBase.prototype.Save_Changes = function(Data, Writer)
 {
+    Writer.WriteLong(this.ClassType);
     WriteChanges_ToBinary(Data, Writer);
 };
 CMathBase.prototype.Load_Changes = function(Reader)
 {
+    var ClassType = Reader.GetLong();
+
+    if (this.ClassType !== ClassType)
+        return;
+
     ReadChanges_FromBinary(Reader, this);
 };
 CMathBase.prototype.Get_AllFontNames = function(AllFonts)
