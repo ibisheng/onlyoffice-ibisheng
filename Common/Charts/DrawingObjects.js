@@ -2727,7 +2727,7 @@ function DrawingObjects() {
             }
             if(data.added)
             {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.added.c1, data.added.r1, data.added.c2, data.added.r2)))
+                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.added.c1, data.added.r1, gc_nMaxCol, gc_nMaxRow)))
             }
 
             if(data.hided)
@@ -2737,7 +2737,7 @@ function DrawingObjects() {
 
             if(data.removed)
             {
-                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.removed.c1, data.removed.r1, data.removed.c2, data.removed.r2)))
+                changedArr.push(new BBoxInfo(worksheet.model, asc_Range(data.removed.c1, data.removed.r1, gc_nMaxCol, gc_nMaxRow)))
             }
             if(Array.isArray(data.arrChanged))
             {
