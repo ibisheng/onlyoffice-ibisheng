@@ -4154,9 +4154,14 @@ CDocumentContent.prototype =
             else if (null !== this.LogicDocument && docpostype_HdrFtr === this.LogicDocument.CurPos.Type)
             {
                 this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
-                this.CurPos.Type = docpostype_DrawingObjects;
-                this.Selection.Use = true;
-                this.Selection.Start = false;
+                var DocContent = this;
+                var HdrFtr = this.Is_HdrFtr(true);
+                if (null !== HdrFtr)
+                    DocContent = HdrFtr.Content;
+
+                DocContent.CurPos.Type     = docpostype_DrawingObjects;
+                DocContent.Selection.Use   = true;
+                DocContent.Selection.Start = false;
             }
         }
     },

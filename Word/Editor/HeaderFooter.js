@@ -281,8 +281,9 @@ CHeaderFooter.prototype =
     {
         var PageIndex = -1;
         
-        for ( var PIndex in this.Parent.Pages )
+        for (var Key in this.Parent.Pages)
         {
+            var PIndex = Key | 0;
             if ( ( this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer ) && ( -1 === PageIndex || PageIndex > PIndex ) )
                 PageIndex = PIndex;
         }
