@@ -215,29 +215,35 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
         if(this.nCol > 1)
         {
             this.setRuleGap(this.spaceColumn, this.Pr.cGpRule, this.Pr.cGp, this.Pr.cSp);
-
-
-            // выставим выравнивание для столбцов
-            var lng = this.Pr.mcs.length;
-            var col = 0;
-
-            this.alignment.wdt.length = 0;
-
-            for(var j = 0; j < lng; j++)
-            {
-                var mc = this.Pr.mcs[j],
-                    count = mc.count;
-
-                for(var i = 0; i < count; i++)
-                {
-                    this.alignment.wdt[col] = mc.mcJc;
-                    col++;
-                }
-            }
         }
 
-        if(this.kind == MATH_MATRIX && this.Pr.plcHide)
-            this.hidePlaceholder(true);
+        if(this.kind == MATH_MATRIX)
+        {
+            // выставим выравнивание для столбцов
+            if(this.Pr.mcs !== undefined)
+            {
+                var lng = this.Pr.mcs.length;
+                var col = 0;
+
+                this.alignment.wdt.length = 0;
+
+                for(var j = 0; j < lng; j++)
+                {
+                    var mc = this.Pr.mcs[j],
+                        count = mc.count;
+
+                    for(var i = 0; i < count; i++)
+                    {
+                        this.alignment.wdt[col] = mc.mcJc;
+                        col++;
+                    }
+                }
+            }
+
+
+            if(this.Pr.plcHide)
+                this.hidePlaceholder(true);
+        }
 
         this.RecalcInfo.bProps = false;
     }

@@ -21,7 +21,6 @@ function CMathBase(bInside)
     this.nRow = 0;
     this.nCol = 0;
 
-
     this.bInside = bInside === true ? true: false;
 
     this.elements = [];
@@ -43,7 +42,6 @@ function CMathBase(bInside)
         bCtrPrp:     true,
         bProps:      true
     };
-
 
     this.Content = [];
     this.CurPos  = 0;
@@ -134,11 +132,11 @@ CMathBase.prototype =
             CompiledCtrPrp = this.Get_CompiledCtrPrp_2();
 
             if(bAllowInline !== false && this.ParaMath)
-                CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
+                CompiledCtrPrp.FontSize = MathApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
         }
 
         if(bAllowInline !== false && this.ParaMath)
-            CompiledCtrPrp.FontSize = this.ParaMath.ApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
+            CompiledCtrPrp.FontSize = MathApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
 
         return CompiledCtrPrp;
     },
@@ -482,12 +480,12 @@ CMathBase.prototype =
             {
                 var TxtPr = Parent.Get_TxtPrControlLetter();
                 FontSize = TxtPr.FontSize;
-                FontSize = ParaMath.ApplyArgSize(FontSize, this.ArgSize.value);
+                FontSize = MathApplyArgSize(FontSize, this.ArgSize.value);
             }
             else
             {
-                FontSize = ParaMath.ApplyArgSize(FontSize, Parent.Get_CompiledArgSize().value);
-                FontSize = ParaMath.ApplyArgSize(FontSize, this.ArgSize.value);
+                FontSize = MathApplyArgSize(FontSize, Parent.Get_CompiledArgSize().value);
+                FontSize = MathApplyArgSize(FontSize, this.ArgSize.value);
             }
 
             this.TextPrControlLetter.FontSize = FontSize;
@@ -730,6 +728,14 @@ CMathBase.prototype =
             {
                 this.Set_DoubleStrikeout(TextPr.DStrikeout);
             }
+
+            if ( undefined != TextPr.RFonts )
+            {
+                var RFonts = new CRFonts();
+                RFonts.Set_All("Cambria Math", -1);
+
+                this.raw_SetRFonts(RFonts);
+            }
         }
 
 
@@ -826,53 +832,77 @@ CMathBase.prototype =
             this.raw_SetItalic(Value);
         }
     },
+    Set_RFonts_Ascii: function(Value)
+    {
+        if(this.CtrPrp.RFonts.Ascii !== Value)
+        {
+            History.Add(this, new CChangesMath_RFontsAscii(Value, this.CtrPrp.RFonts.Ascii));
+            this.raw_SetRFontsAscii(Value);
+        }
+    },
+    Set_RFonts_HAnsi: function(Value)
+    {
+        if(this.CtrPrp.RFonts.HAnsi !== Value)
+        {
+            History.Add(this, new CChangesMath_RFontsHAnsi(Value, this.CtrPrp.RFonts.HAnsi));
+            this.raw_SetRFontsHAnsi(Value);
+        }
+    },
+    Set_RFonts_CS:  function(Value)
+    {
+        if(this.CtrPrp.RFonts.CS !== Value)
+        {
+            History.Add(this, new CChangesMath_RFontsCS(Value, this.CtrPrp.RFonts.CS));
+            this.raw_SetRFontsCS(Value);
+        }
+    },
+    Set_RFonts_EastAsia: function(Value)
+    {
+        if(this.CtrPrp.RFonts.EastAsia !== Value)
+        {
+            History.Add(this, new CChangesMath_RFontsEastAsia(Value, this.CtrPrp.RFonts.EastAsia));
+            this.raw_SetRFontsEastAsia(Value);
+        }
+    },
+    Set_RFonts_Hint: function(Value)
+    {
+        if(this.CtrPrp.RFonts.Hint !== Value)
+        {
+            History.Add(this, new CChangesMath_RFontsHint(Value, this.CtrPrp.RFonts.Hint));
+            this.raw_SetRFontsHint(Value);
+        }
+    },
     raw_SetBold: function(Value)
     {
         this.CtrPrp.Bold = Value;
-        this.RecalcInfo.bCtrPrp = true;
-
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+        this.NeedUpdate_CtrPrp();
     },
     raw_SetItalic: function(Value)
     {
         this.CtrPrp.Italic = Value;
-        this.RecalcInfo.bCtrPrp = true;
-
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+        this.NeedUpdate_CtrPrp();
     },
     raw_SetUnderline : function(Value)
     {
         this.CtrPrp.Underline = Value;
-        this.RecalcInfo.bCtrPrp = true;
+        this.NeedUpdate_CtrPrp();
 
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
     },
     raw_SetStrikeout: function(Value)
     {
         this.CtrPrp.Strikeout = Value;
-        this.RecalcInfo.bCtrPrp = true;
-
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+        this.NeedUpdate_CtrPrp();
     },
     raw_Set_DoubleStrikeout: function(Value)
     {
         this.CtrPrp.DStrikeout = Value;
-        this.RecalcInfo.bCtrPrp = true;
+        this.NeedUpdate_CtrPrp();
 
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
     },
     raw_SetFontSize : function(Value)
     {
         this.CtrPrp.FontSize    = Value;
-        this.RecalcInfo.bCtrPrp = true;
-
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+        this.NeedUpdate_CtrPrp();
     },
     raw_SetShd: function(Shd)
     {
@@ -884,28 +914,78 @@ CMathBase.prototype =
         else
             this.CtrPrp.Shd = undefined;
 
-        this.RecalcInfo.bCtrPrp = true;
-
-        if(null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+        this.NeedUpdate_CtrPrp();
     },
     raw_SetColor: function(Value)
     {
         this.CtrPrp.Color = Value;
-
-        this.RecalcInfo.bCtrPrp = true;
-
-        if(null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+        this.NeedUpdate_CtrPrp();
     },
     raw_SetUnifill: function(Value)
     {
         this.CtrPrp.Unifill = Value;
+        this.NeedUpdate_CtrPrp();
+    },
+    raw_SetRFonts: function(RFonts)
+    {
+        if ( undefined != RFonts )
+        {
+            if ( undefined != RFonts.Ascii )
+                this.Set_RFonts_Ascii( RFonts.Ascii );
 
+            if ( undefined != RFonts.HAnsi )
+                this.Set_RFonts_HAnsi( RFonts.HAnsi );
+
+            if ( undefined != RFonts.CS )
+                this.Set_RFonts_CS( RFonts.CS );
+
+            if ( undefined != RFonts.EastAsia )
+                this.Set_RFonts_EastAsia( RFonts.EastAsia );
+
+            if ( undefined != RFonts.Hint )
+                this.Set_RFonts_Hint( RFonts.Hint );
+        }
+        else
+        {
+            this.Set_RFonts_Ascii( undefined );
+            this.Set_RFonts_HAnsi( undefined );
+            this.Set_RFonts_CS( undefined );
+            this.Set_RFonts_EastAsia( undefined );
+            this.Set_RFonts_Hint( undefined );
+        }
+    },
+    raw_SetRFontsAscii: function(Value)
+    {
+        this.CtrPrp.RFonts.Ascii = Value;
+        this.NeedUpdate_CtrPrp();
+    },
+    raw_SetRFontsHAnsi: function(Value)
+    {
+        this.CtrPrp.RFonts.HAnsi = Value;
+        this.NeedUpdate_CtrPrp();
+    },
+    raw_SetRFontsCS: function(Value)
+    {
+        this.CtrPrp.RFonts.CS = Value;
+        this.NeedUpdate_CtrPrp();
+    },
+    raw_SetRFontsEastAsia: function(Value)
+    {
+        this.CtrPrp.RFonts.EastAsia = Value;
+        this.NeedUpdate_CtrPrp();
+    },
+    raw_SetRFontsHint: function(Value)
+    {
+        this.CtrPrp.RFonts.Hint = Value;
+        this.NeedUpdate_CtrPrp();
+    },
+    NeedUpdate_CtrPrp: function()
+    {
         this.RecalcInfo.bCtrPrp = true;
 
         if(null !== this.ParaMath)
             this.ParaMath.SetNeedResize();
+
     },
     SelectToParent: function(bCorrect)
     {

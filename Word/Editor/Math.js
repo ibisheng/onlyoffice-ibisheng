@@ -1165,21 +1165,6 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     return null;
 };
 
-ParaMath.prototype.ApplyArgSize = function(FontSize, argSize)
-{
-    var ResultFontSize = FontSize;
-    if(argSize == -1)
-    {
-        ResultFontSize *= g_dMathArgSizeKoeff_1;
-    }
-    else if(argSize == -2)
-    {
-        ResultFontSize *= g_dMathArgSizeKoeff_2;
-    }
-
-    return ResultFontSize;
-};
-
 ParaMath.prototype.GetFirstRPrp = function()
 {
     return this.Root.getFirstRPrp(this);
@@ -1990,6 +1975,11 @@ var historyitem_Math_CtrPrpStrikeout           =  11;
 var historyitem_Math_CtrPrpDoubleStrikeout     =  12;
 var historyitem_Math_CtrPrpItalic              =  13;
 var historyitem_Math_CtrPrpBold                =  14;
+var historyitem_Math_RFontsAscii               =  15;
+var historyitem_Math_RFontsHAnsi               =  16;
+var historyitem_Math_RFontsCS                  =  17;
+var historyitem_Math_RFontsEastAsia            =  18;
+var historyitem_Math_RFontsHint                =  19;
 
 
 function ReadChanges_FromBinary(Reader, Class)
@@ -2010,6 +2000,11 @@ function ReadChanges_FromBinary(Reader, Class)
         case historyitem_Math_CtrPrpDoubleStrikeout : Changes = new CChangesMath_DoubleStrikeout(); break;
         case historyitem_Math_CtrPrpItalic          : Changes = new CChangesMathItalic(); break;
         case historyitem_Math_CtrPrpBold            : Changes = new CChangesMathBold(); break;
+        case historyitem_Math_RFontsAscii           : Changes = new CChangesMath_RFontsAscii(); break;
+        case historyitem_Math_RFontsHAnsi           : Changes = new CChangesMath_RFontsHAnsi(); break;
+        case historyitem_Math_RFontsCS              : Changes = new CChangesMath_RFontsCS(); break;
+        case historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
+        case historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
     }
 
     if (null !== Changes)
@@ -2406,6 +2401,244 @@ CChangesMathBold.prototype.Load_Changes = function(Reader, Class)
 };
 
 
+function CChangesMath_RFontsAscii(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsAscii.prototype.Type = historyitem_Math_RFontsAscii;
+CChangesMath_RFontsAscii.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsAscii(this.Old);
+};
+CChangesMath_RFontsAscii.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsAscii(this.New);
+};
+CChangesMath_RFontsAscii.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+};
+CChangesMath_RFontsAscii.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMath_RFontsHAnsi(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsHAnsi.prototype.Type = historyitem_Math_RFontsHAnsi;
+CChangesMath_RFontsHAnsi.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsHAnsi(this.Old);
+};
+CChangesMath_RFontsHAnsi.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsHAnsi(this.New);
+};
+CChangesMath_RFontsHAnsi.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+};
+CChangesMath_RFontsHAnsi.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+
+function CChangesMath_RFontsCS(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsCS.prototype.Type = historyitem_Math_RFontsCS;
+CChangesMath_RFontsCS.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsCS(this.Old);
+};
+CChangesMath_RFontsCS.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsCS(this.New);
+};
+CChangesMath_RFontsCS.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+};
+CChangesMath_RFontsCS.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMath_RFontsEastAsia(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsEastAsia.prototype.Type = historyitem_Math_RFontsEastAsia;
+CChangesMath_RFontsEastAsia.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsEastAsia(this.Old);
+};
+CChangesMath_RFontsEastAsia.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsEastAsia(this.New);
+};
+CChangesMath_RFontsEastAsia.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteString2(this.New.Name);
+    }
+
+
+};
+CChangesMath_RFontsEastAsia.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+    {
+        this.New =
+        {
+            Name  : Reader.GetString2(),
+            Index : -1
+        };
+    }
+
+    this.Redo(Class);
+};
+
+function CChangesMath_RFontsHint(NewValue, OldValue)
+{
+    this.New = NewValue;
+    this.Old = OldValue;
+}
+CChangesMath_RFontsHint.prototype.Type = historyitem_Math_RFontsHint;
+CChangesMath_RFontsHint.prototype.Undo = function(Class)
+{
+    Class.raw_SetRFontsHint(this.Old);
+};
+CChangesMath_RFontsHint.prototype.Redo = function(Class)
+{
+    Class.raw_SetRFontsHint(this.New);
+};
+CChangesMath_RFontsHint.prototype.Save_Changes = function(Writer)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if (undefined === this.New)
+    {
+        Writer.WriteBool(true);
+    }
+    else
+    {
+        Writer.WriteBool(false);
+        Writer.WriteLong(this.New);
+    }
+};
+CChangesMath_RFontsHint.prototype.Load_Changes = function(Reader, Class)
+{
+    // Bool   : IsUndefined
+    // String : Font
+
+    if(true === Reader.GetBool())
+        this.New = undefined;
+    else
+        this.New = Reader.GetLong();
+
+    this.Redo(Class);
+};
+
+
 function CChangesMathAddItems(Pos, Items)
 {
     this.Pos   = Pos;
@@ -2530,4 +2763,19 @@ CChangesMathEqArrayPr.prototype.Load_Changes = function(Reader, Class)
     }
 
     this.Redo(Class);
+};
+
+function MathApplyArgSize(FontSize, argSize)
+{
+    var ResultFontSize = FontSize;
+    if(argSize == -1)
+    {
+        ResultFontSize *= g_dMathArgSizeKoeff_1;
+    }
+    else if(argSize == -2)
+    {
+        ResultFontSize *= g_dMathArgSizeKoeff_2;
+    }
+
+    return ResultFontSize;
 };
