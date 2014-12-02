@@ -5067,7 +5067,7 @@ function BinaryPPTYLoader()
         {
             if(!_chart.spPr)
             {
-                _chart.spPr.setSpPr(new CSpPr());
+                _chart.setSpPr(new CSpPr());
                 _chart.spPr.setParent(_chart);
             }
             _chart.spPr.setXfrm(_xfrm);
