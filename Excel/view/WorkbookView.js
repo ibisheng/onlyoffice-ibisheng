@@ -384,7 +384,7 @@
 						"isGlobalLockEditCell"		: function () {return self.collaborativeEditing.getGlobalLockEditCell();},
 						"updateFormulaEditModEnd"	: function (rangeUpdated) {self.getWorksheet().updateSelection();},
 						"newRange"     				: function (range) { self.getWorksheet().addFormulaRange(range); },
-						"existedRange" 				: function (range) { self.getWorksheet().changeFormulaRange(range); },
+						"existedRange" 				: function (range) { self.getWorksheet().activeFormulaRange(range); },
 						"updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
 							self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
 							self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);

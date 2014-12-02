@@ -10711,20 +10711,26 @@
 		};
 
 		WorksheetView.prototype.enterCellRange = function (editor) {
-			var t = this;
-
-			if (!t.isFormulaEditMode)
+			if (!this.isFormulaEditMode)
 				return;
 
-			var ar = t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1].clone(true);
+			var currentRange = this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1];
+			var arOriginal = currentRange.clone();
+			var arNormal = currentRange.clone(true);
 			// Замерженную ячейку должны отдать только левую верхнюю.
-			var mergedRange = this.model.getMergedByCell(ar.r1, ar.c1);
-			if (mergedRange && ar.isEqual(mergedRange)) {
-				ar.r2 = ar.r1;
-				ar.c2 = ar.c1;
+			var mergedRange = this.model.getMergedByCell(arNormal.r1, arNormal.c1);
+			if (mergedRange && arNormal.isEqual(mergedRange)) {
+				arNormal.r2 = arNormal.r1;
+				arNormal.c2 = arNormal.c1;
 			}
 
-			editor.enterCellRange(ar.getName());
+			editor.enterCellRange(arNormal.getName());
+			for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
+				if (this.arrActiveFormulaRanges[i].isEqual(arNormal)) {
+					this.arrActiveFormulaRanges[i].assign2(arOriginal);
+					break;
+				}
+			}
 		};
 
 		WorksheetView.prototype.addFormulaRange = function (range) {
@@ -10738,7 +10744,7 @@
 			this._fixSelectionOfMergedCells();
 		};
 
-		WorksheetView.prototype.changeFormulaRange = function (range) {
+		WorksheetView.prototype.activeFormulaRange = function (range) {
 			for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
 				if (this.arrActiveFormulaRanges[i].isEqual(range)) {
 					var r = this.arrActiveFormulaRanges[i];

@@ -1290,24 +1290,24 @@
 		};
 
 		CellEditor.prototype._addChars = function (str, pos, isRange) {
-			var t = this, opt = t.options, f, l, s;
+			var opt = this.options, f, l, s;
 
-			if (t.selectionBegin !== t.selectionEnd) {t._removeChars(undefined, undefined, isRange);}
+			if (this.selectionBegin !== this.selectionEnd) {this._removeChars(undefined, undefined, isRange);}
 
-			if (pos === undefined) {pos = t.cursorPos;}
+			if (pos === undefined) {pos = this.cursorPos;}
 
-			if (!t.undoMode) {
+			if (!this.undoMode) {
 				// save info to undo/redo
-				t.undoList.push({fn: t._removeChars, args: [pos, str.length], isRange: isRange});
-				t.redoList = [];
+				this.undoList.push({fn: this._removeChars, args: [pos, str.length], isRange: isRange});
+				this.redoList = [];
 			}
 
-			if (t.newTextFormat) {
-				var oNewObj = new Fragment({format: t.newTextFormat, text: str});
-				t._addFragments([oNewObj], pos);
-				delete t.newTextFormat;
+			if (this.newTextFormat) {
+				var oNewObj = new Fragment({format: this.newTextFormat, text: str});
+				this._addFragments([oNewObj], pos);
+				delete this.newTextFormat;
 			} else {
-				f = t._findFragmentToInsertInto(pos);
+				f = this._findFragmentToInsertInto(pos);
 				if (f) {
 					l = pos - f.begin;
 					s = opt.fragments[f.index].text;
@@ -1315,10 +1315,9 @@
 				}
 			}
 
-			t.cursorPos = pos + str.length;
-			if (!t.undoAllMode) {
-				t._update();
-			}
+			this.cursorPos = pos + str.length;
+			if (!this.undoAllMode)
+				this._update();
 		};
 
 		CellEditor.prototype._addNewLine = function () {
