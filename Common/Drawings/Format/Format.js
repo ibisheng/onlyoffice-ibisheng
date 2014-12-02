@@ -315,6 +315,46 @@ function ExecuteNoHistory(f, oThis, args)
 }
 
 
+function checkObjectUnifill(obj, theme, colorMap)
+{
+    if(obj && obj.Unifill)
+    {
+        obj.Unifill.check(theme, colorMap);
+        var rgba = obj.Unifill.getRGBAColor();
+        obj.Color = new CDocumentColor(rgba.R, rgba.G, rgba.B, false);
+    }
+}
+function checkTableCellPr(cellPr, slide, layout, master, theme)
+{
+    cellPr.Check_PresentationPr(theme);
+    var color_map, rgba;
+    if( slide.clrMap)
+    {
+        color_map = slide.clrMap;
+    }
+    else if(layout.clrMap)
+    {
+        color_map = layout.clrMap;
+    }
+    else if(master.clrMap)
+    {
+        color_map = master.clrMap;
+    }
+    color_map = G_O_DEFAULT_COLOR_MAP;
+
+    checkObjectUnifill(cellPr.Shd, theme, color_map);
+    if(cellPr.TableCellBorders)
+    {
+        checkObjectUnifill(cellPr.TableCellBorders.Left, theme, color_map);
+        checkObjectUnifill(cellPr.TableCellBorders.Top, theme, color_map);
+        checkObjectUnifill(cellPr.TableCellBorders.Right, theme, color_map);
+        checkObjectUnifill(cellPr.TableCellBorders.Bottom, theme, color_map);
+        checkObjectUnifill(cellPr.TableCellBorders.InsideH, theme, color_map);
+        checkObjectUnifill(cellPr.TableCellBorders.InsideV, theme, color_map);
+    }
+    return cellPr;
+}
+
 
 var TYPE_TRACK_SHAPE = 0;
 var TYPE_TRACK_GROUP = TYPE_TRACK_SHAPE;
