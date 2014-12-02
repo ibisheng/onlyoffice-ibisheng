@@ -1532,6 +1532,9 @@ CopyProcessor.prototype =
 			//DocContent/ Drawings/ SlideObjects
 			var presentation = this.oDocument;
 			
+			if(!elementsContent && oDocument && oDocument.Content)
+				elementsContent = oDocument.Content;
+			
 			if(elementsContent.DocContent || (elementsContent.Drawings && elementsContent.Drawings.length) || (elementsContent.SlideObjects && elementsContent.SlideObjects.length))
 			{
 				this.oPresentationWriter.WriteString2(editor.DocumentUrl);
@@ -3818,6 +3821,7 @@ PasteProcessor.prototype =
 					presentationSelectedContent.DocContent = new CSelectedContent();
 					
 					var elements = [], selectedElement, element, drawings, pDrawings = [], drawingCopyObject;
+					var defaultTableStyleId = presentation.DefaultTableStyleId;
 					for(var i = 0; i < aContent.content.length; ++i)
 					{
 						selectedElement = new CSelectedElement();
@@ -3857,6 +3861,7 @@ PasteProcessor.prototype =
 							
 							element = this._convertTableToPPTX(element);
 							graphic_frame.graphicObject = element;
+							graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
 
 							drawingCopyObject = new DrawingCopyObject();
 							drawingCopyObject.Drawing = graphic_frame;
@@ -4116,6 +4121,7 @@ PasteProcessor.prototype =
 						arrShapes[i] = new DrawingCopyObject(shape, 0, 0, w, h);
                     }
 					
+					var defaultTableStyleId = presentation.DefaultTableStyleId;
 					for(var i = 0; i < arrTables.length; ++i)
                     {
                         shape = arrTables[i];
