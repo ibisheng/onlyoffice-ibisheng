@@ -6035,7 +6035,8 @@ CTable.prototype =
             Type     : this.Selection.Type,
             Data     : null,
             Type2    : this.Selection.Type2,
-            Data2    : null
+            Data2    : null,
+            CurRow   : this.Selection.CurRow
         };
 
         TableState.Selection.Data = [];
@@ -6094,7 +6095,8 @@ CTable.prototype =
             Type     : TableState.Selection.Type,
             Data     : null,
             Type2    : TableState.Selection.Type2,
-            Data2    : null
+            Data2    : null,
+            CurRow   : TableState.Selection.CurRow
         };
 
         this.Selection.Data = [];
@@ -7339,6 +7341,7 @@ CTable.prototype =
             this.Selection.Type2    = table_Selection_Common;
             this.Selection.Data     = null;
             this.Selection.Data2    = null;
+            this.Selection.CurRow   = 0;
 
             this.CurCell.Content.Set_SelectionState2( TableState.Data );
         }

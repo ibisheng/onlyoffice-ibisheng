@@ -1370,7 +1370,7 @@ CDocumentContent.prototype =
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Element = this.Content[Index];
-                if ( type_Table === Element.GetType() && true != Element.Is_Inline() )
+                if (type_Table === Element.GetType() && true != Element.Is_Inline() && Element.Pages.length > PageNum - Element.PageNum)
                 {
                     var TableBounds = Element.Get_PageBounds( PageNum - Element.PageNum );
                     if ( TableBounds.Bottom > Bounds.Bottom )
