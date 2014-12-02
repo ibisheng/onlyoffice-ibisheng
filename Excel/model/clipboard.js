@@ -1814,18 +1814,21 @@
 				var count = stream.GetULong();
 				var arr_shapes = [];
 				var arr_transforms = [];
+				var arrBase64Img = [];
 				
 				for(var i = 0; i < count; ++i)
 				{
 					//loader.TempMainObject = presentation.Slides[presentation.CurPage];
-					var style_index = null;
+					/*var style_index = null;
 					if(!loader.stream.GetBool())
 					{
 						if(loader.stream.GetBool())
 						{
 							style_index = stream.GetULong();
 						}
-					}
+					}*/
+					
+					loader.stream.GetBool();
 					
 					var drawing = loader.ReadGraphicObject();
 					
@@ -1833,16 +1836,15 @@
 					var y = stream.GetULong()/100000;
 					var extX = stream.GetULong()/100000;
 					var extY = stream.GetULong()/100000;
+					var base64 = stream.GetString2();
+					
+					if(count !== 1 && typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
+					{
+						drawing = DrawingObjectsController.prototype.createImage(base64, x, y, extX, extY);
+					}
 					
 					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
 					arr_shapes[i].graphicObject = drawing;
-					
-					
-					/*arr_shapes[i].Drawing = drawing;
-					arr_shapes[i].X = x;
-					arr_shapes[i].Y = y;
-					arr_shapes[i].ExtX = extX;
-					arr_shapes[i].ExtY = extY;*/
 				}
 
 				return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
@@ -3272,9 +3274,32 @@
 				}
 
 				for(var i = 0; i < data.Drawings.length; i++)
-				{
-                    data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
+				{	
+					data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
 					drawingObject = data.Drawings[i];
+					
+					
+					//отдельная обработка для вставки таблички из презентаций
+					if(data.Drawings.length === 1 && typeof CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof CGraphicFrame)
+					{
+						//вставляем табличку из презентаций
+						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, ws);
+						
+						var newCDocument = new CDocument(oTempDrawingDocument);
+						newCDocument.bFromDocument = true;
+						newCDocument.theme = this.Api.wbModel.theme;
+						
+						drawingObject.graphicObject.setBDeleted(true);
+						drawingObject.graphicObject.setWordFlag(false, newCDocument);
+						
+						var oTempDrawingDocument = ws.model.DrawingDocument;
+						oTempDrawingDocument.m_oLogicDocument = newCDocument;
+						
+						drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
+						pasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
+						
+						return;
+					}
 
 					CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
@@ -3285,7 +3310,7 @@
 					{
 						activeRow = isIntoShape.Parent.parent.drawingBase.from.row;
 						activeCol = isIntoShape.Parent.parent.drawingBase.from.col;
-					};
+					}
 					
 					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 1, 3);
 					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 1, 3);
