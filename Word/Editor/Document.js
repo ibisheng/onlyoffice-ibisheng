@@ -111,7 +111,7 @@ CSelectedContent.prototype =
         this.MoveDrawing = Value;
     },
     
-    On_EndCollectElements : function(LogicDocument)
+    On_EndCollectElements : function(LogicDocument, bNeedTurnOffHistory)
     {
         // Теперь пройдемся по всем найденным элементам и выясним есть ли автофигуры и комментарии
         var Count = this.Elements.length;
@@ -192,8 +192,12 @@ CSelectedContent.prototype =
             if (null !== OldComment)
             {
                 var NewComment = OldComment.Copy();
-                DocumentComments.Add( NewComment );
-                editor.sync_AddComment( NewComment.Get_Id(), NewComment.Data );
+
+                if (true !== bNeedTurnOffHistory)
+                {
+                    DocumentComments.Add(NewComment);
+                    editor.sync_AddComment(NewComment.Get_Id(), NewComment.Data);
+                }
                 
                 // поправим Id в самих элементах ParaComment
                 for (var Pos2 = 0; Pos2 < Count2; Pos2++)
@@ -8739,7 +8743,7 @@ CDocument.prototype =
             }
         }
         
-        SelectedContent.On_EndCollectElements(this);
+        SelectedContent.On_EndCollectElements(this, bNeedTurnOffHistory);
 
         if (bNeedTurnOffHistory)
             History.TurnOn();
