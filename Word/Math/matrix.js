@@ -190,7 +190,7 @@ CMathMatrixPr.prototype.Read_FromBinary = function(Reader)
     this.baseJc  = Reader.GetLong();
     this.plcHide = Reader.GetBool();
 
-    var nMcsCount = Reader.GetLong();;
+    var nMcsCount = Reader.GetLong();
     this.mcs.length = nMcsCount;
     for (var nIndex = 0; nIndex < nMcsCount; nIndex++)
     {

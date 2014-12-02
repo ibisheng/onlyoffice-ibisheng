@@ -3319,13 +3319,17 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var CurTextPr = this.Get_CompiledPr( false );
     pGraphics.SetTextPr( CurTextPr, Theme );
 
-    var NewMathTextPr;
+    var InfoMathText ;
     if(this.Type == para_Math_Run)
     {
         Y += this.size.ascent;
 
-        NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, CurTextPr, this);
-        pGraphics.SetTextPr( NewMathTextPr, Theme );
+        var ArgSize = this.Parent.Compiled_ArgSz.value,
+            bNormalText = this.IsNormalText();
+
+        InfoMathText = new CMathInfoTextPr(CurTextPr, ArgSize, bNormalText, Theme);
+        //NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, CurTextPr, this);
+        //pGraphics.SetTextPr( NewMathTextPr, Theme );
     }
 
     if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
@@ -3490,7 +3494,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Math_Text:
             case para_Math_Placeholder:
             {
-                Item.draw(X, Y, pGraphics, NewMathTextPr);
+                Item.draw(X, Y, pGraphics, InfoMathText);
 
                 break;
             }
@@ -7862,9 +7866,15 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
     {
         var oWPrp = this.Get_CompiledPr(false);
 
+        //var Theme = this.Paragraph.Get_Theme();
+        //var NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, oWPrp, this);
+        //g_oTextMeasurer.SetTextPr( NewMathTextPr, Theme );
+
+        var ArgSize = this.Parent.Compiled_ArgSz.value,
+            bNormalText = this.IsNormalText();
         var Theme = this.Paragraph.Get_Theme();
-        var NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, oWPrp, this);
-        g_oTextMeasurer.SetTextPr( NewMathTextPr, Theme );
+
+        var InfoMathText = new CMathInfoTextPr(oWPrp, ArgSize, bNormalText, Theme);
 
         this.bEqqArray = RPI.bEqqArray;
 
@@ -7878,7 +7888,7 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
 
         for (var i = 0 ; i < Lng; i++)
         {
-            this.Content[i].Resize(oMeasure, RPI, NewMathTextPr);
+            this.Content[i].Resize(oMeasure, RPI, InfoMathText);
 
             var oSize = this.Content[i].size;
 
