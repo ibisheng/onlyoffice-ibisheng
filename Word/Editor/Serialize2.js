@@ -4677,19 +4677,19 @@ function BinaryFileReader(doc, openParams)
     };
     this.Read = function(data)
     {
-		//try{
+		try{
 			this.stream = this.getbase64DecodedData(data);
 			this.PreLoadPrepare();
 			this.ReadMainTable();
 			this.PostLoadPrepare();
-		//}
-		//catch(e)
-		//{
-		//	if(e.message == g_sErrorCharCountMessage)
-		//		return false;
-		//	else
-		//		throw e;
-		//}
+		}
+		catch(e)
+		{
+			if(e.message == g_sErrorCharCountMessage)
+				return false;
+			else
+				throw e;
+		}
 		return true;
     };
     this.ReadData = function(data)
@@ -7302,7 +7302,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         var oThis = this;
         if ( c_oSerParType.Par === type )
         {
-			if(null != this.openParams && true == this.openParams.checkFileSize)
+			if(null != this.openParams)
 			{
 				this.openParams.parCount += 1;
 				if(this.openParams.parCount >= g_nErrorParagraphCount)
