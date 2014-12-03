@@ -7949,19 +7949,19 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oParaDrawing.Set_BehindDoc(this.stream.GetBool());
 		else if( c_oSerImageType2.DistL === type )
         {
-            oParaDrawing.Set_Distance(this.bcr.ReadDouble(), null, null, null);
+            oParaDrawing.Set_Distance(Math.abs(this.bcr.ReadDouble()), null, null, null);
         }
 		else if( c_oSerImageType2.DistT === type )
         {
-            oParaDrawing.Set_Distance(null, this.bcr.ReadDouble(), null, null);
+            oParaDrawing.Set_Distance(null, Math.abs(this.bcr.ReadDouble()), null, null);
         }
 		else if( c_oSerImageType2.DistR === type )
         {
-            oParaDrawing.Set_Distance(null, null, this.bcr.ReadDouble(), null);
+            oParaDrawing.Set_Distance(null, null, Math.abs(this.bcr.ReadDouble()), null);
         }
 		else if( c_oSerImageType2.DistB === type )
         {
-            oParaDrawing.Set_Distance(null, null, null, this.bcr.ReadDouble());
+            oParaDrawing.Set_Distance(null, null, null, Math.abs(this.bcr.ReadDouble()));
         }
 		else if( c_oSerImageType2.Hidden === type )
 			var Hidden = this.stream.GetBool();
