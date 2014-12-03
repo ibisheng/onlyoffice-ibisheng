@@ -1127,14 +1127,14 @@
 		WorksheetView.prototype._initCellsArea = function (fullRecalc) {
 			// calculate rows heights and visible rows
 			this._calcHeaderRowHeight();
-			this._calcRowHeights(fullRecalc ? 1 : 0);
+			this._calcHeightRows(fullRecalc ? 1 : 0);
 			this.visibleRange.r2 = 0;
 			this._calcVisibleRows();
 			this._updateVisibleRowsCount(/*skipScrolReinit*/true);
 
 			// calculate columns widths and visible columns
 			this._calcHeaderColumnWidth();
-			this._calcColumnWidths(fullRecalc ? 1 : 0);
+			this._calcWidthColumns(fullRecalc ? 1 : 0);
 			this.visibleRange.c2 = 0;
 			this._calcVisibleColumns();
 			this._updateVisibleColsCount(/*skipScrolReinit*/true);
@@ -1260,7 +1260,7 @@
 		 * Вычисляет ширину и позицию колонок (в pt)
 		 * @param {Number} fullRecalc  0 - без пересчета; 1 - пересчитываем все; 2 - пересчитываем новые строки
 		 */
-		WorksheetView.prototype._calcColumnWidths = function (fullRecalc) {
+		WorksheetView.prototype._calcWidthColumns = function (fullRecalc) {
 			var x = this.cellsLeft;
 			var visibleW = this.drawingCtx.getWidth();
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
@@ -1305,7 +1305,7 @@
 		 * Вычисляет высоту и позицию строк (в pt)
 		 * @param {Number} fullRecalc  0 - без пересчета; 1 - пересчитываем все; 2 - пересчитываем новые строки
 		 */
-		WorksheetView.prototype._calcRowHeights = function (fullRecalc) {
+		WorksheetView.prototype._calcHeightRows = function (fullRecalc) {
 			var y = this.cellsTop;
 			var visibleH = this.drawingCtx.getHeight();
 			var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
@@ -5032,11 +5032,11 @@
 
 			if (newCol >= t.cols.length && newCol <= gc_nMaxCol0) {
 				t.nColsCount = newCol + 1;
-				t._calcColumnWidths(/*fullRecalc*/2);
+				t._calcWidthColumns(/*fullRecalc*/2);
 			}
 			if (newRow >= t.rows.length && newRow <= gc_nMaxRow0) {
 				t.nRowsCount = newRow + 1;
-				t._calcRowHeights(/*fullRecalc*/2);
+				t._calcHeightRows(/*fullRecalc*/2);
 			}
 
 			return {
@@ -9741,7 +9741,7 @@
 				bIsMaxCols = true;
 			}
 
-			t._calcColumnWidths(/*fullRecalc*/2);
+			t._calcWidthColumns(/*fullRecalc*/2);
 
             if(this.objectRender && this.objectRender.drawingArea)
                 this.objectRender.drawingArea.reinitRanges();
@@ -9780,7 +9780,7 @@
 				bIsMaxRows = true;
 			}
 
-			t._calcRowHeights(/*fullRecalc*/2);
+			t._calcHeightRows(/*fullRecalc*/2);
             if(this.objectRender && this.objectRender.drawingArea)
                 this.objectRender.drawingArea.reinitRanges();
 			return (nLastRows !== this.nRowsCount || bIsMaxRows);
@@ -9843,18 +9843,18 @@
 				}
 			}
 
-			var cc;
+			var pad, cc, cw;
 			if (width > 0) {
-				var pad = this.width_padding * 2 + this.width_1px;
+				pad = this.width_padding * 2 + this.width_1px;
 				cc = Math.min(this._colWidthToCharCount(width + pad), /*max col width*/255);
-				var cw = this._charCountToModelColWidth(cc);
+				cw = this._charCountToModelColWidth(cc);
 			} else {
 				cw = gc_dDefaultColWidthCharsAttribute;
 				cc = this.defaultColWidthChars;
 			}
 
 			if (onlyIfMore && cc < oldColWidth)
-				return false;
+				return -1;
 
 			History.Create_NewPoint();
 			if (!onlyIfMore) {
@@ -9871,7 +9871,7 @@
 			// Выставляем, что это bestFit
 			this.model.setColBestFit(true, cw, col, col);
 			History.EndTransaction();
-			return oldColWidth !== cc;
+			return oldColWidth !== cc ? cw : -1;
 		};
 
 		WorksheetView.prototype.optimizeColWidth = function (col) {
@@ -9879,9 +9879,12 @@
 			return this._isLockedAll (function (isSuccess) {
 				if (false === isSuccess)
 					return;
-				if (t.onChangeWidthCallback(col, null, null)) {
-					t.nColsCount = 0;
-					t._calcColumnWidths(/*fullRecalc*/0);
+				var w = t.onChangeWidthCallback(col, null, null);
+				if (-1 !== w) {
+					t.cols[col] = t._calcColWidth(w);
+					t.cols[col].isCustomWidth = false;
+
+					t._updateColumnPositions();
 					t._updateVisibleColsCount();
 					t._cleanCache(new asc_Range(col, 0, col, t.rows.length - 1));
 					t.changeWorksheet("update");
@@ -9928,7 +9931,7 @@
 				History.EndTransaction();
 
 				t.nRowsCount = 0;
-				t._calcRowHeights(/*fullRecalc*/0);
+				t._calcHeightRows(/*fullRecalc*/0);
 				t._updateVisibleRowsCount();
 				t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
 				t.changeWorksheet("update");
@@ -10833,17 +10836,18 @@
 			if (!this.activeRange.isEqual(range))
 				this.setSelection(range);
 
-			var i, r = range.r1, bIsUpdate = false;
+			var i, r = range.r1, bIsUpdate = false, w;
 			for (i = range.c1; i <= range.c2; ++i) {
-				if (this.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true)) {
+				w = this.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true);
+				if (-1 !== w) {
+					this.cols[i] = this._calcColWidth(w);
 					this._cleanCache(new asc_Range(i, 0, i, this.rows.length - 1));
 					bIsUpdate = true;
 				}
 			}
 
 			if (bIsUpdate) {
-				this.nColsCount = 0;
-				this._calcColumnWidths(/*fullRecalc*/0);
+				this._updateColumnPositions();
 				this._updateVisibleColsCount();
 				this.changeWorksheet("update");
 			} else if (changeRowsOrMerge) {
