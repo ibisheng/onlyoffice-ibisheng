@@ -4055,23 +4055,32 @@ CCatAx.prototype =
             ret.putInvertCatOrder(true);
 
         //настройки пересечения с другой осью
-        if(isRealNumber(this.crossesAt))
+
+        var crossAx = this.crossAx;
+
+        if(crossAx)
         {
-            ret.putCrossesRule(c_oAscCrossesRule.value);
-            ret.putCrosses(this.crossesAt);
+            if(isRealNumber(crossAx.crossesAt))
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.value);
+                ret.putCrosses(crossAx.crossesAt);
+            }
+            else if(crossAx.crosses === CROSSES_MAX)
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.maxValue);
+            }
+            else if(crossAx.crosses === CROSSES_MIN)
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.minValue);
+            }
+            else
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.auto);
+            }
         }
-        else if(this.crosses === CROSSES_MAX)
-        {
-            ret.putCrossesRule(c_oAscCrossesRule.maxValue);
-        }
-        else if(this.crosses === CROSSES_MIN)
-        {
-            ret.putCrossesRule(c_oAscCrossesRule.minValue);
-        }
-        else
-        {
-            ret.putCrossesRule(c_oAscCrossesRule.auto);
-        }
+
+
+
 
         if(isRealNumber(this.lblOffset))
             ret.putLabelsAxisDistance(this.lblOffset);
@@ -8434,24 +8443,34 @@ CValAx.prototype =
         else
             ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 
-        //настройки пересечения с другой осью
-        if(isRealNumber(this.crossesAt))
+
+
+
+        var crossAx = this.crossAx;
+
+        if(crossAx)
         {
-            ret.putCrossesRule(c_oAscCrossesRule.value);
-            ret.putCrosses(this.crossesAt);
+            //настройки пересечения с другой осью
+            if(isRealNumber(crossAx.crossesAt))
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.value);
+                ret.putCrosses(crossAx.crossesAt);
+            }
+            else if(crossAx.crosses === CROSSES_MAX)
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.maxValue);
+            }
+            else if(crossAx.crosses === CROSSES_MIN)
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.minValue);
+            }
+            else
+            {
+                ret.putCrossesRule(c_oAscCrossesRule.auto);
+            }
         }
-        else if(this.crosses === CROSSES_MAX)
-        {
-            ret.putCrossesRule(c_oAscCrossesRule.maxValue);
-        }
-        else if(this.crosses === CROSSES_MIN)
-        {
-            ret.putCrossesRule(c_oAscCrossesRule.minValue);
-        }
-        else
-        {
-            ret.putCrossesRule(c_oAscCrossesRule.auto);
-        }
+
+
         return ret;
     },
 

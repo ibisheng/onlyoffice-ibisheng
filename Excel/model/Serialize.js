@@ -2790,14 +2790,28 @@
             var oThis = this;
             if(null != oDrawing.Type)
                 this.bs.WriteItem(c_oSer_DrawingType.Type, function(){oThis.memory.WriteByte(ECellAnchorType.cellanchorOneCell);});
-            if(null != oDrawing.from)
-                this.bs.WriteItem(c_oSer_DrawingType.From, function(){oThis.WriteFromTo(oDrawing.from);});
-            if(null != oDrawing.to)
-                this.bs.WriteItem(c_oSer_DrawingType.To, function(){oThis.WriteFromTo(oDrawing.to);});
-            // if(null != oDrawing.Pos)
-            // this.bs.WriteItem(c_oSer_DrawingType.Pos, function(){oThis.WritePos(oDrawing.Pos);});
-            // if(null != oDrawing.ext)
-            // this.bs.WriteItem(c_oSer_DrawingType.Ext, function(){oThis.WriteExt(oDrawing.ext);});
+
+            switch(oDrawing.Type)
+            {
+                case c_oAscCellAnchorType.cellanchorTwoCell:
+                {
+                    this.bs.WriteItem(c_oSer_DrawingType.From, function(){oThis.WriteFromTo(oDrawing.from);});
+                    this.bs.WriteItem(c_oSer_DrawingType.To, function(){oThis.WriteFromTo(oDrawing.to);});
+                    break;
+                }
+                case c_oAscCellAnchorType.cellanchorOneCell:
+                {
+                    this.bs.WriteItem(c_oSer_DrawingType.From, function(){oThis.WriteFromTo(oDrawing.from);});
+                    this.bs.WriteItem(c_oSer_DrawingType.Ext, function(){oThis.WriteExt(oDrawing.ext);});
+                    break;
+                }
+                case c_oAscCellAnchorType.cellanchorAbsolute:
+                {
+                    this.bs.WriteItem(c_oSer_DrawingType.Pos, function(){oThis.WritePos(oDrawing.Pos);});
+                    this.bs.WriteItem(c_oSer_DrawingType.Ext, function(){oThis.WriteExt(oDrawing.ext);});
+                    break;
+                }
+            }
             if (oDrawing.isChart())
             {
                 this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function () { oThis.WriteGraphicFrame(oDrawing); });
@@ -5752,11 +5766,11 @@
                 if(null != oNewDrawing.graphicObject)
                 {
                     if(false != oFlags.from && false != oFlags.to)
-                        oNewDrawing.Type = ECellAnchorType.cellanchorTwoCell;
+                        oNewDrawing.Type = c_oAscCellAnchorType.cellanchorTwoCell;
                     else if(false != oFlags.from && false != oFlags.ext)
-                        oNewDrawing.Type = ECellAnchorType.cellanchorOneCell;
+                        oNewDrawing.Type = c_oAscCellAnchorType.cellanchorOneCell;
                     else if(false != oFlags.pos && false != oFlags.ext)
-                        oNewDrawing.Type = ECellAnchorType.cellanchorAbsolute;
+                        oNewDrawing.Type = c_oAscCellAnchorType.cellanchorAbsolute;
                     if(oNewDrawing.graphicObject)
                     {
 						//TODO при copy/paste в word из excel пропадает метод setWorksheet

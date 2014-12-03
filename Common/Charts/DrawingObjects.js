@@ -1364,10 +1364,17 @@ function DrawingObjects() {
         var coordsFrom, coordsTo;
         switch(_t.Type)
         {
-            case c_oAscCellAnchorType.cellanchorOneCell:
+
             case c_oAscCellAnchorType.cellanchorAbsolute:
             {
-
+                metrics.x = this.Pos.X;
+                metrics.y = this.Pos.Y;
+                metrics.extX = this.ext.cx;
+                metrics.extY = this.ext.cy;
+                break;
+            }
+            case c_oAscCellAnchorType.cellanchorOneCell:
+            {
                 coordsFrom = _this.coordsManager.calculateCoords(_t.from);
                 metrics.x = pxToMm( coordsFrom.x );
                 metrics.y = pxToMm( coordsFrom.y );
@@ -1412,6 +1419,10 @@ function DrawingObjects() {
                 fromY =  mmToPt(_t.graphicObject.y);
                 toX = mmToPt(_t.graphicObject.x + _t.graphicObject.extX);
                 toY = mmToPt(_t.graphicObject.y + _t.graphicObject.extY);
+                this.Pos.X = _t.graphicObject.x;
+                this.Pos.Y = _t.graphicObject.y;
+                this.ext.cx = _t.graphicObject.extX;
+                this.ext.cy = _t.graphicObject.extY;
             }
             else
             {
@@ -1422,6 +1433,10 @@ function DrawingObjects() {
                 fromY =  mmToPt(_yc - _t.graphicObject.extX/2);
                 toX = mmToPt(_xc + _t.graphicObject.extY/2);
                 toY = mmToPt(_yc + _t.graphicObject.extX/2);
+                this.Pos.X = _xc - _t.graphicObject.extY/2;
+                this.Pos.Y = _yc - _t.graphicObject.extX/2;
+                this.ext.cx = _t.graphicObject.extY;
+                this.ext.cy = _t.graphicObject.extX;
             }
 
 

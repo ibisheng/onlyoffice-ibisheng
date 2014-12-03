@@ -1720,6 +1720,12 @@ CGroupShape.prototype =
                 writeDouble(w, data.toColOff);
                 writeDouble(w, data.toRow   );
                 writeDouble(w, data.toRowOff);
+
+
+                writeDouble(w, data.posX);
+                writeDouble(w, data.posY);
+                writeDouble(w, data.cx);
+                writeDouble(w, data.cy);
                 break;
             }
             case historyitem_AutoShapes_RemoveFromDrawingObjects:
@@ -1782,6 +1788,12 @@ CGroupShape.prototype =
                     this.drawingBase.to.colOff   = readDouble(r);
                     this.drawingBase.to.row      = readDouble(r);
                     this.drawingBase.to.rowOff   = readDouble(r);
+
+
+                    this.drawingBase.Pos.X = readDouble(r);
+                    this.drawingBase.Pos.Y = readDouble(r);
+                    this.drawingBase.ext.cx = readDouble(r);
+                    this.drawingBase.ext.cy = readDouble(r);
                 }
                 break;
             }
