@@ -5284,6 +5284,44 @@ function BinaryPPTYLoader()
         s.Skip2(5); // type + len
         var _count = s.GetULong();
 
+        if (true)
+        {
+            for (var i = 0; i < _count; i++)
+            {
+                s.Skip2(1);
+                var bIsNoHMerge = this.ReadCell(row.Content[i]);
+                if (bIsNoHMerge === false)
+                {
+                    row.Remove_Cell(i);
+                    i--;
+                    _count--;
+                }
+                var _gridCol = 1;
+                if ("number" == typeof (row.Content[i].Pr.GridSpan))
+                {
+                    _gridCol = row.Content[i].Pr.GridSpan;
+                }
+                _gridCol--;
+                while (_gridCol > 0)
+                {
+                    i++;
+                    if (i >= _count)
+                        break;
+
+                    s.Skip2(1);
+                    this.ReadCell(row.Content[i]);
+
+                    // удаляем
+                    row.Remove_Cell(i);
+                    i--;
+                    _count--;
+
+                    --_gridCol;
+                }
+            }
+        }
+
+        /*
         if (row.Content.length == _count)
         {
             for (var i = 0; i < _count; i++)
@@ -5298,6 +5336,7 @@ function BinaryPPTYLoader()
                 }
             }
         }
+        */
 
         s.Seek2(_end_rec);
     }
