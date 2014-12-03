@@ -2336,8 +2336,11 @@ CChartSpace.prototype =
                 }
                 num_cache.setPtCount(pt_index);
                 val.numRef.setNumCache(num_cache);
-                ser.isHidden = hidden;
-                ser.isHiddenForLegend = hidden;
+                if(!(val instanceof CCat))
+                {
+                    ser.isHidden = hidden;
+                    ser.isHiddenForLegend = hidden;
+                }
             }
         };
 
@@ -2443,7 +2446,6 @@ CChartSpace.prototype =
                     //cat
                     checkValByNumRef(this, ser, ser.cat);
                     checkCatByNumRef(this, ser, ser.cat);
-                    checkValByNumRef(this, ser, ser.cat);
                     //tx
                     checkCatByNumRef(this, ser, ser.tx);
 
