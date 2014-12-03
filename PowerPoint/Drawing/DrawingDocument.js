@@ -3065,11 +3065,14 @@ function CDrawingDocument()
         return g_comment_image_offsets[_index][3] * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
     }
 
-    this.DrawVerAnchor = function(xPos, bIsFromDrawings)
+    this.DrawVerAnchor = function(pageNum, xPos, bIsFromDrawings)
     {
         if (undefined === bIsFromDrawings)
         {
-            this.HorVerAnchors.push({ Type : 0, Pos : xPos });
+            if (this.m_oWordControl.m_oApi.ShowSnapLines)
+            {
+                this.HorVerAnchors.push({ Type : 0, Pos : xPos });
+            }
             return;
         }
 
@@ -3082,11 +3085,14 @@ function CDrawingDocument()
         }
     }
 
-    this.DrawHorAnchor = function(yPos, bIsFromDrawings)
+    this.DrawHorAnchor = function(pageNum, yPos, bIsFromDrawings)
     {
         if (undefined === bIsFromDrawings)
         {
-            this.HorVerAnchors.push({ Type : 1, Pos : yPos });
+            if (this.m_oWordControl.m_oApi.ShowSnapLines)
+            {
+                this.HorVerAnchors.push({ Type : 1, Pos : yPos });
+            }
             return;
         }
 
@@ -3105,9 +3111,9 @@ function CDrawingDocument()
         {
             var _anchor = this.HorVerAnchors[i];
             if (_anchor.Type == 0)
-                this.DrawVerAnchor(_anchor.Pos, true);
+                this.DrawVerAnchor(0, _anchor.Pos, true);
             else
-                this.DrawHorAnchor(_anchor.Pos, true);
+                this.DrawHorAnchor(0, _anchor.Pos, true);
         }
         this.HorVerAnchors.splice(0, this.HorVerAnchors.length);
     }

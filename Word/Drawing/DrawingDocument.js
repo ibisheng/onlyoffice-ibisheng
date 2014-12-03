@@ -6008,7 +6008,10 @@ function CDrawingDocument()
     {
         if (undefined === bIsFromDrawings)
         {
-            this.HorVerAnchors.push({ Type : 0, Page : pageNum, Pos : xPos });
+            if (this.m_oWordControl.m_oApi.ShowSnapLines)
+            {
+                this.HorVerAnchors.push({ Type : 0, Page : pageNum, Pos : xPos });
+            }
             return;
         }
 
@@ -6025,7 +6028,10 @@ function CDrawingDocument()
     {
         if (undefined === bIsFromDrawings)
         {
-            this.HorVerAnchors.push({ Type : 1, Page : pageNum, Pos : yPos });
+            if (this.m_oWordControl.m_oApi.ShowSnapLines)
+            {
+                this.HorVerAnchors.push({ Type : 1, Page : pageNum, Pos : yPos });
+            }
             return;
         }
 

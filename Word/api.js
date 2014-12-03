@@ -532,6 +532,7 @@ function asc_docs_api(name)
 	this.InterfaceLocale = null;
         
     this.ShowParaMarks = false;
+    this.ShowSnapLines = true;
 	this.isAddSpaceBetweenPrg = false;
     this.isPageBreakBefore = false;
     this.isKeepLinesTogether = false;
@@ -3805,6 +3806,15 @@ asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
             }
         }
     }
+}
+
+asc_docs_api.prototype.put_ShowSnapLines = function(isShow)
+{
+    this.ShowSnapLines = isShow;
+}
+asc_docs_api.prototype.get_ShowSnapLines = function()
+{
+    return this.ShowSnapLines;
 }
 
 asc_docs_api.prototype.put_ShowParaMarks = function(isShow)
