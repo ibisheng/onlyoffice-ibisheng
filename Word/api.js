@@ -6508,6 +6508,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 else
                 {
                     Document.Recalculate_AllTables();
+                    var data = {All:true};
+                    Document.DrawingObjects.recalculate_(data);
+                    Document.DrawingObjects.recalculateText_(data);
                     this.ChangeReaderMode();
                 }
             }
