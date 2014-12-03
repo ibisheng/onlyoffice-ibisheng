@@ -2596,6 +2596,7 @@ CPresentation.prototype =
         editor.sync_EndCatchSelectedElements();
         this.Document_UpdateUndoRedoState();
         this.Document_UpdateRulersState();
+        this.Document_UpdateCanAddHyperlinkState();
         editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
         editor.asc_fireCallback("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
         editor.asc_fireCallback("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
