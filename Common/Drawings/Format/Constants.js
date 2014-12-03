@@ -550,6 +550,7 @@ var historyitem_ImageShapeSetSpPr     = 2536;
 var historyitem_ImageShapeSetBlipFill    = 2537;
 var historyitem_ImageShapeSetParent    = 2538;
 var historyitem_ImageShapeSetGroup    = 2539;
+var historyitem_ImageShapeSetStyle    = 2540;
 var historyitem_GeometrySetParent       = 2540;
 var historyitem_GeometryAddAdj          = 2541;
 var historyitem_GeometryAddGuide        = 2542;

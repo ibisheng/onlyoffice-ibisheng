@@ -94,6 +94,12 @@ CImageShape.prototype =
         this.group = pr;
     },
 
+    setStyle: function(pr)
+    {
+        History.Add(this, {Type: historyitem_ImageShapeSetStyle, oldPr: this.style, newPr: pr});
+        this.style = pr;
+    },
+
     copy: function()
     {
         var copy = new CImageShape();
@@ -110,6 +116,10 @@ CImageShape.prototype =
         if(this.blipFill)
         {
             copy.setBlipFill(this.blipFill.createDuplicate());
+        }
+        if(this.style)
+        {
+            copy.setStyle(this.style.createDuplicate());
         }
         copy.setBDeleted(this.bDeleted);
         copy.cachedImage = this.getBase64Img();
@@ -745,6 +755,11 @@ CImageShape.prototype =
                 this.group = data.oldPr;
                 break;
             }
+            case historyitem_ImageShapeSetStyle:
+            {
+                this.style = data.oldPr;
+                break;
+            }
         }
     },
 
@@ -797,6 +812,11 @@ CImageShape.prototype =
                 this.group = data.newPr;
                 break;
             }
+            case historyitem_ImageShapeSetStyle:
+            {
+                this.style = data.newPr;
+                break;
+            }
         }
     },
 
@@ -846,6 +866,7 @@ CImageShape.prototype =
             case historyitem_ImageShapeSetSpPr:
             case historyitem_ImageShapeSetParent:
             case historyitem_ImageShapeSetGroup:
+            case historyitem_ImageShapeSetStyle:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -984,6 +1005,11 @@ CImageShape.prototype =
             case historyitem_ImageShapeSetGroup:
             {
                 this.group = readObject(r);
+                break;
+            }
+            case historyitem_ImageShapeSetStyle:
+            {
+                this.style = readObject(r);
                 break;
             }
         }
