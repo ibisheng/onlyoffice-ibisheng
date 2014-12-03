@@ -67,7 +67,7 @@ CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gap
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     if(this.bInside == false)
         GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);

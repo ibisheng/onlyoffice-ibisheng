@@ -4651,6 +4651,7 @@ ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)
 
     // Если мы в формуле, тогда ее надо пересчитывать
     this.private_UpdateMathResize();
+    this.private_RecalcCtrPrp();
 };
 
 ParaRun.prototype.Recalc_RunsCompiledPr = function()
@@ -7451,7 +7452,11 @@ ParaRun.prototype.private_UpdateMathResize = function()
     if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
         this.Parent.ParaMath.SetNeedResize();
 };
-
+ParaRun.prototype.private_RecalcCtrPrp = function()
+{
+    if (para_Math_Run === this.Type && undefined !== this.Parent && null !== this.Parent && null !== this.Parent.ParaMath)
+        this.Parent.ParaMath.SetRecalcCtrPrp(this);
+}
 function CParaRunSelection()
 {
     this.Use      = false;

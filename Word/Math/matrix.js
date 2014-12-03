@@ -667,8 +667,6 @@ function CEqArray(props)
 
     this.setDefaultSpace();
 
-    this.bDecreaseRow = false;
-
     // for ampersand in Run
     this.WidthsPoints = [];
     this.Points       = [];

@@ -29,16 +29,21 @@ function ParaMath()
 
     this.Jc       = undefined;
 
-    this.Root       = new CMathContent();
-    this.Root.bRoot = true;
+    this.Root               = new CMathContent();
+    this.Root.bRoot         = true;
     this.Root.ParentElement = this;
 
     this.X          = 0;
     this.Y          = 0;
 
-    this.bInline           = false;
-    this.bChangeInline     = true;
+    this.ParaMathRPI = new CMathRecalculateInfo();
+
+    /*this.bInline           = false;
     this.NeedResize        = true;
+    this.RecalcCtrPrp      = false;
+    this.bChangeInline     = true;
+    */
+
     this.bSelectionUse     = false;
 
     //this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
@@ -155,7 +160,7 @@ ParaMath.prototype.Get_CompiledTextPr = function(Copy)
 
 ParaMath.prototype.Add = function(Item)
 {
-    this.NeedResize = true;
+    this.ParaMathRPI.NeedResize = true;
 
     var Type = Item.Type;
     var oSelectedContent = this.GetSelectContent();
@@ -244,7 +249,7 @@ ParaMath.prototype.Add = function(Item)
 
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
-	this.NeedResize = true;
+    this.ParaMathRPI.NeedResize = true;
     var oSelectedContent = this.GetSelectContent();
 
     var nStartPos = oSelectedContent.Start;
@@ -409,7 +414,7 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     // TODO: ParaMath.Apply_TextPr
 
-    this.NeedResize = true;
+    this.ParaMathRPI.NeedResize = true;
 
 
     if(ApplyToAll == true) // для ситуации, когда ApplyToAll = true, в Root формулы при этом позиции селекта не проставлены
@@ -590,12 +595,14 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaLine  = PRS.Line;
     var ParaRange = PRS.Range;
 
-
-    var RPI = new CRPI();
+    /*var RPI = new CRPI();
     RPI.bInline       = this.bInline;
     RPI.bChangeInline = this.bChangeInline;
-    RPI.NeedResize    = this.NeedResize;
-    RPI.PRS           = PRS;
+    RPI.NeedResize    = this.NeedResize;*/
+
+    var RPI = new CRPI();
+    RPI.MergeMathInfo(this.ParaMathRPI);
+    RPI.PRS = PRS;
 
     var ArgSize = new CMathArgSize();
 
@@ -618,7 +625,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     else
         this.Root.Resize_2(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
 
-    this.NeedResize = false;
+    this.ParaMathRPI.ClearRecalculate();
 
     var OldLineTextAscent  = PRS.LineTextAscent;
     var OldLineTextAscent2 = PRS.LineTextAscent2;
@@ -932,9 +939,14 @@ ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
     if (true === this.NeedResize)
     {
         var RPI = new CRPI();
-        RPI.bInline       = this.bInline;
-        RPI.bChangeInline = this.bChangeInline;
-        RPI.PRS           = this.Paragraph.m_oPRSW;
+        RPI.MergeMathInfo(this.ParaMathRPI);
+
+        RPI.NeedResize = true;
+        RPI.PRS        = this.Paragraph.m_oPRSW;
+
+        //RPI.bInline       = this.bInline;
+        //RPI.bChangeInline = this.bChangeInline;
+
 
         this.Root.PreRecalc(null, this,  new CMathArgSize(), RPI);
         this.Root.Resize(g_oTextMeasurer, RPI);
@@ -995,21 +1007,21 @@ ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 //-----------------------------------------------------------------------------------
 ParaMath.prototype.Set_Inline = function(value)
 {
-    if(value !== this.bInline)
+    if(value !== this.ParaMathRPI.bInline)
     {
-        this.bChangeInline = true;
-        this.NeedResize   = true;
-    }
+        this.ParaMathRPI.bChangeInline = true;
+        this.ParaMathRPI.NeedResize   = true;
 
-    this.bInline = value;
+        this.ParaMathRPI.bInline = value;
+    }
 };
 ParaMath.prototype.Get_Inline = function()
 {
-    return this.bInline;
+    return this.ParaMathRPI.bInline;
 };
 ParaMath.prototype.Is_Inline = function()
 {
-    return this.bInline;
+    return this.ParaMathRPI.bInline;
 };
 ParaMath.prototype.Get_Align = function()
 {
@@ -1036,7 +1048,14 @@ ParaMath.prototype.raw_SetAlign = function(Align)
 };
 ParaMath.prototype.SetNeedResize = function()
 {
-    this.NeedResize = true;
+    this.ParaMathRPI.NeedResize = true;
+};
+ParaMath.prototype.SetRecalcCtrPrp = function(Class)
+{
+    if(this.Root.Content.length > 0)
+    {
+        this.ParaMathRPI.RecalcCtrPrp = this.Root.Content[0] == Class;
+    }
 };
 ParaMath.prototype.NeedCompiledCtrPr = function()
 {
@@ -2778,4 +2797,19 @@ function MathApplyArgSize(FontSize, argSize)
     }
 
     return ResultFontSize;
+}
+
+function CMathRecalculateInfo()
+{
+    this.NeedResize      = true;
+    this.bChangeInline   = true;
+    this.bRecalcCtrPrp   = false;
+
+    this.bInline         = false;
+}
+CMathRecalculateInfo.prototype.ClearRecalculate = function()
+{
+    this.NeedResize      = false;
+    this.bRecalcCtrPrp   = false;
+    this.bChangeInline   = false;
 };

@@ -485,7 +485,7 @@ CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var ArgSzUnd = ArgSize.Copy();
     ArgSzUnd.decrease();
@@ -523,7 +523,7 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var ArgSzOvr = ArgSize.Copy();
     ArgSzOvr.decrease();
@@ -586,7 +586,7 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var ArgSzIter = ArgSize.Copy();
     ArgSzIter.decrease();

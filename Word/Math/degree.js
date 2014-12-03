@@ -65,7 +65,7 @@ CDegreeBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsI
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     this.ApplyProperties(RPI);
 
@@ -310,7 +310,7 @@ CIterators.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
     var ArgSzIters = ArgSize.Copy();
     ArgSzIters.Merge(this.ArgSize);
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     var RPI_ITER = RPI.Copy();
     RPI_ITER.bDecreasedComp = true;

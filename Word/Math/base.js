@@ -366,7 +366,7 @@ CMathBase.prototype =
         this.Parent = Parent;
         this.ParaMath = ParaMath;
 
-        this.Set_CompiledCtrPrp(Parent, ParaMath);
+        this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
         this.ApplyProperties(RPI);
 
@@ -438,9 +438,9 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
     },
-    Set_CompiledCtrPrp: function(Parent, ParaMath)
+    Set_CompiledCtrPrp: function(Parent, ParaMath, RPI)
     {
-        if(this.RecalcInfo.bCtrPrp == true)
+        if(this.RecalcInfo.bCtrPrp == true || (RPI !== null && RPI !== undefined && RPI.bRecalcCtrPrp == true))
         {
             if (undefined === ParaMath || null === ParaMath)
             {
@@ -478,7 +478,7 @@ CMathBase.prototype =
 
             if(this.bInside == true)
             {
-                var TxtPr = Parent.Get_TxtPrControlLetter();
+                var TxtPr = Parent.Get_TxtPrControlLetter(RPI);
                 FontSize = TxtPr.FontSize;
                 FontSize = MathApplyArgSize(FontSize, this.ArgSize.value);
             }
@@ -499,9 +499,9 @@ CMathBase.prototype =
             this.RecalcInfo.bCtrPrp = false;
         }
     },
-    Get_TxtPrControlLetter: function() // TextPrControlLetter не копируются !
+    Get_TxtPrControlLetter: function(RPI) // TextPrControlLetter не копируются !
     {
-        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
+        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath, RPI);
 
         return this.TextPrControlLetter;
     },

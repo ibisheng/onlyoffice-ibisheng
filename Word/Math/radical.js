@@ -430,7 +430,7 @@ CRadical.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 
-    this.Set_CompiledCtrPrp(Parent, ParaMath);
+    this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
     this.ApplyProperties(RPI);
 

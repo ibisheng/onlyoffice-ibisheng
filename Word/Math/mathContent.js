@@ -28,7 +28,7 @@
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
 
 // 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
-// 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выравнено как alignTop)
+// 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора
 
 function CRPI()
 {
@@ -39,6 +39,7 @@ function CRPI()
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
     this.bEqqArray       = false; /*для амперсанда*/
     this.bMathFunc       = false;
+    this.bRecalcCtrPrp   = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
     this.PRS             = null;
 }
 CRPI.prototype.Copy = function()
@@ -52,9 +53,18 @@ CRPI.prototype.Copy = function()
     RPI.bNaryInline     = this.bNaryInline;
     RPI.bEqqArray       = this.bEqqArray;
     RPI.bMathFunc       = this.bMathFunc;
+    RPI.RecalcCtrPrp    = this.bRecalcCtrPrp;
     RPI.PRS             = this.PRS;
 
     return RPI;
+};
+CRPI.prototype.MergeMathInfo = function(MathInfo)
+{
+    this.bInline       = MathInfo.bInline;
+
+    this.NeedResize    = MathInfo.NeedResize;
+    this.bRecalcCtrPrp = MathInfo.bRecalcCtrPrp;
+    this.bChangeInline = MathInfo.bChangeInline;
 }
 
 function CMathPointInfo()
@@ -275,13 +285,14 @@ CCoeffGaps.prototype =
 
         return coeff;
     },
-    checkOperSign: function(code) // "+", "-", "±"
+    checkOperSign: function(code) // "+", "-", "±", "∓"
     {
         var PLUS       = 0x2B,
             MINUS      = 0x2D,
-            PLUS_MINUS = 0xB1;
+            PLUS_MINUS = 0xB1,
+            MINUS_PLUS = 0x2213;
 
-        return code == PLUS || code == MINUS || code == PLUS_MINUS;
+        return code == PLUS || code == MINUS || code == PLUS_MINUS || code == MINUS_PLUS;
     },
     checkEqualSign: function(code)
     {
