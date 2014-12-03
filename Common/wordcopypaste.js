@@ -666,7 +666,11 @@ CopyProcessor.prototype =
                 if(sSrc.length > 0)
                 {
                     sSrc = this.getSrc(sSrc);
-                    sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+
+                    var _w = (null != ParaItem.W) ? ParaItem.W : ParaItem.Extent.W;
+                    var _h = (null != ParaItem.H) ? ParaItem.H : ParaItem.Extent.H;
+
+                    sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(_w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(_h * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
                     break;
                 }
                 // var _canvas     = document.createElement('canvas');

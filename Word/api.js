@@ -1188,7 +1188,9 @@ asc_docs_api.prototype.ContentToHTML = function(bIsRet)
     this.DocumentReaderMode = new CDocumentReaderMode();
     var _old = copyPasteUseBinary;
     copyPasteUseBinary = false;
+    this.WordControl.m_oLogicDocument.Select_All();
     Editor_Copy(this);
+    this.WordControl.m_oLogicDocument.Selection_Remove();
     copyPasteUseBinary = _old;
     this.DocumentReaderMode = null;
     return document.getElementById("SelectId").innerHTML;
