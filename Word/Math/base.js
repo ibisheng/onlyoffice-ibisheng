@@ -108,15 +108,6 @@ CMathBase.prototype =
 
         return CtrPrp;
     },
-    NeedCompiledCtrPr: function()
-    {
-        this.RecalcInfo.bCtrPrp = true;
-
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                if(!this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].NeedCompiledCtrPr();
-    },
     Get_CompiledCtrPrp: function(bAllowInline)
     {
         this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);

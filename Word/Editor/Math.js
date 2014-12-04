@@ -1052,14 +1052,10 @@ ParaMath.prototype.SetNeedResize = function()
 };
 ParaMath.prototype.SetRecalcCtrPrp = function(Class)
 {
-    if(this.Root.Content.length > 0)
+    if(this.Root.Content.length > 0 && this.ParaMathRPI.bRecalcCtrPrp == false)
     {
-        this.ParaMathRPI.RecalcCtrPrp = this.Root.Content[0] == Class;
+        this.ParaMathRPI.bRecalcCtrPrp = this.Root.Content[0] == Class;
     }
-};
-ParaMath.prototype.NeedCompiledCtrPr = function()
-{
-    this.Root.NeedCompiledCtrPr();
 };
 ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx, _heightPx, raster_koef)
 {

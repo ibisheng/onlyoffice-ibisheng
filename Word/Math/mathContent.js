@@ -53,7 +53,7 @@ CRPI.prototype.Copy = function()
     RPI.bNaryInline     = this.bNaryInline;
     RPI.bEqqArray       = this.bEqqArray;
     RPI.bMathFunc       = this.bMathFunc;
-    RPI.RecalcCtrPrp    = this.bRecalcCtrPrp;
+    RPI.bRecalcCtrPrp    = this.bRecalcCtrPrp;
     RPI.PRS             = this.PRS;
 
     return RPI;
@@ -1426,8 +1426,8 @@ CMathContent.prototype =
 
             var FirstPos = this.Selection.Use ? Math.min(StartPos, EndPos) : this.CurPos;
 
-            if(FirstPos == 0)
-                this.ParaMath.NeedCompiledCtrPr();
+            if(FirstPos == 0 && this.bRoot)
+                this.ParaMath.SetRecalcCtrPrp(this.Content[0]);
 
             if( ( !this.Selection.Use && !bMenu ) || (bSelectOneElement && this.Content[StartPos].Type == para_Math_Run) ) // TextPr меняем только в одном Run
             {
@@ -1622,13 +1622,6 @@ CMathContent.prototype =
             if (ContentPos.Data[Depth] >= Pos)
                 ContentPos.Data[Depth]++;
         }
-    },
-    NeedCompiledCtrPr: function()
-    {
-        for(var i = 0; i < this.Content.length; i++)
-            if(this.Content[i].Type == para_Math_Composition)
-                this.Content[i].NeedCompiledCtrPr();
-
     },
     private_CorrectSelectionPos : function()
     {
