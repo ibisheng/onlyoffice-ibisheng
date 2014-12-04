@@ -877,6 +877,24 @@ function CLayoutThumbnailDrawer()
             }
             else
             {
+                var _ph_type = _sp_elem.getPlaceholderType();
+                var _usePH = true;
+                switch (_ph_type)
+                {
+                    case phType_dt:
+                    case phType_ftr:
+                    case phType_hdr:
+                    case phType_sldNum:
+                    {
+                        _usePH = false;
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                if (!_usePH)
+                    continue;
+
                 _ctx.globalAlpha = 1;
                 var _matrix = _sp_elem.transform;
                 var _x = 1;
