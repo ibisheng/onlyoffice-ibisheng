@@ -411,7 +411,7 @@ CNary.prototype.setCtrPrp = function(txtPrp)
 }
 CNary.prototype.setDistance = function()
 {
-    this.dW = this.GetTPrpToControlLetter().FontSize/36*2.45;
+    this.dW = this.Get_TxtPrControlLetter().FontSize/36*2.45;
 }
 CNary.prototype.getBase = function()
 {
@@ -469,7 +469,7 @@ function CNaryUnd(bInside)
 Asc.extendClass(CNaryUnd, CMathBase);
 CNaryUnd.prototype.setDistance = function()
 {
-    var zetta = this.GetTPrpToControlLetter().FontSize*25.4/96;
+    var zetta = this.Get_TxtPrControlLetter().FontSize*25.4/96;
     this.dH = zetta*0.25;
 }
 CNaryUnd.prototype.getAscent = function()
@@ -515,7 +515,7 @@ function CNaryOvr(bInside)
 Asc.extendClass(CNaryOvr, CMathBase);
 CNaryOvr.prototype.old_setDistance = function()
 {
-    var zetta = this.GetTPrpToControlLetter().FontSize* 25.4/96;
+    var zetta = this.Get_TxtPrControlLetter().FontSize* 25.4/96;
     this.dH = zetta*0.1;
 }
 CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
@@ -536,7 +536,7 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 }
 CNaryOvr.prototype.recalculateSize = function()
 {
-    var FontSize = this.GetTPrpToControlLetter().FontSize;
+    var FontSize = this.Get_TxtPrControlLetter().FontSize;
     var zetta = FontSize*25.4/96;
 
     var minGapBottom = zetta*0.1,
@@ -601,7 +601,7 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 }
 CNaryUndOvr.prototype.recalculateSize = function()
 {
-    var FontSize = this.GetTPrpToControlLetter().FontSize;
+    var FontSize = this.Get_TxtPrControlLetter().FontSize;
     var zetta = FontSize*25.4/96;
     this.gapTop = zetta*0.25;
 
@@ -700,7 +700,7 @@ CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
         YY = [];
 
     //var textScale = this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale = this.GetTPrpToControlLetter().FontSize/850; // 1000 pt
+    var textScale = this.Get_TxtPrControlLetter().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
     // g_dKoef_px_to_mm = 25.4/96
 
@@ -740,7 +740,7 @@ CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
 {
     //pGraphics.b_color1(0,0,0,255);
 
-    var ctrPrp = this.GetTPrpToControlLetter();
+    var ctrPrp = this.Get_TxtPrControlLetter();
 
     var Font =
     {
@@ -769,7 +769,7 @@ CNaryOperator.prototype.recalculateSize = function()
 
     var height = this.sizeGlyph.height,
         width =  this.sizeGlyph.width,
-        ascent = this.sizeGlyph.height/2 + DIV_CENT*this.GetTPrpToControlLetter().FontSize;
+        ascent = this.sizeGlyph.height/2 + DIV_CENT*this.Get_TxtPrControlLetter().FontSize;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
@@ -782,9 +782,9 @@ CNaryOperator.prototype.Resize = function(oMeasure, RPI)
 {
     this.recalculateSize(); //обычный пересчет, oMeasure не нужен
 }
-CNaryOperator.prototype.GetTPrpToControlLetter = function()
+CNaryOperator.prototype.Get_TxtPrControlLetter = function()
 {
-    return this.Parent.GetTPrpToControlLetter();
+    return this.Parent.Get_TxtPrControlLetter();
 }
 /*CNaryOperator.prototype.IsOnlyText = function()
 {
@@ -907,7 +907,7 @@ CSigma.prototype.getCoord = function()
 
 
     //var textScale =  this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale =  this.GetTPrpToControlLetter().FontSize/850; // 1000 pt
+    var textScale =  this.Get_TxtPrControlLetter().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var h1 = Y[0] - Y[21],
@@ -979,7 +979,7 @@ CSigma.prototype.calculateSizeGlyph = function()
     // пока размер не меняем в зависимости от высоты аргумента
 
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width = 8.997900390624999*betta,
         _height = 11.994444444444444*betta;
@@ -1111,7 +1111,7 @@ CProduct.prototype.getCoord = function()
 
 
     //var textScale = this.getTxtPrp().FontSize/850, // 1000 pt
-    var textScale = this.GetTPrpToControlLetter().FontSize/850, // 1000 pt
+    var textScale = this.Get_TxtPrControlLetter().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var h1 = Y[9],
@@ -1142,7 +1142,7 @@ CProduct.prototype.getCoord = function()
 CProduct.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width = 10.312548828125*betta,
         _height = 11.994444444444444*betta;
@@ -1214,7 +1214,7 @@ CUnion.prototype.getCoord = function()
 CUnion.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
     this.gap = 0.93*betta;
 
     var _width = 9.38*betta,
@@ -1333,7 +1333,7 @@ CLogicalOr.prototype.getCoord = function()
     X[7] = 0; Y[7] = 0;
 
     //var textScale = this.getTxtPrp().FontSize/850, // 1000 pt
-    var textScale = this.GetTPrpToControlLetter().FontSize/850, // 1000 pt
+    var textScale = this.Get_TxtPrControlLetter().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var w1 = X[1],
@@ -1365,7 +1365,7 @@ CLogicalOr.prototype.getCoord = function()
 CLogicalOr.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width = 9.6159*betta,
         _height = 11.994444444444444*betta;
@@ -1502,7 +1502,7 @@ CIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -1543,7 +1543,7 @@ CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width = 14.2296*betta,
         _height = 13.7*betta;
@@ -1594,7 +1594,7 @@ CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width = 18.925368*betta,
         _height = 13.7*betta;
@@ -1958,7 +1958,7 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
         HH = coord2.H;
 
     //var textScale =  this.getTxtPrp().FontSize/850;// 1000 pt
-    var FontSize = this.GetTPrpToControlLetter().FontSize;
+    var FontSize = this.Get_TxtPrControlLetter().FontSize;
     var textScale =  FontSize/850;// 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
@@ -2006,7 +2006,7 @@ CContourIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -2043,7 +2043,7 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
         WW = 1.6*coord2.W,
         HH = coord2.H;
 
-    var FontSize = this.GetTPrpToControlLetter().FontSize;
+    var FontSize = this.Get_TxtPrControlLetter().FontSize;
     var textScale =  FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
@@ -2092,7 +2092,7 @@ CSurfaceIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  14.2296*betta,
         _height = 13.7*betta;
@@ -2128,7 +2128,7 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
         WW = 2.1*coord2.W,
         HH = coord2.H;
 
-    var FontSize = this.GetTPrpToControlLetter().FontSize;
+    var FontSize = this.Get_TxtPrControlLetter().FontSize;
     var textScale = FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
@@ -2176,7 +2176,7 @@ CVolumeIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Get_TxtPrControlLetter().FontSize/36;
 
     var _width =  18.925368*betta,
         _height = 13.7*betta;

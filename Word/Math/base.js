@@ -157,23 +157,11 @@ CMathBase.prototype =
     {
         return this.Parent.Get_CompiledArgSize();
     },
-    // для управляющих символов в приоритете GetFirstRunPrp
-    // если первый элемент - мат объект, то берутся его CtrPrp
-    GetTPrpToControlLetter: function()
+    Get_TxtPrControlLetter: function(RPI) // TextPrControlLetter не копируются !
     {
-        var TextPrControlLetter;
+        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath, RPI);
 
-        if(this.bInside)
-        {
-            TextPrControlLetter = this.Parent.GetTPrpToControlLetter();
-        }
-        else
-        {
-            this.Set_CompiledCtrPrp(this.Parent, this.ParaMath);
-            TextPrControlLetter = this.TextPrControlLetter;
-        }
-
-        return TextPrControlLetter;
+        return this.TextPrControlLetter;
     },
     fillPlaceholders: function()
     {
@@ -339,7 +327,7 @@ CMathBase.prototype =
             {
                 if(this.elements[i][j].IsJustDraw()) // для Just-Draw элементов надо выставить Font
                 {
-                    var ctrPrp = this.GetTPrpToControlLetter();
+                    var ctrPrp = this.Get_TxtPrControlLetter();
 
                     var Font =
                     {
@@ -412,7 +400,7 @@ CMathBase.prototype =
             {
                 if(this.elements[i][j].IsJustDraw()) // для Just-Draw элементов надо выставить Font
                 {
-                    var ctrPrp = this.GetTPrpToControlLetter();
+                    var ctrPrp = this.Get_TxtPrControlLetter();
 
                     var Font =
                     {
@@ -498,12 +486,6 @@ CMathBase.prototype =
 
             this.RecalcInfo.bCtrPrp = false;
         }
-    },
-    Get_TxtPrControlLetter: function(RPI) // TextPrControlLetter не копируются !
-    {
-        this.Set_CompiledCtrPrp(this.Parent, this.ParaMath, RPI);
-
-        return this.TextPrControlLetter;
     },
     getAscent: function(oMeasure, _height)
     {
@@ -739,12 +721,18 @@ CMathBase.prototype =
         }
 
 
-        // если у нас вложенный мат объект, то CtrPrp возьмутся у родительского класса
+        // нужно пройтись по всем элементам  и вложенным формулам в том числе, чтобы пересчитать ctrPrp у всех мат объектов
+        // для некоторых формул (например, для итератора в Limit) важно учесть собственные настройки (ArgSize), а не только родительские, поэтому и нужно профтись по всем inline-формулам
 
-        for(var i = 0 ; i < this.Content.length; i++)
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+
+        /*for(var i = 0 ; i < this.Content.length; i++)
         {
             this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }
+        }*/
 
     },
     GetMathTextPrForMenu: function(ContentPos, Depth)

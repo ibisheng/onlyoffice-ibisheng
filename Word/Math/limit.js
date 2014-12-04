@@ -88,7 +88,7 @@ CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
     if(this.Type == LIMIT_LOW)
         this.dH = 0;
     else
-        this.dH = 0.06*this.GetTPrpToControlLetter().FontSize;
+        this.dH = 0.06*this.Get_TxtPrControlLetter().FontSize;
 
     this.FName.Resize(oMeasure, RPI);
 
@@ -218,7 +218,7 @@ CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 };
 CMathFunc.prototype.setDistance = function()
 {
-    this.dW = this.GetTPrpToControlLetter().FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.Get_TxtPrControlLetter().FontSize/6*g_dKoef_pt_to_mm;
 };
 CMathFunc.prototype.getFName = function()
 {

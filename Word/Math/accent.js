@@ -22,7 +22,7 @@ function CAccentCircumflex()
 Asc.extendClass(CAccentCircumflex, CGlyphOperator);
 CAccentCircumflex.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.GetTPrpToControlLetter().FontSize/36;
+    var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
 
     var width = 3.88*alpha;
     var height = 3.175*alpha;
@@ -40,7 +40,7 @@ CAccentCircumflex.prototype.calcSize = function(stretch)
 }
 CAccentCircumflex.prototype.calcCoord = function(stretch)
 {
-    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
+    var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
     //var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
@@ -126,7 +126,7 @@ function CAccentLine()
 Asc.extendClass(CAccentLine, CGlyphOperator);
 CAccentLine.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.GetTPrpToControlLetter().FontSize/36;
+    var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
 
     var height = 1.68*alpha;
     var width  = 4.938*alpha;
@@ -137,7 +137,7 @@ CAccentLine.prototype.calcSize = function(stretch)
 }
 CAccentLine.prototype.draw = function(x, y, pGraphics)
 {
-    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
+    var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
 
     var penW = fontSize*0.067 * 25.4/96;
     var x1 = x + 25.4/96,
@@ -156,7 +156,7 @@ function CAccentDoubleLine()
 Asc.extendClass(CAccentDoubleLine, CGlyphOperator);
 CAccentDoubleLine.prototype.calcSize = function(stretch)
 {
-    var alpha = this.Parent.GetTPrpToControlLetter().FontSize/36;
+    var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
 
     var height = 2.843*alpha;
     var width  = 4.938*alpha;
@@ -177,7 +177,7 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
 }
 CAccentDoubleLine.prototype.draw = function(x, y, pGraphics)
 {
-    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
+    var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
 
     var diff = this.diff;
 
@@ -204,7 +204,7 @@ function CAccentTilde()
 Asc.extendClass(CAccentTilde, CGlyphOperator);
 CAccentTilde.prototype.calcSize = function(stretch)
 {
-    var betta = this.Parent.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Parent.Get_TxtPrControlLetter().FontSize/36;
 
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
@@ -257,7 +257,7 @@ CAccentTilde.prototype.calcCoord = function(stretch)
     var XX = [],
         YY = [];
 
-    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
+    var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -304,7 +304,7 @@ function CAccentBreve()
 Asc.extendClass(CAccentBreve, CGlyphOperator);
 CAccentBreve.prototype.calcSize = function(stretch)
 {
-    var betta = this.Parent.GetTPrpToControlLetter().FontSize/36;
+    var betta = this.Parent.Get_TxtPrControlLetter().FontSize/36;
 
     var width =  4.2333333333333325*betta;
     var height = 2.469444444444445*betta;
@@ -344,7 +344,7 @@ CAccentBreve.prototype.calcCoord = function(stretch)
     var XX = [],
         YY = [];
 
-    var fontSize = this.Parent.GetTPrpToControlLetter().FontSize;
+    var fontSize = this.Parent.Get_TxtPrControlLetter().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 

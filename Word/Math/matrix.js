@@ -248,7 +248,7 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
         this.RecalcInfo.bProps = false;
     }
 
-    var FontSize = this.GetTPrpToControlLetter().FontSize;
+    var FontSize = this.Get_TxtPrControlLetter().FontSize;
     var metrics = this.getMetrics();
 
     if(this.nCol > 1)

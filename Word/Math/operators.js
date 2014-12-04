@@ -401,7 +401,7 @@ CGlyphOperator.prototype.drawOnlyLines = function(x, y, pGraphics, PDSE)
 }
 CGlyphOperator.prototype.getCtrPrp = function()
 {
-    return this.Parent.GetTPrpToControlLetter();
+    return this.Parent.Get_TxtPrControlLetter();
 }
 CGlyphOperator.prototype.PreRecalc = function(Parent)
 {
@@ -2943,7 +2943,7 @@ COperator.prototype.draw = function(x, y, pGraphics, PDSE)
 
         this.Make_ShdColor(PDSE);
 
-        var ctrPrp =  this.GetTPrpToControlLetter();
+        var ctrPrp =  this.Get_TxtPrControlLetter();
 
         var Font =
         {
@@ -3035,7 +3035,7 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
         var width, height, ascent;
         var dims;
 
-        var ctrPrp =  this.GetTPrpToControlLetter();
+        var ctrPrp =  this.Get_TxtPrControlLetter();
 
         var Font =
         {
@@ -3108,7 +3108,7 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
 
         // Ascent
 
-        var mgCtrPrp = this.Parent.GetTPrpToControlLetter();
+        var mgCtrPrp = this.Parent.Get_TxtPrControlLetter();
         var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
         if(!bLine && (this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT))
@@ -3193,9 +3193,9 @@ COperator.prototype.PreRecalc = function(Parent, ParaMath)
     if(this.typeOper !== OPERATOR_EMPTY)
         this.operator.PreRecalc(this); // в данном случае mathText нужен только один параметр
 }
-COperator.prototype.GetTPrpToControlLetter = function()
+COperator.prototype.Get_TxtPrControlLetter = function()
 {
-    return this.Parent.GetTPrpToControlLetter();
+    return this.Parent.Get_TxtPrControlLetter();
 }
 COperator.prototype.getChr = function()
 {
@@ -3514,7 +3514,7 @@ CDelimiter.prototype.Resize = function(oMeasure, RPI)
 
     heightG = ascentG + descentG;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
 
@@ -3820,7 +3820,7 @@ CCharacter.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     this.elements[0][0].draw(x, y, pGraphics, PDSE);
 
-    var ctrPrp =  this.GetTPrpToControlLetter();
+    var ctrPrp =  this.Get_TxtPrControlLetter();
 
     var Font =
     {
@@ -4025,7 +4025,7 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 
     //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
 
-    var ctrPrp = this.GetTPrpToControlLetter();
+    var ctrPrp = this.Get_TxtPrControlLetter();
     var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
 
     if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)

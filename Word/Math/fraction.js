@@ -71,7 +71,7 @@ CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics, PDSE)
 {
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 
@@ -95,7 +95,7 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics, PDSE)
 }
 CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics, PDSE)
 {
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
@@ -199,7 +199,7 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics, PDSE)
         x2 = X + this.elements[0][0].size.width + shift,
         y2 = Y + this.size.height;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
     pGraphics.SetFont(mgCtrPrp);
@@ -298,7 +298,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
@@ -310,7 +310,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
 }
 CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     //this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
     this.dW = 5.011235894097222 * mgCtrPrp.FontSize/36;
@@ -331,7 +331,7 @@ CFraction.prototype.recalculateLinear = function()
 
     var H = AscentFirst + DescentSecond;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var gap = 5.011235894097222*mgCtrPrp.FontSize/36;
 
@@ -458,7 +458,7 @@ CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var Descent = arg.height - arg.ascent; // baseLine
 
@@ -510,7 +510,7 @@ CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36;
 

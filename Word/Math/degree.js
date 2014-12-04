@@ -106,7 +106,7 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     this.upBase = 0;
@@ -157,7 +157,7 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
-    var mgCtrPrp = this.GetTPrpToControlLetter();
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var width = base.width + iter.width + this.dW;
@@ -437,7 +437,7 @@ CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI,
 };
 CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
-    //var mgCtrPrp = this.GetTPrpToControlLetter();
+    //var mgCtrPrp = this.Get_TxtPrControlLetter();
 
     var mgCtrPrp = this.Get_CompiledCtrPrp(); // Get_CompiledCtrPrp -  чтобы итераторы не разъезжались
                                               // половину ascent брать нельзя, т.к. черта дроби будет разделительной для верхнего и нижнего итератора => соответственно
@@ -468,7 +468,7 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
     //var lUp    = base.size.height/2; // center of base
     var lDown  = base.size.height - lUp; // height - center of base
 
-    var ctrPrpIter = iters.GetTPrpToControlLetter();
+    var ctrPrpIter = iters.Get_TxtPrControlLetter();
     var shIter = this.ParaMath.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
 
     var minGap =  0.7*shIter;
