@@ -7302,7 +7302,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         var oThis = this;
         if ( c_oSerParType.Par === type )
         {
-			if(null != this.openParams)
+			if(null != this.openParams && true == this.openParams.checkFileSize)
 			{
 				this.openParams.parCount += 1;
 				if(this.openParams.parCount >= g_nErrorParagraphCount)
