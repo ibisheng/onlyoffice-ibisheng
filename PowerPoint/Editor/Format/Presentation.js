@@ -946,6 +946,16 @@ CPresentation.prototype =
         return this.Slides[this.CurPage].graphicObjects.getChartObject(type);
     },
 
+    Check_GraphicFrameRowHeight: function(grFrame)
+    {
+        grFrame.recalculate();
+        var content = grFrame.graphicObject.Content, i;
+        for(i = 0; i < content.length; ++i)
+        {
+            content[i].Set_Height(content[i].Height, heightrule_AtLeast );
+        }
+    },
+
     Add_FlowTable : function(Cols, Rows)
     {
         if(!this.Slides[this.CurPage])
@@ -957,8 +967,10 @@ CPresentation.prototype =
         {
             this.Slides[this.CurPage].graphicObjects.resetSelection();
             this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, this.CurPage);
+            this.Check_GraphicFrameRowHeight(graphic_frame);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
             this.Recalculate();
+
             this.Document_UpdateInterfaceState();
         }
         else
@@ -2966,6 +2978,10 @@ CPresentation.prototype =
                         }
                     }
                     Content.Drawings[i].Drawing.setParent2(this.Slides[this.CurPage]);
+                    if(Content.Drawings[i].Drawing.getObjectType() === historyitem_type_GraphicFrame)
+                    {
+                        this.Check_GraphicFrameRowHeight(Content.Drawings[i].Drawing);
+                    }
                     Content.Drawings[i].Drawing.addToDrawingObjects();
                     this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, this.CurPage);
                 }
@@ -3354,21 +3370,21 @@ CPresentation.prototype =
     addNextSlide: function(layoutIndex)
     {
         History.Create_NewPoint();
-        var  new_slide, layout;
+        var  new_slide, layout, i, _ph_type, sp;
         if(this.Slides[this.CurPage])
         {
             var cur_slide = this.Slides[this.CurPage];
 
             layout = isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout.Master.getMatchingLayout(cur_slide.Layout.type, cur_slide.Layout.matchingName, cur_slide.Layout.cSld.name);
             new_slide = new Slide(this, layout, this.CurPage + 1);
-            for(var i = 0; i < layout.cSld.spTree.length; ++i)
+            for(i = 0; i < layout.cSld.spTree.length; ++i)
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
                 {
-                    var _ph_type = layout.cSld.spTree[i].getPhType();
+                    _ph_type = layout.cSld.spTree[i].getPhType();
                     if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                     {
-                        var sp = layout.cSld.spTree[i].copy();
+                        sp = layout.cSld.spTree[i].copy();
                         sp.setParent(new_slide);
                         sp.clearContent && sp.clearContent();
                         new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
@@ -3379,7 +3395,7 @@ CPresentation.prototype =
             new_slide.setSlideSize(this.Width, this.Height);
             this.insertSlide(this.CurPage+1,  new_slide);
 
-            for(var i = this.CurPage + 2; i < this.Slides.length; ++i)
+            for(i = this.CurPage + 2; i < this.Slides.length; ++i)
             {
                 this.Slides[i].setSlideNum(i);
             }
@@ -3393,14 +3409,14 @@ CPresentation.prototype =
 
 
             new_slide = new Slide(this, layout, this.CurPage + 1);
-            for(var i = 0; i < layout.cSld.spTree.length; ++i)
+            for(i = 0; i < layout.cSld.spTree.length; ++i)
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
                 {
-                    var _ph_type = layout.cSld.spTree[i].getPhType();
+                    _ph_type = layout.cSld.spTree[i].getPhType();
                     if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                     {
-                        var sp = layout.cSld.spTree[i].copy();
+                        sp = layout.cSld.spTree[i].copy();
                         sp.setParent(new_slide);
                         sp.clearContent && sp.clearContent();
                         new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
