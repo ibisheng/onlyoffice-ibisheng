@@ -2935,7 +2935,7 @@ CPresentation.prototype =
         var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray(), i;
         if(Content.SlideObjects.length > 0)
         {
-            var las_slide_index = selected_slides[selected_slides.length-1];
+            var las_slide_index = selected_slides.length > 0 ? selected_slides[selected_slides.length-1] : -1;
 
             this.needSelectPages.length = 0;
             for(i = 0; i < Content.SlideObjects.length; ++i)
