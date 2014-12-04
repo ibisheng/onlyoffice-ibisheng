@@ -3637,7 +3637,7 @@ PasteProcessor.prototype =
 								var presentationSelectedContent = new PresentationSelectedContent();
 								presentationSelectedContent.SlideObjects = slideCopyObjects;
 								presentation.Insert_Content(presentationSelectedContent);
-								
+                                presentation.Recalculate();
 								
 								
 								/*if(false == oThis.bNested)
