@@ -975,18 +975,16 @@ CGraphicFrame.prototype =
     {
         return this.parent.num;
     },
-    Get_PageContentStartPos: function()
+    Get_PageContentStartPos: function(PageNum)
     {
-        if(this.parent.kind == SLIDE_KIND)
-        {
-            return this.parent.Layout.Master.presentation.Get_PageContentStartPos( this.parent.num );
-        }
+        var presentation = editor.WordControl.m_oLogicDocument;
         return {
-            X : this.pH+this.ext.cx,
-            XLimit: this.ext.cx,
-            Y : this.pV+this.ext.cy,
-            YLimit : this.ext.cy,
-            MaxTopBorder : 0};
+            X : 0,
+            XLimit: presentation.Width,
+            Y : 0,
+            YLimit : presentation.Height,
+            MaxTopBorder : 0
+        };
 
 
     },
