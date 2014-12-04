@@ -774,6 +774,9 @@ CShapeDrawer.prototype =
         if (mode == "none" || this.bIsNoFillAttack)
             return;
 
+        if (this.Graphics.IsTrack)
+            this.Graphics.m_oOverlay.ClearAll = true;
+
         if (this.Graphics.IsSlideBoundsCheckerType === true)
             return;
 
@@ -1117,6 +1120,9 @@ CShapeDrawer.prototype =
     {
         if (this.bIsNoStrokeAttack)
             return;
+
+        if (this.Graphics.IsTrack)
+            this.Graphics.m_oOverlay.ClearAll = true;
 
         if (null != this.OldLineJoin && !this.IsArrowsDrawing)
         {
