@@ -10883,7 +10883,7 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    Write.WriteBool(false);
+                    Writer.WriteBool(false);
                 }
 
                 break;
