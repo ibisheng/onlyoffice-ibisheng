@@ -954,6 +954,10 @@ Slide.prototype =
 
     recalculate: function()
     {
+        if(!this.Layout || !isRealNumber(this.num))
+        {
+            return;
+        }
         if(this.recalcInfo.recalculateBackground)
         {
             this.recalculateBackground();
