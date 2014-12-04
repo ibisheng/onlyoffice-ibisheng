@@ -7104,7 +7104,10 @@ function BinaryPPTYLoader()
                                     {
                                         hyperlink = new ParaHyperlink();
                                         hyperlink.Set_Value(_run.hlink.url);
-                                        _run.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                                        if(!_run.Unifill)
+                                        {
+                                            _run.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                                        }
                                         _run.Underline = true;
                                     }
                                     text_pr.Set_FromObject(_run);

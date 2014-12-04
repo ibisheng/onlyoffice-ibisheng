@@ -2252,7 +2252,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
 {
     var _unifill = new CUniFill();
     _unifill.fill = new CSolidFill();
-    _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color);
+    _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color, 0);
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
     this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : _unifill } ) );
 }
