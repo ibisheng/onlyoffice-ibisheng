@@ -262,23 +262,7 @@ CGroupShape.prototype =
         return getBoundsInGroup(this);
     },
 
-    getBase64Img: function ()
-    {
-        if(typeof this.cachedImage === "string")
-        {
-            return this.cachedImage;
-        }
-        var img_object = ShapeToImageConverter(this, this.pageIndex);
-        if(img_object)
-        {
-            return img_object.ImageUrl;
-        }
-        else
-        {
-
-            return "";
-        }
-    },
+    getBase64Img: CShape.prototype.getBase64Img,
 
     convertToWord: function(document)
     {

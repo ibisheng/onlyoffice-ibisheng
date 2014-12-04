@@ -2638,6 +2638,8 @@ CShape.prototype =
         {
             return this.cachedImage;
         }
+        if(!isRealNumber(this.x) || !isRealNumber(this.y) || !isRealNumber(this.extX) || !isRealNumber(this.extY))
+            return "";
         var img_object = ShapeToImageConverter(this, this.pageIndex);
         if(img_object)
         {
