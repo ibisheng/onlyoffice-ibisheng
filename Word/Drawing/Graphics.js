@@ -838,8 +838,15 @@ CGraphics.prototype =
         _t.ty = m.ty;
         this.CalculateFullTransform(isNeedInvert);
 
-        var _ft = this.m_oFullTransform;
-        this.m_oContext.setTransform(_ft.sx,_ft.shy,_ft.shx,_ft.sy,_ft.tx,_ft.ty);
+        if (!this.m_bIntegerGrid)
+        {
+            var _ft = this.m_oFullTransform;
+            this.m_oContext.setTransform(_ft.sx,_ft.shy,_ft.shx,_ft.sy,_ft.tx,_ft.ty);
+        }
+        else
+        {
+            this.SetIntegerGrid(false);
+        }
 
         // теперь трансформ выставляется ТОЛЬКО при загрузке шрифта. Здесь другого быть и не может
         /*
