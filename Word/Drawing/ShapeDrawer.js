@@ -1184,6 +1184,8 @@ CShapeDrawer.prototype =
             var dKoef = Math.sqrt(((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2);
             var _pen_w = (this.Graphics.IsTrack === true) ? (this.Graphics.Graphics.m_oContext.lineWidth * dKoef) : (this.Graphics.m_oContext.lineWidth * dKoef);
 
+            var _max_delta_eps2 = 0.001;
+
             if (this.Ln.headEnd != null)
             {
                 var _x1 = trans.TransformPointX(arr[0].x, arr[0].y);
@@ -1191,9 +1193,11 @@ CShapeDrawer.prototype =
                 var _x2 = trans.TransformPointX(arr[1].x, arr[1].y);
                 var _y2 = trans.TransformPointY(arr[1].x, arr[1].y);
 
+                var _max_delta_eps = Math.max(this.Ln.headEnd.GetLen(_pen_w), 5);
+
                 var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
                 var cur_point = 2;
-                while (_max_delta < 0.001 && cur_point < arr.length)
+                while (_max_delta < _max_delta_eps && cur_point < arr.length)
                 {
                     _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
                     _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
@@ -1201,7 +1205,7 @@ CShapeDrawer.prototype =
                     cur_point++;
                 }
 
-                if (_max_delta > 0.001)
+                if (_max_delta > _max_delta_eps2)
                 {
                     if (this.Graphics.IsTrack)
                     {
@@ -1226,9 +1230,11 @@ CShapeDrawer.prototype =
                 var _x2 = trans.TransformPointX(arr[_2].x, arr[_2].y);
                 var _y2 = trans.TransformPointY(arr[_2].x, arr[_2].y);
 
+                var _max_delta_eps = Math.max(this.Ln.tailEnd.GetLen(_pen_w), 5);
+
                 var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
                 var cur_point = _2 - 1;
-                while (_max_delta < 0.001 && cur_point >= 0)
+                while (_max_delta < _max_delta_eps && cur_point >= 0)
                 {
                     _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
                     _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
@@ -1236,7 +1242,7 @@ CShapeDrawer.prototype =
                     cur_point--;
                 }
 
-                if (_max_delta > 0.001)
+                if (_max_delta > _max_delta_eps2)
                 {
                     if (this.Graphics.IsTrack)
                     {
