@@ -910,7 +910,8 @@ function BinaryPPTYLoader()
                 {
                     var _id = s.GetString2();
                    // _style.Id = _id;
-                    this.presentation.TableStylesIdMap[_style.Id] = true;
+					if(this.presentation.TableStylesIdMa)
+						this.presentation.TableStylesIdMap[_style.Id] = true;
                     this.map_table_styles[_id] = _style;
                     break;
                 }
@@ -1085,7 +1086,8 @@ function BinaryPPTYLoader()
             _style.TablePr.TableBorders.Right = _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
             delete _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
         }
-        this.presentation.globalTableStyles.Add(_style);
+		if(this.presentation.globalTableStyles)
+			this.presentation.globalTableStyles.Add(_style);
     };
 
     this.ReadTableStylePart = function()

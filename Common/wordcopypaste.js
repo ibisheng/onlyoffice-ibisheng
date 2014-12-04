@@ -770,7 +770,7 @@ CopyProcessor.prototype =
 					if(g_bIsDocumentCopyPaste)
 						oStyle = this.parse_para_TextPr(item.Get_CompiledTextPr());
 					else
-						oStyle = this.parse_para_TextPr(item.Pr);
+						oStyle = this.parse_para_TextPr(item.Get_CompiledTextPr());
 					
                     if (oStyle && oStyle.style)
                         sRes += " style=\"" + oStyle.style + "\"";
@@ -1048,7 +1048,17 @@ CopyProcessor.prototype =
         if(rowspan > 1)
             tc.setAttribute("rowspan", rowspan);
         var cellPr = null;
-        if(null != cell.CompiledPr && null != cell.CompiledPr.Pr)
+		
+		var tablePr = null;
+        if(!g_bIsDocumentCopyPaste && editor.WordControl.m_oLogicDocument && null != cell.CompiledPr && null != cell.CompiledPr.Pr)
+		{
+			var presentation = editor.WordControl.m_oLogicDocument;
+			var curSlide = presentation.Slides[presentation.CurPage];
+			if(presentation && curSlide && curSlide.Layout && curSlide.Layout.Master && curSlide.Layout.Master.Theme)
+				checkTableCellPr(cell.CompiledPr.Pr, curSlide, curSlide.Layout, curSlide.Layout.Master, curSlide.Layout.Master.Theme);	
+		}
+		
+		if(null != cell.CompiledPr && null != cell.CompiledPr.Pr)
         {
             cellPr = cell.CompiledPr.Pr;
             //��� ������ � �������� ����� ������������ margin � �� colspan
@@ -1692,6 +1702,22 @@ CopyProcessor.prototype =
 					}
 				}
 			}
+			else if(elementsContent && elementsContent.length)
+			{
+				for ( var Index = 0; Index < elementsContent.length; Index++ )
+				{
+					var Item = elementsContent[Index];
+					
+					if( type_Table === Item.GetType() )
+					{
+						this.CopyTable(oDomTarget, Item, null);
+					}
+					else if ( type_Paragraph === Item.GetType() )
+					{
+						this.CopyParagraph(oDomTarget, Item, true, false);
+					}
+				}
+			}
 			
 		}
 		
@@ -1826,12 +1852,21 @@ CopyProcessor.prototype =
 			var table_styles_ids = [];
             var sp_tree = slide.cSld.spTree;
 			
+
+			for(var i = 0; i < sp_tree.length; i++)
+			{
+				if(sp_tree[i] instanceof CGraphicFrame && sp_tree[i].graphicObject)
+				{
+					table_styles_ids[table_styles_ids.length] = sp_tree[i].graphicObject.Get_TableStyle();
+				}
+			}
+			
             //записываем table_styles_ids
 			this.oPresentationWriter.WriteULong(table_styles_ids.length);
             for(var i = 0; i < table_styles_ids.length; ++i)
             {
-                this.oPresentationWriter.WriteBool(isRealNumber(table_styles_ids[i]) && table_styles_ids[i] > -1)
-                if(isRealNumber(table_styles_ids[i]) && table_styles_ids[i] > -1)
+                this.oPresentationWriter.WriteBool(table_styles_ids[i] !== null);
+                if(table_styles_ids[i] !== null)
                 {
                     this.oPresentationWriter.WriteULong(table_styles_ids[i]);
                 }
@@ -2018,26 +2053,32 @@ CopyProcessor.prototype =
         var oRowElems = {};
         var Item = graphicFrame.graphicObject;
 		
-        /*var b_style_index = false;
-        if(isRealNumber(graphicFrame.graphicObject.styleIndex) && graphicFrame.graphicObject.styleIndex > -1)
+        var b_style_index = false;
+        if(Item.TableStyle)
         {
             b_style_index = true;
         }
+		
+		var presentation = editor.WordControl.m_oLogicDocument;
+		for(var key in presentation.TableStylesIdMap)
+        {
+            if(presentation.TableStylesIdMap.hasOwnProperty(key))
+            {
+                this.oPresentationWriter.tableStylesGuides[key] = "{" + GUID() + "}"
+            }
+        }
 
-        this.oPresentationWriter.WriteBool(b_style_index);
+		
+        this.oPresentationWriter.WriteBool(!b_style_index);
         if(b_style_index)
         {
-            this.oPresentationWriter.WriteULong(graphicFrame.graphicObject.styleIndex);
+            var tableStyle = presentation.globalTableStyles.Style[Item.TableStyle];
+			this.oPresentationWriter.WriteBool(true);
+			this.oPresentationWriter.WriteTableStyle(Item.TableStyle, tableStyle);
+			this.oPresentationWriter.WriteBool(true);
+			this.oPresentationWriter.WriteString2(Item.TableStyle);
         }
-        var old_style_index = graphicFrame.graphicObject.styleIndex;*/
-
-		//graphicFrame.graphicObject.styleIndex = -1;
-		
-		this.oPresentationWriter.WriteBool(true);
         this.oPresentationWriter.WriteTable(graphicFrame);
-		
-        //graphicFrame.graphicObject.styleIndex = old_style_index;
-        //this.oBinaryFileWriter.copyParams.itemCount = 0;
 		
 		this.CopyTable(oDomTarget, Item, null);   
     },
@@ -3199,8 +3240,20 @@ PasteProcessor.prototype =
 						}
 						case "Drawings":
                         {
+							//TODO пересмотреть отключение истории!!!
+							History.TurnOff();
 							var objects = this.ReadPresentationShapes(stream);
+							History.TurnOn();
+							
                             var arr_shapes = objects.arrShapes;
+							//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
+							if(!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] && objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject)
+							{
+								var drawing = objects.arrShapes[0].Drawing;
+								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
+									break;
+							}
+							
 							var aContent = oThis._convertExcelBinary(null, arr_shapes);
 							this.aContent = aContent.content;
 							
@@ -3481,7 +3534,7 @@ PasteProcessor.prototype =
                                 {
                                     if(sp_tree[s] instanceof CGraphicFrame)
                                     {
-                                        sp_tree[s].graphicObject.setStyleIndex(table_style_ids[t]);
+                                        sp_tree[s].graphicObject.Set_TableStyle(table_style_ids[t]);
                                         ++t;
                                     }
                                 }
@@ -4246,7 +4299,7 @@ PasteProcessor.prototype =
 		//пока только распознаём только графические объекты
 		var aContent = null, tempParagraph = null;
 		var aPastedImages = [];
-		var imageUrl, images = [];
+		var imageUrl, images = [], isGraphicFrame, extX, extY;
 		
 		var drawings = pDrawings ? pDrawings : aContentExcel.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
@@ -4264,12 +4317,37 @@ PasteProcessor.prototype =
 				drawing = drawings[i] && drawings[i].Drawing ? drawings[i].Drawing : drawings[i];
 				
 				//TODO нужна отдельная обработка для таблиц из презентаций
-				if(typeof CTable !== "undefined" && drawing.graphicObject instanceof CTable)
+				isGraphicFrame = typeof CTable !== "undefined" && drawing.graphicObject instanceof CTable;
+				if(isGraphicFrame && drawings.length > 1 && drawings[i].base64)//если кроме таблички(при вставке из презентаций) содержатся ещё данные, вставляем в виде base64
 				{
-					drawing.graphicObject.Set_Parent(this.oDocument);
+					if(!tempParagraph)
+						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+					
+					extX = drawings[i].ExtX;
+					extY = drawings[i].ExtY;
+					imageUrl = drawings[i].base64;
+					
+					graphicObj = DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, extX, extY);	
+					
+					tempParaRun = new ParaRun();
+					tempParaRun.Paragraph = null;
+					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
+
+					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
+					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+					
+					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
+					
+					aPastedImages[aPastedImages.length] = new CBuilderImages(graphicObj.blipFill, imageUrl);
+					images[images.length] = imageUrl;
+				}
+				else if(isGraphicFrame)
+				{
                     drawing.setBDeleted(true);
                     drawing.setWordFlag(false);
-					aContent[aContent.length] = drawing.graphicObject.Copy();
+					var copyObj = drawing.graphicObject.Copy();
+					copyObj.Set_Parent(this.oDocument);
+					aContent[aContent.length] = copyObj;
                     drawing.setWordFlag(true);
 				}
 				else
@@ -4277,14 +4355,20 @@ PasteProcessor.prototype =
 					if(!tempParagraph)
 						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
 					
+					extX = drawings[i].ExtX;
+					extY = drawings[i].ExtY;
+					
 					graphicObj = drawing.graphicObject ? drawing.graphicObject.convertToWord(this.oLogicDocument) : drawing.convertToWord(this.oLogicDocument) ;
-				
+					
+					/*graphicObj.spPr.setXfrm(new CXfrm());
+					if(extX)
+						graphicObj.spPr.xfrm.setExtX(extX);
+					if(extY)
+						graphicObj.spPr.xfrm.setExtY(extY);*/
+					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
-					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );//tempParaRun.Content.unshift(new ParaDrawing());
-
-					//paraRun.Content[index].wrappingType = wrappingType;
-					//paraRun.Content[index].DrawingType = DrawingType;
+					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
 					
 					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
 					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
@@ -4479,16 +4563,31 @@ PasteProcessor.prototype =
         var count = stream.GetULong();
         var arr_shapes = [];
         var arr_transforms = [];
+		var cStyle;
 		
         for(var i = 0; i < count; ++i)
         {
             loader.TempMainObject = presentation && presentation.Slides ? presentation.Slides[presentation.CurPage] : presentation;
             var style_index = null;
+			
+			//читаем флаг о наличии табличного стиля
             if(!loader.stream.GetBool())
             {
                 if(loader.stream.GetBool())
                 {
-                    style_index = stream.GetULong();
+					//в случае если вставляем в презентации, пропускаем
+					if(!g_bIsDocumentCopyPaste)
+					{
+						loader.stream.Skip2(1);
+						loader.stream.SkipRecord();
+					}
+					else
+					{
+						loader.stream.Skip2(1);
+						cStyle = loader.ReadTableStyle();
+					}
+					loader.stream.GetBool();
+					style_index = stream.GetString2();
                 }
             }
             
@@ -4510,6 +4609,19 @@ PasteProcessor.prototype =
 			arr_shapes[i].Y = y;
 			arr_shapes[i].ExtX = extX;
 			arr_shapes[i].ExtY = extY;
+			if(!presentation.Slides)
+				arr_shapes[i].base64 = base64;
+			
+			if(style_index != null && arr_shapes[i].Drawing.graphicObject && arr_shapes[i].Drawing.graphicObject.Set_TableStyle)
+			{
+				if(!g_bIsDocumentCopyPaste)
+					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index);
+				else if(cStyle)
+				{
+					//пока не применяем стили, посольку они отличаются
+					//this._applyStylesToTable(arr_shapes[i].Drawing.graphicObject, cStyle);
+				}
+			}
         }
 
         return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
@@ -7284,7 +7396,33 @@ PasteProcessor.prototype =
         {
             arrTables.push(arrTables2[i]);
         }
-    }
+    },
+	
+	_applyStylesToTable: function(cTable, cStyle)
+	{
+		if(!cTable || !cStyle || (cTable && !cTable.Content))
+			return;
+		
+		
+		var row, tableCell;
+		for(var i = 0; i < cTable.Content.length; i++)
+		{	
+			row = cTable.Content[i];
+			
+			for(var j = 0; j < row.Content.length; j++)
+			{
+				tableCell = row.Content[j];
+				//пока не заливаю функцию Internal_Compile_Pr(находится в table.js + правки)
+				var test = this.Internal_Compile_Pr(cTable, cStyle, tableCell);
+				tableCell.Set_Pr(test.CellPr);
+				
+				//проверка цвета
+				/*cStyle.TableFirstRow.TableCellPr.Shd.Unifill.check(cTable.Get_Theme(), cTable.Get_ColorMap());
+				var RGBA = cStyle.TableFirstRow.TableCellPr.Shd.Unifill.getRGBAColor();
+				var theme = cTable.Get_Theme();*/
+			}
+		}
+	}
 };
 
 function SafariIntervalFocus()

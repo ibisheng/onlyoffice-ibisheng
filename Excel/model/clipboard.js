@@ -1781,6 +1781,15 @@
                         case "Drawings":
                         {
                             var objects = this.ReadPresentationShapes(stream, worksheet);
+							
+							//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
+							if(!objects.arrImages.length && objects.arrShapes.length === 1)
+							{
+								var drawing = objects.arrShapes[0].graphicObject;
+								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
+									return false;
+							}
+							
                             var arr_shapes = objects.arrShapes;
 							if(arr_shapes && arr_shapes.length)
 							{
@@ -1815,20 +1824,24 @@
 				var arr_shapes = [];
 				var arr_transforms = [];
 				var arrBase64Img = [];
+				var cStyle;
 				
 				for(var i = 0; i < count; ++i)
 				{
 					//loader.TempMainObject = presentation.Slides[presentation.CurPage];
-					/*var style_index = null;
+					var style_index = null;
+					//читаем флаг о наличии табличного стиля
 					if(!loader.stream.GetBool())
 					{
 						if(loader.stream.GetBool())
 						{
-							style_index = stream.GetULong();
+							loader.stream.Skip2(1);
+							cStyle = loader.ReadTableStyle();
+	
+							loader.stream.GetBool();
+							style_index = stream.GetString2();
 						}
-					}*/
-					
-					loader.stream.GetBool();
+					}
 					
 					var drawing = loader.ReadGraphicObject();
 					
