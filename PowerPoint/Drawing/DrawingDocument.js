@@ -5169,10 +5169,10 @@ function CSlideDrawer()
             g.m_oFontManager = g_fontManager;
 
             if (this.m_oWordControl.bIsRetinaSupport)
-                g.IsRetina = 2;
+                g.IsRetina = true;
 
-            g.m_oCoordTransform.tx = _x;
-            g.m_oCoordTransform.ty = _y;
+            g.m_oCoordTransform.tx = _x - _bounds.min_x;
+            g.m_oCoordTransform.ty = _y - _bounds.min_y;
             g.transform(1,0,0,1,0,0);
 
             if (this.m_oWordControl.m_oApi.isViewMode)
