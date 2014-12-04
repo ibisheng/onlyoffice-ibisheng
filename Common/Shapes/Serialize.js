@@ -5301,6 +5301,15 @@ function BinaryPPTYLoader()
                 {
                     _gridCol = row.Content[i].Pr.GridSpan;
                 }
+
+                if (_gridCol > (_count - i))
+                {
+                    _gridCol = _count - i;
+                    row.Content[i].Pr.GridSpan = _gridCol;
+                    if (1 == row.Content[i].Pr.GridSpan)
+                        row.Content[i].Pr.GridSpan = undefined;
+                }
+
                 _gridCol--;
                 while (_gridCol > 0)
                 {
