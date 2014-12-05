@@ -494,6 +494,27 @@ function CBinaryFileWriter()
         }
 
         var _dst_masters_len = _dst_masters.length;
+        if (0 == _dst_masters_len && presentation.slideMasters.length > 0)
+        {
+            var _m = presentation.slideMasters[0];
+
+            _dst_masters[0] = _m;
+
+            var _m_rels = { ThemeIndex : 0, Layouts : [] };
+            var _lay_c = _m.sldLayoutLst.length;
+
+            var _ind_l = _dst_layouts.length;
+            for (var k = 0; k < _lay_c; k++)
+            {
+                _dst_layouts[_ind_l] = _m.sldLayoutLst[k];
+                _m_rels.Layouts[k] = _ind_l;
+                _ind_l++;
+            }
+
+            _master_rels[0] = _m_rels;
+            _dst_masters_len = 1;
+        }
+
         for (var i = 0; i < _dst_masters_len; i++)
         {
             var _t = _dst_masters[i].Theme;
