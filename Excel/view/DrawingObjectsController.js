@@ -190,6 +190,7 @@ DrawingObjectsController.prototype.setTableProps = function(props)
             by_type.tables[0].graphicObject.Set_Props(props);
             by_type.tables[0].graphicObject.Selection_Remove();
         }
+        editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0]);
     }
 };
 
