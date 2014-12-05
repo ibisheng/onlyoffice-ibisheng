@@ -2146,10 +2146,9 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
             return;
         }
 
-        var _old_fill = null;
-        var _oldBg = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].cSld.Bg;
-        if (_oldBg != null && _oldBg.bgPr != null && _oldBg.bgPr.Fill != null)
-            _old_fill = _oldBg.bgPr.Fill.createDuplicate();
+        var _old_fill = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].backgroundFill;
+        if (isRealObject(_old_fill))
+            _old_fill = _old_fill.createDuplicate();
 
         var bg = new CBg();
         bg.bgPr = new CBgPr();
