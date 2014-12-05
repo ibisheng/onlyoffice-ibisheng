@@ -6783,7 +6783,7 @@ PasteProcessor.prototype =
 					if(!this.bIsPlainText)
 					{
 						var rPr = this._read_rPr(node);
-						var Item = new ParaText( rPr);
+						var Item = new ParaTextPr( rPr);
 						shape.paragraphAdd(Item);
 					}
                     for(var i = 0; i < nTabCount; i++)
@@ -6874,20 +6874,16 @@ PasteProcessor.prototype =
                     var title = child.getAttribute("title");
 
                     this.oDocument = shape.txBody.content;
-                   // bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
-                    var oHyperlink = new ParaHyperlinkStart();
-                    oHyperlink.Set_Value( href );
-                    if(null != title)
-                        oHyperlink.Set_ToolTip(title);
-                    shape.paragraphAdd( oHyperlink );
+
+					var Pos = ( true == this.oDocument.Selection.Use ? this.oDocument.Selection.StartPos : this.oDocument.CurPos.ContentPos );
+					var HyperProps = new CHyperlinkProperty({ Text: null, Value: href, ToolTip: title});
+					this.oDocument.Content[Pos].Hyperlink_Add( HyperProps );
                 }
             }
 
             bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
             if(bIsBlockChild)
                 bAddParagraph = true;
-            if("a" == sChildNodeName && true == bHyperlink)
-                shape.paragraphAdd( new ParaHyperlinkEnd() );
         }
         if(bRoot)
         {
