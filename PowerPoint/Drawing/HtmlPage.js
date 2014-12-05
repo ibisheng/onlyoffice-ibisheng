@@ -2615,11 +2615,13 @@ function CEditorPage(api)
         context.fillRect(0, 0, _width, _height);
         //context.clearRect(0, 0, _width, _height);
 
+        /*
         if (this.SlideDrawer.IsRecalculateSlide == true)
         {
             this.SlideDrawer.CheckSlide(this.m_oDrawingDocument.SlideCurrent);
             this.SlideDrawer.IsRecalculateSlide = false;
         }
+        */
 
         this.SlideDrawer.DrawSlide(context, this.m_dScrollX, this.m_dScrollX_max,
             this.m_dScrollY - this.SlideScrollMIN, this.m_dScrollY_max, this.m_oDrawingDocument.SlideCurrent);
@@ -3182,6 +3184,8 @@ function CEditorPage(api)
         this.StartVerticalScroll = false;
         this.m_oApi.asc_fireCallback("asc_onEndPaintSlideNum");
 
+        var _bIsUpdate = (drDoc.SlideCurrent != lPageNum);
+
         drDoc.SlideCurrent = lPageNum;
         this.m_oLogicDocument.Set_CurPage(lPageNum);
 
@@ -3240,7 +3244,7 @@ function CEditorPage(api)
 
         this.Thumbnails.LockMainObjType = false;
 
-        if (this.m_oDrawingDocument.IsEmptyPresentation != _old_empty)
+        if (this.m_oDrawingDocument.IsEmptyPresentation != _old_empty || _bIsUpdate)
             this.OnScroll();
     }
 

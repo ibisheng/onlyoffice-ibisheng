@@ -1127,9 +1127,14 @@ function CDrawingDocument()
         if (index == this.SlideCurrent)
         {
             this.m_oWordControl.Thumbnails.LockMainObjType = true;
-            //this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
-            this.m_oWordControl.SlideDrawer.IsRecalculateSlide = true;
+
+            // так как серега посылает по сто раз - делаем такую заглушку ---------------------
+
+            this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
             this.m_oWordControl.CalculateDocumentSize(false);
+            this.m_oWordControl.SlideDrawer.IsRecalculateSlide = true;
+            // --------------------------------------------------------------------------------
+
             this.m_oWordControl.OnScroll();
             this.m_oWordControl.Thumbnails.LockMainObjType = false;
         }
@@ -1654,9 +1659,12 @@ function CDrawingDocument()
         //this.m_oWordControl.OnScroll();
 
         this.m_oWordControl.Thumbnails.LockMainObjType = true;
-        //this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
-        this.m_oWordControl.SlideDrawer.IsRecalculateSlide = true;
+
+        // так как серега посылает по сто раз - делаем такую заглушку ---------------------
+        this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
         this.m_oWordControl.CalculateDocumentSize(false);
+        this.m_oWordControl.SlideDrawer.IsRecalculateSlide = true;
+        // --------------------------------------------------------------------------------
         this.m_oWordControl.OnScroll();
         this.m_oWordControl.Thumbnails.LockMainObjType = false;
     }
