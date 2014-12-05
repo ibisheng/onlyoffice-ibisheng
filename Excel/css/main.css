@@ -15,9 +15,11 @@
 
 #ws-canvas {
 	border: 0;
+    -webkit-user-select: none;
 }
 
 #ws-canvas-overlay, #ws-canvas-graphic, #ws-canvas-graphic-overlay {
+    -webkit-user-select: none;
 	border: 0;
 	position: absolute;
 	left: 0;
