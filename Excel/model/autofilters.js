@@ -1392,8 +1392,15 @@ var gUndoInsDelCellsFlag = true;
 						for(var j = 0; j < aWs.TableParts.length; j++)
 						{
 							if(this.changeFilters.TableParts[i].DisplayName == aWs.TableParts[j].DisplayName)
-							{
+							{	
+								if(aWs.TableParts[j].AutoFilter != null)
+									this._addButtonAF({result: aWs.TableParts[j].result,isVis: false});
+									
 								aWs.TableParts[j] = this.changeFilters.TableParts[i].filter;
+								
+								if(aWs.TableParts[j].AutoFilter != null)
+									this._addButtonAF({result: aWs.TableParts[j].result,isVis: true});
+								
 								break;
 							}
 						}
@@ -2077,7 +2084,8 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(cloneData.newFilterRef && cloneData.newFilterRef.isEqual(aWs.TableParts[l].Ref))
 							{
-								if(aWs.TableParts[l].AutoFilter != null)
+								var isIntersectionTableParts = this._isIntersectionTableParts(aWs.TableParts[l].Ref);
+								if(aWs.TableParts[l].AutoFilter != null && !isIntersectionTableParts)
 									this._addButtonAF({result: aWs.TableParts[l].result,isVis: false});
 									
 								aWs.TableParts[l] = cloneData.oldFilter;
@@ -2552,6 +2560,22 @@ var gUndoInsDelCellsFlag = true;
 				{
 					tablePart = tableParts[i];
 					if(tablePart && tablePart.Ref && tablePart.Ref.containsRange(activeRange) && !tablePart.Ref.isEqual(activeRange))
+						return true;
+				}
+				return false;
+			},
+			
+			_isIntersectionTableParts: function(range)
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				
+				var tableParts = aWs.TableParts;
+				var tablePart;
+				for(var i = 0; i < tableParts.length; i++)
+				{
+					tablePart = tableParts[i];
+					if(tablePart.Ref.intersection(range))
 						return true;
 				}
 				return false;
