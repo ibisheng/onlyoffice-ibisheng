@@ -208,6 +208,8 @@ function CEditorPage(api)
 
     this.DrawingFreeze = false;
 
+    this.ZoomFreePageNum = -1;
+
     this.m_bIsIE = AscBrowser.isIE;
 
     // сплиттеры (для табнейлов и для заметок)
@@ -799,6 +801,7 @@ function CEditorPage(api)
         var lCurPage = oWordControl.m_oDrawingDocument.SlideCurrent;
 
         this.GoToPage(lCurPage);
+        this.ZoomFreePageNum = lCurPage;
 
         if (-1 != lCurPage)
         {
@@ -809,6 +812,8 @@ function CEditorPage(api)
         }
         var lPosition = parseInt(dPosition * oWordControl.m_oScrollVerApi.getMaxScrolledY());
         oWordControl.m_oScrollVerApi.scrollToY(lPosition);
+
+        this.ZoomFreePageNum = -1;
 
         oWordControl.m_oApi.sync_zoomChangeCallback(this.m_nZoomValue, type);
         oWordControl.m_bIsUpdateTargetNoAttack = true;
@@ -2014,22 +2019,33 @@ function CEditorPage(api)
             }
 
             var lNumSlide = ((scrollPositionY / this.m_dDocumentPageHeight) + 0.01) >> 0; // 0.01 - ошибка округления!!
-            if (lNumSlide != this.m_oDrawingDocument.SlideCurrent)
-            {
-                if (this.IsGoToPageMAXPosition)
-                {
-                    if (lNumSlide >= this.m_oDrawingDocument.SlideCurrent)
-                        this.IsGoToPageMAXPosition = false;
-                }
+            var _can_change_slide = true;
+            if (-1 != this.ZoomFreePageNum && this.ZoomFreePageNum == this.m_oDrawingDocument.SlideCurrent)
+                _can_change_slide = false;
 
-                this.GoToPage(lNumSlide);
-                return;
-            }
-            else if (this.SlideScrollMAX < scrollPositionY)
+            if (_can_change_slide)
             {
-                this.IsGoToPageMAXPosition = false;
-                this.GoToPage(this.m_oDrawingDocument.SlideCurrent + 1);
-                return;
+                if (lNumSlide != this.m_oDrawingDocument.SlideCurrent)
+                {
+                    if (this.IsGoToPageMAXPosition)
+                    {
+                        if (lNumSlide >= this.m_oDrawingDocument.SlideCurrent)
+                            this.IsGoToPageMAXPosition = false;
+                    }
+
+                    this.GoToPage(lNumSlide);
+                    return;
+                }
+                else if (this.SlideScrollMAX < scrollPositionY)
+                {
+                    this.IsGoToPageMAXPosition = false;
+                    this.GoToPage(this.m_oDrawingDocument.SlideCurrent + 1);
+                    return;
+                }
+            }
+            else
+            {
+                this.GoToPage(this.ZoomFreePageNum);
             }
         }
         else
