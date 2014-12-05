@@ -2570,14 +2570,16 @@ var gUndoInsDelCellsFlag = true;
 					return;
 				
 				var filtersOp = indexFilter.split(':');
-                var currentFilter;
+                var currentFilter, ref;
 				if(filtersOp[0] == 'all')
 				{
 					currentFilter = aWs.AutoFilter;
+					ref = aWs.AutoFilter.Ref;
 				}
 				else
 				{
 					currentFilter = aWs.TableParts[filtersOp[0]];
+					ref = aWs.TableParts[filtersOp[0]].AutoFilter.Ref;
 				}
 				
 				//проходим от начала до конца диапазона данного фильтра
@@ -2589,7 +2591,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				var isMerged = startRange.hasMerged();
 				var startCell = this._idToRange(startIdCell);
-				if(isMerged && startCell.c1 != isMerged.c1)
+				if(isMerged && startCell.c1 != isMerged.c1 && ref && ref.containsRange(isMerged))
 				{
 					var endCell = this._idToRange(endIdCell);
 					var diff = startCell.c1 - isMerged.c1;
@@ -2713,7 +2715,7 @@ var gUndoInsDelCellsFlag = true;
 				if(newAcCells.c1 == (rangeStart.c1 + parseInt(filtersOp[1])))
 				{
 					var isMerged = cell.hasMerged();
-					if(isMerged)
+					if(isMerged && ref && ref.containsRange(isMerged))
 					{
 						var newCol = isMerged.c1 - rangeStart.c1;
 						filtersOp[1] = newCol;
@@ -2734,7 +2736,7 @@ var gUndoInsDelCellsFlag = true;
 					var newArray = [];
 					//если имеются мерженные области в заголовке то смещаем activeCells.c и curCellId на начало мерженной области
 					var isMerged = cell.hasMerged();
-					if(isMerged && activeCells.c1 != isMerged.c1)
+					if(isMerged && activeCells.c1 != isMerged.c1 && ref && ref.containsRange(isMerged))
 					{
 						activeCells.c1 = isMerged.c1;
 					}
@@ -4664,7 +4666,7 @@ var gUndoInsDelCellsFlag = true;
 					//если есть мерженные ячейки в головной строке
 					var cell = ws.model.getCell(new CellAddress(buttonId));
 					var isMerged = cell.hasMerged();
-					if(isMerged)
+					if(isMerged && ref && ref.containsRange(isMerged))
 					{
 						var range  = this._idToRange(buttonId);
 						range.c1 = isMerged.c1;
