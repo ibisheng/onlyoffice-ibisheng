@@ -3036,8 +3036,11 @@ CPresentation.prototype =
     {
         if(State.CurPage > -1)
             this.Slides[State.CurPage].graphicObjects.setSelectionState(State.slideSelection);
-        this.Set_CurPage(State.CurPage);
-        this.bGoToPage = true;
+        if(State.CurPage !== this.CurPage)
+            this.bGoToPage = true;
+        this.CurPage = State.CurPage;
+        //this.Set_CurPage(State.CurPage);
+
     },
 
     Undo : function(Data)
