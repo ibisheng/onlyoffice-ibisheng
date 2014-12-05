@@ -2148,7 +2148,7 @@ function CEditorPage(api)
         if (this.m_bIsHorScrollVisible)
         {
             if (this.m_oScrollHor_)
-                this.m_oScrollHor_.Repos(settings);//unbind("scrollhorizontal")
+                this.m_oScrollHor_.Repos(settings, true, undefined);//unbind("scrollhorizontal")
             else {
                 this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll",settings);
                 this.m_oScrollHor_.bind("scrollhorizontal",function(evt){

@@ -5017,6 +5017,9 @@ function CSlideDrawer()
     this.bIsEmptyPresentation = false;
     this.IsRecalculateSlide = false;
 
+    // TODO: максимальная ширина всех линий и запас под локи
+    this.SlideEps           = 20;
+
     this.CheckSlide = function(slideNum)
     {
         this.bIsEmptyPresentation = false;
@@ -5052,8 +5055,8 @@ function CSlideDrawer()
         this.m_oWordControl.CheckCalculateDocumentSize(this.BoundsChecker.Bounds);
 
         // теперь смотрим, используем ли кэш для скролла
-        var _need_pix_width     = this.BoundsChecker.Bounds.max_x - this.BoundsChecker.Bounds.min_x + 1;
-        var _need_pix_height    = this.BoundsChecker.Bounds.max_y - this.BoundsChecker.Bounds.min_y + 1;
+        var _need_pix_width     = this.BoundsChecker.Bounds.max_x - this.BoundsChecker.Bounds.min_x + 1 + 2 * this.SlideEps;
+        var _need_pix_height    = this.BoundsChecker.Bounds.max_y - this.BoundsChecker.Bounds.min_y + 1 + 2 * this.SlideEps;
 
         this.IsCached = false;
         if (4 *_need_pix_width * _need_pix_height < this.CONST_MAX_SLIDE_CACHE_SIZE)
@@ -5097,8 +5100,8 @@ function CSlideDrawer()
             if (this.m_oWordControl.bIsRetinaSupport)
                 g.IsRetina = true;
 
-            g.m_oCoordTransform.tx = -this.BoundsChecker.Bounds.min_x;
-            g.m_oCoordTransform.ty = -this.BoundsChecker.Bounds.min_y;
+            g.m_oCoordTransform.tx = -this.BoundsChecker.Bounds.min_x + this.SlideEps;
+            g.m_oCoordTransform.ty = -this.BoundsChecker.Bounds.min_y + this.SlideEps;
             g.transform(1,0,0,1,0,0);
 
             if (this.m_oWordControl.m_oApi.isViewMode)
@@ -5148,10 +5151,10 @@ function CSlideDrawer()
 
         if (this.IsCached)
         {
-            var w_px = _bounds.max_x - _bounds.min_x + 1;
-            var h_px = _bounds.max_y - _bounds.min_y + 1;
+            var w_px = _bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps;
+            var h_px = _bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps;
 
-            outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px >> 0, h_px >> 0, _x >> 0, _y >> 0, w_px >> 0, h_px >> 0);
+            outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px >> 0, h_px >> 0, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px >> 0, h_px >> 0);
         }
         else
         {
