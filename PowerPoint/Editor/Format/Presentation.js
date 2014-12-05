@@ -1544,9 +1544,13 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 9 && false === editor.isViewMode ) // Tab
         {
-            var graphicObjects = this.Slides[this.CurPage].graphicObjects;
-
-			bRetValue = true;
+            if(this.Slides[this.CurPage])
+            {
+                var graphicObjects = this.Slides[this.CurPage].graphicObjects;
+                graphicObjects. selectNextObject(!e.ShiftKey ? 1 : -1);
+                this.Document_UpdateInterfaceState();
+            }
+            bRetValue = true;
         }
         else if ( e.KeyCode == 13 && false === editor.isViewMode ) // Enter
         {
