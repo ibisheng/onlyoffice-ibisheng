@@ -6076,6 +6076,8 @@ Paragraph.prototype =
 
         var StartPage_abs = this.Get_StartPage_Absolute();
 
+        var StartPage = 0, EndPage = 0;
+        var _StartX = null, _StartY = null, _EndX = null, _EndY = null;
         if (true === this.Selection.Use)
         {
             var StartPos = this.Selection.StartPos;
@@ -6103,6 +6105,9 @@ Paragraph.prototype =
             StartLine = Math.min( Math.max( 0, StartLine ), LinesCount - 1 );
             EndLine   = Math.min( Math.max( 0, EndLine   ), LinesCount - 1 );
 
+            StartPage = this.private_GetPageByLine(StartLine);
+            EndPage   = this.private_GetPageByLine(EndLine);
+
             var PagesCount = this.Pages.length;
             var DrawSelection = new CParagraphDrawSelectionRange();
             DrawSelection.Draw = false;
@@ -6112,15 +6117,7 @@ Paragraph.prototype =
                 var Line = this.Lines[CurLine];
                 var RangesCount = Line.Ranges.length;
 
-                // Определим номер страницы
-                var CurPage = 0;
-                for (; CurPage < PagesCount; CurPage++ )
-                {
-                    if ( CurLine >= this.Pages[CurPage].StartLine && CurLine <= this.Pages[CurPage].EndLine )
-                        break;
-                }
-
-                CurPage = Math.min( PagesCount - 1, CurPage );
+                var CurPage = this.private_GetPageByLine(CurLine);
 
                 // Определяем позицию и высоту строки
                 DrawSelection.StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
@@ -6158,12 +6155,6 @@ Paragraph.prototype =
                     var StartY = DrawSelection.StartY;
                     var H      = DrawSelection.H;
 
-                    var StartX = DrawSelection.StartX;
-                    var W      = DrawSelection.W;
-
-                    var StartY = DrawSelection.StartY;
-                    var H      = DrawSelection.H;
-
                     if ( W > 0.001 )
                     {
                         X0 = StartX;
@@ -6177,17 +6168,26 @@ Paragraph.prototype =
 
                         EndRect = { X : StartX, Y : StartY, W : W, H : H, Page : Page };
                     }
+
+                    if (null === _StartX)
+                    {
+                        _StartX = StartX;
+                        _StartY = StartY;
+                    }
+
+                    _EndX = StartX;
+                    _EndY = StartY;
                 }
             }
         }
 
         if (null === BeginRect)
-            BeginRect = { X : this.X, Y : this.Y, W : 0, H : 0, Page : StartPage_abs };
+            BeginRect = {X : _StartX === null ? this.Pages[StartPage].X : _StartX, Y : _StartY === null ? this.Pages[StartPage].Y : _StartY, W : 0, H : 0, Page : StartPage_abs + StartPage};
 
         if (null === EndRect)
-            EndRect = { X : this.X, Y : this.Y, W : 0, H : 0, Page : StartPage_abs };
+            EndRect = {X : _EndX === null ? this.Pages[StartPage].X : _EndX, Y : _EndY === null ? this.Pages[StartPage].Y : _EndY, W : 0, H : 0, Page : StartPage_abs + EndPage};
 
-        return { Start : BeginRect, End : EndRect, Direction : this.Get_SelectionDirection() };
+        return {Start : BeginRect, End : EndRect, Direction : this.Get_SelectionDirection()};
     },
 
     Get_SelectionDirection : function()
@@ -12218,6 +12218,19 @@ Paragraph.prototype.private_RecalculateTextMetrics = function(TextMetrics)
         if (this.Content[Index].Recalculate_Measure2)
             this.Content[Index].Recalculate_Measure2(TextMetrics);
     }
+};
+
+Paragraph.prototype.private_GetPageByLine = function(CurLine)
+{
+    var CurPage = 0;
+    var PagesCount = this.Pages.length;
+    for (; CurPage < PagesCount; CurPage++)
+    {
+        if (CurLine >= this.Pages[CurPage].StartLine && CurLine <= this.Pages[CurPage].EndLine)
+            break;
+    }
+
+    return Math.min(PagesCount - 1, CurPage);
 };
 
 var pararecalc_0_All  = 0;

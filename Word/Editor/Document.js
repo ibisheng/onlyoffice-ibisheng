@@ -597,6 +597,8 @@ function CDocument(DrawingDocument)
     this.TurnOffRecalc          = false;
     this.TurnOffInterfaceEvents = false;
 
+    this.CheckEmptyElementsOnSelection = true; // При выделении проверять или нет пустой параграф в конце/начале выделения.
+
     this.Numbering = new CNumbering();
     this.Styles    = new CStyles();
 
@@ -8464,13 +8466,13 @@ CDocument.prototype =
         this.Content[ContentPos].Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
 
         // Проверяем, чтобы у нас в селект не попали элементы, в которых не выделено ничего
-        if ( true === this.Content[End].Selection_IsEmpty() )
+        if (true === this.Content[End].Selection_IsEmpty() && true === this.CheckEmptyElementsOnSelection)
         {
             this.Content[End].Selection_Remove();
             End--;
         }
 
-        if ( Start != End && true === this.Content[Start].Selection_IsEmpty() )
+        if (Start != End && true === this.Content[Start].Selection_IsEmpty() && true === this.CheckEmptyElementsOnSelection)
         {
             this.Content[Start].Selection_Remove();
             Start++;
@@ -14018,6 +14020,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
     var PageH = this.Pages[this.CurPage].Height;
 
     this.TurnOff_InterfaceEvents();
+    this.CheckEmptyElementsOnSelection = false;
 
     var Result = false;
     while (true)
@@ -14050,6 +14053,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
         }
     }
 
+    this.CheckEmptyElementsOnSelection = true;
     this.TurnOn_InterfaceEvents(true);
     return Result;
 };
@@ -14060,6 +14064,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
     var PageH = this.Pages[this.CurPage].Height;
 
     this.TurnOff_InterfaceEvents();
+    this.CheckEmptyElementsOnSelection = false;
 
     var Result = false;
     while (true)
@@ -14091,6 +14096,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
         }
     }
 
+    this.CheckEmptyElementsOnSelection = true;
     this.TurnOn_InterfaceEvents(true);
     return Result;
 };
