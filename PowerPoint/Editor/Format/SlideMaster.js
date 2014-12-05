@@ -58,7 +58,7 @@ MasterSlide.prototype =
 {
     addLayout: function(layout)
     {
-        this.sldLayoutLst.push(layout);
+        this.addToSldLayoutLstToPos(this.sldLayoutLst.length, layout);
     },
 
     getObjectType: function()

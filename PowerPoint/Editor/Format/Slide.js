@@ -90,7 +90,7 @@ Slide.prototype =
         }
         if(this.cSld.Bg)
         {
-            this.changeBackground(this.cSld.Bg.createFullCopy());
+            copy.changeBackground(this.cSld.Bg.createFullCopy());
         }
         for(i = 0; i < this.cSld.spTree.length; ++i)
         {
