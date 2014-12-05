@@ -252,6 +252,7 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
+            this.calculateSnapArrays();
             this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
             b_transform = true;

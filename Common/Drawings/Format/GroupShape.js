@@ -1442,6 +1442,13 @@ CGroupShape.prototype =
 
     calculateSnapArrays: function(snapArrayX, snapArrayY)
     {
+        if(!Array.isArray(snapArrayX) || !Array.isArray(snapArrayX))
+        {
+            snapArrayX = this.snapArrayX;
+            snapArrayY = this.snapArrayY;
+            snapArrayX.length = 0;
+            snapArrayY.length = 0;
+        }
         var sp;
         for(var i = 0; i < this.spTree.length; ++i)
         {

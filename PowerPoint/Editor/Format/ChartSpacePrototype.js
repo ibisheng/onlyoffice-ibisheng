@@ -242,6 +242,7 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateTransform();
             this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
+            this.calculateSnapArrays();
             b_transform = true;
         }
         if(this.recalcInfo.recalculateReferences)

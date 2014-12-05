@@ -140,6 +140,7 @@ CImageShape.prototype.recalculate = function ()
         }
         if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
+            this.calculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
 

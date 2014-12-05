@@ -759,12 +759,12 @@ MoveState.prototype =
         var snap_x = null, snap_y = null;
 
         var snapHorArray = [], snapVerArray = [];
-        snapHorArray.push(X_Left_Field);
-        snapHorArray.push(X_Right_Field);
-        snapHorArray.push(Page_Width/2);
-        snapVerArray.push(Y_Top_Field);
-        snapVerArray.push(Y_Bottom_Field);
-        snapVerArray.push(Page_Height/2);
+       // snapHorArray.push(X_Left_Field);
+       // snapHorArray.push(X_Right_Field);
+       // snapHorArray.push(Page_Width/2);
+       // snapVerArray.push(Y_Top_Field);
+       // snapVerArray.push(Y_Bottom_Field);
+       // snapVerArray.push(Page_Height/2);
         if(result_x === this.startX)
         {
             min_dx = 0;
@@ -902,12 +902,11 @@ MoveState.prototype =
         }
 
 
-
         if(min_dx === null || Math.abs(min_dx) > SNAP_DISTANCE)
             min_dx = 0;
         else
         {
-            if(isRealNumber(snap_x))
+            if(isRealNumber(snap_x) && this.drawingObjects.drawingObjects.cSld)
             {
                 this.drawingObjects.getDrawingDocument().DrawVerAnchor(pageIndex, snap_x);
             }
@@ -917,7 +916,7 @@ MoveState.prototype =
             min_dy = 0;
         else
         {
-            if(isRealNumber(snap_y))
+            if(isRealNumber(snap_y) && this.drawingObjects.drawingObjects.cSld)
             {
                 this.drawingObjects.getDrawingDocument().DrawHorAnchor(pageIndex, snap_y);
             }

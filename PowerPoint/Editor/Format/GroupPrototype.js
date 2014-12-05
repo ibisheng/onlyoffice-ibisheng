@@ -197,6 +197,7 @@ CGroupShape.prototype.recalculate = function()
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
+            this.calculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
         if(this.recalcInfo.recalculateArrGraphicObjects)

@@ -44,6 +44,7 @@ CGraphicFrame.prototype =
     getBase64Img: CShape.prototype.getBase64Img,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
     getSlideIndex: CShape.prototype.getSlideIndex,
+    calculateSnapArrays: CShape.prototype.calculateSnapArrays,
 
     Is_DrawingShape: function()
     {
@@ -353,6 +354,7 @@ CGraphicFrame.prototype =
             if(this.recalcInfo.recalculateTransform)
             {
                 this.recalculateTransform();
+                this.calculateSnapArrays();
                 this.recalcInfo.recalculateTransform = false;
                 this.transformText = this.transform;
                 this.invertTransformText = this.invertTransform;

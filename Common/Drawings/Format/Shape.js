@@ -2979,6 +2979,13 @@ CShape.prototype =
 
     calculateSnapArrays: function(snapArrayX, snapArrayY)
     {
+        if(!Array.isArray(snapArrayX) || !Array.isArray(snapArrayX))
+        {
+            snapArrayX = this.snapArrayX;
+            snapArrayY = this.snapArrayY;
+            snapArrayX.length = 0;
+            snapArrayY.length = 0;
+        }
         var t = this.transform;
         snapArrayX.push(t.TransformPointX(0, 0));
         snapArrayY.push(t.TransformPointY(0, 0));
