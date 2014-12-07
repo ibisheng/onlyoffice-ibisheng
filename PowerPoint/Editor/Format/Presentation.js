@@ -3036,6 +3036,17 @@ CPresentation.prototype =
         }
     },
 
+    Check_CursorMoveRight : function()
+    {
+        if(this.Slides[this.CurPage])
+        {
+            if(this.Slides[this.CurPage].graphicObjects.getTargetDocContent(false, false))
+            {
+                this.Slides[this.CurPage].graphicObjects.cursorMoveRight(false, false);
+            }
+        }
+    },
+
     Set_SelectionState : function(State)
     {
         if(State.CurPage > -1)

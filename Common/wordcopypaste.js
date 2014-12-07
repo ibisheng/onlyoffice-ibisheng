@@ -2870,6 +2870,7 @@ PasteProcessor.prototype =
 		
 		presentation.Insert_Content(presentationSelectedContent);
 		presentation.Recalculate();
+        presentation.Check_CursorMoveRight();
 		presentation.Document_UpdateInterfaceState();
 	},
 
@@ -3388,6 +3389,7 @@ PasteProcessor.prototype =
                                 {
 									presentation.Insert_Content(presentationSelectedContent);
                                     presentation.Recalculate();
+                                    presentation.Check_CursorMoveRight();
                                     presentation.Document_UpdateInterfaceState();
 
                                     nodeDisplay.blur();
@@ -3942,6 +3944,7 @@ PasteProcessor.prototype =
 						{
 							presentation.Insert_Content(presentationSelectedContent);
 							presentation.Recalculate();
+                            presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
 
 							nodeDisplay.blur();
@@ -4058,9 +4061,9 @@ PasteProcessor.prototype =
 								presentationSelectedContent.Drawings = arr_shapes;
 						
 								presentation.Insert_Content(presentationSelectedContent);
-								
-								
 								presentation.Recalculate();
+
+                                presentation.Check_CursorMoveRight();
 								presentation.Document_UpdateInterfaceState();
 
 								nodeDisplay.blur();
@@ -4239,8 +4242,8 @@ PasteProcessor.prototype =
 							presentationSelectedContent.Drawings = arrShapes;
 							
 							presentation.Insert_Content(presentationSelectedContent);
-							
 							presentation.Recalculate();
+                            presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
 						}
 					}
