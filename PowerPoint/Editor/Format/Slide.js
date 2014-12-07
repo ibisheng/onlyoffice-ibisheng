@@ -357,6 +357,12 @@ Slide.prototype =
                 case historyitem_SlideSetBg:
                 {
                     this.recalcInfo.recalculateBackground = true;
+                    break;
+                }
+                case historyitem_SlideSetLayout:
+                {
+                    this.checkSlideTheme();
+                    break;
                 }
             }
             this.addToRecalculate();

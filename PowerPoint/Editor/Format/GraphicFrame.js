@@ -489,6 +489,11 @@ CGraphicFrame.prototype =
         this.recalcTransform && this.recalcTransform();
     },
 
+    recalcTransform: function()
+    {
+        this.recalcInfo.recalculateTransform = true;
+    },
+
     getTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)
