@@ -991,6 +991,8 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
     _loader.Api = this;
     g_oIdCounter.Set_Load(true);
     _loader.Load(gObject, this.WordControl.m_oLogicDocument);
+    _loader.Check_TextFit();
+
 	this.LoadedObject = 1;
     g_oIdCounter.Set_Load(false);
 
@@ -5199,10 +5201,12 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
     if (version === undefined)
     {
         _loader.Load(base64File, this.WordControl.m_oLogicDocument);
+        _loader.Check_TextFit();
     }
     else
     {
         _loader.Load2(base64File, this.WordControl.m_oLogicDocument);
+        _loader.Check_TextFit();
     }
     
     this.LoadedObject = 1;

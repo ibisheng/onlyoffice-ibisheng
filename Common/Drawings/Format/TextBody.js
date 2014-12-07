@@ -429,6 +429,84 @@ CTextBody.prototype =
         }, this, []);
     },
 
+    checkTextFit: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent instanceof Slide)
+        {
+            if(isRealObject(this.bodyPr.textFit))
+            {
+                if(this.bodyPr.textFit.type === text_fit_NormAuto)
+                {
+                    var text_fit = this.bodyPr.textFit;
+                    var font_scale, spacing_scale;
+                    if(isRealNumber(text_fit.fontScale))
+                        font_scale = text_fit.fontScale/100000;
+                    if(isRealNumber(text_fit.lnSpcReduction))
+                        spacing_scale = text_fit.lnSpcReduction/100000;
+
+                    if(isRealNumber(font_scale)|| isRealNumber(spacing_scale))
+                    {
+                        var pars = this.content.Content;
+                        for(var index = 0; index < pars.length; ++index)
+                        {
+                            var parg = pars[index];
+                            if(isRealNumber(spacing_scale))
+                            {
+                                var spacing2 = parg.Get_CompiledPr(false).ParaPr.Spacing;
+                                var new_spacing = {};
+                                var spc = spacing2.Line*spacing_scale;
+                                new_spacing.LineRule = spacing2.LineRule;
+                                if(isRealNumber(spc))
+                                {
+                                    if(spacing2.LineRule === linerule_Auto)
+                                    {
+                                        new_spacing.Line = spacing2.Line - spacing_scale;
+                                    }
+                                    else
+                                    {
+                                        new_spacing.Line = spc;
+                                    }
+                                }
+
+                                spc = spacing2.Before*spacing_scale;
+                                if(isRealNumber(spc))
+                                    new_spacing.Before = spc;
+
+                                spc = spacing2.After*spacing_scale;
+                                if(isRealNumber(spc))
+                                    new_spacing.After = spc;
+                                parg.Set_Spacing(new_spacing);
+                            }
+
+                            if(isRealNumber(font_scale))
+                            {
+                                var par_font_size = parg.Get_CompiledPr(false).TextPr.FontSize;
+                                for(var r = 0; r < parg.Content.length; ++r)
+                                {
+                                    var item = parg.Content[r];
+                                    if(isRealNumber(item.Pr.FontSize))
+                                    {
+                                        item.Set_FontSize(Math.round(item.Pr.FontSize*font_scale));
+                                    }
+                                    else
+                                    {
+                                        if(r === 0)
+                                        {
+                                            item.Set_FontSize(Math.round(par_font_size*font_scale));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+        this.bodyPr.textFit = null;
+    },
+
     Refresh_RecalcData: function()
     {
         if(this.parent && this.parent.recalcInfo)

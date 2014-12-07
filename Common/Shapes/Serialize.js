@@ -220,6 +220,8 @@ function BinaryPPTYLoader()
     this.IsUseFullSrc = false;
     this.RebuildImages = [];
 
+    this.textBodyTextFit = [];
+
     this.Start_UseFullUrl = function()
     {
         this.IsUseFullUrl = true;
@@ -233,6 +235,15 @@ function BinaryPPTYLoader()
         this.RebuildImages = [];
 
         return _result;
+    };
+
+    this.Check_TextFit = function()
+    {
+        for(var i = 0; i < this.textBodyTextFit.length; ++i)
+        {
+            this.textBodyTextFit[i].checkTextFit();
+        }
+        this.textBodyTextFit.length = 0;
     };
 
     this.Load = function(base64_ppty, presentation)
@@ -6814,6 +6825,10 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     txbody.setBodyPr(this.ReadBodyPr());
+                    if(txbody.bodyPr && txbody.bodyPr.textFit)
+                    {
+                        this.textBodyTextFit.push(txbody);
+                    }
                     break;
                 }
                 case 1:
