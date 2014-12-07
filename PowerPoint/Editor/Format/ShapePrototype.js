@@ -370,7 +370,7 @@ CShape.prototype.getParentObjects = function ()
                     slide: this.parent,
                     layout: this.parent.Layout,
                     master: this.parent.Layout ? this.parent.Layout.Master : null,
-                    theme: this.parent.Layout && this.parent.Layout.Master ? this.parent.Layout.Master.Theme : null
+                    theme: this.themeOverride ? this.themeOverride : (this.parent.Layout && this.parent.Layout.Master ? this.parent.Layout.Master.Theme : null)
                 };
             }
             case historyitem_type_SlideLayout:
@@ -380,7 +380,7 @@ CShape.prototype.getParentObjects = function ()
                     slide: null,
                     layout: this.parent,
                     master: this.parent.Master,
-                    theme: this.parent.Master ? this.parent.Master.Theme : null
+                    theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
                 };
             }
             case historyitem_type_SlideMaster:
@@ -390,7 +390,7 @@ CShape.prototype.getParentObjects = function ()
                     slide: null,
                     layout: null,
                     master: this.parent,
-                    theme: this.parent.Theme
+                    theme: this.themeOverride ? this.themeOverride : this.parent.Theme
                 };
             }
         }
@@ -424,6 +424,7 @@ CShape.prototype.recalculate = function ()
         }
         if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
+            this.calculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
 
