@@ -921,7 +921,7 @@ function BinaryPPTYLoader()
                 {
                     var _id = s.GetString2();
                    // _style.Id = _id;
-					if(this.presentation.TableStylesIdMa)
+					if(isRealObject(this.presentation.TableStylesIdMap))
 						this.presentation.TableStylesIdMap[_style.Id] = true;
                     this.map_table_styles[_id] = _style;
                     break;
