@@ -2544,9 +2544,9 @@ function CDrawingDocument()
     }
 
     // вот здесь весь трекинг
-    this.DrawTrack = function(type, matrix, left, top, width, height, isLine, canRotate)
+    this.DrawTrack = function(type, matrix, left, top, width, height, isLine, canRotate, isNoMove)
     {
-        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine,canRotate);
+        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine, canRotate, isNoMove);
     }
 
     this.LockSlide = function(slideNum)
