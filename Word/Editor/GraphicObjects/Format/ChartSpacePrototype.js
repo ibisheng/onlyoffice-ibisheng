@@ -178,6 +178,8 @@ CChartSpace.prototype.handleUpdateStyle = function()
     this.recalcInfo.recalculatePlotAreaPen = true;
     this.recalcInfo.recalculateBrush = true;
     this.recalcInfo.recalculatePen = true;
+    this.recalcInfo.recalculateHiLowLines = true;
+    this.recalcInfo.recalculateUpDownBars = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
