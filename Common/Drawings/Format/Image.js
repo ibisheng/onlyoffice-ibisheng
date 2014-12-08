@@ -684,9 +684,9 @@ CImageShape.prototype =
 
     getAllImages: function(images)
     {
-        if(this.blipFill && this.blipFill.fill instanceof  CBlipFill && typeof this.blipFill.fill.RasterImageId === "string")
+        if(this.blipFill instanceof  CBlipFill && typeof this.blipFill.RasterImageId === "string")
         {
-            images[_getFullImageSrc(this.blipFill.fill.RasterImageId)] = true;
+            images[_getFullImageSrc(this.blipFill.RasterImageId)] = true;
         }
     },
 
