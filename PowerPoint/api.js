@@ -986,7 +986,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	this.InitEditor();
 	this.DocumentUrl = url;
 	this.DocumentType = 2;
-	var _loader = new BinaryPPTYLoader();
+	var _loader = window.global_pptx_content_loader;
 
     _loader.Api = this;
     g_oIdCounter.Set_Load(true);
@@ -5195,7 +5195,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 	
 	g_oIdCounter.Set_Load(true);
 
-	var _loader = new BinaryPPTYLoader();
+	var _loader = window.global_pptx_content_loader;
     _loader.Api = this;
 
     if (version === undefined)
