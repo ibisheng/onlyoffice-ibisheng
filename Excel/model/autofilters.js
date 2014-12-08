@@ -2301,7 +2301,9 @@ var gUndoInsDelCellsFlag = true;
 					return false;
 				
 				var mainAdjacentCells;
-				if(alreadyAddFilter && alreadyAddFilter.changeAllFOnTable && alreadyAddFilter.range)//если к фильтру применяем форматированную таблицу
+				if(alreadyAddFilter && alreadyAddFilter.all && activeCells && alreadyAddFilter.range && !activeCells.containsRange(alreadyAddFilter.range))
+					mainAdjacentCells = activeCells;
+				else if(alreadyAddFilter && alreadyAddFilter.changeAllFOnTable && alreadyAddFilter.range)//если к фильтру применяем форматированную таблицу
 					mainAdjacentCells = alreadyAddFilter.range;
 				else if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
 					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,aWs);
@@ -2536,6 +2538,8 @@ var gUndoInsDelCellsFlag = true;
 							result = true;
 						}
 						else if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop) && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
+							result = true;
+						else if(InsertCellsAndShiftDown && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
 							result = true;
 					}
 					//если выделенная область находится до а/ф
@@ -4027,11 +4031,18 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(!allF[i].AutoFilter)
 							{
-								num = 
+								if(isAll === false && activeCells && range && !activeCells.containsRange(range))//если задеваем часть примененного фильтра и добавляем форматированную таблицу
 								{
-									num: i,
-									range: range,
-									all: true
+									num = 'error';
+								}
+								else
+								{
+									num = 
+									{
+										num: i,
+										range: range,
+										all: true
+									}
 								}
 							}
 							else
