@@ -3643,8 +3643,11 @@ CTable.prototype =
                     if(!this.bPresentation)
                     {
                         var RGBA = CellShd.Get_Color2(Theme, ColorMap);
-                        pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
-                        pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                        if (true !== RGBA.Auto)
+                        {
+                            pGraphics.b_color1(RGBA.r, RGBA.g, RGBA.b, 255);
+                            pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                        }
                     }
                     else
                     {
@@ -3743,8 +3746,11 @@ CTable.prototype =
                     if(!this.bPresentation)
                     {
                         var RGBA = CellShd.Get_Color2(Theme, ColorMap);
-                        pGraphics.b_color1( RGBA.r, RGBA.g, RGBA.b, 255 );
-                        pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                        if (true !== RGBA.Auto)
+                        {
+                            pGraphics.b_color1(RGBA.r, RGBA.g, RGBA.b, 255);
+                            pGraphics.TableRect(Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight), Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight));
+                        }
                     }
                     else
                     {

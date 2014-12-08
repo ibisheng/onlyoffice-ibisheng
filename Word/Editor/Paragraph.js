@@ -7273,6 +7273,12 @@ Paragraph.prototype =
                         Pr.ParaPr.NumPr = undefined;
                     }
                 }
+                else if (0 === this.Pr.NumPr.NumId)
+                {
+                    // Почему то Word в такой ситуации ведет себя так
+                    Pr.ParaPr.Ind.Left      = 0;
+                    Pr.ParaPr.Ind.FirstLine = 0;
+                }
             }
             else if ( undefined != Pr.ParaPr.NumPr )
             {

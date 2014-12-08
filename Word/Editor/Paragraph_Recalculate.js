@@ -1087,10 +1087,6 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
             Bottom = this.YLimit;
-
-        // В ячейке перенос страницы происходит по нижней границе, т.е. с учетом Spacing.After и границы
-        if ( true === this.Parent.Is_TableCellContent() )
-            Bottom2 = Bottom;
     }
 
     // Верхнюю границу мы сохраняем только для первой строки данной страницы
@@ -1112,7 +1108,11 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPage, PRS, ParaPr)
 {
     var Top     = PRS.LineTop;
-    var Bottom2 = PRS.LineBottom2;
+    var Bottom2 = PRS.LineBottom;
+
+    // В ячейке перенос страницы происходит по нижней границе, т.е. с учетом Spacing.After и границы
+    if ( true === this.Parent.Is_TableCellContent() )
+        Bottom2 = PRS.LineBottom;
 
     // Переносим строку по PageBreak. Если в строке ничего нет кроме PageBreak, и это не конец параграфа, тогда нам не надо проверять высоту строки и обтекание.
     var LineInfo = this.Lines[CurLine].Info;

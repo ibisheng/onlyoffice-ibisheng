@@ -3155,7 +3155,7 @@ CAnchorPosition.prototype =
         this.ParagraphTop  = ParaLayout.ParagraphTop;
     },
 
-    Calculate_X : function(bInline, RelativeFrom, bAlign, Value)
+    Calculate_X : function(bInline, RelativeFrom, bAlign, Value, PageLimits)
     {
         if ( true === bInline )
         {
@@ -3337,7 +3337,7 @@ CAnchorPosition.prototype =
                         }
                     }
                     else
-                        this.CalcX = Value;
+                        this.CalcX = Value + PageLimits.X;
 
                     break;
                 }
@@ -3383,7 +3383,7 @@ CAnchorPosition.prototype =
         return this.CalcX;
     },
 
-    Calculate_Y : function(bInline, RelativeFrom, bAlign, Value)
+    Calculate_Y : function(bInline, RelativeFrom, bAlign, Value, PageLimits)
     {
         if ( true === bInline )
         {
@@ -3526,7 +3526,7 @@ CAnchorPosition.prototype =
                         }
                     }
                     else
-                        this.CalcY = Value;
+                        this.CalcY = Value + PageLimits.Y;
 
                     break;
                 }
@@ -4361,7 +4361,7 @@ ParaDrawing.prototype =
         return false;
     },
 
-    Update_Position : function(Paragraph, ParaLayout, PageLimits)
+    Update_Position : function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin)
     {
         if ( undefined != this.PositionH_Old )
         {
@@ -4415,8 +4415,8 @@ ParaDrawing.prototype =
             this.Parent.Pages[PageNum - this.Parent.Get_StartPage_Absolute()].Add_Drawing( this );
         }
         this.Internal_Position.Set( W, H, this.YOffset, ParaLayout);
-        this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-        this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+        this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, PageLimitsOrigin);
+        this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, PageLimitsOrigin);
         this.Internal_Position.Correct_Values(bInline, PageLimits, this.AllowOverlap, this.Use_TextWrap(), OtherFlowObjects);
 
         var OldPageNum = this.PageNum;
