@@ -2162,6 +2162,9 @@
 					mainChildrens = pasteFragment.children;
 				}
 				
+				if(mainChildrens && mainChildrens.length == 1 && mainChildrens[0].nodeName.toLowerCase() == 'b')
+					mainChildrens = mainChildrens[0].children;
+				
 				var onlyImages = null;
 				var addImages = null;
 				var imCount = 0;
@@ -2433,7 +2436,7 @@
 							onlyImages = false;
 						}
                     }
-                };
+                }
 				
 				if(cellCountAll.length == 0)
 					aResult.cellCount = 0;
