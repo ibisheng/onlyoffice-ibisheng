@@ -3533,6 +3533,10 @@ var gUndoInsDelCellsFlag = true;
 			_showAutoFilterDialog: function(cell,kF) {
 				var ws = this.worksheet;
 				var elements = this._getAutoFilterArray(cell);
+				
+				if(!elements)
+					return;
+				
 				//сортируем для массива
 				elements = this._sortArrayMinMax(elements);
 				//получаем значение числового фильтра
@@ -4332,6 +4336,9 @@ var gUndoInsDelCellsFlag = true;
 			
 			_getArrayOpenCells : function(index, buttonId)
 			{
+				if(!index)
+					return;
+					
 				var aWs = this._getCurrentWS(), currentFilter, numFilter, curIndex = index.split(':'), opFil;
 				
 				if(curIndex[0] == 'all')
