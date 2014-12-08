@@ -249,6 +249,7 @@ var gUndoInsDelCellsFlag = true;
 		function AutoFilters(currentSheet) {
 			this.worksheet = currentSheet;
 			this.changeFilters = null;
+			this.historyTempObj = null;
 
 			this.m_oColor = new CColor(120, 120, 120);
 			return this;
@@ -1340,8 +1341,12 @@ var gUndoInsDelCellsFlag = true;
 					colInsert = activeCells.c2 + 1;
 				else if(type == 'delCell')
 					val = activeCells.c1 - activeCells.c2 - 1;
+					
+				this.historyTempObj = {};
+				
 				//val > 0 - добавление, < 0 - удаление
 				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells, insertType);
+				this._addToHistoryFromTempObj();
 				
 				this._changeFiltersApply();
 			},
@@ -1370,10 +1375,43 @@ var gUndoInsDelCellsFlag = true;
 					colInsert = activeCells.r2 + 1;
 				else if(type == 'delCell')
 					val = activeCells.r1 - activeCells.r2 - 1;
+					
+				this.historyTempObj = {};
+				
 				//val > 0 - добавление, < 0 - удаление
 				this._changeFiltersAfterColumn(colInsert,val,'insRow',activeCells, insertType);
+				this._addToHistoryFromTempObj();
 				
 				this._changeFiltersApply();
+			},
+			
+			_addToHistoryFromTempObj: function()
+			{
+				History.TurnOn();
+				History.StartTransaction();
+				History.Create_NewPoint();
+				
+				var point;
+				if(this.historyTempObj.changePoints && this.historyTempObj.changePoints.length)
+				{
+					for(var i = 0; i < this.historyTempObj.changePoints.length; i++)
+					{
+						point = this.historyTempObj.changePoints[i];
+						this._addHistoryObj(point[0], point[1], point[2], point[3], point[4], point[5], point[6]);
+					}
+				}
+				
+				if(this.historyTempObj.emptyPoints && this.historyTempObj.emptyPoints.length)
+				{
+					for(var i = 0; i < this.historyTempObj.emptyPoints.length; i++)
+					{
+						point = this.historyTempObj.emptyPoints[i];
+						this._addHistoryObj(point[0], point[1], point[2], point[3], point[4], point[5], point[6]);
+					}
+				}
+				
+				this.historyTempObj = null;
+				History.EndTransaction();
 			},
 			
 			_changeFiltersApply: function()
@@ -1652,12 +1690,15 @@ var gUndoInsDelCellsFlag = true;
 			
 			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)
 			{
-				if(turnOnHistory)
+				if(turnOnHistory && !this.historyTempObj)
 				{
 					History.TurnOn();
 					History.Create_NewPoint();
 				}
-				History.StartTransaction();
+				
+				if(!this.historyTempObj)
+					History.StartTransaction();
+					
 				var aWs = this._getCurrentWS();
 				var activeCells = ar;
 				if(aWs.AutoFilter)
@@ -1685,7 +1726,10 @@ var gUndoInsDelCellsFlag = true;
 							oldFilter.insCells = true;
 							
 						//заносим в историю
-						this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
+						if(this._historyTempObj)
+							this._addHistoryTempObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
+						else
+							this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 						
 						this._isEmptyButtons(oldFilter.Ref);
 					}
@@ -1708,8 +1752,12 @@ var gUndoInsDelCellsFlag = true;
 							oRange.setTableStyle(null);
 							//открываем скрытые строки
 							aWs.setRowHidden(false, bbox.r1, bbox.r2);
+							
 							//заносим в историю
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
+							if(this.historyTempObj)
+								this._addHistoryTempObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
+							else
+								this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, deleteFilterAfterDeleteColRow, bbox);
 							
 							this._isEmptyButtons(oCurFilter.Ref);
 							
@@ -1731,9 +1779,10 @@ var gUndoInsDelCellsFlag = true;
 						aWs.TableParts = newTableParts;
 				}
 				
-				
-				History.EndTransaction();
-				if(turnOnHistory)
+				if(!this.historyTempObj)
+					History.EndTransaction();
+					
+				if(turnOnHistory && !this.historyTempObj)
 					History.TurnOff();
 			},
 			
@@ -2092,6 +2141,8 @@ var gUndoInsDelCellsFlag = true;
 								
 								if(aWs.TableParts[l].AutoFilter != null)
 									this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
+								else if (aWs.TableParts[l].AutoFilter === null)
+									this._addButtonAF({result: cloneData.oldFilter.result,isVis: false});
 								
 								var splitRange = cloneData.oldFilter.Ref;
 								this._setColorStyleTable(splitRange, cloneData.oldFilter, null, true);
@@ -5458,16 +5509,12 @@ var gUndoInsDelCellsFlag = true;
 				//записываем в историю, если активная область касается данных фильтров
 				if(!bUndoChanges && !bRedoChanges && !notAddToHistory)
 				{
-					History.TurnOn();
-					//History.Create_NewPoint();
-					History.StartTransaction();
 					var changeElement = 
 					{
 						oldFilter: oldFilter,
 						newFilterRef: filter.Ref
-					};
-					this._addHistoryObj(changeElement, null, null, true, oldFilter.Ref);
-					History.EndTransaction();
+					}
+					this._addHistoryTempObj(changeElement, null, null, true, oldFilter.Ref, null, true);
 				}
 				
 				if(cRange.index == 'all')
@@ -6340,6 +6387,25 @@ var gUndoInsDelCellsFlag = true;
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), activeHistoryRange, oHistoryObject);
 				if(deleteFilterAfterDeleteColRow)
 					History.ChangeActionsEndToStart();
+			},
+			
+			_addHistoryTempObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange, bWithoutFilter, isNotEmpty) 
+			{
+				if(!isNotEmpty)
+				{
+					if(!this.historyTempObj.emptyPoints)
+						this.historyTempObj.emptyPoints = [];
+						
+					this.historyTempObj.emptyPoints[this.historyTempObj.emptyPoints.length] = [oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange, bWithoutFilter, isNotEmpty];
+				}
+				else
+				{
+					if(!this.historyTempObj.changePoints)
+						this.historyTempObj.changePoints = [];
+					
+					this.historyTempObj.changePoints[this.historyTempObj.changePoints.length] = [oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange, bWithoutFilter, isNotEmpty];
+				}
+					
 			},
 			
 			_isAddNameColumn: function(range)
