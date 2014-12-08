@@ -12116,6 +12116,17 @@ CDispUnits.prototype =
         }
     },
 
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Get_Id());
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.Get_Id();
+    },
+
     Save_Changes: function(data, w)
     {
         w.WriteLong(data.Type);
