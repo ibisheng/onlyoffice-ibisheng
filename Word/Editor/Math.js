@@ -263,7 +263,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
         // Если данный элемент - ран, удаляем внутри рана, если нет, тогда удаляем целиком элемент
         if (para_Math_Run === oElement.Type)
         {
-            if (false === oElement.Remove(Direction) && true !== this.bSelectionUse)
+            if ((true === oElement.IsPlaceholder()) || (false === oElement.Remove(Direction) && true !== this.bSelectionUse))
             {
                 if ((Direction > 0 && oContent.Content.length - 1 === nStartPos) || (Direction < 0 && 0 === nStartPos))
                 {

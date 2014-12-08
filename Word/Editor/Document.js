@@ -3378,6 +3378,10 @@ CDocument.prototype =
             if ( this.CurPos.ContentPos < 0 )
                 return false;
 
+            // Делаем так, чтобы при выделении нумерации удалялась нумерация. А она удаляется по backspace.
+            if (true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag && Count > 0)
+                Count = -Count;
+
             this.Remove_NumberingSelection();
 
             // Если в документе что-то заселекчено, тогда удаляем селект

@@ -17,6 +17,11 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
     if (true === this.Parent.Is_HdrFtr(false))
         return [];
 
+    // TODO: Отключаем это ускорение в таблицах, т.к. в таблицах и так есть свое ускорение. Но можно и это ускорение
+    // подключить, для этого надо проверять изменились ли MinMax ширины и набираем ли мы в строке заголовков.
+    if (undefined === this.Parent || true === this.Parent.Is_TableCellContent())
+        return [];
+
     // Если изменения происходят в специальном пустом параграфе-конце секции, тогда запускаем обычный пересчет
     if ( this.LogicDocument && true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
         return [];
