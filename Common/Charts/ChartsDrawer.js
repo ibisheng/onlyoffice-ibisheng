@@ -448,9 +448,9 @@ CChartsDrawer.prototype =
 		var pxToMM = this.calcProp.pxToMM;
 		
 		//valAx
+		var valAx = chartSpace.chart.plotArea.valAx;
 		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels && this.calcProp.widthCanvas != undefined)
 		{
-			var valAx = chartSpace.chart.plotArea.valAx;
 			if(isHBar)
 			{
 				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
