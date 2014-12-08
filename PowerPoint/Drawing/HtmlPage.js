@@ -2967,7 +2967,7 @@ function CEditorPage(api)
             {
                 var _interval = (CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
 
-                if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval)
+                if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying())
                 {
                     if (History.Have_Changes() == true)
                     {

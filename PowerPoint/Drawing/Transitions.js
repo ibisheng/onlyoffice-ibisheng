@@ -140,6 +140,28 @@ function CTransitionAnimation(htmlpage)
         this.Rect.h = _h >> 0;
     }
 
+    this.SetBaseTransform = function()
+    {
+        if (this.DemonstrationObject == null)
+        {
+            var ctx1 = this.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+            if (this.HtmlPage.bIsRetinaSupport)
+                ctx1.setTransform(2, 0, 0, 2, 0, 0);
+            else
+                ctx1.setTransform(1, 0, 0, 1, 0, 0);
+
+            this.HtmlPage.m_oOverlayApi.SetBaseTransform();
+        }
+        else
+        {
+            var _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+            _ctx1.setTransform(1, 0, 0, 1, 0, 0);
+
+            var _ctx2 = oThis.DemonstrationObject.Overlay.getContext('2d');
+            _ctx2.setTransform(1, 0, 0, 1, 0, 0);
+        }
+    }
+
     this.DrawImage1 = function(slide_num, _not_use_prev)
     {
         if (undefined === slide_num)
@@ -349,6 +371,8 @@ function CTransitionAnimation(htmlpage)
             return;
         }
 
+        oThis.SetBaseTransform();
+
         if (oThis.TimerId === null)
         {
             oThis.Params = { IsFirstAfterHalf : true };
@@ -481,6 +505,8 @@ function CTransitionAnimation(htmlpage)
             oThis.End(false);
             return;
         }
+
+        oThis.SetBaseTransform();
 
         var _xDst = oThis.Rect.x;
         var _yDst = oThis.Rect.y;
@@ -622,6 +648,8 @@ function CTransitionAnimation(htmlpage)
             return;
         }
 
+        oThis.SetBaseTransform();
+
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
@@ -668,7 +696,6 @@ function CTransitionAnimation(htmlpage)
             oThis.HtmlPage.m_oOverlayApi.CheckRect(_xDst, _yDst, _wDst, _hDst);
 
             _ctx2 = oThis.HtmlPage.m_oOverlayApi.m_oContext;
-            _ctx2.setTransform(1,0,0,1,0,0);
         }
         else
         {
@@ -1173,6 +1200,8 @@ function CTransitionAnimation(htmlpage)
             return;
         }
 
+        oThis.SetBaseTransform();
+
         var _xDst = oThis.Rect.x;
         var _yDst = oThis.Rect.y;
         var _wDst = oThis.Rect.w;
@@ -1189,7 +1218,6 @@ function CTransitionAnimation(htmlpage)
             oThis.HtmlPage.m_oOverlayApi.CheckRect(_xDst, _yDst, _wDst, _hDst);
 
             _ctx2 = oThis.HtmlPage.m_oOverlayApi.m_oContext;
-            _ctx2.setTransform(1,0,0,1,0,0);
         }
         else
         {
@@ -1525,6 +1553,8 @@ function CTransitionAnimation(htmlpage)
             return;
         }
 
+        oThis.SetBaseTransform();
+
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
@@ -1674,6 +1704,8 @@ function CTransitionAnimation(htmlpage)
             return;
         }
 
+        oThis.SetBaseTransform();
+
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
@@ -1822,6 +1854,8 @@ function CTransitionAnimation(htmlpage)
             oThis.End(false);
             return;
         }
+
+        oThis.SetBaseTransform();
 
         if (oThis.TimerId === null)
         {
@@ -2283,6 +2317,8 @@ function CTransitionAnimation(htmlpage)
             return;
         }
 
+        oThis.SetBaseTransform();
+
         var _xDst = oThis.Rect.x;
         var _yDst = oThis.Rect.y;
         var _wDst = oThis.Rect.w;
@@ -2479,7 +2515,7 @@ function CTransitionAnimation(htmlpage)
                 global_MatrixTransformer.RotateRadAppend(localTransform, _angle);
                 global_MatrixTransformer.TranslateAppend(localTransform, _xC, _yC);
 
-                _ctx2.setTransform(localTransform.sx, localTransform.shy, localTransform.shx, localTransform.sy, localTransform.tx, localTransform.ty);
+                _ctx2.transform(localTransform.sx, localTransform.shy, localTransform.shx, localTransform.sy, localTransform.tx, localTransform.ty);
 
                 if (null != oThis.CacheImage2.Image)
                 {
