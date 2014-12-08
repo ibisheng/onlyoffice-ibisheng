@@ -6240,7 +6240,7 @@ catAxisChart.prototype =
 				posX = xPoints[i].pos - firstDiff / 2;
 				if(!this.paths.tickMarks)
 					this.paths.tickMarks = [];
-				this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX, posY + widthLine / this.chartProp.pxToMM);
+				this.paths.tickMarks[i] = this._calculateLine(posX, posY - crossMajorStep / this.chartProp.pxToMM, posX, posY + widthLine / this.chartProp.pxToMM);
 				
 				if(i == xPoints.length - 1)
 				{
