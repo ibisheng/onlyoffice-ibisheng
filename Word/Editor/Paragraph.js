@@ -7081,7 +7081,7 @@ Paragraph.prototype =
                     Pr.ParaPr.Spacing.Before = 0;
                 }
             }
-            else if ( true === Pr.ParaPr.Spacing.BeforeAutoSpacing )
+            else if ( true === Pr.ParaPr.Spacing.BeforeAutoSpacing || !(this.bFromDocument === true))
             {
                 Pr.ParaPr.Spacing.Before = 0;
             }
@@ -7160,6 +7160,10 @@ Paragraph.prototype =
                 {
                     Pr.ParaPr.Spacing.After = 0;
                 }
+            }
+            else if(!(this.bFromDocument === true))
+            {
+                Pr.ParaPr.Spacing.After = 0;
             }
             else
                 Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this );
