@@ -2589,7 +2589,7 @@ CPresentation.prototype =
                 editor.sync_shapePropCallback(drawing_props.shapeProps);
             }
 
-            if(drawing_props.chartProps)
+            if(drawing_props.chartProps && drawing_props.chartProps.chartProps)
             {
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
             }
