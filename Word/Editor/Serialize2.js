@@ -1045,45 +1045,47 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, oUsedStyleMap)
         //ParaPr
         if(null != style.ParaPr)
             this.bs.WriteItem(c_oSer_sts.Style_ParaPr, function(){oThis.bpPrs.Write_pPr(style.ParaPr);});
-        //TablePr
-        if(null != style.TablePr)
-            this.bs.WriteItem(c_oSer_sts.Style_TablePr, function(){oThis.btblPrs.WriteTblPr(style.TablePr, null);});
-		//TableRowPr
-        if(null != style.TableRowPr)
-            this.bs.WriteItem(c_oSer_sts.Style_RowPr, function(){oThis.btblPrs.WriteRowPr(style.TableRowPr);});
-		//TableCellPr
-        if(null != style.TableCellPr)
-            this.bs.WriteItem(c_oSer_sts.Style_CellPr, function(){oThis.btblPrs.WriteCellPr(style.TableCellPr);});
-		//TblStylePr
-		var aTblStylePr = [];
-		if(null != style.TableBand1Horz)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand1Horz, val: style.TableBand1Horz});
-		if(null != style.TableBand1Vert)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand1Vert, val: style.TableBand1Vert});
-		if(null != style.TableBand2Horz)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand2Horz, val: style.TableBand2Horz});
-		if(null != style.TableBand2Vert)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand2Vert, val: style.TableBand2Vert});
-		if(null != style.TableFirstCol)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeFirstCol, val: style.TableFirstCol});
-		if(null != style.TableFirstRow)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeFirstRow, val: style.TableFirstRow});
-		if(null != style.TableLastCol)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeLastCol, val: style.TableLastCol});
-		if(null != style.TableLastRow)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeLastRow, val: style.TableLastRow});
-		if(null != style.TableTLCell)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeNwCell, val: style.TableTLCell});
-		if(null != style.TableTRCell)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeNeCell, val: style.TableTRCell});
-		if(null != style.TableBLCell)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeSwCell, val: style.TableBLCell});
-		if(null != style.TableBRCell)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeSeCell, val: style.TableBRCell});
-		if(null != style.TableWholeTable)
-			aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeWholeTable, val: style.TableWholeTable});
-        if(aTblStylePr.length > 0)
-			this.bs.WriteItem(c_oSer_sts.Style_TblStylePr, function(){oThis.WriteTblStylePr(aTblStylePr);});
+		if(styletype_Table == style.Type){
+			//TablePr
+			if(null != style.TablePr)
+				this.bs.WriteItem(c_oSer_sts.Style_TablePr, function(){oThis.btblPrs.WriteTblPr(style.TablePr, null);});
+			//TableRowPr
+			if(null != style.TableRowPr)
+				this.bs.WriteItem(c_oSer_sts.Style_RowPr, function(){oThis.btblPrs.WriteRowPr(style.TableRowPr);});
+			//TableCellPr
+			if(null != style.TableCellPr)
+				this.bs.WriteItem(c_oSer_sts.Style_CellPr, function(){oThis.btblPrs.WriteCellPr(style.TableCellPr);});
+			//TblStylePr
+			var aTblStylePr = [];
+			if(null != style.TableBand1Horz)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand1Horz, val: style.TableBand1Horz});
+			if(null != style.TableBand1Vert)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand1Vert, val: style.TableBand1Vert});
+			if(null != style.TableBand2Horz)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand2Horz, val: style.TableBand2Horz});
+			if(null != style.TableBand2Vert)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeBand2Vert, val: style.TableBand2Vert});
+			if(null != style.TableFirstCol)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeFirstCol, val: style.TableFirstCol});
+			if(null != style.TableFirstRow)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeFirstRow, val: style.TableFirstRow});
+			if(null != style.TableLastCol)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeLastCol, val: style.TableLastCol});
+			if(null != style.TableLastRow)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeLastRow, val: style.TableLastRow});
+			if(null != style.TableTLCell)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeNwCell, val: style.TableTLCell});
+			if(null != style.TableTRCell)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeNeCell, val: style.TableTRCell});
+			if(null != style.TableBLCell)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeSwCell, val: style.TableBLCell});
+			if(null != style.TableBRCell)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeSeCell, val: style.TableBRCell});
+			if(null != style.TableWholeTable)
+				aTblStylePr.push({type: ETblStyleOverrideType.tblstyleoverridetypeWholeTable, val: style.TableWholeTable});
+			if(aTblStylePr.length > 0)
+				this.bs.WriteItem(c_oSer_sts.Style_TblStylePr, function(){oThis.WriteTblStylePr(aTblStylePr);});
+		}
     };
 	this.WriteTblStylePr = function(aTblStylePr)
     {
