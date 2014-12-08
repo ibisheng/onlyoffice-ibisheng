@@ -8646,29 +8646,6 @@ function CSpPr()
     this.Fill       = null;
     this.ln         = null;
     this.parent     = null;
-    this.merge = function(spPr)
-    {
-        /*if(spPr.xfrm != null)
-         {
-         this.xfrm.merge(spPr.xfrm);
-         }  */
-        if(spPr.geometry!=null)
-        {
-            this.geometry = spPr.geometry.createDuplicate();
-        }
-
-        if(spPr.Fill!=null && spPr.Fill.fill!=null)
-        {
-            //this.Fill = spPr.Fill.createDuplicate();
-        }
-
-        /*if(spPr.ln!=null)
-         {
-         if(this.ln == null)
-         this.ln = new CLn();
-         this.ln.merge(spPr.ln);
-         }  */
-    };
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -8763,6 +8740,30 @@ CSpPr.prototype =
             if(line_image_id)
                 images.push(line_image_id);
         }
+    },
+
+    merge: function(spPr)
+    {
+        /*if(spPr.xfrm != null)
+         {
+         this.xfrm.merge(spPr.xfrm);
+         }  */
+        if(spPr.geometry!=null)
+        {
+            this.geometry = spPr.geometry.createDuplicate();
+        }
+
+        if(spPr.Fill!=null && spPr.Fill.fill!=null)
+        {
+            //this.Fill = spPr.Fill.createDuplicate();
+        }
+
+        /*if(spPr.ln!=null)
+         {
+         if(this.ln == null)
+         this.ln = new CLn();
+         this.ln.merge(spPr.ln);
+         }  */
     },
 
     getObjectType: function()

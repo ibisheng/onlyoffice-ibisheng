@@ -669,7 +669,7 @@ CShape.prototype =
         {
             return this.spPr.geometry.canFill();
         }
-        return false;
+        return true;
     },
 
     isShape: function () {
