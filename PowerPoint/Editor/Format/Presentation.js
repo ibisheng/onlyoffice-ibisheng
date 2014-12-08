@@ -2616,6 +2616,16 @@ CPresentation.prototype =
                 {
                     editor.UpdateTextPr(text_pr);
                 }
+
+                var Hyperlink = this.Hyperlink_Check(false);
+                if (Hyperlink )
+                {
+                    var HyperText = new CParagraphGetText();
+                    Hyperlink.Get_Text( HyperText );
+                    var HyperProps = new CHyperlinkProperty(Hyperlink);
+                    HyperProps.put_Text( HyperText.Text );
+                    editor.sync_HyperlinkPropCallback(HyperProps);
+                }
             }
         }
         editor.sync_EndCatchSelectedElements();
