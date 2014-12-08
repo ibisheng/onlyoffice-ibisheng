@@ -5938,10 +5938,8 @@
 		};
 
 		WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
-			var t = this;
-
 			var ar = fixedRange ? fixedRange : ((this.isFormulaEditMode) ?
-				t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1] : t.activeRange);
+				this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange);
 
 			if (!ar) { return; }
 
@@ -6161,19 +6159,50 @@
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 			x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 			y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
-			return {
+
+			var res = new asc_Range(ar.startCol, ar.startRow, this._findColUnderCursor(x).col, this._findRowUnderCursor(y).row, true);
+			if (ar.type === c_oAscSelectionType.RangeCells)
+				this._fixSelectionOfMergedCells(res);
+			return res;
+			/*return {
 				c2: ar.type === c_oAscSelectionType.RangeCol || ar.type === c_oAscSelectionType.RangeCells ? this._findColUnderCursor(x).col : ar.c2,
 				r2: ar.type === c_oAscSelectionType.RangeRow || ar.type === c_oAscSelectionType.RangeCells ? this._findRowUnderCursor(y).row : ar.r2
-			};
+			};*/
 		};
 
 		WorksheetView.prototype._calcSelectionEndPointByOffset = function (dc, dr) {
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
-			var mc = this.model.getMergedByCell(ar.r2, ar.c2);
-			var c  = mc ? ( dc <= 0 ? mc.c1 : mc.c2 ) : ar.c2;
-			var r  = mc ? ( dr <= 0 ? mc.r1 : mc.r2 ) : ar.r2;
-			var p  = this._calcCellPosition(c, r, dc, dr);
-			return {c2: p.col, r2: p.row};
+			var startCol = ar.startCol, startRow = ar.startRow;
+			var c1, r1, c2, r2, tmp;
+			tmp = asc.getEndValueRange(dc, startCol, ar.c1, ar.c2); c1 = tmp.x1; c2 = tmp.x2;
+			tmp = asc.getEndValueRange(dr, startRow, ar.r1, ar.r2); r1 = tmp.x1; r2 = tmp.x2;
+
+			var p1 = this._calcCellPosition(c2, r2, dc, dr), p2;
+			var res = new asc_Range(c1, r1, c2 = p1.col, r2 = p1.row, true);
+			dc = Math.sign(dc); dr = Math.sign(dr);
+			if (c_oAscSelectionType.RangeCells === ar.type) {
+				this._fixSelectionOfMergedCells(res);
+				while (ar.isEqual(res)) {
+					p2 = this._calcCellPosition(c2, r2, dc, dr);
+					res.assign(c1, r1, c2 = p2.col, r2 = p2.row, true);
+					this._fixSelectionOfMergedCells(res);
+					if (p1.c2 === p2.c2 && p1.r2 === p2.r2)
+						break;
+					p1 = p2;
+				}
+			}
+			var bIsHidden = false;
+			if (0 !== dc && this.cols[c2].width < this.width_1px) {
+				c2 = this._findVisibleCol(c2, dc);
+				bIsHidden = true;
+			}
+			if (0 !== dr && this.cols[r2].height < this.height_1px) {
+				r2 = this._findVisibleRow(r2, dr);
+				bIsHidden = true;
+			}
+			if (bIsHidden)
+				res.assign(c1, r1, c2, r2, true);
+			return res;
 		};
 
 		WorksheetView.prototype._calcActiveRangeOffset = function () {
@@ -6848,67 +6877,54 @@
 			return true;
 		};
 
+		/**
+		 *
+		 * @param x - координата или прибавка к column
+		 * @param y - координата или прибавка к row
+		 * @param isCoord - выделение с помощью мышки (true) или с клавиатуры (false)
+		 * @param isSelectMode - при выделении с помощью мышки, не нужно отправлять эвенты о смене выделения и информации
+		 * @returns {*}
+		 */
 		WorksheetView.prototype.changeSelectionEndPoint = function (x, y, isCoord, isSelectMode) {
 			var isChangeSelectionShape = false;
 			if (isCoord)
 				isChangeSelectionShape = this._checkSelectionShape();
 			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
-			var arOld = ar.clone();
-			var arnOld = ar.clone(true);
-			var ep = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
-			var epOld, ret;
 
-			if (ar.c2 !== ep.c2 || ar.r2 !== ep.r2 || isChangeSelectionShape) {
+			var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
+			var isEqual = newRange.isEqual(ar);
+			if (isEqual && !isCoord) {
+				// При движении стрелками можем попасть на замерженную ячейку
+			}
+			if (!isEqual || isChangeSelectionShape) {
 				this.cleanSelection();
-				ar.assign(ar.startCol, ar.startRow, ep.c2, ep.r2);
-				if (ar.type === c_oAscSelectionType.RangeCells) {
-					this._fixSelectionOfMergedCells();
-					while (!isCoord && arnOld.isEqual( ar.clone(true) )) {
-						ar.c2 = ep.c2;
-						ar.r2 = ep.r2;
-						epOld = $.extend({}, ep);
-						ep = this._calcSelectionEndPointByOffset(x<0?-1:x>0?+1:0, y<0?-1:y>0?+1:0);
-						ar.assign(ar.startCol, ar.startRow, ep.c2, ep.r2);
-						this._fixSelectionOfMergedCells();
-						if (ep.c2 === epOld.c2 && ep.r2 === epOld.r2) {break;}
-					}
-				}
-				if (!isCoord)
-					this._fixSelectionOfHiddenCells(ar.c2 - arOld.c2 >= 0 ? +1 : -1, ar.r2 - arOld.r2 >= 0 ? +1 : -1);
+				ar.assign2(newRange);
 				this._drawSelection();
 				//ToDo this.drawDepCells();
-			}
 
-			ret = this._calcActiveRangeOffset();
-
-			if (!this.isCellEditMode && !arnOld.isEqual(ar.clone(true))) {
-				if (!this.isSelectionDialogMode) {
-					this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
-					if (!isSelectMode) {
-						this.handlers.trigger("selectionChanged", this.getSelectionInfo(false));
-						this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+				if (!this.isCellEditMode) {
+					if (!this.isSelectionDialogMode) {
+						this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
+						if (!isSelectMode) {
+							this.handlers.trigger("selectionChanged", this.getSelectionInfo(false));
+							this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+						}
+					} else {
+						// Смена диапазона
+						this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
 					}
-				} else {
-					// Смена диапазона
-					this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
 				}
 			}
+
 			this.model.workbook.handlers.trigger("asc_onHideComment");
 
-			return ret;
+			return this._calcActiveRangeOffset();
 		};
 
 		// Окончание выделения
 		WorksheetView.prototype.changeSelectionDone = function () {
-			if (this.isFormulaEditMode && this.arrActiveFormulaRanges.length > 0) {
-				// Нормализуем range
-				this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1].normalize();
-			} else {
-				// Нормализуем range
-				this.activeRange.normalize();
-				if (this.stateFormatPainter)
-					this.applyFormatPainter();
-			}
+			if (this.stateFormatPainter)
+				this.applyFormatPainter();
 		};
 
 		// Обработка движения в выделенной области
@@ -10717,20 +10733,21 @@
 			if (!this.isFormulaEditMode)
 				return;
 
-			var currentRange = this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1];
-			var arOriginal = currentRange.clone();
-			var arNormal = currentRange.clone(true);
+			var currentRange = this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1].clone();
+			var startCol = currentRange.startCol, startRow = currentRange.startRow;
 			// Замерженную ячейку должны отдать только левую верхнюю.
-			var mergedRange = this.model.getMergedByCell(arNormal.r1, arNormal.c1);
-			if (mergedRange && arNormal.isEqual(mergedRange)) {
-				arNormal.r2 = arNormal.r1;
-				arNormal.c2 = arNormal.c1;
+			var mergedRange = this.model.getMergedByCell(currentRange.r1, currentRange.c1);
+			if (mergedRange && currentRange.isEqual(mergedRange)) {
+				currentRange.r2 = currentRange.r1;
+				currentRange.c2 = currentRange.c1;
 			}
 
-			editor.enterCellRange(arNormal.getName());
-			for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
-				if (this.arrActiveFormulaRanges[i].isEqual(arNormal)) {
-					this.arrActiveFormulaRanges[i].assign2(arOriginal);
+			editor.enterCellRange(currentRange.getName());
+			for (var tmpRange, i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
+				tmpRange = this.arrActiveFormulaRanges[i];
+				if (tmpRange.isEqual(currentRange)) {
+					tmpRange.startCol = startCol;
+					tmpRange.startRow = startRow;
 					break;
 				}
 			}
@@ -10738,11 +10755,7 @@
 
 		WorksheetView.prototype.addFormulaRange = function (range) {
 			var r = range !== undefined ? range :
-				new asc_Range(this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2);
-			if (r.startCol === undefined || r.startRow === undefined) {
-				r.startCol = r.c1;
-				r.startRow = r.r1;
-			}
+				new asc_ActiveRange(this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2);
 			this.arrActiveFormulaRanges.push(r);
 			this._fixSelectionOfMergedCells();
 		};

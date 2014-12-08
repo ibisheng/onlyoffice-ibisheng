@@ -43,7 +43,7 @@ Date.prototype.excelNullDate1904 = Date.UTC(1904,  0,  1, 0, 0, 0);
 
 Date.prototype.getExcelNullDate = function(){
     return g_bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
-}
+};
 
 Date.prototype.isLeapYear = function () {
     var y = this.getUTCFullYear();
@@ -214,9 +214,9 @@ Math.approxEqual = function ( a, b ) {
     return this.abs( a - b ) < 1e-15;
 };
 
-Math.sign = function(a){
-    return (a < 0) ? -1 : (a == 0) ? 0 : 1;
-}
+Math.sign = function(x){
+    return x > 0 ? 1 : x < 0 ? -1 : 0;
+};
 
 String.prototype.repeat = function (s, n){
     var a = [];
@@ -224,7 +224,7 @@ String.prototype.repeat = function (s, n){
         a.push(s);
     }
     return a.join('');
-}
+};
 
 /** @constructor */
 function cBaseType( val, type ) {

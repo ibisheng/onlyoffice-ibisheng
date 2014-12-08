@@ -814,6 +814,31 @@
 			return frag;
 		}
 
+		function getEndValueRange (dx, start, v1, v2) {
+			var x1, x2;
+			if (0 !== dx) {
+				if (start === v1) {
+					x1 = v1;
+					x2 = v2;
+				} else if (start === v2) {
+					x1 = v2;
+					x2 = v1;
+				} else {
+					if (0 > dx) {
+						x1 = v2;
+						x2 = v1;
+					} else {
+						x1 = v1;
+						x2 = v2;
+					}
+				}
+			} else {
+				x1 = v1;
+				x2 = v2;
+			}
+			return {x1: x1, x2: x2};
+		}
+
 		//-----------------------------------------------------------------
 		// События движения мыши
 		//-----------------------------------------------------------------
@@ -1458,6 +1483,7 @@
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;
 		window["Asc"].isFixedWidthCell = isFixedWidthCell;
 		window["Asc"].truncFracPart = truncFracPart;
+		window["Asc"].getEndValueRange = getEndValueRange;
 
 		window["Asc"].Range = Range;
 		window["Asc"].ActiveRange = ActiveRange;
