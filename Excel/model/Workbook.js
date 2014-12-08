@@ -7030,7 +7030,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 		if(null != a.text)
 		{
 			if(null != b.text)
-				res = strcmp(a.text, b.text);
+				res = strcmp(a.text.toUpperCase(), b.text.toUpperCase());
 			else
 				res = 1;
 		}
