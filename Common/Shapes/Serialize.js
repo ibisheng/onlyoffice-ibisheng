@@ -5042,6 +5042,8 @@ function BinaryPPTYLoader()
                         _stream.size = s.size;
                         _chart = new CChartSpace();
                         _chart.setBDeleted(false);
+                        window.global_pptx_content_loader.ImageMapChecker = this.ImageMapChecker;
+                        window.global_pptx_content_loader.Reader.ImageMapChecker = this.ImageMapChecker;
                         var oBinaryChartReader = new BinaryChartReader(_stream);
                         oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     }

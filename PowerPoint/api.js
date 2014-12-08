@@ -986,12 +986,13 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	this.InitEditor();
 	this.DocumentUrl = url;
 	this.DocumentType = 2;
-	var _loader = window.global_pptx_content_loader;
+
+    var _loader = new BinaryPPTYLoader();
 
     _loader.Api = this;
     g_oIdCounter.Set_Load(true);
-    _loader.Reader.Load(gObject, this.WordControl.m_oLogicDocument);
-    _loader.Reader.Check_TextFit();
+    _loader.Load(gObject, this.WordControl.m_oLogicDocument);
+    _loader.Check_TextFit();
 
 	this.LoadedObject = 1;
     g_oIdCounter.Set_Load(false);
@@ -5186,18 +5187,18 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 	
 	g_oIdCounter.Set_Load(true);
 
-	var _loader = window.global_pptx_content_loader;
+    var _loader = new BinaryPPTYLoader();
     _loader.Api = this;
 
     if (version === undefined)
     {
-        _loader.Reader.Load(base64File, this.WordControl.m_oLogicDocument);
-        _loader.Reader.Check_TextFit();
+        _loader.Load(base64File, this.WordControl.m_oLogicDocument);
+        _loader.Check_TextFit();
     }
     else
     {
-        _loader.Reader.Load2(base64File, this.WordControl.m_oLogicDocument);
-        _loader.Reader.Check_TextFit();
+        _loader.Load2(base64File, this.WordControl.m_oLogicDocument);
+        _loader.Check_TextFit();
     }
     
     this.LoadedObject = 1;
