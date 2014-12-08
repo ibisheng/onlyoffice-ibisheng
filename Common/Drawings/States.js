@@ -484,7 +484,15 @@ RotateState.prototype =
                     tracks[i].originalObject = copy;
                     tracks[i].trackEnd(false);
                     this.drawingObjects.selectObject(copy, 0);
-                    ExecuteNoHistory(function(){drawingObjects.checkSelectedObjectsAndCallback(function(){}, []);}, this, []);
+                    if(!(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld))
+                    {
+                        ExecuteNoHistory(function(){drawingObjects.checkSelectedObjectsAndCallback(function(){}, []);}, this, []);
+                    }
+                    else
+                    {
+                        this.drawingObjects.startRecalculate();
+                        this.drawingObjects.drawingObjects.sendGraphicObjectProps();
+                    }
                 }
             }
             else
