@@ -3243,7 +3243,7 @@ PasteProcessor.prototype =
 							var aContent = [];
 							for(var i = 0; i < docContent.length; i++)
 							{
-								aContent[i] = docContent[i].Element;
+								aContent[i] = ConvertParagraphToWord(docContent[i].Element, this.oDocument);
 							}						
 							this.aContent = aContent;
 	
@@ -3882,10 +3882,17 @@ PasteProcessor.prototype =
 				{
 					var trueDocument = this.oDocument;
 					
-					//создаём темповый CDocumentContent
-					this.oDocument = new CDocumentContent(trueDocument, this.oDocument.DrawingDocument, 0 , 0, 0, 0, false, false);
+					var tempCDocument = function()
+					{
+						return new CDocument( this.oDocument.DrawingDocument);
+					}
+					//создаём темповый CDocument
+					this.oDocument = ExecuteNoHistory(tempCDocument , this, []);
+					
 					var aContent = ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
+					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
+					History.Document = trueDocument;
 					
 					var presentationSelectedContent = new PresentationSelectedContent();
 					presentationSelectedContent.DocContent = new CSelectedContent();
@@ -6765,9 +6772,9 @@ PasteProcessor.prototype =
                         blipFill.fill = new CBlipFill();
                         blipFill.fill.RasterImageId = sSrc;
                         image.setBlipFill(blipFill);
-                        image.setGeometry( CreateGeometry("rect"));
-                        image.spPr.geometry.Init(5, 5);
-                        image.setXfrm(node["offsetLeft"], node["offsetTop"], nWidth, nHeight, null, null, null);
+                        //image.setGeometry( CreateGeometry("rect"));
+                        //image.spPr.geometry.Init(5, 5);
+                        //image.setXfrm(node["offsetLeft"], node["offsetTop"], nWidth, nHeight, null, null, null);
                         arrImages.push(image);
                     }
                 }

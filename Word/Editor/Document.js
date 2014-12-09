@@ -636,7 +636,8 @@ function CDocument(DrawingDocument)
 
     this.HighlightColor = null;
 
-    this.Comments = new CComments();
+    if(typeof CComments !== "undefined")
+		this.Comments = new CComments();
 
     this.Lock = new CLock();
 
