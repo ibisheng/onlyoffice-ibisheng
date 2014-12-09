@@ -83,7 +83,7 @@ CDocumentSearch.prototype =
         return this.Id;
     },
 
-    Select : function(Id)
+    Select : function(Id, bUpdateStates)
     {
         var Paragraph = this.Elements[Id];
         if ( undefined != Paragraph )
@@ -97,7 +97,7 @@ CDocumentSearch.prototype =
                 Paragraph.Set_SelectionContentPos(SearchElement.StartPos, SearchElement.EndPos);
                 Paragraph.Set_ParaContentPos(SearchElement.StartPos, false, -1, -1);
 
-                Paragraph.Document_SetThisElementCurrent(true);
+                Paragraph.Document_SetThisElementCurrent(false !== bUpdateStates ? true : false);
             }
 
             this.CurId = Id;
@@ -147,7 +147,7 @@ CDocumentSearch.prototype =
         }
     },
 
-    Replace_All : function(NewStr)
+    Replace_All : function(NewStr, bUpdateStates)
     {
         var bSelect = true;
         for ( var Id in this.Elements )
@@ -155,7 +155,7 @@ CDocumentSearch.prototype =
             if ( true === bSelect )
             {
                 bSelect = false;
-                this.Select( Id );
+                this.Select(Id, bUpdateStates);
             }
 
             this.Replace( NewStr, Id );
@@ -173,7 +173,7 @@ CDocumentSearch.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Search = function(Str, Props)
+CDocument.prototype.Search = function(Str, Props, bDraw)
 {
     var StartTime = new Date().getTime();
 
@@ -193,8 +193,11 @@ CDocument.prototype.Search = function(Str, Props)
     // Поиск в колонтитулах
     this.SectionsInfo.Search( Str, Props, this.SearchEngine );
 
-    this.DrawingDocument.ClearCachePages();
-    this.DrawingDocument.FirePaint();
+    if (false !== bDraw)
+    {
+        this.DrawingDocument.ClearCachePages();
+        this.DrawingDocument.FirePaint();
+    }
 
     //console.log( "Search logic: " + ((new Date().getTime() - StartTime) / 1000) + " s"  );
 
@@ -204,7 +207,7 @@ CDocument.prototype.Search = function(Str, Props)
 CDocument.prototype.Search_Select = function(Id)
 {
     this.Selection_Remove();
-    this.SearchEngine.Select(Id);
+    this.SearchEngine.Select(Id, true);
     this.RecalculateCurPos();
 
     this.Document_UpdateInterfaceState();
@@ -237,7 +240,7 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
         History.Create_NewPoint();
 
         if ( true === bAll )
-            this.SearchEngine.Replace_All( NewStr );
+            this.SearchEngine.Replace_All( NewStr, true );
         else
             this.SearchEngine.Replace( NewStr, Id );
 

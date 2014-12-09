@@ -65,17 +65,21 @@ function CDocInfo (obj){
         }
         if (obj.OfflineApp === true)
             this.OfflineApp = true;
+
+        this.TemplateReplacement = (undefined !== obj.TemplateReplacement && null !== obj.TemplateReplacement ? obj.TemplateReplacement : null)
 	}
-	else{
-		this.Id = null;
-		this.Url = null;
-		this.Title = null;
-		this.Format = null;
-		this.VKey = null;
-        this.UserId = null;
-		this.UserName = null;
-		this.Options = null;
-        this.CallbackUrl = null;
+	else
+    {
+		this.Id                  = null;
+		this.Url                 = null;
+		this.Title               = null;
+		this.Format              = null;
+		this.VKey                = null;
+        this.UserId              = null;
+		this.UserName            = null;
+		this.Options             = null;
+        this.CallbackUrl         = null;
+        this.TemplateReplacement = null;
 	}
 }
 CDocInfo.prototype.get_Id = function(){return this.Id};
@@ -98,6 +102,8 @@ CDocInfo.prototype.get_Options = function(){return this.Options;};
 CDocInfo.prototype.put_Options = function(v){this.Options = v;};
 CDocInfo.prototype.get_CallbackUrl = function(){return this.CallbackUrl;};
 CDocInfo.prototype.put_CallbackUrl = function(v){this.CallbackUrl = v;};
+CDocInfo.prototype.get_TemplateReplacement = function(){return this.TemplateReplacement;};
+CDocInfo.prototype.put_TemplateReplacement = function(v){this.TemplateReplacement = v;};
 
 function CListType(obj)
 {

@@ -779,7 +779,16 @@ CDocument.prototype =
             this.DrawingObjects.addToZIndexManagerAfterOpen();
                 
         // Перемещаем курсор в начало документа
-        this.Cursor_MoveToStartPos( false );
+        this.Cursor_MoveToStartPos(false);
+
+        if (editor.DocInfo)
+        {
+            var TemplateReplacementData = editor.DocInfo.get_TemplateReplacement();
+            if (null !== TemplateReplacementData)
+            {
+                this.private_ProcessTemplateReplacement(TemplateReplacementData);
+            }
+        }
     },
     
     Add_TestDocument : function()
@@ -14103,6 +14112,14 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
     this.CheckEmptyElementsOnSelection = true;
     this.TurnOn_InterfaceEvents(true);
     return Result;
+};
+CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplacementData)
+{
+    for (var Id in TemplateReplacementData)
+    {
+        this.Search(Id, {MatchCase : true}, false);
+        this.SearchEngine.Replace_All(TemplateReplacementData[Id], false);
+    }
 };
 
 //-----------------------------------------------------------------------------------
