@@ -706,6 +706,8 @@ var gUndoInsDelCellsFlag = true;
 							}
 							else
 							{
+								//сделано для того, чтобы в случае ошибки на тулбаре не была активна кнопка а/ф
+								ws.handlers.trigger("selectionChanged", ws.getSelectionInfo());
 								History.EndTransaction();
 								if(isTurnOffHistory)
 									History.TurnOn();
@@ -6688,7 +6690,6 @@ var gUndoInsDelCellsFlag = true;
 						else
 						{
 							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
-							History.EndTransaction();
 							return false;
 						}
 					}
