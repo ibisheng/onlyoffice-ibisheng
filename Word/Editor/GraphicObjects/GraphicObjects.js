@@ -2206,8 +2206,8 @@ CGraphicObjects.prototype =
                 }
                 this.zIndexManager.removeArrayDrawings(arr_drawings_);
                 this.resetSelection();
-                this.document.Recalculate();
                 first_selected.parent.GoTo_Text();
+                this.document.Recalculate();
             }
         }
     },
