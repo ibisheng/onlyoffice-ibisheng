@@ -6881,10 +6881,13 @@ Paragraph.prototype =
                         var Left = CurParaPr.Ind.Left  + CurParaPr.Ind.FirstLine;
                         var NumLeftCorrection = ( undefined != Lvl.ParaPr.Ind.FirstLine ?  Math.abs( Lvl.ParaPr.Ind.FirstLine ) : 0 );
 
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : Left, Old : this.Pr.Ind.Left } );
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0,    Old : this.Pr.Ind.FirstLine } );
-                        this.Pr.Ind.Left      = Left - NumLeftCorrection;
-                        this.Pr.Ind.FirstLine = 0;
+                        var NewFirstLine = 0;
+                        var NewLeft      = Left < 0 ? Left : Math.max(0, Left - NumLeftCorrection);
+
+                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : NewLeft,      Old : this.Pr.Ind.Left } );
+                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : NewFirstLine, Old : this.Pr.Ind.FirstLine } );
+                        this.Pr.Ind.Left      = NewLeft;
+                        this.Pr.Ind.FirstLine = NewFirstLine;
                     }
                 }
             }
