@@ -882,7 +882,7 @@ function CEditorPage(api)
         this.m_oHorRuler.m_dMarginRight = this.m_oLogicDocument.Width;
 
         this.m_oVerRuler.m_dMarginTop = 0;
-        this.m_oVerRuler.m_dMarginBottom = this.m_oLogicDocument.Width;
+        this.m_oVerRuler.m_dMarginBottom = this.m_oLogicDocument.Height;
         this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
         if (this.m_bIsRuler)
