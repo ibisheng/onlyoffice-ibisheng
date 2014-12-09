@@ -477,25 +477,9 @@ CTextBody.prototype =
                                     new_spacing.After = spc;
                                 parg.Set_Spacing(new_spacing);
                             }
-
                             if(isRealNumber(font_scale))
                             {
-                                var par_font_size = parg.Get_CompiledPr(false).TextPr.FontSize;
-                                for(var r = 0; r < parg.Content.length; ++r)
-                                {
-                                    var item = parg.Content[r];
-                                    if(isRealNumber(item.Pr.FontSize))
-                                    {
-                                        item.Set_FontSize(Math.round(item.Pr.FontSize*font_scale));
-                                    }
-                                    else
-                                    {
-                                        if(r === 0)
-                                        {
-                                            item.Set_FontSize(Math.round(par_font_size*font_scale));
-                                        }
-                                    }
-                                }
+                                this.checkParagraphContent(parg, font_scale, true);
                             }
                         }
 
@@ -505,6 +489,38 @@ CTextBody.prototype =
             }
         }
         this.bodyPr.textFit = null;
+    },
+
+    checkParagraphContent: function(parg, fontScale, bParagraph)
+    {
+        for(var r = 0; r < parg.Content.length; ++r)
+        {
+            var item = parg.Content[r];
+            switch(item.Type)
+            {
+                case para_Run:
+                {
+                    if(isRealNumber(item.Pr.FontSize))
+                    {
+                        item.Set_FontSize(Math.round(item.Pr.FontSize*fontScale));
+                    }
+                    else if(bParagraph)
+                    {
+                        if(r === 0)
+                        {
+                            var par_font_size = parg.Get_CompiledPr(false).TextPr.FontSize;
+                            item.Set_FontSize(Math.round(par_font_size*fontScale));
+                        }
+                    }
+                    break;
+                }
+                case para_Hyperlink:
+                {
+                    this.checkParagraphContent(item, fontScale, false);
+                    break;
+                }
+            }
+        }
     },
 
     Refresh_RecalcData: function()
