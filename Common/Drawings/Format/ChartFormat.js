@@ -12124,7 +12124,7 @@ CDispUnits.prototype =
 
     Read_FromBinary2: function(r)
     {
-        this.Id = r.Get_Id();
+        this.Id = r.GetString2();
     },
 
     Save_Changes: function(data, w)
