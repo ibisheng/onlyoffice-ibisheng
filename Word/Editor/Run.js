@@ -4744,12 +4744,6 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
             TextPr.Merge(this.Parent.GetCtrPrp());
             TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
-
-            // special for placeholder
-
-            TextPr.Italic = false;
-            TextPr.Bold   = false;
-
         }
         else
         {

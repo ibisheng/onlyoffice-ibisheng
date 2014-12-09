@@ -524,9 +524,10 @@ CMathText.prototype =
             }
         }
 
-        /*if(bMathText && code == 0x27)
+        /*if(!bNormal && code == 0x27)
         {
-            code = 0x7F0;
+            // рисовать в Calibri
+            code = 3;  GID
             this.RecalcInfo.bApostrophe = true;
         }*/
 
@@ -573,7 +574,7 @@ CMathText.prototype =
             this.RecalcInfo.StyleCode = letter;
             this.RecalcInfo.bAccentIJ = bAccentIJ;
 
-            if(bAccentIJ)
+            if(bAccentIJ || this.RecalcInfo.bApostrophe)
                 oMeasure.SetStringGid(true);
 
             if( InfoTextPr.NeedUpdateTextPrp(this.value, this.FontSlot, this.IsPlaceholder()) )
@@ -585,7 +586,7 @@ CMathText.prototype =
 
             metricsTxt = oMeasure.MeasureCode(letter);
 
-            if(bAccentIJ)
+            if(bAccentIJ || this.RecalcInfo.bApostrophe)
                 oMeasure.SetStringGid(false);
 
         }
@@ -1055,14 +1056,15 @@ CMathInfoTextPr.prototype.NeedUpdateTextPrp = function(code, fontSlot, IsPlaceho
         NeedUpdate = true;
     }
 
-    // IsMathematicalText ?
-    if(this.bNormalText == false )
+    // IsMathematicalText  || Placeholder ?
+    if(this.bNormalText == false || IsPlaceholder)
     {
         var BoldItalicForMath     = this.RFontsCompare[fontSlot] == true  && (this.CurrentTextPr.Bold !== false || this.CurrentTextPr.Italic !== false),
-            BoldItalicForOther    = this.RFontsCompare[fontSlot] == false && (this.CurrentTextPr.Bold !== this.TextPr.Bold ||  this.CurrentTextPr.Italic !== this.TextPr.Italic),
-            BoldItalicPlaceholder = this.RFontsCompare[fontSlot] == false && IsPlaceholder && (this.CurrentTextPr.Bold !== false || this.CurrentTextPr.Italic !== false);
+            BoldItalicForOther    = this.RFontsCompare[fontSlot] == false && (this.CurrentTextPr.Bold !== this.TextPr.Bold ||  this.CurrentTextPr.Italic !== this.TextPr.Italic);
 
-        if(BoldItalicForMath || BoldItalicPlaceholder) // Cambria Math || Placeholder
+        var BoldItalicPlh = IsPlaceholder && (this.CurrentTextPr.Bold !== false || this.CurrentTextPr.Italic !== false);
+
+        if(BoldItalicForMath || BoldItalicPlh) // Cambria Math
         {
             this.CurrentTextPr.Italic = false;
             this.CurrentTextPr.Bold   = false;
@@ -1077,25 +1079,26 @@ CMathInfoTextPr.prototype.NeedUpdateTextPrp = function(code, fontSlot, IsPlaceho
             NeedUpdate = true;
         }
 
-        var checkSpOperator = IsPlaceholder || Math_Is_SpecilalOperator(code);
+        var checkSpOperator = Math_Is_SpecilalOperator(code),
+            IsPlh = IsPlaceholder && this.RFontsCompare[fontSlot] == false;
 
-        if( checkSpOperator !== this.bSpecialOperator)
+        if( checkSpOperator !== this.bSpecialOperator || IsPlh)
         {
-            if(checkSpOperator == true  && this.RFontsCompare[fontSlot] == false)
-            {
-                this.CurrentTextPr.FontFamily = {Name : "Cambria Math", Index : -1};
-                this.CurrentTextPr.RFonts.Set_All("Cambria Math",-1);
-
-                this.bSpecialOperator = true;
-
-                NeedUpdate = true;
-            }
-            else if(checkSpOperator == false)
+            if(checkSpOperator == false)
             {
                 this.CurrentTextPr.FontFamily = this.TextPr.FontFamily;
                 this.CurrentTextPr.RFonts.Set_FromObject(this.TextPr.RFonts);
 
                 this.bSpecialOperator = false;
+
+                NeedUpdate = true;
+            }
+            else if(this.RFontsCompare[fontSlot] == false)
+            {
+                this.CurrentTextPr.FontFamily = {Name : "Cambria Math", Index : -1};
+                this.CurrentTextPr.RFonts.Set_All("Cambria Math",-1);
+
+                this.bSpecialOperator = true;
 
                 NeedUpdate = true;
             }
