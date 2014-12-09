@@ -404,9 +404,12 @@ function Editor_Copy_Event(e, ElemToSelect)
 	var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
 	var sBase64 = oCopyProcessor.Start();
 	
-	e.clipboardData.setData("text/x-custom", sBase64);
-	e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
-	e.preventDefault();
+	if(sBase64 !== false || g_bIsDocumentCopyPaste)
+	{
+		e.clipboardData.setData("text/x-custom", sBase64);
+		e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
+		e.preventDefault();
+	}
 }
 function CopyProcessor(api, ElemToSelect, onlyBinaryCopy)
 {
@@ -1808,7 +1811,10 @@ CopyProcessor.prototype =
 			var presentation = editor.WordControl.m_oLogicDocument;
 			
 			var selectedContent = oDocument.Get_SelectedContent();			
-
+			
+			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
+				return false;
+			
 			this.CopyDocument2(this.ElemToSelect, oDocument, false, selectedContent);
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
