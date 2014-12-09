@@ -2122,12 +2122,19 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         {
             ExecuteNoHistory(function(){
                 this.WordControl.m_oLogicDocument.ShapeApply(prop);
+                if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
+                {
+                    var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
+                    slide.graphicObjects.recalculate();
+                    this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
+                    this.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                }
             }, this, []);
         }
     }
 }
 
-asc_docs_api.prototype.setStartPointHistory = function(){this.noCreatePoint = true; History.Create_NewPoint();};
+asc_docs_api.prototype.setStartPointHistory = function(){this.noCreatePoint = true;};
 asc_docs_api.prototype.setEndPointHistory   = function(){this.noCreatePoint = false; };
 asc_docs_api.prototype.SetSlideProps = function(prop)
 {
@@ -4105,6 +4112,40 @@ asc_docs_api.prototype.sync_MouseMoveEndCallback = function()
 
 asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 {
+    if(Data.Hyperlink && typeof Data.Hyperlink.Value === "string")
+    {
+        var indAction = Data.Hyperlink.Value.indexOf("ppaction://hlink");
+        var Url = Data.Hyperlink.Value;
+        if (0 == indAction)
+        {
+            if (Url == "ppaction://hlinkshowjump?jump=firstslide")
+            {
+                Data.Hyperlink.Value = "First Slide";
+            }
+            else if (Url == "ppaction://hlinkshowjump?jump=lastslide")
+            {
+                Data.Hyperlink.Value = "Last Slide";
+            }
+            else if (Url == "ppaction://hlinkshowjump?jump=nextslide")
+            {
+                Data.Hyperlink.Value = "Next Slide";
+            }
+            else if (Url == "ppaction://hlinkshowjump?jump=previousslide")
+            {
+                Data.Hyperlink.Value = "Previous Slide";
+            }
+            else
+            {
+                var mask = "ppaction://hlinksldjumpslide";
+                var indSlide = Url.indexOf(mask);
+                if (0 == indSlide)
+                {
+                    var slideNum = parseInt(Url.substring(mask.length));
+                    Data.Hyperlink.Value = "Slide" + slideNum;
+                }
+            }
+        }
+    }
     this.asc_fireCallback("asc_onMouseMove", Data );
 }
 
