@@ -64,6 +64,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentFormatSaveCsvDelimiter = c_oAscCsvDelimiter.Comma;
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
+			this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 			this.DocInfo = null;
 
 			// объекты, нужные для отправки в тулбар (шрифты, стили)
@@ -432,6 +433,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.documentVKey   		= this.DocInfo["VKey"];
 				this.chartEditor			= this.DocInfo["ChartEditor"];
 				this.documentOpenOptions 	= this.DocInfo["Options"];
+				this.documentCallbackUrl 	= this.DocInfo["CallbackUrl"];
 				// if(this.documentFormat)
 				// {
 					// switch(this.documentFormat)
@@ -1697,8 +1699,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			};
 
-			this.CoAuthoringApi.init(t.User, t.documentId, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Spreadsheet,
-				t.documentFormatSave, t.asc_getViewerMode());
+			this.CoAuthoringApi.init(t.User, t.documentId, t.documentCallbackUrl, 'fghhfgsjdgfjs',
+				function(){}, c_oEditorId.Spreadsheet, t.documentFormatSave, t.asc_getViewerMode());
 		};
 
 		// Set CoAuthoring server url

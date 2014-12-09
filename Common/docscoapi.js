@@ -4,7 +4,7 @@
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_coAuthV	= '3.0.5';
+	var asc_coAuthV	= '3.0.6';
 
 	// Класс надстройка, для online и offline работы
 	function CDocsCoApi (options) {
@@ -30,7 +30,7 @@
 		}
 	}
 
-	CDocsCoApi.prototype.init = function (user, docid, token, callback, editorType, documentFormatSave, isViewer) {
+	CDocsCoApi.prototype.init = function (user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e, count) {t.callback_OnAuthParticipantsChanged(e, count);};
@@ -50,7 +50,7 @@
 			this._CoAuthoringApi.onUnSaveLock = function () {t.callback_OnUnSaveLock();};
 			this._CoAuthoringApi.onRecalcLocks = function (e) {t.callback_OnRecalcLocks(e);};
 
-			this._CoAuthoringApi.init(user, docid, token, callback, editorType, documentFormatSave, isViewer);
+			this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer);
 			this._onlineWork = true;
 		}
 		else {
@@ -302,6 +302,7 @@
 		this.errorTimeOut = 10000;
 
 		this._docid = null;
+		this._documentCallbackUrl = null;
 		this._token = null;
 		this._user = "Anonymous";
 		this._userId = "Anonymous";
@@ -847,9 +848,10 @@
 		}
 	};
 
-    DocsCoApi.prototype.init = function (user, docid, token, callback, editorType, documentFormatSave, isViewer) {
+    DocsCoApi.prototype.init = function (user, docid, documentCallbackUrl, token, callback, editorType, documentFormatSave, isViewer) {
         this._user = user;
         this._docid = docid;
+		this._documentCallbackUrl = documentCallbackUrl;
         this._token = token;
         this._initCallback = callback;
         this.ownedLockBlocks = [];
@@ -895,6 +897,7 @@
 				{
 					'type'	: 'auth',
 					'docid'	: t._docid,
+					'documentCallbackUrl' : t._documentCallbackUrl,
 					'token'	: t._token,
 					'user'	: {
 						'id'	: t._user.asc_getId(),

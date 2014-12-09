@@ -13,6 +13,7 @@ var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
+var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
 var c_oSerFormat =
 {
@@ -515,7 +516,7 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         }
 	};
 
-    this.CoAuthoringApi.init(this.User, documentId, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Presentation,
+    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Presentation,
 		documentFormatSave, this.isViewMode);
 
     // ToDo init other callbacks
@@ -783,6 +784,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
+        documentCallbackUrl = this.DocInfo.get_CallbackUrl();
 		var nIndex = -1;
 		if(documentTitle)
 			nIndex = documentTitle.lastIndexOf(".");

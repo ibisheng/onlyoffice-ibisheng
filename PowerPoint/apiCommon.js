@@ -125,6 +125,9 @@ function CDocInfo (obj){
 		if (typeof obj.Options != 'undefined'){
             this.Options = obj.Options;
         }
+        if (typeof obj.CallbackUrl != 'undefined'){
+            this.CallbackUrl = obj.CallbackUrl;
+        }
         if (obj.OfflineApp === true)
             this.OfflineApp = true;
     }
@@ -137,26 +140,29 @@ function CDocInfo (obj){
         this.UserId = null;
         this.UserName = null;
 		this.Options = null;
+        this.CallbackUrl = null;
     }
 }
-CDocInfo.prototype.get_Id = function(){return this.Id}
-CDocInfo.prototype.put_Id = function(v){this.Id = v;}
-CDocInfo.prototype.get_Url = function(){return this.Url;}
-CDocInfo.prototype.put_Url = function(v){this.Url = v;}
-CDocInfo.prototype.get_Title = function(){return this.Title;}
-CDocInfo.prototype.put_Title = function(v){this.Title = v;}
-CDocInfo.prototype.get_Format = function(){return this.Format;}
-CDocInfo.prototype.put_Format = function(v){this.Format = v;}
-CDocInfo.prototype.get_VKey = function(){return this.VKey;}
-CDocInfo.prototype.put_VKey = function(v){this.VKey = v;}
-CDocInfo.prototype.get_OfflineApp = function(){return this.OfflineApp;}
-CDocInfo.prototype.put_OfflineApp = function(v){this.OfflineApp = v;}
-CDocInfo.prototype.get_UserId = function(){return this.UserId;}
-CDocInfo.prototype.put_UserId = function(v){this.UserId = v;}
-CDocInfo.prototype.get_UserName = function(){return this.UserName;}
-CDocInfo.prototype.put_UserName = function(v){this.UserName = v;}
-CDocInfo.prototype.get_Options = function(){return this.Options;}
-CDocInfo.prototype.put_Options = function(v){this.Options = v;}
+CDocInfo.prototype.get_Id = function(){return this.Id};
+CDocInfo.prototype.put_Id = function(v){this.Id = v;};
+CDocInfo.prototype.get_Url = function(){return this.Url;};
+CDocInfo.prototype.put_Url = function(v){this.Url = v;};
+CDocInfo.prototype.get_Title = function(){return this.Title;};
+CDocInfo.prototype.put_Title = function(v){this.Title = v;};
+CDocInfo.prototype.get_Format = function(){return this.Format;};
+CDocInfo.prototype.put_Format = function(v){this.Format = v;};
+CDocInfo.prototype.get_VKey = function(){return this.VKey;};
+CDocInfo.prototype.put_VKey = function(v){this.VKey = v;};
+CDocInfo.prototype.get_OfflineApp = function(){return this.OfflineApp;};
+CDocInfo.prototype.put_OfflineApp = function(v){this.OfflineApp = v;};
+CDocInfo.prototype.get_UserId = function(){return this.UserId;};
+CDocInfo.prototype.put_UserId = function(v){this.UserId = v;};
+CDocInfo.prototype.get_UserName = function(){return this.UserName;};
+CDocInfo.prototype.put_UserName = function(v){this.UserName = v;};
+CDocInfo.prototype.get_Options = function(){return this.Options;};
+CDocInfo.prototype.put_Options = function(v){this.Options = v;};
+CDocInfo.prototype.get_CallbackUrl = function(){return this.CallbackUrl;};
+CDocInfo.prototype.put_CallbackUrl = function(v){this.CallbackUrl = v;};
 // ---------------------------------------------------------------
 
 

@@ -15,6 +15,7 @@ var documentVKey = null;
 var documentOrigin = "";
 var documentFormatSave = c_oAscFileType.DOCX;
 var documentFormatSaveTxtCodepage = 65001;//utf8
+var documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
 
 function CDocOpenProgress()
 {
@@ -59,6 +60,9 @@ function CDocInfo (obj){
 		if (typeof obj.Options != 'undefined'){
 			this.Options = obj.Options;
 		}
+        if (typeof obj.CallbackUrl != 'undefined'){
+            this.CallbackUrl = obj.CallbackUrl;
+        }
         if (obj.OfflineApp === true)
             this.OfflineApp = true;
 	}
@@ -71,6 +75,7 @@ function CDocInfo (obj){
         this.UserId = null;
 		this.UserName = null;
 		this.Options = null;
+        this.CallbackUrl = null;
 	}
 }
 CDocInfo.prototype.get_Id = function(){return this.Id};
@@ -91,6 +96,8 @@ CDocInfo.prototype.get_UserName = function(){return this.UserName;};
 CDocInfo.prototype.put_UserName = function(v){this.UserName = v;};
 CDocInfo.prototype.get_Options = function(){return this.Options;};
 CDocInfo.prototype.put_Options = function(v){this.Options = v;};
+CDocInfo.prototype.get_CallbackUrl = function(){return this.CallbackUrl;};
+CDocInfo.prototype.put_CallbackUrl = function(v){this.CallbackUrl = v;};
 
 function CListType(obj)
 {
@@ -958,6 +965,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
+        documentCallbackUrl = this.DocInfo.get_CallbackUrl();
 		// if(documentFormat)
 		// {
 			// switch(documentFormat)
@@ -1638,8 +1646,8 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		}
 	};
 
-    this.CoAuthoringApi.init(this.User, documentId, 'fghhfgsjdgfjs', function(){}, c_oEditorId.Word,
-		documentFormatSave, this.isViewMode);
+    this.CoAuthoringApi.init(this.User, documentId, documentCallbackUrl, 'fghhfgsjdgfjs', function(){},
+        c_oEditorId.Word, documentFormatSave, this.isViewMode);
 
     // ToDo init other callbacks
 };
