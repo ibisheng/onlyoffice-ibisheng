@@ -2503,6 +2503,9 @@ function Body_Paste(api, e)
                     ifr.style.zIndex = -1000;
                     document.body.appendChild(ifr);
                 }
+				else
+					ifr.style.width = '10000px';
+					
                 var frameWindow = window.frames["pasteFrame"];
                 if(frameWindow)
                 {
@@ -2516,6 +2519,8 @@ function Body_Paste(api, e)
 						bExist = true;
 					}
                 }
+				
+				ifr.style.width = '100px';
             }
 			else if(sBase64)
 			{
@@ -7426,7 +7431,7 @@ PasteProcessor.prototype =
 
 function SafariIntervalFocus()
 {
-    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && (!window.editor.WordControl.TextBoxInputFocus))
+    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && (!g_bIsDocumentCopyPaste || (g_bIsDocumentCopyPaste && !window.editor.WordControl.TextBoxInputFocus)))
     {
         var pastebin = document.getElementById(COPY_ELEMENT_ID);
         if (pastebin)
