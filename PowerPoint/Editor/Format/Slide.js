@@ -1279,7 +1279,7 @@ Slide.prototype =
                     }
                 }
 
-                if ("" != commentData.m_sUserName)
+                //if ("" != commentData.m_sUserName)
                 {
                     _comments_id.push(_wc.WriteCommentId);
                     _comments_data.push(commentData);
