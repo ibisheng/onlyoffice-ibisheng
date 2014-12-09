@@ -2572,7 +2572,7 @@ CPresentation.prototype =
             }
             if(!target_content)
             {
-                editor.UpdateParagraphProp( para_pr, flag );
+               //editor.UpdateParagraphProp( para_pr, flag );
                 editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
                 //if(selected_objects.length === 1 )
                 //{
@@ -2604,7 +2604,8 @@ CPresentation.prototype =
             }
             if(target_content)
             {
-                if(para_pr)
+                target_content.Document_UpdateInterfaceState();
+               /* if(para_pr)
                 {
                     editor.UpdateParagraphProp( para_pr, flag );
 
@@ -2628,7 +2629,7 @@ CPresentation.prototype =
                     var HyperProps = new CHyperlinkProperty(Hyperlink);
                     HyperProps.put_Text( HyperText.Text );
                     editor.sync_HyperlinkPropCallback(HyperProps);
-                }
+                }*/
             }
         }
         editor.sync_EndCatchSelectedElements();
