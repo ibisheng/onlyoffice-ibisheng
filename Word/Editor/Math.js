@@ -233,6 +233,7 @@ ParaMath.prototype.Add = function(Item)
             EndPos:     StartPos + lng2 - lng
         };
 
+        TextPr.RFonts.Set_All("Cambria Math", -1);
         oContent.Apply_TextPr(TextPr, undefined, false, Pos_ApplyTextPr);
         //oContent.Set_MathTextPr2(MathTxtPr.TextPr, MathTxtPr.MathPr, false, StartPos + 1, lng2 - lng);
     }
@@ -2782,19 +2783,26 @@ CChangesMathEqArrayPr.prototype.Load_Changes = function(Reader, Class)
     this.Redo(Class);
 };
 
-function MathApplyArgSize(FontSize, argSize)
+
+function MatGetKoeffArgSize(FontSize, ArgSize)
 {
-    var ResultFontSize = FontSize;
-    if(argSize == -1)
+    var FontKoef = 1;
+
+    if(ArgSize == -1)
     {
-        ResultFontSize *= g_dMathArgSizeKoeff_1;
+        FontKoef = g_dMathArgSizeKoeff_1;
     }
-    else if(argSize == -2)
+    else if(ArgSize == -2)
     {
-        ResultFontSize *= g_dMathArgSizeKoeff_2;
+        FontKoef = g_dMathArgSizeKoeff_2;
     }
 
-    return ResultFontSize;
+    if (1 !== FontKoef )
+    {
+        FontKoef = (((FontSize * FontKoef * 2 + 0.5) | 0) / 2) / FontSize;
+    }
+
+    return FontKoef;
 }
 
 function CMathRecalculateInfo()

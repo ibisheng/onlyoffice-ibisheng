@@ -56,6 +56,8 @@ function CMathText(bJDraw)
     this.GapLeft = 0;
     this.GapRight = 0;
 
+    this.FontSlot  = fontslot_ASCII;
+
     // TO DO
     // убрать
 
@@ -566,7 +568,7 @@ CMathText.prototype =
 
             this.FontSlot = InfoTextPr.GetFontSlot(this.value); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
 
-            var letter = this.getCode(InfoTextPr);
+            var letter = this.getCode();
 
             // в не математическом тексте i и j не подменяются на i и j без точек
             var bAccentIJ = !InfoTextPr.bNormalText && this.Parent.IsAccent() && (this.value == 0x69 || this.value == 0x6A);
@@ -577,18 +579,29 @@ CMathText.prototype =
             if(bAccentIJ || this.RecalcInfo.bApostrophe)
                 oMeasure.SetStringGid(true);
 
-            if( InfoTextPr.NeedUpdateTextPrp(this.value, this.FontSlot, this.IsPlaceholder()) )
+            if( InfoTextPr.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder()) )
             {
-                g_oTextMeasurer.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
+                g_oTextMeasurer.SetFont(InfoTextPr.Font);
+                //g_oTextMeasurer.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
             }
+            else if(InfoTextPr.CurrType == MathTextInfo_NormalText)
+            {
+                /*this.FontKoef = InfoTextPr.FontKoef;
+                if (1 !== this.FontKoef )
+                {
+                    var FontSize = this.FontSlot == fontslot_CS ? InfoTextPr.TextPr.FontSizeCS : InfoTextPr.TextPr.FontSize;
+                    this.FontKoef = (((FontSize * this.FontKoef * 2 + 0.5) | 0) / 2) / FontSize;
+                }*/
 
-            g_oTextMeasurer.SetFontSlot(this.FontSlot, 1);
+                var FontKoef = InfoTextPr.GetFontKoef(this.FontSlot);
+
+                g_oTextMeasurer.SetFontSlot(this.FontSlot, FontKoef);
+            }
 
             metricsTxt = oMeasure.MeasureCode(letter);
 
             if(bAccentIJ || this.RecalcInfo.bApostrophe)
                 oMeasure.SetStringGid(false);
-
         }
 
         if(letter == 0x2061)
@@ -670,12 +683,17 @@ CMathText.prototype =
         }
         else if(this.RecalcInfo.bSpaceSpecial == false)
         {
-            if( InfoTextPr.NeedUpdateTextPrp(this.value, this.FontSlot, this.IsPlaceholder()) )
+            if( InfoTextPr.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder()) )
             {
-                pGraphics.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
+                pGraphics.SetFont(InfoTextPr.Font);
+                //pGraphics.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
+            }
+            else if(InfoTextPr.CurrType == MathTextInfo_NormalText)
+            {
+                var FontKoef = InfoTextPr.GetFontKoef(this.FontSlot);
+                pGraphics.SetFontSlot(this.FontSlot, FontKoef);
             }
 
-            pGraphics.SetFontSlot(this.FontSlot, 1);
 
             if(this.RecalcInfo.bAccentIJ ||  this.RecalcInfo.bApostrophe)
                 pGraphics.tg(this.RecalcInfo.StyleCode, X, Y);
@@ -995,25 +1013,14 @@ function GetMathModifiedFont(type, TextPr, Class)
     return NewMathTextPr;
 }
 
-function Math_Is_SpecilalOperator(val)
-{
-    var bSpecialOperator = val == 0x21 || val == 0x23 || (val >= 0x28 && val <= 0x2F) || (val >= 0x3A && val <= 0x3F) || (val >=0x5B && val <= 0x5F) || (val >= 0x7B && val <= 0xA1) || val == 0xAC || val == 0xB1 || val == 0xB7 || val == 0xBF || val == 0xD7 || val == 0xF7 || (val >= 0x2010 && val <= 0x2014) || val == 0x2016 || (val >= 0x2020 && val <= 0x2022) || val == 0x2026,
-        bSpecialArrow    = val >= 0x2190 && val <= 0x21FF,
-        bSpecialSymbols  = val == 0x2200 || val == 0x2201 || val == 0x2203 || val == 0x2204 || val == 0x2206|| (val >= 0x2208 && val <= 0x220D) || (val >= 0x220F && val <= 0x221E) || (val >= 0x2223 && val <= 0x223E) || (val >= 0x223F && val <= 0x22BD) || (val >= 0x22C0 && val <= 0x22FF) || val == 0x2305 || val == 0x2306 || (val >= 0x2308 && val <= 0x230B) || (val >= 0x231C && val <= 0x231F) || val == 0x2322 || val == 0x2323 || val == 0x2329 || val == 0x232A ||val == 0x233F || val == 0x23B0 || val == 0x23B1,
-        bOtherArrows     = (val >= 0x27D1 && val <= 0x2980) || (val >= 0x2982 && val <= 0x299A) || (val >= 0x29B6 &&  val <= 0x29B9) || val == 0x29C0 || val == 0x29C1 || (val >= 0x29C4 && val <= 0x29C8) || (val >= 0x29CE && val <= 0x29DB) || val == 0x29DF || (val >= 0x29E1 && val <= 0x29E6) || val == 0x29EB || (val >= 0x29F4 && val <= 0x2AFF && val !== 0x2AE1 && val !== 0x2AF1) || (val >= 0x3014 && val <= 0x3017);
 
-    // apostrophe
-    // отдельно Cambria Math 0x27
-
-    return bSpecialOperator || bSpecialArrow || bSpecialSymbols || bOtherArrows;
-}
 
 function CMathInfoTextPr(TextPr, ArgSize, bNormalText, Theme)
 {
     this.BFirstSetTextPr  = true;
     this.TextPr           = new CTextPr();
     this.CurrentTextPr    = new CTextPr();
-    this.bSpecialOperator = false;
+
     this.bNormalText      = bNormalText;
     this.bSpecialOperator = false;
 
@@ -1117,3 +1124,180 @@ CMathInfoTextPr.prototype.GetFontSlot = function(code)
 
     return g_font_detector.Get_FontClass(code, Hint, lcid, bCS, bRTL);
 };
+
+var MathTextInfo_MathText        = 1;
+var MathTextInfo_SpecialOperator = 2;
+var MathTextInfo_NormalText      = 3;
+
+function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText)
+{
+    this.CurrType         = -1; // в первый раз Font всегда выставляем
+    this.TextPr           = TextPr;
+    this.ArgSize          = ArgSize;
+    //this.CurrentTextPr    = new CTextPr();
+    this.Font =
+    {
+        FontFamily:     {Name:  "Cambria Math", Index : -1},
+        FontSize:       TextPr.FontSize,
+        Italic:         false,
+        Bold:           false
+    };
+
+    this.bNormalText      = bNormalText;
+
+    this.RFontsCompare = [];
+
+    // скопируем эти свойства для SetFontSlot
+    // для SpecialOperator нужны уже скомпилированные для мат текста текстовые настройки, поэтому важно эи свойства скопировать именно здесь, а не передавать в MathText обычные текст. настройки
+
+    this.RFontsCompare[fontslot_ASCII]    = undefined !== this.TextPr.RFonts.Ascii && this.TextPr.RFonts.Ascii.Name == "Cambria Math";
+    this.RFontsCompare[fontslot_HAnsi]    = undefined !== this.TextPr.RFonts.HAnsi && this.TextPr.RFonts.HAnsi.Name == "Cambria Math";
+    this.RFontsCompare[fontslot_CS]       = undefined !== this.TextPr.RFonts.CS && this.TextPr.RFonts.CS.Name == "Cambria Math";
+    this.RFontsCompare[fontslot_EastAsia] = undefined !== this.TextPr.RFonts.EastAsia && this.TextPr.RFonts.EastAsia.Name == "Cambria Math";
+
+}
+CMathInfoTextPr_2.prototype.NeedUpdateFont = function(code, fontSlot, IsPlaceholder)
+{
+    var NeedUpdateFont = false;
+    var bMathText = this.bNormalText == false || IsPlaceholder;
+    var Type;
+
+    if(bMathText && (this.RFontsCompare[fontSlot] == true || IsPlaceholder))
+        Type = MathTextInfo_MathText;
+    else if(bMathText && this.RFontsCompare[fontSlot] == false && this.IsSpecilalOperator(code))
+        Type = MathTextInfo_SpecialOperator;
+    else
+        Type = MathTextInfo_NormalText;
+
+    var bChangeType = this.CurrType !== MathTextInfo_MathText && this.CurrType !== MathTextInfo_SpecialOperator; // -1 or MathTextInfo_NormalText
+
+    if(bChangeType && Type !== MathTextInfo_NormalText)
+    {
+        this.Font.FontSize = fontSlot !== fontslot_CS ? this.TextPr.FontSize : this.TextPr.FontSizeCS;
+        this.Font.FontSize *= this.GetFontKoef(fontSlot);
+
+        NeedUpdateFont = true;
+    }
+
+    this.CurrType = Type;
+
+    return NeedUpdateFont;
+};
+CMathInfoTextPr_2.prototype.NeedUpdateFont_2 = function(code, fontSlot, IsPlaceholder)
+{
+    var NeedUpdateFont = false;
+    var bMathText = this.bNormalText == false || IsPlaceholder;
+    var Type;
+
+    if(bMathText && (this.RFontsCompare[fontSlot] == true || IsPlaceholder))
+        Type = MathTextInfo_MathText;
+    else if(bMathText && this.RFontsCompare[fontSlot] == false && this.IsSpecilalOperator(code))
+        Type = MathTextInfo_SpecialOperator;
+    else
+        Type = MathTextInfo_NormalText;
+
+
+    if(this.CurrType !== Type)
+    {
+        if(Type == MathTextInfo_MathText)
+        {
+            this.Font.Italic = false;
+            this.Font.Bold   = false;
+            NeedUpdateFont = true;
+        }
+        else if(Type == MathTextInfo_SpecialOperator)
+        {
+            // FontFamily Cambria Math !
+
+            if(fontSlot !== fontslot_CS)
+            {
+                this.Font.Italic = this.TextPr.Italic;
+                this.Font.Bold   = this.TextPr.Bold;
+            }
+            else
+            {
+                this.Font.Italic = this.TextPr.ItalicCS;
+                this.Font.Bold   = this.TextPr.BoldCS;
+            }
+            NeedUpdateFont = true;
+        }
+
+        if(NeedUpdateFont)
+        {
+            this.Font.FontSize = fontSlot !== fontslot_CS ? this.TextPr.FontSize : this.TextPr.FontSizeCS;
+            this.Font.FontSize *= this.GetFontKoef(fontSlot);
+        }
+
+        this.CurrType = Type;
+    }
+
+    return NeedUpdateFont;
+};
+CMathInfoTextPr_2.prototype.NeedSetFont_2 = function(code, fontSlot, IsPlaceholder)
+{
+    var NeedSetFont = false;
+
+    // IsMathematicalText  || Placeholder ?
+    if(this.bNormalText == false || IsPlaceholder)
+    {
+        if(this.RFontsCompare[fontSlot] == true || IsPlaceholder) // Cambria Math
+        {
+            this.Font.Italic = false;
+            this.Font.Bold   = false;
+
+            NeedSetFont = true;
+        }
+        else if(this.IsSpecilalOperator(code))
+        {
+            // FontFamily Cambria Math !
+
+            if(fontSlot !== fontslot_CS)
+            {
+                this.Font.Italic = this.TextPr.Italic;
+                this.Font.Bold   = this.TextPr.Bold;
+            }
+            else
+            {
+                this.Font.Italic = this.TextPr.ItalicCS;
+                this.Font.Bold   = this.TextPr.BoldCS;
+            }
+
+            NeedSetFont = true;
+        }
+
+        if(NeedSetFont)
+        {
+            this.Font.FontSize = fontSlot !== fontslot_CS ? this.TextPr.FontSize : this.TextPr.FontSizeCS;
+            this.Font.FontSize *= this.GetFontKoef(fontSlot);
+        }
+    }
+
+    return NeedSetFont;
+};
+CMathInfoTextPr_2.prototype.GetFontKoef = function(fontSlot)
+{
+    var FontSize = fontSlot == fontslot_CS ? this.TextPr.FontSizeCS : this.TextPr.FontSize;
+
+    return MatGetKoeffArgSize(FontSize, this.ArgSize);
+};
+CMathInfoTextPr_2.prototype.GetFontSlot = function(code)
+{
+    var Hint = this.TextPr.RFonts.Hint;
+    var bCS  = this.TextPr.CS;
+    var bRTL = this.TextPr.RTL;
+    var lcid = this.TextPr.Lang.EastAsia;
+
+    return g_font_detector.Get_FontClass(code, Hint, lcid, bCS, bRTL);
+};
+CMathInfoTextPr_2.prototype.IsSpecilalOperator = function(val)
+{
+    var bSpecialOperator = val == 0x21 || val == 0x23 || (val >= 0x28 && val <= 0x2F) || (val >= 0x3A && val <= 0x3F) || (val >=0x5B && val <= 0x5F) || (val >= 0x7B && val <= 0xA1) || val == 0xAC || val == 0xB1 || val == 0xB7 || val == 0xBF || val == 0xD7 || val == 0xF7 || (val >= 0x2010 && val <= 0x2014) || val == 0x2016 || (val >= 0x2020 && val <= 0x2022) || val == 0x2026,
+        bSpecialArrow    = val >= 0x2190 && val <= 0x21FF,
+        bSpecialSymbols  = val == 0x2200 || val == 0x2201 || val == 0x2203 || val == 0x2204 || val == 0x2206|| (val >= 0x2208 && val <= 0x220D) || (val >= 0x220F && val <= 0x221E) || (val >= 0x2223 && val <= 0x223E) || (val >= 0x223F && val <= 0x22BD) || (val >= 0x22C0 && val <= 0x22FF) || val == 0x2305 || val == 0x2306 || (val >= 0x2308 && val <= 0x230B) || (val >= 0x231C && val <= 0x231F) || val == 0x2322 || val == 0x2323 || val == 0x2329 || val == 0x232A ||val == 0x233F || val == 0x23B0 || val == 0x23B1,
+        bOtherArrows     = (val >= 0x27D1 && val <= 0x2980) || (val >= 0x2982 && val <= 0x299A) || (val >= 0x29B6 &&  val <= 0x29B9) || val == 0x29C0 || val == 0x29C1 || (val >= 0x29C4 && val <= 0x29C8) || (val >= 0x29CE && val <= 0x29DB) || val == 0x29DF || (val >= 0x29E1 && val <= 0x29E6) || val == 0x29EB || (val >= 0x29F4 && val <= 0x2AFF && val !== 0x2AE1 && val !== 0x2AF1) || (val >= 0x3014 && val <= 0x3017);
+
+    // apostrophe GetMathModifiedFont
+    // отдельно Cambria Math 0x27
+
+    return bSpecialOperator || bSpecialArrow || bSpecialSymbols || bOtherArrows;
+}

@@ -1195,15 +1195,19 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
     if ( undefined !== this.Paragraph && null !== this.Paragraph )
     {
         var TextPr;
-        var FontSize;
+        var FontSize, FontSizeCS;
         if(this.Type === para_Math_Run)
         {
             TextPr = this.Get_CompiledPr(false);
 
             FontSize   = TextPr.FontSize;
+            FontSizeCS = TextPr.FontSizeCS;
 
             if(null !== this.Parent && undefined !== this.Parent && null !== this.Parent.ParaMath && undefined !== this.Parent.ParaMath)
-                TextPr.FontSize = MathApplyArgSize(TextPr.FontSize, ArgSize.value);
+            {
+                TextPr.FontSize   *= MatGetKoeffArgSize(TextPr.FontSize, ArgSize.value);
+                TextPr.FontSizeCS *= MatGetKoeffArgSize(TextPr.FontSizeCS, ArgSize.value);
+            }
         }
         else
             TextPr = this.Get_CompiledPr(false);
@@ -1220,7 +1224,8 @@ ParaRun.prototype.Create_FontMap = function(Map, ArgSize)
 
         if(this.Type === para_Math_Run)
         {
-            TextPr.FontSize = FontSize;
+            TextPr.FontSize   = FontSize;
+            TextPr.FontSizeCS = FontSizeCS;
         }
     }
 };
@@ -3326,10 +3331,13 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     {
         Y += this.size.ascent;
 
+        //var ArgSize = this.Parent.Compiled_ArgSz.value,
+        //    bNormalText = this.IsNormalText();
+
         var ArgSize = this.Parent.Compiled_ArgSz.value,
             bNormalText = this.IsNormalText();
 
-        InfoMathText = new CMathInfoTextPr(CurTextPr, ArgSize, bNormalText, Theme);
+        InfoMathText = new CMathInfoTextPr_2(CurTextPr, ArgSize, bNormalText);
         //NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, CurTextPr, this);
         //pGraphics.SetTextPr( NewMathTextPr, Theme );
     }
@@ -7878,16 +7886,17 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
     if(RPI.NeedResize)
     {
         var oWPrp = this.Get_CompiledPr(false);
+        var Theme = this.Paragraph.Get_Theme();
 
-        //var Theme = this.Paragraph.Get_Theme();
+        var ArgSize     = this.Parent.Compiled_ArgSz.value,
+            bNormalText = this.IsNormalText();
+
         //var NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, oWPrp, this);
         //g_oTextMeasurer.SetTextPr( NewMathTextPr, Theme );
 
-        var ArgSize = this.Parent.Compiled_ArgSz.value,
-            bNormalText = this.IsNormalText();
-        var Theme = this.Paragraph.Get_Theme();
+        g_oTextMeasurer.SetTextPr( oWPrp, Theme );
 
-        var InfoMathText = new CMathInfoTextPr(oWPrp, ArgSize, bNormalText, Theme);
+        var InfoMathText = new CMathInfoTextPr_2(oWPrp, ArgSize, bNormalText);
 
         this.bEqqArray = RPI.bEqqArray;
 

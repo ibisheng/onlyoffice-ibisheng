@@ -123,11 +123,11 @@ CMathBase.prototype =
             CompiledCtrPrp = this.Get_CompiledCtrPrp_2();
 
             if(bAllowInline !== false && this.ParaMath)
-                CompiledCtrPrp.FontSize = MathApplyArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
+                CompiledCtrPrp.FontSize *= MatGetKoeffArgSize(CompiledCtrPrp.FontSize, this.Parent.Get_CompiledArgSize().value);
         }
 
         if(bAllowInline !== false && this.ParaMath)
-            CompiledCtrPrp.FontSize = MathApplyArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
+            CompiledCtrPrp.FontSize *= MatGetKoeffArgSize(CompiledCtrPrp.FontSize, this.ArgSize.value);// для настроек inline формул
 
         return CompiledCtrPrp;
     },
@@ -459,12 +459,12 @@ CMathBase.prototype =
             {
                 var TxtPr = Parent.Get_TxtPrControlLetter(RPI);
                 FontSize = TxtPr.FontSize;
-                FontSize = MathApplyArgSize(FontSize, this.ArgSize.value);
+                FontSize *= MatGetKoeffArgSize(FontSize, this.ArgSize.value);
             }
             else
             {
-                FontSize = MathApplyArgSize(FontSize, Parent.Get_CompiledArgSize().value);
-                FontSize = MathApplyArgSize(FontSize, this.ArgSize.value);
+                FontSize *= MatGetKoeffArgSize(FontSize, Parent.Get_CompiledArgSize().value);
+                FontSize *= MatGetKoeffArgSize(FontSize, this.ArgSize.value);
             }
 
             this.TextPrControlLetter.FontSize = FontSize;
