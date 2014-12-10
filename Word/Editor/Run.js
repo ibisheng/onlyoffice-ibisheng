@@ -3404,6 +3404,12 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Text:
             case para_Sym:
             {
+                if (para_Tab === ItemType)
+                {
+                    pGraphics.p_color(0, 0, 0, 255);
+                    pGraphics.b_color1(0, 0, 0, 255);
+                }
+
                 if ( para_Drawing != ItemType || drawing_Anchor != Item.DrawingType )
                 {
                     Item.Draw( X, Y - this.YOffset, pGraphics );
@@ -3411,7 +3417,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                 }
 
                 // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
-                if ( para_Drawing === ItemType && drawing_Inline === Item.DrawingType )
+                if ((para_Drawing === ItemType && drawing_Inline === Item.DrawingType) || (para_Tab === ItemType))
                 {
                     pGraphics.SetTextPr( CurTextPr, Theme );
 
