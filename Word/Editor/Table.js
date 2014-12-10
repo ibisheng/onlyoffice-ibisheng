@@ -18799,11 +18799,11 @@ CTable.prototype =
             if (GridSpan !== Cell.Get_GridSpan())
                 break;
 
-            CellsArray.splice(0, 0, Cell);
-
             var Vmerge = Cell.Get_VMerge();
             if (vmerge_Continue !== Vmerge)
                 break;
+
+            CellsArray.splice(0, 0, Cell);
         }
 
         // Ищем ячейки вниз
@@ -19797,18 +19797,14 @@ CTableRow.prototype =
     Clear_DirectFormatting : function(bClearMerge)
     {
         // Очищаем все строки и всех ее ячеек
-
-        if ( true === bClearMerge )
+        if (true === bClearMerge)
         {
-            this.Set_After( undefined, undefined );
-            this.Set_Before( undefined, undefined );
+            this.Set_After(undefined, undefined);
+            this.Set_Before(undefined, undefined);
+            this.Set_Height(undefined, undefined);
         }
 
-        this.Set_CellSpacing( undefined );
-        if(!(this.Table.bPresentation === true))
-        {
-            this.Set_Height( undefined, undefined );
-        }
+        this.Set_CellSpacing(undefined);
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
