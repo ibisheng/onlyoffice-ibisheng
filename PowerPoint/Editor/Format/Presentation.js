@@ -1720,6 +1720,7 @@ CPresentation.prototype =
                             this.Create_NewHistoryPoint();
 
                             window.GlobalPasteFlag = true;
+                            editor.waitSave = true;
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
@@ -1731,6 +1732,7 @@ CPresentation.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
+                                editor.waitSave = true;
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 //не возвращаем true чтобы не было preventDefault
                             }
@@ -1969,6 +1971,7 @@ CPresentation.prototype =
                             this.Create_NewHistoryPoint();
 
                             window.GlobalPasteFlag = true;
+                            editor.waitSave = true;
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
@@ -1980,6 +1983,7 @@ CPresentation.prototype =
 
                                 SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
+                                editor.waitSave = true;
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 //не возвращаем true чтобы не было preventDefault
                             }

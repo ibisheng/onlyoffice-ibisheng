@@ -101,6 +101,7 @@ function asc_docs_api(name)
     this.isSaveFonts_Images = false;
     this.saveImageMap = null;
     this.canSave = true;//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+    this.waitSave = false; // Отложенное сохранение, происходит во время долгих операций
 
     this.ServerIdWaitComplete = false;
     this.ServerImagesWaitComplete = false;
@@ -1423,7 +1424,7 @@ asc_docs_api.prototype.Share = function(){
 
 
 function OnSave_Callback(e) {
-	if (false == e["saveLock"]) {
+	if (false == e["saveLock"] && false === editor.waitSave) {
 		editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
 		if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType)
@@ -3676,6 +3677,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
     {
         this.isPasteFonts_Images = false;
         this.pasteImageMap = null;
+        this.waitSave = false;
         this.pasteCallback();
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
@@ -3910,6 +3912,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
     {
         // никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
         // там при LongActions теряется фокус и вставляются пробелы
+        this.waitSave = false;
         this.pasteCallback();
         window.GlobalPasteFlag = false;
         window.GlobalPasteFlagCounter = 0;
