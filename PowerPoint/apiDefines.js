@@ -121,7 +121,9 @@ var c_oAscError = {
 		UserCountExceed: 		-22,
         SplitCellMaxRows:       -23,
         SplitCellMaxCols:       -24,
-        SplitCellRowsDivider:   -25
+        SplitCellRowsDivider:   -25,
+
+        UserDrop:				-100
 	}
 };
 

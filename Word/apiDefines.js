@@ -95,7 +95,9 @@ var c_oAscError = {
 		VKeyEncrypt:			-20,
 		KeyExpire:				-21,
 		UserCountExceed:		-22,
-		MobileUnexpectedCharCount: -23
+		MobileUnexpectedCharCount: -23,
+
+        UserDrop:				-100
 	}
 };
 

@@ -46,7 +46,6 @@ function asc_docs_api(name)
 
     this.FontLoader = window.g_font_loader;
     this.ImageLoader = window.g_image_loader;
-    this.ScriptLoader = window.g_script_loader;
     this.FontLoader.put_Api(this);
     this.ImageLoader.put_Api(this);
 
@@ -510,9 +509,8 @@ asc_docs_api.prototype._coAuthoringInit = function () {
             // Посылаем наверх эвент об отключении от сервера
             t.asc_fireCallback("asc_onСoAuthoringDisconnect");
             t.SetViewMode(true, true);
-            if (!isCloseCoAuthoring){
-                t.sync_ErrorCallback(c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
-            }
+            t.sync_ErrorCallback(isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect,
+                c_oAscError.Level.NoCritical);
         }
 	};
 

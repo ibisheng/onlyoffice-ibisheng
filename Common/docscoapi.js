@@ -796,7 +796,7 @@
 
 	DocsCoApi.prototype._onDrop = function (data) {
 		this.disconnect();
-		this.onDisconnect(data ? data['description'] : '', true, false);
+		this.onDisconnect(data ? data['description'] : '', true, this.isCloseCoAuthoring);
 	};
 
 	DocsCoApi.prototype._onAuth = function (data) {
@@ -937,11 +937,10 @@
 			var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount || t.isCloseCoAuthoring;
 			if (bIsDisconnectAtAll)
 				t._state = 3; // Closed state
-			if (t.onDisconnect) {
-				t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
-			}
 			if (t.isCloseCoAuthoring)
 				return;
+			if (t.onDisconnect)
+				t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
 			//Try reconect
 			if (t.attemptCount < t.maxAttemptCount) {
 				t._tryReconnect();

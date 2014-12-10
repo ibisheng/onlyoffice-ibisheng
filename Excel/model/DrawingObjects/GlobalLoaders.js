@@ -323,7 +323,7 @@
         {
             this.Api = _api;
             this.embedded_cut_manager.Api = _api;
-        }
+        };
                 
         this.LoadEmbeddedFonts = function(url, _fonts)
         {
@@ -368,7 +368,7 @@
                 this.map_font_index[_fonts[i].name] = i + _count_infos_;
                 this.fontInfos[i + _count_infos_] = this.embeddedFontInfos[i];
             }
-        }
+        };
 
         this.SetStandartFonts = function()
         {
@@ -392,7 +392,7 @@
             {
                 _infos[_map[standarts[i]]].Type = FONT_TYPE_STANDART;
             }
-        }
+        };
 
         this.CheckFontsPaste = function(_fonts)
         {
@@ -407,13 +407,13 @@
 
             this.Api.asyncFontsDocumentStartLoaded();
             this._LoadFonts();
-        }
+        };
 
         this.AddLoadFonts = function(info, need_styles)
         {
             this.fonts_loading[this.fonts_loading.length] = info;
             this.fonts_loading[this.fonts_loading.length - 1].NeedStyles = (need_styles == undefined) ? 0x0F : need_styles;
-        }
+        };
 
         this.LoadDocumentFonts = function(_fonts, is_default)
         {
@@ -485,7 +485,7 @@
 
             this.bIsLoadDocumentFirst = true;
             this._LoadFonts();
-        }
+        };
 
         this.LoadDocumentFonts2 = function(_fonts)
         {
@@ -502,7 +502,7 @@
                 this.ThemeLoader.asyncFontsStartLoaded();
 
             this._LoadFonts();
-        }
+        };
 
         var oThis = this;
         this._LoadFonts = function()
@@ -550,7 +550,7 @@
                 this.fonts_loading.shift();
                 this._LoadFonts();
             }
-        }
+        };
 
         this._check_loaded = function()
         {
@@ -581,7 +581,7 @@
                 oThis.fonts_loading.shift();
                 oThis._LoadFonts();
             }
-        }
+        };
 
         this.LoadFont = function(fontinfo)
         {
@@ -603,7 +603,7 @@
                 this.currentInfoLoaded = null;
                 return false;
             }
-        }
+        };
         this.check_loaded = function()
         {
             var current = oThis.currentInfoLoaded;
@@ -621,7 +621,7 @@
                 oThis.Api.asyncFontEndLoaded(oThis.currentInfoLoaded);
                 oThis.currentInfoLoaded = null;
             }
-        }
+        };
 
         this.LoadFontsFromServer = function(_fonts)
         {
@@ -639,66 +639,11 @@
     }
 	CGlobalFontLoader.prototype.SetStreamIndexEmb = function(font_index, stream_index) {
 		this.embeddedFontFiles[font_index].SetStreamIndex(stream_index);
-	}
-	
-	function CGlobalScriptLoader() {
-		this.Status     = -1;  // -1 - notloaded, 0 - loaded, 1 - error, 2 - loading, 3 - imageloading
-		this.callback = null;
-		this.oCallBackThis = null;
-
-		var oThis = this;
-		
-		this.CheckLoaded = function()
-		{
-			return (0 == oThis.Status || 1 == oThis.Status);
-		}
-		this.LoadScriptAsync = function(url, _callback, _callback_this)
-		{
-			this.callback = _callback;
-			this.oCallBackThis = _callback_this;
-			
-			if (-1 != this.Status)
-				return true;
-
-			this.Status = 2;
-			var scriptElem = document.createElement('script');
-
-			if (scriptElem.readyState && false)
-			{
-				scriptElem.onreadystatechange = function () {
-					if (this.readyState == 'complete' || this.readyState == 'loaded')
-					{
-						scriptElem.onreadystatechange = null;
-						setTimeout(oThis._callback_script_load, 0);
-					}
-				}
-			}
-			scriptElem.onload = scriptElem.onerror = oThis._callback_script_load;
-
-			scriptElem.setAttribute('src', url);
-			scriptElem.setAttribute('type','text/javascript');
-			document.getElementsByTagName('head')[0].appendChild(scriptElem);
-			return false;
-		}
-
-		this._callback_script_load = function()
-		{
-			if (oThis.Status != 3)
-				oThis.Status = 1;
-
-			if (null != oThis.callback)
-			{
-				oThis.callback(oThis.oCallBackThis);
-				oThis.callback = null;
-			}
-		}
-	}
+	};
 	
     // exports
     window.g_font_loader    = new CGlobalFontLoader();
     window.g_image_loader   = new CGlobalImageLoader();
-    window.g_script_loader   = new CGlobalScriptLoader();
-	window.g_script_loader2   = new CGlobalScriptLoader();
 
     window.g_flow_anchor = new Image();
     window.g_flow_anchor.asc_complete = false;

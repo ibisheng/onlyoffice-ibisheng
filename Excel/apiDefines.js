@@ -31,9 +31,6 @@ var c_oAscError = {
 		UplImageUrl: 			-17,
 		CoAuthoringDisconnect:	-18,
 		ConvertationPassword:	-19,
-		MaxDataSeriesError:		-80,
-		CannotFillRange:        -81,
-		
 		
 		VKeyEncrypt:			-20,
 		KeyExpire:				-21,
@@ -48,11 +45,16 @@ var c_oAscError = {
 		FrmlAnotherParsingError:	-35,
 		FrmlWrongArgumentRange:		-36,
 		FrmlOperandExpected:		-37,
-        FrmlParenthesesCorrectCount:		    -38,
+        FrmlParenthesesCorrectCount:		-38,
 		
 		AutoFilterDataRangeError:           -50,
 		AutoFilterChangeFormatTableError:   -51,
-		AutoFilterChangeError:              -52
+		AutoFilterChangeError:              -52,
+
+		MaxDataSeriesError:		-80,
+		CannotFillRange:        -81,
+
+		UserDrop:				-100
 	}
 };
 var c_oAscConfirm = {

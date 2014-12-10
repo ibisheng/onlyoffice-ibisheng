@@ -1693,9 +1693,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					t.handlers.trigger("asc_onСoAuthoringDisconnect");
 					// И переходим в режим просмотра т.к. мы не можем сохранить таблицу
 					t.asc_setViewerMode(true);
-					if (!isCloseCoAuthoring) {
-						t.handlers.trigger("asc_onError", c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
-					}
+					t.handlers.trigger("asc_onError", isCloseCoAuthoring ? c_oAscError.ID.UserDrop :
+						c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
 				}
 			};
 
