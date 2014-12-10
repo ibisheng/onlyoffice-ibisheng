@@ -5126,26 +5126,32 @@ drawStockChart.prototype =
 		
 		var widthBar = koffX / (1 + gapWidth / 100);
 		
-		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4, curNumCache;
+		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4, curNumCache, lastNamCache;
 		for (var i = 0; i < numCache.pts.length; i++) {
 			
+			val1 = null, val2 = null, val3 = null, val4 = null;
 			val1 = numCache.pts[i].val;
-			val4 = this.chartProp.series[this.chartProp.series.length - 1].val.numRef ? this.chartProp.series[this.chartProp.series.length - 1].val.numRef.numCache.pts[i].val : this.chartProp.series[this.chartProp.series.length - 1].val.numLit.pts[i].val;
+			
+			lastNamCache = this.chartProp.series[this.chartProp.series.length - 1].val.numRef ? this.chartProp.series[this.chartProp.series.length - 1].val.numRef.numCache.pts : this.chartProp.series[this.chartProp.series.length - 1].val.pts;
+			val4 = lastNamCache[i] ? lastNamCache[i].val : null;
 			
 			for(var k = 1; k < this.chartProp.series.length - 1; k++)
 			{
 				curNumCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
-				if(k == 1)
+				if(curNumCache.pts[i])
 				{
-					val2 = curNumCache.pts[i].val;
-					val3 = curNumCache.pts[i].val;
-				}
-				else
-				{
-					if(parseFloat(val2) > parseFloat(curNumCache.pts[i].val))	
+					if(k == 1)
+					{
 						val2 = curNumCache.pts[i].val;
-					if(parseFloat(val3) < parseFloat(curNumCache.pts[i].val))	
 						val3 = curNumCache.pts[i].val;
+					}
+					else
+					{
+						if(parseFloat(val2) > parseFloat(curNumCache.pts[i].val))	
+							val2 = curNumCache.pts[i].val;
+						if(parseFloat(val3) < parseFloat(curNumCache.pts[i].val))	
+							val3 = curNumCache.pts[i].val;
+					}
 				}
 			}
 			
@@ -5160,13 +5166,18 @@ drawStockChart.prototype =
 			yVal3 = this.cChartDrawer.getYPosition(val3, yPoints);
 			yVal4 = this.cChartDrawer.getYPosition(val4, yPoints);
 			
-			this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
-			this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
+			if(val2 !== null && val1 !== null)
+				this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
+			if(val3 && val4)
+				this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
 			
-			if(parseFloat(val1) > parseFloat(val4))
-				this.paths.values[i].downBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
-			else
-				this.paths.values[i].upBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
+			if(val1 !== null && val4 !== null)
+			{
+				if(parseFloat(val1) > parseFloat(val4))
+					this.paths.values[i].downBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
+				else if(val1 && val4)
+					this.paths.values[i].upBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
+			}
 		}
 	},
 	
