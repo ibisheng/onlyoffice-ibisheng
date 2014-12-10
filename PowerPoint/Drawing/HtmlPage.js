@@ -2149,16 +2149,25 @@ function CEditorPage(api)
             animateScroll: false,
             screenW: this.m_oEditor.HtmlElement.width,
             screenH: this.m_oEditor.HtmlElement.height,
+            screenAddW : 0,
+            screenAddH : 0,
             vsscrollStep: 45,
             hsscrollStep: 45,
             contentH : this.m_dDocumentHeight,
             contentW : this.m_dDocumentWidth
         };
 
+        if (this.m_bIsRuler)
+        {
+            settings.screenAddH = this.m_oTopRuler_horRuler.HtmlElement.height;
+        }
+
         if (this.bIsRetinaSupport)
         {
             settings.screenW >>= 1;
             settings.screenH >>= 1;
+
+            settings.screenAddH >>= 1;
         }
 
         if (this.m_bIsHorScrollVisible)

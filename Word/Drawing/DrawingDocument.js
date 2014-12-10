@@ -2696,8 +2696,11 @@ function CDrawingDocument()
 
             if (_oldW == _newW && _oldH == _newH)
             {
-                // просто очищаем
-                this.TargetHtmlElement.width = _newW;
+                if (_newW != 2 && _newH != 2)
+                {
+                    // просто очищаем
+                    this.TargetHtmlElement.width = _newW;
+                }
             }
             else
             {
@@ -3255,8 +3258,7 @@ function CDrawingDocument()
         ctx.lineWidth = 1;
 
         ctx.beginPath();
-        this.AutoShapesTrack.AddRectDashClever(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2);
-        ctx.stroke();
+        this.AutoShapesTrack.AddRectDashClever(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2, true);
         ctx.beginPath();
 
         var _w = 4;
@@ -3316,8 +3318,7 @@ function CDrawingDocument()
 
             ctx.strokeStyle = "#000000";
             ctx.beginPath();
-            this.AutoShapesTrack.AddRectDashClever(ctx, __x, __y, __r, __b, 3, 3);
-            ctx.stroke();
+            this.AutoShapesTrack.AddRectDashClever(ctx, __x, __y, __r, __b, 3, 3, true);
             ctx.beginPath();
         }
     }
@@ -3609,10 +3610,7 @@ function CDrawingDocument()
 
                 ctx.strokeStyle = "#000000";
                 ctx.beginPath();
-
-                this.AutoShapesTrack.AddRectDash(ctx, x1, y1, x2, y2, x4, y4, x3, y3, 3, 3);
-
-                ctx.stroke();
+                this.AutoShapesTrack.AddRectDash(ctx, x1, y1, x2, y2, x4, y4, x3, y3, 3, 3, true);
                 ctx.beginPath();
             }
         }

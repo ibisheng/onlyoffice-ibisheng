@@ -1194,25 +1194,6 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 {
 	if ( "undefined" != typeof(TextPr) )
 	{
-        var oTextPrMap =
-        {
-            Bold       : function(oThis, v){ oThis.sync_BoldCallBack(v); },
-            Italic     : function(oThis, v){ oThis.sync_ItalicCallBack(v); },
-            Underline  : function(oThis, v){ oThis.sync_UnderlineCallBack(v); },
-            Strikeout  : function(oThis, v){ oThis.sync_StrikeoutCallBack(v); },
-            FontSize   : function(oThis, v){ oThis.sync_TextPrFontSizeCallBack(v); },
-            FontFamily : function(oThis, v){ oThis.sync_TextPrFontFamilyCallBack(v); },
-            VertAlign  : function(oThis, v){ oThis.sync_VerticalAlign(v); },
-          //  Color      : function(oThis, v){ oThis.sync_TextColor(v); },
-            //HighLight  : function(oThis, v){ oThis.sync_TextHighLight(v); },
-            Spacing    : function(oThis, v){ oThis.sync_TextSpacing(v); },
-            DStrikeout : function(oThis, v){ oThis.sync_TextDStrikeout(v); },
-            Caps       : function(oThis, v){ oThis.sync_TextCaps(v); },
-            SmallCaps  : function(oThis, v){ oThis.sync_TextSmallCaps(v); },
-            Position   : function(oThis, v){ oThis.sync_TextPosition(v); },
-            Lang       : function(oThis, v){ oThis.sync_TextLangCallBack(v);}
-        } ;
-
         if (TextPr.Color !== undefined)
         {
             this.WordControl.m_oDrawingDocument.TargetCursorColor.R = TextPr.Color.r;
@@ -1231,13 +1212,29 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
             TextPr.FontFamily = {Index : 0, Name : ""};
         if(TextPr.FontSize === undefined)
             TextPr.FontSize = "";
-		
-		for ( var Item in TextPr )
-		{
-			if( "undefined" != typeof( oTextPrMap[Item] ) )
-				oTextPrMap[Item]( this, TextPr[Item] );
-		}
 
+        this.sync_BoldCallBack(TextPr.Bold);
+        this.sync_ItalicCallBack(TextPr.Italic);
+        this.sync_UnderlineCallBack(TextPr.Underline);
+        this.sync_StrikeoutCallBack(TextPr.Strikeout);
+        this.sync_TextPrFontSizeCallBack(TextPr.FontSize);
+        this.sync_TextPrFontFamilyCallBack(TextPr.FontFamily);
+
+        if (TextPr.VertAlign !== undefined)
+            this.sync_VerticalAlign(TextPr.VertAlign);
+        if (TextPr.Spacing !== undefined)
+            this.sync_TextSpacing(TextPr.Spacing);
+        if (TextPr.DStrikeout !== undefined)
+            this.sync_TextDStrikeout(TextPr.DStrikeout);
+        if (TextPr.Caps !== undefined)
+            this.sync_TextCaps(TextPr.Caps);
+        if (TextPr.SmallCaps !== undefined)
+            this.sync_TextSmallCaps(TextPr.SmallCaps);
+        if (TextPr.Position !== undefined)
+            this.sync_TextPosition(TextPr.Position);
+        if (TextPr.Lang !== undefined)
+            this.sync_TextLangCallBack(TextPr.Lang);
+		
         if (TextPr.Unifill !== undefined)
         {
             this.sync_TextColor2(TextPr.Unifill);

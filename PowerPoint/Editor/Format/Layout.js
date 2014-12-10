@@ -958,8 +958,7 @@ function CLayoutThumbnailDrawer()
                         _ctx.strokeRect(_x + 0.5, _y + 0.5, _r - _x, _b - _y);
                         _ctx.strokeStyle = "#000000";
                         _ctx.beginPath();
-                        this.DrawingDocument.AutoShapesTrack.AddRectDashClever(_ctx, _x, _y, _r, _b, 2, 2);
-                        _ctx.stroke();
+                        this.DrawingDocument.AutoShapesTrack.AddRectDashClever(_ctx, _x, _y, _r, _b, 2, 2, true);
                         _ctx.beginPath();
                     }
                     else
@@ -976,8 +975,7 @@ function CLayoutThumbnailDrawer()
                         _ctx.stroke();
                         _ctx.strokeStyle = "#FFFFFF";
                         _ctx.beginPath();
-                        this.DrawingDocument.AutoShapesTrack.AddRectDash(_ctx, _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4, 2, 2);
-                        _ctx.stroke();
+                        this.DrawingDocument.AutoShapesTrack.AddRectDash(_ctx, _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4, 2, 2, true);
                         _ctx.beginPath();
                     }
                 }
@@ -995,8 +993,7 @@ function CLayoutThumbnailDrawer()
                     _ctx.strokeRect(_x + 0.5, _y + 0.5, _r - _x, _b - _y);
                     _ctx.strokeStyle = "#FFFFFF";
                     _ctx.beginPath();
-                    this.DrawingDocument.AutoShapesTrack.AddRectDashClever(_ctx, _x, _y, _r, _b, 2, 2);
-                    _ctx.stroke();
+                    this.DrawingDocument.AutoShapesTrack.AddRectDashClever(_ctx, _x, _y, _r, _b, 2, 2, true);
                     _ctx.beginPath();
                 }
 

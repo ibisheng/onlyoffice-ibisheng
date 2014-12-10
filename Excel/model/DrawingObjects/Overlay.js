@@ -1935,12 +1935,36 @@ CAutoshapeTrack.prototype =
         }
     },
 
-    AddRectDashClever : function(ctx, x, y, r, b, w_dot, w_dist)
+    AddRectDashClever : function(ctx, x, y, r, b, w_dot, w_dist, bIsStrokeAndCanUseNative)
     {
+        var _support_native_dash = (undefined !== ctx.setLineDash);
+
         var _x = x + 0.5;
         var _y = y + 0.5;
         var _r = r + 0.5;
         var _b = b + 0.5;
+
+        if (_support_native_dash && bIsStrokeAndCanUseNative === true)
+        {
+            ctx.setLineDash([w_dot, w_dist]);
+
+            //ctx.rect(x + 0.5, y + 0.5, r - x, b - y);
+            ctx.moveTo(x, _y);
+            ctx.lineTo(r - 1, _y);
+
+            ctx.moveTo(_r, y);
+            ctx.lineTo(_r, b - 1);
+
+            ctx.moveTo(r + 1, _b);
+            ctx.lineTo(x + 2, _b);
+
+            ctx.moveTo(_x, b + 1);
+            ctx.lineTo(_x, y + 2);
+
+            ctx.stroke();
+            ctx.setLineDash([]);
+            return;
+        }
 
         for (var i = _x; i < _r; i += w_dist)
         {
@@ -1982,6 +2006,9 @@ CAutoshapeTrack.prototype =
 
             ctx.lineTo(_x, i);
         }
+
+        if (bIsStrokeAndCanUseNative)
+            ctx.stroke();
     },
 
     AddLineDash : function(ctx, x1, y1, x2, y2, w_dot, w_dist)
@@ -2065,12 +2092,32 @@ CAutoshapeTrack.prototype =
         }
     },
 
-    AddRectDash : function(ctx, x1, y1, x2, y2, x3, y3, x4, y4, w_dot, w_dist)
+    AddRectDash : function(ctx, x1, y1, x2, y2, x3, y3, x4, y4, w_dot, w_dist, bIsStrokeAndCanUseNative)
     {
+        var _support_native_dash = (undefined !== ctx.setLineDash);
+
+        if (_support_native_dash && bIsStrokeAndCanUseNative === true)
+        {
+            ctx.setLineDash([w_dot, w_dist]);
+
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.lineTo(x4, y4);
+            ctx.lineTo(x3, y3);
+            ctx.closePath();
+
+            ctx.stroke();
+            ctx.setLineDash([]);
+            return;
+        }
+
         this.AddLineDash(ctx, x1, y1, x2, y2, w_dot, w_dist);
         this.AddLineDash(ctx, x2, y2, x4, y4, w_dot, w_dist);
         this.AddLineDash(ctx, x4, y4, x3, y3, w_dot, w_dist);
         this.AddLineDash(ctx, x3, y3, x1, y1, w_dot, w_dist);
+
+        if (bIsStrokeAndCanUseNative)
+            ctx.stroke();
     },
 
     DrawAdjustment : function(matrix, x, y)

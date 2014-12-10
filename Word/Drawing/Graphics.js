@@ -2093,8 +2093,8 @@ CGraphics.prototype =
             var _b = y + h + eps;
 
             this._s();
-            _interf.AddRectDash(ctx, _x, _y, _r, _y, _x, _b, _r, _b, w_dot, w_dist);
-            this.ds();
+            _interf.AddRectDash(ctx, _x, _y, _r, _y, _x, _b, _r, _b, w_dot, w_dist, true);
+            this._s();
             return;
         }
 

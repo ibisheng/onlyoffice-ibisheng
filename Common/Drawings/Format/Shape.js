@@ -2733,8 +2733,8 @@ CShape.prototype =
                     graphics.p_color(127, 127, 127, 255);
 
                     graphics._s();
-                    editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2);
-                    graphics.ds();
+                    editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2, true);
+                    graphics._s();
                 }
                 else {
                     graphics.transform3(_transform, false);
@@ -2760,8 +2760,8 @@ CShape.prototype =
                     graphics.p_color(127, 127, 127, 255);
 
                     graphics._s();
-                    editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDash(graphics.m_oContext, x1, y1, x2, y2, x3, y3, x4, y4, 3, 1);
-                    graphics.ds();
+                    editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDash(graphics.m_oContext, x1, y1, x2, y2, x3, y3, x4, y4, 3, 1, true);
+                    graphics._s();
                 }
             }
             else {

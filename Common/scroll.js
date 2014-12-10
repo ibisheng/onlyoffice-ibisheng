@@ -1807,7 +1807,11 @@ ScrollObject.prototype = {
     {
         if (bIsVerAttack)
         {
-            if (settings.screenH == this.canvasH && undefined !== settings.contentH)
+            var _canvasH = settings.screenH;
+            if (undefined !== _canvasH && undefined !== settings.screenAddH)
+                _canvasH += settings.screenAddH;
+
+            if (_canvasH == this.canvasH && undefined !== settings.contentH)
             {
                 var _maxScrollY = settings.contentH - settings.screenH > 0 ? settings.contentH - settings.screenH : 0;
                 if (_maxScrollY == this.maxScrollY)

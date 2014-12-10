@@ -1841,8 +1841,11 @@ function CDrawingDocument()
 
             if (_oldW == _newW && _oldH == _newH)
             {
-                // просто очищаем
-                this.TargetHtmlElement.width = _newW;
+                if (_newW != 2 && _newH != 2)
+                {
+                    // просто очищаем
+                    this.TargetHtmlElement.width = _newW;
+                }
             }
             else
             {
@@ -5150,8 +5153,7 @@ function CSlideDrawer()
             outputCtx.strokeStyle = "#000000";
 
             outputCtx.beginPath();
-            this.m_oWordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(outputCtx, _x >> 0, _y >> 0, (_x + w_px) >> 0, (_y + h_px) >> 0, 2, 2);
-            outputCtx.stroke();
+            this.m_oWordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(outputCtx, _x >> 0, _y >> 0, (_x + w_px) >> 0, (_y + h_px) >> 0, 2, 2, true);
             outputCtx.beginPath();
 
             return;

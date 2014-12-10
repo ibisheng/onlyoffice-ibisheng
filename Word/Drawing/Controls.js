@@ -204,9 +204,16 @@ function CControl()
             this.HtmlElement.width 	= ((_r - _x) * g_dKoef_mm_to_pix + 0.5) >> 0;
             this.HtmlElement.height = ((_b - _y) * g_dKoef_mm_to_pix + 0.5) >> 0;
         }
-	}
+	};
 
-    
+    this.GetCSS_width = function()
+    {
+        return ((this.AbsolutePosition.R - this.AbsolutePosition.L) * g_dKoef_mm_to_pix + 0.5) >> 0;
+    };
+    this.GetCSS_height = function()
+    {
+        return ((this.AbsolutePosition.B - this.AbsolutePosition.T) * g_dKoef_mm_to_pix + 0.5) >> 0;
+    };
 }
 
 function CControlContainer()
@@ -228,7 +235,7 @@ function CControlContainer()
     {
         ctrl.Parent = this;
         this.Controls[this.Controls.length] = ctrl;
-    }
+    };
 	
 	this.Resize = function(_width,_height,api)
 	{
@@ -382,7 +389,16 @@ function CControlContainer()
 		{
 			this.Controls[i].Resize(_r - _x,_b - _y, api);
 		}
-	}
+	};
+
+    this.GetCSS_width = function()
+    {
+        return ((this.AbsolutePosition.R - this.AbsolutePosition.L) * g_dKoef_mm_to_pix + 0.5) >> 0;
+    };
+    this.GetCSS_height = function()
+    {
+        return ((this.AbsolutePosition.B - this.AbsolutePosition.T) * g_dKoef_mm_to_pix + 0.5) >> 0;
+    };
 }
 
 function CreateControlContainer(name)
