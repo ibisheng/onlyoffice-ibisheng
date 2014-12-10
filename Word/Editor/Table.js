@@ -19797,7 +19797,10 @@ CTableRow.prototype =
         }
 
         this.Set_CellSpacing( undefined );
-        this.Set_Height( undefined, undefined );
+        if(!(this.Table.bPresentation === true))
+        {
+            this.Set_Height( undefined, undefined );
+        }
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
