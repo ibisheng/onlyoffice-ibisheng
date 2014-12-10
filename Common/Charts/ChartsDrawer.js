@@ -6017,20 +6017,23 @@ catAxisChart.prototype =
 		this.cChartDrawer = chartProp;
 		
 		this.paths = {};
-		this._calculateAxis();
-		this._calculateTickMark();
+		if(this.chartSpace.chart.plotArea.catAx.bDelete != true)
+		{
+			this._calculateAxis();
+			this._calculateTickMark();
+		}
 	},
 	
 	_calculateAxis : function()
 	{
 		var nullPoisition = this.chartProp.nullPositionOX;
 		var axisPos;
-		if(this.chartProp.type == "HBar" && this.chartSpace.chart.plotArea.catAx.bDelete != true)
+		if(this.chartProp.type == "HBar")
 		{	
 			axisPos = this.chartSpace.chart.plotArea.catAx.posX;
 			this.paths.axisLine = this._calculateLine( axisPos, this.chartProp.chartGutter._top / this.chartProp.pxToMM, axisPos, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
-		else if(this.chartSpace.chart.plotArea.catAx.bDelete != true)
+		else
 		{
 			//TODO сделать по аналогии с HBAR
 			axisPos = this.chartSpace.chart.plotArea.catAx.posY ? this.chartSpace.chart.plotArea.catAx.posY : this.chartSpace.chart.plotArea.catAx.yPos;
@@ -6407,20 +6410,23 @@ valAxisChart.prototype =
 		this.cChartDrawer = chartProp;
 		
 		this.paths = {};
-		this._calculateAxis();
-		this._calculateTickMark();
+		if(this.chartSpace.chart.plotArea.valAx.bDelete != true)
+		{
+			this._calculateAxis();
+			this._calculateTickMark();
+		}
 	},
 	
 	_calculateAxis : function()
 	{
 		var nullPoisition = this.chartSpace.chart.plotArea.valAx.posX != undefined ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
 
-		if(this.chartProp.type == "HBar" && this.chartSpace.chart.plotArea.valAx.bDelete != true)
+		if(this.chartProp.type == "HBar")
 		{	
 			nullPoisition = this.chartSpace.chart.plotArea.valAx.posY;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition );
 		}
-		else if(this.chartSpace.chart.plotArea.valAx.bDelete != true)
+		else
 		{
 			this.paths.axisLine = this._calculateLine( nullPoisition, this.chartProp.chartGutter._top / this.chartProp.pxToMM, nullPoisition, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM );
 		}
