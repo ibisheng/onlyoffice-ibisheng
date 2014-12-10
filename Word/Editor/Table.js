@@ -5195,6 +5195,14 @@ CTable.prototype =
         this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 
+    Can_CopyCut : function()
+    {
+        if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+            return true;
+        else
+            return this.CurCell.Content.Can_CopyCut();
+    },
+
     Set_Inline : function(Value)
     {
         History.Add( this, { Type : historyitem_Table_Inline, Old : this.Inline, New : Value } );

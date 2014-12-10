@@ -1751,6 +1751,43 @@ CDocumentContent.prototype =
         }
     },
 
+    Can_CopyCut : function()
+    {
+        var bCanCopyCut = false;
+
+        var LogicDocument  = null;
+        var DrawingObjects = null;
+
+        // Работаем с колонтитулом
+        if (docpostype_DrawingObjects === this.CurPos.Type)
+            DrawingObjects = this.DrawingObjects;
+        else
+            LogicDocument = this;
+
+        if (null !== DrawingObjects)
+        {
+            if (true === DrawingObjects.isSelectedText())
+                LogicDocument = DrawingObjects.getTargetDocContent();
+            else
+                bCanCopyCut = true;
+        }
+
+        if (null !== LogicDocument)
+        {
+            if (true === LogicDocument.Is_SelectionUse())
+            {
+                if (selectionflag_Numbering === LogicDocument.Selection.Flag)
+                    bCanCopyCut = false;
+                else if (LogicDocument.Selection.StartPos !== LogicDocument.Selection.EndPos || type_Paragraph === LogicDocument.Content[LogicDocument.Selection.StartPos].Get_Type())
+                    bCanCopyCut = true;
+                else
+                    bCanCopyCut = LogicDocument.Content[LogicDocument.Selection.StartPos].Can_CopyCut();
+            }
+        }
+
+        return bCanCopyCut;
+    },
+
     Cursor_MoveToStartPos : function(AddToSelect)
     {
         if ( true === AddToSelect )
@@ -5590,50 +5627,38 @@ CDocumentContent.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
                 {
-                    case selectionflag_Common:
+                    this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );
+                    this.Parent.OnContentRecalculate( false );
+                }
+                else
+                {
+                    if ( EndPos < StartPos )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-
-                        if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
-                        {
-                            this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );
-                            this.Parent.OnContentRecalculate( false );
-                        }
-                        else
-                        {
-                            if ( EndPos < StartPos )
-                            {
-                                var Temp = StartPos;
-                                StartPos = EndPos;
-                                EndPos   = Temp;
-                            }
-
-                            for ( var Index = StartPos; Index <= EndPos; Index++ )
-                            {
-                                // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                                var Item = this.Content[Index];
-                                if ( type_Paragraph == Item.GetType() )
-                                    Item.Set_Shd( Shd );
-                                else if ( type_Table == Item.GetType() )
-                                {
-                                    Item.TurnOff_RecalcEvent();
-                                    Item.Set_ParagraphShd( Shd );
-                                    Item.TurnOn_RecalcEvent();
-                                }
-                            }
-
-                            this.Parent.OnContentRecalculate( false );
-                        }
-
-                        break;
+                        var Temp = StartPos;
+                        StartPos = EndPos;
+                        EndPos   = Temp;
                     }
-                    case  selectionflag_Numbering:
+
+                    for ( var Index = StartPos; Index <= EndPos; Index++ )
                     {
-                        break;
+                        // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                        var Item = this.Content[Index];
+                        if ( type_Paragraph == Item.GetType() )
+                            Item.Set_Shd( Shd );
+                        else if ( type_Table == Item.GetType() )
+                        {
+                            Item.TurnOff_RecalcEvent();
+                            Item.Set_ParagraphShd( Shd );
+                            Item.TurnOn_RecalcEvent();
+                        }
                     }
+
+                    this.Parent.OnContentRecalculate( false );
                 }
 
                 return;
@@ -5689,12 +5714,6 @@ CDocumentContent.prototype =
 
             if ( true === this.Selection.Use )
             {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                {
-                    this.Interface_Update_ParaPr();
-                    return false;
-                }
-
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
                 if ( EndPos < StartPos )
@@ -5703,6 +5722,9 @@ CDocumentContent.prototype =
                     StartPos = EndPos;
                     EndPos   = Temp;
                 }
+
+                if (selectionflag_Numbering === this.Selection.Flag)
+                    this.Remove_NumberingSelection();
 
                 for ( var Index = StartPos; Index <= EndPos; Index++ )
                 {
@@ -5946,23 +5968,23 @@ CDocumentContent.prototype =
             if ( true === this.Selection.Use )
             {
                 var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-                if ( EndPos < StartPos )
+                var EndPos = this.Selection.EndPos;
+                if (EndPos < StartPos)
                 {
                     var Temp = StartPos;
                     StartPos = EndPos;
-                    EndPos   = Temp;
+                    EndPos = Temp;
                 }
 
-                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                for (var Index = StartPos; Index <= EndPos; Index++)
                 {
                     var Item = this.Content[Index];
-                    if ( type_Paragraph == Item.GetType() )
-                        Item.Set_KeepLines( Value );
-                    else if ( type_Table == Item.GetType() )
+                    if (type_Paragraph == Item.GetType())
+                        Item.Set_KeepLines(Value);
+                    else if (type_Table == Item.GetType())
                     {
                         Item.TurnOff_RecalcEvent();
-                        Item.Set_ParagraphKeepLines( Value );
+                        Item.Set_ParagraphKeepLines(Value);
                         Item.TurnOn_RecalcEvent();
                     }
                 }
@@ -6173,43 +6195,31 @@ CDocumentContent.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_Borders( Borders );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_Borders( Borders );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphBorders( Borders );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        this.Recalculate();
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphBorders( Borders );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
 
+                this.Recalculate();
                 return;
             }
 
@@ -7783,7 +7793,7 @@ CDocumentContent.prototype =
     // Если сейчас у нас заселекчена нумерация, тогда убираем селект
     Remove_NumberingSelection : function()
     {
-        if ( true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag )
+        if (true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag)
             this.Selection_Remove();
     },
 //-----------------------------------------------------------------------------------
@@ -8426,10 +8436,18 @@ CDocumentContent.prototype =
         {
             if ( true === this.Selection.Use )
             {
-                // Выделение нумерации
-                if ( selectionflag_Numbering == this.Selection.Flag )
+                if (selectionflag_Numbering == this.Selection.Flag)
                 {
-                    // Ничего не делаем
+                    if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
+                    {
+                        var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
+                        if (undefined !== NumPr)
+                            this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
+                        else
+                            this.LogicDocument.Selection_Remove();
+                    }
+                    else
+                        this.LogicDocument.Selection_Remove();
                 }
                 else
                 {

@@ -8676,7 +8676,7 @@ Paragraph.prototype =
             EndPos   = CurPos;
         }
 
-        if ( this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use )
+        if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use && selectionflag_Numbering !== this.Selection.Flag)
             this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
         if ( true === this.Selection.Use )

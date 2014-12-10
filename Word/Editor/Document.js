@@ -5999,70 +5999,58 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if (true === this.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
                 {
-                    case selectionflag_Common:
+                    this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );
+                    this.Recalculate();
+                }
+                else
+                {
+                    if ( EndPos < StartPos )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        
-                        if (true === this.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() )
-                        {
-                            this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );                            
-                            this.Recalculate();
-                        }
-                        else
-                        {
-                            if ( EndPos < StartPos )
-                            {
-                                var Temp = StartPos;
-                                StartPos = EndPos;
-                                EndPos   = Temp;
-                            }
-
-                            for ( var Index = StartPos; Index <= EndPos; Index++ )
-                            {
-                                // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                                var Item = this.Content[Index];
-                                if ( type_Paragraph == Item.GetType() )
-                                    Item.Set_Shd( Shd );
-                                else if ( type_Table == Item.GetType() )
-                                {
-                                    Item.TurnOff_RecalcEvent();
-                                    Item.Set_ParagraphShd( Shd );
-                                    Item.TurnOn_RecalcEvent();
-                                }
-                            }
-
-                            // Нам надо определить какие страницы мы должны перерисовать
-                            var PageStart = -1;
-                            var PageEnd   = -1;
-                            for ( var Index = 0; Index < this.Pages.length - 1; Index++ )
-                            {
-                                if ( PageStart == -1 && StartPos <= this.Pages[Index + 1].Pos )
-                                    PageStart = Index;
-
-                                if ( PageEnd == -1 && EndPos < this.Pages[Index + 1].Pos )
-                                    PageEnd = Index;
-                            }
-
-                            if ( -1 === PageStart )
-                                PageStart = this.Pages.length - 1;
-                            if ( -1 === PageEnd )
-                                PageEnd = this.Pages.length - 1;
-
-                            for ( var Index = PageStart; Index <= PageEnd; Index++ )
-                                this.DrawingDocument.OnRecalculatePage( Index, this.Pages[Index] );
-
-                            this.DrawingDocument.OnEndRecalculate(false, true);
-                        }
-
-                        break;
+                        var Temp = StartPos;
+                        StartPos = EndPos;
+                        EndPos   = Temp;
                     }
-                    case  selectionflag_Numbering:
+
+                    for ( var Index = StartPos; Index <= EndPos; Index++ )
                     {
-                        break;
+                        // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                        var Item = this.Content[Index];
+                        if ( type_Paragraph == Item.GetType() )
+                            Item.Set_Shd( Shd );
+                        else if ( type_Table == Item.GetType() )
+                        {
+                            Item.TurnOff_RecalcEvent();
+                            Item.Set_ParagraphShd( Shd );
+                            Item.TurnOn_RecalcEvent();
+                        }
                     }
+
+                    // Нам надо определить какие страницы мы должны перерисовать
+                    var PageStart = -1;
+                    var PageEnd   = -1;
+                    for ( var Index = 0; Index < this.Pages.length - 1; Index++ )
+                    {
+                        if ( PageStart == -1 && StartPos <= this.Pages[Index + 1].Pos )
+                            PageStart = Index;
+
+                        if ( PageEnd == -1 && EndPos < this.Pages[Index + 1].Pos )
+                            PageEnd = Index;
+                    }
+
+                    if ( -1 === PageStart )
+                        PageStart = this.Pages.length - 1;
+                    if ( -1 === PageEnd )
+                        PageEnd = this.Pages.length - 1;
+
+                    for ( var Index = PageStart; Index <= PageEnd; Index++ )
+                        this.DrawingDocument.OnRecalculatePage( Index, this.Pages[Index] );
+
+                    this.DrawingDocument.OnEndRecalculate(false, true);
                 }
 
                 this.Document_UpdateSelectionState();
@@ -6134,11 +6122,8 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                {
-                    this.Document_UpdateInterfaceState();
-                    return false;
-                }
+                if (selectionflag_Numbering === this.Selection.Flag)
+                    this.Remove_NumberingSelection();
 
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
@@ -6224,49 +6209,37 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_ContextualSpacing( Value );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_ContextualSpacing( Value );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphContextualSpacing( Value );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                        // попавшего в селект.
-                        this.ContentLastChangePos = StartPos;
-
-                        this.Recalculate();
-
-                        this.Document_UpdateSelectionState();
-                        this.Document_UpdateInterfaceState();
-
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphContextualSpacing( Value );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
+
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
 
                 return;
             }
@@ -6308,55 +6281,42 @@ CDocument.prototype =
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
-
             if ( this.CurPos.ContentPos < 0 )
                 return false;
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_PageBreakBefore( Value );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_PageBreakBefore( Value );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphPageBreakBefore( Value );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                        // попавшего в селект.
-                        this.ContentLastChangePos = StartPos;
-
-                        this.Recalculate();
-
-                        this.Document_UpdateSelectionState();
-                        this.Document_UpdateInterfaceState();
-
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphPageBreakBefore( Value );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
+
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
 
                 return;
             }
@@ -6403,50 +6363,38 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_KeepLines( Value );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_KeepLines( Value );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphKeepLines( Value );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                        // попавшего в селект.
-                        this.ContentLastChangePos = StartPos;
-
-                        this.Recalculate();
-
-                        this.Document_UpdateSelectionState();
-                        this.Document_UpdateInterfaceState();
-
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphKeepLines( Value );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
+
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
 
                 return;
             }
@@ -6493,50 +6441,38 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_KeepNext( Value );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_KeepNext( Value );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphKeepNext( Value );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                        // попавшего в селект.
-                        this.ContentLastChangePos = StartPos;
-
-                        this.Recalculate();
-
-                        this.Document_UpdateSelectionState();
-                        this.Document_UpdateInterfaceState();
-
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphKeepNext( Value );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
+
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
 
                 return;
             }
@@ -6583,50 +6519,38 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_WidowControl( Value );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_WidowControl( Value );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphWidowControl( Value );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                        // попавшего в селект.
-                        this.ContentLastChangePos = StartPos;
-
-                        this.Recalculate();
-
-                        this.Document_UpdateSelectionState();
-                        this.Document_UpdateInterfaceState();
-
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphWidowControl( Value );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
+
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
 
                 return;
             }
@@ -6673,50 +6597,38 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                switch ( this.Selection.Flag )
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
                 {
-                    case selectionflag_Common:
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                    var Item = this.Content[Index];
+
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_Borders( Borders );
+                    else if ( type_Table == Item.GetType() )
                     {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos   = this.Selection.EndPos;
-                        if ( EndPos < StartPos )
-                        {
-                            var Temp = StartPos;
-                            StartPos = EndPos;
-                            EndPos   = Temp;
-                        }
-
-                        for ( var Index = StartPos; Index <= EndPos; Index++ )
-                        {
-                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                            var Item = this.Content[Index];
-
-                            if ( type_Paragraph == Item.GetType() )
-                                Item.Set_Borders( Borders );
-                            else if ( type_Table == Item.GetType() )
-                            {
-                                Item.TurnOff_RecalcEvent();
-                                Item.Set_ParagraphBorders( Borders );
-                                Item.TurnOn_RecalcEvent();
-                            }
-                        }
-
-                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                        // попавшего в селект.
-                        this.ContentLastChangePos = StartPos;
-
-                        this.Recalculate();
-
-                        this.Document_UpdateSelectionState();
-                        this.Document_UpdateInterfaceState();
-
-                        return;
-                    }
-                    case  selectionflag_Numbering:
-                    {
-                        break;
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphBorders( Borders );
+                        Item.TurnOn_RecalcEvent();
                     }
                 }
+
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
 
                 return;
             }
@@ -6799,9 +6711,6 @@ CDocument.prototype =
         {
             if ( true === this.Selection.Use )
             {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                    return;
-
                 // Проверим, если у нас все выделенные элементы - параграфы, с одинаковыми настройками
                 // FramePr, тогда мы можем применить новую настройку FramePr
 
@@ -12072,8 +11981,18 @@ CDocument.prototype =
                 bCanCopyCut = true;
         }
 
-        if ( null !== LogicDocument )
-            bCanCopyCut = LogicDocument.Is_SelectionUse();
+        if (null !== LogicDocument)
+        {
+            if (true === LogicDocument.Is_SelectionUse())
+            {
+                if (selectionflag_Numbering === LogicDocument.Selection.Flag)
+                    bCanCopyCut = false;
+                else if (LogicDocument.Selection.StartPos !== LogicDocument.Selection.EndPos || type_Paragraph === LogicDocument.Content[LogicDocument.Selection.StartPos].Get_Type())
+                    bCanCopyCut = true;
+                else
+                    bCanCopyCut = LogicDocument.Content[LogicDocument.Selection.StartPos].Can_CopyCut();
+            }
+        }
 
         return bCanCopyCut;
     },
@@ -12270,9 +12189,18 @@ CDocument.prototype =
             if ( true === this.Selection.Use )
             {
                 // Выделение нумерации
-                if ( selectionflag_Numbering == this.Selection.Flag )
+                if (selectionflag_Numbering == this.Selection.Flag)
                 {
-                    // Ничего не делаем
+                    if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
+                    {
+                        var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
+                        if (undefined !== NumPr)
+                            this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
+                        else
+                            this.Selection_Remove();
+                    }
+                    else
+                        this.Selection_Remove();
                 }
                 else
                 {
