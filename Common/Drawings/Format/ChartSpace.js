@@ -7533,7 +7533,7 @@ CChartSpace.prototype =
 
 		graphics.RestoreGrState();
 		
-		if (this.Lock && locktype_None != this.Lock.Get_Type())
+		if (this.Lock && locktype_None != this.Lock.Get_Type() && !this.group)
         {
 			graphics.SaveGrState();
             graphics.transform3(this.transform);

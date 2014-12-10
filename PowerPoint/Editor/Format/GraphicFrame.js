@@ -744,7 +744,7 @@ CGraphicFrame.prototype =
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
             this.graphicObject.Draw(0, graphics);
-            if(locktype_None != this.Lock.Get_Type())
+            if(locktype_None != this.Lock.Get_Type() && !this.group)
                 graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
             graphics.reset();
             graphics.SetIntegerGrid(true);

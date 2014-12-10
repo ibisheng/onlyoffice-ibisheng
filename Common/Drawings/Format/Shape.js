@@ -2887,7 +2887,7 @@ CShape.prototype =
         }
 
 
-        if (this.Lock && locktype_None != this.Lock.Get_Type())
+        if (this.Lock && locktype_None != this.Lock.Get_Type() && !this.group)
         {
             graphics.transform3(_transform);
             graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
