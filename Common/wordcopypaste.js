@@ -3911,7 +3911,7 @@ PasteProcessor.prototype =
 							for(var j = 0; j < drawings.length; j++)
 							{
 								drawingCopyObject = new DrawingCopyObject();
-								drawingCopyObject.Drawing = drawings[j].GraphicObj.convertToPPTX(this.oDocument.DrawingDocument);
+								drawingCopyObject.Drawing = drawings[j].GraphicObj;
 								pDrawings.push(drawingCopyObject);
 							}
 						}
@@ -4032,6 +4032,13 @@ PasteProcessor.prototype =
 									}
 								}
 							}
+							
+							//ковертим изображения в презентационный формат
+							for(var i = 0; i < presentationSelectedContent.Drawings.length; i++)
+							{
+								presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+							}
+							
 							oThis.api.pre_Paste(fonts, image_map, paste_callback);
 						}, rData );
 					}
