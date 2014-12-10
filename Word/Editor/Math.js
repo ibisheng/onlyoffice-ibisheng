@@ -1579,7 +1579,8 @@ ParaMath.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, De
     if (EndPos >= 1)
     {
         // TODO: ParaMath.Get_EndRangePos Сделать для случая, когда формула будет занимать несколько строк
-        return this.Root.Get_EndPos(false, SearchPos.Pos, Depth);
+        this.Root.Get_EndPos(false, SearchPos.Pos, Depth);
+        return true;
     }
 
     return false;
@@ -1595,7 +1596,8 @@ ParaMath.prototype.Get_StartRangePos = function(_CurLine, _CurRange, SearchPos, 
     if (EndPos >= 1)
     {
         // TODO: ParaMath.Get_StartRangePos Сделать для случая, когда формула будет занимать несколько строк
-        return this.Root.Get_StartPos(SearchPos.Pos, Depth);
+        this.Root.Get_StartPos(SearchPos.Pos, Depth);
+        return true;
     }
 
     return false;
