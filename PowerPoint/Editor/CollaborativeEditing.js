@@ -791,7 +791,7 @@ function CCollaborativeEditing()
             SumIndex += Point.Items.length;
         }
 
-        this.Release_Locks();
+        var map = this.Release_Locks();
 
         var UnlockCount2 = this.m_aNeedUnlock2.length;
         for ( var Index = 0; Index < UnlockCount2; Index++ )
@@ -817,8 +817,14 @@ function CCollaborativeEditing()
                 if( (Class.getObjectType() === historyitem_type_Shape
                         || Class.getObjectType() === historyitem_type_ImageShape
                         || Class.getObjectType() === historyitem_type_GroupShape
-                        || Class.getObjectType() === historyitem_type_GraphicFrame) && isRealObject(Class.parent))
+                        || Class.getObjectType() === historyitem_type_GraphicFrame
+                        || Class.getObjectType() === historyitem_type_ChartSpace) && isRealObject(Class.parent))
                 {
+                    if(Class.parent && isRealNumber(Class.parent.num))
+                    {
+                        map[Class.parent.num] = true;
+                    }
+
                     check_obj =
                     {
                         "type": c_oAscLockTypeElemPresentation.Object,
@@ -841,6 +847,16 @@ function CCollaborativeEditing()
             }
         }
 
+
+        var num_arr = [];
+        for(var key in map)
+        {
+            if(map.hasOwnProperty(key))
+            {
+                num_arr.push(parseInt(key, 10));
+            }
+        }
+        num_arr.sort(fSortAscending);
         this.m_aNeedUnlock.length  = 0;
         this.m_aNeedUnlock2.length = 0;
 
@@ -870,26 +886,34 @@ function CCollaborativeEditing()
             History.Reset_SavedIndex();
         }
 
+        for(var i = 0; i < num_arr.length; ++i)
+        {
+            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(num_arr[i], editor.WordControl.m_oLogicDocument.Slides[num_arr[i]]);
+        }
+        if(num_arr.length > 0)
+        {
+            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+        }
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
-        editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
+       // editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
     //    editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     };
 
     this.Release_Locks = function()
     {
+        var map_redraw = {};
         var UnlockCount = this.m_aNeedUnlock.length;
         for ( var Index = 0; Index < UnlockCount; Index++ )
         {
             var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
             if  ( locktype_Other3 != CurLockType && locktype_Other != CurLockType )
             {
-                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
-                if(this.m_aNeedUnlock[Index] instanceof Slide)                                                      //TODO: проверять LockObject
-                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
-
+               //if(this.m_aNeedUnlock[Index] instanceof Slide)                                                      //TODO: проверять LockObject
+               //    editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(this.m_aNeedUnlock[Index].num);
                 var Class =  this.m_aNeedUnlock[Index];
+                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
                 if ( Class instanceof PropLocker )
                 {
                     var object = g_oTableId.Get_ById(Class.objectId);
@@ -908,6 +932,10 @@ function CCollaborativeEditing()
                             editor.asc_fireCallback("asc_onUnLockDocumentProps");
                         }
                     }
+                    if(object.getObjectType && object.getObjectType() === historyitem_type_Slide && object.deleteLock === Class)
+                    {
+                        editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
+                    }
                 }
                 if(Class instanceof CComment)
                 {
@@ -920,7 +948,12 @@ function CCollaborativeEditing()
                 if(this.m_aNeedUnlock[Index] instanceof Slide)
                     editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
             }
+            if(this.m_aNeedUnlock[Index].parent && isRealNumber(this.m_aNeedUnlock[Index].parent.num))
+            {
+                map_redraw[this.m_aNeedUnlock[Index].parent.num] = true;
+            }
         }
+        return map_redraw;
     };
 
     this.OnStart_Load_Objects = function()
