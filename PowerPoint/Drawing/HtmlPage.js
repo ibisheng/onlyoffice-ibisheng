@@ -1288,10 +1288,7 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
-        if (e.preventDefault)
-            e.preventDefault();
-        else
-            e.returnValue = false;
+        var _isCatch = false;
 
         var downClick = global_mouseEvent.ClickCount;
         check_MouseDownEvent(e, true);
@@ -1312,15 +1309,25 @@ function CEditorPage(api)
         {
             oWordControl.m_oBody.HtmlElement.style.cursor = "w-resize";
             oWordControl.createSplitterDiv(true);
+            _isCatch = true;
         }
         else if (_x >= x2 && _x <= oWordControl.Width && _y >= y1 && _y <= y2)
         {
             oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
             oWordControl.createSplitterDiv(false);
+            _isCatch = true;
         }
         else
         {
             oWordControl.m_oBody.HtmlElement.style.cursor = "default";
+        }
+
+        if (_isCatch)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
         }
     }
 
@@ -1329,10 +1336,7 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
-        if (e.preventDefault)
-            e.preventDefault();
-        else
-            e.returnValue = false;
+        var _isCatch = false;
 
         check_MouseMoveEvent(e, true);
 
@@ -1392,6 +1396,16 @@ function CEditorPage(api)
                 oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
                 oWordControl.SplitterDiv.style.top = (_y - parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix)) + "px";
             }
+
+            _isCatch = true;
+        }
+
+        if (_isCatch)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
         }
     }
 
@@ -1438,10 +1452,7 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
-        if (e.preventDefault)
-            e.preventDefault();
-        else
-            e.returnValue = false;
+        var _isCatch = false;
 
         check_MouseUpEvent(e, true);
 
@@ -1476,6 +1487,16 @@ function CEditorPage(api)
             oWordControl.m_oBody.HtmlElement.removeChild(oWordControl.SplitterDiv);
             oWordControl.SplitterDiv = null;
             oWordControl.SplitterType = 0;
+
+            _isCatch = true;
+        }
+
+        if (_isCatch)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
         }
     }
 
