@@ -10777,6 +10777,10 @@
 		};
 
 		WorksheetView.prototype.addAutoFilter = function (lTable, addFormatTableOptionsObj) {
+			// Проверка глобального лока
+			if (this.collaborativeEditing.getGlobalLock())
+				return;
+			
 			var t = this;
 			var ar = t.activeRange.clone(true);
 			var onChangeAutoFilterCallback = function (isSuccess) {

@@ -276,11 +276,6 @@ var gUndoInsDelCellsFlag = true;
 			//добавляем кнопки или удаляем (вызывается из меню при нажатии на кнопку добавления фильтра)
 			addAutoFilter: function (lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj, bWithoutFilter) {
 				var ws = this.worksheet;
-				
-				// Проверка глобального лока
-				if (ws.collaborativeEditing.getGlobalLock())
-					return;
-				
 				var bIsActiveSheet = this._isActiveSheet();
 				var bIsOpenFilter = undefined !== openFilter && null !== openFilter;
 				var activeCells = null === ar ? null : ar.clone(); // ToDo Слишком много клонирования, это долгая операция
