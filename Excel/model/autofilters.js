@@ -1098,12 +1098,16 @@ var gUndoInsDelCellsFlag = true;
 						paramsForCallBackAdd = "addAutoFilterOneCell";
 					}
 					rangeShift1 = t._getAscRange(mainAdjacentCells,rowAdd);
+					
 					if(lTable)
 						selectionTable = rangeShift1.clone();
-					if(isTurnOffHistory)
+					
+					//не лочим в случае обыкновенного а/ф
+					if(isTurnOffHistory || !lTable)
 						onAddAutoFiltersCallback(true);
 					else
 						ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
+						
 					return;
 				}
 				else//выделено > 1 ячейки
@@ -1125,9 +1129,12 @@ var gUndoInsDelCellsFlag = true;
 						paramsForCallBackAdd = "addAutoFilterManyCells";
 					}
 					rangeShift1 = t._getAscRange(activeCells,rowAdd);
+					
 					if(lTable)
 						selectionTable = rangeShift1.clone();
-					if(isTurnOffHistory)
+					
+					//не лочим в случае обыкновенного а/ф
+					if(isTurnOffHistory || !lTable)
 						onAddAutoFiltersCallback(true);
 					else
 						ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
