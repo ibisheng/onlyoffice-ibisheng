@@ -5498,7 +5498,13 @@ ParaRun.prototype.Set_RFonts2 = function(RFonts)
         this.Set_RFonts_Hint( undefined );
     }
 };
-
+ParaRun.prototype.Set_RFont_ForMathRun = function()
+{
+    this.Set_RFonts_Ascii({Name : "Cambria Math", Index : -1});
+    this.Set_RFonts_CS({Name : "Cambria Math", Index : -1});
+    this.Set_RFonts_EastAsia({Name : "Cambria Math", Index : -1});
+    this.Set_RFonts_HAnsi({Name : "Cambria Math", Index : -1});
+};
 ParaRun.prototype.Set_RFonts_Ascii = function(Value)
 {
     if ( Value !== this.Pr.RFonts.Ascii )

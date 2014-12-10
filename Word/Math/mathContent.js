@@ -1127,10 +1127,7 @@ CMathContent.prototype =
             if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
             {
                 emptyRun = new ParaRun(null, true);
-                emptyRun.Set_RFonts_Ascii("Cambria Math");
-                emptyRun.Set_RFonts_CS("Cambria Math");
-                emptyRun.Set_RFonts_EastAsia("Cambria Math");
-                emptyRun.Set_RFonts_HAnsi("Cambria Math");
+                emptyRun.Set_RFont_ForMathRun();
 
                 ctrPrp = current.Get_CtrPrp();
 
@@ -1176,11 +1173,8 @@ CMathContent.prototype =
         if(len > 0 && this.Content[len - 1].Type == para_Math_Composition)
         {
             emptyRun = new ParaRun(null, true);
-            emptyRun.Set_RFonts_Ascii("Cambria Math");
-            emptyRun.Set_RFonts_CS("Cambria Math");
-            emptyRun.Set_RFonts_EastAsia("Cambria Math");
-            emptyRun.Set_RFonts_HAnsi("Cambria Math");
-            
+            emptyRun.Set_RFont_ForMathRun();
+
             ctrPrp = current.Get_CtrPrp();
 
             mathPrp = new CMPrp();
@@ -1239,10 +1233,7 @@ CMathContent.prototype =
         if (this.Content.length < 1)
         {
             var NewMathRun = new ParaRun(null, true);
-            NewMathRun.Set_RFonts_Ascii("Cambria Math");
-            NewMathRun.Set_RFonts_CS("Cambria Math");
-            NewMathRun.Set_RFonts_EastAsia("Cambria Math");
-            NewMathRun.Set_RFonts_HAnsi("Cambria Math");
+            NewMathRun.Set_RFont_ForMathRun();
             this.Add_ToContent(0, NewMathRun);
         }
 
@@ -2750,10 +2741,7 @@ CMathContent.prototype.Add_Text = function(sText, MathStyle)
             MathRun.Add(oText, true);
         }
 
-        MathRun.Set_RFonts_Ascii("Cambria Math");
-        MathRun.Set_RFonts_CS("Cambria Math");
-        MathRun.Set_RFonts_EastAsia("Cambria Math");
-        MathRun.Set_RFonts_HAnsi("Cambria Math");
+        MathRun.Set_RFont_ForMathRun();
 
         if (undefined !== MathStyle && null !== MathStyle)
             MathRun.Math_Apply_Style(MathStyle);
