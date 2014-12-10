@@ -1830,7 +1830,7 @@ CChartsDrawer.prototype =
 					}	
 					else	
 					{
-						if(this.calcProp.type == "Scatter")
+						if(this.calcProp.type == "Scatter" || this.calcProp.type == "Stock")
 						{
 							if(plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
