@@ -3149,7 +3149,7 @@ function CEditorPage(api)
             return;
 
         var master = this.m_oLogicDocument.Slides[this.m_oDrawingDocument.SlideCurrent].Layout.Master;
-        if (this.MasterLayouts != master || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) < MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) < MOVE_DELTA || bIsAttack === true)
+        if (this.MasterLayouts != master || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA || bIsAttack === true)
         {
             this.MasterLayouts = master;
 
