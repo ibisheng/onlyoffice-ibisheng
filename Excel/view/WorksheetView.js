@@ -6196,7 +6196,7 @@
 				c2 = this._findVisibleCol(c2, dc);
 				bIsHidden = true;
 			}
-			if (0 !== dr && this.cols[r2].height < this.height_1px) {
+			if (0 !== dr && this.rows[r2].height < this.height_1px) {
 				r2 = this._findVisibleRow(r2, dr);
 				bIsHidden = true;
 			}
