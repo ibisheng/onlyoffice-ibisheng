@@ -4677,7 +4677,7 @@ DrawingObjectsController.prototype =
                 }
                 cur_group.deleteDrawingBase();
             }
-            this.startRecalculate();
+           // this.startRecalculate();
         }
     },
 
