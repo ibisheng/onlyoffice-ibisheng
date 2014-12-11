@@ -485,6 +485,15 @@ var gUndoInsDelCellsFlag = true;
 									ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
 									changeRows = true;
 									
+									for(var i = activeCells.r1; i <= activeCells.r2; i++)
+									{
+										if(ws.model.getRowHidden(i))
+										{
+											ws.model.setRowHidden(/*bHidden*/false, i, i);
+											isInsert = true;
+										}	
+									}	
+									
 									var n = 0;
 									result = [];
 									for(col = activeCells.c1; col <= activeCells.c2; col++)
@@ -2361,7 +2370,7 @@ var gUndoInsDelCellsFlag = true;
 					return false;
 				
 				var mainAdjacentCells;
-				if(alreadyAddFilter && alreadyAddFilter.all && activeCells && alreadyAddFilter.range && !activeCells.containsRange(alreadyAddFilter.range))
+				if(alreadyAddFilter && alreadyAddFilter.all && activeCells && alreadyAddFilter.range && !activeCells.containsRange(alreadyAddFilter.range) && !alreadyAddFilter.changeAllFOnTable)
 					mainAdjacentCells = activeCells;
 				else if(alreadyAddFilter && alreadyAddFilter.changeAllFOnTable && alreadyAddFilter.range)//если к фильтру применяем форматированную таблицу
 					mainAdjacentCells = alreadyAddFilter.range;
@@ -4095,7 +4104,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							if(!allF[i].AutoFilter)
 							{
-								if(isAll === false && activeCells && range && !activeCells.containsRange(range))//если задеваем часть примененного фильтра и добавляем форматированную таблицу
+								if(isAll === false && activeCells && range && !activeCells.containsRange(range) && !(range.containsRange(activeCells) && activeCells.c1 == activeCells.c2 && activeCells.r1 == activeCells.r2))//если задеваем часть примененного фильтра и добавляем форматированную таблицу
 								{
 									num = 'error';
 								}
