@@ -33,7 +33,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
 DrawingObjectsController.prototype.startRecalculate = function()
 {
     editor.WordControl.m_oLogicDocument.Recalculate();
-    editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+//    editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 };
 
 DrawingObjectsController.prototype.getDrawingObjects = function()

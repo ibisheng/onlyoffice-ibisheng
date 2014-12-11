@@ -2829,8 +2829,8 @@ CPresentation.prototype =
                 this.Slides[oldCurPage].graphicObjects.resetSelectionState();
             }
             editor.asc_hideComments();
+            this.Document_UpdateInterfaceState();
         }
-        this.Document_UpdateInterfaceState();
     },
 
     Get_CurPage : function()
