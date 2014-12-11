@@ -800,7 +800,7 @@ function CEditorPage(api)
         oWordControl.CalculateDocumentSize();
         var lCurPage = oWordControl.m_oDrawingDocument.SlideCurrent;
 
-        this.GoToPage(lCurPage);
+        this.GoToPage(lCurPage, true);
         this.ZoomFreePageNum = lCurPage;
 
         if (-1 != lCurPage)
@@ -820,9 +820,6 @@ function CEditorPage(api)
         oWordControl.m_bIsRePaintOnScroll = true;
 
         oWordControl.OnScroll();
-
-        if (!oWordControl.m_oDrawingDocument.IsEmptyPresentation)
-            oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
 
     this.zoom_Out = function()
@@ -3211,7 +3208,7 @@ function CEditorPage(api)
         this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);
     }
 
-    this.GoToPage = function(lPageNum)
+    this.GoToPage = function(lPageNum, isFromZoom)
     {
         var drDoc = this.m_oDrawingDocument;
 
@@ -3240,9 +3237,12 @@ function CEditorPage(api)
 
         this.SlideDrawer.CheckSlide(drDoc.SlideCurrent);
 
-        this.m_oApi.sync_BeginCatchSelectedElements();
-        this.m_oApi.sync_slidePropCallback(this.m_oLogicDocument.Slides[drDoc.SlideCurrent]);
-        this.m_oApi.sync_EndCatchSelectedElements();
+        if (true !== isFromZoom)
+        {
+            this.m_oApi.sync_BeginCatchSelectedElements();
+            this.m_oApi.sync_slidePropCallback(this.m_oLogicDocument.Slides[drDoc.SlideCurrent]);
+            this.m_oApi.sync_EndCatchSelectedElements();
+        }
 
         this.CalculateDocumentSize(false);
 
