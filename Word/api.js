@@ -6869,17 +6869,31 @@ asc_docs_api.prototype.GoToHeader = function(pageNumber)
     if (this.WordControl.m_oDrawingDocument.IsFreezePage(pageNumber))
         return;
 
+    var bForceRedraw = false;
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+    if (docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+    {
+        LogicDocument.CurPos.Type = docpostype_HdrFtr;
+        bForceRedraw = true;
+    }
+
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.Button = 0;
-    global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, 0, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, 0, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
+    global_mouseEvent.ClickCount = 1;
 
-    this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
-    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    LogicDocument.OnMouseDown(global_mouseEvent, 0, 0, pageNumber);
+    LogicDocument.OnMouseUp(global_mouseEvent, 0, 0, pageNumber);
+    LogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
+    LogicDocument.Cursor_MoveLeft();
+    LogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
+
+    if (true === bForceRedraw)
+    {
+        this.WordControl.m_oDrawingDocument.ClearCachePages();
+        this.WordControl.m_oDrawingDocument.FirePaint();
+    }
 };
 
 asc_docs_api.prototype.GoToFooter = function(pageNumber)
@@ -6887,17 +6901,31 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
     if (this.WordControl.m_oDrawingDocument.IsFreezePage(pageNumber))
         return;
 
+    var bForceRedraw = false;
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+    if (docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+    {
+        LogicDocument.CurPos.Type = docpostype_HdrFtr;
+        bForceRedraw = true;
+    }
+
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.Button = 0;
-    global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
+    global_mouseEvent.ClickCount = 1;
 
-    this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
-    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    LogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height, pageNumber);
+    LogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height, pageNumber);
+    LogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
+    LogicDocument.Cursor_MoveLeft();
+    LogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
+
+    if (true === bForceRedraw)
+    {
+        this.WordControl.m_oDrawingDocument.ClearCachePages();
+        this.WordControl.m_oDrawingDocument.FirePaint();
+    }
 };
 
 asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)
