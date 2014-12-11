@@ -849,14 +849,17 @@ function CCollaborativeEditing()
 
 
         var num_arr = [];
-        for(var key in map)
+        if(editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable)
         {
-            if(map.hasOwnProperty(key))
+            for(var key in map)
             {
-                num_arr.push(parseInt(key, 10));
+                if(map.hasOwnProperty(key))
+                {
+                    num_arr.push(parseInt(key, 10));
+                }
             }
+            num_arr.sort(fSortAscending);
         }
-        num_arr.sort(fSortAscending);
         this.m_aNeedUnlock.length  = 0;
         this.m_aNeedUnlock2.length = 0;
 
