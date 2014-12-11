@@ -2085,28 +2085,13 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         else
         {
             this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-
             var oProp = prop;
             this.asyncImageEndLoaded2 = function(_image)
             {
-                if(!(this.noCreatePoint === true))
-                {
-                    this.WordControl.m_oLogicDocument.ShapeApply(oProp);
-
-                    this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
-
-                    this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-                    this.asyncImageEndLoaded2 = null;
-                }
-                else
-                {
-                    ExecuteNoHistory(function(){
-                        this.WordControl.m_oLogicDocument.ShapeApply(oProp);
-                        this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
-                        this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-                        this.asyncImageEndLoaded2 = null;
-                    }, this, []);
-                }
+                this.WordControl.m_oLogicDocument.ShapeApply(oProp);
+                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+                this.asyncImageEndLoaded2 = null;
             }
         }
     }
@@ -3725,7 +3710,6 @@ asc_docs_api.prototype.asc_getComments = function()
 
 asc_docs_api.prototype.OpenDocumentEndCallback = function()
 {
-    this.bNoSendComments = false;
     var bIsScroll = false;
 
     if (0 == this.DocumentType)
@@ -3745,10 +3729,12 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     this.isApplyChangesOnOpenEnabled = false;
                     this.isApplyChangesOnOpen = true;
                     this.bNoSendComments = true;
+                    var OtherChanges = CollaborativeEditing.m_aChanges.length > 0 ;
                     CollaborativeEditing.Apply_Changes();
                     CollaborativeEditing.Release_Locks();
                     this.bNoSendComments = false;
-                    return;
+                    if(OtherChanges)
+                        return;
                 }
             }
             this.WordControl.m_oLogicDocument.Recalculate({Drawings: {All:true, Map: {}}});
