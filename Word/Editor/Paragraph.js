@@ -6519,12 +6519,20 @@ Paragraph.prototype =
     },
 
     // Проверяем пустой ли параграф
-    IsEmpty : function()
+    IsEmpty : function(Props)
     {
-        var ContentLen = this.Content.length;
-        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        var Pr = {SkipEnd : true};
+
+        if (undefined !== Props)
         {
-            if ( false === this.Content[CurPos].Is_Empty( { SkipEnd : true } ) )
+            if (undefined !== Props.SkipNewLine)
+                Pr.SkipNewLine = true;
+        }
+
+        var ContentLen = this.Content.length;
+        for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+        {
+            if (false === this.Content[CurPos].Is_Empty(Pr))
                 return false;
         }
 

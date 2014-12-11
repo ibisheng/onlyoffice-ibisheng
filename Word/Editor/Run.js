@@ -223,10 +223,11 @@ ParaRun.prototype.Is_Empty = function(Props)
     var SkipAnchor = (undefined !== Props ? Props.SkipAnchor : false);
     var SkipEnd    = (undefined !== Props ? Props.SkipEnd    : false);
     var SkipPlcHldr= (undefined !== Props ? Props.SkipPlcHldr: false);
+    var SkipNewLine= (undefined !== Props ? Props.SkipNewLine: false);
 
     var Count = this.Content.length;
 
-    if (true !== SkipAnchor && true !== SkipEnd && true !== SkipPlcHldr)
+    if (true !== SkipAnchor && true !== SkipEnd && true !== SkipPlcHldr && true !== SkipNewLine)
     {
         if ( Count > 0 )
             return false;
@@ -240,7 +241,7 @@ ParaRun.prototype.Is_Empty = function(Props)
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
 
-            if ((true !== SkipAnchor || para_Drawing !== ItemType || false !== Item.Is_Inline()) && (true !== SkipEnd || para_End !== ItemType) && (true !== SkipPlcHldr || true !== Item.IsPlaceholder()))
+            if ((true !== SkipAnchor || para_Drawing !== ItemType || false !== Item.Is_Inline()) && (true !== SkipEnd || para_End !== ItemType) && (true !== SkipPlcHldr || true !== Item.IsPlaceholder()) && (true !== SkipNewLine || para_NewLine !== ItemType))
                 return false;
         }
 

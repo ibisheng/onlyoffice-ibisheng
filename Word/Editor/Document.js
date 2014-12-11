@@ -2486,7 +2486,7 @@ CDocument.prototype =
             if ( type_Paragraph == Item.GetType() )
             {
                 // Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
-                if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty())
+                if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.Cursor_IsStart())
                 {
                     Item.Numbering_Remove();
                     Item.Set_Ind( { FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right }, true );
