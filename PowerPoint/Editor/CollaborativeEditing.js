@@ -1103,7 +1103,7 @@ function CCollaborativeEditing()
                             var Class = g_oTableId.Get_ById( item );
                             if ( null != Class )
                             {
-                                Class.Lock.Set_Type( locktype_Mine );
+                                Class.Lock.Set_Type( locktype_Mine, false );
                                 if(Class instanceof Slide)
                                     editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                                 this.Add_Unlock2( Class );
