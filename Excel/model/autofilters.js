@@ -915,7 +915,7 @@ var gUndoInsDelCellsFlag = true;
 							rangeShift1 = t._getAscRange(rangeShift);
 						}
 							
-						if(isTurnOffHistory)
+						if(isTurnOffHistory || paramsForCallBack === 'deleteFilter')
 							onAddAutoFiltersCallback(true);
 						else
 							ws._isLockedCells(rangeShift1, /*subType*/null, onAddAutoFiltersCallback);
