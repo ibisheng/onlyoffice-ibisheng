@@ -2163,6 +2163,11 @@ var gUndoInsDelCellsFlag = true;
 									this._addButtonAF({result: cloneData.oldFilter.result,isVis: false});
 								
 								var splitRange = cloneData.oldFilter.Ref;
+								
+								//чистим стиль от старой таблицы
+								var clearRange = new Range(aWs, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
+								clearRange.setTableStyle(null);
+								
 								this._setColorStyleTable(splitRange, cloneData.oldFilter, null, true);
 								this._checkShowButtonsFlag(aWs.TableParts[l]);
 								
