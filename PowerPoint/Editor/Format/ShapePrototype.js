@@ -570,10 +570,17 @@ CShape.prototype.recalculateContent2 = function()
     {
         if(this.isPlaceholder())
         {
+            if(!this.isEmptyPlaceholder())
+            {
+                return;
+            }
             var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
-
             if (!this.txBody.content2)
                 this.txBody.content2 = CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
+            else
+            {
+                this.txBody.content2.Recalc_AllParagraphs_CompiledPr();
+            }
 
             var content = this.txBody.content2;
             if(content)
