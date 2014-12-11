@@ -4036,15 +4036,25 @@ PasteProcessor.prototype =
 							//ковертим изображения в презентационный формат
 							for(var i = 0; i < presentationSelectedContent.Drawings.length; i++)
 							{
-								presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+								if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
+									presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
 							}
 							
 							oThis.api.pre_Paste(fonts, image_map, paste_callback);
 						}, rData );
 					}
 					else
-						oThis.api.pre_Paste(aContent.fonts, aContent.images, paste_callback);
+					{
+						//ковертим изображения в презентационный формат
+						for(var i = 0; i < presentationSelectedContent.Drawings.length; i++)
+						{
+							if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
+								presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+						}
 						
+						oThis.api.pre_Paste(aContent.fonts, aContent.images, paste_callback);
+					}
+	
 					return;
 				}
 				else if(base64FromExcel)//вставляем в презентации из таблиц
