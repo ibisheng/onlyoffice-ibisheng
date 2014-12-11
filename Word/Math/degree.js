@@ -318,6 +318,18 @@ CIterators.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
     this.iterUp.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
     this.iterDn.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
 };
+CIterators.prototype.recalculateSize = function(oMeasure, dH, ascent)
+{
+    this.dH = dH;
+
+    var iterUp = this.iterUp.size,
+        iterDown = this.iterDn.size;
+
+    this.size.ascent = ascent;
+    this.size.height = iterUp.height + dH + iterDown.height;
+    this.size.width  = iterUp.width > iterDown.width ? iterUp.width : iterDown.width;
+
+};
 CIterators.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
@@ -437,108 +449,111 @@ CDegreeSubSupBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI,
 };
 CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
-    //var mgCtrPrp = this.Get_TxtPrControlLetter();
-
     var mgCtrPrp = this.Get_CompiledCtrPrp(); // Get_CompiledCtrPrp -  чтобы итераторы не разъезжались
-                                              // половину ascent брать нельзя, т.к. черта дроби будет разделительной для верхнего и нижнего итератора => соответственно
-                                              // если числитель меньше/больше знаменателя расположение итераторов у степени будет неправильным
+    // половину ascent брать нельзя, т.к. черта дроби будет разделительной для верхнего и нижнего итератора => соответственно
+    // если числитель меньше/больше знаменателя расположение итераторов у степени будет неправильным
+
+    var iterUp   = this.iters.iterUp.size,
+        iterDown = this.iters.iterDn.size,
+        base     = this.baseContent.size;
 
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     shCenter *= 1.4;
 
-    var iters, base;
-
-    if(this.Pr.type == DEGREE_SubSup)
-    {
-        iters = this.elements[0][1];
-        base  = this.elements[0][0];
-    }
-    else if(this.Pr.type == DEGREE_PreSubSup)
-    {
-        iters = this.elements[0][0];
-        base  = this.elements[0][1];
-    }
-
-    // distance for iterators
-
-    var iterUp = iters.elements[0][0].size,
-        iterDown = iters.elements[1][0].size;
-
-    var lUp    = base.size.ascent - shCenter; // center of base
-    //var lUp    = base.size.height/2; // center of base
-    var lDown  = base.size.height - lUp; // height - center of base
-
-    var ctrPrpIter = iters.Get_TxtPrControlLetter();
+    var ctrPrpIter = this.iters.Get_TxtPrControlLetter();
     var shIter = this.ParaMath.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
 
-    var minGap =  0.7*shIter;
+    var height, width, ascent, descent;
 
-    var up, down;
+    var dH; // of Iterators
+    var minGap;
 
-    if(this.bNaryInline)
+    var TextElement = false;
+
+    if(!this.baseContent.IsJustDraw())
     {
-        up = down = 0;
+        var last = this.baseContent.GetLastElement();
+
+        var BaseRun      = last.Type == para_Math_Run && mgCtrPrp.FontSize >= last.Get_CompiledPr(false).FontSize;
+            TextElement  = BaseRun || last.IsJustDraw();
     }
-    else
-    {
-        var upDesc = 0,
-            downAsc = 0;
 
-        if(!base.IsJustDraw() && base.IsOneLineText())
+    //var BaseText       = last.Type == para_Math_Run && !this.baseContent.IsJustDraw(),
+    //    TextElement    = BaseText && mgCtrPrp.FontSize >= last.Get_CompiledPr(false).FontSize;
+
+    if(TextElement)
+    {
+        minGap =  0.5*shIter;
+
+        var DivBaseline = 3.034*shIter;
+        var ascIters, dgrHeight;
+
+        if(DivBaseline > minGap + iterDown.ascent + (iterUp.height - iterUp.ascent))
         {
-            upDesc = 1.5*shIter;
-            downAsc = 1.2*shIter;
+            dH = DivBaseline - iterDown.ascent - (iterUp.height - iterUp.ascent);
+
         }
         else
         {
-            upDesc = iterUp.height - iterUp.ascent + shIter;
-            downAsc = iterDown.ascent - shIter;
+            dH = minGap;
         }
 
-        up = lUp > upDesc ? lUp - upDesc : 0;     // расстояние от центра основания до верхнего итератора
-        down = lDown > downAsc ? lDown - downAsc : 0;   // расстояние от центра основания до нижнего итератора
-    }
+        var GapDown = shIter;
 
+        ascIters = iterUp.height + dH + GapDown;
+        dgrHeight = iterDown.height + iterUp.height + dH;
 
-    if(up + down > minGap)
-    {
-        this.gapBase = iterUp.height + up - lUp;
-        iters.dH = up + down;
+        ascent = ascIters > base.ascent ? ascIters : base.ascent;
+
+        var dscIter = dgrHeight - ascIters,
+            dscBase = base.height - base.ascent;
+
+        descent = dscIter > dscBase ? dscIter : dscBase;
+        height = ascent + descent;
+
+        this.iters.recalculateSize(oMeasure, dH, ascIters /*ascent of Iterators*/);
     }
     else
     {
-        iters.dH = minGap;
-        this.gapBase = iterUp.height - lUp + minGap/2;
+        minGap =  0.7*shIter;
+
+        var lUpBase    = base.ascent - shCenter; // center of base
+        var lDownBase  = base.height - lUpBase; // height - center of base
+
+
+        var DescUpIter  = iterUp.height - iterUp.ascent + shIter;
+        var AscDownIter = iterDown.ascent - shIter;
+
+        var UpGap, DownGap;
+
+        if(this.bNaryInline)
+        {
+            UpGap   = 0;
+            DownGap = 0;
+        }
+        else
+        {
+            UpGap   = lUpBase > DescUpIter    ? lUpBase   - DescUpIter  : 0;           // расстояние от центра основания до верхнего итератора
+            DownGap = lDownBase > AscDownIter ? lDownBase - AscDownIter : 0;           // расстояние от центра основания до нижнего итератора
+        }
+
+        if(UpGap + DownGap > minGap)
+            dH = UpGap + DownGap;
+        else
+            dH = minGap;
+
+        height = iterUp.height + dH + iterDown.height;
+        ascent = iterUp.height + UpGap + shCenter;
+
+        this.iters.recalculateSize(oMeasure, dH, ascent/*ascent of Iterators*/);
     }
 
-    iters.recalculateSize(oMeasure);
-
-    var width  = iters.size.width + base.size.width + this.dW;
+    width  = this.iters.size.width + base.width + this.dW;
     width += this.GapLeft + this.GapRight;
-    var height = iters.size.height;
-
-    var ascent = base.size.ascent + this.gapBase;
 
     this.size = {width: width, height: height, ascent: ascent};
 
-};
-CDegreeSubSupBase.prototype.align = function(x, y)
-{
-    var _x = 0, _y = 0;
-
-    if(this.Pr.type == DEGREE_SubSup)
-    {
-        if(x == 0 && y == 0)
-            _y = this.gapBase;
-    }
-    else
-    {
-        if(x == 0 && y == 1)
-            _y = this.gapBase;
-    }
-
-    return {x: _x, y: _y};
-};
+}
 CDegreeSubSupBase.prototype.getBase = function()
 {
     return this.baseContent;
@@ -564,6 +579,7 @@ CDegreeSubSupBase.prototype.setLowerIterator = function(iterator)
     this.iters.iterDn = iterator;
 };
 
+
 function CDegreeSubSup(props, bInside)
 {
     CDegreeSubSup.superclass.constructor.call(this, props, bInside);
@@ -576,10 +592,8 @@ function CDegreeSubSup(props, bInside)
     g_oTableId.Add( this, this.Id );
 }
 Asc.extendClass(CDegreeSubSup, CDegreeSubSupBase);
-
 CDegreeSubSup.prototype.ClassType = historyitem_type_deg_subsup;
 CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
-
 CDegreeSubSup.prototype.init = function(props)
 {
     this.Fill_LogicalContent(3);
@@ -587,7 +601,6 @@ CDegreeSubSup.prototype.init = function(props)
     this.setProperties(props);
     this.fillContent();
 };
-
 CDegreeSubSup.prototype.fillContent = function()
 {
     if (DEGREE_SubSup === this.Pr.type)

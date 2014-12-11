@@ -1420,7 +1420,11 @@ CMathBase.prototype.Recalc_RunsCompiledPr = function()
 {
     this.RecalcInfo.bCtrPrp = true;
     ParaHyperlink.prototype.Recalc_RunsCompiledPr.call(this);
-}
+};
+CMathBase.prototype.GetLastElement = function()
+{
+    return this;
+};
 
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;

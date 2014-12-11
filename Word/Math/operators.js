@@ -3751,6 +3751,19 @@ CDelimiter.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Type = c_oAscMathInterfaceType.Delimiter;
     MathProps.Pr   = null;
 };
+CDelimiter.prototype.GetLastElement = function()
+{
+    var Result;
+
+    if(this.endOper.typeOper !== OPERATOR_EMPTY && this.Pr.grow == false || this.endOper.typeOper == OPERATOR_TEXT)
+    {
+        Result = this.endOper;
+    }
+    else
+        Result = this;
+
+    return Result;
+};
 
 
 function CCharacter()

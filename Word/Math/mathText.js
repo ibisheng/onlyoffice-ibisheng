@@ -1134,7 +1134,6 @@ function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText)
     this.CurrType         = -1; // в первый раз Font всегда выставляем
     this.TextPr           = TextPr;
     this.ArgSize          = ArgSize;
-    //this.CurrentTextPr    = new CTextPr();
     this.Font =
     {
         FontFamily:     {Name:  "Cambria Math", Index : -1},
@@ -1182,97 +1181,6 @@ CMathInfoTextPr_2.prototype.NeedUpdateFont = function(code, fontSlot, IsPlacehol
     this.CurrType = Type;
 
     return NeedUpdateFont;
-};
-CMathInfoTextPr_2.prototype.NeedUpdateFont_2 = function(code, fontSlot, IsPlaceholder)
-{
-    var NeedUpdateFont = false;
-    var bMathText = this.bNormalText == false || IsPlaceholder;
-    var Type;
-
-    if(bMathText && (this.RFontsCompare[fontSlot] == true || IsPlaceholder))
-        Type = MathTextInfo_MathText;
-    else if(bMathText && this.RFontsCompare[fontSlot] == false && this.IsSpecilalOperator(code))
-        Type = MathTextInfo_SpecialOperator;
-    else
-        Type = MathTextInfo_NormalText;
-
-
-    if(this.CurrType !== Type)
-    {
-        if(Type == MathTextInfo_MathText)
-        {
-            this.Font.Italic = false;
-            this.Font.Bold   = false;
-            NeedUpdateFont = true;
-        }
-        else if(Type == MathTextInfo_SpecialOperator)
-        {
-            // FontFamily Cambria Math !
-
-            if(fontSlot !== fontslot_CS)
-            {
-                this.Font.Italic = this.TextPr.Italic;
-                this.Font.Bold   = this.TextPr.Bold;
-            }
-            else
-            {
-                this.Font.Italic = this.TextPr.ItalicCS;
-                this.Font.Bold   = this.TextPr.BoldCS;
-            }
-            NeedUpdateFont = true;
-        }
-
-        if(NeedUpdateFont)
-        {
-            this.Font.FontSize = fontSlot !== fontslot_CS ? this.TextPr.FontSize : this.TextPr.FontSizeCS;
-            this.Font.FontSize *= this.GetFontKoef(fontSlot);
-        }
-
-        this.CurrType = Type;
-    }
-
-    return NeedUpdateFont;
-};
-CMathInfoTextPr_2.prototype.NeedSetFont_2 = function(code, fontSlot, IsPlaceholder)
-{
-    var NeedSetFont = false;
-
-    // IsMathematicalText  || Placeholder ?
-    if(this.bNormalText == false || IsPlaceholder)
-    {
-        if(this.RFontsCompare[fontSlot] == true || IsPlaceholder) // Cambria Math
-        {
-            this.Font.Italic = false;
-            this.Font.Bold   = false;
-
-            NeedSetFont = true;
-        }
-        else if(this.IsSpecilalOperator(code))
-        {
-            // FontFamily Cambria Math !
-
-            if(fontSlot !== fontslot_CS)
-            {
-                this.Font.Italic = this.TextPr.Italic;
-                this.Font.Bold   = this.TextPr.Bold;
-            }
-            else
-            {
-                this.Font.Italic = this.TextPr.ItalicCS;
-                this.Font.Bold   = this.TextPr.BoldCS;
-            }
-
-            NeedSetFont = true;
-        }
-
-        if(NeedSetFont)
-        {
-            this.Font.FontSize = fontSlot !== fontslot_CS ? this.TextPr.FontSize : this.TextPr.FontSizeCS;
-            this.Font.FontSize *= this.GetFontKoef(fontSlot);
-        }
-    }
-
-    return NeedSetFont;
 };
 CMathInfoTextPr_2.prototype.GetFontKoef = function(fontSlot)
 {

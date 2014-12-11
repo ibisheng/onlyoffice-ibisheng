@@ -1817,6 +1817,19 @@ CMathContent.prototype =
 
         return result;
     },
+    GetLastElement: function()
+    {
+        var pos = this.Content.length - 1;
+
+        while(this.Content[pos].Type == para_Math_Run && this.Content[pos].Is_Empty() && pos > 0)
+        {
+            pos--;
+        }
+
+        var last = this.Content[pos].Type == para_Math_Run ? this.Content[pos] : this.Content[pos].GetLastElement();
+
+        return last;
+    },
 
     ////////////////////////////////////////////////////////////////
 
