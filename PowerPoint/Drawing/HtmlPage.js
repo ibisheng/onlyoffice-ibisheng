@@ -3083,7 +3083,7 @@ function CEditorPage(api)
     this.UpdateHorRulerBack = function()
     {
         var drDoc = this.m_oDrawingDocument;
-        if (0 <= drDoc.m_lCurrentPage && drDoc.m_lCurrentPage < drDoc.m_lPagesCount)
+        if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
         {
             this.CreateBackgroundHorRuler();
         }
@@ -3092,7 +3092,7 @@ function CEditorPage(api)
     this.UpdateVerRulerBack = function()
     {
         var drDoc = this.m_oDrawingDocument;
-        if (0 <= drDoc.m_lCurrentPage && drDoc.m_lCurrentPage < drDoc.m_lPagesCount)
+        if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
         {
             this.CreateBackgroundVerRuler();
         }
