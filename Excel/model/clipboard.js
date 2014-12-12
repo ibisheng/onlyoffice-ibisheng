@@ -2354,8 +2354,6 @@
 												};
 												imCount++;
 											}
-											
-											//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
 										}
 										aResult[tR][tC] = t._getArray(_tBody,isText);
 										if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))

@@ -2347,11 +2347,23 @@ function DrawingObjects() {
                     width /= metricCoeff;
                 }
 
-                var cellTo = _this.drawingArea.calculateCell(realLeftOffset + width, realTopOffset + height);
-                object.to.col = cellTo.col;
-                object.to.colOff = cellTo.colOff;
-                object.to.row = cellTo.row;
-                object.to.rowOff = cellTo.rowOff;
+                var findVal = pxToPt(realLeftOffset + width);
+                var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
+                while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
+                    worksheet.expandColsOnScroll(true);
+                    toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
+                }
+                object.to.col = toCell.col;
+                object.to.colOff = ptToMm(toCell.colOff);
+
+                findVal = pxToPt(realTopOffset + height);
+                toCell = worksheet.findCellByXY(0, findVal, true, true, false);
+                while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
+                    worksheet.expandRowsOnScroll(true);
+                    toCell = worksheet.findCellByXY(0, findVal, true, true, false);
+                }
+                object.to.row = toCell.row;
+                object.to.rowOff = ptToMm(toCell.rowOff);
 
                 worksheet.handlers.trigger("reinitializeScroll");
             };

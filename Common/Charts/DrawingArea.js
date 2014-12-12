@@ -558,77 +558,6 @@ function FrozenPlace(ws, type) {
 		}
 	};
 	
-	_this.calculateCell = function(x, y) {
-		
-		var cell = new CCellObjectInfo();
-					 
-		if ( _this.isPointInside(x, y) ) {
-		
-			var _x = x + _this.worksheet.getCellLeftRelative(0, 0);
-			var _y = y + _this.worksheet.getCellTopRelative(0, 0);
-		
-			var xPt = _this.worksheet.objectRender.convertMetric(_x, 0, 1);
-			var yPt = _this.worksheet.objectRender.convertMetric(_y, 0, 1);
-			
-			var offsetX = 0;// _this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft;
-			var offsetY = 0;//_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop;
-			
-			/* Проверки на максимум в листе */
-			var isMaxCol = function() {
-				var result = false;
-				if ( _this.worksheet.cols.length >= gc_nMaxCol )
-					result = true;
-				return result;
-			};
-			
-			var isMaxRow = function() {
-				var result = false;
-				if ( _this.worksheet.rows.length >= gc_nMaxRow )
-					result = true;
-				return result;
-			};
-			//
-			
-			var delta = 0;
-			var what = roundPlus(xPt - offsetX, 3);
-			var col = _this.worksheet._findColUnderCursor( what, true );
-			while (col == null) {
-				if ( isMaxCol() ) {
-					col = _this.worksheet._findColUnderCursor( _this.worksheet.cols[gc_nMaxCol - 1].left - 1, true );
-					break;
-				}
-				_this.worksheet.expandColsOnScroll(true);
-				_this.worksheet.handlers.trigger("reinitializeScrollX");
-				col = _this.worksheet._findColUnderCursor( what + delta, true );
-				if ( what < 0 )
-					delta++;
-			}
-			cell.col = col.col;
-			cell.colOffPx = Math.max(0, _x - _this.worksheet.getCellLeft(cell.col, 0));
-			cell.colOff = _this.worksheet.objectRender.convertMetric(cell.colOffPx, 0, 3);
-
-			delta = 0;
-			what = roundPlus(yPt - offsetY, 3);
-			var row = _this.worksheet._findRowUnderCursor( what, true );
-			while (row == null) {
-				if ( isMaxRow() ) {
-					row = _this.worksheet._findRowUnderCursor( _this.worksheet.rows[gc_nMaxRow - 1].top - 1, true );
-					break;
-				}
-				_this.worksheet.expandRowsOnScroll(true);
-				_this.worksheet.handlers.trigger("reinitializeScrollY");
-				row = _this.worksheet._findRowUnderCursor( what + delta, true );
-				if ( what < 0 )
-					delta++;
-			}
-			cell.row = row.row;
-			cell.rowOffPx = Math.max(0, _y - _this.worksheet.getCellTop(cell.row, 0));
-			cell.rowOff = _this.worksheet.objectRender.convertMetric(cell.rowOffPx, 0, 3);
-		}		
-		return cell;
-		
-	};
-	
 	// Range constructor	
 	_this.initRange();
 }
@@ -786,17 +715,5 @@ function DrawingArea(ws) {
 			}
 		}
 		return null;
-	};
-	
-	_this.calculateCell = function(x, y) {
-		var cell = null;
-					 
-		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
-			if ( _this.frozenPlaces[i].isPointInside(x, y) ) {
-				cell = _this.frozenPlaces[i].calculateCell(x, y);
-				break;
-			}
-		}
-		return null !== cell ? cell : new CCellObjectInfo();
 	};
 }
