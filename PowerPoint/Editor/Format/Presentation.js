@@ -966,7 +966,7 @@ CPresentation.prototype =
             return;
 
         History.Create_NewPoint();
-        var graphic_frame = this.Create_TableGraphicFrame(Rows, Cols, this.Slides[this.CurPage], this.DefaultTableStyleId);
+        var graphic_frame = this.Create_TableGraphicFrame(Cols, Rows, this.Slides[this.CurPage], this.DefaultTableStyleId);
         if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
         {
             this.Slides[this.CurPage].graphicObjects.resetSelection();
