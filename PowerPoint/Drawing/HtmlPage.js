@@ -3229,6 +3229,7 @@ function CEditorPage(api)
 
         var _bIsUpdate = (drDoc.SlideCurrent != lPageNum);
 
+        this.ZoomFreePageNum = lPageNum;
         drDoc.SlideCurrent = lPageNum;
         this.m_oLogicDocument.Set_CurPage(lPageNum);
 
@@ -3272,6 +3273,8 @@ function CEditorPage(api)
         {
             this.m_oScrollHorApi.scrollToX(this.m_dScrollX_Central);
         }
+
+        this.ZoomFreePageNum = -1;
 
         if (this.m_oApi.isViewMode === false && null != this.m_oLogicDocument)
         {
