@@ -1097,6 +1097,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             this.Slides[this.CurPage].graphicObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
+            this.Document_UpdateInterfaceState();
         }
     },
 
@@ -2371,7 +2372,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-    ApplyTableFunction : function(Function, bBefore, bAll, Rows, Cols)
+    ApplyTableFunction : function(Function, bBefore, bAll, Cols, Rows)
     {
         if(this.Slides[this.CurPage])
         {
@@ -3752,6 +3753,7 @@ CPresentation.prototype =
             this.Height = height;
             this.changeSlideSizeFunction(this.Width, this.Height);
             this.Recalculate();
+            this.Document_UpdateInterfaceState();
         }
     },
 
@@ -4346,12 +4348,14 @@ CPresentation.prototype =
                 if(comments[j].Id === Id)
                 {
                     //this.Set_CurPage(i);
-
-                    this.DrawingDocument.m_oWordControl.GoToPage(i);
-
                     this.Slides[i].removeComment(Id);
                     if ( true === bSendEvent )
                         editor.sync_RemoveComment( Id );
+                    this.Recalculate();
+                    if(this.CurPage !== i)
+                    {
+                        this.DrawingDocument.m_oWordControl.GoToPage(i);
+                    }
                     return;
                 }
             }
