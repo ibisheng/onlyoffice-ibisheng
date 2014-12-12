@@ -3734,7 +3734,24 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     CollaborativeEditing.Release_Locks();
                     this.bNoSendComments = false;
                     if(OtherChanges)
+                    {
+                        var _slides = this.WordControl.m_oLogicDocument.Slides;
+                        var _slidesCount = _slides.length;
+                        for (var i = 0; i < _slidesCount; i++)
+                        {
+                            var slideComments = _slides[i].slideComments;
+                            if(slideComments)
+                            {
+                                var _comments = slideComments.comments;
+                                var _commentsCount = _comments.length;
+                                for (var j = 0; j < _commentsCount; j++)
+                                {
+                                    this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data );
+                                }
+                            }
+                        }
                         return;
+                    }
                 }
             }
             this.WordControl.m_oLogicDocument.Recalculate({Drawings: {All:true, Map: {}}});
