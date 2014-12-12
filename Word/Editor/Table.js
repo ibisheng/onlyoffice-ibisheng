@@ -12641,7 +12641,7 @@ CTable.prototype =
         var CurRow = 0;
         var Row = this.Content[CurRow];
         var CellsCount = Row.Get_CellsCount();
-        var CurCell = Math.min( Delete_info[0][0], CellsCount - 1 );
+        var CurCell = Delete_info[0][0] === undefined ? CellsCount - 1 : Math.min(Delete_info[0][0],  CellsCount - 1);
 
         this.CurCell = Row.Get_Cell( CurCell );
         this.CurCell.Content.Cursor_MoveToStartPos();
