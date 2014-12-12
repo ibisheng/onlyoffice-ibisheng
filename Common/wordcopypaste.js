@@ -408,6 +408,7 @@ function Editor_Copy_Event(e, ElemToSelect)
 	{
 		e.clipboardData.setData("text/x-custom", sBase64);
 		e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
+		e.clipboardData.setData("text/plain", ElemToSelect.innerText);
 		e.preventDefault();
 	}
 }
