@@ -772,8 +772,11 @@ CGraphicFrame.prototype =
                 this.parent.graphicObjects.selectObject(this, 0);
                 this.parent.graphicObjects.selection.textSelection = this;
             }
-            editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
-            editor.WordControl.GoToPage(this.parent.num);
+            if(editor.WordControl.m_oLogicDocument.CurPage !== this.parent.num)
+            {
+                editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
+                editor.WordControl.GoToPage(this.parent.num);
+            }
         }
     },
 
