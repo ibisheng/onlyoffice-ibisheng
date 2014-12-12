@@ -4198,7 +4198,7 @@ PasteProcessor.prototype =
 					
                     oThis._ExecutePresentation(node, {}, true, true, false, arrShapes, arrImages, arrTables);
 
-                    for(var i = 0; i < arrShapes.length; ++i)
+					for(var i = 0; i < arrShapes.length; ++i)
                     {
                         shape = arrShapes[i];
                         if(shape.txBody.content.Content.length > 1)
@@ -4221,15 +4221,32 @@ PasteProcessor.prototype =
                     {
                         shape = arrTables[i];
                        
-                        //var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
+                        //TODO передалать высоту/ширину!
+						//var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                         //var h = shape.txBody.content.Get_SummaryHeight();
+						var w = 100;
+						var h = 100;
                         CheckSpPrXfrm(shape);
                         shape.spPr.xfrm.setExtX(w);
                         shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
                         shape.spPr.xfrm.setOffY(0);
 						
-						arrShapes[i] = new DrawingCopyObject(shape, 0, 0, w, h);
+						arrShapes[arrShapes.length] = new DrawingCopyObject(shape, 0, 0, w, h);
+                    }
+					
+					var defaultTableStyleId = presentation.DefaultTableStyleId;
+					for(var i = 0; i < arrImages.length; ++i)
+                    {
+                        shape = arrImages[i];
+                       
+                        CheckSpPrXfrm(shape);
+                        //shape.spPr.xfrm.setExtX(w);
+                        //shape.spPr.xfrm.setExtY(h);
+                        shape.spPr.xfrm.setOffX(0);
+                        shape.spPr.xfrm.setOffY(0);
+						
+						arrShapes[arrShapes.length] = new DrawingCopyObject(shape, 0, 0, w, h);
                     }
 					
 					
@@ -6663,7 +6680,8 @@ PasteProcessor.prototype =
                     if(value.length > 0)
                     {
                         this.oDocument = shape.txBody.content;
-                        shape.txBody.content.Add_NewParagraph();
+						if(bAddParagraph)
+							shape.txBody.content.Add_NewParagraph();
                        // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
 
                         //��������� ������� ����� ���� �� ���������
@@ -6784,14 +6802,7 @@ PasteProcessor.prototype =
                     var sSrc = this.oImages[sSrc];
                     if(sSrc)
                     {
-                        var image = new CImageShape(presentation.Slides[presentation.CurPage]);
-                        var blipFill = new CUniFill();
-                        blipFill.fill = new CBlipFill();
-                        blipFill.fill.RasterImageId = sSrc;
-                        image.setBlipFill(blipFill);
-                        //image.setGeometry( CreateGeometry("rect"));
-                        //image.spPr.geometry.Init(5, 5);
-                        //image.setXfrm(node["offsetLeft"], node["offsetTop"], nWidth, nHeight, null, null, null);
+						var image = DrawingObjectsController.prototype.createImage(sSrc, 0, 0, nWidth, nHeight);	
                         arrImages.push(image);
                     }
                 }
