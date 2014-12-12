@@ -2826,13 +2826,17 @@ function CBinaryFileWriter()
                 var _count = 1;
                 for (var j = _index + 1; j < _rows_count; j++)
                 {
+                    if (i >= TableGrid.Rows[j].Cells.length)
+                        continue;
+
                     if (TableGrid.Rows[j].Cells[i].vMerge !== true)
                         break;
 
                     ++_count;
                 }
 
-                TableGrid.Rows[_index].Cells[i].row_span = _count;
+                if (i < TableGrid.Rows[_index].Cells.length)
+                    TableGrid.Rows[_index].Cells[i].row_span = _count;
 
                 _index += _count + 1;
             }
