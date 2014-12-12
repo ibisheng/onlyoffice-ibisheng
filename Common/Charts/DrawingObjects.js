@@ -2346,7 +2346,7 @@ function DrawingObjects() {
                     height = areaHeight;
                     width /= metricCoeff;
                 }
-                
+
                 var cellTo = _this.drawingArea.calculateCell(realLeftOffset + width, realTopOffset + height);
                 object.to.col = cellTo.col;
                 object.to.colOff = cellTo.colOff;

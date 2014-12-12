@@ -517,47 +517,6 @@ function FrozenPlace(ws, type) {
         canvas.m_oContext.restore();
 	};
 	
-	_this.clear = function(isOverlay) {
-		var rect = _this.getRect2();
-		var x = convertMetrics(rect.x, 0, 1);
-		var y = convertMetrics(rect.y, 0, 1);
-		var w = convertMetrics(rect.w, 0, 1);
-		var h = convertMetrics(rect.h, 0, 1);
-
-
-        var deltaH = 0, deltaW = 0;
-        switch (_this.type)
-        {
-            case FrozenAreaType.Top:
-            case FrozenAreaType.Center:
-            case FrozenAreaType.LeftTop:
-            case FrozenAreaType.Left:
-            {
-                deltaH = _this.worksheet.getCellTop(0, 1);
-                deltaW = _this.worksheet.getCellLeft(0,1);
-                break;
-            }
-            case FrozenAreaType.LeftBottom:
-            case FrozenAreaType.Bottom:
-            {
-                deltaW = _this.worksheet.getCellLeft(0,1);
-                break;
-            }
-            case FrozenAreaType.Right:
-            case FrozenAreaType.RightTop:
-            {
-                deltaH = _this.worksheet.getCellTop(0,1);
-                break;
-            }
-        }
-		
-		if ( isOverlay ) 
-			_this.worksheet.overlayGraphicCtx.clearRect( x - deltaW, y - deltaH, w + deltaW, h + deltaH );
-		else {
-			_this.worksheet.drawingGraphicCtx.clearRect( x - deltaW, y - deltaH, w + deltaW, h + deltaH );
-		}
-	};
-	
 	_this.drawObject = function(object) {
 		var canvas = _this.worksheet.objectRender.getDrawingCanvas();
 		_this.setTransform(canvas.shapeCtx, canvas.shapeOverlayCtx, canvas.autoShapeTrack);
@@ -722,9 +681,7 @@ function DrawingArea(ws) {
 	};
 
 	_this.clear = function() {
-		for ( var i = 0; i < _this.frozenPlaces.length; i++ ) {
-			_this.frozenPlaces[i].clear();
-		}
+		_this.worksheet.drawingGraphicCtx.clear();
 	};
 	
 	_this.drawObject = function(object) {
@@ -841,8 +798,5 @@ function DrawingArea(ws) {
 			}
 		}
 		return null !== cell ? cell : new CCellObjectInfo();
-	};
-	
-	_this.calculateCoords = function(cell) {
 	};
 }
