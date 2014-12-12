@@ -4862,6 +4862,23 @@ function BinaryFileReader(doc, openParams)
         }
         return res;
     };
+	this.PostLoadPrepareCheckStylesRecursion = function(stId, aStylesGrey, styles){
+		var stylesGrey = aStylesGrey[stId];
+		if(0 != stylesGrey){
+			var stObj = styles[stId];
+			if(stObj){
+				if(1 == stylesGrey)
+					stObj.Set_BasedOn(null);
+				else{
+					if(null != stObj.BasedOn){
+						aStylesGrey[stId] = 1;
+						this.PostLoadPrepareCheckStylesRecursion(stObj.BasedOn, aStylesGrey, styles);
+					}
+					aStylesGrey[stId] = 0;
+				}
+			}
+		}
+	};
     this.PostLoadPrepare = function(setting)
     {
 		//списки
@@ -5084,6 +5101,12 @@ function BinaryFileReader(doc, openParams)
             nStId++;
         }
         this.Document.Styles.Id = nStId;
+		//проверяем циклы в styles по BasedOn
+		var aStylesGrey = {};
+		for(var stId in styles)
+		{
+			this.PostLoadPrepareCheckStylesRecursion(stId, aStylesGrey, styles);
+		}
 		//DefpPr, DefrPr
 		//важно чтобы со списками разобрались выше чем этот код
 		if(null != this.oReadResult.DefpPr)
