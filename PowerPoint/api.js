@@ -4760,7 +4760,7 @@ asc_docs_api.prototype.SlideTimingApplyToAll = function()
         if (i == _cur)
             continue;
 
-        _default.makeDuplicate(_slides[i].timing);
+        _slides[i].applyTiming(_default);
     }
 }
 asc_docs_api.prototype.SlideTransitionPlay = function()
