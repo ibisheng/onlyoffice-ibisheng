@@ -475,7 +475,7 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
         var last = this.baseContent.GetLastElement();
 
         var BaseRun      = last.Type == para_Math_Run && mgCtrPrp.FontSize >= last.Get_CompiledPr(false).FontSize;
-            TextElement  = BaseRun || last.IsJustDraw();
+            TextElement  = BaseRun || (last.Type !== para_Math_Run && last.IsJustDraw());
     }
 
     //var BaseText       = last.Type == para_Math_Run && !this.baseContent.IsJustDraw(),
