@@ -1183,7 +1183,8 @@ TextAddState.prototype =
             return;
         }
         this.majorObject.selectionSetEnd(e, x, y, pageIndex);
-        this.drawingObjects.updateSelectionState();
+        if(!(this.majorObject.getObjectType() === historyitem_type_GraphicFrame && this.majorObject.graphicObject.Selection.Type2 === table_Selection_Border))
+            this.drawingObjects.updateSelectionState();
     },
     onMouseUp: function(e, x, y, pageIndex)
     {

@@ -577,6 +577,7 @@ CPresentation.prototype =
     Add_NewParagraph : function(bRecalculate)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.addNewParagraph, []);
+        this.Document_UpdateInterfaceState();
     },
 
     Search : function(Str, Props)
@@ -892,11 +893,13 @@ CPresentation.prototype =
     groupShapes: function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.createGroup, []);
+        this.Document_UpdateInterfaceState();
     },
 
     unGroupShapes: function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.unGroupCallback, []);
+        this.Document_UpdateInterfaceState();
     },
 
     Add_FlowImage : function(W, H, Img)
@@ -925,7 +928,7 @@ CPresentation.prototype =
             Image.spPr.xfrm.setOffY((_this.Slides[_this.CurPage].Height - Image.spPr.xfrm.extY)/2);
             _this.Slides[_this.CurPage].graphicObjects.resetSelection();
             _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, _this.Slides[_this.CurPage].num);
-            _this.Recalculate();
+            _this.Document_UpdateInterfaceState();
         }, []);
     },
 
@@ -938,6 +941,7 @@ CPresentation.prototype =
         _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
         {
             _this.Slides[_this.CurPage].graphicObjects.editChart(binary);
+            _this.Document_UpdateInterfaceState();
         }, [binary]);
     },
 
@@ -1071,11 +1075,13 @@ CPresentation.prototype =
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphAdd, [ParaItem, bRecalculate]);
+
     },
 
     Paragraph_ClearFormatting : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphClearFormatting, []);
+        this.Document_UpdateInterfaceState();
     },
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection)
@@ -1297,36 +1303,43 @@ CPresentation.prototype =
     Set_ParagraphAlign : function(Align)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphAlign, [Align]);
+        this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphSpacing : function(Spacing)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphSpacing, [Spacing]);
+        this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphTabs : function(Tabs)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphTabs, [Tabs]);
+        this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphIndent : function(Ind)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphIndent, [Ind]);
+        this.Document_UpdateInterfaceState();
     },
 
     Set_ParagraphNumbering : function(NumInfo)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphNumbering, [this.Get_PresentationBulletByNumInfo(NumInfo)]);   //TODO
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphNumbering, [this.Get_PresentationBulletByNumInfo(NumInfo)]);
+        this.Document_UpdateInterfaceState();   //TODO
     },
 
     Paragraph_IncDecFontSize : function(bIncrease)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecFontSize, [bIncrease]);
+        this.Document_UpdateInterfaceState();
     },
 
     Paragraph_IncDecIndent : function(bIncrease)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecIndent, [bIncrease]);
+        this.Document_UpdateInterfaceState();
     },
 
     Can_IncreaseParagraphLevel : function(bIncrease)
@@ -1337,22 +1350,26 @@ CPresentation.prototype =
     Set_ImageProps : function(Props)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [Props]);
+        this.Document_UpdateInterfaceState();
     },
 
     ShapeApply: function(shapeProps)
     {
 
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [shapeProps]);
+        this.Document_UpdateInterfaceState();
     },
 
     ChartApply: function(chartProps)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [chartProps]);
+        this.Document_UpdateInterfaceState();
     },
 
     changeShapeType : function(shapeType)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{type:shapeType}]);
+        this.Document_UpdateInterfaceState();
     },
 
     setVerticalAlign: function(align)
@@ -1360,6 +1377,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [{verticalTextAlign: align}]);
+            this.Document_UpdateInterfaceState();
         }
     },
 
@@ -1569,10 +1587,12 @@ CPresentation.prototype =
                 if ( e.ShiftKey )
                 {
                     this.Paragraph_Add( new ParaNewLine( break_Line ) );
+                    this.Document_UpdateInterfaceState();
                 }
                 else if ( e.CtrlKey )
                 {
                     this.Paragraph_Add( new ParaNewLine( break_Page ) );
+                    this.Document_UpdateInterfaceState();
                 }
                 else
                 {
@@ -1595,6 +1615,7 @@ CPresentation.prototype =
                 this.DrawingDocument.TargetShow();
 
                 this.Paragraph_Add( new ParaText( String.fromCharCode( 0x00A0 ) ) );
+                this.Document_UpdateInterfaceState();
             }
             else if ( true === e.CtrlKey )
             {
@@ -1606,6 +1627,7 @@ CPresentation.prototype =
                // this.DrawingDocument.TargetShow();
 
                 this.Paragraph_Add( new ParaSpace( 1 ) );
+                this.Document_UpdateInterfaceState();
             }
 
             bRetValue = true;
@@ -1844,6 +1866,7 @@ CPresentation.prototype =
             {
 
                 this.Paragraph_Add( new ParaText( "€" ) );
+                this.Document_UpdateInterfaceState();
                 bRetValue = true;
             }
         }
@@ -1853,6 +1876,7 @@ CPresentation.prototype =
             if ( null != TextPr )
             {
                 this.Paragraph_Add( new ParaTextPr( { Italic : TextPr.Italic === true ? false : true } ) );
+                this.Document_UpdateInterfaceState();
                 bRetValue = true;
             }
         }
@@ -1915,7 +1939,6 @@ CPresentation.prototype =
         {
             if ( true === e.ShiftKey && false === editor.isViewMode ) // Ctrl + Shift + P - добавляем номер страницы в текущую позицию
             {
-                this.Paragraph_Add( new ParaPageNum() );
                 bRetValue = true;
             }
             else // Ctrl + P - print
@@ -1949,6 +1972,7 @@ CPresentation.prototype =
             if ( null != TextPr )
             {
                 this.Paragraph_Add( new ParaTextPr( { Underline : TextPr.Underline === true ? false : true } ) );
+                this.Document_UpdateInterfaceState();
                 bRetValue = true;
             }
         }
@@ -2105,6 +2129,7 @@ CPresentation.prototype =
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
                 else
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
+                this.Document_UpdateInterfaceState();
                 bRetValue = true;
             }
         }
@@ -2134,6 +2159,7 @@ CPresentation.prototype =
                 Item = new ParaText( "-" );
 
             this.Paragraph_Add( Item );
+            this.Document_UpdateInterfaceState();
             bRetValue = true;
         }
         else if ( e.KeyCode == 190 && true === e.CtrlKey ) // Ctrl + .
@@ -2214,7 +2240,10 @@ CPresentation.prototype =
     }
 
         if ( true == bRetValue )
+        {
             this.Document_UpdateSelectionState();
+            this.Document_UpdateUndoRedoState();
+        }
 
         return bRetValue;
     },
@@ -3294,6 +3323,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkAdd, [HyperProps]);
+            this.Document_UpdateInterfaceState();
         }
     },
 
@@ -3302,6 +3332,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkModify, [HyperProps]);
+            this.Document_UpdateInterfaceState();
         }
     },
 
@@ -3310,6 +3341,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.hyperlinkRemove, []);
+            this.Document_UpdateInterfaceState();
         }
     },
 
@@ -3337,63 +3369,75 @@ CPresentation.prototype =
     alignLeft : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignLeft);
+        this.Document_UpdateInterfaceState();
     },
 
     alignRight : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignRight);
+        this.Document_UpdateInterfaceState();
     },
 
     alignTop : function()
     {
 
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignTop);
+        this.Document_UpdateInterfaceState();
     },
 
     alignBottom : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignBottom);
+        this.Document_UpdateInterfaceState();
     },
 
     alignCenter : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignCenter);
+        this.Document_UpdateInterfaceState();
     },
 
     alignMiddle : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignMiddle);
+        this.Document_UpdateInterfaceState();
     },
 
     distributeHor : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeHor);
+        this.Document_UpdateInterfaceState();
     },
     distributeVer : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeVer);
+        this.Document_UpdateInterfaceState();
     },
 
     bringToFront : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringToFront);   //TODO: Передавать тип проверки
+        this.Document_UpdateInterfaceState();
     },
 
     bringForward : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringForward);   //TODO: Передавать тип проверки
+        this.Document_UpdateInterfaceState();
     },
 
     sendToBack : function()
     {
 
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.sendToBack);   //TODO: Передавать тип проверки
+        this.Document_UpdateInterfaceState();
     },
 
 
     bringBackward : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.bringBackward);   //TODO: Передавать тип проверки
+        this.Document_UpdateInterfaceState();
     },
 
     // Проверяем, находимся ли мы в гиперссылке сейчас
@@ -4378,9 +4422,11 @@ CPresentation.prototype =
                 this.Paragraph_Add( new ParaSpace(1) );
             else
                 this.Paragraph_Add( new ParaText(_char) );
+
         // На случай, если Count = 0
             this.TurnOffRecalc = false;
         }
+        this.Document_UpdateUndoRedoState();
     },
 
     StartAddShape: function(preset, _is_apply)

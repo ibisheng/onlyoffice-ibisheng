@@ -482,9 +482,7 @@ CTextBody.prototype =
                                 this.checkParagraphContent(parg, font_scale, true);
                             }
                         }
-
                     }
-
                 }
             }
         }

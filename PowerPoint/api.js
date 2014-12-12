@@ -4817,7 +4817,6 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
     {
         //if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) )
         {
-            History.Create_NewPoint();
             this.WordControl.m_oLogicDocument.addChart(chartBinary);
         }
     }
