@@ -495,7 +495,13 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 			t.isStartCoAuthoringOnEndLoad = true;
     };
 	this.CoAuthoringApi.onEndCoAuthoring			= function (isStartEvent) {
-		// ToDo add code
+        CollaborativeEditing.End_CollaborationEditing();
+
+        if (false != t.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable)
+        {
+            t.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable = false;
+            t.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+        }
 	};
 	/**
 	 * Event об отсоединении от сервера
