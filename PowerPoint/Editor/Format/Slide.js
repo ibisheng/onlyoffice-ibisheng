@@ -133,7 +133,8 @@ Slide.prototype =
         var sp_tree = this.cSld.spTree;
         for(var i = 0; i < sp_tree.length; ++i)
         {
-            sp_tree[i].Search(Str, Props, Engine, Type);
+            if (sp_tree[i].Search)
+                sp_tree[i].Search(Str, Props, Engine, Type);
         }
     },
 
