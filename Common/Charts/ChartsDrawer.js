@@ -1130,6 +1130,15 @@ CChartsDrawer.prototype =
 		if(this.calcProp.subType == 'stackedPer' && manualMax != null)
 			manualMax = manualMax * 100;
 		
+		//TODO временная проверка для некорректных минимальных и максимальных значений
+		if(manualMax && manualMin && manualMax < manualMin)
+		{
+			if(manualMax < 0)
+				manualMax = 0;
+			else
+				manualMin = 0;
+		}
+		
 		axisMin =  manualMin !== null && manualMin !== undefined ? manualMin : trueMinMax.min;
 		axisMax =  manualMax !== null && manualMax !== undefined ? manualMax : trueMinMax.max;
 		
@@ -6543,7 +6552,7 @@ valAxisChart.prototype =
 			{
 				var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints;
 
-				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
+				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
 				var posX = this.chartSpace.chart.plotArea.valAx.posX ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
