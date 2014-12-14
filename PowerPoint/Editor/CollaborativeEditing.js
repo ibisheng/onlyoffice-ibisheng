@@ -568,7 +568,7 @@ function CCollaborativeChanges()
         if ( "undefined" != typeof(Class.Save_Changes2) )
         {
             var Writer2 = CollaborativeEditing.m_oMemory;
-            Writer.Seek(0);
+            Writer2.Seek(0);
             if ( true === Class.Save_Changes2( Data, Writer2 ) )
                 return Len + ";" + Writer.GetBase64Memory2(Pos, Len) + ";" + Writer2.GetCurPosition() + ";" + Writer2.GetBase64Memory();
         }
@@ -756,7 +756,6 @@ function CCollaborativeEditing()
         // Генерируем свои изменения
         var StartPoint = ( null === History.SavedIndex ? 0 : History.SavedIndex + 1 );
         var LastPoint  = -1;
-
         if ( this.m_nUseType <= 0 )
         {
             // (ненужные точки предварительно удаляем)
