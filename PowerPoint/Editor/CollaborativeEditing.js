@@ -805,7 +805,7 @@ function CCollaborativeEditing()
             if(Class instanceof PropLocker)
             {
                 var Class2 = g_oTableId.Get_ById(Class.objectId);
-                if(Class2.getObjectType && Class2.getObjectType() === historyitem_type_Slide && Class2.deleteLock === Class)
+                if(Class2 && Class2.getObjectType && Class2.getObjectType() === historyitem_type_Slide && Class2.deleteLock === Class)
                 {
                     editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class2.num);
                 }
