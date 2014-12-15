@@ -7310,12 +7310,14 @@ function _onSpellCheck_Callback2 (response)
 };*/
 function sendCommand(editor, fCallback, rdata){
 	var sData;
+	var sRequestContentType = "application/json";
 	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
 	if(null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked)
 	{
 		var sTemp = rdata["data"];
 		rdata["data"] = null;
 		sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sTemp;
+		sRequestContentType = "application/octet-stream";
 	}
 	else
 		sData = JSON.stringify(rdata);
@@ -7323,6 +7325,7 @@ function sendCommand(editor, fCallback, rdata){
         type: 'POST',
         url: g_sMainServiceLocalUrl,
         data: sData,
+        contentType: sRequestContentType,
         error: function(){
 				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 				if(fCallback)
@@ -7422,6 +7425,7 @@ function sendTrack(fCallback, url, rdata){
         type: 'POST',
         url: url,
         data: rdata,
+        contentType: "application/json",
         error: function(){
 				if(fCallback)
 					fCallback();
@@ -7572,6 +7576,7 @@ function asc_ajax(obj){
 	var url = "", type = "GET", 
 		async = true, data = null, dataType = "text/xml", 
 		error = null, success = null, httpRequest = null,
+		contentType = "application/x-www-form-urlencoded",
 
 	init = function (obj){
 	
@@ -7595,6 +7600,9 @@ function asc_ajax(obj){
 		}		
 		if ( typeof (obj.success) != 'undefined' ){
 			success = obj.success;
+		}
+		if ( typeof (obj.contentType) != 'undefined' ){
+			contentType = obj.contentType;
 		}
 
 		if (window.XMLHttpRequest) { // Mozilla, Safari, ...
@@ -7624,7 +7632,7 @@ function asc_ajax(obj){
 	send = function(){
 		httpRequest.open(type, url, async);
 		if (type === "POST")
-			httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			httpRequest.setRequestHeader("Content-Type", contentType);
 		httpRequest.send(data);
 	},
 	

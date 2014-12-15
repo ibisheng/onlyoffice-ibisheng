@@ -770,12 +770,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype._asc_sendCommand = function (callback, rdata) {
 			var sData;
+			var sRequestContentType = "application/json";
 			//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
 			if(null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked)
 			{
 				var sTemp = rdata["data"];
 				rdata["data"] = null;
 				sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sTemp;
+				sRequestContentType = "application/octet-stream";
 			}
 			else
 				sData = JSON.stringify(rdata);
@@ -784,6 +786,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				type: 'POST',
 				url: g_sMainServiceLocalUrl,
 				data: sData,
+				contentType: sRequestContentType,
 				error: function(){
 					var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
 					oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
@@ -918,6 +921,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				type: 'POST',
 				url: url,
 				data: rdata,
+				contentType: "application/json",
 				error: function() {
 					if (callback)
 						callback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
@@ -3545,6 +3549,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var url = "", type = "GET",
 				async = true, data = null, dataType = "text/xml",
 				error = null, success = null, httpRequest = null,
+				contentType = "application/x-www-form-urlencoded",
 
 			init = function (obj){
 
@@ -3568,6 +3573,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 				if ( typeof obj.success !== 'undefined' ){
 					success = obj.success;
+				}
+				if ( typeof (obj.contentType) !== 'undefined' ){
+					contentType = obj.contentType;
 				}
 
 				if (window.XMLHttpRequest) { // Mozilla, Safari, ...
@@ -3597,7 +3605,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			send = function(){
 				httpRequest.open(type, url, async);
 				if (type === "POST")
-					httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+					httpRequest.setRequestHeader("Content-Type", contentType);
 				httpRequest.send(data);
 			},
 

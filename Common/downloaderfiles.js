@@ -37,7 +37,7 @@ function FileHandler() {
     }
     var generateIFrameContent = function ( file ) {
         var frameWindow = window.frames["fileFrame"];
-        var content = "<form id='frmFile' method='post' enctype='application/data' action='" + file + "'></form>";
+        var content = "<form id='frmFile' method='post' enctype='multipart/form-data' action='" + file + "'></form>";
         frameWindow.document.open();
         frameWindow.document.write( content );
         frameWindow.document.close();
