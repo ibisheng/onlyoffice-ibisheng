@@ -8497,8 +8497,11 @@ CValAx.prototype =
             {
                 if(isRealNumber(props.minVal))
                 {
-                    scaling.setMin(props.minVal);
-                    bChanged = true;
+                    if(!(props.maxValRule === c_oAscValAxisRule.fixed && props.maxVal < props.minVal) && scaling.min !== props.minVal)
+                    {
+                        scaling.setMin(props.minVal);
+                        bChanged = true;
+                    }
                 }
             }
         }
@@ -8519,8 +8522,11 @@ CValAx.prototype =
                 {
                     if(!isRealNumber(scaling.min) || scaling.min < props.maxVal)
                     {
-                        scaling.setMax(props.maxVal);
-                        bChanged = true;
+                        if(scaling.max !== props.maxVal)
+                        {
+                            scaling.setMax(props.maxVal);
+                            bChanged = true;
+                        }
                     }
                 }
             }
