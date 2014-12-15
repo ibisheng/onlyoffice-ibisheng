@@ -5065,7 +5065,20 @@ function CSlideDrawer()
 
         this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, this.BoundsChecker);
 
-        this.m_oWordControl.CheckCalculateDocumentSize(this.BoundsChecker.Bounds);
+        var bIsResize = this.m_oWordControl.CheckCalculateDocumentSize(this.BoundsChecker.Bounds);
+
+        if (true)
+        {
+            // поидее если был ресайз только
+            dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+            if (this.m_oWordControl.bIsRetinaSupport)
+                dKoef *= 2;
+
+            w_mm = this.m_oWordControl.m_oLogicDocument.Width;
+            h_mm = this.m_oWordControl.m_oLogicDocument.Height;
+            w_px = (w_mm * dKoef) >> 0;
+            h_px = (h_mm * dKoef) >> 0;
+        }
 
         // теперь смотрим, используем ли кэш для скролла
         var _need_pix_width     = this.BoundsChecker.Bounds.max_x - this.BoundsChecker.Bounds.min_x + 1 + 2 * this.SlideEps;

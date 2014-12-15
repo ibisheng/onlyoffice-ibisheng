@@ -2898,13 +2898,15 @@ function CEditorPage(api)
 
         this.MainScrollLock();
 
-        this.checkNeedHorScroll();
+        var bIsResize = this.checkNeedHorScroll();
 
         document.getElementById('panel_right_scroll').style.height = this.m_dDocumentHeight + "px";
 
         this.UpdateScrolls();
 
         this.MainScrollUnLock();
+
+        return bIsResize;
     }
 
     this.InitDocument = function(bIsEmpty)
