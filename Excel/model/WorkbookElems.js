@@ -2138,7 +2138,6 @@ function Col(worksheet, index)
 	this.sm = this.ws.workbook.oStyleManager;
 	this.cs = this.ws.workbook.CellStyles;
 	this.index = index;
-	this.id = this.ws.getNextColId();
     this.BestFit = null;
     this.hd = null;
     this.CustomWidth = null;
@@ -2147,10 +2146,6 @@ function Col(worksheet, index)
 }
 Col.prototype =
 {
-	getId : function()
-	{
-		return this.id;
-	},
 	moveHor : function(nDif)
 	{
 		this.index += nDif;
@@ -2401,7 +2396,6 @@ function Row(worksheet)
 	this.sm = this.ws.workbook.oStyleManager;
 	this.cs = this.ws.workbook.CellStyles;
 	this.c = {};
-	this.id = this.ws.getNextRowId();
     this.r = null;
 	this.index = null;
     this.xfs = null;
@@ -2413,10 +2407,6 @@ Row.prototype =
 {
 	getCells : function () {
 		return this.c;
-	},
-	getId : function()
-	{
-		return this.id;
 	},
 	create : function(row)
 	{

@@ -2078,10 +2078,6 @@ function Woorksheet(wb, _index, sId){
 	this.sheetViews = [];
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;
-	
-	this.nMaxRowId = 1;
-	this.nMaxColId = 1;
-
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
@@ -2361,12 +2357,6 @@ Woorksheet.prototype._forEachCell=function(fAction){
 			}
 		}
 	}
-};
-Woorksheet.prototype.getNextRowId=function(){
-	return this.nMaxRowId++;
-};
-Woorksheet.prototype.getNextColId=function(){
-	return this.nMaxColId++;
 };
 Woorksheet.prototype.getId=function(){
 	return this.Id;
