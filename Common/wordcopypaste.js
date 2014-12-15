@@ -4052,7 +4052,10 @@ PasteProcessor.prototype =
 							for(var i = 0; i < presentationSelectedContent.Drawings.length; i++)
 							{
 								if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
-									presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+                                {
+                                    presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+                                    checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
+                                }
 							}
 							
 							oThis.api.pre_Paste(fonts, image_map, paste_callback);
@@ -4064,7 +4067,10 @@ PasteProcessor.prototype =
 						for(var i = 0; i < presentationSelectedContent.Drawings.length; i++)
 						{
 							if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
-								presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+                            {
+                                presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
+                                checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
+                            }
 						}
 						
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, paste_callback);

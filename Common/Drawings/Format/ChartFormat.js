@@ -2398,6 +2398,14 @@ CBarChart.prototype =
     },
 
 
+    checkSpPrRasterImages: function(images)
+    {
+        this.dLbls && this.dLbls.checkSpPrRasterImages(images);
+        for(var i = 0; i < this.series.length; ++i)
+            this.series[i].checkSpPrRasterImages(images);
+    },
+
+
     getObjectType: function()
     {
         return historyitem_type_BarChart;
@@ -2890,6 +2898,7 @@ CAreaChart.prototype =
     },
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
     removeDataLabels: CBarChart.prototype.removeDataLabels,
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
@@ -3341,6 +3350,17 @@ CAreaSeries.prototype =
         {
             this.dPt[i].spPr && this.dPt[i].spPr.checkBlipFillRasterImage(images);
             this.dPt[i].marker && this.dPt[i].marker.spPr && this.dPt[i].marker.spPr.checkBlipFillRasterImage(images);
+        }
+    },
+
+    checkSpPrRasterImages: function(images)
+    {
+        checkSpPrRasterImages(this.spPr);
+        checkSpPrRasterImages(this.dLbls);
+        for(var i = 0; i < this.dPt.length; ++i)
+        {
+            checkSpPrRasterImages(this.dPt[i].spPr);
+            this.dPt[i].marker && checkSpPrRasterImages(this.dPt[i].marker.spPr);
         }
     },
 
@@ -8928,6 +8948,7 @@ CBarSeries.prototype =
     },
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
     setFromOtherSeries: function(o)
     {
@@ -9419,6 +9440,7 @@ CBubbleChart.prototype =
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
 
 
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
@@ -9846,6 +9868,7 @@ CBubbleSeries.prototype =
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
     getSeriesName: CAreaSeries.prototype.getSeriesName,
     getCatName: CAreaSeries.prototype.getCatName,
@@ -10822,6 +10845,15 @@ CDLbls.prototype =
         for(var i = 0; i < this.dLbl.length; ++i)
         {
             this.dLbl[i] && this.dLbl[i].spPr && this.dLbl[i].spPr.checkBlipFillRasterImage(images);
+        }
+    },
+
+    checkSpPrRasterImages: function()
+    {
+        checkSpPrRasterImages(this.spPr);
+        for(var i = 0; i < this.dLbl.length; ++i)
+        {
+            this.dLbl[i] && checkSpPrRasterImages(this.dLbl[i].spPr);
         }
     },
 
@@ -12258,6 +12290,7 @@ CDoughnutChart.prototype =
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
@@ -14178,6 +14211,16 @@ CLineChart.prototype =
         }
     },
 
+    checkSpPrRasterImages: function(images)
+    {
+        CBarChart.prototype.checkSpPrRasterImages.call(this, images);
+        if(this.upDownBars)
+        {
+            checkSpPrRasterImages(this.upDownBars.upBars);
+            checkSpPrRasterImages(this.upDownBars.downBars);
+        }
+    },
+
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
@@ -14749,6 +14792,7 @@ CLineSeries.prototype =
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
     getSeriesName: CAreaSeries.prototype.getSeriesName,
     getCatName: CAreaSeries.prototype.getCatName,
@@ -16658,6 +16702,15 @@ COfPieChart.prototype =
         }
     },
 
+    checkSpPrRasterImages: function(images)
+    {
+        CBarChart.prototype.checkSpPrRasterImages.call(this, images);
+        if(this.serLines && this.serLines.spPr)
+        {
+            checkSpPrRasterImages(this.serLines.spPr);
+        }
+    },
+
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
@@ -17394,6 +17447,7 @@ CPieChart.prototype =
     },
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
@@ -17771,6 +17825,7 @@ CPieSeries.prototype =
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
     setFromOtherSeries: function(o)
     {
@@ -18417,6 +18472,7 @@ CRadarChart.prototype =
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
 
     getAxisByTypes: CPlotArea.prototype.getAxisByTypes,
 
@@ -18817,6 +18873,7 @@ CRadarSeries.prototype =
 
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
     Write_ToBinary2: function(w)
     {
@@ -19501,6 +19558,7 @@ CScatterChart.prototype =
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
 
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
@@ -19933,6 +19991,7 @@ CScatterSeries.prototype =
     },
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
     setFromOtherSeries: function(o)
     {
@@ -20667,6 +20726,7 @@ CStockChart.prototype =
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CBarChart.prototype.checkSpPrRasterImages,
 
     removeDataLabels: CBarChart.prototype.removeDataLabels,
 
@@ -21584,6 +21644,15 @@ CSurfaceChart.prototype =
         }
     },
 
+    checkSpPrRasterImages: function(images)
+    {
+        CBarChart.prototype.checkSpPrRasterImages.call(this, images);
+        for(var i = 0; i < this.bandFmts.length; ++i)
+        {
+            this.bandFmts[i] && checkSpPrRasterImages(this.bandFmts[i].spPr);
+        }
+    },
+
     Write_ToBinary2: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -21922,6 +21991,7 @@ CSurfaceSeries.prototype =
 
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
+    checkSpPrRasterImages: CAreaSeries.prototype.checkSpPrRasterImages,
 
 
     setFromOtherSeries: function(o)

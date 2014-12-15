@@ -512,7 +512,6 @@ CTable.prototype.Selection_Draw_Page = function(Page_abs)
         }
     }
 };
-
 CStyle.prototype.Create_NormalTable = function()
 {
     var TablePr =

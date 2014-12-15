@@ -237,7 +237,7 @@ function checkFiniteNumber(num)
 
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
 
-function addPointToMap(map, worksheet, row, col, pt)
+/*function addPointToMap(map, worksheet, row, col, pt)
 {
     if(!Array.isArray(map[worksheet.getId()+""]))
     {
@@ -271,7 +271,7 @@ function checkPointInMap(map, worksheet, row, col)
     {
         return false;
     }
-}
+}*/
 
 
 function CChartSpace()
@@ -317,7 +317,7 @@ function CChartSpace()
 
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0, x: 0, y: 0};
     this.parsedFromulas = [];
-    this.pointsMap = {};
+    //this.pointsMap = {};
 
     this.setRecalculateInfo();
 
@@ -2214,7 +2214,7 @@ CChartSpace.prototype =
     recalculateReferences: function()
     {
         var worksheet = this.worksheet;
-        this.pointsMap = {};
+        //this.pointsMap = {};
         if(!worksheet)
             return;
 
@@ -2283,7 +2283,7 @@ CChartSpace.prototype =
                                                     pt.setFormatCode(cell.getNumFormatStr())
                                                 }
                                                 num_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
+                                                //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
                                             }
                                         }
                                         pt_index++;
@@ -2308,7 +2308,7 @@ CChartSpace.prototype =
                                                     pt.setFormatCode(cell.getNumFormatStr())
                                                 }
                                                 num_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1, pt);
+                                                //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1, pt);
                                             }
                                         }
                                         pt_index++;
@@ -2378,7 +2378,7 @@ CChartSpace.prototype =
                                                 pt.setVal(value_width_format);
 
                                                 str_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
+                                                //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
                                             }
                                         }
                                         pt_index++;
@@ -2399,7 +2399,7 @@ CChartSpace.prototype =
                                                 pt.setIdx(pt_index);
                                                 pt.setVal(cell.getValueWithFormat());
                                                 str_cache.addPt(pt);
-                                                addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
+                                                //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1,  pt);
                                             }
                                         }
                                         pt_index++;
@@ -11357,3 +11357,75 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 	return {series: series, parsedHeaders: parsedHeaders};
 }
 
+function checkSpPrRasterImages(spPr)
+{
+    if(spPr && spPr.Fill && spPr.Fill && spPr.Fill.fill && spPr.Fill.fill.type === FILL_TYPE_BLIP)
+    {
+        var copyBlipFill = spPr.Fill.createDuplicate();
+        copyBlipFill.fill.setRasterImageId(spPr.Fill.fill.RasterImageId);
+        spPr.setFill(copyBlipFill);
+    }
+}
+function checkBlipFillRasterImages(sp)
+{
+    switch (sp.getObjectType())
+    {
+        case historyitem_type_Shape:
+        {
+            checkSpPrRasterImages(sp.spPr);
+            break;
+        }
+        case historyitem_type_ImageShape:
+        {
+            if(sp.blipFill)
+            {
+                var newBlipFill = sp.blipFill.createDuplicate();
+                newBlipFill.setRasterImageId(sp.blipFill.RasterImageId);
+                sp.setBlipFill(newBlipFill);
+            }
+            break;
+        }
+        case historyitem_type_ChartSpace:
+        {
+            checkSpPrRasterImages(sp.spPr);
+            var chart = sp.chart;
+            if(chart)
+            {
+                chart.backWall && checkSpPrRasterImages(chart.backWall.spPr);
+                chart.floor && checkSpPrRasterImages(chart.floor.spPr);
+                chart.legend && checkSpPrRasterImages(chart.legend.spPr);
+                chart.sideWall && checkSpPrRasterImages(chart.sideWall.spPr);
+                chart.title && checkSpPrRasterImages(chart.title.spPr);
+                //plotArea
+                var plot_area = sp.chart.plotArea;
+                if(plot_area)
+                {
+                    checkSpPrRasterImages(plot_area.spPr);
+                    for(var j = 0; j < plot_area.axId.length; ++j)
+                    {
+                        var axis = plot_area.axId[j];
+                        if(axis)
+                        {
+                            checkSpPrRasterImages(axis.spPr);
+                            axis.title && axis.title && checkSpPrRasterImages(axis.title.spPr);
+                        }
+                    }
+                    for(j = 0; j < plot_area.charts.length; ++j)
+                    {
+                        plot_area.charts[j].checkSpPrRasterImages();
+                    }
+                }
+            }
+            break;
+        }
+        case historyitem_type_GroupShape:
+        {
+            checkBlipFillRasterImages(sp.spTree);
+            break;
+        }
+        case historyitem_type_GraphicFrame:
+        {
+            break;
+        }
+    }
+}
