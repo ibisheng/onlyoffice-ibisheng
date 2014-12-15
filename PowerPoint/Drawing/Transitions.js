@@ -392,14 +392,23 @@ function CTransitionAnimation(htmlpage)
                 _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
 
-            if (null != oThis.CacheImage1.Image)
+            if (!oThis.IsBackward)
             {
-                _ctx1.drawImage(oThis.CacheImage1.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                if (null != oThis.CacheImage1.Image)
+                {
+                    _ctx1.drawImage(oThis.CacheImage1.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                }
+                else
+                {
+                    var _c = oThis.CacheImage1.Color;
+                    _ctx1.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                    _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    _ctx1.beginPath();
+                }
             }
             else
             {
-                var _c = oThis.CacheImage1.Color;
-                _ctx1.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                _ctx1.fillStyle = "rgb(0,0,0)";
                 _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
                 _ctx1.beginPath();
             }
@@ -443,50 +452,110 @@ function CTransitionAnimation(htmlpage)
         }
         else if (oThis.Param == c_oAscSlideTransitionParams.Fade_Through_Black)
         {
-            if (oThis.Params.IsFirstAfterHalf)
+            if (!oThis.IsBackward)
             {
-                if (_part > 0.5)
+                if (oThis.Params.IsFirstAfterHalf)
                 {
-                    var _ctx1 = null;
-                    if (null == oThis.DemonstrationObject)
+                    if (_part > 0.5)
                     {
-                        // отрисовываем на основной канве картинку первого слайда
-                        _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-                    }
-                    else
-                    {
-                        _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
-                    }
+                        var _ctx1 = null;
+                        if (null == oThis.DemonstrationObject)
+                        {
+                            // отрисовываем на основной канве картинку первого слайда
+                            _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                        }
+                        else
+                        {
+                            _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                        }
 
-                    _ctx1.fillStyle = "rgb(0,0,0)";
-                    _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
-                    _ctx1.beginPath();
+                        _ctx1.fillStyle = "rgb(0,0,0)";
+                        _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        _ctx1.beginPath();
 
-                    oThis.Params.IsFirstAfterHalf = false;
+                        oThis.Params.IsFirstAfterHalf = false;
+                    }
                 }
-            }
 
-            if (oThis.Params.IsFirstAfterHalf)
-            {
-                _ctx2.globalAlpha = (2 * _part);
-                _ctx2.fillStyle = "rgb(0,0,0)";
-                _ctx2.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
-                _ctx2.beginPath();
-            }
-            else
-            {
-                _ctx2.globalAlpha = (2 * (_part - 0.5));
-
-                if (null != oThis.CacheImage2.Image)
+                if (oThis.Params.IsFirstAfterHalf)
                 {
-                    _ctx2.drawImage(oThis.CacheImage2.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    _ctx2.globalAlpha = (2 * _part);
+                    _ctx2.fillStyle = "rgb(0,0,0)";
+                    _ctx2.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    _ctx2.beginPath();
                 }
                 else
                 {
-                    var _c = oThis.CacheImage2.Color;
-                    _ctx2.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                    _ctx2.globalAlpha = (2 * (_part - 0.5));
+
+                    if (null != oThis.CacheImage2.Image)
+                    {
+                        _ctx2.drawImage(oThis.CacheImage2.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    }
+                    else
+                    {
+                        var _c = oThis.CacheImage2.Color;
+                        _ctx2.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                        _ctx2.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        _ctx2.beginPath();
+                    }
+                }
+            }
+            else
+            {
+                if (oThis.Params.IsFirstAfterHalf)
+                {
+                    if (_part < 0.5)
+                    {
+                        var _ctx1 = null;
+                        if (null == oThis.DemonstrationObject)
+                        {
+                            // отрисовываем на основной канве картинку первого слайда
+                            _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                        }
+                        else
+                        {
+                            _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                        }
+
+                        if (null != oThis.CacheImage1.Image)
+                        {
+                            _ctx1.drawImage(oThis.CacheImage1.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        }
+                        else
+                        {
+                            var _c = oThis.CacheImage1.Color;
+                            _ctx1.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                            _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                            _ctx1.beginPath();
+                        }
+
+                        oThis.Params.IsFirstAfterHalf = false;
+                    }
+                }
+
+                if (!oThis.Params.IsFirstAfterHalf)
+                {
+                    _ctx2.globalAlpha = (2 * _part);
+                    _ctx2.fillStyle = "rgb(0,0,0)";
                     _ctx2.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
                     _ctx2.beginPath();
+                }
+                else
+                {
+                    _ctx2.globalAlpha = (2 * (_part - 0.5));
+
+                    if (null != oThis.CacheImage2.Image)
+                    {
+                        _ctx2.drawImage(oThis.CacheImage2.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    }
+                    else
+                    {
+                        var _c = oThis.CacheImage2.Color;
+                        _ctx2.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                        _ctx2.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        _ctx2.beginPath();
+                    }
                 }
             }
 
