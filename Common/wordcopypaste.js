@@ -3608,19 +3608,39 @@ PasteProcessor.prototype =
                                 var b_read_layouts = false;
                                 for(var i = 0; i < arr_layouts_id.length; ++i)
                                 {
-                                    if(!isRealObject(g_oTableId.Get_ById(arr_layouts_id[i])))
+                                    var tempLayout = g_oTableId.Get_ById(arr_layouts_id[i]);
+									if(!tempLayout || !tempLayout.Master)
                                     {
                                         b_read_layouts = true;
                                         break;
                                     }
+									else
+									{
+										for(var j = 0; j < presentation.slideMasters.length; ++j)
+										{
+											if(presentation.slideMasters[j] === tempLayout.Master)
+											{
+												break;
+											}
+										}
+										if(j === presentation.slideMasters.length)
+										{
+											b_read_layouts = true;
+											break;
+										}
+									}
                                 }
                                 if(b_read_layouts)
                                 {
                                     var layouts_count = stream.GetULong();
-                                    for(var i = 0; i < layouts_count; ++i)
-                                    {
-                                        arr_layouts[i] = loader.ReadSlideLayout()
-                                    }
+									
+                                    ExecuteNoHistory(function(){
+                                        for(var i = 0; i < layouts_count; ++i)
+                                        {
+                                            arr_layouts[i] = loader.ReadSlideLayout()
+                                        }
+                                    }, this, []);
+									
                                     var arr_indexes = [];
                                     for(var i = 0; i < slide_count; ++i)
                                     {
@@ -3630,7 +3650,8 @@ PasteProcessor.prototype =
                                     var addedLayouts = [];
                                     for(var i = 0; i < slide_count; ++i)
                                     {
-                                        if(isRealObject(g_oTableId.Get_ById(arr_layouts_id[i])))
+                                        var tempLayout = g_oTableId.Get_ById(arr_layouts_id[i]);
+										if(tempLayout && tempLayout.Master)
                                         {
                                             arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                             arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
@@ -3640,20 +3661,10 @@ PasteProcessor.prototype =
                                         {
                                             arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                             arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-                                            arr_slides[i].setLayout(arr_layouts[arr_indexes[i]]);
-                                            for(var j = 0; j < addedLayouts.length; ++j)
-                                            {
-                                                if(addedLayouts[j] === arr_layouts[arr_indexes[i]])
-                                                    break;
-                                            }
-                                            if(j === addedLayouts.length)
-                                            {
-                                                addedLayouts.push(arr_layouts[arr_indexes[i]]);
-                                                arr_layouts[arr_indexes[i]].setMaster(master);
-                                                arr_layouts[arr_indexes[i]].changeSize(presentation.Width, presentation.Height);
-                                                arr_layouts[arr_indexes[i]].Width = presentation.Width;
-                                                arr_layouts[arr_indexes[i]].Height = presentation.Height;
-                                            }
+											
+											//в данном случае применяем дефолтоый layout(как это делает MS)
+											var tempLayout = master.getMatchingLayout(arr_layouts[arr_indexes[i]].type, arr_layouts[arr_indexes[i]].matchingName, arr_layouts[arr_indexes[i]].cSld.name, true);
+											arr_slides[i].setLayout(tempLayout);
                                         }
                                     }
                                 }
