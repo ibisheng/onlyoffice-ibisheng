@@ -1256,6 +1256,12 @@ function CDrawingDocument()
             renderer.EndPage();
         }
 
+        if (end == -1)
+        {
+            renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+            renderer.EndPage()
+        }
+
         this.m_lCurrentRendererPage = end + 1;
 
         if (this.m_lCurrentRendererPage >= pagescount)
