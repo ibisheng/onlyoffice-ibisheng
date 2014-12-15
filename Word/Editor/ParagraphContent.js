@@ -3126,11 +3126,13 @@ function CAnchorPosition()
     this.Margin_V      = 0;
     this.LineTop       = 0;
     this.ParagraphTop  = 0;
+    this.Page_X        = 0;
+    this.Page_Y        = 0;
 }
 
 CAnchorPosition.prototype =
 {
-    Set : function(W, H, YOffset, ParaLayout)
+    Set : function(W, H, YOffset, ParaLayout, PageLimits)
     {
         this.W             = W;
         this.H             = H;
@@ -3153,9 +3155,11 @@ CAnchorPosition.prototype =
         this.Margin_V      = ParaLayout.Margin_V;
         this.LineTop       = ParaLayout.LineTop;
         this.ParagraphTop  = ParaLayout.ParagraphTop;
+        this.Page_X        = PageLimits.X;
+        this.Page_Y        = PageLimits.Y;
     },
 
-    Calculate_X : function(bInline, RelativeFrom, bAlign, Value, PageLimits)
+    Calculate_X : function(bInline, RelativeFrom, bAlign, Value)
     {
         if ( true === bInline )
         {
@@ -3337,7 +3341,7 @@ CAnchorPosition.prototype =
                         }
                     }
                     else
-                        this.CalcX = Value + PageLimits.X;
+                        this.CalcX = Value + this.Page_X;
 
                     break;
                 }
@@ -3383,7 +3387,7 @@ CAnchorPosition.prototype =
         return this.CalcX;
     },
 
-    Calculate_Y : function(bInline, RelativeFrom, bAlign, Value, PageLimits)
+    Calculate_Y : function(bInline, RelativeFrom, bAlign, Value)
     {
         if ( true === bInline )
         {
@@ -3526,7 +3530,7 @@ CAnchorPosition.prototype =
                         }
                     }
                     else
-                        this.CalcY = Value + PageLimits.Y;
+                        this.CalcY = Value + this.Page_Y;
 
                     break;
                 }
@@ -3688,7 +3692,7 @@ CAnchorPosition.prototype =
 
             case c_oAscRelativeFromH.Page:
             {
-                Value = this.CalcX;
+                Value = this.CalcX - this.Page_X;
 
                 break;
             }
@@ -3736,7 +3740,7 @@ CAnchorPosition.prototype =
 
             case c_oAscRelativeFromV.Page:
             {
-                Value = this.CalcY;
+                Value = this.CalcY - this.Page_Y;
 
                 break;
             }
@@ -4411,9 +4415,9 @@ ParaDrawing.prototype =
             else
                 H = this.getXfrmExtY();
         }
-        this.Internal_Position.Set( W, H, this.YOffset, ParaLayout);
-        this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, PageLimitsOrigin);
-        this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, PageLimitsOrigin);
+        this.Internal_Position.Set( W, H, this.YOffset, ParaLayout, PageLimitsOrigin);
+        this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
+        this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
         this.Internal_Position.Correct_Values(bInline, PageLimits, this.AllowOverlap, this.Use_TextWrap(), OtherFlowObjects);
 
         var OldPageNum = this.PageNum;
@@ -4432,7 +4436,7 @@ ParaDrawing.prototype =
             var Value = this.Internal_Position.Calculate_X_Value(this.PositionH_Old.RelativeFrom);
             this.Set_PositionH( this.PositionH_Old.RelativeFrom, false, Value );
             // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, PageLimitsOrigin);
+            this.X = this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
         }
 
         if ( undefined != this.PositionV_Old )
@@ -4670,9 +4674,9 @@ ParaDrawing.prototype =
             var _W = (this.PositionH.Align ? this.W : this.getXfrmExtX() );
             var _H = (this.PositionV.Align ? this.H : this.getXfrmExtY() );
 
-            this.Internal_Position.Set( _W, _H, this.YOffset, Layout.ParagraphLayout );
-            this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X, Layout.PageLimits);
-            this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y, Layout.PageLimits);
+            this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
+            this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
+            this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.Y);
             this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
 
             this.PageNum = PageNum;
@@ -4684,14 +4688,14 @@ ParaDrawing.prototype =
             this.Set_PositionH( this.PositionH.RelativeFrom, false, ValueX );
 
             // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, Layout.PageLimits);
+            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
 
             // Рассчитаем сдвиг с учетом старой привязки
             var ValueY = this.Internal_Position.Calculate_Y_Value(this.PositionV.RelativeFrom);
             this.Set_PositionV( this.PositionV.RelativeFrom, false, ValueY );
 
             // На всякий случай пересчитаем заново координату
-            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, Layout.PageLimits);
+            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
         }
 
         /*
@@ -4788,9 +4792,9 @@ ParaDrawing.prototype =
             var _W = this.W;
             var _H = this.H;
 
-            this.Internal_Position.Set( _W, _H, this.YOffset, Layout.ParagraphLayout );
-            this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X, Layout.PageLimits);
-            this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y, Layout.PageLimits);
+            this.Internal_Position.Set( _W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
+            this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
+            this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.X);
             this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
 
             this.PageNum = PageNum;
@@ -4802,14 +4806,14 @@ ParaDrawing.prototype =
             this.Set_PositionH( this.PositionH.RelativeFrom, false, ValueX );
 
             // На всякий случай пересчитаем заново координату
-            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, Layout.PageLimits);
+            this.X = this.Internal_Position.Calculate_X(false, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
 
             // Рассчитаем сдвиг с учетом старой привязки
             var ValueY = this.Internal_Position.Calculate_Y_Value(this.PositionV.RelativeFrom);
             this.Set_PositionV( this.PositionV.RelativeFrom, false, ValueY );
 
             // На всякий случай пересчитаем заново координату
-            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, Layout.PageLimits);
+            this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
 
             NearPos.Paragraph.Check_NearestPos( NearPos );
 

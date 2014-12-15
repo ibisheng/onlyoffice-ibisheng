@@ -571,7 +571,10 @@ RotateState.prototype =
                             var original = this.drawingObjects.arrTrackObjects[i].originalObject;
                             original.parent.Update_Size(bounds.extX, bounds.extY);
                             arr_nearest_pos[i].Paragraph.Check_NearestPos(arr_nearest_pos[i]);
-                            original.parent.Remove_FromDocument(false);
+
+                            // На удалении включаем пересчет из-за бага (28015), чтобы во время добавления автофигуры на эту же страницу
+                            // расположение всех элементов было рассчитано с уже удаленной автофигурой.
+                            original.parent.Remove_FromDocument(true);
                             original.parent.Set_XYForAdd(bounds.posX, bounds.posY, arr_nearest_pos[i], original.selectStartPage);
                         }
 
