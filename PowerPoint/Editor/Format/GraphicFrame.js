@@ -28,6 +28,17 @@ function CGraphicFrame()
         recalculateShapeHierarchy: true,
         recalculateTable: true
     };
+    this.bounds =
+    {
+        l: 0,
+        t: 0,
+        r: 0,
+        b: 0,
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0
+    };
     this.RecalcInfo = {};
     this.bDeleted = true;
 }
@@ -359,6 +370,14 @@ CGraphicFrame.prototype =
                 this.transformText = this.transform;
                 this.invertTransformText = this.invertTransform;
                 this.cachedImage = null;
+                this.bounds.l = this.x;
+                this.bounds.t = this.y;
+                this.bounds.r = this.x + this.extX;
+                this.bounds.b = this.y + this.extY;
+                this.bounds.x = this.x;
+                this.bounds.y = this.y;
+                this.bounds.w = this.extX;
+                this.bounds.h = this.extY;
             }
         }, this, []);
 
