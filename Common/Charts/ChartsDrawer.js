@@ -2102,7 +2102,7 @@ CChartsDrawer.prototype =
 		for(var i = 0; i < series.length; i++)
 		{
 			numCache = series[i].val.numRef ? series[i].val.numRef.numCache : series[i].val.numLit;
-			if(numCache.ptCount)
+			if(numCache && numCache.ptCount)
 				return numCache.ptCount;
 		}
 		
