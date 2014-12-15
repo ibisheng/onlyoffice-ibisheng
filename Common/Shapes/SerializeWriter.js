@@ -2838,7 +2838,7 @@ function CBinaryFileWriter()
                 if (i < TableGrid.Rows[_index].Cells.length)
                     TableGrid.Rows[_index].Cells[i].row_span = _count;
 
-                _index += _count + 1;
+                _index += _count;
             }
         }
 
