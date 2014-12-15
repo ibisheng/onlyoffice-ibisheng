@@ -920,11 +920,13 @@ CMathContent.prototype =
         {
             if(this.Content[i].Type == para_Math_Composition)
             {
-                if(!this.Content[i].IsOneLineText())
+                bOneLineText = false;
+
+                /*if(!this.Content[i].IsOneLineText())
                 {
                     bOneLineText = false;
                     break;
-                }
+                }*/
             }
         }
 
