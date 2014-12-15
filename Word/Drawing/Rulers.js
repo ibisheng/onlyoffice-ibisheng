@@ -782,6 +782,10 @@ function CHorRuler()
             _margin_right = this.TableMarginRight;
         }
 
+        var _presentations = false;
+        if (word_control.EditorType === "presentations")
+            _presentations = true;
+
         switch (this.DragType)
         {
             case 0:
@@ -859,6 +863,15 @@ function CHorRuler()
                 if (newVal < min)
                     newVal = this.m_dIndentLeft_old;
 
+                if (_presentations)
+                {
+                    min = _margin_left;
+                    if (this.m_dIndentLeftFirst < this.m_dIndentLeft)
+                        min += (this.m_dIndentLeft - this.m_dIndentLeftFirst);
+                    if (newVal < min)
+                        newVal = min;
+                }
+
                 var max = _margin_right;
                 if (0 < this.m_dIndentRight)
                     max = _margin_right - this.m_dIndentRight;
@@ -891,6 +904,12 @@ function CHorRuler()
                 if (0 < this.m_dIndentRight)
                     max -= this.m_dIndentRight;
 
+                if (_presentations)
+                {
+                    if (newVal < _margin_left)
+                        newVal = _margin_left;
+                }
+
                 if (newVal > max)
                     newVal = Math.max(max, _margin_left + this.m_dIndentLeft_old);
 
@@ -912,6 +931,12 @@ function CHorRuler()
                 var max = _margin_right - 20;
                 if (0 < this.m_dIndentRight)
                     max -= this.m_dIndentRight;
+
+                if (_presentations)
+                {
+                    if (newVal < _margin_left)
+                        newVal = _margin_left;
+                }
 
                 if (newVal > max)
                     newVal = Math.max(max, _margin_left + this.m_dIndentLeftFirst_old);
@@ -941,6 +966,12 @@ function CHorRuler()
 
                 if (newVal < min)
                     newVal = Math.min(min, _margin_right - this.m_dIndentRight_old);
+
+                if (_presentations)
+                {
+                    if (newVal > _margin_right)
+                        newVal = _margin_right;
+                }
 
                 this.m_dIndentRight = _margin_right - newVal;
                 word_control.UpdateHorRulerBack();

@@ -72,6 +72,8 @@ function CEditorPage(api)
     this.Name = "";
     this.IsSupportNotes = false;
 
+    this.EditorType = "presentations";
+
     this.X = 0;
     this.Y = 0;
     this.Width      = 10;
