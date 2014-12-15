@@ -9643,6 +9643,20 @@ CDocument.prototype =
             }
             bRetValue = true;
         }
+        else if (e.KeyCode === 53 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Num5 - зачеркиваем текст
+        {
+            var TextPr = this.Get_Paragraph_TextPr();
+            if ( null != TextPr )
+            {
+                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+                {
+                    this.Create_NewHistoryPoint();
+                    this.Paragraph_Add( new ParaTextPr( { Strikeout : TextPr.Strikeout === true ? false : true } ) );
+                    this.Document_UpdateInterfaceState();
+                }
+                bRetValue = true;
+            }
+        }
         else if ( e.KeyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
         {
             this.Select_All();
@@ -12434,7 +12448,7 @@ CDocument.prototype =
             if (null !== Para)
                 HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
 
-            this.Remove();
+            this.Remove(1, false, false, true);
             this.Selection_Remove();
         }
 

@@ -1278,7 +1278,7 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
         switch ( ItemType )
         {
             case para_Drawing:
-            case para_End:
+            //case para_End:
             case para_Numbering:
             case para_PresentationNumbering:
             case para_PageNum:
@@ -2366,6 +2366,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 }
                 else
                 {
+                    Para.Pages[CurPage].Add_Drawing(Item);
+
                     if ( true === PRSA.RecalcFast )
                     {
                         // Если у нас быстрый пересчет, тогда мы не трогаем плавающие картинки

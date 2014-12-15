@@ -934,7 +934,7 @@ Paragraph.prototype =
                 for ( var CurPos = 0; CurPos < DrawingsLen; CurPos++ )
                 {
                     var Item = this.Pages[TempPage].Drawings[CurPos];
-                    DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
+                    this.Parent.DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
                 }
 
                 this.Pages[TempPage].Drawings = [];

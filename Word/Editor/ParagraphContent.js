@@ -4410,9 +4410,6 @@ ParaDrawing.prototype =
                 H = this.GraphicObj.bounds.h;
             else
                 H = this.getXfrmExtY();
-
-            // Добавляем данный элемент в страницы параграфа
-            this.Parent.Pages[PageNum - this.Parent.Get_StartPage_Absolute()].Add_Drawing( this );
         }
         this.Internal_Position.Set( W, H, this.YOffset, ParaLayout);
         this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, PageLimitsOrigin);

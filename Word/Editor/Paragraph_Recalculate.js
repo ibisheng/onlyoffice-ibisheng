@@ -1127,6 +1127,9 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
         if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() &&
             true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != PRS.BreakPageLine && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
         {
+            // Вызываем данную функцию для удаления картинок с предыдущей страницы
+            this.Recalculate_Drawing_AddPageBreak(0, 0, true);
+
             // TODO: Здесь перенос нужно делать сразу же
             this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
             PRS.RecalcResult = recalcresult_CurPage;
@@ -1331,6 +1334,9 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
 
             if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && 0 === BreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) && this.Lines[CurLine - 1].Ranges.length <= 1 )
             {
+                // Вызываем данную функцию для удаления картинок с предыдущей страницы
+                this.Recalculate_Drawing_AddPageBreak(0, 0, true);
+
                 this.Parent.RecalcInfo.Set_WidowControl(this, ( CurLine > 2 ? CurLine - 1 : 0 ) ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
                 PRS.RecalcResult = recalcresult_PrevPage;
                 return false;
