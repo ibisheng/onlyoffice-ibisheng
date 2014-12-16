@@ -1364,10 +1364,10 @@ function CParagraphSpacing (obj)
     }
     else
     {
-        this.Line = 1.15;					// Расстояние между строками внутри абзаца
-        this.LineRule = linerule_Auto;		// Тип расстрояния между строками
-        this.Before = 0;					// Дополнительное расстояние до абзаца
-        this.After = 10 * g_dKoef_pt_to_mm;	// Дополнительное расстояние после абзаца
+        this.Line     = undefined; // Расстояние между строками внутри абзаца
+        this.LineRule = undefined; // Тип расстрояния между строками
+        this.Before   = undefined; // Дополнительное расстояние до абзаца
+        this.After    = undefined; // Дополнительное расстояние после абзаца
     }
 }
 CParagraphSpacing.prototype.get_Line = function ()
