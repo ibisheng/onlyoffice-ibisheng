@@ -94,6 +94,8 @@ function asc_docs_api(name)
     this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
     this.noCreatePoint = false;
+    this.exucuteHistory = false;
+    this.exucuteHistoryEnd = false;
     this.pasteCallback = null;
     this.pasteImageMap = null;
     this.EndActionLoadImages = 0;
@@ -2077,28 +2079,51 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     }
     else
     {
-        if(!this.noCreatePoint)
+        if(!this.noCreatePoint || this.exucuteHistory)
         {
-            this.WordControl.m_oLogicDocument.ShapeApply(prop);
+            if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
+            {
+                var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
+                slide.graphicObjects.applyDrawingProps(prop);
+                slide.graphicObjects.recalculate();
+                this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
+                this.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                this.exucuteHistoryEnd = false;
+            }
+            else
+            {
+                this.WordControl.m_oLogicDocument.ShapeApply(prop);
+            }
+            if(this.exucuteHistory)
+            {
+                this.exucuteHistory = false;
+            }
         }
         else
         {
-            ExecuteNoHistory(function(){
-                this.WordControl.m_oLogicDocument.ShapeApply(prop);
-                if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
-                {
+            if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
+            {
+                ExecuteNoHistory(function(){
                     var slide = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage];
+                    slide.graphicObjects.applyDrawingProps(prop);
                     slide.graphicObjects.recalculate();
                     this.WordControl.m_oDrawingDocument.OnRecalculatePage(this.WordControl.m_oLogicDocument.CurPage, slide);
                     this.WordControl.m_oDrawingDocument.OnEndRecalculate();
-                }
-            }, this, []);
+                }, this, []);
+            }
         }
     }
 }
 
-asc_docs_api.prototype.setStartPointHistory = function(){this.noCreatePoint = true;};
-asc_docs_api.prototype.setEndPointHistory   = function(){this.noCreatePoint = false; };
+asc_docs_api.prototype.setStartPointHistory = function(){
+    this.noCreatePoint = true;
+    this.exucuteHistory = true;
+};
+asc_docs_api.prototype.setEndPointHistory   = function(){
+    this.noCreatePoint = false;
+    this.exucuteHistory = false;
+    this.exucuteHistoryEnd = true;
+};
 asc_docs_api.prototype.SetSlideProps = function(prop)
 {
     if (null == prop)
