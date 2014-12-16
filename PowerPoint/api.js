@@ -1430,7 +1430,7 @@ asc_docs_api.prototype.Share = function(){
 
 
 function OnSave_Callback(e) {
-	if (false == e["saveLock"] && false === editor.waitSave) {
+	if (false == e["saveLock"]) {
 		editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
 		if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType)
@@ -1467,7 +1467,8 @@ function OnSave_Callback(e) {
 }
 
 asc_docs_api.prototype.asc_Save = function () {
-    if (true === this.canSave)
+    // waitSave - означает, что сейчас происходит вставка данных и сохранять до окончания нельзя
+    if (false === this.waitSave && true === this.canSave)
     {
         this.canSave = false;
         this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
