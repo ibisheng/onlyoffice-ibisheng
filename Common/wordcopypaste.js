@@ -3579,7 +3579,9 @@ PasteProcessor.prototype =
                                 var layouts_count = stream.GetULong();
                                 for(var i = 0; i < layouts_count; ++i)
                                 {
-                                    arr_layouts[i] = loader.ReadSlideLayout()
+                                    arr_layouts[i] = loader.ReadSlideLayout();
+									arr_layouts[i].Width = p_width;
+									arr_layouts[i].Height = p_height;
                                 }
                                 var arr_indexes = [];
                                 for(var i = 0; i < slide_count; ++i)
@@ -3591,8 +3593,6 @@ PasteProcessor.prototype =
                                 {
                                     arr_layouts[i].setMaster(master);
                                     arr_layouts[i].changeSize(presentation.Width, presentation.Height);
-                                    //arr_layouts[i].Width = presentation.Width;
-                                    //arr_layouts[i].Height = presentation.Height;
                                     master.addLayout(arr_layouts[i]);
                                 }
                                 for(var i =0; i < slide_count; ++i)
@@ -3637,7 +3637,9 @@ PasteProcessor.prototype =
                                     ExecuteNoHistory(function(){
                                         for(var i = 0; i < layouts_count; ++i)
                                         {
-                                            arr_layouts[i] = loader.ReadSlideLayout()
+                                            arr_layouts[i] = loader.ReadSlideLayout();
+											arr_layouts[i].Width = p_width;
+											arr_layouts[i].Height = p_height;
                                         }
                                     }, this, []);
 									
