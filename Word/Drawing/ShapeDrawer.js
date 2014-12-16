@@ -977,6 +977,11 @@ CShapeDrawer.prototype =
 
                 var koefX = editor.WordControl.m_nZoomValue / 100;
                 var koefY = editor.WordControl.m_nZoomValue / 100;
+                if (this.Graphics.IsThumbnail)
+                {
+                    koefX = 1;
+                    koefY = 1;
+                }
 
                 // TODO: !!!
                 _ctx.translate(this.min_x, this.min_y);

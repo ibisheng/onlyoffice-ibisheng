@@ -531,11 +531,14 @@ CGraphics.prototype =
 
         this.TextureFillTransformScaleX = 1 / this.m_oCoordTransform.sx;
         this.TextureFillTransformScaleY = 1 / this.m_oCoordTransform.sy;
+
+        /*
         if (this.IsThumbnail)
         {
             this.TextureFillTransformScaleX *= (width_px / (width_mm * g_dKoef_mm_to_pix));
             this.TextureFillTransformScaleY *= (height_px / (height_mm * g_dKoef_mm_to_pix))
         }
+        */
 
         /*
 		if (true == this.m_oContext.mozImageSmoothingEnabled)
