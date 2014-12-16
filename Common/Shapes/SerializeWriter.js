@@ -2936,13 +2936,44 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
 
         var _marg = cell.Pr.TableCellMar;
-        if (_marg !== undefined && null != _marg && null != _marg.Left && null != _marg.Top && null != _marg.Right && null != _marg.Bottom)
+        var tableMar = cell.Row.Table.Pr.TableCellMar;
+
+        if(_marg && _marg.Left && isRealNumber(_marg.Left.W))
         {
             oThis._WriteInt1(0, (_marg.Left.W * 36000) >> 0);
+        }
+        else if(tableMar && tableMar.Left && isRealNumber(tableMar.Left.W))
+        {
+            oThis._WriteInt1(0, (tableMar.Left.W * 36000) >> 0);
+        }
+
+        if(_marg && _marg.Top && isRealNumber(_marg.Top.W))
+        {
             oThis._WriteInt1(1, (_marg.Top.W * 36000) >> 0);
+        }
+        else if(tableMar && tableMar.Top && isRealNumber(tableMar.Top.W))
+        {
+            oThis._WriteInt1(1, (tableMar.Top.W * 36000) >> 0);
+        }
+
+        if(_marg && _marg.Right && isRealNumber(_marg.Right.W))
+        {
             oThis._WriteInt1(2, (_marg.Right.W * 36000) >> 0);
+        }
+        else if(tableMar && tableMar.Right && isRealNumber(tableMar.Right.W))
+        {
+            oThis._WriteInt1(2, (tableMar.Right.W * 36000) >> 0);
+        }
+
+        if(_marg && _marg.Bottom && isRealNumber(_marg.Bottom.W))
+        {
             oThis._WriteInt1(3, (_marg.Bottom.W * 36000) >> 0);
         }
+        else if(tableMar && tableMar.Bottom && isRealNumber(tableMar.Bottom.W))
+        {
+            oThis._WriteInt1(3, (tableMar.Bottom.W * 36000) >> 0);
+        }
+
 
         oThis.WriteUChar(g_nodeAttributeEnd);
 
