@@ -6929,6 +6929,7 @@ PasteProcessor.prototype =
             }
 
             var bHyperlink = false;
+			var isPasteHyperlink = null;
             if("a" == sChildNodeName)
             {
                 var href = child.href;
@@ -6948,12 +6949,27 @@ PasteProcessor.prototype =
                     this.oDocument = shape.txBody.content;
 
 					var Pos = ( true == this.oDocument.Selection.Use ? this.oDocument.Selection.StartPos : this.oDocument.CurPos.ContentPos );
-					var HyperProps = new CHyperlinkProperty({ Text: null, Value: href, ToolTip: title});
-					this.oDocument.Content[Pos].Hyperlink_Add( HyperProps );
+					isPasteHyperlink = node.getElementsByTagName('img');
+					
+					var text = null;
+					if(isPasteHyperlink && isPasteHyperlink.length)
+						isPasteHyperlink = null;
+					else
+					{
+						text = child.innerText;
+					}
+					
+					if(isPasteHyperlink)
+					{
+						var HyperProps = new CHyperlinkProperty({ Text: text, Value: href, ToolTip: title});
+						this.oDocument.Content[Pos].Hyperlink_Add( HyperProps );
+					}
                 }
             }
-
-            bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
+			
+			if(!isPasteHyperlink)
+				bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
+			
             if(bIsBlockChild)
                 bAddParagraph = true;
         }
@@ -6961,7 +6977,7 @@ PasteProcessor.prototype =
         {
             //this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
         }
-        return;
+        return bAddParagraph;
     },
 
     _StartExecuteTablePresentation : function(node, pPr, arrShapes, arrImages, arrTables)
