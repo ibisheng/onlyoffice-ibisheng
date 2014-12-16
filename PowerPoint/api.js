@@ -3916,6 +3916,8 @@ asc_docs_api.prototype.pre_SaveCallback = function()
         this.isApplyChangesOnOpen = false;
         this.OpenDocumentEndCallback();
     }
+
+    this.WordControl.SlideDrawer.CheckRecalculateSlide();
 }
 
 asc_docs_api.prototype.initEvents2MobileAdvances = function()

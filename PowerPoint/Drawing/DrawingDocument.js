@@ -1132,7 +1132,6 @@ function CDrawingDocument()
 
             this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
             this.m_oWordControl.CalculateDocumentSize(false);
-            this.m_oWordControl.SlideDrawer.IsRecalculateSlide = true;
             // --------------------------------------------------------------------------------
 
             this.m_oWordControl.OnScroll();
@@ -1669,7 +1668,6 @@ function CDrawingDocument()
         // так как серега посылает по сто раз - делаем такую заглушку ---------------------
         this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
         this.m_oWordControl.CalculateDocumentSize(false);
-        this.m_oWordControl.SlideDrawer.IsRecalculateSlide = true;
         // --------------------------------------------------------------------------------
         this.m_oWordControl.OnScroll();
         this.m_oWordControl.Thumbnails.LockMainObjType = false;
@@ -4371,6 +4369,9 @@ function CThumbnailsManager()
         if (!this.m_bIsVisible || 0 == this.DigitWidths.length)
             return;
 
+        if (this.m_oWordControl.m_oApi.isSaveFonts_Images)
+            return;
+
         if (this.m_lDrawingFirst == -1 || this.m_lDrawingEnd == -1)
         {
             if (this.m_oWordControl.m_oDrawingDocument.IsEmptyPresentation)
@@ -5039,8 +5040,24 @@ function CSlideDrawer()
     // TODO: максимальная ширина всех линий и запас под локи
     this.SlideEps           = 20;
 
+    this.CheckRecalculateSlide = function()
+    {
+        if (this.IsRecalculateSlide)
+        {
+            this.IsRecalculateSlide = false;
+            this.m_oWordControl.m_oDrawingDocument.FirePaint();
+        }
+    }
+
     this.CheckSlide = function(slideNum)
     {
+        if (this.m_oWordControl.m_oApi.isSaveFonts_Images)
+        {
+            this.IsRecalculateSlide = true;
+            return;
+        }
+        this.IsRecalculateSlide = false;
+
         this.bIsEmptyPresentation = false;
         if (-1 == slideNum)
             this.bIsEmptyPresentation = true;
