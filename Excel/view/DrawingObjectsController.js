@@ -530,6 +530,10 @@ DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)
 
 DrawingObjectsController.prototype.setParagraphIndent = function(Indent)
 {
+    if(isRealObject(Indent) && isRealNumber(Indent.Left) && Indent.Left < 0)
+    {
+        Indent.Left = 0;
+    }
     this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphIndent, [Indent], CTable.prototype.Set_ParagraphIndent);
 };
 
