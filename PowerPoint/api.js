@@ -1835,102 +1835,79 @@ asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
 
 asc_docs_api.prototype.paraApply = function(Props)
 {
-    var Additional = undefined;
-
-
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Text_Props, Additional) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-
-        // TODO: Сделать так, чтобы пересчет был всего 1 здесь
-        if ( "undefined" != typeof(Props.ContextualSpacing) && null != Props.ContextualSpacing )
-            this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing( Props.ContextualSpacing );
-
-        if ( "undefined" != typeof(Props.Ind) && null != Props.Ind )
-            this.WordControl.m_oLogicDocument.Set_ParagraphIndent( Props.Ind );
-
-        if ( "undefined" != typeof(Props.Jc) && null != Props.Jc )
-            this.WordControl.m_oLogicDocument.Set_ParagraphAlign( Props.Jc );
-
-        if ( "undefined" != typeof(Props.KeepLines) && null != Props.KeepLines )
-            this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( Props.KeepLines );
-
-        if ( undefined != Props.KeepNext && null != Props.KeepNext )
-            this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( Props.KeepNext );
-
-        if ( undefined != Props.WidowControl && null != Props.WidowControl )
-            this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl( Props.WidowControl );
-
-        if ( "undefined" != typeof(Props.PageBreakBefore) && null != Props.PageBreakBefore )
-            this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore( Props.PageBreakBefore );
-
-        if ( "undefined" != typeof(Props.Spacing) && null != Props.Spacing )
-            this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( Props.Spacing );
-
-        if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
-            this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
-
-        if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
-            this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
-
-        if ( undefined != Props.Tabs )
+        var _presentation = editor.WordControl.m_oLogicDocument;
+        if(_presentation.Slides[_presentation.CurPage])
         {
-            var Tabs = new CParaTabs();
-            Tabs.Set_FromObject( Props.Tabs.Tabs );
-            this.WordControl.m_oLogicDocument.Set_ParagraphTabs( Tabs );
+            var graphicObjects = _presentation.Slides[_presentation.CurPage].graphicObjects;
+            graphicObjects.checkSelectedObjectsAndCallback(function(){
+
+                if ( "undefined" != typeof(Props.Ind) && null != Props.Ind )
+                    graphicObjects.setParagraphIndent( Props.Ind );
+
+                if ( "undefined" != typeof(Props.Jc) && null != Props.Jc )
+                    graphicObjects.setParagraphAlign( Props.Jc );
+
+
+                if ( "undefined" != typeof(Props.Spacing) && null != Props.Spacing )
+                    graphicObjects.setParagraphSpacing( Props.Spacing );
+
+
+                if ( undefined != Props.Tabs )
+                {
+                    var Tabs = new CParaTabs();
+                    Tabs.Set_FromObject( Props.Tabs.Tabs );
+                    graphicObjects.setParagraphTabs( Tabs );
+                }
+
+                if ( undefined != Props.DefaultTab )
+                {
+                    _presentation.Set_DocumentDefaultTab( Props.DefaultTab );
+                }
+                var TextPr = new CTextPr();
+
+                if ( true === Props.Subscript )
+                    TextPr.VertAlign = vertalign_SubScript;
+                else if ( true === Props.Superscript )
+                    TextPr.VertAlign = vertalign_SuperScript;
+                else if ( false === Props.Superscript || false === Props.Subscript )
+                    TextPr.VertAlign = vertalign_Baseline;
+
+                if ( undefined != Props.Strikeout )
+                {
+                    TextPr.Strikeout  = Props.Strikeout;
+                    TextPr.DStrikeout = false;
+                }
+
+                if ( undefined != Props.DStrikeout )
+                {
+                    TextPr.DStrikeout = Props.DStrikeout;
+                    if ( true === TextPr.DStrikeout )
+                        TextPr.Strikeout = false;
+                }
+
+                if ( undefined != Props.SmallCaps )
+                {
+                    TextPr.SmallCaps = Props.SmallCaps;
+                    TextPr.AllCaps   = false;
+                }
+
+                if ( undefined != Props.AllCaps )
+                {
+                    TextPr.Caps = Props.AllCaps;
+                    if ( true === TextPr.AllCaps )
+                        TextPr.SmallCaps = false;
+                }
+
+                if ( undefined != Props.TextSpacing )
+                    TextPr.Spacing = Props.TextSpacing;
+
+                if ( undefined != Props.Position )
+                    TextPr.Position = Props.Position;
+                graphicObjects.paragraphAdd( new ParaTextPr(TextPr) );
+                _presentation.Recalculate();
+                _presentation.Document_UpdateInterfaceState();
+            }, []);
         }
-
-        if ( undefined != Props.DefaultTab )
-        {
-            this.WordControl.m_oLogicDocument.Set_DocumentDefaultTab( Props.DefaultTab );
-        }
-
-
-        // TODO: как только разъединят настройки параграфа и текста переделать тут
-        var TextPr = new CTextPr();
-
-        if ( true === Props.Subscript )
-            TextPr.VertAlign = vertalign_SubScript;
-        else if ( true === Props.Superscript )
-            TextPr.VertAlign = vertalign_SuperScript;
-        else if ( false === Props.Superscript || false === Props.Subscript )
-            TextPr.VertAlign = vertalign_Baseline;
-
-        if ( undefined != Props.Strikeout )
-        {
-            TextPr.Strikeout  = Props.Strikeout;
-            TextPr.DStrikeout = false;
-        }
-
-        if ( undefined != Props.DStrikeout )
-        {
-            TextPr.DStrikeout = Props.DStrikeout;
-            if ( true === TextPr.DStrikeout )
-                TextPr.Strikeout = false;
-        }
-
-        if ( undefined != Props.SmallCaps )
-        {
-            TextPr.SmallCaps = Props.SmallCaps;
-            TextPr.AllCaps   = false;
-        }
-
-        if ( undefined != Props.AllCaps )
-        {
-            TextPr.Caps = Props.AllCaps;
-            if ( true === TextPr.AllCaps )
-                TextPr.SmallCaps = false;
-        }
-
-        if ( undefined != Props.TextSpacing )
-            TextPr.Spacing = Props.TextSpacing;
-
-        if ( undefined != Props.Position )
-            TextPr.Position = Props.Position;
-
-        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr(TextPr) );
-        this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-    }
 }
 
 asc_docs_api.prototype.put_PrAlign = function(value)
@@ -2082,12 +2059,8 @@ asc_docs_api.prototype.ShapeApply = function(prop)
         if (null != _image)
         {
             var doc = this.WordControl.m_oLogicDocument;
-            if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-            {
-                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.ShapeApply(prop);
-                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
-            }
+            this.WordControl.m_oLogicDocument.ShapeApply(prop);
+            this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
         }
         else
         {
@@ -3017,7 +2990,7 @@ asc_docs_api.prototype.AddImageUrlAction = function(url){
                 _w = Math.max(5, Math.min(_w, __w));
                 _h = Math.max(5, Math.min((_w * __h / __w) >> 0));
             }
-            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+          //  this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             var src = _image.src;
 
             //this.WordControl.m_oLogicDocument.Add_FlowImage(_w, _h, src);
@@ -4490,11 +4463,7 @@ asc_docs_api.prototype.can_AddHyperlink = function()
 }
 asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Hyperlink_Add( HyperProps );
-    }
 }
 asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
 {
