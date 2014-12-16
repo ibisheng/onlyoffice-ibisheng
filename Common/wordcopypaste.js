@@ -7133,6 +7133,7 @@ PasteProcessor.prototype =
             table.Set_TableStyle(0);
             var dd = editor.WordControl.m_oDrawingDocument;
             graphicFrame.setGraphicObject(table);
+            graphicFrame.setNvSpPr(new UniNvPr());
             arrTables.push(graphicFrame);
 			
 			//TODO пересмотреть!!!
