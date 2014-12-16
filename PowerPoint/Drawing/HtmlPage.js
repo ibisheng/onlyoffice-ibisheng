@@ -173,6 +173,7 @@ function CEditorPage(api)
     this.m_oHorRuler.IsDrawAnyMarkers = false;
 
     this.m_oVerRuler        = new CVerRuler();
+    this.m_oVerRuler.IsCanMoveMargins = false;
 
     this.m_oDrawingDocument = new CDrawingDocument();
     this.m_oLogicDocument   = null;

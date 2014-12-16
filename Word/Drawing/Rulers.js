@@ -2327,7 +2327,7 @@ function CVerRuler()
             {
                 if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
                 {
-                    if ((Math.abs(_y - this.m_dMarginTop) < 1) || (Math.abs(_y - this.m_dMarginBottom) < 1))
+                    if (this.IsCanMoveMargins && ((Math.abs(_y - this.m_dMarginTop) < 1) || (Math.abs(_y - this.m_dMarginBottom) < 1)))
                         word_control.m_oDrawingDocument.SetCursorType("s-resize");
                     else
                         word_control.m_oDrawingDocument.SetCursorType("default");
