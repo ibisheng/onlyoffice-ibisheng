@@ -1400,12 +1400,12 @@ function CBinaryFileWriter()
 
         oThis.StartRecord(4);
 
-        var uniPr = new UniNvPr();
+        var uniPr = ExecuteNoHistory(function(){return new UniNvPr();}, this, []);
         uniPr.cNvPr.id = 1;
         uniPr.cNvPr.name = "";
 
-        var spPr = new CSpPr();
-        spPr.xfrm = new CXfrm();
+        var spPr = ExecuteNoHistory(function(){return new CSpPr();}, this, []);
+        spPr.xfrm = ExecuteNoHistory(function(){return new CXfrm();}, this, []);
         spPr.xfrm.offX = 0;
         spPr.xfrm.offY = 0;
         spPr.xfrm.extX = 0;
