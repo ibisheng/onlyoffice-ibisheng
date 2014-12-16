@@ -1111,59 +1111,65 @@ CPresentation.prototype =
     Cursor_MoveToStartPos : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveToStartPos();
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveToEndPos : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveToEndPos();
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveLeft : function(AddToSelect, Word)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveLeft(AddToSelect, Word);
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveRight : function(AddToSelect, Word)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveRight(AddToSelect, Word);
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveUp : function(AddToSelect)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect);
-
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveDown : function(AddToSelect)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect);
-
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveEndOfLine : function(AddToSelect)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveEndOfLine(AddToSelect);
-
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveStartOfLine : function(AddToSelect)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveStartOfLine(AddToSelect);
-
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
     Cursor_MoveAt : function( X, Y, AddToSelect )
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveAt(X, Y, AddToSelect);
-
+        this.Document_UpdateInterfaceState();
         return true;
     },
 
