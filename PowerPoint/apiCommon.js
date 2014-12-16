@@ -1339,9 +1339,9 @@ function CParagraphInd (obj)
     }
     else
     {
-        this.Left = 0;			// Левый отступ
-        this.Right = 0;			// Правый отступ
-        this.FirstLine = 0;		// Первая строка
+        this.Left      = undefined; // Левый отступ
+        this.Right     = undefined; // Правый отступ
+        this.FirstLine = undefined; // Первая строка
     }
 }
 CParagraphInd.prototype.get_Left = function () { return this.Left; }
