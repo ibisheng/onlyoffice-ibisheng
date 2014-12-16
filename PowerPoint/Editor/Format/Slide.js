@@ -592,12 +592,14 @@ Slide.prototype =
             }
             case historyitem_SlideAddToSpTree:
             {
-                writeLong(w, data.Pos);
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                writeLong(w, Pos);
                 writeObject(w, data.Item);
                 break;
             }
             case historyitem_SlideRemoveFromSpTree:
             {
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, data.Pos);
                 break;
             }
@@ -696,13 +698,18 @@ Slide.prototype =
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
-                this.cSld.spTree.splice(Pos, 0, Item);
+                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Add, Pos );
+                this.cSld.spTree.splice(ChangesPos, 0, Item);
                 break;
             }
             case historyitem_SlideRemoveFromSpTree:
             {
                 var Pos = readLong(r);
-                this.cSld.spTree.splice(Pos, 1);
+                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Pos );
+                if(!(ChangesPos === false))
+                {
+                    this.cSld.spTree.splice(ChangesPos, 1);
+                }
                 break;
             }
             case historyitem_SlideSetCSldName:
