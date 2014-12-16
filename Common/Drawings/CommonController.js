@@ -1770,8 +1770,9 @@ DrawingObjectsController.prototype =
                 var b_equal_ws = chart_space.bbox && chart_space.bbox.worksheet === ws;
                 var b_equal_vert = chart_space.bbox && chartSettings.getInColumns() === !chart_space.bbox.seriesBBox.bVert;
 
+                var bLimit = (Math.abs(new_bbox.r2 - new_bbox.r1) > 4096 || Math.abs(new_bbox.c2 - new_bbox.c1) > 4096);
                 if(!(chart_space.bbox && chart_space.bbox.seriesBBox && b_equal_ws
-                    && b_equal_bbox && b_equal_vert))
+                    && b_equal_bbox && b_equal_vert ) && !bLimit)
                 {
 					var catHeadersBBox, serHeadersBBox;
                     if(chart_space.bbox && b_equal_bbox && b_equal_ws && !b_equal_vert)
