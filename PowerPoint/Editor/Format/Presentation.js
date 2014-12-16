@@ -256,6 +256,7 @@ function CPresentation(DrawingDocument)
     this.updateSlideIndex = false;
     this.recalcMap = {};
     this.bClearSearch = true;
+    this.bNeedUpdateTh = false;
     this.needSelectPages = [];
 
     this.forwardChangeThemeTimeOutId = null;
@@ -474,6 +475,11 @@ CPresentation.prototype =
                 //    this.DrawingDocument.SelectPage(this.needSelectPages[slideIndex]);
                 //}
                 this.needSelectPages.length = 0;
+            }
+            if(this.bNeedUpdateTh)
+            {
+                this.DrawingDocument.UpdateThumbnailsAttack();
+                this.bNeedUpdateTh = false;
             }
         }
         if(this.Slides[this.CurPage])
@@ -3009,6 +3015,7 @@ CPresentation.prototype =
             }
             this.CurPage = las_slide_index + 1;
             this.bGoToPage = true;
+            this.bNeedUpdateTh = true;
 
         }
         else if(this.Slides[this.CurPage])
@@ -3821,6 +3828,8 @@ CPresentation.prototype =
 		{
 			this.insertSlide(insert_pos + i, removed_slides[i]);
 		}
+        this.Recalculate();
+        this.DrawingDocument.UpdateThumbnailsAttack();
 	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
