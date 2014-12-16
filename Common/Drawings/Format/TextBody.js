@@ -479,7 +479,8 @@ CTextBody.prototype =
                             }
                             if(isRealNumber(font_scale))
                             {
-                                this.checkParagraphContent(parg, font_scale, true);
+                                 var redFontSize = Math.round(parg.Get_CompiledPr(false).TextPr.FontSize*font_scale);
+                                this.checkParagraphContent(parg, font_scale, true, redFontSize);
                             }
                         }
                     }
@@ -489,7 +490,7 @@ CTextBody.prototype =
         this.bodyPr.textFit = null;
     },
 
-    checkParagraphContent: function(parg, fontScale, bParagraph)
+    checkParagraphContent: function(parg, fontScale, bParagraph, paragrRedFontSize)
     {
         for(var r = 0; r < parg.Content.length; ++r)
         {
@@ -502,19 +503,15 @@ CTextBody.prototype =
                     {
                         item.Set_FontSize(Math.round(item.Pr.FontSize*fontScale));
                     }
-                    else if(bParagraph)
+                    else
                     {
-                        if(r === 0)
-                        {
-                            var par_font_size = parg.Get_CompiledPr(false).TextPr.FontSize;
-                            item.Set_FontSize(Math.round(par_font_size*fontScale));
-                        }
-                    }
+                        item.Set_FontSize(paragrRedFontSize);
+                }
                     break;
                 }
                 case para_Hyperlink:
                 {
-                    this.checkParagraphContent(item, fontScale, false);
+                    this.checkParagraphContent(item, fontScale, false, paragrRedFontSize);
                     break;
                 }
             }
