@@ -666,7 +666,7 @@ CShape.prototype.recalculateContent2 = function()
             this.contentHeight2 = this.txBody.contentHeight2;
 
 
-            if (w !== this.contentWidth3)
+          // if (w !== this.contentWidth3)
             {
                 var content_ = this.getDocContent();
                 if(content_ && content_.Content[0])
@@ -681,7 +681,7 @@ CShape.prototype.recalculateContent2 = function()
                 content.Reset(0, 0, w, 20000);
                 content.Recalculate_Page(content.StartPage, true);
 
-                this.contentWidth3 = w;
+               // this.contentWidth3 = w;
             }
         }
         else
