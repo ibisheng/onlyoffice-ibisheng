@@ -685,7 +685,7 @@ CColorMod.prototype =
         if(r.GetLong() !== this.getObjectType())
             return;
         var type = r.GetLong();
-        switch(data.Type)
+        switch(type)
         {
             case historyitem_ColorMod_SetName:
             {
@@ -10796,7 +10796,7 @@ HF.prototype =
     Load_Changes: function(r)
     {
         var type = r.GetLong();
-        switch(data.Type)
+        switch(type)
         {
             case historyitem_HF_SetDt:
             {
