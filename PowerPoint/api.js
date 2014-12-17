@@ -2576,13 +2576,21 @@ asc_docs_api.prototype.CheckBeforeSplitCells = function()
 }
 asc_docs_api.prototype.MergeCells = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_MergeCells();
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_MergeCells();
+    }
 }
 asc_docs_api.prototype.SplitCell = function(Cols, Rows)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
+    }
 }
 asc_docs_api.prototype.widthTable = function(width){
 
