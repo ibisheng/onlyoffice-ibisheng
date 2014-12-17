@@ -2489,6 +2489,9 @@ function CEditorPage(api)
 
         var drDoc = this.m_oDrawingDocument;
 
+        if (drDoc.SlideCurrent >= drDoc.m_oLogicDocument.Slides.length)
+            drDoc.SlideCurrent = drDoc.m_oLogicDocument.Slides.length - 1;
+
         if (drDoc.m_bIsSearching)
         {
             ctx.fillStyle = "rgba(255,200,0,1)";
