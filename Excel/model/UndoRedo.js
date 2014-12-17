@@ -2663,7 +2663,8 @@ UndoRedoWorkbook.prototype = {
 				if(null == nIndex)
 				{
 					var oCurWorksheet = this.wb.getWorksheetById(Data.sheetId);
-					nIndex = oCurWorksheet.getIndex();
+					if (oCurWorksheet)
+						nIndex = oCurWorksheet.getIndex();
 				}
 				if(null != nIndex)
 				{
