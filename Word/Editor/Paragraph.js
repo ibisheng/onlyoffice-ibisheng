@@ -7506,6 +7506,12 @@ Paragraph.prototype =
                 if ( undefined != ParaPr.Brd )
                     this.Set_Borders( ParaPr.Brd );
             }
+            else
+            {
+                History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : ParaPr.Bullet, Old : this.Pr.Bullet } );
+                this.Pr.Bullet = ParaPr.Bullet;
+                this.CompiledPr.NeedRecalc = true;
+            }
 
         }
     },
