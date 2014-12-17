@@ -2121,7 +2121,7 @@ asc_docs_api.prototype.setStartPointHistory = function(){
 };
 asc_docs_api.prototype.setEndPointHistory   = function(){
     this.noCreatePoint = false;
-    this.exucuteHistory = false;
+    //this.exucuteHistory = false;
     this.exucuteHistoryEnd = true;
 };
 asc_docs_api.prototype.SetSlideProps = function(prop)
