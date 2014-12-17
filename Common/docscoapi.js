@@ -300,6 +300,7 @@
 		this.maxAttemptCount = 50;
 		this.reconnectInterval = 2000;
 		this.errorTimeOut = 10000;
+		this.errorTimeOutSave = 60000;	// ToDo стоит переделать это, т.к. могут дублироваться изменения...
 
 		this._docid = null;
 		this._documentCallbackUrl = null;
@@ -470,7 +471,7 @@
 		this.saveCallbackErrorTimeOutId = window.setTimeout(function () {
 			t.saveCallbackErrorTimeOutId = null;
 			t._reSaveChanges();
-		}, this.errorTimeOut);
+		}, this.errorTimeOutSave);
 
 		this._send({'type': 'saveChanges', 'changes': JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
