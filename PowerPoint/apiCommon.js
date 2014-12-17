@@ -503,6 +503,12 @@ CImgProperty.prototype.get_OriginSize = function(api)
         var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
         var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
 
+        if (api.isPresentationEditor === true)
+        {
+            _w = Math.max(1, api.WordControl.m_oLogicDocument.Width);
+            _h = Math.max(1, api.WordControl.m_oLogicDocument.Height);
+        }
+
         var bIsCorrect = false;
         if (_image.Image != null)
         {
