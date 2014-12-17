@@ -1358,6 +1358,8 @@ function CHorRuler()
             {
                 if (!this.SimpleChanges.IsSimple)
                     this.SetPrProperties();
+                else
+                    word_control.OnUpdateOverlay();
                 break;
             }
             case 7:
