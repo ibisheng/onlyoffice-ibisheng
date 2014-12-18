@@ -1755,6 +1755,22 @@ function CEditorPage(api)
             return false;
         }
 
+        var _ctrl = false;
+        if (e.metaKey !== undefined)
+            _ctrl = e.ctrlKey || e.metaKey;
+        else
+            _ctrl = e.ctrlKey;
+
+        if (true === _ctrl)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
+
+            return false;
+        }
+
         var delta = 0;
         var deltaX = 0;
         var deltaY = 0;

@@ -1995,7 +1995,6 @@ CPresentation.prototype =
             {
                 if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
                 {
-                    this.Create_NewHistoryPoint();
                     this.Document_Format_Paste();
                     bRetValue = true;
                 }
@@ -2373,7 +2372,10 @@ CPresentation.prototype =
         this.CopyParaPr = this.Get_Paragraph_ParaPr_Copy();
     },
 
-
+    Document_Format_Paste : function()
+    {
+        // TODO: (начать с создания точки истории, либо добавить ее при обработке клавиш)
+    },
 
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
     Get_SelectedText : function(bClearText)

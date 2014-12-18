@@ -4686,7 +4686,7 @@ function CThumbnailsManager()
 							_presentation.Recalculate();
 							_presentation.Document_UpdateInterfaceState();
 						}
-                        return false;
+                        //return false;
                     }
                 }
                 var drDoc = this.m_oWordControl.m_oDrawingDocument;
@@ -4924,7 +4924,7 @@ function CThumbnailsManager()
 							_presentation.Recalculate();
 							_presentation.Document_UpdateInterfaceState();
 						}
-                        return false;
+                        //return false;
                     }
                 }
                 var drDoc = this.m_oWordControl.m_oDrawingDocument;

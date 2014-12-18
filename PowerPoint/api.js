@@ -4583,8 +4583,12 @@ asc_docs_api.prototype.asyncImageEndLoaded2 = null;
 
 asc_docs_api.prototype.ChangeTheme = function(indexTheme)
 {
+    if (true === CollaborativeEditing.Get_GlobalLock())
+        return;
+
     if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Theme) === false)
     {
+        CollaborativeEditing.m_bGlobalLock = true;
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.ThemeLoader.StartLoadTheme(indexTheme);
     }
@@ -4596,6 +4600,8 @@ asc_docs_api.prototype.StartLoadTheme = function()
 asc_docs_api.prototype.EndLoadTheme = function(theme_load_info)
 {
     this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadTheme);
+
+    CollaborativeEditing.m_bGlobalLock = false;
 
     // применение темы
     var _array = this.WordControl.Thumbnails.GetSelectedArray();
