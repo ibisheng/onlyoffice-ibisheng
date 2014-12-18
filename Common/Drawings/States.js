@@ -606,7 +606,8 @@ PreResizeState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-
+        this.drawingObjects.clearPreTrackObjects();
+        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }
 };
 
