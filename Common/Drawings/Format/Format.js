@@ -5149,7 +5149,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.w = null;
     }
 
-    if(shapeProp1.stroke === null || shapeProp2.stroke === null)
+    if(shapeProp1.stroke == null || shapeProp2.stroke == null)
     {
         _result_shape_prop.stroke = null;
     }

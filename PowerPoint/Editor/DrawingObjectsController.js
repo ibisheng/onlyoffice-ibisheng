@@ -111,40 +111,48 @@ DrawingObjectsController.prototype.editChart = function(binary)
     var bin_object = {"binary":binary};
     var chart_space = this.getChartSpace2(bin_object, null);
     chart_space.setParent(this.drawingObjects);
-    if(this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+    var by_types;
+    by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
+    if(by_types.charts.length === 1)
     {
-        var parent_group = this.selection.groupSelection.selectedObjects[0].group;
-        var major_group = this.selection.groupSelection;
-        for(var i = parent_group.spTree.length -1; i > -1; --i)
+        if(by_types.charts[0].group)
         {
-            if(parent_group.spTree[i] === this.selection.groupSelection.selectedObjects[0])
+            var parent_group = by_types.charts[0].group;
+            var major_group = by_types.charts[0].getMainGroup();
+            for(var i = parent_group.spTree.length -1; i > -1; --i)
             {
-                parent_group.removeFromSpTreeByPos(i);
-                chart_space.setGroup(parent_group);
-                chart_space.spPr.xfrm.setOffX(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offX);
-                chart_space.spPr.xfrm.setOffY(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offY);
-                parent_group.addToSpTree(i, chart_space);
-                parent_group.updateCoordinatesAfterInternalResize();
-                major_group.recalculate();
-                this.selection.groupSelection.resetSelection();
-                this.selection.groupSelection.selectObject(chart_space, this.drawingObjects.num);
-                this.startRecalculate();
-                this.sendGraphicObjectProps();
-                return;
+                if(parent_group.spTree[i] === by_types.charts[0])
+                {
+                    parent_group.removeFromSpTreeByPos(i);
+                    chart_space.setGroup(parent_group);
+                    chart_space.spPr.xfrm.setOffX(by_types.charts[0].spPr.xfrm.offX);
+                    chart_space.spPr.xfrm.setOffY(by_types.charts[0].spPr.xfrm.offY);
+                    parent_group.addToSpTree(i, chart_space);
+                    parent_group.updateCoordinatesAfterInternalResize();
+                    major_group.recalculate();
+                    if(this.selection.groupSelection)
+                    {
+                        this.selection.groupSelection.resetSelection();
+                        this.selection.groupSelection.selectObject(chart_space, this.drawingObjects.num);
+                    }
+                    this.startRecalculate();
+                    this.sendGraphicObjectProps();
+                    return;
+                }
             }
         }
-    }
-    else if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
-    {
-        chart_space.spPr.xfrm.setOffX(this.selectedObjects[0].x);
-        chart_space.spPr.xfrm.setOffY(this.selectedObjects[0].y);
-        var pos = this.selectedObjects[0].deleteDrawingBase();
-        chart_space.addToDrawingObjects(pos);
-        this.resetSelection();
-        this.selectObject(chart_space, this.drawingObjects.num);
-        this.startRecalculate();
-        this.sendGraphicObjectProps();
-        this.updateOverlay();
+        else
+        {
+            chart_space.spPr.xfrm.setOffX(by_types.charts[0].x);
+            chart_space.spPr.xfrm.setOffY(by_types.charts[0].y);
+            var pos = by_types.charts[0].deleteDrawingBase();
+            chart_space.addToDrawingObjects(pos);
+            this.resetSelection();
+            this.selectObject(chart_space, this.drawingObjects.num);
+            this.startRecalculate();
+            this.sendGraphicObjectProps();
+            this.updateOverlay();
+        }
     }
 };
 

@@ -581,75 +581,85 @@ CGraphicObjects.prototype =
     {
         var bin_object = {"binary":chart};
         var chart_space = this.getChartSpace2(bin_object, null), select_start_page, parent_paragraph, nearest_pos;
-        if(this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
-        {
-            var parent_group = this.selection.groupSelection.selectedObjects[0].group;
-            var major_group = this.selection.groupSelection;
-            for(var i = parent_group.spTree.length -1; i > -1; --i)
-            {
-                if(parent_group.spTree[i] === this.selection.groupSelection.selectedObjects[0])
-                {
-                    parent_group.removeFromSpTreeByPos(i);
-                    chart_space.setGroup(parent_group);
-                    chart_space.spPr.xfrm.setOffX(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offX);
-                    chart_space.spPr.xfrm.setOffY(this.selection.groupSelection.selectedObjects[0].spPr.xfrm.offY);
-                    parent_group.addToSpTree(i, chart_space);
-                    parent_group.updateCoordinatesAfterInternalResize();
-                    //TODO: возможно следует нормализовать самую старшую группу
-                    major_group.recalculate();
-                    if(major_group.spPr && major_group.spPr.xfrm)
-                    {
 
-                    }
-                    if(major_group.parent.Is_Inline())
-                    {
-                        major_group.parent.OnEnd_ResizeInline(major_group.bounds.w, major_group.bounds.h);
-                    }
-                    else
-                    {
-                        parent_paragraph = major_group.parent.Get_ParentParagraph();
-                        nearest_pos = this.document.Get_NearestPos(major_group.selectStartPage,major_group.posX + major_group.bounds.x, major_group.posY + major_group.bounds.y, true, major_group.parent);
-                        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                        major_group.parent.Remove_FromDocument(false);
-                        major_group.parent.Set_XYForAdd(major_group.posX,major_group.posY, nearest_pos, major_group.selectStartPage);
-                        major_group.parent.Add_ToDocument2(parent_paragraph);
-                    }
-                    select_start_page = this.selection.groupSelection.selectedObjects[0].selectStartPage;
-                    this.selection.groupSelection.resetSelection();
-                    this.selection.groupSelection.selectObject(chart_space, select_start_page);
-                    this.document.Recalculate();
-                    this.document.Document_UpdateInterfaceState();
-                    return;
-                }
-            }
-        }
-        else if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+
+        var by_types;
+        by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
+        if(by_types.charts.length === 1)
         {
-            chart_space.spPr.xfrm.setOffX(0);
-            chart_space.spPr.xfrm.setOffY(0);
-            select_start_page = this.selectedObjects[0].selectStartPage;
-            chart_space.setParent(this.selectedObjects[0].parent);
-            if(this.selectedObjects[0].parent.Is_Inline())
+            if(by_types.charts[0].group)
             {
-                this.selectedObjects[0].parent.Set_GraphicObject(chart_space);
-                this.resetSelection();
-                this.selectObject(chart_space, select_start_page);
-                this.selectedObjects[0].parent.OnEnd_ResizeInline(chart_space.spPr.xfrm.extX, chart_space.spPr.xfrm.extY);
+                var parent_group = by_types.charts[0].group;
+                var major_group = by_types.charts[0].getMainGroup();
+                for(var i = parent_group.spTree.length -1; i > -1; --i)
+                {
+                    if(parent_group.spTree[i] === by_types.charts[0])
+                    {
+                        parent_group.removeFromSpTreeByPos(i);
+                        chart_space.setGroup(parent_group);
+                        chart_space.spPr.xfrm.setOffX(by_types.charts[0].spPr.xfrm.offX);
+                        chart_space.spPr.xfrm.setOffY(by_types.charts[0].spPr.xfrm.offY);
+                        parent_group.addToSpTree(i, chart_space);
+                        parent_group.updateCoordinatesAfterInternalResize();
+                        //TODO: возможно следует нормализовать самую старшую группу
+                        major_group.recalculate();
+                        if(major_group.spPr && major_group.spPr.xfrm)
+                        {
+
+                        }
+                        if(major_group.parent.Is_Inline())
+                        {
+                            major_group.parent.OnEnd_ResizeInline(major_group.bounds.w, major_group.bounds.h);
+                        }
+                        else
+                        {
+                            parent_paragraph = major_group.parent.Get_ParentParagraph();
+                            nearest_pos = this.document.Get_NearestPos(major_group.selectStartPage,major_group.posX + major_group.bounds.x, major_group.posY + major_group.bounds.y, true, major_group.parent);
+                            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
+                            major_group.parent.Remove_FromDocument(false);
+                            major_group.parent.Set_XYForAdd(major_group.posX,major_group.posY, nearest_pos, major_group.selectStartPage);
+                            major_group.parent.Add_ToDocument2(parent_paragraph);
+                        }
+                        if(this.selection.groupSelection)
+                        {
+                            select_start_page = this.selection.groupSelection.selectedObjects[0].selectStartPage;
+                            this.selection.groupSelection.resetSelection();
+                            this.selection.groupSelection.selectObject(chart_space, select_start_page);
+                        }
+                        this.document.Recalculate();
+                        this.document.Document_UpdateInterfaceState();
+                        return;
+                    }
+                }
             }
             else
             {
-                parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
-                nearest_pos = this.document.Get_NearestPos(this.selectedObjects[0].selectStartPage,this.selectedObjects[0].posX, this.selectedObjects[0].posY, true, this.selectedObjects[0].parent);
-                nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                this.selectedObjects[0].parent.Remove_FromDocument(false);
-                this.selectedObjects[0].parent.Set_GraphicObject(chart_space);
-                this.selectedObjects[0].parent.Set_XYForAdd(this.selectedObjects[0].posX, this.selectedObjects[0].posY, nearest_pos, this.selectedObjects[0].selectStartPage);
-                this.selectedObjects[0].parent.Add_ToDocument2(parent_paragraph);
-                this.resetSelection();
-                this.selectObject(chart_space, select_start_page);
-                this.document.Recalculate();
+                chart_space.spPr.xfrm.setOffX(0);
+                chart_space.spPr.xfrm.setOffY(0);
+                select_start_page = by_types.charts[0].selectStartPage;
+                chart_space.setParent(by_types.charts[0].parent);
+                if(by_types.charts[0].parent.Is_Inline())
+                {
+                    by_types.charts[0].parent.Set_GraphicObject(chart_space);
+                    this.resetSelection();
+                    this.selectObject(chart_space, select_start_page);
+                    by_types.charts[0].parent.OnEnd_ResizeInline(chart_space.spPr.xfrm.extX, chart_space.spPr.xfrm.extY);
+                }
+                else
+                {
+                    parent_paragraph = by_types.charts[0].parent.Get_ParentParagraph();
+                    nearest_pos = this.document.Get_NearestPos(by_types.charts[0].selectStartPage, by_types.charts[0].posX, by_types.charts[0].posY, true, by_types.charts[0].parent);
+                    nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
+                    by_types.charts[0].parent.Remove_FromDocument(false);
+                    by_types.charts[0].parent.Set_GraphicObject(chart_space);
+                    by_types.charts[0].parent.Set_XYForAdd(by_types.charts[0].posX, by_types.charts[0].posY, nearest_pos, by_types.charts[0].selectStartPage);
+                    by_types.charts[0].parent.Add_ToDocument2(parent_paragraph);
+                    this.resetSelection();
+                    this.selectObject(chart_space, select_start_page);
+                    this.document.Recalculate();
+                }
+                this.document.Document_UpdateInterfaceState();
             }
-            this.document.Document_UpdateInterfaceState();
         }
     },
 

@@ -4380,33 +4380,17 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(this.selection.groupSelection)
+            var by_types = getObjectsByTypesFromArr(this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects, true);
+            if(by_types.charts.length === 1)
             {
-                if(this.selection.groupSelection.selectedObjects.length === 1 && this.selection.groupSelection.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
+                by_types.charts[0].theme = this.getTheme();
+                by_types.charts[0].colorMapOverride = this.getColorMapOverride();
+                by_types.charts[0].DocumentUrl = this.getDocumentUrl();
+                ExecuteNoHistory(function()
                 {
-                    this.selection.groupSelection.selectedObjects[0].theme = this.getTheme();
-                    this.selection.groupSelection.selectedObjects[0].colorMapOverride = this.getColorMapOverride();
-                    this.selection.groupSelection.selectedObjects[0].DocumentUrl = this.getDocumentUrl();
-                    ExecuteNoHistory(function()
-                    {
-                        CheckSpPrXfrm2(this.selection.groupSelection.selectedObjects[0]);
-                    }, this, []);
-                    return this.selection.groupSelection.selectedObjects[0];
-                }
-            }
-            else
-            {
-                if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_ChartSpace)
-                {
-                    this.selectedObjects[0].theme = this.getTheme();
-                    this.selectedObjects[0].colorMapOverride = this.getColorMapOverride();
-                    this.selectedObjects[0].DocumentUrl = this.getDocumentUrl();
-                    ExecuteNoHistory(function()
-                    {
-                        CheckSpPrXfrm2(this.selectedObjects[0]);
-                    }, this, []);
-                    return this.selectedObjects[0];
-                }
+                    CheckSpPrXfrm2(by_types.charts[0]);
+                }, this, []);
+                return by_types.charts[0];
             }
         }
         return null;
