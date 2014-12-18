@@ -218,6 +218,9 @@ function Editor_Copy(api, bCut)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 	
+	var overflowBody = document.body.style.overflow;
+	document.body.style.overflow = 'hidden';
+	
 	var oldBackgroundcolor = document.body.style["background-color"];
 	//var oldColor = document.body.style["color"];
 	document.body.style["background-color"] = "transparent";
@@ -303,6 +306,7 @@ function Editor_Copy(api, bCut)
 		//document.body.style["color"] = oldColor;
 		
 		ElemToSelect.style.MozUserSelect = "none";
+		document.body.style.overflow = overflowBody;
 
         if(true == bCut)
         {
@@ -2392,6 +2396,9 @@ function Editor_Paste(api, bClean)
     delete document.body.style["-o-user-select"];
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
+	
+	var overflowBody = document.body.style.overflow;
+	document.body.style.overflow = 'hidden';
 
     var Text;
     var pastebin = Editor_Paste_GetElem(api, bClean);
@@ -2449,6 +2456,8 @@ function Editor_Paste(api, bClean)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+		
+		document.body.style.overflow = overflowBody;
 
         if (!window.USER_AGENT_SAFARI_MACOS)
             pastebin.onpaste = null;
