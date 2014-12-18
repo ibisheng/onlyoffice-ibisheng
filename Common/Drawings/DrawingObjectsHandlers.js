@@ -564,7 +564,7 @@ function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pag
             var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
             if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
-                drawingObjectsController.resetSelection();
+                drawingObjectsController.resetSelection(true);
                 (group ? group : drawingObjectsController).selectObject(drawing,pageIndex);
                 if(!group)
                 {

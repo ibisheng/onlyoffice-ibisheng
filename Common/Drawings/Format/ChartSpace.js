@@ -393,12 +393,15 @@ CChartSpace.prototype =
        }
     },
 
-    resetInternalSelection: function()
+    resetInternalSelection: function(noResetContentSelect)
     {
         if(this.selection.textSelection)
         {
-            //var content = this.selection.textSelection.getDocContent();
-            //content && content.Selection_Remove();
+            if(!(noResetContentSelect === true))
+            {
+                var content = this.selection.textSelection.getDocContent();
+                content && content.Selection_Remove();
+            }
             this.selection.textSelection = null;
         }
     },
@@ -414,9 +417,9 @@ CChartSpace.prototype =
         return this.txPr.content;
     },
 
-    resetSelection: function()
+    resetSelection: function(noResetContentSelect)
     {
-        this.resetInternalSelection();
+        this.resetInternalSelection(noResetContentSelect);
         this.selection.title = null;
         this.selection.legend = null;
         this.selection.legendEntry = null;

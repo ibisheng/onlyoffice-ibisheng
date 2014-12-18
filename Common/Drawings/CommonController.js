@@ -292,7 +292,7 @@ DrawingObjectsController.prototype =
 
     },
 
-    resetInternalSelection: function()
+    resetInternalSelection: function(noResetContentSelect)
     {
         if(this.selection.groupSelection)
         {
@@ -301,13 +301,26 @@ DrawingObjectsController.prototype =
         }
         if(this.selection.textSelection)
         {
-           // var content = this.selection.textSelection.getDocContent();
-           // content && content.Selection_Remove();
+            if(!(noResetContentSelect  === true))
+            {
+                if(this.selection.textSelection.getObjectType() === historyitem_type_GraphicFrame)
+                {
+                    if(this.selection.textSelection.graphicObject)
+                    {
+                        this.selection.textSelection.graphicObject.Selection_Remove();
+                    }
+                }
+                else
+                {
+                    var content = this.selection.textSelection.getDocContent();
+                    content && content.Selection_Remove();
+                }
+            }
             this.selection.textSelection = null;
         }
         if(this.selection.chartSelection)
         {
-            this.selection.chartSelection.resetSelection();
+            this.selection.chartSelection.resetSelection(noResetContentSelect);
             this.selection.chartSelection = null;
         }
         if(this.selection.wrapPolygonSelection)
@@ -513,7 +526,7 @@ DrawingObjectsController.prototype =
                     return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
                 }
             }
-            this.resetSelection();
+            this.resetSelection(true);
             (group ? group : this).selectObject(object,pageIndex);
             object.selectionSetStart(e, x, y, pageIndex);
             if(!group)
@@ -4478,13 +4491,13 @@ DrawingObjectsController.prototype =
         }
     },
 
-    resetSelection: function()
+    resetSelection: function(noResetContentSelect)
     {
         if(this.document)
         {
             this.checkChartTextSelection();
         }
-        this.resetInternalSelection();
+        this.resetInternalSelection(noResetContentSelect);
         for(var i = 0; i < this.selectedObjects.length; ++i)
         {
             this.selectedObjects[i].selected = false;
