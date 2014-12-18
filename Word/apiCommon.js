@@ -890,6 +890,8 @@ function CreateAscShapePropFromProp(shapeProp)
         obj.canFill = shapeProp.canFill;
     }
     obj.bFromChart = shapeProp.bFromChart;
+    obj.w = shapeProp.w;
+    obj.h = shapeProp.h;
     return obj;
 }
 
