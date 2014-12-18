@@ -1578,7 +1578,22 @@ CPresentation.prototype =
             if(this.Slides[this.CurPage])
             {
                 var graphicObjects = this.Slides[this.CurPage].graphicObjects;
-                graphicObjects. selectNextObject(!e.ShiftKey ? 1 : -1);
+                var target_content = graphicObjects.getTargetDocContent(undefined, true);
+                if(target_content)
+                {
+                    if(target_content instanceof CTable)
+                    {
+                        target_content.Cursor_MoveToCell( true === e.ShiftKey ? false : true );
+                    }
+                    else
+                    {
+                        this.Paragraph_Add( new ParaTab() );
+                    }
+                }
+                else
+                {
+                    graphicObjects.selectNextObject(!e.ShiftKey ? 1 : -1);
+                }
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = true;
@@ -1588,7 +1603,7 @@ CPresentation.prototype =
             var Hyperlink = this.Hyperlink_Check(false);
             if ( null != Hyperlink && false === e.ShiftKey )
             {
-                editor.sync_HyperlinkClickCallback( Hyperlink.Get_Value() )
+                editor.sync_HyperlinkClickCallback( Hyperlink.Get_Value() );
                 Hyperlink.Set_Visited(true);
 
                 // TODO: Пока сделаем так, потом надо будет переделать
@@ -3853,6 +3868,12 @@ CPresentation.prototype =
         {
             return true;
         }
+
+        if(CheckType === changestype_None && isRealObject(AdditionalData) && AdditionalData.CheckType === changestype_Table_Properties)
+        {
+            CheckType = changestype_Drawing_Props;
+        }
+
 
         var cur_slide = this.Slides[this.CurPage];
         var slide_id = cur_slide.deleteLock.Get_Id();
