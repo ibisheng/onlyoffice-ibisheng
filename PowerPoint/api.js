@@ -146,6 +146,8 @@ function asc_docs_api(name)
     this.tableStylesIdCounter = 0;
     //выставляем тип copypaste
     g_bIsDocumentCopyPaste = false;
+
+    this.IsLongIteration = false;
 	
 	this.TrackFile = null;
 	
@@ -1591,10 +1593,17 @@ asc_docs_api.prototype.sync_DownloadAsCallBack = function(){
 asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onStartAction", type, id);
+
+    // по идее нужен счетчик, но перед выпуском делаем верняк
+    if (c_oAscAsyncActionType.BlockInteraction == type)
+        this.IsLongIteration = true;
 }
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onEndAction", type, id);
+
+    if (c_oAscAsyncActionType.BlockInteraction == type)
+        this.IsLongIteration = false;
 }
 asc_docs_api.prototype.sync_AddURLCallback = function(){
 	this.asc_fireCallback("asc_onAddURL");

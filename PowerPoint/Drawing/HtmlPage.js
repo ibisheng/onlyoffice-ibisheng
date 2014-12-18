@@ -1842,7 +1842,7 @@ function CEditorPage(api)
     this.onKeyDown = function(e)
     {
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.IsLongIteration === true || oWordControl.m_bIsMouseLock === true)
             return;
 
         if (oThis.DemonstrationManager.Mode)
@@ -1870,7 +1870,7 @@ function CEditorPage(api)
         }
 
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.IsLongIteration === true || oWordControl.m_bIsMouseLock === true)
             return;
 
         check_KeyboardEvent(e);
@@ -1890,7 +1890,7 @@ function CEditorPage(api)
     this.onKeyDownTBIM = function(e)
     {
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.IsLongIteration === true || oWordControl.m_bIsMouseLock === true)
             return;
 
         check_KeyboardEvent(e);
@@ -1996,7 +1996,7 @@ function CEditorPage(api)
         }
 
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.IsLongIteration === true || oWordControl.m_bIsMouseLock === true)
             return;
 
         if (window.opera && !oWordControl.IsKeyDownButNoPress)
