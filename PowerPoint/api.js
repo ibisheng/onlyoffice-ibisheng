@@ -1408,20 +1408,23 @@ asc_docs_api.prototype.Cut = function(){
 	return Editor_Copy_Button(this, true)
 }
 asc_docs_api.prototype.Paste = function(){
-    if (!window.GlobalPasteFlag)
+    if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props))
     {
-        if (!window.USER_AGENT_SAFARI_MACOS)
+        if (!window.GlobalPasteFlag)
         {
-            window.GlobalPasteFlag = true;
-            return Editor_Paste_Button(this);
-        }
-        else
-        {
-            if (0 === window.GlobalPasteFlagCounter)
+            if (!window.USER_AGENT_SAFARI_MACOS)
             {
-                SafariIntervalFocus();
                 window.GlobalPasteFlag = true;
                 return Editor_Paste_Button(this);
+            }
+            else
+            {
+                if (0 === window.GlobalPasteFlagCounter)
+                {
+                    SafariIntervalFocus();
+                    window.GlobalPasteFlag = true;
+                    return Editor_Paste_Button(this);
+                }
             }
         }
     }
