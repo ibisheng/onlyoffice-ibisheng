@@ -4974,6 +4974,13 @@ DrawingObjectsController.prototype =
             if(!drawing.group)
             {
                 locked = drawing.lockType !== c_oAscLockTypes.kLockTypeNone && drawing.lockType !== c_oAscLockTypes.kLockTypeMine ;
+                if(typeof editor !== "undefined" && isRealObject(editor) && editor.isPresentationEditor)
+                {
+                    if(drawing.Lock)
+                    {
+                        locked = drawing.Lock.Is_Locked();
+                    }
+                }
             }
             switch(drawing.getObjectType())
             {

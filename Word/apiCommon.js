@@ -872,6 +872,10 @@ function CreateAscShapePropFromProp(shapeProp)
     var obj = new CAscShapeProp();
     if(!isRealObject(shapeProp))
         return obj;
+    if(isRealBool(shapeProp.locked))
+    {
+        obj.Locked = shapeProp.locked;
+    }
 
     if(typeof shapeProp.type === "string")
         obj.type = shapeProp.type;
