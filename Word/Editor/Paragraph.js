@@ -6980,7 +6980,10 @@ Paragraph.prototype =
     // Удаляем нумерацию
     Remove_PresentationNumbering : function()
     {
-        this.Add_PresentationNumbering(undefined);
+        var Bullet = new CBullet();
+        Bullet.bulletType = new CBulletType();
+        Bullet.bulletType.type = BULLET_TYPE_BULLET_NONE;
+        this.Add_PresentationNumbering(Bullet);
     },
 
     Set_PresentationLevel : function(Level)
