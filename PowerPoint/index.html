@@ -13,6 +13,18 @@
     <!-- splash -->
 
     <style type="text/css">
+        .loadmask {
+            left: 0;
+            top: 0;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            border: none;
+            background-color: #f4f4f4;
+            z-index: 20002;
+        }
+
         .loader-page {
             top: 50%;
             left: 50%;
@@ -73,8 +85,8 @@
         @-webkit-keyframes red {
               0%    { top:120px; background: #de7a59; }
              10%    { top:120px; background: #F2CBBF; }
-             14%    { background: #fff; top:120px; }
-             15%    { background: #fff; top:0;}
+             14%    { background: #f4f4f4; top:120px; }
+             15%    { background: #f4f4f4; top:0;}
              20%    { background: #E6E4E4; }
              30%    { background: #D2D2D2; }
              40%    { top:120px; }
@@ -84,8 +96,8 @@
         @keyframes red {
               0%    { top:120px; background: #de7a59; }
              10%    { top:120px; background: #F2CBBF; }
-             14%    { background: #fff; top:120px; }
-             15%    { background: #fff; top:0; }
+             14%    { background: #f4f4f4; top:120px; }
+             15%    { background: #f4f4f4; top:0; }
              20%    { background: #E6E4E4; }
              30%    { background: #D2D2D2; }
              40%    { top:120px; }
@@ -95,9 +107,9 @@
         @-webkit-keyframes green {
               0%    { top:110px; background: #a1cb5c; opacity:1; }
              10%    { top:110px; background: #CBE0AC; opacity:1; }
-             14%    { background: #fff; top:110px; opacity:1; }
-             15%    { background: #fff; top:0; opacity:1; }
-             20%    { background: #ffffff; top:0; opacity:0; }
+             14%    { background: #f4f4f4; top:110px; opacity:1; }
+             15%    { background: #f4f4f4; top:0; opacity:1; }
+             20%    { background: #f4f4f4; top:0; opacity:0; }
              25%    { background: #EFEFEF; top:0; opacity:1; }
              30%    { background:#E6E4E4; }
              70%    { top:110px; }
@@ -107,9 +119,9 @@
         @keyframes green {
               0%    { top:110px; background: #a1cb5c; opacity:1; }
              10%    { top:110px; background: #CBE0AC; opacity:1; }
-             14%    { background: #fff;  top:110px; opacity:1; }
-             15%    { background: #fff;  top:0;opacity:1; }
-             20%    { background: #ffffff; top:0; opacity:0; }
+             14%    { background: #f4f4f4; top:110px; opacity:1; }
+             15%    { background: #f4f4f4; top:0; opacity:1; }
+             20%    { background: #f4f4f4; top:0; opacity:0; }
              25%    { background: #EFEFEF; top:0; opacity:1; }
              30%    { background:#E6E4E4; }
              70%    { top:110px; }
@@ -119,31 +131,33 @@
         @-webkit-keyframes blue {
               0%    { top:100px; background: #55bce6; opacity:1; }
              10%    { top:100px; background: #BFE8F8; opacity:1; }
-             14%    { background: #fff;  top:100px; opacity:1; }
-             15%    { background: #fff;  top:0;opacity:1; }
-             20%    { background: #ffffff; top:0; opacity:0; }
-             25%    { background: #ffffff; top:0; opacity:0; }
-             45%    { background: #EFEFEF; top:0;opacity:0,2; }
+             14%    { background: #f4f4f4; top:100px; opacity:1; }
+             15%    { background: #f4f4f4; top:0; opacity:1; }
+             20%    { background: #f4f4f4; top:0; opacity:0; }
+             25%    { background: #f4f4f4; top:0; opacity:0; }
+             45%    { background: #EFEFEF; top:0; opacity:0,2; }
             100%    { top:100px; background: #55bce6; }
         }
 
         @keyframes blue {
               0%    { top:100px; background: #55bce6; opacity:1; }
              10%    { top:100px; background: #BFE8F8; opacity:1; }
-             14%    { background: #fff;  top:100px; opacity:1; }
-             15%    { background: #fff;  top:0;opacity:1; }
-             20%    { background: #ffffff; top:0; opacity:0; }
-             25%    { background: #ffffff; top:0; opacity:0; }
-             45%    { background: #EFEFEF; top:0;opacity:0,2; }
+             14%    { background: #f4f4f4; top:100px; opacity:1; }
+             15%    { background: #f4f4f4; top:0; opacity:1; }
+             20%    { background: #f4f4f4; top:0; opacity:0; }
+             25%    { background: #f4f4f4; top:0; opacity:0; }
+             45%    { background: #EFEFEF; top:0; opacity:0,2; }
             100%    { top:100px; background: #55bce6; }
         }
     </style>
 </head>
 <body>
-    <div id="loading-mask" class="loader-page">
-        <div class="romb" id="blue"></div>
-        <div class="romb" id="green"></div>
-        <div class="romb" id="red"></div>
+    <div id="loading-mask" class="loadmask">
+        <div class="loader-page">
+            <div class="romb" id="blue"></div>
+            <div class="romb" id="green"></div>
+            <div class="romb" id="red"></div>
+        </div>
 </div>
 
 <div id="viewport"></div>
