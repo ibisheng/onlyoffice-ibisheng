@@ -3963,7 +3963,7 @@ PasteProcessor.prototype =
 							graphic_frame.setNvSpPr(new UniNvPr());
 							
 							element = this._convertTableToPPTX(element);
-							graphic_frame.graphicObject = element;
+							graphic_frame.setGraphicObject(element.Copy(graphic_frame));
 							graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
 
 							drawingCopyObject = new DrawingCopyObject();
