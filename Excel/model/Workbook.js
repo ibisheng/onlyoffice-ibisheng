@@ -5430,6 +5430,7 @@ Range.prototype._setBorderMerge=function(bLeft, bTop, bRight, bBottom, oNewBorde
 		oTargetBorder.b = oNewBorder.b;
 	else
 		oTargetBorder.b = oNewBorder.ih;
+	oTargetBorder.d = oNewBorder.d;
 	oTargetBorder.dd = oNewBorder.dd;
 	oTargetBorder.du = oNewBorder.du;
 	var oRes = null;

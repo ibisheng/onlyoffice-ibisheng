@@ -933,9 +933,9 @@ Border.prototype =
             if(border.iv)
                 this.iv.merge(border.iv);
             if(null != border.dd)
-                this.dd = border.dd;
+                this.dd = this.dd || border.dd;
             if(null != border.du)
-                this.du = border.du;
+                this.du = this.du || border.du;
         }
     },
 	getType : function()
