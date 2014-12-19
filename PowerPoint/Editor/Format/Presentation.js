@@ -919,6 +919,7 @@ CPresentation.prototype =
             this.Slides[this.CurPage].graphicObjects.resetSelection();
             this.Slides[this.CurPage].graphicObjects.selectObject(Image, this.Slides[this.CurPage].num);
             this.Recalculate();
+            this.Document_UpdateInterfaceState();
         }
     },
 
