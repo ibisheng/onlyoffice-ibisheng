@@ -3686,7 +3686,7 @@ PasteProcessor.prototype =
                                         arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                         arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
                                         arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
-										arr_slides[i].Layout.setMaster(master);
+										//arr_slides[i].Layout.setMaster(master);
                                         arr_slides[i].Width = presentation.Width;
                                         arr_slides[i].Height = presentation.Height;
                                     }
