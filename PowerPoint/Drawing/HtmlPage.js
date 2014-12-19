@@ -1887,6 +1887,26 @@ function CEditorPage(api)
         oWordControl.EndUpdateOverlay();
     }
 
+    this.onKeyDownNoActiveControl = function(e)
+    {
+        var bSendToEditor = false;
+
+        if (e.CtrlKey && !e.ShiftKey)
+        {
+            switch (e.KeyCode)
+            {
+                case 80: // P
+                case 83: // S
+                    bSendToEditor = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return bSendToEditor;
+    }
+
     this.onKeyDownTBIM = function(e)
     {
         var oWordControl = oThis;
