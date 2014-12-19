@@ -372,8 +372,10 @@ CPresentation.prototype =
         }
         var _RecalcData = RecalcData ? RecalcData : History.Get_RecalcData(), key, recalcMap, bSync = true, i, bRedrawAllSlides = false, aToRedrawSlides = [], redrawSlideIndexMap = {}, slideIndex;
         this.updateSlideIndexes();
+        var b_check_layout = false;
         if(_RecalcData.Drawings.All || _RecalcData.Drawings.ThemeInfo)
         {
+            b_check_layout = true;
             recalcMap = this.GetRecalculateMaps();
             for(key in recalcMap.masters)
             {
@@ -467,6 +469,10 @@ CPresentation.prototype =
             {
                 this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
                 this.bGoToPage = false;
+            }
+            else if(b_check_layout)
+            {
+                this.DrawingDocument.m_oWordControl.CheckLayouts();
             }
             if(this.needSelectPages.length > 0)
             {
@@ -2167,6 +2173,7 @@ CPresentation.prototype =
             if ( null != TextPr )
             {
                 this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
+                this.Document_UpdateInterfaceState();
                 bRetValue = true;
             }
         }
@@ -2262,7 +2269,21 @@ CPresentation.prototype =
 
            //this.DrawingDocument.TargetStart();
            //this.DrawingDocument.TargetShow();
+            var target_doc_content1, target_doc_content2, b_update_interface = false;
+            if(this.Slides[this.CurPage])
+            {
+                target_doc_content1 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+            }
             this.Paragraph_Add( new ParaText( String.fromCharCode( Code ) ) );
+            if(this.Slides[this.CurPage])
+            {
+                target_doc_content2 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+            }
+            if(!target_doc_content1 && target_doc_content2)
+            {
+                b_update_interface = true;
+                this.Document_UpdateInterfaceState();
+            }
         }
         bRetValue = true;
     }
@@ -2270,7 +2291,10 @@ CPresentation.prototype =
         if ( true == bRetValue )
         {
             this.Document_UpdateSelectionState();
-            this.Document_UpdateUndoRedoState();
+            if(!b_update_interface)
+            {
+                this.Document_UpdateUndoRedoState();
+            }
         }
 
         return bRetValue;
