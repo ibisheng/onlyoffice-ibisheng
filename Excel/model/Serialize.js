@@ -2912,11 +2912,11 @@
         this.WriteRow = function(oRow)
         {
             var oThis = this;
-            if(null != oRow.r)
+            if(null != oRow.index)
             {
                 this.memory.WriteByte(c_oSerRowTypes.Row);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(oRow.r);
+                this.memory.WriteLong(oRow.index + 1);
             }
             if(null != oRow.xfs)
             {
@@ -5599,8 +5599,8 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadRow(t,l, oNewRow, ws);
                 });
-                if(null != oNewRow.r)
-                    ws.aGCells[oNewRow.r - 1] = oNewRow;
+                if(null != oNewRow.index)
+                    ws.aGCells[oNewRow.index] = oNewRow;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -5612,10 +5612,9 @@
             var oThis = this;
             if ( c_oSerRowTypes.Row == type )
             {
-                oRow.r = this.stream.GetULongLE();
-                oRow.index = oRow.r - 1;
-                if(oRow.r > ws.nRowsCount)
-                    ws.nRowsCount = oRow.r;
+                oRow.index = this.stream.GetULongLE() - 1;
+                if(oRow.index + 1 > ws.nRowsCount)
+                    ws.nRowsCount = oRow.index + 1;
             }
             else if ( c_oSerRowTypes.Style == type )
             {

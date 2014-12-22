@@ -2405,7 +2405,6 @@ function Row(worksheet)
 	this.sm = this.ws.workbook.oStyleManager;
 	this.cs = this.ws.workbook.CellStyles;
 	this.c = {};
-    this.r = null;
 	this.index = null;
     this.xfs = null;
     this.h = null;
@@ -2420,12 +2419,11 @@ Row.prototype =
 	create : function(row)
 	{
 		this.index = row - 1;
-		this.r = row;
 		this.xfs = null;
 	},
 	moveVer : function(nDif)
 	{
-		this.r += nDif;
+		this.index += nDif;
 	},
 	isEmpty : function()
 	{
@@ -2454,7 +2452,7 @@ Row.prototype =
         if(!oNewWs)
             oNewWs = this.ws;
         var oNewRow = new Row(oNewWs);
-		oNewRow.r = this.r;
+		oNewRow.index = this.index;
 		if(null != this.xfs)
 			oNewRow.xfs = this.xfs.clone();
 		if(null != this.h)
