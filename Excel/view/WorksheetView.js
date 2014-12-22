@@ -9157,7 +9157,7 @@
 									}
 								}
 								//если замержили range
-								//c = range.bbox.c2 - autoC*plCol;
+								c = range.bbox.c2 - autoC*plCol;
 							}
 						}
 					}
