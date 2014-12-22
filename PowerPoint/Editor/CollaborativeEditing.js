@@ -1120,60 +1120,63 @@ function CCollaborativeEditing()
 
     this.OnCallback_AskLock = function(result)
     {
-        // Снимаем глобальный лок
-        oThis.m_bGlobalLock = false;
-
-        if (result["lock"])
+        if (true === oThis.m_bGlobalLock)
         {
-            // Пробегаемся по массиву и проставляем, что залочено нами
+            // Снимаем глобальный лок
+            oThis.m_bGlobalLock = false;
 
-            var Count = oThis.m_aCheckLocks.length;
-            for ( var Index = 0; Index < Count; Index++ )
+            if (result["lock"])
             {
-                var oItem = oThis.m_aCheckLocks[Index];
-                var item;
-                switch(oItem["type"])
+                // Пробегаемся по массиву и проставляем, что залочено нами
+
+                var Count = oThis.m_aCheckLocks.length;
+                for ( var Index = 0; Index < Count; Index++ )
                 {
-                    case c_oAscLockTypeElemPresentation.Object:
+                    var oItem = oThis.m_aCheckLocks[Index];
+                    var item;
+                    switch(oItem["type"])
                     {
-                        item = oItem["objId"];
-                        break;
+                        case c_oAscLockTypeElemPresentation.Object:
+                        {
+                            item = oItem["objId"];
+                            break;
+                        }
+                        case c_oAscLockTypeElemPresentation.Slide:
+                        {
+                            item = oItem["val"];
+                            break;
+                        }
+                        case c_oAscLockTypeElemPresentation.Presentation:
+                        {
+                            break;
+                        }
                     }
-                    case c_oAscLockTypeElemPresentation.Slide:
+                    if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
                     {
-                        item = oItem["val"];
-                        break;
-                    }
-                    case c_oAscLockTypeElemPresentation.Presentation:
-                    {
-                        break;
-                    }
-                }
-                if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
-                {
-                    var Class = g_oTableId.Get_ById( item );
-                    if ( null != Class )
-                    {
-                        Class.Lock.Set_Type( locktype_Mine );
-                        if(Class instanceof Slide)
-                            editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
-                        oThis.Add_Unlock2( Class );
+                        var Class = g_oTableId.Get_ById( item );
+                        if ( null != Class )
+                        {
+                            Class.Lock.Set_Type( locktype_Mine );
+                            if(Class instanceof Slide)
+                                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
+                            oThis.Add_Unlock2( Class );
+                        }
                     }
                 }
             }
-        }
-        else if (result["error"])
-        {
-            // Если у нас началось редактирование диаграммы, а вернулось, что ее редактировать нельзя,
-            // посылаем сообщение о закрытии редактора диаграмм.
-            if ( true === editor.isChartEditor )
-                editor.sync_closeChartEditor();
+            else if (result["error"])
+            {
+                // Если у нас началось редактирование диаграммы, а вернулось, что ее редактировать нельзя,
+                // посылаем сообщение о закрытии редактора диаграмм.
+                if ( true === editor.isChartEditor )
+                    editor.sync_closeChartEditor();
 
-            // Делаем откат на 1 шаг назад и удаляем из Undo/Redo эту последнюю точку
-            editor.WordControl.m_oLogicDocument.Document_Undo();
-            History.Clear_Redo();
-        }
+                // Делаем откат на 1 шаг назад и удаляем из Undo/Redo эту последнюю точку
+                editor.WordControl.m_oLogicDocument.Document_Undo();
+                History.Clear_Redo();
+            }
 
+        }
         editor.isChartEditor = false;
     };
 //-----------------------------------------------------------------------------------
