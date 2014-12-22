@@ -9823,7 +9823,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
         {
-            if (true === this.History.Have_Changes())
+            if (true === this.History.Have_Changes() || CollaborativeEditing.m_aChanges.length > 0)
             {
                 this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
             }
