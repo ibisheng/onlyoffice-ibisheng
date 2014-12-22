@@ -1905,6 +1905,18 @@ CPresentation.prototype =
                 bRetValue = true;
             }
         }
+        else if ( e.KeyCode == 71 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + G - группируем объекты
+        {
+            if(true === e.ShiftKey)
+            {
+                this.unGroupShapes();
+            }
+            else
+            {
+                this.groupShapes();
+            }
+            bRetValue = true;
+        }
         else if ( e.KeyCode == 73 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + I - делаем текст наклонным
         {
             var TextPr = this.Get_Paragraph_TextPr();
@@ -3673,11 +3685,31 @@ CPresentation.prototype =
             for(var i = 0; i < _array.length; ++i)
             {
                 var slide = this.Slides[_array[i]];
+                slide.setLayout(layout);
                 for(var j = slide.cSld.spTree.length-1; j  > -1 ; --j)
                 {
                     if(slide.cSld.spTree[j].isEmptyPlaceholder && slide.cSld.spTree[j].isEmptyPlaceholder())
                     {
                         slide.removeFromSpTreeById(slide.cSld.spTree[j].Get_Id());
+                    }
+                    else
+                    {
+                        var shape = slide.cSld.spTree[j];
+                        if(shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
+                        {
+                            var hierarchy = shape.getHierarchy();
+                            for(var t = 0; t < hierarchy.length; ++t)
+                            {
+                                if(hierarchy[t] && hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
+                                {
+                                    break;
+                                }
+                            }
+                            if(t === hierarchy.length)
+                            {
+                                CheckSpPrXfrm(shape);
+                            }
+                        }
                     }
                 }
                 for(var j = 0; j < layout.cSld.spTree.length; ++j)
@@ -3698,7 +3730,6 @@ CPresentation.prototype =
                         }
                     }
                 }
-                slide.setLayout(layout);
             }
             this.Recalculate();
             this.Document_UpdateInterfaceState();
