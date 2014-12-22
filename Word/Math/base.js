@@ -457,7 +457,8 @@ CMathBase.prototype =
 
             if(this.bInside == true)
             {
-                var TxtPr = Parent.Get_TxtPrControlLetter(RPI);
+                var TxtPr = Parent.Get_TxtPrControlLetter(RPI); // чтобы применился ArgSize Parent
+
                 FontSize = TxtPr.FontSize;
                 FontSize *= MatGetKoeffArgSize(FontSize, this.ArgSize.value);
             }
@@ -720,10 +721,15 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
 
-        /*for(var i = 0 ; i < this.Content.length; i++)
+        // такая ситуация может возникнуть при добавлении элементов из меню, и чтобы применились текстовые настройки при вставке нужно пройтись по контентам
+        // a Resize произойдет позже, после вставки = > массив this.elements заполнится позднее
+        if(this.nRow == 0 && this.nCol == 0)
         {
-            this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }*/
+            for(var i = 0 ; i < this.Content.length; i++)
+            {
+                this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+            }
+        }
 
     },
     GetMathTextPrForMenu: function(ContentPos, Depth)

@@ -182,8 +182,10 @@ ParaMath.prototype.Add = function(Item)
 
         if(oContent.bRoot == false && Run.IsPlaceholder())
         {
+
             var ctrPrp = oContent.Parent.Get_CtrPrp(); // копия ctrPrp
             Run.Apply_TextPr(ctrPrp, undefined, true);
+            //Run.Apply_TextPr();
         }
 
         if(Item.Value == 38)
@@ -616,7 +618,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.Set_ParaMath(this, null);
         this.Root.PreRecalc(null, this, ArgSize, RPI);
         this.Root.Resize(g_oTextMeasurer, RPI/*recalculate properties info*/);
-        // когда формула будеат разбиваться на строки, Position придется перерасчитывать
+        // когда формула будет разбиваться на строки, Position придется перерасчитывать
         var pos = new CMathPosition();
         pos.x = 0;
         pos.y = 0;
@@ -1185,13 +1187,24 @@ ParaMath.prototype.GetFirstRPrp = function()
 {
     return this.Root.getFirstRPrp(this);
 };
-
 ParaMath.prototype.GetShiftCenter = function(oMeasure, font)
 {
     oMeasure.SetFont(font);
     var metrics = oMeasure.Measure2Code(0x2217); // "+"
 
     return 0.6*metrics.Height;
+};
+ParaMath.prototype.GetPlh = function(oMeasure, font)
+{
+    oMeasure.SetFont(font);
+
+    return oMeasure.Measure2Code(0x2B1A).Height;
+};
+ParaMath.prototype.GetA = function(oMeasure, font)
+{
+    oMeasure.SetFont(font);
+
+    return oMeasure.Measure2Code(0x61).Height;
 };
 
 ParaMath.prototype.SetMathProperties = function(props)

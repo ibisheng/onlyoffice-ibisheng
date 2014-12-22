@@ -4685,7 +4685,7 @@ ParaRun.prototype.Get_CompiledPr = function(bCopy)
         this.RecalcInfo.TextPr = false;
         this.CompiledPr = this.Internal_Compile_Pr();
     }
-    
+
     if ( false === bCopy )
         return this.CompiledPr;
     else
@@ -5074,7 +5074,7 @@ ParaRun.prototype.Split_Run = function(Pos)
 
 ParaRun.prototype.Clear_TextPr = function()
 {
-    // Данная функция вызывается пока только при изменении стиля параграфа. Оставляем в этой ситуации язык неизмененным.        
+    // Данная функция вызывается пока только при изменении стиля параграфа. Оставляем в этой ситуации язык неизмененным.
     var NewTextPr = new CTextPr();
     NewTextPr.Lang = this.Pr.Lang.Copy();
     this.Set_Pr( NewTextPr );
@@ -7675,13 +7675,13 @@ CRunCollaborativeMarks.prototype =
             else if ( PosS >= Range.PosS && PosS <= Range.PosE && PosE >= Range.PosS && PosE <= Range.PosE )
             {
                 if ( true !== Color.Compare(Range.Color) )
-                {            
+                {
                     var _PosE = Range.PosE;
                     Range.PosE = PosS;
                     this.Ranges.splice( Index + 1, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
-                    this.Ranges.splice( Index + 2, 0, new CRunCollaborativeRange(PosE, _PosE, Range.Color) );                    
+                    this.Ranges.splice( Index + 2, 0, new CRunCollaborativeRange(PosE, _PosE, Range.Color) );
                 }
-                
+
                 return;
             }
             else if ( PosE < Range.PosS )
@@ -7705,7 +7705,7 @@ CRunCollaborativeMarks.prototype =
                     Range.PosS = PosE;
                     this.Ranges.splice( Index, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
                 }
-                
+
                 return;
             }
             else //if ( PosS >= Range.PosS && PosE > Range.Pos.E )
@@ -7717,7 +7717,7 @@ CRunCollaborativeMarks.prototype =
                     Range.PosE = PosS;
                     this.Ranges.splice( Index + 1, 0, new CRunCollaborativeRange(PosS, PosE, Color) );
                 }
-                
+
                 return;
             }
         }
@@ -7894,10 +7894,8 @@ ParaRun.prototype.Math_Recalculate = function(oMeasure, RPI, WidthPoints)
         var ArgSize     = this.Parent.Compiled_ArgSz.value,
             bNormalText = this.IsNormalText();
 
-        //var NewMathTextPr = GetMathModifiedFont(MathFont_ForMathText, oWPrp, this);
-        //g_oTextMeasurer.SetTextPr( NewMathTextPr, Theme );
-
-        g_oTextMeasurer.SetTextPr( oWPrp, Theme );
+        // argSize
+        g_oTextMeasurer.SetTextPr(oWPrp,Theme);
 
         var InfoMathText = new CMathInfoTextPr_2(oWPrp, ArgSize, bNormalText);
 

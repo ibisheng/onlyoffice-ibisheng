@@ -107,36 +107,67 @@ CDegreeBase.prototype.recalculateSup = function(oMeasure)
         iter   = this.elements[0][1].size;
 
     var mgCtrPrp = this.Get_TxtPrControlLetter();
-    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+    //var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
     this.upBase = 0;
     this.upIter = 0;
 
-    var oBase = this.elements[0][0];
+    var bTextElement = false,
+        lastElem;
 
-    var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
-
-    if(bOneLineText)
+    if(!this.baseContent.IsJustDraw())
     {
-        var UpBaseline = 1.65*shCenter; // baseline итератора
+        lastElem = this.baseContent.GetLastElement();
 
-        if(iter.height - UpBaseline - iter.ascent + base.ascent  > 2/3 * base.ascent)
-            this.upBase = iter.height - 2/3*base.ascent;
-        else if(UpBaseline + iter.ascent > base.ascent)
-            this.upBase = UpBaseline + iter.ascent - base.ascent;
+        var BaseRun  = lastElem.Type == para_Math_Run && mgCtrPrp.FontSize == lastElem.Get_CompiledPr(false).FontSize;
+        bTextElement = BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
+    }
+
+    var PlH = 0.64*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
+    //var UpBaseline = 1.65*shCenter; // расстояние от baseline основания до бейзлайна итератора
+     var UpBaseline = 0.75*PlH; // расстояние от baseline основания до бейзлайна итератора
+
+    if(bTextElement)
+    {
+        var last = lastElem.size,
+            upBaseLast = 0,
+            upBaseIter = 0;
+
+        if( (last.ascent - UpBaseline) + (iter.height - iter.ascent) >  (last.ascent - 2/9*PlH) )
+            upBaseLast = iter.height - (last.ascent - 2/9*PlH);
+        else if(UpBaseline + iter.ascent > last.ascent)
+            upBaseLast = UpBaseline + iter.ascent - last.ascent;
         else
-            this.upIter = base.ascent - UpBaseline - iter.ascent;
+            upBaseIter = last.ascent - UpBaseline - iter.ascent;
+
+        if(upBaseLast + last.ascent > base.ascent)
+        {
+            this.upBase = upBaseLast - (base.ascent - last.ascent);
+            this.upIter = upBaseIter;
+        }
+        else
+        {
+            this.upBase = 0;
+            this.upIter = (base.ascent - upBaseLast - last.ascent) + upBaseIter;
+        }
     }
     else
     {
-        this.upBase = iter.ascent - 1.2*shCenter;
-        var ascBase = base.ascent - shCenter > 0.27*mgCtrPrp.FontSize ? base.ascent - shCenter : 2/3*base.ascent;
+        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-        // ограничение для случая, когда дескент итератора >> высоты основания
-        if(iter.height - this.upBase > ascBase)
-            this.upBase = iter.height - ascBase;
+        if(iter.height - iter.ascent + shCenter > base.ascent) // для дробей и т.п.
+        {
+            this.upBase = iter.height - (base.ascent - shCenter);
+        }
+        else if(iter.ascent > shCenter)
+        {
+            this.upBase = iter.ascent - shCenter;
+        }
+        else
+        {
+            this.upIter = shCenter - iter.ascent;
+        }
     }
-
 
     var height = this.upBase + base.height;
     var ascent = this.upBase + base.ascent;
@@ -163,35 +194,63 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
     var width = base.width + iter.width + this.dW;
     width += this.GapLeft + this.GapRight;
 
-    var oBase = this.elements[0][0];
-    var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
+    //var oBase = this.elements[0][0];
+    //var bOneLineText = oBase.IsJustDraw() ? false : oBase.IsOneLineText();
 
-    if(bOneLineText)
+    var bTextElement = false,
+        lastElem;
+
+
+    if(!this.baseContent.IsJustDraw())
     {
+        lastElem = this.baseContent.GetLastElement();
+
+        var txtPrpControl = this.ParaMath.GetFirstRPrp();// нам нужен текстовые настройки для управляющих элементов без учета ArgSize, а это как раз будут текстовые настройки первого рана
+                                                         // если учтем ArgSize, то для вложенных дробей эта проверка на Run не сработает
+        var BaseRun       = lastElem.Type == para_Math_Run && txtPrpControl.FontSize == lastElem.Get_CompiledPr(false).FontSize;
+        bTextElement      = BaseRun || (lastElem.Type !== para_Math_Run && lastElem.IsJustDraw());
+    }
+
+    var height, ascent, descent;
+
+    if(bTextElement)
+    {
+        //var last = lastElem.size;
         var DownBaseline = 0.9*shCenter;
 
-        if(iter.ascent - DownBaseline > 3/4*base.ascent)
-            this.upIter = 1/4*base.ascent;
+        var PlH = 0.64*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
+
+        if(iter.ascent - DownBaseline > 3/4*PlH)
+            this.upIter = 1/4*PlH;
         else
-            this.upIter = base.ascent + DownBaseline - iter.ascent;
+            this.upIter = PlH + DownBaseline - iter.ascent;
+
+        if(base.ascent > PlH)
+        {
+            this.upIter += base.ascent - PlH;
+        }
+
+        //this.upIter = base.ascent + DownBaseline - iter.ascent;
+
+        var descentBase = base.height - base.ascent,
+            descentIter = this.upIter + iter.height - base.ascent;
+
+        descent = descentBase > descentIter ? descentBase : descentIter;
+        ascent  = base.ascent;
+
+        height = ascent + descent;
     }
     else
     {
-        this.upIter = base.height + 0.9*shCenter - iter.ascent;
-
-        /*if(base.ascent - shCenter > this.upIter)
-            this.upIter = base.height - base.ascent + shCenter;*/
+        this.upIter = base.height + shCenter - iter.ascent;
 
         // ограничение для случая, когда аскент итератора >> высоты основания
-        /*if(base.ascent - shCenter > this.upIter)
-            this.upIter = base.ascent - shCenter;*/
+        if(base.ascent - 1.5*shCenter > this.upIter)
+            this.upIter = base.ascent - 1.5*shCenter;
 
-        if(base.ascent - 2*shCenter > this.upIter)
-            this.upIter = base.ascent - 2*shCenter;
+        height = this.upIter + iter.height;
+        ascent = base.ascent;
     }
-
-    var height = this.upIter + iter.height;
-    var ascent = base.ascent;
 
     this.size = {width: width, height: height, ascent: ascent};
 };
@@ -461,7 +520,9 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
     shCenter *= 1.4;
 
     var ctrPrpIter = this.iters.Get_TxtPrControlLetter();
-    var shIter = this.ParaMath.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
+    //var shIter = this.ParaMath.GetShiftCenter(oMeasure, ctrPrpIter); //смещение
+
+    var PlH = 0.26*this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
 
     var height, width, ascent, descent;
 
@@ -483,22 +544,21 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
 
     if(TextElement)
     {
-        minGap =  0.5*shIter;
+        minGap =  0.5*PlH;
 
-        var DivBaseline = 3.034*shIter;
+        var DivBaseline = 3.034*PlH;
         var ascIters, dgrHeight;
 
         if(DivBaseline > minGap + iterDown.ascent + (iterUp.height - iterUp.ascent))
         {
             dH = DivBaseline - iterDown.ascent - (iterUp.height - iterUp.ascent);
-
         }
         else
         {
             dH = minGap;
         }
 
-        var GapDown = shIter;
+        var GapDown = PlH;
 
         ascIters = iterUp.height + dH + GapDown;
         dgrHeight = iterDown.height + iterUp.height + dH;
@@ -515,14 +575,14 @@ CDegreeSubSupBase.prototype.recalculateSize = function(oMeasure, RPI)
     }
     else
     {
-        minGap =  0.7*shIter;
+        minGap =  0.7*PlH;
 
         var lUpBase    = base.ascent - shCenter; // center of base
         var lDownBase  = base.height - lUpBase; // height - center of base
 
 
-        var DescUpIter  = iterUp.height - iterUp.ascent + shIter;
-        var AscDownIter = iterDown.ascent - shIter;
+        var DescUpIter  = iterUp.height - iterUp.ascent + PlH;
+        var AscDownIter = iterDown.ascent - PlH;
 
         var UpGap, DownGap;
 

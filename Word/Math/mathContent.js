@@ -1104,13 +1104,12 @@ CMathContent.prototype =
     {
         return this.Id;
     },
-
-    private_CorrectContent : function()
+    private_CorrectContent: function()
     {
         var len = this.Content.length;
 
         var current = null;
-        var emptyRun, ctrPrp, mathPrp;
+        var emptyRun;
 
         var currPos = 0;
 
@@ -1118,34 +1117,35 @@ CMathContent.prototype =
         {
             current = this.Content[currPos];
 
+            if(currPos < len && para_Math_Run === current.Type)
+                current.Math_Correct_Content();
+
             var bLeftRun  = currPos > 0 ? this.Content[currPos-1].Type == para_Math_Run : false,
                 bRightRun = currPos < len - 1 ? this.Content[currPos + 1].Type === para_Math_Run : false;
 
-            var bCurrComp = current.Type == para_Math_Composition,
-                bCurrEmptyRun = current.Type == para_Math_Run && current.Is_Empty();
+            var bLeftEmptyRun = bLeftRun ? this.Content[currPos-1].Is_Empty() : false;
+
+            var bCurrComp       = current.Type == para_Math_Composition,
+                bCurrEmptyRun   = current.Type == para_Math_Run && current.Is_Empty();
 
             var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
 
-            if(bCurrComp && !bLeftRun) // добавление пустого Run перед мат объектом
+            if(bCurrComp && !bLeftRun)
             {
                 emptyRun = new ParaRun(null, true);
                 emptyRun.Set_RFont_ForMathRun();
 
-                ctrPrp = current.Get_CtrPrp();
-
-                mathPrp = new CMPrp();
-
-                mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
-
-                emptyRun.Set_MathPr(mathPrp);
-
-                ctrPrp.Bold   = undefined;
-                ctrPrp.Italic = undefined;
-
-                emptyRun.Set_Pr(ctrPrp);
-
+                this.Apply_TextPrForRunEmpty(emptyRun, current);
                 this.Internal_Content_Add(currPos, emptyRun);
                 currPos += 2;
+
+            }
+            else if(bCurrComp && bLeftEmptyRun)
+            {
+                emptyRun = this.Content[currPos-1];
+
+                this.Apply_TextPrForRunEmpty(emptyRun, current);
+                currPos++;
             }
             else if(bDeleteEmptyRun)
             {
@@ -1169,30 +1169,46 @@ CMathContent.prototype =
                 currPos++;
 
             len = this.Content.length;
+
         }
 
-
-        if(len > 0 && this.Content[len - 1].Type == para_Math_Composition)
+        if(len > 1)
         {
-            emptyRun = new ParaRun(null, true);
-            emptyRun.Set_RFont_ForMathRun();
+            var bLastComp     =  this.Content[len - 1].Type == para_Math_Composition,
+                bLastRunEmpty =  this.Content[len - 2].Type == para_Math_Composition && this.Content[len - 1].Type == para_Math_Run && this.Content[len-1].Is_Empty();
 
-            ctrPrp = current.Get_CtrPrp();
+            if(bLastComp)
+            {
+                emptyRun = new ParaRun(null, true);
+                emptyRun.Set_RFont_ForMathRun();
 
-            mathPrp = new CMPrp();
-            mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
+                this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 1]);
+                this.Internal_Content_Add(currPos, emptyRun);
+            }
+            else if(bLastRunEmpty)
+            {
+                emptyRun = this.Content[len-1];
 
-            emptyRun.Set_MathPr(mathPrp);
-
-            ctrPrp.Bold   = undefined;
-            ctrPrp.Italic = undefined;
-
-            emptyRun.Set_Pr(ctrPrp);
-
-            this.Internal_Content_Add(len, emptyRun);
+                this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 2]);
+            }
         }
-    },
 
+    },
+    Apply_TextPrForRunEmpty: function(emptyRun, Composition)
+    {
+        var ctrPrp = Composition.Get_CtrPrp();
+
+        var mathPrp = new CMPrp();
+
+        mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
+
+        emptyRun.Set_MathPr(mathPrp);
+
+        ctrPrp.Bold   = undefined;
+        ctrPrp.Italic = undefined;
+
+        emptyRun.Set_Pr(ctrPrp);
+    },
     Correct_Content : function(bInnerCorrection)
     {
         if (true === bInnerCorrection)
@@ -1207,7 +1223,7 @@ CMathContent.prototype =
         this.private_CorrectContent();
 
         // Удаляем лишние пустые раны
-        for (var nPos = 0, nLen = this.Content.length; nPos < nLen - 1; nPos++)
+        /*for (var nPos = 0, nLen = this.Content.length; nPos < nLen - 1; nPos++)
         {
             var oCurrElement = this.Content[nPos];
             var oNextElement = this.Content[nPos + 1];
@@ -1229,7 +1245,7 @@ CMathContent.prototype =
 
             if(para_Math_Run === oCurrElement.Type)
                 oCurrElement.Math_Correct_Content();
-        }
+        }*/
 
         // Если в контенте ничего нет, тогда добавляем пустой ран
         if (this.Content.length < 1)

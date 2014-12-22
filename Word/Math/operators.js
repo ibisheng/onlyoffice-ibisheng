@@ -3290,37 +3290,37 @@ CMathDelimiterPr.prototype.Write_ToBinary = function(Writer)
     Writer.Skip(4);
     var Flags = 0;
 
-    if (undefined !== this.begChr)
+    if (undefined !== this.begChr && this.begChr !== null)
     {
         Writer.WriteLong(this.begChr);
         Flags |= 1;
     }
 
-    if (undefined !== this.begChrType)
+    if (undefined !== this.begChrType && this.begChrType !== null)
     {
         Writer.WriteLong(this.begChrType);
         Flags |= 2;
     }
 
-    if (undefined !== this.endChr)
+    if (undefined !== this.endChr && this.endChr !== null)
     {
         Writer.WriteLong(this.endChr);
         Flags |= 4;
     }
 
-    if (undefined !== this.endChrType)
+    if (undefined !== this.endChrType && this.endChrType !== null)
     {
         Writer.WriteLong(this.endChrType);
         Flags |= 8;
     }
 
-    if (undefined !== this.sepChr)
+    if (undefined !== this.sepChr && this.sepChr !== null)
     {
         Writer.WriteLong(this.sepChr);
         Flags |= 16;
     }
 
-    if (undefined !== this.sepChrType)
+    if (undefined !== this.sepChrType && this.sepChrType !== null)
     {
         Writer.WriteLong(this.sepChrType);
         Flags |= 32;
@@ -3399,6 +3399,7 @@ function CDelimiter(props)
     this.sepOper = new COperator (OPER_SEPARATOR);
 
     this.Pr = new CMathDelimiterPr();
+    this.TextInContent = true;
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
@@ -3518,13 +3519,16 @@ CDelimiter.prototype.Resize = function(oMeasure, RPI)
     var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
     var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
 
-    var plH = 9.877777777777776 * mgCtrPrp.FontSize/36;
+
+    var plH = this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
+    //var plH = 10.8 * mgCtrPrp.FontSize/36;
     //var bTextContent = ascentG < plH || descentG < plH ; // для текста операторы в случае центрирования не увеличиваем
-    var bTextContent = ascentG < plH && heightG < 1.5*plH; // для текста операторы в случае центрирования не увеличиваем
+    var bTextContent = ascentG < 1.01*plH && (heightG - ascentG) < 0.4*plH; // для текста операторы в случае центрирования не увеличиваем
 
     var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
         b2Max = bCentered && (2*maxAD - heightG > 0.001);
 
+    this.TextInContent = bTextContent;
 
     var heightStretch = b2Max && !bTextContent ? 2*maxAD : ascentG + descentG;
 
@@ -3755,7 +3759,11 @@ CDelimiter.prototype.GetLastElement = function()
 {
     var Result;
 
-    if(this.endOper.typeOper !== OPERATOR_EMPTY && this.Pr.grow == false || this.endOper.typeOper == OPERATOR_TEXT)
+    var IsEndOper = this.endOper.typeOper !== OPERATOR_EMPTY;
+    var growLast  = IsEndOper && this.Pr.grow == true && this.TextInContent,
+        smallLast = IsEndOper && this.Pr.grow == false;
+
+    if(growLast || smallLast || this.endOper.typeOper == OPERATOR_TEXT)
     {
         Result = this.endOper;
     }

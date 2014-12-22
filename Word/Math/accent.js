@@ -569,7 +569,7 @@ CAccent.prototype.draw = function(x, y, pGraphics, PDSE)
 };
 CAccent.prototype.GetLastElement = function()
 {
-    return this.elements[0][0].GetLastElement();
+    return this.Content[0].GetLastElement();
 };
 CAccent.prototype.Document_UpdateInterfaceState = function(MathProps)
 {

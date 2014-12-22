@@ -216,6 +216,10 @@ CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     CMathFunc.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
 };
+CMathFunc.prototype.GetLastElement = function()
+{
+    return this.Content[1].GetLastElement();
+};
 CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.Get_TxtPrControlLetter().FontSize/6*g_dKoef_pt_to_mm;
@@ -239,5 +243,3 @@ CMathFunc.prototype.Document_UpdateInterfaceState = function(MathProps)
     MathProps.Type = c_oAscMathInterfaceType.Function;
     MathProps.Pr   = null;
 };
-
-
