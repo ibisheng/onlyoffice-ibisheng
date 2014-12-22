@@ -141,9 +141,7 @@ window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCo
 //-----------------------------------------------------------------------------------
 // CommentData
 //-----------------------------------------------------------------------------------
-/** @constructor */
-function asc_CCommentData(obj) {
-	this.Properties = {
+var g_oCCommentDataProperties = {
 		wsId: 0,
 		nCol: 1,
 		nRow: 2,
@@ -159,6 +157,9 @@ function asc_CCommentData(obj) {
 		aReplies: 13,
 		bHidden: 14
 	};
+/** @constructor */
+function asc_CCommentData(obj) {
+	this.Properties = g_oCCommentDataProperties;
 
 	this.bHidden = false;
 	this.wsId = null;
@@ -389,15 +390,15 @@ prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
 //-----------------------------------------------------------------------------------
 // CompositeCommentData
 //-----------------------------------------------------------------------------------
-
+var g_oCompositeCommentDataProperties = {
+		commentBefore: 0,
+		commentAfter: 1
+	};
 function CompositeCommentData() {
 	this.commentBefore = null;
 	this.commentAfter = null;
 
-	this.Properties = {
-		commentBefore: 0,
-		commentAfter: 1
-	};
+	this.Properties = g_oCompositeCommentDataProperties;
 }
 
 CompositeCommentData.prototype = {

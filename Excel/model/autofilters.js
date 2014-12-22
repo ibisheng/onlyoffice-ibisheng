@@ -14,13 +14,14 @@ var gUndoInsDelCellsFlag = true;
 		var prot;
 		var startRedo = false;
 
-		function AutoFiltersOptionsElements (val, visible) {
-			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements(val, visible);}
-
-			this.Properties = {
+		var g_oAutoFiltersOptionsElementsProperties = {
 				val		: 0,
 				visible	: 1
 			};
+		function AutoFiltersOptionsElements (val, visible) {
+			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements(val, visible);}
+
+			this.Properties = g_oAutoFiltersOptionsElementsProperties;
 
 			this.val = val;
 			this.val2 = null;
@@ -90,12 +91,7 @@ var gUndoInsDelCellsFlag = true;
 			asc_getType: function () { return this.type; },
 			asc_getImage: function () { return this.image; }
 		};
-		
-		function AutoFiltersOptions () {
-
-			if ( !(this instanceof AutoFiltersOptions) ) {return new AutoFiltersOptions();}
-
-			this.Properties = {
+		var g_oAutoFiltersOptionsProperties = {
 				cellId		: 0,
 				result		: 1,
 				filter1		: 2,
@@ -110,6 +106,11 @@ var gUndoInsDelCellsFlag = true;
 				height		: 11,
 				isCustomFilter: 12
 			};
+		function AutoFiltersOptions () {
+
+			if ( !(this instanceof AutoFiltersOptions) ) {return new AutoFiltersOptions();}
+
+			this.Properties = g_oAutoFiltersOptionsProperties;
 
 			this.cellId = null;
 			this.result = null;
@@ -201,15 +202,15 @@ var gUndoInsDelCellsFlag = true;
 			asc_getIsChecked : function() { return this.isChecked; },
 			asc_getSortState : function() { return this.sortVal; }
 		};
-		
+		var g_oAddFormatTableOptionsProperties = {
+				range		: 0,
+				isTitle		: 1
+			};
 		function AddFormatTableOptions () {
 
 			if ( !(this instanceof AddFormatTableOptions) ) {return new AddFormatTableOptions();}
 
-			this.Properties = {
-				range		: 0,
-				isTitle		: 1
-			};
+			this.Properties = g_oAddFormatTableOptionsProperties;
 			
 			this.range = null;
 			this.isTitle = null;

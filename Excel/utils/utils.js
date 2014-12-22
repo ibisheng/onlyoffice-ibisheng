@@ -1071,16 +1071,17 @@
 			this["r2"] = r2;
 		}
 
+		var g_oCSheetViewSettingsProperties = {
+				showGridLines		: 0,
+				showRowColHeaders	: 1
+			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
 			if (!(this instanceof asc_CSheetViewSettings)) {
 				return new asc_CSheetViewSettings();
 			}
 
-			this.Properties = {
-				showGridLines		: 0,
-				showRowColHeaders	: 1
-			};
+			this.Properties = g_oCSheetViewSettingsProperties;
 
 			// Показывать ли сетку
 			this.showGridLines = null;

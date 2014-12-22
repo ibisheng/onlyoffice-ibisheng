@@ -458,13 +458,13 @@ var UndoRedoDataTypes = new function() {
 		return null;
 	};
 };
-
-function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal, sFormula){
-	this.Properties = {
+var g_oUndoRedoData_CellSimpleDataProperties = {
 		Row: 0,
 		Col: 1,
 		NewVal: 2
 	};
+function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal, sFormula){
+	this.Properties = g_oUndoRedoData_CellSimpleDataProperties;
 	this.nRow = nRow;
 	this.nCol = nCol;
 	this.oOldVal = oOldVal;
@@ -505,12 +505,12 @@ UndoRedoData_CellSimpleData.prototype = {
 		this.nCol = collaborativeEditing.getLockMeColumn2(nSheetId, this.nCol);
 	}
 };
-
-function UndoRedoData_CellData(value, style){
-	this.Properties = {
+var g_oUndoRedoData_CellDataProperties = {
 		value: 0,
 		style: 1
 	};
+function UndoRedoData_CellData(value, style){
+	this.Properties = g_oUndoRedoData_CellDataProperties;
 	this.value = value;
 	this.style = style;
 }
@@ -541,12 +541,12 @@ UndoRedoData_CellData.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_CellValueData(sFormula, oValue){
-	this.Properties = {
+var g_oUndoRedoData_CellValueDataProperties = {
 		formula: 0,
 		value: 1
 	};
+function UndoRedoData_CellValueData(sFormula, oValue){
+	this.Properties = g_oUndoRedoData_CellValueDataProperties;
 	this.formula = sFormula;
 	this.value = oValue;
 }
@@ -587,12 +587,12 @@ UndoRedoData_CellValueData.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_FromToRowCol(bRow, from, to){
-	this.Properties = {
+var g_oUndoRedoData_FromToRowColProperties = {
 		from: 0,
 		to: 1
 	};
+function UndoRedoData_FromToRowCol(bRow, from, to){
+	this.Properties = g_oUndoRedoData_FromToRowColProperties;
 	this.bRow = bRow;
 	this.from = from;
 	this.to = to;
@@ -637,13 +637,13 @@ UndoRedoData_FromToRowCol.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_FromTo(from, to, copyRange){
-	this.Properties = {
+var g_oUndoRedoData_FromToProperties = {
 		from: 0,
 		to: 1,
         copyRange: 2
 	};
+function UndoRedoData_FromTo(from, to, copyRange){
+	this.Properties = g_oUndoRedoData_FromToProperties;
 	this.from = from;
 	this.to = to;
     this.copyRange = copyRange;
@@ -677,13 +677,13 @@ UndoRedoData_FromTo.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_FromToHyperlink(oBBoxFrom, oBBoxTo, hyperlink){
-	this.Properties = {
+var g_oUndoRedoData_FromToHyperlinkProperties = {
 		from: 0,
 		to: 1,
 		hyperlink: 2
 	};
+function UndoRedoData_FromToHyperlink(oBBoxFrom, oBBoxTo, hyperlink){
+	this.Properties = g_oUndoRedoData_FromToHyperlinkProperties;
 	this.from = new UndoRedoData_BBox(oBBoxFrom);
 	this.to = new UndoRedoData_BBox(oBBoxTo);
 	this.hyperlink = hyperlink;
@@ -729,12 +729,12 @@ UndoRedoData_FromToHyperlink.prototype = {
 		this.to.c2 = collaborativeEditing.getLockMeColumn2(nSheetId, this.to.c2);
 	}
 };
-
-function UndoRedoData_IndexSimpleProp(index, bRow, oOldVal, oNewVal){
-	this.Properties = {
+var g_oUndoRedoData_IndexSimplePropProperties = {
 		index: 0,
 		oNewVal: 1
 	};
+function UndoRedoData_IndexSimpleProp(index, bRow, oOldVal, oNewVal){
+	this.Properties = g_oUndoRedoData_IndexSimplePropProperties;
 	this.index = index;
 	this.bRow = bRow;
 	this.oOldVal = oOldVal;
@@ -774,14 +774,14 @@ UndoRedoData_IndexSimpleProp.prototype = {
 			this.index = collaborativeEditing.getLockMeColumn2(nSheetId, this.index);
 	}
 };
-
-function UndoRedoData_ColProp(col){
-	this.Properties = {
+var g_oUndoRedoData_ColPropProperties = {
 		width: 0,
 		hd: 1,
 		CustomWidth: 2,
 		BestFit: 3
 	};
+function UndoRedoData_ColProp(col){
+	this.Properties = g_oUndoRedoData_ColPropProperties;
 	if(null != col)
 	{
 		this.width = col.width;
@@ -834,13 +834,13 @@ UndoRedoData_ColProp.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_RowProp(row){
-	this.Properties = {
+var g_oUndoRedoData_RowPropProperties = {
 		h: 0,
 		hd: 1,
 		CustomHeight: 2
 	};
+function UndoRedoData_RowProp(row){
+	this.Properties = g_oUndoRedoData_RowPropProperties;
 	if(null != row)
 	{
 		this.h = row.h;
@@ -889,14 +889,14 @@ UndoRedoData_RowProp.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_BBox(oBBox){
-	this.Properties = {
+var g_oUndoRedoData_BBoxProperties = {
 		c1: 0,
 		r1: 1,
 		c2: 2,
 		r2: 3
 	};
+function UndoRedoData_BBox(oBBox){
+	this.Properties = g_oUndoRedoData_BBoxProperties;
 	if(null != oBBox)
 	{
 		this.c1 = oBBox.c1;
@@ -950,12 +950,12 @@ UndoRedoData_BBox.prototype = {
 		this.c2 = collaborativeEditing.getLockMeColumn2(nSheetId, this.c2);
 	}
 };
-
-function UndoRedoData_SortData(bbox, places){
-	this.Properties = {
+var g_oUndoRedoData_SortDataProperties = {
 		bbox: 0,
 		places: 1
 	};
+function UndoRedoData_SortData(bbox, places){
+	this.Properties = g_oUndoRedoData_SortDataProperties;
 	this.bbox = bbox;
 	this.places = places;
 }
@@ -1447,13 +1447,13 @@ UndoRedoDataParaPr.prototype = {
     }
 };
 
-
-function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
-	this.Properties = {
+var g_oUndoRedoData_SheetAddProperties = {
 		name: 0,
 		sheetidfrom: 1,
 		sheetid: 2
 	};
+function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
+	this.Properties = g_oUndoRedoData_SheetAddProperties;
 	this.insertBefore= insertBefore;
 	this.name = name;
 	this.sheetidfrom = sheetidfrom;
@@ -1491,12 +1491,12 @@ UndoRedoData_SheetAdd.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_SheetRemove(index, sheetId, sheet, cwf){
-	this.Properties = {
+var g_oUndoRedoData_SheetRemoveProperties = {
 		sheetId: 0,
 		sheet: 1
 	};
+function UndoRedoData_SheetRemove(index, sheetId, sheet, cwf){
+	this.Properties = g_oUndoRedoData_SheetRemoveProperties;
 	this.index = index;
 	this.sheetId = sheetId;
 	this.sheet = sheet;
@@ -1529,11 +1529,11 @@ UndoRedoData_SheetRemove.prototype = {
 		}
 	}
 };
-
-function UndoRedoData_SheetPositions(positions){
-	this.Properties = {
+var g_oUndoRedoData_SheetPositionsProperties = {
 		positions: 0
 	};
+function UndoRedoData_SheetPositions(positions){
+	this.Properties = g_oUndoRedoData_SheetPositionsProperties;
 	this.positions = positions;
 }
 UndoRedoData_SheetPositions.prototype = {
@@ -1581,9 +1581,7 @@ UndoRedoData_ClrScheme.prototype = {
 		this.newVal.Read_FromBinary(reader);
 	}
 };
-
-function UndoRedoData_AutoFilter() {
-	this.Properties = {
+var g_oUndoRedoData_AutoFilterProperties = {
 		activeCells			: 0,
 		lTable				: 1,
 		type				: 2,
@@ -1594,6 +1592,8 @@ function UndoRedoData_AutoFilter() {
 		moveTo              : 7,
 		bWithoutFilter      : 8
 	};
+function UndoRedoData_AutoFilter() {
+	this.Properties = g_oUndoRedoData_AutoFilterProperties;
 
 	this.undo				= null;
 
@@ -1656,11 +1656,11 @@ UndoRedoData_AutoFilter.prototype = {
 		this.activeCells.r2 = collaborativeEditing.getLockMeRow2(nSheetId, this.activeCells.r2);
 	}
 };
-
-function UndoRedoData_SingleProperty(elem) {
-	this.Properties = {
+var g_oUndoRedoData_SinglePropertyProperties = {
 		elem : 0
 	};
+function UndoRedoData_SingleProperty(elem) {
+	this.Properties = g_oUndoRedoData_SinglePropertyProperties;
 	this.elem = elem;
 }
 UndoRedoData_SingleProperty.prototype = {
@@ -2300,14 +2300,14 @@ UndoRedoDataAddGeometryRect.prototype =
         }
     }
 };
-
-function UndoRedoDataMoveToLineTo(x, y, bMoveTo)
-{
-    this.Properties = {
+var g_oUndoRedoDataMoveToLineToProperties = {
         x: 0,
         y: 1,
         bMoveTo: 2
     };
+function UndoRedoDataMoveToLineTo(x, y, bMoveTo)
+{
+    this.Properties = g_oUndoRedoDataMoveToLineToProperties;
 
     this.x = x;
     this.y = y;
@@ -2346,15 +2346,15 @@ UndoRedoDataMoveToLineTo.prototype =
     }
 };
 
-
-function UndoRedoDataArcTo(wR, hR, stAng, swAng)
-{
-    this.Properties = {
+var g_gUndoRedoDataArcToProperties = {
         wR: 0,
         hR: 1,
         stAng: 2,
         swAng: 3
     };
+function UndoRedoDataArcTo(wR, hR, stAng, swAng)
+{
+    this.Properties = g_gUndoRedoDataArcToProperties;
 
     this.wR = wR;
     this.hR = hR;
@@ -2396,15 +2396,15 @@ UndoRedoDataArcTo.prototype =
         }
     }
 };
-
-function UndoRedoDataQuadBezTo(x0, y0, x1, y1)
-{
-    this.Properties = {
+var g_oUndoRedoDataQuadBezToProperties = {
         x0: 0,
         y0: 1,
         x1: 2,
         y1: 3
     };
+function UndoRedoDataQuadBezTo(x0, y0, x1, y1)
+{
+    this.Properties = g_oUndoRedoDataQuadBezToProperties;
 
     this.x0 = x0;
     this.y0 = y0;
@@ -2447,10 +2447,7 @@ UndoRedoDataQuadBezTo.prototype =
     }
 };
 
-
-function UndoRedoDataCubicBezTo(x0, y0, x1, y1, x2, y2)
-{
-    this.Properties = {
+var g_oUndoRedoDataCubicBezToProperties = {
         x0: 0,
         y0: 1,
         x1: 2,
@@ -2458,6 +2455,9 @@ function UndoRedoDataCubicBezTo(x0, y0, x1, y1, x2, y2)
         x2: 4,
         y2: 5
     };
+function UndoRedoDataCubicBezTo(x0, y0, x1, y1, x2, y2)
+{
+    this.Properties = g_oUndoRedoDataCubicBezToProperties;
 
     this.x0 = x0;
     this.y0 = y0;
@@ -2506,11 +2506,11 @@ UndoRedoDataCubicBezTo.prototype =
     }
 };
 
-
+var g_oUndoRedoDataClosePathProperties = {
+    };
 function UndoRedoDataClosePath()
 {
-    this.Properties = {
-    };
+    this.Properties = g_oUndoRedoDataClosePathProperties;
 
 }
 
@@ -2534,14 +2534,14 @@ UndoRedoDataClosePath.prototype =
 
     }
 };
-
-function UndoRedoDataSetAdjustmentValue(gdName, oldVal, newVal)
-{
-    this.Properties = {
+var g_oUndoRedoDataSetAdjustmentValueProperties = {
         gdName:0,
         oldVal: 1,
         newVal: 2
     };
+function UndoRedoDataSetAdjustmentValue(gdName, oldVal, newVal)
+{
+    this.Properties = g_oUndoRedoDataSetAdjustmentValueProperties;
 
     this.gdName = gdName;
     this.oldVal = oldVal;

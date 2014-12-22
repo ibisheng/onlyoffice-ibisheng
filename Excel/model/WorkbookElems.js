@@ -82,11 +82,12 @@ function shiftSort(a, b, offset)
 	}
 	return nRes;
 }
-function RgbColor(rgb)
-{
-	this.Properties = {
+var g_oRgbColorProperties = {
 		rgb : 0
 	};
+function RgbColor(rgb)
+{
+	this.Properties = g_oRgbColorProperties;
 	this.rgb = rgb;
 }
 RgbColor.prototype =
@@ -145,13 +146,14 @@ RgbColor.prototype =
 		return 1;
 	}
 };
-function ThemeColor()
-{
-	this.Properties = {
+var g_oThemeColorProperties = {
 		rgb: 0,
 		theme: 1,
 		tint: 2
 	};
+function ThemeColor()
+{
+	this.Properties = g_oThemeColorProperties;
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
@@ -393,13 +395,7 @@ Fragment.prototype = {
 			this.sId = oVal.sId;
 	}
 };
-
-/** @constructor */
-function Font(val)
-{
-	if(null == val)
-		val = g_oDefaultFontAbs;
-	this.Properties = {
+var g_oFontProperties = {
 		fn: 0,
 		scheme: 1,
 		fs: 2,
@@ -410,6 +406,12 @@ function Font(val)
 		c: 7,
 		va: 8
 	};
+/** @constructor */
+function Font(val)
+{
+	if(null == val)
+		val = g_oDefaultFontAbs;
+	this.Properties = g_oFontProperties;
 	this.fn = val.fn;
 	this.scheme = val.scheme;
 	this.fs = val.fs;
@@ -635,14 +637,15 @@ Font.prototype =
 		}
 	}
 };
+var g_oFillProperties = {
+		bg: 0
+	};
 /** @constructor */
 function Fill(val)
 {
 	if(null == val)
 		val = g_oDefaultFillAbs;
-	this.Properties = {
-		bg: 0
-	};
+	this.Properties = g_oFillProperties;
 	this.bg = val.bg;
 }
 Fill.prototype =
@@ -710,12 +713,13 @@ Fill.prototype =
 		}
 	}
 };
-function BorderProp()
-{
-	this.Properties = {
+var g_oBorderPropProperties = {
 		s: 0,
 		c: 1
 	};
+function BorderProp()
+{
+	this.Properties = g_oBorderPropProperties;
 	this.s = c_oAscBorderStyles.None;
 	this.w = c_oAscBorderWidth.None;
 	this.c = g_oColorManager.getThemeColor(1);
@@ -804,12 +808,7 @@ BorderProp.prototype = {
 		}
 	}
 };
-/** @constructor */
-function Border(val)
-{
-	if(null == val)
-		val = g_oDefaultBorderAbs;
-	this.Properties = {
+var g_oBorderProperties = {
 		l: 0,
 		t: 1,
 		r: 2,
@@ -820,6 +819,12 @@ function Border(val)
 		dd: 7,
 		du: 8
 	};
+/** @constructor */
+function Border(val)
+{
+	if(null == val)
+		val = g_oDefaultBorderAbs;
+	this.Properties = g_oBorderProperties;
 	this.l = val.l.clone();
 	this.t = val.t.clone();
 	this.r = val.r.clone();
@@ -977,14 +982,15 @@ Border.prototype =
 		}
 	}
 };
+var g_oNumProperties = {
+		f: 0
+	};
 /** @constructor */
 function Num(val)
 {
 	if(null == val)
 		val = g_oDefaultNumAbs;
-	this.Properties = {
-		f: 0
-	};
+	this.Properties = g_oNumProperties;
 	this.f = val.f;
 }
 Num.prototype =
@@ -1041,9 +1047,7 @@ Num.prototype =
 		}
 	}
 };
-/** @constructor */
-function CellXfs() {
-	this.Properties = {
+var g_oCellXfsProperties = {
 		border: 0,
 		fill: 1,
 		font: 2,
@@ -1052,6 +1056,9 @@ function CellXfs() {
 		QuotePrefix: 5,
 		XfId: 6
 	};
+/** @constructor */
+function CellXfs() {
+	this.Properties = g_oCellXfsProperties;
     this.border = null;
     this.fill = null;
     this.font = null;
@@ -1167,12 +1174,7 @@ CellXfs.prototype =
 		}
 	}
 };
-/** @constructor */
-function Align(val)
-{
-	if(null == val)
-		val = g_oDefaultAlignAbs;
-	this.Properties = {
+var g_oAlignProperties = {
 		hor: 0,
 		indent: 1,
 		RelativeIndent: 2,
@@ -1181,6 +1183,12 @@ function Align(val)
 		ver: 5,
 		wrap: 6
 	};
+/** @constructor */
+function Align(val)
+{
+	if(null == val)
+		val = g_oDefaultAlignAbs;
+	this.Properties = g_oAlignProperties;
 	this.hor = val.hor;
 	this.indent = val.indent;
 	this.RelativeIndent = val.RelativeIndent;
@@ -1978,14 +1986,15 @@ StyleManager.prototype =
 			return this.setAngle(oItemWithXfs, 0);
     }
 };
-/** @constructor */
-function Hyperlink () {
-	this.Properties = {
+var g_oHyperlinkProperties = {
 		Ref: 0,
 		Location: 1,
 		Hyperlink: 2,
 		Tooltip: 3
 	};
+/** @constructor */
+function Hyperlink () {
+	this.Properties = g_oHyperlinkProperties;
     this.Ref = null;
     this.Hyperlink = null;
     this.Tooltip = null;
@@ -2671,12 +2680,13 @@ Row.prototype =
             History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	}
 };
-function CCellValueMultiText()
-{
-	this.Properties = {
+var g_oCCellValueMultiTextProperties = {
 		text: 0,
 		format: 1
 	};
+function CCellValueMultiText()
+{
+	this.Properties = g_oCCellValueMultiTextProperties;
 	this.text = null;
 	this.format = null;
 }
@@ -2722,14 +2732,15 @@ CCellValueMultiText.prototype =
 		}
 	}
 };
-function CCellValue(cell)
-{
-	this.Properties = {
+var g_oCCellValueProperties = {
 		text: 0,
 		multiText: 1,
 		number: 2,
 		type: 3
 	};
+function CCellValue(cell)
+{
+	this.Properties = g_oCCellValueProperties;
 	this.cell = cell;
 	
 	this.text = null;
