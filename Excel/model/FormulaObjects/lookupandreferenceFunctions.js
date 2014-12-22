@@ -1272,7 +1272,7 @@ VHLOOKUPCache.prototype.remove = function ( cell ) {
     var wsId = cell.ws.getId();
     var cacheRange = this.cacheRanges[wsId];
     if ( null != cacheRange ) {
-        var oGetRes = cacheRange.get( new Asc.Range( cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0() ) );
+        var oGetRes = cacheRange.get( new Asc.Range( cell.nCol, cell.nRow, cell.nCol, cell.nRow ) );
         for ( var i = 0, length = oGetRes.all.length; i < length; ++i ) {
             var elem = oGetRes.all[i];
             elem.data.results = {};

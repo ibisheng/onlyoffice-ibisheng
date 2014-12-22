@@ -4758,11 +4758,11 @@
 			for(var id in this.depDrawCells ){
 				c = this.depDrawCells[id].from;
 				node = this.depDrawCells[id].to;
-				var mainCellMetrics = gCM(this,c.getCellAddress().getCol0(),c.getCellAddress().getRow0()), nodeCellMetrics,
+				var mainCellMetrics = gCM(this,c.nCol,c.nRow), nodeCellMetrics,
 					_t1, _t2;
 				for(var id in node){
 					if( !node[id].isArea ){
-						_t1 = gCM(this,node[id].returnCell().getCellAddress().getCol0(),node[id].returnCell().getCellAddress().getRow0())
+						_t1 = gCM(this,node[id].returnCell().nCol,node[id].returnCell().nRow)
 						nodeCellMetrics = { t: _t1.top, l: _t1.left, w: _t1.width, h: _t1.height, apt: _t1.top+_t1.height/2, apl: _t1.left+_t1.width/4};
 					}
 					else{

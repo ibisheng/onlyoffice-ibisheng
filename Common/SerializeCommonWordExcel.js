@@ -710,6 +710,9 @@ function CellAddressUtils(){
 			col_num = 26 * col_num + (col_str.charCodeAt(i) - this._oCodeA + 1);
 		return col_num;
 	};
+	this.getCellId = function(row, col){
+		return g_oCellAddressUtils.colnumToColstr(col + 1) + (row + 1);
+	}
 	this.getCellAddress = function(sId)
 	{
 		var oRes = this.oCellAddressCache[sId];

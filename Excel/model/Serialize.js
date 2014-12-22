@@ -3112,104 +3112,104 @@
         this.WriteCell = function(cell, nXfsId)
         {
             var oThis = this;
-            if(null != cell.oId)
+            if(cell.nRow >= 0 && cell.nCol >= 0)
             {
-                this.memory.WriteByte(c_oSerCellTypes.Ref);
-                this.memory.WriteString2(cell.oId.getID());
-            }
-            if(null != nXfsId)
-            {
-                this.bs.WriteItem(c_oSerCellTypes.Style, function(){oThis.memory.WriteLong(nXfsId);});
-            }
-            var nCellType = cell.getType();
-            if(null != nCellType)
-            {
-                var nType = ECellTypeType.celltypeNumber;
-                switch(nCellType)
-                {
-                    case CellValueType.Bool: nType = ECellTypeType.celltypeBool; break;
-                    case CellValueType.Error: nType = ECellTypeType.celltypeError; break;
-                    case CellValueType.Number: nType = ECellTypeType.celltypeNumber; break;
-                    case CellValueType.String: nType = ECellTypeType.celltypeSharedString; break;
-                }
-                if(ECellTypeType.celltypeNumber != nType)
-                    this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
-            }
-            if(null != cell.sFormula)
-                this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.sFormula, cell.sFormulaCA);});
-            if(null != cell.oValue && false == cell.oValue.isEmpty())
-            {
-                var dValue = 0;
-                if(CellValueType.Error == nCellType || CellValueType.String == nCellType)
-                {
-                    var sText = "";
-                    var aText = null;
-                    if(null != cell.oValue.text)
-                        sText = cell.oValue.text;
-                    else if(null != cell.oValue.multiText)
-                    {
-                        aText = cell.oValue.multiText;
-                        for(var i = 0, length = cell.oValue.multiText.length; i < length; ++i)
-                            sText += cell.oValue.multiText[i].text;
-                    }
-                    var item = this.oSharedStrings.strings[sText];
-                    var bAddItem = false;
-                    if(null == item)
-                    {
-                        item = {t: null, a: []};
-                        bAddItem = true;
-                    }
-                    if(null == aText)
-                    {
-                        if(null == item.t)
-                        {
-                            dValue = this.oSharedStrings.index++;
-                            item.t = {id: dValue, val: sText};
-                        }
-                        else
-                            dValue = item.t.id;
-                    }
-                    else
-                    {
-                        var bFound = false;
-                        for(var i = 0, length = item.a.length; i < length; ++i)
-                        {
-                            var oCurItem = item.a[i];
-                            if(oCurItem.val.length == aText.length)
-                            {
-                                var bEqual = true;
-                                for(var j = 0, length2 = aText.length; j < length2; ++j)
-                                {
-                                    if(false == aText[j].isEqual(oCurItem.val[j]))
-                                    {
-                                        bEqual = false;
-                                        break;
-                                    }
-                                }
-                                if(bEqual)
-                                {
-                                    bFound = true;
-                                    dValue = oCurItem.id;
-                                    break;
-                                }
-                            }
-                        }
-                        if(false == bFound)
-                        {
-                            dValue = this.oSharedStrings.index++;
-                            item.a.push({id: dValue, val: aText});
-                        }
-                    }
-                    if(bAddItem)
-                        this.oSharedStrings.strings[sText] = item;
-                }
-                else
-                {
-                    if(null != cell.oValue.number)
-                        dValue = cell.oValue.number;
-                }
-                this.bs.WriteItem(c_oSerCellTypes.Value, function(){oThis.memory.WriteDouble2(dValue);});
-            }
+				this.bs.WriteItem(c_oSerCellTypes.RefRowCol, function(){oThis.memory.WriteLong(cell.nRow);oThis.memory.WriteLong(cell.nCol);});
+				
+				if(null != nXfsId)
+				{
+					this.bs.WriteItem(c_oSerCellTypes.Style, function(){oThis.memory.WriteLong(nXfsId);});
+				}
+				var nCellType = cell.getType();
+				if(null != nCellType)
+				{
+					var nType = ECellTypeType.celltypeNumber;
+					switch(nCellType)
+					{
+						case CellValueType.Bool: nType = ECellTypeType.celltypeBool; break;
+						case CellValueType.Error: nType = ECellTypeType.celltypeError; break;
+						case CellValueType.Number: nType = ECellTypeType.celltypeNumber; break;
+						case CellValueType.String: nType = ECellTypeType.celltypeSharedString; break;
+					}
+					if(ECellTypeType.celltypeNumber != nType)
+						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
+				}
+				if(null != cell.sFormula)
+					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.sFormula, cell.sFormulaCA);});
+				if(null != cell.oValue && false == cell.oValue.isEmpty())
+				{
+					var dValue = 0;
+					if(CellValueType.Error == nCellType || CellValueType.String == nCellType)
+					{
+						var sText = "";
+						var aText = null;
+						if(null != cell.oValue.text)
+							sText = cell.oValue.text;
+						else if(null != cell.oValue.multiText)
+						{
+							aText = cell.oValue.multiText;
+							for(var i = 0, length = cell.oValue.multiText.length; i < length; ++i)
+								sText += cell.oValue.multiText[i].text;
+						}
+						var item = this.oSharedStrings.strings[sText];
+						var bAddItem = false;
+						if(null == item)
+						{
+							item = {t: null, a: []};
+							bAddItem = true;
+						}
+						if(null == aText)
+						{
+							if(null == item.t)
+							{
+								dValue = this.oSharedStrings.index++;
+								item.t = {id: dValue, val: sText};
+							}
+							else
+								dValue = item.t.id;
+						}
+						else
+						{
+							var bFound = false;
+							for(var i = 0, length = item.a.length; i < length; ++i)
+							{
+								var oCurItem = item.a[i];
+								if(oCurItem.val.length == aText.length)
+								{
+									var bEqual = true;
+									for(var j = 0, length2 = aText.length; j < length2; ++j)
+									{
+										if(false == aText[j].isEqual(oCurItem.val[j]))
+										{
+											bEqual = false;
+											break;
+										}
+									}
+									if(bEqual)
+									{
+										bFound = true;
+										dValue = oCurItem.id;
+										break;
+									}
+								}
+							}
+							if(false == bFound)
+							{
+								dValue = this.oSharedStrings.index++;
+								item.a.push({id: dValue, val: aText});
+							}
+						}
+						if(bAddItem)
+							this.oSharedStrings.strings[sText] = item;
+					}
+					else
+					{
+						if(null != cell.oValue.number)
+							dValue = cell.oValue.number;
+					}
+					this.bs.WriteItem(c_oSerCellTypes.Value, function(){oThis.memory.WriteDouble2(dValue);});
+				}
+			}
         };
         this.WriteFormula = function(sFormula, sFormulaCA)
         {
@@ -5653,10 +5653,10 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCell(t,l, ws, oNewCell);
                 });
-                if(null != oNewCell.oId)
+                if(oNewCell.nRow >= 0 && oNewCell.nCol >= 0)
                 {
                     //вычисляем nColsCount
-                    var nCellCol = oNewCell.oId.getCol0();
+                    var nCellCol = oNewCell.nCol;
                     if(nCellCol + 1 > ws.nColsCount)
                         ws.nColsCount = nCellCol + 1;
                     if(null != oNewCell.oValue.number && (CellValueType.String == oNewCell.oValue.type || CellValueType.Error == oNewCell.oValue.type))
@@ -5680,10 +5680,15 @@
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerCellTypes.Ref == type )
-                oCell.oId = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
-            else if ( c_oSerCellTypes.RefRowCol == type )
-                oCell.oId = new CellAddress(this.stream.GetULongLE(), this.stream.GetULongLE(), 0); //  Ускорение открытия
+            if ( c_oSerCellTypes.Ref == type ){
+				var oCellAddress = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
+				oCell.nRow = oCellAddress.getRow0();
+				oCell.nCol = oCellAddress.getCol0();
+			}
+            else if ( c_oSerCellTypes.RefRowCol == type ){
+				oCell.nRow = this.stream.GetULongLE();
+				oCell.nCol = this.stream.GetULongLE();
+			}
             else if( c_oSerCellTypes.Style == type )
             {
                 var nStyleIndex = this.stream.GetULongLE();

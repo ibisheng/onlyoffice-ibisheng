@@ -3128,9 +3128,7 @@ CCellValue.prototype =
 				//для посещенных гиперссылок
 				if(g_nColorHyperlink == color.theme && null == color.tint)
 				{
-					var nRow = this.cell.oId.getRow0();
-					var nCol = this.cell.oId.getCol0();
-					var hyperlink = this.cell.ws.hyperlinkManager.getByCell(nRow, nCol);
+					var hyperlink = this.cell.ws.hyperlinkManager.getByCell(this.cell.nRow, this.cell.nCol);
 					if(null != hyperlink && hyperlink.data.getVisited())
 					{
 						oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
@@ -3158,9 +3156,7 @@ CCellValue.prototype =
 						//для посещенных гиперссылок
 						if(g_nColorHyperlink == color.theme && null == color.tint)
 						{
-							var nRow = this.cell.oId.getRow0();
-							var nCol = this.cell.oId.getCol0();
-							var hyperlink = this.cell.ws.hyperlinkManager.getByCell(nRow, nCol);
+							var hyperlink = this.cell.ws.hyperlinkManager.getByCell(this.cell.nRow, this.cell.nCol);
 							if(null != hyperlink && hyperlink.data.getVisited())
 							{
 								oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
@@ -3246,7 +3242,7 @@ CCellValue.prototype =
 			if(0 != val.indexOf("http://") && 0 != val.indexOf("https://"))
 				sRealUrl = "http://" + sRealUrl;
 			var oNewHyperlink = new Hyperlink();
-			oNewHyperlink.Ref = this.cell.ws.getCell3(this.cell.oId.getRow0(), this.cell.oId.getCol0());
+			oNewHyperlink.Ref = this.cell.ws.getCell3(this.cell.nRow, this.cell.nCol);
 			oNewHyperlink.Hyperlink = sRealUrl;
 			oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
 		}
@@ -3257,8 +3253,8 @@ CCellValue.prototype =
 		for(var i = 0, length = aVal.length; i < length; ++i)
 			sSimpleText += aVal[i].text;
 		this.setValue(sSimpleText);
-		var nRow = this.cell.oId.getRow0();
-		var nCol = this.cell.oId.getCol0();
+		var nRow = this.cell.nRow;
+		var nCol = this.cell.nCol;
 		if(CellValueType.String == this.type && null == this.cell.ws.hyperlinkManager.getByCell(nRow, nCol))
 		{
 			this.clean();
@@ -3325,7 +3321,7 @@ CCellValue.prototype =
 			bSetCellFont = true;
 		if(null != this.multiText && this.multiText.length > 0)
 		{
-		    var range = this.cell.ws.getCell3(this.cell.oId.getRow0(), this.cell.oId.getCol0());
+		    var range = this.cell.ws.getCell3(this.cell.nRow, this.cell.nCol);
 		    var cellFont = range.getFont();
 		    var oIntersectFont;
 		    for (var i = 0, length = this.multiText.length; i < length; i++) {
@@ -3396,12 +3392,12 @@ CCellValue.prototype =
 				if(this.miminizeMultiText(false))
 				{
 					var DataNew = cell.getValueData();
-					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0()), new UndoRedoData_CellSimpleData(cell.oId.getRow0(),cell.oId.getCol0(), backupObj, DataNew));
+					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
 				}
 				else
 				{
 					var DataNew = this._cloneMultiText();
-					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0()), new UndoRedoData_CellSimpleData(cell.oId.getRow0(), cell.oId.getCol0(), backupObj.value.multiText, DataNew));
+					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow, cell.nCol, backupObj.value.multiText, DataNew));
 				}
 			}
 			bRes = true;
