@@ -754,7 +754,7 @@ CShape.prototype.getIsSingleBody = function(x, y)
         for(var i = 0; i < sp_tree.length; ++i)
         {
             if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
-                return true;
+                return false;
         }
     }
     return true;
