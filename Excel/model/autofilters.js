@@ -335,6 +335,8 @@ var gUndoInsDelCellsFlag = true;
 						
 						if(isTurnOffHistory)
 							History.TurnOff();
+							
+						History.StartTransaction();
 						History.Create_NewPoint();
 						if(selectionTable)
 						{
@@ -346,7 +348,6 @@ var gUndoInsDelCellsFlag = true;
 								History.SetSelectionRedo(oSelection);
 							}
 						}
-						History.StartTransaction();
 						
 						if(rangeShift && rangeShift.r1 != undefined)
 							rangeShift = ws.model.getRange3(rangeShift.r1, rangeShift.c1, rangeShift.r1, rangeShift.c2);
