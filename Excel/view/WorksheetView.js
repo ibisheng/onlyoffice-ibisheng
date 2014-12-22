@@ -6756,15 +6756,14 @@
 		};
 
 		WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isSelectMode) {
-		
-			var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1]: this.activeRange;
-			var sc = ar.startCol, sr = ar.startRow, ret = {};
+			var ar = ((this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange).clone();
+			var ret = {};
 			var isChangeSelectionShape = false;
 
 			this.cleanSelection();
 
 			var commentList = this.cellCommentator.getCommentsXY(x, y);
-			if ( !commentList.length ) {
+			if (!commentList.length) {
 				this.model.workbook.handlers.trigger("asc_onHideComment");
 				this.cellCommentator.resetLastSelectedId();
 			}
@@ -6773,30 +6772,31 @@
 				// move active range to coordinates x,y
 				this._moveActiveCellToXY(x, y);
 				isChangeSelectionShape = this._checkSelectionShape();
-			}
-			else {
+			} else {
 				// move active range to offset x,y
 				this._moveActiveCellToOffset(x, y);
 				ret = this._calcActiveRangeOffset();
 			}
 
-
-			if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow || isChangeSelectionShape)) {
-				if (!this.isSelectionDialogMode) {
+			if (this.isSelectionDialogMode) {
+				if (!this.activeRange.isEqual(ar)) {
+					// Смена диапазона
+					this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
+				}
+			} else if (!this.isCellEditMode) {
+				if (isChangeSelectionShape || (!isCoord && !this.activeRange.isEqual(ar)) ||
+					(isCoord && (this.activeRange.startCol !== ar.startCol || this.activeRange.startRow !== ar.startRow))) {
 					this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					if (!isSelectMode) {
 						this.handlers.trigger("selectionChanged", this.getSelectionInfo());
 						this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 					}
-				} else {
-					// Смена диапазона
-					this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
 				}
 			}
 
-			if ( !isChangeSelectionShape )
+			if (!isChangeSelectionShape)
 				this._drawSelection();
-			
+
 			//ToDo this.drawDepCells();
 
 			return ret;
