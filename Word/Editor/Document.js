@@ -9823,7 +9823,10 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
         {
-            this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
+            if (true === this.History.Have_Changes())
+            {
+                this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
+            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
