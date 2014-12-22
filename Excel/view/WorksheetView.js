@@ -1324,12 +1324,12 @@
 				if (!row) {
 					h = -1; // Будет использоваться дефолтная высота строки
 					isCustomHeight = false;
-				} else if (row.hd) {
+				} else if (0 != (g_nRowFlag_hd & row.flags)) {
 					hR = h = 0;  // Скрытая строка, высоту выставляем 0
 					isCustomHeight = true;
 					hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
 				} else {
-					isCustomHeight = !!row.CustomHeight;
+					isCustomHeight = 0 != (g_nRowFlag_CustomHeight & row.flags);
 					// Берем высоту из модели, если она custom(баг 15618), либо дефолтную
 					if (row.h > 0 && isCustomHeight) {
 						hR = row.h;

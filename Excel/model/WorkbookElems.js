@@ -2394,6 +2394,9 @@ Col.prototype =
             History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	}
 };
+var g_nRowFlag_empty = 0;
+var g_nRowFlag_hd = 1;
+var g_nRowFlag_CustomHeight = 2;
 /**
  * @constructor
  */
@@ -2404,8 +2407,7 @@ function Row(worksheet)
 	this.index = null;
     this.xfs = null;
     this.h = null;
-    this.hd = null;
-    this.CustomHeight = null;
+	this.flags = g_nRowFlag_empty;
 }
 Row.prototype =
 {
@@ -2437,7 +2439,7 @@ Row.prototype =
 	},
 	isEmptyProp : function()
 	{
-		return null == this.xfs && null == this.h && null == this.hd && null == this.CustomHeight;
+		return null == this.xfs && null == this.h && g_nRowFlag_empty == this.flags;
 	},
 	Remove : function()
 	{
@@ -2449,14 +2451,11 @@ Row.prototype =
             oNewWs = this.ws;
         var oNewRow = new Row(oNewWs);
 		oNewRow.index = this.index;
+		oNewRow.flags = this.flags;
 		if(null != this.xfs)
 			oNewRow.xfs = this.xfs.clone();
 		if(null != this.h)
 			oNewRow.h = this.h;
-		if(null != this.CustomHeight)
-			oNewRow.CustomHeight = this.CustomHeight;
-		if(null != this.hd)
-			oNewRow.hd = this.hd;
 		for(var i in this.c)
 			oNewRow.c[i] = this.c[i].clone(oNewWs);
 		return oNewRow;
@@ -2480,14 +2479,14 @@ Row.prototype =
 				this.h = prop.h;
 			else
 				this.h = null;
-			if(null != prop.hd)
-				this.hd = prop.hd;
+			if(true == prop.hd)
+				this.flags |= g_nRowFlag_hd;
 			else
-				this.hd = null;
-			if(null != prop.CustomHeight)
-				this.CustomHeight = prop.CustomHeight;
+				this.flags &= ~g_nRowFlag_hd;
+			if(true == prop.CustomHeight)
+				this.flags |= g_nRowFlag_CustomHeight;
 			else
-				this.CustomHeight = null;
+				this.flags &= ~g_nRowFlag_CustomHeight;
 		}
 	},
 	copyProperty : function(otherRow)
@@ -2497,8 +2496,7 @@ Row.prototype =
 		else
 			this.xfs = null;
 		this.h = otherRow.h;
-		this.CustomHeight = otherRow.CustomHeight;
-		this.hd = otherRow.hd;
+		this.flags = otherRow.flags;
 	},
 	getStyle : function()
 	{

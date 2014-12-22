@@ -844,8 +844,8 @@ function UndoRedoData_RowProp(row){
 	if(null != row)
 	{
 		this.h = row.h;
-		this.hd = row.hd;
-		this.CustomHeight = row.CustomHeight;
+		this.hd = 0 != (g_nRowFlag_hd & row.flags);
+		this.CustomHeight = 0 != (g_nRowFlag_CustomHeight & row.flags);
 	}
 	else
 	{

@@ -2591,17 +2591,17 @@
                     this.memory.WriteByte(c_oSerPropLenType.Double);
                     this.memory.WriteDouble2(oAllRow.h);
                 }
-                if(oAllRow.CustomHeight)
+                if(0 != (g_nRowFlag_CustomHeight & oAllRow.flags))
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.CustomHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
-                    this.memory.WriteBool(oAllRow.CustomHeight);
+                    this.memory.WriteBool(true);
                 }
-                if(oAllRow.hd)
+                if(0 != (g_nRowFlag_hd & oAllRow.flags))
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.ZeroHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
-                    this.memory.WriteBool(oAllRow.hd);
+                    this.memory.WriteBool(true);
                 }
             }
         };
@@ -2931,17 +2931,17 @@
                 this.memory.WriteByte(c_oSerPropLenType.Double);
                 this.memory.WriteDouble2(oRow.h);
             }
-            if(null != oRow.CustomHeight)
+            if(0 != (g_nRowFlag_CustomHeight & oRow.flags))
             {
                 this.memory.WriteByte(c_oSerRowTypes.CustomHeight);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(oRow.CustomHeight);
+                this.memory.WriteBool(true);
             }
-            if(null != oRow.hd)
+            if(0 != (g_nRowFlag_hd & oRow.flags))
             {
                 this.memory.WriteByte(c_oSerRowTypes.Hidden);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(oRow.hd);
+                this.memory.WriteBool(true);
             }
 
             this.memory.WriteByte(c_oSerRowTypes.Cells);
@@ -5486,12 +5486,16 @@
             else if ( c_oSerSheetFormatPrTypes.CustomHeight == type )
             {
                 var oAllRow = oWorksheet.getAllRow();
-                oAllRow.CustomHeight = this.stream.GetBool();
+				var CustomHeight = this.stream.GetBool();
+				if(CustomHeight)
+					oAllRow.flags |= g_nRowFlag_CustomHeight;
             }
             else if ( c_oSerSheetFormatPrTypes.ZeroHeight == type )
             {
                 var oAllRow = oWorksheet.getAllRow();
-                oAllRow.hd = this.stream.GetBool();
+				var hd = this.stream.GetBool();
+				if(hd)
+					oAllRow.flags |= g_nRowFlag_hd;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -5628,12 +5632,20 @@
             {
                 oRow.h = this.stream.GetDoubleLE();
                 if(g_nCurFileVersion < 2)
-                    oRow.CustomHeight = true;
+                    oRow.flags |= g_nRowFlag_CustomHeight;
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
-                oRow.CustomHeight = this.stream.GetBool();
+			{
+				var CustomHeight = this.stream.GetBool();
+				if(CustomHeight)
+					oRow.flags |= g_nRowFlag_CustomHeight;
+			}
             else if ( c_oSerRowTypes.Hidden == type )
-                oRow.hd = this.stream.GetBool();
+			{
+				var hd = this.stream.GetBool();
+				if(hd)
+					oRow.flags |= g_nRowFlag_hd;
+			}
             else if ( c_oSerRowTypes.Cells == type )
             {
                 res = this.bcr.Read1(length, function(t,l){
