@@ -2690,6 +2690,7 @@ CPresentation.prototype =
             if(drawing_props.shapeProps)
             {
                 editor.sync_shapePropCallback(drawing_props.shapeProps);
+                editor.sync_VerticalTextAlign(drawing_props.shapeProps.verticalTextAlign);
             }
 
             if(drawing_props.chartProps && drawing_props.chartProps.chartProps)
