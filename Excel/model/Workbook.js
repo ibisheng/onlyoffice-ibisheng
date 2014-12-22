@@ -2226,75 +2226,66 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }
 };
-Woorksheet.prototype.init=function(){
+Woorksheet.prototype.init=function(aFormulaExt){
 	this.workbook.cwf[this.Id]={ cells:{} };
-	var formulaShared = {};
-	for(var rowid in this.aGCells)
-	{
-		var row = this.aGCells[rowid];
-		for(var cellid in row.c)
-		{
-			var oCell = row.c[cellid];
+	if(aFormulaExt){
+		var formulaShared = {};
+		for(var i = 0; i < aFormulaExt.length; ++i){
+			var elem = aFormulaExt[i];
+			var oCell = elem.cell;
 			var sCellId = g_oCellAddressUtils.getCellId(oCell.nRow, oCell.nCol);
-			/*
-				Проверяем содержит ли ячейка атрибуты f.t и f.si, если содержит, то у указанного диапазона, атрибут f.ref, достраиваем формулы.
-			*/
-			if(null != oCell.oFormulaExt)
-			{
-			    if (oCell.oFormulaExt.t == Asc.ECellFormulaType.cellformulatypeShared) {
-					if(null != oCell.oFormulaExt.si){
-						if(null != oCell.oFormulaExt.ref){
-							formulaShared[oCell.oFormulaExt.si] = 	{
-																		fVal:new parserFormula(oCell.oFormulaExt.v,"",this),
-																		fRef:function(t){
-																				var r = t.getRange2(oCell.oFormulaExt.ref);
-																				return {
-																							c:r,
-																							first:r.first
-																						};
-																			}(this)
-																	}
-								formulaShared[oCell.oFormulaExt.si].fVal.parse();
-						}
-						else{
-							if( formulaShared[oCell.oFormulaExt.si] ){
-								var fr = formulaShared[oCell.oFormulaExt.si].fRef;
-								if( fr.c.containCell2(oCell) ){
-									if( formulaShared[oCell.oFormulaExt.si].fVal.isParsed ){
-										var off = oCell.getOffset3(fr.first);
-										formulaShared[oCell.oFormulaExt.si].fVal.changeOffset(off);
-										oCell.oFormulaExt.v = formulaShared[oCell.oFormulaExt.si].fVal.assemble();
-										off.offsetCol *=-1;
-										off.offsetRow *=-1;
-										formulaShared[oCell.oFormulaExt.si].fVal.changeOffset(off);
-									}
-									this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
+			var oFormulaExt = elem.ext;
+			if (oFormulaExt.t == Asc.ECellFormulaType.cellformulatypeShared) {
+				if(null != oFormulaExt.si){
+					if(null != oFormulaExt.ref){
+						formulaShared[oFormulaExt.si] = 	{
+																	fVal:new parserFormula(oFormulaExt.v,"",this),
+																	fRef:function(t){
+																			var r = t.getRange2(oFormulaExt.ref);
+																			return {
+																						c:r,
+																						first:r.first
+																					};
+																		}(this)
+																}
+							formulaShared[oFormulaExt.si].fVal.parse();
+					}
+					else{
+						if( formulaShared[oFormulaExt.si] ){
+							var fr = formulaShared[oFormulaExt.si].fRef;
+							if( fr.c.containCell2(oCell) ){
+								if( formulaShared[oFormulaExt.si].fVal.isParsed ){
+									var off = oCell.getOffset3(fr.first);
+									formulaShared[oFormulaExt.si].fVal.changeOffset(off);
+									oFormulaExt.v = formulaShared[oFormulaExt.si].fVal.assemble();
+									off.offsetCol *=-1;
+									off.offsetRow *=-1;
+									formulaShared[oFormulaExt.si].fVal.changeOffset(off);
 								}
+								this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
 							}
 						}
 					}
 				}
-				if(oCell.oFormulaExt.v)
-					oCell.setFormula(oCell.oFormulaExt.v);
-					
-				if(oCell.oFormulaExt.ca)
-					oCell.sFormulaCA = true;
+			}
+			if(oFormulaExt.v)
+				oCell.setFormula(oFormulaExt.v);
 				
-				/*
-					Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами.
-				*/
-				if(oCell.sFormula){
-					this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
-				}
-				/*
-					Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
-				*/
-				if(oCell.sFormula && (oCell.oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat()) ){
-					this.workbook.needRecalc.nodes[ getVertexId( this.Id, sCellId ) ] = [this.Id, sCellId];
-					this.workbook.needRecalc.length++;
-				}
-				//в редакторе не работаем с расширенными формулами
-				oCell.oFormulaExt = null;
+			if(oFormulaExt.ca)
+				oCell.sFormulaCA = true;
+			
+			/*
+				Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами.
+			*/
+			if(oCell.sFormula){
+				this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
+			}
+			/*
+				Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
+			*/
+			if(oCell.sFormula && (oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat()) ){
+				this.workbook.needRecalc.nodes[ getVertexId( this.Id, sCellId ) ] = [this.Id, sCellId];
+				this.workbook.needRecalc.length++;
 			}
 		}
 	}
@@ -4048,7 +4039,6 @@ function Cell(worksheet){
 	this.compiledXfs = null;
 	this.nRow = -1;
 	this.nCol = -1;
-	this.oFormulaExt = null;
 	this.sFormula = null;
 	this.sFormulaCA = null;
 	this.formulaParsed = null;
@@ -4602,11 +4592,11 @@ Cell.prototype.getOffset=function(cell){
 };
 Cell.prototype.getOffset2=function(cellId){
 	var cAddr2 = new CellAddress(cellId);
-	return {offsetCol:(this.nCol - cAddr2.col), offsetRow:(this.nRow - cAddr2.row)};
+	return {offsetCol:(this.nCol - cAddr2.col + 1), offsetRow:(this.nRow - cAddr2.row + 1)};
 };
 Cell.prototype.getOffset3=function(cellAddr){
 	var cAddr2 = cellAddr;
-	return {offsetCol:(this.nCol - cAddr2.col), offsetRow:(this.nRow - cAddr2.row)};
+	return {offsetCol:(this.nCol - cAddr2.col + 1), offsetRow:(this.nRow - cAddr2.row + 1)};
 };
 Cell.prototype.getValueData = function(){
 	return new UndoRedoData_CellValueData(this.sFormula, this.oValue.clone(null));
