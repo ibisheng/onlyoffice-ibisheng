@@ -22,6 +22,109 @@ CChartSpace.prototype.recalculateTransform = function()
     CShape.prototype.recalculateTransform.call(this);
     this.localTransform.Reset();
 };
+
+
+CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
+{
+    if(this.chart && this.chart.plotArea)
+    {
+        var plot_area = this.chart.plotArea;
+        var default_brush;
+        var tint = 0.20000;
+        if(this.style >=1 && this.style <=32)
+        {
+            if(this.bPreview)
+            {
+                default_brush = CreateUnifillSolidFillSchemeColor(6, tint);
+            }
+            else
+            {
+                default_brush = CreateNoFillUniFill();
+            }
+        }
+        else if(this.style >=33 && this.style <= 34)
+            default_brush = CreateUnifillSolidFillSchemeColor(8, 0.20000);
+        else if(this.style >=35 && this.style <=40)
+            default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0 + tint);
+        else
+            default_brush = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+
+        if(plot_area.spPr && plot_area.spPr.Fill)
+        {
+            default_brush.merge(plot_area.spPr.Fill);
+        }
+        var parents = this.getParentObjects();
+        default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+        plot_area.brush = default_brush;
+    }
+};
+
+
+CChartSpace.prototype.recalculateChartBrush = function()
+{
+    var default_brush;
+    if(this.style >=1 && this.style <=32)
+    {
+
+        if(this.bPreview)
+        {
+            default_brush = CreateUnifillSolidFillSchemeColor(6, 0);
+        }
+        else
+        {
+            default_brush = CreateNoFillUniFill();
+        }
+    }
+    else if(this.style >=33 && this.style <= 40)
+        default_brush = CreateUnifillSolidFillSchemeColor(12, 0);
+    else
+        default_brush = CreateUnifillSolidFillSchemeColor(8, 0);
+
+    if(this.spPr && this.spPr.Fill)
+    {
+        default_brush.merge(this.spPr.Fill);
+    }
+    var parents = this.getParentObjects();
+    default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    this.brush = default_brush;
+
+};
+
+CChartSpace.prototype.recalculateChartPen = function()
+{
+    var parent_objects = this.getParentObjects();
+    var default_line = new CLn();
+    if(parent_objects.theme  && parent_objects.theme.themeElements
+        && parent_objects.theme.themeElements.fmtScheme
+        && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
+    {
+        default_line.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
+    }
+
+    var fill;
+    if(this.style >= 1 && this.style <= 32)
+    {
+        if(this.bPreview)
+        {
+            fill = CreateUnifillSolidFillSchemeColor(15, 0.75000);
+        }
+        else
+        {
+            fill = CreateNoFillUniFill();
+        }
+    }
+    else if(this.style >= 33 && this.style <= 40)
+        fill = CreateUnifillSolidFillSchemeColor(8, 0.75000);
+    else
+        fill = CreateUnifillSolidFillSchemeColor(12, 0);
+    default_line.setFill(fill);
+    if(this.spPr && this.spPr.ln)
+        default_line.merge(this.spPr.ln);
+    var parents = this.getParentObjects();
+    default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    this.pen = default_line;
+    checkBlackUnifill(this.pen.Fill, true);
+};
 CChartSpace.prototype.recalcText = function()
 {
     this.recalcInfo.recalculateAxisLabels = true;

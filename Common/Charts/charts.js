@@ -227,7 +227,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		settings.type = type;
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
 		var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
-
+        chart_space.bPreview = true;
 		if(window["Asc"]["editor"])
 		{
 			var api_sheet = window["Asc"]["editor"];
