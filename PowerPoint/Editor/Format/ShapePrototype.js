@@ -343,6 +343,9 @@ CShape.prototype.handleUpdateGeometry = function()
 {
     this.recalcGeometry();
     this.recalcBounds();
+    this.recalcContent();
+    this.recalcContent2();
+    this.recalcTransformText();
     this.addToRecalculate();
 };
 CShape.prototype.convertPixToMM = function(pix)
