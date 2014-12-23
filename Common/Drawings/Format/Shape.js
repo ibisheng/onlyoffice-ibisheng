@@ -883,7 +883,7 @@ CShape.prototype =
                     var hierarchy = this.getHierarchy();
                     for (var i = 0; i < hierarchy.length; ++i) {
                         if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
-                            this.compiledTransparent = this.spPr.Fill.transparent;
+                            this.compiledTransparent = hierarchy[i].spPr.Fill.transparent;
                             break;
                         }
 
@@ -894,7 +894,7 @@ CShape.prototype =
                 var hierarchy = this.getHierarchy();
                 for (var i = 0; i < hierarchy.length; ++i) {
                     if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
-                        this.compiledTransparent = this.spPr.Fill.transparent;
+                        this.compiledTransparent = hierarchy[i].spPr.Fill.transparent;
                         break;
                     }
 

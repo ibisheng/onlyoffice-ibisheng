@@ -70,6 +70,7 @@ function asc_docs_api(name)
     this.isPageBreakBefore = false;
     this.isKeepLinesTogether = false;
     this.isPresentationEditor = true;
+    this.bAlignBySelected     = true;
 
     this.isMobileVersion = false;
     this.isPaintFormat = false;
@@ -1785,6 +1786,11 @@ asc_docs_api.prototype.FontSizeOut = function()
 {
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
     this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(false);
+}
+
+asc_docs_api.prototype.put_AlignBySelect = function(val)
+{
+    this.bAlignBySelected = val;
 }
 
 /*callbacks*/
