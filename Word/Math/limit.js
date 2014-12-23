@@ -218,7 +218,11 @@ CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 };
 CMathFunc.prototype.GetLastElement = function()
 {
-    return this.Content[1].GetLastElement();
+    return this.Content[1].GetFirstElement();
+};
+CMathFunc.prototype.GetFirstElement = function()
+{
+    return this.Content[0].GetFirstElement();
 };
 CMathFunc.prototype.setDistance = function()
 {

@@ -1431,6 +1431,10 @@ CMathBase.prototype.GetLastElement = function()
 {
     return this;
 };
+CMathBase.prototype.GetFirstElement = function()
+{
+    return this;
+};
 
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;

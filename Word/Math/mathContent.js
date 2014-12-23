@@ -1848,6 +1848,20 @@ CMathContent.prototype =
 
         return last;
     },
+    GetFirstElement: function()
+    {
+        var pos = 0;
+
+        while(this.Content[pos].Type == para_Math_Run && this.Content[pos].Is_Empty() && pos < this.Content.length - 1)
+        {
+            pos++;
+        }
+
+        var first = this.Content[pos].Type == para_Math_Run ? this.Content[pos] : this.Content[pos].GetFirstElement();
+
+        return first;
+    },
+
 
     ////////////////////////////////////////////////////////////////
 

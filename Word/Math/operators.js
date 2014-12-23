@@ -3772,6 +3772,23 @@ CDelimiter.prototype.GetLastElement = function()
 
     return Result;
 };
+CDelimiter.prototype.GetFirstElement = function()
+{
+    var Result;
+
+    var IsStrartOper = this.begOper.typeOper !== OPERATOR_EMPTY;
+    var growLast  = IsStrartOper && this.Pr.grow == true && this.TextInContent,
+        smallLast = IsStrartOper && this.Pr.grow == false;
+
+    if(growLast || smallLast || this.begOper.typeOper == OPERATOR_TEXT)
+    {
+        Result = this.begOper;
+    }
+    else
+        Result = this;
+
+    return Result;
+};
 
 
 function CCharacter()
