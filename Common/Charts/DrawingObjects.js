@@ -2715,6 +2715,7 @@ function DrawingObjects() {
                     _this.showDrawingObjects(false);
                     _this.controller.resetSelection();
                     _this.controller.selectObject(oNewChartSpace, 0);
+                    _this.controller.updateSelectionState();
                     _this.sendGraphicObjectProps();
                     History.TurnOn();
                     if(aImagesSync.length > 0)
