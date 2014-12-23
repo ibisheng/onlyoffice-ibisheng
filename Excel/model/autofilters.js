@@ -337,8 +337,8 @@ var gUndoInsDelCellsFlag = true;
 						if(isTurnOffHistory)
 							History.TurnOff();
 							
-						History.StartTransaction();
 						History.Create_NewPoint();
+						History.StartTransaction();
 						if(selectionTable)
 						{
 							var oSelection = History.GetSelection();
