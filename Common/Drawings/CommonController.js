@@ -4465,6 +4465,12 @@ DrawingObjectsController.prototype =
                     //}
                     //this.document.Recalculate();
                 }
+                else if(this.drawingObjects.cSld)
+                {
+                    chart_selection.recalculate();
+                    editor.WordControl.m_oDrawingDocument.OnRecalculatePage( this.drawingObjects.num, this.drawingObjects );
+                    editor.WordControl.m_oDrawingDocument.OnEndRecalculate( false, true );
+                }
                 else
                 {
                     chart_selection.addToRecalculate();
@@ -5768,7 +5774,7 @@ DrawingObjectsController.prototype =
 
 
 
-    alignLeft : function()
+    alignLeft : function(bSelected)
     {
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0; i < selected_objects.length; ++i)
@@ -5778,7 +5784,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    alignRight : function()
+    alignRight : function(bSelected)
     {
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0; i < selected_objects.length; ++i)
@@ -5789,7 +5795,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    alignTop : function()
+    alignTop : function(bSelected)
     {
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0; i < selected_objects.length; ++i)
@@ -5800,7 +5806,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    alignBottom : function()
+    alignBottom : function(bSelected)
     {
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0; i < selected_objects.length; ++i)
@@ -5811,7 +5817,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    alignCenter : function()
+    alignCenter : function(bSelected)
     {
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0; i < selected_objects.length; ++i)
@@ -5821,7 +5827,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    alignMiddle : function()
+    alignMiddle : function(bSelected)
     {
         var selected_objects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
         for(var i = 0; i < selected_objects.length; ++i)
@@ -5831,11 +5837,11 @@ DrawingObjectsController.prototype =
         }
     },
 
-    distributeHor : function()
+    distributeHor : function(bSelected)
     {
        this.alignMiddle();
     },
-    distributeVer : function()
+    distributeVer : function(bSelected)
     {
         this.alignCenter();
     },
