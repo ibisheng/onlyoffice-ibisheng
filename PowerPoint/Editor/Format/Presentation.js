@@ -272,6 +272,7 @@ function CPresentation(DrawingDocument)
 
     this.DefaultTableStyleId = null;
     this.TableStylesIdMap = {};
+    this.bNeedUpdateChartPreview = false;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -391,6 +392,7 @@ CPresentation.prototype =
                     recalcMap.layouts[key].recalculate();
                 }
             }
+            this.bNeedUpdateChartPreview = true;
             if(_RecalcData.Drawings.ThemeInfo)
             {
                 this.clearThemeTimeouts();
@@ -2698,8 +2700,15 @@ CPresentation.prototype =
 
             if(drawing_props.chartProps && drawing_props.chartProps.chartProps)
             {
+                if(this.bNeedUpdateChartPreview)
+                {
+                    editor.chartPreviewManager.clearPreviews();
+                    editor.asc_fireCallback("asc_onUpdateChartStyles");
+                    this.bNeedUpdateChartPreview = false;
+                }
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
             }
+
 
             if(drawing_props.tableProps)
             {
