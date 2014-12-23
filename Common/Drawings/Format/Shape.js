@@ -3026,11 +3026,21 @@ CShape.prototype =
     },
 
     getFill: function () {
-        return this.brush;
+        if(this.brush && this.brush.fill)
+        {
+            return this.brush;
+        }
+        return CreateNoFillUniFill();
     },
 
     getStroke: function () {
-        return this.pen;
+        if(this.pen && this.pen.Fill)
+        {
+            return this.pen;
+        }
+        var ret = CreateNoFillLine();
+        ret.w = 0;
+        return ret;
     },
 
     canChangeArrows: function () {
