@@ -264,6 +264,9 @@
 		 * @param [event] {MouseEvent}
 		 */
 		asc_CEventsController.prototype.scrollVertical = function (delta, event) {
+			if (window["NATIVE_EDITOR_ENJINE"])
+				return;
+
 			if (event && event.preventDefault)
 				event.preventDefault();
 			this.vsbApi.scrollByY(this.settings.vscrollStep * delta);
@@ -275,6 +278,9 @@
 		 * @param [event] {MouseEvent}
 		 */
 		asc_CEventsController.prototype.scrollHorizontal = function (delta, event) {
+			if (window["NATIVE_EDITOR_ENJINE"])
+				return;
+
 			if (event && event.preventDefault)
 				event.preventDefault();
 			this.hsbApi.scrollByX(this.settings.hscrollStep * delta);
