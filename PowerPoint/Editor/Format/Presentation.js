@@ -2673,10 +2673,10 @@ CPresentation.prototype =
             {
                 text_pr.FontFamily.Name = theme.themeElements.fontScheme.checkFont(text_pr.FontFamily.Name);
             }
+            editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
             if(!target_content)
             {
                //editor.UpdateParagraphProp( para_pr, flag );
-                editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
                 //if(selected_objects.length === 1 )
                 //{
                 //    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
