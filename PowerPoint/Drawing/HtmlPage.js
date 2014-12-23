@@ -3207,10 +3207,15 @@ function CEditorPage(api)
 
     this.CheckLayouts = function(bIsAttack)
     {
-        if (-1 == this.m_oDrawingDocument.SlideCurrent)
+        var master = null;
+        if (-1 == this.m_oDrawingDocument.SlideCurrent && 0 == this.m_oLogicDocument.slideMasters.length)
             return;
 
-        var master = this.m_oLogicDocument.Slides[this.m_oDrawingDocument.SlideCurrent].Layout.Master;
+        if (-1 != this.m_oDrawingDocument.SlideCurrent)
+            master = this.m_oLogicDocument.Slides[this.m_oDrawingDocument.SlideCurrent].Layout.Master;
+        else
+            master = this.m_oLogicDocument.slideMasters[0];
+
         if (this.MasterLayouts != master || Math.abs(this.m_oLayoutDrawer.WidthMM - this.m_oLogicDocument.Width) > MOVE_DELTA || Math.abs(this.m_oLayoutDrawer.HeightMM - this.m_oLogicDocument.Height) > MOVE_DELTA || bIsAttack === true)
         {
             this.MasterLayouts = master;

@@ -216,6 +216,10 @@ function check_MouseUpEvent(e)
     global_mouseEvent.ShiftKey = e.shiftKey;
     global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
 
+    global_keyboardEvent.AltKey     = global_mouseEvent.AltKey;
+    global_keyboardEvent.CtrlKey    = global_mouseEvent.ShiftKey;
+    global_keyboardEvent.ShiftKey   = global_mouseEvent.CtrlKey;
+
     global_mouseEvent.Type = g_mouse_event_type_up;
     global_mouseEvent.Button = e.button;
 
@@ -261,6 +265,10 @@ function check_MouseDownEvent(e, isClicks)
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
     global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
+
+    global_keyboardEvent.AltKey     = global_mouseEvent.AltKey;
+    global_keyboardEvent.CtrlKey    = global_mouseEvent.ShiftKey;
+    global_keyboardEvent.ShiftKey   = global_mouseEvent.CtrlKey;
 
     global_mouseEvent.Type = g_mouse_event_type_down;
     global_mouseEvent.Button = e.button;

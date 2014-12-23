@@ -2599,15 +2599,30 @@ function CDrawingDocument()
 
     this.CheckGuiControlColors = function(bIsAttack)
     {
+        var _slide = null;
+        var _layout = null;
+        var _master = null;
+
         // потом реализовать проверку на то, что нужно ли посылать
-        if (-1 == this.SlideCurrent)
+        if (-1 != this.SlideCurrent)
+        {
+            _slide = this.m_oWordControl.m_oLogicDocument.Slides[this.SlideCurrent];
+            _layout = _slide.Layout;
+            _master = _layout.Master;
+        }
+        else if ((0 < this.m_oWordControl.m_oLogicDocument.slideMasters.length) &&
+                 (0 < this.m_oWordControl.m_oLogicDocument.slideMasters[0].sldLayoutLst.length))
+        {
+            _layout = this.m_oWordControl.m_oLogicDocument.slideMasters[0].sldLayoutLst[0];
+            _master = this.m_oWordControl.m_oLogicDocument.slideMasters[0];
+        }
+        else
+        {
             return;
+        }
 
         var arr_colors = new Array(10);
 
-        var _slide = this.m_oWordControl.m_oLogicDocument.Slides[this.SlideCurrent];
-        var _layout = _slide.Layout;
-        var _master = _layout.Master;
         var _theme = _master.Theme;
         var rgba = {R:0, G:0, B:0, A:255};
         // bg1,tx1,bg2,tx2,accent1 - accent6
@@ -4646,7 +4661,7 @@ function CThumbnailsManager()
 						_presentation.Recalculate();
 						_presentation.Document_UpdateInterfaceState();
 					}
-					return false;
+					//return false;
                 }
                 else if(global_keyboardEvent.CtrlKey)
                 {
@@ -4697,6 +4712,13 @@ function CThumbnailsManager()
                     if (drDoc.SlideCurrent < (slidesCount - 1))
                     {
                         this.m_oWordControl.GoToPage(drDoc.SlideCurrent + 1);
+                    }
+                }
+                else if (global_keyboardEvent.CtrlKey)
+                {
+                    if (drDoc.SlidesCount > 0)
+                    {
+                        this.m_oWordControl.GoToPage(drDoc.SlidesCount - 1);
                     }
                 }
                 else
@@ -4884,7 +4906,7 @@ function CThumbnailsManager()
 						_presentation.Recalculate();
 						_presentation.Document_UpdateInterfaceState();
 					}
-                    return false;
+                    //return false;
                 }
                 else if(global_keyboardEvent.CtrlKey)
                 {
@@ -4935,6 +4957,13 @@ function CThumbnailsManager()
                     if (drDoc.SlideCurrent > 0)
                     {
                         this.m_oWordControl.GoToPage(drDoc.SlideCurrent - 1);
+                    }
+                }
+                else if (global_keyboardEvent.CtrlKey)
+                {
+                    if (drDoc.SlidesCount > 0)
+                    {
+                        this.m_oWordControl.GoToPage(0);
                     }
                 }
                 else
