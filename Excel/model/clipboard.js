@@ -1716,11 +1716,17 @@
 					if (tempWorkbook)
 						pasteData = tempWorkbook.aWorksheets[0];
 					if (pasteData) {
-						History.TurnOn();
 						if(pasteData.Drawings && pasteData.Drawings.length)
 						{
 							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+							{
+								var historyIsTurnOn = History.Is_On();
+								if(!historyIsTurnOn)
+									History.TurnOn();	
 								t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+								if(!historyIsTurnOn)
+									History.TurnOff();
+							}
 						}
 						else {
 							var newFonts = {};

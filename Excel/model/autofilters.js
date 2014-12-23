@@ -1407,7 +1407,6 @@ var gUndoInsDelCellsFlag = true;
 			
 			_addToHistoryFromTempObj: function()
 			{
-				History.TurnOn();
 				History.StartTransaction();
 				History.Create_NewPoint();
 				
