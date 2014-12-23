@@ -2682,6 +2682,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 	this.pasteInExcel = pasteInExcel;
 	this.pasteInPresentationShape = null;
 	
+	this.maxTableCell = null;
+	
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
     this.bIgnoreNoBlockText = false;
 
@@ -4498,6 +4500,11 @@ PasteProcessor.prototype =
 	
 	_convertTableToPPTX: function(table)
 	{
+		//TODO пересмотреть обработку для вложенных таблиц(можно сделать так, как при копировании из документов в таблицы)
+		var allRows = [];
+		this.maxTableCell = 0;
+		table = this._replaceInnerTables(table, allRows, true);
+		
 		//ковертим внутренние параграфы
 		table.bPresentation = true;
 		for(var i = 0; i < table.Content.length; i++)
@@ -4512,6 +4519,56 @@ PasteProcessor.prototype =
 					cDocumentContent.Content[n] = ConvertParagraphToPPTX(cDocumentContent.Content[n]);
 				}
 			}
+		}
+		
+		return table;
+	},
+	
+	_replaceInnerTables: function(table, allRows, isRoot)
+	{
+		//заменяем внутренние таблички
+		for(var i = 0; i < table.Content.length; i++)
+		{
+			allRows[allRows.length] = table.Content[i];
+			
+			if(this.maxTableCell < table.Content[i].Content.length)
+				this.maxTableCell = table.Content[i].Content.length;
+			
+			for(var j = 0; j < table.Content[i].Content.length; j++)
+			{
+				var cDocumentContent = table.Content[i].Content[j].Content;
+				cDocumentContent.bPresentation = true;
+				
+				var k = 0;
+				for(var n = 0; n < cDocumentContent.Content.length; n++)
+				{
+					//если нашли внутреннюю табличку
+					if(cDocumentContent.Content[n] instanceof CTable)
+					{
+						this._replaceInnerTables(cDocumentContent.Content[n], allRows);
+						cDocumentContent.Content.splice(n, 1);
+					}
+				}
+			}
+		}
+		
+		//дополняем пустыми ячейками, строки, где ячеек меньше
+		if(isRoot === true)
+		{
+			for(var row = 0; row < allRows.length; row++)
+			{
+				var cells = allRows[row].Content;
+				if(cells.length < this.maxTableCell)
+				{
+					for(var cell = cells.length; cell < this.maxTableCell; cell++)
+					{
+						allRows[row].Add_Cell(allRows[row].Get_CellsCount(), allRows[row], null, false);
+					}
+				}
+			}
+			
+			table.Content = allRows;
+			table.Rows = allRows.length;
 		}
 		
 		return table;
