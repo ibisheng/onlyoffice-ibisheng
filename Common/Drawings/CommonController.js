@@ -4397,7 +4397,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    checkChartTextSelection: function()
+    checkChartTextSelection: function(bNoRedraw)
     {
         if(this.bNoCheckChartTextSelection === true)
             return;
@@ -4468,8 +4468,11 @@ DrawingObjectsController.prototype =
                 else if(this.drawingObjects.cSld)
                 {
                     chart_selection.recalculate();
-                    editor.WordControl.m_oDrawingDocument.OnRecalculatePage( this.drawingObjects.num, this.drawingObjects );
-                    editor.WordControl.m_oDrawingDocument.OnEndRecalculate( false, true );
+                    if(!(bNoRedraw === true))
+                    {
+                        editor.WordControl.m_oDrawingDocument.OnRecalculatePage( this.drawingObjects.num, this.drawingObjects );
+                        editor.WordControl.m_oDrawingDocument.OnEndRecalculate( false, true );
+                    }
                 }
                 else
                 {

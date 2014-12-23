@@ -96,6 +96,19 @@ DrawingObjectsController.prototype.convertPixToMM = function(pix)
 {
     return editor.WordControl.m_oDrawingDocument.GetMMPerDot(pix);
 };
+
+
+DrawingObjectsController.prototype.resetSelect = function()
+{
+    this.checkChartTextSelection(true);
+    this.resetSelection();
+    this.clearPreTrackObjects();
+    this.clearTrackObjects();
+    this.changeCurrentState(new NullState(this));
+};
+
+
+
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback  =  DrawingObjectsController.prototype.checkSelectedObjectsAndCallback;
 DrawingObjectsController.prototype.showChartSettings  =  function()
 {

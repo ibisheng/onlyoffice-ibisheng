@@ -737,7 +737,7 @@ function CCollaborativeEditing()
 
             if(LogicDocument.Slides[LogicDocument.CurPage])
             {
-                LogicDocument.Slides[LogicDocument.CurPage].graphicObjects.resetSelection();
+                LogicDocument.Slides[LogicDocument.CurPage].graphicObjects.resetSelect();
             }
             this.Clear_NewImages();
             this.Apply_OtherChanges();
