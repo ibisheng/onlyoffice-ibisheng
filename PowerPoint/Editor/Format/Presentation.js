@@ -2010,7 +2010,10 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
         {
-            this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
+            if (true === this.History.Have_Changes() || CollaborativeEditing.m_aChanges.length > 0)
+            {
+                this.DrawingDocument.m_oWordControl.m_oApi.asc_Save();
+            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
@@ -2741,6 +2744,8 @@ CPresentation.prototype =
         editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
         editor.asc_fireCallback("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
         editor.asc_fireCallback("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
+        editor.asc_fireCallback("asc_onCanGroup", this.canGroup());
+        editor.asc_fireCallback("asc_onCanUnGroup", this.canUnGroup());
     },
 
     changeBackground: function(bg, arr_ind)
@@ -3437,49 +3442,49 @@ CPresentation.prototype =
 
     alignLeft : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignLeft);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignLeft, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
     alignRight : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignRight);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignRight, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
     alignTop : function()
     {
 
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignTop);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignTop, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
     alignBottom : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignBottom);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignBottom, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
     alignCenter : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignCenter);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignCenter, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
     alignMiddle : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignMiddle);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignMiddle, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
     distributeHor : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeHor);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeHor, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
     distributeVer : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeVer);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.distributeVer, editor.bAlignBySelected);
         this.Document_UpdateInterfaceState();
     },
 
