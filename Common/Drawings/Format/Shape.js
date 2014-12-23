@@ -161,11 +161,21 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
         {
             new_paragraph.Internal_Content_Add(new_paragraph.Content.length, CopyRunToPPTX(Item, new_paragraph), false);
         }
+        else if(Item.Type === para_Hyperlink)
+        {
+
+        }
     }
     var EndRun = new ParaRun(new_paragraph);
     EndRun.Add_ToContent( 0, new ParaEnd() );
     new_paragraph.Internal_Content_Add( new_paragraph.Content.length, EndRun, false );
     return new_paragraph;
+}
+
+function ConvertHyperlinkToPPTX(hyperlink, paragraph)
+{
+    var hyperlink = new ParaHyperlink();
+    return hyperlink;
 }
 
 function ConvertParagraphToWord(paragraph, docContent)
@@ -1725,7 +1735,6 @@ CShape.prototype =
     {
         return ExecuteNoHistory(function()
         {
-
             var parent_objects = this.getParentObjects();
             var default_style = new CStyle("defaultStyle", null, null, null, true);
             default_style.ParaPr.Spacing.LineRule = linerule_Auto;
@@ -2001,7 +2010,7 @@ CShape.prototype =
                         _b_empty_text = this.txBody.content.Is_Empty();
                     }
                 }
-                return (_b_empty_text && (this.brush == null || this.brush.fill == null));
+                return (_b_empty_text /* && (this.brush == null || this.brush.fill == null)*/);
             }
         }
         else {
@@ -3291,14 +3300,6 @@ CShape.prototype =
         }
         else
             this.spPr.setLn(_new_line);
-    },
-
-    setGeometry: function (geometry) {
-        var old_geometry = this.spPr.geometry;
-        var new_geometry = geometry;
-        this.spPr.geometry = geometry;
-        History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
-        this.recalcInfo.recalculateGeometry = true;
     },
 
     changeFill: function (unifill) {
