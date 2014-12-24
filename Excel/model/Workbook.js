@@ -1262,6 +1262,14 @@ Workbook.prototype.init=function(){
 		this.nActive = 0;
 	if(this.nActive >= this.aWorksheets.length)
 		this.nActive = this.aWorksheets.length - 1;
+
+    //charts
+    for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
+    {
+        var ws = this.aWorksheets[i];
+        ws.initPostOpen();
+    }
+
 	/*
 		buildDependency необходимо запускать для построения графа зависимостей между ячейками.
 		Сортировка графа производится при необходимости пересчета формул: 
@@ -1269,13 +1277,6 @@ Workbook.prototype.init=function(){
 	*/
     this.buildDependency();
 	sortDependency(this);
-
-	//charts
-	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
-	{
-		var ws = this.aWorksheets[i];
-		ws.initPostOpen();
-	}
 };
 Workbook.prototype.rebuildColors=function(){
 	g_oColorManager.rebuildColors();
@@ -2334,7 +2335,7 @@ Woorksheet.prototype.initPostOpen = function(){
 	// Sheet Views
 	if (0 === this.sheetViews.length) {
 		// Даже если не было, создадим
-		this.sheetViews[0] = new asc.asc_CSheetViewSettings();
+		this.sheetViews.push(new asc.asc_CSheetViewSettings());
 	}
 };
 Woorksheet.prototype._forEachCell=function(fAction){
