@@ -2756,6 +2756,9 @@ CTable.prototype =
 
         var Table = new CTable( this.DrawingDocument, Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid, this.bPresentation);
 
+        Table.Set_PositionH(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
+        Table.Set_PositionV(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+
         // Копируем настройки
         Table.Set_TableStyle( this.TableStyle );
         Table.Set_TableLook( this.TableLook.Copy() );
