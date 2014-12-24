@@ -197,15 +197,15 @@ CSelectedContent.prototype =
                 {
                     DocumentComments.Add(NewComment);
                     editor.sync_AddComment(NewComment.Get_Id(), NewComment.Data);
-                }
-                
-                // поправим Id в самих элементах ParaComment
-                for (var Pos2 = 0; Pos2 < Count2; Pos2++)
-                {
-                    var Element = this.Comments[Pos2].Comment;
-                    if (Id === Element.CommentId)
+
+                    // поправим Id в самих элементах ParaComment
+                    for (var Pos2 = 0; Pos2 < Count2; Pos2++)
                     {
-                        Element.Set_CommentId(NewComment.Get_Id());
+                        var Element = this.Comments[Pos2].Comment;
+                        if (Id === Element.CommentId)
+                        {
+                            Element.Set_CommentId(NewComment.Get_Id());
+                        }
                     }
                 }
             }
@@ -12863,6 +12863,8 @@ CDocument.prototype =
                 {
                     var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
                     var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+                    Pos = Math.min(Pos, this.Content.length);
 
                     if ( null != Element )
                     {
