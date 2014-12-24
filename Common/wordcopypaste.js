@@ -616,9 +616,17 @@ CopyProcessor.prototype =
             aTagStart.push("<i>");
             aTagEnd.push("</i>");
         }
-        if (true == Value.Strikeout) {
+		if (true == Value.Underline) {
             aTagStart.push("<u>");
             aTagEnd.push("</u>");
+        }
+        if (true == Value.Strikeout) {
+            aTagStart.push("<s>");
+            aTagEnd.push("</s>");
+        }
+		 if (true == Value.DStrikeout) {
+            aTagStart.push("<s>");
+            aTagEnd.push("</s>");
         }
         if (null != Value.Shd && shd_Nil != Value.Shd.Value && (null != Value.Shd.Color || null != Value.Shd.Unifill))
             aProp.push("background-color:" + this.RGBToCSS(Value.Shd.Color, Value.Shd.Unifill));
@@ -5259,6 +5267,9 @@ PasteProcessor.prototype =
             var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
             if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)))
                 Spacing.After = margin_bottom;
+			/*var line_height = computedStyle.getPropertyValue( "line-height" );
+			if(line_height && null != (line_height = this._ValueToMm(line_height)))
+                Spacing.Line = line_height;*/
             if(false == this._isEmptyProperty(Spacing))
                 Para.Set_Spacing(Spacing);
             //Shd
