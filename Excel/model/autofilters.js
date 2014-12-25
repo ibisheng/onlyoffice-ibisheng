@@ -1745,7 +1745,7 @@ var gUndoInsDelCellsFlag = true;
 							oldFilter.insCells = true;
 							
 						//заносим в историю
-						if(this._historyTempObj)
+						if(this.historyTempObj)
 							this._addHistoryTempObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 						else
 							this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
