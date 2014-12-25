@@ -5146,63 +5146,41 @@ function BinaryFileReader(doc, openParams)
 		for(var i in this.oReadResult.oCommentsPlaces)
 		{
 			var item = this.oReadResult.oCommentsPlaces[i];
-			if((null != item.Start && null != item.End) || (null != item.Ref && null == item.Start && null == item.End))
-			{
-				var oStart = null;
-				var oEnd = null;
-				var bRef = false;
-				if(null != item.Start && null != item.End)
+			var bToDelete = true;
+			if(null != item.Start && null != item.End){
+				var oCommentObj = oCommentsNewId[item.Start.Id];
+				if(oCommentObj)
 				{
-					oStart = item.Start;
-					oEnd = item.End;
+					bToDelete = false;
+					if(null != item.QuoteText)
+						oCommentObj.Data.m_sQuoteText = item.QuoteText;
+					item.Start.oParaComment.Set_CommentId(oCommentObj.Get_Id());
+					item.End.oParaComment.Set_CommentId(oCommentObj.Get_Id());
 				}
-				else if(null != item.Ref)
+			}
+			if(bToDelete){
+				if(null != item.Start && null != item.Start.oParent)
 				{
-					bRef = true;
-					oStart = oEnd = item.Ref;
-				}
-				if(null != oStart || null != oEnd)
-				{
-					var nId = oStart.Id;
-					var oCommentObj = oCommentsNewId[nId];
-					if(oCommentObj)
+					var oParent = item.Start.oParent;
+					var oParaComment = item.Start.oParaComment;
+					for (var i = OpenParStruct.prototype._GetContentLength(oParent) - 1; i >= 0; --i)
 					{
-						if(null != item.QuoteText)
-							oCommentObj.Data.m_sQuoteText = item.QuoteText;
-						var fInsert = function(bStart, bRef, oCommentPosition)
-						{
-							var index = 0;
-							var oParent = oCommentPosition.oParent;
-							if(null != oParent)
-							{
-								if(bRef)
-								{
-									if(bStart)
-										index = 0;
-									else
-									    index = OpenParStruct.prototype._GetContentLength(oParent) - 1;
-								}
-								else if(oCommentPosition.oAfter)
-								{
-								    for (var j = 0, length2 = OpenParStruct.prototype._GetContentLength(oParent) ; j < length2; ++j)
-									{
-								        if (OpenParStruct.prototype._GetFromContent(oParent, j) == oCommentPosition.oAfter)
-										{
-											index = j + 1;
-											break;
-										}
-									}
-								}
-								var oParaCommentElem;
-								if(bStart)
-									oParaCommentElem = new ParaComment(true, oCommentObj.Get_Id());
-								else
-								    oParaCommentElem = new ParaComment(false, oCommentObj.Get_Id());
-								OpenParStruct.prototype._addToContent(oParent, index, oParaCommentElem);
-							}
+					    if (oParaComment == OpenParStruct.prototype._GetFromContent(oParent, i)){
+							OpenParStruct.prototype._removeFromContent(oParent, i, 1);
+							break;
 						}
-						fInsert(false, bRef, oEnd);
-						fInsert(true, bRef, oStart);
+					}
+				}
+				if(null != item.End && null != item.End.oParent)
+				{
+					var oParent = item.End.oParent;
+					var oParaComment = item.End.oParaComment;
+					for (var i = OpenParStruct.prototype._GetContentLength(oParent) - 1; i >= 0; --i)
+					{
+					    if (oParaComment == OpenParStruct.prototype._GetFromContent(oParent, i)){
+							OpenParStruct.prototype._removeFromContent(oParent, i, 1);
+							break;
+						}
 					}
 				}
 			}
@@ -5405,64 +5383,41 @@ function BinaryFileReader(doc, openParams)
 		for(var i in this.oReadResult.oCommentsPlaces)
 		{
 			var item = this.oReadResult.oCommentsPlaces[i];
-			if((null != item.Start && null != item.End) || (null != item.Ref && null == item.Start && null == item.End))
-			{
-				var oStart = null;
-				var oEnd = null;
-				var bRef = false;
-				if(null != item.Start && null != item.End)
+			var bToDelete = true;
+			if(null != item.Start && null != item.End){
+				var oCommentObj = oCommentsNewId[item.Start.Id];
+				if(oCommentObj)
 				{
-					oStart = item.Start;
-					oEnd = item.End;
+					bToDelete = false;
+					if(null != item.QuoteText)
+						oCommentObj.Data.m_sQuoteText = item.QuoteText;
+					item.Start.oParaComment.Set_CommentId(oCommentObj.Get_Id());
+					item.End.oParaComment.Set_CommentId(oCommentObj.Get_Id());
 				}
-				else if(null != item.Ref)
+			}
+			if(bToDelete){
+				if(null != item.Start && null != item.Start.oParent)
 				{
-					bRef = true;
-					oStart = oEnd = item.Ref;
-				}
-				
-				if(null != oStart || null != oEnd)
-				{
-					var nId = oStart.Id;
-					var oCommentObj = oCommentsNewId[nId];
-					if(oCommentObj)
+					var oParent = item.Start.oParent;
+					var oParaComment = item.Start.oParaComment;
+					for (var i = OpenParStruct.prototype._GetContentLength(oParent) - 1; i >= 0; --i)
 					{
-						if(null != item.QuoteText)
-							oCommentObj.Data.m_sQuoteText = item.QuoteText;
-						var fInsert = function(bStart, bRef, oCommentPosition)
-						{
-							var index = 0;
-							var oParent = oCommentPosition.oParent;
-							if(null != oParent)
-							{
-								if(bRef)
-								{
-									if(bStart)
-										index = 0;
-									else
-									    index = OpenParStruct.prototype._GetContentLength(oParent) - 1;
-								}
-								else if(oCommentPosition.oAfter)
-								{
-								    for (var j = 0, length2 = OpenParStruct.prototype._GetContentLength(oParent) ; j < length2; ++j)
-									{
-								        if (OpenParStruct.prototype._GetFromContent(oParent, j) == oCommentPosition.oAfter)
-										{
-											index = j + 1;
-											break;
-										}
-									}
-								}
-								var oParaCommentElem;
-								if(bStart)
-									oParaCommentElem = new ParaComment(true, oCommentObj.Get_Id());
-								else
-								    oParaCommentElem = new ParaComment(false, oCommentObj.Get_Id());
-								OpenParStruct.prototype._addToContent(oParent, index, oParaCommentElem);
-							}
+					    if (oParaComment == OpenParStruct.prototype._GetFromContent(oParent, i)){
+							OpenParStruct.prototype._removeFromContent(oParent, i, 1);
+							break;
 						}
-						fInsert(false, bRef, oEnd);
-						fInsert(true, bRef, oStart);
+					}
+				}
+				if(null != item.End && null != item.End.oParent)
+				{
+					var oParent = item.End.oParent;
+					var oParaComment = item.End.oParaComment;
+					for (var i = OpenParStruct.prototype._GetContentLength(oParent) - 1; i >= 0; --i)
+					{
+					    if (oParaComment == OpenParStruct.prototype._GetFromContent(oParent, i)){
+							OpenParStruct.prototype._removeFromContent(oParent, i, 1);
+							break;
+						}
 					}
 				}
 			}
@@ -7466,9 +7421,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
 			});
-
-			if (oParStruct.GetContentLength() > 0)
-			    oCommon.oAfter = oParStruct.GetFromContent(oParStruct.cur.pos - 1);
 			if(null != oCommon.Id)
 			{
 			    oCommon.oParent = oCurContainer;
@@ -7482,6 +7434,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					this.nCurCommentsCount++;
 					this.oCurComments[oCommon.Id] = "";
 				}
+				oCommon.oParaComment = new ParaComment(true, oCommon.Id);
+				oParStruct.addToContent(oCommon.oParaComment);
 			}
         }
 		else if (c_oSerParType.CommentEnd === type)
@@ -7490,8 +7444,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
             });
-			if (oParStruct.GetContentLength() > 0)
-			    oCommon.oAfter = oParStruct.GetFromContent(oParStruct.cur.pos - 1);
 			if(null != oCommon.Id)
 			{
 			    oCommon.oParent = oCurContainer;
@@ -7509,6 +7461,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					this.nCurCommentsCount--;
 					delete this.oCurComments[oCommon.Id];
 				}
+				oCommon.oParaComment = new ParaComment(false, oCommon.Id);
+				oParStruct.addToContent(oCommon.oParaComment);
 			}
         }
 		else if ( c_oSerParType.OMathPara == type )
@@ -7757,24 +7711,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             oRes.bRes = false;
             oParStruct.commitElem();
             this.aFields.pop();
-        }
-        else if (c_oSerRunType.CommentReference === type)
-        {
-            var oCommon = {};
-            res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadComment(t,l, oCommon);
-            });
-            if (oParStruct.GetContentLength() > 0)
-                oCommon.oAfter = oParStruct.GetFromContent(oParStruct.cur.pos - 1);
-            if(null != oCommon.Id)
-            {
-                oCommon.oParent = oParStruct.cur.elem;
-                var item = this.oComments[oCommon.Id];
-                if(item)
-                    item.Ref = oCommon;
-                else
-                    this.oComments[oCommon.Id] = {Ref: oCommon};
-            }
         }
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
@@ -11649,6 +11585,10 @@ OpenParStruct.prototype = {
     },
     _GetContentLength: function (elem) {
         return elem.Content.length;
+    },
+	_removeFromContent: function (elem, pos, count) {
+        if (elem.Remove_FromContent)
+            elem.Remove_FromContent(pos, count);
     },
     addToContent: function (oItem) {
         this.cur.pos = this._addToContent(this.cur.elem, this.cur.pos, oItem);
