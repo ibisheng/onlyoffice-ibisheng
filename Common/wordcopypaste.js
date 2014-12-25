@@ -7033,7 +7033,7 @@ PasteProcessor.prototype =
 						isPasteHyperlink = null;
 					else
 					{
-						text = child.innerText;
+						text = child.innerText ? child.innerText : child.textContent;
 					}
 					
 					if(isPasteHyperlink)
