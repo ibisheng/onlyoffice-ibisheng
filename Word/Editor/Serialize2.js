@@ -7807,14 +7807,22 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             oParaDrawing.setExtent(oParaDrawing.Extent.W, oParaDrawing.Extent.H);
         if(null != oParaDrawing.wrappingPolygon)
             oParaDrawing.addWrapPolygon(oParaDrawing.wrappingPolygon);
-		
-		if(editor.WordControl.m_oLogicDocument.DrawingObjects)
-			editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(oParaDrawing);
-        oParaDrawing.init();
-		//TODO некорректная проверка typeof
-        if(drawing_Anchor == oParaDrawing.DrawingType && typeof History.RecalcData_Add === "function")
-            History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : oParaDrawing});
-		
+
+        if(oParaDrawing.GraphicObj)
+        {
+            if(oParaDrawing.GraphicObj.getObjectType() !== historyitem_type_ChartSpace)//диаграммы могут быть без spPr
+            {
+                if(!oParaDrawing.GraphicObj.spPr)
+                {
+                    oParaDrawing.GraphicObj = null;
+                }
+            }
+            if(oParaDrawing.GraphicObj)
+            {
+                if(drawing_Anchor == oParaDrawing.DrawingType && typeof History.RecalcData_Add === "function")//TODO некорректная проверка typeof
+                    History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : oParaDrawing});
+            }
+        }
 		oDrawing.content = oParaDrawing;
 	}
 	this.ReadObject = function (type, length, oParStruct)
@@ -7839,12 +7847,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var oDrawing = new Object();
 			this.ReadDrawing (type, length, oParStruct, oDrawing, res);
 			if(null != oDrawing.content.GraphicObj)
-				oNewElem = oDrawing.content;
-			
-			var oNewRun = new ParaRun(oParStruct.paragraph);
-			oNewRun.Add_ToContent(0, oNewElem, false);
-			oParStruct.addToContent(oNewRun);
-			
+            {
+                oNewElem = oDrawing.content;
+                var oNewRun = new ParaRun(oParStruct.paragraph);
+                oNewRun.Add_ToContent(0, oNewElem, false);
+                oParStruct.addToContent(oNewRun);
+            }
 		}
 		else
 			res = c_oSerConstants.ReadUnknown;

@@ -40,8 +40,6 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
 
     this.urlMap = [];
     this.recalcMap = {};
-    this.arrForCalculateAfterOpen = [];
-
 
     this.recalculateMap = {};
 
