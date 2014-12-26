@@ -5201,6 +5201,8 @@ function BinaryFileReader(doc, openParams)
 			// this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
 
         this.Document.On_EndLoad();
+		//чтобы удалялся stream с бинарником
+		window.global_pptx_content_loader.Clear();
     };
     this.ReadFromString = function (sBase64, isCopyPaste) {
         //надо сбросить то, что остался после открытия документа
@@ -5428,7 +5430,8 @@ function BinaryFileReader(doc, openParams)
 			var oNewComment = oCommentsNewId[i];
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
 		}
-		
+		//чтобы удалялся stream с бинарником
+		window.global_pptx_content_loader.Clear();
         return { content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages, bInBlock: bInBlock };
     }
 };

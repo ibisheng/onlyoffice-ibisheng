@@ -724,7 +724,9 @@ function CPPTXContentLoader()
     this.Clear = function()
     {
         //вызывается пока только перед вставкой
+        this.Reader.stream = null;
         this.stream = null;
+        this.BaseReader = null;
         this.ImageMapChecker = {};
     }
 }

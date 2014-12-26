@@ -6764,6 +6764,8 @@
             }
 			if(!pasteBinaryFromExcel)
 				History.TurnOn();
+			//чтобы удалялся stream с бинарником
+			window.global_pptx_content_loader.Clear();
         };
         this.ReadData = function(data, wb)
         {
