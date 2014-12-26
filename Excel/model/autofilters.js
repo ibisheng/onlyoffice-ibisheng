@@ -6894,7 +6894,7 @@ var gUndoInsDelCellsFlag = true;
 										}
 									}
 									
-									changeButtonArray[changeButtonArray.length] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
+									changeButtonArray[n] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
 									if(findFilters[i].result.length == changeButtonArray.length)
 										break;
 								}
