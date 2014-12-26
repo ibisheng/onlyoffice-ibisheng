@@ -3036,6 +3036,26 @@ var gUndoInsDelCellsFlag = true;
 					this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyMF,
 						{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				
+				//проставляем после применения а/ф hiddenRowsObj
+				if(this.allButtonAF && this.allButtonAF.length && autoFiltersObject.cellId)
+				{
+					for(var  i = 0; i < this.allButtonAF.length; i++)
+					{
+						if(autoFiltersObject.cellId === this.allButtonAF[i].id)
+						{
+							if(currentFilter && currentFilter[isCurFilter])
+							{
+								var hiddenRowsObj = this._getHiddenRows(this.allButtonAF[i].id, this.allButtonAF[i].idNext, currentFilter[isCurFilter]);
+								this.allButtonAF[i].hiddenRows = hiddenRowsObj;
+							}
+							else
+								this.allButtonAF[i].hiddenRows = null;
+							
+							break;
+						}
+					}
+				}
+				
 				this._reDrawFilters();
 				
 				if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
