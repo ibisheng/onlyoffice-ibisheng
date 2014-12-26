@@ -336,8 +336,14 @@ CPresentation.prototype =
 
         for(var i = 0; i < this.Slides.length; ++i)
         {
-            ret.layouts[this.Slides[i].Layout.Id] = this.Slides[i].Layout;
-            ret.masters[this.Slides[i].Layout.Master.Id] = this.Slides[i].Layout.Master;
+            if(this.Slides[i].Layout)
+            {
+                ret.layouts[this.Slides[i].Layout.Id] = this.Slides[i].Layout;
+                if(this.Slides[i].Layout.Master)
+                {
+                    ret.masters[this.Slides[i].Layout.Master.Id] = this.Slides[i].Layout.Master;
+                }
+            }
         }
         return ret;
     },
@@ -3788,7 +3794,17 @@ CPresentation.prototype =
         }
         this.clearThemeTimeouts();
 
-        this.addSlideMaster(this.slideMasters.length, themeInfo.Master);
+        for(i = 0; i < this.slideMasters.length; ++i)
+        {
+            if(this.slideMasters[i] === themeInfo.Master)
+            {
+                break;
+            }
+        }
+        if(i === this.slideMasters.length)
+        {
+            this.addSlideMaster(this.slideMasters.length, themeInfo.Master);
+        }
         var _new_master = themeInfo.Master;
         _new_master.presentation = this;
         var _master_width = _new_master.Width;

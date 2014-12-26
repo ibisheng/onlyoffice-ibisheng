@@ -3801,24 +3801,27 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
             var _masters = this.WordControl.m_oLogicDocument.slideMasters;
             for (var i = 0; i < _masters.length; i++)
             {
-                var theme_load_info = new CThemeLoadInfo();
-                theme_load_info.Master = _masters[i];
-                theme_load_info.Theme = _masters[i].Theme;
+                if(_masters[i].ThemeIndex < 0)//только темы презентации
+                {
+                    var theme_load_info = new CThemeLoadInfo();
+                    theme_load_info.Master = _masters[i];
+                    theme_load_info.Theme = _masters[i].Theme;
 
-                var _lay_cnt = _masters[i].sldLayoutLst.length;
-                for (var j = 0; j < _lay_cnt; j++)
-                    theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
+                    var _lay_cnt = _masters[i].sldLayoutLst.length;
+                    for (var j = 0; j < _lay_cnt; j++)
+                        theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
 
-                var th_info = {};
-                th_info["Name"] = "Doc Theme " + i;
-                th_info["Url"] = "";
-                th_info["Thumbnail"] = _masters[i].ImageBase64;
+                    var th_info = {};
+                    th_info["Name"] = "Doc Theme " + i;
+                    th_info["Url"] = "";
+                    th_info["Thumbnail"] = _masters[i].ImageBase64;
 
-                var th = new CAscThemeInfo(th_info);
-                this.ThemeLoader.Themes.DocumentThemes[this.ThemeLoader.Themes.DocumentThemes.length] = th;
-                th.Index = -this.ThemeLoader.Themes.DocumentThemes.length;
+                    var th = new CAscThemeInfo(th_info);
+                    this.ThemeLoader.Themes.DocumentThemes[this.ThemeLoader.Themes.DocumentThemes.length] = th;
+                    th.Index = -this.ThemeLoader.Themes.DocumentThemes.length;
 
-                this.ThemeLoader.themes_info_document[this.ThemeLoader.Themes.DocumentThemes.length - 1] = theme_load_info;
+                    this.ThemeLoader.themes_info_document[this.ThemeLoader.Themes.DocumentThemes.length - 1] = theme_load_info;
+                }
             }
 
             this.sync_InitEditorThemes(this.ThemeLoader.Themes.EditorThemes, this.ThemeLoader.Themes.DocumentThemes);
