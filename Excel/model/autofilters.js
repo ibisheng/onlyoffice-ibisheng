@@ -6942,10 +6942,13 @@ var gUndoInsDelCellsFlag = true;
 				var arnToRange = new Asc.Range(arnTo.c1, arnTo.r1, arnTo.c2, arnTo.r2);
 				var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnToRange, aWs);
 				if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
-				{
+				{	
+					var tablePart;
 					for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
 					{
-						this._setColorStyleTable(intersectionRangeWithTableParts[i].Ref, intersectionRangeWithTableParts[i]);
+						tablePart = intersectionRangeWithTableParts[i];
+						this._setColorStyleTable(tablePart.Ref, tablePart);
+						ws.model.getRange3(tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).unmerge();
 					}
 				}
 				
