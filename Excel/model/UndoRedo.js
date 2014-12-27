@@ -2926,10 +2926,6 @@ UndoRedoWoorksheet.prototype = {
 					cell.setStyle(oStyle);
 				else
 					cell.setStyle(null);
-
-				// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
-				worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-				worksheetView.autoFilters._renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow));
 			}
 			else
 				ws._removeCell(nRow, nCol);
