@@ -7364,6 +7364,12 @@ var gUndoInsDelCellsFlag = true;
 						var ref = findFilters[i].Ref;
 						var newRange = Asc.Range(ref.c1 + diffCol, ref.r1 + diffRow, ref.c2 + diffCol, ref.r2 + diffRow);
 						
+						//если затрагиваем форматированной таблицей часть а/ф
+						if(aWs.AutoFilter && aWs.AutoFilter.Ref && newRange.intersection(aWs.AutoFilter.Ref) && aWs.AutoFilter !== findFilters[i])
+						{
+							this._deleteAutoFilter();
+						}
+						
 						//если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
 						var findFiltersFromTo = this._intersectionRangeWithTableParts(newRange , aWs, arnFrom);
 						if(findFiltersFromTo && findFiltersFromTo.length)//удаляем данный фильтр
@@ -7382,10 +7388,10 @@ var gUndoInsDelCellsFlag = true;
 				{
 					this.isEmptyAutoFilters(arnTo, null, null, null, findFilters);
 				}
-				else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo) && !aWs.AutoFilter.Ref.isEqual(arnFrom))//если задеваем часть а/ф областью вставки
+				/*else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo) && !aWs.AutoFilter.Ref.isEqual(arnFrom) && findFilters)//если задеваем часть а/ф областью вставки
 				{
 					this._deleteAutoFilter();
-				}
+				}*/
 			},
 			
 			//открываем строки скрытые данным фильтром
