@@ -6938,16 +6938,14 @@ var gUndoInsDelCellsFlag = true;
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move);
 					}
 				}
-				else
+				
+				var arnToRange = new Asc.Range(arnTo.c1, arnTo.r1, arnTo.c2, arnTo.r2);
+				var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnToRange, aWs);
+				if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
 				{
-					var arnToRange = new Asc.Range(arnTo.c1, arnTo.r1, arnTo.c2, arnTo.r2);;
-					var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnToRange, aWs);
-					if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
+					for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
 					{
-						for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
-						{
-							this._setColorStyleTable(intersectionRangeWithTableParts[i].Ref, intersectionRangeWithTableParts[i]);
-						}
+						this._setColorStyleTable(intersectionRangeWithTableParts[i].Ref, intersectionRangeWithTableParts[i]);
 					}
 				}
 				
