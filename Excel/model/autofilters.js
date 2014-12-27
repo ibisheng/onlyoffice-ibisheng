@@ -430,14 +430,18 @@ var gUndoInsDelCellsFlag = true;
 									//открываем скрытые строки
 									var isInsert = false;
 									
-									for(var i = apocal.range.r1; i <= apocal.range.r2; i++)
+									if((changesElemHistory.AutoFilter && changesElemHistory.AutoFilter.FilterColumns && changesElemHistory.AutoFilter.FilterColumns.length) || (changesElemHistory.FilterColumns && changesElemHistory.FilterColumns.length))
 									{
-										if(ws.model.getRowHidden(i))
+										for(var i = apocal.range.r1; i <= apocal.range.r2; i++)
 										{
-											ws.model.setRowHidden(/*bHidden*/false, i, i);
-											isInsert = true;
+											if(ws.model.getRowHidden(i))
+											{
+												ws.model.setRowHidden(/*bHidden*/false, i, i);
+												isInsert = true;
+											}	
 										}	
-									}	
+									}
+									
 
 									if (bIsActiveSheet)
 										t._addButtonAF(newRes);
