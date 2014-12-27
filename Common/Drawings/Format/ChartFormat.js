@@ -23362,7 +23362,7 @@ CUpDownBars.prototype =
         }
         if(isRealObject(this.downBars))
         {
-            c.setUpBars(this.downBars.createDuplicate());
+            c.setDownBars(this.downBars.createDuplicate());
         }
         return c;
     },
