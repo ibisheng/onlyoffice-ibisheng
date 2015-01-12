@@ -1030,9 +1030,9 @@ var gUndoInsDelCellsFlag = true;
 						var endRow = allFil.r2;
 						
 						//проверяем диапазон
-						if (ws.cols.length < endCol)
+						if (ws.cols.length <= endCol)
 						    ws.expandColsOnScroll(false, true, endCol + 1);
-						if (ws.rows.length < endRow)
+						if (ws.rows.length <= endRow)
 						    ws.expandRowsOnScroll(false, true, endRow + 1);
 						for(var col = startCol; col <= endCol; col++)
 						{
