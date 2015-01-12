@@ -126,10 +126,25 @@ function CreateUniFillByUniColorCopy(uniColor)
     return ret;
 }
 
-function CopyRunToPPTX(Run, Paragraph)
+function CopyRunToPPTX(Run, Paragraph, bHyper)
 {
     var NewRun = new ParaRun(Paragraph, false);
-    NewRun.Set_Pr( Run.Pr.Copy() );
+    var RunPr = Run.Pr.Copy();
+    if(RunPr.RStyle != undefined)
+    {
+        RunPr.RStyle = undefined;
+    }
+
+    if(bHyper)
+    {
+        if(!RunPr.Unifill)
+        {
+            RunPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+        }
+        RunPr.Underline = true;
+    }
+
+    NewRun.Set_Pr( RunPr );
 
     var PosToAdd = 0;
     for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
@@ -163,7 +178,7 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
         }
         else if(Item.Type === para_Hyperlink)
         {
-
+            new_paragraph.Internal_Content_Add(new_paragraph.Content.length, ConvertHyperlinkToPPTX(Item, new_paragraph), false);
         }
     }
     var EndRun = new ParaRun(new_paragraph);
@@ -174,8 +189,22 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
 
 function ConvertHyperlinkToPPTX(hyperlink, paragraph)
 {
-    var hyperlink = new ParaHyperlink();
-    return hyperlink;
+    var hyperlink_ret = new ParaHyperlink(), i, item, pos = 0;
+    hyperlink_ret.Set_Value( hyperlink.Value );
+    hyperlink_ret.Set_ToolTip( hyperlink.ToolTip );
+    for(i = 0; i < hyperlink.Content.length; ++i)
+    {
+        item = hyperlink.Content[i];
+        if(item.Type === para_Run)
+        {
+            hyperlink_ret.Add_ToContent(pos++, CopyRunToPPTX(item, paragraph, true));
+        }
+        else if(item.Type === para_Hyperlink)
+        {
+            hyperlink_ret.Add_ToContent(pos++, ConvertHyperlinkToPPTX(item, paragraph));
+        }
+    }
+    return hyperlink_ret;
 }
 
 function ConvertParagraphToWord(paragraph, docContent)
