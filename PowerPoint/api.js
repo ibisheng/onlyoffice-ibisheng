@@ -1793,6 +1793,11 @@ asc_docs_api.prototype.put_AlignBySelect = function(val)
     this.bAlignBySelected = val;
 }
 
+asc_docs_api.prototype.get_AlignBySelect = function()
+{
+    return this.bAlignBySelected;
+}
+
 /*callbacks*/
 asc_docs_api.prototype.sync_BoldCallBack = function(isBold){
 	this.asc_fireCallback("asc_onBold",isBold);
