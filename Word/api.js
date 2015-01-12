@@ -619,6 +619,8 @@ function asc_docs_api(name)
     this.SelectedObjectsStack = [];
 
     this.noCreatePoint = false;
+    this.exucuteHistory = false;
+    this.exucuteHistoryEnd = false;
 	this.isDocumentEditor = true;
 
     this.OpenDocumentProgress = new CDocOpenProgress();
@@ -2963,10 +2965,12 @@ asc_docs_api.prototype.sync_CanCopyCutCallback = function(bCanCopyCut)
 }
 
 asc_docs_api.prototype.setStartPointHistory = function(){
-    this.noCreatePoint = true; History.Create_NewPoint();
+    this.noCreatePoint = true;
+    this.exucuteHistory = true;
 };
 asc_docs_api.prototype.setEndPointHistory   = function(){
     this.noCreatePoint = false;
+    this.exucuteHistoryEnd = true;
 };
 
 function CDocInfoProp(obj)
@@ -5344,18 +5348,17 @@ asc_docs_api.prototype.ImgApply = function(obj)
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties, AdditionalData) )
     {
-        if(!this.noCreatePoint)
-            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
         if (ImagePr.ShapeProperties)
             ImagePr.ImageUrl = "";
 
         if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
         {
-            var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1)
+            var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1);
             if (null != _img)
             {
                 ImagePr.ImageUrl = _img.src;
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
             }
             else
@@ -5363,6 +5366,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
                 this.asyncImageEndLoaded2 = function(_image)
                 {
                     ImagePr.ImageUrl = _image.src;
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                 }
             }
@@ -5374,6 +5378,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
             if (null != _img)
             {
                 ImagePr.ImageUrl = _img.src;
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
             }
             else
@@ -5381,6 +5386,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
                 this.asyncImageEndLoaded2 = function(_image)
                 {
                     ImagePr.ImageUrl = _image.src;
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                 }
             }
@@ -5388,6 +5394,32 @@ asc_docs_api.prototype.ImgApply = function(obj)
         else
         {
             ImagePr.ImageUrl = null;
+
+
+            if(!this.noCreatePoint || this.exucuteHistory)
+            {
+                if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
+                {
+                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    this.exucuteHistoryEnd = false;
+                }
+                else
+                {
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                }
+                if(this.exucuteHistory)
+                {
+                    this.exucuteHistory = false;
+                }
+            }
+            else
+            {
+                ExecuteNoHistory(function(){
+                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                }, this, []);
+            }
+
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
         }
     }
