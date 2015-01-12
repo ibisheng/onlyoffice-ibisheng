@@ -4267,6 +4267,19 @@ CCatAx.prototype =
                     bChanged = true;
                 }
             }
+            else if(crossesRule === c_oAscCrossesRule.minValue)
+            {
+                if(this.crossAx.crossesAt !== null)
+                {
+                    this.crossAx.setCrossesAt(null);
+                    bChanged = true;
+                }
+                if(this.crossAx.crosses !== CROSSES_MIN)
+                {
+                    this.crossAx.setCrosses(CROSSES_MIN);
+                    bChanged = true;
+                }
+            }
         }
 
         if(isRealNumber(labelsPosition) && isRealObject(this.crossAx) && this.crossAx.setCrossBetween)
@@ -8669,6 +8682,19 @@ CValAx.prototype =
                 if(this.crossAx.crosses !== CROSSES_MAX)
                 {
                     this.crossAx.setCrosses(CROSSES_MAX);
+                    bChanged = true;
+                }
+            }
+            else if(props.crossesRule === c_oAscCrossesRule.minValue)
+            {
+                if(this.crossAx.crossesAt !== null)
+                {
+                    this.crossAx.setCrossesAt(null);
+                    bChanged = true;
+                }
+                if(this.crossAx.crosses !== CROSSES_MIN)
+                {
+                    this.crossAx.setCrosses(CROSSES_MIN);
                     bChanged = true;
                 }
             }
