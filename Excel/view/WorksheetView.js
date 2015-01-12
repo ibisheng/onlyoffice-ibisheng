@@ -5246,12 +5246,19 @@
 					this._drawRowHeaders(/*drawingCtx*/ undefined);
 					if (dx < 0) {
 						// draw last column
-						var r1_ = dy > 0 ? vr.r1 : r2 + 1;
-						var r2_ = dy > 0 ? r1 - 1 : vr.r2;
-						var r_ = new asc_Range(vr.c1, r1_, vr.c2, r2_);
+						var r_;
+						var r1_ = r2 + 1;
+						var r2_ = vr.r2;
 						if (r2_ >= r1_) {
+							r_ = new asc_Range(vr.c2, r1_, vr.c2, r2_);
 							this._drawGrid(/*drawingCtx*/ undefined, r_);
 							this._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
+						}
+						if (0 < rFrozen) {
+							r_ = new asc_Range(vr.c2, 0, vr.c2, rFrozen - 1);
+							offsetY = this.rows[0].top - this.cellsTop;
+							this._drawGrid(/*drawingCtx*/ undefined, r_, /*offsetXForDraw*/undefined, offsetY);
+							this._drawCellsAndBorders(/*drawingCtx*/undefined, r_, /*offsetXForDraw*/undefined, offsetY);
 						}
 					}
 				}
