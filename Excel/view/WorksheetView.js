@@ -7816,14 +7816,15 @@
 				History.SetSelection(arnFrom.clone());
 				History.SetSelectionRedo(arnTo.clone());
 				History.StartTransaction();
-
-				t.autoFilters._preMoveAutoFilters(arnFrom, arnTo);
+				
+				if(!copyRange)
+					t.autoFilters._preMoveAutoFilters(arnFrom, arnTo);
 				
 				t.model._moveRange(arnFrom, arnTo, copyRange);
 				t.cellCommentator.moveRangeComments(arnFrom, arnTo);
 				t.objectRender.moveRangeDrawingObject(arnFrom, arnTo);
 
-				t.autoFilters._moveAutoFilters(arnTo, arnFrom);
+				t.autoFilters._moveAutoFilters(arnTo, arnFrom, null, copyRange);
 				// Вызываем функцию пересчета для заголовков форматированной таблицы
 				t.autoFilters._renameTableColumn(arnFrom);
 				t.autoFilters._renameTableColumn(arnTo);
@@ -8168,7 +8169,7 @@
 					if(!aFilters[aF].AutoFilter)
 						bWithoutFilter = true;
 						
-					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter);
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter, true);
 				}
 			}
 
@@ -8179,7 +8180,7 @@
 				t._prepareCellTextMetricsCache(arn);
 			}
 
-			History.EndTransaction();
+			//History.EndTransaction();
 			var oSelection = History.GetSelection();
 			if(null != oSelection)
 			{

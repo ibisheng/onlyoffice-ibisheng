@@ -6822,7 +6822,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			
-			_moveAutoFilters: function(arnTo, arnFrom, data)
+			_moveAutoFilters: function(arnTo, arnFrom, data, copyRange)
 			{
 				//проверяем покрывает ли диапазон хотя бы один автофильтр
 				var ws = this.worksheet;
@@ -6840,106 +6840,113 @@ var gUndoInsDelCellsFlag = true;
 				
 				var addRedo = false;
 				
-				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
-				if(findFilters)
+				if(copyRange)
 				{
-					var diffCol = arnTo.c1 - arnFrom.c1;
-					var diffRow = arnTo.r1 - arnFrom.r1;
-					var ref;
-					var range;
-					var newRange;
-					var oCurFilter;
-					//у найденных фильтров меняем Ref + скрытые строчки открываем
-					for(var i = 0; i < findFilters.length; i++)
+					this._cloneCtrlAutoFilters(arnTo, arnFrom);
+				}
+				else
+				{
+					var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+					if(findFilters)
 					{
-						if(!oCurFilter)
-							oCurFilter = [];
-						oCurFilter[i] = findFilters[i].clone(aWs);
-						ref = findFilters[i].Ref;
-						range = ref;
-						newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);
-						findFilters[i].Ref = newRange;
-						if(findFilters[i].AutoFilter)
-							findFilters[i].AutoFilter.Ref = newRange;
-						
-						if((findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns && findFilters[i].AutoFilter.FilterColumns.length) || (findFilters[i].FilterColumns && findFilters[i].FilterColumns.length))
+						var diffCol = arnTo.c1 - arnFrom.c1;
+						var diffRow = arnTo.r1 - arnFrom.r1;
+						var ref;
+						var range;
+						var newRange;
+						var oCurFilter;
+						//у найденных фильтров меняем Ref + скрытые строчки открываем
+						for(var i = 0; i < findFilters.length; i++)
 						{
-							aWs.setRowHidden(false, ref.r1, ref.r2);
-							isUpdate = true;
-						}
-
-						if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
-							findFilters[i].AutoFilter.FilterColumns = null;
-						else if(!data && findFilters[i] && findFilters[i].FilterColumns)
-							findFilters[i].FilterColumns = null;
-						else if(data && data[i] && data[i].AutoFilter && data[i].AutoFilter.FilterColumns)
-							findFilters[i].AutoFilter.FilterColumns = data[i].AutoFilter.FilterColumns;
-						else if(data && data[i] && data[i].FilterColumns)
-							findFilters[i].FilterColumns = data[i].FilterColumns;
+							if(!oCurFilter)
+								oCurFilter = [];
+							oCurFilter[i] = findFilters[i].clone(aWs);
+							ref = findFilters[i].Ref;
+							range = ref;
+							newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);
+							findFilters[i].Ref = newRange;
+							if(findFilters[i].AutoFilter)
+								findFilters[i].AutoFilter.Ref = newRange;
 							
-						//при перемещении меняем массив кнопок
-						var changeButtonArray = [];
-						var k = 0;
-						if(this.allButtonAF)
-						{
-							var buttons = this.allButtonAF;
-							for(var n = 0; n < buttons.length; n++)
+							if((findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns && findFilters[i].AutoFilter.FilterColumns.length) || (findFilters[i].FilterColumns && findFilters[i].FilterColumns.length))
 							{
-								var id;
-								var idNext;
-								if(buttons[n].inFilter.isEqual(ref) && findFilters[i] && findFilters[i].result && findFilters[i].result.length)
+								aWs.setRowHidden(false, ref.r1, ref.r2);
+								isUpdate = true;
+							}
+
+							if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
+								findFilters[i].AutoFilter.FilterColumns = null;
+							else if(!data && findFilters[i] && findFilters[i].FilterColumns)
+								findFilters[i].FilterColumns = null;
+							else if(data && data[i] && data[i].AutoFilter && data[i].AutoFilter.FilterColumns)
+								findFilters[i].AutoFilter.FilterColumns = data[i].AutoFilter.FilterColumns;
+							else if(data && data[i] && data[i].FilterColumns)
+								findFilters[i].FilterColumns = data[i].FilterColumns;
+								
+							//при перемещении меняем массив кнопок
+							var changeButtonArray = [];
+							var k = 0;
+							if(this.allButtonAF)
+							{
+								var buttons = this.allButtonAF;
+								for(var n = 0; n < buttons.length; n++)
 								{
-									for(var b = 0; b < findFilters[i].result.length; b++)
+									var id;
+									var idNext;
+									if(buttons[n].inFilter.isEqual(ref) && findFilters[i] && findFilters[i].result && findFilters[i].result.length)
 									{
-										if(buttons[n].id == findFilters[i].result[b].id)
+										for(var b = 0; b < findFilters[i].result.length; b++)
 										{
-											id = this._shiftId(buttons[n].id, diffCol, diffRow);
-											idNext = this._shiftId(buttons[n].idNext, diffCol, diffRow);
-											break;
+											if(buttons[n].id == findFilters[i].result[b].id)
+											{
+												id = this._shiftId(buttons[n].id, diffCol, diffRow);
+												idNext = this._shiftId(buttons[n].idNext, diffCol, diffRow);
+												break;
+											}
 										}
+										
+										changeButtonArray[n] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
+										k++;
+										if(findFilters[i].result.length == k)
+											break;
 									}
-									
-									changeButtonArray[n] = {inFilter: newRange, id: id ? id : this._shiftId(buttons[n].id, diffCol, diffRow), idNext: idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow)};
-									k++;
-									if(findFilters[i].result.length == k)
-										break;
 								}
 							}
-						}
-						
-						//изменяем result у фильтра
-						for(var b = 0; b < findFilters[i].result.length; b++)
-						{
-							id = this._shiftId(findFilters[i].result[b].id, diffCol, diffRow);
-							idNext = this._shiftId(findFilters[i].result[b].idNext, diffCol, diffRow);
-							findFilters[i].result[b].id = id;
-							findFilters[i].result[b].idNext = idNext;
-						}
-						
-						//при изменении кнопок, чтобы не было наложений, создаём массив changeButtonArray и изменяем сразу все нужные кнопки
-						for(var b in changeButtonArray)
-						{
-							if(buttons && buttons[b])
+							
+							//изменяем result у фильтра
+							for(var b = 0; b < findFilters[i].result.length; b++)
 							{
-								buttons[b].inFilter = changeButtonArray[b].inFilter;
-								buttons[b].id = changeButtonArray[b].id;
-								buttons[b].idNext = changeButtonArray[b].idNext;
+								id = this._shiftId(findFilters[i].result[b].id, diffCol, diffRow);
+								idNext = this._shiftId(findFilters[i].result[b].idNext, diffCol, diffRow);
+								findFilters[i].result[b].id = id;
+								findFilters[i].result[b].idNext = idNext;
 							}
+							
+							//при изменении кнопок, чтобы не было наложений, создаём массив changeButtonArray и изменяем сразу все нужные кнопки
+							for(var b in changeButtonArray)
+							{
+								if(buttons && buttons[b])
+								{
+									buttons[b].inFilter = changeButtonArray[b].inFilter;
+									buttons[b].id = changeButtonArray[b].id;
+									buttons[b].idNext = changeButtonArray[b].idNext;
+								}
+							}
+							
+							if(oCurFilter[i].TableStyleInfo && oCurFilter[i] && findFilters[i])
+							{
+								this._cleanStyleTable(aWs, oCurFilter[i].Ref);
+								this._setColorStyleTable(findFilters[i].Ref, findFilters[i]);
+							}
+							
+							if(!addRedo && !data)
+							{
+								this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange});
+								addRedo = true;
+							}
+							else if(!data && addRedo)
+								this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move);
 						}
-						
-						if(oCurFilter[i].TableStyleInfo && oCurFilter[i] && findFilters[i])
-						{
-							this._cleanStyleTable(aWs, oCurFilter[i].Ref);
-							this._setColorStyleTable(findFilters[i].Ref, findFilters[i]);
-						}
-						
-						if(!addRedo && !data)
-						{
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange});
-							addRedo = true;
-						}
-						else if(!data && addRedo)
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move);
 					}
 				}
 				
@@ -6956,6 +6963,33 @@ var gUndoInsDelCellsFlag = true;
 					}
 				}
 				
+			},
+			
+			_cloneCtrlAutoFilters: function(arnTo, arnFrom)
+			{
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
+				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+				
+				if(findFilters && findFilters.length)
+				{
+					var diffCol = arnTo.c1 - arnFrom.c1;
+					var diffRow = arnTo.r1 - arnFrom.r1;
+					var newRange, ref, bWithoutFilter;
+					
+					for(var i = 0; i < findFilters.length; i++)
+					{
+						if(findFilters[i].TableStyleInfo)
+						{
+							ref = findFilters[i].Ref;
+							newRange = Asc.Range(ref.c1 + diffCol, ref.r1 + diffRow, ref.c2 + diffCol, ref.r2 + diffRow);
+							bWithoutFilter = findFilters[i].AutoFilter === null ? true : false;
+							
+							if(!ref.intersection(newRange) && !this._intersectionRangeWithTableParts(newRange, aWs, arnFrom))
+								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, null, true, bWithoutFilter);
+						}
+					}
+				}
 			},
 			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
