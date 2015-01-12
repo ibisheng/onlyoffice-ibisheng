@@ -6868,6 +6868,7 @@ var gUndoInsDelCellsFlag = true;
 							if(findFilters[i].AutoFilter)
 								findFilters[i].AutoFilter.Ref = newRange;
 							
+							isUpdate = false;
 							if((findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns && findFilters[i].AutoFilter.FilterColumns.length) || (findFilters[i].FilterColumns && findFilters[i].FilterColumns.length))
 							{
 								aWs.setRowHidden(false, ref.r1, ref.r2);
@@ -6946,6 +6947,10 @@ var gUndoInsDelCellsFlag = true;
 							}
 							else if(!data && addRedo)
 								this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move);
+								
+							//обновляем в случае открытия строк
+							if(isUpdate)
+								ws._onUpdateFormatTable(range, null, true);
 						}
 					}
 				}
