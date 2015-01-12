@@ -8169,7 +8169,7 @@
 					if(!aFilters[aF].AutoFilter)
 						bWithoutFilter = true;
 						
-					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter, true);
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter);
 				}
 			}
 
@@ -8180,7 +8180,7 @@
 				t._prepareCellTextMetricsCache(arn);
 			}
 
-			//History.EndTransaction();
+			History.EndTransaction();
 			var oSelection = History.GetSelection();
 			if(null != oSelection)
 			{
