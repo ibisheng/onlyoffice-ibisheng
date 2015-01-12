@@ -3457,39 +3457,32 @@ CPresentation.prototype =
 
     alignLeft : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignLeft, [editor.bAlignBySelected]);
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignLeft(editor.bAlignBySelected);
     },
 
     alignRight : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignRight, [editor.bAlignBySelected]);
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignRight(editor.bAlignBySelected);
     },
 
     alignTop : function()
     {
-
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignTop, [editor.bAlignBySelected]);
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignTop(editor.bAlignBySelected);
     },
 
     alignBottom : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignBottom, [editor.bAlignBySelected]);
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignBottom(editor.bAlignBySelected);
     },
 
     alignCenter : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignCenter, [editor.bAlignBySelected]);
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignCenter(editor.bAlignBySelected);
     },
 
     alignMiddle : function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.alignMiddle, [editor.bAlignBySelected]);
-        this.Document_UpdateInterfaceState();
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignMiddle(editor.bAlignBySelected);
     },
 
     distributeHor : function()

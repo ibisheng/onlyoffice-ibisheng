@@ -70,7 +70,7 @@ function asc_docs_api(name)
     this.isPageBreakBefore = false;
     this.isKeepLinesTogether = false;
     this.isPresentationEditor = true;
-    this.bAlignBySelected     = true;
+    this.bAlignBySelected     = false;
 
     this.isMobileVersion = false;
     this.isPaintFormat = false;
