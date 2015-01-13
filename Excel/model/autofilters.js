@@ -5427,9 +5427,9 @@ var gUndoInsDelCellsFlag = true;
 						var insertIndexes = [];
 						for(var filR = 0; filR < filter.result.length; filR++)
 						{
-							 var curFilter = filter.result[filR];
-							 var newFirstCol = this._idToRange(curFilter.id);
-							 var newNextCol = this._idToRange(curFilter.idNext);
+							var curFilter = filter.result[filR];
+							var newFirstCol = this._idToRange(curFilter.id);
+							var newNextCol = this._idToRange(curFilter.idNext);
 							if(type == 'insRow')
 							{
 								newFirstCol.r1 = newFirstCol.r1 + val;
