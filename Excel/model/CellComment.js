@@ -582,7 +582,7 @@ CCellCommentator.prototype.drawCommentCells = function() {
 		return;
 
 	this.drawingCtx.setFillStyle(this.commentIconColor);
-	var commentCell, mergedRange, nCol, nRow, vr, nColSize, nRowSize, x, y;
+	var commentCell, mergedRange, nCol, nRow, x, y, metrics;
 	for (var i = 0; i < this.aComments.length; ++i) {
 		commentCell = this.aComments[i];
 		if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
@@ -592,18 +592,14 @@ CCellCommentator.prototype.drawCommentCells = function() {
 		nCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
 		nRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
 
-		if (vr = this.worksheet.getCellVisibleRange(nCol, nRow)) {
-			nColSize = this.worksheet.getColSize(nCol);
-			nRowSize = this.worksheet.getRowSize(nRow);
-			if (nColSize && nRowSize) {
-				x = nColSize.left + nColSize.width - vr.offsetX;
-				y = nRowSize.top - vr.offsetY;
-				this.drawingCtx.beginPath();
-				this.drawingCtx.moveTo(x - this.pxToPt(7), y);
-				this.drawingCtx.lineTo(x - this.pxToPt(1), y);
-				this.drawingCtx.lineTo(x - this.pxToPt(1), y + this.pxToPt(6));
-				this.drawingCtx.fill();
-			}
+		if (metrics = this.worksheet.getCellMetrics(nCol, nRow)) {
+			x = metrics.left + metrics.width;
+			y = metrics.top;
+			this.drawingCtx.beginPath();
+			this.drawingCtx.moveTo(x - this.pxToPt(7), y);
+			this.drawingCtx.lineTo(x - this.pxToPt(1), y);
+			this.drawingCtx.lineTo(x - this.pxToPt(1), y + this.pxToPt(6));
+			this.drawingCtx.fill();
 		}
 	}
 };
@@ -616,47 +612,6 @@ CCellCommentator.prototype.getTextMetrics = function(text, units) {
 		metrics.width = textOptions.width;
 		metrics.height = textOptions.lineHeight;
 	}
-	return metrics;
-};
-
-CCellCommentator.prototype.getCellMetrics = function(col, row) {
-	var metrics = { top: 0, left: 0, width: 0, height: 0, result: false }; 	// px
-
-	for (var n = 0; n < this.worksheet.drawingArea.frozenPlaces.length; n++) {
-		var frozenPlace = this.worksheet.drawingArea.frozenPlaces[n];
-		if ( !frozenPlace.isCellInside({ col: col, row: row }) )
-			continue;
-
-		var fv = frozenPlace.getFirstVisible();
-		var mergedRange = this.worksheet.model.getMergedByCell(row, col);
-
-		if (mergedRange && (fv.col < mergedRange.c2) && (fv.row < mergedRange.r2)) {
-
-			var startCol = (mergedRange.c1 > fv.col) ? mergedRange.c1 : fv.col;
-			var startRow = (mergedRange.r1 > fv.row) ? mergedRange.r1 : fv.row;
-
-			metrics.top = this.worksheet.getCellTop(startRow, 1) /*- this.worksheet.getCellTop(fv.row, 1) + this.worksheet.getCellTop(0, 1)*/ + this.pxToPt(frozenPlace.getVerticalScroll()) - this.worksheet.getCellTop(0, 1);
-			metrics.left = this.worksheet.getCellLeft(startCol, 1) /*- this.worksheet.getCellLeft(fv.col, 1) + this.worksheet.getCellLeft(0, 1)*/ + this.pxToPt(frozenPlace.getHorizontalScroll()) - this.worksheet.getCellLeft(0, 1);
-
-			var i;
-			for (i = startCol; i <= mergedRange.c2; i++) {
-				metrics.width += this.worksheet.getColumnWidth(i, 1)
-			}
-			for (i = startRow; i <= mergedRange.r2; i++) {
-				metrics.height += this.worksheet.getRowHeight(i, 1)
-			}
-			metrics.result = true;
-		}
-		else if ((fv.row <= row) && (fv.col <= col)) {
-
-			metrics.top = this.worksheet.getCellTop(row, 1) /*- this.worksheet.getCellTop(fv.row, 1) + this.worksheet.getCellTop(0, 1)*/ + this.pxToPt(frozenPlace.getVerticalScroll()) - this.worksheet.getCellTop(0, 1);
-			metrics.left = this.worksheet.getCellLeft(col, 1) /*- this.worksheet.getCellLeft(fv.col, 1) + this.worksheet.getCellLeft(0, 1)*/ + this.pxToPt(frozenPlace.getHorizontalScroll()) - this.worksheet.getCellLeft(0, 1);
-			metrics.width = this.worksheet.getColumnWidth(col, 1);
-			metrics.height = this.worksheet.getRowHeight(row, 1);
-			metrics.result = true;
-		}
-	}
-
 	return metrics;
 };
 
@@ -675,12 +630,12 @@ CCellCommentator.prototype.updateCommentPosition = function() {
 				for (var i = 0; i < commentList.length; i++) {
 					indexes.push(commentList[i].asc_getId());
 				}
-				var metrics = this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
+				var isVisible = (null !== this.worksheet.getCellVisibleRange(comment.asc_getCol(), comment.asc_getRow()));
 
 				this.worksheet.model.workbook.handlers.trigger( "asc_onUpdateCommentPosition", indexes,
-					(metrics.result ? coords.asc_getLeftPX() : -1),
-					(metrics.result ? coords.asc_getTopPX() : -1),
-					(metrics.result ? coords.asc_getReverseLeftPX() : -1) );
+					(isVisible ? coords.asc_getLeftPX() : -1),
+					(isVisible ? coords.asc_getTopPX() : -1),
+					(isVisible ? coords.asc_getReverseLeftPX() : -1) );
 			}
 		}
 	}
@@ -858,14 +813,12 @@ CCellCommentator.prototype.resetLastSelectedId = function() {
 };
 
 CCellCommentator.prototype.cleanLastSelection = function() {
-	if ( this.lastSelectedId ) {
+	var metrics;
+	if (this.lastSelectedId) {
 		var lastComment = this.asc_findComment(this.lastSelectedId);
-		if ( lastComment ) {
-			var lastMetrics = this.getCellMetrics(lastComment.nCol, lastComment.nRow);
-			if ( lastMetrics.result ) {
-				var extraOffset = this.pxToPt(1);
-				this.overlayCtx.clearRect(lastMetrics.left, lastMetrics.top, lastMetrics.width - extraOffset, lastMetrics.height - extraOffset);
-			}
+		if (lastComment && (metrics = this.worksheet.getCellMetrics(lastComment.nCol, lastComment.nRow))) {
+			var extraOffset = this.pxToPt(1);
+			this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
 		}
 	}
 };
@@ -1059,13 +1012,12 @@ CCellCommentator.prototype.prepareCommentsToSave = function() {
 };
 
 CCellCommentator.prototype.cleanSelectedComment = function() {
+	var metrics;
 	if ( this.lastSelectedId ) {
 		var comment = this.asc_findComment(this.lastSelectedId);
-		if ( comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() ) {
-			var metrics = this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
-			if (metrics.result)
-				this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
-		}
+		if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() &&
+			(metrics = this.worksheet.getCellMetrics(comment.asc_getCol(), comment.asc_getRow())))
+			this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
 	}
 };
 
@@ -1133,6 +1085,7 @@ CCellCommentator.prototype.asc_showComment = function(id, bNew) {
 
 CCellCommentator.prototype.asc_selectComment = function(id, bMove) {
 	var comment = this.asc_findComment(id);
+	var metrics;
 
 	// Чистим предыдущий селект
 	this.cleanLastSelection();
@@ -1163,8 +1116,7 @@ CCellCommentator.prototype.asc_selectComment = function(id, bMove) {
 			}
 		}
 
-		var metrics = this.getCellMetrics(col, row);
-		if (metrics.result) {
+		if (metrics = this.worksheet.getCellMetrics(col, row)) {
 			var extraOffset = this.pxToPt(1);
 			this.overlayCtx.ctx.globalAlpha = 0.2;
 			this.overlayCtx.beginPath();
