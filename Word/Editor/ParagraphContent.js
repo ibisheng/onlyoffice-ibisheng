@@ -4489,7 +4489,10 @@ ParaDrawing.prototype =
         var _x = (this.PositionH.Align || bInline) ? x - this.GraphicObj.bounds.x : x;
         var _y = (this.PositionV.Align || bInline) ? y - this.GraphicObj.bounds.y : y;
 
-        this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
+        if(!(this.DocumentContent && this.DocumentContent.Is_HdrFtr() && this.DocumentContent.Get_StartPage_Absolute() !== pageIndex))
+        {
+            this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
+        }
         this.selectX = x;
         this.selectY = y;
 

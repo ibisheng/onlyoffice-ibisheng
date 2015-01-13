@@ -712,33 +712,36 @@ CGraphicObjects.prototype =
         for(i = 0; i < drawings.length; ++i)
         {
             var array_type = drawings[i].getDrawingArrayType();
-            var drawing_array = null;
-            switch(array_type)
+            if(drawings[i].PageNum === pageIndex)
             {
-                case DRAWING_ARRAY_TYPE_INLINE:
+                var drawing_array = null;
+                switch(array_type)
                 {
-                    drawing_array = hdr_ftr_page.inlineObjects;
-                    break;
+                    case DRAWING_ARRAY_TYPE_INLINE:
+                    {
+                        drawing_array = hdr_ftr_page.inlineObjects;
+                        break;
+                    }
+                    case DRAWING_ARRAY_TYPE_BEHIND:
+                    {
+                        drawing_array  = hdr_ftr_page.behindDocObjects;
+                        break;
+                    }
+                    case DRAWING_ARRAY_TYPE_BEFORE:
+                    {
+                        drawing_array = hdr_ftr_page.beforeTextObjects;
+                        break;
+                    }
+                    case DRAWING_ARRAY_TYPE_WRAPPING:
+                    {
+                        drawing_array = hdr_ftr_page.wrappingObjects;
+                        break;
+                    }
                 }
-                case DRAWING_ARRAY_TYPE_BEHIND:
+                if(Array.isArray(drawing_array))
                 {
-                    drawing_array  = hdr_ftr_page.behindDocObjects;
-                    break;
+                    drawing_array.push(drawings[i].GraphicObj);
                 }
-                case DRAWING_ARRAY_TYPE_BEFORE:
-                {
-                    drawing_array = hdr_ftr_page.beforeTextObjects;
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_WRAPPING:
-                {
-                    drawing_array = hdr_ftr_page.wrappingObjects;
-                    break;
-                }
-            }
-            if(Array.isArray(drawing_array))
-            {
-                drawing_array.push(drawings[i].GraphicObj);
             }
         }
         for(i = 0; i < tables.length; ++i)
@@ -2380,8 +2383,19 @@ CGraphicObjects.prototype =
     selectById: function(id, pageIndex)
     {
         this.resetSelection();
-        var object = g_oTableId.Get_ById(id);
-        object.GraphicObj.select(this, pageIndex);
+        var obj = g_oTableId.Get_ById(id), nPageIndex = pageIndex;
+        if(obj && obj.GraphicObj)
+        {
+            if(obj.DocumentContent && obj.DocumentContent.Is_HdrFtr())
+            {
+                if(obj.DocumentContent.Get_StartPage_Absolute() !== obj.PageNum)
+                {
+                    nPageIndex = obj.PageNum;
+                }
+            }
+            obj.GraphicObj.select(this, nPageIndex);
+        }
+
     },
 
     calculateAfterChangeTheme: function()
