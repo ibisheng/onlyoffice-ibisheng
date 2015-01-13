@@ -581,52 +581,31 @@ CCellCommentator.prototype.drawCommentCells = function() {
 	if ( this.isViewerMode() || !this.bShow )
 		return;
 
-	var drawCells = []; 	// Associative array
-	function getCellId(col, row) { return (col + "_" + row); }
+	this.drawingCtx.setFillStyle(this.commentIconColor);
+	var commentCell, mergedRange, nCol, nRow, vr, nColSize, nRowSize, x, y;
+	for (var i = 0; i < this.aComments.length; ++i) {
+		commentCell = this.aComments[i];
+		if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
+			continue;
 
-	for (var n = 0; n < this.worksheet.drawingArea.frozenPlaces.length; n++) {
-		var frozenPlace = this.worksheet.drawingArea.frozenPlaces[n];
-		var fv = frozenPlace.getFirstVisible();
-		var lvr = this.worksheet.getLastVisibleRow();
-		var lvc = this.worksheet.getLastVisibleCol();
+		mergedRange = this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
+		nCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
+		nRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
 
-		for (var i = 0; i < this.aComments.length; i++) {
-			// Get cell metrics
-			var commentCell = this.aComments[i];
-			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved())
-				continue;
-
-			var mergedRange = this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
-			var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
-			var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
-			if (drawCol < fv.col || drawRow < fv.row || drawCol > lvc || drawRow > lvr)
-				continue;
-
-			if ( !frozenPlace.isCellInside({ col: drawCol, row: drawRow }) )
-				continue;
-
-			var cellId = getCellId(commentCell.nCol, commentCell.nRow);
-			if (drawCells[cellId])
-				continue;
-
-			var metrics = this.getCellMetrics(drawCol, drawRow);
-			if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
-				continue;
-
-			this.drawingCtx.beginPath();
-			this.drawingCtx.setFillStyle(this.commentIconColor);
-
-			this.drawingCtx.moveTo(metrics.left + metrics.width - this.pxToPt(7), metrics.top);
-			this.drawingCtx.lineTo(metrics.left + metrics.width - this.pxToPt(1), metrics.top);
-			this.drawingCtx.lineTo(metrics.left + metrics.width - this.pxToPt(1), metrics.top + this.pxToPt(6));
-			this.drawingCtx.closePath();
-			this.drawingCtx.fill();
-
-			drawCells[cellId] = cellId;
+		if (vr = this.worksheet.getCellVisibleRange(nCol, nRow)) {
+			nColSize = this.worksheet.getColSize(nCol);
+			nRowSize = this.worksheet.getRowSize(nRow);
+			if (nColSize && nRowSize) {
+				x = nColSize.left + nColSize.width - vr.offsetX;
+				y = nRowSize.top - vr.offsetY;
+				this.drawingCtx.beginPath();
+				this.drawingCtx.moveTo(x - this.pxToPt(7), y);
+				this.drawingCtx.lineTo(x - this.pxToPt(1), y);
+				this.drawingCtx.lineTo(x - this.pxToPt(1), y + this.pxToPt(6));
+				this.drawingCtx.fill();
+			}
 		}
 	}
-	//if (this.lastSelectedId)
-	//	this.asc_selectComment(this.lastSelectedId, false);
 };
 
 CCellCommentator.prototype.getTextMetrics = function(text, units) {

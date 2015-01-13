@@ -31,6 +31,7 @@
 		var asc_Range   = asc.Range;
 		var asc_ActiveRange   = asc.ActiveRange;
 		var asc_CMM		= asc.asc_CMouseMoveData;
+		var asc_VR		= asc.VisibleRange
 
 		var asc_CCellFlag		= asc.asc_CCellFlag;
 		var asc_CFont			= asc.asc_CFont;
@@ -346,6 +347,41 @@
 
 			return this;
 		}
+
+		WorksheetView.prototype.getCellVisibleRange = function (col, row) {
+			var vr, offsetX = 0, offsetY = 0, cFrozen, rFrozen;
+			if (this.topLeftFrozenCell) {
+				cFrozen = this.topLeftFrozenCell.getCol0() - 1;
+				rFrozen = this.topLeftFrozenCell.getRow0() - 1;
+				if (col <= cFrozen && row <= rFrozen)
+					vr = new asc_Range(0, 0, cFrozen, rFrozen);
+				else if (col <= cFrozen) {
+					vr = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+					offsetY -= this.rows[rFrozen + 1].top - this.cellsTop;
+				} else if (row <= rFrozen) {
+					vr = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+					offsetX -= this.cols[cFrozen + 1].left - this.cellsLeft;
+				} else {
+					vr = this.visibleRange;
+					offsetX -= this.cols[cFrozen + 1].left - this.cellsLeft;
+					offsetY -= this.rows[rFrozen + 1].top - this.cellsTop;
+				}
+			} else
+				vr = this.visibleRange;
+
+			offsetX += this.cols[vr.c1].left - this.cellsLeft;
+			offsetY += this.rows[vr.r1].top - this.cellsTop;
+
+			return vr.contains(col, row) ? new asc_VR(vr, offsetX, offsetY) : null;
+		};
+
+		WorksheetView.prototype.getColSize = function (col) {
+			return (col >= 0 && col < this.cols.length) ? this.cols[col] : null;
+		};
+
+		WorksheetView.prototype.getRowSize = function (row) {
+			return (row >= 0 && row < this.rows.length) ? this.rows[row] : null;
+		};
 
 		WorksheetView.prototype.getFrozenCell = function () {
 			return this.topLeftFrozenCell;

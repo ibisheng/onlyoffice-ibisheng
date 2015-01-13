@@ -575,6 +575,12 @@
 			return sRes;
 		};
 
+		function VisibleRange(visibleRange, offsetX, offsetY) {
+			this.visibleRange = visibleRange;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+		}
+
 		function RangeCache()
 		{
 			this.oCache = {};
@@ -1489,6 +1495,7 @@
 		window["Asc"].Range = Range;
 		window["Asc"].ActiveRange = ActiveRange;
 		window["Asc"].FormulaRange = FormulaRange;
+		window["Asc"].VisibleRange = VisibleRange;
 		window["Asc"].g_oRangeCache = g_oRangeCache;
 
 		window["Asc"].HandlersList = HandlersList;
