@@ -1369,7 +1369,7 @@ var gUndoInsDelCellsFlag = true;
 				this.historyTempObj = {};
 				
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells, insertType);
+				this._changeFiltersAfterInsertCells(colInsert,val,'insCol',activeCells, insertType);
 				this._addToHistoryFromTempObj();
 				
 				this._changeFiltersApply();
@@ -1403,7 +1403,7 @@ var gUndoInsDelCellsFlag = true;
 				this.historyTempObj = {};
 				
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(colInsert,val,'insRow',activeCells, insertType);
+				this._changeFiltersAfterInsertCells(colInsert,val,'insRow',activeCells, insertType);
 				this._addToHistoryFromTempObj();
 				
 				this._changeFiltersApply();
@@ -5222,16 +5222,19 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//change filters after insert column
-			_changeFiltersAfterColumn: function(col, val, type, activeCells, insertType)
+			_changeFiltersAfterInsertCells: function(col, val, type, activeCells, insertType)
 			{
 				History.TurnOff();
 				var aWs = this._getCurrentWS();
+				
+				//заранее удаляем все вошедшие в активную область фильтры
+				if(val < 0)
+					this.isEmptyAutoFilters(activeCells, true, true, true);
+				
 				if(aWs.AutoFilter)
 				{
-					//var ref = aWs.AutoFilter.Ref.split(':');
-					
 					var ref = aWs.AutoFilter.Ref;
-					
+				
 					var options = {
 						ref:ref,
 						val:val,
@@ -5239,15 +5242,16 @@ var gUndoInsDelCellsFlag = true;
 						col:col
 					};
 					//внутри данного фильтра располагается колонка(колонки)
-					this._changeFilterAfterInsertColumn(options,type,activeCells);
+					this._isChangeFilterAfterInsertCells(options,type,activeCells);
+		
 				}
+				
+				
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
 					var length;
 					for(var lT = 0; lT < aWs.TableParts.length; lT++)
 					{
-						//var ref = aWs.TableParts[lT].Ref.split(':');
-						
 						var ref = aWs.TableParts[lT].Ref;
 						
 						var options = {
@@ -5268,7 +5272,7 @@ var gUndoInsDelCellsFlag = true;
 								clearRange.setTableStyle(null);
 							}
 								
-							this._changeFilterAfterInsertColumn(options,type,activeCells);
+							this._isChangeFilterAfterInsertCells(options,type,activeCells);
 						}
 							
 						if(length > aWs.TableParts.length)
@@ -5278,30 +5282,10 @@ var gUndoInsDelCellsFlag = true;
 				History.TurnOn();
 			},
 			
-			_bCheckChangeFilter: function(type, insertType, activeCells, ref)
-			{
-				var result = false;
-				
-				if(insertType == c_oAscDeleteOptions.DeleteColumns || insertType == c_oAscDeleteOptions.DeleteRows)
-					result = true;
-				else if(type == "insCol" && (insertType == c_oAscDeleteOptions.DeleteCellsAndShiftLeft || insertType == c_oAscDeleteOptions.DeleteCellsAndShiftTop) && activeCells.r1 <= ref.r1 && activeCells.r2 >= ref.r2)
-					result = true;
-				else if(type == "insRow" && (insertType == c_oAscDeleteOptions.DeleteCellsAndShiftLeft || insertType == c_oAscDeleteOptions.DeleteCellsAndShiftTop) && activeCells.c1 <= ref.c1 && activeCells.c2 >= ref.c2)
-					result = true;
-				else if(insertType == undefined)
-					result = true;
-					
-				return result;
-			},
-			
-			_changeFilterAfterInsertColumn: function(options, type, activeCells)
+			_isChangeFilterAfterInsertCells: function(options, type, activeCells)
 			{
 				var ref = options.ref, val = options.val, col = options.col, index = options.index;
-				//var aWs = this._getCurrentWS(ws);
 				var range = {};
-				
-				/*var startRange = this._idToRange(ref[0]);
-				var endRange = this._idToRange(ref[1]);*/
 				
 				var startRange =  Asc.Range(ref.c1, ref.r1, ref.c1, ref.r1);
 				var endRange =  Asc.Range(ref.c2, ref.r2, ref.c2, ref.r2);
@@ -5313,7 +5297,7 @@ var gUndoInsDelCellsFlag = true;
 				else
 					range.index = index;
 					
-				var  colStart = col;
+				var colStart = col;
 				var colEnd = col + Math.abs(val) - 1;
 				
 				//диапазон фильтра
@@ -5411,55 +5395,6 @@ var gUndoInsDelCellsFlag = true;
 				
 				var oldFilter = filter.clone(aWs);
 				
-				if(val < 0)
-				{
-					var activeRange = ws.activeRange;
-					if(activeCells && typeof activeCells == 'object')
-						activeRange = Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
-					
-					/*var splitRefFilter = filter.Ref.split(":");
-					var startCell = this._idToRange(splitRefFilter[0]);
-					var endCell = this._idToRange(splitRefFilter[1]);*/
-					
-					var splitRefFilter = filter.Ref;
-					
-					var isDelFilter = false;
-					//в данных случаях нужно удалять весь фильтр, как в EXCEl
-					//if(activeRange.contains(startCell.c1,startCell.r1) && activeRange.contains(startCell.c1,endCell.r1) && activeRange.contains(endCell.c1,startCell.r1) && activeRange.contains(endCell.c1,endCell.r1))//под удаление попал весь фильтр
-					if(activeRange.contains(splitRefFilter.c1,splitRefFilter.r1) && activeRange.contains(splitRefFilter.c1,splitRefFilter.r2) && activeRange.contains(splitRefFilter.c2,splitRefFilter.r1) && activeRange.contains(splitRefFilter.c2, splitRefFilter.r2))//под удаление попал весь фильтр
-					{
-						isDelFilter = true;
-					}
-					//else if(type == 'insRow' && activeRange.r1 == startCell.r1 && activeRange.r2 == endCell.r1 && activeRange.c1 >= startCell.c1 && activeRange.c2 <= endCell.c1)//выделен один из столбцов и удаляем строки
-					else if(type == 'insRow' && activeRange.r1 == splitRefFilter.r1 && activeRange.r2 == splitRefFilter.r2 && activeRange.c1 >= splitRefFilter.c1 && activeRange.c2 <= splitRefFilter.c2)//выделен один из столбцов и удаляем строки
-					{
-						isDelFilter = true;
-					}
-					//else if(type != 'insRow' && activeRange.c1 == startCell.c1 && activeRange.c2 == endCell.c1 && activeRange.r1 >= startCell.r1 && activeRange.r2 <= endCell.r1)//выделена одина из строк и удаляем столбцы
-					else if(type != 'insRow' && activeRange.c1 == splitRefFilter.c1 && activeRange.c2 == splitRefFilter.c2 && activeRange.r1 >= splitRefFilter.r1 && activeRange.r2 <= splitRefFilter.r2)//выделена одина из строк и удаляем столбцы
-					{
-						isDelFilter = true;
-					}
-					else if(type === 'insRow' && activeRange.c1 <= splitRefFilter.c1 && activeRange.c2 >= splitRefFilter.c2 && activeRange.r1 <= splitRefFilter.r1 && activeRange.r2 >= splitRefFilter.r1)//под удаление попадает первая строка
-					{
-						isDelFilter = true;
-					}
-					if(isDelFilter)
-					{	
-						/*activeRange = 
-						{
-							r1: startCell.r1,
-							c1: startCell.c1,
-							r2: endCell.r1,
-							c2: endCell.c1
-						}*/
-						
-						activeRange = splitRefFilter;
-						
-						this.isEmptyAutoFilters(activeRange, true, true, true, null, true);
-						return true;
-					}
-				}
 				
 				if(col == null || col == undefined)//добавляем колонку, смещаем фильтры
 				{
@@ -5543,15 +5478,15 @@ var gUndoInsDelCellsFlag = true;
 				else//если добавляем колонку внутрь фильтра
 				{
 					//change Ref into filter
-					if(type == 'insRow')
-						cRange.end.r1 = cRange.end.r1 + val;
-					else
-						cRange.end.c1 = cRange.end.c1 + val;
-						
-					//filter.Ref = this._rangeToId(cRange.start) + ":" + this._rangeToId(cRange.end);
-					
-					//change result into filter and change info in button
-					filter = this._changeInfoFilterAfterInsertCols(filter, type, col, cRange, val, filterColums);
+					if(Asc.Range(cRange.start.c1, cRange.start.r1, cRange.end.c1, cRange.end.r1).intersection(activeCells))
+					{
+						if(type == 'insRow')
+							cRange.end.r1 = cRange.end.r1 + val;
+						else
+							cRange.end.c1 = cRange.end.c1 + val;
+							
+						filter = this._changeInfoFilterAfterInsert(filter, type, col, cRange, val, filterColums);
+					}
 				}
 				
 				//записываем в историю, если активная область касается данных фильтров
@@ -5578,7 +5513,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 			},
 			
-			_changeInfoFilterAfterInsertCols: function(filter, type, col, cRange, val, filterColums)
+			_changeInfoFilterAfterInsert: function(filter, type, col, cRange, val, filterColums)
 			{
 				var ws = this.worksheet;
 				var inFilter = Asc.Range(cRange.start.c1, cRange.start.r1, cRange.end.c1, cRange.end.r1);
@@ -5836,6 +5771,22 @@ var gUndoInsDelCellsFlag = true;
 						
 					return filter;
 				}
+			},
+			
+			_bCheckChangeFilter: function(type, insertType, activeCells, ref)
+			{
+				var result = false;
+				
+				if(insertType == c_oAscDeleteOptions.DeleteColumns || insertType == c_oAscDeleteOptions.DeleteRows)
+					result = true;
+				else if(type == "insCol" && (insertType == c_oAscDeleteOptions.DeleteCellsAndShiftLeft || insertType == c_oAscDeleteOptions.DeleteCellsAndShiftTop) && activeCells.r1 <= ref.r1 && activeCells.r2 >= ref.r2)
+					result = true;
+				else if(type == "insRow" && (insertType == c_oAscDeleteOptions.DeleteCellsAndShiftLeft || insertType == c_oAscDeleteOptions.DeleteCellsAndShiftTop) && activeCells.c1 <= ref.c1 && activeCells.c2 >= ref.c2)
+					result = true;
+				else if(insertType == undefined)
+					result = true;
+					
+				return result;
 			},
 			
 			_changeContentButton: function(array, val, type, inFilter, oldId)
