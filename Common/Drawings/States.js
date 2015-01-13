@@ -198,7 +198,10 @@ NullState.prototype =
         {}
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
-            this.drawingObjects.checkChartTextSelection();
+            if(this.drawingObjects.checkNeedResetChartSelection(e, x, y, pageIndex, bTextFlag))
+            {
+                this.drawingObjects.checkChartTextSelection();
+            }
             this.drawingObjects.resetInternalSelection(true);
         }
         if(!b_no_handle_selected)

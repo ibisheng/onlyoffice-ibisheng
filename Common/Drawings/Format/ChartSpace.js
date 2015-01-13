@@ -367,7 +367,9 @@ CChartSpace.prototype =
             dataLbl:          this.selection.dataLbl,
             textSelection:    this.selection.textSelection,
             plotArea:         this.selection.plotArea,
-            contentSelection: content_selection
+            contentSelection: content_selection,
+            recalcTitle: this.recalcInfo.recalcTitle,
+            bRecalculatedTitle: this.recalcInfo.bRecalculatedTitle
         }
     },
 
@@ -382,6 +384,8 @@ CChartSpace.prototype =
        this.selection.dataLbl        = state.dataLbl;
        this.selection.textSelection  = state.textSelection;
        this.selection.plotArea       = state.plotArea;
+       this.recalcInfo.recalcTitle = state.recalcTitle;
+       this.recalcInfo.bRecalculatedTitle = state.bRecalculatedTitle;
        if(state.contentSelection)
        {
            if(this.selection.textSelection)

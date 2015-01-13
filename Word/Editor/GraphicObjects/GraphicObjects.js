@@ -2440,6 +2440,7 @@ CGraphicObjects.prototype =
     },
 
     checkChartTextSelection: DrawingObjectsController.prototype.checkChartTextSelection,
+    checkNeedResetChartSelection: DrawingObjectsController.prototype.checkNeedResetChartSelection,
 
 
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,

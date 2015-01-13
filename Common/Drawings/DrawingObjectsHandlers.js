@@ -344,7 +344,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
                             content.Update_CursorType(tx, ty, pageIndex);
                         }
                     }
-                    return {objectId: drawing.Get_Id(), cursorType: "text"};
+                    return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
                 }
             }
         }
@@ -443,7 +443,7 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
                             content.Update_CursorType(tx, ty, pageIndex);
                         }
                     }
-                    return {objectId: drawing.Get_Id(), cursorType: "text"};
+                    return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
                 }
             }
         }

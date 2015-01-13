@@ -4397,6 +4397,22 @@ DrawingObjectsController.prototype =
     },
 
 
+    checkNeedResetChartSelection: function(e, x, y, pageIndex, bTextFlag)
+    {
+        var oTitle, oCursorInfo, oTargetTextObject = getTargetTextObject(this);
+        if(oTargetTextObject instanceof CTitle)
+        {
+            oTitle = oTargetTextObject;
+        }
+        if(!oTitle)
+            return true;
+
+        this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        oCursorInfo = this.curState.onMouseDown(e, x, y, pageIndex, bTextFlag);
+        this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        return !(oTitle === oCursorInfo.title);
+    },
+
     checkChartTextSelection: function(bNoRedraw)
     {
         if(this.bNoCheckChartTextSelection === true)
