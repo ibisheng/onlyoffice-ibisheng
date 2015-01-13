@@ -395,7 +395,6 @@ DependencyGraph.prototype = {
         if ( !cellId )
             return;
         var _wsV = this.wb.oApi.wb.getWorksheet(),
-            _getCellMetrics = _wsV.cellCommentator.getCellMetrics,
             _cc = _wsV.cellCommentator,
             ctx = _wsV.overlayCtx,
             _wsVM = _wsV.model,
