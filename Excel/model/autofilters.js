@@ -7319,7 +7319,8 @@ var gUndoInsDelCellsFlag = true;
 						if(aWs.TableParts[k])
 						{
 							rangeFilter = aWs.TableParts[k].Ref;
-							if(range.intersection(rangeFilter) && !range.containsRange(rangeFilter))
+							//TODO пересмотреть условие range.r1 === rangeFilter.r1 && range.c1 === rangeFilter.c1
+							if(range.intersection(rangeFilter) && !(range.containsRange(rangeFilter) && !(range.r1 === rangeFilter.r1 && range.c1 === rangeFilter.c1)))
 							{
 								if(!exceptionRange || !(exceptionRange && exceptionRange.containsRange(rangeFilter)))
 									result[result.length] = aWs.TableParts[k];
@@ -7383,12 +7384,19 @@ var gUndoInsDelCellsFlag = true;
 				var findFiltersTo = this._searchFiltersInRange(arnTo , aWs);
 				if(arnTo && findFiltersTo)
 				{
-					this.isEmptyAutoFilters(arnTo, null, null, null, findFilters);
+					for(var i = 0; i < findFiltersTo.length; i++)
+					{
+						var ref = findFiltersTo[i].Ref;
+						
+						//если переносим просто данные, причём шапки совпадают, то фильтр не очищаем
+						if(arnTo.r1 === ref.r1 && arnTo.c1 === ref.c1)
+						{
+							continue;
+						}
+						else
+							this.isEmptyAutoFilters(ref, null, null, null, findFilters);
+					}
 				}
-				/*else if(aWs.AutoFilter && aWs.AutoFilter.Ref && aWs.AutoFilter.Ref.intersection(arnTo) && !aWs.AutoFilter.Ref.isEqual(arnFrom) && findFilters)//если задеваем часть а/ф областью вставки
-				{
-					this._deleteAutoFilter();
-				}*/
 			},
 			
 			//открываем строки скрытые данным фильтром
