@@ -1373,6 +1373,7 @@ var gUndoInsDelCellsFlag = true;
 				this._addToHistoryFromTempObj();
 				
 				this._changeFiltersApply();
+				this._updateButtonArray();
 			},
 			//при вставке пользователем строки изменяем фильтры
 			insertRows: function(type, val, insertType)
@@ -1407,6 +1408,7 @@ var gUndoInsDelCellsFlag = true;
 				this._addToHistoryFromTempObj();
 				
 				this._changeFiltersApply();
+				this._updateButtonArray();
 			},
 			
 			_addToHistoryFromTempObj: function()
@@ -5380,7 +5382,6 @@ var gUndoInsDelCellsFlag = true;
 				var aWs = this._getCurrentWS();
 				var filter;
 				var filterColums;
-				var buttons = this.allButtonAF;
 				if(cRange.index == 'all')
 				{
 					filter = aWs.AutoFilter.clone(aWs);
@@ -5424,7 +5425,7 @@ var gUndoInsDelCellsFlag = true;
 					//change result into filter and change info in button
 					if(filter.result && filter.result.length > 0)
 					{
-						var insertIndexes = [];
+						//var insertIndexes = [];
 						for(var filR = 0; filR < filter.result.length; filR++)
 						{
 							var curFilter = filter.result[filR];
@@ -5454,20 +5455,7 @@ var gUndoInsDelCellsFlag = true;
 							
 							var id = this._rangeToId(newFirstCol);
 							var nextId = this._rangeToId(newNextCol);
-							if(buttons && buttons.length && ((filter.TableColumns && filter.TableColumns.length && filter.AutoFilter) || (!filter.TableColumns)))//либо а/ф, либо форматированная таблицы с примененным фильтром
-							{
-								for(var b = 0; b < buttons.length; b++)
-								{
-									if(buttons[b].id == curFilter.id && !insertIndexes[b])
-									{
-										buttons[b].inFilter = filter.Ref;
-										buttons[b].id = id;
-										buttons[b].idNext = nextId;
-										insertIndexes[b] = true;
-										break;
-									}
-								}
-							}
+
 							curFilter.inFilter = filter.Ref;
 							curFilter.id = id;
 							curFilter.idNext = nextId;
@@ -5572,15 +5560,11 @@ var gUndoInsDelCellsFlag = true;
 								
 								
 								newResult[n].hiddenRows = [];
-								var num = 1;
-								if(filter.AutoFilter !== null)
-									this._changeContentButton(newResult[n],num,'add',inFilter);
 								n++;
 							}
 							
 							if(val < 0)//удаляем кнопки в случае удаления ячеек
 							{
-								this._changeContentButton(curFilter,Math.abs(val),'del',inFilter);
 								//убираем примененный фильтр
 								if(filterColums)
 								{
@@ -5648,7 +5632,6 @@ var gUndoInsDelCellsFlag = true;
 							newResult[n] = curFilter;
 							
 							var oldId = curFilter.id;
-							this._changeContentButton(newResult[n], null,'change', null, oldId);
 							n++;
 						}
 						else
@@ -5675,9 +5658,6 @@ var gUndoInsDelCellsFlag = true;
 							curFilter.idNext = nextId;
 							newResult[n] = curFilter;
 							
-							if(type == 'insCol')
-								this._changeContentButton(newResult[n], null,'change', null, oldId);
-							
 							//смещаем примененный фильтр(у filter.FilterColumns просматриваем colId)
 							if(filterColums)
 							{
@@ -5693,14 +5673,6 @@ var gUndoInsDelCellsFlag = true;
 							}
 							
 							n++;
-						}
-					}
-					
-					if(type == 'insCol' && filter.AutoFilter !== null)
-					{
-						for(var n = 0; n < newResult.length; n++)
-						{
-							this._changeContentButton(newResult[n], 1, 'add', inFilter);
 						}
 					}
 					
@@ -5766,9 +5738,6 @@ var gUndoInsDelCellsFlag = true;
 					filter.result = newResult;
 					filter.Ref = inFilter;
 					
-					if(val > 0)
-						this._addButtonAF(newResult);
-						
 					return filter;
 				}
 			},
@@ -7611,6 +7580,44 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				return result;
+			},
+			
+			_updateButtonArray: function()
+			{	
+				var aWs = this._getCurrentWS();
+				this.allButtonAF = [];
+				if(aWs.AutoFilter)
+				{
+					var n = 0;
+					for(var i = 0; i < aWs.AutoFilter.result.length; i++)
+					{
+						this.allButtonAF[n] = aWs.AutoFilter.result[i].clone();
+						this.allButtonAF[n].inFilter = aWs.AutoFilter.Ref.clone();
+						n++;
+					}
+				}
+				
+				if(aWs.TableParts && aWs.TableParts.length)
+				{
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{
+						if(aWs.TableParts[i] && aWs.TableParts[i].AutoFilter)
+						{
+							var tablePart = aWs.TableParts[i];
+							
+							var n = this.allButtonAF.length;
+							for(var j = 0; j < tablePart.result.length; j++)
+							{
+								if(tablePart.result[j].showButton != false)
+								{
+									this.allButtonAF[n] = tablePart.result[j].clone();
+									this.allButtonAF[n].inFilter = tablePart.Ref.clone();
+									n++;
+								}
+							}
+						}
+					}
+				}
 			}
 			
 		};
