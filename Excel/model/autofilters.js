@@ -2074,6 +2074,7 @@ var gUndoInsDelCellsFlag = true;
 						{
 							this._reDrawCurrentFilter(cloneData.FilterColumns, cloneData.result);
 							aWs.AutoFilter = cloneData;
+							this._reDrawFilters(aWs.AutoFilter.Ref);
 							isEn = true;
 						}
 						else if(aWs.TableParts)
