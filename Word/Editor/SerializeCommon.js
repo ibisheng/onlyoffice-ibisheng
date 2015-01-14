@@ -721,13 +721,14 @@ function CPPTXContentLoader()
         }
     }
 
-    this.Clear = function()
+    this.Clear = function(bClearStreamOnly)
     {
         //вызывается пока только перед вставкой
         this.Reader.stream = null;
         this.stream = null;
         this.BaseReader = null;
-        this.ImageMapChecker = {};
+        if(!bClearStreamOnly)
+            this.ImageMapChecker = {};
     }
 }
 
