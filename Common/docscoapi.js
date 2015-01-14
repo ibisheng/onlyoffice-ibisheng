@@ -835,6 +835,15 @@
 				}
 				this._onGetLock(data);
 			}
+			// Применения изменений пользователя
+			if (window['AscApplyChanges'] && window['AscChanges']) {
+				var userOfflineChanges = window['AscChanges'], changeOneUser;
+				for (var i = 0; i < userOfflineChanges.length; ++i) {
+					changeOneUser = userOfflineChanges[i];
+					for (var j = 0; j < changeOneUser.length; ++j)
+						this.onSaveChanges(changeOneUser[j], null, true);
+				}
+			}
 			this._updateChanges(data["changes"], data["changesIndex"], true);
 			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
 			if (this.onFirstLoadChangesEnd)
