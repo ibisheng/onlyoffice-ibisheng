@@ -137,6 +137,7 @@
                 "../../PowerPoint/Editor/Format/GraphicFrame.js",
                 "../../PowerPoint/api.js",
                 "../../PowerPoint/apiCommon.js",
+                "../../Word/apiCommon.js",
                 "../../Common/Shapes/EditorSettings.js",
                 "../../PowerPoint/themes/Themes.js"
             ],
