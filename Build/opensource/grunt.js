@@ -1,9 +1,7 @@
 module.exports = function(grunt) {
     var defaultConfig, packageFile;
 
-    grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib');
 
     grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
         defaultConfig = './webword.json';
@@ -46,10 +44,10 @@ module.exports = function(grunt) {
         }
     });
     
-    grunt.registerTask('build_webword',     'build_webword_init build_sdk');
-    grunt.registerTask('build_webexcel',  'build_webexcel_init build_sdk');
-    grunt.registerTask('build_webpowerpoint', 'build_webpowerpoint_init build_sdk');
-    grunt.registerTask('build_all', 'build_webword_init build_sdk build_webexcel_init build_sdk build_webpowerpoint_init build_sdk');
+    grunt.registerTask('build_webword',     ['build_webword_init', 'build_sdk']);
+    grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
+    grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
+    grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk');
 
     grunt.registerTask('compile_sdk_init', function() {
         grunt.initConfig({
@@ -97,7 +95,7 @@ module.exports = function(grunt) {
             }
         });
     });
-    grunt.registerTask('compile_sdk', 'compile_sdk_init min');
+    grunt.registerTask('compile_sdk', ['compile_sdk_init', 'min']);
 
     grunt.registerTask('default', 'build_all');
 };
