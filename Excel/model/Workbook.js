@@ -3750,6 +3750,8 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
 									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
 								}
+								else if(-1 != ref.indexOf(":"))//случай "A1:A1"
+									oNewElem = new cArea(ref, elem.ws);
 								else
 									oNewElem = new cRef(ref, elem.ws);
 							}
