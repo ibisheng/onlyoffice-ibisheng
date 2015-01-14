@@ -3601,7 +3601,7 @@ parserFormula.prototype = {
             if (elem instanceof cRef || elem instanceof cArea) {
                 if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
                     elem.value = elem._cells = node.cellId;
-                    elem.range = node.getBBox().clone();
+                    elem.range = elem.ws.getRange3(to.r1, to.c1, to.r2, to.c2);
                 }
             }
             else if (elem instanceof cRef3D) {
@@ -3625,7 +3625,7 @@ parserFormula.prototype = {
             if (elem instanceof cArea) {
                 if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
                     elem.value = elem._cells = node.cellId;
-                    elem.range = node.getBBox().clone();
+                    elem.range = elem.ws.getRange3(to.r1, to.c1, to.r2, to.c2);
                 }
             }
             else if (elem instanceof cArea3D) {
