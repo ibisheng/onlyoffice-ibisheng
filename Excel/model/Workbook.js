@@ -2540,8 +2540,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 				//удаляем ячейку
 				this._removeCell(nIndex, nColIndex);
 			}
-            delete this.aGCells[nIndex];
 		}
+		delete this.aGCells[nIndex];
 	}
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 
