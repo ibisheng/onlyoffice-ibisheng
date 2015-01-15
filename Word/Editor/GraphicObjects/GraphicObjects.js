@@ -2325,6 +2325,7 @@ CGraphicObjects.prototype =
                     History.Create_NewPoint();
                     this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
                     this.document.Recalculate();
+                    this.document.Document_UpdateInterfaceState();
                 }
             }
             this.resetInternalSelection();

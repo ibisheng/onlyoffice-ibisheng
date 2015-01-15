@@ -260,6 +260,9 @@ CChartSpace.prototype.handleUpdateStyle = function()
     this.recalcInfo.recalculatePen = true;
     this.recalcInfo.recalculateHiLowLines = true;
     this.recalcInfo.recalculateUpDownBars = true;
+    this.handleTitlesAfterChangeTheme();
+    this.recalcInfo.recalculateAxisLabels = true;
+    this.recalcInfo.recalculateAxisVal = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFill = function()

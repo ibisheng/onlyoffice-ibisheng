@@ -180,6 +180,9 @@ CChartSpace.prototype.handleUpdateStyle = function()
     this.recalcInfo.recalculatePen = true;
     this.recalcInfo.recalculateHiLowLines = true;
     this.recalcInfo.recalculateUpDownBars = true;
+    this.handleTitlesAfterChangeTheme();
+    this.recalcInfo.recalculateAxisLabels = true;
+    this.recalcInfo.recalculateAxisVal = true;
     this.addToRecalculate();
 };
 CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
@@ -546,10 +549,10 @@ CChartSpace.prototype.updateTransformMatrix  = function()
 };
 CChartSpace.prototype.getArrayWrapIntervals = CShape.prototype.getArrayWrapIntervals;
 CChartSpace.prototype.select = CShape.prototype.select;
-CChartSpace.prototype.Refresh_RecalcData = function(data)
-{
-    this.addToRecalculate();
-};
+//CChartSpace.prototype.Refresh_RecalcData = function(data)
+//{
+//    this.addToRecalculate();
+//};
 
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
 {

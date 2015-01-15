@@ -297,6 +297,7 @@ CShape.prototype.handleUpdateTheme = function()
     this.recalcStyle && this.recalcStyle();
     this.recalcInfo.recalculateTextStyles && (this.recalcInfo.recalculateTextStyles = [true, true, true, true, true, true, true, true, true]);
     this.recalcBounds && this.recalcBounds();
+    this.handleTitlesAfterChangeTheme && this.handleTitlesAfterChangeTheme();
     if(Array.isArray(this.spTree))
     {
         for(var i = 0; i < this.spTree.length; ++i)

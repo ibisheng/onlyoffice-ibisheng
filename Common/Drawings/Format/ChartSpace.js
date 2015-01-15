@@ -7272,52 +7272,74 @@ CChartSpace.prototype =
         }
     },
 
+    calcGridLine: function(defaultStyle, spPr, subtleLine, parents)
+    {
+        if(spPr)
+        {
+            var compiled_grid_lines = new CLn();
+            compiled_grid_lines.merge(subtleLine);
+            // if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+            // {
+            //     compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+            // }
+            if(!compiled_grid_lines.Fill)
+            {
+                compiled_grid_lines.setFill(new CUniFill());
+            }
+            //if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
+            //{
+            //    compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
+            //}
+            compiled_grid_lines.Fill.merge(defaultStyle);
+
+            if(subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
+                && compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color)
+            {
+                compiled_grid_lines.Fill.fill.color.Mods =  subtleLine.Fill.fill.color.Mods.createDuplicate();
+            }
+            compiled_grid_lines.merge(spPr.ln);
+            compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+            checkBlackUnifill(compiled_grid_lines.Fill, true);
+            return compiled_grid_lines;
+        }
+        return null;
+    },
+
+    calcMajorMinorGridLines: function (axis, defaultStyle, subtleLine, parents)
+    {
+        if(!axis)
+            return;
+        axis.compiledMajorGridLines = this.calcGridLine(defaultStyle.axisAndMajorGridLines, axis.majorGridlines, subtleLine, parents);
+        axis.compiledMinorGridLines = this.calcGridLine(defaultStyle.minorGridlines, axis.minorGridlines, subtleLine, parents);
+    },
+
+    handleTitlesAfterChangeTheme: function()
+    {
+        if(this.chart && this.chart.title)
+        {
+            this.chart.title.checkAfterChangeTheme();
+        }
+        if(this.chart && this.chart.plotArea)
+        {
+            var hor_axis = this.chart.plotArea.getHorizontalAxis();
+            if(hor_axis && hor_axis.title)
+            {
+                hor_axis.checkAfterChangeTheme();
+            }
+            var vert_axis = this.chart.plotArea.getVerticalAxis();
+            if(vert_axis && vert_axis.title)
+            {
+                vert_axis.title.checkAfterChangeTheme();
+            }
+        }
+    },
+
     recalculateGridLines: function()
     {
         if(this.chart && this.chart.plotArea)
         {
-            var calcMajorMinorGridLines = function (axis, defaultStyle, subtleLine, parents)
-            {
-                if(!axis)
-                    return;
-                function calcGridLine(defaultStyle, spPr, subtleLine, parents)
-                {
-                    if(spPr)
-                    {
-                        var compiled_grid_lines = new CLn();
-                        compiled_grid_lines.merge(subtleLine);
-                       // if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
-                       // {
-                       //     compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
-                       // }
-                        if(!compiled_grid_lines.Fill)
-                        {
-                            compiled_grid_lines.setFill(new CUniFill());
-                        }
-                        //if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
-                        //{
-                        //    compiled_grid_lines.Fill.fill.color.Mods.Mods.length = 0;
-                        //}
-                        compiled_grid_lines.Fill.merge(defaultStyle);
-
-                        if(subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
-                            && compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color)
-                        {
-                            compiled_grid_lines.Fill.fill.color.Mods =  subtleLine.Fill.fill.color.Mods.createDuplicate();
-                        }
-                        compiled_grid_lines.merge(spPr.ln);
-                        compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
-                        checkBlackUnifill(compiled_grid_lines.Fill, true);
-                        return compiled_grid_lines;
-                    }
-                    return null;
-                }
-                axis.compiledMajorGridLines = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.majorGridlines, subtleLine, parents);
-                axis.compiledMinorGridLines = calcGridLine(defaultStyle.minorGridlines, axis.minorGridlines, subtleLine, parents);
-            };
             var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.style);
             var parent_objects = this.getParentObjects();
-            var RGBA = {R:0, G:0, B:0, A: 255};
             var subtle_line;
             if(parent_objects.theme  && parent_objects.theme.themeElements
                 && parent_objects.theme.themeElements.fmtScheme
@@ -7325,47 +7347,15 @@ CChartSpace.prototype =
             {
                 subtle_line = parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0];
             }
-            calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
-            calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
+            this.calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
+            this.calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
         }
     },
 
-    getNeedColorCount: function()
-    {
-        var b_vary_markers = this.chart.plotArea.chart instanceof CDoughnutChart || this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1);
-        var need_colors;
-        if(!b_vary_markers)
-        {
-            return this.chart.plotArea.chart.series.length;
-        }
-        else
-        {
-            if(this.chart.plotArea.chart.series[0].val)
-            {
-                return this.chart.plotArea.chart.series[0].val.numRef.numCache.pts.length;
-            }
-            else
-            {
-                if(this.chart.plotArea.chart.series[0].yVal)
-                {
-                    return this.chart.plotArea.chart.series[0].yVal.numRef.numCache.pts.length;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-        }
-    },
 
     hitToAdjustment: function()
     {
         return {hit: false};
-    },
-
-    hitInWorkArea: function()
-    {
-        return false;
     },
 
     recalculateAxisLabels: function()

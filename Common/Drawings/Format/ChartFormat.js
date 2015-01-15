@@ -209,17 +209,6 @@ CDLbl.prototype =
         return this.spPr && this.spPr.Fill ? this.spPr.Fill.transparent : null;
     },
 
-    getTextWidth: function()
-    {
-
-    },
-
-
-
-    getTextHeight: function()
-    {
-
-    },
 
     recalculate: function()
     {
@@ -615,17 +604,14 @@ CDLbl.prototype =
             var style = new CStyle("dataLblStyle", null, null, null);
             var text_pr = new CTextPr();
             text_pr.FontSize = 10;
-            text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
-            var parent_objects;
-            if(this.chart)
+            if(this.chart && isRealNumber(this.chart.style) && this.chart.style > 40)
             {
-                parent_objects = this.chart.getParentObjects();
+                text_pr.Unifill = CreateUnfilFromRGB(255, 255, 255);
             }
-            else if(this.parent)
+            else
             {
-                parent_objects = this.parent.getParentObjects();
+                text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
             }
-            var theme = parent_objects.theme;
 
             var para_pr = new CParaPr();
             para_pr.Jc = align_Center;
@@ -634,10 +620,6 @@ CDLbl.prototype =
             para_pr.Spacing.Line = 1;
             para_pr.Spacing.LineRule = linerule_Auto;
             style.ParaPr = para_pr;
-
-            var minor_font = theme.themeElements.fontScheme.minorFont;
-
-
             text_pr.RFonts.Set_FromObject(
                 {
                     Ascii: {
@@ -659,7 +641,6 @@ CDLbl.prototype =
                 }
             );
             style.TextPr = text_pr;
-
             var chart_text_pr;
 
             if(this.chart && this.chart.txPr
@@ -22350,6 +22331,19 @@ CTitle.prototype =
         this.parent && this.parent.Refresh_RecalcData2 && this.parent.Refresh_RecalcData2(pageIndex, this);
     },
 
+    checkAfterChangeTheme: function()
+    {
+        this.recalcInfo.recalculateTxBody = true;
+        this.recalcInfo.recalcTransform = true;
+        this.recalcInfo.recalcTransformText = true;
+        this.recalcInfo.recalcContent = true;
+        this.recalcInfo.recalculateContent = true;
+        if(this.tx && this.tx.rich && this.tx.rich.content)
+        {
+            this.tx.rich.content.Recalc_AllParagraphs_CompiledPr();
+        }
+    },
+
 
     Search : function(Str, Props, SearchEngine, Type)
     {
@@ -22475,8 +22469,6 @@ CTitle.prototype =
     {
         this.Id = r.GetString2();
     },
-
-
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
@@ -22620,21 +22612,6 @@ CTitle.prototype =
     },
     draw: function(graphics)
     {
-        if(this.chart)
-        {
-            //graphics.SetIntegerGrid(false);
-            //graphics.p_width(70);
-            //graphics.transform3(this.chart.transform, false);
-            //graphics.p_color(0, 0, 0, 255);
-            //graphics._s();
-            //graphics._m(this.x, this.y);
-            //graphics._l(this.x + this.extX, this.y + 0);
-            //graphics._l(this.x + this.extX, this.y + this.extY);
-            //graphics._l(this.x + 0, this.y + this.extY);
-            //graphics._z();
-            //graphics.ds();
-            //graphics.SetIntegerGrid(true);
-        }
         CDLbl.prototype.draw.call(this, graphics);
     },
 
@@ -22643,10 +22620,11 @@ CTitle.prototype =
     recalculatePen: CShape.prototype.recalculatePen,
 
     recalculateBrush: CShape.prototype.recalculateBrush,
+
     updateSelectionState: CShape.prototype.updateSelectionState,
 
-
     checkShapeChildTransform: CDLbl.prototype.checkShapeChildTransform,
+
     updatePosition: function(x, y)
     {
         this.posX = x;
@@ -22699,7 +22677,9 @@ CTitle.prototype =
     },
 
     getStyles: CDLbl.prototype.getStyles,
+
     Get_Theme: CDLbl.prototype.Get_Theme,
+
     Get_ColorMap: CDLbl.prototype.Get_ColorMap,
 
     recalculateStyle: CDLbl.prototype.recalculateStyle,
@@ -22711,7 +22691,6 @@ CTitle.prototype =
     recalculateTransformText: CDLbl.prototype.recalculateTransformText,
 
     recalculateContent: CDLbl.prototype.recalculateContent,
-
 
     recalculate: function()
     {
