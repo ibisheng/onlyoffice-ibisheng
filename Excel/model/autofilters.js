@@ -2950,6 +2950,7 @@ var gUndoInsDelCellsFlag = true;
 							break;
 						var cell = ws.model.getCell3(activeCells.r1 + i + 1, activeCells.c1);
 						var valActive = cell.getValueWithFormat();
+						var valWithoutFormat = cell.getValueWithoutFormat();
 						var arrVal;
 						if(isCurFilter == undefined || !currentFilter[isCurFilter].Filters)//создаём, если его ещё нет
 						{
@@ -2978,13 +2979,13 @@ var gUndoInsDelCellsFlag = true;
 							var isConsist = undefined;
 							for(var h = 0; h < arrVal.length; h++)
 							{
-								if(this._dataFilterParse(arrVal[h],valActive))
+								if(this._dataFilterParse(arrVal[h], valWithoutFormat))
 									isConsist = h;
 							}
 							
 							if(isConsist == undefined)//создаём новый элемент дата
 							{
-								var dataVal = NumFormat.prototype.parseDate(valActive);
+								var dataVal = NumFormat.prototype.parseDate(valWithoutFormat);
 								valActive = new DateGroupItem();
 								valActive.DateTimeGrouping = 1;
 								valActive.Day = dataVal.d;
@@ -4517,6 +4518,9 @@ var gUndoInsDelCellsFlag = true;
 								var cell = ws.model.getCell3(nRow,col);
 								var val, val2;
 								val = val2 = cell.getValueWithFormat();
+								var isDateFormatCell = cell.getNumFormat().isDateTimeFormat();
+								var valueWithoutFormat = cell.getValueWithoutFormat();
+								
 								if(!result[nC])
 									result[nC] = new AutoFiltersOptionsElements();
 								if(curFilter.ColId == numFilter)//щёлкнули по кнопке данного фильтра
@@ -4567,18 +4571,16 @@ var gUndoInsDelCellsFlag = true;
 									{
 										for(var nVal = 0; nVal < dataValues.length; nVal++)
 										{
-											if(this._dataFilterParse(dataValues[nVal],val2))
+											result[nC].val = val;
+											result[nC].val2 = val2;
+											if(isDateFormatCell && this._dataFilterParse(dataValues[nVal], valueWithoutFormat))
 											{
-												result[nC].val = val;
-												result[nC].val2 = val2;
 												if(result[nC].visible != 'hidden')
 													result[nC].visible = true;
 												break;
 											}
 											else
 											{
-												result[nC].val = val;
-												result[nC].val2 = val2;
 												if(result[nC].visible != 'hidden')
 													result[nC].visible = false;
 											}
@@ -4602,7 +4604,7 @@ var gUndoInsDelCellsFlag = true;
 									{
 										for(var nVal = 0; nVal < dataValues.length; nVal++)
 										{
-											if(this._dataFilterParse(dataValues[nVal],val2))
+											if(isDateFormatCell && this._dataFilterParse(dataValues[nVal], valueWithoutFormat))
 											{
 												check = true;
 												break;
