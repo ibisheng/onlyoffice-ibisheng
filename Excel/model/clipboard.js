@@ -802,6 +802,17 @@
 				return false;
 			},
 			
+			bIsEmptyClipboard: function(isCellEditMode)
+			{
+				var result = false;
+				if(isCellEditMode && (!t.lStorageText || t.lStorageText == null || t.lStorageText == ""))
+					result = true;
+				else if(!isCellEditMode && !t.lStorage)
+					result = true;
+				
+				return result;
+			},
+			
 			// Private
 
 			_cleanElement: function () {

@@ -614,6 +614,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.wb.restoreFocus();
 			return result;
 		};
+		
+		spreadsheet_api.prototype.asc_bIsEmptyClipboard = function(){
+			var result = this.wb.bIsEmptyClipboard();
+			this.wb.restoreFocus();
+			return result;
+		};
 
 		spreadsheet_api.prototype.asc_Undo = function(){
 			this.wb.undo();
