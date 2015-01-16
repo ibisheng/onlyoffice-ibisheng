@@ -3045,6 +3045,7 @@ CPresentation.prototype =
                         }
                         else
                         {
+
                             var selector = this.Slides[this.CurPage].graphicObjects.selection.groupSelection ? this.Slides[this.CurPage].graphicObjects.selection.groupSelection : this.Slides[this.CurPage].graphicObjects;
                             if(selector.selection.chartSelection && selector.selection.chartSelection.selection.title)
                             {
@@ -3061,11 +3062,9 @@ CPresentation.prototype =
                             }
                             else
                             {
-                                for(i = 0; i < selector.selectedObjects.length; ++i)
-                                {
-                                    var Drawing = selector.selectedObjects[i];
-                                    ret.Drawings.push(new DrawingCopyObject(Drawing.copy(), Drawing.x, Drawing.y, Drawing.extX, Drawing.extY, Drawing.getBase64Img()));
-                                }
+                                var bRecursive = isRealObject(this.Slides[this.CurPage].graphicObjects.selection.groupSelection);
+                                var aSpTree = bRecursive ? this.Slides[this.CurPage].graphicObjects.selection.groupSelection.spTree : this.Slides[this.CurPage].cSld.spTree;
+                                collectSelectedObjects(aSpTree, ret.Drawings, bRecursive);
                             }
                         }
                         break;
@@ -4657,3 +4656,19 @@ CPresentation.prototype =
         }
     }
 };
+
+
+function collectSelectedObjects(aSpTree, aCollectArray, bRecursive)
+{
+    for(var i = 0; i < aSpTree.length; ++i)
+    {
+        if(aSpTree[i].selected)
+        {
+            aCollectArray.push(new DrawingCopyObject(aSpTree[i].copy(), aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
+        }
+        if(bRecursive && aSpTree[i].getObjectType() === historyitem_type_GroupShape)
+        {
+            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive);
+        }
+    }
+}
