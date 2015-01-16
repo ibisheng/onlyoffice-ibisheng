@@ -2946,9 +2946,9 @@
 
             this.memory.WriteByte(c_oSerRowTypes.Cells);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.bs.WriteItemWithLength(function(){oThis.WriteCells(oRow.c);});
+            this.bs.WriteItemWithLength(function(){oThis.WriteCells(oRow);});
         };
-        this.WriteCells = function(aCells)
+        this.WriteCells = function(row)
         {
             var oThis = this;
             var aIndexes = [];
@@ -2964,13 +2964,13 @@
             }
             else
             {
-                for(var i in aCells)
+                for(var i in row.c)
                     aIndexes.push(i - 0);
             }
             aIndexes.sort(fSortAscending);
             for(var i = 0, length = aIndexes.length; i < length; ++i)
             {
-                var cell = aCells[aIndexes[i]];
+                var cell = row.c[aIndexes[i]];
                 //готовим ячейку к записи
                 if(!oThis.isCopyPaste || (oThis.isCopyPaste && cell))
                 {	
@@ -2982,7 +2982,7 @@
 					
                     //сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
                     if(null != cell.xfs || false == cell.isEmptyText())
-                        this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});
+                        this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId, row.index);});
                 }
             }
         };
@@ -3109,12 +3109,12 @@
             }
             return nXfsId;
         };
-        this.WriteCell = function(cell, nXfsId)
+        this.WriteCell = function(cell, nXfsId, nRowIndex)
         {
             var oThis = this;
-            if(cell.nRow >= 0 && cell.nCol >= 0)
+            if(cell.nCol >= 0)
             {
-				this.bs.WriteItem(c_oSerCellTypes.RefRowCol, function(){oThis.memory.WriteLong(cell.nRow);oThis.memory.WriteLong(cell.nCol);});
+				this.bs.WriteItem(c_oSerCellTypes.RefRowCol, function(){oThis.memory.WriteLong(nRowIndex);oThis.memory.WriteLong(cell.nCol);});
 				
 				if(null != nXfsId)
 				{
@@ -5601,18 +5601,29 @@
             var oThis = this;
             if ( c_oSerWorksheetsTypes.Row == type )
             {
+				var oCellOffset = {pos: null, len: null};
                 var oNewRow = new Row(ws);
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadRow(t,l, oNewRow, ws);
+                    return oThis.ReadRow(t,l, oNewRow, ws, oCellOffset);
                 });
-                if(null != oNewRow.index)
+                if(oNewRow.index >= 0){
+					//читаем ячейки
+					if(null != oCellOffset.pos && null != oCellOffset.len){
+						var nOldPos = this.stream.GetCurPos();
+						this.stream.Seek2(oCellOffset.pos);
+						res = this.bcr.Read1(oCellOffset.len, function(t,l){
+							return oThis.ReadCells(t,l, ws, oNewRow);
+						});
+						this.stream.Seek2(nOldPos);
+					}
                     ws.aGCells[oNewRow.index] = oNewRow;
+				}
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadRow = function(type, length, oRow, ws)
+        this.ReadRow = function(type, length, oRow, ws, oCellOffset)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
@@ -5648,15 +5659,16 @@
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {
-                res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCells(t,l, ws, oRow.c);
-                });
+				//запоминам место чтобы читать Cells в конце, когда уже зачитан oRow.index
+				oCellOffset.pos = this.stream.GetCurPos();
+				oCellOffset.len = length;
+				res = c_oSerConstants.ReadUnknown;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCells = function(type, length, ws, aCells)
+        this.ReadCells = function(type, length, ws, row)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
@@ -5664,7 +5676,7 @@
             {
                 var oNewCell = new Cell(ws);
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCell(t,l, ws, oNewCell);
+                    return oThis.ReadCell(t,l, ws, oNewCell, row.index);
                 });
                 if(oNewCell.nRow >= 0 && oNewCell.nCol >= 0)
                 {
@@ -5682,24 +5694,25 @@
                             oNewCell.oValue.type = nType;
                         }
                     }
-                    aCells[nCellCol] = oNewCell;
+                    row.c[nCellCol] = oNewCell;
                 }
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCell = function(type, length, ws, oCell)
+        this.ReadCell = function(type, length, ws, oCell, nRowIndex)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSerCellTypes.Ref == type ){
 				var oCellAddress = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
-				oCell.nRow = oCellAddress.getRow0();
+				oCell.nRow = nRowIndex;
 				oCell.nCol = oCellAddress.getCol0();
 			}
             else if ( c_oSerCellTypes.RefRowCol == type ){
-				oCell.nRow = this.stream.GetULongLE();
+				var nRow = this.stream.GetULongLE();//todo не используем можно убрать
+				oCell.nRow = nRowIndex;
 				oCell.nCol = this.stream.GetULongLE();
 			}
             else if( c_oSerCellTypes.Style == type )

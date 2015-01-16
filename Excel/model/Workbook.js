@@ -7153,11 +7153,12 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 			var rowTo = this.worksheet._getRow(nIndexTo);
 			
 			var oCurCell;
-			var oTempCell = oTempCellsTo[nIndexFrom];
 			if(oTempCellsTo.hasOwnProperty(nIndexFrom))
-				oCurCell = oTempCell;
-			else
+				oCurCell = oTempCellsTo[nIndexFrom];
+			else{
 				oCurCell = rowFrom.c[i];
+				delete rowFrom.c[i];
+			}
 			oTempCellsTo[nIndexTo] = rowTo.c[i];
 			if(null != oCurCell)
 			{
