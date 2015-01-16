@@ -2579,7 +2579,7 @@ var gUndoInsDelCellsFlag = true;
 							else
 							{
 								//если данный фильтр находится внизу
-								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 == activeCells.c1 && tableRange.c2 == activeCells.c2)))
+								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)))
 								{
 
 									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
@@ -2623,6 +2623,15 @@ var gUndoInsDelCellsFlag = true;
 							result = true;
 						else if(InsertCellsAndShiftDown && activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r1)
 							result = true;
+					}
+					
+					
+					//если данный фильтр находится внизу, то ошибка
+					if((InsertCellsAndShiftDown || DeleteCellsAndShiftTop) && tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)))
+					{
+
+						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+						return false;
 					}
 					//если выделенная область находится до а/ф
 					if(activeCells.c2 < tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2 && (DeleteCellsAndShiftLeft || InsertCellsAndShiftRight))
@@ -5247,7 +5256,10 @@ var gUndoInsDelCellsFlag = true;
 						col:col
 					};
 					//внутри данного фильтра располагается колонка(колонки)
-					this._isChangeFilterAfterInsertCells(options,type,activeCells);
+					if(this._bCheckChangeFilter(type, insertType, activeCells, ref))
+					{
+						this._isChangeFilterAfterInsertCells(options,type,activeCells);
+					}
 		
 				}
 				
