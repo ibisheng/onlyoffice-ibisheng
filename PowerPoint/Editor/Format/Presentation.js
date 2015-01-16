@@ -218,6 +218,8 @@ function CPresentation(DrawingDocument)
 
     this.NeedUpdateTarget = false;
 
+    this.noShowContextMenu = false;
+
     this.viewMode = false;
     // Класс для работы с поиском
     this.SearchInfo =
@@ -2358,7 +2360,7 @@ CPresentation.prototype =
         e.ctrlKey = e.CtrlKey;
         e.shiftKey = e.ShiftKey;
         this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.onMouseUp(e, X, Y);
-        if(e.Button === g_mouse_button_right)
+        if(e.Button === g_mouse_button_right && !this.noShowContextMenu)
         {
             var ContextData = new CContextMenuData();
             var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, PageIndex );
@@ -2367,6 +2369,7 @@ CPresentation.prototype =
             ContextData.IsSlideSelect = false;
             editor.sync_ContextMenuCallback( ContextData );
         }
+        this.noShowContextMenu = false;
         this.Document_UpdateInterfaceState();
     },
 
