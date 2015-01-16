@@ -297,7 +297,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 		}
 
 		for (i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, false, true);
+			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, false, true, oRedoObjectParam.bAddRemoveRowCol);
 
 		for (i in oRedoObjectParam.oChangeWorksheetUpdate)
 			this.workbook.handlers.trigger("changeWorksheetUpdate",
@@ -408,6 +408,8 @@ CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
 		oRedoObjectParam.oOnUpdateTabColor[Point.SheetId] = Point.SheetId;
 	else if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_ChangeFrozenCell === Point.Type)
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
+	else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RemoveRows === Point.Type || historyitem_Worksheet_RemoveCols === Point.Type || historyitem_Worksheet_AddRows === Point.Type || historyitem_Worksheet_AddCols === Point.Type))
+		oRedoObjectParam.bAddRemoveRowCol = true;
 };
 CHistory.prototype.Get_RecalcData = function(Point2)
 {

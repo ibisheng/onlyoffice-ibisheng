@@ -1193,6 +1193,7 @@
 			this.bOnSheetsChanged = false;
 			this.oOnUpdateTabColor = {};
 			this.oOnUpdateSheetViewSettings = {};
+			this.bAddRemoveRowCol = false;
 		}
 
 		/** @constructor */
