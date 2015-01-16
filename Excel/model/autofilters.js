@@ -2961,6 +2961,7 @@ var gUndoInsDelCellsFlag = true;
 						var valActive = cell.getValueWithFormat();
 						var valWithoutFormat = cell.getValueWithoutFormat();
 						var arrVal;
+						
 						if(isCurFilter == undefined || !currentFilter[isCurFilter].Filters)//создаём, если его ещё нет
 						{
 							if(isCurFilter == undefined)
@@ -2968,6 +2969,7 @@ var gUndoInsDelCellsFlag = true;
 							if(currentFilter[isCurFilter])
 							{
 								currentFilter[isCurFilter].ColId = filtersOp[1];
+								currentFilter[isCurFilter].CustomFiltersObj = null;
 								currentFilter[isCurFilter].Filters = new Filters();
 							}
 							else
@@ -2978,6 +2980,7 @@ var gUndoInsDelCellsFlag = true;
 							}
 							currentFilter[isCurFilter].Filters.Values = [];
 						}
+						
 						if(isMerged)
 							currentFilter[isCurFilter].ShowButton = false;
 						if(cell.getNumFormat().isDateTimeFormat())//получаем данные в формате дата
