@@ -10642,8 +10642,9 @@
 		 * @param {Object} ranges
 		 * @param canChangeColWidth
 		 * @param lockDraw
+		 * @param updateHeight
 		 */
-		WorksheetView.prototype.updateRanges = function (ranges, canChangeColWidth, lockDraw) {
+		WorksheetView.prototype.updateRanges = function (ranges, canChangeColWidth, lockDraw, updateHeight) {
 			var arrRanges = [], range;
 			for (var i in ranges) {
 				range = ranges[i];
@@ -10651,8 +10652,12 @@
 				arrRanges.push(range);
 			}
 
-			if (0 < arrRanges.length)
+			if (0 < arrRanges.length) {
+				if (updateHeight)
+					this.isChanged = true;
+
 				this._recalculateAfterUpdate(arrRanges, lockDraw);
+			}
 		};
 		WorksheetView.prototype.updateRange = function (range, canChangeColWidth, lockDraw) {
 			// Для принятия изменения нужно делать расширение диапазона

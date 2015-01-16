@@ -426,11 +426,11 @@
 				"onScroll"					: function (d) {self.controller.scroll(d);}
 			});
 
-			this.model.handlers.add("cleanCellCache", function (wsId, oRanges, canChangeColWidth, bLockDraw) {
+			this.model.handlers.add("cleanCellCache", function (wsId, oRanges, canChangeColWidth, bLockDraw, updateHeight) {
 				var ws = self.getWorksheetById(wsId);
 				if (ws)
 					ws.updateRanges(oRanges, canChangeColWidth,
-						bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId());
+						bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(), updateHeight);
 			});
 			this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
 				var ws = self.getWorksheetById(wsId);
