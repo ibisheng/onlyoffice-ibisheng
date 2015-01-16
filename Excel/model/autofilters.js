@@ -5521,6 +5521,16 @@ var gUndoInsDelCellsFlag = true;
 				
 				if(filter.result && filter.result.length > 0)
 				{
+					//если вставляем колонку в объедененную ячейку заголовка а/ф
+					var isInsertIntoMergeCell = false;
+					if(type == "insCol" && val > 0)
+					{
+						var tempRangeInsert = ws.model.getRange3(filter.Ref.r1, col, filter.Ref.r1, col);
+						if(tempRangeInsert.hasMerged())
+							isInsertIntoMergeCell = true;
+					}
+						
+						
 					//change array
 					var newResult = [];
 					var n = 0;
@@ -5553,7 +5563,7 @@ var gUndoInsDelCellsFlag = true;
 								var nextId = this._rangeToId(localNextCol);
 								
 								newResult[n] = new Result();
-								newResult[n].x =curFilter.x;
+								newResult[n].x = curFilter.x;
 								newResult[n].y = curFilter.y;
 								newResult[n].width = curFilter.width;
 								newResult[n].height = curFilter.height;
@@ -5561,6 +5571,8 @@ var gUndoInsDelCellsFlag = true;
 								newResult[n].idNext = nextId;
 								newResult[n].inFilter = inFilter;
 								
+								if(isInsertIntoMergeCell)
+									newResult[n].showButton = false;
 								
 								newResult[n].hiddenRows = [];
 								n++;
@@ -5681,6 +5693,19 @@ var gUndoInsDelCellsFlag = true;
 					
 					if(cloneFilterColums)
 					{
+						if(isInsertIntoMergeCell)
+						{
+							var filterColumn;
+							for(var i = col; i < col + val; i++)
+							{
+								filterColumn = new FilterColumn();
+								filterColumn.ColId = i - filter.Ref.c1;
+								filterColumn.ShowButton = false;
+								
+								cloneFilterColums.push(filterColumn);
+							}
+						}
+						
 						if(cRange.index == 'all')
 						{
 							filter.FilterColumns = cloneFilterColums;
@@ -7594,9 +7619,12 @@ var gUndoInsDelCellsFlag = true;
 					var n = 0;
 					for(var i = 0; i < aWs.AutoFilter.result.length; i++)
 					{
-						this.allButtonAF[n] = aWs.AutoFilter.result[i].clone();
-						this.allButtonAF[n].inFilter = aWs.AutoFilter.Ref.clone();
-						n++;
+						if(aWs.AutoFilter.result[i].showButton != false)
+						{
+							this.allButtonAF[n] = aWs.AutoFilter.result[i].clone();
+							this.allButtonAF[n].inFilter = aWs.AutoFilter.Ref.clone();
+							n++;
+						}
 					}
 				}
 				
