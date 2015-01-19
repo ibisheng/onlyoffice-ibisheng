@@ -11139,19 +11139,25 @@ function CreateRadarChart(chartSeries, bUseCache)
 function parseSeriesHeaders (ws, rangeBBox) {
 	var cntLeft = 0, cntTop = 0;
 	var headers = { bLeft: false, bTop: false };
-	var i, cell, value, numFormatType;
+	var i, cell, value, numFormatType, j;
 
+    var bLeftOnlyDateTime = true, bTopOnlyDateTime = true;
 	if (rangeBBox) {
 		if (rangeBBox.c2 - rangeBBox.c1 > 0) {
 			for (i = rangeBBox.r1 + 1; i <= rangeBBox.r2; i++) {
 				cell = ws.getCell3(i, rangeBBox.c1);
 				value = cell.getValue();
                 numFormatType = cell.getNumFormatType();
-				if (!isNumber(value) && (value != "") || numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date )
-					cntLeft++;
+                if(!isNumber(value) && (value != ""))
+                {
+                    bLeftOnlyDateTime = false;
+                    headers.bLeft = true;
+                }
+                else if(numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date )
+                {
+                    headers.bLeft = true;
+                }
 			}
-			if ((cntLeft > 0) && (cntLeft >= rangeBBox.r2 - rangeBBox.r1))
-				headers.bLeft = true;
 		}
 
 		if (rangeBBox.r2 - rangeBBox.r1 > 0) {
@@ -11160,12 +11166,49 @@ function parseSeriesHeaders (ws, rangeBBox) {
 				cell = ws.getCell3(rangeBBox.r1, i);
 				value = cell.getValue();
                 numFormatType= cell.getNumFormatType();
-				if (!isNumber(value) && (value != "") || numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date)
-					cntTop++;
+                if(!isNumber(value) && value != "")
+                {
+                    bTopOnlyDateTime = false;
+                    headers.bTop = true;
+                }
+                else if(numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date )
+                {
+                    headers.bTop = true;
+                }
 			}
-			if ((cntTop > 0) && (cntTop >= rangeBBox.c2 - rangeBBox.c1))
-				headers.bTop = true;
 		}
+        if(headers.bTop || headers.bLeft)
+        {
+            var nRowStart = headers.bTop ? rangeBBox.r1 + 1 : rangeBBox.r1, nColStart = headers.bLeft ? rangeBBox.c1 + 1 : rangeBBox.c1;
+            for(i = nRowStart; i <= rangeBBox.r2; ++i)
+            {
+                for(j = nColStart; j <= rangeBBox.c2; ++j)
+                {
+                    cell = ws.getCell3(rangeBBox.r1, i);
+                    value = cell.getValue();
+                    numFormatType= cell.getNumFormatType();
+                    if (numFormatType !== c_oAscNumFormatType.Time && numFormatType !== c_oAscNumFormatType.Date && value !== "")
+                    {
+                        break;
+                    }
+                }
+                if(j <= rangeBBox.c2)
+                {
+                    break;
+                }
+            }
+            if(i === rangeBBox.r2 + 1)
+            {
+                if(headers.bLeft && bLeftOnlyDateTime)
+                {
+                    headers.bLeft = false;
+                }
+                if(headers.bTop && bTopOnlyDateTime)
+                {
+                    headers.bTop = false;
+                }
+            }
+        }
 	}
 	else
 		headers = { bLeft: true, bTop: true };
