@@ -1069,6 +1069,10 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
 			var coord = this._getCoordinates(event);
+            if (this.hsbApiLockMouse)
+                this.hsbApi.mouseDown ? this.hsbApi.evt_mouseup.call(this.hsbApi, event) : false;
+            else if (this.vsbApiLockMouse)
+                this.vsbApi.mouseDown ? this.vsbApi.evt_mouseup.call(this.vsbApi, event) : false;
 
 			this.isMousePressed = false;
 			// Shapes
@@ -1117,10 +1121,6 @@
 			// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
 			this.showCellEditorCursor();
 
-			if (this.hsbApiLockMouse)
-				this.hsbApi.mouseDown ? this.hsbApi.evt_mouseup.call(this.hsbApi, event) : false;
-			else if (this.vsbApiLockMouse)
-				this.vsbApi.mouseDown ? this.vsbApi.evt_mouseup.call(this.vsbApi, event) : false;
 
 			return true;
 		};
