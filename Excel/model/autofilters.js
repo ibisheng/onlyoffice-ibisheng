@@ -5241,13 +5241,14 @@ var gUndoInsDelCellsFlag = true;
 			//change filters after insert column
 			_changeFiltersAfterInsertCells: function(col, val, type, activeCells, insertType)
 			{
-				History.TurnOff();
 				var aWs = this._getCurrentWS();
 				
 				//заранее удаляем все вошедшие в активную область фильтры
 				if(val < 0)
 					this.isEmptyAutoFilters(activeCells, true, true, true);
 				
+				
+				History.TurnOff();
 				if(aWs.AutoFilter)
 				{
 					var ref = aWs.AutoFilter.Ref;
@@ -5603,7 +5604,13 @@ var gUndoInsDelCellsFlag = true;
 										for(var s = 0; s < cloneFilterColums.length; s++)
 										{
 											if(zF == cloneFilterColums[s].ColId)
+											{
+												History.TurnOn();
+												this._openHiddenRowsColId(filter.Ref, s);
+												History.TurnOff();
+												
 												cloneFilterColums.splice(s, 1);
+											}	
 										}
 									}
 									
@@ -7427,6 +7434,30 @@ var gUndoInsDelCellsFlag = true;
 							for(var row = 0; row < arrHiddens.length; row++)
 							{
 								if(arrHiddens[row] != undefined && arrHiddens[row] == true)
+								{
+									ws.model.setRowHidden(/*bHidden*/false, row, row);
+								}
+							}
+						}
+					}
+				}
+			},
+			
+			_openHiddenRowsColId: function(refFilter, ColId)
+			{
+				var ws = this.worksheet;
+				if(refFilter && this.allButtonAF)
+				{
+					var buttons = this.allButtonAF;
+					for(var n = 0; n < buttons.length; n++)
+					{
+						var rangeButton = this._idToRange(buttons[n].id);
+						if((buttons[n].inFilter.isEqual(refFilter)) && rangeButton.c1 === (ColId + refFilter.c1) && buttons[n].hiddenRows.length)
+						{
+							var arrHiddens = buttons[n].hiddenRows;
+							for(var row = 0; row < arrHiddens.length; row++)
+							{
+								if( this._isHiddenAnotherFilter2(buttons[n].id, row, refFilter) !== "hidden" && arrHiddens[row] != undefined && arrHiddens[row] == true)
 								{
 									ws.model.setRowHidden(/*bHidden*/false, row, row);
 								}
