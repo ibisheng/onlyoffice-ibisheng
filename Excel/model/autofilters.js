@@ -2278,6 +2278,9 @@ var gUndoInsDelCellsFlag = true;
 			
 			reDrawFilter: function(range)
 			{
+				if(!range)
+					return;
+				
 				var aWs = this._getCurrentWS();
 				var tableParts = aWs.TableParts;
 				if(tableParts)
@@ -7427,9 +7430,8 @@ var gUndoInsDelCellsFlag = true;
 					var buttons = this.allButtonAF;
 					for(var n = 0; n < buttons.length; n++)
 					{
-						if(((filter.AutoFilter && buttons[n].inFilter == filter.AutoFilter.Ref) || buttons[n].inFilter == filter.Ref) && buttons[n].hiddenRows.length)
+						if(((filter.AutoFilter && buttons[n].inFilter == filter.AutoFilter.Ref) || buttons[n].inFilter == filter.Ref) && buttons[n].hiddenRows && buttons[n].hiddenRows.length)
 						{
-							
 							var arrHiddens = buttons[n].hiddenRows;
 							for(var row = 0; row < arrHiddens.length; row++)
 							{
@@ -7452,7 +7454,7 @@ var gUndoInsDelCellsFlag = true;
 					for(var n = 0; n < buttons.length; n++)
 					{
 						var rangeButton = this._idToRange(buttons[n].id);
-						if((buttons[n].inFilter.isEqual(refFilter)) && rangeButton.c1 === (ColId + refFilter.c1) && buttons[n].hiddenRows.length)
+						if((buttons[n].inFilter.isEqual(refFilter)) && rangeButton.c1 === (ColId + refFilter.c1) && buttons[n].hiddenRows && buttons[n].hiddenRows.length)
 						{
 							var arrHiddens = buttons[n].hiddenRows;
 							for(var row = 0; row < arrHiddens.length; row++)
