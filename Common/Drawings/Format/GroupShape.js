@@ -660,6 +660,7 @@ CGroupShape.prototype =
     },
 
     applyTextFunction: DrawingObjectsController.prototype.applyTextFunction,
+    applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,
 
     applyAllAlign: function(val)
     {

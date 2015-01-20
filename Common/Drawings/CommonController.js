@@ -1043,7 +1043,10 @@ DrawingObjectsController.prototype =
         }
         else if(this.selection.groupSelection)
         {
+            var oOldDoc = this.selection.groupSelection.document;
+            this.selection.groupSelection.document = this.document;
             this.selection.groupSelection.applyTextFunction(docContentFunction, tableFunction, args);
+            this.selection.groupSelection.document = oOldDoc;
         }
         else if(this.selection.chartSelection)
         {
