@@ -58,40 +58,41 @@ function CPPTXContentLoader()
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
+		if (s.cur < _end_rec){
+			s.Skip2(5); // 1 + 4 byte - len
 
-        s.Skip2(5); // 1 + 4 byte - len
-
-        var _type = s.GetUChar();
-        switch (_type)
-        {
-            case 1:
-            {
-                GrObject = this.ReadShape();
-                break;
-            }
-            case 2:
-            {
-                GrObject = this.ReadPic();
-                break;
-            }
-            case 3:
-            {
-                GrObject = this.ReadCxn();
-                break;
-            }
-            case 4:
-            {
-                GrObject = this.ReadGroupShape();
-                break;
-            }
-            case 5:
-            {
-                s.SkipRecord();
-                break;
-            }
-            default:
-                break;
-        }
+			var _type = s.GetUChar();
+			switch (_type)
+			{
+				case 1:
+				{
+					GrObject = this.ReadShape();
+					break;
+				}
+				case 2:
+				{
+					GrObject = this.ReadPic();
+					break;
+				}
+				case 3:
+				{
+					GrObject = this.ReadCxn();
+					break;
+				}
+				case 4:
+				{
+					GrObject = this.ReadGroupShape();
+					break;
+				}
+				case 5:
+				{
+					s.SkipRecord();
+					break;
+				}
+				default:
+					break;
+			}
+		}
 
         s.Seek2(_end_rec);
         stream.pos = s.pos;

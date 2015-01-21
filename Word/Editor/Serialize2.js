@@ -7923,8 +7923,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		}
 		else if( c_oSerImageType2.PptxData === type )
         {
-			var grObject = window.global_pptx_content_loader.ReadDrawing(this, this.stream, this.Document, oParaDrawing);
-            oParaDrawing.Set_GraphicObject(grObject);
+			if(length > 0){
+				var grObject = window.global_pptx_content_loader.ReadDrawing(this, this.stream, this.Document, oParaDrawing);
+				if(null != grObject)
+					oParaDrawing.Set_GraphicObject(grObject);
+			}
+			else
+				res = c_oSerConstants.ReadUnknown;
 		}
 		else if( c_oSerImageType2.Chart2 === type )
         {
