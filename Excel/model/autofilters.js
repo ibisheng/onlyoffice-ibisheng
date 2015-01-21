@@ -5176,7 +5176,7 @@ var gUndoInsDelCellsFlag = true;
 				for(var num = 0; num < buttons.length; num++)
 				{
 					//в случае числового фильтра, смотрим ищем конфиликт только со столбцами из данного фильтра
-					if(customFil != undefined && buttons[num].inFilter == customFil)
+					if(customFil != undefined && buttons[num].inFilter.isEqual(customFil))
 					{
 						isCurrenCell = false;
 						if(!isCurrenCell && cellId == buttons[num].id)
