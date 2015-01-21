@@ -6185,7 +6185,7 @@ catAxisChart.prototype =
 			//промежуточные линии
 			if(widthMinorLine !== 0)
 			{
-				for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+				for(var n = 1; n < this.chartProp.numhMinorlines; n++)
 				{
 					posMinorY = posY - n * minorStep * tickMarkSkip;
 					
@@ -6315,7 +6315,7 @@ catAxisChart.prototype =
 				this.cChartDrawer.drawPath(path, pen);
 				
 				//промежуточные линии
-				if(i != this.chartProp.numvlines && this.paths.minorTickMarks && this.paths.minorTickMarks[i])
+				if(this.paths.minorTickMarks && this.paths.minorTickMarks[i])
 				{
 					for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
 					{
