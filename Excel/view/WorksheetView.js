@@ -689,6 +689,7 @@
 					return;
 
 				t.model.setRowHeight(newHeight, row, row);
+				t.autoFilters.reDrawFilter(null, row);
 				t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
 				t.changeWorksheet("update", {reinitRanges: true});
 				t._updateVisibleRowsCount();

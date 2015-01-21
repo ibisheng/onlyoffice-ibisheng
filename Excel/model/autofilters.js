@@ -2276,15 +2276,21 @@ var gUndoInsDelCellsFlag = true;
 				return result;
 			},
 			
-			reDrawFilter: function(range)
+			reDrawFilter: function(range, row)
 			{
-				if(!range)
+				if(!range && row == undefined)
 					return;
 				
 				var aWs = this._getCurrentWS();
+				var ws = this.worksheet;
 				var tableParts = aWs.TableParts;
 				if(tableParts)
 				{
+					if(range === null && row !== undefined)
+					{
+						range = new Asc.Range(0, row, ws.nColsCount - 1, row);
+					}
+					
 					for(var i = 0; i < tableParts.length; i++)
 					{
 						var currentFilter = tableParts[i];
