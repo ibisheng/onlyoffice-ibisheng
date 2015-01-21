@@ -8042,6 +8042,11 @@
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 						/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
 						lockDraw(t.model.workbook);
+						
+						// Если нужно удалить автофильтры - удаляем
+						if(val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text)
+							t.autoFilters.isEmptyAutoFilters(arn);
+						
 						if (val === c_oAscCleanOptions.All) {
 							range.cleanAll();
 							// Удаляем комментарии
@@ -8055,8 +8060,6 @@
 						else if (val === c_oAscCleanOptions.Hyperlinks)
 							range.cleanHyperlinks();
 
-						// Если нужно удалить автофильтры - удаляем
-						t.autoFilters.isEmptyAutoFilters(arn);
 						// Вызываем функцию пересчета для заголовков форматированной таблицы
 						t.autoFilters._renameTableColumn(arn);
 
