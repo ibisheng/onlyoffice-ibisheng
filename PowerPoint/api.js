@@ -135,7 +135,7 @@ function asc_docs_api(name)
 		this.chartPreviewManager = new ChartPreviewManager();
 	else
 		this.chartPreviewManager = null;
-	if(typeof asc_CChartTranslate !== "undefined")	
+	if(typeof asc_CChartTranslate !== "undefined")
 		this.chartTranslate = new asc_CChartTranslate();
 	else
 		this.chartTranslate = null;
@@ -3155,6 +3155,12 @@ asc_docs_api.prototype.ImgApply = function(obj){
 		this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
 	}
 }
+
+asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
+    this.chartTranslate = translate;
+};
+
+
 asc_docs_api.prototype.ChartApply = function(obj)
 {
     this.WordControl.m_oLogicDocument.ChartApply(obj);

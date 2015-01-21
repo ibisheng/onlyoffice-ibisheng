@@ -5625,6 +5625,9 @@ asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 {
     this.asc_fireCallback("asc_onMouseMove", Data );
 };
+asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
+    this.chartTranslate = translate;
+};
 
 //-----------------------------------------------------------------
 // Функции для работы с гиперссылками
