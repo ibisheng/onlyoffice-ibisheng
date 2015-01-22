@@ -8233,6 +8233,19 @@
 					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true, bWithoutFilter);
 				}
 			}
+			
+			//делаем unmerge ф/т
+			var arnToRange = t.activeRange;
+			var intersectionRangeWithTableParts = t.autoFilters._intersectionRangeWithTableParts(arnToRange, this.model);
+			if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
+			{	
+				var tablePart;
+				for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
+				{
+					tablePart = intersectionRangeWithTableParts[i];
+					this.model.getRange3(tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).unmerge();
+				}
+			}
 
 			if (bIsUpdate) {
 				if (callTrigger) { t.handlers.trigger("slowOperation", false); }
