@@ -9043,6 +9043,8 @@
 									nCol = gc_nMaxCol0;
 									
 								var range = t.model.getRange3(nRow, nCol, nRow, nCol);
+								//range может далее изменится в связи с наличием мерженных ячеек, firstRange  - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
+								var firstRange = range.clone();
 								
 								//****paste comments****
 								if(val.aComments && val.aComments.length)
@@ -9173,7 +9175,7 @@
 										this._getCell(range.bbox.c1, range.bbox.r1).setValue(value2[numStyle].text);
 									}
 									else
-										range.setValue(value2[numStyle].text);
+										firstRange.setValue(value2[numStyle].text);
 
 									if(!isOneMerge)//settings for text
 									{
@@ -9188,7 +9190,7 @@
 									}
 								}
 								else
-									range.setValue2(value2);
+									firstRange.setValue2(value2);
 
 								
 								if(!isOneMerge)//settings for cell
@@ -9220,6 +9222,8 @@
 								}
 								//если замержили range
 								c = range.bbox.c2 - autoC*plCol;
+								if(c === cMax)
+									r = range.bbox.r2 - autoC*plCol;
 							}
 						}
 					}
