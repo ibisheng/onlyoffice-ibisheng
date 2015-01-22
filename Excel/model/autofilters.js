@@ -3018,6 +3018,9 @@ var gUndoInsDelCellsFlag = true;
 								arrVal[arrVal.length] = valActive;
 							else if(array[i] == false && isConsist != undefined)//убираем данное значение из массива
 								arrVal.splice(isConsist,1);
+							else if(array[i] == "hidden" && isConsist != undefined)
+								arrVal.splice(isConsist,1);	
+							
 							if(array[i] == false)
 								allVis = false;
 						}
@@ -3044,6 +3047,9 @@ var gUndoInsDelCellsFlag = true;
 								arrVal[arrVal.length] = valActive;
 							else if(array[i] == false && isConsist != undefined)//убираем данное значение из массива
 								arrVal.splice(isConsist,1);
+							else if(array[i] == "hidden" && isConsist != undefined)
+								arrVal.splice(isConsist,1);
+							
 							if(array[i] == false)
 								allVis = false;
 						}
