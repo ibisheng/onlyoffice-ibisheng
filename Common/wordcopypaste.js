@@ -4254,7 +4254,7 @@ PasteProcessor.prototype =
                         shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
                         shape.spPr.xfrm.setOffY(0);
-						
+                        shape.txBody.content.Cursor_MoveToEndPos();
 						arrShapes[i] = new DrawingCopyObject(shape, 0, 0, w, h);
                     }
 					

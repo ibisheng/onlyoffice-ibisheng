@@ -3247,7 +3247,6 @@ CShape.prototype =
                 _final_preset = "bentConnector5";
                 if (_old_line == null) {
                     _new_line = new CLn();
-
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
@@ -3268,7 +3267,6 @@ CShape.prototype =
                 _final_preset = "curvedConnector3";
                 if (_old_line == null) {
                     _new_line = new CLn();
-
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
