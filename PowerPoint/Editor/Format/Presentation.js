@@ -1516,6 +1516,33 @@ CPresentation.prototype =
         return new CParaPr();
     },
 
+
+    GetTableStyleIdMap : function(oMap)
+    {
+        for(var i = 0; i < this.Slides.length; ++i)
+        {
+            this.CollectStyleId(oMap, this.Slides[i].cSld.spTree);
+        }
+    },
+
+    CollectStyleId : function(oMap, aSpTree)
+    {
+        for(var i = 0; i < aSpTree.length; ++i)
+        {
+            if(aSpTree[i].getObjectType() === historyitem_type_GraphicFrame)
+            {
+                if(isRealObject(aSpTree[i].graphicObject) && typeof aSpTree[i].graphicObject.TableStyle === "string" && isRealObject(g_oTableId.Get_ById(aSpTree[i].graphicObject.TableStyle)))
+                {
+                    oMap[aSpTree[i].graphicObject.TableStyle] = true;
+                }
+            }
+            else if(aSpTree[i].getObjectType() === historyitem_type_GroupShape)
+            {
+                this.CollectStyleId(oMap, aSpTree[i].spTree);
+            }
+        }
+    },
+
     // Обновляем данные в интерфейсе о свойствах параграфа
     Interface_Update_ParaPr : function()
     {

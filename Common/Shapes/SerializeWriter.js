@@ -541,9 +541,19 @@ function CBinaryFileWriter()
         //if (0 < _count_table_styles)
         //{
 
-        for(var key in presentation.TableStylesIdMap)
+        var oTableStyleIdMap;
+        if(presentation.GetTableStyleIdMap)
         {
-            if(presentation.TableStylesIdMap.hasOwnProperty(key))
+            oTableStyleIdMap = {};
+            presentation.GetTableStyleIdMap(oTableStyleIdMap);
+        }
+        else
+        {
+            oTableStyleIdMap = presentation.TableStylesIdMap;
+        }
+        for(var key in oTableStyleIdMap)
+        {
+            if(oTableStyleIdMap.hasOwnProperty(key))
             {
                 this.tableStylesGuides[key] = "{" + GUID() + "}"
             }
