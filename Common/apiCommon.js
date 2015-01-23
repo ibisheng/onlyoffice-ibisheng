@@ -447,10 +447,26 @@
             {
                 if(this.type === type)
                     return;
+
+                var bSwapGridLines = ((this.type === c_oAscChartTypeSettings.hBarNormal || this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer)
+                    !== (type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked || type === c_oAscChartTypeSettings.hBarStackedPer)   );
+
                 this.putType(type);
                 var hor_axis_settings = this.getHorAxisProps();
                 var vert_axis_settings = this.getVertAxisProps();
-                var new_hor_axis_settings, new_vert_axis_settings;
+                var new_hor_axis_settings, new_vert_axis_settings, oTempVal;
+                if(bSwapGridLines)
+                {
+                    oTempVal = hor_axis_settings;
+                    hor_axis_settings = vert_axis_settings;
+                    vert_axis_settings = oTempVal;
+                    this.putHorAxisProps(hor_axis_settings);
+                    this.putVertAxisProps(vert_axis_settings);
+
+                    oTempVal = this.horGridLines;
+                    this.putHorGridLines(this.vertGridLines);
+                    this.putVertGridLines(oTempVal);
+                }
                 switch(type)
                 {
                     case c_oAscChartTypeSettings.pie                 :
@@ -488,8 +504,7 @@
                             new_vert_axis_settings.setDefault();
                             this.putVertAxisProps(new_vert_axis_settings);
                         }
-                        this.putHorGridLines(c_oAscGridLinesSettings.major);
-                        this.putVertGridLines(c_oAscGridLinesSettings.none);
+
                         if( type === c_oAscChartTypeSettings.lineNormal          ||
                             type === c_oAscChartTypeSettings.lineStacked                  ||
                             type === c_oAscChartTypeSettings.lineStackedPer               ||
@@ -519,8 +534,8 @@
                             new_vert_axis_settings.setDefault();
                             this.putVertAxisProps(new_vert_axis_settings);
                         }
-                        this.putHorGridLines(c_oAscGridLinesSettings.none);
-                        this.putVertGridLines(c_oAscGridLinesSettings.major);
+                        //this.putHorGridLines(c_oAscGridLinesSettings.none);
+                        //this.putVertGridLines(c_oAscGridLinesSettings.major);
                         break;
                     }
                     case c_oAscChartTypeSettings.scatter             :
@@ -544,8 +559,8 @@
                             new_vert_axis_settings.setDefault();
                             this.putVertAxisProps(new_vert_axis_settings);
                         }
-                        this.putHorGridLines(c_oAscGridLinesSettings.major);
-                        this.putVertGridLines(c_oAscGridLinesSettings.major);
+                        //this.putHorGridLines(c_oAscGridLinesSettings.major);
+                        //this.putVertGridLines(c_oAscGridLinesSettings.major);
                         this.putShowMarker(true);
                         this.putSmooth(null);
                         this.putLine(false);
