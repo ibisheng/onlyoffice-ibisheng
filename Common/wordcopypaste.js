@@ -5441,6 +5441,12 @@ PasteProcessor.prototype =
 							var oTextPr = this._read_rPr(oFirstTextChild);
 							if(numbering_numfmt_Bullet == num)
 								oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
+								
+							//TODO убираю пока при всатвке извне underline/bold/italic у стиля маркера
+							oTextPr.Bold = oTextPr.Underline = oTextPr.Italic = undefined;
+							if(oFirstTextChild.nodeName.toLowerCase() == "a")
+								oTextPr.Color.Set(0, 0, 0);
+							
 							//�������� ��������� �� node
 							AbstractNum.Apply_TextPr(0, oTextPr);
 						}
