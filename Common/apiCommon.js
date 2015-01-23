@@ -450,7 +450,27 @@
 
                 var bSwapGridLines = ((this.type === c_oAscChartTypeSettings.hBarNormal || this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer)
                     !== (type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked || type === c_oAscChartTypeSettings.hBarStackedPer)   );
+                var bSwapLines = ((
+                    type === c_oAscChartTypeSettings.lineNormal          ||
+                        type === c_oAscChartTypeSettings.lineStacked                  ||
+                        type === c_oAscChartTypeSettings.lineStackedPer               ||
+                        type === c_oAscChartTypeSettings.lineNormalMarker             ||
+                        type === c_oAscChartTypeSettings.lineStackedMarker            ||
+                        type === c_oAscChartTypeSettings.lineStackedPerMarker
 
+                    ) !== (
+
+                    this.type === c_oAscChartTypeSettings.lineNormal          ||
+                        this.type === c_oAscChartTypeSettings.lineStacked                  ||
+                        this.type === c_oAscChartTypeSettings.lineStackedPer               ||
+                        this.type === c_oAscChartTypeSettings.lineNormalMarker             ||
+                        this.type === c_oAscChartTypeSettings.lineStackedMarker            ||
+                        this.type === c_oAscChartTypeSettings.lineStackedPerMarker
+                    ));
+                var bSwapScatter = ((this.type === c_oAscChartTypeSettings.scatter) !== (type === c_oAscChartTypeSettings.scatter));
+
+
+                var nOldType = this.type;
                 this.putType(type);
                 var hor_axis_settings = this.getHorAxisProps();
                 var vert_axis_settings = this.getVertAxisProps();
@@ -505,12 +525,7 @@
                             this.putVertAxisProps(new_vert_axis_settings);
                         }
 
-                        if( type === c_oAscChartTypeSettings.lineNormal          ||
-                            type === c_oAscChartTypeSettings.lineStacked                  ||
-                            type === c_oAscChartTypeSettings.lineStackedPer               ||
-                            type === c_oAscChartTypeSettings.lineNormalMarker             ||
-                            type === c_oAscChartTypeSettings.lineStackedMarker            ||
-                            type === c_oAscChartTypeSettings.lineStackedPerMarker      )
+                        if( bSwapLines)
                         {
                             this.putShowMarker(false);
                             this.putSmooth(null);
@@ -561,9 +576,12 @@
                         }
                         //this.putHorGridLines(c_oAscGridLinesSettings.major);
                         //this.putVertGridLines(c_oAscGridLinesSettings.major);
-                        this.putShowMarker(true);
-                        this.putSmooth(null);
-                        this.putLine(false);
+                        if(bSwapScatter)
+                        {
+                            this.putShowMarker(true);
+                            this.putSmooth(null);
+                            this.putLine(false);
+                        }
                         break;
                     }
                 }
