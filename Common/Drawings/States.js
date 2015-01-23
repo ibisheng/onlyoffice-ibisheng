@@ -82,13 +82,17 @@ StartAddNewShape.prototype =
                 {
                     History.Create_NewPoint();
                     var shape = track.getShape(false, oThis.drawingObjects.getDrawingDocument(), oThis.drawingObjects.drawingObjects);
-                    if(shape.spPr.xfrm.offX < 0)
+
+                    if(!(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld))
                     {
-                        shape.spPr.xfrm.setOffX(0);
-                    }
-                    if(shape.spPr.xfrm.offY < 0)
-                    {
-                        shape.spPr.xfrm.setOffY(0);
+                        if(shape.spPr.xfrm.offX < 0)
+                        {
+                            shape.spPr.xfrm.setOffX(0);
+                        }
+                        if(shape.spPr.xfrm.offY < 0)
+                        {
+                            shape.spPr.xfrm.setOffY(0);
+                        }
                     }
                     oThis.drawingObjects.drawingObjects.getWorksheetModel && shape.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
                     if(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld)

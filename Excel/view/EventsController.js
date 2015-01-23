@@ -1330,7 +1330,8 @@
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
-                if (asc["editor"].isStartAddShape) {
+                if (asc["editor"].isStartAddShape)
+                {
                     event.preventDefault && event.preventDefault();
                     event.stopPropagation && event.stopPropagation();
                 }

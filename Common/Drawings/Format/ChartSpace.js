@@ -132,7 +132,7 @@ function CChartStyleManager()
             this.styles[25] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
             for(i = 26; i < 32; ++i)
             {
-                this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-26,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
+                this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-26,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, [f(i-26,0)], 13);
             }
             this.styles[32] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(8, -0.5)], 5, s[0], 9);
             this.styles[33] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  s[2], 5, s[1], 9);
@@ -2211,13 +2211,6 @@ CChartSpace.prototype =
         }
     },
 
-
-    recalculatePointMap: function()
-    {
-
-    },
-
-
     recalculateReferences: function()
     {
         var worksheet = this.worksheet;
@@ -2225,7 +2218,12 @@ CChartSpace.prototype =
         if(!worksheet)
             return;
 
-        var checkValByNumRef = function(oThis, ser, val)
+        if(this.recalcInfo.recalculateBBox)
+        {
+            this.recalculateBBox();
+            this.recalcInfo.recalculateBBox = false;
+        }
+        var checkValByNumRef = function(oThis, ser, val, bVertical)
         {
             if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
             {
@@ -2257,7 +2255,7 @@ CChartSpace.prototype =
                     removePtsFromLit(num_cache);
                 }
                 var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
-                var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden;
+                var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden, nPtCount;
                 for(i = 0; i < arr_f.length; ++i)
                 {
                     var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2271,7 +2269,8 @@ CChartSpace.prototype =
                             if(range1)
                             {
                                 var range = range1.bbox;
-                                if(range.r1 === range.r2)
+
+                                if(range.r1 === range.r2 || bVertical === true)
                                 {
                                     row_hidden = source_worksheet.getRowHidden(range.r1);
                                     for(j = range.c1;  j <= range.c2; ++j)
@@ -2335,7 +2334,7 @@ CChartSpace.prototype =
             }
         };
 
-        var checkCatByNumRef = function(oThis, ser, cat)
+        var checkCatByNumRef = function(oThis, ser, cat, bVertical)
         {
             if(cat && cat.strRef && typeof cat.strRef.f === "string" /*(!cat.strRef.strCache || cat.strRef.strCache.pt.length === 0)*/)
             {
@@ -2369,7 +2368,7 @@ CChartSpace.prototype =
                             if(range1)
                             {
                                 var range = range1.bbox;
-                                if(range.r1 === range.r2)
+                                if(range.r1 === range.r2 || bVertical === true)
                                 {
                                     row_hidden = source_worksheet.getRowHidden(range.r1);
                                     for(j = range.c1;  j <= range.c2; ++j)
@@ -2435,10 +2434,10 @@ CChartSpace.prototype =
                     //val
                     checkValByNumRef(this, ser, ser.val);
                     //cat
-                    checkValByNumRef(this, ser, ser.cat);
-                    checkCatByNumRef(this, ser, ser.cat);
+                    checkValByNumRef(this, ser, ser.cat, this.bbox.seriesBBox.bVert);
+                    checkCatByNumRef(this, ser, ser.cat, this.bbox.seriesBBox.bVert);
                     //tx
-                    checkCatByNumRef(this, ser, ser.tx);
+                    checkCatByNumRef(this, ser, ser.tx, !this.bbox.seriesBBox.bVert);
 
                     if(ser.isHidden)
                     {
@@ -2456,9 +2455,9 @@ CChartSpace.prototype =
                 for(j = 0; j < series.length; ++j)
                 {
                     ser = series[j];
-                    checkValByNumRef(this, ser, ser.xVal);
+                    checkValByNumRef(this, ser, ser.xVal, this.bbox.seriesBBox.bVert);
                     checkValByNumRef(this, ser, ser.yVal);
-                    checkCatByNumRef(this, ser, ser.tx);
+                    checkCatByNumRef(this, ser, ser.tx, !this.bbox.seriesBBox.bVert);
 
                     if(ser.isHidden)
                     {
@@ -5391,7 +5390,7 @@ CChartSpace.prototype =
                     if(str_pt)
                         arr_str_labels.push(str_pt.val);
                     else
-                        arr_str_labels.push(pt.idx+"");
+                        arr_str_labels.push((pt.idx + 1) + "");
 
                     calc_entry = new CalcLegendEntry(legend, this);
                     calc_entry.txBody = CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
@@ -6605,9 +6604,15 @@ CChartSpace.prototype =
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
         {
-            var default_lbl = new CDLbl();
-            default_lbl.initDefault();
             var series = this.chart.plotArea.chart.series;
+            var nDefaultPosition;
+            if(this.chart.plotArea.chart.getDefaultDataLabelsPosition)
+            {
+                nDefaultPosition = this.chart.plotArea.chart.getDefaultDataLabelsPosition();
+            }
+
+            var default_lbl = new CDLbl();
+            default_lbl.initDefault(nDefaultPosition);
             for(var i = 0; i < series.length; ++i)
             {
                 var ser = series[i];

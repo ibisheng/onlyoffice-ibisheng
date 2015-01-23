@@ -61,6 +61,36 @@ CGroupShape.prototype.documentUpdateInterfaceState = function()
         {
             text_pr = new CTextPr();
         }
+
+        var theme = this.Get_Theme();
+        if(theme && theme.themeElements && theme.themeElements.fontScheme)
+        {
+            if(text_pr.FontFamily)
+            {
+                text_pr.FontFamily.Name =  theme.themeElements.fontScheme.checkFont(text_pr.FontFamily.Name);
+            }
+            if(text_pr.RFonts)
+            {
+                if(text_pr.RFonts.Ascii)
+                    text_pr.RFonts.Ascii.Name     = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.Ascii.Name);
+                if(text_pr.RFonts.EastAsia)
+                    text_pr.RFonts.EastAsia.Name  = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.EastAsia.Name);
+                if(text_pr.RFonts.HAnsi)
+                    text_pr.RFonts.HAnsi.Name     = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.HAnsi.Name);
+                if(text_pr.RFonts.CS)
+                    text_pr.RFonts.CS.Name        = theme.themeElements.fontScheme.checkFont(text_pr.RFonts.CS.Name);
+            }
+        }
+        if(text_pr.Unifill)
+        {
+            var RGBAColor = text_pr.Unifill.getRGBAColor();
+            text_pr.Color = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
+        }
+        if(text_pr.Shd && text_pr.Shd.Unifill && theme)
+        {
+            text_pr.Shd.Unifill.check(theme, this.Get_ColorMap());
+        }
+
         editor.UpdateParagraphProp(para_pr);
         editor.UpdateTextPr(text_pr);
     }

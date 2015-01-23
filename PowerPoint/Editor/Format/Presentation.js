@@ -933,7 +933,7 @@ CPresentation.prototype =
             Image.setParent(this.Slides[this.CurPage]);
             Image.addToDrawingObjects();
             this.Slides[this.CurPage].graphicObjects.resetSelection();
-            this.Slides[this.CurPage].graphicObjects.selectObject(Image, this.Slides[this.CurPage].num);
+            this.Slides[this.CurPage].graphicObjects.selectObject(Image, 0);
             this.Recalculate();
             this.Document_UpdateInterfaceState();
         }
@@ -950,7 +950,7 @@ CPresentation.prototype =
             Image.spPr.xfrm.setOffX((_this.Slides[_this.CurPage].Width - Image.spPr.xfrm.extX)/2);
             Image.spPr.xfrm.setOffY((_this.Slides[_this.CurPage].Height - Image.spPr.xfrm.extY)/2);
             _this.Slides[_this.CurPage].graphicObjects.resetSelection();
-            _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, _this.Slides[_this.CurPage].num);
+            _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, 0);
             _this.Document_UpdateInterfaceState();
         }, []);
     },
@@ -993,7 +993,7 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
         {
             this.Slides[this.CurPage].graphicObjects.resetSelection();
-            this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, this.CurPage);
+            this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, 0);
             this.Check_GraphicFrameRowHeight(graphic_frame);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
             this.Recalculate();
@@ -1649,7 +1649,85 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-            // TODO !!!
+            if(this.Slides[this.CurPage])
+            {
+                var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                var oTargetTextObject = getTargetTextObject(oDrawingObjects);
+
+                var bNeedRedraw;
+                if(oTargetTextObject && oTargetTextObject.isEmptyPlaceholder && oTargetTextObject.isEmptyPlaceholder())
+                {
+                    bNeedRedraw = true;
+                }
+                else
+                {
+                    bNeedRedraw = false;
+                }
+                if(e.ShiftKey || (!oDrawingObjects.selection.groupSelection && !oDrawingObjects.selection.textSelection && !oDrawingObjects.selection.chartSelection))
+                {
+                    oDrawingObjects.resetSelection();
+                }
+                else
+                {
+                    if(oDrawingObjects.selection.groupSelection)
+                    {
+                        var oGroupSelection = oDrawingObjects.selection.groupSelection.selection;
+                        if(oGroupSelection.textSelection)
+                        {
+                            if(oGroupSelection.textSelection.getObjectType() === historyitem_type_GraphicFrame)
+                            {
+                                if(oGroupSelection.textSelection.graphicObject)
+                                {
+                                    oGroupSelection.textSelection.graphicObject.Selection_Remove();
+                                }
+                            }
+                            else
+                            {
+                                var content = oGroupSelection.textSelection.getDocContent();
+                                content && content.Selection_Remove();
+                            }
+                            oGroupSelection.textSelection = null;
+                        }
+                        else if(oGroupSelection.chartSelection)
+                        {
+                            oGroupSelection.chartSelection.resetSelection(false);
+                            oGroupSelection.chartSelection = null;
+                        }
+                        else
+                        {
+                            oDrawingObjects.selection.groupSelection.resetSelection(this);
+                            oDrawingObjects.selection.groupSelection = null;
+                        }
+                    }
+                    else if(oDrawingObjects.selection.textSelection)
+                    {
+                        if(oDrawingObjects.selection.textSelection.getObjectType() === historyitem_type_GraphicFrame)
+                        {
+                            if(oDrawingObjects.selection.textSelection.graphicObject)
+                            {
+                                oDrawingObjects.selection.textSelection.graphicObject.Selection_Remove();
+                            }
+                        }
+                        else
+                        {
+                            var content = oDrawingObjects.selection.textSelection.getDocContent();
+                            content && content.Selection_Remove();
+                        }
+                        oDrawingObjects.selection.textSelection = null;
+                    }
+                    else if(oDrawingObjects.selection.chartSelection)
+                    {
+                        oDrawingObjects.selection.chartSelection.resetSelection(false);
+                        oDrawingObjects.selection.chartSelection = null;
+                    }
+                }
+                if(bNeedRedraw)
+                {
+                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                }
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
+            }
             bRetValue = true;
         }
         else if ( e.KeyCode == 32 && false === editor.isViewMode ) // Space
@@ -3125,7 +3203,7 @@ CPresentation.prototype =
                         this.Check_GraphicFrameRowHeight(Content.Drawings[i].Drawing);
                     }
                     Content.Drawings[i].Drawing.addToDrawingObjects();
-                    this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, this.CurPage);
+                    this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
                 }
             }
             else if(Content.DocContent)
@@ -3168,7 +3246,7 @@ CPresentation.prototype =
                     shape.setParent(this.Slides[this.CurPage]);
                     shape.addToDrawingObjects();
                     this.Slides[this.CurPage].graphicObjects.resetSelection();
-                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, this.CurPage);
+                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                 }
             }
         }

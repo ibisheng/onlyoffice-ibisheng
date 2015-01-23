@@ -783,7 +783,7 @@ CGraphicFrame.prototype =
             {
                 var main_group = this.group.getMainGroup();
                 this.parent.graphicObjects.selectObject(main_group, 0);
-                main_group.selectObject(this, this.parent.num);
+                main_group.selectObject(this, 0);
                 main_group.selection.textSelection = this;
             }
             else

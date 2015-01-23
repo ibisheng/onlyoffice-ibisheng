@@ -2534,7 +2534,7 @@ function DrawingObjects() {
             window["Asc"]["editor"]._loadFonts(font_map,
                 function()
                 {
-                    var min_r = 0, max_r = 0, min_c = 0, max_c = 0;
+                    var max_r = 0, max_c = 0;
 
                     var series = oNewChartSpace.chart.plotArea.charts[0].series, ser;
                     function fillTableFromRef(ref)
@@ -2560,7 +2560,7 @@ function DrawingObjects() {
                             var f1 = sFormula;
 
                             var arr_f = f1.split(",");
-                            var pt_index = 0, i, j, cell, pt;
+                            var pt_index = 0, i, j, cell, pt, nPtCount, k;
                             for(i = 0; i < arr_f.length; ++i)
                             {
                                 var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2584,48 +2584,81 @@ function DrawingObjects() {
                                                 max_r = range.r1;
                                             if(range.r2 > max_r)
                                                 max_r = range.r2;
-                                            if(range.r1 < min_r)
-                                                min_r = range.r1;
-                                            if(range.r2 < min_r)
-                                                min_r = range.r2;
 
                                             if(range.c1 > max_c)
                                                 max_c = range.c1;
                                             if(range.c2 > max_c)
                                                 max_c = range.c2;
-                                            if(range.c1 < min_c)
-                                                min_c = range.c1;
-                                            if(range.c2 < min_c)
-                                                min_c = range.c2;
 
-                                            if(range.r1 === range.r2)
+                                            if(i === arr_f.length - 1)
                                             {
-                                                for(j = range.c1;  j <= range.c2; ++j)
+                                                nPtCount = cache.getPtCount();
+                                                if((range.r2 - range.r1 + 1) === (nPtCount - pt_index))
                                                 {
-
-                                                    cell = source_worksheet.getCell3(range.r1, j);
-                                                    pt = cache.getPtByIndex(pt_index);
-                                                    if(pt)
+                                                    for(k = range.c1; k <= range.c2; ++k)
                                                     {
-                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                        cell.setValue(pt.val + "");
+                                                        for(j = range.r1; j <= range.r2; ++j)
+                                                        {
+                                                            cell = source_worksheet.getCell3(j, k);
+                                                            pt = cache.getPtByIndex(pt_index + j - range.r1);
+                                                            if(pt)
+                                                            {
+                                                                cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
+                                                                cell.setValue(pt.val + "");
+                                                            }
+                                                        }
                                                     }
-                                                    ++pt_index;
+                                                    pt_index += (range.r2 - range.r1 + 1);
+                                                }
+                                                else if((range.c2 - range.c1 + 1) === (nPtCount - pt_index))
+                                                {
+                                                    for(k = range.r1; k <= range.r2; ++k)
+                                                    {
+                                                        for(j = range.c1;  j <= range.c2; ++j)
+                                                        {
+                                                            cell = source_worksheet.getCell3(k, j);
+                                                            pt = cache.getPtByIndex(pt_index + j - range.c1);
+                                                            if(pt)
+                                                            {
+                                                                cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
+                                                                cell.setValue(pt.val + "");
+                                                            }
+                                                        }
+                                                    }
+                                                    pt_index += (range.c2 - range.c1 + 1);
                                                 }
                                             }
                                             else
                                             {
-                                                for(j = range.r1; j <= range.r2; ++j)
+                                                if(range.r1 === range.r2)
                                                 {
-                                                    cell = source_worksheet.getCell3(j, range.c1);
-                                                    pt = cache.getPtByIndex(pt_index);
-                                                    if(pt)
+                                                    for(j = range.c1;  j <= range.c2; ++j)
                                                     {
-                                                        cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
-                                                        cell.setValue(pt.val + "");
+                                                        cell = source_worksheet.getCell3(range.r1, j);
+                                                        pt = cache.getPtByIndex(pt_index);
+                                                        if(pt)
+                                                        {
+                                                            cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
+                                                            cell.setValue(pt.val + "");
+                                                        }
+                                                        ++pt_index;
                                                     }
-                                                    ++pt_index;
                                                 }
+                                                else
+                                                {
+                                                    for(j = range.r1; j <= range.r2; ++j)
+                                                    {
+                                                        cell = source_worksheet.getCell3(j, range.c1);
+                                                        pt = cache.getPtByIndex(pt_index);
+                                                        if(pt)
+                                                        {
+                                                            cell.setNumFormat(typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code);
+                                                            cell.setValue(pt.val + "");
+                                                        }
+                                                        ++pt_index;
+                                                    }
+                                                }
+
                                             }
                                         }
                                     }
@@ -3517,10 +3550,36 @@ function DrawingObjects() {
         }
         else {
             objectProperties.ImageUrl = null;
-            _this.controller.setGraphicObjectProps( objectProperties );
+
+            if(!api.noCreatePoint || api.exucuteHistory)
+            {
+                if( !api.noCreatePoint && !api.exucuteHistory && api.exucuteHistoryEnd)
+                {
+                    _this.controller.setGraphicObjectPropsCallBack(props);
+                    _this.controller.startRecalculate();
+                    api.exucuteHistoryEnd = false;
+                }
+                else
+                {
+                    _this.controller.setGraphicObjectProps( props );
+                }
+                if(api.exucuteHistory)
+                {
+                    api.exucuteHistory = false;
+                }
+            }
+            else
+            {
+                    ExecuteNoHistory(function(){
+                        _this.controller.setGraphicObjectPropsCallBack(props);
+                        _this.controller.startRecalculate();
+                    }, this, []);
+            }
+
+           // _this.controller.setGraphicObjectProps( objectProperties );
         }
 
-        _this.sendGraphicObjectProps();
+        //_this.sendGraphicObjectProps();
     };
 
     _this.showChartSettings = function() {
@@ -3632,7 +3691,7 @@ function DrawingObjects() {
             settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
             settings.putHorGridLines(c_oAscGridLinesSettings.major);
             settings.putVertGridLines(c_oAscGridLinesSettings.none);
-            settings.putInColumns(false);
+            //settings.putInColumns(false);
             settings.putSeparator(",");
             settings.putLine(true);
             settings.putShowMarker(false);

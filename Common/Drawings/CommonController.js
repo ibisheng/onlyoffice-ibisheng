@@ -1076,11 +1076,19 @@ DrawingObjectsController.prototype =
             {
                 this.parent.GoTo_Text();
                 this.resetSelection();
+                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                {
+                    this.document.Add_NewParagraph(args[0]);
+                }
             }
             else if(this.selectedObjects.length > 0 && this.selectedObjects[0].parent && this.selectedObjects[0].parent.GoTo_Text)
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
+                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                {
+                    this.document.Add_NewParagraph(args[0]);
+                }
             }
         }
     },
@@ -5569,7 +5577,7 @@ DrawingObjectsController.prototype =
                     return;
                 }
             }
-            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props]);
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], true);
         }
         else
         {
@@ -5577,7 +5585,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    checkSelectedObjectsAndCallback: function(callback, args)
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps)
     {
         var selection_state = this.getSelectionState();
         this.drawingObjects.objectLocker.reset();
@@ -5601,7 +5609,10 @@ DrawingObjectsController.prototype =
                 }
                 callback.apply(_this, args);
                 _this.startRecalculate();
-                _this.drawingObjects.sendGraphicObjectProps();
+                if(!(bNoSendProps === true))
+                {
+                    _this.drawingObjects.sendGraphicObjectProps();
+                }
             }
         };
         this.drawingObjects.objectLocker.checkObjects(callback2);

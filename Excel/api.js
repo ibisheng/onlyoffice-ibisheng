@@ -124,6 +124,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.shapeElementId = null;
 			this.isImageChangeUrl = false;
 			this.isShapeImageChangeUrl = false;
+
+            //Флаги для применения свойств через слайдеры
+            this.noCreatePoint = false;
+            this.exucuteHistory = false;
+            this.exucuteHistoryEnd = false;
 			
 			//находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
 			this.IsFocus = null;
@@ -2630,9 +2635,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		// Shapes
-		spreadsheet_api.prototype.setStartPointHistory = function(){History.Create_NewPoint(); History.StartTransaction()};
+		spreadsheet_api.prototype.setStartPointHistory = function(){
+            this.noCreatePoint = true;
+            this.exucuteHistory = true;
+        };
 
-		spreadsheet_api.prototype.setEndPointHistory = function(){History.EndTransaction()};
+		spreadsheet_api.prototype.setEndPointHistory = function(){
+            this.noCreatePoint = false;
+            this.exucuteHistoryEnd = true;
+        };
 
 		spreadsheet_api.prototype.asc_startAddShape = function(sPreset) {
 			this.isStartAddShape = this.controller.isShapeAction = true;
