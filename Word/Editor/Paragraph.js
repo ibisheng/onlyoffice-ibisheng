@@ -6948,9 +6948,7 @@ Paragraph.prototype =
         var NewType = _Bullet ? _Bullet.getBulletType() : numbering_presentationnumfrmt_None;
 
         var Bullet = _Bullet ? _Bullet.createDuplicate() : undefined;
-        History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.Pr.Bullet } );
-        this.Pr.Bullet = Bullet;
-        this.CompiledPr.NeedRecalc = true;
+        this.Set_Bullet(Bullet);
         if ( OldType != NewType )
         {
             var ParaPr = this.Get_CompiledPr2(false).ParaPr;
@@ -7511,9 +7509,7 @@ Paragraph.prototype =
             }
             else
             {
-                History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : ParaPr.Bullet, Old : this.Pr.Bullet } );
-                this.Pr.Bullet = ParaPr.Bullet;
-                this.CompiledPr.NeedRecalc = true;
+                this.Set_Bullet(ParaPr.Bullet);
             }
 
         }
@@ -7708,7 +7704,10 @@ Paragraph.prototype =
         this.Set_Border( undefined, historyitem_Paragraph_Borders_Left );
         this.Set_Border( undefined, historyitem_Paragraph_Borders_Right );
         this.Set_Border( undefined, historyitem_Paragraph_Borders_Top );
-
+        if(!(this.bFromDocument === true))
+        {
+            this.Set_Bullet(undefined);
+        }
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
     },
@@ -7886,6 +7885,7 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
+
     Set_ContextualSpacing : function(Value)
     {
         if ( Value != this.Pr.ContextualSpacing )
@@ -8060,6 +8060,13 @@ Paragraph.prototype =
         History.Add( this, { Type : HistoryType, New : Border, Old : OldValue } );
 
         // Надо пересчитать конечный стиль
+        this.CompiledPr.NeedRecalc = true;
+    },
+
+    Set_Bullet : function(Bullet)
+    {
+        History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.Pr.Bullet } );
+        this.Pr.Bullet = Bullet;
         this.CompiledPr.NeedRecalc = true;
     },
 
