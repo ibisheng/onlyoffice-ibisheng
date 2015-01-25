@@ -1915,7 +1915,6 @@ DrawingObjectsController.prototype =
                     if(cat_ax.axPos !== AX_POS_L)
                     {
                         cat_ax.setAxPos(AX_POS_L);
-                        // if(cat_ax.title && cat_ax.title.tx && cat_ax.title.tx.rich)
                     }
                     if(val_ax.axPos !== AX_POS_B)
                     {

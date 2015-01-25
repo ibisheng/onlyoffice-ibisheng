@@ -5525,7 +5525,28 @@ function BinaryPPTYLoader()
                 }
                 case 6:
                 {
-                    s.Skip2(1);
+                    var nVertAlign = s.GetUChar();
+                    switch (nVertAlign)
+                    {
+                        case 0://bottom
+                        {
+                            props.VAlign = vertalignjc_Bottom;
+                            break;
+                        }
+                        case 1://ctr
+                        case 2://dist
+                        case 3: //just
+                        {
+                            props.VAlign = vertalignjc_Center;
+                            break;
+                        }
+                        case 4://top
+                        {
+                            props.VAlign = vertalignjc_Top;
+                            break;
+                        }
+                    }
+                    //s.Skip2(1);
                     break;
                 }
                 case 7:
@@ -6994,7 +7015,7 @@ function BinaryPPTYLoader()
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
-
+        var oBodyPr;
         while (s.cur < _end_rec)
         {
             var _at = s.GetUChar();

@@ -2984,6 +2984,28 @@ function CBinaryFileWriter()
             oThis._WriteInt1(3, (tableMar.Bottom.W * 36000) >> 0);
         }
 
+        if(isRealNumber(cell.Pr.VAlign))
+        {
+            switch(cell.Pr.VAlign)
+            {
+                case vertalignjc_Bottom:
+                {
+                    oThis._WriteUChar1(6, 0);
+                    break;
+                }
+                case vertalignjc_Center:
+                {
+                    oThis._WriteUChar1(6, 1);
+                    break;
+                }
+                case vertalignjc_Top:
+                {
+                    oThis._WriteUChar1(6, 4);
+                    break;
+                }
+            }
+        }
+
 
         oThis.WriteUChar(g_nodeAttributeEnd);
 
