@@ -2141,6 +2141,16 @@ CPresentation.prototype =
                 bRetValue = true;
             }
         }
+        else if ( e.KeyCode == 53 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + 5 - делаем текст зачеркнутым
+        {
+            var TextPr = this.Get_Paragraph_TextPr();
+            if ( null != TextPr )
+            {
+                this.Paragraph_Add( new ParaTextPr( { Strikeout : TextPr.Strikeout === true ? false : true } ) );
+                this.Document_UpdateInterfaceState();
+                bRetValue = true;
+            }
+        }
         else if ( e.KeyCode == 86 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + V - paste
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
