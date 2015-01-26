@@ -4420,7 +4420,7 @@ DrawingObjectsController.prototype =
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
         oCursorInfo = this.curState.onMouseDown(e, x, y, pageIndex, bTextFlag);
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
-        return !(oTitle === oCursorInfo.title);
+        return !(isRealObject(oCursorInfo) && oTitle === oCursorInfo.title);
     },
 
     checkChartTextSelection: function(bNoRedraw)
