@@ -384,9 +384,12 @@ CChartSpace.prototype =
        this.selection.dataLbl        = state.dataLbl;
        this.selection.textSelection  = state.textSelection;
        this.selection.plotArea       = state.plotArea;
-       this.recalcInfo.recalcTitle = state.recalcTitle;
-       this.recalcInfo.bRecalculatedTitle = state.bRecalculatedTitle;
-       if(state.contentSelection)
+       if(isRealObject(state.recalcTitle))
+       {
+           this.recalcInfo.recalcTitle = state.recalcTitle;
+           this.recalcInfo.bRecalculatedTitle = state.bRecalculatedTitle;
+       }
+        if(state.contentSelection)
        {
            if(this.selection.textSelection)
            {
