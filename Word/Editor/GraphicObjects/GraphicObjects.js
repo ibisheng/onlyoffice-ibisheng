@@ -2499,6 +2499,7 @@ CGraphicObjects.prototype =
     setParagraphAlign: DrawingObjectsController.prototype.setParagraphAlign,
 
     setParagraphIndent: DrawingObjectsController.prototype.setParagraphIndent,
+    getSelectedObjectsBounds: DrawingObjectsController.prototype.getSelectedObjectsBounds,
 
 
     CheckRange: function(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, PageNum, HdrFtrRanges, docContent)

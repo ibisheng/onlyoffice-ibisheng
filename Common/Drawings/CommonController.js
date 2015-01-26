@@ -4681,6 +4681,15 @@ DrawingObjectsController.prototype =
         this.checkSelectedObjectsAndCallback(this.unGroupCallback, null)
     },
 
+    getSelectedObjectsBounds: function()
+    {
+        if(!this.getTargetDocContent())
+        {
+            return getAbsoluteRectBoundsArr(this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects);
+        }
+        return null;
+    },
+
     unGroupCallback: function()
     {
         var ungroup_arr = this.canUnGroup(true);
