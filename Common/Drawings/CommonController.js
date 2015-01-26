@@ -3372,7 +3372,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    remove: function(dir)
+    remove: function(dir, bOnlyText, bRemoveOnlySelection)
     {
         var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
         var content = this.getTargetDocContent();
@@ -3380,24 +3380,24 @@ DrawingObjectsController.prototype =
         {
             return;
         }
-        this.checkSelectedObjectsAndCallback(this.removeCallback, [dir]);
+        this.checkSelectedObjectsAndCallback(this.removeCallback, [dir, bOnlyText, bRemoveOnlySelection]);
     },
 
-    removeCallback: function(dir)
+    removeCallback: function(dir, bOnlyText, bRemoveOnlySelection)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
         {
             if(target_text_object.getObjectType() === historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Remove(dir);
+                target_text_object.graphicObject.Remove(dir, bOnlyText, bRemoveOnlySelection);
             }
             else
             {
                 var content = this.getTargetDocContent(true);
                 if(content)
                 {
-                    content.Remove(dir, true)
+                    content.Remove(dir, true, bRemoveOnlySelection)
                 }
             }
         }
