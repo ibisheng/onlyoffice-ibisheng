@@ -24,17 +24,27 @@
             overflow: hidden;
             border: none;
             background-color: #f4f4f4;
-            z-index: 20002;
+            z-index: 100;
         }
 
         .loader-page {
             top: 50%;
             left: 50%;
-            width: 50px;
             height: 180px;
             z-index: 100;
             position: absolute;
             margin-top: -100px;
+            margin-left: -75px;
+        }
+
+        .loader-page-text {
+            display: inline-block;
+            font-size: 14px;
+            margin-left: 80px;
+            margin-top: 125px;
+            color: #888;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            line-height: 20px;
         }
 
         .romb {
@@ -154,13 +164,44 @@
     </style>
 </head>
 <body>
-    <div id="loading-mask" class="loadmask">
-        <div class="loader-page">
-            <div class="romb" id="blue"></div>
-            <div class="romb" id="green"></div>
-            <div class="romb" id="red"></div>
-        </div>
-    </div>
+
+    <script>
+        function getUrlParams() {
+            var e,
+                a = /\+/g,  // Regex for replacing addition symbol with a space
+                r = /([^&=]+)=?([^&]*)/g,
+                d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+                q = window.location.search.substring(1),
+                urlParams = {};
+
+            while (e = r.exec(q))
+                urlParams[d(e[1])] = d(e[2]);
+
+            return urlParams;
+        }
+
+        var lang = getUrlParams()["lang"] || 'en';
+        lang = lang.split("-")[0];
+        var loading = 'Loading...';
+        if ( lang == 'de')      loading = 'Ladevorgang...';
+        else if ( lang == 'es') loading = 'Cargando...';
+        else if ( lang == 'fr') loading = 'Chargement en cours...';
+        else if ( lang == 'it') loading = 'Caricamento in corso...';
+        else if ( lang == 'pt') loading = 'Carregando...';
+        else if ( lang == 'ru') loading = 'Загрузка...';
+        else if ( lang == 'sl') loading = 'Nalaganje...';
+        else if ( lang == 'tr') loading = 'Yükleniyor...';
+
+        document.write(
+            '<div id="loading-mask" class="loadmask">' +
+                '<div class="loader-page">' +
+                    '<div class="romb" id="blue"></div>' +
+                    '<div class="romb" id="green"></div>' +
+                    '<div class="romb" id="red"></div>' +
+                    '<div class="loader-page-text">' + loading + '</div>' +
+                '</div>' +
+            '</div>');
+    </script>
 
     <div id="viewport"></div>
 	<!-- sdk -->
