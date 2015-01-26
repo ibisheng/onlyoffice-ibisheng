@@ -4,7 +4,7 @@
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_coAuthV	= '3.0.6';
+	var asc_coAuthV	= '3.0.7';
 
 	// Класс надстройка, для online и offline работы
 	function CDocsCoApi (options) {
@@ -476,7 +476,6 @@
 		this._send({'type': 'saveChanges', 'changes': JSON.stringify(arrayChanges.slice(startIndex, endIndex)),
 			'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
 			'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
-			'startIndex': startIndex,
 			'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null});
 	};
 
@@ -701,10 +700,13 @@
 		}
 	};
 	
-	DocsCoApi.prototype._onSavePartChanges = function () {
+	DocsCoApi.prototype._onSavePartChanges = function (data) {
 		// Очищаем предыдущий таймер
 		if (null !== this.saveCallbackErrorTimeOutId)
 			clearTimeout(this.saveCallbackErrorTimeOutId);
+
+		if (-1 !== data['changesIndex'])
+			this.changesIndex = data['changesIndex'];
 
 		this.saveChanges(this.arrayChanges, this.currentIndex + 1);
 	};
@@ -936,7 +938,7 @@
 				case 'saveChanges'		: t._onSaveChanges(dataObject); break;
 				case 'saveLock'			: t._onSaveLock(dataObject); break;
 				case 'unSaveLock'		: t._onUnSaveLock(dataObject); break;
-				case 'savePartChanges'	: t._onSavePartChanges(); break;
+				case 'savePartChanges'	: t._onSavePartChanges(dataObject); break;
 				case 'drop'				: t._onDrop(dataObject); break;
 				case 'waitAuth'			: /*Ждем, когда придет auth, документ залочен*/break;
 				case 'error'			: /*Старая версия sdk*/t._onDrop(dataObject); break;
