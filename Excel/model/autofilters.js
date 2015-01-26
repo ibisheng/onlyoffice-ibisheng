@@ -6474,7 +6474,7 @@ var gUndoInsDelCellsFlag = true;
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				
-				if(result && result[0])
+				if(result && result[0] && tableParts && tableParts.AutoFilter && tableParts.AutoFilter && tableParts.AutoFilter.FilterColumns)
 				{
 					var startRow = this._idToRange(result[0].id).r1;
 					var endRow = this._idToRange(result[0].idNext).r1;
@@ -6482,7 +6482,16 @@ var gUndoInsDelCellsFlag = true;
 					{
 						//все открываем
 						if(ws.model.getRowHidden(row))
-							ws.model.setRowHidden(/*bHidden*/false, row, row);
+						{
+							for(var i = 0; i < tableParts.result.length; i++)
+							{
+								if(tableParts.result[i].hiddenRows && tableParts.result[i].hiddenRows[row])
+								{
+									ws.model.setRowHidden(/*bHidden*/false, row, row);
+									break;
+								}
+							}
+						}
 					}
 				}
 				if(fColumns){
