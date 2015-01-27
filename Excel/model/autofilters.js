@@ -6779,10 +6779,6 @@ var gUndoInsDelCellsFlag = true;
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
 						var filter = aWs.TableParts[i];
-						/*var ref = filter.Ref.split(":");
-						var startRange = this._idToRange(ref[0]);
-						var endRange = this._idToRange(ref[1]);
-						var tableRange = new Asc.Range(startRange.c1, startRange.r1, endRange.c2, startRange.r1);*/
 						
 						var ref = filter.Ref;
 						var tableRange = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r1);
@@ -6794,6 +6790,9 @@ var gUndoInsDelCellsFlag = true;
 							//проходимся по всем заголовкам
 							for(var j = tableRange.c1; j <= tableRange.c2; j++)
 							{
+								if(j < range.c1 || j > range.c2)
+									continue;	
+									
 								cell = ws.model.getCell3(ref.r1, j);
 								val = cell.getValue();
 								//если не пустая изменяем TableColumns
