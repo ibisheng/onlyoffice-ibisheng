@@ -5621,7 +5621,7 @@ var gUndoInsDelCellsFlag = true;
 											if(zF == cloneFilterColums[s].ColId)
 											{
 												History.TurnOn();
-												this._openHiddenRowsColId(filter.Ref, s);
+												this._openHiddenRowsColId(filter.Ref, zF);
 												History.TurnOff();
 												
 												cloneFilterColums.splice(s, 1);
