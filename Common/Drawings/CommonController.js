@@ -599,14 +599,64 @@ DrawingObjectsController.prototype =
         return {snapX: snapX, snapY: snapY};
     },
 
-    getCopyTrackArray: function()
+    getLeftTopSelectedFromArray: function(aDrawings, pageIndex)
     {
-        var ret = [];
-        for(var i = 0; i < this.arrTrackObjects.length; ++i)
+        var i, dX, dY;
+        for(i = aDrawings.length - 1; i > -1; --i)
         {
-            ret.push(this.arrTrackObjects[i]);
+            if(aDrawings[i].selected && pageIndex === aDrawings[i].selectStartPage)
+            {
+                dX = aDrawings[i].transform.TransformPointX(aDrawings[i].extX/2, aDrawings[i].extY/2) - aDrawings[i].extX/2;
+                dY = aDrawings[i].transform.TransformPointY(aDrawings[i].extX/2, aDrawings[i].extY/2) - aDrawings[i].extY/2;
+                return {X: dX, Y: dY, bSelected: true};
+            }
         }
-        return ret;
+        return {X: 0, Y: 0, bSelected: false};
+    },
+
+    getLeftTopSelectedObject: function(pageIndex)
+    {
+        return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
+    },
+
+    getContextMenuPosition: function(pageIndex)
+    {
+        var i, aDrawings, dX, dY, oTargetTextObject, oDocContent;
+        oTargetTextObject = getTargetTextObject(this);
+        if(oTargetTextObject)
+        {
+            if(oTargetTextObject.getObjectType() === historyitem_type_Shape)
+            {
+                oDocContent = oTargetTextObject.getDocContent();
+            }
+            else if(oTargetTextObject.getObjectType() === historyitem_type_GraphicFrame)
+            {
+
+            }
+        }
+        else if(this.selection.groupSelection)
+        {
+            if(this.selection.groupSelection.selectStartPage !== pageIndex)
+            {
+                return {X: 0, Y: 0};
+            }
+            aDrawings = this.selection.groupSelection.arrGraphicObjects;
+            for(i = aDrawings.length-1; i > -1; --i)
+            {
+                if(aDrawings[i].selected)
+                {
+                    dX = aDrawings[i].transform.TransformPointX(aDrawings[i].extX/2, aDrawings[i].extY/2) - aDrawings[i].extX/2;
+                    dY = aDrawings[i].transform.TransformPointY(aDrawings[i].extX/2, aDrawings[i].extY/2) - aDrawings[i].extY/2;
+                    return {X: dX, Y: dY};
+                }
+            }
+        }
+        else
+        {
+            return this.getLeftTopSelectedObject(pageIndex);
+        }
+
+        return {X: 0, Y: 0};
     },
 
     drawSelect: function(pageIndex, drawingDocument)
@@ -3154,37 +3204,37 @@ DrawingObjectsController.prototype =
 		switch (options.type) {
 			case c_oAscChartTypeSettings.lineNormal:
 			case c_oAscChartTypeSettings.lineNormalMarker:
-				return CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache);
+				return CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
 			case c_oAscChartTypeSettings.lineStacked:
 			case c_oAscChartTypeSettings.lineStackedMarker:
-				return CreateLineChart(chartSeries, GROUPING_STACKED, bUseCache);
+				return CreateLineChart(chartSeries, GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.lineStackedPer:
 			case c_oAscChartTypeSettings.lineStackedPerMarker:
-				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache);
+				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.barNormal:
-				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache);
+				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
 			case c_oAscChartTypeSettings.barStacked:
-				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache);
+				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.barStackedPer:
-				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache);
+				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarNormal:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache);
+				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarStacked:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache);
+				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarStackedPer:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache);
+				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.areaNormal:
-				return CreateAreaChart(chartSeries, GROUPING_STANDARD, bUseCache);
+				return CreateAreaChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
 			case c_oAscChartTypeSettings.areaStacked:
-				return CreateAreaChart(chartSeries, GROUPING_STACKED, bUseCache);
+				return CreateAreaChart(chartSeries, GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.areaStackedPer:
-				return CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache);
+				return CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.stock:
-				return CreateStockChart(chartSeries, bUseCache);
+				return CreateStockChart(chartSeries, bUseCache, options);
 			case c_oAscChartTypeSettings.doughnut:
-				return CreatePieChart(chartSeries, true, bUseCache);
+				return CreatePieChart(chartSeries, true, bUseCache, options);
 			case c_oAscChartTypeSettings.pie:
-				return CreatePieChart(chartSeries, false, bUseCache);
+				return CreatePieChart(chartSeries, false, bUseCache, options);
 			case c_oAscChartTypeSettings.scatter:
 			case c_oAscChartTypeSettings.scatterLine:
 			case c_oAscChartTypeSettings.scatterLineMarker:
@@ -3192,7 +3242,7 @@ DrawingObjectsController.prototype =
 			case c_oAscChartTypeSettings.scatterNone:
 			case c_oAscChartTypeSettings.scatterSmooth:
 			case c_oAscChartTypeSettings.scatterSmoothMarker:
-				return CreateScatterChart(chartSeries, bUseCache);
+				return CreateScatterChart(chartSeries, bUseCache, options);
 			// radar return CreateRadarChart(chartSeries);
 		}
 
@@ -4683,9 +4733,36 @@ DrawingObjectsController.prototype =
 
     getSelectedObjectsBounds: function()
     {
-        if(!this.getTargetDocContent())
+        if(!this.getTargetDocContent() && this.selectedObjects.length > 0)
         {
-            return getAbsoluteRectBoundsArr(this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects);
+            var nPageIndex, aDrawings, oRes, aSelectedCopy, i;
+            if(this.selection.groupSelection)
+            {
+                aDrawings = this.selection.groupSelection.selectedObjects;
+                nPageIndex = this.selection.groupSelection.selectStartPage;
+
+            }
+            else
+            {
+                aSelectedCopy = [].concat(this.selectedObjects);
+                aSelectedCopy.sort(function(a, b){return a.selectStartPage - b.selectStartPage});
+                nPageIndex = aSelectedCopy[0].selectStartPage;
+                aDrawings = [];
+                for(i = 0; i < aSelectedCopy.length; ++i)
+                {
+                    if(nPageIndex === aSelectedCopy[i].selectStartPage)
+                    {
+                        aDrawings.push(aSelectedCopy[i]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            oRes = getAbsoluteRectBoundsArr(aDrawings);
+            oRes.pageIndex = nPageIndex;
+            return oRes;
         }
         return null;
     },
@@ -4698,7 +4775,6 @@ DrawingObjectsController.prototype =
             History.Create_NewPoint();
             this.resetSelection();
             var i, j,   cur_group, sp_tree, sp;
-            var a_objects = [];
             for(i = 0; i < ungroup_arr.length; ++i)
             {
                 cur_group = ungroup_arr[i];
@@ -4719,7 +4795,6 @@ DrawingObjectsController.prototype =
                 }
                 cur_group.deleteDrawingBase();
             }
-           // this.startRecalculate();
         }
     },
 
