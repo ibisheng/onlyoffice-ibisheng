@@ -1378,7 +1378,7 @@ CDrawingDocument.prototype =
         // 1 - select markers
         // 2 - drawing track
 
-        check_MouseDownEvent(e, true);
+        check_MouseDownEvent(e, false);
 
         var pos = null;
         if (this.AutoShapesTrackLockPageNum == -1)
@@ -1478,7 +1478,9 @@ CDrawingDocument.prototype =
             }
 
             global_mouseEvent.KoefPixToMM = 1;
-            return 2;
+
+            if (_isDrawings)
+                return 2;
         }
 
         return 0;

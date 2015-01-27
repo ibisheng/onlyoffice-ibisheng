@@ -33,19 +33,19 @@ asc_docs_api.prototype["Call_OnUpdateOverlay"] = function(param)
 
 asc_docs_api.prototype["Call_OnMouseDown"] = function(e)
 {
-    this.WordControl.m_oDrawingDocument.OnMouseDown(e);
+    return this.WordControl.m_oDrawingDocument.OnMouseDown(e);
 };
 asc_docs_api.prototype["Call_OnMouseUp"] = function(e)
 {
-    this.WordControl.m_oDrawingDocument.OnMouseUp(e);
+    return this.WordControl.m_oDrawingDocument.OnMouseUp(e);
 };
 asc_docs_api.prototype["Call_OnMouseMove"] = function(e)
 {
-    this.WordControl.m_oDrawingDocument.OnMouseMove(e);
+    return this.WordControl.m_oDrawingDocument.OnMouseMove(e);
 };
 asc_docs_api.prototype["Call_OnCheckMouseDown"] = function(e)
 {
-    this.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
+    return this.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
 };
 
 asc_docs_api.prototype["Call_OnKeyDown"] = function(e)
