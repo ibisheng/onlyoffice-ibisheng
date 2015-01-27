@@ -596,6 +596,11 @@ function CDrawingDocument()
 
     this.SelectRect1 = null;
     this.SelectRect2 = null;
+
+    this.SelectDrag = -1;
+
+    this.UpdateRulerStateFlag = false;
+    this.UpdateRulerStateParams = [];
 }
 
 var _table_styles = null;
@@ -914,8 +919,58 @@ CDrawingDocument.prototype =
     },
 
     // ruler states
+    Set_RulerState_Start : function()
+    {
+        this.UpdateRulerStateFlag = true;
+    },
+    Set_RulerState_End : function()
+    {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateFlag = false;
+            if (this.UpdateRulerStateParams.length > 0)
+            {
+                switch (this.UpdateRulerStateParams[0])
+                {
+                    case 0:
+                    {
+                        this.Set_RulerState_Table(this.UpdateRulerStateParams[1],
+                            this.UpdateRulerStateParams[2]);
+                        break;
+                    }
+                    case 1:
+                    {
+                        this.Set_RulerState_Paragraph(this.UpdateRulerStateParams[1],
+                            this.UpdateRulerStateParams[2]);
+                        break;
+                    }
+                    case 2:
+                    {
+                        this.Set_RulerState_HdrFtr(this.UpdateRulerStateParams[1],
+                            this.UpdateRulerStateParams[2],
+                            this.UpdateRulerStateParams[3]);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                this.UpdateRulerStateParams = [];
+            }
+        }
+    },
+
     Set_RulerState_Table : function(markup, transform)
     {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(0);
+            this.UpdateRulerStateParams.push(markup);
+            this.UpdateRulerStateParams.push(transform);
+            return;
+        }
+
         this.FrameRect.IsActive = false;
         this.Table = markup.Table;
 
@@ -963,6 +1018,15 @@ CDrawingDocument.prototype =
 
     Set_RulerState_Paragraph : function(margins, isCanTrackMargins)
     {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(1);
+            this.UpdateRulerStateParams.push(margins);
+            this.UpdateRulerStateParams.push(isCanTrackMargins);
+            return;
+        }
+
         if (margins && margins.Frame !== undefined)
         {
             var bIsUpdate = false;
@@ -1025,6 +1089,16 @@ CDrawingDocument.prototype =
 
     Set_RulerState_HdrFtr : function(bHeader, Y0, Y1)
     {
+        if (this.UpdateRulerStateFlag)
+        {
+            this.UpdateRulerStateParams.splice(0, this.UpdateRulerStateParams.length);
+            this.UpdateRulerStateParams.push(2);
+            this.UpdateRulerStateParams.push(bHeader);
+            this.UpdateRulerStateParams.push(Y0);
+            this.UpdateRulerStateParams.push(Y1);
+            return;
+        }
+
         this.Frame = null;
         this.Table = null;
         this.Native["DD_Set_RulerState_HdrFtr"](bHeader, Y0, Y1);
@@ -1300,6 +1374,10 @@ CDrawingDocument.prototype =
 
     OnCheckMouseDown : function(e)
     {
+        // 0 - none
+        // 1 - select markers
+        // 2 - drawing track
+
         check_MouseDownEvent(e, true);
 
         var pos = null;
@@ -1308,10 +1386,102 @@ CDrawingDocument.prototype =
         else
             pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
 
-        global_mouseEvent.KoefPixToMM = 5;
-        var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page);
-        global_mouseEvent.KoefPixToMM = 1;
-        return _isDrawings;
+        this.SelectDrag = -1;
+        if (this.SelectRect1 && this.SelectRect2)
+        {
+            // проверям попадание в селект
+            var radiusMM = 5;
+            if (this.IsRetina)
+                radiusMM *= 2;
+            radiusMM /= this.Native["DD_GetDotsPerMM"]();
+
+            var _circlePos1_x = 0;
+            var _circlePos1_y = 0;
+            var _circlePos2_x = 0;
+            var _circlePos2_y = 0;
+
+            if (!this.TextMatrix)
+            {
+                _circlePos1_x = this.SelectRect1.X;
+                _circlePos1_y = this.SelectRect1.Y - radiusMM;
+
+                _circlePos2_x = this.SelectRect2.X + this.SelectRect2.W;
+                _circlePos2_y = this.SelectRect2.Y + this.SelectRect2.H + radiusMM;
+            }
+            else
+            {
+                var _circlePos1_x_mem = this.SelectRect1.X;
+                var _circlePos1_y_mem = this.SelectRect1.Y - radiusMM;
+
+                var _circlePos2_x_mem = this.SelectRect2.X + this.SelectRect2.W;
+                var _circlePos2_y_mem = this.SelectRect2.Y + this.SelectRect2.H + radiusMM;
+
+                _circlePos1_x = this.TextMatrix.TransformPointX(_circlePos1_x_mem, _circlePos1_y_mem);
+                _circlePos1_y = this.TextMatrix.TransformPointY(_circlePos1_x_mem, _circlePos1_y_mem);
+                _circlePos2_x = this.TextMatrix.TransformPointX(_circlePos2_x_mem, _circlePos2_y_mem);
+                _circlePos2_y = this.TextMatrix.TransformPointY(_circlePos2_x_mem, _circlePos2_y_mem);
+            }
+
+            var _selectCircleEpsMM = 10; // 1cm;
+
+            if (Math.abs(pos.X - _circlePos1_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos1_y) < _selectCircleEpsMM)
+            {
+                this.SelectDrag = 1;
+
+                var _xDown = this.SelectRect2.X + this.SelectRect2.W;
+                var _yDown = this.SelectRect2.Y + this.SelectRect2.H / 2;
+                if (!this.TextMatrix)
+                {
+                    this.LogicDocument.OnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect2.Page);
+                }
+                else
+                {
+                    this.LogicDocument.OnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
+                        this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect2.Page);
+                }
+
+                this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            }
+
+            if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_x) < _selectCircleEpsMM)
+            {
+                this.SelectDrag = 2;
+
+                var _xDown = this.SelectRect1.X + this.SelectRect1.W;
+                var _yDown = this.SelectRect1.Y + this.SelectRect1.H / 2;
+                if (!this.TextMatrix)
+                {
+                    this.LogicDocument.OnMouseDown(global_mouseEvent, _xDown, _yDown, this.SelectRect1.Page);
+                }
+                else
+                {
+                    this.LogicDocument.OnMouseDown(global_mouseEvent, this.TextMatrix.TransformPointX(_xDown, _yDown),
+                        this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect1.Page);
+                }
+
+                this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+            }
+
+            if (this.SelectDrag != -1)
+                return 1;
+        }
+
+        if (true)
+        {
+            // проверям на попадание в графические объекты (грубо говоря - треки)
+            global_mouseEvent.KoefPixToMM = 5;
+            var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page);
+
+            if (_isDrawings)
+            {
+                this.OnMouseDown(e);
+            }
+
+            global_mouseEvent.KoefPixToMM = 1;
+            return 2;
+        }
+
+        return 0;
     },
 
     OnMouseDown : function(e)
@@ -1355,9 +1525,7 @@ CDrawingDocument.prototype =
                 return;
 
             this.Native["DD_NeedScrollToTargetFlag"](true);
-            //global_mouseEvent.KoefPixToMM = 5;
             this.LogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
-            //global_mouseEvent.KoefPixToMM = 1;
             this.Native["DD_NeedScrollToTargetFlag"](false);
         }
 
@@ -1376,10 +1544,10 @@ CDrawingDocument.prototype =
             pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
 
         if (pos.Page == -1)
-            return;
+            return this.CheckReturnMouseUp();
 
         if (this.IsFreezePage(pos.Page))
-            return;
+            return this.CheckReturnMouseUp();
 
         this.UnlockCursorType();
 
@@ -1395,7 +1563,7 @@ CDrawingDocument.prototype =
         */
         var is_drawing = this.checkMouseUp_Drawing(pos);
         if (is_drawing === true)
-            return;
+            return this.CheckReturnMouseUp();
 
         this.Native["DD_CheckTimerScroll"](false);
 
@@ -1410,6 +1578,7 @@ CDrawingDocument.prototype =
         this.LogicDocument.Document_UpdateRulersState();
 
         this.EndUpdateOverlay();
+        return this.CheckReturnMouseUp();
     },
 
     OnMouseMove : function(e)
@@ -1451,6 +1620,63 @@ CDrawingDocument.prototype =
         }
 
         this.EndUpdateOverlay();
+    },
+
+    CheckReturnMouseUp : function()
+    {
+        // return: array
+        // first: type (0 - none, 1 - onlytarget, 2 - select, 3 - tracks)
+        // type = 0: none
+        // type = 1: (double)x, (double)y, (int)page, [option: transform (6 double values)]
+        // type = 2: (double)x1, (double)y1, (int)page1, (double)x2, (double)y2, (int)page2, [option: transform (6 double values)]
+        // type = 3: (double)x, (double)y, (double)w, (double)h, (int)page, [option: transform (6 double values)]
+
+        var _ret = [];
+        _ret.push(0);
+
+        var _target = this.LogicDocument.Is_SelectionUse();
+        if (_target === false)
+        {
+            _ret[0] = 1;
+        }
+
+        var _select = this.LogicDocument.Get_SelectionBounds();
+        if (_select)
+        {
+            _ret[0] = 2;
+            var _rect1 = _select.Start;
+            var _rect2 = _select.End;
+
+            _ret.push(_select.Start.X);
+            _ret.push(_select.Start.Y);
+            _ret.push(_select.Start.Page);
+            _ret.push(_select.End.X + _select.End.W);
+            _ret.push(_select.End.Y + _select.End.Height);
+            _ret.push(_select.End.Page);
+
+            if (this.TextMatrix && !this.TextMatrix.IsIdentity())
+            {
+                _ret.push(this.TextMatrix.sx);
+                _ret.push(this.TextMatrix.shy);
+                _ret.push(this.TextMatrix.shx);
+                _ret.push(this.TextMatrix.sy);
+                _ret.push(this.TextMatrix.tx);
+                _ret.push(this.TextMatrix.ty);
+            }
+        }
+
+        var _object_bounds = this.LogicDocument.DrawingObjects.getSelectedObjectsBounds();
+        if (_object_bounds)
+        {
+            _ret[0] = 3;
+            _ret.push(_object_bounds.minX);
+            _ret.push(_object_bounds.minY);
+            _ret.push(_object_bounds.maxX);
+            _ret.push(_object_bounds.maxY);
+            _ret.push(_object_bounds.pageIndex);
+        }
+
+        return _ret;
     },
 
     OnKeyDown : function(e)
