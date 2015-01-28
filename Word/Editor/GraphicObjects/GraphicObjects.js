@@ -2231,7 +2231,7 @@ CGraphicObjects.prototype =
             this.zIndexManager.addItem(null, paraDrawing);
     },
 
-    isPointInDrawingObjects: function(x, y, pageIndex)
+    isPointInDrawingObjects: function(x, y, pageIndex, bSelected)
     {
         var ret;
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
@@ -2240,7 +2240,7 @@ CGraphicObjects.prototype =
         if(isRealObject(ret))
         {
             var object = g_oTableId.Get_ById(ret.objectId);
-            if(isRealObject(object))
+            if(isRealObject(object) && (!(bSelected === true) || bSelected && object.selected) )
             {
                 if(object.group)
                     object = object.getMainGroup();
@@ -2258,9 +2258,9 @@ CGraphicObjects.prototype =
         return -1;
     },
 
-    isPointInDrawingObjects2: function(x, y, pageIndex)
+    isPointInDrawingObjects2: function(x, y, pageIndex, bSelected)
     {
-        return this.isPointInDrawingObjects(x, y, pageIndex) > -1;
+        return this.isPointInDrawingObjects(x, y, pageIndex, bSelected) > -1;
     },
 
 
@@ -2500,6 +2500,68 @@ CGraphicObjects.prototype =
 
     setParagraphIndent: DrawingObjectsController.prototype.setParagraphIndent,
     getSelectedObjectsBounds: DrawingObjectsController.prototype.getSelectedObjectsBounds,
+    getContextMenuPosition: DrawingObjectsController.prototype.getContextMenuPosition,
+    getLeftTopSelectedFromArray: DrawingObjectsController.prototype.getLeftTopSelectedFromArray,
+
+    getLeftTopSelectedObject: function(pageIndex)
+    {
+        if(this.selectedObjects.length > 0)
+        {
+            var oRes = this.getLeftTopSelectedObjectByPage(pageIndex);
+            if(oRes.bSelected === true)
+            {
+                return oRes;
+            }
+            var aSelectedObjectsCopy = [].concat(this.selectedObjects);
+            aSelectedObjectsCopy.sort(function(a, b){return a.selectStartPage - b.selectStartPage});
+            return this.getLeftTopSelectedObjectByPage(aSelectedObjectsCopy[0].selectStartPage);
+        }
+        return {X: 0, Y: 0};
+    },
+
+    getLeftTopSelectedObjectByPage: function(pageIndex)
+    {
+        var oDrawingPage, oRes;
+        if(this.document.CurPos.Type === docpostype_HdrFtr)
+        {
+            if(this.graphicPages[pageIndex])
+            {
+                oDrawingPage = this.graphicPages[pageIndex].hdrFtrPage;
+            }
+        }
+        else
+        {
+            if(this.graphicPages[pageIndex])
+            {
+                oDrawingPage = this.graphicPages[pageIndex];
+            }
+        }
+        if(oDrawingPage)
+        {
+            oRes = this.getLeftTopSelectedFromArray(oDrawingPage.beforeTextObjects, pageIndex);
+            if(oRes.bSelected)
+            {
+                return oRes;
+            }
+            oRes = this.getLeftTopSelectedFromArray(oDrawingPage.inlineObjects, pageIndex);
+            if(oRes.bSelected)
+            {
+                return oRes;
+            }
+            oRes = this.getLeftTopSelectedFromArray(oDrawingPage.wrappingObjects, pageIndex);
+            if(oRes.bSelected)
+            {
+                return oRes;
+            }
+            oRes = this.getLeftTopSelectedFromArray(oDrawingPage.behindDocObjects, pageIndex);
+            if(oRes.bSelected)
+            {
+                return oRes;
+            }
+        }
+        return {X: 0, Y: 0};
+    },
+
 
 
     CheckRange: function(X0, Y0, X1, Y1, Y0Sp, Y1Sp, LeftField, RightField, PageNum, HdrFtrRanges, docContent)

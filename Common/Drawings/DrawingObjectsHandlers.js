@@ -69,7 +69,7 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
             tx = x;
             ty = y;
         }
-        if(selected_objects[i].hitInBoundingRect(x, y))
+        if(selected_objects[i].hitInBoundingRect(x, y) && (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(x, y)))
         {
             if(bWord && selected_objects[i].parent && selected_objects[i].parent.Is_Inline())
                 return handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, x, y, pageIndex);
@@ -136,7 +136,7 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     var hit_in_inner_area = drawing.hitInInnerArea(x, y);
     var hit_in_path = drawing.hitInPath(x, y);
     var hit_in_text_rect = drawing.hitInTextRect(x, y);
-    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+    if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
     {
         return drawingObjectsController.handleMoveHit(drawing, e, x, y, group, false, pageIndex, bWord);
     }
@@ -166,7 +166,7 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     var hit_in_path = shape.hitInPath && shape.hitInPath(x, y);
     var hit_in_text_rect = shape.hitInTextRect && shape.hitInTextRect(x, y);
     var ret;
-    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+    if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
     {
         return drawingObjectsController.handleMoveHit(drawing, e, x, y, null, false, pageIndex, true);
     }
@@ -462,10 +462,11 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex)
     {
         if(drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+            var bIsSelected = drawing.selected;
             drawingObjects.checkChartTextSelection();
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
-            drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing));
+            drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, true, pageIndex, x, y));
             if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1)
                 && drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
             {
