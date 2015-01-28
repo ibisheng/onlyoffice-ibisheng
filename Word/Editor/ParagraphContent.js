@@ -3897,6 +3897,7 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.selected = false;
 
     this.behindDoc = false;
+    this.bNoNeedToAdd = false;
 
     this.pageIndex = -1;//pageIndex;
 
@@ -4492,7 +4493,13 @@ ParaDrawing.prototype =
         if(!(this.DocumentContent && this.DocumentContent.Is_HdrFtr() && this.DocumentContent.Get_StartPage_Absolute() !== pageIndex))
         {
             this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
+            this.bNoNeedToAdd = false;
         }
+        else
+        {
+            this.bNoNeedToAdd = true;
+        }
+
         this.selectX = x;
         this.selectY = y;
 
