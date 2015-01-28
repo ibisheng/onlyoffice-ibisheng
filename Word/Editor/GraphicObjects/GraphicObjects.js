@@ -2252,7 +2252,11 @@ CGraphicObjects.prototype =
             }
             else
             {
-                return DRAWING_ARRAY_TYPE_BEFORE;
+                if(!(bSelected === true))
+                {
+                    return DRAWING_ARRAY_TYPE_BEFORE;
+                }
+                return -1;
             }
         }
         return -1;
@@ -2516,7 +2520,7 @@ CGraphicObjects.prototype =
             aSelectedObjectsCopy.sort(function(a, b){return a.selectStartPage - b.selectStartPage});
             return this.getLeftTopSelectedObjectByPage(aSelectedObjectsCopy[0].selectStartPage);
         }
-        return {X: 0, Y: 0};
+        return {X: 0, Y: 0, PageIndex: pageIndex};
     },
 
     getLeftTopSelectedObjectByPage: function(pageIndex)
@@ -2559,7 +2563,7 @@ CGraphicObjects.prototype =
                 return oRes;
             }
         }
-        return {X: 0, Y: 0};
+        return {X: 0, Y: 0, PageIndex: pageIndex};
     },
 
 
