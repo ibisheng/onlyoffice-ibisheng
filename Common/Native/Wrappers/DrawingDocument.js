@@ -1470,7 +1470,7 @@ CDrawingDocument.prototype =
         {
             // проверям на попадание в графические объекты (грубо говоря - треки)
             global_mouseEvent.KoefPixToMM = 5;
-            var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page);
+            var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);
 
             if (_isDrawings)
             {

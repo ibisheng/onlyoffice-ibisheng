@@ -3273,6 +3273,19 @@ function CThumbnailsManager()
         }
     }
 
+    this.GetThumbnailPagePosition = function(pageIndex)
+    {
+        if (pageIndex < 0 || pageIndex >= this.m_arrPages.length)
+            return null;
+
+        var drawRect = this.m_arrPages[pageIndex];
+        var _ret = { X : this.m_oWordControl.X +  drawRect.left,
+                     Y : this.m_oWordControl.X +  drawRect.top,
+                     W : drawRect.right - drawRect.left + 1,
+                     H : drawRect.bottom - drawRect.top + 1};
+        return _ret;
+    }
+
     this.ConvertCoords = function(x, y, isPage, isFixed)
     {
         var Pos = {X : x, Y : y};
