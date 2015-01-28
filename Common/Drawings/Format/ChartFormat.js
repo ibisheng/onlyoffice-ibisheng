@@ -22864,7 +22864,7 @@ CTitle.prototype =
             }
             if(drawing_objects)
             {
-                drawing_objects.resetSelection();
+                drawing_objects.resetSelection(true);
                 var para_drawing;
                 if(chart.group)
                 {

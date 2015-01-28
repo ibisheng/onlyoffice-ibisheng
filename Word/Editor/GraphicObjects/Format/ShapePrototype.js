@@ -626,7 +626,7 @@ CShape.prototype.hitInTextRect = function(x, y)
 CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
 {
     var drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-    drawing_objects.resetSelection();
+    drawing_objects.resetSelection(true);
     var para_drawing;
     if(this.group)
     {

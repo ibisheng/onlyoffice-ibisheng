@@ -769,7 +769,7 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
     if(this.parent)
     {
         var drawing_objects = this.parent.graphicObjects;
-        drawing_objects.resetSelection();
+        drawing_objects.resetSelection(true);
         if(this.group)
         {
             var main_group = this.group.getMainGroup();
