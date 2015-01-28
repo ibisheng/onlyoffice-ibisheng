@@ -1443,7 +1443,7 @@ CDrawingDocument.prototype =
                 this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
             }
 
-            if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_x) < _selectCircleEpsMM)
+            if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_y) < _selectCircleEpsMM)
             {
                 this.SelectDrag = 2;
 
