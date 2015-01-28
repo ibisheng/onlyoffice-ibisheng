@@ -124,22 +124,30 @@ DrawingObjectsController.prototype.editChart = function(binary)
     var bin_object = {"binary":binary};
     var chart_space = this.getChartSpace2(bin_object, null);
     chart_space.setParent(this.drawingObjects);
-    var by_types;
+    var by_types, i;
     by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
-    if(by_types.charts.length === 1)
+    var aSelectedCharts = [];
+    for(i = 0; i < by_types.charts.length; ++i)
     {
-        if(by_types.charts[0].group)
+        if(by_types.charts[i].selected)
         {
-            var parent_group = by_types.charts[0].group;
-            var major_group = by_types.charts[0].getMainGroup();
-            for(var i = parent_group.spTree.length -1; i > -1; --i)
+            aSelectedCharts.push(by_types.charts[i]);
+        }
+    }
+    if(aSelectedCharts.length === 1)
+    {
+        if(aSelectedCharts[0].group)
+        {
+            var parent_group = aSelectedCharts[0].group;
+            var major_group = aSelectedCharts[0].getMainGroup();
+            for(i = parent_group.spTree.length -1; i > -1; --i)
             {
-                if(parent_group.spTree[i] === by_types.charts[0])
+                if(parent_group.spTree[i] === aSelectedCharts[0])
                 {
                     parent_group.removeFromSpTreeByPos(i);
                     chart_space.setGroup(parent_group);
-                    chart_space.spPr.xfrm.setOffX(by_types.charts[0].spPr.xfrm.offX);
-                    chart_space.spPr.xfrm.setOffY(by_types.charts[0].spPr.xfrm.offY);
+                    chart_space.spPr.xfrm.setOffX(aSelectedCharts[0].spPr.xfrm.offX);
+                    chart_space.spPr.xfrm.setOffY(aSelectedCharts[0].spPr.xfrm.offY);
                     parent_group.addToSpTree(i, chart_space);
                     parent_group.updateCoordinatesAfterInternalResize();
                     major_group.recalculate();
@@ -156,9 +164,9 @@ DrawingObjectsController.prototype.editChart = function(binary)
         }
         else
         {
-            chart_space.spPr.xfrm.setOffX(by_types.charts[0].x);
-            chart_space.spPr.xfrm.setOffY(by_types.charts[0].y);
-            var pos = by_types.charts[0].deleteDrawingBase();
+            chart_space.spPr.xfrm.setOffX(aSelectedCharts[0].x);
+            chart_space.spPr.xfrm.setOffY(aSelectedCharts[0].y);
+            var pos = aSelectedCharts[0].deleteDrawingBase();
             chart_space.addToDrawingObjects(pos);
             this.resetSelection();
             this.selectObject(chart_space, this.drawingObjects.num);
