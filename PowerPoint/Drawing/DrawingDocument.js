@@ -1931,6 +1931,7 @@ function CDrawingDocument()
 
     this.UpdateTarget = function(x, y, pageIndex)
     {
+        this.m_oWordControl.m_oLogicDocument.Set_TargetPos( x, y, pageIndex );
         if (pageIndex != this.SlideCurrent)
         {
             // сначала выставим страницу
@@ -5001,6 +5002,35 @@ function CThumbnailsManager()
                 }
                 break;
             }
+            case   93:
+            case 57351:
+            {
+                var aSelected = this.GetSelectedArray();
+                var nSlideIndex = Math.min.apply(Math, aSelected);
+                var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex );
+                if(ConvertedPos)
+                {
+                    editor.sync_ContextMenuCallback(new CContextMenuData({ Type : c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect: true }) );
+                }
+                return false;
+            }
+
+            case 121:
+            {
+                if(global_keyboardEvent.ShiftKey)
+                {
+                    var aSelected = this.GetSelectedArray();
+                    var nSlideIndex = Math.min.apply(Math, aSelected);
+                    var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex );
+                    if(ConvertedPos)
+                    {
+                        editor.sync_ContextMenuCallback(new CContextMenuData({ Type : c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect: true }) );
+                    }
+                    return false;
+                }
+                break;
+            }
+
 
             default:
                 break;

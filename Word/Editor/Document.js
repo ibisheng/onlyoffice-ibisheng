@@ -9909,9 +9909,18 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 93 || 57351 == e.KeyCode /*в Opera такой код*/ ) // контекстное меню
         {
-            var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
-            var X_abs = ConvertedPos.X;
-            var Y_abs = ConvertedPos.Y;
+            var X_abs, Y_abs, oPosition, ConvertedPos;
+            if(this.DrawingObjects.selectedObjects.length > 0)
+            {
+                oPosition = this.DrawingObjects.getContextMenuPosition(this.CurPage);
+                ConvertedPos =   this.DrawingDocument.ConvertCoordsToCursorWR( oPosition.X, oPosition.Y, oPosition.PageIndex );
+            }
+            else
+            {
+                ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
+            }
+            X_abs = ConvertedPos.X;
+            Y_abs = ConvertedPos.Y;
 
             editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
 
@@ -9920,9 +9929,18 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
         {
-            var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
-            var X_abs = ConvertedPos.X;
-            var Y_abs = ConvertedPos.Y;
+            var X_abs, Y_abs, oPosition, ConvertedPos;
+            if(this.DrawingObjects.selectedObjects.length > 0)
+            {
+                oPosition = this.DrawingObjects.getContextMenuPosition(this.CurPage);
+                ConvertedPos =   this.DrawingDocument.ConvertCoordsToCursorWR( oPosition.X, oPosition.Y, oPosition.PageIndex );
+            }
+            else
+            {
+                ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
+            }
+            X_abs = ConvertedPos.X;
+            Y_abs = ConvertedPos.Y;
 
             editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
 

@@ -4912,12 +4912,22 @@ asc_docs_api.prototype.sync_closeChartEditor = function()
 // События контекстного меню
 //-----------------------------------------------------------------
 
-function CContextMenuData()
+function CContextMenuData(oData)
 {
-    this.Type  = c_oAscContextMenuTypes.Main;
-    this.X_abs = 0;
-    this.Y_abs = 0;
-    this.IsSlideSelect = true;
+    if(isRealObject(oData))
+    {
+        this.Type  = oData.Type;
+        this.X_abs = oData.X_abs;
+        this.Y_abs = oData.Y_abs;
+        this.IsSlideSelect = oData.IsSlideSelect;
+    }
+    else
+    {
+        this.Type  = c_oAscContextMenuTypes.Main;
+        this.X_abs = 0;
+        this.Y_abs = 0;
+        this.IsSlideSelect = true;
+    }
 }
 
 CContextMenuData.prototype.get_Type  = function()  { return this.Type; };

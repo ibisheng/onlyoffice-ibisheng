@@ -423,7 +423,7 @@ DrawingObjectsController.prototype =
                         this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, /*true*/!bInSelect));
                     else
                     {
-                        this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true));
+                        this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, true, pageIndex, x, y));
                     }
 
                 }
@@ -608,10 +608,10 @@ DrawingObjectsController.prototype =
             {
                 dX = aDrawings[i].transform.TransformPointX(aDrawings[i].extX/2, aDrawings[i].extY/2) - aDrawings[i].extX/2;
                 dY = aDrawings[i].transform.TransformPointY(aDrawings[i].extX/2, aDrawings[i].extY/2) - aDrawings[i].extY/2;
-                return {X: dX, Y: dY, bSelected: true};
+                return {X: dX, Y: dY, bSelected: true, PageIndex: pageIndex};
             }
         }
-        return {X: 0, Y: 0, bSelected: false};
+        return {X: 0, Y: 0, bSelected: false, PageIndex: pageIndex};
     },
 
     getLeftTopSelectedObject: function(pageIndex)
@@ -619,87 +619,64 @@ DrawingObjectsController.prototype =
         return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
     },
 
+    getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
+    {
+        var dX, dY, oDocContent, oTransformText, oParagraph, document = editor.WordControl.m_oLogicDocument, dPosX = 0, dPosY = 0;
+        if(oTargetTextObject.getObjectType() === historyitem_type_Shape || oTargetTextObject.getObjectType() === historyitem_type_Title)
+        {
+            dPosX = document.TargetPos.X;
+            dPosY = document.TargetPos.Y;
+            oTransformText = oTargetTextObject.transformText;
+            return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
+        }
+        else if(oTargetTextObject.getObjectType() === historyitem_type_GraphicFrame)
+        {
+            var Doc = oTargetTextObject.graphicObject;
+            oTransformText = oTargetTextObject.transform;
+            if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
+            {
+                switch( Doc.Selection.Type )
+                {
+                    case table_Selection_Cell:
+                    {
+                        var oCellInfo = Doc.CurCell.Row.Get_CellInfo(Doc.CurCell.Index);
+                        var oCellMargins = Doc.CurCell.Get_Margins();
+                        dPosX = oCellInfo.X_content_start;
+                        dPosY = Doc.RowsInfo[Doc.CurCell.Row.Index].Y[0] + Doc.RowsInfo[Doc.CurCell.Row.Index].TopDy[0] + oCellMargins.Top.W +  Doc.CurCell.Temp.Y_VAlign_offset[0];
+                        dX = oTransformText.TransformPointX(dPosX, dPosY);
+                        dY = oTransformText.TransformPointY(dPosX, dPosY);
+                        return {X: dX, Y: dY, PageIndex: this.selectedObjects[0].selectStartPage};
+                    }
+                    case table_Selection_Text:
+                    {
+                        dPosX = document.TargetPos.X;
+                        dPosY = document.TargetPos.Y;
+                        oTransformText = oTargetTextObject.transformText;
+                        return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
+                    }
+                }
+            }
+            else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
+            {
+                dPosX = document.TargetPos.X;
+                dPosY = document.TargetPos.Y;
+                oTransformText = oTargetTextObject.transformText;
+                return {X: oTransformText.TransformPointX(dPosX, dPosY), Y: oTransformText.TransformPointY(dPosX, dPosY), PageIndex: document.TargetPos.PageNum};
+            }
+        }
+        return {X: 0, Y: 0, PageIndex: pageIndex};
+    },
+
     getContextMenuPosition: function(pageIndex)
     {
-        var i, aDrawings, dX, dY, oTargetTextObject, oDocContent, oTransformText;
+        var i, aDrawings, dX, dY, oTargetTextObject;
         if(this.selectedObjects.length > 0)
         {
             oTargetTextObject = getTargetTextObject(this);
             if(oTargetTextObject)
             {
-                if(oTargetTextObject.getObjectType() === historyitem_type_Shape || oTargetTextObject.getObjectType() === historyitem_type_Title)
-                {
-                    oDocContent = oTargetTextObject.getDocContent();
-                    oTransformText = oTargetTextObject.transformText;
-                    dX = oTransformText.TransformPointX(oDocContent.CurPos.X, oDocContent.CurPos.Y);
-                    dY = oTransformText.TransformPointY(oDocContent.CurPos.X, oDocContent.CurPos.Y);
-                    return {X: dX, Y: dY, PageIndex: this.selectedObjects[0].selectStartPage};
-                }
-                else if(oTargetTextObject.getObjectType() === historyitem_type_GraphicFrame)
-                {
-                    var Doc = oTargetTextObject.graphicObject, dPosX = 0, dPosY = 0;
-                    if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
-                    {
-                        switch( Doc.Selection.Type )
-                        {
-                            case table_Selection_Cell:
-                            {
-                                var Row_prev_index = -1;
-                                for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                                {
-                                    var Pos = this.Selection.Data[Index];
-                                    var Row = this.Content[Pos.Row];
-                                    var Cell = Row.Get_Cell( Pos.Cell );
-                                    var CellInfo = Row.Get_CellInfo( Pos.Cell );
-                                    var CellMar = Cell.Get_Margins();
+                return this.getFromTargetTextObjectContextMenuPosition(oTargetTextObject, pageIndex);
 
-                                    if ( -1 === Row_prev_index || Row_prev_index != Pos.Row )
-                                        Row_prev_index = Pos.Row;
-
-                                    var X_start = ( 0 === Pos.Cell ? CellInfo.X_content_start : CellInfo.X_cell_start );
-                                    var X_end   = CellInfo.X_cell_end;
-
-                                    var Cell_Pages   = Cell.Content_Get_PagesCount();
-                                    var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
-                                    if ( Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages )
-                                        continue;
-
-                                    var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
-                                    var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
-
-                                    if ( 0 != Cell_PageRel )
-                                    {
-                                        // мы должны определить ряд, на котором случился перенос на новую страницу
-                                        var TempRowIndex = this.Pages[CurPage].FirstRow;
-                                        this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
-                                    }
-                                    else
-                                    {
-                                        this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
-                                    }
-                                }
-                                break;
-                            }
-                            case table_Selection_Text:
-                            {
-                                var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
-                                Cell.Content.Selection_Draw_Page(Page_abs);
-
-                                break;
-                            }
-                        }
-
-                        Doc.Selection_Draw_Page(this.parent.num);
-                        drawingDocument.SelectShow();
-                    }
-                    else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
-                    {
-                        drawingDocument.SelectEnabled(false);
-                        Doc.RecalculateCurPos();
-                        drawingDocument.UpdateTargetTransform(this.transform);
-                        drawingDocument.TargetShow();
-                    }
-                }
             }
             else if(this.selection.groupSelection)
             {

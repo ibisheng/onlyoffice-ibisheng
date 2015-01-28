@@ -2507,6 +2507,12 @@ CGraphicObjects.prototype =
     getContextMenuPosition: DrawingObjectsController.prototype.getContextMenuPosition,
     getLeftTopSelectedFromArray: DrawingObjectsController.prototype.getLeftTopSelectedFromArray,
 
+    getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
+    {
+        var dPosX = this.document.TargetPos.X, dPosY = this.document.TargetPos.Y, oTransform = oTargetTextObject.transformText;
+        return {X: oTransform.TransformPointX(dPosX, dPosY), Y: oTransform.TransformPointY(dPosX, dPosY), PageIndex: this.document.TargetPos.PageNum};
+    },
+
     getLeftTopSelectedObject: function(pageIndex)
     {
         if(this.selectedObjects.length > 0)

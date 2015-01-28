@@ -292,12 +292,15 @@ PreChangeAdjState.prototype =
     }
 };
 
-function PreMoveInlineObject(drawingObjects, majorObject, isSelected, bInside)
+function PreMoveInlineObject(drawingObjects, majorObject, isSelected, bInside, nStartPage, dStartX, dStartY)
 {
     this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
     this.majorObjectIsSelected = isSelected;
     this.bInside = bInside;
+    this.nStartPage = nStartPage;
+    this.dStartX = dStartX;
+    this.dStartY = dStartY;
 }
 
 PreMoveInlineObject.prototype =
@@ -315,8 +318,11 @@ PreMoveInlineObject.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        this.drawingObjects.changeCurrentState(new MoveInlineObject(this.drawingObjects, this.majorObject));
-        this.drawingObjects.OnMouseMove(e, x, y, pageIndex);
+        if(this.nStartPage !== pageIndex || Math.abs(x - this.dStartX) > MOVE_DELTA || Math.abs(y - this.dStartY) > MOVE_DELTA)
+        {
+            this.drawingObjects.changeCurrentState(new MoveInlineObject(this.drawingObjects, this.majorObject));
+            this.drawingObjects.OnMouseMove(e, x, y, pageIndex);
+        }
     },
 
     onMouseUp: function(e, x,y,pageIndex)
