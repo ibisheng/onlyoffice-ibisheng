@@ -1427,6 +1427,7 @@ CDrawingDocument.prototype =
             if (Math.abs(pos.X - _circlePos1_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos1_y) < _selectCircleEpsMM)
             {
                 this.SelectDrag = 1;
+                this.LogicDocument.Cursor_MoveRight();
 
                 var _xDown = this.SelectRect2.X + this.SelectRect2.W;
                 var _yDown = this.SelectRect2.Y + this.SelectRect2.H / 2;
@@ -1446,6 +1447,7 @@ CDrawingDocument.prototype =
             if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_y) < _selectCircleEpsMM)
             {
                 this.SelectDrag = 2;
+                this.LogicDocument.Cursor_MoveLeft();
 
                 var _xDown = this.SelectRect1.X + this.SelectRect1.W;
                 var _yDown = this.SelectRect1.Y + this.SelectRect1.H / 2;
