@@ -862,30 +862,27 @@ asc_docs_api.prototype.Init = function()
 {
 	this.WordControl.Init();
 };
-asc_docs_api.prototype.asc_getEditorPermissions = function()
-{
-	if (undefined != window['qtDocBridge'])
-	{
+asc_docs_api.prototype.asc_getEditorPermissions = function() {
+	if (undefined != window['qtDocBridge']) {
 		// set permissions
 		//var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		//editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
-	}
-	else
-	{
+	} else {
 		if (this.DocInfo && this.DocInfo.get_Id()) {
 			var rData = {
-				"c"			: "getsettings",
-				"id"		: this.DocInfo.get_Id(),
-				"userid"	: this.DocInfo.get_UserId(),
-				"format"	: this.DocInfo.get_Format(),
-				"vkey"		: this.DocInfo.get_VKey(),
-				"editorid"	: c_oEditorId.Word
+				"c": "getsettings",
+				"id": this.DocInfo.get_Id(),
+				"userid": this.DocInfo.get_UserId(),
+				"format": this.DocInfo.get_Format(),
+				"vkey": this.DocInfo.get_VKey(),
+				"editorid": c_oEditorId.Word
 			};
-			
-			sendCommand( this, this.asc_getEditorPermissionsCallback, rData );
+
+			var t = this;
+			sendCommand(this, function (response) {t.asc_getEditorPermissionsCallback(response);}, rData);
 		} else {
 			var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
-			editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
+			editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
 		}
 	}
 };
@@ -906,9 +903,9 @@ asc_docs_api.prototype.asc_getLicense = function ()
 	}
 };
 
-asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject) {
-	if (null != incomeObject && "getsettings" == incomeObject["type"]) {
-		var oSettings = JSON.parse(incomeObject["data"]);
+asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(response) {
+	if (null != response && "getsettings" == response["type"]) {
+		var oSettings = JSON.parse(response["data"]);
 
 		//Set up coauthoring and spellcheker service
 		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
