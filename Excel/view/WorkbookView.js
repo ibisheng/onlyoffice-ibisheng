@@ -395,7 +395,8 @@
 						"getFormulaRanges"			: function () {return self.getWorksheet().getFormulaRanges();},
 						"setStrictClose"			: function (val) {self.controller.setStrictClose(val);},
 						"updateEditorSelectionInfo"	: function (info) {self.handlers.trigger("asc_onEditorSelectionChanged", info);},
-						"onContextMenu"				: function (event) {self.handlers.trigger("asc_onContextMenu", event);}
+						"onContextMenu"				: function (event) {self.handlers.trigger("asc_onContextMenu", event);},
+						"setUserAlive"				: function () {self.oApi.setUserAlive();}
 					},
 					/*settings*/{
 						font: this.defaultFont,
@@ -423,7 +424,8 @@
 				"onStopFormatPainter"		: function () {self.handlers.trigger("asc_onStopFormatPainter");},
 				"onDocumentPlaceChanged"	: function () {self._onDocumentPlaceChanged();},
 				"updateSheetViewSettings"	: function () {self.handlers.trigger("asc_onUpdateSheetViewSettings");},
-				"onScroll"					: function (d) {self.controller.scroll(d);}
+				"onScroll"					: function (d) {self.controller.scroll(d);},
+				"setUserAlive"				: function () {self.oApi.setUserAlive();}
 			});
 
 			this.model.handlers.add("cleanCellCache", function (wsId, oRanges, canChangeColWidth, bLockDraw, updateHeight) {

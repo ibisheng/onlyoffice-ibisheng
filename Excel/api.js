@@ -1406,7 +1406,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype._onGetEditorPermissions = function(response) {
-			if(null != response && "getsettings" == response.type){
+			if (null != response && "getsettings" == response.type) {
 				var oSettings = JSON.parse(response.data);
 
 				//Set up coauthoring and spellcheker service
@@ -1417,29 +1417,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
 
-				if(undefined != oSettings['trackingInfo'] &&
-					null != oSettings['trackingInfo'])
-				{
+				if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo']) {
 					this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 
 					this.TrackFile.setDocId(this.DocInfo["Id"]);
 					this.TrackFile.setUserId(this.DocInfo["UserId"]);
 
 					var oThis = this;
-					var _sendTrack = function(callback, url, data){
+					var _sendTrack = function (callback, url, data) {
 						return oThis._asc_sendTrack(callback, url, data);
 					};
-
 					this.TrackFile.setTrackFunc(_sendTrack);
 
-					var _isDocumentModified = function(){
-						return oThis.asc_isDocumentModified()
-					};
-
-					this.TrackFile.setIsDocumentModifiedFunc(_isDocumentModified);
-
-					if(undefined != oSettings['TrackingInterval'] &&
-						null != oSettings['TrackingInterval'])
+					if (undefined != oSettings['TrackingInterval'] && null != oSettings['TrackingInterval'])
 						this.TrackFile.setInterval(oSettings['TrackingInterval']);
 
 					this.TrackFile.Start();
@@ -1850,6 +1840,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		spreadsheet_api.prototype.endCollaborationEditing = function () {
 			// Временно заканчиваем совместное редактирование
 			this.collaborativeEditing.endCollaborationEditing();
+		};
+
+		// Update user alive
+		spreadsheet_api.prototype.setUserAlive = function () {
+			if (this.TrackFile)
+				this.TrackFile.setUserAlive();
 		};
 
 		// End Load document

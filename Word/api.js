@@ -906,39 +906,30 @@ asc_docs_api.prototype.asc_getLicense = function ()
 	}
 };
 
-asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
-{				
-	if(null != incomeObject && "getsettings" == incomeObject["type"]){
+asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject) {
+	if (null != incomeObject && "getsettings" == incomeObject["type"]) {
 		var oSettings = JSON.parse(incomeObject["data"]);
-		
+
 		//Set up coauthoring and spellcheker service
 		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
 		window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
-		
+
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
-		editor.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
-		
-		if(undefined != oSettings['trackingInfo'] &&
-			null != oSettings['trackingInfo'])
-		{
+		this.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
+
+		if (undefined != oSettings['trackingInfo'] && null != oSettings['trackingInfo']) {
 			var asc_CTrackFile = window["Asc"].CTrackFile;
-			editor.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
-			
-			editor.TrackFile.setDocId(editor.DocInfo.get_Id());
-			editor.TrackFile.setUserId(editor.DocInfo.get_UserId());
-			editor.TrackFile.setTrackFunc(sendTrack);
-			
-			var _isDocumentModified = function(){
-				return editor.isDocumentModified();
-			};
-			editor.TrackFile.setIsDocumentModifiedFunc(_isDocumentModified);
-			
-			if(undefined != oSettings['TrackingInterval'] &&
-				null != oSettings['TrackingInterval'])
-				editor.TrackFile.setInterval(oSettings['TrackingInterval']);
-				
-			editor.TrackFile.Start();							
+			this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
+
+			this.TrackFile.setDocId(this.DocInfo.get_Id());
+			this.TrackFile.setUserId(this.DocInfo.get_UserId());
+			this.TrackFile.setTrackFunc(sendTrack);
+
+			if (undefined != oSettings['TrackingInterval'] && null != oSettings['TrackingInterval'])
+				this.TrackFile.setInterval(oSettings['TrackingInterval']);
+
+			this.TrackFile.Start();
 		}
 	}
 };
@@ -1725,6 +1716,12 @@ asc_docs_api.prototype._onUpdateDocumentCanSave = function () {
 		this.isDocumentCanSave = tmp;
 		this.asc_fireCallback('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 	}
+};
+
+// Update user alive
+asc_docs_api.prototype.setUserAlive = function () {
+	if (this.TrackFile)
+		this.TrackFile.setUserAlive();
 };
 
 // get functions
