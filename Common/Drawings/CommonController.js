@@ -1877,11 +1877,11 @@ DrawingObjectsController.prototype =
             }
             if( parsed_formula && ws && new_bbox )
             {
-
-                var b_equal_bbox = chart_space.bbox && chart_space.bbox.seriesBBox.r1 === new_bbox.r1
-                    && chart_space.bbox.seriesBBox.r2 === new_bbox.r2
-                    && chart_space.bbox.seriesBBox.c1 === new_bbox.c1
-                    && chart_space.bbox.seriesBBox.c2 === new_bbox.c2;
+                var oCommonBBox = chart_space.getCommonBBox();
+                var b_equal_bbox = oCommonBBox && oCommonBBox.r1 === new_bbox.r1
+                    && oCommonBBox.r2 === new_bbox.r2
+                    && oCommonBBox.c1 === new_bbox.c1
+                    && oCommonBBox.c2 === new_bbox.c2;
                 var b_equal_ws = chart_space.bbox && chart_space.bbox.worksheet === ws;
                 var b_equal_vert = chart_space.bbox && chartSettings.getInColumns() === !chart_space.bbox.seriesBBox.bVert;
 
