@@ -1357,6 +1357,7 @@ CDrawingDocument.prototype =
 
         this.DrawFrameTrack();
 		this.DrawMathTrack();
+        this.DrawFieldTrack();
 
         if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
         {

@@ -1529,6 +1529,12 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
         PRSA.LettersSkip   = PRSC.LettersSkip;
         PRSA.RecalcResult  = recalcresult_NextElement;
 
+        var _LineMetrics = this.Lines[CurLine].Metrics;
+        PRSA.Y0 = (this.Pages[CurPage].Y + this.Lines[CurLine].Y - _LineMetrics.Ascent);
+        PRSA.Y1 = (this.Pages[CurPage].Y + this.Lines[CurLine].Y + _LineMetrics.Descent);
+        if (_LineMetrics.LineGap < 0)
+            PRSA.Y1 += _LineMetrics.LineGap;
+
         this.Lines[CurLine].Ranges[CurRange].XVisible = X;
 
         if ( 0 === CurRange )
@@ -2242,6 +2248,9 @@ function CParagraphRecalculateStateAlign()
     this.LastW         = 0; // Ширина последнего элемента (необходимо для позиционирования картинки)
     this.Paragraph     = undefined;
     this.RecalcResult  = 0x00;//recalcresult_NextElement;
+
+    this.Y0            = 0; // Верхняя граница строки
+    this.Y1            = 0; // Нижняя граница строки
 
     this.CurPage       = 0;
     this.PageY         = 0;

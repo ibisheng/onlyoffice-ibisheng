@@ -1028,66 +1028,6 @@ ParaRun.prototype.Clear_SpellingMarks = function()
     this.SpellingMarks = [];
 };
 //----------------------------------------------------------------------------------------------------------------------
-// ParaHyperlink
-//----------------------------------------------------------------------------------------------------------------------
-ParaHyperlink.prototype.Restart_CheckSpelling = function()
-{
-    for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; nIndex++)
-    {
-        this.Content[nIndex].Restart_CheckSpelling();
-    }
-};
-
-ParaHyperlink.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
-{
-    this.SpellingMarks = [];
-
-    var ContentLen = this.Content.length;
-    for ( var Pos = 0; Pos < ContentLen; Pos++ )
-    {
-        var Item = this.Content[Pos];
-
-        SpellCheckerEngine.ContentPos.Update( Pos, Depth );
-        Item.Check_Spelling( SpellCheckerEngine, Depth + 1 );
-    }
-};
-
-ParaHyperlink.prototype.Add_SpellCheckerElement = function(Element, Start, Depth)
-{
-    if ( true === Start )
-    {
-        //Element.ClassesS.push(this);
-        this.Content[Element.StartPos.Get(Depth)].Add_SpellCheckerElement(Element, Start, Depth + 1);
-    }
-    else
-    {
-        //Element.ClassesE.push(this);
-        this.Content[Element.EndPos.Get(Depth)].Add_SpellCheckerElement(Element, Start, Depth + 1);
-    }
-
-    this.SpellingMarks.push( new CParagraphSpellingMark( Element, Start, Depth ) );
-};
-
-ParaHyperlink.prototype.Remove_SpellCheckerElement = function(Element)
-{
-    var Count = this.SpellingMarks.length;
-    for (var Pos = 0; Pos < Count; Pos++)
-    {
-        var SpellingMark = this.SpellingMarks[Pos];
-        if (Element === SpellingMark.Element)
-        {
-            this.SpellingMarks.splice(Pos, 1);
-            break;
-        }
-    }
-};
-
-ParaHyperlink.prototype.Clear_SpellingMarks = function()
-{
-    this.SpellingMarks = [];
-};
-
-//----------------------------------------------------------------------------------------------------------------------
 // ParaComment
 //----------------------------------------------------------------------------------------------------------------------
 ParaComment.prototype.Restart_CheckSpelling = function()

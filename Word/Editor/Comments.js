@@ -845,6 +845,8 @@ function ParaComment(Start, Id)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
+    this.Paragraph = null;
+
     this.Start     = Start;
     this.CommentId = Id;
 
@@ -876,8 +878,9 @@ ParaComment.prototype =
         }
     },
 
-    Set_Paragraph : function()
+    Set_Paragraph : function(Paragraph)
     {
+        this.Paragraph = Paragraph;
     },
 
     Is_Empty : function()
@@ -1367,6 +1370,15 @@ ParaComment.prototype =
             {
                 // String : CommentId
                 this.CommentId = Reader.GetString2();
+                var Comment = g_oTableId.Get_ById(this.CommentId);
+                if (null !== this.Paragraph && null !== Comment && Comment instanceof CComment)
+                {
+                    if (true === this.Start)
+                        Comment.Set_StartId(this.Paragraph.Get_Id());
+                    else
+                        Comment.Set_EndId(this.Paragraph.Get_Id());
+                }
+
                 break;
             }
         }

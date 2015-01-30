@@ -2807,7 +2807,29 @@ Paragraph.prototype =
 
                 break;
             }
-                
+            case para_Field:
+            {
+                var ContentPos = this.Get_ParaContentPos(false, false);
+                var CurPos = ContentPos.Get(0);
+
+                // В поле не добавляем другое поле
+                if (para_Field !== this.Content[CurPos].Type)
+                {
+                    // Разделяем текущий элемент (возвращается правая часть)
+                    var NewElement = this.Content[CurPos].Split(ContentPos, 1);
+
+                    if (null !== NewElement)
+                        this.Internal_Content_Add(CurPos + 1, NewElement);
+
+                    this.Internal_Content_Add(CurPos + 1, Item);
+
+                    // Перемещаем кусор в конец формулы
+                    this.CurPos.ContentPos = CurPos + 1;
+                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+                }
+
+                break;
+            }
             case para_Run :
             {
                 var ContentPos = this.Get_ParaContentPos(false, false);
@@ -11008,13 +11030,16 @@ Paragraph.prototype =
                         {
                             var Comment = g_oTableId.Get_ById( Element.CommentId );
 
-                            if ( null != Comment )
+                            // При копировании не всегда сразу заполняется правильно CommentId
+                            if (null != Comment && Comment instanceof CComment)
                             {
                                 if ( true === Element.Start )
                                     Comment.Set_StartId( this.Get_Id() );
                                 else
                                     Comment.Set_EndId( this.Get_Id() );
                             }
+
+                            Element.Set_Paragraph(this);
                         }
 
                         this.Content.splice( Pos, 0, Element );

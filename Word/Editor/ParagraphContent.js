@@ -51,6 +51,7 @@ var para_Math_Placeholder          = 0x0032; // Плейсхолдер
 var para_Math_Composition          = 0x0033; // Математический объект (дробь, степень и т.п.)
 var para_Math_Text                 = 0x0034; // Текст в формуле
 var para_Math_Ampersand            = 0x0035; // &
+var para_Field                     = 0x0036; // Поле
 
 
 var break_Line = 0x01;

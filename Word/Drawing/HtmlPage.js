@@ -3082,6 +3082,11 @@ function CEditorPage(api)
                 drDoc.DrawMathTrack(overlay);
             }
 
+            if (drDoc.FieldTrack.IsActive)
+            {
+                drDoc.DrawFieldTrack(overlay);
+            }
+
             if (drDoc.InlineTextTrackEnabled && null != drDoc.InlineTextTrack)
             {
                 var _oldPage = drDoc.AutoShapesTrack.PageIndex;

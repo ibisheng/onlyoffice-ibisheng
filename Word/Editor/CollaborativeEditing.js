@@ -148,6 +148,7 @@ function CTableId()
             case historyitem_type_CommentMark              : Element = new ParaComment(); break;
             case historyitem_type_ParaRun                  : Element = new ParaRun(); break;
             case historyitem_type_Section                  : Element = new CSectionPr(); break;
+            case historyitem_type_Field                    : Element = new ParaField(); break;
 
             case historyitem_type_DefaultShapeDefinition   : Element = new DefaultShapeDefinition(); break;
             case historyitem_type_CNvPr                    : Element = new CNvPr(); break;

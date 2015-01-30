@@ -1693,6 +1693,7 @@ function CDrawingDocument()
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
 
     this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 }, ContentSelection : null };
+    this.FieldTrack = {IsActive : false, Rects : []};
 
     this.m_oCacheManager    = new CCacheManager();
 
@@ -3479,6 +3480,79 @@ function CDrawingDocument()
         }
     }
 
+    this.DrawFieldTrack = function(overlay)
+    {
+        if (!this.FieldTrack.IsActive)
+            return;
+
+        overlay.Show();
+
+        for (var nIndex = 0, nCount = this.FieldTrack.Rects.length; nIndex < nCount; nIndex++)
+        {
+            var FieldRect = this.FieldTrack.Rects[nIndex];
+
+            var _page = this.m_arrPages[FieldRect.PageIndex];
+            var drPage = _page.drawingPage;
+
+            var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+            var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+            if (null == this.TextMatrix || global_MatrixTransformer.IsIdentity(this.TextMatrix))
+            {
+                var _x = (drPage.left + dKoefX * FieldRect.X0);
+                var _y = (drPage.top  + dKoefY * FieldRect.Y0);
+                var _r = (drPage.left + dKoefX * FieldRect.X1);
+                var _b = (drPage.top  + dKoefY * FieldRect.Y1);
+
+                if (_x < overlay.min_x)
+                    overlay.min_x = _x;
+                if (_r > overlay.max_x)
+                    overlay.max_x = _r;
+
+                if (_y < overlay.min_y)
+                    overlay.min_y = _y;
+                if (_b > overlay.max_y)
+                    overlay.max_y = _b;
+
+                var ctx = overlay.m_oContext;
+                ctx.fillStyle = "#375082";
+
+                ctx.beginPath();
+                this.AutoShapesTrack.AddRect(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0);
+
+                ctx.globalAlpha = 0.2;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+            }
+            else
+            {
+                var _arrSelect = TransformRectByMatrix(this.TextMatrix, [FieldRect.X0, FieldRect.Y0, FieldRect.X1, FieldRect.Y1], drPage.left, drPage.top, dKoefX, dKoefY);
+
+                overlay.CheckPoint(_arrSelect[0], _arrSelect[1]);
+                overlay.CheckPoint(_arrSelect[2], _arrSelect[3]);
+                overlay.CheckPoint(_arrSelect[4], _arrSelect[5]);
+                overlay.CheckPoint(_arrSelect[6], _arrSelect[7]);
+
+                var ctx = overlay.m_oContext;
+                ctx.fillStyle = "#375082";
+
+                ctx.beginPath();
+
+                ctx.moveTo(_arrSelect[0], _arrSelect[1]);
+                ctx.lineTo(_arrSelect[2], _arrSelect[3]);
+                ctx.lineTo(_arrSelect[4], _arrSelect[5]);
+                ctx.lineTo(_arrSelect[6], _arrSelect[7]);
+                ctx.closePath();
+
+                ctx.globalAlpha = 0.2;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+            }
+        }
+    }
+
     this.DrawTableTrack = function(overlay)
     {
         if (null == this.TableOutlineDr.TableOutline)
@@ -4512,6 +4586,16 @@ function CDrawingDocument()
             this.MathRect.Rect.PageIndex = PageIndex;
         }
     }
+
+    this.Update_FieldTrack = function(IsActive, aRects)
+    {
+        this.FieldTrack.IsActive = IsActive;
+
+        if (true === IsActive)
+            this.FieldTrack.Rects = aRects;
+        else
+            this.FieldTrack.Rects = [];
+    };
     
     this.Update_ParaTab = function(Default_Tab, ParaTabs)
     {

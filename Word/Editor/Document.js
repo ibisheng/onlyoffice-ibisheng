@@ -532,6 +532,56 @@ CDocumentRecalcInfo.prototype =
     }
 };
 
+function CDocumentFieldsManager()
+{
+    this.m_aFields = [];
+
+    this.m_oMailMergeFields = {};
+}
+
+CDocumentFieldsManager.prototype.Register_Field = function(oField)
+{
+    this.m_aFields.push(oField);
+
+    var nFieldType = oField.Get_FieldType();
+    if (fieldtype_MERGEFIELD === nFieldType)
+    {
+        var sName = oField.Get_Argument(0);
+        if (undefined !== sName)
+        {
+            if (undefined === this.m_oMailMergeFields[sName])
+                this.m_oMailMergeFields[sName] = [];
+
+            this.m_oMailMergeFields[sName].push(oField);
+        }
+    }
+};
+CDocumentFieldsManager.prototype.Update_MailMergeFields = function(Map)
+{
+    for (var FieldName in Map)
+    {
+        if (undefined !== this.m_oMailMergeFields[FieldName])
+        {
+            for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+            {
+                var oField = this.m_oMailMergeFields[FieldName][Index];
+                oField.Map_MailMerge(Map[FieldName]);
+            }
+        }
+    }
+};
+CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
+{
+    for (var FieldName in this.m_oMailMergeFields)
+    {
+        for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+        {
+            var oField = this.m_oMailMergeFields[FieldName][Index];
+            oField.Restore_Template();
+        }
+    }
+};
+
 function CDocument(DrawingDocument)
 {
     this.History   = History;
@@ -662,6 +712,14 @@ function CDocument(DrawingDocument)
     // Дополнительные настройки
     this.UseTextShd = true; // Использовать ли заливку текста
 
+    // Мап для рассылки
+    this.MailMergeMap = null;
+    this.MailMergeMap = [{Name : "Илья", Address : "Нижний Новгород"}, {Name : "Космонавт", Address : "Галактика"}];
+    this.MailMergePreview = false;
+
+    // Класс, управляющий полями
+    this.FieldsManager = new CDocumentFieldsManager();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -678,6 +736,7 @@ function CSelectedElementsInfo()
     this.m_pParagraph      = null;  // Параграф, в котором находится выделение
     this.m_oMath           = null;  // Формула, в которой находится выделение
     this.m_oHyperlink      = null;  // Гиперссылка, в которой находится выделение
+    this.m_oField          = null;  // Поле, в котором находится выделение
 
     this.Reset = function()
     {
@@ -697,6 +756,11 @@ function CSelectedElementsInfo()
         this.m_oMath = Math;
     };
 
+    this.Set_Field = function(Field)
+    {
+        this.m_oField = Field;
+    };
+
     this.Set_Hyperlink = function(Hyperlink)
     {
         this.m_oHyperlink = Hyperlink;
@@ -710,6 +774,11 @@ function CSelectedElementsInfo()
     this.Get_Math = function()
     {
         return this.m_oMath;
+    };
+
+    this.Get_Field = function()
+    {
+        return this.m_oField;
     };
 
     this.Get_Hyperlink = function()
@@ -9690,6 +9759,49 @@ CDocument.prototype =
                 //не возвращаем true чтобы не было preventDefault
             }
         }
+        else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + D
+        {
+            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+            {
+                this.Create_NewHistoryPoint();
+
+                var oField;
+
+                if (true === e.ShiftKey)
+                {
+                    oField = new ParaField(fieldtype_MERGEFIELD, ["Address"], []);
+                    var oRun = new ParaRun();
+                    oRun.Add_ToContent(0, new ParaText("«"));
+                    oRun.Add_ToContent(1, new ParaText("A"));
+                    oRun.Add_ToContent(2, new ParaText("d"));
+                    oRun.Add_ToContent(3, new ParaText("d"));
+                    oRun.Add_ToContent(4, new ParaText("r"));
+                    oRun.Add_ToContent(5, new ParaText("e"));
+                    oRun.Add_ToContent(6, new ParaText("s"));
+                    oRun.Add_ToContent(7, new ParaText("s"));
+                    oRun.Add_ToContent(8, new ParaText("»"));
+                    oField.Add_ToContent(0, oRun);
+                }
+                else
+                {
+                    oField = new ParaField(fieldtype_MERGEFIELD, ["Name"], []);
+                    var oRun = new ParaRun();
+                    oRun.Add_ToContent(0, new ParaText("«"));
+                    oRun.Add_ToContent(1, new ParaText("N"));
+                    oRun.Add_ToContent(2, new ParaText("a"));
+                    oRun.Add_ToContent(3, new ParaText("m"));
+                    oRun.Add_ToContent(4, new ParaText("e"));
+                    oRun.Add_ToContent(5, new ParaText("»"));
+                    oField.Add_ToContent(0, oRun);
+                }
+
+                this.FieldsManager.Register_Field(oField);
+
+                this.Paragraph_Add(oField);
+                this.Document_UpdateInterfaceState();
+            }
+            bRetValue = true;
+        }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E + ...
         {
             if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
@@ -11882,6 +11994,15 @@ CDocument.prototype =
         }
         else
             this.DrawingDocument.Update_MathTrack(false);
+
+        var oField = oSelectedInfo.Get_Field();
+        if (null !== oField)
+        {
+            var aBounds = oField.Get_Bounds();
+            this.DrawingDocument.Update_FieldTrack(true, aBounds);
+        }
+        else
+            this.DrawingDocument.Update_FieldTrack(false);
     },
 
     Document_UpdateUndoRedoState : function()
@@ -12929,6 +13050,8 @@ CDocument.prototype =
                     if ( false === Pos )
                         continue;
 
+                    Pos = Math.min(Pos, this.Content.length - 1);
+
                     this.Content.splice(Pos, 1);
 
                     if ( Pos > 0 )
@@ -13881,7 +14004,50 @@ CDocument.prototype =
         this.UseTextShd = bUse;
     }
 };
+CDocument.prototype.Recalculate_FromStart = function(bUpdateStates)
+{
+    var RecalculateData =
+    {
+        Inline   : { Pos : 0, PageNum : 0 },
+        Flow     : [],
+        HdrFtr   : [],
+        Drawings : { All: true, Map:{} }
+    };
 
+    this.Reset_RecalculateCache();
+    this.Recalculate( false, false, RecalculateData );
+
+    if (true === bUpdateStates)
+    {
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateSelectionState();
+    }
+};
+CDocument.prototype.Preview_MailMergeResult = function(Index)
+{
+    if (null === this.MailMergeMap)
+        return;
+
+    if (true !== this.MailMergePreview)
+    {
+        this.MailMergePreview = true;
+        CollaborativeEditing.m_bGlobalLock = true;
+    }
+
+    this.FieldsManager.Update_MailMergeFields(this.MailMergeMap[Index]);
+    this.Recalculate_FromStart(true);
+};
+CDocument.prototype.EndPreview_MailMergeResult = function()
+{
+    if (null === this.MailMergeMap || true !== this.MailMergePreview)
+        return;
+
+    this.MailMergePreview = false;
+    CollaborativeEditing.m_bGlobalLock = false;
+
+    this.FieldsManager.Restore_MailMergeTemplate();
+    this.Recalculate_FromStart(true);
+};
 CDocument.prototype.private_StartSelectionFromCurPos = function()
 {
     this.private_UpdateCursorXY(true, true);

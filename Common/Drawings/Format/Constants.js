@@ -1105,6 +1105,10 @@ var historyitem_Hyperlink_ToolTip    = 2; // Изменяем подсказку
 var historyitem_Hyperlink_AddItem    = 3;
 var historyitem_Hyperlink_RemoveItem = 4;
 
+// Типы изменений в классе ParaField
+var historyitem_Field_AddItem        = 1;
+var historyitem_Field_RemoveItem     = 2;
+
 //Типы изменений в классе CGraphicObjects
 var historyitem_AddNewGraphicObject = 0;
 var historyitem_RemoveGraphicObject = 1;
@@ -1255,6 +1259,7 @@ var historyitem_type_deg_subsup       = 51;
 var historyitem_type_iterators        = 52;
 var historyitem_type_deg              = 53;
 var historyitem_type_ParaComment      = 54;
+var historyitem_type_Field            = 55;
 
 
 
