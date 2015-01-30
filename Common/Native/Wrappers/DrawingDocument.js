@@ -2443,6 +2443,11 @@ CDrawingDocument.prototype =
     {
         // TODO:
     },
+
+    Update_FieldTrack : function()
+    {
+        // TODO:
+    },
 	
 	Update_MathTrack : function(IsActive, X, Y, W, H, PageIndex)
     {       
