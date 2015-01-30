@@ -1656,7 +1656,7 @@ CDrawingDocument.prototype =
             _ret.push(_select.Start.Y);
             _ret.push(_select.Start.Page);
             _ret.push(_select.End.X + _select.End.W);
-            _ret.push(_select.End.Y + _select.End.Height);
+            _ret.push(_select.End.Y + _select.End.H);
             _ret.push(_select.End.Page);
 
             if (this.TextMatrix && !this.TextMatrix.IsIdentity())
@@ -2437,6 +2437,11 @@ CDrawingDocument.prototype =
 
         this.Native["DD_Overlay_DrawFrameTrack1"](this.MathRect.Rect.PageIndex,
             this.MathRect.Rect.X, this.MathRect.Rect.Y, this.MathRect.Rect.R, this.MathRect.Rect.B);
+    },
+
+    DrawFieldTrack : function()
+    {
+        // TODO:
     },
 	
 	Update_MathTrack : function(IsActive, X, Y, W, H, PageIndex)
