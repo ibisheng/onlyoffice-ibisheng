@@ -117,6 +117,7 @@
                 "../../Word/Editor/ParagraphContent.js",
                 "../../Word/Editor/ParagraphContentBase.js",
                 "../../Word/Editor/Hyperlink.js",
+                "../../Word/Editor/Field.js",
                 "../../Word/Editor/Run.js",
 
                 "../../Word/Math/mathTypes.js",
