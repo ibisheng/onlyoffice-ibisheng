@@ -4,7 +4,7 @@
     'use strict';
 	
 	var asc			= window["Asc"];
-	var asc_coAuthV	= '3.0.7';
+	var asc_coAuthV	= '3.0.8';
 
 	// Класс надстройка, для online и offline работы
 	function CDocsCoApi (options) {
