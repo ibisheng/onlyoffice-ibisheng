@@ -458,7 +458,7 @@ function CTableOutlineDr()
 
         if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
-            var pos = this.Native["DD_ConvertCoordsToCursor"](this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum);
+            var pos = this.__DD_ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum);
 
             var _x0 = 0;
             var _y0 = 0;
@@ -504,28 +504,28 @@ function CTableOutlineDr()
             var _x1 = _bounds[0];
             var _y1 = _bounds[1];
 
-            var pos0 = this.Native["DD_ConvertCoordsToCursor"](x0, y0, this.TableOutline.PageNum);
+            var pos0 = this.__DD_ConvertCoordsToCursor(x0, y0, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 0;
                 return;
             }
 
-            pos0 = this.Native["DD_ConvertCoordsToCursor"](x1, y1, this.TableOutline.PageNum);
+            pos0 = this.__DD_ConvertCoordsToCursor(x1, y1, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 1;
                 return;
             }
 
-            pos0 =this.Native["DD_ConvertCoordsToCursor"](x3, y3, this.TableOutline.PageNum);
+            pos0 = this.__DD_ConvertCoordsToCursor(x3, y3, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 3;
                 return;
             }
 
-            pos0 = this.Native["DD_ConvertCoordsToCursor"](x2, y2, this.TableOutline.PageNum);
+            pos0 = this.__DD_ConvertCoordsToCursor(x2, y2, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 2;
@@ -597,6 +597,10 @@ function CDrawingDocument()
     this.SelectRect1 = null;
     this.SelectRect2 = null;
 
+    this.SelectMobileXOffset = 0;
+    this.SelectMobileYOffset = 0;
+    this.SelectMobileConstantOffsetEpsilon = 1;
+
     this.SelectDrag = -1;
 
     this.UpdateRulerStateFlag = false;
@@ -610,17 +614,17 @@ CDrawingDocument.prototype =
     AfterLoad : function()
     {
         this.m_oWordControl = this;
-		this.Api = window.editor;
+        this.Api = window.editor;
         this.m_oApi = this.Api;
         this.m_oApi.DocumentUrl = "";
-        this.LogicDocument  = window.editor.WordControl.m_oLogicDocument;
-        this.LogicDocument.DrawingDocument = this;        
+        this.LogicDocument = window.editor.WordControl.m_oLogicDocument;
+        this.LogicDocument.DrawingDocument = this;
     },
-	RenderPage : function(nPageIndex)
-	{
-		var _graphics = new CDrawingStream();
-		this.LogicDocument.DrawPage(nPageIndex, _graphics);
-	},
+    RenderPage : function(nPageIndex)
+    {
+        var _graphics = new CDrawingStream();
+        this.LogicDocument.DrawPage(nPageIndex, _graphics);
+    },
     // init lock objects draw
     Start_CollaborationEditing : function()
     {
@@ -726,17 +730,17 @@ CDrawingDocument.prototype =
     {
         var _return = null;
         if (!transform)
-            _return = this.Native["DD_ConvertCoordsToCursor"](x, y, pageIndex);
+            _return = this.__DD_ConvertCoordsToCursor(x, y, pageIndex);
         else
-            _return = this.Native["DD_ConvertCoordsToCursor"](x, y, pageIndex,
+            _return = this.__DD_ConvertCoordsToCursor(x, y, pageIndex,
                 transform.sx, transform.shy, transform.shx, transform.sy, transform.tx, transform.ty);
-        return { X : _return[0], Y : _return[1], Error: _return[2] };
+        return { X : _return[0], Y : _return[1], Error : _return[2] };
     },
 
     ConvertCoordsToAnotherPage : function(x, y, pageCoord, pageNeed)
     {
         var _return = this.Native["DD_ConvertCoordsToAnotherPage"](x, y, pageCoord, pageNeed);
-        return { X : _return[0], Y : _return[1], Error: _return[2] };
+        return { X : _return[0], Y : _return[1], Error : _return[2] };
     },
 
     // target
@@ -757,13 +761,27 @@ CDrawingDocument.prototype =
     UpdateTargetTransform : function(matrix)
     {
         if (matrix)
+        {
+            if (null == this.TextMatrix)
+                this.TextMatrix = new CMatrix();
+            this.TextMatrix.sx = matrix.sx;
+            this.TextMatrix.shy = matrix.shy;
+            this.TextMatrix.shx = matrix.shx;
+            this.TextMatrix.sy = matrix.sy;
+            this.TextMatrix.tx = matrix.tx;
+            this.TextMatrix.ty = matrix.ty;
+
             this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
+        }
         else
+        {
+            this.TextMatrix = null;
             this.Native["DD_RemoveTargetTransform"]();
+        }
     },
     UpdateTarget : function(x, y, pageIndex)
     {
-        this.LogicDocument.Set_TargetPos( x, y, pageIndex );
+        this.LogicDocument.Set_TargetPos(x, y, pageIndex);
         this.UpdateTargetCheck = true;
         this.Native["DD_UpdateTarget"](x, y, pageIndex);
     },
@@ -808,9 +826,9 @@ CDrawingDocument.prototype =
     // track tables
     StartTrackTable : function(obj, transform)
     {
-        this.TableOutlineDr.TableOutline    = obj;
-        this.TableOutlineDr.Counter         = 0;
-        this.TableOutlineDr.bIsNoTable      = false;
+        this.TableOutlineDr.TableOutline = obj;
+        this.TableOutlineDr.Counter = 0;
+        this.TableOutlineDr.bIsNoTable = false;
         this.TableOutlineDr.CheckStartTrack(this, transform);
     },
     EndTrackTable : function(pointer, bIsAttack)
@@ -984,8 +1002,8 @@ CDrawingDocument.prototype =
         _array_params1.push(markup.CurCol);
         _array_params1.push(markup.CurRow);
 
-        this.TableOutlineDr.TableMatrix         = null;
-        this.TableOutlineDr.CurrentPageIndex    = this.m_lCurrentPage;
+        this.TableOutlineDr.TableMatrix = null;
+        this.TableOutlineDr.CurrentPageIndex = this.m_lCurrentPage;
 
         if (transform)
         {
@@ -1104,22 +1122,22 @@ CDrawingDocument.prototype =
         this.Native["DD_Set_RulerState_HdrFtr"](bHeader, Y0, Y1);
     },
 
-    Update_ParaInd : function( Ind )
+    Update_ParaInd : function(Ind)
     {
         var FirstLine = 0,
             Left = 0,
             Right = 0;
-        if ( "undefined" != typeof(Ind) )
+        if ("undefined" != typeof(Ind))
         {
-            if("undefined" != typeof(Ind.FirstLine))
+            if ("undefined" != typeof(Ind.FirstLine))
             {
                 FirstLine = Ind.FirstLine;
             }
-            if("undefined" != typeof(Ind.Left))
+            if ("undefined" != typeof(Ind.Left))
             {
                 Left = Ind.Left;
             }
-            if("undefined" != typeof(Ind.Right))
+            if ("undefined" != typeof(Ind.Right))
             {
                 Right = Ind.Right;
             }
@@ -1175,7 +1193,7 @@ CDrawingDocument.prototype =
     },
     GetMMPerDot : function(value)
     {
-        return value / this.GetDotsPerMM( 1 );
+        return value / this.GetDotsPerMM(1);
     },
     GetVisibleMMHeight : function()
     {
@@ -1202,7 +1220,7 @@ CDrawingDocument.prototype =
     // треки
     DrawTrack : function(type, matrix, left, top, width, height, isLine, canRotate)
     {
-        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine, canRotate);        
+        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine, canRotate);
     },
     DrawTrackSelectShapes : function(x, y, w, h)
     {
@@ -1242,8 +1260,8 @@ CDrawingDocument.prototype =
     StartTrackText : function()
     {
         this.InlineTextTrackEnabled = true;
-        this.InlineTextTrack        = null;
-        this.InlineTextTrackPage    = -1;
+        this.InlineTextTrack = null;
+        this.InlineTextTrackPage = -1;
         this.Native["DD_StartTrackText"]();
     },
     EndTrackText : function()
@@ -1251,8 +1269,8 @@ CDrawingDocument.prototype =
         this.InlineTextTrackEnabled = false;
 
         this.LogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
-        this.InlineTextTrack        = null;
-        this.InlineTextTrackPage    = -1;
+        this.InlineTextTrack = null;
+        this.InlineTextTrackPage = -1;
         this.Native["DD_EndTrackText"]();
     },
 
@@ -1279,13 +1297,13 @@ CDrawingDocument.prototype =
             this.IsUpdateOverlayOnEndCheck = true;
             return false;
         }
-        
+
         this.Native["DD_Overlay_UpdateStart"]();
 
         this.Native["DD_Overlay_Clear"]();
 
-        var drawingFirst    = this.Native["GetDrawingFirstPage"]();
-        var drawingEnd      = this.Native["GetDrawingEndPage"]();
+        var drawingFirst = this.Native["GetDrawingFirstPage"]();
+        var drawingEnd = this.Native["GetDrawingEndPage"]();
 
         if (-1 == drawingFirst || -1 == drawingEnd)
         {
@@ -1356,7 +1374,7 @@ CDrawingDocument.prototype =
         }
 
         this.DrawFrameTrack();
-		this.DrawMathTrack();
+        this.DrawMathTrack();
         this.DrawFieldTrack();
 
         if (this.InlineTextTrackEnabled && null != this.InlineTextTrack)
@@ -1367,7 +1385,7 @@ CDrawingDocument.prototype =
         }
 
         this.Native["DD_Overlay_DrawHorVerAnchor"]();
-        
+
         this.Native["DD_Overlay_UpdateEnd"]();
 
         return true;
@@ -1442,7 +1460,21 @@ CDrawingDocument.prototype =
                         this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect2.Page);
                 }
 
-                this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                //теперь сдвиги
+                var _xStamp = this.SelectRect1.X;
+                var _yStamp = this.SelectRect1.Y;
+                if (this.TextMatrix)
+                {
+                    _xStamp = this.TextMatrix.TransformPointX(this.SelectRect1.X, this.SelectRect1.Y);
+                    _yStamp = this.TextMatrix.TransformPointY(this.SelectRect1.X, this.SelectRect1.Y);
+                }
+
+                var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect1.Page);
+                var ret2 = this.CorrectMouseSelectPosition(Math.min(this.SelectMobileConstantOffsetEpsilon, this.SelectRect1.H / 2));
+                this.SelectMobileXOffset = (ret.X + ret2.X) - global_mouseEvent.X;
+                this.SelectMobileYOffset = (ret.Y + ret2.Y) - global_mouseEvent.Y;
+
+                this.OnMouseMove(e);
             }
 
             if (Math.abs(pos.X - _circlePos2_x) < _selectCircleEpsMM && Math.abs(pos.Y - _circlePos2_y) < _selectCircleEpsMM)
@@ -1450,7 +1482,7 @@ CDrawingDocument.prototype =
                 this.SelectDrag = 2;
                 this.LogicDocument.Cursor_MoveLeft();
 
-                var _xDown = this.SelectRect1.X + this.SelectRect1.W;
+                var _xDown = this.SelectRect1.X;
                 var _yDown = this.SelectRect1.Y + this.SelectRect1.H / 2;
                 if (!this.TextMatrix)
                 {
@@ -1462,7 +1494,22 @@ CDrawingDocument.prototype =
                         this.TextMatrix.TransformPointY(_xDown, _yDown), this.SelectRect1.Page);
                 }
 
-                this.LogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+                //теперь сдвиги
+                var _xStamp = this.SelectRect2.X + this.SelectRect2.W;
+                var _yStamp = this.SelectRect2.Y + this.SelectRect2.H;
+                if (this.TextMatrix)
+                {
+                    var _xTmp = _xStamp;
+                    _xStamp = this.TextMatrix.TransformPointX(_xTmp, _yStamp);
+                    _yStamp = this.TextMatrix.TransformPointY(_xTmp, _yStamp);
+                }
+
+                var ret = this.__DD_ConvertCoordsToCursor(_xStamp, _yStamp, this.SelectRect2.Page);
+                var ret2 = this.CorrectMouseSelectPosition(Math.min(this.SelectMobileConstantOffsetEpsilon, this.SelectRect2.H / 2));
+                this.SelectMobileXOffset = (ret.X - ret2.X) - global_mouseEvent.X;
+                this.SelectMobileYOffset = (ret.Y - ret2.Y) - global_mouseEvent.Y;
+
+                this.OnMouseMove(e);
             }
 
             if (this.SelectDrag != -1)
@@ -1521,10 +1568,10 @@ CDrawingDocument.prototype =
 
             // теперь проверить трек таблиц
             /*
-            var ret = this.Native["checkMouseDown_Drawing"](pos.X, pos.Y, pos.Page);
-            if (ret === true)
-                return;
-            */
+             var ret = this.Native["checkMouseDown_Drawing"](pos.X, pos.Y, pos.Page);
+             if (ret === true)
+             return;
+             */
             var is_drawing = this.checkMouseDown_Drawing(pos);
             if (is_drawing === true)
                 return;
@@ -1541,6 +1588,13 @@ CDrawingDocument.prototype =
     OnMouseUp : function(e)
     {
         check_MouseUpEvent(e);
+
+        if (this.SelectDrag == 1 || this.SelectDrag == 2)
+        {
+            global_mouseEvent.X += this.SelectMobileXOffset;
+            global_mouseEvent.Y += this.SelectMobileYOffset;
+        }
+        this.SelectDrag = -1;
 
         var pos = null;
         if (this.AutoShapesTrackLockPageNum == -1)
@@ -1562,10 +1616,10 @@ CDrawingDocument.prototype =
         this.m_bIsMouseLock = false;
 
         /*
-        var is_drawing = this.Native["checkMouseUp_Drawing"](pos.X, pos.Y, pos.Page);
-        if (is_drawing === true)
-            return;
-        */
+         var is_drawing = this.Native["checkMouseUp_Drawing"](pos.X, pos.Y, pos.Page);
+         if (is_drawing === true)
+         return;
+         */
         var is_drawing = this.checkMouseUp_Drawing(pos);
         if (is_drawing === true)
             return this.CheckReturnMouseUp();
@@ -1589,6 +1643,13 @@ CDrawingDocument.prototype =
     OnMouseMove : function(e)
     {
         check_MouseMoveEvent(e);
+
+        if (this.SelectDrag == 1 || this.SelectDrag == 2)
+        {
+            global_mouseEvent.X += this.SelectMobileXOffset;
+            global_mouseEvent.Y += this.SelectMobileYOffset;
+        }
+
         var pos = null;
         if (this.AutoShapesTrackLockPageNum == -1)
             pos = this.__DD_ConvertCoordsFromCursor(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1607,10 +1668,10 @@ CDrawingDocument.prototype =
         this.StartUpdateOverlay();
 
         /*
-        var is_drawing = this.Native["checkMouseMove_Drawing"](pos.X, pos.Y, pos.Page);
-        if (is_drawing === true)
-            return;
-        */
+         var is_drawing = this.Native["checkMouseMove_Drawing"](pos.X, pos.Y, pos.Page);
+         if (is_drawing === true)
+         return;
+         */
         var is_drawing = this.checkMouseMove_Drawing(pos);
         if (is_drawing === true)
             return;
@@ -1625,6 +1686,31 @@ CDrawingDocument.prototype =
         }
 
         this.EndUpdateOverlay();
+    },
+
+    CorrectMouseSelectPosition : function(eps)
+    {
+        var xOff = 0;
+        var yOff = 1;
+
+        if (null != this.TextMatrix)
+        {
+            var xOff1 = this.TextMatrix.TransformPointX(0, 0);
+            var yOff1 = this.TextMatrix.TransformPointY(0, 0);
+            var xOff2 = this.TextMatrix.TransformPointX(0, 1);
+            var yOff2 = this.TextMatrix.TransformPointY(0, 1);
+
+            // по идее скэйла нет. но на всякий
+            var _len = Math.sqrt((xOff1 - xOff2) * (xOff1 - xOff2) + (yOff1 - yOff2) * (yOff1 - yOff2));
+            if (_len < 0.01)
+                _len = 0.01;
+
+            xOff = (xOff2 - xOff1) / _len;
+            yOff = (yOff2 - yOff1) / _len;
+        }
+
+        var _pixelsH = this.GetDotsPerMM(eps);
+        return { X : xOff * _pixelsH, Y : yOff * _pixelsH };
     },
 
     CheckReturnMouseUp : function()
@@ -1701,9 +1787,9 @@ CDrawingDocument.prototype =
 
     OnKeyUp : function(e)
     {
-        global_keyboardEvent.AltKey     = false;
-        global_keyboardEvent.CtrlKey    = false;
-        global_keyboardEvent.ShiftKey   = false;
+        global_keyboardEvent.AltKey = false;
+        global_keyboardEvent.CtrlKey = false;
+        global_keyboardEvent.ShiftKey = false;
     },
 
     OnKeyPress : function(e)
@@ -1722,7 +1808,7 @@ CDrawingDocument.prototype =
         return retValue;
     },
 
-    OnKeyboardEvent: function (_params)
+    OnKeyboardEvent : function(_params)
     {
         if (this.IsFreezePage(this.m_lCurrentPage))
             return;
@@ -1770,19 +1856,25 @@ CDrawingDocument.prototype =
         this.LogicDocument.TurnOn_Recalculate(true);
         this.LogicDocument.TurnOn_InterfaceEvents(true);
     },
-	
-	__DD_ConvertCoordsFromCursor : function(x, y)
-	{
-		var pos = this.Native["DD_ConvertCoordsFromCursor"](x, y);
-		return { X: pos["X"], Y : pos["Y"], Page : pos["Page"] };
-	},
-	
-	__DD_ConvetToPageCoords : function(x, y, page)
-	{
-		var pos = this.Native["DD_ConvetToPageCoords"](x, y, page);
-		return { X: pos["X"], Y : pos["Y"], Page : pos["Page"] };
-	},
-    
+
+    __DD_ConvertCoordsFromCursor : function(x, y)
+    {
+        var pos = this.Native["DD_ConvertCoordsFromCursor"](x, y);
+        return { X : pos["X"], Y : pos["Y"], Page : pos["Page"] };
+    },
+
+    __DD_ConvertCoordsToCursor : function(x, y, page)
+    {
+        var _arr = this.Native["DD_ConvertCoordsToCursor"](x, y, page);
+        return { X : _arr[0], Y : _arr[1] };
+    },
+
+    __DD_ConvetToPageCoords : function(x, y, page)
+    {
+        var pos = this.Native["DD_ConvetToPageCoords"](x, y, page);
+        return { X : pos["X"], Y : pos["Y"], Page : pos["Page"] };
+    },
+
     ///////////////////////////////////////////
     StartTableStylesCheck : function()
     {
@@ -1827,10 +1919,10 @@ CDrawingDocument.prototype =
         // а то во вьюере не стоит ничего посылать
 
         /*
-        TODO:
-        if (!this.m_oWordControl.m_oApi.asc_checkNeedCallback("asc_onInitTableTemplates"))
-            return;
-        */
+         TODO:
+         if (!this.m_oWordControl.m_oApi.asc_checkNeedCallback("asc_onInitTableTemplates"))
+         	return;
+         */
 
         var bIsChanged = false;
         if (null == this.TableStylesLastLook)
@@ -1839,10 +1931,10 @@ CDrawingDocument.prototype =
 
             this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
             this.TableStylesLastLook.FirstRow = tableLook.FirstRow;
-            this.TableStylesLastLook.LastCol  = tableLook.LastCol;
-            this.TableStylesLastLook.LastRow  = tableLook.LastRow;
-            this.TableStylesLastLook.BandHor  = tableLook.BandHor;
-            this.TableStylesLastLook.BandVer  = tableLook.BandVer;
+            this.TableStylesLastLook.LastCol = tableLook.LastCol;
+            this.TableStylesLastLook.LastRow = tableLook.LastRow;
+            this.TableStylesLastLook.BandHor = tableLook.BandHor;
+            this.TableStylesLastLook.BandVer = tableLook.BandVer;
             bIsChanged = true;
         }
         else
@@ -1934,7 +2026,7 @@ CDrawingDocument.prototype =
             }
             else
             {
-                _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed, CellSelect: false});
+                _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed, CellSelect : false});
                 _table_styles.Recalc_CompiledPr2();
 
                 for (var j = 0; j < Rows; j++)
@@ -1969,7 +2061,7 @@ CDrawingDocument.prototype =
 
         this.Native["DD_EndNativeDraw"](_stream);
     },
-    
+
     SendControlColors : function()
     {
     },
@@ -2081,8 +2173,8 @@ CDrawingDocument.prototype =
 
         if (this.InlineTextTrackEnabled)
         {
-            this.InlineTextTrack        = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-            this.InlineTextTrackPage    = pos.Page;
+            this.InlineTextTrack = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+            this.InlineTextTrackPage = pos.Page;
 
             this.OnUpdateOverlay();
             this.EndUpdateOverlay();
@@ -2179,8 +2271,8 @@ CDrawingDocument.prototype =
 
         if (this.InlineTextTrackEnabled)
         {
-            this.InlineTextTrack        = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-            this.InlineTextTrackPage    = pos.Page;
+            this.InlineTextTrack = this.LogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+            this.InlineTextTrackPage = pos.Page;
             this.EndTrackText();
 
             this.OnUpdateOverlay();
@@ -2429,8 +2521,8 @@ CDrawingDocument.prototype =
                 this.FrameRect.Track.L, this.FrameRect.Track.T, this.FrameRect.Track.R, this.FrameRect.Track.B);
         }
     },
-	
-	DrawMathTrack : function()
+
+    DrawMathTrack : function()
     {
         if (!this.MathRect.IsActive)
             return;
@@ -2448,11 +2540,11 @@ CDrawingDocument.prototype =
     {
         // TODO:
     },
-	
-	Update_MathTrack : function(IsActive, X, Y, W, H, PageIndex)
-    {       
+
+    Update_MathTrack : function(IsActive, X, Y, W, H, PageIndex)
+    {
         this.MathRect.IsActive = IsActive;
-        
+
         if (true === IsActive)
         {
             this.MathRect.Rect.X = X;
