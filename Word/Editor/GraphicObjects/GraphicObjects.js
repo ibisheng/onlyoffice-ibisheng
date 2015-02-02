@@ -2241,7 +2241,7 @@ CGraphicObjects.prototype =
             this.zIndexManager.addItem(null, paraDrawing);
     },
 
-    isPointInDrawingObjects: function(x, y, pageIndex, bSelected)
+    isPointInDrawingObjects: function(x, y, pageIndex, bSelected, bNoText)
     {
         var ret;
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
@@ -2249,6 +2249,13 @@ CGraphicObjects.prototype =
         this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
         if(isRealObject(ret))
         {
+            if(bNoText === true)
+            {
+                if(ret.cursorType === "text")
+                {
+                    return -1;
+                }
+            }
             var object = g_oTableId.Get_ById(ret.objectId);
             if(isRealObject(object) && (!(bSelected === true) || bSelected && object.selected) )
             {
@@ -2274,7 +2281,7 @@ CGraphicObjects.prototype =
 
     isPointInDrawingObjects2: function(x, y, pageIndex, bSelected)
     {
-        return this.isPointInDrawingObjects(x, y, pageIndex, bSelected) > -1;
+        return this.isPointInDrawingObjects(x, y, pageIndex, bSelected, true) > -1;
     },
 
 
