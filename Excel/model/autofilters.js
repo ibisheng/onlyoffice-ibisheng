@@ -5323,6 +5323,8 @@ var gUndoInsDelCellsFlag = true;
 				var ref = options.ref, val = options.val, col = options.col, index = options.index;
 				var range = {};
 				
+				var aWs = this._getCurrentWS();
+				
 				var startRange =  Asc.Range(ref.c1, ref.r1, ref.c1, ref.r1);
 				var endRange =  Asc.Range(ref.c2, ref.r2, ref.c2, ref.r2);
 				
@@ -5345,27 +5347,38 @@ var gUndoInsDelCellsFlag = true;
 					endRangeCell   = endRange.r2;
 				}
 				
+				var filter;
+				if(range.index == 'all')
+				{
+					filter = aWs.AutoFilter;
+				}
+				else
+				{
+					filter = aWs.TableParts[range.index];
+				}
+				var oldFilter = filter.clone(aWs);
+				
 				//определяем диапазоны добавляемых(удаляемых) ячеек (val < 0 - удаление колонок) 
 				if(startRangeCell < colStart && endRangeCell > colEnd)
 				{
-					this._editFilterAfterInsertColumn(range,val,col,type,activeCells);
+					this._editFilterAfterInsertColumn(range,val,col,type,activeCells, false, oldFilter);
 				}
 				else if(startRangeCell <= colStart && endRangeCell >= colEnd)
 				{
 					if(val < 0)
-						this._editFilterAfterInsertColumn(range,val,col,type,activeCells);
+						this._editFilterAfterInsertColumn(range,val,col,type,activeCells, false, oldFilter);
 					else
 					{
 						if(startRangeCell < colStart)
-							this._editFilterAfterInsertColumn(range,val,col,type,activeCells);
+							this._editFilterAfterInsertColumn(range,val,col,type,activeCells, false, oldFilter);
 						else
-							this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+							this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells, false, oldFilter);
 					}
 				}
 				else if((colEnd <= startRangeCell && val > 0) || (colEnd < startRangeCell && val < 0))
 				{
 					if((activeCells.c1 <= ref.c1 && activeCells.c2 >= ref.c2 && options.type == "insRow") || (activeCells.r1 <= ref.r1 && activeCells.r2 >= ref.r2 && options.type == "insCol"))
-						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+						this._editFilterAfterInsertColumn(range, val, undefined, type, activeCells, false, oldFilter);
 				}
 				else if((colStart < startRangeCell && colEnd > startRangeCell && colEnd <= endRangeCell) || (colEnd <= startRangeCell && val < 0))
 				{
@@ -5373,18 +5386,20 @@ var gUndoInsDelCellsFlag = true;
 					{
 						var valNew = startRangeCell - colEnd - 1;
 						var val2 = colStart - startRangeCell;
-						var retVal = this._editFilterAfterInsertColumn(range, valNew, startRangeCell, type, activeCells);
-						if(!retVal)
-							this._editFilterAfterInsertColumn(range,val2,undefined,type,activeCells, true);
+						
+						//удаляем часть фильтра
+						this._editFilterAfterInsertColumn(range, valNew, startRangeCell, type, activeCells, true);
+						//сдвигаем, заносим в историю
+						this._editFilterAfterInsertColumn(range, val2, undefined, type, activeCells, false, oldFilter);	
 					}
 					else
 					{
-						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells, false, oldFilter);
 					}
 				}
 				else if(type == 'insRow' && colStart <= startRangeCell && colEnd >= endRangeCell)
 				{
-					this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+					this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells, false, oldFilter);
 				}
 				else if((colStart > startRangeCell && colStart <= endRangeCell && colEnd >= endRangeCell && activeCells.r1 <= range.start.r1 && activeCells.r2 >= range.end.r1 && val > 0) || (colStart >= startRangeCell && colStart <= endRangeCell && colEnd > endRangeCell && val < 0))
 				{
@@ -5392,7 +5407,7 @@ var gUndoInsDelCellsFlag = true;
 						valNew = colStart - endRangeCell - 1;
 					else
 						valNew = val;
-					this._editFilterAfterInsertColumn(range,valNew,colStart,type,activeCells);
+					this._editFilterAfterInsertColumn(range,valNew,colStart,type,activeCells, false, oldFilter);
 				}
 				else if(colStart <= startRangeCell && colEnd > endRangeCell && activeCells.r1 <= range.start.r1 && activeCells.r2 >= range.end.r1)
 				{
@@ -5400,15 +5415,15 @@ var gUndoInsDelCellsFlag = true;
 					{
 						var valNew = startRangeCell - endRangeCell - 1;
 						var colNew = startRangeCell;
-						this._editFilterAfterInsertColumn(range,valNew,colNew,type,activeCells);
+						this._editFilterAfterInsertColumn(range,valNew,colNew,type,activeCells, false, oldFilter);
 					}
 					else
-						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
+						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells, false, oldFilter);
 				}
 			},
 			
 			//change current filter after insert column
-			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells, notAddToHistory)
+			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells, notAddToHistory, oldFilter)
 			{
 				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
 				var bRedoChanges = this.worksheet.model.workbook.bRedoChanges;
@@ -5427,9 +5442,6 @@ var gUndoInsDelCellsFlag = true;
 					if(filter.AutoFilter)
 						filterColums = filter.AutoFilter.FilterColumns;
 				}
-				
-				var oldFilter = filter.clone(aWs);
-				
 				
 				if(col == null || col == undefined)//добавляем колонку, смещаем фильтры
 				{
@@ -5512,7 +5524,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				//записываем в историю, если активная область касается данных фильтров
-				if(!bUndoChanges && !bRedoChanges && !notAddToHistory)
+				if(!bUndoChanges && !bRedoChanges && !notAddToHistory && oldFilter)
 				{
 					var changeElement = 
 					{
