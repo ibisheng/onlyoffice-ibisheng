@@ -2092,8 +2092,8 @@ CMathContent.prototype =
         this.Correct_ContentPos(-1);
     }
 };
-CMathContent.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
-CMathContent.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
+CMathContent.prototype.Set_Paragraph    = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
+CMathContent.prototype.Get_ElementByPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
 CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
 {
     this.Parent   = Parent;
@@ -3877,14 +3877,13 @@ CMathContent.prototype.private_SetNeedResize = function()
     if (null !== this.ParaMath)
         this.ParaMath.SetNeedResize();
 };
-CMathContent.prototype.Is_CheckingNearestPos  = ParaHyperlink.prototype.Is_CheckingNearestPos;
-
-CMathContent.prototype.Search                        = ParaHyperlink.prototype.Search;
-CMathContent.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
-CMathContent.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
-CMathContent.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
-CMathContent.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
-CMathContent.prototype.Recalc_RunsCompiledPr         = ParaHyperlink.prototype.Recalc_RunsCompiledPr;
+CMathContent.prototype.Is_CheckingNearestPos         = CParagraphContentWithParagraphLikeContent.prototype.Is_CheckingNearestPos;
+CMathContent.prototype.Search                        = CParagraphContentWithParagraphLikeContent.prototype.Search;
+CMathContent.prototype.Add_SearchResult              = CParagraphContentWithParagraphLikeContent.prototype.Add_SearchResult;
+CMathContent.prototype.Clear_SearchResults           = CParagraphContentWithParagraphLikeContent.prototype.Clear_SearchResults;
+CMathContent.prototype.Remove_SearchResult           = CParagraphContentWithParagraphLikeContent.prototype.Remove_SearchResult;
+CMathContent.prototype.Search_GetId                  = CParagraphContentWithParagraphLikeContent.prototype.Search_GetId;
+CMathContent.prototype.Recalc_RunsCompiledPr         = CParagraphContentWithParagraphLikeContent.prototype.Recalc_RunsCompiledPr;
 
 
 CMathContent.prototype.Get_SelectionDirection = function()

@@ -4869,7 +4869,7 @@ Paragraph.prototype =
             return Res.LetterPos;
 
         return 0;
-    },              
+    },
 
     Correct_Content : function(_StartPos, _EndPos)
     {

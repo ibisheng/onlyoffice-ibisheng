@@ -979,8 +979,8 @@ CMathBase.prototype =
     }
     //////////////////////////
 };
-CMathBase.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
-CMathBase.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
+CMathBase.prototype.Set_Paragraph    = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
+CMathBase.prototype.Get_ElementByPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
 CMathBase.prototype.Set_ParaMath     = CMathContent.prototype.Set_ParaMath;
 CMathBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
@@ -1425,7 +1425,7 @@ CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
 CMathBase.prototype.Recalc_RunsCompiledPr = function()
 {
     this.RecalcInfo.bCtrPrp = true;
-    ParaHyperlink.prototype.Recalc_RunsCompiledPr.call(this);
+    CParagraphContentWithParagraphLikeContent.prototype.Recalc_RunsCompiledPr.call(this);
 };
 CMathBase.prototype.GetLastElement = function()
 {
@@ -1456,20 +1456,20 @@ CMathBase.prototype.private_CorrectCurPos = function()
 }
 
 
-CMathBase.prototype.Search                        = ParaHyperlink.prototype.Search;
-CMathBase.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
-CMathBase.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
-CMathBase.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
-CMathBase.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
-CMathBase.prototype.Set_SelectionContentPos       = ParaHyperlink.prototype.Set_SelectionContentPos;
-CMathBase.prototype.Get_LeftPos                   = ParaHyperlink.prototype.Get_LeftPos;
-CMathBase.prototype.Get_RightPos                  = ParaHyperlink.prototype.Get_RightPos;
-CMathBase.prototype.Get_WordStartPos              = ParaHyperlink.prototype.Get_WordStartPos;
-CMathBase.prototype.Get_WordEndPos                = ParaHyperlink.prototype.Get_WordEndPos;
-CMathBase.prototype.Selection_Remove              = ParaHyperlink.prototype.Selection_Remove;
-CMathBase.prototype.Select_All                    = ParaHyperlink.prototype.Select_All;
-CMathBase.prototype.Check_NearestPos              = ParaHyperlink.prototype.Check_NearestPos;
-CMathBase.prototype.Get_SelectionDirection        = ParaHyperlink.prototype.Get_SelectionDirection;
+CMathBase.prototype.Search                        = CParagraphContentWithParagraphLikeContent.prototype.Search;
+CMathBase.prototype.Add_SearchResult              = CParagraphContentWithParagraphLikeContent.prototype.Add_SearchResult;
+CMathBase.prototype.Clear_SearchResults           = CParagraphContentWithParagraphLikeContent.prototype.Clear_SearchResults;
+CMathBase.prototype.Remove_SearchResult           = CParagraphContentWithParagraphLikeContent.prototype.Remove_SearchResult;
+CMathBase.prototype.Search_GetId                  = CParagraphContentWithParagraphLikeContent.prototype.Search_GetId;
+CMathBase.prototype.Set_SelectionContentPos       = CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos;
+CMathBase.prototype.Get_LeftPos                   = CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos;
+CMathBase.prototype.Get_RightPos                  = CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos;
+CMathBase.prototype.Get_WordStartPos              = CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos;
+CMathBase.prototype.Get_WordEndPos                = CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos;
+CMathBase.prototype.Selection_Remove              = CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove;
+CMathBase.prototype.Select_All                    = CParagraphContentWithParagraphLikeContent.prototype.Select_All;
+CMathBase.prototype.Check_NearestPos              = CParagraphContentWithParagraphLikeContent.prototype.Check_NearestPos;
+CMathBase.prototype.Get_SelectionDirection        = CParagraphContentWithParagraphLikeContent.prototype.Get_SelectionDirection;
 CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)
 {
     if (true !== this.Selection.Use)

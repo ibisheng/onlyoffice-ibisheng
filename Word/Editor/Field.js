@@ -379,35 +379,65 @@ ParaField.prototype.Write_ToBinary2 = function(Writer)
     Writer.WriteLong(historyitem_type_Field);
 
     // String : Id
+    // Long   : FieldType
+    // Long   : Количество аргументов
+    // Array of Strings : массив аргументов
+    // Long   : Количество переключателей
+    // Array of Strings : массив переключателей
     // Long   : Количество элементов
     // Array of Strings : массив с Id элементов
 
-    Writer.WriteString2( this.Id );
+    Writer.WriteString2(this.Id);
+    Writer.WriteLong(this.FieldType);
 
+    var ArgsCount = this.Arguments.length;
+    Writer.WriteLong(ArgsCount);
+    for (var Index = 0; Index < ArgsCount; Index++)
+        Writer.WriteString2(this.Arguments[Index]);
+
+    var SwitchesCount = this.Switches.length;
+    Writer.WriteLong(SwitchesCount);
+    for (var Index = 0; Index < SwitchesCount; Index++)
+        Writer.WriteString2(this.Switches[Index]);
 
     var Count = this.Content.length;
-    Writer.WriteLong( Count );
-
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        Writer.WriteString2( this.Content[Index].Get_Id() );
-    }
+    Writer.WriteLong(Count);
+    for (var Index = 0; Index < Count; Index++)
+        Writer.WriteString2(this.Content[Index].Get_Id());
 };
 ParaField.prototype.Read_FromBinary2 = function(Reader)
 {
     // String : Id
+    // Long   : FieldType
+    // Long   : Количество аргументов
+    // Array of Strings : массив аргументов
+    // Long   : Количество переключателей
+    // Array of Strings : массив переключателей
     // Long   : Количество элементов
     // Array of Strings : массив с Id элементов
 
-    this.Id      = Reader.GetString2();
+    this.Id = Reader.GetString2();
+    this.FieldType = Reader.GetLong();
 
     var Count = Reader.GetLong();
-    this.Content = [];
+    this.Arguments = [];
+    for (var Index = 0; Index < Count; Index++)
+        this.Arguments.push(Reader.GetString2());
 
-    for ( var Index = 0; Index < Count; Index++ )
+    Count = Reader.GetLong();
+    this.Switches = [];
+    for (var Index = 0; Index < Count; Index++)
+        this.Switches.push(Reader.GetString2());
+
+    Count = Reader.GetLong();
+    this.Content = [];
+    for (var Index = 0; Index < Count; Index++)
     {
-        var Element = g_oTableId.Get_ById( Reader.GetString2() );
-        if ( null !== Element )
-            this.Content.push( Element );
+        var Element = g_oTableId.Get_ById(Reader.GetString2());
+        if (null !== Element)
+            this.Content.push(Element);
     }
+
+    if (editor)
+        editor.WordControl.m_oLogicDocument.Register_Field(this);
 };

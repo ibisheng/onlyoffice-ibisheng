@@ -9759,49 +9759,6 @@ CDocument.prototype =
                 //не возвращаем true чтобы не было preventDefault
             }
         }
-        else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + D
-        {
-            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-            {
-                this.Create_NewHistoryPoint();
-
-                var oField;
-
-                if (true === e.ShiftKey)
-                {
-                    oField = new ParaField(fieldtype_MERGEFIELD, ["Address"], []);
-                    var oRun = new ParaRun();
-                    oRun.Add_ToContent(0, new ParaText("«"));
-                    oRun.Add_ToContent(1, new ParaText("A"));
-                    oRun.Add_ToContent(2, new ParaText("d"));
-                    oRun.Add_ToContent(3, new ParaText("d"));
-                    oRun.Add_ToContent(4, new ParaText("r"));
-                    oRun.Add_ToContent(5, new ParaText("e"));
-                    oRun.Add_ToContent(6, new ParaText("s"));
-                    oRun.Add_ToContent(7, new ParaText("s"));
-                    oRun.Add_ToContent(8, new ParaText("»"));
-                    oField.Add_ToContent(0, oRun);
-                }
-                else
-                {
-                    oField = new ParaField(fieldtype_MERGEFIELD, ["Name"], []);
-                    var oRun = new ParaRun();
-                    oRun.Add_ToContent(0, new ParaText("«"));
-                    oRun.Add_ToContent(1, new ParaText("N"));
-                    oRun.Add_ToContent(2, new ParaText("a"));
-                    oRun.Add_ToContent(3, new ParaText("m"));
-                    oRun.Add_ToContent(4, new ParaText("e"));
-                    oRun.Add_ToContent(5, new ParaText("»"));
-                    oField.Add_ToContent(0, oRun);
-                }
-
-                this.FieldsManager.Register_Field(oField);
-
-                this.Paragraph_Add(oField);
-                this.Document_UpdateInterfaceState();
-            }
-            bRetValue = true;
-        }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E + ...
         {
             if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
@@ -14047,6 +14004,33 @@ CDocument.prototype.EndPreview_MailMergeResult = function()
 
     this.FieldsManager.Restore_MailMergeTemplate();
     this.Recalculate_FromStart(true);
+};
+CDocument.prototype.Add_MailMergeField = function(Name)
+{
+    if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    {
+        this.Create_NewHistoryPoint();
+
+        var oField = new ParaField(fieldtype_MERGEFIELD, [Name], []);
+        var oRun = new ParaRun();
+
+        var Index = 0;
+        oRun.Add_ToContent(Index++, new ParaText("«"));
+        for (var Len = Name.length; Index <= Len; Index++)
+        {
+            oRun.Add_ToContent(Index, new ParaText(Name.charAt(Index - 1)));
+        }
+        oRun.Add_ToContent(Index, new ParaText("»"));
+        oField.Add_ToContent(0, oRun);
+
+        this.Register_Field(oField);
+        this.Paragraph_Add(oField);
+        this.Document_UpdateInterfaceState();
+    }
+};
+CDocument.prototype.Register_Field = function(oField)
+{
+    this.FieldsManager.Register_Field(oField);
 };
 CDocument.prototype.private_StartSelectionFromCurPos = function()
 {

@@ -1901,7 +1901,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CorrectLeftPos = f
     return true;
 };
 //----------------------------------------------------------------------------------------------------------------------
-// ParaHyperlink
+// Spelling
 //----------------------------------------------------------------------------------------------------------------------
 CParagraphContentWithParagraphLikeContent.prototype.Restart_CheckSpelling = function()
 {
@@ -1948,6 +1948,99 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_SpellCheckerElement =
 CParagraphContentWithParagraphLikeContent.prototype.Clear_SpellingMarks = function()
 {
     this.SpellingMarks = [];
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Search and Replace
+//----------------------------------------------------------------------------------------------------------------------
+CParagraphContentWithParagraphLikeContent.prototype.Search = function(ParaSearch, Depth)
+{
+    this.SearchMarks = [];
+
+    var ContentLen = this.Content.length;
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+    {
+        var Element = this.Content[CurPos];
+
+        ParaSearch.ContentPos.Update( CurPos, Depth );
+
+        Element.Search( ParaSearch, Depth + 1 );
+    }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
+{
+    if ( true === Start )
+        SearchResult.ClassesS.push( this );
+    else
+        SearchResult.ClassesE.push( this );
+
+    this.SearchMarks.push( new CParagraphSearchMark( SearchResult, Start, Depth ) );
+
+    this.Content[ContentPos.Get(Depth)].Add_SearchResult( SearchResult, Start, ContentPos, Depth + 1 );
+};
+CParagraphContentWithParagraphLikeContent.prototype.Clear_SearchResults = function()
+{
+    this.SearchMarks = [];
+};
+CParagraphContentWithParagraphLikeContent.prototype.Remove_SearchResult = function(SearchResult)
+{
+    var MarksCount = this.SearchMarks.length;
+    for ( var Index = 0; Index < MarksCount; Index++ )
+    {
+        var Mark = this.SearchMarks[Index];
+        if ( SearchResult === Mark.SearchResult )
+        {
+            this.SearchMarks.splice( Index, 1 );
+            Index--;
+            MarksCount--;
+        }
+    }
+};
+CParagraphContentWithParagraphLikeContent.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
+{
+    // Определим позицию, начиная с которой мы будем искать ближайший найденный элемент
+    var StartPos = 0;
+
+    if ( true === bUseContentPos )
+    {
+        StartPos = ContentPos.Get( Depth );
+    }
+    else
+    {
+        if ( true === bNext )
+        {
+            StartPos = 0;
+        }
+        else
+        {
+            StartPos = this.Content.length - 1;
+        }
+    }
+
+    // Производим поиск ближайшего элемента
+    if ( true === bNext )
+    {
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
+        {
+            var ElementId = this.Content[CurPos].Search_GetId( true, bUseContentPos && CurPos === StartPos ? true : false, ContentPos, Depth + 1 );
+            if ( null !== ElementId )
+                return ElementId;
+        }
+    }
+    else
+    {
+        var ContentLen = this.Content.length;
+
+        for ( var CurPos = StartPos; CurPos >= 0; CurPos-- )
+        {
+            var ElementId = this.Content[CurPos].Search_GetId( false, bUseContentPos && CurPos === StartPos ? true : false, ContentPos, Depth + 1 );
+            if ( null !== ElementId )
+                return ElementId;
+        }
+    }
+
+    return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
