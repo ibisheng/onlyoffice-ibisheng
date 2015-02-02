@@ -3138,8 +3138,31 @@ PasteProcessor.prototype =
 						pasteFromBinary = true;
 				}
 				
-				
-				if(pasteFromBinary)
+				if(base64FromExcel && pasteFromBinary === false && false)//вставка из редактора таблиц
+				{
+					var fPrepasteCallback = function(){
+                        if(false == oThis.bNested)
+                        {
+                            oThis.InsertInDocument();
+							if(nodeDisplay)
+							{
+								nodeDisplay.blur();
+								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+							}
+                            if(oThis.aContent.bAddNewStyles)
+                                oThis.api.GenerateStyles();
+                        }
+                    }
+					
+					History.TurnOff();
+					aContentExcel = this._readFromBinaryExcel(base64FromExcel);
+					History.TurnOn();
+					
+					this._convertExcelBinary(aContentExcel);
+					oThis.api.pre_Paste(oThis.aContent.fonts, oThis.aContent.images, fPrepasteCallback);
+					return;
+				}
+				else if(pasteFromBinary)//вставка из редактора документов
                 {
 					var fPrepasteCallback = function(){
                         if(false == oThis.bNested)
@@ -4101,7 +4124,7 @@ PasteProcessor.prototype =
 				}
 				else if(base64FromExcel)//вставляем в презентации из таблиц
 				{	
-					var aContentExcel = this._readFromBinaryExcel(base64FromExcel);
+					var aContentExcel = this._readFromBinaryExcel(base64FromExcel).workbook;
 					
 					//если есть шейпы, то вставляем их из excel
 					if(aContentExcel && aContentExcel.aWorksheets && aContentExcel.aWorksheets[0] && aContentExcel.aWorksheets[0].Drawings && aContentExcel.aWorksheets[0].Drawings.length)
@@ -4398,7 +4421,7 @@ PasteProcessor.prototype =
 		var aPastedImages = [];
 		var imageUrl, images = [], isGraphicFrame, extX, extY;
 		
-		var drawings = pDrawings ? pDrawings : aContentExcel.aWorksheets[0].Drawings;
+		var drawings = pDrawings ? pDrawings : aContentExcel.workbook.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
 		{
 			var drawing, graphicObj, paraRun, tempParaRun;
@@ -4502,8 +4525,199 @@ PasteProcessor.prototype =
 			if(tempParagraph)
 				aContent[aContent.length] = tempParagraph;
 		}
+		else
+		{
+			this._convertTableFromExcel(aContentExcel);
+			aContent = this.aContent;
+		}
 		
 		return {content: aContent, aPastedImages: aPastedImages, images: images};			
+	},
+	
+	_convertTableFromExcel: function(aContentExcel)
+	{
+		var worksheet = aContentExcel.workbook.aWorksheets[0];
+		var pasteRange = Asc.g_oRangeCache.getAscRange(aContentExcel.activeRange);
+		var rows = worksheet._getRows(), range;
+		var tempActiveRef = aContentExcel.activeRange;
+		var activeRange = Asc.g_oRangeCache.getAscRange(tempActiveRef);
+		var t = this;
+		
+		var convertBorder = function(border)
+		{
+			var res = new CDocumentBorder();
+			if(border.w)
+			{
+				res.Value = border_Single;
+				res.Size = border.w * g_dKoef_pix_to_mm;
+			}
+			res.Color = new CDocumentColor(border.c.getR(), border.c.getG(), border.c.getB());
+			
+			return res;
+		}
+		
+		var addFont = function(fontFamily)
+		{
+			if(!t.aContent.fonts)
+				t.aContent.fonts = [];
+			
+			if(!t.oFonts)
+				t.oFonts = [];
+
+			t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
+            t.aContent.fonts.push(new CFont(fontFamily, 0, "", 0));
+		}
+		
+		//grid
+		var grid = [];
+		var standartWidth = 17;
+		for(var i = activeRange.c1; i <= activeRange.c2; i++)
+		{
+			if(worksheet.aCols[i])
+				grid[i - activeRange.c1] = worksheet.aCols[i].width;
+			else
+				grid[i - activeRange.c1] = standartWidth;
+		}
+		var table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, grid);
+		this.aContent.push(table);
+		
+		var diffRow = activeRange.r2 - activeRange.r1;
+		var diffCol = activeRange.c2 - activeRange.c1;
+		for(var i = 0; i <= diffRow; i++)
+		{
+			var row = table.Internal_Add_Row(table.Content.length, 0);
+			for(var j = 0; j <= diffCol; j++)
+			{
+				if(!table.Selection.Data)
+					table.Selection.Data = [];
+					
+				table.Selection.Data[table.Selection.Data.length] = {Cell: j, Row: i};
+				
+				range = worksheet.getCell3(i + activeRange.r1, j + activeRange.c1);
+				var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
+				
+				table.CurCell = oCurCell;
+				
+				var isMergedCell = range.hasMerged();
+				var gridSpan = 1;
+				var vMerge = 1;
+				if(isMergedCell)
+				{
+					gridSpan = isMergedCell.c2 - isMergedCell.c1 + 1;
+					vMerge = isMergedCell.r2 - isMergedCell.r1 + 1;
+				}
+				
+				//***cell property***
+				//set grid
+				var sumWidthGrid = 0;
+				for(var l = 0; l < gridSpan; l++)
+				{
+					sumWidthGrid += grid[j + l];
+				}
+				oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, sumWidthGrid));
+				
+				//background color
+				var background_color = range.getFill();
+				if(null != background_color)
+				{
+					var Shd = new CDocumentShd();
+					Shd.Value = shd_Clear;
+					Shd.Color = new CDocumentColor(background_color.getR(), background_color.getG(), background_color.getB());
+					oCurCell.Set_Shd(Shd);
+				}
+				
+				//borders
+				var borders = range.getBorderFull();
+				//left
+				var border = convertBorder(borders.l);
+				if(null != border)
+					oCurCell.Set_Border(border, 3);
+				//top
+				var border = convertBorder(borders.t);
+				if(null != border)
+					oCurCell.Set_Border(border, 0);
+				//right
+				var border = convertBorder(borders.r);
+				if(null != border)
+					oCurCell.Set_Border(border, 1);
+				//bottom
+				var border = convertBorder(borders.b);
+				if(null != border)
+					oCurCell.Set_Border(border, 2);
+				
+				//merge				
+				oCurCell.Set_GridSpan(gridSpan);
+				if(vMerge != 1)
+					oCurCell.Set_VMerge(vmerge_Continue);
+				
+				var oCurPar = oCurCell.Content.Content[0];
+				
+				var value2 = range.getValue2();
+				for(var n = 0; n < value2.length; n++)
+				{
+					var oCurRun = new ParaRun(oCurPar);
+					
+					//***text property***
+					oCurRun.Pr.Bold = value2[n].format.b;
+					if(value2[n].format.c)
+						oCurRun.Pr.Color = new CDocumentColor(value2[n].format.c.getR(), value2[n].format.c.getG(), value2[n].format.c.getB());
+					
+					//font					
+					var font_family = value2[n].format.fn;
+					addFont(font_family);
+					oCurRun.Pr.FontFamily = font_family;
+					var oFontItem = this.oFonts[font_family];
+					if(null != oFontItem && null != oFontItem.Name)
+					{
+						oCurRun.Pr.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
+						oCurRun.Pr.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
+						oCurRun.Pr.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
+						oCurRun.Pr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
+					}
+					
+					oCurRun.Pr.FontSize = value2[n].format.fs;
+					oCurRun.Pr.Italic = value2[n].format.i;
+					oCurRun.Pr.Strikeout = value2[n].format.s;
+					oCurRun.Pr.Underline = value2[n].format.u === 3 ? true : false;
+					
+					//text
+					var value = value2[n].text;
+					for(var k = 0, length = value.length; k < length; k++)
+					{
+						var nUnicode = null;
+						var nCharCode = value.charCodeAt(k);
+						if (isLeadingSurrogateChar(nCharCode)) {
+							if (k + 1 < length) {
+								k++;
+								var nTrailingChar = value.charCodeAt(k);
+								nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+							}
+						}
+						else
+							nUnicode = nCharCode;
+						if (null != nUnicode) {
+							var Item;
+							if (0x20 != nUnicode && 0xA0 != nUnicode) {
+								Item = new ParaText();
+								Item.Set_CharCode(nUnicode);
+							}
+							else
+								Item = new ParaSpace();
+							
+							//add text
+							oCurRun.Add_ToContent(k, Item, false);
+						}
+					}
+					
+					//add run
+					oCurPar.Internal_Content_Add(n, oCurRun, false);
+				}
+				
+				j = j + gridSpan - 1;
+			}
+			//if((i + vMerge - 1) == diffRow)
+				//i = i + vMerge - 1;	
+		}
 	},
 	
 	_convertTableToPPTX: function(table)
@@ -4667,7 +4881,7 @@ PasteProcessor.prototype =
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		oBinaryFileReader.Read(base64, tempWorkbook);
 		
-		return tempWorkbook;
+		return {workbook: tempWorkbook, activeRange: oBinaryFileReader.copyPasteObj.activeRange};
 	},
 	
     ReadPresentationText: function(stream)
