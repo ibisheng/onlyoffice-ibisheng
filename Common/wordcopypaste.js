@@ -4266,10 +4266,12 @@ PasteProcessor.prototype =
 					for(var i = 0; i < arrShapes.length; ++i)
                     {
                         shape = arrShapes[i];
-                        if(shape.txBody.content.Content.length > 1)
+				
+                        if(shape.txBody.content.Content.length > 1 && (shape.txBody.content.Content[0].Content && shape.txBody.content.Content[0].Content.length === 1))
                         {
                             shape.txBody.content.Internal_Content_Remove(0, 1);
                         }
+						
                         var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                         var h = shape.txBody.content.Get_SummaryHeight();
                         CheckSpPrXfrm(shape);
