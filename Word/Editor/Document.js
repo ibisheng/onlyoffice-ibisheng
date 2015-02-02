@@ -7984,7 +7984,7 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            return null;//this.DrawingObjects.Get_SelectionBounds();
+            return this.DrawingObjects.Get_SelectionBounds();
         }
         else
         {
