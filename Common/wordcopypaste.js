@@ -6765,10 +6765,21 @@ PasteProcessor.prototype =
                             var oDrawingDocument = this.oDocument.DrawingDocument;
                             if(oTargetDocument && oDrawingDocument)
                             {
+								//если добавляем изображение в гиперссылку, то кладём его в отдельный ран и делаем не подчёркнутым
+								if(this.oCurHyperlink)
+								{
+									this._CommitElemToParagraph(this.oCurRun);
+									this.oCurRun = new ParaRun(this.oCurPar);
+									this.oCurRun.Pr.Underline = false;
+								}
+										
 								var Drawing = CreateImageFromBinary(sSrc, nWidth, nHeight);
 								// oTargetDocument.DrawingObjects.Add( Drawing );
 
                                 this._Paragraph_Add( Drawing );
+								
+								if(this.oCurHyperlink)
+									this.oCurRun = new ParaRun(this.oCurPar);
 
                                     //oDocument.Add_InlineImage(nWidth, nHeight, img);
                             }
