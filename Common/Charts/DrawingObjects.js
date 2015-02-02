@@ -3579,7 +3579,7 @@ function DrawingObjects() {
            // _this.controller.setGraphicObjectProps( objectProperties );
         }
 
-        //_this.sendGraphicObjectProps();
+        _this.sendGraphicObjectProps();
     };
 
     _this.showChartSettings = function() {
