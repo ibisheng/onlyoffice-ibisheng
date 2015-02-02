@@ -3460,6 +3460,7 @@ CAreaSeries.prototype =
     {
         this.spPr && this.spPr.checkBlipFillRasterImage(images);
         this.dLbls && this.dLbls.getAllRasterImages(images);
+        this.marker && this.marker.spPr && this.marker.spPr.checkBlipFillRasterImage(images);
         for(var i = 0; i < this.dPt.length; ++i)
         {
             this.dPt[i].spPr && this.dPt[i].spPr.checkBlipFillRasterImage(images);
