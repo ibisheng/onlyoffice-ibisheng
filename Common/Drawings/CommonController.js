@@ -3233,6 +3233,34 @@ DrawingObjectsController.prototype =
                     break;
                 }
             }
+            if(ret.bLine)
+            {
+                for(var i = 0; i < chart_type.series.length; ++i)
+                {
+                    if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
+                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                    {
+                        break;
+                    }
+                }
+                if(i === chart_type.series.length)
+                {
+                    ret.bLine = false;
+                }
+                var b_smooth = ret.smooth;
+                if(b_smooth)
+                {
+                    for(var i = 0; i < chart_type.series.length; ++i)
+                    {
+                        if(!chart_type.series[i].smooth)
+                        {
+                            b_smooth = false;
+                            break;
+                        }
+                    }
+                }
+                ret.putSmooth(b_smooth);
+            }
         }
         else
         {
