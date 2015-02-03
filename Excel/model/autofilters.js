@@ -6779,7 +6779,7 @@ var gUndoInsDelCellsFlag = true;
 				return {result: result, mainAdjacentCells: mainAdjacentCells, activeCells: activeCells};
 			},
 
-			_renameTableColumn: function(range)
+			_renameTableColumn: function(range, bUndo)
 			{
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
@@ -6811,14 +6811,18 @@ var gUndoInsDelCellsFlag = true;
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )
 								{
 									filter.TableColumns[j - tableRange.c1].Name = val;
-									cell.setType(CellValueType.String);
+									if(!bUndo)
+										cell.setType(CellValueType.String);
 								}	
 								else if(val == "")//если пустая изменяем генерируем имя и добавляем его в TableColumns  
 								{
 									filter.TableColumns[j - tableRange.c1].Name = "";
 									generateName = this._generateColumnName(filter.TableColumns);
-									cell.setValue(generateName);
-									cell.setType(CellValueType.String);
+									if(!bUndo)
+									{
+										cell.setValue(generateName);
+										cell.setType(CellValueType.String);
+									}									
 									filter.TableColumns[j - tableRange.c1].Name = generateName;
 								}
 							}

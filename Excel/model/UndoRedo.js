@@ -2852,7 +2852,7 @@ UndoRedoCell.prototype = {
 			cell.setValueData(Val);
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters._renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow));
+			worksheetView.autoFilters._renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
 		}
 		else if(historyitem_Cell_SetStyle == Type)
 		{
