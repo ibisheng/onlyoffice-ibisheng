@@ -563,6 +563,9 @@ function CDrawingDocument()
 
     this.UpdateTargetFromPaint  = false;
     this.UpdateTargetCheck      = true;
+
+    this.TargetPos = { X: 0, Y : 0, Page : -1 };
+
     this.TargetShowNeedFlag     = false;
     this.TargetShowNeedFlag     = false;
 
@@ -781,6 +784,10 @@ CDrawingDocument.prototype =
     },
     UpdateTarget : function(x, y, pageIndex)
     {
+        this.TargetPos.X = x;
+        this.TargetPos.Y = y;
+        this.TargetPos.Page = pageIndex;
+
         this.LogicDocument.Set_TargetPos(x, y, pageIndex);
         this.UpdateTargetCheck = true;
         this.Native["DD_UpdateTarget"](x, y, pageIndex);
@@ -1729,6 +1736,20 @@ CDrawingDocument.prototype =
         if (_target === false)
         {
             _ret[0] = 1;
+
+            _ret.push(this.TargetPos.X);
+            _ret.push(this.TargetPos.Y);
+            _ret.push(this.TargetPos.Page);
+
+            if (this.TextMatrix && !this.TextMatrix.IsIdentity())
+            {
+                _ret.push(this.TextMatrix.sx);
+                _ret.push(this.TextMatrix.shy);
+                _ret.push(this.TextMatrix.shx);
+                _ret.push(this.TextMatrix.sy);
+                _ret.push(this.TextMatrix.tx);
+                _ret.push(this.TextMatrix.ty);
+            }
         }
 
         var _select = this.LogicDocument.Get_SelectionBounds();

@@ -88,6 +88,20 @@ asc_docs_api.prototype["Call_CheckTargetUpdate"] = function()
     this.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 };
 
+asc_docs_api.prototype["Call_Common"] = function(type, param)
+{
+    switch (type)
+    {
+        case 1:
+        {
+            this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
+			break;
+        }
+        default:
+            break;
+    }
+};
+
 asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)
 {
     var _arr = new CParaTabs();

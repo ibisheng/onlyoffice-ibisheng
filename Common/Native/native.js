@@ -486,6 +486,10 @@ window.native.Call_CheckTargetUpdate = function()
 {
     return _api.Call_CheckTargetUpdate();
 };
+window.native.Call_Common = function(type, param)
+{
+    return _api.Call_Common();
+};
 
 window.native.Call_HR_Tabs = function(arrT, arrP)
 {
