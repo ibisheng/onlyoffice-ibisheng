@@ -2608,7 +2608,7 @@ cMEDIAN.prototype.Calculate = function ( arg ) {
         medArr.sort(fSortAscending);
 
         if ( medArr.length < 1 )
-            return cError( cErrorType.wrong_value_type );
+            return new cError( cErrorType.wrong_value_type );
         else {
             if ( medArr.length % 2 )
                 return new cNumber( medArr[(medArr.length - 1) / 2] );
@@ -2875,7 +2875,7 @@ cMODE.prototype.Calculate = function ( arg ) {
         medArr.sort(fSortDescending);
 
         if ( medArr.length < 1 )
-            return cError( cErrorType.wrong_value_type );
+            return new cError( cErrorType.wrong_value_type );
         else {
             var nMaxIndex = 0, nMax = 1, nCount = 1, nOldVal = medArr[0], i;
 
