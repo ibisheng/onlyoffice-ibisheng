@@ -2784,26 +2784,27 @@ Paragraph.prototype =
                 var ContentPos = this.Get_ParaContentPos(false, false);
                 var CurPos = ContentPos.Get(0);
 
-                if ( para_Math !== this.Content[CurPos].Type && para_Hyperlink !== this.Content[CurPos].Type )
+                // Ран формула делит на части, а в остальные элементы формула добавляется целиком.
+                if (para_Run === this.Content[CurPos].Type)
                 {
                     // Разделяем текущий элемент (возвращается правая часть)
-                    var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
+                    var NewElement = this.Content[CurPos].Split(ContentPos, 1);
 
-                    if ( null !== NewElement )
-                        this.Internal_Content_Add( CurPos + 1, NewElement );
+                    if (null !== NewElement)
+                        this.Internal_Content_Add(CurPos + 1, NewElement);
 
-					var Elem = new ParaMath();
-					Elem.Root.Load_FromMenu(Item.Menu, this);
-					Elem.Root.Correct_Content(true);
-                    // Добавляем гиперссылку в содержимое параграфа
-                    this.Internal_Content_Add( CurPos + 1, Elem );
+                    var MathElement = new ParaMath();
+                    MathElement.Root.Load_FromMenu(Item.Menu, this);
+                    MathElement.Root.Correct_Content(true);
+
+                    this.Internal_Content_Add(CurPos + 1, MathElement);
 
                     // Перемещаем кусор в конец формулы
                     this.CurPos.ContentPos = CurPos + 1;
                     this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
                 }
                 else
-                    this.Content[CurPos].Add( Item );
+                    this.Content[CurPos].Add(Item);
 
                 break;
             }
@@ -2812,8 +2813,8 @@ Paragraph.prototype =
                 var ContentPos = this.Get_ParaContentPos(false, false);
                 var CurPos = ContentPos.Get(0);
 
-                // В поле не добавляем другое поле
-                if (para_Field !== this.Content[CurPos].Type)
+                // Формулу и ран поле делит на части, в остальные элементы добавляется целиком.
+                if (para_Run === this.Content[CurPos].Type || para_Math === this.Content[CurPos].Type)
                 {
                     // Разделяем текущий элемент (возвращается правая часть)
                     var NewElement = this.Content[CurPos].Split(ContentPos, 1);
@@ -2827,6 +2828,8 @@ Paragraph.prototype =
                     this.CurPos.ContentPos = CurPos + 1;
                     this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
                 }
+                else
+                    this.Content[CurPos].Add(Item);
 
                 break;
             }
@@ -5116,7 +5119,7 @@ Paragraph.prototype =
                 EndContentPos   = Temp;
             }
             
-            // Если у нас попадает комментарий с данную область, тогда удалим его.
+            // Если у нас попадает комментарий в данную область, тогда удалим его.
             // TODO: Переделать здесь, когда комментарии смогут лежать во всех классах (например в Hyperlink)
 
             var StartPos = StartContentPos.Get(0);
@@ -5160,7 +5163,9 @@ Paragraph.prototype =
             var NewElementS = this.Content[StartPos].Split( StartContentPos, 1 );
 
             var HyperPos = 0;
-            Hyperlink.Add_ToContent( HyperPos++, NewElementS );
+
+            if (null !== NewElementS)
+                Hyperlink.Add_ToContent(HyperPos++, NewElementS);
 
             for ( var CurPos = StartPos + 1; CurPos <= EndPos; CurPos++ )
             {
@@ -5169,7 +5174,9 @@ Paragraph.prototype =
 
             this.Internal_Content_Remove2( StartPos + 1, EndPos - StartPos );
             this.Internal_Content_Add( StartPos + 1, Hyperlink );
-            this.Internal_Content_Add( StartPos + 2, NewElementE );
+
+            if (null !== NewElementE)
+                this.Internal_Content_Add(StartPos + 2, NewElementE);
 
             this.Selection.StartPos = StartPos + 1;
             this.Selection.EndPos   = StartPos + 1;

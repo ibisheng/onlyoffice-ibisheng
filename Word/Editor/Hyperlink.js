@@ -73,39 +73,45 @@ ParaHyperlink.prototype.Add = function(Item)
 {
     switch (Item.Type)
     {
-        case para_Run :
+        case para_Run  :
+        case para_Field:
         {
-            var CurItem = this.Content[this.State.ContentPos];
+            var TextPr = this.Get_FirstTextPr();
+            Item.Select_All();
+            Item.Apply_TextPr(TextPr);
+            Item.Selection_Remove();
 
-            switch ( CurItem.Type )
+            var CurPos = this.State.ContentPos;
+            var CurItem = this.Content[CurPos];
+            if (para_Run === CurItem.Type || para_Math === CurItem.Type)
             {
-                case para_Run :
-                {
-                    var NewRun = CurItem.Split2(CurItem.State.ContentPos);
+                var ContentPos = new CParagraphContentPos();
+                this.Content[CurPos].Get_ParaContentPos(false, false, ContentPos);
 
-                    this.Internal_Content_Add( CurPos + 1, Item );
-                    this.Internal_Content_Add( CurPos + 2, NewRun );
-                    this.State.ContentPos = CurPos + 1;
-                    break;
-                }
+                // Разделяем текущий элемент (возвращается правая часть)
+                var NewElement = this.Content[CurPos].Split(ContentPos, 0);
 
-                default:
-                {
-                    this.Content[this.State.ContentPos].Add( Item );
-                    break;
-                }
+                if (null !== NewElement)
+                    this.Add_ToContent(CurPos + 1, NewElement);
+
+                this.Add_ToContent(CurPos + 1, Item);
+
+                this.State.ContentPos = CurPos + 1;
+                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
             }
+            else
+                CurItem.Add(Item);
 
             break;
         }
-
         case para_Math :
         {
             var ContentPos = new CParagraphContentPos();
             this.Get_ParaContentPos(false, false, ContentPos);
             var CurPos = ContentPos.Get(0);
 
-            if ( para_Math !== this.Content[CurPos].Type )
+            // Ран формула делит на части, а в остальные элементы добавляется целиком
+            if (para_Run === this.Content[CurPos].Type)
             {
                 // Разделяем текущий элемент (возвращается правая часть)
                 var NewElement = this.Content[CurPos].Split(ContentPos, 1);
@@ -127,10 +133,34 @@ ParaHyperlink.prototype.Add = function(Item)
 
             break;
         }
+        case para_Hyperlink:
+        {
+            // Вместо добавления самого элемента добавляем его содержимое
+            var Count = Item.Content.length;
 
+            if (Count > 0)
+            {
+                var CurPos  = this.State.ContentPos;
+                var CurItem = this.Content[CurPos];
+
+                var CurContentPos = new CParagraphContentPos();
+                CurItem.Get_ParaContentPos(false, false, CurContentPos);
+
+                var NewItem = CurItem.Split(CurContentPos, 0);
+                for (var Index = 0; Index < Count; Index++)
+                {
+                    this.Add_ToContent(CurPos + Index + 1, Item.Content[Index], false);
+                }
+                this.Add_ToContent(CurPos + Count + 1, NewItem, false);
+                this.State.ContentPos = CurPos + Count;
+                this.Content[this.State.ContentPos].Cursor_MoveToEndPos();
+            }
+
+            break;
+        }
         default :
         {
-            this.Content[this.State.ContentPos].Add( Item );
+            this.Content[this.State.ContentPos].Add(Item);
             break;
         }
     }
@@ -197,15 +227,6 @@ ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 //-----------------------------------------------------------------------------------
 // Работаем со значениями
 //-----------------------------------------------------------------------------------
-ParaHyperlink.prototype.Get_Text = function(Text)
-{
-    var ContentLen = this.Content.length;
-    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
-    {
-        this.Content[CurPos].Get_Text( Text );
-    }
-};
-
 ParaHyperlink.prototype.Set_Visited = function(Value)
 {
     this.Visited = Value;

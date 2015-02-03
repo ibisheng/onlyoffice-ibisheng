@@ -714,6 +714,7 @@ function CCollaborativeEditing()
         if ( true === OtherChanges )
         {
             editor.WordControl.m_oLogicDocument.Stop_Recalculate();
+            editor.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
 
             editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
 

@@ -13980,6 +13980,33 @@ CDocument.prototype.Recalculate_FromStart = function(bUpdateStates)
         this.Document_UpdateSelectionState();
     }
 };
+CDocument.prototype.Start_MailMerge = function(MailMergeMap)
+{
+    this.MailMergeMap = MailMergeMap;
+    editor.sync_StartMailMerge();
+};
+CDocument.prototype.Get_MailMergeReceptionsCount = function()
+{
+    if (null === this.MailMergeMap || !this.MailMergeMap)
+        return 0;
+
+    return this.MailMergeMap.length;
+};
+CDocument.prototype.Get_MailMergeFieldsNameList = function()
+{
+    if (this.Get_MailMergeReceptionsCount() <= 0)
+        return [];
+
+    // Предполагаем, что в первом элементе перечислены все поля
+    var Element = this.MailMergeMap[0];
+    var aList = [];
+    for (var sId in Element)
+    {
+        aList.push(sId);
+    }
+
+    return aList;
+};
 CDocument.prototype.Preview_MailMergeResult = function(Index)
 {
     if (null === this.MailMergeMap)
@@ -13993,6 +14020,8 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
 
     this.FieldsManager.Update_MailMergeFields(this.MailMergeMap[Index]);
     this.Recalculate_FromStart(true);
+
+    editor.sync_PreviewMailMergeResult(Index);
 };
 CDocument.prototype.EndPreview_MailMergeResult = function()
 {
@@ -14004,6 +14033,8 @@ CDocument.prototype.EndPreview_MailMergeResult = function()
 
     this.FieldsManager.Restore_MailMergeTemplate();
     this.Recalculate_FromStart(true);
+
+    editor.sync_EndPreviewMailMergeResult();
 };
 CDocument.prototype.Add_MailMergeField = function(Name)
 {

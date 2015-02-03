@@ -7791,6 +7791,39 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
     }
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с MailMerge
+//----------------------------------------------------------------------------------------------------------------------
+asc_docs_api.prototype.asc_StartMailMerge = function(aList)
+{
+    this.WordControl.m_oLogicDocument.Start_MailMerge();
+};
+asc_docs_api.prototype.asc_GetReceptionsCount = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsCount();
+};
+asc_docs_api.prototype.sync_StartMailMerge = function()
+{
+    this.asc_fireCallback("asc_onStartMailMerge");
+};
+asc_docs_api.prototype.sync_PreviewMailMergeResult = function(Index)
+{
+    this.asc_fireCallback("asc_onPreviewMailMergeResult", Index);
+};
+asc_docs_api.prototype.sync_EndPreviewMailMergeResult = function()
+{
+    this.asc_fireCallback("asc_onEndPreviewMailMergeResult");
+};
+asc_docs_api.prototype.asc_GetMailMergeFieldsNameList = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_MailMergeFieldsNameList();
+};
+asc_docs_api.prototype.asc_AddMailMergeField = function(Name)
+{
+    this.WordControl.m_oLogicDocument.Add_MailMergeField(Name);
+};
+
+
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
 {

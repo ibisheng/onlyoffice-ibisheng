@@ -72,43 +72,95 @@ ParaField.prototype.Add = function(Item)
 {
     switch (Item.Type)
     {
-        case para_Run :
+        case para_Run      :
+        case para_Hyperlink:
         {
-            var CurItem = this.Content[this.State.ContentPos];
+            var TextPr = this.Get_FirstTextPr();
+            Item.Select_All();
+            Item.Apply_TextPr(TextPr);
+            Item.Selection_Remove();
 
-            switch ( CurItem.Type )
+            var CurPos = this.State.ContentPos;
+            var CurItem = this.Content[CurPos];
+            if (para_Run === CurItem.Type)
             {
-                case para_Run :
-                {
-                    var NewRun = CurItem.Split2(CurItem.State.ContentPos);
+                var NewRun = CurItem.Split2(CurItem.State.ContentPos);
+                this.Add_ToContent(CurPos + 1, Item);
+                this.Add_ToContent(CurPos + 2, NewRun);
 
-                    this.Internal_Content_Add( CurPos + 1, Item );
-                    this.Internal_Content_Add( CurPos + 2, NewRun );
-                    this.State.ContentPos = CurPos + 1;
-                    break;
-                }
+                this.State.ContentPos = CurPos + 2;
+                this.Content[this.State.ContentPos].Cursor_MoveToStartPos();
+            }
+            else
+                CurItem.Add(Item);
 
-                default:
+            break;
+        }
+        case para_Math :
+        {
+            var ContentPos = new CParagraphContentPos();
+            this.Get_ParaContentPos(false, false, ContentPos);
+            var CurPos = ContentPos.Get(0);
+
+            // Ран формула делит на части, а в остальные элементы добавляется целиком
+            if (para_Run === this.Content[CurPos].Type)
+            {
+                // Разделяем текущий элемент (возвращается правая часть)
+                var NewElement = this.Content[CurPos].Split(ContentPos, 1);
+
+                if (null !== NewElement)
+                    this.Add_ToContent(CurPos + 1, NewElement, true);
+
+                var Elem = new ParaMath();
+                Elem.Root.Load_FromMenu(Item.Menu, this);
+                Elem.Root.Correct_Content(true);
+                this.Add_ToContent(CurPos + 1, Elem, true);
+
+                // Перемещаем кусор в конец формулы
+                this.State.ContentPos = CurPos + 1;
+                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+            }
+            else
+                this.Content[CurPos].Add(Item);
+
+            break;
+        }
+        case para_Field:
+        {
+            // Вместо добавления самого элемента добавляем его содержимое
+            var Count = Item.Content.length;
+
+            if (Count > 0)
+            {
+                var CurPos  = this.State.ContentPos;
+                var CurItem = this.Content[CurPos];
+
+                var CurContentPos = new CParagraphContentPos();
+                CurItem.Get_ParaContentPos(false, false, CurContentPos);
+
+                var NewItem = CurItem.Split(CurContentPos, 0);
+                for (var Index = 0; Index < Count; Index++)
                 {
-                    this.Content[this.State.ContentPos].Add( Item );
-                    break;
+                    this.Add_ToContent(CurPos + Index + 1, Item.Content[Index], false);
                 }
+                this.Add_ToContent(CurPos + Count + 1, NewItem, false);
+                this.State.ContentPos = CurPos + Count;
+                this.Content[this.State.ContentPos].Cursor_MoveToEndPos();
             }
 
             break;
         }
-
         default :
         {
-            this.Content[this.State.ContentPos].Add( Item );
+            this.Content[this.State.ContentPos].Add(Item);
             break;
         }
     }
 };
 ParaField.prototype.Split = function (ContentPos, Depth)
 {
-    var NewField = ParaField.superclass.Split.apply(this, arguments);
-    return NewField;
+    // Не даем разделять поле
+    return null;
 };
 ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
@@ -161,11 +213,13 @@ ParaField.prototype.Map_MailMerge = function(Value)
         oRun.Add_ToContent(Index, oText);
     }
 
+    oRun.Set_Pr(this.Get_FirstTextPr());
+
     // Подменяем содержимое поля
     this.Content = [];
     this.Content[0] = oRun;
 
-    // В контенте ищем первый ран и копируем его настройки
+    this.Cursor_MoveToStartPos();
 
     if (bHistory)
         History.TurnOn();
@@ -174,6 +228,7 @@ ParaField.prototype.Restore_Template = function()
 {
     // Восстанавливаем содержимое поля.
     this.Content = this.TemplateContent;
+    this.Cursor_MoveToStartPos();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -437,6 +492,8 @@ ParaField.prototype.Read_FromBinary2 = function(Reader)
         if (null !== Element)
             this.Content.push(Element);
     }
+
+    this.TemplateContent = this.Content;
 
     if (editor)
         editor.WordControl.m_oLogicDocument.Register_Field(this);

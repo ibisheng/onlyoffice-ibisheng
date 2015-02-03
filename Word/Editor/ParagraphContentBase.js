@@ -307,6 +307,16 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_TextPr = function(_Conte
     else
         return this.Content[_ContentPos.Get(Depth)].Get_TextPr(_ContentPos, Depth + 1);
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_FirstTextPr = function()
+{
+    if (this.Content.length <= 0)
+        return new CTextPr();
+
+    if (para_Run === this.Content[0].Type)
+        return this.Content[0].Get_TextPr();
+    else
+        return this.Content[0].Get_FirstTextPr();
+};
 CParagraphContentWithParagraphLikeContent.prototype.Get_CompiledTextPr = function(Copy)
 {
     var TextPr = null;
@@ -980,6 +990,14 @@ CParagraphContentWithParagraphLikeContent.prototype.Split = function (ContentPos
     Element.Add_ToContent( 0, NewElement, false );
 
     return Element;
+};
+CParagraphContentWithParagraphLikeContent.prototype.Get_Text = function(Text)
+{
+    var ContentLen = this.Content.length;
+    for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+    {
+        this.Content[CurPos].Get_Text( Text );
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
