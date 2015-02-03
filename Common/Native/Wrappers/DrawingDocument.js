@@ -1732,6 +1732,9 @@ CDrawingDocument.prototype =
         var _ret = [];
         _ret.push(0);
 
+        this.SelectRect1 = null;
+        this.SelectRect2 = null;
+
         var _target = this.LogicDocument.Is_SelectionUse();
         if (_target === false)
         {
@@ -1758,6 +1761,9 @@ CDrawingDocument.prototype =
             _ret[0] = 2;
             var _rect1 = _select.Start;
             var _rect2 = _select.End;
+
+            this.SelectRect1 = _rect1;
+            this.SelectRect2 = _rect2;
 
             _ret.push(_select.Start.X);
             _ret.push(_select.Start.Y);
