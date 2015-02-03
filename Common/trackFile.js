@@ -10,12 +10,13 @@
 
 		// tracking type by license type
 		var c_TrackingType = {
-			TT_USER_COUNT: 0,          // by user count
-			TT_ACTIVE_CONNECTION: 1,   // by active connections
-			TT_TIME_USAGE: 2,          // by time of editing
-			TT_DOCUMENT_SESSION: 3,     // by document editing session count
+			TT_USER_COUNT: 0,			// by user count
+			TT_ACTIVE_CONNECTION: 1,	// by active connections
+			TT_TIME_USAGE: 2,			// by time of editing
+			TT_DOCUMENT_SESSION: 3,		// by document editing session count
 			TT_NONE: 4,					// no tracking
-			TT_USER_COUNT_2: 5			// by user count, without active/inactive detection
+			TT_USER_COUNT_2: 5,			// by user count, without active/inactive detection
+			TT_ACTIVE_CONNECTION_AWS: 6	// by active connections (only on aws instance)
 		};
 
 		function CTrackFile(obj) {
@@ -39,6 +40,7 @@
 
 			switch (this.trackingType) {
 				case c_TrackingType.TT_ACTIVE_CONNECTION:
+				case c_TrackingType.TT_ACTIVE_CONNECTION_AWS:
 					this.isPeriodicalyTracking = true;
 					this.isAliveTrackingOnly = false;
 					break;
