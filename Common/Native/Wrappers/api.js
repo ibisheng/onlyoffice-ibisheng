@@ -1706,6 +1706,48 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                         _imagePr.verticalTextAlign = _params[_current.pos++];
                         break;
                     }
+                    case 21:
+                    {
+                        var bIsNeed = _params[_current.pos++];
+
+                        if (bIsNeed)
+                        {
+                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"];
+                            var _w = _originSize[0];
+                            var _h = _originSize[1];
+
+                            var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+                            var _page_width = Page_Width;
+                            var _page_height = Page_Height;
+                            var _page_x_left_margin = X_Left_Margin;
+                            var _page_y_top_margin = Y_Top_Margin;
+                            var _page_x_right_margin = X_Right_Margin;
+                            var _page_y_bottom_margin = Y_Bottom_Margin;
+
+                            if (_section_select)
+                            {
+                                if (_section_select.W)
+                                    _page_width = _section_select.W;
+
+                                if (_section_select.H)
+                                    _page_height = _section_select.H;
+                            }
+
+                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+
+                            var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
+                            var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
+
+                            wI = Math.max(5, Math.min(wI, __w));
+                            hI = Math.max(5, Math.min(hI, __h));
+
+                            _imagePr.Width = wI;
+                            _imagePr.Height = hI;
+                        }
+
+                        break;
+                    }
                     case 255:
                     default:
                     {
@@ -1767,6 +1809,11 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Add_InlineTable(_rows, _cols);
+
+                if (_style != null)
+                {
+                    this.WordControl.m_oLogicDocument.Set_TableProps({TableStyle : _style});
+                }
             }
             break;
         }
@@ -1782,7 +1829,16 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         case 53: // ASC_MENU_EVENT_TYPE_INSERT_SHAPE
         {
             var _shapeProp = asc_menu_ReadShapePr(_params, _current);
-            this.StartAddShape(_shapeProp.type, true);
+
+            var _pageNum = _shapeProp.InsertPageNum;
+            // получаем размеры страницы
+            var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
+            this.WordControl.m_oLogicDocument.addShapeOnPage(_shapeProp.type, _pageNum,
+                    _sectionPr.X + _sectionPr.XLimit / 4,
+                    _sectionPr.Y + _sectionPr.YLimit / 4,
+                    _sectionPr.XLimit / 2,
+                    _sectionPr.YLimit / 2);
+            //this.StartAddShape(_shapeProp.type, true);
             break;
         }
         case 52: // ASC_MENU_EVENT_TYPE_INSERT_HYPERLINK
@@ -1816,7 +1872,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 58: // ASC_MENU_EVENT_TYPE_CAN_ADD_HYPERLINK
         {
-            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(true);
+            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(false);
 
             var _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
@@ -3791,6 +3847,10 @@ function asc_menu_ReadShapePr(_params, _cursor)
             {
                 _settings.bFromChart = _params[_cursor.pos++];
                 break;
+            }
+            case 6:
+            {
+                _settings.InsertPageNum = _params[_cursor.pos++];
             }
             case 255:
             default:
