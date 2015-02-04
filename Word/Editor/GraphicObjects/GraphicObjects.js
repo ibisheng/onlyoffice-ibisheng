@@ -868,9 +868,32 @@ CGraphicObjects.prototype =
 
     addShapeOnPage: function(sPreset, nPageIndex, dX, dY)
     {
-        this.changeCurrentState(new StartAddNewShape(this, sPreset));
-        this.OnMouseDown({}, dX, dY, nPageIndex);
-        this.OnMouseUp({}, dX, dY, nPageIndex);
+
+        if ( docpostype_HdrFtr !== this.document.CurPos.Type || null !== this.document.HdrFtr.CurHdrFtr )
+        {
+            if (docpostype_HdrFtr !== this.document.CurPos.Type)
+            {
+                this.document.CurPos.Type     = docpostype_DrawingObjects;
+                this.document.Selection.Use   = true;
+                this.document.Selection.Start = true;
+            }
+            else
+            {
+                this.document.Selection.Use   = true;
+                this.document.Selection.Start = true;
+
+                var CurHdrFtr = this.document.HdrFtr.CurHdrFtr;
+                var DocContent = CurHdrFtr.Content;
+
+                DocContent.CurPos.Type     = docpostype_DrawingObjects;
+                DocContent.Selection.Use   = true;
+                DocContent.Selection.Start = true;
+            }
+
+            this.changeCurrentState(new StartAddNewShape(this, sPreset));
+            this.OnMouseDown({}, dX, dY, nPageIndex);
+            this.OnMouseUp({}, dX, dY, nPageIndex);
+        }
     },
 
 
