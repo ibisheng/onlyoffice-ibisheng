@@ -866,6 +866,13 @@ CGraphicObjects.prototype =
     },
 
 
+    addShapeOnPage: function(sPreset, nPageIndex, dX, dY)
+    {
+        this.changeCurrentState(new StartAddNewShape(this, sPreset));
+        this.OnMouseDown({}, dX, dY, nPageIndex);
+        this.OnMouseUp({}, dX, dY, nPageIndex);
+    },
+
 
     drawOnOverlay: function(overlay)
     {
