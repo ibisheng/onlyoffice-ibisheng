@@ -1712,7 +1712,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 
                         if (bIsNeed)
                         {
-                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"];
+                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"]();
                             var _w = _originSize[0];
                             var _h = _originSize[1];
 
