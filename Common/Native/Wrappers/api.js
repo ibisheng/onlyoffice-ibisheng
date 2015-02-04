@@ -1833,7 +1833,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             var _pageNum = _shapeProp.InsertPageNum;
             // получаем размеры страницы
             var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
-            this.WordControl.m_oLogicDocument.addShapeOnPage(_shapeProp.type, _pageNum,
+            this.WordControl.m_oLogicDocument.DrawingObjects.addShapeOnPage(_shapeProp.type, _pageNum,
                     _sectionPr.X + _sectionPr.XLimit / 4,
                     _sectionPr.Y + _sectionPr.YLimit / 4,
                     _sectionPr.XLimit / 2,
@@ -1872,7 +1872,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 58: // ASC_MENU_EVENT_TYPE_CAN_ADD_HYPERLINK
         {
-            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(false);
+            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(true);
 
             var _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
