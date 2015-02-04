@@ -866,9 +866,8 @@ CGraphicObjects.prototype =
     },
 
 
-    addShapeOnPage: function(sPreset, nPageIndex, dX, dY)
+    addShapeOnPage: function(sPreset, nPageIndex, dX, dY, dExtX, dExtY)
     {
-
         if ( docpostype_HdrFtr !== this.document.CurPos.Type || null !== this.document.HdrFtr.CurHdrFtr )
         {
             if (docpostype_HdrFtr !== this.document.CurPos.Type)
@@ -892,6 +891,10 @@ CGraphicObjects.prototype =
 
             this.changeCurrentState(new StartAddNewShape(this, sPreset));
             this.OnMouseDown({}, dX, dY, nPageIndex);
+            if(isRealNumber(dExtX) && isRealNumber(dExtY))
+            {
+                this.OnMouseMove({IsLocked: true}, dX + dExtX, dY + dExtY, nPageIndex)
+            }
             this.OnMouseUp({}, dX, dY, nPageIndex);
         }
     },
