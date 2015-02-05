@@ -4052,7 +4052,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var LineAscent = PRS.LineAscent, LineDescent = PRS.LineDescent,
         LastPos = ContentLen;
 
-    if(this.bRoot && bInline && CurLine == 0 && CurRange == 0)
+    if(this.bRoot && bInline && RangeStartPos == 0)
     {
         PRS.Update_CurPos(0, Depth);
         this.Content[0].Update_LineBreakPos(PRS, false); // обновим : начало нового слова - конец предыдущего Run
