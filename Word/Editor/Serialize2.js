@@ -1893,6 +1893,7 @@ function Binary_oMathWriter(memory, oMathPara)
 					break;
 				}		
 			case para_Math_Text:
+			case para_Math_BreakOperator:
 				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(convertUnicodeToUTF16([item.value]));}); //m:t
 				break;
 			case para_Math_Run:
@@ -1934,10 +1935,11 @@ function Binary_oMathWriter(memory, oMathPara)
 			var Item = oMRun.Content[CurPos];
 			switch ( Item.Type )
             {	
-				case para_Math_Ampersand :	oText += "&"; break;
-				case para_Math_Text :		oText += convertUnicodeToUTF16([Item.value]); break;
+				case para_Math_Ampersand :		oText += "&"; break;
+				case para_Math_BreakOperator:
+				case para_Math_Text :			oText += convertUnicodeToUTF16([Item.value]); break;
             	case para_Space:
-            	case para_Tab : 			oText += " "; break;
+            	case para_Tab : 				oText += " "; break;
             }
 		}
 		

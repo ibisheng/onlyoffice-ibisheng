@@ -8502,6 +8502,10 @@ ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
         {
             AutoCorrectEngine.Add_Text(String.fromCharCode(Item.value), this, nPos, RunPos);
         }
+		else if (para_Math_Ampersand === Item.Type)
+		{
+			 AutoCorrectEngine.Add_Text('&', this, nPos, RunPos);
+		}
 
         if (Item === ActionElement)
         {
