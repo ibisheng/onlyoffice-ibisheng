@@ -10905,7 +10905,7 @@ CTable.prototype =
         this.Pr = TablePr;
     },
 
-    Set_TableStyle : function(StyleId)
+    Set_TableStyle : function(StyleId, bNoClearFormatting)
     {
         // Здесь мы не проверяем изменился ли стиль, потому что при выставлении стиля нужно сбрасывать
         // прямые настройки, даже если мы выставляем тот же самый стиль.
@@ -10914,8 +10914,10 @@ CTable.prototype =
         this.TableStyle = StyleId;
 
         // Очищаем все прямое форматирование таблицы
-        this.Clear_DirectFormatting(false);
-
+        if(!(bNoClearFormatting === true))
+        {
+            this.Clear_DirectFormatting(false);
+        }
         this.Recalc_CompiledPr();
     },
 

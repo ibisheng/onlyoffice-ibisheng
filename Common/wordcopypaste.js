@@ -3590,7 +3590,7 @@ PasteProcessor.prototype =
                                 {
                                     if(sp_tree[s] instanceof CGraphicFrame)
                                     {
-                                        sp_tree[s].graphicObject.Set_TableStyle(table_style_ids[t]);
+                                        sp_tree[s].graphicObject.Set_TableStyle(table_style_ids[t], true);
                                         ++t;
                                     }
                                 }
@@ -4983,7 +4983,7 @@ PasteProcessor.prototype =
 			if(style_index != null && arr_shapes[i].Drawing.graphicObject && arr_shapes[i].Drawing.graphicObject.Set_TableStyle)
 			{
 				if(!g_bIsDocumentCopyPaste)
-					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index);
+					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
 				else if(cStyle)
 				{
 					//пока не применяем стили, посольку они отличаются
