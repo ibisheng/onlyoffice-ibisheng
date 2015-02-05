@@ -1712,9 +1712,12 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 
                         if (bIsNeed)
                         {
-                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"]();
+                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](_imagePr.ImageUrl);
                             var _w = _originSize[0];
                             var _h = _originSize[1];
+
+                            // сбрасываем урл
+                            _imagePr.ImageUrl = undefined;
 
                             var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
                             var _page_width = Page_Width;
