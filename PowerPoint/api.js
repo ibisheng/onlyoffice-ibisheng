@@ -2221,7 +2221,44 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
             {
                 this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bg.bgPr.Fill.fill.RasterImageId);
             }
-            this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
+
+            if(!this.noCreatePoint || this.exucuteHistory)
+            {
+                if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
+                {
+                    this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind, true);
+                    this.exucuteHistoryEnd = false;
+                }
+                else
+                {
+                    this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
+                }
+                if(this.exucuteHistory)
+                {
+                    this.exucuteHistory = false;
+                }
+            }
+            else
+            {
+                if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
+                {
+                    ExecuteNoHistory(function(){
+
+                        this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind, true);
+                        for(var i = 0; i <arr_ind.length; ++i)
+                        {
+                            this.WordControl.m_oLogicDocument.Slides[arr_ind[i]].recalculateBackground()
+                        }
+                        for(i = 0; i <arr_ind.length; ++i)
+                        {
+                            this.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(arr_ind[i], this.WordControl.m_oLogicDocument.Slides[arr_ind[i]]);
+                        }
+                        this.WordControl.m_oLogicDocument.DrawingDocument.OnEndRecalculate(true, false);
+                    }, this, []);
+                }
+            }
+
+
         }
     }
 

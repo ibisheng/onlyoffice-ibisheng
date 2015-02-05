@@ -189,9 +189,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Copy = function(Selected)
         var Item = this.Content[CurPos];
 
         if ( StartPos === CurPos || EndPos === CurPos )
-            NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(Selected) );
+            NewElement.Add_ToContent( CurPos - StartPos, Item.Copy(Selected) );
         else
-            NewHyperlink.Add_ToContent( CurPos - StartPos, Item.Copy(false) );
+            NewElement.Add_ToContent( CurPos - StartPos, Item.Copy(false) );
     }
 
     return NewElement;

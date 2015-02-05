@@ -912,7 +912,7 @@ CGraphicObjects.prototype =
         if(this.curState.InlinePos)
         {
             this.drawingDocument.AutoShapesTrack.SetCurrentPage(this.curState.InlinePos.Page);
-            this.drawingDocument.AutoShapesTrack.DrawInlineMoveCursor(this.curState.InlinePos.X, this.curState.InlinePos.Y, this.curState.InlinePos.Height, this.curState.InlinePos.transform)
+            this.drawingDocument.AutoShapesTrack.DrawInlineMoveCursor(this.curState.InlinePos.X, this.curState.InlinePos.Y, this.curState.InlinePos.Height, this.curState.InlinePos.transform);
         }
         //TODO Anchor Position
         return;

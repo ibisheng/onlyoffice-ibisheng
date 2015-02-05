@@ -346,7 +346,7 @@ CTextBody.prototype =
                     }
                     else
                     {
-                        this.bodyPr = null;
+                        this.lstStyle = null;
                     }
 
                     break;

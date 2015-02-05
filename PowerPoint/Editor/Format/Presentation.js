@@ -2826,11 +2826,14 @@ CPresentation.prototype =
         editor.asc_fireCallback("asc_onCanUnGroup", this.canUnGroup());
     },
 
-    changeBackground: function(bg, arr_ind)
+    changeBackground: function(bg, arr_ind, bNoCreatePoint)
     {
-        if(this.Document_Is_SelectionLocked(changestype_SlideBg) === false)
+        if(bNoCreatePoint === true || this.Document_Is_SelectionLocked(changestype_SlideBg) === false)
         {
-            History.Create_NewPoint();
+            if(!(bNoCreatePoint === true ))
+            {
+                History.Create_NewPoint();
+            }
             for(var i = 0; i <arr_ind.length; ++i)
             {
                 this.Slides[arr_ind[i]].changeBackground(bg);
@@ -2843,7 +2846,10 @@ CPresentation.prototype =
             }
 
             this.DrawingDocument.OnEndRecalculate(true, false);
-            this.Document_UpdateInterfaceState();
+            if(!(bNoCreatePoint === true ))
+            {
+                this.Document_UpdateInterfaceState();
+            }
         }
     },
 
@@ -4328,8 +4334,12 @@ CPresentation.prototype =
             {
                 var pos = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong());
                 var Id = Reader.GetString2();
-                this.Slides.splice(pos, 0, g_oTableId.Get_ById(Id));
-                CollaborativeEditing.Add_ChangedClass(this);
+                var oSlide = g_oTableId.Get_ById(Id);
+                if(oSlide)
+                {
+                    this.Slides.splice(pos, 0, oSlide);
+                    CollaborativeEditing.Add_ChangedClass(this);
+                }
                 break;
             }
             case historyitem_Presentation_RemoveSlide:
