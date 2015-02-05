@@ -18,6 +18,7 @@ var MATH_BAR                    = 14;
 var MATH_PHANTOM                = 15;
 
 var MATH_RUN                    = 16;
+var MATH_PRIMARY_LIMIT          = 17;
 
 var BAR_FRACTION            	=  0;
 var SKEWED_FRACTION         	=  1;

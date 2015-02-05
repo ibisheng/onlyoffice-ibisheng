@@ -41,6 +41,7 @@ function CLimitPrimary(bInside, Type, FName, Iterator)
     this.init(FName, Iterator);
 }
 Asc.extendClass(CLimitPrimary, CMathBase);
+CLimitPrimary.prototype.kind      = MATH_PRIMARY_LIMIT;
 CLimitPrimary.prototype.init = function(FName, Iterator)
 {
     this.setDimension(2, 1);
@@ -85,14 +86,18 @@ CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gap
 };
 CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
 {
+    this.FName.Resize(oMeasure, RPI);
+
+    this.Iterator.Resize(oMeasure, RPI);
+
+    this.recalculateSize(oMeasure);
+};
+CLimitPrimary.prototype.recalculateSize = function(oMeasure)
+{
     if(this.Type == LIMIT_LOW)
         this.dH = 0;
     else
         this.dH = 0.06*this.Get_TxtPrControlLetter().FontSize;
-
-    this.FName.Resize(oMeasure, RPI);
-
-    this.Iterator.Resize(oMeasure, RPI);
 
     var SizeFName = this.FName.size,
         SizeIter  = this.Iterator.size;

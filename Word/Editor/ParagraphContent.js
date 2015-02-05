@@ -52,6 +52,9 @@ var para_Math_Composition          = 0x0033; // Математический о�
 var para_Math_Text                 = 0x0034; // Текст в формуле
 var para_Math_Ampersand            = 0x0035; // &
 var para_Field                     = 0x0036; // Поле
+var para_Math_BreakOperator        = 0x0037; // break operator в формуле
+var para_Math_Content              = 0x0038; // math content
+
 
 
 var break_Line = 0x01;

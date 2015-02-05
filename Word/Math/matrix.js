@@ -462,7 +462,7 @@ CMathMatrix.prototype.init = function(props)
 
     this.fillContent();
 }
-CMathMatrix.prototype.setPosition = function(pos, PosInfo)
+CMathMatrix.prototype.setPosition = function(pos, PDSE)
 {
     this.pos.x = pos.x;
 
@@ -479,22 +479,23 @@ CMathMatrix.prototype.setPosition = function(pos, PosInfo)
 
     var h = 0, w = 0;
 
-
     for(var i=0; i < this.nRow; i++)
     {
         w = 0;
         for(var j = 0; j < this.nCol; j++)
         {
+            var Item = this.elements[i][j];
             var al = this.align(i, j);
             NewPos.x = this.pos.x + this.GapLeft + al.x + w;
-            NewPos.y = this.pos.y + al.y + h;
+            NewPos.y = this.pos.y + al.y + h + Item.size.ascent;
 
-            this.elements[i][j].setPosition(NewPos, PosInfo);
+            Item.setPosition(NewPos, PDSE);
             w += Widths[j] + this.gaps.column[j];
         }
         h += Heights[i] + this.gaps.row[i];
     }
 
+    pos.x += this.size.width;
 }
 CMathMatrix.prototype.getMetrics = function(RPI)
 {
@@ -722,14 +723,23 @@ CEqArray.prototype.fillContent = function()
     for (var nIndex = 0; nIndex < nRowsCount; nIndex++)
         this.elements[nIndex][0] = this.Content[nIndex];
 };
+/*CEqArray.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    PRS.bMath_OneLine = true;
+
+    for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
+        this.Content[Pos].Recalculate_Range(PRS, ParaPr, Depth);
+
+    this.recalculateSize(g_oTextMeasurer);
+};*/
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
     // на случай, чтобы не затереть массив
     //var CurrAmperWPoints = RPI.AmperWPoints,
-    //    CurrEqqArray     = RPI.bEqqArray;
+    //    CurrEqArray     = RPI.bEqArray;
 
     var NewRPI = RPI.Copy();
-    NewRPI.bEqqArray = true;
+    NewRPI.bEqArray = true;
 
     for(var i = 0; i < this.nRow; i++)
         this.elements[i][0].Resize(oMeasure, NewRPI);
@@ -772,7 +782,7 @@ CEqArray.prototype.getMetrics = function()
 
         for(var i = 0; i < this.nRow; i++)
         {
-            var WidthsRow = this.elements[i][0].getWidthsPoints(),
+            var WidthsRow = this.elements[i][0].Get_WidthPoints().Widths,
                 len = WidthsRow.length;
 
             if(Pos < len)
@@ -784,7 +794,7 @@ CEqArray.prototype.getMetrics = function()
                         maxDim = WidthsRow[Pos].even < WidthsRow[Pos].odd ? WidthsRow[Pos].odd : WidthsRow[Pos].even;
                         maxDimWidth = WidthsRow[Pos].even + WidthsRow[Pos].odd;
                     }
-                    even = even > WidthsRow[Pos].even  ? even : WidthsRow[Pos].even;     // before "odd"
+                    even = even > WidthsRow[Pos].even  ? even : WidthsRow[Pos].even;  // before "odd"
                     odd  = odd  > WidthsRow[Pos].odd   ? odd  : WidthsRow[Pos].odd;   // after  "odd"
                 }
                 else
@@ -848,11 +858,8 @@ CEqArray.prototype.getMetrics = function()
 
     return {ascents: AscentsMetrics, descents: DescentsMetrics, widths: WidthsMetrics};
 }
-CEqArray.prototype.setPosition = function(pos)
+CEqArray.prototype.setPosition = function(pos, PDSE)
 {
-    //PosInfo.Widths = this.WidthsPoints;
-    //PosInfo.Points = this.Points;
-
     this.pos.x = pos.x;
 
     if(this.bInside === true)
@@ -869,19 +876,16 @@ CEqArray.prototype.setPosition = function(pos)
 
     for(var i=0; i < this.nRow; i++)
     {
+        var Item = this.elements[i][0];
         NewPos.x = this.pos.x + this.GapLeft;
-        NewPos.y = this.pos.y + h;
+        NewPos.y = this.pos.y + h + Item.size.ascent;
 
-        //PosInfo.CurrPoint = 0;
-        this.elements[i][0].setPosition(NewPos);
-
+        Item.setPosition(NewPos, PDSE);
 
         h += Heights[i] + this.gaps.row[i];
     }
 
-    //PosInfo.Widths.length = 0;
-    //PosInfo.Points.length = 0;
-
+    pos.x += this.size.width;
 }
 CEqArray.prototype.getElement = function(num)
 {
@@ -895,5 +899,9 @@ CEqArray.prototype.Document_UpdateInterfaceState = function(MathProps)
 {
     MathProps.Type = c_oAscMathInterfaceType.EqArray;
     MathProps.Pr   = null;
+};
+CEqArray.prototype.IsEqArray = function()
+{
+    return true;
 };
 

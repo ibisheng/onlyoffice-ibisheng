@@ -201,17 +201,22 @@ CBorderBox.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
+CBorderBox.prototype.Draw_Elements = function(PDSE)
 {
-    this.elements[0][0].draw(x, y, pGraphics, PDSE);
+    this.Content[0].Draw_Elements(PDSE);
 
     var penW = this.Get_TxtPrControlLetter().FontSize*0.02;
 
     var Width  = this.size.width - this.GapLeft - this.GapRight,
         Height = this.size.height;
 
-    var X = this.pos.x + x + this.GapLeft,
-        Y = this.pos.y + y;
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    var X = this.pos.x + PosLine.x + this.GapLeft,
+        Y = this.pos.y + PosLine.y;
+
+    /*var X = this.pos.x + PDSE.X + this.GapLeft,
+        Y = this.pos.y + PDSE.Y;*/
 
 
     this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
@@ -222,7 +227,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             x2 = X + Width,
             y1 = Y;
 
-        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+        PDSE.Graphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
     if(!this.Pr.hideBot)
@@ -231,7 +236,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             x2 = X + Width,
             y1 = Y + Height;
 
-        pGraphics.drawHorLine(2, y1, x1, x2, penW);
+        PDSE.Graphics.drawHorLine(2, y1, x1, x2, penW);
     }
 
     if(!this.Pr.hideLeft)
@@ -240,7 +245,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             y1 = Y,
             y2 = Y + Height;
 
-        pGraphics.drawVerLine(0, x1, y1, y2, penW);
+        PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
     if(!this.Pr.hideRight)
@@ -249,7 +254,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             y1 = Y,
             y2 = Y + Height;
 
-        pGraphics.drawVerLine(2, x1, y1, y2, penW);
+        PDSE.Graphics.drawVerLine(2, x1, y1, y2, penW);
     }
 
     if(this.Pr.strikeTLBR)  // left diagonal
@@ -259,12 +264,12 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             var x1 = X, y1 = Y,
                 x2 = X + Width, y2 = Y + Height;
 
-            pGraphics.p_width(180);
+            PDSE.Graphics.p_width(180);
 
-            pGraphics._s();
-            pGraphics._m(x1, y1);
-            pGraphics._l(x2, y2);
-            pGraphics.ds();
+            PDSE.Graphics._s();
+            PDSE.Graphics._m(x1, y1);
+            PDSE.Graphics._l(x2, y2);
+            PDSE.Graphics.ds();
         }
         else
         {
@@ -278,17 +283,17 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
                 x6 = X,                 y6 = Y + pW,
                 x7 = X,                 y7 = Y;
 
-            pGraphics.p_width(1000);
+            PDSE.Graphics.p_width(1000);
 
-            pGraphics._s();
-            pGraphics._m(x1, y1);
-            pGraphics._l(x2, y2);
-            pGraphics._l(x3, y3);
-            pGraphics._l(x4, y4);
-            pGraphics._l(x5, y5);
-            pGraphics._l(x6, y6);
-            pGraphics._l(x7, y7);
-            pGraphics.df();
+            PDSE.Graphics._s();
+            PDSE.Graphics._m(x1, y1);
+            PDSE.Graphics._l(x2, y2);
+            PDSE.Graphics._l(x3, y3);
+            PDSE.Graphics._l(x4, y4);
+            PDSE.Graphics._l(x5, y5);
+            PDSE.Graphics._l(x6, y6);
+            PDSE.Graphics._l(x7, y7);
+            PDSE.Graphics.df();
         }
 
     }
@@ -300,12 +305,12 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             var x1 = X + Width,      y1 = Y,
                 x2 = X,              y2 = Y + Height;
 
-            pGraphics.p_width(180);
+            PDSE.Graphics.p_width(180);
 
-            pGraphics._s();
-            pGraphics._m(x1, y1);
-            pGraphics._l(x2, y2);
-            pGraphics.ds();
+            PDSE.Graphics._s();
+            PDSE.Graphics._m(x1, y1);
+            PDSE.Graphics._l(x2, y2);
+            PDSE.Graphics.ds();
         }
         else
         {
@@ -320,17 +325,17 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
                 x7 = X + Width,         y7 = Y;
 
 
-            pGraphics.p_width(1000);
+            PDSE.Graphics.p_width(1000);
 
-            pGraphics._s();
-            pGraphics._m(x1, y1);
-            pGraphics._l(x2, y2);
-            pGraphics._l(x3, y3);
-            pGraphics._l(x4, y4);
-            pGraphics._l(x5, y5);
-            pGraphics._l(x6, y6);
-            pGraphics._l(x7, y7);
-            pGraphics.df();
+            PDSE.Graphics._s();
+            PDSE.Graphics._m(x1, y1);
+            PDSE.Graphics._l(x2, y2);
+            PDSE.Graphics._l(x3, y3);
+            PDSE.Graphics._l(x4, y4);
+            PDSE.Graphics._l(x5, y5);
+            PDSE.Graphics._l(x6, y6);
+            PDSE.Graphics._l(x7, y7);
+            PDSE.Graphics.df();
         }
 
     }
@@ -341,7 +346,7 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             x2 = X + Width,
             y1 = Y + Height/2 - penW/2;
 
-        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+        PDSE.Graphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
     if(this.Pr.strikeV)
@@ -350,16 +355,18 @@ CBorderBox.prototype.draw = function(x, y, pGraphics, PDSE)
             y1 = Y,
             y2 = Y + Height;
 
-        pGraphics.drawVerLine(0, x1, y1, y2, penW);
+        PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
 }
-CBorderBox.prototype.setPosition = function(pos, PosInfo)
+CBorderBox.prototype.setPosition = function(pos, PDSE)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
     var NewPos = new CMathPosition();
+
+    var Base = this.Content[0];
 
     if(this.Pr.hideLeft == false)
         NewPos.x = this.pos.x + this.GapLeft + this.gapBrd;
@@ -368,11 +375,13 @@ CBorderBox.prototype.setPosition = function(pos, PosInfo)
 
 
     if(this.Pr.hideTop == false)
-        NewPos.y = this.pos.y + this.gapBrd;
+        NewPos.y = this.pos.y + this.gapBrd + Base.size.ascent;
     else
-        NewPos.y = this.pos.y;
+        NewPos.y = this.pos.y + Base.size.ascent;
 
-    this.elements[0][0].setPosition(NewPos, PosInfo);
+    Base.setPosition(NewPos, PDSE); // base
+
+    pos.x += this.size.width;
 }
 
 function CMathBoxPr()

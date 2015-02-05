@@ -467,31 +467,32 @@ CAccent.prototype.IsAccent = function()
 {
     return true;
 };
-CAccent.prototype.setPosition = function(pos, PosInfo)
+CAccent.prototype.setPosition = function(pos, PDSE)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
 
     var width = this.size.width - this.GapLeft - this.GapRight;
+    var oBase = this.Content[0];
 
     var alignOp  =  (width - this.operator.size.width)/2,
-        alignCnt =  (width- this.elements[0][0].size.width)/2;
+        alignCnt =  (width - oBase.size.width)/2;
 
     var PosOper = new CMathPosition();
 
     PosOper.x = this.pos.x + this.GapLeft  + alignOp;
-
     PosOper.y = this.pos.y;
-    //PosOper.y = this.pos.y + this.size.ascent - this.shiftX;
 
     this.operator.setPosition(PosOper);
 
     var PosBase = new CMathPosition();
 
     PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-    PosBase.y = this.pos.y + this.operator.size.height;
+    PosBase.y = this.pos.y + this.operator.size.height + oBase.size.ascent;
 
-    this.elements[0][0].setPosition(PosBase, PosInfo);
+    oBase.setPosition(PosBase, PDSE);
+
+    pos.x += this.size.width;
 };
 CAccent.prototype.ApplyProperties = function(RPI)
 {
@@ -533,6 +534,30 @@ CAccent.prototype.Resize = function(oMeasure, RPI)
 
     this.size = {height: height, width: width, ascent: ascent};
 };
+CAccent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    var bMath_OneLine = PRS.bMath_OneLine;
+    var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
+
+    PRS.bMath_OneLine = true;
+
+    var oBase = this.getBase();
+    oBase.Recalculate_Reset(PRS.Range, PRS.Line ); // обновим StartLine и StartRange
+    oBase.Recalculate_Range(PRS, ParaPr, Depth);
+
+    this.operator.fixSize(g_oTextMeasurer, oBase.size.width);
+
+    this.size.width  = oBase.size.width + this.GapLeft + this.GapRight; // (!)
+    this.size.height = oBase.size.height + this.operator.size.height;
+    this.size.ascent = this.operator.size.height + oBase.size.ascent;
+
+    PRS.bMath_OneLine = bMath_OneLine;
+
+    this.Update_WordLen(PRS, WordLen);
+};
 CAccent.prototype.draw = function(x, y, pGraphics, PDSE)
 {
     var base = this.elements[0][0];
@@ -566,6 +591,30 @@ CAccent.prototype.draw = function(x, y, pGraphics, PDSE)
     }
 
     this.operator.draw(x, y, pGraphics, PDSE);
+};
+CAccent.prototype.Draw_Elements = function(PDSE)
+{
+    var oBase = this.Content[0];
+    oBase.Draw_Elements(PDSE);
+
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    var x = PosLine.x,
+        y = PosLine.y;
+
+    //var x = PDSE.X,
+    //    y = PDSE.Y;
+
+    if(oBase.Is_InclineLetter())
+    {
+        if(this.Pr.chr != 0x305 && this.Pr.chr >= 0x300 && this.Pr.chr <= 0x315 || this.Pr.chr == 0x20DB)
+        {
+            var ascent = this.elements[0][0].size.ascent;
+            x += ascent*0.1;
+        }
+    }
+
+    this.operator.draw(x, y, PDSE.Graphics, PDSE);
 };
 CAccent.prototype.GetLastElement = function()
 {

@@ -69,7 +69,16 @@ CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
     else if(this.Pr.type == LINEAR_FRACTION)
         this.drawLinearFraction(x, y, pGraphics, PDSE);
 }
-CFraction.prototype.drawBarFraction = function(x, y, pGraphics, PDSE)
+CFraction.prototype.Draw_Elements = function(PDSE)
+{
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+        this.drawBarFraction(PDSE);
+    else if(this.Pr.type == SKEWED_FRACTION)
+        this.drawSkewedFraction(PDSE);
+    else if(this.Pr.type == LINEAR_FRACTION)
+        this.drawLinearFraction(PDSE);
+}
+CFraction.prototype.drawBarFraction = function(PDSE)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
@@ -79,21 +88,23 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics, PDSE)
 
     var width = this.size.width - this.GapLeft - this.GapRight;
 
-    var x1 = this.pos.x + x + this.GapLeft,
-        x2 = x1 + width,
-        y1 = this.pos.y + y + numHeight- penW;
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    var x1 = this.pos.x + PosLine.x + this.GapLeft,
+        x2 = this.pos.x + PosLine.x + this.GapLeft + width,
+        y1 = this.pos.y + PosLine.y + numHeight- penW;
 
     if( !this.bHideBar )
     {
-        pGraphics.SetFont(mgCtrPrp);
+        PDSE.Graphics.SetFont(mgCtrPrp);
 
         this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
-        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+        PDSE.Graphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    CFraction.superclass.draw.call(this, x, y, pGraphics, PDSE);
+    CFraction.superclass.Draw_Elements.call(this, PDSE);
 }
-CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics, PDSE)
+CFraction.prototype.drawSkewedFraction = function(PDSE)
 {
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
@@ -110,8 +121,10 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics, PDSE)
     var tg1 = -2.22,
         tg2 = -3.7;
 
-    var X = this.pos.x + x + this.GapLeft,
-        Y = this.pos.y + y;
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    var X = this.pos.x + PosLine.x + this.GapLeft,
+        Y = this.pos.y + PosLine.y;
 
     var heightSlash = this.size.height*2/3;
 
@@ -175,24 +188,26 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics, PDSE)
 
     }
 
-    pGraphics.SetFont(mgCtrPrp);
+    PDSE.Graphics.SetFont(mgCtrPrp);
 
-    pGraphics.p_width(penW*1000);
+    PDSE.Graphics.p_width(penW*1000);
 
     this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
-    pGraphics._s();
-    pGraphics._m(xx1, yy1);
-    pGraphics._l(xx2, yy2);
-    pGraphics.ds();
+    PDSE.Graphics._s();
+    PDSE.Graphics._m(xx1, yy1);
+    PDSE.Graphics._l(xx2, yy2);
+    PDSE.Graphics.ds();
 
-    CFraction.superclass.draw.call(this, x, y, pGraphics, PDSE);
+    CFraction.superclass.Draw_Elements.call(this, PDSE);
 }
-CFraction.prototype.drawLinearFraction = function(x, y, pGraphics, PDSE)
+CFraction.prototype.drawLinearFraction = function(PDSE)
 {
     var shift = 0.1*this.dW;
 
-    var X = this.pos.x + x + this.GapLeft,
-        Y = this.pos.y + y;
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    var X = this.pos.x + PosLine.x + this.GapLeft,
+        Y = this.pos.y + PosLine.y;
 
     var x1 = X + this.elements[0][0].size.width + this.dW - shift,
         y1 = Y,
@@ -202,17 +217,17 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics, PDSE)
     var mgCtrPrp = this.Get_TxtPrControlLetter();
     var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
-    pGraphics.SetFont(mgCtrPrp);
-    pGraphics.p_width(penW*1000);
+    PDSE.Graphics.SetFont(mgCtrPrp);
+    PDSE.Graphics.p_width(penW*1000);
 
     this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
 
-    pGraphics._s();
-    pGraphics._m(x1, y1);
-    pGraphics._l(x2, y2);
-    pGraphics.ds();
+    PDSE.Graphics._s();
+    PDSE.Graphics._m(x1, y1);
+    PDSE.Graphics._l(x2, y2);
+    PDSE.Graphics.ds();
 
-    CFraction.superclass.draw.call(this, x, y, pGraphics, PDSE);
+    CFraction.superclass.Draw_Elements.call(this, PDSE);
 }
 CFraction.prototype.getNumerator = function()
 {
@@ -359,10 +374,13 @@ CFraction.prototype.recalculateLinear = function()
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CFraction.prototype.setPosition = function(pos, PosInfo)
+CFraction.prototype.setPosition = function(pos, PDSE)
 {
     if(this.Pr.type == SKEWED_FRACTION)
     {
+        var Numerator   = this.Content[0],
+            Denominator = this.Content[1];
+
         this.pos.x = pos.x;
         this.pos.y = pos.y - this.size.ascent;
 
@@ -372,19 +390,20 @@ CFraction.prototype.setPosition = function(pos, PosInfo)
         var PosNum = new CMathPosition();
 
         PosNum.x = X;
-        PosNum.y = Y;
-
+        PosNum.y = Y + Numerator.size.ascent;
 
         var PosDen = new CMathPosition();
 
-        PosDen.x = X + this.elements[0][0].size.width + this.dW;
-        PosDen.y = Y + this.elements[0][0].size.height;
+        PosDen.x = X + Numerator.size.width + this.dW;
+        PosDen.y = Y + Numerator.size.height + Denominator.size.ascent;
 
-        this.elements[0][0].setPosition(PosNum, PosInfo);
-        this.elements[0][1].setPosition(PosDen, PosInfo);
+        Numerator.setPosition(PosNum, PDSE);
+        Denominator.setPosition(PosDen, PDSE);
+
+        pos.x += this.size.width;
     }
     else
-        CFraction.superclass.setPosition.call(this, pos, PosInfo);
+        CFraction.superclass.setPosition.call(this, pos, PDSE);
 }
 CFraction.prototype.fillContent = function()
 {
@@ -496,10 +515,6 @@ CNumerator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CNumerator.prototype.setPosition = function(pos, PosInfo)
-{
-    this.elements[0][0].setPosition(pos, PosInfo);
-}
 
 function CDenominator(MathContent)
 {
@@ -519,7 +534,7 @@ CDenominator.prototype.recalculateSize = function()
 
     var gapDen, minGap;
 
-    if(this.Parent.kind == MATH_LIMIT || this.Parent.kind == MATH_GROUP_CHARACTER)
+    if(this.Parent.kind == MATH_PRIMARY_LIMIT || this.Parent.kind == MATH_GROUP_CHARACTER)
     {
         gapDen = Height/2.6;
         minGap = Height/10;
@@ -540,13 +555,10 @@ CDenominator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, ascent: ascent};
 }
-CDenominator.prototype.setPosition = function(pos, PosInfo)
+CDenominator.prototype.setPosition = function(pos, PDSE)
 {
-    var NewPos = new CMathPosition();
+    pos.y += this.gap;
 
-    NewPos.x = pos.x;
-    NewPos.y = pos.y + this.gap;
-
-    this.elements[0][0].setPosition(NewPos, PosInfo);
+    CDenominator.superclass.setPosition.call(this, pos, PDSE);
 }
 //////////

@@ -625,31 +625,35 @@ CNaryUndOvr.prototype.recalculateSize = function()
 
     this.size = {width: width, height: height, ascent: ascent};
 }
-CNaryUndOvr.prototype.setPosition = function(pos, PosInfo)
+CNaryUndOvr.prototype.setPosition = function(pos, PDSE)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y;
 
+    var UpIter  = this.elements[0][0],
+        Sign    = this.elements[1][0],
+        LowIter = this.elements[2][0];
+
     var PosUpIter = new CMathPosition();
 
     PosUpIter.x = pos.x + this.GapLeft + this.align(0,0).x;
-    PosUpIter.y = pos.y;
+    PosUpIter.y = pos.y + UpIter.size.ascent;
 
 
     var PosSign = new CMathPosition();
 
     PosSign.x = pos.x + this.GapLeft + this.align(1,0).x;
-    PosSign.y = pos.y + this.elements[0][0].size.height + this.gapTop;
+    PosSign.y = pos.y + UpIter.size.height + this.gapTop;
 
 
     var PosLowIter = new CMathPosition();
 
     PosLowIter.x = pos.x + this.GapLeft + this.align(2,0).x;
-    PosLowIter.y = PosSign.y + this.elements[1][0].size.height + this.gapBottom;
+    PosLowIter.y = PosSign.y + Sign.size.height + this.gapBottom + LowIter.size.ascent;
 
-    this.elements[0][0].setPosition(PosUpIter, PosInfo);
-    this.elements[1][0].setPosition(PosSign, PosInfo);
-    this.elements[2][0].setPosition(PosLowIter, PosInfo);
+    UpIter.setPosition(PosUpIter, PDSE);
+    Sign.setPosition(PosSign, PDSE);
+    LowIter.setPosition(PosLowIter, PDSE);
 }
 CNaryUndOvr.prototype.setBase = function(base)
 {
@@ -680,16 +684,18 @@ function CNaryOperator(flip)
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
 }
-CNaryOperator.prototype.draw = function(x, y, pGraphics, PDSE)
+CNaryOperator.prototype.Draw_Elements = function(PDSE)
 {
     this.Parent.Make_ShdColor(PDSE, this.Parent.Get_CompiledCtrPrp());
 
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
     if(this.Type == para_Math_Text)
-        this.drawTextElem(x, y, pGraphics);
+        this.drawTextElem(PosLine.x, PosLine.y, PDSE.Graphics);
     else
-        this.drawGlyph(x, y, pGraphics);
+        this.drawGlyph(PosLine.x, PosLine.y, PDSE.Graphics);
 }
-CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
+CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics)
 {
     var coord = this.getCoord();
 
@@ -778,7 +784,7 @@ CNaryOperator.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     this.Parent = Parent;
     this.ParaMath = ParaMath;
 }
-CNaryOperator.prototype.Resize = function(oMeasure, RPI)
+CNaryOperator.prototype.Measure = function(oMeasure, RPI)
 {
     this.recalculateSize(); //обычный пересчет, oMeasure не нужен
 }

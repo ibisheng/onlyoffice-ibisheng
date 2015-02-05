@@ -22,6 +22,7 @@ function CMathBase(bInside)
     this.nCol = 0;
 
     this.bInside = bInside === true ? true: false;
+    this.bMath_OneLine = true;
 
     this.elements = [];
 
@@ -185,7 +186,7 @@ CMathBase.prototype =
     {
         return false;
     },
-    IsEqqArray: function()
+    IsEqArray: function()
     {
         return false;
     },
@@ -279,7 +280,45 @@ CMathBase.prototype =
 
         return PosAlign;
     },
-    setPosition: function(pos, PosInfo)
+    setPosition: function(pos, PDSE)
+    {
+        this.pos.x = pos.x;
+
+        if(this.bInside === true)
+            this.pos.y = pos.y;
+        else
+            this.pos.y = pos.y - this.size.ascent; ///!!!!
+
+        var maxWH = this.getWidthsHeights();
+        var Widths = maxWH.widths;
+        var Heights = maxWH.heights;
+
+        var h = 0, w = 0;
+
+        for(var i=0; i < this.nRow; i++)
+        {
+            w = 0;
+            for(var j = 0; j < this.nCol; j++)
+            {
+                var NewPos = new CMathPosition();
+                var al = this.align(i, j);
+
+                NewPos.x = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
+                NewPos.y = this.pos.y + al.y + this.dH*i + h;
+
+                if(this.elements[i][j].Type == para_Math_Content) // прибавим ascent только для контентов, для вложенных мат объектов не добавляем !
+                    NewPos.y += this.elements[i][j].size.ascent;
+
+                this.elements[i][j].setPosition(NewPos, PDSE);
+                w += Widths[j];
+            }
+            h += Heights[i];
+        }
+
+        pos.x += this.size.width;
+
+    },
+    old_setPosition: function(pos)
     {
         this.pos.x = pos.x;
 
@@ -303,7 +342,7 @@ CMathBase.prototype =
                 var al = this.align(i, j);
                 NewPos.x = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
                 NewPos.y = this.pos.y + al.y + this.dH*i + h;
-                this.elements[i][j].setPosition(NewPos, PosInfo);
+                this.elements[i][j].setPosition(NewPos);
                 w += Widths[j];
             }
             h += Heights[i];
@@ -333,6 +372,37 @@ CMathBase.prototype =
 
                 this.elements[i][j].draw(x, y, pGraphics, PDSE);
             }
+    },
+    Draw_Elements: function(PDSE)
+    {
+        var X = PDSE.X;
+
+        this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp()); // для Just-Draw элементов
+
+        for(var i=0; i < this.nRow; i++)
+        {
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(this.elements[i][j].IsJustDraw()) // для Just-Draw элементов надо выставить Font
+                {
+                    var ctrPrp = this.Get_TxtPrControlLetter();
+
+                    var Font =
+                    {
+                        FontSize:   ctrPrp.FontSize,
+                        FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+                        Italic:     false,
+                        Bold:       false //ctrPrp.Bold
+                    };
+
+                    PDSE.Graphics.SetFont(Font);
+                }
+
+                this.elements[i][j].Draw_Elements(PDSE);
+            }
+        }
+
+        PDSE.X = X + this.size.width;
     },
     remove: function(order)
     {
@@ -1132,7 +1202,7 @@ CMathBase.prototype.Recalculate_CurPos = function(_X, Y, CurrentRun, _CurRange, 
 {
     return this.Content[this.CurPos].Recalculate_CurPos(_X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 };
-CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+CMathBase.prototype.old_Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
     var nCount = this.Content.length;
     if (nCount <= 0)
@@ -1198,6 +1268,96 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
 
     return bResult;
 };
+CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+{
+    var bResult = false;
+
+    var nCount = this.Content.length;
+    if (nCount <= 0)
+        return false;
+
+    if(this.bMath_OneLine)
+    {
+        var aBounds = [];
+        for (var nIndex = 0; nIndex < nCount; nIndex++)
+        {
+            var oBounds = this.Content[nIndex].Get_Bounds();
+            if (oBounds.W > 0.001 && oBounds.H > 0.001)
+                aBounds.push(oBounds);
+            else
+                aBounds.push(null);
+        }
+
+        var X = SearchPos.X;
+        var Y = SearchPos.Y;
+
+        var dDiff = null;
+
+        var nCurIndex = 0;
+        var nFindIndex = 0;
+
+        var PosLine = this.ParaMath.GetLinePosition(_CurLine);
+
+        while (nCurIndex < nCount)
+        {
+            var oBounds = aBounds[nCurIndex];
+
+            if (null !== oBounds)
+            {
+                var _X = PosLine.x + oBounds.X,
+                    _Y = PosLine.y + oBounds.Y;
+
+                if (_X <= X && X <= _X + oBounds.W && _Y <= Y && Y <= _Y + oBounds.H)
+                {
+                    nFindIndex = nCurIndex;
+                    break;
+                }
+                else
+                {
+                    var dCurDiffX = X - (_X + oBounds.W / 2);
+                    var dCurDiffY = Y - (_Y + oBounds.H / 2);
+                    var dCurDiff = dCurDiffX * dCurDiffX + dCurDiffY * dCurDiffY;
+
+                    if (null === dDiff || dDiff > dCurDiff)
+                    {
+                        dDiff = dCurDiff;
+                        nFindIndex = nCurIndex;
+                    }
+                }
+            }
+
+            nCurIndex++;
+        }
+
+        if (null === aBounds[nFindIndex])
+            return false;
+
+        SearchPos.CurX = aBounds[nFindIndex].X;
+        SearchPos.CurY = aBounds[nFindIndex].Y;
+
+        bResult = this.Content[nFindIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd);
+        if(true === bResult)
+        {
+            SearchPos.Pos.Update2(nFindIndex, Depth);
+        }
+    }
+    else
+    {
+        for (var nIndex = 0; nIndex < nCount; nIndex++)
+        {
+            if ( false === SearchPos.InText )
+                SearchPos.InTextPos.Update2( nIndex, Depth );
+
+            if(true == this.Content[nIndex].Get_ParaContentPosByXY(SearchPos, Depth + 1, _CurLine, _CurRange, StepEnd))
+            {
+                SearchPos.Pos.Update2( nIndex, Depth );
+                bResult = true;
+            }
+        }
+    }
+
+    return bResult;
+};
 CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
 {
     var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
@@ -1225,6 +1385,23 @@ CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
         this.CurPos = CurPos;
         this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
+};
+CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
+{
+    var SelectionStartPos = this.Selection.StartPos;
+    var SelectionEndPos   = this.Selection.EndPos;
+
+    var SelectionUse = this.Selection.Use;
+
+    if(SelectionStartPos !== SelectionEndPos)
+    {
+        SelectionDraw.FindStart = false;
+        SelectionDraw.DrawSelection = true;
+        SelectionDraw.W += this.size.width;
+    }
+    else
+        this.Content[SelectionStartPos].Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+
 };
 CMathBase.prototype.Selection_IsEmpty = function()
 {
@@ -1414,7 +1591,7 @@ CMathBase.prototype.raw_AddToContent = function(Pos, Items, bUpdatePosition)
 
     this.fillContent();
     this.private_SetNeedResize();
-}
+};
 CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
 {
     this.Content.splice(Pos, Count);
@@ -1435,7 +1612,96 @@ CMathBase.prototype.GetFirstElement = function()
 {
     return this;
 };
+CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    //var ParaRange = PRS.Range;
+    //var ParaLine  = PRS.Line;
 
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    var bMath_OneLine = PRS.bMath_OneLine;
+    var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
+
+    this.bMath_OneLine = true;
+    PRS.bMath_OneLine = true;
+
+    for(var i=0; i < this.nRow; i++)
+    {
+        for(var j = 0; j < this.nCol; j++)
+        {
+            var Item = this.elements[i][j];
+
+            if(Item.IsJustDraw()) // для Just-Draw элементов надо выставить Font
+            {
+                var ctrPrp = this.Get_TxtPrControlLetter();
+
+                var Font =
+                {
+                    FontSize:   ctrPrp.FontSize,
+                    FontFamily: {Name : ctrPrp.FontFamily.Name, Index : ctrPrp.FontFamily.Index},
+                    Italic:     false,
+                    Bold:       false //ctrPrp.Bold
+                };
+
+                g_oTextMeasurer.SetFont(Font);
+
+                Item.Measure(g_oTextMeasurer);
+            }
+            else
+            {
+                // когда мат объект будет разбиваться на строки
+                // var CurLine  = PRS.Line - this.StartLine;
+                // var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+                //if ( Item.Type == para_Math_Content && ( 0 === CurLine && 0 === CurRange ) ) // CMathContent для первой строки нужно обновить Lines
+
+                if(Item.Type == para_Math_Content)
+                {
+                    Item.Recalculate_Reset( PRS.Range, PRS.Line ); // обновим StartLine и StartRange
+                }
+
+                Item.Recalculate_Range(PRS, ParaPr, Depth);
+            }
+        }
+    }
+
+    this.recalculateSize(g_oTextMeasurer);
+
+    PRS.bMath_OneLine = bMath_OneLine;
+
+    this.Update_WordLen(PRS, WordLen);
+
+};
+CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
+{
+    if(this.bInside == false)
+    {
+        if(true !== PRS.Word)
+        {
+            PRS.WordLen = this.size.width;
+        }
+        else
+        {
+            PRS.WordLen = WordLen + this.size.width;
+        }
+    }
+};
+CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
+{
+    this.Recalculate_Range(PRS, ParaPr, Depth);
+};
+CMathBase.prototype.Recalculate_Reset = function()
+{
+    //TODO
+    // будет реализовано, когда мат объекты будут разбиваться на строки
+
+};
+CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
+{
+    PRSC.Range.W += this.size.width;
+};
+
+CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;

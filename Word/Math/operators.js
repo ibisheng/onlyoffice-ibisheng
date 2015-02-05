@@ -2957,7 +2957,7 @@ COperator.prototype.draw = function(x, y, pGraphics, PDSE)
 
         ////////////////////////////////////////////////
 
-        this.operator.draw(x, y, pGraphics, PDSE);
+        this.operator.Draw(x, y, pGraphics, PDSE);
     }
     else
     {
@@ -3055,7 +3055,7 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
         // Width
         if(this.typeOper == OPERATOR_TEXT) // отдельный случай для текста в качестве оператора
         {
-            this.operator.Resize(oMeasure, this);
+            this.operator.Measure(oMeasure, ctrPrp);
             width  = this.operator.size.width;
         }
         else
@@ -3083,13 +3083,13 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
 
         var letterOperator = new CMathText(true);
         letterOperator.add(this.code);
-        letterOperator.Resize(oMeasure, null);
+        letterOperator.Measure(oMeasure, ctrPrp);
 
         if(this.type === OPER_ACCENT)
         {
             var letterX = new CMathText(true);
             letterX.add(0x78);
-            letterX.Resize(oMeasure, null);
+            letterX.Measure(oMeasure, ctrPrp);
 
             height = letterOperator.size.ascent - letterX.size.ascent;
         }
@@ -3613,9 +3613,127 @@ CDelimiter.prototype.Resize = function(oMeasure, RPI)
         }
     }
 
-    this.size = {width: width, height: height, ascent: ascent};
-
+    this.size.width  = width;
+    this.size.height = height;
+    this.size.ascent = ascent;
 }
+CDelimiter.prototype.recalculateSize = function(oMeasure)
+{
+    // размеры аргумента
+    var heightG = 0, widthG = 0,
+        ascentG = 0, descentG = 0;
+
+    // Аргумент
+
+    for(var j = 0; j < this.nCol; j++)
+    {
+        var content = this.elements[0][j].size;
+        widthG += content.width;
+        ascentG = content.ascent > ascentG ? content.ascent : ascentG;
+        descentG = content.height - content.ascent > descentG ? content.height - content.ascent: descentG;
+    }
+
+    heightG = ascentG + descentG;
+
+    var mgCtrPrp = this.Get_TxtPrControlLetter();
+    var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
+    var maxAD = ascentG - shCenter  > descentG + shCenter ? ascentG - shCenter: descentG + shCenter;
+
+    var plH = this.ParaMath.GetPlh(oMeasure, mgCtrPrp);
+    //var plH = 10.8 * mgCtrPrp.FontSize/36;
+    //var bTextContent = ascentG < plH || descentG < plH ; // для текста операторы в случае центрирования не увеличиваем
+    var bTextContent = ascentG < 1.01*plH && (heightG - ascentG) < 0.4*plH; // для текста операторы в случае центрирования не увеличиваем
+
+    var bCentered = this.Pr.shp == DELIMITER_SHAPE_CENTERED,
+        b2Max = bCentered && (2*maxAD - heightG > 0.001);
+
+    this.TextInContent = bTextContent;
+
+    var heightStretch = b2Max && !bTextContent ? 2*maxAD : ascentG + descentG;
+
+    this.begOper.fixSize(oMeasure, heightStretch);
+    this.endOper.fixSize(oMeasure, heightStretch);
+    this.sepOper.fixSize(oMeasure, heightStretch);
+
+    // Общая ширина
+    var width = widthG + this.begOper.size.width + this.endOper.size.width + (this.nCol - 1)*this.sepOper.size.width;
+    width += this.GapLeft + this.GapRight;
+
+    var maxDimOper;
+    if(this.begOper.size.height > this.endOper.size.height && this.begOper.size.height > this.sepOper.size.height)
+        maxDimOper = this.begOper.size;
+    else if(this.endOper.size.height > this.sepOper.size.height)
+        maxDimOper = this.endOper.size;
+    else
+        maxDimOper = this.sepOper.size;
+
+    // Общие высота и ascent
+    var height, ascent, descent;
+
+    if(this.Pr.shp == DELIMITER_SHAPE_CENTERED)
+    {
+        var deltaHeight = heightG - maxDimOper.height;
+        if(deltaHeight < 0)
+            deltaHeight = -deltaHeight;
+
+        var deltaMaxAD = maxAD - maxDimOper.height/ 2;
+        if(deltaMaxAD < 0)
+            deltaMaxAD = -deltaMaxAD;
+
+        var deltaMinAD = (heightG - maxAD)  - maxDimOper.height/2;
+
+        var bLHeight = deltaHeight < 0.001,
+            bLMaxAD = deltaMaxAD > 0.001,
+            bLMinAD = deltaMinAD > 0.001,
+            bLText = deltaMinAD < - 0.001;
+
+        var bEqualOper  = bLHeight,
+            bMiddleOper = bLMaxAD && !bLMinAD,
+            bLittleOper = bLMinAD,
+            bText = bLText;
+
+        if(bEqualOper)
+        {
+            height = 2*maxAD;
+            ascent = maxAD + shCenter;
+        }
+        else if(bText)
+        {
+            //ascent = maxDimOper.ascent;
+            ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
+            height = maxDimOper.height;
+        }
+        else if(bMiddleOper)
+        {
+            height = maxDimOper.height/2 + maxAD;
+            ascent = ascentG > maxDimOper.ascent? ascentG : maxDimOper.ascent;
+        }
+        else
+        {
+            ascent = ascentG;
+            height = ascentG + descentG;
+        }
+
+    }
+    else
+    {
+        g_oTextMeasurer.SetFont(mgCtrPrp);
+        var Height = g_oTextMeasurer.GetHeight();
+
+        if(heightG < Height)
+        {
+            ascent = ascentG > maxDimOper.ascent ? ascentG : maxDimOper.ascent;
+            height = maxDimOper.height;
+        }
+        else
+        {
+            ascent = ascentG;
+            height = ascentG + descentG;
+        }
+    }
+
+    this.size = {width: width, height: height, ascent: ascent};
+};
 CDelimiter.prototype.alignOperator = function(operator) // в качестве аргумента передаем высоту оператора
 {
     var align = 0;
@@ -3649,7 +3767,7 @@ CDelimiter.prototype.alignOperator = function(operator) // в качестве �
 
     return align;
 }
-CDelimiter.prototype.setPosition = function(position, PosInfo)
+CDelimiter.prototype.setPosition = function(position, PDSE)
 {
     this.pos.x = position.x;
     this.pos.y = position.y - this.size.ascent;
@@ -3669,10 +3787,10 @@ CDelimiter.prototype.setPosition = function(position, PosInfo)
 
     var PosContent = new CMathPosition();
     PosContent.x = x;
-    PosContent.y = y + this.align_2(content);
+    PosContent.y = y + this.align_2(content) + content.size.ascent;
     x += content.size.width;
 
-    content.setPosition(PosContent, PosInfo); // CMathContent
+    content.setPosition(PosContent, PDSE); // CMathContent
 
     var Positions = [];
 
@@ -3689,9 +3807,9 @@ CDelimiter.prototype.setPosition = function(position, PosInfo)
 
         var NewPosContent = new CMathPosition();
         NewPosContent.x = x;
-        NewPosContent.y = y + this.align_2(content);
+        NewPosContent.y = y + this.align_2(content) + content.size.ascent;
 
-        content.setPosition(NewPosContent, PosInfo);
+        content.setPosition(NewPosContent, PDSE);
         x += content.size.width;
     }
 
@@ -3703,30 +3821,18 @@ CDelimiter.prototype.setPosition = function(position, PosInfo)
 
     this.endOper.setPosition(PosEndOper);
 
-    /*this.pos.x = position.x;
-    this.pos.y = position.y - this.size.ascent;
-
-    var x = this.pos.x + this.GapLeft,
-        y = this.pos.y;
-
-    var content = this.elements[0][0];
-
-    var PosContent = new CMathPosition();
-    PosContent.x = x;
-    PosContent.y = y + this.align(content);
-    x += content.size.width;
-
-    content.setPosition(PosContent); // CMathContent*/
-
+    position.x += this.size.width;
 }
-CDelimiter.prototype.draw = function(x, y, pGraphics, PDSE)
+CDelimiter.prototype.Draw_Elements = function(PDSE)
 {
-    this.begOper.draw(x, y, pGraphics, PDSE);
-    this.sepOper.draw(x, y, pGraphics, PDSE);
-    this.endOper.draw(x, y, pGraphics, PDSE);
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+
+    this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
+    this.sepOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
+    this.endOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
 
     for(var j = 0; j < this.nCol; j++)
-        this.elements[0][j].draw(x, y,pGraphics, PDSE);
+        this.elements[0][j].Draw_Elements(PDSE);
 }
 CDelimiter.prototype.align_2 = function(element)
 {
@@ -3801,22 +3907,21 @@ CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
 }
-CCharacter.prototype.Resize = function(oMeasure, RPI)
+CCharacter.prototype.recalculateSize = function(oMeasure)
 {
-    var base = this.elements[0][0];
-    base.Resize(oMeasure, RPI);
+    var Base = this.Content[0];
 
-    this.operator.fixSize(oMeasure, base.size.width);
+    this.operator.fixSize(oMeasure, Base.size.width);
 
-    var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
-        height = base.size.height + this.operator.size.height,
+    var width  = Base.size.width > this.operator.size.width ? Base.size.width : this.operator.size.width,
+        height = Base.size.height + this.operator.size.height,
         ascent = this.getAscent(oMeasure);
 
     width += this.GapLeft + this.GapRight;
 
     this.size = {height: height, width: width, ascent: ascent};
 }
-CCharacter.prototype.setPosition = function(pos, PosInfo)
+CCharacter.prototype.setPosition = function(pos, PDSE)
 {
     this.pos.x = pos.x;
     this.pos.y = pos.y - this.size.ascent;
@@ -3829,6 +3934,8 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
     var PosOper = new CMathPosition(),
         PosBase = new CMathPosition();
 
+    var Base = this.Content[0];
+
     if(this.Pr.pos === LOCATION_TOP)
     {
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
@@ -3837,26 +3944,28 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
         this.operator.setPosition(PosOper);
 
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-        PosBase.y = this.pos.y + this.operator.size.height;
+        PosBase.y = this.pos.y + this.operator.size.height + Base.size.ascent;
 
-        this.elements[0][0].setPosition(PosBase, PosInfo);
+        Base.setPosition(PosBase, PDSE);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-        PosBase.y = this.pos.y;
+        PosBase.y = this.pos.y + Base.size.ascent;
 
-        this.elements[0][0].setPosition(PosBase, PosInfo);
+        Base.setPosition(PosBase, PDSE);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
-        PosOper.y = this.pos.y + this.elements[0][0].size.height;
+        PosOper.y = this.pos.y + Base.size.height;
 
         this.operator.setPosition(PosOper);
     }
+
+    pos.x += this.size.width;
 }
-CCharacter.prototype.draw = function(x, y, pGraphics, PDSE)
+CCharacter.prototype.Draw_Elements = function(PDSE)
 {
-    this.elements[0][0].draw(x, y, pGraphics, PDSE);
+    this.Content[0].Draw_Elements(PDSE);
 
     var ctrPrp =  this.Get_TxtPrControlLetter();
 
@@ -3869,11 +3978,11 @@ CCharacter.prototype.draw = function(x, y, pGraphics, PDSE)
     };
 
 
-    pGraphics.SetFont(Font);
+    PDSE.Graphics.SetFont(Font);
 
-    //this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
+    var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
 
-    this.operator.draw(x, y, pGraphics, PDSE);
+    this.operator.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
 
 }
 CCharacter.prototype.getBase = function()

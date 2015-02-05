@@ -10,6 +10,8 @@
 //api 2212: asc_docs_api.prototype.sync_TextPrFontFamilyCallBack
 // возвращает название шрифта
 
+// Таблица соответствия кодов ASCII (десятичные, соответствующие восьмеричные, шестнадцатиричные, двоичные, ASCII коды )
+// http://www.dpva.info/Guide/GuideMathematics/GuideMathematicsNumericalSystems/TableCodeEquivalent/
 
 var DIV_CENT = 0.1386;
 
@@ -24,7 +26,7 @@ function CMathSize()
 CMathSize.prototype.SetZero = function()
 {
     this.width  = 0;
-    this.height = 0;
+    this.descent = 0;
     this.ascent = 0;
 }
 
@@ -47,8 +49,12 @@ function CMathText(bJDraw)
         bSpecialOperator: false
     };
 
+    this.ParaMath =  null;
+    this.Flags  = 0;
     this.Parent = null;
     this.size = new CMathSize();
+    this.Width = 0; // для Recalculate_Range
+
     this.pos = new CMathPosition();
 
     this.rasterOffsetX = 0;
@@ -76,6 +82,9 @@ CMathText.prototype =
     add: function(code)
     {
         this.value = code;
+
+        if( this.Is_BreakOperator(code) )
+            this.Type = para_Math_BreakOperator;
     },
 	addTxt: function(txt)
 	{
@@ -544,7 +553,7 @@ CMathText.prototype =
         this.Type = para_Math_Placeholder;
         this.value = StartTextElement;
     },
-    Resize: function(oMeasure, RPI, InfoTextPr)
+    Measure: function(oMeasure, TextPr, InfoMathText)
     {
         /*
          var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
@@ -566,12 +575,12 @@ CMathText.prototype =
         {
             var ascent, width, height, descent;
 
-            this.FontSlot = InfoTextPr.GetFontSlot(this.value); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
+            this.FontSlot = InfoMathText.GetFontSlot(this.value); // возвращает fontslot_ASCII || fontslot_EastAsia || fontslot_CS || fontslot_HAnsi
 
             var letter = this.getCode();
 
             // в не математическом тексте i и j не подменяются на i и j без точек
-            var bAccentIJ = !InfoTextPr.bNormalText && this.Parent.IsAccent() && (this.value == 0x69 || this.value == 0x6A);
+            var bAccentIJ = !InfoMathText.bNormalText && this.Parent.IsAccent() && (this.value == 0x69 || this.value == 0x6A);
 
             this.RecalcInfo.StyleCode = letter;
             this.RecalcInfo.bAccentIJ = bAccentIJ;
@@ -579,21 +588,14 @@ CMathText.prototype =
             if(bAccentIJ || this.RecalcInfo.bApostrophe)
                 oMeasure.SetStringGid(true);
 
-            if( InfoTextPr.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder()) )
+            if( InfoMathText.NeedUpdateFont(this.value, this.FontSlot, this.IsPlaceholder()) )
             {
-                g_oTextMeasurer.SetFont(InfoTextPr.Font);
+                g_oTextMeasurer.SetFont(InfoMathText.Font);
                 //g_oTextMeasurer.SetTextPr(InfoTextPr.CurrentTextPr, InfoTextPr.Theme);
             }
-            else if(InfoTextPr.CurrType == MathTextInfo_NormalText)
+            else if(InfoMathText.CurrType == MathTextInfo_NormalText)
             {
-                /*this.FontKoef = InfoTextPr.FontKoef;
-                if (1 !== this.FontKoef )
-                {
-                    var FontSize = this.FontSlot == fontslot_CS ? InfoTextPr.TextPr.FontSizeCS : InfoTextPr.TextPr.FontSize;
-                    this.FontKoef = (((FontSize * this.FontKoef * 2 + 0.5) | 0) / 2) / FontSize;
-                }*/
-
-                var FontKoef = InfoTextPr.GetFontKoef(this.FontSlot);
+                var FontKoef = InfoMathText.GetFontKoef(this.FontSlot);
 
                 g_oTextMeasurer.SetFontSlot(this.FontSlot, FontKoef);
             }
@@ -634,9 +636,12 @@ CMathText.prototype =
         this.size.height = height;
         this.size.ascent = ascent;
 
+        this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
+
     },
     PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
     {
+        this.ParaMath = ParaMath;
         if(!this.bJDraw)
             this.Parent = Parent;
         else
@@ -646,11 +651,15 @@ CMathText.prototype =
     {
         return this.size.width;
     },
-    draw: function(x, y, pGraphics, InfoTextPr)
+    Draw_Elements: function(PDSE)
     {
-        var X = this.pos.x + x,
+        var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
+        this.Draw(PosLine.x, PosLine.y, PDSE.Graphics);
+    },
+    Draw: function(x, y, pGraphics, InfoTextPr)
+    {
+        var X = this.pos.x + x + this.GapLeft,
             Y = this.pos.y + y;
-
 
         /*var tx = 0;
          var ty = 0;
@@ -708,7 +717,7 @@ CMathText.prototype =
         {
             if (!this.bJDraw)                      // for text
             {
-                this.pos.x = pos.x + this.GapLeft;
+                this.pos.x = pos.x;
                 this.pos.y = pos.y;
             }
             else                                    // for symbol only drawing
@@ -723,19 +732,33 @@ CMathText.prototype =
         }
 
     },
-    getInfoLetter: function(Info)
+    GetLocationOfLetter: function()
+    {
+        var pos = new CMathPosition();
+
+        pos.x = this.pos.x;
+        pos.y = this.pos.y;
+
+        return pos;
+    },
+    Is_InclineLetter: function()
     {
         var code = this.value;
 
         var bCapitale = (code > 0x0040 && code < 0x005B),
             bSmall = (code > 0x0060 && code < 0x007b) || code == 0x131 || code == 0x237;
 
-        Info.Latin = bCapitale || bSmall;
-
         var bCapGreek   = (code > 0x0390 && code < 0x03AA),
             bSmallGreek = (code > 0x03B0 && code < 0x03CA);
 
-        Info.Greek = bCapGreek || bSmallGreek;
+        var bAlphabet    = bCapitale || bSmall || bCapGreek || bSmallGreek;
+
+        var MPrp = this.Parent.GetCompiled_ScrStyles();
+
+        var bRomanSerif  = (MPrp.sty == STY_BI || MPrp.sty == STY_ITALIC) && (MPrp.scr == TXT_ROMAN || MPrp.scr == TXT_SANS_SERIF),
+            bScript      = MPrp.scr == TXT_SCRIPT;
+
+        return bAlphabet && (bRomanSerif || bScript);
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {
@@ -799,6 +822,15 @@ CMathText.prototype =
     {
         return true;
     },
+    Is_BreakOperator: function(val)
+    {
+        var bSimpleOper   = val == 0x2D || val == 0x2B || val == 0x3D || val == 0x2A || val == 0x2F || val == 0x5C || val == 0x3C || val == 0x3E || val == 0xB1 || val == 0x2213,
+            bArrows       = (val >= 0x2190 && val <= 0x21B3) || val == 0x21B6 || val == 0x21B7 || (val >= 0x21BA && val <= 0x21E9) || (val >= 0x21F4 && val <= 0x21FF),
+            bOtherSymbols = (val >= 0x2234 && val <= 0x2237) || val == 0x2239 || (val >= 0x223B && val <= 0x228B) || (val >= 0x228F && val <= 0x2292) || (val >= 0x22A2 && val <= 0x22B9),
+            bFishes       = (val >= 0x22C8 && val <= 0x22CD) || val == 0x22D0 ||val == 0x22D1 || (val >= 0x22D5 && val <= 0x22EE) || (val >= 0x22F0 && val <= 0x22FF) || (val >= 0x27F0 && val <= 0x297F ) || ( val >= 0x29CE && val <= 0x29D5);
+
+        return bSimpleOper || bArrows || bOtherSymbols || bFishes;
+    },
     // For ParaRun
     Is_Punctuation: function()
     {
@@ -823,6 +855,10 @@ CMathText.prototype =
         // отдельно Cambria Math 0x27
 
         return bSpecialOperator || bSpecialArrow || bSpecialSymbols || bOtherArrows;
+    },
+    Can_AddNumbering: function()
+    {
+        return false;
     },
     ////
     Copy: function()
@@ -853,7 +889,7 @@ CMathText.prototype =
 
 function CMathAmp()
 {
-    this.bEqqArray = false;
+    this.bEqArray = false;
     this.Type = para_Math_Ampersand;
 
     this.GapLeft = 0;
@@ -866,16 +902,18 @@ function CMathAmp()
 
     this.size = null;
     this.Parent = null;
+
+    this.Width = 0;
 }
 CMathAmp.prototype =
 {
-    Resize: function(oMeasure, RPI, InfoTextPr)
+    Measure: function(oMeasure, TextPr, InfoMathText)
     {
-        this.bEqqArray = RPI.bEqqArray;
+        this.bEqArray = InfoMathText.bEqArray;
 
-        this.AmpText.Resize(oMeasure, RPI, InfoTextPr);
+        this.AmpText.Measure(oMeasure, TextPr, InfoMathText);
 
-        if(this.bEqqArray)
+        if(this.bEqArray)
         {
             this.size =
             {
@@ -883,6 +921,8 @@ CMathAmp.prototype =
                 height: 0,
                 ascent: 0
             };
+
+            this.Width = 0;
         }
         else
         {
@@ -892,6 +932,8 @@ CMathAmp.prototype =
                 height:         this.AmpText.size.height,
                 ascent:         this.AmpText.size.ascent
             };
+
+            this.Width = this.AmpText.Width;
         }
 
     },
@@ -904,14 +946,14 @@ CMathAmp.prototype =
     getCodeChr: function()
     {
         var code = null;
-        if(!this.bEqqArray)
+        if(!this.bEqArray)
             code = this.AmpText.getCodeChr();
 
         return code;
     },
     IsText: function()
     {
-        return !this.bEqqArray;
+        return !this.bEqArray;
     },
     Get_WidthVisible: function()
     {
@@ -922,13 +964,13 @@ CMathAmp.prototype =
         this.pos.x = pos.x;
         this.pos.y = pos.y;
 
-        if(this.bEqqArray==false)
+        if(this.bEqArray==false)
             this.AmpText.setPosition(pos);
     },
-    draw: function(x, y, pGraphics, InfoTextPr)
+    Draw: function(x, y, pGraphics, InfoTextPr)
     {
-        if(this.bEqqArray==false)
-            this.AmpText.draw(x + this.GapLeft, y, pGraphics, InfoTextPr);
+        if(this.bEqArray==false)
+            this.AmpText.Draw(x + this.GapLeft, y, pGraphics, InfoTextPr);
         else if(editor.ShowParaMarks) // показать метки выравнивания, если включена отметка о знаках параграфа
         {
             var X  = x + this.pos.x + this.size.width,
@@ -937,6 +979,15 @@ CMathAmp.prototype =
 
             pGraphics.drawVerLine(0, X, Y, Y2, 0.1);
         }
+    },
+    GetLocationOfLetter: function()
+    {
+        var pos = new CMathPosition();
+
+        pos.x = this.pos.x;
+        pos.y = this.pos.y;
+
+        return pos;
     },
     IsPlaceholder: function()
     {
@@ -952,11 +1003,15 @@ CMathAmp.prototype =
     },
     IsAlignPoint: function()
     {
-        return this.bEqqArray;
+        return this.bEqArray;
     },
     Copy : function()
     {
         return new CMathAmp();
+    },
+    Can_AddNumbering: function()
+    {
+        return false;
     },
 	Write_ToBinary : function(Writer)
     {
@@ -1129,7 +1184,7 @@ var MathTextInfo_MathText        = 1;
 var MathTextInfo_SpecialOperator = 2;
 var MathTextInfo_NormalText      = 3;
 
-function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText)
+function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText, bEqArray)
 {
     this.CurrType         = -1; // в первый раз Font всегда выставляем
     this.TextPr           = TextPr;
@@ -1143,6 +1198,7 @@ function CMathInfoTextPr_2(TextPr, ArgSize, bNormalText)
     };
 
     this.bNormalText      = bNormalText;
+    this.bEqArray        = bEqArray;
 
     this.RFontsCompare = [];
 
@@ -1208,4 +1264,4 @@ CMathInfoTextPr_2.prototype.IsSpecilalOperator = function(val)
     // отдельно Cambria Math 0x27
 
     return bSpecialOperator || bSpecialArrow || bSpecialSymbols || bOtherArrows;
-}
+};

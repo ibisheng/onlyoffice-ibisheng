@@ -105,6 +105,13 @@ CDegreeBase.prototype.Resize = function(oMeasure, RPI)
     else if(this.Pr.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
 };
+CDegreeBase.prototype.recalculateSize = function(oMeasure)
+{
+    if(this.Pr.type === DEGREE_SUPERSCRIPT)
+        this.recalculateSup(oMeasure);
+    else if(this.Pr.type === DEGREE_SUBSCRIPT)
+        this.recalculateSubScript(oMeasure);
+};
 CDegreeBase.prototype.recalculateSup = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -264,7 +271,37 @@ CDegreeBase.prototype.recalculateSubScript = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 };
-CDegreeBase.prototype.setPosition = function(pos, PosInfo)
+CDegreeBase.prototype.setPosition = function(pos, PDSE)
+{
+    this.pos.x = pos.x;
+
+    if(this.bInside === true)
+        this.pos.y = pos.y;
+    else
+        this.pos.y = pos.y - this.size.ascent;
+
+    var oBase = this.elements[0][0],
+        oIter = this.elements[0][1];
+
+    var PosBase = new CMathPosition();
+
+    PosBase.x = this.pos.x + this.GapLeft;
+    PosBase.y = this.pos.y + this.upBase;
+
+    if(oBase.Type == para_Math_Content)
+        PosBase.y += oBase.size.ascent;
+
+    var PosIter = new CMathPosition();
+
+    PosIter.x = this.pos.x + this.GapLeft + oBase.size.width + this.dW;
+    PosIter.y = this.pos.y + this.upIter + oIter.size.ascent;
+
+    oBase.setPosition(PosBase, PDSE);
+    oIter.setPosition(PosIter, PDSE);
+
+    pos.x += this.size.width;
+};
+CDegreeBase.prototype.old_setPosition = function(pos, PosInfo)
 {
     this.pos.x = pos.x;
 
@@ -285,6 +322,7 @@ CDegreeBase.prototype.setPosition = function(pos, PosInfo)
 
     this.elements[0][0].setPosition(PosBase, PosInfo);
     this.elements[0][1].setPosition(PosIter, PosInfo);
+
 };
 CDegreeBase.prototype.getIterator = function()
 {

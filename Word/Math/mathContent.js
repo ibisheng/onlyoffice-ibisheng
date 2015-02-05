@@ -37,7 +37,7 @@ function CRPI()
     this.bInline         = false;
     this.bChangeInline   = false;
     this.bNaryInline     = false; /*для CDegreeSupSub внутри N-арного оператора, этот флаг необходим, чтобы итераторы максимально близко друг к другу расположить*/
-    this.bEqqArray       = false; /*для амперсанда*/
+    this.bEqArray       = false; /*для амперсанда*/
     this.bMathFunc       = false;
     this.bRecalcCtrPrp   = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
     this.PRS             = null;
@@ -51,7 +51,7 @@ CRPI.prototype.Copy = function()
     RPI.bDecreasedComp  = this.bDecreasedComp;
     RPI.bChangeInline   = this.bChangeInline;
     RPI.bNaryInline     = this.bNaryInline;
-    RPI.bEqqArray       = this.bEqqArray;
+    RPI.bEqArray       = this.bEqArray;
     RPI.bMathFunc       = this.bMathFunc;
     RPI.bRecalcCtrPrp    = this.bRecalcCtrPrp;
     RPI.PRS             = this.PRS;
@@ -671,25 +671,30 @@ CMPrp.prototype =
 
 function CMathContent()
 {
+    CMathContent.superclass.constructor.call(this);
+
 	this.Id = g_oIdCounter.Get_NewId();		
 
     this.Content = []; // array of mathElem
 
+    this.Type = para_Math_Content;
     this.CurPos = 0;
     this.WidthToElement = [];
-    this.pos = new CMathPosition();   // относительная позиция
+    this.pos    = new CMathPosition();   // относительная позиция
 
     //  Properties
     this.ParaMath       = null;
     this.ArgSize        = new CMathArgSize();
     this.Compiled_ArgSz = new CMathArgSize();
 
-    // for EqqArray
+    // for EqArray
     this.InfoPoints = new CInfoPoints();
     ///////////////
 
-    this.plhHide    = false;
-    this.bRoot      = false;
+    this.plhHide        = false;
+    this.bRoot          = false;
+    this.bMath_OneLine  = false;
+
     //////////////////
 
     this.Selection =
@@ -702,8 +707,9 @@ function CMathContent()
     this.RecalcInfo =
     {
         TextPr:             true,
-        bEqqArray:          false,
-        bChangeInfoPoints:  false
+        bEqArray:          false,
+        bChangeInfoPoints:  false,
+        Measure:            true
     };
 
     this.NearPosArray = [];
@@ -714,1386 +720,1422 @@ function CMathContent()
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
 }
-CMathContent.prototype =
+
+Asc.extendClass(CMathContent, ParaHyperlink);
+//Asc.extendClass(CMathContent, CParagraphContentWithContentBase);
+
+CMathContent.prototype.init = function()
 {
-    constructor: CMathContent,
-    init: function()
+
+};
+CMathContent.prototype.addElementToContent = function(obj)   //for "read"
+{
+    this.Internal_Content_Add(this.Content.length, obj, false);
+    this.CurPos = this.Content.length-1;
+};
+CMathContent.prototype.fillPlaceholders = function()
+{
+    this.Content.length = 0;
+
+    var oMRun = new ParaRun(null, true);
+    oMRun.fillPlaceholders();
+    this.addElementToContent(oMRun);
+
+};
+//////////////////////////////////////
+/*recalculateSize: function()
+ {
+ var width      =   0 ;
+ var ascent     =   0 ;
+ var descent    =   0 ;
+
+ var oSize;
+
+ this.WidthToElement.length = 0;
+
+ for(var i = 0; i < this.Content.length; i++)
+ {
+ if(this.Content[i].Type == para_Math_Composition)
+ this.Content[i].ApplyGaps();
+ else if(this.Content[i].Type == para_Math_Run)
+ this.Content[i].Math_ApplyGaps();
+
+ this.WidthToElement[i] = width;
+
+ oSize = this.Content[i].size;
+ width += oSize.width;
+
+ ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+ var oDescent = oSize.height - oSize.ascent;
+ descent =  descent < oDescent ? oDescent : descent;
+ }
+
+ this.size = {width: width, height: ascent + descent, ascent: ascent};
+ },*/
+CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
+{
+    if(ArgSize !== null && ArgSize !== undefined)
     {
+        this.Compiled_ArgSz.value = this.ArgSize.value;
+        this.Compiled_ArgSz.Merge(ArgSize);
+    }
 
-    },
-    addElementToContent: function(obj)   //for "read"
+    this.ParaMath = ParaMath;
+    if(Parent !== null)
     {
-        this.Internal_Content_Add(this.Content.length, obj, false);
-        this.CurPos = this.Content.length-1;
-    },
-    fillPlaceholders: function()
+        this.bRoot = false;
+        this.Parent = Parent;
+    }
+
+    if(ArgSize !== null && ArgSize !== undefined)
     {
-        this.Content.length = 0;
+        this.Compiled_ArgSz.value = this.ArgSize.value;
+        this.Compiled_ArgSz.Merge(ArgSize);
+    }
 
-        var oMRun = new ParaRun(null, true);
-        oMRun.fillPlaceholders();
-        this.addElementToContent(oMRun);
+    var lng = this.Content.length;
 
-    },
-    //////////////////////////////////////
-    /*recalculateSize: function()
+    var GapsInfo = new CMathGapsInfo(this.Compiled_ArgSz.value);
+
+    if(!this.bRoot)
+        this.RecalcInfo.bEqArray = this.Parent.IsEqArray();
+
+    for(var pos = 0; pos < lng; pos++)
     {
-        var width      =   0 ;
-        var ascent     =   0 ;
-        var descent    =   0 ;
+        if(this.Content[pos].Type == para_Math_Composition)
+        {
+            this.Content[pos].PreRecalc(this, ParaMath, this.Compiled_ArgSz, RPI, GapsInfo);
+        }
+        else if(this.Content[pos].Type == para_Math_Run)
+            this.Content[pos].Math_PreRecalc(this, ParaMath, this.Compiled_ArgSz, RPI, GapsInfo);
+    }
 
-        var oSize;
+    if(GapsInfo.Current !== null)
+        GapsInfo.Current.GapRight = 0;
 
-        this.WidthToElement.length = 0;
+};
+CMathContent.prototype.Resize = function(oMeasure, RPI)      // пересчитываем всю формулу
+{
+    if ( false === this.RecalcInfo.Measure )
+        return;
 
-        for(var i = 0; i < this.Content.length; i++)
+    this.WidthToElement.length = 0;
+
+    var lng = this.Content.length;
+
+    this.size.SetZero();
+    this.InfoPoints.SetDefault();
+
+    for(var pos = 0; pos < lng; pos++)
+    {
+        if(this.Content[pos].Type == para_Math_Composition)
+        {
+            /*var NewRPI = RPI.Copy();
+            NewRPI.bEqArray    = false;
+
+            this.Content[pos].Resize(oMeasure, NewRPI);*/
+            this.Content[pos].Resize(oMeasure, RPI);
+
+            if(this.RecalcInfo.bEqArray)
+                this.InfoPoints.ContentPoints.UpdatePoint(this.Content[pos].size.width);
+        }
+        else if(this.Content[pos].Type == para_Math_Run)
+        {
+            this.Content[pos].Math_Recalculate(oMeasure, this.InfoPoints.ContentPoints);
+        }
+
+        this.WidthToElement[pos] = this.size.width;
+
+        var oSize = this.Content[pos].size;
+        this.size.width += oSize.width;
+
+        var oDescent = oSize.height - oSize.ascent,
+            SizeDescent = this.size.height - this.size.ascent;
+
+        this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
+
+        this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
+    }
+};
+CMathContent.prototype.IsEqArray = function()
+{
+    return this.RecalcInfo.bEqArray;
+};
+CMathContent.prototype.Get_WidthPoints = function()
+{
+    return this.InfoPoints.ContentPoints;
+};
+CMathContent.prototype.Get_CompiledArgSize = function()
+{
+    return this.Compiled_ArgSz;
+};
+CMathContent.prototype.getGapsInside = function(GapsInfo) // учитываем gaps внутренних объектов
+{
+    var gaps = {left: 0, right: 0};
+    var bFirstComp = false,
+        bLastComp = false;
+
+    var len = this.Content.length;
+
+    if(len > 1)
+    {
+        var bFRunEmpty = this.Content[0].Is_Empty();
+        bFirstComp = bFRunEmpty && this.Content[1].Type == para_Math_Composition; // первый всегда идет Run
+
+        var bLastRunEmpty = this.Content[len - 1].Is_Empty(); // т.к. после мат. объекта стоит пустой Run
+        bLastComp = bLastRunEmpty && this.Content[len - 2].Type == para_Math_Composition;
+    }
+
+    var checkGap;
+
+    if(bFirstComp)
+    {
+        checkGap = GapsInfo.checkGapKind(this.Content[1].kind);
+
+        if(!checkGap.bChildGaps)
+        {
+            gaps.left = GapsInfo.getGapsMComp(this.Content[1], -1);
+            //gaps.left = gapsMComp.left;
+        }
+    }
+
+    if(bLastComp)
+    {
+        checkGap = GapsInfo.checkGapKind(this.Content[len - 1].kind);
+
+        if(!checkGap.bChildGaps)
+        {
+            gaps.right = GapsInfo.getGapsMComp(this.Content[len - 1], 1);
+            //gaps.right = gapsMComp.right;
+        }
+    }
+
+    return gaps;
+};
+CMathContent.prototype.draw = function(x, y, pGraphics, PDSE)
+{
+    var StartPos, EndPos;
+
+    if(this.bRoot)
+    {
+        var CurLine  = PDSE.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
+
+        StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    }
+    else
+    {
+        StartPos = 0;
+        EndPos   = this.Content.length - 1;
+    }
+
+    var bHidePlh = this.plhHide && this.IsPlaceholder();
+
+    if( !bHidePlh )
+    {
+        for(var i = StartPos; i <= EndPos;i++)
         {
             if(this.Content[i].Type == para_Math_Composition)
-                this.Content[i].ApplyGaps();
-            else if(this.Content[i].Type == para_Math_Run)
-                this.Content[i].Math_ApplyGaps();
-
-            this.WidthToElement[i] = width;
-
-            oSize = this.Content[i].size;
-            width += oSize.width;
-
-            ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-            var oDescent = oSize.height - oSize.ascent;
-            descent =  descent < oDescent ? oDescent : descent;
-        }
-
-        this.size = {width: width, height: ascent + descent, ascent: ascent};
-    },*/
-    PreRecalc: function(Parent, ParaMath, ArgSize, RPI)
-    {
-        if(ArgSize !== null && ArgSize !== undefined)
-        {
-            this.Compiled_ArgSz.value = this.ArgSize.value;
-            this.Compiled_ArgSz.Merge(ArgSize);
-        }
-
-        this.ParaMath = ParaMath;
-        if(Parent !== null)
-        {
-            this.bRoot = false;
-            this.Parent = Parent;
-        }
-
-        if(ArgSize !== null && ArgSize !== undefined)
-        {
-            this.Compiled_ArgSz.value = this.ArgSize.value;
-            this.Compiled_ArgSz.Merge(ArgSize);
-        }
-
-        var lng = this.Content.length;
-
-        var GapsInfo = new CMathGapsInfo(this.Compiled_ArgSz.value);
-
-        for(var pos = 0; pos < lng; pos++)
-        {
-            if(this.Content[pos].Type == para_Math_Composition)
             {
-                this.Content[pos].PreRecalc(this, ParaMath, this.Compiled_ArgSz, RPI, GapsInfo);
+                this.Content[i].draw(x, y, pGraphics, PDSE);
             }
-            else if(this.Content[pos].Type == para_Math_Run)
-                this.Content[pos].Math_PreRecalc(this, ParaMath, this.Compiled_ArgSz, RPI, GapsInfo);
-        }
-
-        if(GapsInfo.Current !== null)
-            GapsInfo.Current.GapRight = 0;
-
-    },
-    Resize: function(oMeasure, RPI)      // пересчитываем всю формулу
-    {
-        this.WidthToElement.length = 0;
-        this.RecalcInfo.bEqqArray = RPI.bEqqArray;
-
-        var lng = this.Content.length;
-
-        this.size.SetZero();
-        this.InfoPoints.SetDefault();
-
-        for(var pos = 0; pos < lng; pos++)
-        {
-            if(this.Content[pos].Type == para_Math_Composition)
-            {
-                var NewRPI = RPI.Copy();
-                NewRPI.bEqqArray    = false;
-
-                this.Content[pos].Resize(oMeasure, NewRPI);
-
-                if(RPI.bEqqArray)
-                    this.InfoPoints.ContentPoints.UpdatePoint(this.Content[pos].size.width);
-            }
-            else if(this.Content[pos].Type == para_Math_Run)
-            {
-                //this.Content[pos].Recalculate_Range();
-                this.Content[pos].Math_Recalculate(oMeasure, RPI, this.InfoPoints.ContentPoints);
-            }
-
-            this.WidthToElement[pos] = this.size.width;
-
-            var oSize = this.Content[pos].size;
-            this.size.width += oSize.width;
-
-            var oDescent = oSize.height - oSize.ascent,
-                SizeDescent = this.size.height - this.size.ascent;
-
-            this.size.ascent = this.size.ascent > oSize.ascent ? this.size.ascent : oSize.ascent;
-
-            this.size.height = SizeDescent < oDescent ? oDescent + this.size.ascent : SizeDescent + this.size.ascent;
-        }
-    },
-    // особый случай: вызываем, когда пересчет всей формулы не нужен, а нужно выставить только Lines (Реализована, чтобы не править Resize у каждого элемента)
-    Resize_2: function(oMeasure, Parent, ParaMath, RPI, ArgSize)
-    {
-        var lng = this.Content.length;
-        for(var i = 0; i < lng; i++)
-        {
-            if(this.Content[i].Type == para_Math_Composition)
-                this.Content[i].Resize_2(oMeasure, this, ParaMath, RPI, ArgSize);
             else
-                this.Content[i].Math_Recalculate(oMeasure, RPI, null);
+                this.Content[i].Draw_Elements(PDSE);
+            //this.Content[i].Math_Draw(x, y, pGraphics);
         }
-    },
-    getWidthsPoints: function()
-    {
-        return this.InfoPoints.ContentPoints.Widths;
-    },
-    IsEqqArray: function()
-    {
-        return this.Parent.IsEqqArray();
-    },
-    Get_CompiledArgSize: function()
-    {
-        return this.Compiled_ArgSz;
-    },
-    getGapsInside: function(GapsInfo) // учитываем gaps внутренних объектов
-    {
-        var gaps = {left: 0, right: 0};
-        var bFirstComp = false,
-            bLastComp = false;
+    }
+};
+CMathContent.prototype.Draw_Elements = function(PDSE)
+{
+    var StartPos, EndPos;
 
-        var len = this.Content.length;
+    if(this.protected_GetLinesCount() > 0)
+    {
+        var CurLine  = PDSE.Line - this.StartLine;
+        var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
 
-        if(len > 1)
+        StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+        EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+    }
+    else
+    {
+        StartPos = 0;
+        EndPos   = this.Content.length - 1;
+    }
+
+    var bHidePlh = this.plhHide && this.IsPlaceholder();
+
+    if( !bHidePlh )
+    {
+        for(var CurPos = StartPos; CurPos <= EndPos;CurPos++)
+            this.Content[CurPos].Draw_Elements(PDSE);
+    }
+
+};
+CMathContent.prototype.setCtrPrp = function()
+{
+
+};
+CMathContent.prototype.Is_InclineLetter = function()
+{
+    var result = false;
+
+    if(this.Content.length == 1)
+        result = this.Content[0].Math_Is_InclineLetter();
+
+    return result;
+};
+CMathContent.prototype.IsPlaceholder = function()
+{
+    var flag = false;
+    if(!this.bRoot && this.Content.length == 1)
+        flag  = this.Content[0].IsPlaceholder();
+
+    return flag;
+};
+CMathContent.prototype.IsJustDraw = function()
+{
+    return false;
+};
+CMathContent.prototype.ApplyPoints = function(WidthsPoints, Points, MaxDimWidths)
+{
+    this.InfoPoints.GWidths       = WidthsPoints;
+    this.InfoPoints.GPoints       = Points;
+    this.InfoPoints.GMaxDimWidths = MaxDimWidths;
+    // точки выравнивания данного контента содержатся в ContentPoints
+
+    var PosInfo = new CMathPointInfo();
+    PosInfo.SetInfoPoints(this.InfoPoints);
+
+    this.size.width = 0;
+
+    for(var i = 0 ; i < this.Content.length; i++)
+    {
+        if(this.Content[i].Type === para_Math_Run)
         {
-            var bFRunEmpty = this.Content[0].Is_Empty();
-            bFirstComp = bFRunEmpty && this.Content[1].Type == para_Math_Composition; // первый всегда идет Run
-
-            var bLastRunEmpty = this.Content[len - 1].Is_Empty(); // т.к. после мат. объекта стоит пустой Run
-            bLastComp = bLastRunEmpty && this.Content[len - 2].Type == para_Math_Composition;
+            this.Content[i].ApplyPoints(PosInfo);
         }
 
-        var checkGap;
+        this.size.width += this.Content[i].size.width;
+    }
 
-        if(bFirstComp)
-        {
-            checkGap = GapsInfo.checkGapKind(this.Content[1].kind);
+};
+CMathContent.prototype.setPosition = function(pos, PDSE)
+{
+    this.pos.x = pos.x;
+    this.pos.y = pos.y;
+    var StartPos, EndPos;
 
-            if(!checkGap.bChildGaps)
-            {
-                gaps.left = GapsInfo.getGapsMComp(this.Content[1], -1);
-                //gaps.left = gapsMComp.left;
-            }
-        }
+    var CurLine  = PDSE.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PDSE.Range - this.StartRange : PDSE.Range );
 
-        if(bLastComp)
-        {
-            checkGap = GapsInfo.checkGapKind(this.Content[len - 1].kind);
+    StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-            if(!checkGap.bChildGaps)
-            {
-                gaps.right = GapsInfo.getGapsMComp(this.Content[len - 1], 1);
-                //gaps.right = gapsMComp.right;
-            }
-        }
-
-        return gaps;
-    },
-    IsOneLineText: function()   // for degree
+    if(this.RecalcInfo.bEqArray)
     {
-        var bOneLineText = true;
+        var PosInfoEqq = new CMathPointInfo();
+        PosInfoEqq.SetInfoPoints(this.InfoPoints);
 
-        for(var i = 0; i < this.Content.length; i++)
-        {
-            if(this.Content[i].Type == para_Math_Composition)
-            {
-                bOneLineText = false;
+        pos.x += PosInfoEqq.GetAlign();
+        this.pos.x = pos.x;
+    }
 
-                /*if(!this.Content[i].IsOneLineText())
-                {
-                    bOneLineText = false;
-                    break;
-                }*/
-            }
-        }
-
-        return bOneLineText;
-    },
-    draw: function(x, y, pGraphics, PDSE)
+    for(var i = StartPos; i <= EndPos; i++)
     {
-        var bHidePlh = this.plhHide && this.IsPlaceholder();
-
-        if( !bHidePlh )
-        {
-            for(var i=0; i < this.Content.length;i++)
-            {
-                if(this.Content[i].Type == para_Math_Composition)
-                {
-                    this.Content[i].draw(x, y, pGraphics, PDSE);
-                }
-                else
-                    this.Content[i].Draw_Elements(PDSE);
-                    //this.Content[i].Math_Draw(x, y, pGraphics);
-            }
-        }
-    },
-    setCtrPrp: function()
-    {
-
-    },
-    getInfoLetter: function(Info)
-    {
-        if(this.Content.length == 1)
-            this.Content[0].Math_GetInfoLetter(Info);
+        if(this.Content[i].Type == para_Math_Run)
+            this.Content[i].Math_SetPosition(pos, PDSE);
         else
-            Info.Result = false;
-    },
-    IsPlaceholder: function()
-    {
-        var flag = false;
-        if(!this.bRoot && this.Content.length == 1)
-            flag  = this.Content[0].IsPlaceholder();
+            this.Content[i].setPosition(pos, PDSE);
+    }
+};
+CMathContent.prototype.old_setPosition = function(pos)
+{
+    this.pos.x = pos.x;
+    this.pos.y = pos.y;
 
-        return flag;
-    },
-    IsJustDraw: function()
+    var w = 0;
+    if(this.RecalcInfo.bEqArray)
     {
-        return false;
-    },
-    ApplyPoints: function(WidthsPoints, Points, MaxDimWidths)
-    {
-        this.InfoPoints.GWidths       = WidthsPoints;
-        this.InfoPoints.GPoints       = Points;
-        this.InfoPoints.GMaxDimWidths = MaxDimWidths;
-        // точки выравнивания данного контента содержатся в ContentPoints
-
         var PosInfo = new CMathPointInfo();
         PosInfo.SetInfoPoints(this.InfoPoints);
 
-        this.size.width = 0;
+        this.pos.x += PosInfo.GetAlign();
+    }
 
-        for(var i = 0 ; i < this.Content.length; i++)
+    for(var i=0; i < this.Content.length; i++)
+    {
+        var NewPos = new CMathPosition();
+        NewPos.x = this.pos.x + w;
+        NewPos.y = this.pos.y + this.size.ascent;
+
+        if(this.Content[i].Type == para_Math_Run)
+            this.Content[i].Math_SetPosition(NewPos);
+        else
+            this.Content[i].setPosition(NewPos);
+
+        w += this.Content[i].size.width;
+    }
+
+};
+CMathContent.prototype.SetParent = function(Parent, ParaMath)
+{
+    this.Parent   = Parent;
+    this.ParaMath = ParaMath;
+};
+///// properties /////
+CMathContent.prototype.hidePlaceholder = function(flag)
+{
+    this.plhHide = flag;
+};
+///////// RunPrp, CtrPrp
+CMathContent.prototype.getFirstRPrp  = function(ParaMath)
+{
+    return this.Content[0].Get_CompiledPr(true);
+};
+CMathContent.prototype.GetCtrPrp = function()       // for placeholder
+{
+    var ctrPrp = new CTextPr();
+    if(!this.bRoot)
+        ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
+
+    return ctrPrp;
+};
+CMathContent.prototype.IsAccent = function()
+{
+    var result = false;
+
+    if(!this.bRoot)
+        result = this.Parent.IsAccent();
+
+    return result;
+};
+////////////////////////
+/// For Para Math
+CMathContent.prototype.GetParent = function()
+{
+    return this.Parent.GetParent();
+};
+CMathContent.prototype.SetArgSize = function(val)
+{
+    this.ArgSize.SetValue(val);
+};
+CMathContent.prototype.GetArgSize = function()
+{
+    return this.ArgSize.value;
+};
+/////////   Перемещение     ////////////
+
+// Поиск позиции, селект
+CMathContent.prototype.Is_SelectedAll = function(Props)
+{
+    var bFirst = false, bEnd = false;
+
+    if(this.Selection.Start == 0 && this.Selection.End == this.Content.length - 1)
+    {
+        if(this.Content[this.Selection.Start].Type == para_Math_Run)
+            bFirst = this.Content[this.Selection.Start].Is_SelectedAll(Props);
+        else
+            bFirst = true;
+
+        if(this.Content[this.Selection.End].Type == para_Math_Run)
+            bEnd = this.Content[this.Selection.End].Is_SelectedAll(Props);
+        else
+            bEnd = true;
+    }
+
+    return bFirst && bEnd;
+};
+
+///////////////////////
+
+CMathContent.prototype.Get_Id = function()
+{
+    return this.GetId();
+};
+CMathContent.prototype.GetId = function()
+{
+    return this.Id;
+};
+CMathContent.prototype.private_CorrectContent = function()
+{
+    var len = this.Content.length;
+
+    var current = null;
+    var emptyRun;
+
+    var currPos = 0;
+
+    while(currPos < len)
+    {
+        current = this.Content[currPos];
+
+        if(currPos < len && para_Math_Run === current.Type)
+            current.Math_Correct_Content();
+
+        var bLeftRun  = currPos > 0 ? this.Content[currPos-1].Type == para_Math_Run : false,
+            bRightRun = currPos < len - 1 ? this.Content[currPos + 1].Type === para_Math_Run : false;
+
+        var bLeftEmptyRun = bLeftRun ? this.Content[currPos-1].Is_Empty() : false;
+
+        var bCurrComp       = current.Type == para_Math_Composition,
+            bCurrEmptyRun   = current.Type == para_Math_Run && current.Is_Empty();
+
+        var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
+
+        if(bCurrComp && !bLeftRun)
         {
-            if(this.Content[i].Type === para_Math_Run)
-            {
-                this.Content[i].ApplyPoints(PosInfo);
-            }
+            emptyRun = new ParaRun(null, true);
+            emptyRun.Set_RFont_ForMathRun();
 
-            this.size.width += this.Content[i].size.width;
+            this.Apply_TextPrForRunEmpty(emptyRun, current);
+            this.Internal_Content_Add(currPos, emptyRun);
+            currPos += 2;
+
         }
-
-    },
-    setPosition: function(pos)
-    {
-        this.pos.x = pos.x;
-        this.pos.y = pos.y;
-
-        var w = 0;
-        if(this.RecalcInfo.bEqqArray)
+        else if(bCurrComp && bLeftEmptyRun)
         {
-            var PosInfo = new CMathPointInfo();
-            PosInfo.SetInfoPoints(this.InfoPoints);
+            emptyRun = this.Content[currPos-1];
 
-            this.pos.x += PosInfo.GetAlign();
+            this.Apply_TextPrForRunEmpty(emptyRun, current);
+            currPos++;
         }
-
-        for(var i=0; i < this.Content.length; i++)
+        else if(bDeleteEmptyRun)
         {
-            var NewPos = new CMathPosition();
-            NewPos.x = this.pos.x + w;
-            NewPos.y = this.pos.y + this.size.ascent;
+            this.Remove_FromContent(currPos, 1);
 
-            if(this.Content[i].Type == para_Math_Run)
-                this.Content[i].Math_SetPosition(NewPos);
-            else
-                this.Content[i].setPosition(NewPos);
-
-            w += this.Content[i].size.width;
-        }
-
-    },
-    SetParent: function(Parent, ParaMath)
-    {
-        this.Parent   = Parent;
-        this.ParaMath = ParaMath;
-    },
-    ///// properties /////
-    hidePlaceholder: function(flag)
-    {
-        this.plhHide = flag;
-    },
-    ///////// RunPrp, CtrPrp
-    getFirstRPrp:    function(ParaMath)
-    {
-        return this.Content[0].Get_CompiledPr(true);
-    },
-    GetCtrPrp: function()       // for placeholder
-    {
-        var ctrPrp = new CTextPr();
-        if(!this.bRoot)
-            ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
-
-        return ctrPrp;
-    },
-    IsAccent: function()
-    {
-        var result = false;
-
-        if(!this.bRoot)
-            result = this.Parent.IsAccent();
-
-        return result;
-    },
-    ////////////////////////
-    /// For Para Math
-    GetParent: function()
-    {
-        return this.Parent.GetParent();
-    },
-    SetArgSize: function(val)
-    {
-        this.ArgSize.SetValue(val);
-    },
-    GetArgSize: function()
-    {
-        return this.ArgSize.value;
-    },
-    /////////   Перемещение     ////////////
-
-    // Поиск позиции, селект
-    Is_SelectedAll: function(Props)
-    {
-        var bFirst = false, bEnd = false;
-
-        if(this.Selection.Start == 0 && this.Selection.End == this.Content.length - 1)
-        {
-            if(this.Content[this.Selection.Start].Type == para_Math_Run)
-                bFirst = this.Content[this.Selection.Start].Is_SelectedAll(Props);
-            else
-                bFirst = true;
-
-            if(this.Content[this.Selection.End].Type == para_Math_Run)
-                bEnd = this.Content[this.Selection.End].Is_SelectedAll(Props);
-            else
-                bEnd = true;
-        }
-
-        return bFirst && bEnd;
-    },
-
-    ///////////////////////
-
-    Get_Id : function()
-    {
-        return this.GetId();
-    },
-    GetId : function()
-    {
-        return this.Id;
-    },
-    private_CorrectContent: function()
-    {
-        var len = this.Content.length;
-
-        var current = null;
-        var emptyRun;
-
-        var currPos = 0;
-
-        while(currPos < len)
-        {
-            current = this.Content[currPos];
-
-            if(currPos < len && para_Math_Run === current.Type)
-                current.Math_Correct_Content();
-
-            var bLeftRun  = currPos > 0 ? this.Content[currPos-1].Type == para_Math_Run : false,
-                bRightRun = currPos < len - 1 ? this.Content[currPos + 1].Type === para_Math_Run : false;
-
-            var bLeftEmptyRun = bLeftRun ? this.Content[currPos-1].Is_Empty() : false;
-
-            var bCurrComp       = current.Type == para_Math_Composition,
-                bCurrEmptyRun   = current.Type == para_Math_Run && current.Is_Empty();
-
-            var bDeleteEmptyRun = bCurrEmptyRun && (bLeftRun || bRightRun);
-
-            if(bCurrComp && !bLeftRun)
+            if (this.CurPos === currPos)
             {
-                emptyRun = new ParaRun(null, true);
-                emptyRun.Set_RFont_ForMathRun();
-
-                this.Apply_TextPrForRunEmpty(emptyRun, current);
-                this.Internal_Content_Add(currPos, emptyRun);
-                currPos += 2;
-
-            }
-            else if(bCurrComp && bLeftEmptyRun)
-            {
-                emptyRun = this.Content[currPos-1];
-
-                this.Apply_TextPrForRunEmpty(emptyRun, current);
-                currPos++;
-            }
-            else if(bDeleteEmptyRun)
-            {
-                this.Remove_FromContent(currPos, 1);
-
-                if (this.CurPos === currPos)
+                if (bLeftRun)
                 {
-                    if (bLeftRun)
-                    {
-                        this.CurPos = currPos - 1;
-                        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
-                    }
-                    else //if (bRightRun)
-                    {
-                        this.CurPos = currPos;
-                        this.Content[this.CurPos].Cursor_MoveToStartPos();
-                    }
+                    this.CurPos = currPos - 1;
+                    this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+                }
+                else //if (bRightRun)
+                {
+                    this.CurPos = currPos;
+                    this.Content[this.CurPos].Cursor_MoveToStartPos();
                 }
             }
-            else
-                currPos++;
-
-            len = this.Content.length;
-
         }
+        else
+            currPos++;
 
-        if(len > 1)
-        {
-            var bLastComp     =  this.Content[len - 1].Type == para_Math_Composition,
-                bLastRunEmpty =  this.Content[len - 2].Type == para_Math_Composition && this.Content[len - 1].Type == para_Math_Run && this.Content[len-1].Is_Empty();
+        len = this.Content.length;
 
-            if(bLastComp)
-            {
-                emptyRun = new ParaRun(null, true);
-                emptyRun.Set_RFont_ForMathRun();
+    }
 
-                this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 1]);
-                this.Internal_Content_Add(currPos, emptyRun);
-            }
-            else if(bLastRunEmpty)
-            {
-                emptyRun = this.Content[len-1];
-
-                this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 2]);
-            }
-        }
-
-    },
-    Apply_TextPrForRunEmpty: function(emptyRun, Composition)
+    if(len > 1)
     {
-        var ctrPrp = Composition.Get_CtrPrp();
+        var bLastComp     =  this.Content[len - 1].Type == para_Math_Composition,
+            bLastRunEmpty =  this.Content[len - 2].Type == para_Math_Composition && this.Content[len - 1].Type == para_Math_Run && this.Content[len-1].Is_Empty();
 
-        var mathPrp = new CMPrp();
+        if(bLastComp)
+        {
+            emptyRun = new ParaRun(null, true);
+            emptyRun.Set_RFont_ForMathRun();
 
-        mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
+            this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 1]);
+            this.Internal_Content_Add(currPos, emptyRun);
+        }
+        else if(bLastRunEmpty)
+        {
+            emptyRun = this.Content[len-1];
 
-        emptyRun.Set_MathPr(mathPrp);
+            this.Apply_TextPrForRunEmpty(emptyRun, this.Content[len - 2]);
+        }
+    }
 
-        ctrPrp.Bold   = undefined;
-        ctrPrp.Italic = undefined;
+};
+CMathContent.prototype.Apply_TextPrForRunEmpty = function(emptyRun, Composition)
+{
+    var ctrPrp = Composition.Get_CtrPrp();
 
-        emptyRun.Set_Pr(ctrPrp);
-    },
-    Correct_Content : function(bInnerCorrection)
+    var mathPrp = new CMPrp();
+
+    mathPrp.SetStyle(ctrPrp.Bold, ctrPrp.Italic);
+
+    emptyRun.Set_MathPr(mathPrp);
+
+    ctrPrp.Bold   = undefined;
+    ctrPrp.Italic = undefined;
+
+    emptyRun.Set_Pr(ctrPrp);
+};
+CMathContent.prototype.Correct_Content = function(bInnerCorrection)
+{
+    if (true === bInnerCorrection)
     {
-        if (true === bInnerCorrection)
-        {
-            for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
-            {
-                if (para_Math_Composition === this.Content[nPos].Type)
-                    this.Content[nPos].Correct_Content(true);
-            }
-        }
-
-        this.private_CorrectContent();
-
-        // Удаляем лишние пустые раны
-        /*for (var nPos = 0, nLen = this.Content.length; nPos < nLen - 1; nPos++)
-        {
-            var oCurrElement = this.Content[nPos];
-            var oNextElement = this.Content[nPos + 1];
-            if (para_Math_Run === oCurrElement.Type && para_Math_Run === oNextElement.Type)
-            {
-                if (oCurrElement.Is_Empty())
-                {
-                    this.Remove_FromContent(nPos);
-                    nPos--;
-                    nLen--;
-                }
-                else if (oNextElement.Is_Empty())
-                {
-                    this.Remove_FromContent(nPos + 1);
-                    nPos--;
-                    nLen--;
-                }
-            }
-
-            if(para_Math_Run === oCurrElement.Type)
-                oCurrElement.Math_Correct_Content();
-        }*/
-
-        // Если в контенте ничего нет, тогда добавляем пустой ран
-        if (this.Content.length < 1)
-        {
-            var NewMathRun = new ParaRun(null, true);
-            NewMathRun.Set_RFont_ForMathRun();
-            this.Add_ToContent(0, NewMathRun);
-        }
-
         for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
         {
-            if(para_Math_Run === this.Content[nPos].Type)
-                this.Content[nPos].Math_Correct_Content();
+            if (para_Math_Composition === this.Content[nPos].Type)
+                this.Content[nPos].Correct_Content(true);
         }
+    }
 
-        if (this.Content.length == 1)
-        {
-            if(this.Content[0].Is_Empty())
-                this.Content[0].fillPlaceholders();
-        }
-    },
+    this.private_CorrectContent();
 
-    Correct_ContentPos : function(nDirection)
+    // Удаляем лишние пустые раны
+    /*for (var nPos = 0, nLen = this.Content.length; nPos < nLen - 1; nPos++)
+     {
+     var oCurrElement = this.Content[nPos];
+     var oNextElement = this.Content[nPos + 1];
+     if (para_Math_Run === oCurrElement.Type && para_Math_Run === oNextElement.Type)
+     {
+     if (oCurrElement.Is_Empty())
+     {
+     this.Remove_FromContent(nPos);
+     nPos--;
+     nLen--;
+     }
+     else if (oNextElement.Is_Empty())
+     {
+     this.Remove_FromContent(nPos + 1);
+     nPos--;
+     nLen--;
+     }
+     }
+
+     if(para_Math_Run === oCurrElement.Type)
+     oCurrElement.Math_Correct_Content();
+     }*/
+
+    // Если в контенте ничего нет, тогда добавляем пустой ран
+    if (this.Content.length < 1)
     {
-        var nCurPos = this.CurPos;
+        var NewMathRun = new ParaRun(null, true);
+        NewMathRun.Set_RFont_ForMathRun();
+        this.Add_ToContent(0, NewMathRun);
+    }
 
-        if (nCurPos < 0)
+    for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
+    {
+        if(para_Math_Run === this.Content[nPos].Type)
+            this.Content[nPos].Math_Correct_Content();
+    }
+
+    if (this.Content.length == 1)
+    {
+        if(this.Content[0].Is_Empty())
+            this.Content[0].fillPlaceholders();
+    }
+};
+
+CMathContent.prototype.Correct_ContentPos = function(nDirection)
+{
+    var nCurPos = this.CurPos;
+
+    if (nCurPos < 0)
+    {
+        this.CurPos = 0;
+        this.Content[0].Cursor_MoveToStartPos();
+    }
+    else if (nCurPos > this.Content.length - 1)
+    {
+        this.CurPos = this.Content.length - 1;
+        this.Content[this.CurPos].Cursor_MoveToEndPos();
+    }
+    else if (para_Math_Run !== this.Content[nCurPos].Type)
+    {
+        if (nDirection > 0)
         {
-            this.CurPos = 0;
-            this.Content[0].Cursor_MoveToStartPos();
+            this.CurPos = nCurPos + 1;
+            this.Content[this.CurPos].Cursor_MoveToStartPos();
         }
-        else if (nCurPos > this.Content.length - 1)
+        else
         {
-            this.CurPos = this.Content.length - 1;
+            this.CurPos = nCurPos - 1;
             this.Content[this.CurPos].Cursor_MoveToEndPos();
         }
-        else if (para_Math_Run !== this.Content[nCurPos].Type)
-        {
-            if (nDirection > 0)
-            {
-                this.CurPos = nCurPos + 1;
-                this.Content[this.CurPos].Cursor_MoveToStartPos();
-            }
-            else
-            {
-                this.CurPos = nCurPos - 1;
-                this.Content[this.CurPos].Cursor_MoveToEndPos();
-            }
-        }
-    },
+    }
+};
 
-    /// функции для работы с курсором
-    Cursor_Is_Start: function()
+/// функции для работы с курсором
+CMathContent.prototype.Cursor_Is_Start = function()
+{
+    var result = false;
+
+    if( !this.Is_Empty() )
     {
-        var result = false;
+        if(this.CurPos == 0)
+            result = this.Content[0].Cursor_Is_Start();
+    }
 
-        if( !this.Is_Empty() )
-        {
-            if(this.CurPos == 0)
-                result = this.Content[0].Cursor_Is_Start();
-        }
+    return result;
+};
+CMathContent.prototype.Cursor_Is_End = function()
+{
+    var result = false;
 
-        return result;
-    },
-    Cursor_Is_End: function()
+    if(!this.Is_Empty())
     {
-        var result = false;
-
-        if(!this.Is_Empty())
+        var len = this.Content.length - 1;
+        if(this.CurPos == len)
         {
-            var len = this.Content.length - 1;
-            if(this.CurPos == len)
-            {
-                result = this.Content[len].Cursor_Is_End();
-            }
+            result = this.Content[len].Cursor_Is_End();
         }
+    }
 
-        return result;
-    },
-    //////////////////////////////////////
+    return result;
+};
+//////////////////////////////////////
 
-    /////////////////////////
-    //  Text Properties
-    ///////////////
-    Get_TextPr: function(ContentPos, Depth)
+/////////////////////////
+//  Text Properties
+///////////////
+
+CMathContent.prototype.Get_TextPr = function(ContentPos, Depth)
+{
+    var pos = ContentPos.Get(Depth);
+
+    var TextPr;
+
+    if(this.IsPlaceholder())
+        TextPr = this.Parent.Get_CtrPrp();
+    else
+        TextPr = this.Content[pos].Get_TextPr(ContentPos, Depth + 1);
+
+    return TextPr;
+};
+CMathContent.prototype.Get_CompiledTextPr = function(Copy, bAll)
+{
+    var TextPr = null;
+
+    if(this.IsPlaceholder())
     {
-        var pos = ContentPos.Get(Depth);
-
-        var TextPr;
-
-        if(this.IsPlaceholder())
-            TextPr = this.Parent.Get_CtrPrp();
-        else
-            TextPr = this.Content[pos].Get_TextPr(ContentPos, Depth + 1);
-
-        return TextPr;
-    },
-    Get_CompiledTextPr : function(Copy, bAll)
+        TextPr = this.Parent.Get_CompiledCtrPrp_2();
+    }
+    else if (this.Selection.Use || bAll == true)
     {
-        var TextPr = null;
+        var StartPos, EndPos;
 
-        if(this.IsPlaceholder())
+        if(bAll == true)
         {
-            TextPr = this.Parent.Get_CompiledCtrPrp_2();
-        }
-        else if (this.Selection.Use || bAll == true)
-        {
-            var StartPos, EndPos;
-
-            if(bAll == true)
-            {
-                StartPos = 0;
-                EndPos = this.Content.length - 1;
-            }
-            else
-            {
-                StartPos = this.Selection.Start;
-                EndPos   = this.Selection.End;
-
-                if ( StartPos > EndPos )
-                {
-                    StartPos = this.Selection.End;
-                    EndPos   = this.Selection.Start;
-                }
-            }
-
-
-            // пропускаем пустые рана только для случая, когда есть селект
-
-            while ( null === TextPr && StartPos <= EndPos )
-            {
-                var bComp = this.Content[StartPos].Type == para_Math_Composition,
-                    bEmptyRun = this.Content[StartPos].Type == para_Math_Run && true === this.Content[StartPos].Selection_IsEmpty();
-
-                if(bComp || !bEmptyRun || bAll)    //пропускаем пустые Run
-                    TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
-
-                StartPos++;
-            }
-
-            while(this.Content[EndPos].Type == para_Math_Run && true === this.Content[EndPos].Selection_IsEmpty() && StartPos < EndPos + 1 && bAll == false) //пропускаем пустые Run
-            {
-                EndPos--;
-            }
-
-
-            for ( var CurPos = StartPos; CurPos < EndPos + 1; CurPos++ )
-            {
-                //var CurTextPr = this.Content[CurPos].Get_CompiledPr(false);
-                var CurTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
-
-                if ( null !== CurTextPr )
-                    TextPr = TextPr.Compare( CurTextPr );
-            }
+            StartPos = 0;
+            EndPos = this.Content.length - 1;
         }
         else
         {
-            var CurPos = this.CurPos;
+            StartPos = this.Selection.Start;
+            EndPos   = this.Selection.End;
 
-            if ( CurPos >= 0 && CurPos < this.Content.length )
-                TextPr = this.Content[CurPos].Get_CompiledTextPr(Copy);
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.End;
+                EndPos   = this.Selection.Start;
+            }
         }
 
-        return TextPr;
-    },
-    GetMathTextPrForMenu: function(ContentPos, Depth)
-    {
-        var pos = ContentPos.Get(Depth);
 
-        return this.Content[pos].GetMathTextPrForMenu(ContentPos, Depth + 1);
-    },
-    Apply_TextPr: function(TextPr, IncFontSize, ApplyToAll, PosForMenu)
-    {
-        if ( true === ApplyToAll )
+        // пропускаем пустые рана только для случая, когда есть селект
+
+        while ( null === TextPr && StartPos <= EndPos )
         {
-            for ( var i = 0; i < this.Content.length; i++ )
-                this.Content[i].Apply_TextPr( TextPr, IncFontSize, true );
+            var bComp = this.Content[StartPos].Type == para_Math_Composition,
+                bEmptyRun = this.Content[StartPos].Type == para_Math_Run && true === this.Content[StartPos].Selection_IsEmpty();
+
+            if(bComp || !bEmptyRun || bAll)    //пропускаем пустые Run
+                TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+
+            StartPos++;
+        }
+
+        while(this.Content[EndPos].Type == para_Math_Run && true === this.Content[EndPos].Selection_IsEmpty() && StartPos < EndPos + 1 && bAll == false) //пропускаем пустые Run
+        {
+            EndPos--;
+        }
+
+
+        for ( var CurPos = StartPos; CurPos < EndPos + 1; CurPos++ )
+        {
+            //var CurTextPr = this.Content[CurPos].Get_CompiledPr(false);
+            var CurTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
+
+            if ( null !== CurTextPr )
+                TextPr = TextPr.Compare( CurTextPr );
+        }
+    }
+    else
+    {
+        var CurPos = this.CurPos;
+
+        if ( CurPos >= 0 && CurPos < this.Content.length )
+            TextPr = this.Content[CurPos].Get_CompiledTextPr(Copy);
+    }
+
+    return TextPr;
+};
+CMathContent.prototype.GetMathTextPrForMenu = function(ContentPos, Depth)
+{
+    var pos = ContentPos.Get(Depth);
+
+    return this.Content[pos].GetMathTextPrForMenu(ContentPos, Depth + 1);
+};
+CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, PosForMenu)
+{
+    if ( true === ApplyToAll )
+    {
+        for ( var i = 0; i < this.Content.length; i++ )
+            this.Content[i].Apply_TextPr( TextPr, IncFontSize, true );
+    }
+    else
+    {
+        var StartPos, EndPos, bMenu = false;
+
+        if(PosForMenu !== undefined)
+        {
+            StartPos = PosForMenu.StartPos;
+            EndPos   = PosForMenu.EndPos;
+
+            bMenu = true;
         }
         else
         {
-            var StartPos, EndPos, bMenu = false;
+            StartPos = this.Selection.Start;
+            EndPos   = this.Selection.End;
+        }
 
-            if(PosForMenu !== undefined)
+        var NewRuns;
+        var LRun, CRun, RRun;
+
+        var bSelectOneElement = this.Selection.Use && StartPos == EndPos;
+
+        var FirstPos = this.Selection.Use ? Math.min(StartPos, EndPos) : this.CurPos;
+
+        if(FirstPos == 0 && this.bRoot)
+            this.ParaMath.SetRecalcCtrPrp(this.Content[0]);
+
+        if( ( !this.Selection.Use && !bMenu ) || (bSelectOneElement && this.Content[StartPos].Type == para_Math_Run) ) // TextPr меняем только в одном Run
+        {
+            var Pos = !this.Selection.Use ? this.CurPos :  StartPos;
+
+            NewRuns = this.Content[Pos].Apply_TextPr(TextPr, IncFontSize, false);
+
+            LRun = NewRuns[0];
+            CRun = NewRuns[1];
+            RRun = NewRuns[2];
+
+            var CRunPos = Pos;
+
+            if(LRun !== null)
             {
-                StartPos = PosForMenu.StartPos;
-                EndPos   = PosForMenu.EndPos;
-
-                bMenu = true;
+                this.Internal_Content_Add(Pos+1, CRun);
+                CRunPos = Pos + 1;
             }
-            else
+
+            if(RRun !== null)
             {
-                StartPos = this.Selection.Start;
-                EndPos   = this.Selection.End;
+                this.Internal_Content_Add(CRunPos+1, RRun);
             }
 
-            var NewRuns;
-            var LRun, CRun, RRun;
+            this.CurPos         = CRunPos;
+            this.Selection.Start = CRunPos;
+            this.Selection.End   = CRunPos;
 
-            var bSelectOneElement = this.Selection.Use && StartPos == EndPos;
+        }
+        else if(bSelectOneElement && this.Content[StartPos].Type == para_Math_Composition)
+        {
+            this.Content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
+        }
+        else
+        {
 
-            var FirstPos = this.Selection.Use ? Math.min(StartPos, EndPos) : this.CurPos;
-
-            if(FirstPos == 0 && this.bRoot)
-                this.ParaMath.SetRecalcCtrPrp(this.Content[0]);
-
-            if( ( !this.Selection.Use && !bMenu ) || (bSelectOneElement && this.Content[StartPos].Type == para_Math_Run) ) // TextPr меняем только в одном Run
+            if(StartPos > EndPos)
             {
-                var Pos = !this.Selection.Use ? this.CurPos :  StartPos;
+                var temp = StartPos;
+                StartPos = EndPos;
+                EndPos = temp;
+            }
 
-                NewRuns = this.Content[Pos].Apply_TextPr(TextPr, IncFontSize, false);
 
-                LRun = NewRuns[0];
+            for(var i = StartPos + 1; i < EndPos; i++)
+                this.Content[i].Apply_TextPr(TextPr, IncFontSize, true );
+
+
+            if(this.Content[EndPos].Type == para_Math_Run)
+            {
+                NewRuns = this.Content[EndPos].Apply_TextPr(TextPr, IncFontSize, false);
+
+                // LRun - null
                 CRun = NewRuns[1];
                 RRun = NewRuns[2];
 
-                var CRunPos = Pos;
+                if(RRun !== null)
+                {
+                    this.Internal_Content_Add(EndPos+1, RRun);
+                }
+
+            }
+            else
+                this.Content[EndPos].Apply_TextPr(TextPr, IncFontSize, true);
+
+
+            if(this.Content[StartPos].Type == para_Math_Run)
+            {
+                NewRuns = this.Content[StartPos].Apply_TextPr(TextPr, IncFontSize, false);
+
+                LRun = NewRuns[0];
+                CRun = NewRuns[1];
+                // RRun - null
+
 
                 if(LRun !== null)
                 {
-                    this.Internal_Content_Add(Pos+1, CRun);
-                    CRunPos = Pos + 1;
+                    this.Internal_Content_Add(StartPos+1, CRun);
                 }
-
-                if(RRun !== null)
-                {
-                    this.Internal_Content_Add(CRunPos+1, RRun);
-                }
-
-                this.CurPos         = CRunPos;
-                this.Selection.Start = CRunPos;
-                this.Selection.End   = CRunPos;
 
             }
-            else if(bSelectOneElement && this.Content[StartPos].Type == para_Math_Composition)
-            {
+            else
                 this.Content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
-            }
-            else
+
+
+            var bStartComposition = this.Content[StartPos].Type == para_Math_Composition || (this.Content[StartPos].Is_Empty() && this.Content[StartPos + 1].Type == para_Math_Composition);
+            var bEndCompostion    = this.Content[EndPos].Type == para_Math_Composition || (this.Content[EndPos].Is_Empty()   && this.Content[EndPos - 1].Type == para_Math_Composition);
+
+            if(!bStartComposition)
             {
-
-                if(StartPos > EndPos)
-                {
-                    var temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos = temp;
-                }
-
-
-                for(var i = StartPos + 1; i < EndPos; i++)
-                    this.Content[i].Apply_TextPr(TextPr, IncFontSize, true );
-
-
-                if(this.Content[EndPos].Type == para_Math_Run)
-                {
-                    NewRuns = this.Content[EndPos].Apply_TextPr(TextPr, IncFontSize, false);
-
-                    // LRun - null
-                    CRun = NewRuns[1];
-                    RRun = NewRuns[2];
-
-                    if(RRun !== null)
-                    {
-                        this.Internal_Content_Add(EndPos+1, RRun);
-                    }
-
-                }
-                else
-                    this.Content[EndPos].Apply_TextPr(TextPr, IncFontSize, true);
-
-
-                if(this.Content[StartPos].Type == para_Math_Run)
-                {
-                    NewRuns = this.Content[StartPos].Apply_TextPr(TextPr, IncFontSize, false);
-
-                    LRun = NewRuns[0];
-                    CRun = NewRuns[1];
-                    // RRun - null
-
-
-                    if(LRun !== null)
-                    {
-                        this.Internal_Content_Add(StartPos+1, CRun);
-                    }
-
-                }
-                else
-                    this.Content[StartPos].Apply_TextPr(TextPr, IncFontSize, true);
-
-
-                var bStartComposition = this.Content[StartPos].Type == para_Math_Composition || (this.Content[StartPos].Is_Empty() && this.Content[StartPos + 1].Type == para_Math_Composition);
-                var bEndCompostion    = this.Content[EndPos].Type == para_Math_Composition || (this.Content[EndPos].Is_Empty()   && this.Content[EndPos - 1].Type == para_Math_Composition);
-
-                if(!bStartComposition)
-                {
-                    if(this.Selection.Start < this.Selection.End && true === this.Content[this.Selection.Start].Selection_IsEmpty(true) )
-                        this.Selection.Start++;
-                    else if (this.Selection.End < this.Selection.Start && true === this.Content[this.Selection.End].Selection_IsEmpty(true) )
-                        this.Selection.End++;
-                }
-
-
-                if(!bEndCompostion)
-                {
-                    if(this.Selection.Start < this.Selection.End && true === this.Content[this.Selection.End].Selection_IsEmpty(true) )
-                        this.Selection.End--;
-                    else if (this.Selection.End < this.Selection.Start && true === this.Content[this.Selection.Start].Selection_IsEmpty(true) )
-                        this.Selection.Start--;
-                }
-
+                if(this.Selection.Start < this.Selection.End && true === this.Content[this.Selection.Start].Selection_IsEmpty(true) )
+                    this.Selection.Start++;
+                else if (this.Selection.End < this.Selection.Start && true === this.Content[this.Selection.End].Selection_IsEmpty(true) )
+                    this.Selection.End++;
             }
-        }
 
-    },
-    Set_MathTextPr2: function(TextPr, MathPr, bAll, StartPos, Count)
-    {
-        if(bAll)
-        {
-            StartPos = 0;
-            Count = this.Content.length - 1;
-        }
 
-        if(Count < 0 || StartPos + Count > this.Content.length - 1)
-            return;
-
-        for(var pos = StartPos; pos <= StartPos + Count; pos++)
-            this.Content[pos].Set_MathTextPr2(TextPr, MathPr, true);
-
-    },
-    IsNormalTextInRuns: function()
-    {
-        var flag = true;
-
-        if(this.Selection.Use)
-        {
-            var StartPos = this.Selection.Start,
-                EndPos   = this.Selection.End;
-
-                if ( StartPos > EndPos )
-                {
-                    StartPos = this.Selection.End;
-                    EndPos   = this.Selection.Start;
-                }
-
-            for(var i = StartPos; i < EndPos+1; i++)
+            if(!bEndCompostion)
             {
-                var curr = this.Content[i],
-                    currType = curr.Type;
-                if(currType == para_Math_Composition || (currType == para_Math_Run && false == curr.IsNormalText()))
-                {
-                    flag = false;
-                    break;
-                }
+                if(this.Selection.Start < this.Selection.End && true === this.Content[this.Selection.End].Selection_IsEmpty(true) )
+                    this.Selection.End--;
+                else if (this.Selection.End < this.Selection.Start && true === this.Content[this.Selection.Start].Selection_IsEmpty(true) )
+                    this.Selection.Start--;
             }
+
         }
-        else
-            flag = false;
+    }
 
-        return flag;
-    },
-    Internal_Content_Add : function(Pos, Item, bUpdatePosition)
+};
+CMathContent.prototype.Set_MathTextPr2 = function(TextPr, MathPr, bAll, StartPos, Count)
+{
+    if(bAll)
     {
-        Item.Set_ParaMath(this.ParaMath);
-        Item.Parent = this;
+        StartPos = 0;
+        Count = this.Content.length - 1;
+    }
 
-        History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
-        this.Content.splice( Pos, 0, Item );
+    if(Count < 0 || StartPos + Count > this.Content.length - 1)
+        return;
 
-        this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
-    },
+    for(var pos = StartPos; pos <= StartPos + Count; pos++)
+        this.Content[pos].Set_MathTextPr2(TextPr, MathPr, true);
 
-    private_UpdatePosOnAdd: function(Pos, bUpdatePosition)
+};
+CMathContent.prototype.IsNormalTextInRuns = function()
+{
+    var flag = true;
+
+    if(this.Selection.Use)
     {
-        if(bUpdatePosition !== false)
+        var StartPos = this.Selection.Start,
+            EndPos   = this.Selection.End;
+
+        if ( StartPos > EndPos )
         {
-            if ( this.CurPos >= Pos )
-                this.CurPos++;
-
-            if ( this.Selection.Start >= Pos )
-                this.Selection.Start++;
-
-            if ( this.Selection.End >= Pos )
-                this.Selection.End++;
-
-            this.private_CorrectSelectionPos();
-            this.private_CorrectCurPos();
-        }
-
-        // Обновляем позиции в NearestPos
-        var NearPosLen = this.NearPosArray.length;
-        for ( var Index = 0; Index < NearPosLen; Index++ )
-        {
-            var HyperNearPos = this.NearPosArray[Index];
-            var ContentPos = HyperNearPos.NearPos.ContentPos;
-            var Depth      = HyperNearPos.Depth;
-
-            if (ContentPos.Data[Depth] >= Pos)
-                ContentPos.Data[Depth]++;
-        }
-    },
-    private_CorrectSelectionPos : function()
-    {
-        this.Selection.Start = Math.max(0, Math.min(this.Content.length - 1, this.Selection.Start));
-        this.Selection.End   = Math.max(0, Math.min(this.Content.length - 1, this.Selection.End));
-    },
-
-    private_CorrectCurPos : function()
-    {
-        if (this.CurPos > this.Content.length - 1)
-        {
-            this.CurPos = this.Content.length - 1;
-
-            if (para_Math_Run === this.Content[this.CurPos].Type)
-                this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+            StartPos = this.Selection.End;
+            EndPos   = this.Selection.Start;
         }
 
-        if (this.CurPos < 0)
+        for(var i = StartPos; i < EndPos+1; i++)
         {
-            this.CurPos = this.Content.length - 1;
-
-            if (para_Math_Run === this.Content[this.CurPos].Type)
-                this.Content[this.CurPos].Cursor_MoveToStartPos();
-        }
-    },
-
-    SplitContent: function(NewContent, ContentPos, Depth)
-    {
-        var Pos = ContentPos.Get(Depth);
-
-        if(para_Math_Run === this.Content[Pos].Type)
-        {
-            var NewRun = this.Content[Pos].Split(ContentPos, Depth+1);
-            NewContent.Add_ToContent(0, NewRun);
-
-            var len = this.Content.length;
-            if(Pos < len - 1)
+            var curr = this.Content[i],
+                currType = curr.Type;
+            if(currType == para_Math_Composition || (currType == para_Math_Run && false == curr.IsNormalText()))
             {
-                NewContent.Concat_ToContent( this.Content.slice(Pos + 1) );
-                this.Remove_FromContent(Pos+1, len - Pos - 1);
+                flag = false;
+                break;
             }
         }
+    }
+    else
+        flag = false;
 
-        this.private_SetNeedResize();
-    },
-    Add_ToContent : function(Pos, Item)
+    return flag;
+};
+CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePosition)
+{
+    Item.Set_ParaMath(this.ParaMath);
+    Item.Parent = this;
+
+    History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+    this.Content.splice( Pos, 0, Item );
+
+    this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
+};
+CMathContent.prototype.private_UpdatePosOnAdd = function(Pos, bUpdatePosition)
+{
+    if(bUpdatePosition !== false)
     {
-        this.Internal_Content_Add(Pos, Item);
-    },
-    Concat_ToContent: function(NewItems)
-    {
-        var StartPos = this.Content.length;
-        this.Content = this.Content.concat( NewItems );
+        if ( this.CurPos >= Pos )
+            this.CurPos++;
 
-        History.Add( this, { Type : historyitem_Math_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems } );
-    },
+        if ( this.Selection.Start >= Pos )
+            this.Selection.Start++;
 
-    Remove_FromContent : function(Pos, Count)
-    {
-        var DeletedItems = this.Content.splice(Pos, Count);
-        History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+        if ( this.Selection.End >= Pos )
+            this.Selection.End++;
 
-        // Обновим текущую позицию
-        if (this.CurPos > Pos + Count)
-            this.CurPos -= Count;
-        else if (this.CurPos > Pos )
-            this.CurPos = Pos;
-
+        this.private_CorrectSelectionPos();
         this.private_CorrectCurPos();
-        this.private_UpdatePosOnRemove(Pos, Count);
-    },
+    }
 
-    private_UpdatePosOnRemove : function(Pos, Count)
+    // Обновляем позиции в NearestPos
+    var NearPosLen = this.NearPosArray.length;
+    for ( var Index = 0; Index < NearPosLen; Index++ )
     {
-        // Обновим начало и конец селекта
-        if (true === this.Selection.Use)
+        var HyperNearPos = this.NearPosArray[Index];
+        var ContentPos = HyperNearPos.NearPos.ContentPos;
+        var Depth      = HyperNearPos.Depth;
+
+        if (ContentPos.Data[Depth] >= Pos)
+            ContentPos.Data[Depth]++;
+    }
+};
+CMathContent.prototype.private_CorrectSelectionPos = function()
+{
+    this.Selection.Start = Math.max(0, Math.min(this.Content.length - 1, this.Selection.Start));
+    this.Selection.End   = Math.max(0, Math.min(this.Content.length - 1, this.Selection.End));
+};
+CMathContent.prototype.private_CorrectCurPos = function()
+{
+    if (this.CurPos > this.Content.length - 1)
+    {
+        this.CurPos = this.Content.length - 1;
+
+        if (para_Math_Run === this.Content[this.CurPos].Type)
+            this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+    }
+
+    if (this.CurPos < 0)
+    {
+        this.CurPos = this.Content.length - 1;
+
+        if (para_Math_Run === this.Content[this.CurPos].Type)
+            this.Content[this.CurPos].Cursor_MoveToStartPos();
+    }
+};
+CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
+{
+    var Pos = ContentPos.Get(Depth);
+
+    if(para_Math_Run === this.Content[Pos].Type)
+    {
+        var NewRun = this.Content[Pos].Split(ContentPos, Depth+1);
+        NewContent.Add_ToContent(0, NewRun);
+
+        var len = this.Content.length;
+        if(Pos < len - 1)
         {
-            if (this.Selection.Start <= this.Selection.End)
-            {
-                if (this.Selection.Start > Pos + Count)
-                    this.Selection.Start -= Count;
-                else if (this.Selection.Start > Pos)
-                    this.Selection.Start = Pos;
-
-                if (this.Selection.End >= Pos + Count)
-                    this.Selection.End -= Count;
-                else if (this.Selection.End >= Pos)
-                    this.Selection.End = Math.max(0, Pos - 1);
-            }
-            else
-            {
-                if (this.Selection.Start >= Pos + Count)
-                    this.Selection.Start -= Count;
-                else if (this.Selection.Start >= Pos)
-                    this.Selection.Start = Math.max(0, Pos - 1);
-
-                if (this.Selection.End > Pos + Count)
-                    this.Selection.End -= Count;
-                else if (this.Selection.End > Pos)
-                    this.Selection.End = Pos;
-            }
+            NewContent.Concat_ToContent( this.Content.slice(Pos + 1) );
+            this.Remove_FromContent(Pos+1, len - Pos - 1);
         }
+    }
 
-        // Обновляем позиции в NearestPos
-        var NearPosLen = this.NearPosArray.length;
-        for (var Index = 0; Index < NearPosLen; Index++)
+    this.private_SetNeedResize();
+};
+CMathContent.prototype.Add_ToContent = function(Pos, Item)
+{
+    this.Internal_Content_Add(Pos, Item);
+};
+CMathContent.prototype.Concat_ToContent = function(NewItems)
+{
+    var StartPos = this.Content.length;
+    this.Content = this.Content.concat( NewItems );
+
+    History.Add( this, { Type : historyitem_Math_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems } );
+};
+CMathContent.prototype.Remove_FromContent = function(Pos, Count)
+{
+    var DeletedItems = this.Content.splice(Pos, Count);
+    History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+
+    // Обновим текущую позицию
+    if (this.CurPos > Pos + Count)
+        this.CurPos -= Count;
+    else if (this.CurPos > Pos )
+        this.CurPos = Pos;
+
+    this.private_CorrectCurPos();
+    this.private_UpdatePosOnRemove(Pos, Count);
+};
+CMathContent.prototype.private_UpdatePosOnRemove = function(Pos, Count)
+{
+    // Обновим начало и конец селекта
+    if (true === this.Selection.Use)
+    {
+        if (this.Selection.Start <= this.Selection.End)
         {
-            var HyperNearPos = this.NearPosArray[Index];
-            var ContentPos = HyperNearPos.NearPos.ContentPos;
-            var Depth      = HyperNearPos.Depth;
+            if (this.Selection.Start > Pos + Count)
+                this.Selection.Start -= Count;
+            else if (this.Selection.Start > Pos)
+                this.Selection.Start = Pos;
 
-            if (ContentPos.Data[Depth] > Pos + Count)
-                ContentPos.Data[Depth] -= Count;
-            else if (ContentPos.Data[Depth] > Pos)
-                ContentPos.Data[Depth] = Math.max(0 , Pos);
-        }
-    },
-
-    Get_Default_TPrp: function()
-    {
-        return this.ParaMath.Get_Default_TPrp();
-    },
-
-    /////////////////////////
-    Is_Empty:    function()
-    {
-        return this.Content.length == 0;
-    },
-
-    Copy: function(Selected)
-    {
-        var NewContent = new CMathContent();
-        this.CopyTo(NewContent, Selected);
-        return NewContent;
-    },
-
-    CopyTo : function(OtherContent, Selected)
-    {
-        var nStartPos, nEndPos;
-
-        if(true === Selected)
-        {
-            if(this.Selection.Start < this.Selection.End)
-            {
-                nStartPos = this.Selection.Start;
-                nEndPos   = this.Selection.End;
-            }
-            else
-            {
-                nStartPos = this.Selection.End;
-                nEndPos   = this.Selection.Start;
-            }
+            if (this.Selection.End >= Pos + Count)
+                this.Selection.End -= Count;
+            else if (this.Selection.End >= Pos)
+                this.Selection.End = Math.max(0, Pos - 1);
         }
         else
         {
-            nStartPos = 0;
-            nEndPos   = this.Content.length - 1;
+            if (this.Selection.Start >= Pos + Count)
+                this.Selection.Start -= Count;
+            else if (this.Selection.Start >= Pos)
+                this.Selection.Start = Math.max(0, Pos - 1);
+
+            if (this.Selection.End > Pos + Count)
+                this.Selection.End -= Count;
+            else if (this.Selection.End > Pos)
+                this.Selection.End = Pos;
         }
+    }
 
-        OtherContent.plHid = this.plhHide;
+    // Обновляем позиции в NearestPos
+    var NearPosLen = this.NearPosArray.length;
+    for (var Index = 0; Index < NearPosLen; Index++)
+    {
+        var HyperNearPos = this.NearPosArray[Index];
+        var ContentPos = HyperNearPos.NearPos.ContentPos;
+        var Depth      = HyperNearPos.Depth;
 
-        for(var nPos = nStartPos; nPos <= nEndPos; nPos++)
+        if (ContentPos.Data[Depth] > Pos + Count)
+            ContentPos.Data[Depth] -= Count;
+        else if (ContentPos.Data[Depth] > Pos)
+            ContentPos.Data[Depth] = Math.max(0 , Pos);
+    }
+};
+CMathContent.prototype.Get_Default_TPrp = function()
+{
+    return this.ParaMath.Get_Default_TPrp();
+};
+/////////////////////////
+CMathContent.prototype.Is_Empty = function()
+{
+    return this.Content.length == 0;
+};
+CMathContent.prototype.Copy = function(Selected)
+{
+    var NewContent = new CMathContent();
+    this.CopyTo(NewContent, Selected);
+    return NewContent;
+};
+CMathContent.prototype.CopyTo = function(OtherContent, Selected)
+{
+    var nStartPos, nEndPos;
+
+    if(true === Selected)
+    {
+        if(this.Selection.Start < this.Selection.End)
         {
-            var oElement;
-            if(this.Content[nPos].Type == para_Math_Run)
-                oElement = this.Content[nPos].Copy(Selected);
-            else
-                oElement = this.Content[nPos].Copy(false);
-
-            OtherContent.Internal_Content_Add(OtherContent.Content.length, oElement);
+            nStartPos = this.Selection.Start;
+            nEndPos   = this.Selection.End;
         }
-    },
-
-    getElem: function(nNum)
-    {
-        return this.Content[nNum];
-    },
-    Is_FirstComposition: function()
-    {
-        var result = false;
-        if(this.Content.length > 1)
+        else
         {
-            var bEmptyRun = this.Content[0].Is_Empty(),
-                bMathComp    = this.Content[1].Type == para_Math_Composition;
-
-            if(bEmptyRun && bMathComp)
-                result = true;
+            nStartPos = this.Selection.End;
+            nEndPos   = this.Selection.Start;
         }
-
-        return result;
-    },
-    GetLastElement: function()
+    }
+    else
     {
-        var pos = this.Content.length - 1;
+        nStartPos = 0;
+        nEndPos   = this.Content.length - 1;
+    }
 
-        while(this.Content[pos].Type == para_Math_Run && this.Content[pos].Is_Empty() && pos > 0)
+    OtherContent.plHid = this.plhHide;
+
+    for(var nPos = nStartPos; nPos <= nEndPos; nPos++)
+    {
+        var oElement;
+        if(this.Content[nPos].Type == para_Math_Run)
+            oElement = this.Content[nPos].Copy(Selected);
+        else
+            oElement = this.Content[nPos].Copy(false);
+
+        OtherContent.Internal_Content_Add(OtherContent.Content.length, oElement);
+    }
+};
+CMathContent.prototype.getElem = function(nNum)
+{
+    return this.Content[nNum];
+};
+CMathContent.prototype.Is_FirstComposition = function()
+{
+    var result = false;
+    if(this.Content.length > 1)
+    {
+        var bEmptyRun = this.Content[0].Is_Empty(),
+            bMathComp    = this.Content[1].Type == para_Math_Composition;
+
+        if(bEmptyRun && bMathComp)
+            result = true;
+    }
+
+    return result;
+};
+CMathContent.prototype.GetLastElement = function()
+{
+    var pos = this.Content.length - 1;
+
+    while(this.Content[pos].Type == para_Math_Run && this.Content[pos].Is_Empty() && pos > 0)
+    {
+        pos--;
+    }
+
+    var last = this.Content[pos].Type == para_Math_Run ? this.Content[pos] : this.Content[pos].GetLastElement();
+
+    return last;
+};
+CMathContent.prototype.GetFirstElement = function()
+{
+    var pos = 0;
+
+    while(this.Content[pos].Type == para_Math_Run && this.Content[pos].Is_Empty() && pos < this.Content.length - 1)
+    {
+        pos++;
+    }
+
+    var first = this.Content[pos].Type == para_Math_Run ? this.Content[pos] : this.Content[pos].GetFirstElement();
+
+    return first;
+};
+
+////////////////////////////////////////////////////////////////
+
+CMathContent.prototype.Undo = function(Data)
+{
+    var type = Data.Type;
+
+    switch(type)
+    {
+        case historyitem_Math_AddItem:
         {
-            pos--;
+            this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
+
+            if (null !== this.ParaMath)
+                this.ParaMath.SetNeedResize();
+
+            break;
         }
-
-        var last = this.Content[pos].Type == para_Math_Run ? this.Content[pos] : this.Content[pos].GetLastElement();
-
-        return last;
-    },
-    GetFirstElement: function()
-    {
-        var pos = 0;
-
-        while(this.Content[pos].Type == para_Math_Run && this.Content[pos].Is_Empty() && pos < this.Content.length - 1)
+        case historyitem_Math_RemoveItem:
         {
-            pos++;
+            var Pos = Data.Pos;
+
+            var Array_start = this.Content.slice(0, Pos);
+            var Array_end   = this.Content.slice(Pos);
+
+            this.Content = Array_start.concat(Data.Items, Array_end);
+
+            if (null !== this.ParaMath)
+                this.ParaMath.SetNeedResize();
+
+            break;
         }
+    }
+};
+CMathContent.prototype.Redo = function(Data)
+{
+    var type = Data.Type;
 
-        var first = this.Content[pos].Type == para_Math_Run ? this.Content[pos] : this.Content[pos].GetFirstElement();
-
-        return first;
-    },
-
-
-    ////////////////////////////////////////////////////////////////
-
-    Undo: function(Data)
+    switch(type)
     {
-        var type = Data.Type;
-
-        switch(type)
+        case historyitem_Math_AddItem:
         {
-            case historyitem_Math_AddItem:
-            {
-                this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
+            var Pos = Data.Pos;
 
-                if (null !== this.ParaMath)
-                    this.ParaMath.SetNeedResize();
+            var Array_start = this.Content.slice(0, Pos);
+            var Array_end   = this.Content.slice(Pos);
 
-                break;
-            }
-            case historyitem_Math_RemoveItem:
-            {
-                var Pos = Data.Pos;
+            this.Content = Array_start.concat(Data.Items, Array_end);
 
-                var Array_start = this.Content.slice(0, Pos);
-                var Array_end   = this.Content.slice(Pos);
+            if (null !== this.ParaMath)
+                this.ParaMath.SetNeedResize();
 
-                this.Content = Array_start.concat(Data.Items, Array_end);
-
-                if (null !== this.ParaMath)
-                    this.ParaMath.SetNeedResize();
-
-                break;
-            }
+            break;
         }
-    },
-    Redo: function(Data)
-    {
-        var type = Data.Type;
-
-        switch(type)
+        case historyitem_Math_RemoveItem:
         {
-            case historyitem_Math_AddItem:
-            {
-                var Pos = Data.Pos;
+            this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
 
-                var Array_start = this.Content.slice(0, Pos);
-                var Array_end   = this.Content.slice(Pos);
+            if (null !== this.ParaMath)
+                this.ParaMath.SetNeedResize();
 
-                this.Content = Array_start.concat(Data.Items, Array_end);
-
-                if (null !== this.ParaMath)
-                    this.ParaMath.SetNeedResize();
-
-                break;
-            }
-            case historyitem_Math_RemoveItem:
-            {
-                this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
-
-                if (null !== this.ParaMath)
-                    this.ParaMath.SetNeedResize();
-
-                break;
-            }
+            break;
         }
-    },	
-    Save_Changes: function(Data, Writer)
+    }
+};
+CMathContent.prototype.Save_Changes = function(Data, Writer)
+{
+    Writer.WriteLong(historyitem_type_MathContent);
+
+    var Type = Data.Type;
+    // Пишем тип
+    Writer.WriteLong(Type);
+
+    switch (Type)
     {
-        Writer.WriteLong(historyitem_type_MathContent);
-
-        var Type = Data.Type;
-        // Пишем тип
-        Writer.WriteLong(Type);
-
-        switch (Type)
+        case historyitem_Math_AddItem:
         {
-            case historyitem_Math_AddItem:
+            // Long     : Количество элементов
+            // Array of :
+            //  {
+            //    Long     : Позиция
+            //    Variable : Id элемента
+            //  }
+
+            var Count = Data.Items.length;
+
+            Writer.WriteLong(Count);
+
+            for (var Index = 0; Index < Count; Index++)
             {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long     : Позиция
-                //    Variable : Id элемента
-                //  }
-
-                var Count = Data.Items.length;
-
-                Writer.WriteLong(Count);
-
-                for (var Index = 0; Index < Count; Index++)
-                {
-                    Writer.WriteLong(Data.Pos + Index);
-                    Writer.WriteString2(Data.Items[Index].Get_Id());
-                }
-
-                break;
+                Writer.WriteLong(Data.Pos + Index);
+                Writer.WriteString2(Data.Items[Index].Get_Id());
             }
-            case historyitem_Math_RemoveItem:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
 
-                var Count = Data.Items.length;
-
-                Writer.WriteLong(Count);
-                for (var Index = 0; Index < Count; Index++)
-                {
-                    Writer.WriteLong(Data.Pos);
-                }
-
-                break;
-            }
+            break;
         }
-    },
-    Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( historyitem_type_MathContent != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
+        case historyitem_Math_RemoveItem:
         {
-            case  historyitem_Math_AddItem:
+            // Long          : Количество удаляемых элементов
+            // Array of Long : позиции удаляемых элементов
+
+            var Count = Data.Items.length;
+
+            Writer.WriteLong(Count);
+            for (var Index = 0; Index < Count; Index++)
             {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long     : Позиция
-                //    Variable : Id Элемента
-                //  }
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos     = Reader.GetLong();
-                    var Element = g_oTableId.Get_ById( Reader.GetString2() );
-
-                    if ( null != Element )
-                        this.Content.splice(Pos, 0, Element);
-                }
-
-                this.private_SetNeedResize();
-
-                break;
+                Writer.WriteLong(Data.Pos);
             }
-			case historyitem_Math_RemoveItem:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
 
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var ChangesPos = Reader.GetLong();
-                    this.Content.splice(ChangesPos, 1);
-                }
-
-                this.private_SetNeedResize();
-
-                break;
-            }
+            break;
         }
-    },
-    Write_ToBinary2 : function(Writer)
-    {
-        Writer.WriteLong(historyitem_type_MathContent);
+    }
+};
+CMathContent.prototype.Load_Changes = function(Reader)
+{
+    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+    // Long : тип класса
+    // Long : тип изменений
 
-        // Long : Id
-        Writer.WriteString2(this.Id);
-    },
-    Read_FromBinary2 : function(Reader)
-    {
-        // Long : Id
-        this.Id = Reader.GetString2();
-    },
-    Refresh_RecalcData: function()
-    {
-        if(this.ParaMath !== null)
-            this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
-    },
+    var ClassType = Reader.GetLong();
+    if ( historyitem_type_MathContent != ClassType )
+        return;
 
-    Insert_MathContent : function(oMathContent, Pos, bSelect)
+    var Type = Reader.GetLong();
+
+    switch ( Type )
     {
-        if (null === this.ParaMath || null === this.ParaMath.Paragraph)
-            bSelect = false;
-
-        if (undefined === Pos)
-            Pos = this.CurPos;
-
-        var nCount = oMathContent.Content.length;
-        for (var nIndex = 0; nIndex < nCount; nIndex++)
+        case  historyitem_Math_AddItem:
         {
-            this.Internal_Content_Add(Pos + nIndex, oMathContent.Content[nIndex], false);
+            // Long     : Количество элементов
+            // Array of :
+            //  {
+            //    Long     : Позиция
+            //    Variable : Id Элемента
+            //  }
 
-            if (true === bSelect)
+            var Count = Reader.GetLong();
+
+            for ( var Index = 0; Index < Count; Index++ )
             {
-                oMathContent.Content[nIndex].Select_All();
+                var Pos     = Reader.GetLong();
+                var Element = g_oTableId.Get_ById( Reader.GetString2() );
+
+                if ( null != Element )
+                    this.Content.splice(Pos, 0, Element);
             }
+
+            this.private_SetNeedResize();
+
+            break;
         }
+        case historyitem_Math_RemoveItem:
+        {
+            // Long          : Количество удаляемых элементов
+            // Array of Long : позиции удаляемых элементов
 
-        if (null !== this.ParaMath)
-            this.ParaMath.SetNeedResize();
+            var Count = Reader.GetLong();
 
-        this.CurPos = Pos + nCount;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var ChangesPos = Reader.GetLong();
+                this.Content.splice(ChangesPos, 1);
+            }
+
+            this.private_SetNeedResize();
+
+            break;
+        }
+    }
+};
+CMathContent.prototype.Write_ToBinary2 = function(Writer)
+{
+    Writer.WriteLong(historyitem_type_MathContent);
+
+    // Long : Id
+    Writer.WriteString2(this.Id);
+};
+CMathContent.prototype.Read_FromBinary2 = function(Reader)
+{
+    // Long : Id
+    this.Id = Reader.GetString2();
+};
+CMathContent.prototype.Refresh_RecalcData = function()
+{
+    if(this.ParaMath !== null)
+        this.ParaMath.Refresh_RecalcData(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
+};
+CMathContent.prototype.Insert_MathContent = function(oMathContent, Pos, bSelect)
+{
+    if (null === this.ParaMath || null === this.ParaMath.Paragraph)
+        bSelect = false;
+
+    if (undefined === Pos)
+        Pos = this.CurPos;
+
+    var nCount = oMathContent.Content.length;
+    for (var nIndex = 0; nIndex < nCount; nIndex++)
+    {
+        this.Internal_Content_Add(Pos + nIndex, oMathContent.Content[nIndex], false);
 
         if (true === bSelect)
         {
-            this.Selection.Use = true;
-            this.Selection.Start = Pos;
-            this.Selection.End   = Pos + nCount - 1;
-
-            if (!this.bRoot)
-                this.ParentElement.Select_MathContent(this);
-            else
-                this.ParaMath.bSelectionUse = true;
-
-            this.ParaMath.Paragraph.Select_Math(this.ParaMath);
+            oMathContent.Content[nIndex].Select_All();
         }
-
-        this.Correct_Content(true);
-        this.Correct_ContentPos(-1);
     }
+
+    if (null !== this.ParaMath)
+        this.ParaMath.SetNeedResize();
+
+    this.CurPos = Pos + nCount;
+
+    if (true === bSelect)
+    {
+        this.Selection.Use = true;
+        this.Selection.Start = Pos;
+        this.Selection.End   = Pos + nCount - 1;
+
+        if (!this.bRoot)
+            this.ParentElement.Select_MathContent(this);
+        else
+            this.ParaMath.bSelectionUse = true;
+
+        this.ParaMath.Paragraph.Select_Math(this.ParaMath);
+    }
+
+    this.Correct_Content(true);
+    this.Correct_ContentPos(-1);
 };
-CMathContent.prototype.Set_Paragraph    = CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph;
-CMathContent.prototype.Get_ElementByPos = CParagraphContentWithParagraphLikeContent.prototype.Get_ElementByPos;
+CMathContent.prototype.Set_Paragraph    = ParaHyperlink.prototype.Set_Paragraph;
+CMathContent.prototype.Get_ElementByPos = ParaHyperlink.prototype.Get_ElementByPos;
 CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
 {
     this.Parent   = Parent;
@@ -3120,19 +3162,24 @@ CMathContent.prototype.Add_MatrixWithBrackets = function(begChr, endChr, ctrPr, 
     var MathContent = Delimiter.getElementMathContent(0);
     return MathContent.Add_Matrix(ctrPr, RowsCount, ColsCount, plcHide, aText);
 };
-CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine)
+/*CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
-    for(var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
+    var CurLine  = StartLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? StartRange - this.StartRange : StartRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for(var nPos = StartPos; nPos <= EndPos; nPos++)
     {
         this.Content[nPos].Recalculate_Reset(StartRange, StartLine);
     }
-};
-CMathContent.prototype.Get_Bounds = function()
+};*/
+CMathContent.prototype.old_Get_Bounds = function()
 {
     var X = 0, Y = 0, W = 0, H = 0;
     if (null !== this.ParaMath)
     {
-
         X = this.ParaMath.X + this.pos.x;
         Y = this.ParaMath.Y + this.pos.y;
         W = this.size.width;
@@ -3141,12 +3188,25 @@ CMathContent.prototype.Get_Bounds = function()
 
     return {X : X, Y : Y, W : W, H : H};
 };
-CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+CMathContent.prototype.Get_Bounds = function()
+{
+    var X = 0, Y = 0, W = 0, H = 0;
+    if (null !== this.ParaMath)
+    {
+        X = this.pos.x;
+        Y = this.pos.y - this.size.ascent;
+        W = this.size.width;
+        H = this.size.height;
+    }
+
+    return {X : X, Y : Y, W : W, H : H, Asc: Asc};
+};
+CMathContent.prototype.old_Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
 {
     var X = this.pos.x + this.ParaMath.X;
     var Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
 
-    if(this.RecalcInfo.bEqqArray)
+    if(this.RecalcInfo.bEqArray)
     {
         for(var nPos = 0; nPos < this.CurPos; nPos++)
         {
@@ -3161,7 +3221,51 @@ CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRan
 
     return this.Content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 };
-CMathContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
+CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var _EndPos = ( true === CurrentRun ? Math.min( EndPos, this.CurPos ) : EndPos );
+
+    return this.Content[_EndPos].Recalculate_CurPos(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+};
+CMathContent.prototype.n_Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+    var X = _X,
+        Y = _Y;
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var bCurr = false;
+
+    for ( var CurPos = StartPos; CurPos <= EndPos && bCurr !== true; CurPos++ )
+    {
+        bCurr = CurrentRun == true && this.CurPos == CurPos;
+
+        if(para_Math_Composition == this.Content[CurPos].Type && bCurr !== true)
+            _X += this.Content[CurPos].size.width;
+        else
+        {
+            var Res = this.Content[CurPos].Recalculate_CurPos(_X, _Y, bCurr, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
+            _X = Res.X;
+        }
+    }
+
+    return Res;
+};
+CMathContent.prototype.Get_CurrentParaPos = function()
+{
+    if ( this.CurPos >= 0 && this.CurPos < this.Content.length )
+        return this.Content[this.CurPos].Get_CurrentParaPos();
+
+    return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
+};
+CMathContent.prototype.old_Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
 {
     var nLength = this.Content.length;
 
@@ -3719,7 +3823,7 @@ CMathContent.prototype.Select_All = function(Direction)
         this.Content[nPos].Select_All(Direction);
     }
 };
-CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
+CMathContent.prototype.old_Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
 {
     var Start = this.Selection.Start;
     var End   = this.Selection.End;
@@ -3761,6 +3865,56 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
         SelectionDraw.H      = this.size.height;
     }
 };
+CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
+{
+    var SelectionStartPos = this.Selection.Start;
+    var SelectionEndPos   = this.Selection.End;
+
+    if(SelectionStartPos > SelectionEndPos)
+    {
+        SelectionStartPos = this.Selection.End;
+        SelectionEndPos   = this.Selection.Start;
+    }
+
+    // Выставляем высоту селекта. В верхнем контенте высота задается параграфом
+    if(true !== this.bRoot)
+    {
+        var PosLine = this.ParaMath.GetLinePosition(_CurLine);
+        SelectionDraw.StartX = PosLine.x + this.pos.x;
+        SelectionDraw.StartY = PosLine.y + this.pos.y - this.size.ascent;
+        SelectionDraw.H      = this.size.height;
+    }
+
+    var SelectionUse = this.Selection.Use;
+
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for(var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+    {
+        var Item = this.Content[CurPos];
+        if(Item.Type == para_Math_Composition)
+        {
+            if(SelectionUse && SelectionStartPos == CurPos && SelectionStartPos == SelectionEndPos)
+            {
+                Item.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
+            }
+            else if(SelectionUse && SelectionStartPos <= CurPos && CurPos <= SelectionEndPos)
+            {
+                SelectionDraw.FindStart = false;
+                SelectionDraw.DrawSelection = true;
+                SelectionDraw.W += Item.size.width;
+            }
+            else if(SelectionDraw.FindStart == true)
+                SelectionDraw.StartX += Item.size.width;
+        }
+        else
+            Item.Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
+    }
+};
 CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)
 {
     this.Selection.Use   = true;
@@ -3780,7 +3934,7 @@ CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)
 CMathContent.prototype.Select_Element = function(Element, bWhole)
 {
     var nPos = -1;
-    for (var nCurPos = 0, nCount = this.Content.length; nCurPos < nCount; nCurPos++)
+    for(var nCurPos = 0, nCount = this.Content.length; nCurPos < nCount; nCurPos++)
     {
         if (this.Content[nCurPos] === Element)
         {
@@ -3877,14 +4031,172 @@ CMathContent.prototype.private_SetNeedResize = function()
     if (null !== this.ParaMath)
         this.ParaMath.SetNeedResize();
 };
-CMathContent.prototype.Is_CheckingNearestPos         = CParagraphContentWithParagraphLikeContent.prototype.Is_CheckingNearestPos;
-CMathContent.prototype.Search                        = CParagraphContentWithParagraphLikeContent.prototype.Search;
-CMathContent.prototype.Add_SearchResult              = CParagraphContentWithParagraphLikeContent.prototype.Add_SearchResult;
-CMathContent.prototype.Clear_SearchResults           = CParagraphContentWithParagraphLikeContent.prototype.Clear_SearchResults;
-CMathContent.prototype.Remove_SearchResult           = CParagraphContentWithParagraphLikeContent.prototype.Remove_SearchResult;
-CMathContent.prototype.Search_GetId                  = CParagraphContentWithParagraphLikeContent.prototype.Search_GetId;
-CMathContent.prototype.Recalc_RunsCompiledPr         = CParagraphContentWithParagraphLikeContent.prototype.Recalc_RunsCompiledPr;
+CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
+{
+    this.bMath_OneLine = PRS.bMath_OneLine;
 
+    var CurLine  = PRS.Line - this.StartLine;
+    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
+
+    var ContentLen = this.Content.length;
+
+    var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
+    var RangeEndPos   = this.bMath_OneLine ? ContentLen - 1 : 0;
+
+    this.InfoPoints.SetDefault();
+
+    var ascent = 0, descent = 0;
+    this.size.width = 0;
+    var bInline = this.ParaMath.Is_Inline();
+
+    var LineAscent = PRS.LineAscent, LineDescent = PRS.LineDescent,
+        LastPos = ContentLen;
+
+    for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
+    {
+        var Item = this.Content[Pos],
+            Type = Item.Type;
+
+        // для однострочных мат объектов обновляем CurLine и CurRange, Run в этом случае не могут разбиваться на несколько строк
+        if ( this.bMath_OneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
+            Item.Recalculate_Reset( PRS.Range, PRS.Line );
+
+        PRS.Update_CurPos( Pos, Depth );
+
+        if(this.bMath_OneLine) // контент занимает всегда(!) одну строку
+        {
+            Item.Recalculate_Range_OneLine(PRS, ParaPr, Depth + 1);
+
+            if(this.RecalcInfo.bEqArray && Type == para_Math_Composition)
+                this.InfoPoints.ContentPoints.UpdatePoint(this.Content[Pos].size.width);
+
+            this.size.width += Item.size.width;
+
+            if(ascent < Item.size.ascent)
+                ascent = Item.size.ascent;
+
+            if(descent < Item.size.height - Item.size.ascent)
+                descent = Item.size.height - Item.size.ascent;
+
+            this.size.ascent = ascent;
+            this.size.height = ascent + descent;
+        }
+        else // контент может занимать несколько строк
+        {
+            Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
+
+            // обновляем LineAscent и LineDescent для мат объектов только тогда, когда встретили новое слово:
+            // LastPos < PRS.LineBreakPos.Get(Depth) - новое слово в Run
+            // (Type == para_Math_Composition && bInline && PRS.Word == false) - мат объект, перед ним break_operator => новое слово в конце предыдущего Run
+            // иначе LastPos текцщего мат объекта перетрет предыдущий и не будут учтены метрики предшествующих мат объектов (из предыдущего слова)
+
+            // для крайнего случая (в контенте не осталось больше элементов проверяем после цикла)
+
+            if(Type == para_Math_Composition )
+            {
+
+                // перед мат объектом идет break_operator (то есть перед мат объектом начинается слово)
+                // или мат оператор (при этом мат объект не является первым элементом в строке)
+                if((PRS.Word == false || (Item.kind == MATH_BOX && PRS.Word == true)))
+                {
+                    if(PRS.Word == true)
+                    {
+                        PRS.FirstItemOnLine = false;
+                    }
+
+                    PRS.Word = true;
+
+                    if(bInline || Item.kind == MATH_BOX)
+                    {
+                        LastPos = Pos - 1;
+
+                        PRS.Update_CurPos(LastPos, Depth);
+                        this.Content[LastPos].Update_LineBreakPos(PRS, true); // обновим : начало нового слова - конец предыдущего Run
+                    }
+
+                    // новое слово => обновляем метрики
+                    if (PRS.LineAscent < LineAscent)
+                        PRS.LineAscent = LineAscent;
+
+                    if (PRS.LineDescent < LineDescent)
+                        PRS.LineDescent = LineDescent;
+                }
+                else
+                {
+                    LastPos = PRS.LineBreakPos.Get(Depth);
+                }
+
+
+                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
+                if (PRS.FirstItemOnLine == false && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+                {
+                    PRS.MoveToLBP = true;
+                    PRS.NewRange = true;
+                }
+
+
+                if( LineAscent < Item.size.ascent )
+                    LineAscent = Item.size.ascent;
+
+                if( LineDescent < Item.size.height - Item.size.ascent )
+                    LineDescent = Item.size.height - Item.size.ascent;
+            }
+            else if(LastPos < PRS.LineBreakPos.Get(Depth)) // Run, новое слово обновляем метрики
+            {
+                if (PRS.LineAscent < LineAscent)
+                    PRS.LineAscent = LineAscent;
+
+                if (PRS.LineDescent < LineDescent)
+                    PRS.LineDescent = LineDescent;
+
+                LastPos = ContentLen;
+            }
+
+
+            if ( true === PRS.NewRange )
+            {
+                RangeEndPos = Pos;
+                break;
+            }
+        }
+    }
+
+    if(PRS.NewRange == false) // элементы в контенте закончились, перехода на новую строчку нет => обновляем LineAscent и LineDescent
+    {
+        if (PRS.LineAscent < LineAscent)
+            PRS.LineAscent = LineAscent;
+
+        if (PRS.LineDescent < LineDescent)
+            PRS.LineDescent = LineDescent;
+    }
+
+
+    if ( Pos >= ContentLen )
+    {
+        RangeEndPos = Pos - 1;
+    }
+
+
+    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
+
+};
+
+/*CMathContent.prototype.Is_CheckingNearestPos         = ParaHyperlink.prototype.Is_CheckingNearestPos;
+
+CMathContent.prototype.Search                        = ParaHyperlink.prototype.Search;
+CMathContent.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
+CMathContent.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
+CMathContent.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
+CMathContent.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
+CMathContent.prototype.Recalc_RunsCompiledPr         = ParaHyperlink.prototype.Recalc_RunsCompiledPr;
+//CMathContent.prototype.Recalculate_Range             = ParaHyperlink.prototype.Recalculate_Range;
+CMathContent.prototype.protected_AddRange            = ParaHyperlink.prototype.protected_AddRange;
+CMathContent.prototype.protected_FillRange           = ParaHyperlink.prototype.protected_FillRange;
+CMathContent.prototype.protected_UpdateSpellChecking = ParaHyperlink.prototype.protected_UpdateSpellChecking;
+CMathContent.prototype.Recalculate_Range_Width       = ParaHyperlink.prototype.Recalculate_Range_Width;
+CMathContent.prototype.Recalculate_Set_RangeEndPos   = ParaHyperlink.prototype.Recalculate_Set_RangeEndPos;
+CMathContent.prototype.Is_EmptyRange                 = ParaHyperlink.prototype.Is_EmptyRange;*/
 
 CMathContent.prototype.Get_SelectionDirection = function()
 {
