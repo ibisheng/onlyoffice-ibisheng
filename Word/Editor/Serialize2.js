@@ -261,7 +261,8 @@ var c_oSerParType = {
 	CommentEnd: 7,
 	OMathPara: 8,
 	OMath: 9,
-    Hyperlink: 10
+    Hyperlink: 10,
+	FldSimple: 11
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -616,6 +617,10 @@ var c_oSer_HyperlinkType = {
     History: 4,
     DocLocation: 5,
     TgtFrame: 6
+};
+var c_oSer_FldSimpleType = {
+	Content: 0,
+	Instr: 1
 };
 var c_oSer_ColorThemeType = {
 	Auto: 0,
@@ -3581,7 +3586,24 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     //if (item.Content.length > 0) 
                         this.WriteRun(item, bUseSelection);
                     break;
-                case para_Hyperlink:
+				case para_Field:
+					if(fieldtype_MERGEFIELD == item.FieldType){
+						var Instr = "MERGEFIELD";
+						for(var j = 0; j < item.Arguments.length; ++j){
+							var argument = item.Arguments[j];
+							argument = argument.replace(/(\\|")/g, "\\$1");
+							if(-1 != argument.indexOf(' '))
+								argument = "\"" + argument + "\"";
+							Instr += " " + argument;
+						}
+						for(var j = 0; j < item.Switches.length; ++j)
+							Instr += " \\" + item.Switches[j];
+						this.bs.WriteItem(c_oSerParType.FldSimple, function () {
+							oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
+						});
+					}
+                    break;
+				case para_Hyperlink:
                     this.bs.WriteItem(c_oSerParType.Hyperlink, function () {
                         oThis.WriteHyperlink(item, bUseSelection);
                     });
@@ -3737,23 +3759,27 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                 });
             }
             if (null != elem.pageNum) {
-                var sField = " PAGE   \\* MERGEFORMAT ";
-                this.WriteRun2(function () {
-                    oThis.memory.WriteByte(c_oSerRunType.fldstart);
-                    oThis.memory.WriteString2(sField);
-                }, oRun);
-				if(null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)){
-					this.WriteRun2(function () {
-						oThis.WriteText(elem.pageNum.String);
-					}, oRun);
-				}
-                this.WriteRun2(function () {
-                    oThis.memory.WriteByte(c_oSerRunType.fldend);
-                    oThis.memory.WriteLong(c_oSerPropLenType.Null);
-                }, oRun);
+				var Instr = "PAGE \\* MERGEFORMAT";
+				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
+					if(null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)){
+						oThis.WriteRun2(function () {
+							oThis.WriteText(elem.pageNum.String);
+						}, oRun);
+					}
+				});});
             }
         }
     }
+	this.WriteFldSimple = function (Instr, fWriteContent)
+    {
+		var oThis = this;
+		//порядок записи важен
+		//Instr
+		this.memory.WriteByte(c_oSer_FldSimpleType.Instr);
+        this.memory.WriteString2(Instr);
+		//Content
+		this.bs.WriteItem(c_oSer_FldSimpleType.Content, fWriteContent);
+    };
     this.WriteRunContent = function (oRun, nStart, nEnd)
     {
         var oThis = this;
@@ -7388,11 +7414,23 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             //для случая гиперссылок на несколько строк в конце параграфа завершаем начатые, а начале - продолжаем незавершенные
             if (this.aFields.length > 0) {
                 for (var i = 0; i < this.aFields.length; ++i) {
-                    var sField = this.aFields[i];
-                    var oHyperlink = new ParaHyperlink();
-                    oHyperlink.Set_Paragraph(paragraph);
-                    oParStruct.addElem(oHyperlink);
-                    this.parseField(oHyperlink, sField);
+                    var elem = this.aFields[i];
+					elem.commitElem = false;
+					var oField = elem.field;
+					if(null != oField){
+						if(para_Hyperlink == oField.Get_Type()){
+							var oHyperlink = new ParaHyperlink();
+							oHyperlink.Set_Paragraph(paragraph);
+							oHyperlink.Set_Value(oField.Get_Value());
+							oHyperlink.Set_ToolTip(oField.Get_ToolTip());
+							oParStruct.addElem(oHyperlink);
+							elem.commitElem = true;
+						}
+						else if(para_PageNum == oField.Get_Type()){
+							oParStruct.addElem(null);
+							elem.commitElem = true;
+						}
+					}
                 }
             }
             res = this.bcr.Read1(length, function(t, l){
@@ -7409,7 +7447,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-        var oCurContainer = oParStruct.cur.elem;
+        var oCurContainer = oParStruct.getElem();
         if (c_oSerParType.Run === type)
         {
             var oNewRun = new ParaRun(oParStruct.paragraph);
@@ -7426,7 +7464,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
 			});
-			if(null != oCommon.Id)
+			if(null != oCommon.Id && null != oCurContainer)
 			{
 			    oCommon.oParent = oCurContainer;
 				var item = this.oComments[oCommon.Id];
@@ -7449,7 +7487,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadComment(t,l, oCommon);
             });
-			if(null != oCommon.Id)
+			if(null != oCommon.Id && null != oCurContainer)
 			{
 			    oCommon.oParent = oCurContainer;
 				var item = this.oComments[oCommon.Id];
@@ -7506,10 +7544,60 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		    }            
             oNewHyperlink.Check_Content();
 		}
+		else if (c_oSerParType.FldSimple == type) {
+			var oFldSimpleObj = {ParaField: null};
+		    res = this.bcr.Read1(length, function (t, l) {
+		        return oThis.ReadFldSimple(t, l, oFldSimpleObj, oParStruct);
+		    });
+			if(null != oFldSimpleObj.ParaField){
+				var oField = oFldSimpleObj.ParaField;
+				var nFieldType = oField.Get_Type();
+				if(para_PageNum == nFieldType)
+				{
+					var oNewRun = new ParaRun(oParStruct.paragraph);
+					oNewRun.Add_ToContent(0, oField);
+					oParStruct.addToContent(oNewRun);
+				}
+				else
+					oParStruct.addToContent(oField);
+				if (para_Field == nFieldType && editor)
+					editor.WordControl.m_oLogicDocument.Register_Field(oField);
+			}
+		}
 		else
 		    res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadFldSimple = function (type, length, oFldSimpleObj, oParStruct) {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSer_FldSimpleType.Instr === type) {
+			var Instr = this.stream.GetString2LE(length);
+			oFldSimpleObj.ParaField = this.parseField(Instr, oParStruct.paragraph);
+        }
+        else if (c_oSer_FldSimpleType.Content === type) {
+			if(null != oFldSimpleObj.ParaField){
+				if(para_PageNum != oFldSimpleObj.ParaField.Get_Type())
+				{
+					var oFldStruct = new OpenParStruct(oFldSimpleObj.ParaField, oParStruct.Content, oParStruct.paragraph);
+					res = this.bcr.Read1(length, function (t, l) {
+						return oThis.ReadParagraphContent(t, l, oFldStruct);
+					});
+					oFldStruct.commitAll();
+				}
+				else
+					res = c_oSerConstants.ReadUnknown;
+			}
+			else{
+				res = this.bcr.Read1(length, function (t, l) {
+					return oThis.ReadParagraphContent(t, l, oParStruct);
+				});
+			}
+		}
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    }
     this.ReadHyperlink = function (type, length, oHyperlinkObj, oNewHyperlink, oParStruct) {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7702,20 +7790,30 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
         else if(c_oSerRunType.fldstart === type)
         {
-            //todo  все field
             oRes.bRes = false;
-            var oHyperlink = new ParaHyperlink();
-            oHyperlink.Set_Paragraph(oParStruct.paragraph);
-            oParStruct.addElem(oHyperlink);
-            var sField = this.stream.GetString2LE(length);
-            this.parseField(oHyperlink, sField);
-            this.aFields.push(sField);
+			var sField = this.stream.GetString2LE(length);
+			var oField = this.parseField(sField, oParStruct.paragraph);
+			var commitElem = false;
+			if(null != oField)
+			{
+				if(para_PageNum == oField.Get_Type()){
+					oNewElem = oField;
+					//досрочно добавляем oPos.run потому что после oParStruct.addElem(null); он никуда не добавится
+					oParStruct.addToContent(oPos.run);
+					oParStruct.addElem(null);
+				}
+				else
+					oParStruct.addElem(oField);
+				commitElem = true;
+			}
+            this.aFields.push({field: oField, commitElem: commitElem});
         }
         else if(c_oSerRunType.fldend === type)
         {
             oRes.bRes = false;
-            oParStruct.commitElem();
-            this.aFields.pop();
+			var elem = this.aFields.pop();
+			if(elem.commitElem)
+				oParStruct.commitElem();
         }
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
@@ -7799,72 +7897,97 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = c_oSerConstants.ReadUnknown;
 		return res;
 	}
-    this.parseField = function(hyp, fld)
+    this.parseField = function(fld, paragraph)
     {
-        if(-1 != fld.indexOf("HYPERLINK"))
-        {
-            var sLink = null;
-            var sTooltip = null;
-            var bNextLink = false;
-            var bNextTooltip = false;
-            //разбиваем по пробелам, но с учетом кавычек
-            var aItems = [];
-            var sCurItem = "";
-            var bDQuot = false;
-            for(var i = 0, length = fld.length; i < length; ++i)
-            {
-                var sCurLetter = fld[i];
-                if("\"" == sCurLetter)
-                    bDQuot = !bDQuot;
-                else if("\\" == sCurLetter && true == bDQuot && i + 1 < length && "\"" == fld[i + 1])
-                {
-                    i++;
-                    sCurItem += fld[i];
-                }
-                else if(" " == sCurLetter && false == bDQuot)
-                {
-                    if(sCurItem.length > 0)
-                    {
-                        aItems.push(sCurItem);
-                        sCurItem = "";
-                    }
-                }
-                else
-                    sCurItem += sCurLetter;
-            }
-            if(sCurItem.length > 0)
-                aItems.push(sCurItem);
-            for(var i = 0, length = aItems.length; i < length; ++i)
-            {
-                var item = aItems[i];
-                if("" != item)
-                {
-                    if(bNextLink)
-                    {
-                        bNextLink = false;
-                        sLink = item;
-                    }
-                    if(bNextTooltip)
-                    {
-                        bNextTooltip = false;
-                        sTooltip = item;
-                    }
-                    
-                    if("HYPERLINK" == item)
-                        bNextLink = true;
-                    else if("\\o" == item)
-                        bNextTooltip = true;
-                }
-            }
-            if(null != sLink)
-                hyp.Set_Value( this.trimField(sLink) );
-            if(null != sTooltip)
-                hyp.Set_ToolTip( this.trimField(sTooltip) );
-        }
+		var sFieldType = "";
+		var aArguments = [];
+		var aSwitches = [];
+		var aParts = this.splitFieldArguments(fld);
+		if(aParts.length > 0){
+			sFieldType = aParts[0].toUpperCase();
+			var bSwitch = false;
+			var sCurSwitch = "";
+			for(var i = 1; i < aParts.length; ++i){
+				var part = aParts[i];
+				if(part.length > 1 && '\\' == part[0] && '\"' != part[1] && '\\' != part[1]){
+					if(sCurSwitch.length > 0)
+						aSwitches.push(sCurSwitch)
+					bSwitch = true;
+					sCurSwitch = part.substring(1);
+				}
+				else{
+					if(bSwitch)
+						sCurSwitch += " " + part;
+					else
+						aArguments.push(this.parseFieldArgument(part));
+				}
+			}
+			if(sCurSwitch.length > 0)
+				aSwitches.push(sCurSwitch)
+		}
+		//обрабатывает известные field
+		return this.initField(sFieldType, aArguments, aSwitches, paragraph);
     };
-    this.trimField = function( str ){
-        return str.replace(/^[\s\"\']+|[\s\"\']+$/g, '');
-    };
+	this.splitFieldArguments = function(sVal){
+		var temp = String.fromCharCode(5);
+		//заменяем '\"' , чтобы было проше регулярное выражение,можно написать более быстрый код
+		sVal = sVal.replace(/\\"/g, temp);
+		var aMatch = sVal.match(/[^\s"]+|"[^"]*"/g);
+		if(null != aMatch){
+			for(var i = 0; i < aMatch.length; ++i)
+				aMatch[i] = aMatch[i].replace(new RegExp(temp, 'g'), "\\\"");
+			}
+		else
+			aMatch = [];
+		return aMatch;
+	};
+	this.parseFieldArgument = function(sVal){
+		//trim
+		sVal = sVal.replace(/^\s+|\s+$/g,'');
+		//remove surrounded quote
+		if(sVal.length > 1 && "\"" == sVal[0] && "\"" == sVal[sVal.length - 1])
+			sVal = sVal.substring(1, sVal.length - 1);
+		//replace '\\' and '\"'
+		sVal = sVal.replace(/\\([\\\"])/g, '$1');
+		return sVal
+	};
+	this.initField = function(sFieldType, aArguments, aSwitches, paragraph)
+    {
+		var oRes = null;
+		if("HYPERLINK" == sFieldType){
+			var sLink = null;
+			var sLocation = null;
+			var sTooltip = null;
+			if(aArguments.length > 0)
+				sLink = aArguments[0];
+			for(var i = 0; i < aSwitches.length; ++i){
+				var sSwitch = aSwitches[i];
+				if(sSwitch.length > 0){
+					var cFirstChar = sSwitch[0].toLowerCase();
+					var sFieldArgument = this.parseFieldArgument(sSwitch.substring(1));
+					if("l" == cFirstChar)
+						sLocation = sFieldArgument;
+					else if("o" == cFirstChar)
+						sTooltip = sFieldArgument;
+				}
+			}
+			if(!(null != sLocation && sLocation.length > 0)){
+				oRes = new ParaHyperlink();
+				oRes.Set_Paragraph(paragraph);
+				if(null != sLink && sLink.length > 0)
+					oRes.Set_Value(sLink);
+				if(null != sTooltip && sTooltip.length > 0)
+					oRes.Set_ToolTip(sTooltip);
+			}
+		}
+		else if("PAGE" == sFieldType){
+			oRes = new ParaPageNum();
+		}
+		else if("MERGEFIELD" == sFieldType){
+			oRes = new ParaField(fieldtype_MERGEFIELD, aArguments, aSwitches);
+		}
+		return oRes;
+	}
     this.ReadImage = function(type, length, img)
     {
         var res = c_oSerConstants.ReadOk;
@@ -11601,24 +11724,34 @@ OpenParStruct.prototype = {
             elem.Remove_FromContent(pos, count);
     },
     addToContent: function (oItem) {
-        this.cur.pos = this._addToContent(this.cur.elem, this.cur.pos, oItem);
+		if(null != this.cur.elem)
+			this.cur.pos = this._addToContent(this.cur.elem, this.cur.pos, oItem);
     },
     GetFromContent: function (nIndex) {
-        return this._GetFromContent(this.cur.elem, nIndex);
+		if(null != this.cur.elem)
+			return this._GetFromContent(this.cur.elem, nIndex);
+		return null;
     },
     GetContentLength: function () {
-        return this._GetContentLength(this.cur.elem);
+		if(null != this.cur.elem)
+			return this._GetContentLength(this.cur.elem);
+		return null;
     },
     addElem: function (oElem) {
-        this.cur = { pos: 0, elem: oElem };
-        this.stack.push(this.cur);
+		if(null != this.cur.elem){
+			this.cur = { pos: 0, elem: oElem };
+			this.stack.push(this.cur);
+		}
+    },
+	getElem: function () {
+        return this.cur.elem;
     },
     commitElem: function () {
         var bRes = false;
         if (this.stack.length > 1) {
             var oPrevElem = this.stack.pop();
             this.cur = this.stack[this.stack.length - 1];
-            if (oPrevElem.elem.Content && oPrevElem.elem.Content.length > 0)
+            if (null != oPrevElem.elem && oPrevElem.elem.Content && oPrevElem.elem.Content.length > 0)
                 this.addToContent(oPrevElem.elem);
             bRes = true;
         }
