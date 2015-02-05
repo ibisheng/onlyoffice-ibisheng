@@ -6896,6 +6896,7 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_PageNum           : Element = new ParaPageNum();           break;
         case para_Math_Placeholder  : Element = new CMathText();             break;
         case para_Math_Text			: Element = new CMathText();		     break;
+        case para_Math_BreakOperator: Element = new CMathText();		     break;
         case para_Math_Ampersand	: Element = new CMathAmp();   		   	 break;
         case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
     }
