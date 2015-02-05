@@ -4052,6 +4052,23 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var LineAscent = PRS.LineAscent, LineDescent = PRS.LineDescent,
         LastPos = ContentLen;
 
+    if(this.bRoot && bInline && CurLine == 0 && CurRange == 0)
+    {
+        PRS.Update_CurPos(0, Depth);
+        this.Content[0].Update_LineBreakPos(PRS, false); // обновим : начало нового слова - конец предыдущего Run
+
+        if(PRS.Word == true)
+        {
+            PRS.FirstItemOnLine = false;
+            PRS.X += PRS.SpaceLen + PRS.WordLen;
+
+            PRS.Word = false;
+            PRS.EmptyLine = false;
+            PRS.SpaceLen = 0;
+            PRS.WordLen = 0;
+        }
+    }
+
     for(var Pos = RangeStartPos; Pos < ContentLen; Pos++)
     {
         var Item = this.Content[Pos],

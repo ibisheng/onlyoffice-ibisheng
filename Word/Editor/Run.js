@@ -1865,20 +1865,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
 
-                        // исключительно для первого элемента в формуле
-                        if(PRS.Line == 0 && PRS.Range == 0 && bCurrWord == true && FirstItemOnLine == true)
-                         {
-                             PRS.Set_LineBreakPos(Pos);
-                             WordLen = SpaceLen;
-                             SpaceLen = 0;
-                             Word = true;
-                         }
-
-                        if(!(bCurrWord == false && FirstItemOnLine == true))
-                            FirstItemOnLine = false;
+                        FirstItemOnLine = false;
 
                     }
-
 
                     break;
                 }
@@ -8489,6 +8478,10 @@ ParaRun.prototype.Update_LineBreakPos = function(PRS, bAfterRun)
     if(bAfterRun)
     {
         PRS.Set_LineBreakPos(this.Content.length);
+    }
+    else
+    {
+        PRS.Set_LineBreakPos(0);
     }
 };
 ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
