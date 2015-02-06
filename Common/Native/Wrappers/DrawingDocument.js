@@ -458,7 +458,7 @@ function CTableOutlineDr()
 
         if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
-            var pos = this.__DD_ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum);
+            var pos = drDoc.__DD_ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum);
 
             var _x0 = 0;
             var _y0 = 0;
@@ -504,28 +504,28 @@ function CTableOutlineDr()
             var _x1 = _bounds[0];
             var _y1 = _bounds[1];
 
-            var pos0 = this.__DD_ConvertCoordsToCursor(x0, y0, this.TableOutline.PageNum);
+            var pos0 = drDoc.__DD_ConvertCoordsToCursor(x0, y0, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 0;
                 return;
             }
 
-            pos0 = this.__DD_ConvertCoordsToCursor(x1, y1, this.TableOutline.PageNum);
+            pos0 = drDoc.__DD_ConvertCoordsToCursor(x1, y1, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 1;
                 return;
             }
 
-            pos0 = this.__DD_ConvertCoordsToCursor(x3, y3, this.TableOutline.PageNum);
+            pos0 = drDoc.__DD_ConvertCoordsToCursor(x3, y3, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 3;
                 return;
             }
 
-            pos0 = this.__DD_ConvertCoordsToCursor(x2, y2, this.TableOutline.PageNum);
+            pos0 = drDoc.__DD_ConvertCoordsToCursor(x2, y2, this.TableOutline.PageNum);
             if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
             {
                 this.TrackTablePos = 2;

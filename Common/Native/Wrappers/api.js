@@ -4340,6 +4340,96 @@ asc_docs_api.prototype.put_AddLineBreak = function()
     }
 };
 
+asc_docs_api.prototype.ImgApply = function(obj)
+{
+
+    var ImagePr = obj;
+
+    // Если у нас меняется с Float->Inline мы также должны залочить соответствующий параграф
+    var AdditionalData = null;
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+    if(obj && obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock)
+    {
+        var selectedObjectsByType = LogicDocument.DrawingObjects.getSelectedObjectsByTypes();
+        if(selectedObjectsByType.charts[0])
+        {
+            var chartSpace = selectedObjectsByType.charts[0];
+            if(chartSpace && chartSpace.chart && chartSpace.chart.plotArea && chartSpace.chart.plotArea.charts[0] && chartSpace.chart.plotArea.charts[0].getObjectType() !== historyitem_type_StockChart)
+            {
+                if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
+                {
+                    this.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError,c_oAscError.Level.NoCritical);
+                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+                    return;
+                }
+            }
+        }
+    }
+    /*
+     if ( docpostype_FlowObjects == LogicDocument.CurPos.Type && "undefined" != typeof( ImagePr.WrappingStyle ) && null != ImagePr.WrappingStyle && c_oAscWrapStyle.Flow != ImagePr.WrappingStyle )
+     {
+     var FlowObject = LogicDocument.Pages[LogicDocument.Selection.Data.PageNum].FlowObjects.Get_ByIndex( LogicDocument.CurPos.ContentPos );
+     AdditionalData =
+     {
+     Type    : 1,
+     X       : FlowObject.X,
+     Y       : FlowObject.Y,
+     PageNum : LogicDocument.Selection.Data.PageNum
+     }
+     }
+     */
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties, AdditionalData) )
+    {
+
+        if (ImagePr.ShapeProperties)
+            ImagePr.ImageUrl = "";
+
+        if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+        }
+        else if (ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill && ImagePr.ShapeProperties.fill.fill &&
+            ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+        }
+        else
+        {
+            ImagePr.ImageUrl = null;
+
+
+            if(!this.noCreatePoint || this.exucuteHistory)
+            {
+                if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
+                {
+                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    this.exucuteHistoryEnd = false;
+                }
+                else
+                {
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                }
+                if(this.exucuteHistory)
+                {
+                    this.exucuteHistory = false;
+                }
+            }
+            else
+            {
+                ExecuteNoHistory(function(){
+                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                }, this, []);
+            }
+
+            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+        }
+    }
+};
+
 asc_docs_api.prototype.IncreaseIndent = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )

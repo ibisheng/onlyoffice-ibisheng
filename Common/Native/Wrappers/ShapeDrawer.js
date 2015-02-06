@@ -751,6 +751,7 @@ CShapeDrawer.prototype =
                 }
 
                 this.NativeGraphics["PD_put_BrushTextureMode"]((null == _fill.tile) ? 1 : 2);
+                this.NativeGraphics["PD_put_BrushTextureAlpha"]((null === this.UniFill.transparent) ? 255 : this.UniFill.transparent);
                 this.NativeGraphics["PD_put_BrushBounds"](this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
 
                 break;
@@ -815,12 +816,18 @@ CShapeDrawer.prototype =
 
                 var arr_pos = [];
                 var arr_colors = [];
+
                 for (var i = 0; i < _fill.colors.length; i++)
                 {
                     arr_pos.push(_fill.colors[i].pos / 100000);
 
                     var _c = _fill.colors[i].color.RGBA;
+                    var _a = _c.A;
+                    if (this.UniFill.transparent != null)
+                        _c.A = this.UniFill.transparent;
+
                     arr_colors.push(_c.R * 256*256*256 + _c.G * 256*256 + _c.B * 256 + _c.A);
+                    _c.A = _a;
                 }
                 this.NativeGraphics["PD_put_BrushGragientColors"](arr_pos, arr_colors);
 
