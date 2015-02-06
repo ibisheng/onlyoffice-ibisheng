@@ -1397,8 +1397,6 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PosByElement = function(
     if ( this === Class )
         return true;
 
-    var ContentPos = new CParagraphContentPos();
-
     var StartPos = 0;
     var EndPos   = this.Content.length - 1;
 

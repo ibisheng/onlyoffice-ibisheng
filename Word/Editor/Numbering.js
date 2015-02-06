@@ -201,7 +201,7 @@ function CAbstractNum(Type)
     }
 
     this.NumStyleLink = undefined;
-	this.StyleLink = undefined;
+	this.StyleLink    = undefined;
 
     this.Lvl = [];
     for ( var Index = 0; Index < 9; Index++ )
@@ -266,6 +266,10 @@ CAbstractNum.prototype =
     // Копируем информацию из другой нумерации
     Copy : function(AbstractNum)
     {
+        //TODO: Сделать функциями для совместного редактирования
+        this.StyleLink    = AbstractNum.StyleLink;
+        this.NumStyleLink = AbstractNum.NumStyleLink;
+
         for ( var Index = 0; Index < 9; Index++ )
         {
             var Lvl_new = this.Internal_CopyLvl( AbstractNum.Lvl[Index] );
@@ -1726,12 +1730,47 @@ CAbstractNum.prototype =
 
 function CNumbering()
 {
-    this.AbstractNum = [];
-    this.Num         = [];
+    this.AbstractNum = {};
+    this.Num         = {};
 }
 
 CNumbering.prototype =
 {
+    Copy_All_AbstractNums : function()
+    {
+        var Map = {};
+        var NewAbstractNums = [];
+
+        for (var OldId in this.AbstractNum)
+        {
+            var OldAbsNum = this.AbstractNum[OldId];
+            var NewAbsNum = new CAbstractNum();
+
+            var NewId = NewAbsNum.Get_Id();
+
+            NewAbsNum.Copy(OldAbsNum);
+
+            NewAbstractNums[NewId] = NewAbsNum;
+            Map[OldId] = NewId;
+        }
+
+        return {AbstractNums : NewAbstractNums, Map : Map};
+    },
+
+    Clear : function()
+    {
+        this.AbstractNum = {};
+        this.Num         = {};
+    },
+
+    Append_AbstractNums : function(AbstractNums)
+    {
+        for (var Id in AbstractNums)
+        {
+            if (undefined === this.AbstractNum[Id])
+                this.AbstractNum[Id] = AbstractNums[Id];
+        }
+    },
 
     Create_AbstractNum : function(Type)
     {

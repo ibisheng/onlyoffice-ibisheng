@@ -570,6 +570,20 @@ CDocumentFieldsManager.prototype.Update_MailMergeFields = function(Map)
         }
     }
 };
+CDocumentFieldsManager.prototype.Replace_MailMergeFields = function(Map)
+{
+    for (var FieldName in Map)
+    {
+        if (undefined !== this.m_oMailMergeFields[FieldName])
+        {
+            for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
+            {
+                var oField = this.m_oMailMergeFields[FieldName][Index];
+                oField.Replace_MailMerge(Map[FieldName]);
+            }
+        }
+    }
+};
 CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
 {
     for (var FieldName in this.m_oMailMergeFields)
@@ -711,11 +725,13 @@ function CDocument(DrawingDocument)
 
     // Дополнительные настройки
     this.UseTextShd = true; // Использовать ли заливку текста
+    this.ForceCopySectPr = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
+    this.CopyNumberingMap = null; // Мап старый индекс -> новый индекс для копирования нумерации
 
     // Мап для рассылки
     this.MailMergeMap = null;
-    this.MailMergeMap = [{Name : "Илья", Address : "Нижний Новгород"}, {Name : "Космонавт", Address : "Галактика"}];
     this.MailMergePreview = false;
+    this.MailMergeFieldsHighlight = false; // Подсвечивать ли все поля связанные с рассылкой
 
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
@@ -11953,7 +11969,7 @@ CDocument.prototype =
             this.DrawingDocument.Update_MathTrack(false);
 
         var oField = oSelectedInfo.Get_Field();
-        if (null !== oField)
+        if (null !== oField && (fieldtype_MERGEFIELD !== oField.Get_FieldType() || true !== this.MailMergeFieldsHighlight))
         {
             var aBounds = oField.Get_Bounds();
             this.DrawingDocument.Update_FieldTrack(true, aBounds);
@@ -13654,7 +13670,6 @@ CDocument.prototype =
         
         return CurPage + 1;
     },
-
     
     Get_SectionPageNumInfo : function(Page_abs)
     {
@@ -13983,6 +13998,7 @@ CDocument.prototype.Recalculate_FromStart = function(bUpdateStates)
 CDocument.prototype.Start_MailMerge = function(MailMergeMap)
 {
     this.MailMergeMap = MailMergeMap;
+    editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
     editor.sync_StartMailMerge();
 };
 CDocument.prototype.Get_MailMergeReceptionsCount = function()
@@ -14062,6 +14078,99 @@ CDocument.prototype.Add_MailMergeField = function(Name)
 CDocument.prototype.Register_Field = function(oField)
 {
     this.FieldsManager.Register_Field(oField);
+};
+CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
+{
+    var nStartIndex = (undefined !== _nStartIndex ? Math.max(0, _nStartIndex) : 0);
+    var nEndIndex   = (undefined !== _nEndIndex   ? Math.min(_nEndIndex, this.MailMergeMap.length - 1) : this.MailMergeMap.length - 1);
+
+    if (null === this.MailMergeMap || nStartIndex > nEndIndex || nStartIndex >= this.MailMergeMap.length)
+        return null;
+
+    History.TurnOff();
+    g_oTableId.TurnOff();
+
+    var LogicDocument = new CDocument();
+
+    // Копируем стили, они все одинаковые для всех документов
+    LogicDocument.Styles = this.Styles.Copy();
+
+    // Нумерацию придется повторить для каждого отдельного файла
+    LogicDocument.Numbering.Clear();
+
+    var FieldsManager = this.FieldsManager;
+
+    var ContentCount = this.Content.length;
+    var OverallIndex = 0;
+    this.ForceCopySectPr = true;
+
+    for (var Index = nStartIndex; Index <= nEndIndex; Index++)
+    {
+        // Подменяем ссылку на менедре полей, чтобы скопированные поля регистрировались в новом классе
+        this.FieldsManager = LogicDocument.FieldsManager;
+        var NewNumbering = this.Numbering.Copy_All_AbstractNums();
+        LogicDocument.Numbering.Append_AbstractNums(NewNumbering.AbstractNums);
+
+        this.CopyNumberingMap = NewNumbering.Map;
+
+        for (var ContentIndex = 0; ContentIndex < ContentCount; ContentIndex++)
+        {
+            LogicDocument.Content[OverallIndex++] = this.Content[ContentIndex].Copy(LogicDocument, this.DrawingDocument);
+        }
+
+        LogicDocument.FieldsManager.Replace_MailMergeFields(this.MailMergeMap[Index]);
+
+        // Добавляем дополнительный параграф с окончанием секции
+        var SectionPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var SectPr = new CSectionPr();
+        SectPr.Copy(this.SectPr);
+        SectPr.Set_Type(section_type_NextPage);
+        SectionPara.Set_SectionPr(SectPr, false);
+        LogicDocument.Content[OverallIndex++] = SectionPara;
+    }
+
+    this.CopyNumberingMap = null;
+    this.ForceCopySectPr  = false;
+
+    // Добавляем дополнительный параграф в самом конце для последней секции документа
+    var SectPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+    LogicDocument.Content[OverallIndex++] = SectPara;
+    LogicDocument.SectPr.Set_Type(section_type_Continuous);
+
+    for (var Index = 0, Count = LogicDocument.Content.length; Index < Count; Index++)
+    {
+        if (0 === Index)
+            LogicDocument.Content[Index].Prev = null;
+        else
+            LogicDocument.Content[Index].Prev = LogicDocument.Content[Index - 1];
+
+        if (Count - 1 === Index)
+            LogicDocument.Content[Index].Next = null;
+        else
+            LogicDocument.Content[Index].Next = LogicDocument.Content[Index + 1];
+
+        LogicDocument.Content[Index].Parent = LogicDocument;
+    }
+
+    this.FieldsManager = FieldsManager;
+    g_oTableId.TurnOn();
+    History.TurnOn();
+
+    return LogicDocument;
+};
+CDocument.prototype.Is_HightlightMailMergeFields = function()
+{
+    return this.MailMergeFieldsHighlight;
+};
+CDocument.prototype.Set_HightlightMailMergeFields = function(Value)
+{
+    if (Value !== this.MailMergeFieldsHighlight)
+    {
+        this.MailMergeFieldsHighlight = Value;
+        this.DrawingDocument.ClearCachePages();
+        this.DrawingDocument.FirePaint();
+        editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
+    }
 };
 CDocument.prototype.private_StartSelectionFromCurPos = function()
 {

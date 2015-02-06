@@ -2745,6 +2745,13 @@ CGraphics.prototype =
         this.df();
     },
 
+    drawMailMergeField : function(x, y, w, h)
+    {
+        this.b_color1(216, 221, 230, 255);
+        this.rect( x, y, w, h );
+        this.df();
+    },
+
     drawSearchResult : function(x, y, w, h)
     {
         this.b_color1( 255, 220, 0, 200 );

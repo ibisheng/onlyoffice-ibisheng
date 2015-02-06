@@ -234,6 +234,13 @@ Paragraph.prototype =
         // Копируем настройки
         Para.Set_Pr(this.Pr.Copy());
 
+        if (this.LogicDocument && null !== this.LogicDocument.CopyNumberingMap && undefined !== Para.Pr.NumPr && undefined !== Para.Pr.NumPr.NumId)
+        {
+            var NewId = this.LogicDocument.CopyNumberingMap[Para.Pr.NumPr.NumId];
+            if (undefined !== NewId)
+                Para.Numbering_Set(NewId, Para.Pr.NumPr.Lvl);
+        }
+
         Para.TextPr.Set_Value( this.TextPr.Value.Copy() );
 
         // Удаляем содержимое нового параграфа
@@ -1453,11 +1460,12 @@ Paragraph.prototype =
         var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
         var Page_abs = CurPage + this.Get_StartPage_Absolute();
 
-        var DrawComm = ( DocumentComments.Is_Use() && true != editor.isViewMode);
-        var DrawFind = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
-        var DrawColl = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
+        var DrawComm     = ( DocumentComments.Is_Use() && true != editor.isViewMode);
+        var DrawFind     = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
+        var DrawColl     = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
+        var DrawMMFields = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
 
-        PDSH.Reset( this, pGraphics, DrawColl, DrawFind, DrawComm, this.Get_EndInfoByPage(CurPage - 1) );
+        PDSH.Reset( this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1) );
 
         var StartLine = _Page.StartLine;
         var EndLine   = _Page.EndLine;
@@ -1666,6 +1674,17 @@ Paragraph.prototype =
                     pGraphics.rect( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0 );
                     pGraphics.df();
                     Element = aHigh.Get_Next();
+                }
+
+                //----------------------------------------------------------------------------------------------------------
+                // Рисуем выделение текста
+                //----------------------------------------------------------------------------------------------------------
+                var aMMFields = PDSH.MMFields;
+                var Element = (pGraphics.RENDERER_PDF_FLAG === true ? null : aMMFields.Get_Next());
+                while ( null != Element )
+                {
+                    pGraphics.drawMailMergeField( Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element );
+                    Element = aMMFields.Get_Next();
                 }
 
                 //----------------------------------------------------------------------------------------------------------
@@ -3937,17 +3956,20 @@ Paragraph.prototype =
         var CurRange = Class.StartRange;
         var CurLine  = Class.StartLine;
 
-        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        if (undefined !== this.Lines[CurLine] && undefined !== this.Ranges[CurRange])
         {
-            var Element = this.Content[CurPos];
+            var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+            var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-            ContentPos.Update( CurPos, 0 );
+            for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+            {
+                var Element = this.Content[CurPos];
 
-            if ( true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine) )
-                return ContentPos;
+                ContentPos.Update(CurPos, 0);
+
+                if (true === Element.Get_PosByElement(Class, ContentPos, 1, true, CurRange, CurLine))
+                    return ContentPos;
+            }
         }
 
         // Если мы дошли до сюда, значит мы так и не нашли заданный класс. Попробуем его найти с помощью
@@ -3963,6 +3985,8 @@ Paragraph.prototype =
             if ( true === Element.Get_PosByElement(Class, ContentPos, 1, false, -1, -1) )
                 return ContentPos;
         }
+
+        return null;
     },
 
     // Получаем по заданной позиции элемент текста
@@ -12140,9 +12164,9 @@ Paragraph.prototype =
         return this.SectPr;
     },
 
-    Set_SectionPr : function(SectPr)
+    Set_SectionPr : function(SectPr, bUpdate)
     {
-        if ( this.LogicDocument !== this.Parent )
+        if (this.LogicDocument !== this.Parent && (!this.LogicDocument || true !== this.LogicDocument.ForceCopySectPr))
             return;
         
         if ( SectPr !== this.SectPr )
@@ -12151,7 +12175,8 @@ Paragraph.prototype =
 
             this.SectPr = SectPr;
 
-            this.LogicDocument.Update_SectionsInfo();
+            if (false !== bUpdate)
+                this.LogicDocument.Update_SectionsInfo();
 
             // TODO: Когда избавимся от ParaEnd переделать тут
             if (this.Content.length > 0 && para_Run === this.Content[this.Content.length - 1].Type)
@@ -12272,7 +12297,7 @@ Paragraph.prototype.Get_RangesByPos = function(ContentPos)
  */
 Paragraph.prototype.Get_ElementByPos = function(ContentPos)
 {
-    if (ContentPos.Depth <= 1)
+    if (ContentPos.Depth < 1)
         return this;
 
     var CurPos = ContentPos.Get(0);
@@ -12625,6 +12650,11 @@ CParagraphContentPos.prototype =
         return this.Depth - 1;
     },
 
+    Decrease_Depth : function(nCount)
+    {
+        this.Depth = Math.max(0, this.Depth - nCount);
+    },
+
     Copy : function ()
     {
         var PRPos = new CParagraphContentPos();
@@ -12689,13 +12719,15 @@ function CParagraphDrawStateHightlights()
 
     this.CurPos = new CParagraphContentPos();
 
-    this.DrawColl = false;
+    this.DrawColl     = false;
+    this.DrawMMFields = false;
 
-    this.High   = new CParaDrawingRangeLines();
-    this.Coll   = new CParaDrawingRangeLines();
-    this.Find   = new CParaDrawingRangeLines();
-    this.Comm   = new CParaDrawingRangeLines();
-    this.Shd    = new CParaDrawingRangeLines();
+    this.High     = new CParaDrawingRangeLines();
+    this.Coll     = new CParaDrawingRangeLines();
+    this.Find     = new CParaDrawingRangeLines();
+    this.Comm     = new CParaDrawingRangeLines();
+    this.Shd      = new CParaDrawingRangeLines();
+    this.MMFields = new CParaDrawingRangeLines();
 
     this.DrawComments = true;
     this.Comments     = [];
@@ -12715,13 +12747,14 @@ function CParagraphDrawStateHightlights()
 
 CParagraphDrawStateHightlights.prototype =
 {
-    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, PageEndInfo)
+    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo)
     {
         this.Paragraph = Paragraph;
         this.Graphics  = Graphics;
 
-        this.DrawColl = DrawColl;
-        this.DrawFind = DrawFind;
+        this.DrawColl     = DrawColl;
+        this.DrawFind     = DrawFind;
+        this.DrawMMFields = DrawMMFields;
 
         this.CurPos = new CParagraphContentPos();
 

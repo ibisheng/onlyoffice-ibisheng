@@ -37,7 +37,16 @@ ParaField.prototype.Get_Id = function()
 };
 ParaField.prototype.Copy = function(Selected)
 {
-    var NewField = ParaHyperlink.superclass.Copy.apply(this, arguments);
+    var NewField = ParaField.superclass.Copy.apply(this, arguments);
+
+    // TODO: Сделать функциями с иторией
+    NewField.FieldType = this.FieldType;
+    NewField.Arguments = this.Arguments;
+    NewField.Switches  = this.Switches;
+
+    if (editor)
+        editor.WordControl.m_oLogicDocument.Register_Field(NewField);
+
     return NewField;
 };
 ParaField.prototype.Get_SelectedElementsInfo = function(Info)
@@ -66,7 +75,7 @@ ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
     History.Add( this, { Type : historyitem_Field_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
-    ParaHyperlink.superclass.Remove_FromContent.apply(this, arguments);
+    ParaField.superclass.Remove_FromContent.apply(this, arguments);
 };
 ParaField.prototype.Add = function(Item)
 {
@@ -179,6 +188,21 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
     var X1 = PRSA.X;
     this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {X0 : X0, X1 : X1, Y0: Y0, Y1 : Y1, PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()};
 };
+ParaField.prototype.Draw_HighLights = function(PDSH)
+{
+    var X0 = PDSH.X;
+    var Y0 = PDSH.Y0;
+    var Y1 = PDSH.Y1;
+
+    ParaField.superclass.Draw_HighLights.apply(this, arguments);
+
+    var X1 = PDSH.X;
+
+    if (Math.abs(X0 - X1) > 0.001 && true === PDSH.DrawMMFields)
+    {
+        PDSH.MMFields.Add(Y0, Y1, X0, X1, 0, 0, 0, 0  );
+    }
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
 //----------------------------------------------------------------------------------------------------------------------
@@ -199,6 +223,57 @@ ParaField.prototype.Map_MailMerge = function(Value)
     if (bHistory)
         History.TurnOff();
 
+    var oRun = this.private_GetMappedRun(Value);
+
+    // Подменяем содержимое поля
+    this.Content = [];
+    this.Content[0] = oRun;
+
+    this.Cursor_MoveToStartPos();
+
+    if (bHistory)
+        History.TurnOn();
+};
+ParaField.prototype.Restore_Template = function()
+{
+    // Восстанавливаем содержимое поля.
+    this.Content = this.TemplateContent;
+    this.Cursor_MoveToStartPos();
+};
+ParaField.prototype.Replace_MailMerge = function(Value)
+{
+    var Paragraph = this.Paragraph;
+
+    if (!Paragraph)
+        return false;
+
+    // Получим ран, на который мы подменяем поле
+    var oRun = this.private_GetMappedRun(Value);
+
+    // Ищем расположение данного поля в параграфе
+    var ParaContentPos = Paragraph.Get_PosByElement(this);
+
+    if (null === ParaContentPos)
+        return false;
+
+    var Depth    = ParaContentPos.Get_Depth();
+    var FieldPos = ParaContentPos.Get(Depth);
+
+    if (Depth < 0)
+        return false;
+
+    ParaContentPos.Decrease_Depth(1);
+    var FieldContainer = Paragraph.Get_ElementByPos(ParaContentPos);
+    if (!FieldContainer || !FieldContainer.Content || FieldContainer.Content[FieldPos] !== this)
+        return false;
+
+    FieldContainer.Remove_FromContent(FieldPos, 1);
+    FieldContainer.Add_ToContent(FieldPos, oRun);
+
+    return true;
+};
+ParaField.prototype.private_GetMappedRun = function(Value)
+{
     // Создаем ран и набиваем в него заданный текст.
     var oRun = new ParaRun();
 
@@ -215,20 +290,7 @@ ParaField.prototype.Map_MailMerge = function(Value)
 
     oRun.Set_Pr(this.Get_FirstTextPr());
 
-    // Подменяем содержимое поля
-    this.Content = [];
-    this.Content[0] = oRun;
-
-    this.Cursor_MoveToStartPos();
-
-    if (bHistory)
-        History.TurnOn();
-};
-ParaField.prototype.Restore_Template = function()
-{
-    // Восстанавливаем содержимое поля.
-    this.Content = this.TemplateContent;
-    this.Cursor_MoveToStartPos();
+    return oRun;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции

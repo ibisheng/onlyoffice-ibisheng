@@ -221,6 +221,47 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Базовые функции для работы со стилем
 //-----------------------------------------------------------------------------------
+    Copy : function()
+    {
+        var Style = new CStyle();
+
+        Style.Name           = this.Name;
+        Style.BasedOn        = this.BasedOn;
+        Style.Next           = this.Next;
+        Style.Type           = this.Type;
+        Style.qFormat        = this.qFormat       ;
+        Style.uiPriority     = this.uiPriority    ;
+        Style.hidden         = this.hidden        ;
+        Style.semiHidden     = this.semiHidden    ;
+        Style.unhideWhenUsed = this.unhideWhenUsed;
+
+        Style.TextPr      = this.TextPr.Copy();
+        Style.ParaPr      = this.ParaPr.Copy();
+        Style.TablePr     = this.TablePr.Copy();
+        Style.TablePr     = this.TablePr.Copy();
+        Style.TableRowPr  = this.TableRowPr.Copy();
+        Style.TableCellPr = this.TableCellPr.Copy();
+
+        if (undefined !== this.TableBand1Horz)
+        {
+            Style.TableBand1Horz = this.TableBand1Horz.Copy();
+            Style.TableBand1Vert = this.TableBand1Vert.Copy();
+            Style.TableBand2Horz = this.TableBand2Horz.Copy();
+            Style.TableBand2Vert = this.TableBand2Vert.Copy();
+            Style.TableFirstCol  = this.TableFirstCol.Copy();
+            Style.TableFirstRow  = this.TableFirstRow.Copy();
+            Style.TableLastCol   = this.TableLastCol.Copy();
+            Style.TableLastRow   = this.TableLastRow.Copy();
+            Style.TableTLCell    = this.TableTLCell.Copy();
+            Style.TableTRCell    = this.TableTRCell.Copy();
+            Style.TableBLCell    = this.TableBLCell.Copy();
+            Style.TableBRCell    = this.TableBRCell.Copy();
+            Style.TableWholeTable= this.TableWholeTable.Copy();
+        }
+
+        return Style;
+    },
+
     Set_TextPr : function(Value)
     {
         var Old = this.TextPr;
@@ -3897,6 +3938,39 @@ CStyles.prototype =
     {
         History.Add( this, { Type : historyitem_Styles_Remove, Id : Id, Style : this.Style[Id] } );
         delete this.Style[Id];
+    },
+    Copy : function()
+    {
+        var Styles = new CStyles();
+
+        Styles.Default.ParaPr      = this.Default.ParaPr.Copy();
+        Styles.Default.TextPr      = this.Default.TextPr.Copy();
+        Styles.Default.TablePr     = this.Default.TablePr.Copy();
+        Styles.Default.TableRowPr  = this.Default.TableRowPr.Copy();
+        Styles.Default.TableCellPr = this.Default.TableCellPr.Copy();
+
+        // Тут можно копировать напрямую, т.к. это либо null, либо StyleId, который мы повторяем
+        Styles.Default.Paragraph   = this.Default.Paragraph;
+        Styles.Default.Character   = this.Default.Character;
+        Styles.Default.Numbering   = this.Default.Numbering;
+        Styles.Default.Table       = this.Default.Table    ;
+        Styles.Default.TableGrid   = this.Default.TableGrid;
+        Styles.Default.ParaList    = this.Default.ParaList ;
+        Styles.Default.Header      = this.Default.Header   ;
+        Styles.Default.Footer      = this.Default.Footer   ;
+        Styles.Default.Hyperlink   = this.Default.Hyperlink;
+
+        for (var Index = 0, Count = this.Default.Headings.length; Index < Count; Index++)
+        {
+            Styles.Default.Headings[Index] = this.Default.Headings[Index];
+        }
+
+        for (var StyleId in this.Style)
+        {
+            Styles.Style[StyleId] = this.Style[StyleId].Copy();
+        }
+
+        return Styles;
     },
 //-----------------------------------------------------------------------------------
 //

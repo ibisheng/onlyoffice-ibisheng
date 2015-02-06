@@ -7802,6 +7802,18 @@ asc_docs_api.prototype.asc_GetReceptionsCount = function()
 {
     return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsCount();
 };
+asc_docs_api.prototype.asc_GetMailMergeFieldsNameList = function()
+{
+    return this.WordControl.m_oLogicDocument.Get_MailMergeFieldsNameList();
+};
+asc_docs_api.prototype.asc_AddMailMergeField = function(Name)
+{
+    this.WordControl.m_oLogicDocument.Add_MailMergeField(Name);
+};
+asc_docs_api.prototype.asc_SetHighlightMailMergeFields = function(Value)
+{
+    this.WordControl.m_oLogicDocument.Set_HightlightMailMergeFields(Value);
+};
 asc_docs_api.prototype.sync_StartMailMerge = function()
 {
     this.asc_fireCallback("asc_onStartMailMerge");
@@ -7814,13 +7826,9 @@ asc_docs_api.prototype.sync_EndPreviewMailMergeResult = function()
 {
     this.asc_fireCallback("asc_onEndPreviewMailMergeResult");
 };
-asc_docs_api.prototype.asc_GetMailMergeFieldsNameList = function()
+asc_docs_api.prototype.sync_HighlightMailMergeFields = function(Value)
 {
-    return this.WordControl.m_oLogicDocument.Get_MailMergeFieldsNameList();
-};
-asc_docs_api.prototype.asc_AddMailMergeField = function(Name)
-{
-    this.WordControl.m_oLogicDocument.Add_MailMergeField(Name);
+    this.asc_fireCallback("asc_onHighlightMailMergeFields", Value);
 };
 
 

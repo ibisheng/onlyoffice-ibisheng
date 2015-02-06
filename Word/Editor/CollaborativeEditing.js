@@ -58,6 +58,16 @@ function CTableId()
 
     this.Add( this, g_oIdCounter.Get_NewId() );
 
+    this.TurnOff = function()
+    {
+        this.m_bTurnOff = true;
+    };
+
+    this.TurnOn = function()
+    {
+        this.m_bTurnOff = false;
+    };
+
     // Получаем указатель на класс по Id
     this.Get_ById = function(Id)
     {
