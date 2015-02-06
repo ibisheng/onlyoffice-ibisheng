@@ -5822,54 +5822,54 @@ CLn.prototype =
 
     setFill: function(fill)
     {
-        History.Add(this, {Type:historyitem_Ln_SetFill, oldFill: this.Fill, newFill: fill});
+       // History.Add(this, {Type:historyitem_Ln_SetFill, oldFill: this.Fill, newFill: fill});
         this.Fill = fill;
     },
 
     setPrstDash: function(prstDash)
     {
-        History.Add(this, {Type:historyitem_Ln_SetPrstDash, oldPrstDash: this.prstDash, newPrstDash: prstDash});
+       // History.Add(this, {Type:historyitem_Ln_SetPrstDash, oldPrstDash: this.prstDash, newPrstDash: prstDash});
         this.prstDash = prstDash;
     },
 
     setJoin: function(join)
     {
-        History.Add(this, {Type:historyitem_Ln_SetJoin, oldJoin: this.Join, newJoin: join});
+      //  History.Add(this, {Type:historyitem_Ln_SetJoin, oldJoin: this.Join, newJoin: join});
         this.Join = join;
     },
 
     setHeadEnd: function(headEnd)
     {
-        History.Add(this, {Type:historyitem_Ln_SetHeadEnd, oldHeadEnd: this.headEnd, newHeadEnd: headEnd});
+       // History.Add(this, {Type:historyitem_Ln_SetHeadEnd, oldHeadEnd: this.headEnd, newHeadEnd: headEnd});
         this.headEnd = headEnd;
     },
 
     setTailEnd: function(tailEnd)
     {
-        History.Add(this, {Type:historyitem_Ln_SetTailEnd, oldTailEnd: this.tailEnd, newTailEnd: tailEnd});
+       // History.Add(this, {Type:historyitem_Ln_SetTailEnd, oldTailEnd: this.tailEnd, newTailEnd: tailEnd});
         this.tailEnd = tailEnd;
     },
 
     setAlgn: function(algn)
     {
-        History.Add(this, {Type:historyitem_Ln_SetAlgn, oldAlgn: this.algn, newAlgn: algn});
+     //   History.Add(this, {Type:historyitem_Ln_SetAlgn, oldAlgn: this.algn, newAlgn: algn});
         this.algn = algn;
     },
 
     setCap: function(cap)
     {
-        History.Add(this, {Type:historyitem_Ln_SetCap, oldCap: this.cap, newCap: cap});
+     //   History.Add(this, {Type:historyitem_Ln_SetCap, oldCap: this.cap, newCap: cap});
         this.cap = cap;
     },
 
     setCmpd: function(cmpd)
     {
-        History.Add(this, {Type:historyitem_Ln_SetCmpd, oldCmpd: this.cmpd, newCmpd: cmpd});
+      //  History.Add(this, {Type:historyitem_Ln_SetCmpd, oldCmpd: this.cmpd, newCmpd: cmpd});
         this.cmpd = cmpd;
     },
     setW: function(w)
     {
-        History.Add(this, {Type:historyitem_Ln_SetW, oldW: this.w, newW: w});
+    //    History.Add(this, {Type:historyitem_Ln_SetW, oldW: this.w, newW: w});
         this.w = w;
     },
 
