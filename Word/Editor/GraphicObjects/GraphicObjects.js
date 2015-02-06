@@ -896,6 +896,7 @@ CGraphicObjects.prototype =
                 this.OnMouseMove({IsLocked: true}, dX + dExtX, dY + dExtY, nPageIndex)
             }
             this.OnMouseUp({}, dX, dY, nPageIndex);
+            this.document.Document_UpdateInterfaceState();
         }
     },
 
