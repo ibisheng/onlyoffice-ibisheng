@@ -897,6 +897,8 @@ CGraphicObjects.prototype =
             }
             this.OnMouseUp({}, dX, dY, nPageIndex);
             this.document.Document_UpdateInterfaceState();
+            this.document.Document_UpdateRulersState();
+            this.document.Document_UpdateSelectionState();
         }
     },
 
