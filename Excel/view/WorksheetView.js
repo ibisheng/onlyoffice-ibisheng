@@ -9224,7 +9224,7 @@
 										if(fullBordersEndMergeCell && fullBordersEndMergeCell.r)
 											fullBorders.r = fullBordersEndMergeCell.r;
 									}
-									range.setBorderSrc(fullBorders);
+									range.setBorder(fullBorders);
 									
 
 									//fill
