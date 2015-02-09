@@ -7814,6 +7814,14 @@ asc_docs_api.prototype.asc_SetHighlightMailMergeFields = function(Value)
 {
     this.WordControl.m_oLogicDocument.Set_HightlightMailMergeFields(Value);
 };
+asc_docs_api.prototype.asc_PreviewMailMergeResult = function(Index)
+{
+    this.WordControl.m_oLogicDocument.Preview_MailMergeResult(Index);
+};
+asc_docs_api.prototype.asc_EndPreviewMailMergeResult = function()
+{
+    this.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
+};
 asc_docs_api.prototype.sync_StartMailMerge = function()
 {
     this.asc_fireCallback("asc_onStartMailMerge");
