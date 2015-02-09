@@ -9213,8 +9213,19 @@
 									
 									//horizontal align
 									range.setAlignHorizontal(newVal.getAlignHorizontal());
+									
 									//borders
-									range.setBorderSrc(newVal.getBorderFull());
+									var fullBorders = newVal.getBorderFull();
+									if(range.bbox.c2 !== range.bbox.c1 && curMerge && fullBorders)
+									{
+										//для мерженных ячеек, правая границу
+										var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
+										var fullBordersEndMergeCell = endMergeCell.getBorderFull();
+										if(fullBordersEndMergeCell && fullBordersEndMergeCell.r)
+											fullBorders.r = fullBordersEndMergeCell.r;
+									}
+									range.setBorderSrc(fullBorders);
+									
 
 									//fill
 									range.setFill(newVal.getFill());
@@ -9234,7 +9245,7 @@
 									}
 								}
 								//если замержили range
-								c = range.bbox.c2 - autoC*plCol;
+								c = range.bbox.c2 - autoC*plCol;	
 								if(c === cMax)
 									r = range.bbox.r2 - autoC*plCol;
 							}
