@@ -30,7 +30,7 @@ function CHistory(Document)
         }
     };
 
-    this.TurnOffHistory = false;
+	this.TurnOffHistory = 0;
     this.MinorChanges   = false; // Данный параметр нужен, чтобы определить влияют ли добавленные изменения на пересчет
 
     this.BinaryWriter = new CMemory();
@@ -52,6 +52,7 @@ CHistory.prototype =
         this.SavedIndex    = null;
         this.ForceSave     = false;
         this.Points.length = 0;
+		this.TurnOffHistory = 0;
         this.Internal_RecalcData_Clear();
     },
 
@@ -142,6 +143,9 @@ CHistory.prototype =
 
     Create_NewPoint : function()
     {
+		if ( 0 !== this.TurnOffHistory )
+			return;
+
         if ( this.Index < this.SavedIndex && null !== this.SavedIndex )
         {
             this.SavedIndex = this.Index;
@@ -186,10 +190,7 @@ CHistory.prototype =
     // Data  - сами изменения
     Add : function(Class, Data)
     {
-        if ( true === this.TurnOffHistory )
-            return;
-
-        if ( this.Index < 0 )
+		if ( 0 !== this.TurnOffHistory || this.Index < 0 )
             return;
 
         if (editor)
@@ -455,17 +456,20 @@ CHistory.prototype =
 
     TurnOff : function()
     {
-        this.TurnOffHistory = true;
+		this.TurnOffHistory++;
     },
 
     TurnOn : function()
     {
-        this.TurnOffHistory = false;
+		this.TurnOffHistory--;
+		if(this.TurnOffHistory < 0)
+			this.TurnOffHistory = 0;
     },
 
+	/** @returns {boolean} */
     Is_On : function()
     {
-        return ( false === this.TurnOffHistory ? true : false ) ;
+		return (0 === this.TurnOffHistory);
     },
 
     Reset_SavedIndex : function()

@@ -2843,8 +2843,9 @@ function DrawingObjects() {
 
     _this.updateDrawingObject = function(bInsert, operType, updateRange) {
 
-        if(History.TurnOffHistory > 0)
+        if(!History.Is_On())
             return;
+
         var metrics = null;
 		var count, bNeedRedraw = false, offset;
        //this.controller.checkObjectsAndCallback(
@@ -3817,8 +3818,9 @@ function DrawingObjects() {
 
     _this.updateSizeDrawingObjects = function(target) {
 
-        if (History.TurnOffHistory > 0)
-            return;
+		if(!History.Is_On())
+			return;
+
         var i, bNeedRecalc = false, drawingObject, coords;
         if (target.target === c_oTargetType.RowResize) {
             for (i = 0; i < aObjects.length; i++) {
