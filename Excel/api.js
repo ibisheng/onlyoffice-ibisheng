@@ -546,6 +546,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		};
 
 		spreadsheet_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
+			if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
+				return;
+
 			if (undefined != window['appBridge']) {
 				window['appBridge']['dummyCommandDownloadAs'] ();     // TEST
 				return;
@@ -570,7 +573,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return;
 			}
 
-			if (!this.canSave || this.isChartEditor)
+			if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
 				return;
 
 			// Не даем пользователю сохранять, пока не закончится сохранение
