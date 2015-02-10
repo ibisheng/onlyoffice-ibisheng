@@ -4356,12 +4356,12 @@ function BinarySettingsTableWriter(memory, doc)
         var oThis = this;
 		this.bs.WriteItem(c_oSer_SettingsType.ClrSchemeMapping, function(){oThis.WriteColorSchemeMapping();});
 		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(Default_Tab_Stop);});
-		//this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
+		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
     }
 	this.WriteMathPr = function()
 	{
 		var oThis = this;
-		var oMathPr = this.Document.MathPr;
+		var oMathPr = g_oMathSettings;
 		if ( null != oMathPr.brkBin)
 			this.bs.WriteItem(c_oSer_MathPrType.BrkBin, function(){oThis.WriteMathBrkBin(oMathPr.brkBin);});
 		if ( null != oMathPr.brkBinSub)
@@ -4445,7 +4445,7 @@ function BinarySettingsTableWriter(memory, doc)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(InterSp);
+		this.memory.WriteDouble(InterSp);
 	}
 	this.WriteMathIntLim = function(IntLim)
 	{
@@ -4463,13 +4463,13 @@ function BinarySettingsTableWriter(memory, doc)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(IntraSp);
+		this.memory.WriteDouble(IntraSp);
 	}
 	this.WriteMathLMargin = function(LMargin)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(LMargin);
+		this.memory.WriteDouble(LMargin);
 	}
 	this.WriteMathMathFont = function(MathFont)
 	{
@@ -4493,19 +4493,19 @@ function BinarySettingsTableWriter(memory, doc)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(PostSp);
+		this.memory.WriteDouble(PostSp);
 	}
 	this.WriteMathPreSp = function(PreSp)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(PreSp);
+		this.memory.WriteDouble(PreSp);
 	}
 	this.WriteMathRMargin = function(RMargin)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(RMargin);
+		this.memory.WriteDouble(RMargin);
 	}
 	this.WriteMathSmallFrac = function(SmallFrac)
 	{
@@ -4517,13 +4517,13 @@ function BinarySettingsTableWriter(memory, doc)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(WrapIndent);
+		this.memory.WriteDouble(WrapIndent);
 	}
 	this.WriteMathWrapRight = function(WrapRight)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
 		this.memory.WriteByte(c_oSerPropLenType.Double);
-		this.memory.WriteDouble2(WrapRight);
+		this.memory.WriteDouble(WrapRight);
 	}
     this.WriteColorSchemeMapping = function()
     {
