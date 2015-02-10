@@ -191,12 +191,8 @@ function CreatePresentationTableStyles(Styles, IdMap)
 
 function CPresentation(DrawingDocument)
 {
-    this.History = new CHistory(this);
-    History = this.History;
-
-    // Создаем глобальные объекты, необходимые для совместного редактирования
-
-    g_oTableId = new CTableId();
+    this.History   = History;
+    History.Document = this;
 
     //------------------------------------------------------------------------
 

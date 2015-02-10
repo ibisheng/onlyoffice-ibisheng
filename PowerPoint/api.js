@@ -36,7 +36,10 @@ function asc_docs_api(name)
 
     var CDocsCoApi      = window["CDocsCoApi"];
     var CSpellCheckApi  = window["CSpellCheckApi"];
-    
+
+    History    = new CHistory();
+    g_oTableId = new CTableId();
+
 	/************ private!!! **************/
     this.HtmlElementName = name;
 

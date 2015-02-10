@@ -288,7 +288,7 @@ function ExecuteNoHistory(f, oThis, args)
         History = {Add: function(){}};
     }
 
-	History.TurnOff();
+    History.TurnOff && History.TurnOff();
 
     var b_table_id = false;
     if(g_oTableId && !g_oTableId.m_bTurnOff)
@@ -298,7 +298,7 @@ function ExecuteNoHistory(f, oThis, args)
     }
 
     var ret = f.apply(oThis, args);
-	History.TurnOn();
+    History.TurnOn && History.TurnOn();
     if(b_table_id)
     {
         g_oTableId.m_bTurnOff = false;
