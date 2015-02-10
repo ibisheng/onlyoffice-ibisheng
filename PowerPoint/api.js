@@ -32,6 +32,8 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 
 function asc_docs_api(name)
 {
+	g_fontApplication.Init();
+
     var CDocsCoApi      = window["CDocsCoApi"];
     var CSpellCheckApi  = window["CSpellCheckApi"];
     
@@ -1724,8 +1726,7 @@ asc_docs_api.prototype.sync_SearchEndCallback = function(){
 asc_docs_api.prototype.put_TextPrFontName = function(name)
 {
 	var loader = window.g_font_loader;
-	var nIndex = loader.map_font_index[name];
-	var fontinfo = loader.fontInfos[nIndex];
+    var fontinfo = g_fontApplication.GetFontInfo(name);
 	var isasync = loader.LoadFont(fontinfo);
 	if (false === isasync)
     {

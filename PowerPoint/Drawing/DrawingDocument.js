@@ -317,12 +317,6 @@ function CTextMeasurer()
 
         this.m_oFont = font;
 
-        if (-1 == font.FontFamily.Index || undefined === font.FontFamily.Index || null == font.FontFamily.Index)
-            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
-
-        if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
-            return;
-
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
 
@@ -335,13 +329,13 @@ function CTextMeasurer()
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
         var _lastSetUp = this.m_oLastFont;
-        if (_lastSetUp.SetUpIndex != font.FontFamily.Index || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
+        if (_lastSetUp.SetUpName != font.FontFamily.Name || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
         {
-            _lastSetUp.SetUpIndex = font.FontFamily.Index;
+            _lastSetUp.SetUpName = font.FontFamily.Name;
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            window.g_font_infos[_lastSetUp.SetUpIndex].LoadFont(window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
         }
     }
 
@@ -368,11 +362,6 @@ function CTextMeasurer()
                 _lastFont.Name   = _rfonts.Ascii.Name;
                 _lastFont.Index  = _rfonts.Ascii.Index;
 
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -383,11 +372,6 @@ function CTextMeasurer()
             {
                 _lastFont.Name   = _rfonts.CS.Name;
                 _lastFont.Index  = _rfonts.CS.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
 
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
                 _lastFont.Bold = this.m_oTextPr.BoldCS;
@@ -400,11 +384,6 @@ function CTextMeasurer()
                 _lastFont.Name   = _rfonts.EastAsia.Name;
                 _lastFont.Index  = _rfonts.EastAsia.Index;
 
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -416,11 +395,6 @@ function CTextMeasurer()
             {
                 _lastFont.Name   = _rfonts.HAnsi.Name;
                 _lastFont.Index  = _rfonts.HAnsi.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
@@ -439,13 +413,13 @@ function CTextMeasurer()
         if (_lastFont.Bold)
             _style += 1;
 
-        if (_lastFont.Index != _lastFont.SetUpIndex || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
+        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
         {
-            _lastFont.SetUpIndex = _lastFont.Index;
+            _lastFont.SetUpName = _lastFont.Name;
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
         }
     }
 
@@ -3890,7 +3864,7 @@ function CThumbnailsManager()
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-        window.g_font_infos[font.FontFamily.Index].LoadFont(window.g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, 96, 96);
+		g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, 96, 96);
     }
 
     this.Init = function()
