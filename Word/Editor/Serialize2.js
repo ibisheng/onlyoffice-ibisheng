@@ -4747,13 +4747,6 @@ function BinaryFileReader(doc, openParams)
         stDefault.Numbering = null;
         stDefault.Paragraph = null;
 		stDefault.Table = null;
-		if(null != stDefault.TableGrid)
-		{
-			//чтобы убрать неспользуемый стиль TableGrid
-			//ниже он сгенерится снова
-			delete styles[stDefault.TableGrid];
-			stDefault.TableGrid = null;
-		}
 	}
     this.ReadMainTable = function()
     {
@@ -5030,6 +5023,8 @@ function BinaryFileReader(doc, openParams)
                 stDefault.Footer = oNewId.id;
 			if(stDefault.Hyperlink == stId || "hyperlink" == sNewStyleName)
                 stDefault.Hyperlink = oNewId.id;
+            if(stDefault.TableGrid == stId || "table grid" == sNewStyleName)
+                stDefault.TableGrid = oNewId.id;
             if(true == oNewId.def)
             {
                 switch(oNewId.type)
@@ -5064,6 +5059,8 @@ function BinaryFileReader(doc, openParams)
                 stDefault.Footer = oNewId.id;
             if("hyperlink" == sNewStyleName)
                 stDefault.Hyperlink = oNewId.id;
+            if("table grid" == sNewStyleName)
+                stDefault.TableGrid = oNewId.id;
 			styles[oNewId.id] = oNewStyle;
 		}
 		var oStyleTypes = {par: 1, table: 2, lvl: 3};
@@ -5116,15 +5113,6 @@ function BinaryFileReader(doc, openParams)
             var oNewStyle = new CStyle( "GenStyleDefTable", null, null, styletype_Table );
 			//oNewStyle.Create_NormalTable();
             stDefault.Table = nStId.toString();
-            styles[nStId] = oNewStyle;
-            nStId++;
-        }
-		if(null == stDefault.TableGrid)
-        {
-            var oNewStyle = new CStyle( "GenStyleDefTableGrid", null, null, styletype_Table );
-			oNewStyle.Create_TableGrid();
-			oNewStyle.BasedOn = stDefault.Table;
-			stDefault.TableGrid = nStId.toString();
             styles[nStId] = oNewStyle;
             nStId++;
         }
