@@ -24,6 +24,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		/** @constructor */
 		function spreadsheet_api(name, inputName, eventsHandlers) {
+			g_fontApplication.Init();
 			/************ private!!! **************/
 			this.HtmlElementName = name;
 			this.topLineEditorName = inputName;
