@@ -8719,8 +8719,16 @@ CDocument.prototype =
     Get_SelectedContent : function(bUseHistory)
     {
         var bNeedTurnOffHistory = (History.Is_On() && true !== bUseHistory);
+        var bNeedTurnOffTableId = g_oTableId.m_bTurnOff === false && true !== bUseHistory;
         if (bNeedTurnOffHistory)
+        {
             History.TurnOff();
+
+        }
+        if(bNeedTurnOffTableId)
+        {
+            g_oTableId.m_bTurnOff = true;
+        }
 
         var SelectedContent = new CSelectedContent();
         
@@ -8736,6 +8744,10 @@ CDocument.prototype =
                 if (bNeedTurnOffHistory)
                     History.TurnOn();
 
+                if(bNeedTurnOffTableId)
+                {
+                    g_oTableId.m_bTurnOff = false;
+                }
                 return null;
             }
 
@@ -8757,6 +8769,11 @@ CDocument.prototype =
 
         if (bNeedTurnOffHistory)
             History.TurnOn();
+
+        if(bNeedTurnOffTableId)
+        {
+            g_oTableId.m_bTurnOff = false;
+        }
 
         return SelectedContent;
     },

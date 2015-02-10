@@ -5411,8 +5411,6 @@ asc_docs_api.prototype.ImgApply = function(obj)
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                 }, this, []);
             }
-
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
         }
     }
 };

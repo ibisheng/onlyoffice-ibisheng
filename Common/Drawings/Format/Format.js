@@ -3276,13 +3276,13 @@ CGs.prototype =
 
     setColor: function(color)
     {
-        History.Add(this, {Type: historyitem_Gs_SetColor, oldColor: this.color, newColor: color});
+        //History.Add(this, {Type: historyitem_Gs_SetColor, oldColor: this.color, newColor: color});
         this.color = color;
     },
 
     setPos: function(pos)
     {
-        History.Add(this, {Type: historyitem_Gs_SetPos, oldPos: this.pos, newPos: pos});
+        //History.Add(this, {Type: historyitem_Gs_SetPos, oldPos: this.pos, newPos: pos});
         this.pos = pos;
     },
 
@@ -3460,13 +3460,11 @@ GradLin.prototype =
 
     setAngle: function(angle)
     {
-        History.Add(this, {Type: historyitem_GradLin_SetAngle, oldAngle: this.angle, newAngle: angle});
         this.angle = angle;
     },
 
     setScale: function(scale)
     {
-        History.Add(this, {Type: historyitem_GradLin_SetScale, oldScale: this.scale, newScale: scale});
         this.scale = scale;
     },
 
@@ -3634,13 +3632,11 @@ GradPath.prototype =
 
     setPath: function(path)
     {
-        History.Add(this, {Type: historyitem_GradPath_SetPath, oldPath: this.path, newPath: path});
         this.path = path;
     },
 
     setRect: function(rect)
     {
-        History.Add(this, {Type: historyitem_GradPath_SetRect, oldRect: this.rect, newRect: rect});
         this.rect = rect;
     },
 
@@ -5226,73 +5222,6 @@ function EndArrow()
     this.len = null;
     this.w = null;
 
-
-    this.compare = function(end_arrow)
-    {
-        if(end_arrow == null)
-        {
-            return null;
-        }
-        var _ret = new EndArrow();
-        if(this.type === end_arrow.type)
-        {
-            _ret.type = this.type;
-        }
-        if(this.len === end_arrow.len)
-        {
-            _ret.len = this.len;
-        }
-        if(this.w === end_arrow)
-        {
-            _ret.w = this.w;
-        }
-        return _ret;
-    };
-
-    this.createDuplicate = function()
-    {
-        var duplicate =  new EndArrow();
-        duplicate.type = this.type;
-        duplicate.len = this.len;
-        duplicate.w = this.w;
-        return duplicate;
-    };
-
-    this.IsIdentical= function(arrow)
-    {
-        return arrow && arrow.type == this.type &&  arrow.len == this.len && arrow.w  == this.w;
-    };
-
-    this.GetWidth = function(size)
-    {
-        if (null == this.w)
-            return size * 3;
-        switch (this.w)
-        {
-            case LineEndSize.Large:
-                return 5 * size;
-            case LineEndSize.Small:
-                return 2 * size;
-            default:
-                break;
-        }
-        return 3 * size;
-    };
-    this.GetLen = function(size)
-    {
-        if (null == this.len)
-            return size * 3;
-        switch (this.len)
-        {
-            case LineEndSize.Large:
-                return 5 * size;
-            case LineEndSize.Small:
-                return 2 * size;
-            default:
-                break;
-        }
-        return 3 * size;
-    };
 }
 
 
@@ -5324,6 +5253,74 @@ EndArrow.prototype =
         this.Id = r.GetString2();
     },
 
+
+    compare: function(end_arrow)
+    {
+        if(end_arrow == null)
+        {
+            return null;
+        }
+        var _ret = new EndArrow();
+        if(this.type === end_arrow.type)
+        {
+            _ret.type = this.type;
+        }
+        if(this.len === end_arrow.len)
+        {
+            _ret.len = this.len;
+        }
+        if(this.w === end_arrow)
+        {
+            _ret.w = this.w;
+        }
+        return _ret;
+    },
+
+    createDuplicate: function()
+    {
+        var duplicate =  new EndArrow();
+        duplicate.type = this.type;
+        duplicate.len = this.len;
+        duplicate.w = this.w;
+        return duplicate;
+    },
+
+    IsIdentical: function(arrow)
+    {
+        return arrow && arrow.type == this.type &&  arrow.len == this.len && arrow.w  == this.w;
+    },
+
+    GetWidth: function(size)
+    {
+        if (null == this.w)
+            return size * 3;
+        switch (this.w)
+        {
+            case LineEndSize.Large:
+                return 5 * size;
+            case LineEndSize.Small:
+                return 2 * size;
+            default:
+                break;
+        }
+        return 3 * size;
+    },
+    GetLen: function(size)
+    {
+        if (null == this.len)
+            return size * 3;
+        switch (this.len)
+        {
+            case LineEndSize.Large:
+                return 5 * size;
+            case LineEndSize.Small:
+                return 2 * size;
+            default:
+                break;
+        }
+        return 3 * size;
+    },
+
     getObjectType: function()
     {
         return historyitem_type_EndArrow;
@@ -5331,20 +5328,17 @@ EndArrow.prototype =
 
     setType: function(type)
     {
-        History.Add(this, {Type:historyitem_EndArrow_SetType, oldType: this.type, newType: type});
         this.type = type;
     },
 
     setLen: function(len)
     {
-        History.Add(this, {Type:historyitem_EndArrow_SetLen, oldLen: this.len, newLen: len});
         this.len = len;
     },
 
 
     setW: function(w)
     {
-        History.Add(this, {Type:historyitem_EndArrow_SetW, oldW: this.w, newW: w});
         this.w = w;
     },
 
@@ -5509,15 +5503,6 @@ function LineJoin()
 {
     this.type = null;
     this.limit = null;
-
-
-    this.createDuplicate = function()
-    {
-        var duplicate =  new LineJoin();
-        duplicate.type = this.type;
-        duplicate.limit = this.limit;
-        return duplicate;
-    }
 }
 
 LineJoin.prototype =
@@ -5534,15 +5519,21 @@ LineJoin.prototype =
         return historyitem_type_LineJoin;
     },
 
+    createDuplicate: function()
+    {
+        var duplicate =  new LineJoin();
+        duplicate.type = this.type;
+        duplicate.limit = this.limit;
+        return duplicate;
+    },
+
     setType: function(type)
     {
-        History.Add(this, {Type:historyitem_LineJoin_SetType, oldType: this.type, newType: type});
         this.type = type;
     },
 
     setLimit: function(limit)
     {
-        History.Add(this, {Type:historyitem_LineJoin_SetLimit, oldLimit: this.limit, newLimit: limit});
         this.limit = limit;
     },
 
@@ -10998,8 +10989,6 @@ function CBg()
     this.bwMode = null;
     this.bgPr   = null;
     this.bgRef  = null;
-
-
 }
 
 CBg.prototype =
@@ -11014,17 +11003,17 @@ CBg.prototype =
 
     setBwMode: function(pr)
     {
-        History.Add(this, {Type: historyitem_BgSetBwMode, oldPr: this.bwMode, newPr: pr});
+        //History.Add(this, {Type: historyitem_BgSetBwMode, oldPr: this.bwMode, newPr: pr});
         this.bwMode = pr;
     },
     setBgPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_BgSetBgPr, oldPr: this.bgPr, newPr: pr});
+        //History.Add(this, {Type: historyitem_BgSetBgPr, oldPr: this.bgPr, newPr: pr});
         this.bgPr = pr;
     },
     setBgRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_BgSetBgRef, oldPr: this.bgRef, newPr: pr});
+        //History.Add(this, {Type: historyitem_BgSetBgRef, oldPr: this.bgRef, newPr: pr});
         this.bgRef = pr;
     },
 
