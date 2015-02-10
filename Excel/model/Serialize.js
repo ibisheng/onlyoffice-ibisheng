@@ -4477,7 +4477,7 @@
                 if(null != oNumFmts)
                     oNumFmts[oNum.id] = {id:oNum.id, f: sFormat};
             }
-            if(null != sFormat && "General" != sFormat)
+            if(null != sFormat)
             {
                 oRes = new Num();
                 oRes.f = sFormat;
