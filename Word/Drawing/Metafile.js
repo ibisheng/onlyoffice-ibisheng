@@ -1252,7 +1252,7 @@ CMetafile.prototype =
 
         if (this.m_oFont.Name != fontinfo.Name)
         {
-            this.m_oFont.Name = fontinfo.name;
+            this.m_oFont.Name = fontinfo.Name;
             this.Memory.WriteByte(CommandType.ctFontName);
             this.Memory.WriteString(this.m_oFont.Name);
         }
@@ -1423,17 +1423,17 @@ CMetafile.prototype =
             style += 1;
 
         var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style);
-        style = fontinfo.GetStyle();
+        style = fontinfo.GetBaseStyle();
 
         if (this.m_oFont.Name != fontinfo.Name)
         {
-            this.m_oFont.Name = fontinfo.name;
+            this.m_oFont.Name = fontinfo.Name;
             this.Memory.WriteByte(CommandType.ctFontName);
             this.Memory.WriteString(this.m_oFont.Name);
         }
         if (this.m_oFont.FontSize != _lastFont.Size)
         {
-            this.m_oFont.FontSize = font.FontSize;
+            this.m_oFont.FontSize = _lastFont.Size;
             this.Memory.WriteByte(CommandType.ctFontSize);
             this.Memory.WriteDouble(this.m_oFont.FontSize);
         }
