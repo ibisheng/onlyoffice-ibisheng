@@ -709,6 +709,7 @@ CHistory.prototype.EndTransaction = function()
 	if(this.Transaction < 0)
 		this.Transaction = 0;
 };
+/** @returns {boolean} */
 CHistory.prototype.IsEndTransaction = function()
 {
 	return (0 === this.Transaction);

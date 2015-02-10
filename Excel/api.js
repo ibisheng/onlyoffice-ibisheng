@@ -576,13 +576,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
 				return;
 
-			// Не даем пользователю сохранять, пока не закончится сохранение
-			this.canSave = false;
 			this.isAutoSave = !!isAutoSave;
 			if (!this.isAutoSave)
 				this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			// Нужно закрыть редактор
+			/* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
+				asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzserver/show_bug.cgi?id=28331 */
 			this.asc_closeCellEditor();
+
+			// Не даем пользователю сохранять, пока не закончится сохранение
+			this.canSave = false;
 
 			var t = this;
 			this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
