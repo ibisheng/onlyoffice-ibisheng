@@ -798,7 +798,6 @@ CShape.prototype =
             this.compiledFill = null;
             if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill)) {
                 if (this.spPr.Fill.fill instanceof CGradFill && this.spPr.Fill.fill.colors.length === 0) {
-                    History.TurnOff();
                     var parent_objects = this.getParentObjects();
                     var theme = parent_objects.theme;
                     var fmt_scheme = theme.themeElements.fmtScheme;
@@ -809,7 +808,6 @@ CShape.prototype =
                             break;
                         }
                     }
-                    History.TurnOn();
                 }
                 this.compiledFill = this.spPr.Fill.createDuplicate();
             }

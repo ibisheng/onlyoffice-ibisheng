@@ -266,17 +266,25 @@ CGroupShape.prototype =
 
     convertToWord: function(document)
     {
-        var sp_tree_copy = [].concat(this.spTree), i;
-        for(i = this.spTree.length-1; i > -1; --i)
+        this.setBDeleted(true);
+        var c = new CGroupShape();
+        c.setBDeleted(false);
+        if(this.nvGrpSpPr)
         {
-            this.removeFromSpTreeByPos(i);
+            c.setNvSpPr(this.nvGrpSpPr.createDuplicate());
         }
-        for(i = 0; i < sp_tree_copy.length; ++i)
+        if(this.spPr)
         {
-            this.addToSpTree(this.spTree.length, sp_tree_copy[i].convertToWord(document));
-            this.spTree[this.spTree.length - 1].setGroup(this);
+            c.setSpPr(this.spPr.createDuplicate());
+            c.spPr.setParent(c);
         }
-        return this;
+
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            c.addToSpTree(c.spTree.length, this.spTree[i].convertToWord(document));
+            c.spTree[c.spTree.length - 1].setGroup(c);
+        }
+        return c;
     },
 
     convertToPPTX: function(drawingDocument, worksheet)

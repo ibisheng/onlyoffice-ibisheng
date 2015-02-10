@@ -350,7 +350,10 @@ CImageShape.prototype =
 
     convertToWord: function(document)
     {
-        return this;
+        this.setBDeleted(true);
+        var oCopy = this.copy();
+        oCopy.setBDeleted(false);
+        return oCopy;
     },
 
     convertToPPTX: function(drawingDocument, worksheet)
@@ -364,13 +367,8 @@ CImageShape.prototype =
 
     recalculateBrush: function()
     {
-        var is_on = History.Is_On();
-        if(is_on)
-            History.TurnOff();
         this.brush = new CUniFill();
         this.brush.setFill(this.blipFill);
-        if(is_on)
-            History.TurnOn();
     },
 
     recalculatePen: function()

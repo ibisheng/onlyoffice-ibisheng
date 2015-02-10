@@ -1153,7 +1153,10 @@ CChartSpace.prototype =
 
     convertToWord: function(document)
     {
-        return this;
+        this.setBDeleted(true);
+        var oCopy = this.copy();
+        oCopy.setBDeleted(false);
+        return oCopy;
     },
 
     convertToPPTX: function(drawingDocument, worksheet)
@@ -9774,7 +9777,6 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions)
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
     chart.setPlotArea(new CPlotArea());
-    chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
     var disp_blanks_as;
     if(type === GROUPING_STANDARD)
@@ -9879,10 +9881,18 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions)
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
-    var legend = chart.legend;
-    legend.setLegendPos(LEGEND_POS_R);
-    legend.setLayout(new CLayout());
-    legend.setOverlay(false);
+
+
+    if(asc_series.length > 1)
+    {
+        chart.setLegend(new CLegend());
+        var legend = chart.legend;
+        legend.setLegendPos(LEGEND_POS_R);
+        legend.setLayout(new CLayout());
+        legend.setOverlay(false);
+    }
+
+
     var print_settings = chart_space.printSettings;
     print_settings.setHeaderFooter(new CHeaderFooterChart());
     print_settings.setPageMargins(new CPageMarginsChart());
@@ -9909,7 +9919,6 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions)
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
     chart.setPlotArea(new CPlotArea());
-    chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
     chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
     chart.setShowDLblsOverMax(false);
@@ -10005,10 +10014,14 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions)
     val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
     scaling.setOrientation(ORIENTATION_MIN_MAX);
-    var legend = chart.legend;
-    legend.setLegendPos(LEGEND_POS_R);
-    legend.setLayout(new CLayout());
-    legend.setOverlay(false);
+    if(asc_series.length > 1)
+    {
+        chart.setLegend(new CLegend());
+        var legend = chart.legend;
+        legend.setLegendPos(LEGEND_POS_R);
+        legend.setLayout(new CLayout());
+        legend.setOverlay(false);
+    }
     var print_settings = chart_space.printSettings;
     print_settings.setHeaderFooter(new CHeaderFooterChart());
     print_settings.setPageMargins(new CPageMarginsChart());
@@ -10035,7 +10048,6 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions)
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
     chart.setPlotArea(new CPlotArea());
-    chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
     chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
     chart.setShowDLblsOverMax(false);
@@ -10137,10 +10149,15 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions)
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
-    var legend = chart.legend;
-    legend.setLegendPos(LEGEND_POS_R);
-    legend.setLayout(new CLayout());
-    legend.setOverlay(false);
+
+    if(asc_series.length > 1)
+    {
+        chart.setLegend(new CLegend());
+        var legend = chart.legend;
+        legend.setLegendPos(LEGEND_POS_R);
+        legend.setLayout(new CLayout());
+        legend.setOverlay(false);
+    }
     var print_settings = chart_space.printSettings;
     print_settings.setHeaderFooter(new CHeaderFooterChart());
     print_settings.setPageMargins(new CPageMarginsChart());
@@ -10167,7 +10184,6 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     var chart = chart_space.chart;
     chart.setAutoTitleDeleted(false);
     chart.setPlotArea(new CPlotArea());
-    chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
     chart.setDispBlanksAs(DISP_BLANKS_AS_ZERO);
     chart.setShowDLblsOverMax(false);
@@ -10262,10 +10278,15 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     }
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
-    var legend = chart.legend;
-    legend.setLegendPos(LEGEND_POS_R);
-    legend.setLayout(new CLayout());
-    legend.setOverlay(false);
+
+    if(asc_series.length > 1)
+    {
+        chart.setLegend(new CLegend());
+        var legend = chart.legend;
+        legend.setLegendPos(LEGEND_POS_R);
+        legend.setLayout(new CLayout());
+        legend.setOverlay(false);
+    }
     var print_settings = chart_space.printSettings;
     print_settings.setHeaderFooter(new CHeaderFooterChart());
     print_settings.setPageMargins(new CPageMarginsChart());
@@ -10527,11 +10548,14 @@ function CreateScatterChart(chartSeries, bUseCache, oOptions)
     var format_code = "General";
     num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
-    chart.setLegend(new CLegend());
-    var legend = chart.legend;
-    legend.setLegendPos(LEGEND_POS_R);
-    legend.setLayout(new CLayout());
-    legend.setOverlay(false);
+    if(scatter_chart.series.length > 1)
+    {
+        chart.setLegend(new CLegend());
+        var legend = chart.legend;
+        legend.setLegendPos(LEGEND_POS_R);
+        legend.setLayout(new CLayout());
+        legend.setOverlay(false);
+    }
     chart_space.setPrintSettings(new CPrintSettings());
     var print_settings = chart_space.printSettings;
     print_settings.setHeaderFooter(new CHeaderFooterChart());
@@ -11006,6 +11030,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
 	var i, cell, value, numFormatType, j;
 
     var bLeftOnlyDateTime = true, bTopOnlyDateTime = true;
+    var nStartIndex;
 	if (rangeBBox) {
 		if (rangeBBox.c2 - rangeBBox.c1 > 0) {
 			for (i = rangeBBox.r1 + 1; i <= rangeBBox.r2; i++) {

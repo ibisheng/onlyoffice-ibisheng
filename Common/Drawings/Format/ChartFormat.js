@@ -23134,6 +23134,20 @@ CTitle.prototype =
         {
             if(this.parent.getObjectType() === historyitem_type_Chart)
             {
+                if(this.parent.plotArea && this.parent.plotArea.charts.length === 1 && Array.isArray(this.parent.plotArea.charts[0].series)
+                    && this.parent.plotArea.charts[0].series.length === 1 && this.parent.plotArea.charts[0].series[0].tx)
+                {
+                    var oTx = this.parent.plotArea.charts[0].series[0].tx;
+                    if(typeof oTx.val === "string" && oTx.val.length > 0)
+                    {
+                        return oTx.val;
+                    }
+                    if(oTx.strRef && oTx.strRef.strCache && oTx.strRef.strCache.pt.length === 1 && isRealObject(oTx.strRef.strCache.pt[0]) && typeof oTx.strRef.strCache.pt[0].val === "string"
+                        && oTx.strRef.strCache.pt[0].val.length > 0)
+                    {
+                        return oTx.strRef.strCache.pt[0].val;
+                    }
+                }
                 return getChartTranslateManager().asc_getTitle();
             }
             else
