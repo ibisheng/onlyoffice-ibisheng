@@ -224,6 +224,7 @@
 
             this.fonts_loading[this.fonts_loading.length] = fontinfo;
             this.fonts_loading[this.fonts_loading.length - 1].NeedStyles = (need_styles == undefined) ? 0x0F : need_styles;
+			return fontinfo;
         };
 
         this.AddLoadFontsNotPick = function(info, need_styles)
@@ -255,7 +256,7 @@
             {
                 if (_fonts[i].Type != FONT_TYPE_EMBEDDED)
                 {
-                    this.AddLoadFonts(_fonts[i].name, _fonts[i].NeedStyles);
+                    var info = this.AddLoadFonts(_fonts[i].name, _fonts[i].NeedStyles);
 
                     if (info.Type == FONT_TYPE_ADDITIONAL)
                     {

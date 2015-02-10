@@ -686,7 +686,8 @@ FD_FontDictionary.prototype =
         var _len = _arr.length;
         for (var i = 0; i < _len; i++)
         {
-            if (-1 != _arr[i].indexOf(sFontName) || sFontName.indexOf(_arr[i]))
+            // здесь точное равенство!
+            if (_arr[i] == sFontName)
                 return true;
         }
         return false;
@@ -1054,7 +1055,7 @@ CFontSelect.prototype =
         if ( sReqName == this.m_wsFontName )
             return 0;
 
-        if (-1 != sReqName.indexOf(this.m_wsFontName) || this.m_wsFontName.indexOf(sReqName))
+        if (-1 != sReqName.indexOf(this.m_wsFontName) || -1 != this.m_wsFontName.indexOf(sReqName))
             return 1000;
 
         if (g_fontApplication.g_fontDictionary.CheckLikeFonts(this.m_wsFontName, sReqName))
