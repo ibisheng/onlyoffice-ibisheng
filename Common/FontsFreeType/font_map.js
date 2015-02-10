@@ -2708,7 +2708,7 @@ function CApplicationFonts()
 
         // используем стиль, пришедший извне, а не стиль _font
         // так как подвираем вез стиля в Web версии
-        window.g_font_infos[font_name_index].LoadFont(window.g_font_loader, fontManager, fEmSize, /*_font.GetStyle()*/lStyle, dHorDpi, dVerDpi, transform);
+        return window.g_font_infos[font_name_index].LoadFont(window.g_font_loader, fontManager, fEmSize, /*_font.GetStyle()*/lStyle, dHorDpi, dVerDpi, transform);
     };
 
     this.GetFontFile = function(name, lStyle)
