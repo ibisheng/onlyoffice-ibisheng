@@ -478,10 +478,17 @@ function CGraphics()
 
     this.ArrayPoints = null;
 
-    this.m_oCurFont = null;
+    this.m_oCurFont =
+    {
+        Name        : "",
+        FontSize    : 10,
+        Bold        : false,
+        Italic      : false
+    };
 
     // RFonts
     this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
     this.m_bIntegerGrid = true;
@@ -528,12 +535,15 @@ CGraphics.prototype =
 
         this.TextureFillTransformScaleX = 1 / this.m_oCoordTransform.sx;
         this.TextureFillTransformScaleY = 1 / this.m_oCoordTransform.sy;
+
+        /*
         if (this.IsThumbnail)
         {
             this.TextureFillTransformScaleX *= (width_px / (width_mm * g_dKoef_mm_to_pix));
             this.TextureFillTransformScaleY *= (height_px / (height_mm * g_dKoef_mm_to_pix))
         }
-		
+        */
+
         /*
 		if (true == this.m_oContext.mozImageSmoothingEnabled)
 			this.m_oContext.mozImageSmoothingEnabled = false;
@@ -798,7 +808,9 @@ CGraphics.prototype =
     {
         this.m_oTransform.Reset();
         this.CalculateFullTransform(false);
-        this.m_oContext.setTransform(this.m_oCoordTransform.sx,0,0,this.m_oCoordTransform.sy,0, 0);
+
+        if (!this.m_bIntegerGrid)
+            this.m_oContext.setTransform(this.m_oCoordTransform.sx,0,0,this.m_oCoordTransform.sy,0, 0);
     },
 
     transform3 : function(m, isNeedInvert)
@@ -953,7 +965,8 @@ CGraphics.prototype =
                         h -= _off;
                     }
 
-                    this.m_oContext.drawImage(img,_sx,_sy,_sr-_sx,_sb-_sy,x,y,w,h);
+                    if ((_sr-_sx) > 0 && (_sb-_sy) > 0 && w > 0 && h > 0)
+                        this.m_oContext.drawImage(img,_sx,_sy,_sr-_sx,_sb-_sy,x,y,w,h);
                 }
                 else
                 {
@@ -1039,7 +1052,8 @@ CGraphics.prototype =
                         h -= _off;
                     }
 
-                    this.m_oContext.drawImage(img,_sx,_sy,_sr-_sx,_sb-_sy,x,y,w,h);
+                    if ((_sr-_sx) > 0 && (_sb-_sy) > 0 && w > 0 && h > 0)
+                        this.m_oContext.drawImage(img,_sx,_sy,_sr-_sx,_sb-_sy,x,y,w,h);
                 }
                 else
                 {
@@ -1128,24 +1142,10 @@ CGraphics.prototype =
         if (null == font)
             return;
 
-        this.m_oCurFont =
-        {
-            FontFamily :
-            {
-                Index : font.FontFamily.Index,
-                Name  : font.FontFamily.Name
-            },
-
-            FontSize : font.FontSize,
-            Bold     : font.Bold,
-            Italic   : font.Italic
-        };
-
-        if (-1 == font.FontFamily.Index || undefined === font.FontFamily.Index || null == font.FontFamily.Index)
-            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
-
-        if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
-            return;
+        this.m_oCurFont.Name        = font.FontFamily.Name;
+        this.m_oCurFont.FontSize    = font.FontSize;
+        this.m_oCurFont.Bold        = font.Bold;
+        this.m_oCurFont.Italic      = font.Italic;
 
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
@@ -1161,11 +1161,11 @@ CGraphics.prototype =
         var _last_font = this.IsUseFonts2 ? this.m_oLastFont2 : this.m_oLastFont;
         var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
 
-        _last_font.SetUpIndex = font.FontFamily.Index;
+        _last_font.SetUpName = font.FontFamily.Name;
         _last_font.SetUpSize = font.FontSize;
         _last_font.SetUpStyle = oFontStyle;
 
-        window.g_font_infos[font.FontFamily.Index].LoadFont(window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+        g_fontApplication.LoadFont(_last_font.SetUpName, window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
 
         var _mD = _last_font.SetUpMatrix;
         var _mS = this.m_oTransform;
@@ -1202,13 +1202,6 @@ CGraphics.prototype =
             case fontslot_ASCII:
             {
                 _lastFont.Name   = _rfonts.Ascii.Name;
-                _lastFont.Index  = _rfonts.Ascii.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -1218,13 +1211,6 @@ CGraphics.prototype =
             case fontslot_CS:
             {
                 _lastFont.Name   = _rfonts.CS.Name;
-                _lastFont.Index  = _rfonts.CS.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
                 _lastFont.Bold = this.m_oTextPr.BoldCS;
                 _lastFont.Italic = this.m_oTextPr.ItalicCS;
@@ -1234,13 +1220,6 @@ CGraphics.prototype =
             case fontslot_EastAsia:
             {
                 _lastFont.Name   = _rfonts.EastAsia.Name;
-                _lastFont.Index  = _rfonts.EastAsia.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -1251,13 +1230,6 @@ CGraphics.prototype =
             default:
             {
                 _lastFont.Name   = _rfonts.HAnsi.Name;
-                _lastFont.Index  = _rfonts.HAnsi.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -1277,13 +1249,13 @@ CGraphics.prototype =
 
         var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
 
-        if (_lastFont.Index != _lastFont.SetUpIndex || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
+        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
         {
-            _lastFont.SetUpIndex = _lastFont.Index;
+            _lastFont.SetUpName = _lastFont.Name;
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
 
             var _mD = _lastFont.SetUpMatrix;
             var _mS = this.m_oTransform;
