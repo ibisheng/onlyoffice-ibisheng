@@ -11,6 +11,7 @@
                 "../../Common/FontsFreeType/font_engine.js",
                 "../../Common/FontsFreeType/FontFile.js",
                 "../../Common/FontsFreeType/FontManager.js",
+                "../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/GlobalLoaders.js",
                 "../../Common/commonDefines.js",
@@ -102,6 +103,7 @@
                 "../../Word/Editor/ParagraphContent.js",
                 "../../Word/Editor/ParagraphContentBase.js",
                 "../../Word/Editor/Hyperlink.js",
+                "../../Word/Editor/Field.js",
                 "../../Word/Editor/Run.js",
 
                 "../../Word/Math/mathTypes.js",
@@ -138,6 +140,12 @@
                 "../../PowerPoint/api.js",
                 "../../PowerPoint/apiCommon.js",
                 "../../Word/apiCommon.js",
+				"../../Excel/utils/utils.js",
+				"../../Excel/model/Serialize.js",
+				"../../Excel/model/WorkbookElems.js",
+				"../../Excel/model/Workbook.js",
+				"../../Excel/model/CellInfo.js",
+				"../../Excel/model/AdvancedOptions.js",
                 "../../Common/Shapes/EditorSettings.js",
                 "../../PowerPoint/themes/Themes.js"
             ],
