@@ -31,6 +31,7 @@
                 "../../Common/FontsFreeType/font_engine.js",
                 "../../Common/FontsFreeType/FontFile.js",
                 "../../Common/FontsFreeType/FontManager.js",
+                "../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/HatchPattern.js",
                 "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Externals.js",
