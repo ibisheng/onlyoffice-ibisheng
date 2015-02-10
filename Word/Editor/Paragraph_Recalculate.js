@@ -508,6 +508,20 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
             PRS.Reset_Ranges();
             PRS.Reset_PageBreak();
             PRS.Reset_RunRecalcInfo();
+            PRS.Reset_PrevLineRecalcInfo();
+        }
+        else if (recalcresult_PrevLine === RecalcResult)
+        {
+            if (PRS.Line < this.Pages[CurPage].StartLine)
+                PRS.Restore_RunRecalcInfo();
+            else
+            {
+                CurLine = PRS.Line;
+
+                PRS.Reset_Ranges();
+                PRS.Reset_PageBreak();
+                PRS.Reset_RunRecalcInfo();
+            }
         }
         else if (recalcresult_CurLine === RecalcResult)
         {
@@ -2115,6 +2129,12 @@ function CParagraphRecalculateStateWrap(Para)
     this.BaseLineOffset = 0;
 
     this.RecalcResult = 0x00;//recalcresult_NextElement;
+
+    this.PrevLineRecalcInfo = // Информация для пересчета предыдущей строки
+    {
+        Line   : 0,           // Номер строки, начиная с которой надо пересчитать
+        Object : null         // Объект, который вызвал пересчет
+    };
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2156,6 +2176,12 @@ CParagraphRecalculateStateWrap.prototype =
 
         this.MoveToLBP    = false;
         this.LineBreakPos = new CParagraphContentPos();
+    },
+
+    Reset_PrevLineRecalcInfo : function()
+    {
+        this.PrevLineRecalcInfo.Line   = 0;
+        this.PrevLineRecalcInfo.Object = null;
     },
 
     Set_LineBreakPos : function(PosObj)

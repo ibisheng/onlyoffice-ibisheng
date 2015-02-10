@@ -63,6 +63,7 @@ var recalcresult_NextPage    = 0x03; // Пересчитываем следую�
 var recalcresult_NextLine    = 0x04; // Пересчитываем следующую строку
 var recalcresult_CurLine     = 0x05; // Пересчитываем текущую строку
 var recalcresult_CurPagePara = 0x06; // Специальный случай, когда мы встретили картинку в начале параграфа
+var recalcresult_PrevLine    = 0x07; // Пересчитываем заново предыдущую строку (мб даже раньше, это должно идти в PRSW)
 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
@@ -14105,6 +14106,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     g_oTableId.TurnOff();
 
     var LogicDocument = new CDocument();
+    History.Document = this;
 
     // Копируем стили, они все одинаковые для всех документов
     LogicDocument.Styles = this.Styles.Copy();
