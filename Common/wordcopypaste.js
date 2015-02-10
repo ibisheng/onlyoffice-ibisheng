@@ -2026,11 +2026,7 @@ CopyProcessor.prototype =
             }
             this.CopyTable(oDomTarget, Item, aSelectedRows);
         }
-        var is_on = History.Is_On();
-        if(is_on)
-        {
-            History.TurnOff();
-        }
+		History.TurnOff();
         var graphic_frame = new CGraphicFrame(graphicFrame.parent);
         var grid = [];
 
@@ -2059,10 +2055,9 @@ CopyProcessor.prototype =
         graphic_frame.graphicObject.styleIndex = -1;
         this.oPresentationWriter.WriteTable(graphic_frame);
         graphic_frame.graphicObject.styleIndex = old_style_index;
-        if(is_on)
-        {
-            History.TurnOn();
-        }
+
+		History.TurnOn();
+
         this.oBinaryFileWriter.copyParams.itemCount = 0;
     },
 

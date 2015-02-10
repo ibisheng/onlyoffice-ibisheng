@@ -1120,18 +1120,14 @@ ParaMath.prototype.SetRecalcCtrPrp = function(Class)
 };
 ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx, _heightPx, raster_koef)
 {
-    var bTurnOnId = false, bTurnOnHistory = false;
+    var bTurnOnId = false;
     if (false === g_oTableId.m_bTurnOff)
     {
         g_oTableId.m_bTurnOff = true;
         bTurnOnId = true;
     }
 
-    if (true === History.Is_On())
-    {
-        bTurnOnHistory = true;
-        History.TurnOff();
-    }
+	History.TurnOff();
 
     var oldDefTabStop = Default_Tab_Stop;
     Default_Tab_Stop = 1;
@@ -1177,8 +1173,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     if (true === bTurnOnId)
         g_oTableId.m_bTurnOff = false;
 
-    if (true === bTurnOnHistory)
-        History.TurnOn();
+    History.TurnOn();
 
     window.IsShapeToImageConverter = true;
 

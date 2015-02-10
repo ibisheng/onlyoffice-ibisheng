@@ -6590,23 +6590,19 @@ function CMathPainter(_api)
         {
             this.Generate();
         }
-    }
+    };
 
     this.Generate2 = function()
     {
         // GENERATE IMAGES & JSON
-        var bTurnOnId = false, bTurnOnHistory = false;
+        var bTurnOnId = false;
         if (false === g_oTableId.m_bTurnOff)
         {
             g_oTableId.m_bTurnOff = true;
             bTurnOnId = true;
         }
 
-        if (true === History.Is_On())
-        {
-            bTurnOnHistory = true;
-            History.TurnOff();
-        }
+		History.TurnOff();
 
         var _math = new CAscMathCategory();
 
@@ -6720,11 +6716,10 @@ function CMathPainter(_api)
         if (true === bTurnOnId)
             g_oTableId.m_bTurnOff = false;
 
-        if (true === bTurnOnHistory)
-            History.TurnOn();
+        History.TurnOn();
 
         this.Api.sendMathTypesToMenu(_math);
-    }
+    };
 
     this.Generate = function()
     {

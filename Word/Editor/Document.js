@@ -111,7 +111,7 @@ CSelectedContent.prototype =
         this.MoveDrawing = Value;
     },
     
-    On_EndCollectElements : function(LogicDocument, bNeedTurnOffHistory)
+    On_EndCollectElements : function(LogicDocument)
     {
         // Теперь пройдемся по всем найденным элементам и выясним есть ли автофигуры и комментарии
         var Count = this.Elements.length;
@@ -187,13 +187,13 @@ CSelectedContent.prototype =
         for (var Pos = 0; Pos < Count; Pos++)
         {
             var Id = NewComments[Pos];
-            var OldComment = DocumentComments.Get_ById(Id)
+            var OldComment = DocumentComments.Get_ById(Id);
             
             if (null !== OldComment)
             {
                 var NewComment = OldComment.Copy();
 
-                if (true !== bNeedTurnOffHistory)
+                if (History.Is_On())
                 {
                     DocumentComments.Add(NewComment);
                     editor.sync_AddComment(NewComment.Get_Id(), NewComment.Data);
@@ -8718,13 +8718,10 @@ CDocument.prototype =
      */
     Get_SelectedContent : function(bUseHistory)
     {
-        var bNeedTurnOffHistory = (History.Is_On() && true !== bUseHistory);
         var bNeedTurnOffTableId = g_oTableId.m_bTurnOff === false && true !== bUseHistory;
-        if (bNeedTurnOffHistory)
-        {
-            History.TurnOff();
+        if (!bUseHistory)
+			History.TurnOff();
 
-        }
         if(bNeedTurnOffTableId)
         {
             g_oTableId.m_bTurnOff = true;
@@ -8741,7 +8738,7 @@ CDocument.prototype =
         {
             if (true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common)
             {
-                if (bNeedTurnOffHistory)
+				if (!bUseHistory)
                     History.TurnOn();
 
                 if(bNeedTurnOffTableId)
@@ -8765,9 +8762,9 @@ CDocument.prototype =
             }
         }
         
-        SelectedContent.On_EndCollectElements(this, bNeedTurnOffHistory);
+        SelectedContent.On_EndCollectElements(this);
 
-        if (bNeedTurnOffHistory)
+		if (!bUseHistory)
             History.TurnOn();
 
         if(bNeedTurnOffTableId)

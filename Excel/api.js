@@ -2240,12 +2240,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						var wsModel = t.wb.model.aWorksheets[key];
 						if ( wsModel )
 						{
-							var history_is_on = History.Is_On();
-							if ( history_is_on )
-								History.TurnOff();
+							History.TurnOff();
 							var ws = t.wb.getWorksheet(wsModel.index);
-							if ( history_is_on )
-								History.TurnOn();
+							History.TurnOn();
 							wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(parserHelp.getEscapeSheetName(activeName), parserHelp.getEscapeSheetName(wsModel.sName));
 							if(ws && ws.objectRender && ws.objectRender.controller)
 							{

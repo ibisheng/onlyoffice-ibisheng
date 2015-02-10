@@ -218,10 +218,7 @@ ParaField.prototype.Map_MailMerge = function(Value)
 {
     // Пока у нас в Value может быть только текст, в будущем планируется, чтобы могли быть картинки.
 
-    var bHistory = History.Is_On();
-
-    if (bHistory)
-        History.TurnOff();
+    History.TurnOff();
 
     var oRun = this.private_GetMappedRun(Value);
 
@@ -231,8 +228,7 @@ ParaField.prototype.Map_MailMerge = function(Value)
 
     this.Cursor_MoveToStartPos();
 
-    if (bHistory)
-        History.TurnOn();
+    History.TurnOn();
 };
 ParaField.prototype.Restore_Template = function()
 {

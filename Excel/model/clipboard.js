@@ -1715,7 +1715,7 @@
 							}
 						}
 					}
-				};
+				}
 				
 				if(base64 != null)//from excel
 				{
@@ -1733,7 +1733,7 @@
 							{
 								var historyIsTurnOn = History.Is_On();
 								if(!historyIsTurnOn)
-									History.TurnOn();	
+									History.TurnOn();
 								t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
 								if(!historyIsTurnOn)
 									History.TurnOff();

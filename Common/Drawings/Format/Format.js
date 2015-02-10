@@ -283,15 +283,12 @@ function checkThemeFonts(oFontMap, font_scheme)
 
 function ExecuteNoHistory(f, oThis, args)
 {
-    var is_on = (History instanceof CHistory) ? History.Is_On() : false;
     if(!(History instanceof CHistory))
     {
         History = {Add: function(){}};
     }
-    if(is_on)
-    {
-        History.TurnOff();
-    }
+
+	History.TurnOff();
 
     var b_table_id = false;
     if(g_oTableId && !g_oTableId.m_bTurnOff)
@@ -300,13 +297,8 @@ function ExecuteNoHistory(f, oThis, args)
         b_table_id = true;
     }
 
-
-
     var ret = f.apply(oThis, args);
-    if(is_on)
-    {
-        History.TurnOn();
-    }
+	History.TurnOn();
     if(b_table_id)
     {
         g_oTableId.m_bTurnOff = false;

@@ -6394,16 +6394,7 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         data.newScheme = theme.themeElements.clrScheme;
         History.Add(this.WordControl.m_oLogicDocument.DrawingObjects, data);
         this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
-        var is_on = History.Is_On();
-        if(is_on)
-        {
-            History.TurnOff();
-        }
         this.chartPreviewManager.clearPreviews();
-        if(is_on)
-        {
-            History.TurnOn();
-        }
         this.asc_fireCallback("asc_onUpdateChartStyles");
         this.WordControl.m_oLogicDocument.Recalculate();
 
