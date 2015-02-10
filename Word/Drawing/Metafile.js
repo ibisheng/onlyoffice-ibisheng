@@ -37,6 +37,7 @@ function CFontSetup()
     this.Bold   = false;
     this.Italic = false;
 
+    this.SetUpName = "";
     this.SetUpIndex = -1;
     this.SetUpSize = 12;
     this.SetUpStyle = -1;
@@ -53,6 +54,7 @@ CFontSetup.prototype =
         this.Bold   = false;
         this.Italic = false;
 
+        this.SetupName = "";
         this.SetUpIndex = -1;
         this.SetUpSize = 12;
         this.SetUpStyle = -1;
@@ -816,7 +818,13 @@ function CMetafile(width, height)
 
     this.m_oPen     = new CPen();
     this.m_oBrush   = new CBrush();
-    this.m_oFont    = null;
+
+    this.m_oFont =
+    {
+        Name     : "",
+        FontSize : -1,
+        Style    : -1
+    };
 
     // чтобы выставилось в первый раз
     this.m_oPen.Color.R     = -1;
@@ -834,7 +842,9 @@ function CMetafile(width, height)
     // RFonts
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
+
+    // просто чтобы не создавать каждый раз
+    this.m_oFontSlotFont = new CFontSetup();
 }
 
 CMetafile.prototype =
@@ -1231,68 +1241,33 @@ CMetafile.prototype =
         if (null == font)
             return;
 
-        if (font.FontFamily.Name == "" && 0 <= font.FontFamily.Index)
-            font.FontFamily.Name = window.g_font_infos[font.FontFamily.Index].Name;
-
-        if (font.FontFamily.Index == -1 || font.FontFamily.Index === undefined)
-        {
-            if (undefined !== window.g_map_font_index[font.FontFamily.Name])
-                font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
-        }
-
-
         var style = 0;
         if (font.Italic == true)
             style += 2;
         if (font.Bold == true)
             style += 1;
 
-        if (null == this.m_oFont)
+        var fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, style);
+        style = fontinfo.GetBaseStyle(style);
+
+        if (this.m_oFont.Name != fontinfo.Name)
         {
+            this.m_oFont.Name = fontinfo.name;
             this.Memory.WriteByte(CommandType.ctFontName);
-            this.Memory.WriteString(font.FontFamily.Name);
-
+            this.Memory.WriteString(this.m_oFont.Name);
+        }
+        if (this.m_oFont.FontSize != font.FontSize)
+        {
+            this.m_oFont.FontSize = font.FontSize;
             this.Memory.WriteByte(CommandType.ctFontSize);
-            this.Memory.WriteDouble(font.FontSize);
-
+            this.Memory.WriteDouble(this.m_oFont.FontSize);
+        }
+        if (this.m_oFont.Style != style)
+        {
+            this.m_oFont.Style = style;
             this.Memory.WriteByte(CommandType.ctFontStyle);
             this.Memory.WriteLong(style);
         }
-        else
-        {
-            if (this.m_oFont.FontFamily.Name != font.FontFamily.Name)
-            {
-                this.Memory.WriteByte(CommandType.ctFontName);
-                this.Memory.WriteString(font.FontFamily.Name);
-            }
-            if (this.m_oFont.FontSize != font.FontSize)
-            {
-                this.Memory.WriteByte(CommandType.ctFontSize);
-                this.Memory.WriteDouble(font.FontSize);
-            }
-            if (this.m_oFont.Italic != font.Italic || this.m_oFont.Bold != font.Bold)
-            {
-                this.Memory.WriteByte(CommandType.ctFontStyle);
-                this.Memory.WriteLong(style);
-            }
-        }
-
-        this.m_oFont =
-        {
-            FontFamily :
-            {
-                Index : font.FontFamily.Index,
-                Name  : font.FontFamily.Name
-            },
-
-            FontSize : font.FontSize,
-            Bold     : font.Bold,
-            Italic   : font.Italic
-        };
-
-        this.m_oLastFont.SetUpIndex = font.FontFamily.Index;
-        this.m_oLastFont.SetUpSize = font.FontSize;
-        this.m_oLastFont.SetUpStyle = style;
     },
     FillText : function(x,y,text)
     {
@@ -1303,18 +1278,7 @@ CMetafile.prototype =
     },
 	FillTextCode : function(x,y,code)
     {
-        var _font = this.m_oLastFont;
-        if (!_font)
-            return;
-
-        var _index = _font.SetUpIndex;
-        if (_index < 0)
-            _index = g_map_font_index[_font.Name];
-
-        var _font_info = window.g_font_infos[_index];
-        if (!_font_info)
-            return;
-
+        var _font_info = window.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];
         var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
 
         if (code < 0xFFFF && _is_face_index_no_0)
@@ -1322,11 +1286,7 @@ CMetafile.prototype =
 
         var _old_pos = this.Memory.pos;
 
-        window.g_font_infos[_index].LoadFont(window.g_font_loader,
-            g_oTextMeasurer.m_oManager,
-            _font.SetUpSize,
-            Math.max(_font.SetUpStyle, 0), 72, 72);
-
+        g_fontApplication.LoadFont(_font_info.Name, window.g_font_loader, g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
         g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
 
         // start (1) + draw(1) + typedraw(4) + end(1) = 7!
@@ -1342,15 +1302,9 @@ CMetafile.prototype =
     },
 	tg : function(gid,x,y)
     {
-        var _font = this.m_oLastFont;
-
         var _old_pos = this.Memory.pos;
 
-        window.g_font_infos[_font.SetUpIndex].LoadFont(window.g_font_loader,
-            g_oTextMeasurer.m_oManager,
-            _font.SetUpSize,
-            _font.SetUpStyle, 72, 72);
-
+        g_fontApplication.LoadFont(this.m_oFont.Name, window.g_font_loader, g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
         g_oTextMeasurer.m_oManager.LoadStringPathCode(gid, true, x, y, this);
 
         // start (1) + draw(1) + typedraw(4) + end(1) = 7!
@@ -1416,20 +1370,13 @@ CMetafile.prototype =
     SetFontSlot : function(slot, fontSizeKoef)
     {
         var _rfonts = this.m_oGrFonts;
-        var _lastFont = this.m_oLastFont;
+        var _lastFont = this.m_oFontSlotFont;
 
         switch (slot)
         {
             case fontslot_ASCII:
             {
                 _lastFont.Name   = _rfonts.Ascii.Name;
-                _lastFont.Index  = _rfonts.Ascii.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -1439,13 +1386,6 @@ CMetafile.prototype =
             case fontslot_CS:
             {
                 _lastFont.Name   = _rfonts.CS.Name;
-                _lastFont.Index  = _rfonts.CS.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
                 _lastFont.Bold = this.m_oTextPr.BoldCS;
                 _lastFont.Italic = this.m_oTextPr.ItalicCS;
@@ -1455,13 +1395,6 @@ CMetafile.prototype =
             case fontslot_EastAsia:
             {
                 _lastFont.Name   = _rfonts.EastAsia.Name;
-                _lastFont.Index  = _rfonts.EastAsia.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -1472,13 +1405,6 @@ CMetafile.prototype =
             default:
             {
                 _lastFont.Name   = _rfonts.HAnsi.Name;
-                _lastFont.Index  = _rfonts.HAnsi.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -1496,52 +1422,27 @@ CMetafile.prototype =
         if (_lastFont.Bold == true)
             style += 1;
 
-        if (null == this.m_oFont)
+        var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style);
+        style = fontinfo.GetStyle();
+
+        if (this.m_oFont.Name != fontinfo.Name)
         {
+            this.m_oFont.Name = fontinfo.name;
             this.Memory.WriteByte(CommandType.ctFontName);
-            this.Memory.WriteString(_lastFont.Name);
-
+            this.Memory.WriteString(this.m_oFont.Name);
+        }
+        if (this.m_oFont.FontSize != _lastFont.Size)
+        {
+            this.m_oFont.FontSize = font.FontSize;
             this.Memory.WriteByte(CommandType.ctFontSize);
-            this.Memory.WriteDouble(_lastFont.Size);
-
+            this.Memory.WriteDouble(this.m_oFont.FontSize);
+        }
+        if (this.m_oFont.Style != style)
+        {
+            this.m_oFont.Style = style;
             this.Memory.WriteByte(CommandType.ctFontStyle);
             this.Memory.WriteLong(style);
         }
-        else
-        {
-            if (this.m_oFont.FontFamily.Name != _lastFont.Name)
-            {
-                this.Memory.WriteByte(CommandType.ctFontName);
-                this.Memory.WriteString(_lastFont.Name);
-            }
-            if (this.m_oFont.FontSize != _lastFont.Size)
-            {
-                this.Memory.WriteByte(CommandType.ctFontSize);
-                this.Memory.WriteDouble(_lastFont.Size);
-            }
-            if (this.m_oFont.Italic != _lastFont.Italic || this.m_oFont.Bold != _lastFont.Bold)
-            {
-                this.Memory.WriteByte(CommandType.ctFontStyle);
-                this.Memory.WriteLong(style);
-            }
-        }
-
-        this.m_oFont =
-        {
-            FontFamily :
-            {
-                Index : _lastFont.Index,
-                Name  : _lastFont.Name
-            },
-
-            FontSize : _lastFont.Size,
-            Bold     : _lastFont.Bold,
-            Italic   : _lastFont.Italic
-        };
-
-        this.m_oLastFont.SetUpIndex = this.m_oFont.FontFamily.Index;
-        this.m_oLastFont.SetUpSize = this.m_oFont.FontSize;
-        this.m_oLastFont.SetUpStyle = style;
     }
 };
 

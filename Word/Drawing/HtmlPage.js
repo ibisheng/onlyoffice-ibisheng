@@ -3931,8 +3931,6 @@ function CEditorPage(api)
         this.TextBoxInputMode = isEA;
         if (isEA)
         {
-            g_fontSelections.fromStream();
-
             if (null == this.TextBoxInput)
             {
                 this.TextBoxInput = document.createElement('textarea');
@@ -4099,7 +4097,8 @@ function CEditorPage(api)
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;
 
-        var _language = g_fontSelections.checkText(oThis.TextBoxInput.value);
+        var _fontSelections = g_fontApplication.g_fontSelections;
+        var _language = _fontSelections.checkText(oThis.TextBoxInput.value);
 
         /*
         switch (_language)
@@ -4145,16 +4144,15 @@ function CEditorPage(api)
         {
             var _textPr = oThis.m_oLogicDocument.Get_Paragraph_TextPr();
 
-            var _check_obj = g_fontSelections.checkPasteText(_textPr, _language);
+            var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
             if (_check_obj.is_async)
             {
                 var loader = window.g_font_loader;
-                var nIndex = loader.map_font_index[_check_obj.name];
-                var fontinfo = loader.fontInfos[nIndex];
+                var fontinfo = g_fontApplication.GetFontInfo(_check_obj.name);
                 var isasync = loader.LoadFont(fontinfo);
                 if (false === isasync)
                 {
-                    var _rfonts = g_fontSelections.getSetupRFonts(_check_obj);
+                    var _rfonts = _fontSelections.getSetupRFonts(_check_obj);
                     oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value, _rfonts);
                     this.ReinitTB();
                 }
@@ -4162,7 +4160,7 @@ function CEditorPage(api)
                 {
                     oThis.m_oApi.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
                     _check_obj.text = oThis.TextBoxInput.value;
-                    g_fontSelections.CurrentLoadedObj = _check_obj;
+                    _fontSelections.CurrentLoadedObj = _check_obj;
                 }
             }
             else

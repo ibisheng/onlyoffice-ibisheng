@@ -218,7 +218,15 @@
             }
         };
 
-        this.AddLoadFonts = function(info, need_styles)
+        this.AddLoadFonts = function(name, need_styles)
+        {
+            var fontinfo = g_fontApplication.GetFontInfo(name);
+
+            this.fonts_loading[this.fonts_loading.length] = fontinfo;
+            this.fonts_loading[this.fonts_loading.length - 1].NeedStyles = (need_styles == undefined) ? 0x0F : need_styles;
+        };
+
+        this.AddLoadFontsNotPick = function(info, need_styles)
         {
             this.fonts_loading[this.fonts_loading.length] = info;
             this.fonts_loading[this.fonts_loading.length - 1].NeedStyles = (need_styles == undefined) ? 0x0F : need_styles;
@@ -247,9 +255,7 @@
             {
                 if (_fonts[i].Type != FONT_TYPE_EMBEDDED)
                 {
-                    var info = this.fontInfos[this.map_font_index[_fonts[i].name]];
-
-                    this.AddLoadFonts(info, _fonts[i].NeedStyles);
+                    this.AddLoadFonts(_fonts[i].name, _fonts[i].NeedStyles);
 
                     if (info.Type == FONT_TYPE_ADDITIONAL)
                     {
@@ -267,7 +273,7 @@
                     {
                         if (this.embeddedFontInfos[j].Name == _fonts[i].name)
                         {
-                            this.AddLoadFonts(this.embeddedFontInfos[j], 0);
+                            this.AddLoadFontsNotPick(this.embeddedFontInfos[j], 0);
                             break;
                         }
                     }
@@ -280,14 +286,11 @@
             if (this.Api.IsNeedDefaultFonts())
             {
                 // теперь добавим шрифты, без которых редактор как без рук (спецсимволы + дефолтовые стили документа)
-                this.AddLoadFonts(this.fontInfos[this.map_font_index["Arial"]], 0x0F);
-                this.AddLoadFonts(this.fontInfos[this.map_font_index["Symbol"]], 0x0F);
-                this.AddLoadFonts(this.fontInfos[this.map_font_index["Wingdings"]], 0x0F);
-                this.AddLoadFonts(this.fontInfos[this.map_font_index["Courier New"]], 0x0F);
-                //if (is_default === true)
-                {
-                    this.AddLoadFonts(this.fontInfos[this.map_font_index["Times New Roman"]], 0x0F);
-                }
+                this.AddLoadFonts("Arial", 0x0F);
+                this.AddLoadFonts("Symbol", 0x0F);
+                this.AddLoadFonts("Wingdings", 0x0F);
+                this.AddLoadFonts("Courier New", 0x0F);
+                this.AddLoadFonts("Times New Roman", 0x0F);
             }
 
             this.Api.asyncFontsDocumentStartLoaded();
@@ -329,8 +332,7 @@
             // сначала заполняем массив this.fonts_loading объекстами fontinfo
             for (var i in _fonts)
             {
-                var info = this.fontInfos[this.map_font_index[_fonts[i].name]];
-                this.AddLoadFonts(info, 0x0F);
+                this.AddLoadFonts(_fonts[i].name, 0x0F);
             }
 
             if (null == this.ThemeLoader)

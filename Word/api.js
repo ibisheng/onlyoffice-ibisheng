@@ -515,6 +515,8 @@ var DocumentPageSize = new function() {
 
 function asc_docs_api(name)
 {
+    g_fontApplication.Init();
+
     var CDocsCoApi      = window["CDocsCoApi"];
     var CSpellCheckApi  = window["CSpellCheckApi"];
 
@@ -1992,13 +1994,10 @@ asc_docs_api.prototype.put_FramePr = function(Obj)
 {
     if ( undefined != Obj.FontFamily )
     {
-        var name     = Obj.FontFamily;
-        Obj.FontFamily = new CTextFontFamily( { Name : Obj.FontFamily, Index : -1 } );
-
         var loader   = window.g_font_loader;
-        var nIndex   = loader.map_font_index[name];
-        var fontinfo = loader.fontInfos[nIndex];
+        var fontinfo = g_fontApplication.GetFontInfo(Obj.FontFamily);
         var isasync  = loader.LoadFont(fontinfo, editor.asyncFontEndLoaded_DropCap, Obj);
+        Obj.FontFamily = new CTextFontFamily( { Name : fontinfo.Name, Index : -1 } );
 
         if (false === isasync)
         {
@@ -3262,15 +3261,14 @@ asc_docs_api.prototype.sync_SearchEndCallback = function()
 asc_docs_api.prototype.put_TextPrFontName = function(name)
 {
 	var loader = window.g_font_loader;
-	var nIndex = loader.map_font_index[name];
-	var fontinfo = loader.fontInfos[nIndex];
+	var fontinfo = g_fontApplication.GetFontInfo(name);
 	var isasync = loader.LoadFont(fontinfo);
 	if (false === isasync)
     {
         if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : nIndex } } ) );
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
         }
     }
 }
@@ -6619,13 +6617,14 @@ asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 {
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
 
-    if (g_fontSelections.CurrentLoadedObj != null)
+    var _fontSelections = g_fontApplication.g_fontSelections;
+    if (_fontSelections.CurrentLoadedObj != null)
     {
-        var _rfonts = g_fontSelections.getSetupRFonts(g_fontSelections.CurrentLoadedObj);
-        this.WordControl.m_oLogicDocument.TextBox_Put(g_fontSelections.CurrentLoadedObj.text, _rfonts);
+        var _rfonts = _fontSelections.getSetupRFonts(_fontSelections.CurrentLoadedObj);
+        this.WordControl.m_oLogicDocument.TextBox_Put(_fontSelections.CurrentLoadedObj.text, _rfonts);
         this.WordControl.ReinitTB();
 
-        g_fontSelections.CurrentLoadedObj = null;
+        _fontSelections.CurrentLoadedObj = null;
         this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
         return;
     }
@@ -7767,8 +7766,7 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 asc_docs_api.prototype.asc_AddMath = function(Type)
 {
     var loader = window.g_font_loader;
-    var nIndex = loader.map_font_index["Cambria Math"];
-    var fontinfo = loader.fontInfos[nIndex];
+    var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
     var isasync = loader.LoadFont(fontinfo);
     if (false === isasync)
     {

@@ -151,12 +151,12 @@ function CTextMeasurer()
     this.Init = function()
     {
         this.m_oManager.Initialize();
-    }
+    };
 
     this.SetStringGid = function(bGID)
     {
         this.m_oManager.SetStringGID(bGID);
-    }
+    };
 
     this.SetFont = function(font)
     {
@@ -164,12 +164,6 @@ function CTextMeasurer()
             return;
 
         this.m_oFont = font;
-
-        if (-1 == font.FontFamily.Index || undefined === font.FontFamily.Index || null == font.FontFamily.Index)
-            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
-
-        if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
-            return;
 
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
@@ -183,15 +177,15 @@ function CTextMeasurer()
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
         var _lastSetUp = this.m_oLastFont;
-        if (_lastSetUp.SetUpIndex != font.FontFamily.Index || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
+        if (_lastSetUp.SetUpName != font.FontFamily.Name || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
         {
-            _lastSetUp.SetUpIndex = font.FontFamily.Index;
+            _lastSetUp.SetUpName = font.FontFamily.Name;
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            window.g_font_infos[_lastSetUp.SetUpIndex].LoadFont(window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
         }
-    }
+    };
 
     this.SetTextPr = function(textPr, theme)
     {
@@ -214,11 +208,6 @@ function CTextMeasurer()
                 _lastFont.Name   = _rfonts.Ascii.Name;
                 _lastFont.Index  = _rfonts.Ascii.Index;
 
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -229,11 +218,6 @@ function CTextMeasurer()
             {
                 _lastFont.Name   = _rfonts.CS.Name;
                 _lastFont.Index  = _rfonts.CS.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
 
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
                 _lastFont.Bold = this.m_oTextPr.BoldCS;
@@ -246,11 +230,6 @@ function CTextMeasurer()
                 _lastFont.Name   = _rfonts.EastAsia.Name;
                 _lastFont.Index  = _rfonts.EastAsia.Index;
 
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -262,11 +241,6 @@ function CTextMeasurer()
             {
                 _lastFont.Name   = _rfonts.HAnsi.Name;
                 _lastFont.Index  = _rfonts.HAnsi.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
@@ -285,25 +259,25 @@ function CTextMeasurer()
         if (_lastFont.Bold)
             _style += 1;
 
-        if (_lastFont.Index != _lastFont.SetUpIndex || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
+        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
         {
-            _lastFont.SetUpIndex = _lastFont.Index;
+            _lastFont.SetUpName = _lastFont.Name;
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
         }
-    }
+    };
 
     this.GetTextPr = function()
     {
         return this.m_oTextPr;
-    }
+    };
 
     this.GetFont = function()
     {
         return this.m_oFont;
-    }
+    };
 
     this.Measure = function(text)
     {
@@ -316,7 +290,7 @@ function CTextMeasurer()
         Height = 0;//Temp.fHeight;
 
         return { Width : Width, Height : Height };
-    }
+    };
     this.Measure2 = function(text)
     {
         var Width  = 0;
@@ -345,7 +319,7 @@ function CTextMeasurer()
             rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
             rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
         };
-    }
+    };
 
     this.MeasureCode = function(lUnicode)
     {
@@ -358,7 +332,7 @@ function CTextMeasurer()
         Height = ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72);
 
         return { Width : Width, Height : Height, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72) };
-    }
+    };
     this.Measure2Code = function(lUnicode)
     {
         var Width  = 0;
@@ -387,7 +361,7 @@ function CTextMeasurer()
             rasterOffsetX: (Temp.oBBox.rasterDistances.dist_l + Temp.oBBox.fMinX) * 25.4 / 72,
             rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
         };
-    }
+    };
 
     this.GetAscender = function()
     {
@@ -395,21 +369,21 @@ function CTextMeasurer()
         var Ascender   = this.m_oManager.m_lAscender;
 
         return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    }
+    };
     this.GetDescender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Descender  = this.m_oManager.m_lDescender;
 
         return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    }
+    };
     this.GetHeight = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Height     = this.m_oManager.m_lLineHeight;
 
         return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    }
+    };
 }
 
 var g_oTextMeasurer = new CTextMeasurer();
@@ -4745,7 +4719,7 @@ function CDrawingDocument()
         var api = this.m_oWordControl.m_oApi;
         for (var i in map_used)
         {
-            var key = GenerateMapId(api, map_used[i].Name, map_used[i].Style, map_used[i].Size);
+            var key = GenerateMapId(api, g_fontApplication.GetFontInfoName(map_used[i].Name), map_used[i].Style, map_used[i].Size);
             map_keys[key] = true;
         }
 
@@ -6603,15 +6577,7 @@ function CMathPainter(_api)
     this.StartLoad = function()
     {
         var loader = window.g_font_loader;
-        var nIndex = loader.map_font_index["Cambria Math"];
-
-        if (undefined === nIndex)
-        {
-            // нет Cambria Math - нет и формул
-            return;
-        }
-
-        var fontinfo = loader.fontInfos[nIndex];
+        var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
         if (undefined === fontinfo)
         {
             // нет Cambria Math - нет и формул
