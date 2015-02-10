@@ -1731,12 +1731,7 @@
 						{
 							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 							{
-								var historyIsTurnOn = History.Is_On();
-								if(!historyIsTurnOn)
-									History.TurnOn();
 								t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-								if(!historyIsTurnOn)
-									History.TurnOff();
 							}
 						}
 						else {
