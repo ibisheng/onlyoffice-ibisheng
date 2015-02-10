@@ -10337,14 +10337,17 @@
 		WorksheetView.prototype.getColValues = function (range, col, arrValues, objValues) {
 			if (null === range)
 				return;
-			var row, cell, value;
+			var row, cell, value, valueLowCase;
 			for (row = range.r1; row <= range.r2; ++row) {
 				cell = this.model._getCellNoEmpty(row, col);
 				if (cell) {
 					value = cell.getValue();
-					if (!isNumber(value) && !objValues.hasOwnProperty(value)) {
-						arrValues.push(value);
-						objValues[value] = 1;
+					if (!isNumber(value)) {
+						valueLowCase = value.toLowerCase();
+						if (!objValues.hasOwnProperty(valueLowCase)) {
+							arrValues.push(value);
+							objValues[valueLowCase] = 1;
+						}
 					}
 				}
 			}
