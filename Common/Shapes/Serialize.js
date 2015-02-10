@@ -3575,10 +3575,7 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-					//проверка на то, что может не быть данного шрифта в g_map_font_index
 					typeface = s.GetString2();
-					if(window.g_map_font_index && window.g_map_font_index[typeface] === undefined && g_oThemeFontsName[typeface] === undefined)
-						typeface = "Arial";
                     break;
                 }
                 default:
