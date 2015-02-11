@@ -7,7 +7,163 @@
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.76 * 0.855;
 
+function CMathPropertiesSettings()
+{
+    this.defJc      = null;
+    this.dispDef    = null;
+
+    this.intLim     = null;
+
+    this.lMargin    = null;
+
+    this.naryLim    = null;
+
+    this.rMargin    = null;
+
+    this.wrapIndent = null;
+
+    //   не реализовано    //
+    this.brkBin     = null;
+    this.brkBinSub  = null;
+
+    this.interSp    = null;
+
+    this.intraSp    = null;
+
+    this.mathFont   = null;
+
+    this.postSp     = null;
+    this.preSp      = null;
+
+    this.smallFrac  = null;
+
+    this.wrapRight  = null;
+
+    //*********************//
+}
+CMathPropertiesSettings.prototype.SetDefaultPr = function()
+{
+    this.defJc      = align_Justify;
+    this.dispDef    = true;
+    this.intLim     = NARY_SubSup;
+    this.mathFont   = {Name  : "Cambria Math", Index : -1 };
+    this.lMargin    = 0;
+    this.naryLim    = NARY_UndOvr;
+    this.rMargin    = 0;
+    this.wrapIndent = 25; // mm
+};
+CMathPropertiesSettings.prototype.Merge = function(Pr)
+{
+    if(Pr.wrapIndent !== null && Pr.wrapIndent !== undefined)
+        this.wrapIndent = Pr.wrapIndent;
+
+    if(Pr.lMargin !== null && Pr.lMargin !== undefined)
+        this.lMargin = Pr.lMargin;
+
+    if(Pr.rMargin !== null && Pr.rMargin !== undefined)
+        this.rMargin = Pr.rMargin;
+
+    if(Pr.intLim !== null && Pr.intLim !== undefined)
+        this.intLim = Pr.intLim;
+
+    if(Pr.naryLim !== null && Pr.naryLim !== undefined)
+        this.naryLim = Pr.naryLim;
+
+    if(Pr.defJc !== null && Pr.defJc !== undefined)
+        this.defJc = Pr.defJc;
+};
+
 var g_oMathSettings = {};
+
+function CMathSettings()
+{
+    this.Pr = {};
+    this.CompiledPr= new CMathPropertiesSettings();
+    this.DefaultPr = new CMathPropertiesSettings();
+
+    /*this.Pr        = new CMathPropertiesSettings();*/
+    this.DefaultPr.SetDefaultPr();
+
+    this.bNeedCompile = true;
+}
+CMathSettings.prototype.SetPr = function(Pr)
+{
+    this.Pr.Merge(Pr);
+    this.SetCompiledPr();
+};
+CMathSettings.prototype.GetPr = function()
+{
+    return this.Pr;
+};
+CMathSettings.prototype.SetCompiledPr = function()
+{
+    if(this.bNeedCompile)
+    {
+        this.CompiledPr.Merge(this.DefaultPr);
+        this.CompiledPr.Merge(this.Pr);
+
+        this.bNeedCompile = false;
+    }
+};
+CMathSettings.prototype.GetPrDispDef = function()
+{
+    var Pr;
+    if(this.CompiledPr.dispDef ==  false)
+        Pr = this.DefaultPr;
+    else
+        Pr = this.CompiledPr;
+
+    return Pr;
+};
+CMathSettings.prototype.Get_WrapIndent = function(State)
+{
+    this.SetCompiledPr();
+
+    var wrapIndent = 0;
+    if(State == ALIGN_MARGIN_WRAP || State == ALIGN_WRAP)
+        wrapIndent = this.GetPrDispDef().wrapIndent;
+
+    return wrapIndent;
+};
+CMathSettings.prototype.Get_LeftMargin = function(State)
+{
+    this.SetCompiledPr();
+
+    var lMargin = 0;
+    if(State == ALIGN_MARGIN_WRAP || State == ALIGN_MARGIN)
+        lMargin =this.GetPrDispDef().lMargin;
+
+    return lMargin;
+};
+CMathSettings.prototype.Get_RightMargin = function(State)
+{
+    this.SetCompiledPr();
+    var rMargin    =  0;
+    if(State == ALIGN_MARGIN_WRAP || State == ALIGN_MARGIN)
+        rMargin =this.GetPrDispDef().rMargin;
+
+    return rMargin;
+};
+CMathSettings.prototype.Get_IntLim = function()
+{
+    this.SetCompiledPr();
+    return this.CompiledPr.intLim;
+};
+CMathSettings.prototype.Get_NaryLim = function()
+{
+    this.SetCompiledPr();
+    return this.CompiledPr.naryLim;
+};
+CMathSettings.prototype.Get_DefJc = function()
+{
+    this.SetCompiledPr();
+    return this.GetPrDispDef().defJc;
+};
+CMathSettings.prototype.Get_DispDef = function()
+{
+    this.SetCompiledPr();
+    return this.CompiledPr.dispDef;
+};
 
 function Get_WordDocumentDefaultMathSettings()
 {
@@ -47,20 +203,16 @@ function ParaMath()
     this.Y          = 0;
 
     this.LinesPositions = [];
+    this.LinesWidths = [];
 
 
     this.ParaMathRPI = new CMathRecalculateInfo();
 
-    /*this.bInline           = false;
-    this.NeedResize        = true;
-    this.RecalcCtrPrp      = false;
-    this.bChangeInline     = true;
-    */
 
     this.bSelectionUse     = false;
 
-    //this.State      = new CParaRunState();       // Положение курсора и селекта для данного run
-    this.Paragraph  = null;
+    this.Paragraph    = null;
+    this.State        = ALIGN_MARGIN_WRAP;
 
     this.NearPosArray = [];
 
@@ -260,7 +412,59 @@ ParaMath.prototype.Add = function(Item)
     // Корректируем данный контент
     oContent.Correct_Content(true);
 };
+ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _X, _XLimit)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
+    var X = _X;
+    var W = 0;
+
+    var MathSettings = Get_WordDocumentDefaultMathSettings();
+
+    var wrapIndent = MathSettings.Get_WrapIndent(this.State);
+
+    _X      +=  MathSettings.Get_LeftMargin(this.State);
+    _XLimit -=  MathSettings.Get_RightMargin(this.State);
+
+    var Jc = this.Get_Align();
+
+    if(CurLine == 0 && CurRange == 0)
+    {
+        switch(Jc)
+        {
+            case align_Left:    X = _X; break;
+            case align_Right:   X = _XLimit - this.LinesWidths[0]; break;
+            case align_Center:  X = Math.max(_X + (_XLimit - _X - this.LinesWidths[0])/2, _X); break;
+            case align_Justify:
+            {
+                W = Math.max(this.MaxLinesW + wrapIndent, this.LinesWidths[0]);
+                X = Math.max(_X + (_XLimit - _X - W)/2, _X);
+                break;
+            }
+        }
+    }
+    else
+    {
+        W = Math.max(this.MaxLinesW + wrapIndent, this.LinesWidths[0]);
+
+        if(Jc == align_Justify)
+        {
+            X = _XLimit - _X > W ? _X + (_XLimit - _X - W)/2 + wrapIndent : _X;
+        }
+        else
+        {
+            X = _XLimit - _X > W ? _X + wrapIndent : _X;
+        }
+    }
+
+
+    return X;
+};
+ParaMath.prototype.GetIndentForState = function()
+{
+
+};
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
     this.ParaMathRPI.NeedResize = true;
@@ -608,20 +812,28 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var Para      = PRS.Paragraph;
     var ParaLine  = PRS.Line;
     var ParaRange = PRS.Range;
+    var Page      = PRS.Page;
+
+    if(PRS.PrevLineRecalcInfo.Object == null && true == this.Root.IsFirstLine(ParaLine))
+        this.State = ALIGN_MARGIN_WRAP;
+
+    var MathSettings = Get_WordDocumentDefaultMathSettings();
+
+    if(false == MathSettings.Get_DispDef())
+        this.State = ALIGN_EMPTY;
+
+    PRS.X    += MathSettings.Get_LeftMargin(this.State);
+    PRS.XEnd -= MathSettings.Get_RightMargin(this.State);
+
+    if(0 !== ParaLine)
+        PRS.X += MathSettings.Get_WrapIndent(this.State);
 
     // информация о пересчете
 
     var RPI = new CRPI();
     RPI.MergeMathInfo(this.ParaMathRPI);
-    //PRS.RPI = RPI;
-
 
     var ArgSize = new CMathArgSize();
-
-    if ( ( 0 === ParaLine && 0 === ParaRange ) )
-    {
-        this.Root.Recalculate_Reset( PRS.Range, PRS.Line ); // обновим StartLine и StartRange только для Root (в CParagraphContentWithContentBase), для внутренних элементов обновится на Recalculate_Range
-    }
 
     if(RPI.NeedResize)
     {
@@ -634,173 +846,21 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
-    this.ParaMathRPI.ClearRecalculate();
-}
-ParaMath.prototype.old_Recalculate_Range = function(PRS, ParaPr, Depth)
-{
-    // TODO: Пока у нас контент здесь состоит из 1 элемента (всего элемента Math). Поэтому у нас в данном
-    //       контенте есть 2 позиции 0 и 1, т.е. до или после Math.
+    PRS.PrevLineRecalcInfo.Object = this;
 
-    if ( this.Paragraph !== PRS.Paragraph )
+    if(PRS.FirstItemOnLine && this.State !== ALIGN_EMPTY)
     {
-        this.Paragraph = PRS.Paragraph;
-        this.protected_UpdateSpellChecking();
+        PRS.RecalcResult = recalcresult_PrevLine;
+        PRS.NewRange = true;
+        this.State++;
     }
-
-    var CurLine  = PRS.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-
-    var Para      = PRS.Paragraph;
-    var ParaLine  = PRS.Line;
-    var ParaRange = PRS.Range;
-
-
-    var RPI = new CRPI();
-    RPI.MergeMathInfo(this.ParaMathRPI);
-    RPI.PRS = PRS;
-
-    var ArgSize = new CMathArgSize();
-
-    if(PRS.NewRange  == false)
-        this.Root.Recalculate_Reset(PRS.Range, PRS.Line);
-
-
-
-    if(RPI.NeedResize)
-    {
-        this.Root.Set_Paragraph(Para);
-        this.Root.Set_ParaMath(this, null);
-        this.Root.PreRecalc(null, this, ArgSize, RPI);
-        this.Root.Resize(g_oTextMeasurer, RPI/*recalculate properties info*/);
-        // когда формула будет разбиваться на строки, Position придется перерасчитывать
-        var pos = new CMathPosition();
-        pos.x = 0;
-        pos.y = 0;
-
-        this.Root.setPosition(pos);
-    }
-    else
-        this.Root.Resize_2(g_oTextMeasurer, null, this, RPI/*recalculate properties info*/, ArgSize);
 
     this.ParaMathRPI.ClearRecalculate();
-
-    var OldLineTextAscent  = PRS.LineTextAscent;
-    var OldLineTextAscent2 = PRS.LineTextAscent2;
-    var OldLineTextDescent = PRS.LineTextDescent;
-
-    this.Width        = this.Root.size.width;
-    this.Height       = this.Root.size.height;
-    this.WidthVisible = this.Root.size.width;
-    this.Ascent       = this.Root.size.ascent;
-    this.Descent      = this.Root.size.height - this.Root.size.ascent;
-
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    // TODO: ParaMath.Recalculate_Range
-    // Пока логика пересчета здесь аналогична логике пересчета отдельного символа в ParaRun. В будущем надо будет
-    // переделать с разбиванием на строки.
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    var RangeStartPos = this.protected_AddRange(CurLine, CurRange);
-    var RangeEndPos   = 0;
-
-    // Отмечаем, что началось слово
-    PRS.StartWord = true;
-
-    // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
-    var LetterLen = this.Width;
-    if ( true !== PRS.Word )
-    {
-        // Слово только началось. Делаем следующее:
-        // 1) Если до него на строке ничего не было и данная строка не
-        //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
-        // 2) В противном случае, проверяем убирается ли слово в промежутке.
-
-        // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
-        if ( true !== PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) )
-        {
-            if ( PRS.X + PRS.SpaceLen + LetterLen > PRS.XEnd )
-            {
-                PRS.NewRange  = true;
-            }
-        }
-
-        if ( true !== PRS.NewRange )
-        {
-            // Отмечаем начало нового слова
-            PRS.Set_LineBreakPos( 0 );
-            PRS.WordLen = this.Width;
-            PRS.Word    = true;
-        }
-    }
-    else
-    {
-        if ( PRS.X + PRS.SpaceLen + PRS.WordLen + LetterLen > PRS.XEnd )
-        {
-            if ( true === PRS.FirstItemOnLine )
-            {
-                // Слово оказалось единственным элементом в промежутке, и, все равно,
-                // не умещается целиком. Делаем следующее:
-                //
-                // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
-                //    текущей позиции.
-                // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
-                //    ставим перенос внутри строки в начале слова.
-                // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
-                //    строки в начале слова.
-
-                if ( false === Para.Internal_Check_Ranges(ParaLine, ParaRange)  )
-                {
-                    // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                    PRS.MoveToLBP = true;
-                    PRS.NewRange  = true; // перенос на новую строку
-                }
-                else
-                {
-                    PRS.EmptyLine   = false;
-                    //PRS.X          += WordLen;
-
-                    // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
-                    // делим слово в данном месте
-                    PRS.NewRange = true; // перенос на новую строку
-                }
-            }
-            else
-            {
-                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                PRS.MoveToLBP = true;
-                PRS.NewRange  = true;
-            }
-        }
-
-        if ( true !== PRS.NewRange )
-        {
-            // Мы убираемся в пределах данной строки. Прибавляем ширину буквы к ширине слова
-            PRS.WordLen += LetterLen;
-        }
-    }
-
-    if ( true !== PRS.NewRange )
-    {
-        RangeEndPos = this.Root.Content.length; // RangeEndPos = 1;    to    RangeEndPos = this.Content.length;
-
-        // Обновляем метрику строки
-        if ( PRS.LineAscent < this.Ascent )
-            PRS.LineAscent = this.Ascent;
-
-        if ( PRS.LineDescent < this.Descent )
-            PRS.LineDescent = this.Descent;
-    }
-    else
-    {
-        PRS.LineTextAscent  = OldLineTextAscent ;
-        PRS.LineTextAscent2 = OldLineTextAscent2;
-        PRS.LineTextDescent = OldLineTextDescent;
-    }
-
-    this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
-
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 };
+ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine )
+{
+    this.Root.Recalculate_Reset(CurRange, CurLine); // обновим StartLine и StartRange только для Root (в CParagraphContentWithContentBase), для внутренних элементов обновится на Recalculate_Range
+}
 ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 {
     //var CurLine  = PRS.Line - this.StartLine;
@@ -812,39 +872,28 @@ ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
-    this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
-};
-ParaMath.prototype.old_Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
-{
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if ( EndPos >= 1 )
+    if(_CurLine == 0 && _CurRange == 0)
     {
-        PRSC.Letters++;
+        this.LinesWidths.length = 0;
+        this.MaxLinesW = 0;
 
-        if ( true !== PRSC.Word )
+
+        /*var lng = this.Root.protected_GetLinesCount();
+        for(var Line = 0; Line < lng; Line++)
         {
-            PRSC.Word = true;
-            PRSC.Words++;
-        }
+            var W = this.Root.GetWidthLine(Line, 0);
+            this.LinesWidths.push(W);
 
-        PRSC.Range.W += this.Width;
-        PRSC.Range.W += PRSC.SpaceLen;
-
-        PRSC.SpaceLen = 0;
-
-        // Пробелы перед первым словом в строке не считаем
-        if (PRSC.Words > 1)
-            PRSC.Spaces += PRSC.SpacesCount;
-        else
-            PRSC.SpacesSkip += PRSC.SpacesCount;
-
-        PRSC.SpacesCount = 0;
+            this.MaxLinesW = Line !== 0 && this.MaxLinesW < W ? W: this.MaxLinesW;
+        }*/
     }
+
+    this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
+
+    var W = PRSC.Range.W + PRSC.SpaceLen;
+    this.LinesWidths.push(W);
+
+   this.MaxLinesW = _CurLine !== 0 && this.MaxLinesW < W ? W: this.MaxLinesW;
 };
 
 ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
@@ -1097,13 +1146,12 @@ ParaMath.prototype.Get_Align = function()
     if (undefined !== this.Jc)
         return this.Jc;
 
-    return align_Center;
+    var MathSettings = Get_WordDocumentDefaultMathSettings();
+
+    return MathSettings.Get_DefJc();
 };
 ParaMath.prototype.Set_Align = function(Align)
 {
-    if (align_Center !== Align && align_Left !== Align && align_Right !== Align)
-        Align = align_Center;
-
     if (this.Jc !== Align)
     {
         History.Add(this, new CChangesMathParaJc(Align, this.Jc));
@@ -1243,7 +1291,6 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     }
     return null;
 };
-
 ParaMath.prototype.GetFirstRPrp = function()
 {
     return this.Root.getFirstRPrp(this);

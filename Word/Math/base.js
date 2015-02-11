@@ -1672,6 +1672,10 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     this.Update_WordLen(PRS, WordLen);
 
 };
+CMathBase.prototype.Math_GetWidth = function(_CurLine, _CurRange)
+{
+    return this.size.width;
+};
 CMathBase.prototype.Update_WordLen = function(PRS, WordLen)
 {
     if(this.bInside == false)
@@ -1704,6 +1708,7 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
 CMathBase.prototype.private_UpdatePosOnRemove   = CMathContent.prototype.private_UpdateOnRemove;
+CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_CorrectSelectionPos = CMathContent.prototype.private_CorrectSelectionPos;
 CMathBase.prototype.private_SetNeedResize       = CMathContent.prototype.private_SetNeedResize;
 CMathBase.prototype.private_CorrectCurPos = function()

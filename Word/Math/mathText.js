@@ -49,7 +49,7 @@ function CMathText(bJDraw)
         bSpecialOperator: false
     };
 
-    this.ParaMath =  null;
+    this.ParaMath = null;
     this.Flags  = 0;
     this.Parent = null;
     this.size = new CMathSize();

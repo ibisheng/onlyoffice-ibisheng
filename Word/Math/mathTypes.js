@@ -199,3 +199,12 @@ var STY_ITALIC                =  2;
 var STY_PLAIN                 =  3;
 
 /////////////////////////////////////////
+
+var ALIGN_MARGIN_WRAP = 0;
+var ALIGN_MARGIN      = 1;
+var ALIGN_WRAP        = 2;
+var ALIGN_EMPTY       = 3;
+
+var MATH_LEFT_MARGIN   = 0;
+var MATH_RIGHT_MARGIN  = 1;
+var MATH_WRAP_INDENT   = 2;

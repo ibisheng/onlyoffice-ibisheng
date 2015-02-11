@@ -720,9 +720,8 @@ function CMathContent()
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
 }
-
-Asc.extendClass(CMathContent, ParaHyperlink);
-//Asc.extendClass(CMathContent, CParagraphContentWithContentBase);
+//Asc.extendClass(CMathContent, ParaHyperlink);
+Asc.extendClass(CMathContent, CParagraphContentWithParagraphLikeContent);
 
 CMathContent.prototype.init = function()
 {
@@ -864,6 +863,22 @@ CMathContent.prototype.IsEqArray = function()
 CMathContent.prototype.Get_WidthPoints = function()
 {
     return this.InfoPoints.ContentPoints;
+};
+CMathContent.prototype.GetWidthLine = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var W = 0;
+    for(var i = StartPos; i <= EndPos; i++)
+    {
+        W += this.Content[i].Math_GetWidth(_CurLine, _CurRange);
+    }
+
+    return W;
 };
 CMathContent.prototype.Get_CompiledArgSize = function()
 {
@@ -4123,10 +4138,10 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     PRS.Word = true;
 
+                    LastPos = Pos - 1;
+
                     if(bInline || Item.kind == MATH_BOX)
                     {
-                        LastPos = Pos - 1;
-
                         PRS.Update_CurPos(LastPos, Depth);
                         this.Content[LastPos].Update_LineBreakPos(PRS, true); // обновим : начало нового слова - конец предыдущего Run
                     }
@@ -4198,6 +4213,12 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 
 };
+CMathContent.prototype.IsFirstLine = function(Line)
+{
+    var CurLine  = Line - this.StartLine;
+    return CurLine == 0;
+}
+
 
 /*CMathContent.prototype.Is_CheckingNearestPos         = ParaHyperlink.prototype.Is_CheckingNearestPos;
 

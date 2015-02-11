@@ -1451,12 +1451,14 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
             var Math_X      = ( 1 === RangesCount ? this.Pages[CurPage].X      + ParaPr.Ind.Left  : Range.X );
             var Math_XLimit = ( 1 === RangesCount ? this.Pages[CurPage].XLimit - ParaPr.Ind.Right : Range.XEnd );
 
-            switch(Math_Jc)
+            X = ParaMath.Get_AlignToLine(CurLine, CurRange, Math_X, Math_XLimit);
+
+            /*switch(Math_Jc)
             {
                 case align_Left   : X = Math_X; break;
                 case align_Right  : X = Math_XLimit - ParaMath.Width; break;
                 case align_Center : X = Math.max(Math_X + (Math_XLimit - Math_X - ParaMath.Width) / 2, Math_X); break;
-            }
+            }*/
         }
         else
         {

@@ -1718,10 +1718,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        if (X + SpaceLen + WordLen + LetterLen > XEnd)
+                        if(X + SpaceLen + WordLen + LetterLen > XEnd)
                         {
-
-                            if (true === FirstItemOnLine)
+                            if(true === FirstItemOnLine)
                             {
                                 // Слово оказалось единственным элементом в промежутке, и, все равно,
                                 // не умещается целиком. Делаем следующее:
@@ -1846,7 +1845,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                             FirstItemOnLine = false;
                         }
-
                     }
                     else
                     {
@@ -8127,6 +8125,23 @@ ParaRun.prototype.old_Math_Recalculate = function(oMeasure, RPI, WidthPoints)
 
     if (RPI.PRS.LineTextDescent < this.TextDescent)
         RPI.PRS.LineTextDescent = this.TextDescent;
+};
+ParaRun.prototype.Math_GetWidth = function(_CurLine, _CurRange)
+{
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var W = 0;
+    for(var i = StartPos; i < EndPos; i++)
+    {
+        W += this.Content[i].size.width;
+    }
+
+    return W;
+
 };
 ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {
