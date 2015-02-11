@@ -1,6 +1,9 @@
 ﻿"use strict";
 
-var global3DPersperctive;
+var global3DPersperctive = 90;
+var globalBasePercent = 100;
+var globalGapDepth = 120;
+
 //*****MAIN*****
 function CChartsDrawer()
 {
@@ -116,7 +119,9 @@ CChartsDrawer.prototype =
 		if(!chartSpace.bEmptySeries)
 		{
 			this.areaChart.reCalculate(this.calcProp, null, this);
-		
+			
+			this._calaculate3DProperties(chartSpace);
+			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 				this.gridChart.reCalculate(this.calcProp, this, chartSpace);
 		}
@@ -1979,6 +1984,43 @@ CChartsDrawer.prototype =
 		return {x: newX,y: newY,z: newZ};
 	},
 	
+	_calaculate3DProperties: function(chartSpace)
+	{
+		var widthLine = this.calcProp.widthCanvas - (this.calcProp.chartGutter._left + this.calcProp.chartGutter._right);
+		var heightLine = this.calcProp.heightCanvas - (this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom);
+		
+		var widthGraph    = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
+		var width         = widthGraph / this.calcProp.ptCount;
+		
+		var defaultOverlap = (this.calcProp.subType == "stacked" || this.calcProp.subType == "stackedPer") ? 100 : 0;
+		var overlap       = chartSpace.chart.plotArea.chart.overlap ? chartSpace.chart.plotArea.chart.overlap : defaultOverlap;
+		
+		var gapWidth = chartSpace.chart.plotArea.chart.gapWidth != null ? chartSpace.chart.plotArea.chart.gapWidth : 150;
+		var gapDepth = chartSpace.chart.plotArea.chart.gapDepth != null ? chartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+		
+		//базовая глубина
+		//более-менее подходит для line
+		//baseDepth = width * this.calcProp.seriesCount/* * Math.cos(Math.atan(heightLine / widthLine))*/;
+		var baseDepth = width / (this.calcProp.seriesCount - (this.calcProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
+		
+		//процент от базовой глубины
+		var basePercent = chartSpace.chart.view3D && chartSpace.chart.view3D.depthPercent ? chartSpace.chart.view3D.depthPercent : globalBasePercent;
+		var depth = baseDepth * basePercent / 100;
+		depth = depth + depth * gapDepth / 100;
+		
+		//угол перспективы
+		var perspective = chartSpace.chart.view3D && chartSpace.chart.view3D.perspective ? chartSpace.chart.view3D.perspective : global3DPersperctive;
+		var alpha = 90 - perspective / 4;
+		var catt = ((heightLine / 2 + this.calcProp.chartGutter._top / 2)) * Math.tan((alpha / 360) * (Math.PI * 2));
+		var rPerspective;
+		if(catt === 0)
+			rPerspective = 0;
+		else
+			rPerspective = 1 / catt;
+			
+		this.calcProp.depthPerspective = depth;
+		this.calcProp.rPerspective = rPerspective;
+	},
 	
 	
 	//****accessory functions****
@@ -6728,11 +6770,6 @@ areaChart.prototype =
 	
 	
 //********************************3D******************************************
-	
-var angleOx = 0;//- Math.PI/6;
-var angleOy = 0;//- Math.PI/6;
-var angleOz = 0;//- Math.PI/6;
-	
 //*****3d LINE CHART*****
 function drawLine3DChart()
 {
@@ -6749,6 +6786,7 @@ drawLine3DChart.prototype =
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.cChartSpace = cShapeDrawer;
 		this._drawLines();
 	},
 	
@@ -6758,6 +6796,7 @@ drawLine3DChart.prototype =
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.cChartSpace = cShapeDrawer;
 		this._calculateLines();
 	},
 	
@@ -6767,6 +6806,9 @@ drawLine3DChart.prototype =
 		var trueHeight = this.chartProp.trueHeight;
 		var min = this.chartProp.scale[0];
 		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
+		
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom);
@@ -6778,9 +6820,26 @@ drawLine3DChart.prototype =
 
 		var koffX = trueWidth/this.chartProp.numvlines;
 		var koffY = trueHeight/digHeight;
+		var pxToMm = this.chartProp.pxToMM;
 		
 		var cX1, cY1, cZ1, cX2, cY2, cZ2, cX3, cY3, cZ3, cX4, cY4, cZ4, convertObj, z, turnResult;
-
+		
+		//параметр r и глубина по OZ
+		var rPerspective = this.chartProp.rPerspective;
+		var perspectiveDepth = this.chartProp.depthPerspective;
+		
+		//сдвиг по OZ в глубину
+		var seriaDiff = perspectiveDepth / this.chartProp.seriesCount;
+		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+		var depthSeria = seriaDiff / ((gapDepth / 100) + 1);
+		var DiffGapDepth = (depthSeria * (gapDepth / 100)) / 2;
+		var depthSeria = (perspectiveDepth / this.chartProp.seriesCount - 2 * DiffGapDepth);
+		
+		var view3DProp = this.cShapeDrawer.chart.view3D;
+		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
+		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
+		var angleOz = 0;
+		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			var seria = this.chartProp.series[i];
@@ -6792,66 +6851,40 @@ drawLine3DChart.prototype =
 			for(var n = 1; n < dataSeries.length; n++)
 			{
 				//рассчитываем значения				
-				prevVal = this._getYVal(n - 1, i) - min;
-				val = this._getYVal(n, i) - min;
+				prevVal = this._getYVal(n - 1, i);
+				val = this._getYVal(n, i);
 				
-				y  = trueHeight - (prevVal)*koffY + this.chartProp.chartGutter._top - heightLine/2;
-				y1 = trueHeight - (val)*koffY + this.chartProp.chartGutter._top - heightLine/2;
+				y  = trueHeight - (prevVal)*koffY + this.chartProp.chartGutter._top;
+				y1 = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
 				
-				x  = this.chartProp.chartGutter._left + (n - 1)*koffX - widthLine/2; 
-				x1 = this.chartProp.chartGutter._left + n*koffX - widthLine/2;
+				y  = this.cChartDrawer.getYPosition(prevVal, yPoints) * pxToMm;
+				y1  = this.cChartDrawer.getYPosition(val, yPoints) * pxToMm;
 				
+				x  = xPoints[n - 1].pos * pxToMm;
+				x1  = xPoints[n].pos * pxToMm;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
 				if(!this.paths.series[i])
 					this.paths.series[i] = [];
 				
+				var point;
+				var p = 0, q = 0, r = rPerspective;
+				point = this._convertAndTurnPoint(x, y, DiffGapDepth + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				cX1 = point.x;
+				cY1 = point.y;
 				
-				z = 50;
-				//поворот относительно осей
-				turnResult = this.cChartDrawer._turnCoords(x, y, z, angleOx, angleOy, angleOz);
-				cX1 = turnResult.x;
-				cY1 = turnResult.y; 
-				cZ1 = turnResult.z;
+				point = this._convertAndTurnPoint(x, y, DiffGapDepth + depthSeria + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				cX2 = point.x;
+				cY2 = point.y;
 				
-				convertObj = this.cChartDrawer._convert3DTo2D(cX1, cY1, cZ1, 0, 0 , 0.002);
-				cX1 = convertObj.x + widthLine/2;
-				cY1 = convertObj.y + heightLine/2;
+				point = this._convertAndTurnPoint(x1, y1, DiffGapDepth + depthSeria + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				cX3 = point.x;
+				cY3 = point.y;
 				
-				
-				z = 50 + 20;
-				//поворот относительно осей
-				turnResult = this.cChartDrawer._turnCoords(x, y, z, angleOx, angleOy, angleOz);
-				cX2 = turnResult.x;
-				cY2 = turnResult.y; 
-				cZ2 = turnResult.z;
-				
-				convertObj = this.cChartDrawer._convert3DTo2D(cX2, cY2, cZ2, 0, 0 , 0.002);
-				cX2 = convertObj.x + widthLine/2;
-				cY2 = convertObj.y + heightLine/2;
-				
-				
-				z = 50 + 20;
-				//поворот относительно осей
-				turnResult = this.cChartDrawer._turnCoords(x1, y1, z, angleOx, angleOy, angleOz);
-				cX3 = turnResult.x;
-				cY3 = turnResult.y; 
-				cZ3 = turnResult.z;
-				convertObj = this.cChartDrawer._convert3DTo2D(cX3, cY3, cZ3, 0, 0 , 0.002);
-				cX3 = convertObj.x + widthLine/2;
-				cY3 = convertObj.y + heightLine/2;
-				
-				
-				z = 50;
-				//поворот относительно осей
-				turnResult = this.cChartDrawer._turnCoords(x1, y1, z, angleOx, angleOy, angleOz);
-				cX4 = turnResult.x;
-				cY4 = turnResult.y; 
-				cZ4 = turnResult.z;
-				convertObj = this.cChartDrawer._convert3DTo2D(cX4, cY4, cZ4, 0, 0 , 0.002);
-				cX4 = convertObj.x + widthLine/2;
-				cY4 = convertObj.y + heightLine/2;
+				point = this._convertAndTurnPoint(x1, y1, DiffGapDepth + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				cX4 = point.x;
+				cY4 = point.y;
 				
 				this.paths.series[i][n] = this._calculateLine(cX1, cY1, cX2, cY2, cX3, cY3, cX4, cY4);
 			}
@@ -6945,6 +6978,26 @@ drawLine3DChart.prototype =
 		return path;
 	},
 	
+	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
+	{
+		//координаты центра проектирования
+		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
+		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
+		
+		x1 = x1 - widthLine;
+		y1 = y1 - heightLine;
+		
+		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
+		x1 = turnResult.x;
+		y1 = turnResult.y; 
+		z1 = turnResult.z;
+		
+		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q , r);
+		x1 = convertObj.x + widthLine;
+		y1 = convertObj.y + heightLine;
+		return {x: x1, y: y1}
+	},
+	
 	_calculateDLbl: function()
 	{
 		return {x: 0, y: 0};
@@ -6991,111 +7044,142 @@ drawBar3DChart.prototype =
 	
 	_DrawBars: function()
 	{
+		var pointChangeDirection = ((this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left) / this.chartProp.pxToMM;
+		
+		var brush, pen, seria;
+		for (var i = 0; i < this.chartProp.ptCount; i++) {
+			
+			
+			for (var j = 0; j < this.paths.series.length; ++j) {
+				seria = this.chartProp.series[j];
+				brush = seria.brush;
+				pen = seria.pen;
+				
+				if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
+					continue;
+				
+				if(seria.val.numRef.numCache.pts[i].pen)
+					pen = seria.val.numRef.numCache.pts[i].pen;
+				if(seria.val.numRef.numCache.pts[i].brush)
+					brush = seria.val.numRef.numCache.pts[i].brush;
+				
+				for(var k = 0; k < this.paths.series[j][i].length; k++)
+				{
+					if(this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && this.paths.series[j][i][k].ArrPathCommand[0].X > pointChangeDirection)
+						break;
+					
+					this._drawBar(this.paths.series[j][i][k], pen, brush, k);
+				}
+			}
+		}
+		
+		
+		//вторую половину с конца рисуем
+		var brush, pen, seria;
+		for (var i = this.chartProp.ptCount - 1; i >= 0; i--) {
+			
+
+			for (var j = this.paths.series.length - 1; j >= 0; j--) {
+				seria = this.chartProp.series[j];
+				brush = seria.brush;
+				pen = seria.pen;
+				
+				if(!this.paths.series[j] || !this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
+					continue;
+				
+				if(seria.val.numRef.numCache.pts[i].pen)
+					pen = seria.val.numRef.numCache.pts[i].pen;
+				if(seria.val.numRef.numCache.pts[i].brush)
+					brush = seria.val.numRef.numCache.pts[i].brush;
+				
+				for(var k = 0; k < this.paths.series[j][i].length; k++)
+				{
+					if(this.paths.series[j][i][k].ArrPathCommand && this.paths.series[j][i][k].ArrPathCommand[0] && this.paths.series[j][i][k].ArrPathCommand[0].X <= pointChangeDirection)
+						break;
+					
+					this._drawBar(this.paths.series[j][i][k], pen, brush, k);
+				}
+			}
+		}
+		return;
+		
+		//рисуем половину от нуля
 		var brush, pen, seria;
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
-
-			for (var j = 0; j < this.paths.series[i].length / 2; ++j) {
+			
+			if(!this.paths.series[j][i] || !seria.val.numRef.numCache.pts[i])
+				continue;
+			
+			for (var j = 0; j < this.paths.series[i].length; ++j) {
 			
 				if(seria.val.numRef.numCache.pts[j].pen)
 					pen = seria.val.numRef.numCache.pts[j].pen;
 				if(seria.val.numRef.numCache.pts[j].brush)
 					brush = seria.val.numRef.numCache.pts[j].brush;
-					
+				
+				if(!this.paths.series[i][j])
+					continue;
 				for(var k = 0; k < this.paths.series[i][j].length; k++)
 				{
-					//затемнение боковых сторон
-					if(k != 5)
-					{
-						var  props = this.chartSpace.getParentObjects();
-						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new CColorMod;
-						cColorMod.val = 80000;
-						cColorMod.name = "shade";
-						duplicateBrush.fill.color.Mods.addMod(cColorMod);
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
-						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, duplicateBrush);
-					}
-					else
-						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, brush);
+					if(this.paths.series[i][j][k].ArrPathCommand && this.paths.series[i][j][k].ArrPathCommand[0] && this.paths.series[i][j][k].ArrPathCommand[0].X > pointChangeDirection)
+						break;
 					
+					this._drawBar(this.paths.series[i][j][k], pen, brush, k);
 				}
 			}
 		}
 		
+		//вторую половину с конца рисуем
 		var brush, pen, seria;
 		for (var i = this.paths.series.length - 1; i >= 0; i--) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 
-			for (var j = this.paths.series[i].length - 1; j >= this.paths.series[i].length / 2; j--) {
+			for (var j = this.paths.series[i].length - 1; j >= 0; j--) {
 			
 				if(seria.val.numRef.numCache.pts[j].pen)
 					pen = seria.val.numRef.numCache.pts[j].pen;
 				if(seria.val.numRef.numCache.pts[j].brush)
 					brush = seria.val.numRef.numCache.pts[j].brush;
-					
+				
+				if(!this.paths.series[i][j])
+					continue;
 				for(var k = 0; k < this.paths.series[i][j].length; k++)
 				{
-					//затемнение боковых сторон
-					if(k != 5)
-					{
-						var  props = this.chartSpace.getParentObjects();
-						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new CColorMod;
-						cColorMod.val = 80000;
-						cColorMod.name = "shade";
-						duplicateBrush.fill.color.Mods.addMod(cColorMod);
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
-						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, duplicateBrush);
-					}
-					else
-						this.cChartDrawer.drawPath(this.paths.series[i][j][k], pen, brush);
+					if(this.paths.series[i][j][k].ArrPathCommand && this.paths.series[i][j][k].ArrPathCommand[0] && this.paths.series[i][j][k].ArrPathCommand[0].X <= pointChangeDirection)
+						break;
 					
+					this._drawBar(this.paths.series[i][j][k], pen, brush, k);
 				}
 			}
 		}
-		
-		/*for (var i = this.paths.series.length - 1; i >= 0; i--) {
-			seria = this.chartProp.series[i];
-			brush = seria.brush;
-			pen = seria.pen;
-
-			for (var j = this.paths.series[i].length - 1; j >= this.paths.series[i].length/2; j --) {
-			
-				if(seria.val.numRef.numCache.pts[j].pen)
-					pen = seria.val.numRef.numCache.pts[j].pen;
-				if(seria.val.numRef.numCache.pts[j].brush)
-					brush = seria.val.numRef.numCache.pts[j].brush;
-					
-				for(var k = 0; k < this.paths.series[i][j].length; k++)
-				{
-					//затемнение боковых сторон
-					if(k != 5)
-					{
-						var  props = this.chartSpace.getParentObjects()
-						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new CColorMod;
-						cColorMod.val = 80000;
-						cColorMod.name = "shade";
-						duplicateBrush.fill.color.Mods.addMod(cColorMod);
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
-						this._drawPaths(this.paths.series[i][j][k], duplicateBrush, pen);
-					}
-					else
-						this._drawPaths(this.paths.series[i][j][k], brush, pen);
-					
-				}
-			}
-		}*/
+	},
+	
+	_drawBar: function(path, pen, brush, k)
+	{
+		//затемнение боковых сторон
+		if(k != 5)
+		{
+			var  props = this.chartSpace.getParentObjects();
+			var duplicateBrush = brush.createDuplicate();
+			var cColorMod = new CColorMod;
+			cColorMod.val = 20000;
+			cColorMod.name = "shade";
+			duplicateBrush.fill.color.Mods.addMod(cColorMod);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
+		}
+		else
+			this.cChartDrawer.drawPath(path, pen, brush);
 	},
 	
 	_reCalculateBars: function (/*isSkip*/)
     {
-		  //соответствует подписям оси категорий(OX)
+		//соответствует подписям оси категорий(OX)
 		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
@@ -7104,16 +7188,15 @@ drawBar3DChart.prototype =
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap       = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
-        var width         = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
+        var width         = widthGraph / this.chartProp.ptCount;
 		
-		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth != null ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
 		
 		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		
 		var widthOverLap = individualBarWidth * (overlap / 100);
 		
 		var hmargin = (gapWidth / 100 * individualBarWidth) / 2;
-		
 		
 		var val;
 		var paths;
@@ -7128,8 +7211,22 @@ drawBar3DChart.prototype =
 		var summBarVal = [];
 		var x1, y1, z1, x1, y2, z2, x2, y3, z3, x3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
 		var point1, point2, point3, point4, point5, point6, point7, point8;
-		var perspectiveVal = 20;
+		
 		var startXPosition, startYColumnPosition;
+		
+		//параметр r и глубина по OZ
+		var rPerspective = this.chartProp.rPerspective;
+		var perspectiveDepth = this.chartProp.depthPerspective;
+		
+		//сдвиг по OZ в глубину
+		var gapDepth = this.cShapeDrawer.chart.plotArea.chart.gapDepth != null ? this.cShapeDrawer.chart.plotArea.chart.gapDepth : globalGapDepth;
+		perspectiveDepth = perspectiveDepth / (gapDepth / 100 + 1);
+		var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
+		
+		var view3DProp = this.cShapeDrawer.chart.view3D;
+		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
+		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
+		var angleOz = 0;
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 
@@ -7159,18 +7256,18 @@ drawBar3DChart.prototype =
 				if(height != 0)
 				{
 					//рассчитываем 8 точек для каждого столбца
-					x1 = startX, y1 = startY, z1 = 0;
-					x2 = startX, y2 = startY, z2 = perspectiveVal;
-					x3 = startX + individualBarWidth, y3 = startY, z3 = perspectiveVal;
-					x4 = startX + individualBarWidth, y4 = startY, z4 = 0;
-					x5 = startX, y5 = startY - height, z5 = 0;
-					x6 = startX, y6 = startY - height, z6 = perspectiveVal;
-					x7 = startX + individualBarWidth, y7 = startY - height, z7 = perspectiveVal;
-					x8 = startX + individualBarWidth, y8 = startY - height, z8 = 0;
+					x1 = startX, y1 = startY, z1 = 0 + DiffGapDepth;
+					x2 = startX, y2 = startY, z2 = perspectiveDepth + DiffGapDepth;
+					x3 = startX + individualBarWidth, y3 = startY, z3 = perspectiveDepth + DiffGapDepth;
+					x4 = startX + individualBarWidth, y4 = startY, z4 = 0 + DiffGapDepth;
+					x5 = startX, y5 = startY - height, z5 = 0 + DiffGapDepth;
+					x6 = startX, y6 = startY - height, z6 = perspectiveDepth + DiffGapDepth;
+					x7 = startX + individualBarWidth, y7 = startY - height, z7 = perspectiveDepth + DiffGapDepth;
+					x8 = startX + individualBarWidth, y8 = startY - height, z8 = 0 + DiffGapDepth;
 					
 					
 					//поворот относительно осей
-					var p = 0, q = 0, r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
+					var p = 0, q = 0, r = rPerspective;
 					point1 = this._convertAndTurnPoint(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r);
 					point2 = this._convertAndTurnPoint(x2, y2, z2, angleOx, angleOy, angleOz, p, q, r);
 					point3 = this._convertAndTurnPoint(x3, y3, z3, angleOx, angleOy, angleOz, p, q, r);
@@ -7196,11 +7293,12 @@ drawBar3DChart.prototype =
 	
 	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
 	{
-		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
-		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom);
+		//координаты центра проектирования
+		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
+		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
 		
-		x1 = x1 - widthLine/2;
-		y1 = y1 - heightLine/2;
+		x1 = x1 - widthLine;
+		y1 = y1 - heightLine;
 		
 		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
 		x1 = turnResult.x;
@@ -7208,8 +7306,8 @@ drawBar3DChart.prototype =
 		z1 = turnResult.z;
 		
 		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q , r);
-		x1 = convertObj.x + widthLine/2;
-		y1 = convertObj.y + heightLine/2;
+		x1 = convertObj.x + widthLine;
+		y1 = convertObj.y + heightLine;
 		return {x: x1, y: y1}
 	},
 	
@@ -7412,6 +7510,7 @@ grid3DChart.prototype =
     {
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.cChartDrawer = chartProp;
 		this.chartSpace = chartSpace;
 		
 		this._drawHorisontalLines();
@@ -7423,6 +7522,7 @@ grid3DChart.prototype =
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
 		this.chartSpace = chartSpace;
+		this.cChartDrawer = cShapeDrawer;
 		
 		this.paths = {};
 		this._calculateHorisontalLines();
@@ -7435,61 +7535,49 @@ grid3DChart.prototype =
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom);
 		
-		var perspectiveValue = 50;
+		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+		var width         = widthGraph / this.chartProp.ptCount;
 		
-		var firstX = this.chartProp.chartGutter._left - widthLine/2;
+		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
+		var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? this.chartSpace.chart.plotArea.chart.overlap : defaultOverlap;
+		
+		var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth ? this.chartSpace.chart.plotArea.chart.gapWidth : 150;
+		
+		var firstX = this.chartProp.chartGutter._left;
 		var firstY;
-		var diff = widthLine/2;
 		
 		var p, q, r, convertResult, turnResult;
 		var x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;  
-		//widthLine/2, heightLine/2 - смещения к центру
+		
+		var rPerspective = this.chartProp.rPerspective;
+		var perspectiveDepth = this.chartProp.depthPerspective;
+		
+		var view3DProp = this.chartSpace.chart.view3D;
+		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
+		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
+		var angleOz = 0;
 		
 		for(var i = 0; i <= this.chartProp.numhlines; i++)
 		{
-			firstY = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - i*stepY - heightLine/2;
-			
-			//поворот относительно OY
-			turnResult = this.cShapeDrawer._turnCoords(firstX, firstY, 0, angleOx, angleOy, angleOz);
-			x1 = turnResult.x;
-			y1 = turnResult.y; 
-			z1 = turnResult.z;
-			
-			turnResult = this.cShapeDrawer._turnCoords(firstX, firstY, perspectiveValue, angleOx, angleOy, angleOz);
-			x2 = turnResult.x;
-			y2 = turnResult.y; 
-			z2 = turnResult.z;
-			
-			turnResult = this.cShapeDrawer._turnCoords(firstX + widthLine, firstY, perspectiveValue, angleOx, angleOy, angleOz);
-			x3 = turnResult.x;
-			y3 = turnResult.y; 
-			z3 = turnResult.z;
-			
-			turnResult = this.cShapeDrawer._turnCoords(firstX + widthLine, firstY, 0, angleOx, angleOy, angleOz);
-			x4 = turnResult.x;
-			y4 = turnResult.y; 
-			z4 = turnResult.z;
+			firstY = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - i*stepY;
 			
 			//перемножение на матрицу  - трехточечное перспективное преобразование
 			p = 0;
 			q = 0;
-			r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
+			r = rPerspective;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
-			x1n = convertResult.x + diff;
-			y1n = convertResult.y + heightLine/2;
-			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x2, y2, z2, p, q, r);
-			x2n = convertResult.x + diff;
-			y2n = convertResult.y + heightLine/2;
-			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x3, y3, z3, p, q, r);
-			x3n = convertResult.x + diff;
-			y3n = convertResult.y + heightLine/2;
-			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x4, y4, z4, p, q, r);
-			x4n = convertResult.x + diff;
-			y4n = convertResult.y + heightLine/2;
+			convertResult = this._convertAndTurnPoint(firstX, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
+			x1n = convertResult.x;
+			y1n = convertResult.y;
+			convertResult = this._convertAndTurnPoint(firstX, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			x2n = convertResult.x;
+			y2n = convertResult.y;
+			convertResult = this._convertAndTurnPoint(firstX + widthLine, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			x3n = convertResult.x;
+			y3n = convertResult.y;
+			convertResult = this._convertAndTurnPoint(firstX + widthLine, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
+			x4n = convertResult.x;
+			y4n = convertResult.y;
 			
 			
 			if(!this.paths.horisontalLines)
@@ -7499,19 +7587,7 @@ grid3DChart.prototype =
 			else
 				this.paths.horisontalLines[i] = this._calculateLine(x1n, y1n, x2n, y2n, x3n, y3n);
 		}
-		
-		
-		/*var firstPerspectiveX = (firstX + perspectiveValue*Math.cos(angle45))*Math.cos(angleAroundOx);
-		var firstPerspectiveY = (firstY - perspectiveValue*Math.sin(angle45))*Math.cos(angleAroundOx);		
-		
-		for(var i = 0; i <= this.chartProp.numhlines; i++)
-		{
-			if(!this.paths.horisontalLines)
-				this.paths.horisontalLines = [];
-			this.paths.horisontalLines[i] = this._calculateLine(firstX, firstY - stepY*i, firstPerspectiveX, firstPerspectiveY - stepY*i/1.263, firstPerspectiveX + widthLine,  firstPerspectiveY - stepY*i/1.263)
-		}*/
 	},
-	
 	
 	_calculateVerticalLines : function()
 	{
@@ -7519,61 +7595,45 @@ grid3DChart.prototype =
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom);
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		
-		var perspectiveValue = 50;
 		
-		var firstY = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - heightLine/2;
+		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+		var width         = widthGraph / this.chartProp.ptCount;
+		
+		var firstY = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom;
 		var firstX;
-		var diff = widthLine/2;
 		
 		var p, q, r, convertResult, turnResult;
 		var x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, x1n, y1n, x2n, y2n, x3n, y3n, x4n, y4n;  
-		//widthLine/2 - смещение к центру
+		
+		var rPerspective = this.chartProp.rPerspective;
+		var perspectiveDepth = this.chartProp.depthPerspective;
+		
+		var view3DProp = this.chartSpace.chart.view3D;
+		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
+		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
+		var angleOz = 0;
 		
 		for(var i = 0; i <= this.chartProp.numvlines; i++)
 		{
-			firstX = this.chartProp.chartGutter._left + i*stepY - widthLine/2;
-			
-			//поворот относительно OY
-			turnResult = this.cShapeDrawer._turnCoords(firstX, firstY, 0, angleOx, angleOy, angleOz);
-			x1 = turnResult.x;
-			y1 = turnResult.y; 
-			z1 = turnResult.z;
-			
-			turnResult = this.cShapeDrawer._turnCoords(firstX, firstY, perspectiveValue, angleOx, angleOy, angleOz);
-			x2 = turnResult.x;
-			y2 = turnResult.y; 
-			z2 = turnResult.z;
-			
-			turnResult = this.cShapeDrawer._turnCoords(firstX, firstY - heightLine, perspectiveValue, angleOx, angleOy, angleOz);
-			x3 = turnResult.x;
-			y3 = turnResult.y; 
-			z3 = turnResult.z;
-			
-			turnResult = this.cShapeDrawer._turnCoords(firstX, firstY - heightLine, 0, angleOx, angleOy, angleOz);
-			x4 = turnResult.x;
-			y4 = turnResult.y; 
-			z4 = turnResult.z;
+			firstX = this.chartProp.chartGutter._left + i*stepY;
 			
 			//перемножение на матрицу  - трехточечное перспективное преобразование
 			p = 0;
 			q = 0;
-			r = global3DPersperctive ? global3DPersperctive / 10000 : 0.002;
+			r = rPerspective;
 			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
-			x1n = convertResult.x + diff;
-			y1n = convertResult.y + heightLine/2;
-			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x2, y2, z2, p, q, r);
-			x2n = convertResult.x + diff;
-			y2n = convertResult.y + heightLine/2;
-			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x3, y3, z3, p, q, r);
-			x3n = convertResult.x + diff;
-			y3n = convertResult.y + heightLine/2;
-			
-			convertResult = this.cShapeDrawer._convert3DTo2D(x4, y4, z4, p, q, r);
-			x4n = convertResult.x + diff;
-			y4n = convertResult.y + heightLine/2;
+			convertResult = this._convertAndTurnPoint(firstX, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
+			x1n = convertResult.x;
+			y1n = convertResult.y;
+			convertResult = this._convertAndTurnPoint(firstX, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			x2n = convertResult.x;
+			y2n = convertResult.y;
+			convertResult = this._convertAndTurnPoint(firstX, firstY - heightLine, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			x3n = convertResult.x;
+			y3n = convertResult.y;
+			convertResult = this._convertAndTurnPoint(firstX, firstY - heightLine, 0, angleOx, angleOy, angleOz, p, q, r);
+			x4n = convertResult.x;
+			y4n = convertResult.y;
 			
 			
 			if(!this.paths.verticalLines)
@@ -7650,6 +7710,26 @@ grid3DChart.prototype =
 			path = this.paths.verticalLines[i];
 			this.cChartDrawer.drawPath(path, pen);
 		}
+	},
+	
+	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
+	{
+		//координаты центра проектирования
+		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
+		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
+		
+		x1 = x1 - widthLine;
+		y1 = y1 - heightLine;
+		
+		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
+		x1 = turnResult.x;
+		y1 = turnResult.y; 
+		z1 = turnResult.z;
+		
+		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q , r);
+		x1 = convertObj.x + widthLine;
+		y1 = convertObj.y + heightLine;
+		return {x: x1, y: y1}
 	}
 };
 	
