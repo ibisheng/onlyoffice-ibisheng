@@ -5649,9 +5649,17 @@ function CLn()
     this.cap = null;
     this.cmpd = null;
     this.w = null;
+}
 
 
-    this.compare = function(line)
+CLn.prototype =
+{
+    getObjectType: function()
+    {
+        return historyitem_type_Ln;
+    },
+
+    compare: function(line)
     {
         if(line == null)
         {
@@ -5696,9 +5704,9 @@ function CLn()
             _ret.w = this.w;
         }
         return _ret;
-    };
+    },
 
-    this.merge =  function(ln)
+    merge:  function(ln)
     {
         if(ln == null)
         {
@@ -5748,16 +5756,17 @@ function CLn()
         {
             this.w = ln.w;
         }
-    };
-    this.calculate = function(theme, slide, layout, master, RGBA)
+    },
+
+    calculate: function(theme, slide, layout, master, RGBA)
     {
         if(isRealObject(this.Fill))
         {
             this.Fill.calculate(theme, slide, layout, master, RGBA);
         }
-    };
+    },
 
-    this.createDuplicate =  function()
+    createDuplicate:  function()
     {
         var duplicate = new CLn();
 
@@ -5783,76 +5792,57 @@ function CLn()
         duplicate.cmpd = this.cmpd;
         duplicate.w = this.w;
         return duplicate;
-    }
+    },
 
-    this.IsIdentical = function(ln)
+    IsIdentical: function(ln)
     {
         return ln && (this.Fill == null ? ln.Fill == null : this.Fill.IsIdentical(ln.Fill) )&& this.Join == ln.Join
             && (this.headEnd == null ? ln.headEnd == null : this.headEnd.IsIdentical(ln.headEnd) )
             && (this.tailEnd == null ? ln.tailEnd == null : this.tailEnd.IsIdentical(ln.headEnd)) &&
             this.algn == ln.algn && this.cap == ln.cap && this.cmpd == ln.cmpd && this.w== ln.w;
-    }
-}
-
-
-CLn.prototype =
-{
-    getObjectType: function()
-    {
-        return historyitem_type_Ln;
     },
-
 
     setFill: function(fill)
     {
-       // History.Add(this, {Type:historyitem_Ln_SetFill, oldFill: this.Fill, newFill: fill});
         this.Fill = fill;
     },
 
     setPrstDash: function(prstDash)
     {
-       // History.Add(this, {Type:historyitem_Ln_SetPrstDash, oldPrstDash: this.prstDash, newPrstDash: prstDash});
         this.prstDash = prstDash;
     },
 
     setJoin: function(join)
     {
-      //  History.Add(this, {Type:historyitem_Ln_SetJoin, oldJoin: this.Join, newJoin: join});
         this.Join = join;
     },
 
     setHeadEnd: function(headEnd)
     {
-       // History.Add(this, {Type:historyitem_Ln_SetHeadEnd, oldHeadEnd: this.headEnd, newHeadEnd: headEnd});
         this.headEnd = headEnd;
     },
 
     setTailEnd: function(tailEnd)
     {
-       // History.Add(this, {Type:historyitem_Ln_SetTailEnd, oldTailEnd: this.tailEnd, newTailEnd: tailEnd});
         this.tailEnd = tailEnd;
     },
 
     setAlgn: function(algn)
     {
-     //   History.Add(this, {Type:historyitem_Ln_SetAlgn, oldAlgn: this.algn, newAlgn: algn});
         this.algn = algn;
     },
 
     setCap: function(cap)
     {
-     //   History.Add(this, {Type:historyitem_Ln_SetCap, oldCap: this.cap, newCap: cap});
         this.cap = cap;
     },
 
     setCmpd: function(cmpd)
     {
-      //  History.Add(this, {Type:historyitem_Ln_SetCmpd, oldCmpd: this.cmpd, newCmpd: cmpd});
         this.cmpd = cmpd;
     },
     setW: function(w)
     {
-    //    History.Add(this, {Type:historyitem_Ln_SetW, oldW: this.w, newW: w});
         this.w = w;
     },
 
@@ -5958,7 +5948,6 @@ CLn.prototype =
         }
     },
 
-
     Write_ToBinary: function(w)
     {
         w.WriteBool(isRealObject(this.Fill));
@@ -6011,235 +6000,8 @@ CLn.prototype =
         this.cap  = readLong(r);
         this.cmpd = readLong(r);
         this.w    = readLong(r);
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_Ln_SetFill:
-            {
-                w.WriteBool(isRealObject(data.newFill));
-                if(isRealObject(data.newFill))
-                {
-                    data.newFill.Write_ToBinary(w);
-                }
-                break;
-            }
-            case historyitem_Ln_SetPrstDash:
-            {
-                w.WriteBool(isRealNumber(data.newPrstDash));
-                if(isRealNumber(data.newPrstDash))
-                {
-                    w.WriteLong(data.newPrstDash);
-                }
-                break;
-            }
-            case historyitem_Ln_SetJoin:
-            {
-                w.WriteBool(isRealNumber(data.newJoin));
-                if(isRealNumber(data.newJoin))
-                {
-                    w.WriteLong(data.newJoin);
-                }
-                break;
-            }
-            case historyitem_Ln_SetHeadEnd:
-            {
-                w.WriteBool(isRealObject(data.newHeadEnd));
-                if(isRealObject(data.newHeadEnd))
-                {
-                    data.newHeadEnd.Write_ToBinary(w)
-                }
-                break;
-            }
-            case historyitem_Ln_SetTailEnd:
-            {
-                w.WriteBool(isRealObject(data.newTailEnd));
-                if(isRealObject(data.newTailEnd))
-                {
-                    data.newTailEnd.Write_ToBinary(w)
-                }
-                break;
-            }
-            case historyitem_Ln_SetAlgn:
-            {
-                w.WriteBool(isRealNumber(data.newAlgn));
-                if(isRealNumber(data.newAlgn))
-                {
-                    w.WriteLong(data.newAlgn);
-                }
-                break;
-            }
-            case historyitem_Ln_SetCap:
-            {
-                w.WriteBool(isRealNumber(data.newCap));
-                if(isRealNumber(data.newCap))
-                {
-                    w.WriteLong(data.newCap);
-                }
-                break;
-            }
-            case historyitem_Ln_SetCmpd:
-            {
-                w.WriteBool(isRealNumber(data.newCmpd));
-                if(isRealNumber(data.newCmpd))
-                {
-                    w.WriteLong(data.newCmpd);
-                }
-                break;
-            }
-            case historyitem_Ln_SetW:
-            {
-                w.WriteBool(isRealNumber(data.newW));
-                if(isRealNumber(data.newW))
-                {
-                    w.WriteLong(data.newW);
-                }
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(this.getObjectType() !== r.GetLong())
-            return;
-        var type = r.GetLong();
-        switch(type)
-        {
-            case historyitem_Ln_SetFill:
-            {
-                if(r.GetBool())
-                {
-                    this.Fill = new CUniFill();
-                    this.Fill.Read_FromBinary(r);
-                }
-                else
-                {
-                    this.Fill = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetPrstDash:
-            {
-                if(r.GetBool())
-                {
-                    this.prstDash = r.GetLong();
-                }
-                else
-                {
-                    this.prstDash = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetJoin:
-            {
-                if(r.GetBool())
-                {
-                    this.Join = r.GetLong();
-                }
-                else
-                {
-                    this.Join = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetHeadEnd:
-            {
-                if(r.GetBool())
-                {
-                    this.headEnd = new EndArrow();
-                    this.headEnd.Read_FromBinary(r);
-                }
-                else
-                {
-                    this.headEnd = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetTailEnd:
-            {
-                if(r.GetBool())
-                {
-                    this.tailEnd = new EndArrow();
-                    this.tailEnd.Read_FromBinary(r);
-                }
-                else
-                {
-                    this.tailEnd = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetAlgn:
-            {
-                if(r.GetBool())
-                {
-                    this.algn = r.GetLong();
-                }
-                else
-                {
-                    this.algn = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetCap:
-            {
-                if(r.GetBool())
-                {
-                    this.cap = r.GetLong();
-                }
-                else
-                {
-                    this.cap = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetCmpd:
-            {
-                if(r.GetBool())
-                {
-                    this.cmpd = r.GetLong();
-                }
-                else
-                {
-                    this.cmpd = null;
-                }
-                break;
-            }
-            case historyitem_Ln_SetW:
-            {
-                if(r.GetBool())
-                {
-                    this.w = r.GetLong();
-                }
-                else
-                {
-                    this.w = null;
-                }
-                break;
-            }
-        }
-    },
-
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-    Refresh_RecalcData: function()
-    {},
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     }
-}
+};
 
 // -----------------------------
 
@@ -7720,10 +7482,6 @@ function CShapeStyle()
     this.fillRef = null;//new StyleRef();
     this.effectRef = null;//new StyleRef();
     this.fontRef = null;//new FontRef();
-
-
-
-
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -11377,12 +11135,6 @@ function NoteMaster()
     this.Theme = null;
     this.TableStyles = null;
 
-    this.Calculate = function()
-    {
-        // нужно пробежаться по всем шейпам:
-        // учесть тему во всех заливках
-        // учесть тему во всех текстовых настройках,
-    }
 }
 
 NoteMaster.prototype =
@@ -11393,7 +11145,14 @@ NoteMaster.prototype =
     } ,
 
     Refresh_RecalcData: function()
-    {}
+    {},
+
+    Calculate: function()
+    {
+        // нужно пробежаться по всем шейпам:
+        // учесть тему во всех заливках
+        // учесть тему во всех текстовых настройках,
+    }
 };
 
 // ----------------------------------
@@ -11407,15 +11166,6 @@ function NoteSlide()
 
     this.showMasterPhAnim = false;
     this.showMasterSp = false;
-
-    // pointers
-
-    this.Calculate = function()
-    {
-        // нужно пробежаться по всем шейпам:
-        // учесть тему во всех заливках
-        // учесть тему во всех текстовых настройках,
-    }
 }
 
 NoteSlide.prototype =
@@ -11426,7 +11176,15 @@ NoteSlide.prototype =
     },
 
     Refresh_RecalcData: function()
-    {}
+    {},
+
+    // pointers
+    Calculate: function()
+    {
+        // нужно пробежаться по всем шейпам:
+        // учесть тему во всех заливках
+        // учесть тему во всех текстовых настройках,
+    }
 };
 
 // ----------------------------------
@@ -12403,88 +12161,8 @@ function CTextParagraphPr()
     this.lvl = null;
     this.pPr = new CParaPr();
     this.rPr = new CTextPr();
-
-    this.createDuplicate = function()
-    {
-        var duplicate = new CTextParagraphPr();
-        duplicate.bullet = this.bullet.createDuplicate();
-        duplicate.lvl = this.lvl;
-        duplicate.pPr = clone(this.pPr);
-        duplicate.rPr = clone(this.rPr);
-        return duplicate;
-    };
-
-    this.Write_ToBinary2 =function(w)
-    {
-        w.WriteBool(isRealObject(this.bullet));
-        if(isRealObject(this.bullet))
-        {
-            this.bullet.Write_ToBinary2(w);
-        }
-        w.WriteBool(isRealNumber(this.lvl));
-        if(isRealNumber(this.lvl))
-        {
-            w.WriteLong(this.lvl);
-        }
-
-        w.WriteBool(isRealObject(this.pPr));
-        if(isRealObject(this.pPr))
-        {
-            this.pPr.Write_ToBinary(w);
-        }
-
-
-        w.WriteBool(isRealObject(this.rPr));
-        if(isRealObject(this.rPr))
-        {
-            this.rPr.Write_ToBinary(w);
-        }
-    };
-
-    this.Read_FromBinary2 = function(r)
-    {
-        if(r.GetBool())
-        {
-            this.bullet = new CBullet();
-            this.bullet.Read_FromBinary2(r);
-        }
-        else
-        {
-            this.bullet = new CBullet();
-        }
-        if(r.GetBool())
-        {
-            this.lvl = r.GetLong();
-        }
-        else
-        {
-            this.lvl = null;
-        }
-
-        this.pPr = new CParaPr();
-        if(r.GetBool())
-        {
-            this.pPr.Read_FromBinary(r);
-        }
-
-        this.rPr = new CTextPr();
-        if(r.GetBool())
-        {
-            this.rPr.Read_FromBinary(r);
-        }
-    };
 }
 
-CTextParagraphPr.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-    Refresh_RecalcData: function()
-    {}
-};
 
 function CompareBullets(bullet1, bullet2)
 {

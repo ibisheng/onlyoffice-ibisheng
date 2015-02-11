@@ -6384,8 +6384,6 @@ function BinaryPPTYLoader()
     {
 
         var para_pr = new CParaPr();
-        var tPr = new CTextParagraphPr();
-
         var s = this.stream;
         var _end_rec = s.cur + s.GetULong() + 4;
 

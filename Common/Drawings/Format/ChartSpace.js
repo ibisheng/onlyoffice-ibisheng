@@ -8626,11 +8626,16 @@ CProtection.prototype =
     createDuplicate: function()
     {
         var c = new CProtection();
-        c.setChartObject  (this.chartObject  );
-        c.setData         (this.data);
-        c.setFormatting   (this.formatting);
-        c.setSelection    (this.selection);
-        c.setUserInterface(this.userInterface);
+        if(this.chartObject !== null)
+            c.setChartObject(this.chartObject);
+        if(this.data !== null)
+            c.setData(this.data);
+        if(this.formatting !== null)
+            c.setFormatting(this.formatting);
+        if(this.selection !== null)
+            c.setSelection(this.selection);
+        if(this.userInterface !== null)
+            c.setUserInterface(this.userInterface);
         return c;
     },
 
@@ -8773,13 +8778,13 @@ CPrintSettings.prototype =
         var oPS = new CPrintSettings();
         
         if ( this.headerFooter )
-            oPS.headerFooter = this.headerFooter.createDuplicate();
+            oPS.setHeaderFooter(this.headerFooter.createDuplicate());
         
         if ( this.pageMargins )
-            oPS.pageMargins  = this.pageMargins.createDuplicate();
+            oPS.setPageMargins(this.pageMargins.createDuplicate());
         
         if ( this.pageSetup )
-            oPS.pageSetup    = this.pageSetup.createDuplicate();
+            oPS.setPageSetup(this.pageSetup.createDuplicate());
         
         return oPS;
     },
@@ -8928,30 +8933,33 @@ CHeaderFooterChart.prototype =
 
     createDuplicate : function()
     {
-        // TODO: Проверить работу данной функции        
         var oHFC = new CHeaderFooterChart();
 
-        oHFC.alignWithMargins = this.alignWithMargins;
-        oHFC.differentFirst   = this.differentFirst;
-        oHFC.differentOddEven = this.differentOddEven;
+        if(this.alignWithMargins !== null)
+            oHFC.setAlignWithMargins(this.alignWithMargins);
+        if(this.differentFirst !== null)
+            oHFC.setDifferentFirst(this.differentFirst);
 
-        if ( this.evenFooter )
-            oHFC.evenFooter = this.evenFooter.createDuplicate();
+        if(this.differentOddEven !== null)
+            oHFC.setDifferentOddEven(this.differentOddEven);
 
-        if ( this.evenHeader )
-            oHFC.evenHeader = this.evenHeader.createDuplicate();
+        if ( this.evenFooter !== null )
+            oHFC.setEvenFooter(this.evenFooter);
 
-        if ( this.firstFooter )
-            oHFC.firstFooter = this.firstFooter.createDuplicate();
+        if ( this.evenHeader !== null)
+            oHFC.setEvenHeader(this.evenHeader);
 
-        if ( this.firstHeader )
-            oHFC.firstHeader = this.firstHeader.createDuplicate();
+        if ( this.firstFooter !== null)
+            oHFC.setFirstFooter(this.firstFooter);
 
-        if ( this.oddFooter )
-            oHFC.oddFooter = this.oddFooter.createDuplicate();
+        if ( this.firstHeader !== null)
+            oHFC.setFirstHeader(this.firstHeader);
 
-        if ( this.oddHeader )
-            oHFC.oddHeader = this.oddHeader.createDuplicate();
+        if ( this.oddFooter !== null)
+            oHFC.setOddFooter(this.oddFooter);
+
+        if ( this.oddHeader !== null)
+            oHFC.setOddHeader(this.oddHeader);
 
         return oHFC;
     },
@@ -9230,12 +9238,18 @@ CPageMarginsChart.prototype =
     {
         var oPMC = new CPageMarginsChart();
 
-        oPMC.b      = this.b;
-        oPMC.footer = this.footer;
-        oPMC.header = this.header;
-        oPMC.l      = this.l;
-        oPMC.r      = this.r;
-        oPMC.t      = this.t;
+        if(this.b !== null)
+            oPMC.setB(this.b);
+        if(this.footer !== null)
+            oPMC.setFooter(this.footer);
+        if(this.header !== null)
+            oPMC.setHeader(this.header);
+        if(this.l !== null)
+            oPMC.setL(this.l);
+        if(this.r !== null)
+            oPMC.setR(this.r);
+        if(this.t !== null)
+            oPMC.setT(this.t);
 
         return oPMC;
     },
@@ -9453,22 +9467,32 @@ CPageSetup.prototype =
     createDuplicate : function()
     {
         var oPS = new CPageSetup();
-        
-        oPS.blackAndWhite    = this.blackAndWhite;
-        oPS.copies           = this.copies;
-        oPS.draft            = this.draft;
-        oPS.firstPageNumber  = this.firstPageNumber;
-        oPS.horizontalDpi    = this.horizontalDpi;
-        oPS.orientation      = this.orientation;
-        oPS.paperHeight      = this.paperHeight;
-        oPS.paperSize        = this.paperSize;
-        oPS.paperWidth       = this.paperWidth;
-        oPS.useFirstPageNumb = this.useFirstPageNumb;
-        oPS.verticalDpi      = this.verticalDpi;
+
+        if(this.blackAndWhite !== null)
+            oPS.setBlackAndWhite(this.blackAndWhite);
+        if(this.copies !== null)
+            oPS.setCopies(this.copies);
+        if(this.draft !== null)
+            oPS.setDraft(this.draft);
+        if(this.firstPageNumber !== null)
+            oPS.setFirstPageNumber(this.firstPageNumber);
+        if(this.horizontalDpi !== null)
+            oPS.setHorizontalDpi(this.horizontalDpi);
+        if(this.orientation !== null)
+            oPS.setOrientation(this.orientation);
+        if(this.paperHeight !== null)
+            oPS.setPaperHeight(this.paperHeight);
+        if(this.paperSize !== null)
+            oPS.setPaperSize(this.paperSize);
+        if(this.paperWidth !== null)
+            oPS.setPaperWidth(this.paperWidth);
+        if(this.useFirstPageNumb !== null)
+            oPS.setUseFirstPageNumb(this.useFirstPageNumb);
+        if(this.verticalDpi !== null)
+            oPS.setVerticalDpi(this.verticalDpi);
                 
         return oPS;
     },
-
 
     Refresh_RecalcData: function()
     {},
