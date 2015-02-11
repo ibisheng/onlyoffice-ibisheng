@@ -118,24 +118,24 @@ CChartsDrawer.prototype =
 		//делаем полный пресчёт
 		if(!chartSpace.bEmptySeries)
 		{
-			this.areaChart.reCalculate(this.calcProp, null, this);
+			this.areaChart.reCalculate(this);
 			
 			this._calaculate3DProperties(chartSpace);
 			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
-				this.gridChart.reCalculate(this.calcProp, this, chartSpace);
+				this.gridChart.reCalculate(this);
 		}
 		
-		this.allAreaChart.reCalculate(this.calcProp);
+		this.allAreaChart.reCalculate(this);
 		
 		if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart" && !chartSpace.bEmptySeries)
 		{
-			this.catAxisChart.reCalculate(this.calcProp, null, chartSpace);
-			this.valAxisChart.reCalculate(this.calcProp, null, chartSpace);
+			this.catAxisChart.reCalculate(this);
+			this.valAxisChart.reCalculate(this);
 		}
 		
 		if(!chartSpace.bEmptySeries)
-			this.chart.reCalculate(this, chartSpace);
+			this.chart.reCalculate(this);
 	},
 	
 	draw : function(chartSpace, graphics)
@@ -149,20 +149,20 @@ CChartsDrawer.prototype =
 		this.cShapeDrawer = cShapeDrawer;
 		
 		//отрисовываем без пересчёта
-		this.allAreaChart.draw(this, cShapeDrawer, chartSpace);
+		this.allAreaChart.draw(this);
 		
 		if(!chartSpace.bEmptySeries)
 		{
-			this.areaChart.draw(this, cShapeDrawer, chartSpace);
+			this.areaChart.draw(this);
 			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 			{
-				this.gridChart.draw(this, cShapeDrawer, chartSpace);
-				this.catAxisChart.draw(this, cShapeDrawer, chartSpace);
-				this.valAxisChart.draw(this, cShapeDrawer, chartSpace);
+				this.gridChart.draw(this);
+				this.catAxisChart.draw(this);
+				this.valAxisChart.draw(this);
 			}
 			
-			this.chart.draw(this, cShapeDrawer, chartSpace);
+			this.chart.draw(this);
 		}
 	},
 	
@@ -2282,30 +2282,31 @@ function drawBarChart()
 
 drawBarChart.prototype =
 {
-    reCalculate : function(chartProp, cShapeDrawer)
+    reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this.paths = {};
 		this.summBarVal = [];
 		
 		this._reCalculateBars();
 	},
 	
-	draw : function(chartProp, cShapeDrawer)
+	draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 
 		this._DrawBars();
 	},
 	
 	_DrawBars: function()
 	{
-		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		var brush, pen, seria, numCache;
 		for (var i = 0; i < this.paths.series.length; i++) {
 		
@@ -2327,27 +2328,27 @@ drawBarChart.prototype =
 					this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
 			}
 		}
-		this.cShapeDrawer.Graphics.RestoreGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 	},
 	
 	_reCalculateBars: function (/*isSkip*/)
     {
         //соответствует подписям оси категорий(OX)
-		var xPoints     = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		var xPoints     = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints     = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		var yPoints     = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
 		var widthGraph  = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		//TODO - передавать overlap из меню!
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
-		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var width          = widthGraph / this.chartProp.ptCount;
-		if(this.cShapeDrawer.chart.plotArea.catAx.crossAx.crossBetween)
+		if(this.cChartSpace.chart.plotArea.catAx.crossAx.crossBetween)
 			width = widthGraph / (numCache.ptCount - 1);
 		
-		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
 		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap / 100);
@@ -2390,23 +2391,23 @@ drawBarChart.prototype =
 				seriesHeight[i][idx] = height;
 				
 				//стартовая позиция колонки X
-				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
 					if(xPoints[1] && xPoints[1].pos)
 						startXPosition = xPoints[idx].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					else
-						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
 				}	
 				else
 				{
 					if(xPoints[1] && xPoints[1].pos)
 						startXPosition = xPoints[idx].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					else
-						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posX);
+						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
 				}
 					
 				
-				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
 					if(seriesCounter == 0)
 						startX = startXPosition * this.chartProp.pxToMM + hmargin + seriesCounter * (individualBarWidth);
@@ -2425,11 +2426,11 @@ drawBarChart.prototype =
 				//if(height != 0)
 				//{
 					newStartX = startX;
-					if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+					if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 						newStartX = startX - individualBarWidth;
 					
 					newStartY = startY;
-					if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+					if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
 						newStartY = startY + height;
 					
 					paths = this._calculateRect(newStartX, newStartY, individualBarWidth, height);
@@ -2451,7 +2452,7 @@ drawBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, i, j, val, yPoints, prevVal)
 	{
 		var startY, diffYVal, height, numCache, tempLogVal, tempPrevLogVal, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cShapeDrawer.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
+		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ?  this.chartProp.nullPositionOXLog : this.cChartSpace.chart.plotArea.catAx.posY * this.chartProp.pxToMM;
 		
 		
 		if(this.chartProp.subType == "stacked")
@@ -2465,7 +2466,7 @@ drawBarChart.prototype =
 			startY = startBlockPosition;
 			height = startBlockPosition - endBlockPosition;
 			
-			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				height = - height;	
 		}
 		else if(this.chartProp.subType == "stackedPer")
@@ -2481,15 +2482,15 @@ drawBarChart.prototype =
 			startY = startBlockPosition;
 			height = startBlockPosition - endBlockPosition;
 			
-			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				height = - height;
 		}
 		else
 		{
 			startY = nullPositionOX;
-			if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)//исключение для логарифмической шкалы
+			if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)//исключение для логарифмической шкалы
 			{
-				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints, null,this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase) * this.chartProp.pxToMM;
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints, null,this.cChartSpace.chart.plotArea.valAx.scaling.logBase) * this.chartProp.pxToMM;
 			}
 			else
 			{
@@ -2687,20 +2688,22 @@ function drawLineChart()
 
 drawLineChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cChartSpace)
+	reCalculate : function(chartsDrawer)
     {
 		this.paths = {};
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cChartSpace = cChartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._calculateLines();
 	},
 	
@@ -2924,8 +2927,8 @@ drawLineChart.prototype =
     {
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
-		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
@@ -2964,7 +2967,7 @@ drawLineChart.prototype =
 					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
         }
-		this.cShapeDrawer.Graphics.RestoreGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_getYVal: function(n, i)
@@ -3083,21 +3086,23 @@ function drawAreaChart()
 drawAreaChart.prototype =
 {
     
-	draw : function(chartProp, cShapeDrawer)
+	draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cChartSpace)
+	reCalculate : function(chartsDrawer)
     {
 		this.paths = {};
 		this.points = null;
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cChartSpace = cChartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._calculateLines();
 	},
 	
@@ -3357,8 +3362,8 @@ drawAreaChart.prototype =
 		var pen;
 		var seria, dataSeries;
 		
-		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			
@@ -3381,7 +3386,7 @@ drawAreaChart.prototype =
 			this.cChartDrawer.drawPath(this.paths.series[i], pen, brush);
         }
 		
-		this.cShapeDrawer.Graphics.RestoreGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_getYVal: function(n, i)
@@ -3444,40 +3449,43 @@ function drawHBarChart()
 
 drawHBarChart.prototype =
 {
-    reCalculate : function(chartProp, cShapeDrawer)
+    reCalculate : function(chartsDrawer)
 	{
 		this.paths = {};
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
 		this.summBarVal = [];
+		
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._recalculateBars();
 	},
 	
-	draw : function(chartProp, cShapeDrawer)
+	draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawBars();
 	},
 	
 	_recalculateBars: function (/*isSkip*/)
     {
         //соответствует подписям оси категорий(OX)
-		var xPoints = this.cShapeDrawer.chart.plotArea.valAx.xPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cShapeDrawer.chart.plotArea.catAx.yPoints;
+		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
 		var xaxispos      = this.chartProp.xaxispos;
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
-		var overlap        = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
         var height         = heightGraph / ptCount;
 		
-		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
 		var individualBarHeight = height / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap = individualBarHeight * (overlap / 100);
@@ -3498,8 +3506,8 @@ drawHBarChart.prototype =
 				
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
-				if(this.cShapeDrawer.chart.plotArea.valAx && this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase)
-					val = this.cChartDrawer.getLogarithmicValue(val, this.cShapeDrawer.chart.plotArea.valAx.scaling.logBase, xPoints);
+				if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, xPoints);
 				idx = seria[j].idx != null ? seria[j].idx : j;	
 				
 				
@@ -3513,23 +3521,23 @@ drawHBarChart.prototype =
 
 				
 				//стартовая позиция колонки Y
-				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
 					if(yPoints[1] && yPoints[1].pos)
 						startYPosition = yPoints[idx].pos + Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
 					else
-						startYPosition = yPoints[idx].pos + Math.abs(yPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posY);
+						startYPosition = yPoints[idx].pos + Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
 				}	
 				else
 				{
 					if(yPoints[1] && yPoints[1].pos)
 						startYPosition = yPoints[idx].pos - Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
 					else
-						startYPosition = yPoints[idx].pos - Math.abs(yPoints[0].pos - this.cShapeDrawer.chart.plotArea.valAx.posY);
+						startYPosition = yPoints[idx].pos - Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
 				}
 					
 				
-				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
 					if(seriesCounter == 0)
 						startY = startYPosition * this.chartProp.pxToMM - hmargin - seriesCounter * (individualBarHeight);
@@ -3547,12 +3555,12 @@ drawHBarChart.prototype =
 				
 
 				newStartY = startY;
-				if(this.cShapeDrawer.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
 						newStartY = startY + individualBarHeight;
 				
 				
 				newStartX = startX;
-				if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+				if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
 					newStartX = startX - width;
 				
 				paths = this._calculateRect(newStartX, newStartY / this.chartProp.pxToMM, width, individualBarHeight / this.chartProp.pxToMM);
@@ -3574,7 +3582,7 @@ drawHBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints, summBarVal)
 	{
 		var startY, diffYVal, width, numCache, dVal, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.cShapeDrawer.chart.plotArea.catAx.posX ? this.cShapeDrawer.chart.plotArea.catAx.posX * this.chartProp.pxToMM : this.cShapeDrawer.chart.plotArea.catAx.xPos * this.chartProp.pxToMM;
+		var nullPositionOX = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX * this.chartProp.pxToMM : this.cChartSpace.chart.plotArea.catAx.xPos * this.chartProp.pxToMM;
 		if(this.chartProp.subType == "stacked")
 		{
 			curVal = this._getStackedValue(this.chartProp.series, i, j, val);
@@ -3586,7 +3594,7 @@ drawHBarChart.prototype =
 			startY = startBlockPosition;
 			width = endBlockPosition - startBlockPosition;
 			
-			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				width = - width;
 		}
 		else if(this.chartProp.subType == "stackedPer")
@@ -3602,7 +3610,7 @@ drawHBarChart.prototype =
 			startY = startBlockPosition;
 			width = endBlockPosition - startBlockPosition;
 			
-			if(this.cShapeDrawer.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				width = - width;
 		}
 		else
@@ -3697,8 +3705,8 @@ drawHBarChart.prototype =
 		var numCache;
 		var seria;
 		
-		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
 			
 			if(!this.paths.series[i])
@@ -3719,7 +3727,7 @@ drawHBarChart.prototype =
 					this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
 			}
 		}
-		this.cShapeDrawer.Graphics.RestoreGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_calculateDLbl: function(chartSpace, ser, val)
@@ -3828,19 +3836,21 @@ function drawPieChart()
 
 drawPieChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawPie();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer)
+	reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this.tempAngle = null;
 		this.paths = {};
 		this._reCalculatePie();
@@ -4101,19 +4111,21 @@ function drawDoughnutChart()
 
 drawDoughnutChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawPie();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer)
+	reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this.tempAngle = null;
 		this.paths = {};
 		this._reCalculatePie();
@@ -4154,10 +4166,10 @@ drawDoughnutChart.prototype =
 		
 		//% from out radius  
 		var defaultSize = 50;
-		var holeSize = this.cShapeDrawer.chart.plotArea.chart.holeSize ? this.cShapeDrawer.chart.plotArea.chart.holeSize : defaultSize;
+		var holeSize = this.cChartSpace.chart.plotArea.chart.holeSize ? this.cChartSpace.chart.plotArea.chart.holeSize : defaultSize;
 		
 		//first ang  
-		var firstSliceAng = this.cShapeDrawer.chart.plotArea.chart.firstSliceAng ? this.cShapeDrawer.chart.plotArea.chart.firstSliceAng : 0;
+		var firstSliceAng = this.cChartSpace.chart.plotArea.chart.firstSliceAng ? this.cChartSpace.chart.plotArea.chart.firstSliceAng : 0;
 		firstSliceAng = (firstSliceAng / 360) * (Math.PI * 2);
 		
 		//inner radius
@@ -4319,27 +4331,29 @@ function drawRadarChart()
 {
 	this.chartProp = null;
 	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
 	this.cChartSpace = null;
+	
 	this.paths = {};
 }
 
 drawRadarChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cChartSpace)
+	reCalculate : function(chartsDrawer)
     {
 		this.paths = {};
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cChartSpace = cChartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._calculateLines();
 	},
 	
@@ -4677,29 +4691,27 @@ function drawScatterChart()
 {
 	this.chartProp = null;
 	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
+	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawScatterChart.prototype =
 {
-    reCalculate : function(chartProp, cShapeDrawer)
+    reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartSpace = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
 		
 		this._recalculateScatter();
 	},
 	
-	draw : function(chartProp, cShapeDrawer)
+	draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartSpace = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		this._drawScatter();
 	},
@@ -4764,9 +4776,9 @@ drawScatterChart.prototype =
 	_recalculateScatter: function ()
     {
 		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
 		var trueHeight = this.chartProp.trueHeight;
 		var trueWidth  = this.chartProp.trueWidth;
@@ -4902,8 +4914,8 @@ drawScatterChart.prototype =
     {
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
-		this.cShapeDrawer.Graphics.SaveGrState();
-		this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
@@ -4942,7 +4954,7 @@ drawScatterChart.prototype =
 					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
         }
-		this.cShapeDrawer.Graphics.RestoreGrState();
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_getYPosition: function(val, yPoints, isOx)
@@ -5136,28 +5148,28 @@ function drawStockChart()
 {
 	this.chartProp = null;
 	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
 	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawStockChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartSpace = chartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cChartSpace)
+	reCalculate : function(chartsDrawer)
     {
 		this.paths = {};
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cChartSpace = cChartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._calculateLines();
 	},
 	
@@ -5429,27 +5441,27 @@ function drawBubbleChart()
 {
 	this.chartProp = null;
 	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
+	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawBubbleChart.prototype =
 {
-    reCalculate : function(chartProp, cShapeDrawer)
+    reCalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
 		
 		this._recalculateScatter();
 	},
 	
-	draw : function(chartProp, cShapeDrawer)
+	draw : function(chartsDrawer)
     {
 		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		this._drawScatter();
 	},
@@ -5457,9 +5469,9 @@ drawBubbleChart.prototype =
 	_recalculateScatter: function ()
     {
 		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
 		var trueHeight = this.chartProp.trueHeight;
 		var trueWidth  = this.chartProp.trueWidth;
@@ -5677,7 +5689,7 @@ drawBubbleChart.prototype =
 			maxSize = this.cChartDrawer._getMaxMinValueArray(bubbleSize).max;
 			curSize = bubbleSize[k].val;
 			
-			yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
+			yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
 			maxDiamBubble = Math.abs(yPoints[1].pos - yPoints[0].pos) * 2;
 			
 			diffSize = maxSize / curSize;
@@ -5720,8 +5732,7 @@ drawBubbleChart.prototype =
 function gridChart()
 {
 	this.chartProp = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartSpace = null;
 	this.cChartDrawer = null;
 	
 	this.paths = {};
@@ -5729,23 +5740,21 @@ function gridChart()
 
 gridChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this._drawHorisontalLines();
 		this._drawVerticalLines();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
+	reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this.paths = {};
 		this._calculateHorisontalLines();
@@ -5769,20 +5778,20 @@ gridChart.prototype =
 		
 		var xCenter = (this.chartProp.chartGutter._left + trueWidth/2) / this.chartProp.pxToMM;
 		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
-		var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
-		var crossBetween = this.chartSpace.chart.plotArea.valAx.crossBetween;
+		var crossBetween = this.cChartSpace.chart.plotArea.valAx.crossBetween;
 		var crossDiff;
-		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.chartSpace.chart.plotArea.valAx.posY)
-			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posY);
+		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posY)
+			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
 		
 		if(this.chartProp.type == "Radar")
 		{
 			var y, x, path;
 			
 			//соответствует подписям оси категорий(OX)
-			if(this.chartSpace.chart.plotArea.valAx)
-				var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints;
+			if(this.cChartSpace.chart.plotArea.valAx)
+				var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 			
 			var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
 			var tempAngle = 2 * Math.PI / numCache.length;
@@ -5895,19 +5904,19 @@ gridChart.prototype =
 		var posY = this.chartProp.chartGutter._top;
 		var posX;
 		var posMinorX;
-		var xPoints = this.chartSpace.chart.plotArea.valAx.xPoints ? this.chartSpace.chart.plotArea.valAx.xPoints : this.chartSpace.chart.plotArea.catAx.xPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints ? this.cChartSpace.chart.plotArea.valAx.xPoints : this.cChartSpace.chart.plotArea.catAx.xPoints;
 		
-		var stepX = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos)) : (Math.abs(xPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posX) * 2);
+		var stepX = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos)) : (Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX) * 2);
 		
 		var minorStep = (stepX * this.chartProp.pxToMM) / this.chartProp.numvMinorlines;
 		
 		if(!xPoints)
 			return;
 		
-		var crossBetween = this.chartSpace.chart.plotArea.valAx.crossBetween;
+		var crossBetween = this.cChartSpace.chart.plotArea.valAx.crossBetween;
 		var crossDiff;
-		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.chartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
-			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posX);
+		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
+			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
 			
 		for(var i = 0; i < xPoints.length; i++)
 		{
@@ -5975,14 +5984,14 @@ gridChart.prototype =
 	{
 		var pen;
 		var path;
-		var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints ? this.chartSpace.chart.plotArea.valAx.yPoints : this.chartSpace.chart.plotArea.catAx.yPoints;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
 		for(var i = 0; i < this.paths.horisontalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
-				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 			else
-				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 				
 			path = this.paths.horisontalLines[i];
 			this.cChartDrawer.drawPath(path, pen);
@@ -5994,9 +6003,9 @@ gridChart.prototype =
 				{
 					path = this.paths.horisontalMinorLines[i][n];
 					if(this.chartProp.type == "HBar")
-						pen = this.chartSpace.chart.plotArea.catAx.compiledMinorGridLines;
+						pen = this.cChartSpace.chart.plotArea.catAx.compiledMinorGridLines;
 					else
-						pen = this.chartSpace.chart.plotArea.valAx.compiledMinorGridLines;
+						pen = this.cChartSpace.chart.plotArea.valAx.compiledMinorGridLines;
 					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
@@ -6006,14 +6015,14 @@ gridChart.prototype =
 	_drawVerticalLines: function()
 	{
 		var pen, path;
-		var xPoints = this.chartSpace.chart.plotArea.valAx.xPoints ? this.chartSpace.chart.plotArea.valAx.xPoints : this.chartSpace.chart.plotArea.catAx.xPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints ? this.cChartSpace.chart.plotArea.valAx.xPoints : this.cChartSpace.chart.plotArea.catAx.xPoints;
 		
 		for(var i = 0; i < this.paths.verticalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
-				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 			else
-				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 				
 			path = this.paths.verticalLines[i];
 			this.cChartDrawer.drawPath(path, pen);
@@ -6025,9 +6034,9 @@ gridChart.prototype =
 				{
 					path = this.paths.verticalMinorLines[i][n];
 					if(this.chartProp.type == "HBar")
-						pen = this.chartSpace.chart.plotArea.valAx.compiledMinorGridLines;
+						pen = this.cChartSpace.chart.plotArea.valAx.compiledMinorGridLines;
 					else
-						pen = this.chartSpace.chart.plotArea.catAx.compiledMinorGridLines;
+						pen = this.cChartSpace.chart.plotArea.catAx.compiledMinorGridLines;
 					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
@@ -6040,8 +6049,7 @@ gridChart.prototype =
 function catAxisChart()
 {
 	this.chartProp = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartSpace = null;
 	this.cChartDrawer = null;
 	
 	this.paths = {};
@@ -6049,26 +6057,24 @@ function catAxisChart()
 
 catAxisChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this._drawAxis();
 		this._drawTickMark();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
+	reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this.paths = {};
-		if(this.chartSpace.chart.plotArea.catAx.bDelete != true)
+		if(this.cChartSpace.chart.plotArea.catAx.bDelete != true)
 		{
 			this._calculateAxis();
 			this._calculateTickMark();
@@ -6081,13 +6087,13 @@ catAxisChart.prototype =
 		var axisPos;
 		if(this.chartProp.type == "HBar")
 		{	
-			axisPos = this.chartSpace.chart.plotArea.catAx.posX;
+			axisPos = this.cChartSpace.chart.plotArea.catAx.posX;
 			this.paths.axisLine = this._calculateLine( axisPos, this.chartProp.chartGutter._top / this.chartProp.pxToMM, axisPos, (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM);
 		}
 		else
 		{
 			//TODO сделать по аналогии с HBAR
-			axisPos = this.chartSpace.chart.plotArea.catAx.posY ? this.chartSpace.chart.plotArea.catAx.posY : this.chartSpace.chart.plotArea.catAx.yPos;
+			axisPos = this.cChartSpace.chart.plotArea.catAx.posY ? this.cChartSpace.chart.plotArea.catAx.posY : this.cChartSpace.chart.plotArea.catAx.yPos;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, axisPos, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, axisPos);
 		}
 	},
@@ -6097,7 +6103,7 @@ catAxisChart.prototype =
 		var widthLine = 0, widthMinorLine = 0;
 		var crossMajorStep = 0, crossMinorStep = 0;
 		
-		switch ( this.chartSpace.chart.plotArea.catAx.majorTickMark )
+		switch ( this.cChartSpace.chart.plotArea.catAx.majorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
@@ -6122,7 +6128,7 @@ catAxisChart.prototype =
 			}
 		}
 		
-		switch ( this.chartSpace.chart.plotArea.catAx.minorTickMark )
+		switch ( this.cChartSpace.chart.plotArea.catAx.minorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
@@ -6155,7 +6161,7 @@ catAxisChart.prototype =
 			crossMinorStep = - crossMinorStep;
 		}
 		
-		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.valAx ? this.chartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		if(orientation !== ORIENTATION_MIN_MAX)
 		{
 			widthMinorLine = - widthMinorLine;
@@ -6181,22 +6187,22 @@ catAxisChart.prototype =
 	
 	_calculateVerticalTickMarks: function(widthLine, widthMinorLine, crossMajorStep, crossMinorStep)
 	{
-		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		var yPoints = this.chartSpace.chart.plotArea.catAx.yPoints;
+		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
 
 		var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 		var minorStep = stepY / this.chartProp.numhMinorlines;
 		
-		var posX = this.chartSpace.chart.plotArea.catAx.posX ? this.chartSpace.chart.plotArea.catAx.posX : this.chartSpace.chart.plotArea.catAx.xPos;
+		var posX = this.cChartSpace.chart.plotArea.catAx.posX ? this.cChartSpace.chart.plotArea.catAx.posX : this.cChartSpace.chart.plotArea.catAx.xPos;
 
 		var posY, posMinorY, k;
 		
 		//сдвиг, если положение оси - между делениями
 		var firstDiff = 0, posYtemp;
-		if(this.chartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
-			firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartSpace.chart.plotArea.valAx.posY) * 2;
+		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+			firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY) * 2;
 			
-		var tickMarkSkip = this.chartSpace.chart.plotArea.catAx.tickMarkSkip ? this.chartSpace.chart.plotArea.catAx.tickMarkSkip : 1;
+		var tickMarkSkip = this.cChartSpace.chart.plotArea.catAx.tickMarkSkip ? this.cChartSpace.chart.plotArea.catAx.tickMarkSkip : 1;
 		
 		if(orientation !== ORIENTATION_MIN_MAX)
 		{
@@ -6247,25 +6253,25 @@ catAxisChart.prototype =
 	
 	_calculateHorisontalTickMarks: function(widthLine, widthMinorLine, crossMajorStep, crossMinorStep)
 	{
-		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		var xPoints = this.chartSpace.chart.plotArea.catAx.xPoints;
+		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 				
-		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.chartSpace.chart.plotArea.catAx.posX) * 2;
+		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.catAx.posX) * 2;
 		var minorStep = stepX / this.chartProp.numvMinorlines;
 		
-		var posY = this.chartSpace.chart.plotArea.catAx.posY ? this.chartSpace.chart.plotArea.catAx.posY : this.chartSpace.chart.plotArea.catAx.yPos;
+		var posY = this.cChartSpace.chart.plotArea.catAx.posY ? this.cChartSpace.chart.plotArea.catAx.posY : this.cChartSpace.chart.plotArea.catAx.yPos;
 		var posX, posMinorX, k;
 		
 		var firstDiff = 0, posXtemp;
-		if(this.chartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
+		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
 		{
 			if(xPoints[1])
 				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
-			else if(this.chartSpace.chart.plotArea.valAx.posX)
-				firstDiff = Math.abs(this.chartSpace.chart.plotArea.valAx.posX - xPoints[0].pos) * 2;
+			else if(this.cChartSpace.chart.plotArea.valAx.posX)
+				firstDiff = Math.abs(this.cChartSpace.chart.plotArea.valAx.posX - xPoints[0].pos) * 2;
 		}
 		
-		var tickMarkSkip = this.chartSpace.chart.plotArea.catAx.tickMarkSkip ? this.chartSpace.chart.plotArea.catAx.tickMarkSkip : 1;
+		var tickMarkSkip = this.cChartSpace.chart.plotArea.catAx.tickMarkSkip ? this.cChartSpace.chart.plotArea.catAx.tickMarkSkip : 1;
 		
 		if(orientation !== ORIENTATION_MIN_MAX)
 		{
@@ -6338,7 +6344,7 @@ catAxisChart.prototype =
 		var pen;
 		var path;
 	
-		pen = this.chartSpace.chart.plotArea.catAx.compiledLn;	
+		pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;	
 		path = this.paths.axisLine;
 		
 		this.cChartDrawer.drawPath(path, pen);
@@ -6351,7 +6357,7 @@ catAxisChart.prototype =
 		{
 			for(var i = 0; i < this.paths.tickMarks.length; i++)
 			{
-				pen = this.chartSpace.chart.plotArea.catAx.compiledTickMarkLn;
+				pen = this.cChartSpace.chart.plotArea.catAx.compiledTickMarkLn;
 					
 				path = this.paths.tickMarks[i];
 				this.cChartDrawer.drawPath(path, pen);
@@ -6375,8 +6381,7 @@ catAxisChart.prototype =
 function valAxisChart()
 {
 	this.chartProp = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartSpace = null;
 	this.cChartDrawer = null;
 	
 	this.paths = {};
@@ -6384,26 +6389,24 @@ function valAxisChart()
 
 valAxisChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this._drawAxis();
 		this._drawTickMark();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
+	reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this.paths = {};
-		if(this.chartSpace.chart.plotArea.valAx.bDelete != true)
+		if(this.cChartSpace.chart.plotArea.valAx.bDelete != true)
 		{
 			this._calculateAxis();
 			this._calculateTickMark();
@@ -6412,11 +6415,11 @@ valAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
-		var nullPoisition = this.chartSpace.chart.plotArea.valAx.posX != undefined ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
+		var nullPoisition = this.cChartSpace.chart.plotArea.valAx.posX != undefined ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
 
 		if(this.chartProp.type == "HBar")
 		{	
-			nullPoisition = this.chartSpace.chart.plotArea.valAx.posY;
+			nullPoisition = this.cChartSpace.chart.plotArea.valAx.posY;
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left / this.chartProp.pxToMM, nullPoisition, (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM, nullPoisition );
 		}
 		else
@@ -6430,7 +6433,7 @@ valAxisChart.prototype =
 		var widthLine = 0, widthMinorLine = 0;
 		var crossMajorStep = 0;
 		var crossMinorStep = 0;
-		switch ( this.chartSpace.chart.plotArea.valAx.majorTickMark )
+		switch ( this.cChartSpace.chart.plotArea.valAx.majorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
@@ -6455,7 +6458,7 @@ valAxisChart.prototype =
 			}
 		}
 		
-		switch ( this.chartSpace.chart.plotArea.valAx.minorTickMark )
+		switch ( this.cChartSpace.chart.plotArea.valAx.minorTickMark )
 		{
 			case TICK_MARK_CROSS:
 			{
@@ -6488,7 +6491,7 @@ valAxisChart.prototype =
 			crossMinorStep = - crossMinorStep;
 		}
 		
-		var orientation = this.chartSpace && this.chartSpace.chart.plotArea.catAx ? this.chartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		if(orientation !== ORIENTATION_MIN_MAX)
 		{
 			widthMinorLine = - widthMinorLine;
@@ -6501,12 +6504,12 @@ valAxisChart.prototype =
 		{
 			if(this.chartProp.type == "HBar")
 			{
-				var yPoints = this.chartSpace.chart.plotArea.valAx.xPoints;
+				var yPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
 				
 				var stepX = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[1].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepX / this.chartProp.numvMinorlines;
 				
-				var posY = this.chartSpace.chart.plotArea.valAx.posY;
+				var posY = this.cChartSpace.chart.plotArea.valAx.posY;
 				var posX;
 				var posMinorX;
 				for(var i = 0; i < yPoints.length; i++)
@@ -6534,12 +6537,12 @@ valAxisChart.prototype =
 			}
 			else
 			{
-				var yPoints = this.chartSpace.chart.plotArea.valAx.yPoints;
+				var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 
 				var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 				var minorStep = stepY / this.chartProp.numhMinorlines;
 				
-				var posX = this.chartSpace.chart.plotArea.valAx.posX ? this.chartSpace.chart.plotArea.valAx.posX : this.chartSpace.chart.plotArea.valAx.xPos;
+				var posX = this.cChartSpace.chart.plotArea.valAx.posX ? this.cChartSpace.chart.plotArea.valAx.posX : this.cChartSpace.chart.plotArea.valAx.xPos;
 
 				var posY;
 				var posMinorY;
@@ -6596,7 +6599,7 @@ valAxisChart.prototype =
 		var pen;
 		var path;
 	
-		pen = this.chartSpace.chart.plotArea.catAx.compiledLn;	
+		pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;	
 		path = this.paths.axisLine;
 		this.cChartDrawer.drawPath(path, pen);
 	},
@@ -6609,7 +6612,7 @@ valAxisChart.prototype =
 		
 		for(var i = 0; i < this.paths.tickMarks.length; i++)
 		{
-			pen = this.chartSpace.chart.plotArea.valAx.compiledTickMarkLn;
+			pen = this.cChartSpace.chart.plotArea.valAx.compiledTickMarkLn;
 				
 			path = this.paths.tickMarks[i];
 			this.cChartDrawer.drawPath(path, pen);
@@ -6632,8 +6635,7 @@ valAxisChart.prototype =
 function allAreaChart()
 {
 	this.chartProp = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartSpace = null;
 	this.cChartDrawer = null;
 	
 	this.paths = null;
@@ -6641,21 +6643,20 @@ function allAreaChart()
 
 allAreaChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this._drawArea();
 	},
 	
-	reCalculate: function(chartProp, cShapeDrawer)
+	reCalculate: function(chartsDrawer)
 	{
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this.paths = null;
 		this._calculateArea();
@@ -6688,8 +6689,8 @@ allAreaChart.prototype =
 	
 	_drawArea: function()
 	{
-		var pen = this.chartSpace.pen;
-		var brush = this.chartSpace.brush;
+		var pen = this.cChartSpace.pen;
+		var brush = this.cChartSpace.brush;
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 };
@@ -6698,8 +6699,7 @@ allAreaChart.prototype =
 function areaChart()
 {
 	this.chartProp = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartSpace = null;
 	this.cChartDrawer = null;
 	
 	this.paths = null;
@@ -6707,21 +6707,20 @@ function areaChart()
 
 areaChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this._drawArea();
 	},
 	
-	reCalculate: function(chartProp, cShapeDrawer)
+	reCalculate: function(chartsDrawer)
 	{
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartDrawer = chartProp;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		this.cChartDrawer = chartsDrawer;
 		
 		this.paths = null;
 		this._calculateArea();
@@ -6762,8 +6761,8 @@ areaChart.prototype =
 	
 	_drawArea: function()
 	{
-		var pen = this.chartSpace.chart.plotArea.pen;
-		var brush = this.chartSpace.chart.plotArea.brush;
+		var pen = this.cChartSpace.chart.plotArea.pen;
+		var brush = this.cChartSpace.chart.plotArea.brush;
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 };
@@ -6775,28 +6774,28 @@ function drawLine3DChart()
 {
 	this.chartProp = null;
 	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
+	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawLine3DChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartSpace = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer)
+	reCalculate : function(chartsDrawer)
     {
 		this.paths = {};
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartSpace = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this._calculateLines();
 	},
 	
@@ -6835,7 +6834,7 @@ drawLine3DChart.prototype =
 		var DiffGapDepth = (depthSeria * (gapDepth / 100)) / 2;
 		var depthSeria = (perspectiveDepth / this.chartProp.seriesCount - 2 * DiffGapDepth);
 		
-		var view3DProp = this.cShapeDrawer.chart.view3D;
+		var view3DProp = this.cChartSpace.chart.view3D;
 		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
 		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
 		var angleOz = 0;
@@ -7011,8 +7010,7 @@ function drawBar3DChart()
 {
 	this.chartProp = null;
 	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartSpace = null;
 	this.summBarVal = [];
 	
 	this.paths = {};
@@ -7020,23 +7018,24 @@ function drawBar3DChart()
 
 drawBar3DChart.prototype =
 {
-    reCalculate : function(chartProp, cShapeDrawer)
+    reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this.paths = {};
 		this.summBarVal = [];
 		
 		this._reCalculateBars();
 	},
 	
-	draw : function(chartProp, cShapeDrawer, chartSpace)
+	draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp.calcProp;
-		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
+		
 		this.summBarVal = [];
 
 		this._DrawBars();
@@ -7164,7 +7163,7 @@ drawBar3DChart.prototype =
 		//затемнение боковых сторон
 		if(k != 5)
 		{
-			var  props = this.chartSpace.getParentObjects();
+			var  props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
 			var cColorMod = new CColorMod;
 			cColorMod.val = 20000;
@@ -7180,17 +7179,17 @@ drawBar3DChart.prototype =
 	_reCalculateBars: function (/*isSkip*/)
     {
 		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cShapeDrawer.chart.plotArea.catAx.xPoints;
+		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cShapeDrawer.chart.plotArea.valAx.yPoints;
+		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
 		
 		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
-		var overlap       = this.cShapeDrawer.chart.plotArea.chart.overlap ? this.cShapeDrawer.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap       = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
         var width         = widthGraph / this.chartProp.ptCount;
 		
-		var gapWidth = this.cShapeDrawer.chart.plotArea.chart.gapWidth != null ? this.cShapeDrawer.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth != null ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
 		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		
@@ -7219,11 +7218,11 @@ drawBar3DChart.prototype =
 		var perspectiveDepth = this.chartProp.depthPerspective;
 		
 		//сдвиг по OZ в глубину
-		var gapDepth = this.cShapeDrawer.chart.plotArea.chart.gapDepth != null ? this.cShapeDrawer.chart.plotArea.chart.gapDepth : globalGapDepth;
+		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
 		perspectiveDepth = perspectiveDepth / (gapDepth / 100 + 1);
 		var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		
-		var view3DProp = this.cShapeDrawer.chart.view3D;
+		var view3DProp = this.cChartSpace.chart.view3D;
 		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
 		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
 		var angleOz = 0;
@@ -7247,7 +7246,7 @@ drawBar3DChart.prototype =
 				if(j != 0)
 					startXPosition = xPoints[j].pos - (xPoints[j].pos - xPoints[j - 1].pos) / 2;
 				else
-					startXPosition = this.cShapeDrawer.chart.plotArea.valAx.posX;
+					startXPosition = this.cChartSpace.chart.plotArea.valAx.posX;
 				if(i == 0)
 					startX = startXPosition * this.chartProp.pxToMM + hmargin + i * (individualBarWidth);
 				else
@@ -7499,30 +7498,28 @@ drawBar3DChart.prototype =
 function grid3DChart()
 {
 	this.chartProp = null;
-	this.cShapeDrawer = null;
-	this.chartSpace = null;
+	this.cChartDrawer = null;
+	this.cChartSpace = null;
 	this.paths = {};
 }
 
 grid3DChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer, chartSpace)
+    draw : function(chartsDrawer)
     {
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.cChartDrawer = chartProp;
-		this.chartSpace = chartSpace;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		this._drawHorisontalLines();
 		this._drawVerticalLines();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
+	reCalculate : function(chartsDrawer)
 	{
-		this.chartProp = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
-		this.chartSpace = chartSpace;
-		this.cChartDrawer = cShapeDrawer;
+		this.chartProp = chartsDrawer.calcProp;
+		this.cChartDrawer = chartsDrawer;
+		this.cChartSpace = chartsDrawer.cChartSpace;
 		
 		this.paths = {};
 		this._calculateHorisontalLines();
@@ -7539,9 +7536,9 @@ grid3DChart.prototype =
 		var width         = widthGraph / this.chartProp.ptCount;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
-		var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? this.chartSpace.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap       = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		
-		var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth ? this.chartSpace.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
 		var firstX = this.chartProp.chartGutter._left;
 		var firstY;
@@ -7552,7 +7549,7 @@ grid3DChart.prototype =
 		var rPerspective = this.chartProp.rPerspective;
 		var perspectiveDepth = this.chartProp.depthPerspective;
 		
-		var view3DProp = this.chartSpace.chart.view3D;
+		var view3DProp = this.cChartSpace.chart.view3D;
 		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
 		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
 		var angleOz = 0;
@@ -7608,7 +7605,7 @@ grid3DChart.prototype =
 		var rPerspective = this.chartProp.rPerspective;
 		var perspectiveDepth = this.chartProp.depthPerspective;
 		
-		var view3DProp = this.chartSpace.chart.view3D;
+		var view3DProp = this.cChartSpace.chart.view3D;
 		var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
 		var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
 		var angleOz = 0;
@@ -7684,9 +7681,9 @@ grid3DChart.prototype =
 		for(var i = 0; i < this.paths.horisontalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
-				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 			else
-				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 				
 			path = this.paths.horisontalLines[i];
 			this.cChartDrawer.drawPath(path, pen);
@@ -7703,9 +7700,9 @@ grid3DChart.prototype =
 		for(var i = 0; i < this.paths.verticalLines.length; i++)
 		{
 			if(this.chartProp.type == "HBar")
-				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 			else
-				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
+				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
 				
 			path = this.paths.verticalLines[i];
 			this.cChartDrawer.drawPath(path, pen);
