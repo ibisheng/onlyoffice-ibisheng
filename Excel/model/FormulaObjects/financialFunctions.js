@@ -944,20 +944,20 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
         }
     }
 
-    var per = Math.ceil(1 / rate ), coeff;
+    var per = 1 / rate, coeff;/*Math.ceil(*/
 
     if (cost == salvage || period > per){
         this.value = new cNumber(0);
     }
     else{
 
-        if ( per >= 3 && per < 5 ) {
+        if ( per >= 3 && per <= 4 ) {
             coeff = 1.5;
         }
-        else if ( per >= 5 && per < 6 ) {
+        else if ( per >= 5 && per <= 6 ) {
             coeff = 2;
         }
-        else if ( per >= 6 ) {
+        else if ( per > 6 ) {
             coeff = 2.5;
         }
         else{
@@ -968,7 +968,7 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
             o = firstDeprLinc(cost, datePurch, firstPer, salvage, deprR, per, basis);
 
         var firstDeprLinc = o[0], assetLife = o[1],
-            firstDepr = Math.round(firstDeprLinc);//round excelComplaint firstDeprLinc
+            firstDepr = Math.round(firstDeprLinc);
 
         if ( period == 0 ){
             this.value = new cNumber( firstDepr );
