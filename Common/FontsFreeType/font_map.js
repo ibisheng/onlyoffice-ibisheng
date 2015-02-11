@@ -673,6 +673,9 @@ FD_FontDictionary.prototype =
         if ( undefined != DefaultIndex && nDefPenalty == nMinPenalty )
             nMinIndex = DefaultIndex;
 
+		if (undefined == DefaultIndex)
+			return nMinIndex;
+			
         return oList[nMinIndex];
     },
 
@@ -2690,15 +2693,7 @@ function CApplicationFonts()
         var oSelect = new CFontSelectFormat();
         oSelect.wsName = "Arial";
 
-        var _font = this.g_fontDictionary.GetFontIndex(oSelect, this.g_fontSelections.List, undefined);
-        if (null != _font)
-        {
-            this.DefaultIndex = 0;
-        }
-        else
-        {
-            this.DefaultIndex = window.g_map_font_index[_font.m_wsFontName];
-        }
+        this.DefaultIndex = this.g_fontDictionary.GetFontIndex(oSelect, this.g_fontSelections.List, undefined);
     };
 
     this.LoadFont = function(name, font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
