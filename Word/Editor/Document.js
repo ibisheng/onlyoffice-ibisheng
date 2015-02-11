@@ -629,6 +629,11 @@ function CDocument(DrawingDocument)
 
     this.ContentLastChangePos = 0;
 
+    this.Settings =
+    {
+        MathSettings : CMathSettings ? new CMathSettings() : {}
+    };
+
     this.CurPos  =
     {
         X          : 0,

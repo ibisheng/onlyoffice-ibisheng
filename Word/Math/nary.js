@@ -262,10 +262,11 @@ CNary.prototype.ApplyProperties = function(RPI)
         {
             var bIntegral = oSign.chrCode > 0x222A && oSign.chrCode < 0x2231;
 
+            var oMathSettings = Get_WordDocumentDefaultMathSettings();
             if(bIntegral)
-                limLoc = g_oMathSettings.intLim;
+                limLoc = oMathSettings.intLim;
             else
-                limLoc = g_oMathSettings.naryLim;
+                limLoc = oMathSettings.naryLim;
         }
 
         var PropsInfo =

@@ -9,6 +9,14 @@ var g_dMathArgSizeKoeff_2 = 0.76 * 0.855;
 
 var g_oMathSettings = {};
 
+function Get_WordDocumentDefaultMathSettings()
+{
+    if (!editor)
+        return new CMathSettings();
+
+    return editor.WordControl.m_oLogicDocument.Settings.MathSettings;
+}
+
 function MathMenu (type)
 {
 	this.Type = para_Math;
