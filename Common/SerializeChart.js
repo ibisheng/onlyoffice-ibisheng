@@ -8906,14 +8906,16 @@ BinaryChartReader.prototype.ReadCT_Bar3DChart = function (type, length, val, aCh
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_GapAmount(t, l, oNewVal);
         });
-        //val.m_gapDepth = oNewVal;
+        if(null != oNewVal.m_val)
+            val.setGapDepth(oNewVal.m_val);
     }
     else if (c_oserct_bar3dchartSHAPE === type) {
         var oNewVal = { m_val: null };
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Shape(t, l, oNewVal);
         });
-        //val.m_shape = oNewVal;
+        if(null != oNewVal.m_val)
+            val.setShape(oNewVal.m_val);
     }
     else if (c_oserct_bar3dchartAXID === type) {
         var oNewVal = { m_val: null };
@@ -10290,6 +10292,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Bar3DChart(t, l, oNewVal, aChartWithAxis);
         });
+        oNewVal.set3D(true);
         //3d->2d
         if (BAR_GROUPING_STANDARD == oNewVal.grouping)
             oNewVal.setGrouping(BAR_GROUPING_CLUSTERED);

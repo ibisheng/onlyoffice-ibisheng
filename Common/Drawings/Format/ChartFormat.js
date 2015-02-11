@@ -718,7 +718,6 @@ CDLbl.prototype =
     {
         ExecuteNoHistory(function()
             {
-
                 this.compiledStyles = this.getStyles();
             },
             this, []);
@@ -2303,6 +2302,9 @@ function CBarChart()
     this.varyColors  = null;
 
     this.parent = null;
+    this.b3D = null;
+    this.gapDepth = null;
+    this.shape = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -2313,6 +2315,24 @@ CBarChart.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    set3D: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_Set3D, oldPr: this.b3D, newPr: pr});
+        this.b3D = pr;
+    },
+
+    setGapDepth: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetGapDepth, oldPr: this.gapDepth, newPr: pr});
+        this.gapDepth = pr;
+    },
+
+    setShape: function(pr)
+    {
+        History.Add(this, {Type: historyitem_BarChart_SetShape, oldPr: this.shape, newPr: pr});
+        this.shape = pr;
     },
 
     getSeriesConstructor: function()
@@ -2422,6 +2442,9 @@ CBarChart.prototype =
                 break;
             }
             case historyitem_BarChart_SetBarDir:
+            case historyitem_BarChart_Set3D:
+            case historyitem_BarChart_SetGapDepth:
+            case historyitem_BarChart_SetShape:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -2598,6 +2621,21 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_BarChart_SetShape:
+            {
+                this.shape = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_Set3D:
+            {
+                this.b3D = data.oldPr;
+                break;
+            }
+            case historyitem_BarChart_SetGapDepth:
+            {
+                this.gapDepth = data.oldPr;
+                break;
+            }
             case historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
@@ -2690,6 +2728,21 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_BarChart_SetShape:
+            {
+                this.shape = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_Set3D:
+            {
+                this.b3D = data.newPr;
+                break;
+            }
+            case historyitem_BarChart_SetGapDepth:
+            {
+                this.gapDepth = data.newPr;
+                break;
+            }
             case historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
@@ -2770,9 +2823,20 @@ CBarChart.prototype =
 
         switch(data.Type)
         {
+            case historyitem_BarChart_Set3D:
+            {
+                writeBool(w, data.newPr);
+                break;
+            }
             case historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
+                break;
+            }
+
+            case historyitem_BarChart_SetShape:
+            {
+                writeLong(w, data.newPr);
                 break;
             }
             case historyitem_CommonChart_RemoveSeries:
@@ -2788,6 +2852,7 @@ CBarChart.prototype =
             }
             case historyitem_BarChart_SetBarDir:
             case historyitem_BarChart_SetGapWidth:
+            case historyitem_BarChart_SetGapDepth:
             case historyitem_BarChart_SetGrouping:
             case historyitem_BarChart_SetOverlap:
             {
@@ -2813,9 +2878,19 @@ CBarChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
+            case historyitem_BarChart_Set3D:
+            {
+                this.b3D = readBool(r);
+                break;
+            }
             case historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
+                break;
+            }
+            case historyitem_BarChart_SetShape:
+            {
+                this.shape = readLong(r);
                 break;
             }
             case historyitem_CommonChart_RemoveSeries:
@@ -2852,6 +2927,11 @@ CBarChart.prototype =
             case historyitem_BarChart_SetGapWidth:
             {
                 this.gapWidth = readLong(r);
+                break;
+            }
+            case historyitem_BarChart_SetGapDepth:
+            {
+                this.gapDepth = readLong(r);
                 break;
             }
             case historyitem_BarChart_SetGrouping:
