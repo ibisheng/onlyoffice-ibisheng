@@ -53,8 +53,8 @@ Date.prototype.isLeapYear = function () {
 Date.prototype.getDaysInMonth = function () {
 //    return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
     return this.isLeapYear() ?
-        this.getDaysInMonth.L[this.getMonth()] :
-        this.getDaysInMonth.R[this.getMonth()];
+        this.getDaysInMonth.L[this.getUTCMonth()] :
+        this.getDaysInMonth.R[this.getUTCMonth()];
 };
 
 // durations of months for the regular year
@@ -2190,7 +2190,7 @@ _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) 
         return new cBool( arg0.getValue() <= arg1.getValue() );
     }
     else if ( what === "=" ) {
-        return new cBool( arg0.getValue() === arg1.getValue() );
+        return new cBool( arg0.getValue().toLowerCase() === arg1.getValue().toLowerCase() );
     }
     else if ( what === "<>" ) {
         return new cBool( arg0.getValue() !== arg1.getValue() );
