@@ -631,7 +631,7 @@ function CDocument(DrawingDocument)
 
     this.Settings =
     {
-        MathSettings : CMathSettings ? new CMathSettings() : {}
+        MathSettings : "undefined" !== typeof(CMathSettings) ? new CMathSettings() : {}
     };
 
     this.CurPos  =
