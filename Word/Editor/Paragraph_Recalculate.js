@@ -516,7 +516,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
                 PRS.Restore_RunRecalcInfo();
             else
             {
-                CurLine = PRS.Line;
+                CurLine = PRS.PrevLineRecalcInfo.Line;
 
                 PRS.Reset_Ranges();
                 PRS.Reset_PageBreak();
