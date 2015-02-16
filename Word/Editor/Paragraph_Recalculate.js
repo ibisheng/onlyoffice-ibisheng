@@ -521,6 +521,8 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
                 PRS.Reset_Ranges();
                 PRS.Reset_PageBreak();
                 PRS.Reset_RunRecalcInfo();
+
+                PRS.Y = this.Lines[CurLine].Top;
             }
         }
         else if (recalcresult_CurLine === RecalcResult)
