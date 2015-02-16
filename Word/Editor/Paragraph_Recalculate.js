@@ -490,6 +490,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
     // Изначально обнуляем промежутки обтекания и наличие переноса строки
     PRS.Reset_Ranges();
     PRS.Reset_PageBreak();
+    PRS.Reset_PrevLineRecalcInfo();
 
     var RecalcResult;
     while (true)
@@ -516,13 +517,8 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
                 PRS.Restore_RunRecalcInfo();
             else
             {
-                CurLine = PRS.PrevLineRecalcInfo.Line;
-
-                PRS.Reset_Ranges();
-                PRS.Reset_PageBreak();
-                PRS.Reset_RunRecalcInfo();
-
-                PRS.Y = this.Lines[CurLine].Top;
+                RecalcResult = this.private_RecalculatePage(CurPage);
+                break;
             }
         }
         else if (recalcresult_CurLine === RecalcResult)
