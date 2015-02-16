@@ -457,7 +457,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
     return this.Get_StartPage_Absolute() + CurPage;
 };
 
-Paragraph.prototype.private_RecalculatePage            = function(CurPage)
+Paragraph.prototype.private_RecalculatePage            = function(CurPage, bResetPrevLineInfo)
 {
     var PRS = this.m_oPRSW;
 
@@ -490,7 +490,9 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
     // Изначально обнуляем промежутки обтекания и наличие переноса строки
     PRS.Reset_Ranges();
     PRS.Reset_PageBreak();
-    PRS.Reset_PrevLineRecalcInfo();
+
+    if (false !== bResetPrevLineInfo)
+        PRS.Reset_PrevLineRecalcInfo();
 
     var RecalcResult;
     while (true)
@@ -517,7 +519,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage)
                 PRS.Restore_RunRecalcInfo();
             else
             {
-                RecalcResult = this.private_RecalculatePage(CurPage);
+                RecalcResult = this.private_RecalculatePage(CurPage, false);
                 break;
             }
         }
