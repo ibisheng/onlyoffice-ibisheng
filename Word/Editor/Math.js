@@ -429,12 +429,12 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _X, _XLimit)
 
     var Jc = this.Get_Align();
 
-    if(CurLine == 0 && CurRange == 0)
+    if(this.Root.IsFirstLine(_CurLine))
     {
         switch(Jc)
         {
             case align_Left:    X = _X; break;
-            case align_Right:   X = _XLimit - this.LinesWidths[0]; break;
+            case align_Right:   X = Math.max(_XLimit - this.LinesWidths[0], _X); break;
             case align_Center:  X = Math.max(_X + (_XLimit - _X - this.LinesWidths[0])/2, _X); break;
             case align_Justify:
             {
@@ -814,7 +814,9 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange = PRS.Range;
     var Page      = PRS.Page;
 
-    if(PRS.PrevLineRecalcInfo.Object == null && true == this.Root.IsFirstLine(ParaLine))
+    var bFirstLine = this.Root.IsFirstLine(ParaLine);
+
+    if(PRS.PrevLineRecalcInfo.Object == null && true == bFirstLine)
         this.State = ALIGN_MARGIN_WRAP;
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
@@ -825,7 +827,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.X    += MathSettings.Get_LeftMargin(this.State);
     PRS.XEnd -= MathSettings.Get_RightMargin(this.State);
 
-    if(0 !== ParaLine)
+    if(bFirstLine == false)
         PRS.X += MathSettings.Get_WrapIndent(this.State);
 
     // информация о пересчете
@@ -842,22 +844,20 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.Root.PreRecalc(null, this, ArgSize, RPI);
     }
 
-    PRS.bMath_OneLine = false;
-
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
-    PRS.PrevLineRecalcInfo.Object = this;
-
-    if(PRS.FirstItemOnLine && this.State !== ALIGN_EMPTY)
+    if(PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
     {
+        PRS.PrevLineRecalcInfo.Object = this;
         PRS.RecalcResult = recalcresult_PrevLine;
         PRS.NewRange = true;
+
         this.State++;
     }
 
     this.ParaMathRPI.ClearRecalculate();
 };
-ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine )
+ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine)
 {
     this.Root.Recalculate_Reset(CurRange, CurLine); // обновим StartLine и StartRange только для Root (в CParagraphContentWithContentBase), для внутренних элементов обновится на Recalculate_Range
 }
@@ -876,7 +876,6 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
     {
         this.LinesWidths.length = 0;
         this.MaxLinesW = 0;
-
 
         /*var lng = this.Root.protected_GetLinesCount();
         for(var Line = 0; Line < lng; Line++)

@@ -1642,6 +1642,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var ParaLine        = PRS.Line;
     var ParaRange       = PRS.Range;
+    var bMathWordLarge  = PRS.bMathWordLarge;
 
     var LineRule        = ParaPr.Spacing.LineRule;
 
@@ -1736,6 +1737,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 if(this.Type == para_Math_Run)
                                 {
                                     //
+                                    bMathWordLarge = true;
+
                                 }
                                 else if (false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
                                 {
@@ -2235,9 +2238,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.SpaceLen        = SpaceLen;
     PRS.WordLen         = WordLen;
+    PRS.bMathWordLarge  = bMathWordLarge;
 
     PRS.X               = X;
     PRS.XEnd            = XEnd;
+
 
     if ( Pos >= ContentLen )
     {

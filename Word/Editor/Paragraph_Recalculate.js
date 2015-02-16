@@ -2137,6 +2137,9 @@ function CParagraphRecalculateStateWrap(Para)
         Line   : 0,           // Номер строки, начиная с которой надо пересчитать
         Object : null         // Объект, который вызвал пересчет
     };
+
+    this.bMath_OneLine  = false; // for ParaMath
+    this.bMathWordLarge = false; // for ParaMath
 }
 
 CParagraphRecalculateStateWrap.prototype =
@@ -2159,6 +2162,9 @@ CParagraphRecalculateStateWrap.prototype =
 
         this.NewPage             = false;
         this.ForceNewPage        = false;
+
+        this.bMath_OneLine       = false;
+        this.bMathWordLarge      = false;
     },
 
     // Обнуляем некоторые параметры перед новым отрезком
