@@ -5983,7 +5983,7 @@ Paragraph.prototype =
 
         if (this.Selection.StartPos <= CurPos && CurPos <= this.Selection.EndPos)
             return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, 1, this.Selection.StartPos === CurPos, CurPos === this.Selection.EndPos);
-        else (this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
+        else if (this.Selection.EndPos <= CurPos && CurPos <= this.Selection.StartPos)
             return this.Content[CurPos].Selection_CheckParaContentPos(ContentPos, 1, this.Selection.EndPos === CurPos, CurPos === this.Selection.StartPos);
 
        return false;
