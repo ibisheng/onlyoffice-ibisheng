@@ -9,6 +9,8 @@ var g_dMathArgSizeKoeff_2 = 0.76 * 0.855;
 
 function CMathPropertiesSettings()
 {
+    this.brkBin     = null;
+
     this.defJc      = null;
     this.dispDef    = null;
 
@@ -21,9 +23,7 @@ function CMathPropertiesSettings()
     this.rMargin    = null;
 
     this.wrapIndent = null;
-
     //   не реализовано    //
-    this.brkBin     = null;
     this.brkBinSub  = null;
 
     this.interSp    = null;
@@ -43,6 +43,7 @@ function CMathPropertiesSettings()
 }
 CMathPropertiesSettings.prototype.SetDefaultPr = function()
 {
+    this.brkBin     = BREAK_BEFORE;
     this.defJc      = align_Justify;
     this.dispDef    = true;
     this.intLim     = NARY_SubSup;
@@ -71,6 +72,9 @@ CMathPropertiesSettings.prototype.Merge = function(Pr)
 
     if(Pr.defJc !== null && Pr.defJc !== undefined)
         this.defJc = Pr.defJc;
+
+    if(Pr.brkBin !== null && Pr.brkBin !== undefined)
+        this.brkBin = Pr.brkBin
 };
 
 var g_oMathSettings = {};
@@ -164,6 +168,11 @@ CMathSettings.prototype.Get_DispDef = function()
     this.SetCompiledPr();
     return this.CompiledPr.dispDef;
 };
+CMathSettings.prototype.Get_BrkBin = function()
+{
+    this.SetCompiledPr();
+    return this.CompiledPr.brkBin;
+};
 
 function Get_WordDocumentDefaultMathSettings()
 {
@@ -210,7 +219,7 @@ function ParaMath()
 
 
     this.bSelectionUse     = false;
-
+    this.RecalcJustify = true;
     this.Paragraph    = null;
     this.State        = ALIGN_MARGIN_WRAP;
 
@@ -817,7 +826,12 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bFirstLine = this.Root.IsFirstLine(ParaLine);
 
     if(PRS.PrevLineRecalcInfo.Object == null && true == bFirstLine)
+    {
         this.State = ALIGN_MARGIN_WRAP;
+        this.LinesWidths.length = 0;
+        this.MaxLinesW = 0;
+        this.RecalcJustify = true;
+    }
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
@@ -855,6 +869,16 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.State++;
     }
 
+    var Jc = this.Get_Align();
+
+    if(PRS.NewRange == false && Jc == align_Justify && this.RecalcJustify == true)
+    {
+        PRS.PrevLineRecalcInfo.Object = this;
+        PRS.RecalcResult = recalcresult_PrevLine;
+        PRS.NewRange = true;
+        this.RecalcJustify = false;
+    }
+
     this.ParaMathRPI.ClearRecalculate();
 };
 ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine)
@@ -872,29 +896,15 @@ ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
-    if(_CurLine == 0 && _CurRange == 0)
-    {
-        this.LinesWidths.length = 0;
-        this.MaxLinesW = 0;
-
-        /*var lng = this.Root.protected_GetLinesCount();
-        for(var Line = 0; Line < lng; Line++)
-        {
-            var W = this.Root.GetWidthLine(Line, 0);
-            this.LinesWidths.push(W);
-
-            this.MaxLinesW = Line !== 0 && this.MaxLinesW < W ? W: this.MaxLinesW;
-        }*/
-    }
-
     this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);
 
     var W = PRSC.Range.W + PRSC.SpaceLen;
-    this.LinesWidths.push(W);
+
+    var CurLine  = _CurLine - this.Root.StartLine;
+    this.LinesWidths[CurLine] = W;
 
    this.MaxLinesW = _CurLine !== 0 && this.MaxLinesW < W ? W: this.MaxLinesW;
 };
-
 ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
     var CurLine = _CurLine - this.StartLine;
@@ -903,7 +913,7 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    if ( EndPos >= 1 )
+    if (EndPos >= 1)
     {
         if ( 0 !== PRSA.LettersSkip )
         {
@@ -922,7 +932,6 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
         PRSA.LastW = this.WidthVisible;
     }
 };
-
 ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
 };
@@ -1104,6 +1113,12 @@ ParaMath.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange
     }
 };
 
+ParaMath.prototype.Is_BrkBinBefore = function()
+{
+    var MathSettings = Get_WordDocumentDefaultMathSettings();
+
+    return this.Is_Inline() ? false : MathSettings.Get_BrkBin() == BREAK_BEFORE;
+};
 ParaMath.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 {
     var CurLine = _CurLine - this.StartLine;

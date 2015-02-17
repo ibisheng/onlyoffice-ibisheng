@@ -1648,11 +1648,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var Pos = RangeStartPos;
 
-    var bInline = false;
-
-    if(this.Type == para_Math_Run)
-        bInline = this.ParaMath.Is_Inline();
-
     var UpdateLineMetricsText = false;
     var ContentLen = this.Content.length;
 
@@ -1709,7 +1704,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             }
                         }
 
-                        if (true !== NewRange || (this.Type == para_Math_Run && bInline == true))
+                        if (true !== NewRange || (this.Type == para_Math_Run && this.ParaMath.Is_BrkBinBefore() == false))
                         {
                             // Отмечаем начало нового слова
                             PRS.Set_LineBreakPos(Pos);
@@ -1830,14 +1825,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     SpaceLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
 
 
-                    /*if(bInline == false && bCurrWord == true)
-                    {
-                        PRS.Set_LineBreakPos(Pos);
-                        WordLen = SpaceLen;
-                        SpaceLen = 0;
-                        Word = true;
-                    }*/
-                    if(bInline == false)
+                    if(this.ParaMath.Is_BrkBinBefore() == true)
                     {
                         if(bCurrWord == true)
                         {

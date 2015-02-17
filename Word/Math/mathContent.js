@@ -236,12 +236,6 @@ function CCoeffGaps()
         right:  new CGaps(0, 0, 0, 0.49)
     };
 
-    /*this.Equal =
-    {
-        left:   new CGaps(0.35, 0, 0, 0.7),
-        right:  new CGaps(0.25, 0, 0, 0.5)
-    };*/
-
     this.Equal =
     {
         left:   new CGaps(0, 0, 0, 0.7),
@@ -381,14 +375,7 @@ CMathArgSize.prototype =
 
 function CMathGapsInfo(argSize)
 {
-    //this.measure = oMeasure;
-
-    //this.Parent   = Parent;
-    //this.ParaMath = this.Parent.ParaMath; // для Para_Run
-
     this.argSize = argSize; // argSize выставляем один раз для всего контента
-    //this.leftRunPrp = null; // Run_Prp левого элемента
-    //this.currRunPrp = null;
 
     this.Left    = null;    // элемент слева
     this.Current = null;    // текущий элемент
@@ -534,7 +521,7 @@ CMathGapsInfo.prototype =
     checkGapKind: function(kind)
     {
         var bEmptyGaps = kind == MATH_DELIMITER || kind == MATH_MATRIX,
-            bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL|| kind == MATH_BOX || kind == MATH_BORDER_BOX || (kind == MATH_DELIMITER);
+            bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL || kind == MATH_LIMIT || kind == MATH_BORDER_BOX || (kind == MATH_DELIMITER);
 
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
     }
@@ -957,7 +944,6 @@ CMathContent.prototype.draw = function(x, y, pGraphics, PDSE)
             }
             else
                 this.Content[i].Draw_Elements(PDSE);
-            //this.Content[i].Math_Draw(x, y, pGraphics);
         }
     }
 };

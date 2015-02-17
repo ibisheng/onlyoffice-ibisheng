@@ -103,7 +103,7 @@ CLimitPrimary.prototype.recalculateSize = function(oMeasure)
         SizeIter  = this.Iterator.size;
 
     var width  = SizeFName.width > SizeIter.width ? SizeFName.width : SizeIter.width,
-        height = SizeFName.height + SizeIter.height,
+        height = SizeFName.height + SizeIter.height + this.dH,
         ascent;
 
     if(this.Type == LIMIT_LOW)
@@ -153,6 +153,10 @@ CLimit.prototype.getFName = function()
 CLimit.prototype.getIterator = function()
 {
     return this.Content[1];
+};
+CLimit.prototype.getBase = function()
+{
+    return this.getFName();
 };
 CLimit.prototype.ApplyProperties = function(RPI)
 {
