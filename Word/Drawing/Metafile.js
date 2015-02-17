@@ -54,7 +54,7 @@ CFontSetup.prototype =
         this.Bold   = false;
         this.Italic = false;
 
-        this.SetupName = "";
+        this.SetUpName = "";
         this.SetUpIndex = -1;
         this.SetUpSize = 12;
         this.SetUpStyle = -1;

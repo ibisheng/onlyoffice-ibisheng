@@ -508,6 +508,8 @@ function CDrawingStream(_writer)
     this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
+    this.LastFontOriginInfo = { Name : "", Replace : null };
+
     this.IsUseFonts2    = false;
     this.m_oLastFont2   = null;
 
@@ -671,12 +673,6 @@ CDrawingStream.prototype =
             Italic   : font.Italic
         };
 
-        if (-1 == font.FontFamily.Index || undefined === font.FontFamily.Index || null == font.FontFamily.Index)
-            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
-
-        if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
-            return;
-
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
 
@@ -688,7 +684,9 @@ CDrawingStream.prototype =
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-        var _info = GetLoadInfoForMeasurer(window.g_font_infos[font.FontFamily.Index], oFontStyle);
+        var _fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
+        var _info = GetLoadInfoForMeasurer(_fontinfo, oFontStyle);
+
         var flag = 0;
         if (_info.NeedBold)     flag |= 0x01;
         if (_info.NeedItalic)   flag |= 0x02;
@@ -721,13 +719,6 @@ CDrawingStream.prototype =
             case fontslot_ASCII:
             {
                 _lastFont.Name   = _rfonts.Ascii.Name;
-                _lastFont.Index  = _rfonts.Ascii.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -737,13 +728,6 @@ CDrawingStream.prototype =
             case fontslot_CS:
             {
                 _lastFont.Name   = _rfonts.CS.Name;
-                _lastFont.Index  = _rfonts.CS.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
                 _lastFont.Bold = this.m_oTextPr.BoldCS;
                 _lastFont.Italic = this.m_oTextPr.ItalicCS;
@@ -753,13 +737,6 @@ CDrawingStream.prototype =
             case fontslot_EastAsia:
             {
                 _lastFont.Name   = _rfonts.EastAsia.Name;
-                _lastFont.Index  = _rfonts.EastAsia.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -770,13 +747,6 @@ CDrawingStream.prototype =
             default:
             {
                 _lastFont.Name   = _rfonts.HAnsi.Name;
-                _lastFont.Index  = _rfonts.HAnsi.Index;
-
-                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
-                {
-                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
-                }
-
                 _lastFont.Size = this.m_oTextPr.FontSize;
                 _lastFont.Bold = this.m_oTextPr.Bold;
                 _lastFont.Italic = this.m_oTextPr.Italic;
@@ -794,13 +764,15 @@ CDrawingStream.prototype =
         if (_lastFont.Bold)
             _style += 1;
 
-        if (_lastFont.Index != _lastFont.SetUpIndex || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
+        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
         {
-            _lastFont.SetUpIndex = _lastFont.Index;
+            _lastFont.SetUpName = _lastFont.Name;
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            var _info = GetLoadInfoForMeasurer(window.g_font_infos[_lastFont.SetUpIndex], _style);
+            var _fontinfo = g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
+            var _info = GetLoadInfoForMeasurer(_fontinfo, _lastFont.SetUpStyle);
+
             var flag = 0;
             if (_info.NeedBold)     flag |= 0x01;
             if (_info.NeedItalic)   flag |= 0x02;
@@ -813,7 +785,11 @@ CDrawingStream.prototype =
 
     FillText : function(x,y,text)
     {
-        this.Native["PD_FillText"](x,y,text.charCodeAt(0));
+        var _code = text.charCodeAt(0);
+        if (null != this.LastFontOriginInfo.Replace)
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+        this.Native["PD_FillText"](x,y,_code);
     },
     t : function(text,x,y)
     {
@@ -825,7 +801,11 @@ CDrawingStream.prototype =
     },
     FillText2 : function(x,y,text,cropX,cropW)
     {
-        this.Native["PD_FillText2"](x,y,text.charCodeAt(0),cropX,cropW);
+        var _code = text.charCodeAt(0);
+        if (null != this.LastFontOriginInfo.Replace)
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+        this.Native["PD_FillText2"](x,y,_code,cropX,cropW);
     },
     t2 : function(text,x,y,cropX,cropW)
     {
@@ -837,6 +817,9 @@ CDrawingStream.prototype =
     },
     FillTextCode : function(x,y,lUnicode)
     {
+        if (null != this.LastFontOriginInfo.Replace)
+            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+
         this.Native["PD_FillText"](x,y,lUnicode);
     },
 
