@@ -2712,7 +2712,7 @@ function CApplicationFonts()
         if (undefined !== objDst)
         {
             objDst.Name = _font.m_wsFontName;
-            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst.Name);
+            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst);
         }
 
         // используем стиль, пришедший извне, а не стиль _font
@@ -2799,7 +2799,7 @@ function CApplicationFonts()
         if (undefined !== objDst)
         {
             objDst.Name = _font.m_wsFontName;
-            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst.Name);
+            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst);
         }
 
         return window.g_font_infos[font_name_index];
@@ -2811,7 +2811,7 @@ function CApplicationFonts()
         if (undefined !== objDst)
         {
             objDst.Name = _font.m_wsFontName;
-            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst.Name);
+            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst);
         }
 
         return _font.m_wsFontName;
