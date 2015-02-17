@@ -6023,15 +6023,31 @@ PasteProcessor.prototype =
     {
         var oDocument = this.oDocument;
         var tableNode = node;
+		var newNode;
         //���� ���� ���� tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             if("tbody" == node.childNodes[i].nodeName.toLowerCase())
             {
-                node = node.childNodes[i];
-                break;
+                if(!newNode)
+					newNode = node.childNodes[i];
+				else
+				{
+					var lengthChild = node.childNodes[i].childNodes.length;
+					for(var j = 0; j < lengthChild; j++)
+					{
+						newNode.appendChild(node.childNodes[i].childNodes[0]);
+					}
+				}
+
             }
         }
+		if(newNode)
+		{
+			node = newNode;
+			tableNode = newNode;
+		}
+		
         //��������� �����. � ������� �� ����� ���� ����� ��������� �� ����������� ���������� �����.
         var nRowCount = 0;
         var nMinColCount = 0;
