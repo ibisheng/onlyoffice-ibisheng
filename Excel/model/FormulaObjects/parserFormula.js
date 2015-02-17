@@ -616,7 +616,7 @@ cArea.prototype.foreach2 = function ( action ) {
     var t = this, r = this.getRange();
     if (r) {
         r._foreach2(function (cell) {
-            action(t._parseCellValue(cell));
+            action(t._parseCellValue(cell),cell);
         });
     }
 };

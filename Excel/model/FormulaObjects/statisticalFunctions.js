@@ -338,9 +338,7 @@ cAVERAGEA.prototype.getInfo = function () {
 }
 
 function cAVERAGEIF() {
-//    cBaseFunction.call( this, "AVERAGEIF" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 3 );
+//    cBaseFunction.call( this, "AVERAGEIF", 2, 3 );
 
     this.name = "AVERAGEIF";
     this.type = cElementType.func;
@@ -392,11 +390,23 @@ cAVERAGEIF.prototype.Calculate = function ( arg ) {
     }
     valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
     if ( arg0 instanceof cArea ) {
-        var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c1 = arg2.getRange().first.getCol0(), i = 0;
-        arg0.foreach2( function ( c ) {
-            if ( matching( c, valueForSearching, oper ) ) {
-                var r1 = r + i,
-                    r2 = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
+        var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c/*c1*/ = arg2.getRange().first.getCol0(), i = 0,
+            tmpCellArg0 = arg0.getRange().getCells()[0],
+            tmpCellArg2 = arg2.getRange(),
+            offset, bbox, r2;
+        arg0.foreach2( function ( v, cell ) {
+            if ( matching( v, valueForSearching, oper ) ) {
+                offset = cell.getOffset(tmpCellArg0);
+                tmpCellArg2 = arg2.getRange();
+                tmpCellArg2.setOffset(offset);
+                bbox = tmpCellArg2.getBBox0();
+                offset.offsetCol *= -1;
+                offset.offsetRow *= -1;
+
+                r2 = new cRef( ws.getRange3( bbox.r1, bbox.c1, bbox.r1, bbox.c1 ).getName(), ws );
+
+                tmpCellArg2.setOffset(offset);
+
                 if ( r2.getValue() instanceof cNumber ) {
                     _sum += r2.getValue().getValue();
                     _count++;
