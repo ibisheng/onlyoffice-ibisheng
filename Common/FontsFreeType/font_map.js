@@ -644,7 +644,7 @@ FD_FontDictionary.prototype =
         return true;
     },
 
-    GetFontIndex : function(oSelect, oList, DefaultIndex)
+    GetFontIndex : function(oSelect, oList, DefaultIndex, isName0)
     {
         this.CorrectParamsFromDictionary(oSelect);
 
@@ -656,7 +656,7 @@ FD_FontDictionary.prototype =
         var nFontsCount = oList.length;
         for ( var nIndex = 0; nIndex < nFontsCount; nIndex++ )
         {
-            var nCurPenalty = oList[nIndex].GetPenalty(oSelect);
+            var nCurPenalty = oList[nIndex].GetPenalty(oSelect, isName0);
 
             if ( 0 == nIndex )
             {
@@ -860,7 +860,7 @@ CFontSelect.prototype =
             return 0;
     },
 
-    GetPenalty : function(oSelect)
+    GetPenalty : function(oSelect, isName0)
     {
         var nCurPenalty = 0;
 
@@ -889,14 +889,20 @@ CFontSelect.prototype =
         if (undefined !== oSelect.bFixedWidth)
             nCurPenalty += this.GetFixedPitchPenalty(oSelect.bFixedWidth);
 
+        var nNamePenalty = 0;
         if (oSelect.wsName !== undefined && oSelect.wsAltName !== undefined)
         {
-            nCurPenalty += Math.min(this.GetFaceNamePenalty(oSelect.wsName), this.GetFaceNamePenalty(oSelect.wsAltName));
+            nNamePenalty += Math.min(this.GetFaceNamePenalty(oSelect.wsName), this.GetFaceNamePenalty(oSelect.wsAltName));
         }
         else if (oSelect.wsName !== undefined)
-            nCurPenalty += this.GetFaceNamePenalty(oSelect.wsName);
+            nNamePenalty += this.GetFaceNamePenalty(oSelect.wsName);
         else if (oSelect.wsAltName !== undefined)
-            nCurPenalty += this.GetFaceNamePenalty(oSelect.wsAltName);
+            nNamePenalty += this.GetFaceNamePenalty(oSelect.wsAltName);
+
+        if (true === isName0 && 0 == nNamePenalty)
+            return 0;
+
+        nCurPenalty += nNamePenalty;
 
         if (undefined != oSelect.usWidth)
             nCurPenalty += this.GetWidthPenalty(oSelect.usWidth);
@@ -2785,7 +2791,7 @@ function CApplicationFonts()
             var oSelect = new CFontSelectFormat();
             oSelect.wsName = name;
 
-            var _font = this.GetFontIndex(oSelect);
+            var _font = this.GetFontIndex(oSelect, true);
             this.FontPickerMap[name] = _font;
             return _font;
         }
@@ -2817,9 +2823,9 @@ function CApplicationFonts()
         return _font.m_wsFontName;
     };
 
-    this.GetFontIndex = function(oSelect)
+    this.GetFontIndex = function(oSelect, isName0)
     {
-        return this.g_fontDictionary.GetFontIndex(oSelect, this.g_fontSelections.List, this.DefaultIndex);
+        return this.g_fontDictionary.GetFontIndex(oSelect, this.g_fontSelections.List, this.DefaultIndex, isName0);
     };
 }
 
