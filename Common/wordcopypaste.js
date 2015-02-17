@@ -2326,7 +2326,7 @@ function Editor_Paste_Button(api)
 	else
 	{
 		var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
-		if(ElemToSelect)
+		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
 		{
 			History.Create_NewPoint();
             editor.waitSave = true;
@@ -4241,7 +4241,9 @@ PasteProcessor.prototype =
             this.oRootNode = node;
             this._Prepeare(node,
                 function(){
-                     oThis.aContent = [];
+					 /*if(node.innerHTML == "&nbsp;")
+						return;*/
+					 oThis.aContent = [];
                      //�� ����� ���������� �������� ��� ������� ��������� �������
                      var arrShapes = [], arrImages = [], arrTables = [];
                     var presentation = editor.WordControl.m_oLogicDocument;
