@@ -148,6 +148,8 @@ function CTextMeasurer()
     this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
+    this.LastFontOriginInfo = { Name : "", Replace : null };
+
     this.Init = function()
     {
         this.m_oManager.Initialize();
@@ -183,7 +185,7 @@ function CTextMeasurer()
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -265,7 +267,7 @@ function CTextMeasurer()
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -284,7 +286,11 @@ function CTextMeasurer()
         var Width  = 0;
         var Height = 0;
 
-        var Temp = this.m_oManager.MeasureChar( text.charCodeAt(0) );
+        var _code = text.charCodeAt(0);
+        if (null != this.LastFontOriginInfo.Replace)
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+        var Temp = this.m_oManager.MeasureChar( _code );
 		
         Width  = Temp.fAdvanceX * 25.4 / 72;
         Height = 0;//Temp.fHeight;
@@ -295,7 +301,11 @@ function CTextMeasurer()
     {
         var Width  = 0;
 
-        var Temp = this.m_oManager.MeasureChar( text.charCodeAt(0), true );
+        var _code = text.charCodeAt(0);
+        if (null != this.LastFontOriginInfo.Replace)
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+        var Temp = this.m_oManager.MeasureChar( _code, true );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
 
@@ -326,6 +336,9 @@ function CTextMeasurer()
         var Width  = 0;
         var Height = 0;
 
+        if (null != this.LastFontOriginInfo.Replace)
+            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+
         var Temp = this.m_oManager.MeasureChar( lUnicode );
 
         Width  = Temp.fAdvanceX * 25.4 / 72;
@@ -336,6 +349,9 @@ function CTextMeasurer()
     this.Measure2Code = function(lUnicode)
     {
         var Width  = 0;
+
+        if (null != this.LastFontOriginInfo.Replace)
+            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         var Temp = this.m_oManager.MeasureChar( lUnicode, true );
 

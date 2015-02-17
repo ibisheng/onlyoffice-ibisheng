@@ -491,6 +491,8 @@ function CGraphics()
     this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
 
+    this.LastFontOriginInfo = { Name : "", Replace : null };
+
     this.m_bIntegerGrid = true;
 
     this.ClipManager = new CClipManager();
@@ -1165,7 +1167,7 @@ CGraphics.prototype =
         _last_font.SetUpSize = font.FontSize;
         _last_font.SetUpStyle = oFontStyle;
 
-        g_fontApplication.LoadFont(_last_font.SetUpName, window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+        g_fontApplication.LoadFont(_last_font.SetUpName, window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
 
         var _mD = _last_font.SetUpMatrix;
         var _mS = this.m_oTransform;
@@ -1255,7 +1257,7 @@ CGraphics.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
 
             var _mD = _lastFont.SetUpMatrix;
             var _mS = this.m_oTransform;
@@ -1306,7 +1308,12 @@ CGraphics.prototype =
 
         try
         {
-            _font_manager.LoadString2C(text,_x,_y);
+            var _code = text.charCodeAt(0);
+
+            if (null != this.LastFontOriginInfo.Replace)
+                _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+            _font_manager.LoadString4C(_code,_x,_y);
         }
         catch(err)
         {
@@ -1379,7 +1386,12 @@ CGraphics.prototype =
 
         try
         {
-            _font_manager.LoadString2C(text,_x,_y);
+            var _code = text.charCodeAt(0);
+
+            if (null != this.LastFontOriginInfo.Replace)
+                _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+            _font_manager.LoadString4C(_code,_x,_y);
         }
         catch(err)
         {
@@ -1450,6 +1462,9 @@ CGraphics.prototype =
 
         try
         {
+            if (null != this.LastFontOriginInfo.Replace)
+                lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+
             _font_manager.LoadString4C(lUnicode,_x,_y);
         }
         catch(err)

@@ -460,7 +460,7 @@ function CGraphics()
     this.m_lWidthPix    = 0;
     this.m_lHeightPix   = 0;
     this.m_dDpiX        = 96.0;
-    this.m_dDpiY        = 96.0; 
+    this.m_dDpiY        = 96.0;
     this.m_bIsBreak 	= false;
 
     this.textBB_l       = 10000;
@@ -494,6 +494,8 @@ function CGraphics()
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new CGrRFonts();
     this.m_oLastFont    = new CFontSetup();
+
+    this.LastFontOriginInfo = { Name : "", Replace : null };
 
     this.m_bIntegerGrid = true;
 
@@ -651,7 +653,7 @@ CGraphics.prototype =
         _c.A = a;
 
         this.m_oContext.fillStyle = "rgba(" + _c.R + "," + _c.G + "," + _c.B + "," + (_c.A / 255) + ")";
-			
+
 		this.m_bIsFillTextCanvasColor = 0;
     },
     b_color2 : function(r,g,b,a)
@@ -1191,7 +1193,7 @@ CGraphics.prototype =
         _last_font.SetUpSize = font.FontSize;
         _last_font.SetUpStyle = oFontStyle;
 
-        g_fontApplication.LoadFont(_last_font.SetUpName, window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+        g_fontApplication.LoadFont(_last_font.SetUpName, window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
 
         var _mD = _last_font.SetUpMatrix;
         var _mS = this.m_oTransform;
@@ -1279,7 +1281,7 @@ CGraphics.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
 
             var _mD = _lastFont.SetUpMatrix;
             var _mS = this.m_oTransform;
@@ -1330,7 +1332,12 @@ CGraphics.prototype =
 
         try
         {
-            _font_manager.LoadString2C(text,_x,_y);
+            var _code = text.charCodeAt(0);
+
+            if (null != this.LastFontOriginInfo.Replace)
+                _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+            _font_manager.LoadString4C(_code,_x,_y);
         }
         catch(err)
         {
@@ -1403,7 +1410,12 @@ CGraphics.prototype =
 
         try
         {
-            _font_manager.LoadString2C(text,_x,_y);
+            var _code = text.charCodeAt(0);
+
+            if (null != this.LastFontOriginInfo.Replace)
+                _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+            _font_manager.LoadString4C(_code,_x,_y);
         }
         catch(err)
         {
@@ -1474,6 +1486,9 @@ CGraphics.prototype =
 
         try
         {
+            if (null != this.LastFontOriginInfo.Replace)
+                lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+
             _font_manager.LoadString4C(lUnicode,_x,_y);
         }
         catch(err)
@@ -1610,7 +1625,7 @@ CGraphics.prototype =
 
         var imageData = this.m_oContext.getImageData(nX,nY,nW,nH);
         var pPixels = imageData.data;
-	
+
         var _r = this.m_oBrush.Color1.R;
         var _g = this.m_oBrush.Color1.G;
         var _b = this.m_oBrush.Color1.B;

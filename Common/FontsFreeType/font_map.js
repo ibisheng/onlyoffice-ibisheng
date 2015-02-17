@@ -263,13 +263,22 @@ function FD_FontDictionary()
 
     // шрифты в массиве this.FD_Ascii_Font_Like_Names - в порядке важности.
     this.FD_Ascii_Font_Like_Names = [
-        ["Cambria Math", "Asana Math", "XITS Math", "Latin Modern"]
+        ["Cambria Math", "Asana Math", "XITS Math", "Latin Modern"],
+        ["OpenSymbol"]
     ];
     this.FD_Ascii_Font_Like_Main = {
         "Cambria Math"  : 0,
         "Asana Math"    : 0,
         "XITS Math"     : 0,
-        "Latin Modern"  : 0
+        "Latin Modern"  : 0,
+
+        "Symbol"        : 1,
+        "Wingdings"     : 1
+    };
+
+    this.ChangeGlyphsMap = {
+        "Symbol" : { Name : "OpenSymbol", IsSymbolSrc : true, MapSrc : [0xB7, 0xA8], MapDst : [0xE12C, 0xE442] },
+        "Wingdings" : { Name : "OpenSymbol", IsSymbolSrc : true, MapSrc : [0x76, 0xD8, 0xA7, 0xFC, 0x71], MapDst : [0xE441, 0xE25F, 0xE46F, 0xE330, 0x2751] }
     };
 }
 
@@ -2696,14 +2705,47 @@ function CApplicationFonts()
         this.DefaultIndex = this.g_fontDictionary.GetFontIndex(oSelect, this.g_fontSelections.List, undefined);
     };
 
-    this.LoadFont = function(name, font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
+    this.LoadFont = function(name, font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform, objDst)
     {
         var _font = this.GetFontFileWeb(name, lStyle);
         var font_name_index = window.g_map_font_index[_font.m_wsFontName];
+        if (undefined !== objDst)
+        {
+            objDst.Name = _font.m_wsFontName;
+            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst.Name);
+        }
 
         // используем стиль, пришедший извне, а не стиль _font
         // так как подвираем вез стиля в Web версии
         return window.g_font_infos[font_name_index].LoadFont(window.g_font_loader, fontManager, fEmSize, /*_font.GetStyle()*/lStyle, dHorDpi, dVerDpi, transform);
+    };
+
+    this.CheckReplaceGlyphsMap = function(name, objDst)
+    {
+        var _replaceInfo = this.g_fontDictionary.ChangeGlyphsMap[name];
+        if (!_replaceInfo)
+            return null;
+        if (_replaceInfo.Name != objDst.Name)
+            return null;
+        return _replaceInfo;
+    };
+
+    this.GetReplaceGlyph = function(src, objDst)
+    {
+        // TODO: must be faster!!!
+        var _arr = objDst.MapSrc;
+        var _arrLen = _arr.length;
+
+        for (var i = 0; i < _arrLen; i++)
+        {
+            if (_arr[i] == src)
+                return objDst.MapDst[i];
+
+            if (objDst.IsSymbolSrc && (src == (0xF000 + _arr[i])))
+            {
+                return objDst.MapDst[i];
+            }
+        }
     };
 
     this.GetFontFile = function(name, lStyle)
@@ -2749,15 +2791,29 @@ function CApplicationFonts()
         }
     };
 
-    this.GetFontInfo = function(name, lStyle)
+    this.GetFontInfo = function(name, lStyle, objDst)
     {
         var _font = this.GetFontFileWeb(name, lStyle);
         var font_name_index = window.g_map_font_index[_font.m_wsFontName];
+
+        if (undefined !== objDst)
+        {
+            objDst.Name = _font.m_wsFontName;
+            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst.Name);
+        }
+
         return window.g_font_infos[font_name_index];
     };
-    this.GetFontInfoName = function(name)
+    this.GetFontInfoName = function(name, objDst)
     {
         var _font = this.GetFontFileWeb(name);
+
+        if (undefined !== objDst)
+        {
+            objDst.Name = _font.m_wsFontName;
+            objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst.Name);
+        }
+
         return _font.m_wsFontName;
     };
 

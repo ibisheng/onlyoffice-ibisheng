@@ -845,6 +845,7 @@ function CMetafile(width, height)
 
     // просто чтобы не создавать каждый раз
     this.m_oFontSlotFont = new CFontSetup();
+    this.LastFontOriginInfo = { Name : "", Replace : null };
 }
 
 CMetafile.prototype =
@@ -1247,7 +1248,7 @@ CMetafile.prototype =
         if (font.Bold == true)
             style += 1;
 
-        var fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, style);
+        var fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, style, this.LastFontOriginInfo);
         style = fontinfo.GetBaseStyle(style);
 
         if (this.m_oFont.Name != fontinfo.Name)
@@ -1272,6 +1273,14 @@ CMetafile.prototype =
     FillText : function(x,y,text)
     {
         this.Memory.WriteByte(CommandType.ctDrawText);
+
+        if (null != this.LastFontOriginInfo.Replace && 1 == text.length)
+        {
+            var _code = text.charCodeAt(0);
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            text = String.fromCharCode(_code);
+        }
+
         this.Memory.WriteString(text);
         this.Memory.WriteDouble(x);
         this.Memory.WriteDouble(y);
@@ -1287,6 +1296,12 @@ CMetafile.prototype =
         var _old_pos = this.Memory.pos;
 
         g_fontApplication.LoadFont(_font_info.Name, window.g_font_loader, g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
+
+        if (null != this.LastFontOriginInfo.Replace)
+        {
+            code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
+        }
+
         g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
 
         // start (1) + draw(1) + typedraw(4) + end(1) = 7!
@@ -1422,7 +1437,7 @@ CMetafile.prototype =
         if (_lastFont.Bold == true)
             style += 1;
 
-        var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style);
+        var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
         style = fontinfo.GetBaseStyle();
 
         if (this.m_oFont.Name != fontinfo.Name)
