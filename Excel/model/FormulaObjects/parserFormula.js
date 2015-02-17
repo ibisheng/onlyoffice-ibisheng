@@ -504,9 +504,13 @@ cArea.prototype.getValue = function () {
     return val;
 };
 cArea.prototype.getValue2 = function (i, j) {
-    var r = this.getRange();
-    var cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
-    return this._parseCellValue(cell);
+    var res = this.index( i+1, j+1 ), r, cell;
+    if( !res ){
+        r = this.getRange();
+        cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
+        res = this._parseCellValue(cell);
+    }
+    return res;
 };
 cArea.prototype.getRange = function () {
     if( !this.range ){
@@ -630,7 +634,7 @@ cArea.prototype.getMatrix = function () {
     return arr;
 };
 cArea.prototype.index = function ( r, c, n ) {
-    var bbox = this.getBBox();
+    var bbox = this.getBBox0();
     bbox.normalize();
     var box = {c1:1, c2:bbox.c2-bbox.c1+1, r1:1, r2:bbox.r2-bbox.r1+1};
 

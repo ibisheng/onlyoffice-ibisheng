@@ -481,14 +481,23 @@ cINDEX.prototype.Calculate = function ( arg ) {
         return this.value = new cError(cErrorType.wrong_value_type);
     }
 
-    if (arg1.getValue() < 0 || arg2.getValue() < 0) {
+    arg1 = arg1.getValue();
+    arg2 = arg2.getValue();
+    arg3 = arg3.getValue();
+
+    if (arg1 < 0 || arg2 < 0) {
         return this.value = new cError(cErrorType.wrong_value_type);
     }
 
     if (arg0 instanceof cArray || arg0 instanceof cArea) {
-        res = arg0.getValue2(arg1.getValue() - 1, arg2.getValue() - 1);
-    } else {
-        res = arg0.tryConvert();
+        res = arg0.getValue2(arg1 - 1, arg2 - 1);
+    } else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
+        if( (arg1 == 0 || arg1 == 1) && (arg2 ==0 || arg2 == 1) ){
+            res = arg0.tryConvert();
+        }
+    }
+    else{
+        res = new cError(cErrorType.wrong_value_type);
     }
 
     return this.value = res ? res : new cError(cErrorType.bad_reference);
