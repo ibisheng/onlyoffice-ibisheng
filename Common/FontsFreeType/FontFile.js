@@ -1294,6 +1294,7 @@ function CFontFile(fileName, faceIndex)
 			}
 			else if (FT_ENCODING_NONE == pEncoding || FT_ENCODING_MS_SYMBOL == pEncoding || FT_ENCODING_APPLE_ROMAN == pEncoding)
 			{
+				/*
 				var res_code = FT_Get_First_Char(this.m_pFace);
 				while (res_code.gindex != 0)
 				{                                                               
@@ -1304,7 +1305,8 @@ function CFontFile(fileName, faceIndex)
                         pnCMapIndex.index = nIndex;
 						break;
 					}
-				}                                                               
+				}
+				*/
 
                 nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode);
                 if (0 != nCharIndex)
