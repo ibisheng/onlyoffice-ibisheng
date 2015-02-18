@@ -1734,7 +1734,7 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
 	if (false === isasync)
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-		this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : nIndex } } ) );
+		this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
     }
 }
 asc_docs_api.prototype.put_TextPrFontSize = function(size)
