@@ -12,14 +12,13 @@ require.config({
     // The shim config allows us to configure dependencies for
     // scripts that do not call define() to register a module
     baseUrl: '../../',
-    waitSeconds: 30,
     paths: {
         jquery          : '../vendor/jquery/jquery',
         underscore      : '../vendor/underscore/underscore',
         backbone        : '../vendor/backbone/backbone',
         bootstrap       : '../vendor/bootstrap/dist/js/bootstrap',
         text            : '../vendor/requirejs-text/text',
-        perfectscrollbar: '../vendor/perfect-scrollbar/src/perfect-scrollbar',
+        perfectscrollbar: 'common/main/lib/mods/perfect-scrollbar',
         jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
         xregexp         : '../vendor/xregexp/xregexp-all-min',
         sockjs          : '../vendor/sockjs/sockjs.min',
