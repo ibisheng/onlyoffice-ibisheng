@@ -3726,7 +3726,7 @@ function find_unicode_charmap(face)
     var cur = count - 1;
     for ( ; cur >= 0; cur--)
     {
-        var cmap = face.charmaps[cur];
+        var cmap = __FT_CharmapRec(face.charmaps[cur]);
         if (cmap.encoding == 1970170211)
         {
             if ((cmap.platform_id == 3 && cmap.encoding_id == 10) ||
@@ -3746,7 +3746,7 @@ function find_unicode_charmap(face)
     cur = count - 1;
     for ( ; cur >= 0; cur--)
     {
-        var cmap = face.charmaps[cur];
+        var cmap = __FT_CharmapRec(face.charmaps[cur]);
         if (cmap.encoding == 1970170211)
         {
             //#ifdef FT_MAX_CHARMAP_CACHEABLE
