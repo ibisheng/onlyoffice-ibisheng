@@ -1655,8 +1655,6 @@ CFontSelectList.prototype =
         if (undefined == _fontFamily)
             return _ret_obj;
 
-        var _info = window.g_font_infos[window.g_map_font_index[_fontFamily.Name]];
-
         var oFontStyle = FontStyle.FontStyleRegular;
         if (!italic && bold)
             oFontStyle = FontStyle.FontStyleBold;
@@ -1664,6 +1662,8 @@ CFontSelectList.prototype =
             oFontStyle = FontStyle.FontStyleItalic;
         else if (italic && bold)
             oFontStyle = FontStyle.FontStyleBoldItalic;
+
+        var _info = g_fontApplication.GetFontInfo(_fontFamily.Name, oFontStyle);
 
         var _id = _info.GetFontID(window.g_font_loader, oFontStyle);
         var _select = this.List[this.ListMap[_id.id]];
@@ -1792,6 +1792,11 @@ CFontSelectList.prototype =
                     _name = _info.Name;
                 }
             }
+        }
+
+        if (_name == "")
+        {
+            _name = g_fontApplication.GetFontInfoName(_lang.DefaultFont);
         }
 
         return _name;
