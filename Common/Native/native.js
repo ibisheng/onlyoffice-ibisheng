@@ -414,15 +414,69 @@ function GetNativeId()
     return window.native.GetFileId();
 }
 
-function clearTimeout() {}
-function setTimeout() {}
-function clearInterval() {}
-function setInterval() {}
+// для работы с таймерами
+window.NativeSupportTimeouts = false;
+window.NativeTimeoutObject = {};
 
-window.clearTimeout = clearTimeout;
-window.setTimeout = setTimeout;
-window.clearInterval = clearInterval;
-window.setInterval = setInterval;
+function clearTimeout(_id)
+{
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    window.NativeTimeoutObject["" + _id] = undefined;
+    window.native["ClearTimeout"](_id);
+}
+function setTimeout(func, interval)
+{
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    var _id = window.native["GenerateTimeoutId"](interval);
+    window.NativeTimeoutObject["" + _id] = func;
+    return _id;
+}
+
+window.native.Call_TimeoutFire = function(_id)
+{
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    var _prop = "" + _id;
+    if (!window.NativeTimeoutObject[_prop])
+        return;
+
+    window.NativeTimeoutObject[_prop].apply(null);
+    window.NativeTimeoutObject[_prop] = undefined;
+};
+
+function clearInterval(_id)
+{
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    window.NativeTimeoutObject["" + _id] = undefined;
+    window.native["ClearTimeout"](_id);
+}
+function setInterval(func, interval)
+{
+    if (!window.NativeSupportTimeouts)
+        return;
+
+    var _intervalFunc = function()
+    {
+        func.apply(null);
+        setTimeout(func, interval);
+    };
+
+    var _id = window.native["GenerateTimeoutId"](interval);
+    window.NativeTimeoutObject["" + _id] = _intervalFunc;
+    return _id;
+}
+
+window.clearTimeout     = clearTimeout;
+window.setTimeout       = setTimeout;
+window.clearInterval    = clearInterval;
+window.setInterval      = setInterval;
 
 var console = {
 	log : function(param) { window.native.ConsoleLog(param); }
@@ -488,7 +542,7 @@ window.native.Call_CheckTargetUpdate = function()
 };
 window.native.Call_Common = function(type, param)
 {
-    return _api.Call_Common();
+    return _api.Call_Common(type, param);
 };
 
 window.native.Call_HR_Tabs = function(arrT, arrP)

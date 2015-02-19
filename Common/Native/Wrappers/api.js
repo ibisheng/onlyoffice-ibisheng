@@ -97,6 +97,16 @@ asc_docs_api.prototype["Call_Common"] = function(type, param)
             this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
 			break;
         }
+        case 67:
+        {
+            this.startGetDocInfo();
+            break;
+        }
+        case 68:
+        {
+            this.stopGetDocInfo();
+            break;
+        }
         default:
             break;
     }
@@ -4625,6 +4635,64 @@ function Deserialize_Table_Markup(_params, _cols, _margins, _rows)
     return _markup;
 }
 
+asc_docs_api.prototype.startGetDocInfo = function()
+{
+    /*
+     Возвращаем объект следующего вида:
+     {
+     PageCount: 12,
+     WordsCount: 2321,
+     ParagraphCount: 45,
+     SymbolsCount: 232345,
+     SymbolsWSCount: 34356
+     }
+     */
+    this.sync_GetDocInfoStartCallback();
+
+    if (null != this.WordControl.m_oLogicDocument)
+        this.WordControl.m_oLogicDocument.Statistics_Start();
+};
+asc_docs_api.prototype.stopGetDocInfo = function()
+{
+    this.sync_GetDocInfoStopCallback();
+
+    if (null != this.WordControl.m_oLogicDocument)
+        this.WordControl.m_oLogicDocument.Statistics_Stop();
+};
+asc_docs_api.prototype.sync_DocInfoCallback = function(obj)
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+    _stream["WriteLong"](obj.PageCount);
+    _stream["WriteLong"](obj.WordsCount);
+    _stream["WriteLong"](obj.ParagraphCount);
+    _stream["WriteLong"](obj.SymbolsCount);
+    _stream["WriteLong"](obj.SymbolsWSCount);
+
+    window["native"]["OnCallMenuEvent"](70, _stream); // ASC_MENU_EVENT_TYPE_STATISTIC_INFO
+};
+asc_docs_api.prototype.sync_GetDocInfoStartCallback = function()
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    window["native"]["OnCallMenuEvent"](67, _stream); // ASC_MENU_EVENT_TYPE_STATISTIC_START
+};
+asc_docs_api.prototype.sync_GetDocInfoStopCallback = function()
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    window["native"]["OnCallMenuEvent"](68, _stream); // ASC_MENU_EVENT_TYPE_STATISTIC_STOP
+};
+asc_docs_api.prototype.sync_GetDocInfoEndCallback = function()
+{
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    window["native"]["OnCallMenuEvent"](69, _stream); // ASC_MENU_EVENT_TYPE_STATISTIC_END
+};
+
 asc_docs_api.prototype.sync_CanUndoCallback = function(bCanUndo)
 {
     var _stream = global_memory_stream_menu;
@@ -5112,6 +5180,8 @@ window["ftm"] = FT_Memory;
 
 asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
 {
+    window.NativeSupportTimeouts = true;
+
     if (!_params)
         return;
 
