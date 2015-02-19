@@ -2098,6 +2098,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.LineBottom2    = 0;
     this.LinePrevBottom = 0;
 
+    this.XRange = 0; // Начальное положение по горизонтали для данного отрезка
     this.X      = 0; // Текущее положение по горизонтали
     this.XEnd   = 0; // Предельное значение по горизонтали для текущего отрезка
 
@@ -2181,6 +2182,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.NewRange        = false;
         this.X               = X;
         this.XEnd            = XEnd;
+        this.XRange          = X;
 
         this.MoveToLBP    = false;
         this.LineBreakPos = new CParagraphContentPos();
