@@ -1445,6 +1445,11 @@ CFontSelectList.prototype =
          console.log(f.m_wsFontPath + "_" + f.m_lIndex + " codepage1: " + f.m_ulCodePageRange1 + ", codepage2: " + f.m_ulCodePageRange2);
          }
          */
+		 
+		// добавляем ASCW3
+		var _fs = new CFontSelect();
+		_fs.m_wsFontName = "ASCW3";
+		this.List.push(_fs);
 
         delete window["g_fonts_selection_bin"];
     },
