@@ -280,6 +280,21 @@ function FD_FontDictionary()
         "Symbol" : { Name : "OpenSymbol", IsSymbolSrc : true, MapSrc : [0xB7, 0xA8], MapDst : [0xE12C, 0xE442] },
         "Wingdings" : { Name : "OpenSymbol", IsSymbolSrc : true, MapSrc : [0x76, 0xD8, 0xA7, 0xFC, 0x71], MapDst : [0xE441, 0xE25F, 0xE46F, 0xE330, 0x2751] }
     };
+	
+	this.MainUnicodeRanges = {
+		"48" : 3000,
+		"49" : 3000,
+		"50" : 3000,
+		
+		"55" : 3000,
+		"59" : 3000,
+		
+		"28" : 3000,
+		
+		"13" : 3000,
+		"63" : 3000,
+		"67" : 3000
+	};
 }
 
 FD_FontDictionary.prototype =
@@ -656,7 +671,7 @@ FD_FontDictionary.prototype =
         var nFontsCount = oList.length;
         for ( var nIndex = 0; nIndex < nFontsCount; nIndex++ )
         {
-            var nCurPenalty = oList[nIndex].GetPenalty(oSelect, isName0);
+            var nCurPenalty = oList[nIndex].GetPenalty(oSelect, isName0, this.MainUnicodeRanges);
 
             if ( 0 == nIndex )
             {
@@ -860,7 +875,7 @@ CFontSelect.prototype =
             return 0;
     },
 
-    GetPenalty : function(oSelect, isName0)
+    GetPenalty : function(oSelect, isName0, _main_ranges)
     {
         var nCurPenalty = 0;
 
@@ -878,7 +893,7 @@ CFontSelect.prototype =
                 undefined !== oSelect.ulCodeRange1 &&
                 undefined !== oSelect.ulCodeRange2)
             {
-                nCurPenalty += this.GetSigPenalty(oSelect, nCurPenalty >= 1000 ? 50 : 10, 10);
+                nCurPenalty += this.GetSigPenalty(oSelect, nCurPenalty >= 1000 ? 50 : 10, 10, _main_ranges);
             }
         }
 
@@ -972,7 +987,7 @@ CFontSelect.prototype =
         return nPenalty;
     },
 
-    GetSigPenalty : function(format, dRangeWeight, dRangeWeightSuferflouous)
+    GetSigPenalty : function(format, dRangeWeight, dRangeWeightSuferflouous, _main_ranges)
     {
         var dPenalty = 0;
 
@@ -992,8 +1007,8 @@ CFontSelect.prototype =
 
         var ulCandRanges = [this.m_ulUnicodeRange1, this.m_ulUnicodeRange2, this.m_ulUnicodeRange3, this.m_ulUnicodeRange4,
             this.m_ulCodePageRange1, this.m_ulCodePageRange2];
-        var ulReqRanges = [this.ulRange1, this.ulRange2, this.ulRange3, this.uleRange4,
-            this.ulCodePageRange1, this.ulCodePageRange2];
+        var ulReqRanges = [format.ulRange1, format.ulRange2, format.ulRange3, format.ulRange4,
+            format.ulCodeRange1, format.ulCodeRange2];
 
         var nIndex = 0;
         for (var nIndex = 0; nIndex < 6; nIndex++)
@@ -1022,11 +1037,16 @@ CFontSelect.prototype =
             return 0;
 
         //double dRangeWeight = 1;//1000.0 / nRangesCount;
-
+		
         for (nIndex = 0; nIndex < 192; nIndex++)
         {
             if (1 == arrRequest[nIndex] && 0 == arrCandidate[nIndex])
-                dPenalty += dRangeWeight;
+            {
+				if (undefined !== _main_ranges && undefined !== _main_ranges["" + nIndex])
+					dPenalty += Math.max(_main_ranges["" + nIndex], dRangeWeight);
+				else
+					dPenalty += dRangeWeight;
+			}
             else if (dRangeWeightSuferflouous != 0 && 0 == arrRequest[nIndex] && 1 == arrCandidate[nIndex])
                 dPenalty += dRangeWeightSuferflouous;
         }
@@ -1342,6 +1362,14 @@ CFontSelectList.prototype =
         {
             var _fs = new CFontSelect();
             _fs.fromStream(_file_stream);
+			
+			// корректируем плохие популярные шрифты
+			if (_fs.m_wsFontName == "Droid Sans Fallback")
+			{	
+				if ((_fs.m_ulCodePageRange1 & (1 << 19)) == (1 << 19))
+					_fs.m_ulCodePageRange1 -= (1 << 19);
+			}
+					
             this.List.push(_fs);
             this.ListMap[_fs.m_wsFontPath] = this.List.length - 1;
         }
