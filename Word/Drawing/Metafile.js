@@ -1438,7 +1438,7 @@ CMetafile.prototype =
             style += 1;
 
         var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
-        style = fontinfo.GetBaseStyle();
+        style = fontinfo.GetBaseStyle(style);
 
         if (this.m_oFont.Name != fontinfo.Name)
         {
