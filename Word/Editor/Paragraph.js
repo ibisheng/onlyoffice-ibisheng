@@ -8524,7 +8524,10 @@ Paragraph.prototype =
         if ( undefined != NumPr )
         {
             ParaStats.EmptyParagraph = false;
-            this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId).DocumentStatistics( NumPr.Lvl, Stats );
+            var AbstractNum = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId);
+
+            if (undefined !== AbstractNum && null !== AbstractNum)
+                AbstractNum.DocumentStatistics( NumPr.Lvl, Stats );
         }
 
         if ( false === ParaStats.EmptyParagraph )
