@@ -1651,6 +1651,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var UpdateLineMetricsText = false;
     var ContentLen = this.Content.length;
 
+    var WidthLine = PRS.XEnd - PRS.X;
+    var XRange    = PRS.XRange;
+
     if (false === StartWord && true === FirstItemOnLine && XEnd - X < 0.001 && RangesCount > 0)
     {
         NewRange = true;
@@ -2176,10 +2179,21 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
             }
 
+            if(true === Word)
+            {
+                WidthLine = X - XRange;
+            }
+
             if (true === NewRange)
                 break;
         }
     }
+
+    if(this.Type == para_Math_Run && true === NewRange)
+    {
+        this.ParaMath.UpdateMaxWidthLine(PRS, WidthLine);
+    }
+
 
     if ( true === UpdateLineMetricsText )
     {

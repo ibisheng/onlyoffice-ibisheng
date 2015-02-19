@@ -23,6 +23,7 @@ function CMathPropertiesSettings()
     this.rMargin    = null;
 
     this.wrapIndent = null;
+
     //   не реализовано    //
     this.brkBinSub  = null;
 
@@ -81,11 +82,10 @@ var g_oMathSettings = {};
 
 function CMathSettings()
 {
-    this.Pr = {};
+    this.Pr        = new CMathPropertiesSettings();
     this.CompiledPr= new CMathPropertiesSettings();
     this.DefaultPr = new CMathPropertiesSettings();
 
-    /*this.Pr        = new CMathPropertiesSettings();*/
     this.DefaultPr.SetDefaultPr();
 
     this.bNeedCompile = true;
@@ -135,7 +135,7 @@ CMathSettings.prototype.Get_LeftMargin = function(State)
 
     var lMargin = 0;
     if(State == ALIGN_MARGIN_WRAP || State == ALIGN_MARGIN)
-        lMargin =this.GetPrDispDef().lMargin;
+        lMargin = this.GetPrDispDef().lMargin;
 
     return lMargin;
 };
@@ -144,7 +144,7 @@ CMathSettings.prototype.Get_RightMargin = function(State)
     this.SetCompiledPr();
     var rMargin    =  0;
     if(State == ALIGN_MARGIN_WRAP || State == ALIGN_MARGIN)
-        rMargin =this.GetPrDispDef().rMargin;
+        rMargin = this.GetPrDispDef().rMargin;
 
     return rMargin;
 };
@@ -199,39 +199,47 @@ function ParaMath()
 {
     ParaMath.superclass.constructor.call(this);
 
-    this.Id = g_oIdCounter.Get_NewId();
-    this.Type  = para_Math;
+    this.Id                 = g_oIdCounter.Get_NewId();
+    this.Type               = para_Math;
 
-    this.Jc       = undefined;
+    this.Jc                 = undefined;
 
     this.Root               = new CMathContent();
     this.Root.bRoot         = true;
     this.Root.ParentElement = this;
 
-    this.X          = 0;
-    this.Y          = 0;
+    this.X                  = 0;
+    this.Y                  = 0;
 
-    this.LinesPositions = [];
-    this.LinesWidths = [];
+    this.LinesPositions     = [];
 
+    this.FirstPage          = 0;
+    this.LinesWidths        = []; // в тч для отрисовки рамки
 
-    this.ParaMathRPI = new CMathRecalculateInfo();
+    this.CurPageInfo        =
+    {
+        Page:               -1,
+        FirstLine:          -1,
+        MaxLineW:            0
+    };
 
+    this.ParaMathRPI       = new CMathRecalculateInfo();
 
     this.bSelectionUse     = false;
-    this.RecalcJustify = true;
-    this.Paragraph    = null;
-    this.State        = ALIGN_MARGIN_WRAP;
+    this.RecalcJustify     = true;
+    this.Paragraph         = null;
+    this.State             = ALIGN_MARGIN_WRAP;
 
-    this.NearPosArray = [];
+    this.NearPosArray      = [];
 
-    this.Width        = 0;
-    this.WidthVisible = 0;
-    this.Height       = 0;
-    this.Ascent       = 0;
-    this.Descent      = 0;
+    this.Width             = 0;
+    this.WidthVisible      = 0;
+    this.Height            = 0;
+    this.Ascent            = 0;
+    this.Descent           = 0;
 
-    this.DefaultTextPr = new CTextPr();
+
+    this.DefaultTextPr     = new CTextPr();
 
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
@@ -421,13 +429,12 @@ ParaMath.prototype.Add = function(Item)
     // Корректируем данный контент
     oContent.Correct_Content(true);
 };
-ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _X, _XLimit)
+ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, Page, _X, _XLimit)
 {
     var CurLine  = _CurLine - this.StartLine;
     var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
     var X = _X;
-    var W = 0;
 
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
@@ -437,17 +444,26 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _X, _XLimit)
     _XLimit -=  MathSettings.Get_RightMargin(this.State);
 
     var Jc = this.Get_Align();
+    var FirstWidth = Page == 0 ? this.LinesWidths[0] : 0; // если страница не первая, то ширину первой строки формулы не учитываем
+
+    var W = 0;
+    var MaxW =  this.CurPageInfo.MaxLineW;
+
+    if(this.FirstPage == Page)
+        W = Math.max(MaxW + wrapIndent, FirstWidth);
+    else
+        W = MaxW;
+
 
     if(this.Root.IsFirstLine(_CurLine))
     {
         switch(Jc)
         {
             case align_Left:    X = _X; break;
-            case align_Right:   X = Math.max(_XLimit - this.LinesWidths[0], _X); break;
-            case align_Center:  X = Math.max(_X + (_XLimit - _X - this.LinesWidths[0])/2, _X); break;
+            case align_Right:   X = Math.max(_XLimit - FirstWidth, _X); break;
+            case align_Center:  X = Math.max(_X + (_XLimit - _X - FirstWidth)/2, _X); break;
             case align_Justify:
             {
-                W = Math.max(this.MaxLinesW + wrapIndent, this.LinesWidths[0]);
                 X = Math.max(_X + (_XLimit - _X - W)/2, _X);
                 break;
             }
@@ -455,8 +471,6 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _X, _XLimit)
     }
     else
     {
-        W = Math.max(this.MaxLinesW + wrapIndent, this.LinesWidths[0]);
-
         if(Jc == align_Justify)
         {
             X = _XLimit - _X > W ? _X + (_XLimit - _X - W)/2 + wrapIndent : _X;
@@ -469,10 +483,6 @@ ParaMath.prototype.Get_AlignToLine = function(_CurLine, _CurRange, _X, _XLimit)
 
 
     return X;
-};
-ParaMath.prototype.GetIndentForState = function()
-{
-
 };
 ParaMath.prototype.Remove = function(Direction, bOnAddText)
 {
@@ -825,18 +835,38 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     var bFirstLine = this.Root.IsFirstLine(ParaLine);
 
+    // первый пересчет
     if(PRS.PrevLineRecalcInfo.Object == null && true == bFirstLine)
     {
-        this.State = ALIGN_MARGIN_WRAP;
+        this.State              = ALIGN_MARGIN_WRAP;
+        this.FirstPage          = Page;
+        this.CurPageInfo.Page   = -1;
         this.LinesWidths.length = 0;
-        this.MaxLinesW = 0;
-        this.RecalcJustify = true;
+
+        // информация о пересчете
+        var RPI = new CRPI();
+        RPI.MergeMathInfo(this.ParaMathRPI);
+        var ArgSize = new CMathArgSize();
+
+        this.Root.Set_Paragraph(Para);
+        this.Root.Set_ParaMath(this, null);
+        this.Root.PreRecalc(null, this, ArgSize, RPI);
     }
 
+    if(this.CurPageInfo.Page < Page)
+    {
+        this.CurPageInfo.Page       = Page;
+        this.CurPageInfo.FirstLine  = ParaLine - this.Root.StartLine;
+        this.CurPageInfo.MaxLineW   = 0;
+    }
+
+    var bFirstPage = this.FirstPage == Page;
     var MathSettings = Get_WordDocumentDefaultMathSettings();
 
     if(false == MathSettings.Get_DispDef())
         this.State = ALIGN_EMPTY;
+    else if(bFirstPage == false)
+        this.State = ALIGN_MARGIN;
 
     PRS.X    += MathSettings.Get_LeftMargin(this.State);
     PRS.XEnd -= MathSettings.Get_RightMargin(this.State);
@@ -844,42 +874,30 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if(bFirstLine == false)
         PRS.X += MathSettings.Get_WrapIndent(this.State);
 
-    // информация о пересчете
-
-    var RPI = new CRPI();
-    RPI.MergeMathInfo(this.ParaMathRPI);
-
-    var ArgSize = new CMathArgSize();
-
-    if(RPI.NeedResize)
-    {
-        this.Root.Set_Paragraph(Para);
-        this.Root.Set_ParaMath(this, null);
-        this.Root.PreRecalc(null, this, ArgSize, RPI);
-    }
+    PRS.XRange = PRS.X;
 
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
-    if(PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
+    if(bFirstPage && PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
     {
-        PRS.PrevLineRecalcInfo.Object = this;
-        PRS.RecalcResult = recalcresult_PrevLine;
-        PRS.NewRange = true;
-
+        this.UpdateInfoForBreak(PRS);
         this.State++;
     }
 
-    var Jc = this.Get_Align();
-
-    if(PRS.NewRange == false && Jc == align_Justify && this.RecalcJustify == true)
+    if(PRS.NewRange == false)
     {
-        PRS.PrevLineRecalcInfo.Object = this;
-        PRS.RecalcResult = recalcresult_PrevLine;
-        PRS.NewRange = true;
-        this.RecalcJustify = false;
+        var WidthLine = PRS.X - PRS.XRange + PRS.SpaceLen + PRS.WordLen;
+        this.UpdateMaxWidthLine(PRS, WidthLine);
     }
 
     this.ParaMathRPI.ClearRecalculate();
+};
+ParaMath.prototype.UpdateInfoForBreak = function(PRS)
+{
+    PRS.PrevLineRecalcInfo.Object = this;
+    PRS.RecalcResult = recalcresult_PrevLine;
+    PRS.PrevLineRecalcInfo.Line = this.CurPageInfo.FirstLine + this.Root.StartLine;
+    PRS.NewRange = true;
 };
 ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine)
 {
@@ -887,11 +905,6 @@ ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine)
 }
 ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 {
-    //var CurLine  = PRS.Line - this.StartLine;
-    //var CurRange = ( 0 === CurLine ? PRS.Range - this.StartRange : PRS.Range );
-    //var CurPos   = PRP.Get(Depth);
-
-    //this.protected_FillRangeEndPos(CurLine, CurRange, CurPos);
     this.Root.Recalculate_Set_RangeEndPos(PRS, PRP, Depth);
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
@@ -902,8 +915,19 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
     var CurLine  = _CurLine - this.Root.StartLine;
     this.LinesWidths[CurLine] = W;
+};
+ParaMath.prototype.UpdateMaxWidthLine = function(PRS, Width)
+{
+    var MaxW    = this.CurPageInfo.MaxLineW,
+        CurLine = PRS.Line - this.Root.StartLine;
 
-   this.MaxLinesW = _CurLine !== 0 && this.MaxLinesW < W ? W: this.MaxLinesW;
+    if(MaxW < Width && CurLine !== 0)
+    {
+        this.CurPageInfo.MaxLineW = Width;
+
+        if(align_Justify == this.Get_Align())
+            this.UpdateInfoForBreak(PRS);
+    }
 };
 ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange, _CurPage)
 {
@@ -935,7 +959,6 @@ ParaMath.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange
 ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
 };
-
 ParaMath.prototype.Save_RecalculateObject = function(Copy)
 {
     var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
@@ -945,34 +968,16 @@ ParaMath.prototype.Save_RecalculateObject = function(Copy)
 
     return RecalcObj;
 };
-
 ParaMath.prototype.Load_RecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines(this);
 };
-
 ParaMath.prototype.Prepare_RecalculateObject = function()
 {
     this.protected_ClearLines();
 };
-
-ParaMath.prototype.old_Is_EmptyRange = function(_CurLine, _CurRange)
-{
-    var CurLine = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    if ( EndPos >= 1 )
-        return false;
-
-    return true;
-};
 ParaMath.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
-    // TO DO
-    // доделать
     return this.Root.Is_EmptyRange(_CurLine, _CurRange);
 };
 ParaMath.prototype.Check_Range_OnlyMath = function(Checker, CurRange, CurLine)
@@ -1498,23 +1503,6 @@ ParaMath.prototype.Draw_Elements = function(PDSE)
 
     this.Root.Draw_Elements(PDSE);
 
-
-    /*PDSE.Graphics.p_color(255,0,0, 255);
-     PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
-};
-ParaMath.prototype.old_Draw_Elements = function(PDSE)
-{
-    /*PDSE.Graphics.p_color(255,0,0, 255);
-     PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/
-
-    PDSE.X_Line = PDSE.X;
-
-    var pos = new CMathPosition();
-    this.Root.setPosition(pos, PDSE);
-
-    this.Root.Draw_Elements(PDSE);
-
-    PDSE.X = PDSE.X_Line;
 
     /*PDSE.Graphics.p_color(255,0,0, 255);
      PDSE.Graphics.drawHorLine(0, PDSE.Y - this.Ascent + this.Height, PDSE.X - 30, PDSE.X + this.Width + 30 , 1);*/

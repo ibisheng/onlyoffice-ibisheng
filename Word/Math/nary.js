@@ -264,9 +264,9 @@ CNary.prototype.ApplyProperties = function(RPI)
 
             var oMathSettings = Get_WordDocumentDefaultMathSettings();
             if(bIntegral)
-                limLoc = oMathSettings.intLim;
+                limLoc = oMathSettings.Get_IntLim();
             else
-                limLoc = oMathSettings.naryLim;
+                limLoc = oMathSettings.Get_NaryLim();
         }
 
         var PropsInfo =

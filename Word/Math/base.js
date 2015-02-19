@@ -1704,6 +1704,11 @@ CMathBase.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange
 {
     PRSC.Range.W += this.size.width;
 };
+CMathBase.prototype.Is_EmptyRange = function()
+{
+    return false;
+};
+
 
 CMathBase.prototype.Get_CurrentParaPos          = CMathContent.prototype.Get_CurrentParaPos;
 CMathBase.prototype.private_UpdatePosOnAdd      = CMathContent.prototype.private_UpdatePosOnAdd;
@@ -1724,7 +1729,7 @@ CMathBase.prototype.private_CorrectCurPos = function()
         this.CurPos = this.Content.length - 1;
         this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
-}
+};
 
 
 CMathBase.prototype.Search                        = CParagraphContentWithParagraphLikeContent.prototype.Search;
