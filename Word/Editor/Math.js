@@ -211,10 +211,9 @@ function ParaMath()
     this.X                  = 0;
     this.Y                  = 0;
 
-    this.LinesPositions     = [];
-
     this.FirstPage          = 0;
     this.LinesWidths        = []; // в тч для отрисовки рамки
+    this.LinesPositions     = [];
 
     this.CurPageInfo        =
     {
@@ -226,7 +225,6 @@ function ParaMath()
     this.ParaMathRPI       = new CMathRecalculateInfo();
 
     this.bSelectionUse     = false;
-    this.RecalcJustify     = true;
     this.Paragraph         = null;
     this.State             = ALIGN_MARGIN_WRAP;
 

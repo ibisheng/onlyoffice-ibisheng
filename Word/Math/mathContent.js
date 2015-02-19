@@ -707,9 +707,7 @@ function CMathContent()
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add( this, this.Id );
 }
-//Asc.extendClass(CMathContent, ParaHyperlink);
 Asc.extendClass(CMathContent, CParagraphContentWithParagraphLikeContent);
-
 CMathContent.prototype.init = function()
 {
 
@@ -729,35 +727,6 @@ CMathContent.prototype.fillPlaceholders = function()
 
 };
 //////////////////////////////////////
-/*recalculateSize: function()
- {
- var width      =   0 ;
- var ascent     =   0 ;
- var descent    =   0 ;
-
- var oSize;
-
- this.WidthToElement.length = 0;
-
- for(var i = 0; i < this.Content.length; i++)
- {
- if(this.Content[i].Type == para_Math_Composition)
- this.Content[i].ApplyGaps();
- else if(this.Content[i].Type == para_Math_Run)
- this.Content[i].Math_ApplyGaps();
-
- this.WidthToElement[i] = width;
-
- oSize = this.Content[i].size;
- width += oSize.width;
-
- ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
- var oDescent = oSize.height - oSize.ascent;
- descent =  descent < oDescent ? oDescent : descent;
- }
-
- this.size = {width: width, height: ascent + descent, ascent: ascent};
- },*/
 CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     if(ArgSize !== null && ArgSize !== undefined)
@@ -3163,19 +3132,6 @@ CMathContent.prototype.Add_MatrixWithBrackets = function(begChr, endChr, ctrPr, 
     var MathContent = Delimiter.getElementMathContent(0);
     return MathContent.Add_Matrix(ctrPr, RowsCount, ColsCount, plcHide, aText);
 };
-/*CMathContent.prototype.Recalculate_Reset = function(StartRange, StartLine)
-{
-    var CurLine  = StartLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? StartRange - this.StartRange : StartRange );
-
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
-
-    for(var nPos = StartPos; nPos <= EndPos; nPos++)
-    {
-        this.Content[nPos].Recalculate_Reset(StartRange, StartLine);
-    }
-};*/
 CMathContent.prototype.old_Get_Bounds = function()
 {
     var X = 0, Y = 0, W = 0, H = 0;
@@ -3201,26 +3157,6 @@ CMathContent.prototype.Get_Bounds = function()
     }
 
     return {X : X, Y : Y, W : W, H : H, Asc: Asc};
-};
-CMathContent.prototype.old_Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
-{
-    var X = this.pos.x + this.ParaMath.X;
-    var Y = this.pos.y + this.ParaMath.Y + this.size.ascent;
-
-    if(this.RecalcInfo.bEqArray)
-    {
-        for(var nPos = 0; nPos < this.CurPos; nPos++)
-        {
-            if(para_Math_Run === this.Content[nPos].Type)
-                X = this.Content[nPos].Recalculate_CurPos(X, Y, false, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget).X;
-            else
-                X += this.Content[nPos].size.width;
-        }
-    }
-    else
-        X += this.WidthToElement[this.CurPos];
-
-    return this.Content[this.CurPos].Recalculate_CurPos(X, Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 };
 CMathContent.prototype.Recalculate_CurPos = function(_X, _Y, CurrentRun, _CurRange, _CurLine, _CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
 {
@@ -4203,24 +4139,7 @@ CMathContent.prototype.IsFirstLine = function(Line)
 {
     var CurLine  = Line - this.StartLine;
     return CurLine == 0;
-}
-
-
-/*CMathContent.prototype.Is_CheckingNearestPos         = ParaHyperlink.prototype.Is_CheckingNearestPos;
-
-CMathContent.prototype.Search                        = ParaHyperlink.prototype.Search;
-CMathContent.prototype.Add_SearchResult              = ParaHyperlink.prototype.Add_SearchResult;
-CMathContent.prototype.Clear_SearchResults           = ParaHyperlink.prototype.Clear_SearchResults;
-CMathContent.prototype.Remove_SearchResult           = ParaHyperlink.prototype.Remove_SearchResult;
-CMathContent.prototype.Search_GetId                  = ParaHyperlink.prototype.Search_GetId;
-CMathContent.prototype.Recalc_RunsCompiledPr         = ParaHyperlink.prototype.Recalc_RunsCompiledPr;
-//CMathContent.prototype.Recalculate_Range             = ParaHyperlink.prototype.Recalculate_Range;
-CMathContent.prototype.protected_AddRange            = ParaHyperlink.prototype.protected_AddRange;
-CMathContent.prototype.protected_FillRange           = ParaHyperlink.prototype.protected_FillRange;
-CMathContent.prototype.protected_UpdateSpellChecking = ParaHyperlink.prototype.protected_UpdateSpellChecking;
-CMathContent.prototype.Recalculate_Range_Width       = ParaHyperlink.prototype.Recalculate_Range_Width;
-CMathContent.prototype.Recalculate_Set_RangeEndPos   = ParaHyperlink.prototype.Recalculate_Set_RangeEndPos;
-CMathContent.prototype.Is_EmptyRange                 = ParaHyperlink.prototype.Is_EmptyRange;*/
+};
 
 CMathContent.prototype.Get_SelectionDirection = function()
 {
