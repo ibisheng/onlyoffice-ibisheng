@@ -34,6 +34,7 @@
                 "../../Common/Drawings/Format/Format.js",
                 "../../Common/trackFile.js",
 
+				"../../Common/FontsFreeType/font_map.js",
                 "../../Word/Drawing/Externals.js",
                 "../../Word/Drawing/GlobalLoaders.js",
                 "../../Word/Drawing/translations.js",
