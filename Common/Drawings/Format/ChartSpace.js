@@ -7353,7 +7353,7 @@ CChartSpace.prototype =
             var hor_axis = this.chart.plotArea.getHorizontalAxis();
             if(hor_axis && hor_axis.title)
             {
-                hor_axis.checkAfterChangeTheme();
+                hor_axis.title.checkAfterChangeTheme();
             }
             var vert_axis = this.chart.plotArea.getVerticalAxis();
             if(vert_axis && vert_axis.title)
