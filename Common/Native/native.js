@@ -442,11 +442,14 @@ window.native.Call_TimeoutFire = function(_id)
         return;
 
     var _prop = "" + _id;
-    if (!window.NativeTimeoutObject[_prop])
+    var _func = window.NativeTimeoutObject[_prop];
+    window.NativeTimeoutObject[_prop] = undefined;
+
+    if (!_func)
         return;
 
-    window.NativeTimeoutObject[_prop].apply(null);
-    window.NativeTimeoutObject[_prop] = undefined;
+    _func.call(null);
+    _func = null;
 };
 
 function clearInterval(_id)
@@ -464,7 +467,7 @@ function setInterval(func, interval)
 
     var _intervalFunc = function()
     {
-        func.apply(null);
+        func.call(null);
         setTimeout(func, interval);
     };
 
