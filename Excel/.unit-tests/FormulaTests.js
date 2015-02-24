@@ -1011,7 +1011,10 @@
         ws.getRange2( "A7" ).setValue( "3-Mar" );
         oParser = new parserFormula( "DATEVALUE(A7)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 41701 );
+        var d = new Date();
+        d.setUTCMonth(2);
+        d.setUTCDate(3);
+        strictEqual( oParser.calculate().getValue(), d.getExcelDate() );
 
         oParser = new parserFormula( "DATEVALUE(\"$1,000\")", "A2", ws );
         ok( oParser.parse() );
@@ -3255,7 +3258,7 @@
 
         oParser = new parserFormula( "INDEX(\"Apples\",2,2)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "#REF!" );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 
         oParser = new parserFormula( "INDEX({\"Apples\",\"Lemons\"},,2)", "A2", ws );
         ok( oParser.parse() );
@@ -3633,6 +3636,18 @@
         oParser = new parserFormula( "AMORDEGRC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.15,1)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 776 );
+
+        oParser = new parserFormula( "AMORDEGRC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.50,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "AMORDEGRC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.20,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 819 );
+
+        oParser = new parserFormula( "AMORDEGRC(2400,DATE(2008,8,19),DATE(2008,12,31),300,1,0.33,0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 972 );
 
     } )
 
@@ -4621,12 +4636,11 @@
 
         oParser = new parserFormula( "XIRR({-10000,2750,4250,3250,2750},F100:J100,0.1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), xirr([-10000,2750,4250,3250,2750],[new Date(2008,0,1 ).getExcelDate(),
-                                                                                        new Date(2008,2,1 ).getExcelDate(),
-                                                                                        new Date(2008,9,30).getExcelDate(),
-                                                                                        new Date(2009,1,15).getExcelDate(),
-                                                                                        new Date(2009,3,1 ).getExcelDate()],0.1) );
+        strictEqual( oParser.calculate().getValue(), 0.3733625335188316 );
 
+        ws.getRange2( "F100" ).setValue( 0 );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.0024114950175866895 );
 
     } )
 
@@ -5615,19 +5629,19 @@
 
         oParser = new parserFormula( "ERF(1.234,4.5432)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.08096058291050978 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.08096058291050978.toFixed(14)-0 );
 
         oParser = new parserFormula( "ERF(1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.8427007929497149 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.8427007929497149.toFixed(14)-0 );
 
         oParser = new parserFormula( "ERF(0,1.345)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.9428441710878559 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.9428441710878559.toFixed(14)-0 );
 
         oParser = new parserFormula( "ERF(1.234)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.9190394169576684 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.9190394169576684.toFixed(14)-0 );
 
     })
 
@@ -5635,11 +5649,11 @@
 
         oParser = new parserFormula( "ERFC(1.234)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.08096058304233157 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.08096058304233157.toFixed(14)-0 );
 
         oParser = new parserFormula( "ERFC(1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.15729920705028513 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.15729920705028513.toFixed(14)-0 );
 
         oParser = new parserFormula( "ERFC(0)", "A2", ws );
         ok( oParser.parse() );
@@ -5647,7 +5661,7 @@
 
         oParser = new parserFormula( "ERFC(-1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1.8427007929497148 );
+        strictEqual( oParser.calculate().getValue().toFixed(14)-0, 1.8427007929497148.toFixed(14)-0 );
 
     })
 

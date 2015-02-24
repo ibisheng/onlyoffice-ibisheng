@@ -2196,7 +2196,7 @@ cDISC.prototype.Calculate = function ( arg ) {
     var res = ( 1 - pr / redemption ) / yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
 
     this.value = new cNumber( res );
-    this.value.numFormat = 9;
+//    this.value.numFormat = 9;
     return this.value;
 
 };
@@ -5667,7 +5667,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         var D_0 = dates[0],
             r = rate + 1,
             res = values[0];
-        for ( var i = 1, count = values.length; i < count; i++ ){
+        for ( var i = 1; i < values.length; i++ ){
             res += values[i] / Math.pow( r, (dates[i] - D_0) / 365 );
         }
         return res;
@@ -5684,9 +5684,9 @@ cXIRR.prototype.Calculate = function ( arg ) {
         return res;
     }
 
-    function xirr( valueArray, dateArray, rate ) {
+    function xirr2( _values, _dates, _rate ) {
 
-        var arr0 = valueArray[0], arr1 = dateArray[0];
+        var arr0 = _values[0], arr1 = _dates[0];
 
         if ( arr0 instanceof cError ){
             return arr0;
@@ -5698,30 +5698,31 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return new cError( cErrorType.not_numeric );
         }
 
-        if ( valueArray.length < 2 || (dateArray.length != valueArray.length) )
+        if ( _values.length < 2 || (_dates.length != _values.length) ){
             return new cError( cErrorType.not_numeric );
+        }
 
-        var res = rate.getValue();
-        if ( res <= -1 )
+        var res = _rate.getValue();
+        if ( res <= -1 ){
             return new cError( cErrorType.not_numeric );
+        }
 
-        var deltaEps = 1e-6, maxIter = 100, wasNeg = false, wasPos = false,
-            newXirrRes, eps, xirrRes, bContLoop = true;
+        var wasNeg = false, wasPos = false;
 
-        for ( var i = 0; i < dateArray.length; i++ ) {
-            dateArray[i] = dateArray[i].tocNumber();
-            valueArray[i] = valueArray[i].tocNumber();
-            if ( dateArray[i] instanceof cError || valueArray[i] instanceof cError ) {
+        for ( var i = 0; i < _dates.length; i++ ) {
+            _dates[i] = _dates[i].tocNumber();
+            _values[i] = _values[i].tocNumber();
+            if ( _dates[i] instanceof cError || _values[i] instanceof cError ) {
                 return new cError( cErrorType.wrong_value_type );
             }
-            dateArray[i] = Math.floor( dateArray[i].getValue() );
-            valueArray[i] = valueArray[i].getValue();
+            _dates[i] = Math.floor( _dates[i].getValue() );
+            _values[i] = _values[i].getValue();
 
-            if ( dateArray[0] > dateArray[i] ) {
+            if ( _dates[0] > _dates[i] ) {
                 return new cError( cErrorType.not_numeric );
             }
 
-            if ( valueArray[i] < 0 ) {
+            if ( _values[i] < 0 ) {
                 wasNeg = true;
             }
             else {
@@ -5734,53 +5735,106 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return new cError( cErrorType.not_numeric );
         }
 
-        do{
-            xirrRes = xirrFunction( valueArray, dateArray, res );
-            newXirrRes = res - xirrRes / xirrDeriv( valueArray, dateArray, res );
-            eps = Math.abs( newXirrRes - res );
-            res = newXirrRes;
-            bContLoop = (eps > deltaEps) && (Math.abs( xirrRes ) > deltaEps);
-        }while( --maxIter && bContLoop );
+        var g_Eps = 1e-7, nIM = 500, eps = 1, nMC = 0, xN, guess = res, g_Eps2 = g_Eps * 2;
 
-        if ( bContLoop ) {
-            return new cError( cErrorType.not_numeric );
+        while ( eps > g_Eps && nMC < nIM ) {
+            xN = res - xirrFunction( _values, _dates, res ) / ( (xirrFunction( _values, _dates, res + g_Eps ) - xirrFunction( _values, _dates, res - g_Eps )) / g_Eps2 );
+            nMC++;
+            eps = Math.abs( xN - res );
+            res = xN;
         }
+        if ( isNaN( res ) || Infinity == Math.abs( res ) ) {
+            var max = Number.MAX_VALUE, min = -Number.MAX_VALUE,
+                step = 1.6,
+                low = guess - 0.01 <= min ? min + g_Eps : guess - 0.01,
+                high = guess + 0.01 >= max ? max - g_Eps : guess + 0.01,
+                i, xBegin, xEnd, x, y, currentIter = 0;
 
-        return new cNumber( res );
+            if ( guess <= min || guess >= max ) {
+                return new cError( cErrorType.not_numeric );
+            }
+
+            for ( i = 0; i < nIM; i++ ) {
+                xBegin = low <= min ? min + g_Eps : low;
+                xEnd = high >= max ? max - g_Eps : high;
+                x = xirrFunction( _values, _dates, xBegin );
+                y = xirrFunction( _values, _dates, xEnd );
+                if ( x * y <= 0 ) {
+                    break;
+                }
+                else if ( x * y > 0 ) {
+                    low = (xBegin + step * (xBegin - xEnd));
+                    high = (xEnd + step * (xEnd - xBegin));
+                }
+                else {
+                    return new cError( cErrorType.not_numeric );
+                }
+            }
+
+            if ( i == nIM ) {
+                return new cError( cErrorType.not_numeric );
+            }
+
+            var fXbegin = xirrFunction( _values, _dates, xBegin ), fXend = xirrFunction( _values, _dates, xEnd ), fXi, xI;
+
+            if ( Math.abs( fXbegin ) < g_Eps ) {
+                return new cNumber( fXbegin );
+            }
+            if ( Math.abs( fXend ) < g_Eps ) {
+                return new cNumber( fXend );
+            }
+            do {
+                xI = xBegin + (xEnd - xBegin) / 2;
+                fXi = xirrFunction( _values, _dates, xI );
+                if ( fXbegin * fXi < 0 ) {
+                    xEnd = xI;
+                }
+                else {
+                    xBegin = xI;
+                }
+                fXbegin = xirrFunction( _values, _dates, xBegin );
+                currentIter++;
+            } while ( Math.abs( fXi ) > g_Eps && currentIter < nIM )
+
+            return new cNumber( xI );
+        }
+        else
+            return new cNumber( res );
 
     }
 
-    var dateArray = [], valueArray = [];
+
+    var _dates = [], _values = [];
 
     if ( arg0 instanceof cArea ) {
         arg0.foreach2( function ( c ) {
             if ( c instanceof cNumber ) {
-                valueArray.push( c );
+                _values.push( c );
             }
             else if ( c instanceof cEmpty ) {
-                valueArray.push( c.tocNumber() );
+                _values.push( c.tocNumber() );
             }
             else {
-                valueArray.push( new cError( cErrorType.wrong_value_type ) );
+                _values.push( new cError( cErrorType.wrong_value_type ) );
             }
         } );
     }
     else if ( arg0 instanceof cArray ) {
         arg0.foreach( function ( c ) {
             if ( c instanceof cNumber ) {
-                valueArray.push( c );
+                _values.push( c );
             }
             else if ( c instanceof cEmpty ) {
-                valueArray.push( c.tocNumber() );
+                _values.push( c.tocNumber() );
             }
             else {
-                valueArray.push( new cError( cErrorType.wrong_value_type ) );
+                _values.push( new cError( cErrorType.wrong_value_type ) );
             }
         } )
     }
     else if ( arg0 instanceof cArea3D ) {
         if ( arg0.wsFrom == arg0.wsTo ) {
-            valueArray = arg0.getMatrix()[0];
+            _values = arg0.getMatrix()[0];
         }
         else {
             return this.value = new cError( cErrorType.wrong_value_type );
@@ -5791,39 +5845,39 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.wrong_value_type )
         }
         else {
-            valueArray[0] = arg0;
+            _values[0] = arg0;
         }
     }
 
     if ( arg1 instanceof cArea ) {
         arg1.foreach2( function ( c ) {
             if ( c instanceof cNumber ) {
-                dateArray.push( c );
+                _dates.push( c );
             }
             else if ( c instanceof cEmpty ) {
-                dateArray.push( c.tocNumber() );
+                _dates.push( c.tocNumber() );
             }
             else {
-                dateArray.push( new cError( cErrorType.wrong_value_type ) );
+                _dates.push( new cError( cErrorType.wrong_value_type ) );
             }
         } );
     }
     else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( c ) {
             if ( c instanceof cNumber ) {
-                dateArray.push( c );
+                _dates.push( c );
             }
             else if( c instanceof cEmpty ){
-                dateArray.push( c.tocNumber() );
+                _dates.push( c.tocNumber() );
             }
             else {
-                dateArray.push( new cError( cErrorType.wrong_value_type ) );
+                _dates.push( new cError( cErrorType.wrong_value_type ) );
             }
         } )
     }
     else if ( arg1 instanceof cArea3D ) {
         if ( arg1.wsFrom == arg1.wsTo ) {
-            dateArray = arg1.getMatrix()[0];
+            _dates = arg1.getMatrix()[0];
         }
         else {
             return this.value = new cError( cErrorType.wrong_value_type );
@@ -5834,7 +5888,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
             return this.value = new cError( cErrorType.wrong_value_type )
         }
         else {
-            dateArray[0] = arg1;
+            _dates[0] = arg1;
         }
     }
 
@@ -5863,7 +5917,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         return this.value = arg2;
     }
 
-    this.value = xirr( valueArray, dateArray, arg2 );
+    this.value = xirr2( _values, _dates, arg2 );
     this.value.numFormat = 9;
     return this.value;
 
@@ -5897,7 +5951,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
     function xnpv( rate, valueArray, dateArray ) {
-        var res = 0, vaTmp, daTmp, r = rate.getValue();
+        var res = 0, vaTmp, daTmp, r = 1 + rate.getValue();
 
         if ( dateArray.length != valueArray.length ) {
             return new cError( cErrorType.not_numeric );
@@ -5916,7 +5970,7 @@ cXNPV.prototype.Calculate = function ( arg ) {
                 return new cError( cErrorType.not_numeric );
             }
 
-            res += vaTmp.getValue() / ( Math.pow( ( 1 + r ), ( Math.floor( daTmp.getValue() ) - d1 ) / 365 ) );
+            res += vaTmp.getValue() / ( Math.pow( r, ( Math.floor( daTmp.getValue() ) - d1 ) / 365 ) );
         }
 
         return new cNumber( res );
