@@ -3825,6 +3825,8 @@ CDelimiter.prototype.setPosition = function(position, PDSE)
 }
 CDelimiter.prototype.Draw_Elements = function(PDSE)
 {
+    var X = PDSE.X;
+
     var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
 
     this.begOper.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
@@ -3833,6 +3835,8 @@ CDelimiter.prototype.Draw_Elements = function(PDSE)
 
     for(var j = 0; j < this.nCol; j++)
         this.elements[0][j].Draw_Elements(PDSE);
+
+    PDSE.X = X + this.size.width;
 }
 CDelimiter.prototype.align_2 = function(element)
 {
@@ -3965,6 +3969,8 @@ CCharacter.prototype.setPosition = function(pos, PDSE)
 }
 CCharacter.prototype.Draw_Elements = function(PDSE)
 {
+    var X = PDSE.X;
+
     this.Content[0].Draw_Elements(PDSE);
 
     var ctrPrp =  this.Get_TxtPrControlLetter();
@@ -3984,6 +3990,7 @@ CCharacter.prototype.Draw_Elements = function(PDSE)
 
     this.operator.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
 
+    PDSE.X = X + this.size.width;
 }
 CCharacter.prototype.getBase = function()
 {

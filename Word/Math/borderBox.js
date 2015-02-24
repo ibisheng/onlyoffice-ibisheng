@@ -203,6 +203,8 @@ CBorderBox.prototype.recalculateSize = function()
 }
 CBorderBox.prototype.Draw_Elements = function(PDSE)
 {
+    var _X = PDSE.X;
+
     this.Content[0].Draw_Elements(PDSE);
 
     var penW = this.Get_TxtPrControlLetter().FontSize*0.02;
@@ -214,10 +216,6 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
 
     var X = this.pos.x + PosLine.x + this.GapLeft,
         Y = this.pos.y + PosLine.y;
-
-    /*var X = this.pos.x + PDSE.X + this.GapLeft,
-        Y = this.pos.y + PDSE.Y;*/
-
 
     this.Make_ShdColor(PDSE, this.Get_CompiledCtrPrp());
 
@@ -357,6 +355,8 @@ CBorderBox.prototype.Draw_Elements = function(PDSE)
 
         PDSE.Graphics.drawVerLine(0, x1, y1, y2, penW);
     }
+
+    PDSE.X = _X + this.size.width;
 
 }
 CBorderBox.prototype.setPosition = function(pos, PDSE)

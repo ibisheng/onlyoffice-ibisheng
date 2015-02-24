@@ -694,9 +694,9 @@ CNaryOperator.prototype.Draw_Elements = function(PDSE)
     if(this.Type == para_Math_Text)
         this.drawTextElem(PosLine.x, PosLine.y, PDSE.Graphics);
     else
-        this.drawGlyph(PosLine.x, PosLine.y, PDSE.Graphics);
+        this.drawGlyph(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
 }
-CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics)
+CNaryOperator.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var coord = this.getCoord();
 
@@ -1946,7 +1946,7 @@ function CContourIntegral()
     CNaryOperator.call(this);
 }
 Asc.extendClass(CContourIntegral, CNaryOperator);
-CContourIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
+CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var circle = new CCircle();
     var coord = circle.getCoord();
@@ -2032,7 +2032,7 @@ function CSurfaceIntegral()
     CNaryOperator.call(this);
 }
 Asc.extendClass(CSurfaceIntegral, CNaryOperator);
-CSurfaceIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
+CSurfaceIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var surf = new CSurface();
     var coord = surf.getCoord();
@@ -2117,7 +2117,7 @@ function CVolumeIntegral()
     CNaryOperator.call(this);
 }
 Asc.extendClass(CVolumeIntegral, CNaryOperator);
-CVolumeIntegral.prototype.draw = function(x, y, pGraphics, PDSE)
+CVolumeIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var volume = new CVolume();
     var coord = volume.getCoord();

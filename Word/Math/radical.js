@@ -637,10 +637,14 @@ CRadical.prototype.setPosition = function(pos, PDSE)
 }
 CRadical.prototype.Draw_Elements = function(PDSE)
 {
+    var X = PDSE.X;
+
     var PosLine = this.ParaMath.GetLinePosition(PDSE.Line);
 
     this.signRadical.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
     CRadical.superclass.Draw_Elements.call(this, PDSE);
+
+    PDSE.X = X + this.size.width;
 }
 CRadical.prototype.getBase = function()
 {

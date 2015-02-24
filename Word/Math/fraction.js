@@ -71,12 +71,16 @@ CFraction.prototype.draw = function(x, y, pGraphics, PDSE)
 }
 CFraction.prototype.Draw_Elements = function(PDSE)
 {
+    var X = PDSE.X;
+
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
         this.drawBarFraction(PDSE);
     else if(this.Pr.type == SKEWED_FRACTION)
         this.drawSkewedFraction(PDSE);
     else if(this.Pr.type == LINEAR_FRACTION)
         this.drawLinearFraction(PDSE);
+
+    PDSE.X = X + this.size.width;
 }
 CFraction.prototype.drawBarFraction = function(PDSE)
 {

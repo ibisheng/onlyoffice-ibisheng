@@ -165,11 +165,11 @@ CAccentDoubleLine.prototype.calcSize = function(stretch)
 
     var Line = new CMathText(true);
     Line.add(0x305);
-    Line.Resize(g_oTextMeasurer);
+    Line.Measure(g_oTextMeasurer);
 
     var DoubleLine = new CMathText(true);
     DoubleLine.add(0x33F);
-    DoubleLine.Resize(g_oTextMeasurer);
+    DoubleLine.Measure(g_oTextMeasurer);
 
     this.diff = DoubleLine.size.ascent - Line.size.ascent;
 
@@ -594,6 +594,8 @@ CAccent.prototype.draw = function(x, y, pGraphics, PDSE)
 };
 CAccent.prototype.Draw_Elements = function(PDSE)
 {
+    var X = PDSE.X;
+
     var oBase = this.Content[0];
     oBase.Draw_Elements(PDSE);
 
@@ -615,6 +617,8 @@ CAccent.prototype.Draw_Elements = function(PDSE)
     }
 
     this.operator.draw(x, y, PDSE.Graphics, PDSE);
+
+    PDSE.X = X + this.size.width;
 };
 CAccent.prototype.GetLastElement = function()
 {
