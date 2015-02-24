@@ -1426,7 +1426,7 @@ CDocument.prototype =
         var SectElement = this.SectionsInfo.Get_SectPr( StartIndex );
         
         var OldPage = ( undefined !== this.Pages[PageIndex] ? this.Pages[PageIndex] : null );
-        
+
         if ( true === bStart )
         {
             this.Pages[PageIndex] = new CDocumentPage();

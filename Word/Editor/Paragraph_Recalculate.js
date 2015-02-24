@@ -1364,10 +1364,31 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
 
             if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && 0 === BreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) && this.Lines[CurLine - 1].Ranges.length <= 1 )
             {
-                // Вызываем данную функцию для удаления картинок с предыдущей страницы
-                this.Recalculate_Drawing_AddPageBreak(0, 0, true);
+                var bBreakPageFromStart = false;
+                for (var Index = 0, Count = this.Pages[CurPage - 1].Drawings.length; Index < Count; Index++)
+                {
+                    var Drawing = this.Pages[CurPage - 1].Drawings[Index];
+                    var DrawingLine = Drawing.LineNum;
 
-                this.Parent.RecalcInfo.Set_WidowControl(this, ( CurLine > 2 ? CurLine - 1 : 0 ) ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
+                    if (DrawingLine >= CurLine - 1)
+                    {
+                        bBreakPageFromStart = true;
+                        break;
+                    }
+                }
+
+                // Если в строках, которые мы переносим есть картинки, либо, если у нас в параграфе 3 строки,
+                // тогда сразу начинаем параграф с новой строки
+                if (true === bBreakPageFromStart || CurLine <= 2)
+                {
+                    CurLine = 0;
+                    // Вызываем данную функцию для удаления картинок с предыдущей страницы
+                    this.Recalculate_Drawing_AddPageBreak(0, 0, true);
+                }
+                else
+                    CurLine = CurLine - 1;
+
+                this.Parent.RecalcInfo.Set_WidowControl(this, CurLine);
                 PRS.RecalcResult = recalcresult_PrevPage;
                 return false;
             }

@@ -3825,6 +3825,7 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.W = W;
     this.H = H;
     this.PageNum = 0;
+    this.LineNum = 0;
     this.YOffset = 0;
 
     this.DocumentContent = DocumentContent;
@@ -4370,7 +4371,7 @@ ParaDrawing.prototype =
         return false;
     },
 
-    Update_Position : function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin)
+    Update_Position : function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
     {
         if ( undefined != this.PositionH_Old )
         {
@@ -4427,6 +4428,7 @@ ParaDrawing.prototype =
 
         var OldPageNum = this.PageNum;
         this.PageNum = PageNum;
+        this.LineNum = LineNum;
         this.X       = this.Internal_Position.CalcX;
         this.Y       = this.Internal_Position.CalcY;
 
