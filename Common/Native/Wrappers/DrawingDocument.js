@@ -596,6 +596,7 @@ function CDrawingDocument()
 
     this.IsRetina = false;
     this.IsMobile = false;
+    this.IsViewMode = false;
 
     this.SelectRect1 = null;
     this.SelectRect2 = null;
@@ -1526,18 +1527,21 @@ CDrawingDocument.prototype =
         if (true)
         {
             // проверям на попадание в графические объекты (грубо говоря - треки)
-            global_mouseEvent.KoefPixToMM = 5;
-            var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);
-
-            if (_isDrawings)
+            if (!this.IsViewMode)
             {
-                this.OnMouseDown(e);
+                global_mouseEvent.KoefPixToMM = 5;
+                var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);
+
+                if (_isDrawings)
+                {
+                    this.OnMouseDown(e);
+                }
+
+                global_mouseEvent.KoefPixToMM = 1;
+
+                if (_isDrawings)
+                    return 2;
             }
-
-            global_mouseEvent.KoefPixToMM = 1;
-
-            if (_isDrawings)
-                return 2;
         }
 
         return 0;

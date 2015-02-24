@@ -2044,6 +2044,13 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             this.Call_Menu_Context_SelectAll();
             break;
         }
+        case 201: // ASC_MENU_EVENT_TYPE_DOCUMENT_CHARTSTYLES
+        {
+            var _typeChart = _params[0];
+            this.chartPreviewManager.getChartPreviews(_typeChart);
+            _return = global_memory_stream_menu;
+            break;
+        }
         default:
             break;
     }
@@ -5212,6 +5219,29 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
                 TABLE_STYLE_HEIGHT_PIX = _params[_current.pos++];
                 break;
             }
+            case 4:
+            {
+                this.chartPreviewManager.CHART_PREVIEW_WIDTH_PIX = _params[_current.pos++];
+                break;
+            }
+            case 5:
+            {
+                this.chartPreviewManager.CHART_PREVIEW_HEIGHT_PIX = _params[_current.pos++];
+                break;
+            }
+            case 6:
+            {
+                var _val = _params[_current.pos++];
+                if (_val === true)
+                {
+                    this.ShowParaMarks = false;
+                    CollaborativeEditing.m_bGlobalLock = true;
+
+                    this.isViewMode = true;
+                    this.WordControl.m_oDrawingDocument.IsViewMode = true;
+                }
+                break;
+            }
             case 100:
             {
                 this.WordControl.m_oDrawingDocument.IsRetina = _params[_current.pos++];
@@ -5230,6 +5260,8 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
             }
         }
     }
+
+    AscBrowser.isRetina = this.WordControl.m_oDrawingDocument.IsRetina;
 
     if (this.WordControl.m_oDrawingDocument.IsRetina && this.WordControl.m_oDrawingDocument.IsMobile)
     {
@@ -5347,13 +5379,88 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 };
 /************************************************************************/
 
-window.NativeCorrectImageUrlOnPaste = function(url)
+window["NativeCorrectImageUrlOnPaste"] = function(url)
 {
-    return window.native.CorrectImageUrlOnPaste(url);
+    return window["native"]["CorrectImageUrlOnPaste"](url);
 };
-window.NativeCorrectImageUrlOnCopy = function(url)
+window["NativeCorrectImageUrlOnCopy"] = function(url)
 {
-    return window.native.CorrectImageUrlOnCopy(url);
+    return window["native"]["CorrectImageUrlOnCopy"](url);
+};
+
+// chat styles
+ChartPreviewManager.prototype.clearPreviews = function()
+{
+    window["native"]["DD_ClearCacheChartStyles"]();
+};
+ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
+{
+    return ExecuteNoHistory(function(){
+        if(!this.chartsByTypes[type])
+            this.chartsByTypes[type] = this.getChartByType(type);
+        var chart_space = this.chartsByTypes[type];
+        if(chart_space.style !== styleIndex)
+        {
+            chart_space.style = styleIndex;
+            chart_space.recalculateMarkers();
+            chart_space.recalculateSeriesColors();
+            chart_space.recalculatePlotAreaChartBrush();
+            chart_space.recalculatePlotAreaChartPen();
+            chart_space.recalculateChartBrush();
+            chart_space.recalculateChartPen();
+            chart_space.recalculateUpDownBars();
+        }
+        chart_space.recalculatePenBrush();
+
+        var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
+        var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
+        if (AscBrowser.isRetina)
+        {
+            _width_px <<= 1;
+            _height_px <<= 1;
+        }
+
+        window["native"]["DD_StartNativeDraw"](_width_px, _height_px,
+                _width_px * g_dKoef_pix_to_mm, _height_px * g_dKoef_pix_to_mm);
+
+        var dKoefToMM = g_dKoef_pix_to_mm;
+        if (this.IsRetinaEnabled)
+            dKoefToMM /= 2;
+
+        chart_space.draw(_graphics);
+        _graphics.ClearParams();
+
+        var _stream = global_memory_stream_menu;
+        _stream["ClearNoAttack"]();
+        _stream["WriteByte"](4);
+        _stream["WriteLong"](type);
+        _stream["WriteLong"](styleIndex);
+        window["native"]["DD_EndNativeDraw"](_stream);
+
+    }, this, []);
+
+};
+
+ChartPreviewManager.prototype.getChartPreviews = function(chartType)
+{
+    if (isRealNumber(chartType))
+    {
+        var bIsCached = window["native"]["DD_IsCachedChartStyles"](chartType);
+        if (!bIsCached)
+        {
+            window["native"]["DD_PrepareNativeDraw"]();
+
+            var _graphics = new CDrawingStream();
+
+            for (var i = 1; i < 49; ++i)
+                this.createChartPreview(_graphics, chartType, i);
+
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteByte"](5);
+            _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
+        }
+    }
 };
 
 // FT_Common
