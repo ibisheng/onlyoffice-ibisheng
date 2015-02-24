@@ -1644,11 +1644,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ParaRange       = PRS.Range;
     var bMathWordLarge  = PRS.bMathWordLarge;
 
-    var LineRule        = ParaPr.Spacing.LineRule;
-
     var Pos = RangeStartPos;
 
-    var UpdateLineMetricsText = false;
     var ContentLen = this.Content.length;
 
     var WidthLine = PRS.XEnd - PRS.X;
@@ -1669,10 +1666,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             // Проверяем, не нужно ли добавить нумерацию к данному элементу
             if (true === this.RecalcInfo.NumberingAdd && true === Item.Can_AddNumbering())
             {
-                var TempRes = this.Internal_Recalculate_Numbering(Item, PRS.Paragraph, ParaPr, X, PRS.LineAscent, PRS.Page, PRS.Line, PRS.Range);
-
-                X = TempRes.X;
-                PRS.LineAscent = TempRes.LineAscent;
+                X = this.Internal_Recalculate_Numbering(Item, PRS.Paragraph, ParaPr, X, PRS.LineAscent, PRS.Page, PRS.Line, PRS.Range);
             }
 
             switch (ItemType)
@@ -1684,8 +1678,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
-
-                    UpdateLineMetricsText = true;
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
@@ -1846,7 +1838,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             MoveToLBP = true;
                             NewRange = true;
-                            UpdateLineMetricsText = true;
 
                             if(bCurrWord == false)
                             {
@@ -1899,21 +1890,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                         else
                         {
-                            // Обновим метрики строки
-                            if (linerule_Exact === LineRule)
-                            {
-                                if (PRS.LineAscent < Item.Height)
-                                    PRS.LineAscent = Item.Height;
-                            }
-                            else
-                            {
-                                if (PRS.LineAscent < Item.Height + this.YOffset)
-                                    PRS.LineAscent = Item.Height + this.YOffset;
-
-                                if (PRS.LineDescent < -this.YOffset)
-                                    PRS.LineDescent = -this.YOffset;
-                            }
-
                             // Добавляем длину пробелов до автофигуры
                             X += SpaceLen + DrawingWidth;
 
@@ -2009,8 +1985,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // Если на строке начиналось какое-то слово, тогда данная строка уже не пустая
                     if (true === StartWord)
                         FirstItemOnLine = false;
-
-                    UpdateLineMetricsText = true;
 
                     var PageNumWidth = Item.Get_Width();
                     if (X + SpaceLen + PageNumWidth > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
@@ -2194,38 +2168,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.ParaMath.UpdateMaxWidthLine(PRS, WidthLine);
     }
 
-
-    if ( true === UpdateLineMetricsText )
-    {
-        // Пересчитаем метрику строки относительно размера данного текста
-        if ( PRS.LineTextAscent < this.TextAscent )
-            PRS.LineTextAscent = this.TextAscent;
-
-        if ( PRS.LineTextAscent2 < this.TextAscent2 )
-            PRS.LineTextAscent2 = this.TextAscent2;
-
-        if ( PRS.LineTextDescent < this.TextDescent )
-            PRS.LineTextDescent = this.TextDescent;
-
-        if ( linerule_Exact === LineRule )
-        {
-            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
-            if ( PRS.LineAscent < this.TextAscent )
-                PRS.LineAscent = this.TextAscent;
-
-            if ( PRS.LineDescent < this.TextDescent )
-                PRS.LineDescent = this.TextDescent;
-        }
-        else
-        {
-            if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
-                PRS.LineAscent = this.TextAscent + this.YOffset;
-
-            if ( PRS.LineDescent < this.TextDescent - this.YOffset )
-                PRS.LineDescent = this.TextDescent - this.YOffset;
-        }
-    }
-
     PRS.MoveToLBP       = MoveToLBP;
     PRS.NewRange        = NewRange;
     PRS.ForceNewPage    = ForceNewPage;
@@ -2263,6 +2205,109 @@ ParaRun.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
     var CurPos   = PRP.Get(Depth);
 
     this.protected_FillRangeEndPos(CurLine, CurRange, CurPos);
+};
+
+ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    var Para = PRS.Paragraph;
+
+    // Если заданный отрезок пустой, тогда мы не должны учитывать метрики данного рана.
+
+    var CurLine  = _CurLine - this.StartLine;
+    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    var UpdateLineMetricsText = false;
+    var LineRule = ParaPr.Spacing.LineRule;
+
+    for (var CurPos = StartPos; CurPos < EndPos; CurPos++)
+    {
+        var Item = this.Content[CurPos];
+
+        if (Item === Para.Numbering.Item)
+        {
+            PRS.LineAscent = Para.Numbering.LineAscent;
+        }
+
+        switch (Item.Type)
+        {
+            case para_Sym:
+            case para_Text:
+            case para_Math_Text:
+            case para_Math_Placeholder:
+            case para_Math_BreakOperator:
+            case para_PageNum:
+            {
+                UpdateLineMetricsText = true;
+                break;
+            }
+            case para_Space:
+            {
+                break;
+            }
+            case para_Drawing:
+            {
+                if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
+                {
+                    // Обновим метрики строки
+                    if (linerule_Exact === LineRule)
+                    {
+                        if (PRS.LineAscent < Item.Height)
+                            PRS.LineAscent = Item.Height;
+                    }
+                    else
+                    {
+                        if (PRS.LineAscent < Item.Height + this.YOffset)
+                            PRS.LineAscent = Item.Height + this.YOffset;
+
+                        if (PRS.LineDescent < -this.YOffset)
+                            PRS.LineDescent = -this.YOffset;
+                    }
+                }
+
+                break;
+            }
+
+            case para_End:
+            {
+                // TODO: Тут можно сделать проверку на пустую строку.
+                break;
+            }
+        }
+    }
+
+    if ( true === UpdateLineMetricsText )
+    {
+        // Пересчитаем метрику строки относительно размера данного текста
+        if ( PRS.LineTextAscent < this.TextAscent )
+            PRS.LineTextAscent = this.TextAscent;
+
+        if ( PRS.LineTextAscent2 < this.TextAscent2 )
+            PRS.LineTextAscent2 = this.TextAscent2;
+
+        if ( PRS.LineTextDescent < this.TextDescent )
+            PRS.LineTextDescent = this.TextDescent;
+
+        if ( linerule_Exact === LineRule )
+        {
+            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
+            if ( PRS.LineAscent < this.TextAscent )
+                PRS.LineAscent = this.TextAscent;
+
+            if ( PRS.LineDescent < this.TextDescent )
+                PRS.LineDescent = this.TextDescent;
+        }
+        else
+        {
+            if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
+                PRS.LineAscent = this.TextAscent + this.YOffset;
+
+            if ( PRS.LineDescent < this.TextDescent - this.YOffset )
+                PRS.LineDescent = this.TextDescent - this.YOffset;
+        }
+    }
 };
 
 ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
@@ -2838,38 +2883,9 @@ ParaRun.prototype.Internal_Recalculate_Numbering = function(Item, Para, ParaPr, 
 
     NumberingItem.Line  = CurLine;
     NumberingItem.Range = CurRange;
+    NumberingItem.LineAscent = LineAscent;
 
-    return { X : X, LineAscent : LineAscent };
-};
-
-ParaRun.prototype.Internal_Recalculate_LineMetrics = function(PRS, SpacingLineRule)
-{
-    if ( PRS.LineTextAscent < this.TextAscent )
-        PRS.LineTextAscent = this.TextAscent;
-
-    if ( PRS.LineTextAscent2 < this.TextAscent2 )
-        PRS.LineTextAscent2 = this.TextAscent2;
-
-    if ( PRS.LineTextDescent < this.TextDescent )
-        PRS.LineTextDescent = this.TextDescent;
-
-    if ( linerule_Exact === SpacingLineRule )
-    {
-        // Смещение не учитывается в метриках строки, когда расстояние между строк точное
-        if ( PRS.LineAscent < this.TextAscent )
-            PRS.LineAscent = this.TextAscent;
-
-        if ( PRS.LineDescent < this.TextDescent )
-            PRS.LineDescent = this.TextDescent;
-    }
-    else
-    {
-        if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
-            PRS.LineAscent = this.TextAscent + this.YOffset;
-
-        if ( PRS.LineDescent < this.TextDescent - this.YOffset )
-            PRS.LineDescent = this.TextDescent - this.YOffset;
-    }
+    return X;
 };
 
 ParaRun.prototype.Internal_Recalculate_LastTab = function(LastTab, X, XEnd, Word, WordLen, SpaceLen)

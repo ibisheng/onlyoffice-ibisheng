@@ -905,6 +905,10 @@ ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 {
     this.Root.Recalculate_Set_RangeEndPos(PRS, PRP, Depth);
 };
+ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+
+};
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
     this.Root.Recalculate_Range_Width(PRSC, _CurLine, _CurRange);

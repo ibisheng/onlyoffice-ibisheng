@@ -13043,7 +13043,7 @@ CDocument.prototype =
                     if ( false === Pos )
                         continue;
 
-                    Pos = Math.min(Pos, this.Content.length - 1);
+                    //Pos = Math.min(Pos, this.Content.length - 1);
 
                     this.Content.splice(Pos, 1);
 

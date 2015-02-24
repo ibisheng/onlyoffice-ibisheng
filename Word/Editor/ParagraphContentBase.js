@@ -1058,6 +1058,19 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Set_RangeEndPos 
 
     this.Content[CurPos].Recalculate_Set_RangeEndPos( PRS, PRP, Depth + 1 );
 };
+CParagraphContentWithParagraphLikeContent.prototype.Recalculate_LineMetrics = function(PRS, _CurLine, _CurRange)
+{
+    var CurLine = _CurLine - this.StartLine;
+    var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
+
+    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+    for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+    {
+        this.Content[CurPos].Recalculate_LineMetrics(PRSC, _CurLine, _CurRange);
+    }
+};
 CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
     var CurLine = _CurLine - this.StartLine;

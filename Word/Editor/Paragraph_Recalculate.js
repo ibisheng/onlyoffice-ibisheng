@@ -899,6 +899,22 @@ Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPage, PRS, ParaPr)
 {
+    var Line = this.Lines[CurLine];
+    var RangesCount = Line.Ranges.length;
+
+    for (var CurRange = 0; CurRange < RangesCount; CurRange++)
+    {
+        var Range = Line.Ranges[CurRange];
+
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        for (var Pos = StartPos; Pos <= EndPos; Pos++)
+        {
+            this.Content[Pos].Recalculate_LineMetrics(PRS, ParaPr, CurLine, CurRange);
+        }
+    }
+
     // Строка пустая, у нее надо выставить ненулевую высоту. Делаем как Word, выставляем высоту по размеру
     // текста, на котором закончилась данная строка.
     if ( true === PRS.EmptyLine || PRS.LineAscent < 0.001 )
