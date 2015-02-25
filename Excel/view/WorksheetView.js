@@ -9706,7 +9706,7 @@
 					}
 					break;
 				case "delCell":
-					range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
+					range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
 					switch (val) {
 						case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
@@ -9719,14 +9719,14 @@
 								if (range.deleteCellsShiftLeft()) {
 									t._cleanCache(oChangeData.changedRange);
 									if(isCheckChangeAutoFilter === true)
-										t.autoFilters.insertColumn(prop, arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
-									t.cellCommentator.updateCommentsDependencies(false, val, arn);
-									t.objectRender.updateDrawingObject(false, val, arn);
+										t.autoFilters.insertColumn(prop, checkRange, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
+									t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+									t.objectRender.updateDrawingObject(false, val, checkRange);
 								}
 								History.EndTransaction();
 							};
 
-							oChangeData.changedRange = new asc_Range(arn.c1, arn.r1, gc_nMaxCol0, arn.r2);
+							oChangeData.changedRange = new asc_Range(checkRange.c1, checkRange.r1, gc_nMaxCol0, checkRange.r2);
 							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
@@ -9740,18 +9740,18 @@
 									if (range.deleteCellsShiftUp()) {
 										t._cleanCache(oChangeData.changedRange);
 										if(isCheckChangeAutoFilter === true)
-											t.autoFilters.insertRows(prop, arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
-										t.cellCommentator.updateCommentsDependencies(false, val, arn);
-										t.objectRender.updateDrawingObject(false, val, arn);
+											t.autoFilters.insertRows(prop, checkRange, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
+										t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+										t.objectRender.updateDrawingObject(false, val, checkRange);
 									}
 									History.EndTransaction();
 							};
 
-							oChangeData.changedRange = new asc_Range(arn.c1, arn.r1, arn.c2, gc_nMaxRow0);
+							oChangeData.changedRange = new asc_Range(checkRange.c1, checkRange.r1, checkRange.c2, gc_nMaxRow0);
 							this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
 							break;
 						case c_oAscDeleteOptions.DeleteColumns:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(arn, c_oAscDeleteOptions.DeleteColumns, prop);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(checkRange, c_oAscDeleteOptions.DeleteColumns, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9759,19 +9759,19 @@
 								fullRecalc = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
-								t.model.removeCols(arn.c1, arn.c2);
+								t.model.removeCols(checkRange.c1, checkRange.c2);
 								t.autoFilters.insertColumn(prop, arn, c_oAscDeleteOptions.DeleteColumns);
-								t.objectRender.updateDrawingObject(false, val, arn);
-								t.cellCommentator.updateCommentsDependencies(false, val, arn);
+								t.objectRender.updateDrawingObject(false, val, checkRange);
+								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 								History.EndTransaction();
 							};
 
-							oChangeData.removed = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+							oChangeData.removed = new asc_Range(checkRange.c1, 0, checkRange.c2, gc_nMaxRow0);
 							this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteColumns,
 								onChangeWorksheetCallback);
 							break;
 						case c_oAscDeleteOptions.DeleteRows:
-							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(arn, c_oAscDeleteOptions.DeleteRows, prop);
+							isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(checkRange, c_oAscDeleteOptions.DeleteRows, prop);
 							if(isCheckChangeAutoFilter === false)
 								return;
 
@@ -9779,14 +9779,14 @@
 								fullRecalc = true;
 								History.Create_NewPoint();
 								History.StartTransaction();
-								t.model.removeRows(arn.r1, arn.r2);
-								t.autoFilters.insertRows(prop, arn, c_oAscDeleteOptions.DeleteRows);
-								t.objectRender.updateDrawingObject(false, val, arn);
-								t.cellCommentator.updateCommentsDependencies(false, val, arn);
+								t.model.removeRows(checkRange.r1, checkRange.r2);
+								t.autoFilters.insertRows(prop, checkRange, c_oAscDeleteOptions.DeleteRows);
+								t.objectRender.updateDrawingObject(false, val, checkRange);
+								t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 								History.EndTransaction();
 							};
 
-							oChangeData.removed = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
+							oChangeData.removed = new asc_Range(0, checkRange.r1, gc_nMaxCol0, checkRange.r2);
 							this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows,
 								onChangeWorksheetCallback);
 							break;
