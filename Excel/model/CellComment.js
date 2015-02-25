@@ -775,36 +775,27 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 	updateCommentsList(aChangedComments);
 };
 
-CCellCommentator.prototype.sortComments = function(activeRange, changes) {
-	var t = this;
+CCellCommentator.prototype.sortComments = function(sortData) {
+	var comment, isChangeComment = false, places = sortData.places, i = 0, l = places.length, j, row, line;
+	var range = sortData.bbox, oComments = this.getRangeComments(new Asc.Range(range.c1, range.r1, range.c2, range.r2));
+	if (null === oComments)
+		return;
 
-	if (changes && activeRange) {
+	History.StartTransaction();
 
-		var updateCommentsList = function(aComments) {
-			if ( aComments.length ) {
-				History.StartTransaction();
-
-				for (var i = 0; i < aComments.length; i++) {
-					t.asc_changeComment(aComments[i].asc_getId(), aComments[i], true);
-				}
-
-				History.EndTransaction();
-				t.drawCommentCells();
-			}
-		};
-
-		var aChangedComments = [];
-		for (var i = 0; i < changes.places.length; i++) {
-
-			var list = this.asc_getComments(activeRange.c1, changes.places[i].from);
-			for (var j = 0; j < list.length; j++) {
-				var comment = new asc_CCommentData(list[j]);
-				comment.nRow = changes.places[i].to;
-				aChangedComments.push(comment);
+	for (; i < l; ++i) {
+		if (oComments.hasOwnProperty((row = places[i].from))) {
+			for (j = 0, line = oComments[row]; j < line.length; ++j) {
+				comment = new asc_CCommentData(line[j]);
+				comment.nRow = places[i].to;
+				this.asc_changeComment(comment.asc_getId(), comment, true);
 			}
 		}
-		updateCommentsList(aChangedComments);
 	}
+
+	History.EndTransaction();
+	if (isChangeComment)
+		this.drawCommentCells();
 };
 
 CCellCommentator.prototype.resetLastSelectedId = function() {
@@ -1299,6 +1290,25 @@ CCellCommentator.prototype.asc_getComments = function(col, row) {
 		}
 	}
 	return comments;
+};
+
+CCellCommentator.prototype.getRangeComments = function(range) {
+	var oComments = {};
+	if (!this.bShow)
+		return null;
+
+	var i, length, comment, bEmpty = true;
+	for (i = 0, length = this.aComments.length; i < length; ++i) {
+		comment = this.aComments[i];
+		if (range.contains(comment.nCol, comment.nRow)) {
+			bEmpty = false;
+			if (!oComments.hasOwnProperty(comment.nRow))
+				oComments[comment.nRow] = [];
+			oComments[comment.nRow].push(comment);
+		}
+	}
+
+	return bEmpty ? null : oComments;
 };
 
 CCellCommentator.prototype.asc_getDocumentComments = function() {

@@ -159,11 +159,6 @@
 		function Range(c1, r1, c2, r2, normalize) {
 			if ( !(this instanceof Range) ) {return new Range(c1, r1, c2, r2, normalize);}
 
-			// if (typeOf(c1) !== kNumberL || typeOf(c2) !== kNumberL ||
-			    // typeOf(r1) !== kNumberL || typeOf(r2) !== kNumberL) {
-				// throw "Error: Range("+c1+","+r1+","+c2+","+r2+") - numerical args are expected";
-			// }
-
 			/** @type Number */
 			this.c1 = c1;
 			/** @type Number */

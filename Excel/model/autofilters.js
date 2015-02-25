@@ -1509,7 +1509,6 @@ var gUndoInsDelCellsFlag = true;
 				var activeCells;
 				var newEndId;
 				var t = this;
-				var selectionRange;
 				var sortCol;
 				
 				var onSortAutoFilterCallback = function(success)
@@ -1534,10 +1533,7 @@ var gUndoInsDelCellsFlag = true;
 						currentFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
 						currentFilter.SortState.SortConditions[0].ConditionDescending = type;
 						//сама сортировка
-						sortCol = curCell.c1;
-						var changes = sortRange.sort(type,sortCol);
-						
-						ws.cellCommentator.sortComments(sortRange.bbox, changes);
+						ws.cellCommentator.sortComments(sortRange.sort(type, curCell.c1));
 						
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
@@ -1551,48 +1547,35 @@ var gUndoInsDelCellsFlag = true;
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
-					else
-						return false;
 				};
-				var standartSort = function(success)
-				{
-					if(success)
-					{
-						if(isTurnOffHistory)
+				var standartSort = function(success) {
+					if (success) {
+						if (isTurnOffHistory)
 							History.TurnOff();
 						History.Create_NewPoint();
 						History.StartTransaction();
-						var changes = sortRange.sort(type,sortCol);
-						
-						ws.cellCommentator.sortComments(sortRange.bbox, changes);
-						
-						if(currentFilter.TableStyleInfo)
+						ws.cellCommentator.sortComments(sortRange.sort(type, sortCol));
+
+						if (currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref, currentFilter);
 						History.EndTransaction();
-						
-						if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
+
+						if (!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
 							ws._onUpdateFormatTable(sortRange.bbox, false);
-						
-						if(isTurnOffHistory)
+
+						if (isTurnOffHistory)
 							History.TurnOn();
 					}
-					else
-					{
-						return false;
-					}
 				};
-					
-				
+
 				if(type == 'ascending' || type == 'descending')
 				{
 					var activeRange = ar;
 					if(cellId)
 						activeRange = t._idToRange(cellId);
 					var filter = t._searchFilters(activeRange, null);
-					if(type == 'ascending')
-						type = true;
-					else
-						type = false;
+					type = (type === 'ascending');
+
 					if(filter && filter == "error")//если захвачена часть фильтра
 					{
 						return;
@@ -1607,10 +1590,6 @@ var gUndoInsDelCellsFlag = true;
 							num = filter.num - 1;
 						
 						var curFilter = allAutoFilters[num];
-						/*var splitRef = curFilter.Ref.split(":");
-						var startCellFilter = this._idToRange(splitRef[0]);
-						var endCellFilter = this._idToRange(splitRef[1]);*/
-						
 						var splitRef = curFilter.Ref; 
 						
 						if(activeRange.r1 == activeRange.r2 && activeRange.c1 == activeRange.c2)//внутри фильтра одна выделенная ячейка
@@ -1625,7 +1604,6 @@ var gUndoInsDelCellsFlag = true;
 								}
 							}
 						}
-						//else if(startCellFilter.r1 == activeRange.r1 && startCellFilter.c1 == activeRange.c1 && endCellFilter.r1 == activeRange.r2 && endCellFilter.c1 == activeRange.c2)//выделен весь фильтр(сортируем по 1 столбцу)
 						else if(splitRef.r1 == activeRange.r1 && splitRef.c1 == activeRange.c1 && splitRef.r2 == activeRange.r2 && splitRef.c2 == activeRange.c2)//выделен весь фильтр(сортируем по 1 столбцу)
 						{
 							cellId = Asc.Range(splitRef.c1, splitRef.r1, splitRef.c1, splitRef.r1);
@@ -1639,17 +1617,14 @@ var gUndoInsDelCellsFlag = true;
 							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
 						}
 						else if(splitRef.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
-						//else if(startCellFilter.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
 						{
 							sortCol = activeRange.c1;
 							sortRange = ws.model.getRange3(activeRange.r1 + 1, activeRange.c1, activeRange.r2, activeRange.c2);
-							selectionRange = activeRange;
-							var sortRange1 = t._getAscRange(sortRange.bbox);
 							currentFilter = curFilter;
 							if(isTurnOffHistory)
 								standartSort(true);
 							else
-								ws._isLockedCells (sortRange1, /*subType*/null, standartSort);
+								ws._isLockedCells(t._getAscRange(sortRange.bbox), /*subType*/null, standartSort);
 							return;
 						}
 						else
@@ -1683,34 +1658,18 @@ var gUndoInsDelCellsFlag = true;
 				}
 				
 				oldFilter = currentFilter.clone(aWs);
-				
-				/*var rangeCell = currentFilter.Ref.split(':');
-				var startCell = t._idToRange(rangeCell[0]);
-				var endCell = t._idToRange(rangeCell[1]);*/
-				
 				var rangeCell = currentFilter.Ref;
 				
 				curCell = t._idToRange(cellId);
-				
-				//curCell.r1 = endCell.r1;
 				curCell.r1 = rangeCell.r1;
-				
-				//selectionRange = new Asc.Range(startCell.c1, startCell.r1 + 1, endCell.c2, endCell.r2);
-				
-				selectionRange = new Asc.Range(rangeCell.c1, rangeCell.r1 + 1, rangeCell.c2, rangeCell.r2);
-				
 				newEndId = t._rangeToId(curCell);
-				//startCell.r1 = startCell.r1 + 1;
-
-				//sortRange = ws.model.getRange3(startCell.r1, startCell.c1, endCell.r1, endCell.c1);
 				
 				sortRange = ws.model.getRange3(rangeCell.r1 + 1, rangeCell.c1, rangeCell.r2, rangeCell.c2);
-				
-				var sortRange1 = t._getAscRange(sortRange.bbox);
+
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
 				else
-					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
+					ws._isLockedCells (t._getAscRange(sortRange.bbox), /*subType*/null, onSortAutoFilterCallback);
 			},
 			
 			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)

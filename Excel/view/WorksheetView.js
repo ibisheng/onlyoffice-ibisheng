@@ -8034,8 +8034,7 @@
 
 					case "sort":
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
-						var changes = range.sort(val, arn.startCol);
-						t.cellCommentator.sortComments(arn, changes);
+						t.cellCommentator.sortComments(range.sort(val, arn.startCol));
 						break;
 
 					case "empty":
