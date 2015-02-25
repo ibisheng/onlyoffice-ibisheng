@@ -414,7 +414,6 @@ CWrapPolygon.prototype =
         var transform = new CMatrix();
         var arrEdges = [];
         var arrPoints = [];
-
         var polygonsCount = arrPolygons.length;
         for(var polygon_index=0; polygon_index < polygonsCount; ++polygon_index)
         {
@@ -449,9 +448,7 @@ CWrapPolygon.prototype =
         }
         if(arrPoints.length < 2)
         {
-            this.arrPoints.length = 0;
-            this.relativeArrPoints.length = 0;
-            return;
+            return [];
         }
         arrEdges.sort(function(a, b){return Math.min(a.point1.y, a.point2.y) - Math.min(b.point1.y, b.point2.y)});
         arrPoints.sort(function(a, b){return a.y - b.y});
@@ -593,41 +590,17 @@ CWrapPolygon.prototype =
             }
         }
 
-        this.arrPoints = [];
-        this.arrPoints.push(left_path_arr[0]);
+        var aPoints = [];
+        aPoints.push(left_path_arr[0]);
         for(point_index = 0; point_index < right_path_arr.length; ++point_index)
         {
-            this.arrPoints.push(right_path_arr[point_index]);
+            aPoints.push(right_path_arr[point_index]);
         }
         for(point_index =  left_path_arr.length - 1; point_index > 0; --point_index)
         {
-            this.arrPoints.push(left_path_arr[point_index]);
+            aPoints.push(left_path_arr[point_index]);
         }
-
-
-
-        var bounds = drawing.parent.getBounds(), oDistance = drawing.parent.Get_Distance();
-        if(bounds.l < x_min)
-            this.localLeft = bounds.l - oDistance.L;
-        else
-            this.localLeft  = x_min - oDistance.L;
-
-        if(bounds.r > x_max)
-            this.localRight = bounds.r + oDistance.R;
-        else
-            this.localRight = x_max + oDistance.R;
-
-        if(!isRealObject(left_path_arr[0]) || !(typeof left_path_arr[0].y === "number"))
-            this.localTop = bounds.t - oDistance.T;
-        else
-            this.localTop = left_path_arr[0].y - oDistance.T;
-
-        if(!isRealObject(left_path_arr[left_path_arr.length - 1]) || !(typeof left_path_arr[left_path_arr.length - 1].y === "number"))
-            this.localBottom = bounds.b + oDistance.B;
-        else
-            this.localBottom = left_path_arr[left_path_arr.length - 1].y + oDistance.B;
-        this.calculateAbsToRel(drawing.localTransform, drawing);
-        this.rect_flag = this.isRect();
+        return this.calculateAbsToRel(drawing, aPoints);
     },
 
     calculateRelToAbs: function(transform, drawing)
@@ -696,35 +669,32 @@ CWrapPolygon.prototype =
         this.rect_flag = this.isRect();
     },
 
-    calculateAbsToRel: function(transform, drawing)
+    calculateAbsToRel: function(drawing, aPoints)
     {
-        if(this.arrPoints.length === 0)
+        var relArr = [];
+        if(aPoints.length === 0)
         {
-            this.relativeArrPoints.length = 0;
-            return;
+            return relArr;
         }
+        var transform = drawing.localTransform;
         var invert_transform = global_MatrixTransformer.Invert(transform);
-
-        var relArr = this.relativeArrPoints;
-        var absArr = this.arrPoints;
-        relArr.length = 0;
-        for(var point_index = 0; point_index < absArr.length; ++point_index)
+        for(var point_index = 0; point_index < aPoints.length; ++point_index)
         {
-            var abs_point = absArr[point_index];
+            var abs_point = aPoints[point_index];
             var tr_x = invert_transform.TransformPointX(abs_point.x, abs_point.y)*(21600/drawing.extX)>>0;
             var tr_y = invert_transform.TransformPointY(abs_point.x, abs_point.y)*(21600/drawing.extY)>>0;
             relArr[point_index] = {x: tr_x, y:tr_y};
         }
 
         var min_x, max_x, min_y, max_y;
-        min_x = absArr[0].x;
+        min_x = aPoints[0].x;
         max_x = min_x;
-        min_y = absArr[0].y;
+        min_y = aPoints[0].y;
         max_y = min_y;
 
-        for(point_index = 0; point_index < absArr.length; ++point_index)
+        for(point_index = 0; point_index < aPoints.length; ++point_index)
         {
-            var absPoint = absArr[point_index];
+            var absPoint = aPoints[point_index];
             if(min_x > absPoint.x)
                 min_x = absPoint.x;
             if(max_x < absPoint.x)
@@ -735,30 +705,7 @@ CWrapPolygon.prototype =
             if(max_y < absPoint.y)
                 max_y = absPoint.y;
         }
-
-
-        var bounds = drawing.parent.getBounds(), oDistance = drawing.parent.Get_Distance();
-        if(bounds.l < min_x)
-            this.left = bounds.l - oDistance.L;
-        else
-            this.left  = min_x - oDistance.L;
-
-        if(bounds.r > max_x)
-            this.right = bounds.r + oDistance.R;
-        else
-            this.right = max_x + oDistance.R;
-
-        if(bounds.t < min_y)
-            this.top = bounds.t - oDistance.T;
-        else
-            this.top = min_y - oDistance.T;
-
-        if(bounds.b > max_y)
-            this.bottom = bounds.b + oDistance.B;
-        else
-            this.bottom = max_y + oDistance.B;
-
-        this.rect_flag = this.isRect();
+        return relArr;
     },
 
     updatePosition: function(x, y)

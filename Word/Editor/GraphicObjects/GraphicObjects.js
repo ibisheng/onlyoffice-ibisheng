@@ -414,7 +414,6 @@ CGraphicObjects.prototype =
     {
         if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
-
             History.Create_NewPoint();
             if(this.selection.groupSelection)
             {
@@ -434,6 +433,7 @@ CGraphicObjects.prototype =
                 }
             }
             this.document.Recalculate();
+            this.document.Document_UpdateUndoRedoState();
         }
     },
 
@@ -576,9 +576,10 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint();
                 this.applyZIndex(oCheckObject);
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
-        this.document.Recalculate();
     },
 
     sendToBack : function()
@@ -609,9 +610,10 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint();
                 this.applyZIndex(oCheckObject);
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
-        this.document.Recalculate();
     },
 
     bringBackward : function()
@@ -663,9 +665,10 @@ CGraphicObjects.prototype =
             {
                 History.Create_NewPoint();
                 this.applyZIndex(oCheckObject);
+                this.document.Recalculate();
+                this.document.Document_UpdateUndoRedoState();
             }
         }
-        this.document.Recalculate();
     },
 
     editChart: function(chart)

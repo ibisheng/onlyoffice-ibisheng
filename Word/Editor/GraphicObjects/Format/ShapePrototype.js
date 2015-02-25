@@ -351,22 +351,9 @@ CShape.prototype.recalculateText = function()
 
 CShape.prototype.recalculateWrapPolygon = function()
 {
-    if(this.parent)
+    if(this.parent && this.parent.wrappingPolygon)
     {
-        var wrapping_polygon = this.parent.wrappingPolygon;
-        if(!wrapping_polygon.edited)
-        {
-            if(this.spTree)
-            {
-                for(var i = 0; i < this.spTree.length; ++i)
-                    this.spTree[i].recalculate();
-            }
-            wrapping_polygon.calculate(this);
-        }
-        else
-        {
-            wrapping_polygon.calculateRelToAbs(this.localTransform, this);
-        }
+        this.parent.wrappingPolygon.calculateRelToAbs(this.localTransform, this);
     }
 };
 

@@ -4162,6 +4162,7 @@ ParaDrawing.prototype =
 
     Set_Props : function(Props)
     {
+        var bCheckWrapPolygon = false;
         if ( undefined != Props.WrappingStyle )
         {
             if ( drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings )
@@ -4187,8 +4188,18 @@ ParaDrawing.prototype =
                 switch ( Props.WrappingStyle )
                 {
                     case c_oAscWrapStyle2.Square      : this.Set_WrappingType(WRAPPING_TYPE_SQUARE);         break;
-                    case c_oAscWrapStyle2.Tight       : this.Set_WrappingType(WRAPPING_TYPE_TIGHT);          break;
-                    case c_oAscWrapStyle2.Through     : this.Set_WrappingType(WRAPPING_TYPE_THROUGH);        break;
+                    case c_oAscWrapStyle2.Tight       :
+                    {
+                        bCheckWrapPolygon = true;
+                        this.Set_WrappingType(WRAPPING_TYPE_TIGHT);
+                        break;
+                    }
+                    case c_oAscWrapStyle2.Through     :
+                    {
+                        this.Set_WrappingType(WRAPPING_TYPE_THROUGH);
+                        bCheckWrapPolygon = true;
+                        break;
+                    }
                     case c_oAscWrapStyle2.TopAndBottom: this.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM); break;
                     default                           : this.Set_WrappingType(WRAPPING_TYPE_SQUARE);         break;
                 }
@@ -4232,6 +4243,10 @@ ParaDrawing.prototype =
         {
             this.setExtent(newW, newH);
         }
+        if(bCheckWrapPolygon)
+        {
+            this.Check_WrapPolygon();
+        }
     },
 
     CheckWH: function()
@@ -4260,6 +4275,17 @@ ParaDrawing.prototype =
             dH = this.GraphicObj.spPr.xfrm.extY;
         }
         this.setExtent(dW, dH);
+        this.Check_WrapPolygon();
+    },
+
+    Check_WrapPolygon: function()
+    {
+        if((this.wrappingType === WRAPPING_TYPE_TIGHT || this.wrappingType === WRAPPING_TYPE_THROUGH) && this.wrappingPolygon && !this.wrappingPolygon.edited)
+        {
+            this.GraphicObj.recalculate();
+            this.wrappingPolygon.setArrRelPoints(this.wrappingPolygon.calculate(this.GraphicObj));
+        }
+
     },
 
     Draw : function( X, Y, pGraphics, pageIndex, align)
@@ -6302,17 +6328,6 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.addComment === "function")
             return this.GraphicObj.addComment(commentData);
-    },
-
-    recalculateWrapPolygon: function()
-    {
-        if(this.wrappingPolygon)
-        {
-            if(this.wrappingPolygon.edited)
-                this.wrappingPolygon.calculateRelToAbs(this.getTransformMatrix()) ;
-            else
-                this.wrappingPolygon.calculate();
-        }
     },
 
     selectionSetStart: function(x, y, event, pageIndex)
