@@ -3522,31 +3522,37 @@ CPresentation.prototype =
     alignLeft : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignLeft(editor.bAlignBySelected);
+        this.Document_UpdateInterfaceState();
     },
 
     alignRight : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignRight(editor.bAlignBySelected);
+        this.Document_UpdateInterfaceState();
     },
 
     alignTop : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignTop(editor.bAlignBySelected);
+        this.Document_UpdateInterfaceState();
     },
 
     alignBottom : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignBottom(editor.bAlignBySelected);
+        this.Document_UpdateInterfaceState();
     },
 
     alignCenter : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignCenter(editor.bAlignBySelected);
+        this.Document_UpdateInterfaceState();
     },
 
     alignMiddle : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.alignMiddle(editor.bAlignBySelected);
+        this.Document_UpdateInterfaceState();
     },
 
     distributeHor : function()
