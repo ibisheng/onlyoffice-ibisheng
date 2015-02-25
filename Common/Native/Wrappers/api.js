@@ -5051,12 +5051,18 @@ CStylesPainter.prototype =
 
     drawStyle: function(graphics, style, _api)
     {
-        _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](this.STYLE_THUMBNAIL_WIDTH, this.STYLE_THUMBNAIL_HEIGHT,
-                this.STYLE_THUMBNAIL_WIDTH * g_dKoef_pix_to_mm, this.STYLE_THUMBNAIL_HEIGHT * g_dKoef_pix_to_mm);
-
+        var _w_px = this.STYLE_THUMBNAIL_WIDTH;
+        var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
         var dKoefToMM = g_dKoef_pix_to_mm;
-        if (this.IsRetinaEnabled)
+
+        if (AscBrowser.isRetina)
+        {
+            _w_px *= 2;
+            _h_px *= 2;
             dKoefToMM /= 2;
+        }
+
+        _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 
         g_oTableId.m_bTurnOff = true;
         History.TurnOff();
@@ -5139,8 +5145,8 @@ CStylesPainter.prototype =
         _dc.Recalculate_Page(0, true);
 
         var y = 0;
-        var b = dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
-        var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
+        var b = dKoefToMM * _h_px;
+        var w = dKoefToMM * _w_px;
         var off = 10 * dKoefToMM;
         var off2 = 5 * dKoefToMM;
         var off3 = 1 * dKoefToMM;

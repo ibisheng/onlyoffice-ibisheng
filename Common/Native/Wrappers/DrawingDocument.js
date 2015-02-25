@@ -2067,7 +2067,16 @@ CDrawingDocument.prototype =
 
             _table_styles.Recalculate_Page(0);
 
-            this.Native["DD_StartNativeDraw"](TABLE_STYLE_WIDTH_PIX, TABLE_STYLE_HEIGHT_PIX, _pageW, _pageH);
+            var _w_px = TABLE_STYLE_WIDTH_PIX;
+            var _h_px = TABLE_STYLE_HEIGHT_PIX;
+
+            if (AscBrowser.isRetina)
+            {
+                _w_px *= 2;
+                _h_px *= 2;
+            }
+
+            this.Native["DD_StartNativeDraw"](_w_px, _h_px, _pageW, _pageH);
 
             var _old_mode = editor.isViewMode;
             editor.isViewMode = true;
