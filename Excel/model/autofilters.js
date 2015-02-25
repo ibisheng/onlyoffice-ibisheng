@@ -1502,14 +1502,8 @@ var gUndoInsDelCellsFlag = true;
 			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
 				var aWs = this._getCurrentWS();
 				var ws = this.worksheet;
-				var currentFilter;
-				var curCell;
-				var sortRange;
-				var oldFilter;
-				var activeCells;
-				var newEndId;
 				var t = this;
-				var sortCol;
+				var curFilter, oldFilter, newEndId, activeCells, curCell, sortRange;
 				
 				var onSortAutoFilterCallback = function(success)
 				{
@@ -1519,26 +1513,30 @@ var gUndoInsDelCellsFlag = true;
 							History.TurnOff();
 						History.Create_NewPoint();
 						History.StartTransaction();
+						
+						oldFilter = curFilter.clone(aWs);
+						
 						//изменяем содержимое фильтра
-						if(!currentFilter.SortState)
+						if(!curFilter.SortState)
 						{
-							currentFilter.SortState = new SortState();
-							currentFilter.SortState.Ref = currentFilter.Ref;
-							currentFilter.SortState.SortConditions = [];
-							currentFilter.SortState.SortConditions[0] = new SortCondition();
+							curFilter.SortState = new SortState();
+							curFilter.SortState.Ref = curFilter.Ref;
+							curFilter.SortState.SortConditions = [];
+							curFilter.SortState.SortConditions[0] = new SortCondition();
 						}
-						if(!currentFilter.SortState.SortConditions[0])
-							currentFilter.SortState.SortConditions[0] = new SortCondition();
+						if(!curFilter.SortState.SortConditions[0])
+							curFilter.SortState.SortConditions[0] = new SortCondition();
 							
-						currentFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
-						currentFilter.SortState.SortConditions[0].ConditionDescending = type;
+						curFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
+						curFilter.SortState.SortConditions[0].ConditionDescending = type;
+
 						//сама сортировка
 						ws.cellCommentator.sortComments(sortRange.sort(type, curCell.c1));
-						
-						if(currentFilter.TableStyleInfo)
-							t._setColorStyleTable(currentFilter.Ref, currentFilter);
+
+						if(curFilter.TableStyleInfo)
+							t._setColorStyleTable(curFilter.Ref, curFilter);
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
-							{activeCells: activeCells, type: type, cellId: cellId}, null, currentFilter.Ref);
+							{activeCells: activeCells, type: type, cellId: cellId}, null, curFilter.Ref);
 						History.EndTransaction();
 						
 						if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
@@ -1547,125 +1545,64 @@ var gUndoInsDelCellsFlag = true;
 						if(isTurnOffHistory)
 							History.TurnOn();
 					}
-				};
-				var standartSort = function(success) {
-					if (success) {
-						if (isTurnOffHistory)
-							History.TurnOff();
-						History.Create_NewPoint();
-						History.StartTransaction();
-						ws.cellCommentator.sortComments(sortRange.sort(type, sortCol));
-
-						if (currentFilter.TableStyleInfo)
-							t._setColorStyleTable(currentFilter.Ref, currentFilter);
-						History.EndTransaction();
-
-						if (!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
-							ws._onUpdateFormatTable(sortRange.bbox, false);
-
-						if (isTurnOffHistory)
-							History.TurnOn();
-					}
-				};
-
-				if(type == 'ascending' || type == 'descending')
-				{
-					var activeRange = ar;
-					if(cellId)
-						activeRange = t._idToRange(cellId);
-					var filter = t._searchFilters(activeRange, null);
-					type = (type === 'ascending');
-
-					if(filter && filter == "error")//если захвачена часть фильтра
-					{
-						return;
-					}
-					else if(filter)
-					{
-						var allAutoFilters = aWs.TableParts;
-						if(filter.all)
-							allAutoFilters = [aWs.AutoFilter];
-						var num = filter.num;
-						if(aWs.AutoFilter && !filter.all)
-							num = filter.num - 1;
-						
-						var curFilter = allAutoFilters[num];
-						var splitRef = curFilter.Ref; 
-						
-						if(activeRange.r1 == activeRange.r2 && activeRange.c1 == activeRange.c2)//внутри фильтра одна выделенная ячейка
-						{
-							for(var i = 0; i < curFilter.result.length; i++)
-							{
-								var rangeCol = t._idToRange(curFilter.result[i].id);
-								if(rangeCol.c1 == activeRange.c1)
-								{
-									cellId = curFilter.result[i].id;
-									break;
-								}
-							}
-						}
-						else if(splitRef.r1 == activeRange.r1 && splitRef.c1 == activeRange.c1 && splitRef.r2 == activeRange.r2 && splitRef.c2 == activeRange.c2)//выделен весь фильтр(сортируем по 1 столбцу)
-						{
-							cellId = Asc.Range(splitRef.c1, splitRef.r1, splitRef.c1, splitRef.r1);
-						}
-						else if(splitRef.r1 == activeRange.r1 && splitRef.containsRange(activeRange) && !curFilter.TableStyleInfo)
-						{
-							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
-						}
-						else if(splitRef.containsRange(activeRange) && curFilter.TableStyleInfo)//TODO разделить обработки для а/ф и форматированной таблицы
-						{
-							cellId = Asc.Range(activeRange.startCol, splitRef.r1, activeRange.startCol, splitRef.r1);
-						}
-						else if(splitRef.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
-						{
-							sortCol = activeRange.c1;
-							sortRange = ws.model.getRange3(activeRange.r1 + 1, activeRange.c1, activeRange.r2, activeRange.c2);
-							currentFilter = curFilter;
-							if(isTurnOffHistory)
-								standartSort(true);
-							else
-								ws._isLockedCells(t._getAscRange(sortRange.bbox), /*subType*/null, standartSort);
-							return;
-						}
-						else
-						{
-							ws.setSelectionInfo("sort", type);
-							return;
-						}
-						
-					}
 					else
-					{
-						ws.setSelectionInfo("sort", type);
-						return;
-					}
+						return false;
 				}
 				
+				var activeRange = ar;
+				if(cellId)
+					activeRange = t._idToRange(cellId);
+				
+				if(type == 'ascending')
+					type = true;
+				else
+					type = false;
+					
+				var filter = t._searchFilters(activeRange, null);
+				if(filter && filter == "error")//если захвачена часть фильтра
+					return;
+				
+				if(!filter)//если нет а/ф и ф/т в выделенном диапазоне
+				{
+					ws.setSelectionInfo("sort", type);
+					return;
+				}
+				
+				//получаем данный фильтр или ф/т
+				var allAutoFilters = aWs.TableParts;
+				if(filter.all)
+					allAutoFilters = [aWs.AutoFilter];
+				var num = filter.num;
+				if(aWs.AutoFilter && !filter.all)
+					num = filter.num - 1;
+				var curFilter = allAutoFilters[num];
+				var filterRef = curFilter.Ref;
+				
+				if(!cellId && filterRef.r1 == activeRange.r1 && filterRef.c1 == activeRange.c1 && filterRef.r2 == activeRange.r2 && filterRef.c2 == activeRange.c2)//если выделен весь фильтр
+				{
+					cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
+				}
+				else if(!cellId && filterRef.containsRange(activeRange) && curFilter.TableStyleInfo)//если находимся внутри ф/т
+				{
+					cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
+				}
+				else if(!cellId)//стандартная сортировка
+				{
+					ws.setSelectionInfo("sort", type);
+					return;
+				}
+				
+				//TODO преобразование range - строка. позже избваиться от преобразования, ref при открытии преобразовать в range
 				if(typeof cellId !== "string")
 					cellId = t._rangeToId(cellId);
-					
-				activeCells = t._idToRange(cellId);
-					
-				var indexFilter = t._findArrayFromAllFilter3(activeCells, cellId);
-				var filtersOp = indexFilter.split(':');
-				if(filtersOp[0] == 'all')
-				{
-					currentFilter = aWs.AutoFilter;
-				}
-				else
-				{
-					currentFilter = aWs.TableParts[filtersOp[0]];
-				}
 				
-				oldFilter = currentFilter.clone(aWs);
-				var rangeCell = currentFilter.Ref;
+				activeCells = t._idToRange(cellId);
 				
 				curCell = t._idToRange(cellId);
-				curCell.r1 = rangeCell.r1;
+				curCell.r1 = filterRef.r1;
 				newEndId = t._rangeToId(curCell);
-				
-				sortRange = ws.model.getRange3(rangeCell.r1 + 1, rangeCell.c1, rangeCell.r2, rangeCell.c2);
 
+				sortRange = ws.model.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
 				else
