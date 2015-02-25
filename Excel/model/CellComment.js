@@ -776,6 +776,8 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 };
 
 CCellCommentator.prototype.sortComments = function(sortData) {
+	if (null === sortData)
+		return;
 	var comment, isChangeComment = false, places = sortData.places, i = 0, l = places.length, j, row, line;
 	var range = sortData.bbox, oComments = this.getRangeComments(new Asc.Range(range.c1, range.r1, range.c2, range.r2));
 	if (null === oComments)
