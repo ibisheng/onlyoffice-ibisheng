@@ -222,7 +222,6 @@ CHistory.prototype =
         };
 
         this.Points[this.Index].Items.push( Item );
-        var bZIndexManager = !(typeof ZIndexManager === "undefined");
         var bPresentation = !(typeof CPresentation === "undefined");
         var bSlide = !(typeof Slide === "undefined");
         if ( ( Class instanceof CDocument        && ( historyitem_Document_AddItem        === Data.Type || historyitem_Document_RemoveItem        === Data.Type ) ) ||
@@ -232,7 +231,6 @@ CHistory.prototype =
             ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaHyperlink    && ( historyitem_Hyperlink_AddItem       === Data.Type || historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaRun          && ( historyitem_ParaRun_AddItem         === Data.Type || historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
-            ( bZIndexManager && Class instanceof ZIndexManager    && (historyitem_ZIndexManagerRemoveItem  === Data.Type || historyitem_ZIndexManagerAddItem       === Data.Type )) ||
             ( bPresentation && Class instanceof CPresentation && (historyitem_Presentation_AddSlide === Data.Type || historyitem_Presentation_RemoveSlide === Data.Type)) ||
             ( bSlide && Class instanceof Slide && (historyitem_SlideAddToSpTree === Data.Type || historyitem_SlideRemoveFromSpTree === Data.Type))
             )
@@ -244,7 +242,6 @@ CHistory.prototype =
                 ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaHyperlink    && historyitem_Hyperlink_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaRun          && historyitem_ParaRun_AddItem         === Data.Type ) ||
-                (bZIndexManager && Class instanceof ZIndexManager    && historyitem_ZIndexManagerAddItem === Data.Type ) ||
                 ( bPresentation && Class instanceof CPresentation && (historyitem_Presentation_AddSlide === Data.Type )) ||
                 ( bSlide && Class instanceof Slide && (historyitem_SlideAddToSpTree === Data.Type))
                 ) ? true : false;

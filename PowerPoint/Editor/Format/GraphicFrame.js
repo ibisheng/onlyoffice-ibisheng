@@ -707,7 +707,7 @@ CGraphicFrame.prototype =
                 Doc.Selection_Draw_Page(this.parent.num);
                 drawingDocument.SelectShow();
             }
-            else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
+            else
             {
                 drawingDocument.SelectEnabled(false);
                 Doc.RecalculateCurPos();

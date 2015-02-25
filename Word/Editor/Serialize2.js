@@ -8057,9 +8057,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			// oParaDrawing.LayoutInCell = this.stream.GetBool();
 		// }
 		else if( c_oSerImageType2.Locked === type )
-			var Locked = this.stream.GetBool();
+            oParaDrawing.Set_Locked(this.stream.GetBool());
 		else if( c_oSerImageType2.RelativeHeight === type )
-			oParaDrawing.setZIndex2(this.stream.GetULongLE());
+			oParaDrawing.Set_RelativeHeight(this.stream.GetULongLE());
 		else if( c_oSerImageType2.BSimplePos === type )
 			oParaDrawing.SimplePos.Use = this.stream.GetBool();
 		else if( c_oSerImageType2.EffectExtent === type )

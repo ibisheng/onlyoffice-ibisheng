@@ -313,8 +313,9 @@ CWrapPolygon.prototype =
 
                 if(max_x !== null && min_x !== null)
                 {
-                    max_x+= this.wordGraphicObject.Distance.R;
-                    min_x-= this.wordGraphicObject.Distance.L;
+                    var oDistance = this.wordGraphicObject.Get_Distance();
+                    max_x+= oDistance.R;
+                    min_x-= oDistance.L;
                     switch(this.wrapSide)
                     {
                         case WRAP_TEXT_SIDE_BOTH_SIDES:
@@ -605,26 +606,26 @@ CWrapPolygon.prototype =
 
 
 
-        var bounds = drawing.parent.getBounds();
+        var bounds = drawing.parent.getBounds(), oDistance = drawing.parent.Get_Distance();
         if(bounds.l < x_min)
-            this.localLeft = bounds.l - drawing.parent.Distance.L;
+            this.localLeft = bounds.l - oDistance.L;
         else
-            this.localLeft  = x_min - drawing.parent.Distance.L;
+            this.localLeft  = x_min - oDistance.L;
 
         if(bounds.r > x_max)
-            this.localRight = bounds.r + drawing.parent.Distance.R;
+            this.localRight = bounds.r + oDistance.R;
         else
-            this.localRight = x_max + drawing.parent.Distance.R;
+            this.localRight = x_max + oDistance.R;
 
         if(!isRealObject(left_path_arr[0]) || !(typeof left_path_arr[0].y === "number"))
-            this.localTop = bounds.t - drawing.parent.Distance.T;
+            this.localTop = bounds.t - oDistance.T;
         else
-            this.localTop = left_path_arr[0].y - drawing.parent.Distance.T;
+            this.localTop = left_path_arr[0].y - oDistance.T;
 
         if(!isRealObject(left_path_arr[left_path_arr.length - 1]) || !(typeof left_path_arr[left_path_arr.length - 1].y === "number"))
-            this.localBottom = bounds.b + drawing.parent.Distance.B;
+            this.localBottom = bounds.b + oDistance.B;
         else
-            this.localBottom = left_path_arr[left_path_arr.length - 1].y + drawing.parent.Distance.B;
+            this.localBottom = left_path_arr[left_path_arr.length - 1].y + oDistance.B;
         this.calculateAbsToRel(drawing.localTransform, drawing);
         this.rect_flag = this.isRect();
     },
@@ -667,31 +668,31 @@ CWrapPolygon.prototype =
                 max_y = absPoint.y;
         }
 
-        var bounds = {};
+        var bounds = {}, oDistance = drawing.parent.Get_Distance();
 
         bounds.l = drawing.bounds.l;
         bounds.t = drawing.bounds.t;
         bounds.r = drawing.bounds.r;
         bounds.b = drawing.bounds.b;
         if(bounds.l < min_x)
-            this.localLeft = bounds.l - drawing.parent.Distance.L;
+            this.localLeft = bounds.l - oDistance.L;
         else
-            this.localLeft  = min_x - drawing.parent.Distance.L;
+            this.localLeft  = min_x - oDistance.L;
 
         if(bounds.r > max_x)
-            this.localRight = bounds.r + drawing.parent.Distance.R;
+            this.localRight = bounds.r + oDistance.R;
         else
-            this.localRight = max_x + drawing.parent.Distance.R;
+            this.localRight = max_x + oDistance.R;
 
         if(bounds.t < min_y)
-            this.localTop = bounds.t - drawing.parent.Distance.T;
+            this.localTop = bounds.t - oDistance.T;
         else
-            this.localTop = min_y - drawing.parent.Distance.T;
+            this.localTop = min_y - oDistance.T;
 
         if(bounds.b > max_y)
-            this.localBottom = bounds.b + drawing.parent.Distance.B;
+            this.localBottom = bounds.b + oDistance.B;
         else
-            this.localBottom = max_y + drawing.parent.Distance.B;
+            this.localBottom = max_y + oDistance.B;
         this.rect_flag = this.isRect();
     },
 
@@ -736,26 +737,26 @@ CWrapPolygon.prototype =
         }
 
 
-        var bounds = drawing.parent.getBounds();
+        var bounds = drawing.parent.getBounds(), oDistance = drawing.parent.Get_Distance();
         if(bounds.l < min_x)
-            this.left = bounds.l - drawing.parent.Distance.L;
+            this.left = bounds.l - oDistance.L;
         else
-            this.left  = min_x - drawing.parent.Distance.L;
+            this.left  = min_x - oDistance.L;
 
         if(bounds.r > max_x)
-            this.right = bounds.r + drawing.parent.Distance.R;
+            this.right = bounds.r + oDistance.R;
         else
-            this.right = max_x + drawing.parent.Distance.R;
+            this.right = max_x + oDistance.R;
 
         if(bounds.t < min_y)
-            this.top = bounds.t - drawing.parent.Distance.T;
+            this.top = bounds.t - oDistance.T;
         else
-            this.top = min_y - drawing.parent.Distance.T;
+            this.top = min_y - oDistance.T;
 
         if(bounds.b > max_y)
-            this.bottom = bounds.b + drawing.parent.Distance.B;
+            this.bottom = bounds.b + oDistance.B;
         else
-            this.bottom = max_y + drawing.parent.Distance.B;
+            this.bottom = max_y + oDistance.B;
 
         this.rect_flag = this.isRect();
     },
@@ -899,7 +900,8 @@ CWrapPolygon.prototype =
         if(this.wordGraphicObject && this.wordGraphicObject.GraphicObj && this.wordGraphicObject.GraphicObj.recalcWrapPolygon)
         {
             this.wordGraphicObject.GraphicObj.recalcWrapPolygon();
-            this.wordGraphicObject.GraphicObj.addToRecalculate()
+            this.wordGraphicObject.GraphicObj.addToRecalculate();
+            this.wordGraphicObject.Refresh_RecalcData();
         }
     },
 

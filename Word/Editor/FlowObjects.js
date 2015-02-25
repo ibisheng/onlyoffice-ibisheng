@@ -111,8 +111,8 @@ CFlowTable.prototype =
             y0 = Y0Sp;
             y1 = Y1Sp;
         }
-        var top = this.Y - this.Distance.T;
-        var bottom = this.Y + this.H + this.Distance.B;
+        var top = this.Y - getValOrDefault(this.Distance.T, 0);
+        var bottom = this.Y + this.H + getValOrDefault(this.Distance.B, 0);
         if(y1 < top || y0 > bottom)
             return ret;
 
@@ -127,8 +127,8 @@ CFlowTable.prototype =
             case WRAPPING_TYPE_THROUGH:
             case WRAPPING_TYPE_TIGHT:
             {
-                X0 = this.X - this.Distance.L;
-                X1 = this.X + this.W + this.Distance.R;
+                X0 = this.X - getValOrDefault(this.Distance.L, DISTANCE_TO_TEXT_LEFTRIGHT);
+                X1 = this.X + this.W + getValOrDefault(this.Distance.R, DISTANCE_TO_TEXT_LEFTRIGHT);
                 Y1 = bottom;
                 b_check = true;
                 break;

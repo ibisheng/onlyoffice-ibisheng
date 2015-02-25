@@ -619,9 +619,6 @@ var historyitem_ValAxSetTickLblPos        = 2601;
 var historyitem_ValAxSetTitle             = 2602;
 var historyitem_ValAxSetTxPr              = 2603;
 
-var historyitem_ZIndexManagerRemoveItem   = 2604;
-var historyitem_ZIndexManagerAddItem      = 2605;
-
 var historyitem_WrapPolygonSetEdited     = 2607;
 var historyitem_WrapPolygonSetRelPoints  = 2608;
 var historyitem_WrapPolygonSetWrapSide  = 2608;
@@ -986,11 +983,13 @@ var historyitem_Drawing_Distance          = 5; // Изменяем рассто�
 var historyitem_Drawing_AllowOverlap      = 6; // Изменяем возможность перекрытия плавающих картинок
 var historyitem_Drawing_PositionH         = 7; // Изменяем привязку по горизонтали
 var historyitem_Drawing_PositionV         = 8; // Изменяем привязку по вертикали
-var historyitem_Drawing_BehindDoc         = 10; // Изменяем положение объекта (за/перед текстом)
+var historyitem_Drawing_BehindDoc         = 10;// Изменяем положение объекта (за/перед текстом)
 var historyitem_Drawing_SetGraphicObject  = 11;
 var historyitem_SetSimplePos              = 12;
 var historyitem_SetExtent                 = 13;
 var historyitem_SetWrapPolygon            = 14;
+var historyitem_Drawing_SetLocked         = 15;// Устанавливаем привязку к конкретному параграфу
+var historyitem_Drawing_SetRelativeHeight = 15;// Устанавливаем Z-Index
 
 
 

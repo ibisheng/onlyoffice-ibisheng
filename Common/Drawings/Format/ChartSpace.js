@@ -7465,8 +7465,6 @@ CChartSpace.prototype =
 
     draw: function(graphics)
     {
-        /*this.setRecalculateInfo();
-         this.recalculate();*/
         if(graphics.IsSlideBoundsCheckerType)
         {
             graphics.transform3(this.transform);
@@ -7503,15 +7501,10 @@ CChartSpace.prototype =
         }
         graphics.AddClipRect(-ln_width, -ln_width, this.extX+2*ln_width, this.extY+2*ln_width);
 
-
         if(this.chartObj)
         {
             this.chartObj.draw(this, graphics);
         }
-       // graphics.reset();
-
-
-
         if(this.chart)
         {
             if(this.chart.plotArea)
@@ -7545,7 +7538,6 @@ CChartSpace.prototype =
                     if(this.chart.plotArea.valAx.labels)
                         this.chart.plotArea.valAx.labels.draw(graphics);
                 }
-
             }
             if(this.chart.title)
             {
@@ -7556,17 +7548,26 @@ CChartSpace.prototype =
                 this.chart.legend.draw(graphics);
             }
         }
-
 		graphics.RestoreGrState();
-		
-		if (this.Lock && locktype_None != this.Lock.Get_Type() && !this.group)
+        if(!this.group)
         {
-			graphics.SaveGrState();
-            graphics.transform3(this.transform);
-            graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
-			graphics.RestoreGrState();
-        }        
-       // graphics.reset();
+            var oLock;
+            if(this.parent && this.parent.Lock)
+            {
+                oLock = this.parent.Lock;
+            }
+            else if(this.Lock)
+            {
+                oLock = this.Lock;
+            }
+            if(oLock && locktype_None != oLock.Get_Type())
+            {
+                graphics.SaveGrState();
+                graphics.transform3(this.transform);
+                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+                graphics.RestoreGrState();
+            }
+        }
     },
 
     addToSetPosition: function(dLbl)

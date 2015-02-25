@@ -5302,12 +5302,12 @@ CImgProperty заменяет пережнюю структуру:
 asc_docs_api.prototype.ImgApply = function(obj)
 {
 
-    var ImagePr = obj;
+    if(!isRealObject(obj))
+        return;
+    var ImagePr = obj, AdditionalData, LogicDocument = this.WordControl.m_oLogicDocument;
 
-    // Если у нас меняется с Float->Inline мы также должны залочить соответствующий параграф
-    var AdditionalData = null;
-    var LogicDocument = this.WordControl.m_oLogicDocument;
-    if(obj && obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock)
+    /*проверка корректности данных для биржевой диаграммы*/
+    if(obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock)
     {
         var selectedObjectsByType = LogicDocument.DrawingObjects.getSelectedObjectsByTypes();
         if(selectedObjectsByType.charts[0])
@@ -5317,30 +5317,73 @@ asc_docs_api.prototype.ImgApply = function(obj)
             {
                 if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
                 {
-                    this.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError,c_oAscError.Level.NoCritical);
+                    this.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
                     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                     return;
                 }
             }
         }
     }
-    /*
-    if ( docpostype_FlowObjects == LogicDocument.CurPos.Type && "undefined" != typeof( ImagePr.WrappingStyle ) && null != ImagePr.WrappingStyle && c_oAscWrapStyle.Flow != ImagePr.WrappingStyle )
+
+    /*изменение z-индекса*/
+    if(isRealNumber(ImagePr.ChangeLevel))
     {
-        var FlowObject = LogicDocument.Pages[LogicDocument.Selection.Data.PageNum].FlowObjects.Get_ByIndex( LogicDocument.CurPos.ContentPos );
-        AdditionalData =
+        switch(ImagePr.ChangeLevel)
         {
-            Type    : 1,
-            X       : FlowObject.X,
-            Y       : FlowObject.Y,
-            PageNum : LogicDocument.Selection.Data.PageNum
+            case 0:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringToFront();
+                break;
+            }
+            case 1:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringForward();
+                break;
+            }
+            case 2:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.sendToBack();
+                break;
+            }
+            case 3:
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.bringBackward();
+            }
         }
+        return;
     }
-    */
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties, AdditionalData) )
+    /*параграфы в которых лежат выделенные ParaDrawing*/
+    var aParagraphs = [], aSelectedObjects = this.WordControl.m_oLogicDocument.DrawingObjects.selectedObjects, i, j, oParentParagraph;
+    for(i = 0; i < aSelectedObjects.length; ++i)
     {
+        oParentParagraph = aSelectedObjects[i].parent.Get_ParentParagraph();
+        checkObjectInArray(aParagraphs, oParentParagraph);
+    }
 
+
+    AdditionalData = {Type : changestype_2_ElementsArray_and_Type , Elements : aParagraphs, CheckType : changestype_Paragraph_Content};
+    /*группировка и разгруппировка*/
+    if(ImagePr.Group === 1 || ImagePr.Group === -1)
+    {
+        if(false == this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props, AdditionalData))
+        {
+            History.Create_NewPoint();
+            if(ImagePr.Group === 1)
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.groupSelectedObjects();
+            }
+            else
+            {
+                this.WordControl.m_oLogicDocument.DrawingObjects.unGroupSelectedObjects();
+            }
+        }
+        return;
+    }
+
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties) )
+    {
         if (ImagePr.ShapeProperties)
             ImagePr.ImageUrl = "";
 
@@ -5386,8 +5429,6 @@ asc_docs_api.prototype.ImgApply = function(obj)
         else
         {
             ImagePr.ImageUrl = null;
-
-
             if(!this.noCreatePoint || this.exucuteHistory)
             {
                 if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
@@ -7936,7 +7977,6 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
     this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
 	CollaborativeEditing.Apply_OtherChanges();
-    this.WordControl.m_oLogicDocument.DrawingObjects.zIndexManager.recalculate();
 };
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
@@ -8001,7 +8041,6 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
 
         CollaborativeEditing.OnEnd_ReadForeignChanges();
 
-        this.WordControl.m_oLogicDocument.DrawingObjects.zIndexManager.recalculate();
     }
 
     g_oIdCounter.Set_Load( false );

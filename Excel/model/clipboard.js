@@ -4784,7 +4784,7 @@
 						if(sSrc.length > 0)
 						{
 							sSrc = this.getSrc(sSrc);
-							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
+							sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.GraphicObj.bounds.w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.GraphicObj.bounds.h * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
 							break;
 						}
 						// var _canvas     = document.createElement('canvas');
@@ -4801,36 +4801,6 @@
 						// var _data = _ctx.getImageData(0, 0, w, h);
 						// _ctx = null;
 						// delete _canvas;
-						break;
-					case para_FlowObjectAnchor:
-						var oFlowObj = ParaItem.FlowObject;
-						if(flowobject_Image == oFlowObj.Get_Type())
-						{
-							var sSrc = oFlowObj.Img;
-							if(sSrc.length > 0)
-							{
-								sSrc = this.getSrc(sSrc);
-								var sStyle = "";
-								var nLeft = oFlowObj.X;
-								var nRight = nLeft + oFlowObj.W;
-								if(Math.abs(nLeft - X_Left_Margin) < Math.abs(Page_Width - nRight - X_Right_Margin))
-									sStyle = "float:left;";
-								else
-									sStyle = "float:right;";
-								if(!this.api.DocumentReaderMode)
-								{
-									if(null != oFlowObj.Paddings)
-										sStyle += "margin:" + (oFlowObj.Paddings.Top * g_dKoef_mm_to_pt) + "pt " + (oFlowObj.Paddings.Right * g_dKoef_mm_to_pt) + "pt " +  + (oFlowObj.Paddings.Bottom * g_dKoef_mm_to_pt) + "pt " + + (oFlowObj.Paddings.Left * g_dKoef_mm_to_pt) + "pt;";
-								}
-								else
-									sStyle += "margin:0pt 10pt 0pt 10pt;";
-
-								if (this.api.DocumentReaderMode)
-									sStyle += "max-width:100%;";
-
-								sRes += "<img style=\""+sStyle+"\" width=\""+Math.round(oFlowObj.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oFlowObj.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />"; break;
-							}
-						}
 						break;
 				}
 				return sRes;
@@ -5136,38 +5106,6 @@
 							if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
 								oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
 						}
-						if ( oDocument.CurPos.Type == docpostype_FlowObjects )
-						{
-							var oData = oDocument.Selection.Data.FlowObject;
-							switch ( oData.Get_Type() )
-							{
-								case flowobject_Image:
-								{
-									this.Para = document.createElement("p");
-									var sInnerHtml = this.ParseItem(oData);
-									var oImg = oData;
-									var sSrc = oImg.Img;
-									if(sSrc.length > 0)
-									{
-										sSrc = this.getSrc(sSrc);
-
-										if (this.api.DocumentReaderMode)
-											sInnerHtml += "<img style=\"max-width:100%;\" width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
-										else
-											sInnerHtml += "<img width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
-									}
-									this.Para.innerHTML = sInnerHtml;
-									this.ElemToSelect.appendChild( this.Para );
-									return;
-								}
-								case flowobject_Table:
-								{
-									if(null != oData.Table && null != oData.Table.CurCell && null != oData.Table.CurCell.Content)
-										oDocument = oData.Table.CurCell.Content;
-									break;
-								}
-							}
-						}
 
 						if(oDocument.CurPos.Type === docpostype_DrawingObjects)
 						{
@@ -5283,7 +5221,7 @@
 									var base64_img = cur_element.getBase64Img();
 									var src = this.getSrc(base64_img);
 
-									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
+									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.GraphicObj.bounds.w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.GraphicObj.bounds.h * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
 
 									this.ElemToSelect.appendChild( this.Para );
 

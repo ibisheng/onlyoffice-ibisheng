@@ -2922,11 +2922,22 @@ CShape.prototype =
             graphics.RestoreGrState();
         }
 
-
-        if (this.Lock && locktype_None != this.Lock.Get_Type() && !this.group)
+        if(!this.group)
         {
-            graphics.transform3(_transform);
-            graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
+            var oLock;
+            if(this.parent && this.parent.Lock)
+            {
+                oLock = this.parent.Lock;
+            }
+            else if(this.Lock)
+            {
+                oLock = this.Lock;
+            }
+            if(oLock && locktype_None != oLock.Get_Type())
+            {
+                graphics.transform3(_transform);
+                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            }
         }
         graphics.SetIntegerGrid(true);
         graphics.reset();

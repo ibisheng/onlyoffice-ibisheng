@@ -138,6 +138,24 @@ CParagraphContentWithContentBase.prototype.protected_UpdateSpellChecking = funct
     if(undefined !== this.Paragraph && null !== this.Paragraph)
         this.Paragraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
 };
+CParagraphContentWithContentBase.prototype.Is_UseInDocument = function(Id)
+{
+    if(this.Paragraph)
+    {
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            if(this.Content[i].Get_Id() === Id)
+            {
+                break;
+            }
+        }
+        if(i < this.Content.length)
+        {
+            return this.Paragraph.Is_UseInDocument(this.Get_Id());
+        }
+    }
+    return false;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CParagraphContentWithContentBase
@@ -230,6 +248,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_AllDrawingObjects = func
             Item.Get_AllDrawingObjects(DrawingObjs);
     }
 };
+
 CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph = function(Paragraph)
 {
     this.Paragraph = Paragraph;

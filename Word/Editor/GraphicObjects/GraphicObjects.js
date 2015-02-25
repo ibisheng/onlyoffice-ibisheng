@@ -16,8 +16,6 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
 
     this.arrPreTrackObjects = [];
     this.arrTrackObjects = [];
-    this.majorGraphicObject = null;
-    this.zIndexManager = new ZIndexManager(this);
 
 
     this.curState = new NullState(this);
@@ -27,15 +25,12 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
         selectionArray: []
     };
 
-    this.currentPresetGeom = null;//выставляется при выборе автофигуры в меню (строка)
-
     this.maximalGraphicObjectZIndex = 1024;
 
     this.spline = null;
     this.polyline = null;
 
     this.drawingObjects = [];
-    this.objectsMap = {};
 
 
     this.urlMap = [];
@@ -53,7 +48,6 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     };
 
     this.selectedObjects = [];
-
 
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 
@@ -223,9 +217,6 @@ CGraphicObjects.prototype =
                     this.drawingObjects[i].GraphicObj.recalculateText();
                 }
             }
-            this.zIndexManager.startRefreshIndex = 0;
-            this.zIndexManager.recalculate();
-            //TODO
         }
         else
         {
@@ -266,16 +257,6 @@ CGraphicObjects.prototype =
         this.recalculateMap = {};
     },
 
-
-    addToZIndexManagerAfterOpen: function()
-    {
-        this.drawingObjects.sort(ComparisonByZIndexSimple);
-        this.zIndexManager.bTurnOff = false;
-        for(var i = 0; i < this.drawingObjects.length; ++i)
-        {
-            this.zIndexManager.addItem(null, this.drawingObjects[i]);
-        }
-    },
 
     selectObject: DrawingObjectsController.prototype.selectObject,
 
@@ -332,7 +313,6 @@ CGraphicObjects.prototype =
             {
                 shape_props = new CImgProperty(para_drawing_props);
                 shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
-                //shape_props.fromGroup = (this.selection.groupSelection ? true : false);
                 shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
                 shape_props.Width = props_by_types.shapeProps.w;
                 shape_props.Height = props_by_types.shapeProps.h;
@@ -341,7 +321,6 @@ CGraphicObjects.prototype =
             {
                 image_props = new CImgProperty(para_drawing_props);
                 image_props.ImageUrl = props_by_types.imageProps.imageUrl;
-                //image_props.fromGroup = (this.selection.groupSelection ? true : false);
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
             }
@@ -388,137 +367,171 @@ CGraphicObjects.prototype =
         return ret;
     },
 
-    setProps: function(props)
+    setProps: function(oProps)
     {
-        var apply_props;
-        if(props.Group === 1)
+        var oApplyProps, i;
+
+        for(i = 0; i < this.selectedObjects.length; ++i)
         {
-            this.groupSelectedObjects();
+            this.selectedObjects[i].parent.Set_Props(oProps);
         }
-        else if(props.Group === -1)
+        if(isRealNumber(oProps.Width) && isRealNumber(oProps.Height))
         {
-            this.unGroupSelectedObjects();
-        }
-        else if(isRealNumber(props.ChangeLevel))
-        {
-            switch(props.ChangeLevel)
-            {
-                case 0:
-                {
-                    this.bringToFront();
-                    break;
-                }
-                case 1:
-                {
-                    this.bringForward();
-                    break;
-                }
-                case 2:
-                {
-                    this.sendToBack();
-                    break;
-                }
-                case 3:
-                {
-                    this.bringBackward();
-                }
-            }
+            oApplyProps = oProps;
         }
         else
         {
-            var i;
-            for(i = 0; i < this.selectedObjects.length; ++i)
+            oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
+        }
+        this.applyDrawingProps(oApplyProps);
+        if(isRealNumber(oApplyProps.Width) && isRealNumber(oApplyProps.Height))
+        {
+            /*в случае если в насторойках ParaDrawing стоит UseAlign - пересчитываем drawing, т. к. ширина и высото ParaDrawing рассчитывается по bounds*/
+            var aSelectedObjects = this.selectedObjects;
+            for(i = 0; i < aSelectedObjects.length; ++i)
             {
-                this.selectedObjects[i].parent.Set_Props(props);
-            }
-            if(isRealNumber(props.Width) && isRealNumber(props.Height))
-            {
-                apply_props = props;
-            }
-            else
-            {
-                apply_props = props.ShapeProperties ? props.ShapeProperties : props;
-            }
-            var objects_by_types = this.applyDrawingProps(apply_props);
-            if(isRealNumber(apply_props.Width) && isRealNumber(apply_props.Height) || apply_props.ChartProperties /*|| (objects_by_types.charts.length > 0)*/)
-            {
-                for(i = 0; i < objects_by_types.shapes.length; ++i)
-                {
-                    objects_by_types.shapes[i].recalculate();
-                    objects_by_types.shapes[i].recalculateText();
-                }
-                for(i = 0; i < objects_by_types.images.length; ++i)
-                {
-                    objects_by_types.images[i].recalculate();
-                }
-
-                for(i = 0; i < objects_by_types.charts.length; ++i)
-                {
-                    objects_by_types.charts[i].recalculate();
-                }
-                for(i = 0; i < objects_by_types.groups.length; ++i)
-                {
-                    objects_by_types.groups[i].recalculate();
-                }
-                if(!(this.selectedObjects.length === 1 && this.selectedObjects[0].parent.Is_Inline()))
-                {
-                    var a_objects = [], nearest_pos;
-                    for(i = 0; i < this.selectedObjects.length; ++i)
-                    {
-                        nearest_pos = this.document.Get_NearestPos(this.selectedObjects[i].parent.PageNum, this.selectedObjects[i].posX, this.selectedObjects[i].posY, true, this.selectedObjects[i].parent);
-                        a_objects.push(
-                            {
-                                nearestPos: nearest_pos,
-                                pageNum: this.selectedObjects[i].parent.PageNum,
-                                drawing: this.selectedObjects[i].parent,
-                                par: this.selectedObjects[i].parent.Get_ParentParagraph()
-                            });
-                    }
-                    for(i = 0; i < this.selectedObjects.length; ++i)
-                    {
-                        a_objects[i].nearestPos.Paragraph.Check_NearestPos(a_objects[i].nearestPos);
-                        this.selectedObjects[i].parent.Remove_FromDocument(false);
-                        this.selectedObjects[i].parent.Set_XYForAdd(this.selectedObjects[i].posX, this.selectedObjects[i].posY, a_objects[i].nearestPos, a_objects[i].pageNum);
-                    }
-                    for(i = 0; i < a_objects.length; ++i)
-                    {
-                        a_objects[i].drawing.Add_ToDocument2(a_objects[i].par);
-                    }
-                }
-                else
-                {
-                    this.selectedObjects[0].parent.OnEnd_ResizeInline(this.selectedObjects[0].bounds.w, this.selectedObjects[0].bounds.h);
-                }
+                aSelectedObjects[i].parent.CheckWH();
             }
         }
         this.document.Recalculate();
-        apply_props && isRealNumber(apply_props.verticalTextAlign) && this.document.Document_UpdateSelectionState();
+        oApplyProps && isRealNumber(oApplyProps.verticalTextAlign) && this.document.Document_UpdateSelectionState();
     },
 
     applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
 
+    checkUseDrawings: function(aDrawings)
+    {
+        for(var i = aDrawings.length - 1; i > -1; --i)
+        {
+            if(!aDrawings[i].Is_UseInDocument())
+            {
+                aDrawings.splice(i, 1);
+            }
+        }
+    },
+
     bringToFront : function()//перемещаем заселекченые объекты наверх
     {
-        if(this.selection.groupSelection)
+        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
-            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : [this.selection.groupSelection.parent.Get_ParentParagraph()], CheckType : changestype_Paragraph_Content}))
+
+            History.Create_NewPoint();
+            if(this.selection.groupSelection)
             {
-                History.Create_NewPoint();
                 this.selection.groupSelection.bringToFront();
+            }
+            else
+            {
+                var aSelectedObjectsCopy = [], i;
+                for(i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    aSelectedObjectsCopy.push(this.selectedObjects[i].parent);
+                }
+                aSelectedObjectsCopy.sort(ComparisonByZIndexSimple);
+                for(i = 0; i < aSelectedObjectsCopy.length; ++i)
+                {
+                    aSelectedObjectsCopy[i].Set_RelativeHeight(this.getZIndex());
+                }
+            }
+            this.document.Recalculate();
+        }
+    },
+
+    checkZIndexMap: function(oDrawing, oDrawingMap, nNewZIndex)
+    {
+        if(!isRealObject(oDrawingMap[oDrawing.Get_Id()]))
+        {
+            oDrawingMap[oDrawing.Get_Id()] = oDrawing.RelativeHeight;
+        }
+        oDrawing.Set_RelativeHeight2(nNewZIndex);
+    },
+
+    insertBetween: function(aToInsert/*массив в котрый вставляем*/, aDrawings/*массив куда вставляем*/, nPos, oDrawingMap)
+    {
+        if(nPos > aDrawings.length || nPos < 0)
+            return;
+        var i, j, nBetweenMin, nBetweenMax, nTempInterval, aTempDrawingsArray, nDelta;
+        if(nPos === aDrawings.length)
+        {
+            for(i = 0; i < aToInsert.length; ++i)
+            {
+                this.checkZIndexMap(aToInsert[i], oDrawingMap, this.getZIndex());
+                aDrawings.push(aToInsert[i]);
             }
         }
         else
         {
-            this.zIndexManager.bringToFront(this.getArrZIndexSelectedObjects());
+            if(nPos > 0)
+            {
+                nBetweenMin = aDrawings[nPos-1].RelativeHeight;
+            }
+            else
+            {
+                nBetweenMin = -1;
+            }
+            nBetweenMax = aDrawings[nPos].RelativeHeight;
+            if(aToInsert.length < nBetweenMax - nBetweenMin)//интервала хватает для вставки
+            {
+                for(i = 0; i < aToInsert.length; ++i)
+                {
+                    nBetweenMin += ((nBetweenMax - nBetweenMin)/(aToInsert.length + 1 - i)) >> 0;
+                    this.checkZIndexMap(aToInsert[i], oDrawingMap, nBetweenMin);
+                    aDrawings.splice(nPos + i, aToInsert[i]);
+                }
+            }
+            else
+            {
+                nDelta =  nBetweenMax - nBetweenMin - aToInsert.length + 1; //сколько нам не хватает для вставки
+                for(i = nPos; i < aDrawings.length; ++i)
+                {
+                    this.checkZIndexMap(aDrawings[i], oDrawingMap, aDrawings[i].RelativeHeight + nDelta);
+                    if(i < aDrawings.length - 1)
+                    {
+                        if(aDrawings[i].RelativeHeight <= aDrawings[i+1].RelativeHeight)
+                        {
+                            break;
+                        }
+                    }
+                }
+                for(i = 0; i < aToInsert.length; ++i)
+                {
+                    this.checkZIndexMap(aToInsert[i], oDrawingMap, nBetweenMin+i);
+                    aDrawings.splice(nPos + i, aToInsert[i]);
+                }
+            }
         }
-        this.document.Recalculate();
     },
 
-    bringForward : function()
+    checkDrawingsMap: function(oDrawingMap)
+    {
+        var aDrawings = [], oDrawing, aZIndex = [];
+        for(var key in oDrawingMap)
+        {
+            if(oDrawingMap.hasOwnProperty(key))
+            {
+                oDrawing = g_oTableId.Get_ById(key);
+                aDrawings.push(oDrawing);
+                aZIndex.push(oDrawing.RelativeHeight);
+                oDrawing.Set_RelativeHeight2(oDrawingMap[key]);
+            }
+        }
+        return {aDrawings: aDrawings, aZIndex: aZIndex};
+    },
+
+    applyZIndex: function(oDrawingObject)
+    {
+        var aDrawings = oDrawingObject.aDrawings, aZIndex = oDrawingObject.aZIndex;
+        for(var i = 0; i < aDrawings.length; ++i)
+        {
+            aDrawings[i].Set_RelativeHeight(aZIndex[i]);
+        }
+    },
+
+    bringForward : function()//перемещаем заселекченные объекты на один уровень выше
     {
         if(this.selection.groupSelection)
         {
-            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : [this.selection.groupSelection.parent.Get_ParentParagraph()], CheckType : changestype_Paragraph_Content}))
+            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {
                 History.Create_NewPoint();
                 this.selection.groupSelection.bringForward();
@@ -526,7 +539,44 @@ CGraphicObjects.prototype =
         }
         else
         {
-            this.zIndexManager.bringForward(this.getArrZIndexSelectedObjects());
+            var aDrawings = [].concat(this.drawingObjects), i, j, aSelect = [], nIndexLastNoSelect = -1, oDrawingsMap = {};
+            this.checkUseDrawings(aDrawings);
+            aDrawings.sort(ComparisonByZIndexSimple);
+            for(i = aDrawings.length - 1; i > -1; --i)
+            {
+                if(aDrawings[i].GraphicObj.selected)
+                {
+                    if(nIndexLastNoSelect !== -1)
+                    {
+                        for(j = i; j > -1; --j)
+                        {
+                            if(aDrawings[j].GraphicObj.selected)
+                            {
+                                aSelect.splice(0, 0, aDrawings.splice(j, 1)[0]);
+                                --nIndexLastNoSelect;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        this.insertBetween(aSelect, aDrawings, nIndexLastNoSelect + 1, oDrawingsMap);
+                        aSelect.length = 0;
+                        nIndexLastNoSelect = -1;
+                        i = j+1;
+                    }
+                }
+                else
+                {
+                    nIndexLastNoSelect = i;
+                }
+            }
+            var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
+            if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
+            {
+                History.Create_NewPoint();
+                this.applyZIndex(oCheckObject);
+            }
         }
         this.document.Recalculate();
     },
@@ -535,7 +585,7 @@ CGraphicObjects.prototype =
     {
         if(this.selection.groupSelection)
         {
-            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : [this.selection.groupSelection.parent.Get_ParentParagraph()], CheckType : changestype_Paragraph_Content}))
+            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {
                 History.Create_NewPoint();
                 this.selection.groupSelection.sendToBack();
@@ -543,7 +593,23 @@ CGraphicObjects.prototype =
         }
         else
         {
-            this.zIndexManager.sendToBack(this.getArrZIndexSelectedObjects());
+            var aDrawings = [].concat(this.drawingObjects), i, aSelect = [], oDrawingsMap = {};
+            this.checkUseDrawings(aDrawings);
+            aDrawings.sort(ComparisonByZIndexSimple);
+            for(i = 0; i < aDrawings.length; ++i)
+            {
+                if(aDrawings[i].GraphicObj.selected)
+                {
+                    aSelect.push(aDrawings.splice(i, 1)[0]);
+                }
+            }
+            this.insertBetween(aSelect, aDrawings, 0, oDrawingsMap);
+            var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
+            if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
+            {
+                History.Create_NewPoint();
+                this.applyZIndex(oCheckObject);
+            }
         }
         this.document.Recalculate();
     },
@@ -560,19 +626,46 @@ CGraphicObjects.prototype =
         }
         else
         {
-            this.zIndexManager.bringBackward(this.getArrZIndexSelectedObjects());
+            var aDrawings = [].concat(this.drawingObjects), i, j, aSelect = [], nIndexLastNoSelect = -1, oDrawingsMap = {};
+            this.checkUseDrawings(aDrawings);
+            aDrawings.sort(ComparisonByZIndexSimple);
+            for(i = 0; i < aDrawings.length; ++i)
+            {
+                if(aDrawings[i].GraphicObj.selected)
+                {
+                    if(nIndexLastNoSelect !== -1)
+                    {
+                        for(j = i; j < aDrawings.length; ++j)
+                        {
+                            if(aDrawings[j].GraphicObj.selected)
+                            {
+                                aSelect.push(aDrawings.splice(j, 1)[0]);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        this.insertBetween(aSelect, aDrawings, nIndexLastNoSelect, oDrawingsMap);
+                        aSelect.length = 0;
+                        nIndexLastNoSelect = -1;
+                        i = j-1;
+                    }
+                }
+                else
+                {
+                    nIndexLastNoSelect = i;
+                }
+            }
+            var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
+            if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
+            {
+                History.Create_NewPoint();
+                this.applyZIndex(oCheckObject);
+            }
         }
         this.document.Recalculate();
-    },
-
-    getArrZIndexSelectedObjects: function()
-    {
-        var ret = [];
-        for(var i = 0; i < this.selectedObjects.length; ++i)
-        {
-            ret.push(this.selectedObjects[i].parent.RelativeHeight - 1000);
-        }
-        return ret;
     },
 
     editChart: function(chart)
@@ -608,26 +701,8 @@ CGraphicObjects.prototype =
                         chart_space.spPr.xfrm.setOffX(aSelectedCharts[0].spPr.xfrm.offX);
                         chart_space.spPr.xfrm.setOffY(aSelectedCharts[0].spPr.xfrm.offY);
                         parent_group.addToSpTree(i, chart_space);
-                        parent_group.updateCoordinatesAfterInternalResize();
-                        //TODO: возможно следует нормализовать самую старшую группу
-                        major_group.recalculate();
-                        if(major_group.spPr && major_group.spPr.xfrm)
-                        {
-
-                        }
-                        if(major_group.parent.Is_Inline())
-                        {
-                            major_group.parent.OnEnd_ResizeInline(major_group.bounds.w, major_group.bounds.h);
-                        }
-                        else
-                        {
-                            parent_paragraph = major_group.parent.Get_ParentParagraph();
-                            nearest_pos = this.document.Get_NearestPos(major_group.selectStartPage,major_group.posX + major_group.bounds.x, major_group.posY + major_group.bounds.y, true, major_group.parent);
-                            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                            major_group.parent.Remove_FromDocument(false);
-                            major_group.parent.Set_XYForAdd(major_group.posX,major_group.posY, nearest_pos, major_group.selectStartPage);
-                            major_group.parent.Add_ToDocument2(parent_paragraph);
-                        }
+                        major_group.updateCoordinatesAfterInternalResize();
+                        major_group.parent.CheckWH();
                         if(this.selection.groupSelection)
                         {
                             select_start_page = this.selection.groupSelection.selectedObjects[0].selectStartPage;
@@ -646,26 +721,11 @@ CGraphicObjects.prototype =
                 chart_space.spPr.xfrm.setOffY(0);
                 select_start_page = aSelectedCharts[0].selectStartPage;
                 chart_space.setParent(aSelectedCharts[0].parent);
-                if(aSelectedCharts[0].parent.Is_Inline())
-                {
-                    aSelectedCharts[0].parent.Set_GraphicObject(chart_space);
-                    this.resetSelection();
-                    this.selectObject(chart_space, select_start_page);
-                    aSelectedCharts[0].parent.OnEnd_ResizeInline(chart_space.spPr.xfrm.extX, chart_space.spPr.xfrm.extY);
-                }
-                else
-                {
-                    parent_paragraph = aSelectedCharts[0].parent.Get_ParentParagraph();
-                    nearest_pos = this.document.Get_NearestPos(aSelectedCharts[0].selectStartPage, aSelectedCharts[0].posX, aSelectedCharts[0].posY, true, aSelectedCharts[0].parent);
-                    nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                    aSelectedCharts[0].parent.Remove_FromDocument(false);
-                    aSelectedCharts[0].parent.Set_GraphicObject(chart_space);
-                    aSelectedCharts[0].parent.Set_XYForAdd(aSelectedCharts[0].posX, aSelectedCharts[0].posY, nearest_pos, aSelectedCharts[0].selectStartPage);
-                    aSelectedCharts[0].parent.Add_ToDocument2(parent_paragraph);
-                    this.resetSelection();
-                    this.selectObject(chart_space, select_start_page);
-                    this.document.Recalculate();
-                }
+                aSelectedCharts[0].parent.Set_GraphicObject(chart_space);
+                this.resetSelection();
+                this.selectObject(chart_space, select_start_page);
+                aSelectedCharts[0].parent.CheckWH();
+                this.document.Recalculate();
                 this.document.Document_UpdateInterfaceState();
             }
         }
@@ -1038,24 +1098,18 @@ CGraphicObjects.prototype =
 
     documentIsSelectionLocked: function(CheckType)
     {
-        var content = this.getTargetDocContent();
-        content && content.Document_Is_SelectionLocked(CheckType);
-        switch(CheckType)
+        var oDrawing, i;
+        if(changestype_Drawing_Props === CheckType
+          || changestype_Image_Properties === CheckType
+            || changestype_Delete === CheckType
+                || changestype_Remove === CheckType
+                    || changestype_Paragraph_Content === CheckType
+                        || changestype_Document_Content_Add === CheckType)
         {
-            case changestype_Drawing_Props:
-            case changestype_Image_Properties:
-            case changestype_Delete://TODO: Отдельная обработка
-            case changestype_Remove:
-            case changestype_Paragraph_Content:
-            case changestype_Document_Content_Add:
+            for(i = 0; i < this.selectedObjects.length; ++i)
             {
-                var selection_array =  this.selectedObjects;
-                for(var i = 0; i < selection_array.length; ++i)
-                {
-                    var par = selection_array[i].parent.Get_ParentParagraph();
-                    par.Lock.Check(par.Get_Id());
-                }
-                break;
+                oDrawing = this.selectedObjects[i].parent;
+                oDrawing.Lock.Check(oDrawing.Get_Id());
             }
         }
     },
@@ -1110,7 +1164,7 @@ CGraphicObjects.prototype =
                         drawing.GraphicObj.spPr.xfrm.setOffX(0);
                         drawing.GraphicObj.spPr.xfrm.setOffY(0);
                     }
-                    drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
+                    drawing.CheckWH();
                     if(groupParaDrawing.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(groupParaDrawing.Distance.L, groupParaDrawing.Distance.T, groupParaDrawing.Distance.R, groupParaDrawing.Distance.B);
@@ -1134,7 +1188,7 @@ CGraphicObjects.prototype =
 
                     drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
-                    drawing.Update_Size(selectedObjects[i].bounds.w, selectedObjects[i].bounds.h);
+                    drawing.CheckWH();
                     if(selectedObjects[i].parent.Extent)
                     {
                         drawing.setExtent(selectedObjects[i].parent.Extent.W, selectedObjects[i].parent.Extent.H)
@@ -1867,7 +1921,6 @@ CGraphicObjects.prototype =
 
         var i;
         var common_bounds = this.checkCommonBounds(objects_for_grouping);
-        History.Create_NewPoint();
         var para_drawing = new ParaDrawing(common_bounds.maxX - common_bounds.minX, common_bounds.maxY - common_bounds.minY, null, this.drawingDocument, null, null);
         para_drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
         para_drawing.Set_DrawingType(drawing_Anchor);
@@ -1913,24 +1966,6 @@ CGraphicObjects.prototype =
 
     },
 
-    getParentParagraphsFromArr: function(drawings)
-    {
-        var ret = [];
-        var i, j;
-        for(i = 0; i < drawings.length; ++i)
-        {
-            var paragraph = drawings[i].parent.Get_ParentParagraph();
-            for(j = 0; j < ret.length; ++j)
-            {
-                if(ret[j] === paragraph)
-                    break;
-            }
-            if(j === ret.length)
-                ret.push(paragraph);
-        }
-        return ret;
-    },
-
     unGroupSelectedObjects: function()
     {
         if(!(editor.isViewMode === false))
@@ -1938,71 +1973,65 @@ CGraphicObjects.prototype =
         var ungroup_arr = this.canUnGroup(true);
         if(ungroup_arr.length > 0)
         {
-            var check_paragraphs =  this.getParentParagraphsFromArr(ungroup_arr);
-            //todo if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : changestype_Paragraph_Content}))
+            this.resetSelection();
+            var i, j, nearest_pos, cur_group, sp_tree, sp, parent_paragraph, page_num;
+            var a_objects = [];
+            for(i = 0; i < ungroup_arr.length; ++i)
             {
-                History.Create_NewPoint();
-                this.resetSelection();
-                var i, j, cur_page_index, nearest_pos, cur_group, sp_tree, sp, parent_paragraph, page_num;
-                var a_objects = [];
-                for(i = 0; i < ungroup_arr.length; ++i)
+                cur_group = ungroup_arr[i];
+                parent_paragraph = cur_group.parent.Get_ParentParagraph();
+                page_num = cur_group.selectStartPage;
+                sp_tree = cur_group.spTree;
+                for(j = 0; j < sp_tree.length; ++j)
                 {
-                    cur_group = ungroup_arr[i];
-                    parent_paragraph = cur_group.parent.Get_ParentParagraph();
-                    page_num = cur_group.selectStartPage;
-                    sp_tree = cur_group.spTree;
-                    for(j = 0; j < sp_tree.length; ++j)
-                    {
-                        sp = sp_tree[j];
-                        var drawing = new ParaDrawing(0, 0, sp_tree[j], this.drawingDocument, null, null);
-                        drawing.Set_GraphicObject(sp);
-                        sp.setParent(drawing);
-                        drawing.Set_DrawingType(drawing_Anchor);
-                        drawing.Set_WrappingType(cur_group.parent.wrappingType);
-                        drawing.Update_Size(sp.extX, sp.extY);
-                        sp.spPr.xfrm.setRot(normalizeRotate(sp.rot + cur_group.rot));
-                        sp.spPr.xfrm.setOffX(0);
-                        sp.spPr.xfrm.setOffY(0);
-                        sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
-                        sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
-                        sp.setGroup(null);
-                        nearest_pos = this.document.Get_NearestPos(page_num, sp.bounds.x + sp.posX, sp.bounds.y + sp.posY, true, drawing);
-                        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
+                    sp = sp_tree[j];
+                    var drawing = new ParaDrawing(0, 0, sp_tree[j], this.drawingDocument, null, null);
+                    drawing.Set_GraphicObject(sp);
+                    sp.setParent(drawing);
+                    drawing.Set_DrawingType(drawing_Anchor);
+                    drawing.Set_WrappingType(cur_group.parent.wrappingType);
+                    drawing.CheckWH();
+                    sp.spPr.xfrm.setRot(normalizeRotate(sp.rot + cur_group.rot));
+                    sp.spPr.xfrm.setOffX(0);
+                    sp.spPr.xfrm.setOffY(0);
+                    sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
+                    sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
+                    sp.setGroup(null);
+                    nearest_pos = this.document.Get_NearestPos(page_num, sp.bounds.x + sp.posX, sp.bounds.y + sp.posY, true, drawing);
+                    nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
 
-                        var posX, posY, xc, yc, hc = sp.extX/2, vc = sp.extY/2;
-                        xc = sp.transform.TransformPointX(hc, vc);
-                        yc = sp.transform.TransformPointY(hc, vc);
-
-                        drawing.Set_XYForAdd(xc - hc, yc - vc, nearest_pos, page_num);
-                        //drawing.Add_ToDocument2(parent_paragraph);
-                        a_objects.push({drawing: drawing, par: parent_paragraph, posX: xc - hc, posY: yc - vc});
-                        this.selectObject(sp, page_num);
-                    }
-                    cur_group.parent.Remove_FromDocument(false);
+                    var xc, yc, hc = sp.extX/2, vc = sp.extY/2;
+                    xc = sp.transform.TransformPointX(hc, vc);
+                    yc = sp.transform.TransformPointY(hc, vc);
+                    drawing.Set_XYForAdd(xc - hc, yc - vc, nearest_pos, page_num);
+                    a_objects.push({drawing: drawing, par: parent_paragraph, posX: xc - hc, posY: yc - vc});
+                    this.selectObject(sp, page_num);
                 }
-                for(i = 0; i < a_objects.length; ++i)
-                {
-                    a_objects[i].drawing.Set_Props(new CImgProperty(
-                        {
-                            PositionH:
-                            {
-                                RelativeFrom: c_oAscRelativeFromH.Page,
-                                UseAlign : false,
-                                Align    : undefined,
-                                Value    : a_objects[i].posX
-                            },
-
-                            PositionV:
-                            {
-                                RelativeFrom: c_oAscRelativeFromV.Page,
-                                UseAlign    : false,
-                                Align       : undefined,
-                                Value       : a_objects[i].posY
-                            }
-                        }));
-                    a_objects[i].drawing.Add_ToDocument2(a_objects[i].par);
-                }
+                cur_group.parent.Remove_FromDocument(false);
             }
+            for(i = 0; i < a_objects.length; ++i)
+            {
+                a_objects[i].drawing.Set_Props(new CImgProperty(
+                    {
+                        PositionH:
+                        {
+                            RelativeFrom: c_oAscRelativeFromH.Page,
+                            UseAlign : false,
+                            Align    : undefined,
+                            Value    : a_objects[i].posX
+                        },
+
+                        PositionV:
+                        {
+                            RelativeFrom: c_oAscRelativeFromV.Page,
+                            UseAlign    : false,
+                            Align       : undefined,
+                            Value       : a_objects[i].posY
+                        }
+                    }));
+                a_objects[i].drawing.Add_ToDocument2(a_objects[i].par);
+            }
+
         }
     },
 
@@ -2130,7 +2159,6 @@ CGraphicObjects.prototype =
                             group_arr.push(group_map[key]);
                     }
                     group_arr.sort(CompareGroups);
-                    var a_objects  = [];
                     for(i = 0; i < group_arr.length; ++i)
                     {
                         cur_group = group_arr[i];
@@ -2167,8 +2195,7 @@ CGraphicObjects.prototype =
                         }
                         else
                         {
-                            var para_drawing = cur_group.parent, para_drawing2 = null;
-                            var paragraph = cur_group.parent.Get_ParentParagraph();
+                            var para_drawing = cur_group.parent;
                             if(cur_group.spTree.length === 0)
                             {
                                 this.resetInternalSelection();
@@ -2188,29 +2215,19 @@ CGraphicObjects.prototype =
                                 sp.setParent(para_drawing);
                                 this.resetSelection();
                                 this.selectObject(sp, cur_group.selectStartPage);
-                                if(para_drawing.Is_Inline())
-                                {
-                                    para_drawing.OnEnd_ResizeInline(sp.bounds.w, sp.bounds.h);
-                                    return;
-                                }
-                                else
+                                para_drawing.CheckWH();
+                                if(!para_drawing.Is_Inline())
                                 {
                                     var new_x, new_y;
-
                                     var deltaX, deltaY;
                                     deltaX = 0;//sp.localTransform.tx - sp.bounds.x;
                                     deltaY = 0;//sp.localTransform.ty - sp.bounds.y;
                                     new_x = sp.transform.tx - deltaX;
                                     new_y = sp.transform.ty - deltaY;
-                                    sp.recalcBounds();
-                                    var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage, new_x, new_y, true, para_drawing);
-                                    nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                                    para_drawing.Remove_FromDocument(false);
-                                    para_drawing.Set_XYForAdd(new_x, new_y, nearest_pos, cur_group.selectStartPage);
-                                    para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
-                                    this.document.Recalculate();
-                                    break;
+                                    para_drawing.Set_XY(new_x, new_x, para_drawing.Get_ParentParagraph(), para_drawing.GraphicObj.selectStartPage, true);
                                 }
+                                this.document.Recalculate();
+                                return;
                             }
                             else
                             {
@@ -2225,27 +2242,11 @@ CGraphicObjects.prototype =
                                 cur_group.spPr.xfrm.setOffX(0);
                                 cur_group.spPr.xfrm.setOffY(0);
 
-                                var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage, new_x, new_y, true, para_drawing);
-                                nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                                para_drawing.Remove_FromDocument(false);
-                                para_drawing.Set_XYForAdd(new_x, new_y, nearest_pos, cur_group.selectStartPage);
-                                para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
+                                para_drawing.Set_XY(new_x, new_y, nearest_pos, cur_group.selectStartPage, false);//X, Y, Paragraph, PageNum, bResetAlign
                                 this.document.Recalculate();
                                 break;
                             }
 
-                            var d;
-                            if(para_drawing2)
-                                d = para_drawing2;
-                            else
-                                d = para_drawing;
-                            var nearest_pos = this.document.Get_NearestPos(cur_group.selectStartPage,cur_group.posX + d.GraphicObj.bounds.x,cur_group.posY + d.GraphicObj.bounds.y, true, d);
-                            nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                            para_drawing.Remove_FromDocument(false);
-                            d.Set_XYForAdd(cur_group.posX + d.GraphicObj.bounds.x, cur_group.posX + d.GraphicObj.bounds.y, nearest_pos, cur_group.selectStartPage);
-                            d.Add_ToDocument2(paragraph);
-                            this.document.Recalculate();
-                            return;
                         }
                     }
                 }
@@ -2271,7 +2272,6 @@ CGraphicObjects.prototype =
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
                     arr_drawings_.push(this.selectedObjects[i].parent);
                 }
-                this.zIndexManager.removeArrayDrawings(arr_drawings_);
                 this.resetSelection();
                 first_selected.parent.GoTo_Text();
                 this.document.Recalculate();
@@ -2282,9 +2282,12 @@ CGraphicObjects.prototype =
     addGraphicObject: function(paraDrawing)
     {
         this.drawingObjects.push(paraDrawing);
-        this.objectsMap["_" + paraDrawing.Get_Id()] = paraDrawing;
-        if(!g_oTableId.m_bTurnOff)
-            this.zIndexManager.addItem(null, paraDrawing);
+    },
+
+    getZIndex: function()
+    {
+        this.maximalGraphicObjectZIndex+=1024;
+        return this.maximalGraphicObjectZIndex;
     },
 
     isPointInDrawingObjects: function(x, y, pageIndex, bSelected, bNoText)
@@ -2401,12 +2404,6 @@ CGraphicObjects.prototype =
         }
     },
 
-    getObjectById: function(id)
-    {
-        if(isRealObject(this.objectsMap["_" + id]))
-            return this.objectsMap["_" + id];
-        return null;
-    },
 
     removeById: function(pageIndex, id)
     {
@@ -2695,7 +2692,6 @@ CGraphicObjects.prototype =
             }
             default :
             {
-                this.currentPresetGeom = preset;
                 this.changeCurrentState(new StartAddNewShape(this, preset));
                 break;
             }
@@ -2866,277 +2862,3 @@ function CreateImageFromBinary(bin, nW, nH)
     para_drawing.Set_GraphicObject(word_image);
     return para_drawing;
 }
-
-function CreateImageFromBinary2(bin, w, h)
-{
-    var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
-    var word_image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(bin, 0, 0, w, h);
-    para_drawing.Set_GraphicObject(word_image);
-    word_image.setParent(para_drawing);
-    para_drawing.Set_GraphicObject(word_image);
-    return para_drawing;
-}
-
-function CreateParaDrawingFromBinary(reader, bNoRecalc)
-{
-    var para_drawing = new ParaDrawing(null, null, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
-    para_drawing.readFromBinaryForCopyPaste(reader, bNoRecalc);
-    return para_drawing;
-}
-
-
-function ZIndexManager(drawingObjects)
-{
-    this.drawingObjects = drawingObjects;
-    this.Content = [];//индекс ParaDrawing в этом массиве равен z-индексу элемента
-    this.m_oContentChanges = new CContentChanges();
-    this.bTurnOff = true;
-    this.startRefreshIndex = -1;
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
-}
-
-ZIndexManager.prototype =
-{
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-    addToRecalculate: function()
-    {
-        this.drawingObjects.addToRecalculate(this);
-    },
-
-    removeArrayDrawings: function(aDrawings)
-    {
-        aDrawings.sort(ComparisonByZIndexSimple);
-        for(var i =  aDrawings.length-1; i > -1; --i)
-        {
-            this.removeItem(aDrawings[i].RelativeHeight-1000);
-        }
-    },
-
-    removeItem: function(pos)
-    {
-        History.Add(this, {Type: historyitem_ZIndexManagerRemoveItem, Pos: pos, Item: this.Content[pos]});
-        return this.Content.splice(pos, 1)[0];
-    },
-
-    addItem: function(pos, item)
-    {
-        if(this.bTurnOff)
-            return;
-        if(!isRealNumber(pos))
-            pos = this.Content.length;
-        History.Add(this, {Type: historyitem_ZIndexManagerAddItem, Pos: pos, Item: item});
-        this.Content.splice(pos, 0, item);
-
-        if(this.startRefreshIndex < 0 || this.startRefreshIndex > pos)
-            this.startRefreshIndex = pos;
-    },
-
-
-
-    recalculate: function()
-    {
-        if(this.startRefreshIndex > -1)
-        {
-            for(var i = 0; i < this.Content.length; ++i)
-            {
-                this.Content[i].RelativeHeight = i + 1000;
-            }
-            this.startRefreshIndex = -1;
-        }
-        this.drawingObjects.sortDrawingArrays();
-    },
-
-    sendToBack: function(arrInd)//
-    {
-        arrInd.sort(fSortAscending);
-        var arrDrawings = [];
-        var i;
-        for(i = arrInd.length-1; i > -1; --i)
-        {
-            arrDrawings.push(this.removeItem(arrInd[i]));
-        }
-        for(i = 0; i < arrDrawings.length; ++i)
-        {
-            this.addItem(0, arrDrawings[i]);
-        }
-    },
-
-    bringForward: function(arrInd)
-    {
-        arrInd.sort(fSortAscending);
-        var i;
-        var item;
-        if(arrInd[arrInd.length-1] < this.Content.length-1)
-        {
-            item = this.removeItem(arrInd[arrInd.length-1]);
-            this.addItem(++arrInd[arrInd.length-1], item);
-        }
-        for(i = arrInd.length-2; i > -1; --i)
-        {
-            if((arrInd[i+1] - arrInd[i]) > 1  )
-            {
-                item = this.removeItem(arrInd[i]);
-                this.addItem(++arrInd[i], item);
-            }
-        }
-    },
-
-    bringToFront: function(arrInd)
-    {
-        arrInd.sort(fSortAscending);
-        var i;
-        var arrDrawings = [];
-        for(i = arrInd.length-1; i > -1; --i)
-        {
-            arrDrawings.push(this.removeItem(arrInd[i]));
-        }
-        arrDrawings.reverse();
-        for(i = 0; i < arrDrawings.length; ++i)
-        {
-            this.addItem(this.Content.length, arrDrawings[i]);
-        }
-    },
-
-    bringBackward: function(arrInd)
-    {
-        arrInd.sort(fSortAscending);
-        var i, item;
-        if(arrInd[0] > 0)
-        {
-            item = this.removeItem(arrInd[0]);
-            this.addItem(--arrInd[0], item);
-        }
-        for(i = 1; i < arrInd.length; ++i)
-        {
-            if(arrInd[i] - arrInd[i-1] > 1)
-            {
-                item = this.removeItem(arrInd[i]);
-                this.addItem(--arrInd[i], item);
-            }
-        }
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ZIndexManagerRemoveItem:
-            {
-                this.Content.splice(data.Pos, 0, data.Item);
-                break;
-            }
-            case historyitem_ZIndexManagerAddItem:
-            {
-                this.Content.splice(data.Pos, 1);
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ZIndexManagerRemoveItem:
-            {
-                this.Content.splice(data.Pos, 1);
-                break;
-            }
-            case historyitem_ZIndexManagerAddItem:
-            {
-                this.Content.splice(data.Pos, 0, data.Item);
-                break;
-            }
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(data.Type);
-        var Pos;
-        switch(data.Type)
-        {
-            case historyitem_ZIndexManagerRemoveItem:
-            {
-                Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                w.WriteLong(Pos);
-                break;
-            }
-            case historyitem_ZIndexManagerAddItem:
-            {
-                Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                w.WriteLong(Pos);
-                w.WriteString2(data.Item.Get_Id());
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        var type = r.GetLong();
-        var Pos, ChangedPos;
-        switch(type)
-        {
-            case historyitem_ZIndexManagerRemoveItem:
-            {
-                Pos = r.GetLong();
-                ChangedPos = this.m_oContentChanges.Check(contentchanges_Remove, Pos);
-                this.Content.splice(ChangedPos, 1);
-                break;
-            }
-            case historyitem_ZIndexManagerAddItem:
-            {
-                Pos = r.GetLong();
-                var Id = r.GetString2();
-                ChangedPos = this.m_oContentChanges.Check(contentchanges_Add, Pos);
-                this.Content.splice(ChangedPos, 0, g_oTableId.Get_ById(Id));
-                break;
-            }
-        }
-    },
-
-    Refresh_RecalcData: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_ZIndexManagerRemoveItem:
-            case historyitem_ZIndexManagerAddItem:
-            {
-                if(this.startRefreshIndex < 0)
-                    this.startRefreshIndex = data.Pos;
-                else if(this.startRefreshIndex > data.Pos)
-                {
-                    this.startRefreshIndex = data.Pos;
-                }
-                break;
-            }
-        }
-        this.Refresh_RecalcData2();
-    },
-
-    Refresh_RecalcData2: function()
-    {
-        this.drawingObjects.addToRecalculate(this);
-    },
-
-    Clear_ContentChanges : function()
-    {
-        this.m_oContentChanges.Clear();
-    },
-
-    Add_ContentChanges : function(Changes)
-    {
-        this.m_oContentChanges.Add( Changes );
-    },
-
-    Refresh_ContentChanges : function()
-    {
-        this.m_oContentChanges.Refresh();
-    }
-};

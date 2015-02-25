@@ -3808,22 +3808,14 @@ var WRAP_HIT_TYPE_SECTION = 0x01;
 function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 {
     this.Id = g_oIdCounter.Get_NewId();
-
-    this.Lock = new CLock();
-    if ( false === g_oIdCounter.m_bLoad )
-    {
-        this.Lock.Set_Type(locktype_Mine, false);
-        if (typeof CollaborativeEditing !== "undefined")
-            CollaborativeEditing.Add_Unlock2( this );
-    }
-
     this.DrawingType = drawing_Inline;
     this.GraphicObj  = GraphicObj;
 
     this.X = 0;
     this.Y = 0;
-    this.W = W;
-    this.H = H;
+    this.Width = 0;
+    this.Height = 0;
+
     this.PageNum = 0;
     this.LineNum = 0;
     this.YOffset = 0;
@@ -3864,6 +3856,12 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 
     this.AllowOverlap = true;
 
+    //привязка к параграфу
+    this.Locked = null;
+
+    //скрытые drawing'и
+    this.Hidden = null;
+
     // Позиция по горизонтали
     this.PositionH =
     {
@@ -3884,7 +3882,6 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.PositionH_Old = undefined;
     this.PositionV_Old = undefined;
 
-
     this.Internal_Position = new CAnchorPosition();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -3904,16 +3901,19 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.behindDoc = false;
     this.bNoNeedToAdd = false;
 
-    this.pageIndex = -1;//pageIndex;
-
-    this.snapArrayX = [];
-    this.snapArrayY = [];
-    this.bNeedUpdateWH = true;
+    this.pageIndex = -1;
+    this.Lock = new CLock();
 //------------------------------------------------------------
     g_oTableId.Add( this, this.Id );
 
 	if(this.graphicObjects)
-		this.graphicObjects.addGraphicObject(this);
+    {
+        this.Set_RelativeHeight(this.graphicObjects.getZIndex());
+        if(History.Is_On() && !g_oTableId.m_bTurnOff)
+        {
+            this.graphicObjects.addGraphicObject(this);
+        }
+    }
 }
 
 
@@ -3987,20 +3987,21 @@ ParaDrawing.prototype =
         {
             Props.Paddings =
             {
-                Left   : 3.2,
-                Right  : 3.2,
+                Left   : DISTANCE_TO_TEXT_LEFTRIGHT,
+                Right  : DISTANCE_TO_TEXT_LEFTRIGHT,
                 Top    : 0,
                 Bottom : 0
             };
         }
         else
         {
+            var oDistance = this.Get_Distance();
             Props.Paddings =
             {
-                Left   : this.Distance.L,
-                Right  : this.Distance.R,
-                Top    : this.Distance.T,
-                Bottom : this.Distance.B
+                Left   : oDistance.L,
+                Right  : oDistance.R,
+                Top    : oDistance.T,
+                Bottom : oDistance.B
             };
         }
 
@@ -4030,10 +4031,10 @@ ParaDrawing.prototype =
 
         Props.Internal_Position = this.Internal_Position;
 
+        Props.Locked = this.Lock.Is_Locked();
         var ParentParagraph = this.Get_ParentParagraph();
         if(ParentParagraph)
         {
-            Props.Locked = ParentParagraph.Lock.Is_Locked();
             if(ParentParagraph)
             {
                 if (undefined != ParentParagraph.Parent && true === ParentParagraph.Parent.Is_DrawingShape() )
@@ -4120,12 +4121,25 @@ ParaDrawing.prototype =
         return Props;
     },
 
+    Is_UseInDocument : function()
+    {
+        if(this.Parent)
+        {
+            var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+            if(Run)
+            {
+                return Run.Is_UseInDocument(this.Get_Id());
+            }
+        }
+        return false;
+    },
+
     getXfrmExtX: function()
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
             return this.GraphicObj.spPr.xfrm.extX;
-        if(isRealNumber(this.W))
-            return this.W;
+        if(isRealNumber(this.Extent.W))
+            return this.Extent.W;
         return 0;
     },
 
@@ -4133,8 +4147,8 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
             return this.GraphicObj.spPr.xfrm.extY;
-        if(isRealNumber(this.H))
-            return this.H;
+        if(isRealNumber(this.Extent.H))
+            return this.Extent.H;
         return 0;
     },
 
@@ -4160,7 +4174,7 @@ ParaDrawing.prototype =
             {
                 if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h))
                 {
-                    this.Update_Size(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
+                    this.setExtent(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
                 }
             }
             if ( c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle )
@@ -4189,7 +4203,7 @@ ParaDrawing.prototype =
         if ( undefined != Props.AllowOverlap )
             this.Set_AllowOverlap( Props.AllowOverlap );
 
-        var bNeedUpdateWH = false, newW = this.W, newH = this.H;
+        var bNeedUpdateWH = false, newW = this.Extent.W, newH = this.Extent.H;
         if ( undefined != Props.PositionH )
         {
             this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ) );
@@ -4216,8 +4230,36 @@ ParaDrawing.prototype =
         }
         if(bNeedUpdateWH)
         {
-            this.Update_Size(newW, newH);
+            this.setExtent(newW, newH);
         }
+    },
+
+    CheckWH: function()
+    {
+        if(!this.GraphicObj)
+            return;
+        var dW, dH, bInline = this.Is_Inline();
+        if(this.PositionH.UseAlign || this.PositionV.UseAlign || bInline)
+        {
+            this.GraphicObj.recalculate();
+        }
+        if(this.PositionH.UseAlign || bInline)
+        {
+            dW = this.GraphicObj.bounds.w;
+        }
+        else
+        {
+            dW = this.GraphicObj.spPr.xfrm.extX;
+        }
+        if(this.PositionV.UseAlign || bInline)
+        {
+            dH = this.GraphicObj.bounds.h;
+        }
+        else
+        {
+            dH = this.GraphicObj.spPr.xfrm.extY;
+        }
+        this.setExtent(dW, dH);
     },
 
     Draw : function( X, Y, pGraphics, pageIndex, align)
@@ -4229,20 +4271,41 @@ ParaDrawing.prototype =
             pGraphics.shapePageIndex = null;
         }
     },
-    Measure : function(Context)
+    Measure : function()
     {
-        if(this.bNeedUpdateWH || (!this.W || !this.H))
-            this.updateWidthHeight();
-        this.Width        = this.W;
-        this.Height       = this.H;
-        this.WidthVisible = this.W;
-    },
-
-    Measure2 : function(Context)
-    {
-        this.Width        = this.W;
-        this.Height       = this.H;
-        this.WidthVisible = this.W;
+        if(!this.GraphicObj)
+        {
+            this.Width = 0;
+            this.Height = 0;
+            return;
+        }
+        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
+        {
+            this.Width        = this.Extent.W;
+            this.Height       = this.Extent.H;
+            this.WidthVisible = this.Extent.W;
+        }
+        else
+        {
+            this.GraphicObj.recalculate();
+            if(this.PositionH.UseAlign || this.Is_Inline())
+            {
+                this.Width = this.GraphicObj.bounds.w;
+            }
+            else
+            {
+                this.Width = this.GraphicObj.extX;
+            }
+            this.WidthVisible = this.Width;
+            if(this.PositionV.UseAlign || this.Is_Inline())
+            {
+                this.Height = this.GraphicObj.bounds.h;
+            }
+            else
+            {
+                this.Height = this.GraphicObj.extY;
+            }
+        }
     },
 
     Save_RecalculateObject : function(Copy)
@@ -4255,12 +4318,13 @@ ParaDrawing.prototype =
 
         if ( drawing_Anchor === this.Get_DrawingType() && true === this.Use_TextWrap() )
         {
+            var oDistance = this.Get_Distance();
             DrawingObj.FlowPos =
             {
-                X : this.X - this.Distance.L,
-                Y : this.Y - this.Distance.T,
-                W : this.W + this.Distance.R,
-                H : this.H + this.Distance.B
+                X : this.X - oDistance.L,
+                Y : this.Y - oDistance.T,
+                W : this.Width +  oDistance.R,
+                H : this.Height + oDistance.B
             }
         }
         DrawingObj.PageNum = this.PageNum;
@@ -4296,7 +4360,7 @@ ParaDrawing.prototype =
 
     Copy : function()
     {
-        var c = new ParaDrawing(this.W,  this.H, null, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
+        var c = new ParaDrawing(this.Extent.W,  this.Extent.H, null, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
         c.Set_DrawingType(this.DrawingType);
         if(isRealObject(this.GraphicObj))
         {
@@ -4305,8 +4369,8 @@ ParaDrawing.prototype =
         }
 
         var d = this.Distance;
-        c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
-        c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
+        c.Set_PositionH(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
+        c.Set_PositionV(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
@@ -4315,8 +4379,10 @@ ParaDrawing.prototype =
             c.wrappingPolygon.fromOther(this.wrappingPolygon);
         }
         c.Set_BehindDoc(this.behindDoc);
-        c.Update_Size(this.W, this.H);
-
+        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
+        {
+            c.setExtent(this.Extent.W, this.Extent.H);
+        }
         return c;
     },
 
@@ -4519,34 +4585,6 @@ ParaDrawing.prototype =
         this.calculateSnapArrays();
     },
 
-    Set_XYForAdd2 : function(X, Y)
-    {
-        this.Set_PositionH( c_oAscRelativeFromH.Column, false, 0 );
-        this.Set_PositionV( c_oAscRelativeFromV.Paragraph, false, 0 );
-
-        this.PositionH_Old =
-        {
-            RelativeFrom : this.PositionH.RelativeFrom,
-            Align        : this.PositionH.Align,
-            Value        : this.PositionH.Value
-        };
-
-        this.PositionV_Old =
-        {
-            RelativeFrom : this.PositionV.RelativeFrom,
-            Align        : this.PositionV.Align,
-            Value        : this.PositionV.Value
-        };
-
-        this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
-        this.PositionH.Align        = false;
-        this.PositionH.Value        = X;
-
-        this.PositionV.RelativeFrom = c_oAscRelativeFromV.Page;
-        this.PositionV.Align        = false;
-        this.PositionV.Value        = Y;
-    },
-
     calculateAfterChangeTheme: function()
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateAfterChangeTheme === "function")
@@ -4576,21 +4614,6 @@ ParaDrawing.prototype =
         this.updatePosition3( this.PageNum, this.X, this.Y );
     },
 
-    Update_Size : function(W,H)
-    {
-        History.Add( this, { Type : historyitem_Drawing_Size, New : { W : W, H : H }, Old : { W : this.W, H : this.H } } );
-        this.W = W;
-        this.H = H;
-
-
-        this.Measure2();
-    },
-
-    Set_Url : function(Img)
-    {
-        History.Add( this, { Type : historyitem_Drawing_Url, New : Img, Old : this.GraphicObj.Img } );
-        this.GraphicObj.Img = Img;
-    },
 
     Set_DrawingType : function(DrawingType)
     {
@@ -4615,17 +4638,23 @@ ParaDrawing.prototype =
 
     Set_Distance : function(L, T, R, B)
     {
-        if ( null === L || undefined === L )
-            L = this.Distance.L;
-
-        if ( null === T || undefined === T )
-            T = this.Distance.T;
-
-        if ( null === R || undefined === R )
-            R = this.Distance.R;
-
-        if ( null === B || undefined === B )
-            B = this.Distance.B;
+        var oDistance = this.Get_Distance();
+        if (!isRealNumber(L))
+        {
+            L = oDistance.L;
+        }
+        if (!isRealNumber(T))
+        {
+            T = oDistance.T;
+        }
+        if(!isRealNumber(R))
+        {
+            R = oDistance.R;
+        }
+        if (!isRealNumber(B))
+        {
+            B = oDistance.B;
+        }
 
         History.Add( this, { Type : historyitem_Drawing_Distance, Old : { Left : this.Distance.L, Top : this.Distance.T, Right : this.Distance.R, Bottom : this.Distance.B }, New : { Left : L, Top : T, Right : R, Bottom : B } } );
         this.Distance.L = L;
@@ -4634,20 +4663,10 @@ ParaDrawing.prototype =
         this.Distance.B = B;
     },
 
-    updateWidthHeight: function()
+    Get_Distance : function()
     {
-        if(isRealObject(this.GraphicObj))
-        {
-            this.GraphicObj.recalculate();
-            var bounds = this.getBounds();
-            this.W = bounds.r - bounds.l;
-            this.H = bounds.b - bounds.t;
-            this.l = bounds.l;
-            this.t = bounds.t;
-            this.r = bounds.r;
-            this.b = bounds.b;
-        }
-        this.bNeedUpdateWH = false;
+        var oDist = this.Distance;
+        return new CDistance(getValOrDefault(oDist.L, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.T, 0), getValOrDefault(oDist.R, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.B, 0));
     },
 
     Set_AllowOverlap : function(AllowOverlap)
@@ -4672,13 +4691,25 @@ ParaDrawing.prototype =
         this.PositionV.Value        = Value;
     },
 
-    canTakeOutPage: function()
+    Set_Locked : function(bLocked)
     {
-        if(isRealObject(this.GraphicObj) &&  typeof this.GraphicObj.canTakeOutPage === "function")
+        History.Add(this, {Type: historyitem_Drawing_SetLocked, OldPr: this.Locked, NewPr: bLocked });
+        this.Locked = bLocked;
+    },
+
+    Set_RelativeHeight : function(nRelativeHeight)
+    {
+        History.Add(this, {Type: historyitem_Drawing_SetRelativeHeight, OldPr: this.RelativeHeight, NewPr: nRelativeHeight});
+        this.Set_RelativeHeight2(nRelativeHeight);
+    },
+
+    Set_RelativeHeight2 : function(nRelativeHeight)
+    {
+        this.RelativeHeight = nRelativeHeight;
+        if(this.graphicObjects && isRealNumber(nRelativeHeight) && nRelativeHeight > this.graphicObjects.maximalGraphicObjectZIndex)
         {
-            return this.GraphicObj.canTakeOutPage();
+            this.graphicObjects.maximalGraphicObjectZIndex = nRelativeHeight;
         }
-        return false;
     },
 
     Set_XYForAdd : function(X, Y, NearPos, PageNum)
@@ -4687,8 +4718,8 @@ ParaDrawing.prototype =
         {
             var Layout = NearPos.Paragraph.Get_Layout( NearPos.ContentPos, this );
 
-            var _W = (this.PositionH.Align ? this.W : this.getXfrmExtX() );
-            var _H = (this.PositionV.Align ? this.H : this.getXfrmExtY() );
+            var _W = (this.PositionH.Align ? this.Extent.W : this.getXfrmExtX() );
+            var _H = (this.PositionV.Align ? this.Extent.H : this.getXfrmExtY() );
 
             this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
             this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
@@ -4713,41 +4744,13 @@ ParaDrawing.prototype =
             // На всякий случай пересчитаем заново координату
             this.Y = this.Internal_Position.Calculate_Y(false, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
         }
+    },
 
-        /*
-         this.Set_PositionH( c_oAscRelativeFromH.Column, false, 0 );
-         this.Set_PositionV( c_oAscRelativeFromV.Paragraph, false, 0 );
-
-         this.PositionH_Old =
-         {
-         RelativeFrom : this.PositionH.RelativeFrom,
-         Align        : this.PositionH.Align,
-         Value        : this.PositionH.Value,
-
-         RelativeFrom2 : c_oAscRelativeFromH.Page,
-         Align2        : false,
-         Value2        : X
-         };
-
-         this.PositionV_Old =
-         {
-         RelativeFrom : this.PositionV.RelativeFrom,
-         Align        : this.PositionV.Align,
-         Value        : this.PositionV.Value,
-
-         RelativeFrom2 : c_oAscRelativeFromV.Page,
-         Align2        : false,
-         Value2        : Y
-         };
-
-         this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
-         this.PositionH.Align        = false;
-         this.PositionH.Value        = X;
-
-         this.PositionV.RelativeFrom = c_oAscRelativeFromV.Page;
-         this.PositionV.Align        = false;
-         this.PositionV.Value        = Y;
-         */
+    Set_XY : function(X, Y, Paragraph, PageNum, bResetAlign)
+    {
+        //TODO: Реализовать
+        this.Set_PositionH( c_oAscRelativeFromH.Page, false, X );
+        this.Set_PositionV( c_oAscRelativeFromV.Page, false, Y );
     },
 
     Get_DrawingType : function()
@@ -4770,7 +4773,7 @@ ParaDrawing.prototype =
     Draw_Selection : function()
     {
         var Padding = this.DrawingDocument.GetMMPerDot( 6 );
-        this.DrawingDocument.AddPageSelection( this.PageNum, this.selectX - Padding, this.selectY - Padding, this.W + 2 * Padding, this.H + 2 * Padding );
+        this.DrawingDocument.AddPageSelection( this.PageNum, this.selectX - Padding, this.selectY - Padding, this.Width + 2 * Padding, this.Height + 2 * Padding );
     },
 
     OnEnd_MoveInline : function(NearPos)
@@ -4784,29 +4787,20 @@ ParaDrawing.prototype =
     OnEnd_ResizeInline : function(W, H)
     {
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        // Проверяем, залочено ли данное изображение
-        if (true/* false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties)*/ )
-        {
-            //   LogicDocument.Create_NewHistoryPoint();
-            this.Update_Size( W, H );
-            LogicDocument.Recalculate();
-        }
-        else
-        {
-            LogicDocument.Document_UpdateSelectionState();
-        }
+        this.setExtent( W, H );
+        LogicDocument.Recalculate();
     },
 
     OnEnd_ChangeFlow : function(X, Y, PageNum, W, H, NearPos, bMove, bLast)
     {
-        this.Update_Size( W, H );
+        this.setExtent( W, H );
 
         if ( true === bMove && null !== NearPos )
         {
             var Layout = NearPos.Paragraph.Get_Layout( NearPos.ContentPos, this );
 
-            var _W = this.W;
-            var _H = this.H;
+            var _W = this.Extent.W;
+            var _H = this.Extent.H;
 
             this.Internal_Position.Set( _W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
             this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X);
@@ -4953,24 +4947,14 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_Size:
+            case historyitem_Drawing_SetRelativeHeight:
             {
-                this.W = Data.Old.W;
-                this.H = Data.Old.H;
-                this.Measure2();
+                this.Set_RelativeHeight2(Data.OldPr);
                 break;
             }
-
-            case historyitem_Drawing_Url:
-            {
-                this.GraphicObj.Img = Data.Old;
-                break;
-            }
-
             case historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.Old;
-                //this.updateWidthHeight();
                 break;
             }
 
@@ -5063,6 +5047,11 @@ ParaDrawing.prototype =
                 this.wrappingPolygon = Data.oldW;
                 break;
             }
+            case historyitem_Drawing_SetLocked:
+            {
+                this.Locked = Data.OldPr;
+                break;
+            }
         }
     },
 
@@ -5072,31 +5061,21 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_Size:
+            case historyitem_Drawing_SetRelativeHeight:
             {
-                this.W = Data.New.W;
-                this.H = Data.New.H;
-                this.Measure2();
-                break;
-            }
-
-            case historyitem_Drawing_Url:
-            {
-                this.GraphicObj.Img = Data.New;
+                this.Set_RelativeHeight2(Data.NewPr);
                 break;
             }
 
             case historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.New;
-                //this.updateWidthHeight();
                 break;
             }
 
             case historyitem_Drawing_WrappingType:
             {
                 this.wrappingType = Data.New;
-                //this.updateWidthHeight();
                 break;
             }
 
@@ -5106,7 +5085,6 @@ ParaDrawing.prototype =
                 this.Distance.T = Data.New.Top;
                 this.Distance.R = Data.New.Right;
                 this.Distance.B = Data.New.Bottom;
-
                 this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
                 break;
             }
@@ -5122,7 +5100,6 @@ ParaDrawing.prototype =
                 this.PositionH.RelativeFrom = Data.New.RelativeFrom;
                 this.PositionH.Align        = Data.New.Align;
                 this.PositionH.Value        = Data.New.Value;
-
                 break;
             }
 
@@ -5131,25 +5108,18 @@ ParaDrawing.prototype =
                 this.PositionV.RelativeFrom = Data.New.RelativeFrom;
                 this.PositionV.Align        = Data.New.Align;
                 this.PositionV.Value        = Data.New.Value;
-
                 break;
             }
-
 
             case historyitem_Drawing_BehindDoc:
             {
                 this.behindDoc = Data.New;
-
                 break;
             }
 
-
             case historyitem_Drawing_SetGraphicObject:
             {
-                if(this.GraphicObj != null)
-                {
-                    //this.GraphicObj.parent = null;
-                }
+
                 if(Data.newId != null)
                 {
                     this.GraphicObj = g_oTableId.Get_ById(Data.newId);
@@ -5161,12 +5131,12 @@ ParaDrawing.prototype =
 
                 if(isRealObject(this.GraphicObj))
                 {
-                    //this.GraphicObj.parent = this;
                     this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
                 }
 
                 break;
             }
+
             case historyitem_SetSimplePos:
             {
                 this.SimplePos.Use = Data.newUse;
@@ -5174,6 +5144,7 @@ ParaDrawing.prototype =
                 this.SimplePos.Y = Data.newY;
                 break;
             }
+
             case historyitem_SetExtent:
             {
                 this.Extent.W = Data.newW;
@@ -5184,6 +5155,12 @@ ParaDrawing.prototype =
             case historyitem_SetWrapPolygon:
             {
                 this.wrappingPolygon = Data.newW;
+                break;
+            }
+
+            case historyitem_Drawing_SetLocked:
+            {
+                this.Locked = Data.NewPr;
                 break;
             }
         }
@@ -5199,12 +5176,32 @@ ParaDrawing.prototype =
     {
         if ( undefined != this.Parent && null != this.Parent )
         {
-            if(Data && Data.Type === historyitem_Drawing_Distance)
+            if(isRealObject(Data))
             {
-                this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
-                this.GraphicObj && this.GraphicObj.addToRecalculate();
+                switch(Data.Type)
+                {
+                    case historyitem_Drawing_Distance:
+                    {
+                        this.GraphicObj && this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
+                        this.GraphicObj && this.GraphicObj.addToRecalculate();
+                        break;
+                    }
+                    case historyitem_SetExtent:
+                    {
+                        var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+                        if(Run)
+                        {
+                            Run.RecalcInfo.Measure = true;
+                        }
+                        break;
+                    }
+                    case historyitem_Drawing_SetRelativeHeight:
+                    {
+                        //TODO
+                        break;
+                    }
+                }
             }
-
             return this.Parent.Refresh_RecalcData2();
         }
     },
@@ -5213,7 +5210,10 @@ ParaDrawing.prototype =
 //-----------------------------------------------------------------------------------
     Document_Is_SelectionLocked : function(CheckType)
     {
-
+        if(CheckType === changestype_Drawing_Props)
+        {
+            this.Lock.Check(this.Get_Id());
+        }
     },
 
     hyperlinkCheck: function(bCheck)
@@ -5411,25 +5411,11 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_Size:
+            case historyitem_Drawing_SetRelativeHeight:
             {
-                // Double : W
-                // Double : H
-
-                Writer.WriteDouble( Data.New.W );
-                Writer.WriteDouble( Data.New.H );
-
+                writeLong(Writer, Data.NewPr);
                 break;
             }
-
-            case historyitem_Drawing_Url:
-            {
-                // String : указатель на картинку
-
-                Writer.WriteString2( Data.New );
-                break;
-            }
-
             case historyitem_Drawing_DrawingType:
             {
                 // Long : тип обтекания
@@ -5540,6 +5526,11 @@ ParaDrawing.prototype =
                // }
                 break;
             }
+            case historyitem_Drawing_SetLocked:
+            {
+                writeBool(Writer, Data.NewPr);
+                break;
+            }
         }
 
         return Writer;
@@ -5559,32 +5550,15 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_Size:
+            case historyitem_Drawing_SetRelativeHeight:
             {
-                // Double : W
-                // Double : H
-
-                this.W = Reader.GetDouble();
-                this.H = Reader.GetDouble();
-                this.bNeedUpdateWH = true;
-                this.Measure2();
+                this.Set_RelativeHeight2(readLong(Reader));
                 break;
             }
-
-            case historyitem_Drawing_Url:
-            {
-                // String : указатель на картинку
-
-                this.GraphicObj.Img = Reader.GetString2();
-
-                break;
-            }
-
             case historyitem_Drawing_DrawingType:
             {
                 // Long : тип обтекания
                 this.DrawingType = Reader.GetLong();
-                //this.updateWidthHeight();
                 break;
             }
 
@@ -5593,7 +5567,6 @@ ParaDrawing.prototype =
             {
                 // Long : тип обтекания
                 this.wrappingType = Reader.GetLong();
-                //this.updateWidthHeight();
                 break;
             }
 
@@ -5660,15 +5633,11 @@ ParaDrawing.prototype =
             {
                 // Bool
                 this.behindDoc = Reader.GetBool();
-
                 break;
             }
 
-
             case historyitem_Drawing_SetGraphicObject:
             {
-                /*if(this.GraphicObj != null)
-                 this.GraphicObj.parent = null;  */
                 if(Reader.GetBool())
                 {
                     this.GraphicObj = g_oTableId.Get_ById(Reader.GetString2());
@@ -5677,11 +5646,8 @@ ParaDrawing.prototype =
                 {
                     this.GraphicObj = null;
                 }
-                //if(isRealObject(this.GraphicObj))
-                //    this.GraphicObj.parent = this;
                 if(isRealObject(this.GraphicObj))
                 {
-                    //this.GraphicObj.parent = this;
                     this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
                 }
                 break;
@@ -5709,11 +5675,25 @@ ParaDrawing.prototype =
                 {
                     this.Extent.H = Reader.GetDouble();
                 }
+
+                if(this.Parent)
+                {
+                    var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+                    if(Run)
+                    {
+                        Run.RecalcInfo.Measure = true;
+                    }
+                }
                 break;
             }
             case historyitem_SetWrapPolygon:
             {
                 this.wrappingPolygon = readObject(Reader);
+                break;
+            }
+            case historyitem_Drawing_SetLocked:
+            {
+                this.Locked = readBool(Reader);
                 break;
             }
         }
@@ -5734,12 +5714,13 @@ ParaDrawing.prototype =
     {
         Writer.WriteLong( historyitem_type_Drawing );
         Writer.WriteString2(this.Id);
-        writeDouble(Writer, this.W);
-        writeDouble(Writer, this.H);
+        writeDouble(Writer, this.Extent.W);
+        writeDouble(Writer, this.Extent.H);
         writeObject(Writer, this.GraphicObj);
         writeObject(Writer, this.DocumentContent);
         writeObject(Writer, this.Parent);
         writeObject(Writer, this.wrappingPolygon);
+        writeLong(Writer, this.RelativeHeight);
 
     },
 
@@ -5748,25 +5729,22 @@ ParaDrawing.prototype =
         this.Id = Reader.GetString2();
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
-        this.W               = readDouble(Reader);
-        this.H               = readDouble(Reader);
+        this.Extent.W = readDouble(Reader);
+        this.Extent.H = readDouble(Reader);
         this.GraphicObj      = readObject(Reader);
         this.DocumentContent = readObject(Reader);
         this.Parent          = readObject(Reader);
         this.wrappingPolygon = readObject(Reader);
+        this.RelativeHeight  = readLong(Reader);
         if(this.wrappingPolygon)
         {
             this.wrappingPolygon.wordGraphicObject = this;
         }
 
-        this.Extent.W = this.W;
-        this.Extent.H = this.H;
-
-
         this.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
         this.document = editor.WordControl.m_oLogicDocument;
         this.graphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
-        this.graphicObjects.objectsMap["_" + this.Get_Id()] = this;
+        this.graphicObjects.addGraphicObject(this);
         g_oTableId.Add(this, this.Id);
     },
 
@@ -5933,12 +5911,6 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getSpTree === "function")
             return this.GraphicObj.getSpTree();
         return [];
-    },
-
-
-    setZIndex2: function(zIndex)
-    {
-        this.RelativeHeight = zIndex;
     },
 
     hitToAdj: function(x, y)
@@ -6577,7 +6549,7 @@ ParaDrawing.prototype =
 
     copy: function()
     {
-        var c = new ParaDrawing(this.W,  this.H, null, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
+        var c = new ParaDrawing(this.Extent.W,  this.Extent.H, null, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
         c.Set_DrawingType(this.DrawingType);
         if(isRealObject(this.GraphicObj))
         {
@@ -6592,7 +6564,6 @@ ParaDrawing.prototype =
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
         c.Set_BehindDoc(this.behindDoc);
-        c.Update_Size(this.W, this.H);
         return c;
     },
 

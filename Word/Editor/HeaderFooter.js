@@ -175,12 +175,13 @@ CHeaderFooter.prototype =
                 var Obj = AllDrawingObjects[Index];
                 if ( drawing_Anchor === Obj.Get_DrawingType() && true === Obj.Use_TextWrap() )
                 {
+                    var oDistance = Obj.Get_Distance();
                     var FlowPos =
                     {
-                        X : Obj.X - Obj.Distance.L,
-                        Y : Obj.Y - Obj.Distance.T,
-                        W : Obj.W + Obj.Distance.R,
-                        H : Obj.H + Obj.Distance.B
+                        X : Obj.X - oDistance.L,
+                        Y : Obj.Y - oDistance.T,
+                        W : Obj.Width + oDistance.R,
+                        H : Obj.Height + oDistance.B
                     };
 
                     NewFlowPos.push( FlowPos );

@@ -9,8 +9,38 @@ var contentchanges_Remove = 2;
 var HANDLE_EVENT_MODE_HANDLE = 0;
 var HANDLE_EVENT_MODE_CURSOR = 1;
 
+var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
+
 var global_canvas = null;
 
+var g_nZIndexCounter = -1;
+
+function CDistance(L, T, R, B)
+{
+    this.L = L;
+    this.T = T;
+    this.R = R;
+    this.B = B;
+}
+
+function checkObjectInArray(aObjects, oObject)
+{
+    var i;
+    for(i = 0; i < aObjects.length; ++i)
+    {
+        if(aObjects[i] === oObject)
+        {
+            return;
+        }
+    }
+    aObjects.push(oObject);
+}
+function getValOrDefault(val, defaultVal)
+{
+    if(val !== null && val !== undefined)
+        return val;
+    return defaultVal;
+}
 
 function checkInternalSelection(selection)
 {
@@ -161,9 +191,15 @@ function getObjectsByTypesFromArr(arr, bGrouped)
 function CreateBlipFillUniFillFromUrl(url)
 {
     var ret = new CUniFill();
-    ret.setFill(new CBlipFill());
-    ret.fill.setRasterImageId(url);
+    ret.setFill(CreateBlipFillRasterImageId(url));
     return ret;
+}
+
+function CreateBlipFillRasterImageId(url)
+{
+    var oBlipFill = new CBlipFill();
+    oBlipFill.setRasterImageId(url);
+    return oBlipFill;
 }
 
 
@@ -656,7 +692,7 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
-            else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
+            else
             {
                 dPosX = document.TargetPos.X;
                 dPosY = document.TargetPos.Y;
@@ -826,9 +862,7 @@ DrawingObjectsController.prototype =
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
                     drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
-
                 }
-
             }
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].drawAdjustments && this.selectedObjects[0].selectStartPage === pageIndex)
             {
@@ -1747,7 +1781,7 @@ DrawingObjectsController.prototype =
         {
             for(i = 0; i < objects_by_type.images.length; ++i)
             {
-                objects_by_type.images[i].setBlipFill(CreateBlipFillUniFillFromUrl(props.ImageUrl).fill);
+                objects_by_type.images[i].setBlipFill(CreateBlipFillRasterImageId(props.ImageUrl));
             }
         }
         if(props.ChartProperties)
@@ -1757,6 +1791,7 @@ DrawingObjectsController.prototype =
                 this.applyPropsToChartSpace(props.ChartProperties, objects_by_type.charts[i]);
             }
         }
+        var aGroups = [];
         if(isRealNumber(props.Width) && isRealNumber(props.Height))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
@@ -1766,7 +1801,7 @@ DrawingObjectsController.prototype =
                 objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
                 if(objects_by_type.shapes[i].group)
                 {
-                    objects_by_type.shapes[i].group.updateCoordinatesAfterInternalResize();
+                    checkObjectInArray(aGroups, objects_by_type.shapes[i].group.getMainGroup());
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
@@ -1777,7 +1812,7 @@ DrawingObjectsController.prototype =
                 objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
                 if(objects_by_type.images[i].group)
                 {
-                    objects_by_type.images[i].group.updateCoordinatesAfterInternalResize();
+                    checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
                 }
                 objects_by_type.images[i].checkDrawingBaseCoords();
             }
@@ -1788,14 +1823,10 @@ DrawingObjectsController.prototype =
                 objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
                 if(objects_by_type.charts[i].group)
                 {
-                    objects_by_type.charts[i].group.updateCoordinatesAfterInternalResize();
+                    checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
                 }
                 objects_by_type.charts[i].checkDrawingBaseCoords();
             }
-            //if(this.selection.groupSelection)
-            //{
-            //    this.selection.groupSelection.updateCoordinatesAfterInternalResize();
-            //}
         }
 
         if(isRealObject(props.Position) &&isRealNumber(props.Position.X) && isRealNumber(props.Position.Y))
@@ -1807,7 +1838,7 @@ DrawingObjectsController.prototype =
                 objects_by_type.shapes[i].spPr.xfrm.setOffY(props.Position.Y);
                 if(objects_by_type.shapes[i].group)
                 {
-                    objects_by_type.shapes[i].group.updateCoordinatesAfterInternalResize();
+                    checkObjectInArray(aGroups, objects_by_type.shapes[i].group.getMainGroup());
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
@@ -1818,7 +1849,7 @@ DrawingObjectsController.prototype =
                 objects_by_type.images[i].spPr.xfrm.setOffY(props.Position.Y);
                 if(objects_by_type.images[i].group)
                 {
-                    objects_by_type.images[i].group.updateCoordinatesAfterInternalResize();
+                    checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
                 }
                 objects_by_type.images[i].checkDrawingBaseCoords();
             }
@@ -1829,14 +1860,14 @@ DrawingObjectsController.prototype =
                 objects_by_type.charts[i].spPr.xfrm.setOffY(props.Position.Y);
                 if(objects_by_type.charts[i].group)
                 {
-                    objects_by_type.charts[i].group.updateCoordinatesAfterInternalResize();
+                    checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
                 }
                 objects_by_type.charts[i].checkDrawingBaseCoords();
             }
-            //if(this.selection.groupSelection)
-            //{
-            //    this.selection.groupSelection.updateCoordinatesAfterInternalResize();
-            //}
+        }
+        for(i = 0; i < aGroups.length; ++i)
+        {
+            aGroups[i].updateCoordinatesAfterInternalResize();
         }
         return objects_by_type;
     },
@@ -4578,37 +4609,6 @@ DrawingObjectsController.prototype =
                     chart_selection.recalculate();
                     this.document.DrawingDocument.OnRecalculatePage( chart_selection.selectStartPage, this.document.Pages[chart_selection.selectStartPage] );
                     this.document.DrawingDocument.OnEndRecalculate( false, true );
-
-                    //var para_drawing;
-                    //if(chart_selection.group)
-                    //{
-                    //    var cur_group = chart_selection.group;
-                    //    while(cur_group.group)
-                    //        cur_group = cur_group.group;
-                    //    para_drawing = cur_group.parent;
-                    //}
-                    //else
-                    //{
-                    //    para_drawing = chart_selection.parent;
-                    //}
-                    //if(para_drawing && para_drawing.GraphicObj)
-                    //{
-                    //    if(para_drawing.Is_Inline())
-                    //    {
-                    //        para_drawing.OnEnd_ResizeInline(para_drawing.GraphicObj.bounds.w, para_drawing.GraphicObj.bounds.h);
-                    //    }
-                    //    else
-                    //    {
-                    //        var pos_x = para_drawing.GraphicObj.bounds.x + para_drawing.GraphicObj.posX;
-                    //        var pos_y = para_drawing.GraphicObj.bounds.y + para_drawing.GraphicObj.posY;
-                    //        var nearest_pos = this.document.Get_NearestPos(para_drawing.GraphicObj.selectStartPage, pos_x, pos_y, true, para_drawing);
-                    //        nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
-                    //        para_drawing.Remove_FromDocument(false);
-                    //        para_drawing.Set_XYForAdd(pos_x, pos_y, nearest_pos, para_drawing.GraphicObj.selectStartPage);
-                    //        para_drawing.Add_ToDocument2(para_drawing.Get_ParentParagraph());
-                    //    }
-                    //}
-                    //this.document.Recalculate();
                 }
                 else if(this.drawingObjects.cSld)
                 {
@@ -4906,7 +4906,6 @@ DrawingObjectsController.prototype =
             }
             default :
             {
-                this.currentPresetGeom = presetGeom;
                 this.changeCurrentState(new StartAddNewShape(this, presetGeom));
                 break;
             }
@@ -6453,85 +6452,6 @@ function CreateAscColorEx(unicolor) {
     return ret;
 }
 
-function CorrectUniColorEx(asc_color, unicolor) {
-    if (null == asc_color)
-        return unicolor;
-
-    var ret = unicolor;
-    if (null == ret)
-        ret = new CUniColor();
-
-    var _type = asc_color.asc_getType();
-    switch (_type)
-    {
-        case c_oAscColor.COLOR_TYPE_PRST:
-        {
-            if (ret.color == null || ret.color.type != COLOR_TYPE_PRST)
-            {
-                ret.setColor(new CPrstColor());
-            }
-            ret.color.id = asc_color.asc_getValue();
-            break;
-        }
-        case c_oAscColor.COLOR_TYPE_SCHEME:
-        {
-            if (ret.color == null || ret.color.type != COLOR_TYPE_SCHEME)
-            {
-                ret.setColor(new CSchemeColor());
-            }
-
-            // тут выставляется ТОЛЬКО из меню. поэтому:
-            var _index = parseInt(asc_color.asc_getValue());
-            var _id = (_index / 6) >> 0;
-            var _pos = _index - _id * 6;
-
-            var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
-            ret.color.setColorId(array_colors_types[_id]);
-
-            if (ret.Mods.Mods.length != 0)
-                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
-
-            var __mods = null;
-
-            var _editor = window["Asc"]["editor"];
-            if (_editor && _editor.wbModel)
-            {
-                var _theme = _editor.wbModel.theme;
-                var _clrMap = _editor.wbModel.clrSchemeMap;
-
-                if (_theme && _clrMap)
-                {
-                    var _schemeClr = new CSchemeColor();
-                    _schemeClr.id = array_colors_types[_id];
-
-                    var _rgba = {R:0, G:0, B:0, A:255};
-                    _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
-					
-					__mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, 0);
-                }
-            }
-			
-			if (null != __mods)
-			{
-				for (var modInd = 0; modInd < __mods.length; modInd++)
-					ret.addMod(_create_mod(__mods[modInd]));
-			}
-
-            break;
-        }
-        default:
-        {
-            if (ret.color == null || ret.color.type != COLOR_TYPE_SRGB)
-            {
-                ret.setColor(new CRGBColor());
-            }
-            ret.color.setColor(((asc_color.asc_getR() << 16) & 0xFF0000) + ((asc_color.asc_getG() << 8) & 0xFF00) + asc_color.asc_getB());
-            ret.clearMods();
-        }
-    }
-    return ret;
-}
-
 function asc_CShapeFill() {
     this.type = null;
     this.fill = null;
@@ -6765,164 +6685,6 @@ function CreateAscFillEx(unifill) {
     return ret;
 }
 
-function CorrectUniFillEx(asc_fill, unifill) {
-
-    if (null == asc_fill)
-        return unifill;
-
-    var ret = unifill;
-    if (null == ret)
-        ret = new CUniFill();
-
-    var _fill = asc_fill.asc_getFill();
-    var _type = asc_fill.asc_getType();
-
-    if (null != _type)
-    {
-        switch (_type)
-        {
-            case c_oAscFill.FILL_TYPE_NOFILL:
-            {
-                ret.setFill(new CNoFill());
-                break;
-            }
-            case c_oAscFill.FILL_TYPE_BLIP:
-            {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_BLIP)
-                {
-                    ret.setFill(new CBlipFill());
-                }
-
-                var _url = _fill.asc_getUrl();
-                var _tx_id = _fill.asc_getTextureId();
-                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
-                {
-                    _url = g_oUserTexturePresets[_tx_id];
-                }
-
-                if (_url != null && _url !== undefined && _url != "")
-                    ret.fill.setRasterImageId(_url);
-
-                if (ret.fill.RasterImageId == null)
-                    ret.fill.setRasterImageId("");
-
-                var tile = _fill.asc_getType();
-                if (tile == c_oAscFillBlipType.STRETCH)
-                    ret.fill.setTile(null);
-                else if (tile == c_oAscFillBlipType.TILE)
-                    ret.fill.setTile(true);
-
-                break;
-            }
-            case c_oAscFill.FILL_TYPE_PATT:
-            {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_PATT)
-                {
-                    ret.setFill(new CPattFill());
-                }
-
-                if (undefined != _fill.PatternType)
-                {
-                    ret.fill.setFType(_fill.PatternType);
-                }
-                if (undefined != _fill.fgClr)
-                {
-                    ret.fill.setFgColor(CorrectUniColorEx(_fill.asc_getColorFg(), ret.fill.fgClr));
-                }
-                if (undefined != _fill.bgClr)
-                {
-                    ret.fill.setBgColor(CorrectUniColorEx(_fill.asc_getColorBg(), ret.fill.bgClr));
-                }
-
-                break;
-            }
-            case c_oAscFill.FILL_TYPE_GRAD:
-            {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_GRAD)
-                {
-                    ret.setFill(new CGradFill());
-                }
-
-                var _colors     = _fill.asc_getColors();
-                var _positions  = _fill.asc_getPositions();
-                if (undefined != _colors && undefined != _positions)
-                {
-                    if (_colors.length == _positions.length)
-                    {
-                        ret.fill.colors.splice(0, ret.fill.colors.length);
-
-                        for (var i = 0; i < _colors.length; i++)
-                        {
-                            var _gs = new CGs();
-                            _gs.setColor(CorrectUniColorEx(_colors[i], _gs.color));
-                            _gs.setPos(_positions[i]);
-
-                            ret.fill.addGS(_gs);
-                        }
-                    }
-                }
-                else if (undefined != _colors)
-                {
-                    if (_colors.length == ret.fill.colors.length)
-                    {
-                        for (var i = 0; i < _colors.length; i++)
-                        {
-                            if(!(_colors[i].value == null && _colors[i].type ===c_oAscColor.COLOR_TYPE_SCHEME))
-                                ret.fill.colors[i].setColor(CorrectUniColorEx(_colors[i], ret.fill.colors[i].color));
-                        }
-                    }
-                }
-                else if (undefined != _positions)
-                {
-                    if (_positions.length == ret.fill.colors.length)
-                    {
-                        for (var i = 0; i < _positions.length; i++)
-                        {
-                            ret.fill.colors[i].setPos(_positions[i]);
-                        }
-                    }
-                }
-
-                var _grad_type = _fill.asc_getGradType();
-
-                if (c_oAscFillGradType.GRAD_LINEAR == _grad_type)
-                {
-                    var _angle = _fill.asc_getLinearAngle();
-                    var _scale = _fill.asc_getLinearScale();
-
-                    if (!ret.fill.lin)
-                        ret.fill.setLin(new GradLin());
-
-                    if (undefined != _angle)
-                        ret.fill.lin.setAngle(_angle);
-                    if (undefined != _scale)
-                        ret.fill.lin.setScale(_scale);
-                }
-                else if (c_oAscFillGradType.GRAD_PATH == _grad_type)
-                {
-                    ret.fill.setLin(null);
-                    ret.fill.setPath(new GradPath());
-                }
-                break;
-            }
-            default:
-            {
-                if (ret.fill == null || ret.fill.type != FILL_TYPE_SOLID)
-                {
-                    ret.setFill(new CSolidFill());
-                }
-                ret.fill.setColor(CorrectUniColorEx(_fill.asc_getColor(), ret.fill.color));
-            }
-        }
-    }
-
-    var _alpha = asc_fill.asc_getTransparent();
-    if (null != _alpha)
-        ret.setTransparent(_alpha);
-
-    return ret;
-}
-
 function asc_CStroke() {
     this.type = null;
     this.width = null;
@@ -7089,92 +6851,6 @@ function CreateAscStrokeEx(ln, _canChangeArrows) {
     return ret;
 }
 
-function CorrectUniStrokeEx(asc_stroke, unistroke) {
-    if (null == asc_stroke)
-        return unistroke;
-
-    var ret = unistroke;
-    if (null == ret)
-        ret = new CLn();
-
-    var _type = asc_stroke.asc_getType();
-    var _w = asc_stroke.asc_getWidth();
-
-    if (_w != null && _w !== undefined)
-        ret.setW(_w * 36000.0);
-
-    var _color = asc_stroke.asc_getColor();
-    if (_type == c_oAscStrokeType.STROKE_NONE)
-    {
-        ret.setFill(new CUniFill());
-        ret.Fill.setFill(new CNoFill());
-    }
-    else if (_type != null)
-    {
-        if (null != _color && undefined !== _color)
-        {
-            ret.setFill(new CUniFill());
-            ret.Fill.setFill(new CSolidFill());
-            ret.Fill.fill.setColor(CorrectUniColorEx(_color, ret.Fill.fill.color));
-        }
-    }
-
-    var _join = asc_stroke.asc_getLinejoin();
-    if (null != _join)
-    {
-        ret.Join = new LineJoin();
-        ret.Join.type = _join;
-    }
-
-    var _cap = asc_stroke.asc_getLinecap();
-    if (null != _cap)
-    {
-        ret.cap = _cap;
-    }
-
-    var _begin_style = asc_stroke.asc_getLinebeginstyle();
-    if (null != _begin_style)
-    {
-        if (ret.headEnd == null)
-            ret.headEnd = new EndArrow();
-
-        ret.headEnd.type = _begin_style;
-    }
-
-    var _end_style = asc_stroke.asc_getLineendstyle();
-    if (null != _end_style)
-    {
-        if (ret.tailEnd == null)
-            ret.tailEnd = new EndArrow();
-
-        ret.tailEnd.type = _end_style;
-    }
-
-    var _begin_size = asc_stroke.asc_getLinebeginsize();
-    if (null != _begin_size)
-    {
-        if (ret.headEnd == null)
-            ret.headEnd = new EndArrow();
-
-        ret.headEnd.w = 2 - ((_begin_size/3) >> 0);
-        ret.headEnd.len = 2 - (_begin_size % 3);
-    }
-
-    var _end_size = asc_stroke.asc_getLineendsize();
-    if (null != _end_size)
-    {
-        if (ret.tailEnd == null)
-            ret.tailEnd = new EndArrow();
-
-        ret.tailEnd.w = 2 - ((_end_size/3) >> 0);
-        ret.tailEnd.len = 2 - (_end_size % 3);
-    }
-
-    return ret;
-}
-
-
-
 function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
 
     var _this = drawingObjects;
@@ -7260,7 +6936,6 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
     }
     return null;
 }
-
 
 function GetMinSnapDistanceXObject(pointX, arrGrObjects)
 {

@@ -16,6 +16,8 @@ function XYAdjustmentTrack(originalShape, adjIndex)
         this.refX = null;
         this.refY = null;
 
+        this.originalObject= originalShape;
+
         if(this.adjastment !== null && typeof this.adjastment === "object")
         {
             var _ref_x = this.adjastment.gdRefX;

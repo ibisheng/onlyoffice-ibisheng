@@ -6611,8 +6611,27 @@ Paragraph.prototype =
         return null;
     },
 
-    Is_UseInDocument : function()
+    Is_UseInDocument : function(Id)
     {
+        if(Id !== undefined)
+        {
+            for(var i = 0; i < this.Content.length; ++i)
+            {
+                if(this.Content[i].Get_Id() === Id)
+                {
+                    break;
+                }
+            }
+            if(i < this.Content.length)
+            {
+                if(this.Parent)
+                {
+                    return this.Parent.Is_UseInDocument(this.Get_Id());
+                }
+            }
+            return false;
+        }
+
         if ( null != this.Parent )
             return this.Parent.Is_UseInDocument(this.Get_Id());
 

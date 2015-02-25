@@ -32,7 +32,6 @@ var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
 var Y_Top_Field    = Y_Top_Margin;
 
 var docpostype_Content        = 0x00;
-var docpostype_FlowObjects    = 0x01;
 var docpostype_HdrFtr         = 0x02;
 var docpostype_DrawingObjects = 0x03;
 
@@ -865,10 +864,7 @@ CDocument.prototype =
         
         // Проверяем последний параграф на наличие секции 
         this.Check_SectionLastParagraph();
-        
-        // Заполняем массив с ZIndex для всех автофигур документа
-        if(null != this.DrawingObjects)
-            this.DrawingObjects.addToZIndexManagerAfterOpen();
+
                 
         // Перемещаем курсор в начало документа
         this.Cursor_MoveToStartPos(false);
@@ -2829,7 +2825,7 @@ CDocument.prototype =
                     var Image = this.DrawingObjects.getChartSpace2(Chart,null);
                     Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
-                    Drawing.Update_Size( Image.spPr.xfrm.extX, Image.spPr.xfrm.extY );
+                    Drawing.setExtent( Image.spPr.xfrm.extX, Image.spPr.xfrm.extY );
                 }
                 if ( true === bFlow )
                 {

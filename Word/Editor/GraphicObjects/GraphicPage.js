@@ -15,10 +15,8 @@ function CGraphicPage(pageIndex, graphicObjects)
     {
         selectionArray: []
     };
+
     //массивы для отрисовки
-
-    this.objectsMap = {};
-
     this.inlineObjects = [];
     this.behindDocObjects = [];
     this.wrappingObjects = [];
@@ -164,66 +162,6 @@ CGraphicPage.prototype =
         {
             if(this.flowTables[index].IsPointIn(x, y) && this.flowTables[index].Table.Parent === documentContent)
                 return this.flowTables[index];
-        }
-        return null;
-    },
-
-    getObjectById: function(id, type)
-    {
-        if(!isNaN(type) && typeof type === "number")
-        {
-            var drawing_array;
-            switch (type)
-            {
-                case DRAWING_ARRAY_TYPE_BEFORE:
-                {
-                    drawing_array = this.beforeTextObjects;
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_BEHIND:
-                {
-                    drawing_array = this.behindDocObjects;
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_INLINE:
-                {
-                    drawing_array = this.inlineObjects;
-                    break;
-                }
-                case DRAWING_ARRAY_TYPE_WRAPPING:
-                {
-                    drawing_array = this.wrappingObjects;
-                    break;
-                }
-            }
-            if(Array.isArray(drawing_array))
-            {
-                for(var index = 0; index < drawing_array.length; ++index)
-                    if(drawing_array[index].Get_Id() === id)
-                        return drawing_array[index];
-            }
-        }
-        else
-        {
-            drawing_array = this.beforeTextObjects;
-            for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
-                    return drawing_array[index];
-
-            drawing_array = this.behindDocObjects;
-            for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
-                    return drawing_array[index];
-
-            drawing_array = this.inlineObjects;
-            for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
-                    return drawing_array[index];
-
-            drawing_array = this.wrappingObjects;
-            for(index = 0; index < drawing_array.length; ++index)
-                if(drawing_array[index].Get_Id() === id)
-                    return drawing_array[index];
         }
         return null;
     },

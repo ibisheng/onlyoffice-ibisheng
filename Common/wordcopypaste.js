@@ -93,30 +93,6 @@ function Editor_Copy_GetElem(api)
 }
 function Editor_Copy_Button(api, bCut)
 {
-    /*if(false == g_bIsDocumentCopyPaste)
-    {
-        switch(api.WordControl.Thumbnails.FocusObjType)
-        {
-            case FOCUS_OBJECT_MAIN:
-            {
-                var _logic_document = api.WordControl.m_oLogicDocument;
-                if(_logic_document && _logic_document.CurPos.Type != docpostype_FlowObjects )
-                {
-                    _logic_document.slidesBuffer.length = 0;
-                    _logic_document.glyphsBuffer = _logic_document.Slides[_logic_document.CurPage].elementsManipulator.glyphsCopy();
-                    return true;
-                }
-                break;
-            }
-            case FOCUS_OBJECT_THUMBNAILS :
-            {
-                var _selected_array = api.WordControl.m_oLogicDocument.DrawingDocument.m_oWordControl.Thumbnails.GetSelectedArray();
-                api.WordControl.m_oLogicDocument.glyphsBuffer.length = 0;
-                api.WordControl.m_oLogicDocument.slidesCopy(_selected_array);
-                return true;
-            }
-        }
-    }*/
 	
 	if(bCut)
 		History.Create_NewPoint();
@@ -683,8 +659,8 @@ CopyProcessor.prototype =
                 {
                     sSrc = this.getSrc(sSrc);
 
-                    var _w = (null != ParaItem.W) ? ParaItem.W : ParaItem.Extent.W;
-                    var _h = (null != ParaItem.H) ? ParaItem.H : ParaItem.Extent.H;
+                    var _w = ParaItem.GraphicObj.bounds.w;
+                    var _h = ParaItem.GraphicObj.bounds.h;
 
                     sRes += "<img style=\"max-width:100%;\" width=\""+Math.round(_w * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(_h * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />";
                     break;
@@ -703,36 +679,6 @@ CopyProcessor.prototype =
                 // var _data = _ctx.getImageData(0, 0, w, h);
                 // _ctx = null;
                 // delete _canvas;
-                break;
-            case para_FlowObjectAnchor:
-                var oFlowObj = ParaItem.FlowObject;
-                if(flowobject_Image == oFlowObj.Get_Type())
-                {
-                    var sSrc = oFlowObj.Img;
-                    if(sSrc.length > 0)
-                    {
-                        sSrc = this.getSrc(sSrc);
-						var sStyle = "";
-						var nLeft = oFlowObj.X;
-						var nRight = nLeft + oFlowObj.W;
-						if(Math.abs(nLeft - X_Left_Margin) < Math.abs(Page_Width - nRight - X_Right_Margin))
-							sStyle = "float:left;";
-						else
-							sStyle = "float:right;";
-						if(!this.api.DocumentReaderMode)
-						{
-							if(null != oFlowObj.Paddings)
-								sStyle += "margin:" + (oFlowObj.Paddings.Top * g_dKoef_mm_to_pt) + "pt " + (oFlowObj.Paddings.Right * g_dKoef_mm_to_pt) + "pt " +  + (oFlowObj.Paddings.Bottom * g_dKoef_mm_to_pt) + "pt " + + (oFlowObj.Paddings.Left * g_dKoef_mm_to_pt) + "pt;";
-						}
-						else
-							sStyle += "margin:0pt 10pt 0pt 10pt;";
-
-                        if (this.api.DocumentReaderMode)
-                            sStyle += "max-width:100%;";
-
-                        sRes += "<img style=\""+sStyle+"\" width=\""+Math.round(oFlowObj.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oFlowObj.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />"; break;
-                    }
-                }
                 break;
         }
         return sRes;
@@ -2356,31 +2302,6 @@ function CanPaste(oDocument)
             else
                 return false;
         }
-        if ( docpostype_FlowObjects == oTargetDoc.CurPos.Type )
-        {
-            var nType = oTargetDoc.Selection.Data.FlowObject.Get_Type();
-            if(flowobject_Table == nType)
-            {
-                var oTable = oTargetDoc.Selection.Data.FlowObject.Table;
-                if(true == oTable.Selection.Use && table_Selection_Cell == oTable.Selection.Type)
-                    return false;
-                if(null != oTable.CurCell && null != oTable.CurCell.Content)
-                {
-                    oTargetDoc = oTable.CurCell.Content;
-                }
-            }
-        }
-    }
-    else
-    {
-        if ( oTargetDoc && oTargetDoc.CurPos != undefined && docpostype_FlowObjects == oTargetDoc.CurPos.Type )
-        {
-            var _cur_slide_elements = oTargetDoc.Slides[oTargetDoc.CurPage].elementsManipulator;
-            if(_cur_slide_elements.obj != undefined && _cur_slide_elements.obj.txBody && _cur_slide_elements.obj.txBody.content)
-            {
-                return true;
-            }
-        }
     }
     return true;
 };
@@ -2729,24 +2650,6 @@ PasteProcessor.prototype =
                 {
                     oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
                     this.oRecalcDocument = oDocument;
-                }
-            }
-            
-            if ( docpostype_FlowObjects == oDocument.CurPos.Type )
-            {
-                var oData = oDocument.Selection.Data.FlowObject;
-                switch ( oData.Get_Type() )
-                {
-                    case flowobject_Table:
-                    {
-                        if(null != oData.Table && null != oData.Table.CurCell && null != oData.Table.CurCell.Content)
-                        {
-                            oDocument = this._GetTargetDocument(oData.Table.CurCell.Content);
-                            this.oRecalcDocument = oDocument;
-                            this.dMaxWidth = this._CalcMaxWidthByCell(oData.Table.CurCell);
-                        }
-                        break;
-                    }
                 }
             }
 

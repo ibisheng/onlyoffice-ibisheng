@@ -602,9 +602,22 @@ CImageShape.prototype =
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
-        if(locktype_None != this.Lock.Get_Type()  && !this.group)
+        if(!this.group)
         {
-            graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+            var oLock;
+            if(this.parent && this.parent.Lock)
+            {
+                oLock = this.parent.Lock;
+            }
+            else if(this.Lock)
+            {
+                oLock = this.Lock;
+            }
+            if(oLock && locktype_None != oLock.Get_Type())
+            {
+                graphics.transform3(_transform);
+                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            }
         }
         graphics.reset();
         graphics.SetIntegerGrid(true);

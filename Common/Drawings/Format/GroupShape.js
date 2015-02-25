@@ -395,17 +395,25 @@ CGroupShape.prototype =
             this.spTree[i].draw(graphics);
 
 
-        if(locktype_None != this.Lock.Get_Type() && !this.group)
+        if(!this.group)
         {
-            graphics.transform3(this.transform);
-
-            graphics.SetIntegerGrid(false);
-
-            graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
-
-            graphics.reset();
-            graphics.SetIntegerGrid(true);
+            var oLock;
+            if(this.parent && this.parent.Lock)
+            {
+                oLock = this.parent.Lock;
+            }
+            else if(this.Lock)
+            {
+                oLock = this.Lock;
+            }
+            if(oLock && locktype_None != oLock.Get_Type())
+            {
+                graphics.transform3(this.transform);
+                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+            }
         }
+        graphics.reset();
+        graphics.SetIntegerGrid(true);
     },
 
     getLocalTransform: function()
