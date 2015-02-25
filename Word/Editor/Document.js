@@ -13513,6 +13513,8 @@ CDocument.prototype =
                 
                 this.Recalculate();
             }
+
+            this.Document_UpdateUndoRedoState();
         }
     },
 //-----------------------------------------------------------------------------------
