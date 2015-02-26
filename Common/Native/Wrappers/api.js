@@ -5426,8 +5426,7 @@ ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, sty
             _height_px <<= 1;
         }
 
-        window["native"]["DD_StartNativeDraw"](_width_px, _height_px,
-                _width_px * g_dKoef_pix_to_mm, _height_px * g_dKoef_pix_to_mm);
+        window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
 
         var dKoefToMM = g_dKoef_pix_to_mm;
         if (this.IsRetinaEnabled)
