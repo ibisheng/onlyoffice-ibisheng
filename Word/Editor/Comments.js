@@ -1006,7 +1006,7 @@ ParaComment.prototype =
     {
     },
 
-    Recalculate_LineMetrics : function(PRS, _CurLine, _CurRange)
+    Recalculate_LineMetrics : function(PRS, ParaPr, _CurLine, _CurRange)
     {
     },
 

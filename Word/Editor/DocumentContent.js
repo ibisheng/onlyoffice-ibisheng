@@ -172,7 +172,7 @@ CDocumentContent.prototype =
     // Данную функцию используют внутренние классы, для определения следующей позиции.
     // Данный класс запрашивает следующую позицию у своего родителя.
 
-    Update_ConentIndexing : function()
+    Update_ContentIndexing : function()
     {
         if (-1 !== this.ReindexStartPos)
         {
@@ -9249,6 +9249,25 @@ CDocumentContent.prototype =
 
 };
 
+CDocumentContent.prototype.Get_TopElement = function()
+{
+    if (this.Parent)
+        return this.Parent.Get_TopElement();
+
+    return null;
+};
+
+CDocumentContent.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+{
+    for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+    {
+        var Element = this.Content[Index];
+        Element.Compare_DrawingsLogicPositions(CompareObject);
+
+        if (0 !== CompareObject.Result)
+            return;
+    }
+};
 
 function CDocumentContentStartState(DocContent)
 {

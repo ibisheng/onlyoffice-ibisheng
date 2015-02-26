@@ -7839,8 +7839,29 @@ asc_docs_api.prototype.asc_StartMailMerge = function(oData)
 };
 asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
 {
-	this.WordControl.m_oLogicDocument.Start_MailMerge();
-	// ToDo Add load data
+    if (!aList || !aList.length || aList.length <= 1)
+        return;
+
+    var aFields = aList[0];
+    if (!aFields || !aFields.length || aFields.length <= 0)
+        return;
+
+    var DstList = [];
+    var FieldsCount = aFields.length;
+    for (var Index = 1, Count = aList.length ; Index < Count; Index++)
+    {
+        var oSrcElement = aList[Index];
+        var oDstElement = {};
+        for (var FieldIndex = 0; FieldIndex < FieldsCount; FieldIndex++)
+        {
+            var sFieldName = aFields[FieldIndex];
+            oDstElement[sFieldName] = oSrcElement[FieldIndex];
+        }
+
+        DstList.push(oDstElement);
+    }
+
+	this.WordControl.m_oLogicDocument.Start_MailMerge(DstList);
 };
 asc_docs_api.prototype.asc_GetReceptionsCount = function()
 {

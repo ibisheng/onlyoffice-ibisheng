@@ -5194,7 +5194,7 @@ CTable.prototype =
 
     Document_SetThisElementCurrent : function(bUpdateStates)
     {
-        this.Parent.Update_ConentIndexing();
+        this.Parent.Update_ContentIndexing();
         this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 
@@ -19578,6 +19578,52 @@ CTable.prototype =
     }
 };
 
+CTable.prototype.Get_TopElement = function()
+{
+    if (!this.Parent)
+        return null;
+
+    if (true === this.Parent.Is_TopDocument(false))
+        return this;
+
+    return this.Parent.Get_TopElement();
+};
+
+CTable.prototype.Get_Index = function()
+{
+    if (!this.Parent)
+        return -1;
+
+    this.Parent.Update_ContentIndexing();
+
+    return this.Index;
+};
+
+CTable.prototype.Get_RowsCount = function()
+{
+    return this.Content.length;
+};
+
+CTable.prototype.Get_Row = function(Index)
+{
+    return this.Content[Index];
+};
+CTable.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+{
+    for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; CurRow++)
+    {
+        var Row = this.Get_Row(CurRow);
+        for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; CurCell++)
+        {
+            var Cell = Row.Get_Cell(CurCell);
+            Cell.Content.Compare_DrawingsLogicPositions(CompareObject);
+
+            if (0 !== CompareObject.Result)
+                return;
+        }
+    }
+};
+
 // Класс CTableRow
 function CTableRow(Table, Cols, TableGrid)
 {
@@ -23023,6 +23069,14 @@ CTableCell.prototype =
     Load_LinkData : function(LinkData)
     {
     }
+};
+
+CTableCell.prototype.Get_TopElement = function()
+{
+    if (this.Row && this.Row.Table)
+        return this.Row.Table.Get_TopElement();
+
+    return null;
 };
 
 

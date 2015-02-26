@@ -8577,6 +8577,28 @@ ParaRun.prototype.Get_RangesByPos = function(Pos)
     return Ranges;
 };
 
+ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+{
+    var Drawing1 = CompareObject.Drawing1;
+    var Drawing2 = CompareObject.Drawing2;
+
+    for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
+    {
+        var Item = this.Content[Pos];
+
+        if (Item === Drawing1)
+        {
+            CompareObject.Result = 1;
+            return;
+        }
+        else if (Item === Drawing2)
+        {
+            CompareObject.Result = -1;
+            return;
+        }
+    }
+};
+
 function CParaRunStartState(Run)
 {
     this.Paragraph = Run.Paragraph;

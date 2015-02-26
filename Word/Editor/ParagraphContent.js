@@ -3960,6 +3960,11 @@ ParaDrawing.prototype =
         return isRealObject(this.GraphicObj) && typeof this.GraphicObj.canRotate == "function" && this.GraphicObj.canRotate();
     },
 
+    Get_Paragraph : function()
+    {
+        return this.Parent;
+    },
+
     Get_Props : function(OtherProps)
     {
         // Сначала заполняем свойства

@@ -3956,7 +3956,7 @@ Paragraph.prototype =
         var CurRange = Class.StartRange;
         var CurLine  = Class.StartLine;
 
-        if (undefined !== this.Lines[CurLine] && undefined !== this.Ranges[CurRange])
+        if (undefined !== this.Lines[CurLine] && undefined !== this.Lines[CurLine].Ranges[CurRange])
         {
             var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
             var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
@@ -5681,7 +5681,7 @@ Paragraph.prototype =
                 this.Set_ParaContentPos(this.Get_StartPos(), true, -1, -1);
 
                 // Производим выделение нумерации
-                this.Parent.Update_ConentIndexing();
+                this.Parent.Update_ContentIndexing();
                 this.Parent.Document_SelectNumbering(NumPr, this.Index);
             }
             else
@@ -8838,7 +8838,7 @@ Paragraph.prototype =
 //-----------------------------------------------------------------------------------
     Document_SetThisElementCurrent : function(bUpdateStates)
     {
-        this.Parent.Update_ConentIndexing();
+        this.Parent.Update_ContentIndexing();
         this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 
@@ -8846,7 +8846,7 @@ Paragraph.prototype =
     {
         var Parent = this.Parent;
 
-        Parent.Update_ConentIndexing();
+        Parent.Update_ContentIndexing();
         if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
@@ -10477,7 +10477,7 @@ Paragraph.prototype =
 
     Get_ParentObject_or_DocumentPos : function()
     {
-        this.Parent.Update_ConentIndexing();
+        this.Parent.Update_ContentIndexing();
         return this.Parent.Get_ParentObject_or_DocumentPos(this.Index);
     },
 
@@ -12347,6 +12347,49 @@ Paragraph.prototype.private_GetPageByLine = function(CurLine)
     }
 
     return Math.min(PagesCount - 1, CurPage);
+};
+
+Paragraph.prototype.Get_TopElement = function()
+{
+    if (true === this.Parent.Is_TopDocument(false))
+        return this;
+
+    return this.Parent.Get_TopElement();
+};
+
+Paragraph.prototype.Get_Index = function()
+{
+    if (!this.Parent)
+        return -1;
+
+    this.Parent.Update_ContentIndexing();
+
+    return this.Index;
+};
+
+Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+{
+    var Run1 = this.Get_DrawingObjectRun(CompareObject.Drawing1.Get_Id());
+    var Run2 = this.Get_DrawingObjectRun(CompareObject.Drawing2.Get_Id());
+
+    if (Run1 && !Run2)
+        CompareObject.Result = 1;
+    else if (Run2 && !Run1)
+        CompareObject.Result = -1;
+    else if (Run1 && Run2)
+    {
+        var RunPos1 = this.Get_PosByElement(Run1);
+        var RunPos2 = this.Get_PosByElement(Run2);
+
+        var Result = RunPos2.Compare(RunPos1);
+
+        if (0 !== Result)
+            CompareObject.Result = Result;
+        else
+        {
+            Run1.Compare_DrawingsLogicPositions(CompareObject);
+        }
+    }
 };
 
 var pararecalc_0_All  = 0;

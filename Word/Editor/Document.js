@@ -70,6 +70,9 @@ var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжи
 
 var StartTime;
 
+var document_EditingType_Common = 0x00; // Обычный режим редактирования
+var document_EditingType_Review = 0x01; // Режим рецензирования
+
 function CSelectedElement(Element, SelectedAll)
 {
     this.Element     = Element;
@@ -741,6 +744,9 @@ function CDocument(DrawingDocument)
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
 
+    // Проверяем режим редактирования
+    this.m_eEditType = document_EditingType_Common;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -970,7 +976,7 @@ CDocument.prototype =
         return true;
     },
 
-    Update_ConentIndexing : function()
+    Update_ContentIndexing : function()
     {
         if (-1 !== this.ReindexStartPos)
         {
@@ -14197,6 +14203,47 @@ CDocument.prototype.Set_HightlightMailMergeFields = function(Value)
         editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
     }
 };
+CDocument.prototype.Compare_DrawingsLogicPositions = function(Drawing1, Drawing2)
+{
+    var ParentPara1 = Drawing1.Get_Paragraph();
+    var ParentPara2 = Drawing2.Get_Paragraph();
+
+    if (!ParentPara1 || !ParentPara2 || !ParentPara1.Parent || !ParentPara2.Parent)
+        return 0;
+
+    var TopDocument1 = ParentPara1.Parent.Is_TopDocument(true);
+    var TopDocument2 = ParentPara2.Parent.Is_TopDocument(true);
+
+    if (TopDocument1 !== TopDocument2 || !TopDocument1)
+        return 0;
+
+    var TopElement1 = ParentPara1.Get_TopElement();
+    var TopElement2 = ParentPara2.Get_TopElement();
+
+    if (!TopElement1 || !TopElement2)
+        return 0;
+
+    var TopIndex1 = TopElement1.Get_Index();
+    var TopIndex2 = TopElement2.Get_Index();
+
+    if (TopIndex1 < TopIndex2)
+        return 1;
+    else if (TopIndex1 > TopIndex2)
+        return -1;
+
+    if (undefined !== TopDocument1.Content[TopIndex1])
+    {
+        var CompareEngine = new CDocumentCompareDrawingsLogicPositions(Drawing1, Drawing2);
+        TopDocument1.Content[TopIndex1].Compare_DrawingsLogicPositions(CompareEngine);
+        return CompareEngine.Result;
+    }
+
+    return 0;
+};
+CDocument.prototype.Get_TopElement = function()
+{
+    return null;
+};
 CDocument.prototype.private_StartSelectionFromCurPos = function()
 {
     this.private_UpdateCursorXY(true, true);
@@ -14694,3 +14741,10 @@ function CDocumentSectionsInfoElement(SectPr, Index)
     this.SectPr = SectPr;
     this.Index  = Index;
 }
+
+function CDocumentCompareDrawingsLogicPositions(Drawing1, Drawing2)
+{
+    this.Drawing1 = Drawing1;
+    this.Drawing2 = Drawing2;
+    this.Result   = 0;
+};
