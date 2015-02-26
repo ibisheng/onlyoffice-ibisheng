@@ -358,7 +358,7 @@ function CreateAscFill(unifill)
         {
             ret.type = c_oAscFill.FILL_TYPE_GRAD;
             ret.fill = new CAscFillGrad();
-
+            var bCheckTransparent = true, nLastTransparent = null, nLastTempTransparent, j, aMods;
             for (var i = 0; i < _fill.colors.length; i++)
             {
                 if (0 == i)
@@ -366,9 +366,51 @@ function CreateAscFill(unifill)
                     ret.fill.Colors = [];
                     ret.fill.Positions = [];
                 }
-
+                if(bCheckTransparent)
+                {
+                    if(_fill.colors[i].color.Mods)
+                    {
+                        aMods = _fill.colors[i].color.Mods.Mods;
+                        nLastTempTransparent = null;
+                        for(j = 0; j < aMods.length; ++j)
+                        {
+                            if(aMods[j].name === "alpha")
+                            {
+                                if(nLastTempTransparent === null)
+                                {
+                                    nLastTempTransparent = aMods[j].val;
+                                    if(nLastTransparent === null)
+                                    {
+                                        nLastTransparent = nLastTempTransparent;
+                                    }
+                                    else
+                                    {
+                                        if(nLastTransparent !== nLastTempTransparent)
+                                        {
+                                            bCheckTransparent = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    bCheckTransparent = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        bCheckTransparent = false;
+                    }
+                }
                 ret.fill.Colors.push(CreateAscColor(_fill.colors[i].color));
                 ret.fill.Positions.push(_fill.colors[i].pos);
+            }
+            if(bCheckTransparent && nLastTransparent !== null)
+            {
+                ret.transparent = (nLastTransparent/100000)*255;
             }
 
             if (_fill.lin)
@@ -404,7 +446,10 @@ function CreateAscFill(unifill)
             break;
     }
 
-    ret.transparent = unifill.transparent;
+    if(isRealNumber(unifill.transparent))
+    {
+        ret.transparent = unifill.transparent;
+    }
     return ret;
 }
 function CorrectUniFill(asc_fill, unifill)
