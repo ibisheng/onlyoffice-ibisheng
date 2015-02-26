@@ -1672,9 +1672,30 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
+
+            if(editor.sync_EndAddShape)
+            {
+                editor.sync_EndAddShape();
+            }
             if(this.Slides[this.CurPage])
             {
                 var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                if(oDrawingObjects.curState instanceof  StartAddNewShape
+                    || oDrawingObjects.curState instanceof  SplineBezierState
+                    || oDrawingObjects.curState instanceof  PolyLineAddState
+                    || oDrawingObjects.curState instanceof  AddPolyLine2State
+                    || oDrawingObjects.arrTrackObjects.length > 0)
+                {
+                    oDrawingObjects.changeCurrentState(new NullState(oDrawingObjects));
+                    if( oDrawingObjects.arrTrackObjects.length > 0)
+                    {
+                        oDrawingObjects.clearTrackObjects();
+                        oDrawingObjects.updateOverlay();
+                    }
+                    editor.sync_EndAddShape();
+                    this.Update_CursorType( 0, 0,  new CMouseEventHandler() );
+                    return;
+                }
                 var oTargetTextObject = getTargetTextObject(oDrawingObjects);
 
                 var bNeedRedraw;

@@ -335,8 +335,11 @@
 				    "getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
 				    "getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
 				    "updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);},
-					"canReceiveKeyPress":			function () {return self.getWorksheet().objectRender.controller.canReceiveKeyPress()},
-					
+					"canReceiveKeyPress":			function () {return self.getWorksheet().objectRender.controller.canReceiveKeyPress();},
+					"stopAddShape":			        function () {
+                        self.getWorksheet().objectRender.controller.checkEndAddShape();
+                    },
+
 					// Frozen anchor
 					"moveFrozenAnchorHandle":		function () {self._onMoveFrozenAnchorHandle.apply(self, arguments);},
 					"moveFrozenAnchorHandleDone":	function () {self._onMoveFrozenAnchorHandleDone.apply(self, arguments);},

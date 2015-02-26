@@ -9321,6 +9321,12 @@ CDocument.prototype =
                 editor.sync_PaintFormatCallback( c_oAscFormatPainterState.kOff );
                 this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
             }
+            else if(editor.isStartAddShape)
+            {
+                editor.sync_StartAddShapeCallback( false );
+                editor.sync_EndAddShape();
+                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
+            }
             else if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
             {
                 this.DrawingObjects.resetSelection2();

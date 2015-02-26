@@ -4161,12 +4161,16 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                this.resetSelection();
-                var ws = drawingObjectsController.drawingObjects.getWorksheet();
-                var isChangeSelectionShape = ws._checkSelectionShape();
-                if (isChangeSelectionShape) {
-                    ws._drawSelection();
-                    ws._updateSelectionNameAndInfo();
+                if(!this.checkEndAddShape())
+                {
+
+                    this.resetSelection();
+                    var ws = drawingObjectsController.drawingObjects.getWorksheet();
+                    var isChangeSelectionShape = ws._checkSelectionShape();
+                    if (isChangeSelectionShape) {
+                        ws._drawSelection();
+                        ws._updateSelectionNameAndInfo();
+                    }
                 }
             }
             bRetValue = true;
@@ -4447,6 +4451,29 @@ DrawingObjectsController.prototype =
         if(bRetValue)
             e.preventDefault();
         return bRetValue;
+    },
+
+    checkEndAddShape: function()
+    {
+        if(this.curState instanceof  StartAddNewShape
+            || this.curState instanceof  SplineBezierState
+            || this.curState instanceof  PolyLineAddState
+            || this.curState instanceof  AddPolyLine2State
+            || this.arrTrackObjects.length > 0)
+        {
+            this.changeCurrentState(new NullState(this));
+            if( this.arrTrackObjects.length > 0)
+            {
+                this.clearTrackObjects();
+                this.updateOverlay();
+            }
+            if(asc["editor"])
+            {
+                asc["editor"].asc_endAddShape();
+            }
+            return true;
+        }
+        return false;
     },
 
     /*onKeyPress: function(e)

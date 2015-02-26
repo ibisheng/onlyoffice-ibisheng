@@ -762,6 +762,7 @@
 					// Перехватим Esc и отключим дефалтовую обработку
 					stop();
 					t.handlers.trigger("stopFormatPainter");
+                    t.handlers.trigger("stopAddShape");
 					return result;
 
 				case 144: //Num Lock
