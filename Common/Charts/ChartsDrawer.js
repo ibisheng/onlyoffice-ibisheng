@@ -1962,6 +1962,45 @@ CChartsDrawer.prototype =
 		return {x: newX, y: newY};
 	},
 	
+	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
+	{
+		//координаты центра проектирования(расположение камеры)
+		var widthChart = this.calcProp.widthCanvas - (this.calcProp.chartGutter._left2 + this.calcProp.chartGutter._right2);
+		//widthChart = widthChart - widthChart * Math.sin(-angleOy);
+		var heightChart = this.calcProp.heightCanvas - (this.calcProp.chartGutter._top2 + this.calcProp.chartGutter._bottom2);
+		//heightChart = heightChart - heightChart * Math.cos(-angleOy);
+		
+		var dubleAngle = -(2 * angleOy);
+		var diffX = widthChart / 2 * Math.cos(90 * 2 * Math.PI / 360 - dubleAngle);
+		var diffY = heightChart / 20 * Math.cos(dubleAngle);
+		//diffY = heightChart - heightChart * Math.cos(-angleOy)
+		//diffX = widthChart * Math.sin(-angleOy);
+		diffX = 0;
+		diffY = 0;
+	
+		//var diffX = widthChart - ((widthChart) * Math.cos(angleOy));
+		
+		//var dubleAngle = - (angleOy);
+		//diffX = widthChart / 2 * Math.sin(dubleAngle);
+		
+		var widthLine = (widthChart) / 2 + this.calcProp.chartGutter._left2 + diffX;
+		var heightLine = (heightChart) / 2 + this.calcProp.chartGutter._top2 + diffY;
+		
+		x1 = x1 - widthLine;
+		y1 = y1 - heightLine;
+		
+		var turnResult = this._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
+		z1 = turnResult.z;
+		x1 = turnResult.x;
+		y1 = turnResult.y;
+		
+		var convertObj = this._convert3DTo2D(x1, y1, z1, p, q , r);
+		x1 = convertObj.x + widthLine - diffX;
+		y1 = convertObj.y + heightLine - diffY;
+		
+		return {x: x1, y: y1}
+	},
+	
 	_turnCoords: function(x, y, z, angleOX, angleOY, angleOZ)
 	{
 		var newX, newY, newZ;
@@ -6869,19 +6908,19 @@ drawLine3DChart.prototype =
 				
 				var point;
 				var p = 0, q = 0, r = rPerspective;
-				point = this._convertAndTurnPoint(x, y, DiffGapDepth + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				point = this.cChartDrawer._convertAndTurnPoint(x, y, DiffGapDepth + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
 				cX1 = point.x;
 				cY1 = point.y;
 				
-				point = this._convertAndTurnPoint(x, y, DiffGapDepth + depthSeria + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				point = this.cChartDrawer._convertAndTurnPoint(x, y, DiffGapDepth + depthSeria + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
 				cX2 = point.x;
 				cY2 = point.y;
 				
-				point = this._convertAndTurnPoint(x1, y1, DiffGapDepth + depthSeria + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				point = this.cChartDrawer._convertAndTurnPoint(x1, y1, DiffGapDepth + depthSeria + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
 				cX3 = point.x;
 				cY3 = point.y;
 				
-				point = this._convertAndTurnPoint(x1, y1, DiffGapDepth + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
+				point = this.cChartDrawer._convertAndTurnPoint(x1, y1, DiffGapDepth + seriaDiff * i, angleOx, angleOy, angleOz, p, q, r);
 				cX4 = point.x;
 				cY4 = point.y;
 				
@@ -6975,26 +7014,6 @@ drawLine3DChart.prototype =
 		path.recalculate(gdLst);
 		
 		return path;
-	},
-	
-	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
-	{
-		//координаты центра проектирования
-		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
-		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
-		
-		x1 = x1 - widthLine;
-		y1 = y1 - heightLine;
-		
-		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
-		x1 = turnResult.x;
-		y1 = turnResult.y; 
-		z1 = turnResult.z;
-		
-		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q , r);
-		x1 = convertObj.x + widthLine;
-		y1 = convertObj.y + heightLine;
-		return {x: x1, y: y1}
 	},
 	
 	_calculateDLbl: function()
@@ -7206,14 +7225,14 @@ drawBar3DChart.prototype =
 					
 					//поворот относительно осей
 					var p = 0, q = 0, r = rPerspective;
-					point1 = this._convertAndTurnPoint(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r);
-					point2 = this._convertAndTurnPoint(x2, y2, z2, angleOx, angleOy, angleOz, p, q, r);
-					point3 = this._convertAndTurnPoint(x3, y3, z3, angleOx, angleOy, angleOz, p, q, r);
-					point4 = this._convertAndTurnPoint(x4, y4, z4, angleOx, angleOy, angleOz, p, q, r);
-					point5 = this._convertAndTurnPoint(x5, y5, z5, angleOx, angleOy, angleOz, p, q, r);
-					point6 = this._convertAndTurnPoint(x6, y6, z6, angleOx, angleOy, angleOz, p, q, r);
-					point7 = this._convertAndTurnPoint(x7, y7, z7, angleOx, angleOy, angleOz, p, q, r);
-					point8 = this._convertAndTurnPoint(x8, y8, z8, angleOx, angleOy, angleOz, p, q, r);
+					point1 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r);
+					point2 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2, angleOx, angleOy, angleOz, p, q, r);
+					point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3, angleOx, angleOy, angleOz, p, q, r);
+					point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4, angleOx, angleOy, angleOz, p, q, r);
+					point5 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5, angleOx, angleOy, angleOz, p, q, r);
+					point6 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, angleOx, angleOy, angleOz, p, q, r);
+					point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, angleOx, angleOy, angleOz, p, q, r);
+					point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, angleOx, angleOy, angleOz, p, q, r);
 					
 					
 					paths = this._calculateRect(point1, point2, point3, point4, point5, point6, point7, point8);
@@ -7228,26 +7247,6 @@ drawBar3DChart.prototype =
 			}
         }
     },
-	
-	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
-	{
-		//координаты центра проектирования
-		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
-		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
-		
-		x1 = x1 - widthLine;
-		y1 = y1 - heightLine;
-		
-		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
-		x1 = turnResult.x;
-		y1 = turnResult.y; 
-		z1 = turnResult.z;
-		
-		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q , r);
-		x1 = convertObj.x + widthLine;
-		y1 = convertObj.y + heightLine;
-		return {x: x1, y: y1}
-	},
 	
 	_calculateRect : function(point1, point2, point3, point4, point5, point6, point7, point8)
 	{
@@ -7502,16 +7501,16 @@ grid3DChart.prototype =
 			q = 0;
 			r = rPerspective;
 			
-			convertResult = this._convertAndTurnPoint(firstX, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
 			x1n = convertResult.x;
 			y1n = convertResult.y;
-			convertResult = this._convertAndTurnPoint(firstX, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
 			x2n = convertResult.x;
 			y2n = convertResult.y;
-			convertResult = this._convertAndTurnPoint(firstX + widthLine, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX + widthLine, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
 			x3n = convertResult.x;
 			y3n = convertResult.y;
-			convertResult = this._convertAndTurnPoint(firstX + widthLine, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX + widthLine, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
 			x4n = convertResult.x;
 			y4n = convertResult.y;
 			
@@ -7558,16 +7557,16 @@ grid3DChart.prototype =
 			q = 0;
 			r = rPerspective;
 			
-			convertResult = this._convertAndTurnPoint(firstX, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX, firstY, 0, angleOx, angleOy, angleOz, p, q, r);
 			x1n = convertResult.x;
 			y1n = convertResult.y;
-			convertResult = this._convertAndTurnPoint(firstX, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX, firstY, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
 			x2n = convertResult.x;
 			y2n = convertResult.y;
-			convertResult = this._convertAndTurnPoint(firstX, firstY - heightLine, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX, firstY - heightLine, perspectiveDepth, angleOx, angleOy, angleOz, p, q, r);
 			x3n = convertResult.x;
 			y3n = convertResult.y;
-			convertResult = this._convertAndTurnPoint(firstX, firstY - heightLine, 0, angleOx, angleOy, angleOz, p, q, r);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(firstX, firstY - heightLine, 0, angleOx, angleOy, angleOz, p, q, r);
 			x4n = convertResult.x;
 			y4n = convertResult.y;
 			
@@ -7646,26 +7645,6 @@ grid3DChart.prototype =
 			path = this.paths.verticalLines[i];
 			this.cChartDrawer.drawPath(path, pen);
 		}
-	},
-	
-	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
-	{
-		//координаты центра проектирования
-		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
-		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
-		
-		x1 = x1 - widthLine;
-		y1 = y1 - heightLine;
-		
-		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
-		x1 = turnResult.x;
-		y1 = turnResult.y; 
-		z1 = turnResult.z;
-		
-		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
-		x1 = convertObj.x + widthLine;
-		y1 = convertObj.y + heightLine;
-		return {x: x1, y: y1}
 	}
 };
 
@@ -7892,11 +7871,11 @@ valAxis3DChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		convertResult = this._convertAndTurnPoint(x * this.chartProp.pxToMM, y * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(x * this.chartProp.pxToMM, y * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
 		x = convertResult.x / this.chartProp.pxToMM;
 		y = convertResult.y / this.chartProp.pxToMM;
 		
-		convertResult = this._convertAndTurnPoint(x1 * this.chartProp.pxToMM, y1 * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(x1 * this.chartProp.pxToMM, y1 * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
 		x1 = convertResult.x / this.chartProp.pxToMM;
 		y1 = convertResult.y / this.chartProp.pxToMM;
 		
@@ -7940,26 +7919,6 @@ valAxis3DChart.prototype =
 				}
 			}
 		}	
-	},
-	
-	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
-	{
-		//координаты центра проектирования
-		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
-		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
-		
-		x1 = x1 - widthLine;
-		y1 = y1 - heightLine;
-		
-		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
-		x1 = turnResult.x;
-		y1 = turnResult.y; 
-		z1 = turnResult.z;
-		
-		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
-		x1 = convertObj.x + widthLine;
-		y1 = convertObj.y + heightLine;
-		return {x: x1, y: y1}
 	}
 };
 
@@ -8262,11 +8221,11 @@ catAxis3DChart.prototype =
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
 		
-		convertResult = this._convertAndTurnPoint(x * this.chartProp.pxToMM, y * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(x * this.chartProp.pxToMM, y * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
 		x = convertResult.x / this.chartProp.pxToMM;
 		y = convertResult.y / this.chartProp.pxToMM;
 		
-		convertResult = this._convertAndTurnPoint(x1 * this.chartProp.pxToMM, y1 * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(x1 * this.chartProp.pxToMM, y1 * this.chartProp.pxToMM, 0, angleOx, angleOy, angleOz, p, q, r);
 		x1 = convertResult.x / this.chartProp.pxToMM;
 		y1 = convertResult.y / this.chartProp.pxToMM;
 		
@@ -8311,26 +8270,6 @@ catAxis3DChart.prototype =
 				}
 			}	
 		}
-	},
-	
-	_convertAndTurnPoint: function(x1, y1, z1, angleOx, angleOy, angleOz, p, q, r)
-	{
-		//координаты центра проектирования
-		var widthLine = (this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right)) / 2 + this.chartProp.chartGutter._left;
-		var heightLine = (this.chartProp.heightCanvas - (this.chartProp.chartGutter._top + this.chartProp.chartGutter._bottom)) / 2 + this.chartProp.chartGutter._top;
-		
-		x1 = x1 - widthLine;
-		y1 = y1 - heightLine;
-		
-		var turnResult = this.cChartDrawer._turnCoords(x1, y1, z1, angleOx, angleOy, angleOz);
-		x1 = turnResult.x;
-		y1 = turnResult.y; 
-		z1 = turnResult.z;
-		
-		var convertObj = this.cChartDrawer._convert3DTo2D(x1, y1, z1, p, q, r);
-		x1 = convertObj.x + widthLine;
-		y1 = convertObj.y + heightLine;
-		return {x: x1, y: y1}
 	}
 };
 
