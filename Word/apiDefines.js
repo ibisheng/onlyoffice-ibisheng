@@ -37,7 +37,9 @@ var c_oAscFileType = {
 	EPUB: 		0x0048,
 	FB2: 		0x0049,
 	MOBI: 		0x004a,
-	DOCY: 		0x1001
+	DOCY: 		0x1001,
+
+	JSON:		0x0808		// Для mail-merge
 };
 
 // Right = 0; Left = 1; Center = 2; Justify = 3;

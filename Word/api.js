@@ -562,6 +562,8 @@ function asc_docs_api(name)
     this.isApplyChangesOnOpen = false;
     this.isApplyChangesOnOpenEnabled = true;
 
+	this.mailMergeFileUrl = null;
+
     // CoAuthoring and Chat
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
@@ -2820,25 +2822,26 @@ asc_docs_api.prototype.asc_Save = function ()
 	}
 };
 
-asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
+asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 	var editor = this;
-	_downloadAs(this, typeFile, function(incomeObject){
-		if(null != incomeObject && "save" == incomeObject["type"])
+	_downloadAs(this, typeFile, function (incomeObject) {
+		if (null != incomeObject && "save" == incomeObject["type"])
 			editor.processSavedFile(incomeObject["data"], false);
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
-}
+		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+	}, true);
+};
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
 		return;
 	this.WordControl.OnResize(false);
-}
+};
 asc_docs_api.prototype.AddURL = function(url){
 
-}
+};
 asc_docs_api.prototype.Help = function(){
 
-}
+};
 asc_docs_api.prototype.ClearCache = function(){
 	var rData = {
 		"id":documentId,
@@ -2848,7 +2851,7 @@ asc_docs_api.prototype.ClearCache = function(){
 		"c":"cc"};
 
 	sendCommand(editor, function(){}, rData);
-}
+};
 
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 {
@@ -2873,18 +2876,30 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 
     if (this.bInit_word_control)
         this.WordControl.OnScroll();
-}
-asc_docs_api.prototype.processSavedFile = function(url, bInner)
-{
-	if(bInner)
-	{
-		this.asc_fireCallback("asc_onSaveUrl", url, function(hasError){});
+};
+asc_docs_api.prototype.processSavedFile = function(url, bInner) {
+	var t = this;
+	if (this.mailMergeFileUrl) {
+		this.mailMergeFileUrl = null;
+		asc_ajax({
+			url: url,
+			dataType: "text",
+			success: function (result) {
+				t.asc_StartMailMergeByList(JSON.parse(result));
+			},
+			error: function () {
+				// ToDo Error
+			}
+		});
+	} else {
+		if (bInner) {
+			this.asc_fireCallback("asc_onSaveUrl", url, function (hasError) {
+			});
+		} else {
+			getFile(url);
+		}
 	}
-	else
-	{
-		getFile(url);
-	}	
-}
+};
 asc_docs_api.prototype.startGetDocInfo = function(){
 	/*
 	Возвращаем объект следующего вида:
@@ -2913,39 +2928,39 @@ asc_docs_api.prototype.startGetDocInfo = function(){
     {
         this.WordControl.m_oLogicDocument.Statistics_Start();
     }
-}
+};
 asc_docs_api.prototype.stopGetDocInfo = function(){
     this.sync_GetDocInfoStopCallback();
 
     if (null != this.WordControl.m_oLogicDocument)
         this.WordControl.m_oLogicDocument.Statistics_Stop();
-}
+};
 asc_docs_api.prototype.sync_DocInfoCallback = function(obj){
 	this.asc_fireCallback( "asc_onDocInfo", new CDocInfoProp(obj));
-}
+};
 asc_docs_api.prototype.sync_GetDocInfoStartCallback = function(){
 	this.asc_fireCallback("asc_onGetDocInfoStart");
-}
+};
 asc_docs_api.prototype.sync_GetDocInfoStopCallback = function(){
 	this.asc_fireCallback("asc_onGetDocInfoStop");
-}
+};
 asc_docs_api.prototype.sync_GetDocInfoEndCallback = function(){
 	this.asc_fireCallback("asc_onGetDocInfoEnd");
-}
+};
 asc_docs_api.prototype.sync_CanUndoCallback = function(bCanUndo)
 {
     //if ( true === CollaborativeEditing.Get_GlobalLock() )
     //    this.asc_fireCallback("asc_onCanUndo", false);
     //else
         this.asc_fireCallback("asc_onCanUndo", bCanUndo);
-}
+};
 asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
 {
     //if ( true === CollaborativeEditing.Get_GlobalLock() )
     //    this.asc_fireCallback("asc_onCanRedo", false);
     //else
         this.asc_fireCallback("asc_onCanRedo", bCanRedo);
-}
+};
 
 asc_docs_api.prototype.can_CopyCut = function()
 {
@@ -2955,7 +2970,7 @@ asc_docs_api.prototype.can_CopyCut = function()
 asc_docs_api.prototype.sync_CanCopyCutCallback = function(bCanCopyCut)
 {
     this.asc_fireCallback("asc_onCanCopyCut", bCanCopyCut);
-}
+};
 
 asc_docs_api.prototype.setStartPointHistory = function(){
     this.noCreatePoint = true;
@@ -3000,31 +3015,31 @@ CDocInfoProp.prototype.put_SymbolsWSCount = function(v){ this.SymbolsWSCount = v
 }*/
 asc_docs_api.prototype.sync_PrintCallBack = function(){
 	this.asc_fireCallback("asc_onPrint");
-}
+};
 asc_docs_api.prototype.sync_UndoCallBack = function(){
 	this.asc_fireCallback("asc_onUndo");
-}
+};
 asc_docs_api.prototype.sync_RedoCallBack = function(){
 	this.asc_fireCallback("asc_onRedo");
-}
+};
 asc_docs_api.prototype.sync_CopyCallBack = function(){
 	this.asc_fireCallback("asc_onCopy");
-}
+};
 asc_docs_api.prototype.sync_CutCallBack = function(){
 	this.asc_fireCallback("asc_onCut");
-}
+};
 asc_docs_api.prototype.sync_PasteCallBack = function(){
 	this.asc_fireCallback("asc_onPaste");
-}
+};
 asc_docs_api.prototype.sync_ShareCallBack = function(){
 	this.asc_fireCallback("asc_onShare");
-}
+};
 asc_docs_api.prototype.sync_SaveCallBack = function(){
 	this.asc_fireCallback("asc_onSave");
-}
+};
 asc_docs_api.prototype.sync_DownloadAsCallBack = function(){
 	this.asc_fireCallback("asc_onDownload");
-}
+};
 asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onStartAction", type, id);
@@ -3032,7 +3047,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
         this.IsLongActionCurrent = true;
-}
+};
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onEndAction", type, id);
@@ -3040,25 +3055,25 @@ asc_docs_api.prototype.sync_EndAction = function(type, id){
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
         this.IsLongActionCurrent = false;
-}
+};
 asc_docs_api.prototype.sync_AddURLCallback = function(){
 	this.asc_fireCallback("asc_onAddURL");
-}
+};
 asc_docs_api.prototype.sync_ErrorCallback = function(errorID,errorLevel){
 	this.asc_fireCallback("asc_onError",errorID,errorLevel);
-}
+};
 asc_docs_api.prototype.sync_HelpCallback = function(url){
 	this.asc_fireCallback("asc_onHelp",url);
-}
+};
 asc_docs_api.prototype.sync_UpdateZoom = function(zoom){
 	this.asc_fireCallback("asc_onZoom", zoom);
-}
+};
 asc_docs_api.prototype.sync_StatusMessage = function(message){
 	this.asc_fireCallback("asc_onMessage", message);
-}
+};
 asc_docs_api.prototype.ClearPropObjCallback = function(prop){//колбэк предшествующий приходу свойств объекта, prop а всякий случай
 	this.asc_fireCallback("asc_onClearPropObj", prop);
-}
+};
 
 /*----------------------------------------------------------------*/
 /*functions for working with headers*/
@@ -3096,23 +3111,23 @@ function CHeader (obj)
 CHeader.prototype.get_headerText = function ()
 {
 	return this.headerText;
-}
+};
 CHeader.prototype.get_pageNumber = function ()
 {
 	return this.pageNumber;
-}
+};
 CHeader.prototype.get_X = function ()
 {
 	return this.X;
-}
+};
 CHeader.prototype.get_Y = function ()
 {
 	return this.Y;
-}
+};
 CHeader.prototype.get_Level = function ()
 {
 	return this.level;
-}
+};
 var _fakeHeaders = [
 	new CHeader ({headerText: "Header1", pageNumber: 0, X: 0, Y: 0, level: 1}),
 	new CHeader ({headerText: "Header2", pageNumber: 0, X: 0, Y: 0, level: 1}),
@@ -3136,20 +3151,20 @@ var _fakeHeaders = [
 	new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 1}),
 	new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 0}),
 	new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 0})
-]
+];
 
 asc_docs_api.prototype.CollectHeaders = function(){
 	this.sync_ReturnHeadersCallback(_fakeHeaders);
-}
+};
 asc_docs_api.prototype.GetActiveHeader = function(){
 
-}
+};
 asc_docs_api.prototype.gotoHeader = function(page, X, Y){
 	this.goToPage(page);
-}
+};
 asc_docs_api.prototype.sync_ChangeActiveHeaderCallback = function (position, header){
 	this.asc_fireCallback("asc_onChangeActiveHeader", position, new CHeader (header));
-}
+};
 asc_docs_api.prototype.sync_ReturnHeadersCallback = function (headers){
 	var _headers = [];
 	for (var i = 0; i < headers.length; i++)
@@ -3158,7 +3173,7 @@ asc_docs_api.prototype.sync_ReturnHeadersCallback = function (headers){
 	}
 
 	this.asc_fireCallback("asc_onReturnHeaders", _headers);
-}
+};
 /*----------------------------------------------------------------*/
 /*functions for working with search*/
 /*
@@ -3178,7 +3193,7 @@ asc_docs_api.prototype.asc_searchEnabled = function(bIsEnabled)
         this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.IsSearch = false;
         this.WordControl.OnUpdateOverlay();
     }
-}
+};
 
 asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
 {
@@ -3196,7 +3211,7 @@ asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
         this.WordControl.m_oLogicDocument.Search_Select( Id );
 
     return SearchEngine.Count;
-}
+};
 
 asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
 {
@@ -3224,7 +3239,7 @@ asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAl
 
         return false;
     }
-}
+};
 
 asc_docs_api.prototype.asc_selectSearchingResults = function(bShow)
 {
@@ -3235,7 +3250,7 @@ asc_docs_api.prototype.asc_selectSearchingResults = function(bShow)
         return;
     }
     this.WordControl.m_oLogicDocument.Search_Set_Selection(bShow);
-}
+};
 
 asc_docs_api.prototype.asc_isSelectSearchingResults = function()
 {
@@ -3244,17 +3259,17 @@ asc_docs_api.prototype.asc_isSelectSearchingResults = function()
         return this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.Show;
     }
     return this.WordControl.m_oLogicDocument.Search_Get_Selection();
-}
+};
 
 asc_docs_api.prototype.sync_ReplaceAllCallback = function(ReplaceCount, OverallCount)
 {
     this.asc_fireCallback("asc_onReplaceAll", ReplaceCount, OverallCount);
-}
+};
 
 asc_docs_api.prototype.sync_SearchEndCallback = function()
 {
 	this.asc_fireCallback("asc_onSearchEnd");
-}
+};
 /*----------------------------------------------------------------*/
 /*functions for working with font*/
 /*setters*/
@@ -3271,7 +3286,7 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
             this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontFamily : { Name : fontinfo.Name , Index : -1 } } ) );
         }
     }
-}
+};
 asc_docs_api.prototype.put_TextPrFontSize = function(size)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3279,7 +3294,7 @@ asc_docs_api.prototype.put_TextPrFontSize = function(size)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontSize : Math.min(size, 100) } ) );
     }
-}
+};
 asc_docs_api.prototype.put_TextPrBold = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3287,7 +3302,7 @@ asc_docs_api.prototype.put_TextPrBold = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
     	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Bold : value } ) );
     }
-}
+};
 asc_docs_api.prototype.put_TextPrItalic = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3295,7 +3310,7 @@ asc_docs_api.prototype.put_TextPrItalic = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 	    this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Italic : value } ) );
     }
-}
+};
 asc_docs_api.prototype.put_TextPrUnderline = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3306,7 +3321,7 @@ asc_docs_api.prototype.put_TextPrUnderline = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 asc_docs_api.prototype.put_TextPrStrikeout = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3317,7 +3332,7 @@ asc_docs_api.prototype.put_TextPrStrikeout = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 asc_docs_api.prototype.put_TextPrDStrikeout = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3328,7 +3343,7 @@ asc_docs_api.prototype.put_TextPrDStrikeout = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 asc_docs_api.prototype.put_TextPrSpacing = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3339,7 +3354,7 @@ asc_docs_api.prototype.put_TextPrSpacing = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 
 asc_docs_api.prototype.put_TextPrCaps = function(value)
 {
@@ -3351,7 +3366,7 @@ asc_docs_api.prototype.put_TextPrCaps = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 
 asc_docs_api.prototype.put_TextPrSmallCaps = function(value)
 {
@@ -3363,7 +3378,7 @@ asc_docs_api.prototype.put_TextPrSmallCaps = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 
 
 asc_docs_api.prototype.put_TextPrPosition = function(value)
@@ -3376,7 +3391,7 @@ asc_docs_api.prototype.put_TextPrPosition = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 
 asc_docs_api.prototype.put_TextPrLang = function(value)
 {
@@ -3390,7 +3405,7 @@ asc_docs_api.prototype.put_TextPrLang = function(value)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 
 
 asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
@@ -3404,7 +3419,7 @@ asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
         if ( null != ParaPr )
             this.sync_ParaSpacingLine( ParaPr.Spacing );
     }
-}
+};
 asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type == 0" means "Before", "type == 1" means "After"
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -3432,7 +3447,7 @@ asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type 
             }
         }
     }
-}
+};
 asc_docs_api.prototype.FontSizeIn = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3440,7 +3455,7 @@ asc_docs_api.prototype.FontSizeIn = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(true);
     }
-}
+};
 asc_docs_api.prototype.FontSizeOut = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3448,7 +3463,7 @@ asc_docs_api.prototype.FontSizeOut = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(false);
     }
-}
+};
 // Object:
 // {
 //    Bottom :
@@ -3514,47 +3529,47 @@ asc_docs_api.prototype.put_Borders = function(Obj)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Obj );
     }
-}
+};
 /*callbacks*/
 asc_docs_api.prototype.sync_BoldCallBack = function(isBold){
 	this.asc_fireCallback("asc_onBold",isBold);
-}
+};
 asc_docs_api.prototype.sync_ItalicCallBack = function(isItalic){
 	this.asc_fireCallback("asc_onItalic",isItalic);
-}
+};
 asc_docs_api.prototype.sync_UnderlineCallBack = function(isUnderline){
 	this.asc_fireCallback("asc_onUnderline",isUnderline);
-}
+};
 asc_docs_api.prototype.sync_StrikeoutCallBack = function(isStrikeout){
 	this.asc_fireCallback("asc_onStrikeout",isStrikeout);
-}
+};
 asc_docs_api.prototype.sync_TextPrFontFamilyCallBack = function(FontFamily)
 {
     if ( undefined != FontFamily )
 	    this.asc_fireCallback("asc_onFontFamily", new CTextFontFamily( FontFamily ));
     else
         this.asc_fireCallback("asc_onFontFamily", new CTextFontFamily( { Name : "", Index : -1 } ));
-}
+};
 asc_docs_api.prototype.sync_TextPrFontSizeCallBack = function(FontSize){
 	this.asc_fireCallback("asc_onFontSize",FontSize);
-}
+};
 asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
     this.asc_fireCallback("asc_onLineSpacing", new CParagraphInd( LineSpacing ) );
-}
+};
 asc_docs_api.prototype.sync_InitEditorFonts = function(gui_fonts){
     this._gui_fonts = gui_fonts;
-}
+};
 asc_docs_api.prototype.sync_InitEditorStyles = function(styles_painter){
     this._gui_styles = styles_painter;
     this.asc_fireCallback("asc_onInitEditorStyles", styles_painter);
-}
+};
 asc_docs_api.prototype.sync_InitEditorStyles2 = function(){
     if (null != this._gui_styles)
         this.asc_fireCallback("asc_onInitEditorStyles", this._gui_styles);
-}
+};
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles, is_retina_enabled){
     this.asc_fireCallback("asc_onInitTableTemplates",styles, is_retina_enabled);
-}
+};
 
 
 /*----------------------------------------------------------------*/
@@ -3721,7 +3736,7 @@ asc_docs_api.prototype.paraApply = function(Props)
         this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr(TextPr) );
         this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
-}
+};
 
 asc_docs_api.prototype.put_PrAlign = function(value)
 {
@@ -3730,7 +3745,7 @@ asc_docs_api.prototype.put_PrAlign = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphAlign(value);
     }
-}
+};
 // 0- baseline, 2-subscript, 1-superscript
 asc_docs_api.prototype.put_TextPrBaseline = function(value)
 {
@@ -3739,7 +3754,7 @@ asc_docs_api.prototype.put_TextPrBaseline = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
     	this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { VertAlign : value } ) );
     }
-}
+};
 /*
     Во всех случаях SubType = 0 означает, что нажали просто на кнопку
     c выбором типа списка, без выбора подтипа.
@@ -3786,7 +3801,7 @@ asc_docs_api.prototype.put_ListType = function(type, subtype)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphNumbering( NumberInfo );
     }
-}
+};
 asc_docs_api.prototype.put_Style = function(name)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -3794,7 +3809,7 @@ asc_docs_api.prototype.put_Style = function(name)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphStyle(name);
     }
-}
+};
 
 asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
 {
@@ -3821,16 +3836,16 @@ asc_docs_api.prototype.SetDeviceInputHelperId = function(idKeyboard)
             }
         }
     }
-}
+};
 
 asc_docs_api.prototype.put_ShowSnapLines = function(isShow)
 {
     this.ShowSnapLines = isShow;
-}
+};
 asc_docs_api.prototype.get_ShowSnapLines = function()
 {
     return this.ShowSnapLines;
-}
+};
 
 asc_docs_api.prototype.put_ShowParaMarks = function(isShow)
 {
@@ -3869,10 +3884,10 @@ asc_docs_api.prototype.put_ShowParaMarks = function(isShow)
         this.sync_MarkerFormatCallback( false );
 
     return this.ShowParaMarks;
-}
+};
 asc_docs_api.prototype.get_ShowParaMarks = function(){
     return this.ShowParaMarks;
-}
+};
 asc_docs_api.prototype.put_ShowTableEmptyLine = function(isShow)
 {
     this.isShowTableEmptyLine = isShow;
@@ -3882,7 +3897,7 @@ asc_docs_api.prototype.put_ShowTableEmptyLine = function(isShow)
         this.sync_MarkerFormatCallback( false );
 
     return this.isShowTableEmptyLine;
-}
+};
 asc_docs_api.prototype.get_ShowTableEmptyLine = function(){
     return this.isShowTableEmptyLine;
 }
@@ -3895,7 +3910,7 @@ asc_docs_api.prototype.put_PageBreak = function(isBreak)
         this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore(isBreak);
         this.sync_PageBreakCallback(isBreak);
     }
-}
+};
 
 asc_docs_api.prototype.put_WidowControl = function(bValue)
 {
@@ -3905,7 +3920,7 @@ asc_docs_api.prototype.put_WidowControl = function(bValue)
         this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl(bValue);
         this.sync_WidowControlCallback(bValue);
     }
-}
+};
 
 asc_docs_api.prototype.put_KeepLines = function(isKeepLines)
 {
@@ -3916,7 +3931,7 @@ asc_docs_api.prototype.put_KeepLines = function(isKeepLines)
         this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines(isKeepLines);
         this.sync_KeepLinesCallback(isKeepLines);
     }
-}
+};
 
 asc_docs_api.prototype.put_KeepNext = function(isKeepNext)
 {
@@ -3926,7 +3941,7 @@ asc_docs_api.prototype.put_KeepNext = function(isKeepNext)
         this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext(isKeepNext);
         this.sync_KeepNextCallback(isKeepNext);
     }
-}
+};
 
 asc_docs_api.prototype.put_AddSpaceBetweenPrg = function(isSpacePrg)
 {
@@ -3936,7 +3951,7 @@ asc_docs_api.prototype.put_AddSpaceBetweenPrg = function(isSpacePrg)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing(isSpacePrg);
     }
-}
+};
 asc_docs_api.prototype.put_LineHighLight = function(is_flag, r, g, b)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3952,7 +3967,7 @@ asc_docs_api.prototype.put_LineHighLight = function(is_flag, r, g, b)
             this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { HighLight :  { r : r, g : g, b: b}  } ) );
         }
     }
-}
+};
 asc_docs_api.prototype.put_TextColor = function(color)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
@@ -3974,7 +3989,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }
-}
+};
 asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color, isOnlyPara)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -3996,7 +4011,7 @@ asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color, isOnlyPara)
 
         this.WordControl.m_oLogicDocument.Set_UseTextShd(true);
     }
-}
+};
 asc_docs_api.prototype.put_PrIndent = function(value,levelValue)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -4004,7 +4019,7 @@ asc_docs_api.prototype.put_PrIndent = function(value,levelValue)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : value, ChangeLevel: levelValue } );
     }
-}
+};
 asc_docs_api.prototype.IncreaseIndent = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -4012,7 +4027,7 @@ asc_docs_api.prototype.IncreaseIndent = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
     }
-}
+};
 asc_docs_api.prototype.DecreaseIndent = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -4020,7 +4035,7 @@ asc_docs_api.prototype.DecreaseIndent = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
     }
-}
+};
 asc_docs_api.prototype.put_PrIndentRight = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -4028,7 +4043,7 @@ asc_docs_api.prototype.put_PrIndentRight = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphIndent( { Right : value } );
     }
-}
+};
 asc_docs_api.prototype.put_PrFirstLineIndent = function(value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -4036,25 +4051,25 @@ asc_docs_api.prototype.put_PrFirstLineIndent = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 	    this.WordControl.m_oLogicDocument.Set_ParagraphIndent( { FirstLine : value } );
     }
-}
+};
 asc_docs_api.prototype.put_Margins = function(left, top, right, bottom)
 {
 	this.WordControl.m_oLogicDocument.Set_DocumentMargin( { Left : left, Top : top, Right : right, Bottom : bottom });
-}
+};
 asc_docs_api.prototype.getFocusObject = function(){//возвратит тип элемента - параграф c_oAscTypeSelectElement.Paragraph, изображение c_oAscTypeSelectElement.Image, таблица c_oAscTypeSelectElement.Table, колонтитул c_oAscTypeSelectElement.Header.
 
-}
+};
 
 /*callbacks*/
 asc_docs_api.prototype.sync_VerticalAlign = function(typeBaseline){
 	this.asc_fireCallback("asc_onVerticalAlign",typeBaseline);
-}
+};
 asc_docs_api.prototype.sync_PrAlignCallBack = function(value){
 	this.asc_fireCallback("asc_onPrAlign",value);
-}
+};
 asc_docs_api.prototype.sync_ListType = function(NumPr){
     this.asc_fireCallback("asc_onListType", new CListType( NumPr ) );
-}
+};
 asc_docs_api.prototype.sync_TextColor = function(TextPr)
 {
     if(TextPr.Unifill && TextPr.Unifill.fill && TextPr.Unifill.fill.type === FILL_TYPE_SOLID && TextPr.Unifill.fill.color)
@@ -4065,39 +4080,39 @@ asc_docs_api.prototype.sync_TextColor = function(TextPr)
     {
         this.asc_fireCallback("asc_onTextColor", CreateAscColorCustom( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto ));
     }
-}
+};
 asc_docs_api.prototype.sync_TextHighLight = function(HighLight)
 {
     if ( undefined != HighLight )
 	    this.asc_fireCallback("asc_onTextHighLight", new CColor( HighLight.r, HighLight.g, HighLight.b ) );
-}
+};
 asc_docs_api.prototype.sync_TextSpacing = function(Spacing)
 {
     this.asc_fireCallback("asc_onTextSpacing", Spacing );
-}
+};
 asc_docs_api.prototype.sync_TextDStrikeout = function(Value)
 {
     this.asc_fireCallback("asc_onTextDStrikeout", Value );
-}
+};
 asc_docs_api.prototype.sync_TextCaps = function(Value)
 {
     this.asc_fireCallback("asc_onTextCaps", Value );
-}
+};
 asc_docs_api.prototype.sync_TextSmallCaps = function(Value)
 {
     this.asc_fireCallback("asc_onTextSmallCaps", Value );
-}
+};
 asc_docs_api.prototype.sync_TextPosition = function(Value)
 {
     this.asc_fireCallback("asc_onTextPosition", Value );
-}
+};
 asc_docs_api.prototype.sync_TextLangCallBack = function(Lang)
 {
     this.asc_fireCallback("asc_onTextLanguage", Lang.Val );
-}
+};
 asc_docs_api.prototype.sync_ParaStyleName = function(Name){
 	this.asc_fireCallback("asc_onParaStyleName",Name);
-}
+};
 asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine)
 {
     if ( true === SpacingLine.AfterAutoSpacing )
@@ -4111,30 +4126,30 @@ asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine)
         SpacingLine.Before = UnknownValue;
 
 	this.asc_fireCallback("asc_onParaSpacingLine", new CParagraphSpacing( SpacingLine ));
-}
+};
 asc_docs_api.prototype.sync_PageBreakCallback = function(isBreak){
 	this.asc_fireCallback("asc_onPageBreak",isBreak);
-}
+};
 
 asc_docs_api.prototype.sync_WidowControlCallback = function(bValue)
 {
     this.asc_fireCallback("asc_onWidowControl",bValue);
-}
+};
 
 asc_docs_api.prototype.sync_KeepNextCallback = function(bValue)
 {
     this.asc_fireCallback("asc_onKeepNext",bValue);
-}
+};
 
 asc_docs_api.prototype.sync_KeepLinesCallback = function(isKeepLines){
 	this.asc_fireCallback("asc_onKeepLines",isKeepLines);
-}
+};
 asc_docs_api.prototype.sync_ShowParaMarksCallback = function(){
 	this.asc_fireCallback("asc_onShowParaMarks");
-}
+};
 asc_docs_api.prototype.sync_SpaceBetweenPrgCallback = function(){
 	this.asc_fireCallback("asc_onSpaceBetweenPrg");
-}
+};
 asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)
@@ -4147,12 +4162,12 @@ asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
     }
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Paragraph, new CParagraphProp( prProp ) );
-}
+};
 
 asc_docs_api.prototype.sync_MathPropCallback = function(MathProp)
 {
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject(c_oAscTypeSelectElement.Math, new CMathProp(MathProp));
-}
+};
 
 asc_docs_api.prototype.sync_EndAddShape = function()
 {
@@ -4161,7 +4176,7 @@ asc_docs_api.prototype.sync_EndAddShape = function()
     {
         this.WordControl.m_oDrawingDocument.UnlockCursorType();
     }
-}
+};
 
 asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
 {
@@ -4188,7 +4203,7 @@ asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
 
     if (!bIsFreeze)
         this.WordControl.OnScroll();
-}
+};
 
 /*----------------------------------------------------------------*/
 /*functions for working with page*/
@@ -4210,11 +4225,11 @@ asc_docs_api.prototype.change_PageOrient = function(isPortrait)
         }
         this.sync_PageOrientCallback(editor.get_DocumentOrientation());
     }
-}
+};
 asc_docs_api.prototype.get_DocumentOrientation = function()
 {
 	return this.DocumentOrientation;
-}
+};
 asc_docs_api.prototype.change_DocSize = function(width,height)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
@@ -4226,17 +4241,17 @@ asc_docs_api.prototype.change_DocSize = function(width,height)
         else
             this.WordControl.m_oLogicDocument.Set_DocumentPageSize(height, width);
     }
-}
+};
 
 asc_docs_api.prototype.get_DocumentWidth = function()
 {
     return Page_Width;
-}
+};
 
 asc_docs_api.prototype.get_DocumentHeight = function()
 {
     return Page_Height;
-}
+};
 
 asc_docs_api.prototype.put_AddPageBreak = function()
 {
@@ -4250,7 +4265,7 @@ asc_docs_api.prototype.put_AddPageBreak = function()
             this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaNewLine( break_Page ) );
         }
     }
-}
+};
 asc_docs_api.prototype.Update_ParaInd = function( Ind ){
 	var FirstLine = 0,
 		Left = 0,
@@ -4290,28 +4305,28 @@ asc_docs_api.prototype.Update_ParaInd = function( Ind ){
     }
     if (bIsUpdate)
         this.WordControl.UpdateHorRuler();
-}
+};
 asc_docs_api.prototype.Internal_Update_Ind_FirstLine = function(FirstLine,Left){
 	if (this.WordControl.m_oHorRuler.m_dIndentLeftFirst != (FirstLine + Left))
     {
         this.WordControl.m_oHorRuler.m_dIndentLeftFirst = (FirstLine + Left);
 	    this.WordControl.UpdateHorRuler();
     }
-}
+};
 asc_docs_api.prototype.Internal_Update_Ind_Left = function(Left){
     if (this.WordControl.m_oHorRuler.m_dIndentLeft != Left)
     {
         this.WordControl.m_oHorRuler.m_dIndentLeft = Left;
         this.WordControl.UpdateHorRuler();
     }
-}
+};
 asc_docs_api.prototype.Internal_Update_Ind_Right = function(Right){
     if (this.WordControl.m_oHorRuler.m_dIndentRight != Right)
     {
         this.WordControl.m_oHorRuler.m_dIndentRight = Right;
         this.WordControl.UpdateHorRuler();
     }
-}
+};
 
 // "where" где нижний или верхний, align выравнивание
 asc_docs_api.prototype.put_PageNum = function(where,align)
@@ -4332,7 +4347,7 @@ asc_docs_api.prototype.put_PageNum = function(where,align)
             this.WordControl.m_oLogicDocument.Document_AddPageNum( where, align );
         }
     }
-}
+};
 
 asc_docs_api.prototype.put_HeadersAndFootersDistance = function(value)
 {
@@ -4341,7 +4356,7 @@ asc_docs_api.prototype.put_HeadersAndFootersDistance = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Document_SetHdrFtrDistance(value);
     }
-}
+};
 
 asc_docs_api.prototype.HeadersAndFooters_DifferentFirstPage = function(isOn)
 {
@@ -4350,7 +4365,7 @@ asc_docs_api.prototype.HeadersAndFooters_DifferentFirstPage = function(isOn)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Document_SetHdrFtrFirstPage( isOn );
     }
-}
+};
 
 asc_docs_api.prototype.HeadersAndFooters_DifferentOddandEvenPage = function(isOn)
 {
@@ -4359,7 +4374,7 @@ asc_docs_api.prototype.HeadersAndFooters_DifferentOddandEvenPage = function(isOn
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Document_SetHdrFtrEvenAndOddHeaders( isOn );
     }
-}
+};
 
 asc_docs_api.prototype.HeadersAndFooters_LinkToPrevious = function(isOn)
 {
@@ -4368,7 +4383,7 @@ asc_docs_api.prototype.HeadersAndFooters_LinkToPrevious = function(isOn)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Document_SetHdrFtrLink( isOn );
     }
-}
+};
 
 /*структура для передачи настроек колонтитулов
 	{
@@ -4381,17 +4396,17 @@ asc_docs_api.prototype.HeadersAndFooters_LinkToPrevious = function(isOn)
 /*callback*/
 asc_docs_api.prototype.sync_DocSizeCallback = function(width,height){
 	this.asc_fireCallback("asc_onDocSize",width,height);
-}
+};
 asc_docs_api.prototype.sync_PageOrientCallback = function(isPortrait){
     this.asc_fireCallback("asc_onPageOrient",isPortrait);
-}
+};
 asc_docs_api.prototype.sync_HeadersAndFootersPropCallback = function(hafProp)
 {
     if ( true === hafProp )
         hafProp.Locked = true;
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Header, new CHeaderProp( hafProp ) );
-}
+};
 
 /*----------------------------------------------------------------*/
 /*functions for working with table*/
@@ -4402,7 +4417,7 @@ asc_docs_api.prototype.put_Table = function(col,row)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Add_InlineTable(col,row);
     }
-}
+};
 asc_docs_api.prototype.addRowAbove = function(count)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
@@ -4410,7 +4425,7 @@ asc_docs_api.prototype.addRowAbove = function(count)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_AddRow(true);
     }
-}
+};
 asc_docs_api.prototype.addRowBelow = function(count)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
@@ -4418,7 +4433,7 @@ asc_docs_api.prototype.addRowBelow = function(count)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_AddRow(false);
     }
-}
+};
 asc_docs_api.prototype.addColumnLeft = function(count)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
@@ -4426,7 +4441,7 @@ asc_docs_api.prototype.addColumnLeft = function(count)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_AddCol(true);
     }
-}
+};
 asc_docs_api.prototype.addColumnRight = function(count)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
@@ -4434,7 +4449,7 @@ asc_docs_api.prototype.addColumnRight = function(count)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_AddCol(false);
     }
-}
+};
 asc_docs_api.prototype.remRow = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_RemoveCells) )
@@ -4442,7 +4457,7 @@ asc_docs_api.prototype.remRow = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_RemoveRow();
     }
-}
+};
 asc_docs_api.prototype.remColumn = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_RemoveCells) )
@@ -4450,7 +4465,7 @@ asc_docs_api.prototype.remColumn = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_RemoveCol();
     }
-}
+};
 asc_docs_api.prototype.remTable = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_RemoveCells) )
@@ -4458,40 +4473,40 @@ asc_docs_api.prototype.remTable = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_RemoveTable();
     }
-}
+};
 asc_docs_api.prototype.selectRow = function()
 {
     this.WordControl.m_oLogicDocument.Table_Select( c_oAscTableSelectionType.Row );
-}
+};
 asc_docs_api.prototype.selectColumn = function()
 {
     this.WordControl.m_oLogicDocument.Table_Select( c_oAscTableSelectionType.Column );
-}
+};
 asc_docs_api.prototype.selectCell = function()
 {
     this.WordControl.m_oLogicDocument.Table_Select( c_oAscTableSelectionType.Cell );
-}
+};
 asc_docs_api.prototype.selectTable = function()
 {
     this.WordControl.m_oLogicDocument.Table_Select( c_oAscTableSelectionType.Table );
-}
+};
 asc_docs_api.prototype.setColumnWidth = function(width){
 
-}
+};
 asc_docs_api.prototype.setRowHeight = function(height){
 
-}
+};
 asc_docs_api.prototype.set_TblDistanceFromText = function(left,top,right,bottom){
 
-}
+};
 asc_docs_api.prototype.CheckBeforeMergeCells = function()
 {
     return this.WordControl.m_oLogicDocument.Table_CheckMerge();
-}
+};
 asc_docs_api.prototype.CheckBeforeSplitCells = function()
 {
     return this.WordControl.m_oLogicDocument.Table_CheckSplit();
-}
+};
 asc_docs_api.prototype.MergeCells = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
@@ -4499,7 +4514,7 @@ asc_docs_api.prototype.MergeCells = function()
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_MergeCells();
     }
-}
+};
 asc_docs_api.prototype.SplitCell = function(Cols, Rows)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
@@ -4507,25 +4522,25 @@ asc_docs_api.prototype.SplitCell = function(Cols, Rows)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
     }
-}
+};
 asc_docs_api.prototype.widthTable = function(width){
 
-}
+};
 asc_docs_api.prototype.put_CellsMargin = function(left,top,right,bottom){
 
-}
+};
 asc_docs_api.prototype.set_TblWrap = function(type){
 
-}
+};
 asc_docs_api.prototype.set_TblIndentLeft = function(spacing){
 
-}
+};
 asc_docs_api.prototype.set_Borders = function(typeBorders,size,Color){//если size == 0 то границы нет.
 
-}
+};
 asc_docs_api.prototype.set_TableBackground = function(Color){
 
-}
+};
 asc_docs_api.prototype.set_AlignCell = function(align){// c_oAscAlignType.RIGHT, c_oAscAlignType.LEFT, c_oAscAlignType.CENTER
 	switch(align)
 	{
@@ -4533,7 +4548,7 @@ asc_docs_api.prototype.set_AlignCell = function(align){// c_oAscAlignType.RIGHT,
 		case c_oAscAlignType.CENTER : break;
 		case c_oAscAlignType.RIGHT : break;
 	}
-}
+};
 asc_docs_api.prototype.set_TblAlign = function(align){// c_oAscAlignType.RIGHT, c_oAscAlignType.LEFT, c_oAscAlignType.CENTER
 	switch(align)
 	{
@@ -4541,12 +4556,12 @@ asc_docs_api.prototype.set_TblAlign = function(align){// c_oAscAlignType.RIGHT, 
 		case c_oAscAlignType.CENTER : break;
 		case c_oAscAlignType.RIGHT : break;
 	}
-}
+};
 asc_docs_api.prototype.set_SpacingBetweenCells = function(isOn,spacing){// c_oAscAlignType.RIGHT, c_oAscAlignType.LEFT, c_oAscAlignType.CENTER
 	if(isOn){
 
 	}
-}
+};
 
 // CBackground
 // Value : тип заливки(прозрачная или нет),
@@ -4564,10 +4579,10 @@ function CBackground (obj)
 		this.Value = 1;
 	}
 }
-CBackground.prototype.get_Color = function (){return this.Color;}
-CBackground.prototype.put_Color = function (v){this.Color = (v) ? v: null;}
-CBackground.prototype.get_Value = function (){return this.Value;}
-CBackground.prototype.put_Value = function (v){this.Value = v;}
+CBackground.prototype.get_Color = function (){return this.Color;};
+CBackground.prototype.put_Color = function (v){this.Color = (v) ? v: null;};
+CBackground.prototype.get_Value = function (){return this.Value;};
+CBackground.prototype.put_Value = function (v){this.Value = v;};
 
 function CTablePositionH(obj)
 {
@@ -4587,14 +4602,14 @@ function CTablePositionH(obj)
     }
 }
 
-CTablePositionH.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; }
-CTablePositionH.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; }
-CTablePositionH.prototype.get_UseAlign = function()  { return this.UseAlign; }
-CTablePositionH.prototype.put_UseAlign = function(v) { this.UseAlign = v; }
-CTablePositionH.prototype.get_Align = function()  { return this.Align; }
-CTablePositionH.prototype.put_Align = function(v) { this.Align = v; }
-CTablePositionH.prototype.get_Value = function()  { return this.Value; }
-CTablePositionH.prototype.put_Value = function(v) { this.Value = v; }
+CTablePositionH.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; };
+CTablePositionH.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; };
+CTablePositionH.prototype.get_UseAlign = function()  { return this.UseAlign; };
+CTablePositionH.prototype.put_UseAlign = function(v) { this.UseAlign = v; };
+CTablePositionH.prototype.get_Align = function()  { return this.Align; };
+CTablePositionH.prototype.put_Align = function(v) { this.Align = v; };
+CTablePositionH.prototype.get_Value = function()  { return this.Value; };
+CTablePositionH.prototype.put_Value = function(v) { this.Value = v; };
 
 function CTablePositionV(obj)
 {
@@ -4614,14 +4629,14 @@ function CTablePositionV(obj)
     }
 }
 
-CTablePositionV.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; }
-CTablePositionV.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; }
-CTablePositionV.prototype.get_UseAlign = function()  { return this.UseAlign; }
-CTablePositionV.prototype.put_UseAlign = function(v) { this.UseAlign = v; }
-CTablePositionV.prototype.get_Align = function()  { return this.Align; }
-CTablePositionV.prototype.put_Align = function(v) { this.Align = v; }
-CTablePositionV.prototype.get_Value = function()  { return this.Value; }
-CTablePositionV.prototype.put_Value = function(v) { this.Value = v; }
+CTablePositionV.prototype.get_RelativeFrom = function()  { return this.RelativeFrom; };
+CTablePositionV.prototype.put_RelativeFrom = function(v) { this.RelativeFrom = v; };
+CTablePositionV.prototype.get_UseAlign = function()  { return this.UseAlign; };
+CTablePositionV.prototype.put_UseAlign = function(v) { this.UseAlign = v; };
+CTablePositionV.prototype.get_Align = function()  { return this.Align; };
+CTablePositionV.prototype.put_Align = function(v) { this.Align = v; };
+CTablePositionV.prototype.get_Value = function()  { return this.Value; };
+CTablePositionV.prototype.put_Value = function(v) { this.Value = v; };
 
 function CTablePropLook(obj)
 {
@@ -4643,18 +4658,18 @@ function CTablePropLook(obj)
     }
 }
 
-CTablePropLook.prototype.get_FirstCol = function() {return this.FirstCol;}
-CTablePropLook.prototype.put_FirstCol = function(v) {this.FirstCol = v;}
-CTablePropLook.prototype.get_FirstRow = function() {return this.FirstRow;}
-CTablePropLook.prototype.put_FirstRow = function(v) {this.FirstRow = v;}
-CTablePropLook.prototype.get_LastCol = function() {return this.LastCol;}
-CTablePropLook.prototype.put_LastCol = function(v) {this.LastCol = v;}
-CTablePropLook.prototype.get_LastRow = function() {return this.LastRow;}
-CTablePropLook.prototype.put_LastRow = function(v) {this.LastRow = v;}
-CTablePropLook.prototype.get_BandHor = function() {return this.BandHor;}
-CTablePropLook.prototype.put_BandHor = function(v) {this.BandHor = v;}
-CTablePropLook.prototype.get_BandVer = function() {return this.BandVer;}
-CTablePropLook.prototype.put_BandVer = function(v) {this.BandVer = v;}
+CTablePropLook.prototype.get_FirstCol = function() {return this.FirstCol;};
+CTablePropLook.prototype.put_FirstCol = function(v) {this.FirstCol = v;};
+CTablePropLook.prototype.get_FirstRow = function() {return this.FirstRow;};
+CTablePropLook.prototype.put_FirstRow = function(v) {this.FirstRow = v;};
+CTablePropLook.prototype.get_LastCol = function() {return this.LastCol;};
+CTablePropLook.prototype.put_LastCol = function(v) {this.LastCol = v;};
+CTablePropLook.prototype.get_LastRow = function() {return this.LastRow;};
+CTablePropLook.prototype.put_LastRow = function(v) {this.LastRow = v;};
+CTablePropLook.prototype.get_BandHor = function() {return this.BandHor;};
+CTablePropLook.prototype.put_BandHor = function(v) {this.BandHor = v;};
+CTablePropLook.prototype.get_BandVer = function() {return this.BandVer;};
+CTablePropLook.prototype.put_BandVer = function(v) {this.BandVer = v;};
 
 function CTableProp (tblProp)
 {
@@ -7529,43 +7544,38 @@ function _onOpenCommand(fCallback, incomeObject) {
 		}
 	});
 }
-function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
-{
+function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
 	var oAdditionalData = {};
 	oAdditionalData["c"] = "save";
 	oAdditionalData["id"] = documentId;
 	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
 	oAdditionalData["outputformat"] = filetype;
-	if(null != sSaveKey)
+	if (null != sSaveKey)
 		oAdditionalData["savekey"] = sSaveKey;
-	if(c_oAscFileType.PDF == filetype)
-	{
+	if (c_oAscFileType.PDF === filetype) {
 		var dd = editor.WordControl.m_oDrawingDocument;
-		if(dd.isComleteRenderer2())
-		{
-			if(false == bStart)
+		if (dd.isComleteRenderer2()) {
+			if (false == bStart)
 				oAdditionalData["savetype"] = "complete";
 			else
 				oAdditionalData["savetype"] = "completeall";
-		}
-		else
-		{
-			if(false == bStart)
+		} else {
+			if (false == bStart)
 				oAdditionalData["savetype"] = "part";
 			else
 				oAdditionalData["savetype"] = "partstart";
 		}
 		oAdditionalData["data"] = dd.ToRendererPart();
-		sendCommand(editor, fCallback, oAdditionalData);
-	}
-	else
-	{
+	} else if (c_oAscFileType.JSON === filetype) {
+		oAdditionalData["savetype"] = "completeall";
+		oAdditionalData["url"] = editor.mailMergeFileUrl;
+	} else {
 		var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
 		oAdditionalData["savetype"] = "completeall";
 		oAdditionalData["data"] = oBinaryFileWriter.Write();
-		sendCommand(editor, fCallback, oAdditionalData);
 	}
+	sendCommand(editor, fCallback, oAdditionalData);
 }
 
 function _addImageUrl2 (url)
@@ -7822,9 +7832,15 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_StartMailMerge = function(aList)
+asc_docs_api.prototype.asc_StartMailMerge = function(oData)
 {
-    this.WordControl.m_oLogicDocument.Start_MailMerge();
+	this.mailMergeFileUrl = oData["url"];
+	this.asc_DownloadAs(c_oAscFileType.JSON);
+};
+asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
+{
+	this.WordControl.m_oLogicDocument.Start_MailMerge();
+	// ToDo Add load data
 };
 asc_docs_api.prototype.asc_GetReceptionsCount = function()
 {
