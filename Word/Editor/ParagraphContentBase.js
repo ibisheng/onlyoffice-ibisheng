@@ -1087,7 +1087,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_LineMetrics = fu
 
     for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
     {
-        this.Content[CurPos].Recalculate_LineMetrics(PRSC, _CurLine, _CurRange);
+        this.Content[CurPos].Recalculate_LineMetrics(PRS, _CurLine, _CurRange);
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
