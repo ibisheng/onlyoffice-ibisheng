@@ -3383,7 +3383,7 @@ CShape.prototype =
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
         if (this.spPr && isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(TRACK_CIRCLE_RADIUS));
+            return this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * TRACK_CIRCLE_RADIUS));
         return { hit: false, adjPolarFlag: null, adjNum: null };
     },
 
