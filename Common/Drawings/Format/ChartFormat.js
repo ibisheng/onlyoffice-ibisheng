@@ -23155,9 +23155,9 @@ CTitle.prototype =
     {
         return this.chart && this.chart.getCanvasContext();
     },
-    convertPixToMM: function()
+    convertPixToMM: function(pix)
     {
-        return this.chart && this.chart.convertPixToMM();
+        return this.chart && this.chart.convertPixToMM(pix);
     },
     getDrawingDocument: function()
     {

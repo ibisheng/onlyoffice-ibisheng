@@ -605,9 +605,15 @@ CWrapPolygon.prototype =
 
     calculateRelToAbs: function(transform, drawing)
     {
+
+        var bounds = drawing.bounds, oDistance = drawing.parent.Get_Distance();
         if(this.relativeArrPoints.length === 0)
         {
             this.arrPoints.length = 0;
+            this.localLeft = bounds.l - oDistance.L;
+            this.localRight = bounds.r + oDistance.R;
+            this.localTop = bounds.t - oDistance.T;
+            this.localBottom = bounds.b + oDistance.B;
             return;
         }
         var relArr = this.relativeArrPoints;
@@ -641,12 +647,6 @@ CWrapPolygon.prototype =
                 max_y = absPoint.y;
         }
 
-        var bounds = {}, oDistance = drawing.parent.Get_Distance();
-
-        bounds.l = drawing.bounds.l;
-        bounds.t = drawing.bounds.t;
-        bounds.r = drawing.bounds.r;
-        bounds.b = drawing.bounds.b;
         if(bounds.l < min_x)
             this.localLeft = bounds.l - oDistance.L;
         else
@@ -666,7 +666,6 @@ CWrapPolygon.prototype =
             this.localBottom = bounds.b + oDistance.B;
         else
             this.localBottom = max_y + oDistance.B;
-        this.rect_flag = this.isRect();
     },
 
     calculateAbsToRel: function(drawing, aPoints)
