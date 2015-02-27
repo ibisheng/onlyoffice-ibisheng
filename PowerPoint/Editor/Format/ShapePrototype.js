@@ -563,7 +563,7 @@ CShape.prototype.recalculateContent = function()
         this.contentHeight = this.txBody.contentHeight;
 
         content.Set_StartPage(0);
-        content.Reset(0, 0, w, 20000);
+        content.Reset(0, 0, this.contentWidth, 20000);
         content.Recalculate_Page(content.StartPage, true);
     }
 };
