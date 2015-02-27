@@ -1377,6 +1377,38 @@ CGraphicObjects.prototype =
         }
     },
 
+    resetInterfaceTextPr: function()
+    {
+        var oTextPr =  new CTextPr();
+        oTextPr.Set_FromObject(
+            {
+                Bold: false,
+                Italic: false,
+                Underline: false,
+                Strikeout: false,
+                FontFamily:{
+                    Name : "", Index : -1
+                },
+                FontSize: null,
+                VertAlign: null,
+                HighLight: highlight_None,
+                Spacing: null,
+                DStrikeout: false,
+                Caps: null,
+                SmallCaps: null,
+                Position: null,
+                Lang: null
+            }
+        );
+        editor.UpdateTextPr(oTextPr);
+        editor.Update_ParaTab(Default_Tab_Stop, new CParaTabs());
+        editor.sync_ParaSpacingLine( new CParaSpacing() );
+        editor.Update_ParaInd(new CParaInd());
+        editor.sync_PrAlignCallBack(null);
+        editor.sync_ParaStyleName(null);
+        editor.sync_ListType({ Type : -1, SubType : -1 });
+    },
+
     isNeedUpdateRulers: function()
     {
         if(this.selectedObjects.length === 1 && this.selectedObjects[0].getDocContent && this.selectedObjects[0].getDocContent())

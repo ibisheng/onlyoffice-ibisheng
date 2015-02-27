@@ -11761,7 +11761,7 @@ CDocument.prototype =
             }
             else
             {
-                this.DrawingObjects.documentUpdateInterfaceState();
+                this.DrawingObjects.resetInterfaceTextPr();
                 this.Interface_Update_DrawingPr();
             }
         }
