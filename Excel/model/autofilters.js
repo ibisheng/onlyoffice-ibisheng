@@ -1531,7 +1531,7 @@ var gUndoInsDelCellsFlag = true;
 						curFilter.SortState.SortConditions[0].ConditionDescending = type;
 
 						//сама сортировка
-						ws.cellCommentator.sortComments(sortRange.sort(type, curCell.c1));
+						ws.cellCommentator.sortComments(sortRange.sort(type, activeCells.c1));
 
 						if(curFilter.TableStyleInfo)
 							t._setColorStyleTable(curFilter.Ref, curFilter);
@@ -1575,11 +1575,7 @@ var gUndoInsDelCellsFlag = true;
 						if(!cellId)
 							cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
 					}
-					else if(curFilter && filterRef.isIntersect(activeRange) && !filterRef.containsRange(activeRange))//если захвачена часть а/ф
-					{
-						return;
-					}	
-					else//внутри а/ф либо без а/ф
+					else//внутри а/ф либо без а/ф либо часть а/ф
 					{
 						ws.setSelectionInfo("sort", type);
 						return;
@@ -1607,9 +1603,7 @@ var gUndoInsDelCellsFlag = true;
 				
 				activeCells = t._idToRange(cellId);
 				
-				curCell = t._idToRange(cellId);
-				curCell.r1 = filterRef.r1;
-				newEndId = t._rangeToId(curCell);
+				newEndId = t._rangeToId(new Asc.Range(activeCells.c1, filterRef.r1, activeCells.c2, activeCells.r2));
 
 				sortRange = ws.model.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
 				if(isTurnOffHistory)
@@ -2245,7 +2239,7 @@ var gUndoInsDelCellsFlag = true;
 				if(-1 !== tablePartId)
 				{
 					var tablePart = aWs.TableParts[tablePartId];
-					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
+					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.AutoFilter && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
 						result = {isFilterColumns: true, isAutoFilter: true};
 					else if(tablePart.Ref && tablePart.AutoFilter && tablePart.AutoFilter !== null)
 						result = {isFilterColumns: false, isAutoFilter: true};
