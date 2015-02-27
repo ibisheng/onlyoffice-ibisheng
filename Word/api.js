@@ -2823,12 +2823,13 @@ asc_docs_api.prototype.asc_Save = function ()
 };
 
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату.
-	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-	var editor = this;
+	var actionType = this.mailMergeFileUrl ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
+	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+	var t = this;
 	_downloadAs(this, typeFile, function (incomeObject) {
 		if (null != incomeObject && "save" == incomeObject["type"])
-			editor.processSavedFile(incomeObject["data"], false);
-		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+			t.processSavedFile(incomeObject["data"], false);
+		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 	}, true);
 };
 asc_docs_api.prototype.Resize = function(){
@@ -2885,10 +2886,14 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner) {
 			url: url,
 			dataType: "text",
 			success: function (result) {
-				t.asc_StartMailMergeByList(JSON.parse(result));
+				try {
+					t.asc_StartMailMergeByList(JSON.parse(result));
+				} catch (e) {
+					t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+				}
 			},
 			error: function () {
-				// ToDo Error
+				t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 			}
 		});
 	} else {

@@ -546,12 +546,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this._asc_sendCommand(function (response) {t._onGetLicense(response);}, rdata);
 		};
 
-		spreadsheet_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
+		spreadsheet_api.prototype.asc_DownloadAs = function(typeFile) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
 			if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
 				return;
 
 			if (undefined != window['appBridge']) {
-				window['appBridge']['dummyCommandDownloadAs'] ();     // TEST
+				window['appBridge']['dummyCommandDownloadAs']();     // TEST
 				return;
 			}
 
@@ -559,8 +559,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			var that = this;
 			// Меняем тип состояния (на сохранение)
 			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-			this._asc_downloadAs(typeFile, function(incomeObject){
-				if(null != incomeObject && "save" == incomeObject["type"])
+			this._asc_downloadAs(typeFile, function (incomeObject) {
+				if (null != incomeObject && "save" == incomeObject["type"])
 					that.asc_processSavedFile(incomeObject["data"], false);
 				// Меняем тип состояния (на никакое)
 				that.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;

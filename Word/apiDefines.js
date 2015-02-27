@@ -21,7 +21,8 @@ var c_oAscAsyncAction = {
 	DownloadAs			: 6,
 	Print				: 7, // конвертация в PDF и сохранение у пользователя
 	UploadImage			: 8,
-	ApplyChanges		: 9  // применение изменений от другого пользователя.
+	ApplyChanges		: 9, // применение изменений от другого пользователя.
+	MailMergeLoadFile	: 10,// загрузка файла для mail merge
 };
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
@@ -98,6 +99,8 @@ var c_oAscError = {
 		KeyExpire:				-21,
 		UserCountExceed:		-22,
 		MobileUnexpectedCharCount: -23,
+
+		MailMergeLoadFile:		-24,
 
         UserDrop:				-100
 	}
