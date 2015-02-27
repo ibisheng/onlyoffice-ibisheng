@@ -1096,6 +1096,9 @@ CFontSelect.prototype =
         if (-1 != sReqName.indexOf(this.m_wsFontName) || -1 != this.m_wsFontName.indexOf(sReqName))
             return 1000;
 
+        if (sReqName.toLowerCase() == this.m_wsFontName.toLowerCase())
+            return 2000;
+
         if (g_fontApplication.g_fontDictionary.CheckLikeFonts(this.m_wsFontName, sReqName))
             return 2000;
 
@@ -2904,7 +2907,7 @@ function CApplicationFonts()
                     return oSelect.wsName;
                 else
                 {
-                    return g_fontApplication.GetFontInfoName(sFontname);
+                    return this.GetFontInfoName(sFontname);
                 }
             }
         }
