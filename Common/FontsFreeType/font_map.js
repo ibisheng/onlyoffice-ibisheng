@@ -2865,6 +2865,51 @@ function CApplicationFonts()
     {
         return this.g_fontDictionary.GetFontIndex(oSelect, this.g_fontSelections.List, this.DefaultIndex, isName0);
     };
+
+    this.GetFontNameDictionary = function(sFontFamily, bDontReturnDef)
+    {
+        var sFontname;
+        var nIndex = sFontFamily.indexOf(",");
+        if(-1 != nIndex)
+            sFontname = sFontFamily.substring(0, nIndex);
+        else
+            sFontname = sFontFamily;
+        //trim { }, {'}, {"}
+        sFontname = sFontname.replace(/^[\s|'|"]+|[\s|'|"]+$/g, '');
+        if (0 == sFontname.length)
+        {
+            if (true === bDontReturnDef)
+                sFontname = "Arial";
+        }
+        else
+        {
+            var sFontnameLower = sFontname.toLowerCase();
+            if("serif" == sFontnameLower)
+                sFontname = "Times New Roman";
+            else if("sans-serif" == sFontnameLower)
+                sFontname = "Arial";
+            else if("cursive" == sFontnameLower)
+                sFontname = "Comic Sans MS";
+            else if("fantasy" == sFontnameLower)
+                sFontname = "Impact";
+            else if("monospace" == sFontnameLower)
+                sFontname = "Courier New";
+            else
+            {
+                var oSelect = new CFontSelectFormat();
+                oSelect.wsName = sFontFamily;
+                this.g_fontDictionary.CorrectParamsFromDictionary(oSelect);
+
+                if (null != oSelect.pPanose)
+                    return oSelect.wsName;
+                else
+                {
+                    g_fontApplication.GetFontInfoName(sFontFamily);
+                }
+            }
+        }
+        return sFontname;
+    };
 }
 
 var g_fontApplication = new CApplicationFonts();
