@@ -1096,13 +1096,10 @@ CFontSelect.prototype =
         if (-1 != sReqName.indexOf(this.m_wsFontName) || -1 != this.m_wsFontName.indexOf(sReqName))
             return 1000;
 
-        if (sReqName.toLowerCase() == this.m_wsFontName.toLowerCase())
-            return 2000;
-
         if (g_fontApplication.g_fontDictionary.CheckLikeFonts(this.m_wsFontName, sReqName))
             return 2000;
 
-        return 10000;
+        return this.CheckEqualFonts2(sReqName, this.m_wsFontName);
     },
 
     GetWidthPenalty : function(usReqWidth)
@@ -1286,6 +1283,20 @@ CFontSelect.prototype =
             return FD_UNKNOWN_CHARSET;
 
         return 0;
+    },
+
+    CheckEqualFonts2 : function(name1, name2)
+    {
+        var _res1 = name1.toLowerCase();
+        var _res2 = name2.toLowerCase();
+
+        if (_res1 == _res2)
+            return 1500;
+
+        if (_res1.replace(/\s+/g, '') == _res2.replace(/\s+/g, ''))
+            return 3000;
+
+        return 10000;
     }
 };
 
