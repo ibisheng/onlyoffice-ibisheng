@@ -2875,7 +2875,7 @@ function CApplicationFonts()
         else
             sFontname = sFontFamily;
         //trim { }, {'}, {"}
-        sFontname = sFontname.replace(/^[\s|'|"]+|[\s|'|"]+$/g, '');
+        sFontname = sFontname.replace(/^[\s'"]+|[\s'"]+$/g, '');
         if (0 == sFontname.length)
         {
             if (true === bDontReturnDef)
@@ -2897,14 +2897,14 @@ function CApplicationFonts()
             else
             {
                 var oSelect = new CFontSelectFormat();
-                oSelect.wsName = sFontFamily;
+                oSelect.wsName = sFontname;
                 this.g_fontDictionary.CorrectParamsFromDictionary(oSelect);
 
                 if (null != oSelect.pPanose)
                     return oSelect.wsName;
                 else
                 {
-                    g_fontApplication.GetFontInfoName(sFontFamily);
+                    return g_fontApplication.GetFontInfoName(sFontname);
                 }
             }
         }

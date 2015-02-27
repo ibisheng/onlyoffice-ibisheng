@@ -1267,7 +1267,7 @@
 				oNewItem.text = jqSpanObject.text().replace(/(\r|\t|\n|)/g,'');
 
 				oNewItem.format = {};
-				oNewItem.format.fn = this._checkFonts(spanObject.style.fontFamily.replace(/'/g,"").split(',')[0]);
+				oNewItem.format.fn = g_fontApplication.GetFontNameDictionary(spanObject.style.fontFamily, true);
 
 				if (oNewItem.format.fn == null || oNewItem.format.fn == '')
 					oNewItem.format.fn = 'Calibri';
@@ -1976,7 +1976,6 @@
 				for(var i in oFonts)
 				{
 					fontName = oFonts[i].Name;
-					fontName = this._checkFonts(fontName);
 					newFonts[fontName] = 1;
 				};
 				return newFonts;
@@ -3072,10 +3071,9 @@
 						if(elem.getAttribute != undefined && elem.getAttribute("class") == "qPrefix")
 							parent = elem;
 						var style = window.getComputedStyle(parent);
-						var fn = getFontName(style);
+						var fn = g_fontApplication.GetFontNameDictionary(style.fontFamily, false);
 						if(fn == '')
-							fn = parent.style.fontFamily.replace(/'/g,""); 
-						fn = t._checkFonts(fn);
+							fn = g_fontApplication.GetFontNameDictionary(parent.style.fontFamily, true);
 						var fs = Math.round(getFontSize(style));
 						var fb = style.fontWeight.toLowerCase();
 						var fi = style.fontStyle.toLowerCase();
@@ -3160,29 +3158,6 @@
 						Array.prototype.forEach.call(elem.childNodes, processElement);
 				});
 				return res;
-			},
-			
-			_checkFonts: function (fontName) {
-				//var defaultFont = 'Arial';
-				var defaultFont = 'Calibri';
-				if (null === this.Api)
-					return defaultFont;
-				if(this.Api.FontLoader.map_font_index[fontName] != undefined)
-					return fontName;
-				var arrName = fontName.toLowerCase().split(' ');
-				var newFontName = '';
-				for(var i = 0;i < arrName.length;i++)
-				{
-					arrName[i] = arrName[i].substr(0,1).toUpperCase() + arrName[i].substr(1).toLowerCase();
-					if(i == arrName.length - 1)
-						newFontName += arrName[i];
-					else
-						newFontName += arrName[i] + ' ';
-				}
-				if(this.Api.FontLoader.map_font_index[newFontName] != undefined)
-					return newFontName;
-				else
-					return defaultFont;
 			},
 			
 			_encode : function (input) {

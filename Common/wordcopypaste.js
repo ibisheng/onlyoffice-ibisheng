@@ -4983,35 +4983,7 @@ PasteProcessor.prototype =
                 if ( computedStyle )
                 {
                     var fontFamily = computedStyle.getPropertyValue( "font-family" );
-                    var sNewFF;
-                    var nIndex = fontFamily.indexOf(",");
-                    if(-1 != nIndex)
-                        sNewFF = fontFamily.substring(0, nIndex);
-                    else
-                        sNewFF = fontFamily;
-                    //trim ' � "
-                    var nLength = sNewFF.length
-                    if(nLength >= 2)
-                    {
-                        var nStart = 0;
-                        var nStop = nLength;
-                        var cFirstChar = sNewFF[0];
-                        var cLastChar = sNewFF[nLength - 1];
-                        var bTrim = false;
-                        if('\'' == cFirstChar || '\"' == cFirstChar)
-                        {
-                            bTrim = true;
-                            nStart = 1;
-                        }
-                        if('\'' == cLastChar || '\"' == cLastChar)
-                        {
-                            bTrim = true;
-                            nStop = nLength - 1;
-                        }
-                        if(bTrim)
-                            sNewFF = sNewFF.substring(nStart, nStop);
-                    }
-                    this.oFonts[fontFamily] = {Name:sNewFF, Index: -1};
+                    this.oFonts[fontFamily] = {Name: g_fontApplication.GetFontNameDictionary(fontFamily, true), Index: -1};
                 }
             }
             else
