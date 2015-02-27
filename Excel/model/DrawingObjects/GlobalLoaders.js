@@ -628,10 +628,9 @@
             var _count = _fonts.length;
             for (var i = 0; i < _count; i++)
             {
-                var _info_ind = this.map_font_index[_fonts[i]];
-                if (undefined !== _info_ind)
+                var _info = g_fontApplication.GetFontInfo(_fonts[i]);
+                if (undefined !== _info)
                 {
-                    var _info = this.fontInfos[_info_ind];
                     _info.LoadFontsFromServer(this);
                 }
             }
