@@ -9083,7 +9083,14 @@ CParaPr.prototype =
                 case BULLET_TYPE_BULLET_CHAR:
                 {
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
-                    Bullet.m_sChar = this.Bullet.bulletType.Char;
+                    if(typeof this.Bullet.bulletType.Char === "string" && this.Bullet.bulletType.Char.length > 0)
+                    {
+                        Bullet.m_sChar = this.Bullet.bulletType.Char.substring(0, 1);
+                    }
+                    else
+                    {
+                        Bullet.m_sChar = "•";
+                    }
                     if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
                     {
                         Bullet.m_bFontTx = false;

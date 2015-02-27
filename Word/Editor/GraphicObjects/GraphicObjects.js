@@ -2801,7 +2801,16 @@ function ComparisonByZIndexSimpleParent(obj1, obj2)
 function ComparisonByZIndexSimple(obj1, obj2)
 {
     if(isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+    {
+        if(obj1.RelativeHeight === obj2.RelativeHeight)
+        {
+            if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
+            {
+                return editor.WordControl.m_oLogicDocument.Compare_DrawingsLogicPositions(obj2, obj1);
+            }
+        }
         return obj1.RelativeHeight - obj2.RelativeHeight;
+    }
     if(!isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
         return -1;
     if(isRealNumber(obj1.RelativeHeight) && !isRealNumber(obj2.RelativeHeight))
