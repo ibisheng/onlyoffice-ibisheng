@@ -5261,10 +5261,15 @@ function CSlideDrawer()
 
         if (this.IsCached)
         {
-            var w_px = _bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps;
-            var h_px = _bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps;
+            var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
+            var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
 
-            outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px >> 0, h_px >> 0, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px >> 0, h_px >> 0);
+			if (w_px > this.CachedCanvas.width)
+				w_px = this.CachedCanvas.width;
+			if (h_px > this.CachedCanvas.height)
+				h_px = this.CachedCanvas.height;
+			
+            outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
         }
         else
         {
