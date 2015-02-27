@@ -988,13 +988,15 @@ CPresentation.prototype =
         var graphic_frame = this.Create_TableGraphicFrame(Cols, Rows, this.Slides[this.CurPage], this.DefaultTableStyleId);
         if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
         {
-            this.Slides[this.CurPage].graphicObjects.resetSelection();
-            this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, 0);
+            //this.Slides[this.CurPage].graphicObjects.resetSelection();
+            //this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, 0);
             this.Check_GraphicFrameRowHeight(graphic_frame);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
+            graphic_frame.Set_CurrentElement();
+            graphic_frame.graphicObject.Cursor_MoveToStartPos();
             this.Recalculate();
-
             this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
         }
         else
         {
