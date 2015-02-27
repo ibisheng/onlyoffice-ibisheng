@@ -5048,17 +5048,8 @@ PasteProcessor.prototype =
                 //todo ��������� �����, ������ �� ��������
                 var oFontItem = this.oFonts[font_family];
                 //���� ����� ����� �������
-                var index = this.map_font_index[oFontItem.Name];
-                if(null != index)
-                {
-                    this.oFonts[font_family].Index = index;
-                    aPrepeareFonts.push(new CFont(oFontItem.Name, 0, "", 0));
-                }
-                else
-                {
-                    this.oFonts[font_family] = {Name:"Arial", Index: -1};
-                    aPrepeareFonts.push(new CFont("Arial", 0, "", 0));
-                }
+                this.oFonts[font_family].Index = -1;
+                aPrepeareFonts.push(new CFont(oFontItem.Name, 0, "", 0));
             };
 			
 			return aPrepeareFonts;
@@ -5068,14 +5059,6 @@ PasteProcessor.prototype =
 	{
 		if(!fonts)
 			return;
-		for(var i = 0; i < fonts.length; i++)
-		{
-			var index = this.map_font_index[fonts[i].name];
-			if(null == index ||  undefined == index)
-			{
-				fonts[i] = new CFont("Arial", 0, "", 0);
-			}
-		}
 		return fonts;
 	},
     _IsBlockElem : function(name)

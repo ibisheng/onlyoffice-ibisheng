@@ -11604,7 +11604,7 @@ CFontsCharMap.prototype =
 
     StartFont : function(family, bold, italic, size)
     {
-        var _index = window.g_map_font_index[family];
+        var font_info = g_fontApplication.GetFontInfo(family);
 
         var bItalic = (true === italic);
         var bBold   = (true === bold);
@@ -11617,7 +11617,6 @@ CFontsCharMap.prototype =
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-        var font_info = window.g_font_infos[_index];
         var _id = font_info.GetFontID(window.g_font_loader, oFontStyle);
 
         var _find_index = _id.id + "_teamlab_" + _id.faceIndex;

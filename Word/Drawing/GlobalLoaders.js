@@ -320,7 +320,7 @@
         {
             for (var i in _fonts)
             {
-                var info = this.fontInfos[this.map_font_index[_fonts[i].name]];
+                var info = g_fontApplication.GetFontInfo(_fonts[i].name);
                 var _isNeed = info.CheckFontLoadStylesNoLoad(this);
                 if (_isNeed === true)
                     return true;
@@ -480,10 +480,9 @@
             var _count = _fonts.length;
             for (var i = 0; i < _count; i++)
             {
-                var _info_ind = this.map_font_index[_fonts[i]];
-                if (undefined !== _info_ind)
+                var _info = g_fontApplication.GetFontInfo(_fonts[i]);
+                if (undefined !== _info)
                 {
-                    var _info = this.fontInfos[_info_ind];
                     _info.LoadFontsFromServer(this);
                 }
             }
