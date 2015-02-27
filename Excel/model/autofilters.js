@@ -1499,11 +1499,11 @@ var gUndoInsDelCellsFlag = true;
 			},
 			
 			//применяем сортировку из меню фильтра
-			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
+			sortColFilter: function(type, cellId, activeRange, isTurnOffHistory) {
 				var aWs = this._getCurrentWS();
 				var ws = this.worksheet;
 				var t = this;
-				var curFilter, oldFilter, newEndId, activeCells, curCell, sortRange;
+				var curFilter, oldFilter, newEndId, activeCells, curCell, sortRange, filterRef;
 				
 				var onSortAutoFilterCallback = function(success)
 				{
@@ -1549,7 +1549,6 @@ var gUndoInsDelCellsFlag = true;
 						return false;
 				}
 				
-				var activeRange = ar;
 				if(cellId)
 					activeRange = t._idToRange(cellId);
 				
@@ -1558,38 +1557,48 @@ var gUndoInsDelCellsFlag = true;
 				else
 					type = false;
 					
-				var filter = t._searchFilters(activeRange, null);
-				if(filter && filter == "error")//если захвачена часть фильтра
+				var filter = t.searchRangeInTableParts(activeRange);
+				if(filter === -2)//если захвачена часть ф/т
 					return;
-				
-				if(!filter)//если нет а/ф и ф/т в выделенном диапазоне
+					
+				if(filter === -1)//если нет ф/т в выделенном диапазоне
 				{
-					ws.setSelectionInfo("sort", type);
-					return;
+					if(aWs.AutoFilter && aWs.AutoFilter.Ref)
+					{
+						curFilter = aWs.AutoFilter;
+						filterRef = curFilter.Ref;
+					}
+					
+					//в данному случае может быть захвачен а/ф, если он присутвует(надо проверить), либо нажата кнопка а/ф
+					if(curFilter && (filterRef.isEqual(activeRange) || cellId))
+					{
+						if(!cellId)
+							cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
+					}
+					else if(curFilter && filterRef.isIntersect(activeRange) && !filterRef.containsRange(activeRange))//если захвачена часть а/ф
+					{
+						return;
+					}	
+					else//внутри а/ф либо без а/ф
+					{
+						ws.setSelectionInfo("sort", type);
+						return;
+					}
 				}
-				
-				//получаем данный фильтр или ф/т
-				var allAutoFilters = aWs.TableParts;
-				if(filter.all)
-					allAutoFilters = [aWs.AutoFilter];
-				var num = filter.num;
-				if(aWs.AutoFilter && !filter.all)
-					num = filter.num - 1;
-				var curFilter = allAutoFilters[num];
-				var filterRef = curFilter.Ref;
-				
-				if(!cellId && filterRef.r1 == activeRange.r1 && filterRef.c1 == activeRange.c1 && filterRef.r2 == activeRange.r2 && filterRef.c2 == activeRange.c2)//если выделен весь фильтр
+				else
 				{
-					cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
-				}
-				else if(!cellId && filterRef.containsRange(activeRange) && curFilter.TableStyleInfo)//если находимся внутри ф/т
-				{
-					cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
-				}
-				else if(!cellId)//стандартная сортировка
-				{
-					ws.setSelectionInfo("sort", type);
-					return;
+					//получаем данную ф/т
+					curFilter = aWs.TableParts[filter];
+					filterRef = curFilter.Ref;
+					
+					if(!cellId && filterRef.r1 == activeRange.r1 && filterRef.c1 == activeRange.c1 && filterRef.r2 == activeRange.r2 && filterRef.c2 == activeRange.c2)//если выделен вся ф/т
+					{
+						cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
+					}
+					else if(!cellId && filterRef.containsRange(activeRange))//если находимся внутри ф/т
+					{
+						cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
+					}
 				}
 				
 				//TODO преобразование range - строка. позже избваиться от преобразования, ref при открытии преобразовать в range
@@ -2223,7 +2232,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 
 				//если выделена часть форматир. таблицы, то отправляем -2
-				//если форматировання таблица входит в данный диапазон, то id
+				//если форматировання таблица содержит данный диапазон, то id
 				//если диапазон не затрагивает форматированную таблицу, то -1
 				return containRangeId;
 			},
