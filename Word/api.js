@@ -5329,19 +5329,9 @@ asc_docs_api.prototype.ImgApply = function(obj)
     /*проверка корректности данных для биржевой диаграммы*/
     if(obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock)
     {
-        var selectedObjectsByType = LogicDocument.DrawingObjects.getSelectedObjectsByTypes();
-        if(selectedObjectsByType.charts[0])
+        if(!CheckStockChart(this.WordControl.m_oLogicDocument.DrawingObjects, this))
         {
-            var chartSpace = selectedObjectsByType.charts[0];
-            if(chartSpace && chartSpace.chart && chartSpace.chart.plotArea && chartSpace.chart.plotArea.charts[0] && chartSpace.chart.plotArea.charts[0].getObjectType() !== historyitem_type_StockChart)
-            {
-                if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
-                {
-                    this.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
-                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-                    return;
-                }
-            }
+            return;
         }
     }
 
@@ -7551,11 +7541,11 @@ function _onOpenCommand(fCallback, incomeObject) {
 }
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
 	var oAdditionalData = {};
-	oAdditionalData["c"] = "save";
+	oAdditionalData["c"] = "sfct";
 	oAdditionalData["id"] = documentId;
 	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
-	oAdditionalData["outputformat"] = filetype;
+	oAdditionalData["outputformat"] = 0x1001;
 	if (null != sSaveKey)
 		oAdditionalData["savekey"] = sSaveKey;
 	if (c_oAscFileType.PDF === filetype) {

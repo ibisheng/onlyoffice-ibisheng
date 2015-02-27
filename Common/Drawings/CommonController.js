@@ -47,6 +47,26 @@ function checkInternalSelection(selection)
     return !!(selection.groupSelection || selection.chartSelection || selection.textSelection);
 }
 
+
+function CheckStockChart(oDrawingObjects, oApi)
+{
+    var selectedObjectsByType = oDrawingObjects.getSelectedObjectsByTypes();
+    if(selectedObjectsByType.charts[0])
+    {
+        var chartSpace = selectedObjectsByType.charts[0];
+        if(chartSpace && chartSpace.chart && chartSpace.chart.plotArea && chartSpace.chart.plotArea.charts[0] && chartSpace.chart.plotArea.charts[0].getObjectType() !== historyitem_type_StockChart)
+        {
+            if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
+            {
+                oApi.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
+                oApi.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 function CheckLinePreset(preset)
 {
     return preset === "line";

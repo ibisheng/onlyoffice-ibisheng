@@ -3201,6 +3201,13 @@ asc_docs_api.prototype.asc_setChartTranslate = function(translate) {
 
 asc_docs_api.prototype.ChartApply = function(obj)
 {
+    if(obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock && this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
+    {
+        if(!CheckStockChart(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].graphicObjects, this))
+        {
+            return;
+        }
+    }
     this.WordControl.m_oLogicDocument.ChartApply(obj);
 }
 asc_docs_api.prototype.set_Size = function(width, height){
