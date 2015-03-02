@@ -22,7 +22,7 @@ var c_oAscAsyncAction = {
 	Print				: 7, // конвертация в PDF и сохранение у пользователя
 	UploadImage			: 8,
 	ApplyChanges		: 9, // применение изменений от другого пользователя.
-	MailMergeLoadFile	: 10,// загрузка файла для mail merge
+	MailMergeLoadFile	: 10// загрузка файла для mail merge
 };
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
