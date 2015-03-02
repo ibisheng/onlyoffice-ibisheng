@@ -186,7 +186,15 @@ CTextMeasurerWrapper.prototype =
             _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         var _bounds = this.Measurer["GetDrawingBox"](_code);
-        return { Width : _bounds[0], Ascent : _bounds[4], Height : (_bounds[4] - _bounds[3]), WidthG: (_bounds[2] - _bounds[1]) };
+
+        return {
+            Width  : _bounds[0],
+            Ascent : _bounds[4],
+            Height : _bounds[4] - _bounds[3],
+            WidthG : _bounds[2] - _bounds[1],
+            rasterOffsetX: 0,
+            rasterOffsetY: 0
+        };
     },
 
     MeasureCode : function(lUnicode)
@@ -203,7 +211,15 @@ CTextMeasurerWrapper.prototype =
             lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         var _bounds = this.Measurer["GetDrawingBox"](lUnicode);
-        return { Width : _bounds[0], Ascent : _bounds[4], Height : (_bounds[4] - _bounds[3]), WidthG: (_bounds[2] - _bounds[1]) };
+
+        return {
+            Width  : _bounds[0],
+            Ascent : _bounds[4],
+            Height : _bounds[4] - _bounds[3],
+            WidthG : _bounds[2] - _bounds[1],
+            rasterOffsetX: 0,
+            rasterOffsetY: 0
+        };
     },
 
     GetAscender : function()
