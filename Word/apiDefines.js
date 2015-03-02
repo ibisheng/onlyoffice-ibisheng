@@ -117,7 +117,8 @@ var c_oAscTypeSelectElement =
     Shape      : 6,
     Slide      : 7,
     Chart      : 8,
-    Math       : 9
+    Math       : 9,
+    MailMerge  : 10
 };
 
 var c_oAscTableBordersType = {
