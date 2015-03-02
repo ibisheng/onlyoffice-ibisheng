@@ -7541,11 +7541,11 @@ function _onOpenCommand(fCallback, incomeObject) {
 }
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey) {
 	var oAdditionalData = {};
-	oAdditionalData["c"] = "sfct";
-	oAdditionalData["id"] = documentId;
-	oAdditionalData["userid"] = documentUserId;
-	oAdditionalData["vkey"] = documentVKey;
-	oAdditionalData["outputformat"] = 0x1001;
+    oAdditionalData["c"] = "save";
+    oAdditionalData["id"] = documentId;
+    oAdditionalData["userid"] = documentUserId;
+    oAdditionalData["vkey"] = documentVKey;
+    oAdditionalData["outputformat"] = filetype;
 	if (null != sSaveKey)
 		oAdditionalData["savekey"] = sSaveKey;
 	if (c_oAscFileType.PDF === filetype) {
