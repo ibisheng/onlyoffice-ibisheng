@@ -1503,7 +1503,7 @@ var gUndoInsDelCellsFlag = true;
 				var aWs = this._getCurrentWS();
 				var ws = this.worksheet;
 				var t = this;
-				var curFilter, oldFilter, newEndId, activeCells, curCell, sortRange, filterRef;
+				var curFilter, sortRange, filterRef, startCol;
 				
 				var onSortAutoFilterCallback = function(success)
 				{
@@ -1514,7 +1514,7 @@ var gUndoInsDelCellsFlag = true;
 						History.Create_NewPoint();
 						History.StartTransaction();
 						
-						oldFilter = curFilter.clone(aWs);
+						var oldFilter = curFilter.clone(aWs);
 						
 						//изменяем содержимое фильтра
 						if(!curFilter.SortState)
@@ -1527,16 +1527,21 @@ var gUndoInsDelCellsFlag = true;
 						if(!curFilter.SortState.SortConditions[0])
 							curFilter.SortState.SortConditions[0] = new SortCondition();
 							
-						curFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
+						var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
+						var sortCol = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+						
+						curFilter.SortState.SortConditions[0].Ref = sortCol.getName();
 						curFilter.SortState.SortConditions[0].ConditionDescending = type;
-
+						
+						cellId = t._rangeToId(cellIdRange);
+						
 						//сама сортировка
-						ws.cellCommentator.sortComments(sortRange.sort(type, activeCells.c1));
+						ws.cellCommentator.sortComments(sortRange.sort(type, startCol));
 
 						if(curFilter.TableStyleInfo)
 							t._setColorStyleTable(curFilter.Ref, curFilter);
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
-							{activeCells: activeCells, type: type, cellId: cellId}, null, curFilter.Ref);
+							{activeCells: cellIdRange, type: type, cellId: cellId}, null, curFilter.Ref);
 						History.EndTransaction();
 						
 						if(!aWs.workbook.bUndoChanges && !aWs.workbook.bRedoChanges)
@@ -1572,8 +1577,7 @@ var gUndoInsDelCellsFlag = true;
 					//в данному случае может быть захвачен а/ф, если он присутвует(надо проверить), либо нажата кнопка а/ф
 					if(curFilter && (filterRef.isEqual(activeRange) || cellId))
 					{
-						if(!cellId)
-							cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
+						startCol = activeRange.startCol;
 					}
 					else//внутри а/ф либо без а/ф либо часть а/ф
 					{
@@ -1588,23 +1592,11 @@ var gUndoInsDelCellsFlag = true;
 					filterRef = curFilter.Ref;
 					
 					if(!cellId && filterRef.r1 == activeRange.r1 && filterRef.c1 == activeRange.c1 && filterRef.r2 == activeRange.r2 && filterRef.c2 == activeRange.c2)//если выделен вся ф/т
-					{
-						cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
-					}
+						startCol = activeRange.startCol;
 					else if(!cellId && filterRef.containsRange(activeRange))//если находимся внутри ф/т
-					{
-						cellId = Asc.Range(activeRange.startCol, filterRef.r1, activeRange.startCol, filterRef.r1);
-					}
+						startCol = activeRange.startCol;
 				}
-				
-				//TODO преобразование range - строка. позже избваиться от преобразования, ref при открытии преобразовать в range
-				if(typeof cellId !== "string")
-					cellId = t._rangeToId(cellId);
-				
-				activeCells = t._idToRange(cellId);
-				
-				newEndId = t._rangeToId(new Asc.Range(activeCells.c1, filterRef.r1, activeCells.c2, activeCells.r2));
-
+			
 				sortRange = ws.model.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
