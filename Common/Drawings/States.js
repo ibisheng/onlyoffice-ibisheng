@@ -1342,6 +1342,14 @@ SplineBezierState2.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
+        if(e.fromWindow)
+        {
+            var nOldClickCount = e.ClickCount;
+            e.ClickCount = 2;
+            this.onMouseDown(e, x, y, pageIndex);
+            e.ClickCount = nOldClickCount;
+            return;
+        }
         if( e.ClickCount < 2)
         {
             var tr_x, tr_y;
@@ -1442,6 +1450,14 @@ SplineBezierState3.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
+        if(e.fromWindow)
+        {
+            var nOldClickCount = e.ClickCount;
+            e.ClickCount = 2;
+            this.onMouseDown(e, x, y, pageIndex);
+            e.ClickCount = nOldClickCount;
+            return;
+        }
         if(e.ClickCount >= 2)
         {
             this.bStart = true;
@@ -1545,6 +1561,14 @@ SplineBezierState4.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
+        if(e.fromWindow)
+        {
+            var nOldClickCount = e.ClickCount;
+            e.ClickCount = 2;
+            this.onMouseDown(e, x, y, pageIndex);
+            e.ClickCount = nOldClickCount;
+            return;
+        }
         if(e.ClickCount < 2 )
         {
             var tr_x, tr_y;
@@ -1661,7 +1685,7 @@ SplineBezierState5.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(e.ClickCount >= 2)
+        if(e.ClickCount >= 2 || e.fromWindow)
         {
             this.bStart = true;
             this.pageIndex = this.drawingObjects.startTrackPos.pageIndex;
@@ -1915,6 +1939,14 @@ AddPolyLine2State3.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
+        if(e.fromWindow)
+        {
+            var nOldClickCount = e.ClickCount;
+            e.ClickCount = 2;
+            this.onMouseDown(e, x, y, pageIndex);
+            e.ClickCount = nOldClickCount;
+            return;
+        }
         if(e.ClickCount > 1)
         {
 

@@ -536,19 +536,6 @@ DrawingObjectsController.prototype =
         }
     },
 
-    getSnapArraysTrackObjects: function()
-    {
-        var snapX = [], snapY = [];
-        for(var i = 0; i < this.arrTrackObjects.length; ++i)
-        {
-            if(this.arrTrackObjects[i].originalObject && this.arrTrackObjects[i].originalObject.getSnapArrays)
-            {
-                this.arrTrackObjects[i].originalObject.getSnapArrays(snapX, snapY);
-            }
-        }
-        return {snapX: snapX, snapY: snapY};
-    },
-
     handleTextHit: function(object, e, x, y, group, pageIndex, bWord)
     {
         var content, invert_transform_text, tx, ty, hit_paragraph, par, check_hyperlink;
