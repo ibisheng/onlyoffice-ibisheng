@@ -926,19 +926,7 @@ CImageShape.prototype =
             }
             case historyitem_AutoShapes_SetWorksheet:
             {
-                if(readBool(r))
-                {
-                    var api = window["Asc"]["editor"];
-                    if ( api.wb )
-                    {
-                        var id = readString(r);
-                        this.worksheet = api.wbModel.getWorksheetById(id);
-                    }
-                }
-                else
-                {
-                    this.worksheet = null;
-                }
+                ReadWBModel(this, r);
                 break;
             }
             case historyitem_ShapeSetBDeleted:

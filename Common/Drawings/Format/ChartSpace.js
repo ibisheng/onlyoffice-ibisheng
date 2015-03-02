@@ -9,6 +9,28 @@ var CHART_STYLE_MANAGER = null;
 var SKIP_LBL_LIMIT = 100;
 
 
+
+function ReadWBModel(oDrawing, oReader)
+{
+    if(isRealObject(window["Asc"]) && isRealObject(window["Asc"]["editor"]))
+    {
+        if(readBool(oReader))
+        {
+            var api = window["Asc"]["editor"];
+            if (api.wbModel )
+            {
+                var id = readString(oReader);
+                oDrawing.worksheet = api.wbModel.getWorksheetById(id);
+            }
+        }
+        else
+        {
+            oDrawing.worksheet = null;
+        }
+    }
+}
+
+
 function checkBlackUnifill(unifill, bLines)
 {
     if(unifill && unifill.fill && unifill.fill.color)
@@ -7977,19 +7999,7 @@ CChartSpace.prototype =
             }
             case historyitem_AutoShapes_SetWorksheet:
             {
-                if(readBool(r))
-                {
-                    var api = window["Asc"]["editor"];
-                    if ( api.wb )
-                    {
-                        var id = readString(r);
-                        this.worksheet = api.wbModel.getWorksheetById(id);
-                    }
-                }
-                else
-                {
-                    this.worksheet = null;
-                }
+                ReadWBModel(this, r);
                 break;
             }
             case historyitem_ChartSpace_SetParent:
