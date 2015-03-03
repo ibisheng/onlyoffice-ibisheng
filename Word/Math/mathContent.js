@@ -3985,14 +3985,13 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var ascent = 0, descent = 0;
     this.size.width = 0;
     var bInline = this.ParaMath.Is_Inline();
+    var Brk_Before = this.ParaMath.Is_BrkBinBefore();
 
-    var LineAscent = PRS.LineAscent, LineDescent = PRS.LineDescent,
-        LastPos = ContentLen;
-
+    // для внутристроковой формулы : начало формулы - начало нового слова
     if(this.bRoot && bInline && RangeStartPos == 0)
     {
         PRS.Update_CurPos(0, Depth);
-        this.Content[0].Update_LineBreakPos(PRS, false); // обновим : начало нового слова - конец предыдущего Run
+        PRS.Update_CurPos(0, Depth+1); // нулевой элемент всегда Run
 
         if(PRS.Word == true)
         {
@@ -4012,7 +4011,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             Type = Item.Type;
 
         // для однострочных мат объектов обновляем CurLine и CurRange, Run в этом случае не могут разбиваться на несколько строк
-        if ( this.bMath_OneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
+        if (this.bMath_OneLine || (0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos)
             Item.Recalculate_Reset( PRS.Range, PRS.Line );
 
         PRS.Update_CurPos( Pos, Depth );
@@ -4039,74 +4038,86 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         {
             Item.Recalculate_Range(PRS, ParaPr, Depth + 1);
 
-            // обновляем LineAscent и LineDescent для мат объектов только тогда, когда встретили новое слово:
-            // LastPos < PRS.LineBreakPos.Get(Depth) - новое слово в Run
-            // (Type == para_Math_Composition && bInline && PRS.Word == false) - мат объект, перед ним break_operator => новое слово в конце предыдущего Run
-            // иначе LastPos текцщего мат объекта перетрет предыдущий и не будут учтены метрики предшествующих мат объектов (из предыдущего слова)
-
-            // для крайнего случая (в контенте не осталось больше элементов проверяем после цикла)
-
-            if(Type == para_Math_Composition )
+            if(Type == para_Math_Composition)
             {
-
-                // перед мат объектом идет break_operator (то есть перед мат объектом начинается слово)
-                // или мат оператор (при этом мат объект не является первым элементом в строке)
-                if((PRS.Word == false || (Item.kind == MATH_BOX && PRS.Word == true)))
+                // перед мат объектом идет break_operator и он не является первым элементом в строке
+                if(Item.kind == MATH_BOX )
                 {
-                    if(PRS.Word == true)
+                    var BoxLen = Item.size.width;
+
+                    if(Brk_Before == true) // break_operator должен идти в начале слова
                     {
+                        if(PRS.Word == true)
+                        {
+                            // обновим : начало нового слова - конец предыдущего Run
+                            PRS.FirstItemOnLine = false;
+
+                            PRS.Update_CurPos(PRS.PosEndRun.Get(Depth), Depth);
+                            PRS.Set_LineBreakPos(PRS.PosEndRun.Get(Depth + 1));
+
+                            //PRS.Update_CurPos(Pos - 1, Depth);
+                            //this.Content[Pos - 1].Update_LineBreakPos(PRS, true);
+                        }
+
+                        PRS.X += PRS.SpaceLen + PRS.WordLen;
+                        PRS.SpaceLen = BoxLen;
+                        PRS.WordLen = 0;
+
+                        if(PRS.Word)
+                            PRS.FirstItemOnLine = false;
+
+                        PRS.Word = true;
+                    }
+                    else
+                    {
+                        PRS.SpaceLen += BoxLen;
+
+                        // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                        // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
+                        if (PRS.FirstItemOnLine == false && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+                        {
+                            PRS.MoveToLBP = true;
+                            PRS.NewRange = true;
+
+                            this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+                        }
+
+                        PRS.X += PRS.SpaceLen + PRS.WordLen;
+                        PRS.SpaceLen = 0;
+                        PRS.WordLen = 0;
+
+                        PRS.Word = false;
                         PRS.FirstItemOnLine = false;
+                    }
+                }
+                else
+                {
+                    // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                    // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
+                    if (PRS.FirstItemOnLine == false && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
+                    {
+                        PRS.MoveToLBP = true;
+                        PRS.NewRange = true;
+
+                        this.ParaMath.UpdateWidthLine(PRS, PRS.X - PRS.XRange);
+                    }
+
+                    if(Brk_Before == false && PRS.Word == false)
+                    {
+                        // Отмечаем начало нового слова
+                        //PRS.Update_CurPos(Pos - 1, Depth);
+                        //this.Content[Pos - 1].Update_LineBreakPos(PRS, true); // обновим : начало нового слова - конец предыдущего Run
+
+                        // обновим : начало нового слова - конец предыдущего Run
+                        PRS.Update_CurPos(PRS.PosEndRun.Get(Depth), Depth);
+                        PRS.Set_LineBreakPos(PRS.PosEndRun.Get(Depth + 1));
                     }
 
                     PRS.Word = true;
 
-                    LastPos = Pos - 1;
-
-                    if(bInline || Item.kind == MATH_BOX)
-                    {
-                        PRS.Update_CurPos(LastPos, Depth);
-                        this.Content[LastPos].Update_LineBreakPos(PRS, true); // обновим : начало нового слова - конец предыдущего Run
-                    }
-
-                    // новое слово => обновляем метрики
-                    if (PRS.LineAscent < LineAscent)
-                        PRS.LineAscent = LineAscent;
-
-                    if (PRS.LineDescent < LineDescent)
-                        PRS.LineDescent = LineDescent;
-                }
-                else
-                {
-                    LastPos = PRS.LineBreakPos.Get(Depth);
                 }
 
-
-                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                // FirstItemOnLine == false - слово оказалось не единственным элементом в промежутке, делаем перенос
-                if (PRS.FirstItemOnLine == false && PRS.X + PRS.SpaceLen + PRS.WordLen > PRS.XEnd)
-                {
-                    PRS.MoveToLBP = true;
-                    PRS.NewRange = true;
-                }
-
-
-                if( LineAscent < Item.size.ascent )
-                    LineAscent = Item.size.ascent;
-
-                if( LineDescent < Item.size.height - Item.size.ascent )
-                    LineDescent = Item.size.height - Item.size.ascent;
             }
-            else if(LastPos < PRS.LineBreakPos.Get(Depth)) // Run, новое слово обновляем метрики
-            {
-                if (PRS.LineAscent < LineAscent)
-                    PRS.LineAscent = LineAscent;
-
-                if (PRS.LineDescent < LineDescent)
-                    PRS.LineDescent = LineDescent;
-
-                LastPos = ContentLen;
-            }
-
 
             if ( true === PRS.NewRange )
             {
@@ -4115,16 +4126,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             }
         }
     }
-
-    if(PRS.NewRange == false) // элементы в контенте закончились, перехода на новую строчку нет => обновляем LineAscent и LineDescent
-    {
-        if (PRS.LineAscent < LineAscent)
-            PRS.LineAscent = LineAscent;
-
-        if (PRS.LineDescent < LineDescent)
-            PRS.LineDescent = LineDescent;
-    }
-
 
     if ( Pos >= ContentLen )
     {
@@ -4140,7 +4141,6 @@ CMathContent.prototype.IsFirstLine = function(Line)
     var CurLine  = Line - this.StartLine;
     return CurLine == 0;
 };
-
 CMathContent.prototype.Get_SelectionDirection = function()
 {
     if (true !== this.Selection.Use)

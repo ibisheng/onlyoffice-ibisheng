@@ -1647,6 +1647,14 @@ CMathBase.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
 {
     this.Recalculate_Range(PRS, ParaPr, Depth);
 };
+CMathBase.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
+{
+    if ( PRS.LineAscent < this.size.ascent )
+        PRS.LineAscent = this.size.ascent;
+
+    if ( PRS.LineDescent < this.size.height - this.size.ascent )
+        PRS.LineDescent = this.size.height - this.size.ascent;
+};
 CMathBase.prototype.Recalculate_Reset = function()
 {
     //TODO

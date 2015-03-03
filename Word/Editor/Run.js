@@ -633,7 +633,7 @@ ParaRun.prototype.Get_CurrentParaPos = function()
         EndPos   = this.protected_GetRangeEndPos(Line, Range);
 
         // учтем, что в одной строке в формуле может быть только один Range
-        while(StartPos == EndPos && Line >= 0) // == this.Content.length, т.к. последний Range
+        while(StartPos == EndPos && Line > 0 && this.Content.length !== 0) // == this.Content.length, т.к. последний Range
         {
             Line--;
             StartPos = this.protected_GetRangeStartPos(Line, Range);
@@ -1647,8 +1647,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var Pos = RangeStartPos;
 
     var ContentLen = this.Content.length;
-
-    var WidthLine = PRS.XEnd - PRS.X;
     var XRange    = PRS.XRange;
 
     if (false === StartWord && true === FirstItemOnLine && XEnd - X < 0.001 && RangesCount > 0)
@@ -1801,54 +1799,48 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Math_BreakOperator:
                 {
-                    var bCurrWord = Word;
-
-                    if (true === Word)
-                    {
-                        // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
-                        // убирается ли слово, мы это проверяем при добавленнии букв.
-                        X += SpaceLen + WordLen;
-
-                        Word = false;
-                        EmptyLine = false;
-                        SpaceLen = 0;
-                        WordLen = 0;
-                    }
-
-                    // На пробеле не делаем перенос. Перенос строки или внутристрочный
-                    // перенос делаем при добавлении любого непробельного символа
-                    SpaceLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
-
-
                     if(this.ParaMath.Is_BrkBinBefore() == true)
                     {
-                        if(bCurrWord == true)
+                        if(Word == true)
                         {
+                            X += SpaceLen + WordLen;
                             PRS.Set_LineBreakPos(Pos);
-                            WordLen = SpaceLen;
+                            EmptyLine = false;
+                            WordLen = Item.Width/TEXTWIDTH_DIVIDER;
                             SpaceLen = 0;
-                            Word = true;
 
                             FirstItemOnLine = false;
+                        }
+                        else
+                        {
+                            SpaceLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
                         }
                     }
                     else
                     {
-                        if(X + SpaceLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                        SpaceLen  = Item.Width / TEXTWIDTH_DIVIDER;
+
+                        if(X + WordLen + SpaceLen > XEnd && FirstItemOnLine == false) // Слово не убирается в отрезке. Переносим слово в следующий отрезок
                         {
                             MoveToLBP = true;
                             NewRange = true;
 
-                            if(bCurrWord == false)
-                            {
+                            if(Word == false)
                                 PRS.Set_LineBreakPos(Pos);
-
-
-                                SpaceLen = Item.Width / TEXTWIDTH_DIVIDER;
-                            }
                         }
+                        else
+                        {
+                            X += SpaceLen + WordLen;
 
-                        FirstItemOnLine = false;
+                            EmptyLine = false;
+                            SpaceLen = 0;
+                            WordLen = 0;
+
+                            if(Word == true)
+                                FirstItemOnLine = false;
+
+                            Word = false;
+                        }
 
                     }
 
@@ -2153,19 +2145,34 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
             }
 
-            if(true === Word)
-            {
-                WidthLine = X - XRange;
-            }
 
             if (true === NewRange)
                 break;
         }
     }
 
-    if(this.Type == para_Math_Run && true === NewRange)
+    if(this.Type == para_Math_Run)
     {
-        this.ParaMath.UpdateMaxWidthLine(PRS, WidthLine);
+        if(true === NewRange)
+        {
+            var WidthLine = X - XRange;
+
+            if(this.ParaMath.Is_BrkBinBefore() == false)
+                WidthLine += SpaceLen;
+
+            this.ParaMath.UpdateWidthLine(PRS, WidthLine);
+        }
+        // для пустого Run, обновляем LineBreakPos на случай, если пустой Run находится между break_operator и мат объектом
+        else if(this.Content.length == 0 && this.ParaMath.Is_BrkBinBefore() == false && Word == false && FirstItemOnLine == false)
+        {
+            PRS.Set_LineBreakPos(Pos);
+            X += SpaceLen;
+            SpaceLen = 0;
+        }
+
+        // запоминаем конец Run
+        PRS.PosEndRun = PRS.CurPos.Copy();
+        PRS.PosEndRun.Update2(this.Content.length, Depth);
     }
 
     PRS.MoveToLBP       = MoveToLBP;
@@ -8251,85 +8258,6 @@ ParaRun.prototype.Recalculate_Range_OneLine = function(PRS, ParaPr, Depth)
     this.bEqArray = true;
     this.Recalculate_MeasureContent(WidthPoints);
 };*/
-ParaRun.prototype.new_Math_Recalculate = function(oMeasure, WidthPoints)
-{
-
-    // ParaText (ParagraphContent.js)
-    // для настройки TextPr
-    // Measure
-
-    // FontClassification.js
-    // Get_FontClass
-
-    var RangeStartPos = 0;
-    var RangeEndPos = this.Content.length;
-
-
-    // обновляем позиции start и end для Range
-    //this.Lines[0].Add_Range(0, RangeStartPos, RangeEndPos);
-    this.protected_AddRange(0, 0);
-    this.protected_FillRange(0, 0, RangeStartPos, RangeEndPos);
-
-    var oWPrp = this.Get_CompiledPr(false);
-    var Theme = this.Paragraph.Get_Theme();
-
-    var ArgSize     = this.Parent.Compiled_ArgSz.value,
-        bNormalText = this.IsNormalText();
-
-    // argSize
-    g_oTextMeasurer.SetTextPr(oWPrp,Theme);
-
-    var InfoMathText = new CMathInfoTextPr_2(oWPrp, ArgSize, bNormalText);
-
-    //this.bEqArray = RPI.bEqArray;
-
-    this.size.SetZero();
-
-    var ascent = 0, descent = 0;
-
-    var Lng = this.Content.length;
-
-    for (var i = 0 ; i < Lng; i++)
-    {
-        this.Content[i].Measure(oMeasure, oWPrp, InfoMathText);
-
-        var oSize = this.Content[i].size;
-
-        this.size.width += oSize.width;
-
-        var oDescent = oSize.height - oSize.ascent;
-
-        ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-        descent = descent < oDescent ? oDescent : descent;
-
-        if(this.Parent.IsEqArray())
-        {
-            if(this.Content[i].Type !== para_Math_Ampersand)
-                WidthPoints.UpdatePoint(oSize.width);
-            else
-                WidthPoints.AddNewAlignRange();
-        }
-
-        this.size.ascent = ascent;
-        this.size.height = ascent + descent;
-
-        // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
-        /*this.TextHeight  = g_oTextMeasurer.GetHeight();
-        this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-        this.TextAscent  = this.TextHeight - this.TextDescent;
-        this.TextAscent2 = g_oTextMeasurer.GetAscender();*/
-    }
-
-    // Пересчитаем метрику строки относительно размера данного текста
-    /*if (RPI.PRS.LineTextAscent < this.TextAscent)
-        RPI.PRS.LineTextAscent = this.TextAscent;
-
-    if (RPI.PRS.LineTextAscent2 < this.TextAscent2)
-        RPI.PRS.LineTextAscent2 = this.TextAscent2;
-
-    if (RPI.PRS.LineTextDescent < this.TextDescent)
-        RPI.PRS.LineTextDescent = this.TextDescent;*/
-};
 ParaRun.prototype.Math_Apply_Style = function(Value)
 {
     if(Value !== this.MathPrp.sty)
@@ -8511,7 +8439,7 @@ ParaRun.prototype.ApplyPoints = function(PointsInfo)
         }
     }
 };
-ParaRun.prototype.Update_LineBreakPos = function(PRS, bAfterRun)
+/*ParaRun.prototype.Update_LineBreakPos = function(PRS, bAfterRun)
 {
     if(bAfterRun)
     {
@@ -8521,7 +8449,7 @@ ParaRun.prototype.Update_LineBreakPos = function(PRS, bAfterRun)
     {
         PRS.Set_LineBreakPos(0);
     }
-};
+};*/
 ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
 {
     var ActionElement = AutoCorrectEngine.Get_ActionElement();

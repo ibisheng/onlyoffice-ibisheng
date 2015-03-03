@@ -858,7 +858,7 @@ CMathText.prototype =
     },
     Can_AddNumbering: function()
     {
-        return false;
+        return true;
     },
     ////
     Copy: function()

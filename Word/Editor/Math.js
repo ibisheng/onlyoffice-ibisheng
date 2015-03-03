@@ -44,7 +44,7 @@ function CMathPropertiesSettings()
 }
 CMathPropertiesSettings.prototype.SetDefaultPr = function()
 {
-    this.brkBin     = BREAK_BEFORE;
+    this.brkBin     = BREAK_AFTER;
     this.defJc      = align_Justify;
     this.dispDef    = true;
     this.intLim     = NARY_SubSup;
@@ -874,6 +874,9 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     PRS.XRange = PRS.X;
 
+    PRS.RecalcResult = recalcresult_NextLine;
+    PRS.PrevLineRecalcInfo.Object = null;
+
     this.Root.Recalculate_Range(PRS, ParaPr, Depth);
 
     if(bFirstPage && PRS.bMathWordLarge && this.State !== ALIGN_EMPTY)
@@ -885,7 +888,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     if(PRS.NewRange == false)
     {
         var WidthLine = PRS.X - PRS.XRange + PRS.SpaceLen + PRS.WordLen;
-        this.UpdateMaxWidthLine(PRS, WidthLine);
+        this.UpdateWidthLine(PRS, WidthLine);
     }
 
     this.ParaMathRPI.ClearRecalculate();
@@ -900,14 +903,14 @@ ParaMath.prototype.UpdateInfoForBreak = function(PRS)
 ParaMath.prototype.Recalculate_Reset = function(CurRange, CurLine)
 {
     this.Root.Recalculate_Reset(CurRange, CurLine); // обновим StartLine и StartRange только для Root (в CParagraphContentWithContentBase), для внутренних элементов обновится на Recalculate_Range
-}
+};
 ParaMath.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 {
     this.Root.Recalculate_Set_RangeEndPos(PRS, PRP, Depth);
 };
 ParaMath.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange)
 {
-
+    this.Root.Recalculate_LineMetrics(PRS, ParaPr, _CurLine, _CurRange);
 };
 ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 {
@@ -918,7 +921,7 @@ ParaMath.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
     var CurLine  = _CurLine - this.Root.StartLine;
     this.LinesWidths[CurLine] = W;
 };
-ParaMath.prototype.UpdateMaxWidthLine = function(PRS, Width)
+ParaMath.prototype.UpdateWidthLine = function(PRS, Width)
 {
     var MaxW    = this.CurPageInfo.MaxLineW,
         CurLine = PRS.Line - this.Root.StartLine;
@@ -1076,10 +1079,6 @@ ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
 
         RPI.NeedResize = true;
         RPI.PRS        = this.Paragraph.m_oPRSW;
-
-        //RPI.bInline       = this.bInline;
-        //RPI.bChangeInline = this.bChangeInline;
-
 
         this.Root.PreRecalc(null, this,  new CMathArgSize(), RPI);
         this.Root.Resize(g_oTextMeasurer, RPI);

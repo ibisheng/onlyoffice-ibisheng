@@ -1034,17 +1034,12 @@ COperatorParenthesis.prototype.calcCoord = function(stretch)
     }
 
     // X
-    var DistW = [];
-    for(var j= 0; j< 5; j++)
-        DistW[j] = X[18-j] - X[9+j];
-
-    for(var i=0; i< 5; i++)
-        DistW[i] = X[9-j] - X[j];
+    var DistW = X[4] - X[5];
 
     for(var i=5; i<10; i++ )
     {
         X[i] = X[i]*RX;
-        X[9-i] = X[i] + DistW[9-i];
+        X[9-i] = X[i] + DistW;
     }
 
     var XX = [],

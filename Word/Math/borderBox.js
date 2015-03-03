@@ -510,16 +510,20 @@ CBox.prototype.init = function(props)
 
     this.setProperties(props);
     this.fillContent();
-}
+};
 CBox.prototype.fillContent = function()
 {
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
-}
+};
 CBox.prototype.getBase = function()
 {
     return this.Content[0];
-}
+};
+CBox.prototype.Update_WordLen = function(PRS, WordLen)
+{
+    PRS.WordLen   = WordLen;
+};
 
 
 function CMathBarPr()
