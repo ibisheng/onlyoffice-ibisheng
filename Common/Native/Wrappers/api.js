@@ -5298,7 +5298,7 @@ asc_docs_api.prototype.Call_Menu_Context_Copy = function()
     if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
     {
         _stream["WriteByte"](1);
-        _stream["WriteString2"](_binary_data.drawingUrls[0]);
+        _stream["WriteStringA"](_binary_data.drawingUrls[0]);
     }
 
     // owner format

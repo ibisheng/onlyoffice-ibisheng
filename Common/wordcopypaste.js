@@ -1711,9 +1711,9 @@ CopyProcessor.prototype =
 					if(graphicObj.isImage())
 					{
 						url = graphicObj.getImageUrl();
-						if(window.NativeCorrectImageUrlOnCopy)
+						if(window["NativeCorrectImageUrlOnCopy"])
 						{
-							correctUrl = window.NativeCorrectImageUrlOnCopy(url);
+							correctUrl = window["NativeCorrectImageUrlOnCopy"](url);
 							
 							drawingUrls[i] = correctUrl;
 						}
@@ -1730,6 +1730,8 @@ CopyProcessor.prototype =
 			
 			var sBase64 = this.oBinaryFileWriter.GetResult();
 			var text = "";
+            if (oDocument.Get_SelectedText)
+                text = oDocument.Get_SelectedText();
 			
 			return {sBase64: sBase64, text: text, drawingUrls: drawingUrls};
 		}
