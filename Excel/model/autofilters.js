@@ -1591,17 +1591,14 @@ var gUndoInsDelCellsFlag = true;
 					curFilter = aWs.TableParts[filter];
 					filterRef = curFilter.Ref;
 					
-					if(!cellId && filterRef.r1 == activeRange.r1 && filterRef.c1 == activeRange.c1 && filterRef.r2 == activeRange.r2 && filterRef.c2 == activeRange.c2)//если выделен вся ф/т
-						startCol = activeRange.startCol;
-					else if(!cellId && filterRef.containsRange(activeRange))//если находимся внутри ф/т
-						startCol = activeRange.startCol;
+					startCol = activeRange.startCol;
 				}
 			
 				sortRange = ws.model.getRange3(filterRef.r1 + 1, filterRef.c1, filterRef.r2, filterRef.c2);
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
 				else
-					ws._isLockedCells (t._getAscRange(sortRange.bbox), /*subType*/null, onSortAutoFilterCallback);
+					ws._isLockedCells (sortRange.bbox, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
 			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow, exceptionArray, doNotChangeFilters)
