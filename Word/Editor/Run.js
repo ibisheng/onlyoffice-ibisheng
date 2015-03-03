@@ -8439,17 +8439,6 @@ ParaRun.prototype.ApplyPoints = function(PointsInfo)
         }
     }
 };
-/*ParaRun.prototype.Update_LineBreakPos = function(PRS, bAfterRun)
-{
-    if(bAfterRun)
-    {
-        PRS.Set_LineBreakPos(this.Content.length);
-    }
-    else
-    {
-        PRS.Set_LineBreakPos(0);
-    }
-};*/
 ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
 {
     var ActionElement = AutoCorrectEngine.Get_ActionElement();

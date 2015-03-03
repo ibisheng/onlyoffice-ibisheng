@@ -44,7 +44,7 @@ function CMathPropertiesSettings()
 }
 CMathPropertiesSettings.prototype.SetDefaultPr = function()
 {
-    this.brkBin     = BREAK_AFTER;
+    this.brkBin     = BREAK_BEFORE;
     this.defJc      = align_Justify;
     this.dispDef    = true;
     this.intLim     = NARY_SubSup;
