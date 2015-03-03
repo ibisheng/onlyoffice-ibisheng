@@ -1413,6 +1413,9 @@ CDrawingDocument.prototype =
         else
             pos = this.__DD_ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, this.AutoShapesTrackLockPageNum);
 
+        if (pos.Page == -1)
+            return 0;
+
         this.SelectDrag = -1;
         if (this.SelectRect1 && this.SelectRect2)
         {
