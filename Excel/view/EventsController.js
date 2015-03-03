@@ -82,6 +82,7 @@
 			this.clickCounter = new ClickCounter();
 			this.isMousePressed = false;
 			this.isShapeAction = false;
+            this.isUpOnCanvas = false;
 
 			// Был ли DblClick обработан в onMouseDown эвенте
 			this.isDblClickInMouseDown = false;
@@ -1078,11 +1079,15 @@
 			this.isMousePressed = false;
 			// Shapes
 			if (this.isShapeAction) {
-				event.isLocked = this.isMousePressed;
-				event.ClickCount = this.clickCounter.clickCount;
-                event.fromWindow = true;
-				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
-				this._changeSelectionDone(event);
+                if(!this.isUpOnCanvas)
+                {
+                    event.isLocked = this.isMousePressed;
+                    event.ClickCount = this.clickCounter.clickCount;
+                    event.fromWindow = true;
+                    this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
+                    this._changeSelectionDone(event);
+                }
+                this.isUpOnCanvas = false;
 				return true;
 			}
 
@@ -1183,6 +1188,8 @@
 					return;
 
 				t.isShapeAction = true;
+                t.isUpOnCanvas = false;
+
 
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
@@ -1332,8 +1339,16 @@
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
-                event.preventDefault && event.preventDefault();
-                event.stopPropagation && event.stopPropagation();
+                if (asc["editor"].isStartAddShape)
+                {
+                    event.preventDefault && event.preventDefault();
+                    event.stopPropagation && event.stopPropagation();
+                }
+                else
+                {
+                    this.isUpOnCanvas = true;
+                }
+
 				return true;
 			}
 
