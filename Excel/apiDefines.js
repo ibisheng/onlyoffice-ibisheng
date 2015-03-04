@@ -214,12 +214,6 @@ var c_oAscMouseMoveLockedObjectType = {
 	Sheet			: 2
 };
 
-var c_oAscColor = {
-    COLOR_TYPE_SRGB		: 1,
-    COLOR_TYPE_PRST		: 2,
-    COLOR_TYPE_SCHEME	: 3
-};
-
 // Print default options (in mm)
 var c_oAscPrintDefaultSettings = {
 	// Размеры страницы при печати
@@ -300,113 +294,6 @@ var c_oAscCanChangeColWidth = {
 	all:			2	// numbers + text
 };
 
-// Режимы отрисовки
-var c_oAscFontRenderingModeType = {
-	noHinting				: 1,
-	hinting					: 2,
-	hintingAndSubpixeling	: 3
-};
-
-var c_oAscStyleImage = {
-	Default		: 0,
-	Document	: 1
-};
-
-var c_oAscFill = {
-    FILL_TYPE_BLIP   : 1,
-    FILL_TYPE_NOFILL : 2,
-    FILL_TYPE_SOLID	 : 3,
-    FILL_TYPE_PATT   : 4,
-    FILL_TYPE_GRAD   : 5
-};
-
-var c_oAscFillBlipType = {
-    STRETCH : 1,
-    TILE    : 2
-};
-
-var c_oAscStrokeType = {
-    STROKE_NONE: 0,
-    STROKE_COLOR: 1
-};
-
-var c_oAscLineJoinType = {
-    Round : 1,
-    Bevel : 2,
-    Miter : 3
-};
-
-var c_oAscLineCapType = {
-    Flat : 0,
-    Round : 1,
-    Square : 2
-};
-
-var c_oAscLineBeginType = {
-    None: 0,
-    Arrow: 1,
-    Diamond: 2,
-    Oval: 3,
-    Stealth: 4,
-    Triangle: 5
-};
-
-var c_oAscTypeSelectElement = {
-    Paragraph  : 0,
-    Table      : 1,
-    Image      : 2,
-    Header     : 3,
-    Hyperlink  : 4,
-    SpellCheck : 5,
-    Shape:6,
-    Slide:7,
-    Chart: 8
-};
-
-var c_oAscLineBeginSize = {
-    small_small	: 0,
-    small_mid	: 1,
-    small_large	: 2,
-    mid_small	: 3,
-    mid_mid		: 4,
-    mid_large	: 5,
-    large_small	: 6,
-    large_mid 	: 7,
-    large_large	: 8
-};
-
-
-var c_oAscFillGradType  = {
-    GRAD_LINEAR : 1,
-    GRAD_PATH   : 2
-};
-
-var c_oAscVerticalTextAlign = {
-    TEXT_ALIGN_BOTTOM	: 0, // (Text Anchor Enum ( Bottom ))
-    TEXT_ALIGN_CTR		: 1, // (Text Anchor Enum ( Center ))
-    TEXT_ALIGN_DIST		: 2, // (Text Anchor Enum ( Distributed ))
-    TEXT_ALIGN_JUST		: 3, // (Text Anchor Enum ( Justified ))
-    TEXT_ALIGN_TOP		: 4  // Top
-};
-
-
-// Chart defines
-var c_oAscChartType = {
-    line	: "Line",
-    bar		: "Bar",
-    hbar	: "HBar",
-    area	: "Area",
-    pie		: "Pie",
-    scatter	: "Scatter",
-    stock	: "Stock"
-};
-
-var c_oAscChartSubType = {
-    normal		: "normal",
-    stacked		: "stacked",
-    stackedPer	: "stackedPer"
-};
-
 var c_oAscPaneState = {
 	Frozen		: "frozen",
 	FrozenSplit	: "frozenSplit"
@@ -449,5 +336,3 @@ var c_oAscFormulaRangeBorderColor = [
 
 var c_oAscLockNameFrozenPane	= "frozenPane";
 var c_oAscLockNameTabColor		= "tabColor";
-
-var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;

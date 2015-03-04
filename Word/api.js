@@ -2856,18 +2856,12 @@ asc_docs_api.prototype.ClearCache = function(){
 
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 {
-    if (1 == mode)
-    {
+    if (c_oAscFontRenderingModeType.noHinting === mode)
         SetHintsProps(false, false);
-    }
-    else if (2 == mode)
-    {
+    else if (c_oAscFontRenderingModeType.hinting === mode)
         SetHintsProps(true, false);
-    }
-    else if (3 == mode)
-    {
+    else if (c_oAscFontRenderingModeType.hintingAndSubpixeling === mode)
         SetHintsProps(true, true);
-    }
 
     this.WordControl.m_oDrawingDocument.ClearCachePages();
     g_fontManager.ClearFontsRasterCache();

@@ -1,58 +1,78 @@
 ﻿"use strict";
 
 var g_bDate1904 = false;
+var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
+
+// Режимы отрисовки
+var c_oAscFontRenderingModeType = {
+	noHinting				: 1,
+	hinting					: 2,
+	hintingAndSubpixeling	: 3
+};
 
 var c_oAscAsyncActionType = {
 	Information			: 0,
 	BlockInteraction	: 1
 };
 
-var CellValueType = 
-{
-	Number:0,
-	String:1,
-	Bool:2,
-	Error:3
+var CellValueType = {
+	Number	: 0,
+	String	: 1,
+	Bool	: 2,
+	Error	: 3
 };
 
 //NumFormat defines
 var c_oAscNumFormatType = {
-	General : 0,
-	Custom : 1,
-	Text : 2,
-	Number : 3,
-	Integer : 4,
-	Scientific : 5,
-	Currency : 6,
-	Date : 7,
-	Time : 8,
-	Percent : 9,
-	Fraction : 10,
-	Accounting : 11
+	General		: 0,
+	Custom		: 1,
+	Text		: 2,
+	Number		: 3,
+	Integer		: 4,
+	Scientific	: 5,
+	Currency	: 6,
+	Date		: 7,
+	Time		: 8,
+	Percent		: 9,
+	Fraction	: 10,
+	Accounting	: 11
 };
  
  var c_oAscDrawingLayerType = {
-	BringToFront: 0,
-	SendToBack: 1,
-	BringForward: 2,
-	SendBackward: 3
+	BringToFront	: 0,
+	SendToBack		: 1,
+	BringForward	: 2,
+	SendBackward	: 3
  };
-
-var	c_oAscTransactionState = { 
-	No: -1,
-	Start: 0,
-	Stop: 1
-};
 						
 var c_oAscCellAnchorType = {
-	cellanchorAbsolute:  0,
-	cellanchorOneCell:  1,
-	cellanchorTwoCell:  2
+	cellanchorAbsolute	:  0,
+	cellanchorOneCell	:  1,
+	cellanchorTwoCell	:  2
 };
 
 var c_oAscChartDefines = {
-	defaultChartWidth: 478,
-	defaultChartHeight: 286
+	defaultChartWidth	: 478,
+	defaultChartHeight	: 286
+};
+
+var c_oAscStyleImage = {
+	Default		: 0,
+	Document	: 1
+};
+
+var c_oAscTypeSelectElement = {
+	Paragraph  : 0,
+	Table      : 1,
+	Image      : 2,
+	Header     : 3,
+	Hyperlink  : 4,
+	SpellCheck : 5,
+	Shape      : 6,
+	Slide      : 7,
+	Chart      : 8,
+	Math       : 9,
+	MailMerge  : 10
 };
 
 var c_oAscLineDrawingRule = {
@@ -95,7 +115,6 @@ var c_oAscChartHorAxisLabelShowSettings =
     none: 0,
     noOverlay: 1
 };
-
 
 var c_oAscChartVertAxisLabelShowSettings =
 {
@@ -434,4 +453,85 @@ var c_oAscSaveTypes = {
 	Part		: 1,
 	Complete	: 2,
 	CompleteAll	: 3
+};
+
+var c_oAscColor = {
+	COLOR_TYPE_SRGB		: 1,
+	COLOR_TYPE_PRST		: 2,
+	COLOR_TYPE_SCHEME	: 3
+};
+
+var c_oAscFill = {
+	FILL_TYPE_BLIP   : 1,
+	FILL_TYPE_NOFILL : 2,
+	FILL_TYPE_SOLID	 : 3,
+	FILL_TYPE_PATT   : 4,
+	FILL_TYPE_GRAD   : 5
+};
+
+// Chart defines
+var c_oAscChartType = {
+	line	: "Line",
+	bar		: "Bar",
+	hbar	: "HBar",
+	area	: "Area",
+	pie		: "Pie",
+	scatter	: "Scatter",
+	stock	: "Stock",
+	doughnut: "Doughnut"
+};
+var c_oAscChartSubType = {
+	normal		: "normal",
+	stacked		: "stacked",
+	stackedPer	: "stackedPer"
+};
+
+var c_oAscFillGradType  = {
+	GRAD_LINEAR : 1,
+	GRAD_PATH   : 2
+};
+var c_oAscFillBlipType = {
+	STRETCH : 1,
+	TILE    : 2
+};
+var c_oAscStrokeType = {
+	STROKE_NONE	: 0,
+	STROKE_COLOR: 1
+};
+
+var c_oAscVerticalTextAlign = {
+	TEXT_ALIGN_BOTTOM	: 0, // (Text Anchor Enum ( Bottom ))
+	TEXT_ALIGN_CTR		: 1, // (Text Anchor Enum ( Center ))
+	TEXT_ALIGN_DIST		: 2, // (Text Anchor Enum ( Distributed ))
+	TEXT_ALIGN_JUST		: 3, // (Text Anchor Enum ( Justified ))
+	TEXT_ALIGN_TOP		: 4  // Top
+};
+var c_oAscLineJoinType = {
+	Round : 1,
+	Bevel : 2,
+	Miter : 3
+};
+var c_oAscLineCapType = {
+	Flat	: 0,
+	Round	: 1,
+	Square	: 2
+};
+var c_oAscLineBeginType = {
+	None	: 0,
+	Arrow	: 1,
+	Diamond	: 2,
+	Oval	: 3,
+	Stealth	: 4,
+	Triangle: 5
+};
+var c_oAscLineBeginSize = {
+	small_small	: 0,
+	small_mid	: 1,
+	small_large	: 2,
+	mid_small	: 3,
+	mid_mid		: 4,
+	mid_large	: 5,
+	large_small	: 6,
+	large_mid	: 7,
+	large_large	: 8
 };

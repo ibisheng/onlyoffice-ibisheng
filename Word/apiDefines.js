@@ -101,65 +101,6 @@ var c_oAscError = {
 	}
 };
 
-var c_oAscTypeSelectElement =
-{
-    Paragraph  : 0,
-    Table      : 1,
-    Image      : 2,
-    Header     : 3,
-    Hyperlink  : 4,
-    SpellCheck : 5,
-    Shape      : 6,
-    Slide      : 7,
-    Chart      : 8,
-    Math       : 9,
-    MailMerge  : 10
-};
-
-var c_oAscTableBordersType = {
-	LEFT:0,
-	TOP:1,
-	RIGHT:2,
-	BOTTOM:3,
-	VERTLINE:4,
-	HORIZONTLINE:5,
-	INSIDE:6,
-	OUTSIDE:7,
-	ALL:8
-};
-var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
-
-var c_oAscStyleImage = {
-    Default :0,
-    Document:1
-};
-
-var c_oAscLineDrawingRule = {
-    Left   : 0,
-    Center : 1,
-    Right  : 2,
-    Top    : 0,
-    Bottom : 2
-};
-
-// Chart defines
-var c_oAscChartType = {
-    line: "Line",
-    bar: "Bar",
-    hbar: "HBar",
-    area: "Area",
-    pie: "Pie",
-    scatter: "Scatter",
-    stock: "Stock",
-    doughnut: "Doughnut"
-};
-
-var c_oAscChartSubType = {
-    normal: "normal",
-    stacked: "stacked",
-    stackedPer: "stackedPer"
-};
-
 var align_Right   = 0;
 var align_Left    = 1;
 var align_Center  = 2;
@@ -170,10 +111,6 @@ var vertalign_SuperScript = 1;
 var vertalign_SubScript   = 2;
 var hdrftr_Header = 0x01;
 var hdrftr_Footer = 0x02;
-
-var hdrftr_Default = 0x01;
-var hdrftr_Even    = 0x02;
-var hdrftr_First   = 0x03;
 
 var c_oAscTableSelectionType = {
     Cell   : 0,
@@ -246,35 +183,6 @@ var c_oAscTableLayout = {
     Fixed   : 0x01
 };
 
-var c_oAscColor = {
-    COLOR_TYPE_SRGB   : 1,
-    COLOR_TYPE_PRST   : 2,
-    COLOR_TYPE_SCHEME : 3
-};
-
-var c_oAscFill = {
-    FILL_TYPE_BLIP   : 1,
-    FILL_TYPE_NOFILL : 2,
-    FILL_TYPE_SOLID	 : 3,
-    FILL_TYPE_PATT   : 4,
-    FILL_TYPE_GRAD   : 5
-};
-
-var c_oAscFillGradType  = {
-    GRAD_LINEAR : 1,
-    GRAD_PATH   : 2
-};
-
-var c_oAscFillBlipType = {
-    STRETCH : 1,
-    TILE    : 2
-};
-
-var c_oAscStrokeType = {
-    STROKE_NONE: 0,
-    STROKE_COLOR: 1
-};
-
 var c_oAscAlignShapeType = {
     ALIGN_LEFT: 0,
     ALIGN_RIGHT: 1,
@@ -282,48 +190,6 @@ var c_oAscAlignShapeType = {
     ALIGN_BOTTOM : 3,
     ALIGN_CENTER : 4,
     ALIGN_MIDDLE: 5
-};
-
-
-var c_oAscVerticalTextAlign = {
-    TEXT_ALIGN_BOTTOM : 0,// (Text Anchor Enum ( Bottom ))
-    TEXT_ALIGN_CTR : 1,// (Text Anchor Enum ( Center ))
-    TEXT_ALIGN_DIST : 2,// (Text Anchor Enum ( Distributed ))
-    TEXT_ALIGN_JUST : 3,// (Text Anchor Enum ( Justified ))
-    TEXT_ALIGN_TOP : 4// Top
-};
-
-var c_oAscLineJoinType = {
-    Round : 1,
-    Bevel : 2,
-    Miter : 3
-};
-
-var c_oAscLineCapType = {
-    Flat : 0,
-    Round : 1,
-    Square : 2
-};
-
-var c_oAscLineBeginType = {
-    None: 0,
-    Arrow: 1,
-    Diamond: 2,
-    Oval: 3,
-    Stealth: 4,
-    Triangle: 5
-};
-
-var c_oAscLineBeginSize = {
-    small_small : 0,
-    small_mid : 1,
-    small_large : 2,
-    mid_small : 3,
-    mid_mid : 4,
-    mid_large : 5,
-    large_small : 6,
-    large_mid : 7,
-    large_large : 8
 };
 
 var TABLE_STYLE_WIDTH_PIX   = 70;
